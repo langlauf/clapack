@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 	work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
     Purpose   
     =======   
 
-    CLANHP  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    CLANHP  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     complex hermitian matrix A,  supplied in packed form.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -57,28 +53,22 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
             set to zero.   
 
     AP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The upper or lower triangle of the hermitian matrix A, packed 
-  
-            columnwise in a linear array.  The j-th column of A is stored 
-  
+            The upper or lower triangle of the hermitian matrix A, packed   
+            columnwise in a linear array.  The j-th column of A is stored   
             in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-            Note that the  imaginary parts of the diagonal elements need 
-  
+            Note that the  imaginary parts of the diagonal elements need   
             not be set and are assumed to be zero.   
 
     WORK    (workspace) REAL array, dimension (LWORK),   
             where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise,   
             WORK is not referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -89,7 +79,7 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
     double c_abs(complex *), sqrt(doublereal);
     /* Local variables */
     static real absa;
-    static integer i, j, k;
+    static integer i__, j, k;
     static real scale;
     extern logical lsame_(char *, char *);
     static real value;
@@ -98,11 +88,10 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
     static real sum;
 
 
+    --work;
+    --ap;
 
-#define WORK(I) work[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.f;
     } else if (lsame_(norm, "M")) {
@@ -113,33 +102,33 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 	if (lsame_(uplo, "U")) {
 	    k = 0;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = k + j - 1;
-		for (i = k + 1; i <= k+j-1; ++i) {
+		for (i__ = k + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		    r__1 = value, r__2 = c_abs(&AP(i));
+		    r__1 = value, r__2 = c_abs(&ap[i__]);
 		    value = dmax(r__1,r__2);
 /* L10: */
 		}
 		k += j;
 /* Computing MAX */
 		i__2 = k;
-		r__2 = value, r__3 = (r__1 = AP(k).r, dabs(r__1));
+		r__2 = value, r__3 = (r__1 = ap[i__2].r, dabs(r__1));
 		value = dmax(r__2,r__3);
 /* L20: */
 	    }
 	} else {
 	    k = 1;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 		i__2 = k;
-		r__2 = value, r__3 = (r__1 = AP(k).r, dabs(r__1));
+		r__2 = value, r__3 = (r__1 = ap[i__2].r, dabs(r__1));
 		value = dmax(r__2,r__3);
 		i__2 = k + *n - j;
-		for (i = k + 1; i <= k+*n-j; ++i) {
+		for (i__ = k + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		    r__1 = value, r__2 = c_abs(&AP(i));
+		    r__1 = value, r__2 = c_abs(&ap[i__]);
 		    value = dmax(r__1,r__2);
 /* L30: */
 		}
@@ -147,8 +136,7 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 /* L40: */
 	    }
 	}
-    } else if (lsame_(norm, "I") || lsame_(norm, "O") || *(
-	    unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "I") || lsame_(norm, "O") || *(unsigned char *)norm == '1') {
 
 /*        Find normI(A) ( = norm1(A), since A is hermitian). */
 
@@ -156,44 +144,44 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 	k = 1;
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		sum = 0.f;
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    absa = c_abs(&AP(k));
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    absa = c_abs(&ap[k]);
 		    sum += absa;
-		    WORK(i) += absa;
+		    work[i__] += absa;
 		    ++k;
 /* L50: */
 		}
 		i__2 = k;
-		WORK(j) = sum + (r__1 = AP(k).r, dabs(r__1));
+		work[j] = sum + (r__1 = ap[i__2].r, dabs(r__1));
 		++k;
 /* L60: */
 	    }
 	    i__1 = *n;
-	    for (i = 1; i <= *n; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		r__1 = value, r__2 = WORK(i);
+		r__1 = value, r__2 = work[i__];
 		value = dmax(r__1,r__2);
 /* L70: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		WORK(i) = 0.f;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		work[i__] = 0.f;
 /* L80: */
 	    }
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = k;
-		sum = WORK(j) + (r__1 = AP(k).r, dabs(r__1));
+		sum = work[j] + (r__1 = ap[i__2].r, dabs(r__1));
 		++k;
 		i__2 = *n;
-		for (i = j + 1; i <= *n; ++i) {
-		    absa = c_abs(&AP(k));
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    absa = c_abs(&ap[k]);
 		    sum += absa;
-		    WORK(i) += absa;
+		    work[i__] += absa;
 		    ++k;
 /* L90: */
 		}
@@ -210,17 +198,17 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 	k = 2;
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 2; j <= *n; ++j) {
+	    for (j = 2; j <= i__1; ++j) {
 		i__2 = j - 1;
-		classq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		classq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		k += j;
 /* L110: */
 	    }
 	} else {
 	    i__1 = *n - 1;
-	    for (j = 1; j <= *n-1; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j;
-		classq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		classq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		k = k + *n - j + 1;
 /* L120: */
 	    }
@@ -228,11 +216,11 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 	sum *= 2;
 	k = 1;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = k;
-	    if (AP(k).r != 0.f) {
+	    if (ap[i__2].r != 0.f) {
 		i__2 = k;
-		absa = (r__1 = AP(k).r, dabs(r__1));
+		absa = (r__1 = ap[i__2].r, dabs(r__1));
 		if (scale < absa) {
 /* Computing 2nd power */
 		    r__1 = scale / absa;
@@ -245,9 +233,9 @@ doublereal clanhp_(char *norm, char *uplo, integer *n, complex *ap, real *
 		}
 	    }
 	    if (lsame_(uplo, "U")) {
-		k = k + i + 1;
+		k = k + i__ + 1;
 	    } else {
-		k = k + *n - i + 1;
+		k = k + *n - i__ + 1;
 	    }
 /* L130: */
 	}

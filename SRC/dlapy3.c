@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-doublereal dlapy3_(doublereal *x, doublereal *y, doublereal *z)
+doublereal dlapy3_(doublereal *x, doublereal *y, doublereal *z__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -22,10 +23,8 @@ doublereal dlapy3_(doublereal *x, doublereal *y, doublereal *z)
     Z       (input) DOUBLE PRECISION   
             X, Y and Z specify the values x, y and z.   
 
-    ===================================================================== 
-*/
-/* >>Start of File<<   
-       System generated locals */
+    ===================================================================== */
+    /* System generated locals */
     doublereal ret_val, d__1, d__2, d__3;
     /* Builtin functions */
     double sqrt(doublereal);
@@ -36,7 +35,7 @@ doublereal dlapy3_(doublereal *x, doublereal *y, doublereal *z)
 
     xabs = abs(*x);
     yabs = abs(*y);
-    zabs = abs(*z);
+    zabs = abs(*z__);
 /* Computing MAX */
     d__1 = max(xabs,yabs);
     w = max(d__1,zabs);

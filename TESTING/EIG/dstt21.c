@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -41,7 +42,10 @@ static doublereal c_b19 = 1.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -54,10 +58,8 @@ static doublereal c_b19 = 1.;
 
        A = U S U'   
 
-    where ' means transpose, A is symmetric tridiagonal, U is orthogonal, 
-  
-    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1). 
-  
+    where ' means transpose, A is symmetric tridiagonal, U is orthogonal,   
+    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1).   
     Two tests are performed:   
 
        RESULT(1) = | A - U S U' | / ( |A| n ulp )   
@@ -68,8 +70,7 @@ static doublereal c_b19 = 1.;
     =========   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DSTT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, DSTT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -84,8 +85,7 @@ static doublereal c_b19 = 1.;
     AE      (input) DOUBLE PRECISION array, dimension (N-1)   
             The off-diagonal of the original (unfactored) matrix A.  A   
             is assumed to be symmetric tridiagonal.  AE(1) is the (1,2)   
-            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc. 
-  
+            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc.   
 
     SD      (input) DOUBLE PRECISION array, dimension (N)   
             The diagonal of the (symmetric tri-) diagonal matrix S.   
@@ -109,8 +109,7 @@ static doublereal c_b19 = 1.;
             values are currently limited to 1/ulp, to avoid overflow.   
             RESULT(1) is always modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Constants   
@@ -121,7 +120,7 @@ static doublereal c_b19 = 1.;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --result;
@@ -170,7 +169,7 @@ static doublereal c_b19 = 1.;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	d__1 = -sd[j];
-	dsyr_("L", n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1], n);
+	dsyr_("L", n, &d__1, &u_ref(1, j), &c__1, &work[1], n);
 /* L20: */
     }
 
@@ -178,8 +177,8 @@ static doublereal c_b19 = 1.;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    d__1 = -se[j];
-	    dsyr2_("L", n, &d__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1], n);
+	    dsyr2_("L", n, &d__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1], n);
 /* L30: */
 	}
     }
@@ -227,4 +226,7 @@ static doublereal c_b19 = 1.;
 /*     End of DSTT21 */
 
 } /* dstt21_ */
+
+#undef u_ref
+
 

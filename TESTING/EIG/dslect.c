@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,12 +25,12 @@ logical dslect_(doublereal *zr, doublereal *zi)
 
     /* Local variables */
     static doublereal rmin;
-    static integer i;
+    static integer i__;
     static doublereal x;
     extern doublereal dlapy2_(doublereal *, doublereal *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -40,8 +41,7 @@ logical dslect_(doublereal *zr, doublereal *zi)
 
     DSLECT returns .TRUE. if the eigenvalue ZR+sqrt(-1)*ZI is to be   
     selected, and otherwise it returns .FALSE.   
-    It is used by DCHK41 to test if DGEES succesfully sorts eigenvalues, 
-  
+    It is used by DCHK41 to test if DGEES succesfully sorts eigenvalues,   
     and by DCHK43 to test if DGEESX succesfully sorts eigenvalues.   
 
     The common block /SSLCT/ controls how eigenvalues are selected.   
@@ -59,8 +59,7 @@ logical dslect_(doublereal *zr, doublereal *zi)
     ZI      (input) DOUBLE PRECISION   
             The imaginary part of a complex eigenvalue ZR + i*ZI.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (sslct_1.selopt == 0) {
@@ -68,13 +67,13 @@ logical dslect_(doublereal *zr, doublereal *zi)
     } else {
 	rmin = 0.;
 	i__1 = sslct_1.seldim;
-	for (i = 1; i <= i__1; ++i) {
-	    d__1 = *zr - sslct_1.selwr[i - 1];
-	    d__2 = *zi - sslct_1.selwi[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__1 = *zr - sslct_1.selwr[i__ - 1];
+	    d__2 = *zi - sslct_1.selwi[i__ - 1];
 	    x = dlapy2_(&d__1, &d__2);
 	    if (x <= rmin) {
 		rmin = x;
-		ret_val = sslct_1.selval[i - 1];
+		ret_val = sslct_1.selval[i__ - 1];
 	    }
 /* L10: */
 	}

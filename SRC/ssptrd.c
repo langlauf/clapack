@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int ssptrd_(char *uplo, integer *n, real *ap, real *d, real *
-	e, real *tau, integer *info)
+/* Subroutine */ int ssptrd_(char *uplo, integer *n, real *ap, real *d__, 
+	real *e, real *tau, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -27,26 +28,20 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
-            On exit, if UPLO = 'U', the diagonal and first superdiagonal 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
+            On exit, if UPLO = 'U', the diagonal and first superdiagonal   
             of A are overwritten by the corresponding elements of the   
             tridiagonal matrix T, and the elements above the first   
             superdiagonal, with the array TAU, represent the orthogonal   
             matrix Q as a product of elementary reflectors; if UPLO   
             = 'L', the diagonal and first subdiagonal of A are over-   
             written by the corresponding elements of the tridiagonal   
-            matrix T, and the elements below the first subdiagonal, with 
-  
-            the array TAU, represent the orthogonal matrix Q as a product 
-  
+            matrix T, and the elements below the first subdiagonal, with   
+            the array TAU, represent the orthogonal matrix Q as a product   
             of elementary reflectors. See Further Details.   
 
     D       (output) REAL array, dimension (N)   
@@ -55,12 +50,10 @@
 
     E       (output) REAL array, dimension (N-1)   
             The off-diagonal elements of the tridiagonal matrix T:   
-            E(i) = A(i,i+1) if UPLO = 'U', E(i) = A(i+1,i) if UPLO = 'L'. 
-  
+            E(i) = A(i,i+1) if UPLO = 'U', E(i) = A(i+1,i) if UPLO = 'L'.   
 
     TAU     (output) REAL array, dimension (N-1)   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     INFO    (output) INTEGER   
@@ -70,8 +63,7 @@
     Further Details   
     ===============   
 
-    If UPLO = 'U', the matrix Q is represented as a product of elementary 
-  
+    If UPLO = 'U', the matrix Q is represented as a product of elementary   
     reflectors   
 
        Q = H(n-1) . . . H(2) H(1).   
@@ -84,8 +76,7 @@
     v(i+1:n) = 0 and v(i) = 1; v(1:i-1) is stored on exit in AP,   
     overwriting A(1:i-1,i+1), and tau is stored in TAU(i).   
 
-    If UPLO = 'L', the matrix Q is represented as a product of elementary 
-  
+    If UPLO = 'L', the matrix Q is represented as a product of elementary   
     reflectors   
 
        Q = H(1) H(2) . . . H(n-1).   
@@ -98,15 +89,12 @@
     v(1:i) = 0 and v(i+1) = 1; v(i+2:n) is stored on exit in AP,   
     overwriting A(i+2:n,i), and tau is stored in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b8 = 0.f;
@@ -117,7 +105,7 @@
     /* Local variables */
     static real taui;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int sspr2_(char *, integer *, real *, real *, 
 	    integer *, real *, integer *, real *);
     static real alpha;
@@ -133,13 +121,12 @@
     static integer i1i1;
 
 
+    --tau;
+    --e;
+    --d__;
+    --ap;
 
-#define TAU(I) tau[(I)-1]
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -165,48 +152,45 @@
           I1 is the index in AP of A(1,I+1). */
 
 	i1 = *n * (*n - 1) / 2 + 1;
-	for (i = *n - 1; i >= 1; --i) {
+	for (i__ = *n - 1; i__ >= 1; --i__) {
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'
-   
+/*           Generate elementary reflector H(i) = I - tau * v * v'   
              to annihilate A(1:i-1,i+1) */
 
-	    slarfg_(&i, &AP(i1 + i - 1), &AP(i1), &c__1, &taui);
-	    E(i) = AP(i1 + i - 1);
+	    slarfg_(&i__, &ap[i1 + i__ - 1], &ap[i1], &c__1, &taui);
+	    e[i__] = ap[i1 + i__ - 1];
 
 	    if (taui != 0.f) {
 
 /*              Apply H(i) from both sides to A(1:i,1:i) */
 
-		AP(i1 + i - 1) = 1.f;
+		ap[i1 + i__ - 1] = 1.f;
 
-/*              Compute  y := tau * A * v  storing y in TAU(1:
-i) */
+/*              Compute  y := tau * A * v  storing y in TAU(1:i) */
 
-		sspmv_(uplo, &i, &taui, &AP(1), &AP(i1), &c__1, &c_b8, &TAU(1)
-			, &c__1);
+		sspmv_(uplo, &i__, &taui, &ap[1], &ap[i1], &c__1, &c_b8, &tau[
+			1], &c__1);
 
 /*              Compute  w := y - 1/2 * tau * (y'*v) * v */
 
-		alpha = taui * -.5f * sdot_(&i, &TAU(1), &c__1, &AP(i1), &
+		alpha = taui * -.5f * sdot_(&i__, &tau[1], &c__1, &ap[i1], &
 			c__1);
-		saxpy_(&i, &alpha, &AP(i1), &c__1, &TAU(1), &c__1);
+		saxpy_(&i__, &alpha, &ap[i1], &c__1, &tau[1], &c__1);
 
-/*              Apply the transformation as a rank-2 update: 
-  
+/*              Apply the transformation as a rank-2 update:   
                    A := A - v * w' - w * v' */
 
-		sspr2_(uplo, &i, &c_b14, &AP(i1), &c__1, &TAU(1), &c__1, &AP(
-			1));
+		sspr2_(uplo, &i__, &c_b14, &ap[i1], &c__1, &tau[1], &c__1, &
+			ap[1]);
 
-		AP(i1 + i - 1) = E(i);
+		ap[i1 + i__ - 1] = e[i__];
 	    }
-	    D(i + 1) = AP(i1 + i);
-	    TAU(i) = taui;
-	    i1 -= i;
+	    d__[i__ + 1] = ap[i1 + i__];
+	    tau[i__] = taui;
+	    i1 -= i__;
 /* L10: */
 	}
-	D(1) = AP(1);
+	d__[1] = ap[1];
     } else {
 
 /*        Reduce the lower triangle of A. II is the index in AP of   
@@ -214,55 +198,51 @@ i) */
 
 	ii = 1;
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
-	    i1i1 = ii + *n - i + 1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i1i1 = ii + *n - i__ + 1;
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'
-   
+/*           Generate elementary reflector H(i) = I - tau * v * v'   
              to annihilate A(i+2:n,i) */
 
-	    i__2 = *n - i;
-	    slarfg_(&i__2, &AP(ii + 1), &AP(ii + 2), &c__1, &taui);
-	    E(i) = AP(ii + 1);
+	    i__2 = *n - i__;
+	    slarfg_(&i__2, &ap[ii + 1], &ap[ii + 2], &c__1, &taui);
+	    e[i__] = ap[ii + 1];
 
 	    if (taui != 0.f) {
 
-/*              Apply H(i) from both sides to A(i+1:n,i+1:n) 
-*/
+/*              Apply H(i) from both sides to A(i+1:n,i+1:n) */
 
-		AP(ii + 1) = 1.f;
+		ap[ii + 1] = 1.f;
 
-/*              Compute  y := tau * A * v  storing y in TAU(i:
-n-1) */
+/*              Compute  y := tau * A * v  storing y in TAU(i:n-1) */
 
-		i__2 = *n - i;
-		sspmv_(uplo, &i__2, &taui, &AP(i1i1), &AP(ii + 1), &c__1, &
-			c_b8, &TAU(i), &c__1);
+		i__2 = *n - i__;
+		sspmv_(uplo, &i__2, &taui, &ap[i1i1], &ap[ii + 1], &c__1, &
+			c_b8, &tau[i__], &c__1);
 
 /*              Compute  w := y - 1/2 * tau * (y'*v) * v */
 
-		i__2 = *n - i;
-		alpha = taui * -.5f * sdot_(&i__2, &TAU(i), &c__1, &AP(ii + 1)
-			, &c__1);
-		i__2 = *n - i;
-		saxpy_(&i__2, &alpha, &AP(ii + 1), &c__1, &TAU(i), &c__1);
+		i__2 = *n - i__;
+		alpha = taui * -.5f * sdot_(&i__2, &tau[i__], &c__1, &ap[ii + 
+			1], &c__1);
+		i__2 = *n - i__;
+		saxpy_(&i__2, &alpha, &ap[ii + 1], &c__1, &tau[i__], &c__1);
 
-/*              Apply the transformation as a rank-2 update: 
-  
+/*              Apply the transformation as a rank-2 update:   
                    A := A - v * w' - w * v' */
 
-		i__2 = *n - i;
-		sspr2_(uplo, &i__2, &c_b14, &AP(ii + 1), &c__1, &TAU(i), &
-			c__1, &AP(i1i1));
+		i__2 = *n - i__;
+		sspr2_(uplo, &i__2, &c_b14, &ap[ii + 1], &c__1, &tau[i__], &
+			c__1, &ap[i1i1]);
 
-		AP(ii + 1) = E(i);
+		ap[ii + 1] = e[i__];
 	    }
-	    D(i) = AP(ii);
-	    TAU(i) = taui;
+	    d__[i__] = ap[ii];
+	    tau[i__] = taui;
 	    ii = i1i1;
 /* L20: */
 	}
-	D(*n) = AP(ii);
+	d__[*n] = ap[ii];
     }
 
     return 0;

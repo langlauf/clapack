@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -30,14 +31,14 @@ static integer c__1 = 1;
 /* Subroutine */ int cerrbd_(char *path, integer *nunit)
 {
     /* Format strings */
-    static char fmt_9999[] = "(1x,a3,\002 passed the tests of the error ex"
-	    "its\002)";
-    static char fmt_9998[] = "(\002 *** \002,a3,\002 failed the tests of the"
-	    " error exits ***\002)";
+    static char fmt_9999[] = "(1x,a3,\002 routines passed the tests of the e"
+	    "rror exits (\002,i3,\002 tests done)\002)";
+    static char fmt_9998[] = "(\002 *** \002,a3,\002 routines failed the tes"
+	    "ts of the error \002,\002exits ***\002)";
 
     /* System generated locals */
     integer i__1;
-    doublereal d__1;
+    real r__1;
 
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
@@ -47,16 +48,15 @@ static integer c__1 = 1;
     /* Local variables */
     static integer info;
     static complex a[16]	/* was [4][4] */;
-    static real d[4], e[4];
-    static integer i, j;
+    static real d__[4], e[4];
+    static integer i__, j;
     static complex u[16]	/* was [4][4] */, v[16]	/* was [4][4] */, w[4]
 	    ;
     static char c2[2];
-    extern /* Subroutine */ int cgebd2_(integer *, integer *, complex *, 
+    extern /* Subroutine */ int cgebrd_(integer *, integer *, complex *, 
 	    integer *, real *, real *, complex *, complex *, complex *, 
-	    integer *), cgebrd_(integer *, integer *, complex *, integer *, 
-	    real *, real *, complex *, complex *, complex *, integer *, 
-	    integer *);
+	    integer *, integer *);
+    static integer nt;
     static complex tp[4], tq[4];
     static real rw[16];
     extern /* Subroutine */ int cbdsqr_(char *, integer *, integer *, integer 
@@ -72,22 +72,25 @@ static integer c__1 = 1;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
-    static cilist io___15 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___16 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___16 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___17 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       December 22, 1999   
 
 
     Purpose   
     =======   
 
-    CERRBD tests the error exits for CGEBRD, CUNGBR, CUNMBR, and CBDSQR. 
-  
+    CERRBD tests the error exits for CGEBRD, CUNGBR, CUNMBR, and CBDSQR.   
 
     Arguments   
     =========   
@@ -98,28 +101,28 @@ static integer c__1 = 1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    a[i__1].r = d__1, a[i__1].i = 0.f;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    a[i__1].r = r__1, a[i__1].i = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     infoc_1.ok = TRUE_;
+    nt = 0;
 
 /*     Test error exits of the SVD routines. */
 
@@ -127,43 +130,28 @@ static integer c__1 = 1;
 
 /*        CGEBRD */
 
-	s_copy(srnamc_1.srnamt, "CGEBRD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGEBRD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgebrd_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	cgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("CGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgebrd_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	cgebrd_(&c__0, &c_n1, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("CGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgebrd_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &c__2, &info);
+	cgebrd_(&c__2, &c__1, a, &c__1, d__, e, tq, tp, w, &c__2, &info);
 	chkxer_("CGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	cgebrd_(&c__2, &c__1, a, &c__2, d, e, tq, tp, w, &c__1, &info);
+	cgebrd_(&c__2, &c__1, a, &c__2, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("CGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
-
-/*        CGEBD2 */
-
-	s_copy(srnamc_1.srnamt, "CGEBD2", 6L, 6L);
-	infoc_1.infot = 1;
-	cgebd2_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("CGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
-	infoc_1.infot = 2;
-	cgebd2_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("CGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
-	infoc_1.infot = 4;
-	cgebd2_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("CGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
+	nt += 4;
 
 /*        CUNGBR */
 
-	s_copy(srnamc_1.srnamt, "CUNGBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CUNGBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cungbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("CUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -204,10 +192,11 @@ static integer c__1 = 1;
 	cungbr_("Q", &c__2, &c__2, &c__1, a, &c__2, tq, w, &c__1, &info);
 	chkxer_("CUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 10;
 
 /*        CUNMBR */
 
-	s_copy(srnamc_1.srnamt, "CUNMBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CUNMBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
 		 &c__1, &info);
@@ -273,63 +262,66 @@ static integer c__1 = 1;
 		 &c__1, &info);
 	chkxer_("CUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 13;
 
 /*        CBDSQR */
 
-	s_copy(srnamc_1.srnamt, "CBDSQR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CBDSQR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	cbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	cbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	cbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	cbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("CBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 8;
     }
 
 /*     Print a summary line. */
 
     if (infoc_1.ok) {
-	io___15.ciunit = infoc_1.nout;
-	s_wsfe(&io___15);
-	do_fio(&c__1, path, 3L);
-	e_wsfe();
-    } else {
 	io___16.ciunit = infoc_1.nout;
 	s_wsfe(&io___16);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	e_wsfe();
+    } else {
+	io___17.ciunit = infoc_1.nout;
+	s_wsfe(&io___17);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -339,4 +331,8 @@ static integer c__1 = 1;
 /*     End of CERRBD */
 
 } /* cerrbd_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,7 @@ static integer c__1 = 1;
     double r_imag(complex *);
 
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern /* Subroutine */ int cherk_(char *, char *, integer *, integer *, 
@@ -44,10 +45,14 @@ static integer c__1 = 1;
     static complex tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -74,8 +79,7 @@ static integer c__1 = 1;
     =========   
 
     ROWCOL  (input) CHARACTER   
-            Specifies whether the rows or columns of U should be checked 
-  
+            Specifies whether the rows or columns of U should be checked   
             for orthogonality.  Used only if M = N.   
             = 'R':  Check for orthogonal rows of U   
             = 'C':  Check for orthogonal columns of U   
@@ -106,17 +110,15 @@ static integer c__1 = 1;
             code.   
 
     RESID   (output) REAL   
-            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or 
-  
+            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or   
             RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --rwork;
@@ -157,21 +159,20 @@ static integer c__1 = 1;
 
 	*resid = clansy_("1", "Upper", &mnmin, &work[1], &ldwork, &rwork[1]);
 	*resid = *resid / (real) k / eps;
-    } else if (*(unsigned char *)transu == 'T') {
+    } else if (*(unsigned char *)transu == 'C') {
 
 /*        Find the maximum element in abs( I - U'*U ) / ( m * EPS ) */
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		if (i != j) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (i__ != j) {
 		    tmp.r = 0.f, tmp.i = 0.f;
 		} else {
 		    tmp.r = 1.f, tmp.i = 0.f;
 		}
-		cdotc_(&q__2, m, &u[i * u_dim1 + 1], &c__1, &u[j * u_dim1 + 1]
-			, &c__1);
+		cdotc_(&q__2, m, &u_ref(1, i__), &c__1, &u_ref(1, j), &c__1);
 		q__1.r = tmp.r - q__2.r, q__1.i = tmp.i - q__2.i;
 		tmp.r = q__1.r, tmp.i = q__1.i;
 /* Computing MAX */
@@ -190,13 +191,13 @@ static integer c__1 = 1;
 	i__1 = *m;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		if (i != j) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (i__ != j) {
 		    tmp.r = 0.f, tmp.i = 0.f;
 		} else {
 		    tmp.r = 1.f, tmp.i = 0.f;
 		}
-		cdotc_(&q__2, n, &u[j + u_dim1], ldu, &u[i + u_dim1], ldu);
+		cdotc_(&q__2, n, &u_ref(j, 1), ldu, &u_ref(i__, 1), ldu);
 		q__1.r = tmp.r - q__2.r, q__1.i = tmp.i - q__2.i;
 		tmp.r = q__1.r, tmp.i = q__1.i;
 /* Computing MAX */
@@ -214,4 +215,8 @@ static integer c__1 = 1;
 /*     End of CUNT01 */
 
 } /* cunt01_ */
+
+#undef u_ref
+#undef u_subscr
+
 

@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaruv_(integer *iseed, integer *n, real *x)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -11,8 +12,7 @@
     Purpose   
     =======   
 
-    SLARUV returns a vector of n random real numbers from a uniform (0,1) 
-  
+    SLARUV returns a vector of n random real numbers from a uniform (0,1)   
     distribution (n <= 128).   
 
     This is an auxiliary routine called by SLARNV and CLARNV.   
@@ -21,8 +21,7 @@
     =========   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array 
-  
+            On entry, the seed of the random number generator; the array   
             elements must be between 0 and 4095, and ISEED(4) must be   
             odd.   
             On exit, the seed is updated.   
@@ -46,12 +45,9 @@
     per element. Hence the routine is portable across machines with   
     integers of 32 bits or more.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Initialized data */
     static integer mm[512]	/* was [128][4] */ = { 494,2637,255,2008,1253,
 	    3344,4084,1739,3143,3468,688,1657,1238,3166,1292,3422,1270,2016,
@@ -95,44 +91,41 @@
     /* System generated locals */
     integer i__1;
     /* Local variables */
-    static integer i, i1, i2, i3, i4, it1, it2, it3, it4;
+    static integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
+#define mm_ref(a_1,a_2) mm[(a_2)*128 + a_1 - 129]
 
+    --iseed;
+    --x;
 
-#define MM(I) mm[(I)]
-#define WAS(I) was[(I)]
-#define ISEED(I) iseed[(I)-1]
-#define X(I) x[(I)-1]
+    /* Function Body */
 
-
-
-    i1 = ISEED(1);
-    i2 = ISEED(2);
-    i3 = ISEED(3);
-    i4 = ISEED(4);
+    i1 = iseed[1];
+    i2 = iseed[2];
+    i3 = iseed[3];
+    i4 = iseed[4];
 
     i__1 = min(*n,128);
-    for (i = 1; i <= min(*n,128); ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*        Multiply the seed by i-th power of the multiplier modulo 2**
-48 */
+/*        Multiply the seed by i-th power of the multiplier modulo 2**48 */
 
-	it4 = i4 * MM(i + 383);
+	it4 = i4 * mm_ref(i__, 4);
 	it3 = it4 / 4096;
 	it4 -= it3 << 12;
-	it3 = it3 + i3 * MM(i + 383) + i4 * MM(i + 255);
+	it3 = it3 + i3 * mm_ref(i__, 4) + i4 * mm_ref(i__, 3);
 	it2 = it3 / 4096;
 	it3 -= it2 << 12;
-	it2 = it2 + i2 * MM(i + 383) + i3 * MM(i + 255) + i4 * MM(i + 127);
+	it2 = it2 + i2 * mm_ref(i__, 4) + i3 * mm_ref(i__, 3) + i4 * mm_ref(
+		i__, 2);
 	it1 = it2 / 4096;
 	it2 -= it1 << 12;
-	it1 = it1 + i1 * MM(i + 383) + i2 * MM(i + 255) + i3 * MM(i + 127) + 
-		i4 * MM(i - 1);
+	it1 = it1 + i1 * mm_ref(i__, 4) + i2 * mm_ref(i__, 3) + i3 * mm_ref(
+		i__, 2) + i4 * mm_ref(i__, 1);
 	it1 %= 4096;
 
-/*        Convert 48-bit integer to a real number in the interval (0,1
-) */
+/*        Convert 48-bit integer to a real number in the interval (0,1) */
 
-	X(i) = ((real) it1 + ((real) it2 + ((real) it3 + (real) it4 * 
+	x[i__] = ((real) it1 + ((real) it2 + ((real) it3 + (real) it4 * 
 		2.44140625e-4f) * 2.44140625e-4f) * 2.44140625e-4f) * 
 		2.44140625e-4f;
 /* L10: */
@@ -140,13 +133,16 @@
 
 /*     Return final value of seed */
 
-    ISEED(1) = it1;
-    ISEED(2) = it2;
-    ISEED(3) = it3;
-    ISEED(4) = it4;
+    iseed[1] = it1;
+    iseed[2] = it2;
+    iseed[3] = it3;
+    iseed[4] = it4;
     return 0;
 
 /*     End of SLARUV */
 
 } /* slaruv_ */
+
+#undef mm_ref
+
 

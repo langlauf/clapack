@@ -1,15 +1,16 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dstebz_(char *range, char *order, integer *n, doublereal 
 	*vl, doublereal *vu, integer *il, integer *iu, doublereal *abstol, 
-	doublereal *d, doublereal *e, integer *m, integer *nsplit, doublereal 
-	*w, integer *iblock, integer *isplit, doublereal *work, integer *
-	iwork, integer *info)
+	doublereal *d__, doublereal *e, integer *m, integer *nsplit, 
+	doublereal *w, integer *iblock, integer *isplit, doublereal *work, 
+	integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -36,14 +37,12 @@
             = 'A': ("All")   all eigenvalues will be found.   
             = 'V': ("Value") all eigenvalues in the half-open interval   
                              (VL, VU] will be found.   
-            = 'I': ("Index") the IL-th through IU-th eigenvalues (of the 
-  
+            = 'I': ("Index") the IL-th through IU-th eigenvalues (of the   
                              entire matrix) will be found.   
 
     ORDER   (input) CHARACTER   
             = 'B': ("By Block") the eigenvalues will be grouped by   
-                                split-off block (see IBLOCK, ISPLIT) and 
-  
+                                split-off block (see IBLOCK, ISPLIT) and   
                                 ordered from smallest to largest within   
                                 the block.   
             = 'E': ("Entire matrix")   
@@ -57,8 +56,7 @@
     VL      (input) DOUBLE PRECISION   
     VU      (input) DOUBLE PRECISION   
             If RANGE='V', the lower and upper bounds of the interval to   
-            be searched for eigenvalues.  Eigenvalues less than or equal 
-  
+            be searched for eigenvalues.  Eigenvalues less than or equal   
             to VL, or greater than VU, will not be returned.  VL < VU.   
             Not referenced if RANGE = 'A' or 'I'.   
 
@@ -73,20 +71,17 @@
             The absolute tolerance for the eigenvalues.  An eigenvalue   
             (or cluster) is considered to be located if it has been   
             determined to lie in an interval whose width is ABSTOL or   
-            less.  If ABSTOL is less than or equal to zero, then ULP*|T| 
-  
+            less.  If ABSTOL is less than or equal to zero, then ULP*|T|   
             will be used, where |T| means the 1-norm of T.   
 
             Eigenvalues will be computed most accurately when ABSTOL is   
-            set to twice the underflow threshold 2*DLAMCH('S'), not zero. 
-  
+            set to twice the underflow threshold 2*DLAMCH('S'), not zero.   
 
     D       (input) DOUBLE PRECISION array, dimension (N)   
             The n diagonal elements of the tridiagonal matrix T.   
 
     E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the tridiagonal matrix T. 
-  
+            The (n-1) off-diagonal elements of the tridiagonal matrix T.   
 
     M       (output) INTEGER   
             The actual number of eigenvalues found. 0 <= M <= N.   
@@ -110,10 +105,8 @@
             workspace.)   
 
     ISPLIT  (output) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices. 
-  
-            The first submatrix consists of rows/columns 1 to ISPLIT(1), 
-  
+            The splitting points, at which T breaks up into submatrices.   
+            The first submatrix consists of rows/columns 1 to ISPLIT(1),   
             the second of rows/columns ISPLIT(1)+1 through ISPLIT(2),   
             etc., and the NSPLIT-th consists of rows/columns   
             ISPLIT(NSPLIT-1)+1 through ISPLIT(NSPLIT)=N.   
@@ -131,10 +124,8 @@
             > 0:  some or all of the eigenvalues failed to converge or   
                   were not computed:   
                   =1 or 3: Bisection failed to converge for some   
-                          eigenvalues; these eigenvalues are flagged by a 
-  
-                          negative block number.  The effect is that the 
-  
+                          eigenvalues; these eigenvalues are flagged by a   
+                          negative block number.  The effect is that the   
                           eigenvalues may not be as accurate as the   
                           absolute and relative tolerances.  This is   
                           generally caused by unexpectedly inaccurate   
@@ -144,10 +135,8 @@
                           Effect: M < IU+1-IL   
                           Cause:  non-monotonic arithmetic, causing the   
                                   Sturm sequence to be non-monotonic.   
-                          Cure:   recalculate, using RANGE='A', and pick 
-  
-                                  out eigenvalues IL:IU.  In some cases, 
-  
+                          Cure:   recalculate, using RANGE='A', and pick   
+                                  out eigenvalues IL:IU.  In some cases,   
                                   increasing the PARAMETER "FUDGE" may   
                                   make things work.   
                   = 4:    RANGE='I', and the Gershgorin interval   
@@ -168,21 +157,17 @@
             the next larger floating point number.)   
 
     FUDGE   DOUBLE PRECISION, default = 2   
-            A "fudge factor" to widen the Gershgorin intervals.  Ideally, 
-  
+            A "fudge factor" to widen the Gershgorin intervals.  Ideally,   
             a value of 1 should work, but on machines with sloppy   
             arithmetic, this needs to be larger.  The default for   
             publicly released versions should be large enough to handle   
             the worst machine around.  Note that this has no effect   
             on accuracy of the solution.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -233,17 +218,15 @@
     static doublereal tmp1, tmp2;
 
 
+    --iwork;
+    --work;
+    --isplit;
+    --iblock;
+    --w;
+    --e;
+    --d__;
 
-#define IDUMMA(I) idumma[(I)]
-#define IWORK(I) iwork[(I)-1]
-#define WORK(I) work[(I)-1]
-#define ISPLIT(I) isplit[(I)-1]
-#define IBLOCK(I) iblock[(I)-1]
-#define W(I) w[(I)-1]
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
 
 /*     Decode RANGE */
@@ -276,8 +259,10 @@
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
-    } else if (irange == 2 && *vl >= *vu) {
-	*info = -5;
+    } else if (irange == 2) {
+	if (*vl >= *vu) {
+	    *info = -5;
+	}
     } else if (irange == 3 && (*il < 1 || *il > max(1,*n))) {
 	*info = -6;
     } else if (irange == 3 && (*iu < min(*n,*il) || *iu > *n)) {
@@ -316,7 +301,8 @@
     safemn = dlamch_("S");
     ulp = dlamch_("P");
     rtoli = ulp * 2.;
-    nb = ilaenv_(&c__1, "DSTEBZ", " ", n, &c_n1, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "DSTEBZ", " ", n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
     if (nb <= 1) {
 	nb = 0;
     }
@@ -325,12 +311,12 @@
 
     if (*n == 1) {
 	*nsplit = 1;
-	ISPLIT(1) = 1;
-	if (irange == 2 && (*vl >= D(1) || *vu < D(1))) {
+	isplit[1] = 1;
+	if (irange == 2 && (*vl >= d__[1] || *vu < d__[1])) {
 	    *m = 0;
 	} else {
-	    W(1) = D(1);
-	    IBLOCK(1) = 1;
+	    w[1] = d__[1];
+	    iblock[1] = 1;
 	    *m = 1;
 	}
 	return 0;
@@ -339,28 +325,29 @@
 /*     Compute Splitting Points */
 
     *nsplit = 1;
-    WORK(*n) = 0.;
+    work[*n] = 0.;
     pivmin = 1.;
 
+/* DIR$ NOVECTOR */
     i__1 = *n;
-    for (j = 2; j <= *n; ++j) {
+    for (j = 2; j <= i__1; ++j) {
 /* Computing 2nd power */
-	d__1 = E(j - 1);
+	d__1 = e[j - 1];
 	tmp1 = d__1 * d__1;
 /* Computing 2nd power */
 	d__2 = ulp;
-	if ((d__1 = D(j) * D(j - 1), abs(d__1)) * (d__2 * d__2) + safemn > 
-		tmp1) {
-	    ISPLIT(*nsplit) = j - 1;
+	if ((d__1 = d__[j] * d__[j - 1], abs(d__1)) * (d__2 * d__2) + safemn 
+		> tmp1) {
+	    isplit[*nsplit] = j - 1;
 	    ++(*nsplit);
-	    WORK(j - 1) = 0.;
+	    work[j - 1] = 0.;
 	} else {
-	    WORK(j - 1) = tmp1;
+	    work[j - 1] = tmp1;
 	    pivmin = max(pivmin,tmp1);
 	}
 /* L10: */
     }
-    ISPLIT(*nsplit) = *n;
+    isplit[*nsplit] = *n;
     pivmin *= safemn;
 
 /*     Compute Interval and ATOLI */
@@ -373,28 +360,28 @@
           Compute Gershgorin interval for entire (split) matrix   
           and use it as the initial interval */
 
-	gu = D(1);
-	gl = D(1);
+	gu = d__[1];
+	gl = d__[1];
 	tmp1 = 0.;
 
 	i__1 = *n - 1;
-	for (j = 1; j <= *n-1; ++j) {
-	    tmp2 = sqrt(WORK(j));
+	for (j = 1; j <= i__1; ++j) {
+	    tmp2 = sqrt(work[j]);
 /* Computing MAX */
-	    d__1 = gu, d__2 = D(j) + tmp1 + tmp2;
+	    d__1 = gu, d__2 = d__[j] + tmp1 + tmp2;
 	    gu = max(d__1,d__2);
 /* Computing MIN */
-	    d__1 = gl, d__2 = D(j) - tmp1 - tmp2;
+	    d__1 = gl, d__2 = d__[j] - tmp1 - tmp2;
 	    gl = min(d__1,d__2);
 	    tmp1 = tmp2;
 /* L20: */
 	}
 
 /* Computing MAX */
-	d__1 = gu, d__2 = D(*n) + tmp1;
+	d__1 = gu, d__2 = d__[*n] + tmp1;
 	gu = max(d__1,d__2);
 /* Computing MIN */
-	d__1 = gl, d__2 = D(*n) - tmp1;
+	d__1 = gl, d__2 = d__[*n] - tmp1;
 	gl = min(d__1,d__2);
 /* Computing MAX */
 	d__1 = abs(gl), d__2 = abs(gu);
@@ -411,37 +398,37 @@
 	    atoli = *abstol;
 	}
 
-	WORK(*n + 1) = gl;
-	WORK(*n + 2) = gl;
-	WORK(*n + 3) = gu;
-	WORK(*n + 4) = gu;
-	WORK(*n + 5) = gl;
-	WORK(*n + 6) = gu;
-	IWORK(1) = -1;
-	IWORK(2) = -1;
-	IWORK(3) = *n + 1;
-	IWORK(4) = *n + 1;
-	IWORK(5) = *il - 1;
-	IWORK(6) = *iu;
+	work[*n + 1] = gl;
+	work[*n + 2] = gl;
+	work[*n + 3] = gu;
+	work[*n + 4] = gu;
+	work[*n + 5] = gl;
+	work[*n + 6] = gu;
+	iwork[1] = -1;
+	iwork[2] = -1;
+	iwork[3] = *n + 1;
+	iwork[4] = *n + 1;
+	iwork[5] = *il - 1;
+	iwork[6] = *iu;
 
 	dlaebz_(&c__3, &itmax, n, &c__2, &c__2, &nb, &atoli, &rtoli, &pivmin, 
-		&D(1), &E(1), &WORK(1), &IWORK(5), &WORK(*n + 1), &WORK(*n + 
-		5), &iout, &IWORK(1), &W(1), &IBLOCK(1), &iinfo);
+		&d__[1], &e[1], &work[1], &iwork[5], &work[*n + 1], &work[*n 
+		+ 5], &iout, &iwork[1], &w[1], &iblock[1], &iinfo);
 
-	if (IWORK(6) == *iu) {
-	    wl = WORK(*n + 1);
-	    wlu = WORK(*n + 3);
-	    nwl = IWORK(1);
-	    wu = WORK(*n + 4);
-	    wul = WORK(*n + 2);
-	    nwu = IWORK(4);
+	if (iwork[6] == *iu) {
+	    wl = work[*n + 1];
+	    wlu = work[*n + 3];
+	    nwl = iwork[1];
+	    wu = work[*n + 4];
+	    wul = work[*n + 2];
+	    nwu = iwork[4];
 	} else {
-	    wl = WORK(*n + 2);
-	    wlu = WORK(*n + 4);
-	    nwl = IWORK(2);
-	    wu = WORK(*n + 3);
-	    wul = WORK(*n + 1);
-	    nwu = IWORK(3);
+	    wl = work[*n + 2];
+	    wlu = work[*n + 4];
+	    nwl = iwork[2];
+	    wu = work[*n + 3];
+	    wul = work[*n + 1];
+	    nwu = iwork[3];
 	}
 
 	if (nwl < 0 || nwl >= *n || nwu < 1 || nwu > *n) {
@@ -453,15 +440,15 @@
 /*        RANGE='A' or 'V' -- Set ATOLI   
 
    Computing MAX */
-	d__3 = abs(D(1)) + abs(E(1)), d__4 = (d__1 = D(*n), abs(d__1)) + (
-		d__2 = E(*n - 1), abs(d__2));
+	d__3 = abs(d__[1]) + abs(e[1]), d__4 = (d__1 = d__[*n], abs(d__1)) + (
+		d__2 = e[*n - 1], abs(d__2));
 	tnorm = max(d__3,d__4);
 
 	i__1 = *n - 1;
-	for (j = 2; j <= *n-1; ++j) {
+	for (j = 2; j <= i__1; ++j) {
 /* Computing MAX */
-	    d__4 = tnorm, d__5 = (d__1 = D(j), abs(d__1)) + (d__2 = E(j - 1), 
-		    abs(d__2)) + (d__3 = E(j), abs(d__3));
+	    d__4 = tnorm, d__5 = (d__1 = d__[j], abs(d__1)) + (d__2 = e[j - 1]
+		    , abs(d__2)) + (d__3 = e[j], abs(d__3));
 	    tnorm = max(d__4,d__5);
 /* L30: */
 	}
@@ -475,6 +462,9 @@
 	if (irange == 2) {
 	    wl = *vl;
 	    wu = *vu;
+	} else {
+	    wl = 0.;
+	    wu = 0.;
 	}
     }
 
@@ -489,27 +479,27 @@
     nwu = 0;
 
     i__1 = *nsplit;
-    for (jb = 1; jb <= *nsplit; ++jb) {
+    for (jb = 1; jb <= i__1; ++jb) {
 	ioff = iend;
 	ibegin = ioff + 1;
-	iend = ISPLIT(jb);
+	iend = isplit[jb];
 	in = iend - ioff;
 
 	if (in == 1) {
 
 /*           Special Case -- IN=1 */
 
-	    if (irange == 1 || wl >= D(ibegin) - pivmin) {
+	    if (irange == 1 || wl >= d__[ibegin] - pivmin) {
 		++nwl;
 	    }
-	    if (irange == 1 || wu >= D(ibegin) - pivmin) {
+	    if (irange == 1 || wu >= d__[ibegin] - pivmin) {
 		++nwu;
 	    }
-	    if (irange == 1 || wl < D(ibegin) - pivmin && wu >= D(ibegin) - 
-		    pivmin) {
+	    if (irange == 1 || wl < d__[ibegin] - pivmin && wu >= d__[ibegin] 
+		    - pivmin) {
 		++(*m);
-		W(*m) = D(ibegin);
-		IBLOCK(*m) = jb;
+		w[*m] = d__[ibegin];
+		iblock[*m] = jb;
 	    }
 	} else {
 
@@ -518,28 +508,28 @@
              Compute Gershgorin Interval   
              and use it as the initial interval */
 
-	    gu = D(ibegin);
-	    gl = D(ibegin);
+	    gu = d__[ibegin];
+	    gl = d__[ibegin];
 	    tmp1 = 0.;
 
 	    i__2 = iend - 1;
-	    for (j = ibegin; j <= iend-1; ++j) {
-		tmp2 = (d__1 = E(j), abs(d__1));
+	    for (j = ibegin; j <= i__2; ++j) {
+		tmp2 = (d__1 = e[j], abs(d__1));
 /* Computing MAX */
-		d__1 = gu, d__2 = D(j) + tmp1 + tmp2;
+		d__1 = gu, d__2 = d__[j] + tmp1 + tmp2;
 		gu = max(d__1,d__2);
 /* Computing MIN */
-		d__1 = gl, d__2 = D(j) - tmp1 - tmp2;
+		d__1 = gl, d__2 = d__[j] - tmp1 - tmp2;
 		gl = min(d__1,d__2);
 		tmp1 = tmp2;
 /* L40: */
 	    }
 
 /* Computing MAX */
-	    d__1 = gu, d__2 = D(iend) + tmp1;
+	    d__1 = gu, d__2 = d__[iend] + tmp1;
 	    gu = max(d__1,d__2);
 /* Computing MIN */
-	    d__1 = gl, d__2 = D(iend) - tmp1;
+	    d__1 = gl, d__2 = d__[iend] - tmp1;
 	    gl = min(d__1,d__2);
 /* Computing MAX */
 	    d__1 = abs(gl), d__2 = abs(gu);
@@ -572,33 +562,32 @@
 
 /*           Set Up Initial Interval */
 
-	    WORK(*n + 1) = gl;
-	    WORK(*n + in + 1) = gu;
+	    work[*n + 1] = gl;
+	    work[*n + in + 1] = gu;
 	    dlaebz_(&c__1, &c__0, &in, &in, &c__1, &nb, &atoli, &rtoli, &
-		    pivmin, &D(ibegin), &E(ibegin), &WORK(ibegin), idumma, &
-		    WORK(*n + 1), &WORK(*n + (in << 1) + 1), &im, &IWORK(1), &
-		    W(*m + 1), &IBLOCK(*m + 1), &iinfo);
+		    pivmin, &d__[ibegin], &e[ibegin], &work[ibegin], idumma, &
+		    work[*n + 1], &work[*n + (in << 1) + 1], &im, &iwork[1], &
+		    w[*m + 1], &iblock[*m + 1], &iinfo);
 
-	    nwl += IWORK(1);
-	    nwu += IWORK(in + 1);
-	    iwoff = *m - IWORK(1);
+	    nwl += iwork[1];
+	    nwu += iwork[in + 1];
+	    iwoff = *m - iwork[1];
 
 /*           Compute Eigenvalues */
 
 	    itmax = (integer) ((log(gu - gl + pivmin) - log(pivmin)) / log(2.)
 		    ) + 2;
 	    dlaebz_(&c__2, &itmax, &in, &in, &c__1, &nb, &atoli, &rtoli, &
-		    pivmin, &D(ibegin), &E(ibegin), &WORK(ibegin), idumma, &
-		    WORK(*n + 1), &WORK(*n + (in << 1) + 1), &iout, &IWORK(1),
-		     &W(*m + 1), &IBLOCK(*m + 1), &iinfo);
+		    pivmin, &d__[ibegin], &e[ibegin], &work[ibegin], idumma, &
+		    work[*n + 1], &work[*n + (in << 1) + 1], &iout, &iwork[1],
+		     &w[*m + 1], &iblock[*m + 1], &iinfo);
 
 /*           Copy Eigenvalues Into W and IBLOCK   
-             Use -JB for block number for unconverged eigenvalues.
- */
+             Use -JB for block number for unconverged eigenvalues. */
 
 	    i__2 = iout;
-	    for (j = 1; j <= iout; ++j) {
-		tmp1 = (WORK(j + *n) + WORK(j + in + *n)) * .5;
+	    for (j = 1; j <= i__2; ++j) {
+		tmp1 = (work[j + *n] + work[j + in + *n]) * .5;
 
 /*              Flag non-convergence. */
 
@@ -608,10 +597,10 @@
 		} else {
 		    ib = jb;
 		}
-		i__3 = IWORK(j + in) + iwoff;
-		for (je = IWORK(j) + 1 + iwoff; je <= IWORK(j+in)+iwoff; ++je) {
-		    W(je) = tmp1;
-		    IBLOCK(je) = ib;
+		i__3 = iwork[j + in] + iwoff;
+		for (je = iwork[j] + 1 + iwoff; je <= i__3; ++je) {
+		    w[je] = tmp1;
+		    iblock[je] = ib;
 /* L50: */
 		}
 /* L60: */
@@ -633,15 +622,15 @@ L70:
 
 	if (idiscl > 0 || idiscu > 0) {
 	    i__1 = *m;
-	    for (je = 1; je <= *m; ++je) {
-		if (W(je) <= wlu && idiscl > 0) {
+	    for (je = 1; je <= i__1; ++je) {
+		if (w[je] <= wlu && idiscl > 0) {
 		    --idiscl;
-		} else if (W(je) >= wul && idiscu > 0) {
+		} else if (w[je] >= wul && idiscu > 0) {
 		    --idiscu;
 		} else {
 		    ++im;
-		    W(im) = W(je);
-		    IBLOCK(im) = IBLOCK(je);
+		    w[im] = w[je];
+		    iblock[im] = iblock[je];
 		}
 /* L80: */
 	    }
@@ -650,34 +639,29 @@ L70:
 	if (idiscl > 0 || idiscu > 0) {
 
 /*           Code to deal with effects of bad arithmetic:   
-             Some low eigenvalues to be discarded are not in (WL,W
-LU],   
-             or high eigenvalues to be discarded are not in (WUL,W
-U]   
-             so just kill off the smallest IDISCL/largest IDISCU 
-  
-             eigenvalues, by simply finding the smallest/largest 
-  
+             Some low eigenvalues to be discarded are not in (WL,WLU],   
+             or high eigenvalues to be discarded are not in (WUL,WU]   
+             so just kill off the smallest IDISCL/largest IDISCU   
+             eigenvalues, by simply finding the smallest/largest   
              eigenvalue(s).   
 
-             (If N(w) is monotone non-decreasing, this should neve
-r   
+             (If N(w) is monotone non-decreasing, this should never   
                  happen.) */
 
 	    if (idiscl > 0) {
 		wkill = wu;
 		i__1 = idiscl;
-		for (jdisc = 1; jdisc <= idiscl; ++jdisc) {
+		for (jdisc = 1; jdisc <= i__1; ++jdisc) {
 		    iw = 0;
 		    i__2 = *m;
-		    for (je = 1; je <= *m; ++je) {
-			if (IBLOCK(je) != 0 && (W(je) < wkill || iw == 0)) {
+		    for (je = 1; je <= i__2; ++je) {
+			if (iblock[je] != 0 && (w[je] < wkill || iw == 0)) {
 			    iw = je;
-			    wkill = W(je);
+			    wkill = w[je];
 			}
 /* L90: */
 		    }
-		    IBLOCK(iw) = 0;
+		    iblock[iw] = 0;
 /* L100: */
 		}
 	    }
@@ -685,27 +669,27 @@ r
 
 		wkill = wl;
 		i__1 = idiscu;
-		for (jdisc = 1; jdisc <= idiscu; ++jdisc) {
+		for (jdisc = 1; jdisc <= i__1; ++jdisc) {
 		    iw = 0;
 		    i__2 = *m;
-		    for (je = 1; je <= *m; ++je) {
-			if (IBLOCK(je) != 0 && (W(je) > wkill || iw == 0)) {
+		    for (je = 1; je <= i__2; ++je) {
+			if (iblock[je] != 0 && (w[je] > wkill || iw == 0)) {
 			    iw = je;
-			    wkill = W(je);
+			    wkill = w[je];
 			}
 /* L110: */
 		    }
-		    IBLOCK(iw) = 0;
+		    iblock[iw] = 0;
 /* L120: */
 		}
 	    }
 	    im = 0;
 	    i__1 = *m;
-	    for (je = 1; je <= *m; ++je) {
-		if (IBLOCK(je) != 0) {
+	    for (je = 1; je <= i__1; ++je) {
+		if (iblock[je] != 0) {
 		    ++im;
-		    W(im) = W(je);
-		    IBLOCK(im) = IBLOCK(je);
+		    w[im] = w[je];
+		    iblock[im] = iblock[je];
 		}
 /* L130: */
 	    }
@@ -722,24 +706,24 @@ r
 
     if (iorder == 1 && *nsplit > 1) {
 	i__1 = *m - 1;
-	for (je = 1; je <= *m-1; ++je) {
+	for (je = 1; je <= i__1; ++je) {
 	    ie = 0;
-	    tmp1 = W(je);
+	    tmp1 = w[je];
 	    i__2 = *m;
-	    for (j = je + 1; j <= *m; ++j) {
-		if (W(j) < tmp1) {
+	    for (j = je + 1; j <= i__2; ++j) {
+		if (w[j] < tmp1) {
 		    ie = j;
-		    tmp1 = W(j);
+		    tmp1 = w[j];
 		}
 /* L140: */
 	    }
 
 	    if (ie != 0) {
-		itmp1 = IBLOCK(ie);
-		W(ie) = W(je);
-		IBLOCK(ie) = IBLOCK(je);
-		W(je) = tmp1;
-		IBLOCK(je) = itmp1;
+		itmp1 = iblock[ie];
+		w[ie] = w[je];
+		iblock[ie] = iblock[je];
+		w[je] = tmp1;
+		iblock[je] = itmp1;
 	    }
 /* L150: */
 	}

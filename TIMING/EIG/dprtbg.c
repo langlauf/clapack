@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -40,7 +41,7 @@ static integer c__1 = 1;
 	     i_len(char *, ftnlen), s_wsfi(icilist *), e_wsfi(void);
 
     /* Local variables */
-    static integer ipar, i, j, ipada, ipadi, iline, iinfo;
+    static integer ipar, i__, j, ipada, ipadi, iline, iinfo;
     static logical ltemp;
     static integer jp, js, jt;
     static char frmata[40];
@@ -74,7 +75,13 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define times_ref(a_1,a_2,a_3) times[((a_3)*times_dim2 + (a_2))*\
+times_dim1 + a_1]
+#define pnames_ref(a_0,a_1) &pnames[(a_1)*pnames_len + a_0]
+#define ops_ref(a_1,a_2,a_3) ops[((a_3)*ops_dim2 + (a_2))*ops_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -83,8 +90,7 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-       DPRTBG prints out timing information for the eigenvalue routines. 
-  
+       DPRTBG prints out timing information for the eigenvalue routines.   
        The table has NTYPES block rows and NSIZES columns, with NPARMS   
        individual rows in each block row.  There are INPARM quantities   
        which depend on rows (currently, INPARM <= 4).   
@@ -155,8 +161,7 @@ static integer c__1 = 1;
              min( 1, NTYPES ).   
 
     TIMES  - DOUBLE PRECISION array of dimension( LDT1, LDT2, NSIZES )   
-             The times (in seconds).  The first index indicates the row, 
-  
+             The times (in seconds).  The first index indicates the row,   
              the second index indicates the block row, and the last   
              indicates the column.   
 
@@ -168,8 +173,7 @@ static integer c__1 = 1;
              The second dimension of RESLTS.  It must be at least   
              min( 1, NTYPES ).   
 
-    RWORK  - DOUBLE PRECISION array of dimension( NSIZES*NTYPES*NPARMS ) 
-  
+    RWORK  - DOUBLE PRECISION array of dimension( NSIZES*NTYPES*NPARMS )   
              Real workspace.   
              Modified.   
 
@@ -185,8 +189,7 @@ static integer c__1 = 1;
              The output unit number on which the table   
              is to be printed.  If NOUT <= 0, no output is printed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -205,11 +208,11 @@ static integer c__1 = 1;
     --np6;
     ops_dim1 = *ldo1;
     ops_dim2 = *ldo2;
-    ops_offset = ops_dim1 * (ops_dim2 + 1) + 1;
+    ops_offset = 1 + ops_dim1 * (1 + ops_dim2 * 1);
     ops -= ops_offset;
     times_dim1 = *ldt1;
     times_dim2 = *ldt2;
-    times_offset = times_dim1 * (times_dim2 + 1) + 1;
+    times_offset = 1 + times_dim1 * (1 + times_dim2 * 1);
     times -= times_offset;
     --rwork;
 
@@ -261,67 +264,67 @@ static integer c__1 = 1;
 	if (*inparm == 1) {
 	    io___6.ciunit = *nout;
 	    s_wsfe(&io___6);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (*inparm == 2) {
 	    io___7.ciunit = *nout;
 	    s_wsfe(&io___7);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 1), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 2), pnames_len);
 	    do_fio(&c__1, (char *)&np2[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (*inparm == 3) {
 	    io___8.ciunit = *nout;
 	    s_wsfe(&io___8);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 1), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 2), pnames_len);
 	    do_fio(&c__1, (char *)&np2[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 3, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 3), pnames_len);
 	    do_fio(&c__1, (char *)&np3[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (*inparm == 4) {
 	    io___9.ciunit = *nout;
 	    s_wsfe(&io___9);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 1), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 2), pnames_len);
 	    do_fio(&c__1, (char *)&np2[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 3, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 3), pnames_len);
 	    do_fio(&c__1, (char *)&np3[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 2), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 4), pnames_len);
 	    do_fio(&c__1, (char *)&np4[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (*inparm == 5) {
 	    io___10.ciunit = *nout;
 	    s_wsfe(&io___10);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 1), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 2), pnames_len);
 	    do_fio(&c__1, (char *)&np2[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 3, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 3), pnames_len);
 	    do_fio(&c__1, (char *)&np3[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 2), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 4), pnames_len);
 	    do_fio(&c__1, (char *)&np4[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 5, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 5), pnames_len);
 	    do_fio(&c__1, (char *)&np5[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else if (*inparm == 6) {
 	    io___11.ciunit = *nout;
 	    s_wsfe(&io___11);
-	    do_fio(&c__1, pnames + pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 1), pnames_len);
 	    do_fio(&c__1, (char *)&np1[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 1), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 2), pnames_len);
 	    do_fio(&c__1, (char *)&np2[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 3, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 3), pnames_len);
 	    do_fio(&c__1, (char *)&np3[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + (pnames_len << 2), pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 4), pnames_len);
 	    do_fio(&c__1, (char *)&np4[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 5, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 5), pnames_len);
 	    do_fio(&c__1, (char *)&np5[1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, pnames + pnames_len * 6, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, 6), pnames_len);
 	    do_fio(&c__1, (char *)&np6[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -331,12 +334,12 @@ static integer c__1 = 1;
 /*        Compute output format statement.   
 
    Computing MAX */
-	i__1 = i_len(pnames + pnames_len, pnames_len) - 3;
+	i__1 = i_len(pnames_ref(0, 1), pnames_len) - 3;
 	ipadi = max(i__1,1);
 	s_wsfi(&io___15);
 	do_fio(&c__1, (char *)&ipadi, (ftnlen)sizeof(integer));
 	e_wsfi();
-	ipada = ipadi + 5 - i_len(pnames + pnames_len, pnames_len);
+	ipada = ipadi + 5 - i_len(pnames_ref(0, 1), pnames_len);
 	s_wsfi(&io___18);
 	do_fio(&c__1, (char *)&ipada, (ftnlen)sizeof(integer));
 	e_wsfi();
@@ -344,7 +347,7 @@ static integer c__1 = 1;
 	s_wsfe(&io___19);
 	i__1 = min(6,*inparm);
 	for (j = 1; j <= i__1; ++j) {
-	    do_fio(&c__1, pnames + j * pnames_len, pnames_len);
+	    do_fio(&c__1, pnames_ref(0, j), pnames_len);
 	}
 	e_wsfe();
 	i__1 = *nparms;
@@ -414,7 +417,7 @@ static integer c__1 = 1;
     s_wsfe(&io___26);
     e_wsfe();
     dprtbs_("Type", "N ", ntypes, &dotype[1], nsizes, &nn[1], nparms, &llwork[
-	    1], &times[times_offset], ldt1, ldt2, nout, 4L, 2L);
+	    1], &times[times_offset], ldt1, ldt2, nout, (ftnlen)4, (ftnlen)2);
 
 /*     Operation Counts */
 
@@ -422,7 +425,7 @@ static integer c__1 = 1;
     s_wsfe(&io___27);
     e_wsfe();
     dprtbs_("Type", "N ", ntypes, &dotype[1], nsizes, &nn[1], nparms, &llwork[
-	    1], &ops[ops_offset], ldo1, ldo2, nout, 4L, 2L);
+	    1], &ops[ops_offset], ldo1, ldo2, nout, (ftnlen)4, (ftnlen)2);
 
 /*     Megaflop Rates */
 
@@ -434,10 +437,9 @@ static integer c__1 = 1;
 	    if (dotype[jt]) {
 		i__3 = *nparms;
 		for (jp = 1; jp <= i__3; ++jp) {
-		    i = jp + *nparms * (jt - 1 + *ntypes * (js - 1));
-		    rwork[i] = dmflop_(&ops[jp + (jt + js * ops_dim2) * 
-			    ops_dim1], &times[jp + (jt + js * times_dim2) * 
-			    times_dim1], &iinfo);
+		    i__ = jp + *nparms * (jt - 1 + *ntypes * (js - 1));
+		    rwork[i__] = dmflop_(&ops_ref(jp, jt, js), &times_ref(jp, 
+			    jt, js), &iinfo);
 /* L40: */
 		}
 	    }
@@ -450,7 +452,7 @@ static integer c__1 = 1;
     s_wsfe(&io___33);
     e_wsfe();
     dprtbs_("Type", "N ", ntypes, &dotype[1], nsizes, &nn[1], nparms, &llwork[
-	    1], &rwork[1], nparms, ntypes, nout, 4L, 2L);
+	    1], &rwork[1], nparms, ntypes, nout, (ftnlen)4, (ftnlen)2);
 
 
 /*     Format statements for generating format statements.   
@@ -462,4 +464,9 @@ static integer c__1 = 1;
 /*     End of DPRTBG */
 
 } /* dprtbg_ */
+
+#undef ops_ref
+#undef pnames_ref
+#undef times_ref
+
 

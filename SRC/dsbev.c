@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsbev_(char *jobz, char *uplo, integer *n, integer *kd, 
-	doublereal *ab, integer *ldab, doublereal *w, doublereal *z, integer *
-	ldz, doublereal *work, integer *info)
+	doublereal *ab, integer *ldab, doublereal *w, doublereal *z__, 
+	integer *ldz, doublereal *work, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -37,13 +38,10 @@
     AB      (input/output) DOUBLE PRECISION array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, AB is overwritten by values generated during the   
             reduction to tridiagonal form.  If UPLO = 'U', the first   
@@ -68,8 +66,7 @@
             The leading dimension of the array Z.  LDZ >= 1, and if   
             JOBZ = 'V', LDZ >= max(1,N).   
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (max(1,3*N-2)) 
-  
+    WORK    (workspace) DOUBLE PRECISION array, dimension (max(1,3*N-2))   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -78,15 +75,12 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b11 = 1.;
     static integer c__1 = 1;
@@ -125,15 +119,20 @@
     extern /* Subroutine */ int dsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     static doublereal smlnum, eps;
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     lower = lsame_(uplo, "L");
 
@@ -165,9 +164,13 @@
     }
 
     if (*n == 1) {
-	W(1) = AB(1,1);
+	if (lower) {
+	    w[1] = ab_ref(1, 1);
+	} else {
+	    w[1] = ab_ref(*kd + 1, 1);
+	}
 	if (wantz) {
-	    Z(1,1) = 1.;
+	    z___ref(1, 1) = 1.;
 	}
 	return 0;
     }
@@ -183,7 +186,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = dlansb_("M", uplo, n, kd, &AB(1,1), ldab, &WORK(1));
+    anrm = dlansb_("M", uplo, n, kd, &ab[ab_offset], ldab, &work[1]);
     iscale = 0;
     if (anrm > 0. && anrm < rmin) {
 	iscale = 1;
@@ -194,10 +197,10 @@
     }
     if (iscale == 1) {
 	if (lower) {
-	    dlascl_("B", kd, kd, &c_b11, &sigma, n, n, &AB(1,1), ldab, 
+	    dlascl_("B", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	} else {
-	    dlascl_("Q", kd, kd, &c_b11, &sigma, n, n, &AB(1,1), ldab, 
+	    dlascl_("Q", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	}
     }
@@ -206,16 +209,16 @@
 
     inde = 1;
     indwrk = inde + *n;
-    dsbtrd_(jobz, uplo, n, kd, &AB(1,1), ldab, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk), &iinfo);
+    dsbtrd_(jobz, uplo, n, kd, &ab[ab_offset], ldab, &w[1], &work[inde], &z__[
+	    z_offset], ldz, &work[indwrk], &iinfo);
 
-/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEQR. 
-*/
+/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEQR. */
 
     if (! wantz) {
-	dsterf_(n, &W(1), &WORK(inde), info);
+	dsterf_(n, &w[1], &work[inde], info);
     } else {
-	dsteqr_(jobz, n, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk),
-		 info);
+	dsteqr_(jobz, n, &w[1], &work[inde], &z__[z_offset], ldz, &work[
+		indwrk], info);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -227,7 +230,7 @@
 	    imax = *info - 1;
 	}
 	d__1 = 1. / sigma;
-	dscal_(&imax, &d__1, &W(1), &c__1);
+	dscal_(&imax, &d__1, &w[1], &c__1);
     }
 
     return 0;
@@ -235,4 +238,8 @@
 /*     End of DSBEV */
 
 } /* dsbev_ */
+
+#undef ab_ref
+#undef z___ref
+
 

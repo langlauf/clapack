@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,10 +13,10 @@
     integer i__1;
 
     /* Local variables */
-    static integer i, m, ix, iy, mp1;
+    static integer i__, m, ix, iy, mp1;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -45,8 +46,7 @@
     INCY    (input) INTEGER   
             The spacing between consecutive elements of SY.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -72,7 +72,7 @@
 	iy = (-(*n) + 1) * *incy + 1;
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	sy[iy] = sx[ix];
 	ix += *incx;
 	iy += *incy;
@@ -90,8 +90,8 @@ L20:
 	goto L40;
     }
     i__1 = m;
-    for (i = 1; i <= i__1; ++i) {
-	sy[i] = sx[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	sy[i__] = sx[i__];
 /* L30: */
     }
     if (*n < 7) {
@@ -100,14 +100,14 @@ L20:
 L40:
     mp1 = m + 1;
     i__1 = *n;
-    for (i = mp1; i <= i__1; i += 7) {
-	sy[i] = sx[i];
-	sy[i + 1] = sx[i + 1];
-	sy[i + 2] = sx[i + 2];
-	sy[i + 3] = sx[i + 3];
-	sy[i + 4] = sx[i + 4];
-	sy[i + 5] = sx[i + 5];
-	sy[i + 6] = sx[i + 6];
+    for (i__ = mp1; i__ <= i__1; i__ += 7) {
+	sy[i__] = sx[i__];
+	sy[i__ + 1] = sx[i__ + 1];
+	sy[i__ + 2] = sx[i__ + 2];
+	sy[i__ + 3] = sx[i__ + 3];
+	sy[i__ + 4] = sx[i__ + 4];
+	sy[i__ + 5] = sx[i__ + 5];
+	sy[i__ + 6] = sx[i__ + 6];
 /* L50: */
     }
     return 0;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,8 +15,8 @@ static real c_b34 = -1.f;
 static real c_b35 = 1.f;
 
 /* Subroutine */ int cgrqts_(integer *m, integer *p, integer *n, complex *a, 
-	complex *af, complex *q, complex *r, integer *lda, complex *taua, 
-	complex *b, complex *bf, complex *z, complex *t, complex *bwk, 
+	complex *af, complex *q, complex *r__, integer *lda, complex *taua, 
+	complex *b, complex *bf, complex *z__, complex *t, complex *bwk, 
 	integer *ldb, complex *taub, complex *work, integer *lwork, real *
 	rwork, real *result)
 {
@@ -50,7 +51,19 @@ static real c_b35 = 1.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define r___subscr(a_1,a_2) (a_2)*r_dim1 + a_1
+#define r___ref(a_1,a_2) r__[r___subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+#define bf_subscr(a_1,a_2) (a_2)*bf_dim1 + a_1
+#define bf_ref(a_1,a_2) bf[bf_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -91,8 +104,7 @@ static real c_b35 = 1.f;
             LDA >= max(M,N).   
 
     TAUA    (output) COMPLEX array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by SGGQRC.   
 
     B       (input) COMPLEX array, dimension (LDB,N)   
@@ -114,8 +126,7 @@ static real c_b35 = 1.f;
             LDB >= max(P,N).   
 
     TAUB    (output) COMPLEX array, dimension (min(P,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by SGGRQF.   
 
     WORK    (workspace) COMPLEX array, dimension (LWORK)   
@@ -132,38 +143,37 @@ static real c_b35 = 1.f;
               RESULT(3) = norm( I - Q'*Q ) / ( N*ULP )   
               RESULT(4) = norm( I - Z'*Z ) / ( P*ULP )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --taua;
     bwk_dim1 = *ldb;
-    bwk_offset = bwk_dim1 + 1;
+    bwk_offset = 1 + bwk_dim1 * 1;
     bwk -= bwk_offset;
     t_dim1 = *ldb;
-    t_offset = t_dim1 + 1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     z_dim1 = *ldb;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --taub;
     --work;
@@ -197,21 +207,21 @@ static real c_b35 = 1.f;
     if (*m <= *n) {
 	if (*m > 0 && *m < *n) {
 	    i__1 = *n - *m;
-	    clacpy_("Full", m, &i__1, &af[af_offset], lda, &q[*n - *m + 1 + 
-		    q_dim1], lda);
+	    clacpy_("Full", m, &i__1, &af[af_offset], lda, &q_ref(*n - *m + 1,
+		     1), lda);
 	}
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    clacpy_("Lower", &i__1, &i__2, &af[(*n - *m + 1) * af_dim1 + 2], 
-		    lda, &q[*n - *m + 2 + (*n - *m + 1) * q_dim1], lda);
+	    clacpy_("Lower", &i__1, &i__2, &af_ref(2, *n - *m + 1), lda, &
+		    q_ref(*n - *m + 2, *n - *m + 1), lda);
 	}
     } else {
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    clacpy_("Lower", &i__1, &i__2, &af[*m - *n + 2 + af_dim1], lda, &
-		    q[q_dim1 + 2], lda);
+	    clacpy_("Lower", &i__1, &i__2, &af_ref(*m - *n + 2, 1), lda, &
+		    q_ref(2, 1), lda);
 	}
     }
     i__1 = min(*m,*n);
@@ -219,25 +229,26 @@ static real c_b35 = 1.f;
 
 /*     Generate the P-by-P matrix Z */
 
-    claset_("Full", p, p, &c_b3, &c_b3, &z[z_offset], ldb);
+    claset_("Full", p, p, &c_b3, &c_b3, &z__[z_offset], ldb);
     if (*p > 1) {
 	i__1 = *p - 1;
-	clacpy_("Lower", &i__1, n, &bf[bf_dim1 + 2], ldb, &z[z_dim1 + 2], ldb);
+	clacpy_("Lower", &i__1, n, &bf_ref(2, 1), ldb, &z___ref(2, 1), ldb);
     }
     i__1 = min(*p,*n);
-    cungqr_(p, p, &i__1, &z[z_offset], ldb, &taub[1], &work[1], lwork, &info);
+    cungqr_(p, p, &i__1, &z__[z_offset], ldb, &taub[1], &work[1], lwork, &
+	    info);
 
 /*     Copy R */
 
-    claset_("Full", m, n, &c_b1, &c_b1, &r[r_offset], lda);
+    claset_("Full", m, n, &c_b1, &c_b1, &r__[r_offset], lda);
     if (*m <= *n) {
-	clacpy_("Upper", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &r[(*n 
-		- *m + 1) * r_dim1 + 1], lda);
+	clacpy_("Upper", m, m, &af_ref(1, *n - *m + 1), lda, &r___ref(1, *n - 
+		*m + 1), lda);
     } else {
 	i__1 = *m - *n;
-	clacpy_("Full", &i__1, n, &af[af_offset], lda, &r[r_offset], lda);
-	clacpy_("Upper", n, n, &af[*m - *n + 1 + af_dim1], lda, &r[*m - *n + 
-		1 + r_dim1], lda);
+	clacpy_("Full", &i__1, n, &af[af_offset], lda, &r__[r_offset], lda);
+	clacpy_("Upper", n, n, &af_ref(*m - *n + 1, 1), lda, &r___ref(*m - *n 
+		+ 1, 1), lda);
     }
 
 /*     Copy T */
@@ -249,11 +260,11 @@ static real c_b35 = 1.f;
 
     q__1.r = -1.f, q__1.i = 0.f;
     cgemm_("No transpose", "Conjugate transpose", m, n, n, &q__1, &a[a_offset]
-	    , lda, &q[q_offset], lda, &c_b2, &r[r_offset], lda);
+	    , lda, &q[q_offset], lda, &c_b2, &r__[r_offset], lda);
 
 /*     Compute norm( R - A*Q' ) / ( MAX(M,N)*norm(A)*ULP ) . */
 
-    resid = clange_("1", m, n, &r[r_offset], lda, &rwork[1]);
+    resid = clange_("1", m, n, &r__[r_offset], lda, &rwork[1]);
     if (anorm > 0.f) {
 /* Computing MAX */
 	i__1 = max(1,*m);
@@ -264,8 +275,8 @@ static real c_b35 = 1.f;
 
 /*     Compute T*Q - Z'*B */
 
-    cgemm_("Conjugate transpose", "No transpose", p, n, p, &c_b2, &z[z_offset]
-	    , ldb, &b[b_offset], ldb, &c_b1, &bwk[bwk_offset], ldb);
+    cgemm_("Conjugate transpose", "No transpose", p, n, p, &c_b2, &z__[
+	    z_offset], ldb, &b[b_offset], ldb, &c_b1, &bwk[bwk_offset], ldb);
     q__1.r = -1.f, q__1.i = 0.f;
     cgemm_("No transpose", "No transpose", p, n, n, &c_b2, &t[t_offset], ldb, 
 	    &q[q_offset], lda, &q__1, &bwk[bwk_offset], ldb);
@@ -283,20 +294,20 @@ static real c_b35 = 1.f;
 
 /*     Compute I - Q*Q' */
 
-    claset_("Full", n, n, &c_b1, &c_b2, &r[r_offset], lda);
+    claset_("Full", n, n, &c_b1, &c_b2, &r__[r_offset], lda);
     cherk_("Upper", "No Transpose", n, n, &c_b34, &q[q_offset], lda, &c_b35, &
-	    r[r_offset], lda);
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q'*Q ) / ( N * ULP ) . */
 
-    resid = clanhe_("1", "Upper", n, &r[r_offset], lda, &rwork[1]);
+    resid = clanhe_("1", "Upper", n, &r__[r_offset], lda, &rwork[1]);
     result[3] = resid / (real) max(1,*n) / ulp;
 
 /*     Compute I - Z'*Z */
 
     claset_("Full", p, p, &c_b1, &c_b2, &t[t_offset], ldb);
-    cherk_("Upper", "Conjugate transpose", p, p, &c_b34, &z[z_offset], ldb, &
-	    c_b35, &t[t_offset], ldb);
+    cherk_("Upper", "Conjugate transpose", p, p, &c_b34, &z__[z_offset], ldb, 
+	    &c_b35, &t[t_offset], ldb);
 
 /*     Compute norm( I - Z'*Z ) / ( P*ULP ) . */
 
@@ -308,4 +319,16 @@ static real c_b35 = 1.f;
 /*     End of CGRQTS */
 
 } /* cgrqts_ */
+
+#undef bf_ref
+#undef bf_subscr
+#undef af_ref
+#undef af_subscr
+#undef z___ref
+#undef z___subscr
+#undef r___ref
+#undef r___subscr
+#undef q_ref
+#undef q_subscr
+
 

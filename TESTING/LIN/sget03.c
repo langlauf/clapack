@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static real c_b8 = 0.f;
 	    i__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
@@ -29,18 +30,20 @@ static real c_b8 = 0.f;
     static real ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SGET03 computes the residual for a general matrix times its inverse: 
-  
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
+    SGET03 computes the residual for a general matrix times its inverse:   
+       norm( I - AINV*A ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
 
     Arguments   
@@ -59,14 +62,12 @@ static real c_b8 = 0.f;
             The inverse of the matrix A.   
 
     LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N). 
-  
+            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
 
     WORK    (workspace) REAL array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) REAL array, dimension (N)   
 
@@ -75,23 +76,22 @@ static real c_b8 = 0.f;
             ( 1/norm(A) ) / norm(AINV).   
 
     RESID   (output) REAL   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+            norm(I - AINV*A) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = ainv_dim1 + 1;
+    ainv_offset = 1 + ainv_dim1 * 1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -116,15 +116,15 @@ static real c_b8 = 0.f;
 
 /*     Compute I - A * AINV */
 
-    sgemm_("No transpose", "No transpose", n, n, n, &c_b7, &a[a_offset], lda, 
-	    &ainv[ainv_offset], ldainv, &c_b8, &work[work_offset], ldwork);
+    sgemm_("No transpose", "No transpose", n, n, n, &c_b7, &ainv[ainv_offset],
+	     ldainv, &a[a_offset], lda, &c_b8, &work[work_offset], ldwork);
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	work[i + i * work_dim1] += 1.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	work_ref(i__, i__) = work_ref(i__, i__) + 1.f;
 /* L10: */
     }
 
-/*     Compute norm(I - A*AINV) / (N * norm(A) * norm(AINV) * EPS) */
+/*     Compute norm(I - AINV*A) / (N * norm(A) * norm(AINV) * EPS) */
 
     *resid = slange_("1", n, n, &work[work_offset], ldwork, &rwork[1]);
 
@@ -135,4 +135,7 @@ static real c_b8 = 0.f;
 /*     End of SGET03 */
 
 } /* sget03_ */
+
+#undef work_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap, 
 	real *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
     Purpose   
     =======   
 
-    SLANTP  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    SLANTP  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     triangular matrix A, supplied in packed form.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -47,8 +43,7 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
             above.   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -62,10 +57,8 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
             set to zero.   
 
     AP      (input) REAL array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
@@ -77,13 +70,10 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
             where LWORK >= N when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -93,7 +83,7 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
     static real scale;
     static logical udiag;
     extern logical lsame_(char *, char *);
@@ -103,11 +93,10 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
     static real sum;
 
 
+    --work;
+    --ap;
 
-#define WORK(I) work[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.f;
     } else if (lsame_(norm, "M")) {
@@ -119,11 +108,11 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	    value = 1.f;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + j - 2;
-		    for (i = k; i <= k+j-2; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = value, r__3 = (r__1 = AP(i), dabs(r__1));
+			r__2 = value, r__3 = (r__1 = ap[i__], dabs(r__1));
 			value = dmax(r__2,r__3);
 /* L10: */
 		    }
@@ -132,11 +121,11 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + *n - j;
-		    for (i = k + 1; i <= k+*n-j; ++i) {
+		    for (i__ = k + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = value, r__3 = (r__1 = AP(i), dabs(r__1));
+			r__2 = value, r__3 = (r__1 = ap[i__], dabs(r__1));
 			value = dmax(r__2,r__3);
 /* L30: */
 		    }
@@ -148,11 +137,11 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	    value = 0.f;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + j - 1;
-		    for (i = k; i <= k+j-1; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = value, r__3 = (r__1 = AP(i), dabs(r__1));
+			r__2 = value, r__3 = (r__1 = ap[i__], dabs(r__1));
 			value = dmax(r__2,r__3);
 /* L50: */
 		    }
@@ -161,11 +150,11 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + *n - j;
-		    for (i = k; i <= k+*n-j; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = value, r__3 = (r__1 = AP(i), dabs(r__1));
+			r__2 = value, r__3 = (r__1 = ap[i__], dabs(r__1));
 			value = dmax(r__2,r__3);
 /* L70: */
 		    }
@@ -174,7 +163,8 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		}
 	    }
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
@@ -183,19 +173,19 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	udiag = lsame_(diag, "U");
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.f;
 		    i__2 = k + j - 2;
-		    for (i = k; i <= k+j-2; ++i) {
-			sum += (r__1 = AP(i), dabs(r__1));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += (r__1 = ap[i__], dabs(r__1));
 /* L90: */
 		    }
 		} else {
 		    sum = 0.f;
 		    i__2 = k + j - 1;
-		    for (i = k; i <= k+j-1; ++i) {
-			sum += (r__1 = AP(i), dabs(r__1));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += (r__1 = ap[i__], dabs(r__1));
 /* L100: */
 		    }
 		}
@@ -205,19 +195,19 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.f;
 		    i__2 = k + *n - j;
-		    for (i = k + 1; i <= k+*n-j; ++i) {
-			sum += (r__1 = AP(i), dabs(r__1));
+		    for (i__ = k + 1; i__ <= i__2; ++i__) {
+			sum += (r__1 = ap[i__], dabs(r__1));
 /* L120: */
 		    }
 		} else {
 		    sum = 0.f;
 		    i__2 = k + *n - j;
-		    for (i = k; i <= k+*n-j; ++i) {
-			sum += (r__1 = AP(i), dabs(r__1));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += (r__1 = ap[i__], dabs(r__1));
 /* L130: */
 		    }
 		}
@@ -234,15 +224,15 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	if (lsame_(uplo, "U")) {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.f;
 /* L150: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j - 1;
-		    for (i = 1; i <= j-1; ++i) {
-			WORK(i) += (r__1 = AP(k), dabs(r__1));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += (r__1 = ap[k], dabs(r__1));
 			++k;
 /* L160: */
 		    }
@@ -251,15 +241,15 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.f;
 /* L180: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= j; ++i) {
-			WORK(i) += (r__1 = AP(k), dabs(r__1));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += (r__1 = ap[k], dabs(r__1));
 			++k;
 /* L190: */
 		    }
@@ -269,16 +259,16 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	} else {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.f;
 /* L210: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    ++k;
 		    i__2 = *n;
-		    for (i = j + 1; i <= *n; ++i) {
-			WORK(i) += (r__1 = AP(k), dabs(r__1));
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
+			work[i__] += (r__1 = ap[k], dabs(r__1));
 			++k;
 /* L220: */
 		    }
@@ -286,15 +276,15 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.f;
 /* L240: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = j; i <= *n; ++i) {
-			WORK(i) += (r__1 = AP(k), dabs(r__1));
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			work[i__] += (r__1 = ap[k], dabs(r__1));
 			++k;
 /* L250: */
 		    }
@@ -304,9 +294,9 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 	}
 	value = 0.f;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__1 = value, r__2 = WORK(i);
+	    r__1 = value, r__2 = work[i__];
 	    value = dmax(r__1,r__2);
 /* L270: */
 	}
@@ -320,9 +310,9 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		sum = (real) (*n);
 		k = 2;
 		i__1 = *n;
-		for (j = 2; j <= *n; ++j) {
+		for (j = 2; j <= i__1; ++j) {
 		    i__2 = j - 1;
-		    slassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    slassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k += j;
 /* L280: */
 		}
@@ -331,8 +321,8 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		sum = 1.f;
 		k = 1;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    slassq_(&j, &AP(k), &c__1, &scale, &sum);
+		for (j = 1; j <= i__1; ++j) {
+		    slassq_(&j, &ap[k], &c__1, &scale, &sum);
 		    k += j;
 /* L290: */
 		}
@@ -343,9 +333,9 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		sum = (real) (*n);
 		k = 2;
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n - j;
-		    slassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    slassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k = k + *n - j + 1;
 /* L300: */
 		}
@@ -354,9 +344,9 @@ doublereal slantp_(char *norm, char *uplo, char *diag, integer *n, real *ap,
 		sum = 1.f;
 		k = 1;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n - j + 1;
-		    slassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    slassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k = k + *n - j + 1;
 /* L310: */
 		}

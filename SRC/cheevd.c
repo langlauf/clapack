@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cheevd_(char *jobz, char *uplo, integer *n, complex *a, 
 	integer *lda, real *w, complex *work, integer *lwork, real *rwork, 
 	integer *lrwork, integer *iwork, integer *liwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -21,8 +22,7 @@
     floating point arithmetic. It will work on machines with a guard   
     digit in add/subtract, or on those binary machines without guard   
     digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or   
-    Cray-2. It could conceivably fail on hexadecimal or decimal machines 
-  
+    Cray-2. It could conceivably fail on hexadecimal or decimal machines   
     without guard digits, but we know of none.   
 
     Arguments   
@@ -47,8 +47,7 @@
             the lower triangular part of the matrix A.   
             On exit, if JOBZ = 'V', then if INFO = 0, A contains the   
             orthonormal eigenvectors of the matrix A.   
-            If JOBZ = 'N', then on exit the lower triangle (if UPLO='L') 
-  
+            If JOBZ = 'N', then on exit the lower triangle (if UPLO='L')   
             or the upper triangle (if UPLO='U') of A, including the   
             diagonal, is destroyed.   
 
@@ -59,38 +58,48 @@
             If INFO = 0, the eigenvalues in ascending order.   
 
     WORK    (workspace/output) COMPLEX array, dimension (LWORK)   
-            On exit, if LWORK > 0, WORK(1) returns the optimal LWORK.   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The length of the array WORK.   
             If N <= 1,                LWORK must be at least 1.   
             If JOBZ  = 'N' and N > 1, LWORK must be at least N + 1.   
-            If JOBZ  = 'V' and N > 1, LWORK must be at least 2*N + N**2. 
-  
+            If JOBZ  = 'V' and N > 1, LWORK must be at least 2*N + N**2.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     RWORK   (workspace/output) REAL array,   
                                            dimension (LRWORK)   
-            On exit, if LRWORK > 0, RWORK(1) returns the optimal LRWORK. 
-  
+            On exit, if INFO = 0, RWORK(1) returns the optimal LRWORK.   
 
     LRWORK  (input) INTEGER   
             The dimension of the array RWORK.   
             If N <= 1,                LRWORK must be at least 1.   
             If JOBZ  = 'N' and N > 1, LRWORK must be at least N.   
             If JOBZ  = 'V' and N > 1, LRWORK must be at least   
-                           1 + 4*N + 2*N*lg N + 3*N**2 ,   
-                           where lg( N ) = smallest integer k such   
-                           that 2**k >= N .   
+                           1 + 5*N + 2*N**2.   
+
+            If LRWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the RWORK array,   
+            returns this value as the first entry of the RWORK array, and   
+            no error message related to LRWORK is issued by XERBLA.   
 
     IWORK   (workspace/output) INTEGER array, dimension (LIWORK)   
-            On exit, if LIWORK > 0, IWORK(1) returns the optimal LIWORK. 
-  
+            On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK.   
 
     LIWORK  (input) INTEGER   
             The dimension of the array IWORK.   
             If N <= 1,                LIWORK must be at least 1.   
             If JOBZ  = 'N' and N > 1, LIWORK must be at least 1.   
-            If JOBZ  = 'V' and N > 1, LIWORK must be at least 2 + 5*N.   
+            If JOBZ  = 'V' and N > 1, LIWORK must be at least 3 + 5*N.   
+
+            If LIWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the IWORK array,   
+            returns this value as the first entry of the IWORK array, and   
+            no error message related to LIWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -99,27 +108,28 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
-    static integer c__2 = 2;
     static integer c__0 = 0;
-    static real c_b16 = 1.f;
+    static real c_b13 = 1.f;
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
     real r__1, r__2;
     /* Builtin functions */
-    double log(doublereal);
-    integer pow_ii(integer *, integer *);
     double sqrt(doublereal);
     /* Local variables */
     static integer inde;
@@ -158,24 +168,27 @@
 	    complex *, integer *, integer *);
     static integer llwork;
     static real smlnum;
-    static integer lgn;
+    static logical lquery;
     static real eps;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --w;
+    --work;
+    --rwork;
+    --iwork;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     lower = lsame_(uplo, "L");
+    lquery = *lwork == -1 || *lrwork == -1 || *liwork == -1;
 
     *info = 0;
     if (*n <= 1) {
-	lgn = 0;
 	lwmin = 1;
 	lrwmin = 1;
 	liwmin = 1;
@@ -183,19 +196,12 @@
 	lropt = lrwmin;
 	liopt = liwmin;
     } else {
-	lgn = (integer) (log((real) (*n)) / log(2.f));
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
 	if (wantz) {
 	    lwmin = (*n << 1) + *n * *n;
 /* Computing 2nd power */
 	    i__1 = *n;
-	    lrwmin = (*n << 2) + 1 + (*n << 1) * lgn + i__1 * i__1 * 3;
-	    liwmin = *n * 5 + 2;
+	    lrwmin = *n * 5 + 1 + (i__1 * i__1 << 1);
+	    liwmin = *n * 5 + 3;
 	} else {
 	    lwmin = *n + 1;
 	    lrwmin = *n;
@@ -213,34 +219,42 @@
 	*info = -3;
     } else if (*lda < max(1,*n)) {
 	*info = -5;
-    } else if (*lwork < lwmin) {
+    } else if (*lwork < lwmin && ! lquery) {
 	*info = -8;
-    } else if (*lrwork < lrwmin) {
+    } else if (*lrwork < lrwmin && ! lquery) {
 	*info = -10;
-    } else if (*liwork < liwmin) {
+    } else if (*liwork < liwmin && ! lquery) {
 	*info = -12;
+    }
+
+    if (*info == 0) {
+	work[1].r = (real) lopt, work[1].i = 0.f;
+	rwork[1] = (real) lropt;
+	iwork[1] = liopt;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
-	xerbla_("CHEEVD ", &i__1);
-	goto L10;
+	xerbla_("CHEEVD", &i__1);
+	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n == 0) {
-	goto L10;
+	return 0;
     }
 
     if (*n == 1) {
-	i__1 = a_dim1 + 1;
-	W(1) = A(1,1).r;
+	i__1 = a_subscr(1, 1);
+	w[1] = a[i__1].r;
 	if (wantz) {
-	    i__1 = a_dim1 + 1;
-	    A(1,1).r = 1.f, A(1,1).i = 0.f;
+	    i__1 = a_subscr(1, 1);
+	    a[i__1].r = 1.f, a[i__1].i = 0.f;
 	}
-	goto L10;
+	return 0;
     }
 
 /*     Get machine constants. */
@@ -254,7 +268,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = clanhe_("M", uplo, n, &A(1,1), lda, &RWORK(1));
+    anrm = clanhe_("M", uplo, n, &a[a_offset], lda, &rwork[1]);
     iscale = 0;
     if (anrm > 0.f && anrm < rmin) {
 	iscale = 1;
@@ -264,7 +278,7 @@
 	sigma = rmax / anrm;
     }
     if (iscale == 1) {
-	clascl_(uplo, &c__0, &c__0, &c_b16, &sigma, n, n, &A(1,1), lda, 
+	clascl_(uplo, &c__0, &c__0, &c_b13, &sigma, n, n, &a[a_offset], lda, 
 		info);
     }
 
@@ -278,33 +292,32 @@
     llwork = *lwork - indwrk + 1;
     llwrk2 = *lwork - indwk2 + 1;
     llrwk = *lrwork - indrwk + 1;
-    chetrd_(uplo, n, &A(1,1), lda, &W(1), &RWORK(inde), &WORK(indtau), &
-	    WORK(indwrk), &llwork, &iinfo);
+    chetrd_(uplo, n, &a[a_offset], lda, &w[1], &rwork[inde], &work[indtau], &
+	    work[indwrk], &llwork, &iinfo);
 /* Computing MAX */
     i__1 = indwrk;
-    r__1 = (real) lopt, r__2 = (real) (*n) + WORK(indwrk).r;
+    r__1 = (real) lopt, r__2 = (real) (*n) + work[i__1].r;
     lopt = dmax(r__1,r__2);
 
 /*     For eigenvalues only, call SSTERF.  For eigenvectors, first call   
        CSTEDC to generate the eigenvector matrix, WORK(INDWRK), of the   
        tridiagonal matrix, then call CUNMTR to multiply it to the   
-       Householder transformations represented as Householder vectors in 
-  
+       Householder transformations represented as Householder vectors in   
        A. */
 
     if (! wantz) {
-	ssterf_(n, &W(1), &RWORK(inde), info);
+	ssterf_(n, &w[1], &rwork[inde], info);
     } else {
-	cstedc_("I", n, &W(1), &RWORK(inde), &WORK(indwrk), n, &WORK(indwk2), 
-		&llwrk2, &RWORK(indrwk), &llrwk, &IWORK(1), liwork, info);
-	cunmtr_("L", uplo, "N", n, n, &A(1,1), lda, &WORK(indtau), &WORK(
-		indwrk), n, &WORK(indwk2), &llwrk2, &iinfo);
-	clacpy_("A", n, n, &WORK(indwrk), n, &A(1,1), lda);
+	cstedc_("I", n, &w[1], &rwork[inde], &work[indwrk], n, &work[indwk2], 
+		&llwrk2, &rwork[indrwk], &llrwk, &iwork[1], liwork, info);
+	cunmtr_("L", uplo, "N", n, n, &a[a_offset], lda, &work[indtau], &work[
+		indwrk], n, &work[indwk2], &llwrk2, &iinfo);
+	clacpy_("A", n, n, &work[indwrk], n, &a[a_offset], lda);
 /* Computing MAX   
    Computing 2nd power */
 	i__3 = *n;
 	i__4 = indwk2;
-	i__1 = lopt, i__2 = *n + i__3 * i__3 + (integer) WORK(indwk2).r;
+	i__1 = lopt, i__2 = *n + i__3 * i__3 + (integer) work[i__4].r;
 	lopt = max(i__1,i__2);
     }
 
@@ -317,22 +330,20 @@
 	    imax = *info - 1;
 	}
 	r__1 = 1.f / sigma;
-	sscal_(&imax, &r__1, &W(1), &c__1);
+	sscal_(&imax, &r__1, &w[1], &c__1);
     }
 
-L10:
-    if (*lwork > 0) {
-	WORK(1).r = (real) lopt, WORK(1).i = 0.f;
-    }
-    if (*lrwork > 0) {
-	RWORK(1) = (real) lropt;
-    }
-    if (*liwork > 0) {
-	IWORK(1) = liopt;
-    }
+    work[1].r = (real) lopt, work[1].i = 0.f;
+    rwork[1] = (real) lropt;
+    iwork[1] = liopt;
+
     return 0;
 
 /*     End of CHEEVD */
 
 } /* cheevd_ */
+
+#undef a_ref
+#undef a_subscr
+
 

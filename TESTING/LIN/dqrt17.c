@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,10 +17,12 @@ static doublereal c_b22 = 0.;
 
 doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n, 
 	integer *nrhs, doublereal *a, integer *lda, doublereal *x, integer *
-	ldx, doublereal *b, integer *ldb, doublereal *work, integer *lwork)
+	ldx, doublereal *b, integer *ldb, doublereal *c__, doublereal *work, 
+	integer *lwork)
 {
     /* System generated locals */
-    integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset, i__1;
+    integer a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, x_dim1, 
+	    x_offset, i__1;
     doublereal ret_val;
 
     /* Local variables */
@@ -42,10 +45,10 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
     static doublereal bignum, smlnum, normrs, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -105,28 +108,32 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
             If TRANS = 'T', the n-by-nrhs matrix B.   
 
     LDB     (input) INTEGER   
-            The leading dimension of the arry B.   
+            The leading dimension of the array B.   
             If TRANS = 'N', LDB >= M.   
             If TRANS = 'T', LDB >= N.   
+
+    C       (workspace) DOUBLE PRECISION array, dimension (LDB,NRHS)   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
 
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= NRHS*(M+N).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
+    c_dim1 = *ldb;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -144,7 +151,7 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 	return ret_val;
     }
 
-    if (*lwork < *nrhs * (*m + *n)) {
+    if (*lwork < ncols * *nrhs) {
 	xerbla_("DQRT17", &c__13);
 	return ret_val;
     }
@@ -160,25 +167,24 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 
 /*     compute residual and scale it */
 
-    dlacpy_("All", &nrows, nrhs, &b[b_offset], ldb, &work[1], &nrows);
+    dlacpy_("All", &nrows, nrhs, &b[b_offset], ldb, &c__[c_offset], ldb);
     dgemm_(trans, "No transpose", &nrows, nrhs, &ncols, &c_b13, &a[a_offset], 
-	    lda, &x[x_offset], ldx, &c_b14, &work[1], &nrows);
-    normrs = dlange_("Max", &nrows, nrhs, &work[1], &nrows, rwork);
+	    lda, &x[x_offset], ldx, &c_b14, &c__[c_offset], ldb);
+    normrs = dlange_("Max", &nrows, nrhs, &c__[c_offset], ldb, rwork);
     if (normrs > smlnum) {
 	iscl = 1;
-	dlascl_("General", &c__0, &c__0, &normrs, &c_b14, &nrows, nrhs, &work[
-		1], &nrows, &info);
+	dlascl_("General", &c__0, &c__0, &normrs, &c_b14, &nrows, nrhs, &c__[
+		c_offset], ldb, &info);
     }
 
 /*     compute R'*A */
 
-    dgemm_("Transpose", trans, nrhs, &ncols, &nrows, &c_b14, &work[1], &nrows,
-	     &a[a_offset], lda, &c_b22, &work[nrows * *nrhs + 1], nrhs);
+    dgemm_("Transpose", trans, nrhs, &ncols, &nrows, &c_b14, &c__[c_offset], 
+	    ldb, &a[a_offset], lda, &c_b22, &work[1], nrhs);
 
 /*     compute and properly scale error */
 
-    err = dlange_("One-norm", nrhs, &ncols, &work[nrows * *nrhs + 1], nrhs, 
-	    rwork);
+    err = dlange_("One-norm", nrhs, &ncols, &work[1], nrhs, rwork);
     if (norma != 0.) {
 	err /= norma;
     }
@@ -201,7 +207,8 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 
 /* Computing MAX */
     i__1 = max(*m,*n);
-    ret_val = err / (dlamch_("Epsilon") * (doublereal) max(i__1,*nrhs));
+    ret_val = err / (dlamch_("Epsilon") * (doublereal) max(i__1,*
+	    nrhs));
     return ret_val;
 
 /*     End of DQRT17 */

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,10 +16,12 @@ struct {
 
 /* Table of constant values */
 
+static integer c__9 = 9;
+static integer c__0 = 0;
 static integer c__2 = 2;
 static integer c__1 = 1;
 
-/* Subroutine */ int zlaed0_(integer *qsiz, integer *n, doublereal *d, 
+/* Subroutine */ int zlaed0_(integer *qsiz, integer *n, doublereal *d__, 
 	doublereal *e, doublecomplex *q, integer *ldq, doublecomplex *qstore, 
 	integer *ldqs, doublereal *rwork, integer *iwork, integer *info)
 {
@@ -32,7 +35,7 @@ static integer c__1 = 1;
 
     /* Local variables */
     static doublereal temp;
-    static integer curr, i, j, k, iperm;
+    static integer curr, i__, j, k, iperm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     static integer indxq, iwrem, iqptr, tlvls;
@@ -44,17 +47,25 @@ static integer c__1 = 1;
 	    doublereal *, doublecomplex *, doublereal *, integer *, integer *)
 	    ;
     static integer ll, iq, igivcl;
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int xerbla_(char *, integer *), zlacrm_(
 	    integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    integer *, doublecomplex *, integer *, doublereal *);
     static integer igivnm, submat, curprb, subpbs, igivpt;
     extern /* Subroutine */ int dsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    static integer curlvl, matsiz, iprmpt, lgn, msd2, smm1, spm1, spm2;
+    static integer curlvl, matsiz, iprmpt, smlsiz, lgn, msd2, smm1, spm1, 
+	    spm2;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define qstore_subscr(a_1,a_2) (a_2)*qstore_dim1 + a_1
+#define qstore_ref(a_1,a_2) qstore[qstore_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -65,8 +76,7 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    Using the divide and conquer method, ZLAED0 computes all eigenvalues 
-  
+    Using the divide and conquer method, ZLAED0 computes all eigenvalues   
     of a symmetric tridiagonal matrix which is one diagonal block of   
     those from reducing a dense or band Hermitian matrix and   
     corresponding eigenvectors of the dense or band matrix.   
@@ -76,8 +86,7 @@ static integer c__1 = 1;
 
     QSIZ   (input) INTEGER   
            The dimension of the unitary matrix used to reduce   
-           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1. 
-  
+           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1.   
 
     N      (input) INTEGER   
            The dimension of the symmetric tridiagonal matrix.  N >= 0.   
@@ -87,8 +96,7 @@ static integer c__1 = 1;
            On exit, the eigenvalues in ascending order.   
 
     E      (input/output) DOUBLE PRECISION array, dimension (N-1)   
-           On entry, the off-diagonal elements of the tridiagonal matrix. 
-  
+           On entry, the off-diagonal elements of the tridiagonal matrix.   
            On exit, E has been destroyed.   
 
     Q      (input/output) COMPLEX*16 array, dimension (LDQ,N)   
@@ -107,8 +115,7 @@ static integer c__1 = 1;
                                     such that 2^k >= N )   
 
     RWORK  (workspace) DOUBLE PRECISION array,   
-                                 dimension (1 + 3*N + 2*N*lg N + 3*N**2) 
-  
+                                 dimension (1 + 3*N + 2*N*lg N + 3*N**2)   
                           ( lg( N ) = smallest integer k   
                                       such that 2^k >= N )   
 
@@ -128,8 +135,7 @@ static integer c__1 = 1;
                   working on the submatrix lying in rows and columns   
                   INFO/(N+1) through mod(INFO,N+1).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
     Warning:      N could be as big as QSIZ!   
 
@@ -137,13 +143,13 @@ static integer c__1 = 1;
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     qstore_dim1 = *ldqs;
-    qstore_offset = qstore_dim1 + 1;
+    qstore_offset = 1 + qstore_dim1 * 1;
     qstore -= qstore_offset;
     --rwork;
     --iwork;
@@ -176,6 +182,9 @@ static integer c__1 = 1;
 	return 0;
     }
 
+    smlsiz = ilaenv_(&c__9, "ZLAED0", " ", &c__0, &c__0, &c__0, &c__0, (
+	    ftnlen)6, (ftnlen)1);
+
 /*     Determine the size and placement of the submatrices, and save in   
        the leading elements of IWORK. */
 
@@ -183,7 +192,7 @@ static integer c__1 = 1;
     subpbs = 1;
     tlvls = 0;
 L10:
-    if (iwork[subpbs] > 25) {
+    if (iwork[subpbs] > smlsiz) {
 	for (j = subpbs; j >= 1; --j) {
 	    iwork[j * 2] = (iwork[j] + 1) / 2;
 	    iwork[(j << 1) - 1] = iwork[j] / 2;
@@ -199,18 +208,17 @@ L10:
 /* L30: */
     }
 
-/*     Divide the matrix into SUBPBS submatrices of size at most SMLSIZ+1 
-  
+/*     Divide the matrix into SUBPBS submatrices of size at most SMLSIZ+1   
        using rank-1 modifications (cuts). */
 
     spm1 = subpbs - 1;
     latime_1.ops += spm1 << 1;
     i__1 = spm1;
-    for (i = 1; i <= i__1; ++i) {
-	submat = iwork[i] + 1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	submat = iwork[i__] + 1;
 	smm1 = submat - 1;
-	d[smm1] -= (d__1 = e[smm1], abs(d__1));
-	d[submat] -= (d__1 = e[smm1], abs(d__1));
+	d__[smm1] -= (d__1 = e[smm1], abs(d__1));
+	d__[submat] -= (d__1 = e[smm1], abs(d__1));
 /* L40: */
     }
 
@@ -241,34 +249,32 @@ L10:
     iwrem = iq + i__1 * i__1 + 1;
 /*     Initialize pointers */
     i__1 = subpbs;
-    for (i = 0; i <= i__1; ++i) {
-	iwork[iprmpt + i] = 1;
-	iwork[igivpt + i] = 1;
+    for (i__ = 0; i__ <= i__1; ++i__) {
+	iwork[iprmpt + i__] = 1;
+	iwork[igivpt + i__] = 1;
 /* L50: */
     }
     iwork[iqptr] = 1;
 
-/*     Solve each submatrix eigenproblem at the bottom of the divide and 
-  
+/*     Solve each submatrix eigenproblem at the bottom of the divide and   
        conquer tree. */
 
     curr = 0;
     i__1 = spm1;
-    for (i = 0; i <= i__1; ++i) {
-	if (i == 0) {
+    for (i__ = 0; i__ <= i__1; ++i__) {
+	if (i__ == 0) {
 	    submat = 1;
 	    matsiz = iwork[1];
 	} else {
-	    submat = iwork[i] + 1;
-	    matsiz = iwork[i + 1] - iwork[i];
+	    submat = iwork[i__] + 1;
+	    matsiz = iwork[i__ + 1] - iwork[i__];
 	}
 	ll = iq - 1 + iwork[iqptr + curr];
-	dsteqr_("I", &matsiz, &d[submat], &e[submat], &rwork[ll], &matsiz, &
+	dsteqr_("I", &matsiz, &d__[submat], &e[submat], &rwork[ll], &matsiz, &
 		rwork[1], info);
 	latime_1.ops += (doublereal) (*qsiz) * 4 * matsiz * matsiz;
-	zlacrm_(qsiz, &matsiz, &q[submat * q_dim1 + 1], ldq, &rwork[ll], &
-		matsiz, &qstore[submat * qstore_dim1 + 1], ldqs, &rwork[iwrem]
-		);
+	zlacrm_(qsiz, &matsiz, &q_ref(1, submat), ldq, &rwork[ll], &matsiz, &
+		qstore_ref(1, submat), ldqs, &rwork[iwrem]);
 /* Computing 2nd power */
 	i__2 = matsiz;
 	iwork[iqptr + curr + 1] = iwork[iqptr + curr] + i__2 * i__2;
@@ -278,7 +284,7 @@ L10:
 	    return 0;
 	}
 	k = 1;
-	i__2 = iwork[i + 1];
+	i__2 = iwork[i__ + 1];
 	for (j = submat; j <= i__2; ++j) {
 	    iwork[indxq + j] = k;
 	    ++k;
@@ -297,41 +303,37 @@ L80:
     if (subpbs > 1) {
 	spm2 = subpbs - 2;
 	i__1 = spm2;
-	for (i = 0; i <= i__1; i += 2) {
-	    if (i == 0) {
+	for (i__ = 0; i__ <= i__1; i__ += 2) {
+	    if (i__ == 0) {
 		submat = 1;
 		matsiz = iwork[2];
 		msd2 = iwork[1];
 		curprb = 0;
 	    } else {
-		submat = iwork[i] + 1;
-		matsiz = iwork[i + 2] - iwork[i];
+		submat = iwork[i__] + 1;
+		matsiz = iwork[i__ + 2] - iwork[i__];
 		msd2 = matsiz / 2;
 		++curprb;
 	    }
 
-/*     Merge lower order eigensystems (of size MSD2 and MATSIZ - M
-SD2)   
-       into an eigensystem of size MATSIZ.  ZLAED7 handles the cas
-e   
-       when the eigenvectors of a full or band Hermitian matrix (w
-hich   
+/*     Merge lower order eigensystems (of size MSD2 and MATSIZ - MSD2)   
+       into an eigensystem of size MATSIZ.  ZLAED7 handles the case   
+       when the eigenvectors of a full or band Hermitian matrix (which   
        was reduced to tridiagonal form) are desired.   
 
-       I am free to use Q as a valuable working space until Loop 1
-50. */
+       I am free to use Q as a valuable working space until Loop 150. */
 
-	    zlaed7_(&matsiz, &msd2, qsiz, &tlvls, &curlvl, &curprb, &d[submat]
-		    , &qstore[submat * qstore_dim1 + 1], ldqs, &e[submat + 
-		    msd2 - 1], &iwork[indxq + submat], &rwork[iq], &iwork[
-		    iqptr], &iwork[iprmpt], &iwork[iperm], &iwork[igivpt], &
-		    iwork[igivcl], &rwork[igivnm], &q[submat * q_dim1 + 1], &
-		    rwork[iwrem], &iwork[subpbs + 1], info);
+	    zlaed7_(&matsiz, &msd2, qsiz, &tlvls, &curlvl, &curprb, &d__[
+		    submat], &qstore_ref(1, submat), ldqs, &e[submat + msd2 - 
+		    1], &iwork[indxq + submat], &rwork[iq], &iwork[iqptr], &
+		    iwork[iprmpt], &iwork[iperm], &iwork[igivpt], &iwork[
+		    igivcl], &rwork[igivnm], &q_ref(1, submat), &rwork[iwrem],
+		     &iwork[subpbs + 1], info);
 	    if (*info > 0) {
 		*info = submat * (*n + 1) + submat + matsiz - 1;
 		return 0;
 	    }
-	    iwork[i / 2 + 1] = iwork[i + 2];
+	    iwork[i__ / 2 + 1] = iwork[i__ + 2];
 /* L90: */
 	}
 	subpbs /= 2;
@@ -341,23 +343,27 @@ hich
 
 /*     end while   
 
-       Re-merge the eigenvalues/vectors which were deflated at the final 
-  
+       Re-merge the eigenvalues/vectors which were deflated at the final   
        merge step. */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	j = iwork[indxq + i];
-	rwork[i] = d[j];
-	zcopy_(qsiz, &qstore[j * qstore_dim1 + 1], &c__1, &q[i * q_dim1 + 1], 
-		&c__1);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	j = iwork[indxq + i__];
+	rwork[i__] = d__[j];
+	zcopy_(qsiz, &qstore_ref(1, j), &c__1, &q_ref(1, i__), &c__1);
 /* L100: */
     }
-    dcopy_(n, &rwork[1], &c__1, &d[1], &c__1);
+    dcopy_(n, &rwork[1], &c__1, &d__[1], &c__1);
 
     return 0;
 
 /*     End of ZLAED0 */
 
 } /* zlaed0_ */
+
+#undef qstore_ref
+#undef qstore_subscr
+#undef q_ref
+#undef q_subscr
+
 

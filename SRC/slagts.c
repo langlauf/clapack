@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slagts_(integer *job, integer *n, real *a, real *b, real 
-	*c, real *d, integer *in, real *y, real *tol, integer *info)
+	*c__, real *d__, integer *in, real *y, real *tol, integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -37,8 +38,7 @@
                   and, if overflow would otherwise occur, the diagonal   
                   elements of U are to be perturbed. See argument TOL   
                   below.   
-            =  2: The equations  (T - lambda*I)'x = y  are to be solved, 
-  
+            =  2: The equations  (T - lambda*I)'x = y  are to be solved,   
                   but diagonal elements of U are not to be perturbed.   
             = -2: The equations  (T - lambda*I)'x = y  are to be solved   
                   and, if overflow would otherwise occur, the diagonal   
@@ -53,8 +53,7 @@
             returned from SLAGTF.   
 
     B       (input) REAL array, dimension (N-1)   
-            On entry, B must contain the first super-diagonal elements of 
-  
+            On entry, B must contain the first super-diagonal elements of   
             U as returned from SLAGTF.   
 
     C       (input) REAL array, dimension (N-1)   
@@ -66,8 +65,7 @@
             of U as returned from SLAGTF.   
 
     IN      (input) INTEGER array, dimension (N)   
-            On entry, IN must contain details of the matrix P as returned 
-  
+            On entry, IN must contain details of the matrix P as returned   
             from SLAGTF.   
 
     Y       (input/output) REAL array, dimension (N)   
@@ -76,12 +74,9 @@
 
     TOL     (input/output) REAL   
             On entry, with  JOB .lt. 0, TOL should be the minimum   
-            perturbation to be made to very small diagonal elements of U. 
-  
-            TOL should normally be chosen as about eps*norm(U), where eps 
-  
-            is the relative machine precision, but if TOL is supplied as 
-  
+            perturbation to be made to very small diagonal elements of U.   
+            TOL should normally be chosen as about eps*norm(U), where eps   
+            is the relative machine precision, but if TOL is supplied as   
             non-positive, then it is reset to eps*max( abs( u(i,j) ) ).   
             If  JOB .gt. 0  then TOL is not referenced.   
 
@@ -90,24 +85,18 @@
 
     INFO    (output) INTEGER   
             = 0   : successful exit   
-            .lt. 0: if INFO = -i, the i-th argument had an illegal value 
-  
+            .lt. 0: if INFO = -i, the i-th argument had an illegal value   
             .gt. 0: overflow would occur when computing the INFO(th)   
-                    element of the solution vector x. This can only occur 
-  
+                    element of the solution vector x. This can only occur   
                     when JOB is supplied as positive and either means   
                     that a diagonal element of U is very small, or that   
-                    the elements of the right-hand side vector y are very 
-  
+                    the elements of the right-hand side vector y are very   
                     large.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1, r__2, r__3, r__4, r__5;
@@ -121,15 +110,14 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static real bignum, eps;
 
+    --y;
+    --in;
+    --d__;
+    --c__;
+    --b;
+    --a;
 
-#define Y(I) y[(I)-1]
-#define IN(I) in[(I)-1]
-#define D(I) d[(I)-1]
-#define C(I) c[(I)-1]
-#define B(I) b[(I)-1]
-#define A(I) a[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     if (abs(*job) > 2 || *job == 0) {
 	*info = -1;
@@ -152,20 +140,20 @@
 
     if (*job < 0) {
 	if (*tol <= 0.f) {
-	    *tol = dabs(A(1));
+	    *tol = dabs(a[1]);
 	    if (*n > 1) {
 /* Computing MAX */
-		r__1 = *tol, r__2 = dabs(A(2)), r__1 = max(r__1,r__2), r__2 = 
-			dabs(B(1));
+		r__1 = *tol, r__2 = dabs(a[2]), r__1 = max(r__1,r__2), r__2 = 
+			dabs(b[1]);
 		*tol = dmax(r__1,r__2);
 	    }
 	    i__1 = *n;
-	    for (k = 3; k <= *n; ++k) {
+	    for (k = 3; k <= i__1; ++k) {
 /* Computing MAX */
-		r__4 = *tol, r__5 = (r__1 = A(k), dabs(r__1)), r__4 = max(
-			r__4,r__5), r__5 = (r__2 = B(k - 1), dabs(r__2)), 
-			r__4 = max(r__4,r__5), r__5 = (r__3 = D(k - 2), dabs(
-			r__3));
+		r__4 = *tol, r__5 = (r__1 = a[k], dabs(r__1)), r__4 = max(
+			r__4,r__5), r__5 = (r__2 = b[k - 1], dabs(r__2)), 
+			r__4 = max(r__4,r__5), r__5 = (r__3 = d__[k - 2], 
+			dabs(r__3));
 		*tol = dmax(r__4,r__5);
 /* L10: */
 	    }
@@ -178,26 +166,26 @@
 
     if (abs(*job) == 1) {
 	i__1 = *n;
-	for (k = 2; k <= *n; ++k) {
-	    if (IN(k - 1) == 0) {
-		Y(k) -= C(k - 1) * Y(k - 1);
+	for (k = 2; k <= i__1; ++k) {
+	    if (in[k - 1] == 0) {
+		y[k] -= c__[k - 1] * y[k - 1];
 	    } else {
-		temp = Y(k - 1);
-		Y(k - 1) = Y(k);
-		Y(k) = temp - C(k - 1) * Y(k);
+		temp = y[k - 1];
+		y[k - 1] = y[k];
+		y[k] = temp - c__[k - 1] * y[k];
 	    }
 /* L20: */
 	}
 	if (*job == 1) {
 	    for (k = *n; k >= 1; --k) {
 		if (k <= *n - 2) {
-		    temp = Y(k) - B(k) * Y(k + 1) - D(k) * Y(k + 2);
+		    temp = y[k] - b[k] * y[k + 1] - d__[k] * y[k + 2];
 		} else if (k == *n - 1) {
-		    temp = Y(k) - B(k) * Y(k + 1);
+		    temp = y[k] - b[k] * y[k + 1];
 		} else {
-		    temp = Y(k);
+		    temp = y[k];
 		}
-		ak = A(k);
+		ak = a[k];
 		absak = dabs(ak);
 		if (absak < 1.f) {
 		    if (absak < sfmin) {
@@ -213,19 +201,19 @@
 			return 0;
 		    }
 		}
-		Y(k) = temp / ak;
+		y[k] = temp / ak;
 /* L30: */
 	    }
 	} else {
 	    for (k = *n; k >= 1; --k) {
 		if (k <= *n - 2) {
-		    temp = Y(k) - B(k) * Y(k + 1) - D(k) * Y(k + 2);
+		    temp = y[k] - b[k] * y[k + 1] - d__[k] * y[k + 2];
 		} else if (k == *n - 1) {
-		    temp = Y(k) - B(k) * Y(k + 1);
+		    temp = y[k] - b[k] * y[k + 1];
 		} else {
-		    temp = Y(k);
+		    temp = y[k];
 		}
-		ak = A(k);
+		ak = a[k];
 		pert = r_sign(tol, &ak);
 L40:
 		absak = dabs(ak);
@@ -245,7 +233,7 @@ L40:
 			goto L40;
 		    }
 		}
-		Y(k) = temp / ak;
+		y[k] = temp / ak;
 /* L50: */
 	    }
 	}
@@ -255,15 +243,15 @@ L40:
 
 	if (*job == 2) {
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		if (k >= 3) {
-		    temp = Y(k) - B(k - 1) * Y(k - 1) - D(k - 2) * Y(k - 2);
+		    temp = y[k] - b[k - 1] * y[k - 1] - d__[k - 2] * y[k - 2];
 		} else if (k == 2) {
-		    temp = Y(k) - B(k - 1) * Y(k - 1);
+		    temp = y[k] - b[k - 1] * y[k - 1];
 		} else {
-		    temp = Y(k);
+		    temp = y[k];
 		}
-		ak = A(k);
+		ak = a[k];
 		absak = dabs(ak);
 		if (absak < 1.f) {
 		    if (absak < sfmin) {
@@ -279,20 +267,20 @@ L40:
 			return 0;
 		    }
 		}
-		Y(k) = temp / ak;
+		y[k] = temp / ak;
 /* L60: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		if (k >= 3) {
-		    temp = Y(k) - B(k - 1) * Y(k - 1) - D(k - 2) * Y(k - 2);
+		    temp = y[k] - b[k - 1] * y[k - 1] - d__[k - 2] * y[k - 2];
 		} else if (k == 2) {
-		    temp = Y(k) - B(k - 1) * Y(k - 1);
+		    temp = y[k] - b[k - 1] * y[k - 1];
 		} else {
-		    temp = Y(k);
+		    temp = y[k];
 		}
-		ak = A(k);
+		ak = a[k];
 		pert = r_sign(tol, &ak);
 L70:
 		absak = dabs(ak);
@@ -312,18 +300,18 @@ L70:
 			goto L70;
 		    }
 		}
-		Y(k) = temp / ak;
+		y[k] = temp / ak;
 /* L80: */
 	    }
 	}
 
 	for (k = *n; k >= 2; --k) {
-	    if (IN(k - 1) == 0) {
-		Y(k - 1) -= C(k - 1) * Y(k);
+	    if (in[k - 1] == 0) {
+		y[k - 1] -= c__[k - 1] * y[k];
 	    } else {
-		temp = Y(k - 1);
-		Y(k - 1) = Y(k);
-		Y(k) = temp - C(k - 1) * Y(k);
+		temp = y[k - 1];
+		y[k - 1] = y[k];
+		y[k] = temp - c__[k - 1] * y[k];
 	    }
 /* L90: */
 	}

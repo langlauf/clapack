@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku, 
 	doublereal *ab, integer *ldab, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,12 +13,9 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
     Purpose   
     =======   
 
-    DLANGB  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the element of  largest absolute value  of an 
-  
-    n by n band matrix  A,  with kl sub-diagonals and ku super-diagonals. 
-  
+    DLANGB  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the element of  largest absolute value  of an   
+    n by n band matrix  A,  with kl sub-diagonals and ku super-diagonals.   
 
     Description   
     ===========   
@@ -32,12 +30,9 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -70,14 +65,11 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
             where LWORK >= N when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -87,20 +79,22 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i, j, k, l;
+    static integer i__, j, k, l;
     static doublereal scale;
     extern logical lsame_(char *, char *);
     static doublereal value;
     extern /* Subroutine */ int dlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
     static doublereal sum;
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.;
     } else if (lsame_(norm, "M")) {
@@ -109,35 +103,36 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
 
 	value = 0.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__2 = *ku + 2 - j;
 /* Computing MIN */
 	    i__4 = *n + *ku + 1 - j, i__5 = *kl + *ku + 1;
 	    i__3 = min(i__4,i__5);
-	    for (i = max(*ku+2-j,1); i <= min(*n+*ku+1-j,*kl+*ku+1); ++i) {
+	    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-		d__2 = value, d__3 = (d__1 = AB(i,j), abs(d__1));
+		d__2 = value, d__3 = (d__1 = ab_ref(i__, j), abs(d__1));
 		value = max(d__2,d__3);
 /* L10: */
 	    }
 /* L20: */
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
 	value = 0.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    sum = 0.;
 /* Computing MAX */
 	    i__3 = *ku + 2 - j;
 /* Computing MIN */
 	    i__4 = *n + *ku + 1 - j, i__5 = *kl + *ku + 1;
 	    i__2 = min(i__4,i__5);
-	    for (i = max(*ku+2-j,1); i <= min(*n+*ku+1-j,*kl+*ku+1); ++i) {
-		sum += (d__1 = AB(i,j), abs(d__1));
+	    for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
+		sum += (d__1 = ab_ref(i__, j), abs(d__1));
 /* L30: */
 	    }
 	    value = max(value,sum);
@@ -148,29 +143,29 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
 /*        Find normI(A). */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    WORK(i) = 0.;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    work[i__] = 0.;
 /* L50: */
 	}
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    k = *ku + 1 - j;
 /* Computing MAX */
 	    i__2 = 1, i__3 = j - *ku;
 /* Computing MIN */
 	    i__5 = *n, i__6 = j + *kl;
 	    i__4 = min(i__5,i__6);
-	    for (i = max(1,j-*ku); i <= min(*n,j+*kl); ++i) {
-		WORK(i) += (d__1 = AB(k+i,j), abs(d__1));
+	    for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
+		work[i__] += (d__1 = ab_ref(k + i__, j), abs(d__1));
 /* L60: */
 	    }
 /* L70: */
 	}
 	value = 0.;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = value, d__2 = WORK(i);
+	    d__1 = value, d__2 = work[i__];
 	    value = max(d__1,d__2);
 /* L80: */
 	}
@@ -181,7 +176,7 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
 	scale = 0.;
 	sum = 1.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__4 = 1, i__2 = j - *ku;
 	    l = max(i__4,i__2);
@@ -189,7 +184,7 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
 /* Computing MIN */
 	    i__2 = *n, i__3 = j + *kl;
 	    i__4 = min(i__2,i__3) - l + 1;
-	    dlassq_(&i__4, &AB(k,j), &c__1, &scale, &sum);
+	    dlassq_(&i__4, &ab_ref(k, j), &c__1, &scale, &sum);
 /* L90: */
 	}
 	value = scale * sqrt(sum);
@@ -201,4 +196,7 @@ doublereal dlangb_(char *norm, integer *n, integer *kl, integer *ku,
 /*     End of DLANGB */
 
 } /* dlangb_ */
+
+#undef ab_ref
+
 

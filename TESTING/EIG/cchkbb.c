@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static integer c_n1 = -1;
 	integer *nwdths, integer *kk, integer *ntypes, logical *dotype, 
 	integer *nrhs, integer *iseed, real *thresh, integer *nounit, complex 
 	*a, integer *lda, complex *ab, integer *ldab, real *bd, real *be, 
-	complex *q, integer *ldq, complex *p, integer *ldp, complex *c, 
+	complex *q, integer *ldq, complex *p, integer *ldp, complex *c__, 
 	integer *ldc, complex *cc, complex *work, integer *lwork, real *rwork,
 	 real *result, integer *info)
 {
@@ -52,7 +53,7 @@ static integer c_n1 = -1;
     static real cond;
     static integer jcol, kmax, mmax, nmax;
     static real unfl, ovfl;
-    static integer i, j, k, m, n;
+    static integer i__, j, k, m, n;
     extern /* Subroutine */ int cbdt01_(integer *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, 
 	    complex *, integer *, complex *, real *, real *);
@@ -64,8 +65,7 @@ static integer c_n1 = -1;
     extern /* Subroutine */ int cunt01_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, real *, real *);
     static real anorm;
-    static integer mnmin, mnmax, nmats, jsize, nerrs, itype, iwork, jtype, 
-	    ntest;
+    static integer mnmin, mnmax, nmats, jsize, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int slahd2_(integer *, char *), cgbbrd_(
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    complex *, integer *, real *, real *, complex *, integer *, 
@@ -97,16 +97,22 @@ static integer c_n1 = -1;
     static real ulp;
 
     /* Fortran I/O blocks */
-    static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___44 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___46 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9998, 0 };
 
+
+
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
 
 /*  -- LAPACK test routine (new routine for release 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -116,8 +122,7 @@ static integer c_n1 = -1;
     matrix to real bidiagonal form.   
 
     CGBBRD factors a general band matrix A as  Q B P* , where * means   
-    conjugate transpose, B is upper bidiagonal, and Q and P are unitary; 
-  
+    conjugate transpose, B is upper bidiagonal, and Q and P are unitary;   
     CGBBRD can also overwrite a given matrix C with Q* C .   
 
     For each pair of matrix dimensions (M,N) and each selected matrix   
@@ -220,8 +225,7 @@ static integer c_n1 = -1;
 
     NRHS    (input) INTEGER   
             The number of columns in the "right-hand side" matrix C.   
-            If NRHS = 0, then the operations on the right-hand side will 
-  
+            If NRHS = 0, then the operations on the right-hand side will   
             not be tested. NRHS must be at least 0.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
@@ -259,8 +263,7 @@ static integer c_n1 = -1;
             Used to hold A in band storage format.   
 
     LDAB    (input) INTEGER   
-            The leading dimension of AB.  It must be at least 2 (not 1!) 
-  
+            The leading dimension of AB.  It must be at least 2 (not 1!)   
             and at least max( KK )+1.   
 
     BD      (workspace) REAL array, dimension (max(NN))   
@@ -311,8 +314,7 @@ static integer c_n1 = -1;
     INFO    (output) INTEGER   
             If 0, then everything ran OK.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -338,8 +340,7 @@ static integer c_n1 = -1;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -348,25 +349,25 @@ static integer c_n1 = -1;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     --bd;
     --be;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     p_dim1 = *ldp;
-    p_offset = p_dim1 + 1;
+    p_offset = 1 + p_dim1 * 1;
     p -= p_offset;
     cc_dim1 = *ldc;
-    cc_offset = cc_dim1 + 1;
+    cc_offset = 1 + cc_dim1 * 1;
     cc -= cc_offset;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --work;
     --rwork;
     --result;
@@ -529,11 +530,9 @@ static integer c_n1 = -1;
                 =1  O(1)   clustered 1  zero   
                 =2  large  clustered 2  identity   
                 =3  small  exponential  (none)   
-                =4         arithmetic   diagonal, (w/ singular
- values)   
+                =4         arithmetic   diagonal, (w/ singular values)   
                 =5         random log   (none)   
-                =6         random       nonhermitian, w/ singu
-lar values   
+                =6         random       nonhermitian, w/ singular values   
                 =7                      (none)   
                 =8                      (none)   
                 =9                      random nonhermitian */
@@ -585,15 +584,14 @@ L70:
 
 		    i__4 = n;
 		    for (jcol = 1; jcol <= i__4; ++jcol) {
-			i__5 = jcol + jcol * a_dim1;
+			i__5 = a_subscr(jcol, jcol);
 			a[i__5].r = anorm, a[i__5].i = 0.f;
 /* L80: */
 		    }
 
 		} else if (itype == 4) {
 
-/*                 Diagonal Matrix, singular values specif
-ied */
+/*                 Diagonal Matrix, singular values specified */
 
 		    clatms_(&m, &n, "S", &iseed[1], "N", &rwork[1], &imode, &
 			    cond, &anorm, &c__0, &c__0, "N", &a[a_offset], 
@@ -601,8 +599,7 @@ ied */
 
 		} else if (itype == 6) {
 
-/*                 Nonhermitian, singular values specified
- */
+/*                 Nonhermitian, singular values specified */
 
 		    clatms_(&m, &n, "S", &iseed[1], "N", &rwork[1], &imode, &
 			    cond, &anorm, &kl, &ku, "N", &a[a_offset], lda, &
@@ -627,14 +624,14 @@ ied */
 
 		clatmr_(&m, nrhs, "S", &iseed[1], "N", &work[1], &c__6, &
 			c_b33, &c_b2, "T", "N", &work[m + 1], &c__1, &c_b33, &
-			work[(m << 1) + 1], &c__1, &c_b33, "N", &iwork, &m, 
-			nrhs, &c_b41, &c_b33, "NO", &c[c_offset], ldc, &iwork,
-			 &iinfo);
+			work[(m << 1) + 1], &c__1, &c_b33, "N", idumma, &m, 
+			nrhs, &c_b41, &c_b33, "NO", &c__[c_offset], ldc, 
+			idumma, &iinfo);
 
 		if (iinfo != 0) {
-		    io___42.ciunit = *nounit;
-		    s_wsfe(&io___42);
-		    do_fio(&c__1, "Generator", 9L);
+		    io___41.ciunit = *nounit;
+		    s_wsfe(&io___41);
+		    do_fio(&c__1, "Generator", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -656,9 +653,9 @@ L90:
 /* Computing MIN */
 		    i__8 = m, i__9 = j + kl;
 		    i__7 = min(i__8,i__9);
-		    for (i = max(i__5,i__6); i <= i__7; ++i) {
-			i__5 = ku + 1 + i - j + j * ab_dim1;
-			i__6 = i + j * a_dim1;
+		    for (i__ = max(i__5,i__6); i__ <= i__7; ++i__) {
+			i__5 = ab_subscr(ku + 1 + i__ - j, j);
+			i__6 = a_subscr(i__, j);
 			ab[i__5].r = a[i__6].r, ab[i__5].i = a[i__6].i;
 /* L100: */
 		    }
@@ -667,20 +664,19 @@ L90:
 
 /*              Copy C */
 
-		clacpy_("Full", &m, nrhs, &c[c_offset], ldc, &cc[cc_offset], 
-			ldc);
+		clacpy_("Full", &m, nrhs, &c__[c_offset], ldc, &cc[cc_offset],
+			 ldc);
 
-/*              Call CGBBRD to compute B, Q and P, and to upda
-te C. */
+/*              Call CGBBRD to compute B, Q and P, and to update C. */
 
 		cgbbrd_("B", &m, &n, nrhs, &kl, &ku, &ab[ab_offset], ldab, &
 			bd[1], &be[1], &q[q_offset], ldq, &p[p_offset], ldp, &
 			cc[cc_offset], ldc, &work[1], &rwork[1], &iinfo);
 
 		if (iinfo != 0) {
-		    io___44.ciunit = *nounit;
-		    s_wsfe(&io___44);
-		    do_fio(&c__1, "CGBBRD", 6L);
+		    io___43.ciunit = *nounit;
+		    s_wsfe(&io___43);
+		    do_fio(&c__1, "CGBBRD", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -696,8 +692,7 @@ te C. */
 		    }
 		}
 
-/*              Test 1:  Check the decomposition A := Q * B * 
-P'   
+/*              Test 1:  Check the decomposition A := Q * B * P'   
                      2:  Check the orthogonality of Q   
                      3:  Check the orthogonality of P   
                      4:  Check the computation of Q' * C */
@@ -709,8 +704,8 @@ P'
 			 &rwork[1], &result[2]);
 		cunt01_("Rows", &n, &n, &p[p_offset], ldp, &work[1], lwork, &
 			rwork[1], &result[3]);
-		cbdt02_(&m, nrhs, &c[c_offset], ldc, &cc[cc_offset], ldc, &q[
-			q_offset], ldq, &work[1], &rwork[1], &result[4]);
+		cbdt02_(&m, nrhs, &c__[c_offset], ldc, &cc[cc_offset], ldc, &
+			q[q_offset], ldq, &work[1], &rwork[1], &result[4]);
 
 /*              End of Loop -- Check for RESULT(j) > THRESH */
 
@@ -727,8 +722,8 @@ L120:
 			    slahd2_(nounit, "ZBB");
 			}
 			++nerrs;
-			io___46.ciunit = *nounit;
-			s_wsfe(&io___46);
+			io___45.ciunit = *nounit;
+			s_wsfe(&io___45);
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -762,4 +757,10 @@ L150:
 /*     End of CCHKBB */
 
 } /* cchkbb_ */
+
+#undef ab_ref
+#undef ab_subscr
+#undef a_ref
+#undef a_subscr
+
 

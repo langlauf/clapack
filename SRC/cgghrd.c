@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgghrd_(char *compq, char *compz, integer *n, integer *
 	ilo, integer *ihi, complex *a, integer *lda, complex *b, integer *ldb,
-	 complex *q, integer *ldq, complex *z, integer *ldz, integer *info)
+	 complex *q, integer *ldq, complex *z__, integer *ldz, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    CGGHRD reduces a pair of complex matrices (A,B) to generalized upper 
-  
+    CGGHRD reduces a pair of complex matrices (A,B) to generalized upper   
     Hessenberg form using unitary transformations, where A is a   
     general matrix and B is upper triangular:  Q' * A * Z = H and   
     Q' * B * Z = T, where H is upper Hessenberg, T is upper triangular,   
@@ -49,8 +49,7 @@
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            It is assumed that A is already upper triangular in rows and 
-  
+            It is assumed that A is already upper triangular in rows and   
             columns 1:ILO-1 and IHI+1:N.  ILO and IHI are normally set   
             by a previous call to CGGBAL; otherwise they should be set   
             to 1 and N respectively.   
@@ -110,15 +109,12 @@
     an unblocked reduction, as described in _Matrix_Computations_,   
     by Golub and van Loan (Johns Hopkins Press).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode COMPQ   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static complex c_b2 = {0.f,0.f};
@@ -135,7 +131,7 @@
     extern /* Subroutine */ int crot_(integer *, complex *, integer *, 
 	    complex *, integer *, real *, complex *);
     static integer jrow;
-    static real c;
+    static real c__;
     static complex s;
     extern logical lsame_(char *, char *);
     static complex ctemp;
@@ -145,15 +141,30 @@
 	    *);
     static integer icompq, icompz;
     static logical ilq, ilz;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     if (lsame_(compq, "N")) {
 	ilq = FALSE_;
 	icompq = 1;
@@ -213,10 +224,10 @@
 /*     Initialize Q and Z if desired. */
 
     if (icompq == 3) {
-	claset_("Full", n, n, &c_b2, &c_b1, &Q(1,1), ldq);
+	claset_("Full", n, n, &c_b2, &c_b1, &q[q_offset], ldq);
     }
     if (icompz == 3) {
-	claset_("Full", n, n, &c_b2, &c_b1, &Z(1,1), ldz);
+	claset_("Full", n, n, &c_b2, &c_b1, &z__[z_offset], ldz);
     }
 
 /*     Quick return if possible */
@@ -228,11 +239,11 @@
 /*     Zero out lower triangle of B */
 
     i__1 = *n - 1;
-    for (jcol = 1; jcol <= *n-1; ++jcol) {
+    for (jcol = 1; jcol <= i__1; ++jcol) {
 	i__2 = *n;
-	for (jrow = jcol + 1; jrow <= *n; ++jrow) {
-	    i__3 = jrow + jcol * b_dim1;
-	    B(jrow,jcol).r = 0.f, B(jrow,jcol).i = 0.f;
+	for (jrow = jcol + 1; jrow <= i__2; ++jrow) {
+	    i__3 = b_subscr(jrow, jcol);
+	    b[i__3].r = 0.f, b[i__3].i = 0.f;
 /* L10: */
 	}
 /* L20: */
@@ -241,41 +252,47 @@
 /*     Reduce A and B */
 
     i__1 = *ihi - 2;
-    for (jcol = *ilo; jcol <= *ihi-2; ++jcol) {
+    for (jcol = *ilo; jcol <= i__1; ++jcol) {
 
 	i__2 = jcol + 2;
-	for (jrow = *ihi; jrow >= jcol+2; --jrow) {
+	for (jrow = *ihi; jrow >= i__2; --jrow) {
 
-/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL)
- */
+/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL) */
 
-	    i__3 = jrow - 1 + jcol * a_dim1;
-	    ctemp.r = A(jrow-1,jcol).r, ctemp.i = A(jrow-1,jcol).i;
-	    clartg_(&ctemp, &A(jrow,jcol), &c, &s, &A(jrow-1,jcol));
-	    i__3 = jrow + jcol * a_dim1;
-	    A(jrow,jcol).r = 0.f, A(jrow,jcol).i = 0.f;
+	    i__3 = a_subscr(jrow - 1, jcol);
+	    ctemp.r = a[i__3].r, ctemp.i = a[i__3].i;
+	    clartg_(&ctemp, &a_ref(jrow, jcol), &c__, &s, &a_ref(jrow - 1, 
+		    jcol));
+	    i__3 = a_subscr(jrow, jcol);
+	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 	    i__3 = *n - jcol;
-	    crot_(&i__3, &A(jrow-1,jcol+1), lda, &A(jrow,jcol+1), lda, &c, &s);
+	    crot_(&i__3, &a_ref(jrow - 1, jcol + 1), lda, &a_ref(jrow, jcol + 
+		    1), lda, &c__, &s);
 	    i__3 = *n + 2 - jrow;
-	    crot_(&i__3, &B(jrow-1,jrow-1), ldb, &B(jrow,jrow-1), ldb, &c, &s);
+	    crot_(&i__3, &b_ref(jrow - 1, jrow - 1), ldb, &b_ref(jrow, jrow - 
+		    1), ldb, &c__, &s);
 	    if (ilq) {
 		r_cnjg(&q__1, &s);
-		crot_(n, &Q(1,jrow-1), &c__1, &Q(1,jrow), &c__1, &c, &q__1);
+		crot_(n, &q_ref(1, jrow - 1), &c__1, &q_ref(1, jrow), &c__1, &
+			c__, &q__1);
 	    }
 
-/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JR
-OW-1) */
+/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JROW-1) */
 
-	    i__3 = jrow + jrow * b_dim1;
-	    ctemp.r = B(jrow,jrow).r, ctemp.i = B(jrow,jrow).i;
-	    clartg_(&ctemp, &B(jrow,jrow-1), &c, &s, &B(jrow,jrow));
-	    i__3 = jrow + (jrow - 1) * b_dim1;
-	    B(jrow,jrow-1).r = 0.f, B(jrow,jrow-1).i = 0.f;
-	    crot_(ihi, &A(1,jrow), &c__1, &A(1,jrow-1), &c__1, &c, &s);
+	    i__3 = b_subscr(jrow, jrow);
+	    ctemp.r = b[i__3].r, ctemp.i = b[i__3].i;
+	    clartg_(&ctemp, &b_ref(jrow, jrow - 1), &c__, &s, &b_ref(jrow, 
+		    jrow));
+	    i__3 = b_subscr(jrow, jrow - 1);
+	    b[i__3].r = 0.f, b[i__3].i = 0.f;
+	    crot_(ihi, &a_ref(1, jrow), &c__1, &a_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    i__3 = jrow - 1;
-	    crot_(&i__3, &B(1,jrow), &c__1, &B(1,jrow-1), &c__1, &c, &s);
+	    crot_(&i__3, &b_ref(1, jrow), &c__1, &b_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    if (ilz) {
-		crot_(n, &Z(1,jrow), &c__1, &Z(1,jrow-1), &c__1, &c, &s);
+		crot_(n, &z___ref(1, jrow), &c__1, &z___ref(1, jrow - 1), &
+			c__1, &c__, &s);
 	    }
 /* L30: */
 	}
@@ -287,4 +304,14 @@ OW-1) */
 /*     End of CGGHRD */
 
 } /* cgghrd_ */
+
+#undef z___ref
+#undef z___subscr
+#undef q_ref
+#undef q_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

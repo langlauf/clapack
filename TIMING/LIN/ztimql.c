@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -54,7 +55,7 @@ static integer c__0 = 0;
     static integer info;
     static char path[3];
     static doublereal time;
-    static integer isub, muse[12], nuse[12], i, k, m, n;
+    static integer isub, muse[12], nuse[12], i__, k, m, n;
     static char cname[6];
     static integer iside;
     extern doublereal dopla_(char *, integer *, integer *, integer *, integer 
@@ -113,7 +114,12 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -132,8 +138,7 @@ static integer c__0 = 0;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -210,15 +215,13 @@ static integer c__0 = 0;
             eigenvalues.  See ZLATMS for further details.   
 
     COND    DOUBLE PRECISION   
-            The condition number of the matrix.  The singular values are 
-  
+            The condition number of the matrix.  The singular values are   
             set to values from DMAX to DMAX/COND.   
 
     DMAX    DOUBLE PRECISION   
             The magnitude of the largest singular value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -235,28 +238,31 @@ static integer c__0 = 0;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Zomplex precision", 1L, 17L);
-    s_copy(path + 1, "QL", 2L, 2L);
-    atimin_(path, line, &c__3, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "QL", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__3, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L230;
     }
 
 /*     Check that M <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___9.ciunit = *nout;
 	s_wsfe(&io___9);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L230;
     }
@@ -276,8 +282,7 @@ static integer c__0 = 0;
 	for (ilda = 1; ilda <= i__2; ++ilda) {
 	    lda = ldaval[ilda];
 
-/*           Do for each pair of values (NB, NX) in NBVAL and NXVA
-L. */
+/*           Do for each pair of values (NB, NX) in NBVAL and NXVAL. */
 
 	    i__3 = *nnb;
 	    for (inb = 1; inb <= i__3; ++inb) {
@@ -329,16 +334,13 @@ L20:
 
 		    time = (time - untime) / (doublereal) ic;
 		    ops = dopla_("ZGEQLF", &m, &n, &c__0, &c__0, &nb);
-		    reslts[inb + (im + (ilda + reslts_dim3) * reslts_dim2) * 
-			    reslts_dim1] = dmflop_(&ops, &time, &info);
+		    reslts_ref(inb, im, ilda, 1) = dmflop_(&ops, &time, &info)
+			    ;
 		} else {
 
-/*                 If ZGEQLF was not timed, generate a mat
-rix and factor   
-                   it using ZGEQLF anyway so that the fact
-ored form of   
-                   the matrix can be used in timing the ot
-her routines. */
+/*                 If ZGEQLF was not timed, generate a matrix and factor   
+                   it using ZGEQLF anyway so that the factored form of   
+                   the matrix can be used in timing the other routines. */
 
 		    zlacpy_("Full", &m, &n, &b[1], &lda, &a[1], &lda);
 		    zgeqlf_(&m, &n, &a[1], &lda, &tau[1], &work[1], &lw, &
@@ -347,8 +349,7 @@ her routines. */
 
 		if (timsub[1]) {
 
-/*                 ZUNGQL:  Generate orthogonal matrix Q f
-rom the QL   
+/*                 ZUNGQL:  Generate orthogonal matrix Q from the QL   
                    factorization */
 
 		    zlacpy_("Full", &m, &minmn, &a[1], &lda, &b[1], &lda);
@@ -379,11 +380,9 @@ L40:
 		    }
 
 		    time = (time - untime) / (doublereal) ic;
-		    ops = dopla_("ZUNGQL", &m, &minmn, &minmn, &c__0, &nb)
+		    ops = dopla_("ZUNGQL", &m, &minmn, &minmn, &c__0, &nb);
+		    reslts_ref(inb, im, ilda, 2) = dmflop_(&ops, &time, &info)
 			    ;
-		    reslts[inb + (im + (ilda + (reslts_dim3 << 1)) * 
-			    reslts_dim2) * reslts_dim1] = dmflop_(&ops, &time,
-			     &info);
 		}
 
 /* L50: */
@@ -401,15 +400,15 @@ L40:
 	}
 	io___29.ciunit = *nout;
 	s_wsfe(&io___29);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___31.ciunit = *nout;
 		s_wsfe(&io___31);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L80: */
 	    }
@@ -423,9 +422,8 @@ L40:
 	    e_wsfe();
 	}
 	dprtb4_("(  NB,  NX)", "M", "N", nnb, &nbval[1], &nxval[1], nm, &mval[
-		1], &nval[1], nlda, &reslts[((isub * reslts_dim3 + 1) * 
-		reslts_dim2 + 1) * reslts_dim1 + 1], ldr1, ldr2, nout, 11L, 
-		1L, 1L);
+		1], &nval[1], nlda, &reslts_ref(1, 1, 1, isub), ldr1, ldr2, 
+		nout, (ftnlen)11, (ftnlen)1, (ftnlen)1);
 L90:
 	;
     }
@@ -437,12 +435,12 @@ L90:
 
 /*        Check that K <= LDA for the input values. */
 
-	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info, 6L)
-		;
+	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info, (
+		ftnlen)6);
 	if (info > 0) {
 	    io___34.ciunit = *nout;
 	    s_wsfe(&io___34);
-	    do_fio(&c__1, subnam + 12, 6L);
+	    do_fio(&c__1, subnam_ref(0, 3), (ftnlen)6);
 	    e_wsfe();
 	    goto L230;
 	}
@@ -476,8 +474,7 @@ L90:
 	    for (ilda = 1; ilda <= i__2; ++ilda) {
 		lda = ldaval[ilda];
 
-/*              Generate an M by N matrix and form its QL deco
-mposition. */
+/*              Generate an M by N matrix and form its QL decomposition. */
 
 		zlatms_(&m, &n, "Uniform", iseed, "Nonsymm", &rwork[1], &c__3,
 			 &c_b24, &c_b25, &m, &n, "No packing", &a[1], &lda, &
@@ -487,16 +484,14 @@ mposition. */
 		lw = max(i__3,i__4);
 		zgeqlf_(&m, &n, &a[1], &lda, &tau[1], &work[1], &lw, &info);
 
-/*              Do first for SIDE = 'L', then for SIDE = 'R' 
-*/
+/*              Do first for SIDE = 'L', then for SIDE = 'R' */
 
 		i4 = 0;
 		for (iside = 1; iside <= 2; ++iside) {
 		    *(unsigned char *)side = *(unsigned char *)&sides[iside - 
 			    1];
 
-/*                 Do for each pair of values (NB, NX) in 
-NBVAL and   
+/*                 Do for each pair of values (NB, NX) in NBVAL and   
                    NXVAL. */
 
 		    i__3 = *nnb;
@@ -506,15 +501,13 @@ NBVAL and
 			nx = nxval[inb];
 			xlaenv_(&c__3, &nx);
 
-/*                    Do for each value of K in KVAL 
-*/
+/*                    Do for each value of K in KVAL */
 
 			i__4 = *nk;
 			for (ik = 1; ik <= i__4; ++ik) {
 			    k = kval[ik];
 
-/*                       Sort out which variable i
-s which */
+/*                       Sort out which variable is which */
 
 			    if (iside == 1) {
 				m1 = m;
@@ -532,8 +525,7 @@ s which */
 				lw = max(i__5,i__6);
 			    }
 
-/*                       Do first for TRANS = 'N',
- then for TRANS = 'T' */
+/*                       Do first for TRANS = 'N', then for TRANS = 'T' */
 
 			    itoff = 0;
 			    for (itran = 1; itran <= 2; ++itran) {
@@ -556,8 +548,7 @@ L110:
 				    goto L110;
 				}
 
-/*                          Subtract the time 
-used in ZTIMMG. */
+/*                          Subtract the time used in ZTIMMG. */
 
 				icl = 1;
 				s1 = dsecnd_();
@@ -575,10 +566,8 @@ L120:
 				i__5 = iside - 1;
 				ops = dopla_("ZUNMQL", &m1, &n1, &k1, &i__5, &
 					nb);
-				reslts[inb + (im + (ilda + (i4 + itoff + ik) *
-					 reslts_dim3) * reslts_dim2) * 
-					reslts_dim1] = dmflop_(&ops, &time, &
-					info);
+				reslts_ref(inb, im, ilda, i4 + itoff + ik) = 
+					dmflop_(&ops, &time, &info);
 				itoff = *nk;
 /* L130: */
 			    }
@@ -604,17 +593,17 @@ L120:
 		if (iside == 1) {
 		    io___49.ciunit = *nout;
 		    s_wsfe(&io___49);
-		    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+		    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 		    e_wsfe();
 		    if (*nlda > 1) {
 			i__1 = *nlda;
-			for (i = 1; i <= i__1; ++i) {
+			for (i__ = 1; i__ <= i__1; ++i__) {
 			    io___50.ciunit = *nout;
 			    s_wsfe(&io___50);
-			    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer))
-				    ;
-			    do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
+			    do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)
+				    sizeof(integer));
 			    e_wsfe();
 /* L190: */
 			}
@@ -629,10 +618,10 @@ L120:
 			    n = kval[ik];
 			    io___51.ciunit = *nout;
 			    s_wsfe(&io___51);
-			    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-			    do_fio(&c__1, side, 1L);
-			    do_fio(&c__1, trans, 1L);
-			    do_fio(&c__1, "N", 1L);
+			    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+			    do_fio(&c__1, side, (ftnlen)1);
+			    do_fio(&c__1, trans, (ftnlen)1);
+			    do_fio(&c__1, "N", (ftnlen)1);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    e_wsfe();
@@ -641,19 +630,18 @@ L120:
 			    m = kval[ik];
 			    io___53.ciunit = *nout;
 			    s_wsfe(&io___53);
-			    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-			    do_fio(&c__1, side, 1L);
-			    do_fio(&c__1, trans, 1L);
-			    do_fio(&c__1, "M", 1L);
+			    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+			    do_fio(&c__1, side, (ftnlen)1);
+			    do_fio(&c__1, trans, (ftnlen)1);
+			    do_fio(&c__1, "M", (ftnlen)1);
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
 				    ;
 			    e_wsfe();
 			    *(unsigned char *)labm = 'N';
 			}
 			dprtb5_("NB", labm, "K", nnb, &nbval[1], &imx, muse, 
-				nuse, nlda, &reslts[((i4 * reslts_dim3 + 1) * 
-				reslts_dim2 + 1) * reslts_dim1 + 1], ldr1, 
-				ldr2, nout, 2L, 1L, 1L);
+				nuse, nlda, &reslts_ref(1, 1, 1, i4), ldr1, 
+				ldr2, nout, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 			++i4;
 /* L200: */
 		    }
@@ -664,7 +652,7 @@ L120:
 	} else {
 	    io___54.ciunit = *nout;
 	    s_wsfe(&io___54);
-	    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	    e_wsfe();
 	}
     }
@@ -674,4 +662,8 @@ L230:
 /*     End of ZTIMQL */
 
 } /* ztimql_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,7 +14,7 @@ static complex c_b15 = {1.f,0.f};
 
 /* Subroutine */ int cglmts_(integer *n, integer *m, integer *p, complex *a, 
 	complex *af, integer *lda, complex *b, complex *bf, integer *ldb, 
-	complex *d, complex *df, complex *x, complex *u, complex *work, 
+	complex *d__, complex *df, complex *x, complex *u, complex *work, 
 	integer *lwork, real *rwork, real *result)
 {
     /* System generated locals */
@@ -43,7 +44,7 @@ static complex c_b15 = {1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -107,25 +108,24 @@ static complex c_b15 = {1.f,0.f};
               RESULT = -----------------------------------------   
                        (norm(A)+norm(B))*(norm(x)+norm(u))*EPS   
 
-    ==================================================================== 
-  
+    ====================================================================   
 
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
-    --d;
+    --d__;
     --df;
     --x;
     --u;
@@ -147,7 +147,7 @@ static complex c_b15 = {1.f,0.f};
 
     clacpy_("Full", n, m, &a[a_offset], lda, &af[af_offset], lda);
     clacpy_("Full", n, p, &b[b_offset], ldb, &bf[bf_offset], ldb);
-    ccopy_(n, &d[1], &c__1, &df[1], &c__1);
+    ccopy_(n, &d__[1], &c__1, &df[1], &c__1);
 
 /*     Solve GLM problem */
 
@@ -160,7 +160,7 @@ static complex c_b15 = {1.f,0.f};
          RESULT = -----------------------------------------   
                   (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
 
-    ccopy_(n, &d[1], &c__1, &df[1], &c__1);
+    ccopy_(n, &d__[1], &c__1, &df[1], &c__1);
     cgemv_("No transpose", n, m, &c_b13, &a[a_offset], lda, &x[1], &c__1, &
 	    c_b15, &df[1], &c__1);
 

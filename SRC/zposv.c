@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zposv_(char *uplo, integer *n, integer *nrhs, 
 	doublecomplex *a, integer *lda, doublecomplex *b, integer *ldb, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -41,13 +42,11 @@
             of the matrix B.  NRHS >= 0.   
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
-            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading   
             N-by-N upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of A contains the lower 
-  
+            leading N-by-N lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -71,15 +70,12 @@
                   positive definite, so the factorization could not be   
                   completed, and the solution has not been computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1;
     /* Local variables */
@@ -89,11 +85,14 @@
 	     zpotrs_(char *, integer *, integer *, doublecomplex *, integer *,
 	     doublecomplex *, integer *, integer *);
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
@@ -114,13 +113,12 @@
 
 /*     Compute the Cholesky factorization A = U'*U or A = L*L'. */
 
-    zpotrf_(uplo, n, &A(1,1), lda, info);
+    zpotrf_(uplo, n, &a[a_offset], lda, info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	zpotrs_(uplo, n, nrhs, &A(1,1), lda, &B(1,1), ldb, info)
-		;
+	zpotrs_(uplo, n, nrhs, &a[a_offset], lda, &b[b_offset], ldb, info);
 
     }
     return 0;

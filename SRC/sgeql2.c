@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgeql2_(integer *m, integer *n, real *a, integer *lda, 
 	real *tau, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -27,11 +28,9 @@
     A       (input/output) REAL array, dimension (LDA,N)   
             On entry, the m by n matrix A.   
             On exit, if m >= n, the lower triangle of the subarray   
-            A(m-n+1:m,1:n) contains the n by n lower triangular matrix L; 
-  
+            A(m-n+1:m,1:n) contains the n by n lower triangular matrix L;   
             if m <= n, the elements on and below the (n-m)-th   
-            superdiagonal contain the m by n lower trapezoidal matrix L; 
-  
+            superdiagonal contain the m by n lower trapezoidal matrix L;   
             the remaining elements, with the array TAU, represent the   
             orthogonal matrix Q as a product of elementary reflectors   
             (see Further Details).   
@@ -40,8 +39,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) REAL array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) REAL array, dimension (N)   
@@ -62,39 +60,37 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in 
-  
+    v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in   
     A(1:m-k+i-1,n-k+i), and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     extern /* Subroutine */ int slarf_(char *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *), xerbla_(
 	    char *, integer *), slarfg_(integer *, real *, real *, 
 	    integer *, real *);
     static real aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -111,23 +107,24 @@
 
     k = min(*m,*n);
 
-    for (i = k; i >= 1; --i) {
+    for (i__ = k; i__ >= 1; --i__) {
 
 /*        Generate elementary reflector H(i) to annihilate   
           A(1:m-k+i-1,n-k+i) */
 
-	i__1 = *m - k + i;
-	slarfg_(&i__1, &A(*m-k+i,*n-k+i), &A(1,*n-k+i), &c__1, &TAU(i));
+	i__1 = *m - k + i__;
+	slarfg_(&i__1, &a_ref(*m - k + i__, *n - k + i__), &a_ref(1, *n - k + 
+		i__), &c__1, &tau[i__]);
 
 /*        Apply H(i) to A(1:m-k+i,1:n-k+i-1) from the left */
 
-	aii = A(*m-k+i,*n-k+i);
-	A(*m-k+i,*n-k+i) = 1.f;
-	i__1 = *m - k + i;
-	i__2 = *n - k + i - 1;
-	slarf_("Left", &i__1, &i__2, &A(1,*n-k+i), &c__1, &
-		TAU(i), &A(1,1), lda, &WORK(1));
-	A(*m-k+i,*n-k+i) = aii;
+	aii = a_ref(*m - k + i__, *n - k + i__);
+	a_ref(*m - k + i__, *n - k + i__) = 1.f;
+	i__1 = *m - k + i__;
+	i__2 = *n - k + i__ - 1;
+	slarf_("Left", &i__1, &i__2, &a_ref(1, *n - k + i__), &c__1, &tau[i__]
+		, &a[a_offset], lda, &work[1]);
+	a_ref(*m - k + i__, *n - k + i__) = aii;
 /* L10: */
     }
     return 0;
@@ -135,4 +132,7 @@
 /*     End of SGEQL2 */
 
 } /* sgeql2_ */
+
+#undef a_ref
+
 

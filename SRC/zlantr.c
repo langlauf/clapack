@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	 doublecomplex *a, integer *lda, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
     Purpose   
     =======   
 
-    ZLANTR  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    ZLANTR  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     trapezoidal or triangular matrix A.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -47,8 +43,7 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
             above.   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower trapezoidal. 
-  
+            Specifies whether the matrix A is upper or lower trapezoidal.   
             = 'U':  Upper trapezoidal   
             = 'L':  Lower trapezoidal   
             Note that A is triangular instead of trapezoidal if M = N.   
@@ -73,8 +68,7 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
             strictly lower triangular part of A is not referenced.   
             If UPLO = 'L', the leading m by n lower trapezoidal part of   
             the array A contains the lower trapezoidal matrix, and the   
-            strictly upper triangular part of A is not referenced.  Note 
-  
+            strictly upper triangular part of A is not referenced.  Note   
             that when DIAG = 'U', the diagonal elements of A are not   
             referenced and are assumed to be one.   
 
@@ -85,13 +79,10 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
             where LWORK >= M when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -101,7 +92,7 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
     /* Builtin functions */
     double z_abs(doublecomplex *), sqrt(doublereal);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal scale;
     static logical udiag;
     extern logical lsame_(char *, char *);
@@ -109,13 +100,16 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
     extern /* Subroutine */ int zlassq_(integer *, doublecomplex *, integer *,
 	     doublereal *, doublereal *);
     static doublereal sum;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (min(*m,*n) == 0) {
 	value = 0.;
     } else if (lsame_(norm, "M")) {
@@ -126,13 +120,13 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	    value = 1.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__3 = *m, i__4 = j - 1;
 		    i__2 = min(i__3,i__4);
-		    for (i = 1; i <= min(*m,j-1); ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&A(i,j));
+			d__1 = value, d__2 = z_abs(&a_ref(i__, j));
 			value = max(d__1,d__2);
 /* L10: */
 		    }
@@ -140,11 +134,11 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j + 1; i <= *m; ++i) {
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&A(i,j));
+			d__1 = value, d__2 = z_abs(&a_ref(i__, j));
 			value = max(d__1,d__2);
 /* L30: */
 		    }
@@ -155,11 +149,11 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	    value = 0.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = min(*m,j);
-		    for (i = 1; i <= min(*m,j); ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&A(i,j));
+			d__1 = value, d__2 = z_abs(&a_ref(i__, j));
 			value = max(d__1,d__2);
 /* L50: */
 		    }
@@ -167,11 +161,11 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j; i <= *m; ++i) {
+		    for (i__ = j; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&A(i,j));
+			d__1 = value, d__2 = z_abs(&a_ref(i__, j));
 			value = max(d__1,d__2);
 /* L70: */
 		    }
@@ -179,7 +173,8 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 		}
 	    }
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
@@ -187,19 +182,19 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	udiag = lsame_(diag, "U");
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag && j <= *m) {
 		    sum = 1.;
 		    i__2 = j - 1;
-		    for (i = 1; i <= j-1; ++i) {
-			sum += z_abs(&A(i,j));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			sum += z_abs(&a_ref(i__, j));
 /* L90: */
 		    }
 		} else {
 		    sum = 0.;
 		    i__2 = min(*m,j);
-		    for (i = 1; i <= min(*m,j); ++i) {
-			sum += z_abs(&A(i,j));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			sum += z_abs(&a_ref(i__, j));
 /* L100: */
 		    }
 		}
@@ -208,19 +203,19 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.;
 		    i__2 = *m;
-		    for (i = j + 1; i <= *m; ++i) {
-			sum += z_abs(&A(i,j));
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
+			sum += z_abs(&a_ref(i__, j));
 /* L120: */
 		    }
 		} else {
 		    sum = 0.;
 		    i__2 = *m;
-		    for (i = j; i <= *m; ++i) {
-			sum += z_abs(&A(i,j));
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			sum += z_abs(&a_ref(i__, j));
 /* L130: */
 		    }
 		}
@@ -235,32 +230,32 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	if (lsame_(uplo, "U")) {
 	    if (lsame_(diag, "U")) {
 		i__1 = *m;
-		for (i = 1; i <= *m; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L150: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__3 = *m, i__4 = j - 1;
 		    i__2 = min(i__3,i__4);
-		    for (i = 1; i <= min(*m,j-1); ++i) {
-			WORK(i) += z_abs(&A(i,j));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&a_ref(i__, j));
 /* L160: */
 		    }
 /* L170: */
 		}
 	    } else {
 		i__1 = *m;
-		for (i = 1; i <= *m; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L180: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = min(*m,j);
-		    for (i = 1; i <= min(*m,j); ++i) {
-			WORK(i) += z_abs(&A(i,j));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&a_ref(i__, j));
 /* L190: */
 		    }
 /* L200: */
@@ -269,35 +264,35 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	} else {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L210: */
 		}
 		i__1 = *m;
-		for (i = *n + 1; i <= *m; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = *n + 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L220: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j + 1; i <= *m; ++i) {
-			WORK(i) += z_abs(&A(i,j));
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&a_ref(i__, j));
 /* L230: */
 		    }
 /* L240: */
 		}
 	    } else {
 		i__1 = *m;
-		for (i = 1; i <= *m; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L250: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j; i <= *m; ++i) {
-			WORK(i) += z_abs(&A(i,j));
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&a_ref(i__, j));
 /* L260: */
 		    }
 /* L270: */
@@ -306,9 +301,9 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 	}
 	value = 0.;
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = value, d__2 = WORK(i);
+	    d__1 = value, d__2 = work[i__];
 	    value = max(d__1,d__2);
 /* L280: */
 	}
@@ -321,20 +316,20 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 		scale = 1.;
 		sum = (doublereal) min(*m,*n);
 		i__1 = *n;
-		for (j = 2; j <= *n; ++j) {
+		for (j = 2; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__3 = *m, i__4 = j - 1;
 		    i__2 = min(i__3,i__4);
-		    zlassq_(&i__2, &A(1,j), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &a_ref(1, j), &c__1, &scale, &sum);
 /* L290: */
 		}
 	    } else {
 		scale = 0.;
 		sum = 1.;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = min(*m,j);
-		    zlassq_(&i__2, &A(1,j), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &a_ref(1, j), &c__1, &scale, &sum);
 /* L300: */
 		}
 	    }
@@ -343,21 +338,21 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 		scale = 1.;
 		sum = (doublereal) min(*m,*n);
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    i__2 = *m - j;
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-		    i__3 = *m, i__4 = j + 1;
-		    zlassq_(&i__2, &A(min(*m,j+1),j), &c__1, &
-			    scale, &sum);
+		    i__2 = *m, i__3 = j + 1;
+		    i__4 = *m - j;
+		    zlassq_(&i__4, &a_ref(min(i__2,i__3), j), &c__1, &scale, &
+			    sum);
 /* L310: */
 		}
 	    } else {
 		scale = 0.;
 		sum = 1.;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m - j + 1;
-		    zlassq_(&i__2, &A(j,j), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &a_ref(j, j), &c__1, &scale, &sum);
 /* L320: */
 		}
 	    }
@@ -371,4 +366,8 @@ doublereal zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n,
 /*     End of ZLANTR */
 
 } /* zlantr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

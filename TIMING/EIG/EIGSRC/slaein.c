@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,8 +19,8 @@ struct {
 static integer c__1 = 1;
 
 /* Subroutine */ int slaein_(logical *rightv, logical *noinit, integer *n, 
-	real *h, integer *ldh, real *wr, real *wi, real *vr, real *vi, real *
-	b, integer *ldb, real *work, real *eps3, real *smlnum, real *bignum, 
+	real *h__, integer *ldh, real *wr, real *wi, real *vr, real *vi, real 
+	*b, integer *ldb, real *work, real *eps3, real *smlnum, real *bignum, 
 	integer *info)
 {
     /* System generated locals */
@@ -33,7 +34,7 @@ static integer c__1 = 1;
     static integer ierr;
     static real temp, norm, vmax, opst;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, j;
+    static integer i__, j;
     static real scale, w, x, y;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static char trans[1];
@@ -52,6 +53,10 @@ static integer c__1 = 1;
 	    integer *, real *, integer *, real *, real *, real *, integer *);
     static real growto, rec;
     static integer its;
+
+
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
 
 
 /*  -- LAPACK auxiliary routine (instrumented to count operations) --   
@@ -102,8 +107,7 @@ static integer c__1 = 1;
             starting vector for inverse iteration using the complex   
             eigenvalue (WR,WI); otherwise VR and VI need not be set.   
             On exit, if WI = 0.0 (real eigenvalue), VR contains the   
-            computed real eigenvector; if WI.ne.0.0 (complex eigenvalue), 
-  
+            computed real eigenvector; if WI.ne.0.0 (complex eigenvalue),   
             VR and VI contain the real and imaginary parts of the   
             computed complex eigenvector. The eigenvector is normalized   
             so that the component of largest magnitude has magnitude 1;   
@@ -133,18 +137,17 @@ static integer c__1 = 1;
             = 1:  inverse iteration did not converge; VR is set to the   
                   last iterate, and so is VI if WI.ne.0.0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     --vr;
     --vi;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -174,11 +177,11 @@ static integer c__1 = 1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j - 1;
-	for (i = 1; i <= i__2; ++i) {
-	    b[i + j * b_dim1] = h[i + j * h_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    b_ref(i__, j) = h___ref(i__, j);
 /* L10: */
 	}
-	b[j + j * b_dim1] = h[j + j * h_dim1] - *wr;
+	b_ref(j, j) = h___ref(j, j) - *wr;
 /* L20: */
     }
 /* ** */
@@ -194,8 +197,8 @@ static integer c__1 = 1;
 /*           Set initial vector. */
 
 	    i__1 = *n;
-	    for (i = 1; i <= i__1; ++i) {
-		vr[i] = *eps3;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		vr[i__] = *eps3;
 /* L30: */
 	    }
 	} else {
@@ -212,46 +215,46 @@ static integer c__1 = 1;
 
 	if (*rightv) {
 
-/*           LU decomposition with partial pivoting of B, replacin
-g zero   
+/*           LU decomposition with partial pivoting of B, replacing zero   
              pivots by EPS3. */
 
 	    i__1 = *n - 1;
-	    for (i = 1; i <= i__1; ++i) {
-		ei = h[i + 1 + i * h_dim1];
-		if ((r__1 = b[i + i * b_dim1], dabs(r__1)) < dabs(ei)) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		ei = h___ref(i__ + 1, i__);
+		if ((r__1 = b_ref(i__, i__), dabs(r__1)) < dabs(ei)) {
 
 /*                 Interchange rows and eliminate. */
 
-		    x = b[i + i * b_dim1] / ei;
-		    b[i + i * b_dim1] = ei;
+		    x = b_ref(i__, i__) / ei;
+		    b_ref(i__, i__) = ei;
 		    i__2 = *n;
-		    for (j = i + 1; j <= i__2; ++j) {
-			temp = b[i + 1 + j * b_dim1];
-			b[i + 1 + j * b_dim1] = b[i + j * b_dim1] - x * temp;
-			b[i + j * b_dim1] = temp;
+		    for (j = i__ + 1; j <= i__2; ++j) {
+			temp = b_ref(i__ + 1, j);
+			b_ref(i__ + 1, j) = b_ref(i__, j) - x * temp;
+			b_ref(i__, j) = temp;
 /* L40: */
 		    }
 		} else {
 
 /*                 Eliminate without interchange. */
 
-		    if (b[i + i * b_dim1] == 0.f) {
-			b[i + i * b_dim1] = *eps3;
+		    if (b_ref(i__, i__) == 0.f) {
+			b_ref(i__, i__) = *eps3;
 		    }
-		    x = ei / b[i + i * b_dim1];
+		    x = ei / b_ref(i__, i__);
 		    if (x != 0.f) {
 			i__2 = *n;
-			for (j = i + 1; j <= i__2; ++j) {
-			    b[i + 1 + j * b_dim1] -= x * b[i + j * b_dim1];
+			for (j = i__ + 1; j <= i__2; ++j) {
+			    b_ref(i__ + 1, j) = b_ref(i__ + 1, j) - x * b_ref(
+				    i__, j);
 /* L50: */
 			}
 		    }
 		}
 /* L60: */
 	    }
-	    if (b[*n + *n * b_dim1] == 0.f) {
-		b[*n + *n * b_dim1] = *eps3;
+	    if (b_ref(*n, *n) == 0.f) {
+		b_ref(*n, *n) = *eps3;
 	    }
 /* **   
              Increment op count for LU decomposition */
@@ -262,46 +265,45 @@ g zero
 
 	} else {
 
-/*           UL decomposition with partial pivoting of B, replacin
-g zero   
+/*           UL decomposition with partial pivoting of B, replacing zero   
              pivots by EPS3. */
 
 	    for (j = *n; j >= 2; --j) {
-		ej = h[j + (j - 1) * h_dim1];
-		if ((r__1 = b[j + j * b_dim1], dabs(r__1)) < dabs(ej)) {
+		ej = h___ref(j, j - 1);
+		if ((r__1 = b_ref(j, j), dabs(r__1)) < dabs(ej)) {
 
 /*                 Interchange columns and eliminate. */
 
-		    x = b[j + j * b_dim1] / ej;
-		    b[j + j * b_dim1] = ej;
+		    x = b_ref(j, j) / ej;
+		    b_ref(j, j) = ej;
 		    i__1 = j - 1;
-		    for (i = 1; i <= i__1; ++i) {
-			temp = b[i + (j - 1) * b_dim1];
-			b[i + (j - 1) * b_dim1] = b[i + j * b_dim1] - x * 
-				temp;
-			b[i + j * b_dim1] = temp;
+		    for (i__ = 1; i__ <= i__1; ++i__) {
+			temp = b_ref(i__, j - 1);
+			b_ref(i__, j - 1) = b_ref(i__, j) - x * temp;
+			b_ref(i__, j) = temp;
 /* L70: */
 		    }
 		} else {
 
 /*                 Eliminate without interchange. */
 
-		    if (b[j + j * b_dim1] == 0.f) {
-			b[j + j * b_dim1] = *eps3;
+		    if (b_ref(j, j) == 0.f) {
+			b_ref(j, j) = *eps3;
 		    }
-		    x = ej / b[j + j * b_dim1];
+		    x = ej / b_ref(j, j);
 		    if (x != 0.f) {
 			i__1 = j - 1;
-			for (i = 1; i <= i__1; ++i) {
-			    b[i + (j - 1) * b_dim1] -= x * b[i + j * b_dim1];
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    b_ref(i__, j - 1) = b_ref(i__, j - 1) - x * b_ref(
+				    i__, j);
 /* L80: */
 			}
 		    }
 		}
 /* L90: */
 	    }
-	    if (b[b_dim1 + 1] == 0.f) {
-		b[b_dim1 + 1] = *eps3;
+	    if (b_ref(1, 1) == 0.f) {
+		b_ref(1, 1) = *eps3;
 	    }
 /* **   
              Increment op count for UL decomposition */
@@ -323,8 +325,7 @@ g zero
 	    slatrs_("Upper", trans, "Nonunit", normin, n, &b[b_offset], ldb, &
 		    vr[1], &scale, &work[1], &ierr);
 /* **   
-             Increment opcount for triangular solver, assuming tha
-t   
+             Increment opcount for triangular solver, assuming that   
              ops SLATRS = ops STRSV, with no scaling in SLATRS. */
 	    latime_1.ops += *n * *n;
 /* ** */
@@ -340,14 +341,13 @@ t
 		goto L120;
 	    }
 
-/*           Choose new orthogonal starting vector and try again. 
-*/
+/*           Choose new orthogonal starting vector and try again. */
 
 	    temp = *eps3 / (rootn + 1.f);
 	    vr[1] = *eps3;
 	    i__2 = *n;
-	    for (i = 2; i <= i__2; ++i) {
-		vr[i] = temp;
+	    for (i__ = 2; i__ <= i__2; ++i__) {
+		vr[i__] = temp;
 /* L100: */
 	    }
 	    vr[*n - its + 1] -= *eps3 * rootn;
@@ -365,8 +365,8 @@ L120:
 
 /*        Normalize eigenvector. */
 
-	i = isamax_(n, &vr[1], &c__1);
-	r__2 = 1.f / (r__1 = vr[i], dabs(r__1));
+	i__ = isamax_(n, &vr[1], &c__1);
+	r__2 = 1.f / (r__1 = vr[i__], dabs(r__1));
 	sscal_(n, &r__2, &vr[1], &c__1);
 /* ** */
 	opst += (*n << 1) + 1;
@@ -380,9 +380,9 @@ L120:
 /*           Set initial vector. */
 
 	    i__1 = *n;
-	    for (i = 1; i <= i__1; ++i) {
-		vr[i] = *eps3;
-		vi[i] = 0.f;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		vr[i__] = *eps3;
+		vi[i__] = 0.f;
 /* L130: */
 	    }
 	} else {
@@ -402,92 +402,87 @@ L120:
 
 	if (*rightv) {
 
-/*           LU decomposition with partial pivoting of B, replacin
-g zero   
+/*           LU decomposition with partial pivoting of B, replacing zero   
              pivots by EPS3.   
 
-             The imaginary part of the (i,j)-th element of U is st
-ored in   
+             The imaginary part of the (i,j)-th element of U is stored in   
              B(j+1,i). */
 
-	    b[b_dim1 + 2] = -(doublereal)(*wi);
+	    b_ref(2, 1) = -(*wi);
 	    i__1 = *n;
-	    for (i = 2; i <= i__1; ++i) {
-		b[i + 1 + b_dim1] = 0.f;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		b_ref(i__ + 1, 1) = 0.f;
 /* L140: */
 	    }
 
 	    i__1 = *n - 1;
-	    for (i = 1; i <= i__1; ++i) {
-		absbii = slapy2_(&b[i + i * b_dim1], &b[i + 1 + i * b_dim1]);
-		ei = h[i + 1 + i * h_dim1];
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		absbii = slapy2_(&b_ref(i__, i__), &b_ref(i__ + 1, i__));
+		ei = h___ref(i__ + 1, i__);
 		if (absbii < dabs(ei)) {
 
 /*                 Interchange rows and eliminate. */
 
-		    xr = b[i + i * b_dim1] / ei;
-		    xi = b[i + 1 + i * b_dim1] / ei;
-		    b[i + i * b_dim1] = ei;
-		    b[i + 1 + i * b_dim1] = 0.f;
+		    xr = b_ref(i__, i__) / ei;
+		    xi = b_ref(i__ + 1, i__) / ei;
+		    b_ref(i__, i__) = ei;
+		    b_ref(i__ + 1, i__) = 0.f;
 		    i__2 = *n;
-		    for (j = i + 1; j <= i__2; ++j) {
-			temp = b[i + 1 + j * b_dim1];
-			b[i + 1 + j * b_dim1] = b[i + j * b_dim1] - xr * temp;
-			b[j + 1 + (i + 1) * b_dim1] = b[j + 1 + i * b_dim1] - 
-				xi * temp;
-			b[i + j * b_dim1] = temp;
-			b[j + 1 + i * b_dim1] = 0.f;
+		    for (j = i__ + 1; j <= i__2; ++j) {
+			temp = b_ref(i__ + 1, j);
+			b_ref(i__ + 1, j) = b_ref(i__, j) - xr * temp;
+			b_ref(j + 1, i__ + 1) = b_ref(j + 1, i__) - xi * temp;
+			b_ref(i__, j) = temp;
+			b_ref(j + 1, i__) = 0.f;
 /* L150: */
 		    }
-		    b[i + 2 + i * b_dim1] = -(doublereal)(*wi);
-		    b[i + 1 + (i + 1) * b_dim1] -= xi * *wi;
-		    b[i + 2 + (i + 1) * b_dim1] += xr * *wi;
+		    b_ref(i__ + 2, i__) = -(*wi);
+		    b_ref(i__ + 1, i__ + 1) = b_ref(i__ + 1, i__ + 1) - xi * *
+			    wi;
+		    b_ref(i__ + 2, i__ + 1) = b_ref(i__ + 2, i__ + 1) + xr * *
+			    wi;
 /* ** */
-		    opst += (*n - i << 2) + 6;
+		    opst += (*n - i__ << 2) + 6;
 /* ** */
 		} else {
 
-/*                 Eliminate without interchanging rows. 
-*/
+/*                 Eliminate without interchanging rows. */
 
 		    if (absbii == 0.f) {
-			b[i + i * b_dim1] = *eps3;
-			b[i + 1 + i * b_dim1] = 0.f;
+			b_ref(i__, i__) = *eps3;
+			b_ref(i__ + 1, i__) = 0.f;
 			absbii = *eps3;
 		    }
 		    ei = ei / absbii / absbii;
-		    xr = b[i + i * b_dim1] * ei;
-		    xi = -(doublereal)b[i + 1 + i * b_dim1] * ei;
+		    xr = b_ref(i__, i__) * ei;
+		    xi = -b_ref(i__ + 1, i__) * ei;
 		    i__2 = *n;
-		    for (j = i + 1; j <= i__2; ++j) {
-			b[i + 1 + j * b_dim1] = b[i + 1 + j * b_dim1] - xr * 
-				b[i + j * b_dim1] + xi * b[j + 1 + i * b_dim1]
-				;
-			b[j + 1 + (i + 1) * b_dim1] = -(doublereal)xr * b[j + 
-				1 + i * b_dim1] - xi * b[i + j * b_dim1];
+		    for (j = i__ + 1; j <= i__2; ++j) {
+			b_ref(i__ + 1, j) = b_ref(i__ + 1, j) - xr * b_ref(
+				i__, j) + xi * b_ref(j + 1, i__);
+			b_ref(j + 1, i__ + 1) = -xr * b_ref(j + 1, i__) - xi *
+				 b_ref(i__, j);
 /* L160: */
 		    }
-		    b[i + 2 + (i + 1) * b_dim1] -= *wi;
+		    b_ref(i__ + 2, i__ + 1) = b_ref(i__ + 2, i__ + 1) - *wi;
 /* ** */
-		    opst += (*n - i) * 7 + 4;
+		    opst += (*n - i__) * 7 + 4;
 /* ** */
 		}
 
-/*              Compute 1-norm of offdiagonal elements of i-th
- row. */
+/*              Compute 1-norm of offdiagonal elements of i-th row. */
 
-		i__2 = *n - i;
-		i__3 = *n - i;
-		work[i] = sasum_(&i__2, &b[i + (i + 1) * b_dim1], ldb) + 
-			sasum_(&i__3, &b[i + 2 + i * b_dim1], &c__1);
+		i__2 = *n - i__;
+		i__3 = *n - i__;
+		work[i__] = sasum_(&i__2, &b_ref(i__, i__ + 1), ldb) + sasum_(
+			&i__3, &b_ref(i__ + 2, i__), &c__1);
 /* ** */
-		opst += (*n - i << 1) + 4;
+		opst += (*n - i__ << 1) + 4;
 /* **   
    L170: */
 	    }
-	    if (b[*n + *n * b_dim1] == 0.f && b[*n + 1 + *n * b_dim1] == 0.f) 
-		    {
-		b[*n + *n * b_dim1] = *eps3;
+	    if (b_ref(*n, *n) == 0.f && b_ref(*n + 1, *n) == 0.f) {
+		b_ref(*n, *n) = *eps3;
 	    }
 	    work[*n] = 0.f;
 
@@ -496,45 +491,42 @@ ored in
 	    i3 = -1;
 	} else {
 
-/*           UL decomposition with partial pivoting of conjg(B), 
-  
+/*           UL decomposition with partial pivoting of conjg(B),   
              replacing zero pivots by EPS3.   
 
-             The imaginary part of the (i,j)-th element of U is st
-ored in   
+             The imaginary part of the (i,j)-th element of U is stored in   
              B(j+1,i). */
 
-	    b[*n + 1 + *n * b_dim1] = *wi;
+	    b_ref(*n + 1, *n) = *wi;
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
-		b[*n + 1 + j * b_dim1] = 0.f;
+		b_ref(*n + 1, j) = 0.f;
 /* L180: */
 	    }
 
 	    for (j = *n; j >= 2; --j) {
-		ej = h[j + (j - 1) * h_dim1];
-		absbjj = slapy2_(&b[j + j * b_dim1], &b[j + 1 + j * b_dim1]);
+		ej = h___ref(j, j - 1);
+		absbjj = slapy2_(&b_ref(j, j), &b_ref(j + 1, j));
 		if (absbjj < dabs(ej)) {
 
 /*                 Interchange columns and eliminate */
 
-		    xr = b[j + j * b_dim1] / ej;
-		    xi = b[j + 1 + j * b_dim1] / ej;
-		    b[j + j * b_dim1] = ej;
-		    b[j + 1 + j * b_dim1] = 0.f;
+		    xr = b_ref(j, j) / ej;
+		    xi = b_ref(j + 1, j) / ej;
+		    b_ref(j, j) = ej;
+		    b_ref(j + 1, j) = 0.f;
 		    i__1 = j - 1;
-		    for (i = 1; i <= i__1; ++i) {
-			temp = b[i + (j - 1) * b_dim1];
-			b[i + (j - 1) * b_dim1] = b[i + j * b_dim1] - xr * 
-				temp;
-			b[j + i * b_dim1] = b[j + 1 + i * b_dim1] - xi * temp;
-			b[i + j * b_dim1] = temp;
-			b[j + 1 + i * b_dim1] = 0.f;
+		    for (i__ = 1; i__ <= i__1; ++i__) {
+			temp = b_ref(i__, j - 1);
+			b_ref(i__, j - 1) = b_ref(i__, j) - xr * temp;
+			b_ref(j, i__) = b_ref(j + 1, i__) - xi * temp;
+			b_ref(i__, j) = temp;
+			b_ref(j + 1, i__) = 0.f;
 /* L190: */
 		    }
-		    b[j + 1 + (j - 1) * b_dim1] = *wi;
-		    b[j - 1 + (j - 1) * b_dim1] += xi * *wi;
-		    b[j + (j - 1) * b_dim1] -= xr * *wi;
+		    b_ref(j + 1, j - 1) = *wi;
+		    b_ref(j - 1, j - 1) = b_ref(j - 1, j - 1) + xi * *wi;
+		    b_ref(j, j - 1) = b_ref(j, j - 1) - xr * *wi;
 /* ** */
 		    opst += (j - 1 << 2) + 6;
 /* ** */
@@ -543,42 +535,40 @@ ored in
 /*                 Eliminate without interchange. */
 
 		    if (absbjj == 0.f) {
-			b[j + j * b_dim1] = *eps3;
-			b[j + 1 + j * b_dim1] = 0.f;
+			b_ref(j, j) = *eps3;
+			b_ref(j + 1, j) = 0.f;
 			absbjj = *eps3;
 		    }
 		    ej = ej / absbjj / absbjj;
-		    xr = b[j + j * b_dim1] * ej;
-		    xi = -(doublereal)b[j + 1 + j * b_dim1] * ej;
+		    xr = b_ref(j, j) * ej;
+		    xi = -b_ref(j + 1, j) * ej;
 		    i__1 = j - 1;
-		    for (i = 1; i <= i__1; ++i) {
-			b[i + (j - 1) * b_dim1] = b[i + (j - 1) * b_dim1] - 
-				xr * b[i + j * b_dim1] + xi * b[j + 1 + i * 
-				b_dim1];
-			b[j + i * b_dim1] = -(doublereal)xr * b[j + 1 + i * 
-				b_dim1] - xi * b[i + j * b_dim1];
+		    for (i__ = 1; i__ <= i__1; ++i__) {
+			b_ref(i__, j - 1) = b_ref(i__, j - 1) - xr * b_ref(
+				i__, j) + xi * b_ref(j + 1, i__);
+			b_ref(j, i__) = -xr * b_ref(j + 1, i__) - xi * b_ref(
+				i__, j);
 /* L200: */
 		    }
-		    b[j + (j - 1) * b_dim1] += *wi;
+		    b_ref(j, j - 1) = b_ref(j, j - 1) + *wi;
 /* ** */
 		    opst += (j - 1) * 7 + 4;
 /* ** */
 		}
 
-/*              Compute 1-norm of offdiagonal elements of j-th
- column. */
+/*              Compute 1-norm of offdiagonal elements of j-th column. */
 
 		i__1 = j - 1;
 		i__2 = j - 1;
-		work[j] = sasum_(&i__1, &b[j * b_dim1 + 1], &c__1) + sasum_(&
-			i__2, &b[j + 1 + b_dim1], ldb);
+		work[j] = sasum_(&i__1, &b_ref(1, j), &c__1) + sasum_(&i__2, &
+			b_ref(j + 1, 1), ldb);
 /* ** */
 		opst += (j - 1 << 1) + 4;
 /* **   
    L210: */
 	    }
-	    if (b[b_dim1 + 1] == 0.f && b[b_dim1 + 2] == 0.f) {
-		b[b_dim1 + 1] = *eps3;
+	    if (b_ref(1, 1) == 0.f && b_ref(2, 1) == 0.f) {
+		b_ref(1, 1) = *eps3;
 	    }
 	    work[1] = 0.f;
 
@@ -593,17 +583,16 @@ ored in
 	    vmax = 1.f;
 	    vcrit = *bignum;
 
-/*           Solve U*(xr,xi) = scale*(vr,vi) for a right eigenvect
-or,   
-               or U'*(xr,xi) = scale*(vr,vi) for a left eigenvecto
-r,   
+/*           Solve U*(xr,xi) = scale*(vr,vi) for a right eigenvector,   
+               or U'*(xr,xi) = scale*(vr,vi) for a left eigenvector,   
              overwriting (xr,xi) on (vr,vi). */
 
 	    i__2 = i2;
 	    i__3 = i3;
-	    for (i = i1; i__3 < 0 ? i >= i__2 : i <= i__2; i += i__3) {
+	    for (i__ = i1; i__3 < 0 ? i__ >= i__2 : i__ <= i__2; i__ += i__3) 
+		    {
 
-		if (work[i] > vcrit) {
+		if (work[i__] > vcrit) {
 		    rec = 1.f / vmax;
 		    sscal_(n, &rec, &vr[1], &c__1);
 		    sscal_(n, &rec, &vi[1], &c__1);
@@ -612,30 +601,30 @@ r,
 		    vcrit = *bignum;
 		}
 
-		xr = vr[i];
-		xi = vi[i];
+		xr = vr[i__];
+		xi = vi[i__];
 		if (*rightv) {
 		    i__4 = *n;
-		    for (j = i + 1; j <= i__4; ++j) {
-			xr = xr - b[i + j * b_dim1] * vr[j] + b[j + 1 + i * 
-				b_dim1] * vi[j];
-			xi = xi - b[i + j * b_dim1] * vi[j] - b[j + 1 + i * 
-				b_dim1] * vr[j];
+		    for (j = i__ + 1; j <= i__4; ++j) {
+			xr = xr - b_ref(i__, j) * vr[j] + b_ref(j + 1, i__) * 
+				vi[j];
+			xi = xi - b_ref(i__, j) * vi[j] - b_ref(j + 1, i__) * 
+				vr[j];
 /* L220: */
 		    }
 		} else {
-		    i__4 = i - 1;
+		    i__4 = i__ - 1;
 		    for (j = 1; j <= i__4; ++j) {
-			xr = xr - b[j + i * b_dim1] * vr[j] + b[i + 1 + j * 
-				b_dim1] * vi[j];
-			xi = xi - b[j + i * b_dim1] * vi[j] - b[i + 1 + j * 
-				b_dim1] * vr[j];
+			xr = xr - b_ref(j, i__) * vr[j] + b_ref(i__ + 1, j) * 
+				vi[j];
+			xi = xi - b_ref(j, i__) * vi[j] - b_ref(i__ + 1, j) * 
+				vr[j];
 /* L230: */
 		    }
 		}
 
-		w = (r__1 = b[i + i * b_dim1], dabs(r__1)) + (r__2 = b[i + 1 
-			+ i * b_dim1], dabs(r__2));
+		w = (r__1 = b_ref(i__, i__), dabs(r__1)) + (r__2 = b_ref(i__ 
+			+ 1, i__), dabs(r__2));
 		if (w > *smlnum) {
 		    if (w < 1.f) {
 			w1 = dabs(xr) + dabs(xi);
@@ -643,8 +632,8 @@ r,
 			    rec = 1.f / w1;
 			    sscal_(n, &rec, &vr[1], &c__1);
 			    sscal_(n, &rec, &vi[1], &c__1);
-			    xr = vr[i];
-			    xi = vi[i];
+			    xr = vr[i__];
+			    xi = vi[i__];
 			    scale *= rec;
 			    vmax *= rec;
 			}
@@ -652,11 +641,11 @@ r,
 
 /*                 Divide by diagonal element of B. */
 
-		    sladiv_(&xr, &xi, &b[i + i * b_dim1], &b[i + 1 + i * 
-			    b_dim1], &vr[i], &vi[i]);
+		    sladiv_(&xr, &xi, &b_ref(i__, i__), &b_ref(i__ + 1, i__), 
+			    &vr[i__], &vi[i__]);
 /* Computing MAX */
-		    r__3 = (r__1 = vr[i], dabs(r__1)) + (r__2 = vi[i], dabs(
-			    r__2));
+		    r__3 = (r__1 = vr[i__], dabs(r__1)) + (r__2 = vi[i__], 
+			    dabs(r__2));
 		    vmax = dmax(r__3,vmax);
 		    vcrit = *bignum / vmax;
 /* ** */
@@ -669,8 +658,8 @@ r,
 			vi[j] = 0.f;
 /* L240: */
 		    }
-		    vr[i] = 1.f;
-		    vi[i] = 1.f;
+		    vr[i__] = 1.f;
+		    vi[i__] = 1.f;
 		    scale = 0.f;
 		    vmax = 1.f;
 		    vcrit = *bignum;
@@ -678,8 +667,7 @@ r,
 /* L250: */
 	    }
 /* **   
-             Increment op count for loop 260, assuming no scaling 
-*/
+             Increment op count for loop 260, assuming no scaling */
 	    latime_1.ops += (*n << 2) * (*n - 1);
 /* **   
 
@@ -693,17 +681,16 @@ r,
 		goto L280;
 	    }
 
-/*           Choose a new orthogonal starting vector and try again
-. */
+/*           Choose a new orthogonal starting vector and try again. */
 
 	    y = *eps3 / (rootn + 1.f);
 	    vr[1] = *eps3;
 	    vi[1] = 0.f;
 
 	    i__3 = *n;
-	    for (i = 2; i <= i__3; ++i) {
-		vr[i] = y;
-		vi[i] = 0.f;
+	    for (i__ = 2; i__ <= i__3; ++i__) {
+		vr[i__] = y;
+		vi[i__] = 0.f;
 /* L260: */
 	    }
 	    vr[*n - its + 1] -= *eps3 * rootn;
@@ -723,10 +710,10 @@ L280:
 
 	vnorm = 0.f;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__3 = vnorm, r__4 = (r__1 = vr[i], dabs(r__1)) + (r__2 = vi[i], 
-		    dabs(r__2));
+	    r__3 = vnorm, r__4 = (r__1 = vr[i__], dabs(r__1)) + (r__2 = vi[
+		    i__], dabs(r__2));
 	    vnorm = dmax(r__3,r__4);
 /* L290: */
 	}
@@ -749,4 +736,8 @@ L280:
 /*     End of SLAEIN */
 
 } /* slaein_ */
+
+#undef h___ref
+#undef b_ref
+
 

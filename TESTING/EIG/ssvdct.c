@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,16 +18,16 @@
 
     /* Local variables */
     static real unfl, ovfl, ssun;
-    static integer i;
+    static integer i__;
     static real u, m1, m2, mx;
     extern doublereal slamch_(char *);
     static real sshift, tmp, tom, sun, sov;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -34,12 +35,10 @@
 
     SSVDCT counts the number NUM of eigenvalues of a 2*N by 2*N   
     tridiagonal matrix T which are less than or equal to SHIFT.  T is   
-    formed by putting zeros on the diagonal and making the off-diagonals 
-  
+    formed by putting zeros on the diagonal and making the off-diagonals   
     equal to S(1), E(1), S(2), E(2), ... , E(N-1), S(N).  If SHIFT is   
     positive, NUM is equal to N plus the number of singular values of a   
-    bidiagonal matrix B less than or equal to SHIFT.  Here B has diagonal 
-  
+    bidiagonal matrix B less than or equal to SHIFT.  Here B has diagonal   
     entries S(1), ..., S(N) and superdiagonal entries E(1), ... E(N-1).   
     If SHIFT is negative, NUM is equal to the number of singular values   
     of B greater than or equal to -SHIFT.   
@@ -66,8 +65,7 @@
     NUM     (output) INTEGER   
             The number of eigenvalues of T less than or equal to SHIFT.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine constants   
@@ -78,16 +76,16 @@
 
     /* Function Body */
     unfl = slamch_("Safe minimum") * 2;
-    ovfl = slamch_("Overflow");
+    ovfl = 1.f / unfl;
 
 /*     Find largest entry */
 
     mx = dabs(s[1]);
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	r__3 = mx, r__4 = (r__1 = s[i + 1], dabs(r__1)), r__3 = max(r__3,r__4)
-		, r__4 = (r__2 = e[i], dabs(r__2));
+	r__3 = mx, r__4 = (r__1 = s[i__ + 1], dabs(r__1)), r__3 = max(r__3,
+		r__4), r__4 = (r__2 = e[i__], dabs(r__2));
 	mx = dmax(r__3,r__4);
 /* L10: */
     }
@@ -120,50 +118,50 @@
     u = 1.f;
     *num = 0;
     sshift = *shift * m1 * m2;
-    u = -(doublereal)sshift;
+    u = -sshift;
     if (u <= sun) {
 	if (u <= 0.f) {
 	    ++(*num);
-	    if (u > -(doublereal)sun) {
-		u = -(doublereal)sun;
+	    if (u > -sun) {
+		u = -sun;
 	    }
 	} else {
 	    u = sun;
 	}
     }
     tmp = s[1] * m1 * m2;
-    u = -(doublereal)tmp * (tmp / u) - sshift;
+    u = -tmp * (tmp / u) - sshift;
     if (u <= sun) {
 	if (u <= 0.f) {
 	    ++(*num);
-	    if (u > -(doublereal)sun) {
-		u = -(doublereal)sun;
+	    if (u > -sun) {
+		u = -sun;
 	    }
 	} else {
 	    u = sun;
 	}
     }
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	tmp = e[i] * m1 * m2;
-	u = -(doublereal)tmp * (tmp / u) - sshift;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	tmp = e[i__] * m1 * m2;
+	u = -tmp * (tmp / u) - sshift;
 	if (u <= sun) {
 	    if (u <= 0.f) {
 		++(*num);
-		if (u > -(doublereal)sun) {
-		    u = -(doublereal)sun;
+		if (u > -sun) {
+		    u = -sun;
 		}
 	    } else {
 		u = sun;
 	    }
 	}
-	tmp = s[i + 1] * m1 * m2;
-	u = -(doublereal)tmp * (tmp / u) - sshift;
+	tmp = s[i__ + 1] * m1 * m2;
+	u = -tmp * (tmp / u) - sshift;
 	if (u <= sun) {
 	    if (u <= 0.f) {
 		++(*num);
-		if (u > -(doublereal)sun) {
-		    u = -(doublereal)sun;
+		if (u > -sun) {
+		    u = -sun;
 		}
 	    } else {
 		u = sun;

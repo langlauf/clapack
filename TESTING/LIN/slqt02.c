@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -52,7 +53,11 @@ static real c_b15 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -74,24 +79,21 @@ static real c_b15 = 1.f;
     =========   
 
     M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0. 
-  
+            The number of rows of the matrix Q to be generated.  M >= 0.   
 
     N       (input) INTEGER   
             The number of columns of the matrix Q to be generated.   
             N >= M >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input) REAL array, dimension (LDA,N)   
             The m-by-n matrix A which was factorized by SLQT01.   
 
     AF      (input) REAL array, dimension (LDA,N)   
-            Details of the LQ factorization of A, as returned by SGELQF. 
-  
+            Details of the LQ factorization of A, as returned by SGELQF.   
             See SGELQF for further details.   
 
     Q       (workspace) REAL array, dimension (LDA,N)   
@@ -99,12 +101,10 @@ static real c_b15 = 1.f;
     L       (workspace) REAL array, dimension (LDA,M)   
 
     LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= N. 
-  
+            The leading dimension of the arrays A, AF, Q and L. LDA >= N.   
 
     TAU     (input) REAL array, dimension (M)   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the LQ factorization in AF.   
 
     WORK    (workspace) REAL array, dimension (LWORK)   
@@ -119,22 +119,21 @@ static real c_b15 = 1.f;
             RESULT(1) = norm( L - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = l_dim1 + 1;
+    l_offset = 1 + l_dim1 * 1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -148,12 +147,11 @@ static real c_b15 = 1.f;
 
     slaset_("Full", m, n, &c_b4, &c_b4, &q[q_offset], lda);
     i__1 = *n - 1;
-    slacpy_("Upper", k, &i__1, &af[(af_dim1 << 1) + 1], lda, &q[(q_dim1 << 1) 
-	    + 1], lda);
+    slacpy_("Upper", k, &i__1, &af_ref(1, 2), lda, &q_ref(1, 2), lda);
 
 /*     Generate the first n columns of the matrix Q */
 
-    s_copy(srnamc_1.srnamt, "SORGLQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORGLQ", (ftnlen)6, (ftnlen)6);
     sorglq_(m, n, k, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy L(1:k,1:m) */
@@ -193,4 +191,8 @@ static real c_b15 = 1.f;
 /*     End of SLQT02 */
 
 } /* slqt02_ */
+
+#undef af_ref
+#undef q_ref
+
 

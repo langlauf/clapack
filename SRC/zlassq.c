@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlassq_(integer *n, doublecomplex *x, integer *incx, 
 	doublereal *scale, doublereal *sumsq)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -16,16 +17,14 @@
 
        ( scl**2 )*ssq = x( 1 )**2 +...+ x( n )**2 + ( scale**2 )*sumsq,   
 
-    where x( i ) = abs( X( 1 + ( i - 1 )*INCX ) ). The value of sumsq is 
-  
+    where x( i ) = abs( X( 1 + ( i - 1 )*INCX ) ). The value of sumsq is   
     assumed to be at least unity and the value of ssq will then satisfy   
 
        1.0 .le. ssq .le. ( sumsq + 2*n ).   
 
     scale is assumed to be non-negative and scl returns the value   
 
-       scl = max( scale, abs( real( x( i ) ) ), abs( aimag( x( i ) ) ) ), 
-  
+       scl = max( scale, abs( real( x( i ) ) ), abs( aimag( x( i ) ) ) ),   
               i   
 
     scale and sumsq must be supplied in SCALE and SUMSQ respectively.   
@@ -39,7 +38,7 @@
     N       (input) INTEGER   
             The number of elements to be used from the vector X.   
 
-    X       (input) DOUBLE PRECISION   
+    X       (input) COMPLEX*16 array, dimension (N)   
             The vector x as described above.   
                x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n.   
 
@@ -55,13 +54,10 @@
             On entry, the value  sumsq  in the equation above.   
             On exit, SUMSQ is overwritten with the value  ssq .   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3;
     doublereal d__1;
@@ -71,18 +67,17 @@
     static doublereal temp1;
     static integer ix;
 
+    --x;
 
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n > 0) {
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
-	for (ix = 1; *incx < 0 ? ix >= (*n-1)**incx+1 : ix <= (*n-1)**incx+1; ix += *incx) {
+	for (ix = 1; i__2 < 0 ? ix >= i__1 : ix <= i__1; ix += i__2) {
 	    i__3 = ix;
-	    if (X(ix).r != 0.) {
+	    if (x[i__3].r != 0.) {
 		i__3 = ix;
-		temp1 = (d__1 = X(ix).r, abs(d__1));
+		temp1 = (d__1 = x[i__3].r, abs(d__1));
 		if (*scale < temp1) {
 /* Computing 2nd power */
 		    d__1 = *scale / temp1;
@@ -94,8 +89,8 @@
 		    *sumsq += d__1 * d__1;
 		}
 	    }
-	    if (d_imag(&X(ix)) != 0.) {
-		temp1 = (d__1 = d_imag(&X(ix)), abs(d__1));
+	    if (d_imag(&x[ix]) != 0.) {
+		temp1 = (d__1 = d_imag(&x[ix]), abs(d__1));
 		if (*scale < temp1) {
 /* Computing 2nd power */
 		    d__1 = *scale / temp1;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 
 /* Subroutine */ int sstebz_(char *range, char *order, integer *n, real *vl, 
-	real *vu, integer *il, integer *iu, real *abstol, real *d, real *e, 
+	real *vu, integer *il, integer *iu, real *abstol, real *d__, real *e, 
 	integer *m, integer *nsplit, real *w, integer *iblock, integer *
 	isplit, real *work, integer *iwork, integer *info)
 {
@@ -70,11 +71,10 @@ static integer c__0 = 0;
     static real tmp1, tmp2;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
@@ -103,14 +103,12 @@ static integer c__0 = 0;
             = 'A': ("All")   all eigenvalues will be found.   
             = 'V': ("Value") all eigenvalues in the half-open interval   
                              (VL, VU] will be found.   
-            = 'I': ("Index") the IL-th through IU-th eigenvalues (of the 
-  
+            = 'I': ("Index") the IL-th through IU-th eigenvalues (of the   
                              entire matrix) will be found.   
 
     ORDER   (input) CHARACTER   
             = 'B': ("By Block") the eigenvalues will be grouped by   
-                                split-off block (see IBLOCK, ISPLIT) and 
-  
+                                split-off block (see IBLOCK, ISPLIT) and   
                                 ordered from smallest to largest within   
                                 the block.   
             = 'E': ("Entire matrix")   
@@ -124,8 +122,7 @@ static integer c__0 = 0;
     VL      (input) REAL   
     VU      (input) REAL   
             If RANGE='V', the lower and upper bounds of the interval to   
-            be searched for eigenvalues.  Eigenvalues less than or equal 
-  
+            be searched for eigenvalues.  Eigenvalues less than or equal   
             to VL, or greater than VU, will not be returned.  VL < VU.   
             Not referenced if RANGE = 'A' or 'I'.   
 
@@ -140,20 +137,17 @@ static integer c__0 = 0;
             The absolute tolerance for the eigenvalues.  An eigenvalue   
             (or cluster) is considered to be located if it has been   
             determined to lie in an interval whose width is ABSTOL or   
-            less.  If ABSTOL is less than or equal to zero, then ULP*|T| 
-  
+            less.  If ABSTOL is less than or equal to zero, then ULP*|T|   
             will be used, where |T| means the 1-norm of T.   
 
             Eigenvalues will be computed most accurately when ABSTOL is   
-            set to twice the underflow threshold 2*SLAMCH('S'), not zero. 
-  
+            set to twice the underflow threshold 2*SLAMCH('S'), not zero.   
 
     D       (input) REAL array, dimension (N)   
             The n diagonal elements of the tridiagonal matrix T.   
 
     E       (input) REAL array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the tridiagonal matrix T. 
-  
+            The (n-1) off-diagonal elements of the tridiagonal matrix T.   
 
     M       (output) INTEGER   
             The actual number of eigenvalues found. 0 <= M <= N.   
@@ -177,10 +171,8 @@ static integer c__0 = 0;
             workspace.)   
 
     ISPLIT  (output) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices. 
-  
-            The first submatrix consists of rows/columns 1 to ISPLIT(1), 
-  
+            The splitting points, at which T breaks up into submatrices.   
+            The first submatrix consists of rows/columns 1 to ISPLIT(1),   
             the second of rows/columns ISPLIT(1)+1 through ISPLIT(2),   
             etc., and the NSPLIT-th consists of rows/columns   
             ISPLIT(NSPLIT-1)+1 through ISPLIT(NSPLIT)=N.   
@@ -198,10 +190,8 @@ static integer c__0 = 0;
             > 0:  some or all of the eigenvalues failed to converge or   
                   were not computed:   
                   =1 or 3: Bisection failed to converge for some   
-                          eigenvalues; these eigenvalues are flagged by a 
-  
-                          negative block number.  The effect is that the 
-  
+                          eigenvalues; these eigenvalues are flagged by a   
+                          negative block number.  The effect is that the   
                           eigenvalues may not be as accurate as the   
                           absolute and relative tolerances.  This is   
                           generally caused by unexpectedly inaccurate   
@@ -211,10 +201,8 @@ static integer c__0 = 0;
                           Effect: M < IU+1-IL   
                           Cause:  non-monotonic arithmetic, causing the   
                                   Sturm sequence to be non-monotonic.   
-                          Cure:   recalculate, using RANGE='A', and pick 
-  
-                                  out eigenvalues IL:IU.  In some cases, 
-  
+                          Cure:   recalculate, using RANGE='A', and pick   
+                                  out eigenvalues IL:IU.  In some cases,   
                                   increasing the PARAMETER "FUDGE" may   
                                   make things work.   
                   = 4:    RANGE='I', and the Gershgorin interval   
@@ -235,16 +223,14 @@ static integer c__0 = 0;
             the next larger floating point number.)   
 
     FUDGE   REAL, default = 2   
-            A "fudge factor" to widen the Gershgorin intervals.  Ideally, 
-  
+            A "fudge factor" to widen the Gershgorin intervals.  Ideally,   
             a value of 1 should work, but on machines with sloppy   
             arithmetic, this needs to be larger.  The default for   
             publicly released versions should be large enough to handle   
             the worst machine around.  Note that this has no effect   
             on accuracy of the solution.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -254,7 +240,7 @@ static integer c__0 = 0;
     --iblock;
     --w;
     --e;
-    --d;
+    --d__;
 
     /* Function Body */
     *info = 0;
@@ -289,8 +275,10 @@ static integer c__0 = 0;
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
-    } else if (irange == 2 && *vl >= *vu) {
-	*info = -5;
+    } else if (irange == 2) {
+	if (*vl >= *vu) {
+	    *info = -5;
+	}
     } else if (irange == 3 && (*il < 1 || *il > max(1,*n))) {
 	*info = -6;
     } else if (irange == 3 && (*iu < min(*n,*il) || *iu > *n)) {
@@ -330,7 +318,8 @@ static integer c__0 = 0;
     ulp = slamch_("P");
     latime_1.ops += 1;
     rtoli = ulp * 2.f;
-    nb = ilaenv_(&c__1, "SSTEBZ", " ", n, &c_n1, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "SSTEBZ", " ", n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
     if (nb <= 1) {
 	nb = 0;
     }
@@ -340,10 +329,10 @@ static integer c__0 = 0;
     if (*n == 1) {
 	*nsplit = 1;
 	isplit[1] = 1;
-	if (irange == 2 && (*vl >= d[1] || *vu < d[1])) {
+	if (irange == 2 && (*vl >= d__[1] || *vu < d__[1])) {
 	    *m = 0;
 	} else {
-	    w[1] = d[1];
+	    w[1] = d__[1];
 	    iblock[1] = 1;
 	    *m = 1;
 	}
@@ -357,6 +346,7 @@ static integer c__0 = 0;
     pivmin = 1.f;
 
     latime_1.ops = latime_1.ops + (*n - 1) * 5 + 1;
+/* DIR$ NOVECTOR */
     i__1 = *n;
     for (j = 2; j <= i__1; ++j) {
 /* Computing 2nd power */
@@ -364,8 +354,8 @@ static integer c__0 = 0;
 	tmp1 = r__1 * r__1;
 /* Computing 2nd power */
 	r__2 = ulp;
-	if ((r__1 = d[j] * d[j - 1], dabs(r__1)) * (r__2 * r__2) + safemn > 
-		tmp1) {
+	if ((r__1 = d__[j] * d__[j - 1], dabs(r__1)) * (r__2 * r__2) + safemn 
+		> tmp1) {
 	    isplit[*nsplit] = j - 1;
 	    ++(*nsplit);
 	    work[j - 1] = 0.f;
@@ -388,8 +378,8 @@ static integer c__0 = 0;
           Compute Gershgorin interval for entire (split) matrix   
           and use it as the initial interval */
 
-	gu = d[1];
-	gl = d[1];
+	gu = d__[1];
+	gl = d__[1];
 	tmp1 = 0.f;
 
 	latime_1.ops = latime_1.ops + (*n - 1) * 5 + 23;
@@ -397,20 +387,20 @@ static integer c__0 = 0;
 	for (j = 1; j <= i__1; ++j) {
 	    tmp2 = sqrt(work[j]);
 /* Computing MAX */
-	    r__1 = gu, r__2 = d[j] + tmp1 + tmp2;
+	    r__1 = gu, r__2 = d__[j] + tmp1 + tmp2;
 	    gu = dmax(r__1,r__2);
 /* Computing MIN */
-	    r__1 = gl, r__2 = d[j] - tmp1 - tmp2;
+	    r__1 = gl, r__2 = d__[j] - tmp1 - tmp2;
 	    gl = dmin(r__1,r__2);
 	    tmp1 = tmp2;
 /* L20: */
 	}
 
 /* Computing MAX */
-	r__1 = gu, r__2 = d[*n] + tmp1;
+	r__1 = gu, r__2 = d__[*n] + tmp1;
 	gu = dmax(r__1,r__2);
 /* Computing MIN */
-	r__1 = gl, r__2 = d[*n] - tmp1;
+	r__1 = gl, r__2 = d__[*n] - tmp1;
 	gl = dmin(r__1,r__2);
 /* Computing MAX */
 	r__1 = dabs(gl), r__2 = dabs(gu);
@@ -442,8 +432,8 @@ static integer c__0 = 0;
 	iwork[6] = *iu;
 
 	slaebz_(&c__3, &itmax, n, &c__2, &c__2, &nb, &atoli, &rtoli, &pivmin, 
-		&d[1], &e[1], &work[1], &iwork[5], &work[*n + 1], &work[*n + 
-		5], &iout, &iwork[1], &w[1], &iblock[1], &iinfo);
+		&d__[1], &e[1], &work[1], &iwork[5], &work[*n + 1], &work[*n 
+		+ 5], &iout, &iwork[1], &w[1], &iblock[1], &iinfo);
 
 	if (iwork[6] == *iu) {
 	    wl = work[*n + 1];
@@ -471,15 +461,15 @@ static integer c__0 = 0;
 
 	latime_1.ops = latime_1.ops + 3 + (*n - 2 << 1);
 /* Computing MAX */
-	r__3 = dabs(d[1]) + dabs(e[1]), r__4 = (r__1 = d[*n], dabs(r__1)) + (
-		r__2 = e[*n - 1], dabs(r__2));
+	r__3 = dabs(d__[1]) + dabs(e[1]), r__4 = (r__1 = d__[*n], dabs(r__1)) 
+		+ (r__2 = e[*n - 1], dabs(r__2));
 	tnorm = dmax(r__3,r__4);
 
 	i__1 = *n - 1;
 	for (j = 2; j <= i__1; ++j) {
 /* Computing MAX */
-	    r__4 = tnorm, r__5 = (r__1 = d[j], dabs(r__1)) + (r__2 = e[j - 1],
-		     dabs(r__2)) + (r__3 = e[j], dabs(r__3));
+	    r__4 = tnorm, r__5 = (r__1 = d__[j], dabs(r__1)) + (r__2 = e[j - 
+		    1], dabs(r__2)) + (r__3 = e[j], dabs(r__3));
 	    tnorm = dmax(r__4,r__5);
 /* L30: */
 	}
@@ -493,6 +483,9 @@ static integer c__0 = 0;
 	if (irange == 2) {
 	    wl = *vl;
 	    wu = *vu;
+	} else {
+	    wl = 0.f;
+	    wu = 0.f;
 	}
     }
 
@@ -518,16 +511,16 @@ static integer c__0 = 0;
 /*           Special Case -- IN=1 */
 
 	    latime_1.ops += 4;
-	    if (irange == 1 || wl >= d[ibegin] - pivmin) {
+	    if (irange == 1 || wl >= d__[ibegin] - pivmin) {
 		++nwl;
 	    }
-	    if (irange == 1 || wu >= d[ibegin] - pivmin) {
+	    if (irange == 1 || wu >= d__[ibegin] - pivmin) {
 		++nwu;
 	    }
-	    if (irange == 1 || wl < d[ibegin] - pivmin && wu >= d[ibegin] - 
-		    pivmin) {
+	    if (irange == 1 || wl < d__[ibegin] - pivmin && wu >= d__[ibegin] 
+		    - pivmin) {
 		++(*m);
-		w[*m] = d[ibegin];
+		w[*m] = d__[ibegin];
 		iblock[*m] = jb;
 	    }
 	} else {
@@ -537,8 +530,8 @@ static integer c__0 = 0;
              Compute Gershgorin Interval   
              and use it as the initial interval */
 
-	    gu = d[ibegin];
-	    gl = d[ibegin];
+	    gu = d__[ibegin];
+	    gl = d__[ibegin];
 	    tmp1 = 0.f;
 
 	    latime_1.ops = latime_1.ops + (iend - ibegin << 2) + 13;
@@ -546,20 +539,20 @@ static integer c__0 = 0;
 	    for (j = ibegin; j <= i__2; ++j) {
 		tmp2 = (r__1 = e[j], dabs(r__1));
 /* Computing MAX */
-		r__1 = gu, r__2 = d[j] + tmp1 + tmp2;
+		r__1 = gu, r__2 = d__[j] + tmp1 + tmp2;
 		gu = dmax(r__1,r__2);
 /* Computing MIN */
-		r__1 = gl, r__2 = d[j] - tmp1 - tmp2;
+		r__1 = gl, r__2 = d__[j] - tmp1 - tmp2;
 		gl = dmin(r__1,r__2);
 		tmp1 = tmp2;
 /* L40: */
 	    }
 
 /* Computing MAX */
-	    r__1 = gu, r__2 = d[iend] + tmp1;
+	    r__1 = gu, r__2 = d__[iend] + tmp1;
 	    gu = dmax(r__1,r__2);
 /* Computing MIN */
-	    r__1 = gl, r__2 = d[iend] - tmp1;
+	    r__1 = gl, r__2 = d__[iend] - tmp1;
 	    gl = dmin(r__1,r__2);
 /* Computing MAX */
 	    r__1 = dabs(gl), r__2 = dabs(gu);
@@ -595,7 +588,7 @@ static integer c__0 = 0;
 	    work[*n + 1] = gl;
 	    work[*n + in + 1] = gu;
 	    slaebz_(&c__1, &c__0, &in, &in, &c__1, &nb, &atoli, &rtoli, &
-		    pivmin, &d[ibegin], &e[ibegin], &work[ibegin], idumma, &
+		    pivmin, &d__[ibegin], &e[ibegin], &work[ibegin], idumma, &
 		    work[*n + 1], &work[*n + (in << 1) + 1], &im, &iwork[1], &
 		    w[*m + 1], &iblock[*m + 1], &iinfo);
 
@@ -609,13 +602,12 @@ static integer c__0 = 0;
 	    itmax = (integer) ((log(gu - gl + pivmin) - log(pivmin)) / log(
 		    2.f)) + 2;
 	    slaebz_(&c__2, &itmax, &in, &in, &c__1, &nb, &atoli, &rtoli, &
-		    pivmin, &d[ibegin], &e[ibegin], &work[ibegin], idumma, &
+		    pivmin, &d__[ibegin], &e[ibegin], &work[ibegin], idumma, &
 		    work[*n + 1], &work[*n + (in << 1) + 1], &iout, &iwork[1],
 		     &w[*m + 1], &iblock[*m + 1], &iinfo);
 
 /*           Copy Eigenvalues Into W and IBLOCK   
-             Use -JB for block number for unconverged eigenvalues.
- */
+             Use -JB for block number for unconverged eigenvalues. */
 
 	    latime_1.ops += iout << 1;
 	    i__2 = iout;
@@ -672,18 +664,13 @@ L70:
 	if (idiscl > 0 || idiscu > 0) {
 
 /*           Code to deal with effects of bad arithmetic:   
-             Some low eigenvalues to be discarded are not in (WL,W
-LU],   
-             or high eigenvalues to be discarded are not in (WUL,W
-U]   
-             so just kill off the smallest IDISCL/largest IDISCU 
-  
-             eigenvalues, by simply finding the smallest/largest 
-  
+             Some low eigenvalues to be discarded are not in (WL,WLU],   
+             or high eigenvalues to be discarded are not in (WUL,WU]   
+             so just kill off the smallest IDISCL/largest IDISCU   
+             eigenvalues, by simply finding the smallest/largest   
              eigenvalue(s).   
 
-             (If N(w) is monotone non-decreasing, this should neve
-r   
+             (If N(w) is monotone non-decreasing, this should never   
                  happen.) */
 
 	    if (idiscl > 0) {

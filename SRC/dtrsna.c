@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dtrsna_(char *job, char *howmny, logical *select, 
@@ -6,7 +7,7 @@
 	integer *mm, integer *m, doublereal *work, integer *ldwork, integer *
 	iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -44,12 +45,9 @@
             If HOWMNY = 'S', SELECT specifies the eigenpairs for which   
             condition numbers are required. To select condition numbers   
             for the eigenpair corresponding to a real eigenvalue w(j),   
-            SELECT(j) must be set to .TRUE.. To select condition numbers 
-  
-            corresponding to a complex conjugate pair of eigenvalues w(j) 
-  
-            and w(j+1), either SELECT(j) or SELECT(j+1) or both, must be 
-  
+            SELECT(j) must be set to .TRUE.. To select condition numbers   
+            corresponding to a complex conjugate pair of eigenvalues w(j)   
+            and w(j+1), either SELECT(j) or SELECT(j+1) or both, must be   
             set to .TRUE..   
             If HOWMNY = 'A', SELECT is not referenced.   
 
@@ -57,16 +55,14 @@
             The order of the matrix T. N >= 0.   
 
     T       (input) DOUBLE PRECISION array, dimension (LDT,N)   
-            The upper quasi-triangular matrix T, in Schur canonical form. 
-  
+            The upper quasi-triangular matrix T, in Schur canonical form.   
 
     LDT     (input) INTEGER   
             The leading dimension of the array T. LDT >= max(1,N).   
 
     VL      (input) DOUBLE PRECISION array, dimension (LDVL,M)   
             If JOB = 'E' or 'B', VL must contain left eigenvectors of T   
-            (or of any Q*T*Q**T with Q orthogonal), corresponding to the 
-  
+            (or of any Q*T*Q**T with Q orthogonal), corresponding to the   
             eigenpairs specified by HOWMNY and SELECT. The eigenvectors   
             must be stored in consecutive columns of VL, as returned by   
             DHSEIN or DTREVC.   
@@ -77,10 +73,8 @@
             LDVL >= 1; and if JOB = 'E' or 'B', LDVL >= N.   
 
     VR      (input) DOUBLE PRECISION array, dimension (LDVR,M)   
-            If JOB = 'E' or 'B', VR must contain right eigenvectors of T 
-  
-            (or of any Q*T*Q**T with Q orthogonal), corresponding to the 
-  
+            If JOB = 'E' or 'B', VR must contain right eigenvectors of T   
+            (or of any Q*T*Q**T with Q orthogonal), corresponding to the   
             eigenpairs specified by HOWMNY and SELECT. The eigenvectors   
             must be stored in consecutive columns of VR, as returned by   
             DHSEIN or DTREVC.   
@@ -91,8 +85,7 @@
             LDVR >= 1; and if JOB = 'E' or 'B', LDVR >= N.   
 
     S       (output) DOUBLE PRECISION array, dimension (MM)   
-            If JOB = 'E' or 'B', the reciprocal condition numbers of the 
-  
+            If JOB = 'E' or 'B', the reciprocal condition numbers of the   
             selected eigenvalues, stored in consecutive elements of the   
             array. For a complex conjugate pair of eigenvalues two   
             consecutive elements of S are set to the same value. Thus   
@@ -106,16 +99,13 @@
             numbers of the selected eigenvectors, stored in consecutive   
             elements of the array. For a complex eigenvector two   
             consecutive elements of SEP are set to the same value. If   
-            the eigenvalues cannot be reordered to compute SEP(j), SEP(j) 
-  
-            is set to 0; this can only occur when the true value would be 
-  
+            the eigenvalues cannot be reordered to compute SEP(j), SEP(j)   
+            is set to 0; this can only occur when the true value would be   
             very small anyway.   
             If JOB = 'E', SEP is not referenced.   
 
     MM      (input) INTEGER   
-            The number of elements in the arrays S (if JOB = 'E' or 'B') 
-  
+            The number of elements in the arrays S (if JOB = 'E' or 'B')   
              and/or SEP (if JOB = 'V' or 'B'). MM >= M.   
 
     M       (output) INTEGER   
@@ -145,16 +135,13 @@
 
             S(lambda) = |v'*u| / (norm(u)*norm(v))   
 
-    where u and v are the right and left eigenvectors of T corresponding 
-  
+    where u and v are the right and left eigenvectors of T corresponding   
     to lambda; v' denotes the conjugate-transpose of v, and norm(u)   
-    denotes the Euclidean norm. These reciprocal condition numbers always 
-  
+    denotes the Euclidean norm. These reciprocal condition numbers always   
     lie between zero (very badly conditioned) and one (very well   
     conditioned). If n = 1, S(lambda) is defined to be 1.   
 
-    An approximate error bound for a computed eigenvalue W(i) is given by 
-  
+    An approximate error bound for a computed eigenvalue W(i) is given by   
 
                         EPS * norm(T) / S(i)   
 
@@ -180,15 +167,12 @@
 
                         EPS * norm(T) / SEP(i)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static logical c_true = TRUE_;
@@ -214,7 +198,7 @@
     static doublereal rnrm;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
     static doublereal prod1, prod2;
-    static integer i, j, k;
+    static integer i__, j, k;
     static doublereal scale, delta;
     extern logical lsame_(char *, char *);
     static logical wants;
@@ -242,20 +226,30 @@
     static doublereal smlnum;
     static logical wantsp;
     static doublereal eps, est;
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
 
 
+    --select;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --s;
+    --sep;
+    work_dim1 = *ldwork;
+    work_offset = 1 + work_dim1 * 1;
+    work -= work_offset;
+    --iwork;
 
-#define DUMMY(I) dummy[(I)]
-#define SELECT(I) select[(I)-1]
-#define S(I) s[(I)-1]
-#define SEP(I) sep[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-#define WORK(I,J) work[(I)-1 + ((J)-1)* ( *ldwork)]
-
+    /* Function Body */
     wantbh = lsame_(job, "B");
     wants = lsame_(job, "E") || wantbh;
     wantsp = lsame_(job, "V") || wantbh;
@@ -277,31 +271,30 @@
 	*info = -10;
     } else {
 
-/*        Set M to the number of eigenpairs for which condition number
-s   
+/*        Set M to the number of eigenpairs for which condition numbers   
           are required, and test MM. */
 
 	if (somcon) {
 	    *m = 0;
 	    pair = FALSE_;
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		if (pair) {
 		    pair = FALSE_;
 		} else {
 		    if (k < *n) {
-			if (T(k+1,k) == 0.) {
-			    if (SELECT(k)) {
+			if (t_ref(k + 1, k) == 0.) {
+			    if (select[k]) {
 				++(*m);
 			    }
 			} else {
 			    pair = TRUE_;
-			    if (SELECT(k) || SELECT(k + 1)) {
+			    if (select[k] || select[k + 1]) {
 				*m += 2;
 			    }
 			}
 		    } else {
-			if (SELECT(*n)) {
+			if (select[*n]) {
 			    ++(*m);
 			}
 		    }
@@ -332,15 +325,15 @@ s
 
     if (*n == 1) {
 	if (somcon) {
-	    if (! SELECT(1)) {
+	    if (! select[1]) {
 		return 0;
 	    }
 	}
 	if (wants) {
-	    S(1) = 1.;
+	    s[1] = 1.;
 	}
 	if (wantsp) {
-	    SEP(1) = (d__1 = T(1,1), abs(d__1));
+	    sep[1] = (d__1 = t_ref(1, 1), abs(d__1));
 	}
 	return 0;
     }
@@ -355,7 +348,7 @@ s
     ks = 0;
     pair = FALSE_;
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
+    for (k = 1; k <= i__1; ++k) {
 
 /*        Determine whether T(k,k) begins a 1-by-1 or 2-by-2 block. */
 
@@ -364,21 +357,20 @@ s
 	    goto L60;
 	} else {
 	    if (k < *n) {
-		pair = T(k+1,k) != 0.;
+		pair = t_ref(k + 1, k) != 0.;
 	    }
 	}
 
-/*        Determine whether condition numbers are required for the k-t
-h   
+/*        Determine whether condition numbers are required for the k-th   
           eigenpair. */
 
 	if (somcon) {
 	    if (pair) {
-		if (! SELECT(k) && ! SELECT(k + 1)) {
+		if (! select[k] && ! select[k + 1]) {
 		    goto L60;
 		}
 	    } else {
-		if (! SELECT(k)) {
+		if (! select[k]) {
 		    goto L60;
 		}
 	    }
@@ -388,59 +380,59 @@ h
 
 	if (wants) {
 
-/*           Compute the reciprocal condition number of the k-th 
-  
+/*           Compute the reciprocal condition number of the k-th   
              eigenvalue. */
 
 	    if (! pair) {
 
 /*              Real eigenvalue. */
 
-		prod = ddot_(n, &VR(1,ks), &c__1, &VL(1,ks), &c__1);
-		rnrm = dnrm2_(n, &VR(1,ks), &c__1);
-		lnrm = dnrm2_(n, &VL(1,ks), &c__1);
-		S(ks) = abs(prod) / (rnrm * lnrm);
+		prod = ddot_(n, &vr_ref(1, ks), &c__1, &vl_ref(1, ks), &c__1);
+		rnrm = dnrm2_(n, &vr_ref(1, ks), &c__1);
+		lnrm = dnrm2_(n, &vl_ref(1, ks), &c__1);
+		s[ks] = abs(prod) / (rnrm * lnrm);
 	    } else {
 
 /*              Complex eigenvalue. */
 
-		prod1 = ddot_(n, &VR(1,ks), &c__1, &VL(1,ks), &c__1);
-		prod1 += ddot_(n, &VR(1,ks+1), &c__1, &VL(1,ks+1), &c__1);
-		prod2 = ddot_(n, &VL(1,ks), &c__1, &VR(1,ks+1), &c__1);
-		prod2 -= ddot_(n, &VL(1,ks+1), &c__1, &VR(1,ks), &c__1);
-		d__1 = dnrm2_(n, &VR(1,ks), &c__1);
-		d__2 = dnrm2_(n, &VR(1,ks+1), &c__1);
+		prod1 = ddot_(n, &vr_ref(1, ks), &c__1, &vl_ref(1, ks), &c__1)
+			;
+		prod1 += ddot_(n, &vr_ref(1, ks + 1), &c__1, &vl_ref(1, ks + 
+			1), &c__1);
+		prod2 = ddot_(n, &vl_ref(1, ks), &c__1, &vr_ref(1, ks + 1), &
+			c__1);
+		prod2 -= ddot_(n, &vl_ref(1, ks + 1), &c__1, &vr_ref(1, ks), &
+			c__1);
+		d__1 = dnrm2_(n, &vr_ref(1, ks), &c__1);
+		d__2 = dnrm2_(n, &vr_ref(1, ks + 1), &c__1);
 		rnrm = dlapy2_(&d__1, &d__2);
-		d__1 = dnrm2_(n, &VL(1,ks), &c__1);
-		d__2 = dnrm2_(n, &VL(1,ks+1), &c__1);
+		d__1 = dnrm2_(n, &vl_ref(1, ks), &c__1);
+		d__2 = dnrm2_(n, &vl_ref(1, ks + 1), &c__1);
 		lnrm = dlapy2_(&d__1, &d__2);
 		cond = dlapy2_(&prod1, &prod2) / (rnrm * lnrm);
-		S(ks) = cond;
-		S(ks + 1) = cond;
+		s[ks] = cond;
+		s[ks + 1] = cond;
 	    }
 	}
 
 	if (wantsp) {
 
-/*           Estimate the reciprocal condition number of the k-th 
-  
+/*           Estimate the reciprocal condition number of the k-th   
              eigenvector.   
 
-             Copy the matrix T to the array WORK and swap the diag
-onal   
+             Copy the matrix T to the array WORK and swap the diagonal   
              block beginning at T(k,k) to the (1,1) position. */
 
-	    dlacpy_("Full", n, n, &T(1,1), ldt, &WORK(1,1), 
+	    dlacpy_("Full", n, n, &t[t_offset], ldt, &work[work_offset], 
 		    ldwork);
 	    ifst = k;
 	    ilst = 1;
-	    dtrexc_("No Q", n, &WORK(1,1), ldwork, dummy, &c__1, &
-		    ifst, &ilst, &WORK(1,*n+1), &ierr);
+	    dtrexc_("No Q", n, &work[work_offset], ldwork, dummy, &c__1, &
+		    ifst, &ilst, &work_ref(1, *n + 1), &ierr);
 
 	    if (ierr == 1 || ierr == 2) {
 
-/*              Could not swap because blocks not well separat
-ed */
+/*              Could not swap because blocks not well separated */
 
 		scale = 1.;
 		est = bignum;
@@ -448,69 +440,57 @@ ed */
 
 /*              Reordering successful */
 
-		if (WORK(2,1) == 0.) {
+		if (work_ref(2, 1) == 0.) {
 
-/*                 Form C = T22 - lambda*I in WORK(2:N,2:N
-). */
+/*                 Form C = T22 - lambda*I in WORK(2:N,2:N). */
 
 		    i__2 = *n;
-		    for (i = 2; i <= *n; ++i) {
-			WORK(i,i) -= WORK(1,1);
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			work_ref(i__, i__) = work_ref(i__, i__) - work_ref(1, 
+				1);
 /* L20: */
 		    }
 		    n2 = 1;
 		    nn = *n - 1;
 		} else {
 
-/*                 Triangularize the 2 by 2 block by unita
-ry   
+/*                 Triangularize the 2 by 2 block by unitary   
                    transformation U = [  cs   i*ss ]   
                                       [ i*ss   cs  ].   
-                   such that the (1,1) position of WORK is
- complex   
-                   eigenvalue lambda with positive imagina
-ry part. (2,2)   
-                   position of WORK is the complex eigenva
-lue lambda   
+                   such that the (1,1) position of WORK is complex   
+                   eigenvalue lambda with positive imaginary part. (2,2)   
+                   position of WORK is the complex eigenvalue lambda   
                    with negative imaginary  part. */
 
-		    mu = sqrt((d__1 = WORK(1,2), abs(d__1))) 
-			    * sqrt((d__2 = WORK(2,1), abs(d__2)));
-		    delta = dlapy2_(&mu, &WORK(2,1));
+		    mu = sqrt((d__1 = work_ref(1, 2), abs(d__1))) * sqrt((
+			    d__2 = work_ref(2, 1), abs(d__2)));
+		    delta = dlapy2_(&mu, &work_ref(2, 1));
 		    cs = mu / delta;
-		    sn = -WORK(2,1) / delta;
+		    sn = -work_ref(2, 1) / delta;
 
 /*                 Form   
 
-                   C' = WORK(2:N,2:N) + i*[rwork(1) ..... 
-rwork(n-1) ]   
-                                          [   mu          
-           ]   
-                                          [         ..    
-           ]   
-                                          [             ..
-           ]   
-                                          [               
-   mu      ]   
-                   where C' is conjugate transpose of comp
-lex matrix C,   
-                   and RWORK is stored starting in the N+1
--st column of   
+                   C' = WORK(2:N,2:N) + i*[rwork(1) ..... rwork(n-1) ]   
+                                          [   mu                     ]   
+                                          [         ..               ]   
+                                          [             ..           ]   
+                                          [                  mu      ]   
+                   where C' is conjugate transpose of complex matrix C,   
+                   and RWORK is stored starting in the N+1-st column of   
                    WORK. */
 
 		    i__2 = *n;
-		    for (j = 3; j <= *n; ++j) {
-			WORK(2,j) = cs * WORK(2,j)
-				;
-			WORK(j,j) -= WORK(1,1);
+		    for (j = 3; j <= i__2; ++j) {
+			work_ref(2, j) = cs * work_ref(2, j);
+			work_ref(j, j) = work_ref(j, j) - work_ref(1, 1);
 /* L30: */
 		    }
-		    WORK(2,2) = 0.;
+		    work_ref(2, 2) = 0.;
 
-		    WORK(1,*n+1) = mu * 2.;
+		    work_ref(1, *n + 1) = mu * 2.;
 		    i__2 = *n - 1;
-		    for (i = 2; i <= *n-1; ++i) {
-			WORK(i,*n+1) = sn * WORK(1,i+1);
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			work_ref(i__, *n + 1) = sn * work_ref(1, i__ + 1);
 /* L40: */
 		    }
 		    n2 = 2;
@@ -522,46 +502,48 @@ lex matrix C,
 		est = 0.;
 		kase = 0;
 L50:
-		dlacon_(&nn, &WORK(1,*n+2), &WORK(1,*n+4), &IWORK(1), &est, &kase);
+		dlacon_(&nn, &work_ref(1, *n + 2), &work_ref(1, *n + 4), &
+			iwork[1], &est, &kase);
 		if (kase != 0) {
 		    if (kase == 1) {
 			if (n2 == 1) {
 
-/*                       Real eigenvalue: solve C'
-*x = scale*c. */
+/*                       Real eigenvalue: solve C'*x = scale*c. */
 
 			    i__2 = *n - 1;
-			    dlaqtr_(&c_true, &c_true, &i__2, &WORK(2,2), ldwork, dummy, &dumm, &scale, 
-				    &WORK(1,*n+4), &WORK(1,*n+6), &ierr);
+			    dlaqtr_(&c_true, &c_true, &i__2, &work_ref(2, 2), 
+				    ldwork, dummy, &dumm, &scale, &work_ref(1,
+				     *n + 4), &work_ref(1, *n + 6), &ierr);
 			} else {
 
-/*                       Complex eigenvalue: solve
-   
-                         C'*(p+iq) = scale*(c+id) 
-in real arithmetic. */
+/*                       Complex eigenvalue: solve   
+                         C'*(p+iq) = scale*(c+id) in real arithmetic. */
 
 			    i__2 = *n - 1;
-			    dlaqtr_(&c_true, &c_false, &i__2, &WORK(2,2), ldwork, &WORK(1,*n+1), &mu, &scale, &WORK(1,*n+4), &WORK(1,*n+6), &ierr);
+			    dlaqtr_(&c_true, &c_false, &i__2, &work_ref(2, 2),
+				     ldwork, &work_ref(1, *n + 1), &mu, &
+				    scale, &work_ref(1, *n + 4), &work_ref(1, 
+				    *n + 6), &ierr);
 			}
 		    } else {
 			if (n2 == 1) {
 
-/*                       Real eigenvalue: solve C*
-x = scale*c. */
+/*                       Real eigenvalue: solve C*x = scale*c. */
 
 			    i__2 = *n - 1;
-			    dlaqtr_(&c_false, &c_true, &i__2, &WORK(2,2), ldwork, dummy, &
-				    dumm, &scale, &WORK(1,*n+4), &WORK(1,*n+6), &
-				    ierr);
+			    dlaqtr_(&c_false, &c_true, &i__2, &work_ref(2, 2),
+				     ldwork, dummy, &dumm, &scale, &work_ref(
+				    1, *n + 4), &work_ref(1, *n + 6), &ierr);
 			} else {
 
-/*                       Complex eigenvalue: solve
-   
-                         C*(p+iq) = scale*(c+id) i
-n real arithmetic. */
+/*                       Complex eigenvalue: solve   
+                         C*(p+iq) = scale*(c+id) in real arithmetic. */
 
 			    i__2 = *n - 1;
-			    dlaqtr_(&c_false, &c_false, &i__2, &WORK(2,2), ldwork, &WORK(1,*n+1), &mu, &scale, &WORK(1,*n+4), &WORK(1,*n+6), &ierr);
+			    dlaqtr_(&c_false, &c_false, &i__2, &work_ref(2, 2)
+				    , ldwork, &work_ref(1, *n + 1), &mu, &
+				    scale, &work_ref(1, *n + 4), &work_ref(1, 
+				    *n + 6), &ierr);
 
 			}
 		    }
@@ -570,9 +552,9 @@ n real arithmetic. */
 		}
 	    }
 
-	    SEP(ks) = scale / max(est,smlnum);
+	    sep[ks] = scale / max(est,smlnum);
 	    if (pair) {
-		SEP(ks + 1) = SEP(ks);
+		sep[ks + 1] = sep[ks];
 	    }
 	}
 
@@ -588,4 +570,10 @@ L60:
 /*     End of DTRSNA */
 
 } /* dtrsna_ */
+
+#undef vr_ref
+#undef vl_ref
+#undef t_ref
+#undef work_ref
+
 

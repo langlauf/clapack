@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,7 +36,7 @@ static integer c__4 = 4;
 /* Subroutine */ int cchkbd_(integer *nsizes, integer *mval, integer *nval, 
 	integer *ntypes, logical *dotype, integer *nrhs, integer *iseed, real 
 	*thresh, complex *a, integer *lda, real *bd, real *be, real *s1, real 
-	*s2, complex *x, integer *ldx, complex *y, complex *z, complex *q, 
+	*s2, complex *x, integer *ldx, complex *y, complex *z__, complex *q, 
 	integer *ldq, complex *pt, integer *ldpt, complex *u, complex *vt, 
 	complex *work, integer *lwork, real *rwork, integer *nout, integer *
 	info)
@@ -73,7 +74,7 @@ static integer c__4 = 4;
     static real unfl, ovfl;
     static char uplo[1];
     static real temp1, temp2;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     extern /* Subroutine */ int cbdt01_(integer *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, 
 	    complex *, integer *, complex *, real *, real *);
@@ -140,7 +141,11 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -152,8 +157,7 @@ static integer c__4 = 4;
     CCHKBD checks the singular value decomposition (SVD) routines.   
 
     CGEBRD reduces a complex general m by n matrix A to real upper or   
-    lower bidiagonal form by an orthogonal transformation: Q' * A * P = B 
-  
+    lower bidiagonal form by an orthogonal transformation: Q' * A * P = B   
     (or A = Q * B * P').  The matrix B is upper bidiagonal if m >= n   
     and lower bidiagonal if m < n.   
 
@@ -168,8 +172,7 @@ static integer c__4 = 4;
        2)  Same as 1), but the singular values are stored in S2 and the   
            singular vectors are not computed.   
        3)  A = (UQ) S (P'V'), the SVD of the original matrix A.   
-    In addition, CBDSQR has an option to apply the left orthogonal matrix 
-  
+    In addition, CBDSQR has an option to apply the left orthogonal matrix   
     U to a matrix X, useful in least squares applications.   
 
     For each pair of matrix dimensions (M,N) and each selected matrix   
@@ -301,8 +304,7 @@ static integer c__4 = 4;
             DOTYPE(NTYPES) will be ignored.   
 
     NRHS    (input) INTEGER   
-            The number of columns in the "right-hand side" matrices X, Y, 
-  
+            The number of columns in the "right-hand side" matrices X, Y,   
             and Z, used in testing CBDSQR.  If NRHS = 0, then the   
             operations on the right-hand side will not be tested.   
             NRHS must be at least 0.   
@@ -311,8 +313,7 @@ static integer c__4 = 4;
             On entry ISEED specifies the seed of the random number   
             generator. The array elements should be between 0 and 4095;   
             if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The values of ISEED are changed on exit, and can be 
-  
+            be odd.  The values of ISEED are changed on exit, and can be   
             used in the next call to CCHKBD to continue the same random   
             number sequence.   
 
@@ -400,8 +401,7 @@ static integer c__4 = 4;
                 returns an error code, the   
                 absolute value of it is returned.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -412,8 +412,7 @@ static integer c__4 = 4;
                        be performed so far, for the current matrix.   
        MMAX            Largest value in NN.   
        NMAX            Largest value in NN.   
-       MNMIN           min(MM(j), NN(j)) (the dimension of the bidiagonal 
-  
+       MNMIN           min(MM(j), NN(j)) (the dimension of the bidiagonal   
                        matrix.)   
        MNMAX           The maximum value of MNMIN for j=1,...,NSIZES.   
        NFAIL           The number of tests which have exceeded THRESH   
@@ -431,8 +430,7 @@ static integer c__4 = 4;
        KMAGN(j)        The order of magnitude ( O(1),   
                        O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
        Parameter adjustments */
     --mval;
@@ -440,32 +438,32 @@ static integer c__4 = 4;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --bd;
     --be;
     --s1;
     --s2;
     z_dim1 = *ldx;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     y_dim1 = *ldx;
-    y_offset = y_dim1 + 1;
+    y_offset = 1 + y_dim1 * 1;
     y -= y_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     vt_dim1 = *ldpt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     u_dim1 = *ldpt;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     pt_dim1 = *ldpt;
-    pt_offset = pt_dim1 + 1;
+    pt_offset = 1 + pt_dim1 * 1;
     pt -= pt_offset;
     --work;
     --rwork;
@@ -545,8 +543,8 @@ static integer c__4 = 4;
 
 /*     Initialize constants */
 
-    *(unsigned char *)path = 'C';
-    s_copy(path + 1, "BD", 2L, 2L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "BD", (ftnlen)2, (ftnlen)2);
     nfail = 0;
     ntest = 0;
     unfl = slamch_("Safe minimum");
@@ -604,13 +602,11 @@ static integer c__4 = 4;
          =3  small  exponential  (none)   
          =4         arithmetic   diagonal, (w/ eigenvalues)   
          =5         random       symmetric, w/ eigenvalues   
-         =6                      nonsymmetric, w/ singular values 
-  
+         =6                      nonsymmetric, w/ singular values   
          =7                      random diagonal   
          =8                      random symmetric   
          =9                      random nonsymmetric   
-         =10                     random bidiagonal (log. distrib.)
- */
+         =10                     random bidiagonal (log. distrib.) */
 
 	    if (mtypes > 16) {
 		goto L100;
@@ -658,7 +654,7 @@ L70:
 
 		i__3 = mnmin;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    a[i__4].r = anorm, a[i__4].i = 0.f;
 /* L80: */
 		}
@@ -695,8 +691,7 @@ L70:
 			&c_b37, &c_b2, "T", "N", &work[mnmin + 1], &c__1, &
 			c_b37, &work[(mnmin << 1) + 1], &c__1, &c_b37, "N", 
 			iwork, &c__0, &c__0, &c_b47, &anorm, "NO", &a[
-			a_offset], lda, iwork, &iinfo)
-			;
+			a_offset], lda, iwork, &iinfo);
 
 	    } else if (itype == 8) {
 
@@ -767,7 +762,7 @@ L70:
 	    if (iinfo != 0) {
 		io___40.ciunit = *nout;
 		s_wsfe(&io___40);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -780,17 +775,14 @@ L70:
 
 L100:
 
-/*           Call CGEBRD and CUNGBR to compute B, Q, and P, do tes
-ts. */
+/*           Call CGEBRD and CUNGBR to compute B, Q, and P, do tests. */
 
 	    if (! bidiag) {
 
-/*              Compute transformations to reduce A to bidiago
-nal form:   
+/*              Compute transformations to reduce A to bidiagonal form:   
                 B := Q' * A * P. */
 
-		clacpy_(" ", &m, &n, &a[a_offset], lda, &q[q_offset], ldq)
-			;
+		clacpy_(" ", &m, &n, &a[a_offset], lda, &q[q_offset], ldq);
 		i__3 = *lwork - (mnmin << 1);
 		cgebrd_(&m, &n, &q[q_offset], ldq, &bd[1], &be[1], &work[1], &
 			work[mnmin + 1], &work[(mnmin << 1) + 1], &i__3, &
@@ -801,7 +793,7 @@ nal form:
 		if (iinfo != 0) {
 		    io___41.ciunit = *nout;
 		    s_wsfe(&io___41);
-		    do_fio(&c__1, "CGEBRD", 6L);
+		    do_fio(&c__1, "CGEBRD", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -835,7 +827,7 @@ nal form:
 		if (iinfo != 0) {
 		    io___43.ciunit = *nout;
 		    s_wsfe(&io___43);
-		    do_fio(&c__1, "CUNGBR(Q)", 9L);
+		    do_fio(&c__1, "CUNGBR(Q)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -858,7 +850,7 @@ nal form:
 		if (iinfo != 0) {
 		    io___44.ciunit = *nout;
 		    s_wsfe(&io___44);
-		    do_fio(&c__1, "CUNGBR(P)", 9L);
+		    do_fio(&c__1, "CUNGBR(P)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -870,15 +862,13 @@ nal form:
 		    return 0;
 		}
 
-/*              Apply Q' to an M by NRHS matrix X:  Y := Q' * 
-X. */
+/*              Apply Q' to an M by NRHS matrix X:  Y := Q' * X. */
 
 		cgemm_("Conjugate transpose", "No transpose", &m, nrhs, &m, &
 			c_b2, &q[q_offset], ldq, &x[x_offset], ldx, &c_b1, &y[
 			y_offset], ldx);
 
-/*              Test 1:  Check the decomposition A := Q * B * 
-PT   
+/*              Test 1:  Check the decomposition A := Q * B * PT   
                      2:  Check the orthogonality of Q   
                      3:  Check the orthogonality of PT */
 
@@ -891,8 +881,7 @@ PT
 			lwork, &rwork[1], &result[2]);
 	    }
 
-/*           Use CBDSQR to form the SVD of the bidiagonal matrix B
-:   
+/*           Use CBDSQR to form the SVD of the bidiagonal matrix B:   
              B := U * S1 * VT, and compute Z = U' * Y. */
 
 	    scopy_(&mnmin, &bd[1], &c__1, &s1[1], &c__1);
@@ -900,13 +889,13 @@ PT
 		i__3 = mnmin - 1;
 		scopy_(&i__3, &be[1], &c__1, &rwork[1], &c__1);
 	    }
-	    clacpy_(" ", &m, nrhs, &y[y_offset], ldx, &z[z_offset], ldx);
+	    clacpy_(" ", &m, nrhs, &y[y_offset], ldx, &z__[z_offset], ldx);
 	    claset_("Full", &mnmin, &mnmin, &c_b1, &c_b2, &u[u_offset], ldpt);
 	    claset_("Full", &mnmin, &mnmin, &c_b1, &c_b2, &vt[vt_offset], 
 		    ldpt);
 
 	    cbdsqr_(uplo, &mnmin, &mnmin, &mnmin, nrhs, &s1[1], &rwork[1], &
-		    vt[vt_offset], ldpt, &u[u_offset], ldpt, &z[z_offset], 
+		    vt[vt_offset], ldpt, &u[u_offset], ldpt, &z__[z_offset], 
 		    ldx, &rwork[mnmin + 1], &iinfo);
 
 /*           Check error code from CBDSQR. */
@@ -914,7 +903,7 @@ PT
 	    if (iinfo != 0) {
 		io___45.ciunit = *nout;
 		s_wsfe(&io___45);
-		do_fio(&c__1, "CBDSQR(vects)", 13L);
+		do_fio(&c__1, "CBDSQR(vects)", (ftnlen)13);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -930,10 +919,8 @@ PT
 		}
 	    }
 
-/*           Use CBDSQR to compute only the singular values of the
-   
-             bidiagonal matrix B;  U, VT, and Z should not be modi
-fied. */
+/*           Use CBDSQR to compute only the singular values of the   
+             bidiagonal matrix B;  U, VT, and Z should not be modified. */
 
 	    scopy_(&mnmin, &bd[1], &c__1, &s2[1], &c__1);
 	    if (mnmin > 0) {
@@ -942,15 +929,15 @@ fied. */
 	    }
 
 	    cbdsqr_(uplo, &mnmin, &c__0, &c__0, &c__0, &s2[1], &rwork[1], &vt[
-		    vt_offset], ldpt, &u[u_offset], ldpt, &z[z_offset], ldx, &
-		    rwork[mnmin + 1], &iinfo);
+		    vt_offset], ldpt, &u[u_offset], ldpt, &z__[z_offset], ldx,
+		     &rwork[mnmin + 1], &iinfo);
 
 /*           Check error code from CBDSQR. */
 
 	    if (iinfo != 0) {
 		io___46.ciunit = *nout;
 		s_wsfe(&io___46);
-		do_fio(&c__1, "CBDSQR(values)", 14L);
+		do_fio(&c__1, "CBDSQR(values)", (ftnlen)14);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -973,24 +960,23 @@ fied. */
 
 	    cbdt03_(uplo, &mnmin, &c__1, &bd[1], &be[1], &u[u_offset], ldpt, &
 		    s1[1], &vt[vt_offset], ldpt, &work[1], &result[3]);
-	    cbdt02_(&mnmin, nrhs, &y[y_offset], ldx, &z[z_offset], ldx, &u[
+	    cbdt02_(&mnmin, nrhs, &y[y_offset], ldx, &z__[z_offset], ldx, &u[
 		    u_offset], ldpt, &work[1], &rwork[1], &result[4]);
 	    cunt01_("Columns", &mnmin, &mnmin, &u[u_offset], ldpt, &work[1], 
 		    lwork, &rwork[1], &result[5]);
 	    cunt01_("Rows", &mnmin, &mnmin, &vt[vt_offset], ldpt, &work[1], 
 		    lwork, &rwork[1], &result[6]);
 
-/*           Test 8:  Check that the singular values are sorted in
-   
+/*           Test 8:  Check that the singular values are sorted in   
                       non-increasing order and are non-negative */
 
 	    result[7] = 0.f;
 	    i__3 = mnmin - 1;
-	    for (i = 1; i <= i__3; ++i) {
-		if (s1[i] < s1[i + 1]) {
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		if (s1[i__] < s1[i__ + 1]) {
 		    result[7] = ulpinv;
 		}
-		if (s1[i] < 0.f) {
+		if (s1[i__] < 0.f) {
 		    result[7] = ulpinv;
 		}
 /* L110: */
@@ -1001,8 +987,7 @@ fied. */
 		}
 	    }
 
-/*           Test 9:  Compare CBDSQR with and without singular vec
-tors */
+/*           Test 9:  Compare CBDSQR with and without singular vectors */
 
 	    temp2 = 0.f;
 
@@ -1010,11 +995,11 @@ tors */
 	    for (j = 1; j <= i__3; ++j) {
 /* Computing MAX   
    Computing MAX */
-		r__6 = (r__2 = s1[j], dabs(r__2)), r__7 = (r__3 = s2[j], dabs(
-			r__3));
+		r__6 = (r__1 = s1[j], dabs(r__1)), r__7 = (r__2 = s2[j], dabs(
+			r__2));
 		r__4 = sqrt(unfl) * dmax(s1[1],1.f), r__5 = ulp * dmax(r__6,
 			r__7);
-		temp1 = (r__1 = s1[j] - s2[j], dabs(r__1)) / dmax(r__4,r__5);
+		temp1 = (r__3 = s1[j] - s2[j], dabs(r__3)) / dmax(r__4,r__5);
 		temp2 = dmax(temp1,temp2);
 /* L120: */
 	    }
@@ -1022,8 +1007,7 @@ tors */
 	    result[8] = temp2;
 
 /*           Test 10:  Sturm sequence test of singular values   
-                       Go up by factors of two until it succeeds 
-*/
+                       Go up by factors of two until it succeeds */
 
 	    temp1 = *thresh * (.5f - ulp);
 
@@ -1040,8 +1024,7 @@ tors */
 L140:
 	    result[9] = temp1;
 
-/*           Use CBDSQR to form the decomposition A := (QU) S (VT 
-PT)   
+/*           Use CBDSQR to form the decomposition A := (QU) S (VT PT)   
              from the bidiagonal form A := Q B PT. */
 
 	    if (! bidiag) {
@@ -1055,10 +1038,8 @@ PT)
 			pt_offset], ldpt, &q[q_offset], ldq, &y[y_offset], 
 			ldx, &rwork[mnmin + 1], &iinfo);
 
-/*              Test 11:  Check the decomposition A := Q*U * S
-2 * VT*PT   
-                     12:  Check the computation Z := U' * Q' *
- X   
+/*              Test 11:  Check the decomposition A := Q*U * S2 * VT*PT   
+                     12:  Check the computation Z := U' * Q' * X   
                      13:  Check the orthogonality of Q*U   
                      14:  Check the orthogonality of VT*PT */
 
@@ -1118,4 +1099,8 @@ L170:
 
 
 } /* cchkbd_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlacon_(integer *n, doublecomplex *v, doublecomplex *x, 
 	doublereal *est, integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     ZLACON estimates the 1-norm of a square, complex matrix A.   
-    Reverse communication is used for evaluating matrix-vector products. 
-  
+    Reverse communication is used for evaluating matrix-vector products.   
 
     Arguments   
     =========   
@@ -48,33 +48,31 @@
     Contributed by Nick Higham, University of Manchester.   
     Originally named CONEST, dated March 16, 1988.   
 
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of 
-  
-    a real or complex matrix, with applications to condition estimation", 
-  
+    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
+    a real or complex matrix, with applications to condition estimation",   
     ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
 
-    ===================================================================== 
-  
+    Last modified:  April, 1999   
+
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
-    integer i__1, i__2;
-    doublereal d__1;
-    doublecomplex z__1, z__2;
+    integer i__1, i__2, i__3;
+    doublereal d__1, d__2;
+    doublecomplex z__1;
     /* Builtin functions */
-    double z_abs(doublecomplex *);
-    void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
+    double z_abs(doublecomplex *), d_imag(doublecomplex *);
     /* Local variables */
     static integer iter;
     static doublereal temp;
-    static integer jump, i, j, jlast;
+    static integer jump, i__, j;
+    static doublereal absxi;
+    static integer jlast;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
     extern integer izmax1_(integer *, doublecomplex *, integer *);
@@ -83,19 +81,18 @@
     static doublereal safmin, altsgn, estold;
 
 
+    --x;
+    --v;
 
-#define X(I) x[(I)-1]
-#define V(I) v[(I)-1]
-
-
+    /* Function Body */
     safmin = dlamch_("Safe minimum");
     if (*kase == 0) {
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    i__2 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
 	    d__1 = 1. / (doublereal) (*n);
 	    z__1.r = d__1, z__1.i = 0.;
-	    X(i).r = z__1.r, X(i).i = z__1.i;
+	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 /* L10: */
 	}
 	*kase = 1;
@@ -116,24 +113,26 @@
 
 L20:
     if (*n == 1) {
-	V(1).r = X(1).r, V(1).i = X(1).i;
-	*est = z_abs(&V(1));
+	v[1].r = x[1].r, v[1].i = x[1].i;
+	*est = z_abs(&v[1]);
 /*        ... QUIT */
 	goto L130;
     }
-    *est = dzsum1_(n, &X(1), &c__1);
+    *est = dzsum1_(n, &x[1], &c__1);
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (z_abs(&X(i)) > safmin) {
-	    i__2 = i;
-	    d__1 = z_abs(&X(i));
-	    z__2.r = d__1, z__2.i = 0.;
-	    z_div(&z__1, &X(i), &z__2);
-	    X(i).r = z__1.r, X(i).i = z__1.i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	absxi = z_abs(&x[i__]);
+	if (absxi > safmin) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    d__1 = x[i__3].r / absxi;
+	    d__2 = d_imag(&x[i__]) / absxi;
+	    z__1.r = d__1, z__1.i = d__2;
+	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	} else {
-	    i__2 = i;
-	    X(i).r = 1., X(i).i = 0.;
+	    i__2 = i__;
+	    x[i__2].r = 1., x[i__2].i = 0.;
 	}
 /* L30: */
     }
@@ -145,20 +144,20 @@ L20:
        FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY ZTRANS(A)*X. */
 
 L40:
-    j = izmax1_(n, &X(1), &c__1);
+    j = izmax1_(n, &x[1], &c__1);
     iter = 2;
 
 /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
 
 L50:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i;
-	X(i).r = 0., X(i).i = 0.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	x[i__2].r = 0., x[i__2].i = 0.;
 /* L60: */
     }
     i__1 = j;
-    X(j).r = 1., X(j).i = 0.;
+    x[i__1].r = 1., x[i__1].i = 0.;
     *kase = 1;
     jump = 3;
     return 0;
@@ -167,9 +166,9 @@ L50:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
-    zcopy_(n, &X(1), &c__1, &V(1), &c__1);
+    zcopy_(n, &x[1], &c__1, &v[1], &c__1);
     estold = *est;
-    *est = dzsum1_(n, &V(1), &c__1);
+    *est = dzsum1_(n, &v[1], &c__1);
 
 /*     TEST FOR CYCLING. */
     if (*est <= estold) {
@@ -177,16 +176,18 @@ L70:
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (z_abs(&X(i)) > safmin) {
-	    i__2 = i;
-	    d__1 = z_abs(&X(i));
-	    z__2.r = d__1, z__2.i = 0.;
-	    z_div(&z__1, &X(i), &z__2);
-	    X(i).r = z__1.r, X(i).i = z__1.i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	absxi = z_abs(&x[i__]);
+	if (absxi > safmin) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    d__1 = x[i__3].r / absxi;
+	    d__2 = d_imag(&x[i__]) / absxi;
+	    z__1.r = d__1, z__1.i = d__2;
+	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	} else {
-	    i__2 = i;
-	    X(i).r = 1., X(i).i = 0.;
+	    i__2 = i__;
+	    x[i__2].r = 1., x[i__2].i = 0.;
 	}
 /* L80: */
     }
@@ -199,10 +200,8 @@ L70:
 
 L90:
     jlast = j;
-    j = izmax1_(n, &X(1), &c__1);
-    i__1 = jlast;
-    i__2 = j;
-    if (X(jlast).r != (d__1 = X(j).r, abs(d__1)) && iter < 5) {
+    j = izmax1_(n, &x[1], &c__1);
+    if (z_abs(&x[jlast]) != z_abs(&x[j]) && iter < 5) {
 	++iter;
 	goto L50;
     }
@@ -212,11 +211,11 @@ L90:
 L100:
     altsgn = 1.;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i;
-	d__1 = altsgn * ((doublereal) (i - 1) / (doublereal) (*n - 1) + 1.);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	d__1 = altsgn * ((doublereal) (i__ - 1) / (doublereal) (*n - 1) + 1.);
 	z__1.r = d__1, z__1.i = 0.;
-	X(i).r = z__1.r, X(i).i = z__1.i;
+	x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	altsgn = -altsgn;
 /* L110: */
     }
@@ -228,9 +227,9 @@ L100:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L120:
-    temp = dzsum1_(n, &X(1), &c__1) / (doublereal) (*n * 3) * 2.;
+    temp = dzsum1_(n, &x[1], &c__1) / (doublereal) (*n * 3) * 2.;
     if (temp > *est) {
-	zcopy_(n, &X(1), &c__1, &V(1), &c__1);
+	zcopy_(n, &x[1], &c__1, &v[1], &c__1);
 	*est = temp;
     }
 

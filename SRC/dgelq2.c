@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgelq2_(integer *m, integer *n, doublereal *a, integer *
 	lda, doublereal *tau, doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -26,11 +27,9 @@
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
             On entry, the m by n matrix A.   
-            On exit, the elements on and below the diagonal of the array 
-  
+            On exit, the elements on and below the diagonal of the array   
             contain the m by min(m,n) lower trapezoidal matrix L (L is   
-            lower triangular if m <= n); the elements above the diagonal, 
-  
+            lower triangular if m <= n); the elements above the diagonal,   
             with the array TAU, represent the orthogonal matrix Q as a   
             product of elementary reflectors (see Further Details).   
 
@@ -38,8 +37,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (M)   
@@ -60,35 +58,33 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n), 
-  
+    v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n),   
     and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *), dlarfg_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *), xerbla_(char *, integer *);
     static doublereal aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -106,27 +102,26 @@
     k = min(*m,*n);
 
     i__1 = k;
-    for (i = 1; i <= k; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*        Generate elementary reflector H(i) to annihilate A(i,i+1:n) 
-*/
+/*        Generate elementary reflector H(i) to annihilate A(i,i+1:n)   
 
-	i__2 = *n - i + 1;
-/* Computing MIN */
-	i__3 = i + 1;
-	dlarfg_(&i__2, &A(i,i), &A(i,min(i+1,*n)), lda,
-		 &TAU(i));
-	if (i < *m) {
+   Computing MIN */
+	i__2 = i__ + 1;
+	i__3 = *n - i__ + 1;
+	dlarfg_(&i__3, &a_ref(i__, i__), &a_ref(i__, min(i__2,*n)), lda, &tau[
+		i__]);
+	if (i__ < *m) {
 
 /*           Apply H(i) to A(i+1:m,i:n) from the right */
 
-	    aii = A(i,i);
-	    A(i,i) = 1.;
-	    i__2 = *m - i;
-	    i__3 = *n - i + 1;
-	    dlarf_("Right", &i__2, &i__3, &A(i,i), lda, &TAU(i), &
-		    A(i+1,i), lda, &WORK(1));
-	    A(i,i) = aii;
+	    aii = a_ref(i__, i__);
+	    a_ref(i__, i__) = 1.;
+	    i__2 = *m - i__;
+	    i__3 = *n - i__ + 1;
+	    dlarf_("Right", &i__2, &i__3, &a_ref(i__, i__), lda, &tau[i__], &
+		    a_ref(i__ + 1, i__), lda, &work[1]);
+	    a_ref(i__, i__) = aii;
 	}
 /* L10: */
     }
@@ -135,4 +130,7 @@
 /*     End of DGELQ2 */
 
 } /* dgelq2_ */
+
+#undef a_ref
+
 

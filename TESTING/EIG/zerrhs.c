@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -48,8 +49,9 @@ static integer c__4 = 4;
 
     /* Local variables */
     static integer info;
-    static doublecomplex a[9]	/* was [3][3] */, c[9]	/* was [3][3] */;
-    static integer i, j, m;
+    static doublecomplex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] 
+	    */;
+    static integer i__, j, m;
     static doublereal s[3];
     static doublecomplex w[9], x[3];
     static char c2[2];
@@ -94,7 +96,11 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -115,22 +121,21 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 3; ++j) {
-	for (i = 1; i <= 3; ++i) {
-	    i__1 = i + j * 3 - 4;
-	    d__1 = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
 	    a[i__1].r = d__1, a[i__1].i = 0.;
 /* L10: */
 	}
@@ -146,7 +151,7 @@ static integer c__4 = 4;
 
 /*        ZGEBAL */
 
-	s_copy(srnamc_1.srnamt, "ZGEBAL", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGEBAL", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgebal_("/", &c__0, a, &c__1, &ilo, &ihi, s, &info);
 	chkxer_("ZGEBAL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -163,7 +168,7 @@ static integer c__4 = 4;
 
 /*        ZGEBAK */
 
-	s_copy(srnamc_1.srnamt, "ZGEBAK", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGEBAK", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgebak_("/", "R", &c__0, &c__1, &c__0, s, &c__0, a, &c__1, &info);
 	chkxer_("ZGEBAK", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -204,7 +209,7 @@ static integer c__4 = 4;
 
 /*        ZGEHRD */
 
-	s_copy(srnamc_1.srnamt, "ZGEHRD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGEHRD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgehrd_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("ZGEHRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -237,7 +242,7 @@ static integer c__4 = 4;
 
 /*        ZUNGHR */
 
-	s_copy(srnamc_1.srnamt, "ZUNGHR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZUNGHR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunghr_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("ZUNGHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -270,134 +275,134 @@ static integer c__4 = 4;
 
 /*        ZUNMHR */
 
-	s_copy(srnamc_1.srnamt, "ZUNMHR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZUNMHR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zunmhr_("L", "/", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "/", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zunmhr_("L", "N", &c_n1, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c_n1, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zunmhr_("L", "N", &c__0, &c_n1, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__0, &c_n1, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zunmhr_("L", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zunmhr_("L", "N", &c__0, &c__0, &c__2, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__0, &c__0, &c__2, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zunmhr_("L", "N", &c__1, &c__2, &c__2, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__2, &info);
+	zunmhr_("L", "N", &c__1, &c__2, &c__2, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__2, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zunmhr_("R", "N", &c__2, &c__1, &c__2, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__2, &info);
+	zunmhr_("R", "N", &c__2, &c__1, &c__2, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__2, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zunmhr_("L", "N", &c__1, &c__1, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__1, &c__1, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zunmhr_("L", "N", &c__0, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__0, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zunmhr_("R", "N", &c__1, &c__0, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("R", "N", &c__1, &c__0, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmhr_("R", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("R", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__2, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__2, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zunmhr_("L", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	zunmhr_("L", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zunmhr_("R", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__1, &info);
+	zunmhr_("R", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__1, &info);
 	chkxer_("ZUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 16;
 
 /*        ZHSEQR */
 
-	s_copy(srnamc_1.srnamt, "ZHSEQR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHSEQR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zhseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zhseqr_("E", "/", &c__0, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "/", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zhseqr_("E", "N", &c_n1, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "N", &c_n1, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zhseqr_("E", "N", &c__0, &c__0, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "N", &c__0, &c__0, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zhseqr_("E", "N", &c__0, &c__2, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "N", &c__0, &c__2, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zhseqr_("E", "N", &c__1, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "N", &c__1, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zhseqr_("E", "N", &c__1, &c__1, &c__2, a, &c__1, x, c, &c__1, w, &
+	zhseqr_("E", "N", &c__1, &c__1, &c__2, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	zhseqr_("E", "N", &c__2, &c__1, &c__2, a, &c__1, x, c, &c__2, w, &
+	zhseqr_("E", "N", &c__2, &c__1, &c__2, a, &c__1, x, c__, &c__2, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	zhseqr_("E", "V", &c__2, &c__1, &c__2, a, &c__2, x, c, &c__1, w, &
+	zhseqr_("E", "V", &c__2, &c__1, &c__2, a, &c__2, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("ZHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -405,7 +410,7 @@ static integer c__4 = 4;
 
 /*        ZHSEIN */
 
-	s_copy(srnamc_1.srnamt, "ZHSEIN", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHSEIN", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhsein_("/", "N", "N", sel, &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, 
 		&c__0, &m, w, rw, ifaill, ifailr, &info);
@@ -450,7 +455,7 @@ static integer c__4 = 4;
 
 /*        ZTREVC */
 
-	s_copy(srnamc_1.srnamt, "ZTREVC", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTREVC", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrevc_("/", "A", sel, &c__0, a, &c__1, vl, &c__1, vr, &c__1, &c__0, &
 		m, w, rw, &info);
@@ -494,13 +499,13 @@ static integer c__4 = 4;
     if (infoc_1.ok) {
 	io___22.ciunit = infoc_1.nout;
 	s_wsfe(&io___22);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___23.ciunit = infoc_1.nout;
 	s_wsfe(&io___23);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -510,4 +515,8 @@ static integer c__4 = 4;
 /*     End of ZERRHS */
 
 } /* zerrhs_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static integer c__1 = 1;
     double r_imag(complex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real xnorm;
     static integer ix;
     extern integer icamax_(integer *, complex *, integer *);
@@ -30,7 +31,13 @@ static integer c__1 = 1;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_subscr(a_1,a_2) (a_2)*xact_dim1 + a_1
+#define xact_ref(a_1,a_2) xact[xact_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -43,8 +50,7 @@ static integer c__1 = 1;
     true solution to a system of linear equations.   
 
     RESID =  ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS ),   
-    where RCOND is the reciprocal of the condition number and EPS is the 
-  
+    where RCOND is the reciprocal of the condition number and EPS is the   
     machine epsilon.   
 
     Arguments   
@@ -54,8 +60,7 @@ static integer c__1 = 1;
             The number of rows of the matrices X and XACT.  N >= 0.   
 
     NRHS    (input) INTEGER   
-            The number of columns of the matrices X and XACT.  NRHS >= 0. 
-  
+            The number of columns of the matrices X and XACT.  NRHS >= 0.   
 
     X       (input) COMPLEX array, dimension (LDX,NRHS)   
             The computed solution vectors.  Each vector is stored as a   
@@ -69,8 +74,7 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     RCOND   (input) REAL   
             The reciprocal of the condition number of the coefficient   
@@ -80,18 +84,17 @@ static integer c__1 = 1;
             The maximum over the NRHS solution vectors of   
             ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
 
        Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
 
     /* Function Body */
@@ -115,15 +118,15 @@ static integer c__1 = 1;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	ix = icamax_(n, &xact[j * xact_dim1 + 1], &c__1);
-	i__2 = ix + j * xact_dim1;
-	xnorm = (r__1 = xact[i__2].r, dabs(r__1)) + (r__2 = r_imag(&xact[ix + 
-		j * xact_dim1]), dabs(r__2));
+	ix = icamax_(n, &xact_ref(1, j), &c__1);
+	i__2 = xact_subscr(ix, j);
+	xnorm = (r__1 = xact[i__2].r, dabs(r__1)) + (r__2 = r_imag(&xact_ref(
+		ix, j)), dabs(r__2));
 	diffnm = 0.f;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * x_dim1;
-	    i__4 = i + j * xact_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = x_subscr(i__, j);
+	    i__4 = xact_subscr(i__, j);
 	    q__2.r = x[i__3].r - xact[i__4].r, q__2.i = x[i__3].i - xact[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
@@ -153,4 +156,10 @@ static integer c__1 = 1;
 /*     End of CGET04 */
 
 } /* cget04_ */
+
+#undef x_ref
+#undef x_subscr
+#undef xact_ref
+#undef xact_subscr
+
 

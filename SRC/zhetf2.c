@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhetf2_(char *uplo, integer *n, doublecomplex *a, 
 	integer *lda, integer *ipiv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -19,11 +20,9 @@
 
     where U (or L) is a product of permutation and unit upper (lower)   
     triangular matrices, U' is the conjugate transpose of U, and D is   
-    Hermitian and block diagonal with 1-by-1 and 2-by-2 diagonal blocks. 
-  
+    Hermitian and block diagonal with 1-by-1 and 2-by-2 diagonal blocks.   
 
-    This is the unblocked version of the algorithm, calling Level 2 BLAS. 
-  
+    This is the unblocked version of the algorithm, calling Level 2 BLAS.   
 
     Arguments   
     =========   
@@ -38,20 +37,16 @@
             The order of the matrix A.  N >= 0.   
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
-            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading   
             n-by-n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n-by-n lower triangular part of A contains the lower 
-  
+            leading n-by-n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
-            On exit, the block diagonal matrix D and the multipliers used 
-  
-            to obtain the factor U or L (see below for further details). 
-  
+            On exit, the block diagonal matrix D and the multipliers used   
+            to obtain the factor U or L (see below for further details).   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.  LDA >= max(1,N).   
@@ -61,8 +56,7 @@
             If IPIV(k) > 0, then rows and columns k and IPIV(k) were   
             interchanged and D(k,k) is a 1-by-1 diagonal block.   
             If UPLO = 'U' and IPIV(k) = IPIV(k-1) < 0, then rows and   
-            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k) 
-  
+            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k)   
             is a 2-by-2 diagonal block.  If UPLO = 'L' and IPIV(k) =   
             IPIV(k+1) < 0, then rows and columns k+1 and -IPIV(k) were   
             interchanged and D(k:k+1,k:k+1) is a 2-by-2 diagonal block.   
@@ -70,24 +64,24 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
-            > 0: if INFO = k, D(k,k) is exactly zero.  The factorization 
-  
+            > 0: if INFO = k, D(k,k) is exactly zero.  The factorization   
                  has been completed, but the block diagonal matrix D is   
-                 exactly singular, and division by zero will occur if it 
-  
+                 exactly singular, and division by zero will occur if it   
                  is used to solve a system of equations.   
 
     Further Details   
     ===============   
 
+    1-96 - Based on modifications by   
+      J. Lewis, Boeing Computer Services Company   
+      A. Petitet, Computer Science Dept., Univ. of Tenn., Knoxville, USA   
+
     If UPLO = 'U', then A = U*D*U', where   
        U = P(n)*U(n)* ... *P(k)U(k)* ...,   
-    i.e., U is a product of terms P(k)*U(k), where k decreases from n to 
-  
+    i.e., U is a product of terms P(k)*U(k), where k decreases from n to   
     1 in steps of 1 or 2, and D is a block diagonal matrix with 1-by-1   
     and 2-by-2 diagonal blocks D(k).  P(k) is a permutation matrix as   
-    defined by IPIV(k), and U(k) is a unit upper triangular matrix, such 
-  
+    defined by IPIV(k), and U(k) is a unit upper triangular matrix, such   
     that if the diagonal block D(k) is of order s (s = 1 or 2), then   
 
                (   I    v    0   )   k-s   
@@ -96,18 +90,15 @@
                   k-s   s   n-k   
 
     If s = 1, D(k) overwrites A(k,k), and v overwrites A(1:k-1,k).   
-    If s = 2, the upper triangle of D(k) overwrites A(k-1,k-1), A(k-1,k), 
-  
+    If s = 2, the upper triangle of D(k) overwrites A(k-1,k-1), A(k-1,k),   
     and A(k,k), and v overwrites A(1:k-2,k-1:k).   
 
     If UPLO = 'L', then A = L*D*L', where   
        L = P(1)*L(1)* ... *P(k)*L(k)* ...,   
-    i.e., L is a product of terms P(k)*L(k), where k increases from 1 to 
-  
+    i.e., L is a product of terms P(k)*L(k), where k increases from 1 to   
     n in steps of 1 or 2, and D is a block diagonal matrix with 1-by-1   
     and 2-by-2 diagonal blocks D(k).  P(k) is a permutation matrix as   
-    defined by IPIV(k), and L(k) is a unit lower triangular matrix, such 
-  
+    defined by IPIV(k), and L(k) is a unit lower triangular matrix, such   
     that if the diagonal block D(k) is of order s (s = 1 or 2), then   
 
                (   I    0     0   )  k-1   
@@ -119,57 +110,61 @@
     If s = 2, the lower triangle of D(k) overwrites A(k,k), A(k+1,k),   
     and A(k+1,k+1), and v overwrites A(k+2:n,k:k+1).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
-    integer a_dim1, a_offset, i__1, i__2;
+    integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5, i__6;
     doublereal d__1, d__2, d__3, d__4;
-    doublecomplex z__1;
+    doublecomplex z__1, z__2, z__3, z__4, z__5, z__6;
     /* Builtin functions */
     double sqrt(doublereal), d_imag(doublecomplex *);
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
     static integer imax, jmax;
     extern /* Subroutine */ int zher_(char *, integer *, doublereal *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *), 
-	    zrot_(integer *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublereal *, doublecomplex *);
-    static doublereal c;
-    static integer j, k;
-    static doublecomplex s, t;
+	    doublecomplex *, integer *, doublecomplex *, integer *);
+    static doublereal d__;
+    static integer i__, j, k;
+    static doublecomplex t;
     static doublereal alpha;
     extern logical lsame_(char *, char *);
     static integer kstep;
     static logical upper;
-    static doublereal r1, r2;
+    static doublereal r1;
     extern /* Subroutine */ int zswap_(integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *), zlaev2_(doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublereal *, doublereal *, 
-	    doublereal *, doublecomplex *);
+	    doublecomplex *, integer *);
+    extern doublereal dlapy2_(doublereal *, doublereal *);
+    static doublereal d11;
+    static doublecomplex d12;
+    static doublereal d22;
+    static doublecomplex d21;
     static integer kk, kp;
     static doublereal absakk;
+    static doublecomplex wk;
+    static doublereal tt;
     extern /* Subroutine */ int xerbla_(char *, integer *), zdscal_(
 	    integer *, doublereal *, doublecomplex *, integer *);
     static doublereal colmax;
     extern integer izamax_(integer *, doublecomplex *, integer *);
     static doublereal rowmax;
+    static doublecomplex wkm1, wkp1;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -193,8 +188,7 @@
 
 /*        Factorize A as U*D*U' using the upper triangle of A   
 
-          K is the main loop index, decreasing from N to 1 in steps of
-   
+          K is the main loop index, decreasing from N to 1 in steps of   
           1 or 2 */
 
 	k = *n;
@@ -203,25 +197,25 @@ L10:
 /*        If K < 1, exit from loop */
 
 	if (k < 1) {
-	    goto L50;
+	    goto L90;
 	}
 	kstep = 1;
 
 /*        Determine rows and columns to be interchanged and whether   
           a 1-by-1 or 2-by-2 pivot block will be used */
 
-	i__1 = k + k * a_dim1;
-	absakk = (d__1 = A(k,k).r, abs(d__1));
+	i__1 = a_subscr(k, k);
+	absakk = (d__1 = a[i__1].r, abs(d__1));
 
-/*        IMAX is the row-index of the largest off-diagonal element in
-   
+/*        IMAX is the row-index of the largest off-diagonal element in   
           column K, and COLMAX is its absolute value */
 
 	if (k > 1) {
 	    i__1 = k - 1;
-	    imax = izamax_(&i__1, &A(1,k), &c__1);
-	    i__1 = imax + k * a_dim1;
-	    colmax = (d__1 = A(imax,k).r, abs(d__1)) + (d__2 = d_imag(&A(imax,k)), abs(d__2));
+	    imax = izamax_(&i__1, &a_ref(1, k), &c__1);
+	    i__1 = a_subscr(imax, k);
+	    colmax = (d__1 = a[i__1].r, abs(d__1)) + (d__2 = d_imag(&a_ref(
+		    imax, k)), abs(d__2));
 	} else {
 	    colmax = 0.;
 	}
@@ -234,10 +228,10 @@ L10:
 		*info = k;
 	    }
 	    kp = k;
-	    i__1 = k + k * a_dim1;
-	    i__2 = k + k * a_dim1;
-	    d__1 = A(k,k).r;
-	    A(k,k).r = d__1, A(k,k).i = 0.;
+	    i__1 = a_subscr(k, k);
+	    i__2 = a_subscr(k, k);
+	    d__1 = a[i__2].r;
+	    a[i__1].r = d__1, a[i__1].i = 0.;
 	} else {
 	    if (absakk >= alpha * colmax) {
 
@@ -246,46 +240,40 @@ L10:
 		kp = k;
 	    } else {
 
-/*              JMAX is the column-index of the largest off-di
-agonal   
-                element in row IMAX, and ROWMAX is its absolut
-e value */
+/*              JMAX is the column-index of the largest off-diagonal   
+                element in row IMAX, and ROWMAX is its absolute value */
 
 		i__1 = k - imax;
-		jmax = imax + izamax_(&i__1, &A(imax,imax+1), 
-			lda);
-		i__1 = imax + jmax * a_dim1;
-		rowmax = (d__1 = A(imax,jmax).r, abs(d__1)) + (d__2 = d_imag(&A(imax,jmax)), abs(d__2));
+		jmax = imax + izamax_(&i__1, &a_ref(imax, imax + 1), lda);
+		i__1 = a_subscr(imax, jmax);
+		rowmax = (d__1 = a[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+			a_ref(imax, jmax)), abs(d__2));
 		if (imax > 1) {
 		    i__1 = imax - 1;
-		    jmax = izamax_(&i__1, &A(1,imax), &c__1);
+		    jmax = izamax_(&i__1, &a_ref(1, imax), &c__1);
 /* Computing MAX */
-		    i__1 = jmax + imax * a_dim1;
-		    d__3 = rowmax, d__4 = (d__1 = A(jmax,imax).r, abs(d__1)) + (
-			    d__2 = d_imag(&A(jmax,imax)), abs(d__2)
-			    );
+		    i__1 = a_subscr(jmax, imax);
+		    d__3 = rowmax, d__4 = (d__1 = a[i__1].r, abs(d__1)) + (
+			    d__2 = d_imag(&a_ref(jmax, imax)), abs(d__2));
 		    rowmax = max(d__3,d__4);
 		}
 
 		if (absakk >= alpha * colmax * (colmax / rowmax)) {
 
-/*                 no interchange, use 1-by-1 pivot block 
-*/
+/*                 no interchange, use 1-by-1 pivot block */
 
 		    kp = k;
 		} else /* if(complicated condition) */ {
-		    i__1 = imax + imax * a_dim1;
-		    if ((d__1 = A(imax,imax).r, abs(d__1)) >= alpha * rowmax) {
+		    i__1 = a_subscr(imax, imax);
+		    if ((d__1 = a[i__1].r, abs(d__1)) >= alpha * rowmax) {
 
-/*                 interchange rows and columns K and 
-IMAX, use 1-by-1   
+/*                 interchange rows and columns K and IMAX, use 1-by-1   
                    pivot block */
 
 			kp = imax;
 		    } else {
 
-/*                 interchange rows and columns K-1 an
-d IMAX, use 2-by-2   
+/*                 interchange rows and columns K-1 and IMAX, use 2-by-2   
                    pivot block */
 
 			kp = imax;
@@ -297,58 +285,56 @@ d IMAX, use 2-by-2
 	    kk = k - kstep + 1;
 	    if (kp != kk) {
 
-/*              Interchange rows and columns KK and KP in the 
-leading   
+/*              Interchange rows and columns KK and KP in the leading   
                 submatrix A(1:k,1:k) */
 
 		i__1 = kp - 1;
-		zswap_(&i__1, &A(1,kk), &c__1, &A(1,kp),
-			 &c__1);
+		zswap_(&i__1, &a_ref(1, kk), &c__1, &a_ref(1, kp), &c__1);
 		i__1 = kk - 1;
-		for (j = kp + 1; j <= kk-1; ++j) {
-		    d_cnjg(&z__1, &A(j,kk));
+		for (j = kp + 1; j <= i__1; ++j) {
+		    d_cnjg(&z__1, &a_ref(j, kk));
 		    t.r = z__1.r, t.i = z__1.i;
-		    i__2 = j + kk * a_dim1;
-		    d_cnjg(&z__1, &A(kp,j));
-		    A(j,kk).r = z__1.r, A(j,kk).i = z__1.i;
-		    i__2 = kp + j * a_dim1;
-		    A(kp,j).r = t.r, A(kp,j).i = t.i;
+		    i__2 = a_subscr(j, kk);
+		    d_cnjg(&z__1, &a_ref(kp, j));
+		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
+		    i__2 = a_subscr(kp, j);
+		    a[i__2].r = t.r, a[i__2].i = t.i;
 /* L20: */
 		}
-		i__1 = kp + kk * a_dim1;
-		d_cnjg(&z__1, &A(kp,kk));
-		A(kp,kk).r = z__1.r, A(kp,kk).i = z__1.i;
-		i__1 = kk + kk * a_dim1;
-		r1 = A(kk,kk).r;
-		i__1 = kk + kk * a_dim1;
-		i__2 = kp + kp * a_dim1;
-		d__1 = A(kp,kp).r;
-		A(kk,kk).r = d__1, A(kk,kk).i = 0.;
-		i__1 = kp + kp * a_dim1;
-		A(kp,kp).r = r1, A(kp,kp).i = 0.;
+		i__1 = a_subscr(kp, kk);
+		d_cnjg(&z__1, &a_ref(kp, kk));
+		a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+		i__1 = a_subscr(kk, kk);
+		r1 = a[i__1].r;
+		i__1 = a_subscr(kk, kk);
+		i__2 = a_subscr(kp, kp);
+		d__1 = a[i__2].r;
+		a[i__1].r = d__1, a[i__1].i = 0.;
+		i__1 = a_subscr(kp, kp);
+		a[i__1].r = r1, a[i__1].i = 0.;
 		if (kstep == 2) {
-		    i__1 = k + k * a_dim1;
-		    i__2 = k + k * a_dim1;
-		    d__1 = A(k,k).r;
-		    A(k,k).r = d__1, A(k,k).i = 0.;
-		    i__1 = k - 1 + k * a_dim1;
-		    t.r = A(k-1,k).r, t.i = A(k-1,k).i;
-		    i__1 = k - 1 + k * a_dim1;
-		    i__2 = kp + k * a_dim1;
-		    A(k-1,k).r = A(kp,k).r, A(k-1,k).i = A(kp,k).i;
-		    i__1 = kp + k * a_dim1;
-		    A(kp,k).r = t.r, A(kp,k).i = t.i;
+		    i__1 = a_subscr(k, k);
+		    i__2 = a_subscr(k, k);
+		    d__1 = a[i__2].r;
+		    a[i__1].r = d__1, a[i__1].i = 0.;
+		    i__1 = a_subscr(k - 1, k);
+		    t.r = a[i__1].r, t.i = a[i__1].i;
+		    i__1 = a_subscr(k - 1, k);
+		    i__2 = a_subscr(kp, k);
+		    a[i__1].r = a[i__2].r, a[i__1].i = a[i__2].i;
+		    i__1 = a_subscr(kp, k);
+		    a[i__1].r = t.r, a[i__1].i = t.i;
 		}
 	    } else {
-		i__1 = k + k * a_dim1;
-		i__2 = k + k * a_dim1;
-		d__1 = A(k,k).r;
-		A(k,k).r = d__1, A(k,k).i = 0.;
+		i__1 = a_subscr(k, k);
+		i__2 = a_subscr(k, k);
+		d__1 = a[i__2].r;
+		a[i__1].r = d__1, a[i__1].i = 0.;
 		if (kstep == 2) {
-		    i__1 = k - 1 + (k - 1) * a_dim1;
-		    i__2 = k - 1 + (k - 1) * a_dim1;
-		    d__1 = A(k-1,k-1).r;
-		    A(k-1,k-1).r = d__1, A(k-1,k-1).i = 0.;
+		    i__1 = a_subscr(k - 1, k - 1);
+		    i__2 = a_subscr(k - 1, k - 1);
+		    d__1 = a[i__2].r;
+		    a[i__1].r = d__1, a[i__1].i = 0.;
 		}
 	    }
 
@@ -362,77 +348,115 @@ leading
 
                 where U(k) is the k-th column of U   
 
-                Perform a rank-1 update of A(1:k-1,1:k-1) as 
-  
+                Perform a rank-1 update of A(1:k-1,1:k-1) as   
 
-                A := A - U(k)*D(k)*U(k)' = A - W(k)*1/D(k)*W(k
-)' */
+                A := A - U(k)*D(k)*U(k)' = A - W(k)*1/D(k)*W(k)' */
 
-		i__1 = k + k * a_dim1;
-		r1 = 1. / A(k,k).r;
+		i__1 = a_subscr(k, k);
+		r1 = 1. / a[i__1].r;
 		i__1 = k - 1;
 		d__1 = -r1;
-		zher_(uplo, &i__1, &d__1, &A(1,k), &c__1, &A(1,1), lda);
+		zher_(uplo, &i__1, &d__1, &a_ref(1, k), &c__1, &a[a_offset], 
+			lda);
 
 /*              Store U(k) in column k */
 
 		i__1 = k - 1;
-		zdscal_(&i__1, &r1, &A(1,k), &c__1);
+		zdscal_(&i__1, &r1, &a_ref(1, k), &c__1);
 	    } else {
 
-/*              2-by-2 pivot block D(k): columns k and k-1 now
- hold   
+/*              2-by-2 pivot block D(k): columns k and k-1 now hold   
 
                 ( W(k-1) W(k) ) = ( U(k-1) U(k) )*D(k)   
 
-                where U(k) and U(k-1) are the k-th and (k-1)-t
-h columns   
+                where U(k) and U(k-1) are the k-th and (k-1)-th columns   
                 of U   
 
-                Perform a rank-2 update of A(1:k-2,1:k-2) as 
-  
+                Perform a rank-2 update of A(1:k-2,1:k-2) as   
 
-                A := A - ( U(k-1) U(k) )*D(k)*( U(k-1) U(k) )'
-   
-                   = A - ( W(k-1) W(k) )*inv(D(k))*( W(k-1) W(
-k) )'   
+                A := A - ( U(k-1) U(k) )*D(k)*( U(k-1) U(k) )'   
+                   = A - ( W(k-1) W(k) )*inv(D(k))*( W(k-1) W(k) )' */
 
-                Convert this to two rank-1 updates by using th
-e eigen-   
-                decomposition of D(k) */
+		if (k > 2) {
 
-		zlaev2_(&A(k-1,k-1), &A(k-1,k), 
-			&A(k,k), &r1, &r2, &c, &s);
-		r1 = 1. / r1;
-		r2 = 1. / r2;
-		i__1 = k - 2;
-		zrot_(&i__1, &A(1,k-1), &c__1, &A(1,k), &c__1, &c, &s);
-		i__1 = k - 2;
-		d__1 = -r1;
-		zher_(uplo, &i__1, &d__1, &A(1,k-1), &c__1, &A(1,1), lda);
-		i__1 = k - 2;
-		d__1 = -r2;
-		zher_(uplo, &i__1, &d__1, &A(1,k), &c__1, &A(1,1), lda);
+		    i__1 = a_subscr(k - 1, k);
+		    d__1 = a[i__1].r;
+		    d__2 = d_imag(&a_ref(k - 1, k));
+		    d__ = dlapy2_(&d__1, &d__2);
+		    i__1 = a_subscr(k - 1, k - 1);
+		    d22 = a[i__1].r / d__;
+		    i__1 = a_subscr(k, k);
+		    d11 = a[i__1].r / d__;
+		    tt = 1. / (d11 * d22 - 1.);
+		    i__1 = a_subscr(k - 1, k);
+		    z__1.r = a[i__1].r / d__, z__1.i = a[i__1].i / d__;
+		    d12.r = z__1.r, d12.i = z__1.i;
+		    d__ = tt / d__;
 
-/*              Store U(k) and U(k-1) in columns k and k-1 */
+		    for (j = k - 2; j >= 1; --j) {
+			i__1 = a_subscr(j, k - 1);
+			z__3.r = d11 * a[i__1].r, z__3.i = d11 * a[i__1].i;
+			d_cnjg(&z__5, &d12);
+			i__2 = a_subscr(j, k);
+			z__4.r = z__5.r * a[i__2].r - z__5.i * a[i__2].i, 
+				z__4.i = z__5.r * a[i__2].i + z__5.i * a[i__2]
+				.r;
+			z__2.r = z__3.r - z__4.r, z__2.i = z__3.i - z__4.i;
+			z__1.r = d__ * z__2.r, z__1.i = d__ * z__2.i;
+			wkm1.r = z__1.r, wkm1.i = z__1.i;
+			i__1 = a_subscr(j, k);
+			z__3.r = d22 * a[i__1].r, z__3.i = d22 * a[i__1].i;
+			i__2 = a_subscr(j, k - 1);
+			z__4.r = d12.r * a[i__2].r - d12.i * a[i__2].i, 
+				z__4.i = d12.r * a[i__2].i + d12.i * a[i__2]
+				.r;
+			z__2.r = z__3.r - z__4.r, z__2.i = z__3.i - z__4.i;
+			z__1.r = d__ * z__2.r, z__1.i = d__ * z__2.i;
+			wk.r = z__1.r, wk.i = z__1.i;
+			for (i__ = j; i__ >= 1; --i__) {
+			    i__1 = a_subscr(i__, j);
+			    i__2 = a_subscr(i__, j);
+			    i__3 = a_subscr(i__, k);
+			    d_cnjg(&z__4, &wk);
+			    z__3.r = a[i__3].r * z__4.r - a[i__3].i * z__4.i, 
+				    z__3.i = a[i__3].r * z__4.i + a[i__3].i * 
+				    z__4.r;
+			    z__2.r = a[i__2].r - z__3.r, z__2.i = a[i__2].i - 
+				    z__3.i;
+			    i__4 = a_subscr(i__, k - 1);
+			    d_cnjg(&z__6, &wkm1);
+			    z__5.r = a[i__4].r * z__6.r - a[i__4].i * z__6.i, 
+				    z__5.i = a[i__4].r * z__6.i + a[i__4].i * 
+				    z__6.r;
+			    z__1.r = z__2.r - z__5.r, z__1.i = z__2.i - 
+				    z__5.i;
+			    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+/* L30: */
+			}
+			i__1 = a_subscr(j, k);
+			a[i__1].r = wk.r, a[i__1].i = wk.i;
+			i__1 = a_subscr(j, k - 1);
+			a[i__1].r = wkm1.r, a[i__1].i = wkm1.i;
+			i__1 = a_subscr(j, j);
+			i__2 = a_subscr(j, j);
+			d__1 = a[i__2].r;
+			z__1.r = d__1, z__1.i = 0.;
+			a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+/* L40: */
+		    }
 
-		i__1 = k - 2;
-		zdscal_(&i__1, &r1, &A(1,k-1), &c__1);
-		i__1 = k - 2;
-		zdscal_(&i__1, &r2, &A(1,k), &c__1);
-		i__1 = k - 2;
-		z__1.r = -s.r, z__1.i = -s.i;
-		zrot_(&i__1, &A(1,k-1), &c__1, &A(1,k), &c__1, &c, &z__1);
+		}
+
 	    }
 	}
 
 /*        Store details of the interchanges in IPIV */
 
 	if (kstep == 1) {
-	    IPIV(k) = kp;
+	    ipiv[k] = kp;
 	} else {
-	    IPIV(k) = -kp;
-	    IPIV(k - 1) = -kp;
+	    ipiv[k] = -kp;
+	    ipiv[k - 1] = -kp;
 	}
 
 /*        Decrease K and return to the start of the main loop */
@@ -444,35 +468,34 @@ e eigen-
 
 /*        Factorize A as L*D*L' using the lower triangle of A   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2 */
 
 	k = 1;
-L30:
+L50:
 
 /*        If K > N, exit from loop */
 
 	if (k > *n) {
-	    goto L50;
+	    goto L90;
 	}
 	kstep = 1;
 
 /*        Determine rows and columns to be interchanged and whether   
           a 1-by-1 or 2-by-2 pivot block will be used */
 
-	i__1 = k + k * a_dim1;
-	absakk = (d__1 = A(k,k).r, abs(d__1));
+	i__1 = a_subscr(k, k);
+	absakk = (d__1 = a[i__1].r, abs(d__1));
 
-/*        IMAX is the row-index of the largest off-diagonal element in
-   
+/*        IMAX is the row-index of the largest off-diagonal element in   
           column K, and COLMAX is its absolute value */
 
 	if (k < *n) {
 	    i__1 = *n - k;
-	    imax = k + izamax_(&i__1, &A(k+1,k), &c__1);
-	    i__1 = imax + k * a_dim1;
-	    colmax = (d__1 = A(imax,k).r, abs(d__1)) + (d__2 = d_imag(&A(imax,k)), abs(d__2));
+	    imax = k + izamax_(&i__1, &a_ref(k + 1, k), &c__1);
+	    i__1 = a_subscr(imax, k);
+	    colmax = (d__1 = a[i__1].r, abs(d__1)) + (d__2 = d_imag(&a_ref(
+		    imax, k)), abs(d__2));
 	} else {
 	    colmax = 0.;
 	}
@@ -485,10 +508,10 @@ L30:
 		*info = k;
 	    }
 	    kp = k;
-	    i__1 = k + k * a_dim1;
-	    i__2 = k + k * a_dim1;
-	    d__1 = A(k,k).r;
-	    A(k,k).r = d__1, A(k,k).i = 0.;
+	    i__1 = a_subscr(k, k);
+	    i__2 = a_subscr(k, k);
+	    d__1 = a[i__2].r;
+	    a[i__1].r = d__1, a[i__1].i = 0.;
 	} else {
 	    if (absakk >= alpha * colmax) {
 
@@ -497,46 +520,41 @@ L30:
 		kp = k;
 	    } else {
 
-/*              JMAX is the column-index of the largest off-di
-agonal   
-                element in row IMAX, and ROWMAX is its absolut
-e value */
+/*              JMAX is the column-index of the largest off-diagonal   
+                element in row IMAX, and ROWMAX is its absolute value */
 
 		i__1 = imax - k;
-		jmax = k - 1 + izamax_(&i__1, &A(imax,k), lda);
-		i__1 = imax + jmax * a_dim1;
-		rowmax = (d__1 = A(imax,jmax).r, abs(d__1)) + (d__2 = d_imag(&A(imax,jmax)), abs(d__2));
+		jmax = k - 1 + izamax_(&i__1, &a_ref(imax, k), lda);
+		i__1 = a_subscr(imax, jmax);
+		rowmax = (d__1 = a[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+			a_ref(imax, jmax)), abs(d__2));
 		if (imax < *n) {
 		    i__1 = *n - imax;
-		    jmax = imax + izamax_(&i__1, &A(imax+1,imax),
-			     &c__1);
+		    jmax = imax + izamax_(&i__1, &a_ref(imax + 1, imax), &
+			    c__1);
 /* Computing MAX */
-		    i__1 = jmax + imax * a_dim1;
-		    d__3 = rowmax, d__4 = (d__1 = A(jmax,imax).r, abs(d__1)) + (
-			    d__2 = d_imag(&A(jmax,imax)), abs(d__2)
-			    );
+		    i__1 = a_subscr(jmax, imax);
+		    d__3 = rowmax, d__4 = (d__1 = a[i__1].r, abs(d__1)) + (
+			    d__2 = d_imag(&a_ref(jmax, imax)), abs(d__2));
 		    rowmax = max(d__3,d__4);
 		}
 
 		if (absakk >= alpha * colmax * (colmax / rowmax)) {
 
-/*                 no interchange, use 1-by-1 pivot block 
-*/
+/*                 no interchange, use 1-by-1 pivot block */
 
 		    kp = k;
 		} else /* if(complicated condition) */ {
-		    i__1 = imax + imax * a_dim1;
-		    if ((d__1 = A(imax,imax).r, abs(d__1)) >= alpha * rowmax) {
+		    i__1 = a_subscr(imax, imax);
+		    if ((d__1 = a[i__1].r, abs(d__1)) >= alpha * rowmax) {
 
-/*                 interchange rows and columns K and 
-IMAX, use 1-by-1   
+/*                 interchange rows and columns K and IMAX, use 1-by-1   
                    pivot block */
 
 			kp = imax;
 		    } else {
 
-/*                 interchange rows and columns K+1 an
-d IMAX, use 2-by-2   
+/*                 interchange rows and columns K+1 and IMAX, use 2-by-2   
                    pivot block */
 
 			kp = imax;
@@ -548,59 +566,59 @@ d IMAX, use 2-by-2
 	    kk = k + kstep - 1;
 	    if (kp != kk) {
 
-/*              Interchange rows and columns KK and KP in the 
-trailing   
+/*              Interchange rows and columns KK and KP in the trailing   
                 submatrix A(k:n,k:n) */
 
 		if (kp < *n) {
 		    i__1 = *n - kp;
-		    zswap_(&i__1, &A(kp+1,kk), &c__1, &A(kp+1,kp), &c__1);
+		    zswap_(&i__1, &a_ref(kp + 1, kk), &c__1, &a_ref(kp + 1, 
+			    kp), &c__1);
 		}
 		i__1 = kp - 1;
-		for (j = kk + 1; j <= kp-1; ++j) {
-		    d_cnjg(&z__1, &A(j,kk));
+		for (j = kk + 1; j <= i__1; ++j) {
+		    d_cnjg(&z__1, &a_ref(j, kk));
 		    t.r = z__1.r, t.i = z__1.i;
-		    i__2 = j + kk * a_dim1;
-		    d_cnjg(&z__1, &A(kp,j));
-		    A(j,kk).r = z__1.r, A(j,kk).i = z__1.i;
-		    i__2 = kp + j * a_dim1;
-		    A(kp,j).r = t.r, A(kp,j).i = t.i;
-/* L40: */
+		    i__2 = a_subscr(j, kk);
+		    d_cnjg(&z__1, &a_ref(kp, j));
+		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
+		    i__2 = a_subscr(kp, j);
+		    a[i__2].r = t.r, a[i__2].i = t.i;
+/* L60: */
 		}
-		i__1 = kp + kk * a_dim1;
-		d_cnjg(&z__1, &A(kp,kk));
-		A(kp,kk).r = z__1.r, A(kp,kk).i = z__1.i;
-		i__1 = kk + kk * a_dim1;
-		r1 = A(kk,kk).r;
-		i__1 = kk + kk * a_dim1;
-		i__2 = kp + kp * a_dim1;
-		d__1 = A(kp,kp).r;
-		A(kk,kk).r = d__1, A(kk,kk).i = 0.;
-		i__1 = kp + kp * a_dim1;
-		A(kp,kp).r = r1, A(kp,kp).i = 0.;
+		i__1 = a_subscr(kp, kk);
+		d_cnjg(&z__1, &a_ref(kp, kk));
+		a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+		i__1 = a_subscr(kk, kk);
+		r1 = a[i__1].r;
+		i__1 = a_subscr(kk, kk);
+		i__2 = a_subscr(kp, kp);
+		d__1 = a[i__2].r;
+		a[i__1].r = d__1, a[i__1].i = 0.;
+		i__1 = a_subscr(kp, kp);
+		a[i__1].r = r1, a[i__1].i = 0.;
 		if (kstep == 2) {
-		    i__1 = k + k * a_dim1;
-		    i__2 = k + k * a_dim1;
-		    d__1 = A(k,k).r;
-		    A(k,k).r = d__1, A(k,k).i = 0.;
-		    i__1 = k + 1 + k * a_dim1;
-		    t.r = A(k+1,k).r, t.i = A(k+1,k).i;
-		    i__1 = k + 1 + k * a_dim1;
-		    i__2 = kp + k * a_dim1;
-		    A(k+1,k).r = A(kp,k).r, A(k+1,k).i = A(kp,k).i;
-		    i__1 = kp + k * a_dim1;
-		    A(kp,k).r = t.r, A(kp,k).i = t.i;
+		    i__1 = a_subscr(k, k);
+		    i__2 = a_subscr(k, k);
+		    d__1 = a[i__2].r;
+		    a[i__1].r = d__1, a[i__1].i = 0.;
+		    i__1 = a_subscr(k + 1, k);
+		    t.r = a[i__1].r, t.i = a[i__1].i;
+		    i__1 = a_subscr(k + 1, k);
+		    i__2 = a_subscr(kp, k);
+		    a[i__1].r = a[i__2].r, a[i__1].i = a[i__2].i;
+		    i__1 = a_subscr(kp, k);
+		    a[i__1].r = t.r, a[i__1].i = t.i;
 		}
 	    } else {
-		i__1 = k + k * a_dim1;
-		i__2 = k + k * a_dim1;
-		d__1 = A(k,k).r;
-		A(k,k).r = d__1, A(k,k).i = 0.;
+		i__1 = a_subscr(k, k);
+		i__2 = a_subscr(k, k);
+		d__1 = a[i__2].r;
+		a[i__1].r = d__1, a[i__1].i = 0.;
 		if (kstep == 2) {
-		    i__1 = k + 1 + (k + 1) * a_dim1;
-		    i__2 = k + 1 + (k + 1) * a_dim1;
-		    d__1 = A(k+1,k+1).r;
-		    A(k+1,k+1).r = d__1, A(k+1,k+1).i = 0.;
+		    i__1 = a_subscr(k + 1, k + 1);
+		    i__2 = a_subscr(k + 1, k + 1);
+		    d__1 = a[i__2].r;
+		    a[i__1].r = d__1, a[i__1].i = 0.;
 		}
 	    }
 
@@ -616,74 +634,103 @@ trailing
 
 		if (k < *n) {
 
-/*                 Perform a rank-1 update of A(k+1:n,k+1:
-n) as   
+/*                 Perform a rank-1 update of A(k+1:n,k+1:n) as   
 
-                   A := A - L(k)*D(k)*L(k)' = A - W(k)*(1/
-D(k))*W(k)' */
+                   A := A - L(k)*D(k)*L(k)' = A - W(k)*(1/D(k))*W(k)' */
 
-		    i__1 = k + k * a_dim1;
-		    r1 = 1. / A(k,k).r;
+		    i__1 = a_subscr(k, k);
+		    r1 = 1. / a[i__1].r;
 		    i__1 = *n - k;
 		    d__1 = -r1;
-		    zher_(uplo, &i__1, &d__1, &A(k+1,k), &c__1, &
-			    A(k+1,k+1), lda);
+		    zher_(uplo, &i__1, &d__1, &a_ref(k + 1, k), &c__1, &a_ref(
+			    k + 1, k + 1), lda);
 
 /*                 Store L(k) in column K */
 
 		    i__1 = *n - k;
-		    zdscal_(&i__1, &r1, &A(k+1,k), &c__1);
+		    zdscal_(&i__1, &r1, &a_ref(k + 1, k), &c__1);
 		}
 	    } else {
 
-/*              2-by-2 pivot block D(k): columns K and K+1 now
- hold   
-
-                ( W(k) W(k+1) ) = ( L(k) L(k+1) )*D(k)   
-
-                where L(k) and L(k+1) are the k-th and (k+1)-t
-h columns   
-                of L */
+/*              2-by-2 pivot block D(k) */
 
 		if (k < *n - 1) {
 
-/*                 Perform a rank-2 update of A(k+2:n,k+2:
-n) as   
+/*                 Perform a rank-2 update of A(k+2:n,k+2:n) as   
 
-                   A := A - ( L(k) L(k+1) )*D(k)*( L(k) L(
-k+1) )'   
-                      = A - ( W(k) W(k+1) )*inv(D(k))*( W(
-k) W(k+1) )'   
+                   A := A - ( L(k) L(k+1) )*D(k)*( L(k) L(k+1) )'   
+                      = A - ( W(k) W(k+1) )*inv(D(k))*( W(k) W(k+1) )'   
 
-                   Convert this to two rank-1 updates by u
-sing the eigen-   
-                   decomposition of D(k) */
+                   where L(k) and L(k+1) are the k-th and (k+1)-th   
+                   columns of L */
 
-		    d_cnjg(&z__1, &A(k+1,k));
-		    zlaev2_(&A(k,k), &z__1, &A(k+1,k+1), &r1, &r2, &c, &s);
-		    r1 = 1. / r1;
-		    r2 = 1. / r2;
-		    i__1 = *n - k - 1;
-		    zrot_(&i__1, &A(k+2,k), &c__1, &A(k+2,k+1), &c__1, &c, &s);
-		    i__1 = *n - k - 1;
-		    d__1 = -r1;
-		    zher_(uplo, &i__1, &d__1, &A(k+2,k), &c__1, &
-			    A(k+2,k+2), lda);
-		    i__1 = *n - k - 1;
-		    d__1 = -r2;
-		    zher_(uplo, &i__1, &d__1, &A(k+2,k+1), &
-			    c__1, &A(k+2,k+2), lda);
+		    i__1 = a_subscr(k + 1, k);
+		    d__1 = a[i__1].r;
+		    d__2 = d_imag(&a_ref(k + 1, k));
+		    d__ = dlapy2_(&d__1, &d__2);
+		    i__1 = a_subscr(k + 1, k + 1);
+		    d11 = a[i__1].r / d__;
+		    i__1 = a_subscr(k, k);
+		    d22 = a[i__1].r / d__;
+		    tt = 1. / (d11 * d22 - 1.);
+		    i__1 = a_subscr(k + 1, k);
+		    z__1.r = a[i__1].r / d__, z__1.i = a[i__1].i / d__;
+		    d21.r = z__1.r, d21.i = z__1.i;
+		    d__ = tt / d__;
 
-/*                 Store L(k) and L(k+1) in columns k and 
-k+1 */
-
-		    i__1 = *n - k - 1;
-		    zdscal_(&i__1, &r1, &A(k+2,k), &c__1);
-		    i__1 = *n - k - 1;
-		    zdscal_(&i__1, &r2, &A(k+2,k+1), &c__1);
-		    i__1 = *n - k - 1;
-		    z__1.r = -s.r, z__1.i = -s.i;
-		    zrot_(&i__1, &A(k+2,k), &c__1, &A(k+2,k+1), &c__1, &c, &z__1);
+		    i__1 = *n;
+		    for (j = k + 2; j <= i__1; ++j) {
+			i__2 = a_subscr(j, k);
+			z__3.r = d11 * a[i__2].r, z__3.i = d11 * a[i__2].i;
+			i__3 = a_subscr(j, k + 1);
+			z__4.r = d21.r * a[i__3].r - d21.i * a[i__3].i, 
+				z__4.i = d21.r * a[i__3].i + d21.i * a[i__3]
+				.r;
+			z__2.r = z__3.r - z__4.r, z__2.i = z__3.i - z__4.i;
+			z__1.r = d__ * z__2.r, z__1.i = d__ * z__2.i;
+			wk.r = z__1.r, wk.i = z__1.i;
+			i__2 = a_subscr(j, k + 1);
+			z__3.r = d22 * a[i__2].r, z__3.i = d22 * a[i__2].i;
+			d_cnjg(&z__5, &d21);
+			i__3 = a_subscr(j, k);
+			z__4.r = z__5.r * a[i__3].r - z__5.i * a[i__3].i, 
+				z__4.i = z__5.r * a[i__3].i + z__5.i * a[i__3]
+				.r;
+			z__2.r = z__3.r - z__4.r, z__2.i = z__3.i - z__4.i;
+			z__1.r = d__ * z__2.r, z__1.i = d__ * z__2.i;
+			wkp1.r = z__1.r, wkp1.i = z__1.i;
+			i__2 = *n;
+			for (i__ = j; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(i__, j);
+			    i__4 = a_subscr(i__, j);
+			    i__5 = a_subscr(i__, k);
+			    d_cnjg(&z__4, &wk);
+			    z__3.r = a[i__5].r * z__4.r - a[i__5].i * z__4.i, 
+				    z__3.i = a[i__5].r * z__4.i + a[i__5].i * 
+				    z__4.r;
+			    z__2.r = a[i__4].r - z__3.r, z__2.i = a[i__4].i - 
+				    z__3.i;
+			    i__6 = a_subscr(i__, k + 1);
+			    d_cnjg(&z__6, &wkp1);
+			    z__5.r = a[i__6].r * z__6.r - a[i__6].i * z__6.i, 
+				    z__5.i = a[i__6].r * z__6.i + a[i__6].i * 
+				    z__6.r;
+			    z__1.r = z__2.r - z__5.r, z__1.i = z__2.i - 
+				    z__5.i;
+			    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
+/* L70: */
+			}
+			i__2 = a_subscr(j, k);
+			a[i__2].r = wk.r, a[i__2].i = wk.i;
+			i__2 = a_subscr(j, k + 1);
+			a[i__2].r = wkp1.r, a[i__2].i = wkp1.i;
+			i__2 = a_subscr(j, j);
+			i__3 = a_subscr(j, j);
+			d__1 = a[i__3].r;
+			z__1.r = d__1, z__1.i = 0.;
+			a[i__2].r = z__1.r, a[i__2].i = z__1.i;
+/* L80: */
+		    }
 		}
 	    }
 	}
@@ -691,23 +738,27 @@ k+1 */
 /*        Store details of the interchanges in IPIV */
 
 	if (kstep == 1) {
-	    IPIV(k) = kp;
+	    ipiv[k] = kp;
 	} else {
-	    IPIV(k) = -kp;
-	    IPIV(k + 1) = -kp;
+	    ipiv[k] = -kp;
+	    ipiv[k + 1] = -kp;
 	}
 
 /*        Increase K and return to the start of the main loop */
 
 	k += kstep;
-	goto L30;
+	goto L50;
 
     }
 
-L50:
+L90:
     return 0;
 
 /*     End of ZHETF2 */
 
 } /* zhetf2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,9 +22,9 @@ static doublecomplex c_b20 = {-1.,0.};
 static doublecomplex c_b21 = {1.,0.};
 
 /* Subroutine */ int zlqt03_(integer *m, integer *n, integer *k, 
-	doublecomplex *af, doublecomplex *c, doublecomplex *cc, doublecomplex 
-	*q, integer *lda, doublecomplex *tau, doublecomplex *work, integer *
-	lwork, doublereal *rwork, doublereal *result)
+	doublecomplex *af, doublecomplex *c__, doublecomplex *cc, 
+	doublecomplex *q, integer *lda, doublecomplex *tau, doublecomplex *
+	work, integer *lwork, doublereal *rwork, doublereal *result)
 {
     /* Initialized data */
 
@@ -63,7 +64,15 @@ static doublecomplex c_b21 = {1.,0.};
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -82,8 +91,7 @@ static doublecomplex c_b21 = {1.,0.};
     =========   
 
     M       (input) INTEGER   
-            The number of rows or columns of the matrix C; C is n-by-m if 
-  
+            The number of rows or columns of the matrix C; C is n-by-m if   
             Q is applied from the left, or m-by-n if Q is applied from   
             the right.  M >= 0.   
 
@@ -91,8 +99,7 @@ static doublecomplex c_b21 = {1.,0.};
             The order of the orthogonal matrix Q.  N >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             orthogonal matrix Q.  N >= K >= 0.   
 
     AF      (input) COMPLEX*16 array, dimension (LDA,N)   
@@ -109,15 +116,13 @@ static doublecomplex c_b21 = {1.,0.};
             The leading dimension of the arrays AF, C, CC, and Q.   
 
     TAU     (input) COMPLEX*16 array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the LQ factorization in AF.   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
 
     LWORK   (input) INTEGER   
-            The length of WORK.  LWORK must be at least M, and should be 
-  
+            The length of WORK.  LWORK must be at least M, and should be   
             M*NB, where NB is the blocksize for this environment.   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
@@ -130,21 +135,20 @@ static doublecomplex c_b21 = {1.,0.};
             RESULT(3) = norm( Q'*C - Q'*C )/ ( N * norm(C) * EPS )   
             RESULT(4) = norm( C*Q' - C*Q' )/ ( N * norm(C) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     cc_dim1 = *lda;
-    cc_offset = cc_dim1 + 1;
+    cc_offset = 1 + cc_dim1 * 1;
     cc -= cc_offset;
     c_dim1 = *lda;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     --tau;
     --work;
@@ -159,12 +163,11 @@ static doublecomplex c_b21 = {1.,0.};
 
     zlaset_("Full", n, n, &c_b1, &c_b1, &q[q_offset], lda);
     i__1 = *n - 1;
-    zlacpy_("Upper", k, &i__1, &af[(af_dim1 << 1) + 1], lda, &q[(q_dim1 << 1) 
-	    + 1], lda);
+    zlacpy_("Upper", k, &i__1, &af_ref(1, 2), lda, &q_ref(1, 2), lda);
 
 /*     Generate the n-by-n matrix Q */
 
-    s_copy(srnamc_1.srnamt, "ZUNGLQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNGLQ", (ftnlen)6, (ftnlen)6);
     zunglq_(n, n, k, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
     for (iside = 1; iside <= 2; ++iside) {
@@ -182,10 +185,10 @@ static doublecomplex c_b21 = {1.,0.};
 
 	i__1 = nc;
 	for (j = 1; j <= i__1; ++j) {
-	    zlarnv_(&c__2, iseed, &mc, &c[j * c_dim1 + 1]);
+	    zlarnv_(&c__2, iseed, &mc, &c___ref(1, j));
 /* L10: */
 	}
-	cnorm = zlange_("1", &mc, &nc, &c[c_offset], lda, &rwork[1]);
+	cnorm = zlange_("1", &mc, &nc, &c__[c_offset], lda, &rwork[1]);
 	if (cnorm == 0.) {
 	    cnorm = 1.;
 	}
@@ -199,11 +202,12 @@ static doublecomplex c_b21 = {1.,0.};
 
 /*           Copy C */
 
-	    zlacpy_("Full", &mc, &nc, &c[c_offset], lda, &cc[cc_offset], lda);
+	    zlacpy_("Full", &mc, &nc, &c__[c_offset], lda, &cc[cc_offset], 
+		    lda);
 
 /*           Apply Q or Q' to C */
 
-	    s_copy(srnamc_1.srnamt, "ZUNMLQ", 6L, 6L);
+	    s_copy(srnamc_1.srnamt, "ZUNMLQ", (ftnlen)6, (ftnlen)6);
 	    zunmlq_(side, trans, &mc, &nc, k, &af[af_offset], lda, &tau[1], &
 		    cc[cc_offset], lda, &work[1], lwork, &info);
 
@@ -211,18 +215,17 @@ static doublecomplex c_b21 = {1.,0.};
 
 	    if (lsame_(side, "L")) {
 		zgemm_(trans, "No transpose", &mc, &nc, &mc, &c_b20, &q[
-			q_offset], lda, &c[c_offset], lda, &c_b21, &cc[
+			q_offset], lda, &c__[c_offset], lda, &c_b21, &cc[
 			cc_offset], lda);
 	    } else {
-		zgemm_("No transpose", trans, &mc, &nc, &nc, &c_b20, &c[
+		zgemm_("No transpose", trans, &mc, &nc, &nc, &c_b20, &c__[
 			c_offset], lda, &q[q_offset], lda, &c_b21, &cc[
 			cc_offset], lda);
 	    }
 
 /*           Compute error in the difference */
 
-	    resid = zlange_("1", &mc, &nc, &cc[cc_offset], lda, &rwork[1])
-		    ;
+	    resid = zlange_("1", &mc, &nc, &cc[cc_offset], lda, &rwork[1]);
 	    result[(iside - 1 << 1) + itrans] = resid / ((doublereal) max(1,*
 		    n) * cnorm * eps);
 
@@ -236,4 +239,12 @@ static doublecomplex c_b21 = {1.,0.};
 /*     End of ZLQT03 */
 
 } /* zlqt03_ */
+
+#undef af_ref
+#undef af_subscr
+#undef q_ref
+#undef q_subscr
+#undef c___ref
+#undef c___subscr
+
 

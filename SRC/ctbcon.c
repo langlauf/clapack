@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctbcon_(char *norm, char *uplo, char *diag, integer *n, 
 	integer *kd, complex *ab, integer *ldab, real *rcond, complex *work, 
 	real *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -14,8 +15,7 @@
     =======   
 
     CTBCON estimates the reciprocal of the condition number of a   
-    triangular band matrix A, in either the 1-norm or the infinity-norm. 
-  
+    triangular band matrix A, in either the 1-norm or the infinity-norm.   
 
     The norm of A is computed and an estimate is obtained for   
     norm(inv(A)), then the reciprocal of the condition number is   
@@ -48,15 +48,11 @@
 
     AB      (input) COMPLEX array, dimension (LDAB,N)   
             The upper or lower triangular band matrix A, stored in the   
-            first kd+1 rows of the array. The j-th column of A is stored 
-  
+            first kd+1 rows of the array. The j-th column of A is stored   
             in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
-            If DIAG = 'U', the diagonal elements of A are not referenced 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
+            If DIAG = 'U', the diagonal elements of A are not referenced   
             and are assumed to be 1.   
 
     LDAB    (input) INTEGER   
@@ -74,15 +70,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -118,12 +111,13 @@
     static logical nounit;
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
+    --rwork;
 
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
@@ -160,7 +154,7 @@
 
 /*     Compute the 1-norm of the triangular matrix A or A'. */
 
-    anorm = clantb_(norm, uplo, diag, n, kd, &AB(1,1), ldab, &RWORK(1));
+    anorm = clantb_(norm, uplo, diag, n, kd, &ab[ab_offset], ldab, &rwork[1]);
 
 /*     Continue only if ANORM > 0. */
 
@@ -177,33 +171,34 @@
 	}
 	kase = 0;
 L10:
-	clacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+	clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
 	if (kase != 0) {
 	    if (kase == kase1) {
 
 /*              Multiply by inv(A). */
 
-		clatbs_(uplo, "No transpose", diag, normin, n, kd, &AB(1,1), ldab, &WORK(1), &scale, &RWORK(1), info);
+		clatbs_(uplo, "No transpose", diag, normin, n, kd, &ab[
+			ab_offset], ldab, &work[1], &scale, &rwork[1], info);
 	    } else {
 
 /*              Multiply by inv(A'). */
 
-		clatbs_(uplo, "Conjugate transpose", diag, normin, n, kd, &AB(1,1), ldab, &WORK(1), &scale, &RWORK(1), info);
+		clatbs_(uplo, "Conjugate transpose", diag, normin, n, kd, &ab[
+			ab_offset], ldab, &work[1], &scale, &rwork[1], info);
 	    }
 	    *(unsigned char *)normin = 'Y';
 
-/*           Multiply by 1/SCALE if doing so will not cause overfl
-ow. */
+/*           Multiply by 1/SCALE if doing so will not cause overflow. */
 
 	    if (scale != 1.f) {
-		ix = icamax_(n, &WORK(1), &c__1);
+		ix = icamax_(n, &work[1], &c__1);
 		i__1 = ix;
-		xnorm = (r__1 = WORK(ix).r, dabs(r__1)) + (r__2 = r_imag(&
-			WORK(ix)), dabs(r__2));
+		xnorm = (r__1 = work[i__1].r, dabs(r__1)) + (r__2 = r_imag(&
+			work[ix]), dabs(r__2));
 		if (scale < xnorm * smlnum || scale == 0.f) {
 		    goto L20;
 		}
-		csrscl_(n, &scale, &WORK(1), &c__1);
+		csrscl_(n, &scale, &work[1], &c__1);
 	    }
 	    goto L10;
 	}

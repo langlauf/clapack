@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static real c_b7 = 1.f;
 static integer c__1 = 1;
 
 /* Subroutine */ int sgtt02_(char *trans, integer *n, integer *nrhs, real *dl,
-	 real *d, real *du, real *x, integer *ldx, real *b, integer *ldb, 
+	 real *d__, real *du, real *x, integer *ldx, real *b, integer *ldb, 
 	real *rwork, real *resid)
 {
     /* System generated locals */
@@ -33,7 +34,11 @@ static integer c__1 = 1;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -91,21 +96,20 @@ static integer c__1 = 1;
     RESID   (output) REAL   
             norm(B - op(A)*X) / (norm(A) * norm(X) * EPS)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0   
 
        Parameter adjustments */
     --dl;
-    --d;
+    --d__;
     --du;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --rwork;
 
@@ -119,9 +123,9 @@ static integer c__1 = 1;
           norm(B - op(A)*X) / ( norm(A) * norm(X) * EPS ). */
 
     if (lsame_(trans, "N")) {
-	anorm = slangt_("1", n, &dl[1], &d[1], &du[1]);
+	anorm = slangt_("1", n, &dl[1], &d__[1], &du[1]);
     } else {
-	anorm = slangt_("I", n, &dl[1], &d[1], &du[1]);
+	anorm = slangt_("I", n, &dl[1], &d__[1], &du[1]);
     }
 
 /*     Exit with RESID = 1/EPS if ANORM = 0. */
@@ -134,13 +138,13 @@ static integer c__1 = 1;
 
 /*     Compute B - op(A)*X. */
 
-    slagtm_(trans, n, nrhs, &c_b6, &dl[1], &d[1], &du[1], &x[x_offset], ldx, &
-	    c_b7, &b[b_offset], ldb);
+    slagtm_(trans, n, nrhs, &c_b6, &dl[1], &d__[1], &du[1], &x[x_offset], ldx,
+	     &c_b7, &b[b_offset], ldb);
 
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = sasum_(n, &b[j * b_dim1 + 1], &c__1);
-	xnorm = sasum_(n, &x[j * x_dim1 + 1], &c__1);
+	bnorm = sasum_(n, &b_ref(1, j), &c__1);
+	xnorm = sasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.f) {
 	    *resid = 1.f / eps;
 	} else {
@@ -156,4 +160,8 @@ static integer c__1 = 1;
 /*     End of SGTT02 */
 
 } /* sgtt02_ */
+
+#undef x_ref
+#undef b_ref
+
 

@@ -1,9 +1,19 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
+
+/* Common Block Declarations */
+
+struct {
+    char srnamt[6];
+} srnamc_;
+
+#define srnamc_1 srnamc_
 
 /* Table of constant values */
 
@@ -18,10 +28,10 @@ static integer c__3 = 3;
 
 /* Subroutine */ int sdrvst_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, real *
-	a, integer *lda, real *d1, real *d2, real *d3, real *d4, real *wa1, 
-	real *wa2, real *wa3, real *u, integer *ldu, real *v, real *tau, real 
-	*z, real *work, integer *nwork, integer *iwork, real *result, integer 
-	*info)
+	a, integer *lda, real *d1, real *d2, real *d3, real *d4, real *eveigs,
+	 real *wa1, real *wa2, real *wa3, real *u, integer *ldu, real *v, 
+	real *tau, real *z__, real *work, integer *lwork, integer *iwork, 
+	integer *liwork, real *result, integer *info)
 {
     /* Initialized data */
 
@@ -45,7 +55,8 @@ static integer c__3 = 3;
     double sqrt(doublereal), log(doublereal);
     integer pow_ii(integer *, integer *), s_wsfe(cilist *), do_fio(integer *, 
 	    char *, ftnlen), e_wsfe(void);
-    /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen), s_cat(char *,
+	     char **, integer *, integer *, ftnlen);
 
     /* Local variables */
     static real cond;
@@ -54,7 +65,7 @@ static integer c__3 = 3;
     static char uplo[1];
     static integer irow;
     static real temp1, temp2, temp3;
-    static integer i, j, idiag, m, n;
+    static integer i__, j, idiag, m, n;
     static logical badnn;
     extern doublereal ssxt1_(integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *);
@@ -116,52 +127,57 @@ static integer c__3 = 3;
 	    , real *, integer *, integer *, integer *)
 	    , sspevx_(char *, char *, char *, integer *, real *, real *, real 
 	    *, integer *, integer *, real *, integer *, real *, real *, 
-	    integer *, real *, integer *, integer *, integer *), ssyevd_(char *, char *, integer *, real *, 
-	    integer *, real *, real *, integer *, integer *, integer *, 
-	    integer *), sstevx_(char *, char *, integer *, 
-	    real *, real *, real *, real *, integer *, integer *, real *, 
-	    integer *, real *, real *, integer *, real *, integer *, integer *
-	    , integer *), ssyevx_(char *, char *, char *, 
+	    integer *, real *, integer *, integer *, integer *), sstevr_(char *, char *, integer *, real *, real *
+	    , real *, real *, integer *, integer *, real *, integer *, real *,
+	     real *, integer *, integer *, real *, integer *, integer *, 
+	    integer *, integer *), ssyevd_(char *, char *, 
 	    integer *, real *, integer *, real *, real *, integer *, integer *
-	    , real *, integer *, real *, real *, integer *, real *, integer *,
-	     integer *, integer *, integer *);
+	    , integer *, integer *), ssyevr_(char *, char *, 
+	    char *, integer *, real *, integer *, real *, real *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, integer *
+	    , real *, integer *, integer *, integer *, integer *), sstevx_(char *, char *, integer *, real *, real *
+	    , real *, real *, integer *, integer *, real *, integer *, real *,
+	     real *, integer *, real *, integer *, integer *, integer *), ssyevx_(char *, char *, char *, integer *, real *
+	    , integer *, real *, real *, integer *, integer *, real *, 
+	    integer *, real *, real *, integer *, real *, integer *, integer *
+	    , integer *, integer *);
     static integer lgn;
     static real ulp;
 
     /* Fortran I/O blocks */
-    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___46 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___47 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___48 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___49 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___53 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___56 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___59 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___61 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___62 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___63 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___64 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___65 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___66 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___67 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___68 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___69 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___70 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___71 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___72 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___73 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___74 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___75 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___76 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___77 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___78 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___79 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___80 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___81 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___82 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___83 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___84 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___85 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___86 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___87 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___88 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___89 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___90 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___91 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___92 = { 0, 0, 0, fmt_9999, 0 };
@@ -170,13 +186,30 @@ static integer c__3 = 3;
     static cilist io___95 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___96 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___97 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___98 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___99 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___100 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___101 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___102 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___103 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___104 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___105 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___106 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___107 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___108 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___109 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       April 4, 2000   
 
 
     Purpose   
@@ -190,11 +223,19 @@ static integer c__3 = 3;
                  SSTEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a real symmetric tridiagonal matrix.   
 
+                 SSTEVR computes selected eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric tridiagonal matrix   
+                 using the Relatively Robust Representation where it can.   
+
                  SSYEV computes all eigenvalues and, optionally,   
                  eigenvectors of a real symmetric matrix.   
 
                  SSYEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a real symmetric matrix.   
+
+                 SSYEVR computes selected eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric matrix   
+                 using the Relatively Robust Representation where it can.   
 
                  SSPEV computes all eigenvalues and, optionally,   
                  eigenvectors of a real symmetric matrix in packed   
@@ -222,8 +263,7 @@ static integer c__3 = 3;
                  eigenvectors of a real symmetric band matrix,   
                  using a divide and conquer algorithm.   
 
-         When SDRVST is called, a number of matrix "sizes" ("n's") and a 
-  
+         When SDRVST is called, a number of matrix "sizes" ("n's") and a   
          number of matrix "types" are specified.  For each size ("n")   
          and each type of matrix, one matrix will be generated and used   
          to test the appropriate drivers.  For each matrix and each   
@@ -239,13 +279,10 @@ static integer c__3 = 3;
          eigenvector option is given and D1 and D2 are the eigenvalues   
          returned with and without the eigenvector option.   
 
-         The "sizes" are specified by an array NN(1:NSIZES); the value of 
-  
+         The "sizes" are specified by an array NN(1:NSIZES); the value of   
          each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES ); 
-  
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. 
-  
+         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
+         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
          Currently, the list of possible types is:   
 
          (1)  The zero matrix.   
@@ -260,16 +297,14 @@ static integer c__3 = 3;
               1, ULP, ..., ULP and random signs.   
 
          (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold ) 
-  
+         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
 
          (8)  A matrix of the form  U' D U, where U is orthogonal and   
               D has evenly spaced entries 1, ..., ULP with random signs   
               on the diagonal.   
 
          (9)  A matrix of the form  U' D U, where U is orthogonal and   
-              D has geometrically spaced entries 1, ..., ULP with random 
-  
+              D has geometrically spaced entries 1, ..., ULP with random   
               signs on the diagonal.   
 
          (10) A matrix of the form  U' D U, where U is orthogonal and   
@@ -277,21 +312,16 @@ static integer c__3 = 3;
               signs on the diagonal.   
 
          (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold ) 
-  
+         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
 
          (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold ) 
-  
-         (15) Same as (13), but multiplied by SQRT( underflow threshold ) 
-  
+         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
+         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
          (16) A band matrix with half bandwidth randomly chosen between   
               0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
               with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold ) 
-  
-         (18) Same as (16), but multiplied by SQRT( underflow threshold ) 
-  
+         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
+         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
 
     Arguments   
     =========   
@@ -382,6 +412,11 @@ static integer c__3 = 3;
 
     D4      REAL array, dimension   
 
+    EVEIGS  REAL array, dimension (max(NN))   
+            The eigenvalues as computed by SSTEV('N', ... )   
+            (I reserve the right to change this to the output of   
+            whichever algorithm computes the most accurate eigenvalues).   
+
     WA1     REAL array, dimension   
 
     WA2     REAL array, dimension   
@@ -412,11 +447,11 @@ static integer c__3 = 3;
             SPTEQR, and SSTEIN.   
             Modified.   
 
-    WORK    REAL array, dimension (NWORK)   
+    WORK    REAL array, dimension (LWORK)   
             Workspace.   
             Modified.   
 
-    NWORK   INTEGER   
+    LWORK   INTEGER   
             The number of entries in WORK.  This must be at least   
             1 + 4 * Nmax + 2 * Nmax * lg Nmax + 4 * Nmax**2   
             where Nmax = max( NN(j), 2 ) and lg = log base 2.   
@@ -442,14 +477,13 @@ static integer c__3 = 3;
              -5: THRESH < 0   
              -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
             -16: LDU < 1 or LDU < NMAX.   
-            -21: NWORK too small.   
+            -21: LWORK too small.   
             If  SLATMR, SLATMS, SSYTRD, SORGTR, SSTEQR, SSTERF,   
                 or SORMTR returns an error code, the   
                 absolute value of it is returned.   
             Modified.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -475,31 +509,137 @@ static integer c__3 = 3;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+       The tests performed are:                 Routine tested   
+      1= | A - U S U' | / ( |A| n ulp )         SSTEV('V', ... )   
+      2= | I - U U' | / ( n ulp )               SSTEV('V', ... )   
+      3= |D(with Z) - D(w/o Z)| / (|D| ulp)     SSTEV('N', ... )   
+      4= | A - U S U' | / ( |A| n ulp )         SSTEVX('V','A', ... )   
+      5= | I - U U' | / ( n ulp )               SSTEVX('V','A', ... )   
+      6= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVX('N','A', ... )   
+      7= | A - U S U' | / ( |A| n ulp )         SSTEVR('V','A', ... )   
+      8= | I - U U' | / ( n ulp )               SSTEVR('V','A', ... )   
+      9= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVR('N','A', ... )   
+      10= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','I', ... )   
+      11= | I - U U' | / ( n ulp )              SSTEVX('V','I', ... )   
+      12= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','I', ... )   
+      13= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','V', ... )   
+      14= | I - U U' | / ( n ulp )              SSTEVX('V','V', ... )   
+      15= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','V', ... )   
+      16= | A - U S U' | / ( |A| n ulp )        SSTEVD('V', ... )   
+      17= | I - U U' | / ( n ulp )              SSTEVD('V', ... )   
+      18= |D(with Z) - EVEIGS| / (|D| ulp)      SSTEVD('N', ... )   
+      19= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','I', ... )   
+      20= | I - U U' | / ( n ulp )              SSTEVR('V','I', ... )   
+      21= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','I', ... )   
+      22= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','V', ... )   
+      23= | I - U U' | / ( n ulp )              SSTEVR('V','V', ... )   
+      24= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','V', ... )   
+
+      25= | A - U S U' | / ( |A| n ulp )        SSYEV('L','V', ... )   
+      26= | I - U U' | / ( n ulp )              SSYEV('L','V', ... )   
+      27= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEV('L','N', ... )   
+      28= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','A', ... )   
+      29= | I - U U' | / ( n ulp )              SSYEVX('L','V','A', ... )   
+      30= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','A', ... )   
+      31= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','I', ... )   
+      32= | I - U U' | / ( n ulp )              SSYEVX('L','V','I', ... )   
+      33= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','I', ... )   
+      34= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','V', ... )   
+      35= | I - U U' | / ( n ulp )              SSYEVX('L','V','V', ... )   
+      36= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','V', ... )   
+      37= | A - U S U' | / ( |A| n ulp )        SSPEV('L','V', ... )   
+      38= | I - U U' | / ( n ulp )              SSPEV('L','V', ... )   
+      39= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEV('L','N', ... )   
+      40= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','A', ... )   
+      41= | I - U U' | / ( n ulp )              SSPEVX('L','V','A', ... )   
+      42= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','A', ... )   
+      43= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','I', ... )   
+      44= | I - U U' | / ( n ulp )              SSPEVX('L','V','I', ... )   
+      45= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','I', ... )   
+      46= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','V', ... )   
+      47= | I - U U' | / ( n ulp )              SSPEVX('L','V','V', ... )   
+      48= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','V', ... )   
+      49= | A - U S U' | / ( |A| n ulp )        SSBEV('L','V', ... )   
+      50= | I - U U' | / ( n ulp )              SSBEV('L','V', ... )   
+      51= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEV('L','N', ... )   
+      52= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','A', ... )   
+      53= | I - U U' | / ( n ulp )              SSBEVX('L','V','A', ... )   
+      54= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','A', ... )   
+      55= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','I', ... )   
+      56= | I - U U' | / ( n ulp )              SSBEVX('L','V','I', ... )   
+      57= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','I', ... )   
+      58= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','V', ... )   
+      59= | I - U U' | / ( n ulp )              SSBEVX('L','V','V', ... )   
+      60= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','V', ... )   
+      61= | A - U S U' | / ( |A| n ulp )        SSYEVD('L','V', ... )   
+      62= | I - U U' | / ( n ulp )              SSYEVD('L','V', ... )   
+      63= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVD('L','N', ... )   
+      64= | A - U S U' | / ( |A| n ulp )        SSPEVD('L','V', ... )   
+      65= | I - U U' | / ( n ulp )              SSPEVD('L','V', ... )   
+      66= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVD('L','N', ... )   
+      67= | A - U S U' | / ( |A| n ulp )        SSBEVD('L','V', ... )   
+      68= | I - U U' | / ( n ulp )              SSBEVD('L','V', ... )   
+      69= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVD('L','N', ... )   
+      70= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','A', ... )   
+      71= | I - U U' | / ( n ulp )              SSYEVR('L','V','A', ... )   
+      72= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','A', ... )   
+      73= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','I', ... )   
+      74= | I - U U' | / ( n ulp )              SSYEVR('L','V','I', ... )   
+      75= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','I', ... )   
+      76= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','V', ... )   
+      77= | I - U U' | / ( n ulp )              SSYEVR('L','V','V', ... )   
+      78= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','V', ... )   
+
+      Tests 25 through 78 are repeated (as tests 79 through 132)   
+      with UPLO='U'   
+
+      To be added in 1999   
+
+      79= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','A', ... )   
+      80= | I - U U' | / ( n ulp )              SSPEVR('L','V','A', ... )   
+      81= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','A', ... )   
+      82= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','I', ... )   
+      83= | I - U U' | / ( n ulp )              SSPEVR('L','V','I', ... )   
+      84= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','I', ... )   
+      85= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','V', ... )   
+      86= | I - U U' | / ( n ulp )              SSPEVR('L','V','V', ... )   
+      87= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','V', ... )   
+      88= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','A', ... )   
+      89= | I - U U' | / ( n ulp )              SSBEVR('L','V','A', ... )   
+      90= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','A', ... )   
+      91= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','I', ... )   
+      92= | I - U U' | / ( n ulp )              SSBEVR('L','V','I', ... )   
+      93= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','I', ... )   
+      94= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','V', ... )   
+      95= | I - U U' | / ( n ulp )              SSBEVR('L','V','V', ... )   
+      96= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','V', ... )   
+
+
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --d1;
     --d2;
     --d3;
     --d4;
+    --eveigs;
     --wa1;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --tau;
     --work;
@@ -508,7 +648,12 @@ static integer c__3 = 3;
 
     /* Function Body   
 
-       1)      Check for errors */
+       Keep ftrnchek happy */
+
+    vl = 0.f;
+    vu = 0.f;
+
+/*     1)      Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -541,7 +686,7 @@ static integer c__3 = 3;
     } else /* if(complicated condition) */ {
 /* Computing 2nd power */
 	i__1 = max(2,nmax);
-	if (i__1 * i__1 << 1 > *nwork) {
+	if (i__1 * i__1 << 1 > *lwork) {
 	    *info = -21;
 	}
     }
@@ -570,14 +715,15 @@ static integer c__3 = 3;
 
 /*     Loop over sizes, types */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed2[i - 1] = iseed[i];
-	iseed3[i - 1] = iseed[i];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed2[i__ - 1] = iseed[i__];
+	iseed3[i__ - 1] = iseed[i__];
 /* L20: */
     }
 
     nerrs = 0;
     nmats = 0;
+
 
     i__1 = *nsizes;
     for (jsize = 1; jsize <= i__1; ++jsize) {
@@ -593,10 +739,12 @@ static integer c__3 = 3;
 /* Computing 2nd power */
 	    i__2 = n;
 	    lwedc = (n << 2) + 1 + (n << 1) * lgn + (i__2 * i__2 << 2);
-	    liwedc = n * 6 + 6 + n * 5 * lgn;
+/*           LIWEDC = 6 + 6*N + 5*N*LGN */
+	    liwedc = n * 5 + 3;
 	} else {
 	    lwedc = 9;
-	    liwedc = 12;
+/*           LIWEDC = 12 */
+	    liwedc = 8;
 	}
 	aninv = 1.f / (real) max(1,n);
 
@@ -608,8 +756,9 @@ static integer c__3 = 3;
 
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
+
 	    if (! dotype[jtype]) {
-		goto L1510;
+		goto L1730;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -632,8 +781,7 @@ static integer c__3 = 3;
              =6         random       (none)   
              =7                      random diagonal   
              =8                      random symmetric   
-             =9                      band symmetric, w/ eigenvalue
-s */
+             =9                      band symmetric, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -681,7 +829,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L80: */
 		}
 
@@ -705,6 +853,7 @@ L70:
 
 /*              Diagonal, random eigenvalues */
 
+		idumma[0] = 1;
 		slatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &c_b34, 
 			&c_b34, "T", "N", &work[n + 1], &c__1, &c_b34, &work[(
 			n << 1) + 1], &c__1, &c_b34, "N", idumma, &c__0, &
@@ -715,6 +864,7 @@ L70:
 
 /*              Symmetric, random eigenvalues */
 
+		idumma[0] = 1;
 		slatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &c_b34, 
 			&c_b34, "T", "N", &work[n + 1], &c__1, &c_b34, &work[(
 			n << 1) + 1], &c__1, &c_b34, "N", idumma, &n, &n, &
@@ -725,7 +875,7 @@ L70:
 
 /*              Symmetric banded, eigenvalues specified */
 
-		ihbw = (n - 1) * slarnd_(&c__1, iseed3);
+		ihbw = (integer) ((n - 1) * slarnd_(&c__1, iseed3));
 		slatms_(&n, &n, "S", &iseed[1], "S", &work[1], &imode, &cond, 
 			&anorm, &ihbw, &ihbw, "Z", &u[u_offset], ldu, &work[n 
 			+ 1], &iinfo);
@@ -736,14 +886,16 @@ L70:
 		i__3 = ihbw;
 		for (idiag = -ihbw; idiag <= i__3; ++idiag) {
 		    irow = ihbw - idiag + 1;
-		    j1 = max(1,idiag);
+/* Computing MAX */
+		    i__4 = 1, i__5 = idiag + 1;
+		    j1 = max(i__4,i__5);
 /* Computing MIN */
 		    i__4 = n, i__5 = n + idiag;
 		    j2 = min(i__4,i__5);
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
-			i = j - idiag;
-			a[i + j * a_dim1] = u[irow + j * u_dim1];
+			i__ = j - idiag;
+			a_ref(i__, j) = u_ref(irow, j);
 /* L90: */
 		    }
 /* L100: */
@@ -753,9 +905,9 @@ L70:
 	    }
 
 	    if (iinfo != 0) {
-		io___41.ciunit = *nounit;
-		s_wsfe(&io___41);
-		do_fio(&c__1, "Generator", 9L);
+		io___43.ciunit = *nounit;
+		s_wsfe(&io___43);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -772,8 +924,8 @@ L110:
 		il = 1;
 		iu = n;
 	    } else {
-		il = (n - 1) * slarnd_(&c__1, iseed2) + 1;
-		iu = (n - 1) * slarnd_(&c__1, iseed2) + 1;
+		il = (integer) ((n - 1) * slarnd_(&c__1, iseed2)) + 1;
+		iu = (integer) ((n - 1) * slarnd_(&c__1, iseed2)) + 1;
 		if (il > iu) {
 		    itemp = il;
 		    il = iu;
@@ -781,27 +933,27 @@ L110:
 		}
 	    }
 
-/*           3)      If matrix is tridiagonal, call SSTEV and SSTE
-VX. */
+/*           3)      If matrix is tridiagonal, call SSTEV and SSTEVX. */
 
 	    if (jtype <= 7) {
 		ntest = 1;
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d1[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
 /* L120: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d2[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
 /* L130: */
 		}
-		sstev_("V", &n, &d1[1], &d2[1], &z[z_offset], ldu, &work[1], &
-			iinfo);
+		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
+		sstev_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1],
+			 &iinfo);
 		if (iinfo != 0) {
-		    io___46.ciunit = *nounit;
-		    s_wsfe(&io___46);
-		    do_fio(&c__1, "SSTEV(V)", 8L);
+		    io___48.ciunit = *nounit;
+		    s_wsfe(&io___48);
+		    do_fio(&c__1, "SSTEV(V)", (ftnlen)8);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -822,30 +974,31 @@ VX. */
 /*              Do tests 1 and 2. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d3[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
 /* L140: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L150: */
 		}
-		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z[
+		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z__[
 			z_offset], ldu, &work[1], &result[1]);
 
 		ntest = 3;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L160: */
 		}
-		sstev_("N", &n, &d3[1], &d4[1], &z[z_offset], ldu, &work[1], &
-			iinfo);
+		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
+		sstev_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1],
+			 &iinfo);
 		if (iinfo != 0) {
-		    io___47.ciunit = *nounit;
-		    s_wsfe(&io___47);
-		    do_fio(&c__1, "SSTEV(N)", 8L);
+		    io___49.ciunit = *nounit;
+		    s_wsfe(&io___49);
+		    do_fio(&c__1, "SSTEV(N)", (ftnlen)8);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -884,22 +1037,24 @@ L180:
 
 		ntest = 4;
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d1[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    eveigs[i__] = d3[i__];
+		    d1[i__] = a_ref(i__, i__);
 /* L190: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d2[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
 /* L200: */
 		}
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
 		sstevx_("V", "A", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &wa1[1], &z[z_offset], ldu, &work[1], &
+			abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___53.ciunit = *nounit;
 		    s_wsfe(&io___53);
-		    do_fio(&c__1, "SSTEVX(V,A)", 11L);
+		    do_fio(&c__1, "SSTEVX(V,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -927,31 +1082,32 @@ L180:
 /*              Do tests 4 and 5. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d3[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
 /* L210: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L220: */
 		}
-		sstt21_(&n, &c__0, &d3[1], &d4[1], &wa1[1], &d2[1], &z[
+		sstt21_(&n, &c__0, &d3[1], &d4[1], &wa1[1], &d2[1], &z__[
 			z_offset], ldu, &work[1], &result[4]);
 
 		ntest = 6;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L230: */
 		}
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
 		sstevx_("N", "A", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[1], &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___56.ciunit = *nounit;
 		    s_wsfe(&io___56);
-		    do_fio(&c__1, "SSTEVX(N,A)", 11L);
+		    do_fio(&c__1, "SSTEVX(N,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -974,12 +1130,13 @@ L180:
 		i__3 = n;
 		for (j = 1; j <= i__3; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = wa1[j], dabs(r__1)), r__3 = 
-			    max(r__3,r__4), r__4 = (r__2 = wa2[j], dabs(r__2))
-			    ;
+		    r__3 = temp1, r__4 = (r__1 = wa2[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = eveigs[j], dabs(
+			    r__2));
 		    temp1 = dmax(r__3,r__4);
 /* Computing MAX */
-		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
+		    r__2 = temp2, r__3 = (r__1 = wa2[j] - eveigs[j], dabs(
+			    r__1));
 		    temp2 = dmax(r__2,r__3);
 /* L240: */
 		}
@@ -991,22 +1148,24 @@ L250:
 
 		ntest = 7;
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d1[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
 /* L260: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d2[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
 /* L270: */
 		}
-		sstevx_("V", "I", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[1], &
-			iwork[1], &iwork[n * 5 + 1], &iinfo);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("V", "A", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
+			abstol, &m, &wa1[1], &z__[z_offset], ldu, &iwork[1], &
+			work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
 		if (iinfo != 0) {
 		    io___57.ciunit = *nounit;
 		    s_wsfe(&io___57);
-		    do_fio(&c__1, "SSTEVX(V,I)", 11L);
+		    do_fio(&c__1, "SSTEVR(V,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1019,40 +1178,47 @@ L250:
 		    } else {
 			result[7] = ulpinv;
 			result[8] = ulpinv;
-			result[9] = ulpinv;
-			goto L310;
+			goto L320;
 		    }
+		}
+		if (n > 0) {
+/* Computing MAX */
+		    r__2 = dabs(wa1[1]), r__3 = (r__1 = wa1[n], dabs(r__1));
+		    temp3 = dmax(r__2,r__3);
+		} else {
+		    temp3 = 0.f;
 		}
 
 /*              Do tests 7 and 8. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d3[i] = a[i + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
 /* L280: */
 		}
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L290: */
 		}
-		i__3 = max(1,m2);
-		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z[
-			z_offset], ldu, &work[1], &i__3, &result[7]);
+		sstt21_(&n, &c__0, &d3[1], &d4[1], &wa1[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &result[7]);
 
 		ntest = 9;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
 /* L300: */
 		}
-		sstevx_("N", "I", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[1], &
-			iwork[1], &iwork[n * 5 + 1], &iinfo);
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("N", "A", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
+			&work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
 		if (iinfo != 0) {
-		    io___59.ciunit = *nounit;
-		    s_wsfe(&io___59);
-		    do_fio(&c__1, "SSTEVX(N,I)", 11L);
+		    io___58.ciunit = *nounit;
+		    s_wsfe(&io___58);
+		    do_fio(&c__1, "SSTEVR(N,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1064,11 +1230,117 @@ L250:
 			return 0;
 		    } else {
 			result[9] = ulpinv;
-			goto L310;
+			goto L320;
 		    }
 		}
 
 /*              Do test 9. */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = wa2[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = eveigs[j], dabs(
+			    r__2));
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = wa2[j] - eveigs[j], dabs(
+			    r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L310: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[9] = temp2 / dmax(r__1,r__2);
+
+L320:
+
+
+		ntest = 10;
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
+/* L330: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
+/* L340: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		sstevx_("V", "I", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
+			iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___59.ciunit = *nounit;
+		    s_wsfe(&io___59);
+		    do_fio(&c__1, "SSTEVX(V,I)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[10] = ulpinv;
+			result[11] = ulpinv;
+			result[12] = ulpinv;
+			goto L380;
+		    }
+		}
+
+/*              Do tests 10 and 11. */
+
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
+/* L350: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L360: */
+		}
+		i__3 = max(1,m2);
+		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &i__3, &result[10]);
+
+
+		ntest = 12;
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L370: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		sstevx_("N", "I", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &work[1], &
+			iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___61.ciunit = *nounit;
+		    s_wsfe(&io___61);
+		    do_fio(&c__1, "SSTEVX(N,I)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[12] = ulpinv;
+			goto L380;
+		    }
+		}
+
+/*              Do test 12. */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -1076,11 +1348,11 @@ L250:
 			ulp, &unfl);
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * temp3;
-		result[9] = (temp1 + temp2) / dmax(r__1,r__2);
+		result[12] = (temp1 + temp2) / dmax(r__1,r__2);
 
-L310:
+L380:
 
-		ntest = 10;
+		ntest = 12;
 		if (n > 0) {
 		    if (il != 1) {
 /* Computing MAX */
@@ -1114,120 +1386,23 @@ L310:
 		}
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d1[i] = a[i + i * a_dim1];
-/* L320: */
-		}
-		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d2[i] = a[i + 1 + i * a_dim1];
-/* L330: */
-		}
-
-		sstevx_("V", "V", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[1], &
-			iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___60.ciunit = *nounit;
-		    s_wsfe(&io___60);
-		    do_fio(&c__1, "SSTEVX(V,V)", 11L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[10] = ulpinv;
-			result[11] = ulpinv;
-			result[12] = ulpinv;
-			goto L370;
-		    }
-		}
-
-		if (m2 == 0 && n > 0) {
-		    result[10] = ulpinv;
-		    result[11] = ulpinv;
-		    result[12] = ulpinv;
-		    goto L370;
-		}
-
-/*              Do tests 10 and 11. */
-
-		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d3[i] = a[i + i * a_dim1];
-/* L340: */
-		}
-		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
-/* L350: */
-		}
-		i__3 = max(1,m2);
-		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z[
-			z_offset], ldu, &work[1], &i__3, &result[10]);
-
-		ntest = 12;
-		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
-/* L360: */
-		}
-		sstevx_("N", "V", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[1], &
-			iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___61.ciunit = *nounit;
-		    s_wsfe(&io___61);
-		    do_fio(&c__1, "SSTEVX(N,V)", 11L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[12] = ulpinv;
-			goto L370;
-		    }
-		}
-
-/*              Do test 12. */
-
-		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
-			ulp, &unfl);
-		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
-			ulp, &unfl);
-/* Computing MAX */
-		r__1 = unfl, r__2 = temp3 * ulp;
-		result[12] = (temp1 + temp2) / dmax(r__1,r__2);
-
-L370:
-
-		ntest = 13;
-		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d1[i] = a[i + i * a_dim1];
-/* L380: */
-		}
-		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d2[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
 /* L390: */
 		}
-		sstevd_("V", &n, &d1[1], &d2[1], &z[z_offset], ldu, &work[1], 
-			&lwedc, &iwork[1], &liwedc, &iinfo);
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
+/* L400: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		sstevx_("V", "V", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &work[1], &
+			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___62.ciunit = *nounit;
 		    s_wsfe(&io___62);
-		    do_fio(&c__1, "SSTEVD(V)", 9L);
+		    do_fio(&c__1, "SSTEVX(V,V)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1245,33 +1420,43 @@ L370:
 		    }
 		}
 
+		if (m2 == 0 && n > 0) {
+		    result[13] = ulpinv;
+		    result[14] = ulpinv;
+		    result[15] = ulpinv;
+		    goto L440;
+		}
+
 /*              Do tests 13 and 14. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    d3[i] = a[i + i * a_dim1];
-/* L400: */
-		}
-		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
 /* L410: */
 		}
-		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z[
-			z_offset], ldu, &work[1], &result[13]);
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L420: */
+		}
+		i__3 = max(1,m2);
+		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &i__3, &result[13]);
 
 		ntest = 15;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d4[i] = a[i + 1 + i * a_dim1];
-/* L420: */
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L430: */
 		}
-		sstevd_("N", &n, &d3[1], &d4[1], &z[z_offset], ldu, &work[1], 
-			&lwedc, &iwork[1], &liwedc, &iinfo);
+		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
+		sstevx_("N", "V", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &work[1], &
+			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___63.ciunit = *nounit;
 		    s_wsfe(&io___63);
-		    do_fio(&c__1, "SSTEVD(N)", 9L);
+		    do_fio(&c__1, "SSTEVX(N,V)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1289,37 +1474,360 @@ L370:
 
 /*              Do test 15. */
 
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		r__1 = unfl, r__2 = temp3 * ulp;
+		result[15] = (temp1 + temp2) / dmax(r__1,r__2);
+
+L440:
+
+		ntest = 16;
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
+/* L450: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
+/* L460: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
+		sstevd_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1]
+			, &lwedc, &iwork[1], &liwedc, &iinfo);
+		if (iinfo != 0) {
+		    io___64.ciunit = *nounit;
+		    s_wsfe(&io___64);
+		    do_fio(&c__1, "SSTEVD(V)", (ftnlen)9);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[16] = ulpinv;
+			result[17] = ulpinv;
+			result[18] = ulpinv;
+			goto L510;
+		    }
+		}
+
+/*              Do tests 16 and 17. */
+
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
+/* L470: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L480: */
+		}
+		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &result[16]);
+
+		ntest = 18;
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L490: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
+		sstevd_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1]
+			, &lwedc, &iwork[1], &liwedc, &iinfo);
+		if (iinfo != 0) {
+		    io___65.ciunit = *nounit;
+		    s_wsfe(&io___65);
+		    do_fio(&c__1, "SSTEVD(N)", (ftnlen)9);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[18] = ulpinv;
+			goto L510;
+		    }
+		}
+
+/*              Do test 18. */
+
 		temp1 = 0.f;
 		temp2 = 0.f;
 		i__3 = n;
 		for (j = 1; j <= i__3; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 = 
-			    max(r__3,r__4), r__4 = (r__2 = d3[j], dabs(r__2));
+		    r__3 = temp1, r__4 = (r__1 = eveigs[j], dabs(r__1)), r__3 
+			    = max(r__3,r__4), r__4 = (r__2 = d3[j], dabs(r__2)
+			    );
 		    temp1 = dmax(r__3,r__4);
 /* Computing MAX */
-		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
+		    r__2 = temp2, r__3 = (r__1 = eveigs[j] - d3[j], dabs(r__1)
+			    );
 		    temp2 = dmax(r__2,r__3);
-/* L430: */
+/* L500: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
-		result[15] = temp2 / dmax(r__1,r__2);
+		result[18] = temp2 / dmax(r__1,r__2);
 
-L440:
+L510:
+
+		ntest = 19;
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
+/* L520: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
+/* L530: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("V", "I", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
+			&work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___66.ciunit = *nounit;
+		    s_wsfe(&io___66);
+		    do_fio(&c__1, "SSTEVR(V,I)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[19] = ulpinv;
+			result[20] = ulpinv;
+			result[21] = ulpinv;
+			goto L570;
+		    }
+		}
+
+/*              DO tests 19 and 20. */
+
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
+/* L540: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L550: */
+		}
+		i__3 = max(1,m2);
+		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &i__3, &result[19]);
+
+
+		ntest = 21;
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L560: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("N", "I", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &iwork[1], 
+			&work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___67.ciunit = *nounit;
+		    s_wsfe(&io___67);
+		    do_fio(&c__1, "SSTEVR(N,I)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[21] = ulpinv;
+			goto L570;
+		    }
+		}
+
+/*              Do test 21. */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * temp3;
+		result[21] = (temp1 + temp2) / dmax(r__1,r__2);
+
+L570:
+
+		ntest = 21;
+		if (n > 0) {
+		    if (il != 1) {
+/* Computing MAX */
+			r__1 = (wa1[il] - wa1[il - 1]) * .5f, r__2 = ulp * 
+				10.f * temp3, r__1 = max(r__1,r__2), r__2 = 
+				rtunfl * 10.f;
+			vl = wa1[il] - dmax(r__1,r__2);
+		    } else {
+/* Computing MAX */
+			r__1 = (wa1[n] - wa1[1]) * .5f, r__2 = ulp * 10.f * 
+				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				10.f;
+			vl = wa1[1] - dmax(r__1,r__2);
+		    }
+		    if (iu != n) {
+/* Computing MAX */
+			r__1 = (wa1[iu + 1] - wa1[iu]) * .5f, r__2 = ulp * 
+				10.f * temp3, r__1 = max(r__1,r__2), r__2 = 
+				rtunfl * 10.f;
+			vu = wa1[iu] + dmax(r__1,r__2);
+		    } else {
+/* Computing MAX */
+			r__1 = (wa1[n] - wa1[1]) * .5f, r__2 = ulp * 10.f * 
+				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				10.f;
+			vu = wa1[n] + dmax(r__1,r__2);
+		    }
+		} else {
+		    vl = 0.f;
+		    vu = 1.f;
+		}
+
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d1[i__] = a_ref(i__, i__);
+/* L580: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d2[i__] = a_ref(i__ + 1, i__);
+/* L590: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("V", "V", &n, &d1[1], &d2[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &iwork[1], 
+			&work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___68.ciunit = *nounit;
+		    s_wsfe(&io___68);
+		    do_fio(&c__1, "SSTEVR(V,V)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[22] = ulpinv;
+			result[23] = ulpinv;
+			result[24] = ulpinv;
+			goto L630;
+		    }
+		}
+
+		if (m2 == 0 && n > 0) {
+		    result[22] = ulpinv;
+		    result[23] = ulpinv;
+		    result[24] = ulpinv;
+		    goto L630;
+		}
+
+/*              Do tests 22 and 23. */
+
+		i__3 = n;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d3[i__] = a_ref(i__, i__);
+/* L600: */
+		}
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L610: */
+		}
+		i__3 = max(1,m2);
+		sstt22_(&n, &m2, &c__0, &d3[1], &d4[1], &wa2[1], &d2[1], &z__[
+			z_offset], ldu, &work[1], &i__3, &result[22]);
+
+		ntest = 24;
+		i__3 = n - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d4[i__] = a_ref(i__ + 1, i__);
+/* L620: */
+		}
+		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		sstevr_("N", "V", &n, &d3[1], &d4[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &iwork[1], 
+			&work[1], lwork, &iwork[(n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___69.ciunit = *nounit;
+		    s_wsfe(&io___69);
+		    do_fio(&c__1, "SSTEVR(N,V)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[24] = ulpinv;
+			goto L630;
+		    }
+		}
+
+/*              Do test 24. */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		r__1 = unfl, r__2 = temp3 * ulp;
+		result[24] = (temp1 + temp2) / dmax(r__1,r__2);
+
+L630:
+
+
 
 		;
 	    } else {
 
-		for (i = 1; i <= 15; ++i) {
-		    result[i] = 0.f;
-/* L450: */
+		for (i__ = 1; i__ <= 24; ++i__) {
+		    result[i__] = 0.f;
+/* L640: */
 		}
-		ntest = 15;
+		ntest = 24;
 	    }
 
-/*           Perform remaining tests storing upper or lower triang
-ular   
+/*           Perform remaining tests storing upper or lower triangular   
              part of matrix. */
 
 	    for (iuplo = 0; iuplo <= 1; ++iuplo) {
@@ -1331,21 +1839,21 @@ ular
 
 /*              4)      Call SSYEV and SSYEVX. */
 
-		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu)
-			;
+		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
+		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)6, (ftnlen)5);
 		ssyev_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], 
-			nwork, &iinfo);
+			lwork, &iinfo);
 		if (iinfo != 0) {
-		    io___66.ciunit = *nounit;
-		    s_wsfe(&io___66);
+		    io___72.ciunit = *nounit;
+		    s_wsfe(&io___72);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSYEV(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1359,31 +1867,31 @@ ular
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L470;
+			goto L660;
 		    }
 		}
 
-/*              Do tests 16 and 17 (or 61 and 62). */
+/*              Do tests 25 and 26 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
-			d2[1], &a[a_offset], ldu, &z[z_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
+		s_copy(srnamc_1.srnamt, "SSYEV", (ftnlen)6, (ftnlen)5);
 		ssyev_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], 
-			nwork, &iinfo);
+			lwork, &iinfo);
 		if (iinfo != 0) {
-		    io___67.ciunit = *nounit;
-		    s_wsfe(&io___67);
+		    io___73.ciunit = *nounit;
+		    s_wsfe(&io___73);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSYEV(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1395,11 +1903,11 @@ ular
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L470;
+			goto L660;
 		    }
 		}
 
-/*              Do test 18 (or 63). */
+/*              Do test 27 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -1412,15 +1920,14 @@ ular
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L460: */
+/* L650: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-L470:
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+L660:
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
@@ -1460,18 +1967,19 @@ L470:
 		    vu = 1.f;
 		}
 
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m, &wa1[1], &z[z_offset], ldu, &work[1]
-			, nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[
+			1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___68.ciunit = *nounit;
-		    s_wsfe(&io___68);
+		    io___74.ciunit = *nounit;
+		    s_wsfe(&io___74);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(V,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1485,32 +1993,32 @@ L470:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L490;
+			goto L680;
 		    }
 		}
 
-/*              Do tests 19 and 20 (or 64 and 65). */
+/*              Do tests 28 and 29 (or +54) */
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		ntest += 2;
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___69.ciunit = *nounit;
-		    s_wsfe(&io___69);
+		    io___75.ciunit = *nounit;
+		    s_wsfe(&io___75);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(N,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1522,11 +2030,11 @@ L470:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L490;
+			goto L680;
 		    }
 		}
 
-/*              Do test 21 (or 66). */
+/*              Do test 30 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -1540,29 +2048,29 @@ L470:
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L480: */
+/* L670: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-L490:
+L680:
 
 		++ntest;
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___70.ciunit = *nounit;
-		    s_wsfe(&io___70);
+		    io___76.ciunit = *nounit;
+		    s_wsfe(&io___76);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(V,I,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1576,34 +2084,33 @@ L490:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L500;
+			goto L690;
 		    }
 		}
 
-/*              Do tests 22 and 23 (or 67 and 68) */
+/*              Do tests 31 and 32 (or +54) */
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &result[ntest]);
 
 		ntest += 2;
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___71.ciunit = *nounit;
-		    s_wsfe(&io___71);
+		    io___77.ciunit = *nounit;
+		    s_wsfe(&io___77);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(N,I,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1615,11 +2122,11 @@ L490:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L500;
+			goto L690;
 		    }
 		}
 
-/*              Do test 24 (or 69) */
+/*              Do test 33 (or +54) */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -1628,23 +2135,23 @@ L490:
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * temp3;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
-L500:
+L690:
 
 		++ntest;
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___72.ciunit = *nounit;
-		    s_wsfe(&io___72);
+		    io___78.ciunit = *nounit;
+		    s_wsfe(&io___78);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(V,V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1658,34 +2165,33 @@ L500:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L510;
+			goto L700;
 		    }
 		}
 
-/*              Do tests 25 and 26 (or 70 and 71). */
+/*              Do tests 34 and 35 (or +54) */
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &result[ntest]);
 
 		ntest += 2;
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
 		ssyevx_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___73.ciunit = *nounit;
-		    s_wsfe(&io___73);
+		    io___79.ciunit = *nounit;
+		    s_wsfe(&io___79);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSYEVX(N,V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1697,16 +2203,16 @@ L500:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L510;
+			goto L700;
 		    }
 		}
 
 		if (m3 == 0 && n > 0) {
 		    result[ntest] = ulpinv;
-		    goto L510;
+		    goto L700;
 		}
 
-/*              Do test 27 (or 72). */
+/*              Do test 36 (or +54) */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -1723,15 +2229,13 @@ L500:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-L510:
+L700:
 
 /*              5)      Call SSPEV and SSPEVX. */
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triang
-ular   
+/*              Load array WORK with the upper or lower triangular   
                 part of the matrix in packed form. */
 
 		if (iuplo == 1) {
@@ -1739,39 +2243,40 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L520: */
+/* L710: */
 			}
-/* L530: */
+/* L720: */
 		    }
 		} else {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L540: */
+/* L730: */
 			}
-/* L550: */
+/* L740: */
 		    }
 		}
 
 		++ntest;
-		sspev_("V", uplo, &n, &work[1], &d1[1], &z[z_offset], ldu, &v[
-			v_offset], &iinfo);
+		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)6, (ftnlen)5);
+		sspev_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, &
+			v[v_offset], &iinfo);
 		if (iinfo != 0) {
-		    io___75.ciunit = *nounit;
-		    s_wsfe(&io___75);
+		    io___81.ciunit = *nounit;
+		    s_wsfe(&io___81);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSPEV(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1785,54 +2290,55 @@ ular
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L610;
+			goto L800;
 		    }
 		}
 
-/*              Do tests 28 and 29 (or 73 and 74). */
+/*              Do tests 37 and 38 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L560: */
+/* L750: */
 			}
-/* L570: */
+/* L760: */
 		    }
 		} else {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L580: */
+/* L770: */
 			}
-/* L590: */
+/* L780: */
 		    }
 		}
 
 		ntest += 2;
-		sspev_("N", uplo, &n, &work[1], &d3[1], &z[z_offset], ldu, &v[
-			v_offset], &iinfo);
+		s_copy(srnamc_1.srnamt, "SSPEV", (ftnlen)6, (ftnlen)5);
+		sspev_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, &
+			v[v_offset], &iinfo);
 		if (iinfo != 0) {
-		    io___76.ciunit = *nounit;
-		    s_wsfe(&io___76);
+		    io___82.ciunit = *nounit;
+		    s_wsfe(&io___82);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSPEV(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1844,11 +2350,11 @@ ular
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L610;
+			goto L800;
 		    }
 		}
 
-/*              Do test 30 (or 75) */
+/*              Do test 39 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -1861,331 +2367,14 @@ ular
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L600: */
-		}
-/* Computing MAX */
-		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
-		result[ntest] = temp2 / dmax(r__1,r__2);
-
-/*              Load array WORK with the upper or lower triang
-ular part   
-                of the matrix in packed form. */
-
-L610:
-		if (iuplo == 1) {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L620: */
-			}
-/* L630: */
-		    }
-		} else {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L640: */
-			}
-/* L650: */
-		    }
-		}
-
-		++ntest;
-
-		if (n > 0) {
-/* Computing MAX */
-		    r__2 = dabs(d1[1]), r__3 = (r__1 = d1[n], dabs(r__1));
-		    temp3 = dmax(r__2,r__3);
-		    if (il != 1) {
-/* Computing MAX */
-			r__1 = (d1[il] - d1[il - 1]) * .5f, r__2 = ulp * 10.f 
-				* temp3, r__1 = max(r__1,r__2), r__2 = rtunfl 
-				* 10.f;
-			vl = d1[il] - dmax(r__1,r__2);
-		    } else if (n > 0) {
-/* Computing MAX */
-			r__1 = (d1[n] - d1[1]) * .5f, r__2 = ulp * 10.f * 
-				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
-				10.f;
-			vl = d1[1] - dmax(r__1,r__2);
-		    }
-		    if (iu != n) {
-/* Computing MAX */
-			r__1 = (d1[iu + 1] - d1[iu]) * .5f, r__2 = ulp * 10.f 
-				* temp3, r__1 = max(r__1,r__2), r__2 = rtunfl 
-				* 10.f;
-			vu = d1[iu] + dmax(r__1,r__2);
-		    } else if (n > 0) {
-/* Computing MAX */
-			r__1 = (d1[n] - d1[1]) * .5f, r__2 = ulp * 10.f * 
-				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
-				10.f;
-			vu = d1[n] + dmax(r__1,r__2);
-		    }
-		} else {
-		    temp3 = 0.f;
-		    vl = 0.f;
-		    vu = 1.f;
-		}
-
-		sspevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &wa1[1], &z[z_offset], ldu, &v[v_offset], 
-			&iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___77.ciunit = *nounit;
-		    s_wsfe(&io___77);
-/* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(V,A,";
-		    i__6[1] = 1, a__1[1] = uplo;
-		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[ntest] = ulpinv;
-			result[ntest + 1] = ulpinv;
-			result[ntest + 2] = ulpinv;
-			goto L710;
-		    }
-		}
-
-/*              Do tests 31 and 32 (or 76 and 77). */
-
-		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
-
-		ntest += 2;
-
-		if (iuplo == 1) {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L660: */
-			}
-/* L670: */
-		    }
-		} else {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L680: */
-			}
-/* L690: */
-		    }
-		}
-
-		sspevx_("N", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___78.ciunit = *nounit;
-		    s_wsfe(&io___78);
-/* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(N,A,";
-		    i__6[1] = 1, a__1[1] = uplo;
-		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[ntest] = ulpinv;
-			goto L710;
-		    }
-		}
-
-/*              Do test 33 (or 78). */
-
-		temp1 = 0.f;
-		temp2 = 0.f;
-		i__3 = n;
-		for (j = 1; j <= i__3; ++j) {
-/* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = wa1[j], dabs(r__1)), r__3 = 
-			    max(r__3,r__4), r__4 = (r__2 = wa2[j], dabs(r__2))
-			    ;
-		    temp1 = dmax(r__3,r__4);
-/* Computing MAX */
-		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
-		    temp2 = dmax(r__2,r__3);
-/* L700: */
-		}
-/* Computing MAX */
-		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
-		result[ntest] = temp2 / dmax(r__1,r__2);
-
-L710:
-		if (iuplo == 1) {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L720: */
-			}
-/* L730: */
-		    }
-		} else {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L740: */
-			}
-/* L750: */
-		    }
-		}
-
-		++ntest;
-
-		sspevx_("V", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___79.ciunit = *nounit;
-		    s_wsfe(&io___79);
-/* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(V,I,";
-		    i__6[1] = 1, a__1[1] = uplo;
-		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[ntest] = ulpinv;
-			result[ntest + 1] = ulpinv;
-			result[ntest + 2] = ulpinv;
-			goto L800;
-		    }
-		}
-
-/*              Do tests 34 and 35 (or 79 and 80). */
-
-		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
-			tau[1], &work[1], &result[ntest]);
-
-		ntest += 2;
-
-		if (iuplo == 1) {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L760: */
-			}
-/* L770: */
-		    }
-		} else {
-		    indx = 1;
-		    i__3 = n;
-		    for (j = 1; j <= i__3; ++j) {
-			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
-			    ++indx;
-/* L780: */
-			}
 /* L790: */
-		    }
-		}
-
-		sspevx_("N", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &iwork[1], &iwork[n * 5 + 1], &iinfo);
-		if (iinfo != 0) {
-		    io___80.ciunit = *nounit;
-		    s_wsfe(&io___80);
-/* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(N,I,";
-		    i__6[1] = 1, a__1[1] = uplo;
-		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
-		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
-		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
-			    ;
-		    e_wsfe();
-		    *info = abs(iinfo);
-		    if (iinfo < 0) {
-			return 0;
-		    } else {
-			result[ntest] = ulpinv;
-			goto L800;
-		    }
-		}
-
-		if (m3 == 0 && n > 0) {
-		    result[ntest] = ulpinv;
-		    goto L800;
-		}
-
-/*              Do test 36 (or 81). */
-
-		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
-			ulp, &unfl);
-		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
-			ulp, &unfl);
-		if (n > 0) {
-/* Computing MAX */
-		    r__2 = dabs(wa1[1]), r__3 = (r__1 = wa1[n], dabs(r__1));
-		    temp3 = dmax(r__2,r__3);
-		} else {
-		    temp3 = 0.f;
 		}
 /* Computing MAX */
-		r__1 = unfl, r__2 = temp3 * ulp;
-		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+/*              Load array WORK with the upper or lower triangular part   
+                of the matrix in packed form. */
 
 L800:
 		if (iuplo == 1) {
@@ -2193,8 +2382,8 @@ L800:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
 /* L810: */
 			}
@@ -2205,8 +2394,8 @@ L800:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
 /* L830: */
 			}
@@ -2216,18 +2405,55 @@ L800:
 
 		++ntest;
 
-		sspevx_("V", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (n > 0) {
+/* Computing MAX */
+		    r__2 = dabs(d1[1]), r__3 = (r__1 = d1[n], dabs(r__1));
+		    temp3 = dmax(r__2,r__3);
+		    if (il != 1) {
+/* Computing MAX */
+			r__1 = (d1[il] - d1[il - 1]) * .5f, r__2 = ulp * 10.f 
+				* temp3, r__1 = max(r__1,r__2), r__2 = rtunfl 
+				* 10.f;
+			vl = d1[il] - dmax(r__1,r__2);
+		    } else if (n > 0) {
+/* Computing MAX */
+			r__1 = (d1[n] - d1[1]) * .5f, r__2 = ulp * 10.f * 
+				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				10.f;
+			vl = d1[1] - dmax(r__1,r__2);
+		    }
+		    if (iu != n) {
+/* Computing MAX */
+			r__1 = (d1[iu + 1] - d1[iu]) * .5f, r__2 = ulp * 10.f 
+				* temp3, r__1 = max(r__1,r__2), r__2 = rtunfl 
+				* 10.f;
+			vu = d1[iu] + dmax(r__1,r__2);
+		    } else if (n > 0) {
+/* Computing MAX */
+			r__1 = (d1[n] - d1[1]) * .5f, r__2 = ulp * 10.f * 
+				temp3, r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				10.f;
+			vu = d1[n] + dmax(r__1,r__2);
+		    }
+		} else {
+		    temp3 = 0.f;
+		    vl = 0.f;
+		    vu = 1.f;
+		}
+
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
+			, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___81.ciunit = *nounit;
-		    s_wsfe(&io___81);
+		    io___83.ciunit = *nounit;
+		    s_wsfe(&io___83);
 /* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(V,V,";
+		    i__6[0] = 11, a__1[0] = "SSPEVX(V,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2241,15 +2467,15 @@ L800:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L890;
+			goto L900;
 		    }
 		}
 
-/*              Do tests 37 and 38 (or 82 and 83). */
+/*              Do tests 40 and 41 (or +54) */
 
-		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
-			tau[1], &work[1], &result[ntest]);
+		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2258,8 +2484,8 @@ L800:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
 /* L850: */
 			}
@@ -2270,8 +2496,8 @@ L800:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
 /* L870: */
 			}
@@ -2279,18 +2505,19 @@ L800:
 		    }
 		}
 
-		sspevx_("N", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("N", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___82.ciunit = *nounit;
-		    s_wsfe(&io___82);
+		    io___84.ciunit = *nounit;
+		    s_wsfe(&io___84);
 /* Writing concatenation */
-		    i__6[0] = 11, a__1[0] = "SSPEVX(N,V,";
+		    i__6[0] = 11, a__1[0] = "SSPEVX(N,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2302,16 +2529,157 @@ L800:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L890;
+			goto L900;
+		    }
+		}
+
+/*              Do test 42 (or +54) */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = wa1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = wa2[j], dabs(r__2))
+			    ;
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L890: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+L900:
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = j;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L910: */
+			}
+/* L920: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L930: */
+			}
+/* L940: */
+		    }
+		}
+
+		++ntest;
+
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("V", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___85.ciunit = *nounit;
+		    s_wsfe(&io___85);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSPEVX(V,I,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L990;
+		    }
+		}
+
+/*              Do tests 43 and 44 (or +54) */
+
+		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &result[ntest]);
+
+		ntest += 2;
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = j;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L950: */
+			}
+/* L960: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L970: */
+			}
+/* L980: */
+		    }
+		}
+
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("N", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___86.ciunit = *nounit;
+		    s_wsfe(&io___86);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSPEVX(N,I,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L990;
 		    }
 		}
 
 		if (m3 == 0 && n > 0) {
 		    result[ntest] = ulpinv;
-		    goto L890;
+		    goto L990;
 		}
 
-/*              Do test 39 (or 84). */
+/*              Do test 45 (or +54) */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -2328,7 +2696,150 @@ L800:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-L890:
+L990:
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = j;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L1000: */
+			}
+/* L1010: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L1020: */
+			}
+/* L1030: */
+		    }
+		}
+
+		++ntest;
+
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("V", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___87.ciunit = *nounit;
+		    s_wsfe(&io___87);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSPEVX(V,V,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1080;
+		    }
+		}
+
+/*              Do tests 46 and 47 (or +54) */
+
+		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &result[ntest]);
+
+		ntest += 2;
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = j;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L1040: */
+			}
+/* L1050: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__4 = n;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    work[indx] = a_ref(i__, j);
+			    ++indx;
+/* L1060: */
+			}
+/* L1070: */
+		    }
+		}
+
+		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
+		sspevx_("N", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+		if (iinfo != 0) {
+		    io___88.ciunit = *nounit;
+		    s_wsfe(&io___88);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSPEVX(N,V,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1080;
+		    }
+		}
+
+		if (m3 == 0 && n > 0) {
+		    result[ntest] = ulpinv;
+		    goto L1080;
+		}
+
+/*              Do test 48 (or +54) */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+		if (n > 0) {
+/* Computing MAX */
+		    r__2 = dabs(wa1[1]), r__3 = (r__1 = wa1[n], dabs(r__1));
+		    temp3 = dmax(r__2,r__3);
+		} else {
+		    temp3 = 0.f;
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = temp3 * ulp;
+		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+
+L1080:
 
 /*              6)      Call SSBEV and SSBEVX. */
 
@@ -2342,8 +2853,7 @@ L890:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 		if (iuplo == 1) {
@@ -2352,12 +2862,11 @@ r part
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
-			for (i = max(i__4,i__5); i <= i__7; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L900: */
+			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1090: */
 			}
-/* L910: */
+/* L1100: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2365,26 +2874,27 @@ r part
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
-			for (i = j; i <= i__7; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L920: */
+			for (i__ = j; i__ <= i__7; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1110: */
 			}
-/* L930: */
+/* L1120: */
 		    }
 		}
 
 		++ntest;
-		ssbev_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z[
+		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)6, (ftnlen)5);
+		ssbev_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &iinfo);
 		if (iinfo != 0) {
-		    io___84.ciunit = *nounit;
-		    s_wsfe(&io___84);
+		    io___90.ciunit = *nounit;
+		    s_wsfe(&io___90);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSBEV(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2398,15 +2908,15 @@ r part
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L990;
+			goto L1180;
 		    }
 		}
 
-/*              Do tests 40 and 41 (or 85 and 86). */
+/*              Do tests 49 and 50 (or ... ) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2414,12 +2924,11 @@ r part
 /* Computing MAX */
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__7,i__4); i <= i__5; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L940: */
+			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1130: */
 			}
-/* L950: */
+/* L1140: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2427,26 +2936,27 @@ r part
 /* Computing MIN */
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L960: */
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1150: */
 			}
-/* L970: */
+/* L1160: */
 		    }
 		}
 
 		ntest += 2;
-		ssbev_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z[
+		s_copy(srnamc_1.srnamt, "SSBEV", (ftnlen)6, (ftnlen)5);
+		ssbev_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &iinfo);
 		if (iinfo != 0) {
-		    io___85.ciunit = *nounit;
-		    s_wsfe(&io___85);
+		    io___91.ciunit = *nounit;
+		    s_wsfe(&io___91);
 /* Writing concatenation */
 		    i__6[0] = 8, a__1[0] = "SSBEV(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-		    do_fio(&c__1, ch__1, 10L);
+		    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__1, (ftnlen)10);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2458,11 +2968,11 @@ r part
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L990;
+			goto L1180;
 		    }
 		}
 
-/*              Do test 42 (or 87). */
+/*              Do test 51 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -2475,29 +2985,27 @@ r part
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L980: */
+/* L1170: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
-L990:
+L1180:
 		if (iuplo == 1) {
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 /* Computing MAX */
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__7); i <= i__4; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1000: */
+			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1190: */
 			}
-/* L1010: */
+/* L1200: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2505,28 +3013,29 @@ L990:
 /* Computing MIN */
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
-			for (i = j; i <= i__4; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1020: */
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1210: */
 			}
-/* L1030: */
+/* L1220: */
 		    }
 		}
 
 		++ntest;
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("V", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m, &wa2[
-			1], &z[z_offset], ldu, &work[1], &iwork[1], &iwork[n *
-			 5 + 1], &iinfo);
+			1], &z__[z_offset], ldu, &work[1], &iwork[1], &iwork[
+			n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___86.ciunit = *nounit;
-		    s_wsfe(&io___86);
+		    io___92.ciunit = *nounit;
+		    s_wsfe(&io___92);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(V,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2540,15 +3049,15 @@ L990:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1090;
+			goto L1280;
 		    }
 		}
 
-/*              Do tests 43 and 44 (or 88 and 89). */
+/*              Do tests 52 and 53 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa2[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2558,12 +3067,11 @@ L990:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
-			for (i = max(i__4,i__5); i <= i__7; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1040: */
+			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1230: */
 			}
-/* L1050: */
+/* L1240: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2571,27 +3079,28 @@ L990:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
-			for (i = j; i <= i__7; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1060: */
+			for (i__ = j; i__ <= i__7; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1250: */
 			}
-/* L1070: */
+/* L1260: */
 		    }
 		}
 
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("N", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &iwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
 			iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___87.ciunit = *nounit;
-		    s_wsfe(&io___87);
+		    io___93.ciunit = *nounit;
+		    s_wsfe(&io___93);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(N,A,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2603,11 +3112,11 @@ L990:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1090;
+			goto L1280;
 		    }
 		}
 
-/*              Do test 45 (or 90). */
+/*              Do test 54 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -2621,13 +3130,13 @@ L990:
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = wa2[j] - wa3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L1080: */
+/* L1270: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-L1090:
+L1280:
 		++ntest;
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2635,12 +3144,11 @@ L1090:
 /* Computing MAX */
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__7,i__4); i <= i__5; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1100: */
+			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1290: */
 			}
-/* L1110: */
+/* L1300: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2648,27 +3156,28 @@ L1090:
 /* Computing MIN */
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1120: */
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1310: */
 			}
-/* L1130: */
+/* L1320: */
 		    }
 		}
 
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("V", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &iwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
 			iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___88.ciunit = *nounit;
-		    s_wsfe(&io___88);
+		    io___94.ciunit = *nounit;
+		    s_wsfe(&io___94);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(V,I,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2682,14 +3191,14 @@ L1090:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1180;
+			goto L1370;
 		    }
 		}
 
-/*              Do tests 46 and 47 (or 91 and 92). */
+/*              Do tests 55 and 56 (or +54) */
 
 		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &result[ntest]);
 
 		ntest += 2;
@@ -2700,12 +3209,11 @@ L1090:
 /* Computing MAX */
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__7); i <= i__4; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1140: */
+			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1330: */
 			}
-/* L1150: */
+/* L1340: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2713,27 +3221,28 @@ L1090:
 /* Computing MIN */
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
-			for (i = j; i <= i__4; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1160: */
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1350: */
 			}
-/* L1170: */
+/* L1360: */
 		    }
 		}
 
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("N", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &iwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
 			iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___89.ciunit = *nounit;
-		    s_wsfe(&io___89);
+		    io___95.ciunit = *nounit;
+		    s_wsfe(&io___95);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(N,I,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2745,11 +3254,11 @@ L1090:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1180;
+			goto L1370;
 		    }
 		}
 
-/*              Do test 48 (or 93). */
+/*              Do test 57 (or +54) */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -2766,7 +3275,7 @@ L1090:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-L1180:
+L1370:
 		++ntest;
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2774,12 +3283,11 @@ L1180:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
-			for (i = max(i__4,i__5); i <= i__7; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1190: */
+			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1380: */
 			}
-/* L1200: */
+/* L1390: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2787,27 +3295,28 @@ L1180:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
-			for (i = j; i <= i__7; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1210: */
+			for (i__ = j; i__ <= i__7; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1400: */
 			}
-/* L1220: */
+/* L1410: */
 		    }
 		}
 
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("V", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &iwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
 			iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___90.ciunit = *nounit;
-		    s_wsfe(&io___90);
+		    io___96.ciunit = *nounit;
+		    s_wsfe(&io___96);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(V,V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2821,14 +3330,14 @@ L1180:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1270;
+			goto L1460;
 		    }
 		}
 
-/*              Do tests 49 and 50 (or 94 and 95). */
+/*              Do tests 58 and 59 (or +54) */
 
 		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &result[ntest]);
 
 		ntest += 2;
@@ -2839,12 +3348,11 @@ L1180:
 /* Computing MAX */
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__7,i__4); i <= i__5; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1230: */
+			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1420: */
 			}
-/* L1240: */
+/* L1430: */
 		    }
 		} else {
 		    i__3 = n;
@@ -2852,27 +3360,28 @@ L1180:
 /* Computing MIN */
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1250: */
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1440: */
 			}
-/* L1260: */
+/* L1450: */
 		    }
 		}
 
+		s_copy(srnamc_1.srnamt, "SSBEVX", (ftnlen)6, (ftnlen)6);
 		ssbevx_("N", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &iwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &iwork[1], &
 			iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___91.ciunit = *nounit;
-		    s_wsfe(&io___91);
+		    io___97.ciunit = *nounit;
+		    s_wsfe(&io___97);
 /* Writing concatenation */
 		    i__6[0] = 11, a__1[0] = "SSBEVX(N,V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__6, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2884,16 +3393,16 @@ L1180:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1270;
+			goto L1460;
 		    }
 		}
 
 		if (m3 == 0 && n > 0) {
 		    result[ntest] = ulpinv;
-		    goto L1270;
+		    goto L1460;
 		}
 
-/*              Do test 51 (or 96). */
+/*              Do test 60 (or +54) */
 
 		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
 			ulp, &unfl);
@@ -2910,25 +3419,25 @@ L1180:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-L1270:
+L1460:
 
 /*              7)      Call SSYEVD */
 
-		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu)
-			;
+		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
+		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)6, (ftnlen)6);
 		ssyevd_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], &
 			lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
-		    io___92.ciunit = *nounit;
-		    s_wsfe(&io___92);
+		    io___98.ciunit = *nounit;
+		    s_wsfe(&io___98);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSYEVD(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2942,31 +3451,31 @@ L1270:
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1290;
+			goto L1480;
 		    }
 		}
 
-/*              Do tests 52 and 53 (or 97 and 98). */
+/*              Do tests 61 and 62 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
-			d2[1], &a[a_offset], ldu, &z[z_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
+		s_copy(srnamc_1.srnamt, "SSYEVD", (ftnlen)6, (ftnlen)6);
 		ssyevd_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], &
 			lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
-		    io___93.ciunit = *nounit;
-		    s_wsfe(&io___93);
+		    io___99.ciunit = *nounit;
+		    s_wsfe(&io___99);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSYEVD(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2978,11 +3487,11 @@ L1270:
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1290;
+			goto L1480;
 		    }
 		}
 
-/*              Do test 54 (or 99). */
+/*              Do test 63 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -2995,21 +3504,19 @@ L1270:
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L1280: */
+/* L1470: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-L1290:
+L1480:
 
 /*              8)      Call SSPEVD. */
 
-		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triang
-ular   
+/*              Load array WORK with the upper or lower triangular   
                 part of the matrix in packed form. */
 
 		if (iuplo == 1) {
@@ -3017,41 +3524,41 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = j;
-			for (i = 1; i <= i__5; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L1300: */
+/* L1490: */
 			}
-/* L1310: */
+/* L1500: */
 		    }
 		} else {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = n;
-			for (i = j; i <= i__5; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L1320: */
+/* L1510: */
 			}
-/* L1330: */
+/* L1520: */
 		    }
 		}
 
 		++ntest;
+		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)6, (ftnlen)6);
 		i__3 = lwedc - indx + 1;
-		sspevd_("V", uplo, &n, &work[1], &d1[1], &z[z_offset], ldu, &
-			work[indx], &i__3, &iwork[1], &liwedc, &iinfo)
-			;
+		sspevd_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, 
+			&work[indx], &i__3, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
-		    io___94.ciunit = *nounit;
-		    s_wsfe(&io___94);
+		    io___100.ciunit = *nounit;
+		    s_wsfe(&io___100);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSPEVD(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -3065,56 +3572,57 @@ ular
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1390;
+			goto L1580;
 		    }
 		}
 
-/*              Do tests 55 and 56 (or 100 and 101). */
+/*              Do tests 64 and 65 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = j;
-			for (i = 1; i <= i__5; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = 1; i__ <= i__5; ++i__) {
+
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L1340: */
+/* L1530: */
 			}
-/* L1350: */
+/* L1540: */
 		    }
 		} else {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = n;
-			for (i = j; i <= i__5; ++i) {
-			    work[indx] = a[i + j * a_dim1];
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    work[indx] = a_ref(i__, j);
 			    ++indx;
-/* L1360: */
+/* L1550: */
 			}
-/* L1370: */
+/* L1560: */
 		    }
 		}
 
 		ntest += 2;
+		s_copy(srnamc_1.srnamt, "SSPEVD", (ftnlen)6, (ftnlen)6);
 		i__3 = lwedc - indx + 1;
-		sspevd_("N", uplo, &n, &work[1], &d3[1], &z[z_offset], ldu, &
-			work[indx], &i__3, &iwork[1], &liwedc, &iinfo)
-			;
+		sspevd_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, 
+			&work[indx], &i__3, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
-		    io___95.ciunit = *nounit;
-		    s_wsfe(&io___95);
+		    io___101.ciunit = *nounit;
+		    s_wsfe(&io___101);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSPEVD(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -3126,11 +3634,11 @@ ular
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1390;
+			goto L1580;
 		    }
 		}
 
-/*              Do test 57 (or 102). */
+/*              Do test 66 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -3143,12 +3651,12 @@ ular
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L1380: */
+/* L1570: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
-L1390:
+L1580:
 
 /*              9)      Call SSBEVD. */
 
@@ -3162,8 +3670,7 @@ L1390:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 		if (iuplo == 1) {
@@ -3172,12 +3679,11 @@ r part
 /* Computing MAX */
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__7); i <= i__4; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1400: */
+			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1590: */
 			}
-/* L1410: */
+/* L1600: */
 		    }
 		} else {
 		    i__3 = n;
@@ -3185,27 +3691,28 @@ r part
 /* Computing MIN */
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
-			for (i = j; i <= i__4; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1420: */
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1610: */
 			}
-/* L1430: */
+/* L1620: */
 		    }
 		}
 
 		++ntest;
-		ssbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z[
+		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)6, (ftnlen)6);
+		ssbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &iwork[1], &liwedc, 
 			&iinfo);
 		if (iinfo != 0) {
-		    io___96.ciunit = *nounit;
-		    s_wsfe(&io___96);
+		    io___102.ciunit = *nounit;
+		    s_wsfe(&io___102);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSBEVD(V,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -3219,15 +3726,15 @@ r part
 			result[ntest] = ulpinv;
 			result[ntest + 1] = ulpinv;
 			result[ntest + 2] = ulpinv;
-			goto L1490;
+			goto L1680;
 		    }
 		}
 
-/*              Do tests 58 and 59 (or 103 and 104). */
+/*              Do tests 67 and 68 (or +54) */
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -3235,12 +3742,11 @@ r part
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
-			for (i = max(i__4,i__5); i <= i__7; ++i) {
-			    v[kd + 1 + i - j + j * v_dim1] = a[i + j * a_dim1]
-				    ;
-/* L1440: */
+			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
+			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+/* L1630: */
 			}
-/* L1450: */
+/* L1640: */
 		    }
 		} else {
 		    i__3 = n;
@@ -3248,27 +3754,28 @@ r part
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
-			for (i = j; i <= i__7; ++i) {
-			    v[i + 1 - j + j * v_dim1] = a[i + j * a_dim1];
-/* L1460: */
+			for (i__ = j; i__ <= i__7; ++i__) {
+			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L1650: */
 			}
-/* L1470: */
+/* L1660: */
 		    }
 		}
 
 		ntest += 2;
-		ssbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z[
+		s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)6, (ftnlen)6);
+		ssbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &iwork[1], &liwedc, 
 			&iinfo);
 		if (iinfo != 0) {
-		    io___97.ciunit = *nounit;
-		    s_wsfe(&io___97);
+		    io___103.ciunit = *nounit;
+		    s_wsfe(&io___103);
 /* Writing concatenation */
 		    i__6[0] = 9, a__1[0] = "SSBEVD(N,";
 		    i__6[1] = 1, a__1[1] = uplo;
 		    i__6[2] = 1, a__1[2] = ")";
-		    s_cat(ch__3, a__1, i__6, &c__3, 11L);
-		    do_fio(&c__1, ch__3, 11L);
+		    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__3, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -3280,11 +3787,11 @@ r part
 			return 0;
 		    } else {
 			result[ntest] = ulpinv;
-			goto L1490;
+			goto L1680;
 		    }
 		}
 
-/*              Do test 60 (or 105). */
+/*              Do test 69 (or +54) */
 
 		temp1 = 0.f;
 		temp2 = 0.f;
@@ -3297,28 +3804,307 @@ r part
 /* Computing MAX */
 		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
 		    temp2 = dmax(r__2,r__3);
-/* L1480: */
+/* L1670: */
 		}
 /* Computing MAX */
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-L1490:
+L1680:
 
-/* L1500: */
-		;
+
+		slacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
+		++ntest;
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___104.ciunit = *nounit;
+		    s_wsfe(&io___104);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(V,A,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1700;
+		    }
+		}
+
+/*              Do tests 70 and 71 (or ... ) */
+
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &result[ntest]);
+
+		ntest += 2;
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___105.ciunit = *nounit;
+		    s_wsfe(&io___105);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(N,A,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1700;
+		    }
+		}
+
+/*              Do test 72 (or ... ) */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = wa1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = wa2[j], dabs(r__2))
+			    ;
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L1690: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+L1700:
+
+		++ntest;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___106.ciunit = *nounit;
+		    s_wsfe(&io___106);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(V,I,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1710;
+		    }
+		}
+
+/*              Do tests 73 and 74 (or +54) */
+
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &result[ntest]);
+
+		ntest += 2;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___107.ciunit = *nounit;
+		    s_wsfe(&io___107);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(N,I,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1710;
+		    }
+		}
+
+/*              Do test 75 (or +54) */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * temp3;
+		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+L1710:
+
+		++ntest;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___108.ciunit = *nounit;
+		    s_wsfe(&io___108);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(V,V,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L700;
+		    }
+		}
+
+/*              Do tests 76 and 77 (or +54) */
+
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		ssyt22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &result[ntest]);
+
+		ntest += 2;
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
+		i__3 = *liwork - (n << 1);
+		ssyevr_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &iwork[(n << 1) + 1], &
+			i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___109.ciunit = *nounit;
+		    s_wsfe(&io___109);
+/* Writing concatenation */
+		    i__6[0] = 11, a__1[0] = "SSYEVR(N,V,";
+		    i__6[1] = 1, a__1[1] = uplo;
+		    i__6[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L700;
+		    }
+		}
+
+		if (m3 == 0 && n > 0) {
+		    result[ntest] = ulpinv;
+		    goto L700;
+		}
+
+/*              Do test 78 (or +54) */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+		if (n > 0) {
+/* Computing MAX */
+		    r__2 = dabs(wa1[1]), r__3 = (r__1 = wa1[n], dabs(r__1));
+		    temp3 = dmax(r__2,r__3);
+		} else {
+		    temp3 = 0.f;
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = temp3 * ulp;
+		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+
+		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+/* L1720: */
 	    }
 
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
 	    ntestt += ntest;
+
 	    slafts_("SST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
 
-L1510:
+L1730:
 	    ;
 	}
-/* L1520: */
+/* L1740: */
     }
 
 /*     Summary */
@@ -3331,4 +4117,9 @@ L1510:
 /*     End of SDRVST */
 
 } /* sdrvst_ */
+
+#undef v_ref
+#undef u_ref
+#undef a_ref
+
 

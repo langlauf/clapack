@@ -1,13 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int cstedc_(char *compz, integer *n, real *d, real *e, 
-	complex *z, integer *ldz, complex *work, integer *lwork, real *rwork, 
-	integer *lrwork, integer *iwork, integer *liwork, integer *info)
+/* Subroutine */ int cstedc_(char *compz, integer *n, real *d__, real *e, 
+	complex *z__, integer *ldz, complex *work, integer *lwork, real *
+	rwork, integer *lrwork, integer *iwork, integer *liwork, integer *
+	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -15,8 +17,7 @@
 
     CSTEDC computes all eigenvalues and, optionally, eigenvectors of a   
     symmetric tridiagonal matrix using the divide and conquer method.   
-    The eigenvectors of a full or band complex Hermitian matrix can also 
-  
+    The eigenvectors of a full or band complex Hermitian matrix can also   
     be found if CHETRD or CHPTRD or CHBTRD has been used to reduce this   
     matrix to tridiagonal form.   
 
@@ -45,8 +46,7 @@
             On exit, if INFO = 0, the eigenvalues in ascending order.   
 
     E       (input/output) REAL array, dimension (N-1)   
-            On entry, the subdiagonal elements of the tridiagonal matrix. 
-  
+            On entry, the subdiagonal elements of the tridiagonal matrix.   
             On exit, E has been destroyed.   
 
     Z       (input/output) COMPLEX array, dimension (LDZ,N)   
@@ -63,17 +63,21 @@
             If eigenvectors are desired, then LDZ >= max(1,N).   
 
     WORK    (workspace/output) COMPLEX array, dimension (LWORK)   
-            On exit, if LWORK > 0, WORK(1) returns the optimal LWORK.   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.   
             If COMPZ = 'N' or 'I', or N <= 1, LWORK must be at least 1.   
             If COMPZ = 'V' and N > 1, LWORK must be at least N*N.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     RWORK   (workspace/output) REAL array,   
                                            dimension (LRWORK)   
-            On exit, if LRWORK > 0, RWORK(1) returns the optimal LRWORK. 
-  
+            On exit, if INFO = 0, RWORK(1) returns the optimal LRWORK.   
 
     LRWORK  (input) INTEGER   
             The dimension of the array RWORK.   
@@ -83,11 +87,15 @@
                            where lg( N ) = smallest integer k such   
                            that 2**k >= N.   
             If COMPZ = 'I' and N > 1, LRWORK must be at least   
-                           1 + 3*N + 2*N*lg N + 3*N**2 .   
+                           1 + 4*N + 2*N**2 .   
+
+            If LRWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the RWORK array,   
+            returns this value as the first entry of the RWORK array, and   
+            no error message related to LRWORK is issued by XERBLA.   
 
     IWORK   (workspace/output) INTEGER array, dimension (LIWORK)   
-            On exit, if LIWORK > 0, IWORK(1) returns the optimal LIWORK. 
-  
+            On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK.   
 
     LIWORK  (input) INTEGER   
             The dimension of the array IWORK.   
@@ -95,7 +103,12 @@
             If COMPZ = 'V' or N > 1,  LIWORK must be at least   
                                       6 + 6*N + 5*N*lg N.   
             If COMPZ = 'I' or N > 1,  LIWORK must be at least   
-                                      2 + 5*N .   
+                                      3 + 5*N .   
+
+            If LIWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the IWORK array,   
+            returns this value as the first entry of the IWORK array, and   
+            no error message related to LIWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit.   
@@ -104,20 +117,25 @@
                   working on the submatrix lying in rows and columns   
                   INFO/(N+1) through mod(INFO,N+1).   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__2 = 2;
-    static real c_b12 = 0.f;
-    static real c_b13 = 1.f;
+    static integer c__9 = 9;
     static integer c__0 = 0;
+    static real c_b18 = 0.f;
+    static real c_b19 = 1.f;
     static integer c__1 = 1;
     
     /* System generated locals */
@@ -129,7 +147,7 @@
     double sqrt(doublereal);
     /* Local variables */
     static real tiny;
-    static integer i, j, k, m;
+    static integer i__, j, k, m;
     static real p;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cswap_(integer *, complex *, integer *, 
@@ -144,7 +162,10 @@
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *), xerbla_(char *, 
-	    integer *), slascl_(char *, integer *, integer *, real *, 
+	    integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, integer *), sstedc_(char *, integer *, real *, real *, real *, 
 	    integer *, real *, integer *, integer *, integer *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *);
@@ -154,23 +175,29 @@
     static real orgnrm;
     extern doublereal slanst_(char *, integer *, real *, real *);
     extern /* Subroutine */ int ssterf_(integer *, real *, real *, integer *);
-    static integer lrwmin, nm1;
+    static integer lrwmin;
+    static logical lquery;
+    static integer smlsiz;
     extern /* Subroutine */ int ssteqr_(char *, integer *, real *, real *, 
 	    real *, integer *, real *, integer *);
     static integer end, lgn;
     static real eps;
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    --d__;
+    --e;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
+    --iwork;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     *info = 0;
+    lquery = *lwork == -1 || *lrwork == -1 || *liwork == -1;
 
     if (lsame_(compz, "N")) {
 	icompz = 0;
@@ -203,8 +230,8 @@
 	    lwmin = 1;
 /* Computing 2nd power */
 	    i__1 = *n;
-	    lrwmin = *n * 3 + 1 + (*n << 1) * lgn + i__1 * i__1 * 3;
-	    liwmin = *n * 5 + 2;
+	    lrwmin = (*n << 2) + 1 + (i__1 * i__1 << 1);
+	    liwmin = *n * 5 + 3;
 	}
     }
     if (icompz < 0) {
@@ -213,31 +240,43 @@
 	*info = -2;
     } else if (*ldz < 1 || icompz > 0 && *ldz < max(1,*n)) {
 	*info = -6;
-    } else if (*lwork < lwmin) {
+    } else if (*lwork < lwmin && ! lquery) {
 	*info = -8;
-    } else if (*lrwork < lrwmin) {
+    } else if (*lrwork < lrwmin && ! lquery) {
 	*info = -10;
-    } else if (*liwork < liwmin) {
+    } else if (*liwork < liwmin && ! lquery) {
 	*info = -12;
     }
+
+    if (*info == 0) {
+	work[1].r = (real) lwmin, work[1].i = 0.f;
+	rwork[1] = (real) lrwmin;
+	iwork[1] = liwmin;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CSTEDC", &i__1);
-	goto L70;
+	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n == 0) {
-	goto L70;
+	return 0;
     }
     if (*n == 1) {
 	if (icompz != 0) {
-	    i__1 = z_dim1 + 1;
-	    Z(1,1).r = 1.f, Z(1,1).i = 0.f;
+	    i__1 = z___subscr(1, 1);
+	    z__[i__1].r = 1.f, z__[i__1].i = 0.f;
 	}
-	goto L70;
+	return 0;
     }
+
+    smlsiz = ilaenv_(&c__9, "CSTEDC", " ", &c__0, &c__0, &c__0, &c__0, (
+	    ftnlen)6, (ftnlen)1);
 
 /*     If the following conditional clause is removed, then the routine   
        will use the Divide and Conquer routine to compute only the   
@@ -250,46 +289,48 @@
        If COMPZ = 'N', use SSTERF to compute the eigenvalues. */
 
     if (icompz == 0) {
-	ssterf_(n, &D(1), &E(1), info);
-	goto L70;
+	ssterf_(n, &d__[1], &e[1], info);
+	return 0;
     }
 
 /*     If N is smaller than the minimum divide size (SMLSIZ+1), then   
        solve the problem with another solver. */
 
-    if (*n <= 25) {
+    if (*n <= smlsiz) {
 	if (icompz == 0) {
-	    ssterf_(n, &D(1), &E(1), info);
-	    goto L70;
+	    ssterf_(n, &d__[1], &e[1], info);
+	    return 0;
 	} else if (icompz == 2) {
-	    csteqr_("I", n, &D(1), &E(1), &Z(1,1), ldz, &RWORK(1), info);
-	    goto L70;
+	    csteqr_("I", n, &d__[1], &e[1], &z__[z_offset], ldz, &rwork[1], 
+		    info);
+	    return 0;
 	} else {
-	    csteqr_("V", n, &D(1), &E(1), &Z(1,1), ldz, &RWORK(1), info);
-	    goto L70;
+	    csteqr_("V", n, &d__[1], &e[1], &z__[z_offset], ldz, &rwork[1], 
+		    info);
+	    return 0;
 	}
     }
 
 /*     If COMPZ = 'I', we simply call SSTEDC instead. */
 
     if (icompz == 2) {
-	slaset_("Full", n, n, &c_b12, &c_b13, &RWORK(1), n);
+	slaset_("Full", n, n, &c_b18, &c_b19, &rwork[1], n);
 	ll = *n * *n + 1;
 	i__1 = *lrwork - ll + 1;
-	sstedc_("I", n, &D(1), &E(1), &RWORK(1), n, &RWORK(ll), &i__1, &IWORK(
-		1), liwork, info);
+	sstedc_("I", n, &d__[1], &e[1], &rwork[1], n, &rwork[ll], &i__1, &
+		iwork[1], liwork, info);
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		i__3 = i + j * z_dim1;
-		i__4 = (j - 1) * *n + i;
-		Z(i,j).r = RWORK((j-1)**n+i), Z(i,j).i = 0.f;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = z___subscr(i__, j);
+		i__4 = (j - 1) * *n + i__;
+		z__[i__3].r = rwork[i__4], z__[i__3].i = 0.f;
 /* L10: */
 	    }
 /* L20: */
 	}
-	goto L70;
+	return 0;
     }
 
 /*     From now on, only option left to be handled is COMPZ = 'V',   
@@ -297,10 +338,9 @@
 
        Scale. */
 
-    nm1 = *n - 1;
-    orgnrm = slanst_("M", n, &D(1), &E(1));
+    orgnrm = slanst_("M", n, &d__[1], &e[1]);
     if (orgnrm == 0.f) {
-	goto L70;
+	return 0;
     }
 
     eps = slamch_("Epsilon");
@@ -312,19 +352,17 @@
 L30:
     if (start <= *n) {
 
-/*     Let END be the position of the next subdiagonal entry such that
-   
-       E( END ) <= TINY or END = N if no such subdiagonal exists.  The
-   
+/*     Let END be the position of the next subdiagonal entry such that   
+       E( END ) <= TINY or END = N if no such subdiagonal exists.  The   
        matrix identified by the elements between START and END   
        constitutes an independent sub-problem. */
 
 	end = start;
 L40:
 	if (end < *n) {
-	    tiny = eps * sqrt((r__1 = D(end), dabs(r__1))) * sqrt((r__2 = D(
-		    end + 1), dabs(r__2)));
-	    if ((r__1 = E(end), dabs(r__1)) > tiny) {
+	    tiny = eps * sqrt((r__1 = d__[end], dabs(r__1))) * sqrt((r__2 = 
+		    d__[end + 1], dabs(r__2)));
+	    if ((r__1 = e[end], dabs(r__1)) > tiny) {
 		++end;
 		goto L40;
 	    }
@@ -333,41 +371,41 @@ L40:
 /*        (Sub) Problem determined.  Compute its size and solve it. */
 
 	m = end - start + 1;
-	if (m > 25) {
-	    *info = 25;
+	if (m > smlsiz) {
+	    *info = smlsiz;
 
 /*           Scale. */
 
-	    orgnrm = slanst_("M", &m, &D(start), &E(start));
-	    slascl_("G", &c__0, &c__0, &orgnrm, &c_b13, &m, &c__1, &D(start), 
-		    &m, info);
+	    orgnrm = slanst_("M", &m, &d__[start], &e[start]);
+	    slascl_("G", &c__0, &c__0, &orgnrm, &c_b19, &m, &c__1, &d__[start]
+		    , &m, info);
 	    i__1 = m - 1;
 	    i__2 = m - 1;
-	    slascl_("G", &c__0, &c__0, &orgnrm, &c_b13, &i__1, &c__1, &E(
-		    start), &i__2, info);
+	    slascl_("G", &c__0, &c__0, &orgnrm, &c_b19, &i__1, &c__1, &e[
+		    start], &i__2, info);
 
-	    claed0_(n, &m, &D(start), &E(start), &Z(1,start), ldz, 
-		    &WORK(1), n, &RWORK(1), &IWORK(1), info);
+	    claed0_(n, &m, &d__[start], &e[start], &z___ref(1, start), ldz, &
+		    work[1], n, &rwork[1], &iwork[1], info);
 	    if (*info > 0) {
 		*info = (*info / (m + 1) + start - 1) * (*n + 1) + *info % (m 
 			+ 1) + start - 1;
-		goto L70;
+		return 0;
 	    }
 
 /*           Scale back. */
 
-	    slascl_("G", &c__0, &c__0, &c_b13, &orgnrm, &m, &c__1, &D(start), 
-		    &m, info);
+	    slascl_("G", &c__0, &c__0, &c_b19, &orgnrm, &m, &c__1, &d__[start]
+		    , &m, info);
 
 	} else {
-	    ssteqr_("I", &m, &D(start), &E(start), &RWORK(1), &m, &RWORK(m * 
-		    m + 1), info);
-	    clacrm_(n, &m, &Z(1,start), ldz, &RWORK(1), &m, &WORK(
-		    1), n, &RWORK(m * m + 1));
-	    clacpy_("A", n, &m, &WORK(1), n, &Z(1,start), ldz);
+	    ssteqr_("I", &m, &d__[start], &e[start], &rwork[1], &m, &rwork[m *
+		     m + 1], info);
+	    clacrm_(n, &m, &z___ref(1, start), ldz, &rwork[1], &m, &work[1], 
+		    n, &rwork[m * m + 1]);
+	    clacpy_("A", n, &m, &work[1], n, &z___ref(1, start), ldz);
 	    if (*info > 0) {
 		*info = start * (*n + 1) + end;
-		goto L70;
+		return 0;
 	    }
 	}
 
@@ -386,41 +424,38 @@ L40:
 /*        Use Selection Sort to minimize swaps of eigenvectors */
 
 	i__1 = *n;
-	for (ii = 2; ii <= *n; ++ii) {
-	    i = ii - 1;
-	    k = i;
-	    p = D(i);
+	for (ii = 2; ii <= i__1; ++ii) {
+	    i__ = ii - 1;
+	    k = i__;
+	    p = d__[i__];
 	    i__2 = *n;
-	    for (j = ii; j <= *n; ++j) {
-		if (D(j) < p) {
+	    for (j = ii; j <= i__2; ++j) {
+		if (d__[j] < p) {
 		    k = j;
-		    p = D(j);
+		    p = d__[j];
 		}
 /* L50: */
 	    }
-	    if (k != i) {
-		D(k) = D(i);
-		D(i) = p;
-		cswap_(n, &Z(1,i), &c__1, &Z(1,k), &
-			c__1);
+	    if (k != i__) {
+		d__[k] = d__[i__];
+		d__[i__] = p;
+		cswap_(n, &z___ref(1, i__), &c__1, &z___ref(1, k), &c__1);
 	    }
 /* L60: */
 	}
     }
 
-L70:
-    if (*lwork > 0) {
-	WORK(1).r = (real) lwmin, WORK(1).i = 0.f;
-    }
-    if (*lrwork > 0) {
-	RWORK(1) = (real) lrwmin;
-    }
-    if (*liwork > 0) {
-	IWORK(1) = liwmin;
-    }
+    work[1].r = (real) lwmin, work[1].i = 0.f;
+    rwork[1] = (real) lrwmin;
+    iwork[1] = liwmin;
+
     return 0;
 
 /*     End of CSTEDC */
 
 } /* cstedc_ */
+
+#undef z___ref
+#undef z___subscr
+
 

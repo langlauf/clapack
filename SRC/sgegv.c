@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgegv_(char *jobvl, char *jobvr, integer *n, real *a, 
@@ -5,17 +6,18 @@
 	*beta, real *vl, integer *ldvl, real *vr, integer *ldvr, real *work, 
 	integer *lwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SGEGV computes for a pair of n-by-n real nonsymmetric matrices A and 
-  
+    This routine is deprecated and has been replaced by routine SGGEV.   
+
+    SGEGV computes for a pair of n-by-n real nonsymmetric matrices A and   
     B, the generalized eigenvalues (alphar +/- alphai*i, beta), and   
     optionally, the left and/or right generalized eigenvectors (VL and   
     VR).   
@@ -82,8 +84,7 @@
             ALPHAI(j+1) negative.   
 
             Note: the quotients ALPHAR(j)/BETA(j) and ALPHAI(j)/BETA(j)   
-            may easily over- or underflow, and BETA(j) may even be zero. 
-  
+            may easily over- or underflow, and BETA(j) may even be zero.   
             Thus, the user should avoid naively computing the ratio   
             alpha/beta.  However, ALPHAR and ALPHAI will be always less   
             than and usually comparable with norm(A) in magnitude, and   
@@ -106,7 +107,7 @@
             if JOBVL = 'V', LDVL >= N.   
 
     VR      (output) REAL array, dimension (LDVR,N)   
-            If JOBVL = 'V', the right generalized eigenvectors.  (See   
+            If JOBVR = 'V', the right generalized eigenvectors.  (See   
             "Purpose", above.)  Real eigenvectors take one column,   
             complex take two columns, the first for the real part and   
             the second for the imaginary part.  Complex eigenvectors   
@@ -129,10 +130,14 @@
             For good performance, LWORK must generally be larger.   
             To compute the optimal value of LWORK, call ILAENV to get   
             blocksizes (for SGEQRF, SORMQR, and SORGQR.)  Then compute:   
-            NB  -- MAX of the blocksizes for SGEQRF, SORMQR, and SORGQR; 
-  
+            NB  -- MAX of the blocksizes for SGEQRF, SORMQR, and SORGQR;   
             The optimal LWORK is:   
                 2*N + MAX( 6*N, N*(NB+1) ).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -184,20 +189,17 @@
     [*] See SHGEQZ, SGEGS, or read the book "Matrix Computations",   
         by Golub & van Loan, pub. by Johns Hopkins U. Press.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
-    static integer c_n1 = -1;
-    static real c_b14 = 1.f;
-    static real c_b25 = 0.f;
     static integer c__1 = 1;
+    static integer c_n1 = -1;
+    static real c_b27 = 1.f;
+    static real c_b38 = 0.f;
     
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, vl_dim1, vl_offset, vr_dim1, 
@@ -208,9 +210,10 @@
     static integer itau;
     static real temp;
     static logical ilvl, ilvr;
+    static integer lopt;
     static real anrm1, anrm2, bnrm1, bnrm2, absai, scale, absar, sbeta;
     extern logical lsame_(char *, char *);
-    static integer ileft, iinfo, icols, iwork, irows, jc, in, jr;
+    static integer ileft, iinfo, icols, iwork, irows, jc, nb, in, jr;
     static real salfai;
     extern /* Subroutine */ int sggbak_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, integer *
@@ -229,6 +232,8 @@
     static logical ldumma[1];
     extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, integer *), xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     static integer ijobvl, iright;
     static logical ilimit;
     extern /* Subroutine */ int sgeqrf_(integer *, integer *, real *, integer 
@@ -241,7 +246,7 @@
 	    integer *, real *, integer *, real *, integer *, integer *, 
 	    integer *, real *, integer *);
     static real onepls;
-    static integer lwkmin;
+    static integer lwkmin, nb1, nb2, nb3;
     extern /* Subroutine */ int shgeqz_(char *, char *, char *, integer *, 
 	    integer *, integer *, real *, integer *, real *, integer *, real *
 	    , real *, real *, real *, integer *, real *, integer *, real *, 
@@ -249,25 +254,37 @@
 	    integer *, integer *, real *, integer *, real *, real *, integer *
 	    , integer *);
     static integer lwkopt;
+    static logical lquery;
     extern /* Subroutine */ int sormqr_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, integer *, real *, 
 	    integer *, integer *);
     static integer ihi, ilo;
     static real eps;
     static logical ilv;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alphar;
+    --alphai;
+    --beta;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --work;
 
-#define ALPHAR(I) alphar[(I)-1]
-#define ALPHAI(I) alphai[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-
+    /* Function Body */
     if (lsame_(jobvl, "N")) {
 	ijobvl = 1;
 	ilvl = FALSE_;
@@ -297,6 +314,8 @@
     i__1 = *n << 3;
     lwkmin = max(i__1,1);
     lwkopt = lwkmin;
+    work[1] = (real) lwkopt;
+    lquery = *lwork == -1;
     *info = 0;
     if (ijobvl <= 0) {
 	*info = -1;
@@ -312,19 +331,36 @@
 	*info = -12;
     } else if (*ldvr < 1 || ilvr && *ldvr < *n) {
 	*info = -14;
-    } else if (*lwork < lwkmin) {
+    } else if (*lwork < lwkmin && ! lquery) {
 	*info = -16;
+    }
+
+    if (*info == 0) {
+	nb1 = ilaenv_(&c__1, "SGEQRF", " ", n, n, &c_n1, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+	nb2 = ilaenv_(&c__1, "SORMQR", " ", n, n, n, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+	nb3 = ilaenv_(&c__1, "SORGQR", " ", n, n, n, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+/* Computing MAX */
+	i__1 = max(nb1,nb2);
+	nb = max(i__1,nb3);
+/* Computing MAX */
+	i__1 = *n * 6, i__2 = *n * (nb + 1);
+	lopt = (*n << 1) + max(i__1,i__2);
+	work[1] = (real) lopt;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SGEGV ", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
-    WORK(1) = (real) lwkopt;
     if (*n == 0) {
 	return 0;
     }
@@ -339,7 +375,7 @@
 
 /*     Scale A */
 
-    anrm = slange_("M", n, n, &A(1,1), lda, &WORK(1));
+    anrm = slange_("M", n, n, &a[a_offset], lda, &work[1]);
     anrm1 = anrm;
     anrm2 = 1.f;
     if (anrm < 1.f) {
@@ -350,7 +386,7 @@
     }
 
     if (anrm > 0.f) {
-	slascl_("G", &c_n1, &c_n1, &anrm, &c_b14, n, n, &A(1,1), lda, &
+	slascl_("G", &c_n1, &c_n1, &anrm, &c_b27, n, n, &a[a_offset], lda, &
 		iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 10;
@@ -360,7 +396,7 @@
 
 /*     Scale B */
 
-    bnrm = slange_("M", n, n, &B(1,1), ldb, &WORK(1));
+    bnrm = slange_("M", n, n, &b[b_offset], ldb, &work[1]);
     bnrm1 = bnrm;
     bnrm2 = 1.f;
     if (bnrm < 1.f) {
@@ -371,7 +407,7 @@
     }
 
     if (bnrm > 0.f) {
-	slascl_("G", &c_n1, &c_n1, &bnrm, &c_b14, n, n, &B(1,1), ldb, &
+	slascl_("G", &c_n1, &c_n1, &bnrm, &c_b27, n, n, &b[b_offset], ldb, &
 		iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 10;
@@ -386,8 +422,8 @@
     ileft = 1;
     iright = *n + 1;
     iwork = iright + *n;
-    sggbal_("B", n, &A(1,1), lda, &B(1,1), ldb, &ilo, &ihi, &WORK(
-	    ileft), &WORK(iright), &WORK(iwork), &iinfo);
+    sggbal_("P", n, &a[a_offset], lda, &b[b_offset], ldb, &ilo, &ihi, &work[
+	    ileft], &work[iright], &work[iwork], &iinfo);
     if (iinfo != 0) {
 	*info = *n + 1;
 	goto L120;
@@ -406,11 +442,11 @@
     itau = iwork;
     iwork = itau + irows;
     i__1 = *lwork + 1 - iwork;
-    sgeqrf_(&irows, &icols, &B(ilo,ilo), ldb, &WORK(itau), &WORK(
-	    iwork), &i__1, &iinfo);
+    sgeqrf_(&irows, &icols, &b_ref(ilo, ilo), ldb, &work[itau], &work[iwork], 
+	    &i__1, &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork) + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[iwork] + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -419,12 +455,11 @@
     }
 
     i__1 = *lwork + 1 - iwork;
-    sormqr_("L", "T", &irows, &icols, &irows, &B(ilo,ilo), ldb, &
-	    WORK(itau), &A(ilo,ilo), lda, &WORK(iwork), &i__1, &
-	    iinfo);
+    sormqr_("L", "T", &irows, &icols, &irows, &b_ref(ilo, ilo), ldb, &work[
+	    itau], &a_ref(ilo, ilo), lda, &work[iwork], &i__1, &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork) + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[iwork] + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -433,16 +468,18 @@
     }
 
     if (ilvl) {
-	slaset_("Full", n, n, &c_b25, &c_b14, &VL(1,1), ldvl);
+	slaset_("Full", n, n, &c_b38, &c_b27, &vl[vl_offset], ldvl)
+		;
 	i__1 = irows - 1;
 	i__2 = irows - 1;
-	slacpy_("L", &i__1, &i__2, &B(ilo+1,ilo), ldb, &VL(ilo+1,ilo), ldvl);
+	slacpy_("L", &i__1, &i__2, &b_ref(ilo + 1, ilo), ldb, &vl_ref(ilo + 1,
+		 ilo), ldvl);
 	i__1 = *lwork + 1 - iwork;
-	sorgqr_(&irows, &irows, &irows, &VL(ilo,ilo), ldvl, &WORK(
-		itau), &WORK(iwork), &i__1, &iinfo);
+	sorgqr_(&irows, &irows, &irows, &vl_ref(ilo, ilo), ldvl, &work[itau], 
+		&work[iwork], &i__1, &iinfo);
 	if (iinfo >= 0) {
 /* Computing MAX */
-	    i__1 = lwkopt, i__2 = (integer) WORK(iwork) + iwork - 1;
+	    i__1 = lwkopt, i__2 = (integer) work[iwork] + iwork - 1;
 	    lwkopt = max(i__1,i__2);
 	}
 	if (iinfo != 0) {
@@ -452,7 +489,8 @@
     }
 
     if (ilvr) {
-	slaset_("Full", n, n, &c_b25, &c_b14, &VR(1,1), ldvr);
+	slaset_("Full", n, n, &c_b38, &c_b27, &vr[vr_offset], ldvr)
+		;
     }
 
 /*     Reduce to generalized Hessenberg form */
@@ -461,11 +499,12 @@
 
 /*        Eigenvectors requested -- work on whole matrix. */
 
-	sgghrd_(jobvl, jobvr, n, &ilo, &ihi, &A(1,1), lda, &B(1,1), 
-		ldb, &VL(1,1), ldvl, &VR(1,1), ldvr, &iinfo);
+	sgghrd_(jobvl, jobvr, n, &ilo, &ihi, &a[a_offset], lda, &b[b_offset], 
+		ldb, &vl[vl_offset], ldvl, &vr[vr_offset], ldvr, &iinfo);
     } else {
-	sgghrd_("N", "N", &irows, &c__1, &irows, &A(ilo,ilo), lda, 
-		&B(ilo,ilo), ldb, &VL(1,1), ldvl, &VR(1,1), ldvr, &iinfo);
+	sgghrd_("N", "N", &irows, &c__1, &irows, &a_ref(ilo, ilo), lda, &
+		b_ref(ilo, ilo), ldb, &vl[vl_offset], ldvl, &vr[vr_offset], 
+		ldvr, &iinfo);
     }
     if (iinfo != 0) {
 	*info = *n + 5;
@@ -483,11 +522,12 @@
 	*(unsigned char *)chtemp = 'E';
     }
     i__1 = *lwork + 1 - iwork;
-    shgeqz_(chtemp, jobvl, jobvr, n, &ilo, &ihi, &A(1,1), lda, &B(1,1), ldb, &ALPHAR(1), &ALPHAI(1), &BETA(1), &VL(1,1), 
-	    ldvl, &VR(1,1), ldvr, &WORK(iwork), &i__1, &iinfo);
+    shgeqz_(chtemp, jobvl, jobvr, n, &ilo, &ihi, &a[a_offset], lda, &b[
+	    b_offset], ldb, &alphar[1], &alphai[1], &beta[1], &vl[vl_offset], 
+	    ldvl, &vr[vr_offset], ldvr, &work[iwork], &i__1, &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork) + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[iwork] + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -503,8 +543,7 @@
 
     if (ilv) {
 
-/*        Compute Eigenvectors  (STGEVC requires 6*N words of workspac
-e) */
+/*        Compute Eigenvectors  (STGEVC requires 6*N words of workspace) */
 
 	if (ilvl) {
 	    if (ilvr) {
@@ -516,9 +555,9 @@ e) */
 	    *(unsigned char *)chtemp = 'R';
 	}
 
-	stgevc_(chtemp, "B", ldumma, n, &A(1,1), lda, &B(1,1), ldb, 
-		&VL(1,1), ldvl, &VR(1,1), ldvr, n, &in, &WORK(
-		iwork), &iinfo);
+	stgevc_(chtemp, "B", ldumma, n, &a[a_offset], lda, &b[b_offset], ldb, 
+		&vl[vl_offset], ldvl, &vr[vr_offset], ldvr, n, &in, &work[
+		iwork], &iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 7;
 	    goto L120;
@@ -527,33 +566,33 @@ e) */
 /*        Undo balancing on VL and VR, rescale */
 
 	if (ilvl) {
-	    sggbak_("B", "L", n, &ilo, &ihi, &WORK(ileft), &WORK(iright), n, &
-		    VL(1,1), ldvl, &iinfo);
+	    sggbak_("P", "L", n, &ilo, &ihi, &work[ileft], &work[iright], n, &
+		    vl[vl_offset], ldvl, &iinfo);
 	    if (iinfo != 0) {
 		*info = *n + 8;
 		goto L120;
 	    }
 	    i__1 = *n;
-	    for (jc = 1; jc <= *n; ++jc) {
-		if (ALPHAI(jc) < 0.f) {
+	    for (jc = 1; jc <= i__1; ++jc) {
+		if (alphai[jc] < 0.f) {
 		    goto L50;
 		}
 		temp = 0.f;
-		if (ALPHAI(jc) == 0.f) {
+		if (alphai[jc] == 0.f) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
+		    for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-			r__2 = temp, r__3 = (r__1 = VL(jr,jc), 
-				dabs(r__1));
+			r__2 = temp, r__3 = (r__1 = vl_ref(jr, jc), dabs(r__1)
+				);
 			temp = dmax(r__2,r__3);
 /* L10: */
 		    }
 		} else {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
+		    for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-			r__3 = temp, r__4 = (r__1 = VL(jr,jc), 
-				dabs(r__1)) + (r__2 = VL(jr,jc+1), dabs(r__2));
+			r__3 = temp, r__4 = (r__1 = vl_ref(jr, jc), dabs(r__1)
+				) + (r__2 = vl_ref(jr, jc + 1), dabs(r__2));
 			temp = dmax(r__3,r__4);
 /* L20: */
 		    }
@@ -562,17 +601,17 @@ e) */
 		    goto L50;
 		}
 		temp = 1.f / temp;
-		if (ALPHAI(jc) == 0.f) {
+		if (alphai[jc] == 0.f) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VL(jr,jc) *= temp;
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vl_ref(jr, jc) = vl_ref(jr, jc) * temp;
 /* L30: */
 		    }
 		} else {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VL(jr,jc) *= temp;
-			VL(jr,jc+1) *= temp;
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vl_ref(jr, jc) = vl_ref(jr, jc) * temp;
+			vl_ref(jr, jc + 1) = vl_ref(jr, jc + 1) * temp;
 /* L40: */
 		    }
 		}
@@ -581,33 +620,33 @@ L50:
 	    }
 	}
 	if (ilvr) {
-	    sggbak_("B", "R", n, &ilo, &ihi, &WORK(ileft), &WORK(iright), n, &
-		    VR(1,1), ldvr, &iinfo);
+	    sggbak_("P", "R", n, &ilo, &ihi, &work[ileft], &work[iright], n, &
+		    vr[vr_offset], ldvr, &iinfo);
 	    if (iinfo != 0) {
 		*info = *n + 9;
 		goto L120;
 	    }
 	    i__1 = *n;
-	    for (jc = 1; jc <= *n; ++jc) {
-		if (ALPHAI(jc) < 0.f) {
+	    for (jc = 1; jc <= i__1; ++jc) {
+		if (alphai[jc] < 0.f) {
 		    goto L100;
 		}
 		temp = 0.f;
-		if (ALPHAI(jc) == 0.f) {
+		if (alphai[jc] == 0.f) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
+		    for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-			r__2 = temp, r__3 = (r__1 = VR(jr,jc), 
-				dabs(r__1));
+			r__2 = temp, r__3 = (r__1 = vr_ref(jr, jc), dabs(r__1)
+				);
 			temp = dmax(r__2,r__3);
 /* L60: */
 		    }
 		} else {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
+		    for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-			r__3 = temp, r__4 = (r__1 = VR(jr,jc), 
-				dabs(r__1)) + (r__2 = VR(jr,jc+1), dabs(r__2));
+			r__3 = temp, r__4 = (r__1 = vr_ref(jr, jc), dabs(r__1)
+				) + (r__2 = vr_ref(jr, jc + 1), dabs(r__2));
 			temp = dmax(r__3,r__4);
 /* L70: */
 		    }
@@ -616,17 +655,17 @@ L50:
 		    goto L100;
 		}
 		temp = 1.f / temp;
-		if (ALPHAI(jc) == 0.f) {
+		if (alphai[jc] == 0.f) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VR(jr,jc) *= temp;
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vr_ref(jr, jc) = vr_ref(jr, jc) * temp;
 /* L80: */
 		    }
 		} else {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VR(jr,jc) *= temp;
-			VR(jr,jc+1) *= temp;
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vr_ref(jr, jc) = vr_ref(jr, jc) * temp;
+			vr_ref(jr, jc + 1) = vr_ref(jr, jc + 1) * temp;
 /* L90: */
 		    }
 		}
@@ -648,13 +687,13 @@ L100:
        if they are significant. */
 
     i__1 = *n;
-    for (jc = 1; jc <= *n; ++jc) {
-	absar = (r__1 = ALPHAR(jc), dabs(r__1));
-	absai = (r__1 = ALPHAI(jc), dabs(r__1));
-	absb = (r__1 = BETA(jc), dabs(r__1));
-	salfar = anrm * ALPHAR(jc);
-	salfai = anrm * ALPHAI(jc);
-	sbeta = bnrm * BETA(jc);
+    for (jc = 1; jc <= i__1; ++jc) {
+	absar = (r__1 = alphar[jc], dabs(r__1));
+	absai = (r__1 = alphai[jc], dabs(r__1));
+	absb = (r__1 = beta[jc], dabs(r__1));
+	salfar = anrm * alphar[jc];
+	salfai = anrm * alphai[jc];
+	sbeta = bnrm * beta[jc];
 	ilimit = FALSE_;
 	scale = 1.f;
 
@@ -671,14 +710,13 @@ L100:
 
 	} else if (salfai == 0.f) {
 
-/*           If insignificant underflow in ALPHAI, then make the 
-  
+/*           If insignificant underflow in ALPHAI, then make the   
              conjugate eigenvalue real. */
 
-	    if (ALPHAI(jc) < 0.f && jc > 1) {
-		ALPHAI(jc - 1) = 0.f;
-	    } else if (ALPHAI(jc) > 0.f && jc < *n) {
-		ALPHAI(jc + 1) = 0.f;
+	    if (alphai[jc] < 0.f && jc > 1) {
+		alphai[jc - 1] = 0.f;
+	    } else if (alphai[jc] > 0.f && jc < *n) {
+		alphai[jc + 1] = 0.f;
 	    }
 	}
 
@@ -728,22 +766,28 @@ L100:
 /*        Recompute un-scaled ALPHAR, ALPHAI, BETA if necessary. */
 
 	if (ilimit) {
-	    salfar = scale * ALPHAR(jc) * anrm;
-	    salfai = scale * ALPHAI(jc) * anrm;
-	    sbeta = scale * BETA(jc) * bnrm;
+	    salfar = scale * alphar[jc] * anrm;
+	    salfai = scale * alphai[jc] * anrm;
+	    sbeta = scale * beta[jc] * bnrm;
 	}
-	ALPHAR(jc) = salfar;
-	ALPHAI(jc) = salfai;
-	BETA(jc) = sbeta;
+	alphar[jc] = salfar;
+	alphai[jc] = salfai;
+	beta[jc] = sbeta;
 /* L110: */
     }
 
 L120:
-    WORK(1) = (real) lwkopt;
+    work[1] = (real) lwkopt;
 
     return 0;
 
 /*     End of SGEGV */
 
 } /* sgegv_ */
+
+#undef vr_ref
+#undef vl_ref
+#undef b_ref
+#undef a_ref
+
 

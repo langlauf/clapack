@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static complex c_b21 = {-1.f,0.f};
 static complex c_b22 = {1.f,0.f};
 
 /* Subroutine */ int cqlt03_(integer *m, integer *n, integer *k, complex *af, 
-	complex *c, complex *cc, complex *q, integer *lda, complex *tau, 
+	complex *c__, complex *cc, complex *q, integer *lda, complex *tau, 
 	complex *work, integer *lwork, real *rwork, real *result)
 {
     /* Initialized data */
@@ -61,7 +62,15 @@ static complex c_b22 = {1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -83,14 +92,12 @@ static complex c_b22 = {1.f,0.f};
             The order of the orthogonal matrix Q.  M >= 0.   
 
     N       (input) INTEGER   
-            The number of rows or columns of the matrix C; C is m-by-n if 
-  
+            The number of rows or columns of the matrix C; C is m-by-n if   
             Q is applied from the left, or n-by-m if Q is applied from   
             the right.  N >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             orthogonal matrix Q.  M >= K >= 0.   
 
     AF      (input) COMPLEX array, dimension (LDA,N)   
@@ -107,15 +114,13 @@ static complex c_b22 = {1.f,0.f};
             The leading dimension of the arrays AF, C, CC, and Q.   
 
     TAU     (input) COMPLEX array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the QL factorization in AF.   
 
     WORK    (workspace) COMPLEX array, dimension (LWORK)   
 
     LWORK   (input) INTEGER   
-            The length of WORK.  LWORK must be at least M, and should be 
-  
+            The length of WORK.  LWORK must be at least M, and should be   
             M*NB, where NB is the blocksize for this environment.   
 
     RWORK   (workspace) REAL array, dimension (M)   
@@ -128,21 +133,20 @@ static complex c_b22 = {1.f,0.f};
             RESULT(3) = norm( Q'*C - Q'*C )/ ( M * norm(C) * EPS )   
             RESULT(4) = norm( C*Q' - C*Q' )/ ( M * norm(C) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     cc_dim1 = *lda;
-    cc_offset = cc_dim1 + 1;
+    cc_offset = 1 + cc_dim1 * 1;
     cc -= cc_offset;
     c_dim1 = *lda;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     --tau;
     --work;
@@ -169,19 +173,19 @@ static complex c_b22 = {1.f,0.f};
     claset_("Full", m, m, &c_b1, &c_b1, &q[q_offset], lda);
     if (*k > 0 && *m > *k) {
 	i__1 = *m - *k;
-	clacpy_("Full", &i__1, k, &af[(*n - *k + 1) * af_dim1 + 1], lda, &q[(*
-		m - *k + 1) * q_dim1 + 1], lda);
+	clacpy_("Full", &i__1, k, &af_ref(1, *n - *k + 1), lda, &q_ref(1, *m 
+		- *k + 1), lda);
     }
     if (*k > 1) {
 	i__1 = *k - 1;
 	i__2 = *k - 1;
-	clacpy_("Upper", &i__1, &i__2, &af[*m - *k + 1 + (*n - *k + 2) * 
-		af_dim1], lda, &q[*m - *k + 1 + (*m - *k + 2) * q_dim1], lda);
+	clacpy_("Upper", &i__1, &i__2, &af_ref(*m - *k + 1, *n - *k + 2), lda,
+		 &q_ref(*m - *k + 1, *m - *k + 2), lda);
     }
 
 /*     Generate the m-by-m matrix Q */
 
-    s_copy(srnamc_1.srnamt, "CUNGQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNGQL", (ftnlen)6, (ftnlen)6);
     cungql_(m, m, k, &q[q_offset], lda, &tau[minmn - *k + 1], &work[1], lwork,
 	     &info);
 
@@ -200,10 +204,10 @@ static complex c_b22 = {1.f,0.f};
 
 	i__1 = nc;
 	for (j = 1; j <= i__1; ++j) {
-	    clarnv_(&c__2, iseed, &mc, &c[j * c_dim1 + 1]);
+	    clarnv_(&c__2, iseed, &mc, &c___ref(1, j));
 /* L10: */
 	}
-	cnorm = clange_("1", &mc, &nc, &c[c_offset], lda, &rwork[1]);
+	cnorm = clange_("1", &mc, &nc, &c__[c_offset], lda, &rwork[1]);
 	if (cnorm == 0.f) {
 	    cnorm = 1.f;
 	}
@@ -217,33 +221,33 @@ static complex c_b22 = {1.f,0.f};
 
 /*           Copy C */
 
-	    clacpy_("Full", &mc, &nc, &c[c_offset], lda, &cc[cc_offset], lda);
+	    clacpy_("Full", &mc, &nc, &c__[c_offset], lda, &cc[cc_offset], 
+		    lda);
 
 /*           Apply Q or Q' to C */
 
-	    s_copy(srnamc_1.srnamt, "CUNMQL", 6L, 6L);
+	    s_copy(srnamc_1.srnamt, "CUNMQL", (ftnlen)6, (ftnlen)6);
 	    if (*k > 0) {
-		cunmql_(side, trans, &mc, &nc, k, &af[(*n - *k + 1) * af_dim1 
-			+ 1], lda, &tau[minmn - *k + 1], &cc[cc_offset], lda, 
-			&work[1], lwork, &info);
+		cunmql_(side, trans, &mc, &nc, k, &af_ref(1, *n - *k + 1), 
+			lda, &tau[minmn - *k + 1], &cc[cc_offset], lda, &work[
+			1], lwork, &info);
 	    }
 
 /*           Form explicit product and subtract */
 
 	    if (lsame_(side, "L")) {
 		cgemm_(trans, "No transpose", &mc, &nc, &mc, &c_b21, &q[
-			q_offset], lda, &c[c_offset], lda, &c_b22, &cc[
+			q_offset], lda, &c__[c_offset], lda, &c_b22, &cc[
 			cc_offset], lda);
 	    } else {
-		cgemm_("No transpose", trans, &mc, &nc, &nc, &c_b21, &c[
+		cgemm_("No transpose", trans, &mc, &nc, &nc, &c_b21, &c__[
 			c_offset], lda, &q[q_offset], lda, &c_b22, &cc[
 			cc_offset], lda);
 	    }
 
 /*           Compute error in the difference */
 
-	    resid = clange_("1", &mc, &nc, &cc[cc_offset], lda, &rwork[1])
-		    ;
+	    resid = clange_("1", &mc, &nc, &cc[cc_offset], lda, &rwork[1]);
 	    result[(iside - 1 << 1) + itrans] = resid / ((real) max(1,*m) * 
 		    cnorm * eps);
 
@@ -257,4 +261,12 @@ static complex c_b22 = {1.f,0.f};
 /*     End of CQLT03 */
 
 } /* cqlt03_ */
+
+#undef af_ref
+#undef af_subscr
+#undef q_ref
+#undef q_subscr
+#undef c___ref
+#undef c___subscr
+
 

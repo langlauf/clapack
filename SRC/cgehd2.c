@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgehd2_(integer *n, integer *ilo, integer *ihi, complex *
 	a, integer *lda, complex *tau, complex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -12,8 +13,7 @@
     Purpose   
     =======   
 
-    CGEHD2 reduces a complex general matrix A to upper Hessenberg form H 
-  
+    CGEHD2 reduces a complex general matrix A to upper Hessenberg form H   
     by a unitary similarity transformation:  Q' * A * Q = H .   
 
     Arguments   
@@ -42,8 +42,7 @@
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     TAU     (output) COMPLEX array, dimension (N-1)   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) COMPLEX array, dimension (N)   
@@ -82,19 +81,15 @@
     (                         a )    (                          a )   
 
     where a denotes an element of the original matrix A, h denotes a   
-    modified element of the upper Hessenberg matrix H, and vi denotes an 
-  
+    modified element of the upper Hessenberg matrix H, and vi denotes an   
     element of the vector defining H(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -104,20 +99,23 @@
     /* Builtin functions */
     void r_cnjg(complex *, complex *);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static complex alpha;
     extern /* Subroutine */ int clarf_(char *, integer *, integer *, complex *
 	    , integer *, complex *, complex *, integer *, complex *), 
 	    clarfg_(integer *, complex *, complex *, integer *, complex *), 
 	    xerbla_(char *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -135,35 +133,35 @@
     }
 
     i__1 = *ihi - 1;
-    for (i = *ilo; i <= *ihi-1; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 
-/*        Compute elementary reflector H(i) to annihilate A(i+2:ihi,i)
- */
+/*        Compute elementary reflector H(i) to annihilate A(i+2:ihi,i) */
 
-	i__2 = i + 1 + i * a_dim1;
-	alpha.r = A(i+1,i).r, alpha.i = A(i+1,i).i;
-	i__2 = *ihi - i;
+	i__2 = a_subscr(i__ + 1, i__);
+	alpha.r = a[i__2].r, alpha.i = a[i__2].i;
 /* Computing MIN */
-	i__3 = i + 2;
-	clarfg_(&i__2, &alpha, &A(min(i+2,*n),i), &c__1, &TAU(i));
-	i__2 = i + 1 + i * a_dim1;
-	A(i+1,i).r = 1.f, A(i+1,i).i = 0.f;
+	i__2 = i__ + 2;
+	i__3 = *ihi - i__;
+	clarfg_(&i__3, &alpha, &a_ref(min(i__2,*n), i__), &c__1, &tau[i__]);
+	i__2 = a_subscr(i__ + 1, i__);
+	a[i__2].r = 1.f, a[i__2].i = 0.f;
 
 /*        Apply H(i) to A(1:ihi,i+1:ihi) from the right */
 
-	i__2 = *ihi - i;
-	clarf_("Right", ihi, &i__2, &A(i+1,i), &c__1, &TAU(i), &
-		A(1,i+1), lda, &WORK(1));
+	i__2 = *ihi - i__;
+	clarf_("Right", ihi, &i__2, &a_ref(i__ + 1, i__), &c__1, &tau[i__], &
+		a_ref(1, i__ + 1), lda, &work[1]);
 
 /*        Apply H(i)' to A(i+1:ihi,i+1:n) from the left */
 
-	i__2 = *ihi - i;
-	i__3 = *n - i;
-	r_cnjg(&q__1, &TAU(i));
-	clarf_("Left", &i__2, &i__3, &A(i+1,i), &c__1, &q__1, &A(i+1,i+1), lda, &WORK(1));
+	i__2 = *ihi - i__;
+	i__3 = *n - i__;
+	r_cnjg(&q__1, &tau[i__]);
+	clarf_("Left", &i__2, &i__3, &a_ref(i__ + 1, i__), &c__1, &q__1, &
+		a_ref(i__ + 1, i__ + 1), lda, &work[1]);
 
-	i__2 = i + 1 + i * a_dim1;
-	A(i+1,i).r = alpha.r, A(i+1,i).i = alpha.i;
+	i__2 = a_subscr(i__ + 1, i__);
+	a[i__2].r = alpha.r, a[i__2].i = alpha.i;
 /* L10: */
     }
 
@@ -172,4 +170,8 @@
 /*     End of CGEHD2 */
 
 } /* cgehd2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlaset_(char *uplo, integer *m, integer *n, doublereal *
 	alpha, doublereal *beta, doublereal *a, integer *lda)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -20,11 +21,9 @@
 
     UPLO    (input) CHARACTER*1   
             Specifies the part of the matrix A to be set.   
-            = 'U':      Upper triangular part is set; the strictly lower 
-  
+            = 'U':      Upper triangular part is set; the strictly lower   
                         triangular part of A is not changed.   
-            = 'L':      Lower triangular part is set; the strictly upper 
-  
+            = 'L':      Lower triangular part is set; the strictly upper   
                         triangular part of A is not changed.   
             Otherwise:  All of the matrix A is set.   
 
@@ -35,15 +34,13 @@
             The number of columns of the matrix A.  N >= 0.   
 
     ALPHA   (input) DOUBLE PRECISION   
-            The constant to which the offdiagonal elements are to be set. 
-  
+            The constant to which the offdiagonal elements are to be set.   
 
     BETA    (input) DOUBLE PRECISION   
             The constant to which the diagonal elements are to be set.   
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On exit, the leading m-by-n submatrix of A is set as follows: 
-  
+            On exit, the leading m-by-n submatrix of A is set as follows:   
 
             if UPLO = 'U', A(i,j) = ALPHA, 1<=i<=j-1, 1<=j<=n,   
             if UPLO = 'L', A(i,j) = ALPHA, j+1<=i<=m, 1<=j<=n,   
@@ -54,36 +51,34 @@
     LDA     (input) INTEGER   
             The leading dimension of the array A.  LDA >= max(1,M).   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (lsame_(uplo, "U")) {
 
-/*        Set the strictly upper triangular or trapezoidal part of the
-   
+/*        Set the strictly upper triangular or trapezoidal part of the   
           array to ALPHA. */
 
 	i__1 = *n;
-	for (j = 2; j <= *n; ++j) {
+	for (j = 2; j <= i__1; ++j) {
 /* Computing MIN */
 	    i__3 = j - 1;
 	    i__2 = min(i__3,*m);
-	    for (i = 1; i <= min(j-1,*m); ++i) {
-		A(i,j) = *alpha;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = *alpha;
 /* L10: */
 	    }
 /* L20: */
@@ -91,15 +86,14 @@
 
     } else if (lsame_(uplo, "L")) {
 
-/*        Set the strictly lower triangular or trapezoidal part of the
-   
+/*        Set the strictly lower triangular or trapezoidal part of the   
           array to ALPHA. */
 
 	i__1 = min(*m,*n);
-	for (j = 1; j <= min(*m,*n); ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = j + 1; i <= *m; ++i) {
-		A(i,j) = *alpha;
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = *alpha;
 /* L30: */
 	    }
 /* L40: */
@@ -110,10 +104,10 @@
 /*        Set the leading m-by-n submatrix to ALPHA. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		A(i,j) = *alpha;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = *alpha;
 /* L50: */
 	    }
 /* L60: */
@@ -123,8 +117,8 @@
 /*     Set the first min(M,N) diagonal elements to BETA. */
 
     i__1 = min(*m,*n);
-    for (i = 1; i <= min(*m,*n); ++i) {
-	A(i,i) = *beta;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	a_ref(i__, i__) = *beta;
 /* L70: */
     }
 
@@ -133,4 +127,7 @@
 /*     End of DLASET */
 
 } /* dlaset_ */
+
+#undef a_ref
+
 

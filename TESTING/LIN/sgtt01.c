@@ -1,11 +1,12 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 
-/* Subroutine */ int sgtt01_(integer *n, real *dl, real *d, real *du, real *
+/* Subroutine */ int sgtt01_(integer *n, real *dl, real *d__, real *du, real *
 	dlf, real *df, real *duf, real *du2, integer *ipiv, real *work, 
 	integer *ldwork, real *rwork, real *resid)
 {
@@ -13,7 +14,7 @@
     integer work_dim1, work_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real anorm;
     static integer lastj;
     extern /* Subroutine */ int sswap_(integer *, real *, integer *, real *, 
@@ -27,7 +28,10 @@
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -36,8 +40,7 @@
     Purpose   
     =======   
 
-    SGTT01 reconstructs a tridiagonal matrix A from its LU factorization 
-  
+    SGTT01 reconstructs a tridiagonal matrix A from its LU factorization   
     and computes the residual   
        norm(L*U - A) / ( norm(A) * EPS ),   
     where EPS is the machine epsilon.   
@@ -62,8 +65,7 @@
             LU factorization of A.   
 
     DF      (input) REAL array, dimension (N)   
-            The n diagonal elements of the upper triangular matrix U from 
-  
+            The n diagonal elements of the upper triangular matrix U from   
             the LU factorization of A.   
 
     DUF     (input) REAL array, dimension (N-1)   
@@ -74,31 +76,28 @@
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices; for 1 <= i <= n, row i of the matrix was   
-            interchanged with row IPIV(i).  IPIV(i) will always be either 
-  
+            interchanged with row IPIV(i).  IPIV(i) will always be either   
             i or i+1; IPIV(i) = i indicates a row interchange was not   
             required.   
 
     WORK    (workspace) REAL array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) REAL array, dimension (N)   
 
     RESID   (output) REAL   
             The scaled residual:  norm(L*U - A) / (norm(A) * EPS)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     --dl;
-    --d;
+    --d__;
     --du;
     --dlf;
     --df;
@@ -106,7 +105,7 @@
     --du2;
     --ipiv;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -123,29 +122,29 @@
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    work[i + j * work_dim1] = 0.f;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work_ref(i__, j) = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	if (i == 1) {
-	    work[i + i * work_dim1] = df[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (i__ == 1) {
+	    work_ref(i__, i__) = df[i__];
 	    if (*n >= 2) {
-		work[i + (i + 1) * work_dim1] = duf[i];
+		work_ref(i__, i__ + 1) = duf[i__];
 	    }
 	    if (*n >= 3) {
-		work[i + (i + 2) * work_dim1] = du2[i];
+		work_ref(i__, i__ + 2) = du2[i__];
 	    }
-	} else if (i == *n) {
-	    work[i + i * work_dim1] = df[i];
+	} else if (i__ == *n) {
+	    work_ref(i__, i__) = df[i__];
 	} else {
-	    work[i + i * work_dim1] = df[i];
-	    work[i + (i + 1) * work_dim1] = duf[i];
-	    if (i < *n - 1) {
-		work[i + (i + 2) * work_dim1] = du2[i];
+	    work_ref(i__, i__) = df[i__];
+	    work_ref(i__, i__ + 1) = duf[i__];
+	    if (i__ < *n - 1) {
+		work_ref(i__, i__ + 2) = du2[i__];
 	    }
 	}
 /* L30: */
@@ -154,48 +153,49 @@
 /*     Multiply on the left by L. */
 
     lastj = *n;
-    for (i = *n - 1; i >= 1; --i) {
-	li = dlf[i];
-	i__1 = lastj - i + 1;
-	saxpy_(&i__1, &li, &work[i + i * work_dim1], ldwork, &work[i + 1 + i *
-		 work_dim1], ldwork);
-	ip = ipiv[i];
-	if (ip == i) {
+    for (i__ = *n - 1; i__ >= 1; --i__) {
+	li = dlf[i__];
+	i__1 = lastj - i__ + 1;
+	saxpy_(&i__1, &li, &work_ref(i__, i__), ldwork, &work_ref(i__ + 1, 
+		i__), ldwork);
+	ip = ipiv[i__];
+	if (ip == i__) {
 /* Computing MIN */
-	    i__1 = i + 2;
+	    i__1 = i__ + 2;
 	    lastj = min(i__1,*n);
 	} else {
-	    i__1 = lastj - i + 1;
-	    sswap_(&i__1, &work[i + i * work_dim1], ldwork, &work[i + 1 + i * 
-		    work_dim1], ldwork);
+	    i__1 = lastj - i__ + 1;
+	    sswap_(&i__1, &work_ref(i__, i__), ldwork, &work_ref(i__ + 1, i__)
+		    , ldwork);
 	}
 /* L40: */
     }
 
 /*     Subtract the matrix A. */
 
-    work[work_dim1 + 1] -= d[1];
+    work_ref(1, 1) = work_ref(1, 1) - d__[1];
     if (*n > 1) {
-	work[(work_dim1 << 1) + 1] -= du[1];
-	work[*n + (*n - 1) * work_dim1] -= dl[*n - 1];
-	work[*n + *n * work_dim1] -= d[*n];
+	work_ref(1, 2) = work_ref(1, 2) - du[1];
+	work_ref(*n, *n - 1) = work_ref(*n, *n - 1) - dl[*n - 1];
+	work_ref(*n, *n) = work_ref(*n, *n) - d__[*n];
 	i__1 = *n - 1;
-	for (i = 2; i <= i__1; ++i) {
-	    work[i + (i - 1) * work_dim1] -= dl[i - 1];
-	    work[i + i * work_dim1] -= d[i];
-	    work[i + (i + 1) * work_dim1] -= du[i];
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    work_ref(i__, i__ - 1) = work_ref(i__, i__ - 1) - dl[i__ - 1];
+	    work_ref(i__, i__) = work_ref(i__, i__) - d__[i__];
+	    work_ref(i__, i__ + 1) = work_ref(i__, i__ + 1) - du[i__];
 /* L50: */
 	}
     }
 
 /*     Compute the 1-norm of the tridiagonal matrix A. */
 
-    anorm = slangt_("1", n, &dl[1], &d[1], &du[1]);
+    anorm = slangt_("1", n, &dl[1], &d__[1], &du[1]);
 
 /*     Compute the 1-norm of WORK, which is only guaranteed to be   
        upper Hessenberg. */
 
-    *resid = slanhs_("1", n, &work[work_offset], ldwork, &rwork[1]);
+    *resid = slanhs_("1", n, &work[work_offset], ldwork, &rwork[1])
+	    ;
 
 /*     Compute norm(L*U - A) / (norm(A) * EPS) */
 
@@ -212,4 +212,7 @@
 /*     End of SGTT01 */
 
 } /* sgtt01_ */
+
+#undef work_ref
+
 

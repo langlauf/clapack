@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,7 @@ static integer c__15 = 15;
 static logical c_false = FALSE_;
 
 /* Subroutine */ int chseqr_(char *job, char *compz, integer *n, integer *ilo,
-	 integer *ihi, complex *h, integer *ldh, complex *w, complex *z, 
+	 integer *ihi, complex *h__, integer *ldh, complex *w, complex *z__, 
 	integer *ldz, complex *work, integer *lwork, integer *info)
 {
     /* System generated locals */
@@ -34,7 +35,6 @@ static logical c_false = FALSE_;
     integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4[2], 
 	    i__5, i__6;
     real r__1, r__2, r__3, r__4;
-    doublereal d__1;
     complex q__1;
     char ch__1[2];
 
@@ -48,7 +48,7 @@ static logical c_false = FALSE_;
     static real unfl;
     static complex temp;
     static real ovfl, opst;
-    static integer i, j, k, l;
+    static integer i__, j, k, l;
     static complex s[225]	/* was [15][15] */;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
@@ -86,17 +86,25 @@ static logical c_false = FALSE_;
 	    *, complex *, complex *, integer *, complex *), xerbla_(
 	    char *, integer *);
     static real smlnum;
+    static logical lquery;
     static integer itn;
     static complex tau;
     static integer its;
     static real ulp, tst1;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define s_subscr(a_1,a_2) (a_2)*15 + a_1 - 16
+#define s_ref(a_1,a_2) s[s_subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count.   
 
@@ -142,8 +150,7 @@ static logical c_false = FALSE_;
 
     H       (input/output) COMPLEX array, dimension (LDH,N)   
             On entry, the upper Hessenberg matrix H.   
-            On exit, if JOB = 'S', H contains the upper triangular matrix 
-  
+            On exit, if JOB = 'S', H contains the upper triangular matrix   
             T from the Schur decomposition (the Schur form). If   
             JOB = 'E', the contents of H are unspecified on exit.   
 
@@ -152,8 +159,7 @@ static logical c_false = FALSE_;
 
     W       (output) COMPLEX array, dimension (N)   
             The computed eigenvalues. If JOB = 'S', the eigenvalues are   
-            stored in the same order as on the diagonal of the Schur form 
-  
+            stored in the same order as on the diagonal of the Schur form   
             returned in H, with W(i) = H(i,i).   
 
     Z       (input/output) COMPLEX array, dimension (LDZ,N)   
@@ -170,10 +176,16 @@ static logical c_false = FALSE_;
             The leading dimension of the array Z.   
             LDZ >= max(1,N) if COMPZ = 'I' or 'V'; LDZ >= 1 otherwise.   
 
-    WORK    (workspace) COMPLEX array, dimension (N)   
+    WORK    (workspace/output) COMPLEX array, dimension (LWORK)   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
-            This argument is currently redundant.   
+            The dimension of the array WORK.  LWORK >= max(1,N).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -183,20 +195,19 @@ static logical c_false = FALSE_;
                   elements 1:ilo-1 and i+1:n of W contain those   
                   eigenvalues which have been successfully computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters   
 
        Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     --w;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --work;
 
     /* Function Body */
@@ -205,6 +216,9 @@ static logical c_false = FALSE_;
     wantz = initz || lsame_(compz, "V");
 
     *info = 0;
+    i__1 = max(1,*n);
+    work[1].r = (real) i__1, work[1].i = 0.f;
+    lquery = *lwork == -1;
     if (! lsame_(job, "E") && ! wantt) {
 	*info = -1;
     } else if (! lsame_(compz, "N") && ! wantz) {
@@ -219,10 +233,14 @@ static logical c_false = FALSE_;
 	*info = -7;
     } else if (*ldz < 1 || wantz && *ldz < max(1,*n)) {
 	*info = -10;
+    } else if (*lwork < max(1,*n) && ! lquery) {
+	*info = -12;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CHSEQR", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 /* **   
@@ -233,23 +251,23 @@ static logical c_false = FALSE_;
        Initialize Z, if necessary */
 
     if (initz) {
-	claset_("Full", n, n, &c_b1, &c_b2, &z[z_offset], ldz);
+	claset_("Full", n, n, &c_b1, &c_b2, &z__[z_offset], ldz);
     }
 
 /*     Store the eigenvalues isolated by CGEBAL. */
 
     i__1 = *ilo - 1;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i;
-	i__3 = i + i * h_dim1;
-	w[i__2].r = h[i__3].r, w[i__2].i = h[i__3].i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	i__3 = h___subscr(i__, i__);
+	w[i__2].r = h__[i__3].r, w[i__2].i = h__[i__3].i;
 /* L10: */
     }
     i__1 = *n;
-    for (i = *ihi + 1; i <= i__1; ++i) {
-	i__2 = i;
-	i__3 = i + i * h_dim1;
-	w[i__2].r = h[i__3].r, w[i__2].i = h[i__3].i;
+    for (i__ = *ihi + 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	i__3 = h___subscr(i__, i__);
+	w[i__2].r = h__[i__3].r, w[i__2].i = h__[i__3].i;
 /* L20: */
     }
 
@@ -260,8 +278,8 @@ static logical c_false = FALSE_;
     }
     if (*ilo == *ihi) {
 	i__1 = *ilo;
-	i__2 = *ilo + *ilo * h_dim1;
-	w[i__1].r = h[i__2].r, w[i__1].i = h[i__2].i;
+	i__2 = h___subscr(*ilo, *ilo);
+	w[i__1].r = h__[i__2].r, w[i__1].i = h__[i__2].i;
 	return 0;
     }
 
@@ -271,9 +289,9 @@ static logical c_false = FALSE_;
     i__1 = *ihi - 2;
     for (j = *ilo; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = j + 2; i <= i__2; ++i) {
-	    i__3 = i + j * h_dim1;
-	    h[i__3].r = 0.f, h[i__3].i = 0.f;
+	for (i__ = j + 2; i__ <= i__2; ++i__) {
+	    i__3 = h___subscr(i__, j);
+	    h__[i__3].r = 0.f, h__[i__3].i = 0.f;
 /* L30: */
 	}
 /* L40: */
@@ -281,8 +299,7 @@ static logical c_false = FALSE_;
     nh = *ihi - *ilo + 1;
 
 /*     I1 and I2 are the indices of the first row and last column of H   
-       to which transformations must be applied. If eigenvalues only are 
-  
+       to which transformations must be applied. If eigenvalues only are   
        being computed, I1 and I2 are re-set inside the main loop. */
 
     if (wantt) {
@@ -296,37 +313,37 @@ static logical c_false = FALSE_;
 /*     Ensure that the subdiagonal elements are real. */
 
     i__1 = *ihi;
-    for (i = *ilo + 1; i <= i__1; ++i) {
-	i__2 = i + (i - 1) * h_dim1;
-	temp.r = h[i__2].r, temp.i = h[i__2].i;
+    for (i__ = *ilo + 1; i__ <= i__1; ++i__) {
+	i__2 = h___subscr(i__, i__ - 1);
+	temp.r = h__[i__2].r, temp.i = h__[i__2].i;
 	if (r_imag(&temp) != 0.f) {
 	    r__1 = temp.r;
 	    r__2 = r_imag(&temp);
 	    rtemp = slapy2_(&r__1, &r__2);
-	    i__2 = i + (i - 1) * h_dim1;
-	    h[i__2].r = rtemp, h[i__2].i = 0.f;
+	    i__2 = h___subscr(i__, i__ - 1);
+	    h__[i__2].r = rtemp, h__[i__2].i = 0.f;
 	    q__1.r = temp.r / rtemp, q__1.i = temp.i / rtemp;
 	    temp.r = q__1.r, temp.i = q__1.i;
-	    if (i2 > i) {
-		i__2 = i2 - i;
+	    if (i2 > i__) {
+		i__2 = i2 - i__;
 		r_cnjg(&q__1, &temp);
-		cscal_(&i__2, &q__1, &h[i + (i + 1) * h_dim1], ldh);
+		cscal_(&i__2, &q__1, &h___ref(i__, i__ + 1), ldh);
 	    }
-	    i__2 = i - i1;
-	    cscal_(&i__2, &temp, &h[i1 + i * h_dim1], &c__1);
-	    if (i < *ihi) {
-		i__2 = i + 1 + i * h_dim1;
-		i__3 = i + 1 + i * h_dim1;
-		q__1.r = temp.r * h[i__3].r - temp.i * h[i__3].i, q__1.i = 
-			temp.r * h[i__3].i + temp.i * h[i__3].r;
-		h[i__2].r = q__1.r, h[i__2].i = q__1.i;
+	    i__2 = i__ - i1;
+	    cscal_(&i__2, &temp, &h___ref(i1, i__), &c__1);
+	    if (i__ < *ihi) {
+		i__2 = h___subscr(i__ + 1, i__);
+		i__3 = h___subscr(i__ + 1, i__);
+		q__1.r = temp.r * h__[i__3].r - temp.i * h__[i__3].i, q__1.i =
+			 temp.r * h__[i__3].i + temp.i * h__[i__3].r;
+		h__[i__2].r = q__1.r, h__[i__2].i = q__1.i;
 	    }
 /* **   
              Increment op count */
 	    opst += (i2 - i1 + 2) * 6;
 /* ** */
 	    if (wantz) {
-		cscal_(&nh, &temp, &z[*ilo + i * z_dim1], &c__1);
+		cscal_(&nh, &temp, &z___ref(*ilo, i__), &c__1);
 /* **   
                 Increment op count */
 		opst += nh * 6;
@@ -341,19 +358,21 @@ static logical c_false = FALSE_;
    Writing concatenation */
     i__4[0] = 1, a__1[0] = job;
     i__4[1] = 1, a__1[1] = compz;
-    s_cat(ch__1, a__1, i__4, &c__2, 2L);
-    ns = ilaenv_(&c__4, "CHSEQR", ch__1, n, ilo, ihi, &c_n1, 6L, 2L);
+    s_cat(ch__1, a__1, i__4, &c__2, (ftnlen)2);
+    ns = ilaenv_(&c__4, "CHSEQR", ch__1, n, ilo, ihi, &c_n1, (ftnlen)6, (
+	    ftnlen)2);
 /* Writing concatenation */
     i__4[0] = 1, a__1[0] = job;
     i__4[1] = 1, a__1[1] = compz;
-    s_cat(ch__1, a__1, i__4, &c__2, 2L);
-    maxb = ilaenv_(&c__8, "CHSEQR", ch__1, n, ilo, ihi, &c_n1, 6L, 2L);
+    s_cat(ch__1, a__1, i__4, &c__2, (ftnlen)2);
+    maxb = ilaenv_(&c__8, "CHSEQR", ch__1, n, ilo, ihi, &c_n1, (ftnlen)6, (
+	    ftnlen)2);
     if (ns <= 1 || ns > nh || maxb >= nh) {
 
 /*        Use the standard double-shift algorithm */
 
-	clahqr_(&wantt, &wantz, n, ilo, ihi, &h[h_offset], ldh, &w[1], ilo, 
-		ihi, &z[z_offset], ldz, info);
+	clahqr_(&wantt, &wantz, n, ilo, ihi, &h__[h_offset], ldh, &w[1], ilo, 
+		ihi, &z__[z_offset], ldz, info);
 	return 0;
     }
     maxb = max(2,maxb);
@@ -376,22 +395,19 @@ static logical c_false = FALSE_;
 
     itn = nh * 30;
 
-/*     The main loop begins here. I is the loop index and decreases from 
-  
+/*     The main loop begins here. I is the loop index and decreases from   
        IHI to ILO in steps of at most MAXB. Each iteration of the loop   
        works with the active submatrix in rows and columns L to I.   
-       Eigenvalues I+1 to IHI have already converged. Either L = ILO, or 
-  
+       Eigenvalues I+1 to IHI have already converged. Either L = ILO, or   
        H(L,L-1) is negligible so that the matrix splits. */
 
-    i = *ihi;
+    i__ = *ihi;
 L60:
-    if (i < *ilo) {
+    if (i__ < *ilo) {
 	goto L180;
     }
 
-/*     Perform multiple-shift QR iterations on rows and columns ILO to I 
-  
+/*     Perform multiple-shift QR iterations on rows and columns ILO to I   
        until a submatrix of order at most MAXB splits off at the bottom   
        because a subdiagonal element has become negligible. */
 
@@ -402,26 +418,24 @@ L60:
 /*        Look for a single small subdiagonal element. */
 
 	i__2 = l + 1;
-	for (k = i; k >= i__2; --k) {
-	    i__3 = k - 1 + (k - 1) * h_dim1;
-	    i__5 = k + k * h_dim1;
-	    tst1 = (r__1 = h[i__3].r, dabs(r__1)) + (r__2 = r_imag(&h[k - 1 + 
-		    (k - 1) * h_dim1]), dabs(r__2)) + ((r__3 = h[i__5].r, 
-		    dabs(r__3)) + (r__4 = r_imag(&h[k + k * h_dim1]), dabs(
-		    r__4)));
+	for (k = i__; k >= i__2; --k) {
+	    i__3 = h___subscr(k - 1, k - 1);
+	    i__5 = h___subscr(k, k);
+	    tst1 = (r__1 = h__[i__3].r, dabs(r__1)) + (r__2 = r_imag(&h___ref(
+		    k - 1, k - 1)), dabs(r__2)) + ((r__3 = h__[i__5].r, dabs(
+		    r__3)) + (r__4 = r_imag(&h___ref(k, k)), dabs(r__4)));
 	    if (tst1 == 0.f) {
-		i__3 = i - l + 1;
-		tst1 = clanhs_("1", &i__3, &h[l + l * h_dim1], ldh, rwork)
-			;
+		i__3 = i__ - l + 1;
+		tst1 = clanhs_("1", &i__3, &h___ref(l, l), ldh, rwork);
 /* **   
                 Increment op count */
-		latime_1.ops += (i - l + 1) * 5 * (i - l) / 2;
+		latime_1.ops += (i__ - l + 1) * 5 * (i__ - l) / 2;
 /* ** */
 	    }
-	    i__3 = k + (k - 1) * h_dim1;
+	    i__3 = h___subscr(k, k - 1);
 /* Computing MAX */
 	    r__2 = ulp * tst1;
-	    if ((r__1 = h[i__3].r, dabs(r__1)) <= dmax(r__2,smlnum)) {
+	    if ((r__1 = h__[i__3].r, dabs(r__1)) <= dmax(r__2,smlnum)) {
 		goto L80;
 	    }
 /* L70: */
@@ -430,46 +444,43 @@ L80:
 	l = k;
 /* **   
           Increment op count */
-	opst += (i - l + 1) * 5;
+	opst += (i__ - l + 1) * 5;
 /* ** */
 	if (l > *ilo) {
 
 /*           H(L,L-1) is negligible. */
 
-	    i__2 = l + (l - 1) * h_dim1;
-	    h[i__2].r = 0.f, h[i__2].i = 0.f;
+	    i__2 = h___subscr(l, l - 1);
+	    h__[i__2].r = 0.f, h__[i__2].i = 0.f;
 	}
 
-/*        Exit from loop if a submatrix of order <= MAXB has split off
-. */
+/*        Exit from loop if a submatrix of order <= MAXB has split off. */
 
-	if (l >= i - maxb + 1) {
+	if (l >= i__ - maxb + 1) {
 	    goto L170;
 	}
 
-/*        Now the active submatrix is in rows and columns L to I. If 
-  
-          eigenvalues only are being computed, only the active submatr
-ix   
+/*        Now the active submatrix is in rows and columns L to I. If   
+          eigenvalues only are being computed, only the active submatrix   
           need be transformed. */
 
 	if (! wantt) {
 	    i1 = l;
-	    i2 = i;
+	    i2 = i__;
 	}
 
 	if (its == 20 || its == 30) {
 
 /*           Exceptional shifts. */
 
-	    i__2 = i;
-	    for (ii = i - ns + 1; ii <= i__2; ++ii) {
+	    i__2 = i__;
+	    for (ii = i__ - ns + 1; ii <= i__2; ++ii) {
 		i__3 = ii;
-		i__5 = ii + (ii - 1) * h_dim1;
-		i__6 = ii + ii * h_dim1;
-		d__1 = ((r__1 = h[i__5].r, dabs(r__1)) + (r__2 = h[i__6].r, 
-			dabs(r__2))) * 1.5f;
-		w[i__3].r = d__1, w[i__3].i = 0.f;
+		i__5 = h___subscr(ii, ii - 1);
+		i__6 = h___subscr(ii, ii);
+		r__3 = ((r__1 = h__[i__5].r, dabs(r__1)) + (r__2 = h__[i__6]
+			.r, dabs(r__2))) * 1.5f;
+		w[i__3].r = r__3, w[i__3].i = 0.f;
 /* L90: */
 	    }
 /* **   
@@ -478,32 +489,28 @@ ix
 /* ** */
 	} else {
 
-/*           Use eigenvalues of trailing submatrix of order NS as 
-shifts. */
+/*           Use eigenvalues of trailing submatrix of order NS as shifts. */
 
-	    clacpy_("Full", &ns, &ns, &h[i - ns + 1 + (i - ns + 1) * h_dim1], 
+	    clacpy_("Full", &ns, &ns, &h___ref(i__ - ns + 1, i__ - ns + 1), 
 		    ldh, s, &c__15);
-	    clahqr_(&c_false, &c_false, &ns, &c__1, &ns, s, &c__15, &w[i - ns 
-		    + 1], &c__1, &ns, &z[z_offset], ldz, &ierr);
+	    clahqr_(&c_false, &c_false, &ns, &c__1, &ns, s, &c__15, &w[i__ - 
+		    ns + 1], &c__1, &ns, &z__[z_offset], ldz, &ierr);
 	    if (ierr > 0) {
 
-/*              If CLAHQR failed to compute all NS eigenvalues
-, use the   
-                unconverged diagonal elements as the remaining
- shifts. */
+/*              If CLAHQR failed to compute all NS eigenvalues, use the   
+                unconverged diagonal elements as the remaining shifts. */
 
 		i__2 = ierr;
 		for (ii = 1; ii <= i__2; ++ii) {
-		    i__3 = i - ns + ii;
-		    i__5 = ii + ii * 15 - 16;
+		    i__3 = i__ - ns + ii;
+		    i__5 = s_subscr(ii, ii);
 		    w[i__3].r = s[i__5].r, w[i__3].i = s[i__5].i;
 /* L100: */
 		}
 	    }
 	}
 
-/*        Form the first column of (G-w(1)) (G-w(2)) . . . (G-w(ns)) 
-  
+/*        Form the first column of (G-w(1)) (G-w(2)) . . . (G-w(ns))   
           where G is the Hessenberg submatrix H(L:I,L:I) and w is   
           the vector of shifts (stored in W). The result is   
           stored in the local array V. */
@@ -516,23 +523,22 @@ shifts. */
 /* L110: */
 	}
 	nv = 1;
-	i__2 = i;
-	for (j = i - ns + 1; j <= i__2; ++j) {
+	i__2 = i__;
+	for (j = i__ - ns + 1; j <= i__2; ++j) {
 	    i__3 = nv + 1;
 	    ccopy_(&i__3, v, &c__1, vv, &c__1);
 	    i__3 = nv + 1;
 	    i__5 = j;
-	    q__1.r = -(doublereal)w[i__5].r, q__1.i = -(doublereal)w[i__5].i;
-	    cgemv_("No transpose", &i__3, &nv, &c_b2, &h[l + l * h_dim1], ldh,
-		     vv, &c__1, &q__1, v, &c__1);
+	    q__1.r = -w[i__5].r, q__1.i = -w[i__5].i;
+	    cgemv_("No transpose", &i__3, &nv, &c_b2, &h___ref(l, l), ldh, vv,
+		     &c__1, &q__1, v, &c__1);
 	    ++nv;
 /* **   
              Increment op count */
 	    opst = opst + (nv << 3) * (*n + 1) + (nv + 1) * 6;
 /* **   
 
-             Scale V(1:NV) so that max(abs(V(i))) = 1. If V is zer
-o,   
+             Scale V(1:NV) so that max(abs(V(i))) = 1. If V is zero,   
              reset it to the unit vector. */
 
 	    itemp = icamax_(&nv, v, &c__1);
@@ -565,29 +571,23 @@ o,
 
 /*        Multiple-shift QR step */
 
-	i__2 = i - 1;
+	i__2 = i__ - 1;
 	for (k = l; k <= i__2; ++k) {
 
-/*           The first iteration of this loop determines a reflect
-ion G   
-             from the vector V and applies it from left and right 
-to H,   
-             thus creating a nonzero bulge below the subdiagonal. 
-  
+/*           The first iteration of this loop determines a reflection G   
+             from the vector V and applies it from left and right to H,   
+             thus creating a nonzero bulge below the subdiagonal.   
 
-             Each subsequent iteration determines a reflection G t
-o   
-             restore the Hessenberg form in the (K-1)th column, an
-d thus   
-             chases the bulge one step toward the bottom of the ac
-tive   
+             Each subsequent iteration determines a reflection G to   
+             restore the Hessenberg form in the (K-1)th column, and thus   
+             chases the bulge one step toward the bottom of the active   
              submatrix. NR is the order of G.   
 
    Computing MIN */
-	    i__3 = ns + 1, i__5 = i - k + 1;
+	    i__3 = ns + 1, i__5 = i__ - k + 1;
 	    nr = min(i__3,i__5);
 	    if (k > l) {
-		ccopy_(&nr, &h[k + (k - 1) * h_dim1], &c__1, v, &c__1);
+		ccopy_(&nr, &h___ref(k, k - 1), &c__1, v, &c__1);
 	    }
 	    clarfg_(&nr, v, &v[1], &c__1, &tau);
 /* **   
@@ -595,39 +595,37 @@ tive
 	    opst = opst + nr * 10 + 12;
 /* ** */
 	    if (k > l) {
-		i__3 = k + (k - 1) * h_dim1;
-		h[i__3].r = v[0].r, h[i__3].i = v[0].i;
-		i__3 = i;
+		i__3 = h___subscr(k, k - 1);
+		h__[i__3].r = v[0].r, h__[i__3].i = v[0].i;
+		i__3 = i__;
 		for (ii = k + 1; ii <= i__3; ++ii) {
-		    i__5 = ii + (k - 1) * h_dim1;
-		    h[i__5].r = 0.f, h[i__5].i = 0.f;
+		    i__5 = h___subscr(ii, k - 1);
+		    h__[i__5].r = 0.f, h__[i__5].i = 0.f;
 /* L140: */
 		}
 	    }
 	    v[0].r = 1.f, v[0].i = 0.f;
 
-/*           Apply G' from the left to transform the rows of the m
-atrix   
+/*           Apply G' from the left to transform the rows of the matrix   
              in columns K to I2. */
 
 	    i__3 = i2 - k + 1;
 	    r_cnjg(&q__1, &tau);
-	    clarfx_("Left", &nr, &i__3, v, &q__1, &h[k + k * h_dim1], ldh, &
-		    work[1]);
+	    clarfx_("Left", &nr, &i__3, v, &q__1, &h___ref(k, k), ldh, &work[
+		    1]);
 
-/*           Apply G from the right to transform the columns of th
-e   
+/*           Apply G from the right to transform the columns of the   
              matrix in rows I1 to min(K+NR,I).   
 
    Computing MIN */
 	    i__5 = k + nr;
-	    i__3 = min(i__5,i) - i1 + 1;
-	    clarfx_("Right", &i__3, &nr, v, &tau, &h[i1 + k * h_dim1], ldh, &
-		    work[1]);
+	    i__3 = min(i__5,i__) - i1 + 1;
+	    clarfx_("Right", &i__3, &nr, v, &tau, &h___ref(i1, k), ldh, &work[
+		    1]);
 /* **   
              Increment op count   
    Computing MIN */
-	    i__3 = nr, i__5 = i - k;
+	    i__3 = nr, i__5 = i__ - k;
 	    latime_1.ops += ((nr << 2) - 2 << 2) * (i2 - i1 + 2 + min(i__3,
 		    i__5));
 /* ** */
@@ -636,8 +634,8 @@ e
 
 /*              Accumulate transformations in the matrix Z */
 
-		clarfx_("Right", &nh, &nr, v, &tau, &z[*ilo + k * z_dim1], 
-			ldz, &work[1]);
+		clarfx_("Right", &nh, &nr, v, &tau, &z___ref(*ilo, k), ldz, &
+			work[1]);
 /* **   
                 Increment op count */
 		latime_1.ops += ((nr << 2) - 2 << 2) * nh;
@@ -648,29 +646,29 @@ e
 
 /*        Ensure that H(I,I-1) is real. */
 
-	i__2 = i + (i - 1) * h_dim1;
-	temp.r = h[i__2].r, temp.i = h[i__2].i;
+	i__2 = h___subscr(i__, i__ - 1);
+	temp.r = h__[i__2].r, temp.i = h__[i__2].i;
 	if (r_imag(&temp) != 0.f) {
 	    r__1 = temp.r;
 	    r__2 = r_imag(&temp);
 	    rtemp = slapy2_(&r__1, &r__2);
-	    i__2 = i + (i - 1) * h_dim1;
-	    h[i__2].r = rtemp, h[i__2].i = 0.f;
+	    i__2 = h___subscr(i__, i__ - 1);
+	    h__[i__2].r = rtemp, h__[i__2].i = 0.f;
 	    q__1.r = temp.r / rtemp, q__1.i = temp.i / rtemp;
 	    temp.r = q__1.r, temp.i = q__1.i;
-	    if (i2 > i) {
-		i__2 = i2 - i;
+	    if (i2 > i__) {
+		i__2 = i2 - i__;
 		r_cnjg(&q__1, &temp);
-		cscal_(&i__2, &q__1, &h[i + (i + 1) * h_dim1], ldh);
+		cscal_(&i__2, &q__1, &h___ref(i__, i__ + 1), ldh);
 	    }
-	    i__2 = i - i1;
-	    cscal_(&i__2, &temp, &h[i1 + i * h_dim1], &c__1);
+	    i__2 = i__ - i1;
+	    cscal_(&i__2, &temp, &h___ref(i1, i__), &c__1);
 /* **   
              Increment op count */
 	    opst += (i2 - i1 + 1) * 6;
 /* ** */
 	    if (wantz) {
-		cscal_(&nh, &temp, &z[*ilo + i * z_dim1], &c__1);
+		cscal_(&nh, &temp, &z___ref(*ilo, i__), &c__1);
 /* **   
                 Increment op count */
 		opst += nh * 6;
@@ -683,17 +681,16 @@ e
 
 /*     Failure to converge in remaining number of iterations */
 
-    *info = i;
+    *info = i__;
     return 0;
 
 L170:
 
-/*     A submatrix of order <= MAXB in rows and columns L to I has split 
-  
+/*     A submatrix of order <= MAXB in rows and columns L to I has split   
        off. Use the double-shift QR algorithm to handle it. */
 
-    clahqr_(&wantt, &wantz, n, &l, &i, &h[h_offset], ldh, &w[1], ilo, ihi, &z[
-	    z_offset], ldz, info);
+    clahqr_(&wantt, &wantz, n, &l, &i__, &h__[h_offset], ldh, &w[1], ilo, ihi,
+	     &z__[z_offset], ldz, info);
     if (*info > 0) {
 	return 0;
     }
@@ -702,7 +699,7 @@ L170:
        the main loop with a new value of I. */
 
     itn -= its;
-    i = l - 1;
+    i__ = l - 1;
     goto L60;
 
 L180:
@@ -710,9 +707,19 @@ L180:
        Compute final op count */
     latime_1.ops += opst;
 /* ** */
+    i__1 = max(1,*n);
+    work[1].r = (real) i__1, work[1].i = 0.f;
     return 0;
 
 /*     End of CHSEQR */
 
 } /* chseqr_ */
+
+#undef z___ref
+#undef z___subscr
+#undef s_ref
+#undef s_subscr
+#undef h___ref
+#undef h___subscr
+
 

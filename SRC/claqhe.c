@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int claqhe_(char *uplo, integer *n, complex *a, integer *lda,
 	 real *s, real *scond, real *amax, char *equed)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -28,13 +29,11 @@
             The order of the matrix A.  N >= 0.   
 
     A       (input/output) COMPLEX array, dimension (LDA,N)   
-            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading   
             n by n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of A contains the lower 
-  
+            leading n by n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -56,48 +55,45 @@
     EQUED   (output) CHARACTER*1   
             Specifies whether or not equilibration was done.   
             = 'N':  No equilibration.   
-            = 'Y':  Equilibration was done, i.e., A has been replaced by 
-  
+            = 'Y':  Equilibration was done, i.e., A has been replaced by   
                     diag(S) * A * diag(S).   
 
     Internal Parameters   
     ===================   
 
-    THRESH is a threshold value used to decide if scaling should be done 
-  
+    THRESH is a threshold value used to decide if scaling should be done   
     based on the ratio of the scaling factors.  If SCOND < THRESH,   
     scaling is done.   
 
-    LARGE and SMALL are threshold values used to decide if scaling should 
-  
+    LARGE and SMALL are threshold values used to decide if scaling should   
     be done based on the absolute size of the largest matrix element.   
     If AMAX > LARGE or AMAX < SMALL, scaling is done.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
-    doublereal d__1;
+    real r__1;
     complex q__1;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real large;
     extern logical lsame_(char *, char *);
     static real small, cj;
     extern doublereal slamch_(char *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --s;
 
-#define S(I) s[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (*n <= 0) {
 	*(unsigned char *)equed = 'N';
 	return 0;
@@ -122,21 +118,21 @@
 /*           Upper triangle of A is stored. */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = S(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = s[j];
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    i__3 = i + j * a_dim1;
-		    d__1 = cj * S(i);
-		    i__4 = i + j * a_dim1;
-		    q__1.r = d__1 * A(i,j).r, q__1.i = d__1 * A(i,j).i;
-		    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    r__1 = cj * s[i__];
+		    i__4 = a_subscr(i__, j);
+		    q__1.r = r__1 * a[i__4].r, q__1.i = r__1 * a[i__4].i;
+		    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L10: */
 		}
-		i__2 = j + j * a_dim1;
-		i__3 = j + j * a_dim1;
-		d__1 = cj * cj * A(j,j).r;
-		A(j,j).r = d__1, A(j,j).i = 0.f;
+		i__2 = a_subscr(j, j);
+		i__3 = a_subscr(j, j);
+		r__1 = cj * cj * a[i__3].r;
+		a[i__2].r = r__1, a[i__2].i = 0.f;
 /* L20: */
 	    }
 	} else {
@@ -144,19 +140,19 @@
 /*           Lower triangle of A is stored. */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = S(j);
-		i__2 = j + j * a_dim1;
-		i__3 = j + j * a_dim1;
-		d__1 = cj * cj * A(j,j).r;
-		A(j,j).r = d__1, A(j,j).i = 0.f;
+	    for (j = 1; j <= i__1; ++j) {
+		cj = s[j];
+		i__2 = a_subscr(j, j);
+		i__3 = a_subscr(j, j);
+		r__1 = cj * cj * a[i__3].r;
+		a[i__2].r = r__1, a[i__2].i = 0.f;
 		i__2 = *n;
-		for (i = j + 1; i <= *n; ++i) {
-		    i__3 = i + j * a_dim1;
-		    d__1 = cj * S(i);
-		    i__4 = i + j * a_dim1;
-		    q__1.r = d__1 * A(i,j).r, q__1.i = d__1 * A(i,j).i;
-		    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    r__1 = cj * s[i__];
+		    i__4 = a_subscr(i__, j);
+		    q__1.r = r__1 * a[i__4].r, q__1.i = r__1 * a[i__4].i;
+		    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L30: */
 		}
 /* L40: */
@@ -170,4 +166,8 @@
 /*     End of CLAQHE */
 
 } /* claqhe_ */
+
+#undef a_ref
+#undef a_subscr
+
 

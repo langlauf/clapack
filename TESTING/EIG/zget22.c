@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -51,7 +52,11 @@ static doublecomplex c_b2 = {1.,0.};
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define e_subscr(a_1,a_2) (a_2)*e_dim1 + a_1
+#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -106,8 +111,7 @@ static doublecomplex c_b2 = {1.,0.};
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     E       (input) COMPLEX*16 array, dimension (LDE,N)   
-            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors 
-  
+            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors   
             are stored in the columns of E, if TRANSE = 'T' or 'C', the   
             eigenvectors are stored in the rows of E.   
 
@@ -125,18 +129,17 @@ static doublecomplex c_b2 = {1.,0.};
             RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
             RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
                          j   
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize RESULT (in case N=0)   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     e_dim1 = *lde;
-    e_offset = e_dim1 + 1;
+    e_offset = 1 + e_dim1 * 1;
     e -= e_offset;
     --w;
     --work;
@@ -185,9 +188,9 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = j + jvec * e_dim1;
+		i__3 = e_subscr(j, jvec);
 		d__3 = temp1, d__4 = (d__1 = e[i__3].r, abs(d__1)) + (d__2 = 
-			d_imag(&e[j + jvec * e_dim1]), abs(d__2));
+			d_imag(&e_ref(j, jvec)), abs(d__2));
 		temp1 = max(d__3,d__4);
 /* L10: */
 	    }
@@ -207,9 +210,9 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jvec = 1; jvec <= i__2; ++jvec) {
 /* Computing MAX */
-		i__3 = jvec + j * e_dim1;
+		i__3 = e_subscr(jvec, j);
 		d__3 = rwork[jvec], d__4 = (d__1 = e[i__3].r, abs(d__1)) + (
-			d__2 = d_imag(&e[jvec + j * e_dim1]), abs(d__2));
+			d__2 = d_imag(&e_ref(jvec, j)), abs(d__2));
 		rwork[jvec] = max(d__3,d__4);
 /* L40: */
 	    }
@@ -261,7 +264,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		i__4 = jrow + jcol * e_dim1;
+		i__4 = e_subscr(jrow, jcol);
 		z__1.r = e[i__4].r * wtemp.r - e[i__4].i * wtemp.i, z__1.i = 
 			e[i__4].r * wtemp.i + e[i__4].i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -271,7 +274,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		i__4 = jcol + jrow * e_dim1;
+		i__4 = e_subscr(jcol, jrow);
 		z__1.r = e[i__4].r * wtemp.r - e[i__4].i * wtemp.i, z__1.i = 
 			e[i__4].r * wtemp.i + e[i__4].i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -281,7 +284,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		d_cnjg(&z__2, &e[jcol + jrow * e_dim1]);
+		d_cnjg(&z__2, &e_ref(jcol, jrow));
 		z__1.r = z__2.r * wtemp.r - z__2.i * wtemp.i, z__1.i = z__2.r 
 			* wtemp.i + z__2.i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -324,4 +327,8 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGET22 */
 
 } /* zget22_ */
+
+#undef e_ref
+#undef e_subscr
+
 

@@ -1,84 +1,53 @@
-
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dtpsv_(char *uplo, char *trans, char *diag, integer *n, 
 	doublereal *ap, doublereal *x, integer *incx)
 {
-
-
     /* System generated locals */
     integer i__1, i__2;
-
     /* Local variables */
     static integer info;
     static doublereal temp;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static integer kk, ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical nounit;
-
-
 /*  Purpose   
     =======   
-
     DTPSV  solves one of the systems of equations   
-
        A*x = b,   or   A'*x = b,   
-
     where b and x are n element vectors and A is an n by n unit, or   
-    non-unit, upper or lower triangular matrix, supplied in packed form. 
-  
-
+    non-unit, upper or lower triangular matrix, supplied in packed form.   
     No test for singularity or near-singularity is included in this   
     routine. Such tests must be performed before calling this routine.   
-
     Parameters   
     ==========   
-
     UPLO   - CHARACTER*1.   
              On entry, UPLO specifies whether the matrix is an upper or   
              lower triangular matrix as follows:   
-
                 UPLO = 'U' or 'u'   A is an upper triangular matrix.   
-
                 UPLO = 'L' or 'l'   A is a lower triangular matrix.   
-
              Unchanged on exit.   
-
     TRANS  - CHARACTER*1.   
              On entry, TRANS specifies the equations to be solved as   
              follows:   
-
                 TRANS = 'N' or 'n'   A*x = b.   
-
                 TRANS = 'T' or 't'   A'*x = b.   
-
                 TRANS = 'C' or 'c'   A'*x = b.   
-
              Unchanged on exit.   
-
     DIAG   - CHARACTER*1.   
              On entry, DIAG specifies whether or not A is unit   
              triangular as follows:   
-
                 DIAG = 'U' or 'u'   A is assumed to be unit triangular.   
-
                 DIAG = 'N' or 'n'   A is not assumed to be unit   
                                     triangular.   
-
              Unchanged on exit.   
-
     N      - INTEGER.   
              On entry, N specifies the order of the matrix A.   
              N must be at least zero.   
              Unchanged on exit.   
-
     AP     - DOUBLE PRECISION array of DIMENSION at least   
              ( ( n*( n + 1 ) )/2 ).   
              Before entry with  UPLO = 'U' or 'u', the array AP must   
@@ -91,50 +60,37 @@
              column by column, so that AP( 1 ) contains a( 1, 1 ),   
              AP( 2 ) and AP( 3 ) contain a( 2, 1 ) and a( 3, 1 )   
              respectively, and so on.   
-             Note that when  DIAG = 'U' or 'u', the diagonal elements of 
-  
+             Note that when  DIAG = 'U' or 'u', the diagonal elements of   
              A are not referenced, but are assumed to be unity.   
              Unchanged on exit.   
-
     X      - DOUBLE PRECISION array of dimension at least   
              ( 1 + ( n - 1 )*abs( INCX ) ).   
              Before entry, the incremented array X must contain the n   
-             element right-hand side vector b. On exit, X is overwritten 
-  
+             element right-hand side vector b. On exit, X is overwritten   
              with the solution vector x.   
-
     INCX   - INTEGER.   
              On entry, INCX specifies the increment for the elements of   
              X. INCX must not be zero.   
              Unchanged on exit.   
-
-
     Level 2 Blas routine.   
-
     -- Written on 22-October-1986.   
        Jack Dongarra, Argonne National Lab.   
        Jeremy Du Croz, Nag Central Office.   
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
-
-
-
        Test the input parameters.   
-
-    
-   Parameter adjustments   
-       Function Body */
-#define X(I) x[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+       Parameter adjustments */
+    --x;
+    --ap;
+    /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	info = 1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T") &&
-	     ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T") && ! lsame_(trans, "C")) {
 	info = 2;
-    } else if (! lsame_(diag, "U") && ! lsame_(diag, "N")) {
+    } else if (! lsame_(diag, "U") && ! lsame_(diag, 
+	    "N")) {
 	info = 3;
     } else if (*n < 0) {
 	info = 4;
@@ -145,43 +101,34 @@
 	xerbla_("DTPSV ", &info);
 	return 0;
     }
-
 /*     Quick return if possible. */
-
     if (*n == 0) {
 	return 0;
     }
-
     nounit = lsame_(diag, "N");
-
 /*     Set up the start point in X if the increment is not unity. This   
        will be  ( N - 1 )*INCX  too small for descending loops. */
-
     if (*incx <= 0) {
 	kx = 1 - (*n - 1) * *incx;
     } else if (*incx != 1) {
 	kx = 1;
     }
-
 /*     Start the operations. In this version the elements of AP are   
        accessed sequentially with one pass through AP. */
-
     if (lsame_(trans, "N")) {
-
 /*        Form  x := inv( A )*x. */
-
 	if (lsame_(uplo, "U")) {
 	    kk = *n * (*n + 1) / 2;
 	    if (*incx == 1) {
 		for (j = *n; j >= 1; --j) {
-		    if (X(j) != 0.) {
+		    if (x[j] != 0.) {
 			if (nounit) {
-			    X(j) /= AP(kk);
+			    x[j] /= ap[kk];
 			}
-			temp = X(j);
+			temp = x[j];
 			k = kk - 1;
-			for (i = j - 1; i >= 1; --i) {
-			    X(i) -= temp * AP(k);
+			for (i__ = j - 1; i__ >= 1; --i__) {
+			    x[i__] -= temp * ap[k];
 			    --k;
 /* L10: */
 			}
@@ -192,16 +139,16 @@
 	    } else {
 		jx = kx + (*n - 1) * *incx;
 		for (j = *n; j >= 1; --j) {
-		    if (X(jx) != 0.) {
+		    if (x[jx] != 0.) {
 			if (nounit) {
-			    X(jx) /= AP(kk);
+			    x[jx] /= ap[kk];
 			}
-			temp = X(jx);
+			temp = x[jx];
 			ix = jx;
 			i__1 = kk - j + 1;
-			for (k = kk - 1; k >= kk-j+1; --k) {
+			for (k = kk - 1; k >= i__1; --k) {
 			    ix -= *incx;
-			    X(ix) -= temp * AP(k);
+			    x[ix] -= temp * ap[k];
 /* L30: */
 			}
 		    }
@@ -214,16 +161,16 @@
 	    kk = 1;
 	    if (*incx == 1) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    if (X(j) != 0.) {
+		for (j = 1; j <= i__1; ++j) {
+		    if (x[j] != 0.) {
 			if (nounit) {
-			    X(j) /= AP(kk);
+			    x[j] /= ap[kk];
 			}
-			temp = X(j);
+			temp = x[j];
 			k = kk + 1;
 			i__2 = *n;
-			for (i = j + 1; i <= *n; ++i) {
-			    X(i) -= temp * AP(k);
+			for (i__ = j + 1; i__ <= i__2; ++i__) {
+			    x[i__] -= temp * ap[k];
 			    ++k;
 /* L50: */
 			}
@@ -234,17 +181,17 @@
 	    } else {
 		jx = kx;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    if (X(jx) != 0.) {
+		for (j = 1; j <= i__1; ++j) {
+		    if (x[jx] != 0.) {
 			if (nounit) {
-			    X(jx) /= AP(kk);
+			    x[jx] /= ap[kk];
 			}
-			temp = X(jx);
+			temp = x[jx];
 			ix = jx;
 			i__2 = kk + *n - j;
-			for (k = kk + 1; k <= kk+*n-j; ++k) {
+			for (k = kk + 1; k <= i__2; ++k) {
 			    ix += *incx;
-			    X(ix) -= temp * AP(k);
+			    x[ix] -= temp * ap[k];
 /* L70: */
 			}
 		    }
@@ -255,45 +202,43 @@
 	    }
 	}
     } else {
-
 /*        Form  x := inv( A' )*x. */
-
 	if (lsame_(uplo, "U")) {
 	    kk = 1;
 	    if (*incx == 1) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    temp = X(j);
+		for (j = 1; j <= i__1; ++j) {
+		    temp = x[j];
 		    k = kk;
 		    i__2 = j - 1;
-		    for (i = 1; i <= j-1; ++i) {
-			temp -= AP(k) * X(i);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			temp -= ap[k] * x[i__];
 			++k;
 /* L90: */
 		    }
 		    if (nounit) {
-			temp /= AP(kk + j - 1);
+			temp /= ap[kk + j - 1];
 		    }
-		    X(j) = temp;
+		    x[j] = temp;
 		    kk += j;
 /* L100: */
 		}
 	    } else {
 		jx = kx;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    temp = X(jx);
+		for (j = 1; j <= i__1; ++j) {
+		    temp = x[jx];
 		    ix = kx;
 		    i__2 = kk + j - 2;
-		    for (k = kk; k <= kk+j-2; ++k) {
-			temp -= AP(k) * X(ix);
+		    for (k = kk; k <= i__2; ++k) {
+			temp -= ap[k] * x[ix];
 			ix += *incx;
 /* L110: */
 		    }
 		    if (nounit) {
-			temp /= AP(kk + j - 1);
+			temp /= ap[kk + j - 1];
 		    }
-		    X(jx) = temp;
+		    x[jx] = temp;
 		    jx += *incx;
 		    kk += j;
 /* L120: */
@@ -303,18 +248,18 @@
 	    kk = *n * (*n + 1) / 2;
 	    if (*incx == 1) {
 		for (j = *n; j >= 1; --j) {
-		    temp = X(j);
+		    temp = x[j];
 		    k = kk;
 		    i__1 = j + 1;
-		    for (i = *n; i >= j+1; --i) {
-			temp -= AP(k) * X(i);
+		    for (i__ = *n; i__ >= i__1; --i__) {
+			temp -= ap[k] * x[i__];
 			--k;
 /* L130: */
 		    }
 		    if (nounit) {
-			temp /= AP(kk - *n + j);
+			temp /= ap[kk - *n + j];
 		    }
-		    X(j) = temp;
+		    x[j] = temp;
 		    kk -= *n - j + 1;
 /* L140: */
 		}
@@ -322,18 +267,18 @@
 		kx += (*n - 1) * *incx;
 		jx = kx;
 		for (j = *n; j >= 1; --j) {
-		    temp = X(jx);
+		    temp = x[jx];
 		    ix = kx;
 		    i__1 = kk - (*n - (j + 1));
-		    for (k = kk; k >= kk-(*n-(j+1)); --k) {
-			temp -= AP(k) * X(ix);
+		    for (k = kk; k >= i__1; --k) {
+			temp -= ap[k] * x[ix];
 			ix -= *incx;
 /* L150: */
 		    }
 		    if (nounit) {
-			temp /= AP(kk - *n + j);
+			temp /= ap[kk - *n + j];
 		    }
-		    X(jx) = temp;
+		    x[jx] = temp;
 		    jx -= *incx;
 		    kk -= *n - j + 1;
 /* L160: */
@@ -341,10 +286,7 @@
 	    }
 	}
     }
-
     return 0;
-
 /*     End of DTPSV . */
-
 } /* dtpsv_ */
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,7 @@
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -39,18 +40,14 @@
     values of the bidiagonal matrix B with diagonal entries   
     S(1) ,..., S(N) and superdiagonal entries E(1) ,..., E(N-1)).   
     It does this by expanding each SVD(I) into an interval   
-    [SVD(I) * (1-EPS) , SVD(I) * (1+EPS)], merging overlapping intervals 
-  
+    [SVD(I) * (1-EPS) , SVD(I) * (1+EPS)], merging overlapping intervals   
     if any, and using Sturm sequences to count and verify whether each   
     resulting interval has the correct number of singular values (using   
     SSVDCT). Here EPS=TOL*MAX(N/10,1)*MACHEP, where MACHEP is the   
-    machine precision. The routine assumes the singular values are sorted 
-  
+    machine precision. The routine assumes the singular values are sorted   
     with SVD(1) the largest and SVD(N) smallest.  If each interval   
-    contains the correct number of singular values, INFO = 0 is returned, 
-  
-    otherwise INFO is the index of the first singular value in the first 
-  
+    contains the correct number of singular values, INFO = 0 is returned,   
+    otherwise INFO is the index of the first singular value in the first   
     bad interval.   
 
     Arguments   
@@ -78,8 +75,7 @@
             >0 if the interval containing the INFO-th singular value   
                contains the incorrect number of singular values.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine constants   
@@ -99,8 +95,7 @@
     eps = slamch_("Epsilon") * slamch_("Base");
 
 /*     UNFLEP is chosen so that when an eigenvalue is multiplied by the   
-       scale factor sqrt(OVFL)*sqrt(sqrt(UNFL))/MX in SSVDCT, it exceeds 
-  
+       scale factor sqrt(OVFL)*sqrt(sqrt(UNFL))/MX in SSVDCT, it exceeds   
        sqrt(UNFL), which is the lower limit for SSVDCT. */
 
     unflep = sqrt(sqrt(unfl)) / sqrt(ovfl) * svd[1] + unfl / eps;
@@ -123,7 +118,7 @@ L10:
     upper = (eps + 1.f) * svd[tpnt] + unflep;
     lower = (1.f - eps) * svd[bpnt] - unflep;
     if (lower <= unflep) {
-	lower = -(doublereal)upper;
+	lower = -upper;
     }
 
 /*     Begin loop merging overlapping intervals */
@@ -142,7 +137,7 @@ L20:
     ++bpnt;
     lower = (1.f - eps) * svd[bpnt] - unflep;
     if (lower <= unflep) {
-	lower = -(doublereal)upper;
+	lower = -upper;
     }
     goto L20;
 L30:

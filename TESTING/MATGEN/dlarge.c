@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,7 +28,7 @@ static doublereal c_b10 = 0.;
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dgemv_(char *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -38,7 +39,10 @@ static doublereal c_b10 = 0.;
     static doublereal tau;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0)   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary test routine (version 3.0)   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -65,8 +69,7 @@ static doublereal c_b10 = 0.;
             The leading dimension of the array A.  LDA >= N.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array 
-  
+            On entry, the seed of the random number generator; the array   
             elements must be between 0 and 4095, and ISEED(4) must be   
             odd.   
             On exit, the seed is updated.   
@@ -77,15 +80,14 @@ static doublereal c_b10 = 0.;
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
     --work;
@@ -105,20 +107,20 @@ static doublereal c_b10 = 0.;
 
 /*     pre- and post-multiply A by random orthogonal matrix */
 
-    for (i = *n; i >= 1; --i) {
+    for (i__ = *n; i__ >= 1; --i__) {
 
 /*        generate random reflection */
 
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	dlarnv_(&c__3, &iseed[1], &i__1, &work[1]);
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	wn = dnrm2_(&i__1, &work[1], &c__1);
 	wa = d_sign(&wn, &work[1]);
 	if (wn == 0.) {
 	    tau = 0.;
 	} else {
 	    wb = work[1] + wa;
-	    i__1 = *n - i;
+	    i__1 = *n - i__;
 	    d__1 = 1. / wb;
 	    dscal_(&i__1, &d__1, &work[2], &c__1);
 	    work[1] = 1.;
@@ -127,23 +129,23 @@ static doublereal c_b10 = 0.;
 
 /*        multiply A(i:n,1:n) by random reflection from the left */
 
-	i__1 = *n - i + 1;
-	dgemv_("Transpose", &i__1, n, &c_b8, &a[i + a_dim1], lda, &work[1], &
+	i__1 = *n - i__ + 1;
+	dgemv_("Transpose", &i__1, n, &c_b8, &a_ref(i__, 1), lda, &work[1], &
 		c__1, &c_b10, &work[*n + 1], &c__1);
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	d__1 = -tau;
-	dger_(&i__1, n, &d__1, &work[1], &c__1, &work[*n + 1], &c__1, &a[i + 
-		a_dim1], lda);
+	dger_(&i__1, n, &d__1, &work[1], &c__1, &work[*n + 1], &c__1, &a_ref(
+		i__, 1), lda);
 
 /*        multiply A(1:n,i:n) by random reflection from the right */
 
-	i__1 = *n - i + 1;
-	dgemv_("No transpose", n, &i__1, &c_b8, &a[i * a_dim1 + 1], lda, &
-		work[1], &c__1, &c_b10, &work[*n + 1], &c__1);
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
+	dgemv_("No transpose", n, &i__1, &c_b8, &a_ref(1, i__), lda, &work[1],
+		 &c__1, &c_b10, &work[*n + 1], &c__1);
+	i__1 = *n - i__ + 1;
 	d__1 = -tau;
-	dger_(n, &i__1, &d__1, &work[*n + 1], &c__1, &work[1], &c__1, &a[i * 
-		a_dim1 + 1], lda);
+	dger_(n, &i__1, &d__1, &work[*n + 1], &c__1, &work[1], &c__1, &a_ref(
+		1, i__), lda);
 /* L10: */
     }
     return 0;
@@ -151,4 +153,7 @@ static doublereal c_b10 = 0.;
 /*     End of DLARGE */
 
 } /* dlarge_ */
+
+#undef a_ref
+
 

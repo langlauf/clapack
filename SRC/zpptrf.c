@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zpptrf_(char *uplo, integer *n, doublecomplex *ap, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -31,18 +32,15 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the Hermitian matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
             See below for further details.   
 
             On exit, if INFO = 0, the triangular factor U or L from the   
-            Cholesky factorization A = U**H*U or A = L*L**H, in the same 
-  
+            Cholesky factorization A = U**H*U or A = L*L**H, in the same   
             storage format as A.   
 
     INFO    (output) INTEGER   
@@ -69,15 +67,12 @@
 
     AP = [ a11, a12, a22, a13, a23, a33, a14, a24, a34, a44 ]   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b16 = -1.;
@@ -104,10 +99,9 @@
     static doublereal ajj;
 
 
+    --ap;
 
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -133,7 +127,7 @@
 
 	jj = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jc = jj + 1;
 	    jj += j;
 
@@ -141,27 +135,26 @@
 
 	    if (j > 1) {
 		i__2 = j - 1;
-		ztpsv_("Upper", "Conjugate transpose", "Non-unit", &i__2, &AP(
-			1), &AP(jc), &c__1);
+		ztpsv_("Upper", "Conjugate transpose", "Non-unit", &i__2, &ap[
+			1], &ap[jc], &c__1);
 	    }
 
-/*           Compute U(J,J) and test for non-positive-definiteness
-. */
+/*           Compute U(J,J) and test for non-positive-definiteness. */
 
 	    i__2 = jj;
-	    d__1 = AP(jj).r;
+	    d__1 = ap[i__2].r;
 	    i__3 = j - 1;
-	    zdotc_(&z__2, &i__3, &AP(jc), &c__1, &AP(jc), &c__1);
+	    zdotc_(&z__2, &i__3, &ap[jc], &c__1, &ap[jc], &c__1);
 	    z__1.r = d__1 - z__2.r, z__1.i = -z__2.i;
 	    ajj = z__1.r;
 	    if (ajj <= 0.) {
 		i__2 = jj;
-		AP(jj).r = ajj, AP(jj).i = 0.;
+		ap[i__2].r = ajj, ap[i__2].i = 0.;
 		goto L30;
 	    }
 	    i__2 = jj;
 	    d__1 = sqrt(ajj);
-	    AP(jj).r = d__1, AP(jj).i = 0.;
+	    ap[i__2].r = d__1, ap[i__2].i = 0.;
 /* L10: */
 	}
     } else {
@@ -170,33 +163,31 @@
 
 	jj = 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute L(J,J) and test for non-positive-definiteness
-. */
+/*           Compute L(J,J) and test for non-positive-definiteness. */
 
 	    i__2 = jj;
-	    ajj = AP(jj).r;
+	    ajj = ap[i__2].r;
 	    if (ajj <= 0.) {
 		i__2 = jj;
-		AP(jj).r = ajj, AP(jj).i = 0.;
+		ap[i__2].r = ajj, ap[i__2].i = 0.;
 		goto L30;
 	    }
 	    ajj = sqrt(ajj);
 	    i__2 = jj;
-	    AP(jj).r = ajj, AP(jj).i = 0.;
+	    ap[i__2].r = ajj, ap[i__2].i = 0.;
 
-/*           Compute elements J+1:N of column J and update the tra
-iling   
+/*           Compute elements J+1:N of column J and update the trailing   
              submatrix. */
 
 	    if (j < *n) {
 		i__2 = *n - j;
 		d__1 = 1. / ajj;
-		zdscal_(&i__2, &d__1, &AP(jj + 1), &c__1);
+		zdscal_(&i__2, &d__1, &ap[jj + 1], &c__1);
 		i__2 = *n - j;
-		zhpr_("Lower", &i__2, &c_b16, &AP(jj + 1), &c__1, &AP(jj + *n 
-			- j + 1));
+		zhpr_("Lower", &i__2, &c_b16, &ap[jj + 1], &c__1, &ap[jj + *n 
+			- j + 1]);
 		jj = jj + *n - j + 1;
 	    }
 /* L20: */

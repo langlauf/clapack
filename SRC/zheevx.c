@@ -1,16 +1,17 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zheevx_(char *jobz, char *range, char *uplo, integer *n, 
 	doublecomplex *a, integer *lda, doublereal *vl, doublereal *vu, 
 	integer *il, integer *iu, doublereal *abstol, integer *m, doublereal *
-	w, doublecomplex *z, integer *ldz, doublecomplex *work, integer *
+	w, doublecomplex *z__, integer *ldz, doublecomplex *work, integer *
 	lwork, doublereal *rwork, integer *iwork, integer *ifail, integer *
 	info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -81,8 +82,7 @@
             by reducing A to tridiagonal form.   
 
             Eigenvalues will be computed most accurately when ABSTOL is   
-            set to twice the underflow threshold 2*DLAMCH('S'), not zero. 
-  
+            set to twice the underflow threshold 2*DLAMCH('S'), not zero.   
             If this routine returns with INFO>0, indicating that some   
             eigenvectors did not converge, try setting ABSTOL to   
             2*DLAMCH('S').   
@@ -105,14 +105,11 @@
             corresponding to the selected eigenvalues, with the i-th   
             column of Z holding the eigenvector associated with W(i).   
             If an eigenvector fails to converge, then that column of Z   
-            contains the latest approximation to the eigenvector, and the 
-  
+            contains the latest approximation to the eigenvector, and the   
             index of the eigenvector is returned in IFAIL.   
             If JOBZ = 'N', then Z is not referenced.   
-            Note: the user must ensure that at least max(1,M) columns are 
-  
-            supplied in the array Z; if RANGE = 'V', the exact value of M 
-  
+            Note: the user must ensure that at least max(1,M) columns are   
+            supplied in the array Z; if RANGE = 'V', the exact value of M   
             is not known in advance and an upper bound must be used.   
 
     LDZ     (input) INTEGER   
@@ -125,7 +122,13 @@
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= max(1,2*N-1).   
             For optimal efficiency, LWORK >= (NB+1)*N,   
-            where NB is the blocksize for ZHETRD returned by ILAENV.   
+            where NB is the max of the blocksize for ZHETRD and for   
+            ZUNMTR as returned by ILAENV.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (7*N)   
 
@@ -143,17 +146,15 @@
             > 0:  if INFO = i, then i eigenvectors failed to converge.   
                   Their indices are stored in array IFAIL.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
+    static integer c_n1 = -1;
     
     /* System generated locals */
     integer a_dim1, a_offset, z_dim1, z_offset, i__1, i__2;
@@ -166,7 +167,7 @@
     static doublereal anrm;
     static integer imax;
     static doublereal rmin, rmax;
-    static integer lopt, itmp1, i, j, indee;
+    static integer lopt, itmp1, i__, j, indee;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     static doublereal sigma;
@@ -178,12 +179,14 @@
     static logical lower, wantz;
     extern /* Subroutine */ int zswap_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    static integer jj;
+    static integer nb, jj;
     extern doublereal dlamch_(char *);
     static logical alleig, indeig;
     static integer iscale, indibl;
     static logical valeig;
     static doublereal safmin;
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int xerbla_(char *, integer *), zdscal_(
 	    integer *, doublereal *, doublecomplex *, integer *);
     static doublereal abstll, bignum;
@@ -205,32 +208,41 @@
     static doublereal smlnum;
     extern /* Subroutine */ int zstein_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublecomplex *, 
-	    integer *, doublereal *, integer *, integer *, integer *), 
-	    zsteqr_(char *, integer *, doublereal *, doublereal *, 
-	    doublecomplex *, integer *, doublereal *, integer *), 
-	    zungtr_(char *, integer *, doublecomplex *, integer *, 
+	    integer *, doublereal *, integer *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int zsteqr_(char *, integer *, doublereal *, 
+	    doublereal *, doublecomplex *, integer *, doublereal *, integer *), zungtr_(char *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, integer *), 
 	    zunmtr_(char *, char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, integer *);
     static doublereal eps, vll, vuu, tmp1;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
+    --iwork;
+    --ifail;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-#define IFAIL(I) ifail[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     lower = lsame_(uplo, "L");
     wantz = lsame_(jobz, "V");
     alleig = lsame_(range, "A");
     valeig = lsame_(range, "V");
     indeig = lsame_(range, "I");
+    lquery = *lwork == -1;
 
     *info = 0;
     if (! (wantz || lsame_(jobz, "N"))) {
@@ -243,25 +255,47 @@
 	*info = -4;
     } else if (*lda < max(1,*n)) {
 	*info = -6;
-    } else if (valeig && *n > 0 && *vu <= *vl) {
-	*info = -8;
-    } else if (indeig && *il < 1) {
-	*info = -9;
-    } else if (indeig && (*iu < min(*n,*il) || *iu > *n)) {
-	*info = -10;
-    } else if (*ldz < 1 || wantz && *ldz < *n) {
-	*info = -15;
-    } else /* if(complicated condition) */ {
-/* Computing MAX */
-	i__1 = 1, i__2 = (*n << 1) - 1;
-	if (*lwork < max(i__1,i__2)) {
-	    *info = -17;
+    } else {
+	if (valeig) {
+	    if (*n > 0 && *vu <= *vl) {
+		*info = -8;
+	    }
+	} else if (indeig) {
+	    if (*il < 1 || *il > max(1,*n)) {
+		*info = -9;
+	    } else if (*iu < min(*n,*il) || *iu > *n) {
+		*info = -10;
+	    }
 	}
+    }
+    if (*info == 0) {
+	if (*ldz < 1 || wantz && *ldz < *n) {
+	    *info = -15;
+	} else /* if(complicated condition) */ {
+/* Computing MAX */
+	    i__1 = 1, i__2 = (*n << 1) - 1;
+	    if (*lwork < max(i__1,i__2) && ! lquery) {
+		*info = -17;
+	    }
+	}
+    }
+
+    if (*info == 0) {
+	nb = ilaenv_(&c__1, "ZHETRD", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6,
+		 (ftnlen)1);
+/* Computing MAX */
+	i__1 = nb, i__2 = ilaenv_(&c__1, "ZUNMTR", uplo, n, &c_n1, &c_n1, &
+		c_n1, (ftnlen)6, (ftnlen)1);
+	nb = max(i__1,i__2);
+	lwkopt = (nb + 1) * *n;
+	work[1].r = (doublereal) lwkopt, work[1].i = 0.;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZHEEVX", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -269,28 +303,28 @@
 
     *m = 0;
     if (*n == 0) {
-	WORK(1).r = 1., WORK(1).i = 0.;
+	work[1].r = 1., work[1].i = 0.;
 	return 0;
     }
 
     if (*n == 1) {
-	WORK(1).r = 1., WORK(1).i = 0.;
+	work[1].r = 1., work[1].i = 0.;
 	if (alleig || indeig) {
 	    *m = 1;
-	    i__1 = a_dim1 + 1;
-	    W(1) = A(1,1).r;
+	    i__1 = a_subscr(1, 1);
+	    w[1] = a[i__1].r;
 	} else if (valeig) {
-	    i__1 = a_dim1 + 1;
-	    i__2 = a_dim1 + 1;
-	    if (*vl < A(1,1).r && *vu >= A(1,1).r) {
+	    i__1 = a_subscr(1, 1);
+	    i__2 = a_subscr(1, 1);
+	    if (*vl < a[i__1].r && *vu >= a[i__2].r) {
 		*m = 1;
-		i__1 = a_dim1 + 1;
-		W(1) = A(1,1).r;
+		i__1 = a_subscr(1, 1);
+		w[1] = a[i__1].r;
 	    }
 	}
 	if (wantz) {
-	    i__1 = z_dim1 + 1;
-	    Z(1,1).r = 1., Z(1,1).i = 0.;
+	    i__1 = z___subscr(1, 1);
+	    z__[i__1].r = 1., z__[i__1].i = 0.;
 	}
 	return 0;
     }
@@ -310,11 +344,9 @@
 
     iscale = 0;
     abstll = *abstol;
-    if (valeig) {
-	vll = *vl;
-	vuu = *vu;
-    }
-    anrm = zlanhe_("M", uplo, n, &A(1,1), lda, &RWORK(1));
+    vll = *vl;
+    vuu = *vu;
+    anrm = zlanhe_("M", uplo, n, &a[a_offset], lda, &rwork[1]);
     if (anrm > 0. && anrm < rmin) {
 	iscale = 1;
 	sigma = rmin / anrm;
@@ -325,15 +357,15 @@
     if (iscale == 1) {
 	if (lower) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j + 1;
-		zdscal_(&i__2, &sigma, &A(j,j), &c__1);
+		zdscal_(&i__2, &sigma, &a_ref(j, j), &c__1);
 /* L10: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		zdscal_(&j, &sigma, &A(1,j), &c__1);
+	    for (j = 1; j <= i__1; ++j) {
+		zdscal_(&j, &sigma, &a_ref(1, j), &c__1);
 /* L20: */
 	    }
 	}
@@ -354,36 +386,35 @@
     indtau = 1;
     indwrk = indtau + *n;
     llwork = *lwork - indwrk + 1;
-    zhetrd_(uplo, n, &A(1,1), lda, &RWORK(indd), &RWORK(inde), &WORK(
-	    indtau), &WORK(indwrk), &llwork, &iinfo);
+    zhetrd_(uplo, n, &a[a_offset], lda, &rwork[indd], &rwork[inde], &work[
+	    indtau], &work[indwrk], &llwork, &iinfo);
     i__1 = indwrk;
-    z__1.r = *n + WORK(indwrk).r, z__1.i = WORK(indwrk).i;
+    z__1.r = *n + work[i__1].r, z__1.i = work[i__1].i;
     lopt = (integer) z__1.r;
 
-/*     If all eigenvalues are desired and ABSTOL is less than or equal to 
-  
+/*     If all eigenvalues are desired and ABSTOL is less than or equal to   
        zero, then call DSTERF or ZUNGTR and ZSTEQR.  If this fails for   
        some eigenvalue, then try DSTEBZ. */
 
     if ((alleig || indeig && *il == 1 && *iu == *n) && *abstol <= 0.) {
-	dcopy_(n, &RWORK(indd), &c__1, &W(1), &c__1);
+	dcopy_(n, &rwork[indd], &c__1, &w[1], &c__1);
 	indee = indrwk + (*n << 1);
 	if (! wantz) {
 	    i__1 = *n - 1;
-	    dcopy_(&i__1, &RWORK(inde), &c__1, &RWORK(indee), &c__1);
-	    dsterf_(n, &W(1), &RWORK(indee), info);
+	    dcopy_(&i__1, &rwork[inde], &c__1, &rwork[indee], &c__1);
+	    dsterf_(n, &w[1], &rwork[indee], info);
 	} else {
-	    zlacpy_("A", n, n, &A(1,1), lda, &Z(1,1), ldz);
-	    zungtr_(uplo, n, &Z(1,1), ldz, &WORK(indtau), &WORK(indwrk), 
-		    &llwork, &iinfo);
+	    zlacpy_("A", n, n, &a[a_offset], lda, &z__[z_offset], ldz);
+	    zungtr_(uplo, n, &z__[z_offset], ldz, &work[indtau], &work[indwrk]
+		    , &llwork, &iinfo);
 	    i__1 = *n - 1;
-	    dcopy_(&i__1, &RWORK(inde), &c__1, &RWORK(indee), &c__1);
-	    zsteqr_(jobz, n, &W(1), &RWORK(indee), &Z(1,1), ldz, &RWORK(
-		    indrwk), info);
+	    dcopy_(&i__1, &rwork[inde], &c__1, &rwork[indee], &c__1);
+	    zsteqr_(jobz, n, &w[1], &rwork[indee], &z__[z_offset], ldz, &
+		    rwork[indrwk], info);
 	    if (*info == 0) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    IFAIL(i) = 0;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    ifail[i__] = 0;
 /* L30: */
 		}
 	    }
@@ -405,19 +436,20 @@
     indibl = 1;
     indisp = indibl + *n;
     indiwk = indisp + *n;
-    dstebz_(range, order, n, &vll, &vuu, il, iu, &abstll, &RWORK(indd), &
-	    RWORK(inde), m, &nsplit, &W(1), &IWORK(indibl), &IWORK(indisp), &
-	    RWORK(indrwk), &IWORK(indiwk), info);
+    dstebz_(range, order, n, &vll, &vuu, il, iu, &abstll, &rwork[indd], &
+	    rwork[inde], m, &nsplit, &w[1], &iwork[indibl], &iwork[indisp], &
+	    rwork[indrwk], &iwork[indiwk], info);
 
     if (wantz) {
-	zstein_(n, &RWORK(indd), &RWORK(inde), m, &W(1), &IWORK(indibl), &
-		IWORK(indisp), &Z(1,1), ldz, &RWORK(indrwk), &IWORK(
-		indiwk), &IFAIL(1), info);
+	zstein_(n, &rwork[indd], &rwork[inde], m, &w[1], &iwork[indibl], &
+		iwork[indisp], &z__[z_offset], ldz, &rwork[indrwk], &iwork[
+		indiwk], &ifail[1], info);
 
 /*        Apply unitary matrix used in reduction to tridiagonal   
           form to eigenvectors returned by ZSTEIN. */
 
-	zunmtr_("L", uplo, "N", n, m, &A(1,1), lda, &WORK(indtau), &Z(1,1), ldz, &WORK(indwrk), &llwork, &iinfo);
+	zunmtr_("L", uplo, "N", n, m, &a[a_offset], lda, &work[indtau], &z__[
+		z_offset], ldz, &work[indwrk], &llwork, &iinfo);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -430,7 +462,7 @@ L40:
 	    imax = *info - 1;
 	}
 	d__1 = 1. / sigma;
-	dscal_(&imax, &d__1, &W(1), &c__1);
+	dscal_(&imax, &d__1, &w[1], &c__1);
     }
 
 /*     If eigenvalues are not in order, then sort them, along with   
@@ -438,46 +470,48 @@ L40:
 
     if (wantz) {
 	i__1 = *m - 1;
-	for (j = 1; j <= *m-1; ++j) {
-	    i = 0;
-	    tmp1 = W(j);
+	for (j = 1; j <= i__1; ++j) {
+	    i__ = 0;
+	    tmp1 = w[j];
 	    i__2 = *m;
-	    for (jj = j + 1; jj <= *m; ++jj) {
-		if (W(jj) < tmp1) {
-		    i = jj;
-		    tmp1 = W(jj);
+	    for (jj = j + 1; jj <= i__2; ++jj) {
+		if (w[jj] < tmp1) {
+		    i__ = jj;
+		    tmp1 = w[jj];
 		}
 /* L50: */
 	    }
 
-	    if (i != 0) {
-		itmp1 = IWORK(indibl + i - 1);
-		W(i) = W(j);
-		IWORK(indibl + i - 1) = IWORK(indibl + j - 1);
-		W(j) = tmp1;
-		IWORK(indibl + j - 1) = itmp1;
-		zswap_(n, &Z(1,i), &c__1, &Z(1,j), &
-			c__1);
+	    if (i__ != 0) {
+		itmp1 = iwork[indibl + i__ - 1];
+		w[i__] = w[j];
+		iwork[indibl + i__ - 1] = iwork[indibl + j - 1];
+		w[j] = tmp1;
+		iwork[indibl + j - 1] = itmp1;
+		zswap_(n, &z___ref(1, i__), &c__1, &z___ref(1, j), &c__1);
 		if (*info != 0) {
-		    itmp1 = IFAIL(i);
-		    IFAIL(i) = IFAIL(j);
-		    IFAIL(j) = itmp1;
+		    itmp1 = ifail[i__];
+		    ifail[i__] = ifail[j];
+		    ifail[j] = itmp1;
 		}
 	    }
 /* L60: */
 	}
     }
 
-/*     Set WORK(1) to optimal complex workspace size.   
+/*     Set WORK(1) to optimal complex workspace size. */
 
-   Computing MAX */
-    i__1 = (*n << 1) - 1;
-    d__1 = (doublereal) max(i__1,lopt);
-    WORK(1).r = d__1, WORK(1).i = 0.;
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
 
     return 0;
 
 /*     End of ZHEEVX */
 
 } /* zheevx_ */
+
+#undef z___ref
+#undef z___subscr
+#undef a_ref
+#undef a_subscr
+
 

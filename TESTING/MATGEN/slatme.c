@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,11 +13,11 @@ static real c_b23 = 0.f;
 static integer c__0 = 0;
 static real c_b39 = 1.f;
 
-/* Subroutine */ int slatme_(integer *n, char *dist, integer *iseed, real *d, 
-	integer *mode, real *cond, real *dmax__, char *ei, char *rsign, char *
-	upper, char *sim, real *ds, integer *modes, real *conds, integer *kl, 
-	integer *ku, real *anorm, real *a, integer *lda, real *work, integer *
-	info)
+/* Subroutine */ int slatme_(integer *n, char *dist, integer *iseed, real *
+	d__, integer *mode, real *cond, real *dmax__, char *ei, char *rsign, 
+	char *upper, char *sim, real *ds, integer *modes, real *conds, 
+	integer *kl, integer *ku, real *anorm, real *a, integer *lda, real *
+	work, integer *info)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
@@ -29,7 +30,7 @@ static real c_b39 = 1.f;
     static integer isim;
     static real temp;
     static logical badei;
-    static integer i, j;
+    static integer i__, j;
     static real alpha;
     extern logical lsame_(char *, char *);
     static integer iinfo;
@@ -61,7 +62,10 @@ static real c_b39 = 1.f;
     static real tau;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -100,8 +104,7 @@ static real c_b39 = 1.f;
        6. If ANORM is not negative, the matrix is scaled to have   
             maximum-element-norm ANORM.   
 
-       (Note: since the matrix cannot be reduced beyond Hessenberg form, 
-  
+       (Note: since the matrix cannot be reduced beyond Hessenberg form,   
         no packing options are available.)   
 
     Arguments   
@@ -111,8 +114,7 @@ static real c_b39 = 1.f;
              The number of columns (or rows) of A. Not modified.   
 
     DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used 
-  
+             On entry, DIST specifies the type of distribution to be used   
              to generate the random eigen-/singular values, and for the   
              upper triangle (see UPPER).   
              'U' => UNIFORM( 0, 1 )  ( 'U' for uniform )   
@@ -179,24 +181,21 @@ static real c_b39 = 1.f;
     EI     - CHARACTER*1 array, dimension ( N )   
              If MODE is 0, and EI(1) is not ' ' (space character),   
              this array specifies which elements of D (on input) are   
-             real eigenvalues and which are the real and imaginary parts 
-  
+             real eigenvalues and which are the real and imaginary parts   
              of a complex conjugate pair of eigenvalues.  The elements   
              of EI may then only have the values 'R' and 'I'.  If   
              EI(j)='R' and EI(j+1)='I', then the j-th eigenvalue is   
              CMPLX( D(j) , D(j+1) ), and the (j+1)-th is the complex   
              conjugate thereof.  If EI(j)=EI(j+1)='R', then the j-th   
              eigenvalue is D(j) (i.e., real).  EI(1) may not be 'I',   
-             nor may two adjacent elements of EI both have the value 'I'. 
-  
+             nor may two adjacent elements of EI both have the value 'I'.   
              If MODE is not 0, then EI is ignored.  If MODE is 0 and   
              EI(1)=' ', then the eigenvalues will all be real.   
              Not modified.   
 
     RSIGN  - CHARACTER*1   
              If MODE is not 0, 6, or -6, and RSIGN='T', then the   
-             elements of D, as computed according to MODE and COND, will 
-  
+             elements of D, as computed according to MODE and COND, will   
              be multiplied by a random sign (+1 or -1).  If RSIGN='F',   
              they will not be.  RSIGN may only have the values 'T' or   
              'F'.   
@@ -274,8 +273,7 @@ static real c_b39 = 1.f;
               -2 => DIST illegal string   
               -5 => MODE not in range -6 to 6   
               -6 => COND less than 1.0, and MODE neither -6, 0 nor 6   
-              -8 => EI(1) is not ' ' or 'R', EI(j) is not 'R' or 'I', or 
-  
+              -8 => EI(1) is not ' ' or 'R', EI(j) is not 'R' or 'I', or   
                     two adjacent elements of EI are 'I'.   
               -9 => RSIGN is not 'T' or 'F'   
              -10 => UPPER is not 'T' or 'F'   
@@ -293,8 +291,7 @@ static real c_b39 = 1.f;
               4  => Error return from SLARGE   
               5  => Zero singular value from SLATM1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Decode and Test the input parameters.   
@@ -302,11 +299,11 @@ static real c_b39 = 1.f;
 
        Parameter adjustments */
     --iseed;
-    --d;
+    --d__;
     --ei;
     --ds;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --work;
 
@@ -440,8 +437,8 @@ static real c_b39 = 1.f;
 
 /*     Initialize random number generator */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i] = (i__1 = iseed[i], abs(i__1)) % 4096;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__] = (i__1 = iseed[i__], abs(i__1)) % 4096;
 /* L30: */
     }
 
@@ -453,7 +450,7 @@ static real c_b39 = 1.f;
 
                Compute D according to COND and MODE */
 
-    slatm1_(mode, cond, &irsign, &idist, &iseed[1], &d[1], n, &iinfo);
+    slatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], n, &iinfo);
     if (iinfo != 0) {
 	*info = 1;
 	return 0;
@@ -462,11 +459,11 @@ static real c_b39 = 1.f;
 
 /*        Scale by DMAX */
 
-	temp = dabs(d[1]);
+	temp = dabs(d__[1]);
 	i__1 = *n;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__2 = temp, r__3 = (r__1 = d[i], dabs(r__1));
+	    r__2 = temp, r__3 = (r__1 = d__[i__], dabs(r__1));
 	    temp = dmax(r__2,r__3);
 /* L40: */
 	}
@@ -480,13 +477,13 @@ static real c_b39 = 1.f;
 	    alpha = 0.f;
 	}
 
-	sscal_(n, &alpha, &d[1], &c__1);
+	sscal_(n, &alpha, &d__[1], &c__1);
 
     }
 
     slaset_("Full", n, n, &c_b23, &c_b23, &a[a_offset], lda);
     i__1 = *lda + 1;
-    scopy_(n, &d[1], &c__1, &a[a_offset], &i__1);
+    scopy_(n, &d__[1], &c__1, &a[a_offset], &i__1);
 
 /*     Set up complex conjugate pairs */
 
@@ -495,9 +492,9 @@ static real c_b39 = 1.f;
 	    i__1 = *n;
 	    for (j = 2; j <= i__1; ++j) {
 		if (lsame_(ei + j, "I")) {
-		    a[j - 1 + j * a_dim1] = a[j + j * a_dim1];
-		    a[j + (j - 1) * a_dim1] = -(doublereal)a[j + j * a_dim1];
-		    a[j + j * a_dim1] = a[j - 1 + (j - 1) * a_dim1];
+		    a_ref(j - 1, j) = a_ref(j, j);
+		    a_ref(j, j - 1) = -a_ref(j, j);
+		    a_ref(j, j) = a_ref(j - 1, j - 1);
 		}
 /* L50: */
 	    }
@@ -508,9 +505,9 @@ static real c_b39 = 1.f;
 	i__1 = *n;
 	for (j = 2; j <= i__1; j += 2) {
 	    if (slaran_(&iseed[1]) > .5f) {
-		a[j - 1 + j * a_dim1] = a[j + j * a_dim1];
-		a[j + (j - 1) * a_dim1] = -(doublereal)a[j + j * a_dim1];
-		a[j + j * a_dim1] = a[j - 1 + (j - 1) * a_dim1];
+		a_ref(j - 1, j) = a_ref(j, j);
+		a_ref(j, j - 1) = -a_ref(j, j);
+		a_ref(j, j) = a_ref(j - 1, j - 1);
 	    }
 /* L60: */
 	}
@@ -522,12 +519,12 @@ static real c_b39 = 1.f;
     if (iupper != 0) {
 	i__1 = *n;
 	for (jc = 2; jc <= i__1; ++jc) {
-	    if (a[jc - 1 + jc * a_dim1] != 0.f) {
+	    if (a_ref(jc - 1, jc) != 0.f) {
 		jr = jc - 2;
 	    } else {
 		jr = jc - 1;
 	    }
-	    slarnv_(&idist, &iseed[1], &jr, &a[jc * a_dim1 + 1]);
+	    slarnv_(&idist, &iseed[1], &jr, &a_ref(1, jc));
 /* L70: */
 	}
     }
@@ -562,10 +559,10 @@ static real c_b39 = 1.f;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    sscal_(n, &ds[j], &a[j + a_dim1], lda);
+	    sscal_(n, &ds[j], &a_ref(j, 1), lda);
 	    if (ds[j] != 0.f) {
 		r__1 = 1.f / ds[j];
-		sscal_(n, &r__1, &a[j * a_dim1 + 1], &c__1);
+		sscal_(n, &r__1, &a_ref(1, j), &c__1);
 	    } else {
 		*info = 5;
 		return 0;
@@ -594,28 +591,27 @@ static real c_b39 = 1.f;
 	    irows = *n + 1 - jcr;
 	    icols = *n + *kl - jcr;
 
-	    scopy_(&irows, &a[jcr + ic * a_dim1], &c__1, &work[1], &c__1);
+	    scopy_(&irows, &a_ref(jcr, ic), &c__1, &work[1], &c__1);
 	    xnorms = work[1];
 	    slarfg_(&irows, &xnorms, &work[2], &c__1, &tau);
 	    work[1] = 1.f;
 
-	    sgemv_("T", &irows, &icols, &c_b39, &a[jcr + (ic + 1) * a_dim1], 
-		    lda, &work[1], &c__1, &c_b23, &work[irows + 1], &c__1)
-		    ;
-	    r__1 = -(doublereal)tau;
+	    sgemv_("T", &irows, &icols, &c_b39, &a_ref(jcr, ic + 1), lda, &
+		    work[1], &c__1, &c_b23, &work[irows + 1], &c__1);
+	    r__1 = -tau;
 	    sger_(&irows, &icols, &r__1, &work[1], &c__1, &work[irows + 1], &
-		    c__1, &a[jcr + (ic + 1) * a_dim1], lda);
+		    c__1, &a_ref(jcr, ic + 1), lda);
 
-	    sgemv_("N", n, &irows, &c_b39, &a[jcr * a_dim1 + 1], lda, &work[1]
-		    , &c__1, &c_b23, &work[irows + 1], &c__1);
-	    r__1 = -(doublereal)tau;
+	    sgemv_("N", n, &irows, &c_b39, &a_ref(1, jcr), lda, &work[1], &
+		    c__1, &c_b23, &work[irows + 1], &c__1);
+	    r__1 = -tau;
 	    sger_(n, &irows, &r__1, &work[irows + 1], &c__1, &work[1], &c__1, 
-		    &a[jcr * a_dim1 + 1], lda);
+		    &a_ref(1, jcr), lda);
 
-	    a[jcr + ic * a_dim1] = xnorms;
+	    a_ref(jcr, ic) = xnorms;
 	    i__2 = irows - 1;
-	    slaset_("Full", &i__2, &c__1, &c_b23, &c_b23, &a[jcr + 1 + ic * 
-		    a_dim1], lda);
+	    slaset_("Full", &i__2, &c__1, &c_b23, &c_b23, &a_ref(jcr + 1, ic),
+		     lda);
 /* L90: */
 	}
     } else if (*ku < *n - 1) {
@@ -628,28 +624,27 @@ static real c_b39 = 1.f;
 	    irows = *n + *ku - jcr;
 	    icols = *n + 1 - jcr;
 
-	    scopy_(&icols, &a[ir + jcr * a_dim1], lda, &work[1], &c__1);
+	    scopy_(&icols, &a_ref(ir, jcr), lda, &work[1], &c__1);
 	    xnorms = work[1];
 	    slarfg_(&icols, &xnorms, &work[2], &c__1, &tau);
 	    work[1] = 1.f;
 
-	    sgemv_("N", &irows, &icols, &c_b39, &a[ir + 1 + jcr * a_dim1], 
-		    lda, &work[1], &c__1, &c_b23, &work[icols + 1], &c__1)
-		    ;
-	    r__1 = -(doublereal)tau;
+	    sgemv_("N", &irows, &icols, &c_b39, &a_ref(ir + 1, jcr), lda, &
+		    work[1], &c__1, &c_b23, &work[icols + 1], &c__1);
+	    r__1 = -tau;
 	    sger_(&irows, &icols, &r__1, &work[icols + 1], &c__1, &work[1], &
-		    c__1, &a[ir + 1 + jcr * a_dim1], lda);
+		    c__1, &a_ref(ir + 1, jcr), lda);
 
-	    sgemv_("C", &icols, n, &c_b39, &a[jcr + a_dim1], lda, &work[1], &
+	    sgemv_("C", &icols, n, &c_b39, &a_ref(jcr, 1), lda, &work[1], &
 		    c__1, &c_b23, &work[icols + 1], &c__1);
-	    r__1 = -(doublereal)tau;
+	    r__1 = -tau;
 	    sger_(&icols, n, &r__1, &work[1], &c__1, &work[icols + 1], &c__1, 
-		    &a[jcr + a_dim1], lda);
+		    &a_ref(jcr, 1), lda);
 
-	    a[ir + jcr * a_dim1] = xnorms;
+	    a_ref(ir, jcr) = xnorms;
 	    i__2 = icols - 1;
-	    slaset_("Full", &c__1, &i__2, &c_b23, &c_b23, &a[ir + (jcr + 1) * 
-		    a_dim1], lda);
+	    slaset_("Full", &c__1, &i__2, &c_b23, &c_b23, &a_ref(ir, jcr + 1),
+		     lda);
 /* L100: */
 	}
     }
@@ -662,7 +657,7 @@ static real c_b39 = 1.f;
 	    alpha = *anorm / temp;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		sscal_(n, &alpha, &a[j * a_dim1 + 1], &c__1);
+		sscal_(n, &alpha, &a_ref(1, j), &c__1);
 /* L110: */
 	    }
 	}
@@ -673,4 +668,7 @@ static real c_b39 = 1.f;
 /*     End of SLATME */
 
 } /* slatme_ */
+
+#undef a_ref
+
 

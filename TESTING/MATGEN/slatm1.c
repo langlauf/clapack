@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -6,7 +7,7 @@
 #include "f2c.h"
 
 /* Subroutine */ int slatm1_(integer *mode, real *cond, integer *irsign, 
-	integer *idist, integer *iseed, real *d, integer *n, integer *info)
+	integer *idist, integer *iseed, real *d__, integer *n, integer *info)
 {
     /* System generated locals */
     integer i__1, i__2;
@@ -18,7 +19,7 @@
 
     /* Local variables */
     static real temp;
-    static integer i;
+    static integer i__;
     static real alpha;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern doublereal slaran_(integer *);
@@ -26,7 +27,7 @@
 	    *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -69,8 +70,7 @@
              On entry, if MODE neither -6, 0 nor 6, determines sign of   
              entries of D   
              0 => leave entries of D unchanged   
-             1 => multiply each entry of D by 1 or -1 with probability .5 
-  
+             1 => multiply each entry of D by 1 or -1 with probability .5   
 
     IDIST  - CHARACTER*1   
              On entry, IDIST specifies the type of distribution to be   
@@ -103,18 +103,16 @@
              -2  => if MODE neither -6, 0 nor 6, and   
                     IRSIGN neither 0 nor 1   
              -3  => if MODE neither -6, 0 nor 6 and COND less than 1   
-             -4  => if MODE equals 6 or -6 and IDIST not in range 1 to 3 
-  
+             -4  => if MODE equals 6 or -6 and IDIST not in range 1 to 3   
              -7  => if N negative   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters. Initialize flags & seed.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --iseed;
 
     /* Function Body */
@@ -163,36 +161,36 @@
 
 L10:
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] = 1.f / *cond;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = 1.f / *cond;
 /* L20: */
 	}
-	d[1] = 1.f;
+	d__[1] = 1.f;
 	goto L120;
 
 /*        One small D value: */
 
 L30:
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] = 1.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = 1.f;
 /* L40: */
 	}
-	d[*n] = 1.f / *cond;
+	d__[*n] = 1.f / *cond;
 	goto L120;
 
 /*        Exponentially distributed D values: */
 
 L50:
-	d[1] = 1.f;
+	d__[1] = 1.f;
 	if (*n > 1) {
 	    d__1 = (doublereal) (*cond);
 	    d__2 = (doublereal) (-1.f / (real) (*n - 1));
 	    alpha = pow_dd(&d__1, &d__2);
 	    i__1 = *n;
-	    for (i = 2; i <= i__1; ++i) {
-		i__2 = i - 1;
-		d[i] = pow_ri(&alpha, &i__2);
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = i__ - 1;
+		d__[i__] = pow_ri(&alpha, &i__2);
 /* L60: */
 	    }
 	}
@@ -201,13 +199,13 @@ L50:
 /*        Arithmetically distributed D values: */
 
 L70:
-	d[1] = 1.f;
+	d__[1] = 1.f;
 	if (*n > 1) {
 	    temp = 1.f / *cond;
 	    alpha = (1.f - temp) / (real) (*n - 1);
 	    i__1 = *n;
-	    for (i = 2; i <= i__1; ++i) {
-		d[i] = (real) (*n - i) * alpha + temp;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		d__[i__] = (real) (*n - i__) * alpha + temp;
 /* L80: */
 	    }
 	}
@@ -218,8 +216,8 @@ L70:
 L90:
 	alpha = log(1.f / *cond);
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] = exp(alpha * slaran_(&iseed[1]));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = exp(alpha * slaran_(&iseed[1]));
 /* L100: */
 	}
 	goto L120;
@@ -227,7 +225,7 @@ L90:
 /*        Randomly distributed D values from IDIST */
 
 L110:
-	slarnv_(idist, &iseed[1], n, &d[1]);
+	slarnv_(idist, &iseed[1], n, &d__[1]);
 
 L120:
 
@@ -236,10 +234,10 @@ L120:
 
 	if (*mode != -6 && *mode != 0 && *mode != 6 && *irsign == 1) {
 	    i__1 = *n;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		temp = slaran_(&iseed[1]);
 		if (temp > .5f) {
-		    d[i] = -(doublereal)d[i];
+		    d__[i__] = -d__[i__];
 		}
 /* L130: */
 	    }
@@ -249,10 +247,10 @@ L120:
 
 	if (*mode < 0) {
 	    i__1 = *n / 2;
-	    for (i = 1; i <= i__1; ++i) {
-		temp = d[i];
-		d[i] = d[*n + 1 - i];
-		d[*n + 1 - i] = temp;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		temp = d__[i__];
+		d__[i__] = d__[*n + 1 - i__];
+		d__[*n + 1 - i__] = temp;
 /* L140: */
 	    }
 	}

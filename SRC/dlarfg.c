@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlarfg_(integer *n, doublereal *alpha, doublereal *x, 
 	integer *incx, doublereal *tau)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -27,8 +28,7 @@
     where tau is a real scalar and v is a real (n-1)-element   
     vector.   
 
-    If the elements of x are all zero, then tau = 0 and H is taken to be 
-  
+    If the elements of x are all zero, then tau = 0 and H is taken to be   
     the unit matrix.   
 
     Otherwise  1 <= tau <= 2.   
@@ -54,13 +54,10 @@
     TAU     (output) DOUBLE PRECISION   
             The value tau.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     doublereal d__1;
@@ -77,17 +74,16 @@
     static doublereal safmin, rsafmn;
     static integer knt;
 
+    --x;
 
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 1) {
 	*tau = 0.;
 	return 0;
     }
 
     i__1 = *n - 1;
-    xnorm = dnrm2_(&i__1, &X(1), incx);
+    xnorm = dnrm2_(&i__1, &x[1], incx);
 
     if (xnorm == 0.) {
 
@@ -103,15 +99,14 @@
 	safmin = dlamch_("S") / dlamch_("E");
 	if (abs(beta) < safmin) {
 
-/*           XNORM, BETA may be inaccurate; scale X and recompute 
-them */
+/*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
 	    rsafmn = 1. / safmin;
 	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
-	    dscal_(&i__1, &rsafmn, &X(1), incx);
+	    dscal_(&i__1, &rsafmn, &x[1], incx);
 	    beta *= rsafmn;
 	    *alpha *= rsafmn;
 	    if (abs(beta) < safmin) {
@@ -121,20 +116,19 @@ L10:
 /*           New BETA is at most 1, at least SAFMIN */
 
 	    i__1 = *n - 1;
-	    xnorm = dnrm2_(&i__1, &X(1), incx);
+	    xnorm = dnrm2_(&i__1, &x[1], incx);
 	    d__1 = dlapy2_(alpha, &xnorm);
 	    beta = -d_sign(&d__1, alpha);
 	    *tau = (beta - *alpha) / beta;
 	    i__1 = *n - 1;
 	    d__1 = 1. / (*alpha - beta);
-	    dscal_(&i__1, &d__1, &X(1), incx);
+	    dscal_(&i__1, &d__1, &x[1], incx);
 
-/*           If ALPHA is subnormal, it may lose relative accuracy 
-*/
+/*           If ALPHA is subnormal, it may lose relative accuracy */
 
 	    *alpha = beta;
 	    i__1 = knt;
-	    for (j = 1; j <= knt; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		*alpha *= safmin;
 /* L20: */
 	    }
@@ -142,7 +136,7 @@ L10:
 	    *tau = (beta - *alpha) / beta;
 	    i__1 = *n - 1;
 	    d__1 = 1. / (*alpha - beta);
-	    dscal_(&i__1, &d__1, &X(1), incx);
+	    dscal_(&i__1, &d__1, &x[1], incx);
 	    *alpha = beta;
 	}
     }

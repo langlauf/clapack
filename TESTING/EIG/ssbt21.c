@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,8 +13,8 @@ static real c_b22 = 1.f;
 static real c_b23 = 0.f;
 
 /* Subroutine */ int ssbt21_(char *uplo, integer *n, integer *ka, integer *ks,
-	 real *a, integer *lda, real *d, real *e, real *u, integer *ldu, real 
-	*work, real *result)
+	 real *a, integer *lda, real *d__, real *e, real *u, integer *ldu, 
+	real *work, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, u_dim1, u_offset, i__1, i__2, i__3, i__4;
@@ -41,7 +42,11 @@ static real c_b23 = 0.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -73,13 +78,11 @@ static real c_b23 = 0.f;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SSBT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, SSBT21 does nothing.   
             It must be at least zero.   
 
     KA      (input) INTEGER   
-            The bandwidth of the matrix A.  It must be at least zero.  If 
-  
+            The bandwidth of the matrix A.  It must be at least zero.  If   
             it is larger than N-1, then max( 0, N-1 ) will be used.   
 
     KS      (input) INTEGER   
@@ -120,20 +123,19 @@ static real c_b23 = 0.f;
             The values computed by the two tests described above.  The   
             values are currently limited to 1/ulp, to avoid overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Constants   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --result;
@@ -186,7 +188,7 @@ static real c_b23 = 0.f;
 	    i__2 = min(i__3,i__4);
 	    for (jr = 1; jr <= i__2; ++jr) {
 		++j;
-		work[j] = a[jr + jc * a_dim1];
+		work[j] = a_ref(jr, jc);
 /* L10: */
 	    }
 	    i__2 = *n + 1 - jc;
@@ -206,7 +208,7 @@ static real c_b23 = 0.f;
 	    i__2 = ika, i__3 = jc - 1;
 	    for (jr = min(i__2,i__3); jr >= 0; --jr) {
 		++j;
-		work[j] = a[ika + 1 - jr + jc * a_dim1];
+		work[j] = a_ref(ika + 1 - jr, jc);
 /* L40: */
 	    }
 	}
@@ -215,17 +217,17 @@ static real c_b23 = 0.f;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	r__1 = -(doublereal)d[j];
-	sspr_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
+	r__1 = -d__[j];
+	sspr_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &work[1]);
 /* L60: */
     }
 
     if (*n > 1 && *ks == 1) {
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    r__1 = -(doublereal)e[j];
-	    sspr2_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1]);
+	    r__1 = -e[j];
+	    sspr2_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1]);
 /* L70: */
 	}
     }
@@ -261,8 +263,8 @@ static real c_b23 = 0.f;
 /* Computing MIN   
    Computing 2nd power */
     i__1 = *n;
-    r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), r__2 =
-	     (real) (*n);
+    r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]),
+	     r__2 = (real) (*n);
     result[2] = dmin(r__1,r__2) / (*n * ulp);
 
     return 0;
@@ -270,4 +272,8 @@ static real c_b23 = 0.f;
 /*     End of SSBT21 */
 
 } /* ssbt21_ */
+
+#undef u_ref
+#undef a_ref
+
 

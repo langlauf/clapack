@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spptrf_(char *uplo, integer *n, real *ap, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -30,18 +31,15 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
             See below for further details.   
 
             On exit, if INFO = 0, the triangular factor U or L from the   
-            Cholesky factorization A = U**T*U or A = L*L**T, in the same 
-  
+            Cholesky factorization A = U**T*U or A = L*L**T, in the same   
             storage format as A.   
 
     INFO    (output) INTEGER   
@@ -68,15 +66,12 @@
 
     AP = [ a11, a12, a22, a13, a23, a33, a14, a24, a34, a44 ]   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b16 = -1.f;
@@ -101,10 +96,9 @@
     static real ajj;
 
 
+    --ap;
 
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -130,7 +124,7 @@
 
 	jj = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jc = jj + 1;
 	    jj += j;
 
@@ -138,20 +132,19 @@
 
 	    if (j > 1) {
 		i__2 = j - 1;
-		stpsv_("Upper", "Transpose", "Non-unit", &i__2, &AP(1), &AP(
-			jc), &c__1);
+		stpsv_("Upper", "Transpose", "Non-unit", &i__2, &ap[1], &ap[
+			jc], &c__1);
 	    }
 
-/*           Compute U(J,J) and test for non-positive-definiteness
-. */
+/*           Compute U(J,J) and test for non-positive-definiteness. */
 
 	    i__2 = j - 1;
-	    ajj = AP(jj) - sdot_(&i__2, &AP(jc), &c__1, &AP(jc), &c__1);
+	    ajj = ap[jj] - sdot_(&i__2, &ap[jc], &c__1, &ap[jc], &c__1);
 	    if (ajj <= 0.f) {
-		AP(jj) = ajj;
+		ap[jj] = ajj;
 		goto L30;
 	    }
-	    AP(jj) = sqrt(ajj);
+	    ap[jj] = sqrt(ajj);
 /* L10: */
 	}
     } else {
@@ -160,30 +153,28 @@
 
 	jj = 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute L(J,J) and test for non-positive-definiteness
-. */
+/*           Compute L(J,J) and test for non-positive-definiteness. */
 
-	    ajj = AP(jj);
+	    ajj = ap[jj];
 	    if (ajj <= 0.f) {
-		AP(jj) = ajj;
+		ap[jj] = ajj;
 		goto L30;
 	    }
 	    ajj = sqrt(ajj);
-	    AP(jj) = ajj;
+	    ap[jj] = ajj;
 
-/*           Compute elements J+1:N of column J and update the tra
-iling   
+/*           Compute elements J+1:N of column J and update the trailing   
              submatrix. */
 
 	    if (j < *n) {
 		i__2 = *n - j;
 		r__1 = 1.f / ajj;
-		sscal_(&i__2, &r__1, &AP(jj + 1), &c__1);
+		sscal_(&i__2, &r__1, &ap[jj + 1], &c__1);
 		i__2 = *n - j;
-		sspr_("Lower", &i__2, &c_b16, &AP(jj + 1), &c__1, &AP(jj + *n 
-			- j + 1));
+		sspr_("Lower", &i__2, &c_b16, &ap[jj + 1], &c__1, &ap[jj + *n 
+			- j + 1]);
 		jj = jj + *n - j + 1;
 	    }
 /* L20: */

@@ -1,9 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaqge_(integer *m, integer *n, real *a, integer *lda, 
-	real *r, real *c, real *rowcnd, real *colcnd, real *amax, char *equed)
+	real *r__, real *c__, real *rowcnd, real *colcnd, real *amax, char *
+	equed)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -26,8 +28,7 @@
 
     A       (input/output) REAL array, dimension (LDA,N)   
             On entry, the M by N matrix A.   
-            On exit, the equilibrated matrix.  See EQUED for the form of 
-  
+            On exit, the equilibrated matrix.  See EQUED for the form of   
             the equilibrated matrix.   
 
     LDA     (input) INTEGER   
@@ -51,11 +52,9 @@
     EQUED   (output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration   
-            = 'R':  Row equilibration, i.e., A has been premultiplied by 
-  
+            = 'R':  Row equilibration, i.e., A has been premultiplied by   
                     diag(R).   
-            = 'C':  Column equilibration, i.e., A has been postmultiplied 
-  
+            = 'C':  Column equilibration, i.e., A has been postmultiplied   
                     by diag(C).   
             = 'B':  Both row and column equilibration, i.e., A has been   
                     replaced by diag(R) * A * diag(C).   
@@ -72,28 +71,27 @@
     should be done based on the absolute size of the largest matrix   
     element.  If AMAX > LARGE or AMAX < SMALL, row scaling is done.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real large, small, cj;
     extern doublereal slamch_(char *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --r__;
+    --c__;
 
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	*(unsigned char *)equed = 'N';
 	return 0;
@@ -118,11 +116,11 @@
 /*           Column scaling */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = C(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = c__[j];
 		i__2 = *m;
-		for (i = 1; i <= *m; ++i) {
-		    A(i,j) = cj * A(i,j);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = cj * a_ref(i__, j);
 /* L10: */
 		}
 /* L20: */
@@ -134,10 +132,10 @@
 /*        Row scaling, no column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		A(i,j) = R(i) * A(i,j);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = r__[i__] * a_ref(i__, j);
 /* L30: */
 	    }
 /* L40: */
@@ -148,11 +146,11 @@
 /*        Row and column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    cj = C(j);
+	for (j = 1; j <= i__1; ++j) {
+	    cj = c__[j];
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		A(i,j) = cj * R(i) * A(i,j);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = cj * r__[i__] * a_ref(i__, j);
 /* L50: */
 	    }
 /* L60: */
@@ -165,4 +163,7 @@
 /*     End of SLAQGE */
 
 } /* slaqge_ */
+
+#undef a_ref
+
 

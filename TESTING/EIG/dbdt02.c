@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublereal c_b7 = -1.;
 static doublereal c_b9 = 1.;
 
 /* Subroutine */ int dbdt02_(integer *m, integer *n, doublereal *b, integer *
-	ldb, doublereal *c, integer *ldc, doublereal *u, integer *ldu, 
+	ldb, doublereal *c__, integer *ldc, doublereal *u, integer *ldu, 
 	doublereal *work, doublereal *resid)
 {
     /* System generated locals */
@@ -33,7 +34,11 @@ static doublereal c_b9 = 1.;
     static doublereal realmn, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -42,13 +47,11 @@ static doublereal c_b9 = 1.;
     Purpose   
     =======   
 
-    DBDT02 tests the change of basis C = U' * B by computing the residual 
-  
+    DBDT02 tests the change of basis C = U' * B by computing the residual   
 
        RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
 
-    where B and C are M by N matrices, U is an M by M orthogonal matrix, 
-  
+    where B and C are M by N matrices, U is an M by M orthogonal matrix,   
     and EPS is the machine precision.   
 
     Arguments   
@@ -84,21 +87,20 @@ static doublereal c_b9 = 1.;
     RESID   (output) DOUBLE PRECISION   
             RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
 
@@ -114,9 +116,9 @@ static doublereal c_b9 = 1.;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(m, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
-	dgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c[j * c_dim1 
-		+ 1], &c__1, &c_b9, &work[1], &c__1);
+	dcopy_(m, &b_ref(1, j), &c__1, &work[1], &c__1);
+	dgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c___ref(1, j),
+		 &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
 	d__1 = *resid, d__2 = dasum_(m, &work[1], &c__1);
 	*resid = max(d__1,d__2);
@@ -151,4 +153,8 @@ static doublereal c_b9 = 1.;
 /*     End of DBDT02 */
 
 } /* dbdt02_ */
+
+#undef c___ref
+#undef b_ref
+
 

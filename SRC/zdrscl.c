@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zdrscl_(integer *n, doublereal *sa, doublecomplex *sx, 
 	integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -32,18 +33,14 @@
 
     INCX    (input) INTEGER   
             The increment between successive values of the vector SX.   
-            > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n 
-  
+            > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     static doublereal cden;
     static logical done;
     static doublereal cnum, cden1, cnum1;
@@ -53,10 +50,9 @@
 	    doublecomplex *, integer *);
     static doublereal bignum, smlnum, mul;
 
+    --sx;
 
-#define SX(I) sx[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 0) {
 	return 0;
     }
@@ -77,16 +73,14 @@ L10:
     cnum1 = cnum / bignum;
     if (abs(cden1) > abs(cnum) && cnum != 0.) {
 
-/*        Pre-multiply X by SMLNUM if CDEN is large compared to CNUM. 
-*/
+/*        Pre-multiply X by SMLNUM if CDEN is large compared to CNUM. */
 
 	mul = smlnum;
 	done = FALSE_;
 	cden = cden1;
     } else if (abs(cnum1) > abs(cden)) {
 
-/*        Pre-multiply X by BIGNUM if CDEN is small compared to CNUM. 
-*/
+/*        Pre-multiply X by BIGNUM if CDEN is small compared to CNUM. */
 
 	mul = bignum;
 	done = FALSE_;
@@ -101,7 +95,7 @@ L10:
 
 /*     Scale the vector X by MUL */
 
-    zdscal_(n, &mul, &SX(1), incx);
+    zdscal_(n, &mul, &sx[1], incx);
 
     if (! done) {
 	goto L10;

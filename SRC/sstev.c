@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int sstev_(char *jobz, integer *n, real *d, real *e, real *z,
-	 integer *ldz, real *work, integer *info)
+/* Subroutine */ int sstev_(char *jobz, integer *n, real *d__, real *e, real *
+	z__, integer *ldz, real *work, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -55,15 +56,12 @@
             > 0:  if INFO = i, the algorithm failed to converge; i   
                   off-diagonal elements of E did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -89,15 +87,17 @@
     extern /* Subroutine */ int ssteqr_(char *, integer *, real *, real *, 
 	    real *, integer *, real *, integer *);
     static real eps;
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
+    --d__;
+    --e;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
 
     *info = 0;
@@ -123,7 +123,7 @@
 
     if (*n == 1) {
 	if (wantz) {
-	    Z(1,1) = 1.f;
+	    z___ref(1, 1) = 1.f;
 	}
 	return 0;
     }
@@ -140,7 +140,7 @@
 /*     Scale matrix to allowable range, if necessary. */
 
     iscale = 0;
-    tnrm = slanst_("M", n, &D(1), &E(1));
+    tnrm = slanst_("M", n, &d__[1], &e[1]);
     if (tnrm > 0.f && tnrm < rmin) {
 	iscale = 1;
 	sigma = rmin / tnrm;
@@ -149,18 +149,18 @@
 	sigma = rmax / tnrm;
     }
     if (iscale == 1) {
-	sscal_(n, &sigma, &D(1), &c__1);
+	sscal_(n, &sigma, &d__[1], &c__1);
 	i__1 = *n - 1;
-	sscal_(&i__1, &sigma, &E(1), &c__1);
+	sscal_(&i__1, &sigma, &e[1], &c__1);
     }
 
 /*     For eigenvalues only, call SSTERF.  For eigenvalues and   
        eigenvectors, call SSTEQR. */
 
     if (! wantz) {
-	ssterf_(n, &D(1), &E(1), info);
+	ssterf_(n, &d__[1], &e[1], info);
     } else {
-	ssteqr_("I", n, &D(1), &E(1), &Z(1,1), ldz, &WORK(1), info);
+	ssteqr_("I", n, &d__[1], &e[1], &z__[z_offset], ldz, &work[1], info);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -172,7 +172,7 @@
 	    imax = *info - 1;
 	}
 	r__1 = 1.f / sigma;
-	sscal_(&imax, &r__1, &D(1), &c__1);
+	sscal_(&imax, &r__1, &d__[1], &c__1);
     }
 
     return 0;
@@ -180,4 +180,7 @@
 /*     End of SSTEV */
 
 } /* sstev_ */
+
+#undef z___ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -7,12 +8,12 @@
 
 /* Table of constant values */
 
+static doublecomplex c_b6 = {-1.,0.};
 static integer c__1 = 1;
-static doublecomplex c_b8 = {-1.,0.};
 static doublecomplex c_b9 = {0.,0.};
 
 /* Subroutine */ int zbdt03_(char *uplo, integer *n, integer *kd, doublereal *
-	d, doublereal *e, doublecomplex *u, integer *ldu, doublereal *s, 
+	d__, doublereal *e, doublecomplex *u, integer *ldu, doublereal *s, 
 	doublecomplex *vt, integer *ldvt, doublecomplex *work, doublereal *
 	resid)
 {
@@ -23,7 +24,7 @@ static doublecomplex c_b9 = {0.,0.};
     doublecomplex z__1;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal bnorm;
     extern /* Subroutine */ int zgemv_(char *, integer *, integer *, 
@@ -35,7 +36,11 @@ static doublecomplex c_b9 = {0.,0.};
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define vt_subscr(a_1,a_2) (a_2)*vt_dim1 + a_1
+#define vt_ref(a_1,a_2) vt[vt_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -56,8 +61,7 @@ static doublecomplex c_b9 = {0.,0.};
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix B is upper or lower bidiagonal. 
-  
+            Specifies whether the matrix B is upper or lower bidiagonal.   
             = 'U':  Upper bidiagonal   
             = 'L':  Lower bidiagonal   
 
@@ -66,10 +70,8 @@ static doublecomplex c_b9 = {0.,0.};
 
     KD      (input) INTEGER   
             The bandwidth of the bidiagonal matrix B.  If KD = 1, the   
-            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is 
-  
-            not referenced.  If KD is greater than 1, it is assumed to be 
-  
+            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is   
+            not referenced.  If KD is greater than 1, it is assumed to be   
             1, and if KD is less than 0, it is assumed to be 0.   
 
     D       (input) DOUBLE PRECISION array, dimension (N)   
@@ -100,24 +102,22 @@ static doublecomplex c_b9 = {0.,0.};
     WORK    (workspace) COMPLEX*16 array, dimension (2*N)   
 
     RESID   (output) DOUBLE PRECISION   
-            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS ) 
-  
+            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS )   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --s;
     vt_dim1 = *ldvt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     --work;
 
@@ -141,21 +141,21 @@ static doublecomplex c_b9 = {0.,0.};
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *n + i;
-		    i__4 = i;
-		    i__5 = i + j * vt_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *n + i__;
+		    i__4 = i__;
+		    i__5 = vt_subscr(i__, j);
 		    z__1.r = s[i__4] * vt[i__5].r, z__1.i = s[i__4] * vt[i__5]
 			    .i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L10: */
 		}
-		zgemv_("No transpose", n, n, &c_b8, &u[u_offset], ldu, &work[*
+		zgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
 			n + 1], &c__1, &c_b9, &work[1], &c__1);
 		i__2 = j;
 		i__3 = j;
 		i__4 = j;
-		z__1.r = work[i__3].r + d[i__4], z__1.i = work[i__3].i;
+		z__1.r = work[i__3].r + d__[i__4], z__1.i = work[i__3].i;
 		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 		if (j > 1) {
 		    i__2 = j - 1;
@@ -164,12 +164,12 @@ static doublecomplex c_b9 = {0.,0.};
 		    z__1.r = work[i__3].r + e[i__4], z__1.i = work[i__3].i;
 		    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* Computing MAX */
-		    d__3 = bnorm, d__4 = (d__1 = d[j], abs(d__1)) + (d__2 = e[
-			    j - 1], abs(d__2));
+		    d__3 = bnorm, d__4 = (d__1 = d__[j], abs(d__1)) + (d__2 = 
+			    e[j - 1], abs(d__2));
 		    bnorm = max(d__3,d__4);
 		} else {
 /* Computing MAX */
-		    d__2 = bnorm, d__3 = (d__1 = d[j], abs(d__1));
+		    d__2 = bnorm, d__3 = (d__1 = d__[j], abs(d__1));
 		    bnorm = max(d__2,d__3);
 		}
 /* Computing MAX */
@@ -184,21 +184,21 @@ static doublecomplex c_b9 = {0.,0.};
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *n + i;
-		    i__4 = i;
-		    i__5 = i + j * vt_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *n + i__;
+		    i__4 = i__;
+		    i__5 = vt_subscr(i__, j);
 		    z__1.r = s[i__4] * vt[i__5].r, z__1.i = s[i__4] * vt[i__5]
 			    .i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L30: */
 		}
-		zgemv_("No transpose", n, n, &c_b8, &u[u_offset], ldu, &work[*
+		zgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
 			n + 1], &c__1, &c_b9, &work[1], &c__1);
 		i__2 = j;
 		i__3 = j;
 		i__4 = j;
-		z__1.r = work[i__3].r + d[i__4], z__1.i = work[i__3].i;
+		z__1.r = work[i__3].r + d__[i__4], z__1.i = work[i__3].i;
 		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 		if (j < *n) {
 		    i__2 = j + 1;
@@ -207,12 +207,12 @@ static doublecomplex c_b9 = {0.,0.};
 		    z__1.r = work[i__3].r + e[i__4], z__1.i = work[i__3].i;
 		    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* Computing MAX */
-		    d__3 = bnorm, d__4 = (d__1 = d[j], abs(d__1)) + (d__2 = e[
-			    j], abs(d__2));
+		    d__3 = bnorm, d__4 = (d__1 = d__[j], abs(d__1)) + (d__2 = 
+			    e[j], abs(d__2));
 		    bnorm = max(d__3,d__4);
 		} else {
 /* Computing MAX */
-		    d__2 = bnorm, d__3 = (d__1 = d[j], abs(d__1));
+		    d__2 = bnorm, d__3 = (d__1 = d__[j], abs(d__1));
 		    bnorm = max(d__2,d__3);
 		}
 /* Computing MAX */
@@ -228,28 +228,28 @@ static doublecomplex c_b9 = {0.,0.};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = *n + i;
-		i__4 = i;
-		i__5 = i + j * vt_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = *n + i__;
+		i__4 = i__;
+		i__5 = vt_subscr(i__, j);
 		z__1.r = s[i__4] * vt[i__5].r, z__1.i = s[i__4] * vt[i__5].i;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L50: */
 	    }
-	    zgemv_("No transpose", n, n, &c_b8, &u[u_offset], ldu, &work[*n + 
+	    zgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*n + 
 		    1], &c__1, &c_b9, &work[1], &c__1);
 	    i__2 = j;
 	    i__3 = j;
 	    i__4 = j;
-	    z__1.r = work[i__3].r + d[i__4], z__1.i = work[i__3].i;
+	    z__1.r = work[i__3].r + d__[i__4], z__1.i = work[i__3].i;
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* Computing MAX */
 	    d__1 = *resid, d__2 = dzasum_(n, &work[1], &c__1);
 	    *resid = max(d__1,d__2);
 /* L60: */
 	}
-	j = idamax_(n, &d[1], &c__1);
-	bnorm = (d__1 = d[j], abs(d__1));
+	j = idamax_(n, &d__[1], &c__1);
+	bnorm = (d__1 = d__[j], abs(d__1));
     }
 
 /*     Compute norm(B - U * S * V') / ( n * norm(B) * EPS ) */
@@ -281,4 +281,8 @@ static doublecomplex c_b9 = {0.,0.};
 /*     End of ZBDT03 */
 
 } /* zbdt03_ */
+
+#undef vt_ref
+#undef vt_subscr
+
 

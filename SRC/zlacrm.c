@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlacrm_(integer *m, integer *n, doublecomplex *a, 
-	integer *lda, doublereal *b, integer *ldb, doublecomplex *c, integer *
-	ldc, doublereal *rwork)
+	integer *lda, doublereal *b, integer *ldb, doublecomplex *c__, 
+	integer *ldc, doublereal *rwork)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -50,15 +51,12 @@
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (2*M*N)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b6 = 1.;
     static doublereal c_b7 = 0.;
@@ -71,70 +69,79 @@
     /* Builtin functions */
     double d_imag(doublecomplex *);
     /* Local variables */
-    static integer i, j, l;
+    static integer i__, j, l;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --rwork;
 
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     if (*m == 0 || *n == 0) {
 	return 0;
     }
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    i__3 = i + j * a_dim1;
-	    RWORK((j - 1) * *m + i) = A(i,j).r;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = a_subscr(i__, j);
+	    rwork[(j - 1) * *m + i__] = a[i__3].r;
 /* L10: */
 	}
 /* L20: */
     }
 
     l = *m * *n + 1;
-    dgemm_("N", "N", m, n, n, &c_b6, &RWORK(1), m, &B(1,1), ldb, &c_b7, &
-	    RWORK(l), m);
+    dgemm_("N", "N", m, n, n, &c_b6, &rwork[1], m, &b[b_offset], ldb, &c_b7, &
+	    rwork[l], m);
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    i__3 = i + j * c_dim1;
-	    i__4 = l + (j - 1) * *m + i - 1;
-	    C(i,j).r = RWORK(l+(j-1)**m+i-1), C(i,j).i = 0.;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = c___subscr(i__, j);
+	    i__4 = l + (j - 1) * *m + i__ - 1;
+	    c__[i__3].r = rwork[i__4], c__[i__3].i = 0.;
 /* L30: */
 	}
 /* L40: */
     }
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    RWORK((j - 1) * *m + i) = d_imag(&A(i,j));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    rwork[(j - 1) * *m + i__] = d_imag(&a_ref(i__, j));
 /* L50: */
 	}
 /* L60: */
     }
-    dgemm_("N", "N", m, n, n, &c_b6, &RWORK(1), m, &B(1,1), ldb, &c_b7, &
-	    RWORK(l), m);
+    dgemm_("N", "N", m, n, n, &c_b6, &rwork[1], m, &b[b_offset], ldb, &c_b7, &
+	    rwork[l], m);
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    i__3 = i + j * c_dim1;
-	    i__4 = i + j * c_dim1;
-	    d__1 = C(i,j).r;
-	    i__5 = l + (j - 1) * *m + i - 1;
-	    z__1.r = d__1, z__1.i = RWORK(l+(j-1)**m+i-1);
-	    C(i,j).r = z__1.r, C(i,j).i = z__1.i;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = c___subscr(i__, j);
+	    i__4 = c___subscr(i__, j);
+	    d__1 = c__[i__4].r;
+	    i__5 = l + (j - 1) * *m + i__ - 1;
+	    z__1.r = d__1, z__1.i = rwork[i__5];
+	    c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L70: */
 	}
 /* L80: */
@@ -145,4 +152,10 @@
 /*     End of ZLACRM */
 
 } /* zlacrm_ */
+
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
 

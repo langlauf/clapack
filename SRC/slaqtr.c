@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaqtr_(logical *ltran, logical *lreal, integer *n, real 
 	*t, integer *ldt, real *b, real *w, real *scale, real *x, real *work, 
 	integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -44,8 +45,7 @@
     =========   
 
     LTRAN   (input) LOGICAL   
-            On entry, LTRAN specifies the option of conjugate transpose: 
-  
+            On entry, LTRAN specifies the option of conjugate transpose:   
                = .FALSE.,    op(T+i*B) = T+i*B,   
                = .TRUE.,     op(T+i*B) = (T+i*B)'.   
 
@@ -86,24 +86,19 @@
     INFO    (output) INTEGER   
             On exit, INFO is set to   
                0: successful exit.   
-                 1: the some diagonal 1 by 1 block has been perturbed by 
-  
+                 1: the some diagonal 1 by 1 block has been perturbed by   
                     a small number SMIN to keep nonsingularity.   
-                 2: the some diagonal 2 by 2 block has been perturbed by 
-  
+                 2: the some diagonal 2 by 2 block has been perturbed by   
                     a small number in SLALN2 to keep nonsingularity.   
             NOTE: In the interests of speed, this routine does not   
                   check the inputs for errors.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Do not test the input parameters for errors   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static logical c_false = FALSE_;
@@ -119,9 +114,9 @@
     static integer ierr;
     static real smin;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static real xmax, d[4]	/* was [2][2] */;
-    static integer i, j, k;
-    static real v[4]	/* was [2][2] */, z;
+    static real xmax, d__[4]	/* was [2][2] */;
+    static integer i__, j, k;
+    static real v[4]	/* was [2][2] */, z__;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static integer jnext;
     extern doublereal sasum_(integer *, real *, integer *);
@@ -142,15 +137,19 @@
 	    , real *);
     static logical notran;
     static real smlnum, rec, eps, tjj, tmp;
+#define d___ref(a_1,a_2) d__[(a_2)*2 + a_1 - 3]
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*2 + a_1 - 3]
 
 
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    --b;
+    --x;
+    --work;
 
-#define B(I) b[(I)-1]
-#define X(I) x[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-
+    /* Function Body */
     notran = ! (*ltran);
     *info = 0;
 
@@ -166,11 +165,11 @@
     smlnum = slamch_("S") / eps;
     bignum = 1.f / smlnum;
 
-    xnorm = slange_("M", n, n, &T(1,1), ldt, d);
+    xnorm = slange_("M", n, n, &t[t_offset], ldt, d__);
     if (! (*lreal)) {
 /* Computing MAX */
 	r__1 = xnorm, r__2 = dabs(*w), r__1 = max(r__1,r__2), r__2 = slange_(
-		"M", n, &c__1, &B(1), n, d);
+		"M", n, &c__1, &b[1], n, d__);
 	xnorm = dmax(r__1,r__2);
     }
 /* Computing MAX */
@@ -180,18 +179,18 @@
 /*     Compute 1-norm of each column of strictly upper triangular   
        part of T to control overflow in triangular solver. */
 
-    WORK(1) = 0.f;
+    work[1] = 0.f;
     i__1 = *n;
-    for (j = 2; j <= *n; ++j) {
+    for (j = 2; j <= i__1; ++j) {
 	i__2 = j - 1;
-	WORK(j) = sasum_(&i__2, &T(1,j), &c__1);
+	work[j] = sasum_(&i__2, &t_ref(1, j), &c__1);
 /* L10: */
     }
 
     if (! (*lreal)) {
 	i__1 = *n;
-	for (i = 2; i <= *n; ++i) {
-	    WORK(i) += (r__1 = B(i), dabs(r__1));
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    work[i__] += (r__1 = b[i__], dabs(r__1));
 /* L20: */
 	}
     }
@@ -201,13 +200,13 @@
     if (! (*lreal)) {
 	n1 = n2;
     }
-    k = isamax_(&n1, &X(1), &c__1);
-    xmax = (r__1 = X(k), dabs(r__1));
+    k = isamax_(&n1, &x[1], &c__1);
+    xmax = (r__1 = x[k], dabs(r__1));
     *scale = 1.f;
 
     if (xmax > bignum) {
 	*scale = bignum / xmax;
-	sscal_(&n1, scale, &X(1), &c__1);
+	sscal_(&n1, scale, &x[1], &c__1);
 	xmax = bignum;
     }
 
@@ -225,23 +224,23 @@
 		j1 = j;
 		j2 = j;
 		jnext = j - 1;
-		if (j > 1 && T(j,j-1) != 0.f) {
-		    j1 = j - 1;
-		    j2 = j;
-		    jnext = j - 2;
+		if (j > 1) {
+		    if (t_ref(j, j - 1) != 0.f) {
+			j1 = j - 1;
+			jnext = j - 2;
+		    }
 		}
 
 		if (j1 == j2) {
 
 /*                 Meet 1 by 1 diagonal block   
 
-                   Scale to avoid overflow when computing 
-  
+                   Scale to avoid overflow when computing   
                        x(j) = b(j)/T(j,j) */
 
-		    xj = (r__1 = X(j1), dabs(r__1));
-		    tjj = (r__1 = T(j1,j1), dabs(r__1));
-		    tmp = T(j1,j1);
+		    xj = (r__1 = x[j1], dabs(r__1));
+		    tjj = (r__1 = t_ref(j1, j1), dabs(r__1));
+		    tmp = t_ref(j1, j1);
 		    if (tjj < smin) {
 			tmp = smin;
 			tjj = smin;
@@ -255,73 +254,70 @@
 		    if (tjj < 1.f) {
 			if (xj > bignum * tjj) {
 			    rec = 1.f / xj;
-			    sscal_(n, &rec, &X(1), &c__1);
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
-		    X(j1) /= tmp;
-		    xj = (r__1 = X(j1), dabs(r__1));
+		    x[j1] /= tmp;
+		    xj = (r__1 = x[j1], dabs(r__1));
 
-/*                 Scale x if necessary to avoid overflow 
-when adding a   
+/*                 Scale x if necessary to avoid overflow when adding a   
                    multiple of column j1 of T. */
 
 		    if (xj > 1.f) {
 			rec = 1.f / xj;
-			if (WORK(j1) > (bignum - xmax) * rec) {
-			    sscal_(n, &rec, &X(1), &c__1);
+			if (work[j1] > (bignum - xmax) * rec) {
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			}
 		    }
 		    if (j1 > 1) {
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[1], &
+				c__1);
 			i__1 = j1 - 1;
-			k = isamax_(&i__1, &X(1), &c__1);
-			xmax = (r__1 = X(k), dabs(r__1));
+			k = isamax_(&i__1, &x[1], &c__1);
+			xmax = (r__1 = x[k], dabs(r__1));
 		    }
 
 		} else {
 
 /*                 Meet 2 by 2 diagonal block   
 
-                   Call 2 by 2 linear system solve, to tak
-e   
-                   care of possible overflow by scaling fa
-ctor. */
+                   Call 2 by 2 linear system solve, to take   
+                   care of possible overflow by scaling factor. */
 
-		    d[0] = X(j1);
-		    d[1] = X(j2);
-		    slaln2_(&c_false, &c__2, &c__1, &smin, &c_b21, &T(j1,j1), ldt, &c_b21, &c_b21, d, &c__2, &c_b25, 
-			    &c_b25, v, &c__2, &scaloc, &xnorm, &ierr);
+		    d___ref(1, 1) = x[j1];
+		    d___ref(2, 1) = x[j2];
+		    slaln2_(&c_false, &c__2, &c__1, &smin, &c_b21, &t_ref(j1, 
+			    j1), ldt, &c_b21, &c_b21, d__, &c__2, &c_b25, &
+			    c_b25, v, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 2;
 		    }
 
 		    if (scaloc != 1.f) {
-			sscal_(n, &scaloc, &X(1), &c__1);
+			sscal_(n, &scaloc, &x[1], &c__1);
 			*scale *= scaloc;
 		    }
-		    X(j1) = v[0];
-		    X(j2) = v[1];
+		    x[j1] = v_ref(1, 1);
+		    x[j2] = v_ref(2, 1);
 
-/*                 Scale V(1,1) (= X(J1)) and/or V(2,1) (=
-X(J2))   
-                   to avoid overflow in updating right-han
-d side.   
+/*                 Scale V(1,1) (= X(J1)) and/or V(2,1) (=X(J2))   
+                   to avoid overflow in updating right-hand side.   
 
    Computing MAX */
-		    r__1 = dabs(v[0]), r__2 = dabs(v[1]);
-		    xj = dmax(r__1,r__2);
+		    r__3 = (r__1 = v_ref(1, 1), dabs(r__1)), r__4 = (r__2 = 
+			    v_ref(2, 1), dabs(r__2));
+		    xj = dmax(r__3,r__4);
 		    if (xj > 1.f) {
 			rec = 1.f / xj;
 /* Computing MAX */
-			r__1 = WORK(j1), r__2 = WORK(j2);
+			r__1 = work[j1], r__2 = work[j2];
 			if (dmax(r__1,r__2) > (bignum - xmax) * rec) {
-			    sscal_(n, &rec, &X(1), &c__1);
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			}
 		    }
@@ -330,16 +326,16 @@ d side.
 
 		    if (j1 > 1) {
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[1], &
+				c__1);
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j2);
-			saxpy_(&i__1, &r__1, &T(1,j2), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j2];
+			saxpy_(&i__1, &r__1, &t_ref(1, j2), &c__1, &x[1], &
+				c__1);
 			i__1 = j1 - 1;
-			k = isamax_(&i__1, &X(1), &c__1);
-			xmax = (r__1 = X(k), dabs(r__1));
+			k = isamax_(&i__1, &x[1], &c__1);
+			xmax = (r__1 = x[k], dabs(r__1));
 		    }
 
 		}
@@ -354,45 +350,43 @@ L30:
 
 	    jnext = 1;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (j < jnext) {
 		    goto L40;
 		}
 		j1 = j;
 		j2 = j;
 		jnext = j + 1;
-		if (j < *n && T(j+1,j) != 0.f) {
-		    j1 = j;
-		    j2 = j + 1;
-		    jnext = j + 2;
+		if (j < *n) {
+		    if (t_ref(j + 1, j) != 0.f) {
+			j2 = j + 1;
+			jnext = j + 2;
+		    }
 		}
 
 		if (j1 == j2) {
 
 /*                 1 by 1 diagonal block   
 
-                   Scale if necessary to avoid overflow in
- forming the   
-                   right-hand side element by inner produc
-t. */
+                   Scale if necessary to avoid overflow in forming the   
+                   right-hand side element by inner product. */
 
-		    xj = (r__1 = X(j1), dabs(r__1));
+		    xj = (r__1 = x[j1], dabs(r__1));
 		    if (xmax > 1.f) {
 			rec = 1.f / xmax;
-			if (WORK(j1) > (bignum - xj) * rec) {
-			    sscal_(n, &rec, &X(1), &c__1);
+			if (work[j1] > (bignum - xj) * rec) {
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
 
 		    i__2 = j1 - 1;
-		    X(j1) -= sdot_(&i__2, &T(1,j1), &c__1, &X(1), &
-			    c__1);
+		    x[j1] -= sdot_(&i__2, &t_ref(1, j1), &c__1, &x[1], &c__1);
 
-		    xj = (r__1 = X(j1), dabs(r__1));
-		    tjj = (r__1 = T(j1,j1), dabs(r__1));
-		    tmp = T(j1,j1);
+		    xj = (r__1 = x[j1], dabs(r__1));
+		    tjj = (r__1 = t_ref(j1, j1), dabs(r__1));
+		    tmp = t_ref(j1, j1);
 		    if (tjj < smin) {
 			tmp = smin;
 			tjj = smin;
@@ -402,61 +396,60 @@ t. */
 		    if (tjj < 1.f) {
 			if (xj > bignum * tjj) {
 			    rec = 1.f / xj;
-			    sscal_(n, &rec, &X(1), &c__1);
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
-		    X(j1) /= tmp;
+		    x[j1] /= tmp;
 /* Computing MAX */
-		    r__2 = xmax, r__3 = (r__1 = X(j1), dabs(r__1));
+		    r__2 = xmax, r__3 = (r__1 = x[j1], dabs(r__1));
 		    xmax = dmax(r__2,r__3);
 
 		} else {
 
 /*                 2 by 2 diagonal block   
 
-                   Scale if necessary to avoid overflow in
- forming the   
-                   right-hand side elements by inner produ
-ct.   
+                   Scale if necessary to avoid overflow in forming the   
+                   right-hand side elements by inner product.   
 
    Computing MAX */
-		    r__3 = (r__1 = X(j1), dabs(r__1)), r__4 = (r__2 = X(j2), 
+		    r__3 = (r__1 = x[j1], dabs(r__1)), r__4 = (r__2 = x[j2], 
 			    dabs(r__2));
 		    xj = dmax(r__3,r__4);
 		    if (xmax > 1.f) {
 			rec = 1.f / xmax;
 /* Computing MAX */
-			r__1 = WORK(j2), r__2 = WORK(j1);
+			r__1 = work[j2], r__2 = work[j1];
 			if (dmax(r__1,r__2) > (bignum - xj) * rec) {
-			    sscal_(n, &rec, &X(1), &c__1);
+			    sscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
 
 		    i__2 = j1 - 1;
-		    d[0] = X(j1) - sdot_(&i__2, &T(1,j1), &c__1, &
-			    X(1), &c__1);
+		    d___ref(1, 1) = x[j1] - sdot_(&i__2, &t_ref(1, j1), &c__1,
+			     &x[1], &c__1);
 		    i__2 = j1 - 1;
-		    d[1] = X(j2) - sdot_(&i__2, &T(1,j2), &c__1, &
-			    X(1), &c__1);
+		    d___ref(2, 1) = x[j2] - sdot_(&i__2, &t_ref(1, j2), &c__1,
+			     &x[1], &c__1);
 
-		    slaln2_(&c_true, &c__2, &c__1, &smin, &c_b21, &T(j1,j1), ldt, &c_b21, &c_b21, d, &c__2, &c_b25, &
+		    slaln2_(&c_true, &c__2, &c__1, &smin, &c_b21, &t_ref(j1, 
+			    j1), ldt, &c_b21, &c_b21, d__, &c__2, &c_b25, &
 			    c_b25, v, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 2;
 		    }
 
 		    if (scaloc != 1.f) {
-			sscal_(n, &scaloc, &X(1), &c__1);
+			sscal_(n, &scaloc, &x[1], &c__1);
 			*scale *= scaloc;
 		    }
-		    X(j1) = v[0];
-		    X(j2) = v[1];
+		    x[j1] = v_ref(1, 1);
+		    x[j2] = v_ref(2, 1);
 /* Computing MAX */
-		    r__3 = (r__1 = X(j1), dabs(r__1)), r__4 = (r__2 = X(j2), 
+		    r__3 = (r__1 = x[j1], dabs(r__1)), r__4 = (r__2 = x[j2], 
 			    dabs(r__2)), r__3 = max(r__3,r__4);
 		    xmax = dmax(r__3,xmax);
 
@@ -483,27 +476,27 @@ L40:
 		j1 = j;
 		j2 = j;
 		jnext = j - 1;
-		if (j > 1 && T(j,j-1) != 0.f) {
-		    j1 = j - 1;
-		    j2 = j;
-		    jnext = j - 2;
+		if (j > 1) {
+		    if (t_ref(j, j - 1) != 0.f) {
+			j1 = j - 1;
+			jnext = j - 2;
+		    }
 		}
 
 		if (j1 == j2) {
 
 /*                 1 by 1 diagonal block   
 
-                   Scale if necessary to avoid overflow in
- division */
+                   Scale if necessary to avoid overflow in division */
 
-		    z = *w;
+		    z__ = *w;
 		    if (j1 == 1) {
-			z = B(1);
+			z__ = b[1];
 		    }
-		    xj = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(*n + j1), 
+		    xj = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[*n + j1], 
 			    dabs(r__2));
-		    tjj = (r__1 = T(j1,j1), dabs(r__1)) + dabs(z);
-		    tmp = T(j1,j1);
+		    tjj = (r__1 = t_ref(j1, j1), dabs(r__1)) + dabs(z__);
+		    tmp = t_ref(j1, j1);
 		    if (tjj < sminw) {
 			tmp = sminw;
 			tjj = sminw;
@@ -517,48 +510,47 @@ L40:
 		    if (tjj < 1.f) {
 			if (xj > bignum * tjj) {
 			    rec = 1.f / xj;
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
-		    sladiv_(&X(j1), &X(*n + j1), &tmp, &z, &sr, &si);
-		    X(j1) = sr;
-		    X(*n + j1) = si;
-		    xj = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(*n + j1), 
+		    sladiv_(&x[j1], &x[*n + j1], &tmp, &z__, &sr, &si);
+		    x[j1] = sr;
+		    x[*n + j1] = si;
+		    xj = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[*n + j1], 
 			    dabs(r__2));
 
-/*                 Scale x if necessary to avoid overflow 
-when adding a   
+/*                 Scale x if necessary to avoid overflow when adding a   
                    multiple of column j1 of T. */
 
 		    if (xj > 1.f) {
 			rec = 1.f / xj;
-			if (WORK(j1) > (bignum - xmax) * rec) {
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			if (work[j1] > (bignum - xmax) * rec) {
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			}
 		    }
 
 		    if (j1 > 1) {
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[1], &
+				c__1);
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(*n + j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(*
-				n + 1), &c__1);
+			r__1 = -x[*n + j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[*n + 1],
+				 &c__1);
 
-			X(1) += B(j1) * X(*n + j1);
-			X(*n + 1) -= B(j1) * X(j1);
+			x[1] += b[j1] * x[*n + j1];
+			x[*n + 1] -= b[j1] * x[j1];
 
 			xmax = 0.f;
 			i__1 = j1 - 1;
-			for (k = 1; k <= j1-1; ++k) {
+			for (k = 1; k <= i__1; ++k) {
 /* Computing MAX */
-			    r__3 = xmax, r__4 = (r__1 = X(k), dabs(r__1)) + (
-				    r__2 = X(k + *n), dabs(r__2));
+			    r__3 = xmax, r__4 = (r__1 = x[k], dabs(r__1)) + (
+				    r__2 = x[k + *n], dabs(r__2));
 			    xmax = dmax(r__3,r__4);
 /* L50: */
 			}
@@ -568,41 +560,42 @@ when adding a
 
 /*                 Meet 2 by 2 diagonal block */
 
-		    d[0] = X(j1);
-		    d[1] = X(j2);
-		    d[2] = X(*n + j1);
-		    d[3] = X(*n + j2);
-		    r__1 = -(doublereal)(*w);
-		    slaln2_(&c_false, &c__2, &c__2, &sminw, &c_b21, &T(j1,j1), ldt, &c_b21, &c_b21, d, &c__2, &
-			    c_b25, &r__1, v, &c__2, &scaloc, &xnorm, &ierr);
+		    d___ref(1, 1) = x[j1];
+		    d___ref(2, 1) = x[j2];
+		    d___ref(1, 2) = x[*n + j1];
+		    d___ref(2, 2) = x[*n + j2];
+		    r__1 = -(*w);
+		    slaln2_(&c_false, &c__2, &c__2, &sminw, &c_b21, &t_ref(j1,
+			     j1), ldt, &c_b21, &c_b21, d__, &c__2, &c_b25, &
+			    r__1, v, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 2;
 		    }
 
 		    if (scaloc != 1.f) {
 			i__1 = *n << 1;
-			sscal_(&i__1, &scaloc, &X(1), &c__1);
+			sscal_(&i__1, &scaloc, &x[1], &c__1);
 			*scale = scaloc * *scale;
 		    }
-		    X(j1) = v[0];
-		    X(j2) = v[1];
-		    X(*n + j1) = v[2];
-		    X(*n + j2) = v[3];
+		    x[j1] = v_ref(1, 1);
+		    x[j2] = v_ref(2, 1);
+		    x[*n + j1] = v_ref(1, 2);
+		    x[*n + j2] = v_ref(2, 2);
 
-/*                 Scale X(J1), .... to avoid overflow in 
-  
+/*                 Scale X(J1), .... to avoid overflow in   
                    updating right hand side.   
 
    Computing MAX */
-		    r__1 = dabs(v[0]) + dabs(v[2]), r__2 = dabs(v[1]) + dabs(
-			    v[3]);
-		    xj = dmax(r__1,r__2);
+		    r__5 = (r__1 = v_ref(1, 1), dabs(r__1)) + (r__2 = v_ref(1,
+			     2), dabs(r__2)), r__6 = (r__3 = v_ref(2, 1), 
+			    dabs(r__3)) + (r__4 = v_ref(2, 2), dabs(r__4));
+		    xj = dmax(r__5,r__6);
 		    if (xj > 1.f) {
 			rec = 1.f / xj;
 /* Computing MAX */
-			r__1 = WORK(j1), r__2 = WORK(j2);
+			r__1 = work[j1], r__2 = work[j2];
 			if (dmax(r__1,r__2) > (bignum - xmax) * rec) {
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			}
 		    }
@@ -611,32 +604,32 @@ when adding a
 
 		    if (j1 > 1) {
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[1], &
+				c__1);
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(j2);
-			saxpy_(&i__1, &r__1, &T(1,j2), &c__1, &X(1)
-				, &c__1);
+			r__1 = -x[j2];
+			saxpy_(&i__1, &r__1, &t_ref(1, j2), &c__1, &x[1], &
+				c__1);
 
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(*n + j1);
-			saxpy_(&i__1, &r__1, &T(1,j1), &c__1, &X(*
-				n + 1), &c__1);
+			r__1 = -x[*n + j1];
+			saxpy_(&i__1, &r__1, &t_ref(1, j1), &c__1, &x[*n + 1],
+				 &c__1);
 			i__1 = j1 - 1;
-			r__1 = -(doublereal)X(*n + j2);
-			saxpy_(&i__1, &r__1, &T(1,j2), &c__1, &X(*
-				n + 1), &c__1);
+			r__1 = -x[*n + j2];
+			saxpy_(&i__1, &r__1, &t_ref(1, j2), &c__1, &x[*n + 1],
+				 &c__1);
 
-			X(1) = X(1) + B(j1) * X(*n + j1) + B(j2) * X(*n + j2);
-			X(*n + 1) = X(*n + 1) - B(j1) * X(j1) - B(j2) * X(j2);
+			x[1] = x[1] + b[j1] * x[*n + j1] + b[j2] * x[*n + j2];
+			x[*n + 1] = x[*n + 1] - b[j1] * x[j1] - b[j2] * x[j2];
 
 			xmax = 0.f;
 			i__1 = j1 - 1;
-			for (k = 1; k <= j1-1; ++k) {
+			for (k = 1; k <= i__1; ++k) {
 /* Computing MAX */
-			    r__3 = (r__1 = X(k), dabs(r__1)) + (r__2 = X(k + *
-				    n), dabs(r__2));
+			    r__3 = (r__1 = x[k], dabs(r__1)) + (r__2 = x[k + *
+				    n], dabs(r__2));
 			    xmax = dmax(r__3,xmax);
 /* L60: */
 			}
@@ -653,63 +646,60 @@ L70:
 
 	    jnext = 1;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (j < jnext) {
 		    goto L80;
 		}
 		j1 = j;
 		j2 = j;
 		jnext = j + 1;
-		if (j < *n && T(j+1,j) != 0.f) {
-		    j1 = j;
-		    j2 = j + 1;
-		    jnext = j + 2;
+		if (j < *n) {
+		    if (t_ref(j + 1, j) != 0.f) {
+			j2 = j + 1;
+			jnext = j + 2;
+		    }
 		}
 
 		if (j1 == j2) {
 
 /*                 1 by 1 diagonal block   
 
-                   Scale if necessary to avoid overflow in
- forming the   
-                   right-hand side element by inner produc
-t. */
+                   Scale if necessary to avoid overflow in forming the   
+                   right-hand side element by inner product. */
 
-		    xj = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(j1 + *n), 
+		    xj = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[j1 + *n], 
 			    dabs(r__2));
 		    if (xmax > 1.f) {
 			rec = 1.f / xmax;
-			if (WORK(j1) > (bignum - xj) * rec) {
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			if (work[j1] > (bignum - xj) * rec) {
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
 
 		    i__2 = j1 - 1;
-		    X(j1) -= sdot_(&i__2, &T(1,j1), &c__1, &X(1), &
-			    c__1);
+		    x[j1] -= sdot_(&i__2, &t_ref(1, j1), &c__1, &x[1], &c__1);
 		    i__2 = j1 - 1;
-		    X(*n + j1) -= sdot_(&i__2, &T(1,j1), &c__1, &X(
-			    *n + 1), &c__1);
+		    x[*n + j1] -= sdot_(&i__2, &t_ref(1, j1), &c__1, &x[*n + 
+			    1], &c__1);
 		    if (j1 > 1) {
-			X(j1) -= B(j1) * X(*n + 1);
-			X(*n + j1) += B(j1) * X(1);
+			x[j1] -= b[j1] * x[*n + 1];
+			x[*n + j1] += b[j1] * x[1];
 		    }
-		    xj = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(j1 + *n), 
+		    xj = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[j1 + *n], 
 			    dabs(r__2));
 
-		    z = *w;
+		    z__ = *w;
 		    if (j1 == 1) {
-			z = B(1);
+			z__ = b[1];
 		    }
 
-/*                 Scale if necessary to avoid overflow in
-   
+/*                 Scale if necessary to avoid overflow in   
                    complex division */
 
-		    tjj = (r__1 = T(j1,j1), dabs(r__1)) + dabs(z);
-		    tmp = T(j1,j1);
+		    tjj = (r__1 = t_ref(j1, j1), dabs(r__1)) + dabs(z__);
+		    tmp = t_ref(j1, j1);
 		    if (tjj < sminw) {
 			tmp = sminw;
 			tjj = sminw;
@@ -719,17 +709,17 @@ t. */
 		    if (tjj < 1.f) {
 			if (xj > bignum * tjj) {
 			    rec = 1.f / xj;
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
-		    r__1 = -(doublereal)z;
-		    sladiv_(&X(j1), &X(*n + j1), &tmp, &r__1, &sr, &si);
-		    X(j1) = sr;
-		    X(j1 + *n) = si;
+		    r__1 = -z__;
+		    sladiv_(&x[j1], &x[*n + j1], &tmp, &r__1, &sr, &si);
+		    x[j1] = sr;
+		    x[j1 + *n] = si;
 /* Computing MAX */
-		    r__3 = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(j1 + *n), 
+		    r__3 = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[j1 + *n], 
 			    dabs(r__2));
 		    xmax = dmax(r__3,xmax);
 
@@ -737,62 +727,61 @@ t. */
 
 /*                 2 by 2 diagonal block   
 
-                   Scale if necessary to avoid overflow in
- forming the   
-                   right-hand side element by inner produc
-t.   
+                   Scale if necessary to avoid overflow in forming the   
+                   right-hand side element by inner product.   
 
    Computing MAX */
-		    r__5 = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(*n + j1), 
-			    dabs(r__2)), r__6 = (r__3 = X(j2), dabs(r__3)) + (
-			    r__4 = X(*n + j2), dabs(r__4));
+		    r__5 = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[*n + j1], 
+			    dabs(r__2)), r__6 = (r__3 = x[j2], dabs(r__3)) + (
+			    r__4 = x[*n + j2], dabs(r__4));
 		    xj = dmax(r__5,r__6);
 		    if (xmax > 1.f) {
 			rec = 1.f / xmax;
 /* Computing MAX */
-			r__1 = WORK(j1), r__2 = WORK(j2);
+			r__1 = work[j1], r__2 = work[j2];
 			if (dmax(r__1,r__2) > (bignum - xj) / xmax) {
-			    sscal_(&n2, &rec, &X(1), &c__1);
+			    sscal_(&n2, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
 
 		    i__2 = j1 - 1;
-		    d[0] = X(j1) - sdot_(&i__2, &T(1,j1), &c__1, &
-			    X(1), &c__1);
+		    d___ref(1, 1) = x[j1] - sdot_(&i__2, &t_ref(1, j1), &c__1,
+			     &x[1], &c__1);
 		    i__2 = j1 - 1;
-		    d[1] = X(j2) - sdot_(&i__2, &T(1,j2), &c__1, &
-			    X(1), &c__1);
+		    d___ref(2, 1) = x[j2] - sdot_(&i__2, &t_ref(1, j2), &c__1,
+			     &x[1], &c__1);
 		    i__2 = j1 - 1;
-		    d[2] = X(*n + j1) - sdot_(&i__2, &T(1,j1), &
-			    c__1, &X(*n + 1), &c__1);
+		    d___ref(1, 2) = x[*n + j1] - sdot_(&i__2, &t_ref(1, j1), &
+			    c__1, &x[*n + 1], &c__1);
 		    i__2 = j1 - 1;
-		    d[3] = X(*n + j2) - sdot_(&i__2, &T(1,j2), &
-			    c__1, &X(*n + 1), &c__1);
-		    d[0] -= B(j1) * X(*n + 1);
-		    d[1] -= B(j2) * X(*n + 1);
-		    d[2] += B(j1) * X(1);
-		    d[3] += B(j2) * X(1);
+		    d___ref(2, 2) = x[*n + j2] - sdot_(&i__2, &t_ref(1, j2), &
+			    c__1, &x[*n + 1], &c__1);
+		    d___ref(1, 1) = d___ref(1, 1) - b[j1] * x[*n + 1];
+		    d___ref(2, 1) = d___ref(2, 1) - b[j2] * x[*n + 1];
+		    d___ref(1, 2) = d___ref(1, 2) + b[j1] * x[1];
+		    d___ref(2, 2) = d___ref(2, 2) + b[j2] * x[1];
 
-		    slaln2_(&c_true, &c__2, &c__2, &sminw, &c_b21, &T(j1,j1), ldt, &c_b21, &c_b21, d, &c__2, &c_b25, 
-			    w, v, &c__2, &scaloc, &xnorm, &ierr);
+		    slaln2_(&c_true, &c__2, &c__2, &sminw, &c_b21, &t_ref(j1, 
+			    j1), ldt, &c_b21, &c_b21, d__, &c__2, &c_b25, w, 
+			    v, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 2;
 		    }
 
 		    if (scaloc != 1.f) {
-			sscal_(&n2, &scaloc, &X(1), &c__1);
+			sscal_(&n2, &scaloc, &x[1], &c__1);
 			*scale = scaloc * *scale;
 		    }
-		    X(j1) = v[0];
-		    X(j2) = v[1];
-		    X(*n + j1) = v[2];
-		    X(*n + j2) = v[3];
+		    x[j1] = v_ref(1, 1);
+		    x[j2] = v_ref(2, 1);
+		    x[*n + j1] = v_ref(1, 2);
+		    x[*n + j2] = v_ref(2, 2);
 /* Computing MAX */
-		    r__5 = (r__1 = X(j1), dabs(r__1)) + (r__2 = X(*n + j1), 
-			    dabs(r__2)), r__6 = (r__3 = X(j2), dabs(r__3)) + (
-			    r__4 = X(*n + j2), dabs(r__4)), r__5 = max(r__5,
+		    r__5 = (r__1 = x[j1], dabs(r__1)) + (r__2 = x[*n + j1], 
+			    dabs(r__2)), r__6 = (r__3 = x[j2], dabs(r__3)) + (
+			    r__4 = x[*n + j2], dabs(r__4)), r__5 = max(r__5,
 			    r__6);
 		    xmax = dmax(r__5,xmax);
 
@@ -811,4 +800,9 @@ L80:
 /*     End of SLAQTR */
 
 } /* slaqtr_ */
+
+#undef v_ref
+#undef t_ref
+#undef d___ref
+
 

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int stgsja_(char *jobu, char *jobv, char *jobq, integer *m, 
@@ -6,10 +7,10 @@
 	beta, real *u, integer *ldu, real *v, integer *ldv, real *q, integer *
 	ldq, real *work, integer *ncycle, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -91,38 +92,33 @@
     S = diag( BETA(K+1),  ... , BETA(M) ),   
     C**2 + S**2 = I.   
 
-    R = ( R11 R12 R13 ) is stored in A(1:M, N-K-L+1:N) and R33 is stored 
-  
+    R = ( R11 R12 R13 ) is stored in A(1:M, N-K-L+1:N) and R33 is stored   
         (  0  R22 R23 )   
     in B(M-K+1:L,N+M-K-L+1:N) on exit.   
 
     The computation of the orthogonal transformation matrices U, V or Q   
-    is optional.  These matrices may either be formed explicitly, or they 
-  
+    is optional.  These matrices may either be formed explicitly, or they   
     may be postmultiplied into input matrices U1, V1, or Q1.   
 
     Arguments   
     =========   
 
     JOBU    (input) CHARACTER*1   
-            = 'U':  U must contain an orthogonal matrix U1 on entry, and 
-  
+            = 'U':  U must contain an orthogonal matrix U1 on entry, and   
                     the product U1*U is returned;   
             = 'I':  U is initialized to the unit matrix, and the   
                     orthogonal matrix U is returned;   
             = 'N':  U is not computed.   
 
     JOBV    (input) CHARACTER*1   
-            = 'V':  V must contain an orthogonal matrix V1 on entry, and 
-  
+            = 'V':  V must contain an orthogonal matrix V1 on entry, and   
                     the product V1*V is returned;   
             = 'I':  V is initialized to the unit matrix, and the   
                     orthogonal matrix V is returned;   
             = 'N':  V is not computed.   
 
     JOBQ    (input) CHARACTER*1   
-            = 'Q':  Q must contain an orthogonal matrix Q1 on entry, and 
-  
+            = 'Q':  Q must contain an orthogonal matrix Q1 on entry, and   
                     the product Q1*Q is returned;   
             = 'I':  Q is initialized to the unit matrix, and the   
                     orthogonal matrix Q is returned;   
@@ -139,8 +135,7 @@
 
     K       (input) INTEGER   
     L       (input) INTEGER   
-            K and L specify the subblocks in the input matrices A and B: 
-  
+            K and L specify the subblocks in the input matrices A and B:   
             A23 = A(K+1:MIN(K+L,M),N-L+1:N) and B13 = B(1:L,N-L+1:N)   
             of A and B, whose GSVD is going to be computed by STGSJA.   
             See Further details.   
@@ -186,8 +181,7 @@
               BETA(K+L+1:N)  = 0.   
 
     U       (input/output) REAL array, dimension (LDU,M)   
-            On entry, if JOBU = 'U', U must contain a matrix U1 (usually 
-  
+            On entry, if JOBU = 'U', U must contain a matrix U1 (usually   
             the orthogonal matrix returned by SGGSVP).   
             On exit,   
             if JOBU = 'I', U contains the orthogonal matrix U;   
@@ -199,8 +193,7 @@
             JOBU = 'U'; LDU >= 1 otherwise.   
 
     V       (input/output) REAL array, dimension (LDV,P)   
-            On entry, if JOBV = 'V', V must contain a matrix V1 (usually 
-  
+            On entry, if JOBV = 'V', V must contain a matrix V1 (usually   
             the orthogonal matrix returned by SGGSVP).   
             On exit,   
             if JOBV = 'I', V contains the orthogonal matrix V;   
@@ -212,8 +205,7 @@
             JOBV = 'V'; LDV >= 1 otherwise.   
 
     Q       (input/output) REAL array, dimension (LDQ,N)   
-            On entry, if JOBQ = 'Q', Q must contain a matrix Q1 (usually 
-  
+            On entry, if JOBQ = 'Q', Q must contain a matrix Q1 (usually   
             the orthogonal matrix returned by SGGSVP).   
             On exit,   
             if JOBQ = 'I', Q contains the orthogonal matrix Q;   
@@ -238,16 +230,14 @@
     ===================   
 
     MAXIT   INTEGER   
-            MAXIT specifies the total loops that the iterative procedure 
-  
+            MAXIT specifies the total loops that the iterative procedure   
             may take. If after MAXIT cycles, the routine fails to   
             converge, we return INFO = 1.   
 
     Further Details   
     ===============   
 
-    STGSJA essentially uses a variant of Kogbetliantz algorithm to reduce 
-  
+    STGSJA essentially uses a variant of Kogbetliantz algorithm to reduce   
     min(L,M-K)-by-L triangular (or trapezoidal) matrix A23 and L-by-L   
     matrix B13 to the form:   
 
@@ -260,16 +250,13 @@
 
     and R1 is an L-by-L nonsingular upper triangular matrix.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b13 = 0.f;
     static real c_b14 = 1.f;
@@ -283,7 +270,7 @@
     /* Local variables */
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static integer i, j;
+    static integer i__, j;
     static real gamma;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
@@ -299,22 +286,37 @@
 	    real *, real *, real *, real *, real *, real *, real *, real *);
     static integer kcycle;
     extern /* Subroutine */ int xerbla_(char *, integer *), slapll_(
-	    integer *, real *, integer *, real *, integer *, real *), slaset_(
-	    char *, integer *, integer *, real *, real *, real *, integer *), slartg_(real *, real *, real *, real *, real *);
+	    integer *, real *, integer *, real *, integer *, real *), slartg_(
+	    real *, real *, real *, real *, real *), slaset_(char *, integer *
+	    , integer *, real *, real *, real *, integer *);
     static real csq, csu, csv, snq, rwk, snu, snv;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alpha;
+    --beta;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --work;
 
-#define ALPHA(I) alpha[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     initu = lsame_(jobu, "I");
     wantu = initu || lsame_(jobu, "U");
 
@@ -327,9 +329,11 @@
     *info = 0;
     if (! (initu || wantu || lsame_(jobu, "N"))) {
 	*info = -1;
-    } else if (! (initv || wantv || lsame_(jobv, "N"))) {
+    } else if (! (initv || wantv || lsame_(jobv, "N"))) 
+	    {
 	*info = -2;
-    } else if (! (initq || wantq || lsame_(jobq, "N"))) {
+    } else if (! (initq || wantq || lsame_(jobq, "N"))) 
+	    {
 	*info = -3;
     } else if (*m < 0) {
 	*info = -4;
@@ -357,13 +361,13 @@
 /*     Initialize U, V and Q, if necessary */
 
     if (initu) {
-	slaset_("Full", m, m, &c_b13, &c_b14, &U(1,1), ldu);
+	slaset_("Full", m, m, &c_b13, &c_b14, &u[u_offset], ldu);
     }
     if (initv) {
-	slaset_("Full", p, p, &c_b13, &c_b14, &V(1,1), ldv);
+	slaset_("Full", p, p, &c_b13, &c_b14, &v[v_offset], ldv);
     }
     if (initq) {
-	slaset_("Full", n, n, &c_b13, &c_b14, &Q(1,1), ldq);
+	slaset_("Full", n, n, &c_b13, &c_b14, &q[q_offset], ldq);
     }
 
 /*     Loop until convergence */
@@ -374,86 +378,89 @@
 	upper = ! upper;
 
 	i__1 = *l - 1;
-	for (i = 1; i <= *l-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *l;
-	    for (j = i + 1; j <= *l; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 
 		a1 = 0.f;
 		a2 = 0.f;
 		a3 = 0.f;
-		if (*k + i <= *m) {
-		    a1 = A(*k+i,*n-*l+i);
+		if (*k + i__ <= *m) {
+		    a1 = a_ref(*k + i__, *n - *l + i__);
 		}
 		if (*k + j <= *m) {
-		    a3 = A(*k+j,*n-*l+j);
+		    a3 = a_ref(*k + j, *n - *l + j);
 		}
 
-		b1 = B(i,*n-*l+i);
-		b3 = B(j,*n-*l+j);
+		b1 = b_ref(i__, *n - *l + i__);
+		b3 = b_ref(j, *n - *l + j);
 
 		if (upper) {
-		    if (*k + i <= *m) {
-			a2 = A(*k+i,*n-*l+j);
+		    if (*k + i__ <= *m) {
+			a2 = a_ref(*k + i__, *n - *l + j);
 		    }
-		    b2 = B(i,*n-*l+j);
+		    b2 = b_ref(i__, *n - *l + j);
 		} else {
 		    if (*k + j <= *m) {
-			a2 = A(*k+j,*n-*l+i);
+			a2 = a_ref(*k + j, *n - *l + i__);
 		    }
-		    b2 = B(j,*n-*l+i);
+		    b2 = b_ref(j, *n - *l + i__);
 		}
 
 		slags2_(&upper, &a1, &a2, &a3, &b1, &b2, &b3, &csu, &snu, &
 			csv, &snv, &csq, &snq);
 
-/*              Update (K+I)-th and (K+J)-th rows of matrix A:
- U'*A */
+/*              Update (K+I)-th and (K+J)-th rows of matrix A: U'*A */
 
 		if (*k + j <= *m) {
-		    srot_(l, &A(*k+j,*n-*l+1), lda, &A(*k+i,*n-*l+1), lda, &csu, &snu);
+		    srot_(l, &a_ref(*k + j, *n - *l + 1), lda, &a_ref(*k + 
+			    i__, *n - *l + 1), lda, &csu, &snu);
 		}
 
 /*              Update I-th and J-th rows of matrix B: V'*B */
 
-		srot_(l, &B(j,*n-*l+1), ldb, &B(i,*n-*l+1), ldb, &csv, &snv);
+		srot_(l, &b_ref(j, *n - *l + 1), ldb, &b_ref(i__, *n - *l + 1)
+			, ldb, &csv, &snv);
 
-/*              Update (N-L+I)-th and (N-L+J)-th columns of ma
-trices   
+/*              Update (N-L+I)-th and (N-L+J)-th columns of matrices   
                 A and B: A*Q and B*Q   
 
    Computing MIN */
 		i__4 = *k + *l;
 		i__3 = min(i__4,*m);
-		srot_(&i__3, &A(1,*n-*l+j), &c__1, &A(1,*n-*l+i), &c__1, &csq, &snq);
+		srot_(&i__3, &a_ref(1, *n - *l + j), &c__1, &a_ref(1, *n - *l 
+			+ i__), &c__1, &csq, &snq);
 
-		srot_(l, &B(1,*n-*l+j), &c__1, &B(1,*n-*l+i), &c__1, &csq, &snq);
+		srot_(l, &b_ref(1, *n - *l + j), &c__1, &b_ref(1, *n - *l + 
+			i__), &c__1, &csq, &snq);
 
 		if (upper) {
-		    if (*k + i <= *m) {
-			A(*k+i,*n-*l+j) = 0.f;
+		    if (*k + i__ <= *m) {
+			a_ref(*k + i__, *n - *l + j) = 0.f;
 		    }
-		    B(i,*n-*l+j) = 0.f;
+		    b_ref(i__, *n - *l + j) = 0.f;
 		} else {
 		    if (*k + j <= *m) {
-			A(*k+j,*n-*l+i) = 0.f;
+			a_ref(*k + j, *n - *l + i__) = 0.f;
 		    }
-		    B(j,*n-*l+i) = 0.f;
+		    b_ref(j, *n - *l + i__) = 0.f;
 		}
 
-/*              Update orthogonal matrices U, V, Q, if desired
-. */
+/*              Update orthogonal matrices U, V, Q, if desired. */
 
 		if (wantu && *k + j <= *m) {
-		    srot_(m, &U(1,*k+j), &c__1, &U(1,*k+i), &c__1, &csu, &snu);
+		    srot_(m, &u_ref(1, *k + j), &c__1, &u_ref(1, *k + i__), &
+			    c__1, &csu, &snu);
 		}
 
 		if (wantv) {
-		    srot_(p, &V(1,j), &c__1, &V(1,i), &
-			    c__1, &csv, &snv);
+		    srot_(p, &v_ref(1, j), &c__1, &v_ref(1, i__), &c__1, &csv,
+			     &snv);
 		}
 
 		if (wantq) {
-		    srot_(n, &Q(1,*n-*l+j), &c__1, &Q(1,*n-*l+i), &c__1, &csq, &snq);
+		    srot_(n, &q_ref(1, *n - *l + j), &c__1, &q_ref(1, *n - *l 
+			    + i__), &c__1, &csq, &snq);
 		}
 
 /* L10: */
@@ -463,32 +470,30 @@ trices
 
 	if (! upper) {
 
-/*           The matrices A13 and B13 were lower triangular at the
- start   
+/*           The matrices A13 and B13 were lower triangular at the start   
              of the cycle, and are now upper triangular.   
 
-             Convergence test: test the parallelism of the corresp
-onding   
+             Convergence test: test the parallelism of the corresponding   
              rows of A and B. */
 
 	    error = 0.f;
 /* Computing MIN */
 	    i__2 = *l, i__3 = *m - *k;
 	    i__1 = min(i__2,i__3);
-	    for (i = 1; i <= min(*l,*m-*k); ++i) {
-		i__2 = *l - i + 1;
-		scopy_(&i__2, &A(*k+i,*n-*l+i), lda, &WORK(
-			1), &c__1);
-		i__2 = *l - i + 1;
-		scopy_(&i__2, &B(i,*n-*l+i), ldb, &WORK(*l + 
-			1), &c__1);
-		i__2 = *l - i + 1;
-		slapll_(&i__2, &WORK(1), &c__1, &WORK(*l + 1), &c__1, &ssmin);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = *l - i__ + 1;
+		scopy_(&i__2, &a_ref(*k + i__, *n - *l + i__), lda, &work[1], 
+			&c__1);
+		i__2 = *l - i__ + 1;
+		scopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &work[*l + 1], 
+			&c__1);
+		i__2 = *l - i__ + 1;
+		slapll_(&i__2, &work[1], &c__1, &work[*l + 1], &c__1, &ssmin);
 		error = dmax(error,ssmin);
 /* L30: */
 	    }
 
-	    if (dabs(error) <= (real) (*n) * dmin(*tola,*tolb)) {
+	    if (dabs(error) <= dmin(*tola,*tolb)) {
 		goto L50;
 	    }
 	}
@@ -501,28 +506,28 @@ onding
 /*     The algorithm has not converged after MAXIT cycles. */
 
     *info = 1;
-    goto L90;
+    goto L100;
 
 L50:
 
-/*     If ERROR <= N*MIN(TOLA,TOLB), then the algorithm has converged.   
+/*     If ERROR <= MIN(TOLA,TOLB), then the algorithm has converged.   
        Compute the generalized singular value pairs (ALPHA, BETA), and   
        set the triangular matrix R to array A. */
 
     i__1 = *k;
-    for (i = 1; i <= *k; ++i) {
-	ALPHA(i) = 1.f;
-	BETA(i) = 0.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	alpha[i__] = 1.f;
+	beta[i__] = 0.f;
 /* L60: */
     }
 
 /* Computing MIN */
     i__2 = *l, i__3 = *m - *k;
     i__1 = min(i__2,i__3);
-    for (i = 1; i <= min(*l,*m-*k); ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
-	a1 = A(*k+i,*n-*l+i);
-	b1 = B(i,*n-*l+i);
+	a1 = a_ref(*k + i__, *n - *l + i__);
+	b1 = b_ref(i__, *n - *l + i__);
 
 	if (a1 != 0.f) {
 	    gamma = b1 / a1;
@@ -530,35 +535,36 @@ L50:
 /*           change sign if necessary */
 
 	    if (gamma < 0.f) {
-		i__2 = *l - i + 1;
-		sscal_(&i__2, &c_b43, &B(i,*n-*l+i), ldb);
+		i__2 = *l - i__ + 1;
+		sscal_(&i__2, &c_b43, &b_ref(i__, *n - *l + i__), ldb);
 		if (wantv) {
-		    sscal_(p, &c_b43, &V(1,i), &c__1);
+		    sscal_(p, &c_b43, &v_ref(1, i__), &c__1);
 		}
 	    }
 
 	    r__1 = dabs(gamma);
-	    slartg_(&r__1, &c_b14, &BETA(*k + i), &ALPHA(*k + i), &rwk);
+	    slartg_(&r__1, &c_b14, &beta[*k + i__], &alpha[*k + i__], &rwk);
 
-	    if (ALPHA(*k + i) >= BETA(*k + i)) {
-		i__2 = *l - i + 1;
-		r__1 = 1.f / ALPHA(*k + i);
-		sscal_(&i__2, &r__1, &A(*k+i,*n-*l+i), lda)
-			;
+	    if (alpha[*k + i__] >= beta[*k + i__]) {
+		i__2 = *l - i__ + 1;
+		r__1 = 1.f / alpha[*k + i__];
+		sscal_(&i__2, &r__1, &a_ref(*k + i__, *n - *l + i__), lda);
 	    } else {
-		i__2 = *l - i + 1;
-		r__1 = 1.f / BETA(*k + i);
-		sscal_(&i__2, &r__1, &B(i,*n-*l+i), ldb);
-		i__2 = *l - i + 1;
-		scopy_(&i__2, &B(i,*n-*l+i), ldb, &A(*k+i,*n-*l+i), lda);
+		i__2 = *l - i__ + 1;
+		r__1 = 1.f / beta[*k + i__];
+		sscal_(&i__2, &r__1, &b_ref(i__, *n - *l + i__), ldb);
+		i__2 = *l - i__ + 1;
+		scopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &a_ref(*k + 
+			i__, *n - *l + i__), lda);
 	    }
 
 	} else {
 
-	    ALPHA(*k + i) = 0.f;
-	    BETA(*k + i) = 1.f;
-	    i__2 = *l - i + 1;
-	    scopy_(&i__2, &B(i,*n-*l+i), ldb, &A(*k+i,*n-*l+i), lda);
+	    alpha[*k + i__] = 0.f;
+	    beta[*k + i__] = 1.f;
+	    i__2 = *l - i__ + 1;
+	    scopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &a_ref(*k + i__, *
+		    n - *l + i__), lda);
 
 	}
 
@@ -568,26 +574,33 @@ L50:
 /*     Post-assignment */
 
     i__1 = *k + *l;
-    for (i = *m + 1; i <= *k+*l; ++i) {
-	ALPHA(i) = 0.f;
-	BETA(i) = 1.f;
+    for (i__ = *m + 1; i__ <= i__1; ++i__) {
+	alpha[i__] = 0.f;
+	beta[i__] = 1.f;
 /* L80: */
     }
 
     if (*k + *l < *n) {
 	i__1 = *n;
-	for (i = *k + *l + 1; i <= *n; ++i) {
-	    ALPHA(i) = 0.f;
-	    BETA(i) = 0.f;
-/* L85: */
+	for (i__ = *k + *l + 1; i__ <= i__1; ++i__) {
+	    alpha[i__] = 0.f;
+	    beta[i__] = 0.f;
+/* L90: */
 	}
     }
 
-L90:
+L100:
     *ncycle = kcycle;
     return 0;
 
 /*     End of STGSJA */
 
 } /* stgsja_ */
+
+#undef v_ref
+#undef u_ref
+#undef q_ref
+#undef b_ref
+#undef a_ref
+
 

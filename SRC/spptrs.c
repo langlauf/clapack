@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spptrs_(char *uplo, integer *n, integer *nrhs, real *ap, 
 	real *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -31,8 +32,7 @@
             of the matrix B.  NRHS >= 0.   
 
     AP      (input) REAL array, dimension (N*(N+1)/2)   
-            The triangular factor U or L from the Cholesky factorization 
-  
+            The triangular factor U or L from the Cholesky factorization   
             A = U**T*U or A = L*L**T, packed columnwise in a linear   
             array.  The j-th column of U or L is stored in the array AP   
             as follows:   
@@ -50,34 +50,33 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer b_dim1, b_offset, i__1;
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static logical upper;
     extern /* Subroutine */ int stpsv_(char *, char *, char *, integer *, 
 	    real *, real *, integer *), xerbla_(char *
 	    , integer *);
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    --ap;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define AP(I) ap[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -106,15 +105,17 @@
 /*        Solve A*X = B where A = U'*U. */
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve U'*X = B, overwriting B with X. */
 
-	    stpsv_("Upper", "Transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    stpsv_("Upper", "Transpose", "Non-unit", n, &ap[1], &b_ref(1, i__)
+		    , &c__1);
 
 /*           Solve U*X = B, overwriting B with X. */
 
-	    stpsv_("Upper", "No transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    stpsv_("Upper", "No transpose", "Non-unit", n, &ap[1], &b_ref(1, 
+		    i__), &c__1);
 /* L10: */
 	}
     } else {
@@ -122,15 +123,17 @@
 /*        Solve A*X = B where A = L*L'. */
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve L*Y = B, overwriting B with X. */
 
-	    stpsv_("Lower", "No transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    stpsv_("Lower", "No transpose", "Non-unit", n, &ap[1], &b_ref(1, 
+		    i__), &c__1);
 
 /*           Solve L'*X = Y, overwriting B with X. */
 
-	    stpsv_("Lower", "Transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    stpsv_("Lower", "Transpose", "Non-unit", n, &ap[1], &b_ref(1, i__)
+		    , &c__1);
 /* L20: */
 	}
     }
@@ -140,4 +143,7 @@
 /*     End of SPPTRS */
 
 } /* spptrs_ */
+
+#undef b_ref
+
 

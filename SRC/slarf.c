@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slarf_(char *side, integer *m, integer *n, real *v, 
-	integer *incv, real *tau, real *c, integer *ldc, real *work)
+	integer *incv, real *tau, real *c__, integer *ldc, real *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -48,8 +49,7 @@
 
     C       (input/output) REAL array, dimension (LDC,N)   
             On entry, the m by n matrix C.   
-            On exit, C is overwritten by the matrix H * C if SIDE = 'L', 
-  
+            On exit, C is overwritten by the matrix H * C if SIDE = 'L',   
             or C * H if SIDE = 'R'.   
 
     LDC     (input) INTEGER   
@@ -59,13 +59,10 @@
                            (N) if SIDE = 'L'   
                         or (M) if SIDE = 'R'   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b4 = 1.f;
     static real c_b5 = 0.f;
@@ -82,12 +79,13 @@
 	    real *, integer *, real *, integer *, real *, real *, integer *);
 
 
+    --v;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define V(I) v[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     if (lsame_(side, "L")) {
 
 /*        Form  H * C */
@@ -96,13 +94,13 @@
 
 /*           w := C' * v */
 
-	    sgemv_("Transpose", m, n, &c_b4, &C(1,1), ldc, &V(1), incv, &
-		    c_b5, &WORK(1), &c__1);
+	    sgemv_("Transpose", m, n, &c_b4, &c__[c_offset], ldc, &v[1], incv,
+		     &c_b5, &work[1], &c__1);
 
 /*           C := C - v * w' */
 
-	    r__1 = -(doublereal)(*tau);
-	    sger_(m, n, &r__1, &V(1), incv, &WORK(1), &c__1, &C(1,1), 
+	    r__1 = -(*tau);
+	    sger_(m, n, &r__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], 
 		    ldc);
 	}
     } else {
@@ -113,13 +111,13 @@
 
 /*           w := C * v */
 
-	    sgemv_("No transpose", m, n, &c_b4, &C(1,1), ldc, &V(1), 
-		    incv, &c_b5, &WORK(1), &c__1);
+	    sgemv_("No transpose", m, n, &c_b4, &c__[c_offset], ldc, &v[1], 
+		    incv, &c_b5, &work[1], &c__1);
 
 /*           C := C - w * v' */
 
-	    r__1 = -(doublereal)(*tau);
-	    sger_(m, n, &r__1, &WORK(1), &c__1, &V(1), incv, &C(1,1), 
+	    r__1 = -(*tau);
+	    sger_(m, n, &r__1, &work[1], &c__1, &v[1], incv, &c__[c_offset], 
 		    ldc);
 	}
     }

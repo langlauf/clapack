@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static real c_b12 = -1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static integer lenj, i, j;
+    static integer lenj, i__, j;
     static real t, anorm;
     extern doublereal sasum_(integer *, real *, integer *);
     static integer i1, i2;
@@ -32,7 +33,11 @@ static real c_b12 = -1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define afac_ref(a_1,a_2) afac[(a_2)*afac_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -41,8 +46,7 @@ static real c_b12 = -1.f;
     Purpose   
     =======   
 
-    SGBT01 reconstructs a band matrix  A  from its L*U factorization and 
-  
+    SGBT01 reconstructs a band matrix  A  from its L*U factorization and   
     computes the residual:   
        norm(L*U - A) / ( N * norm(A) * EPS ),   
     where EPS is the machine epsilon.   
@@ -63,26 +67,21 @@ static real c_b12 = -1.f;
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
             The original matrix A in band storage, stored in rows 1 to   
             KL+KU+1.   
 
     LDA     (input) INTEGER.   
-            The leading dimension of the array A.  LDA >= max(1,KL+KU+1). 
-  
+            The leading dimension of the array A.  LDA >= max(1,KL+KU+1).   
 
     AFAC    (input) REAL array, dimension (LDAFAC,N)   
-            The factored form of the matrix A.  AFAC contains the banded 
-  
+            The factored form of the matrix A.  AFAC contains the banded   
             factors L and U from the L*U factorization, as computed by   
-            SGBTRF.  U is stored as an upper triangular band matrix with 
-  
+            SGBTRF.  U is stored as an upper triangular band matrix with   
             KL+KU superdiagonals in rows 1 to KL+KU+1, and the   
-            multipliers used during the factorization are stored in rows 
-  
+            multipliers used during the factorization are stored in rows   
             KL+KU+2 to 2*KL+KU+1.  See SGBTRF for further details.   
 
     LDAFAC  (input) INTEGER   
@@ -97,18 +96,17 @@ static real c_b12 = -1.f;
     RESID   (output) REAL   
             norm(L*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if M = 0 or N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --ipiv;
     --work;
@@ -135,7 +133,7 @@ static real c_b12 = -1.f;
 	if (i2 >= i1) {
 /* Computing MAX */
 	    i__2 = i2 - i1 + 1;
-	    r__1 = anorm, r__2 = sasum_(&i__2, &a[i1 + j * a_dim1], &c__1);
+	    r__1 = anorm, r__2 = sasum_(&i__2, &a_ref(i1, j), &c__1);
 	    anorm = dmax(r__1,r__2);
 	}
 /* L10: */
@@ -157,33 +155,30 @@ static real c_b12 = -1.f;
 	jl = min(i__2,i__3);
 	lenj = min(*m,j) - j + ju + 1;
 	if (lenj > 0) {
-	    scopy_(&lenj, &afac[kd - ju + j * afac_dim1], &c__1, &work[1], &
-		    c__1);
+	    scopy_(&lenj, &afac_ref(kd - ju, j), &c__1, &work[1], &c__1);
 	    i__2 = ju + jl + 1;
-	    for (i = lenj + 1; i <= i__2; ++i) {
-		work[i] = 0.f;
+	    for (i__ = lenj + 1; i__ <= i__2; ++i__) {
+		work[i__] = 0.f;
 /* L20: */
 	    }
 
-/*           Multiply by the unit lower triangular matrix L.  Note
- that L   
-             is stored as a product of transformations and permuta
-tions.   
+/*           Multiply by the unit lower triangular matrix L.  Note that L   
+             is stored as a product of transformations and permutations.   
 
    Computing MIN */
 	    i__2 = *m - 1;
 	    i__3 = j - ju;
-	    for (i = min(i__2,j); i >= i__3; --i) {
+	    for (i__ = min(i__2,j); i__ >= i__3; --i__) {
 /* Computing MIN */
-		i__2 = *kl, i__4 = *m - i;
+		i__2 = *kl, i__4 = *m - i__;
 		il = min(i__2,i__4);
 		if (il > 0) {
-		    iw = i - j + ju + 1;
+		    iw = i__ - j + ju + 1;
 		    t = work[iw];
-		    saxpy_(&il, &t, &afac[kd + 1 + i * afac_dim1], &c__1, &
-			    work[iw + 1], &c__1);
-		    ip = ipiv[i];
-		    if (i != ip) {
+		    saxpy_(&il, &t, &afac_ref(kd + 1, i__), &c__1, &work[iw + 
+			    1], &c__1);
+		    ip = ipiv[i__];
+		    if (i__ != ip) {
 			ip = ip - j + ju + 1;
 			work[iw] = work[ip];
 			work[ip] = t;
@@ -197,8 +192,8 @@ tions.
 	    jua = min(ju,*ku);
 	    if (jua + jl + 1 > 0) {
 		i__3 = jua + jl + 1;
-		saxpy_(&i__3, &c_b12, &a[*ku + 1 - jua + j * a_dim1], &c__1, &
-			work[ju + 1 - jua], &c__1);
+		saxpy_(&i__3, &c_b12, &a_ref(*ku + 1 - jua, j), &c__1, &work[
+			ju + 1 - jua], &c__1);
 	    }
 
 /*           Compute the 1-norm of the column.   
@@ -226,4 +221,8 @@ tions.
 /*     End of SGBT01 */
 
 } /* sgbt01_ */
+
+#undef afac_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,24 +20,24 @@ static integer c__2 = 2;
 static integer c__1 = 1;
 
 /* Subroutine */ int clahqr_(logical *wantt, logical *wantz, integer *n, 
-	integer *ilo, integer *ihi, complex *h, integer *ldh, complex *w, 
-	integer *iloz, integer *ihiz, complex *z, integer *ldz, integer *info)
+	integer *ilo, integer *ihi, complex *h__, integer *ldh, complex *w, 
+	integer *iloz, integer *ihiz, complex *z__, integer *ldz, integer *
+	info)
 {
     /* System generated locals */
     integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4, i__5;
     real r__1, r__2, r__3, r__4, r__5, r__6;
-    doublereal d__1;
     complex q__1, q__2, q__3, q__4;
 
     /* Builtin functions */
     double r_imag(complex *);
     void c_sqrt(complex *, complex *), r_cnjg(complex *, complex *);
+    double c_abs(complex *);
 
     /* Local variables */
-    static real unfl, ovfl;
     static complex temp;
     static real opst;
-    static integer i, j, k, l, m;
+    static integer i__, j, k, l, m;
     static real s;
     static complex t, u, v[2], x, y;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
@@ -52,10 +53,9 @@ static integer c__1 = 1;
     static complex h11;
     static real h21;
     static complex h22;
-    extern doublereal slapy2_(real *, real *);
     static integer nh;
-    extern /* Subroutine */ int slabad_(real *, real *), clarfg_(integer *, 
-	    complex *, complex *, integer *, complex *);
+    extern /* Subroutine */ int clarfg_(integer *, complex *, complex *, 
+	    integer *, complex *);
     extern /* Complex */ VOID cladiv_(complex *, complex *, complex *);
     extern doublereal slamch_(char *);
     static integer nz;
@@ -68,10 +68,16 @@ static integer c__1 = 1;
     static real tst1;
 
 
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+
+
 /*  -- LAPACK auxiliary routine (instrumented to count operations) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count.   
 
@@ -80,8 +86,7 @@ static integer c__1 = 1;
 
     CLAHQR is an auxiliary routine called by CHSEQR to update the   
     eigenvalues and Schur decomposition already computed by CHSEQR, by   
-    dealing with the Hessenberg submatrix in rows and columns ILO to IHI. 
-  
+    dealing with the Hessenberg submatrix in rows and columns ILO to IHI.   
 
     Arguments   
     =========   
@@ -99,14 +104,10 @@ static integer c__1 = 1;
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            It is assumed that H is already upper triangular in rows and 
-  
-            columns IHI+1:N, and that H(ILO,ILO-1) = 0 (unless ILO = 1). 
-  
-            CLAHQR works primarily with the Hessenberg submatrix in rows 
-  
-            and columns ILO to IHI, but applies transformations to all of 
-  
+            It is assumed that H is already upper triangular in rows and   
+            columns IHI+1:N, and that H(ILO,ILO-1) = 0 (unless ILO = 1).   
+            CLAHQR works primarily with the Hessenberg submatrix in rows   
+            and columns ILO to IHI, but applies transformations to all of   
             H if WANTT is .TRUE..   
             1 <= ILO <= max(1,IHI); IHI <= N.   
 
@@ -135,8 +136,7 @@ static integer c__1 = 1;
     Z       (input/output) COMPLEX array, dimension (LDZ,N)   
             If WANTZ is .TRUE., on entry Z must contain the current   
             matrix Z of transformations accumulated by CHSEQR, and on   
-            exit Z has been updated; transformations are applied only to 
-  
+            exit Z has been updated; transformations are applied only to   
             the submatrix Z(ILOZ:IHIZ,ILO:IHI).   
             If WANTZ is .FALSE., Z is not referenced.   
 
@@ -150,18 +150,17 @@ static integer c__1 = 1;
                  iterations; elements i+1:ihi of W contain those   
                  eigenvalues which have been successfully computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     --w;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
     /* Function Body */
     *info = 0;
@@ -177,8 +176,8 @@ static integer c__1 = 1;
     }
     if (*ilo == *ihi) {
 	i__1 = *ilo;
-	i__2 = *ilo + *ilo * h_dim1;
-	w[i__1].r = h[i__2].r, w[i__1].i = h[i__2].i;
+	i__2 = h___subscr(*ilo, *ilo);
+	w[i__1].r = h__[i__2].r, w[i__1].i = h__[i__2].i;
 	return 0;
     }
 
@@ -188,15 +187,11 @@ static integer c__1 = 1;
 /*     Set machine-dependent constants for the stopping criterion.   
        If norm(H) <= sqrt(OVFL), overflow should not occur. */
 
-    unfl = slamch_("Safe minimum");
-    ovfl = 1.f / unfl;
-    slabad_(&unfl, &ovfl);
     ulp = slamch_("Precision");
-    smlnum = unfl * (nh / ulp);
+    smlnum = slamch_("Safe minimum") / ulp;
 
 /*     I1 and I2 are the indices of the first row and last column of H   
-       to which transformations must be applied. If eigenvalues only are 
-  
+       to which transformations must be applied. If eigenvalues only are   
        being computed, I1 and I2 are set inside the main loop. */
 
     if (*wantt) {
@@ -208,17 +203,15 @@ static integer c__1 = 1;
 
     itn = nh * 30;
 
-/*     The main loop begins here. I is the loop index and decreases from 
-  
+/*     The main loop begins here. I is the loop index and decreases from   
        IHI to ILO in steps of 1. Each iteration of the loop works   
        with the active submatrix in rows and columns L to I.   
-       Eigenvalues I+1 to IHI have already converged. Either L = ILO, or 
-  
+       Eigenvalues I+1 to IHI have already converged. Either L = ILO, or   
        H(L,L-1) is negligible so that the matrix splits. */
 
-    i = *ihi;
+    i__ = *ihi;
 L10:
-    if (i < *ilo) {
+    if (i__ < *ilo) {
 	goto L130;
     }
 
@@ -233,26 +226,24 @@ L10:
 /*        Look for a single small subdiagonal element. */
 
 	i__2 = l + 1;
-	for (k = i; k >= i__2; --k) {
-	    i__3 = k - 1 + (k - 1) * h_dim1;
-	    i__4 = k + k * h_dim1;
-	    tst1 = (r__1 = h[i__3].r, dabs(r__1)) + (r__2 = r_imag(&h[k - 1 + 
-		    (k - 1) * h_dim1]), dabs(r__2)) + ((r__3 = h[i__4].r, 
-		    dabs(r__3)) + (r__4 = r_imag(&h[k + k * h_dim1]), dabs(
-		    r__4)));
+	for (k = i__; k >= i__2; --k) {
+	    i__3 = h___subscr(k - 1, k - 1);
+	    i__4 = h___subscr(k, k);
+	    tst1 = (r__1 = h__[i__3].r, dabs(r__1)) + (r__2 = r_imag(&h___ref(
+		    k - 1, k - 1)), dabs(r__2)) + ((r__3 = h__[i__4].r, dabs(
+		    r__3)) + (r__4 = r_imag(&h___ref(k, k)), dabs(r__4)));
 	    if (tst1 == 0.f) {
-		i__3 = i - l + 1;
-		tst1 = clanhs_("1", &i__3, &h[l + l * h_dim1], ldh, rwork)
-			;
+		i__3 = i__ - l + 1;
+		tst1 = clanhs_("1", &i__3, &h___ref(l, l), ldh, rwork);
 /* **   
                 Increment op count */
-		latime_1.ops += (i - l + 1) * 5 * (i - l) / 2;
+		latime_1.ops += (i__ - l + 1) * 5 * (i__ - l) / 2;
 /* ** */
 	    }
-	    i__3 = k + (k - 1) * h_dim1;
+	    i__3 = h___subscr(k, k - 1);
 /* Computing MAX */
 	    r__2 = ulp * tst1;
-	    if ((r__1 = h[i__3].r, dabs(r__1)) <= dmax(r__2,smlnum)) {
+	    if ((r__1 = h__[i__3].r, dabs(r__1)) <= dmax(r__2,smlnum)) {
 		goto L30;
 	    }
 /* L20: */
@@ -261,42 +252,40 @@ L30:
 	l = k;
 /* **   
           Increment op count */
-	opst += (i - l + 1) * 5;
+	opst += (i__ - l + 1) * 5;
 /* ** */
 	if (l > *ilo) {
 
 /*           H(L,L-1) is negligible */
 
-	    i__2 = l + (l - 1) * h_dim1;
-	    h[i__2].r = 0.f, h[i__2].i = 0.f;
+	    i__2 = h___subscr(l, l - 1);
+	    h__[i__2].r = 0.f, h__[i__2].i = 0.f;
 	}
 
 /*        Exit from loop if a submatrix of order 1 has split off. */
 
-	if (l >= i) {
+	if (l >= i__) {
 	    goto L120;
 	}
 
-/*        Now the active submatrix is in rows and columns L to I. If 
-  
-          eigenvalues only are being computed, only the active submatr
-ix   
+/*        Now the active submatrix is in rows and columns L to I. If   
+          eigenvalues only are being computed, only the active submatrix   
           need be transformed. */
 
 	if (! (*wantt)) {
 	    i1 = l;
-	    i2 = i;
+	    i2 = i__;
 	}
 
 	if (its == 10 || its == 20) {
 
 /*           Exceptional shift. */
 
-	    i__2 = i + (i - 1) * h_dim1;
-	    i__3 = i - 1 + (i - 2) * h_dim1;
-	    d__1 = (r__1 = h[i__2].r, dabs(r__1)) + (r__2 = h[i__3].r, dabs(
-		    r__2));
-	    t.r = d__1, t.i = 0.f;
+	    i__2 = h___subscr(i__, i__ - 1);
+	    s = (r__1 = h__[i__2].r, dabs(r__1)) * .75f;
+	    i__2 = h___subscr(i__, i__);
+	    q__1.r = s + h__[i__2].r, q__1.i = h__[i__2].i;
+	    t.r = q__1.r, t.i = q__1.i;
 /* **   
              Increment op count */
 	    opst += 1;
@@ -305,20 +294,20 @@ ix
 
 /*           Wilkinson's shift. */
 
-	    i__2 = i + i * h_dim1;
-	    t.r = h[i__2].r, t.i = h[i__2].i;
-	    i__2 = i - 1 + i * h_dim1;
-	    i__3 = i + (i - 1) * h_dim1;
-	    d__1 = h[i__3].r;
-	    q__1.r = d__1 * h[i__2].r, q__1.i = d__1 * h[i__2].i;
+	    i__2 = h___subscr(i__, i__);
+	    t.r = h__[i__2].r, t.i = h__[i__2].i;
+	    i__2 = h___subscr(i__ - 1, i__);
+	    i__3 = h___subscr(i__, i__ - 1);
+	    r__1 = h__[i__3].r;
+	    q__1.r = r__1 * h__[i__2].r, q__1.i = r__1 * h__[i__2].i;
 	    u.r = q__1.r, u.i = q__1.i;
 /* **   
              Increment op count */
 	    opst += 2;
 /* ** */
 	    if (u.r != 0.f || u.i != 0.f) {
-		i__2 = i - 1 + (i - 1) * h_dim1;
-		q__2.r = h[i__2].r - t.r, q__2.i = h[i__2].i - t.i;
+		i__2 = h___subscr(i__ - 1, i__ - 1);
+		q__2.r = h__[i__2].r - t.r, q__2.i = h__[i__2].i - t.i;
 		q__1.r = q__2.r * .5f, q__1.i = q__2.i * .5f;
 		x.r = q__1.r, x.i = q__1.i;
 		q__3.r = x.r * x.r - x.i * x.i, q__3.i = x.r * x.i + x.i * 
@@ -327,7 +316,7 @@ ix
 		c_sqrt(&q__1, &q__2);
 		y.r = q__1.r, y.i = q__1.i;
 		if (x.r * y.r + r_imag(&x) * r_imag(&y) < 0.f) {
-		    q__1.r = -(doublereal)y.r, q__1.i = -(doublereal)y.i;
+		    q__1.r = -y.r, q__1.i = -y.i;
 		    y.r = q__1.r, y.i = q__1.i;
 		}
 		q__3.r = x.r + y.r, q__3.i = x.i + y.i;
@@ -343,23 +332,21 @@ ix
 
 /*        Look for two consecutive small subdiagonal elements. */
 
-	i__2 = l;
-	for (m = i - 1; m >= i__2; --m) {
+	i__2 = l + 1;
+	for (m = i__ - 1; m >= i__2; --m) {
 
-/*           Determine the effect of starting the single-shift QR 
-  
-             iteration at row M, and see if this would make H(M,M-
-1)   
+/*           Determine the effect of starting the single-shift QR   
+             iteration at row M, and see if this would make H(M,M-1)   
              negligible. */
 
-	    i__3 = m + m * h_dim1;
-	    h11.r = h[i__3].r, h11.i = h[i__3].i;
-	    i__3 = m + 1 + (m + 1) * h_dim1;
-	    h22.r = h[i__3].r, h22.i = h[i__3].i;
+	    i__3 = h___subscr(m, m);
+	    h11.r = h__[i__3].r, h11.i = h__[i__3].i;
+	    i__3 = h___subscr(m + 1, m + 1);
+	    h22.r = h__[i__3].r, h22.i = h__[i__3].i;
 	    q__1.r = h11.r - t.r, q__1.i = h11.i - t.i;
 	    h11s.r = q__1.r, h11s.i = q__1.i;
-	    i__3 = m + 1 + m * h_dim1;
-	    h21 = h[i__3].r;
+	    i__3 = h___subscr(m + 1, m);
+	    h21 = h__[i__3].r;
 	    s = (r__1 = h11s.r, dabs(r__1)) + (r__2 = r_imag(&h11s), dabs(
 		    r__2)) + dabs(h21);
 	    q__1.r = h11s.r / s, q__1.i = h11s.i / s;
@@ -367,11 +354,8 @@ ix
 	    h21 /= s;
 	    v[0].r = h11s.r, v[0].i = h11s.i;
 	    v[1].r = h21, v[1].i = 0.f;
-	    if (m == l) {
-		goto L50;
-	    }
-	    i__3 = m + (m - 1) * h_dim1;
-	    h10 = h[i__3].r;
+	    i__3 = h___subscr(m, m - 1);
+	    h10 = h__[i__3].r;
 	    tst1 = ((r__1 = h11s.r, dabs(r__1)) + (r__2 = r_imag(&h11s), dabs(
 		    r__2))) * ((r__3 = h11.r, dabs(r__3)) + (r__4 = r_imag(&
 		    h11), dabs(r__4)) + ((r__5 = h22.r, dabs(r__5)) + (r__6 = 
@@ -381,38 +365,46 @@ ix
 	    }
 /* L40: */
 	}
+	i__2 = h___subscr(l, l);
+	h11.r = h__[i__2].r, h11.i = h__[i__2].i;
+	i__2 = h___subscr(l + 1, l + 1);
+	h22.r = h__[i__2].r, h22.i = h__[i__2].i;
+	q__1.r = h11.r - t.r, q__1.i = h11.i - t.i;
+	h11s.r = q__1.r, h11s.i = q__1.i;
+	i__2 = h___subscr(l + 1, l);
+	h21 = h__[i__2].r;
+	s = (r__1 = h11s.r, dabs(r__1)) + (r__2 = r_imag(&h11s), dabs(r__2)) 
+		+ dabs(h21);
+	q__1.r = h11s.r / s, q__1.i = h11s.i / s;
+	h11s.r = q__1.r, h11s.i = q__1.i;
+	h21 /= s;
+	v[0].r = h11s.r, v[0].i = h11s.i;
+	v[1].r = h21, v[1].i = 0.f;
 L50:
 /* **   
           Increment op count */
-	opst += (i - m) * 14;
+	opst += (i__ - m) * 14;
 /* **   
 
           Single-shift QR step */
 
-	i__2 = i - 1;
+	i__2 = i__ - 1;
 	for (k = m; k <= i__2; ++k) {
 
-/*           The first iteration of this loop determines a reflect
-ion G   
-             from the vector V and applies it from left and right 
-to H,   
-             thus creating a nonzero bulge below the subdiagonal. 
-  
+/*           The first iteration of this loop determines a reflection G   
+             from the vector V and applies it from left and right to H,   
+             thus creating a nonzero bulge below the subdiagonal.   
 
-             Each subsequent iteration determines a reflection G t
-o   
-             restore the Hessenberg form in the (K-1)th column, an
-d thus   
-             chases the bulge one step toward the bottom of the ac
-tive   
+             Each subsequent iteration determines a reflection G to   
+             restore the Hessenberg form in the (K-1)th column, and thus   
+             chases the bulge one step toward the bottom of the active   
              submatrix.   
 
-             V(2) is always real before the call to CLARFG, and he
-nce   
+             V(2) is always real before the call to CLARFG, and hence   
              after the call T2 ( = T1*V(2) ) is also real. */
 
 	    if (k > m) {
-		ccopy_(&c__2, &h[k + (k - 1) * h_dim1], &c__1, v, &c__1);
+		ccopy_(&c__2, &h___ref(k, k - 1), &c__1, v, &c__1);
 	    }
 	    clarfg_(&c__2, v, &v[1], &c__1, &t1);
 /* **   
@@ -420,75 +412,73 @@ nce
 	    opst += 38;
 /* ** */
 	    if (k > m) {
-		i__3 = k + (k - 1) * h_dim1;
-		h[i__3].r = v[0].r, h[i__3].i = v[0].i;
-		i__3 = k + 1 + (k - 1) * h_dim1;
-		h[i__3].r = 0.f, h[i__3].i = 0.f;
+		i__3 = h___subscr(k, k - 1);
+		h__[i__3].r = v[0].r, h__[i__3].i = v[0].i;
+		i__3 = h___subscr(k + 1, k - 1);
+		h__[i__3].r = 0.f, h__[i__3].i = 0.f;
 	    }
 	    v2.r = v[1].r, v2.i = v[1].i;
 	    q__1.r = t1.r * v2.r - t1.i * v2.i, q__1.i = t1.r * v2.i + t1.i * 
 		    v2.r;
 	    t2 = q__1.r;
 
-/*           Apply G from the left to transform the rows of the ma
-trix   
+/*           Apply G from the left to transform the rows of the matrix   
              in columns K to I2. */
 
 	    i__3 = i2;
 	    for (j = k; j <= i__3; ++j) {
 		r_cnjg(&q__3, &t1);
-		i__4 = k + j * h_dim1;
-		q__2.r = q__3.r * h[i__4].r - q__3.i * h[i__4].i, q__2.i = 
-			q__3.r * h[i__4].i + q__3.i * h[i__4].r;
-		i__5 = k + 1 + j * h_dim1;
-		q__4.r = t2 * h[i__5].r, q__4.i = t2 * h[i__5].i;
+		i__4 = h___subscr(k, j);
+		q__2.r = q__3.r * h__[i__4].r - q__3.i * h__[i__4].i, q__2.i =
+			 q__3.r * h__[i__4].i + q__3.i * h__[i__4].r;
+		i__5 = h___subscr(k + 1, j);
+		q__4.r = t2 * h__[i__5].r, q__4.i = t2 * h__[i__5].i;
 		q__1.r = q__2.r + q__4.r, q__1.i = q__2.i + q__4.i;
 		sum.r = q__1.r, sum.i = q__1.i;
-		i__4 = k + j * h_dim1;
-		i__5 = k + j * h_dim1;
-		q__1.r = h[i__5].r - sum.r, q__1.i = h[i__5].i - sum.i;
-		h[i__4].r = q__1.r, h[i__4].i = q__1.i;
-		i__4 = k + 1 + j * h_dim1;
-		i__5 = k + 1 + j * h_dim1;
+		i__4 = h___subscr(k, j);
+		i__5 = h___subscr(k, j);
+		q__1.r = h__[i__5].r - sum.r, q__1.i = h__[i__5].i - sum.i;
+		h__[i__4].r = q__1.r, h__[i__4].i = q__1.i;
+		i__4 = h___subscr(k + 1, j);
+		i__5 = h___subscr(k + 1, j);
 		q__2.r = sum.r * v2.r - sum.i * v2.i, q__2.i = sum.r * v2.i + 
 			sum.i * v2.r;
-		q__1.r = h[i__5].r - q__2.r, q__1.i = h[i__5].i - q__2.i;
-		h[i__4].r = q__1.r, h[i__4].i = q__1.i;
+		q__1.r = h__[i__5].r - q__2.r, q__1.i = h__[i__5].i - q__2.i;
+		h__[i__4].r = q__1.r, h__[i__4].i = q__1.i;
 /* L60: */
 	    }
 
-/*           Apply G from the right to transform the columns of th
-e   
+/*           Apply G from the right to transform the columns of the   
              matrix in rows I1 to min(K+2,I).   
 
    Computing MIN */
 	    i__4 = k + 2;
-	    i__3 = min(i__4,i);
+	    i__3 = min(i__4,i__);
 	    for (j = i1; j <= i__3; ++j) {
-		i__4 = j + k * h_dim1;
-		q__2.r = t1.r * h[i__4].r - t1.i * h[i__4].i, q__2.i = t1.r * 
-			h[i__4].i + t1.i * h[i__4].r;
-		i__5 = j + (k + 1) * h_dim1;
-		q__3.r = t2 * h[i__5].r, q__3.i = t2 * h[i__5].i;
+		i__4 = h___subscr(j, k);
+		q__2.r = t1.r * h__[i__4].r - t1.i * h__[i__4].i, q__2.i = 
+			t1.r * h__[i__4].i + t1.i * h__[i__4].r;
+		i__5 = h___subscr(j, k + 1);
+		q__3.r = t2 * h__[i__5].r, q__3.i = t2 * h__[i__5].i;
 		q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
 		sum.r = q__1.r, sum.i = q__1.i;
-		i__4 = j + k * h_dim1;
-		i__5 = j + k * h_dim1;
-		q__1.r = h[i__5].r - sum.r, q__1.i = h[i__5].i - sum.i;
-		h[i__4].r = q__1.r, h[i__4].i = q__1.i;
-		i__4 = j + (k + 1) * h_dim1;
-		i__5 = j + (k + 1) * h_dim1;
+		i__4 = h___subscr(j, k);
+		i__5 = h___subscr(j, k);
+		q__1.r = h__[i__5].r - sum.r, q__1.i = h__[i__5].i - sum.i;
+		h__[i__4].r = q__1.r, h__[i__4].i = q__1.i;
+		i__4 = h___subscr(j, k + 1);
+		i__5 = h___subscr(j, k + 1);
 		r_cnjg(&q__3, &v2);
 		q__2.r = sum.r * q__3.r - sum.i * q__3.i, q__2.i = sum.r * 
 			q__3.i + sum.i * q__3.r;
-		q__1.r = h[i__5].r - q__2.r, q__1.i = h[i__5].i - q__2.i;
-		h[i__4].r = q__1.r, h[i__4].i = q__1.i;
+		q__1.r = h__[i__5].r - q__2.r, q__1.i = h__[i__5].i - q__2.i;
+		h__[i__4].r = q__1.r, h__[i__4].i = q__1.i;
 /* L70: */
 	    }
 /* **   
              Increment op count   
    Computing MIN */
-	    i__3 = 2, i__4 = i - k;
+	    i__3 = 2, i__4 = i__ - k;
 	    latime_1.ops += (i2 - i1 + 2 + min(i__3,i__4)) * 20;
 /* ** */
 
@@ -498,24 +488,26 @@ e
 
 		i__3 = *ihiz;
 		for (j = *iloz; j <= i__3; ++j) {
-		    i__4 = j + k * z_dim1;
-		    q__2.r = t1.r * z[i__4].r - t1.i * z[i__4].i, q__2.i = 
-			    t1.r * z[i__4].i + t1.i * z[i__4].r;
-		    i__5 = j + (k + 1) * z_dim1;
-		    q__3.r = t2 * z[i__5].r, q__3.i = t2 * z[i__5].i;
+		    i__4 = z___subscr(j, k);
+		    q__2.r = t1.r * z__[i__4].r - t1.i * z__[i__4].i, q__2.i =
+			     t1.r * z__[i__4].i + t1.i * z__[i__4].r;
+		    i__5 = z___subscr(j, k + 1);
+		    q__3.r = t2 * z__[i__5].r, q__3.i = t2 * z__[i__5].i;
 		    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
 		    sum.r = q__1.r, sum.i = q__1.i;
-		    i__4 = j + k * z_dim1;
-		    i__5 = j + k * z_dim1;
-		    q__1.r = z[i__5].r - sum.r, q__1.i = z[i__5].i - sum.i;
-		    z[i__4].r = q__1.r, z[i__4].i = q__1.i;
-		    i__4 = j + (k + 1) * z_dim1;
-		    i__5 = j + (k + 1) * z_dim1;
+		    i__4 = z___subscr(j, k);
+		    i__5 = z___subscr(j, k);
+		    q__1.r = z__[i__5].r - sum.r, q__1.i = z__[i__5].i - 
+			    sum.i;
+		    z__[i__4].r = q__1.r, z__[i__4].i = q__1.i;
+		    i__4 = z___subscr(j, k + 1);
+		    i__5 = z___subscr(j, k + 1);
 		    r_cnjg(&q__3, &v2);
 		    q__2.r = sum.r * q__3.r - sum.i * q__3.i, q__2.i = sum.r *
 			     q__3.i + sum.i * q__3.r;
-		    q__1.r = z[i__5].r - q__2.r, q__1.i = z[i__5].i - q__2.i;
-		    z[i__4].r = q__1.r, z[i__4].i = q__1.i;
+		    q__1.r = z__[i__5].r - q__2.r, q__1.i = z__[i__5].i - 
+			    q__2.i;
+		    z__[i__4].r = q__1.r, z__[i__4].i = q__1.i;
 /* L80: */
 		}
 /* **   
@@ -526,52 +518,47 @@ e
 
 	    if (k == m && m > l) {
 
-/*              If the QR step was started at row M > L becaus
-e two   
-                consecutive small subdiagonals were found, the
-n extra   
-                scaling must be performed to ensure that H(M,M
--1) remains   
+/*              If the QR step was started at row M > L because two   
+                consecutive small subdiagonals were found, then extra   
+                scaling must be performed to ensure that H(M,M-1) remains   
                 real. */
 
 		q__1.r = 1.f - t1.r, q__1.i = 0.f - t1.i;
 		temp.r = q__1.r, temp.i = q__1.i;
-		r__1 = temp.r;
-		r__2 = r_imag(&temp);
-		d__1 = slapy2_(&r__1, &r__2);
-		q__1.r = temp.r / d__1, q__1.i = temp.i / d__1;
+		r__1 = c_abs(&temp);
+		q__1.r = temp.r / r__1, q__1.i = temp.i / r__1;
 		temp.r = q__1.r, temp.i = q__1.i;
-		i__3 = m + 1 + m * h_dim1;
-		i__4 = m + 1 + m * h_dim1;
+		i__3 = h___subscr(m + 1, m);
+		i__4 = h___subscr(m + 1, m);
 		r_cnjg(&q__2, &temp);
-		q__1.r = h[i__4].r * q__2.r - h[i__4].i * q__2.i, q__1.i = h[
-			i__4].r * q__2.i + h[i__4].i * q__2.r;
-		h[i__3].r = q__1.r, h[i__3].i = q__1.i;
-		if (m + 2 <= i) {
-		    i__3 = m + 2 + (m + 1) * h_dim1;
-		    i__4 = m + 2 + (m + 1) * h_dim1;
-		    q__1.r = h[i__4].r * temp.r - h[i__4].i * temp.i, q__1.i =
-			     h[i__4].r * temp.i + h[i__4].i * temp.r;
-		    h[i__3].r = q__1.r, h[i__3].i = q__1.i;
+		q__1.r = h__[i__4].r * q__2.r - h__[i__4].i * q__2.i, q__1.i =
+			 h__[i__4].r * q__2.i + h__[i__4].i * q__2.r;
+		h__[i__3].r = q__1.r, h__[i__3].i = q__1.i;
+		if (m + 2 <= i__) {
+		    i__3 = h___subscr(m + 2, m + 1);
+		    i__4 = h___subscr(m + 2, m + 1);
+		    q__1.r = h__[i__4].r * temp.r - h__[i__4].i * temp.i, 
+			    q__1.i = h__[i__4].r * temp.i + h__[i__4].i * 
+			    temp.r;
+		    h__[i__3].r = q__1.r, h__[i__3].i = q__1.i;
 		}
-		i__3 = i;
+		i__3 = i__;
 		for (j = m; j <= i__3; ++j) {
 		    if (j != m + 1) {
 			if (i2 > j) {
 			    i__4 = i2 - j;
-			    cscal_(&i__4, &temp, &h[j + (j + 1) * h_dim1], 
-				    ldh);
+			    cscal_(&i__4, &temp, &h___ref(j, j + 1), ldh);
 			}
 			i__4 = j - i1;
 			r_cnjg(&q__1, &temp);
-			cscal_(&i__4, &q__1, &h[i1 + j * h_dim1], &c__1);
+			cscal_(&i__4, &q__1, &h___ref(i1, j), &c__1);
 /* **   
                       Increment op count */
 			opst += (i2 - i1 + 3) * 6;
 /* ** */
 			if (*wantz) {
 			    r_cnjg(&q__1, &temp);
-			    cscal_(&nz, &q__1, &z[*iloz + j * z_dim1], &c__1);
+			    cscal_(&nz, &q__1, &z___ref(*iloz, j), &c__1);
 /* **   
                          Increment op count */
 			    opst += nz * 6;
@@ -586,29 +573,27 @@ n extra
 
 /*        Ensure that H(I,I-1) is real. */
 
-	i__2 = i + (i - 1) * h_dim1;
-	temp.r = h[i__2].r, temp.i = h[i__2].i;
+	i__2 = h___subscr(i__, i__ - 1);
+	temp.r = h__[i__2].r, temp.i = h__[i__2].i;
 	if (r_imag(&temp) != 0.f) {
-	    r__1 = temp.r;
-	    r__2 = r_imag(&temp);
-	    rtemp = slapy2_(&r__1, &r__2);
-	    i__2 = i + (i - 1) * h_dim1;
-	    h[i__2].r = rtemp, h[i__2].i = 0.f;
+	    rtemp = c_abs(&temp);
+	    i__2 = h___subscr(i__, i__ - 1);
+	    h__[i__2].r = rtemp, h__[i__2].i = 0.f;
 	    q__1.r = temp.r / rtemp, q__1.i = temp.i / rtemp;
 	    temp.r = q__1.r, temp.i = q__1.i;
-	    if (i2 > i) {
-		i__2 = i2 - i;
+	    if (i2 > i__) {
+		i__2 = i2 - i__;
 		r_cnjg(&q__1, &temp);
-		cscal_(&i__2, &q__1, &h[i + (i + 1) * h_dim1], ldh);
+		cscal_(&i__2, &q__1, &h___ref(i__, i__ + 1), ldh);
 	    }
-	    i__2 = i - i1;
-	    cscal_(&i__2, &temp, &h[i1 + i * h_dim1], &c__1);
+	    i__2 = i__ - i1;
+	    cscal_(&i__2, &temp, &h___ref(i1, i__), &c__1);
 /* **   
              Increment op count */
 	    opst += (i2 - i1 + 1) * 6;
 /* ** */
 	    if (*wantz) {
-		cscal_(&nz, &temp, &z[*iloz + i * z_dim1], &c__1);
+		cscal_(&nz, &temp, &z___ref(*iloz, i__), &c__1);
 /* **   
                 Increment op count */
 		opst += nz * 6;
@@ -621,22 +606,22 @@ n extra
 
 /*     Failure to converge in remaining number of iterations */
 
-    *info = i;
+    *info = i__;
     return 0;
 
 L120:
 
 /*     H(I,I-1) is negligible: one eigenvalue has converged. */
 
-    i__1 = i;
-    i__2 = i + i * h_dim1;
-    w[i__1].r = h[i__2].r, w[i__1].i = h[i__2].i;
+    i__1 = i__;
+    i__2 = h___subscr(i__, i__);
+    w[i__1].r = h__[i__2].r, w[i__1].i = h__[i__2].i;
 
 /*     Decrement number of remaining iterations, and return to start of   
        the main loop with new value of I. */
 
     itn -= its;
-    i = l - 1;
+    i__ = l - 1;
     goto L10;
 
 L130:
@@ -649,4 +634,10 @@ L130:
 /*     End of CLAHQR */
 
 } /* clahqr_ */
+
+#undef z___ref
+#undef z___subscr
+#undef h___ref
+#undef h___subscr
+
 

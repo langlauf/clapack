@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -34,7 +35,13 @@ static doublecomplex c_b12 = {-1.,0.};
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -45,22 +52,18 @@ static doublecomplex c_b12 = {-1.,0.};
 
     ZTRT02 computes the residual for the computed solution to a   
     triangular system of linear equations  A*x = b,  A**T *x = b,   
-    or A**H *x = b.  Here A is a triangular matrix, A**T is the transpose 
-  
-    of A, A**H is the conjugate transpose of A, and x and b are N by NRHS 
-  
+    or A**H *x = b.  Here A is a triangular matrix, A**T is the transpose   
+    of A, A**H is the conjugate transpose of A, and x and b are N by NRHS   
     matrices.  The test ratio is the maximum over the number of right   
     hand sides of   
        norm(b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
-    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon. 
-  
+    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon.   
 
     Arguments   
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -85,12 +88,9 @@ static doublecomplex c_b12 = {-1.,0.};
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading n by n   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading n by n lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading n by n lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -120,21 +120,20 @@ static doublecomplex c_b12 = {-1.,0.};
             The maximum over the number of right hand sides of   
             norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
     --rwork;
@@ -167,11 +166,11 @@ static doublecomplex c_b12 = {-1.,0.};
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	zcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	zcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ztrmv_(uplo, trans, diag, n, &a[a_offset], lda, &work[1], &c__1);
-	zaxpy_(n, &c_b12, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	zaxpy_(n, &c_b12, &b_ref(1, j), &c__1, &work[1], &c__1);
 	bnorm = dzasum_(n, &work[1], &c__1);
-	xnorm = dzasum_(n, &x[j * x_dim1 + 1], &c__1);
+	xnorm = dzasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -187,4 +186,10 @@ static doublecomplex c_b12 = {-1.,0.};
 /*     End of ZTRT02 */
 
 } /* ztrt02_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,9 +29,9 @@ static doublereal c_b55 = 0.;
 	    "ot 0 =\002,i4)";
     static char fmt_9994[] = "(\002 example number having largest error     "
 	    "     =\002,i4)";
-    static char fmt_9992[] = "(\002 number of examples where info is not 0  "
+    static char fmt_9993[] = "(\002 number of examples where info is not 0  "
 	    "     =\002,i4)";
-    static char fmt_9991[] = "(\002 total number of examples tested         "
+    static char fmt_9992[] = "(\002 total number of examples tested         "
 	    "     =\002,i4)";
 
     /* System generated locals */
@@ -47,7 +48,7 @@ static doublereal c_b55 = 0.;
     static doublereal rmax, vmax, work[2500]	/* was [50][50] */, a[2500]	
 	    /* was [50][50] */, b[2500]	/* was [50][50] */, e[2500]	/* 
 	    was [50][50] */, f[2500]	/* was [50][50] */;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
@@ -82,12 +83,20 @@ static doublereal c_b55 = 0.;
     static cilist io___37 = { 0, 0, 0, fmt_9996, 0 };
     static cilist io___38 = { 0, 0, 0, fmt_9995, 0 };
     static cilist io___39 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___40 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9991, 0 };
+    static cilist io___40 = { 0, 0, 0, fmt_9993, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9992, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*50 + a_1 - 51]
+#define b_ref(a_1,a_2) b[(a_2)*50 + a_1 - 51]
+#define e_ref(a_1,a_2) e[(a_2)*50 + a_1 - 51]
+#define f_ref(a_1,a_2) f[(a_2)*50 + a_1 - 51]
+#define vl_ref(a_1,a_2) vl[(a_2)*50 + a_1 - 51]
+#define vr_ref(a_1,a_2) vr[(a_2)*50 + a_1 - 51]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -108,8 +117,7 @@ static doublereal c_b55 = 0.;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialization */
@@ -135,12 +143,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___10.ciunit = *nin;
 	s_rsle(&io___10);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&a[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__5, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
 		    doublereal));
 	}
 	e_rsle();
@@ -148,12 +156,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___13.ciunit = *nin;
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&b[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__5, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
 		    doublereal));
 	}
 	e_rsle();
@@ -161,12 +169,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___15.ciunit = *nin;
 	s_rsle(&io___15);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&vl[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__5, &c__1, (char *)&vl_ref(i__, j), (ftnlen)sizeof(
 		    doublereal));
 	}
 	e_rsle();
@@ -174,12 +182,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___17.ciunit = *nin;
 	s_rsle(&io___17);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&vr[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__5, &c__1, (char *)&vr_ref(i__, j), (ftnlen)sizeof(
 		    doublereal));
 	}
 	e_rsle();
@@ -235,10 +243,10 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = vmax, d__3 = (d__1 = e[i + j * 50 - 51] - f[i + j * 50 - 
-		    51], abs(d__1));
+	    d__2 = vmax, d__3 = (d__1 = e_ref(i__, j) - f_ref(i__, j), abs(
+		    d__1));
 	    vmax = max(d__2,d__3);
 /* L60: */
 	}
@@ -266,10 +274,10 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = vmax, d__3 = (d__1 = e[i + j * 50 - 51] - f[i + j * 50 - 
-		    51], abs(d__1));
+	    d__2 = vmax, d__3 = (d__1 = e_ref(i__, j) - f_ref(i__, j), abs(
+		    d__1));
 	    vmax = max(d__2,d__3);
 /* L80: */
 	}
@@ -323,4 +331,12 @@ L100:
 /*     End of DCHKGK */
 
 } /* dchkgk_ */
+
+#undef vr_ref
+#undef vl_ref
+#undef f_ref
+#undef e_ref
+#undef b_ref
+#undef a_ref
+
 

@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgttrs_(char *trans, integer *n, integer *nrhs, 
-	doublereal *dl, doublereal *d, doublereal *du, doublereal *du2, 
+	doublereal *dl, doublereal *d__, doublereal *du, doublereal *du2, 
 	integer *ipiv, doublereal *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -22,13 +23,13 @@
     =========   
 
     TRANS   (input) CHARACTER   
-            Specifies the form of the system of equations:   
+            Specifies the form of the system of equations.   
             = 'N':  A * X = B  (No transpose)   
             = 'T':  A'* X = B  (Transpose)   
             = 'C':  A'* X = B  (Conjugate transpose = Transpose)   
 
     N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+            The order of the matrix A.   
 
     NRHS    (input) INTEGER   
             The number of right hand sides, i.e., the number of columns   
@@ -39,26 +40,24 @@
             LU factorization of A.   
 
     D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the upper triangular matrix U from 
-  
+            The n diagonal elements of the upper triangular matrix U from   
             the LU factorization of A.   
 
     DU      (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) elements of the first superdiagonal of U.   
+            The (n-1) elements of the first super-diagonal of U.   
 
     DU2     (input) DOUBLE PRECISION array, dimension (N-2)   
-            The (n-2) elements of the second superdiagonal of U.   
+            The (n-2) elements of the second super-diagonal of U.   
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices; for 1 <= i <= n, row i of the matrix was   
-            interchanged with row IPIV(i).  IPIV(i) will always be either 
-  
+            interchanged with row IPIV(i).  IPIV(i) will always be either   
             i or i+1; IPIV(i) = i indicates a row interchange was not   
             required.   
 
     B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            On entry, the right hand side matrix B.   
-            On exit, B is overwritten by the solution matrix X.   
+            On entry, the matrix of right hand side vectors B.   
+            On exit, B is overwritten by the solution vectors X.   
 
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,N).   
@@ -67,34 +66,45 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer b_dim1, b_offset, i__1, i__2;
+    integer b_dim1, b_offset, i__1, i__2, i__3;
     /* Local variables */
-    static doublereal temp;
-    static integer i, j;
-    extern logical lsame_(char *, char *);
+    static integer j;
+    extern /* Subroutine */ int dgtts2_(integer *, integer *, integer *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+	     doublereal *, integer *);
+    static integer jb, nb;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    static integer itrans;
     static logical notran;
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
-#define DL(I) dl[(I)-1]
-#define D(I) d[(I)-1]
-#define DU(I) du[(I)-1]
-#define DU2(I) du2[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
+    --dl;
+    --d__;
+    --du;
+    --du2;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
-    notran = lsame_(trans, "N");
-    if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, "C")) {
+    notran = *(unsigned char *)trans == 'N' || *(unsigned char *)trans == 'n';
+    if (! notran && ! (*(unsigned char *)trans == 'T' || *(unsigned char *)
+	    trans == 't') && ! (*(unsigned char *)trans == 'C' || *(unsigned 
+	    char *)trans == 'c')) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -115,75 +125,38 @@
 	return 0;
     }
 
+/*     Decode TRANS */
+
     if (notran) {
-
-/*        Solve A*X = B using the LU factorization of A,   
-          overwriting each right hand side vector with its solution. 
-*/
-
-	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve L*x = b. */
-
-	    i__2 = *n - 1;
-	    for (i = 1; i <= *n-1; ++i) {
-		if (IPIV(i) == i) {
-		    B(i+1,j) -= DL(i) * B(i,j);
-		} else {
-		    temp = B(i,j);
-		    B(i,j) = B(i+1,j);
-		    B(i+1,j) = temp - DL(i) * B(i,j);
-		}
-/* L10: */
-	    }
-
-/*           Solve U*x = b. */
-
-	    B(*n,j) /= D(*n);
-	    if (*n > 1) {
-		B(*n-1,j) = (B(*n-1,j) - DU(*n - 1) 
-			* B(*n,j)) / D(*n - 1);
-	    }
-	    for (i = *n - 2; i >= 1; --i) {
-		B(i,j) = (B(i,j) - DU(i) * B(i+1,j) - DU2(i) * B(i+2,j)) / D(i);
-/* L20: */
-	    }
-/* L30: */
-	}
+	itrans = 0;
     } else {
+	itrans = 1;
+    }
 
-/*        Solve A' * X = B. */
+/*     Determine the number of right-hand sides to solve at a time. */
 
+    if (*nrhs == 1) {
+	nb = 1;
+    } else {
+/* Computing MAX */
+	i__1 = 1, i__2 = ilaenv_(&c__1, "DGTTRS", trans, n, nrhs, &c_n1, &
+		c_n1, (ftnlen)6, (ftnlen)1);
+	nb = max(i__1,i__2);
+    }
+
+    if (nb >= *nrhs) {
+	dgtts2_(&itrans, n, nrhs, &dl[1], &d__[1], &du[1], &du2[1], &ipiv[1], 
+		&b[b_offset], ldb);
+    } else {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve U'*x = b. */
-
-	    B(1,j) /= D(1);
-	    if (*n > 1) {
-		B(2,j) = (B(2,j) - DU(1) * B(1,j)) / D(2);
-	    }
-	    i__2 = *n;
-	    for (i = 3; i <= *n; ++i) {
-		B(i,j) = (B(i,j) - DU(i - 1) * B(i-1,j) - DU2(i - 2) * B(i-2,j)) / 
-			D(i);
-/* L40: */
-	    }
-
-/*           Solve L'*x = b. */
-
-	    for (i = *n - 1; i >= 1; --i) {
-		if (IPIV(i) == i) {
-		    B(i,j) -= DL(i) * B(i+1,j);
-		} else {
-		    temp = B(i+1,j);
-		    B(i+1,j) = B(i,j) - DL(i) * temp;
-		    B(i,j) = temp;
-		}
-/* L50: */
-	    }
-/* L60: */
+	i__2 = nb;
+	for (j = 1; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
+/* Computing MIN */
+	    i__3 = *nrhs - j + 1;
+	    jb = min(i__3,nb);
+	    dgtts2_(&itrans, n, &jb, &dl[1], &d__[1], &du[1], &du2[1], &ipiv[
+		    1], &b_ref(1, j), ldb);
+/* L10: */
 	}
     }
 
@@ -191,4 +164,7 @@
 
     return 0;
 } /* dgttrs_ */
+
+#undef b_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,14 +20,12 @@ static integer c__1 = 1;
 static real c_b22 = 1.f;
 static real c_b23 = 0.f;
 
-/* Subroutine */ int slaed3_(integer *k, integer *kstart, integer *kstop, 
-	integer *n, real *d, real *q, integer *ldq, real *rho, integer *
-	cutpnt, real *dlamda, real *q2, integer *ldq2, integer *indxc, 
-	integer *ctot, real *w, real *s, integer *lds, integer *info)
+/* Subroutine */ int slaed3_(integer *k, integer *n, integer *n1, real *d__, 
+	real *q, integer *ldq, real *rho, real *dlamda, real *q2, integer *
+	indx, integer *ctot, real *w, real *s, integer *info)
 {
     /* System generated locals */
-    integer q_dim1, q_offset, q2_dim1, q2_offset, s_dim1, s_offset, i__1, 
-	    i__2;
+    integer q_dim1, q_offset, i__1, i__2;
     real r__1;
 
     /* Builtin functions */
@@ -35,26 +34,30 @@ static real c_b23 = 0.f;
     /* Local variables */
     static real temp;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
-	    real *, integer *);
-    static integer ktemp, parts;
-    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
-	    integer *), slaed4_(integer *, integer *, real *, real *, real *, 
-	    real *, real *, integer *);
+	    real *, integer *), scopy_(integer *, real *, 
+	    integer *, real *, integer *);
+    static integer n2;
+    extern /* Subroutine */ int slaed4_(integer *, integer *, real *, real *, 
+	    real *, real *, real *, integer *);
     extern doublereal slamc3_(real *, real *);
-    static integer jc;
-    extern /* Subroutine */ int xerbla_(char *, integer *), slaset_(
-	    char *, integer *, integer *, real *, real *, real *, integer *);
+    static integer n12, ii, n23;
+    extern /* Subroutine */ int xerbla_(char *, integer *), slacpy_(
+	    char *, integer *, integer *, real *, integer *, real *, integer *
+	    ), slaset_(char *, integer *, integer *, real *, real *, 
+	    real *, integer *);
+    static integer iq2;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is unchanged, OPS is only incremented   
@@ -63,7 +66,7 @@ static real c_b23 = 0.f;
     =======   
 
     SLAED3 finds the roots of the secular equation, as defined by the   
-    values in D, W, and RHO, between KSTART and KSTOP.  It makes the   
+    values in D, W, and RHO, between 1 and K.  It makes the   
     appropriate calls to SLAED4 and then updates the eigenvectors by   
     multiplying the matrix of eigenvectors of the pair of eigensystems   
     being combined by the matrix of eigenvectors of the K-by-K system   
@@ -80,26 +83,24 @@ static real c_b23 = 0.f;
     =========   
 
     K       (input) INTEGER   
-            The number of terms in the rational function to be solved by 
-  
+            The number of terms in the rational function to be solved by   
             SLAED4.  K >= 0.   
-
-    KSTART  (input) INTEGER   
-    KSTOP   (input) INTEGER   
-            The updated eigenvalues Lambda(I), KSTART <= I <= KSTOP   
-            are to be computed.  1 <= KSTART <= KSTOP <= K.   
 
     N       (input) INTEGER   
             The number of rows and columns in the Q matrix.   
             N >= K (deflation may result in N>K).   
 
+    N1      (input) INTEGER   
+            The location of the last eigenvalue in the leading submatrix.   
+            min(1,N) <= N1 <= N/2.   
+
     D       (output) REAL array, dimension (N)   
             D(I) contains the updated eigenvalues for   
-            KSTART <= I <= KSTOP.   
+            1 <= I <= K.   
 
     Q       (output) REAL array, dimension (LDQ,N)   
             Initially the first K columns are used as workspace.   
-            On output the columns KSTART to KSTOP contain   
+            On output the columns 1 to K contain   
             the updated eigenvectors.   
 
     LDQ     (input) INTEGER   
@@ -109,39 +110,26 @@ static real c_b23 = 0.f;
             The value of the parameter in the rank one update equation.   
             RHO >= 0 required.   
 
-    CUTPNT  (input) INTEGER   
-            The location of the last eigenvalue in the leading submatrix. 
-  
-            min(1,N) <= CUTPNT <= N.   
-
     DLAMDA  (input/output) REAL array, dimension (K)   
             The first K elements of this array contain the old roots   
             of the deflated updating problem.  These are the poles   
             of the secular equation. May be changed on output by   
-            having lowest order bit set to zero on Cray X-MP, Cray Y-MP, 
-  
+            having lowest order bit set to zero on Cray X-MP, Cray Y-MP,   
             Cray-2, or Cray C-90, as described above.   
 
     Q2      (input) REAL array, dimension (LDQ2, N)   
             The first K columns of this matrix contain the non-deflated   
             eigenvectors for the split problem.   
 
-    LDQ2    (input) INTEGER   
-            The leading dimension of the array Q2.  LDQ2 >= max(1,N).   
-
-    INDXC   (input) INTEGER array, dimension (N)   
+    INDX    (input) INTEGER array, dimension (N)   
             The permutation used to arrange the columns of the deflated   
-            Q matrix into three groups:  the first group contains   
-            non-zero elements only at and above CUTPNT, the second   
-            contains non-zero elements only below CUTPNT, and the third   
-            is dense.  The rows of the eigenvectors found by SLAED4   
-            must be likewise permuted before the matrix multiply can take 
-  
-            place.   
+            Q matrix into three groups (see SLAED2).   
+            The rows of the eigenvectors found by SLAED4 must be likewise   
+            permuted before the matrix multiply can take place.   
 
     CTOT    (input) INTEGER array, dimension (4)   
             A count of the total number of the various types of columns   
-            in Q, as described in INDXC.  The fourth column type is any   
+            in Q, as described in INDX.  The fourth column type is any   
             column which has been deflated.   
 
     W       (input/output) REAL array, dimension (K)   
@@ -149,10 +137,9 @@ static real c_b23 = 0.f;
             of the deflation-adjusted updating vector. Destroyed on   
             output.   
 
-    S       (workspace) REAL array, dimension (LDS, K)   
+    S       (workspace) REAL array, dimension (N1 + 1)*K   
             Will contain the eigenvectors of the repaired matrix which   
-            will be multiplied by the previously accumulated eigenvectors 
-  
+            will be multiplied by the previously accumulated eigenvectors   
             to update the system.   
 
     LDS     (input) INTEGER   
@@ -163,45 +150,40 @@ static real c_b23 = 0.f;
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = 1, an eigenvalue did not converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+    Modified by Francoise Tisseur, University of Tennessee.   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --dlamda;
-    q2_dim1 = *ldq2;
-    q2_offset = q2_dim1 + 1;
-    q2 -= q2_offset;
-    --indxc;
+    --q2;
+    --indx;
     --ctot;
     --w;
-    s_dim1 = *lds;
-    s_offset = s_dim1 + 1;
-    s -= s_offset;
+    --s;
 
     /* Function Body */
     *info = 0;
 
     if (*k < 0) {
 	*info = -1;
-    } else if (*kstart < 1 || *kstart > max(1,*k)) {
-	*info = -2;
-    } else if (max(1,*kstop) < *kstart || *kstop > max(1,*k)) {
-	*info = -3;
     } else if (*n < *k) {
-	*info = -4;
+	*info = -2;
     } else if (*ldq < max(1,*n)) {
-	*info = -7;
-    } else if (*ldq2 < max(1,*n)) {
-	*info = -12;
-    } else if (*lds < max(1,*k)) {
-	*info = -17;
+	*info = -6;
     }
     if (*info != 0) {
 	i__1 = -(*info);
@@ -216,8 +198,7 @@ static real c_b23 = 0.f;
     }
 
 /*     Modify values DLAMDA(i) to make sure all DLAMDA(i)-DLAMDA(j) can   
-       be computed with high relative accuracy (barring over/underflow). 
-  
+       be computed with high relative accuracy (barring over/underflow).   
        This is a problem on machines without a guard digit in   
        add/subtract (Cray XMP, Cray YMP, Cray C 90 and Cray 2).   
        The following code replaces DLAMDA(I) by 2*DLAMDA(I)-DLAMDA(I),   
@@ -234,43 +215,44 @@ static real c_b23 = 0.f;
        this code. */
 
     latime_1.ops += *n << 1;
-    i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	dlamda[i] = slamc3_(&dlamda[i], &dlamda[i]) - dlamda[i];
+    i__1 = *k;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	dlamda[i__] = slamc3_(&dlamda[i__], &dlamda[i__]) - dlamda[i__];
 /* L10: */
     }
 
-    ktemp = *kstop - *kstart + 1;
-    i__1 = *kstop;
-    for (j = *kstart; j <= i__1; ++j) {
-	slaed4_(k, &j, &dlamda[1], &w[1], &q[j * q_dim1 + 1], rho, &d[j], 
-		info);
+    i__1 = *k;
+    for (j = 1; j <= i__1; ++j) {
+	slaed4_(k, &j, &dlamda[1], &w[1], &q_ref(1, j), rho, &d__[j], info);
 
 /*        If the zero finder fails, the computation is terminated. */
 
 	if (*info != 0) {
-	    goto L130;
+	    goto L120;
 	}
 /* L20: */
     }
 
-    if (*k == 1 || *k == 2) {
+    if (*k == 1) {
+	goto L110;
+    }
+    if (*k == 2) {
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = *k;
-	    for (j = 1; j <= i__2; ++j) {
-		jc = indxc[j];
-		s[j + i * s_dim1] = q[jc + i * q_dim1];
+	for (j = 1; j <= i__1; ++j) {
+	    w[1] = q_ref(1, j);
+	    w[2] = q_ref(2, j);
+	    ii = indx[1];
+	    q_ref(1, j) = w[ii];
+	    ii = indx[2];
+	    q_ref(2, j) = w[ii];
 /* L30: */
-	    }
-/* L40: */
 	}
-	goto L120;
+	goto L110;
     }
 
 /*     Compute updated W. */
 
-    scopy_(k, &w[1], &c__1, &s[s_offset], &c__1);
+    scopy_(k, &w[1], &c__1, &s[1], &c__1);
 
 /*     Initialize W(I) = Q(I,I) */
 
@@ -280,23 +262,23 @@ static real c_b23 = 0.f;
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j - 1;
-	for (i = 1; i <= i__2; ++i) {
-	    w[i] *= q[i + j * q_dim1] / (dlamda[i] - dlamda[j]);
-/* L50: */
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    w[i__] *= q_ref(i__, j) / (dlamda[i__] - dlamda[j]);
+/* L40: */
 	}
 	i__2 = *k;
-	for (i = j + 1; i <= i__2; ++i) {
-	    w[i] *= q[i + j * q_dim1] / (dlamda[i] - dlamda[j]);
-/* L60: */
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    w[i__] *= q_ref(i__, j) / (dlamda[i__] - dlamda[j]);
+/* L50: */
 	}
-/* L70: */
+/* L60: */
     }
     latime_1.ops += *k;
     i__1 = *k;
-    for (i = 1; i <= i__1; ++i) {
-	r__1 = sqrt(-(doublereal)w[i]);
-	w[i] = r_sign(&r__1, &s[i + s_dim1]);
-/* L80: */
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	r__1 = sqrt(-w[i__]);
+	w[i__] = r_sign(&r__1, &s[i__]);
+/* L70: */
     }
 
 /*     Compute eigenvectors of the modified rank-1 modification. */
@@ -305,69 +287,56 @@ static real c_b23 = 0.f;
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *k;
-	for (i = 1; i <= i__2; ++i) {
-	    q[i + j * q_dim1] = w[i] / q[i + j * q_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    s[i__] = w[i__] / q_ref(i__, j);
+/* L80: */
+	}
+	temp = snrm2_(k, &s[1], &c__1);
+	i__2 = *k;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    ii = indx[i__];
+	    q_ref(i__, j) = s[ii] / temp;
 /* L90: */
 	}
-	temp = snrm2_(k, &q[j * q_dim1 + 1], &c__1);
-	i__2 = *k;
-	for (i = 1; i <= i__2; ++i) {
-	    jc = indxc[i];
-	    s[i + j * s_dim1] = q[jc + j * q_dim1] / temp;
 /* L100: */
-	}
-/* L110: */
     }
 
 /*     Compute the updated eigenvectors. */
 
+L110:
+
+    n2 = *n - *n1;
+    n12 = ctot[1] + ctot[2];
+    n23 = ctot[2] + ctot[3];
+
+    slacpy_("A", &n23, k, &q_ref(ctot[1] + 1, 1), ldq, &s[1], &n23)
+	    ;
+    iq2 = *n1 * n12 + 1;
+    if (n23 != 0) {
+	latime_1.ops += (real) n2 * 2 * *k * n23;
+	sgemm_("N", "N", &n2, k, &n23, &c_b22, &q2[iq2], &n2, &s[1], &n23, &
+		c_b23, &q_ref(*n1 + 1, 1), ldq);
+    } else {
+	slaset_("A", &n2, k, &c_b23, &c_b23, &q_ref(*n1 + 1, 1), ldq);
+    }
+
+    slacpy_("A", &n12, k, &q[q_offset], ldq, &s[1], &n12);
+    if (n12 != 0) {
+	latime_1.ops += (real) (*n1) * 2 * *k * n12;
+	sgemm_("N", "N", n1, k, &n12, &c_b22, &q2[1], n1, &s[1], &n12, &c_b23,
+		 &q[q_offset], ldq);
+    } else {
+	slaset_("A", n1, k, &c_b23, &c_b23, &q_ref(1, 1), ldq);
+    }
+
+
 L120:
-
-    parts = 0;
-    if (ctot[1] > 0) {
-	++parts;
-	latime_1.ops += (real) (*cutpnt) * 2 * ktemp * ctot[1];
-	sgemm_("N", "N", cutpnt, &ktemp, &ctot[1], &c_b22, &q2[q2_dim1 + 1], 
-		ldq2, &s[*kstart * s_dim1 + 1], lds, &c_b23, &q[*kstart * 
-		q_dim1 + 1], ldq);
-    }
-    if (ctot[2] > 0) {
-	parts += 2;
-	latime_1.ops += (real) (*n - *cutpnt) * 2 * ktemp * ctot[2];
-	i__1 = *n - *cutpnt;
-	sgemm_("N", "N", &i__1, &ktemp, &ctot[2], &c_b22, &q2[*cutpnt + 1 + (
-		ctot[1] + 1) * q2_dim1], ldq2, &s[ctot[1] + 1 + *kstart * 
-		s_dim1], lds, &c_b23, &q[*cutpnt + 1 + *kstart * q_dim1], ldq);
-    }
-    if (parts == 1) {
-	i__1 = *n - *cutpnt;
-	slaset_("A", &i__1, &ktemp, &c_b23, &c_b23, &q[*cutpnt + 1 + *kstart *
-		 q_dim1], ldq);
-    }
-    if (parts == 2) {
-	slaset_("A", cutpnt, &ktemp, &c_b23, &c_b23, &q[*kstart * q_dim1 + 1],
-		 ldq);
-    }
-    if (ctot[3] > 0) {
-	if (parts > 0) {
-	    latime_1.ops += (real) (*n) * 2 * ktemp * ctot[3];
-	    sgemm_("N", "N", n, &ktemp, &ctot[3], &c_b22, &q2[(ctot[1] + 1 + 
-		    ctot[2]) * q2_dim1 + 1], ldq2, &s[ctot[1] + 1 + ctot[2] + 
-		    *kstart * s_dim1], lds, &c_b22, &q[*kstart * q_dim1 + 1], 
-		    ldq);
-	} else {
-	    latime_1.ops += (real) (*n) * 2 * ktemp * ctot[3];
-	    sgemm_("N", "N", n, &ktemp, &ctot[3], &c_b22, &q2[(ctot[1] + 1 + 
-		    ctot[2]) * q2_dim1 + 1], ldq2, &s[ctot[1] + 1 + ctot[2] + 
-		    *kstart * s_dim1], lds, &c_b23, &q[*kstart * q_dim1 + 1], 
-		    ldq);
-	}
-    }
-
-L130:
     return 0;
 
 /*     End of SLAED3 */
 
 } /* slaed3_ */
+
+#undef q_ref
+
 

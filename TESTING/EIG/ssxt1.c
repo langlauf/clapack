@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,10 +15,10 @@ doublereal ssxt1_(integer *ijob, real *d1, integer *n1, real *d2, integer *n2,
 
     /* Local variables */
     static real temp1, temp2;
-    static integer i, j;
+    static integer i__, j;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -66,8 +67,7 @@ doublereal ssxt1_(integer *ijob, real *d1, integer *n1, real *d2, integer *n2,
             The smallest positive number whose reciprocal does not   
             overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -79,28 +79,28 @@ doublereal ssxt1_(integer *ijob, real *d1, integer *n1, real *d2, integer *n2,
 
     j = 1;
     i__1 = *n1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 L10:
-	if (d2[j] < d1[i] && j < *n2) {
+	if (d2[j] < d1[i__] && j < *n2) {
 	    ++j;
 	    goto L10;
 	}
 	if (j == 1) {
-	    temp2 = (r__1 = d2[j] - d1[i], dabs(r__1));
+	    temp2 = (r__1 = d2[j] - d1[i__], dabs(r__1));
 	    if (*ijob == 2) {
 /* Computing MAX */
-		r__2 = *unfl, r__3 = *abstol + *ulp * (r__1 = d1[i], dabs(
+		r__2 = *unfl, r__3 = *abstol + *ulp * (r__1 = d1[i__], dabs(
 			r__1));
 		temp2 /= dmax(r__2,r__3);
 	    }
 	} else {
 /* Computing MIN */
-	    r__3 = (r__1 = d2[j] - d1[i], dabs(r__1)), r__4 = (r__2 = d1[i] - 
-		    d2[j - 1], dabs(r__2));
+	    r__3 = (r__1 = d2[j] - d1[i__], dabs(r__1)), r__4 = (r__2 = d1[
+		    i__] - d2[j - 1], dabs(r__2));
 	    temp2 = dmin(r__3,r__4);
 	    if (*ijob == 2) {
 /* Computing MAX */
-		r__2 = *unfl, r__3 = *abstol + *ulp * (r__1 = d1[i], dabs(
+		r__2 = *unfl, r__3 = *abstol + *ulp * (r__1 = d1[i__], dabs(
 			r__1));
 		temp2 /= dmax(r__2,r__3);
 	    }

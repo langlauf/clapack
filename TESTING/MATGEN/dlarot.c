@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static integer c__8 = 8;
 static integer c__1 = 1;
 
 /* Subroutine */ int dlarot_(logical *lrows, logical *lleft, logical *lright, 
-	integer *nl, doublereal *c, doublereal *s, doublereal *a, integer *
+	integer *nl, doublereal *c__, doublereal *s, doublereal *a, integer *
 	lda, doublereal *xleft, doublereal *xright)
 {
     /* System generated locals */
@@ -28,7 +29,7 @@ static integer c__1 = 1;
     static integer iyt;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,8 +45,7 @@ static integer c__1 = 1;
        that elements of the matrix may be used or modified for which   
        no array element is provided.   
 
-       One example is a symmetric matrix in SB format (bandwidth=4), for 
-  
+       One example is a symmetric matrix in SB format (bandwidth=4), for   
        which UPLO='L':  Two adjacent rows will have the format:   
 
        row j:     *  *  *  *  *  .  .  .  .   
@@ -71,8 +71,7 @@ static integer c__1 = 1;
        is rotated, setting p to its new value.  The next call to   
        DLAROT would rotate columns j and j+1, using p, and restore   
        symmetry.  The element q would start out being zero, and be   
-       made non-zero by the rotation.  Later, rotations would presumably 
-  
+       made non-zero by the rotation.  Later, rotations would presumably   
        be chosen to zero q out.   
 
        Typical Calling Sequences: rotating the i-th and (i+1)-st rows.   
@@ -119,8 +118,7 @@ static integer c__1 = 1;
                       . . .   
                          A(K+1,i), LDA-1, XLEFT, XRIGHT )   
 
-         Rotating columns is just the transpose of rotating rows, except 
-  
+         Rotating columns is just the transpose of rotating rows, except   
          for GB and SB: (rotating columns i and i+1)   
 
          GB:   
@@ -160,8 +158,7 @@ static integer c__1 = 1;
     LRIGHT - LOGICAL   
              If .TRUE., then XRIGHT will be used instead of the   
              corresponding element of A for the last element in the   
-             first row (if LROWS=.FALSE.) or column (if LROWS=.TRUE.) If 
-  
+             first row (if LROWS=.FALSE.) or column (if LROWS=.TRUE.) If   
              .FALSE., then the corresponding element of A will be used.   
              Not modified.   
 
@@ -203,10 +200,8 @@ static integer c__1 = 1;
              be the j-th element in the first of the two rows   
              to be rotated, and A(2,j) would be the j-th in the second,   
              regardless of how the array may be stored in the calling   
-             routine.  [A cannot, however, actually be dimensioned thus, 
-  
-             since for band format, the row number may exceed LDA, which 
-  
+             routine.  [A cannot, however, actually be dimensioned thus,   
+             since for band format, the row number may exceed LDA, which   
              is not legal FORTRAN.]   
              If LROWS=.TRUE., then LDA must be at least 1, otherwise   
              it must be at least NL minus the number of .TRUE. values   
@@ -225,8 +220,7 @@ static integer c__1 = 1;
              (if LROWS=.FALSE.).   
              Read and modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Set up indices, arrays for ends   
@@ -276,8 +270,8 @@ static integer c__1 = 1;
 /*     Rotate */
 
     i__1 = *nl - nt;
-    drot_(&i__1, &a[ix], &iinc, &a[iy], &iinc, c, s);
-    drot_(&nt, xt, &c__1, yt, &c__1, c, s);
+    drot_(&i__1, &a[ix], &iinc, &a[iy], &iinc, c__, s);
+    drot_(&nt, xt, &c__1, yt, &c__1, c__, s);
 
 /*     Stuff values back into XLEFT, XRIGHT, etc. */
 

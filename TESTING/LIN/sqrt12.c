@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     static integer iscl, info;
     static real anrm;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern doublereal sasum_(integer *, real *, integer *);
     static real dummy[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
@@ -44,7 +45,10 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     static real smlnum, nrmsvl;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -68,8 +72,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
             The number of columns of the matrix A.   
 
     A       (input) REAL array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced. 
-  
+            The M-by-N matrix A. Only the upper trapezoid is referenced.   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.   
@@ -83,13 +86,12 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
             The length of the array WORK. LWORK >= M*N + 4*min(M,N) +   
             max(M,N).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --s;
     --work;
@@ -119,8 +121,8 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = a[i + j * a_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = a_ref(i__, j);
 /* L10: */
 	}
 /* L20: */
@@ -175,8 +177,8 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     } else {
 
 	i__1 = mn;
-	for (i = 1; i <= i__1; ++i) {
-	    work[*m * *n + i] = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    work[*m * *n + i__] = 0.f;
 /* L30: */
 	}
     }
@@ -184,8 +186,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
 /*     Compare s and singular values of work */
 
     saxpy_(&mn, &c_b33, &s[1], &c__1, &work[*m * *n + 1], &c__1);
-    ret_val = sasum_(&mn, &work[*m * *n + 1], &c__1) / (slamch_("Epsilon")
-	     * (real) max(*m,*n));
+    ret_val = sasum_(&mn, &work[*m * *n + 1], &c__1) / (slamch_("Epsilon") * (real) max(*m,*n));
     if (nrmsvl != 0.f) {
 	ret_val /= nrmsvl;
     }
@@ -195,4 +196,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
 /*     End of SQRT12 */
 
 } /* sqrt12_ */
+
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,17 +19,16 @@ struct {
 static integer c__1 = 1;
 static integer c__4 = 4;
 static integer c__3 = 3;
-static integer c__12 = 12;
-static integer c__5000 = 5000;
 static integer c__6 = 6;
-static integer c_b172 = 362400;
+static integer c__5000 = 5000;
+static integer c_b172 = 272384;
 static integer c__2 = 2;
 
 /* Main program */ MAIN__(void)
 {
     /* Format strings */
-    static char fmt_9983[] = "(\002 LAPACK VERSION 2.0, released September 3"
-	    "0, 1994 \002,/)";
+    static char fmt_9983[] = "(\002 LAPACK VERSION 3.0, released June 30, 19"
+	    "99 \002,/)";
     static char fmt_9992[] = "(\002 The following parameter values will be u"
 	    "sed:\002)";
     static char fmt_9999[] = "(\002 Too many values of \002,a,\002 using "
@@ -78,15 +78,17 @@ static integer c__2 = 2;
     static integer need, nlda;
     static logical blas;
     static char line[80];
-    static integer kval[12], mval[12], maxk, nval[12], maxm, maxn;
-    static real a[1087200]	/* was [362400][3] */, d[2400]	/* was [1200][
-	    2] */;
-    static integer i, l;
+    static integer kval[6], mval[6], maxk, nval[6], maxm, maxn;
+    static real work[280576]	/* was [512][548] */, a[817152]	/* was [
+	    272384][3] */, b[817152]	/* was [272384][3] */, d__[2048]	
+	    /* was [1024][2] */;
+    static integer i__, l;
+    static real s[1024];
     static logical ldaok;
     extern logical lsame_(char *, char *);
-    static integer nbval[12], maxnb, mkmax;
+    static integer nbval[6], maxnb, mkmax;
     static char c1[1], c2[2], c3[3];
-    static integer nxval[12], i2, j2, iwork[10000];
+    static integer nxval[6], i2, j2, iwork[10000];
     static real s1, s2;
     extern /* Subroutine */ int stimb2_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
@@ -94,12 +96,16 @@ static integer c__2 = 2;
 	    integer *, integer *, integer *, ftnlen), stimb3_(char *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, real *, real *, real *, real *, real *, integer *, 
-	    integer *, integer *, ftnlen);
+	    integer *, integer *, ftnlen), stimq3_(char *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, real *, real *, real *, real *, real *, integer *, real *, 
+	    integer *, integer *, integer *, ftnlen);
     static integer nk, nm, nn, ldaval[4];
     static logical ldamok, ldanok;
     static integer maxlda;
     extern doublereal second_(void);
     extern logical lsamen_(integer *, char *, char *);
+    static real flptbl[1088640], opctbl[1088640];
     extern /* Subroutine */ int stimgb_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, real *, real *, real *, integer *, real *, integer *
@@ -107,7 +113,7 @@ static integer c__2 = 2;
 	    integer *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, real *, real *, real *, real *, integer *, 
 	    real *, integer *, integer *, integer *, integer *, ftnlen);
-    static real timmin;
+    static real timtbl[1088640], timmin;
     extern /* Subroutine */ int stimpb_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, real *, real *, real *, integer *, real *, integer *
@@ -139,31 +145,35 @@ static integer c__2 = 2;
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, real *, real *, 
 	    real *, real *, real *, real *, integer *, integer *, integer *, 
-	    integer *, ftnlen), stimpo_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, real *, 
-	    real *, real *, integer *, real *, integer *, integer *, integer *
-	    , integer *, ftnlen);
-    static real reslts[55296]	/* was [12][12][8][48] */;
-    extern /* Subroutine */ int stimpp_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, real *, real *, real *, integer *, real *
-	    , integer *, integer *, integer *, integer *, ftnlen), stimqp_(
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    real *, real *, real *, real *, real *, integer *, real *, 
-	    integer *, integer *, integer *, ftnlen), stimmv_(char *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, real *, 
-	    real *, integer *, real *, real *, real *, integer *, integer *, 
-	    integer *, ftnlen), stimpt_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, real *, real *, real *, real *
-	    , integer *, integer *, integer *, integer *, ftnlen), stimqr_(
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *, real *, 
-	    real *, real *, real *, real *, real *, integer *, integer *, 
-	    integer *, integer *, ftnlen), stimrq_(char *, integer *, integer 
+	    integer *, ftnlen), stimls_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, integer *, real *, real *, real *, real *, real *, 
-	    real *, integer *, integer *, integer *, integer *, ftnlen), 
-	    stimsp_(char *, integer *, integer *, integer *, integer *, 
-	    integer *, real *, real *, real *, real *, integer *, real *, 
+	    real *, real *, real *, real *, real *, real *, integer *, 
+	    integer *, ftnlen);
+    static real reslts[6912]	/* was [6][6][8][24] */;
+    extern /* Subroutine */ int stimpo_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, real *, 
+	    real *, real *, integer *, real *, integer *, integer *, integer *
+	    , integer *, ftnlen), stimpp_(char *, integer *, integer *, 
+	    integer *, integer *, integer *, real *, real *, real *, integer *
+	    , real *, integer *, integer *, integer *, integer *, ftnlen), 
+	    stimmv_(char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, real *, real *, integer *, real *, real *, 
+	    real *, integer *, integer *, integer *, ftnlen), stimpt_(char *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    real *, real *, real *, real *, integer *, integer *, integer *, 
+	    integer *, ftnlen), stimqp_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, real *, real *, real *, real *, 
+	    integer *, real *, integer *, integer *, integer *, ftnlen), 
+	    stimqr_(char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    real *, real *, real *, real *, real *, real *, integer *, 
+	    integer *, integer *, integer *, ftnlen), stimrq_(char *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, real *, real *, real *, real *
+	    , real *, real *, integer *, integer *, integer *, integer *, 
+	    ftnlen), stimsp_(char *, integer *, integer *, integer *, integer 
+	    *, integer *, real *, real *, real *, real *, integer *, real *, 
 	    integer *, integer *, integer *, integer *, ftnlen), stimtp_(char 
 	    *, integer *, integer *, integer *, integer *, integer *, real *, 
 	    real *, real *, real *, integer *, integer *, integer *, integer *
@@ -231,17 +241,22 @@ static integer c__2 = 2;
     static cilist io___92 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___93 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___94 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___95 = { 0, 6, 0, fmt_9987, 0 };
-    static cilist io___96 = { 0, 5, 1, "(A)", 0 };
-    static cilist io___98 = { 0, 6, 0, fmt_9986, 0 };
-    static cilist io___99 = { 0, 6, 0, fmt_9985, 0 };
+    static cilist io___101 = { 0, 6, 0, fmt_9987, 0 };
+    static cilist io___102 = { 0, 5, 1, "(A)", 0 };
+    static cilist io___104 = { 0, 6, 0, fmt_9986, 0 };
+    static cilist io___105 = { 0, 6, 0, fmt_9985, 0 };
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*272384 + a_1 - 272385]
+#define b_ref(a_1,a_2) b[(a_2)*272384 + a_1 - 272385]
+#define d___ref(a_1,a_2) d__[(a_2)*1024 + a_1 - 1025]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
     Purpose   
     =======   
@@ -250,8 +265,7 @@ static integer c__2 = 2;
     routines.  This program collects performance data for the factor,   
     solve, and inverse routines used in solving systems of linear   
     equations, and also for the orthogonal factorization and reduction   
-    routines used in solving least squares problems and matrix eigenvalue 
-  
+    routines used in solving least squares problems and matrix eigenvalue   
     problems.   
 
     The subprograms call a REAL function SECOND with no   
@@ -264,14 +278,10 @@ static integer c__2 = 2;
     for each subroutine is included for timing small problems or for   
     obtaining results on a machine with an inaccurate SECOND function.   
 
-    The matrix dimensions M, N, and K correspond to the three dimensions 
-  
-    m, n, and k in the Level 3 BLAS.  When timing the LAPACK routines for 
-  
-    square matrices, M and N correspond to the matrix dimensions m and n, 
-  
-    and K is the number of right-hand sides (nrhs) for the solves.  When 
-  
+    The matrix dimensions M, N, and K correspond to the three dimensions   
+    m, n, and k in the Level 3 BLAS.  When timing the LAPACK routines for   
+    square matrices, M and N correspond to the matrix dimensions m and n,   
+    and K is the number of right-hand sides (nrhs) for the solves.  When   
     timing the LAPACK routines for band matrices, M is the matrix order   
     m, N is the half-bandwidth (kl, ku, or kd in the LAPACK notation),   
     and K is again the number of right-hand sides.   
@@ -286,13 +296,10 @@ static integer c__2 = 2;
     records, the first 6 characters are reserved for the path or   
     subroutine name.  If a path name is used, the characters after the   
     path name indicate the routines in the path to be timed, where   
-    'T' or 't' means 'Time this routine'.  If the line is blank after the 
-  
+    'T' or 't' means 'Time this routine'.  If the line is blank after the   
     path name, all routines in the path are timed.  If fewer characters   
-    appear than routines in a path, the remaining characters are assumed 
-  
-    to be 'F'.  For example, the following 3 lines are equivalent ways of 
-  
+    appear than routines in a path, the remaining characters are assumed   
+    to be 'F'.  For example, the following 3 lines are equivalent ways of   
     requesting timing of SGETRF:   
     SGE    T F F   
     SGE    T   
@@ -328,12 +335,11 @@ static integer c__2 = 2;
     SHR    T T F F   
     STD    T T F F   
     SBR    T F F   
+    SLS    T T T T T T   
 
     The routines are timed for all combinations of applicable values of   
-    M, N, K, NB, NX, and LDA, and for all combinations of options such as 
-  
-    UPLO and TRANS.  For Level 2 BLAS timings, values of NB are used for 
-  
+    M, N, K, NB, NX, and LDA, and for all combinations of options such as   
+    UPLO and TRANS.  For Level 2 BLAS timings, values of NB are used for   
     INCX.  Certain subroutines, such as the QR factorization, treat the   
     values of M and N as ordered pairs and operate on M x N matrices.   
 
@@ -360,16 +366,14 @@ static integer c__2 = 2;
             The unit number for input.  Currently set to 5 (std input).   
 
     NOUT    INTEGER   
-            The unit number for output.  Currently set to 6 (std output). 
-  
+            The unit number for output.  Currently set to 6 (std output).   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     s1 = second_();
-    ldr1 = 12;
-    ldr2 = 12;
+    ldr1 = 6;
+    ldr2 = 6;
     ldr3 = 8;
     s_wsfe(&io___5);
     e_wsfe();
@@ -379,7 +383,7 @@ static integer c__2 = 2;
        data file format is assumed. */
 
     s_rsfe(&io___6);
-    do_fio(&c__1, line, 80L);
+    do_fio(&c__1, line, (ftnlen)80);
     e_rsfe();
     blas = lsamen_(&c__4, line, "BLAS");
 
@@ -405,25 +409,25 @@ L20:
     s_rsle(&io___12);
     do_lio(&c__3, &c__1, (char *)&nm, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nm > 12) {
+    if (nm > 6) {
 	s_wsfe(&io___14);
-	do_fio(&c__1, "M", 1L);
-	do_fio(&c__1, "NM", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+	do_fio(&c__1, "M", (ftnlen)1);
+	do_fio(&c__1, "NM", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nm = 12;
+	nm = 6;
     }
     s_rsle(&io___15);
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
     s_wsfe(&io___18);
-    do_fio(&c__1, "M:     ", 7L);
+    do_fio(&c__1, "M:     ", (ftnlen)7);
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -432,14 +436,14 @@ L20:
     mok = TRUE_;
     maxm = 0;
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = mval[i - 1];
+	i__2 = mval[i__ - 1];
 	maxm = max(i__2,maxm);
-	if (mval[i - 1] > 5000) {
+	if (mval[i__ - 1] > 5000) {
 	    s_wsfe(&io___21);
-	    do_fio(&c__1, "M", 1L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, "M", (ftnlen)1);
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__5000, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    mok = FALSE_;
@@ -456,25 +460,25 @@ L20:
     s_rsle(&io___23);
     do_lio(&c__3, &c__1, (char *)&nn, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nn > 12) {
+    if (nn > 6) {
 	s_wsfe(&io___25);
-	do_fio(&c__1, "N", 1L);
-	do_fio(&c__1, "NN", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+	do_fio(&c__1, "N", (ftnlen)1);
+	do_fio(&c__1, "NN", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nn = 12;
+	nn = 6;
     }
     s_rsle(&io___26);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
     s_wsfe(&io___28);
-    do_fio(&c__1, "N:     ", 7L);
+    do_fio(&c__1, "N:     ", (ftnlen)7);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -483,14 +487,14 @@ L20:
     nok = TRUE_;
     maxn = 0;
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = nval[i - 1];
+	i__2 = nval[i__ - 1];
 	maxn = max(i__2,maxn);
-	if (nval[i - 1] > 5000) {
+	if (nval[i__ - 1] > 5000) {
 	    s_wsfe(&io___31);
-	    do_fio(&c__1, "N", 1L);
-	    do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, "N", (ftnlen)1);
+	    do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__5000, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    nok = FALSE_;
@@ -507,25 +511,25 @@ L20:
     s_rsle(&io___33);
     do_lio(&c__3, &c__1, (char *)&nk, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nk > 12) {
+    if (nk > 6) {
 	s_wsfe(&io___35);
-	do_fio(&c__1, "K", 1L);
-	do_fio(&c__1, "NK", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+	do_fio(&c__1, "K", (ftnlen)1);
+	do_fio(&c__1, "NK", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nk = 12;
+	nk = 6;
     }
     s_rsle(&io___36);
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
     s_wsfe(&io___38);
-    do_fio(&c__1, "K:     ", 7L);
+    do_fio(&c__1, "K:     ", (ftnlen)7);
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -533,9 +537,9 @@ L20:
 
     maxk = 0;
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = kval[i - 1];
+	i__2 = kval[i__ - 1];
 	maxk = max(i__2,maxk);
 /* L50: */
     }
@@ -547,18 +551,19 @@ L20:
     s_rsle(&io___41);
     do_lio(&c__3, &c__1, (char *)&nnb, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nnb > 12) {
+    if (nnb > 6) {
 	s_wsfe(&io___43);
-	do_fio(&c__1, "NB", 2L);
-	do_fio(&c__1, "NNB", 3L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+	do_fio(&c__1, "NB", (ftnlen)2);
+	do_fio(&c__1, "NNB", (ftnlen)3);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nnb = 12;
+	nnb = 6;
     }
     s_rsle(&io___44);
     i__1 = nnb;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer))
+		;
     }
     e_rsle();
 
@@ -566,24 +571,24 @@ L20:
 
     maxnb = 0;
     i__1 = nnb;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = nbval[i - 1];
+	i__2 = nbval[i__ - 1];
 	maxnb = max(i__2,maxnb);
 /* L60: */
     }
 
     if (blas) {
 	s_wsfe(&io___47);
-	do_fio(&c__1, "INCX:  ", 7L);
+	do_fio(&c__1, "INCX:  ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    nxval[i - 1] = 0;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nxval[i__ - 1] = 0;
 /* L70: */
 	}
     } else {
@@ -592,24 +597,24 @@ L20:
 
 	s_rsle(&io___49);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 
 	s_wsfe(&io___50);
-	do_fio(&c__1, "NB:    ", 7L);
+	do_fio(&c__1, "NB:    ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 	s_wsfe(&io___51);
-	do_fio(&c__1, "NX:    ", 7L);
+	do_fio(&c__1, "NX:    ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     }
@@ -621,23 +626,24 @@ L20:
     e_rsle();
     if (nlda > 4) {
 	s_wsfe(&io___54);
-	do_fio(&c__1, "LDA", 3L);
-	do_fio(&c__1, "NLDA", 4L);
+	do_fio(&c__1, "LDA", (ftnlen)3);
+	do_fio(&c__1, "NLDA", (ftnlen)4);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
 	nlda = 4;
     }
     s_rsle(&io___55);
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer)
+		);
     }
     e_rsle();
     s_wsfe(&io___57);
-    do_fio(&c__1, "LDA:   ", 7L);
+    do_fio(&c__1, "LDA:   ", (ftnlen)7);
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -646,13 +652,13 @@ L20:
     ldaok = TRUE_;
     maxlda = 0;
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = ldaval[i - 1];
+	i__2 = ldaval[i__ - 1];
 	maxlda = max(i__2,maxlda);
-	if (ldaval[i - 1] <= 0) {
+	if (ldaval[i__ - 1] <= 0) {
 	    s_wsfe(&io___60);
-	    do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    ldaok = FALSE_;
 	}
@@ -667,7 +673,7 @@ L20:
 
     ldanok = TRUE_;
     need = maxlda * maxn;
-    if (need > 362400) {
+    if (need > 272384) {
 	s_wsfe(&io___64);
 	do_fio(&c__1, (char *)&maxlda, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxn, (ftnlen)sizeof(integer));
@@ -680,7 +686,7 @@ L20:
 
     ldamok = TRUE_;
     need = maxlda * maxm + maxm * maxk;
-    if (need > 1087200) {
+    if (need > 817152) {
 	need = (need + 2) / 3;
 	s_wsfe(&io___66);
 	do_fio(&c__1, (char *)&maxlda, (ftnlen)sizeof(integer));
@@ -695,7 +701,7 @@ L20:
 
     nxnbok = TRUE_;
     need = maxn * maxnb;
-    if (need > 362400) {
+    if (need > 272384) {
 	s_wsfe(&io___68);
 	do_fio(&c__1, (char *)&maxn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxnb, (ftnlen)sizeof(integer));
@@ -733,7 +739,7 @@ L20:
     if (i__1 != 0) {
 	goto L100;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
 	goto L100;
     }
@@ -750,7 +756,7 @@ L20:
 	if (i__1 != 0) {
 	    goto L100;
 	}
-	i__1 = do_fio(&c__1, line, 80L);
+	i__1 = do_fio(&c__1, line, (ftnlen)80);
 	if (i__1 != 0) {
 	    goto L100;
 	}
@@ -762,36 +768,36 @@ L20:
 	s_wsfe(&io___78);
 	e_wsfe();
 
-/*        If the first record is the special signal 'BAND', then time 
-  
+/*        If the first record is the special signal 'BAND', then time   
           the band routine SGBMV and SGEMM with N = K. */
 
 	if (lsamen_(&c__4, line, "BAND")) {
 	    if (ldamok) {
-		if (mkmax > 362400) {
-		    i2 = 724800 - mkmax + 1;
+		if (mkmax > 272384) {
+		    i2 = 544768 - mkmax + 1;
 		    j2 = 2;
 		} else {
-		    i2 = 362400 - mkmax + 1;
+		    i2 = 272384 - mkmax + 1;
 		    j2 = 3;
 		}
 		i__1 = mkmax / 2;
 		stimmv_("SGBMV ", &nm, mval, &nn, nval, &nlda, ldaval, &
-			timmin, a, &i__1, &a[i2 + j2 * 362400 - 362401], &a[
-			362400 - mkmax / 2 + 724800], reslts, &ldr1, &ldr2, &
-			c__6, 6L);
+			timmin, &a_ref(1, 1), &i__1, &a_ref(i2, j2), &a_ref(
+			272384 - mkmax / 2 + 1, 3), reslts, &ldr1, &ldr2, &
+			c__6, (ftnlen)6);
 	    } else {
 		s_wsfe(&io___83);
-		do_fio(&c__1, "SGBMV ", 6L);
+		do_fio(&c__1, "SGBMV ", (ftnlen)6);
 		e_wsfe();
 	    }
-	    stimmm_("SGEMM ", "K", &nn, nval, &nlda, ldaval, &timmin, a, &a[
-		    362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 6L, 1L);
+	    stimmm_("SGEMM ", "K", &nn, nval, &nlda, ldaval, &timmin, &a_ref(
+		    1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &
+		    c__6, (ftnlen)6, (ftnlen)1);
 	    i__1 = s_rsfe(&io___84);
 	    if (i__1 != 0) {
 		goto L100;
 	    }
-	    i__1 = do_fio(&c__1, line, 80L);
+	    i__1 = do_fio(&c__1, line, (ftnlen)80);
 	    if (i__1 != 0) {
 		goto L100;
 	    }
@@ -805,10 +811,11 @@ L20:
 /*           Otherwise time SGEMV and SGEMM. */
 
 	    stimmv_("SGEMV ", &nn, nval, &nnb, nbval, &nlda, ldaval, &timmin, 
-		    a, &c_b172, &a[362400], &a[724800], reslts, &ldr1, &ldr2, 
-		    &c__6, 6L);
-	    stimmm_("SGEMM ", "N", &nn, nval, &nlda, ldaval, &timmin, a, &a[
-		    362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 6L, 1L);
+		    &a_ref(1, 1), &c_b172, &a_ref(1, 2), &a_ref(1, 3), reslts,
+		     &ldr1, &ldr2, &c__6, (ftnlen)6);
+	    stimmm_("SGEMM ", "N", &nn, nval, &nlda, ldaval, &timmin, &a_ref(
+		    1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &
+		    c__6, (ftnlen)6, (ftnlen)1);
 	}
     }
 
@@ -818,104 +825,133 @@ L20:
     e_wsfe();
 L90:
     *(unsigned char *)c1 = *(unsigned char *)line;
-    s_copy(c2, line + 1, 2L, 2L);
-    s_copy(c3, line + 3, 3L, 3L);
+    s_copy(c2, line + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, line + 3, (ftnlen)3, (ftnlen)3);
 
 /*     Check first character for correct precision. */
 
     if (! lsame_(c1, "Single precision")) {
 	s_wsfe(&io___89);
-	do_fio(&c__1, line, 6L);
+	do_fio(&c__1, line, (ftnlen)6);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, c2, "B2") || lsamen_(&c__3, c3, "MV ") || lsamen_(&c__3, c3, "SV ") || lsamen_(&c__3, c3,
-	     "R  ") || lsamen_(&c__3, c3, "RC ") || lsamen_(&
-	    c__3, c3, "RU ") || lsamen_(&c__3, c3, "R2 ")) {
+    } else if (lsamen_(&c__2, c2, "B2") || lsamen_(&
+	    c__3, c3, "MV ") || lsamen_(&c__3, c3, 
+	    "SV ") || lsamen_(&c__3, c3, "R  ") || lsamen_(&c__3, c3, "RC ") 
+	    || lsamen_(&c__3, c3, "RU ") || lsamen_(&
+	    c__3, c3, "R2 ")) {
 
 /*        Level 2 BLAS */
 
 	stimb2_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda, 
-		ldaval, &c_b172, &timmin, a, &a[362400], &a[724800], reslts, &
-		ldr1, &ldr2, &c__6, 80L);
+		ldaval, &c_b172, &timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(
+		1, 3), reslts, &ldr1, &ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "B3") || lsamen_(&c__3, c3, "MM ") || lsamen_(&c__3, c3, "SM ") || lsamen_(&c__3, c3,
-	     "RK ") || lsamen_(&c__3, c3, "R2K")) {
+    } else if (lsamen_(&c__2, c2, "B3") || lsamen_(&
+	    c__3, c3, "MM ") || lsamen_(&c__3, c3, 
+	    "SM ") || lsamen_(&c__3, c3, "RK ") || lsamen_(&c__3, c3, "R2K")) 
+	    {
 
 /*        Level 3 BLAS */
 
 	stimb3_(line, &nm, mval, &nn, nval, &nk, kval, &nlda, ldaval, &timmin,
-		 a, &a[362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 80L);
+		 &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &
+		ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QR") || lsamen_(&c__2, c3, "QR") || lsamen_(&c__2, c3 + 1, "QR")) {
+    } else if (lsamen_(&c__2, c2, "QR") || lsamen_(&
+	    c__2, c3, "QR") || lsamen_(&c__2, c3 + 1, 
+	    "QR")) {
 
 /*        QR routines */
 
 	stimqr_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, d, &a[362400], &a[724800], reslts, &ldr1, 
-		&ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), d__, &a_ref(1, 2), &a_ref(1, 3)
+		, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "LQ") || lsamen_(&c__2, c3, "LQ") || lsamen_(&c__2, c3 + 1, "LQ")) {
+    } else if (lsamen_(&c__2, c2, "LQ") || lsamen_(&
+	    c__2, c3, "LQ") || lsamen_(&c__2, c3 + 1, 
+	    "LQ")) {
 
 /*        LQ routines */
 
 	stimlq_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, d, &a[362400], &a[724800], reslts, &ldr1, 
-		&ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), d__, &a_ref(1, 2), &a_ref(1, 3)
+		, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c3, "QL") || lsamen_(&c__2, c3 + 1, "QL")) {
+    } else if (lsamen_(&c__2, c2, "QL") || lsamen_(&
+	    c__2, c3, "QL") || lsamen_(&c__2, c3 + 1, 
+	    "QL")) {
 
 /*        QL routines */
 
 	stimql_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, d, &a[362400], &a[724800], reslts, &ldr1, 
-		&ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), d__, &a_ref(1, 2), &a_ref(1, 3)
+		, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "RQ") || lsamen_(&c__2, c3, "RQ") || lsamen_(&c__2, c3 + 1, "RQ")) {
+    } else if (lsamen_(&c__2, c2, "RQ") || lsamen_(&
+	    c__2, c3, "RQ") || lsamen_(&c__2, c3 + 1, 
+	    "RQ")) {
 
 /*        RQ routines */
 
 	stimrq_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, d, &a[362400], &a[724800], reslts, &ldr1, 
-		&ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), d__, &a_ref(1, 2), &a_ref(1, 3)
+		, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QP") || lsamen_(&c__3, c3, "QPF")) {
+    } else if (lsamen_(&c__2, c2, "QP") || lsamen_(&
+	    c__3, c3, "QPF")) {
 
 /*        QR with column pivoting */
 
-	stimqp_(line, &nm, mval, nval, &nlda, ldaval, &timmin, a, &a[362400], 
-		d, &a[724800], iwork, reslts, &ldr1, &ldr2, &c__6, 80L);
+	stimqp_(line, &nm, mval, nval, &nlda, ldaval, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), &d___ref(1, 1), &a_ref(1, 3), iwork, reslts, &
+		ldr1, &ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "HR") || lsamen_(&c__3, c3, "HRD") || lsamen_(&c__2, c3 + 1, "HR")) {
+/*        Blas-3 QR with column pivoting */
+
+	stimq3_(line, &nm, mval, nval, &nnb, nbval, nxval, &nlda, ldaval, &
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &d___ref(1, 1), &a_ref(1, 
+		3), iwork, reslts, &ldr1, &ldr2, &c__6, (ftnlen)80);
+
+    } else if (lsamen_(&c__2, c2, "HR") || lsamen_(&
+	    c__3, c3, "HRD") || lsamen_(&c__2, c3 + 1, 
+	    "HR")) {
 
 /*        Reduction to Hessenberg form */
 
 	stimhr_(line, &nn, nval, &nk, kval, &nnb, nbval, nxval, &nlda, ldaval,
-		 &timmin, a, d, &a[362400], &a[724800], reslts, &ldr1, &ldr2, 
-		&ldr3, &c__6, 80L);
+		 &timmin, &a_ref(1, 1), d__, &a_ref(1, 2), &a_ref(1, 3), 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "TD") || lsamen_(&c__3, c3, "TRD") || lsamen_(&c__2, c3 + 1, "TR")) {
+    } else if (lsamen_(&c__2, c2, "TD") || lsamen_(&
+	    c__3, c3, "TRD") || lsamen_(&c__2, c3 + 1, 
+	    "TR")) {
 
 /*        Reduction to tridiagonal form */
 
 	stimtd_(line, &nn, nval, &nk, kval, &nnb, nbval, nxval, &nlda, ldaval,
-		 &timmin, a, &a[362400], d, &d[1200], &a[724800], reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		 &timmin, &a_ref(1, 1), &a_ref(1, 2), &d___ref(1, 1), &
+		d___ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &ldr3, &
+		c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "BR") || lsamen_(&c__3, c3, "BRD") || lsamen_(&c__2, c3 + 1, "BR")) {
+    } else if (lsamen_(&c__2, c2, "BR") || lsamen_(&
+	    c__3, c3, "BRD") || lsamen_(&c__2, c3 + 1, 
+	    "BR")) {
 
 /*        Reduction to bidiagonal form */
 
 	stimbr_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, &a[362400], d, &d[1200], &a[724800], 
-		reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), &a_ref(1, 2), &d___ref(1, 1), &
+		d___ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &ldr3, &
+		c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "GE")) {
 
 /*        Routines for general matrices */
 
 	stimge_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], &a[724800], iwork, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), iwork, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
@@ -923,11 +959,12 @@ L90:
 
 	if (ldamok) {
 	    stimgb_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda,
-		     ldaval, &timmin, a, &a[362400 - mkmax + 724800], iwork, 
-		    reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+		     ldaval, &timmin, &a_ref(1, 1), &a_ref(272384 - mkmax + 1,
+		     3), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)
+		    80);
 	} else {
 	    s_wsfe(&io___92);
-	    do_fio(&c__1, line, 6L);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
@@ -935,42 +972,44 @@ L90:
 
 /*        Routines for general tridiagonal matrices */
 
-	stimgt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, a, &a[
-		362400], iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	stimgt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, &a_ref(1, 
+		1), &a_ref(1, 2), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (
+		ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PO")) {
 
 /*        Positive definite matrices */
 
 	stimpo_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], iwork, reslts, &ldr1, &ldr2, &ldr3, &
-		c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), iwork, reslts, &ldr1, &
+		ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
 /*        Positive definite packed matrices */
 
-	stimpp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, a, &a[362400], 
-		iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	stimpp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (
+		ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
 /*        Positive definite banded matrices */
 
 	if (ldamok) {
-	    if (mkmax > 362400) {
+	    if (mkmax > 272384) {
 		j2 = 2;
-		i2 = 724800 - mkmax + 1;
+		i2 = 544768 - mkmax + 1;
 	    } else {
 		j2 = 3;
-		i2 = 362400 - mkmax + 1;
+		i2 = 272384 - mkmax + 1;
 	    }
 	    stimpb_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda,
-		     ldaval, &timmin, a, &a[i2 + j2 * 362400 - 362401], iwork,
-		     reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+		     ldaval, &timmin, &a_ref(1, 1), &a_ref(i2, j2), iwork, 
+		    reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 	} else {
 	    s_wsfe(&io___93);
-	    do_fio(&c__1, line, 6L);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
@@ -978,74 +1017,85 @@ L90:
 
 /*        Routines for positive definite tridiagonal matrices */
 
-	stimpt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, a, &a[
-		362400], reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	stimpt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, &a_ref(1, 
+		1), &a_ref(1, 2), reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)
+		80);
 
     } else if (lsamen_(&c__2, c2, "SY")) {
 
 /*        Symmetric indefinite matrices */
 
 	stimsy_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], &a[724800], iwork, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), iwork, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
 /*        Symmetric indefinite packed matrices */
 
-	stimsp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, a, &a[362400], &
-		a[724800], iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	stimsp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), &a_ref(1, 3), iwork, reslts, &ldr1, &ldr2, &ldr3,
+		 &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TR")) {
 
 /*        Triangular matrices */
 
 	stimtr_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], reslts, &ldr1, &ldr2, &ldr3, &c__6, 
-		80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), reslts, &ldr1, &ldr2, &
+		ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TP")) {
 
 /*        Triangular packed matrices */
 
-	stimtp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, a, &a[362400], 
-		reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	stimtp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
 /*        Triangular band matrices */
 
 	if (ldamok) {
-	    if (mkmax > 362400) {
+	    if (mkmax > 272384) {
 		j2 = 2;
-		i2 = 724800 - mkmax + 1;
+		i2 = 544768 - mkmax + 1;
 	    } else {
 		j2 = 3;
-		i2 = 362400 - mkmax + 1;
+		i2 = 272384 - mkmax + 1;
 	    }
 	    stimtb_(line, &nm, mval, &nn, nval, &nk, kval, &nlda, ldaval, &
-		    timmin, a, &a[i2 + j2 * 362400 - 362401], reslts, &ldr1, &
-		    ldr2, &ldr3, &c__6, 80L);
+		    timmin, &a_ref(1, 1), &a_ref(i2, j2), reslts, &ldr1, &
+		    ldr2, &ldr3, &c__6, (ftnlen)80);
 	} else {
 	    s_wsfe(&io___94);
-	    do_fio(&c__1, line, 6L);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
+    } else if (lsamen_(&c__2, c2, "LS")) {
+
+/*        Least squares drivers */
+
+	stimls_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, nxval, &
+		nlda, ldaval, &timmin, &a_ref(1, 1), &a_ref(1, 2), &b_ref(1, 
+		1), &b_ref(1, 2), s, &s[512], opctbl, timtbl, flptbl, work, 
+		iwork, &c__6, (ftnlen)80);
+
     } else {
 
-	s_wsfe(&io___95);
-	do_fio(&c__1, line, 6L);
+	s_wsfe(&io___101);
+	do_fio(&c__1, line, (ftnlen)6);
 	e_wsfe();
     }
 
 /*     Read the next line of the input file. */
 
-    i__1 = s_rsfe(&io___96);
+    i__1 = s_rsfe(&io___102);
     if (i__1 != 0) {
 	goto L100;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
 	goto L100;
     }
@@ -1059,9 +1109,9 @@ L90:
 
 L100:
     s2 = second_();
-    s_wsfe(&io___98);
+    s_wsfe(&io___104);
     e_wsfe();
-    s_wsfe(&io___99);
+    s_wsfe(&io___105);
     r__1 = s2 - s1;
     do_fio(&c__1, (char *)&r__1, (ftnlen)sizeof(real));
     e_wsfe();
@@ -1071,6 +1121,11 @@ L110:
 /*     End of STIMAA */
 
     return 0;
-} /* MAIN__   
+} /* MAIN__ */
 
-   Main program alias */ int stimaa_ () { MAIN__ (); return 0; }
+#undef d___ref
+#undef b_ref
+#undef a_ref
+
+
+/* Main program alias */ int stimaa_ () { MAIN__ (); return 0; }

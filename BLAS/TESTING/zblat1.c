@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -47,26 +48,19 @@ static doublereal c_b43 = 1.;
     static cilist io___4 = { 0, 6, 0, fmt_99998, 0 };
 
 
-/*     Test program for the COMPLEX*16 Level 1 BLAS. */
-/*     Based upon the original BLAS test routine together with: */
-/*     F06GAF Example Program Text */
-/*     .. Parameters .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. External Subroutines .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-/*     .. Executable Statements .. */
+/*     Test program for the COMPLEX*16 Level 1 BLAS.   
+       Based upon the original BLAS test routine together with:   
+       F06GAF Example Program Text */
     s_wsfe(&io___2);
     e_wsfe();
     for (ic = 1; ic <= 10; ++ic) {
 	combla_1.icase = ic;
 	header_();
 
-/*        Initialize PASS, INCX, INCY, and MODE for a new case. */
-/*        The value 9999 for INCX, INCY or MODE will appear in the */
-/*        detailed  output, if any, for cases that do not involve */
-/*        these parameters. */
+/*        Initialize PASS, INCX, INCY, and MODE for a new case.   
+          The value 9999 for INCX, INCY or MODE will appear in the   
+          detailed  output, if any, for cases that do not involve   
+          these parameters. */
 
 	combla_1.pass = TRUE_;
 	combla_1.incx = 9999;
@@ -84,12 +78,12 @@ static doublereal c_b43 = 1.;
 	}
 /* L20: */
     }
-    s_stop("", 0L);
+    s_stop("", (ftnlen)0);
 
     return 0;
-} /* MAIN__ */
+} /* MAIN__   
 
-/* Subroutine */ int header_(void)
+   Subroutine */ int header_(void)
 {
     /* Initialized data */
 
@@ -107,19 +101,19 @@ static doublereal c_b43 = 1.;
     static cilist io___6 = { 0, 6, 0, fmt_99999, 0 };
 
 
-/*     .. Parameters .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Arrays .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-/*     .. Executable Statements .. */
+
+#define l_ref(a_0,a_1) &l[(a_1)*6 + a_0 - 6]
+
     s_wsfe(&io___6);
     do_fio(&c__1, (char *)&combla_1.icase, (ftnlen)sizeof(integer));
-    do_fio(&c__1, l + (combla_1.icase - 1) * 6, 6L);
+    do_fio(&c__1, l_ref(0, combla_1.icase), (ftnlen)6);
     e_wsfe();
     return 0;
 
 } /* header_ */
+
+#undef l_ref
+
 
 /* Subroutine */ int check1_(doublereal *sfac)
 {
@@ -177,7 +171,7 @@ static doublereal c_b43 = 1.;
     /* Subroutine */ int s_stop(char *, ftnlen);
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int zscal_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *), ctest_(integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *);
@@ -197,56 +191,48 @@ static doublereal c_b43 = 1.;
     static cilist io___19 = { 0, 6, 0, 0, 0 };
 
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-/*     .. Executable Statements .. */
+
+#define ctrue5_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
+#define ctrue5_ref(a_1,a_2,a_3) ctrue5[ctrue5_subscr(a_1,a_2,a_3)]
+#define ctrue6_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
+#define ctrue6_ref(a_1,a_2,a_3) ctrue6[ctrue6_subscr(a_1,a_2,a_3)]
+#define cv_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
+#define cv_ref(a_1,a_2,a_3) cv[cv_subscr(a_1,a_2,a_3)]
+
     for (combla_1.incx = 1; combla_1.incx <= 2; ++combla_1.incx) {
 	for (np1 = 1; np1 <= 5; ++np1) {
 	    combla_1.n = np1 - 1;
 	    len = max(combla_1.n,1) << 1;
-/*           .. Set vector arguments .. */
 	    i__1 = len;
-	    for (i = 1; i <= i__1; ++i) {
-		i__2 = i - 1;
-		i__3 = i + (np1 + combla_1.incx * 5 << 3) - 49;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = i__ - 1;
+		i__3 = cv_subscr(i__, np1, combla_1.incx);
 		cx[i__2].r = cv[i__3].r, cx[i__2].i = cv[i__3].i;
 /* L20: */
 	    }
 	    if (combla_1.icase == 6) {
-/*              .. DZNRM2 .. */
 		d__1 = dznrm2_(&combla_1.n, cx, &combla_1.incx);
 		stest1_(&d__1, &strue2[np1 - 1], &strue2[np1 - 1], sfac);
 	    } else if (combla_1.icase == 7) {
-/*              .. DZASUM .. */
 		d__1 = dzasum_(&combla_1.n, cx, &combla_1.incx);
 		stest1_(&d__1, &strue4[np1 - 1], &strue4[np1 - 1], sfac);
 	    } else if (combla_1.icase == 8) {
-/*              .. ZSCAL .. */
 		zscal_(&combla_1.n, &ca, cx, &combla_1.incx);
-		ctest_(&len, cx, &ctrue5[(np1 + combla_1.incx * 5 << 3) - 48],
-			 &ctrue5[(np1 + combla_1.incx * 5 << 3) - 48], sfac);
+		ctest_(&len, cx, &ctrue5_ref(1, np1, combla_1.incx), &
+			ctrue5_ref(1, np1, combla_1.incx), sfac);
 	    } else if (combla_1.icase == 9) {
-/*              .. ZDSCAL .. */
 		zdscal_(&combla_1.n, &sa, cx, &combla_1.incx);
-		ctest_(&len, cx, &ctrue6[(np1 + combla_1.incx * 5 << 3) - 48],
-			 &ctrue6[(np1 + combla_1.incx * 5 << 3) - 48], sfac);
+		ctest_(&len, cx, &ctrue6_ref(1, np1, combla_1.incx), &
+			ctrue6_ref(1, np1, combla_1.incx), sfac);
 	    } else if (combla_1.icase == 10) {
-/*              .. IZAMAX .. */
 		i__1 = izamax_(&combla_1.n, cx, &combla_1.incx);
 		itest1_(&i__1, &itrue3[np1 - 1]);
 	    } else {
 		s_wsle(&io___19);
-		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK1", 28L);
+		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK1", (ftnlen)
+			28);
 		e_wsle();
-		s_stop("", 0L);
+		s_stop("", (ftnlen)0);
 	    }
 
 /* L40: */
@@ -256,26 +242,26 @@ static doublereal c_b43 = 1.;
 
     combla_1.incx = 1;
     if (combla_1.icase == 8) {
-/*        ZSCAL */
-/*        Add a test for alpha equal to zero. */
+/*        ZSCAL   
+          Add a test for alpha equal to zero. */
 	ca.r = 0., ca.i = 0.;
-	for (i = 1; i <= 5; ++i) {
-	    i__1 = i - 1;
+	for (i__ = 1; i__ <= 5; ++i__) {
+	    i__1 = i__ - 1;
 	    mwpct[i__1].r = 0., mwpct[i__1].i = 0.;
-	    i__1 = i - 1;
+	    i__1 = i__ - 1;
 	    mwpcs[i__1].r = 1., mwpcs[i__1].i = 1.;
 /* L80: */
 	}
 	zscal_(&c__5, &ca, cx, &combla_1.incx);
 	ctest_(&c__5, cx, mwpct, mwpcs, sfac);
     } else if (combla_1.icase == 9) {
-/*        ZDSCAL */
-/*        Add a test for alpha equal to zero. */
+/*        ZDSCAL   
+          Add a test for alpha equal to zero. */
 	sa = 0.;
-	for (i = 1; i <= 5; ++i) {
-	    i__1 = i - 1;
+	for (i__ = 1; i__ <= 5; ++i__) {
+	    i__1 = i__ - 1;
 	    mwpct[i__1].r = 0., mwpct[i__1].i = 0.;
-	    i__1 = i - 1;
+	    i__1 = i__ - 1;
 	    mwpcs[i__1].r = 1., mwpcs[i__1].i = 1.;
 /* L100: */
 	}
@@ -283,12 +269,12 @@ static doublereal c_b43 = 1.;
 	ctest_(&c__5, cx, mwpct, mwpcs, sfac);
 /*        Add a test for alpha equal to one. */
 	sa = 1.;
-	for (i = 1; i <= 5; ++i) {
-	    i__1 = i - 1;
-	    i__2 = i - 1;
+	for (i__ = 1; i__ <= 5; ++i__) {
+	    i__1 = i__ - 1;
+	    i__2 = i__ - 1;
 	    mwpct[i__1].r = cx[i__2].r, mwpct[i__1].i = cx[i__2].i;
-	    i__1 = i - 1;
-	    i__2 = i - 1;
+	    i__1 = i__ - 1;
+	    i__2 = i__ - 1;
 	    mwpcs[i__1].r = cx[i__2].r, mwpcs[i__1].i = cx[i__2].i;
 /* L120: */
 	}
@@ -296,13 +282,13 @@ static doublereal c_b43 = 1.;
 	ctest_(&c__5, cx, mwpct, mwpcs, sfac);
 /*        Add a test for alpha equal to minus one. */
 	sa = -1.;
-	for (i = 1; i <= 5; ++i) {
-	    i__1 = i - 1;
-	    i__2 = i - 1;
+	for (i__ = 1; i__ <= 5; ++i__) {
+	    i__1 = i__ - 1;
+	    i__2 = i__ - 1;
 	    z__1.r = -cx[i__2].r, z__1.i = -cx[i__2].i;
 	    mwpct[i__1].r = z__1.r, mwpct[i__1].i = z__1.i;
-	    i__1 = i - 1;
-	    i__2 = i - 1;
+	    i__1 = i__ - 1;
+	    i__2 = i__ - 1;
 	    z__1.r = -cx[i__2].r, z__1.i = -cx[i__2].i;
 	    mwpcs[i__1].r = z__1.r, mwpcs[i__1].i = z__1.i;
 /* L140: */
@@ -312,6 +298,14 @@ static doublereal c_b43 = 1.;
     }
     return 0;
 } /* check1_ */
+
+#undef cv_ref
+#undef cv_subscr
+#undef ctrue6_ref
+#undef ctrue6_subscr
+#undef ctrue5_ref
+#undef ctrue5_subscr
+
 
 /* Subroutine */ int check2_(doublereal *sfac)
 {
@@ -403,7 +397,7 @@ static doublereal c_b43 = 1.;
 
     /* Local variables */
     static doublecomplex cdot[1];
-    static integer lenx, leny, i;
+    static integer lenx, leny, i__;
     extern /* Subroutine */ int ctest_(integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *);
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
@@ -424,17 +418,21 @@ static doublereal c_b43 = 1.;
     static cilist io___48 = { 0, 6, 0, 0, 0 };
 
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-/*     .. Executable Statements .. */
+
+#define ct10x_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
+#define ct10x_ref(a_1,a_2,a_3) ct10x[ct10x_subscr(a_1,a_2,a_3)]
+#define ct10y_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
+#define ct10y_ref(a_1,a_2,a_3) ct10y[ct10y_subscr(a_1,a_2,a_3)]
+#define lens_ref(a_1,a_2) lens[(a_2)*4 + a_1 - 5]
+#define csize2_subscr(a_1,a_2) (a_2)*7 + a_1 - 8
+#define csize2_ref(a_1,a_2) csize2[csize2_subscr(a_1,a_2)]
+#define ct6_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define ct6_ref(a_1,a_2) ct6[ct6_subscr(a_1,a_2)]
+#define ct7_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define ct7_ref(a_1,a_2) ct7[ct7_subscr(a_1,a_2)]
+#define ct8_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
+#define ct8_ref(a_1,a_2,a_3) ct8[ct8_subscr(a_1,a_2,a_3)]
+
     for (ki = 1; ki <= 4; ++ki) {
 	combla_1.incx = incxs[ki - 1];
 	combla_1.incy = incys[ki - 1];
@@ -444,55 +442,45 @@ static doublereal c_b43 = 1.;
 	for (kn = 1; kn <= 4; ++kn) {
 	    combla_1.n = ns[kn - 1];
 	    ksize = min(2,kn);
-	    lenx = lens[kn + (mx << 2) - 5];
-	    leny = lens[kn + (my << 2) - 5];
-/*           .. initialize all argument arrays .. */
-	    for (i = 1; i <= 7; ++i) {
-		i__1 = i - 1;
-		i__2 = i - 1;
+	    lenx = lens_ref(kn, mx);
+	    leny = lens_ref(kn, my);
+	    for (i__ = 1; i__ <= 7; ++i__) {
+		i__1 = i__ - 1;
+		i__2 = i__ - 1;
 		cx[i__1].r = cx1[i__2].r, cx[i__1].i = cx1[i__2].i;
-		i__1 = i - 1;
-		i__2 = i - 1;
+		i__1 = i__ - 1;
+		i__2 = i__ - 1;
 		cy[i__1].r = cy1[i__2].r, cy[i__1].i = cy1[i__2].i;
 /* L20: */
 	    }
 	    if (combla_1.icase == 1) {
-/*              .. ZDOTC .. */
 		zdotc_(&z__1, &combla_1.n, cx, &combla_1.incx, cy, &
 			combla_1.incy);
 		cdot[0].r = z__1.r, cdot[0].i = z__1.i;
-		ctest_(&c__1, cdot, &ct6[kn + (ki << 2) - 5], &csize1[kn - 1],
-			 sfac);
+		ctest_(&c__1, cdot, &ct6_ref(kn, ki), &csize1[kn - 1], sfac);
 	    } else if (combla_1.icase == 2) {
-/*              .. ZDOTU .. */
 		zdotu_(&z__1, &combla_1.n, cx, &combla_1.incx, cy, &
 			combla_1.incy);
 		cdot[0].r = z__1.r, cdot[0].i = z__1.i;
-		ctest_(&c__1, cdot, &ct7[kn + (ki << 2) - 5], &csize1[kn - 1],
-			 sfac);
+		ctest_(&c__1, cdot, &ct7_ref(kn, ki), &csize1[kn - 1], sfac);
 	    } else if (combla_1.icase == 3) {
-/*              .. ZAXPY .. */
 		zaxpy_(&combla_1.n, &ca, cx, &combla_1.incx, cy, &
 			combla_1.incy);
-		ctest_(&leny, cy, &ct8[(kn + (ki << 2)) * 7 - 35], &csize2[
-			ksize * 7 - 7], sfac);
+		ctest_(&leny, cy, &ct8_ref(1, kn, ki), &csize2_ref(1, ksize), 
+			sfac);
 	    } else if (combla_1.icase == 4) {
-/*              .. ZCOPY .. */
 		zcopy_(&combla_1.n, cx, &combla_1.incx, cy, &combla_1.incy);
-		ctest_(&leny, cy, &ct10y[(kn + (ki << 2)) * 7 - 35], csize3, &
-			c_b43);
+		ctest_(&leny, cy, &ct10y_ref(1, kn, ki), csize3, &c_b43);
 	    } else if (combla_1.icase == 5) {
-/*              .. ZSWAP .. */
 		zswap_(&combla_1.n, cx, &combla_1.incx, cy, &combla_1.incy);
-		ctest_(&lenx, cx, &ct10x[(kn + (ki << 2)) * 7 - 35], csize3, &
-			c_b43);
-		ctest_(&leny, cy, &ct10y[(kn + (ki << 2)) * 7 - 35], csize3, &
-			c_b43);
+		ctest_(&lenx, cx, &ct10x_ref(1, kn, ki), csize3, &c_b43);
+		ctest_(&leny, cy, &ct10y_ref(1, kn, ki), csize3, &c_b43);
 	    } else {
 		s_wsle(&io___48);
-		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK2", 28L);
+		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK2", (ftnlen)
+			28);
 		e_wsle();
-		s_stop("", 0L);
+		s_stop("", (ftnlen)0);
 	    }
 
 /* L40: */
@@ -501,6 +489,21 @@ static doublereal c_b43 = 1.;
     }
     return 0;
 } /* check2_ */
+
+#undef ct8_ref
+#undef ct8_subscr
+#undef ct7_ref
+#undef ct7_subscr
+#undef ct6_ref
+#undef ct6_subscr
+#undef csize2_ref
+#undef csize2_subscr
+#undef lens_ref
+#undef ct10y_ref
+#undef ct10y_subscr
+#undef ct10x_ref
+#undef ct10x_subscr
+
 
 /* Subroutine */ int stest_(integer *len, doublereal *scomp, doublereal *
 	strue, doublereal *ssize, doublereal *sfac)
@@ -521,7 +524,7 @@ static doublereal c_b43 = 1.;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern doublereal sdiff_(doublereal *, doublereal *);
     static doublereal sd;
 
@@ -531,42 +534,32 @@ static doublereal c_b43 = 1.;
     static cilist io___53 = { 0, 6, 0, fmt_99997, 0 };
 
 
-/*     ********************************* STEST ************************** 
-*/
+/*     ********************************* STEST **************************   
 
-/*     THIS SUBR COMPARES ARRAYS  SCOMP() AND STRUE() OF LENGTH LEN TO */
-/*     SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE */
-/*     NEGLIGIBLE. */
+       THIS SUBR COMPARES ARRAYS  SCOMP() AND STRUE() OF LENGTH LEN TO   
+       SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE   
+       NEGLIGIBLE.   
 
-/*     C. L. LAWSON, JPL, 1974 DEC 10 */
+       C. L. LAWSON, JPL, 1974 DEC 10   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. External Functions .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Common blocks .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --ssize;
     --strue;
     --scomp;
 
     /* Function Body */
     i__1 = *len;
-    for (i = 1; i <= i__1; ++i) {
-	sd = scomp[i] - strue[i];
-	d__4 = (d__1 = ssize[i], abs(d__1)) + (d__2 = *sfac * sd, abs(d__2));
-	d__5 = (d__3 = ssize[i], abs(d__3));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	sd = scomp[i__] - strue[i__];
+	d__4 = (d__1 = ssize[i__], abs(d__1)) + (d__2 = *sfac * sd, abs(d__2))
+		;
+	d__5 = (d__3 = ssize[i__], abs(d__3));
 	if (sdiff_(&d__4, &d__5) == 0.) {
 	    goto L40;
 	}
 
-/*                             HERE    SCOMP(I) IS NOT CLOSE TO STRUE(
-I). */
+/*                             HERE    SCOMP(I) IS NOT CLOSE TO STRUE(I). */
 
 	if (! combla_1.pass) {
 	    goto L20;
@@ -584,41 +577,36 @@ L20:
 	do_fio(&c__1, (char *)&combla_1.incx, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&combla_1.incy, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&combla_1.mode, (ftnlen)sizeof(integer));
-	do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	do_fio(&c__1, (char *)&scomp[i], (ftnlen)sizeof(doublereal));
-	do_fio(&c__1, (char *)&strue[i], (ftnlen)sizeof(doublereal));
+	do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&scomp[i__], (ftnlen)sizeof(doublereal));
+	do_fio(&c__1, (char *)&strue[i__], (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&sd, (ftnlen)sizeof(doublereal));
-	do_fio(&c__1, (char *)&ssize[i], (ftnlen)sizeof(doublereal));
+	do_fio(&c__1, (char *)&ssize[i__], (ftnlen)sizeof(doublereal));
 	e_wsfe();
 L40:
 	;
     }
     return 0;
 
-} /* stest_ */
+} /* stest_   
 
-/* Subroutine */ int stest1_(doublereal *scomp1, doublereal *strue1, 
+   Subroutine */ int stest1_(doublereal *scomp1, doublereal *strue1, 
 	doublereal *ssize, doublereal *sfac)
 {
     static doublereal scomp[1], strue[1];
     extern /* Subroutine */ int stest_(integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *);
 
-/*     ************************* STEST1 ***************************** */
+/*     ************************* STEST1 *****************************   
 
-/*     THIS IS AN INTERFACE SUBROUTINE TO ACCOMODATE THE FORTRAN */
-/*     REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE */
-/*     ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT. */
+       THIS IS AN INTERFACE SUBROUTINE TO ACCOMODATE THE FORTRAN   
+       REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE   
+       ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT.   
 
-/*     C.L. LAWSON, JPL, 1978 DEC 6 */
+       C.L. LAWSON, JPL, 1978 DEC 6   
 
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Arrays .. */
-/*     .. External Subroutines .. */
-/*     .. Executable Statements .. */
 
-    /* Parameter adjustments */
+       Parameter adjustments */
     --ssize;
 
     /* Function Body */
@@ -634,18 +622,14 @@ doublereal sdiff_(doublereal *sa, doublereal *sb)
     /* System generated locals */
     doublereal ret_val;
 
-/*     ********************************* SDIFF ************************** 
-*/
-/*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15 
-*/
+/*     ********************************* SDIFF **************************   
+       COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15 */
 
-/*     .. Scalar Arguments .. */
-/*     .. Executable Statements .. */
     ret_val = *sa - *sb;
     return ret_val;
-} /* sdiff_ */
+} /* sdiff_   
 
-/* Subroutine */ int ctest_(integer *len, doublecomplex *ccomp, doublecomplex 
+   Subroutine */ int ctest_(integer *len, doublecomplex *ccomp, doublecomplex 
 	*ctrue, doublecomplex *csize, doublereal *sfac)
 {
     /* System generated locals */
@@ -655,48 +639,41 @@ doublereal sdiff_(doublereal *sa, doublereal *sb)
     double d_imag(doublecomplex *);
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal scomp[20], ssize[20], strue[20];
     extern /* Subroutine */ int stest_(integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *);
 
-/*     **************************** CTEST ***************************** */
+/*     **************************** CTEST *****************************   
 
-/*     C.L. LAWSON, JPL, 1978 DEC 6 */
+       C.L. LAWSON, JPL, 1978 DEC 6   
 
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Executable Statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     --csize;
     --ctrue;
     --ccomp;
 
     /* Function Body */
     i__1 = *len;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i;
-	scomp[(i << 1) - 2] = ccomp[i__2].r;
-	scomp[(i << 1) - 1] = d_imag(&ccomp[i]);
-	i__2 = i;
-	strue[(i << 1) - 2] = ctrue[i__2].r;
-	strue[(i << 1) - 1] = d_imag(&ctrue[i]);
-	i__2 = i;
-	ssize[(i << 1) - 2] = csize[i__2].r;
-	ssize[(i << 1) - 1] = d_imag(&csize[i]);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	scomp[(i__ << 1) - 2] = ccomp[i__2].r;
+	scomp[(i__ << 1) - 1] = d_imag(&ccomp[i__]);
+	i__2 = i__;
+	strue[(i__ << 1) - 2] = ctrue[i__2].r;
+	strue[(i__ << 1) - 1] = d_imag(&ctrue[i__]);
+	i__2 = i__;
+	ssize[(i__ << 1) - 2] = csize[i__2].r;
+	ssize[(i__ << 1) - 1] = d_imag(&csize[i__]);
 /* L20: */
     }
 
     i__1 = *len << 1;
     stest_(&i__1, scomp, strue, ssize, sfac);
     return 0;
-} /* ctest_ */
+} /* ctest_   
 
-/* Subroutine */ int itest1_(integer *icomp, integer *itrue)
+   Subroutine */ int itest1_(integer *icomp, integer *itrue)
 {
     /* Format strings */
     static char fmt_99999[] = "(\002                                       F"
@@ -718,19 +695,12 @@ doublereal sdiff_(doublereal *sa, doublereal *sb)
     static cilist io___63 = { 0, 6, 0, fmt_99997, 0 };
 
 
-/*     ********************************* ITEST1 ************************* 
-*/
+/*     ********************************* ITEST1 *************************   
 
-/*     THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR */
-/*     EQUALITY. */
-/*     C. L. LAWSON, JPL, 1974 DEC 10 */
+       THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR   
+       EQUALITY.   
+       C. L. LAWSON, JPL, 1974 DEC 10 */
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. Common blocks .. */
-/*     .. Executable Statements .. */
     if (*icomp == *itrue) {
 	goto L40;
     }
@@ -761,6 +731,6 @@ L20:
 L40:
     return 0;
 
-} /* itest1_ */
+} /* itest1_   
 
-/* Main program alias */ int zblat1_ () { MAIN__ (); return 0; }
+   Main program alias */ int zblat1_ () { MAIN__ (); return 0; }

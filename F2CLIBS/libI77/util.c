@@ -1,4 +1,6 @@
 #ifndef NON_UNIX_STDIO
+#define _INCLUDE_POSIX_SOURCE	/* for HP-UX */
+#define _INCLUDE_XOPEN_SOURCE	/* for HP-UX */
 #include "sys/types.h"
 #include "sys/stat.h"
 #endif
@@ -49,24 +51,3 @@ long f__inode(char *a, int *dev)
 	return(x.st_ino);
 }
 #endif
-
-#define INTBOUND sizeof(int)-1
- VOID
-#ifdef KR_headers
-f__mvgbt(n,len,a,b) char *a,*b;
-#else
-f__mvgbt(int n, int len, char *a, char *b)
-#endif
-{	register int num=n*len;
-	if( ((int)a&INTBOUND)==0 && ((int)b&INTBOUND)==0 && (num&INTBOUND)==0 )
-	{	register int *x=(int *)a,*y=(int *)b;
-		num /= sizeof(int);
-		if(x>y) for(;num>0;num--) *y++= *x++;
-		else for(num--;num>=0;num--) *(y+num)= *(x+num);
-	}
-	else
-	{	register char *x=a,*y=b;
-		if(x>y) for(;num>0;num--) *y++= *x++;
-		else for(num--;num>=0;num--) *(y+num)= *(x+num);
-	}
-}

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,7 +36,10 @@ static real c_b13 = -1.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -72,8 +76,7 @@ static real c_b13 = -1.f;
             =3: RESULT = | I - UU' | / ( n ulp )   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SGET51 does nothing. 
-  
+            The size of the matrix.  If it is zero, SGET51 does nothing.   
             It must be at least zero.   
 
     A       (input) REAL array, dimension (LDA, N)   
@@ -115,22 +118,21 @@ static real c_b13 = -1.f;
             value is currently limited to 1/ulp, to avoid overflow.   
             Errors are flagged by RESULT=10/ulp.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
 
@@ -185,7 +187,7 @@ static real c_b13 = -1.f;
 	    for (jcol = 1; jcol <= i__1; ++jcol) {
 		i__2 = *n;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
-		    work[jrow + *n * (jcol - 1)] -= a[jrow + jcol * a_dim1];
+		    work[jrow + *n * (jcol - 1)] -= a_ref(jrow, jcol);
 /* L10: */
 		}
 /* L20: */
@@ -230,8 +232,7 @@ static real c_b13 = -1.f;
 /* Computing MIN   
    Computing 2nd power */
 	i__1 = *n;
-	r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), 
-		r__2 = (real) (*n);
+	r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), r__2 = (real) (*n);
 	*result = dmin(r__1,r__2) / (*n * ulp);
     }
 
@@ -240,4 +241,7 @@ static real c_b13 = -1.f;
 /*     End of SGET51 */
 
 } /* sget51_ */
+
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -46,7 +47,7 @@ static integer c__1 = 1;
     static real time;
     static integer isub, nrhs;
     static char uplo[1];
-    static integer i, k, n;
+    static integer i__, k, n;
     static char cname[6];
     extern logical lsame_(char *, char *);
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
@@ -83,7 +84,12 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -101,8 +107,7 @@ static integer c__1 = 1;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NN      (input) INTEGER   
@@ -163,8 +168,7 @@ static integer c__1 = 1;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nval;
@@ -178,28 +182,31 @@ static integer c__1 = 1;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Single precision", 1L, 16L);
-    s_copy(path + 1, "PB", 2L, 2L);
-    atimin_(path, line, &c__2, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "PB", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__2, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L140;
     }
 
 /*     Check that K+1 <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__0, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__0, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___7.ciunit = *nout;
 	s_wsfe(&io___7);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L140;
     }
@@ -242,10 +249,8 @@ static integer c__1 = 1;
 
 		    if (timsub[0]) {
 
-/*                    Do for each value of NB in NBVAL
-.  Only SPBTRF is   
-                      timed in this loop since the oth
-er routines are   
+/*                    Do for each value of NB in NBVAL.  Only SPBTRF is   
+                      timed in this loop since the other routines are   
                       independent of NB. */
 
 			i__4 = *nnb;
@@ -265,8 +270,7 @@ L10:
 				goto L10;
 			    }
 
-/*                       Subtract the time used in
- STIMMG. */
+/*                       Subtract the time used in STIMMG. */
 
 			    icl = 1;
 			    s1 = second_();
@@ -281,9 +285,8 @@ L20:
 
 			    time = (time - untime) / (real) ic;
 			    ops = sopla_("SPBTRF", &n, &n, &k, &k, &nb);
-			    reslts[inb + (ik + (i3 + reslts_dim3) * 
-				    reslts_dim2) * reslts_dim1] = smflop_(&
-				    ops, &time, &info);
+			    reslts_ref(inb, ik, i3, 1) = smflop_(&ops, &time, 
+				    &info);
 /* L30: */
 			}
 		    } else {
@@ -291,10 +294,8 @@ L20:
 			stimmg_(&mat, &n, &n, &a[1], &lda, &k, &k);
 		    }
 
-/*                 Generate another matrix and factor it u
-sing SPBTRF so   
-                   that the factored form can be used in t
-iming the other   
+/*                 Generate another matrix and factor it using SPBTRF so   
+                   that the factored form can be used in timing the other   
                    routines. */
 
 		    nb = 1;
@@ -307,8 +308,8 @@ iming the other
 
 		    if (timsub[1]) {
 			i__4 = *nns;
-			for (i = 1; i <= i__4; ++i) {
-			    nrhs = nsval[i];
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    nrhs = nsval[i__];
 			    ldb = n;
 			    stimmg_(&c__0, &n, &nrhs, &b[1], &ldb, &c__0, &
 				    c__0);
@@ -326,8 +327,7 @@ L40:
 				goto L40;
 			    }
 
-/*                       Subtract the time used in
- STIMMG. */
+/*                       Subtract the time used in STIMMG. */
 
 			    icl = 1;
 			    s1 = second_();
@@ -343,9 +343,8 @@ L50:
 
 			    time = (time - untime) / (real) ic;
 			    ops = sopla_("SPBTRS", &n, &nrhs, &k, &k, &c__0);
-			    reslts[i + (ik + (i3 + (reslts_dim3 << 1)) * 
-				    reslts_dim2) * reslts_dim1] = smflop_(&
-				    ops, &time, &info);
+			    reslts_ref(i__, ik, i3, 2) = smflop_(&ops, &time, 
+				    &info);
 /* L60: */
 			}
 		    }
@@ -365,18 +364,19 @@ L50:
 
 /*           Print header for routine names. */
 
-	    if (in == 1 || s_cmp(cname, "SPB   ", 6L, 6L) == 0) {
+	    if (in == 1 || s_cmp(cname, "SPB   ", (ftnlen)6, (ftnlen)6) == 0) 
+		    {
 		io___31.ciunit = *nout;
 		s_wsfe(&io___31);
-		do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+		do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 		e_wsfe();
 		if (*nlda > 1) {
 		    i__2 = *nlda;
-		    for (i = 1; i <= i__2; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 			io___32.ciunit = *nout;
 			s_wsfe(&io___32);
-			do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-			do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(
+			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(
 				integer));
 			e_wsfe();
 /* L100: */
@@ -389,19 +389,19 @@ L50:
 	    for (iuplo = 1; iuplo <= 2; ++iuplo) {
 		io___34.ciunit = *nout;
 		s_wsfe(&io___34);
-		do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+		do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		do_fio(&c__1, uplos + (iuplo - 1), 1L);
+		do_fio(&c__1, uplos + (iuplo - 1), (ftnlen)1);
 		e_wsfe();
 		i3 = (iuplo - 1) * *nlda + 1;
 		if (isub == 1) {
 		    sprtbl_("NB", "K", nnb, &nbval[1], nk, &kval[1], nlda, &
-			    reslts[((i3 + reslts_dim3) * reslts_dim2 + 1) * 
-			    reslts_dim1 + 1], ldr1, ldr2, nout, 2L, 1L);
+			    reslts_ref(1, 1, i3, 1), ldr1, ldr2, nout, (
+			    ftnlen)2, (ftnlen)1);
 		} else if (isub == 2) {
 		    sprtbl_("NRHS", "K", nns, &nsval[1], nk, &kval[1], nlda, &
-			    reslts[((i3 + (reslts_dim3 << 1)) * reslts_dim2 + 
-			    1) * reslts_dim1 + 1], ldr1, ldr2, nout, 4L, 1L);
+			    reslts_ref(1, 1, i3, 2), ldr1, ldr2, nout, (
+			    ftnlen)4, (ftnlen)1);
 		}
 /* L110: */
 	    }
@@ -417,4 +417,8 @@ L140:
 /*     End of STIMPB */
 
 } /* stimpb_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

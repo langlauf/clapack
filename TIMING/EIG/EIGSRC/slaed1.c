@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,36 +19,37 @@ struct {
 static integer c__1 = 1;
 static integer c_n1 = -1;
 
-/* Subroutine */ int slaed1_(integer *n, real *d, real *q, integer *ldq, 
+/* Subroutine */ int slaed1_(integer *n, real *d__, real *q, integer *ldq, 
 	integer *indxq, real *rho, integer *cutpnt, real *work, integer *
 	iwork, integer *info)
 {
     /* System generated locals */
-    integer q_dim1, q_offset, i__1;
+    integer q_dim1, q_offset, i__1, i__2;
 
     /* Local variables */
-    static integer indx, i, k, indxc, indxp;
+    static integer indx, i__, k, indxc, indxp;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
     static integer n1, n2;
-    extern /* Subroutine */ int slaed2_(integer *, integer *, real *, real *, 
-	    integer *, integer *, real *, integer *, real *, real *, real *, 
-	    integer *, integer *, real *, integer *, integer *, integer *, 
-	    integer *), slaed3_(integer *, integer *, integer *, integer *, 
-	    real *, real *, integer *, real *, integer *, real *, real *, 
-	    integer *, integer *, integer *, real *, real *, integer *, 
+    extern /* Subroutine */ int slaed2_(integer *, integer *, integer *, real 
+	    *, real *, integer *, integer *, real *, real *, real *, real *, 
+	    real *, integer *, integer *, integer *, integer *, integer *), 
+	    slaed3_(integer *, integer *, integer *, real *, real *, integer *
+	    , real *, real *, real *, integer *, integer *, real *, real *, 
 	    integer *);
     static integer idlmda, is, iw, iz;
     extern /* Subroutine */ int xerbla_(char *, integer *), slamrg_(
 	    integer *, integer *, real *, integer *, integer *, integer *);
-    static integer coltyp, iq2, ldq2, cpp1;
+    static integer coltyp, iq2, cpp1;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is unchanged, OPS is only incremented   
@@ -58,14 +60,12 @@ static integer c_n1 = -1;
     SLAED1 computes the updated eigensystem of a diagonal   
     matrix after modification by a rank-one symmetric matrix.  This   
     routine is used only for the eigenproblem which requires all   
-    eigenvalues and eigenvectors of a tridiagonal matrix.  SLAED7 handles 
-  
+    eigenvalues and eigenvectors of a tridiagonal matrix.  SLAED7 handles   
     the case in which eigenvalues only or eigenvalues and eigenvectors   
     of a full symmetric matrix (which was reduced to tridiagonal form)   
     are desired.   
 
-      T = Q(in) ( D(in) + RHO * Z*Z' ) Q'(in) = Q(out) * D(out) * Q'(out) 
-  
+      T = Q(in) ( D(in) + RHO * Z*Z' ) Q'(in) = Q(out) * D(out) * Q'(out)   
 
        where Z = Q'u, u is a vector of length N with ones in the   
        CUTPNT and CUTPNT + 1 th elements and zeros elsewhere.   
@@ -85,8 +85,7 @@ static integer c_n1 = -1;
           This routine also calculates the eigenvectors of the current   
           problem.   
 
-          The final stage consists of computing the updated eigenvectors 
-  
+          The final stage consists of computing the updated eigenvectors   
           directly using the updated eigenvalues.  The eigenvectors for   
           the current problem are multiplied with the eigenvectors from   
           the overall problem.   
@@ -103,8 +102,7 @@ static integer c_n1 = -1;
 
     Q      (input/output) REAL array, dimension (LDQ,N)   
            On entry, the eigenvectors of the rank-1-perturbed matrix.   
-           On exit, the eigenvectors of the repaired tridiagonal matrix. 
-  
+           On exit, the eigenvectors of the repaired tridiagonal matrix.   
 
     LDQ    (input) INTEGER   
            The leading dimension of the array Q.  LDQ >= max(1,N).   
@@ -117,15 +115,13 @@ static integer c_n1 = -1;
            i.e. D( INDXQ( I = 1, N ) ) will be in ascending order.   
 
     RHO    (input) REAL   
-           The subdiagonal entry used to create the rank-1 modification. 
-  
+           The subdiagonal entry used to create the rank-1 modification.   
 
     CUTPNT (input) INTEGER   
-           The location of the last eigenvalue in the leading sub-matrix. 
-  
-           min(1,N) <= CUTPNT <= N.   
+           The location of the last eigenvalue in the leading sub-matrix.   
+           min(1,N) <= CUTPNT <= N/2.   
 
-    WORK   (workspace) REAL array, dimension (3*N+2*N**2)   
+    WORK   (workspace) REAL array, dimension (4*N + N**2)   
 
     IWORK  (workspace) INTEGER array, dimension (4*N)   
 
@@ -134,16 +130,23 @@ static integer c_n1 = -1;
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = 1, an eigenvalue did not converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+    Modified by Francoise Tisseur, University of Tennessee.   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --indxq;
     --work;
@@ -156,8 +159,12 @@ static integer c_n1 = -1;
 	*info = -1;
     } else if (*ldq < max(1,*n)) {
 	*info = -4;
-    } else if (min(1,*n) > *cutpnt || *n < *cutpnt) {
-	*info = -7;
+    } else /* if(complicated condition) */ {
+/* Computing MIN */
+	i__1 = 1, i__2 = *n / 2;
+	if (min(i__1,i__2) > *cutpnt || *n / 2 < *cutpnt) {
+	    *info = -7;
+	}
     }
     if (*info != 0) {
 	i__1 = -(*info);
@@ -171,18 +178,14 @@ static integer c_n1 = -1;
 	return 0;
     }
 
-/*     The following values are for bookkeeping purposes only.  They are 
-  
-       integer pointers which indicate the portion of the workspace   
+/*     The following values are integer pointers which indicate   
+       the portion of the workspace   
        used by a particular array in SLAED2 and SLAED3. */
-
-    ldq2 = *n;
 
     iz = 1;
     idlmda = iz + *n;
     iw = idlmda + *n;
     iq2 = iw + *n;
-    is = iq2 + *n * ldq2;
 
     indx = 1;
     indxc = indx + *n;
@@ -193,16 +196,17 @@ static integer c_n1 = -1;
 /*     Form the z-vector which consists of the last row of Q_1 and the   
        first row of Q_2. */
 
-    scopy_(cutpnt, &q[*cutpnt + q_dim1], ldq, &work[iz], &c__1);
+    scopy_(cutpnt, &q_ref(*cutpnt, 1), ldq, &work[iz], &c__1);
     cpp1 = *cutpnt + 1;
     i__1 = *n - *cutpnt;
-    scopy_(&i__1, &q[cpp1 + cpp1 * q_dim1], ldq, &work[iz + *cutpnt], &c__1);
+    scopy_(&i__1, &q_ref(cpp1, cpp1), ldq, &work[iz + *cutpnt], &c__1);
 
 /*     Deflate eigenvalues. */
 
-    slaed2_(&k, n, &d[1], &q[q_offset], ldq, &indxq[1], rho, cutpnt, &work[iz]
-	    , &work[idlmda], &work[iq2], &ldq2, &iwork[indxc], &work[iw], &
-	    iwork[indxp], &iwork[indx], &iwork[coltyp], info);
+    slaed2_(&k, n, cutpnt, &d__[1], &q[q_offset], ldq, &indxq[1], rho, &work[
+	    iz], &work[idlmda], &work[iw], &work[iq2], &iwork[indx], &iwork[
+	    indxc], &iwork[indxp], &iwork[coltyp], info);
+
     if (*info != 0) {
 	goto L20;
     }
@@ -210,9 +214,11 @@ static integer c_n1 = -1;
 /*     Solve Secular Equation. */
 
     if (k != 0) {
-	slaed3_(&k, &c__1, &k, n, &d[1], &q[q_offset], ldq, rho, cutpnt, &
-		work[idlmda], &work[iq2], &ldq2, &iwork[indxc], &iwork[coltyp]
-		, &work[iw], &work[is], &k, info);
+	is = (iwork[coltyp] + iwork[coltyp + 1]) * *cutpnt + (iwork[coltyp + 
+		1] + iwork[coltyp + 2]) * (*n - *cutpnt) + iq2;
+	slaed3_(&k, n, cutpnt, &d__[1], &q[q_offset], ldq, rho, &work[idlmda],
+		 &work[iq2], &iwork[indxc], &iwork[coltyp], &work[iw], &work[
+		is], info);
 	if (*info != 0) {
 	    goto L20;
 	}
@@ -221,11 +227,11 @@ static integer c_n1 = -1;
 
 	n1 = k;
 	n2 = *n - k;
-	slamrg_(&n1, &n2, &d[1], &c__1, &c_n1, &indxq[1]);
+	slamrg_(&n1, &n2, &d__[1], &c__1, &c_n1, &indxq[1]);
     } else {
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    indxq[i] = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    indxq[i__] = i__;
 /* L10: */
 	}
     }
@@ -236,4 +242,7 @@ L20:
 /*     End of SLAED1 */
 
 } /* slaed1_ */
+
+#undef q_ref
+
 

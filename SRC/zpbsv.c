@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zpbsv_(char *uplo, integer *n, integer *kd, integer *
 	nrhs, doublecomplex *ab, integer *ldab, doublecomplex *b, integer *
 	ldb, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -23,8 +24,7 @@
        A = L * L**H,  if UPLO = 'L',   
     where U is an upper triangular band matrix, and L is a lower   
     triangular band matrix, with the same number of superdiagonals or   
-    subdiagonals as A.  The factored form of A is then used to solve the 
-  
+    subdiagonals as A.  The factored form of A is then used to solve the   
     system of equations A * X = B.   
 
     Arguments   
@@ -49,13 +49,10 @@
     AB      (input/output) COMPLEX*16 array, dimension (LDAB,N)   
             On entry, the upper or lower triangle of the Hermitian band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(KD+1+i-j,j) = A(i,j) for max(1,j-KD)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(N,j+KD). 
-  
+            if UPLO = 'U', AB(KD+1+i-j,j) = A(i,j) for max(1,j-KD)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(N,j+KD).   
             See below for further details.   
 
             On exit, if INFO = 0, the triangular factor U or L from the   
@@ -82,8 +79,7 @@
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     N = 6, KD = 2, and UPLO = 'U':   
 
     On entry:                       On exit:   
@@ -102,15 +98,12 @@
 
     Array elements marked * are not used by the routine.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, b_dim1, b_offset, i__1;
     /* Local variables */
@@ -120,11 +113,14 @@
 	    *), zpbtrs_(char *, integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
@@ -147,12 +143,12 @@
 
 /*     Compute the Cholesky factorization A = U'*U or A = L*L'. */
 
-    zpbtrf_(uplo, n, kd, &AB(1,1), ldab, info);
+    zpbtrf_(uplo, n, kd, &ab[ab_offset], ldab, info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	zpbtrs_(uplo, n, kd, nrhs, &AB(1,1), ldab, &B(1,1), ldb, 
+	zpbtrs_(uplo, n, kd, nrhs, &ab[ab_offset], ldab, &b[b_offset], ldb, 
 		info);
 
     }

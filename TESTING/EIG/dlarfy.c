@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,8 @@ static doublereal c_b3 = 0.;
 static integer c__1 = 1;
 
 /* Subroutine */ int dlarfy_(char *uplo, integer *n, doublereal *v, integer *
-	incv, doublereal *tau, doublereal *c, integer *ldc, doublereal *work)
+	incv, doublereal *tau, doublereal *c__, integer *ldc, doublereal *
+	work)
 {
     /* System generated locals */
     integer c_dim1, c_offset;
@@ -31,7 +33,7 @@ static integer c__1 = 1;
 	    doublereal *, doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -83,15 +85,14 @@ static integer c__1 = 1;
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (N)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --work;
 
     /* Function Body */
@@ -101,8 +102,8 @@ static integer c__1 = 1;
 
 /*     Form  w:= C * v */
 
-    dsymv_(uplo, n, &c_b2, &c[c_offset], ldc, &v[1], incv, &c_b3, &work[1], &
-	    c__1);
+    dsymv_(uplo, n, &c_b2, &c__[c_offset], ldc, &v[1], incv, &c_b3, &work[1], 
+	    &c__1);
 
     alpha = *tau * -.5 * ddot_(n, &work[1], &c__1, &v[1], incv);
     daxpy_(n, &alpha, &v[1], incv, &work[1], &c__1);
@@ -110,7 +111,7 @@ static integer c__1 = 1;
 /*     C := C - v * w' - w * v' */
 
     d__1 = -(*tau);
-    dsyr2_(uplo, n, &d__1, &v[1], incv, &work[1], &c__1, &c[c_offset], ldc);
+    dsyr2_(uplo, n, &d__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], ldc);
 
     return 0;
 

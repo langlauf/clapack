@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spbtf2_(char *uplo, integer *n, integer *kd, real *ab, 
 	integer *ldab, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -18,12 +19,10 @@
     The factorization has the form   
        A = U' * U ,  if UPLO = 'U', or   
        A = L  * L',  if UPLO = 'L',   
-    where U is an upper triangular matrix, U' is the transpose of U, and 
-  
+    where U is an upper triangular matrix, U' is the transpose of U, and   
     L is lower triangular.   
 
-    This is the unblocked version of the algorithm, calling Level 2 BLAS. 
-  
+    This is the unblocked version of the algorithm, calling Level 2 BLAS.   
 
     Arguments   
     =========   
@@ -38,20 +37,16 @@
             The order of the matrix A.  N >= 0.   
 
     KD      (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U', 
-  
+            The number of super-diagonals of the matrix A if UPLO = 'U',   
             or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
 
     AB      (input/output) REAL array, dimension (LDAB,N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, if INFO = 0, the triangular factor U or L from the   
             Cholesky factorization A = U'*U or A = L*L' of the band   
@@ -70,8 +65,7 @@
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     N = 6, KD = 2, and UPLO = 'U':   
 
     On entry:                       On exit:   
@@ -90,15 +84,12 @@
 
     Array elements marked * are not used by the routine.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b8 = -1.f;
     static integer c__1 = 1;
@@ -119,12 +110,14 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static real ajj;
     static integer kld;
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
 
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -157,17 +150,16 @@
 /*        Compute the Cholesky factorization A = U'*U. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute U(J,J) and test for non-positive-definiteness
-. */
+/*           Compute U(J,J) and test for non-positive-definiteness. */
 
-	    ajj = AB(*kd+1,j);
+	    ajj = ab_ref(*kd + 1, j);
 	    if (ajj <= 0.f) {
 		goto L30;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(*kd+1,j) = ajj;
+	    ab_ref(*kd + 1, j) = ajj;
 
 /*           Compute elements J+1:J+KN of row J and update the   
              trailing submatrix within the band.   
@@ -177,9 +169,9 @@
 	    kn = min(i__2,i__3);
 	    if (kn > 0) {
 		r__1 = 1.f / ajj;
-		sscal_(&kn, &r__1, &AB(*kd,j+1), &kld);
-		ssyr_("Upper", &kn, &c_b8, &AB(*kd,j+1), &kld,
-			 &AB(*kd+1,j+1), &kld);
+		sscal_(&kn, &r__1, &ab_ref(*kd, j + 1), &kld);
+		ssyr_("Upper", &kn, &c_b8, &ab_ref(*kd, j + 1), &kld, &ab_ref(
+			*kd + 1, j + 1), &kld);
 	    }
 /* L10: */
 	}
@@ -188,20 +180,18 @@
 /*        Compute the Cholesky factorization A = L*L'. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute L(J,J) and test for non-positive-definiteness
-. */
+/*           Compute L(J,J) and test for non-positive-definiteness. */
 
-	    ajj = AB(1,j);
+	    ajj = ab_ref(1, j);
 	    if (ajj <= 0.f) {
 		goto L30;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(1,j) = ajj;
+	    ab_ref(1, j) = ajj;
 
-/*           Compute elements J+1:J+KN of column J and update the 
-  
+/*           Compute elements J+1:J+KN of column J and update the   
              trailing submatrix within the band.   
 
    Computing MIN */
@@ -209,8 +199,9 @@
 	    kn = min(i__2,i__3);
 	    if (kn > 0) {
 		r__1 = 1.f / ajj;
-		sscal_(&kn, &r__1, &AB(2,j), &c__1);
-		ssyr_("Lower", &kn, &c_b8, &AB(2,j), &c__1, &AB(1,j+1), &kld);
+		sscal_(&kn, &r__1, &ab_ref(2, j), &c__1);
+		ssyr_("Lower", &kn, &c_b8, &ab_ref(2, j), &c__1, &ab_ref(1, j 
+			+ 1), &kld);
 	    }
 /* L20: */
 	}
@@ -224,4 +215,7 @@ L30:
 /*     End of SPBTF2 */
 
 } /* spbtf2_ */
+
+#undef ab_ref
+
 

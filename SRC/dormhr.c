@@ -1,14 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dormhr_(char *side, char *trans, integer *m, integer *n, 
 	integer *ilo, integer *ihi, doublereal *a, integer *lda, doublereal *
-	tau, doublereal *c, integer *ldc, doublereal *work, integer *lwork, 
+	tau, doublereal *c__, integer *ldc, doublereal *work, integer *lwork, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -45,8 +46,7 @@
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            ILO and IHI must have the same values as in the previous call 
-  
+            ILO and IHI must have the same values as in the previous call   
             of DGEHRD. Q is equal to the unit matrix except in the   
             submatrix Q(ilo+1:ihi,ilo+1:ihi).   
             If SIDE = 'L', then 1 <= ILO <= IHI <= M, if M > 0, and   
@@ -62,8 +62,7 @@
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.   
-            LDA >= max(1,M) if SIDE = 'L'; LDA >= max(1,N) if SIDE = 'R'. 
-  
+            LDA >= max(1,M) if SIDE = 'L'; LDA >= max(1,N) if SIDE = 'R'.   
 
     TAU     (input) DOUBLE PRECISION array, dimension   
                                  (M-1) if SIDE = 'L'   
@@ -73,14 +72,12 @@
 
     C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
             On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q. 
-  
+            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
 
     LDC     (input) INTEGER   
             The leading dimension of the array C. LDC >= max(1,M).   
 
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK) 
-  
+    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
             On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
@@ -91,39 +88,62 @@
             LWORK >= M*NB if SIDE = 'R', where NB is the optimal   
             blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
+    static integer c__2 = 2;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer a_dim1, a_offset, c_dim1, c_offset, i__1;
+    address a__1[2];
+    integer a_dim1, a_offset, c_dim1, c_offset, i__1[2], i__2;
+    char ch__1[2];
+    /* Builtin functions   
+       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
     /* Local variables */
     static logical left;
     extern logical lsame_(char *, char *);
-    static integer iinfo, i1, i2, mi, nh, ni, nq, nw;
-    extern /* Subroutine */ int xerbla_(char *, integer *), dormqr_(
-	    char *, char *, integer *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
-	    integer *, integer *);
+    static integer iinfo, i1, i2, nb, mi, nh, ni, nq, nw;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int dormqr_(char *, char *, integer *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
+	    integer *, doublereal *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
 
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
+    nh = *ihi - *ilo;
     left = lsame_(side, "L");
+    lquery = *lwork == -1;
 
 /*     NQ is the order of Q and NW is the minimum dimension of WORK */
 
@@ -136,7 +156,8 @@
     }
     if (! left && ! lsame_(side, "R")) {
 	*info = -1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T")) {
 	*info = -2;
     } else if (*m < 0) {
 	*info = -3;
@@ -150,20 +171,42 @@
 	*info = -8;
     } else if (*ldc < max(1,*m)) {
 	*info = -11;
-    } else if (*lwork < max(1,nw)) {
+    } else if (*lwork < max(1,nw) && ! lquery) {
 	*info = -13;
     }
+
+    if (*info == 0) {
+	if (left) {
+/* Writing concatenation */
+	    i__1[0] = 1, a__1[0] = side;
+	    i__1[1] = 1, a__1[1] = trans;
+	    s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+	    nb = ilaenv_(&c__1, "DORMQR", ch__1, &nh, n, &nh, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
+	} else {
+/* Writing concatenation */
+	    i__1[0] = 1, a__1[0] = side;
+	    i__1[1] = 1, a__1[1] = trans;
+	    s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+	    nb = ilaenv_(&c__1, "DORMQR", ch__1, m, &nh, &nh, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
+	}
+	lwkopt = max(1,nw) * nb;
+	work[1] = (doublereal) lwkopt;
+    }
+
     if (*info != 0) {
-	i__1 = -(*info);
-	xerbla_("DORMHR", &i__1);
+	i__2 = -(*info);
+	xerbla_("DORMHR", &i__2);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Quick return if possible */
 
-    nh = *ihi - *ilo;
     if (*m == 0 || *n == 0 || nh == 0) {
-	WORK(1) = 1.;
+	work[1] = 1.;
 	return 0;
     }
 
@@ -179,11 +222,17 @@
 	i2 = *ilo + 1;
     }
 
-    dormqr_(side, trans, &mi, &ni, &nh, &A(*ilo+1,*ilo), lda, &
-	    TAU(*ilo), &C(i1,i2), ldc, &WORK(1), lwork, &iinfo);
+    dormqr_(side, trans, &mi, &ni, &nh, &a_ref(*ilo + 1, *ilo), lda, &tau[*
+	    ilo], &c___ref(i1, i2), ldc, &work[1], lwork, &iinfo);
+
+    work[1] = (doublereal) lwkopt;
     return 0;
 
 /*     End of DORMHR */
 
 } /* dormhr_ */
+
+#undef c___ref
+#undef a_ref
+
 

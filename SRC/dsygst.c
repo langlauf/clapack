@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsygst_(integer *itype, char *uplo, integer *n, 
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -22,8 +23,7 @@
     If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or   
     B*A*x = lambda*x, and A is overwritten by U*A*U**T or L**T*A*L.   
 
-    B must have been previously factorized as U**T*U or L*L**T by DPOTRF. 
-  
+    B must have been previously factorized as U**T*U or L*L**T by DPOTRF.   
 
     Arguments   
     =========   
@@ -42,13 +42,11 @@
             The order of the matrices A and B.  N >= 0.   
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
             N-by-N upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of A contains the lower 
-  
+            leading N-by-N lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -69,15 +67,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -111,13 +106,18 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (*itype < 1 || *itype > 3) {
@@ -145,13 +145,14 @@
 
 /*     Determine the block size for this environment. */
 
-    nb = ilaenv_(&c__1, "DSYGST", uplo, n, &c_n1, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "DSYGST", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
 
     if (nb <= 1 || nb >= *n) {
 
 /*        Use unblocked code */
 
-	dsygs2_(itype, uplo, n, &A(1,1), lda, &B(1,1), ldb, info);
+	dsygs2_(itype, uplo, n, &a[a_offset], lda, &b[b_offset], ldb, info);
     } else {
 
 /*        Use blocked code */
@@ -163,31 +164,36 @@
 
 		i__1 = *n;
 		i__2 = nb;
-		for (k = 1; nb < 0 ? k >= *n : k <= *n; k += nb) {
+		for (k = 1; i__2 < 0 ? k >= i__1 : k <= i__1; k += i__2) {
 /* Computing MIN */
 		    i__3 = *n - k + 1;
 		    kb = min(i__3,nb);
 
-/*                 Update the upper triangle of A(k:n,k:n)
- */
+/*                 Update the upper triangle of A(k:n,k:n) */
 
-		    dsygs2_(itype, uplo, &kb, &A(k,k), lda, &B(k,k), ldb, info);
+		    dsygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
+			     ldb, info);
 		    if (k + kb <= *n) {
 			i__3 = *n - k - kb + 1;
 			dtrsm_("Left", uplo, "Transpose", "Non-unit", &kb, &
-				i__3, &c_b14, &B(k,k), ldb, &A(k,k+kb), lda);
+				i__3, &c_b14, &b_ref(k, k), ldb, &a_ref(k, k 
+				+ kb), lda);
 			i__3 = *n - k - kb + 1;
-			dsymm_("Left", uplo, &kb, &i__3, &c_b16, &A(k,k), lda, &B(k,k+kb), ldb, 
-				&c_b14, &A(k,k+kb), lda);
+			dsymm_("Left", uplo, &kb, &i__3, &c_b16, &a_ref(k, k),
+				 lda, &b_ref(k, k + kb), ldb, &c_b14, &a_ref(
+				k, k + kb), lda);
 			i__3 = *n - k - kb + 1;
-			dsyr2k_(uplo, "Transpose", &i__3, &kb, &c_b19, &A(k,k+kb), lda, &B(k,k+kb), ldb, &c_b14, &A(k+kb,k+kb), lda);
+			dsyr2k_(uplo, "Transpose", &i__3, &kb, &c_b19, &a_ref(
+				k, k + kb), lda, &b_ref(k, k + kb), ldb, &
+				c_b14, &a_ref(k + kb, k + kb), lda);
 			i__3 = *n - k - kb + 1;
-			dsymm_("Left", uplo, &kb, &i__3, &c_b16, &A(k,k), lda, &B(k,k+kb), ldb, 
-				&c_b14, &A(k,k+kb), lda);
+			dsymm_("Left", uplo, &kb, &i__3, &c_b16, &a_ref(k, k),
+				 lda, &b_ref(k, k + kb), ldb, &c_b14, &a_ref(
+				k, k + kb), lda);
 			i__3 = *n - k - kb + 1;
 			dtrsm_("Right", uplo, "No transpose", "Non-unit", &kb,
-				 &i__3, &c_b14, &B(k+kb,k+kb)
-				, ldb, &A(k,k+kb), lda);
+				 &i__3, &c_b14, &b_ref(k + kb, k + kb), ldb, &
+				a_ref(k, k + kb), lda);
 		    }
 /* L10: */
 		}
@@ -197,30 +203,36 @@
 
 		i__2 = *n;
 		i__1 = nb;
-		for (k = 1; nb < 0 ? k >= *n : k <= *n; k += nb) {
+		for (k = 1; i__1 < 0 ? k >= i__2 : k <= i__2; k += i__1) {
 /* Computing MIN */
 		    i__3 = *n - k + 1;
 		    kb = min(i__3,nb);
 
-/*                 Update the lower triangle of A(k:n,k:n)
- */
+/*                 Update the lower triangle of A(k:n,k:n) */
 
-		    dsygs2_(itype, uplo, &kb, &A(k,k), lda, &B(k,k), ldb, info);
+		    dsygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
+			     ldb, info);
 		    if (k + kb <= *n) {
 			i__3 = *n - k - kb + 1;
 			dtrsm_("Right", uplo, "Transpose", "Non-unit", &i__3, 
-				&kb, &c_b14, &B(k,k), ldb, &A(k+kb,k), lda);
+				&kb, &c_b14, &b_ref(k, k), ldb, &a_ref(k + kb,
+				 k), lda);
 			i__3 = *n - k - kb + 1;
-			dsymm_("Right", uplo, &i__3, &kb, &c_b16, &A(k,k), lda, &B(k+kb,k), ldb, &
-				c_b14, &A(k+kb,k), lda);
+			dsymm_("Right", uplo, &i__3, &kb, &c_b16, &a_ref(k, k)
+				, lda, &b_ref(k + kb, k), ldb, &c_b14, &a_ref(
+				k + kb, k), lda);
 			i__3 = *n - k - kb + 1;
-			dsyr2k_(uplo, "No transpose", &i__3, &kb, &c_b19, &A(k+kb,k), lda, &B(k+kb,k), ldb, &c_b14, &A(k+kb,k+kb), lda);
+			dsyr2k_(uplo, "No transpose", &i__3, &kb, &c_b19, &
+				a_ref(k + kb, k), lda, &b_ref(k + kb, k), ldb,
+				 &c_b14, &a_ref(k + kb, k + kb), lda);
 			i__3 = *n - k - kb + 1;
-			dsymm_("Right", uplo, &i__3, &kb, &c_b16, &A(k,k), lda, &B(k+kb,k), ldb, &
-				c_b14, &A(k+kb,k), lda);
+			dsymm_("Right", uplo, &i__3, &kb, &c_b16, &a_ref(k, k)
+				, lda, &b_ref(k + kb, k), ldb, &c_b14, &a_ref(
+				k + kb, k), lda);
 			i__3 = *n - k - kb + 1;
 			dtrsm_("Left", uplo, "No transpose", "Non-unit", &
-				i__3, &kb, &c_b14, &B(k+kb,k+kb), ldb, &A(k+kb,k), lda);
+				i__3, &kb, &c_b14, &b_ref(k + kb, k + kb), 
+				ldb, &a_ref(k + kb, k), lda);
 		    }
 /* L20: */
 		}
@@ -232,29 +244,31 @@
 
 		i__1 = *n;
 		i__2 = nb;
-		for (k = 1; nb < 0 ? k >= *n : k <= *n; k += nb) {
+		for (k = 1; i__2 < 0 ? k >= i__1 : k <= i__1; k += i__2) {
 /* Computing MIN */
 		    i__3 = *n - k + 1;
 		    kb = min(i__3,nb);
 
-/*                 Update the upper triangle of A(1:k+kb-1
-,1:k+kb-1) */
+/*                 Update the upper triangle of A(1:k+kb-1,1:k+kb-1) */
 
 		    i__3 = k - 1;
 		    dtrmm_("Left", uplo, "No transpose", "Non-unit", &i__3, &
-			    kb, &c_b14, &B(1,1), ldb, &A(1,k),
-			     lda);
+			    kb, &c_b14, &b[b_offset], ldb, &a_ref(1, k), lda);
 		    i__3 = k - 1;
-		    dsymm_("Right", uplo, &i__3, &kb, &c_b52, &A(k,k), lda, &B(1,k), ldb, &c_b14, &A(1,k), lda);
+		    dsymm_("Right", uplo, &i__3, &kb, &c_b52, &a_ref(k, k), 
+			    lda, &b_ref(1, k), ldb, &c_b14, &a_ref(1, k), lda);
 		    i__3 = k - 1;
-		    dsyr2k_(uplo, "No transpose", &i__3, &kb, &c_b14, &A(1,k), lda, &B(1,k), ldb, &c_b14,
-			     &A(1,1), lda);
+		    dsyr2k_(uplo, "No transpose", &i__3, &kb, &c_b14, &a_ref(
+			    1, k), lda, &b_ref(1, k), ldb, &c_b14, &a[
+			    a_offset], lda);
 		    i__3 = k - 1;
-		    dsymm_("Right", uplo, &i__3, &kb, &c_b52, &A(k,k), lda, &B(1,k), ldb, &c_b14, &A(1,k), lda);
+		    dsymm_("Right", uplo, &i__3, &kb, &c_b52, &a_ref(k, k), 
+			    lda, &b_ref(1, k), ldb, &c_b14, &a_ref(1, k), lda);
 		    i__3 = k - 1;
 		    dtrmm_("Right", uplo, "Transpose", "Non-unit", &i__3, &kb,
-			     &c_b14, &B(k,k), ldb, &A(1,k), lda);
-		    dsygs2_(itype, uplo, &kb, &A(k,k), lda, &B(k,k), ldb, info);
+			     &c_b14, &b_ref(k, k), ldb, &a_ref(1, k), lda);
+		    dsygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
+			     ldb, info);
 /* L30: */
 		}
 	    } else {
@@ -263,29 +277,32 @@
 
 		i__2 = *n;
 		i__1 = nb;
-		for (k = 1; nb < 0 ? k >= *n : k <= *n; k += nb) {
+		for (k = 1; i__1 < 0 ? k >= i__2 : k <= i__2; k += i__1) {
 /* Computing MIN */
 		    i__3 = *n - k + 1;
 		    kb = min(i__3,nb);
 
-/*                 Update the lower triangle of A(1:k+kb-1
-,1:k+kb-1) */
+/*                 Update the lower triangle of A(1:k+kb-1,1:k+kb-1) */
 
 		    i__3 = k - 1;
 		    dtrmm_("Right", uplo, "No transpose", "Non-unit", &kb, &
-			    i__3, &c_b14, &B(1,1), ldb, &A(k,1), 
+			    i__3, &c_b14, &b[b_offset], ldb, &a_ref(k, 1), 
 			    lda);
 		    i__3 = k - 1;
-		    dsymm_("Left", uplo, &kb, &i__3, &c_b52, &A(k,k), lda, &B(k,1), ldb, &c_b14, &A(k,1), lda);
+		    dsymm_("Left", uplo, &kb, &i__3, &c_b52, &a_ref(k, k), 
+			    lda, &b_ref(k, 1), ldb, &c_b14, &a_ref(k, 1), lda);
 		    i__3 = k - 1;
-		    dsyr2k_(uplo, "Transpose", &i__3, &kb, &c_b14, &A(k,1), lda, &B(k,1), ldb, &c_b14, &A(1,1), lda);
+		    dsyr2k_(uplo, "Transpose", &i__3, &kb, &c_b14, &a_ref(k, 
+			    1), lda, &b_ref(k, 1), ldb, &c_b14, &a[a_offset], 
+			    lda);
 		    i__3 = k - 1;
-		    dsymm_("Left", uplo, &kb, &i__3, &c_b52, &A(k,k), lda, &B(k,1), ldb, &c_b14, &A(k,1), lda);
+		    dsymm_("Left", uplo, &kb, &i__3, &c_b52, &a_ref(k, k), 
+			    lda, &b_ref(k, 1), ldb, &c_b14, &a_ref(k, 1), lda);
 		    i__3 = k - 1;
 		    dtrmm_("Left", uplo, "Transpose", "Non-unit", &kb, &i__3, 
-			    &c_b14, &B(k,k), ldb, &A(k,1), 
-			    lda);
-		    dsygs2_(itype, uplo, &kb, &A(k,k), lda, &B(k,k), ldb, info);
+			    &c_b14, &b_ref(k, k), ldb, &a_ref(k, 1), lda);
+		    dsygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
+			     ldb, info);
 /* L40: */
 		}
 	    }
@@ -296,4 +313,8 @@
 /*     End of DSYGST */
 
 } /* dsygst_ */
+
+#undef b_ref
+#undef a_ref
+
 

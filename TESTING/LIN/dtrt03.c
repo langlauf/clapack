@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -37,7 +38,12 @@ static integer c__1 = 1;
     static doublereal bignum, smlnum, eps, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -46,8 +52,7 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    DTRT03 computes the residual for the solution to a scaled triangular 
-  
+    DTRT03 computes the residual for the solution to a scaled triangular   
     system of equations A*x = s*b  or  A'*x = s*b.   
     Here A is a triangular matrix, A' is the transpose of A, s is a   
     scalar, and x and b are N by NRHS matrices.  The test ratio is the   
@@ -59,8 +64,7 @@ static integer c__1 = 1;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -85,12 +89,9 @@ static integer c__1 = 1;
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading n by n   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading n by n lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading n by n lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -128,22 +129,21 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - s*b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --cnorm;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -165,8 +165,8 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-	    d__2 = tnorm, d__3 = *tscal * (d__1 = a[j + j * a_dim1], abs(d__1)
-		    ) + cnorm[j];
+	    d__2 = tnorm, d__3 = *tscal * (d__1 = a_ref(j, j), abs(d__1)) + 
+		    cnorm[j];
 	    tnorm = max(d__2,d__3);
 /* L10: */
 	}
@@ -186,20 +186,20 @@ static integer c__1 = 1;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	dcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ix = idamax_(n, &work[1], &c__1);
 /* Computing MAX */
-	d__2 = 1., d__3 = (d__1 = x[ix + j * x_dim1], abs(d__1));
+	d__2 = 1., d__3 = (d__1 = x_ref(ix, j), abs(d__1));
 	xnorm = max(d__2,d__3);
 	xscal = 1. / xnorm / (doublereal) (*n);
 	dscal_(n, &xscal, &work[1], &c__1);
 	dtrmv_(uplo, trans, diag, n, &a[a_offset], lda, &work[1], &c__1);
 	d__1 = -(*scale) * xscal;
-	daxpy_(n, &d__1, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	daxpy_(n, &d__1, &b_ref(1, j), &c__1, &work[1], &c__1);
 	ix = idamax_(n, &work[1], &c__1);
 	err = *tscal * (d__1 = work[ix], abs(d__1));
-	ix = idamax_(n, &x[j * x_dim1 + 1], &c__1);
-	xnorm = (d__1 = x[ix + j * x_dim1], abs(d__1));
+	ix = idamax_(n, &x_ref(1, j), &c__1);
+	xnorm = (d__1 = x_ref(ix, j), abs(d__1));
 	if (err * smlnum <= xnorm) {
 	    if (xnorm > 0.) {
 		err /= xnorm;
@@ -227,4 +227,9 @@ static integer c__1 = 1;
 /*     End of DTRT03 */
 
 } /* dtrt03_ */
+
+#undef x_ref
+#undef b_ref
+#undef a_ref
+
 

@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sggglm_(integer *n, integer *m, integer *p, real *a, 
-	integer *lda, real *b, integer *ldb, real *d, real *x, real *y, real *
-	work, integer *lwork, integer *info)
+	integer *lda, real *b, integer *ldb, real *d__, real *x, real *y, 
+	real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -80,6 +81,11 @@
             where NB is an upper bound for the optimal blocksizes for   
             SGEQRF, SGERQF, SORMQR and SORMRQ.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
@@ -89,43 +95,64 @@
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
-    static real c_b14 = -1.f;
-    static real c_b16 = 1.f;
+    static integer c_n1 = -1;
+    static real c_b32 = -1.f;
+    static real c_b34 = 1.f;
     
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
-    static integer lopt, i;
+    static integer lopt, i__;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *), scopy_(integer *, real *, integer *, real *, integer *), 
 	    strsv_(char *, char *, char *, integer *, real *, integer *, real 
 	    *, integer *);
-    static integer np;
-    extern /* Subroutine */ int xerbla_(char *, integer *), sggqrf_(
+    static integer nb, np;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int sggqrf_(integer *, integer *, integer *, real 
+	    *, integer *, real *, real *, integer *, real *, real *, integer *
+	    , integer *);
+    static integer nb1, nb2, nb3, nb4, lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int sormqr_(char *, char *, integer *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, real *, 
+	    integer *, integer *), sormrq_(char *, char *, 
 	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, real *, real *, integer *, integer *), sormqr_(char *
-	    , char *, integer *, integer *, integer *, real *, integer *, 
-	    real *, real *, integer *, real *, integer *, integer *), sormrq_(char *, char *, integer *, integer *, integer *, 
-	    real *, integer *, real *, real *, integer *, real *, integer *, 
-	    integer *);
+	    , integer *, real *, integer *, integer *);
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --d__;
+    --x;
+    --y;
+    --work;
 
-#define D(I) d[(I)-1]
-#define X(I) x[(I)-1]
-#define Y(I) y[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     np = min(*n,*p);
+    nb1 = ilaenv_(&c__1, "SGEQRF", " ", n, m, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb2 = ilaenv_(&c__1, "SGERQF", " ", n, m, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb3 = ilaenv_(&c__1, "SORMQR", " ", n, m, p, &c_n1, (ftnlen)6, (ftnlen)1);
+    nb4 = ilaenv_(&c__1, "SORMRQ", " ", n, m, p, &c_n1, (ftnlen)6, (ftnlen)1);
+/* Computing MAX */
+    i__1 = max(nb1,nb2), i__1 = max(i__1,nb3);
+    nb = max(i__1,nb4);
+    lwkopt = *m + np + max(*n,*p) * nb;
+    work[1] = (real) lwkopt;
+    lquery = *lwork == -1;
     if (*n < 0) {
 	*info = -1;
     } else if (*m < 0 || *m > *n) {
@@ -139,13 +166,15 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = 1, i__2 = *n + *m + *p;
-	if (*lwork < max(i__1,i__2)) {
+	if (*lwork < max(i__1,i__2) && ! lquery) {
 	    *info = -12;
 	}
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SGGGLM", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -165,49 +194,51 @@
        orthogonal. */
 
     i__1 = *lwork - *m - np;
-    sggqrf_(n, m, p, &A(1,1), lda, &WORK(1), &B(1,1), ldb, &WORK(*m 
-	    + 1), &WORK(*m + np + 1), &i__1, info);
-    lopt = WORK(*m + np + 1);
+    sggqrf_(n, m, p, &a[a_offset], lda, &work[1], &b[b_offset], ldb, &work[*m 
+	    + 1], &work[*m + np + 1], &i__1, info);
+    lopt = work[*m + np + 1];
 
 /*     Update left-hand-side vector d = Q'*d = ( d1 ) M   
                                                ( d2 ) N-M */
 
     i__1 = max(1,*n);
     i__2 = *lwork - *m - np;
-    sormqr_("Left", "Transpose", n, &c__1, m, &A(1,1), lda, &WORK(1), &D(
-	    1), &i__1, &WORK(*m + np + 1), &i__2, info);
+    sormqr_("Left", "Transpose", n, &c__1, m, &a[a_offset], lda, &work[1], &
+	    d__[1], &i__1, &work[*m + np + 1], &i__2, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(*m + np + 1);
+    i__1 = lopt, i__2 = (integer) work[*m + np + 1];
     lopt = max(i__1,i__2);
 
 /*     Solve T22*y2 = d2 for y2 */
 
     i__1 = *n - *m;
-    strsv_("Upper", "No transpose", "Non unit", &i__1, &B(*m+1,*m+*p-*n+1), ldb, &D(*m + 1), &c__1);
+    strsv_("Upper", "No transpose", "Non unit", &i__1, &b_ref(*m + 1, *m + *p 
+	    - *n + 1), ldb, &d__[*m + 1], &c__1);
     i__1 = *n - *m;
-    scopy_(&i__1, &D(*m + 1), &c__1, &Y(*m + *p - *n + 1), &c__1);
+    scopy_(&i__1, &d__[*m + 1], &c__1, &y[*m + *p - *n + 1], &c__1);
 
 /*     Set y1 = 0 */
 
     i__1 = *m + *p - *n;
-    for (i = 1; i <= *m+*p-*n; ++i) {
-	Y(i) = 0.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	y[i__] = 0.f;
 /* L10: */
     }
 
 /*     Update d1 = d1 - T12*y2 */
 
     i__1 = *n - *m;
-    sgemv_("No transpose", m, &i__1, &c_b14, &B(1,*m+*p-*n+1), ldb, &Y(*m + *p - *n + 1), &c__1, &c_b16, &D(1), &c__1);
+    sgemv_("No transpose", m, &i__1, &c_b32, &b_ref(1, *m + *p - *n + 1), ldb,
+	     &y[*m + *p - *n + 1], &c__1, &c_b34, &d__[1], &c__1);
 
 /*     Solve triangular system: R11*x = d1 */
 
-    strsv_("Upper", "No Transpose", "Non unit", m, &A(1,1), lda, &D(1), &
-	    c__1);
+    strsv_("Upper", "No Transpose", "Non unit", m, &a[a_offset], lda, &d__[1],
+	     &c__1);
 
 /*     Copy D to X */
 
-    scopy_(m, &D(1), &c__1, &X(1), &c__1);
+    scopy_(m, &d__[1], &c__1, &x[1], &c__1);
 
 /*     Backward transformation y = Z'*y   
 
@@ -215,15 +246,18 @@
     i__1 = 1, i__2 = *n - *p + 1;
     i__3 = max(1,*p);
     i__4 = *lwork - *m - np;
-    sormrq_("Left", "Transpose", p, &c__1, &np, &B(max(1,*n-*p+1),1), 
-	    ldb, &WORK(*m + 1), &Y(1), &i__3, &WORK(*m + np + 1), &i__4, info);
+    sormrq_("Left", "Transpose", p, &c__1, &np, &b_ref(max(i__1,i__2), 1), 
+	    ldb, &work[*m + 1], &y[1], &i__3, &work[*m + np + 1], &i__4, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(*m + np + 1);
-    WORK(1) = (real) max(i__1,i__2);
+    i__1 = lopt, i__2 = (integer) work[*m + np + 1];
+    work[1] = (real) (*m + np + max(i__1,i__2));
 
     return 0;
 
 /*     End of SGGGLM */
 
 } /* sggglm_ */
+
+#undef b_ref
+
 

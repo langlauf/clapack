@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,8 +32,7 @@ static integer c_n1 = -1;
 {
     /* System generated locals */
     integer i__1;
-    real r__1;
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1;
 
     /* Builtin functions */
@@ -43,8 +43,8 @@ static integer c_n1 = -1;
     static integer info;
     static real anrm;
     static complex a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
-    static real r[4];
+    static integer i__, j;
+    static real r__[4];
     static complex w[8], x[4];
     static real rcond;
     static char c2[2];
@@ -88,7 +88,13 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -109,29 +115,28 @@ static integer c_n1 = -1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	    i__1 = af_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    af[i__1].r = q__1.r, af[i__1].i = q__1.i;
 /* L10: */
 	}
@@ -155,7 +160,7 @@ static integer c_n1 = -1;
 
 /*        CPOTRF */
 
-	s_copy(srnamc_1.srnamt, "CPOTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpotrf_("/", &c__0, a, &c__1, &info);
 	chkxer_("CPOTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -171,7 +176,7 @@ static integer c_n1 = -1;
 
 /*        CPOTF2 */
 
-	s_copy(srnamc_1.srnamt, "CPOTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpotf2_("/", &c__0, a, &c__1, &info);
 	chkxer_("CPOTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -187,7 +192,7 @@ static integer c_n1 = -1;
 
 /*        CPOTRI */
 
-	s_copy(srnamc_1.srnamt, "CPOTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpotri_("/", &c__0, a, &c__1, &info);
 	chkxer_("CPOTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -203,7 +208,7 @@ static integer c_n1 = -1;
 
 /*        CPOTRS */
 
-	s_copy(srnamc_1.srnamt, "CPOTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpotrs_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("CPOTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -227,67 +232,71 @@ static integer c_n1 = -1;
 
 /*        CPORFS */
 
-	s_copy(srnamc_1.srnamt, "CPORFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPORFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cporfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	cporfs_("U", &c_n1, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	cporfs_("U", &c__0, &c_n1, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	cporfs_("U", &c__2, &c__1, a, &c__1, af, &c__2, b, &c__2, x, &c__2, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	cporfs_("U", &c__2, &c__1, a, &c__2, af, &c__1, b, &c__2, x, &c__2, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
 	cporfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, b, &c__1, x, &c__2, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
 	cporfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, b, &c__2, x, &c__1, 
-		r1, r2, w, r, &info);
+		r1, r2, w, r__, &info);
 	chkxer_("CPORFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPOCON */
 
-	s_copy(srnamc_1.srnamt, "CPOCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cpocon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpocon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cpocon_("U", &c_n1, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpocon_("U", &c_n1, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cpocon_("U", &c__2, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpocon_("U", &c__2, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	r__1 = -(doublereal)anrm;
-	cpocon_("U", &c__1, a, &c__1, &r__1, &rcond, w, r, &info);
+	r__1 = -anrm;
+	cpocon_("U", &c__1, a, &c__1, &r__1, &rcond, w, r__, &info)
+		;
 	chkxer_("CPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPOEQU */
 
-	s_copy(srnamc_1.srnamt, "CPOEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPOEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpoequ_(&c_n1, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("CPOEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -298,14 +307,13 @@ static integer c_n1 = -1;
 		infoc_1.ok);
 
 /*     Test error exits of the routines that use the Cholesky   
-       decomposition of a Hermitian positive definite packed matrix. 
-*/
+       decomposition of a Hermitian positive definite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
 /*        CPPTRF */
 
-	s_copy(srnamc_1.srnamt, "CPPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpptrf_("/", &c__0, a, &info);
 	chkxer_("CPPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -317,7 +325,7 @@ static integer c_n1 = -1;
 
 /*        CPPTRI */
 
-	s_copy(srnamc_1.srnamt, "CPPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpptri_("/", &c__0, a, &info);
 	chkxer_("CPPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -329,7 +337,7 @@ static integer c_n1 = -1;
 
 /*        CPPTRS */
 
-	s_copy(srnamc_1.srnamt, "CPPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpptrs_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("CPPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -349,53 +357,53 @@ static integer c_n1 = -1;
 
 /*        CPPRFS */
 
-	s_copy(srnamc_1.srnamt, "CPPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cpprfs_("/", &c__0, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, r, &
-		info);
+	cpprfs_("/", &c__0, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, r__, 
+		&info);
 	chkxer_("CPPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cpprfs_("U", &c_n1, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, r, &
-		info);
+	cpprfs_("U", &c_n1, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, r__, 
+		&info);
 	chkxer_("CPPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cpprfs_("U", &c__0, &c_n1, a, af, b, &c__1, x, &c__1, r1, r2, w, r, &
-		info);
+	cpprfs_("U", &c__0, &c_n1, a, af, b, &c__1, x, &c__1, r1, r2, w, r__, 
+		&info);
 	chkxer_("CPPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	cpprfs_("U", &c__2, &c__1, a, af, b, &c__1, x, &c__2, r1, r2, w, r, &
-		info);
+	cpprfs_("U", &c__2, &c__1, a, af, b, &c__1, x, &c__2, r1, r2, w, r__, 
+		&info);
 	chkxer_("CPPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	cpprfs_("U", &c__2, &c__1, a, af, b, &c__2, x, &c__1, r1, r2, w, r, &
-		info);
+	cpprfs_("U", &c__2, &c__1, a, af, b, &c__2, x, &c__1, r1, r2, w, r__, 
+		&info);
 	chkxer_("CPPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPPCON */
 
-	s_copy(srnamc_1.srnamt, "CPPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cppcon_("/", &c__0, a, &anrm, &rcond, w, r, &info);
+	cppcon_("/", &c__0, a, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cppcon_("U", &c_n1, a, &anrm, &rcond, w, r, &info);
+	cppcon_("U", &c_n1, a, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	r__1 = -(doublereal)anrm;
-	cppcon_("U", &c__1, a, &r__1, &rcond, w, r, &info);
+	r__1 = -anrm;
+	cppcon_("U", &c__1, a, &r__1, &rcond, w, r__, &info);
 	chkxer_("CPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPPEQU */
 
-	s_copy(srnamc_1.srnamt, "CPPEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPPEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cppequ_("/", &c__0, a, r1, &rcond, &anrm, &info);
 	chkxer_("CPPEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -412,7 +420,7 @@ static integer c_n1 = -1;
 
 /*        CPBTRF */
 
-	s_copy(srnamc_1.srnamt, "CPBTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbtrf_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("CPBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -432,7 +440,7 @@ static integer c_n1 = -1;
 
 /*        CPBTF2 */
 
-	s_copy(srnamc_1.srnamt, "CPBTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbtf2_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("CPBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -452,7 +460,7 @@ static integer c_n1 = -1;
 
 /*        CPBTRS */
 
-	s_copy(srnamc_1.srnamt, "CPBTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbtrs_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("CPBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -480,76 +488,76 @@ static integer c_n1 = -1;
 
 /*        CPBRFS */
 
-	s_copy(srnamc_1.srnamt, "CPBRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbrfs_("/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	cpbrfs_("U", &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	cpbrfs_("U", &c__1, &c_n1, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
 	cpbrfs_("U", &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
 	cpbrfs_("U", &c__2, &c__1, &c__1, a, &c__1, af, &c__2, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	cpbrfs_("U", &c__2, &c__1, &c__1, a, &c__2, af, &c__1, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	cpbrfs_("U", &c__2, &c__0, &c__1, a, &c__1, af, &c__1, b, &c__1, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	cpbrfs_("U", &c__2, &c__0, &c__1, a, &c__1, af, &c__1, b, &c__2, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CPBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPBCON */
 
-	s_copy(srnamc_1.srnamt, "CPBCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cpbcon_("/", &c__0, &c__0, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpbcon_("/", &c__0, &c__0, a, &c__1, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cpbcon_("U", &c_n1, &c__0, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpbcon_("U", &c_n1, &c__0, a, &c__1, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cpbcon_("U", &c__1, &c_n1, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpbcon_("U", &c__1, &c_n1, a, &c__1, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cpbcon_("U", &c__2, &c__1, a, &c__1, &anrm, &rcond, w, r, &info);
+	cpbcon_("U", &c__2, &c__1, a, &c__1, &anrm, &rcond, w, r__, &info);
 	chkxer_("CPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	r__1 = -(doublereal)anrm;
-	cpbcon_("U", &c__1, &c__0, a, &c__1, &r__1, &rcond, w, r, &info);
+	r__1 = -anrm;
+	cpbcon_("U", &c__1, &c__0, a, &c__1, &r__1, &rcond, w, r__, &info);
 	chkxer_("CPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CPBEQU */
 
-	s_copy(srnamc_1.srnamt, "CPBEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CPBEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cpbequ_("/", &c__0, &c__0, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("CPBEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -577,4 +585,10 @@ static integer c_n1 = -1;
 /*     End of CERRPO */
 
 } /* cerrpo_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

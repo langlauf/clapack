@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static doublecomplex c_b1 = {0.,0.};
     doublecomplex z__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -30,18 +31,21 @@ static doublecomplex c_b1 = {0.,0.};
     static doublereal ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZGET03 computes the residual for a general matrix times its inverse: 
-  
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
+    ZGET03 computes the residual for a general matrix times its inverse:   
+       norm( I - AINV*A ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
 
     Arguments   
@@ -60,14 +64,12 @@ static doublecomplex c_b1 = {0.,0.};
             The inverse of the matrix A.   
 
     LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N). 
-  
+            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
 
@@ -76,23 +78,22 @@ static doublecomplex c_b1 = {0.,0.};
             ( 1/norm(A) ) / norm(AINV).   
 
     RESID   (output) DOUBLE PRECISION   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+            norm(I - AINV*A) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = ainv_dim1 + 1;
+    ainv_offset = 1 + ainv_dim1 * 1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -118,18 +119,18 @@ static doublecomplex c_b1 = {0.,0.};
 /*     Compute I - A * AINV */
 
     z__1.r = -1., z__1.i = 0.;
-    zgemm_("No transpose", "No transpose", n, n, n, &z__1, &a[a_offset], lda, 
-	    &ainv[ainv_offset], ldainv, &c_b1, &work[work_offset], ldwork);
+    zgemm_("No transpose", "No transpose", n, n, n, &z__1, &ainv[ainv_offset],
+	     ldainv, &a[a_offset], lda, &c_b1, &work[work_offset], ldwork);
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * work_dim1;
-	i__3 = i + i * work_dim1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = work_subscr(i__, i__);
+	i__3 = work_subscr(i__, i__);
 	z__1.r = work[i__3].r + 1., z__1.i = work[i__3].i + 0.;
 	work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L10: */
     }
 
-/*     Compute norm(I - A*AINV) / (N * norm(A) * norm(AINV) * EPS) */
+/*     Compute norm(I - AINV*A) / (N * norm(A) * norm(AINV) * EPS) */
 
     *resid = zlange_("1", n, n, &work[work_offset], ldwork, &rwork[1]);
 
@@ -140,4 +141,8 @@ static doublecomplex c_b1 = {0.,0.};
 /*     End of ZGET03 */
 
 } /* zget03_ */
+
+#undef work_ref
+#undef work_subscr
+
 

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int csysvx_(char *fact, char *uplo, integer *n, integer *
@@ -6,10 +7,10 @@
 	 real *ferr, real *berr, complex *work, integer *lwork, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -32,14 +33,16 @@
        The form of the factorization is   
           A = U * D * U**T,  if UPLO = 'U', or   
           A = L * D * L**T,  if UPLO = 'L',   
-       where U (or L) is a product of permutation and unit upper (lower) 
-  
+       where U (or L) is a product of permutation and unit upper (lower)   
        triangular matrices, and D is symmetric and block diagonal with   
        1-by-1 and 2-by-2 diagonal blocks.   
 
-    2. The factored form of A is used to estimate the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 3 and 4 are skipped.   
+    2. If some D(i,i)=0, so that D is exactly singular, then the routine   
+       returns with INFO = i. Otherwise, the factored form of A is used   
+       to estimate the condition number of the matrix A.  If the   
+       reciprocal of the condition number is less than machine precision,   
+       INFO = N+1 is returned as a warning, but the routine still goes on   
+       to solve for X and compute error bounds as described below.   
 
     3. The system of equations is solved for X using the factored form   
        of A.   
@@ -72,14 +75,11 @@
 
     A       (input) COMPLEX array, dimension (LDA,N)   
             The symmetric matrix A.  If UPLO = 'U', the leading N-by-N   
-            upper triangular part of A contains the upper triangular part 
-  
-            of the matrix A, and the strictly lower triangular part of A 
-  
+            upper triangular part of A contains the upper triangular part   
+            of the matrix A, and the strictly lower triangular part of A   
             is not referenced.  If UPLO = 'L', the leading N-by-N lower   
             triangular part of A contains the lower triangular part of   
-            the matrix A, and the strictly upper triangular part of A is 
-  
+            the matrix A, and the strictly upper triangular part of A is   
             not referenced.   
 
     LDA     (input) INTEGER   
@@ -87,14 +87,12 @@
 
     AF      (input or output) COMPLEX array, dimension (LDAF,N)   
             If FACT = 'F', then AF is an input argument and on entry   
-            contains the block diagonal matrix D and the multipliers used 
-  
+            contains the block diagonal matrix D and the multipliers used   
             to obtain the factor U or L from the factorization   
             A = U*D*U**T or A = L*D*L**T as computed by CSYTRF.   
 
             If FACT = 'N', then AF is an output argument and on exit   
-            returns the block diagonal matrix D and the multipliers used 
-  
+            returns the block diagonal matrix D and the multipliers used   
             to obtain the factor U or L from the factorization   
             A = U*D*U**T or A = L*D*L**T.   
 
@@ -103,21 +101,18 @@
 
     IPIV    (input or output) INTEGER array, dimension (N)   
             If FACT = 'F', then IPIV is an input argument and on entry   
-            contains details of the interchanges and the block structure 
-  
+            contains details of the interchanges and the block structure   
             of D, as determined by CSYTRF.   
             If IPIV(k) > 0, then rows and columns k and IPIV(k) were   
             interchanged and D(k,k) is a 1-by-1 diagonal block.   
             If UPLO = 'U' and IPIV(k) = IPIV(k-1) < 0, then rows and   
-            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k) 
-  
+            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k)   
             is a 2-by-2 diagonal block.  If UPLO = 'L' and IPIV(k) =   
             IPIV(k+1) < 0, then rows and columns k+1 and -IPIV(k) were   
             interchanged and D(k:k+1,k:k+1) is a 2-by-2 diagonal block.   
 
             If FACT = 'N', then IPIV is an output argument and on exit   
-            contains details of the interchanges and the block structure 
-  
+            contains details of the interchanges and the block structure   
             of D, as determined by CSYTRF.   
 
     B       (input) COMPLEX array, dimension (LDB,NRHS)   
@@ -127,28 +122,23 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) COMPLEX array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X.   
+            If INFO = 0 or INFO = N+1, the N-by-NRHS solution matrix X.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     RCOND   (output) REAL   
-            The estimate of the reciprocal condition number of the matrix 
-  
+            The estimate of the reciprocal condition number of the matrix   
             A.  If RCOND is less than the machine precision (in   
-            particular, if RCOND = 0), the matrix is singular to working 
-  
+            particular, if RCOND = 0), the matrix is singular to working   
             precision.  This condition is indicated by a return code of   
-            INFO > 0, and the solution and error bounds are not computed. 
-  
+            INFO > 0.   
 
     FERR    (output) REAL array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -167,44 +157,53 @@
             LWORK >= N*NB, where NB is the optimal blocksize for   
             CSYTRF.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     RWORK   (workspace) REAL array, dimension (N)   
 
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
             > 0: if INFO = i, and i is   
-                 <= N: D(i,i) is exactly zero.  The factorization   
-                       has been completed, but the block diagonal   
-                       matrix D is exactly singular, so the solution and 
-  
-                       error bounds could not be computed.   
-                 = N+1: the block diagonal matrix D is nonsingular, but   
-                       RCOND is less than machine precision.  The   
-                       factorization has been completed, but the matrix   
-                       is singular to working precision, so the solution 
-  
-                       and error bounds have not been computed.   
+                  <= N:  D(i,i) is exactly zero.  The factorization   
+                         has been completed but the factor D is exactly   
+                         singular, so the solution and error bounds could   
+                         not be computed. RCOND = 0 is returned.   
+                  = N+1: D is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, af_dim1, af_offset, b_dim1, b_offset, x_dim1, 
-	    x_offset, i__1;
+	    x_offset, i__1, i__2;
     /* Local variables */
     extern logical lsame_(char *, char *);
     static real anorm;
+    static integer nb;
     extern doublereal slamch_(char *);
     static logical nofact;
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *), xerbla_(char *, 
 	    integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     extern doublereal clansy_(char *, char *, integer *, complex *, integer *,
 	     real *);
     extern /* Subroutine */ int csycon_(char *, integer *, complex *, integer 
@@ -213,27 +212,39 @@
 	    complex *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, real *, real *, complex *, real *, integer *), 
 	    csytrf_(char *, integer *, complex *, integer *, integer *, 
-	    complex *, integer *, integer *), csytrs_(char *, integer 
-	    *, integer *, complex *, integer *, integer *, complex *, integer 
-	    *, integer *);
+	    complex *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int csytrs_(char *, integer *, integer *, complex 
+	    *, integer *, integer *, complex *, integer *, integer *);
 
 
-#define IPIV(I) ipiv[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    af_dim1 = *ldaf;
+    af_offset = 1 + af_dim1 * 1;
+    af -= af_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --rwork;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define AF(I,J) af[(I)-1 + ((J)-1)* ( *ldaf)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
+    lquery = *lwork == -1;
     if (! nofact && ! lsame_(fact, "F")) {
 	*info = -1;
-    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
+    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, 
+	    "L")) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
@@ -247,12 +258,26 @@
 	*info = -11;
     } else if (*ldx < max(1,*n)) {
 	*info = -13;
-    } else if (*lwork < *n << 1) {
-	*info = -18;
+    } else /* if(complicated condition) */ {
+/* Computing MAX */
+	i__1 = 1, i__2 = *n << 1;
+	if (*lwork < max(i__1,i__2) && ! lquery) {
+	    *info = -18;
+	}
     }
+
+    if (*info == 0) {
+	nb = ilaenv_(&c__1, "CSYTRF", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6,
+		 (ftnlen)1);
+	lwkopt = *n * nb;
+	work[1].r = (real) lwkopt, work[1].i = 0.f;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CSYSVX", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -260,8 +285,8 @@
 
 /*        Compute the factorization A = U*D*U' or A = L*D*L'. */
 
-	clacpy_(uplo, n, n, &A(1,1), lda, &AF(1,1), ldaf);
-	csytrf_(uplo, n, &AF(1,1), ldaf, &IPIV(1), &WORK(1), lwork, 
+	clacpy_(uplo, n, n, &a[a_offset], lda, &af[af_offset], ldaf);
+	csytrf_(uplo, n, &af[af_offset], ldaf, &ipiv[1], &work[1], lwork, 
 		info);
 
 /*        Return if INFO is non-zero. */
@@ -276,32 +301,33 @@
 
 /*     Compute the norm of the matrix A. */
 
-    anorm = clansy_("I", uplo, n, &A(1,1), lda, &RWORK(1));
+    anorm = clansy_("I", uplo, n, &a[a_offset], lda, &rwork[1]);
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    csycon_(uplo, n, &AF(1,1), ldaf, &IPIV(1), &anorm, rcond, &WORK(1), 
+    csycon_(uplo, n, &af[af_offset], ldaf, &ipiv[1], &anorm, rcond, &work[1], 
 	    info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < slamch_("Epsilon")) {
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution vectors X. */
 
-    clacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    csytrs_(uplo, n, nrhs, &AF(1,1), ldaf, &IPIV(1), &X(1,1), ldx, 
+    clacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    csytrs_(uplo, n, nrhs, &af[af_offset], ldaf, &ipiv[1], &x[x_offset], ldx, 
 	    info);
 
 /*     Use iterative refinement to improve the computed solutions and   
        compute error bounds and backward error estimates for them. */
 
-    csyrfs_(uplo, n, nrhs, &A(1,1), lda, &AF(1,1), ldaf, &IPIV(1), 
-	    &B(1,1), ldb, &X(1,1), ldx, &FERR(1), &BERR(1), &WORK(1)
-	    , &RWORK(1), info);
+    csyrfs_(uplo, n, nrhs, &a[a_offset], lda, &af[af_offset], ldaf, &ipiv[1], 
+	    &b[b_offset], ldb, &x[x_offset], ldx, &ferr[1], &berr[1], &work[1]
+	    , &rwork[1], info);
+
+    work[1].r = (real) lwkopt, work[1].i = 0.f;
 
     return 0;
 

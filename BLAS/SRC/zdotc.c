@@ -1,8 +1,4 @@
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Double Complex */ VOID zdotc_(doublecomplex * ret_val, integer *n, 
@@ -11,25 +7,18 @@
     /* System generated locals */
     integer i__1, i__2;
     doublecomplex z__1, z__2, z__3;
-
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
-
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublecomplex ztemp;
     static integer ix, iy;
-
-
 /*     forms the dot product of a vector.   
        jack dongarra, 3/11/78.   
        modified 12/3/93, array(1) declarations changed to array(*)   
-
-    
-   Parameter adjustments */
+       Parameter adjustments */
     --zy;
     --zx;
-
     /* Function Body */
     ztemp.r = 0., ztemp.i = 0.;
      ret_val->r = 0.,  ret_val->i = 0.;
@@ -39,10 +28,8 @@
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-
 /*        code for unequal increments or equal increments   
             not equal to 1 */
-
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -52,11 +39,11 @@
 	iy = (-(*n) + 1) * *incy + 1;
     }
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	d_cnjg(&z__3, &zx[ix]);
 	i__2 = iy;
-	z__2.r = z__3.r * zy[iy].r - z__3.i * zy[iy].i, z__2.i = z__3.r * 
-		zy[iy].i + z__3.i * zy[iy].r;
+	z__2.r = z__3.r * zy[i__2].r - z__3.i * zy[i__2].i, z__2.i = z__3.r * 
+		zy[i__2].i + z__3.i * zy[i__2].r;
 	z__1.r = ztemp.r + z__2.r, z__1.i = ztemp.i + z__2.i;
 	ztemp.r = z__1.r, ztemp.i = z__1.i;
 	ix += *incx;
@@ -65,16 +52,14 @@
     }
      ret_val->r = ztemp.r,  ret_val->i = ztemp.i;
     return ;
-
 /*        code for both increments equal to 1 */
-
 L20:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	d_cnjg(&z__3, &zx[i]);
-	i__2 = i;
-	z__2.r = z__3.r * zy[i].r - z__3.i * zy[i].i, z__2.i = z__3.r * 
-		zy[i].i + z__3.i * zy[i].r;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d_cnjg(&z__3, &zx[i__]);
+	i__2 = i__;
+	z__2.r = z__3.r * zy[i__2].r - z__3.i * zy[i__2].i, z__2.i = z__3.r * 
+		zy[i__2].i + z__3.i * zy[i__2].r;
 	z__1.r = ztemp.r + z__2.r, z__1.i = ztemp.i + z__2.i;
 	ztemp.r = z__1.r, ztemp.i = z__1.i;
 /* L30: */

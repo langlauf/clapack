@@ -6,4 +6,4 @@ SEP:  Data file for timing Symmetric Eigenvalue Problem routines
 401 401 401 401 401             Values of LDA (leading dimension)
 0.0                             Minimum time in seconds
 4                               Number of matrix types
-SST    T T T T T T T T 
+SST    T T T T T T T T T T T T T T T T T T T T T T T

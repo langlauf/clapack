@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,7 @@ static doublereal c_b17 = 1.;
     static integer klen;
     extern /* Subroutine */ int zher_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
@@ -43,7 +44,13 @@ static doublereal c_b17 = 1.;
     static doublereal akk, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define afac_subscr(a_1,a_2) (a_2)*afac_dim1 + a_1
+#define afac_ref(a_1,a_2) afac[afac_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -52,8 +59,7 @@ static doublereal c_b17 = 1.;
     Purpose   
     =======   
 
-    ZPBT01 reconstructs a Hermitian positive definite band matrix A from 
-  
+    ZPBT01 reconstructs a Hermitian positive definite band matrix A from   
     its L*L' or U'*U factorization and computes the residual   
        norm( L*L' - A ) / ( N * norm(A) * EPS ) or   
        norm( U'*U - A ) / ( N * norm(A) * EPS ),   
@@ -73,26 +79,22 @@ static doublereal c_b17 = 1.;
             The number of rows and columns of the matrix A.  N >= 0.   
 
     KD      (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U', 
-  
+            The number of super-diagonals of the matrix A if UPLO = 'U',   
             or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
 
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The original Hermitian band matrix A.  If UPLO = 'U', the   
             upper triangular part of A is stored as a band matrix; if   
             UPLO = 'L', the lower triangular part of A is stored.  The   
-            columns of the appropriate triangle are stored in the columns 
-  
-            of A and the diagonals of the triangle are stored in the rows 
-  
+            columns of the appropriate triangle are stored in the columns   
+            of A and the diagonals of the triangle are stored in the rows   
             of A.  See ZPBTRF for further details.   
 
     LDA     (input) INTEGER.   
             The leading dimension of the array A.  LDA >= max(1,KD+1).   
 
     AFAC    (input) COMPLEX*16 array, dimension (LDAFAC,N)   
-            The factored form of the matrix A.  AFAC contains the factor 
-  
+            The factored form of the matrix A.  AFAC contains the factor   
             L or U from the L*L' or U'*U factorization in band storage   
             format, as computed by ZPBTRF.   
 
@@ -106,8 +108,7 @@ static doublereal c_b17 = 1.;
             If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -115,10 +116,10 @@ static doublereal c_b17 = 1.;
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --rwork;
 
@@ -137,14 +138,13 @@ static doublereal c_b17 = 1.;
 	return 0;
     }
 
-/*     Check the imaginary parts of the diagonal elements and return with 
-  
+/*     Check the imaginary parts of the diagonal elements and return with   
        an error code if any are nonzero. */
 
     if (lsame_(uplo, "U")) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    if (d_imag(&afac[*kd + 1 + j * afac_dim1]) != 0.) {
+	    if (d_imag(&afac_ref(*kd + 1, j)) != 0.) {
 		*resid = 1. / eps;
 		return 0;
 	    }
@@ -153,7 +153,7 @@ static doublereal c_b17 = 1.;
     } else {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    if (d_imag(&afac[j * afac_dim1 + 1]) != 0.) {
+	    if (d_imag(&afac_ref(1, j)) != 0.) {
 		*resid = 1. / eps;
 		return 0;
 	    }
@@ -173,19 +173,18 @@ static doublereal c_b17 = 1.;
 /*           Compute the (K,K) element of the result. */
 
 	    i__1 = klen + 1;
-	    zdotc_(&z__1, &i__1, &afac[kc + k * afac_dim1], &c__1, &afac[kc + 
-		    k * afac_dim1], &c__1);
+	    zdotc_(&z__1, &i__1, &afac_ref(kc, k), &c__1, &afac_ref(kc, k), &
+		    c__1);
 	    akk = z__1.r;
-	    i__1 = *kd + 1 + k * afac_dim1;
+	    i__1 = afac_subscr(*kd + 1, k);
 	    afac[i__1].r = akk, afac[i__1].i = 0.;
 
 /*           Compute the rest of column K. */
 
 	    if (klen > 0) {
 		i__1 = *ldafac - 1;
-		ztrmv_("Upper", "Conjugate", "Non-unit", &klen, &afac[*kd + 1 
-			+ (k - klen) * afac_dim1], &i__1, &afac[kc + k * 
-			afac_dim1], &c__1);
+		ztrmv_("Upper", "Conjugate", "Non-unit", &klen, &afac_ref(*kd 
+			+ 1, k - klen), &i__1, &afac_ref(kc, k), &c__1);
 	    }
 
 /* L30: */
@@ -199,22 +198,21 @@ static doublereal c_b17 = 1.;
 	    i__1 = *kd, i__2 = *n - k;
 	    klen = min(i__1,i__2);
 
-/*           Add a multiple of column K of the factor L to each of
-   
+/*           Add a multiple of column K of the factor L to each of   
              columns K+1 through N. */
 
 	    if (klen > 0) {
 		i__1 = *ldafac - 1;
-		zher_("Lower", &klen, &c_b17, &afac[k * afac_dim1 + 2], &c__1,
-			 &afac[(k + 1) * afac_dim1 + 1], &i__1);
+		zher_("Lower", &klen, &c_b17, &afac_ref(2, k), &c__1, &
+			afac_ref(1, k + 1), &i__1);
 	    }
 
 /*           Scale column K by the diagonal element. */
 
-	    i__1 = k * afac_dim1 + 1;
+	    i__1 = afac_subscr(1, k);
 	    akk = afac[i__1].r;
 	    i__1 = klen + 1;
-	    zdscal_(&i__1, &akk, &afac[k * afac_dim1 + 1], &c__1);
+	    zdscal_(&i__1, &akk, &afac_ref(1, k), &c__1);
 
 /* L40: */
 	}
@@ -229,10 +227,10 @@ static doublereal c_b17 = 1.;
 	    i__2 = 1, i__3 = *kd + 2 - j;
 	    mu = max(i__2,i__3);
 	    i__2 = *kd + 1;
-	    for (i = mu; i <= i__2; ++i) {
-		i__3 = i + j * afac_dim1;
-		i__4 = i + j * afac_dim1;
-		i__5 = i + j * a_dim1;
+	    for (i__ = mu; i__ <= i__2; ++i__) {
+		i__3 = afac_subscr(i__, j);
+		i__4 = afac_subscr(i__, j);
+		i__5 = a_subscr(i__, j);
 		z__1.r = afac[i__4].r - a[i__5].r, z__1.i = afac[i__4].i - a[
 			i__5].i;
 		afac[i__3].r = z__1.r, afac[i__3].i = z__1.i;
@@ -247,10 +245,10 @@ static doublereal c_b17 = 1.;
 	    i__2 = *kd + 1, i__3 = *n - j + 1;
 	    ml = min(i__2,i__3);
 	    i__2 = ml;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * afac_dim1;
-		i__4 = i + j * afac_dim1;
-		i__5 = i + j * a_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = afac_subscr(i__, j);
+		i__4 = afac_subscr(i__, j);
+		i__5 = a_subscr(i__, j);
 		z__1.r = afac[i__4].r - a[i__5].r, z__1.i = afac[i__4].i - a[
 			i__5].i;
 		afac[i__3].r = z__1.r, afac[i__3].i = z__1.i;
@@ -271,4 +269,10 @@ static doublereal c_b17 = 1.;
 /*     End of ZPBT01 */
 
 } /* zpbt01_ */
+
+#undef afac_ref
+#undef afac_subscr
+#undef a_ref
+#undef a_subscr
+
 

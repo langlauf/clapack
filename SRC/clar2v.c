@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int clar2v_(integer *n, complex *x, complex *y, complex *z, 
-	integer *incx, real *c, complex *s, integer *incc)
+/* Subroutine */ int clar2v_(integer *n, complex *x, complex *y, complex *z__,
+	 integer *incx, real *c__, complex *s, integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -12,19 +13,15 @@
     Purpose   
     =======   
 
-    CLAR2V applies a vector of complex plane rotations with real cosines 
-  
+    CLAR2V applies a vector of complex plane rotations with real cosines   
     from both sides to a sequence of 2-by-2 complex Hermitian matrices,   
-    defined by the elements of the vectors x, y and z. For i = 1,2,...,n 
-  
+    defined by the elements of the vectors x, y and z. For i = 1,2,...,n   
 
        (       x(i)  z(i) ) :=   
        ( conjg(z(i)) y(i) )   
 
-         (  c(i) conjg(s(i)) ) (       x(i)  z(i) ) ( c(i) -conjg(s(i)) ) 
-  
-         ( -s(i)       c(i)  ) ( conjg(z(i)) y(i) ) ( s(i)        c(i)  ) 
-  
+         (  c(i) conjg(s(i)) ) (       x(i)  z(i) ) ( c(i) -conjg(s(i)) )   
+         ( -s(i)       c(i)  ) ( conjg(z(i)) y(i) ) ( s(i)        c(i)  )   
 
     Arguments   
     =========   
@@ -53,22 +50,19 @@
     INCC    (input) INTEGER   
             The increment between elements of C and S. INCC > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
-    doublereal d__1;
+    real r__1;
     complex q__1, q__2, q__3, q__4, q__5;
     /* Builtin functions */
     double r_imag(complex *);
     void r_cnjg(complex *, complex *);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static complex t2, t3, t4;
     static real t5, t6;
     static integer ic;
@@ -79,29 +73,28 @@
     static complex zi;
     static real t1i, t1r, sii, zii, sir, zir;
 
+    --s;
+    --c__;
+    --z__;
+    --y;
+    --x;
 
-#define S(I) s[(I)-1]
-#define C(I) c[(I)-1]
-#define Z(I) z[(I)-1]
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     ix = 1;
     ic = 1;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = ix;
-	xi = X(ix).r;
+	xi = x[i__2].r;
 	i__2 = ix;
-	yi = Y(ix).r;
+	yi = y[i__2].r;
 	i__2 = ix;
-	zi.r = Z(ix).r, zi.i = Z(ix).i;
+	zi.r = z__[i__2].r, zi.i = z__[i__2].i;
 	zir = zi.r;
 	zii = r_imag(&zi);
-	ci = C(ic);
+	ci = c__[ic];
 	i__2 = ic;
-	si.r = S(ic).r, si.i = S(ic).i;
+	si.r = s[i__2].r, si.i = s[i__2].i;
 	sir = si.r;
 	sii = r_imag(&si);
 	t1r = sir * zir - sii * zii;
@@ -119,11 +112,11 @@
 	t5 = ci * xi + t1r;
 	t6 = ci * yi - t1r;
 	i__2 = ix;
-	d__1 = ci * t5 + (sir * t4.r + sii * r_imag(&t4));
-	X(ix).r = d__1, X(ix).i = 0.f;
+	r__1 = ci * t5 + (sir * t4.r + sii * r_imag(&t4));
+	x[i__2].r = r__1, x[i__2].i = 0.f;
 	i__2 = ix;
-	d__1 = ci * t6 - (sir * t3.r - sii * r_imag(&t3));
-	Y(ix).r = d__1, Y(ix).i = 0.f;
+	r__1 = ci * t6 - (sir * t3.r - sii * r_imag(&t3));
+	y[i__2].r = r__1, y[i__2].i = 0.f;
 	i__2 = ix;
 	q__2.r = ci * t3.r, q__2.i = ci * t3.i;
 	r_cnjg(&q__4, &si);
@@ -131,7 +124,7 @@
 	q__3.r = q__4.r * q__5.r - q__4.i * q__5.i, q__3.i = q__4.r * q__5.i 
 		+ q__4.i * q__5.r;
 	q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
-	Z(ix).r = q__1.r, Z(ix).i = q__1.i;
+	z__[i__2].r = q__1.r, z__[i__2].i = q__1.i;
 	ix += *incx;
 	ic += *incc;
 /* L10: */

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static doublereal c_b6 = 1.;
 static doublereal c_b7 = 0.;
 
 /* Subroutine */ int dsyt22_(integer *itype, char *uplo, integer *n, integer *
-	m, integer *kband, doublereal *a, integer *lda, doublereal *d, 
+	m, integer *kband, doublereal *a, integer *lda, doublereal *d__, 
 	doublereal *e, doublereal *u, integer *ldu, doublereal *v, integer *
 	ldv, doublereal *tau, doublereal *work, doublereal *result)
 {
@@ -42,7 +43,7 @@ static doublereal c_b7 = 0.;
     static integer nnp1;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -57,8 +58,7 @@ static doublereal c_b7 = 0.;
 
          where A is symmetric, the columns of U are orthonormal, and S   
          is diagonal (if KBAND=0) or symmetric tridiagonal (if   
-         KBAND=1).  If ITYPE=1, then U is represented as a dense matrix, 
-  
+         KBAND=1).  If ITYPE=1, then U is represented as a dense matrix,   
          otherwise the U is expressed as a product of Householder   
          transformations, whose vectors are stored in the array "V" and   
          whose scaling constants are in "TAU"; we shall use the letter   
@@ -87,8 +87,7 @@ static doublereal c_b7 = 0.;
             Not modified.   
 
     N       INTEGER   
-            The size of the matrix.  If it is zero, DSYT22 does nothing. 
-  
+            The size of the matrix.  If it is zero, DSYT22 does nothing.   
             It must be at least zero.   
             Not modified.   
 
@@ -126,8 +125,7 @@ static doublereal c_b7 = 0.;
 
     U       DOUBLE PRECISION array, dimension (LDU, N)   
             If ITYPE=1 or 3, this contains the orthogonal matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2, 
-  
+            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
             then it is not referenced.   
             Not modified.   
 
@@ -166,21 +164,20 @@ static doublereal c_b7 = 0.;
             if LDU is at least N.   
             Modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --tau;
     --work;
@@ -217,7 +214,7 @@ static doublereal c_b7 = 0.;
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
 	jj = nn + (j - 1) * *n + j;
-	work[jj] -= d[j];
+	work[jj] -= d__[j];
 /* L10: */
     }
     if (*kband == 1 && *n > 1) {

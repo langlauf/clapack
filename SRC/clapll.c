@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clapll_(integer *n, complex *x, integer *incx, complex *
 	y, integer *incy, real *ssmin)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -42,18 +43,14 @@
             The increment between successive elements of Y. INCY > 0.   
 
     SSMIN   (output) REAL   
-            The smallest singular value of the N-by-2 matrix A = ( X Y ). 
-  
+            The smallest singular value of the N-by-2 matrix A = ( X Y ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1, r__2, r__3;
@@ -64,7 +61,7 @@
     /* Local variables */
     extern /* Subroutine */ int slas2_(real *, real *, real *, real *, real *)
 	    ;
-    static complex c;
+    static complex c__;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern /* Subroutine */ int caxpy_(integer *, complex *, complex *, 
@@ -75,11 +72,10 @@
 	    integer *, complex *);
     static complex tau;
 
+    --y;
+    --x;
 
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 1) {
 	*ssmin = 0.f;
 	return 0;
@@ -87,24 +83,24 @@
 
 /*     Compute the QR factorization of the N-by-2 matrix ( X Y ) */
 
-    clarfg_(n, &X(1), &X(*incx + 1), incx, &tau);
-    a11.r = X(1).r, a11.i = X(1).i;
-    X(1).r = 1.f, X(1).i = 0.f;
+    clarfg_(n, &x[1], &x[*incx + 1], incx, &tau);
+    a11.r = x[1].r, a11.i = x[1].i;
+    x[1].r = 1.f, x[1].i = 0.f;
 
     r_cnjg(&q__3, &tau);
-    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-    cdotc_(&q__4, n, &X(1), incx, &Y(1), incy);
+    q__2.r = -q__3.r, q__2.i = -q__3.i;
+    cdotc_(&q__4, n, &x[1], incx, &y[1], incy);
     q__1.r = q__2.r * q__4.r - q__2.i * q__4.i, q__1.i = q__2.r * q__4.i + 
 	    q__2.i * q__4.r;
-    c.r = q__1.r, c.i = q__1.i;
-    caxpy_(n, &c, &X(1), incx, &Y(1), incy);
+    c__.r = q__1.r, c__.i = q__1.i;
+    caxpy_(n, &c__, &x[1], incx, &y[1], incy);
 
     i__1 = *n - 1;
-    clarfg_(&i__1, &Y(*incy + 1), &Y((*incy << 1) + 1), incy, &tau);
+    clarfg_(&i__1, &y[*incy + 1], &y[(*incy << 1) + 1], incy, &tau);
 
-    a12.r = Y(1).r, a12.i = Y(1).i;
+    a12.r = y[1].r, a12.i = y[1].i;
     i__1 = *incy + 1;
-    a22.r = Y(*incy+1).r, a22.i = Y(*incy+1).i;
+    a22.r = y[i__1].r, a22.i = y[i__1].i;
 
 /*     Compute the SVD of 2-by-2 Upper triangular matrix. */
 

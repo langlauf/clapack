@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrtri_(char *uplo, char *diag, integer *n, 
 	doublecomplex *a, integer *lda, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -33,18 +34,15 @@
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the triangular matrix A.  If UPLO = 'U', the   
-            leading N-by-N upper triangular part of the array A contains 
-  
+            leading N-by-N upper triangular part of the array A contains   
             the upper triangular matrix, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of the array A contains 
-  
+            leading N-by-N lower triangular part of the array A contains   
             the lower triangular matrix, and the strictly upper   
             triangular part of A is not referenced.  If DIAG = 'U', the   
             diagonal elements of A are also not referenced and are   
             assumed to be 1.   
-            On exit, the (triangular) inverse of the original matrix, in 
-  
+            On exit, the (triangular) inverse of the original matrix, in   
             the same storage format.   
 
     LDA     (input) INTEGER   
@@ -54,18 +52,14 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
             > 0: if INFO = i, A(i,i) is exactly zero.  The triangular   
-                 matrix is singular and its inverse can not be computed. 
-  
+                 matrix is singular and its inverse can not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -96,12 +90,15 @@
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
     static logical nounit;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     nounit = lsame_(diag, "N");
@@ -131,8 +128,8 @@
     if (nounit) {
 	i__1 = *n;
 	for (*info = 1; *info <= i__1; ++(*info)) {
-	    i__2 = *info + *info * a_dim1;
-	    if (A(*info,*info).r == 0. && A(*info,*info).i == 0.) {
+	    i__2 = a_subscr(*info, *info);
+	    if (a[i__2].r == 0. && a[i__2].i == 0.) {
 		return 0;
 	    }
 /* L10: */
@@ -145,13 +142,14 @@
    Writing concatenation */
     i__3[0] = 1, a__1[0] = uplo;
     i__3[1] = 1, a__1[1] = diag;
-    s_cat(ch__1, a__1, i__3, &c__2, 2L);
-    nb = ilaenv_(&c__1, "ZTRTRI", ch__1, n, &c_n1, &c_n1, &c_n1, 6L, 2L);
+    s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+    nb = ilaenv_(&c__1, "ZTRTRI", ch__1, n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)2);
     if (nb <= 1 || nb >= *n) {
 
 /*        Use unblocked code */
 
-	ztrti2_(uplo, diag, n, &A(1,1), lda, info);
+	ztrti2_(uplo, diag, n, &a[a_offset], lda, info);
     } else {
 
 /*        Use blocked code */
@@ -162,7 +160,7 @@
 
 	    i__1 = *n;
 	    i__2 = nb;
-	    for (j = 1; nb < 0 ? j >= *n : j <= *n; j += nb) {
+	    for (j = 1; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 /* Computing MIN */
 		i__4 = nb, i__5 = *n - j + 1;
 		jb = min(i__4,i__5);
@@ -171,16 +169,15 @@
 
 		i__4 = j - 1;
 		ztrmm_("Left", "Upper", "No transpose", diag, &i__4, &jb, &
-			c_b1, &A(1,1), lda, &A(1,j), lda);
+			c_b1, &a[a_offset], lda, &a_ref(1, j), lda);
 		i__4 = j - 1;
 		z__1.r = -1., z__1.i = 0.;
 		ztrsm_("Right", "Upper", "No transpose", diag, &i__4, &jb, &
-			z__1, &A(j,j), lda, &A(1,j), 
-			lda);
+			z__1, &a_ref(j, j), lda, &a_ref(1, j), lda);
 
 /*              Compute inverse of current diagonal block */
 
-		ztrti2_("Upper", diag, &jb, &A(j,j), lda, info);
+		ztrti2_("Upper", diag, &jb, &a_ref(j, j), lda, info);
 /* L20: */
 	    }
 	} else {
@@ -189,27 +186,27 @@
 
 	    nn = (*n - 1) / nb * nb + 1;
 	    i__2 = -nb;
-	    for (j = nn; -nb < 0 ? j >= 1 : j <= 1; j += -nb) {
+	    for (j = nn; i__2 < 0 ? j >= 1 : j <= 1; j += i__2) {
 /* Computing MIN */
 		i__1 = nb, i__4 = *n - j + 1;
 		jb = min(i__1,i__4);
 		if (j + jb <= *n) {
 
-/*                 Compute rows j+jb:n of current block co
-lumn */
+/*                 Compute rows j+jb:n of current block column */
 
 		    i__1 = *n - j - jb + 1;
 		    ztrmm_("Left", "Lower", "No transpose", diag, &i__1, &jb, 
-			    &c_b1, &A(j+jb,j+jb), lda, &A(j+jb,j), lda);
+			    &c_b1, &a_ref(j + jb, j + jb), lda, &a_ref(j + jb,
+			     j), lda);
 		    i__1 = *n - j - jb + 1;
 		    z__1.r = -1., z__1.i = 0.;
 		    ztrsm_("Right", "Lower", "No transpose", diag, &i__1, &jb,
-			     &z__1, &A(j,j), lda, &A(j+jb,j), lda);
+			     &z__1, &a_ref(j, j), lda, &a_ref(j + jb, j), lda);
 		}
 
 /*              Compute inverse of current diagonal block */
 
-		ztrti2_("Lower", diag, &jb, &A(j,j), lda, info);
+		ztrti2_("Lower", diag, &jb, &a_ref(j, j), lda, info);
 /* L30: */
 	    }
 	}
@@ -220,4 +217,8 @@ lumn */
 /*     End of ZTRTRI */
 
 } /* ztrtri_ */
+
+#undef a_ref
+#undef a_subscr
+
 

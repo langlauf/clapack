@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,7 +21,7 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     doublereal ret_val;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     static doublereal norma;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
@@ -34,7 +35,11 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 	    integer *, integer *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,12 +49,10 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     =======   
 
     DQPT01 tests the QR-factorization with pivoting of a matrix A.  The   
-    array AF contains the (possibly partial) QR-factorization of A, where 
-  
+    array AF contains the (possibly partial) QR-factorization of A, where   
     the upper triangle of AF(1:k,1:k) is a partial triangular factor,   
     the entries below the diagonal in the first k columns are the   
-    Householder vectors, and the rest of AF contains a partially updated 
-  
+    Householder vectors, and the rest of AF contains a partially updated   
     matrix.   
 
     This function returns ||A*P - Q*R||/(||norm(A)||*eps*M)   
@@ -71,11 +74,9 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
             The original matrix A.   
 
     AF      (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The (possibly partial) output of DGEQPF.  The upper triangle 
-  
+            The (possibly partial) output of DGEQPF.  The upper triangle   
             of AF(1:k,1:k) is a partial triangular factor, the entries   
-            below the diagonal in the first k columns are the Householder 
-  
+            below the diagonal in the first k columns are the Householder   
             vectors, and the rest of AF contains a partially updated   
             matrix.   
 
@@ -94,16 +95,15 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= M*N+N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --jpvt;
@@ -130,21 +130,20 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = af[i + j * af_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = af_ref(i__, j);
 /* L10: */
 	}
 	i__2 = *m;
-	for (i = j + 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = 0.;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = 0.;
 /* L20: */
 	}
 /* L30: */
     }
     i__1 = *n;
     for (j = *k + 1; j <= i__1; ++j) {
-	dcopy_(m, &af[j * af_dim1 + 1], &c__1, &work[(j - 1) * *m + 1], &c__1)
-		;
+	dcopy_(m, &af_ref(1, j), &c__1, &work[(j - 1) * *m + 1], &c__1);
 /* L40: */
     }
 
@@ -157,8 +156,8 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 
 /*        Compare i-th column of QR and jpvt(i)-th column of A */
 
-	daxpy_(m, &c_b14, &a[jpvt[j] * a_dim1 + 1], &c__1, &work[(j - 1) * *m 
-		+ 1], &c__1);
+	daxpy_(m, &c_b14, &a_ref(1, jpvt[j]), &c__1, &work[(j - 1) * *m + 1], 
+		&c__1);
 /* L50: */
     }
 
@@ -173,4 +172,8 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 /*     End of DQPT01 */
 
 } /* dqpt01_ */
+
+#undef af_ref
+#undef a_ref
+
 

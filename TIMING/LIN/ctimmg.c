@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,11 +21,11 @@ static integer c__5 = 5;
 
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
-    doublereal d__1;
+    real r__1;
     complex q__1, q__2;
 
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *);
     static integer jj, jn, mj, mu;
@@ -33,7 +34,11 @@ static integer c__5 = 5;
 	    complex *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -42,8 +47,7 @@ static integer c__5 = 5;
     Purpose   
     =======   
 
-    CTIMMG generates a complex test matrix whose type is given by IFLAG. 
-  
+    CTIMMG generates a complex test matrix whose type is given by IFLAG.   
     All the matrices are Toeplitz (constant along a diagonal), with   
     random elements on each diagonal.   
 
@@ -79,20 +83,16 @@ static integer c__5 = 5;
     A       (output) COMPLEX array, dimension (LDA,N)   
             The generated matrix.   
 
-            If the absolute value of IFLAG is 1, 3, 6, or 8, the leading 
-  
+            If the absolute value of IFLAG is 1, 3, 6, or 8, the leading   
             M x N (or N x N) subblock is used to store the matrix.   
-            If the matrix is symmetric, only the upper or lower triangle 
-  
+            If the matrix is symmetric, only the upper or lower triangle   
             of this block is referenced.   
 
             If the absolute value of IFLAG is 4, 7, or 9, the matrix is   
             Hermitian or symmetric and packed storage is used for the   
             upper or lower triangle.  The triangular matrix is stored   
-            columnwise as a linear array, and the array A is treated as a 
-  
-            vector of length LDA.  LDA must be set to at least N*(N+1)/2. 
-  
+            columnwise as a linear array, and the array A is treated as a   
+            vector of length LDA.  LDA must be set to at least N*(N+1)/2.   
 
             If the absolute value of IFLAG is 2 or 5, the matrix is   
             returned in band format.  The columns of the matrix are   
@@ -115,12 +115,11 @@ static integer c__5 = 5;
     KU      (input) INTEGER   
             The number of superdiagonals if IFLAG = 2, 5, or -5.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
@@ -134,18 +133,17 @@ static integer c__5 = 5;
 
           Set first column and row to random values. */
 
-	clarnv_(&c__2, iseed, m, &a[a_dim1 + 1]);
+	clarnv_(&c__2, iseed, m, &a_ref(1, 1));
 	i__1 = *n;
 	i__2 = *m;
 	for (j = 2; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 /* Computing MIN */
 	    i__3 = *m, i__4 = *n - j + 1;
 	    mj = min(i__3,i__4);
-	    clarnv_(&c__2, iseed, &mj, &a[j * a_dim1 + 1]);
+	    clarnv_(&c__2, iseed, &mj, &a_ref(1, j));
 	    if (mj > 1) {
 		i__3 = mj - 1;
-		ccopy_(&i__3, &a[j * a_dim1 + 2], &c__1, &a[(j + 1) * a_dim1 
-			+ 1], lda);
+		ccopy_(&i__3, &a_ref(2, j), &c__1, &a_ref(1, j + 1), lda);
 	    }
 /* L10: */
 	}
@@ -155,9 +153,9 @@ static integer c__5 = 5;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *m;
-	    for (i = 2; i <= i__1; ++i) {
-		i__3 = i + j * a_dim1;
-		i__4 = i - 1 + (j - 1) * a_dim1;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__3 = a_subscr(i__, j);
+		i__4 = a_subscr(i__ - 1, j - 1);
 		a[i__3].r = a[i__4].r, a[i__3].i = a[i__4].i;
 /* L20: */
 	    }
@@ -176,23 +174,22 @@ static integer c__5 = 5;
 /* Computing MIN */
 	i__1 = *m, i__3 = *kl + 1;
 	i__2 = min(i__1,i__3);
-	clarnv_(&c__2, iseed, &i__2, &a[k + a_dim1]);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(k, 1));
 /* Computing MIN */
 	i__2 = *n - 1;
 	mu = min(i__2,*ku);
 	i__2 = mu + 1;
-	clarnv_(&c__2, iseed, &i__2, &a[k - mu + *n * a_dim1]);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(k - mu, *n));
 	i__2 = *n - 1;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__1 = j - 1;
 	    mu = min(i__1,*ku);
-	    ccopy_(&mu, &a[k - mu + *n * a_dim1], &c__1, &a[k - mu + j * 
-		    a_dim1], &c__1);
+	    ccopy_(&mu, &a_ref(k - mu, *n), &c__1, &a_ref(k - mu, j), &c__1);
 /* Computing MIN */
 	    i__3 = *m - j + 1, i__4 = *kl + 1;
 	    i__1 = min(i__3,i__4);
-	    ccopy_(&i__1, &a[k + a_dim1], &c__1, &a[k + j * a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(k, 1), &c__1, &a_ref(k, j), &c__1);
 /* L40: */
 	}
 
@@ -201,13 +198,12 @@ static integer c__5 = 5;
 /*        Hermitian positive definite, upper triangle */
 
 	i__2 = *n - 1;
-	clarnv_(&c__2, iseed, &i__2, &a[*n * a_dim1 + 1]);
-	i__2 = *n + *n * a_dim1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, &i__2, &a_ref(1, *n));
+	i__2 = a_subscr(*n, *n);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	for (j = *n - 1; j >= 1; --j) {
-	    ccopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    ccopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L50: */
 	}
 
@@ -215,17 +211,17 @@ static integer c__5 = 5;
 
 /*        Hermitian positive definite, lower triangle */
 
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L60: */
 	}
 
@@ -235,15 +231,15 @@ static integer c__5 = 5;
 
 	jn = (*n - 1) * *n / 2 + 1;
 	i__2 = *n - 1;
-	clarnv_(&c__2, iseed, &i__2, &a[jn + a_dim1]);
-	i__2 = jn + *n - 1 + a_dim1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, &i__2, &a_ref(jn, 1));
+	i__2 = a_subscr(jn + *n - 1, 1);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    ccopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L70: */
 	}
 
@@ -251,18 +247,18 @@ static integer c__5 = 5;
 
 /*        Hermitian positive definite packed, lower triangle */
 
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L80: */
 	}
@@ -275,16 +271,16 @@ static integer c__5 = 5;
 /* Computing MIN */
 	i__2 = *n - 1;
 	mu = min(i__2,k);
-	clarnv_(&c__2, iseed, &mu, &a[k + 1 - mu + *n * a_dim1]);
-	i__2 = k + 1 + *n * a_dim1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, &mu, &a_ref(k + 1 - mu, *n));
+	i__2 = a_subscr(k + 1, *n);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    ccopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    ccopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L90: */
 	}
 
@@ -293,19 +289,19 @@ static integer c__5 = 5;
 /*        Hermitian positive definite banded, lower triangle */
 
 	k = *kl;
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (*n);
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (*n);
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 /* Computing MIN */
 	i__1 = *n - 1;
 	i__2 = min(i__1,k);
-	clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L100: */
 	}
 
@@ -313,14 +309,13 @@ static integer c__5 = 5;
 
 /*        Hermitian indefinite, upper triangle */
 
-	clarnv_(&c__2, iseed, n, &a[*n * a_dim1 + 1]);
-	i__2 = *n + *n * a_dim1;
-	i__1 = *n + *n * a_dim1;
-	d__1 = a[i__1].r;
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, n, &a_ref(1, *n));
+	i__2 = a_subscr(*n, *n);
+	i__1 = a_subscr(*n, *n);
+	r__1 = a[i__1].r;
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	for (j = *n - 1; j >= 1; --j) {
-	    ccopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    ccopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L110: */
 	}
 
@@ -328,15 +323,15 @@ static integer c__5 = 5;
 
 /*        Hermitian indefinite, lower triangle */
 
-	clarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
-	i__2 = a_dim1 + 1;
-	i__1 = a_dim1 + 1;
-	d__1 = a[i__1].r;
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, n, &a_ref(1, 1));
+	i__2 = a_subscr(1, 1);
+	i__1 = a_subscr(1, 1);
+	r__1 = a[i__1].r;
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L120: */
 	}
 
@@ -345,16 +340,16 @@ static integer c__5 = 5;
 /*        Hermitian indefinite packed, upper triangle */
 
 	jn = (*n - 1) * *n / 2 + 1;
-	clarnv_(&c__2, iseed, n, &a[jn + a_dim1]);
-	i__2 = jn + *n - 1 + a_dim1;
-	i__1 = jn + *n - 1 + a_dim1;
-	d__1 = a[i__1].r;
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, n, &a_ref(jn, 1));
+	i__2 = a_subscr(jn + *n - 1, 1);
+	i__1 = a_subscr(jn + *n - 1, 1);
+	r__1 = a[i__1].r;
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    ccopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L130: */
 	}
 
@@ -362,16 +357,16 @@ static integer c__5 = 5;
 
 /*        Hermitian indefinite packed, lower triangle */
 
-	clarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
-	i__2 = a_dim1 + 1;
-	i__1 = a_dim1 + 1;
-	d__1 = a[i__1].r;
-	a[i__2].r = d__1, a[i__2].i = 0.f;
+	clarnv_(&c__2, iseed, n, &a_ref(1, 1));
+	i__2 = a_subscr(1, 1);
+	i__1 = a_subscr(1, 1);
+	r__1 = a[i__1].r;
+	a[i__2].r = r__1, a[i__2].i = 0.f;
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L140: */
 	}
@@ -380,10 +375,9 @@ static integer c__5 = 5;
 
 /*        Symmetric indefinite, upper triangle */
 
-	clarnv_(&c__2, iseed, n, &a[*n * a_dim1 + 1]);
+	clarnv_(&c__2, iseed, n, &a_ref(1, *n));
 	for (j = *n - 1; j >= 1; --j) {
-	    ccopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    ccopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L150: */
 	}
 
@@ -391,11 +385,11 @@ static integer c__5 = 5;
 
 /*        Symmetric indefinite, lower triangle */
 
-	clarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	clarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L160: */
 	}
 
@@ -404,12 +398,12 @@ static integer c__5 = 5;
 /*        Symmetric indefinite packed, upper triangle */
 
 	jn = (*n - 1) * *n / 2 + 1;
-	clarnv_(&c__2, iseed, n, &a[jn + a_dim1]);
+	clarnv_(&c__2, iseed, n, &a_ref(jn, 1));
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    ccopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L170: */
 	}
 
@@ -417,12 +411,12 @@ static integer c__5 = 5;
 
 /*        Symmetric indefinite packed, lower triangle */
 
-	clarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	clarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L180: */
 	}
@@ -435,13 +429,13 @@ static integer c__5 = 5;
 /* Computing MIN */
 	i__2 = *n, i__1 = k + 1;
 	mu = min(i__2,i__1);
-	clarnv_(&c__2, iseed, &mu, &a[k + 2 - mu + *n * a_dim1]);
+	clarnv_(&c__2, iseed, &mu, &a_ref(k + 2 - mu, *n));
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    ccopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    ccopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L190: */
 	}
 
@@ -453,13 +447,13 @@ static integer c__5 = 5;
 /* Computing MIN */
 	i__1 = *n, i__3 = k + 1;
 	i__2 = min(i__1,i__3);
-	clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 1]);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L200: */
 	}
 
@@ -468,15 +462,14 @@ static integer c__5 = 5;
 /*        Upper triangular */
 
 	i__2 = *n - 1;
-	clarnv_(&c__2, iseed, &i__2, &a[*n * a_dim1 + 1]);
-	i__2 = *n + *n * a_dim1;
-	d__1 = (real) (*n);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(1, *n));
+	i__2 = a_subscr(*n, *n);
+	r__1 = (real) (*n);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	for (j = *n - 1; j >= 1; --j) {
-	    ccopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    ccopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L210: */
 	}
 
@@ -484,19 +477,19 @@ static integer c__5 = 5;
 
 /*        Lower triangular */
 
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (*n);
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (*n);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L220: */
 	}
 
@@ -506,17 +499,17 @@ static integer c__5 = 5;
 
 	jn = (*n - 1) * *n / 2 + 1;
 	i__2 = *n - 1;
-	clarnv_(&c__2, iseed, &i__2, &a[jn + a_dim1]);
-	i__2 = jn + *n - 1 + a_dim1;
-	d__1 = (real) (*n);
+	clarnv_(&c__2, iseed, &i__2, &a_ref(jn, 1));
+	i__2 = a_subscr(jn + *n - 1, 1);
+	r__1 = (real) (*n);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    ccopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L230: */
 	}
 
@@ -524,20 +517,20 @@ static integer c__5 = 5;
 
 /*        Lower triangular packed */
 
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (*n);
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (*n);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L240: */
 	}
@@ -550,18 +543,18 @@ static integer c__5 = 5;
 /* Computing MIN */
 	i__2 = *n - 1;
 	mu = min(i__2,k);
-	clarnv_(&c__2, iseed, &mu, &a[k + 1 - mu + *n * a_dim1]);
-	i__2 = k + 1 + *n * a_dim1;
-	d__1 = (real) (k + 1);
+	clarnv_(&c__2, iseed, &mu, &a_ref(k + 1 - mu, *n));
+	i__2 = a_subscr(k + 1, *n);
+	r__1 = (real) (k + 1);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    ccopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    ccopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L250: */
 	}
 
@@ -570,23 +563,23 @@ static integer c__5 = 5;
 /*        Lower triangular banded */
 
 	k = *kl;
-	i__2 = a_dim1 + 1;
-	d__1 = (real) (k + 1);
+	i__2 = a_subscr(1, 1);
+	r__1 = (real) (k + 1);
 	clarnd_(&q__2, &c__5, iseed);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	if (*n > 1) {
 /* Computing MIN */
 	    i__1 = *n - 1;
 	    i__2 = min(i__1,k);
-	    clarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    clarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    ccopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    ccopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L260: */
 	}
 
@@ -603,4 +596,8 @@ static integer c__5 = 5;
 /*     End of CTIMMG */
 
 } /* ctimmg_ */
+
+#undef a_ref
+#undef a_subscr
+
 

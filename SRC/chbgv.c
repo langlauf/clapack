@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int chbgv_(char *jobz, char *uplo, integer *n, integer *ka, 
 	integer *kb, complex *ab, integer *ldab, complex *bb, integer *ldbb, 
-	real *w, complex *z, integer *ldz, complex *work, real *rwork, 
+	real *w, complex *z__, integer *ldz, complex *work, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -14,8 +15,7 @@
     Purpose   
     =======   
 
-    CHBGV computes all the eigenvalues, and optionally, the eigenvectors 
-  
+    CHBGV computes all the eigenvalues, and optionally, the eigenvectors   
     of a complex generalized Hermitian-definite banded eigenproblem, of   
     the form A*x=(lambda)*B*x. Here A and B are assumed to be Hermitian   
     and banded, and B is also positive definite.   
@@ -45,13 +45,10 @@
     AB      (input/output) COMPLEX array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the Hermitian band   
             matrix A, stored in the first ka+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(ka+1+i-j,j) = A(i,j) for max(1,j-ka)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+ka). 
-  
+            if UPLO = 'U', AB(ka+1+i-j,j) = A(i,j) for max(1,j-ka)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+ka).   
 
             On exit, the contents of AB are destroyed.   
 
@@ -61,13 +58,10 @@
     BB      (input/output) COMPLEX array, dimension (LDBB, N)   
             On entry, the upper or lower triangle of the Hermitian band   
             matrix B, stored in the first kb+1 rows of the array.  The   
-            j-th column of B is stored in the j-th column of the array BB 
-  
+            j-th column of B is stored in the j-th column of the array BB   
             as follows:   
-            if UPLO = 'U', BB(kb+1+i-j,j) = B(i,j) for max(1,j-kb)<=i<=j; 
-  
-            if UPLO = 'L', BB(1+i-j,j)    = B(i,j) for j<=i<=min(n,j+kb). 
-  
+            if UPLO = 'U', BB(kb+1+i-j,j) = B(i,j) for max(1,j-kb)<=i<=j;   
+            if UPLO = 'L', BB(1+i-j,j)    = B(i,j) for j<=i<=min(n,j+kb).   
 
             On exit, the factor S from the split Cholesky factorization   
             B = S**H*S, as returned by CPBSTF.   
@@ -105,15 +99,12 @@
                       The factorization of B could not be completed and   
                       no eigenvalues or eigenvectors were computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, bb_dim1, bb_offset, z_dim1, z_offset, i__1;
     /* Local variables */
@@ -133,15 +124,20 @@
 	    complex *, integer *, real *, integer *), ssterf_(integer 
 	    *, real *, real *, integer *);
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    bb_dim1 = *ldbb;
+    bb_offset = 1 + bb_dim1 * 1;
+    bb -= bb_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define BB(I,J) bb[(I)-1 + ((J)-1)* ( *ldbb)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     upper = lsame_(uplo, "U");
 
@@ -177,7 +173,7 @@
 
 /*     Form a split Cholesky factorization of B. */
 
-    cpbstf_(uplo, n, kb, &BB(1,1), ldbb, info);
+    cpbstf_(uplo, n, kb, &bb[bb_offset], ldbb, info);
     if (*info != 0) {
 	*info = *n + *info;
 	return 0;
@@ -187,8 +183,8 @@
 
     inde = 1;
     indwrk = inde + *n;
-    chbgst_(jobz, uplo, n, ka, kb, &AB(1,1), ldab, &BB(1,1), ldbb,
-	     &Z(1,1), ldz, &WORK(1), &RWORK(indwrk), &iinfo);
+    chbgst_(jobz, uplo, n, ka, kb, &ab[ab_offset], ldab, &bb[bb_offset], ldbb,
+	     &z__[z_offset], ldz, &work[1], &rwork[indwrk], &iinfo);
 
 /*     Reduce to tridiagonal form. */
 
@@ -197,16 +193,16 @@
     } else {
 	*(unsigned char *)vect = 'N';
     }
-    chbtrd_(vect, uplo, n, ka, &AB(1,1), ldab, &W(1), &RWORK(inde), &Z(1,1), ldz, &WORK(1), &iinfo);
+    chbtrd_(vect, uplo, n, ka, &ab[ab_offset], ldab, &w[1], &rwork[inde], &
+	    z__[z_offset], ldz, &work[1], &iinfo);
 
-/*     For eigenvalues only, call SSTERF.  For eigenvectors, call CSTEQR. 
-*/
+/*     For eigenvalues only, call SSTERF.  For eigenvectors, call CSTEQR. */
 
     if (! wantz) {
-	ssterf_(n, &W(1), &RWORK(inde), info);
+	ssterf_(n, &w[1], &rwork[inde], info);
     } else {
-	csteqr_(jobz, n, &W(1), &RWORK(inde), &Z(1,1), ldz, &RWORK(
-		indwrk), info);
+	csteqr_(jobz, n, &w[1], &rwork[inde], &z__[z_offset], ldz, &rwork[
+		indwrk], info);
     }
     return 0;
 

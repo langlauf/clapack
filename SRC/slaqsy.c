@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaqsy_(char *uplo, integer *n, real *a, integer *lda, 
 	real *s, real *scond, real *amax, char *equed)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -28,13 +29,11 @@
             The order of the matrix A.  N >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
             n by n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of A contains the lower 
-  
+            leading n by n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -56,46 +55,42 @@
     EQUED   (output) CHARACTER*1   
             Specifies whether or not equilibration was done.   
             = 'N':  No equilibration.   
-            = 'Y':  Equilibration was done, i.e., A has been replaced by 
-  
+            = 'Y':  Equilibration was done, i.e., A has been replaced by   
                     diag(S) * A * diag(S).   
 
     Internal Parameters   
     ===================   
 
-    THRESH is a threshold value used to decide if scaling should be done 
-  
+    THRESH is a threshold value used to decide if scaling should be done   
     based on the ratio of the scaling factors.  If SCOND < THRESH,   
     scaling is done.   
 
-    LARGE and SMALL are threshold values used to decide if scaling should 
-  
+    LARGE and SMALL are threshold values used to decide if scaling should   
     be done based on the absolute size of the largest matrix element.   
     If AMAX > LARGE or AMAX < SMALL, scaling is done.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real large;
     extern logical lsame_(char *, char *);
     static real small, cj;
     extern doublereal slamch_(char *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --s;
 
-#define S(I) s[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (*n <= 0) {
 	*(unsigned char *)equed = 'N';
 	return 0;
@@ -120,11 +115,11 @@
 /*           Upper triangle of A is stored. */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = S(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = s[j];
 		i__2 = j;
-		for (i = 1; i <= j; ++i) {
-		    A(i,j) = cj * S(i) * A(i,j);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = cj * s[i__] * a_ref(i__, j);
 /* L10: */
 		}
 /* L20: */
@@ -134,11 +129,11 @@
 /*           Lower triangle of A is stored. */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = S(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = s[j];
 		i__2 = *n;
-		for (i = j; i <= *n; ++i) {
-		    A(i,j) = cj * S(i) * A(i,j);
+		for (i__ = j; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = cj * s[i__] * a_ref(i__, j);
 /* L30: */
 		}
 /* L40: */
@@ -152,4 +147,7 @@
 /*     End of SLAQSY */
 
 } /* slaqsy_ */
+
+#undef a_ref
+
 

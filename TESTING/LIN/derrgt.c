@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,8 @@ static integer c__1 = 1;
 
     /* Local variables */
     static integer info;
-    static doublereal b[2], c[2], d[2], e[2], f[2], w[2], x[2], rcond, anorm;
+    static doublereal b[2], c__[2], d__[2], e[2], f[2], w[2], x[2], rcond, 
+	    anorm;
     static char c2[2];
     static doublereal r1[2], r2[2], cf[2], df[2], ef[2];
     static integer ip[2], iw[2];
@@ -69,7 +71,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -90,17 +92,16 @@ static integer c__1 = 1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
-    d[0] = 1.;
-    d[1] = 2.;
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
+    d__[0] = 1.;
+    d__[1] = 2.;
     df[0] = 1.;
     df[1] = 2.;
     e[0] = 3.;
@@ -116,75 +117,75 @@ static integer c__1 = 1;
 
           DGTTRF */
 
-	s_copy(srnamc_1.srnamt, "DGTTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgttrf_(&c_n1, c, d, e, f, ip, &info);
+	dgttrf_(&c_n1, c__, d__, e, f, ip, &info);
 	chkxer_("DGTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DGTTRS */
 
-	s_copy(srnamc_1.srnamt, "DGTTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgttrs_("/", &c__0, &c__0, c, d, e, f, ip, x, &c__1, &info);
+	dgttrs_("/", &c__0, &c__0, c__, d__, e, f, ip, x, &c__1, &info);
 	chkxer_("DGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgttrs_("N", &c_n1, &c__0, c, d, e, f, ip, x, &c__1, &info);
+	dgttrs_("N", &c_n1, &c__0, c__, d__, e, f, ip, x, &c__1, &info);
 	chkxer_("DGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dgttrs_("N", &c__0, &c_n1, c, d, e, f, ip, x, &c__1, &info);
+	dgttrs_("N", &c__0, &c_n1, c__, d__, e, f, ip, x, &c__1, &info);
 	chkxer_("DGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dgttrs_("N", &c__2, &c__1, c, d, e, f, ip, x, &c__1, &info);
+	dgttrs_("N", &c__2, &c__1, c__, d__, e, f, ip, x, &c__1, &info);
 	chkxer_("DGTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DGTRFS */
 
-	s_copy(srnamc_1.srnamt, "DGTRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgtrfs_("/", &c__0, &c__0, c, d, e, cf, df, ef, f, ip, b, &c__1, x, &
-		c__1, r1, r2, w, iw, &info);
+	dgtrfs_("/", &c__0, &c__0, c__, d__, e, cf, df, ef, f, ip, b, &c__1, 
+		x, &c__1, r1, r2, w, iw, &info);
 	chkxer_("DGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgtrfs_("N", &c_n1, &c__0, c, d, e, cf, df, ef, f, ip, b, &c__1, x, &
-		c__1, r1, r2, w, iw, &info);
+	dgtrfs_("N", &c_n1, &c__0, c__, d__, e, cf, df, ef, f, ip, b, &c__1, 
+		x, &c__1, r1, r2, w, iw, &info);
 	chkxer_("DGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dgtrfs_("N", &c__0, &c_n1, c, d, e, cf, df, ef, f, ip, b, &c__1, x, &
-		c__1, r1, r2, w, iw, &info);
+	dgtrfs_("N", &c__0, &c_n1, c__, d__, e, cf, df, ef, f, ip, b, &c__1, 
+		x, &c__1, r1, r2, w, iw, &info);
 	chkxer_("DGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dgtrfs_("N", &c__2, &c__1, c, d, e, cf, df, ef, f, ip, b, &c__1, x, &
-		c__2, r1, r2, w, iw, &info);
+	dgtrfs_("N", &c__2, &c__1, c__, d__, e, cf, df, ef, f, ip, b, &c__1, 
+		x, &c__2, r1, r2, w, iw, &info);
 	chkxer_("DGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	dgtrfs_("N", &c__2, &c__1, c, d, e, cf, df, ef, f, ip, b, &c__2, x, &
-		c__1, r1, r2, w, iw, &info);
+	dgtrfs_("N", &c__2, &c__1, c__, d__, e, cf, df, ef, f, ip, b, &c__2, 
+		x, &c__1, r1, r2, w, iw, &info);
 	chkxer_("DGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DGTCON */
 
-	s_copy(srnamc_1.srnamt, "DGTCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgtcon_("/", &c__0, c, d, e, f, ip, &anorm, &rcond, w, iw, &info);
+	dgtcon_("/", &c__0, c__, d__, e, f, ip, &anorm, &rcond, w, iw, &info);
 	chkxer_("DGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgtcon_("I", &c_n1, c, d, e, f, ip, &anorm, &rcond, w, iw, &info);
+	dgtcon_("I", &c_n1, c__, d__, e, f, ip, &anorm, &rcond, w, iw, &info);
 	chkxer_("DGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	d__1 = -anorm;
-	dgtcon_("I", &c__0, c, d, e, f, ip, &d__1, &rcond, w, iw, &info);
+	dgtcon_("I", &c__0, c__, d__, e, f, ip, &d__1, &rcond, w, iw, &info);
 	chkxer_("DGTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -195,62 +196,62 @@ static integer c__1 = 1;
 
           DPTTRF */
 
-	s_copy(srnamc_1.srnamt, "DPTTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dpttrf_(&c_n1, d, e, &info);
+	dpttrf_(&c_n1, d__, e, &info);
 	chkxer_("DPTTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DPTTRS */
 
-	s_copy(srnamc_1.srnamt, "DPTTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dpttrs_(&c_n1, &c__0, d, e, x, &c__1, &info);
+	dpttrs_(&c_n1, &c__0, d__, e, x, &c__1, &info);
 	chkxer_("DPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dpttrs_(&c__0, &c_n1, d, e, x, &c__1, &info);
+	dpttrs_(&c__0, &c_n1, d__, e, x, &c__1, &info);
 	chkxer_("DPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dpttrs_(&c__2, &c__1, d, e, x, &c__1, &info);
+	dpttrs_(&c__2, &c__1, d__, e, x, &c__1, &info);
 	chkxer_("DPTTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DPTRFS */
 
-	s_copy(srnamc_1.srnamt, "DPTRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dptrfs_(&c_n1, &c__0, d, e, df, ef, b, &c__1, x, &c__1, r1, r2, w, &
+	dptrfs_(&c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, w, &
 		info);
 	chkxer_("DPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dptrfs_(&c__0, &c_n1, d, e, df, ef, b, &c__1, x, &c__1, r1, r2, w, &
+	dptrfs_(&c__0, &c_n1, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, w, &
 		info);
 	chkxer_("DPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dptrfs_(&c__2, &c__1, d, e, df, ef, b, &c__1, x, &c__2, r1, r2, w, &
+	dptrfs_(&c__2, &c__1, d__, e, df, ef, b, &c__1, x, &c__2, r1, r2, w, &
 		info);
 	chkxer_("DPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dptrfs_(&c__2, &c__1, d, e, df, ef, b, &c__2, x, &c__1, r1, r2, w, &
+	dptrfs_(&c__2, &c__1, d__, e, df, ef, b, &c__2, x, &c__1, r1, r2, w, &
 		info);
 	chkxer_("DPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DPTCON */
 
-	s_copy(srnamc_1.srnamt, "DPTCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dptcon_(&c_n1, d, e, &anorm, &rcond, w, &info);
+	dptcon_(&c_n1, d__, e, &anorm, &rcond, w, &info);
 	chkxer_("DPTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
 	d__1 = -anorm;
-	dptcon_(&c__0, d, e, &d__1, &rcond, w, &info);
+	dptcon_(&c__0, d__, e, &d__1, &rcond, w, &info);
 	chkxer_("DPTCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
     }

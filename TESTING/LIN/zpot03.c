@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ static doublecomplex c_b1 = {0.,0.};
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     extern /* Subroutine */ int zhemm_(char *, char *, integer *, integer *, 
@@ -36,7 +37,13 @@ static doublecomplex c_b1 = {0.,0.};
     static doublereal ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define ainv_subscr(a_1,a_2) (a_2)*ainv_dim1 + a_1
+#define ainv_ref(a_1,a_2) ainv[ainv_subscr(a_1,a_2)]
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -69,24 +76,20 @@ static doublecomplex c_b1 = {0.,0.};
             The leading dimension of the array A.  LDA >= max(1,N)   
 
     AINV    (input/output) COMPLEX*16 array, dimension (LDAINV,N)   
-            On entry, the inverse of the matrix A, stored as a Hermitian 
-  
+            On entry, the inverse of the matrix A, stored as a Hermitian   
             matrix in the same format as A.   
             In this version, AINV is expanded into a full matrix and   
             multiplied by A, so the opposing triangle of AINV will be   
             changed; i.e., if the upper triangular part of AINV is   
-            stored, the lower triangular part will be used as work space. 
-  
+            stored, the lower triangular part will be used as work space.   
 
     LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N). 
-  
+            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
 
@@ -97,21 +100,20 @@ static doublecomplex c_b1 = {0.,0.};
     RESID   (output) DOUBLE PRECISION   
             norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = ainv_dim1 + 1;
+    ainv_offset = 1 + ainv_dim1 * 1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -141,9 +143,9 @@ static doublecomplex c_b1 = {0.,0.};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = j + i * ainv_dim1;
-		d_cnjg(&z__1, &ainv[i + j * ainv_dim1]);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = ainv_subscr(j, i__);
+		d_cnjg(&z__1, &ainv_ref(i__, j));
 		ainv[i__3].r = z__1.r, ainv[i__3].i = z__1.i;
 /* L10: */
 	    }
@@ -153,9 +155,9 @@ static doublecomplex c_b1 = {0.,0.};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j + 1; i <= i__2; ++i) {
-		i__3 = j + i * ainv_dim1;
-		d_cnjg(&z__1, &ainv[i + j * ainv_dim1]);
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		i__3 = ainv_subscr(j, i__);
+		d_cnjg(&z__1, &ainv_ref(i__, j));
 		ainv[i__3].r = z__1.r, ainv[i__3].i = z__1.i;
 /* L30: */
 	    }
@@ -169,9 +171,9 @@ static doublecomplex c_b1 = {0.,0.};
 /*     Add the identity matrix to WORK . */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * work_dim1;
-	i__3 = i + i * work_dim1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = work_subscr(i__, i__);
+	i__3 = work_subscr(i__, i__);
 	z__1.r = work[i__3].r + 1., z__1.i = work[i__3].i + 0.;
 	work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L50: */
@@ -188,4 +190,10 @@ static doublecomplex c_b1 = {0.,0.};
 /*     End of ZPOT03 */
 
 } /* zpot03_ */
+
+#undef work_ref
+#undef work_subscr
+#undef ainv_ref
+#undef ainv_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -9,7 +10,7 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int sptt05_(integer *n, integer *nrhs, real *d, real *e, 
+/* Subroutine */ int sptt05_(integer *n, integer *nrhs, real *d__, real *e, 
 	real *b, integer *ldb, real *x, integer *ldx, real *xact, integer *
 	ldxact, real *ferr, real *berr, real *reslts)
 {
@@ -22,7 +23,7 @@ static integer c__1 = 1;
     static real diff, axbi;
     static integer imax;
     static real unfl, ovfl;
-    static integer i, j, k;
+    static integer i__, j, k;
     static real xnorm;
     extern doublereal slamch_(char *);
     static integer nz;
@@ -31,7 +32,12 @@ static integer c__1 = 1;
     static real eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_ref(a_1,a_2) xact[(a_2)*xact_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -52,8 +58,7 @@ static integer c__1 = 1;
     RESLTS(2) = residual from the iterative refinement routine   
               = the maximum of BERR / ( NZ*EPS + (*) ), where   
                 (*) = NZ*UNFL / (min_i (abs(A)*abs(X) +abs(b))_i )   
-                and NZ = max. number of nonzeros in any row of A, plus 1 
-  
+                and NZ = max. number of nonzeros in any row of A, plus 1   
 
     Arguments   
     =========   
@@ -91,21 +96,17 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     FERR    (input) REAL array, dimension (NRHS)   
             The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude 
-  
-            of the largest entry in (X - XTRUE) divided by the magnitude 
-  
+            X.  If XTRUE is the true solution, FERR bounds the magnitude   
+            of the largest entry in (X - XTRUE) divided by the magnitude   
             of the largest entry in X.   
 
     BERR    (input) REAL array, dimension (NRHS)   
             The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A 
-  
+            vector (i.e., the smallest relative change in any entry of A   
             or B that makes X an exact solution).   
 
     RESLTS  (output) REAL array, dimension (2)   
@@ -113,23 +114,22 @@ static integer c__1 = 1;
             RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
             RESLTS(2) = BERR / ( NZ*EPS + (*) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -154,16 +154,16 @@ static integer c__1 = 1;
     errbnd = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = isamax_(n, &x[j * x_dim1 + 1], &c__1);
+	imax = isamax_(n, &x_ref(1, j), &c__1);
 /* Computing MAX */
-	r__2 = (r__1 = x[imax + j * x_dim1], dabs(r__1));
+	r__2 = (r__1 = x_ref(imax, j), dabs(r__1));
 	xnorm = dmax(r__2,unfl);
 	diff = 0.f;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    r__2 = diff, r__3 = (r__1 = x[i + j * x_dim1] - xact[i + j * 
-		    xact_dim1], dabs(r__1));
+	    r__2 = diff, r__3 = (r__1 = x_ref(i__, j) - xact_ref(i__, j), 
+		    dabs(r__1));
 	    diff = dmax(r__2,r__3);
 /* L10: */
 	}
@@ -196,24 +196,24 @@ L30:
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	if (*n == 1) {
-	    axbi = (r__1 = b[k * b_dim1 + 1], dabs(r__1)) + (r__2 = d[1] * x[
-		    k * x_dim1 + 1], dabs(r__2));
+	    axbi = (r__1 = b_ref(1, k), dabs(r__1)) + (r__2 = d__[1] * x_ref(
+		    1, k), dabs(r__2));
 	} else {
-	    axbi = (r__1 = b[k * b_dim1 + 1], dabs(r__1)) + (r__2 = d[1] * x[
-		    k * x_dim1 + 1], dabs(r__2)) + (r__3 = e[1] * x[k * 
-		    x_dim1 + 2], dabs(r__3));
+	    axbi = (r__1 = b_ref(1, k), dabs(r__1)) + (r__2 = d__[1] * x_ref(
+		    1, k), dabs(r__2)) + (r__3 = e[1] * x_ref(2, k), dabs(
+		    r__3));
 	    i__2 = *n - 1;
-	    for (i = 2; i <= i__2; ++i) {
-		tmp = (r__1 = b[i + k * b_dim1], dabs(r__1)) + (r__2 = e[i - 
-			1] * x[i - 1 + k * x_dim1], dabs(r__2)) + (r__3 = d[i]
-			 * x[i + k * x_dim1], dabs(r__3)) + (r__4 = e[i] * x[
-			i + 1 + k * x_dim1], dabs(r__4));
+	    for (i__ = 2; i__ <= i__2; ++i__) {
+		tmp = (r__1 = b_ref(i__, k), dabs(r__1)) + (r__2 = e[i__ - 1] 
+			* x_ref(i__ - 1, k), dabs(r__2)) + (r__3 = d__[i__] * 
+			x_ref(i__, k), dabs(r__3)) + (r__4 = e[i__] * x_ref(
+			i__ + 1, k), dabs(r__4));
 		axbi = dmin(axbi,tmp);
 /* L40: */
 	    }
-	    tmp = (r__1 = b[*n + k * b_dim1], dabs(r__1)) + (r__2 = e[*n - 1] 
-		    * x[*n - 1 + k * x_dim1], dabs(r__2)) + (r__3 = d[*n] * x[
-		    *n + k * x_dim1], dabs(r__3));
+	    tmp = (r__1 = b_ref(*n, k), dabs(r__1)) + (r__2 = e[*n - 1] * 
+		    x_ref(*n - 1, k), dabs(r__2)) + (r__3 = d__[*n] * x_ref(*
+		    n, k), dabs(r__3));
 	    axbi = dmin(axbi,tmp);
 	}
 /* Computing MAX */
@@ -232,4 +232,9 @@ L30:
 /*     End of SPTT05 */
 
 } /* sptt05_ */
+
+#undef x_ref
+#undef b_ref
+#undef xact_ref
+
 

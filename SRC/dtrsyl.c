@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dtrsyl_(char *trana, char *tranb, integer *isgn, integer 
 	*m, integer *n, doublereal *a, integer *lda, doublereal *b, integer *
-	ldb, doublereal *c, integer *ldc, doublereal *scale, integer *info)
+	ldb, doublereal *c__, integer *ldc, doublereal *scale, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -23,8 +24,7 @@
     the solution X are M-by-N; and scale is an output scale factor, set   
     <= 1 to avoid overflow in X.   
 
-    A and B must be in Schur canonical form (as returned by DHSEQR), that 
-  
+    A and B must be in Schur canonical form (as returned by DHSEQR), that   
     is, block upper triangular with 1-by-1 and 2-by-2 diagonal blocks;   
     each 2-by-2 diagonal block has its diagonal elements equal and its   
     off-diagonal elements of opposite sign.   
@@ -58,15 +58,13 @@
             matrices X and C. N >= 0.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
-            The upper quasi-triangular matrix A, in Schur canonical form. 
-  
+            The upper quasi-triangular matrix A, in Schur canonical form.   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A. LDA >= max(1,M).   
 
     B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
-            The upper quasi-triangular matrix B, in Schur canonical form. 
-  
+            The upper quasi-triangular matrix B, in Schur canonical form.   
 
     LDB     (input) INTEGER   
             The leading dimension of the array B. LDB >= max(1,N).   
@@ -84,21 +82,16 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            = 1: A and B have common or very close eigenvalues; perturbed 
-  
-                 values were used to solve the equation (but the matrices 
-  
+            = 1: A and B have common or very close eigenvalues; perturbed   
+                 values were used to solve the equation (but the matrices   
                  A and B are unchanged).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static logical c_false = FALSE_;
@@ -141,25 +134,33 @@
     static logical notrna, notrnb;
     static doublereal smlnum, da11, vec[4]	/* was [2][2] */, dum[1], eps,
 	     sgn;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*2 + a_1 - 3]
+#define vec_ref(a_1,a_2) vec[(a_2)*2 + a_1 - 3]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
 
-#define X(I) x[(I)]
-#define WAS(I) was[(I)]
-#define DUM(I) dum[(I)]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     notrna = lsame_(trana, "N");
     notrnb = lsame_(tranb, "N");
 
     *info = 0;
-    if (! notrna && ! lsame_(trana, "T") && ! lsame_(trana, "C")) {
+    if (! notrna && ! lsame_(trana, "T") && ! lsame_(
+	    trana, "C")) {
 	*info = -1;
-    } else if (! notrnb && ! lsame_(tranb, "T") && ! lsame_(tranb, 
-	    "C")) {
+    } else if (! notrnb && ! lsame_(tranb, "T") && ! 
+	    lsame_(tranb, "C")) {
 	*info = -2;
     } else if (*isgn != 1 && *isgn != -1) {
 	*info = -3;
@@ -196,8 +197,8 @@
     bignum = 1. / smlnum;
 
 /* Computing MAX */
-    d__1 = smlnum, d__2 = eps * dlange_("M", m, m, &A(1,1), lda, dum)
-	    , d__1 = max(d__1,d__2), d__2 = eps * dlange_("M", n, n, &B(1,1), ldb, dum);
+    d__1 = smlnum, d__2 = eps * dlange_("M", m, m, &a[a_offset], lda, dum), d__1 = max(d__1,d__2), d__2 = eps * dlange_("M", n, n, 
+	    &b[b_offset], ldb, dum);
     smin = max(d__1,d__2);
 
     *scale = 1.;
@@ -218,12 +219,11 @@
                   I=K+1                       J=1   
 
           Start column loop (index = L)   
-          L1 (L2) : column index of the first (first) row of X(K,L). 
-*/
+          L1 (L2) : column index of the first (first) row of X(K,L). */
 
 	lnext = 1;
 	i__1 = *n;
-	for (l = 1; l <= *n; ++l) {
+	for (l = 1; l <= i__1; ++l) {
 	    if (l < lnext) {
 		goto L60;
 	    }
@@ -231,7 +231,7 @@
 		l1 = l;
 		l2 = l;
 	    } else {
-		if (B(l+1,l) != 0.) {
+		if (b_ref(l + 1, l) != 0.) {
 		    l1 = l;
 		    l2 = l + 1;
 		    lnext = l + 2;
@@ -243,8 +243,7 @@
 	    }
 
 /*           Start row loop (index = K)   
-             K1 (K2): row index of the first (last) row of X(K,L).
- */
+             K1 (K2): row index of the first (last) row of X(K,L). */
 
 	    knext = *m;
 	    for (k = *m; k >= 1; --k) {
@@ -255,7 +254,7 @@
 		    k1 = k;
 		    k2 = k;
 		} else {
-		    if (A(k,k-1) != 0.) {
+		    if (a_ref(k, k - 1) != 0.) {
 			k1 = k - 1;
 			k2 = k;
 			knext = k - 2;
@@ -267,193 +266,205 @@
 		}
 
 		if (l1 == l2 && k1 == k2) {
-		    i__2 = *m - k1;
+/* Computing MIN */
+		    i__2 = k1 + 1;
 /* Computing MIN */
 		    i__3 = k1 + 1;
-/* Computing MIN */
-		    i__4 = k1 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l1), &c__1);
+		    i__4 = *m - k1;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 		    scaloc = 1.;
 
-		    a11 = A(k1,k1) + sgn * B(l1,l1);
+		    a11 = a_ref(k1, k1) + sgn * b_ref(l1, l1);
 		    da11 = abs(a11);
 		    if (da11 <= smin) {
 			a11 = smin;
 			da11 = smin;
 			*info = 1;
 		    }
-		    db = abs(vec[0]);
+		    db = (d__1 = vec_ref(1, 1), abs(d__1));
 		    if (da11 < 1. && db > 1.) {
 			if (db > bignum * da11) {
 			    scaloc = 1. / db;
 			}
 		    }
-		    X(0) = vec[0] * scaloc / a11;
+		    x_ref(1, 1) = vec_ref(1, 1) * scaloc / a11;
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L10: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
+		    c___ref(k1, l1) = x_ref(1, 1);
 
 		} else if (l1 == l2 && k1 != k2) {
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k2, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k2,1), ldc, &B(1,l1), &c__1);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k2, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    d__1 = -sgn * B(l1,l1);
-		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &A(k1,k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1,
-			     &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * b_ref(l1, l1);
+		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &a_ref(k1, 
+			    k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L20: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k2,l1) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k2, l1) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 == k2) {
 
-		    i__2 = *m - k1;
+/* Computing MIN */
+		    i__2 = k1 + 1;
 /* Computing MIN */
 		    i__3 = k1 + 1;
-/* Computing MIN */
-		    i__4 = k1 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l1), &c__1);
+		    i__4 = *m - k1;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = sgn * (C(k1,l1) - (suml + sgn * sumr))
-			    ;
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = sgn * (c___ref(k1, l1) - (suml + sgn * 
+			    sumr));
 
-		    i__2 = *m - k1;
+/* Computing MIN */
+		    i__2 = k1 + 1;
 /* Computing MIN */
 		    i__3 = k1 + 1;
-/* Computing MIN */
-		    i__4 = k1 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l2), &c__1);
+		    i__4 = *m - k1;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l2), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l2), &c__1);
-		    vec[1] = sgn * (C(k1,l2) - (suml + sgn * sumr))
-			    ;
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(2, 1) = sgn * (c___ref(k1, l2) - (suml + sgn * 
+			    sumr));
 
-		    d__1 = -sgn * A(k1,k1);
-		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &B(l1,l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, 
-			    &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * a_ref(k1, k1);
+		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &b_ref(l1, 
+			    l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L30: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 != k2) {
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l2), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k1, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l2), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k1,1), ldc, &B(1,l2), &c__1);
-		    vec[2] = C(k1,l2) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k1, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(1, 2) = c___ref(k1, l2) - (suml + sgn * sumr);
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k2, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l1), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k2,1), ldc, &B(1,l1), &c__1);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k2, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    i__2 = *m - k2;
+/* Computing MIN */
+		    i__2 = k2 + 1;
 /* Computing MIN */
 		    i__3 = k2 + 1;
-/* Computing MIN */
-		    i__4 = k2 + 1;
-		    suml = ddot_(&i__2, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l2), &c__1);
+		    i__4 = *m - k2;
+		    suml = ddot_(&i__4, &a_ref(k2, min(i__2,*m)), lda, &
+			    c___ref(min(i__3,*m), l2), &c__1);
 		    i__2 = l1 - 1;
-		    sumr = ddot_(&i__2, &C(k2,1), ldc, &B(1,l2), &c__1);
-		    vec[3] = C(k2,l2) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__2, &c___ref(k2, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(2, 2) = c___ref(k2, l2) - (suml + sgn * sumr);
 
-		    dlasy2_(&c_false, &c_false, isgn, &c__2, &c__2, &A(k1,k1), lda, &B(l1,l1), ldb, vec,
-			     &c__2, &scaloc, x, &c__2, &xnorm, &ierr);
+		    dlasy2_(&c_false, &c_false, isgn, &c__2, &c__2, &a_ref(k1,
+			     k1), lda, &b_ref(l1, l1), ldb, vec, &c__2, &
+			    scaloc, x, &c__2, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L40: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(2);
-		    C(k2,l1) = X(1);
-		    C(k2,l2) = X(3);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(1, 2);
+		    c___ref(k2, l1) = x_ref(2, 1);
+		    c___ref(k2, l2) = x_ref(2, 2);
 		}
 
 L50:
@@ -483,7 +494,7 @@ L60:
 
 	lnext = 1;
 	i__1 = *n;
-	for (l = 1; l <= *n; ++l) {
+	for (l = 1; l <= i__1; ++l) {
 	    if (l < lnext) {
 		goto L120;
 	    }
@@ -491,7 +502,7 @@ L60:
 		l1 = l;
 		l2 = l;
 	    } else {
-		if (B(l+1,l) != 0.) {
+		if (b_ref(l + 1, l) != 0.) {
 		    l1 = l;
 		    l2 = l + 1;
 		    lnext = l + 2;
@@ -503,12 +514,11 @@ L60:
 	    }
 
 /*           Start row loop (index = K)   
-             K1 (K2): row index of the first (last) row of X(K,L) 
-*/
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = 1;
 	    i__2 = *m;
-	    for (k = 1; k <= *m; ++k) {
+	    for (k = 1; k <= i__2; ++k) {
 		if (k < knext) {
 		    goto L110;
 		}
@@ -516,7 +526,7 @@ L60:
 		    k1 = k;
 		    k2 = k;
 		} else {
-		    if (A(k+1,k) != 0.) {
+		    if (a_ref(k + 1, k) != 0.) {
 			k1 = k;
 			k2 = k + 1;
 			knext = k + 2;
@@ -529,147 +539,168 @@ L60:
 
 		if (l1 == l2 && k1 == k2) {
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 		    scaloc = 1.;
 
-		    a11 = A(k1,k1) + sgn * B(l1,l1);
+		    a11 = a_ref(k1, k1) + sgn * b_ref(l1, l1);
 		    da11 = abs(a11);
 		    if (da11 <= smin) {
 			a11 = smin;
 			da11 = smin;
 			*info = 1;
 		    }
-		    db = abs(vec[0]);
+		    db = (d__1 = vec_ref(1, 1), abs(d__1));
 		    if (da11 < 1. && db > 1.) {
 			if (db > bignum * da11) {
 			    scaloc = 1. / db;
 			}
 		    }
-		    X(0) = vec[0] * scaloc / a11;
+		    x_ref(1, 1) = vec_ref(1, 1) * scaloc / a11;
 
 		    if (scaloc != 1.) {
 			i__3 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__3; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L70: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
+		    c___ref(k1, l1) = x_ref(1, 1);
 
 		} else if (l1 == l2 && k1 != k2) {
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k2), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k2), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k2,1), ldc, &B(1,l1), &c__1);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k2, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    d__1 = -sgn * B(l1,l1);
-		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &A(k1,k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, 
-			    &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * b_ref(l1, l1);
+		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &a_ref(k1, 
+			    k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__3 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__3; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L80: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k2,l1) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k2, l1) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 == k2) {
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = sgn * (C(k1,l1) - (suml + sgn * sumr))
-			    ;
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = sgn * (c___ref(k1, l1) - (suml + sgn * 
+			    sumr));
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l2), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l2),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l2), &c__1);
-		    vec[1] = sgn * (C(k1,l2) - (suml + sgn * sumr))
-			    ;
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(2, 1) = sgn * (c___ref(k1, l2) - (suml + sgn * 
+			    sumr));
 
-		    d__1 = -sgn * A(k1,k1);
-		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &B(l1,l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, 
-			    &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * a_ref(k1, k1);
+		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &b_ref(l1, 
+			    l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__3 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__3; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L90: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 != k2) {
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l1), &c__1);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k1), &c__1, &C(1,l2), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k1), &c__1, &c___ref(1, l2),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k1,1), ldc, &B(1,l2), &c__1);
-		    vec[2] = C(k1,l2) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k1, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(1, 2) = c___ref(k1, l2) - (suml + sgn * sumr);
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k2), &c__1, &C(1,l1), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k2), &c__1, &c___ref(1, l1),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k2,1), ldc, &B(1,l1), &c__1);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k2, 1), ldc, &b_ref(1, l1), &
+			    c__1);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
 		    i__3 = k1 - 1;
-		    suml = ddot_(&i__3, &A(1,k2), &c__1, &C(1,l2), &c__1);
+		    suml = ddot_(&i__3, &a_ref(1, k2), &c__1, &c___ref(1, l2),
+			     &c__1);
 		    i__3 = l1 - 1;
-		    sumr = ddot_(&i__3, &C(k2,1), ldc, &B(1,l2), &c__1);
-		    vec[3] = C(k2,l2) - (suml + sgn * sumr);
+		    sumr = ddot_(&i__3, &c___ref(k2, 1), ldc, &b_ref(1, l2), &
+			    c__1);
+		    vec_ref(2, 2) = c___ref(k2, l2) - (suml + sgn * sumr);
 
-		    dlasy2_(&c_true, &c_false, isgn, &c__2, &c__2, &A(k1,k1), lda, &B(l1,l1), ldb, vec, &
-			    c__2, &scaloc, x, &c__2, &xnorm, &ierr);
+		    dlasy2_(&c_true, &c_false, isgn, &c__2, &c__2, &a_ref(k1, 
+			    k1), lda, &b_ref(l1, l1), ldb, vec, &c__2, &
+			    scaloc, x, &c__2, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__3 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__3; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L100: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(2);
-		    C(k2,l1) = X(1);
-		    C(k2,l2) = X(3);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(1, 2);
+		    c___ref(k2, l1) = x_ref(2, 1);
+		    c___ref(k2, l2) = x_ref(2, 2);
 		}
 
 L110:
@@ -690,8 +721,7 @@ L120:
 
           Where   
                        K-1                          N   
-              R(K,L) = SUM [A(I,K)'*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'
-].   
+              R(K,L) = SUM [A(I,K)'*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
                        I=1                        J=L+1   
 
           Start column loop (index = L)   
@@ -706,7 +736,7 @@ L120:
 		l1 = l;
 		l2 = l;
 	    } else {
-		if (B(l,l-1) != 0.) {
+		if (b_ref(l, l - 1) != 0.) {
 		    l1 = l - 1;
 		    l2 = l;
 		    lnext = l - 2;
@@ -718,12 +748,11 @@ L120:
 	    }
 
 /*           Start row loop (index = K)   
-             K1 (K2): row index of the first (last) row of X(K,L) 
-*/
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = 1;
 	    i__1 = *m;
-	    for (k = 1; k <= *m; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		if (k < knext) {
 		    goto L170;
 		}
@@ -731,7 +760,7 @@ L120:
 		    k1 = k;
 		    k2 = k;
 		} else {
-		    if (A(k+1,k) != 0.) {
+		    if (a_ref(k + 1, k) != 0.) {
 			k1 = k;
 			k2 = k + 1;
 			knext = k + 2;
@@ -744,192 +773,204 @@ L120:
 
 		if (l1 == l2 && k1 == k2) {
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l1;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l1 + 1;
 /* Computing MIN */
 		    i__3 = l1 + 1;
-/* Computing MIN */
-		    i__4 = l1 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l1+1,*n)), ldc, &
-			    B(l1,min(l1+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__4 = *n - l1;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 		    scaloc = 1.;
 
-		    a11 = A(k1,k1) + sgn * B(l1,l1);
+		    a11 = a_ref(k1, k1) + sgn * b_ref(l1, l1);
 		    da11 = abs(a11);
 		    if (da11 <= smin) {
 			a11 = smin;
 			da11 = smin;
 			*info = 1;
 		    }
-		    db = abs(vec[0]);
+		    db = (d__1 = vec_ref(1, 1), abs(d__1));
 		    if (da11 < 1. && db > 1.) {
 			if (db > bignum * da11) {
 			    scaloc = 1. / db;
 			}
 		    }
-		    X(0) = vec[0] * scaloc / a11;
+		    x_ref(1, 1) = vec_ref(1, 1) * scaloc / a11;
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L130: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
+		    c___ref(k1, l1) = x_ref(1, 1);
 
 		} else if (l1 == l2 && k1 != k2) {
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k2), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k2), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k2, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    d__1 = -sgn * B(l1,l1);
-		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &A(k1,k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, 
-			    &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * b_ref(l1, l1);
+		    dlaln2_(&c_true, &c__2, &c__1, &smin, &c_b26, &a_ref(k1, 
+			    k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L140: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k2,l1) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k2, l1) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 == k2) {
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = sgn * (C(k1,l1) - (suml + sgn * sumr))
-			    ;
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(1, 1) = sgn * (c___ref(k1, l1) - (suml + sgn * 
+			    sumr));
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l2), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l2),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[1] = sgn * (C(k1,l2) - (suml + sgn * sumr))
-			    ;
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l2, min(i__3,*n)), ldb);
+		    vec_ref(2, 1) = sgn * (c___ref(k1, l2) - (suml + sgn * 
+			    sumr));
 
-		    d__1 = -sgn * A(k1,k1);
-		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &B(l1,l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1,
-			     &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * a_ref(k1, k1);
+		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &b_ref(l1, 
+			    l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L150: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 != k2) {
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k1), &c__1, &C(1,l2), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k1), &c__1, &c___ref(1, l2),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[2] = C(k1,l2) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k1, min(i__2,*n)), ldc, &
+			    b_ref(l2, min(i__3,*n)), ldb);
+		    vec_ref(1, 2) = c___ref(k1, l2) - (suml + sgn * sumr);
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k2), &c__1, &C(1,l1), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k2), &c__1, &c___ref(1, l1),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k2, min(i__2,*n)), ldc, &
+			    b_ref(l1, min(i__3,*n)), ldb);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
 		    i__2 = k1 - 1;
-		    suml = ddot_(&i__2, &A(1,k2), &c__1, &C(1,l2), &c__1);
-		    i__2 = *n - l2;
+		    suml = ddot_(&i__2, &a_ref(1, k2), &c__1, &c___ref(1, l2),
+			     &c__1);
+/* Computing MIN */
+		    i__2 = l2 + 1;
 /* Computing MIN */
 		    i__3 = l2 + 1;
-/* Computing MIN */
-		    i__4 = l2 + 1;
-		    sumr = ddot_(&i__2, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[3] = C(k2,l2) - (suml + sgn * sumr);
+		    i__4 = *n - l2;
+		    sumr = ddot_(&i__4, &c___ref(k2, min(i__2,*n)), ldc, &
+			    b_ref(l2, min(i__3,*n)), ldb);
+		    vec_ref(2, 2) = c___ref(k2, l2) - (suml + sgn * sumr);
 
-		    dlasy2_(&c_true, &c_true, isgn, &c__2, &c__2, &A(k1,k1), lda, &B(l1,l1), ldb, vec, &
-			    c__2, &scaloc, x, &c__2, &xnorm, &ierr);
+		    dlasy2_(&c_true, &c_true, isgn, &c__2, &c__2, &a_ref(k1, 
+			    k1), lda, &b_ref(l1, l1), ldb, vec, &c__2, &
+			    scaloc, x, &c__2, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__2 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__2; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L160: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(2);
-		    C(k2,l1) = X(1);
-		    C(k2,l2) = X(3);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(1, 2);
+		    c___ref(k2, l1) = x_ref(2, 1);
+		    c___ref(k2, l2) = x_ref(2, 2);
 		}
 
 L170:
@@ -950,8 +991,7 @@ L180:
 
           Where   
                         M                          N   
-              R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)']
-.   
+              R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B(L,J)'].   
                       I=K+1                      J=L+1   
 
           Start column loop (index = L)   
@@ -966,7 +1006,7 @@ L180:
 		l1 = l;
 		l2 = l;
 	    } else {
-		if (B(l,l-1) != 0.) {
+		if (b_ref(l, l - 1) != 0.) {
 		    l1 = l - 1;
 		    l2 = l;
 		    lnext = l - 2;
@@ -978,8 +1018,7 @@ L180:
 	    }
 
 /*           Start row loop (index = K)   
-             K1 (K2): row index of the first (last) row of X(K,L) 
-*/
+             K1 (K2): row index of the first (last) row of X(K,L) */
 
 	    knext = *m;
 	    for (k = *m; k >= 1; --k) {
@@ -990,7 +1029,7 @@ L180:
 		    k1 = k;
 		    k2 = k;
 		} else {
-		    if (A(k,k-1) != 0.) {
+		    if (a_ref(k, k - 1) != 0.) {
 			k1 = k - 1;
 			k2 = k;
 			knext = k - 2;
@@ -1002,238 +1041,241 @@ L180:
 		}
 
 		if (l1 == l2 && k1 == k2) {
-		    i__1 = *m - k1;
+/* Computing MIN */
+		    i__1 = k1 + 1;
 /* Computing MIN */
 		    i__2 = k1 + 1;
+		    i__3 = *m - k1;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k1 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l1), &c__1);
-		    i__1 = *n - l1;
+		    i__1 = l1 + 1;
 /* Computing MIN */
 		    i__2 = l1 + 1;
-/* Computing MIN */
-		    i__3 = l1 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l1+1,*n)), ldc, &
-			    B(l1,min(l1+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__3 = *n - l1;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 		    scaloc = 1.;
 
-		    a11 = A(k1,k1) + sgn * B(l1,l1);
+		    a11 = a_ref(k1, k1) + sgn * b_ref(l1, l1);
 		    da11 = abs(a11);
 		    if (da11 <= smin) {
 			a11 = smin;
 			da11 = smin;
 			*info = 1;
 		    }
-		    db = abs(vec[0]);
+		    db = (d__1 = vec_ref(1, 1), abs(d__1));
 		    if (da11 < 1. && db > 1.) {
 			if (db > bignum * da11) {
 			    scaloc = 1. / db;
 			}
 		    }
-		    X(0) = vec[0] * scaloc / a11;
+		    x_ref(1, 1) = vec_ref(1, 1) * scaloc / a11;
 
 		    if (scaloc != 1.) {
 			i__1 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__1; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L190: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
+		    c___ref(k1, l1) = x_ref(1, 1);
 
 		} else if (l1 == l2 && k1 != k2) {
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k2, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k2, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    d__1 = -sgn * B(l1,l1);
-		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &A(k1,k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1,
-			     &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * b_ref(l1, l1);
+		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &a_ref(k1, 
+			    k1), lda, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__1 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__1; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L200: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k2,l1) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k2, l1) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 == k2) {
 
-		    i__1 = *m - k1;
+/* Computing MIN */
+		    i__1 = k1 + 1;
 /* Computing MIN */
 		    i__2 = k1 + 1;
+		    i__3 = *m - k1;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k1 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l1), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = sgn * (C(k1,l1) - (suml + sgn * sumr))
-			    ;
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(1, 1) = sgn * (c___ref(k1, l1) - (suml + sgn * 
+			    sumr));
 
-		    i__1 = *m - k1;
+/* Computing MIN */
+		    i__1 = k1 + 1;
 /* Computing MIN */
 		    i__2 = k1 + 1;
+		    i__3 = *m - k1;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l2), &c__1);
 /* Computing MIN */
-		    i__3 = k1 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k1+1,*m)), lda, &
-			    C(min(k1+1,*m),l2), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[1] = sgn * (C(k1,l2) - (suml + sgn * sumr))
-			    ;
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l2, min(i__2,*n)), ldb);
+		    vec_ref(2, 1) = sgn * (c___ref(k1, l2) - (suml + sgn * 
+			    sumr));
 
-		    d__1 = -sgn * A(k1,k1);
-		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &B(l1,l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1,
-			     &c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
+		    d__1 = -sgn * a_ref(k1, k1);
+		    dlaln2_(&c_false, &c__2, &c__1, &smin, &c_b26, &b_ref(l1, 
+			    l1), ldb, &c_b26, &c_b26, vec, &c__2, &d__1, &
+			    c_b30, x, &c__2, &scaloc, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__1 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__1; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L210: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(1);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(2, 1);
 
 		} else if (l1 != l2 && k1 != k2) {
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[0] = C(k1,l1) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(1, 1) = c___ref(k1, l1) - (suml + sgn * sumr);
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k1, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l2), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k1,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l2), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k1,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[2] = C(k1,l2) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k1, min(i__1,*n)), ldc, &
+			    b_ref(l2, min(i__2,*n)), ldb);
+		    vec_ref(1, 2) = c___ref(k1, l2) - (suml + sgn * sumr);
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k2, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l1), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l1), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l1,min(l2+1,*n)), ldb);
-		    vec[1] = C(k2,l1) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k2, min(i__1,*n)), ldc, &
+			    b_ref(l1, min(i__2,*n)), ldb);
+		    vec_ref(2, 1) = c___ref(k2, l1) - (suml + sgn * sumr);
 
-		    i__1 = *m - k2;
+/* Computing MIN */
+		    i__1 = k2 + 1;
 /* Computing MIN */
 		    i__2 = k2 + 1;
+		    i__3 = *m - k2;
+		    suml = ddot_(&i__3, &a_ref(k2, min(i__1,*m)), lda, &
+			    c___ref(min(i__2,*m), l2), &c__1);
 /* Computing MIN */
-		    i__3 = k2 + 1;
-		    suml = ddot_(&i__1, &A(k2,min(k2+1,*m)), lda, &
-			    C(min(k2+1,*m),l2), &c__1);
-		    i__1 = *n - l2;
+		    i__1 = l2 + 1;
 /* Computing MIN */
 		    i__2 = l2 + 1;
-/* Computing MIN */
-		    i__3 = l2 + 1;
-		    sumr = ddot_(&i__1, &C(k2,min(l2+1,*n)), ldc, &
-			    B(l2,min(l2+1,*n)), ldb);
-		    vec[3] = C(k2,l2) - (suml + sgn * sumr);
+		    i__3 = *n - l2;
+		    sumr = ddot_(&i__3, &c___ref(k2, min(i__1,*n)), ldc, &
+			    b_ref(l2, min(i__2,*n)), ldb);
+		    vec_ref(2, 2) = c___ref(k2, l2) - (suml + sgn * sumr);
 
-		    dlasy2_(&c_false, &c_true, isgn, &c__2, &c__2, &A(k1,k1), lda, &B(l1,l1), ldb, vec, &
-			    c__2, &scaloc, x, &c__2, &xnorm, &ierr);
+		    dlasy2_(&c_false, &c_true, isgn, &c__2, &c__2, &a_ref(k1, 
+			    k1), lda, &b_ref(l1, l1), ldb, vec, &c__2, &
+			    scaloc, x, &c__2, &xnorm, &ierr);
 		    if (ierr != 0) {
 			*info = 1;
 		    }
 
 		    if (scaloc != 1.) {
 			i__1 = *n;
-			for (j = 1; j <= *n; ++j) {
-			    dscal_(m, &scaloc, &C(1,j), &c__1);
+			for (j = 1; j <= i__1; ++j) {
+			    dscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L220: */
 			}
 			*scale *= scaloc;
 		    }
-		    C(k1,l1) = X(0);
-		    C(k1,l2) = X(2);
-		    C(k2,l1) = X(1);
-		    C(k2,l2) = X(3);
+		    c___ref(k1, l1) = x_ref(1, 1);
+		    c___ref(k1, l2) = x_ref(1, 2);
+		    c___ref(k2, l1) = x_ref(2, 1);
+		    c___ref(k2, l2) = x_ref(2, 2);
 		}
 
 L230:
@@ -1250,4 +1292,11 @@ L240:
 /*     End of DTRSYL */
 
 } /* dtrsyl_ */
+
+#undef vec_ref
+#undef x_ref
+#undef c___ref
+#undef b_ref
+#undef a_ref
+
 

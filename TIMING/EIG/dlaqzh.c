@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublereal c_b7 = 1.;
 
 /* Subroutine */ int dlaqzh_(logical *ilq, logical *ilz, integer *n, integer *
 	ilo, integer *ihi, doublereal *a, integer *lda, doublereal *b, 
-	integer *ldb, doublereal *q, integer *ldq, doublereal *z, integer *
+	integer *ldb, doublereal *q, integer *ldq, doublereal *z__, integer *
 	ldz, doublereal *work, integer *info)
 {
     /* System generated locals */
@@ -36,7 +37,12 @@ static doublereal c_b7 = 1.;
 	    doublereal *, integer *, integer *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -83,8 +89,7 @@ static doublereal c_b7 = 1.;
             not be greater than N.   
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA, N)   
-            On entry, the first of the pair of N x N general matrices to 
-  
+            On entry, the first of the pair of N x N general matrices to   
             be reduced.   
             On exit, the upper triangle and the first subdiagonal of A   
             are overwritten with the Hessenberg matrix H, and the rest   
@@ -95,8 +100,7 @@ static doublereal c_b7 = 1.;
             program. LDA must be at least max ( 1, N ) .   
 
     B       (input/output) DOUBLE PRECISION array, dimension (LDB, N)   
-            On entry, the second of the pair of N x N general matrices to 
-  
+            On entry, the second of the pair of N x N general matrices to   
             be reduced.   
             On exit, the transformed matrix T = Q' B Z, which is upper   
             triangular.   
@@ -135,8 +139,7 @@ static doublereal c_b7 = 1.;
                   = 4: error return from DORGQR;   
                   = 5: error return from DGGHRD.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
@@ -144,17 +147,17 @@ static doublereal c_b7 = 1.;
        Parameter adjustments */
     --work;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
     /* Function Body */
     if (*n == 0) {
@@ -166,17 +169,16 @@ static doublereal c_b7 = 1.;
     irows = *ihi + 1 - *ilo;
     icols = *n + 1 - *ilo;
     i__1 = *n * *ldz;
-    dgeqrf_(&irows, &icols, &b[*ilo + *ilo * b_dim1], ldb, &work[1], &z[
-	    z_offset], &i__1, &iinfo);
+    dgeqrf_(&irows, &icols, &b_ref(*ilo, *ilo), ldb, &work[1], &z__[z_offset],
+	     &i__1, &iinfo);
     if (iinfo != 0) {
 	*info = 2;
 	goto L10;
     }
 
     i__1 = *n * *ldz;
-    dormqr_("L", "T", &irows, &icols, &irows, &b[*ilo + *ilo * b_dim1], ldb, &
-	    work[1], &a[*ilo + *ilo * a_dim1], lda, &z[z_offset], &i__1, &
-	    iinfo);
+    dormqr_("L", "T", &irows, &icols, &irows, &b_ref(*ilo, *ilo), ldb, &work[
+	    1], &a_ref(*ilo, *ilo), lda, &z__[z_offset], &i__1, &iinfo);
     if (iinfo != 0) {
 	*info = 3;
 	goto L10;
@@ -186,11 +188,11 @@ static doublereal c_b7 = 1.;
 	dlaset_("Full", n, n, &c_b6, &c_b7, &q[q_offset], ldq);
 	i__1 = irows - 1;
 	i__2 = irows - 1;
-	dlacpy_("L", &i__1, &i__2, &b[*ilo + 1 + *ilo * b_dim1], ldb, &q[*ilo 
-		+ 1 + *ilo * q_dim1], ldq);
+	dlacpy_("L", &i__1, &i__2, &b_ref(*ilo + 1, *ilo), ldb, &q_ref(*ilo + 
+		1, *ilo), ldq);
 	i__1 = *n * *ldz;
-	dorgqr_(&irows, &irows, &irows, &q[*ilo + *ilo * q_dim1], ldq, &work[
-		1], &z[z_offset], &i__1, &iinfo);
+	dorgqr_(&irows, &irows, &irows, &q_ref(*ilo, *ilo), ldq, &work[1], &
+		z__[z_offset], &i__1, &iinfo);
 	if (iinfo != 0) {
 	    *info = 4;
 	    goto L10;
@@ -212,7 +214,7 @@ static doublereal c_b7 = 1.;
     }
 
     dgghrd_(compq, compz, n, ilo, ihi, &a[a_offset], lda, &b[b_offset], ldb, &
-	    q[q_offset], ldq, &z[z_offset], ldz, &iinfo);
+	    q[q_offset], ldq, &z__[z_offset], ldz, &iinfo);
     if (iinfo != 0) {
 	*info = 5;
 	goto L10;
@@ -227,4 +229,9 @@ L10:
 /*     End of DLAQZH */
 
 } /* dlaqzh_ */
+
+#undef q_ref
+#undef b_ref
+#undef a_ref
+
 

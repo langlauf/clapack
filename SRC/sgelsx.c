@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgelsx_(integer *m, integer *n, integer *nrhs, real *a, 
 	integer *lda, real *b, integer *ldb, integer *jpvt, real *rcond, 
 	integer *rank, real *work, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -12,6 +13,8 @@
 
     Purpose   
     =======   
+
+    This routine is deprecated and has been replaced by routine SGELSY.   
 
     SGELSX computes the minimum-norm solution to a real linear least   
     squares problem:   
@@ -100,13 +103,10 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__0 = 0;
     static real c_b13 = 0.f;
@@ -119,7 +119,7 @@
     real r__1;
     /* Local variables */
     static real anrm, bnrm, smin, smax;
-    static integer i, j, k, iascl, ibscl, ismin, ismax;
+    static integer i__, j, k, iascl, ibscl, ismin, ismax;
     static real c1, c2, s1, s2, t1, t2;
     extern /* Subroutine */ int strsm_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
@@ -142,15 +142,20 @@
 	    integer *, real *, real *, real *, integer *, real *), 
 	    stzrqf_(integer *, integer *, real *, integer *, real *, integer *
 	    );
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --jpvt;
+    --work;
 
-#define JPVT(I) jpvt[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     mn = min(*m,*n);
     ismin = mn + 1;
     ismax = (mn << 1) + 1;
@@ -197,20 +202,20 @@
 
 /*     Scale A, B if max elements outside range [SMLNUM,BIGNUM] */
 
-    anrm = slange_("M", m, n, &A(1,1), lda, &WORK(1));
+    anrm = slange_("M", m, n, &a[a_offset], lda, &work[1]);
     iascl = 0;
     if (anrm > 0.f && anrm < smlnum) {
 
 /*        Scale matrix norm up to SMLNUM */
 
-	slascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &A(1,1), lda, 
+	slascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &a[a_offset], lda, 
 		info);
 	iascl = 1;
     } else if (anrm > bignum) {
 
 /*        Scale matrix norm down to BIGNUM */
 
-	slascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &A(1,1), lda, 
+	slascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &a[a_offset], lda, 
 		info);
 	iascl = 2;
     } else if (anrm == 0.f) {
@@ -218,25 +223,25 @@
 /*        Matrix all zero. Return zero solution. */
 
 	i__1 = max(*m,*n);
-	slaset_("F", &i__1, nrhs, &c_b13, &c_b13, &B(1,1), ldb);
+	slaset_("F", &i__1, nrhs, &c_b13, &c_b13, &b[b_offset], ldb);
 	*rank = 0;
 	goto L100;
     }
 
-    bnrm = slange_("M", m, nrhs, &B(1,1), ldb, &WORK(1));
+    bnrm = slange_("M", m, nrhs, &b[b_offset], ldb, &work[1]);
     ibscl = 0;
     if (bnrm > 0.f && bnrm < smlnum) {
 
 /*        Scale matrix norm up to SMLNUM */
 
-	slascl_("G", &c__0, &c__0, &bnrm, &smlnum, m, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &bnrm, &smlnum, m, nrhs, &b[b_offset], ldb,
 		 info);
 	ibscl = 1;
     } else if (bnrm > bignum) {
 
 /*        Scale matrix norm down to BIGNUM */
 
-	slascl_("G", &c__0, &c__0, &bnrm, &bignum, m, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &bnrm, &bignum, m, nrhs, &b[b_offset], ldb,
 		 info);
 	ibscl = 2;
     }
@@ -244,21 +249,21 @@
 /*     Compute QR factorization with column pivoting of A:   
           A * P = Q * R */
 
-    sgeqpf_(m, n, &A(1,1), lda, &JPVT(1), &WORK(1), &WORK(mn + 1), info);
+    sgeqpf_(m, n, &a[a_offset], lda, &jpvt[1], &work[1], &work[mn + 1], info);
 
 /*     workspace 3*N. Details of Householder rotations stored   
        in WORK(1:MN).   
 
        Determine RANK using incremental condition estimation */
 
-    WORK(ismin) = 1.f;
-    WORK(ismax) = 1.f;
-    smax = (r__1 = A(1,1), dabs(r__1));
+    work[ismin] = 1.f;
+    work[ismax] = 1.f;
+    smax = (r__1 = a_ref(1, 1), dabs(r__1));
     smin = smax;
-    if ((r__1 = A(1,1), dabs(r__1)) == 0.f) {
+    if ((r__1 = a_ref(1, 1), dabs(r__1)) == 0.f) {
 	*rank = 0;
 	i__1 = max(*m,*n);
-	slaset_("F", &i__1, nrhs, &c_b13, &c_b13, &B(1,1), ldb);
+	slaset_("F", &i__1, nrhs, &c_b13, &c_b13, &b[b_offset], ldb);
 	goto L100;
     } else {
 	*rank = 1;
@@ -266,19 +271,21 @@
 
 L10:
     if (*rank < mn) {
-	i = *rank + 1;
-	slaic1_(&c__2, rank, &WORK(ismin), &smin, &A(1,i), &A(i,i), &sminpr, &s1, &c1);
-	slaic1_(&c__1, rank, &WORK(ismax), &smax, &A(1,i), &A(i,i), &smaxpr, &s2, &c2);
+	i__ = *rank + 1;
+	slaic1_(&c__2, rank, &work[ismin], &smin, &a_ref(1, i__), &a_ref(i__, 
+		i__), &sminpr, &s1, &c1);
+	slaic1_(&c__1, rank, &work[ismax], &smax, &a_ref(1, i__), &a_ref(i__, 
+		i__), &smaxpr, &s2, &c2);
 
 	if (smaxpr * *rcond <= sminpr) {
 	    i__1 = *rank;
-	    for (i = 1; i <= *rank; ++i) {
-		WORK(ismin + i - 1) = s1 * WORK(ismin + i - 1);
-		WORK(ismax + i - 1) = s2 * WORK(ismax + i - 1);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		work[ismin + i__ - 1] = s1 * work[ismin + i__ - 1];
+		work[ismax + i__ - 1] = s2 * work[ismax + i__ - 1];
 /* L20: */
 	    }
-	    WORK(ismin + *rank) = c1;
-	    WORK(ismax + *rank) = c2;
+	    work[ismin + *rank] = c1;
+	    work[ismax + *rank] = c2;
 	    smin = sminpr;
 	    smax = smaxpr;
 	    ++(*rank);
@@ -293,28 +300,28 @@ L10:
        [R11,R12] = [ T11, 0 ] * Y */
 
     if (*rank < *n) {
-	stzrqf_(rank, n, &A(1,1), lda, &WORK(mn + 1), info);
+	stzrqf_(rank, n, &a[a_offset], lda, &work[mn + 1], info);
     }
 
 /*     Details of Householder rotations stored in WORK(MN+1:2*MN)   
 
        B(1:M,1:NRHS) := Q' * B(1:M,1:NRHS) */
 
-    sorm2r_("Left", "Transpose", m, nrhs, &mn, &A(1,1), lda, &WORK(1), &
-	    B(1,1), ldb, &WORK((mn << 1) + 1), info);
+    sorm2r_("Left", "Transpose", m, nrhs, &mn, &a[a_offset], lda, &work[1], &
+	    b[b_offset], ldb, &work[(mn << 1) + 1], info);
 
 /*     workspace NRHS   
 
        B(1:RANK,1:NRHS) := inv(T11) * B(1:RANK,1:NRHS) */
 
     strsm_("Left", "Upper", "No transpose", "Non-unit", rank, nrhs, &c_b36, &
-	    A(1,1), lda, &B(1,1), ldb);
+	    a[a_offset], lda, &b[b_offset], ldb);
 
     i__1 = *n;
-    for (i = *rank + 1; i <= *n; ++i) {
+    for (i__ = *rank + 1; i__ <= i__1; ++i__) {
 	i__2 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    B(i,j) = 0.f;
+	for (j = 1; j <= i__2; ++j) {
+	    b_ref(i__, j) = 0.f;
 /* L30: */
 	}
 /* L40: */
@@ -324,11 +331,11 @@ L10:
 
     if (*rank < *n) {
 	i__1 = *rank;
-	for (i = 1; i <= *rank; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *n - *rank + 1;
-	    slatzm_("Left", &i__2, nrhs, &A(i,*rank+1), lda, &
-		    WORK(mn + i), &B(i,1), &B(*rank+1,1), ldb,
-		     &WORK((mn << 1) + 1));
+	    slatzm_("Left", &i__2, nrhs, &a_ref(i__, *rank + 1), lda, &work[
+		    mn + i__], &b_ref(i__, 1), &b_ref(*rank + 1, 1), ldb, &
+		    work[(mn << 1) + 1]);
 /* L50: */
 	}
     }
@@ -338,30 +345,30 @@ L10:
        B(1:N,1:NRHS) := P * B(1:N,1:NRHS) */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    WORK((mn << 1) + i) = 1.f;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(mn << 1) + i__] = 1.f;
 /* L60: */
 	}
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (WORK((mn << 1) + i) == 1.f) {
-		if (JPVT(i) != i) {
-		    k = i;
-		    t1 = B(k,j);
-		    t2 = B(JPVT(k),j);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (work[(mn << 1) + i__] == 1.f) {
+		if (jpvt[i__] != i__) {
+		    k = i__;
+		    t1 = b_ref(k, j);
+		    t2 = b_ref(jpvt[k], j);
 L70:
-		    B(JPVT(k),j) = t1;
-		    WORK((mn << 1) + k) = 0.f;
+		    b_ref(jpvt[k], j) = t1;
+		    work[(mn << 1) + k] = 0.f;
 		    t1 = t2;
-		    k = JPVT(k);
-		    t2 = B(JPVT(k),j);
-		    if (JPVT(k) != i) {
+		    k = jpvt[k];
+		    t2 = b_ref(jpvt[k], j);
+		    if (jpvt[k] != i__) {
 			goto L70;
 		    }
-		    B(i,j) = t1;
-		    WORK((mn << 1) + k) = 0.f;
+		    b_ref(i__, j) = t1;
+		    work[(mn << 1) + k] = 0.f;
 		}
 	    }
 /* L80: */
@@ -372,21 +379,21 @@ L70:
 /*     Undo scaling */
 
     if (iascl == 1) {
-	slascl_("G", &c__0, &c__0, &anrm, &smlnum, n, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &anrm, &smlnum, n, nrhs, &b[b_offset], ldb,
 		 info);
-	slascl_("U", &c__0, &c__0, &smlnum, &anrm, rank, rank, &A(1,1), 
+	slascl_("U", &c__0, &c__0, &smlnum, &anrm, rank, rank, &a[a_offset], 
 		lda, info);
     } else if (iascl == 2) {
-	slascl_("G", &c__0, &c__0, &anrm, &bignum, n, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &anrm, &bignum, n, nrhs, &b[b_offset], ldb,
 		 info);
-	slascl_("U", &c__0, &c__0, &bignum, &anrm, rank, rank, &A(1,1), 
+	slascl_("U", &c__0, &c__0, &bignum, &anrm, rank, rank, &a[a_offset], 
 		lda, info);
     }
     if (ibscl == 1) {
-	slascl_("G", &c__0, &c__0, &smlnum, &bnrm, n, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &smlnum, &bnrm, n, nrhs, &b[b_offset], ldb,
 		 info);
     } else if (ibscl == 2) {
-	slascl_("G", &c__0, &c__0, &bignum, &bnrm, n, nrhs, &B(1,1), ldb,
+	slascl_("G", &c__0, &c__0, &bignum, &bnrm, n, nrhs, &b[b_offset], ldb,
 		 info);
     }
 
@@ -397,4 +404,8 @@ L100:
 /*     End of SGELSX */
 
 } /* sgelsx_ */
+
+#undef b_ref
+#undef a_ref
+
 

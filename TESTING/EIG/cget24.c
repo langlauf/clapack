@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ static integer c__4 = 4;
 
 /* Subroutine */ int cget24_(logical *comp, integer *jtype, real *thresh, 
 	integer *iseed, integer *nounit, integer *n, complex *a, integer *lda,
-	 complex *h, complex *ht, complex *w, complex *wt, complex *wtmp, 
+	 complex *h__, complex *ht, complex *w, complex *wt, complex *wtmp, 
 	complex *vs, integer *ldvs, complex *vs1, real *rcdein, real *rcdvin, 
 	integer *nslct, integer *islct, integer *isrt, real *result, complex *
 	work, integer *lwork, real *rwork, logical *bwork, integer *info)
@@ -52,7 +53,7 @@ static integer c__4 = 4;
     static complex ctmp;
     static integer itmp, ipnt[20], rsub;
     static char sort[1];
-    static integer sdim1, i, j;
+    static integer sdim1, i__, j;
     static real v;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
@@ -100,7 +101,17 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define ht_subscr(a_1,a_2) (a_2)*ht_dim1 + a_1
+#define ht_ref(a_1,a_2) ht[ht_subscr(a_1,a_2)]
+#define vs_subscr(a_1,a_2) (a_2)*vs_dim1 + a_1
+#define vs_ref(a_1,a_2) vs[vs_subscr(a_1,a_2)]
+#define vs1_subscr(a_1,a_2) (a_2)*vs1_dim1 + a_1
+#define vs1_ref(a_1,a_2) vs1[vs1_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -147,8 +158,7 @@ static integer c__4 = 4;
          Here VS is the matrix of Schur eigenvectors, and T is in Schur   
          form  (with sorting of eigenvalues).   
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). 
-  
+       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
 
        (10)    0     if W are eigenvalues of T   
                1/ulp otherwise   
@@ -164,8 +174,7 @@ static integer c__4 = 4;
 
        (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
                1/ulp otherwise   
-               If workspace sufficient, also compare VS with and without 
-  
+               If workspace sufficient, also compare VS with and without   
                reciprocal condition numbers   
                (with sorting of eigenvalues)   
 
@@ -174,11 +183,9 @@ static integer c__4 = 4;
                If workspace sufficient, also compare SDIM with and   
                without reciprocal condition numbers   
 
-       (14)    if RCONDE the same no matter if VS and/or RCONDV computed 
-  
+       (14)    if RCONDE the same no matter if VS and/or RCONDV computed   
 
-       (15)    if RCONDV the same no matter if VS and/or RCONDE computed 
-  
+       (15)    if RCONDV the same no matter if VS and/or RCONDE computed   
 
        (16)  |RCONDE - RCDEIN| / cond(RCONDE)   
 
@@ -314,8 +321,7 @@ static integer c__4 = 4;
             If >0, CGEESX returned an error code, the absolute   
                    value of which is returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Check for errors   
@@ -323,22 +329,22 @@ static integer c__4 = 4;
        Parameter adjustments */
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = ht_dim1 + 1;
+    ht_offset = 1 + ht_dim1 * 1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --w;
     --wt;
     --wtmp;
     vs1_dim1 = *ldvs;
-    vs1_offset = vs1_dim1 + 1;
+    vs1_offset = 1 + vs1_dim1 * 1;
     vs1 -= vs1_offset;
     vs_dim1 = *ldvs;
-    vs_offset = vs_dim1 + 1;
+    vs_offset = 1 + vs_dim1 * 1;
     vs -= vs_offset;
     --islct;
     --result;
@@ -370,8 +376,8 @@ static integer c__4 = 4;
 
 /*     Quick return if nothing to do */
 
-    for (i = 1; i <= 17; ++i) {
-	result[i] = -1.f;
+    for (i__ = 1; i__ <= 17; ++i__) {
+	result[i__] = -1.f;
 /* L10: */
     }
 
@@ -399,16 +405,16 @@ static integer c__4 = 4;
 
 /*        Compute Schur form and Schur vectors, and test them */
 
-	clacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-	cgeesx_("V", sort, (L_fp)cslect_, "N", n, &h[h_offset], lda, &sdim, &
-		w[1], &vs[vs_offset], ldvs, &rconde, &rcondv, &work[1], lwork,
-		 &rwork[1], &bwork[1], &iinfo);
+	clacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+	cgeesx_("V", sort, (L_fp)cslect_, "N", n, &h__[h_offset], lda, &sdim, 
+		&w[1], &vs[vs_offset], ldvs, &rconde, &rcondv, &work[1], 
+		lwork, &rwork[1], &bwork[1], &iinfo);
 	if (iinfo != 0) {
 	    result[rsub + 1] = ulpinv;
 	    if (*jtype != 22) {
 		io___12.ciunit = *nounit;
 		s_wsfe(&io___12);
-		do_fio(&c__1, "CGEESX1", 7L);
+		do_fio(&c__1, "CGEESX1", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -417,7 +423,7 @@ static integer c__4 = 4;
 	    } else {
 		io___13.ciunit = *nounit;
 		s_wsfe(&io___13);
-		do_fio(&c__1, "CGEESX1", 7L);
+		do_fio(&c__1, "CGEESX1", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -436,9 +442,9 @@ static integer c__4 = 4;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j + 1; i <= i__2; ++i) {
-		i__3 = i + j * h_dim1;
-		if (h[i__3].r != 0.f || h[i__3].i != 0.f) {
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		i__3 = h___subscr(i__, j);
+		if (h__[i__3].r != 0.f || h__[i__3].i != 0.f) {
 		    result[rsub + 1] = ulpinv;
 		}
 /* L20: */
@@ -446,8 +452,7 @@ static integer c__4 = 4;
 /* L30: */
 	}
 
-/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * U
-LP)   
+/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * ULP)   
 
           Copy A to VS1, used as workspace */
 
@@ -456,7 +461,7 @@ LP)
 /*        Compute Q*H and store in HT. */
 
 	cgemm_("No transpose", "No transpose", n, n, n, &c_b2, &vs[vs_offset],
-		 ldvs, &h[h_offset], lda, &c_b1, &ht[ht_offset], lda);
+		 ldvs, &h__[h_offset], lda, &c_b1, &ht[ht_offset], lda);
 
 /*        Compute A - Q*H*Q' */
 
@@ -493,10 +498,10 @@ LP)
 
 	result[rsub + 4] = 0.f;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i + i * h_dim1;
-	    i__3 = i;
-	    if (h[i__2].r != w[i__3].r || h[i__2].i != w[i__3].i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = h___subscr(i__, i__);
+	    i__3 = i__;
+	    if (h__[i__2].r != w[i__3].r || h__[i__2].i != w[i__3].i) {
 		result[rsub + 4] = ulpinv;
 	    }
 /* L40: */
@@ -513,7 +518,7 @@ LP)
 	    if (*jtype != 22) {
 		io___17.ciunit = *nounit;
 		s_wsfe(&io___17);
-		do_fio(&c__1, "CGEESX2", 7L);
+		do_fio(&c__1, "CGEESX2", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -522,7 +527,7 @@ LP)
 	    } else {
 		io___18.ciunit = *nounit;
 		s_wsfe(&io___18);
-		do_fio(&c__1, "CGEESX2", 7L);
+		do_fio(&c__1, "CGEESX2", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -536,10 +541,10 @@ LP)
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[rsub + 5] = ulpinv;
 		}
 /* L50: */
@@ -551,9 +556,9 @@ LP)
 
 	result[rsub + 6] = 0.f;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[rsub + 6] = ulpinv;
 	    }
@@ -566,12 +571,12 @@ LP)
 	    result[13] = 0.f;
 	    knteig = 0;
 	    i__1 = *n;
-	    for (i = 1; i <= i__1; ++i) {
-		if (cslect_(&w[i])) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (cslect_(&w[i__])) {
 		    ++knteig;
 		}
-		if (i < *n) {
-		    if (cslect_(&w[i + 1]) && ! cslect_(&w[i])) {
+		if (i__ < *n) {
+		    if (cslect_(&w[i__ + 1]) && ! cslect_(&w[i__])) {
 			result[13] = ulpinv;
 		    }
 		}
@@ -605,7 +610,7 @@ LP)
 	    if (*jtype != 22) {
 		io___21.ciunit = *nounit;
 		s_wsfe(&io___21);
-		do_fio(&c__1, "CGEESX3", 7L);
+		do_fio(&c__1, "CGEESX3", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -614,7 +619,7 @@ LP)
 	    } else {
 		io___22.ciunit = *nounit;
 		s_wsfe(&io___22);
-		do_fio(&c__1, "CGEESX3", 7L);
+		do_fio(&c__1, "CGEESX3", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -627,21 +632,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -665,7 +670,7 @@ LP)
 	    if (*jtype != 22) {
 		io___25.ciunit = *nounit;
 		s_wsfe(&io___25);
-		do_fio(&c__1, "CGEESX4", 7L);
+		do_fio(&c__1, "CGEESX4", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -674,7 +679,7 @@ LP)
 	    } else {
 		io___26.ciunit = *nounit;
 		s_wsfe(&io___26);
-		do_fio(&c__1, "CGEESX4", 7L);
+		do_fio(&c__1, "CGEESX4", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -696,21 +701,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -733,7 +738,7 @@ LP)
 	    if (*jtype != 22) {
 		io___27.ciunit = *nounit;
 		s_wsfe(&io___27);
-		do_fio(&c__1, "CGEESX5", 7L);
+		do_fio(&c__1, "CGEESX5", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -742,7 +747,7 @@ LP)
 	    } else {
 		io___28.ciunit = *nounit;
 		s_wsfe(&io___28);
-		do_fio(&c__1, "CGEESX5", 7L);
+		do_fio(&c__1, "CGEESX5", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -761,21 +766,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -798,7 +803,7 @@ LP)
 	    if (*jtype != 22) {
 		io___29.ciunit = *nounit;
 		s_wsfe(&io___29);
-		do_fio(&c__1, "CGEESX6", 7L);
+		do_fio(&c__1, "CGEESX6", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -807,7 +812,7 @@ LP)
 	    } else {
 		io___30.ciunit = *nounit;
 		s_wsfe(&io___30);
-		do_fio(&c__1, "CGEESX6", 7L);
+		do_fio(&c__1, "CGEESX6", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -826,21 +831,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -863,7 +868,7 @@ LP)
 	    if (*jtype != 22) {
 		io___31.ciunit = *nounit;
 		s_wsfe(&io___31);
-		do_fio(&c__1, "CGEESX7", 7L);
+		do_fio(&c__1, "CGEESX7", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -872,7 +877,7 @@ LP)
 	    } else {
 		io___32.ciunit = *nounit;
 		s_wsfe(&io___32);
-		do_fio(&c__1, "CGEESX7", 7L);
+		do_fio(&c__1, "CGEESX7", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -891,21 +896,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -928,7 +933,7 @@ LP)
 	    if (*jtype != 22) {
 		io___33.ciunit = *nounit;
 		s_wsfe(&io___33);
-		do_fio(&c__1, "CGEESX8", 7L);
+		do_fio(&c__1, "CGEESX8", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
@@ -937,7 +942,7 @@ LP)
 	    } else {
 		io___34.ciunit = *nounit;
 		s_wsfe(&io___34);
-		do_fio(&c__1, "CGEESX8", 7L);
+		do_fio(&c__1, "CGEESX8", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -956,21 +961,21 @@ LP)
 /*        Perform tests (10), (11), (12), and (13) */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
 	    if (w[i__2].r != wt[i__3].r || w[i__2].i != wt[i__3].i) {
 		result[10] = ulpinv;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * h_dim1;
-		i__4 = i + j * ht_dim1;
-		if (h[i__3].r != ht[i__4].r || h[i__3].i != ht[i__4].i) {
+		i__3 = h___subscr(i__, j);
+		i__4 = ht_subscr(i__, j);
+		if (h__[i__3].r != ht[i__4].r || h__[i__3].i != ht[i__4].i) {
 		    result[11] = ulpinv;
 		}
-		i__3 = i + j * vs_dim1;
-		i__4 = i + j * vs1_dim1;
+		i__3 = vs_subscr(i__, j);
+		i__4 = vs1_subscr(i__, j);
 		if (vs[i__3].r != vs1[i__4].r || vs[i__3].i != vs1[i__4].i) {
 		    result[12] = ulpinv;
 		}
@@ -991,35 +996,33 @@ L220:
 
     if (*comp) {
 
-/*        First set up SELOPT, SELDIM, SELVAL, SELWR and SELWI so that
-   
-          the logical function CSLECT selects the eigenvalues specifie
-d   
+/*        First set up SELOPT, SELDIM, SELVAL, SELWR and SELWI so that   
+          the logical function CSLECT selects the eigenvalues specified   
           by NSLCT, ISLCT and ISRT. */
 
 	sslct_1.seldim = *n;
 	sslct_1.selopt = 1;
 	eps = dmax(ulp,5.9605e-8f);
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    ipnt[i - 1] = i;
-	    sslct_1.selval[i - 1] = FALSE_;
-	    i__2 = i;
-	    sslct_1.selwr[i - 1] = wtmp[i__2].r;
-	    sslct_1.selwi[i - 1] = r_imag(&wtmp[i]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ipnt[i__ - 1] = i__;
+	    sslct_1.selval[i__ - 1] = FALSE_;
+	    i__2 = i__;
+	    sslct_1.selwr[i__ - 1] = wtmp[i__2].r;
+	    sslct_1.selwi[i__ - 1] = r_imag(&wtmp[i__]);
 /* L230: */
 	}
 	i__1 = *n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    kmin = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    kmin = i__;
 	    if (*isrt == 0) {
-		i__2 = i;
+		i__2 = i__;
 		vrimin = wtmp[i__2].r;
 	    } else {
-		vrimin = r_imag(&wtmp[i]);
+		vrimin = r_imag(&wtmp[i__]);
 	    }
 	    i__2 = *n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		if (*isrt == 0) {
 		    i__3 = j;
 		    vricmp = wtmp[i__3].r;
@@ -1035,18 +1038,18 @@ d
 	    i__2 = kmin;
 	    ctmp.r = wtmp[i__2].r, ctmp.i = wtmp[i__2].i;
 	    i__2 = kmin;
-	    i__3 = i;
+	    i__3 = i__;
 	    wtmp[i__2].r = wtmp[i__3].r, wtmp[i__2].i = wtmp[i__3].i;
-	    i__2 = i;
+	    i__2 = i__;
 	    wtmp[i__2].r = ctmp.r, wtmp[i__2].i = ctmp.i;
-	    itmp = ipnt[i - 1];
-	    ipnt[i - 1] = ipnt[kmin - 1];
+	    itmp = ipnt[i__ - 1];
+	    ipnt[i__ - 1] = ipnt[kmin - 1];
 	    ipnt[kmin - 1] = itmp;
 /* L250: */
 	}
 	i__1 = *nslct;
-	for (i = 1; i <= i__1; ++i) {
-	    sslct_1.selval[ipnt[islct[i] - 1] - 1] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    sslct_1.selval[ipnt[islct[i__] - 1] - 1] = TRUE_;
 /* L260: */
 	}
 
@@ -1061,7 +1064,7 @@ d
 	    result[17] = ulpinv;
 	    io___42.ciunit = *nounit;
 	    s_wsfe(&io___42);
-	    do_fio(&c__1, "CGEESX9", 7L);
+	    do_fio(&c__1, "CGEESX9", (ftnlen)7);
 	    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -1070,8 +1073,7 @@ d
 	    goto L270;
 	}
 
-/*        Compare condition number for average of selected eigenvalues
-   
+/*        Compare condition number for average of selected eigenvalues   
           taking its condition number into account */
 
 	anorm = clange_("1", n, n, &a[a_offset], lda, &rwork[1]);
@@ -1151,4 +1153,14 @@ L270:
 /*     End of CGET24 */
 
 } /* cget24_ */
+
+#undef vs1_ref
+#undef vs1_subscr
+#undef vs_ref
+#undef vs_subscr
+#undef ht_ref
+#undef ht_subscr
+#undef h___ref
+#undef h___subscr
+
 

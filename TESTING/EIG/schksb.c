@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -70,7 +71,7 @@ static integer c__4 = 4;
     static real cond;
     static integer jcol, kmax, nmax;
     static real unfl, ovfl, temp1;
-    static integer i, j, k, n;
+    static integer i__, j, k, n;
     static logical badnn;
     static integer imode, iinfo;
     static real aninv, anorm;
@@ -115,7 +116,10 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -124,8 +128,7 @@ static integer c__4 = 4;
     Purpose   
     =======   
 
-    SCHKSB tests the reduction of a symmetric band matrix to tridiagonal 
-  
+    SCHKSB tests the reduction of a symmetric band matrix to tridiagonal   
     form, used with the symmetric eigenvalue problem.   
 
     SSBTRD factors a symmetric band matrix A as  U S U' , where ' means   
@@ -259,8 +262,7 @@ static integer c__4 = 4;
             and at least max( KK )+1.   
 
     SD      (workspace) REAL array, dimension (max(NN))   
-            Used to hold the diagonal of the tridiagonal matrix computed 
-  
+            Used to hold the diagonal of the tridiagonal matrix computed   
             by SSBTRD.   
 
     SE      (workspace) REAL array, dimension (max(NN))   
@@ -288,8 +290,7 @@ static integer c__4 = 4;
     INFO    (output) INTEGER   
             If 0, then everything ran OK.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -315,8 +316,7 @@ static integer c__4 = 4;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
@@ -324,12 +324,12 @@ static integer c__4 = 4;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --result;
@@ -455,8 +455,7 @@ static integer c__4 = 4;
 		}
 
 /*              Compute "A".   
-                Store as "Upper"; later, we will copy to other
- format.   
+                Store as "Upper"; later, we will copy to other format.   
 
                 Control parameters:   
 
@@ -464,16 +463,13 @@ static integer c__4 = 4;
                 =1  O(1)   clustered 1  zero   
                 =2  large  clustered 2  identity   
                 =3  small  exponential  (none)   
-                =4         arithmetic   diagonal, (w/ eigenval
-ues)   
-                =5         random log   symmetric, w/ eigenval
-ues   
+                =4         arithmetic   diagonal, (w/ eigenvalues)   
+                =5         random log   symmetric, w/ eigenvalues   
                 =6         random       (none)   
                 =7                      random diagonal   
                 =8                      random symmetric   
                 =9                      positive definite   
-                =10                     diagonally dominant tr
-idiagonal */
+                =10                     diagonally dominant tridiagonal */
 
 		if (mtypes > 15) {
 		    goto L100;
@@ -525,18 +521,17 @@ L70:
 
 		    i__4 = n;
 		    for (jcol = 1; jcol <= i__4; ++jcol) {
-			a[k + 1 + jcol * a_dim1] = anorm;
+			a_ref(k + 1, jcol) = anorm;
 /* L80: */
 		    }
 
 		} else if (itype == 4) {
 
-/*                 Diagonal Matrix, [Eigen]values Specifie
-d */
+/*                 Diagonal Matrix, [Eigen]values Specified */
 
 		    slatms_(&n, &n, "S", &iseed[1], "S", &work[1], &imode, &
-			    cond, &anorm, &c__0, &c__0, "Q", &a[k + 1 + 
-			    a_dim1], lda, &work[n + 1], &iinfo);
+			    cond, &anorm, &c__0, &c__0, "Q", &a_ref(k + 1, 1),
+			     lda, &work[n + 1], &iinfo);
 
 		} else if (itype == 5) {
 
@@ -553,8 +548,8 @@ d */
 		    slatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &
 			    c_b32, &c_b32, "T", "N", &work[n + 1], &c__1, &
 			    c_b32, &work[(n << 1) + 1], &c__1, &c_b32, "N", 
-			    idumma, &c__0, &c__0, &c_b18, &anorm, "Q", &a[k + 
-			    1 + a_dim1], lda, idumma, &iinfo);
+			    idumma, &c__0, &c__0, &c_b18, &anorm, "Q", &a_ref(
+			    k + 1, 1), lda, idumma, &iinfo);
 
 		} else if (itype == 8) {
 
@@ -568,8 +563,7 @@ d */
 
 		} else if (itype == 9) {
 
-/*                 Positive definite, eigenvalues specifie
-d. */
+/*                 Positive definite, eigenvalues specified. */
 
 		    slatms_(&n, &n, "S", &iseed[1], "P", &work[1], &imode, &
 			    cond, &anorm, &k, &k, "Q", &a[a_offset], lda, &
@@ -577,24 +571,22 @@ d. */
 
 		} else if (itype == 10) {
 
-/*                 Positive definite tridiagonal, eigenval
-ues specified. */
+/*                 Positive definite tridiagonal, eigenvalues specified. */
 
 		    if (n > 1) {
 			k = max(1,k);
 		    }
 		    slatms_(&n, &n, "S", &iseed[1], "P", &work[1], &imode, &
-			    cond, &anorm, &c__1, &c__1, "Q", &a[k + a_dim1], 
+			    cond, &anorm, &c__1, &c__1, "Q", &a_ref(k, 1), 
 			    lda, &work[n + 1], &iinfo);
 		    i__4 = n;
-		    for (i = 2; i <= i__4; ++i) {
-			temp1 = (r__1 = a[k + i * a_dim1], dabs(r__1)) / sqrt(
-				(r__2 = a[k + 1 + (i - 1) * a_dim1] * a[k + 1 
-				+ i * a_dim1], dabs(r__2)));
+		    for (i__ = 2; i__ <= i__4; ++i__) {
+			temp1 = (r__1 = a_ref(k, i__), dabs(r__1)) / sqrt((
+				r__2 = a_ref(k + 1, i__ - 1) * a_ref(k + 1, 
+				i__), dabs(r__2)));
 			if (temp1 > .5f) {
-			    a[k + i * a_dim1] = sqrt((r__1 = a[k + 1 + (i - 1)
-				     * a_dim1] * a[k + 1 + i * a_dim1], dabs(
-				    r__1))) * .5f;
+			    a_ref(k, i__) = sqrt((r__1 = a_ref(k + 1, i__ - 1)
+				     * a_ref(k + 1, i__), dabs(r__1))) * .5f;
 			}
 /* L90: */
 		    }
@@ -607,7 +599,7 @@ ues specified. */
 		if (iinfo != 0) {
 		    io___36.ciunit = *nounit;
 		    s_wsfe(&io___36);
-		    do_fio(&c__1, "Generator", 9L);
+		    do_fio(&c__1, "Generator", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -620,8 +612,7 @@ ues specified. */
 
 L100:
 
-/*              Call SSBTRD to compute S and U from upper tria
-ngle. */
+/*              Call SSBTRD to compute S and U from upper triangle. */
 
 		i__4 = k + 1;
 		slacpy_(" ", &i__4, &n, &a[a_offset], lda, &work[1], lda);
@@ -633,7 +624,7 @@ ngle. */
 		if (iinfo != 0) {
 		    io___37.ciunit = *nounit;
 		    s_wsfe(&io___37);
-		    do_fio(&c__1, "SSBTRD(U)", 9L);
+		    do_fio(&c__1, "SSBTRD(U)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -654,8 +645,7 @@ ngle. */
 		ssbt21_("Upper", &n, &k, &c__1, &a[a_offset], lda, &sd[1], &
 			se[1], &u[u_offset], ldu, &work[1], &result[1]);
 
-/*              Convert A from Upper-Triangle-Only storage to 
-  
+/*              Convert A from Upper-Triangle-Only storage to   
                 Lower-Triangle-Only storage. */
 
 		i__4 = n;
@@ -664,8 +654,7 @@ ngle. */
 		    i__6 = k, i__7 = n - jc;
 		    i__5 = min(i__6,i__7);
 		    for (jr = 0; jr <= i__5; ++jr) {
-			a[jr + 1 + jc * a_dim1] = a[k + 1 - jr + (jc + jr) * 
-				a_dim1];
+			a_ref(jr + 1, jc) = a_ref(k + 1 - jr, jc + jr);
 /* L110: */
 		    }
 /* L120: */
@@ -676,14 +665,13 @@ ngle. */
 		    i__5 = k, i__6 = n - jc;
 		    i__7 = k;
 		    for (jr = min(i__5,i__6) + 1; jr <= i__7; ++jr) {
-			a[jr + 1 + jc * a_dim1] = 0.f;
+			a_ref(jr + 1, jc) = 0.f;
 /* L130: */
 		    }
 /* L140: */
 		}
 
-/*              Call SSBTRD to compute S and U from lower tria
-ngle */
+/*              Call SSBTRD to compute S and U from lower triangle */
 
 		i__4 = k + 1;
 		slacpy_(" ", &i__4, &n, &a[a_offset], lda, &work[1], lda);
@@ -695,7 +683,7 @@ ngle */
 		if (iinfo != 0) {
 		    io___40.ciunit = *nounit;
 		    s_wsfe(&io___40);
-		    do_fio(&c__1, "SSBTRD(L)", 9L);
+		    do_fio(&c__1, "SSBTRD(L)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -728,15 +716,13 @@ L150:
 		for (jr = 1; jr <= i__4; ++jr) {
 		    if (result[jr] >= *thresh) {
 
-/*                    If this is the first test to fai
-l,   
-                      print a header to the data file.
- */
+/*                    If this is the first test to fail,   
+                      print a header to the data file. */
 
 			if (nerrs == 0) {
 			    io___41.ciunit = *nounit;
 			    s_wsfe(&io___41);
-			    do_fio(&c__1, "SSB", 3L);
+			    do_fio(&c__1, "SSB", (ftnlen)3);
 			    e_wsfe();
 			    io___42.ciunit = *nounit;
 			    s_wsfe(&io___42);
@@ -746,15 +732,15 @@ l,
 			    e_wsfe();
 			    io___44.ciunit = *nounit;
 			    s_wsfe(&io___44);
-			    do_fio(&c__1, "Symmetric", 9L);
+			    do_fio(&c__1, "Symmetric", (ftnlen)9);
 			    e_wsfe();
 			    io___45.ciunit = *nounit;
 			    s_wsfe(&io___45);
-			    do_fio(&c__1, "orthogonal", 10L);
-			    do_fio(&c__1, "'", 1L);
-			    do_fio(&c__1, "transpose", 9L);
+			    do_fio(&c__1, "orthogonal", (ftnlen)10);
+			    do_fio(&c__1, "'", (ftnlen)1);
+			    do_fio(&c__1, "transpose", (ftnlen)9);
 			    for (j = 1; j <= 4; ++j) {
-				do_fio(&c__1, "'", 1L);
+				do_fio(&c__1, "'", (ftnlen)1);
 			    }
 			    e_wsfe();
 			}
@@ -796,4 +782,7 @@ L180:
 /*     End of SCHKSB */
 
 } /* schksb_ */
+
+#undef a_ref
+
 

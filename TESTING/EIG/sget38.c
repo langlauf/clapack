@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,7 +33,7 @@ static integer c__400 = 400;
 	    20] */, tnrm, qtmp[400]	/* was [20][20] */, work[1200], stmp, 
 	    vmul, ttmp[400]	/* was [20][20] */, tsav1[400]	/* was [20][
 	    20] */;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     static real q[400]	/* was [20][20] */, s, t[400]	/* was [20][20] */, v;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static real sepin, vimin;
@@ -76,22 +77,27 @@ static integer c__400 = 400;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define qsav_ref(a_1,a_2) qsav[(a_2)*20 + a_1 - 21]
+#define qtmp_ref(a_1,a_2) qtmp[(a_2)*20 + a_1 - 21]
+#define ttmp_ref(a_1,a_2) ttmp[(a_2)*20 + a_1 - 21]
+#define q_ref(a_1,a_2) q[(a_2)*20 + a_1 - 21]
+#define t_ref(a_1,a_2) t[(a_2)*20 + a_1 - 21]
+#define tmp_ref(a_1,a_2) tmp[(a_2)*20 + a_1 - 21]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SGET38 tests STRSEN, a routine for estimating condition numbers of a 
-  
-    cluster of eigenvalues and/or its associated right invariant subspace 
-  
+    SGET38 tests STRSEN, a routine for estimating condition numbers of a   
+    cluster of eigenvalues and/or its associated right invariant subspace   
 
-    The test matrices are read from a file with logical unit number NIN. 
-  
+    The test matrices are read from a file with logical unit number NIN.   
 
     Arguments   
     ==========   
@@ -114,9 +120,9 @@ static integer c__400 = 400;
             If STRSEN returns INFO nonzero on example i, LMAX(3)=i   
 
     NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = 1 if SGEHRD returned INFO nonzero   
-            NINFO(2) = 1 if SHSEQR returned INFO nonzero   
-            NINFO(3) = 1 if STRSEN returned INFO nonzero   
+            NINFO(1) = No. of times SGEHRD returned INFO nonzero   
+            NINFO(2) = No. of times SHSEQR returned INFO nonzero   
+            NINFO(3) = No. of times STRSEN returned INFO nonzero   
 
     KNT     (output) INTEGER   
             Total number of examples tested.   
@@ -124,8 +130,7 @@ static integer c__400 = 400;
     NIN     (input) INTEGER   
             Input logical unit number.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -173,18 +178,19 @@ L10:
     io___8.ciunit = *nin;
     s_rsle(&io___8);
     i__1 = ndim;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&iselec[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&iselec[i__ - 1], (ftnlen)sizeof(integer)
+		);
     }
     e_rsle();
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___11.ciunit = *nin;
 	s_rsle(&io___11);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&tmp[i + j * 20 - 21], (ftnlen)
-		    sizeof(real));
+	    do_lio(&c__4, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
+		    real));
 	}
 	e_rsle();
 /* L20: */
@@ -204,8 +210,8 @@ L10:
 	slacpy_("F", &n, &n, tmp, &c__20, t, &c__20);
 	vmul = val[iscl - 1];
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    sscal_(&n, &vmul, &t[i * 20 - 20], &c__1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    sscal_(&n, &vmul, &t_ref(1, i__), &c__1);
 /* L30: */
 	}
 	if (tnrm == 0.f) {
@@ -220,7 +226,7 @@ L10:
 	if (info != 0) {
 	    lmax[1] = *knt;
 	    ++ninfo[1];
-	    return 0;
+	    goto L160;
 	}
 
 /*        Generate orthogonal matrix */
@@ -236,26 +242,26 @@ L10:
 	if (info != 0) {
 	    lmax[2] = *knt;
 	    ++ninfo[2];
-	    return 0;
+	    goto L160;
 	}
 
 /*        Sort, select eigenvalues */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    ipnt[i - 1] = i;
-	    select[i - 1] = FALSE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ipnt[i__ - 1] = i__;
+	    select[i__ - 1] = FALSE_;
 /* L40: */
 	}
 	scopy_(&n, wr, &c__1, wrtmp, &c__1);
 	scopy_(&n, wi, &c__1, witmp, &c__1);
 	i__1 = n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    kmin = i;
-	    vrmin = wrtmp[i - 1];
-	    vimin = witmp[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    kmin = i__;
+	    vrmin = wrtmp[i__ - 1];
+	    vimin = witmp[i__ - 1];
 	    i__2 = n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		if (wrtmp[j - 1] < vrmin) {
 		    kmin = j;
 		    vrmin = wrtmp[j - 1];
@@ -263,18 +269,18 @@ L10:
 		}
 /* L50: */
 	    }
-	    wrtmp[kmin - 1] = wrtmp[i - 1];
-	    witmp[kmin - 1] = witmp[i - 1];
-	    wrtmp[i - 1] = vrmin;
-	    witmp[i - 1] = vimin;
-	    itmp = ipnt[i - 1];
-	    ipnt[i - 1] = ipnt[kmin - 1];
+	    wrtmp[kmin - 1] = wrtmp[i__ - 1];
+	    witmp[kmin - 1] = witmp[i__ - 1];
+	    wrtmp[i__ - 1] = vrmin;
+	    witmp[i__ - 1] = vimin;
+	    itmp = ipnt[i__ - 1];
+	    ipnt[i__ - 1] = ipnt[kmin - 1];
 	    ipnt[kmin - 1] = itmp;
 /* L60: */
 	}
 	i__1 = ndim;
-	for (i = 1; i <= i__1; ++i) {
-	    select[ipnt[iselec[i - 1] - 1] - 1] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    select[ipnt[iselec[i__ - 1] - 1] - 1] = TRUE_;
 /* L70: */
 	}
 
@@ -287,7 +293,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L160;
 	}
 	septmp = sep / vmul;
 	stmp = s;
@@ -299,7 +305,9 @@ L10:
 	vmax = dmax(result[0],result[1]);
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
 
 /*        Compare condition number for eigenvalue cluster   
@@ -340,7 +348,9 @@ L10:
 	}
 	if (vmax > rmax[2]) {
 	    rmax[2] = vmax;
-	    lmax[2] = *knt;
+	    if (ninfo[2] == 0) {
+		lmax[2] = *knt;
+	    }
 	}
 
 /*        Compare condition numbers for invariant subspace   
@@ -375,7 +385,9 @@ L10:
 	}
 	if (vmax > rmax[2]) {
 	    rmax[2] = vmax;
-	    lmax[2] = *knt;
+	    if (ninfo[2] == 0) {
+		lmax[2] = *knt;
+	    }
 	}
 
 /*        Compare condition number for eigenvalue cluster   
@@ -396,7 +408,9 @@ L10:
 	}
 	if (vmax > rmax[3]) {
 	    rmax[3] = vmax;
-	    lmax[3] = *knt;
+	    if (ninfo[3] == 0) {
+		lmax[3] = *knt;
+	    }
 	}
 
 /*        Compare condition numbers for invariant subspace   
@@ -417,7 +431,9 @@ L10:
 	}
 	if (vmax > rmax[3]) {
 	    rmax[3] = vmax;
-	    lmax[3] = *knt;
+	    if (ninfo[3] == 0) {
+		lmax[3] = *knt;
+	    }
 	}
 
 /*        Compute eigenvalue condition number only and compare   
@@ -434,7 +450,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L160;
 	}
 	if (s != stmp) {
 	    vmax = 1.f / eps;
@@ -443,13 +459,13 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp[i + j * 20 - 21] != t[i + j * 20 - 21]) {
+		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp[i + j * 20 - 21] != q[i + j * 20 - 21]) {
+		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
 /* L80: */
@@ -457,8 +473,7 @@ L10:
 /* L90: */
 	}
 
-/*        Compute invariant subspace condition number only and compare
-   
+/*        Compute invariant subspace condition number only and compare   
           Update Q */
 
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -471,7 +486,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L160;
 	}
 	if (-1.f != stmp) {
 	    vmax = 1.f / eps;
@@ -480,13 +495,13 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp[i + j * 20 - 21] != t[i + j * 20 - 21]) {
+		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp[i + j * 20 - 21] != q[i + j * 20 - 21]) {
+		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
 /* L100: */
@@ -507,7 +522,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L160;
 	}
 	if (s != stmp) {
 	    vmax = 1.f / eps;
@@ -516,13 +531,13 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp[i + j * 20 - 21] != t[i + j * 20 - 21]) {
+		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp[i + j * 20 - 21] != qsav[i + j * 20 - 21]) {
+		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
 /* L120: */
@@ -530,8 +545,7 @@ L10:
 /* L130: */
 	}
 
-/*        Compute invariant subspace condition number only and compare
-   
+/*        Compute invariant subspace condition number only and compare   
           Do not update Q */
 
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -544,7 +558,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L160;
 	}
 	if (-1.f != stmp) {
 	    vmax = 1.f / eps;
@@ -553,13 +567,13 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp[i + j * 20 - 21] != t[i + j * 20 - 21]) {
+		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp[i + j * 20 - 21] != qsav[i + j * 20 - 21]) {
+		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
 		    vmax = 1.f / eps;
 		}
 /* L140: */
@@ -568,13 +582,24 @@ L10:
 	}
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
-/* L160: */
+L160:
+	;
     }
     goto L10;
 
 /*     End of SGET38 */
 
 } /* sget38_ */
+
+#undef tmp_ref
+#undef t_ref
+#undef q_ref
+#undef ttmp_ref
+#undef qtmp_ref
+#undef qsav_ref
+
 

@@ -1,25 +1,21 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int zpttrf_(integer *n, doublereal *d, doublecomplex *e, 
+/* Subroutine */ int zpttrf_(integer *n, doublereal *d__, doublecomplex *e, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZPTTRF computes the factorization of a complex Hermitian positive   
-    definite tridiagonal matrix A.   
-
-    If the subdiagonal elements of A are supplied in the array E, the   
-    factorization has the form A = L*D*L**H, where D is diagonal and L   
-    is unit lower bidiagonal; if the superdiagonal elements of A are   
-    supplied, it has the form A = U**H*D*U, where U is unit upper   
-    bidiagonal.   
+    ZPTTRF computes the L*D*L' factorization of a complex Hermitian   
+    positive definite tridiagonal matrix A.  The factorization may also   
+    be regarded as having the form A = U'*D*U.   
 
     Arguments   
     =========   
@@ -30,32 +26,29 @@
     D       (input/output) DOUBLE PRECISION array, dimension (N)   
             On entry, the n diagonal elements of the tridiagonal matrix   
             A.  On exit, the n diagonal elements of the diagonal matrix   
-            D from the L*D*L**H factorization of A.   
+            D from the L*D*L' factorization of A.   
 
     E       (input/output) COMPLEX*16 array, dimension (N-1)   
-            On entry, the (n-1) off-diagonal elements of the tridiagonal 
-  
-            matrix A.  On exit, the (n-1) off-diagonal elements of the   
-            unit bidiagonal factor L or U from the factorization of A.   
+            On entry, the (n-1) subdiagonal elements of the tridiagonal   
+            matrix A.  On exit, the (n-1) subdiagonal elements of the   
+            unit bidiagonal factor L from the L*D*L' factorization of A.   
+            E can also be regarded as the superdiagonal of the unit   
+            bidiagonal factor U from the U'*D*U factorization of A.   
 
     INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the leading minor of order i is not   
-                  positive definite; if i < N, the factorization could   
-                  not be completed, while if i = N, the factorization was 
-  
-                  completed, but D(N) = 0.   
+            = 0: successful exit   
+            < 0: if INFO = -k, the k-th argument had an illegal value   
+            > 0: if INFO = k, the leading minor of order k is not   
+                 positive definite; if k < N, the factorization could not   
+                 be completed, while if k = N, the factorization was   
+                 completed, but D(N) = 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     doublecomplex z__1;
@@ -63,16 +56,14 @@
     double d_imag(doublecomplex *);
     /* Local variables */
     static doublereal f, g;
-    static integer i;
-    static doublereal di;
+    static integer i__, i4;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal eii, eir;
 
+    --e;
+    --d__;
 
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -89,41 +80,106 @@
 
 /*     Compute the L*D*L' (or U'*D*U) factorization of A. */
 
-    i__1 = *n - 1;
-    for (i = 1; i <= *n-1; ++i) {
+    i4 = (*n - 1) % 4;
+    i__1 = i4;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (d__[i__] <= 0.) {
+	    *info = i__;
+	    goto L30;
+	}
+	i__2 = i__;
+	eir = e[i__2].r;
+	eii = d_imag(&e[i__]);
+	f = eir / d__[i__];
+	g = eii / d__[i__];
+	i__2 = i__;
+	z__1.r = f, z__1.i = g;
+	e[i__2].r = z__1.r, e[i__2].i = z__1.i;
+	d__[i__ + 1] = d__[i__ + 1] - f * eir - g * eii;
+/* L10: */
+    }
 
-/*        Drop out of the loop if d(i) <= 0: the matrix is not positiv
-e   
+    i__1 = *n - 4;
+    for (i__ = i4 + 1; i__ <= i__1; i__ += 4) {
+
+/*        Drop out of the loop if d(i) <= 0: the matrix is not positive   
           definite. */
 
-	di = D(i);
-	if (di <= 0.) {
-	    goto L20;
+	if (d__[i__] <= 0.) {
+	    *info = i__;
+	    goto L30;
 	}
 
 /*        Solve for e(i) and d(i+1). */
 
-	i__2 = i;
-	eir = E(i).r;
-	eii = d_imag(&E(i));
-	f = eir / di;
-	g = eii / di;
-	i__2 = i;
+	i__2 = i__;
+	eir = e[i__2].r;
+	eii = d_imag(&e[i__]);
+	f = eir / d__[i__];
+	g = eii / d__[i__];
+	i__2 = i__;
 	z__1.r = f, z__1.i = g;
-	E(i).r = z__1.r, E(i).i = z__1.i;
-	D(i + 1) = D(i + 1) - f * eir - g * eii;
-/* L10: */
+	e[i__2].r = z__1.r, e[i__2].i = z__1.i;
+	d__[i__ + 1] = d__[i__ + 1] - f * eir - g * eii;
+
+	if (d__[i__ + 1] <= 0.) {
+	    *info = i__ + 1;
+	    goto L30;
+	}
+
+/*        Solve for e(i+1) and d(i+2). */
+
+	i__2 = i__ + 1;
+	eir = e[i__2].r;
+	eii = d_imag(&e[i__ + 1]);
+	f = eir / d__[i__ + 1];
+	g = eii / d__[i__ + 1];
+	i__2 = i__ + 1;
+	z__1.r = f, z__1.i = g;
+	e[i__2].r = z__1.r, e[i__2].i = z__1.i;
+	d__[i__ + 2] = d__[i__ + 2] - f * eir - g * eii;
+
+	if (d__[i__ + 2] <= 0.) {
+	    *info = i__ + 2;
+	    goto L30;
+	}
+
+/*        Solve for e(i+2) and d(i+3). */
+
+	i__2 = i__ + 2;
+	eir = e[i__2].r;
+	eii = d_imag(&e[i__ + 2]);
+	f = eir / d__[i__ + 2];
+	g = eii / d__[i__ + 2];
+	i__2 = i__ + 2;
+	z__1.r = f, z__1.i = g;
+	e[i__2].r = z__1.r, e[i__2].i = z__1.i;
+	d__[i__ + 3] = d__[i__ + 3] - f * eir - g * eii;
+
+	if (d__[i__ + 3] <= 0.) {
+	    *info = i__ + 3;
+	    goto L30;
+	}
+
+/*        Solve for e(i+3) and d(i+4). */
+
+	i__2 = i__ + 3;
+	eir = e[i__2].r;
+	eii = d_imag(&e[i__ + 3]);
+	f = eir / d__[i__ + 3];
+	g = eii / d__[i__ + 3];
+	i__2 = i__ + 3;
+	z__1.r = f, z__1.i = g;
+	e[i__2].r = z__1.r, e[i__2].i = z__1.i;
+	d__[i__ + 4] = d__[i__ + 4] - f * eir - g * eii;
+/* L20: */
     }
 
 /*     Check d(n) for positive definiteness. */
 
-    i = *n;
-    if (D(i) > 0.) {
-	goto L30;
+    if (d__[*n] <= 0.) {
+	*info = *n;
     }
-
-L20:
-    *info = i;
 
 L30:
     return 0;

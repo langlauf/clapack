@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,7 +11,7 @@
 static integer c__3 = 3;
 
 /* Subroutine */ int zlatm1_(integer *mode, doublereal *cond, integer *irsign,
-	 integer *idist, integer *iseed, doublecomplex *d, integer *n, 
+	 integer *idist, integer *iseed, doublecomplex *d__, integer *n, 
 	integer *info)
 {
     /* System generated locals */
@@ -24,7 +25,7 @@ static integer c__3 = 3;
 
     /* Local variables */
     static doublereal temp;
-    static integer i;
+    static integer i__;
     static doublereal alpha;
     static doublecomplex ctemp;
     extern doublereal dlaran_(integer *);
@@ -35,7 +36,7 @@ static integer c__3 = 3;
 	    doublecomplex *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -113,18 +114,16 @@ static integer c__3 = 3;
              -2  => if MODE neither -6, 0 nor 6, and   
                     IRSIGN neither 0 nor 1   
              -3  => if MODE neither -6, 0 nor 6 and COND less than 1   
-             -4  => if MODE equals 6 or -6 and IDIST not in range 1 to 4 
-  
+             -4  => if MODE equals 6 or -6 and IDIST not in range 1 to 4   
              -7  => if N negative   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters. Initialize flags & seed.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --iseed;
 
     /* Function Body */
@@ -173,42 +172,42 @@ static integer c__3 = 3;
 
 L10:
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
 	    d__1 = 1. / *cond;
-	    d[i__2].r = d__1, d[i__2].i = 0.;
+	    d__[i__2].r = d__1, d__[i__2].i = 0.;
 /* L20: */
 	}
-	d[1].r = 1., d[1].i = 0.;
+	d__[1].r = 1., d__[1].i = 0.;
 	goto L120;
 
 /*        One small D value: */
 
 L30:
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    d[i__2].r = 1., d[i__2].i = 0.;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    d__[i__2].r = 1., d__[i__2].i = 0.;
 /* L40: */
 	}
 	i__1 = *n;
 	d__1 = 1. / *cond;
-	d[i__1].r = d__1, d[i__1].i = 0.;
+	d__[i__1].r = d__1, d__[i__1].i = 0.;
 	goto L120;
 
 /*        Exponentially distributed D values: */
 
 L50:
-	d[1].r = 1., d[1].i = 0.;
+	d__[1].r = 1., d__[1].i = 0.;
 	if (*n > 1) {
 	    d__1 = -1. / (doublereal) (*n - 1);
 	    alpha = pow_dd(cond, &d__1);
 	    i__1 = *n;
-	    for (i = 2; i <= i__1; ++i) {
-		i__2 = i;
-		i__3 = i - 1;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = i__;
+		i__3 = i__ - 1;
 		d__1 = pow_di(&alpha, &i__3);
-		d[i__2].r = d__1, d[i__2].i = 0.;
+		d__[i__2].r = d__1, d__[i__2].i = 0.;
 /* L60: */
 	    }
 	}
@@ -217,15 +216,15 @@ L50:
 /*        Arithmetically distributed D values: */
 
 L70:
-	d[1].r = 1., d[1].i = 0.;
+	d__[1].r = 1., d__[1].i = 0.;
 	if (*n > 1) {
 	    temp = 1. / *cond;
 	    alpha = (1. - temp) / (doublereal) (*n - 1);
 	    i__1 = *n;
-	    for (i = 2; i <= i__1; ++i) {
-		i__2 = i;
-		d__1 = (doublereal) (*n - i) * alpha + temp;
-		d[i__2].r = d__1, d[i__2].i = 0.;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = i__;
+		d__1 = (doublereal) (*n - i__) * alpha + temp;
+		d__[i__2].r = d__1, d__[i__2].i = 0.;
 /* L80: */
 	    }
 	}
@@ -236,10 +235,10 @@ L70:
 L90:
 	alpha = log(1. / *cond);
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
 	    d__1 = exp(alpha * dlaran_(&iseed[1]));
-	    d[i__2].r = d__1, d[i__2].i = 0.;
+	    d__[i__2].r = d__1, d__[i__2].i = 0.;
 /* L100: */
 	}
 	goto L120;
@@ -247,7 +246,7 @@ L90:
 /*        Randomly distributed D values from IDIST */
 
 L110:
-	zlarnv_(idist, &iseed[1], n, &d[1]);
+	zlarnv_(idist, &iseed[1], n, &d__[1]);
 
 L120:
 
@@ -256,16 +255,16 @@ L120:
 
 	if (*mode != -6 && *mode != 0 && *mode != 6 && *irsign == 1) {
 	    i__1 = *n;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		zlarnd_(&z__1, &c__3, &iseed[1]);
 		ctemp.r = z__1.r, ctemp.i = z__1.i;
-		i__2 = i;
-		i__3 = i;
+		i__2 = i__;
+		i__3 = i__;
 		d__1 = z_abs(&ctemp);
 		z__2.r = ctemp.r / d__1, z__2.i = ctemp.i / d__1;
-		z__1.r = d[i__3].r * z__2.r - d[i__3].i * z__2.i, z__1.i = d[
-			i__3].r * z__2.i + d[i__3].i * z__2.r;
-		d[i__2].r = z__1.r, d[i__2].i = z__1.i;
+		z__1.r = d__[i__3].r * z__2.r - d__[i__3].i * z__2.i, z__1.i =
+			 d__[i__3].r * z__2.i + d__[i__3].i * z__2.r;
+		d__[i__2].r = z__1.r, d__[i__2].i = z__1.i;
 /* L130: */
 	    }
 	}
@@ -274,14 +273,14 @@ L120:
 
 	if (*mode < 0) {
 	    i__1 = *n / 2;
-	    for (i = 1; i <= i__1; ++i) {
-		i__2 = i;
-		ctemp.r = d[i__2].r, ctemp.i = d[i__2].i;
-		i__2 = i;
-		i__3 = *n + 1 - i;
-		d[i__2].r = d[i__3].r, d[i__2].i = d[i__3].i;
-		i__2 = *n + 1 - i;
-		d[i__2].r = ctemp.r, d[i__2].i = ctemp.i;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = i__;
+		ctemp.r = d__[i__2].r, ctemp.i = d__[i__2].i;
+		i__2 = i__;
+		i__3 = *n + 1 - i__;
+		d__[i__2].r = d__[i__3].r, d__[i__2].i = d__[i__3].i;
+		i__2 = *n + 1 - i__;
+		d__[i__2].r = ctemp.r, d__[i__2].i = ctemp.i;
 /* L140: */
 	    }
 	}

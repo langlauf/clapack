@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int slartg_(real *f, real *g, real *cs, real *sn, real *r)
+/* Subroutine */ int slartg_(real *f, real *g, real *cs, real *sn, real *r__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -44,8 +45,7 @@
     R       (output) REAL   
             The nonzero component of the rotated vector.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* Initialized data */
     static logical first = TRUE_;
     /* System generated locals */
@@ -54,7 +54,7 @@
     /* Builtin functions */
     double log(doublereal), pow_ri(real *, integer *), sqrt(doublereal);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static real scale;
     static integer count;
     static real f1, g1, safmn2, safmx2;
@@ -68,18 +68,19 @@
 	safmin = slamch_("S");
 	eps = slamch_("E");
 	r__1 = slamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 2.f);
+	i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 
+		2.f);
 	safmn2 = pow_ri(&r__1, &i__1);
 	safmx2 = 1.f / safmn2;
     }
     if (*g == 0.f) {
 	*cs = 1.f;
 	*sn = 0.f;
-	*r = *f;
+	*r__ = *f;
     } else if (*f == 0.f) {
 	*cs = 0.f;
 	*sn = 1.f;
-	*r = *g;
+	*r__ = *g;
     } else {
 	f1 = *f;
 	g1 = *g;
@@ -102,12 +103,12 @@ L10:
 	    r__1 = f1;
 /* Computing 2nd power */
 	    r__2 = g1;
-	    *r = sqrt(r__1 * r__1 + r__2 * r__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(r__1 * r__1 + r__2 * r__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	    i__1 = count;
-	    for (i = 1; i <= count; ++i) {
-		*r *= safmx2;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		*r__ *= safmx2;
 /* L20: */
 	    }
 	} else if (scale <= safmn2) {
@@ -126,12 +127,12 @@ L30:
 	    r__1 = f1;
 /* Computing 2nd power */
 	    r__2 = g1;
-	    *r = sqrt(r__1 * r__1 + r__2 * r__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(r__1 * r__1 + r__2 * r__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	    i__1 = count;
-	    for (i = 1; i <= count; ++i) {
-		*r *= safmn2;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		*r__ *= safmn2;
 /* L40: */
 	    }
 	} else {
@@ -139,14 +140,14 @@ L30:
 	    r__1 = f1;
 /* Computing 2nd power */
 	    r__2 = g1;
-	    *r = sqrt(r__1 * r__1 + r__2 * r__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(r__1 * r__1 + r__2 * r__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	}
 	if (dabs(*f) > dabs(*g) && *cs < 0.f) {
-	    *cs = -(doublereal)(*cs);
-	    *sn = -(doublereal)(*sn);
-	    *r = -(doublereal)(*r);
+	    *cs = -(*cs);
+	    *sn = -(*sn);
+	    *r__ = -(*r__);
 	}
     }
     return 0;

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int ddisna_(char *job, integer *m, integer *n, doublereal *d,
-	 doublereal *sep, integer *info)
+/* Subroutine */ int ddisna_(char *job, integer *m, integer *n, doublereal *
+	d__, doublereal *sep, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -12,12 +13,10 @@
     Purpose   
     =======   
 
-    DDISNA computes the reciprocal condition numbers for the eigenvectors 
-  
+    DDISNA computes the reciprocal condition numbers for the eigenvectors   
     of a real symmetric or complex Hermitian matrix or for the left or   
     right singular vectors of a general m-by-n matrix. The reciprocal   
-    condition number is the 'gap' between the corresponding eigenvalue or 
-  
+    condition number is the 'gap' between the corresponding eigenvalue or   
     singular value and the nearest other one.   
 
     The bound on the error, measured by angle in radians, in the I-th   
@@ -25,10 +24,8 @@
 
            DLAMCH( 'E' ) * ( ANORM / SEP( I ) )   
 
-    where ANORM = 2-norm(A) = max( abs( D(j) ) ).  SEP(I) is not allowed 
-  
-    to be smaller than DLAMCH( 'E' )*ANORM in order to limit the size of 
-  
+    where ANORM = 2-norm(A) = max( abs( D(j) ) ).  SEP(I) is not allowed   
+    to be smaller than DLAMCH( 'E' )*ANORM in order to limit the size of   
     the error bound.   
 
     DDISNA may also be used to compute error bounds for eigenvectors of   
@@ -38,8 +35,7 @@
     =========   
 
     JOB     (input) CHARACTER*1   
-            Specifies for which problem the reciprocal condition numbers 
-  
+            Specifies for which problem the reciprocal condition numbers   
             should be computed:   
             = 'E':  the eigenvectors of a symmetric/Hermitian matrix;   
             = 'L':  the left singular vectors of a general matrix;   
@@ -53,37 +49,31 @@
             in which case N >= 0. Ignored if JOB = 'E'.   
 
     D       (input) DOUBLE PRECISION array, dimension (M) if JOB = 'E'   
-                                dimension (min(M,N)) if JOB = 'L' or 'R' 
-  
+                                dimension (min(M,N)) if JOB = 'L' or 'R'   
             The eigenvalues (if JOB = 'E') or singular values (if JOB =   
-            'L' or 'R') of the matrix, in either increasing or decreasing 
-  
+            'L' or 'R') of the matrix, in either increasing or decreasing   
             order. If singular values, they must be non-negative.   
 
     SEP     (output) DOUBLE PRECISION array, dimension (M) if JOB = 'E'   
-                                 dimension (min(M,N)) if JOB = 'L' or 'R' 
-  
+                                 dimension (min(M,N)) if JOB = 'L' or 'R'   
             The reciprocal condition numbers of the vectors.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2, d__3;
     /* Local variables */
     static logical decr, left, incr, sing;
-    static integer i, k;
+    static integer i__, k;
     static logical eigen;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
@@ -93,11 +83,10 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal newgap, thresh, eps;
 
+    --sep;
+    --d__;
 
-#define SEP(I) sep[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     eigen = lsame_(job, "E");
     left = lsame_(job, "L");
@@ -118,21 +107,21 @@
 	incr = TRUE_;
 	decr = TRUE_;
 	i__1 = k - 1;
-	for (i = 1; i <= k-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    if (incr) {
-		incr = incr && D(i) <= D(i + 1);
+		incr = incr && d__[i__] <= d__[i__ + 1];
 	    }
 	    if (decr) {
-		decr = decr && D(i) >= D(i + 1);
+		decr = decr && d__[i__] >= d__[i__ + 1];
 	    }
 /* L10: */
 	}
 	if (sing && k > 0) {
 	    if (incr) {
-		incr = incr && 0. <= D(1);
+		incr = incr && 0. <= d__[1];
 	    }
 	    if (decr) {
-		decr = decr && D(k) >= 0.;
+		decr = decr && d__[k] >= 0.;
 	    }
 	}
 	if (! (incr || decr)) {
@@ -154,28 +143,28 @@
 /*     Compute reciprocal condition numbers */
 
     if (k == 1) {
-	SEP(1) = dlamch_("O");
+	sep[1] = dlamch_("O");
     } else {
-	oldgap = (d__1 = D(2) - D(1), abs(d__1));
-	SEP(1) = oldgap;
+	oldgap = (d__1 = d__[2] - d__[1], abs(d__1));
+	sep[1] = oldgap;
 	i__1 = k - 1;
-	for (i = 2; i <= k-1; ++i) {
-	    newgap = (d__1 = D(i + 1) - D(i), abs(d__1));
-	    SEP(i) = min(oldgap,newgap);
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    newgap = (d__1 = d__[i__ + 1] - d__[i__], abs(d__1));
+	    sep[i__] = min(oldgap,newgap);
 	    oldgap = newgap;
 /* L20: */
 	}
-	SEP(k) = oldgap;
+	sep[k] = oldgap;
     }
     if (sing) {
 	if (left && *m > *n || right && *m < *n) {
 	    if (incr) {
-		SEP(1) = min(SEP(1),D(1));
+		sep[1] = min(sep[1],d__[1]);
 	    }
 	    if (decr) {
 /* Computing MIN */
-		d__1 = SEP(k), d__2 = D(k);
-		SEP(k) = min(d__1,d__2);
+		d__1 = sep[k], d__2 = d__[k];
+		sep[k] = min(d__1,d__2);
 	    }
 	}
     }
@@ -186,7 +175,7 @@
     eps = dlamch_("E");
     safmin = dlamch_("S");
 /* Computing MAX */
-    d__2 = abs(D(1)), d__3 = (d__1 = D(k), abs(d__1));
+    d__2 = abs(d__[1]), d__3 = (d__1 = d__[k], abs(d__1));
     anorm = max(d__2,d__3);
     if (anorm == 0.) {
 	thresh = eps;
@@ -196,10 +185,10 @@
 	thresh = max(d__1,safmin);
     }
     i__1 = k;
-    for (i = 1; i <= k; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	d__1 = SEP(i);
-	SEP(i) = max(d__1,thresh);
+	d__1 = sep[i__];
+	sep[i__] = max(d__1,thresh);
 /* L30: */
     }
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -42,10 +43,10 @@ static integer c__5 = 5;
 /* Subroutine */ int serred_(char *path, integer *nunit)
 {
     /* Format strings */
-    static char fmt_9999[] = "(1x,a6,\002 passed the tests of the error exit"
-	    "s (\002,i3,\002 tests done)\002)";
-    static char fmt_9998[] = "(\002 *** \002,a6,\002 failed the tests of the"
-	    " error exits ***\002)";
+    static char fmt_9999[] = "(1x,a3,\002 routines passed the tests of the e"
+	    "rror exits (\002,i3,\002 tests done)\002)";
+    static char fmt_9998[] = "(\002 *** \002,a3,\002 routines failed the tes"
+	    "ts of the error ex\002,\002its ***\002)";
 
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
@@ -56,7 +57,7 @@ static integer c__5 = 5;
     static integer info, sdim;
     static real a[16]	/* was [4][4] */;
     static logical b[4];
-    static integer i, j;
+    static integer i__, j;
     static real s[4], u[16]	/* was [4][4] */, w[16], abnrm;
     extern /* Subroutine */ int sgees_(char *, char *, L_fp, integer *, real *
 	    , integer *, integer *, real *, real *, real *, integer *, real *,
@@ -70,6 +71,9 @@ static integer c__5 = 5;
     static integer nt;
     static real vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] */, wr[
 	    4], vt[16]	/* was [4][4] */;
+    extern /* Subroutine */ int sgesdd_(char *, integer *, integer *, real *, 
+	    integer *, real *, real *, integer *, real *, integer *, real *, 
+	    integer *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), sgesvd_(char *, char *, integer *, integer 
@@ -93,10 +97,13 @@ static integer c__5 = 5;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       December 22, 1999   
 
 
     Purpose   
@@ -112,6 +119,8 @@ static integer c__5 = 5;
     SVX   SGEEVX   SGEEV + balancing and condition estimation   
     SSX   SGEESX   SGEES + balancing and condition estimation   
     SBD   SGESVD   compute SVD of an M-by-N matrix A   
+          SGESDD   compute SVD of an M-by-N matrix A (by divide and   
+                   conquer)   
 
     Arguments   
     =========   
@@ -122,27 +131,26 @@ static integer c__5 = 5;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Initialize A */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 0.f;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
-    for (i = 1; i <= 4; ++i) {
-	a[i + (i << 2) - 5] = 1.f;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	a_ref(i__, i__) = 1.f;
 /* L30: */
     }
     infoc_1.ok = TRUE_;
@@ -152,7 +160,7 @@ static integer c__5 = 5;
 
 /*        Test SGEEV */
 
-	s_copy(srnamc_1.srnamt, "SGEEV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGEEV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeev_("X", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &c__1, w, &
 		c__1, &info);
@@ -194,7 +202,7 @@ static integer c__5 = 5;
 
 /*        Test SGEES */
 
-	s_copy(srnamc_1.srnamt, "SGEES ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGEES ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgees_("X", "N", (L_fp)sslect_, &c__0, a, &c__1, &sdim, wr, wi, vl, &
 		c__1, w, &c__1, b, &info);
@@ -231,7 +239,7 @@ static integer c__5 = 5;
 
 /*        Test SGEEVX */
 
-	s_copy(srnamc_1.srnamt, "SGEEVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGEEVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeevx_("X", "N", "N", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &
 		c__1, &ilo, &ihi, s, &abnrm, r1, r2, w, &c__1, iw, &info);
@@ -293,7 +301,7 @@ static integer c__5 = 5;
 
 /*        Test SGEESX */
 
-	s_copy(srnamc_1.srnamt, "SGEESX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGEESX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeesx_("X", "N", (L_fp)sslect_, "N", &c__0, a, &c__1, &sdim, wr, wi, 
 		vl, &c__1, r1, r2, w, &c__1, iw, &c__1, b, &info);
@@ -335,7 +343,7 @@ static integer c__5 = 5;
 
 /*        Test SGESVD */
 
-	s_copy(srnamc_1.srnamt, "SGESVD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgesvd_("X", "N", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &
 		c__1, &info);
@@ -377,24 +385,66 @@ static integer c__5 = 5;
 	chkxer_("SGESVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 8;
+
+/*        Test SGESDD */
+
+	s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	sgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	sgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	sgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	sgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 8;
+	sgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 10;
+	sgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	nt += 6;
     }
 
 /*     Print a summary line. */
 
-    if (infoc_1.ok) {
-	io___24.ciunit = infoc_1.nout;
-	s_wsfe(&io___24);
-	do_fio(&c__1, srnamc_1.srnamt, 6L);
-	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
-	e_wsfe();
-    } else {
-	io___25.ciunit = infoc_1.nout;
-	s_wsfe(&io___25);
-	e_wsfe();
+    if (! lsamen_(&c__2, c2, "BD")) {
+	if (infoc_1.ok) {
+	    io___24.ciunit = infoc_1.nout;
+	    s_wsfe(&io___24);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	} else {
+	    io___25.ciunit = infoc_1.nout;
+	    s_wsfe(&io___25);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    e_wsfe();
+	}
     }
 
     return 0;
 
 /*     End of SERRED */
+
 } /* serred_ */
+
+#undef a_ref
+
 

@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 logical lsamen_(integer *n, char *ca, char *cb)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgecon_(char *norm, integer *n, doublecomplex *a, 
 	integer *lda, doublereal *anorm, doublereal *rcond, doublecomplex *
 	work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    ZGECON estimates the reciprocal of the condition number of a general 
-  
+    ZGECON estimates the reciprocal of the condition number of a general   
     complex matrix A, in either the 1-norm or the infinity-norm, using   
     the LU factorization computed by ZGETRF.   
 
@@ -57,15 +57,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -97,12 +94,13 @@
 	    doublereal *, doublereal *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
+    --rwork;
 
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
     if (! onenrm && ! lsame_(norm, "I")) {
@@ -143,42 +141,44 @@
     }
     kase = 0;
 L10:
-    zlacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+    zlacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (kase == kase1) {
 
 /*           Multiply by inv(L). */
 
-	    zlatrs_("Lower", "No transpose", "Unit", normin, n, &A(1,1), 
-		    lda, &WORK(1), &sl, &RWORK(1), info);
+	    zlatrs_("Lower", "No transpose", "Unit", normin, n, &a[a_offset], 
+		    lda, &work[1], &sl, &rwork[1], info);
 
 /*           Multiply by inv(U). */
 
-	    zlatrs_("Upper", "No transpose", "Non-unit", normin, n, &A(1,1), lda, &WORK(1), &su, &RWORK(*n + 1), info);
+	    zlatrs_("Upper", "No transpose", "Non-unit", normin, n, &a[
+		    a_offset], lda, &work[1], &su, &rwork[*n + 1], info);
 	} else {
 
 /*           Multiply by inv(U'). */
 
-	    zlatrs_("Upper", "Conjugate transpose", "Non-unit", normin, n, &A(1,1), lda, &WORK(1), &su, &RWORK(*n + 1), info);
+	    zlatrs_("Upper", "Conjugate transpose", "Non-unit", normin, n, &a[
+		    a_offset], lda, &work[1], &su, &rwork[*n + 1], info);
 
 /*           Multiply by inv(L'). */
 
-	    zlatrs_("Lower", "Conjugate transpose", "Unit", normin, n, &A(1,1), lda, &WORK(1), &sl, &RWORK(1), info);
+	    zlatrs_("Lower", "Conjugate transpose", "Unit", normin, n, &a[
+		    a_offset], lda, &work[1], &sl, &rwork[1], info);
 	}
 
-/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. 
-*/
+/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. */
 
 	scale = sl * su;
 	*(unsigned char *)normin = 'Y';
 	if (scale != 1.) {
-	    ix = izamax_(n, &WORK(1), &c__1);
+	    ix = izamax_(n, &work[1], &c__1);
 	    i__1 = ix;
-	    if (scale < ((d__1 = WORK(ix).r, abs(d__1)) + (d__2 = d_imag(&
-		    WORK(ix)), abs(d__2))) * smlnum || scale == 0.) {
+	    if (scale < ((d__1 = work[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+		    work[ix]), abs(d__2))) * smlnum || scale == 0.) {
 		goto L20;
 	    }
-	    zdrscl_(n, &scale, &WORK(1), &c__1);
+	    zdrscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ static integer c__1 = 1;
     static doublereal diff, axbi;
     static integer imax;
     static doublereal unfl, ovfl;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static doublereal xnorm;
     extern doublereal dlamch_(char *);
@@ -34,7 +35,13 @@ static integer c__1 = 1;
     static doublereal eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_ref(a_1,a_2) xact[(a_2)*xact_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,8 +51,7 @@ static integer c__1 = 1;
     =======   
 
     DGBT05 tests the error bounds from iterative refinement for the   
-    computed solution to a system of equations op(A)*X = B, where A is a 
-  
+    computed solution to a system of equations op(A)*X = B, where A is a   
     general band matrix of order n with kl subdiagonals and ku   
     superdiagonals and op(A) = A or A**T, depending on TRANS.   
 
@@ -57,8 +63,7 @@ static integer c__1 = 1;
     RESLTS(2) = residual from the iterative refinement routine   
               = the maximum of BERR / ( NZ*EPS + (*) ), where   
                 (*) = NZ*UNFL / (min_i (abs(op(A))*abs(X) +abs(b))_i )   
-                and NZ = max. number of nonzeros in any row of A, plus 1 
-  
+                and NZ = max. number of nonzeros in any row of A, plus 1   
 
     Arguments   
     =========   
@@ -77,8 +82,7 @@ static integer c__1 = 1;
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     NRHS    (input) INTEGER   
             The number of columns of the matrices X, B, and XACT.   
@@ -112,21 +116,17 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     FERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude 
-  
-            of the largest entry in (X - XTRUE) divided by the magnitude 
-  
+            X.  If XTRUE is the true solution, FERR bounds the magnitude   
+            of the largest entry in (X - XTRUE) divided by the magnitude   
             of the largest entry in X.   
 
     BERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A 
-  
+            vector (i.e., the smallest relative change in any entry of A   
             or B that makes X an exact solution).   
 
     RESLTS  (output) DOUBLE PRECISION array, dimension (2)   
@@ -134,24 +134,23 @@ static integer c__1 = 1;
             RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
             RESLTS(2) = BERR / ( NZ*EPS + (*) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
 
        Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -179,16 +178,16 @@ static integer c__1 = 1;
     errbnd = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = idamax_(n, &x[j * x_dim1 + 1], &c__1);
+	imax = idamax_(n, &x_ref(1, j), &c__1);
 /* Computing MAX */
-	d__2 = (d__1 = x[imax + j * x_dim1], abs(d__1));
+	d__2 = (d__1 = x_ref(imax, j), abs(d__1));
 	xnorm = max(d__2,unfl);
 	diff = 0.;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = diff, d__3 = (d__1 = x[i + j * x_dim1] - xact[i + j * 
-		    xact_dim1], abs(d__1));
+	    d__2 = diff, d__3 = (d__1 = x_ref(i__, j) - xact_ref(i__, j), abs(
+		    d__1));
 	    diff = max(d__2,d__3);
 /* L10: */
 	}
@@ -221,32 +220,32 @@ L30:
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    tmp = (d__1 = b[i + k * b_dim1], abs(d__1));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    tmp = (d__1 = b_ref(i__, k), abs(d__1));
 	    if (notran) {
 /* Computing MAX */
-		i__3 = i - *kl;
+		i__3 = i__ - *kl;
 /* Computing MIN */
-		i__5 = i + *ku;
+		i__5 = i__ + *ku;
 		i__4 = min(i__5,*n);
 		for (j = max(i__3,1); j <= i__4; ++j) {
-		    tmp += (d__1 = ab[*ku + 1 + i - j + j * ab_dim1], abs(
-			    d__1)) * (d__2 = x[j + k * x_dim1], abs(d__2));
+		    tmp += (d__1 = ab_ref(*ku + 1 + i__ - j, j), abs(d__1)) * 
+			    (d__2 = x_ref(j, k), abs(d__2));
 /* L40: */
 		}
 	    } else {
 /* Computing MAX */
-		i__4 = i - *ku;
+		i__4 = i__ - *ku;
 /* Computing MIN */
-		i__5 = i + *kl;
+		i__5 = i__ + *kl;
 		i__3 = min(i__5,*n);
 		for (j = max(i__4,1); j <= i__3; ++j) {
-		    tmp += (d__1 = ab[*ku + 1 + j - i + i * ab_dim1], abs(
-			    d__1)) * (d__2 = x[j + k * x_dim1], abs(d__2));
+		    tmp += (d__1 = ab_ref(*ku + 1 + j - i__, i__), abs(d__1)) 
+			    * (d__2 = x_ref(j, k), abs(d__2));
 /* L50: */
 		}
 	    }
-	    if (i == 1) {
+	    if (i__ == 1) {
 		axbi = tmp;
 	    } else {
 		axbi = min(axbi,tmp);
@@ -269,4 +268,10 @@ L30:
 /*     End of DGBT05 */
 
 } /* dgbt05_ */
+
+#undef ab_ref
+#undef x_ref
+#undef b_ref
+#undef xact_ref
+
 

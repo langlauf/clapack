@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,13 @@ static complex c_b9 = {-1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -71,18 +78,17 @@ static complex c_b9 = {-1.f,0.f};
     RESULT  (output) REAL   
             RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
     --rwork;
@@ -99,8 +105,8 @@ static complex c_b9 = {-1.f,0.f};
     wnorm = 0.f;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
-	caxpy_(m, &c_b9, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+	caxpy_(m, &c_b9, &b_ref(1, j), &c__1, &work[1], &c__1);
 /* Computing MAX */
 	r__1 = wnorm, r__2 = scasum_(n, &work[1], &c__1);
 	wnorm = dmax(r__1,r__2);
@@ -130,4 +136,10 @@ static complex c_b9 = {-1.f,0.f};
 /*     End of CGET10 */
 
 } /* cget10_ */
+
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,8 +17,8 @@ static integer c__3 = 3;
 {
     /* Format strings */
     static char fmt_9989[] = "(\002 Tests of the Nonsymmetric eigenproblem c"
-	    "ondition estim\002,\002ation routines\002,/\002 DLALN2, SLASY2, "
-	    "SLANV2, SLAEXC, DTRS\002,\002YL, DTREXC, STRSNA, STRSEN, DLAQT"
+	    "ondition estim\002,\002ation routines\002,/\002 DLALN2, DLASY2, "
+	    "DLANV2, DLAEXC, DTRS\002,\002YL, DTREXC, DTRSNA, DTRSEN, DLAQT"
 	    "R\002,/)";
     static char fmt_9988[] = "(\002 Relative machine precision (EPS) = \002,"
 	    "d16.6,/\002 Safe \002,\002minimum (SFMIN)             = \002,d16"
@@ -98,7 +99,7 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -108,13 +109,12 @@ static integer c__3 = 3;
     =======   
 
     DCHKEC tests eigen- condition estimation routines   
-           DLALN2, SLASY2, SLANV2, SLAQTR, SLAEXC,   
-           DTRSYL, STREXC, STRSNA, STRSEN   
+           DLALN2, DLASY2, DLANV2, DLAQTR, DLAEXC,   
+           DTRSYL, DTREXC, DTRSNA, DTRSEN   
 
     In all cases, the routine runs through a fixed set of numerical   
     examples, subjects them to various tests, and compares the test   
-    results to a threshold THRESH. In addition, DTREXC, STRSNA and STRSEN 
-  
+    results to a threshold THRESH. In addition, DTREXC, DTRSNA and DTRSEN   
     are tested by reading in precomputed examples from a file (on input   
     unit NIN).  Output is written to output unit NOUT.   
 
@@ -134,12 +134,11 @@ static integer c__3 = 3;
     NOUT    (input) INTEGER   
             The logical unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "EC", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "EC", (ftnlen)2, (ftnlen)2);
     eps = dlamch_("P");
     sfmin = dlamch_("S");
 
@@ -280,7 +279,7 @@ static integer c__3 = 3;
     if (ok) {
 	io___54.ciunit = *nout;
 	s_wsfe(&io___54);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&ntests, (ftnlen)sizeof(integer));
 	e_wsfe();
     }

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlaev2_(doublecomplex *a, doublecomplex *b, 
-	doublecomplex *c, doublereal *rt1, doublereal *rt2, doublereal *cs1, 
-	doublecomplex *sn1)
+	doublecomplex *c__, doublereal *rt1, doublereal *rt2, doublereal *cs1,
+	 doublecomplex *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -16,16 +17,12 @@
     ZLAEV2 computes the eigendecomposition of a 2-by-2 Hermitian matrix   
        [  A         B  ]   
        [  CONJG(B)  C  ].   
-    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the 
-  
-    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right 
-  
+    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the   
+    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right   
     eigenvector for RT1, giving the decomposition   
 
-    [ CS1  CONJG(SN1) ] [    A     B ] [ CS1 -CONJG(SN1) ] = [ RT1  0  ] 
-  
-    [-SN1     CS1     ] [ CONJG(B) C ] [ SN1     CS1     ]   [  0  RT2 ]. 
-  
+    [ CS1  CONJG(SN1) ] [    A     B ] [ CS1 -CONJG(SN1) ] = [ RT1  0  ]   
+    [-SN1     CS1     ] [ CONJG(B) C ] [ SN1     CS1     ]   [  0  RT2 ].   
 
     Arguments   
     =========   
@@ -62,13 +59,11 @@
 
     CS1 and SN1 are accurate to a few ulps barring over/underflow.   
 
-    Overflow is possible only if RT1 is within a factor of 5 of overflow. 
-  
+    Overflow is possible only if RT1 is within a factor of 5 of overflow.   
     Underflow is harmless if the input data is 0 or exceeds   
        underflow_threshold / macheps.   
 
-   ===================================================================== 
-*/
+   ===================================================================== */
     /* System generated locals */
     doublereal d__1, d__2, d__3;
     doublecomplex z__1, z__2;
@@ -94,7 +89,7 @@
     }
     d__1 = a->r;
     d__2 = z_abs(b);
-    d__3 = c->r;
+    d__3 = c__->r;
     dlaev2_(&d__1, &d__2, &d__3, rt1, rt2, cs1, &t);
     z__1.r = t * w.r, z__1.i = t * w.i;
     sn1->r = z__1.r, sn1->i = z__1.i;

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgees_(char *jobvs, char *sort, L_fp select, integer *n, 
@@ -5,10 +6,10 @@
 	integer *ldvs, complex *work, integer *lwork, real *rwork, logical *
 	bwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
@@ -39,8 +40,7 @@
 
     SELECT  (input) LOGICAL FUNCTION of one COMPLEX argument   
             SELECT must be declared EXTERNAL in the calling subroutine.   
-            If SORT = 'S', SELECT is used to select eigenvalues to order 
-  
+            If SORT = 'S', SELECT is used to select eigenvalues to order   
             to the top left of the Schur form.   
             IF SORT = 'N', SELECT is not referenced.   
             The eigenvalue W(j) is selected if SELECT(W(j)) is true.   
@@ -80,6 +80,11 @@
             The dimension of the array WORK.  LWORK >= max(1,2*N).   
             For good performance, LWORK must generally be larger.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     RWORK   (workspace) REAL array, dimension (N)   
 
     BWORK   (workspace) LOGICAL array, dimension (N)   
@@ -93,11 +98,9 @@
                         eigenvalues; elements 1:ILO-1 and i+1:N of W   
                         contain those eigenvalues which have converged;   
                         if JOBVS = 'V', VS contains the matrix which   
-                        reduces A to its partially converged Schur form. 
-  
+                        reduces A to its partially converged Schur form.   
                  = N+1: the eigenvalues could not be reordered because   
-                        some eigenvalues were too close to separate (the 
-  
+                        some eigenvalues were too close to separate (the   
                         problem is very ill-conditioned);   
                  = N+2: after reordering, roundoff changed values of   
                         some complex eigenvalues so that leading   
@@ -105,15 +108,12 @@
                         SELECT = .TRUE..  This could also be caused by   
                         underflow due to scaling.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c__0 = 0;
@@ -128,7 +128,7 @@
     /* Local variables */
     static integer ibal, maxb;
     static real anrm;
-    static integer ierr, itau, iwrk, i, k;
+    static integer ierr, itau, iwrk, i__, k;
     static real s;
     static integer icond, ieval;
     extern logical lsame_(char *, char *);
@@ -162,21 +162,25 @@
     static integer minwrk, maxwrk;
     static real smlnum;
     static integer hswork;
-    static logical wantst, wantvs;
+    static logical wantst, lquery, wantvs;
     static integer ihi, ilo;
     static real dum[1], eps, sep;
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --w;
+    vs_dim1 = *ldvs;
+    vs_offset = 1 + vs_dim1 * 1;
+    vs -= vs_offset;
+    --work;
+    --rwork;
+    --bwork;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define BWORK(I) bwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define VS(I,J) vs[(I)-1 + ((J)-1)* ( *ldvs)]
-
+    /* Function Body */
     *info = 0;
+    lquery = *lwork == -1;
     wantvs = lsame_(jobvs, "V");
     wantst = lsame_(sort, "S");
     if (! wantvs && ! lsame_(jobvs, "N")) {
@@ -203,20 +207,21 @@
          the worst case.) */
 
     minwrk = 1;
-    if (*info == 0 && *lwork >= 1) {
-	maxwrk = *n + *n * ilaenv_(&c__1, "CGEHRD", " ", n, &c__1, n, &c__0, 
-		6L, 1L);
+    if (*info == 0 && (*lwork >= 1 || lquery)) {
+	maxwrk = *n + *n * ilaenv_(&c__1, "CGEHRD", " ", n, &c__1, n, &c__0, (
+		ftnlen)6, (ftnlen)1);
 /* Computing MAX */
-	i__1 = 1, i__2 = *n * 3;
+	i__1 = 1, i__2 = *n << 1;
 	minwrk = max(i__1,i__2);
 	if (! wantvs) {
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "CHSEQR", "SN", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "CHSEQR", "SN", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "CHSEQR", "SN", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -228,15 +233,16 @@
 	} else {
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n + (*n - 1) * ilaenv_(&c__1, "CUNGHR", 
-		    " ", n, &c__1, n, &c_n1, 6L, 1L);
+		    " ", n, &c__1, n, &c_n1, (ftnlen)6, (ftnlen)1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "CHSEQR", "EN", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "CHSEQR", "EN", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "CHSEQR", "EN", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -246,14 +252,16 @@
 	    i__1 = max(maxwrk,hswork);
 	    maxwrk = max(i__1,1);
 	}
-	WORK(1).r = (real) maxwrk, WORK(1).i = 0.f;
+	work[1].r = (real) maxwrk, work[1].i = 0.f;
     }
-    if (*lwork < minwrk) {
+    if (*lwork < minwrk && ! lquery) {
 	*info = -12;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CGEES ", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -275,7 +283,7 @@
 
 /*     Scale A if max element outside range [SMLNUM,BIGNUM] */
 
-    anrm = clange_("M", n, n, &A(1,1), lda, dum);
+    anrm = clange_("M", n, n, &a[a_offset], lda, dum);
     scalea = FALSE_;
     if (anrm > 0.f && anrm < smlnum) {
 	scalea = TRUE_;
@@ -285,7 +293,7 @@
 	cscale = bignum;
     }
     if (scalea) {
-	clascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &A(1,1), lda, &
+	clascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &a[a_offset], lda, &
 		ierr);
     }
 
@@ -294,7 +302,7 @@
        (RWorkspace: need N) */
 
     ibal = 1;
-    cgebal_("P", n, &A(1,1), lda, &ilo, &ihi, &RWORK(ibal), &ierr);
+    cgebal_("P", n, &a[a_offset], lda, &ilo, &ihi, &rwork[ibal], &ierr);
 
 /*     Reduce to upper Hessenberg form   
        (CWorkspace: need 2*N, prefer N+N*NB)   
@@ -303,34 +311,35 @@
     itau = 1;
     iwrk = *n + itau;
     i__1 = *lwork - iwrk + 1;
-    cgehrd_(n, &ilo, &ihi, &A(1,1), lda, &WORK(itau), &WORK(iwrk), &i__1,
+    cgehrd_(n, &ilo, &ihi, &a[a_offset], lda, &work[itau], &work[iwrk], &i__1,
 	     &ierr);
 
     if (wantvs) {
 
 /*        Copy Householder vectors to VS */
 
-	clacpy_("L", n, n, &A(1,1), lda, &VS(1,1), ldvs);
+	clacpy_("L", n, n, &a[a_offset], lda, &vs[vs_offset], ldvs)
+		;
 
 /*        Generate unitary matrix in VS   
           (CWorkspace: need 2*N-1, prefer N+(N-1)*NB)   
           (RWorkspace: none) */
 
 	i__1 = *lwork - iwrk + 1;
-	cunghr_(n, &ilo, &ihi, &VS(1,1), ldvs, &WORK(itau), &WORK(iwrk),
+	cunghr_(n, &ilo, &ihi, &vs[vs_offset], ldvs, &work[itau], &work[iwrk],
 		 &i__1, &ierr);
     }
 
     *sdim = 0;
 
-/*     Perform QR iteration, accumulating Schur vectors in VS if desired 
-  
+/*     Perform QR iteration, accumulating Schur vectors in VS if desired   
        (CWorkspace: need 1, prefer HSWORK (see comments) )   
        (RWorkspace: none) */
 
     iwrk = itau;
     i__1 = *lwork - iwrk + 1;
-    chseqr_("S", jobvs, n, &ilo, &ihi, &A(1,1), lda, &W(1), &VS(1,1), ldvs, &WORK(iwrk), &i__1, &ieval);
+    chseqr_("S", jobvs, n, &ilo, &ihi, &a[a_offset], lda, &w[1], &vs[
+	    vs_offset], ldvs, &work[iwrk], &i__1, &ieval);
     if (ieval > 0) {
 	*info = ieval;
     }
@@ -339,12 +348,12 @@
 
     if (wantst && *info == 0) {
 	if (scalea) {
-	    clascl_("G", &c__0, &c__0, &cscale, &anrm, n, &c__1, &W(1), n, &
+	    clascl_("G", &c__0, &c__0, &cscale, &anrm, n, &c__1, &w[1], n, &
 		    ierr);
 	}
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    BWORK(i) = (*select)(&W(i));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    bwork[i__] = (*select)(&w[i__]);
 /* L10: */
 	}
 
@@ -353,8 +362,8 @@
           (RWorkspace: none) */
 
 	i__1 = *lwork - iwrk + 1;
-	ctrsen_("N", jobvs, &BWORK(1), n, &A(1,1), lda, &VS(1,1), 
-		ldvs, &W(1), sdim, &s, &sep, &WORK(iwrk), &i__1, &icond);
+	ctrsen_("N", jobvs, &bwork[1], n, &a[a_offset], lda, &vs[vs_offset], 
+		ldvs, &w[1], sdim, &s, &sep, &work[iwrk], &i__1, &icond);
     }
 
     if (wantvs) {
@@ -363,7 +372,7 @@
           (CWorkspace: none)   
           (RWorkspace: need N) */
 
-	cgebak_("P", "R", n, &ilo, &ihi, &RWORK(ibal), n, &VS(1,1), 
+	cgebak_("P", "R", n, &ilo, &ihi, &rwork[ibal], n, &vs[vs_offset], 
 		ldvs, &ierr);
     }
 
@@ -371,13 +380,13 @@
 
 /*        Undo scaling for the Schur form of A */
 
-	clascl_("U", &c__0, &c__0, &cscale, &anrm, n, n, &A(1,1), lda, &
+	clascl_("U", &c__0, &c__0, &cscale, &anrm, n, n, &a[a_offset], lda, &
 		ierr);
 	i__1 = *lda + 1;
-	ccopy_(n, &A(1,1), &i__1, &W(1), &c__1);
+	ccopy_(n, &a[a_offset], &i__1, &w[1], &c__1);
     }
 
-    WORK(1).r = (real) maxwrk, WORK(1).i = 0.f;
+    work[1].r = (real) maxwrk, work[1].i = 0.f;
     return 0;
 
 /*     End of CGEES */

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -43,8 +44,8 @@ static integer c__3 = 3;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char type[2];
-    static integer i, j, n;
+    static char type__[2];
+    static integer i__, j, n;
     extern logical lsamen_(integer *, char *, char *);
     static integer lda;
 
@@ -60,7 +61,7 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -109,8 +110,7 @@ static integer c__3 = 3;
     INFO    (output) INTEGER   
             The number of pairs (N, LDA) that were invalid.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -118,7 +118,7 @@ static integer c__3 = 3;
     --nval;
 
     /* Function Body */
-    s_copy(type, subnam + 1, 2L, 2L);
+    s_copy(type__, subnam + 1, (ftnlen)2, (ftnlen)2);
     *info = 0;
 
 /*     M, N, or K must be less than or equal to LDA. */
@@ -128,15 +128,15 @@ static integer c__3 = 3;
 	for (j = 1; j <= i__1; ++j) {
 	    lda = ldaval[j];
 	    i__2 = *nn;
-	    for (i = 1; i <= i__2; ++i) {
-		if (nval[i] > lda) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (nval[i__] > lda) {
 		    ++(*info);
 		    if (*nout > 0) {
 			if (*ichk == 1) {
 			    io___5.ciunit = *nout;
 			    s_wsfe(&io___5);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));
@@ -144,8 +144,8 @@ static integer c__3 = 3;
 			} else if (*ichk == 2) {
 			    io___6.ciunit = *nout;
 			    s_wsfe(&io___6);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));
@@ -153,8 +153,8 @@ static integer c__3 = 3;
 			} else {
 			    io___7.ciunit = *nout;
 			    s_wsfe(&io___7);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));
@@ -173,14 +173,14 @@ static integer c__3 = 3;
     } else if (*ichk == 4) {
 	lda = ldaval[1];
 	i__1 = *nn;
-	for (i = 1; i <= i__1; ++i) {
-	    n = nval[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    n = nval[i__];
 	    if (n * (n + 1) / 2 > lda) {
 		++(*info);
 		if (*nout > 0) {
 		    io___9.ciunit = *nout;
 		    s_wsfe(&io___9);
-		    do_fio(&c__1, subnam, 6L);
+		    do_fio(&c__1, subnam, (ftnlen)6);
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -193,24 +193,24 @@ static integer c__3 = 3;
           2*K+1 <= LDA,  if SUBNAM = 'xGBMV'   
           3*K+1 <= LDA,  otherwise. */
 
-    } else if (lsamen_(&c__2, type, "GB")) {
+    } else if (lsamen_(&c__2, type__, "GB")) {
 	if (lsamen_(&c__3, subnam + 3, "MV ")) {
 	    i__1 = *nlda;
 	    for (j = 1; j <= i__1; ++j) {
 		lda = ldaval[j];
 		i__2 = *nn;
-		for (i = 1; i <= i__2; ++i) {
-		    if ((nval[i] << 1) + 1 > lda) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    if ((nval[i__] << 1) + 1 > lda) {
 			++(*info);
 			if (*nout > 0) {
 			    io___10.ciunit = *nout;
 			    s_wsfe(&io___10);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));
-			    i__3 = (nval[i] << 1) + 1;
+			    i__3 = (nval[i__] << 1) + 1;
 			    do_fio(&c__1, (char *)&i__3, (ftnlen)sizeof(
 				    integer));
 			    e_wsfe();
@@ -225,18 +225,18 @@ static integer c__3 = 3;
 	    for (j = 1; j <= i__1; ++j) {
 		lda = ldaval[j];
 		i__2 = *nn;
-		for (i = 1; i <= i__2; ++i) {
-		    if (nval[i] * 3 + 1 > lda) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    if (nval[i__] * 3 + 1 > lda) {
 			++(*info);
 			if (*nout > 0) {
 			    io___11.ciunit = *nout;
 			    s_wsfe(&io___11);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));
-			    i__3 = nval[i] * 3 + 1;
+			    i__3 = nval[i__] * 3 + 1;
 			    do_fio(&c__1, (char *)&i__3, (ftnlen)sizeof(
 				    integer));
 			    e_wsfe();
@@ -251,20 +251,20 @@ static integer c__3 = 3;
 /*     IF TYPE = 'PB' or 'TB', then K must satisfy   
           K+1 <= LDA. */
 
-    } else if (lsamen_(&c__2, type, "PB") || lsamen_(&c__2, type, 
-	    "TB")) {
+    } else if (lsamen_(&c__2, type__, "PB") || lsamen_(&
+	    c__2, type__, "TB")) {
 	i__1 = *nlda;
 	for (j = 1; j <= i__1; ++j) {
 	    lda = ldaval[j];
 	    i__2 = *nn;
-	    for (i = 1; i <= i__2; ++i) {
-		if (nval[i] + 1 > lda) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (nval[i__] + 1 > lda) {
 		    ++(*info);
 		    if (*nout > 0) {
 			io___12.ciunit = *nout;
 			s_wsfe(&io___12);
-			do_fio(&c__1, subnam, 6L);
-			do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			do_fio(&c__1, subnam, (ftnlen)6);
+			do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				integer));
 			do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(integer));
 			e_wsfe();
@@ -278,21 +278,21 @@ static integer c__3 = 3;
 /*     IF TYPE = 'SB' or 'HB', then K must satisfy   
           K+1   <= LDA,  if SUBNAM = 'xxxMV ' */
 
-    } else if (lsamen_(&c__2, type, "SB") || lsamen_(&c__2, type, 
-	    "HB")) {
+    } else if (lsamen_(&c__2, type__, "SB") || lsamen_(&
+	    c__2, type__, "HB")) {
 	if (lsamen_(&c__3, subnam + 3, "MV ")) {
 	    i__1 = *nlda;
 	    for (j = 1; j <= i__1; ++j) {
 		lda = ldaval[j];
 		i__2 = *nn;
-		for (i = 1; i <= i__2; ++i) {
-		    if (nval[i] + 1 > lda) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    if (nval[i__] + 1 > lda) {
 			++(*info);
 			if (*nout > 0) {
 			    io___13.ciunit = *nout;
 			    s_wsfe(&io___13);
-			    do_fio(&c__1, subnam, 6L);
-			    do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(
+			    do_fio(&c__1, subnam, (ftnlen)6);
+			    do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&lda, (ftnlen)sizeof(
 				    integer));

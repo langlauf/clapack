@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlacon_(integer *n, doublereal *v, doublereal *x, 
 	integer *isgn, doublereal *est, integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -13,8 +14,7 @@
     =======   
 
     DLACON estimates the 1-norm of a square, real matrix A.   
-    Reverse communication is used for evaluating matrix-vector products. 
-  
+    Reverse communication is used for evaluating matrix-vector products.   
 
     Arguments   
     =========   
@@ -50,19 +50,14 @@
     Contributed by Nick Higham, University of Manchester.   
     Originally named SONEST, dated March 16, 1988.   
 
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of 
-  
-    a real or complex matrix, with applications to condition estimation", 
-  
+    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
+    a real or complex matrix, with applications to condition estimation",   
     ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b11 = 1.;
@@ -76,7 +71,7 @@
     /* Local variables */
     static integer iter;
     static doublereal temp;
-    static integer jump, i, j;
+    static integer jump, i__, j;
     extern doublereal dasum_(integer *, doublereal *, integer *);
     static integer jlast;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
@@ -85,16 +80,15 @@
     static doublereal altsgn, estold;
 
 
+    --isgn;
+    --x;
+    --v;
 
-#define ISGN(I) isgn[(I)-1]
-#define X(I) x[(I)-1]
-#define V(I) v[(I)-1]
-
-
+    /* Function Body */
     if (*kase == 0) {
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    X(i) = 1. / (doublereal) (*n);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    x[i__] = 1. / (doublereal) (*n);
 /* L10: */
 	}
 	*kase = 1;
@@ -115,17 +109,17 @@
 
 L20:
     if (*n == 1) {
-	V(1) = X(1);
-	*est = abs(V(1));
+	v[1] = x[1];
+	*est = abs(v[1]);
 /*        ... QUIT */
 	goto L150;
     }
-    *est = dasum_(n, &X(1), &c__1);
+    *est = dasum_(n, &x[1], &c__1);
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = d_sign(&c_b11, &X(i));
-	ISGN(i) = i_dnnt(&X(i));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = d_sign(&c_b11, &x[i__]);
+	isgn[i__] = i_dnnt(&x[i__]);
 /* L30: */
     }
     *kase = 2;
@@ -136,18 +130,18 @@ L20:
        FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
 
 L40:
-    j = idamax_(n, &X(1), &c__1);
+    j = idamax_(n, &x[1], &c__1);
     iter = 2;
 
 /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
 
 L50:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = 0.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = 0.;
 /* L60: */
     }
-    X(j) = 1.;
+    x[j] = 1.;
     *kase = 1;
     jump = 3;
     return 0;
@@ -156,13 +150,13 @@ L50:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
-    dcopy_(n, &X(1), &c__1, &V(1), &c__1);
+    dcopy_(n, &x[1], &c__1, &v[1], &c__1);
     estold = *est;
-    *est = dasum_(n, &V(1), &c__1);
+    *est = dasum_(n, &v[1], &c__1);
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	d__1 = d_sign(&c_b11, &X(i));
-	if (i_dnnt(&d__1) != ISGN(i)) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__1 = d_sign(&c_b11, &x[i__]);
+	if (i_dnnt(&d__1) != isgn[i__]) {
 	    goto L90;
 	}
 /* L80: */
@@ -177,9 +171,9 @@ L90:
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = d_sign(&c_b11, &X(i));
-	ISGN(i) = i_dnnt(&X(i));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = d_sign(&c_b11, &x[i__]);
+	isgn[i__] = i_dnnt(&x[i__]);
 /* L100: */
     }
     *kase = 2;
@@ -191,8 +185,8 @@ L90:
 
 L110:
     jlast = j;
-    j = idamax_(n, &X(1), &c__1);
-    if (X(jlast) != (d__1 = X(j), abs(d__1)) && iter < 5) {
+    j = idamax_(n, &x[1], &c__1);
+    if (x[jlast] != (d__1 = x[j], abs(d__1)) && iter < 5) {
 	++iter;
 	goto L50;
     }
@@ -202,8 +196,9 @@ L110:
 L120:
     altsgn = 1.;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = altsgn * ((doublereal) (i - 1) / (doublereal) (*n - 1) + 1.);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = altsgn * ((doublereal) (i__ - 1) / (doublereal) (*n - 1) + 
+		1.);
 	altsgn = -altsgn;
 /* L130: */
     }
@@ -215,9 +210,9 @@ L120:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L140:
-    temp = dasum_(n, &X(1), &c__1) / (doublereal) (*n * 3) * 2.;
+    temp = dasum_(n, &x[1], &c__1) / (doublereal) (*n * 3) * 2.;
     if (temp > *est) {
-	dcopy_(n, &X(1), &c__1, &V(1), &c__1);
+	dcopy_(n, &x[1], &c__1, &v[1], &c__1);
 	*est = temp;
     }
 

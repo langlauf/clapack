@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sormlq_(char *side, char *trans, integer *m, integer *n, 
-	integer *k, real *a, integer *lda, real *tau, real *c, integer *ldc, 
-	real *work, integer *lwork, integer *info)
+	integer *k, real *a, integer *lda, real *tau, real *c__, integer *ldc,
+	 real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -54,8 +55,7 @@
                                  (LDA,M) if SIDE = 'L',   
                                  (LDA,N) if SIDE = 'R'   
             The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by 
-  
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
             SGELQF in the first k rows of its array argument A.   
             A is modified by the routine but restored on exit.   
 
@@ -68,8 +68,7 @@
 
     C       (input/output) REAL array, dimension (LDC,N)   
             On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q. 
-  
+            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
 
     LDC     (input) INTEGER   
             The leading dimension of the array C. LDC >= max(1,M).   
@@ -85,19 +84,21 @@
             LWORK >= M*NB if SIDE = 'R', where NB is the optimal   
             blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -113,7 +114,7 @@
        Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
     /* Local variables */
     static logical left;
-    static integer i;
+    static integer i__;
     static real t[4160]	/* was [65][64] */;
     extern logical lsame_(char *, char *);
     static integer nbmin, iinfo, i1, i2, i3, ib, ic, jc;
@@ -131,19 +132,27 @@
     static logical notran;
     static integer ldwork;
     static char transt[1];
+    static integer lwkopt;
+    static logical lquery;
     static integer iws;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
+    lquery = *lwork == -1;
 
 /*     NQ is the order of Q and NW is the minimum dimension of WORK */
 
@@ -168,32 +177,42 @@
 	*info = -7;
     } else if (*ldc < max(1,*m)) {
 	*info = -10;
-    } else if (*lwork < max(1,nw)) {
+    } else if (*lwork < max(1,nw) && ! lquery) {
 	*info = -12;
     }
+
+    if (*info == 0) {
+
+/*        Determine the block size.  NB may be at most NBMAX, where NBMAX   
+          is used to define the local array T.   
+
+   Computing MIN   
+   Writing concatenation */
+	i__3[0] = 1, a__1[0] = side;
+	i__3[1] = 1, a__1[1] = trans;
+	s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+	i__1 = 64, i__2 = ilaenv_(&c__1, "SORMLQ", ch__1, m, n, k, &c_n1, (
+		ftnlen)6, (ftnlen)2);
+	nb = min(i__1,i__2);
+	lwkopt = max(1,nw) * nb;
+	work[1] = (real) lwkopt;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SORMLQ", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*m == 0 || *n == 0 || *k == 0) {
-	WORK(1) = 1.f;
+	work[1] = 1.f;
 	return 0;
     }
 
-/*     Determine the block size.  NB may be at most NBMAX, where NBMAX   
-       is used to define the local array T.   
-
-   Computing MIN   
-   Writing concatenation */
-    i__3[0] = 1, a__1[0] = side;
-    i__3[1] = 1, a__1[1] = trans;
-    s_cat(ch__1, a__1, i__3, &c__2, 2L);
-    i__1 = 64, i__2 = ilaenv_(&c__1, "SORMLQ", ch__1, m, n, k, &c_n1, 6L, 2L);
-    nb = min(i__1,i__2);
     nbmin = 2;
     ldwork = nw;
     if (nb > 1 && nb < *k) {
@@ -204,9 +223,9 @@
    Writing concatenation */
 	    i__3[0] = 1, a__1[0] = side;
 	    i__3[1] = 1, a__1[1] = trans;
-	    s_cat(ch__1, a__1, i__3, &c__2, 2L);
-	    i__1 = 2, i__2 = ilaenv_(&c__2, "SORMLQ", ch__1, m, n, k, &c_n1, 
-		    6L, 2L);
+	    s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+	    i__1 = 2, i__2 = ilaenv_(&c__2, "SORMLQ", ch__1, m, n, k, &c_n1, (
+		    ftnlen)6, (ftnlen)2);
 	    nbmin = max(i__1,i__2);
 	}
     } else {
@@ -217,8 +236,8 @@
 
 /*        Use unblocked code */
 
-	sorml2_(side, trans, m, n, k, &A(1,1), lda, &TAU(1), &C(1,1)
-		, ldc, &WORK(1), &iinfo);
+	sorml2_(side, trans, m, n, k, &a[a_offset], lda, &tau[1], &c__[
+		c_offset], ldc, &work[1], &iinfo);
     } else {
 
 /*        Use blocked code */
@@ -249,42 +268,47 @@
 
 	i__1 = i2;
 	i__2 = i3;
-	for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+	for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 /* Computing MIN */
-	    i__4 = nb, i__5 = *k - i + 1;
+	    i__4 = nb, i__5 = *k - i__ + 1;
 	    ib = min(i__4,i__5);
 
 /*           Form the triangular factor of the block reflector   
              H = H(i) H(i+1) . . . H(i+ib-1) */
 
-	    i__4 = nq - i + 1;
-	    slarft_("Forward", "Rowwise", &i__4, &ib, &A(i,i), lda,
-		     &TAU(i), t, &c__65);
+	    i__4 = nq - i__ + 1;
+	    slarft_("Forward", "Rowwise", &i__4, &ib, &a_ref(i__, i__), lda, &
+		    tau[i__], t, &c__65);
 	    if (left) {
 
 /*              H or H' is applied to C(i:m,1:n) */
 
-		mi = *m - i + 1;
-		ic = i;
+		mi = *m - i__ + 1;
+		ic = i__;
 	    } else {
 
 /*              H or H' is applied to C(1:m,i:n) */
 
-		ni = *n - i + 1;
-		jc = i;
+		ni = *n - i__ + 1;
+		jc = i__;
 	    }
 
 /*           Apply H or H' */
 
-	    slarfb_(side, transt, "Forward", "Rowwise", &mi, &ni, &ib, &A(i,i), lda, t, &c__65, &C(ic,jc), ldc, &
-		    WORK(1), &ldwork);
+	    slarfb_(side, transt, "Forward", "Rowwise", &mi, &ni, &ib, &a_ref(
+		    i__, i__), lda, t, &c__65, &c___ref(ic, jc), ldc, &work[1]
+		    , &ldwork);
 /* L10: */
 	}
     }
-    WORK(1) = (real) iws;
+    work[1] = (real) lwkopt;
     return 0;
 
 /*     End of SORMLQ */
 
 } /* sormlq_ */
+
+#undef c___ref
+#undef a_ref
+
 

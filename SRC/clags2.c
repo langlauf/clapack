@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clags2_(logical *upper, real *a1, complex *a2, real *a3, 
 	real *b1, complex *b2, real *b3, real *csu, complex *snu, real *csv, 
 	complex *snv, real *csq, complex *snq)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -42,8 +43,7 @@
     The rows of the transformed A and B are parallel. Moreover, if the   
     input 2-by-2 matrix A is not zero, then the transformed (1,1) entry   
     of A is not zero. If the input matrices A and B are both not zero,   
-    then the transformed (2,2) element of B is not zero, except when the 
-  
+    then the transformed (2,2) element of B is not zero, except when the   
     first rows of input A and B are parallel and the second rows are   
     zero.   
 
@@ -78,11 +78,9 @@
     SNQ     (output) COMPLEX   
             The desired unitary matrix Q.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* System generated locals */
     real r__1, r__2, r__3, r__4, r__5, r__6, r__7, r__8;
-    doublereal d__1;
     complex q__1, q__2, q__3, q__4, q__5;
     /* Builtin functions */
     double c_abs(complex *), r_imag(complex *);
@@ -90,9 +88,9 @@
     /* Local variables */
     static real aua11, aua12, aua21, aua22, avb11, avb12, avb21, avb22, ua11r,
 	     ua22r, vb11r, vb22r, a;
-    static complex b, c;
-    static real d;
-    static complex r, d1;
+    static complex b, c__;
+    static real d__;
+    static complex r__, d1;
     static real s1, s2, fb, fc;
     extern /* Subroutine */ int slasv2_(real *, real *, real *, real *, real *
 	    , real *, real *, real *, real *), clartg_(complex *, complex *, 
@@ -110,15 +108,14 @@
                                      ( 0 d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
+	d__ = *a3 * *b1;
 	q__2.r = *b1 * a2->r, q__2.i = *b1 * a2->i;
 	q__3.r = *a1 * b2->r, q__3.i = *a1 * b2->i;
 	q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - q__3.i;
 	b.r = q__1.r, b.i = q__1.i;
 	fb = c_abs(&b);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary 
-  
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
           diagonal matrix diag(1,D1). */
 
 	d1.r = 1.f, d1.i = 0.f;
@@ -132,12 +129,11 @@
            ( CSL -SNL )*( A B )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( 0 D ) ( -SNR  CSR )   ( 0 T ) */
 
-	slasv2_(&a, &fb, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	slasv2_(&a, &fb, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (dabs(csl) >= dabs(snl) || dabs(csr) >= dabs(snr)) {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua11r = csl * *a1;
@@ -164,71 +160,70 @@
 	    if (dabs(ua11r) + ((r__1 = ua12.r, dabs(r__1)) + (r__2 = r_imag(&
 		    ua12), dabs(r__2))) == 0.f) {
 		q__2.r = vb11r, q__2.i = 0.f;
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &vb12);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else if (dabs(vb11r) + ((r__1 = vb12.r, dabs(r__1)) + (r__2 = 
 		    r_imag(&vb12), dabs(r__2))) == 0.f) {
 		q__2.r = ua11r, q__2.i = 0.f;
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &ua12);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else if (aua12 / (dabs(ua11r) + ((r__1 = ua12.r, dabs(r__1)) + (
 		    r__2 = r_imag(&ua12), dabs(r__2)))) <= avb12 / (dabs(
 		    vb11r) + ((r__3 = vb12.r, dabs(r__3)) + (r__4 = r_imag(&
 		    vb12), dabs(r__4))))) {
 		q__2.r = ua11r, q__2.i = 0.f;
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &ua12);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else {
 		q__2.r = vb11r, q__2.i = 0.f;
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &vb12);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    }
 
 	    *csu = csl;
-	    q__2.r = -(doublereal)d1.r, q__2.i = -(doublereal)d1.i;
+	    q__2.r = -d1.r, q__2.i = -d1.i;
 	    q__1.r = snl * q__2.r, q__1.i = snl * q__2.i;
 	    snu->r = q__1.r, snu->i = q__1.i;
 	    *csv = csr;
-	    q__2.r = -(doublereal)d1.r, q__2.i = -(doublereal)d1.i;
+	    q__2.r = -d1.r, q__2.i = -d1.i;
 	    q__1.r = snr * q__2.r, q__1.i = snr * q__2.i;
 	    snv->r = q__1.r, snv->i = q__1.i;
 
 	} else {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    r_cnjg(&q__4, &d1);
-	    q__3.r = -(doublereal)q__4.r, q__3.i = -(doublereal)q__4.i;
+	    q__3.r = -q__4.r, q__3.i = -q__4.i;
 	    q__2.r = snl * q__3.r, q__2.i = snl * q__3.i;
 	    q__1.r = *a1 * q__2.r, q__1.i = *a1 * q__2.i;
 	    ua21.r = q__1.r, ua21.i = q__1.i;
 	    r_cnjg(&q__5, &d1);
-	    q__4.r = -(doublereal)q__5.r, q__4.i = -(doublereal)q__5.i;
+	    q__4.r = -q__5.r, q__4.i = -q__5.i;
 	    q__3.r = snl * q__4.r, q__3.i = snl * q__4.i;
 	    q__2.r = q__3.r * a2->r - q__3.i * a2->i, q__2.i = q__3.r * a2->i 
 		    + q__3.i * a2->r;
-	    d__1 = csl * *a3;
-	    q__1.r = q__2.r + d__1, q__1.i = q__2.i;
+	    r__1 = csl * *a3;
+	    q__1.r = q__2.r + r__1, q__1.i = q__2.i;
 	    ua22.r = q__1.r, ua22.i = q__1.i;
 
 	    r_cnjg(&q__4, &d1);
-	    q__3.r = -(doublereal)q__4.r, q__3.i = -(doublereal)q__4.i;
+	    q__3.r = -q__4.r, q__3.i = -q__4.i;
 	    q__2.r = snr * q__3.r, q__2.i = snr * q__3.i;
 	    q__1.r = *b1 * q__2.r, q__1.i = *b1 * q__2.i;
 	    vb21.r = q__1.r, vb21.i = q__1.i;
 	    r_cnjg(&q__5, &d1);
-	    q__4.r = -(doublereal)q__5.r, q__4.i = -(doublereal)q__5.i;
+	    q__4.r = -q__5.r, q__4.i = -q__5.i;
 	    q__3.r = snr * q__4.r, q__3.i = snr * q__4.i;
 	    q__2.r = q__3.r * b2->r - q__3.i * b2->i, q__2.i = q__3.r * b2->i 
 		    + q__3.i * b2->r;
-	    d__1 = csr * *b3;
-	    q__1.r = q__2.r + d__1, q__1.i = q__2.i;
+	    r__1 = csr * *b3;
+	    q__1.r = q__2.r + r__1, q__1.i = q__2.i;
 	    vb22.r = q__1.r, vb22.i = q__1.i;
 
 	    aua22 = dabs(snl) * ((r__1 = a2->r, dabs(r__1)) + (r__2 = r_imag(
@@ -236,22 +231,21 @@
 	    avb22 = dabs(snr) * ((r__1 = b2->r, dabs(r__1)) + (r__2 = r_imag(
 		    b2), dabs(r__2))) + dabs(csr) * dabs(*b3);
 
-/*           zero (2,2) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (2,2) elements of U'*A and V'*B, and then swap. */
 
 	    if ((r__1 = ua21.r, dabs(r__1)) + (r__2 = r_imag(&ua21), dabs(
 		    r__2)) + ((r__3 = ua22.r, dabs(r__3)) + (r__4 = r_imag(&
 		    ua22), dabs(r__4))) == 0.f) {
 		r_cnjg(&q__2, &vb21);
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &vb22);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else if ((r__1 = vb21.r, dabs(r__1)) + (r__2 = r_imag(&vb21), 
 		    dabs(r__2)) + c_abs(&vb22) == 0.f) {
 		r_cnjg(&q__2, &ua21);
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &ua22);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else if (aua22 / ((r__1 = ua21.r, dabs(r__1)) + (r__2 = r_imag(&
 		    ua21), dabs(r__2)) + ((r__3 = ua22.r, dabs(r__3)) + (r__4 
 		    = r_imag(&ua22), dabs(r__4)))) <= avb22 / ((r__5 = vb21.r,
@@ -259,14 +253,14 @@
 		    r__7 = vb22.r, dabs(r__7)) + (r__8 = r_imag(&vb22), dabs(
 		    r__8))))) {
 		r_cnjg(&q__2, &ua21);
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &ua22);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    } else {
 		r_cnjg(&q__2, &vb21);
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		r_cnjg(&q__3, &vb22);
-		clartg_(&q__1, &q__3, csq, snq, &r);
+		clartg_(&q__1, &q__3, csq, snq, &r__);
 	    }
 
 	    *csu = snl;
@@ -286,20 +280,19 @@
                                      ( c d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
+	d__ = *a3 * *b1;
 	q__2.r = *b3 * a2->r, q__2.i = *b3 * a2->i;
 	q__3.r = *a3 * b2->r, q__3.i = *a3 * b2->i;
 	q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - q__3.i;
-	c.r = q__1.r, c.i = q__1.i;
-	fc = c_abs(&c);
+	c__.r = q__1.r, c__.i = q__1.i;
+	fc = c_abs(&c__);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary 
-  
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
           diagonal matrix diag(d1,1). */
 
 	d1.r = 1.f, d1.i = 0.f;
 	if (fc != 0.f) {
-	    q__1.r = c.r / fc, q__1.i = c.i / fc;
+	    q__1.r = c__.r / fc, q__1.i = c__.i / fc;
 	    d1.r = q__1.r, d1.i = q__1.i;
 	}
 
@@ -308,15 +301,14 @@
            ( CSL -SNL )*( A 0 )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( C D ) ( -SNR  CSR )   ( 0 T ) */
 
-	slasv2_(&a, &fc, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	slasv2_(&a, &fc, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (dabs(csr) >= dabs(snr) || dabs(csl) >= dabs(snl)) {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,1) element of |U|'*|A| and |V|'*|B|. */
 
-	    q__4.r = -(doublereal)d1.r, q__4.i = -(doublereal)d1.i;
+	    q__4.r = -d1.r, q__4.i = -d1.i;
 	    q__3.r = snr * q__4.r, q__3.i = snr * q__4.i;
 	    q__2.r = *a1 * q__3.r, q__2.i = *a1 * q__3.i;
 	    q__5.r = csr * a2->r, q__5.i = csr * a2->i;
@@ -324,7 +316,7 @@
 	    ua21.r = q__1.r, ua21.i = q__1.i;
 	    ua22r = csr * *a3;
 
-	    q__4.r = -(doublereal)d1.r, q__4.i = -(doublereal)d1.i;
+	    q__4.r = -d1.r, q__4.i = -d1.i;
 	    q__3.r = snl * q__4.r, q__3.i = snl * q__4.i;
 	    q__2.r = *b1 * q__3.r, q__2.i = *b1 * q__3.i;
 	    q__5.r = csl * b2->r, q__5.i = csl * b2->i;
@@ -342,57 +334,56 @@
 	    if ((r__1 = ua21.r, dabs(r__1)) + (r__2 = r_imag(&ua21), dabs(
 		    r__2)) + dabs(ua22r) == 0.f) {
 		q__1.r = vb22r, q__1.i = 0.f;
-		clartg_(&q__1, &vb21, csq, snq, &r);
+		clartg_(&q__1, &vb21, csq, snq, &r__);
 	    } else if ((r__1 = vb21.r, dabs(r__1)) + (r__2 = r_imag(&vb21), 
 		    dabs(r__2)) + dabs(vb22r) == 0.f) {
 		q__1.r = ua22r, q__1.i = 0.f;
-		clartg_(&q__1, &ua21, csq, snq, &r);
+		clartg_(&q__1, &ua21, csq, snq, &r__);
 	    } else if (aua21 / ((r__1 = ua21.r, dabs(r__1)) + (r__2 = r_imag(&
 		    ua21), dabs(r__2)) + dabs(ua22r)) <= avb21 / ((r__3 = 
 		    vb21.r, dabs(r__3)) + (r__4 = r_imag(&vb21), dabs(r__4)) 
 		    + dabs(vb22r))) {
 		q__1.r = ua22r, q__1.i = 0.f;
-		clartg_(&q__1, &ua21, csq, snq, &r);
+		clartg_(&q__1, &ua21, csq, snq, &r__);
 	    } else {
 		q__1.r = vb22r, q__1.i = 0.f;
-		clartg_(&q__1, &vb21, csq, snq, &r);
+		clartg_(&q__1, &vb21, csq, snq, &r__);
 	    }
 
 	    *csu = csr;
 	    r_cnjg(&q__3, &d1);
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
 	    q__1.r = snr * q__2.r, q__1.i = snr * q__2.i;
 	    snu->r = q__1.r, snu->i = q__1.i;
 	    *csv = csl;
 	    r_cnjg(&q__3, &d1);
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
 	    q__1.r = snl * q__2.r, q__1.i = snl * q__2.i;
 	    snv->r = q__1.r, snv->i = q__1.i;
 
 	} else {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,1) element of |U|'*|A| and |V|'*|B|. */
 
-	    d__1 = csr * *a1;
+	    r__1 = csr * *a1;
 	    r_cnjg(&q__4, &d1);
 	    q__3.r = snr * q__4.r, q__3.i = snr * q__4.i;
 	    q__2.r = q__3.r * a2->r - q__3.i * a2->i, q__2.i = q__3.r * a2->i 
 		    + q__3.i * a2->r;
-	    q__1.r = d__1 + q__2.r, q__1.i = q__2.i;
+	    q__1.r = r__1 + q__2.r, q__1.i = q__2.i;
 	    ua11.r = q__1.r, ua11.i = q__1.i;
 	    r_cnjg(&q__3, &d1);
 	    q__2.r = snr * q__3.r, q__2.i = snr * q__3.i;
 	    q__1.r = *a3 * q__2.r, q__1.i = *a3 * q__2.i;
 	    ua12.r = q__1.r, ua12.i = q__1.i;
 
-	    d__1 = csl * *b1;
+	    r__1 = csl * *b1;
 	    r_cnjg(&q__4, &d1);
 	    q__3.r = snl * q__4.r, q__3.i = snl * q__4.i;
 	    q__2.r = q__3.r * b2->r - q__3.i * b2->i, q__2.i = q__3.r * b2->i 
 		    + q__3.i * b2->r;
-	    q__1.r = d__1 + q__2.r, q__1.i = q__2.i;
+	    q__1.r = r__1 + q__2.r, q__1.i = q__2.i;
 	    vb11.r = q__1.r, vb11.i = q__1.i;
 	    r_cnjg(&q__3, &d1);
 	    q__2.r = snl * q__3.r, q__2.i = snl * q__3.i;
@@ -404,26 +395,25 @@
 	    avb11 = dabs(csl) * dabs(*b1) + dabs(snl) * ((r__1 = b2->r, dabs(
 		    r__1)) + (r__2 = r_imag(b2), dabs(r__2)));
 
-/*           zero (1,1) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (1,1) elements of U'*A and V'*B, and then swap. */
 
 	    if ((r__1 = ua11.r, dabs(r__1)) + (r__2 = r_imag(&ua11), dabs(
 		    r__2)) + ((r__3 = ua12.r, dabs(r__3)) + (r__4 = r_imag(&
 		    ua12), dabs(r__4))) == 0.f) {
-		clartg_(&vb12, &vb11, csq, snq, &r);
+		clartg_(&vb12, &vb11, csq, snq, &r__);
 	    } else if ((r__1 = vb11.r, dabs(r__1)) + (r__2 = r_imag(&vb11), 
 		    dabs(r__2)) + ((r__3 = vb12.r, dabs(r__3)) + (r__4 = 
 		    r_imag(&vb12), dabs(r__4))) == 0.f) {
-		clartg_(&ua12, &ua11, csq, snq, &r);
+		clartg_(&ua12, &ua11, csq, snq, &r__);
 	    } else if (aua11 / ((r__1 = ua11.r, dabs(r__1)) + (r__2 = r_imag(&
 		    ua11), dabs(r__2)) + ((r__3 = ua12.r, dabs(r__3)) + (r__4 
 		    = r_imag(&ua12), dabs(r__4)))) <= avb11 / ((r__5 = vb11.r,
 		     dabs(r__5)) + (r__6 = r_imag(&vb11), dabs(r__6)) + ((
 		    r__7 = vb12.r, dabs(r__7)) + (r__8 = r_imag(&vb12), dabs(
 		    r__8))))) {
-		clartg_(&ua12, &ua11, csq, snq, &r);
+		clartg_(&ua12, &ua11, csq, snq, &r__);
 	    } else {
-		clartg_(&vb12, &vb11, csq, snq, &r);
+		clartg_(&vb12, &vb11, csq, snq, &r__);
 	    }
 
 	    *csu = snr;

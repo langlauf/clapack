@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int chpev_(char *jobz, char *uplo, integer *n, complex *ap, 
-	real *w, complex *z, integer *ldz, complex *work, real *rwork, 
+	real *w, complex *z__, integer *ldz, complex *work, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    CHPEV computes all the eigenvalues and, optionally, eigenvectors of a 
-  
+    CHPEV computes all the eigenvalues and, optionally, eigenvectors of a   
     complex Hermitian matrix in packed storage.   
 
     Arguments   
@@ -32,19 +32,15 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) COMPLEX array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the Hermitian matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
 
             On exit, AP is overwritten by values generated during the   
             reduction to tridiagonal form.  If UPLO = 'U', the diagonal   
-            and first superdiagonal of the tridiagonal matrix T overwrite 
-  
+            and first superdiagonal of the tridiagonal matrix T overwrite   
             the corresponding elements of A, and if UPLO = 'L', the   
             diagonal and first subdiagonal of T overwrite the   
             corresponding elements of A.   
@@ -73,15 +69,12 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -115,22 +108,26 @@
 	    integer *, complex *, complex *, complex *, integer *, complex *, 
 	    integer *), ssterf_(integer *, real *, real *, integer *);
     static real smlnum, eps;
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    --ap;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
 
-#define AP(I) ap[(I)-1]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
 
     *info = 0;
     if (! (wantz || lsame_(jobz, "N"))) {
 	*info = -1;
-    } else if (! (lsame_(uplo, "L") || lsame_(uplo, "U"))) {
+    } else if (! (lsame_(uplo, "L") || lsame_(uplo, 
+	    "U"))) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
@@ -151,11 +148,11 @@
     }
 
     if (*n == 1) {
-	W(1) = AP(1).r;
-	RWORK(1) = 1.f;
+	w[1] = ap[1].r;
+	rwork[1] = 1.f;
 	if (wantz) {
-	    i__1 = z_dim1 + 1;
-	    Z(1,1).r = 1.f, Z(1,1).i = 0.f;
+	    i__1 = z___subscr(1, 1);
+	    z__[i__1].r = 1.f, z__[i__1].i = 0.f;
 	}
 	return 0;
     }
@@ -171,7 +168,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = clanhp_("M", uplo, n, &AP(1), &RWORK(1));
+    anrm = clanhp_("M", uplo, n, &ap[1], &rwork[1]);
     iscale = 0;
     if (anrm > 0.f && anrm < rmin) {
 	iscale = 1;
@@ -182,28 +179,27 @@
     }
     if (iscale == 1) {
 	i__1 = *n * (*n + 1) / 2;
-	csscal_(&i__1, &sigma, &AP(1), &c__1);
+	csscal_(&i__1, &sigma, &ap[1], &c__1);
     }
 
-/*     Call CHPTRD to reduce Hermitian packed matrix to tridiagonal form. 
-*/
+/*     Call CHPTRD to reduce Hermitian packed matrix to tridiagonal form. */
 
     inde = 1;
     indtau = 1;
-    chptrd_(uplo, n, &AP(1), &W(1), &RWORK(inde), &WORK(indtau), &iinfo);
+    chptrd_(uplo, n, &ap[1], &w[1], &rwork[inde], &work[indtau], &iinfo);
 
 /*     For eigenvalues only, call SSTERF.  For eigenvectors, first call   
        CUPGTR to generate the orthogonal matrix, then call CSTEQR. */
 
     if (! wantz) {
-	ssterf_(n, &W(1), &RWORK(inde), info);
+	ssterf_(n, &w[1], &rwork[inde], info);
     } else {
 	indwrk = indtau + *n;
-	cupgtr_(uplo, n, &AP(1), &WORK(indtau), &Z(1,1), ldz, &WORK(
-		indwrk), &iinfo);
+	cupgtr_(uplo, n, &ap[1], &work[indtau], &z__[z_offset], ldz, &work[
+		indwrk], &iinfo);
 	indrwk = inde + *n;
-	csteqr_(jobz, n, &W(1), &RWORK(inde), &Z(1,1), ldz, &RWORK(
-		indrwk), info);
+	csteqr_(jobz, n, &w[1], &rwork[inde], &z__[z_offset], ldz, &rwork[
+		indrwk], info);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -215,7 +211,7 @@
 	    imax = *info - 1;
 	}
 	r__1 = 1.f / sigma;
-	sscal_(&imax, &r__1, &W(1), &c__1);
+	sscal_(&imax, &r__1, &w[1], &c__1);
     }
 
     return 0;
@@ -223,4 +219,8 @@
 /*     End of CHPEV */
 
 } /* chpev_ */
+
+#undef z___ref
+#undef z___subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static integer c__0 = 0;
 static integer c__1 = 1;
 
 /* Subroutine */ int dlatmr_(integer *m, integer *n, char *dist, integer *
-	iseed, char *sym, doublereal *d, integer *mode, doublereal *cond, 
+	iseed, char *sym, doublereal *d__, integer *mode, doublereal *cond, 
 	doublereal *dmax__, char *rsign, char *grade, doublereal *dl, integer 
 	*model, doublereal *condl, doublereal *dr, integer *moder, doublereal 
 	*condr, char *pivtng, integer *ipivot, integer *kl, integer *ku, 
@@ -25,7 +26,7 @@ static integer c__1 = 1;
     /* Local variables */
     static integer isub, jsub;
     static doublereal temp;
-    static integer isym, i, j, k;
+    static integer isym, i__, j, k;
     static doublereal alpha;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
@@ -60,7 +61,10 @@ static integer c__1 = 1;
     static integer irsign, ipvtng, kll, kuu;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -95,8 +99,7 @@ static integer c__1 = 1;
             matrix as specified by SPARSE.   
 
          Make A a band matrix, if desired, by zeroing out the matrix   
-            outside a band of lower bandwidth KL and upper bandwidth KU. 
-  
+            outside a band of lower bandwidth KL and upper bandwidth KU.   
 
          Scale A, if desired, to have maximum entry ANORM.   
 
@@ -133,8 +136,7 @@ static integer c__1 = 1;
              Number of columns of A. Not modified.   
 
     DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used 
-  
+             On entry, DIST specifies the type of distribution to be used   
              to generate a random matrix .   
              'U' => UNIFORM( 0, 1 )  ( 'U' for uniform )   
              'S' => UNIFORM( -1, 1 ) ( 'S' for symmetric )   
@@ -220,49 +222,39 @@ static integer c__1 = 1;
              Not modified.   
 
     DL     - DOUBLE PRECISION array, dimension (M)   
-             If MODEL=0, then on entry this array specifies the diagonal 
-  
+             If MODEL=0, then on entry this array specifies the diagonal   
              entries of a diagonal matrix used as described under GRADE   
              above. If MODEL is not zero, then DL will be set according   
-             to MODEL and CONDL, analogous to the way D is set according 
-  
-             to MODE and COND (except there is no DMAX parameter for DL). 
-  
+             to MODEL and CONDL, analogous to the way D is set according   
+             to MODE and COND (except there is no DMAX parameter for DL).   
              If GRADE='E', then DL cannot have zero entries.   
              Not referenced if GRADE = 'N' or 'R'. Changed on exit.   
 
     MODEL  - INTEGER   
-             This specifies how the diagonal array DL is to be computed, 
-  
+             This specifies how the diagonal array DL is to be computed,   
              just as MODE specifies how D is to be computed.   
              Not modified.   
 
     CONDL  - DOUBLE PRECISION   
-             When MODEL is not zero, this specifies the condition number 
-  
+             When MODEL is not zero, this specifies the condition number   
              of the computed DL.  Not modified.   
 
     DR     - DOUBLE PRECISION array, dimension (N)   
-             If MODER=0, then on entry this array specifies the diagonal 
-  
+             If MODER=0, then on entry this array specifies the diagonal   
              entries of a diagonal matrix used as described under GRADE   
              above. If MODER is not zero, then DR will be set according   
-             to MODER and CONDR, analogous to the way D is set according 
-  
-             to MODE and COND (except there is no DMAX parameter for DR). 
-  
+             to MODER and CONDR, analogous to the way D is set according   
+             to MODE and COND (except there is no DMAX parameter for DR).   
              Not referenced if GRADE = 'N', 'L', 'H', 'S' or 'E'.   
              Changed on exit.   
 
     MODER  - INTEGER   
-             This specifies how the diagonal array DR is to be computed, 
-  
+             This specifies how the diagonal array DR is to be computed,   
              just as MODE specifies how D is to be computed.   
              Not modified.   
 
     CONDR  - DOUBLE PRECISION   
-             When MODER is not zero, this specifies the condition number 
-  
+             When MODER is not zero, this specifies the condition number   
              of the computed DR.  Not modified.   
 
     PIVTNG - CHARACTER*1   
@@ -300,8 +292,7 @@ static integer c__1 = 1;
     SPARSE - DOUBLE PRECISION   
              On entry specifies the sparsity of the matrix if a sparse   
              matrix is to be generated. SPARSE should lie between   
-             0 and 1. To generate a sparse matrix, for each matrix entry 
-  
+             0 and 1. To generate a sparse matrix, for each matrix entry   
              a uniform ( 0, 1 ) random number x is generated and   
              compared to SPARSE; if x is larger the matrix entry   
              is unchanged and if x is smaller the entry is set   
@@ -336,11 +327,9 @@ static integer c__1 = 1;
              'U' => zero out all subdiagonal entries (if symmetric)   
              'L' => zero out all superdiagonal entries (if symmetric)   
              'C' => store the upper triangle columnwise   
-                    (only if matrix symmetric or square upper triangular) 
-  
+                    (only if matrix symmetric or square upper triangular)   
              'R' => store the lower triangle columnwise   
-                    (only if matrix symmetric or square lower triangular) 
-  
+                    (only if matrix symmetric or square lower triangular)   
                     (same as upper half rowwise if symmetric)   
              'B' => store the lower triangle in band storage scheme   
                     (only if matrix symmetric)   
@@ -371,8 +360,7 @@ static integer c__1 = 1;
     LDA    - INTEGER   
              on entry LDA specifies the first dimension of A as   
              declared in the calling program.   
-             If PACK='N', 'U' or 'L', LDA must be at least max ( 1, M ). 
-  
+             If PACK='N', 'U' or 'L', LDA must be at least max ( 1, M ).   
              If PACK='C' or 'R', LDA must be at least 1.   
              If PACK='B', or 'Q', LDA must be MIN ( KU+1, N )   
              If PACK='Z', LDA must be at least KUU+KLL+1, where   
@@ -380,8 +368,7 @@ static integer c__1 = 1;
              Not modified.   
 
     IWORK  - INTEGER array, dimension ( N or M)   
-             Workspace. Not referenced if PIVTNG = 'N'. Changed on exit. 
-  
+             Workspace. Not referenced if PIVTNG = 'N'. Changed on exit.   
 
     INFO   - INTEGER   
              Error parameter on exit:   
@@ -397,11 +384,9 @@ static integer c__1 = 1;
                     M not equal to N, or GRADE='L', 'R', 'B' or 'E' and   
                     SYM = 'S' or 'H'   
              -12 => GRADE = 'E' and DL contains zero   
-             -13 => MODEL not in range -6 to 6 and GRADE= 'L', 'B', 'H', 
-  
+             -13 => MODEL not in range -6 to 6 and GRADE= 'L', 'B', 'H',   
                     'S' or 'E'   
-             -14 => CONDL less than 1.0, GRADE='L', 'B', 'H', 'S' or 'E', 
-  
+             -14 => CONDL less than 1.0, GRADE='L', 'B', 'H', 'S' or 'E',   
                     and MODEL neither -6, 0 nor 6   
              -16 => MODER not in range -6 to 6 and GRADE= 'R' or 'B'   
              -17 => CONDR less than 1.0, GRADE='R' or 'B', and   
@@ -412,14 +397,12 @@ static integer c__1 = 1;
              -19 => IPIVOT contains out of range number and   
                     PIVTNG not equal to 'N'   
              -20 => KL negative   
-             -21 => KU negative, or SYM='S' or 'H' and KU not equal to KL 
-  
+             -21 => KU negative, or SYM='S' or 'H' and KU not equal to KL   
              -22 => SPARSE not in range 0. to 1.   
              -24 => PACK illegal string, or PACK='U', 'L', 'B' or 'Q'   
                     and SYM='N', or PACK='C' and SYM='N' and either KL   
                     not equal to 0 or N not equal to M, or PACK='R' and   
-                    SYM='N', and either KU not equal to 0 or N not equal 
-  
+                    SYM='N', and either KU not equal to 0 or N not equal   
                     to M   
              -26 => LDA too small   
                1 => Error return from DLATM1 (computing D)   
@@ -429,8 +412,7 @@ static integer c__1 = 1;
                5 => ANORM is positive, but matrix constructed prior to   
                     attempting to scale it to have norm ANORM, is zero   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Decode and Test the input parameters.   
@@ -438,12 +420,12 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     --iseed;
-    --d;
+    --d__;
     --dl;
     --dr;
     --ipivot;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iwork;
 
@@ -524,7 +506,8 @@ static integer c__1 = 1;
 	igrade = 3;
     } else if (lsame_(grade, "E")) {
 	igrade = 4;
-    } else if (lsame_(grade, "H") || lsame_(grade, "S")) {
+    } else if (lsame_(grade, "H") || lsame_(grade, 
+	    "S")) {
 	igrade = 5;
     } else {
 	igrade = -1;
@@ -567,8 +550,8 @@ static integer c__1 = 1;
     dzero = FALSE_;
     if (igrade == 4 && *model == 0) {
 	i__1 = *m;
-	for (i = 1; i <= i__1; ++i) {
-	    if (dl[i] == 0.) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (dl[i__] == 0.) {
 		dzero = TRUE_;
 	    }
 /* L10: */
@@ -659,8 +642,8 @@ static integer c__1 = 1;
 
 /*     Initialize random number generator */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i] = (i__1 = iseed[i], abs(i__1)) % 4096;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__] = (i__1 = iseed[i__], abs(i__1)) % 4096;
 /* L30: */
     }
 
@@ -670,7 +653,7 @@ static integer c__1 = 1;
 
                Compute D according to COND and MODE */
 
-    dlatm1_(mode, cond, &irsign, &idist, &iseed[1], &d[1], &mnmin, info);
+    dlatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], &mnmin, info);
     if (*info != 0) {
 	*info = 1;
 	return 0;
@@ -679,11 +662,11 @@ static integer c__1 = 1;
 
 /*        Scale by DMAX */
 
-	temp = abs(d[1]);
+	temp = abs(d__[1]);
 	i__1 = mnmin;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__2 = temp, d__3 = (d__1 = d[i], abs(d__1));
+	    d__2 = temp, d__3 = (d__1 = d__[i__], abs(d__1));
 	    temp = max(d__2,d__3);
 /* L40: */
 	}
@@ -697,8 +680,8 @@ static integer c__1 = 1;
 	    alpha = 1.;
 	}
 	i__1 = mnmin;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] = alpha * d[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = alpha * d__[i__];
 /* L50: */
 	}
 
@@ -728,24 +711,24 @@ static integer c__1 = 1;
 
     if (ipvtng > 0) {
 	i__1 = npvts;
-	for (i = 1; i <= i__1; ++i) {
-	    iwork[i] = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    iwork[i__] = i__;
 /* L60: */
 	}
 	if (fulbnd) {
 	    i__1 = npvts;
-	    for (i = 1; i <= i__1; ++i) {
-		k = ipivot[i];
-		j = iwork[i];
-		iwork[i] = iwork[k];
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		k = ipivot[i__];
+		j = iwork[i__];
+		iwork[i__] = iwork[k];
 		iwork[k] = j;
 /* L70: */
 	    }
 	} else {
-	    for (i = npvts; i >= 1; --i) {
-		k = ipivot[i];
-		j = iwork[i];
-		iwork[i] = iwork[k];
+	    for (i__ = npvts; i__ >= 1; --i__) {
+		k = ipivot[i__];
+		j = iwork[i__];
+		iwork[i__] = iwork[k];
 		iwork[k] = j;
 /* L80: */
 	    }
@@ -759,8 +742,7 @@ static integer c__1 = 1;
 
     if (fulbnd) {
 
-/*        Use DLATM3 so matrices generated with differing PIVOTing onl
-y   
+/*        Use DLATM3 so matrices generated with differing PIVOTing only   
           differ only in the order of their rows and/or columns. */
 
 	if (ipack == 0) {
@@ -768,12 +750,12 @@ y
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
-			a[isub + jsub * a_dim1] = temp;
-			a[jsub + isub * a_dim1] = temp;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(isub, jsub) = temp;
+			a_ref(jsub, isub) = temp;
 /* L90: */
 		    }
 /* L100: */
@@ -782,11 +764,11 @@ y
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= i__2; ++i) {
-			temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
-			a[isub + jsub * a_dim1] = temp;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(isub, jsub) = temp;
 /* L110: */
 		    }
 /* L120: */
@@ -798,15 +780,15 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
-		    a[mnsub + mxsub * a_dim1] = temp;
+		    a_ref(mnsub, mxsub) = temp;
 		    if (mnsub != mxsub) {
-			a[mxsub + mnsub * a_dim1] = 0.;
+			a_ref(mxsub, mnsub) = 0.;
 		    }
 /* L130: */
 		}
@@ -818,15 +800,15 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
-		    a[mxsub + mnsub * a_dim1] = temp;
+		    a_ref(mxsub, mnsub) = temp;
 		    if (mnsub != mxsub) {
-			a[mnsub + mxsub * a_dim1] = 0.;
+			a_ref(mnsub, mxsub) = 0.;
 		    }
 /* L150: */
 		}
@@ -838,13 +820,12 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 
-/*                 Compute K = location of (ISUB,JSUB) ent
-ry in packed   
+/*                 Compute K = location of (ISUB,JSUB) entry in packed   
                    array */
 
 		    mnsub = min(isub,jsub);
@@ -856,7 +837,7 @@ ry in packed
 		    jjsub = (k - 1) / *lda + 1;
 		    iisub = k - *lda * (jjsub - 1);
 
-		    a[iisub + jjsub * a_dim1] = temp;
+		    a_ref(iisub, jjsub) = temp;
 /* L170: */
 		}
 /* L180: */
@@ -867,13 +848,12 @@ ry in packed
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 
-/*                 Compute K = location of (I,J) entry in 
-packed array */
+/*                 Compute K = location of (I,J) entry in packed array */
 
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
@@ -889,7 +869,7 @@ packed array */
 		    jjsub = (k - 1) / *lda + 1;
 		    iisub = k - *lda * (jjsub - 1);
 
-		    a[iisub + jjsub * a_dim1] = temp;
+		    a_ref(iisub, jjsub) = temp;
 /* L190: */
 		}
 /* L200: */
@@ -900,16 +880,16 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    if (i < 1) {
-			a[j - i + 1 + (i + *n) * a_dim1] = 0.;
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    if (i__ < 1) {
+			a_ref(j - i__ + 1, i__ + *n) = 0.;
 		    } else {
-			temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+			temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			mnsub = min(isub,jsub);
 			mxsub = max(isub,jsub);
-			a[mxsub - mnsub + 1 + mnsub * a_dim1] = temp;
+			a_ref(mxsub - mnsub + 1, mnsub) = temp;
 		    }
 /* L210: */
 		}
@@ -921,13 +901,13 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
-		    a[mnsub - mxsub + kuu + 1 + mxsub * a_dim1] = temp;
+		    a_ref(mnsub - mxsub + kuu + 1, mxsub) = temp;
 /* L230: */
 		}
 /* L240: */
@@ -939,19 +919,18 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			mnsub = min(isub,jsub);
 			mxsub = max(isub,jsub);
-			a[mnsub - mxsub + kuu + 1 + mxsub * a_dim1] = temp;
-			if (i < 1) {
-			    a[j - i + 1 + kuu + (i + *n) * a_dim1] = 0.;
+			a_ref(mnsub - mxsub + kuu + 1, mxsub) = temp;
+			if (i__ < 1) {
+			    a_ref(j - i__ + 1 + kuu, i__ + *n) = 0.;
 			}
-			if (i >= 1 && mnsub != mxsub) {
-			    a[mxsub - mnsub + 1 + kuu + mnsub * a_dim1] = 
-				    temp;
+			if (i__ >= 1 && mnsub != mxsub) {
+			    a_ref(mxsub - mnsub + 1 + kuu, mnsub) = temp;
 			}
 /* L250: */
 		    }
@@ -961,11 +940,11 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j + kll;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			temp = dlatm3_(m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
-			a[isub - jsub + kuu + 1 + jsub * a_dim1] = temp;
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			temp = dlatm3_(m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(isub - jsub + kuu + 1, jsub) = temp;
 /* L270: */
 		    }
 /* L280: */
@@ -983,11 +962,11 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			a[i + j * a_dim1] = dlatm2_(m, n, &i, &j, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
-			a[j + i * a_dim1] = a[i + j * a_dim1];
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			a_ref(i__, j) = dlatm2_(m, n, &i__, &j, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(j, i__) = a_ref(i__, j);
 /* L290: */
 		    }
 /* L300: */
@@ -996,10 +975,10 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= i__2; ++i) {
-			a[i + j * a_dim1] = dlatm2_(m, n, &i, &j, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			a_ref(i__, j) = dlatm2_(m, n, &i__, &j, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 /* L310: */
 		    }
 /* L320: */
@@ -1011,12 +990,12 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    a[i + j * a_dim1] = dlatm2_(m, n, &i, &j, kl, ku, &idist, 
-			    &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = dlatm2_(m, n, &i__, &j, kl, ku, &idist, &
+			    iseed[1], &d__[1], &igrade, &dl[1], &dr[1], &
 			    ipvtng, &iwork[1], sparse);
-		    if (i != j) {
-			a[j + i * a_dim1] = 0.;
+		    if (i__ != j) {
+			a_ref(j, i__) = 0.;
 		    }
 /* L330: */
 		}
@@ -1028,12 +1007,12 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    a[j + i * a_dim1] = dlatm2_(m, n, &i, &j, kl, ku, &idist, 
-			    &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    a_ref(j, i__) = dlatm2_(m, n, &i__, &j, kl, ku, &idist, &
+			    iseed[1], &d__[1], &igrade, &dl[1], &dr[1], &
 			    ipvtng, &iwork[1], sparse);
-		    if (i != j) {
-			a[i + j * a_dim1] = 0.;
+		    if (i__ != j) {
+			a_ref(i__, j) = 0.;
 		    }
 /* L350: */
 		}
@@ -1047,15 +1026,15 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 		    ++isub;
 		    if (isub > *lda) {
 			isub = 1;
 			++jsub;
 		    }
-		    a[isub + jsub * a_dim1] = dlatm2_(m, n, &i, &j, kl, ku, &
-			    idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[1], 
-			    &ipvtng, &iwork[1], sparse);
+		    a_ref(isub, jsub) = dlatm2_(m, n, &i__, &j, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 /* L370: */
 		}
 /* L380: */
@@ -1067,27 +1046,25 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 
-/*                    Compute K = location of (I,J) en
-try in packed array */
+/*                    Compute K = location of (I,J) entry in packed array */
 
-			if (i == 1) {
+			if (i__ == 1) {
 			    k = j;
 			} else {
-			    k = *n * (*n + 1) / 2 - (*n - i + 1) * (*n - i + 
-				    2) / 2 + j - i + 1;
+			    k = *n * (*n + 1) / 2 - (*n - i__ + 1) * (*n - 
+				    i__ + 2) / 2 + j - i__ + 1;
 			}
 
-/*                    Convert K to (ISUB,JSUB) locatio
-n */
+/*                    Convert K to (ISUB,JSUB) location */
 
 			jsub = (k - 1) / *lda + 1;
 			isub = k - *lda * (jsub - 1);
 
-			a[isub + jsub * a_dim1] = dlatm2_(m, n, &i, &j, kl, 
-				ku, &idist, &iseed[1], &d[1], &igrade, &dl[1],
-				 &dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(isub, jsub) = dlatm2_(m, n, &i__, &j, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 /* L390: */
 		    }
 /* L400: */
@@ -1098,15 +1075,15 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j; i <= i__2; ++i) {
+		    for (i__ = j; i__ <= i__2; ++i__) {
 			++isub;
 			if (isub > *lda) {
 			    isub = 1;
 			    ++jsub;
 			}
-			a[isub + jsub * a_dim1] = dlatm2_(m, n, &i, &j, kl, 
-				ku, &idist, &iseed[1], &d[1], &igrade, &dl[1],
-				 &dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(isub, jsub) = dlatm2_(m, n, &i__, &j, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 /* L410: */
 		    }
 /* L420: */
@@ -1118,13 +1095,13 @@ n */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    if (i < 1) {
-			a[j - i + 1 + (i + *n) * a_dim1] = 0.;
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    if (i__ < 1) {
+			a_ref(j - i__ + 1, i__ + *n) = 0.;
 		    } else {
-			a[j - i + 1 + i * a_dim1] = dlatm2_(m, n, &i, &j, kl, 
-				ku, &idist, &iseed[1], &d[1], &igrade, &dl[1],
-				 &dr[1], &ipvtng, &iwork[1], sparse);
+			a_ref(j - i__ + 1, i__) = dlatm2_(m, n, &i__, &j, kl, 
+				ku, &idist, &iseed[1], &d__[1], &igrade, &dl[
+				1], &dr[1], &ipvtng, &iwork[1], sparse);
 		    }
 /* L430: */
 		}
@@ -1136,10 +1113,10 @@ n */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    a[i - j + kuu + 1 + j * a_dim1] = dlatm2_(m, n, &i, &j, 
-			    kl, ku, &idist, &iseed[1], &d[1], &igrade, &dl[1],
-			     &dr[1], &ipvtng, &iwork[1], sparse);
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    a_ref(i__ - j + kuu + 1, j) = dlatm2_(m, n, &i__, &j, kl, 
+			    ku, &idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+			    dr[1], &ipvtng, &iwork[1], sparse);
 /* L450: */
 		}
 /* L460: */
@@ -1151,16 +1128,16 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			a[i - j + kuu + 1 + j * a_dim1] = dlatm2_(m, n, &i, &
-				j, kl, ku, &idist, &iseed[1], &d[1], &igrade, 
-				&dl[1], &dr[1], &ipvtng, &iwork[1], sparse);
-			if (i < 1) {
-			    a[j - i + 1 + kuu + (i + *n) * a_dim1] = 0.;
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			a_ref(i__ - j + kuu + 1, j) = dlatm2_(m, n, &i__, &j, 
+				kl, ku, &idist, &iseed[1], &d__[1], &igrade, &
+				dl[1], &dr[1], &ipvtng, &iwork[1], sparse);
+			if (i__ < 1) {
+			    a_ref(j - i__ + 1 + kuu, i__ + *n) = 0.;
 			}
-			if (i >= 1 && i != j) {
-			    a[j - i + 1 + kuu + i * a_dim1] = a[i - j + kuu + 
-				    1 + j * a_dim1];
+			if (i__ >= 1 && i__ != j) {
+			    a_ref(j - i__ + 1 + kuu, i__) = a_ref(i__ - j + 
+				    kuu + 1, j);
 			}
 /* L470: */
 		    }
@@ -1170,10 +1147,10 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j + kll;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			a[i - j + kuu + 1 + j * a_dim1] = dlatm2_(m, n, &i, &
-				j, kl, ku, &idist, &iseed[1], &d[1], &igrade, 
-				&dl[1], &dr[1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			a_ref(i__ - j + kuu + 1, j) = dlatm2_(m, n, &i__, &j, 
+				kl, ku, &idist, &iseed[1], &d__[1], &igrade, &
+				dl[1], &dr[1], &ipvtng, &iwork[1], sparse);
 /* L490: */
 		    }
 /* L500: */
@@ -1221,8 +1198,8 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    d__1 = 1. / onorm;
-		    dscal_(m, &d__1, &a[j * a_dim1 + 1], &c__1);
-		    dscal_(m, anorm, &a[j * a_dim1 + 1], &c__1);
+		    dscal_(m, &d__1, &a_ref(1, j), &c__1);
+		    dscal_(m, anorm, &a_ref(1, j), &c__1);
 /* L510: */
 		}
 
@@ -1240,9 +1217,9 @@ n */
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = kll + kuu + 1;
 		    d__1 = 1. / onorm;
-		    dscal_(&i__2, &d__1, &a[j * a_dim1 + 1], &c__1);
+		    dscal_(&i__2, &d__1, &a_ref(1, j), &c__1);
 		    i__2 = kll + kuu + 1;
-		    dscal_(&i__2, anorm, &a[j * a_dim1 + 1], &c__1);
+		    dscal_(&i__2, anorm, &a_ref(1, j), &c__1);
 /* L520: */
 		}
 
@@ -1256,7 +1233,7 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    d__1 = *anorm / onorm;
-		    dscal_(m, &d__1, &a[j * a_dim1 + 1], &c__1);
+		    dscal_(m, &d__1, &a_ref(1, j), &c__1);
 /* L530: */
 		}
 
@@ -1272,7 +1249,7 @@ n */
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = kll + kuu + 1;
 		    d__1 = *anorm / onorm;
-		    dscal_(&i__2, &d__1, &a[j * a_dim1 + 1], &c__1);
+		    dscal_(&i__2, &d__1, &a_ref(1, j), &c__1);
 /* L540: */
 		}
 	    }
@@ -1285,4 +1262,7 @@ n */
 
     return 0;
 } /* dlatmr_ */
+
+#undef a_ref
+
 

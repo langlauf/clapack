@@ -32,17 +32,11 @@ include ../../make.inc
 #  entering (for example)
 #       make single FRC=FRC
 #
-#----------------------------------------------------------------------
-#
-#  Edward Anderson, University of Tennessee
-#  March 26, 1990.
-#  Last updated by Susan Ostrouchov:  September 30, 1994
-#
 #######################################################################
 
 ALINTST = \
    aladhd.o alaerh.o alaesm.o alahd.o alareq.o \
-   alasum.o alasvm.o chkxer.o ilaenv.o xlaenv.o xerbla.o
+   alasum.o alasvm.o chkxer.o icopy.o ilaenv.o xlaenv.o xerbla.o
 
 SCLNTST= slaord.o
 
@@ -51,7 +45,7 @@ DZLNTST= dlaord.o
 SLINTST = schkaa.o \
    schkeq.o schkgb.o schkge.o schkgt.o \
    schklq.o schkpb.o schkpo.o schkpp.o \
-   schkpt.o schkql.o schkqp.o schkqr.o schkrq.o \
+   schkpt.o schkq3.o schkql.o schkqp.o schkqr.o schkrq.o \
    schksp.o schksy.o schktb.o schktp.o schktr.o \
    schktz.o \
    sdrvgb.o sdrvge.o sdrvgt.o sdrvls.o sdrvpb.o \
@@ -70,7 +64,8 @@ SLINTST = schkaa.o \
    sptt05.o sqlt01.o sqlt02.o sqlt03.o sqpt01.o \
    sqrt01.o sqrt02.o sqrt03.o sqrt11.o sqrt12.o \
    sqrt13.o sqrt14.o sqrt15.o sqrt16.o sqrt17.o \
-   srqt01.o srqt02.o srqt03.o sspt01.o ssyt01.o \
+   srqt01.o srqt02.o srqt03.o srzt01.o srzt02.o \
+   sspt01.o ssyt01.o \
    stbt02.o stbt03.o stbt05.o stbt06.o stpt01.o \
    stpt02.o stpt03.o stpt05.o stpt06.o strt01.o \
    strt02.o strt03.o strt05.o strt06.o \
@@ -79,7 +74,7 @@ SLINTST = schkaa.o \
 CLINTST = cchkaa.o \
    cchkeq.o cchkgb.o cchkge.o cchkgt.o \
    cchkhe.o cchkhp.o cchklq.o cchkpb.o \
-   cchkpo.o cchkpp.o cchkpt.o cchkql.o cchkqp.o \
+   cchkpo.o cchkpp.o cchkpt.o cchkq3.o cchkql.o cchkqp.o \
    cchkqr.o cchkrq.o cchksp.o cchksy.o cchktb.o \
    cchktp.o cchktr.o cchktz.o \
    cdrvgb.o cdrvge.o cdrvgt.o cdrvhe.o cdrvhp.o \
@@ -101,8 +96,9 @@ CLINTST = cchkaa.o \
    cptt02.o cptt05.o cqlt01.o cqlt02.o cqlt03.o \
    cqpt01.o cqrt01.o cqrt02.o cqrt03.o cqrt11.o \
    cqrt12.o cqrt13.o cqrt14.o cqrt15.o cqrt16.o \
-   cqrt17.o crqt01.o crqt02.o crqt03.o cspt01.o \
-   csbmv.o  cspt02.o cspt03.o csyt01.o csyt02.o csyt03.o \
+   cqrt17.o crqt01.o crqt02.o crqt03.o crzt01.o crzt02.o \
+   csbmv.o  cspt01.o \
+   cspt02.o cspt03.o csyt01.o csyt02.o csyt03.o \
    ctbt02.o ctbt03.o ctbt05.o ctbt06.o ctpt01.o \
    ctpt02.o ctpt03.o ctpt05.o ctpt06.o ctrt01.o \
    ctrt02.o ctrt03.o ctrt05.o ctrt06.o \
@@ -111,7 +107,7 @@ CLINTST = cchkaa.o \
 DLINTST = dchkaa.o \
    dchkeq.o dchkgb.o dchkge.o dchkgt.o \
    dchklq.o dchkpb.o dchkpo.o dchkpp.o \
-   dchkpt.o dchkql.o dchkqp.o dchkqr.o dchkrq.o \
+   dchkpt.o dchkq3.o dchkql.o dchkqp.o dchkqr.o dchkrq.o \
    dchksp.o dchksy.o dchktb.o dchktp.o dchktr.o \
    dchktz.o \
    ddrvgb.o ddrvge.o ddrvgt.o ddrvls.o ddrvpb.o \
@@ -130,7 +126,8 @@ DLINTST = dchkaa.o \
    dptt05.o dqlt01.o dqlt02.o dqlt03.o dqpt01.o \
    dqrt01.o dqrt02.o dqrt03.o dqrt11.o dqrt12.o \
    dqrt13.o dqrt14.o dqrt15.o dqrt16.o dqrt17.o \
-   drqt01.o drqt02.o drqt03.o dspt01.o dsyt01.o \
+   drqt01.o drqt02.o drqt03.o drzt01.o drzt02.o \
+   dspt01.o dsyt01.o \
    dtbt02.o dtbt03.o dtbt05.o dtbt06.o dtpt01.o \
    dtpt02.o dtpt03.o dtpt05.o dtpt06.o dtrt01.o \
    dtrt02.o dtrt03.o dtrt05.o dtrt06.o \
@@ -139,7 +136,7 @@ DLINTST = dchkaa.o \
 ZLINTST = zchkaa.o \
    zchkeq.o zchkgb.o zchkge.o zchkgt.o \
    zchkhe.o zchkhp.o zchklq.o zchkpb.o \
-   zchkpo.o zchkpp.o zchkpt.o zchkql.o zchkqp.o \
+   zchkpo.o zchkpp.o zchkpt.o zchkq3.o zchkql.o zchkqp.o \
    zchkqr.o zchkrq.o zchksp.o zchksy.o zchktb.o \
    zchktp.o zchktr.o zchktz.o \
    zdrvgb.o zdrvge.o zdrvgt.o zdrvhe.o zdrvhp.o \
@@ -161,7 +158,8 @@ ZLINTST = zchkaa.o \
    zptt02.o zptt05.o zqlt01.o zqlt02.o zqlt03.o \
    zqpt01.o zqrt01.o zqrt02.o zqrt03.o zqrt11.o \
    zqrt12.o zqrt13.o zqrt14.o zqrt15.o zqrt16.o \
-   zqrt17.o zrqt01.o zrqt02.o zrqt03.o zsbmv.o  zspt01.o \
+   zqrt17.o zrqt01.o zrqt02.o zrqt03.o zrzt01.o zrzt02.o \
+   zsbmv.o  zspt01.o \
    zspt02.o zspt03.o zsyt01.o zsyt02.o zsyt03.o \
    ztbt02.o ztbt03.o ztbt05.o ztbt06.o ztpt01.o \
    ztpt02.o ztpt03.o ztpt05.o ztpt06.o ztrt01.o \
@@ -208,6 +206,16 @@ FRC:
  
 clean:
 	rm -f *.o
+
+schkaa.o: schkaa.c
+	$(CC) $(DRVCFLAGS) -c $<
+dchkaa.o: dchkaa.c
+	$(CC) $(DRVCFLAGS) -c $<
+cchkaa.o: cchkaa.c
+	$(CC) $(DRVCFLAGS) -c $<
+zchkaa.o: zchkaa.c
+	$(CC) $(DRVCFLAGS) -c $<
  
-.c.o: 
-	$(CC) -c $(CFLAGS) $*.c
+.c.o:
+	$(CC) $(CFLAGS) -c $*.c
+

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgetrs_(char *trans, integer *n, integer *nrhs, real *a, 
 	integer *lda, integer *ipiv, real *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -55,15 +56,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b12 = 1.f;
@@ -81,15 +79,19 @@
 	    *, integer *, integer *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     notran = lsame_(trans, "N");
-    if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, "C")) {
+    if (! notran && ! lsame_(trans, "T") && ! lsame_(
+	    trans, "C")) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -118,31 +120,34 @@
 
           Apply row interchanges to the right hand sides. */
 
-	slaswp_(nrhs, &B(1,1), ldb, &c__1, n, &IPIV(1), &c__1);
+	slaswp_(nrhs, &b[b_offset], ldb, &c__1, n, &ipiv[1], &c__1);
 
 /*        Solve L*X = B, overwriting B with X. */
 
-	strsm_("Left", "Lower", "No transpose", "Unit", n, nrhs, &c_b12, &A(1,1), lda, &B(1,1), ldb);
+	strsm_("Left", "Lower", "No transpose", "Unit", n, nrhs, &c_b12, &a[
+		a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve U*X = B, overwriting B with X. */
 
 	strsm_("Left", "Upper", "No transpose", "Non-unit", n, nrhs, &c_b12, &
-		A(1,1), lda, &B(1,1), ldb);
+		a[a_offset], lda, &b[b_offset], ldb);
     } else {
 
 /*        Solve A' * X = B.   
 
           Solve U'*X = B, overwriting B with X. */
 
-	strsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b12, &A(1,1), lda, &B(1,1), ldb);
+	strsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b12, &a[
+		a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve L'*X = B, overwriting B with X. */
 
-	strsm_("Left", "Lower", "Transpose", "Unit", n, nrhs, &c_b12, &A(1,1), lda, &B(1,1), ldb);
+	strsm_("Left", "Lower", "Transpose", "Unit", n, nrhs, &c_b12, &a[
+		a_offset], lda, &b[b_offset], ldb);
 
 /*        Apply row interchanges to the solution vectors. */
 
-	slaswp_(nrhs, &B(1,1), ldb, &c__1, n, &IPIV(1), &c_n1);
+	slaswp_(nrhs, &b[b_offset], ldb, &c__1, n, &ipiv[1], &c_n1);
     }
 
     return 0;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,7 +16,7 @@ static integer c__0 = 0;
 
 /* Subroutine */ int ztimmm_(char *vname, char *lab2, integer *nn, integer *
 	nval, integer *nlda, integer *ldaval, doublereal *timmin, 
-	doublecomplex *a, doublecomplex *b, doublecomplex *c, doublereal *
+	doublecomplex *a, doublecomplex *b, doublecomplex *c__, doublereal *
 	reslts, integer *ldr1, integer *ldr2, integer *nout, ftnlen vname_len,
 	 ftnlen lab2_len)
 {
@@ -43,7 +44,7 @@ static integer c__0 = 0;
     /* Local variables */
     static integer ilda, info;
     static doublereal time;
-    static integer isub, i, n;
+    static integer isub, i__, n;
     static char cname[6];
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -79,7 +80,12 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3) reslts[((a_3)*reslts_dim2 + (a_2))*\
+reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -135,25 +141,24 @@ static integer c__0 = 0;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nval;
     --ldaval;
     --a;
     --b;
-    --c;
+    --c__;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
-    reslts_offset = reslts_dim1 * (reslts_dim2 + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * 1);
     reslts -= reslts_offset;
 
     /* Function Body */
 
-    s_copy(cname, vname, 6L, vname_len);
+    s_copy(cname, vname, (ftnlen)6, vname_len);
     for (isub = 1; isub <= 1; ++isub) {
-	timsub[isub - 1] = lsamen_(&c__6, cname, subnam + (isub - 1) * 6);
+	timsub[isub - 1] = lsamen_(&c__6, cname, subnam_ref(0, isub));
 	if (timsub[isub - 1]) {
 	    goto L20;
 	}
@@ -161,18 +166,19 @@ static integer c__0 = 0;
     }
     io___5.ciunit = *nout;
     s_wsfe(&io___5);
-    do_fio(&c__1, cname, 6L);
+    do_fio(&c__1, cname, (ftnlen)6);
     e_wsfe();
     goto L80;
 L20:
 
 /*     Check that N <= LDA for the input values. */
 
-    atimck_(&c__2, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, 6L);
+    atimck_(&c__2, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___7.ciunit = *nout;
 	s_wsfe(&io___7);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L80;
     }
@@ -188,17 +194,17 @@ L20:
 
 	    ztimmg_(&c__1, &n, &n, &a[1], &lda, &c__0, &c__0);
 	    ztimmg_(&c__0, &n, &n, &b[1], &lda, &c__0, &c__0);
-	    ztimmg_(&c__1, &n, &n, &c[1], &lda, &c__0, &c__0);
+	    ztimmg_(&c__1, &n, &n, &c__[1], &lda, &c__0, &c__0);
 	    ic = 0;
 	    s1 = dsecnd_();
 L30:
 	    zgemm_("No transpose", "No transpose", &n, &n, &n, &c_b1, &a[1], &
-		    lda, &b[1], &lda, &c_b1, &c[1], &lda);
+		    lda, &b[1], &lda, &c_b1, &c__[1], &lda);
 	    s2 = dsecnd_();
 	    time = s2 - s1;
 	    ++ic;
 	    if (time < *timmin) {
-		ztimmg_(&c__1, &n, &n, &c[1], &lda, &c__0, &c__0);
+		ztimmg_(&c__1, &n, &n, &c__[1], &lda, &c__0, &c__0);
 		goto L30;
 	    }
 
@@ -211,14 +217,13 @@ L40:
 	    untime = s2 - s1;
 	    ++icl;
 	    if (icl <= ic) {
-		ztimmg_(&c__1, &n, &n, &c[1], &lda, &c__0, &c__0);
+		ztimmg_(&c__1, &n, &n, &c__[1], &lda, &c__0, &c__0);
 		goto L40;
 	    }
 
 	    time = (time - untime) / (doublereal) ic;
 	    ops = dopbl3_("ZGEMM ", &n, &n, &n);
-	    reslts[(in + ilda * reslts_dim2) * reslts_dim1 + 1] = dmflop_(&
-		    ops, &time, &c__0);
+	    reslts_ref(1, in, ilda) = dmflop_(&ops, &time, &c__0);
 /* L50: */
 	}
 /* L60: */
@@ -237,11 +242,11 @@ L40:
 	e_wsfe();
     } else {
 	i__1 = *nlda;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    io___22.ciunit = *nout;
 	    s_wsfe(&io___22);
-	    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 	    e_wsfe();
 /* L70: */
 	}
@@ -250,7 +255,7 @@ L40:
     s_wsle(&io___23);
     e_wsle();
     dprtbl_(" ", lab2, &c__1, idummy, nn, &nval[1], nlda, &reslts[
-	    reslts_offset], ldr1, ldr2, nout, 1L, lab2_len);
+	    reslts_offset], ldr1, ldr2, nout, (ftnlen)1, lab2_len);
 
 L80:
     return 0;
@@ -258,4 +263,8 @@ L80:
 /*     End of ZTIMMM */
 
 } /* ztimmm_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

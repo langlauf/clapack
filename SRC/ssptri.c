@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ssptri_(char *uplo, integer *n, real *ap, integer *ipiv, 
 	real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -20,8 +21,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored 
-  
+            Specifies whether the details of the factorization are stored   
             as an upper or lower triangular matrix.   
             = 'U':  Upper triangular, form is A = U*D*U**T;   
             = 'L':  Lower triangular, form is A = L*D*L**T.   
@@ -34,10 +34,8 @@
             used to obtain the factor U or L as computed by SSPTRF,   
             stored as a packed triangular matrix.   
 
-            On exit, if INFO = 0, the (symmetric) inverse of the original 
-  
-            matrix, stored as a packed triangular matrix. The j-th column 
-  
+            On exit, if INFO = 0, the (symmetric) inverse of the original   
+            matrix, stored as a packed triangular matrix. The j-th column   
             of inv(A) is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = inv(A)(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -52,19 +50,15 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its 
-  
+            > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its   
                  inverse could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b11 = -1.f;
@@ -76,7 +70,7 @@
     /* Local variables */
     static real temp;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static real akkp1, d;
+    static real akkp1, d__;
     static integer j, k;
     static real t;
     extern logical lsame_(char *, char *);
@@ -93,12 +87,11 @@
     static real akp1;
 
 
+    --work;
+    --ipiv;
+    --ap;
 
-#define WORK(I) work[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -126,7 +119,7 @@
 
 	kp = *n * (*n + 1) / 2;
 	for (*info = *n; *info >= 1; --(*info)) {
-	    if (IPIV(*info) > 0 && AP(kp) == 0.f) {
+	    if (ipiv[*info] > 0 && ap[kp] == 0.f) {
 		return 0;
 	    }
 	    kp -= *info;
@@ -139,7 +132,7 @@
 	kp = 1;
 	i__1 = *n;
 	for (*info = 1; *info <= i__1; ++(*info)) {
-	    if (IPIV(*info) > 0 && AP(kp) == 0.f) {
+	    if (ipiv[*info] > 0 && ap[kp] == 0.f) {
 		return 0;
 	    }
 	    kp = kp + *n - *info + 1;
@@ -152,8 +145,7 @@
 
 /*        Compute inv(A) from the factorization A = U*D*U'.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = 1;
@@ -167,24 +159,24 @@ L30:
 	}
 
 	kcnext = kc + k;
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
              Invert the diagonal block. */
 
-	    AP(kc + k - 1) = 1.f / AP(kc + k - 1);
+	    ap[kc + k - 1] = 1.f / ap[kc + k - 1];
 
 /*           Compute column K of the inverse. */
 
 	    if (k > 1) {
 		i__1 = k - 1;
-		scopy_(&i__1, &AP(kc), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		sspmv_(uplo, &i__1, &c_b11, &AP(1), &WORK(1), &c__1, &c_b13, &
-			AP(kc), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[1], &work[1], &c__1, &c_b13, &
+			ap[kc], &c__1);
 		i__1 = k - 1;
-		AP(kc + k - 1) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kc), &
+		ap[kc + k - 1] -= sdot_(&i__1, &work[1], &c__1, &ap[kc], &
 			c__1);
 	    }
 	    kstep = 1;
@@ -194,68 +186,67 @@ L30:
 
              Invert the diagonal block. */
 
-	    t = (r__1 = AP(kcnext + k - 1), dabs(r__1));
-	    ak = AP(kc + k - 1) / t;
-	    akp1 = AP(kcnext + k) / t;
-	    akkp1 = AP(kcnext + k - 1) / t;
-	    d = t * (ak * akp1 - 1.f);
-	    AP(kc + k - 1) = akp1 / d;
-	    AP(kcnext + k) = ak / d;
-	    AP(kcnext + k - 1) = -(doublereal)akkp1 / d;
+	    t = (r__1 = ap[kcnext + k - 1], dabs(r__1));
+	    ak = ap[kc + k - 1] / t;
+	    akp1 = ap[kcnext + k] / t;
+	    akkp1 = ap[kcnext + k - 1] / t;
+	    d__ = t * (ak * akp1 - 1.f);
+	    ap[kc + k - 1] = akp1 / d__;
+	    ap[kcnext + k] = ak / d__;
+	    ap[kcnext + k - 1] = -akkp1 / d__;
 
 /*           Compute columns K and K+1 of the inverse. */
 
 	    if (k > 1) {
 		i__1 = k - 1;
-		scopy_(&i__1, &AP(kc), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		sspmv_(uplo, &i__1, &c_b11, &AP(1), &WORK(1), &c__1, &c_b13, &
-			AP(kc), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[1], &work[1], &c__1, &c_b13, &
+			ap[kc], &c__1);
 		i__1 = k - 1;
-		AP(kc + k - 1) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kc), &
+		ap[kc + k - 1] -= sdot_(&i__1, &work[1], &c__1, &ap[kc], &
 			c__1);
 		i__1 = k - 1;
-		AP(kcnext + k - 1) -= sdot_(&i__1, &AP(kc), &c__1, &AP(kcnext)
+		ap[kcnext + k - 1] -= sdot_(&i__1, &ap[kc], &c__1, &ap[kcnext]
 			, &c__1);
 		i__1 = k - 1;
-		scopy_(&i__1, &AP(kcnext), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kcnext], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		sspmv_(uplo, &i__1, &c_b11, &AP(1), &WORK(1), &c__1, &c_b13, &
-			AP(kcnext), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[1], &work[1], &c__1, &c_b13, &
+			ap[kcnext], &c__1);
 		i__1 = k - 1;
-		AP(kcnext + k) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kcnext), &
+		ap[kcnext + k] -= sdot_(&i__1, &work[1], &c__1, &ap[kcnext], &
 			c__1);
 	    }
 	    kstep = 2;
 	    kcnext = kcnext + k + 1;
 	}
 
-	kp = (i__1 = IPIV(k), abs(i__1));
+	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the leading 
-  
+/*           Interchange rows and columns K and KP in the leading   
              submatrix A(1:k+1,1:k+1) */
 
 	    kpc = (kp - 1) * kp / 2 + 1;
 	    i__1 = kp - 1;
-	    sswap_(&i__1, &AP(kc), &c__1, &AP(kpc), &c__1);
+	    sswap_(&i__1, &ap[kc], &c__1, &ap[kpc], &c__1);
 	    kx = kpc + kp - 1;
 	    i__1 = k - 1;
-	    for (j = kp + 1; j <= k-1; ++j) {
+	    for (j = kp + 1; j <= i__1; ++j) {
 		kx = kx + j - 1;
-		temp = AP(kc + j - 1);
-		AP(kc + j - 1) = AP(kx);
-		AP(kx) = temp;
+		temp = ap[kc + j - 1];
+		ap[kc + j - 1] = ap[kx];
+		ap[kx] = temp;
 /* L40: */
 	    }
-	    temp = AP(kc + k - 1);
-	    AP(kc + k - 1) = AP(kpc + kp - 1);
-	    AP(kpc + kp - 1) = temp;
+	    temp = ap[kc + k - 1];
+	    ap[kc + k - 1] = ap[kpc + kp - 1];
+	    ap[kpc + kp - 1] = temp;
 	    if (kstep == 2) {
-		temp = AP(kc + k + k - 1);
-		AP(kc + k + k - 1) = AP(kc + k + kp - 1);
-		AP(kc + k + kp - 1) = temp;
+		temp = ap[kc + k + k - 1];
+		ap[kc + k + k - 1] = ap[kc + k + kp - 1];
+		ap[kc + k + kp - 1] = temp;
 	    }
 	}
 
@@ -269,8 +260,7 @@ L50:
 
 /*        Compute inv(A) from the factorization A = L*D*L'.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	npp = *n * (*n + 1) / 2;
@@ -285,24 +275,24 @@ L60:
 	}
 
 	kcnext = kc - (*n - k + 2);
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
              Invert the diagonal block. */
 
-	    AP(kc) = 1.f / AP(kc);
+	    ap[kc] = 1.f / ap[kc];
 
 /*           Compute column K of the inverse. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		scopy_(&i__1, &AP(kc + 1), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		sspmv_(uplo, &i__1, &c_b11, &AP(kc + *n - k + 1), &WORK(1), &
-			c__1, &c_b13, &AP(kc + 1), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[kc + *n - k + 1], &work[1], &
+			c__1, &c_b13, &ap[kc + 1], &c__1);
 		i__1 = *n - k;
-		AP(kc) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kc + 1), &c__1);
+		ap[kc] -= sdot_(&i__1, &work[1], &c__1, &ap[kc + 1], &c__1);
 	    }
 	    kstep = 1;
 	} else {
@@ -311,70 +301,69 @@ L60:
 
              Invert the diagonal block. */
 
-	    t = (r__1 = AP(kcnext + 1), dabs(r__1));
-	    ak = AP(kcnext) / t;
-	    akp1 = AP(kc) / t;
-	    akkp1 = AP(kcnext + 1) / t;
-	    d = t * (ak * akp1 - 1.f);
-	    AP(kcnext) = akp1 / d;
-	    AP(kc) = ak / d;
-	    AP(kcnext + 1) = -(doublereal)akkp1 / d;
+	    t = (r__1 = ap[kcnext + 1], dabs(r__1));
+	    ak = ap[kcnext] / t;
+	    akp1 = ap[kc] / t;
+	    akkp1 = ap[kcnext + 1] / t;
+	    d__ = t * (ak * akp1 - 1.f);
+	    ap[kcnext] = akp1 / d__;
+	    ap[kc] = ak / d__;
+	    ap[kcnext + 1] = -akkp1 / d__;
 
 /*           Compute columns K-1 and K of the inverse. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		scopy_(&i__1, &AP(kc + 1), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		sspmv_(uplo, &i__1, &c_b11, &AP(kc + (*n - k + 1)), &WORK(1), 
-			&c__1, &c_b13, &AP(kc + 1), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[kc + (*n - k + 1)], &work[1], 
+			&c__1, &c_b13, &ap[kc + 1], &c__1);
 		i__1 = *n - k;
-		AP(kc) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kc + 1), &c__1);
+		ap[kc] -= sdot_(&i__1, &work[1], &c__1, &ap[kc + 1], &c__1);
 		i__1 = *n - k;
-		AP(kcnext + 1) -= sdot_(&i__1, &AP(kc + 1), &c__1, &AP(kcnext 
-			+ 2), &c__1);
+		ap[kcnext + 1] -= sdot_(&i__1, &ap[kc + 1], &c__1, &ap[kcnext 
+			+ 2], &c__1);
 		i__1 = *n - k;
-		scopy_(&i__1, &AP(kcnext + 2), &c__1, &WORK(1), &c__1);
+		scopy_(&i__1, &ap[kcnext + 2], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		sspmv_(uplo, &i__1, &c_b11, &AP(kc + (*n - k + 1)), &WORK(1), 
-			&c__1, &c_b13, &AP(kcnext + 2), &c__1);
+		sspmv_(uplo, &i__1, &c_b11, &ap[kc + (*n - k + 1)], &work[1], 
+			&c__1, &c_b13, &ap[kcnext + 2], &c__1);
 		i__1 = *n - k;
-		AP(kcnext) -= sdot_(&i__1, &WORK(1), &c__1, &AP(kcnext + 2), &
+		ap[kcnext] -= sdot_(&i__1, &work[1], &c__1, &ap[kcnext + 2], &
 			c__1);
 	    }
 	    kstep = 2;
 	    kcnext -= *n - k + 3;
 	}
 
-	kp = (i__1 = IPIV(k), abs(i__1));
+	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the trailing
-   
+/*           Interchange rows and columns K and KP in the trailing   
              submatrix A(k-1:n,k-1:n) */
 
 	    kpc = npp - (*n - kp + 1) * (*n - kp + 2) / 2 + 1;
 	    if (kp < *n) {
 		i__1 = *n - kp;
-		sswap_(&i__1, &AP(kc + kp - k + 1), &c__1, &AP(kpc + 1), &
+		sswap_(&i__1, &ap[kc + kp - k + 1], &c__1, &ap[kpc + 1], &
 			c__1);
 	    }
 	    kx = kc + kp - k;
 	    i__1 = kp - 1;
-	    for (j = k + 1; j <= kp-1; ++j) {
+	    for (j = k + 1; j <= i__1; ++j) {
 		kx = kx + *n - j + 1;
-		temp = AP(kc + j - k);
-		AP(kc + j - k) = AP(kx);
-		AP(kx) = temp;
+		temp = ap[kc + j - k];
+		ap[kc + j - k] = ap[kx];
+		ap[kx] = temp;
 /* L70: */
 	    }
-	    temp = AP(kc);
-	    AP(kc) = AP(kpc);
-	    AP(kpc) = temp;
+	    temp = ap[kc];
+	    ap[kc] = ap[kpc];
+	    ap[kpc] = temp;
 	    if (kstep == 2) {
-		temp = AP(kc - *n + k - 1);
-		AP(kc - *n + k - 1) = AP(kc - *n + kp - 1);
-		AP(kc - *n + kp - 1) = temp;
+		temp = ap[kc - *n + k - 1];
+		ap[kc - *n + k - 1] = ap[kc - *n + kp - 1];
+		ap[kc - *n + kp - 1] = temp;
 	    }
 	}
 

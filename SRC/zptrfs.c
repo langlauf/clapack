@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zptrfs_(char *uplo, integer *n, integer *nrhs, 
-	doublereal *d, doublecomplex *e, doublereal *df, doublecomplex *ef, 
+	doublereal *d__, doublecomplex *e, doublereal *df, doublecomplex *ef, 
 	doublecomplex *b, integer *ldb, doublecomplex *x, integer *ldx, 
 	doublereal *ferr, doublereal *berr, doublecomplex *work, doublereal *
 	rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -16,8 +17,7 @@
     =======   
 
     ZPTRFS improves the computed solution to a system of linear   
-    equations when the coefficient matrix is Hermitian positive definite 
-  
+    equations when the coefficient matrix is Hermitian positive definite   
     and tridiagonal, and provides error bounds and backward error   
     estimates for the solution.   
 
@@ -25,8 +25,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the superdiagonal or the subdiagonal of the 
-  
+            Specifies whether the superdiagonal or the subdiagonal of the   
             tridiagonal matrix A is stored and the form of the   
             factorization:   
             = 'U':  E is the superdiagonal of A, and A = U**H*D*U;   
@@ -72,10 +71,8 @@
     FERR    (output) DOUBLE PRECISION array, dimension (NRHS)   
             The forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).   
 
@@ -97,15 +94,12 @@
 
     ITMAX is the maximum number of steps of iterative refinement.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublecomplex c_b16 = {1.,0.};
@@ -122,7 +116,7 @@
     double z_abs(doublecomplex *);
     /* Local variables */
     static doublereal safe1, safe2;
-    static integer i, j;
+    static integer i__, j;
     static doublereal s;
     extern logical lsame_(char *, char *);
     static integer count;
@@ -142,21 +136,28 @@
 	    doublereal *, doublecomplex *, doublecomplex *, integer *, 
 	    integer *);
     static doublereal eps;
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
 
 
+    --d__;
+    --e;
+    --df;
+    --ef;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --rwork;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define DF(I) df[(I)-1]
-#define EF(I) ef[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -180,9 +181,9 @@
 
     if (*n == 0 || *nrhs == 0) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    FERR(j) = 0.;
-	    BERR(j) = 0.;
+	for (j = 1; j <= i__1; ++j) {
+	    ferr[j] = 0.;
+	    berr[j] = 0.;
 /* L10: */
 	}
 	return 0;
@@ -199,7 +200,7 @@
 /*     Do for each right hand side */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 
 	count = 1;
 	lstres = 3.;
@@ -208,248 +209,251 @@ L20:
 /*        Loop until stopping criterion is satisfied.   
 
           Compute residual R = B - A * X.  Also compute   
-          abs(A)*abs(x) + abs(b) for use in the backward error bound. 
-*/
+          abs(A)*abs(x) + abs(b) for use in the backward error bound. */
 
 	if (upper) {
 	    if (*n == 1) {
-		i__2 = j * b_dim1 + 1;
-		bi.r = B(1,j).r, bi.i = B(1,j).i;
-		i__2 = j * x_dim1 + 1;
-		z__1.r = D(1) * X(1,j).r, z__1.i = D(1) * X(1,j).i;
+		i__2 = b_subscr(1, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
+		i__2 = x_subscr(1, j);
+		z__1.r = d__[1] * x[i__2].r, z__1.i = d__[1] * x[i__2].i;
 		dx.r = z__1.r, dx.i = z__1.i;
 		z__1.r = bi.r - dx.r, z__1.i = bi.i - dx.i;
-		WORK(1).r = z__1.r, WORK(1).i = z__1.i;
-		RWORK(1) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+		work[1].r = z__1.r, work[1].i = z__1.i;
+		rwork[1] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
 			abs(d__2)) + ((d__3 = dx.r, abs(d__3)) + (d__4 = 
 			d_imag(&dx), abs(d__4)));
 	    } else {
-		i__2 = j * b_dim1 + 1;
-		bi.r = B(1,j).r, bi.i = B(1,j).i;
-		i__2 = j * x_dim1 + 1;
-		z__1.r = D(1) * X(1,j).r, z__1.i = D(1) * X(1,j).i;
+		i__2 = b_subscr(1, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
+		i__2 = x_subscr(1, j);
+		z__1.r = d__[1] * x[i__2].r, z__1.i = d__[1] * x[i__2].i;
 		dx.r = z__1.r, dx.i = z__1.i;
-		i__2 = j * x_dim1 + 2;
-		z__1.r = E(1).r * X(2,j).r - E(1).i * X(2,j).i, z__1.i = E(
-			1).r * X(2,j).i + E(1).i * X(2,j).r;
+		i__2 = x_subscr(2, j);
+		z__1.r = e[1].r * x[i__2].r - e[1].i * x[i__2].i, z__1.i = e[
+			1].r * x[i__2].i + e[1].i * x[i__2].r;
 		ex.r = z__1.r, ex.i = z__1.i;
 		z__2.r = bi.r - dx.r, z__2.i = bi.i - dx.i;
 		z__1.r = z__2.r - ex.r, z__1.i = z__2.i - ex.i;
-		WORK(1).r = z__1.r, WORK(1).i = z__1.i;
-		i__2 = j * x_dim1 + 2;
-		RWORK(1) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+		work[1].r = z__1.r, work[1].i = z__1.i;
+		i__2 = x_subscr(2, j);
+		rwork[1] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
 			abs(d__2)) + ((d__3 = dx.r, abs(d__3)) + (d__4 = 
-			d_imag(&dx), abs(d__4))) + ((d__5 = E(1).r, abs(d__5))
-			 + (d__6 = d_imag(&E(1)), abs(d__6))) * ((d__7 = X(2,j).r, abs(d__7)) + (d__8 = d_imag(&X(2,j)), abs(d__8)));
+			d_imag(&dx), abs(d__4))) + ((d__5 = e[1].r, abs(d__5))
+			 + (d__6 = d_imag(&e[1]), abs(d__6))) * ((d__7 = x[
+			i__2].r, abs(d__7)) + (d__8 = d_imag(&x_ref(2, j)), 
+			abs(d__8)));
 		i__2 = *n - 1;
-		for (i = 2; i <= *n-1; ++i) {
-		    i__3 = i + j * b_dim1;
-		    bi.r = B(i,j).r, bi.i = B(i,j).i;
-		    d_cnjg(&z__2, &E(i - 1));
-		    i__3 = i - 1 + j * x_dim1;
-		    z__1.r = z__2.r * X(i-1,j).r - z__2.i * X(i-1,j).i, z__1.i =
-			     z__2.r * X(i-1,j).i + z__2.i * X(i-1,j).r;
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    i__3 = b_subscr(i__, j);
+		    bi.r = b[i__3].r, bi.i = b[i__3].i;
+		    d_cnjg(&z__2, &e[i__ - 1]);
+		    i__3 = x_subscr(i__ - 1, j);
+		    z__1.r = z__2.r * x[i__3].r - z__2.i * x[i__3].i, z__1.i =
+			     z__2.r * x[i__3].i + z__2.i * x[i__3].r;
 		    cx.r = z__1.r, cx.i = z__1.i;
-		    i__3 = i;
-		    i__4 = i + j * x_dim1;
-		    z__1.r = D(i) * X(i,j).r, z__1.i = D(i) * X(i,j)
-			    .i;
+		    i__3 = i__;
+		    i__4 = x_subscr(i__, j);
+		    z__1.r = d__[i__3] * x[i__4].r, z__1.i = d__[i__3] * x[
+			    i__4].i;
 		    dx.r = z__1.r, dx.i = z__1.i;
-		    i__3 = i;
-		    i__4 = i + 1 + j * x_dim1;
-		    z__1.r = E(i).r * X(i+1,j).r - E(i).i * X(i+1,j).i, 
-			    z__1.i = E(i).r * X(i+1,j).i + E(i).i * X(i+1,j).r;
+		    i__3 = i__;
+		    i__4 = x_subscr(i__ + 1, j);
+		    z__1.r = e[i__3].r * x[i__4].r - e[i__3].i * x[i__4].i, 
+			    z__1.i = e[i__3].r * x[i__4].i + e[i__3].i * x[
+			    i__4].r;
 		    ex.r = z__1.r, ex.i = z__1.i;
-		    i__3 = i;
+		    i__3 = i__;
 		    z__3.r = bi.r - cx.r, z__3.i = bi.i - cx.i;
 		    z__2.r = z__3.r - dx.r, z__2.i = z__3.i - dx.i;
 		    z__1.r = z__2.r - ex.r, z__1.i = z__2.i - ex.i;
-		    WORK(i).r = z__1.r, WORK(i).i = z__1.i;
-		    i__3 = i - 1;
-		    i__4 = i - 1 + j * x_dim1;
-		    i__5 = i;
-		    i__6 = i + 1 + j * x_dim1;
-		    RWORK(i) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi),
-			     abs(d__2)) + ((d__3 = E(i-1).r, abs(d__3)) + (
-			    d__4 = d_imag(&E(i - 1)), abs(d__4))) * ((d__5 = 
-			    X(i-1,j).r, abs(d__5)) + (d__6 = d_imag(&X(i-1,j)), abs(d__6))) + ((d__7 = dx.r, abs(
-			    d__7)) + (d__8 = d_imag(&dx), abs(d__8))) + ((
-			    d__9 = E(i).r, abs(d__9)) + (d__10 = d_imag(&E(
-			    i)), abs(d__10))) * ((d__11 = X(i+1,j).r, abs(
-			    d__11)) + (d__12 = d_imag(&X(i+1,j)),
-			     abs(d__12)));
+		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
+		    i__3 = i__ - 1;
+		    i__4 = x_subscr(i__ - 1, j);
+		    i__5 = i__;
+		    i__6 = x_subscr(i__ + 1, j);
+		    rwork[i__] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&
+			    bi), abs(d__2)) + ((d__3 = e[i__3].r, abs(d__3)) 
+			    + (d__4 = d_imag(&e[i__ - 1]), abs(d__4))) * ((
+			    d__5 = x[i__4].r, abs(d__5)) + (d__6 = d_imag(&
+			    x_ref(i__ - 1, j)), abs(d__6))) + ((d__7 = dx.r, 
+			    abs(d__7)) + (d__8 = d_imag(&dx), abs(d__8))) + ((
+			    d__9 = e[i__5].r, abs(d__9)) + (d__10 = d_imag(&e[
+			    i__]), abs(d__10))) * ((d__11 = x[i__6].r, abs(
+			    d__11)) + (d__12 = d_imag(&x_ref(i__ + 1, j)), 
+			    abs(d__12)));
 /* L30: */
 		}
-		i__2 = *n + j * b_dim1;
-		bi.r = B(*n,j).r, bi.i = B(*n,j).i;
-		d_cnjg(&z__2, &E(*n - 1));
-		i__2 = *n - 1 + j * x_dim1;
-		z__1.r = z__2.r * X(*n-1,j).r - z__2.i * X(*n-1,j).i, z__1.i = 
-			z__2.r * X(*n-1,j).i + z__2.i * X(*n-1,j).r;
+		i__2 = b_subscr(*n, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
+		d_cnjg(&z__2, &e[*n - 1]);
+		i__2 = x_subscr(*n - 1, j);
+		z__1.r = z__2.r * x[i__2].r - z__2.i * x[i__2].i, z__1.i = 
+			z__2.r * x[i__2].i + z__2.i * x[i__2].r;
 		cx.r = z__1.r, cx.i = z__1.i;
 		i__2 = *n;
-		i__3 = *n + j * x_dim1;
-		z__1.r = D(*n) * X(*n,j).r, z__1.i = D(*n) * X(*n,j).i;
+		i__3 = x_subscr(*n, j);
+		z__1.r = d__[i__2] * x[i__3].r, z__1.i = d__[i__2] * x[i__3]
+			.i;
 		dx.r = z__1.r, dx.i = z__1.i;
 		i__2 = *n;
 		z__2.r = bi.r - cx.r, z__2.i = bi.i - cx.i;
 		z__1.r = z__2.r - dx.r, z__1.i = z__2.i - dx.i;
-		WORK(*n).r = z__1.r, WORK(*n).i = z__1.i;
+		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 		i__2 = *n - 1;
-		i__3 = *n - 1 + j * x_dim1;
-		RWORK(*n) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
-			abs(d__2)) + ((d__3 = E(*n-1).r, abs(d__3)) + (d__4 = 
-			d_imag(&E(*n - 1)), abs(d__4))) * ((d__5 = X(*n-1,j).r, 
-			abs(d__5)) + (d__6 = d_imag(&X(*n-1,j)), 
-			abs(d__6))) + ((d__7 = dx.r, abs(d__7)) + (d__8 = 
-			d_imag(&dx), abs(d__8)));
+		i__3 = x_subscr(*n - 1, j);
+		rwork[*n] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+			abs(d__2)) + ((d__3 = e[i__2].r, abs(d__3)) + (d__4 = 
+			d_imag(&e[*n - 1]), abs(d__4))) * ((d__5 = x[i__3].r, 
+			abs(d__5)) + (d__6 = d_imag(&x_ref(*n - 1, j)), abs(
+			d__6))) + ((d__7 = dx.r, abs(d__7)) + (d__8 = d_imag(&
+			dx), abs(d__8)));
 	    }
 	} else {
 	    if (*n == 1) {
-		i__2 = j * b_dim1 + 1;
-		bi.r = B(1,j).r, bi.i = B(1,j).i;
-		i__2 = j * x_dim1 + 1;
-		z__1.r = D(1) * X(1,j).r, z__1.i = D(1) * X(1,j).i;
+		i__2 = b_subscr(1, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
+		i__2 = x_subscr(1, j);
+		z__1.r = d__[1] * x[i__2].r, z__1.i = d__[1] * x[i__2].i;
 		dx.r = z__1.r, dx.i = z__1.i;
 		z__1.r = bi.r - dx.r, z__1.i = bi.i - dx.i;
-		WORK(1).r = z__1.r, WORK(1).i = z__1.i;
-		RWORK(1) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+		work[1].r = z__1.r, work[1].i = z__1.i;
+		rwork[1] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
 			abs(d__2)) + ((d__3 = dx.r, abs(d__3)) + (d__4 = 
 			d_imag(&dx), abs(d__4)));
 	    } else {
-		i__2 = j * b_dim1 + 1;
-		bi.r = B(1,j).r, bi.i = B(1,j).i;
-		i__2 = j * x_dim1 + 1;
-		z__1.r = D(1) * X(1,j).r, z__1.i = D(1) * X(1,j).i;
+		i__2 = b_subscr(1, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
+		i__2 = x_subscr(1, j);
+		z__1.r = d__[1] * x[i__2].r, z__1.i = d__[1] * x[i__2].i;
 		dx.r = z__1.r, dx.i = z__1.i;
-		d_cnjg(&z__2, &E(1));
-		i__2 = j * x_dim1 + 2;
-		z__1.r = z__2.r * X(2,j).r - z__2.i * X(2,j).i, z__1.i = 
-			z__2.r * X(2,j).i + z__2.i * X(2,j).r;
+		d_cnjg(&z__2, &e[1]);
+		i__2 = x_subscr(2, j);
+		z__1.r = z__2.r * x[i__2].r - z__2.i * x[i__2].i, z__1.i = 
+			z__2.r * x[i__2].i + z__2.i * x[i__2].r;
 		ex.r = z__1.r, ex.i = z__1.i;
 		z__2.r = bi.r - dx.r, z__2.i = bi.i - dx.i;
 		z__1.r = z__2.r - ex.r, z__1.i = z__2.i - ex.i;
-		WORK(1).r = z__1.r, WORK(1).i = z__1.i;
-		i__2 = j * x_dim1 + 2;
-		RWORK(1) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+		work[1].r = z__1.r, work[1].i = z__1.i;
+		i__2 = x_subscr(2, j);
+		rwork[1] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
 			abs(d__2)) + ((d__3 = dx.r, abs(d__3)) + (d__4 = 
-			d_imag(&dx), abs(d__4))) + ((d__5 = E(1).r, abs(d__5))
-			 + (d__6 = d_imag(&E(1)), abs(d__6))) * ((d__7 = X(2,j).r, abs(d__7)) + (d__8 = d_imag(&X(2,j)), abs(d__8)));
+			d_imag(&dx), abs(d__4))) + ((d__5 = e[1].r, abs(d__5))
+			 + (d__6 = d_imag(&e[1]), abs(d__6))) * ((d__7 = x[
+			i__2].r, abs(d__7)) + (d__8 = d_imag(&x_ref(2, j)), 
+			abs(d__8)));
 		i__2 = *n - 1;
-		for (i = 2; i <= *n-1; ++i) {
-		    i__3 = i + j * b_dim1;
-		    bi.r = B(i,j).r, bi.i = B(i,j).i;
-		    i__3 = i - 1;
-		    i__4 = i - 1 + j * x_dim1;
-		    z__1.r = E(i-1).r * X(i-1,j).r - E(i-1).i * X(i-1,j).i, 
-			    z__1.i = E(i-1).r * X(i-1,j).i + E(i-1).i * X(i-1,j).r;
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    i__3 = b_subscr(i__, j);
+		    bi.r = b[i__3].r, bi.i = b[i__3].i;
+		    i__3 = i__ - 1;
+		    i__4 = x_subscr(i__ - 1, j);
+		    z__1.r = e[i__3].r * x[i__4].r - e[i__3].i * x[i__4].i, 
+			    z__1.i = e[i__3].r * x[i__4].i + e[i__3].i * x[
+			    i__4].r;
 		    cx.r = z__1.r, cx.i = z__1.i;
-		    i__3 = i;
-		    i__4 = i + j * x_dim1;
-		    z__1.r = D(i) * X(i,j).r, z__1.i = D(i) * X(i,j)
-			    .i;
+		    i__3 = i__;
+		    i__4 = x_subscr(i__, j);
+		    z__1.r = d__[i__3] * x[i__4].r, z__1.i = d__[i__3] * x[
+			    i__4].i;
 		    dx.r = z__1.r, dx.i = z__1.i;
-		    d_cnjg(&z__2, &E(i));
-		    i__3 = i + 1 + j * x_dim1;
-		    z__1.r = z__2.r * X(i+1,j).r - z__2.i * X(i+1,j).i, z__1.i =
-			     z__2.r * X(i+1,j).i + z__2.i * X(i+1,j).r;
+		    d_cnjg(&z__2, &e[i__]);
+		    i__3 = x_subscr(i__ + 1, j);
+		    z__1.r = z__2.r * x[i__3].r - z__2.i * x[i__3].i, z__1.i =
+			     z__2.r * x[i__3].i + z__2.i * x[i__3].r;
 		    ex.r = z__1.r, ex.i = z__1.i;
-		    i__3 = i;
+		    i__3 = i__;
 		    z__3.r = bi.r - cx.r, z__3.i = bi.i - cx.i;
 		    z__2.r = z__3.r - dx.r, z__2.i = z__3.i - dx.i;
 		    z__1.r = z__2.r - ex.r, z__1.i = z__2.i - ex.i;
-		    WORK(i).r = z__1.r, WORK(i).i = z__1.i;
-		    i__3 = i - 1;
-		    i__4 = i - 1 + j * x_dim1;
-		    i__5 = i;
-		    i__6 = i + 1 + j * x_dim1;
-		    RWORK(i) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi),
-			     abs(d__2)) + ((d__3 = E(i-1).r, abs(d__3)) + (
-			    d__4 = d_imag(&E(i - 1)), abs(d__4))) * ((d__5 = 
-			    X(i-1,j).r, abs(d__5)) + (d__6 = d_imag(&X(i-1,j)), abs(d__6))) + ((d__7 = dx.r, abs(
-			    d__7)) + (d__8 = d_imag(&dx), abs(d__8))) + ((
-			    d__9 = E(i).r, abs(d__9)) + (d__10 = d_imag(&E(
-			    i)), abs(d__10))) * ((d__11 = X(i+1,j).r, abs(
-			    d__11)) + (d__12 = d_imag(&X(i+1,j)),
-			     abs(d__12)));
+		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
+		    i__3 = i__ - 1;
+		    i__4 = x_subscr(i__ - 1, j);
+		    i__5 = i__;
+		    i__6 = x_subscr(i__ + 1, j);
+		    rwork[i__] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&
+			    bi), abs(d__2)) + ((d__3 = e[i__3].r, abs(d__3)) 
+			    + (d__4 = d_imag(&e[i__ - 1]), abs(d__4))) * ((
+			    d__5 = x[i__4].r, abs(d__5)) + (d__6 = d_imag(&
+			    x_ref(i__ - 1, j)), abs(d__6))) + ((d__7 = dx.r, 
+			    abs(d__7)) + (d__8 = d_imag(&dx), abs(d__8))) + ((
+			    d__9 = e[i__5].r, abs(d__9)) + (d__10 = d_imag(&e[
+			    i__]), abs(d__10))) * ((d__11 = x[i__6].r, abs(
+			    d__11)) + (d__12 = d_imag(&x_ref(i__ + 1, j)), 
+			    abs(d__12)));
 /* L40: */
 		}
-		i__2 = *n + j * b_dim1;
-		bi.r = B(*n,j).r, bi.i = B(*n,j).i;
+		i__2 = b_subscr(*n, j);
+		bi.r = b[i__2].r, bi.i = b[i__2].i;
 		i__2 = *n - 1;
-		i__3 = *n - 1 + j * x_dim1;
-		z__1.r = E(*n-1).r * X(*n-1,j).r - E(*n-1).i * X(*n-1,j).i, 
-			z__1.i = E(*n-1).r * X(*n-1,j).i + E(*n-1).i * X(*n-1,j)
+		i__3 = x_subscr(*n - 1, j);
+		z__1.r = e[i__2].r * x[i__3].r - e[i__2].i * x[i__3].i, 
+			z__1.i = e[i__2].r * x[i__3].i + e[i__2].i * x[i__3]
 			.r;
 		cx.r = z__1.r, cx.i = z__1.i;
 		i__2 = *n;
-		i__3 = *n + j * x_dim1;
-		z__1.r = D(*n) * X(*n,j).r, z__1.i = D(*n) * X(*n,j).i;
+		i__3 = x_subscr(*n, j);
+		z__1.r = d__[i__2] * x[i__3].r, z__1.i = d__[i__2] * x[i__3]
+			.i;
 		dx.r = z__1.r, dx.i = z__1.i;
 		i__2 = *n;
 		z__2.r = bi.r - cx.r, z__2.i = bi.i - cx.i;
 		z__1.r = z__2.r - dx.r, z__1.i = z__2.i - dx.i;
-		WORK(*n).r = z__1.r, WORK(*n).i = z__1.i;
+		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 		i__2 = *n - 1;
-		i__3 = *n - 1 + j * x_dim1;
-		RWORK(*n) = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
-			abs(d__2)) + ((d__3 = E(*n-1).r, abs(d__3)) + (d__4 = 
-			d_imag(&E(*n - 1)), abs(d__4))) * ((d__5 = X(*n-1,j).r, 
-			abs(d__5)) + (d__6 = d_imag(&X(*n-1,j)), 
-			abs(d__6))) + ((d__7 = dx.r, abs(d__7)) + (d__8 = 
-			d_imag(&dx), abs(d__8)));
+		i__3 = x_subscr(*n - 1, j);
+		rwork[*n] = (d__1 = bi.r, abs(d__1)) + (d__2 = d_imag(&bi), 
+			abs(d__2)) + ((d__3 = e[i__2].r, abs(d__3)) + (d__4 = 
+			d_imag(&e[*n - 1]), abs(d__4))) * ((d__5 = x[i__3].r, 
+			abs(d__5)) + (d__6 = d_imag(&x_ref(*n - 1, j)), abs(
+			d__6))) + ((d__7 = dx.r, abs(d__7)) + (d__8 = d_imag(&
+			dx), abs(d__8)));
 	    }
 	}
 
-/*        Compute componentwise relative backward error from formula 
-  
+/*        Compute componentwise relative backward error from formula   
 
           max(i) ( abs(R(i)) / ( abs(A)*abs(X) + abs(B) )(i) )   
 
-          where abs(Z) is the componentwise absolute value of the matr
-ix   
-          or vector Z.  If the i-th component of the denominator is le
-ss   
-          than SAFE2, then SAFE1 is added to the i-th components of th
-e   
+          where abs(Z) is the componentwise absolute value of the matrix   
+          or vector Z.  If the i-th component of the denominator is less   
+          than SAFE2, then SAFE1 is added to the i-th components of the   
           numerator and denominator before dividing. */
 
 	s = 0.;
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (RWORK(i) > safe2) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (rwork[i__] > safe2) {
 /* Computing MAX */
-		i__3 = i;
-		d__3 = s, d__4 = ((d__1 = WORK(i).r, abs(d__1)) + (d__2 = 
-			d_imag(&WORK(i)), abs(d__2))) / RWORK(i);
+		i__3 = i__;
+		d__3 = s, d__4 = ((d__1 = work[i__3].r, abs(d__1)) + (d__2 = 
+			d_imag(&work[i__]), abs(d__2))) / rwork[i__];
 		s = max(d__3,d__4);
 	    } else {
 /* Computing MAX */
-		i__3 = i;
-		d__3 = s, d__4 = ((d__1 = WORK(i).r, abs(d__1)) + (d__2 = 
-			d_imag(&WORK(i)), abs(d__2)) + safe1) / (RWORK(i) + 
-			safe1);
+		i__3 = i__;
+		d__3 = s, d__4 = ((d__1 = work[i__3].r, abs(d__1)) + (d__2 = 
+			d_imag(&work[i__]), abs(d__2)) + safe1) / (rwork[i__] 
+			+ safe1);
 		s = max(d__3,d__4);
 	    }
 /* L50: */
 	}
-	BERR(j) = s;
+	berr[j] = s;
 
 /*        Test stopping criterion. Continue iterating if   
-             1) The residual BERR(J) is larger than machine epsilon, a
-nd   
-             2) BERR(J) decreased by at least a factor of 2 during the
-   
+             1) The residual BERR(J) is larger than machine epsilon, and   
+             2) BERR(J) decreased by at least a factor of 2 during the   
                 last iteration, and   
              3) At most ITMAX iterations tried. */
 
-	if (BERR(j) > eps && BERR(j) * 2. <= lstres && count <= 5) {
+	if (berr[j] > eps && berr[j] * 2. <= lstres && count <= 5) {
 
 /*           Update solution and try again. */
 
-	    zpttrs_(uplo, n, &c__1, &DF(1), &EF(1), &WORK(1), n, info);
-	    zaxpy_(n, &c_b16, &WORK(1), &c__1, &X(1,j), &c__1);
-	    lstres = BERR(j);
+	    zpttrs_(uplo, n, &c__1, &df[1], &ef[1], &work[1], n, info);
+	    zaxpy_(n, &c_b16, &work[1], &c__1, &x_ref(1, j), &c__1);
+	    lstres = berr[j];
 	    ++count;
 	    goto L20;
 	}
@@ -463,33 +467,32 @@ nd
           where   
             norm(Z) is the magnitude of the largest component of Z   
             inv(A) is the inverse of A   
-            abs(Z) is the componentwise absolute value of the matrix o
-r   
+            abs(Z) is the componentwise absolute value of the matrix or   
                vector Z   
-            NZ is the maximum number of nonzeros in any row of A, plus
- 1   
+            NZ is the maximum number of nonzeros in any row of A, plus 1   
             EPS is machine epsilon   
 
-          The i-th component of abs(R)+NZ*EPS*(abs(A)*abs(X)+abs(B)) 
-  
+          The i-th component of abs(R)+NZ*EPS*(abs(A)*abs(X)+abs(B))   
           is incremented by SAFE1 if the i-th component of   
           abs(A)*abs(X) + abs(B) is less than SAFE2. */
 
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (RWORK(i) > safe2) {
-		i__3 = i;
-		RWORK(i) = (d__1 = WORK(i).r, abs(d__1)) + (d__2 = d_imag(&
-			WORK(i)), abs(d__2)) + nz * eps * RWORK(i);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (rwork[i__] > safe2) {
+		i__3 = i__;
+		rwork[i__] = (d__1 = work[i__3].r, abs(d__1)) + (d__2 = 
+			d_imag(&work[i__]), abs(d__2)) + nz * eps * rwork[i__]
+			;
 	    } else {
-		i__3 = i;
-		RWORK(i) = (d__1 = WORK(i).r, abs(d__1)) + (d__2 = d_imag(&
-			WORK(i)), abs(d__2)) + nz * eps * RWORK(i) + safe1;
+		i__3 = i__;
+		rwork[i__] = (d__1 = work[i__3].r, abs(d__1)) + (d__2 = 
+			d_imag(&work[i__]), abs(d__2)) + nz * eps * rwork[i__]
+			 + safe1;
 	    }
 /* L60: */
 	}
-	ix = idamax_(n, &RWORK(1), &c__1);
-	FERR(j) = RWORK(ix);
+	ix = idamax_(n, &rwork[1], &c__1);
+	ferr[j] = rwork[ix];
 
 /*        Estimate the norm of inv(A).   
 
@@ -502,38 +505,39 @@ r
 
           Solve M(L) * x = e. */
 
-	RWORK(1) = 1.;
+	rwork[1] = 1.;
 	i__2 = *n;
-	for (i = 2; i <= *n; ++i) {
-	    RWORK(i) = RWORK(i - 1) * z_abs(&EF(i - 1)) + 1.;
+	for (i__ = 2; i__ <= i__2; ++i__) {
+	    rwork[i__] = rwork[i__ - 1] * z_abs(&ef[i__ - 1]) + 1.;
 /* L70: */
 	}
 
 /*        Solve D * M(L)' * x = b. */
 
-	RWORK(*n) /= DF(*n);
-	for (i = *n - 1; i >= 1; --i) {
-	    RWORK(i) = RWORK(i) / DF(i) + RWORK(i + 1) * z_abs(&EF(i));
+	rwork[*n] /= df[*n];
+	for (i__ = *n - 1; i__ >= 1; --i__) {
+	    rwork[i__] = rwork[i__] / df[i__] + rwork[i__ + 1] * z_abs(&ef[
+		    i__]);
 /* L80: */
 	}
 
 /*        Compute norm(inv(A)) = max(x(i)), 1<=i<=n. */
 
-	ix = idamax_(n, &RWORK(1), &c__1);
-	FERR(j) *= (d__1 = RWORK(ix), abs(d__1));
+	ix = idamax_(n, &rwork[1], &c__1);
+	ferr[j] *= (d__1 = rwork[ix], abs(d__1));
 
 /*        Normalize error. */
 
 	lstres = 0.;
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__1 = lstres, d__2 = z_abs(&X(i,j));
+	    d__1 = lstres, d__2 = z_abs(&x_ref(i__, j));
 	    lstres = max(d__1,d__2);
 /* L90: */
 	}
 	if (lstres != 0.) {
-	    FERR(j) /= lstres;
+	    ferr[j] /= lstres;
 	}
 
 /* L100: */
@@ -544,4 +548,10 @@ r
 /*     End of ZPTRFS */
 
 } /* zptrfs_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

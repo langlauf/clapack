@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,23 +11,23 @@
 static integer c__1 = 1;
 static integer c__4 = 4;
 
-/* Subroutine */ int dlafts_(char *type, integer *m, integer *n, integer *
+/* Subroutine */ int dlafts_(char *type__, integer *m, integer *n, integer *
 	imat, integer *ntests, doublereal *result, integer *iseed, doublereal 
 	*thresh, integer *iounit, integer *ie)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
-	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i2,\002 is\002"
+	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i3,\002 is\002"
 	    ",0p,f8.2)";
     static char fmt_9998[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
-	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i2,\002 is\002"
+	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i3,\002 is\002"
 	    ",1p,d10.3)";
     static char fmt_9997[] = "(1x,i5,\002 x\002,i5,\002 matrix, type=\002,"
 	    "i2,\002, s\002,\002eed=\002,3(i4,\002,\002),i4,\002: result \002"
-	    ",i2,\002 is\002,0p,f8.2)";
+	    ",i3,\002 is\002,0p,f8.2)";
     static char fmt_9996[] = "(1x,i5,\002 x\002,i5,\002 matrix, type=\002,"
 	    "i2,\002, s\002,\002eed=\002,3(i4,\002,\002),i4,\002: result \002"
-	    ",i2,\002 is\002,1p,d10.3)";
+	    ",i3,\002 is\002,1p,d10.3)";
 
     /* System generated locals */
     integer i__1;
@@ -46,18 +47,17 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
        DLAFTS tests the result vector against the threshold value to   
-       see which tests for this matrix type failed to pass the threshold. 
-  
+       see which tests for this matrix type failed to pass the threshold.   
        Output is to the file given by unit IOUNIT.   
 
     Arguments   
@@ -83,8 +83,7 @@ static integer c__4 = 4;
              subroutines in the path given by TYPE.   
              Not modified.   
 
-    RESULT - DOUBLE PRECISION               array of dimension( NTESTS ) 
-  
+    RESULT - DOUBLE PRECISION               array of dimension( NTESTS )   
              On entry, RESULT contains the test ratios from the tests   
              performed in the calling program.   
              Not modified.   
@@ -110,8 +109,7 @@ static integer c__4 = 4;
              failed to pass the threshold so far.   
              Updated on exit if any of the ratios in RESULT also fail.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -131,7 +129,7 @@ static integer c__4 = 4;
              to print a header to the data file. */
 
 		if (*ie == 0) {
-		    dlahd2_(iounit, type);
+		    dlahd2_(iounit, type__);
 		}
 		++(*ie);
 /* **            WRITE( IOUNIT, 15 )' Matrix of order', N,   
@@ -171,21 +169,17 @@ static integer c__4 = 4;
 	for (k = 1; k <= i__1; ++k) {
 	    if (result[k] >= *thresh) {
 
-/*              If this is the first test to fail, call DLAHD2
-   
+/*              If this is the first test to fail, call DLAHD2   
                 to print a header to the data file. */
 
 		if (*ie == 0) {
-		    dlahd2_(iounit, type);
+		    dlahd2_(iounit, type__);
 		}
 		++(*ie);
-/* **              WRITE( IOUNIT, FMT = 9997 )' Matrix of size
-', M, ' x',   
-   **     $             N, ', type ', IMAT, ',  test ', K, ', 
- ratio = ',   
+/* **              WRITE( IOUNIT, FMT = 9997 )' Matrix of size', M, ' x',   
+   **     $             N, ', type ', IMAT, ',  test ', K, ',  ratio = ',   
    **     $             RESULT( K )   
-   ** 9997           FORMAT( A10, I5, A2, I5, A7, I2, A8, I2, 
-A11, G13.6 ) */
+   ** 9997           FORMAT( A10, I5, A2, I5, A7, I2, A8, I2, A11, G13.6 ) */
 		if (result[k] < 1e4) {
 		    io___4.ciunit = *iounit;
 		    s_wsfe(&io___4);

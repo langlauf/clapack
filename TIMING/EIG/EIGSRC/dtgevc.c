@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,9 +18,9 @@ struct {
 
 static logical c_true = TRUE_;
 static integer c__2 = 2;
-static doublereal c_b34 = 1.;
+static doublereal c_b35 = 1.;
 static integer c__1 = 1;
-static doublereal c_b36 = 0.;
+static doublereal c_b37 = 0.;
 static logical c_false = FALSE_;
 
 /* Subroutine */ int dtgevc_(char *side, char *howmny, logical *select, 
@@ -40,7 +41,7 @@ static logical c_false = FALSE_;
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, doublereal *);
     static doublereal cim2a, cim2b, cre2a, cre2b, temp2, bdiag[2];
-    static integer i, j;
+    static integer i__, j;
     static doublereal acoef, scale;
     static logical ilall;
     static integer iside;
@@ -88,20 +89,27 @@ static logical c_false = FALSE_;
     static doublereal ulp, sum[4]	/* was [2][2] */;
 
 
-/*  -- LAPACK routine (instrumented to count operations) --   
+#define suma_ref(a_1,a_2) suma[(a_2)*2 + a_1 - 3]
+#define sumb_ref(a_1,a_2) sumb[(a_2)*2 + a_1 - 3]
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
+#define sum_ref(a_1,a_2) sum[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
-       ---------------------- Begin Timing Code ------------------------- 
-  
+       ---------------------- Begin Timing Code -------------------------   
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
        OPST is used to accumulate small contributions to OPS   
        to avoid roundoff error   
-       ----------------------- End Timing Code -------------------------- 
-  
+       ----------------------- End Timing Code --------------------------   
 
 
     Purpose   
@@ -118,8 +126,7 @@ static logical c_false = FALSE_;
 
     where y**H denotes the conjugate tranpose of y.   
 
-    If an eigenvalue w is determined by zero diagonal elements of both A 
-  
+    If an eigenvalue w is determined by zero diagonal elements of both A   
     and B, a unit vector is returned as the corresponding eigenvector.   
 
     If all eigenvectors are requested, the routine may either return   
@@ -159,8 +166,7 @@ static logical c_false = FALSE_;
             If HOWMNY='A' or 'B', SELECT is not referenced.   
             To select the real eigenvector corresponding to the real   
             eigenvalue w(j), SELECT(j) must be set to .TRUE.  To select   
-            the complex eigenvector corresponding to a complex conjugate 
-  
+            the complex eigenvector corresponding to a complex conjugate   
             pair w(j) and w(j+1), either SELECT(j) or SELECT(j+1) must   
             be set to .TRUE..   
 
@@ -186,11 +192,9 @@ static logical c_false = FALSE_;
             contain an N-by-N matrix Q (usually the orthogonal matrix Q   
             of left Schur vectors returned by DHGEQZ).   
             On exit, if SIDE = 'L' or 'B', VL contains:   
-            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Q*Y;   
-            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VL, in the same order as their eigenvalues.   
             If SIDE = 'R', VL is not referenced.   
@@ -203,16 +207,14 @@ static logical c_false = FALSE_;
             The leading dimension of array VL.   
             LDVL >= max(1,N) if SIDE = 'L' or 'B'; LDVL >= 1 otherwise.   
 
-    VR      (input/output) COMPLEX*16 array, dimension (LDVR,MM)   
+    VR      (input/output) DOUBLE PRECISION array, dimension (LDVR,MM)   
             On entry, if SIDE = 'R' or 'B' and HOWMNY = 'B', VR must   
             contain an N-by-N matrix Q (usually the orthogonal matrix Z   
             of right Schur vectors returned by DHGEQZ).   
             On exit, if SIDE = 'R' or 'B', VR contains:   
-            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Z*X;   
-            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VR, in the same order as their eigenvalues.   
             If SIDE = 'L', VR is not referenced.   
@@ -240,8 +242,7 @@ static logical c_false = FALSE_;
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  the 2-by-2 block (INFO:INFO+1) does not have a complex 
-  
+            > 0:  the 2-by-2 block (INFO:INFO+1) does not have a complex   
                   eigenvalue.   
 
     Further Details   
@@ -255,8 +256,7 @@ static logical c_false = FALSE_;
        WORK( 2*N+1:3*N ) = real part of eigenvector   
        WORK( 3*N+1:4*N ) = imaginary part of eigenvector   
        WORK( 4*N+1:5*N ) = real part of back-transformed eigenvector   
-       WORK( 5*N+1:6*N ) = imaginary part of back-transformed eigenvector 
-  
+       WORK( 5*N+1:6*N ) = imaginary part of back-transformed eigenvector   
 
     Rowwise vs. columnwise solution methods:   
     ------- --  ---------- -------- -------   
@@ -264,8 +264,7 @@ static logical c_false = FALSE_;
     Finding a generalized eigenvector consists basically of solving the   
     singular triangular system   
 
-     (A - w B) x = 0     (for right) or:   (A - w B)**H y = 0  (for left) 
-  
+     (A - w B) x = 0     (for right) or:   (A - w B)**H y = 0  (for left)   
 
     Consider finding the i-th right eigenvector (assume all eigenvalues   
     are real). The equation to be solved is:   
@@ -286,16 +285,14 @@ static logical c_false = FALSE_;
         (3) v(j) := s / C(j,j)   
 
     Step 2 is sometimes called the "dot product" step, since it is an   
-    inner product between the j-th row and the portion of the eigenvector 
-  
+    inner product between the j-th row and the portion of the eigenvector   
     that has been computed so far.   
 
     The "columnwise" method consists basically in doing the sums   
     for all the rows in parallel.  As each v(j) is computed, the   
     contribution of v(j) times the j-th column of C is added to the   
     partial sums.  Since FORTRAN arrays are stored columnwise, this has   
-    the advantage that at each step, the elements of C that are accessed 
-  
+    the advantage that at each step, the elements of C that are accessed   
     are adjacent to one another, whereas with the rowwise method, the   
     elements accessed at a step are spaced LDA (and LDB) words apart.   
 
@@ -304,8 +301,7 @@ static logical c_false = FALSE_;
     actually accesses columns of A and B at each step, and so is the   
     preferred method.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters   
@@ -313,16 +309,16 @@ static logical c_false = FALSE_;
        Parameter adjustments */
     --select;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     --work;
 
@@ -335,7 +331,8 @@ static logical c_false = FALSE_;
 	ihwmny = 2;
 	ilall = FALSE_;
 	ilback = FALSE_;
-    } else if (lsame_(howmny, "B") || lsame_(howmny, "T")) {
+    } else if (lsame_(howmny, "B") || lsame_(howmny, 
+	    "T")) {
 	ihwmny = 3;
 	ilall = TRUE_;
 	ilback = TRUE_;
@@ -360,6 +357,24 @@ static logical c_false = FALSE_;
 	iside = -1;
     }
 
+    *info = 0;
+    if (iside < 0) {
+	*info = -1;
+    } else if (ihwmny < 0) {
+	*info = -2;
+    } else if (*n < 0) {
+	*info = -4;
+    } else if (*lda < max(1,*n)) {
+	*info = -6;
+    } else if (*ldb < max(1,*n)) {
+	*info = -8;
+    }
+    if (*info != 0) {
+	i__1 = -(*info);
+	xerbla_("DTGEVC", &i__1);
+	return 0;
+    }
+
 /*     Count the number of eigenvectors to be computed */
 
     if (! ilall) {
@@ -372,7 +387,7 @@ static logical c_false = FALSE_;
 		goto L10;
 	    }
 	    if (j < *n) {
-		if (a[j + 1 + j * a_dim1] != 0.) {
+		if (a_ref(j + 1, j) != 0.) {
 		    ilcplx = TRUE_;
 		}
 	    }
@@ -398,13 +413,13 @@ L10:
     ilbbad = FALSE_;
     i__1 = *n - 1;
     for (j = 1; j <= i__1; ++j) {
-	if (a[j + 1 + j * a_dim1] != 0.) {
-	    if (b[j + j * b_dim1] == 0. || b[j + 1 + (j + 1) * b_dim1] == 0. 
-		    || b[j + (j + 1) * b_dim1] != 0.) {
+	if (a_ref(j + 1, j) != 0.) {
+	    if (b_ref(j, j) == 0. || b_ref(j + 1, j + 1) == 0. || b_ref(j, j 
+		    + 1) != 0.) {
 		ilbbad = TRUE_;
 	    }
 	    if (j < *n - 1) {
-		if (a[j + 2 + (j + 1) * a_dim1] != 0.) {
+		if (a_ref(j + 2, j + 1) != 0.) {
 		    ilabad = TRUE_;
 		}
 	    }
@@ -412,21 +427,10 @@ L10:
 /* L20: */
     }
 
-    *info = 0;
-    if (iside < 0) {
-	*info = -1;
-    } else if (ihwmny < 0) {
-	*info = -2;
-    } else if (*n < 0) {
-	*info = -4;
-    } else if (ilabad) {
+    if (ilabad) {
 	*info = -5;
-    } else if (*lda < max(1,*n)) {
-	*info = -6;
     } else if (ilbbad) {
 	*info = -7;
-    } else if (*ldb < max(1,*n)) {
-	*info = -8;
     } else if (compl && *ldvl < *n || *ldvl < 1) {
 	*info = -10;
     } else if (compr && *ldvr < *n || *ldvr < 1) {
@@ -457,17 +461,16 @@ L10:
     big = 1. / small;
     bignum = 1. / (safmin * *n);
 
-/*     Compute the 1-norm of each column of the strictly upper triangular 
-  
+/*     Compute the 1-norm of each column of the strictly upper triangular   
        part (i.e., excluding all elements belonging to the diagonal   
        blocks) of A and B to check for possible overflow in the   
        triangular solver. */
 
-    anorm = (d__1 = a[a_dim1 + 1], abs(d__1));
+    anorm = (d__1 = a_ref(1, 1), abs(d__1));
     if (*n > 1) {
-	anorm += (d__1 = a[a_dim1 + 2], abs(d__1));
+	anorm += (d__1 = a_ref(2, 1), abs(d__1));
     }
-    bnorm = (d__1 = b[b_dim1 + 1], abs(d__1));
+    bnorm = (d__1 = b_ref(1, 1), abs(d__1));
     work[1] = 0.;
     work[*n + 1] = 0.;
 
@@ -475,15 +478,15 @@ L10:
     for (j = 2; j <= i__1; ++j) {
 	temp = 0.;
 	temp2 = 0.;
-	if (a[j + (j - 1) * a_dim1] == 0.) {
+	if (a_ref(j, j - 1) == 0.) {
 	    iend = j - 1;
 	} else {
 	    iend = j - 2;
 	}
 	i__2 = iend;
-	for (i = 1; i <= i__2; ++i) {
-	    temp += (d__1 = a[i + j * a_dim1], abs(d__1));
-	    temp2 += (d__1 = b[i + j * b_dim1], abs(d__1));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    temp += (d__1 = a_ref(i__, j), abs(d__1));
+	    temp2 += (d__1 = b_ref(i__, j), abs(d__1));
 /* L30: */
 	}
 	work[j] = temp;
@@ -491,9 +494,9 @@ L10:
 /* Computing MIN */
 	i__3 = j + 1;
 	i__2 = min(i__3,*n);
-	for (i = iend + 1; i <= i__2; ++i) {
-	    temp += (d__1 = a[i + j * a_dim1], abs(d__1));
-	    temp2 += (d__1 = b[i + j * b_dim1], abs(d__1));
+	for (i__ = iend + 1; i__ <= i__2; ++i__) {
+	    temp += (d__1 = a_ref(i__, j), abs(d__1));
+	    temp2 += (d__1 = b_ref(i__, j), abs(d__1));
 /* L40: */
 	}
 	anorm = max(anorm,temp);
@@ -504,13 +507,11 @@ L10:
     ascale = 1. / max(anorm,safmin);
     bscale = 1. / max(bnorm,safmin);
 
-/*     ---------------------- Begin Timing Code ------------------------- 
-  
+/*     ---------------------- Begin Timing Code -------------------------   
    Computing 2nd power */
     i__1 = *n;
     latime_1.ops += (doublereal) (i__1 * i__1 + *n * 3 + 6);
-/*     ----------------------- End Timing Code -------------------------- 
-  
+/*     ----------------------- End Timing Code --------------------------   
 
        Left eigenvectors */
 
@@ -523,11 +524,9 @@ L10:
 	i__1 = *n;
 	for (je = 1; je <= i__1; ++je) {
 
-/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FAL
-SE., or   
+/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FALSE., or   
              (b) this would be the second of a complex pair.   
-             Check for complex eigenvalue, so as to be sure of whi
-ch   
+             Check for complex eigenvalue, so as to be sure of which   
              entry(-ies) of SELECT to look at. */
 
 	    if (ilcplx) {
@@ -536,7 +535,7 @@ ch
 	    }
 	    nw = 1;
 	    if (je < *n) {
-		if (a[je + 1 + je * a_dim1] != 0.) {
+		if (a_ref(je + 1, je) != 0.) {
 		    ilcplx = TRUE_;
 		    nw = 2;
 		}
@@ -552,24 +551,22 @@ ch
 		goto L220;
 	    }
 
-/*           Decide if (a) singular pencil, (b) real eigenvalue, o
-r   
+/*           Decide if (a) singular pencil, (b) real eigenvalue, or   
              (c) complex eigenvalue. */
 
 	    if (! ilcplx) {
-		if ((d__1 = a[je + je * a_dim1], abs(d__1)) <= safmin && (
-			d__2 = b[je + je * b_dim1], abs(d__2)) <= safmin) {
+		if ((d__1 = a_ref(je, je), abs(d__1)) <= safmin && (d__2 = 
+			b_ref(je, je), abs(d__2)) <= safmin) {
 
-/*                 Singular matrix pencil -- returns unit 
-eigenvector */
+/*                 Singular matrix pencil -- returns unit eigenvector */
 
 		    ++ieig;
 		    i__2 = *n;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			vl[jr + ieig * vl_dim1] = 0.;
+			vl_ref(jr, ieig) = 0.;
 /* L60: */
 		    }
-		    vl[ieig + ieig * vl_dim1] = 1.;
+		    vl_ref(ieig, ieig) = 1.;
 		    goto L220;
 		}
 	    }
@@ -591,12 +588,12 @@ eigenvector */
 /*              Real eigenvalue   
 
    Computing MAX */
-		d__3 = (d__1 = a[je + je * a_dim1], abs(d__1)) * ascale, d__4 
-			= (d__2 = b[je + je * b_dim1], abs(d__2)) * bscale, 
-			d__3 = max(d__3,d__4);
+		d__3 = (d__1 = a_ref(je, je), abs(d__1)) * ascale, d__4 = (
+			d__2 = b_ref(je, je), abs(d__2)) * bscale, d__3 = max(
+			d__3,d__4);
 		temp = 1. / max(d__3,safmin);
-		salfar = temp * a[je + je * a_dim1] * ascale;
-		sbeta = temp * b[je + je * b_dim1] * bscale;
+		salfar = temp * a_ref(je, je) * ascale;
+		sbeta = temp * b_ref(je, je) * bscale;
 		acoef = sbeta * ascale;
 		bcoefr = salfar * bscale;
 		bcoefi = 0.;
@@ -644,8 +641,8 @@ eigenvector */
 /*              Complex eigenvalue */
 
 		d__1 = safmin * 100.;
-		dlag2_(&a[je + je * a_dim1], lda, &b[je + je * b_dim1], ldb, &
-			d__1, &acoef, &temp, &bcoefr, &temp2, &bcoefi);
+		dlag2_(&a_ref(je, je), lda, &b_ref(je, je), ldb, &d__1, &
+			acoef, &temp, &bcoefr, &temp2, &bcoefi);
 		bcoefi = -bcoefi;
 		if (bcoefi == 0.) {
 		    *info = je;
@@ -683,10 +680,9 @@ eigenvector */
 
 /*              Compute first two components of eigenvector */
 
-		temp = acoef * a[je + 1 + je * a_dim1];
-		temp2r = acoef * a[je + je * a_dim1] - bcoefr * b[je + je * 
-			b_dim1];
-		temp2i = -bcoefi * b[je + je * b_dim1];
+		temp = acoef * a_ref(je + 1, je);
+		temp2r = acoef * a_ref(je, je) - bcoefr * b_ref(je, je);
+		temp2i = -bcoefi * b_ref(je, je);
 		if (abs(temp) > abs(temp2r) + abs(temp2i)) {
 		    work[(*n << 1) + je] = 1.;
 		    work[*n * 3 + je] = 0.;
@@ -695,12 +691,10 @@ eigenvector */
 		} else {
 		    work[(*n << 1) + je + 1] = 1.;
 		    work[*n * 3 + je + 1] = 0.;
-		    temp = acoef * a[je + (je + 1) * a_dim1];
-		    work[(*n << 1) + je] = (bcoefr * b[je + 1 + (je + 1) * 
-			    b_dim1] - acoef * a[je + 1 + (je + 1) * a_dim1]) /
-			     temp;
-		    work[*n * 3 + je] = bcoefi * b[je + 1 + (je + 1) * b_dim1]
-			     / temp;
+		    temp = acoef * a_ref(je, je + 1);
+		    work[(*n << 1) + je] = (bcoefr * b_ref(je + 1, je + 1) - 
+			    acoef * a_ref(je + 1, je + 1)) / temp;
+		    work[*n * 3 + je] = bcoefi * b_ref(je + 1, je + 1) / temp;
 		}
 /* Computing MAX */
 		d__5 = (d__1 = work[(*n << 1) + je], abs(d__1)) + (d__2 = 
@@ -719,46 +713,38 @@ eigenvector */
              Triangular solve of  (a A - b B)  y = 0   
 
                                      T   
-             (rowwise in  (a A - b B) , or columnwise in (a A - b 
-B) ) */
+             (rowwise in  (a A - b B) , or columnwise in (a A - b B) ) */
 
 	    il2by2 = FALSE_;
-/*           ------------------- Begin Timing Code --------------
--------- */
+/*           ------------------- Begin Timing Code ---------------------- */
 	    opst = 0.;
 	    in2by2 = 0;
-/*           -------------------- End Timing Code ---------------
--------- */
+/*           -------------------- End Timing Code ----------------------- */
 
 	    i__2 = *n;
 	    for (j = je + nw; j <= i__2; ++j) {
-/*              ------------------- Begin Timing Code -------
------------- */
+/*              ------------------- Begin Timing Code ------------------- */
 		opssca = (doublereal) (nw * (j - je) + 1);
-/*              -------------------- End Timing Code --------
------------- */
+/*              -------------------- End Timing Code -------------------- */
 		if (il2by2) {
 		    il2by2 = FALSE_;
 		    goto L160;
 		}
 
 		na = 1;
-		bdiag[0] = b[j + j * b_dim1];
+		bdiag[0] = b_ref(j, j);
 		if (j < *n) {
-		    if (a[j + 1 + j * a_dim1] != 0.) {
+		    if (a_ref(j + 1, j) != 0.) {
 			il2by2 = TRUE_;
-			bdiag[1] = b[j + 1 + (j + 1) * b_dim1];
+			bdiag[1] = b_ref(j + 1, j + 1);
 			na = 2;
-/*                    ---------------- Begin Timing Co
-de ---------------- */
+/*                    ---------------- Begin Timing Code ---------------- */
 			++in2by2;
-/*                    ----------------- End Timing Cod
-e ----------------- */
+/*                    ----------------- End Timing Code ----------------- */
 		    }
 		}
 
-/*              Check whether scaling is necessary for dot pro
-ducts */
+/*              Check whether scaling is necessary for dot products */
 
 		xscale = 1. / max(1.,xmax);
 /* Computing MAX */
@@ -785,34 +771,28 @@ ducts */
 /* L90: */
 		    }
 		    xmax *= xscale;
-/*                 ------------------ Begin Timing Code -
----------------- */
+/*                 ------------------ Begin Timing Code ----------------- */
 		    opst += opssca;
-/*                 ------------------- End Timing Code --
----------------- */
+/*                 ------------------- End Timing Code ------------------ */
 		}
 
 /*              Compute dot products   
 
                       j-1   
-                SUM = sum  conjg( a*A(k,j) - b*B(k,j) )*x(k) 
-  
+                SUM = sum  conjg( a*A(k,j) - b*B(k,j) )*x(k)   
                       k=je   
 
                 To reduce the op count, this is done as   
 
                 _        j-1                  _        j-1   
-                a*conjg( sum  A(k,j)*x(k) ) - b*conjg( sum  B(
-k,j)*x(k) )   
+                a*conjg( sum  A(k,j)*x(k) ) - b*conjg( sum  B(k,j)*x(k) )   
                          k=je                          k=je   
 
-                which may cause underflow problems if A or B a
-re close   
+                which may cause underflow problems if A or B are close   
                 to underflow.  (E.g., less than SMALL.)   
 
 
-                A series of compiler directives to defeat vect
-orization   
+                A series of compiler directives to defeat vectorization   
                 for the next loop   
 
    $PL$ CMCHAR=' '   
@@ -844,15 +824,15 @@ orization
 
 		    i__4 = na;
 		    for (ja = 1; ja <= i__4; ++ja) {
-			suma[ja + (jw << 1) - 3] = 0.;
-			sumb[ja + (jw << 1) - 3] = 0.;
+			suma_ref(ja, jw) = 0.;
+			sumb_ref(ja, jw) = 0.;
 
 			i__5 = j - 1;
 			for (jr = je; jr <= i__5; ++jr) {
-			    suma[ja + (jw << 1) - 3] += a[jr + (j + ja - 1) * 
-				    a_dim1] * work[(jw + 1) * *n + jr];
-			    sumb[ja + (jw << 1) - 3] += b[jr + (j + ja - 1) * 
-				    b_dim1] * work[(jw + 1) * *n + jr];
+			    suma_ref(ja, jw) = suma_ref(ja, jw) + a_ref(jr, j 
+				    + ja - 1) * work[(jw + 1) * *n + jr];
+			    sumb_ref(ja, jw) = sumb_ref(ja, jw) + b_ref(jr, j 
+				    + ja - 1) * work[(jw + 1) * *n + jr];
 /* L100: */
 			}
 /* L110: */
@@ -875,25 +855,24 @@ orization
 		i__3 = na;
 		for (ja = 1; ja <= i__3; ++ja) {
 		    if (ilcplx) {
-			sum[ja - 1] = -acoef * suma[ja - 1] + bcoefr * sumb[
-				ja - 1] - bcoefi * sumb[ja + 1];
-			sum[ja + 1] = -acoef * suma[ja + 1] + bcoefr * sumb[
-				ja + 1] + bcoefi * sumb[ja - 1];
+			sum_ref(ja, 1) = -acoef * suma_ref(ja, 1) + bcoefr * 
+				sumb_ref(ja, 1) - bcoefi * sumb_ref(ja, 2);
+			sum_ref(ja, 2) = -acoef * suma_ref(ja, 2) + bcoefr * 
+				sumb_ref(ja, 2) + bcoefi * sumb_ref(ja, 1);
 		    } else {
-			sum[ja - 1] = -acoef * suma[ja - 1] + bcoefr * sumb[
-				ja - 1];
+			sum_ref(ja, 1) = -acoef * suma_ref(ja, 1) + bcoefr * 
+				sumb_ref(ja, 1);
 		    }
 /* L130: */
 		}
 
 /*                                  T   
                 Solve  ( a A - b B )  y = SUM(,)   
-                with scaling and perturbation of the denominat
-or */
+                with scaling and perturbation of the denominator */
 
-		dlaln2_(&c_true, &na, &nw, &dmin__, &acoef, &a[j + j * a_dim1]
-			, lda, bdiag, &bdiag[1], sum, &c__2, &bcoefr, &bcoefi,
-			 &work[(*n << 1) + j], n, &scale, &temp, &iinfo);
+		dlaln2_(&c_true, &na, &nw, &dmin__, &acoef, &a_ref(j, j), lda,
+			 bdiag, &bdiag[1], sum, &c__2, &bcoefr, &bcoefi, &
+			work[(*n << 1) + j], n, &scale, &temp, &iinfo);
 		if (scale < 1.) {
 		    i__3 = nw - 1;
 		    for (jw = 0; jw <= i__3; ++jw) {
@@ -906,11 +885,9 @@ or */
 /* L150: */
 		    }
 		    xmax = scale * xmax;
-/*                 ------------------ Begin Timing Code -
----------------- */
+/*                 ------------------ Begin Timing Code ----------------- */
 		    opst += opssca;
-/*                 ------------------- End Timing Code --
----------------- */
+/*                 ------------------- End Timing Code ------------------ */
 		}
 		xmax = max(xmax,temp);
 L160:
@@ -925,17 +902,17 @@ L160:
 		i__2 = nw - 1;
 		for (jw = 0; jw <= i__2; ++jw) {
 		    i__3 = *n + 1 - je;
-		    dgemv_("N", n, &i__3, &c_b34, &vl[je * vl_dim1 + 1], ldvl,
-			     &work[(jw + 2) * *n + je], &c__1, &c_b36, &work[(
-			    jw + 4) * *n + 1], &c__1);
+		    dgemv_("N", n, &i__3, &c_b35, &vl_ref(1, je), ldvl, &work[
+			    (jw + 2) * *n + je], &c__1, &c_b37, &work[(jw + 4)
+			     * *n + 1], &c__1);
 /* L170: */
 		}
-		dlacpy_(" ", n, &nw, &work[(*n << 2) + 1], n, &vl[je * 
-			vl_dim1 + 1], ldvl);
+		dlacpy_(" ", n, &nw, &work[(*n << 2) + 1], n, &vl_ref(1, je), 
+			ldvl);
 		ibeg = 1;
 	    } else {
-		dlacpy_(" ", n, &nw, &work[(*n << 1) + 1], n, &vl[ieig * 
-			vl_dim1 + 1], ldvl);
+		dlacpy_(" ", n, &nw, &work[(*n << 1) + 1], n, &vl_ref(1, ieig)
+			, ldvl);
 		ibeg = je;
 	    }
 
@@ -946,9 +923,8 @@ L160:
 		i__2 = *n;
 		for (j = ibeg; j <= i__2; ++j) {
 /* Computing MAX */
-		    d__3 = xmax, d__4 = (d__1 = vl[j + ieig * vl_dim1], abs(
-			    d__1)) + (d__2 = vl[j + (ieig + 1) * vl_dim1], 
-			    abs(d__2));
+		    d__3 = xmax, d__4 = (d__1 = vl_ref(j, ieig), abs(d__1)) + 
+			    (d__2 = vl_ref(j, ieig + 1), abs(d__2));
 		    xmax = max(d__3,d__4);
 /* L180: */
 		}
@@ -956,8 +932,7 @@ L160:
 		i__2 = *n;
 		for (j = ibeg; j <= i__2; ++j) {
 /* Computing MAX */
-		    d__2 = xmax, d__3 = (d__1 = vl[j + ieig * vl_dim1], abs(
-			    d__1));
+		    d__2 = xmax, d__3 = (d__1 = vl_ref(j, ieig), abs(d__1));
 		    xmax = max(d__2,d__3);
 /* L190: */
 		}
@@ -970,8 +945,8 @@ L160:
 		for (jw = 0; jw <= i__2; ++jw) {
 		    i__3 = *n;
 		    for (jr = ibeg; jr <= i__3; ++jr) {
-			vl[jr + (ieig + jw) * vl_dim1] = xscale * vl[jr + (
-				ieig + jw) * vl_dim1];
+			vl_ref(jr, ieig + jw) = xscale * vl_ref(jr, ieig + jw)
+				;
 /* L200: */
 		    }
 /* L210: */
@@ -979,26 +954,20 @@ L160:
 	    }
 	    ieig = ieig + nw - 1;
 
-/*           ------------------- Begin Timing Code --------------
---------   
+/*           ------------------- Begin Timing Code ----------------------   
              Opcounts for each eigenvector   
 
                                   Real                Complex   
              Initialization       8--16               71--87   
 
-             Dot Prod (per iter)  4*NA*(J-JE) + 2     8*NA*(J-JE) 
-+ 2   
-                                  + 6*NA + scaling    + 13*NA + sc
-aling   
-             Solve (per iter)     NA*(5 + 7*(NA-1))   NA*(17 + 17*
-(NA-1))   
+             Dot Prod (per iter)  4*NA*(J-JE) + 2     8*NA*(J-JE) + 2   
+                                  + 6*NA + scaling    + 13*NA + scaling   
+             Solve (per iter)     NA*(5 + 7*(NA-1))   NA*(17 + 17*(NA-1))   
                                   + scaling           + scaling   
 
-             Back xform           2*N*(N+1-JE) - N    4*N*(N+1-JE)
- - 2*N   
+             Back xform           2*N*(N+1-JE) - N    4*N*(N+1-JE) - 2*N   
              Scaling (w/back x.)  N                   3*N   
-             Scaling (w/o back)   N - (JE-1)          3*N - 3*(JE-
-1) */
+             Scaling (w/o back)   N - (JE-1)          3*N - 3*(JE-1) */
 
 	    if (! ilcplx) {
 		opst += (doublereal) ((*n - je << 1) * (*n + 1 - je) + (*n - 
@@ -1019,8 +988,7 @@ aling
 	    }
 	    latime_1.ops += opst;
 
-/*           -------------------- End Timing Code ---------------
--------- */
+/*           -------------------- End Timing Code ----------------------- */
 
 L220:
 	    ;
@@ -1037,18 +1005,13 @@ L220:
 	ilcplx = FALSE_;
 	for (je = *n; je >= 1; --je) {
 
-/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FAL
-SE., or   
+/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FALSE., or   
              (b) this would be the second of a complex pair.   
-             Check for complex eigenvalue, so as to be sure of whi
-ch   
-             entry(-ies) of SELECT to look at -- if complex, SELEC
-T(JE)   
+             Check for complex eigenvalue, so as to be sure of which   
+             entry(-ies) of SELECT to look at -- if complex, SELECT(JE)   
              or SELECT(JE-1).   
-             If this is a complex pair, the 2-by-2 diagonal block 
-  
-             corresponding to the eigenvalue is in rows/columns JE
--1:JE */
+             If this is a complex pair, the 2-by-2 diagonal block   
+             corresponding to the eigenvalue is in rows/columns JE-1:JE */
 
 	    if (ilcplx) {
 		ilcplx = FALSE_;
@@ -1056,7 +1019,7 @@ T(JE)
 	    }
 	    nw = 1;
 	    if (je > 1) {
-		if (a[je + (je - 1) * a_dim1] != 0.) {
+		if (a_ref(je, je - 1) != 0.) {
 		    ilcplx = TRUE_;
 		    nw = 2;
 		}
@@ -1072,24 +1035,22 @@ T(JE)
 		goto L500;
 	    }
 
-/*           Decide if (a) singular pencil, (b) real eigenvalue, o
-r   
+/*           Decide if (a) singular pencil, (b) real eigenvalue, or   
              (c) complex eigenvalue. */
 
 	    if (! ilcplx) {
-		if ((d__1 = a[je + je * a_dim1], abs(d__1)) <= safmin && (
-			d__2 = b[je + je * b_dim1], abs(d__2)) <= safmin) {
+		if ((d__1 = a_ref(je, je), abs(d__1)) <= safmin && (d__2 = 
+			b_ref(je, je), abs(d__2)) <= safmin) {
 
-/*                 Singular matrix pencil -- returns unit 
-eigenvector */
+/*                 Singular matrix pencil -- returns unit eigenvector */
 
 		    --ieig;
 		    i__1 = *n;
 		    for (jr = 1; jr <= i__1; ++jr) {
-			vr[jr + ieig * vr_dim1] = 0.;
+			vr_ref(jr, ieig) = 0.;
 /* L230: */
 		    }
-		    vr[ieig + ieig * vr_dim1] = 1.;
+		    vr_ref(ieig, ieig) = 1.;
 		    goto L500;
 		}
 	    }
@@ -1115,12 +1076,12 @@ eigenvector */
 /*              Real eigenvalue   
 
    Computing MAX */
-		d__3 = (d__1 = a[je + je * a_dim1], abs(d__1)) * ascale, d__4 
-			= (d__2 = b[je + je * b_dim1], abs(d__2)) * bscale, 
-			d__3 = max(d__3,d__4);
+		d__3 = (d__1 = a_ref(je, je), abs(d__1)) * ascale, d__4 = (
+			d__2 = b_ref(je, je), abs(d__2)) * bscale, d__3 = max(
+			d__3,d__4);
 		temp = 1. / max(d__3,safmin);
-		salfar = temp * a[je + je * a_dim1] * ascale;
-		sbeta = temp * b[je + je * b_dim1] * bscale;
+		salfar = temp * a_ref(je, je) * ascale;
+		sbeta = temp * b_ref(je, je) * bscale;
 		acoef = sbeta * ascale;
 		bcoefr = salfar * bscale;
 		bcoefi = 0.;
@@ -1164,14 +1125,13 @@ eigenvector */
 		work[(*n << 1) + je] = 1.;
 		xmax = 1.;
 
-/*              Compute contribution from column JE of A and B
- to sum   
+/*              Compute contribution from column JE of A and B to sum   
                 (See "Further Details", above.) */
 
 		i__1 = je - 1;
 		for (jr = 1; jr <= i__1; ++jr) {
-		    work[(*n << 1) + jr] = bcoefr * b[jr + je * b_dim1] - 
-			    acoef * a[jr + je * a_dim1];
+		    work[(*n << 1) + jr] = bcoefr * b_ref(jr, je) - acoef * 
+			    a_ref(jr, je);
 /* L260: */
 		}
 	    } else {
@@ -1179,9 +1139,8 @@ eigenvector */
 /*              Complex eigenvalue */
 
 		d__1 = safmin * 100.;
-		dlag2_(&a[je - 1 + (je - 1) * a_dim1], lda, &b[je - 1 + (je - 
-			1) * b_dim1], ldb, &d__1, &acoef, &temp, &bcoefr, &
-			temp2, &bcoefi);
+		dlag2_(&a_ref(je - 1, je - 1), lda, &b_ref(je - 1, je - 1), 
+			ldb, &d__1, &acoef, &temp, &bcoefr, &temp2, &bcoefi);
 		if (bcoefi == 0.) {
 		    *info = je - 1;
 		    return 0;
@@ -1219,10 +1178,9 @@ eigenvector */
 /*              Compute first two components of eigenvector   
                 and contribution to sums */
 
-		temp = acoef * a[je + (je - 1) * a_dim1];
-		temp2r = acoef * a[je + je * a_dim1] - bcoefr * b[je + je * 
-			b_dim1];
-		temp2i = -bcoefi * b[je + je * b_dim1];
+		temp = acoef * a_ref(je, je - 1);
+		temp2r = acoef * a_ref(je, je) - bcoefr * b_ref(je, je);
+		temp2i = -bcoefi * b_ref(je, je);
 		if (abs(temp) >= abs(temp2r) + abs(temp2i)) {
 		    work[(*n << 1) + je] = 1.;
 		    work[*n * 3 + je] = 0.;
@@ -1231,12 +1189,10 @@ eigenvector */
 		} else {
 		    work[(*n << 1) + je - 1] = 1.;
 		    work[*n * 3 + je - 1] = 0.;
-		    temp = acoef * a[je - 1 + je * a_dim1];
-		    work[(*n << 1) + je] = (bcoefr * b[je - 1 + (je - 1) * 
-			    b_dim1] - acoef * a[je - 1 + (je - 1) * a_dim1]) /
-			     temp;
-		    work[*n * 3 + je] = bcoefi * b[je - 1 + (je - 1) * b_dim1]
-			     / temp;
+		    temp = acoef * a_ref(je - 1, je);
+		    work[(*n << 1) + je] = (bcoefr * b_ref(je - 1, je - 1) - 
+			    acoef * a_ref(je - 1, je - 1)) / temp;
+		    work[*n * 3 + je] = bcoefi * b_ref(je - 1, je - 1) / temp;
 		}
 
 /* Computing MAX */
@@ -1246,8 +1202,7 @@ eigenvector */
 			je - 1], abs(d__4));
 		xmax = max(d__5,d__6);
 
-/*              Compute contribution from columns JE and JE-1 
-  
+/*              Compute contribution from columns JE and JE-1   
                 of A and B to the sums. */
 
 		creala = acoef * work[(*n << 1) + je - 1];
@@ -1264,12 +1219,12 @@ eigenvector */
 			+ je];
 		i__1 = je - 2;
 		for (jr = 1; jr <= i__1; ++jr) {
-		    work[(*n << 1) + jr] = -creala * a[jr + (je - 1) * a_dim1]
-			     + crealb * b[jr + (je - 1) * b_dim1] - cre2a * a[
-			    jr + je * a_dim1] + cre2b * b[jr + je * b_dim1];
-		    work[*n * 3 + jr] = -cimaga * a[jr + (je - 1) * a_dim1] + 
-			    cimagb * b[jr + (je - 1) * b_dim1] - cim2a * a[jr 
-			    + je * a_dim1] + cim2b * b[jr + je * b_dim1];
+		    work[(*n << 1) + jr] = -creala * a_ref(jr, je - 1) + 
+			    crealb * b_ref(jr, je - 1) - cre2a * a_ref(jr, je)
+			     + cre2b * b_ref(jr, je);
+		    work[*n * 3 + jr] = -cimaga * a_ref(jr, je - 1) + cimagb *
+			     b_ref(jr, je - 1) - cim2a * a_ref(jr, je) + 
+			    cim2b * b_ref(jr, je);
 /* L270: */
 		}
 	    }
@@ -1282,49 +1237,40 @@ eigenvector */
 /*           Columnwise triangular solve of  (a A - b B)  x = 0 */
 
 	    il2by2 = FALSE_;
-/*           ------------------- Begin Timing Code --------------
--------- */
+/*           ------------------- Begin Timing Code ---------------------- */
 	    opst = 0.;
 	    in2by2 = 0;
-/*           -------------------- End Timing Code ---------------
--------- */
+/*           -------------------- End Timing Code ----------------------- */
 	    for (j = je - nw; j >= 1; --j) {
-/*              ------------------- Begin Timing Code -------
------------- */
+/*              ------------------- Begin Timing Code ------------------- */
 		opssca = (doublereal) (nw * je + 1);
-/*              -------------------- End Timing Code --------
-------------   
+/*              -------------------- End Timing Code --------------------   
 
-                If a 2-by-2 block, is in position j-1:j, wait 
-until   
-                next iteration to process it (when it will be 
-j:j+1) */
+                If a 2-by-2 block, is in position j-1:j, wait until   
+                next iteration to process it (when it will be j:j+1) */
 
 		if (! il2by2 && j > 1) {
-		    if (a[j + (j - 1) * a_dim1] != 0.) {
+		    if (a_ref(j, j - 1) != 0.) {
 			il2by2 = TRUE_;
-/*                    -------------- Begin Timing Code
- ----------------- */
+/*                    -------------- Begin Timing Code ----------------- */
 			++in2by2;
-/*                    --------------- End Timing Code 
-------------------- */
+/*                    --------------- End Timing Code ------------------- */
 			goto L370;
 		    }
 		}
-		bdiag[0] = b[j + j * b_dim1];
+		bdiag[0] = b_ref(j, j);
 		if (il2by2) {
 		    na = 2;
-		    bdiag[1] = b[j + 1 + (j + 1) * b_dim1];
+		    bdiag[1] = b_ref(j + 1, j + 1);
 		} else {
 		    na = 1;
 		}
 
 /*              Compute x(j) (and x(j+1), if 2-by-2 block) */
 
-		dlaln2_(&c_false, &na, &nw, &dmin__, &acoef, &a[j + j * 
-			a_dim1], lda, bdiag, &bdiag[1], &work[(*n << 1) + j], 
-			n, &bcoefr, &bcoefi, sum, &c__2, &scale, &temp, &
-			iinfo);
+		dlaln2_(&c_false, &na, &nw, &dmin__, &acoef, &a_ref(j, j), 
+			lda, bdiag, &bdiag[1], &work[(*n << 1) + j], n, &
+			bcoefr, &bcoefi, sum, &c__2, &scale, &temp, &iinfo);
 		if (scale < 1.) {
 
 		    i__1 = nw - 1;
@@ -1341,30 +1287,25 @@ j:j+1) */
 /* Computing MAX */
 		d__1 = scale * xmax;
 		xmax = max(d__1,temp);
-/*              ------------------ Begin Timing Code --------
---------- */
+/*              ------------------ Begin Timing Code ----------------- */
 		opst += opssca;
-/*              ------------------- End Timing Code ---------
---------- */
+/*              ------------------- End Timing Code ------------------ */
 
 		i__1 = nw;
 		for (jw = 1; jw <= i__1; ++jw) {
 		    i__2 = na;
 		    for (ja = 1; ja <= i__2; ++ja) {
-			work[(jw + 1) * *n + j + ja - 1] = sum[ja + (jw << 1) 
-				- 3];
+			work[(jw + 1) * *n + j + ja - 1] = sum_ref(ja, jw);
 /* L300: */
 		    }
 /* L310: */
 		}
 
-/*              w = w + x(j)*(a A(*,j) - b B(*,j) ) with scali
-ng */
+/*              w = w + x(j)*(a A(*,j) - b B(*,j) ) with scaling */
 
 		if (j > 1) {
 
-/*                 Check whether scaling is necessary for 
-sum. */
+/*                 Check whether scaling is necessary for sum. */
 
 		    xscale = 1. / max(1.,xmax);
 		    temp = acoefa * work[j] + bcoefa * work[*n + j];
@@ -1390,17 +1331,13 @@ sum. */
 /* L330: */
 			}
 			xmax *= xscale;
-/*                    ----------------- Begin Timing C
-ode --------------- */
+/*                    ----------------- Begin Timing Code --------------- */
 			opst += opssca;
-/*                    ------------------ End Timing Co
-de ---------------- */
+/*                    ------------------ End Timing Code ---------------- */
 		    }
 
-/*                 Compute the contributions of the off-di
-agonals of   
-                   column j (and j+1, if 2-by-2 block) of 
-A and B to the   
+/*                 Compute the contributions of the off-diagonals of   
+                   column j (and j+1, if 2-by-2 block) of A and B to the   
                    sums. */
 
 
@@ -1416,13 +1353,11 @@ A and B to the
 			    i__2 = j - 1;
 			    for (jr = 1; jr <= i__2; ++jr) {
 				work[(*n << 1) + jr] = work[(*n << 1) + jr] - 
-					creala * a[jr + (j + ja - 1) * a_dim1]
-					 + crealb * b[jr + (j + ja - 1) * 
-					b_dim1];
+					creala * a_ref(jr, j + ja - 1) + 
+					crealb * b_ref(jr, j + ja - 1);
 				work[*n * 3 + jr] = work[*n * 3 + jr] - 
-					cimaga * a[jr + (j + ja - 1) * a_dim1]
-					 + cimagb * b[jr + (j + ja - 1) * 
-					b_dim1];
+					cimaga * a_ref(jr, j + ja - 1) + 
+					cimagb * b_ref(jr, j + ja - 1);
 /* L340: */
 			    }
 			} else {
@@ -1431,9 +1366,8 @@ A and B to the
 			    i__2 = j - 1;
 			    for (jr = 1; jr <= i__2; ++jr) {
 				work[(*n << 1) + jr] = work[(*n << 1) + jr] - 
-					creala * a[jr + (j + ja - 1) * a_dim1]
-					 + crealb * b[jr + (j + ja - 1) * 
-					b_dim1];
+					creala * a_ref(jr, j + ja - 1) + 
+					crealb * b_ref(jr, j + ja - 1);
 /* L350: */
 			    }
 			}
@@ -1457,12 +1391,11 @@ L370:
 		    i__2 = *n;
 		    for (jr = 1; jr <= i__2; ++jr) {
 			work[(jw + 4) * *n + jr] = work[(jw + 2) * *n + 1] * 
-				vr[jr + vr_dim1];
+				vr_ref(jr, 1);
 /* L380: */
 		    }
 
-/*                 A series of compiler directives to defe
-at   
+/*                 A series of compiler directives to defeat   
                    vectorization for the next loop */
 
 
@@ -1471,7 +1404,7 @@ at
 			i__3 = *n;
 			for (jr = 1; jr <= i__3; ++jr) {
 			    work[(jw + 4) * *n + jr] += work[(jw + 2) * *n + 
-				    jc] * vr[jr + jc * vr_dim1];
+				    jc] * vr_ref(jr, jc);
 /* L390: */
 			}
 /* L400: */
@@ -1483,8 +1416,7 @@ at
 		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = *n;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			vr[jr + (ieig + jw) * vr_dim1] = work[(jw + 4) * *n + 
-				jr];
+			vr_ref(jr, ieig + jw) = work[(jw + 4) * *n + jr];
 /* L420: */
 		    }
 /* L430: */
@@ -1496,8 +1428,7 @@ at
 		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = *n;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			vr[jr + (ieig + jw) * vr_dim1] = work[(jw + 2) * *n + 
-				jr];
+			vr_ref(jr, ieig + jw) = work[(jw + 2) * *n + jr];
 /* L440: */
 		    }
 /* L450: */
@@ -1513,9 +1444,8 @@ at
 		i__1 = iend;
 		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		    d__3 = xmax, d__4 = (d__1 = vr[j + ieig * vr_dim1], abs(
-			    d__1)) + (d__2 = vr[j + (ieig + 1) * vr_dim1], 
-			    abs(d__2));
+		    d__3 = xmax, d__4 = (d__1 = vr_ref(j, ieig), abs(d__1)) + 
+			    (d__2 = vr_ref(j, ieig + 1), abs(d__2));
 		    xmax = max(d__3,d__4);
 /* L460: */
 		}
@@ -1523,8 +1453,7 @@ at
 		i__1 = iend;
 		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		    d__2 = xmax, d__3 = (d__1 = vr[j + ieig * vr_dim1], abs(
-			    d__1));
+		    d__2 = xmax, d__3 = (d__1 = vr_ref(j, ieig), abs(d__1));
 		    xmax = max(d__2,d__3);
 /* L470: */
 		}
@@ -1536,35 +1465,29 @@ at
 		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = iend;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			vr[jr + (ieig + jw) * vr_dim1] = xscale * vr[jr + (
-				ieig + jw) * vr_dim1];
+			vr_ref(jr, ieig + jw) = xscale * vr_ref(jr, ieig + jw)
+				;
 /* L480: */
 		    }
 /* L490: */
 		}
 	    }
 
-/*           ------------------- Begin Timing Code --------------
---------   
+/*           ------------------- Begin Timing Code ----------------------   
              Opcounts for each eigenvector   
 
                                   Real                Complex   
-             Initialization       8--16 + 3*(JE-1)    71--87+16+14
-*(JE-2)   
+             Initialization       8--16 + 3*(JE-1)    71--87+16+14*(JE-2)   
 
-             Solve (per iter)     NA*(5 + 7*(NA-1))   NA*(17 + 17*
-(NA-1))   
+             Solve (per iter)     NA*(5 + 7*(NA-1))   NA*(17 + 17*(NA-1))   
                                   + scaling           + scaling   
              column add (per iter)   
                                   2 + 5*NA            2 + 11*NA   
-                                  + 4*NA*(J-1)        + 8*NA*(J-1)
-   
+                                  + 4*NA*(J-1)        + 8*NA*(J-1)   
                                   + scaling           + scaling   
-             iteration:           J=JE-1,...,1        J=JE-2,...,1
-   
+             iteration:           J=JE-1,...,1        J=JE-2,...,1   
 
-             Back xform           2*N*JE - N          4*N*JE - 2*N
-   
+             Back xform           2*N*JE - N          4*N*JE - 2*N   
              Scaling (w/back x.)  N                   3*N   
              Scaling (w/o back)   JE                  3*JE */
 
@@ -1587,8 +1510,7 @@ at
 	    }
 	    latime_1.ops += opst;
 
-/*           -------------------- End Timing Code ---------------
--------- */
+/*           -------------------- End Timing Code ----------------------- */
 
 L500:
 	    ;
@@ -1600,4 +1522,13 @@ L500:
 /*     End of DTGEVC */
 
 } /* dtgevc_ */
+
+#undef sum_ref
+#undef vr_ref
+#undef vl_ref
+#undef b_ref
+#undef a_ref
+#undef sumb_ref
+#undef suma_ref
+
 

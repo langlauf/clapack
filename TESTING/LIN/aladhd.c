@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -227,7 +228,7 @@ static integer c__7 = 7;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -236,8 +237,7 @@ static integer c__7 = 7;
     Purpose   
     =======   
 
-    ALADHD prints header information for the driver routines test paths. 
-  
+    ALADHD prints header information for the driver routines test paths.   
 
     Arguments   
     =========   
@@ -255,14 +255,12 @@ static integer c__7 = 7;
                _PO:  Symmetric or Hermitian positive definite   
                _PP:  Symmetric or Hermitian positive definite packed   
                _PB:  Symmetric or Hermitian positive definite band   
-               _PT:  Symmetric or Hermitian positive definite tridiagonal 
-  
+               _PT:  Symmetric or Hermitian positive definite tridiagonal   
                _SY:  Symmetric indefinite   
                _SP:  Symmetric indefinite packed   
                _HE:  (complex) Hermitian indefinite   
                _HP:  (complex) Hermitian indefinite packed   
-            The first character must be one of S, D, C, or Z (C or Z only 
-  
+            The first character must be one of S, D, C, or Z (C or Z only   
             if complex). */
 
 
@@ -271,7 +269,7 @@ static integer c__7 = 7;
     }
     *(unsigned char *)c1 = *(unsigned char *)path;
     *(unsigned char *)c3 = *(unsigned char *)&path[2];
-    s_copy(p2, path + 1, 2L, 2L);
+    s_copy(p2, path + 1, (ftnlen)2, (ftnlen)2);
     sord = lsame_(c1, "S") || lsame_(c1, "D");
     corz = lsame_(c1, "C") || lsame_(c1, "Z");
     if (! (sord || corz)) {
@@ -284,7 +282,7 @@ static integer c__7 = 7;
 
 	io___6.ciunit = *iounit;
 	s_wsfe(&io___6);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___7.ciunit = *iounit;
 	s_wsfe(&io___7);
@@ -333,7 +331,7 @@ static integer c__7 = 7;
 
 	io___18.ciunit = *iounit;
 	s_wsfe(&io___18);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___19.ciunit = *iounit;
 	s_wsfe(&io___19);
@@ -382,7 +380,7 @@ static integer c__7 = 7;
 
 	io___30.ciunit = *iounit;
 	s_wsfe(&io___30);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___31.ciunit = *iounit;
 	s_wsfe(&io___31);
@@ -418,27 +416,28 @@ static integer c__7 = 7;
 	s_wsfe(&io___39);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&c__2, p2, "PP")) {
+    } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&
+	    c__2, p2, "PP")) {
 
 /*        PO: Positive definite full   
           PP: Positive definite packed */
 
 	if (sord) {
-	    s_copy(sym, "Symmetric", 9L, 9L);
+	    s_copy(sym, "Symmetric", (ftnlen)9, (ftnlen)9);
 	} else {
-	    s_copy(sym, "Hermitian", 9L, 9L);
+	    s_copy(sym, "Hermitian", (ftnlen)9, (ftnlen)9);
 	}
 	if (lsame_(c3, "O")) {
 	    io___41.ciunit = *iounit;
 	    s_wsfe(&io___41);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, sym, 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___42.ciunit = *iounit;
 	    s_wsfe(&io___42);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, sym, 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	}
 	io___43.ciunit = *iounit;
@@ -446,7 +445,7 @@ static integer c__7 = 7;
 	e_wsfe();
 	io___44.ciunit = *iounit;
 	s_wsfe(&io___44);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___45.ciunit = *iounit;
 	s_wsfe(&io___45);
@@ -486,14 +485,14 @@ static integer c__7 = 7;
 	if (sord) {
 	    io___53.ciunit = *iounit;
 	    s_wsfe(&io___53);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___54.ciunit = *iounit;
 	    s_wsfe(&io___54);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___55.ciunit = *iounit;
@@ -501,7 +500,7 @@ static integer c__7 = 7;
 	e_wsfe();
 	io___56.ciunit = *iounit;
 	s_wsfe(&io___56);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___57.ciunit = *iounit;
 	s_wsfe(&io___57);
@@ -541,14 +540,14 @@ static integer c__7 = 7;
 	if (sord) {
 	    io___65.ciunit = *iounit;
 	    s_wsfe(&io___65);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___66.ciunit = *iounit;
 	    s_wsfe(&io___66);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___67.ciunit = *iounit;
@@ -585,7 +584,8 @@ static integer c__7 = 7;
 	s_wsfe(&io___75);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&c__2, p2, "SP")) {
+    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&
+	    c__2, p2, "SP")) {
 
 /*        SY: Symmetric indefinite full   
           SP: Symmetric indefinite packed */
@@ -593,14 +593,14 @@ static integer c__7 = 7;
 	if (lsame_(c3, "Y")) {
 	    io___76.ciunit = *iounit;
 	    s_wsfe(&io___76);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___77.ciunit = *iounit;
 	    s_wsfe(&io___77);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___78.ciunit = *iounit;
@@ -646,7 +646,8 @@ static integer c__7 = 7;
 	s_wsfe(&io___88);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "HE") || lsamen_(&c__2, p2, "HP")) {
+    } else if (lsamen_(&c__2, p2, "HE") || lsamen_(&
+	    c__2, p2, "HP")) {
 
 /*        HE: Hermitian indefinite full   
           HP: Hermitian indefinite packed */
@@ -654,14 +655,14 @@ static integer c__7 = 7;
 	if (lsame_(c3, "E")) {
 	    io___89.ciunit = *iounit;
 	    s_wsfe(&io___89);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___90.ciunit = *iounit;
 	    s_wsfe(&io___90);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___91.ciunit = *iounit;
@@ -707,7 +708,7 @@ static integer c__7 = 7;
 
 	io___101.ciunit = *iounit;
 	s_wsfe(&io___101);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 

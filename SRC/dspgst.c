@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dspgst_(integer *itype, char *uplo, integer *n, 
 	doublereal *ap, doublereal *bp, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -21,8 +22,7 @@
     If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or   
     B*A*x = lambda*x, and A is overwritten by U*A*U**T or L**T*A*L.   
 
-    B must have been previously factorized as U**T*U or L*L**T by DPPTRF. 
-  
+    B must have been previously factorized as U**T*U or L*L**T by DPPTRF.   
 
     Arguments   
     =========   
@@ -40,12 +40,9 @@
     N       (input) INTEGER   
             The order of the matrices A and B.  N >= 0.   
 
-    AP      (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2) 
-  
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+    AP      (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
@@ -61,15 +58,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b9 = -1.;
@@ -107,11 +101,10 @@
     static doublereal bjj, bkk;
 
 
+    --bp;
+    --ap;
 
-#define BP(I) bp[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (*itype < 1 || *itype > 3) {
@@ -136,24 +129,23 @@
 
 	    jj = 0;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		j1 = jj + 1;
 		jj += j;
 
-/*              Compute the j-th column of the upper triangle 
-of A */
+/*              Compute the j-th column of the upper triangle of A */
 
-		bjj = BP(jj);
-		dtpsv_(uplo, "Transpose", "Nonunit", &j, &BP(1), &AP(j1), &
+		bjj = bp[jj];
+		dtpsv_(uplo, "Transpose", "Nonunit", &j, &bp[1], &ap[j1], &
 			c__1);
 		i__2 = j - 1;
-		dspmv_(uplo, &i__2, &c_b9, &AP(1), &BP(j1), &c__1, &c_b11, &
-			AP(j1), &c__1);
+		dspmv_(uplo, &i__2, &c_b9, &ap[1], &bp[j1], &c__1, &c_b11, &
+			ap[j1], &c__1);
 		i__2 = j - 1;
 		d__1 = 1. / bjj;
-		dscal_(&i__2, &d__1, &AP(j1), &c__1);
+		dscal_(&i__2, &d__1, &ap[j1], &c__1);
 		i__2 = j - 1;
-		AP(jj) = (AP(jj) - ddot_(&i__2, &AP(j1), &c__1, &BP(j1), &
+		ap[jj] = (ap[jj] - ddot_(&i__2, &ap[j1], &c__1, &bp[j1], &
 			c__1)) / bjj;
 /* L10: */
 	    }
@@ -161,39 +153,38 @@ of A */
 
 /*           Compute inv(L)*A*inv(L')   
 
-             KK and K1K1 are the indices of A(k,k) and A(k+1,k+1) 
-*/
+             KK and K1K1 are the indices of A(k,k) and A(k+1,k+1) */
 
 	    kk = 1;
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		k1k1 = kk + *n - k + 1;
 
 /*              Update the lower triangle of A(k:n,k:n) */
 
-		akk = AP(kk);
-		bkk = BP(kk);
+		akk = ap[kk];
+		bkk = bp[kk];
 /* Computing 2nd power */
 		d__1 = bkk;
 		akk /= d__1 * d__1;
-		AP(kk) = akk;
+		ap[kk] = akk;
 		if (k < *n) {
 		    i__2 = *n - k;
 		    d__1 = 1. / bkk;
-		    dscal_(&i__2, &d__1, &AP(kk + 1), &c__1);
+		    dscal_(&i__2, &d__1, &ap[kk + 1], &c__1);
 		    ct = akk * -.5;
 		    i__2 = *n - k;
-		    daxpy_(&i__2, &ct, &BP(kk + 1), &c__1, &AP(kk + 1), &c__1)
+		    daxpy_(&i__2, &ct, &bp[kk + 1], &c__1, &ap[kk + 1], &c__1)
 			    ;
 		    i__2 = *n - k;
-		    dspr2_(uplo, &i__2, &c_b9, &AP(kk + 1), &c__1, &BP(kk + 1)
-			    , &c__1, &AP(k1k1));
+		    dspr2_(uplo, &i__2, &c_b9, &ap[kk + 1], &c__1, &bp[kk + 1]
+			    , &c__1, &ap[k1k1]);
 		    i__2 = *n - k;
-		    daxpy_(&i__2, &ct, &BP(kk + 1), &c__1, &AP(kk + 1), &c__1)
+		    daxpy_(&i__2, &ct, &bp[kk + 1], &c__1, &ap[kk + 1], &c__1)
 			    ;
 		    i__2 = *n - k;
-		    dtpsv_(uplo, "No transpose", "Non-unit", &i__2, &BP(k1k1),
-			     &AP(kk + 1), &c__1);
+		    dtpsv_(uplo, "No transpose", "Non-unit", &i__2, &bp[k1k1],
+			     &ap[kk + 1], &c__1);
 		}
 		kk = k1k1;
 /* L20: */
@@ -208,59 +199,57 @@ of A */
 
 	    kk = 0;
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		k1 = kk + 1;
 		kk += k;
 
 /*              Update the upper triangle of A(1:k,1:k) */
 
-		akk = AP(kk);
-		bkk = BP(kk);
+		akk = ap[kk];
+		bkk = bp[kk];
 		i__2 = k - 1;
-		dtpmv_(uplo, "No transpose", "Non-unit", &i__2, &BP(1), &AP(
-			k1), &c__1);
+		dtpmv_(uplo, "No transpose", "Non-unit", &i__2, &bp[1], &ap[
+			k1], &c__1);
 		ct = akk * .5;
 		i__2 = k - 1;
-		daxpy_(&i__2, &ct, &BP(k1), &c__1, &AP(k1), &c__1);
+		daxpy_(&i__2, &ct, &bp[k1], &c__1, &ap[k1], &c__1);
 		i__2 = k - 1;
-		dspr2_(uplo, &i__2, &c_b11, &AP(k1), &c__1, &BP(k1), &c__1, &
-			AP(1));
+		dspr2_(uplo, &i__2, &c_b11, &ap[k1], &c__1, &bp[k1], &c__1, &
+			ap[1]);
 		i__2 = k - 1;
-		daxpy_(&i__2, &ct, &BP(k1), &c__1, &AP(k1), &c__1);
+		daxpy_(&i__2, &ct, &bp[k1], &c__1, &ap[k1], &c__1);
 		i__2 = k - 1;
-		dscal_(&i__2, &bkk, &AP(k1), &c__1);
+		dscal_(&i__2, &bkk, &ap[k1], &c__1);
 /* Computing 2nd power */
 		d__1 = bkk;
-		AP(kk) = akk * (d__1 * d__1);
+		ap[kk] = akk * (d__1 * d__1);
 /* L30: */
 	    }
 	} else {
 
 /*           Compute L'*A*L   
 
-             JJ and J1J1 are the indices of A(j,j) and A(j+1,j+1) 
-*/
+             JJ and J1J1 are the indices of A(j,j) and A(j+1,j+1) */
 
 	    jj = 1;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		j1j1 = jj + *n - j + 1;
 
-/*              Compute the j-th column of the lower triangle 
-of A */
+/*              Compute the j-th column of the lower triangle of A */
 
-		ajj = AP(jj);
-		bjj = BP(jj);
+		ajj = ap[jj];
+		bjj = bp[jj];
 		i__2 = *n - j;
-		AP(jj) = ajj * bjj + ddot_(&i__2, &AP(jj + 1), &c__1, &BP(jj 
-			+ 1), &c__1);
+		ap[jj] = ajj * bjj + ddot_(&i__2, &ap[jj + 1], &c__1, &bp[jj 
+			+ 1], &c__1);
 		i__2 = *n - j;
-		dscal_(&i__2, &bjj, &AP(jj + 1), &c__1);
+		dscal_(&i__2, &bjj, &ap[jj + 1], &c__1);
 		i__2 = *n - j;
-		dspmv_(uplo, &i__2, &c_b11, &AP(j1j1), &BP(jj + 1), &c__1, &
-			c_b11, &AP(jj + 1), &c__1);
+		dspmv_(uplo, &i__2, &c_b11, &ap[j1j1], &bp[jj + 1], &c__1, &
+			c_b11, &ap[jj + 1], &c__1);
 		i__2 = *n - j + 1;
-		dtpmv_(uplo, "Transpose", "Non-unit", &i__2, &BP(jj), &AP(jj),
+		dtpmv_(uplo, "Transpose", "Non-unit", &i__2, &bp[jj], &ap[jj],
 			 &c__1);
 		jj = j1j1;
 /* L40: */

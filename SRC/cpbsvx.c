@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cpbsvx_(char *fact, char *uplo, integer *n, integer *kd, 
@@ -6,10 +7,10 @@
 	integer *ldx, real *rcond, real *ferr, real *berr, complex *work, 
 	real *rwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -43,9 +44,13 @@
        where U is an upper triangular band matrix, and L is a lower   
        triangular band matrix.   
 
-    3. The factored form of A is used to estimate the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 4-6 are skipped.   
+    3. If the leading i-by-i principal minor is not positive definite,   
+       then the routine returns with INFO = i. Otherwise, the factored   
+       form of A is used to estimate the condition number of the matrix   
+       A.  If the reciprocal of the condition number is less than machine   
+       precision, INFO = N+1 is returned as a warning, but the routine   
+       still goes on to solve for X and compute error bounds as   
+       described below.   
 
     4. The system of equations is solved for X using the factored form   
        of A.   
@@ -62,19 +67,15 @@
     =========   
 
     FACT    (input) CHARACTER*1   
-            Specifies whether or not the factored form of the matrix A is 
-  
-            supplied on entry, and if not, whether the matrix A should be 
-  
+            Specifies whether or not the factored form of the matrix A is   
+            supplied on entry, and if not, whether the matrix A should be   
             equilibrated before it is factored.   
             = 'F':  On entry, AFB contains the factored form of A.   
                     If EQUED = 'Y', the matrix A has been equilibrated   
-                    with scaling factors given by S.  AB and AFB will not 
-  
+                    with scaling factors given by S.  AB and AFB will not   
                     be modified.   
             = 'N':  The matrix A will be copied to AFB and factored.   
-            = 'E':  The matrix A will be equilibrated if necessary, then 
-  
+            = 'E':  The matrix A will be equilibrated if necessary, then   
                     copied to AFB and factored.   
 
     UPLO    (input) CHARACTER*1   
@@ -95,16 +96,12 @@
 
     AB      (input/output) COMPLEX array, dimension (LDAB,N)   
             On entry, the upper or lower triangle of the Hermitian band   
-            matrix A, stored in the first KD+1 rows of the array, except 
-  
+            matrix A, stored in the first KD+1 rows of the array, except   
             if FACT = 'F' and EQUED = 'Y', then A must contain the   
-            equilibrated matrix diag(S)*A*diag(S).  The j-th column of A 
-  
+            equilibrated matrix diag(S)*A*diag(S).  The j-th column of A   
             is stored in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(KD+1+i-j,j) = A(i,j) for max(1,j-KD)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(N,j+KD). 
-  
+            if UPLO = 'U', AB(KD+1+i-j,j) = A(i,j) for max(1,j-KD)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(N,j+KD).   
             See below for further details.   
 
             On exit, if FACT = 'E' and EQUED = 'Y', A is overwritten by   
@@ -117,8 +114,7 @@
             If FACT = 'F', then AFB is an input argument and on entry   
             contains the triangular factor U or L from the Cholesky   
             factorization A = U**H*U or A = L*L**H of the band matrix   
-            A, in the same storage format as A (see AB).  If EQUED = 'Y', 
-  
+            A, in the same storage format as A (see AB).  If EQUED = 'Y',   
             then AFB is the factored form of the equilibrated matrix A.   
 
             If FACT = 'N', then AFB is an output argument and on exit   
@@ -137,11 +133,9 @@
     EQUED   (input or output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration (always true if FACT = 'N').   
-            = 'Y':  Equilibration was done, i.e., A has been replaced by 
-  
+            = 'Y':  Equilibration was done, i.e., A has been replaced by   
                     diag(S) * A * diag(S).   
-            EQUED is an input argument if FACT = 'F'; otherwise, it is an 
-  
+            EQUED is an input argument if FACT = 'F'; otherwise, it is an   
             output argument.   
 
     S       (input or output) REAL array, dimension (N)   
@@ -159,33 +153,26 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) COMPLEX array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X to the original 
-  
-            system of equations.  Note that if EQUED = 'Y', A and B are   
-            modified on exit, and the solution to the equilibrated system 
-  
-            is inv(diag(S))*X.   
+            If INFO = 0 or INFO = N+1, the N-by-NRHS solution matrix X to   
+            the original system of equations.  Note that if EQUED = 'Y',   
+            A and B are modified on exit, and the solution to the   
+            equilibrated system is inv(diag(S))*X.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     RCOND   (output) REAL   
-            The estimate of the reciprocal condition number of the matrix 
-  
+            The estimate of the reciprocal condition number of the matrix   
             A after equilibration (if done).  If RCOND is less than the   
             machine precision (in particular, if RCOND = 0), the matrix   
             is singular to working precision.  This condition is   
-            indicated by a return code of INFO > 0, and the solution and 
-  
-            error bounds are not computed.   
+            indicated by a return code of INFO > 0.   
 
     FERR    (output) REAL array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -204,22 +191,22 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
             > 0: if INFO = i, and i is   
-                 <= N: the leading minor of order i of A is   
-                       not positive definite, so the factorization could 
-  
-                       not be completed, and the solution has not been   
-                       computed.   
-                 = N+1: RCOND is less than machine precision.  The   
-                       factorization has been completed, but the matrix   
-                       is singular to working precision, and the solution 
-  
-                       and error bounds have not been computed.   
+                  <= N:  the leading minor of order i of A is   
+                         not positive definite, so the factorization   
+                         could not be completed, and the solution has not   
+                         been computed. RCOND = 0 is returned.   
+                  = N+1: U is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     N = 6, KD = 2, and UPLO = 'U':   
 
     Two-dimensional storage of the Hermitian matrix A:   
@@ -245,13 +232,10 @@
 
     Array elements marked * are not used by the routine.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -262,7 +246,7 @@
     complex q__1;
     /* Local variables */
     static real amax, smin, smax;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real scond, anorm;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
@@ -291,20 +275,35 @@
     extern /* Subroutine */ int cpbtrs_(char *, integer *, integer *, integer 
 	    *, complex *, integer *, complex *, integer *, integer *);
     static real smlnum;
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+#define afb_subscr(a_1,a_2) (a_2)*afb_dim1 + a_1
+#define afb_ref(a_1,a_2) afb[afb_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    afb_dim1 = *ldafb;
+    afb_offset = 1 + afb_dim1 * 1;
+    afb -= afb_offset;
+    --s;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --rwork;
 
-#define S(I) s[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define AFB(I,J) afb[(I)-1 + ((J)-1)* ( *ldafb)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
     equil = lsame_(fact, "E");
@@ -334,19 +333,20 @@
 	*info = -7;
     } else if (*ldafb < *kd + 1) {
 	*info = -9;
-    } else if (lsame_(fact, "F") && ! (rcequ || lsame_(equed, "N"))) {
+    } else if (lsame_(fact, "F") && ! (rcequ || lsame_(
+	    equed, "N"))) {
 	*info = -10;
     } else {
 	if (rcequ) {
 	    smin = bignum;
 	    smax = 0.f;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-		r__1 = smin, r__2 = S(j);
+		r__1 = smin, r__2 = s[j];
 		smin = dmin(r__1,r__2);
 /* Computing MAX */
-		r__1 = smax, r__2 = S(j);
+		r__1 = smax, r__2 = s[j];
 		smax = dmax(r__1,r__2);
 /* L10: */
 	    }
@@ -375,16 +375,15 @@
 
     if (equil) {
 
-/*        Compute row and column scalings to equilibrate the matrix A.
- */
+/*        Compute row and column scalings to equilibrate the matrix A. */
 
-	cpbequ_(uplo, n, kd, &AB(1,1), ldab, &S(1), &scond, &amax, &
+	cpbequ_(uplo, n, kd, &ab[ab_offset], ldab, &s[1], &scond, &amax, &
 		infequ);
 	if (infequ == 0) {
 
 /*           Equilibrate the matrix. */
 
-	    claqhb_(uplo, n, kd, &AB(1,1), ldab, &S(1), &scond, &amax, 
+	    claqhb_(uplo, n, kd, &ab[ab_offset], ldab, &s[1], &scond, &amax, 
 		    equed);
 	    rcequ = lsame_(equed, "Y");
 	}
@@ -394,14 +393,14 @@
 
     if (rcequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i;
-		i__5 = i + j * b_dim1;
-		q__1.r = S(i) * B(i,j).r, q__1.i = S(i) * B(i,j).i;
-		B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		i__4 = i__;
+		i__5 = b_subscr(i__, j);
+		q__1.r = s[i__4] * b[i__5].r, q__1.i = s[i__4] * b[i__5].i;
+		b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L20: */
 	    }
 /* L30: */
@@ -414,28 +413,28 @@
 
 	if (upper) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 		i__2 = j - *kd;
 		j1 = max(i__2,1);
 		i__2 = j - j1 + 1;
-		ccopy_(&i__2, &AB(*kd+1-j+j1,j), &c__1, &
-			AFB(*kd+1-j+j1,j), &c__1);
+		ccopy_(&i__2, &ab_ref(*kd + 1 - j + j1, j), &c__1, &afb_ref(*
+			kd + 1 - j + j1, j), &c__1);
 /* L40: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__2 = j + *kd;
 		j2 = min(i__2,*n);
 		i__2 = j2 - j + 1;
-		ccopy_(&i__2, &AB(1,j), &c__1, &AFB(1,j), &c__1);
+		ccopy_(&i__2, &ab_ref(1, j), &c__1, &afb_ref(1, j), &c__1);
 /* L50: */
 	    }
 	}
 
-	cpbtrf_(uplo, n, kd, &AFB(1,1), ldafb, info);
+	cpbtrf_(uplo, n, kd, &afb[afb_offset], ldafb, info);
 
 /*        Return if INFO is non-zero. */
 
@@ -449,54 +448,52 @@
 
 /*     Compute the norm of the matrix A. */
 
-    anorm = clanhb_("1", uplo, n, kd, &AB(1,1), ldab, &RWORK(1))
-	    ;
+    anorm = clanhb_("1", uplo, n, kd, &ab[ab_offset], ldab, &rwork[1]);
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    cpbcon_(uplo, n, kd, &AFB(1,1), ldafb, &anorm, rcond, &WORK(1), &
-	    RWORK(1), info);
+    cpbcon_(uplo, n, kd, &afb[afb_offset], ldafb, &anorm, rcond, &work[1], &
+	    rwork[1], info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < slamch_("Epsilon")) {
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution matrix X. */
 
-    clacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    cpbtrs_(uplo, n, kd, nrhs, &AFB(1,1), ldafb, &X(1,1), ldx, 
+    clacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    cpbtrs_(uplo, n, kd, nrhs, &afb[afb_offset], ldafb, &x[x_offset], ldx, 
 	    info);
 
 /*     Use iterative refinement to improve the computed solution and   
        compute error bounds and backward error estimates for it. */
 
-    cpbrfs_(uplo, n, kd, nrhs, &AB(1,1), ldab, &AFB(1,1), ldafb, 
-	    &B(1,1), ldb, &X(1,1), ldx, &FERR(1), &BERR(1), &WORK(1)
-	    , &RWORK(1), info);
+    cpbrfs_(uplo, n, kd, nrhs, &ab[ab_offset], ldab, &afb[afb_offset], ldafb, 
+	    &b[b_offset], ldb, &x[x_offset], ldx, &ferr[1], &berr[1], &work[1]
+	    , &rwork[1], info);
 
 /*     Transform the solution matrix X to a solution of the original   
        system. */
 
     if (rcequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		i__3 = i + j * x_dim1;
-		i__4 = i;
-		i__5 = i + j * x_dim1;
-		q__1.r = S(i) * X(i,j).r, q__1.i = S(i) * X(i,j).i;
-		X(i,j).r = q__1.r, X(i,j).i = q__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = x_subscr(i__, j);
+		i__4 = i__;
+		i__5 = x_subscr(i__, j);
+		q__1.r = s[i__4] * x[i__5].r, q__1.i = s[i__4] * x[i__5].i;
+		x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 /* L60: */
 	    }
 /* L70: */
 	}
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    FERR(j) /= scond;
+	for (j = 1; j <= i__1; ++j) {
+	    ferr[j] /= scond;
 /* L80: */
 	}
     }
@@ -506,4 +503,14 @@
 /*     End of CPBSVX */
 
 } /* cpbsvx_ */
+
+#undef afb_ref
+#undef afb_subscr
+#undef ab_ref
+#undef ab_subscr
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sorgr2_(integer *m, integer *n, integer *k, real *a, 
 	integer *lda, real *tau, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -30,14 +31,12 @@
             The number of columns of the matrix Q. N >= M.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
             On entry, the (m-k+i)-th row must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as 
-  
+            defines the elementary reflector H(i), for i = 1,2,...,k, as   
             returned by SGERQF in the last k rows of its array argument   
             A.   
             On exit, the m by n matrix Q.   
@@ -55,32 +54,31 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument has an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     real r__1;
     /* Local variables */
-    static integer i, j, l;
+    static integer i__, j, l;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
 	    slarf_(char *, integer *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *);
     static integer ii;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -108,39 +106,40 @@
 /*        Initialise rows 1:m-k to rows of the unit matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m - *k;
-	    for (l = 1; l <= *m-*k; ++l) {
-		A(l,j) = 0.f;
+	    for (l = 1; l <= i__2; ++l) {
+		a_ref(l, j) = 0.f;
 /* L10: */
 	    }
 	    if (j > *n - *m && j <= *n - *k) {
-		A(*m-*n+j,j) = 1.f;
+		a_ref(*m - *n + j, j) = 1.f;
 	    }
 /* L20: */
 	}
     }
 
     i__1 = *k;
-    for (i = 1; i <= *k; ++i) {
-	ii = *m - *k + i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	ii = *m - *k + i__;
 
 /*        Apply H(i) to A(1:m-k+i,1:n-k+i) from the right */
 
-	A(ii,*n-*m+ii) = 1.f;
+	a_ref(ii, *n - *m + ii) = 1.f;
 	i__2 = ii - 1;
 	i__3 = *n - *m + ii;
-	slarf_("Right", &i__2, &i__3, &A(ii,1), lda, &TAU(i), &A(1,1), lda, &WORK(1));
+	slarf_("Right", &i__2, &i__3, &a_ref(ii, 1), lda, &tau[i__], &a[
+		a_offset], lda, &work[1]);
 	i__2 = *n - *m + ii - 1;
-	r__1 = -(doublereal)TAU(i);
-	sscal_(&i__2, &r__1, &A(ii,1), lda);
-	A(ii,*n-*m+ii) = 1.f - TAU(i);
+	r__1 = -tau[i__];
+	sscal_(&i__2, &r__1, &a_ref(ii, 1), lda);
+	a_ref(ii, *n - *m + ii) = 1.f - tau[i__];
 
 /*        Set A(m-k+i,n-k+i+1:n) to zero */
 
 	i__2 = *n;
-	for (l = *n - *m + ii + 1; l <= *n; ++l) {
-	    A(ii,l) = 0.f;
+	for (l = *n - *m + ii + 1; l <= i__2; ++l) {
+	    a_ref(ii, l) = 0.f;
 /* L30: */
 	}
 /* L40: */
@@ -150,4 +149,7 @@
 /*     End of SORGR2 */
 
 } /* sorgr2_ */
+
+#undef a_ref
+
 

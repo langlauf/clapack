@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgbbrd_(char *vect, integer *m, integer *n, integer *ncc,
-	 integer *kl, integer *ku, real *ab, integer *ldab, real *d, real *e, 
-	real *q, integer *ldq, real *pt, integer *ldpt, real *c, integer *ldc,
-	 real *work, integer *info)
+	 integer *kl, integer *ku, real *ab, integer *ldab, real *d__, real *
+	e, real *q, integer *ldq, real *pt, integer *ldpt, real *c__, integer 
+	*ldc, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -48,8 +49,7 @@
 
     AB      (input/output) REAL array, dimension (LDAB,N)   
             On entry, the m-by-n band matrix A, stored in rows 1 to   
-            KL+KU+1. The j-th column of A is stored in the j-th column of 
-  
+            KL+KU+1. The j-th column of A is stored in the j-th column of   
             the array AB as follows:   
             AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl).   
             On exit, A is overwritten by values generated during the   
@@ -95,15 +95,12 @@
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b8 = 0.f;
     static real c_b9 = 1.f;
@@ -116,7 +113,7 @@
     static integer inca;
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static integer i, j, l;
+    static integer i__, j, l;
     extern logical lsame_(char *, char *);
     static logical wantb, wantc;
     static integer minmn;
@@ -135,18 +132,29 @@
 	    integer *, real *, real *, integer *);
     static logical wantpt;
     static integer mu0, klm, kun, nrt, klu1;
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+#define pt_ref(a_1,a_2) pt[(a_2)*pt_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --d__;
+    --e;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    pt_dim1 = *ldpt;
+    pt_offset = 1 + pt_dim1 * 1;
+    pt -= pt_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define PT(I,J) pt[(I)-1 + ((J)-1)* ( *ldpt)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     wantb = lsame_(vect, "B");
     wantq = lsame_(vect, "Q") || wantb;
     wantpt = lsame_(vect, "P") || wantb;
@@ -183,10 +191,10 @@
 /*     Initialize Q and P' to the unit matrix, if needed */
 
     if (wantq) {
-	slaset_("Full", m, m, &c_b8, &c_b9, &Q(1,1), ldq);
+	slaset_("Full", m, m, &c_b8, &c_b9, &q[q_offset], ldq);
     }
     if (wantpt) {
-	slaset_("Full", n, n, &c_b8, &c_b9, &PT(1,1), ldpt);
+	slaset_("Full", n, n, &c_b8, &c_b9, &pt[pt_offset], ldpt);
     }
 
 /*     Quick return if possible. */
@@ -199,10 +207,8 @@
 
     if (*kl + *ku > 1) {
 
-/*        Reduce to upper bidiagonal form if KU > 0; if KU = 0, reduce
-   
-          first to lower bidiagonal form and then transform to upper 
-  
+/*        Reduce to upper bidiagonal form if KU > 0; if KU = 0, reduce   
+          first to lower bidiagonal form and then transform to upper   
           bidiagonal */
 
 	if (*ku > 0) {
@@ -213,13 +219,10 @@
 	    mu0 = 1;
 	}
 
-/*        Wherever possible, plane rotations are generated and applied
- in   
-          vector operations of length NR over the index set J1:J2:KLU1
-.   
+/*        Wherever possible, plane rotations are generated and applied in   
+          vector operations of length NR over the index set J1:J2:KLU1.   
 
-          The sines of the plane rotations are stored in WORK(1:max(m,
-n))   
+          The sines of the plane rotations are stored in WORK(1:max(m,n))   
           and the cosines in WORK(max(m,n)+1:2*max(m,n)). */
 
 	mn = max(*m,*n);
@@ -237,63 +240,62 @@ n))
 	j2 = 1 - kun;
 
 	i__1 = minmn;
-	for (i = 1; i <= minmn; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*           Reduce i-th column and i-th row of matrix to bidiagon
-al form */
+/*           Reduce i-th column and i-th row of matrix to bidiagonal form */
 
 	    ml = klm + 1;
 	    mu = kun + 1;
 	    i__2 = kb;
-	    for (kk = 1; kk <= kb; ++kk) {
+	    for (kk = 1; kk <= i__2; ++kk) {
 		j1 += kb;
 		j2 += kb;
 
-/*              generate plane rotations to annihilate nonzero
- elements   
+/*              generate plane rotations to annihilate nonzero elements   
                 which have been created below the band */
 
 		if (nr > 0) {
-		    slargv_(&nr, &AB(klu1,j1-klm-1), &inca, 
-			    &WORK(j1), &kb1, &WORK(mn + j1), &kb1);
+		    slargv_(&nr, &ab_ref(klu1, j1 - klm - 1), &inca, &work[j1]
+			    , &kb1, &work[mn + j1], &kb1);
 		}
 
 /*              apply plane rotations from the left */
 
 		i__3 = kb;
-		for (l = 1; l <= kb; ++l) {
+		for (l = 1; l <= i__3; ++l) {
 		    if (j2 - klm + l - 1 > *n) {
 			nrt = nr - 1;
 		    } else {
 			nrt = nr;
 		    }
 		    if (nrt > 0) {
-			slartv_(&nrt, &AB(klu1-l,j1-klm+l-1), &inca, &AB(klu1-l+1,j1-klm+l-1), &inca, &WORK(mn + j1), &
-				WORK(j1), &kb1);
+			slartv_(&nrt, &ab_ref(klu1 - l, j1 - klm + l - 1), &
+				inca, &ab_ref(klu1 - l + 1, j1 - klm + l - 1),
+				 &inca, &work[mn + j1], &work[j1], &kb1);
 		    }
 /* L10: */
 		}
 
 		if (ml > ml0) {
-		    if (ml <= *m - i + 1) {
+		    if (ml <= *m - i__ + 1) {
 
-/*                    generate plane rotation to annih
-ilate a(i+ml-1,i)   
-                      within the band, and apply rotat
-ion from the left */
+/*                    generate plane rotation to annihilate a(i+ml-1,i)   
+                      within the band, and apply rotation from the left */
 
-			slartg_(&AB(*ku+ml-1,i), &AB(*ku+ml,i), &WORK(mn + i + ml - 1), &WORK(
-				i + ml - 1), &ra);
-			AB(*ku+ml-1,i) = ra;
-			if (i < *n) {
+			slartg_(&ab_ref(*ku + ml - 1, i__), &ab_ref(*ku + ml, 
+				i__), &work[mn + i__ + ml - 1], &work[i__ + 
+				ml - 1], &ra);
+			ab_ref(*ku + ml - 1, i__) = ra;
+			if (i__ < *n) {
 /* Computing MIN */
-			    i__4 = *ku + ml - 2, i__5 = *n - i;
+			    i__4 = *ku + ml - 2, i__5 = *n - i__;
 			    i__3 = min(i__4,i__5);
 			    i__6 = *ldab - 1;
 			    i__7 = *ldab - 1;
-			    srot_(&i__3, &AB(*ku+ml-2,i+1)
-				    , &i__6, &AB(*ku+ml-1,i+1), &i__7, &WORK(mn + i + ml - 1), &
-				    WORK(i + ml - 1));
+			    srot_(&i__3, &ab_ref(*ku + ml - 2, i__ + 1), &
+				    i__6, &ab_ref(*ku + ml - 1, i__ + 1), &
+				    i__7, &work[mn + i__ + ml - 1], &work[i__ 
+				    + ml - 1]);
 			}
 		    }
 		    ++nr;
@@ -302,14 +304,14 @@ ion from the left */
 
 		if (wantq) {
 
-/*                 accumulate product of plane rotations i
-n Q */
+/*                 accumulate product of plane rotations in Q */
 
 		    i__3 = j2;
 		    i__4 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) 
 			    {
-			srot_(m, &Q(1,j-1), &c__1, &Q(1,j), &c__1, &WORK(mn + j), &WORK(j));
+			srot_(m, &q_ref(1, j - 1), &c__1, &q_ref(1, j), &c__1,
+				 &work[mn + j], &work[j]);
 /* L20: */
 		    }
 		}
@@ -320,18 +322,17 @@ n Q */
 
 		    i__4 = j2;
 		    i__3 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__3 < 0 ? j >= i__4 : j <= i__4; j += i__3) 
 			    {
-			srot_(ncc, &C(j-1,1), ldc, &C(j,1), 
-				ldc, &WORK(mn + j), &WORK(j));
+			srot_(ncc, &c___ref(j - 1, 1), ldc, &c___ref(j, 1), 
+				ldc, &work[mn + j], &work[j]);
 /* L30: */
 		    }
 		}
 
 		if (j2 + kun > *n) {
 
-/*                 adjust J2 to keep within the bounds of 
-the matrix */
+/*                 adjust J2 to keep within the bounds of the matrix */
 
 		    --nr;
 		    j2 -= kb1;
@@ -339,61 +340,58 @@ the matrix */
 
 		i__3 = j2;
 		i__4 = kb1;
-		for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) {
+		for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) {
 
-/*                 create nonzero element a(j-1,j+ku) abov
-e the band   
+/*                 create nonzero element a(j-1,j+ku) above the band   
                    and store it in WORK(n+1:2*n) */
 
-		    WORK(j + kun) = WORK(j) * AB(1,j+kun);
-		    AB(1,j+kun) = WORK(mn + j) * AB(1,j+kun);
+		    work[j + kun] = work[j] * ab_ref(1, j + kun);
+		    ab_ref(1, j + kun) = work[mn + j] * ab_ref(1, j + kun);
 /* L40: */
 		}
 
-/*              generate plane rotations to annihilate nonzero
- elements   
+/*              generate plane rotations to annihilate nonzero elements   
                 which have been generated above the band */
 
 		if (nr > 0) {
-		    slargv_(&nr, &AB(1,j1+kun-1), &inca, &
-			    WORK(j1 + kun), &kb1, &WORK(mn + j1 + kun), &kb1);
+		    slargv_(&nr, &ab_ref(1, j1 + kun - 1), &inca, &work[j1 + 
+			    kun], &kb1, &work[mn + j1 + kun], &kb1);
 		}
 
 /*              apply plane rotations from the right */
 
 		i__4 = kb;
-		for (l = 1; l <= kb; ++l) {
+		for (l = 1; l <= i__4; ++l) {
 		    if (j2 + l - 1 > *m) {
 			nrt = nr - 1;
 		    } else {
 			nrt = nr;
 		    }
 		    if (nrt > 0) {
-			slartv_(&nrt, &AB(l+1,j1+kun-1), &
-				inca, &AB(l,j1+kun), &inca, &
-				WORK(mn + j1 + kun), &WORK(j1 + kun), &kb1);
+			slartv_(&nrt, &ab_ref(l + 1, j1 + kun - 1), &inca, &
+				ab_ref(l, j1 + kun), &inca, &work[mn + j1 + 
+				kun], &work[j1 + kun], &kb1);
 		    }
 /* L50: */
 		}
 
 		if (ml == ml0 && mu > mu0) {
-		    if (mu <= *n - i + 1) {
+		    if (mu <= *n - i__ + 1) {
 
-/*                    generate plane rotation to annih
-ilate a(i,i+mu-1)   
-                      within the band, and apply rotat
-ion from the right */
+/*                    generate plane rotation to annihilate a(i,i+mu-1)   
+                      within the band, and apply rotation from the right */
 
-			slartg_(&AB(*ku-mu+3,i+mu-2), &
-				AB(*ku-mu+2,i+mu-1), &
-				WORK(mn + i + mu - 1), &WORK(i + mu - 1), &ra)
-				;
-			AB(*ku-mu+3,i+mu-2) = ra;
+			slartg_(&ab_ref(*ku - mu + 3, i__ + mu - 2), &ab_ref(*
+				ku - mu + 2, i__ + mu - 1), &work[mn + i__ + 
+				mu - 1], &work[i__ + mu - 1], &ra);
+			ab_ref(*ku - mu + 3, i__ + mu - 2) = ra;
 /* Computing MIN */
-			i__3 = *kl + mu - 2, i__5 = *m - i;
+			i__3 = *kl + mu - 2, i__5 = *m - i__;
 			i__4 = min(i__3,i__5);
-			srot_(&i__4, &AB(*ku-mu+4,i+mu-2), &c__1, &AB(*ku-mu+3,i+mu-1), &c__1, &WORK(mn + i + mu - 1), 
-				&WORK(i + mu - 1));
+			srot_(&i__4, &ab_ref(*ku - mu + 4, i__ + mu - 2), &
+				c__1, &ab_ref(*ku - mu + 3, i__ + mu - 1), &
+				c__1, &work[mn + i__ + mu - 1], &work[i__ + 
+				mu - 1]);
 		    }
 		    ++nr;
 		    j1 -= kb1;
@@ -401,23 +399,22 @@ ion from the right */
 
 		if (wantpt) {
 
-/*                 accumulate product of plane rotations i
-n P' */
+/*                 accumulate product of plane rotations in P' */
 
 		    i__4 = j2;
 		    i__3 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__3 < 0 ? j >= i__4 : j <= i__4; j += i__3) 
 			    {
-			srot_(n, &PT(j+kun-1,1), ldpt, &PT(j+kun,1), ldpt, &WORK(mn + j + kun), &
-				WORK(j + kun));
+			srot_(n, &pt_ref(j + kun - 1, 1), ldpt, &pt_ref(j + 
+				kun, 1), ldpt, &work[mn + j + kun], &work[j + 
+				kun]);
 /* L60: */
 		    }
 		}
 
 		if (j2 + kb > *m) {
 
-/*                 adjust J2 to keep within the bounds of 
-the matrix */
+/*                 adjust J2 to keep within the bounds of the matrix */
 
 		    --nr;
 		    j2 -= kb1;
@@ -425,14 +422,14 @@ the matrix */
 
 		i__3 = j2;
 		i__4 = kb1;
-		for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) {
+		for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) {
 
-/*                 create nonzero element a(j+kl+ku,j+ku-1
-) below the   
+/*                 create nonzero element a(j+kl+ku,j+ku-1) below the   
                    band and store it in WORK(1:n) */
 
-		    WORK(j + kb) = WORK(j + kun) * AB(klu1,j+kun);
-		    AB(klu1,j+kun) = WORK(mn + j + kun) * AB(klu1,j+kun);
+		    work[j + kb] = work[j + kun] * ab_ref(klu1, j + kun);
+		    ab_ref(klu1, j + kun) = work[mn + j + kun] * ab_ref(klu1, 
+			    j + kun);
 /* L70: */
 		}
 
@@ -451,35 +448,32 @@ the matrix */
 
 /*        A has been reduced to lower bidiagonal form   
 
-          Transform lower bidiagonal form to upper bidiagonal by apply
-ing   
-          plane rotations from the left, storing diagonal elements in 
-D   
+          Transform lower bidiagonal form to upper bidiagonal by applying   
+          plane rotations from the left, storing diagonal elements in D   
           and off-diagonal elements in E   
 
    Computing MIN */
 	i__2 = *m - 1;
 	i__1 = min(i__2,*n);
-	for (i = 1; i <= min(*m-1,*n); ++i) {
-	    slartg_(&AB(1,i), &AB(2,i), &rc, &rs, &ra)
-		    ;
-	    D(i) = ra;
-	    if (i < *n) {
-		E(i) = rs * AB(1,i+1);
-		AB(1,i+1) = rc * AB(1,i+1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    slartg_(&ab_ref(1, i__), &ab_ref(2, i__), &rc, &rs, &ra);
+	    d__[i__] = ra;
+	    if (i__ < *n) {
+		e[i__] = rs * ab_ref(1, i__ + 1);
+		ab_ref(1, i__ + 1) = rc * ab_ref(1, i__ + 1);
 	    }
 	    if (wantq) {
-		srot_(m, &Q(1,i), &c__1, &Q(1,i+1), 
-			&c__1, &rc, &rs);
+		srot_(m, &q_ref(1, i__), &c__1, &q_ref(1, i__ + 1), &c__1, &
+			rc, &rs);
 	    }
 	    if (wantc) {
-		srot_(ncc, &C(i,1), ldc, &C(i+1,1), ldc, &rc, 
-			&rs);
+		srot_(ncc, &c___ref(i__, 1), ldc, &c___ref(i__ + 1, 1), ldc, &
+			rc, &rs);
 	    }
 /* L100: */
 	}
 	if (*m <= *n) {
-	    D(*m) = AB(1,*m);
+	    d__[*m] = ab_ref(1, *m);
 	}
     } else if (*ku > 0) {
 
@@ -487,56 +481,52 @@ D
 
 	if (*m < *n) {
 
-/*           Annihilate a(m,m+1) by applying plane rotations from 
-the   
-             right, storing diagonal elements in D and off-diagona
-l   
+/*           Annihilate a(m,m+1) by applying plane rotations from the   
+             right, storing diagonal elements in D and off-diagonal   
              elements in E */
 
-	    rb = AB(*ku,*m+1);
-	    for (i = *m; i >= 1; --i) {
-		slartg_(&AB(*ku+1,i), &rb, &rc, &rs, &ra);
-		D(i) = ra;
-		if (i > 1) {
-		    rb = -(doublereal)rs * AB(*ku,i);
-		    E(i - 1) = rc * AB(*ku,i);
+	    rb = ab_ref(*ku, *m + 1);
+	    for (i__ = *m; i__ >= 1; --i__) {
+		slartg_(&ab_ref(*ku + 1, i__), &rb, &rc, &rs, &ra);
+		d__[i__] = ra;
+		if (i__ > 1) {
+		    rb = -rs * ab_ref(*ku, i__);
+		    e[i__ - 1] = rc * ab_ref(*ku, i__);
 		}
 		if (wantpt) {
-		    srot_(n, &PT(i,1), ldpt, &PT(*m+1,1), 
-			    ldpt, &rc, &rs);
+		    srot_(n, &pt_ref(i__, 1), ldpt, &pt_ref(*m + 1, 1), ldpt, 
+			    &rc, &rs);
 		}
 /* L110: */
 	    }
 	} else {
 
-/*           Copy off-diagonal elements to E and diagonal elements
- to D */
+/*           Copy off-diagonal elements to E and diagonal elements to D */
 
 	    i__1 = minmn - 1;
-	    for (i = 1; i <= minmn-1; ++i) {
-		E(i) = AB(*ku,i+1);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		e[i__] = ab_ref(*ku, i__ + 1);
 /* L120: */
 	    }
 	    i__1 = minmn;
-	    for (i = 1; i <= minmn; ++i) {
-		D(i) = AB(*ku+1,i);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		d__[i__] = ab_ref(*ku + 1, i__);
 /* L130: */
 	    }
 	}
     } else {
 
-/*        A is diagonal. Set elements of E to zero and copy diagonal 
-  
+/*        A is diagonal. Set elements of E to zero and copy diagonal   
           elements to D. */
 
 	i__1 = minmn - 1;
-	for (i = 1; i <= minmn-1; ++i) {
-	    E(i) = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    e[i__] = 0.f;
 /* L140: */
 	}
 	i__1 = minmn;
-	for (i = 1; i <= minmn; ++i) {
-	    D(i) = AB(1,i);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = ab_ref(1, i__);
 /* L150: */
 	}
     }
@@ -545,4 +535,10 @@ l
 /*     End of SGBBRD */
 
 } /* sgbbrd_ */
+
+#undef pt_ref
+#undef ab_ref
+#undef q_ref
+#undef c___ref
+
 

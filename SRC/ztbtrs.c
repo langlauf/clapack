@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztbtrs_(char *uplo, char *trans, char *diag, integer *n, 
 	integer *kd, integer *nrhs, doublecomplex *ab, integer *ldab, 
 	doublecomplex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -52,12 +53,9 @@
             The upper or lower triangular band matrix A, stored in the   
             first kd+1 rows of AB.  The j-th column of A is stored   
             in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
-            If DIAG = 'U', the diagonal elements of A are not referenced 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
+            If DIAG = 'U', the diagonal elements of A are not referenced   
             and are assumed to be 1.   
 
     LDAB    (input) INTEGER   
@@ -77,15 +75,12 @@
                   indicating that the matrix is singular and the   
                   solutions X have not been computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -98,20 +93,27 @@
     extern /* Subroutine */ int ztbsv_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *), xerbla_(char *, integer *);
     static logical nounit;
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     nounit = lsame_(diag, "N");
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T") &&
-	     ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T") && ! lsame_(trans, "C")) {
 	*info = -2;
     } else if (! nounit && ! lsame_(diag, "U")) {
 	*info = -3;
@@ -144,8 +146,8 @@
 	if (upper) {
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
-		i__2 = *kd + 1 + *info * ab_dim1;
-		if (AB(*kd+1,*info).r == 0. && AB(*kd+1,*info).i == 0.) {
+		i__2 = ab_subscr(*kd + 1, *info);
+		if (ab[i__2].r == 0. && ab[i__2].i == 0.) {
 		    return 0;
 		}
 /* L10: */
@@ -153,8 +155,8 @@
 	} else {
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
-		i__2 = *info * ab_dim1 + 1;
-		if (AB(1,*info).r == 0. && AB(1,*info).i == 0.) {
+		i__2 = ab_subscr(1, *info);
+		if (ab[i__2].r == 0. && ab[i__2].i == 0.) {
 		    return 0;
 		}
 /* L20: */
@@ -166,8 +168,9 @@
 /*     Solve A * X = B,  A**T * X = B,  or  A**H * X = B. */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
-	ztbsv_(uplo, trans, diag, n, kd, &AB(1,1), ldab, &B(1,j), &c__1);
+    for (j = 1; j <= i__1; ++j) {
+	ztbsv_(uplo, trans, diag, n, kd, &ab[ab_offset], ldab, &b_ref(1, j), &
+		c__1);
 /* L30: */
     }
 
@@ -176,4 +179,10 @@
 /*     End of ZTBTRS */
 
 } /* ztbtrs_ */
+
+#undef ab_ref
+#undef ab_subscr
+#undef b_ref
+#undef b_subscr
+
 

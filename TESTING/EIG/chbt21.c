@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,8 +13,8 @@ static complex c_b2 = {1.f,0.f};
 static integer c__1 = 1;
 
 /* Subroutine */ int chbt21_(char *uplo, integer *n, integer *ka, integer *ks,
-	 complex *a, integer *lda, real *d, real *e, complex *u, integer *ldu,
-	 complex *work, real *rwork, real *result)
+	 complex *a, integer *lda, real *d__, real *e, complex *u, integer *
+	ldu, complex *work, real *rwork, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, u_dim1, u_offset, i__1, i__2, i__3, i__4;
@@ -45,7 +46,13 @@ static integer c__1 = 1;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -77,13 +84,11 @@ static integer c__1 = 1;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, CHBT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, CHBT21 does nothing.   
             It must be at least zero.   
 
     KA      (input) INTEGER   
-            The bandwidth of the matrix A.  It must be at least zero.  If 
-  
+            The bandwidth of the matrix A.  It must be at least zero.  If   
             it is larger than N-1, then max( 0, N-1 ) will be used.   
 
     KS      (input) INTEGER   
@@ -126,20 +131,19 @@ static integer c__1 = 1;
             The values computed by the two tests described above.  The   
             values are currently limited to 1/ulp, to avoid overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Constants   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --rwork;
@@ -193,7 +197,7 @@ static integer c__1 = 1;
 	    for (jr = 1; jr <= i__2; ++jr) {
 		++j;
 		i__3 = j;
-		i__4 = jr + jc * a_dim1;
+		i__4 = a_subscr(jr, jc);
 		work[i__3].r = a[i__4].r, work[i__3].i = a[i__4].i;
 /* L10: */
 	    }
@@ -217,7 +221,7 @@ static integer c__1 = 1;
 	    for (jr = min(i__2,i__3); jr >= 0; --jr) {
 		++j;
 		i__2 = j;
-		i__3 = ika + 1 - jr + jc * a_dim1;
+		i__3 = a_subscr(ika + 1 - jr, jc);
 		work[i__2].r = a[i__3].r, work[i__2].i = a[i__3].i;
 /* L40: */
 	    }
@@ -227,8 +231,8 @@ static integer c__1 = 1;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	r__1 = -(doublereal)d[j];
-	chpr_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
+	r__1 = -d__[j];
+	chpr_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &work[1]);
 /* L60: */
     }
 
@@ -237,9 +241,9 @@ static integer c__1 = 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
 	    q__2.r = e[i__2], q__2.i = 0.f;
-	    q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
-	    chpr2_(cuplo, n, &q__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1]);
+	    q__1.r = -q__2.r, q__1.i = -q__2.i;
+	    chpr2_(cuplo, n, &q__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1]);
 /* L70: */
 	}
     }
@@ -276,7 +280,8 @@ static integer c__1 = 1;
     }
 
 /* Computing MIN */
-    r__1 = clange_("1", n, n, &work[1], n, &rwork[1]), r__2 = (real) (*n);
+    r__1 = clange_("1", n, n, &work[1], n, &rwork[1]), r__2 = (
+	    real) (*n);
     result[2] = dmin(r__1,r__2) / (*n * ulp);
 
     return 0;
@@ -284,4 +289,10 @@ static integer c__1 = 1;
 /*     End of CHBT21 */
 
 } /* chbt21_ */
+
+#undef u_ref
+#undef u_subscr
+#undef a_ref
+#undef a_subscr
+
 

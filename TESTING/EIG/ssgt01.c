@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,15 +13,15 @@ static real c_b7 = 0.f;
 static integer c__1 = 1;
 static real c_b12 = -1.f;
 
-/* Subroutine */ int ssgt01_(integer *itype, char *uplo, integer *n, real *a, 
-	integer *lda, real *b, integer *ldb, real *z, integer *ldz, real *d, 
-	real *work, real *result)
+/* Subroutine */ int ssgt01_(integer *itype, char *uplo, integer *n, integer *
+	m, real *a, integer *lda, real *b, integer *ldb, real *z__, integer *
+	ldz, real *d__, real *work, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, z_dim1, z_offset, i__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static real anorm;
     extern /* Subroutine */ int ssymm_(char *, char *, integer *, integer *, 
@@ -32,10 +33,16 @@ static real c_b12 = -1.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
+
+       modified August 1997, a new parameter M is added to the calling   
+       sequence.   
 
 
     Purpose   
@@ -76,6 +83,9 @@ static real c_b12 = -1.f;
     N       (input) INTEGER   
             The order of the matrix A.  N >= 0.   
 
+    M       (input) INTEGER   
+            The number of eigenvalues found.  0 <= M <= N.   
+
     A       (input) REAL array, dimension (LDA, N)   
             The original symmetric matrix A.   
 
@@ -88,13 +98,13 @@ static real c_b12 = -1.f;
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,N).   
 
-    Z       (input) REAL array, dimension (LDZ, N)   
+    Z       (input) REAL array, dimension (LDZ, M)   
             The computed eigenvectors of the generalized eigenproblem.   
 
     LDZ     (input) INTEGER   
             The leading dimension of the array Z.  LDZ >= max(1,N).   
 
-    D       (input) REAL array, dimension (N)   
+    D       (input) REAL array, dimension (M)   
             The computed eigenvalues of the generalized eigenproblem.   
 
     WORK    (workspace) REAL array, dimension (N*N)   
@@ -102,21 +112,20 @@ static real c_b12 = -1.f;
     RESULT  (output) REAL array, dimension (1)   
             The test ratio as described above.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
-    --d;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --d__;
     --work;
     --result;
 
@@ -130,8 +139,7 @@ static real c_b12 = -1.f;
 
 /*     Compute product of 1-norms of A and Z. */
 
-    anorm = slansy_("1", uplo, n, &a[a_offset], lda, &work[1]) * 
-	    slange_("1", n, n, &z[z_offset], ldz, &work[1]);
+    anorm = slansy_("1", uplo, n, &a[a_offset], lda, &work[1]) * slange_("1", n, m, &z__[z_offset], ldz, &work[1]);
     if (anorm == 0.f) {
 	anorm = 1.f;
     }
@@ -140,52 +148,50 @@ static real c_b12 = -1.f;
 
 /*        Norm of AZ - BZD */
 
-	ssymm_("Left", uplo, n, n, &c_b6, &a[a_offset], lda, &z[z_offset], 
+	ssymm_("Left", uplo, n, m, &c_b6, &a[a_offset], lda, &z__[z_offset], 
 		ldz, &c_b7, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    sscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    sscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L10: */
 	}
-	ssymm_("Left", uplo, n, n, &c_b6, &b[b_offset], ldb, &z[z_offset], 
+	ssymm_("Left", uplo, n, m, &c_b6, &b[b_offset], ldb, &z__[z_offset], 
 		ldz, &c_b12, &work[1], n);
 
-	result[1] = slange_("1", n, n, &work[1], n, &work[1]) / anorm / (*
-		n * ulp);
+	result[1] = slange_("1", n, m, &work[1], n, &work[1]) / 
+		anorm / (*n * ulp);
 
     } else if (*itype == 2) {
 
 /*        Norm of ABZ - ZD */
 
-	ssymm_("Left", uplo, n, n, &c_b6, &b[b_offset], ldb, &z[z_offset], 
+	ssymm_("Left", uplo, n, m, &c_b6, &b[b_offset], ldb, &z__[z_offset], 
 		ldz, &c_b7, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    sscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    sscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L20: */
 	}
-	ssymm_("Left", uplo, n, n, &c_b6, &a[a_offset], lda, &work[1], n, &
-		c_b12, &z[z_offset], ldz);
+	ssymm_("Left", uplo, n, m, &c_b6, &a[a_offset], lda, &work[1], n, &
+		c_b12, &z__[z_offset], ldz);
 
-	result[1] = slange_("1", n, n, &z[z_offset], ldz, &work[1]) / 
-		anorm / (*n * ulp);
+	result[1] = slange_("1", n, m, &z__[z_offset], ldz, &work[1]) / anorm / (*n * ulp);
 
     } else if (*itype == 3) {
 
 /*        Norm of BAZ - ZD */
 
-	ssymm_("Left", uplo, n, n, &c_b6, &a[a_offset], lda, &z[z_offset], 
+	ssymm_("Left", uplo, n, m, &c_b6, &a[a_offset], lda, &z__[z_offset], 
 		ldz, &c_b7, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    sscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    sscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L30: */
 	}
-	ssymm_("Left", uplo, n, n, &c_b6, &b[b_offset], ldb, &work[1], n, &
-		c_b12, &z[z_offset], ldz);
+	ssymm_("Left", uplo, n, m, &c_b6, &b[b_offset], ldb, &work[1], n, &
+		c_b12, &z__[z_offset], ldz);
 
-	result[1] = slange_("1", n, n, &z[z_offset], ldz, &work[1]) / 
-		anorm / (*n * ulp);
+	result[1] = slange_("1", n, m, &z__[z_offset], ldz, &work[1]) / anorm / (*n * ulp);
     }
 
     return 0;
@@ -193,4 +199,7 @@ static real c_b12 = -1.f;
 /*     End of SSGT01 */
 
 } /* ssgt01_ */
+
+#undef z___ref
+
 

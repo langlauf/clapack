@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zggbak_(char *job, char *side, integer *n, integer *ilo, 
 	integer *ihi, doublereal *lscale, doublereal *rscale, integer *m, 
 	doublecomplex *v, integer *ldv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,11 +14,9 @@
     Purpose   
     =======   
 
-    ZGGBAK forms the right or left eigenvectors of a complex generalized 
-  
+    ZGGBAK forms the right or left eigenvectors of a complex generalized   
     eigenvalue problem A*x = lambda*B*x, by backward transformation on   
-    the computed eigenvectors of the balanced pair of matrices output by 
-  
+    the computed eigenvectors of the balanced pair of matrices output by   
     ZGGBAL.   
 
     Arguments   
@@ -28,11 +27,9 @@
             = 'N':  do nothing, return immediately;   
             = 'P':  do backward transformation for permutation only;   
             = 'S':  do backward transformation for scaling only;   
-            = 'B':  do backward transformations for both permutation and 
-  
+            = 'B':  do backward transformations for both permutation and   
                     scaling.   
-            JOB must be the same as the argument JOB supplied to ZGGBAL. 
-  
+            JOB must be the same as the argument JOB supplied to ZGGBAL.   
 
     SIDE    (input) CHARACTER*1   
             = 'R':  V contains right eigenvectors;   
@@ -75,38 +72,38 @@
     See R.C. Ward, Balancing the generalized eigenvalue problem,   
                    SIAM J. Sci. Stat. Comp. 2 (1981), 141-152.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer v_dim1, v_offset, i__1;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     extern logical lsame_(char *, char *);
     static logical leftv;
     extern /* Subroutine */ int zswap_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), xerbla_(char *, integer *), 
 	    zdscal_(integer *, doublereal *, doublecomplex *, integer *);
     static logical rightv;
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
 
+    --lscale;
+    --rscale;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
 
-#define LSCALE(I) lscale[(I)-1]
-#define RSCALE(I) rscale[(I)-1]
-
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-
+    /* Function Body */
     rightv = lsame_(side, "R");
     leftv = lsame_(side, "L");
 
     *info = 0;
-    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(
-	    job, "S") && ! lsame_(job, "B")) {
+    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(job, "S") 
+	    && ! lsame_(job, "B")) {
 	*info = -1;
     } else if (! rightv && ! leftv) {
 	*info = -2;
@@ -151,8 +148,8 @@
 
 	if (rightv) {
 	    i__1 = *ihi;
-	    for (i = *ilo; i <= *ihi; ++i) {
-		zdscal_(m, &RSCALE(i), &V(i,1), ldv);
+	    for (i__ = *ilo; i__ <= i__1; ++i__) {
+		zdscal_(m, &rscale[i__], &v_ref(i__, 1), ldv);
 /* L10: */
 	    }
 	}
@@ -161,8 +158,8 @@
 
 	if (leftv) {
 	    i__1 = *ihi;
-	    for (i = *ilo; i <= *ihi; ++i) {
-		zdscal_(m, &LSCALE(i), &V(i,1), ldv);
+	    for (i__ = *ilo; i__ <= i__1; ++i__) {
+		zdscal_(m, &lscale[i__], &v_ref(i__, 1), ldv);
 /* L20: */
 	    }
 	}
@@ -179,12 +176,12 @@ L30:
 	    if (*ilo == 1) {
 		goto L50;
 	    }
-	    for (i = *ilo - 1; i >= 1; --i) {
-		k = (integer) RSCALE(i);
-		if (k == i) {
+	    for (i__ = *ilo - 1; i__ >= 1; --i__) {
+		k = (integer) rscale[i__];
+		if (k == i__) {
 		    goto L40;
 		}
-		zswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		zswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L40:
 		;
 	    }
@@ -194,12 +191,12 @@ L50:
 		goto L70;
 	    }
 	    i__1 = *n;
-	    for (i = *ihi + 1; i <= *n; ++i) {
-		k = (integer) RSCALE(i);
-		if (k == i) {
+	    for (i__ = *ihi + 1; i__ <= i__1; ++i__) {
+		k = (integer) rscale[i__];
+		if (k == i__) {
 		    goto L60;
 		}
-		zswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		zswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L60:
 		;
 	    }
@@ -212,12 +209,12 @@ L70:
 	    if (*ilo == 1) {
 		goto L90;
 	    }
-	    for (i = *ilo - 1; i >= 1; --i) {
-		k = (integer) LSCALE(i);
-		if (k == i) {
+	    for (i__ = *ilo - 1; i__ >= 1; --i__) {
+		k = (integer) lscale[i__];
+		if (k == i__) {
 		    goto L80;
 		}
-		zswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		zswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L80:
 		;
 	    }
@@ -227,12 +224,12 @@ L90:
 		goto L110;
 	    }
 	    i__1 = *n;
-	    for (i = *ihi + 1; i <= *n; ++i) {
-		k = (integer) LSCALE(i);
-		if (k == i) {
+	    for (i__ = *ihi + 1; i__ <= i__1; ++i__) {
+		k = (integer) lscale[i__];
+		if (k == i__) {
 		    goto L100;
 		}
-		zswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		zswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L100:
 		;
 	    }
@@ -246,4 +243,8 @@ L110:
 /*     End of ZGGBAK */
 
 } /* zggbak_ */
+
+#undef v_ref
+#undef v_subscr
+
 

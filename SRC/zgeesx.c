@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgeesx_(char *jobvs, char *sort, L_fp select, char *
@@ -6,10 +7,10 @@
 	rconde, doublereal *rcondv, doublecomplex *work, integer *lwork, 
 	doublereal *rwork, logical *bwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
@@ -48,8 +49,7 @@
 
     SELECT  (input) LOGICAL FUNCTION of one COMPLEX*16 argument   
             SELECT must be declared EXTERNAL in the calling subroutine.   
-            If SORT = 'S', SELECT is used to select eigenvalues to order 
-  
+            If SORT = 'S', SELECT is used to select eigenvalues to order   
             to the top left of the Schur form.   
             If SORT = 'N', SELECT is not referenced.   
             An eigenvalue W(j) is selected if SELECT(W(j)) is true.   
@@ -79,8 +79,7 @@
 
     W       (output) COMPLEX*16 array, dimension (N)   
             W contains the computed eigenvalues, in the same order   
-            that they appear on the diagonal of the output Schur form T. 
-  
+            that they appear on the diagonal of the output Schur form T.   
 
     VS      (output) COMPLEX*16 array, dimension (LDVS,N)   
             If JOBVS = 'V', VS contains the unitary matrix Z of Schur   
@@ -93,8 +92,7 @@
 
     RCONDE  (output) DOUBLE PRECISION   
             If SENSE = 'E' or 'B', RCONDE contains the reciprocal   
-            condition number for the average of the selected eigenvalues. 
-  
+            condition number for the average of the selected eigenvalues.   
             Not referenced if SENSE = 'N' or 'V'.   
 
     RCONDV  (output) DOUBLE PRECISION   
@@ -107,10 +105,8 @@
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.  LWORK >= max(1,2*N).   
-            Also, if SENSE = 'E' or 'V' or 'B', LWORK >= 2*SDIM*(N-SDIM), 
-  
-            where SDIM is the number of selected eigenvalues computed by 
-  
+            Also, if SENSE = 'E' or 'V' or 'B', LWORK >= 2*SDIM*(N-SDIM),   
+            where SDIM is the number of selected eigenvalues computed by   
             this routine.  Note that 2*SDIM*(N-SDIM) <= N*N/2.   
             For good performance, LWORK must generally be larger.   
 
@@ -128,26 +124,20 @@
                      contain those eigenvalues which have converged; if   
                      JOBVS = 'V', VS contains the transformation which   
                      reduces A to its partially converged Schur form.   
-               = N+1: the eigenvalues could not be reordered because some 
-  
-                     eigenvalues were too close to separate (the problem 
-  
+               = N+1: the eigenvalues could not be reordered because some   
+                     eigenvalues were too close to separate (the problem   
                      is very ill-conditioned);   
                = N+2: after reordering, roundoff changed values of some   
                      complex eigenvalues so that leading eigenvalues in   
-                     the Schur form no longer satisfy SELECT=.TRUE.  This 
-  
+                     the Schur form no longer satisfy SELECT=.TRUE.  This   
                      could also be caused by underflow due to scaling.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c__0 = 0;
@@ -162,7 +152,7 @@
     /* Local variables */
     static integer ibal, maxb;
     static doublereal anrm;
-    static integer ierr, itau, iwrk, i, k, icond, ieval;
+    static integer ierr, itau, iwrk, i__, k, icond, ieval;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), dlabad_(doublereal *, doublereal *);
@@ -208,16 +198,18 @@
     static doublereal dum[1], eps;
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --w;
+    vs_dim1 = *ldvs;
+    vs_offset = 1 + vs_dim1 * 1;
+    vs -= vs_offset;
+    --work;
+    --rwork;
+    --bwork;
 
-#define DUM(I) dum[(I)]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define BWORK(I) bwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define VS(I,J) vs[(I)-1 + ((J)-1)* ( *ldvs)]
-
+    /* Function Body */
     *info = 0;
     wantvs = lsame_(jobvs, "V");
     wantst = lsame_(sort, "S");
@@ -250,26 +242,26 @@
          HSWORK refers to the workspace preferred by ZHSEQR, as   
          calculated below. HSWORK is computed assuming ILO=1 and IHI=N,   
          the worst case.   
-         If SENSE = 'E', 'V' or 'B', then the amount of workspace needed 
-  
+         If SENSE = 'E', 'V' or 'B', then the amount of workspace needed   
          depends on SDIM, which is computed by the routine ZTRSEN later   
          in the code.) */
 
     minwrk = 1;
     if (*info == 0 && *lwork >= 1) {
-	maxwrk = *n + *n * ilaenv_(&c__1, "ZGEHRD", " ", n, &c__1, n, &c__0, 
-		6L, 1L);
+	maxwrk = *n + *n * ilaenv_(&c__1, "ZGEHRD", " ", n, &c__1, n, &c__0, (
+		ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 	i__1 = 1, i__2 = *n << 1;
 	minwrk = max(i__1,i__2);
 	if (! wantvs) {
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "ZHSEQR", "SN", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "ZHSEQR", "SN", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "ZHSEQR", "SN", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -281,15 +273,16 @@
 	} else {
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n + (*n - 1) * ilaenv_(&c__1, "ZUNGHR", 
-		    " ", n, &c__1, n, &c_n1, 6L, 1L);
+		    " ", n, &c__1, n, &c_n1, (ftnlen)6, (ftnlen)1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "ZHSEQR", "SV", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "ZHSEQR", "SV", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "ZHSEQR", "SV", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -299,7 +292,7 @@
 	    i__1 = max(maxwrk,hswork);
 	    maxwrk = max(i__1,1);
 	}
-	WORK(1).r = (doublereal) maxwrk, WORK(1).i = 0.;
+	work[1].r = (doublereal) maxwrk, work[1].i = 0.;
     }
     if (*lwork < minwrk) {
 	*info = -15;
@@ -328,7 +321,7 @@
 
 /*     Scale A if max element outside range [SMLNUM,BIGNUM] */
 
-    anrm = zlange_("M", n, n, &A(1,1), lda, dum);
+    anrm = zlange_("M", n, n, &a[a_offset], lda, dum);
     scalea = FALSE_;
     if (anrm > 0. && anrm < smlnum) {
 	scalea = TRUE_;
@@ -338,7 +331,7 @@
 	cscale = bignum;
     }
     if (scalea) {
-	zlascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &A(1,1), lda, &
+	zlascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &a[a_offset], lda, &
 		ierr);
     }
 
@@ -348,7 +341,7 @@
        (RWorkspace: need N) */
 
     ibal = 1;
-    zgebal_("P", n, &A(1,1), lda, &ilo, &ihi, &RWORK(ibal), &ierr);
+    zgebal_("P", n, &a[a_offset], lda, &ilo, &ihi, &rwork[ibal], &ierr);
 
 /*     Reduce to upper Hessenberg form   
        (CWorkspace: need 2*N, prefer N+N*NB)   
@@ -357,34 +350,35 @@
     itau = 1;
     iwrk = *n + itau;
     i__1 = *lwork - iwrk + 1;
-    zgehrd_(n, &ilo, &ihi, &A(1,1), lda, &WORK(itau), &WORK(iwrk), &i__1,
+    zgehrd_(n, &ilo, &ihi, &a[a_offset], lda, &work[itau], &work[iwrk], &i__1,
 	     &ierr);
 
     if (wantvs) {
 
 /*        Copy Householder vectors to VS */
 
-	zlacpy_("L", n, n, &A(1,1), lda, &VS(1,1), ldvs);
+	zlacpy_("L", n, n, &a[a_offset], lda, &vs[vs_offset], ldvs)
+		;
 
 /*        Generate unitary matrix in VS   
           (CWorkspace: need 2*N-1, prefer N+(N-1)*NB)   
           (RWorkspace: none) */
 
 	i__1 = *lwork - iwrk + 1;
-	zunghr_(n, &ilo, &ihi, &VS(1,1), ldvs, &WORK(itau), &WORK(iwrk),
+	zunghr_(n, &ilo, &ihi, &vs[vs_offset], ldvs, &work[itau], &work[iwrk],
 		 &i__1, &ierr);
     }
 
     *sdim = 0;
 
-/*     Perform QR iteration, accumulating Schur vectors in VS if desired 
-  
+/*     Perform QR iteration, accumulating Schur vectors in VS if desired   
        (CWorkspace: need 1, prefer HSWORK (see comments) )   
        (RWorkspace: none) */
 
     iwrk = itau;
     i__1 = *lwork - iwrk + 1;
-    zhseqr_("S", jobvs, n, &ilo, &ihi, &A(1,1), lda, &W(1), &VS(1,1), ldvs, &WORK(iwrk), &i__1, &ieval);
+    zhseqr_("S", jobvs, n, &ilo, &ihi, &a[a_offset], lda, &w[1], &vs[
+	    vs_offset], ldvs, &work[iwrk], &i__1, &ieval);
     if (ieval > 0) {
 	*info = ieval;
     }
@@ -393,12 +387,12 @@
 
     if (wantst && *info == 0) {
 	if (scalea) {
-	    zlascl_("G", &c__0, &c__0, &cscale, &anrm, n, &c__1, &W(1), n, &
+	    zlascl_("G", &c__0, &c__0, &cscale, &anrm, n, &c__1, &w[1], n, &
 		    ierr);
 	}
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    BWORK(i) = (*select)(&W(i));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    bwork[i__] = (*select)(&w[i__]);
 /* L10: */
 	}
 
@@ -409,8 +403,8 @@
           (RWorkspace: none) */
 
 	i__1 = *lwork - iwrk + 1;
-	ztrsen_(sense, jobvs, &BWORK(1), n, &A(1,1), lda, &VS(1,1),
-		 ldvs, &W(1), sdim, rconde, rcondv, &WORK(iwrk), &i__1, &
+	ztrsen_(sense, jobvs, &bwork[1], n, &a[a_offset], lda, &vs[vs_offset],
+		 ldvs, &w[1], sdim, rconde, rcondv, &work[iwrk], &i__1, &
 		icond);
 	if (! wantsn) {
 /* Computing MAX */
@@ -431,7 +425,7 @@
           (CWorkspace: none)   
           (RWorkspace: need N) */
 
-	zgebak_("P", "R", n, &ilo, &ihi, &RWORK(ibal), n, &VS(1,1), 
+	zgebak_("P", "R", n, &ilo, &ihi, &rwork[ibal], n, &vs[vs_offset], 
 		ldvs, &ierr);
     }
 
@@ -439,19 +433,19 @@
 
 /*        Undo scaling for the Schur form of A */
 
-	zlascl_("U", &c__0, &c__0, &cscale, &anrm, n, n, &A(1,1), lda, &
+	zlascl_("U", &c__0, &c__0, &cscale, &anrm, n, n, &a[a_offset], lda, &
 		ierr);
 	i__1 = *lda + 1;
-	zcopy_(n, &A(1,1), &i__1, &W(1), &c__1);
+	zcopy_(n, &a[a_offset], &i__1, &w[1], &c__1);
 	if ((wantsv || wantsb) && *info == 0) {
-	    DUM(0) = *rcondv;
+	    dum[0] = *rcondv;
 	    dlascl_("G", &c__0, &c__0, &cscale, &anrm, &c__1, &c__1, dum, &
 		    c__1, &ierr);
-	    *rcondv = DUM(0);
+	    *rcondv = dum[0];
 	}
     }
 
-    WORK(1).r = (doublereal) maxwrk, WORK(1).i = 0.;
+    work[1].r = (doublereal) maxwrk, work[1].i = 0.;
     return 0;
 
 /*     End of ZGEESX */

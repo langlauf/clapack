@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,16 +37,16 @@ static integer c_n1 = -1;
     static integer mode;
     static char path[3], dist[1];
     static doublereal unfl, rexp;
-    static char type[1];
+    static char type__[1];
     static doublereal texp;
     extern /* Subroutine */ int zrot_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *);
     static doublecomplex star1;
-    static doublereal c;
+    static doublereal c__;
     static doublecomplex plus1, plus2;
-    static integer i, j;
+    static integer i__, j;
     static doublecomplex s;
-    static doublereal bscal, x, y, z;
+    static doublereal bscal, x, y, z__;
     extern logical lsame_(char *, char *);
     static doublereal tscal, anorm, bnorm, tleft;
     static logical upper;
@@ -79,7 +80,11 @@ static integer c_n1 = -1;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -126,12 +131,9 @@ static integer c_n1 = -1;
     A       (output) COMPLEX*16 array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading N x N   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading N x N lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading N x N lower   
+            triangular part of the array A contains the lower triangular   
             matrix and the strictly upper triangular part of A is not   
             referenced.   
 
@@ -149,22 +151,21 @@ static integer c_n1 = -1;
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --b;
     --work;
     --rwork;
 
     /* Function Body */
-    *(unsigned char *)path = 'Z';
-    s_copy(path + 1, "TR", 2L, 2L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "TR", (ftnlen)2, (ftnlen)2);
     unfl = dlamch_("Safe minimum");
     ulp = dlamch_("Epsilon") * dlamch_("Base");
     smlnum = unfl;
@@ -187,18 +188,18 @@ static integer c_n1 = -1;
 
     upper = lsame_(uplo, "U");
     if (upper) {
-	zlatb4_(path, imat, n, n, type, &kl, &ku, &anorm, &mode, &cndnum, 
+	zlatb4_(path, imat, n, n, type__, &kl, &ku, &anorm, &mode, &cndnum, 
 		dist);
     } else {
 	i__1 = -(*imat);
-	zlatb4_(path, &i__1, n, n, type, &kl, &ku, &anorm, &mode, &cndnum, 
+	zlatb4_(path, &i__1, n, n, type__, &kl, &ku, &anorm, &mode, &cndnum, 
 		dist);
     }
 
 /*     IMAT <= 6:  Non-unit triangular matrix */
 
     if (*imat <= 6) {
-	zlatms_(n, n, dist, &iseed[1], type, &rwork[1], &mode, &cndnum, &
+	zlatms_(n, n, dist, &iseed[1], type__, &rwork[1], &mode, &cndnum, &
 		anorm, &kl, &ku, "No packing", &a[a_offset], lda, &work[1], 
 		info);
 
@@ -212,23 +213,23 @@ static integer c_n1 = -1;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L10: */
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = (doublereal) j, a[i__2].i = 0.;
 /* L20: */
 	    }
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = (doublereal) j, a[i__2].i = 0.;
 		i__2 = *n;
-		for (i = j + 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L30: */
 		}
@@ -247,23 +248,23 @@ static integer c_n1 = -1;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L50: */
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = (doublereal) j, a[i__2].i = 0.;
 /* L60: */
 	    }
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = (doublereal) j, a[i__2].i = 0.;
 		i__2 = *n;
-		for (i = j + 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L70: */
 		}
@@ -271,13 +272,10 @@ static integer c_n1 = -1;
 	    }
 	}
 
-/*        Since the trace of a unit triangular matrix is 1, the produc
-t   
+/*        Since the trace of a unit triangular matrix is 1, the product   
           of its singular values must be 1.  Let s = sqrt(CNDNUM),   
-          x = sqrt(s) - 1/sqrt(s), y = sqrt(2/(n-2))*x, and z = x**2. 
-  
-          The following triangular matrix has singular values s, 1, 1,
-   
+          x = sqrt(s) - 1/sqrt(s), y = sqrt(2/(n-2))*x, and z = x**2.   
+          The following triangular matrix has singular values s, 1, 1,   
           ..., 1, 1/s:   
 
           1  y  y  y  ...  y  y  z   
@@ -289,8 +287,7 @@ t
                               1  y   
                                  1   
 
-          To fill in the zeros, we first multiply by a matrix with sma
-ll   
+          To fill in the zeros, we first multiply by a matrix with small   
           condition number of the form   
 
           1  0  0  0  0  ...   
@@ -303,16 +300,11 @@ ll
                                1  0   
                                   1   
 
-          Each element marked with a '*' is formed by taking the produ
-ct   
-          of the adjacent elements marked with '+'.  The '*'s can be 
-  
-          chosen freely, and the '+'s are chosen so that the inverse o
-f   
-          T will have elements of the same magnitude as T.  If the *'s
- in   
-          both T and inv(T) have small magnitude, T is well conditione
-d.   
+          Each element marked with a '*' is formed by taking the product   
+          of the adjacent elements marked with '+'.  The '*'s can be   
+          chosen freely, and the '+'s are chosen so that the inverse of   
+          T will have elements of the same magnitude as T.  If the *'s in   
+          both T and inv(T) have small magnitude, T is well conditioned.   
           The two offdiagonals of T are stored in WORK.   
 
           The product of these two matrices has the form   
@@ -384,52 +376,50 @@ d.
 	} else {
 	    y = 0.;
 	}
-	z = x * x;
+	z__ = x * x;
 
 	if (upper) {
 	    if (*n > 3) {
 		i__1 = *n - 3;
 		i__2 = *lda + 1;
-		zcopy_(&i__1, &work[1], &c__1, &a[a_dim1 * 3 + 2], &i__2);
+		zcopy_(&i__1, &work[1], &c__1, &a_ref(2, 3), &i__2);
 		if (*n > 4) {
 		    i__1 = *n - 4;
 		    i__2 = *lda + 1;
-		    zcopy_(&i__1, &work[*n + 1], &c__1, &a[(a_dim1 << 2) + 2],
-			     &i__2);
+		    zcopy_(&i__1, &work[*n + 1], &c__1, &a_ref(2, 4), &i__2);
 		}
 	    }
 	    i__1 = *n - 1;
 	    for (j = 2; j <= i__1; ++j) {
-		i__2 = j * a_dim1 + 1;
+		i__2 = a_subscr(1, j);
 		a[i__2].r = y, a[i__2].i = 0.;
-		i__2 = j + *n * a_dim1;
+		i__2 = a_subscr(j, *n);
 		a[i__2].r = y, a[i__2].i = 0.;
 /* L100: */
 	    }
-	    i__1 = *n * a_dim1 + 1;
-	    a[i__1].r = z, a[i__1].i = 0.;
+	    i__1 = a_subscr(1, *n);
+	    a[i__1].r = z__, a[i__1].i = 0.;
 	} else {
 	    if (*n > 3) {
 		i__1 = *n - 3;
 		i__2 = *lda + 1;
-		zcopy_(&i__1, &work[1], &c__1, &a[(a_dim1 << 1) + 3], &i__2);
+		zcopy_(&i__1, &work[1], &c__1, &a_ref(3, 2), &i__2);
 		if (*n > 4) {
 		    i__1 = *n - 4;
 		    i__2 = *lda + 1;
-		    zcopy_(&i__1, &work[*n + 1], &c__1, &a[(a_dim1 << 1) + 4],
-			     &i__2);
+		    zcopy_(&i__1, &work[*n + 1], &c__1, &a_ref(4, 2), &i__2);
 		}
 	    }
 	    i__1 = *n - 1;
 	    for (j = 2; j <= i__1; ++j) {
-		i__2 = j + a_dim1;
+		i__2 = a_subscr(j, 1);
 		a[i__2].r = y, a[i__2].i = 0.;
-		i__2 = *n + j * a_dim1;
+		i__2 = a_subscr(*n, j);
 		a[i__2].r = y, a[i__2].i = 0.;
 /* L110: */
 	    }
-	    i__1 = *n + a_dim1;
-	    a[i__1].r = z, a[i__1].i = 0.;
+	    i__1 = a_subscr(*n, 1);
+	    a[i__1].r = z__, a[i__1].i = 0.;
 	}
 
 /*        Fill in the zeros using Givens rotations. */
@@ -437,35 +427,33 @@ d.
 	if (upper) {
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
-		i__2 = j + (j + 1) * a_dim1;
+		i__2 = a_subscr(j, j + 1);
 		ra.r = a[i__2].r, ra.i = a[i__2].i;
 		rb.r = 2., rb.i = 0.;
-		zrotg_(&ra, &rb, &c, &s);
+		zrotg_(&ra, &rb, &c__, &s);
 
-/*              Multiply by [ c  s; -conjg(s)  c] on the left.
- */
+/*              Multiply by [ c  s; -conjg(s)  c] on the left. */
 
 		if (*n > j + 1) {
 		    i__2 = *n - j - 1;
-		    zrot_(&i__2, &a[j + (j + 2) * a_dim1], lda, &a[j + 1 + (j 
-			    + 2) * a_dim1], lda, &c, &s);
+		    zrot_(&i__2, &a_ref(j, j + 2), lda, &a_ref(j + 1, j + 2), 
+			    lda, &c__, &s);
 		}
 
-/*              Multiply by [-c -s;  conjg(s) -c] on the right
-. */
+/*              Multiply by [-c -s;  conjg(s) -c] on the right. */
 
 		if (j > 1) {
 		    i__2 = j - 1;
-		    d__1 = -c;
+		    d__1 = -c__;
 		    z__1.r = -s.r, z__1.i = -s.i;
-		    zrot_(&i__2, &a[(j + 1) * a_dim1 + 1], &c__1, &a[j * 
-			    a_dim1 + 1], &c__1, &d__1, &z__1);
+		    zrot_(&i__2, &a_ref(1, j + 1), &c__1, &a_ref(1, j), &c__1,
+			     &d__1, &z__1);
 		}
 
 /*              Negate A(J,J+1). */
 
-		i__2 = j + (j + 1) * a_dim1;
-		i__3 = j + (j + 1) * a_dim1;
+		i__2 = a_subscr(j, j + 1);
+		i__3 = a_subscr(j, j + 1);
 		z__1.r = -a[i__3].r, z__1.i = -a[i__3].i;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L120: */
@@ -473,65 +461,57 @@ d.
 	} else {
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
-		i__2 = j + 1 + j * a_dim1;
+		i__2 = a_subscr(j + 1, j);
 		ra.r = a[i__2].r, ra.i = a[i__2].i;
 		rb.r = 2., rb.i = 0.;
-		zrotg_(&ra, &rb, &c, &s);
+		zrotg_(&ra, &rb, &c__, &s);
 		d_cnjg(&z__1, &s);
 		s.r = z__1.r, s.i = z__1.i;
 
-/*              Multiply by [ c -s;  conjg(s) c] on the right.
- */
+/*              Multiply by [ c -s;  conjg(s) c] on the right. */
 
 		if (*n > j + 1) {
 		    i__2 = *n - j - 1;
 		    z__1.r = -s.r, z__1.i = -s.i;
-		    zrot_(&i__2, &a[j + 2 + (j + 1) * a_dim1], &c__1, &a[j + 
-			    2 + j * a_dim1], &c__1, &c, &z__1);
+		    zrot_(&i__2, &a_ref(j + 2, j + 1), &c__1, &a_ref(j + 2, j)
+			    , &c__1, &c__, &z__1);
 		}
 
-/*              Multiply by [-c  s; -conjg(s) -c] on the left.
- */
+/*              Multiply by [-c  s; -conjg(s) -c] on the left. */
 
 		if (j > 1) {
 		    i__2 = j - 1;
-		    d__1 = -c;
-		    zrot_(&i__2, &a[j + a_dim1], lda, &a[j + 1 + a_dim1], lda,
-			     &d__1, &s);
+		    d__1 = -c__;
+		    zrot_(&i__2, &a_ref(j, 1), lda, &a_ref(j + 1, 1), lda, &
+			    d__1, &s);
 		}
 
 /*              Negate A(J+1,J). */
 
-		i__2 = j + 1 + j * a_dim1;
-		i__3 = j + 1 + j * a_dim1;
+		i__2 = a_subscr(j + 1, j);
+		i__3 = a_subscr(j + 1, j);
 		z__1.r = -a[i__3].r, z__1.i = -a[i__3].i;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L130: */
 	    }
 	}
 
-/*     IMAT > 10:  Pathological test cases.  These triangular matrices
-   
-       are badly scaled or badly conditioned, so when used in solving 
-a   
-       triangular system they may cause overflow in the solution vecto
-r. */
+/*     IMAT > 10:  Pathological test cases.  These triangular matrices   
+       are badly scaled or badly conditioned, so when used in solving a   
+       triangular system they may cause overflow in the solution vector. */
 
     } else if (*imat == 11) {
 
-/*        Type 11:  Generate a triangular matrix with elements between
-   
-          -1 and 1. Give the diagonal norm 2 to make it well-condition
-ed.   
-          Make the right hand side large so that it requires scaling. 
-*/
+/*        Type 11:  Generate a triangular matrix with elements between   
+          -1 and 1. Give the diagonal norm 2 to make it well-conditioned.   
+          Make the right hand side large so that it requires scaling. */
 
 	if (upper) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		zlarnv_(&c__4, &iseed[1], &i__2, &a[j * a_dim1 + 1]);
-		i__2 = j + j * a_dim1;
+		zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(1, j));
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = z__2.r * 2., z__1.i = z__2.i * 2.;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -542,9 +522,9 @@ ed.
 	    for (j = 1; j <= i__1; ++j) {
 		if (j < *n) {
 		    i__2 = *n - j;
-		    zlarnv_(&c__4, &iseed[1], &i__2, &a[j + 1 + j * a_dim1]);
+		    zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(j + 1, j));
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = z__2.r * 2., z__1.i = z__2.i * 2.;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -552,8 +532,7 @@ ed.
 	    }
 	}
 
-/*        Set the right hand side so that the largest value is BIGNUM.
- */
+/*        Set the right hand side so that the largest value is BIGNUM. */
 
 	zlarnv_(&c__2, &iseed[1], n, &b[1]);
 	iy = izamax_(n, &b[1], &c__1);
@@ -563,11 +542,9 @@ ed.
 
     } else if (*imat == 12) {
 
-/*        Type 12:  Make the first diagonal element in the solve small
- to   
+/*        Type 12:  Make the first diagonal element in the solve small to   
           cause immediate overflow when dividing by T(j,j).   
-          In type 12, the offdiagonal elements are small (CNORM(j) < 1
-). */
+          In type 12, the offdiagonal elements are small (CNORM(j) < 1). */
 
 	zlarnv_(&c__2, &iseed[1], n, &b[1]);
 /* Computing MAX */
@@ -577,16 +554,16 @@ ed.
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		zlarnv_(&c__4, &iseed[1], &i__2, &a[j * a_dim1 + 1]);
+		zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(1, j));
 		i__2 = j - 1;
-		zdscal_(&i__2, &tscal, &a[j * a_dim1 + 1], &c__1);
-		i__2 = j + j * a_dim1;
+		zdscal_(&i__2, &tscal, &a_ref(1, j), &c__1);
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__1, &c__5, &iseed[1]);
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L160: */
 	    }
-	    i__1 = *n + *n * a_dim1;
-	    i__2 = *n + *n * a_dim1;
+	    i__1 = a_subscr(*n, *n);
+	    i__2 = a_subscr(*n, *n);
 	    z__1.r = smlnum * a[i__2].r, z__1.i = smlnum * a[i__2].i;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 	} else {
@@ -594,42 +571,40 @@ ed.
 	    for (j = 1; j <= i__1; ++j) {
 		if (j < *n) {
 		    i__2 = *n - j;
-		    zlarnv_(&c__4, &iseed[1], &i__2, &a[j + 1 + j * a_dim1]);
+		    zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(j + 1, j));
 		    i__2 = *n - j;
-		    zdscal_(&i__2, &tscal, &a[j + 1 + j * a_dim1], &c__1);
+		    zdscal_(&i__2, &tscal, &a_ref(j + 1, j), &c__1);
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__1, &c__5, &iseed[1]);
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L170: */
 	    }
-	    i__1 = a_dim1 + 1;
-	    i__2 = a_dim1 + 1;
+	    i__1 = a_subscr(1, 1);
+	    i__2 = a_subscr(1, 1);
 	    z__1.r = smlnum * a[i__2].r, z__1.i = smlnum * a[i__2].i;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 	}
 
     } else if (*imat == 13) {
 
-/*        Type 13:  Make the first diagonal element in the solve small
- to   
+/*        Type 13:  Make the first diagonal element in the solve small to   
           cause immediate overflow when dividing by T(j,j).   
-          In type 13, the offdiagonal elements are O(1) (CNORM(j) > 1)
-. */
+          In type 13, the offdiagonal elements are O(1) (CNORM(j) > 1). */
 
 	zlarnv_(&c__2, &iseed[1], n, &b[1]);
 	if (upper) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		zlarnv_(&c__4, &iseed[1], &i__2, &a[j * a_dim1 + 1]);
-		i__2 = j + j * a_dim1;
+		zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(1, j));
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__1, &c__5, &iseed[1]);
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L180: */
 	    }
-	    i__1 = *n + *n * a_dim1;
-	    i__2 = *n + *n * a_dim1;
+	    i__1 = a_subscr(*n, *n);
+	    i__2 = a_subscr(*n, *n);
 	    z__1.r = smlnum * a[i__2].r, z__1.i = smlnum * a[i__2].i;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 	} else {
@@ -637,43 +612,41 @@ ed.
 	    for (j = 1; j <= i__1; ++j) {
 		if (j < *n) {
 		    i__2 = *n - j;
-		    zlarnv_(&c__4, &iseed[1], &i__2, &a[j + 1 + j * a_dim1]);
+		    zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(j + 1, j));
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__1, &c__5, &iseed[1]);
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L190: */
 	    }
-	    i__1 = a_dim1 + 1;
-	    i__2 = a_dim1 + 1;
+	    i__1 = a_subscr(1, 1);
+	    i__2 = a_subscr(1, 1);
 	    z__1.r = smlnum * a[i__2].r, z__1.i = smlnum * a[i__2].i;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 	}
 
     } else if (*imat == 14) {
 
-/*        Type 14:  T is diagonal with small numbers on the diagonal t
-o   
-          make the growth factor underflow, but a small right hand sid
-e   
+/*        Type 14:  T is diagonal with small numbers on the diagonal to   
+          make the growth factor underflow, but a small right hand side   
           chosen so that the solution does not overflow. */
 
 	if (upper) {
 	    jcount = 1;
 	    for (j = *n; j >= 1; --j) {
 		i__1 = j - 1;
-		for (i = 1; i <= i__1; ++i) {
-		    i__2 = i + j * a_dim1;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    i__2 = a_subscr(i__, j);
 		    a[i__2].r = 0., a[i__2].i = 0.;
 /* L200: */
 		}
 		if (jcount <= 2) {
-		    i__1 = j + j * a_dim1;
+		    i__1 = a_subscr(j, j);
 		    zlarnd_(&z__2, &c__5, &iseed[1]);
 		    z__1.r = smlnum * z__2.r, z__1.i = smlnum * z__2.i;
 		    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 		} else {
-		    i__1 = j + j * a_dim1;
+		    i__1 = a_subscr(j, j);
 		    zlarnd_(&z__1, &c__5, &iseed[1]);
 		    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 		}
@@ -688,18 +661,18 @@ e
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = j + 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L220: */
 		}
 		if (jcount <= 2) {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    zlarnd_(&z__2, &c__5, &iseed[1]);
 		    z__1.r = smlnum * z__2.r, z__1.i = smlnum * z__2.i;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 		} else {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    zlarnd_(&z__1, &c__5, &iseed[1]);
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 		}
@@ -715,10 +688,10 @@ e
 
 	if (upper) {
 	    b[1].r = 0., b[1].i = 0.;
-	    for (i = *n; i >= 2; i += -2) {
-		i__1 = i;
+	    for (i__ = *n; i__ >= 2; i__ += -2) {
+		i__1 = i__;
 		b[i__1].r = 0., b[i__1].i = 0.;
-		i__1 = i - 1;
+		i__1 = i__ - 1;
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = smlnum * z__2.r, z__1.i = smlnum * z__2.i;
 		b[i__1].r = z__1.r, b[i__1].i = z__1.i;
@@ -728,10 +701,10 @@ e
 	    i__1 = *n;
 	    b[i__1].r = 0., b[i__1].i = 0.;
 	    i__1 = *n - 1;
-	    for (i = 1; i <= i__1; i += 2) {
-		i__2 = i;
+	    for (i__ = 1; i__ <= i__1; i__ += 2) {
+		i__2 = i__;
 		b[i__2].r = 0., b[i__2].i = 0.;
-		i__2 = i + 1;
+		i__2 = i__ + 1;
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = smlnum * z__2.r, z__1.i = smlnum * z__2.i;
 		b[i__2].r = z__1.r, b[i__2].i = z__1.i;
@@ -741,10 +714,8 @@ e
 
     } else if (*imat == 15) {
 
-/*        Type 15:  Make the diagonal elements small to cause gradual 
-  
-          overflow when dividing by T(j,j).  To control the amount of 
-  
+/*        Type 15:  Make the diagonal elements small to cause gradual   
+          overflow when dividing by T(j,j).  To control the amount of   
           scaling needed, the matrix is bidiagonal.   
 
    Computing MAX */
@@ -756,16 +727,16 @@ e
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 2;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L260: */
 		}
 		if (j > 1) {
-		    i__2 = j - 1 + j * a_dim1;
+		    i__2 = a_subscr(j - 1, j);
 		    a[i__2].r = -1., a[i__2].i = -1.;
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = tscal * z__2.r, z__1.i = tscal * z__2.i;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -777,16 +748,16 @@ e
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = j + 2; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
+		for (i__ = j + 2; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
 		    a[i__3].r = 0., a[i__3].i = 0.;
 /* L280: */
 		}
 		if (j < *n) {
-		    i__2 = j + 1 + j * a_dim1;
+		    i__2 = a_subscr(j + 1, j);
 		    a[i__2].r = -1., a[i__2].i = -1.;
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		zlarnd_(&z__2, &c__5, &iseed[1]);
 		z__1.r = tscal * z__2.r, z__1.i = tscal * z__2.i;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -804,14 +775,14 @@ e
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		zlarnv_(&c__4, &iseed[1], &i__2, &a[j * a_dim1 + 1]);
+		zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(1, j));
 		if (j != iy) {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    zlarnd_(&z__2, &c__5, &iseed[1]);
 		    z__1.r = z__2.r * 2., z__1.i = z__2.i * 2.;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 		} else {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    a[i__2].r = 0., a[i__2].i = 0.;
 		}
 /* L300: */
@@ -821,15 +792,15 @@ e
 	    for (j = 1; j <= i__1; ++j) {
 		if (j < *n) {
 		    i__2 = *n - j;
-		    zlarnv_(&c__4, &iseed[1], &i__2, &a[j + 1 + j * a_dim1]);
+		    zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(j + 1, j));
 		}
 		if (j != iy) {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    zlarnd_(&z__2, &c__5, &iseed[1]);
 		    z__1.r = z__2.r * 2., z__1.i = z__2.i * 2.;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 		} else {
-		    i__2 = j + j * a_dim1;
+		    i__2 = a_subscr(j, j);
 		    a[i__2].r = 0., a[i__2].i = 0.;
 		}
 /* L310: */
@@ -840,12 +811,9 @@ e
 
     } else if (*imat == 17) {
 
-/*        Type 17:  Make the offdiagonal elements large to cause overf
-low   
-          when adding a column of T.  In the non-transposed case, the 
-  
-          matrix is constructed to cause overflow when adding a column
- in   
+/*        Type 17:  Make the offdiagonal elements large to cause overflow   
+          when adding a column of T.  In the non-transposed case, the   
+          matrix is constructed to cause overflow when adding a column in   
           every other step. */
 
 	tscal = unfl / ulp;
@@ -853,8 +821,8 @@ low
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * a_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
 		a[i__3].r = 0., a[i__3].i = 0.;
 /* L320: */
 	    }
@@ -863,19 +831,19 @@ low
 	texp = 1.;
 	if (upper) {
 	    for (j = *n; j >= 2; j += -2) {
-		i__1 = j * a_dim1 + 1;
+		i__1 = a_subscr(1, j);
 		d__1 = -tscal / (doublereal) (*n + 1);
 		a[i__1].r = d__1, a[i__1].i = 0.;
-		i__1 = j + j * a_dim1;
+		i__1 = a_subscr(j, j);
 		a[i__1].r = 1., a[i__1].i = 0.;
 		i__1 = j;
 		d__1 = texp * (1. - ulp);
 		b[i__1].r = d__1, b[i__1].i = 0.;
-		i__1 = (j - 1) * a_dim1 + 1;
+		i__1 = a_subscr(1, j - 1);
 		d__1 = -(tscal / (doublereal) (*n + 1)) / (doublereal) (*n + 
 			2);
 		a[i__1].r = d__1, a[i__1].i = 0.;
-		i__1 = j - 1 + (j - 1) * a_dim1;
+		i__1 = a_subscr(j - 1, j - 1);
 		a[i__1].r = 1., a[i__1].i = 0.;
 		i__1 = j - 1;
 		d__1 = texp * (doublereal) (*n * *n + *n - 1);
@@ -888,19 +856,19 @@ low
 	} else {
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; j += 2) {
-		i__2 = *n + j * a_dim1;
+		i__2 = a_subscr(*n, j);
 		d__1 = -tscal / (doublereal) (*n + 1);
 		a[i__2].r = d__1, a[i__2].i = 0.;
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = 1., a[i__2].i = 0.;
 		i__2 = j;
 		d__1 = texp * (1. - ulp);
 		b[i__2].r = d__1, b[i__2].i = 0.;
-		i__2 = *n + (j + 1) * a_dim1;
+		i__2 = a_subscr(*n, j + 1);
 		d__1 = -(tscal / (doublereal) (*n + 1)) / (doublereal) (*n + 
 			2);
 		a[i__2].r = d__1, a[i__2].i = 0.;
-		i__2 = j + 1 + (j + 1) * a_dim1;
+		i__2 = a_subscr(j + 1, j + 1);
 		a[i__2].r = 1., a[i__2].i = 0.;
 		i__2 = j + 1;
 		d__1 = texp * (doublereal) (*n * *n + *n - 1);
@@ -916,16 +884,15 @@ low
     } else if (*imat == 18) {
 
 /*        Type 18:  Generate a unit triangular matrix with elements   
-          between -1 and 1, and make the right hand side large so that
- it   
+          between -1 and 1, and make the right hand side large so that it   
           requires scaling. */
 
 	if (upper) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		zlarnv_(&c__4, &iseed[1], &i__2, &a[j * a_dim1 + 1]);
-		i__2 = j + j * a_dim1;
+		zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(1, j));
+		i__2 = a_subscr(j, j);
 		a[i__2].r = 0., a[i__2].i = 0.;
 /* L360: */
 	    }
@@ -934,16 +901,15 @@ low
 	    for (j = 1; j <= i__1; ++j) {
 		if (j < *n) {
 		    i__2 = *n - j;
-		    zlarnv_(&c__4, &iseed[1], &i__2, &a[j + 1 + j * a_dim1]);
+		    zlarnv_(&c__4, &iseed[1], &i__2, &a_ref(j + 1, j));
 		}
-		i__2 = j + j * a_dim1;
+		i__2 = a_subscr(j, j);
 		a[i__2].r = 0., a[i__2].i = 0.;
 /* L370: */
 	    }
 	}
 
-/*        Set the right hand side so that the largest value is BIGNUM.
- */
+/*        Set the right hand side so that the largest value is BIGNUM. */
 
 	zlarnv_(&c__2, &iseed[1], n, &b[1]);
 	iy = izamax_(n, &b[1], &c__1);
@@ -953,10 +919,8 @@ low
 
     } else if (*imat == 19) {
 
-/*        Type 19:  Generate a triangular matrix with elements between
-   
-          BIGNUM/(n-1) and BIGNUM so that at least one of the column 
-  
+/*        Type 19:  Generate a triangular matrix with elements between   
+          BIGNUM/(n-1) and BIGNUM so that at least one of the column   
           norms will exceed BIGNUM.   
           1/3/91:  ZLATRS no longer can handle this case   
 
@@ -969,13 +933,13 @@ low
 	if (upper) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zlarnv_(&c__5, &iseed[1], &j, &a[j * a_dim1 + 1]);
+		zlarnv_(&c__5, &iseed[1], &j, &a_ref(1, j));
 		dlarnv_(&c__1, &iseed[1], &j, &rwork[1]);
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
-		    i__4 = i + j * a_dim1;
-		    d__1 = tleft + rwork[i] * tscal;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    i__4 = a_subscr(i__, j);
+		    d__1 = tleft + rwork[i__] * tscal;
 		    z__1.r = d__1 * a[i__4].r, z__1.i = d__1 * a[i__4].i;
 		    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L380: */
@@ -986,14 +950,14 @@ low
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j + 1;
-		zlarnv_(&c__5, &iseed[1], &i__2, &a[j + j * a_dim1]);
+		zlarnv_(&c__5, &iseed[1], &i__2, &a_ref(j, j));
 		i__2 = *n - j + 1;
 		dlarnv_(&c__1, &iseed[1], &i__2, &rwork[1]);
 		i__2 = *n;
-		for (i = j; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
-		    i__4 = i + j * a_dim1;
-		    d__1 = tleft + rwork[i - j + 1] * tscal;
+		for (i__ = j; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    i__4 = a_subscr(i__, j);
+		    d__1 = tleft + rwork[i__ - j + 1] * tscal;
 		    z__1.r = d__1 * a[i__4].r, z__1.i = d__1 * a[i__4].i;
 		    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L400: */
@@ -1012,8 +976,8 @@ low
 	    i__1 = *n / 2;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - (j << 1) + 1;
-		zswap_(&i__2, &a[j + j * a_dim1], lda, &a[j + 1 + (*n - j + 1)
-			 * a_dim1], &c_n1);
+		zswap_(&i__2, &a_ref(j, j), lda, &a_ref(j + 1, *n - j + 1), &
+			c_n1);
 /* L420: */
 	    }
 	} else {
@@ -1021,8 +985,8 @@ low
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - (j << 1) + 1;
 		i__3 = -(*lda);
-		zswap_(&i__2, &a[j + j * a_dim1], &c__1, &a[*n - j + 1 + (j + 
-			1) * a_dim1], &i__3);
+		zswap_(&i__2, &a_ref(j, j), &c__1, &a_ref(*n - j + 1, j + 1), 
+			&i__3);
 /* L430: */
 	    }
 	}
@@ -1033,4 +997,8 @@ low
 /*     End of ZLATTR */
 
 } /* zlattr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

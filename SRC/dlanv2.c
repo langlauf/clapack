@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dlanv2_(doublereal *a, doublereal *b, doublereal *c, 
-	doublereal *d, doublereal *rt1r, doublereal *rt1i, doublereal *rt2r, 
-	doublereal *rt2i, doublereal *cs, doublereal *sn)
+/* Subroutine */ int dlanv2_(doublereal *a, doublereal *b, doublereal *c__, 
+	doublereal *d__, doublereal *rt1r, doublereal *rt1i, doublereal *rt2r,
+	 doublereal *rt2i, doublereal *cs, doublereal *sn)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric 
-  
+    DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric   
     matrix in standard form:   
 
          [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ]   
@@ -41,36 +41,42 @@
     RT2R    (output) DOUBLE PRECISION   
     RT2I    (output) DOUBLE PRECISION   
             The real and imaginary parts of the eigenvalues. If the   
-            eigenvalues are both real, abs(RT1R) >= abs(RT2R); if the   
             eigenvalues are a complex conjugate pair, RT1I > 0.   
 
     CS      (output) DOUBLE PRECISION   
     SN      (output) DOUBLE PRECISION   
             Parameters of the rotation matrix.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
 
+    Modified by V. Sima, Research Institute for Informatics, Bucharest,   
+    Romania, to reduce the risk of cancellation errors,   
+    when computing real eigenvalues, and to ensure, if possible, that   
+    abs(RT1R) >= abs(RT2R).   
 
-       Initialize CS and SN */
+    ===================================================================== */
     /* Table of constant values */
-    static doublereal c_b3 = 1.;
+    static doublereal c_b4 = 1.;
     
     /* System generated locals */
-    doublereal d__1;
+    doublereal d__1, d__2;
     /* Builtin functions */
     double d_sign(doublereal *, doublereal *), sqrt(doublereal);
     /* Local variables */
-    static doublereal temp, p, sigma;
+    static doublereal temp, p, scale, bcmax, z__, bcmis, sigma;
     extern doublereal dlapy2_(doublereal *, doublereal *);
-    static doublereal aa, bb, cc, dd, cs1, sn1, sab, sac, tau;
+    static doublereal aa, bb, cc, dd;
+    extern doublereal dlamch_(char *);
+    static doublereal cs1, sn1, sab, sac, eps, tau;
 
 
 
-    *cs = 1.;
-    *sn = 0.;
 
-    if (*c == 0.) {
+    eps = dlamch_("P");
+    if (*c__ == 0.) {
+	*cs = 1.;
+	*sn = 0.;
 	goto L10;
 
     } else if (*b == 0.) {
@@ -79,81 +85,111 @@
 
 	*cs = 0.;
 	*sn = 1.;
-	temp = *d;
-	*d = *a;
+	temp = *d__;
+	*d__ = *a;
 	*a = temp;
-	*b = -(*c);
-	*c = 0.;
+	*b = -(*c__);
+	*c__ = 0.;
 	goto L10;
-    } else if (*a - *d == 0. && d_sign(&c_b3, b) != d_sign(&c_b3, c)) {
+    } else if (*a - *d__ == 0. && d_sign(&c_b4, b) != d_sign(&c_b4, c__)) {
+	*cs = 1.;
+	*sn = 0.;
 	goto L10;
     } else {
 
-/*        Make diagonal elements equal */
-
-	temp = *a - *d;
+	temp = *a - *d__;
 	p = temp * .5;
-	sigma = *b + *c;
-	tau = dlapy2_(&sigma, &temp);
-	cs1 = sqrt((abs(sigma) / tau + 1.) * .5);
-	sn1 = -(p / (tau * cs1)) * d_sign(&c_b3, &sigma);
+/* Computing MAX */
+	d__1 = abs(*b), d__2 = abs(*c__);
+	bcmax = max(d__1,d__2);
+/* Computing MIN */
+	d__1 = abs(*b), d__2 = abs(*c__);
+	bcmis = min(d__1,d__2) * d_sign(&c_b4, b) * d_sign(&c_b4, c__);
+/* Computing MAX */
+	d__1 = abs(p);
+	scale = max(d__1,bcmax);
+	z__ = p / scale * p + bcmax / scale * bcmis;
 
-/*        Compute [ AA  BB ] = [ A  B ] [ CS1 -SN1 ]   
-                  [ CC  DD ]   [ C  D ] [ SN1  CS1 ] */
+/*        If Z is of the order of the machine accuracy, postpone the   
+          decision on the nature of eigenvalues */
 
-	aa = *a * cs1 + *b * sn1;
-	bb = -(*a) * sn1 + *b * cs1;
-	cc = *c * cs1 + *d * sn1;
-	dd = -(*c) * sn1 + *d * cs1;
+	if (z__ >= eps * 4.) {
 
-/*        Compute [ A  B ] = [ CS1  SN1 ] [ AA  BB ]   
-                  [ C  D ]   [-SN1  CS1 ] [ CC  DD ] */
+/*           Real eigenvalues. Compute A and D. */
 
-	*a = aa * cs1 + cc * sn1;
-	*b = bb * cs1 + dd * sn1;
-	*c = -aa * sn1 + cc * cs1;
-	*d = -bb * sn1 + dd * cs1;
+	    d__1 = sqrt(scale) * sqrt(z__);
+	    z__ = p + d_sign(&d__1, &p);
+	    *a = *d__ + z__;
+	    *d__ -= bcmax / z__ * bcmis;
 
-/*        Accumulate transformation */
+/*           Compute B and the rotation matrix */
 
-	temp = *cs * cs1 - *sn * sn1;
-	*sn = *cs * sn1 + *sn * cs1;
-	*cs = temp;
+	    tau = dlapy2_(c__, &z__);
+	    *cs = z__ / tau;
+	    *sn = *c__ / tau;
+	    *b -= *c__;
+	    *c__ = 0.;
+	} else {
 
-	temp = (*a + *d) * .5;
-	*a = temp;
-	*d = temp;
+/*           Complex eigenvalues, or real (almost) equal eigenvalues.   
+             Make diagonal elements equal. */
 
-	if (*c != 0.) {
-	    if (*b != 0.) {
-		if (d_sign(&c_b3, b) == d_sign(&c_b3, c)) {
+	    sigma = *b + *c__;
+	    tau = dlapy2_(&sigma, &temp);
+	    *cs = sqrt((abs(sigma) / tau + 1.) * .5);
+	    *sn = -(p / (tau * *cs)) * d_sign(&c_b4, &sigma);
 
-/*                 Real eigenvalues: reduce to upper trian
-gular form */
+/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ]   
+                     [ CC  DD ]   [ C  D ] [ SN  CS ] */
 
-		    sab = sqrt((abs(*b)));
-		    sac = sqrt((abs(*c)));
-		    d__1 = sab * sac;
-		    p = d_sign(&d__1, c);
-		    tau = 1. / sqrt((d__1 = *b + *c, abs(d__1)));
-		    *a = temp + p;
-		    *d = temp - p;
-		    *b -= *c;
-		    *c = 0.;
-		    cs1 = sab * tau;
-		    sn1 = sac * tau;
-		    temp = *cs * cs1 - *sn * sn1;
-		    *sn = *cs * sn1 + *sn * cs1;
-		    *cs = temp;
+	    aa = *a * *cs + *b * *sn;
+	    bb = -(*a) * *sn + *b * *cs;
+	    cc = *c__ * *cs + *d__ * *sn;
+	    dd = -(*c__) * *sn + *d__ * *cs;
+
+/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ]   
+                     [ C  D ]   [-SN  CS ] [ CC  DD ] */
+
+	    *a = aa * *cs + cc * *sn;
+	    *b = bb * *cs + dd * *sn;
+	    *c__ = -aa * *sn + cc * *cs;
+	    *d__ = -bb * *sn + dd * *cs;
+
+	    temp = (*a + *d__) * .5;
+	    *a = temp;
+	    *d__ = temp;
+
+	    if (*c__ != 0.) {
+		if (*b != 0.) {
+		    if (d_sign(&c_b4, b) == d_sign(&c_b4, c__)) {
+
+/*                    Real eigenvalues: reduce to upper triangular form */
+
+			sab = sqrt((abs(*b)));
+			sac = sqrt((abs(*c__)));
+			d__1 = sab * sac;
+			p = d_sign(&d__1, c__);
+			tau = 1. / sqrt((d__1 = *b + *c__, abs(d__1)));
+			*a = temp + p;
+			*d__ = temp - p;
+			*b -= *c__;
+			*c__ = 0.;
+			cs1 = sab * tau;
+			sn1 = sac * tau;
+			temp = *cs * cs1 - *sn * sn1;
+			*sn = *cs * sn1 + *sn * cs1;
+			*cs = temp;
+		    }
+		} else {
+		    *b = -(*c__);
+		    *c__ = 0.;
+		    temp = *cs;
+		    *cs = -(*sn);
+		    *sn = temp;
 		}
-	    } else {
-		*b = -(*c);
-		*c = 0.;
-		temp = *cs;
-		*cs = -(*sn);
-		*sn = temp;
 	    }
 	}
+
     }
 
 L10:
@@ -161,12 +197,12 @@ L10:
 /*     Store eigenvalues in (RT1R,RT1I) and (RT2R,RT2I). */
 
     *rt1r = *a;
-    *rt2r = *d;
-    if (*c == 0.) {
+    *rt2r = *d__;
+    if (*c__ == 0.) {
 	*rt1i = 0.;
 	*rt2i = 0.;
     } else {
-	*rt1i = sqrt((abs(*b))) * sqrt((abs(*c)));
+	*rt1i = sqrt((abs(*b))) * sqrt((abs(*c__)));
 	*rt2i = -(*rt1i);
     }
     return 0;

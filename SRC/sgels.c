@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgels_(char *trans, integer *m, integer *n, integer *
 	nrhs, real *a, integer *lda, real *b, integer *ldb, real *work, 
 	integer *lwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -72,10 +73,8 @@
             if TRANS = 'T'.   
             On exit, B is overwritten by the solution vectors, stored   
             columnwise:   
-            if TRANS = 'N' and m >= n, rows 1 to n of B contain the least 
-  
-            squares solution vectors; the residual sum of squares for the 
-  
+            if TRANS = 'N' and m >= n, rows 1 to n of B contain the least   
+            squares solution vectors; the residual sum of squares for the   
             solution in each column is given by the sum of squares of   
             elements N+1 to M in that column;   
             if TRANS = 'N' and m < n, rows 1 to N of B contain the   
@@ -95,24 +94,26 @@
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.   
-            LWORK >= min(M,N) + MAX(1,M,N,NRHS).   
+            LWORK >= max( 1, MN + max( MN, NRHS ) ).   
             For optimal performance,   
-            LWORK >= min(M,N) + MAX(1,M,N,NRHS) * NB   
-            where NB is the optimum block size.   
+            LWORK >= max( 1, MN + max( MN, NRHS )*NB ).   
+            where MN = min(M,N) and NB is the optimum block size.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -121,12 +122,12 @@
     static real c_b61 = 1.f;
     
     /* System generated locals */
-    integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
+    integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2;
     /* Local variables */
     static real anrm, bnrm;
     static integer brow;
     static logical tpsd;
-    static integer i, j, iascl, ibscl;
+    static integer i__, j, iascl, ibscl;
     extern logical lsame_(char *, char *);
     static integer wsize;
     static real rwork[1];
@@ -152,19 +153,26 @@
     static real smlnum;
     extern /* Subroutine */ int sormlq_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, integer *, real *, 
-	    integer *, integer *), sormqr_(char *, char *, 
-	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, real *, integer *, integer *);
+	    integer *, integer *);
+    static logical lquery;
+    extern /* Subroutine */ int sormqr_(char *, char *, integer *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, real *, 
+	    integer *, integer *);
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     mn = min(*m,*n);
+    lquery = *lwork == -1;
     if (! (lsame_(trans, "N") || lsame_(trans, "T"))) {
 	*info = -1;
     } else if (*m < 0) {
@@ -181,11 +189,9 @@
 	if (*ldb < max(i__1,*n)) {
 	    *info = -8;
 	} else /* if(complicated condition) */ {
-/* Computing MAX   
-   Computing MAX */
-	    i__3 = max(*m,*n);
-	    i__1 = 1, i__2 = mn + max(i__3,*nrhs);
-	    if (*lwork < max(i__1,i__2)) {
+/* Computing MAX */
+	    i__1 = 1, i__2 = mn + max(mn,*nrhs);
+	    if (*lwork < max(i__1,i__2) && ! lquery) {
 		*info = -10;
 	    }
 	}
@@ -201,43 +207,47 @@
 	}
 
 	if (*m >= *n) {
-	    nb = ilaenv_(&c__1, "SGEQRF", " ", m, n, &c_n1, &c_n1, 6L, 1L);
+	    nb = ilaenv_(&c__1, "SGEQRF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, 
+		    (ftnlen)1);
 	    if (tpsd) {
 /* Computing MAX */
 		i__1 = nb, i__2 = ilaenv_(&c__1, "SORMQR", "LN", m, nrhs, n, &
-			c_n1, 6L, 2L);
+			c_n1, (ftnlen)6, (ftnlen)2);
 		nb = max(i__1,i__2);
 	    } else {
 /* Computing MAX */
 		i__1 = nb, i__2 = ilaenv_(&c__1, "SORMQR", "LT", m, nrhs, n, &
-			c_n1, 6L, 2L);
+			c_n1, (ftnlen)6, (ftnlen)2);
 		nb = max(i__1,i__2);
 	    }
 	} else {
-	    nb = ilaenv_(&c__1, "SGELQF", " ", m, n, &c_n1, &c_n1, 6L, 1L);
+	    nb = ilaenv_(&c__1, "SGELQF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, 
+		    (ftnlen)1);
 	    if (tpsd) {
 /* Computing MAX */
 		i__1 = nb, i__2 = ilaenv_(&c__1, "SORMLQ", "LT", n, nrhs, m, &
-			c_n1, 6L, 2L);
+			c_n1, (ftnlen)6, (ftnlen)2);
 		nb = max(i__1,i__2);
 	    } else {
 /* Computing MAX */
 		i__1 = nb, i__2 = ilaenv_(&c__1, "SORMLQ", "LN", n, nrhs, m, &
-			c_n1, 6L, 2L);
+			c_n1, (ftnlen)6, (ftnlen)2);
 		nb = max(i__1,i__2);
 	    }
 	}
 
 /* Computing MAX */
-	i__1 = max(*m,*n);
-	wsize = mn + max(i__1,*nrhs) * nb;
-	WORK(1) = (real) wsize;
+	i__1 = 1, i__2 = mn + max(mn,*nrhs) * nb;
+	wsize = max(i__1,i__2);
+	work[1] = (real) wsize;
 
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SGELS ", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -247,7 +257,7 @@
     i__1 = min(*m,*n);
     if (min(i__1,*nrhs) == 0) {
 	i__1 = max(*m,*n);
-	slaset_("Full", &i__1, nrhs, &c_b33, &c_b33, &B(1,1), ldb);
+	slaset_("Full", &i__1, nrhs, &c_b33, &c_b33, &b[b_offset], ldb);
 	return 0;
     }
 
@@ -259,20 +269,20 @@
 
 /*     Scale A, B if max element outside range [SMLNUM,BIGNUM] */
 
-    anrm = slange_("M", m, n, &A(1,1), lda, rwork);
+    anrm = slange_("M", m, n, &a[a_offset], lda, rwork);
     iascl = 0;
     if (anrm > 0.f && anrm < smlnum) {
 
 /*        Scale matrix norm up to SMLNUM */
 
-	slascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &A(1,1), lda, 
+	slascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &a[a_offset], lda, 
 		info);
 	iascl = 1;
     } else if (anrm > bignum) {
 
 /*        Scale matrix norm down to BIGNUM */
 
-	slascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &A(1,1), lda, 
+	slascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &a[a_offset], lda, 
 		info);
 	iascl = 2;
     } else if (anrm == 0.f) {
@@ -280,7 +290,7 @@
 /*        Matrix all zero. Return zero solution. */
 
 	i__1 = max(*m,*n);
-	slaset_("F", &i__1, nrhs, &c_b33, &c_b33, &B(1,1), ldb);
+	slaset_("F", &i__1, nrhs, &c_b33, &c_b33, &b[b_offset], ldb);
 	goto L50;
     }
 
@@ -288,20 +298,20 @@
     if (tpsd) {
 	brow = *n;
     }
-    bnrm = slange_("M", &brow, nrhs, &B(1,1), ldb, rwork);
+    bnrm = slange_("M", &brow, nrhs, &b[b_offset], ldb, rwork);
     ibscl = 0;
     if (bnrm > 0.f && bnrm < smlnum) {
 
 /*        Scale matrix norm up to SMLNUM */
 
-	slascl_("G", &c__0, &c__0, &bnrm, &smlnum, &brow, nrhs, &B(1,1), 
+	slascl_("G", &c__0, &c__0, &bnrm, &smlnum, &brow, nrhs, &b[b_offset], 
 		ldb, info);
 	ibscl = 1;
     } else if (bnrm > bignum) {
 
 /*        Scale matrix norm down to BIGNUM */
 
-	slascl_("G", &c__0, &c__0, &bnrm, &bignum, &brow, nrhs, &B(1,1), 
+	slascl_("G", &c__0, &c__0, &bnrm, &bignum, &brow, nrhs, &b[b_offset], 
 		ldb, info);
 	ibscl = 2;
     }
@@ -311,7 +321,7 @@
 /*        compute QR factorization of A */
 
 	i__1 = *lwork - mn;
-	sgeqrf_(m, n, &A(1,1), lda, &WORK(1), &WORK(mn + 1), &i__1, info)
+	sgeqrf_(m, n, &a[a_offset], lda, &work[1], &work[mn + 1], &i__1, info)
 		;
 
 /*        workspace at least N, optimally N*NB */
@@ -323,16 +333,15 @@
              B(1:M,1:NRHS) := Q' * B(1:M,1:NRHS) */
 
 	    i__1 = *lwork - mn;
-	    sormqr_("Left", "Transpose", m, nrhs, n, &A(1,1), lda, &WORK(
-		    1), &B(1,1), ldb, &WORK(mn + 1), &i__1, info)
-		    ;
+	    sormqr_("Left", "Transpose", m, nrhs, n, &a[a_offset], lda, &work[
+		    1], &b[b_offset], ldb, &work[mn + 1], &i__1, info);
 
 /*           workspace at least NRHS, optimally NRHS*NB   
 
              B(1:N,1:NRHS) := inv(R) * B(1:N,1:NRHS) */
 
 	    strsm_("Left", "Upper", "No transpose", "Non-unit", n, nrhs, &
-		    c_b61, &A(1,1), lda, &B(1,1), ldb);
+		    c_b61, &a[a_offset], lda, &b[b_offset], ldb);
 
 	    scllen = *n;
 
@@ -343,15 +352,15 @@
              B(1:N,1:NRHS) := inv(R') * B(1:N,1:NRHS) */
 
 	    strsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b61, 
-		    &A(1,1), lda, &B(1,1), ldb);
+		    &a[a_offset], lda, &b[b_offset], ldb);
 
 /*           B(N+1:M,1:NRHS) = ZERO */
 
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *m;
-		for (i = *n + 1; i <= *m; ++i) {
-		    B(i,j) = 0.f;
+		for (i__ = *n + 1; i__ <= i__2; ++i__) {
+		    b_ref(i__, j) = 0.f;
 /* L10: */
 		}
 /* L20: */
@@ -360,8 +369,8 @@
 /*           B(1:M,1:NRHS) := Q(1:N,:) * B(1:N,1:NRHS) */
 
 	    i__1 = *lwork - mn;
-	    sormqr_("Left", "No transpose", m, nrhs, n, &A(1,1), lda, &
-		    WORK(1), &B(1,1), ldb, &WORK(mn + 1), &i__1, info);
+	    sormqr_("Left", "No transpose", m, nrhs, n, &a[a_offset], lda, &
+		    work[1], &b[b_offset], ldb, &work[mn + 1], &i__1, info);
 
 /*           workspace at least NRHS, optimally NRHS*NB */
 
@@ -374,7 +383,7 @@
 /*        Compute LQ factorization of A */
 
 	i__1 = *lwork - mn;
-	sgelqf_(m, n, &A(1,1), lda, &WORK(1), &WORK(mn + 1), &i__1, info)
+	sgelqf_(m, n, &a[a_offset], lda, &work[1], &work[mn + 1], &i__1, info)
 		;
 
 /*        workspace at least M, optimally M*NB. */
@@ -386,15 +395,15 @@
              B(1:M,1:NRHS) := inv(L) * B(1:M,1:NRHS) */
 
 	    strsm_("Left", "Lower", "No transpose", "Non-unit", m, nrhs, &
-		    c_b61, &A(1,1), lda, &B(1,1), ldb);
+		    c_b61, &a[a_offset], lda, &b[b_offset], ldb);
 
 /*           B(M+1:N,1:NRHS) = 0 */
 
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = *m + 1; i <= *n; ++i) {
-		    B(i,j) = 0.f;
+		for (i__ = *m + 1; i__ <= i__2; ++i__) {
+		    b_ref(i__, j) = 0.f;
 /* L30: */
 		}
 /* L40: */
@@ -403,9 +412,8 @@
 /*           B(1:N,1:NRHS) := Q(1:N,:)' * B(1:M,1:NRHS) */
 
 	    i__1 = *lwork - mn;
-	    sormlq_("Left", "Transpose", n, nrhs, m, &A(1,1), lda, &WORK(
-		    1), &B(1,1), ldb, &WORK(mn + 1), &i__1, info)
-		    ;
+	    sormlq_("Left", "Transpose", n, nrhs, m, &a[a_offset], lda, &work[
+		    1], &b[b_offset], ldb, &work[mn + 1], &i__1, info);
 
 /*           workspace at least NRHS, optimally NRHS*NB */
 
@@ -418,15 +426,15 @@
              B(1:N,1:NRHS) := Q * B(1:N,1:NRHS) */
 
 	    i__1 = *lwork - mn;
-	    sormlq_("Left", "No transpose", n, nrhs, m, &A(1,1), lda, &
-		    WORK(1), &B(1,1), ldb, &WORK(mn + 1), &i__1, info);
+	    sormlq_("Left", "No transpose", n, nrhs, m, &a[a_offset], lda, &
+		    work[1], &b[b_offset], ldb, &work[mn + 1], &i__1, info);
 
 /*           workspace at least NRHS, optimally NRHS*NB   
 
              B(1:M,1:NRHS) := inv(L') * B(1:M,1:NRHS) */
 
 	    strsm_("Left", "Lower", "Transpose", "Non-unit", m, nrhs, &c_b61, 
-		    &A(1,1), lda, &B(1,1), ldb);
+		    &a[a_offset], lda, &b[b_offset], ldb);
 
 	    scllen = *m;
 
@@ -437,26 +445,29 @@
 /*     Undo scaling */
 
     if (iascl == 1) {
-	slascl_("G", &c__0, &c__0, &anrm, &smlnum, &scllen, nrhs, &B(1,1)
+	slascl_("G", &c__0, &c__0, &anrm, &smlnum, &scllen, nrhs, &b[b_offset]
 		, ldb, info);
     } else if (iascl == 2) {
-	slascl_("G", &c__0, &c__0, &anrm, &bignum, &scllen, nrhs, &B(1,1)
+	slascl_("G", &c__0, &c__0, &anrm, &bignum, &scllen, nrhs, &b[b_offset]
 		, ldb, info);
     }
     if (ibscl == 1) {
-	slascl_("G", &c__0, &c__0, &smlnum, &bnrm, &scllen, nrhs, &B(1,1)
+	slascl_("G", &c__0, &c__0, &smlnum, &bnrm, &scllen, nrhs, &b[b_offset]
 		, ldb, info);
     } else if (ibscl == 2) {
-	slascl_("G", &c__0, &c__0, &bignum, &bnrm, &scllen, nrhs, &B(1,1)
+	slascl_("G", &c__0, &c__0, &bignum, &bnrm, &scllen, nrhs, &b[b_offset]
 		, ldb, info);
     }
 
 L50:
-    WORK(1) = (real) wsize;
+    work[1] = (real) wsize;
 
     return 0;
 
 /*     End of SGELS */
 
 } /* sgels_ */
+
+#undef b_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlarfg_(integer *n, doublecomplex *alpha, doublecomplex *
 	x, integer *incx, doublecomplex *tau)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -53,13 +54,10 @@
     TAU     (output) COMPLEX*16   
             The value tau.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b5 = {1.,0.};
     
@@ -87,17 +85,16 @@
     static integer knt;
 
 
+    --x;
 
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 0) {
 	tau->r = 0., tau->i = 0.;
 	return 0;
     }
 
     i__1 = *n - 1;
-    xnorm = dznrm2_(&i__1, &X(1), incx);
+    xnorm = dznrm2_(&i__1, &x[1], incx);
     alphr = alpha->r;
     alphi = d_imag(alpha);
 
@@ -117,14 +114,13 @@
 
 	if (abs(beta) < safmin) {
 
-/*           XNORM, BETA may be inaccurate; scale X and recompute 
-them */
+/*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
 	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
-	    zdscal_(&i__1, &rsafmn, &X(1), incx);
+	    zdscal_(&i__1, &rsafmn, &x[1], incx);
 	    beta *= rsafmn;
 	    alphi *= rsafmn;
 	    alphr *= rsafmn;
@@ -135,7 +131,7 @@ L10:
 /*           New BETA is at most 1, at least SAFMIN */
 
 	    i__1 = *n - 1;
-	    xnorm = dznrm2_(&i__1, &X(1), incx);
+	    xnorm = dznrm2_(&i__1, &x[1], incx);
 	    z__1.r = alphr, z__1.i = alphi;
 	    alpha->r = z__1.r, alpha->i = z__1.i;
 	    d__1 = dlapy3_(&alphr, &alphi, &xnorm);
@@ -148,14 +144,13 @@ L10:
 	    zladiv_(&z__1, &c_b5, &z__2);
 	    alpha->r = z__1.r, alpha->i = z__1.i;
 	    i__1 = *n - 1;
-	    zscal_(&i__1, alpha, &X(1), incx);
+	    zscal_(&i__1, alpha, &x[1], incx);
 
-/*           If ALPHA is subnormal, it may lose relative accuracy 
-*/
+/*           If ALPHA is subnormal, it may lose relative accuracy */
 
 	    alpha->r = beta, alpha->i = 0.;
 	    i__1 = knt;
-	    for (j = 1; j <= knt; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		z__1.r = safmin * alpha->r, z__1.i = safmin * alpha->i;
 		alpha->r = z__1.r, alpha->i = z__1.i;
 /* L20: */
@@ -169,7 +164,7 @@ L10:
 	    zladiv_(&z__1, &c_b5, &z__2);
 	    alpha->r = z__1.r, alpha->i = z__1.i;
 	    i__1 = *n - 1;
-	    zscal_(&i__1, alpha, &X(1), incx);
+	    zscal_(&i__1, alpha, &x[1], incx);
 	    alpha->r = beta, alpha->i = 0.;
 	}
     }

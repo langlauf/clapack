@@ -1,24 +1,24 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgbsvx_(char *fact, char *trans, integer *n, integer *kl,
 	 integer *ku, integer *nrhs, doublereal *ab, integer *ldab, 
 	doublereal *afb, integer *ldafb, integer *ipiv, char *equed, 
-	doublereal *r, doublereal *c, doublereal *b, integer *ldb, doublereal 
-	*x, integer *ldx, doublereal *rcond, doublereal *ferr, doublereal *
-	berr, doublereal *work, integer *iwork, integer *info)
+	doublereal *r__, doublereal *c__, doublereal *b, integer *ldb, 
+	doublereal *x, integer *ldx, doublereal *rcond, doublereal *ferr, 
+	doublereal *berr, doublereal *work, integer *iwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     DGBSVX uses the LU factorization to compute the solution to a real   
-    system of linear equations A * X = B, A**T * X = B, or A**H * X = B, 
-  
+    system of linear equations A * X = B, A**T * X = B, or A**H * X = B,   
     where A is a band matrix of order N with KL subdiagonals and KU   
     superdiagonals, and X and B are N-by-NRHS matrices.   
 
@@ -32,16 +32,12 @@
 
     1. If FACT = 'E', real scaling factors are computed to equilibrate   
        the system:   
-          TRANS = 'N':  diag(R)*A*diag(C)     *inv(diag(C))*X = diag(R)*B 
-  
-          TRANS = 'T': (diag(R)*A*diag(C))**T *inv(diag(R))*X = diag(C)*B 
-  
-          TRANS = 'C': (diag(R)*A*diag(C))**H *inv(diag(R))*X = diag(C)*B 
-  
+          TRANS = 'N':  diag(R)*A*diag(C)     *inv(diag(C))*X = diag(R)*B   
+          TRANS = 'T': (diag(R)*A*diag(C))**T *inv(diag(R))*X = diag(C)*B   
+          TRANS = 'C': (diag(R)*A*diag(C))**H *inv(diag(R))*X = diag(C)*B   
        Whether or not the system will be equilibrated depends on the   
        scaling of the matrix A, but if equilibration is used, A is   
-       overwritten by diag(R)*A*diag(C) and B by diag(R)*B (if TRANS='N') 
-  
+       overwritten by diag(R)*A*diag(C) and B by diag(R)*B (if TRANS='N')   
        or diag(C)*B (if TRANS = 'T' or 'C').   
 
     2. If FACT = 'N' or 'E', the LU decomposition is used to factor the   
@@ -51,9 +47,12 @@
        matrices with KL subdiagonals, and U is upper triangular with   
        KL+KU superdiagonals.   
 
-    3. The factored form of A is used to estimate the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 4-6 are skipped.   
+    3. If some U(i,i)=0, so that U is exactly singular, then the routine   
+       returns with INFO = i. Otherwise, the factored form of A is used   
+       to estimate the condition number of the matrix A.  If the   
+       reciprocal of the condition number is less than machine precision,   
+       INFO = N+1 is returned as a warning, but the routine still goes on   
+       to solve for X and compute error bounds as described below.   
 
     4. The system of equations is solved for X using the factored form   
        of A.   
@@ -70,18 +69,15 @@
     =========   
 
     FACT    (input) CHARACTER*1   
-            Specifies whether or not the factored form of the matrix A is 
-  
-            supplied on entry, and if not, whether the matrix A should be 
-  
+            Specifies whether or not the factored form of the matrix A is   
+            supplied on entry, and if not, whether the matrix A should be   
             equilibrated before it is factored.   
             = 'F':  On entry, AFB and IPIV contain the factored form of   
                     A.  If EQUED is not 'N', the matrix A has been   
                     equilibrated with scaling factors given by R and C.   
                     AB, AFB, and IPIV are not modified.   
             = 'N':  The matrix A will be copied to AFB and factored.   
-            = 'E':  The matrix A will be equilibrated if necessary, then 
-  
+            = 'E':  The matrix A will be equilibrated if necessary, then   
                     copied to AFB and factored.   
 
     TRANS   (input) CHARACTER*1   
@@ -98,23 +94,20 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     NRHS    (input) INTEGER   
             The number of right hand sides, i.e., the number of columns   
             of the matrices B and X.  NRHS >= 0.   
 
     AB      (input/output) DOUBLE PRECISION array, dimension (LDAB,N)   
-            On entry, the matrix A in band storage, in rows 1 to KL+KU+1. 
-  
+            On entry, the matrix A in band storage, in rows 1 to KL+KU+1.   
             The j-th column of A is stored in the j-th column of the   
             array AB as follows:   
             AB(KU+1+i-j,j) = A(i,j) for max(1,j-KU)<=i<=min(N,j+kl)   
 
             If FACT = 'F' and EQUED is not 'N', then A must have been   
-            equilibrated by the scaling factors in R and/or C.  AB is not 
-  
+            equilibrated by the scaling factors in R and/or C.  AB is not   
             modified if FACT = 'F' or 'N', or if FACT = 'E' and   
             EQUED = 'N' on exit.   
 
@@ -126,17 +119,13 @@
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KL+KU+1.   
 
-    AFB     (input or output) DOUBLE PRECISION array, dimension (LDAFB,N) 
-  
+    AFB     (input or output) DOUBLE PRECISION array, dimension (LDAFB,N)   
             If FACT = 'F', then AFB is an input argument and on entry   
             contains details of the LU factorization of the band matrix   
-            A, as computed by DGBTRF.  U is stored as an upper triangular 
-  
+            A, as computed by DGBTRF.  U is stored as an upper triangular   
             band matrix with KL+KU superdiagonals in rows 1 to KL+KU+1,   
-            and the multipliers used during the factorization are stored 
-  
-            in rows KL+KU+2 to 2*KL+KU+1.  If EQUED .ne. 'N', then AFB is 
-  
+            and the multipliers used during the factorization are stored   
+            in rows KL+KU+2 to 2*KL+KU+1.  If EQUED .ne. 'N', then AFB is   
             the factored form of the equilibrated matrix A.   
 
             If FACT = 'N', then AFB is an output argument and on exit   
@@ -148,8 +137,7 @@
             equilibrated matrix).   
 
     LDAFB   (input) INTEGER   
-            The leading dimension of the array AFB.  LDAFB >= 2*KL+KU+1. 
-  
+            The leading dimension of the array AFB.  LDAFB >= 2*KL+KU+1.   
 
     IPIV    (input or output) INTEGER array, dimension (N)   
             If FACT = 'F', then IPIV is an input argument and on entry   
@@ -168,16 +156,13 @@
     EQUED   (input or output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration (always true if FACT = 'N').   
-            = 'R':  Row equilibration, i.e., A has been premultiplied by 
-  
+            = 'R':  Row equilibration, i.e., A has been premultiplied by   
                     diag(R).   
-            = 'C':  Column equilibration, i.e., A has been postmultiplied 
-  
+            = 'C':  Column equilibration, i.e., A has been postmultiplied   
                     by diag(C).   
             = 'B':  Both row and column equilibration, i.e., A has been   
                     replaced by diag(R) * A * diag(C).   
-            EQUED is an input argument if FACT = 'F'; otherwise, it is an 
-  
+            EQUED is an input argument if FACT = 'F'; otherwise, it is an   
             output argument.   
 
     R       (input or output) DOUBLE PRECISION array, dimension (N)   
@@ -188,10 +173,8 @@
             EQUED = 'R' or 'B', each element of R must be positive.   
 
     C       (input or output) DOUBLE PRECISION array, dimension (N)   
-            The column scale factors for A.  If EQUED = 'C' or 'B', A is 
-  
-            multiplied on the right by diag(C); if EQUED = 'N' or 'R', C 
-  
+            The column scale factors for A.  If EQUED = 'C' or 'B', A is   
+            multiplied on the right by diag(C); if EQUED = 'N' or 'R', C   
             is not accessed.  C is an input argument if FACT = 'F';   
             otherwise, C is an output argument.  If FACT = 'F' and   
             EQUED = 'C' or 'B', each element of C must be positive.   
@@ -209,36 +192,28 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) DOUBLE PRECISION array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X to the original 
-  
-            system of equations.  Note that A and B are modified on exit 
-  
-            if EQUED .ne. 'N', and the solution to the equilibrated   
-            system is inv(diag(C))*X if TRANS = 'N' and EQUED = 'C' or   
-            'B', or inv(diag(R))*X if TRANS = 'T' or 'C' and EQUED = 'R' 
-  
-            or 'B'.   
+            If INFO = 0 or INFO = N+1, the N-by-NRHS solution matrix X   
+            to the original system of equations.  Note that A and B are   
+            modified on exit if EQUED .ne. 'N', and the solution to the   
+            equilibrated system is inv(diag(C))*X if TRANS = 'N' and   
+            EQUED = 'C' or 'B', or inv(diag(R))*X if TRANS = 'T' or 'C'   
+            and EQUED = 'R' or 'B'.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     RCOND   (output) DOUBLE PRECISION   
-            The estimate of the reciprocal condition number of the matrix 
-  
+            The estimate of the reciprocal condition number of the matrix   
             A after equilibration (if done).  If RCOND is less than the   
             machine precision (in particular, if RCOND = 0), the matrix   
             is singular to working precision.  This condition is   
-            indicated by a return code of INFO > 0, and the solution and 
-  
-            error bounds are not computed.   
+            indicated by a return code of INFO > 0.   
 
     FERR    (output) DOUBLE PRECISION array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -254,8 +229,7 @@
             factor norm(A)/norm(U). The "max absolute element" norm is   
             used. If WORK(1) is much less than 1, then the stability   
             of the LU factorization of the (equilibrated) matrix A   
-            could be poor. This also means that the solution X, condition 
-  
+            could be poor. This also means that the solution X, condition   
             estimator RCOND, and forward error bound FERR could be   
             unreliable. If factorization fails with 0<INFO<=N, then   
             WORK(1) contains the reciprocal pivot growth factor for the   
@@ -268,23 +242,21 @@
             < 0:  if INFO = -i, the i-th argument had an illegal value   
             > 0:  if INFO = i, and i is   
                   <= N:  U(i,i) is exactly zero.  The factorization   
-                         has been completed, but the factor U is exactly 
-  
+                         has been completed, but the factor U is exactly   
                          singular, so the solution and error bounds   
-                         could not be computed.   
-                  = N+1: RCOND is less than machine precision.  The   
-                         factorization has been completed, but the   
-                         matrix A is singular to working precision, and   
-                         the solution and error bounds have not been   
-                         computed.   
+                         could not be computed. RCOND = 0 is returned.   
+                  = N+1: U is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -295,7 +267,7 @@
     /* Local variables */
     static doublereal amax;
     static char norm[1];
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal rcmin, rcmax, anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
@@ -337,22 +309,33 @@
     static doublereal smlnum;
     static logical rowequ;
     static doublereal rpvgrw;
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+#define afb_ref(a_1,a_2) afb[(a_2)*afb_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    afb_dim1 = *ldafb;
+    afb_offset = 1 + afb_dim1 * 1;
+    afb -= afb_offset;
+    --ipiv;
+    --r__;
+    --c__;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --iwork;
 
-#define IPIV(I) ipiv[(I)-1]
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define AFB(I,J) afb[(I)-1 + ((J)-1)* ( *ldafb)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
     equil = lsame_(fact, "E");
@@ -362,8 +345,10 @@
 	rowequ = FALSE_;
 	colequ = FALSE_;
     } else {
-	rowequ = lsame_(equed, "R") || lsame_(equed, "B");
-	colequ = lsame_(equed, "C") || lsame_(equed, "B");
+	rowequ = lsame_(equed, "R") || lsame_(equed, 
+		"B");
+	colequ = lsame_(equed, "C") || lsame_(equed, 
+		"B");
 	smlnum = dlamch_("Safe minimum");
 	bignum = 1. / smlnum;
     }
@@ -372,8 +357,8 @@
 
     if (! nofact && ! equil && ! lsame_(fact, "F")) {
 	*info = -1;
-    } else if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, 
-	    "C")) {
+    } else if (! notran && ! lsame_(trans, "T") && ! 
+	    lsame_(trans, "C")) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
@@ -387,20 +372,20 @@
 	*info = -8;
     } else if (*ldafb < (*kl << 1) + *ku + 1) {
 	*info = -10;
-    } else if (lsame_(fact, "F") && ! (rowequ || colequ || lsame_(
-	    equed, "N"))) {
+    } else if (lsame_(fact, "F") && ! (rowequ || colequ 
+	    || lsame_(equed, "N"))) {
 	*info = -12;
     } else {
 	if (rowequ) {
 	    rcmin = bignum;
 	    rcmax = 0.;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-		d__1 = rcmin, d__2 = R(j);
+		d__1 = rcmin, d__2 = r__[j];
 		rcmin = min(d__1,d__2);
 /* Computing MAX */
-		d__1 = rcmax, d__2 = R(j);
+		d__1 = rcmax, d__2 = r__[j];
 		rcmax = max(d__1,d__2);
 /* L10: */
 	    }
@@ -416,12 +401,12 @@
 	    rcmin = bignum;
 	    rcmax = 0.;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-		d__1 = rcmin, d__2 = C(j);
+		d__1 = rcmin, d__2 = c__[j];
 		rcmin = min(d__1,d__2);
 /* Computing MAX */
-		d__1 = rcmax, d__2 = C(j);
+		d__1 = rcmax, d__2 = c__[j];
 		rcmax = max(d__1,d__2);
 /* L20: */
 	    }
@@ -450,19 +435,20 @@
 
     if (equil) {
 
-/*        Compute row and column scalings to equilibrate the matrix A.
- */
+/*        Compute row and column scalings to equilibrate the matrix A. */
 
-	dgbequ_(n, n, kl, ku, &AB(1,1), ldab, &R(1), &C(1), &rowcnd, &
-		colcnd, &amax, &infequ);
+	dgbequ_(n, n, kl, ku, &ab[ab_offset], ldab, &r__[1], &c__[1], &rowcnd,
+		 &colcnd, &amax, &infequ);
 	if (infequ == 0) {
 
 /*           Equilibrate the matrix. */
 
-	    dlaqgb_(n, n, kl, ku, &AB(1,1), ldab, &R(1), &C(1), &rowcnd,
-		     &colcnd, &amax, equed);
-	    rowequ = lsame_(equed, "R") || lsame_(equed, "B");
-	    colequ = lsame_(equed, "C") || lsame_(equed, "B");
+	    dlaqgb_(n, n, kl, ku, &ab[ab_offset], ldab, &r__[1], &c__[1], &
+		    rowcnd, &colcnd, &amax, equed);
+	    rowequ = lsame_(equed, "R") || lsame_(equed,
+		     "B");
+	    colequ = lsame_(equed, "C") || lsame_(equed,
+		     "B");
 	}
     }
 
@@ -471,10 +457,10 @@
     if (notran) {
 	if (rowequ) {
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    B(i,j) = R(i) * B(i,j);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    b_ref(i__, j) = r__[i__] * b_ref(i__, j);
 /* L30: */
 		}
 /* L40: */
@@ -482,10 +468,10 @@
 	}
     } else if (colequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		B(i,j) = C(i) * B(i,j);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		b_ref(i__, j) = c__[i__] * b_ref(i__, j);
 /* L50: */
 	    }
 /* L60: */
@@ -497,7 +483,7 @@
 /*        Compute the LU factorization of the band matrix A. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__2 = j - *ku;
 	    j1 = max(i__2,1);
@@ -505,51 +491,51 @@
 	    i__2 = j + *kl;
 	    j2 = min(i__2,*n);
 	    i__2 = j2 - j1 + 1;
-	    dcopy_(&i__2, &AB(*ku+1-j+j1,j), &c__1, &AFB(*kl+*ku+1-j+j1,j), &c__1);
+	    dcopy_(&i__2, &ab_ref(*ku + 1 - j + j1, j), &c__1, &afb_ref(*kl + 
+		    *ku + 1 - j + j1, j), &c__1);
 /* L70: */
 	}
 
-	dgbtrf_(n, n, kl, ku, &AFB(1,1), ldafb, &IPIV(1), info);
+	dgbtrf_(n, n, kl, ku, &afb[afb_offset], ldafb, &ipiv[1], info);
 
 /*        Return if INFO is non-zero. */
 
 	if (*info != 0) {
 	    if (*info > 0) {
 
-/*              Compute the reciprocal pivot growth factor of 
-the   
+/*              Compute the reciprocal pivot growth factor of the   
                 leading rank-deficient INFO columns of A. */
 
 		anorm = 0.;
 		i__1 = *info;
-		for (j = 1; j <= *info; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 		    i__2 = *ku + 2 - j;
 /* Computing MIN */
 		    i__4 = *n + *ku + 1 - j, i__5 = *kl + *ku + 1;
 		    i__3 = min(i__4,i__5);
-		    for (i = max(*ku+2-j,1); i <= min(*n+*ku+1-j,*kl+*ku+1); ++i) {
+		    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-			d__2 = anorm, d__3 = (d__1 = AB(i,j), abs(
-				d__1));
+			d__2 = anorm, d__3 = (d__1 = ab_ref(i__, j), abs(d__1)
+				);
 			anorm = max(d__2,d__3);
 /* L80: */
 		    }
 /* L90: */
 		}
-/* Computing MIN */
-		i__3 = *info - 1, i__2 = *kl + *ku;
-		i__1 = min(i__3,i__2);
 /* Computing MAX */
-		i__4 = 1, i__5 = *kl + *ku + 2 - *info;
-		rpvgrw = dlantb_("M", "U", "N", info, &i__1, &AFB(max(1,
-			*kl+*ku+2-*info),1), ldafb, &WORK(1));
+		i__1 = 1, i__3 = *kl + *ku + 2 - *info;
+/* Computing MIN */
+		i__4 = *info - 1, i__5 = *kl + *ku;
+		i__2 = min(i__4,i__5);
+		rpvgrw = dlantb_("M", "U", "N", info, &i__2, &afb_ref(max(
+			i__1,i__3), 1), ldafb, &work[1]);
 		if (rpvgrw == 0.) {
 		    rpvgrw = 1.;
 		} else {
 		    rpvgrw = anorm / rpvgrw;
 		}
-		WORK(1) = rpvgrw;
+		work[1] = rpvgrw;
 		*rcond = 0.;
 	    }
 	    return 0;
@@ -564,41 +550,39 @@ the
     } else {
 	*(unsigned char *)norm = 'I';
     }
-    anorm = dlangb_(norm, n, kl, ku, &AB(1,1), ldab, &WORK(1));
+    anorm = dlangb_(norm, n, kl, ku, &ab[ab_offset], ldab, &work[1]);
     i__1 = *kl + *ku;
-    rpvgrw = dlantb_("M", "U", "N", n, &i__1, &AFB(1,1), ldafb, &WORK(
-	    1));
+    rpvgrw = dlantb_("M", "U", "N", n, &i__1, &afb[afb_offset], ldafb, &work[
+	    1]);
     if (rpvgrw == 0.) {
 	rpvgrw = 1.;
     } else {
-	rpvgrw = dlangb_("M", n, kl, ku, &AB(1,1), ldab, &WORK(1)) /
-		 rpvgrw;
+	rpvgrw = dlangb_("M", n, kl, ku, &ab[ab_offset], ldab, &work[1]) / rpvgrw;
     }
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    dgbcon_(norm, n, kl, ku, &AFB(1,1), ldafb, &IPIV(1), &anorm, rcond,
-	     &WORK(1), &IWORK(1), info);
+    dgbcon_(norm, n, kl, ku, &afb[afb_offset], ldafb, &ipiv[1], &anorm, rcond,
+	     &work[1], &iwork[1], info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < dlamch_("Epsilon")) {
-	WORK(1) = rpvgrw;
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution matrix X. */
 
-    dlacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    dgbtrs_(trans, n, kl, ku, nrhs, &AFB(1,1), ldafb, &IPIV(1), &X(1,1), ldx, info);
+    dlacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    dgbtrs_(trans, n, kl, ku, nrhs, &afb[afb_offset], ldafb, &ipiv[1], &x[
+	    x_offset], ldx, info);
 
 /*     Use iterative refinement to improve the computed solution and   
        compute error bounds and backward error estimates for it. */
 
-    dgbrfs_(trans, n, kl, ku, nrhs, &AB(1,1), ldab, &AFB(1,1), 
-	    ldafb, &IPIV(1), &B(1,1), ldb, &X(1,1), ldx, &FERR(1), &
-	    BERR(1), &WORK(1), &IWORK(1), info);
+    dgbrfs_(trans, n, kl, ku, nrhs, &ab[ab_offset], ldab, &afb[afb_offset], 
+	    ldafb, &ipiv[1], &b[b_offset], ldb, &x[x_offset], ldx, &ferr[1], &
+	    berr[1], &work[1], &iwork[1], info);
 
 /*     Transform the solution matrix X to a solution of the original   
        system. */
@@ -606,41 +590,47 @@ the
     if (notran) {
 	if (colequ) {
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__3 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    X(i,j) = C(i) * X(i,j);
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    x_ref(i__, j) = c__[i__] * x_ref(i__, j);
 /* L100: */
 		}
 /* L110: */
 	    }
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
-		FERR(j) /= colcnd;
+	    for (j = 1; j <= i__1; ++j) {
+		ferr[j] /= colcnd;
 /* L120: */
 	    }
 	}
     } else if (rowequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__3 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		X(i,j) = R(i) * X(i,j);
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		x_ref(i__, j) = r__[i__] * x_ref(i__, j);
 /* L130: */
 	    }
 /* L140: */
 	}
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    FERR(j) /= rowcnd;
+	for (j = 1; j <= i__1; ++j) {
+	    ferr[j] /= rowcnd;
 /* L150: */
 	}
     }
 
-    WORK(1) = rpvgrw;
+    work[1] = rpvgrw;
     return 0;
 
 /*     End of DGBSVX */
 
 } /* dgbsvx_ */
+
+#undef afb_ref
+#undef ab_ref
+#undef x_ref
+#undef b_ref
+
 

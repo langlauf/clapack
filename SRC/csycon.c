@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int csycon_(char *uplo, integer *n, complex *a, integer *lda,
 	 integer *ipiv, real *anorm, real *rcond, complex *work, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -24,8 +25,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored 
-  
+            Specifies whether the details of the factorization are stored   
             as an upper or lower triangular matrix.   
             = 'U':  Upper triangular, form is A = U*D*U**T;   
             = 'L':  Lower triangular, form is A = L*D*L**T.   
@@ -58,22 +58,19 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
-    static integer kase, i;
+    static integer kase, i__;
     extern logical lsame_(char *, char *);
     static logical upper;
     extern /* Subroutine */ int clacon_(integer *, complex *, complex *, real 
@@ -81,14 +78,17 @@
     static real ainvnm;
     extern /* Subroutine */ int csytrs_(char *, integer *, integer *, complex 
 	    *, integer *, integer *, complex *, integer *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
+    --work;
 
-#define IPIV(I) ipiv[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -122,9 +122,9 @@
 
 /*        Upper triangular storage: examine D from bottom to top */
 
-	for (i = *n; i >= 1; --i) {
-	    i__1 = i + i * a_dim1;
-	    if (IPIV(i) > 0 && (A(i,i).r == 0.f && A(i,i).i == 0.f)) {
+	for (i__ = *n; i__ >= 1; --i__) {
+	    i__1 = a_subscr(i__, i__);
+	    if (ipiv[i__] > 0 && (a[i__1].r == 0.f && a[i__1].i == 0.f)) {
 		return 0;
 	    }
 /* L10: */
@@ -134,9 +134,9 @@
 /*        Lower triangular storage: examine D from top to bottom. */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    i__2 = i + i * a_dim1;
-	    if (IPIV(i) > 0 && (A(i,i).r == 0.f && A(i,i).i == 0.f)) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = a_subscr(i__, i__);
+	    if (ipiv[i__] > 0 && (a[i__2].r == 0.f && a[i__2].i == 0.f)) {
 		return 0;
 	    }
 /* L20: */
@@ -147,12 +147,12 @@
 
     kase = 0;
 L30:
-    clacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+    clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
     if (kase != 0) {
 
 /*        Multiply by inv(L*D*L') or inv(U*D*U'). */
 
-	csytrs_(uplo, n, &c__1, &A(1,1), lda, &IPIV(1), &WORK(1), n, 
+	csytrs_(uplo, n, &c__1, &a[a_offset], lda, &ipiv[1], &work[1], n, 
 		info);
 	goto L30;
     }
@@ -168,4 +168,8 @@ L30:
 /*     End of CSYCON */
 
 } /* csycon_ */
+
+#undef a_ref
+#undef a_subscr
+
 

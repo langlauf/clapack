@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static integer c__4 = 4;
 static integer c__8 = 8;
 
 /* Subroutine */ int zlarot_(logical *lrows, logical *lleft, logical *lright, 
-	integer *nl, doublecomplex *c, doublecomplex *s, doublecomplex *a, 
+	integer *nl, doublecomplex *c__, doublecomplex *s, doublecomplex *a, 
 	integer *lda, doublecomplex *xleft, doublecomplex *xright)
 {
     /* System generated locals */
@@ -30,7 +31,7 @@ static integer c__8 = 8;
     static integer iyt;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -46,8 +47,7 @@ static integer c__8 = 8;
        that elements of the matrix may be used or modified for which   
        no array element is provided.   
 
-       One example is a symmetric matrix in SB format (bandwidth=4), for 
-  
+       One example is a symmetric matrix in SB format (bandwidth=4), for   
        which UPLO='L':  Two adjacent rows will have the format:   
 
        row j:     *  *  *  *  *  .  .  .  .   
@@ -73,8 +73,7 @@ static integer c__8 = 8;
        is rotated, setting p to its new value.  The next call to   
        ZLAROT would rotate columns j and j+1, using p, and restore   
        symmetry.  The element q would start out being zero, and be   
-       made non-zero by the rotation.  Later, rotations would presumably 
-  
+       made non-zero by the rotation.  Later, rotations would presumably   
        be chosen to zero q out.   
 
        Typical Calling Sequences: rotating the i-th and (i+1)-st rows.   
@@ -121,8 +120,7 @@ static integer c__8 = 8;
                      . . .   
                          A(K+1,i), LDA-1, XLEFT, XRIGHT )   
 
-         Rotating columns is just the transpose of rotating rows, except 
-  
+         Rotating columns is just the transpose of rotating rows, except   
          for GB and SB: (rotating columns i and i+1)   
 
          GB:   
@@ -162,8 +160,7 @@ static integer c__8 = 8;
     LRIGHT - LOGICAL   
              If .TRUE., then XRIGHT will be used instead of the   
              corresponding element of A for the last element in the   
-             first row (if LROWS=.FALSE.) or column (if LROWS=.TRUE.) If 
-  
+             first row (if LROWS=.FALSE.) or column (if LROWS=.TRUE.) If   
              .FALSE., then the corresponding element of A will be used.   
              Not modified.   
 
@@ -187,8 +184,7 @@ static integer c__8 = 8;
              if false, then the transpose (not conjugated) thereof is   
              applied from the right.  Note that in contrast to the   
              output of ZROTG or to most versions of ZROT, both C and S   
-             are complex.  For a Givens rotation, |C|**2 + |S|**2 should 
-  
+             are complex.  For a Givens rotation, |C|**2 + |S|**2 should   
              be 1, but this is not checked.   
              Not modified.   
 
@@ -202,10 +198,8 @@ static integer c__8 = 8;
              The "effective" leading dimension of A.  If A contains   
              a matrix stored in GE, HE, or SY format, then this is just   
              the leading dimension of A as dimensioned in the calling   
-             routine.  If A contains a matrix stored in band (GB, HB, or 
-  
-             SB) format, then this should be *one less* than the leading 
-  
+             routine.  If A contains a matrix stored in band (GB, HB, or   
+             SB) format, then this should be *one less* than the leading   
              dimension used in the calling routine.  Thus, if A were   
              dimensioned A(LDA,*) in ZLAROT, then A(1,j) would be the   
              j-th element in the first of the two rows to be rotated,   
@@ -231,8 +225,7 @@ static integer c__8 = 8;
              (if LROWS=.FALSE.).   
              Read and modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Set up indices, arrays for ends   
@@ -289,8 +282,8 @@ static integer c__8 = 8;
     i__1 = *nl - nt - 1;
     for (j = 0; j <= i__1; ++j) {
 	i__2 = ix + j * iinc;
-	z__2.r = c->r * a[i__2].r - c->i * a[i__2].i, z__2.i = c->r * a[i__2]
-		.i + c->i * a[i__2].r;
+	z__2.r = c__->r * a[i__2].r - c__->i * a[i__2].i, z__2.i = c__->r * a[
+		i__2].i + c__->i * a[i__2].r;
 	i__3 = iy + j * iinc;
 	z__3.r = s->r * a[i__3].r - s->i * a[i__3].i, z__3.i = s->r * a[i__3]
 		.i + s->i * a[i__3].r;
@@ -302,7 +295,7 @@ static integer c__8 = 8;
 	i__3 = ix + j * iinc;
 	z__2.r = z__3.r * a[i__3].r - z__3.i * a[i__3].i, z__2.i = z__3.r * a[
 		i__3].i + z__3.i * a[i__3].r;
-	d_cnjg(&z__6, c);
+	d_cnjg(&z__6, c__);
 	i__4 = iy + j * iinc;
 	z__5.r = z__6.r * a[i__4].r - z__6.i * a[i__4].i, z__5.i = z__6.r * a[
 		i__4].i + z__6.i * a[i__4].r;
@@ -318,8 +311,8 @@ static integer c__8 = 8;
     i__1 = nt;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j - 1;
-	z__2.r = c->r * xt[i__2].r - c->i * xt[i__2].i, z__2.i = c->r * xt[
-		i__2].i + c->i * xt[i__2].r;
+	z__2.r = c__->r * xt[i__2].r - c__->i * xt[i__2].i, z__2.i = c__->r * 
+		xt[i__2].i + c__->i * xt[i__2].r;
 	i__3 = j - 1;
 	z__3.r = s->r * yt[i__3].r - s->i * yt[i__3].i, z__3.i = s->r * yt[
 		i__3].i + s->i * yt[i__3].r;
@@ -331,7 +324,7 @@ static integer c__8 = 8;
 	i__3 = j - 1;
 	z__2.r = z__3.r * xt[i__3].r - z__3.i * xt[i__3].i, z__2.i = z__3.r * 
 		xt[i__3].i + z__3.i * xt[i__3].r;
-	d_cnjg(&z__6, c);
+	d_cnjg(&z__6, c__);
 	i__4 = j - 1;
 	z__5.r = z__6.r * yt[i__4].r - z__6.i * yt[i__4].i, z__5.i = z__6.r * 
 		yt[i__4].i + z__6.i * yt[i__4].r;

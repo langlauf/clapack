@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctrsyl_(char *trana, char *tranb, integer *isgn, integer 
 	*m, integer *n, complex *a, integer *lda, complex *b, integer *ldb, 
-	complex *c, integer *ldc, real *scale, integer *info)
+	complex *c__, integer *ldc, real *scale, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
@@ -18,10 +19,8 @@
        op(A)*X + X*op(B) = scale*C or   
        op(A)*X - X*op(B) = scale*C,   
 
-    where op(A) = A or A**H, and A and B are both upper triangular. A is 
-  
-    M-by-M and B is N-by-N; the right hand side C and the solution X are 
-  
+    where op(A) = A or A**H, and A and B are both upper triangular. A is   
+    M-by-M and B is N-by-N; the right hand side C and the solution X are   
     M-by-N; and scale is an output scale factor, set <= 1 to avoid   
     overflow in X.   
 
@@ -76,21 +75,16 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            = 1: A and B have common or very close eigenvalues; perturbed 
-  
-                 values were used to solve the equation (but the matrices 
-  
+            = 1: A and B have common or very close eigenvalues; perturbed   
+                 values were used to solve the equation (but the matrices   
                  A and B are unchanged).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -101,7 +95,7 @@
     complex q__1, q__2, q__3, q__4;
     /* Builtin functions */
     double r_imag(complex *);
-    void c_div(complex *, complex *, complex *), r_cnjg(complex *, complex *);
+    void r_cnjg(complex *, complex *);
     /* Local variables */
     static real smin;
     static complex suml, sumr;
@@ -117,6 +111,7 @@
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
     static complex x11;
+    extern /* Complex */ VOID cladiv_(complex *, complex *, complex *);
     static real scaloc;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
@@ -126,22 +121,34 @@
     static real smlnum, da11;
     static complex vec;
     static real dum[1], eps, sgn;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     notrna = lsame_(trana, "N");
     notrnb = lsame_(tranb, "N");
 
     *info = 0;
-    if (! notrna && ! lsame_(trana, "T") && ! lsame_(trana, "C")) {
+    if (! notrna && ! lsame_(trana, "T") && ! lsame_(
+	    trana, "C")) {
 	*info = -1;
-    } else if (! notrnb && ! lsame_(tranb, "T") && ! lsame_(tranb, 
-	    "C")) {
+    } else if (! notrnb && ! lsame_(tranb, "T") && ! 
+	    lsame_(tranb, "C")) {
 	*info = -2;
     } else if (*isgn != 1 && *isgn != -1) {
 	*info = -3;
@@ -177,8 +184,8 @@
     smlnum = smlnum * (real) (*m * *n) / eps;
     bignum = 1.f / smlnum;
 /* Computing MAX */
-    r__1 = smlnum, r__2 = eps * clange_("M", m, m, &A(1,1), lda, dum)
-	    , r__1 = max(r__1,r__2), r__2 = eps * clange_("M", n, n, &B(1,1), ldb, dum);
+    r__1 = smlnum, r__2 = eps * clange_("M", m, m, &a[a_offset], lda, dum), r__1 = max(r__1,r__2), r__2 = eps * clange_("M", n, n, 
+	    &b[b_offset], ldb, dum);
     smin = dmax(r__1,r__2);
     *scale = 1.f;
     sgn = (real) (*isgn);
@@ -198,31 +205,32 @@
                     I=K+1                      J=1 */
 
 	i__1 = *n;
-	for (l = 1; l <= *n; ++l) {
+	for (l = 1; l <= i__1; ++l) {
 	    for (k = *m; k >= 1; --k) {
 
-		i__2 = *m - k;
+/* Computing MIN */
+		i__2 = k + 1;
 /* Computing MIN */
 		i__3 = k + 1;
-/* Computing MIN */
-		i__4 = k + 1;
-		cdotu_(&q__1, &i__2, &A(k,min(k+1,*m)), lda, &C(min(k+1,*m),l), &c__1);
+		i__4 = *m - k;
+		cdotu_(&q__1, &i__4, &a_ref(k, min(i__2,*m)), lda, &c___ref(
+			min(i__3,*m), l), &c__1);
 		suml.r = q__1.r, suml.i = q__1.i;
 		i__2 = l - 1;
-		cdotu_(&q__1, &i__2, &C(k,1), ldc, &B(1,l), 
-			&c__1);
+		cdotu_(&q__1, &i__2, &c___ref(k, 1), ldc, &b_ref(1, l), &c__1)
+			;
 		sumr.r = q__1.r, sumr.i = q__1.i;
-		i__2 = k + l * c_dim1;
+		i__2 = c___subscr(k, l);
 		q__3.r = sgn * sumr.r, q__3.i = sgn * sumr.i;
 		q__2.r = suml.r + q__3.r, q__2.i = suml.i + q__3.i;
-		q__1.r = C(k,l).r - q__2.r, q__1.i = C(k,l).i - q__2.i;
+		q__1.r = c__[i__2].r - q__2.r, q__1.i = c__[i__2].i - q__2.i;
 		vec.r = q__1.r, vec.i = q__1.i;
 
 		scaloc = 1.f;
-		i__2 = k + k * a_dim1;
-		i__3 = l + l * b_dim1;
-		q__2.r = sgn * B(l,l).r, q__2.i = sgn * B(l,l).i;
-		q__1.r = A(k,k).r + q__2.r, q__1.i = A(k,k).i + q__2.i;
+		i__2 = a_subscr(k, k);
+		i__3 = b_subscr(l, l);
+		q__2.r = sgn * b[i__3].r, q__2.i = sgn * b[i__3].i;
+		q__1.r = a[i__2].r + q__2.r, q__1.i = a[i__2].i + q__2.i;
 		a11.r = q__1.r, a11.i = q__1.i;
 		da11 = (r__1 = a11.r, dabs(r__1)) + (r__2 = r_imag(&a11), 
 			dabs(r__2));
@@ -241,19 +249,19 @@
 		q__3.r = scaloc, q__3.i = 0.f;
 		q__2.r = vec.r * q__3.r - vec.i * q__3.i, q__2.i = vec.r * 
 			q__3.i + vec.i * q__3.r;
-		c_div(&q__1, &q__2, &a11);
+		cladiv_(&q__1, &q__2, &a11);
 		x11.r = q__1.r, x11.i = q__1.i;
 
 		if (scaloc != 1.f) {
 		    i__2 = *n;
-		    for (j = 1; j <= *n; ++j) {
-			csscal_(m, &scaloc, &C(1,j), &c__1);
+		    for (j = 1; j <= i__2; ++j) {
+			csscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L10: */
 		    }
 		    *scale *= scaloc;
 		}
-		i__2 = k + l * c_dim1;
-		C(k,l).r = x11.r, C(k,l).i = x11.i;
+		i__2 = c___subscr(k, l);
+		c__[i__2].r = x11.r, c__[i__2].i = x11.i;
 
 /* L20: */
 	    }
@@ -271,32 +279,32 @@
 
           Where   
                      K-1                         L-1   
-            R(K,L) = SUM [A'(I,K)*X(I,L)] + ISGN*SUM [X(K,J)*B(J,L)] 
-  
+            R(K,L) = SUM [A'(I,K)*X(I,L)] + ISGN*SUM [X(K,J)*B(J,L)]   
                      I=1                         J=1 */
 
 	i__1 = *n;
-	for (l = 1; l <= *n; ++l) {
+	for (l = 1; l <= i__1; ++l) {
 	    i__2 = *m;
-	    for (k = 1; k <= *m; ++k) {
+	    for (k = 1; k <= i__2; ++k) {
 
 		i__3 = k - 1;
-		cdotc_(&q__1, &i__3, &A(1,k), &c__1, &C(1,l), &c__1);
+		cdotc_(&q__1, &i__3, &a_ref(1, k), &c__1, &c___ref(1, l), &
+			c__1);
 		suml.r = q__1.r, suml.i = q__1.i;
 		i__3 = l - 1;
-		cdotu_(&q__1, &i__3, &C(k,1), ldc, &B(1,l), 
-			&c__1);
+		cdotu_(&q__1, &i__3, &c___ref(k, 1), ldc, &b_ref(1, l), &c__1)
+			;
 		sumr.r = q__1.r, sumr.i = q__1.i;
-		i__3 = k + l * c_dim1;
+		i__3 = c___subscr(k, l);
 		q__3.r = sgn * sumr.r, q__3.i = sgn * sumr.i;
 		q__2.r = suml.r + q__3.r, q__2.i = suml.i + q__3.i;
-		q__1.r = C(k,l).r - q__2.r, q__1.i = C(k,l).i - q__2.i;
+		q__1.r = c__[i__3].r - q__2.r, q__1.i = c__[i__3].i - q__2.i;
 		vec.r = q__1.r, vec.i = q__1.i;
 
 		scaloc = 1.f;
-		r_cnjg(&q__2, &A(k,k));
-		i__3 = l + l * b_dim1;
-		q__3.r = sgn * B(l,l).r, q__3.i = sgn * B(l,l).i;
+		r_cnjg(&q__2, &a_ref(k, k));
+		i__3 = b_subscr(l, l);
+		q__3.r = sgn * b[i__3].r, q__3.i = sgn * b[i__3].i;
 		q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
 		a11.r = q__1.r, a11.i = q__1.i;
 		da11 = (r__1 = a11.r, dabs(r__1)) + (r__2 = r_imag(&a11), 
@@ -317,19 +325,19 @@
 		q__3.r = scaloc, q__3.i = 0.f;
 		q__2.r = vec.r * q__3.r - vec.i * q__3.i, q__2.i = vec.r * 
 			q__3.i + vec.i * q__3.r;
-		c_div(&q__1, &q__2, &a11);
+		cladiv_(&q__1, &q__2, &a11);
 		x11.r = q__1.r, x11.i = q__1.i;
 
 		if (scaloc != 1.f) {
 		    i__3 = *n;
-		    for (j = 1; j <= *n; ++j) {
-			csscal_(m, &scaloc, &C(1,j), &c__1);
+		    for (j = 1; j <= i__3; ++j) {
+			csscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L40: */
 		    }
 		    *scale *= scaloc;
 		}
-		i__3 = k + l * c_dim1;
-		C(k,l).r = x11.r, C(k,l).i = x11.i;
+		i__3 = c___subscr(k, l);
+		c__[i__3].r = x11.r, c__[i__3].i = x11.i;
 
 /* L50: */
 	    }
@@ -343,8 +351,7 @@
           The (K,L)th block of X is determined starting from   
           upper-right corner column by column by   
 
-              A'(K,K)*X(K,L) + ISGN*X(K,L)*B'(L,L) = C(K,L) - R(K,L) 
-  
+              A'(K,K)*X(K,L) + ISGN*X(K,L)*B'(L,L) = C(K,L) - R(K,L)   
 
           Where   
                       K-1   
@@ -356,30 +363,32 @@
 
 	for (l = *n; l >= 1; --l) {
 	    i__1 = *m;
-	    for (k = 1; k <= *m; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 		i__2 = k - 1;
-		cdotc_(&q__1, &i__2, &A(1,k), &c__1, &C(1,l), &c__1);
+		cdotc_(&q__1, &i__2, &a_ref(1, k), &c__1, &c___ref(1, l), &
+			c__1);
 		suml.r = q__1.r, suml.i = q__1.i;
-		i__2 = *n - l;
+/* Computing MIN */
+		i__2 = l + 1;
 /* Computing MIN */
 		i__3 = l + 1;
-/* Computing MIN */
-		i__4 = l + 1;
-		cdotc_(&q__1, &i__2, &C(k,min(l+1,*n)), ldc, &B(l,min(l+1,*n)), ldb);
+		i__4 = *n - l;
+		cdotc_(&q__1, &i__4, &c___ref(k, min(i__2,*n)), ldc, &b_ref(l,
+			 min(i__3,*n)), ldb);
 		sumr.r = q__1.r, sumr.i = q__1.i;
-		i__2 = k + l * c_dim1;
+		i__2 = c___subscr(k, l);
 		r_cnjg(&q__4, &sumr);
 		q__3.r = sgn * q__4.r, q__3.i = sgn * q__4.i;
 		q__2.r = suml.r + q__3.r, q__2.i = suml.i + q__3.i;
-		q__1.r = C(k,l).r - q__2.r, q__1.i = C(k,l).i - q__2.i;
+		q__1.r = c__[i__2].r - q__2.r, q__1.i = c__[i__2].i - q__2.i;
 		vec.r = q__1.r, vec.i = q__1.i;
 
 		scaloc = 1.f;
-		i__2 = k + k * a_dim1;
-		i__3 = l + l * b_dim1;
-		q__3.r = sgn * B(l,l).r, q__3.i = sgn * B(l,l).i;
-		q__2.r = A(k,k).r + q__3.r, q__2.i = A(k,k).i + q__3.i;
+		i__2 = a_subscr(k, k);
+		i__3 = b_subscr(l, l);
+		q__3.r = sgn * b[i__3].r, q__3.i = sgn * b[i__3].i;
+		q__2.r = a[i__2].r + q__3.r, q__2.i = a[i__2].i + q__3.i;
 		r_cnjg(&q__1, &q__2);
 		a11.r = q__1.r, a11.i = q__1.i;
 		da11 = (r__1 = a11.r, dabs(r__1)) + (r__2 = r_imag(&a11), 
@@ -400,19 +409,19 @@
 		q__3.r = scaloc, q__3.i = 0.f;
 		q__2.r = vec.r * q__3.r - vec.i * q__3.i, q__2.i = vec.r * 
 			q__3.i + vec.i * q__3.r;
-		c_div(&q__1, &q__2, &a11);
+		cladiv_(&q__1, &q__2, &a11);
 		x11.r = q__1.r, x11.i = q__1.i;
 
 		if (scaloc != 1.f) {
 		    i__2 = *n;
-		    for (j = 1; j <= *n; ++j) {
-			csscal_(m, &scaloc, &C(1,j), &c__1);
+		    for (j = 1; j <= i__2; ++j) {
+			csscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L70: */
 		    }
 		    *scale *= scaloc;
 		}
-		i__2 = k + l * c_dim1;
-		C(k,l).r = x11.r, C(k,l).i = x11.i;
+		i__2 = c___subscr(k, l);
+		c__[i__2].r = x11.r, c__[i__2].i = x11.i;
 
 /* L80: */
 	    }
@@ -430,39 +439,40 @@
 
           Where   
                       M                          N   
-            R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B'(L,J)] 
-  
+            R(K,L) = SUM [A(K,I)*X(I,L)] + ISGN*SUM [X(K,J)*B'(L,J)]   
                     I=K+1                      J=L+1 */
 
 	for (l = *n; l >= 1; --l) {
 	    for (k = *m; k >= 1; --k) {
 
-		i__1 = *m - k;
+/* Computing MIN */
+		i__1 = k + 1;
 /* Computing MIN */
 		i__2 = k + 1;
-/* Computing MIN */
-		i__3 = k + 1;
-		cdotu_(&q__1, &i__1, &A(k,min(k+1,*m)), lda, &C(min(k+1,*m),l), &c__1);
+		i__3 = *m - k;
+		cdotu_(&q__1, &i__3, &a_ref(k, min(i__1,*m)), lda, &c___ref(
+			min(i__2,*m), l), &c__1);
 		suml.r = q__1.r, suml.i = q__1.i;
-		i__1 = *n - l;
+/* Computing MIN */
+		i__1 = l + 1;
 /* Computing MIN */
 		i__2 = l + 1;
-/* Computing MIN */
-		i__3 = l + 1;
-		cdotc_(&q__1, &i__1, &C(k,min(l+1,*n)), ldc, &B(l,min(l+1,*n)), ldb);
+		i__3 = *n - l;
+		cdotc_(&q__1, &i__3, &c___ref(k, min(i__1,*n)), ldc, &b_ref(l,
+			 min(i__2,*n)), ldb);
 		sumr.r = q__1.r, sumr.i = q__1.i;
-		i__1 = k + l * c_dim1;
+		i__1 = c___subscr(k, l);
 		r_cnjg(&q__4, &sumr);
 		q__3.r = sgn * q__4.r, q__3.i = sgn * q__4.i;
 		q__2.r = suml.r + q__3.r, q__2.i = suml.i + q__3.i;
-		q__1.r = C(k,l).r - q__2.r, q__1.i = C(k,l).i - q__2.i;
+		q__1.r = c__[i__1].r - q__2.r, q__1.i = c__[i__1].i - q__2.i;
 		vec.r = q__1.r, vec.i = q__1.i;
 
 		scaloc = 1.f;
-		i__1 = k + k * a_dim1;
-		r_cnjg(&q__3, &B(l,l));
+		i__1 = a_subscr(k, k);
+		r_cnjg(&q__3, &b_ref(l, l));
 		q__2.r = sgn * q__3.r, q__2.i = sgn * q__3.i;
-		q__1.r = A(k,k).r + q__2.r, q__1.i = A(k,k).i + q__2.i;
+		q__1.r = a[i__1].r + q__2.r, q__1.i = a[i__1].i + q__2.i;
 		a11.r = q__1.r, a11.i = q__1.i;
 		da11 = (r__1 = a11.r, dabs(r__1)) + (r__2 = r_imag(&a11), 
 			dabs(r__2));
@@ -482,19 +492,19 @@
 		q__3.r = scaloc, q__3.i = 0.f;
 		q__2.r = vec.r * q__3.r - vec.i * q__3.i, q__2.i = vec.r * 
 			q__3.i + vec.i * q__3.r;
-		c_div(&q__1, &q__2, &a11);
+		cladiv_(&q__1, &q__2, &a11);
 		x11.r = q__1.r, x11.i = q__1.i;
 
 		if (scaloc != 1.f) {
 		    i__1 = *n;
-		    for (j = 1; j <= *n; ++j) {
-			csscal_(m, &scaloc, &C(1,j), &c__1);
+		    for (j = 1; j <= i__1; ++j) {
+			csscal_(m, &scaloc, &c___ref(1, j), &c__1);
 /* L100: */
 		    }
 		    *scale *= scaloc;
 		}
-		i__1 = k + l * c_dim1;
-		C(k,l).r = x11.r, C(k,l).i = x11.i;
+		i__1 = c___subscr(k, l);
+		c__[i__1].r = x11.r, c__[i__1].i = x11.i;
 
 /* L110: */
 	    }
@@ -508,4 +518,12 @@
 /*     End of CTRSYL */
 
 } /* ctrsyl_ */
+
+#undef c___ref
+#undef c___subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

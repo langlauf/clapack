@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static complex c_b1 = {0.f,0.f};
 static complex c_b2 = {1.f,0.f};
 
 /* Subroutine */ int chet22_(integer *itype, char *uplo, integer *n, integer *
-	m, integer *kband, complex *a, integer *lda, real *d, real *e, 
+	m, integer *kband, complex *a, integer *lda, real *d__, real *e, 
 	complex *u, integer *ldu, complex *v, integer *ldv, complex *tau, 
 	complex *work, real *rwork, real *result)
 {
@@ -41,7 +42,7 @@ static complex c_b2 = {1.f,0.f};
     static integer nnp1;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -54,11 +55,9 @@ static complex c_b2 = {1.f,0.f};
 
                  A U = U S   
 
-         where A is complex Hermitian, the columns of U are orthonormal, 
-  
+         where A is complex Hermitian, the columns of U are orthonormal,   
          and S is diagonal (if KBAND=0) or symmetric tridiagonal (if   
-         KBAND=1).  If ITYPE=1, then U is represented as a dense matrix, 
-  
+         KBAND=1).  If ITYPE=1, then U is represented as a dense matrix,   
          otherwise the U is expressed as a product of Householder   
          transformations, whose vectors are stored in the array "V" and   
          whose scaling constants are in "TAU"; we shall use the letter   
@@ -87,8 +86,7 @@ static complex c_b2 = {1.f,0.f};
             Not modified.   
 
     N       INTEGER   
-            The size of the matrix.  If it is zero, CHET22 does nothing. 
-  
+            The size of the matrix.  If it is zero, CHET22 does nothing.   
             It must be at least zero.   
             Not modified.   
 
@@ -168,21 +166,20 @@ static complex c_b2 = {1.f,0.f};
             if LDU is at least N.   
             Modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --tau;
     --work;
@@ -223,7 +220,7 @@ static complex c_b2 = {1.f,0.f};
 	i__2 = jj;
 	i__3 = jj;
 	i__4 = j;
-	q__1.r = work[i__3].r - d[i__4], q__1.i = work[i__3].i;
+	q__1.r = work[i__3].r - d__[i__4], q__1.i = work[i__3].i;
 	work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L10: */
     }

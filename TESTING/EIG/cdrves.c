@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__2 = 2;
 
 /* Subroutine */ int cdrves_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, 
-	complex *a, integer *lda, complex *h, complex *ht, complex *w, 
+	complex *a, integer *lda, complex *h__, complex *ht, complex *w, 
 	complex *wt, complex *vs, integer *ldvs, real *result, complex *work, 
 	integer *nwork, real *rwork, integer *iwork, logical *bwork, integer *
 	info)
@@ -109,7 +110,7 @@ static integer c__2 = 2;
     static real unfl, ovfl;
     static integer rsub;
     static char sort[1];
-    static integer i, j, n;
+    static integer i__, j, n;
     static logical badnn;
     extern /* Subroutine */ int cgees_(char *, char *, L_fp, integer *, 
 	    complex *, integer *, integer *, complex *, complex *, integer *, 
@@ -167,7 +168,15 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define ht_subscr(a_1,a_2) (a_2)*ht_dim1 + a_1
+#define ht_ref(a_1,a_2) ht[ht_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -215,8 +224,7 @@ static integer c__2 = 2;
          Here VS is the matrix of Schur eigenvectors, and T is in Schur   
          form  (with sorting of eigenvalues).   
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). 
-  
+       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
 
        (10)    0     if W are eigenvalues of T   
                1/ulp otherwise   
@@ -363,8 +371,7 @@ static integer c__2 = 2;
 
     A       (workspace) COMPLEX array, dimension (LDA, max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used. 
-  
+            computed.  On exit, A contains the last matrix actually used.   
 
     LDA     (input) INTEGER   
             The leading dimension of A, and H. LDA must be at   
@@ -392,8 +399,7 @@ static integer c__2 = 2;
 
     RESULT  (output) REAL array, dimension (13)   
             The values computed by the 13 tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow. 
-  
+            The values are currently limited to 1/ulp, to avoid overflow.   
 
     WORK    (workspace) COMPLEX array, dimension (NWORK)   
 
@@ -417,8 +423,7 @@ static integer c__2 = 2;
             If  CLATMR, CLATMS, CLATME or CGEES returns an error code,   
                 the absolute value of it is returned.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -442,26 +447,25 @@ static integer c__2 = 2;
        KCONDS(j)       Select whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = ht_dim1 + 1;
+    ht_offset = 1 + ht_dim1 * 1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --w;
     --wt;
     vs_dim1 = *ldvs;
-    vs_offset = vs_dim1 + 1;
+    vs_offset = 1 + vs_dim1 * 1;
     vs -= vs_offset;
     --result;
     --work;
@@ -471,8 +475,8 @@ static integer c__2 = 2;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'C';
-    s_copy(path + 1, "ES", 2L, 2L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "ES", (ftnlen)2, (ftnlen)2);
 
 /*     Check for errors */
 
@@ -576,12 +580,9 @@ static integer c__2 = 2;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -634,7 +635,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    q__1.r = anorm, q__1.i = 0.f;
 		    a[i__4].r = q__1.r, a[i__4].i = q__1.i;
 /* L70: */
@@ -646,11 +647,11 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    q__1.r = anorm, q__1.i = 0.f;
 		    a[i__4].r = q__1.r, a[i__4].i = q__1.i;
 		    if (jcol > 1) {
-			i__4 = jcol + (jcol - 1) * a_dim1;
+			i__4 = a_subscr(jcol, jcol - 1);
 			a[i__4].r = 1.f, a[i__4].i = 0.f;
 		    }
 /* L80: */
@@ -722,12 +723,12 @@ L60:
 		    claset_("Full", &c__2, &n, &c_b1, &c_b1, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    claset_("Full", &i__3, &c__1, &c_b1, &c_b1, &a[a_dim1 + 3]
-			    , lda);
+		    claset_("Full", &i__3, &c__1, &c_b1, &c_b1, &a_ref(3, 1), 
+			    lda);
 		    i__3 = n - 3;
-		    claset_("Full", &i__3, &c__2, &c_b1, &c_b1, &a[(n - 1) * 
-			    a_dim1 + 3], lda);
-		    claset_("Full", &c__1, &n, &c_b1, &c_b1, &a[n + a_dim1], 
+		    claset_("Full", &i__3, &c__2, &c_b1, &c_b1, &a_ref(3, n - 
+			    1), lda);
+		    claset_("Full", &c__1, &n, &c_b1, &c_b1, &a_ref(n, 1), 
 			    lda);
 		}
 
@@ -749,7 +750,7 @@ L60:
 	    if (iinfo != 0) {
 		io___31.ciunit = *nounit;
 		s_wsfe(&io___31);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -780,8 +781,7 @@ L90:
 /* L100: */
 		}
 
-/*              Test with and without sorting of eigenvalues 
-*/
+/*              Test with and without sorting of eigenvalues */
 
 		for (isort = 0; isort <= 1; ++isort) {
 		    if (isort == 0) {
@@ -792,18 +792,18 @@ L90:
 			rsub = 6;
 		    }
 
-/*                 Compute Schur form and Schur vectors, a
-nd test them */
+/*                 Compute Schur form and Schur vectors, and test them */
 
-		    clacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda);
-		    cgees_("V", sort, (L_fp)cslect_, &n, &h[h_offset], lda, &
-			    sdim, &w[1], &vs[vs_offset], ldvs, &work[1], &
+		    clacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], 
+			    lda);
+		    cgees_("V", sort, (L_fp)cslect_, &n, &h__[h_offset], lda, 
+			    &sdim, &w[1], &vs[vs_offset], ldvs, &work[1], &
 			    nnwork, &rwork[1], &bwork[1], &iinfo);
 		    if (iinfo != 0) {
 			result[rsub + 1] = ulpinv;
 			io___38.ciunit = *nounit;
 			s_wsfe(&io___38);
-			do_fio(&c__1, "CGEES1", 6L);
+			do_fio(&c__1, "CGEES1", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -822,9 +822,9 @@ nd test them */
 		    i__3 = n - 1;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j + 1; i <= i__4; ++i) {
-			    i__5 = i + j * h_dim1;
-			    if (h[i__5].r != 0.f || h[i__5].i != 0.f) {
+			for (i__ = j + 1; i__ <= i__4; ++i__) {
+			    i__5 = h___subscr(i__, j);
+			    if (h__[i__5].r != 0.f || h__[i__5].i != 0.f) {
 				result[rsub + 1] = ulpinv;
 			    }
 /* L110: */
@@ -832,13 +832,12 @@ nd test them */
 /* L120: */
 		    }
 
-/*                 Do Tests (2) and (3) or Tests (8) and (
-9)   
+/*                 Do Tests (2) and (3) or Tests (8) and (9)   
 
    Computing MAX */
 		    i__3 = 1, i__4 = (n << 1) * n;
 		    lwork = max(i__3,i__4);
-		    chst01_(&n, &c__1, &n, &a[a_offset], lda, &h[h_offset], 
+		    chst01_(&n, &c__1, &n, &a[a_offset], lda, &h__[h_offset], 
 			    lda, &vs[vs_offset], ldvs, &work[1], &lwork, &
 			    rwork[1], res);
 		    result[rsub + 2] = res[0];
@@ -848,11 +847,11 @@ nd test them */
 
 		    result[rsub + 4] = 0.f;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i + i * h_dim1;
-			i__5 = i;
-			if (h[i__4].r != w[i__5].r || h[i__4].i != w[i__5].i) 
-				{
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = h___subscr(i__, i__);
+			i__5 = i__;
+			if (h__[i__4].r != w[i__5].r || h__[i__4].i != w[i__5]
+				.i) {
 			    result[rsub + 4] = ulpinv;
 			}
 /* L130: */
@@ -869,7 +868,7 @@ nd test them */
 			result[rsub + 5] = ulpinv;
 			io___42.ciunit = *nounit;
 			s_wsfe(&io___42);
-			do_fio(&c__1, "CGEES2", 6L);
+			do_fio(&c__1, "CGEES2", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -886,11 +885,11 @@ nd test them */
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = 1; i <= i__4; ++i) {
-			    i__5 = i + j * h_dim1;
-			    i__6 = i + j * ht_dim1;
-			    if (h[i__5].r != ht[i__6].r || h[i__5].i != ht[
-				    i__6].i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    i__5 = h___subscr(i__, j);
+			    i__6 = ht_subscr(i__, j);
+			    if (h__[i__5].r != ht[i__6].r || h__[i__5].i != 
+				    ht[i__6].i) {
 				result[rsub + 5] = ulpinv;
 			    }
 /* L140: */
@@ -902,9 +901,9 @@ nd test them */
 
 		    result[rsub + 6] = 0.f;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i;
-			i__5 = i;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			i__5 = i__;
 			if (w[i__4].r != wt[i__5].r || w[i__4].i != wt[i__5]
 				.i) {
 			    result[rsub + 6] = ulpinv;
@@ -918,12 +917,13 @@ nd test them */
 			result[13] = 0.f;
 			knteig = 0;
 			i__3 = n;
-			for (i = 1; i <= i__3; ++i) {
-			    if (cslect_(&w[i])) {
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    if (cslect_(&w[i__])) {
 				++knteig;
 			    }
-			    if (i < n) {
-				if (cslect_(&w[i + 1]) && ! cslect_(&w[i])) {
+			    if (i__ < n) {
+				if (cslect_(&w[i__ + 1]) && ! cslect_(&w[i__])
+					) {
 				    result[13] = ulpinv;
 				}
 			    }
@@ -959,7 +959,7 @@ L190:
 		if (ntestf == 1) {
 		    io___46.ciunit = *nounit;
 		    s_wsfe(&io___46);
-		    do_fio(&c__1, path, 3L);
+		    do_fio(&c__1, path, (ftnlen)3);
 		    e_wsfe();
 		    io___47.ciunit = *nounit;
 		    s_wsfe(&io___47);
@@ -1020,4 +1020,12 @@ L230:
 /*     End of CDRVES */
 
 } /* cdrves_ */
+
+#undef ht_ref
+#undef ht_subscr
+#undef h___ref
+#undef h___subscr
+#undef a_ref
+#undef a_subscr
+
 

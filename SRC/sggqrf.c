@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sggqrf_(integer *n, integer *m, integer *p, real *a, 
 	integer *lda, real *taua, real *b, integer *ldb, real *taub, real *
 	work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SGGQRF computes a generalized QR factorization of an N-by-M matrix A 
-  
+    SGGQRF computes a generalized QR factorization of an N-by-M matrix A   
     and an N-by-P matrix B:   
 
                 A = Q*R,        B = Q*T*Z,   
@@ -34,14 +34,12 @@
 
     where T12 or T21 is upper triangular.   
 
-    In particular, if B is square and nonsingular, the GQR factorization 
-  
+    In particular, if B is square and nonsingular, the GQR factorization   
     of A and B implicitly gives the QR factorization of inv(B)*A:   
 
                  inv(B)*A = Z'*(inv(T)*R)   
 
-    where inv(B) denotes the inverse of the matrix B, and Z' denotes the 
-  
+    where inv(B) denotes the inverse of the matrix B, and Z' denotes the   
     transpose of the matrix Z.   
 
     Arguments   
@@ -58,11 +56,9 @@
 
     A       (input/output) REAL array, dimension (LDA,M)   
             On entry, the N-by-M matrix A.   
-            On exit, the elements on and above the diagonal of the array 
-  
+            On exit, the elements on and above the diagonal of the array   
             contain the min(N,M)-by-M upper trapezoidal matrix R (R is   
-            upper triangular if N >= M); the elements below the diagonal, 
-  
+            upper triangular if N >= M); the elements below the diagonal,   
             with the array TAUA, represent the orthogonal matrix Q as a   
             product of min(N,M) elementary reflectors (see Further   
             Details).   
@@ -77,12 +73,9 @@
     B       (input/output) REAL array, dimension (LDB,P)   
             On entry, the N-by-P matrix B.   
             On exit, if N <= P, the upper triangle of the subarray   
-            B(1:N,P-N+1:P) contains the N-by-N upper triangular matrix T; 
-  
-            if N > P, the elements on and above the (N-P)-th subdiagonal 
-  
-            contain the N-by-P upper trapezoidal matrix T; the remaining 
-  
+            B(1:N,P-N+1:P) contains the N-by-N upper triangular matrix T;   
+            if N > P, the elements on and above the (N-P)-th subdiagonal   
+            contain the N-by-P upper trapezoidal matrix T; the remaining   
             elements, with the array TAUB, represent the orthogonal   
             matrix Z as a product of elementary reflectors (see Further   
             Details).   
@@ -99,13 +92,16 @@
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK. LWORK >= max(1,N,M,P).   
-            For optimum performance LWORK >= max(N,M,P)*max(NB1,NB2,NB3), 
-  
+            For optimum performance LWORK >= max(N,M,P)*max(NB1,NB2,NB3),   
             where NB1 is the optimal blocksize for the QR factorization   
             of an N-by-M matrix, NB2 is the optimal blocksize for the   
-            RQ factorization of an N-by-P matrix, and NB3 is the optimal 
-  
+            RQ factorization of an N-by-P matrix, and NB3 is the optimal   
             blocksize for a call of SORMQR.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -123,8 +119,7 @@
        H(i) = I - taua * v * v'   
 
     where taua is a real scalar, and v is a real vector with   
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i+1:n,i), 
-  
+    v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i+1:n,i),   
     and taua in TAUA(i).   
     To form Q explicitly, use LAPACK subroutine SORGQR.   
     To use Q to update another matrix, use LAPACK subroutine SORMQR.   
@@ -138,41 +133,64 @@
        H(i) = I - taub * v * v'   
 
     where taub is a real scalar, and v is a real vector with   
-    v(p-k+i+1:p) = 0 and v(p-k+i) = 1; v(1:p-k+i-1) is stored on exit in 
-  
+    v(p-k+i+1:p) = 0 and v(p-k+i) = 1; v(1:p-k+i-1) is stored on exit in   
     B(n-k+i,1:p-k+i-1), and taub in TAUB(i).   
     To form Z explicitly, use LAPACK subroutine SORGRQ.   
     To use Z to update another matrix, use LAPACK subroutine SORMRQ.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2;
     /* Local variables */
-    static integer lopt;
-    extern /* Subroutine */ int xerbla_(char *, integer *), sgeqrf_(
-	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , integer *), sgerqf_(integer *, integer *, real *, integer *, 
-	    real *, real *, integer *, integer *), sormqr_(char *, char *, 
-	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, real *, integer *, integer *);
+    static integer lopt, nb;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int sgeqrf_(integer *, integer *, real *, integer 
+	    *, real *, real *, integer *, integer *), sgerqf_(integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, integer *
+	    );
+    static integer nb1, nb2, nb3, lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int sormqr_(char *, char *, integer *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, real *, 
+	    integer *, integer *);
 
 
-#define TAUA(I) taua[(I)-1]
-#define TAUB(I) taub[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --taua;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --taub;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
+    nb1 = ilaenv_(&c__1, "SGEQRF", " ", n, m, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb2 = ilaenv_(&c__1, "SGERQF", " ", n, p, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb3 = ilaenv_(&c__1, "SORMQR", " ", n, m, p, &c_n1, (ftnlen)6, (ftnlen)1);
+/* Computing MAX */
+    i__1 = max(nb1,nb2);
+    nb = max(i__1,nb3);
+/* Computing MAX */
+    i__1 = max(*n,*m);
+    lwkopt = max(i__1,*p) * nb;
+    work[1] = (real) lwkopt;
+    lquery = *lwork == -1;
     if (*n < 0) {
 	*info = -1;
     } else if (*m < 0) {
@@ -186,7 +204,7 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = max(1,*n), i__1 = max(i__1,*m);
-	if (*lwork < max(i__1,*p)) {
+	if (*lwork < max(i__1,*p) && ! lquery) {
 	    *info = -11;
 	}
     }
@@ -194,27 +212,30 @@
 	i__1 = -(*info);
 	xerbla_("SGGQRF", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     QR factorization of N-by-M matrix A: A = Q*R */
 
-    sgeqrf_(n, m, &A(1,1), lda, &TAUA(1), &WORK(1), lwork, info);
-    lopt = WORK(1);
+    sgeqrf_(n, m, &a[a_offset], lda, &taua[1], &work[1], lwork, info);
+    lopt = work[1];
 
 /*     Update B := Q'*B. */
 
     i__1 = min(*n,*m);
-    sormqr_("Left", "Transpose", n, p, &i__1, &A(1,1), lda, &TAUA(1), &B(1,1), ldb, &WORK(1), lwork, info);
+    sormqr_("Left", "Transpose", n, p, &i__1, &a[a_offset], lda, &taua[1], &b[
+	    b_offset], ldb, &work[1], lwork, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(1);
+    i__1 = lopt, i__2 = (integer) work[1];
     lopt = max(i__1,i__2);
 
 /*     RQ factorization of N-by-P matrix B: B = T*Z. */
 
-    sgerqf_(n, p, &B(1,1), ldb, &TAUB(1), &WORK(1), lwork, info);
+    sgerqf_(n, p, &b[b_offset], ldb, &taub[1], &work[1], lwork, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(1);
-    WORK(1) = (real) max(i__1,i__2);
+    i__1 = lopt, i__2 = (integer) work[1];
+    work[1] = (real) max(i__1,i__2);
 
     return 0;
 

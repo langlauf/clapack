@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static complex c_b1 = {0.f,0.f};
     complex q__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *);
@@ -29,18 +30,21 @@ static complex c_b1 = {0.f,0.f};
     static real ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    CGET03 computes the residual for a general matrix times its inverse: 
-  
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
+    CGET03 computes the residual for a general matrix times its inverse:   
+       norm( I - AINV*A ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
 
     Arguments   
@@ -59,14 +63,12 @@ static complex c_b1 = {0.f,0.f};
             The inverse of the matrix A.   
 
     LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N). 
-  
+            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
 
     WORK    (workspace) COMPLEX array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) REAL array, dimension (N)   
 
@@ -75,23 +77,22 @@ static complex c_b1 = {0.f,0.f};
             ( 1/norm(A) ) / norm(AINV).   
 
     RESID   (output) REAL   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+            norm(I - AINV*A) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = ainv_dim1 + 1;
+    ainv_offset = 1 + ainv_dim1 * 1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -117,18 +118,18 @@ static complex c_b1 = {0.f,0.f};
 /*     Compute I - A * AINV */
 
     q__1.r = -1.f, q__1.i = 0.f;
-    cgemm_("No transpose", "No transpose", n, n, n, &q__1, &a[a_offset], lda, 
-	    &ainv[ainv_offset], ldainv, &c_b1, &work[work_offset], ldwork);
+    cgemm_("No transpose", "No transpose", n, n, n, &q__1, &ainv[ainv_offset],
+	     ldainv, &a[a_offset], lda, &c_b1, &work[work_offset], ldwork);
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * work_dim1;
-	i__3 = i + i * work_dim1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = work_subscr(i__, i__);
+	i__3 = work_subscr(i__, i__);
 	q__1.r = work[i__3].r + 1.f, q__1.i = work[i__3].i + 0.f;
 	work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L10: */
     }
 
-/*     Compute norm(I - A*AINV) / (N * norm(A) * norm(AINV) * EPS) */
+/*     Compute norm(I - AINV*A) / (N * norm(A) * norm(AINV) * EPS) */
 
     *resid = clange_("1", n, n, &work[work_offset], ldwork, &rwork[1]);
 
@@ -139,4 +140,8 @@ static complex c_b1 = {0.f,0.f};
 /*     End of CGET03 */
 
 } /* cget03_ */
+
+#undef work_ref
+#undef work_subscr
+
 

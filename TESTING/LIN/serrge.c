@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -39,7 +40,7 @@ static integer c__4 = 4;
     /* Local variables */
     static integer info;
     static real anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
+    static integer i__, j;
     static real ccond, w[12], x[4], rcond;
     static char c2[2];
     static real r1[4], r2[4];
@@ -78,7 +79,11 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -99,22 +104,21 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1.f / (real) (i + j);
-	    af[i + (j << 2) - 5] = 1.f / (real) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1.f / (real) (i__ + j);
+	    af_ref(i__, j) = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -130,13 +134,12 @@ static integer c__4 = 4;
 
     if (lsamen_(&c__2, c2, "GE")) {
 
-/*        Test error exits of the routines that use the LU decompositi
-on   
+/*        Test error exits of the routines that use the LU decomposition   
           of a general matrix.   
 
           SGETRF */
 
-	s_copy(srnamc_1.srnamt, "SGETRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGETRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgetrf_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("SGETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -152,7 +155,7 @@ on
 
 /*        SGETF2 */
 
-	s_copy(srnamc_1.srnamt, "SGETF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGETF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgetf2_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("SGETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -168,7 +171,7 @@ on
 
 /*        SGETRI */
 
-	s_copy(srnamc_1.srnamt, "SGETRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGETRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgetri_(&c_n1, a, &c__1, ip, w, &c__12, &info);
 	chkxer_("SGETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -180,7 +183,7 @@ on
 
 /*        SGETRS */
 
-	s_copy(srnamc_1.srnamt, "SGETRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGETRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("SGETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -204,7 +207,7 @@ on
 
 /*        SGERFS */
 
-	s_copy(srnamc_1.srnamt, "SGERFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGERFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgerfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -243,7 +246,7 @@ on
 
 /*        SGECON */
 
-	s_copy(srnamc_1.srnamt, "SGECON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGECON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgecon_("/", &c__0, a, &c__1, &anrm, &rcond, w, iw, &info);
 	chkxer_("SGECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -259,7 +262,7 @@ on
 
 /*        SGEEQU */
 
-	s_copy(srnamc_1.srnamt, "SGEEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGEEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgeequ_(&c_n1, &c__0, a, &c__1, r1, r2, &rcond, &ccond, &anrm, &info);
 	chkxer_("SGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -275,13 +278,12 @@ on
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
-/*        Test error exits of the routines that use the LU decompositi
-on   
+/*        Test error exits of the routines that use the LU decomposition   
           of a general band matrix.   
 
           SGBTRF */
 
-	s_copy(srnamc_1.srnamt, "SGBTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbtrf_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("SGBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -305,7 +307,7 @@ on
 
 /*        SGBTF2 */
 
-	s_copy(srnamc_1.srnamt, "SGBTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbtf2_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("SGBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -329,7 +331,7 @@ on
 
 /*        SGBTRS */
 
-	s_copy(srnamc_1.srnamt, "SGBTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbtrs_("/", &c__0, &c__0, &c__0, &c__1, a, &c__1, ip, b, &c__1, &
 		info);
@@ -368,7 +370,7 @@ on
 
 /*        SGBRFS */
 
-	s_copy(srnamc_1.srnamt, "SGBRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbrfs_("/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
 		c__1, x, &c__1, r1, r2, w, iw, &info);
@@ -417,7 +419,7 @@ on
 
 /*        SGBCON */
 
-	s_copy(srnamc_1.srnamt, "SGBCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, iw, 
 		&info);
@@ -446,7 +448,7 @@ on
 
 /*        SGBEQU */
 
-	s_copy(srnamc_1.srnamt, "SGBEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SGBEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sgbequ_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, r1, r2, &rcond, &ccond, 
 		&anrm, &info);
@@ -483,4 +485,8 @@ on
 /*     End of SERRGE */
 
 } /* serrge_ */
+
+#undef af_ref
+#undef a_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int claic1_(integer *job, integer *j, complex *x, real *sest,
-	 complex *w, complex *gamma, real *sestpr, complex *s, complex *c)
+	 complex *w, complex *gamma, real *sestpr, complex *s, complex *c__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -15,8 +16,7 @@
     CLAIC1 applies one step of incremental condition estimation in   
     its simplest version:   
 
-    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j 
-  
+    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j   
     lower triangular matrix L, such that   
              twonorm(L*x) = sest   
     Then CLAIC1 computes sestpr, s, c such that   
@@ -43,10 +43,8 @@
     =========   
 
     JOB     (input) INTEGER   
-            = 1: an estimate for the largest singular value is computed. 
-  
-            = 2: an estimate for the smallest singular value is computed. 
-  
+            = 1: an estimate for the largest singular value is computed.   
+            = 2: an estimate for the smallest singular value is computed.   
 
     J       (input) INTEGER   
             Length of X and W   
@@ -72,19 +70,15 @@
     C       (output) COMPLEX   
             Cosine needed in forming xhat.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     real r__1, r__2;
-    doublereal d__1, d__2;
     complex q__1, q__2, q__3, q__4, q__5, q__6;
     /* Builtin functions */
     double c_abs(complex *);
@@ -103,13 +97,12 @@
     static real absest, scl, eps, tmp;
 
 
+    --w;
+    --x;
 
-#define W(I) w[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     eps = slamch_("Epsilon");
-    cdotc_(&q__1, j, &X(1), &c__1, &W(1), &c__1);
+    cdotc_(&q__1, j, &x[1], &c__1, &w[1], &c__1);
     alpha.r = q__1.r, alpha.i = q__1.i;
 
     absalp = c_abs(&alpha);
@@ -126,32 +119,32 @@
 	    s1 = dmax(absgam,absalp);
 	    if (s1 == 0.f) {
 		s->r = 0.f, s->i = 0.f;
-		c->r = 1.f, c->i = 0.f;
+		c__->r = 1.f, c__->i = 0.f;
 		*sestpr = 0.f;
 	    } else {
 		q__1.r = alpha.r / s1, q__1.i = alpha.i / s1;
 		s->r = q__1.r, s->i = q__1.i;
 		q__1.r = gamma->r / s1, q__1.i = gamma->i / s1;
-		c->r = q__1.r, c->i = q__1.i;
+		c__->r = q__1.r, c__->i = q__1.i;
 		r_cnjg(&q__4, s);
 		q__3.r = s->r * q__4.r - s->i * q__4.i, q__3.i = s->r * 
 			q__4.i + s->i * q__4.r;
-		r_cnjg(&q__6, c);
-		q__5.r = c->r * q__6.r - c->i * q__6.i, q__5.i = c->r * 
-			q__6.i + c->i * q__6.r;
+		r_cnjg(&q__6, c__);
+		q__5.r = c__->r * q__6.r - c__->i * q__6.i, q__5.i = c__->r * 
+			q__6.i + c__->i * q__6.r;
 		q__2.r = q__3.r + q__5.r, q__2.i = q__3.i + q__5.i;
 		c_sqrt(&q__1, &q__2);
 		tmp = q__1.r;
 		q__1.r = s->r / tmp, q__1.i = s->i / tmp;
 		s->r = q__1.r, s->i = q__1.i;
-		q__1.r = c->r / tmp, q__1.i = c->i / tmp;
-		c->r = q__1.r, c->i = q__1.i;
+		q__1.r = c__->r / tmp, q__1.i = c__->i / tmp;
+		c__->r = q__1.r, c__->i = q__1.i;
 		*sestpr = s1 * tmp;
 	    }
 	    return 0;
 	} else if (absgam <= eps * absest) {
 	    s->r = 1.f, s->i = 0.f;
-	    c->r = 0.f, c->i = 0.f;
+	    c__->r = 0.f, c__->i = 0.f;
 	    tmp = dmax(absest,absalp);
 	    s1 = absest / tmp;
 	    s2 = absalp / tmp;
@@ -162,11 +155,11 @@
 	    s2 = absest;
 	    if (s1 <= s2) {
 		s->r = 1.f, s->i = 0.f;
-		c->r = 0.f, c->i = 0.f;
+		c__->r = 0.f, c__->i = 0.f;
 		*sestpr = s2;
 	    } else {
 		s->r = 0.f, s->i = 0.f;
-		c->r = 1.f, c->i = 0.f;
+		c__->r = 1.f, c__->i = 0.f;
 		*sestpr = s1;
 	    }
 	    return 0;
@@ -182,7 +175,7 @@
 		s->r = q__1.r, s->i = q__1.i;
 		q__2.r = gamma->r / s2, q__2.i = gamma->i / s2;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
-		c->r = q__1.r, c->i = q__1.i;
+		c__->r = q__1.r, c__->i = q__1.i;
 	    } else {
 		tmp = s2 / s1;
 		scl = sqrt(tmp * tmp + 1.f);
@@ -192,7 +185,7 @@
 		s->r = q__1.r, s->i = q__1.i;
 		q__2.r = gamma->r / s1, q__2.i = gamma->i / s1;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
-		c->r = q__1.r, c->i = q__1.i;
+		c__->r = q__1.r, c__->i = q__1.i;
 	    }
 	    return 0;
 	} else {
@@ -203,31 +196,31 @@
 	    zeta2 = absgam / absest;
 
 	    b = (1.f - zeta1 * zeta1 - zeta2 * zeta2) * .5f;
-	    d__1 = zeta1 * zeta1;
-	    c->r = d__1, c->i = 0.f;
+	    r__1 = zeta1 * zeta1;
+	    c__->r = r__1, c__->i = 0.f;
 	    if (b > 0.f) {
-		d__1 = b * b;
-		q__4.r = d__1 + c->r, q__4.i = c->i;
+		r__1 = b * b;
+		q__4.r = r__1 + c__->r, q__4.i = c__->i;
 		c_sqrt(&q__3, &q__4);
 		q__2.r = b + q__3.r, q__2.i = q__3.i;
-		c_div(&q__1, c, &q__2);
+		c_div(&q__1, c__, &q__2);
 		t = q__1.r;
 	    } else {
-		d__1 = b * b;
-		q__3.r = d__1 + c->r, q__3.i = c->i;
+		r__1 = b * b;
+		q__3.r = r__1 + c__->r, q__3.i = c__->i;
 		c_sqrt(&q__2, &q__3);
 		q__1.r = q__2.r - b, q__1.i = q__2.i;
 		t = q__1.r;
 	    }
 
 	    q__3.r = alpha.r / absest, q__3.i = alpha.i / absest;
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
 	    q__1.r = q__2.r / t, q__1.i = q__2.i / t;
 	    sine.r = q__1.r, sine.i = q__1.i;
 	    q__3.r = gamma->r / absest, q__3.i = gamma->i / absest;
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-	    d__1 = t + 1.f;
-	    q__1.r = q__2.r / d__1, q__1.i = q__2.i / d__1;
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
+	    r__1 = t + 1.f;
+	    q__1.r = q__2.r / r__1, q__1.i = q__2.i / r__1;
 	    cosine.r = q__1.r, cosine.i = q__1.i;
 	    r_cnjg(&q__4, &sine);
 	    q__3.r = sine.r * q__4.r - sine.i * q__4.i, q__3.i = sine.r * 
@@ -241,7 +234,7 @@
 	    q__1.r = sine.r / tmp, q__1.i = sine.i / tmp;
 	    s->r = q__1.r, s->i = q__1.i;
 	    q__1.r = cosine.r / tmp, q__1.i = cosine.i / tmp;
-	    c->r = q__1.r, c->i = q__1.i;
+	    c__->r = q__1.r, c__->i = q__1.i;
 	    *sestpr = sqrt(t + 1.f) * absest;
 	    return 0;
 	}
@@ -259,7 +252,7 @@
 		cosine.r = 0.f, cosine.i = 0.f;
 	    } else {
 		r_cnjg(&q__2, gamma);
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
 		sine.r = q__1.r, sine.i = q__1.i;
 		r_cnjg(&q__1, &alpha);
 		cosine.r = q__1.r, cosine.i = q__1.i;
@@ -270,24 +263,24 @@
 	    q__1.r = sine.r / s1, q__1.i = sine.i / s1;
 	    s->r = q__1.r, s->i = q__1.i;
 	    q__1.r = cosine.r / s1, q__1.i = cosine.i / s1;
-	    c->r = q__1.r, c->i = q__1.i;
+	    c__->r = q__1.r, c__->i = q__1.i;
 	    r_cnjg(&q__4, s);
 	    q__3.r = s->r * q__4.r - s->i * q__4.i, q__3.i = s->r * q__4.i + 
 		    s->i * q__4.r;
-	    r_cnjg(&q__6, c);
-	    q__5.r = c->r * q__6.r - c->i * q__6.i, q__5.i = c->r * q__6.i + 
-		    c->i * q__6.r;
+	    r_cnjg(&q__6, c__);
+	    q__5.r = c__->r * q__6.r - c__->i * q__6.i, q__5.i = c__->r * 
+		    q__6.i + c__->i * q__6.r;
 	    q__2.r = q__3.r + q__5.r, q__2.i = q__3.i + q__5.i;
 	    c_sqrt(&q__1, &q__2);
 	    tmp = q__1.r;
 	    q__1.r = s->r / tmp, q__1.i = s->i / tmp;
 	    s->r = q__1.r, s->i = q__1.i;
-	    q__1.r = c->r / tmp, q__1.i = c->i / tmp;
-	    c->r = q__1.r, c->i = q__1.i;
+	    q__1.r = c__->r / tmp, q__1.i = c__->i / tmp;
+	    c__->r = q__1.r, c__->i = q__1.i;
 	    return 0;
 	} else if (absgam <= eps * absest) {
 	    s->r = 0.f, s->i = 0.f;
-	    c->r = 1.f, c->i = 0.f;
+	    c__->r = 1.f, c__->i = 0.f;
 	    *sestpr = absgam;
 	    return 0;
 	} else if (absalp <= eps * absest) {
@@ -295,11 +288,11 @@
 	    s2 = absest;
 	    if (s1 <= s2) {
 		s->r = 0.f, s->i = 0.f;
-		c->r = 1.f, c->i = 0.f;
+		c__->r = 1.f, c__->i = 0.f;
 		*sestpr = s1;
 	    } else {
 		s->r = 1.f, s->i = 0.f;
-		c->r = 0.f, c->i = 0.f;
+		c__->r = 0.f, c__->i = 0.f;
 		*sestpr = s2;
 	    }
 	    return 0;
@@ -312,26 +305,26 @@
 		*sestpr = absest * (tmp / scl);
 		r_cnjg(&q__4, gamma);
 		q__3.r = q__4.r / s2, q__3.i = q__4.i / s2;
-		q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+		q__2.r = -q__3.r, q__2.i = -q__3.i;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
 		s->r = q__1.r, s->i = q__1.i;
 		r_cnjg(&q__3, &alpha);
 		q__2.r = q__3.r / s2, q__2.i = q__3.i / s2;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
-		c->r = q__1.r, c->i = q__1.i;
+		c__->r = q__1.r, c__->i = q__1.i;
 	    } else {
 		tmp = s2 / s1;
 		scl = sqrt(tmp * tmp + 1.f);
 		*sestpr = absest / scl;
 		r_cnjg(&q__4, gamma);
 		q__3.r = q__4.r / s1, q__3.i = q__4.i / s1;
-		q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+		q__2.r = -q__3.r, q__2.i = -q__3.i;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
 		s->r = q__1.r, s->i = q__1.i;
 		r_cnjg(&q__3, &alpha);
 		q__2.r = q__3.r / s1, q__2.i = q__3.i / s1;
 		q__1.r = q__2.r / scl, q__1.i = q__2.i / scl;
-		c->r = q__1.r, c->i = q__1.i;
+		c__->r = q__1.r, c__->i = q__1.i;
 	    }
 	    return 0;
 	} else {
@@ -354,19 +347,19 @@
 /*              root is close to zero, compute directly */
 
 		b = (zeta1 * zeta1 + zeta2 * zeta2 + 1.f) * .5f;
-		d__1 = zeta2 * zeta2;
-		c->r = d__1, c->i = 0.f;
-		d__2 = b * b;
-		q__2.r = d__2 - c->r, q__2.i = -(doublereal)c->i;
-		d__1 = b + sqrt(c_abs(&q__2));
-		q__1.r = c->r / d__1, q__1.i = c->i / d__1;
+		r__1 = zeta2 * zeta2;
+		c__->r = r__1, c__->i = 0.f;
+		r__2 = b * b;
+		q__2.r = r__2 - c__->r, q__2.i = -c__->i;
+		r__1 = b + sqrt(c_abs(&q__2));
+		q__1.r = c__->r / r__1, q__1.i = c__->i / r__1;
 		t = q__1.r;
 		q__2.r = alpha.r / absest, q__2.i = alpha.i / absest;
-		d__1 = 1.f - t;
-		q__1.r = q__2.r / d__1, q__1.i = q__2.i / d__1;
+		r__1 = 1.f - t;
+		q__1.r = q__2.r / r__1, q__1.i = q__2.i / r__1;
 		sine.r = q__1.r, sine.i = q__1.i;
 		q__3.r = gamma->r / absest, q__3.i = gamma->i / absest;
-		q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+		q__2.r = -q__3.r, q__2.i = -q__3.i;
 		q__1.r = q__2.r / t, q__1.i = q__2.i / t;
 		cosine.r = q__1.r, cosine.i = q__1.i;
 		*sestpr = sqrt(t + eps * 4.f * eps * norma) * absest;
@@ -375,31 +368,31 @@
 /*              root is closer to ONE, shift by that amount */
 
 		b = (zeta2 * zeta2 + zeta1 * zeta1 - 1.f) * .5f;
-		d__1 = zeta1 * zeta1;
-		c->r = d__1, c->i = 0.f;
+		r__1 = zeta1 * zeta1;
+		c__->r = r__1, c__->i = 0.f;
 		if (b >= 0.f) {
-		    q__2.r = -(doublereal)c->r, q__2.i = -(doublereal)c->i;
-		    d__1 = b * b;
-		    q__5.r = d__1 + c->r, q__5.i = c->i;
+		    q__2.r = -c__->r, q__2.i = -c__->i;
+		    r__1 = b * b;
+		    q__5.r = r__1 + c__->r, q__5.i = c__->i;
 		    c_sqrt(&q__4, &q__5);
 		    q__3.r = b + q__4.r, q__3.i = q__4.i;
 		    c_div(&q__1, &q__2, &q__3);
 		    t = q__1.r;
 		} else {
-		    d__1 = b * b;
-		    q__3.r = d__1 + c->r, q__3.i = c->i;
+		    r__1 = b * b;
+		    q__3.r = r__1 + c__->r, q__3.i = c__->i;
 		    c_sqrt(&q__2, &q__3);
-		    q__1.r = b - q__2.r, q__1.i = -(doublereal)q__2.i;
+		    q__1.r = b - q__2.r, q__1.i = -q__2.i;
 		    t = q__1.r;
 		}
 		q__3.r = alpha.r / absest, q__3.i = alpha.i / absest;
-		q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
+		q__2.r = -q__3.r, q__2.i = -q__3.i;
 		q__1.r = q__2.r / t, q__1.i = q__2.i / t;
 		sine.r = q__1.r, sine.i = q__1.i;
 		q__3.r = gamma->r / absest, q__3.i = gamma->i / absest;
-		q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-		d__1 = t + 1.f;
-		q__1.r = q__2.r / d__1, q__1.i = q__2.i / d__1;
+		q__2.r = -q__3.r, q__2.i = -q__3.i;
+		r__1 = t + 1.f;
+		q__1.r = q__2.r / r__1, q__1.i = q__2.i / r__1;
 		cosine.r = q__1.r, cosine.i = q__1.i;
 		*sestpr = sqrt(t + 1.f + eps * 4.f * eps * norma) * absest;
 	    }
@@ -415,7 +408,7 @@
 	    q__1.r = sine.r / tmp, q__1.i = sine.i / tmp;
 	    s->r = q__1.r, s->i = q__1.i;
 	    q__1.r = cosine.r / tmp, q__1.i = cosine.i / tmp;
-	    c->r = q__1.r, c->i = q__1.i;
+	    c__->r = q__1.r, c__->i = q__1.i;
 	    return 0;
 
 	}

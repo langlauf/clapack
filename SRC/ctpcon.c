@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctpcon_(char *norm, char *uplo, char *diag, integer *n, 
 	complex *ap, real *rcond, complex *work, real *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -41,15 +42,12 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-            If DIAG = 'U', the diagonal elements of A are not referenced 
-  
+            If DIAG = 'U', the diagonal elements of A are not referenced   
             and are assumed to be 1.   
 
     RCOND   (output) REAL   
@@ -64,15 +62,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -107,12 +102,11 @@
     static logical nounit;
 
 
+    --rwork;
+    --work;
+    --ap;
 
-#define RWORK(I) rwork[(I)-1]
-#define WORK(I) work[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
@@ -145,7 +139,7 @@
 
 /*     Compute the norm of the triangular matrix A. */
 
-    anorm = clantp_(norm, uplo, diag, n, &AP(1), &RWORK(1));
+    anorm = clantp_(norm, uplo, diag, n, &ap[1], &rwork[1]);
 
 /*     Continue only if ANORM > 0. */
 
@@ -162,35 +156,34 @@
 	}
 	kase = 0;
 L10:
-	clacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+	clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
 	if (kase != 0) {
 	    if (kase == kase1) {
 
 /*              Multiply by inv(A). */
 
-		clatps_(uplo, "No transpose", diag, normin, n, &AP(1), &WORK(
-			1), &scale, &RWORK(1), info);
+		clatps_(uplo, "No transpose", diag, normin, n, &ap[1], &work[
+			1], &scale, &rwork[1], info);
 	    } else {
 
 /*              Multiply by inv(A'). */
 
-		clatps_(uplo, "Conjugate transpose", diag, normin, n, &AP(1), 
-			&WORK(1), &scale, &RWORK(1), info);
+		clatps_(uplo, "Conjugate transpose", diag, normin, n, &ap[1], 
+			&work[1], &scale, &rwork[1], info);
 	    }
 	    *(unsigned char *)normin = 'Y';
 
-/*           Multiply by 1/SCALE if doing so will not cause overfl
-ow. */
+/*           Multiply by 1/SCALE if doing so will not cause overflow. */
 
 	    if (scale != 1.f) {
-		ix = icamax_(n, &WORK(1), &c__1);
+		ix = icamax_(n, &work[1], &c__1);
 		i__1 = ix;
-		xnorm = (r__1 = WORK(ix).r, dabs(r__1)) + (r__2 = r_imag(&
-			WORK(ix)), dabs(r__2));
+		xnorm = (r__1 = work[i__1].r, dabs(r__1)) + (r__2 = r_imag(&
+			work[ix]), dabs(r__2));
 		if (scale < xnorm * smlnum || scale == 0.f) {
 		    goto L20;
 		}
-		csrscl_(n, &scale, &WORK(1), &c__1);
+		csrscl_(n, &scale, &work[1], &c__1);
 	    }
 	    goto L10;
 	}

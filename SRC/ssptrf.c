@@ -1,19 +1,19 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ssptrf_(char *uplo, integer *n, real *ap, integer *ipiv, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SSPTRF computes the factorization of a real symmetric matrix A stored 
-  
+    SSPTRF computes the factorization of a real symmetric matrix A stored   
     in packed format using the Bunch-Kaufman diagonal pivoting method:   
 
        A = U*D*U**T  or  A = L*D*L**T   
@@ -33,16 +33,13 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
 
-            On exit, the block diagonal matrix D and the multipliers used 
-  
+            On exit, the block diagonal matrix D and the multipliers used   
             to obtain the factor U or L, stored as a packed triangular   
             matrix overwriting A (see below for further details).   
 
@@ -51,8 +48,7 @@
             If IPIV(k) > 0, then rows and columns k and IPIV(k) were   
             interchanged and D(k,k) is a 1-by-1 diagonal block.   
             If UPLO = 'U' and IPIV(k) = IPIV(k-1) < 0, then rows and   
-            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k) 
-  
+            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k)   
             is a 2-by-2 diagonal block.  If UPLO = 'L' and IPIV(k) =   
             IPIV(k+1) < 0, then rows and columns k+1 and -IPIV(k) were   
             interchanged and D(k:k+1,k:k+1) is a 2-by-2 diagonal block.   
@@ -60,24 +56,23 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, D(i,i) is exactly zero.  The factorization 
-  
+            > 0: if INFO = i, D(i,i) is exactly zero.  The factorization   
                  has been completed, but the block diagonal matrix D is   
-                 exactly singular, and division by zero will occur if it 
-  
+                 exactly singular, and division by zero will occur if it   
                  is used to solve a system of equations.   
 
     Further Details   
     ===============   
 
+    5-96 - Based on modifications by J. Lewis, Boeing Computer Services   
+           Company   
+
     If UPLO = 'U', then A = U*D*U', where   
        U = P(n)*U(n)* ... *P(k)U(k)* ...,   
-    i.e., U is a product of terms P(k)*U(k), where k decreases from n to 
-  
+    i.e., U is a product of terms P(k)*U(k), where k decreases from n to   
     1 in steps of 1 or 2, and D is a block diagonal matrix with 1-by-1   
     and 2-by-2 diagonal blocks D(k).  P(k) is a permutation matrix as   
-    defined by IPIV(k), and U(k) is a unit upper triangular matrix, such 
-  
+    defined by IPIV(k), and U(k) is a unit upper triangular matrix, such   
     that if the diagonal block D(k) is of order s (s = 1 or 2), then   
 
                (   I    v    0   )   k-s   
@@ -86,18 +81,15 @@
                   k-s   s   n-k   
 
     If s = 1, D(k) overwrites A(k,k), and v overwrites A(1:k-1,k).   
-    If s = 2, the upper triangle of D(k) overwrites A(k-1,k-1), A(k-1,k), 
-  
+    If s = 2, the upper triangle of D(k) overwrites A(k-1,k-1), A(k-1,k),   
     and A(k,k), and v overwrites A(1:k-2,k-1:k).   
 
     If UPLO = 'L', then A = L*D*L', where   
        L = P(1)*L(1)* ... *P(k)*L(k)* ...,   
-    i.e., L is a product of terms P(k)*L(k), where k increases from 1 to 
-  
+    i.e., L is a product of terms P(k)*L(k), where k increases from 1 to   
     n in steps of 1 or 2, and D is a block diagonal matrix with 1-by-1   
     and 2-by-2 diagonal blocks D(k).  P(k) is a permutation matrix as   
-    defined by IPIV(k), and L(k) is a unit lower triangular matrix, such 
-  
+    defined by IPIV(k), and L(k) is a unit lower triangular matrix, such   
     that if the diagonal block D(k) is of order s (s = 1 or 2), then   
 
                (   I    0     0   )  k-1   
@@ -109,54 +101,47 @@
     If s = 2, the lower triangle of D(k) overwrites A(k,k), A(k+1,k),   
     and A(k+1,k+1), and v overwrites A(k+2:n,k:k+1).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
-    integer i__1;
+    integer i__1, i__2;
     real r__1, r__2, r__3;
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
     static integer imax, jmax;
-    extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
-	    integer *, real *, real *), sspr_(char *, integer *, real *, real 
-	    *, integer *, real *);
-    static real c;
-    static integer j, k;
-    static real s, t, alpha;
+    extern /* Subroutine */ int sspr_(char *, integer *, real *, real *, 
+	    integer *, real *);
+    static integer i__, j, k;
+    static real t, alpha;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static integer kstep;
     static logical upper;
     extern /* Subroutine */ int sswap_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real r1, r2;
-    extern /* Subroutine */ int slaev2_(real *, real *, real *, real *, real *
-	    , real *, real *);
+    static real r1, d11, d12, d21, d22;
     static integer kc, kk, kp;
-    static real absakk;
+    static real absakk, wk;
     static integer kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
     static real colmax, rowmax;
     static integer knc, kpc, npp;
+    static real wkm1, wkp1;
 
 
+    --ipiv;
+    --ap;
 
-#define IPIV(I) ipiv[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -178,8 +163,7 @@
 
 /*        Factorize A as U*D*U' using the upper triangle of A   
 
-          K is the main loop index, decreasing from N to 1 in steps of
-   
+          K is the main loop index, decreasing from N to 1 in steps of   
           1 or 2 */
 
 	k = *n;
@@ -190,23 +174,22 @@ L10:
 /*        If K < 1, exit from loop */
 
 	if (k < 1) {
-	    goto L70;
+	    goto L110;
 	}
 	kstep = 1;
 
 /*        Determine rows and columns to be interchanged and whether   
           a 1-by-1 or 2-by-2 pivot block will be used */
 
-	absakk = (r__1 = AP(kc + k - 1), dabs(r__1));
+	absakk = (r__1 = ap[kc + k - 1], dabs(r__1));
 
-/*        IMAX is the row-index of the largest off-diagonal element in
-   
+/*        IMAX is the row-index of the largest off-diagonal element in   
           column K, and COLMAX is its absolute value */
 
 	if (k > 1) {
 	    i__1 = k - 1;
-	    imax = isamax_(&i__1, &AP(kc), &c__1);
-	    colmax = (r__1 = AP(kc + imax - 1), dabs(r__1));
+	    imax = isamax_(&i__1, &ap[kc], &c__1);
+	    colmax = (r__1 = ap[kc + imax - 1], dabs(r__1));
 	} else {
 	    colmax = 0.f;
 	}
@@ -227,18 +210,16 @@ L10:
 		kp = k;
 	    } else {
 
-/*              JMAX is the column-index of the largest off-di
-agonal   
-                element in row IMAX, and ROWMAX is its absolut
-e value */
+/*              JMAX is the column-index of the largest off-diagonal   
+                element in row IMAX, and ROWMAX is its absolute value */
 
 		rowmax = 0.f;
 		jmax = imax;
 		kx = imax * (imax + 1) / 2 + imax;
 		i__1 = k;
-		for (j = imax + 1; j <= k; ++j) {
-		    if ((r__1 = AP(kx), dabs(r__1)) > rowmax) {
-			rowmax = (r__1 = AP(kx), dabs(r__1));
+		for (j = imax + 1; j <= i__1; ++j) {
+		    if ((r__1 = ap[kx], dabs(r__1)) > rowmax) {
+			rowmax = (r__1 = ap[kx], dabs(r__1));
 			jmax = j;
 		    }
 		    kx += j;
@@ -247,31 +228,28 @@ e value */
 		kpc = (imax - 1) * imax / 2 + 1;
 		if (imax > 1) {
 		    i__1 = imax - 1;
-		    jmax = isamax_(&i__1, &AP(kpc), &c__1);
+		    jmax = isamax_(&i__1, &ap[kpc], &c__1);
 /* Computing MAX */
-		    r__2 = rowmax, r__3 = (r__1 = AP(kpc + jmax - 1), dabs(
+		    r__2 = rowmax, r__3 = (r__1 = ap[kpc + jmax - 1], dabs(
 			    r__1));
 		    rowmax = dmax(r__2,r__3);
 		}
 
 		if (absakk >= alpha * colmax * (colmax / rowmax)) {
 
-/*                 no interchange, use 1-by-1 pivot block 
-*/
+/*                 no interchange, use 1-by-1 pivot block */
 
 		    kp = k;
-		} else if ((r__1 = AP(kpc + imax - 1), dabs(r__1)) >= alpha * 
+		} else if ((r__1 = ap[kpc + imax - 1], dabs(r__1)) >= alpha * 
 			rowmax) {
 
-/*                 interchange rows and columns K and IMAX
-, use 1-by-1   
+/*                 interchange rows and columns K and IMAX, use 1-by-1   
                    pivot block */
 
 		    kp = imax;
 		} else {
 
-/*                 interchange rows and columns K-1 and IM
-AX, use 2-by-2   
+/*                 interchange rows and columns K-1 and IMAX, use 2-by-2   
                    pivot block */
 
 		    kp = imax;
@@ -285,28 +263,27 @@ AX, use 2-by-2
 	    }
 	    if (kp != kk) {
 
-/*              Interchange rows and columns KK and KP in the 
-leading   
+/*              Interchange rows and columns KK and KP in the leading   
                 submatrix A(1:k,1:k) */
 
 		i__1 = kp - 1;
-		sswap_(&i__1, &AP(knc), &c__1, &AP(kpc), &c__1);
+		sswap_(&i__1, &ap[knc], &c__1, &ap[kpc], &c__1);
 		kx = kpc + kp - 1;
 		i__1 = kk - 1;
-		for (j = kp + 1; j <= kk-1; ++j) {
+		for (j = kp + 1; j <= i__1; ++j) {
 		    kx = kx + j - 1;
-		    t = AP(knc + j - 1);
-		    AP(knc + j - 1) = AP(kx);
-		    AP(kx) = t;
+		    t = ap[knc + j - 1];
+		    ap[knc + j - 1] = ap[kx];
+		    ap[kx] = t;
 /* L30: */
 		}
-		t = AP(knc + kk - 1);
-		AP(knc + kk - 1) = AP(kpc + kp - 1);
-		AP(kpc + kp - 1) = t;
+		t = ap[knc + kk - 1];
+		ap[knc + kk - 1] = ap[kpc + kp - 1];
+		ap[kpc + kp - 1] = t;
 		if (kstep == 2) {
-		    t = AP(kc + k - 2);
-		    AP(kc + k - 2) = AP(kc + kp - 1);
-		    AP(kc + kp - 1) = t;
+		    t = ap[kc + k - 2];
+		    ap[kc + k - 2] = ap[kc + kp - 1];
+		    ap[kc + kp - 1] = t;
 		}
 	    }
 
@@ -320,76 +297,69 @@ leading
 
                 where U(k) is the k-th column of U   
 
-                Perform a rank-1 update of A(1:k-1,1:k-1) as 
-  
+                Perform a rank-1 update of A(1:k-1,1:k-1) as   
 
-                A := A - U(k)*D(k)*U(k)' = A - W(k)*1/D(k)*W(k
-)' */
+                A := A - U(k)*D(k)*U(k)' = A - W(k)*1/D(k)*W(k)' */
 
-		r1 = 1.f / AP(kc + k - 1);
+		r1 = 1.f / ap[kc + k - 1];
 		i__1 = k - 1;
-		r__1 = -(doublereal)r1;
-		sspr_(uplo, &i__1, &r__1, &AP(kc), &c__1, &AP(1));
+		r__1 = -r1;
+		sspr_(uplo, &i__1, &r__1, &ap[kc], &c__1, &ap[1]);
 
 /*              Store U(k) in column k */
 
 		i__1 = k - 1;
-		sscal_(&i__1, &r1, &AP(kc), &c__1);
+		sscal_(&i__1, &r1, &ap[kc], &c__1);
 	    } else {
 
-/*              2-by-2 pivot block D(k): columns k and k-1 now
- hold   
+/*              2-by-2 pivot block D(k): columns k and k-1 now hold   
 
                 ( W(k-1) W(k) ) = ( U(k-1) U(k) )*D(k)   
 
-                where U(k) and U(k-1) are the k-th and (k-1)-t
-h columns   
+                where U(k) and U(k-1) are the k-th and (k-1)-th columns   
                 of U   
 
-                Perform a rank-2 update of A(1:k-2,1:k-2) as 
-  
+                Perform a rank-2 update of A(1:k-2,1:k-2) as   
 
-                A := A - ( U(k-1) U(k) )*D(k)*( U(k-1) U(k) )'
-   
-                   = A - ( W(k-1) W(k) )*inv(D(k))*( W(k-1) W(
-k) )'   
+                A := A - ( U(k-1) U(k) )*D(k)*( U(k-1) U(k) )'   
+                   = A - ( W(k-1) W(k) )*inv(D(k))*( W(k-1) W(k) )' */
 
-                Convert this to two rank-1 updates by using th
-e eigen-   
-                decomposition of D(k) */
+		if (k > 2) {
 
-		slaev2_(&AP(kc - 1), &AP(kc + k - 2), &AP(kc + k - 1), &r1, &
-			r2, &c, &s);
-		r1 = 1.f / r1;
-		r2 = 1.f / r2;
-		i__1 = k - 2;
-		srot_(&i__1, &AP(knc), &c__1, &AP(kc), &c__1, &c, &s);
-		i__1 = k - 2;
-		r__1 = -(doublereal)r1;
-		sspr_(uplo, &i__1, &r__1, &AP(knc), &c__1, &AP(1));
-		i__1 = k - 2;
-		r__1 = -(doublereal)r2;
-		sspr_(uplo, &i__1, &r__1, &AP(kc), &c__1, &AP(1));
+		    d12 = ap[k - 1 + (k - 1) * k / 2];
+		    d22 = ap[k - 1 + (k - 2) * (k - 1) / 2] / d12;
+		    d11 = ap[k + (k - 1) * k / 2] / d12;
+		    t = 1.f / (d11 * d22 - 1.f);
+		    d12 = t / d12;
 
-/*              Store U(k) and U(k-1) in columns k and k-1 */
+		    for (j = k - 2; j >= 1; --j) {
+			wkm1 = d12 * (d11 * ap[j + (k - 2) * (k - 1) / 2] - 
+				ap[j + (k - 1) * k / 2]);
+			wk = d12 * (d22 * ap[j + (k - 1) * k / 2] - ap[j + (k 
+				- 2) * (k - 1) / 2]);
+			for (i__ = j; i__ >= 1; --i__) {
+			    ap[i__ + (j - 1) * j / 2] = ap[i__ + (j - 1) * j /
+				     2] - ap[i__ + (k - 1) * k / 2] * wk - ap[
+				    i__ + (k - 2) * (k - 1) / 2] * wkm1;
+/* L40: */
+			}
+			ap[j + (k - 1) * k / 2] = wk;
+			ap[j + (k - 2) * (k - 1) / 2] = wkm1;
+/* L50: */
+		    }
 
-		i__1 = k - 2;
-		sscal_(&i__1, &r1, &AP(knc), &c__1);
-		i__1 = k - 2;
-		sscal_(&i__1, &r2, &AP(kc), &c__1);
-		i__1 = k - 2;
-		r__1 = -(doublereal)s;
-		srot_(&i__1, &AP(knc), &c__1, &AP(kc), &c__1, &c, &r__1);
+		}
+
 	    }
 	}
 
 /*        Store details of the interchanges in IPIV */
 
 	if (kstep == 1) {
-	    IPIV(k) = kp;
+	    ipiv[k] = kp;
 	} else {
-	    IPIV(k) = -kp;
-	    IPIV(k - 1) = -kp;
+	    ipiv[k] = -kp;
+	    ipiv[k - 1] = -kp;
 	}
 
 /*        Decrease K and return to the start of the main loop */
@@ -402,36 +372,34 @@ e eigen-
 
 /*        Factorize A as L*D*L' using the lower triangle of A   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2 */
 
 	k = 1;
 	kc = 1;
 	npp = *n * (*n + 1) / 2;
-L40:
+L60:
 	knc = kc;
 
 /*        If K > N, exit from loop */
 
 	if (k > *n) {
-	    goto L70;
+	    goto L110;
 	}
 	kstep = 1;
 
 /*        Determine rows and columns to be interchanged and whether   
           a 1-by-1 or 2-by-2 pivot block will be used */
 
-	absakk = (r__1 = AP(kc), dabs(r__1));
+	absakk = (r__1 = ap[kc], dabs(r__1));
 
-/*        IMAX is the row-index of the largest off-diagonal element in
-   
+/*        IMAX is the row-index of the largest off-diagonal element in   
           column K, and COLMAX is its absolute value */
 
 	if (k < *n) {
 	    i__1 = *n - k;
-	    imax = k + isamax_(&i__1, &AP(kc + 1), &c__1);
-	    colmax = (r__1 = AP(kc + imax - k), dabs(r__1));
+	    imax = k + isamax_(&i__1, &ap[kc + 1], &c__1);
+	    colmax = (r__1 = ap[kc + imax - k], dabs(r__1));
 	} else {
 	    colmax = 0.f;
 	}
@@ -452,49 +420,44 @@ L40:
 		kp = k;
 	    } else {
 
-/*              JMAX is the column-index of the largest off-di
-agonal   
-                element in row IMAX, and ROWMAX is its absolut
-e value */
+/*              JMAX is the column-index of the largest off-diagonal   
+                element in row IMAX, and ROWMAX is its absolute value */
 
 		rowmax = 0.f;
 		kx = kc + imax - k;
 		i__1 = imax - 1;
-		for (j = k; j <= imax-1; ++j) {
-		    if ((r__1 = AP(kx), dabs(r__1)) > rowmax) {
-			rowmax = (r__1 = AP(kx), dabs(r__1));
+		for (j = k; j <= i__1; ++j) {
+		    if ((r__1 = ap[kx], dabs(r__1)) > rowmax) {
+			rowmax = (r__1 = ap[kx], dabs(r__1));
 			jmax = j;
 		    }
 		    kx = kx + *n - j;
-/* L50: */
+/* L70: */
 		}
 		kpc = npp - (*n - imax + 1) * (*n - imax + 2) / 2 + 1;
 		if (imax < *n) {
 		    i__1 = *n - imax;
-		    jmax = imax + isamax_(&i__1, &AP(kpc + 1), &c__1);
+		    jmax = imax + isamax_(&i__1, &ap[kpc + 1], &c__1);
 /* Computing MAX */
-		    r__2 = rowmax, r__3 = (r__1 = AP(kpc + jmax - imax), dabs(
+		    r__2 = rowmax, r__3 = (r__1 = ap[kpc + jmax - imax], dabs(
 			    r__1));
 		    rowmax = dmax(r__2,r__3);
 		}
 
 		if (absakk >= alpha * colmax * (colmax / rowmax)) {
 
-/*                 no interchange, use 1-by-1 pivot block 
-*/
+/*                 no interchange, use 1-by-1 pivot block */
 
 		    kp = k;
-		} else if ((r__1 = AP(kpc), dabs(r__1)) >= alpha * rowmax) {
+		} else if ((r__1 = ap[kpc], dabs(r__1)) >= alpha * rowmax) {
 
-/*                 interchange rows and columns K and IMAX
-, use 1-by-1   
+/*                 interchange rows and columns K and IMAX, use 1-by-1   
                    pivot block */
 
 		    kp = imax;
 		} else {
 
-/*                 interchange rows and columns K+1 and IM
-AX, use 2-by-2   
+/*                 interchange rows and columns K+1 and IMAX, use 2-by-2   
                    pivot block */
 
 		    kp = imax;
@@ -508,31 +471,30 @@ AX, use 2-by-2
 	    }
 	    if (kp != kk) {
 
-/*              Interchange rows and columns KK and KP in the 
-trailing   
+/*              Interchange rows and columns KK and KP in the trailing   
                 submatrix A(k:n,k:n) */
 
 		if (kp < *n) {
 		    i__1 = *n - kp;
-		    sswap_(&i__1, &AP(knc + kp - kk + 1), &c__1, &AP(kpc + 1),
+		    sswap_(&i__1, &ap[knc + kp - kk + 1], &c__1, &ap[kpc + 1],
 			     &c__1);
 		}
 		kx = knc + kp - kk;
 		i__1 = kp - 1;
-		for (j = kk + 1; j <= kp-1; ++j) {
+		for (j = kk + 1; j <= i__1; ++j) {
 		    kx = kx + *n - j + 1;
-		    t = AP(knc + j - kk);
-		    AP(knc + j - kk) = AP(kx);
-		    AP(kx) = t;
-/* L60: */
+		    t = ap[knc + j - kk];
+		    ap[knc + j - kk] = ap[kx];
+		    ap[kx] = t;
+/* L80: */
 		}
-		t = AP(knc);
-		AP(knc) = AP(kpc);
-		AP(kpc) = t;
+		t = ap[knc];
+		ap[knc] = ap[kpc];
+		ap[kpc] = t;
 		if (kstep == 2) {
-		    t = AP(kc + 1);
-		    AP(kc + 1) = AP(kc + kp - k);
-		    AP(kc + kp - k) = t;
+		    t = ap[kc + 1];
+		    ap[kc + 1] = ap[kc + kp - k];
+		    ap[kc + kp - k] = t;
 		}
 	    }
 
@@ -548,74 +510,65 @@ trailing
 
 		if (k < *n) {
 
-/*                 Perform a rank-1 update of A(k+1:n,k+1:
-n) as   
+/*                 Perform a rank-1 update of A(k+1:n,k+1:n) as   
 
-                   A := A - L(k)*D(k)*L(k)' = A - W(k)*(1/
-D(k))*W(k)' */
+                   A := A - L(k)*D(k)*L(k)' = A - W(k)*(1/D(k))*W(k)' */
 
-		    r1 = 1.f / AP(kc);
+		    r1 = 1.f / ap[kc];
 		    i__1 = *n - k;
-		    r__1 = -(doublereal)r1;
-		    sspr_(uplo, &i__1, &r__1, &AP(kc + 1), &c__1, &AP(kc + *n 
-			    - k + 1));
+		    r__1 = -r1;
+		    sspr_(uplo, &i__1, &r__1, &ap[kc + 1], &c__1, &ap[kc + *n 
+			    - k + 1]);
 
 /*                 Store L(k) in column K */
 
 		    i__1 = *n - k;
-		    sscal_(&i__1, &r1, &AP(kc + 1), &c__1);
+		    sscal_(&i__1, &r1, &ap[kc + 1], &c__1);
 		}
 	    } else {
 
-/*              2-by-2 pivot block D(k): columns K and K+1 now
- hold   
+/*              2-by-2 pivot block D(k): columns K and K+1 now hold   
 
                 ( W(k) W(k+1) ) = ( L(k) L(k+1) )*D(k)   
 
-                where L(k) and L(k+1) are the k-th and (k+1)-t
-h columns   
+                where L(k) and L(k+1) are the k-th and (k+1)-th columns   
                 of L */
 
 		if (k < *n - 1) {
 
-/*                 Perform a rank-2 update of A(k+2:n,k+2:
-n) as   
+/*                 Perform a rank-2 update of A(k+2:n,k+2:n) as   
 
-                   A := A - ( L(k) L(k+1) )*D(k)*( L(k) L(
-k+1) )'   
-                      = A - ( W(k) W(k+1) )*inv(D(k))*( W(
-k) W(k+1) )'   
+                   A := A - ( L(k) L(k+1) )*D(k)*( L(k) L(k+1) )'   
+                      = A - ( W(k) W(k+1) )*inv(D(k))*( W(k) W(k+1) )' */
 
-                   Convert this to two rank-1 updates by u
-sing the eigen-   
-                   decomposition of D(k) */
+		    d21 = ap[k + 1 + (k - 1) * ((*n << 1) - k) / 2];
+		    d11 = ap[k + 1 + k * ((*n << 1) - k - 1) / 2] / d21;
+		    d22 = ap[k + (k - 1) * ((*n << 1) - k) / 2] / d21;
+		    t = 1.f / (d11 * d22 - 1.f);
+		    d21 = t / d21;
 
-		    slaev2_(&AP(kc), &AP(kc + 1), &AP(knc), &r1, &r2, &c, &s);
-		    r1 = 1.f / r1;
-		    r2 = 1.f / r2;
-		    i__1 = *n - k - 1;
-		    srot_(&i__1, &AP(kc + 2), &c__1, &AP(knc + 1), &c__1, &c, 
-			    &s);
-		    i__1 = *n - k - 1;
-		    r__1 = -(doublereal)r1;
-		    sspr_(uplo, &i__1, &r__1, &AP(kc + 2), &c__1, &AP(knc + *
-			    n - k));
-		    i__1 = *n - k - 1;
-		    r__1 = -(doublereal)r2;
-		    sspr_(uplo, &i__1, &r__1, &AP(knc + 1), &c__1, &AP(knc + *
-			    n - k));
+		    i__1 = *n;
+		    for (j = k + 2; j <= i__1; ++j) {
+			wk = d21 * (d11 * ap[j + (k - 1) * ((*n << 1) - k) / 
+				2] - ap[j + k * ((*n << 1) - k - 1) / 2]);
+			wkp1 = d21 * (d22 * ap[j + k * ((*n << 1) - k - 1) / 
+				2] - ap[j + (k - 1) * ((*n << 1) - k) / 2]);
 
-/*                 Store L(k) and L(k+1) in columns k and 
-k+1 */
+			i__2 = *n;
+			for (i__ = j; i__ <= i__2; ++i__) {
+			    ap[i__ + (j - 1) * ((*n << 1) - j) / 2] = ap[i__ 
+				    + (j - 1) * ((*n << 1) - j) / 2] - ap[i__ 
+				    + (k - 1) * ((*n << 1) - k) / 2] * wk - 
+				    ap[i__ + k * ((*n << 1) - k - 1) / 2] * 
+				    wkp1;
+/* L90: */
+			}
 
-		    i__1 = *n - k - 1;
-		    sscal_(&i__1, &r1, &AP(kc + 2), &c__1);
-		    i__1 = *n - k - 1;
-		    sscal_(&i__1, &r2, &AP(knc + 1), &c__1);
-		    i__1 = *n - k - 1;
-		    r__1 = -(doublereal)s;
-		    srot_(&i__1, &AP(kc + 2), &c__1, &AP(knc + 1), &c__1, &c, 
-			    &r__1);
+			ap[j + (k - 1) * ((*n << 1) - k) / 2] = wk;
+			ap[j + k * ((*n << 1) - k - 1) / 2] = wkp1;
+
+/* L100: */
+		    }
 		}
 	    }
 	}
@@ -623,21 +576,21 @@ k+1 */
 /*        Store details of the interchanges in IPIV */
 
 	if (kstep == 1) {
-	    IPIV(k) = kp;
+	    ipiv[k] = kp;
 	} else {
-	    IPIV(k) = -kp;
-	    IPIV(k + 1) = -kp;
+	    ipiv[k] = -kp;
+	    ipiv[k + 1] = -kp;
 	}
 
 /*        Increase K and return to the start of the main loop */
 
 	k += kstep;
 	kc = knc + *n - k + 2;
-	goto L40;
+	goto L60;
 
     }
 
-L70:
+L110:
     return 0;
 
 /*     End of SSPTRF */

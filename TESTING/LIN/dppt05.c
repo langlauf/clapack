@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ static integer c__1 = 1;
     static doublereal diff, axbi;
     static integer imax;
     static doublereal unfl, ovfl;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static logical upper;
     static doublereal xnorm;
@@ -33,7 +34,12 @@ static integer c__1 = 1;
     static doublereal errbnd, eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_ref(a_1,a_2) xact[(a_2)*xact_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -73,10 +79,8 @@ static integer c__1 = 1;
             NRHS >= 0.   
 
     AP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            The upper or lower triangle of the symmetric matrix A, packed 
-  
-            columnwise in a linear array.  The j-th column of A is stored 
-  
+            The upper or lower triangle of the symmetric matrix A, packed   
+            columnwise in a linear array.  The j-th column of A is stored   
             in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
@@ -100,21 +104,17 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     FERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude 
-  
-            of the largest entry in (X - XTRUE) divided by the magnitude 
-  
+            X.  If XTRUE is the true solution, FERR bounds the magnitude   
+            of the largest entry in (X - XTRUE) divided by the magnitude   
             of the largest entry in X.   
 
     BERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A 
-  
+            vector (i.e., the smallest relative change in any entry of A   
             or B that makes X an exact solution).   
 
     RESLTS  (output) DOUBLE PRECISION array, dimension (2)   
@@ -122,8 +122,7 @@ static integer c__1 = 1;
             RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
             RESLTS(2) = BERR / ( (n+1)*EPS + (*) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
@@ -131,13 +130,13 @@ static integer c__1 = 1;
        Parameter adjustments */
     --ap;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -162,16 +161,16 @@ static integer c__1 = 1;
     errbnd = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = idamax_(n, &x[j * x_dim1 + 1], &c__1);
+	imax = idamax_(n, &x_ref(1, j), &c__1);
 /* Computing MAX */
-	d__2 = (d__1 = x[imax + j * x_dim1], abs(d__1));
+	d__2 = (d__1 = x_ref(imax, j), abs(d__1));
 	xnorm = max(d__2,unfl);
 	diff = 0.;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = diff, d__3 = (d__1 = x[i + j * x_dim1] - xact[i + j * 
-		    xact_dim1], abs(d__1));
+	    d__2 = diff, d__3 = (d__1 = x_ref(i__, j) - xact_ref(i__, j), abs(
+		    d__1));
 	    diff = max(d__2,d__3);
 /* L10: */
 	}
@@ -198,48 +197,47 @@ L30:
     }
     reslts[1] = errbnd;
 
-/*     Test 2:  Compute the maximum of BERR / ( (n+1)*EPS + (*) ), where 
-  
+/*     Test 2:  Compute the maximum of BERR / ( (n+1)*EPS + (*) ), where   
        (*) = (n+1)*UNFL / (min_i (abs(A)*abs(X) +abs(b))_i ) */
 
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    tmp = (d__1 = b[i + k * b_dim1], abs(d__1));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    tmp = (d__1 = b_ref(i__, k), abs(d__1));
 	    if (upper) {
-		jc = (i - 1) * i / 2;
-		i__3 = i;
+		jc = (i__ - 1) * i__ / 2;
+		i__3 = i__;
 		for (j = 1; j <= i__3; ++j) {
-		    tmp += (d__1 = ap[jc + j], abs(d__1)) * (d__2 = x[j + k * 
-			    x_dim1], abs(d__2));
+		    tmp += (d__1 = ap[jc + j], abs(d__1)) * (d__2 = x_ref(j, 
+			    k), abs(d__2));
 /* L40: */
 		}
-		jc += i;
+		jc += i__;
 		i__3 = *n;
-		for (j = i + 1; j <= i__3; ++j) {
-		    tmp += (d__1 = ap[jc], abs(d__1)) * (d__2 = x[j + k * 
-			    x_dim1], abs(d__2));
+		for (j = i__ + 1; j <= i__3; ++j) {
+		    tmp += (d__1 = ap[jc], abs(d__1)) * (d__2 = x_ref(j, k), 
+			    abs(d__2));
 		    jc += j;
 /* L50: */
 		}
 	    } else {
-		jc = i;
-		i__3 = i - 1;
+		jc = i__;
+		i__3 = i__ - 1;
 		for (j = 1; j <= i__3; ++j) {
-		    tmp += (d__1 = ap[jc], abs(d__1)) * (d__2 = x[j + k * 
-			    x_dim1], abs(d__2));
+		    tmp += (d__1 = ap[jc], abs(d__1)) * (d__2 = x_ref(j, k), 
+			    abs(d__2));
 		    jc = jc + *n - j;
 /* L60: */
 		}
 		i__3 = *n;
-		for (j = i; j <= i__3; ++j) {
-		    tmp += (d__1 = ap[jc + j - i], abs(d__1)) * (d__2 = x[j + 
-			    k * x_dim1], abs(d__2));
+		for (j = i__; j <= i__3; ++j) {
+		    tmp += (d__1 = ap[jc + j - i__], abs(d__1)) * (d__2 = 
+			    x_ref(j, k), abs(d__2));
 /* L70: */
 		}
 	    }
-	    if (i == 1) {
+	    if (i__ == 1) {
 		axbi = tmp;
 	    } else {
 		axbi = min(axbi,tmp);
@@ -262,4 +260,9 @@ L30:
 /*     End of DPPT05 */
 
 } /* dppt05_ */
+
+#undef x_ref
+#undef b_ref
+#undef xact_ref
+
 

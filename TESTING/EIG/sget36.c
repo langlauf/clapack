@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__200 = 200;
     /* Local variables */
     static integer ifst, ilst;
     static real work[200];
-    static integer info1, info2, ifst1, ifst2, ilst1, ilst2, i, j, n;
+    static integer info1, info2, ifst1, ifst2, ilst1, ilst2, i__, j, n;
     static real q[100]	/* was [10][10] */;
     extern /* Subroutine */ int shst01_(integer *, integer *, integer *, real 
 	    *, integer *, real *, integer *, real *, integer *, real *, 
@@ -52,7 +53,13 @@ static integer c__200 = 200;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_ref(a_1,a_2) q[(a_2)*10 + a_1 - 11]
+#define t1_ref(a_1,a_2) t1[(a_2)*10 + a_1 - 11]
+#define t2_ref(a_1,a_2) t2[(a_2)*10 + a_1 - 11]
+#define tmp_ref(a_1,a_2) tmp[(a_2)*10 + a_1 - 11]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -62,23 +69,19 @@ static integer c__200 = 200;
     =======   
 
     SGET36 tests STREXC, a routine for moving blocks (either 1 by 1 or   
-    2 by 2) on the diagonal of a matrix in real Schur form.  Thus, SLAEXC 
-  
+    2 by 2) on the diagonal of a matrix in real Schur form.  Thus, SLAEXC   
     computes an orthogonal matrix Q such that   
 
        Q' * T1 * Q  = T2   
 
-    and where one of the diagonal blocks of T1 (the one at row IFST) has 
-  
+    and where one of the diagonal blocks of T1 (the one at row IFST) has   
     been moved to position ILST.   
 
-    The test code verifies that the residual Q'*T1*Q-T2 is small, that T2 
-  
+    The test code verifies that the residual Q'*T1*Q-T2 is small, that T2   
     is in Schur form, and that the final position of the IFST block is   
     ILST (within +-1).   
 
-    The test matrices are read from a file with logical unit number NIN. 
-  
+    The test matrices are read from a file with logical unit number NIN.   
 
     Arguments   
     ==========   
@@ -98,8 +101,7 @@ static integer c__200 = 200;
     NIN     (input) INTEGER   
             Input logical unit number.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -128,13 +130,13 @@ L10:
     }
     ++(*knt);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___7.ciunit = *nin;
 	s_rsle(&io___7);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&tmp[i + j * 10 - 11], (ftnlen)
-		    sizeof(real));
+	    do_lio(&c__4, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
+		    real));
 	}
 	e_rsle();
 /* L20: */
@@ -154,13 +156,13 @@ L10:
     slaset_("Full", &n, &n, &c_b21, &c_b22, q, &c__10);
     strexc_("N", &n, t1, &c__10, q, &c__10, &ifst1, &ilst1, work, &info1);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    if (i == j && q[i + j * 10 - 11] != 1.f) {
+	    if (i__ == j && q_ref(i__, j) != 1.f) {
 		res += 1.f / eps;
 	    }
-	    if (i != j && q[i + j * 10 - 11] != 0.f) {
+	    if (i__ != j && q_ref(i__, j) != 0.f) {
 		res += 1.f / eps;
 	    }
 /* L30: */
@@ -176,10 +178,10 @@ L10:
 /*     Compare T1 with T2 */
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    if (t1[i + j * 10 - 11] != t2[i + j * 10 - 11]) {
+	    if (t1_ref(i__, j) != t2_ref(i__, j)) {
 		res += 1.f / eps;
 	    }
 /* L50: */
@@ -219,22 +221,21 @@ L10:
 
     loc = 1;
 L70:
-    if (t2[loc + 1 + loc * 10 - 11] != 0.f) {
+    if (t2_ref(loc + 1, loc) != 0.f) {
 
 /*        2 by 2 block */
 
-	if (t2[loc + (loc + 1) * 10 - 11] == 0.f || t2[loc + loc * 10 - 11] !=
-		 t2[loc + 1 + (loc + 1) * 10 - 11] || r_sign(&c_b22, &t2[loc 
-		+ (loc + 1) * 10 - 11]) == r_sign(&c_b22, &t2[loc + 1 + loc * 
-		10 - 11])) {
+	if (t2_ref(loc, loc + 1) == 0.f || t2_ref(loc, loc) != t2_ref(loc + 1,
+		 loc + 1) || r_sign(&c_b22, &t2_ref(loc, loc + 1)) == r_sign(&
+		c_b22, &t2_ref(loc + 1, loc))) {
 	    res += 1.f / eps;
 	}
 	i__1 = n;
-	for (i = loc + 2; i <= i__1; ++i) {
-	    if (t2[i + loc * 10 - 11] != 0.f) {
+	for (i__ = loc + 2; i__ <= i__1; ++i__) {
+	    if (t2_ref(i__, loc) != 0.f) {
 		res += 1.f / res;
 	    }
-	    if (t2[i + (loc + 1) * 10 - 11] != 0.f) {
+	    if (t2_ref(i__, loc + 1) != 0.f) {
 		res += 1.f / res;
 	    }
 /* L80: */
@@ -245,8 +246,8 @@ L70:
 /*        1 by 1 block */
 
 	i__1 = n;
-	for (i = loc + 1; i <= i__1; ++i) {
-	    if (t2[i + loc * 10 - 11] != 0.f) {
+	for (i__ = loc + 1; i__ <= i__1; ++i__) {
+	    if (t2_ref(i__, loc) != 0.f) {
 		res += 1.f / res;
 	    }
 /* L90: */
@@ -265,4 +266,10 @@ L70:
 /*     End of SGET36 */
 
 } /* sget36_ */
+
+#undef tmp_ref
+#undef t2_ref
+#undef t1_ref
+#undef q_ref
+
 

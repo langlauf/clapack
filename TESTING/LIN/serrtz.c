@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,13 +36,14 @@ static integer c__1 = 1;
 
     /* Local variables */
     static integer info;
-    static real a[4]	/* was [2][2] */;
+    static real a[4]	/* was [2][2] */, w[2];
     static char c2[2];
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), stzrqf_(integer *, integer *, real *, 
-	    integer *, real *, integer *);
+	    integer *, real *, integer *), stzrzf_(integer *, integer *, real 
+	    *, integer *, real *, real *, integer *, integer *);
     static real tau[2];
 
     /* Fortran I/O blocks */
@@ -49,16 +51,19 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    SERRTZ tests the error exits for STZRQF.   
+    SERRTZ tests the error exits for STZRQF and STZRZF.   
 
     Arguments   
     =========   
@@ -69,19 +74,20 @@ static integer c__1 = 1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
-    a[0] = 1.f;
-    a[2] = 2.f;
-    a[3] = 3.f;
-    a[1] = 4.f;
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
+    a_ref(1, 1) = 1.f;
+    a_ref(1, 2) = 2.f;
+    a_ref(2, 2) = 3.f;
+    a_ref(2, 1) = 4.f;
+    w[0] = 0.f;
+    w[1] = 0.f;
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "TZ")) {
@@ -90,7 +96,7 @@ static integer c__1 = 1;
 
           STZRQF */
 
-	s_copy(srnamc_1.srnamt, "STZRQF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "STZRQF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	stzrqf_(&c_n1, &c__0, a, &c__1, tau, &info);
 	chkxer_("STZRQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -103,6 +109,26 @@ static integer c__1 = 1;
 	stzrqf_(&c__2, &c__2, a, &c__1, tau, &info);
 	chkxer_("STZRQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+
+/*        STZRZF */
+
+	s_copy(srnamc_1.srnamt, "STZRZF", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	stzrzf_(&c_n1, &c__0, a, &c__1, tau, w, &c__1, &info);
+	chkxer_("STZRZF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	stzrzf_(&c__1, &c__0, a, &c__1, tau, w, &c__1, &info);
+	chkxer_("STZRZF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 4;
+	stzrzf_(&c__2, &c__2, a, &c__1, tau, w, &c__1, &info);
+	chkxer_("STZRZF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	stzrzf_(&c__2, &c__2, a, &c__2, tau, w, &c__1, &info);
+	chkxer_("STZRZF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
     }
 
 /*     Print a summary line. */
@@ -114,4 +140,7 @@ static integer c__1 = 1;
 /*     End of SERRTZ */
 
 } /* serrtz_ */
+
+#undef a_ref
+
 

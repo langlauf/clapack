@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,7 +29,11 @@ static doublecomplex c_b2 = {1.,0.};
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
 
 
-/*  -- LAPACK routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -83,19 +88,18 @@ static doublecomplex c_b2 = {1.,0.};
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -135,7 +139,7 @@ static doublecomplex c_b2 = {1.,0.};
 
     if (*m < *n) {
 	i__1 = *n - *m;
-	zlaset_("Full", &i__1, nrhs, &c_b1, &c_b1, &b[*m + 1 + b_dim1], ldb);
+	zlaset_("Full", &i__1, nrhs, &c_b1, &c_b1, &b_ref(*m + 1, 1), ldb);
     }
 
 /*     B := Q' * B */
@@ -148,4 +152,8 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGELQS */
 
 } /* zgelqs_ */
+
+#undef b_ref
+#undef b_subscr
+
 

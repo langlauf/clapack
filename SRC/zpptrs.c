@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zpptrs_(char *uplo, integer *n, integer *nrhs, 
 	doublecomplex *ap, doublecomplex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -31,8 +32,7 @@
             of the matrix B.  NRHS >= 0.   
 
     AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The triangular factor U or L from the Cholesky factorization 
-  
+            The triangular factor U or L from the Cholesky factorization   
             A = U**H*U or A = L*L**H, packed columnwise in a linear   
             array.  The j-th column of U or L is stored in the array AP   
             as follows:   
@@ -50,33 +50,33 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer b_dim1, b_offset, i__1;
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static logical upper;
     extern /* Subroutine */ int ztpsv_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *), xerbla_(char *, integer *);
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
 
+    --ap;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define AP(I) ap[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -105,15 +105,17 @@
 /*        Solve A*X = B where A = U'*U. */
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve U'*X = B, overwriting B with X. */
 
-	    ztpsv_("Upper", "Conjugate transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    ztpsv_("Upper", "Conjugate transpose", "Non-unit", n, &ap[1], &
+		    b_ref(1, i__), &c__1);
 
 /*           Solve U*X = B, overwriting B with X. */
 
-	    ztpsv_("Upper", "No transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    ztpsv_("Upper", "No transpose", "Non-unit", n, &ap[1], &b_ref(1, 
+		    i__), &c__1);
 /* L10: */
 	}
     } else {
@@ -121,15 +123,17 @@
 /*        Solve A*X = B where A = L*L'. */
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve L*Y = B, overwriting B with X. */
 
-	    ztpsv_("Lower", "No transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    ztpsv_("Lower", "No transpose", "Non-unit", n, &ap[1], &b_ref(1, 
+		    i__), &c__1);
 
 /*           Solve L'*X = Y, overwriting B with X. */
 
-	    ztpsv_("Lower", "Conjugate transpose", "Non-unit", n, &AP(1), &B(1,i), &c__1);
+	    ztpsv_("Lower", "Conjugate transpose", "Non-unit", n, &ap[1], &
+		    b_ref(1, i__), &c__1);
 /* L20: */
 	}
     }
@@ -139,4 +143,8 @@
 /*     End of ZPPTRS */
 
 } /* zpptrs_ */
+
+#undef b_ref
+#undef b_subscr
+
 

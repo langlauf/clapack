@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static doublereal c_b16 = -1.;
 static doublereal c_b17 = 1.;
 
 /* Subroutine */ int dqrt01_(integer *m, integer *n, doublereal *a, 
-	doublereal *af, doublereal *q, doublereal *r, integer *lda, 
+	doublereal *af, doublereal *q, doublereal *r__, integer *lda, 
 	doublereal *tau, doublereal *work, integer *lwork, doublereal *rwork, 
 	doublereal *result)
 {
@@ -57,7 +58,11 @@ static doublereal c_b17 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -66,8 +71,7 @@ static doublereal c_b17 = 1.;
     Purpose   
     =======   
 
-    DQRT01 tests DGEQRF, which computes the QR factorization of an m-by-n 
-  
+    DQRT01 tests DGEQRF, which computes the QR factorization of an m-by-n   
     matrix A, and partially tests DORGQR which forms the m-by-m   
     orthogonal matrix Q.   
 
@@ -86,23 +90,20 @@ static doublereal c_b17 = 1.;
             The m-by-n matrix A.   
 
     AF      (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the QR factorization of A, as returned by DGEQRF. 
-  
+            Details of the QR factorization of A, as returned by DGEQRF.   
             See DGEQRF for further details.   
 
     Q       (output) DOUBLE PRECISION array, dimension (LDA,M)   
             The m-by-m orthogonal matrix Q.   
 
-    R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N)) 
-  
+    R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N))   
 
     LDA     (input) INTEGER   
             The leading dimension of the arrays A, AF, Q and R.   
             LDA >= max(M,N).   
 
     TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by DGEQRF.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
@@ -117,22 +118,21 @@ static doublereal c_b17 = 1.;
             RESULT(1) = norm( R - Q'*A ) / ( M * norm(A) * EPS )   
             RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -149,35 +149,34 @@ static doublereal c_b17 = 1.;
 
 /*     Factorize the matrix A in the array AF. */
 
-    s_copy(srnamc_1.srnamt, "DGEQRF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DGEQRF", (ftnlen)6, (ftnlen)6);
     dgeqrf_(m, n, &af[af_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy details of Q */
 
     dlaset_("Full", m, m, &c_b6, &c_b6, &q[q_offset], lda);
     i__1 = *m - 1;
-    dlacpy_("Lower", &i__1, n, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda)
-	    ;
+    dlacpy_("Lower", &i__1, n, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
 
 /*     Generate the m-by-m matrix Q */
 
-    s_copy(srnamc_1.srnamt, "DORGQR", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORGQR", (ftnlen)6, (ftnlen)6);
     dorgqr_(m, m, &minmn, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy R */
 
-    dlaset_("Full", m, n, &c_b11, &c_b11, &r[r_offset], lda);
-    dlacpy_("Upper", m, n, &af[af_offset], lda, &r[r_offset], lda);
+    dlaset_("Full", m, n, &c_b11, &c_b11, &r__[r_offset], lda);
+    dlacpy_("Upper", m, n, &af[af_offset], lda, &r__[r_offset], lda);
 
 /*     Compute R - Q'*A */
 
     dgemm_("Transpose", "No transpose", m, n, m, &c_b16, &q[q_offset], lda, &
-	    a[a_offset], lda, &c_b17, &r[r_offset], lda);
+	    a[a_offset], lda, &c_b17, &r__[r_offset], lda);
 
 /*     Compute norm( R - Q'*A ) / ( M * norm(A) * EPS ) . */
 
     anorm = dlange_("1", m, n, &a[a_offset], lda, &rwork[1]);
-    resid = dlange_("1", m, n, &r[r_offset], lda, &rwork[1]);
+    resid = dlange_("1", m, n, &r__[r_offset], lda, &rwork[1]);
     if (anorm > 0.) {
 	result[1] = resid / (doublereal) max(1,*m) / anorm / eps;
     } else {
@@ -186,13 +185,13 @@ static doublereal c_b17 = 1.;
 
 /*     Compute I - Q'*Q */
 
-    dlaset_("Full", m, m, &c_b11, &c_b17, &r[r_offset], lda);
-    dsyrk_("Upper", "Transpose", m, m, &c_b16, &q[q_offset], lda, &c_b17, &r[
-	    r_offset], lda);
+    dlaset_("Full", m, m, &c_b11, &c_b17, &r__[r_offset], lda);
+    dsyrk_("Upper", "Transpose", m, m, &c_b16, &q[q_offset], lda, &c_b17, &
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q'*Q ) / ( M * EPS ) . */
 
-    resid = dlansy_("1", "Upper", m, &r[r_offset], lda, &rwork[1]);
+    resid = dlansy_("1", "Upper", m, &r__[r_offset], lda, &rwork[1]);
 
     result[2] = resid / (doublereal) max(1,*m) / eps;
 
@@ -201,4 +200,8 @@ static doublereal c_b17 = 1.;
 /*     End of DQRT01 */
 
 } /* dqrt01_ */
+
+#undef af_ref
+#undef q_ref
+
 

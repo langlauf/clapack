@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -6,8 +7,8 @@
 #include "f2c.h"
 
 /* Double Complex */ VOID zlatm2_(doublecomplex * ret_val, integer *m, 
-	integer *n, integer *i, integer *j, integer *kl, integer *ku, integer 
-	*idist, integer *iseed, doublecomplex *d, integer *igrade, 
+	integer *n, integer *i__, integer *j, integer *kl, integer *ku, 
+	integer *idist, integer *iseed, doublecomplex *d__, integer *igrade, 
 	doublecomplex *dl, doublecomplex *dr, integer *ipvtng, integer *iwork,
 	 doublereal *sparse)
 {
@@ -27,7 +28,7 @@
 	    integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -42,29 +43,24 @@
        ZLATM2 returns the (I,J) entry of a random matrix of dimension   
        (M, N) described by the other paramters. It is called by the   
        ZLATMR routine in order to build random test matrices. No error   
-       checking on parameters is done, because this routine is called in 
-  
+       checking on parameters is done, because this routine is called in   
        a tight loop by ZLATMR which has already checked the parameters.   
 
-       Use of ZLATM2 differs from CLATM3 in the order in which the random 
-  
+       Use of ZLATM2 differs from CLATM3 in the order in which the random   
        number generator is called to fill in random matrix entries.   
-       With ZLATM2, the generator is called to fill in the pivoted matrix 
-  
+       With ZLATM2, the generator is called to fill in the pivoted matrix   
        columnwise. With ZLATM3, the generator is called to fill in the   
        matrix columnwise, after which it is pivoted. Thus, ZLATM3 can   
        be used to construct random matrices which differ only in their   
        order of rows and/or columns. ZLATM2 is used to construct band   
        matrices while avoiding calling the random number generator for   
-       entries outside the band (and therefore generating random numbers 
-  
+       entries outside the band (and therefore generating random numbers   
 
        The matrix whose (I,J) entry is returned is constructed as   
        follows (this routine only computes one entry):   
 
          If I is outside (1..M) or J is outside (1..N), return zero   
-            (this is convenient for generating matrices in band format). 
-  
+            (this is convenient for generating matrices in band format).   
 
          Generate a matrix A with random entries of distribution IDIST.   
 
@@ -164,8 +160,7 @@
              entries will be set to zero.   
              Not modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -175,8 +170,7 @@
 
 
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
 
 
@@ -186,18 +180,18 @@
     --iwork;
     --dr;
     --dl;
-    --d;
+    --d__;
     --iseed;
 
     /* Function Body */
-    if (*i < 1 || *i > *m || *j < 1 || *j > *n) {
+    if (*i__ < 1 || *i__ > *m || *j < 1 || *j > *n) {
 	 ret_val->r = 0.,  ret_val->i = 0.;
 	return ;
     }
 
 /*     Check for banding */
 
-    if (*j > *i + *ku || *j < *i - *kl) {
+    if (*j > *i__ + *ku || *j < *i__ - *kl) {
 	 ret_val->r = 0.,  ret_val->i = 0.;
 	return ;
     }
@@ -214,16 +208,16 @@
 /*     Compute subscripts depending on IPVTNG */
 
     if (*ipvtng == 0) {
-	isub = *i;
+	isub = *i__;
 	jsub = *j;
     } else if (*ipvtng == 1) {
-	isub = iwork[*i];
+	isub = iwork[*i__];
 	jsub = *j;
     } else if (*ipvtng == 2) {
-	isub = *i;
+	isub = *i__;
 	jsub = iwork[*j];
     } else if (*ipvtng == 3) {
-	isub = iwork[*i];
+	isub = iwork[*i__];
 	jsub = iwork[*j];
     }
 
@@ -231,7 +225,7 @@
 
     if (isub == jsub) {
 	i__1 = isub;
-	ctemp.r = d[i__1].r, ctemp.i = d[i__1].i;
+	ctemp.r = d__[i__1].r, ctemp.i = d__[i__1].i;
     } else {
 	zlarnd_(&z__1, idist, &iseed[1]);
 	ctemp.r = z__1.r, ctemp.i = z__1.i;

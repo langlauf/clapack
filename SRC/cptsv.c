@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int cptsv_(integer *n, integer *nrhs, real *d, complex *e, 
+/* Subroutine */ int cptsv_(integer *n, integer *nrhs, real *d__, complex *e, 
 	complex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       February 25, 1997   
 
 
     Purpose   
     =======   
 
     CPTSV computes the solution to a complex system of linear equations   
-    A*X = B, where A is an N-by-N Hermitian positive definite tridiagonal 
-  
+    A*X = B, where A is an N-by-N Hermitian positive definite tridiagonal   
     matrix, and X and B are N-by-NRHS matrices.   
 
     A is factored as A = L*D*L**H, and the factored form of A is then   
@@ -42,7 +42,7 @@
             A.  E can also be regarded as the superdiagonal of the unit   
             bidiagonal factor U from the U**H*D*U factorization of A.   
 
-    B       (input/output) COMPLEX array, dimension (LDB,N)   
+    B       (input/output) COMPLEX array, dimension (LDB,NRHS)   
             On entry, the N-by-NRHS right hand side matrix B.   
             On exit, if INFO = 0, the N-by-NRHS solution matrix X.   
 
@@ -57,15 +57,12 @@
                   computed.  The factorization has not been completed   
                   unless i = N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer b_dim1, b_offset, i__1;
     /* Local variables */
@@ -73,12 +70,13 @@
 	    integer *, real *, complex *, integer *), cpttrs_(char *, integer 
 	    *, integer *, real *, complex *, complex *, integer *, integer *);
 
+    --d__;
+    --e;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -95,12 +93,12 @@
 
 /*     Compute the L*D*L' (or U'*D*U) factorization of A. */
 
-    cpttrf_(n, &D(1), &E(1), info);
+    cpttrf_(n, &d__[1], &e[1], info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	cpttrs_("Lower", n, nrhs, &D(1), &E(1), &B(1,1), ldb, info);
+	cpttrs_("Lower", n, nrhs, &d__[1], &e[1], &b[b_offset], ldb, info);
     }
     return 0;
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -30,7 +31,7 @@ static integer c__200 = 200;
     static doublecomplex diag[10];
     static integer ifst, ilst;
     static doublecomplex work[200];
-    static integer info1, info2, i, j, n;
+    static integer info1, info2, i__, j, n;
     static doublecomplex q[100]	/* was [10][10] */, ctemp;
     extern /* Subroutine */ int zhst01_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
@@ -59,7 +60,17 @@ static integer c__200 = 200;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define t1_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
+#define t1_ref(a_1,a_2) t1[t1_subscr(a_1,a_2)]
+#define t2_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
+#define t2_ref(a_1,a_2) t2[t2_subscr(a_1,a_2)]
+#define tmp_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
+#define tmp_ref(a_1,a_2) tmp[tmp_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -69,23 +80,19 @@ static integer c__200 = 200;
     =======   
 
     ZGET36 tests ZTREXC, a routine for reordering diagonal entries of a   
-    matrix in complex Schur form. Thus, ZLAEXC computes a unitary matrix 
-  
+    matrix in complex Schur form. Thus, ZLAEXC computes a unitary matrix   
     Q such that   
 
        Q' * T1 * Q  = T2   
 
-    and where one of the diagonal blocks of T1 (the one at row IFST) has 
-  
+    and where one of the diagonal blocks of T1 (the one at row IFST) has   
     been moved to position ILST.   
 
-    The test code verifies that the residual Q'*T1*Q-T2 is small, that T2 
-  
+    The test code verifies that the residual Q'*T1*Q-T2 is small, that T2   
     is in Schur form, and that the final position of the IFST block is   
     ILST.   
 
-    The test matrices are read from a file with logical unit number NIN. 
-  
+    The test matrices are read from a file with logical unit number NIN.   
 
     Arguments   
     ==========   
@@ -105,8 +112,7 @@ static integer c__200 = 200;
     NIN     (input) INTEGER   
             Input logical unit number.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     eps = dlamch_("P");
@@ -129,13 +135,13 @@ L10:
     }
     ++(*knt);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___7.ciunit = *nin;
 	s_rsle(&io___7);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&tmp[i + j * 10 - 11], (ftnlen)
-		    sizeof(doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
+		    doublecomplex));
 	}
 	e_rsle();
 /* L20: */
@@ -149,15 +155,15 @@ L10:
     zlaset_("Full", &n, &n, &c_b1, &c_b2, q, &c__10);
     ztrexc_("N", &n, t1, &c__10, q, &c__10, &ifst, &ilst, &info1);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = i + j * 10 - 11;
-	    if (i == j && (q[i__3].r != 1. || q[i__3].i != 0.)) {
+	    i__3 = q_subscr(i__, j);
+	    if (i__ == j && (q[i__3].r != 1. || q[i__3].i != 0.)) {
 		res += 1. / eps;
 	    }
-	    i__3 = i + j * 10 - 11;
-	    if (i != j && (q[i__3].r != 0. || q[i__3].i != 0.)) {
+	    i__3 = q_subscr(i__, j);
+	    if (i__ != j && (q[i__3].r != 0. || q[i__3].i != 0.)) {
 		res += 1. / eps;
 	    }
 /* L30: */
@@ -173,11 +179,11 @@ L10:
 /*     Compare T1 with T2 */
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = i + j * 10 - 11;
-	    i__4 = i + j * 10 - 11;
+	    i__3 = t1_subscr(i__, j);
+	    i__4 = t2_subscr(i__, j);
 	    if (t1[i__3].r != t2[i__4].r || t1[i__3].i != t2[i__4].i) {
 		res += 1. / eps;
 	    }
@@ -197,33 +203,33 @@ L10:
     zcopy_(&n, tmp, &c__11, diag, &c__1);
     if (ifst < ilst) {
 	i__1 = ilst;
-	for (i = ifst + 1; i <= i__1; ++i) {
-	    i__2 = i - 1;
+	for (i__ = ifst + 1; i__ <= i__1; ++i__) {
+	    i__2 = i__ - 1;
 	    ctemp.r = diag[i__2].r, ctemp.i = diag[i__2].i;
-	    i__2 = i - 1;
-	    i__3 = i - 2;
+	    i__2 = i__ - 1;
+	    i__3 = i__ - 2;
 	    diag[i__2].r = diag[i__3].r, diag[i__2].i = diag[i__3].i;
-	    i__2 = i - 2;
+	    i__2 = i__ - 2;
 	    diag[i__2].r = ctemp.r, diag[i__2].i = ctemp.i;
 /* L70: */
 	}
     } else if (ifst > ilst) {
 	i__1 = ilst;
-	for (i = ifst - 1; i >= i__1; --i) {
-	    i__2 = i;
+	for (i__ = ifst - 1; i__ >= i__1; --i__) {
+	    i__2 = i__;
 	    ctemp.r = diag[i__2].r, ctemp.i = diag[i__2].i;
-	    i__2 = i;
-	    i__3 = i - 1;
+	    i__2 = i__;
+	    i__3 = i__ - 1;
 	    diag[i__2].r = diag[i__3].r, diag[i__2].i = diag[i__3].i;
-	    i__2 = i - 1;
+	    i__2 = i__ - 1;
 	    diag[i__2].r = ctemp.r, diag[i__2].i = ctemp.i;
 /* L80: */
 	}
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * 10 - 11;
-	i__3 = i - 1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = t2_subscr(i__, i__);
+	i__3 = i__ - 1;
 	if (t2[i__2].r != diag[i__3].r || t2[i__2].i != diag[i__3].i) {
 	    res += 1. / eps;
 	}
@@ -241,8 +247,8 @@ L10:
     i__1 = n - 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = n;
-	for (i = j + 1; i <= i__2; ++i) {
-	    i__3 = i + j * 10 - 11;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    i__3 = t2_subscr(i__, j);
 	    if (t2[i__3].r != 0. || t2[i__3].i != 0.) {
 		res += 1. / eps;
 	    }
@@ -259,4 +265,14 @@ L10:
 /*     End of ZGET36 */
 
 } /* zget36_ */
+
+#undef tmp_ref
+#undef tmp_subscr
+#undef t2_ref
+#undef t2_subscr
+#undef t1_ref
+#undef t1_subscr
+#undef q_ref
+#undef q_subscr
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zpbcon_(char *uplo, integer *n, integer *kd, 
 	doublecomplex *ab, integer *ldab, doublereal *anorm, doublereal *
 	rcond, doublecomplex *work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -36,23 +37,18 @@
             or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
 
     AB      (input) COMPLEX*16 array, dimension (LDAB,N)   
-            The triangular factor U or L from the Cholesky factorization 
-  
-            A = U**H*U or A = L*L**H of the band matrix A, stored in the 
-  
+            The triangular factor U or L from the Cholesky factorization   
+            A = U**H*U or A = L*L**H of the band matrix A, stored in the   
             first KD+1 rows of the array.  The j-th column of U or L is   
             stored in the j-th column of the array AB as follows:   
-            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
 
     ANORM   (input) DOUBLE PRECISION   
-            The 1-norm (or infinity-norm) of the Hermitian band matrix A. 
-  
+            The 1-norm (or infinity-norm) of the Hermitian band matrix A.   
 
     RCOND   (output) DOUBLE PRECISION   
             The reciprocal of the condition number of the matrix A,   
@@ -67,15 +63,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -105,12 +98,13 @@
     static doublereal smlnum;
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
+    --rwork;
 
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -147,43 +141,45 @@
     kase = 0;
     *(unsigned char *)normin = 'N';
 L10:
-    zlacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+    zlacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (upper) {
 
 /*           Multiply by inv(U'). */
 
 	    zlatbs_("Upper", "Conjugate transpose", "Non-unit", normin, n, kd,
-		     &AB(1,1), ldab, &WORK(1), &scalel, &RWORK(1), info);
+		     &ab[ab_offset], ldab, &work[1], &scalel, &rwork[1], info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(U). */
 
-	    zlatbs_("Upper", "No transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scaleu, &RWORK(1), info);
+	    zlatbs_("Upper", "No transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scaleu, &rwork[1], info);
 	} else {
 
 /*           Multiply by inv(L). */
 
-	    zlatbs_("Lower", "No transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scalel, &RWORK(1), info);
+	    zlatbs_("Lower", "No transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scalel, &rwork[1], info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(L'). */
 
 	    zlatbs_("Lower", "Conjugate transpose", "Non-unit", normin, n, kd,
-		     &AB(1,1), ldab, &WORK(1), &scaleu, &RWORK(1), info);
+		     &ab[ab_offset], ldab, &work[1], &scaleu, &rwork[1], info);
 	}
 
 /*        Multiply by 1/SCALE if doing so will not cause overflow. */
 
 	scale = scalel * scaleu;
 	if (scale != 1.) {
-	    ix = izamax_(n, &WORK(1), &c__1);
+	    ix = izamax_(n, &work[1], &c__1);
 	    i__1 = ix;
-	    if (scale < ((d__1 = WORK(ix).r, abs(d__1)) + (d__2 = d_imag(&
-		    WORK(ix)), abs(d__2))) * smlnum || scale == 0.) {
+	    if (scale < ((d__1 = work[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+		    work[ix]), abs(d__2))) * smlnum || scale == 0.) {
 		goto L20;
 	    }
-	    zdrscl_(n, &scale, &WORK(1), &c__1);
+	    zdrscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

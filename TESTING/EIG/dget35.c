@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -39,8 +40,8 @@ static doublereal c_b35 = 1.;
     static doublereal cnrm;
     static integer isgn;
     static doublereal rmul, tnrm, xnrm, a[36]	/* was [6][6] */, b[36]	/* 
-	    was [6][6] */, c[36]	/* was [6][6] */;
-    static integer i, j, m, n;
+	    was [6][6] */, c__[36]	/* was [6][6] */;
+    static integer i__, j, m, n;
     static doublereal scale;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
@@ -61,7 +62,14 @@ static doublereal c_b35 = 1.;
     static doublereal dum[1], eps, res, res1;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define ival_ref(a_1,a_2,a_3) ival[((a_3)*6 + (a_2))*6 + a_1 - 43]
+#define a_ref(a_1,a_2) a[(a_2)*6 + a_1 - 7]
+#define b_ref(a_1,a_2) b[(a_2)*6 + a_1 - 7]
+#define c___ref(a_1,a_2) c__[(a_2)*6 + a_1 - 7]
+#define cc_ref(a_1,a_2) cc[(a_2)*6 + a_1 - 7]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -75,8 +83,7 @@ static doublereal c_b35 = 1.;
 
        op(A)*X + ISGN*X*op(B) = scale*C,   
 
-    A and B are assumed to be in Schur canonical form, op() represents an 
-  
+    A and B are assumed to be in Schur canonical form, op() represents an   
     optional transpose, and ISGN can be -1 or +1.  Scale is an output   
     less than or equal to 1, chosen to avoid overflow in X.   
 
@@ -100,8 +107,7 @@ static doublereal c_b35 = 1.;
     KNT     (output) INTEGER   
             Total number of examples tested.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine parameters */
@@ -152,39 +158,37 @@ static doublereal c_b35 = 1.;
 					n = idim[imb - 1];
 					tnrm = 0.;
 					i__1 = m;
-					for (i = 1; i <= i__1; ++i) {
+					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = m;
 					    for (j = 1; j <= i__2; ++j) {
-			  a[i + j * 6 - 7] = (doublereal) ival[i + (j + ima * 
-				  6) * 6 - 43];
-			  if ((i__3 = i - j, abs(i__3)) <= 1) {
-			      a[i + j * 6 - 7] *= vm1[imlda1 - 1];
-			      a[i + j * 6 - 7] *= vm2[imlda2 - 1];
+			  a_ref(i__, j) = (doublereal) ival_ref(i__, j, ima);
+			  if ((i__3 = i__ - j, abs(i__3)) <= 1) {
+			      a_ref(i__, j) = a_ref(i__, j) * vm1[imlda1 - 1];
+			      a_ref(i__, j) = a_ref(i__, j) * vm2[imlda2 - 1];
 			  } else {
-			      a[i + j * 6 - 7] *= vm1[imloff - 1];
+			      a_ref(i__, j) = a_ref(i__, j) * vm1[imloff - 1];
 			  }
 /* Computing MAX */
-			  d__2 = tnrm, d__3 = (d__1 = a[i + j * 6 - 7], abs(
-				  d__1));
+			  d__2 = tnrm, d__3 = (d__1 = a_ref(i__, j), abs(d__1)
+				  );
 			  tnrm = max(d__2,d__3);
 /* L10: */
 					    }
 /* L20: */
 					}
 					i__1 = n;
-					for (i = 1; i <= i__1; ++i) {
+					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = n;
 					    for (j = 1; j <= i__2; ++j) {
-			  b[i + j * 6 - 7] = (doublereal) ival[i + (j + imb * 
-				  6) * 6 - 43];
-			  if ((i__3 = i - j, abs(i__3)) <= 1) {
-			      b[i + j * 6 - 7] *= vm1[imldb1 - 1];
+			  b_ref(i__, j) = (doublereal) ival_ref(i__, j, imb);
+			  if ((i__3 = i__ - j, abs(i__3)) <= 1) {
+			      b_ref(i__, j) = b_ref(i__, j) * vm1[imldb1 - 1];
 			  } else {
-			      b[i + j * 6 - 7] *= vm1[imloff - 1];
+			      b_ref(i__, j) = b_ref(i__, j) * vm1[imloff - 1];
 			  }
 /* Computing MAX */
-			  d__2 = tnrm, d__3 = (d__1 = b[i + j * 6 - 7], abs(
-				  d__1));
+			  d__2 = tnrm, d__3 = (d__1 = b_ref(i__, j), abs(d__1)
+				  );
 			  tnrm = max(d__2,d__3);
 /* L30: */
 					    }
@@ -192,27 +196,27 @@ static doublereal c_b35 = 1.;
 					}
 					cnrm = 0.;
 					i__1 = m;
-					for (i = 1; i <= i__1; ++i) {
+					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = n;
 					    for (j = 1; j <= i__2; ++j) {
-			  c[i + j * 6 - 7] = sin((doublereal) (i * j));
+			  c___ref(i__, j) = sin((doublereal) (i__ * j));
 /* Computing MAX */
-			  d__1 = cnrm, d__2 = c[i + j * 6 - 7];
+			  d__1 = cnrm, d__2 = c___ref(i__, j);
 			  cnrm = max(d__1,d__2);
-			  cc[i + j * 6 - 7] = c[i + j * 6 - 7];
+			  cc_ref(i__, j) = c___ref(i__, j);
 /* L50: */
 					    }
 /* L60: */
 					}
 					++(*knt);
 					dtrsyl_(trana, tranb, &isgn, &m, &n, 
-						a, &c__6, b, &c__6, c, &c__6, 
-						&scale, &info);
+						a, &c__6, b, &c__6, c__, &
+						c__6, &scale, &info);
 					if (info != 0) {
 					    ++(*ninfo);
 					}
-					xnrm = dlange_("M", &m, &n, c, &c__6, 
-						dum);
+					xnrm = dlange_("M", &m, &n, c__, &
+						c__6, dum);
 					rmul = 1.;
 					if (xnrm > 1. && tnrm > 1.) {
 					    if (xnrm > bignum / tnrm) {
@@ -221,11 +225,11 @@ static doublereal c_b35 = 1.;
 					}
 					d__1 = -scale * rmul;
 					dgemm_(trana, "N", &m, &n, &m, &rmul, 
-						a, &c__6, c, &c__6, &d__1, cc,
-						 &c__6);
+						a, &c__6, c__, &c__6, &d__1, 
+						cc, &c__6);
 					d__1 = (doublereal) isgn * rmul;
 					dgemm_("N", tranb, &m, &n, &n, &d__1, 
-						c, &c__6, b, &c__6, &c_b35, 
+						c__, &c__6, b, &c__6, &c_b35, 
 						cc, &c__6);
 					res1 = dlange_("M", &m, &n, cc, &c__6,
 						 dum);
@@ -262,4 +266,11 @@ static doublereal c_b35 = 1.;
 /*     End of DGET35 */
 
 } /* dget35_ */
+
+#undef cc_ref
+#undef c___ref
+#undef b_ref
+#undef a_ref
+#undef ival_ref
+
 

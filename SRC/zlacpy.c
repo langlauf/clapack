@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlacpy_(char *uplo, integer *m, integer *n, 
 	doublecomplex *a, integer *lda, doublecomplex *b, integer *ldb)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -31,8 +32,7 @@
             The number of columns of the matrix A.  N >= 0.   
 
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The m by n matrix A.  If UPLO = 'U', only the upper trapezium 
-  
+            The m by n matrix A.  If UPLO = 'U', only the upper trapezium   
             is accessed; if UPLO = 'L', only the lower trapezium is   
             accessed.   
 
@@ -45,32 +45,36 @@
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,M).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     if (lsame_(uplo, "U")) {
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = min(j,*m);
-	    for (i = 1; i <= min(j,*m); ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * a_dim1;
-		B(i,j).r = A(i,j).r, B(i,j).i = A(i,j).i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		i__4 = a_subscr(i__, j);
+		b[i__3].r = a[i__4].r, b[i__3].i = a[i__4].i;
 /* L10: */
 	    }
 /* L20: */
@@ -78,12 +82,12 @@
 
     } else if (lsame_(uplo, "L")) {
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = j; i <= *m; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * a_dim1;
-		B(i,j).r = A(i,j).r, B(i,j).i = A(i,j).i;
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		i__4 = a_subscr(i__, j);
+		b[i__3].r = a[i__4].r, b[i__3].i = a[i__4].i;
 /* L30: */
 	    }
 /* L40: */
@@ -91,12 +95,12 @@
 
     } else {
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * a_dim1;
-		B(i,j).r = A(i,j).r, B(i,j).i = A(i,j).i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		i__4 = a_subscr(i__, j);
+		b[i__3].r = a[i__4].r, b[i__3].i = a[i__4].i;
 /* L50: */
 	    }
 /* L60: */
@@ -108,4 +112,10 @@
 /*     End of ZLACPY */
 
 } /* zlacpy_ */
+
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

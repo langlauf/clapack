@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgeev_(char *jobvl, char *jobvr, integer *n, real *a, 
 	integer *lda, real *wr, real *wi, real *vl, integer *ldvl, real *vr, 
 	integer *ldvr, real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 8, 1999   
 
 
     Purpose   
@@ -93,24 +94,25 @@
             if JOBVL = 'V' or JOBVR = 'V', LWORK >= 4*N.  For good   
             performance, LWORK must generally be larger.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  if INFO = i, the QR algorithm failed to compute all the 
-  
+            > 0:  if INFO = i, the QR algorithm failed to compute all the   
                   eigenvalues, and no eigenvectors have been computed;   
                   elements i+1:N of WR and WI contain eigenvalues which   
                   have converged.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c__0 = 0;
@@ -133,8 +135,8 @@
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, k;
-    static real r;
+    static integer i__, k;
+    static real r__;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     extern doublereal slapy2_(real *, real *);
@@ -170,23 +172,31 @@
     static logical wantvl;
     static real smlnum;
     static integer hswork;
-    static logical wantvr;
+    static logical lquery, wantvr;
     static integer ihi;
     static real scl;
     static integer ilo;
     static real dum[1], eps;
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --wr;
+    --wi;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --work;
 
-#define WR(I) wr[(I)-1]
-#define WI(I) wi[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-
+    /* Function Body */
     *info = 0;
+    lquery = *lwork == -1;
     wantvl = lsame_(jobvl, "V");
     wantvr = lsame_(jobvr, "V");
     if (! wantvl && ! lsame_(jobvl, "N")) {
@@ -214,20 +224,21 @@
          the worst case.) */
 
     minwrk = 1;
-    if (*info == 0 && *lwork >= 1) {
+    if (*info == 0 && (*lwork >= 1 || lquery)) {
 	maxwrk = (*n << 1) + *n * ilaenv_(&c__1, "SGEHRD", " ", n, &c__1, n, &
-		c__0, 6L, 1L);
+		c__0, (ftnlen)6, (ftnlen)1);
 	if (! wantvl && ! wantvr) {
 /* Computing MAX */
 	    i__1 = 1, i__2 = *n * 3;
 	    minwrk = max(i__1,i__2);
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "SHSEQR", "EN", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "SHSEQR", "EN", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "SHSEQR", "EN", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -243,15 +254,16 @@
 	    minwrk = max(i__1,i__2);
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = (*n << 1) + (*n - 1) * ilaenv_(&c__1, "SOR"
-		    "GHR", " ", n, &c__1, n, &c_n1, 6L, 1L);
+		    "GHR", " ", n, &c__1, n, &c_n1, (ftnlen)6, (ftnlen)1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
-	    i__1 = ilaenv_(&c__8, "SHSEQR", "SV", n, &c__1, n, &c_n1, 6L, 2L);
+	    i__1 = ilaenv_(&c__8, "SHSEQR", "SV", n, &c__1, n, &c_n1, (ftnlen)
+		    6, (ftnlen)2);
 	    maxb = max(i__1,2);
 /* Computing MIN   
    Computing MAX */
 	    i__3 = 2, i__4 = ilaenv_(&c__4, "SHSEQR", "SV", n, &c__1, n, &
-		    c_n1, 6L, 2L);
+		    c_n1, (ftnlen)6, (ftnlen)2);
 	    i__1 = min(maxb,*n), i__2 = max(i__3,i__4);
 	    k = min(i__1,i__2);
 /* Computing MAX */
@@ -265,14 +277,16 @@
 	    i__1 = maxwrk, i__2 = *n << 2;
 	    maxwrk = max(i__1,i__2);
 	}
-	WORK(1) = (real) maxwrk;
+	work[1] = (real) maxwrk;
     }
-    if (*lwork < minwrk) {
+    if (*lwork < minwrk && ! lquery) {
 	*info = -13;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SGEEV ", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -293,7 +307,7 @@
 
 /*     Scale A if max element outside range [SMLNUM,BIGNUM] */
 
-    anrm = slange_("M", n, n, &A(1,1), lda, dum);
+    anrm = slange_("M", n, n, &a[a_offset], lda, dum);
     scalea = FALSE_;
     if (anrm > 0.f && anrm < smlnum) {
 	scalea = TRUE_;
@@ -303,7 +317,7 @@
 	cscale = bignum;
     }
     if (scalea) {
-	slascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &A(1,1), lda, &
+	slascl_("G", &c__0, &c__0, &anrm, &cscale, n, n, &a[a_offset], lda, &
 		ierr);
     }
 
@@ -311,7 +325,7 @@
        (Workspace: need N) */
 
     ibal = 1;
-    sgebal_("B", n, &A(1,1), lda, &ilo, &ihi, &WORK(ibal), &ierr);
+    sgebal_("B", n, &a[a_offset], lda, &ilo, &ihi, &work[ibal], &ierr);
 
 /*     Reduce to upper Hessenberg form   
        (Workspace: need 3*N, prefer 2*N+N*NB) */
@@ -319,7 +333,7 @@
     itau = ibal + *n;
     iwrk = itau + *n;
     i__1 = *lwork - iwrk + 1;
-    sgehrd_(n, &ilo, &ihi, &A(1,1), lda, &WORK(itau), &WORK(iwrk), &i__1,
+    sgehrd_(n, &ilo, &ihi, &a[a_offset], lda, &work[itau], &work[iwrk], &i__1,
 	     &ierr);
 
     if (wantvl) {
@@ -328,13 +342,14 @@
           Copy Householder vectors to VL */
 
 	*(unsigned char *)side = 'L';
-	slacpy_("L", n, n, &A(1,1), lda, &VL(1,1), ldvl);
+	slacpy_("L", n, n, &a[a_offset], lda, &vl[vl_offset], ldvl)
+		;
 
 /*        Generate orthogonal matrix in VL   
           (Workspace: need 3*N-1, prefer 2*N+(N-1)*NB) */
 
 	i__1 = *lwork - iwrk + 1;
-	sorghr_(n, &ilo, &ihi, &VL(1,1), ldvl, &WORK(itau), &WORK(iwrk),
+	sorghr_(n, &ilo, &ihi, &vl[vl_offset], ldvl, &work[itau], &work[iwrk],
 		 &i__1, &ierr);
 
 /*        Perform QR iteration, accumulating Schur vectors in VL   
@@ -342,8 +357,8 @@
 
 	iwrk = itau;
 	i__1 = *lwork - iwrk + 1;
-	shseqr_("S", "V", n, &ilo, &ihi, &A(1,1), lda, &WR(1), &WI(1), &
-		VL(1,1), ldvl, &WORK(iwrk), &i__1, info);
+	shseqr_("S", "V", n, &ilo, &ihi, &a[a_offset], lda, &wr[1], &wi[1], &
+		vl[vl_offset], ldvl, &work[iwrk], &i__1, info);
 
 	if (wantvr) {
 
@@ -351,8 +366,7 @@
              Copy Schur vectors to VR */
 
 	    *(unsigned char *)side = 'B';
-	    slacpy_("F", n, n, &VL(1,1), ldvl, &VR(1,1), ldvr)
-		    ;
+	    slacpy_("F", n, n, &vl[vl_offset], ldvl, &vr[vr_offset], ldvr);
 	}
 
     } else if (wantvr) {
@@ -361,13 +375,14 @@
           Copy Householder vectors to VR */
 
 	*(unsigned char *)side = 'R';
-	slacpy_("L", n, n, &A(1,1), lda, &VR(1,1), ldvr);
+	slacpy_("L", n, n, &a[a_offset], lda, &vr[vr_offset], ldvr)
+		;
 
 /*        Generate orthogonal matrix in VR   
           (Workspace: need 3*N-1, prefer 2*N+(N-1)*NB) */
 
 	i__1 = *lwork - iwrk + 1;
-	sorghr_(n, &ilo, &ihi, &VR(1,1), ldvr, &WORK(itau), &WORK(iwrk),
+	sorghr_(n, &ilo, &ihi, &vr[vr_offset], ldvr, &work[itau], &work[iwrk],
 		 &i__1, &ierr);
 
 /*        Perform QR iteration, accumulating Schur vectors in VR   
@@ -375,8 +390,8 @@
 
 	iwrk = itau;
 	i__1 = *lwork - iwrk + 1;
-	shseqr_("S", "V", n, &ilo, &ihi, &A(1,1), lda, &WR(1), &WI(1), &
-		VR(1,1), ldvr, &WORK(iwrk), &i__1, info);
+	shseqr_("S", "V", n, &ilo, &ihi, &a[a_offset], lda, &wr[1], &wi[1], &
+		vr[vr_offset], ldvr, &work[iwrk], &i__1, info);
 
     } else {
 
@@ -385,8 +400,8 @@
 
 	iwrk = itau;
 	i__1 = *lwork - iwrk + 1;
-	shseqr_("E", "N", n, &ilo, &ihi, &A(1,1), lda, &WR(1), &WI(1), &
-		VR(1,1), ldvr, &WORK(iwrk), &i__1, info);
+	shseqr_("E", "N", n, &ilo, &ihi, &a[a_offset], lda, &wr[1], &wi[1], &
+		vr[vr_offset], ldvr, &work[iwrk], &i__1, info);
     }
 
 /*     If INFO > 0 from SHSEQR, then quit */
@@ -400,8 +415,8 @@
 /*        Compute left and/or right eigenvectors   
           (Workspace: need 4*N) */
 
-	strevc_(side, "B", select, n, &A(1,1), lda, &VL(1,1), ldvl,
-		 &VR(1,1), ldvr, n, &nout, &WORK(iwrk), &ierr);
+	strevc_(side, "B", select, n, &a[a_offset], lda, &vl[vl_offset], ldvl,
+		 &vr[vr_offset], ldvr, n, &nout, &work[iwrk], &ierr);
     }
 
     if (wantvl) {
@@ -409,37 +424,36 @@
 /*        Undo balancing of left eigenvectors   
           (Workspace: need N) */
 
-	sgebak_("B", "L", n, &ilo, &ihi, &WORK(ibal), n, &VL(1,1), ldvl,
+	sgebak_("B", "L", n, &ilo, &ihi, &work[ibal], n, &vl[vl_offset], ldvl,
 		 &ierr);
 
-/*        Normalize left eigenvectors and make largest component real 
-*/
+/*        Normalize left eigenvectors and make largest component real */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (WI(i) == 0.f) {
-		scl = 1.f / snrm2_(n, &VL(1,i), &c__1);
-		sscal_(n, &scl, &VL(1,i), &c__1);
-	    } else if (WI(i) > 0.f) {
-		r__1 = snrm2_(n, &VL(1,i), &c__1);
-		r__2 = snrm2_(n, &VL(1,i+1), &c__1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (wi[i__] == 0.f) {
+		scl = 1.f / snrm2_(n, &vl_ref(1, i__), &c__1);
+		sscal_(n, &scl, &vl_ref(1, i__), &c__1);
+	    } else if (wi[i__] > 0.f) {
+		r__1 = snrm2_(n, &vl_ref(1, i__), &c__1);
+		r__2 = snrm2_(n, &vl_ref(1, i__ + 1), &c__1);
 		scl = 1.f / slapy2_(&r__1, &r__2);
-		sscal_(n, &scl, &VL(1,i), &c__1);
-		sscal_(n, &scl, &VL(1,i+1), &c__1);
+		sscal_(n, &scl, &vl_ref(1, i__), &c__1);
+		sscal_(n, &scl, &vl_ref(1, i__ + 1), &c__1);
 		i__2 = *n;
-		for (k = 1; k <= *n; ++k) {
+		for (k = 1; k <= i__2; ++k) {
 /* Computing 2nd power */
-		    r__1 = VL(k,i);
+		    r__1 = vl_ref(k, i__);
 /* Computing 2nd power */
-		    r__2 = VL(k,i+1);
-		    WORK(iwrk + k - 1) = r__1 * r__1 + r__2 * r__2;
+		    r__2 = vl_ref(k, i__ + 1);
+		    work[iwrk + k - 1] = r__1 * r__1 + r__2 * r__2;
 /* L10: */
 		}
-		k = isamax_(n, &WORK(iwrk), &c__1);
-		slartg_(&VL(k,i), &VL(k,i+1), &cs,
-			 &sn, &r);
-		srot_(n, &VL(1,i), &c__1, &VL(1,i+1), &c__1, &cs, &sn);
-		VL(k,i+1) = 0.f;
+		k = isamax_(n, &work[iwrk], &c__1);
+		slartg_(&vl_ref(k, i__), &vl_ref(k, i__ + 1), &cs, &sn, &r__);
+		srot_(n, &vl_ref(1, i__), &c__1, &vl_ref(1, i__ + 1), &c__1, &
+			cs, &sn);
+		vl_ref(k, i__ + 1) = 0.f;
 	    }
 /* L20: */
 	}
@@ -450,37 +464,36 @@
 /*        Undo balancing of right eigenvectors   
           (Workspace: need N) */
 
-	sgebak_("B", "R", n, &ilo, &ihi, &WORK(ibal), n, &VR(1,1), ldvr,
+	sgebak_("B", "R", n, &ilo, &ihi, &work[ibal], n, &vr[vr_offset], ldvr,
 		 &ierr);
 
-/*        Normalize right eigenvectors and make largest component real
- */
+/*        Normalize right eigenvectors and make largest component real */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (WI(i) == 0.f) {
-		scl = 1.f / snrm2_(n, &VR(1,i), &c__1);
-		sscal_(n, &scl, &VR(1,i), &c__1);
-	    } else if (WI(i) > 0.f) {
-		r__1 = snrm2_(n, &VR(1,i), &c__1);
-		r__2 = snrm2_(n, &VR(1,i+1), &c__1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (wi[i__] == 0.f) {
+		scl = 1.f / snrm2_(n, &vr_ref(1, i__), &c__1);
+		sscal_(n, &scl, &vr_ref(1, i__), &c__1);
+	    } else if (wi[i__] > 0.f) {
+		r__1 = snrm2_(n, &vr_ref(1, i__), &c__1);
+		r__2 = snrm2_(n, &vr_ref(1, i__ + 1), &c__1);
 		scl = 1.f / slapy2_(&r__1, &r__2);
-		sscal_(n, &scl, &VR(1,i), &c__1);
-		sscal_(n, &scl, &VR(1,i+1), &c__1);
+		sscal_(n, &scl, &vr_ref(1, i__), &c__1);
+		sscal_(n, &scl, &vr_ref(1, i__ + 1), &c__1);
 		i__2 = *n;
-		for (k = 1; k <= *n; ++k) {
+		for (k = 1; k <= i__2; ++k) {
 /* Computing 2nd power */
-		    r__1 = VR(k,i);
+		    r__1 = vr_ref(k, i__);
 /* Computing 2nd power */
-		    r__2 = VR(k,i+1);
-		    WORK(iwrk + k - 1) = r__1 * r__1 + r__2 * r__2;
+		    r__2 = vr_ref(k, i__ + 1);
+		    work[iwrk + k - 1] = r__1 * r__1 + r__2 * r__2;
 /* L30: */
 		}
-		k = isamax_(n, &WORK(iwrk), &c__1);
-		slartg_(&VR(k,i), &VR(k,i+1), &cs,
-			 &sn, &r);
-		srot_(n, &VR(1,i), &c__1, &VR(1,i+1), &c__1, &cs, &sn);
-		VR(k,i+1) = 0.f;
+		k = isamax_(n, &work[iwrk], &c__1);
+		slartg_(&vr_ref(k, i__), &vr_ref(k, i__ + 1), &cs, &sn, &r__);
+		srot_(n, &vr_ref(1, i__), &c__1, &vr_ref(1, i__ + 1), &c__1, &
+			cs, &sn);
+		vr_ref(k, i__ + 1) = 0.f;
 	    }
 /* L40: */
 	}
@@ -494,28 +507,32 @@ L50:
 /* Computing MAX */
 	i__3 = *n - *info;
 	i__2 = max(i__3,1);
-	slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &WR(*info + 
-		1), &i__2, &ierr);
+	slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &wr[*info + 
+		1], &i__2, &ierr);
 	i__1 = *n - *info;
 /* Computing MAX */
 	i__3 = *n - *info;
 	i__2 = max(i__3,1);
-	slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &WI(*info + 
-		1), &i__2, &ierr);
+	slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &wi[*info + 
+		1], &i__2, &ierr);
 	if (*info > 0) {
 	    i__1 = ilo - 1;
-	    slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &WR(1), 
+	    slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &wr[1], 
 		    n, &ierr);
 	    i__1 = ilo - 1;
-	    slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &WI(1), 
+	    slascl_("G", &c__0, &c__0, &cscale, &anrm, &i__1, &c__1, &wi[1], 
 		    n, &ierr);
 	}
     }
 
-    WORK(1) = (real) maxwrk;
+    work[1] = (real) maxwrk;
     return 0;
 
 /*     End of SGEEV */
 
 } /* sgeev_ */
+
+#undef vr_ref
+#undef vl_ref
+
 

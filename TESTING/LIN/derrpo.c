@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,7 +37,7 @@ static integer c_n1 = -1;
     /* Local variables */
     static integer info;
     static doublereal anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
+    static integer i__, j;
     static doublereal w[12], x[4], rcond;
     static char c2[2];
     static doublereal r1[4], r2[4];
@@ -85,7 +86,11 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -106,22 +111,21 @@ static integer c_n1 = -1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
-	    af[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -141,7 +145,7 @@ static integer c_n1 = -1;
 
           DPOTRF */
 
-	s_copy(srnamc_1.srnamt, "DPOTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotrf_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -157,7 +161,7 @@ static integer c_n1 = -1;
 
 /*        DPOTF2 */
 
-	s_copy(srnamc_1.srnamt, "DPOTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotf2_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -173,7 +177,7 @@ static integer c_n1 = -1;
 
 /*        DPOTRI */
 
-	s_copy(srnamc_1.srnamt, "DPOTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotri_("/", &c__0, a, &c__1, &info);
 	chkxer_("DPOTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -189,7 +193,7 @@ static integer c_n1 = -1;
 
 /*        DPOTRS */
 
-	s_copy(srnamc_1.srnamt, "DPOTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpotrs_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("DPOTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -213,7 +217,7 @@ static integer c_n1 = -1;
 
 /*        DPORFS */
 
-	s_copy(srnamc_1.srnamt, "DPORFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPORFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dporfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &c__1, 
 		r1, r2, w, iw, &info);
@@ -252,7 +256,7 @@ static integer c_n1 = -1;
 
 /*        DPOCON */
 
-	s_copy(srnamc_1.srnamt, "DPOCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpocon_("/", &c__0, a, &c__1, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPOCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -268,7 +272,7 @@ static integer c_n1 = -1;
 
 /*        DPOEQU */
 
-	s_copy(srnamc_1.srnamt, "DPOEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpoequ_(&c_n1, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("DPOEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -281,12 +285,11 @@ static integer c_n1 = -1;
     } else if (lsamen_(&c__2, c2, "PP")) {
 
 /*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite packed matrix
-.   
+          decomposition of a symmetric positive definite packed matrix.   
 
           DPPTRF */
 
-	s_copy(srnamc_1.srnamt, "DPPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptrf_("/", &c__0, a, &info);
 	chkxer_("DPPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -298,7 +301,7 @@ static integer c_n1 = -1;
 
 /*        DPPTRI */
 
-	s_copy(srnamc_1.srnamt, "DPPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptri_("/", &c__0, a, &info);
 	chkxer_("DPPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -310,7 +313,7 @@ static integer c_n1 = -1;
 
 /*        DPPTRS */
 
-	s_copy(srnamc_1.srnamt, "DPPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpptrs_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("DPPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -330,7 +333,7 @@ static integer c_n1 = -1;
 
 /*        DPPRFS */
 
-	s_copy(srnamc_1.srnamt, "DPPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpprfs_("/", &c__0, &c__0, a, af, b, &c__1, x, &c__1, r1, r2, w, iw, &
 		info);
@@ -359,7 +362,7 @@ static integer c_n1 = -1;
 
 /*        DPPCON */
 
-	s_copy(srnamc_1.srnamt, "DPPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dppcon_("/", &c__0, a, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -371,7 +374,7 @@ static integer c_n1 = -1;
 
 /*        DPPEQU */
 
-	s_copy(srnamc_1.srnamt, "DPPEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dppequ_("/", &c__0, a, r1, &rcond, &anrm, &info);
 	chkxer_("DPPEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -384,12 +387,11 @@ static integer c_n1 = -1;
     } else if (lsamen_(&c__2, c2, "PB")) {
 
 /*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite band matrix. 
-  
+          decomposition of a symmetric positive definite band matrix.   
 
           DPBTRF */
 
-	s_copy(srnamc_1.srnamt, "DPBTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtrf_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("DPBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -409,7 +411,7 @@ static integer c_n1 = -1;
 
 /*        DPBTF2 */
 
-	s_copy(srnamc_1.srnamt, "DPBTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtf2_("/", &c__0, &c__0, a, &c__1, &info);
 	chkxer_("DPBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -429,7 +431,7 @@ static integer c_n1 = -1;
 
 /*        DPBTRS */
 
-	s_copy(srnamc_1.srnamt, "DPBTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbtrs_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("DPBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -457,7 +459,7 @@ static integer c_n1 = -1;
 
 /*        DPBRFS */
 
-	s_copy(srnamc_1.srnamt, "DPBRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbrfs_("/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -501,7 +503,7 @@ static integer c_n1 = -1;
 
 /*        DPBCON */
 
-	s_copy(srnamc_1.srnamt, "DPBCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbcon_("/", &c__0, &c__0, a, &c__1, &anrm, &rcond, w, iw, &info);
 	chkxer_("DPBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -521,7 +523,7 @@ static integer c_n1 = -1;
 
 /*        DPBEQU */
 
-	s_copy(srnamc_1.srnamt, "DPBEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dpbequ_("/", &c__0, &c__0, a, &c__1, r1, &rcond, &anrm, &info);
 	chkxer_("DPBEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -549,4 +551,8 @@ static integer c_n1 = -1;
 /*     End of DERRPO */
 
 } /* derrpo_ */
+
+#undef af_ref
+#undef a_ref
+
 

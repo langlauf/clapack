@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgbbrd_(char *vect, integer *m, integer *n, integer *ncc,
 	 integer *kl, integer *ku, doublecomplex *ab, integer *ldab, 
-	doublereal *d, doublereal *e, doublecomplex *q, integer *ldq, 
-	doublecomplex *pt, integer *ldpt, doublecomplex *c, integer *ldc, 
+	doublereal *d__, doublereal *e, doublecomplex *q, integer *ldq, 
+	doublecomplex *pt, integer *ldpt, doublecomplex *c__, integer *ldc, 
 	doublecomplex *work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -49,8 +50,7 @@
 
     AB      (input/output) COMPLEX*16 array, dimension (LDAB,N)   
             On entry, the m-by-n band matrix A, stored in rows 1 to   
-            KL+KU+1. The j-th column of A is stored in the j-th column of 
-  
+            KL+KU+1. The j-th column of A is stored in the j-th column of   
             the array AB as follows:   
             AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl).   
             On exit, A is overwritten by values generated during the   
@@ -98,15 +98,12 @@
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {0.,0.};
     static doublecomplex c_b2 = {1.,0.};
@@ -124,7 +121,7 @@
     static doublereal abst;
     extern /* Subroutine */ int zrot_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *);
-    static integer i, j, l;
+    static integer i__, j, l;
     static doublecomplex t;
     extern logical lsame_(char *, char *);
     static logical wantb, wantc;
@@ -151,19 +148,34 @@
 	     doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    integer *);
     static integer klm, kun, nrt, klu1;
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+#define pt_subscr(a_1,a_2) (a_2)*pt_dim1 + a_1
+#define pt_ref(a_1,a_2) pt[pt_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --d__;
+    --e;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    pt_dim1 = *ldpt;
+    pt_offset = 1 + pt_dim1 * 1;
+    pt -= pt_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
+    --rwork;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define PT(I,J) pt[(I)-1 + ((J)-1)* ( *ldpt)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     wantb = lsame_(vect, "B");
     wantq = lsame_(vect, "Q") || wantb;
     wantpt = lsame_(vect, "P") || wantb;
@@ -200,10 +212,10 @@
 /*     Initialize Q and P' to the unit matrix, if needed */
 
     if (wantq) {
-	zlaset_("Full", m, m, &c_b1, &c_b2, &Q(1,1), ldq);
+	zlaset_("Full", m, m, &c_b1, &c_b2, &q[q_offset], ldq);
     }
     if (wantpt) {
-	zlaset_("Full", n, n, &c_b1, &c_b2, &PT(1,1), ldpt);
+	zlaset_("Full", n, n, &c_b1, &c_b2, &pt[pt_offset], ldpt);
     }
 
 /*     Quick return if possible. */
@@ -216,10 +228,8 @@
 
     if (*kl + *ku > 1) {
 
-/*        Reduce to upper bidiagonal form if KU > 0; if KU = 0, reduce
-   
-          first to lower bidiagonal form and then transform to upper 
-  
+/*        Reduce to upper bidiagonal form if KU > 0; if KU = 0, reduce   
+          first to lower bidiagonal form and then transform to upper   
           bidiagonal */
 
 	if (*ku > 0) {
@@ -230,13 +240,10 @@
 	    mu0 = 1;
 	}
 
-/*        Wherever possible, plane rotations are generated and applied
- in   
-          vector operations of length NR over the index set J1:J2:KLU1
-.   
+/*        Wherever possible, plane rotations are generated and applied in   
+          vector operations of length NR over the index set J1:J2:KLU1.   
 
-          The complex sines of the plane rotations are stored in WORK,
-   
+          The complex sines of the plane rotations are stored in WORK,   
           and the real cosines in RWORK.   
 
    Computing MIN */
@@ -253,64 +260,63 @@
 	j2 = 1 - kun;
 
 	i__1 = minmn;
-	for (i = 1; i <= minmn; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*           Reduce i-th column and i-th row of matrix to bidiagon
-al form */
+/*           Reduce i-th column and i-th row of matrix to bidiagonal form */
 
 	    ml = klm + 1;
 	    mu = kun + 1;
 	    i__2 = kb;
-	    for (kk = 1; kk <= kb; ++kk) {
+	    for (kk = 1; kk <= i__2; ++kk) {
 		j1 += kb;
 		j2 += kb;
 
-/*              generate plane rotations to annihilate nonzero
- elements   
+/*              generate plane rotations to annihilate nonzero elements   
                 which have been created below the band */
 
 		if (nr > 0) {
-		    zlargv_(&nr, &AB(klu1,j1-klm-1), &inca, 
-			    &WORK(j1), &kb1, &RWORK(j1), &kb1);
+		    zlargv_(&nr, &ab_ref(klu1, j1 - klm - 1), &inca, &work[j1]
+			    , &kb1, &rwork[j1], &kb1);
 		}
 
 /*              apply plane rotations from the left */
 
 		i__3 = kb;
-		for (l = 1; l <= kb; ++l) {
+		for (l = 1; l <= i__3; ++l) {
 		    if (j2 - klm + l - 1 > *n) {
 			nrt = nr - 1;
 		    } else {
 			nrt = nr;
 		    }
 		    if (nrt > 0) {
-			zlartv_(&nrt, &AB(klu1-l,j1-klm+l-1), &inca, &AB(klu1-l+1,j1-klm+l-1), &inca, &RWORK(j1), &WORK(
-				j1), &kb1);
+			zlartv_(&nrt, &ab_ref(klu1 - l, j1 - klm + l - 1), &
+				inca, &ab_ref(klu1 - l + 1, j1 - klm + l - 1),
+				 &inca, &rwork[j1], &work[j1], &kb1);
 		    }
 /* L10: */
 		}
 
 		if (ml > ml0) {
-		    if (ml <= *m - i + 1) {
+		    if (ml <= *m - i__ + 1) {
 
-/*                    generate plane rotation to annih
-ilate a(i+ml-1,i)   
-                      within the band, and apply rotat
-ion from the left */
+/*                    generate plane rotation to annihilate a(i+ml-1,i)   
+                      within the band, and apply rotation from the left */
 
-			zlartg_(&AB(*ku+ml-1,i), &AB(*ku+ml,i), &RWORK(i + ml - 1), &WORK(i + 
-				ml - 1), &ra);
-			i__3 = *ku + ml - 1 + i * ab_dim1;
-			AB(*ku+ml-1,i).r = ra.r, AB(*ku+ml-1,i).i = ra.i;
-			if (i < *n) {
+			zlartg_(&ab_ref(*ku + ml - 1, i__), &ab_ref(*ku + ml, 
+				i__), &rwork[i__ + ml - 1], &work[i__ + ml - 
+				1], &ra);
+			i__3 = ab_subscr(*ku + ml - 1, i__);
+			ab[i__3].r = ra.r, ab[i__3].i = ra.i;
+			if (i__ < *n) {
 /* Computing MIN */
-			    i__4 = *ku + ml - 2, i__5 = *n - i;
+			    i__4 = *ku + ml - 2, i__5 = *n - i__;
 			    i__3 = min(i__4,i__5);
 			    i__6 = *ldab - 1;
 			    i__7 = *ldab - 1;
-			    zrot_(&i__3, &AB(*ku+ml-2,i+1)
-				    , &i__6, &AB(*ku+ml-1,i+1), &i__7, &RWORK(i + ml - 1), &
-				    WORK(i + ml - 1));
+			    zrot_(&i__3, &ab_ref(*ku + ml - 2, i__ + 1), &
+				    i__6, &ab_ref(*ku + ml - 1, i__ + 1), &
+				    i__7, &rwork[i__ + ml - 1], &work[i__ + 
+				    ml - 1]);
 			}
 		    }
 		    ++nr;
@@ -319,15 +325,15 @@ ion from the left */
 
 		if (wantq) {
 
-/*                 accumulate product of plane rotations i
-n Q */
+/*                 accumulate product of plane rotations in Q */
 
 		    i__3 = j2;
 		    i__4 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) 
 			    {
-			d_cnjg(&z__1, &WORK(j));
-			zrot_(m, &Q(1,j-1), &c__1, &Q(1,j), &c__1, &RWORK(j), &z__1);
+			d_cnjg(&z__1, &work[j]);
+			zrot_(m, &q_ref(1, j - 1), &c__1, &q_ref(1, j), &c__1,
+				 &rwork[j], &z__1);
 /* L20: */
 		    }
 		}
@@ -338,18 +344,17 @@ n Q */
 
 		    i__4 = j2;
 		    i__3 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__3 < 0 ? j >= i__4 : j <= i__4; j += i__3) 
 			    {
-			zrot_(ncc, &C(j-1,1), ldc, &C(j,1), 
-				ldc, &RWORK(j), &WORK(j));
+			zrot_(ncc, &c___ref(j - 1, 1), ldc, &c___ref(j, 1), 
+				ldc, &rwork[j], &work[j]);
 /* L30: */
 		    }
 		}
 
 		if (j2 + kun > *n) {
 
-/*                 adjust J2 to keep within the bounds of 
-the matrix */
+/*                 adjust J2 to keep within the bounds of the matrix */
 
 		    --nr;
 		    j2 -= kb1;
@@ -357,71 +362,70 @@ the matrix */
 
 		i__3 = j2;
 		i__4 = kb1;
-		for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) {
+		for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) {
 
-/*                 create nonzero element a(j-1,j+ku) abov
-e the band   
+/*                 create nonzero element a(j-1,j+ku) above the band   
                    and store it in WORK(n+1:2*n) */
 
 		    i__5 = j + kun;
 		    i__6 = j;
-		    i__7 = (j + kun) * ab_dim1 + 1;
-		    z__1.r = WORK(j).r * AB(1,j+kun).r - WORK(j).i * AB(1,j+kun).i, z__1.i = WORK(j).r * AB(1,j+kun).i + 
-			    WORK(j).i * AB(1,j+kun).r;
-		    WORK(j+kun).r = z__1.r, WORK(j+kun).i = z__1.i;
-		    i__5 = (j + kun) * ab_dim1 + 1;
+		    i__7 = ab_subscr(1, j + kun);
+		    z__1.r = work[i__6].r * ab[i__7].r - work[i__6].i * ab[
+			    i__7].i, z__1.i = work[i__6].r * ab[i__7].i + 
+			    work[i__6].i * ab[i__7].r;
+		    work[i__5].r = z__1.r, work[i__5].i = z__1.i;
+		    i__5 = ab_subscr(1, j + kun);
 		    i__6 = j;
-		    i__7 = (j + kun) * ab_dim1 + 1;
-		    z__1.r = RWORK(j) * AB(1,j+kun).r, z__1.i = RWORK(j) * 
-			    AB(1,j+kun).i;
-		    AB(1,j+kun).r = z__1.r, AB(1,j+kun).i = z__1.i;
+		    i__7 = ab_subscr(1, j + kun);
+		    z__1.r = rwork[i__6] * ab[i__7].r, z__1.i = rwork[i__6] * 
+			    ab[i__7].i;
+		    ab[i__5].r = z__1.r, ab[i__5].i = z__1.i;
 /* L40: */
 		}
 
-/*              generate plane rotations to annihilate nonzero
- elements   
+/*              generate plane rotations to annihilate nonzero elements   
                 which have been generated above the band */
 
 		if (nr > 0) {
-		    zlargv_(&nr, &AB(1,j1+kun-1), &inca, &
-			    WORK(j1 + kun), &kb1, &RWORK(j1 + kun), &kb1);
+		    zlargv_(&nr, &ab_ref(1, j1 + kun - 1), &inca, &work[j1 + 
+			    kun], &kb1, &rwork[j1 + kun], &kb1);
 		}
 
 /*              apply plane rotations from the right */
 
 		i__4 = kb;
-		for (l = 1; l <= kb; ++l) {
+		for (l = 1; l <= i__4; ++l) {
 		    if (j2 + l - 1 > *m) {
 			nrt = nr - 1;
 		    } else {
 			nrt = nr;
 		    }
 		    if (nrt > 0) {
-			zlartv_(&nrt, &AB(l+1,j1+kun-1), &
-				inca, &AB(l,j1+kun), &inca, &
-				RWORK(j1 + kun), &WORK(j1 + kun), &kb1);
+			zlartv_(&nrt, &ab_ref(l + 1, j1 + kun - 1), &inca, &
+				ab_ref(l, j1 + kun), &inca, &rwork[j1 + kun], 
+				&work[j1 + kun], &kb1);
 		    }
 /* L50: */
 		}
 
 		if (ml == ml0 && mu > mu0) {
-		    if (mu <= *n - i + 1) {
+		    if (mu <= *n - i__ + 1) {
 
-/*                    generate plane rotation to annih
-ilate a(i,i+mu-1)   
-                      within the band, and apply rotat
-ion from the right */
+/*                    generate plane rotation to annihilate a(i,i+mu-1)   
+                      within the band, and apply rotation from the right */
 
-			zlartg_(&AB(*ku-mu+3,i+mu-2), &
-				AB(*ku-mu+2,i+mu-1), &
-				RWORK(i + mu - 1), &WORK(i + mu - 1), &ra);
-			i__4 = *ku - mu + 3 + (i + mu - 2) * ab_dim1;
-			AB(*ku-mu+3,i+mu-2).r = ra.r, AB(*ku-mu+3,i+mu-2).i = ra.i;
+			zlartg_(&ab_ref(*ku - mu + 3, i__ + mu - 2), &ab_ref(*
+				ku - mu + 2, i__ + mu - 1), &rwork[i__ + mu - 
+				1], &work[i__ + mu - 1], &ra);
+			i__4 = ab_subscr(*ku - mu + 3, i__ + mu - 2);
+			ab[i__4].r = ra.r, ab[i__4].i = ra.i;
 /* Computing MIN */
-			i__3 = *kl + mu - 2, i__5 = *m - i;
+			i__3 = *kl + mu - 2, i__5 = *m - i__;
 			i__4 = min(i__3,i__5);
-			zrot_(&i__4, &AB(*ku-mu+4,i+mu-2), &c__1, &AB(*ku-mu+3,i+mu-1), &c__1, &RWORK(i + mu - 1), &
-				WORK(i + mu - 1));
+			zrot_(&i__4, &ab_ref(*ku - mu + 4, i__ + mu - 2), &
+				c__1, &ab_ref(*ku - mu + 3, i__ + mu - 1), &
+				c__1, &rwork[i__ + mu - 1], &work[i__ + mu - 
+				1]);
 		    }
 		    ++nr;
 		    j1 -= kb1;
@@ -429,23 +433,22 @@ ion from the right */
 
 		if (wantpt) {
 
-/*                 accumulate product of plane rotations i
-n P' */
+/*                 accumulate product of plane rotations in P' */
 
 		    i__4 = j2;
 		    i__3 = kb1;
-		    for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) 
+		    for (j = j1; i__3 < 0 ? j >= i__4 : j <= i__4; j += i__3) 
 			    {
-			d_cnjg(&z__1, &WORK(j + kun));
-			zrot_(n, &PT(j+kun-1,1), ldpt, &PT(j+kun,1), ldpt, &RWORK(j + kun), &z__1);
+			d_cnjg(&z__1, &work[j + kun]);
+			zrot_(n, &pt_ref(j + kun - 1, 1), ldpt, &pt_ref(j + 
+				kun, 1), ldpt, &rwork[j + kun], &z__1);
 /* L60: */
 		    }
 		}
 
 		if (j2 + kb > *m) {
 
-/*                 adjust J2 to keep within the bounds of 
-the matrix */
+/*                 adjust J2 to keep within the bounds of the matrix */
 
 		    --nr;
 		    j2 -= kb1;
@@ -453,24 +456,24 @@ the matrix */
 
 		i__3 = j2;
 		i__4 = kb1;
-		for (j = j1; kb1 < 0 ? j >= j2 : j <= j2; j += kb1) {
+		for (j = j1; i__4 < 0 ? j >= i__3 : j <= i__3; j += i__4) {
 
-/*                 create nonzero element a(j+kl+ku,j+ku-1
-) below the   
+/*                 create nonzero element a(j+kl+ku,j+ku-1) below the   
                    band and store it in WORK(1:n) */
 
 		    i__5 = j + kb;
 		    i__6 = j + kun;
-		    i__7 = klu1 + (j + kun) * ab_dim1;
-		    z__1.r = WORK(j+kun).r * AB(klu1,j+kun).r - WORK(j+kun).i * AB(klu1,j+kun).i, z__1.i = WORK(j+kun).r * AB(klu1,j+kun).i + 
-			    WORK(j+kun).i * AB(klu1,j+kun).r;
-		    WORK(j+kb).r = z__1.r, WORK(j+kb).i = z__1.i;
-		    i__5 = klu1 + (j + kun) * ab_dim1;
+		    i__7 = ab_subscr(klu1, j + kun);
+		    z__1.r = work[i__6].r * ab[i__7].r - work[i__6].i * ab[
+			    i__7].i, z__1.i = work[i__6].r * ab[i__7].i + 
+			    work[i__6].i * ab[i__7].r;
+		    work[i__5].r = z__1.r, work[i__5].i = z__1.i;
+		    i__5 = ab_subscr(klu1, j + kun);
 		    i__6 = j + kun;
-		    i__7 = klu1 + (j + kun) * ab_dim1;
-		    z__1.r = RWORK(j+kun) * AB(klu1,j+kun).r, z__1.i = RWORK(j+kun) * 
-			    AB(klu1,j+kun).i;
-		    AB(klu1,j+kun).r = z__1.r, AB(klu1,j+kun).i = z__1.i;
+		    i__7 = ab_subscr(klu1, j + kun);
+		    z__1.r = rwork[i__6] * ab[i__7].r, z__1.i = rwork[i__6] * 
+			    ab[i__7].i;
+		    ab[i__5].r = z__1.r, ab[i__5].i = z__1.i;
 /* L70: */
 		}
 
@@ -489,38 +492,36 @@ the matrix */
 
 /*        A has been reduced to complex lower bidiagonal form   
 
-          Transform lower bidiagonal form to upper bidiagonal by apply
-ing   
+          Transform lower bidiagonal form to upper bidiagonal by applying   
           plane rotations from the left, overwriting superdiagonal   
           elements on subdiagonal elements   
 
    Computing MIN */
 	i__2 = *m - 1;
 	i__1 = min(i__2,*n);
-	for (i = 1; i <= min(*m-1,*n); ++i) {
-	    zlartg_(&AB(1,i), &AB(2,i), &rc, &rs, &ra)
-		    ;
-	    i__2 = i * ab_dim1 + 1;
-	    AB(1,i).r = ra.r, AB(1,i).i = ra.i;
-	    if (i < *n) {
-		i__2 = i * ab_dim1 + 2;
-		i__4 = (i + 1) * ab_dim1 + 1;
-		z__1.r = rs.r * AB(1,i+1).r - rs.i * AB(1,i+1).i, z__1.i = rs.r 
-			* AB(1,i+1).i + rs.i * AB(1,i+1).r;
-		AB(2,i).r = z__1.r, AB(2,i).i = z__1.i;
-		i__2 = (i + 1) * ab_dim1 + 1;
-		i__4 = (i + 1) * ab_dim1 + 1;
-		z__1.r = rc * AB(1,i+1).r, z__1.i = rc * AB(1,i+1).i;
-		AB(1,i+1).r = z__1.r, AB(1,i+1).i = z__1.i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zlartg_(&ab_ref(1, i__), &ab_ref(2, i__), &rc, &rs, &ra);
+	    i__2 = ab_subscr(1, i__);
+	    ab[i__2].r = ra.r, ab[i__2].i = ra.i;
+	    if (i__ < *n) {
+		i__2 = ab_subscr(2, i__);
+		i__4 = ab_subscr(1, i__ + 1);
+		z__1.r = rs.r * ab[i__4].r - rs.i * ab[i__4].i, z__1.i = rs.r 
+			* ab[i__4].i + rs.i * ab[i__4].r;
+		ab[i__2].r = z__1.r, ab[i__2].i = z__1.i;
+		i__2 = ab_subscr(1, i__ + 1);
+		i__4 = ab_subscr(1, i__ + 1);
+		z__1.r = rc * ab[i__4].r, z__1.i = rc * ab[i__4].i;
+		ab[i__2].r = z__1.r, ab[i__2].i = z__1.i;
 	    }
 	    if (wantq) {
 		d_cnjg(&z__1, &rs);
-		zrot_(m, &Q(1,i), &c__1, &Q(1,i+1), 
-			&c__1, &rc, &z__1);
+		zrot_(m, &q_ref(1, i__), &c__1, &q_ref(1, i__ + 1), &c__1, &
+			rc, &z__1);
 	    }
 	    if (wantc) {
-		zrot_(ncc, &C(i,1), ldc, &C(i+1,1), ldc, &rc, 
-			&rs);
+		zrot_(ncc, &c___ref(i__, 1), ldc, &c___ref(i__ + 1, 1), ldc, &
+			rc, &rs);
 	    }
 /* L100: */
 	}
@@ -531,33 +532,32 @@ ing
 
 	if (*ku > 0 && *m < *n) {
 
-/*           Annihilate a(m,m+1) by applying plane rotations from 
-the   
+/*           Annihilate a(m,m+1) by applying plane rotations from the   
              right */
 
-	    i__1 = *ku + (*m + 1) * ab_dim1;
-	    rb.r = AB(*ku,*m+1).r, rb.i = AB(*ku,*m+1).i;
-	    for (i = *m; i >= 1; --i) {
-		zlartg_(&AB(*ku+1,i), &rb, &rc, &rs, &ra);
-		i__1 = *ku + 1 + i * ab_dim1;
-		AB(*ku+1,i).r = ra.r, AB(*ku+1,i).i = ra.i;
-		if (i > 1) {
+	    i__1 = ab_subscr(*ku, *m + 1);
+	    rb.r = ab[i__1].r, rb.i = ab[i__1].i;
+	    for (i__ = *m; i__ >= 1; --i__) {
+		zlartg_(&ab_ref(*ku + 1, i__), &rb, &rc, &rs, &ra);
+		i__1 = ab_subscr(*ku + 1, i__);
+		ab[i__1].r = ra.r, ab[i__1].i = ra.i;
+		if (i__ > 1) {
 		    d_cnjg(&z__3, &rs);
 		    z__2.r = -z__3.r, z__2.i = -z__3.i;
-		    i__1 = *ku + i * ab_dim1;
-		    z__1.r = z__2.r * AB(*ku,i).r - z__2.i * AB(*ku,i).i, 
-			    z__1.i = z__2.r * AB(*ku,i).i + z__2.i * AB(*ku,i)
+		    i__1 = ab_subscr(*ku, i__);
+		    z__1.r = z__2.r * ab[i__1].r - z__2.i * ab[i__1].i, 
+			    z__1.i = z__2.r * ab[i__1].i + z__2.i * ab[i__1]
 			    .r;
 		    rb.r = z__1.r, rb.i = z__1.i;
-		    i__1 = *ku + i * ab_dim1;
-		    i__2 = *ku + i * ab_dim1;
-		    z__1.r = rc * AB(*ku,i).r, z__1.i = rc * AB(*ku,i).i;
-		    AB(*ku,i).r = z__1.r, AB(*ku,i).i = z__1.i;
+		    i__1 = ab_subscr(*ku, i__);
+		    i__2 = ab_subscr(*ku, i__);
+		    z__1.r = rc * ab[i__2].r, z__1.i = rc * ab[i__2].i;
+		    ab[i__1].r = z__1.r, ab[i__1].i = z__1.i;
 		}
 		if (wantpt) {
 		    d_cnjg(&z__1, &rs);
-		    zrot_(n, &PT(i,1), ldpt, &PT(*m+1,1), 
-			    ldpt, &rc, &z__1);
+		    zrot_(n, &pt_ref(i__, 1), ldpt, &pt_ref(*m + 1, 1), ldpt, 
+			    &rc, &z__1);
 		}
 /* L110: */
 	    }
@@ -567,12 +567,12 @@ the
 /*     Make diagonal and superdiagonal elements real, storing them in D   
        and E */
 
-    i__1 = *ku + 1 + ab_dim1;
-    t.r = AB(*ku+1,1).r, t.i = AB(*ku+1,1).i;
+    i__1 = ab_subscr(*ku + 1, 1);
+    t.r = ab[i__1].r, t.i = ab[i__1].i;
     i__1 = minmn;
-    for (i = 1; i <= minmn; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	abst = z_abs(&t);
-	D(i) = abst;
+	d__[i__] = abst;
 	if (abst != 0.) {
 	    z__1.r = t.r / abst, z__1.i = t.i / abst;
 	    t.r = z__1.r, t.i = z__1.i;
@@ -580,35 +580,35 @@ the
 	    t.r = 1., t.i = 0.;
 	}
 	if (wantq) {
-	    zscal_(m, &t, &Q(1,i), &c__1);
+	    zscal_(m, &t, &q_ref(1, i__), &c__1);
 	}
 	if (wantc) {
 	    d_cnjg(&z__1, &t);
-	    zscal_(ncc, &z__1, &C(i,1), ldc);
+	    zscal_(ncc, &z__1, &c___ref(i__, 1), ldc);
 	}
-	if (i < minmn) {
+	if (i__ < minmn) {
 	    if (*ku == 0 && *kl == 0) {
-		E(i) = 0.;
-		i__2 = (i + 1) * ab_dim1 + 1;
-		t.r = AB(1,i+1).r, t.i = AB(1,i+1).i;
+		e[i__] = 0.;
+		i__2 = ab_subscr(1, i__ + 1);
+		t.r = ab[i__2].r, t.i = ab[i__2].i;
 	    } else {
 		if (*ku == 0) {
-		    i__2 = i * ab_dim1 + 2;
+		    i__2 = ab_subscr(2, i__);
 		    d_cnjg(&z__2, &t);
-		    z__1.r = AB(2,i).r * z__2.r - AB(2,i).i * z__2.i, 
-			    z__1.i = AB(2,i).r * z__2.i + AB(2,i).i * 
+		    z__1.r = ab[i__2].r * z__2.r - ab[i__2].i * z__2.i, 
+			    z__1.i = ab[i__2].r * z__2.i + ab[i__2].i * 
 			    z__2.r;
 		    t.r = z__1.r, t.i = z__1.i;
 		} else {
-		    i__2 = *ku + (i + 1) * ab_dim1;
+		    i__2 = ab_subscr(*ku, i__ + 1);
 		    d_cnjg(&z__2, &t);
-		    z__1.r = AB(*ku,i+1).r * z__2.r - AB(*ku,i+1).i * z__2.i, 
-			    z__1.i = AB(*ku,i+1).r * z__2.i + AB(*ku,i+1).i * 
+		    z__1.r = ab[i__2].r * z__2.r - ab[i__2].i * z__2.i, 
+			    z__1.i = ab[i__2].r * z__2.i + ab[i__2].i * 
 			    z__2.r;
 		    t.r = z__1.r, t.i = z__1.i;
 		}
 		abst = z_abs(&t);
-		E(i) = abst;
+		e[i__] = abst;
 		if (abst != 0.) {
 		    z__1.r = t.r / abst, z__1.i = t.i / abst;
 		    t.r = z__1.r, t.i = z__1.i;
@@ -616,12 +616,12 @@ the
 		    t.r = 1., t.i = 0.;
 		}
 		if (wantpt) {
-		    zscal_(n, &t, &PT(i+1,1), ldpt);
+		    zscal_(n, &t, &pt_ref(i__ + 1, 1), ldpt);
 		}
-		i__2 = *ku + 1 + (i + 1) * ab_dim1;
+		i__2 = ab_subscr(*ku + 1, i__ + 1);
 		d_cnjg(&z__2, &t);
-		z__1.r = AB(*ku+1,i+1).r * z__2.r - AB(*ku+1,i+1).i * z__2.i, z__1.i = 
-			AB(*ku+1,i+1).r * z__2.i + AB(*ku+1,i+1).i * z__2.r;
+		z__1.r = ab[i__2].r * z__2.r - ab[i__2].i * z__2.i, z__1.i = 
+			ab[i__2].r * z__2.i + ab[i__2].i * z__2.r;
 		t.r = z__1.r, t.i = z__1.i;
 	    }
 	}
@@ -632,4 +632,14 @@ the
 /*     End of ZGBBRD */
 
 } /* zgbbrd_ */
+
+#undef pt_ref
+#undef pt_subscr
+#undef ab_ref
+#undef ab_subscr
+#undef q_ref
+#undef q_subscr
+#undef c___ref
+#undef c___subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,19 +12,19 @@ static complex c_b1 = {0.f,0.f};
 static complex c_b2 = {1.f,0.f};
 
 /* Subroutine */ int chpt01_(char *uplo, integer *n, complex *a, complex *
-	afac, integer *ipiv, complex *c, integer *ldc, real *rwork, real *
+	afac, integer *ipiv, complex *c__, integer *ldc, real *rwork, real *
 	resid)
 {
     /* System generated locals */
     integer c_dim1, c_offset, i__1, i__2, i__3, i__4, i__5;
-    doublereal d__1;
+    real r__1;
     complex q__1;
 
     /* Builtin functions */
     double r_imag(complex *);
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     extern logical lsame_(char *, char *);
     static real anorm;
     static integer jc;
@@ -37,7 +38,11 @@ static complex c_b2 = {1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -50,8 +55,7 @@ static complex c_b2 = {1.f,0.f};
     block L*D*L' or U*D*U' factorization and computes the residual   
        norm( C - A ) / ( N * norm(A) * EPS ),   
     where C is the reconstructed matrix, EPS is the machine epsilon,   
-    L' is the conjugate transpose of L, and U' is the conjugate transpose 
-  
+    L' is the conjugate transpose of L, and U' is the conjugate transpose   
     of U.   
 
     Arguments   
@@ -72,10 +76,8 @@ static complex c_b2 = {1.f,0.f};
 
     AFAC    (input) COMPLEX array, dimension (N*(N+1)/2)   
             The factored form of the matrix A, stored as a packed   
-            triangular matrix.  AFAC contains the block diagonal matrix D 
-  
-            and the multipliers used to obtain the factor L or U from the 
-  
+            triangular matrix.  AFAC contains the block diagonal matrix D   
+            and the multipliers used to obtain the factor L or U from the   
             block L*D*L' or U*D*U' factorization as computed by CHPTRF.   
 
     IPIV    (input) INTEGER array, dimension (N)   
@@ -92,8 +94,7 @@ static complex c_b2 = {1.f,0.f};
             If UPLO = 'L', norm(L*D*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U*D*U' - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -103,8 +104,8 @@ static complex c_b2 = {1.f,0.f};
     --afac;
     --ipiv;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
@@ -118,8 +119,7 @@ static complex c_b2 = {1.f,0.f};
     eps = slamch_("Epsilon");
     anorm = clanhp_("1", uplo, n, &a[1], &rwork[1]);
 
-/*     Check the imaginary parts of the diagonal elements and return with 
-  
+/*     Check the imaginary parts of the diagonal elements and return with   
        an error code if any are nonzero. */
 
     jc = 1;
@@ -147,16 +147,16 @@ static complex c_b2 = {1.f,0.f};
 
 /*     Initialize C to the identity matrix. */
 
-    claset_("Full", n, n, &c_b1, &c_b2, &c[c_offset], ldc);
+    claset_("Full", n, n, &c_b1, &c_b2, &c__[c_offset], ldc);
 
 /*     Call CLAVHP to form the product D * U' (or D * L' ). */
 
-    clavhp_(uplo, "Conjugate", "Non-unit", n, n, &afac[1], &ipiv[1], &c[
+    clavhp_(uplo, "Conjugate", "Non-unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Call CLAVHP again to multiply by U ( or L ). */
 
-    clavhp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c[
+    clavhp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Compute the difference  C - A . */
@@ -166,21 +166,21 @@ static complex c_b2 = {1.f,0.f};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = jc + i;
-		q__1.r = c[i__4].r - a[i__5].r, q__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = q__1.r, c[i__3].i = q__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = jc + i__;
+		q__1.r = c__[i__4].r - a[i__5].r, q__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = q__1.r, c__[i__3].i = q__1.i;
 /* L30: */
 	    }
-	    i__2 = j + j * c_dim1;
-	    i__3 = j + j * c_dim1;
+	    i__2 = c___subscr(j, j);
+	    i__3 = c___subscr(j, j);
 	    i__4 = jc + j;
-	    d__1 = a[i__4].r;
-	    q__1.r = c[i__3].r - d__1, q__1.i = c[i__3].i;
-	    c[i__2].r = q__1.r, c[i__2].i = q__1.i;
+	    r__1 = a[i__4].r;
+	    q__1.r = c__[i__3].r - r__1, q__1.i = c__[i__3].i;
+	    c__[i__2].r = q__1.r, c__[i__2].i = q__1.i;
 	    jc += j;
 /* L40: */
 	}
@@ -188,20 +188,20 @@ static complex c_b2 = {1.f,0.f};
 	jc = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    i__2 = j + j * c_dim1;
-	    i__3 = j + j * c_dim1;
+	    i__2 = c___subscr(j, j);
+	    i__3 = c___subscr(j, j);
 	    i__4 = jc;
-	    d__1 = a[i__4].r;
-	    q__1.r = c[i__3].r - d__1, q__1.i = c[i__3].i;
-	    c[i__2].r = q__1.r, c[i__2].i = q__1.i;
+	    r__1 = a[i__4].r;
+	    q__1.r = c__[i__3].r - r__1, q__1.i = c__[i__3].i;
+	    c__[i__2].r = q__1.r, c__[i__2].i = q__1.i;
 	    i__2 = *n;
-	    for (i = j + 1; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = jc + i - j;
-		q__1.r = c[i__4].r - a[i__5].r, q__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = q__1.r, c[i__3].i = q__1.i;
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = jc + i__ - j;
+		q__1.r = c__[i__4].r - a[i__5].r, q__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = q__1.r, c__[i__3].i = q__1.i;
 /* L50: */
 	    }
 	    jc = jc + *n - j + 1;
@@ -211,7 +211,7 @@ static complex c_b2 = {1.f,0.f};
 
 /*     Compute norm( C - A ) / ( N * norm(A) * EPS ) */
 
-    *resid = clanhe_("1", uplo, n, &c[c_offset], ldc, &rwork[1]);
+    *resid = clanhe_("1", uplo, n, &c__[c_offset], ldc, &rwork[1]);
 
     if (anorm <= 0.f) {
 	if (*resid != 0.f) {
@@ -226,4 +226,8 @@ static complex c_b2 = {1.f,0.f};
 /*     End of CHPT01 */
 
 } /* chpt01_ */
+
+#undef c___ref
+#undef c___subscr
+
 

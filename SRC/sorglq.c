@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sorglq_(integer *m, integer *n, integer *k, real *a, 
 	integer *lda, real *tau, real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -30,15 +31,12 @@
             The number of columns of the matrix Q. N >= M.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the i-th row must contain the vector which defines 
-  
-            the elementary reflector H(i), for i = 1,2,...,k, as returned 
-  
+            On entry, the i-th row must contain the vector which defines   
+            the elementary reflector H(i), for i = 1,2,...,k, as returned   
             by SGELQF in the first k rows of its array argument A.   
             On exit, the M-by-N matrix Q.   
 
@@ -57,19 +55,21 @@
             For optimum performance LWORK >= M*NB, where NB is   
             the optimal blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument has an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -79,7 +79,7 @@
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j, l, nbmin, iinfo;
+    static integer i__, j, l, nbmin, iinfo;
     extern /* Subroutine */ int sorgl2_(integer *, integer *, integer *, real 
 	    *, integer *, real *, real *, integer *);
     static integer ib, nb, ki, kk, nx;
@@ -90,16 +90,24 @@
 	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int slarft_(char *, char *, integer *, integer *, 
 	    real *, integer *, real *, real *, integer *);
-    static integer ldwork, iws;
+    static integer ldwork, lwkopt;
+    static logical lquery;
+    static integer iws;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
+    nb = ilaenv_(&c__1, "SORGLQ", " ", m, n, k, &c_n1, (ftnlen)6, (ftnlen)1);
+    lwkopt = max(1,*m) * nb;
+    work[1] = (real) lwkopt;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*n < *m) {
@@ -108,54 +116,50 @@
 	*info = -3;
     } else if (*lda < max(1,*m)) {
 	*info = -5;
-    } else if (*lwork < max(1,*m)) {
+    } else if (*lwork < max(1,*m) && ! lquery) {
 	*info = -8;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SORGLQ", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*m <= 0) {
-	WORK(1) = 1.f;
+	work[1] = 1.f;
 	return 0;
     }
 
-/*     Determine the block size. */
-
-    nb = ilaenv_(&c__1, "SORGLQ", " ", m, n, k, &c_n1, 6L, 1L);
     nbmin = 2;
     nx = 0;
     iws = *m;
     if (nb > 1 && nb < *k) {
 
-/*        Determine when to cross over from blocked to unblocked code.
-   
+/*        Determine when to cross over from blocked to unblocked code.   
 
    Computing MAX */
-	i__1 = 0, i__2 = ilaenv_(&c__3, "SORGLQ", " ", m, n, k, &c_n1, 6L, 1L)
-		;
+	i__1 = 0, i__2 = ilaenv_(&c__3, "SORGLQ", " ", m, n, k, &c_n1, (
+		ftnlen)6, (ftnlen)1);
 	nx = max(i__1,i__2);
 	if (nx < *k) {
 
-/*           Determine if workspace is large enough for blocked co
-de. */
+/*           Determine if workspace is large enough for blocked code. */
 
 	    ldwork = *m;
 	    iws = ldwork * nb;
 	    if (*lwork < iws) {
 
-/*              Not enough workspace to use optimal NB:  reduc
-e NB and   
+/*              Not enough workspace to use optimal NB:  reduce NB and   
                 determine the minimum value of NB. */
 
 		nb = *lwork / ldwork;
 /* Computing MAX */
 		i__1 = 2, i__2 = ilaenv_(&c__2, "SORGLQ", " ", m, n, k, &c_n1,
-			 6L, 1L);
+			 (ftnlen)6, (ftnlen)1);
 		nbmin = max(i__1,i__2);
 	    }
 	}
@@ -174,10 +178,10 @@ e NB and
 /*        Set A(kk+1:m,1:kk) to zero. */
 
 	i__1 = kk;
-	for (j = 1; j <= kk; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = kk + 1; i <= *m; ++i) {
-		A(i,j) = 0.f;
+	    for (i__ = kk + 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = 0.f;
 /* L10: */
 	    }
 /* L20: */
@@ -192,8 +196,8 @@ e NB and
 	i__1 = *m - kk;
 	i__2 = *n - kk;
 	i__3 = *k - kk;
-	sorgl2_(&i__1, &i__2, &i__3, &A(kk+1,kk+1), lda, &
-		TAU(kk + 1), &WORK(1), &iinfo);
+	sorgl2_(&i__1, &i__2, &i__3, &a_ref(kk + 1, kk + 1), lda, &tau[kk + 1]
+		, &work[1], &iinfo);
     }
 
     if (kk > 0) {
@@ -201,42 +205,41 @@ e NB and
 /*        Use blocked code */
 
 	i__1 = -nb;
-	for (i = ki + 1; -nb < 0 ? i >= 1 : i <= 1; i += -nb) {
+	for (i__ = ki + 1; i__1 < 0 ? i__ >= 1 : i__ <= 1; i__ += i__1) {
 /* Computing MIN */
-	    i__2 = nb, i__3 = *k - i + 1;
+	    i__2 = nb, i__3 = *k - i__ + 1;
 	    ib = min(i__2,i__3);
-	    if (i + ib <= *m) {
+	    if (i__ + ib <= *m) {
 
-/*              Form the triangular factor of the block reflec
-tor   
+/*              Form the triangular factor of the block reflector   
                 H = H(i) H(i+1) . . . H(i+ib-1) */
 
-		i__2 = *n - i + 1;
-		slarft_("Forward", "Rowwise", &i__2, &ib, &A(i,i), 
-			lda, &TAU(i), &WORK(1), &ldwork);
+		i__2 = *n - i__ + 1;
+		slarft_("Forward", "Rowwise", &i__2, &ib, &a_ref(i__, i__), 
+			lda, &tau[i__], &work[1], &ldwork);
 
 /*              Apply H' to A(i+ib:m,i:n) from the right */
 
-		i__2 = *m - i - ib + 1;
-		i__3 = *n - i + 1;
+		i__2 = *m - i__ - ib + 1;
+		i__3 = *n - i__ + 1;
 		slarfb_("Right", "Transpose", "Forward", "Rowwise", &i__2, &
-			i__3, &ib, &A(i,i), lda, &WORK(1), &ldwork,
-			 &A(i+ib,i), lda, &WORK(ib + 1), &ldwork);
+			i__3, &ib, &a_ref(i__, i__), lda, &work[1], &ldwork, &
+			a_ref(i__ + ib, i__), lda, &work[ib + 1], &ldwork);
 	    }
 
 /*           Apply H' to columns i:n of current block */
 
-	    i__2 = *n - i + 1;
-	    sorgl2_(&ib, &i__2, &ib, &A(i,i), lda, &TAU(i), &WORK(
-		    1), &iinfo);
+	    i__2 = *n - i__ + 1;
+	    sorgl2_(&ib, &i__2, &ib, &a_ref(i__, i__), lda, &tau[i__], &work[
+		    1], &iinfo);
 
 /*           Set columns 1:i-1 of current block to zero */
 
-	    i__2 = i - 1;
-	    for (j = 1; j <= i-1; ++j) {
-		i__3 = i + ib - 1;
-		for (l = i; l <= i+ib-1; ++l) {
-		    A(l,j) = 0.f;
+	    i__2 = i__ - 1;
+	    for (j = 1; j <= i__2; ++j) {
+		i__3 = i__ + ib - 1;
+		for (l = i__; l <= i__3; ++l) {
+		    a_ref(l, j) = 0.f;
 /* L30: */
 		}
 /* L40: */
@@ -245,10 +248,13 @@ tor
 	}
     }
 
-    WORK(1) = (real) iws;
+    work[1] = (real) iws;
     return 0;
 
 /*     End of SORGLQ */
 
 } /* sorglq_ */
+
+#undef a_ref
+
 

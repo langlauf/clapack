@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgtsv_(integer *n, integer *nrhs, doublecomplex *dl, 
-	doublecomplex *d, doublecomplex *du, doublecomplex *b, integer *ldb, 
-	integer *info)
+	doublecomplex *d__, doublecomplex *du, doublecomplex *b, integer *ldb,
+	 integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -17,12 +18,10 @@
 
        A*X = B,   
 
-    where A is an N-by-N tridiagonal matrix, by Gaussian elimination with 
-  
+    where A is an N-by-N tridiagonal matrix, by Gaussian elimination with   
     partial pivoting.   
 
-    Note that the equation  A'*X = B  may be solved by interchanging the 
-  
+    Note that the equation  A'*X = B  may be solved by interchanging the   
     order of the arguments DU and DL.   
 
     Arguments   
@@ -49,8 +48,7 @@
     DU      (input/output) COMPLEX*16 array, dimension (N-1)   
             On entry, DU must contain the (n-1) superdiagonal elements   
             of A.   
-            On exit, DU is overwritten by the (n-1) elements of the first 
-  
+            On exit, DU is overwritten by the (n-1) elements of the first   
             superdiagonal of U.   
 
     B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS)   
@@ -64,17 +62,13 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
             > 0:  if INFO = i, U(i,i) is exactly zero, and the solution   
-                  has not been computed.  The factorization has not been 
-  
+                  has not been computed.  The factorization has not been   
                   completed unless i = N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer b_dim1, b_offset, i__1, i__2, i__3, i__4, i__5, i__6, i__7;
     doublereal d__1, d__2, d__3, d__4;
@@ -86,14 +80,17 @@
     static doublecomplex temp, mult;
     static integer j, k;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
+    --dl;
+    --d__;
+    --du;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define DL(I) dl[(I)-1]
-#define D(I) d[(I)-1]
-#define DU(I) du[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -113,17 +110,16 @@
     }
 
     i__1 = *n - 1;
-    for (k = 1; k <= *n-1; ++k) {
+    for (k = 1; k <= i__1; ++k) {
 	i__2 = k;
-	if (DL(k).r == 0. && DL(k).i == 0.) {
+	if (dl[i__2].r == 0. && dl[i__2].i == 0.) {
 
 /*           Subdiagonal is zero, no elimination is required. */
 
 	    i__2 = k;
-	    if (D(k).r == 0. && D(k).i == 0.) {
+	    if (d__[i__2].r == 0. && d__[i__2].i == 0.) {
 
-/*              Diagonal is zero: set INFO = K and return; a u
-nique   
+/*              Diagonal is zero: set INFO = K and return; a unique   
                 solution can not be found. */
 
 		*info = k;
@@ -132,80 +128,80 @@ nique
 	} else /* if(complicated condition) */ {
 	    i__2 = k;
 	    i__3 = k;
-	    if ((d__1 = D(k).r, abs(d__1)) + (d__2 = d_imag(&D(k)), abs(
-		    d__2)) >= (d__3 = DL(k).r, abs(d__3)) + (d__4 = d_imag(
-		    &DL(k)), abs(d__4))) {
+	    if ((d__1 = d__[i__2].r, abs(d__1)) + (d__2 = d_imag(&d__[k]), 
+		    abs(d__2)) >= (d__3 = dl[i__3].r, abs(d__3)) + (d__4 = 
+		    d_imag(&dl[k]), abs(d__4))) {
 
 /*           No row interchange required */
 
-		z_div(&z__1, &DL(k), &D(k));
+		z_div(&z__1, &dl[k], &d__[k]);
 		mult.r = z__1.r, mult.i = z__1.i;
 		i__2 = k + 1;
 		i__3 = k + 1;
 		i__4 = k;
-		z__2.r = mult.r * DU(k).r - mult.i * DU(k).i, z__2.i = 
-			mult.r * DU(k).i + mult.i * DU(k).r;
-		z__1.r = D(k+1).r - z__2.r, z__1.i = D(k+1).i - z__2.i;
-		D(k+1).r = z__1.r, D(k+1).i = z__1.i;
+		z__2.r = mult.r * du[i__4].r - mult.i * du[i__4].i, z__2.i = 
+			mult.r * du[i__4].i + mult.i * du[i__4].r;
+		z__1.r = d__[i__3].r - z__2.r, z__1.i = d__[i__3].i - z__2.i;
+		d__[i__2].r = z__1.r, d__[i__2].i = z__1.i;
 		i__2 = *nrhs;
-		for (j = 1; j <= *nrhs; ++j) {
-		    i__3 = k + 1 + j * b_dim1;
-		    i__4 = k + 1 + j * b_dim1;
-		    i__5 = k + j * b_dim1;
-		    z__2.r = mult.r * B(k,j).r - mult.i * B(k,j).i, z__2.i =
-			     mult.r * B(k,j).i + mult.i * B(k,j).r;
-		    z__1.r = B(k+1,j).r - z__2.r, z__1.i = B(k+1,j).i - z__2.i;
-		    B(k+1,j).r = z__1.r, B(k+1,j).i = z__1.i;
+		for (j = 1; j <= i__2; ++j) {
+		    i__3 = b_subscr(k + 1, j);
+		    i__4 = b_subscr(k + 1, j);
+		    i__5 = b_subscr(k, j);
+		    z__2.r = mult.r * b[i__5].r - mult.i * b[i__5].i, z__2.i =
+			     mult.r * b[i__5].i + mult.i * b[i__5].r;
+		    z__1.r = b[i__4].r - z__2.r, z__1.i = b[i__4].i - z__2.i;
+		    b[i__3].r = z__1.r, b[i__3].i = z__1.i;
 /* L10: */
 		}
 		if (k < *n - 1) {
 		    i__2 = k;
-		    DL(k).r = 0., DL(k).i = 0.;
+		    dl[i__2].r = 0., dl[i__2].i = 0.;
 		}
 	    } else {
 
 /*           Interchange rows K and K+1 */
 
-		z_div(&z__1, &D(k), &DL(k));
+		z_div(&z__1, &d__[k], &dl[k]);
 		mult.r = z__1.r, mult.i = z__1.i;
 		i__2 = k;
 		i__3 = k;
-		D(k).r = DL(k).r, D(k).i = DL(k).i;
+		d__[i__2].r = dl[i__3].r, d__[i__2].i = dl[i__3].i;
 		i__2 = k + 1;
-		temp.r = D(k+1).r, temp.i = D(k+1).i;
+		temp.r = d__[i__2].r, temp.i = d__[i__2].i;
 		i__2 = k + 1;
 		i__3 = k;
 		z__2.r = mult.r * temp.r - mult.i * temp.i, z__2.i = mult.r * 
 			temp.i + mult.i * temp.r;
-		z__1.r = DU(k).r - z__2.r, z__1.i = DU(k).i - z__2.i;
-		D(k+1).r = z__1.r, D(k+1).i = z__1.i;
+		z__1.r = du[i__3].r - z__2.r, z__1.i = du[i__3].i - z__2.i;
+		d__[i__2].r = z__1.r, d__[i__2].i = z__1.i;
 		if (k < *n - 1) {
 		    i__2 = k;
 		    i__3 = k + 1;
-		    DL(k).r = DU(k+1).r, DL(k).i = DU(k+1).i;
+		    dl[i__2].r = du[i__3].r, dl[i__2].i = du[i__3].i;
 		    i__2 = k + 1;
 		    z__2.r = -mult.r, z__2.i = -mult.i;
 		    i__3 = k;
-		    z__1.r = z__2.r * DL(k).r - z__2.i * DL(k).i, 
-			    z__1.i = z__2.r * DL(k).i + z__2.i * DL(k)
+		    z__1.r = z__2.r * dl[i__3].r - z__2.i * dl[i__3].i, 
+			    z__1.i = z__2.r * dl[i__3].i + z__2.i * dl[i__3]
 			    .r;
-		    DU(k+1).r = z__1.r, DU(k+1).i = z__1.i;
+		    du[i__2].r = z__1.r, du[i__2].i = z__1.i;
 		}
 		i__2 = k;
-		DU(k).r = temp.r, DU(k).i = temp.i;
+		du[i__2].r = temp.r, du[i__2].i = temp.i;
 		i__2 = *nrhs;
-		for (j = 1; j <= *nrhs; ++j) {
-		    i__3 = k + j * b_dim1;
-		    temp.r = B(k,j).r, temp.i = B(k,j).i;
-		    i__3 = k + j * b_dim1;
-		    i__4 = k + 1 + j * b_dim1;
-		    B(k,j).r = B(k+1,j).r, B(k,j).i = B(k+1,j).i;
-		    i__3 = k + 1 + j * b_dim1;
-		    i__4 = k + 1 + j * b_dim1;
-		    z__2.r = mult.r * B(k+1,j).r - mult.i * B(k+1,j).i, z__2.i =
-			     mult.r * B(k+1,j).i + mult.i * B(k+1,j).r;
+		for (j = 1; j <= i__2; ++j) {
+		    i__3 = b_subscr(k, j);
+		    temp.r = b[i__3].r, temp.i = b[i__3].i;
+		    i__3 = b_subscr(k, j);
+		    i__4 = b_subscr(k + 1, j);
+		    b[i__3].r = b[i__4].r, b[i__3].i = b[i__4].i;
+		    i__3 = b_subscr(k + 1, j);
+		    i__4 = b_subscr(k + 1, j);
+		    z__2.r = mult.r * b[i__4].r - mult.i * b[i__4].i, z__2.i =
+			     mult.r * b[i__4].i + mult.i * b[i__4].r;
 		    z__1.r = temp.r - z__2.r, z__1.i = temp.i - z__2.i;
-		    B(k+1,j).r = z__1.r, B(k+1,j).i = z__1.i;
+		    b[i__3].r = z__1.r, b[i__3].i = z__1.i;
 /* L20: */
 		}
 	    }
@@ -213,7 +209,7 @@ nique
 /* L30: */
     }
     i__1 = *n;
-    if (D(*n).r == 0. && D(*n).i == 0.) {
+    if (d__[i__1].r == 0. && d__[i__1].i == 0.) {
 	*info = *n;
 	return 0;
     }
@@ -221,36 +217,36 @@ nique
 /*     Back solve with the matrix U from the factorization. */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
-	i__2 = *n + j * b_dim1;
-	z_div(&z__1, &B(*n,j), &D(*n));
-	B(*n,j).r = z__1.r, B(*n,j).i = z__1.i;
+    for (j = 1; j <= i__1; ++j) {
+	i__2 = b_subscr(*n, j);
+	z_div(&z__1, &b_ref(*n, j), &d__[*n]);
+	b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 	if (*n > 1) {
-	    i__2 = *n - 1 + j * b_dim1;
-	    i__3 = *n - 1 + j * b_dim1;
+	    i__2 = b_subscr(*n - 1, j);
+	    i__3 = b_subscr(*n - 1, j);
 	    i__4 = *n - 1;
-	    i__5 = *n + j * b_dim1;
-	    z__3.r = DU(*n-1).r * B(*n,j).r - DU(*n-1).i * B(*n,j).i, z__3.i =
-		     DU(*n-1).r * B(*n,j).i + DU(*n-1).i * B(*n,j).r;
-	    z__2.r = B(*n-1,j).r - z__3.r, z__2.i = B(*n-1,j).i - z__3.i;
-	    z_div(&z__1, &z__2, &D(*n - 1));
-	    B(*n-1,j).r = z__1.r, B(*n-1,j).i = z__1.i;
+	    i__5 = b_subscr(*n, j);
+	    z__3.r = du[i__4].r * b[i__5].r - du[i__4].i * b[i__5].i, z__3.i =
+		     du[i__4].r * b[i__5].i + du[i__4].i * b[i__5].r;
+	    z__2.r = b[i__3].r - z__3.r, z__2.i = b[i__3].i - z__3.i;
+	    z_div(&z__1, &z__2, &d__[*n - 1]);
+	    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 	}
 	for (k = *n - 2; k >= 1; --k) {
-	    i__2 = k + j * b_dim1;
-	    i__3 = k + j * b_dim1;
+	    i__2 = b_subscr(k, j);
+	    i__3 = b_subscr(k, j);
 	    i__4 = k;
-	    i__5 = k + 1 + j * b_dim1;
-	    z__4.r = DU(k).r * B(k+1,j).r - DU(k).i * B(k+1,j).i, z__4.i =
-		     DU(k).r * B(k+1,j).i + DU(k).i * B(k+1,j).r;
-	    z__3.r = B(k,j).r - z__4.r, z__3.i = B(k,j).i - z__4.i;
+	    i__5 = b_subscr(k + 1, j);
+	    z__4.r = du[i__4].r * b[i__5].r - du[i__4].i * b[i__5].i, z__4.i =
+		     du[i__4].r * b[i__5].i + du[i__4].i * b[i__5].r;
+	    z__3.r = b[i__3].r - z__4.r, z__3.i = b[i__3].i - z__4.i;
 	    i__6 = k;
-	    i__7 = k + 2 + j * b_dim1;
-	    z__5.r = DL(k).r * B(k+2,j).r - DL(k).i * B(k+2,j).i, z__5.i =
-		     DL(k).r * B(k+2,j).i + DL(k).i * B(k+2,j).r;
+	    i__7 = b_subscr(k + 2, j);
+	    z__5.r = dl[i__6].r * b[i__7].r - dl[i__6].i * b[i__7].i, z__5.i =
+		     dl[i__6].r * b[i__7].i + dl[i__6].i * b[i__7].r;
 	    z__2.r = z__3.r - z__5.r, z__2.i = z__3.i - z__5.i;
-	    z_div(&z__1, &z__2, &D(k));
-	    B(k,j).r = z__1.r, B(k,j).i = z__1.i;
+	    z_div(&z__1, &z__2, &d__[k]);
+	    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 /* L40: */
 	}
 /* L50: */
@@ -261,4 +257,8 @@ nique
 /*     End of ZGTSV */
 
 } /* zgtsv_ */
+
+#undef b_ref
+#undef b_subscr
+
 

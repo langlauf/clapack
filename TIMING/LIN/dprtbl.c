@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__1 = 1;
 	    void);
 
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, fmt_9999, 0 };
@@ -42,7 +43,11 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define reslts_ref(a_1,a_2,a_3) reslts[((a_3)*reslts_dim2 + (a_2))*\
+reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -72,8 +77,7 @@ static integer c__1 = 1;
             The values of LAB1 used for the data in each block row.   
 
     NN      (input) INTEGER   
-            The number of values of NVAL, and also the number of columns 
-  
+            The number of values of NVAL, and also the number of columns   
             of the table.   
 
     NVAL    (input) INTEGER array, dimension (NN)   
@@ -83,8 +87,7 @@ static integer c__1 = 1;
             The number of values of LDA, hence the number of rows for   
             each value of KVAL.   
 
-    RESLTS  (input) DOUBLE PRECISION array, dimension (LDR1, LDR2, NLDA) 
-  
+    RESLTS  (input) DOUBLE PRECISION array, dimension (LDR1, LDR2, NLDA)   
             The timing results for each value of N, K, and LDA.   
 
     LDR1    (input) INTEGER   
@@ -97,8 +100,7 @@ static integer c__1 = 1;
             The unit number on which the table is to be printed.   
             NOUT >= 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -106,7 +108,7 @@ static integer c__1 = 1;
     --nval;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
-    reslts_offset = reslts_dim1 * (reslts_dim2 + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * 1);
     reslts -= reslts_offset;
 
     /* Function Body */
@@ -117,8 +119,8 @@ static integer c__1 = 1;
     s_wsfe(&io___1);
     do_fio(&c__1, lab2, lab2_len);
     i__1 = *nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(integer));
     }
     e_wsfe();
     io___3.ciunit = *nout;
@@ -127,24 +129,24 @@ static integer c__1 = 1;
     e_wsfe();
 
     i__1 = *nk;
-    for (i = 1; i <= i__1; ++i) {
-	if (s_cmp(lab1, " ", lab1_len, 1L) == 0) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (s_cmp(lab1, " ", lab1_len, (ftnlen)1) == 0) {
 	    io___4.ciunit = *nout;
 	    s_wsfe(&io___4);
 	    i__2 = *nn;
 	    for (j = 1; j <= i__2; ++j) {
-		do_fio(&c__1, (char *)&reslts[(j + reslts_dim2) * reslts_dim1 
-			+ 1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&reslts_ref(1, j, 1), (ftnlen)sizeof(
+			doublereal));
 	    }
 	    e_wsfe();
 	} else {
 	    io___6.ciunit = *nout;
 	    s_wsfe(&io___6);
-	    do_fio(&c__1, (char *)&kval[i], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&kval[i__], (ftnlen)sizeof(integer));
 	    i__2 = *nn;
 	    for (j = 1; j <= i__2; ++j) {
-		do_fio(&c__1, (char *)&reslts[i + (j + reslts_dim2) * 
-			reslts_dim1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&reslts_ref(i__, j, 1), (ftnlen)sizeof(
+			doublereal));
 	    }
 	    e_wsfe();
 	}
@@ -154,8 +156,8 @@ static integer c__1 = 1;
 	    s_wsfe(&io___8);
 	    i__3 = *nn;
 	    for (j = 1; j <= i__3; ++j) {
-		do_fio(&c__1, (char *)&reslts[i + (j + k * reslts_dim2) * 
-			reslts_dim1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&reslts_ref(i__, j, k), (ftnlen)sizeof(
+			doublereal));
 	    }
 	    e_wsfe();
 /* L10: */
@@ -178,4 +180,7 @@ static integer c__1 = 1;
 /*     End of DPRTBL */
 
 } /* dprtbl_ */
+
+#undef reslts_ref
+
 

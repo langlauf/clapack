@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clauu2_(char *uplo, integer *n, complex *a, integer *lda,
 	 integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -16,11 +17,9 @@
     factor U or L is stored in the upper or lower triangular part of   
     the array A.   
 
-    If UPLO = 'U' or 'u' then the upper triangle of the result is stored, 
-  
+    If UPLO = 'U' or 'u' then the upper triangle of the result is stored,   
     overwriting the factor U in A.   
-    If UPLO = 'L' or 'l' then the lower triangle of the result is stored, 
-  
+    If UPLO = 'L' or 'l' then the lower triangle of the result is stored,   
     overwriting the factor L in A.   
 
     This is the unblocked form of the algorithm, calling Level 2 BLAS.   
@@ -29,8 +28,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the triangular factor stored in the array A 
-  
+            Specifies whether the triangular factor stored in the array A   
             is upper or lower triangular:   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
@@ -52,25 +50,22 @@
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
-    doublereal d__1;
+    real r__1;
     complex q__1;
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern logical lsame_(char *, char *);
@@ -82,12 +77,15 @@
 	    csscal_(integer *, real *, complex *, integer *), xerbla_(char *, 
 	    integer *);
     static real aii;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -114,26 +112,28 @@
 /*        Compute the product U * U'. */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    i__2 = i + i * a_dim1;
-	    aii = A(i,i).r;
-	    if (i < *n) {
-		i__2 = i + i * a_dim1;
-		i__3 = *n - i;
-		cdotc_(&q__1, &i__3, &A(i,i+1), lda, &A(i,i+1), lda);
-		d__1 = aii * aii + q__1.r;
-		A(i,i).r = d__1, A(i,i).i = 0.f;
-		i__2 = *n - i;
-		clacgv_(&i__2, &A(i,i+1), lda);
-		i__2 = i - 1;
-		i__3 = *n - i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = a_subscr(i__, i__);
+	    aii = a[i__2].r;
+	    if (i__ < *n) {
+		i__2 = a_subscr(i__, i__);
+		i__3 = *n - i__;
+		cdotc_(&q__1, &i__3, &a_ref(i__, i__ + 1), lda, &a_ref(i__, 
+			i__ + 1), lda);
+		r__1 = aii * aii + q__1.r;
+		a[i__2].r = r__1, a[i__2].i = 0.f;
+		i__2 = *n - i__;
+		clacgv_(&i__2, &a_ref(i__, i__ + 1), lda);
+		i__2 = i__ - 1;
+		i__3 = *n - i__;
 		q__1.r = aii, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &c_b1, &A(1,i+1), lda, &A(i,i+1), lda, &
-			q__1, &A(1,i), &c__1);
-		i__2 = *n - i;
-		clacgv_(&i__2, &A(i,i+1), lda);
+		cgemv_("No transpose", &i__2, &i__3, &c_b1, &a_ref(1, i__ + 1)
+			, lda, &a_ref(i__, i__ + 1), lda, &q__1, &a_ref(1, 
+			i__), &c__1);
+		i__2 = *n - i__;
+		clacgv_(&i__2, &a_ref(i__, i__ + 1), lda);
 	    } else {
-		csscal_(&i, &aii, &A(1,i), &c__1);
+		csscal_(&i__, &aii, &a_ref(1, i__), &c__1);
 	    }
 /* L10: */
 	}
@@ -143,26 +143,28 @@
 /*        Compute the product L' * L. */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    i__2 = i + i * a_dim1;
-	    aii = A(i,i).r;
-	    if (i < *n) {
-		i__2 = i + i * a_dim1;
-		i__3 = *n - i;
-		cdotc_(&q__1, &i__3, &A(i+1,i), &c__1, &A(i+1,i), &c__1);
-		d__1 = aii * aii + q__1.r;
-		A(i,i).r = d__1, A(i,i).i = 0.f;
-		i__2 = i - 1;
-		clacgv_(&i__2, &A(i,1), lda);
-		i__2 = *n - i;
-		i__3 = i - 1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = a_subscr(i__, i__);
+	    aii = a[i__2].r;
+	    if (i__ < *n) {
+		i__2 = a_subscr(i__, i__);
+		i__3 = *n - i__;
+		cdotc_(&q__1, &i__3, &a_ref(i__ + 1, i__), &c__1, &a_ref(i__ 
+			+ 1, i__), &c__1);
+		r__1 = aii * aii + q__1.r;
+		a[i__2].r = r__1, a[i__2].i = 0.f;
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &a_ref(i__, 1), lda);
+		i__2 = *n - i__;
+		i__3 = i__ - 1;
 		q__1.r = aii, q__1.i = 0.f;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b1, &A(i+1,1), lda, &A(i+1,i), &c__1, &q__1, &
-			A(i,1), lda);
-		i__2 = i - 1;
-		clacgv_(&i__2, &A(i,1), lda);
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b1, &a_ref(i__ 
+			+ 1, 1), lda, &a_ref(i__ + 1, i__), &c__1, &q__1, &
+			a_ref(i__, 1), lda);
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &a_ref(i__, 1), lda);
 	    } else {
-		csscal_(&i, &aii, &A(i,1), lda);
+		csscal_(&i__, &aii, &a_ref(i__, 1), lda);
 	    }
 /* L20: */
 	}
@@ -173,4 +175,8 @@
 /*     End of CLAUU2 */
 
 } /* clauu2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

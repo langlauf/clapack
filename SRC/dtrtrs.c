@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dtrtrs_(char *uplo, char *trans, char *diag, integer *n, 
 	integer *nrhs, doublereal *a, integer *lda, doublereal *b, integer *
 	ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -47,12 +48,9 @@
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading N-by-N   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading N-by-N lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading N-by-N lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -71,19 +69,15 @@
             = 0:  successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
             > 0: if INFO = i, the i-th diagonal element of A is zero,   
-                 indicating that the matrix is singular and the solutions 
-  
+                 indicating that the matrix is singular and the solutions   
                  X have not been computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b12 = 1.;
     
@@ -96,19 +90,23 @@
 	    doublereal *, integer *), xerbla_(
 	    char *, integer *);
     static logical nounit;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     nounit = lsame_(diag, "N");
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T") &&
-	     ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T") && ! lsame_(trans, "C")) {
 	*info = -2;
     } else if (! nounit && ! lsame_(diag, "U")) {
 	*info = -3;
@@ -138,7 +136,7 @@
     if (nounit) {
 	i__1 = *n;
 	for (*info = 1; *info <= i__1; ++(*info)) {
-	    if (A(*info,*info) == 0.) {
+	    if (a_ref(*info, *info) == 0.) {
 		return 0;
 	    }
 /* L10: */
@@ -148,11 +146,15 @@
 
 /*     Solve A * x = b  or  A' * x = b. */
 
-    dtrsm_("Left", uplo, trans, diag, n, nrhs, &c_b12, &A(1,1), lda, &B(1,1), ldb);
+    dtrsm_("Left", uplo, trans, diag, n, nrhs, &c_b12, &a[a_offset], lda, &b[
+	    b_offset], ldb);
 
     return 0;
 
 /*     End of DTRTRS */
 
 } /* dtrtrs_ */
+
+#undef a_ref
+
 

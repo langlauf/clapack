@@ -33,22 +33,16 @@ include ../../make.inc
 #  entering (for example)
 #       make single FRC=FRC
 #
-#----------------------------------------------------------------------
-#
-#  Edward Anderson, University of Tennessee
-#  March 26, 1990
-#  Susan Ostrouchov, Last updated September 30, 1994
-#
 #######################################################################
 
 AEIGTIM = atimin.o ilaenv.o xlaenv.o
 
 SCIGTIM = \
-   smflop.o sopla.o sopla2.o \
+   smflop.o sopla.o sopla2.o sopbl3.o \
    sprtbe.o sprtbg.o sprtbr.o sprtbs.o sprtbv.o
 
 DZIGTIM = \
-   dmflop.o dopla.o dopla2.o \
+   dmflop.o dopla.o dopla2.o dopbl3.o \
    dprtbe.o dprtbg.o dprtbr.o dprtbs.o dprtbv.o
 
 SEIGTIM = stimee.o \
@@ -103,5 +97,14 @@ FRC: ; \
  
 clean: ; \
         rm -f *.o
+
+stimee.o: stimee.c
+	$(CC) $(DRVCFLAGS) -c $<
+dtimee.o: dtimee.c
+	$(CC) $(DRVCFLAGS) -c $<
+ctimee.o: ctimee.c
+	$(CC) $(DRVCFLAGS) -c $<
+ztimee.o: ztimee.c
+	$(CC) $(DRVCFLAGS) -c $<
  
 .c.o : ; $(CC) $(CFLAGS) -c $<

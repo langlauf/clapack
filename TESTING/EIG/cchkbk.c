@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -43,7 +44,7 @@ static integer c__20 = 20;
     static integer info, lmax[2];
     static real rmax, vmax;
     static complex e[400]	/* was [20][20] */;
-    static integer i, j, n;
+    static integer i__, j, n;
     static real scale[20], x;
     static integer ninfo;
     extern /* Subroutine */ int cgebak_(char *, char *, integer *, integer *, 
@@ -70,7 +71,13 @@ static integer c__20 = 20;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define e_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+#define ein_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define ein_ref(a_1,a_2) ein[ein_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -92,8 +99,7 @@ static integer c__20 = 20;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-   ====================================================================== 
-*/
+   ====================================================================== */
 
 
     lmax[0] = 0;
@@ -119,17 +125,17 @@ L10:
     io___11.ciunit = *nin;
     s_rsle(&io___11);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__4, &c__1, (char *)&scale[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__4, &c__1, (char *)&scale[i__ - 1], (ftnlen)sizeof(real));
     }
     e_rsle();
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___14.ciunit = *nin;
 	s_rsle(&io___14);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&e[i + j * 20 - 21], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&e_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -137,13 +143,13 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___17.ciunit = *nin;
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&ein[i + j * 20 - 21], (ftnlen)
-		    sizeof(complex));
+	    do_lio(&c__6, &c__1, (char *)&ein_ref(i__, j), (ftnlen)sizeof(
+		    complex));
 	}
 	e_rsle();
 /* L30: */
@@ -159,22 +165,22 @@ L10:
 
     vmax = 0.f;
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = i + j * 20 - 21;
-	    i__4 = i + j * 20 - 21;
+	    i__3 = e_subscr(i__, j);
+	    i__4 = ein_subscr(i__, j);
 	    q__2.r = e[i__3].r - ein[i__4].r, q__2.i = e[i__3].i - ein[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 	    x = ((r__1 = q__1.r, dabs(r__1)) + (r__2 = r_imag(&q__1), dabs(
 		    r__2))) / eps;
-	    i__3 = i + j * 20 - 21;
-	    if ((r__1 = e[i__3].r, dabs(r__1)) + (r__2 = r_imag(&e[i + j * 20 
-		    - 21]), dabs(r__2)) > safmin) {
-		i__4 = i + j * 20 - 21;
-		x /= (r__3 = e[i__4].r, dabs(r__3)) + (r__4 = r_imag(&e[i + j 
-			* 20 - 21]), dabs(r__4));
+	    i__3 = e_subscr(i__, j);
+	    if ((r__1 = e[i__3].r, dabs(r__1)) + (r__2 = r_imag(&e_ref(i__, j)
+		    ), dabs(r__2)) > safmin) {
+		i__4 = e_subscr(i__, j);
+		x /= (r__3 = e[i__4].r, dabs(r__3)) + (r__4 = r_imag(&e_ref(
+			i__, j)), dabs(r__4));
 	    }
 	    vmax = dmax(vmax,x);
 /* L40: */
@@ -221,4 +227,10 @@ L60:
 /*     End of CCHKBK */
 
 } /* cchkbk_ */
+
+#undef ein_ref
+#undef ein_subscr
+#undef e_ref
+#undef e_subscr
+
 

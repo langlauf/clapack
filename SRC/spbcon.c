@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spbcon_(char *uplo, integer *n, integer *kd, real *ab, 
 	integer *ldab, real *anorm, real *rcond, real *work, integer *iwork, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -35,23 +36,18 @@
             or the number of subdiagonals if UPLO = 'L'.  KD >= 0.   
 
     AB      (input) REAL array, dimension (LDAB,N)   
-            The triangular factor U or L from the Cholesky factorization 
-  
-            A = U**T*U or A = L*L**T of the band matrix A, stored in the 
-  
+            The triangular factor U or L from the Cholesky factorization   
+            A = U**T*U or A = L*L**T of the band matrix A, stored in the   
             first KD+1 rows of the array.  The j-th column of U or L is   
             stored in the j-th column of the array AB as follows:   
-            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
 
     ANORM   (input) REAL   
-            The 1-norm (or infinity-norm) of the symmetric band matrix A. 
-  
+            The 1-norm (or infinity-norm) of the symmetric band matrix A.   
 
     RCOND   (output) REAL   
             The reciprocal of the condition number of the matrix A,   
@@ -66,15 +62,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -102,12 +95,13 @@
     static real smlnum;
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
+    --iwork;
 
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -144,31 +138,35 @@
     kase = 0;
     *(unsigned char *)normin = 'N';
 L10:
-    slacon_(n, &WORK(*n + 1), &WORK(1), &IWORK(1), &ainvnm, &kase);
+    slacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (upper) {
 
 /*           Multiply by inv(U'). */
 
-	    slatbs_("Upper", "Transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scalel, &WORK((*n << 1) + 1),
+	    slatbs_("Upper", "Transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scalel, &work[(*n << 1) + 1],
 		     info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(U). */
 
-	    slatbs_("Upper", "No transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scaleu, &WORK((*n << 1) + 1),
+	    slatbs_("Upper", "No transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scaleu, &work[(*n << 1) + 1],
 		     info);
 	} else {
 
 /*           Multiply by inv(L). */
 
-	    slatbs_("Lower", "No transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scalel, &WORK((*n << 1) + 1),
+	    slatbs_("Lower", "No transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scalel, &work[(*n << 1) + 1],
 		     info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(L'). */
 
-	    slatbs_("Lower", "Transpose", "Non-unit", normin, n, kd, &AB(1,1), ldab, &WORK(1), &scaleu, &WORK((*n << 1) + 1),
+	    slatbs_("Lower", "Transpose", "Non-unit", normin, n, kd, &ab[
+		    ab_offset], ldab, &work[1], &scaleu, &work[(*n << 1) + 1],
 		     info);
 	}
 
@@ -176,12 +174,12 @@ L10:
 
 	scale = scalel * scaleu;
 	if (scale != 1.f) {
-	    ix = isamax_(n, &WORK(1), &c__1);
-	    if (scale < (r__1 = WORK(ix), dabs(r__1)) * smlnum || scale == 
+	    ix = isamax_(n, &work[1], &c__1);
+	    if (scale < (r__1 = work[ix], dabs(r__1)) * smlnum || scale == 
 		    0.f) {
 		goto L20;
 	    }
-	    srscl_(n, &scale, &WORK(1), &c__1);
+	    srscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

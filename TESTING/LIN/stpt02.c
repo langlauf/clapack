@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -34,7 +35,11 @@ static real c_b10 = -1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -46,8 +51,7 @@ static real c_b10 = -1.f;
     STPT02 computes the residual for the computed solution to a   
     triangular system of linear equations  A*x = b  or  A'*x = b  when   
     the triangular matrix A is stored in packed format.  Here A' is the   
-    transpose of A and x and b are N by NRHS matrices.  The test ratio is 
-  
+    transpose of A and x and b are N by NRHS matrices.  The test ratio is   
     the maximum over the number of right hand sides of   
        norm(b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
     where op(A) denotes A or A' and EPS is the machine epsilon.   
@@ -56,8 +60,7 @@ static real c_b10 = -1.f;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -80,10 +83,8 @@ static real c_b10 = -1.f;
             of the matrices X and B.  NRHS >= 0.   
 
     AP      (input) REAL array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -109,8 +110,7 @@ static real c_b10 = -1.f;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0   
@@ -118,10 +118,10 @@ static real c_b10 = -1.f;
        Parameter adjustments */
     --ap;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -153,11 +153,11 @@ static real c_b10 = -1.f;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	scopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	stpmv_(uplo, trans, diag, n, &ap[1], &work[1], &c__1);
-	saxpy_(n, &c_b10, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	saxpy_(n, &c_b10, &b_ref(1, j), &c__1, &work[1], &c__1);
 	bnorm = sasum_(n, &work[1], &c__1);
-	xnorm = sasum_(n, &x[j * x_dim1 + 1], &c__1);
+	xnorm = sasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.f) {
 	    *resid = 1.f / eps;
 	} else {
@@ -173,4 +173,8 @@ static real c_b10 = -1.f;
 /*     End of STPT02 */
 
 } /* stpt02_ */
+
+#undef x_ref
+#undef b_ref
+
 

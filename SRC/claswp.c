@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int claswp_(integer *n, complex *a, integer *lda, integer *
 	k1, integer *k2, integer *ipiv, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     CLASWP performs a series of row interchanges on the matrix A.   
-    One row interchange is initiated for each of rows K1 through K2 of A. 
-  
+    One row interchange is initiated for each of rows K1 through K2 of A.   
 
     Arguments   
     =========   
@@ -39,8 +39,7 @@
             be done.   
 
     IPIV    (input) INTEGER array, dimension (M*abs(INCX))   
-            The vector of pivot indices.  Only the elements in positions 
-  
+            The vector of pivot indices.  Only the elements in positions   
             K1 through K2 of IPIV are accessed.   
             IPIV(K) = L implies rows K and L are to be interchanged.   
 
@@ -48,65 +47,97 @@
             The increment between successive values of IPIV.  If IPIV   
             is negative, the pivots are applied in reverse order.   
 
-   ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Modified by   
+     R. C. Whaley, Computer Science Dept., Univ. of Tenn., Knoxville, USA   
+
+   =====================================================================   
 
 
-       Interchange row I with row IPIV(I) for each of rows K1 through K2. 
-  
+       Interchange row I with row IPIV(I) for each of rows K1 through K2.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
-    integer a_dim1, a_offset, i__1;
+    integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5, i__6;
     /* Local variables */
-    static integer i;
-    extern /* Subroutine */ int cswap_(integer *, complex *, integer *, 
-	    complex *, integer *);
-    static integer ip, ix;
+    static complex temp;
+    static integer i__, j, k, i1, i2, n32, ip, ix, ix0, inc;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
-    if (*incx == 0) {
+    /* Function Body */
+    if (*incx > 0) {
+	ix0 = *k1;
+	i1 = *k1;
+	i2 = *k2;
+	inc = 1;
+    } else if (*incx < 0) {
+	ix0 = (1 - *k2) * *incx + 1;
+	i1 = *k2;
+	i2 = *k1;
+	inc = -1;
+    } else {
 	return 0;
     }
-    if (*incx > 0) {
-	ix = *k1;
-    } else {
-	ix = (1 - *k2) * *incx + 1;
-    }
-    if (*incx == 1) {
-	i__1 = *k2;
-	for (i = *k1; i <= *k2; ++i) {
-	    ip = IPIV(i);
-	    if (ip != i) {
-		cswap_(n, &A(i,1), lda, &A(ip,1), lda);
-	    }
+
+    n32 = *n / 32 << 5;
+    if (n32 != 0) {
+	i__1 = n32;
+	for (j = 1; j <= i__1; j += 32) {
+	    ix = ix0;
+	    i__2 = i2;
+	    i__3 = inc;
+	    for (i__ = i1; i__3 < 0 ? i__ >= i__2 : i__ <= i__2; i__ += i__3) 
+		    {
+		ip = ipiv[ix];
+		if (ip != i__) {
+		    i__4 = j + 31;
+		    for (k = j; k <= i__4; ++k) {
+			i__5 = a_subscr(i__, k);
+			temp.r = a[i__5].r, temp.i = a[i__5].i;
+			i__5 = a_subscr(i__, k);
+			i__6 = a_subscr(ip, k);
+			a[i__5].r = a[i__6].r, a[i__5].i = a[i__6].i;
+			i__5 = a_subscr(ip, k);
+			a[i__5].r = temp.r, a[i__5].i = temp.i;
 /* L10: */
-	}
-    } else if (*incx > 1) {
-	i__1 = *k2;
-	for (i = *k1; i <= *k2; ++i) {
-	    ip = IPIV(ix);
-	    if (ip != i) {
-		cswap_(n, &A(i,1), lda, &A(ip,1), lda);
-	    }
-	    ix += *incx;
+		    }
+		}
+		ix += *incx;
 /* L20: */
+	    }
+/* L30: */
 	}
-    } else if (*incx < 0) {
-	i__1 = *k1;
-	for (i = *k2; i >= *k1; --i) {
-	    ip = IPIV(ix);
-	    if (ip != i) {
-		cswap_(n, &A(i,1), lda, &A(ip,1), lda);
+    }
+    if (n32 != *n) {
+	++n32;
+	ix = ix0;
+	i__1 = i2;
+	i__3 = inc;
+	for (i__ = i1; i__3 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__3) {
+	    ip = ipiv[ix];
+	    if (ip != i__) {
+		i__2 = *n;
+		for (k = n32; k <= i__2; ++k) {
+		    i__4 = a_subscr(i__, k);
+		    temp.r = a[i__4].r, temp.i = a[i__4].i;
+		    i__4 = a_subscr(i__, k);
+		    i__5 = a_subscr(ip, k);
+		    a[i__4].r = a[i__5].r, a[i__4].i = a[i__5].i;
+		    i__4 = a_subscr(ip, k);
+		    a[i__4].r = temp.r, a[i__4].i = temp.i;
+/* L40: */
+		}
 	    }
 	    ix += *incx;
-/* L30: */
+/* L50: */
 	}
     }
 
@@ -115,4 +146,8 @@
 /*     End of CLASWP */
 
 } /* claswp_ */
+
+#undef a_ref
+#undef a_subscr
+
 

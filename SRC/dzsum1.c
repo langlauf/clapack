@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal dzsum1_(integer *n, doublecomplex *cx, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -31,26 +32,22 @@ doublereal dzsum1_(integer *n, doublecomplex *cx, integer *incx)
     INCX    (input) INTEGER   
             The spacing between successive values of CX.  INCX > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     doublereal ret_val;
     /* Builtin functions */
     double z_abs(doublecomplex *);
     /* Local variables */
-    static integer i, nincx;
+    static integer i__, nincx;
     static doublereal stemp;
 
+    --cx;
 
-#define CX(I) cx[(I)-1]
-
-
+    /* Function Body */
     ret_val = 0.;
     stemp = 0.;
     if (*n <= 0) {
@@ -65,11 +62,11 @@ doublereal dzsum1_(integer *n, doublecomplex *cx, integer *incx)
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
-    for (i = 1; *incx < 0 ? i >= nincx : i <= nincx; i += *incx) {
+    for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 
 /*        NEXT LINE MODIFIED. */
 
-	stemp += z_abs(&CX(i));
+	stemp += z_abs(&cx[i__]);
 /* L10: */
     }
     ret_val = stemp;
@@ -79,11 +76,11 @@ doublereal dzsum1_(integer *n, doublecomplex *cx, integer *incx)
 
 L20:
     i__2 = *n;
-    for (i = 1; i <= *n; ++i) {
+    for (i__ = 1; i__ <= i__2; ++i__) {
 
 /*        NEXT LINE MODIFIED. */
 
-	stemp += z_abs(&CX(i));
+	stemp += z_abs(&cx[i__]);
 /* L30: */
     }
     ret_val = stemp;

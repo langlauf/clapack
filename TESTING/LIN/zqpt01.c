@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,7 +21,7 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
     doublereal ret_val;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     static doublereal norma, rwork[1];
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zaxpy_(integer *, doublecomplex *, 
@@ -34,7 +35,13 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,12 +51,10 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
     =======   
 
     ZQPT01 tests the QR-factorization with pivoting of a matrix A.  The   
-    array AF contains the (possibly partial) QR-factorization of A, where 
-  
+    array AF contains the (possibly partial) QR-factorization of A, where   
     the upper triangle of AF(1:k,1:k) is a partial triangular factor,   
     the entries below the diagonal in the first k columns are the   
-    Householder vectors, and the rest of AF contains a partially updated 
-  
+    Householder vectors, and the rest of AF contains a partially updated   
     matrix.   
 
     This function returns ||A*P - Q*R||/(||norm(A)||*eps*M)   
@@ -71,11 +76,9 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
             The original matrix A.   
 
     AF      (input) COMPLEX*16 array, dimension (LDA,N)   
-            The (possibly partial) output of ZGEQPF.  The upper triangle 
-  
+            The (possibly partial) output of ZGEQPF.  The upper triangle   
             of AF(1:k,1:k) is a partial triangular factor, the entries   
-            below the diagonal in the first k columns are the Householder 
-  
+            below the diagonal in the first k columns are the Householder   
             vectors, and the rest of AF contains a partially updated   
             matrix.   
 
@@ -94,16 +97,15 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= M*N+N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --jpvt;
@@ -130,15 +132,15 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = (j - 1) * *m + i;
-	    i__4 = i + j * af_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = (j - 1) * *m + i__;
+	    i__4 = af_subscr(i__, j);
 	    work[i__3].r = af[i__4].r, work[i__3].i = af[i__4].i;
 /* L10: */
 	}
 	i__2 = *m;
-	for (i = j + 1; i <= i__2; ++i) {
-	    i__3 = (j - 1) * *m + i;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    i__3 = (j - 1) * *m + i__;
 	    work[i__3].r = 0., work[i__3].i = 0.;
 /* L20: */
 	}
@@ -146,8 +148,7 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
     }
     i__1 = *n;
     for (j = *k + 1; j <= i__1; ++j) {
-	zcopy_(m, &af[j * af_dim1 + 1], &c__1, &work[(j - 1) * *m + 1], &c__1)
-		;
+	zcopy_(m, &af_ref(1, j), &c__1, &work[(j - 1) * *m + 1], &c__1);
 /* L40: */
     }
 
@@ -160,8 +161,8 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
 
 /*        Compare i-th column of QR and jpvt(i)-th column of A */
 
-	zaxpy_(m, &c_b16, &a[jpvt[j] * a_dim1 + 1], &c__1, &work[(j - 1) * *m 
-		+ 1], &c__1);
+	zaxpy_(m, &c_b16, &a_ref(1, jpvt[j]), &c__1, &work[(j - 1) * *m + 1], 
+		&c__1);
 /* L50: */
     }
 
@@ -176,4 +177,10 @@ doublereal zqpt01_(integer *m, integer *n, integer *k, doublecomplex *a,
 /*     End of ZQPT01 */
 
 } /* zqpt01_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,8 +11,8 @@
 static integer c__1 = 1;
 
 /* Subroutine */ int slsets_(integer *m, integer *p, integer *n, real *a, 
-	real *af, integer *lda, real *b, real *bf, integer *ldb, real *c, 
-	real *cf, real *d, real *df, real *x, real *work, integer *lwork, 
+	real *af, integer *lda, real *b, real *bf, integer *ldb, real *c__, 
+	real *cf, real *d__, real *df, real *x, real *work, integer *lwork, 
 	real *rwork, real *result)
 {
     /* System generated locals */
@@ -29,7 +30,7 @@ static integer c__1 = 1;
 	    *, integer *, real *, integer *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -96,8 +97,7 @@ static integer c__1 = 1;
               RESULT(1) = norm( A*x - c )/ norm(A)*norm(X)*EPS   
               RESULT(2) = norm( B*x - d )/ norm(B)*norm(X)*EPS   
 
-    ==================================================================== 
-  
+    ====================================================================   
 
 
        Copy the matrices A and B to the arrays AF and BF,   
@@ -105,20 +105,20 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
-    --c;
+    --c__;
     --cf;
-    --d;
+    --d__;
     --df;
     --x;
     --work;
@@ -128,8 +128,8 @@ static integer c__1 = 1;
     /* Function Body */
     slacpy_("Full", m, n, &a[a_offset], lda, &af[af_offset], lda);
     slacpy_("Full", p, n, &b[b_offset], ldb, &bf[bf_offset], ldb);
-    scopy_(m, &c[1], &c__1, &cf[1], &c__1);
-    scopy_(p, &d[1], &c__1, &df[1], &c__1);
+    scopy_(m, &c__[1], &c__1, &cf[1], &c__1);
+    scopy_(p, &d__[1], &c__1, &df[1], &c__1);
 
 /*     Solve LSE problem */
 
@@ -140,8 +140,8 @@ static integer c__1 = 1;
 
        Compute RESULT(1) = norm( A*x - c ) / norm(A)*norm(X)*EPS */
 
-    scopy_(m, &c[1], &c__1, &cf[1], &c__1);
-    scopy_(p, &d[1], &c__1, &df[1], &c__1);
+    scopy_(m, &c__[1], &c__1, &cf[1], &c__1);
+    scopy_(p, &d__[1], &c__1, &df[1], &c__1);
     sget02_("No transpose", m, n, &c__1, &a[a_offset], lda, &x[1], n, &cf[1], 
 	    m, &rwork[1], &result[1]);
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -6,8 +7,8 @@
 #include "f2c.h"
 
 /* Subroutine */ int zlaptm_(char *uplo, integer *n, integer *nrhs, 
-	doublereal *alpha, doublereal *d, doublecomplex *e, doublecomplex *x, 
-	integer *ldx, doublereal *beta, doublecomplex *b, integer *ldb)
+	doublereal *alpha, doublereal *d__, doublecomplex *e, doublecomplex *
+	x, integer *ldx, doublereal *beta, doublecomplex *b, integer *ldb)
 {
     /* System generated locals */
     integer b_dim1, b_offset, x_dim1, x_offset, i__1, i__2, i__3, i__4, i__5, 
@@ -18,11 +19,17 @@
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -32,8 +39,7 @@
     =======   
 
     ZLAPTM multiplies an N by NRHS matrix X by a Hermitian tridiagonal   
-    matrix A and stores the result in a matrix B.  The operation has the 
-  
+    matrix A and stores the result in a matrix B.  The operation has the   
     form   
 
        B := alpha * A * X + beta * B   
@@ -44,8 +50,7 @@
     =========   
 
     UPLO    (input) CHARACTER   
-            Specifies whether the superdiagonal or the subdiagonal of the 
-  
+            Specifies whether the superdiagonal or the subdiagonal of the   
             tridiagonal matrix A is stored.   
             = 'U':  Upper, E is the superdiagonal of A.   
             = 'L':  Lower, E is the subdiagonal of A.   
@@ -85,18 +90,17 @@
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(N,1).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
@@ -108,8 +112,8 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * b_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
 		b[i__3].r = 0., b[i__3].i = 0.;
 /* L10: */
 	    }
@@ -119,9 +123,9 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * b_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		i__4 = b_subscr(i__, j);
 		z__1.r = -b[i__4].r, z__1.i = -b[i__4].i;
 		b[i__3].r = z__1.r, b[i__3].i = z__1.i;
 /* L30: */
@@ -133,60 +137,59 @@
     if (*alpha == 1.) {
 	if (lsame_(uplo, "U")) {
 
-/*           Compute B := B + A*X, where E is the superdiagonal of
- A. */
+/*           Compute B := B + A*X, where E is the superdiagonal of A. */
 
 	    i__1 = *nrhs;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*n == 1) {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__2.r = d[1] * x[i__4].r, z__2.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__2.r = d__[1] * x[i__4].r, z__2.i = d__[1] * x[i__4].i;
 		    z__1.r = b[i__3].r + z__2.r, z__1.i = b[i__3].i + z__2.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		} else {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__3.r = d[1] * x[i__4].r, z__3.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__3.r = d__[1] * x[i__4].r, z__3.i = d__[1] * x[i__4].i;
 		    z__2.r = b[i__3].r + z__3.r, z__2.i = b[i__3].i + z__3.i;
-		    i__5 = j * x_dim1 + 2;
+		    i__5 = x_subscr(2, j);
 		    z__4.r = e[1].r * x[i__5].r - e[1].i * x[i__5].i, z__4.i =
 			     e[1].r * x[i__5].i + e[1].i * x[i__5].r;
 		    z__1.r = z__2.r + z__4.r, z__1.i = z__2.i + z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-		    i__2 = *n + j * b_dim1;
-		    i__3 = *n + j * b_dim1;
+		    i__2 = b_subscr(*n, j);
+		    i__3 = b_subscr(*n, j);
 		    d_cnjg(&z__4, &e[*n - 1]);
-		    i__4 = *n - 1 + j * x_dim1;
+		    i__4 = x_subscr(*n - 1, j);
 		    z__3.r = z__4.r * x[i__4].r - z__4.i * x[i__4].i, z__3.i =
 			     z__4.r * x[i__4].i + z__4.i * x[i__4].r;
 		    z__2.r = b[i__3].r + z__3.r, z__2.i = b[i__3].i + z__3.i;
 		    i__5 = *n;
-		    i__6 = *n + j * x_dim1;
-		    z__5.r = d[i__5] * x[i__6].r, z__5.i = d[i__5] * x[i__6]
-			    .i;
+		    i__6 = x_subscr(*n, j);
+		    z__5.r = d__[i__5] * x[i__6].r, z__5.i = d__[i__5] * x[
+			    i__6].i;
 		    z__1.r = z__2.r + z__5.r, z__1.i = z__2.i + z__5.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		    i__2 = *n - 1;
-		    for (i = 2; i <= i__2; ++i) {
-			i__3 = i + j * b_dim1;
-			i__4 = i + j * b_dim1;
-			d_cnjg(&z__5, &e[i - 1]);
-			i__5 = i - 1 + j * x_dim1;
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			i__4 = b_subscr(i__, j);
+			d_cnjg(&z__5, &e[i__ - 1]);
+			i__5 = x_subscr(i__ - 1, j);
 			z__4.r = z__5.r * x[i__5].r - z__5.i * x[i__5].i, 
 				z__4.i = z__5.r * x[i__5].i + z__5.i * x[i__5]
 				.r;
 			z__3.r = b[i__4].r + z__4.r, z__3.i = b[i__4].i + 
 				z__4.i;
-			i__6 = i;
-			i__7 = i + j * x_dim1;
-			z__6.r = d[i__6] * x[i__7].r, z__6.i = d[i__6] * x[
-				i__7].i;
+			i__6 = i__;
+			i__7 = x_subscr(i__, j);
+			z__6.r = d__[i__6] * x[i__7].r, z__6.i = d__[i__6] * 
+				x[i__7].i;
 			z__2.r = z__3.r + z__6.r, z__2.i = z__3.i + z__6.i;
-			i__8 = i;
-			i__9 = i + 1 + j * x_dim1;
+			i__8 = i__;
+			i__9 = x_subscr(i__ + 1, j);
 			z__7.r = e[i__8].r * x[i__9].r - e[i__8].i * x[i__9]
 				.i, z__7.i = e[i__8].r * x[i__9].i + e[i__8]
 				.i * x[i__9].r;
@@ -199,62 +202,61 @@
 	    }
 	} else {
 
-/*           Compute B := B + A*X, where E is the subdiagonal of A
-. */
+/*           Compute B := B + A*X, where E is the subdiagonal of A. */
 
 	    i__1 = *nrhs;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*n == 1) {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__2.r = d[1] * x[i__4].r, z__2.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__2.r = d__[1] * x[i__4].r, z__2.i = d__[1] * x[i__4].i;
 		    z__1.r = b[i__3].r + z__2.r, z__1.i = b[i__3].i + z__2.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		} else {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__3.r = d[1] * x[i__4].r, z__3.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__3.r = d__[1] * x[i__4].r, z__3.i = d__[1] * x[i__4].i;
 		    z__2.r = b[i__3].r + z__3.r, z__2.i = b[i__3].i + z__3.i;
 		    d_cnjg(&z__5, &e[1]);
-		    i__5 = j * x_dim1 + 2;
+		    i__5 = x_subscr(2, j);
 		    z__4.r = z__5.r * x[i__5].r - z__5.i * x[i__5].i, z__4.i =
 			     z__5.r * x[i__5].i + z__5.i * x[i__5].r;
 		    z__1.r = z__2.r + z__4.r, z__1.i = z__2.i + z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-		    i__2 = *n + j * b_dim1;
-		    i__3 = *n + j * b_dim1;
+		    i__2 = b_subscr(*n, j);
+		    i__3 = b_subscr(*n, j);
 		    i__4 = *n - 1;
-		    i__5 = *n - 1 + j * x_dim1;
+		    i__5 = x_subscr(*n - 1, j);
 		    z__3.r = e[i__4].r * x[i__5].r - e[i__4].i * x[i__5].i, 
 			    z__3.i = e[i__4].r * x[i__5].i + e[i__4].i * x[
 			    i__5].r;
 		    z__2.r = b[i__3].r + z__3.r, z__2.i = b[i__3].i + z__3.i;
 		    i__6 = *n;
-		    i__7 = *n + j * x_dim1;
-		    z__4.r = d[i__6] * x[i__7].r, z__4.i = d[i__6] * x[i__7]
-			    .i;
+		    i__7 = x_subscr(*n, j);
+		    z__4.r = d__[i__6] * x[i__7].r, z__4.i = d__[i__6] * x[
+			    i__7].i;
 		    z__1.r = z__2.r + z__4.r, z__1.i = z__2.i + z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		    i__2 = *n - 1;
-		    for (i = 2; i <= i__2; ++i) {
-			i__3 = i + j * b_dim1;
-			i__4 = i + j * b_dim1;
-			i__5 = i - 1;
-			i__6 = i - 1 + j * x_dim1;
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			i__4 = b_subscr(i__, j);
+			i__5 = i__ - 1;
+			i__6 = x_subscr(i__ - 1, j);
 			z__4.r = e[i__5].r * x[i__6].r - e[i__5].i * x[i__6]
 				.i, z__4.i = e[i__5].r * x[i__6].i + e[i__5]
 				.i * x[i__6].r;
 			z__3.r = b[i__4].r + z__4.r, z__3.i = b[i__4].i + 
 				z__4.i;
-			i__7 = i;
-			i__8 = i + j * x_dim1;
-			z__5.r = d[i__7] * x[i__8].r, z__5.i = d[i__7] * x[
-				i__8].i;
+			i__7 = i__;
+			i__8 = x_subscr(i__, j);
+			z__5.r = d__[i__7] * x[i__8].r, z__5.i = d__[i__7] * 
+				x[i__8].i;
 			z__2.r = z__3.r + z__5.r, z__2.i = z__3.i + z__5.i;
-			d_cnjg(&z__7, &e[i]);
-			i__9 = i + 1 + j * x_dim1;
+			d_cnjg(&z__7, &e[i__]);
+			i__9 = x_subscr(i__ + 1, j);
 			z__6.r = z__7.r * x[i__9].r - z__7.i * x[i__9].i, 
 				z__6.i = z__7.r * x[i__9].i + z__7.i * x[i__9]
 				.r;
@@ -269,60 +271,59 @@
     } else if (*alpha == -1.) {
 	if (lsame_(uplo, "U")) {
 
-/*           Compute B := B - A*X, where E is the superdiagonal of
- A. */
+/*           Compute B := B - A*X, where E is the superdiagonal of A. */
 
 	    i__1 = *nrhs;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*n == 1) {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__2.r = d[1] * x[i__4].r, z__2.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__2.r = d__[1] * x[i__4].r, z__2.i = d__[1] * x[i__4].i;
 		    z__1.r = b[i__3].r - z__2.r, z__1.i = b[i__3].i - z__2.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		} else {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__3.r = d[1] * x[i__4].r, z__3.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__3.r = d__[1] * x[i__4].r, z__3.i = d__[1] * x[i__4].i;
 		    z__2.r = b[i__3].r - z__3.r, z__2.i = b[i__3].i - z__3.i;
-		    i__5 = j * x_dim1 + 2;
+		    i__5 = x_subscr(2, j);
 		    z__4.r = e[1].r * x[i__5].r - e[1].i * x[i__5].i, z__4.i =
 			     e[1].r * x[i__5].i + e[1].i * x[i__5].r;
 		    z__1.r = z__2.r - z__4.r, z__1.i = z__2.i - z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-		    i__2 = *n + j * b_dim1;
-		    i__3 = *n + j * b_dim1;
+		    i__2 = b_subscr(*n, j);
+		    i__3 = b_subscr(*n, j);
 		    d_cnjg(&z__4, &e[*n - 1]);
-		    i__4 = *n - 1 + j * x_dim1;
+		    i__4 = x_subscr(*n - 1, j);
 		    z__3.r = z__4.r * x[i__4].r - z__4.i * x[i__4].i, z__3.i =
 			     z__4.r * x[i__4].i + z__4.i * x[i__4].r;
 		    z__2.r = b[i__3].r - z__3.r, z__2.i = b[i__3].i - z__3.i;
 		    i__5 = *n;
-		    i__6 = *n + j * x_dim1;
-		    z__5.r = d[i__5] * x[i__6].r, z__5.i = d[i__5] * x[i__6]
-			    .i;
+		    i__6 = x_subscr(*n, j);
+		    z__5.r = d__[i__5] * x[i__6].r, z__5.i = d__[i__5] * x[
+			    i__6].i;
 		    z__1.r = z__2.r - z__5.r, z__1.i = z__2.i - z__5.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		    i__2 = *n - 1;
-		    for (i = 2; i <= i__2; ++i) {
-			i__3 = i + j * b_dim1;
-			i__4 = i + j * b_dim1;
-			d_cnjg(&z__5, &e[i - 1]);
-			i__5 = i - 1 + j * x_dim1;
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			i__4 = b_subscr(i__, j);
+			d_cnjg(&z__5, &e[i__ - 1]);
+			i__5 = x_subscr(i__ - 1, j);
 			z__4.r = z__5.r * x[i__5].r - z__5.i * x[i__5].i, 
 				z__4.i = z__5.r * x[i__5].i + z__5.i * x[i__5]
 				.r;
 			z__3.r = b[i__4].r - z__4.r, z__3.i = b[i__4].i - 
 				z__4.i;
-			i__6 = i;
-			i__7 = i + j * x_dim1;
-			z__6.r = d[i__6] * x[i__7].r, z__6.i = d[i__6] * x[
-				i__7].i;
+			i__6 = i__;
+			i__7 = x_subscr(i__, j);
+			z__6.r = d__[i__6] * x[i__7].r, z__6.i = d__[i__6] * 
+				x[i__7].i;
 			z__2.r = z__3.r - z__6.r, z__2.i = z__3.i - z__6.i;
-			i__8 = i;
-			i__9 = i + 1 + j * x_dim1;
+			i__8 = i__;
+			i__9 = x_subscr(i__ + 1, j);
 			z__7.r = e[i__8].r * x[i__9].r - e[i__8].i * x[i__9]
 				.i, z__7.i = e[i__8].r * x[i__9].i + e[i__8]
 				.i * x[i__9].r;
@@ -335,62 +336,61 @@
 	    }
 	} else {
 
-/*           Compute B := B - A*X, where E is the subdiagonal of A
-. */
+/*           Compute B := B - A*X, where E is the subdiagonal of A. */
 
 	    i__1 = *nrhs;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*n == 1) {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__2.r = d[1] * x[i__4].r, z__2.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__2.r = d__[1] * x[i__4].r, z__2.i = d__[1] * x[i__4].i;
 		    z__1.r = b[i__3].r - z__2.r, z__1.i = b[i__3].i - z__2.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		} else {
-		    i__2 = j * b_dim1 + 1;
-		    i__3 = j * b_dim1 + 1;
-		    i__4 = j * x_dim1 + 1;
-		    z__3.r = d[1] * x[i__4].r, z__3.i = d[1] * x[i__4].i;
+		    i__2 = b_subscr(1, j);
+		    i__3 = b_subscr(1, j);
+		    i__4 = x_subscr(1, j);
+		    z__3.r = d__[1] * x[i__4].r, z__3.i = d__[1] * x[i__4].i;
 		    z__2.r = b[i__3].r - z__3.r, z__2.i = b[i__3].i - z__3.i;
 		    d_cnjg(&z__5, &e[1]);
-		    i__5 = j * x_dim1 + 2;
+		    i__5 = x_subscr(2, j);
 		    z__4.r = z__5.r * x[i__5].r - z__5.i * x[i__5].i, z__4.i =
 			     z__5.r * x[i__5].i + z__5.i * x[i__5].r;
 		    z__1.r = z__2.r - z__4.r, z__1.i = z__2.i - z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-		    i__2 = *n + j * b_dim1;
-		    i__3 = *n + j * b_dim1;
+		    i__2 = b_subscr(*n, j);
+		    i__3 = b_subscr(*n, j);
 		    i__4 = *n - 1;
-		    i__5 = *n - 1 + j * x_dim1;
+		    i__5 = x_subscr(*n - 1, j);
 		    z__3.r = e[i__4].r * x[i__5].r - e[i__4].i * x[i__5].i, 
 			    z__3.i = e[i__4].r * x[i__5].i + e[i__4].i * x[
 			    i__5].r;
 		    z__2.r = b[i__3].r - z__3.r, z__2.i = b[i__3].i - z__3.i;
 		    i__6 = *n;
-		    i__7 = *n + j * x_dim1;
-		    z__4.r = d[i__6] * x[i__7].r, z__4.i = d[i__6] * x[i__7]
-			    .i;
+		    i__7 = x_subscr(*n, j);
+		    z__4.r = d__[i__6] * x[i__7].r, z__4.i = d__[i__6] * x[
+			    i__7].i;
 		    z__1.r = z__2.r - z__4.r, z__1.i = z__2.i - z__4.i;
 		    b[i__2].r = z__1.r, b[i__2].i = z__1.i;
 		    i__2 = *n - 1;
-		    for (i = 2; i <= i__2; ++i) {
-			i__3 = i + j * b_dim1;
-			i__4 = i + j * b_dim1;
-			i__5 = i - 1;
-			i__6 = i - 1 + j * x_dim1;
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			i__4 = b_subscr(i__, j);
+			i__5 = i__ - 1;
+			i__6 = x_subscr(i__ - 1, j);
 			z__4.r = e[i__5].r * x[i__6].r - e[i__5].i * x[i__6]
 				.i, z__4.i = e[i__5].r * x[i__6].i + e[i__5]
 				.i * x[i__6].r;
 			z__3.r = b[i__4].r - z__4.r, z__3.i = b[i__4].i - 
 				z__4.i;
-			i__7 = i;
-			i__8 = i + j * x_dim1;
-			z__5.r = d[i__7] * x[i__8].r, z__5.i = d[i__7] * x[
-				i__8].i;
+			i__7 = i__;
+			i__8 = x_subscr(i__, j);
+			z__5.r = d__[i__7] * x[i__8].r, z__5.i = d__[i__7] * 
+				x[i__8].i;
 			z__2.r = z__3.r - z__5.r, z__2.i = z__3.i - z__5.i;
-			d_cnjg(&z__7, &e[i]);
-			i__9 = i + 1 + j * x_dim1;
+			d_cnjg(&z__7, &e[i__]);
+			i__9 = x_subscr(i__ + 1, j);
 			z__6.r = z__7.r * x[i__9].r - z__7.i * x[i__9].i, 
 				z__6.i = z__7.r * x[i__9].i + z__7.i * x[i__9]
 				.r;
@@ -408,4 +408,10 @@
 /*     End of ZLAPTM */
 
 } /* zlaptm_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

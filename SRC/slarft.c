@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slarft_(char *direct, char *storev, integer *n, integer *
 	k, real *v, integer *ldv, real *tau, real *t, integer *ldt)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -13,14 +14,11 @@
     =======   
 
     SLARFT forms the triangular factor T of a real block reflector H   
-    of order n, which is defined as a product of k elementary reflectors. 
-  
+    of order n, which is defined as a product of k elementary reflectors.   
 
-    If DIRECT = 'F', H = H(1) H(2) . . . H(k) and T is upper triangular; 
-  
+    If DIRECT = 'F', H = H(1) H(2) . . . H(k) and T is upper triangular;   
 
-    If DIRECT = 'B', H = H(k) . . . H(2) H(1) and T is lower triangular. 
-  
+    If DIRECT = 'B', H = H(k) . . . H(2) H(1) and T is lower triangular.   
 
     If STOREV = 'C', the vector which defines the elementary reflector   
     H(i) is stored in the i-th column of the array V, and   
@@ -61,8 +59,7 @@
 
     LDV     (input) INTEGER   
             The leading dimension of the array V.   
-            If STOREV = 'C', LDV >= max(1,N); if STOREV = 'R', LDV >= K. 
-  
+            If STOREV = 'C', LDV >= max(1,N); if STOREV = 'R', LDV >= K.   
 
     TAU     (input) REAL array, dimension (K)   
             TAU(i) must contain the scalar factor of the elementary   
@@ -70,8 +67,7 @@
 
     T       (output) REAL array, dimension (LDT,K)   
             The k by k triangular factor T of the block reflector.   
-            If DIRECT = 'F', T is upper triangular; if DIRECT = 'B', T is 
-  
+            If DIRECT = 'F', T is upper triangular; if DIRECT = 'B', T is   
             lower triangular. The rest of the array is not used.   
 
     LDT     (input) INTEGER   
@@ -80,47 +76,34 @@
     Further Details   
     ===============   
 
-    The shape of the matrix V and the storage of the vectors which define 
-  
-    the H(i) is best illustrated by the following example with n = 5 and 
-  
+    The shape of the matrix V and the storage of the vectors which define   
+    the H(i) is best illustrated by the following example with n = 5 and   
     k = 3. The elements equal to 1 are not stored; the corresponding   
     array elements are modified but restored on exit. The rest of the   
     array is not used.   
 
-    DIRECT = 'F' and STOREV = 'C':         DIRECT = 'F' and STOREV = 'R': 
-  
+    DIRECT = 'F' and STOREV = 'C':         DIRECT = 'F' and STOREV = 'R':   
 
-                 V = (  1       )                 V = (  1 v1 v1 v1 v1 ) 
-  
-                     ( v1  1    )                     (     1 v2 v2 v2 ) 
-  
-                     ( v1 v2  1 )                     (        1 v3 v3 ) 
-  
+                 V = (  1       )                 V = (  1 v1 v1 v1 v1 )   
+                     ( v1  1    )                     (     1 v2 v2 v2 )   
+                     ( v1 v2  1 )                     (        1 v3 v3 )   
                      ( v1 v2 v3 )   
                      ( v1 v2 v3 )   
 
-    DIRECT = 'B' and STOREV = 'C':         DIRECT = 'B' and STOREV = 'R': 
-  
+    DIRECT = 'B' and STOREV = 'C':         DIRECT = 'B' and STOREV = 'R':   
 
-                 V = ( v1 v2 v3 )                 V = ( v1 v1  1       ) 
-  
-                     ( v1 v2 v3 )                     ( v2 v2 v2  1    ) 
-  
-                     (  1 v2 v3 )                     ( v3 v3 v3 v3  1 ) 
-  
+                 V = ( v1 v2 v3 )                 V = ( v1 v1  1       )   
+                     ( v1 v2 v3 )                     ( v2 v2 v2  1    )   
+                     (  1 v2 v3 )                     ( v3 v3 v3 v3  1 )   
                      (     1 v3 )   
                      (        1 )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b8 = 0.f;
@@ -129,126 +112,133 @@
     integer t_dim1, t_offset, v_dim1, v_offset, i__1, i__2, i__3;
     real r__1;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *), strmv_(char *, char *, char *, integer *, real *, 
 	    integer *, real *, integer *);
     static real vii;
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
 
 
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    --tau;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
 
-#define TAU(I) tau[(I)-1]
-
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-
+    /* Function Body */
     if (*n == 0) {
 	return 0;
     }
 
     if (lsame_(direct, "F")) {
 	i__1 = *k;
-	for (i = 1; i <= *k; ++i) {
-	    if (TAU(i) == 0.f) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (tau[i__] == 0.f) {
 
 /*              H(i)  =  I */
 
-		i__2 = i;
-		for (j = 1; j <= i; ++j) {
-		    T(j,i) = 0.f;
+		i__2 = i__;
+		for (j = 1; j <= i__2; ++j) {
+		    t_ref(j, i__) = 0.f;
 /* L10: */
 		}
 	    } else {
 
 /*              general case */
 
-		vii = V(i,i);
-		V(i,i) = 1.f;
+		vii = v_ref(i__, i__);
+		v_ref(i__, i__) = 1.f;
 		if (lsame_(storev, "C")) {
 
-/*                 T(1:i-1,i) := - tau(i) * V(i:n,1:i-1)' 
-* V(i:n,i) */
+/*                 T(1:i-1,i) := - tau(i) * V(i:n,1:i-1)' * V(i:n,i) */
 
-		    i__2 = *n - i + 1;
-		    i__3 = i - 1;
-		    r__1 = -(doublereal)TAU(i);
-		    sgemv_("Transpose", &i__2, &i__3, &r__1, &V(i,1), 
-			    ldv, &V(i,i), &c__1, &c_b8, &T(1,i), &c__1);
+		    i__2 = *n - i__ + 1;
+		    i__3 = i__ - 1;
+		    r__1 = -tau[i__];
+		    sgemv_("Transpose", &i__2, &i__3, &r__1, &v_ref(i__, 1), 
+			    ldv, &v_ref(i__, i__), &c__1, &c_b8, &t_ref(1, 
+			    i__), &c__1);
 		} else {
 
-/*                 T(1:i-1,i) := - tau(i) * V(1:i-1,i:n) *
- V(i,i:n)' */
+/*                 T(1:i-1,i) := - tau(i) * V(1:i-1,i:n) * V(i,i:n)' */
 
-		    i__2 = i - 1;
-		    i__3 = *n - i + 1;
-		    r__1 = -(doublereal)TAU(i);
-		    sgemv_("No transpose", &i__2, &i__3, &r__1, &V(1,i), ldv, &V(i,i), ldv, &c_b8, &T(1,i), &c__1);
+		    i__2 = i__ - 1;
+		    i__3 = *n - i__ + 1;
+		    r__1 = -tau[i__];
+		    sgemv_("No transpose", &i__2, &i__3, &r__1, &v_ref(1, i__)
+			    , ldv, &v_ref(i__, i__), ldv, &c_b8, &t_ref(1, 
+			    i__), &c__1);
 		}
-		V(i,i) = vii;
+		v_ref(i__, i__) = vii;
 
 /*              T(1:i-1,i) := T(1:i-1,1:i-1) * T(1:i-1,i) */
 
-		i__2 = i - 1;
-		strmv_("Upper", "No transpose", "Non-unit", &i__2, &T(1,1), ldt, &T(1,i), &c__1);
-		T(i,i) = TAU(i);
+		i__2 = i__ - 1;
+		strmv_("Upper", "No transpose", "Non-unit", &i__2, &t[
+			t_offset], ldt, &t_ref(1, i__), &c__1);
+		t_ref(i__, i__) = tau[i__];
 	    }
 /* L20: */
 	}
     } else {
-	for (i = *k; i >= 1; --i) {
-	    if (TAU(i) == 0.f) {
+	for (i__ = *k; i__ >= 1; --i__) {
+	    if (tau[i__] == 0.f) {
 
 /*              H(i)  =  I */
 
 		i__1 = *k;
-		for (j = i; j <= *k; ++j) {
-		    T(j,i) = 0.f;
+		for (j = i__; j <= i__1; ++j) {
+		    t_ref(j, i__) = 0.f;
 /* L30: */
 		}
 	    } else {
 
 /*              general case */
 
-		if (i < *k) {
+		if (i__ < *k) {
 		    if (lsame_(storev, "C")) {
-			vii = V(*n-*k+i,i);
-			V(*n-*k+i,i) = 1.f;
+			vii = v_ref(*n - *k + i__, i__);
+			v_ref(*n - *k + i__, i__) = 1.f;
 
 /*                    T(i+1:k,i) :=   
-                              - tau(i) * V(1:n-k+i,i+1
-:k)' * V(1:n-k+i,i) */
+                              - tau(i) * V(1:n-k+i,i+1:k)' * V(1:n-k+i,i) */
 
-			i__1 = *n - *k + i;
-			i__2 = *k - i;
-			r__1 = -(doublereal)TAU(i);
-			sgemv_("Transpose", &i__1, &i__2, &r__1, &V(1,i+1), ldv, &V(1,i), &c__1, &
-				c_b8, &T(i+1,i), &c__1);
-			V(*n-*k+i,i) = vii;
+			i__1 = *n - *k + i__;
+			i__2 = *k - i__;
+			r__1 = -tau[i__];
+			sgemv_("Transpose", &i__1, &i__2, &r__1, &v_ref(1, 
+				i__ + 1), ldv, &v_ref(1, i__), &c__1, &c_b8, &
+				t_ref(i__ + 1, i__), &c__1);
+			v_ref(*n - *k + i__, i__) = vii;
 		    } else {
-			vii = V(i,*n-*k+i);
-			V(i,*n-*k+i) = 1.f;
+			vii = v_ref(i__, *n - *k + i__);
+			v_ref(i__, *n - *k + i__) = 1.f;
 
 /*                    T(i+1:k,i) :=   
-                              - tau(i) * V(i+1:k,1:n-k
-+i) * V(i,1:n-k+i)' */
+                              - tau(i) * V(i+1:k,1:n-k+i) * V(i,1:n-k+i)' */
 
-			i__1 = *k - i;
-			i__2 = *n - *k + i;
-			r__1 = -(doublereal)TAU(i);
-			sgemv_("No transpose", &i__1, &i__2, &r__1, &V(i+1,1), ldv, &V(i,1), ldv, &c_b8, &
-				T(i+1,i), &c__1);
-			V(i,*n-*k+i) = vii;
+			i__1 = *k - i__;
+			i__2 = *n - *k + i__;
+			r__1 = -tau[i__];
+			sgemv_("No transpose", &i__1, &i__2, &r__1, &v_ref(
+				i__ + 1, 1), ldv, &v_ref(i__, 1), ldv, &c_b8, 
+				&t_ref(i__ + 1, i__), &c__1);
+			v_ref(i__, *n - *k + i__) = vii;
 		    }
 
-/*                 T(i+1:k,i) := T(i+1:k,i+1:k) * T(i+1:k,
-i) */
+/*                 T(i+1:k,i) := T(i+1:k,i+1:k) * T(i+1:k,i) */
 
-		    i__1 = *k - i;
-		    strmv_("Lower", "No transpose", "Non-unit", &i__1, &T(i+1,i+1), ldt, &T(i+1,i)
-			    , &c__1);
+		    i__1 = *k - i__;
+		    strmv_("Lower", "No transpose", "Non-unit", &i__1, &t_ref(
+			    i__ + 1, i__ + 1), ldt, &t_ref(i__ + 1, i__), &
+			    c__1);
 		}
-		T(i,i) = TAU(i);
+		t_ref(i__, i__) = tau[i__];
 	    }
 /* L40: */
 	}
@@ -258,4 +248,8 @@ i) */
 /*     End of SLARFT */
 
 } /* slarft_ */
+
+#undef v_ref
+#undef t_ref
+
 

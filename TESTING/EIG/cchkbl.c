@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,21 +19,21 @@ static integer c__20 = 20;
     /* Format strings */
     static char fmt_9999[] = "(1x,\002.. test output of CGEBAL .. \002)";
     static char fmt_9998[] = "(1x,\002value of largest test error           "
-	    "  = \002,e12.3)";
+	    " = \002,e12.3)";
     static char fmt_9997[] = "(1x,\002example number where info is not zero "
-	    "  = \002,i4)";
+	    " = \002,i4)";
     static char fmt_9996[] = "(1x,\002example number where ILO or IHI wrong "
-	    "  = \002,i4)";
+	    " = \002,i4)";
     static char fmt_9995[] = "(1x,\002example number having largest error   "
-	    "  = \002,i4)";
+	    " = \002,i4)";
     static char fmt_9994[] = "(1x,\002number of examples where info is not 0"
-	    "  = \002,i4)";
+	    " = \002,i4)";
     static char fmt_9993[] = "(1x,\002total number of examples tested       "
-	    "  = \002,i4)";
+	    " = \002,i4)";
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
-    real r__1, r__2, r__3, r__4;
+    real r__1, r__2, r__3, r__4, r__5, r__6;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -43,12 +44,12 @@ static integer c__20 = 20;
 
     /* Local variables */
     static integer info, lmax[3];
-    static real rmax, vmax;
+    static real meps, temp, rmax, vmax;
     static complex a[400]	/* was [20][20] */;
-    static integer i, j, n;
+    static integer i__, j, n;
     static real scale[20];
     static integer ihiin, ninfo, iloin;
-    static real anorm, dummy[1];
+    static real anorm, sfmin, dummy[1];
     extern /* Subroutine */ int cgebal_(char *, integer *, complex *, integer 
 	    *, integer *, integer *, real *, integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
@@ -58,25 +59,31 @@ static integer c__20 = 20;
     static integer ihi, ilo, knt;
 
     /* Fortran I/O blocks */
-    static cilist io___5 = { 0, 0, 0, 0, 0 };
     static cilist io___8 = { 0, 0, 0, 0, 0 };
     static cilist io___11 = { 0, 0, 0, 0, 0 };
     static cilist io___14 = { 0, 0, 0, 0, 0 };
-    static cilist io___16 = { 0, 0, 0, 0, 0 };
-    static cilist io___25 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___26 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___27 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___28 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___29 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___30 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___31 = { 0, 0, 0, fmt_9993, 0 };
+    static cilist io___17 = { 0, 0, 0, 0, 0 };
+    static cilist io___19 = { 0, 0, 0, 0, 0 };
+    static cilist io___28 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___29 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___30 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___31 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___32 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___33 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___34 = { 0, 0, 0, fmt_9993, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define ain_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define ain_ref(a_1,a_2) ain[ain_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -94,8 +101,7 @@ static integer c__20 = 20;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-   ====================================================================== 
-*/
+   ====================================================================== */
 
 
     lmax[0] = 0;
@@ -104,51 +110,54 @@ static integer c__20 = 20;
     ninfo = 0;
     knt = 0;
     rmax = 0.f;
+    vmax = 0.f;
+    sfmin = slamch_("S");
+    meps = slamch_("E");
 
 L10:
 
-    io___5.ciunit = *nin;
-    s_rsle(&io___5);
+    io___8.ciunit = *nin;
+    s_rsle(&io___8);
     do_lio(&c__3, &c__1, (char *)&n, (ftnlen)sizeof(integer));
     e_rsle();
     if (n == 0) {
 	goto L70;
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	io___8.ciunit = *nin;
-	s_rsle(&io___8);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	io___11.ciunit = *nin;
+	s_rsle(&io___11);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&a[i + j * 20 - 21], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
 /* L20: */
     }
 
-    io___11.ciunit = *nin;
-    s_rsle(&io___11);
+    io___14.ciunit = *nin;
+    s_rsle(&io___14);
     do_lio(&c__3, &c__1, (char *)&iloin, (ftnlen)sizeof(integer));
     do_lio(&c__3, &c__1, (char *)&ihiin, (ftnlen)sizeof(integer));
     e_rsle();
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	io___14.ciunit = *nin;
-	s_rsle(&io___14);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	io___17.ciunit = *nin;
+	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&ain[i + j * 20 - 21], (ftnlen)
-		    sizeof(complex));
+	    do_lio(&c__6, &c__1, (char *)&ain_ref(i__, j), (ftnlen)sizeof(
+		    complex));
 	}
 	e_rsle();
 /* L30: */
     }
-    io___16.ciunit = *nin;
-    s_rsle(&io___16);
+    io___19.ciunit = *nin;
+    s_rsle(&io___19);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__4, &c__1, (char *)&scalin[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__4, &c__1, (char *)&scalin[i__ - 1], (ftnlen)sizeof(real));
     }
     e_rsle();
 
@@ -166,19 +175,26 @@ L10:
 	lmax[1] = knt;
     }
 
-    vmax = 0.f;
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = i + j * 20 - 21;
-	    i__4 = i + j * 20 - 21;
+/* Computing MAX */
+	    i__3 = a_subscr(i__, j);
+	    i__4 = ain_subscr(i__, j);
+	    r__5 = (r__1 = a[i__3].r, dabs(r__1)) + (r__2 = r_imag(&a_ref(i__,
+		     j)), dabs(r__2)), r__6 = (r__3 = ain[i__4].r, dabs(r__3))
+		     + (r__4 = r_imag(&ain_ref(i__, j)), dabs(r__4));
+	    temp = dmax(r__5,r__6);
+	    temp = dmax(temp,sfmin);
+	    i__3 = a_subscr(i__, j);
+	    i__4 = ain_subscr(i__, j);
 	    q__2.r = a[i__3].r - ain[i__4].r, q__2.i = a[i__3].i - ain[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 /* Computing MAX */
-	    r__3 = vmax, r__4 = (r__1 = q__1.r, dabs(r__1)) + (r__2 = r_imag(&
-		    q__1), dabs(r__2));
+	    r__3 = vmax, r__4 = ((r__1 = q__1.r, dabs(r__1)) + (r__2 = r_imag(
+		    &q__1), dabs(r__2))) / temp;
 	    vmax = dmax(r__3,r__4);
 /* L40: */
 	}
@@ -186,14 +202,17 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	r__2 = vmax, r__3 = (r__1 = scale[i - 1] - scalin[i - 1], dabs(r__1));
+	r__1 = scale[i__ - 1], r__2 = scalin[i__ - 1];
+	temp = dmax(r__1,r__2);
+	temp = dmax(temp,sfmin);
+/* Computing MAX */
+	r__2 = vmax, r__3 = (r__1 = scale[i__ - 1] - scalin[i__ - 1], dabs(
+		r__1)) / temp;
 	vmax = dmax(r__2,r__3);
 /* L60: */
     }
-
-    vmax = vmax / anorm / slamch_("E");
 
     if (vmax > rmax) {
 	lmax[2] = knt;
@@ -204,32 +223,32 @@ L10:
 
 L70:
 
-    io___25.ciunit = *nout;
-    s_wsfe(&io___25);
-    e_wsfe();
-
-    io___26.ciunit = *nout;
-    s_wsfe(&io___26);
-    do_fio(&c__1, (char *)&rmax, (ftnlen)sizeof(real));
-    e_wsfe();
-    io___27.ciunit = *nout;
-    s_wsfe(&io___27);
-    do_fio(&c__1, (char *)&lmax[0], (ftnlen)sizeof(integer));
-    e_wsfe();
     io___28.ciunit = *nout;
     s_wsfe(&io___28);
-    do_fio(&c__1, (char *)&lmax[1], (ftnlen)sizeof(integer));
     e_wsfe();
+
     io___29.ciunit = *nout;
     s_wsfe(&io___29);
-    do_fio(&c__1, (char *)&lmax[2], (ftnlen)sizeof(integer));
+    do_fio(&c__1, (char *)&rmax, (ftnlen)sizeof(real));
     e_wsfe();
     io___30.ciunit = *nout;
     s_wsfe(&io___30);
-    do_fio(&c__1, (char *)&ninfo, (ftnlen)sizeof(integer));
+    do_fio(&c__1, (char *)&lmax[0], (ftnlen)sizeof(integer));
     e_wsfe();
     io___31.ciunit = *nout;
     s_wsfe(&io___31);
+    do_fio(&c__1, (char *)&lmax[1], (ftnlen)sizeof(integer));
+    e_wsfe();
+    io___32.ciunit = *nout;
+    s_wsfe(&io___32);
+    do_fio(&c__1, (char *)&lmax[2], (ftnlen)sizeof(integer));
+    e_wsfe();
+    io___33.ciunit = *nout;
+    s_wsfe(&io___33);
+    do_fio(&c__1, (char *)&ninfo, (ftnlen)sizeof(integer));
+    e_wsfe();
+    io___34.ciunit = *nout;
+    s_wsfe(&io___34);
     do_fio(&c__1, (char *)&knt, (ftnlen)sizeof(integer));
     e_wsfe();
 
@@ -238,4 +257,10 @@ L70:
 /*     End of CCHKBL */
 
 } /* cchkbl_ */
+
+#undef ain_ref
+#undef ain_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -47,7 +48,11 @@ static doublereal c_b30 = -1.;
     static doublereal errnrm, ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define wmat_ref(a_1,a_2) wmat[(a_2)*2 + a_1 - 3]
+#define e_ref(a_1,a_2) e[(a_2)*e_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -69,8 +74,7 @@ static doublereal c_b30 = -1.;
 
     where E(j) is the j-th eigenvector, and m-norm is the max-norm of a   
     vector.  If an eigenvector is complex, as determined from WI(j)   
-    nonzero, then the max-norm of the vector ( er + i*ei ) is the maximum 
-  
+    nonzero, then the max-norm of the vector ( er + i*ei ) is the maximum   
     of   
        |er(1)| + |ei(1)|, ... , |er(n)| + |ei(n)|   
 
@@ -86,8 +90,7 @@ static doublereal c_b30 = -1.;
     Such a block multiplying an n by 2 matrix ( ur ui ) on the right   
     will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
 
-    To handle various schemes for storage of left eigenvectors, there are 
-  
+    To handle various schemes for storage of left eigenvectors, there are   
     options to use A-transpose instead of A, E-transpose instead of E,   
     and/or W-transpose instead of W.   
 
@@ -122,8 +125,7 @@ static doublereal c_b30 = -1.;
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     E       (input) DOUBLE PRECISION array, dimension (LDE,N)   
-            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors 
-  
+            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors   
             are stored in the columns of E, if TRANSE = 'T' or 'C', the   
             eigenvectors are stored in the rows of E.   
 
@@ -145,18 +147,17 @@ static doublereal c_b30 = -1.;
             RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
             RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize RESULT (in case N=0)   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     e_dim1 = *lde;
-    e_offset = e_dim1 + 1;
+    e_offset = 1 + e_dim1 * 1;
     e -= e_offset;
     --wr;
     --wi;
@@ -209,9 +210,8 @@ static doublereal c_b30 = -1.;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    d__3 = temp1, d__4 = (d__1 = e[j + jvec * e_dim1], abs(
-			    d__1)) + (d__2 = e[j + (jvec + 1) * e_dim1], abs(
-			    d__2));
+		    d__3 = temp1, d__4 = (d__1 = e_ref(j, jvec), abs(d__1)) + 
+			    (d__2 = e_ref(j, jvec + 1), abs(d__2));
 		    temp1 = max(d__3,d__4);
 /* L10: */
 		}
@@ -227,8 +227,7 @@ static doublereal c_b30 = -1.;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    d__2 = temp1, d__3 = (d__1 = e[j + jvec * e_dim1], abs(
-			    d__1));
+		    d__2 = temp1, d__3 = (d__1 = e_ref(j, jvec), abs(d__1));
 		    temp1 = max(d__2,d__3);
 /* L20: */
 		}
@@ -259,17 +258,16 @@ static doublereal c_b30 = -1.;
 		}
 		if (ipair == 1) {
 /* Computing MAX */
-		    d__3 = work[jvec], d__4 = (d__1 = e[j + jvec * e_dim1], 
-			    abs(d__1)) + (d__2 = e[j + (jvec + 1) * e_dim1], 
-			    abs(d__2));
+		    d__3 = work[jvec], d__4 = (d__1 = e_ref(j, jvec), abs(
+			    d__1)) + (d__2 = e_ref(j, jvec + 1), abs(d__2));
 		    work[jvec] = max(d__3,d__4);
 		    work[jvec + 1] = work[jvec];
 		} else if (ipair == 2) {
 		    ipair = 0;
 		} else {
 /* Computing MAX */
-		    d__2 = work[jvec], d__3 = (d__1 = e[j + jvec * e_dim1], 
-			    abs(d__1));
+		    d__2 = work[jvec], d__3 = (d__1 = e_ref(j, jvec), abs(
+			    d__1));
 		    work[jvec] = max(d__2,d__3);
 		    ipair = 0;
 		}
@@ -325,21 +323,21 @@ static doublereal c_b30 = -1.;
 	}
 
 	if (ipair == 1) {
-	    wmat[0] = wr[jcol];
-	    wmat[1] = -wi[jcol];
-	    wmat[2] = wi[jcol];
-	    wmat[3] = wr[jcol];
-	    dgemm_(transe, transw, n, &c__2, &c__2, &c_b25, &e[ierow + iecol *
-		     e_dim1], lde, wmat, &c__2, &c_b20, &work[*n * (jcol - 1) 
-		    + 1], n);
+	    wmat_ref(1, 1) = wr[jcol];
+	    wmat_ref(2, 1) = -wi[jcol];
+	    wmat_ref(1, 2) = wi[jcol];
+	    wmat_ref(2, 2) = wr[jcol];
+	    dgemm_(transe, transw, n, &c__2, &c__2, &c_b25, &e_ref(ierow, 
+		    iecol), lde, wmat, &c__2, &c_b20, &work[*n * (jcol - 1) + 
+		    1], n);
 	    ipair = 2;
 	} else if (ipair == 2) {
 	    ipair = 0;
 
 	} else {
 
-	    daxpy_(n, &wr[jcol], &e[ierow + iecol * e_dim1], &ince, &work[*n *
-		     (jcol - 1) + 1], &c__1);
+	    daxpy_(n, &wr[jcol], &e_ref(ierow, iecol), &ince, &work[*n * (
+		    jcol - 1) + 1], &c__1);
 	    ipair = 0;
 	}
 
@@ -349,8 +347,8 @@ static doublereal c_b30 = -1.;
     dgemm_(transa, transe, n, n, n, &c_b25, &a[a_offset], lda, &e[e_offset], 
 	    lde, &c_b30, &work[1], n);
 
-    errnrm = dlange_("One", n, n, &work[1], n, &work[*n * *n + 1]) / 
-	    enorm;
+    errnrm = dlange_("One", n, n, &work[1], n, &work[*n * *n + 1]) 
+	    / enorm;
 
 /*     Compute RESULT(1) (avoiding under/overflow) */
 
@@ -378,4 +376,8 @@ static doublereal c_b30 = -1.;
 /*     End of DGET22 */
 
 } /* dget22_ */
+
+#undef e_ref
+#undef wmat_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,8 +17,8 @@ static integer c__1 = 1;
 
 /* Subroutine */ int dchkhs_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, doublereal *thresh, integer *nounit, 
-	doublereal *a, integer *lda, doublereal *h, doublereal *t1, 
-	doublereal *t2, doublereal *u, integer *ldu, doublereal *z, 
+	doublereal *a, integer *lda, doublereal *h__, doublereal *t1, 
+	doublereal *t2, doublereal *u, integer *ldu, doublereal *z__, 
 	doublereal *uz, doublereal *wr1, doublereal *wi1, doublereal *wr3, 
 	doublereal *wi3, doublereal *evectl, doublereal *evectr, doublereal *
 	evecty, doublereal *evectx, doublereal *uu, doublereal *tau, 
@@ -39,6 +40,10 @@ static integer c__1 = 1;
 	    " \002,a,\002 incorrectly \002,\002normalized.\002,/\002 Bits of "
 	    "error=\002,0p,g10.3,\002,\002,9x,\002N=\002,i6,\002, JTYPE=\002,"
 	    "i6,\002, ISEED=(\002,3(i5,\002,\002),i5,\002)\002)";
+    static char fmt_9997[] = "(\002 DCHKHS: Selected \002,a,\002 Eigenvector"
+	    "s from \002,a,\002 do not match other eigenvectors \002,9x,\002N="
+	    "\002,i6,\002, JTYPE=\002,i6,\002, ISEED=(\002,3(i5,\002,\002),i5,"
+	    "\002)\002)";
 
     /* System generated locals */
     integer a_dim1, a_offset, evectl_dim1, evectl_offset, evectr_dim1, 
@@ -56,7 +61,7 @@ static integer c__1 = 1;
     static doublereal cond;
     static integer jcol, nmax;
     static doublereal unfl, ovfl, temp1, temp2;
-    static integer i, j, n;
+    static integer i__, j, k, n;
     static logical badnn;
     extern /* Subroutine */ int dget10_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *), 
@@ -66,19 +71,21 @@ static integer c__1 = 1;
 	    integer *, integer *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *);
+    static logical match;
     static integer imode;
     static doublereal dumma[6];
-    static integer iinfo;
+    static integer iinfo, nselc;
+    static doublereal conds;
     extern /* Subroutine */ int dhst01_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal conds, aninv, anorm;
+    static doublereal aninv, anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer nmats, jsize, nerrs, itype, jtype, ntest, n1;
+    static integer nmats, nselr, jsize, nerrs, itype, jtype, ntest, n1;
     static doublereal rtulp;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer in;
+    static integer jj, in;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int dgehrd_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
@@ -132,23 +139,35 @@ static integer c__1 = 1;
     static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___48 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___49 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___50 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___51 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___52 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___53 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___54 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___55 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___56 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___61 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___63 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___64 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___65 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___66 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define uu_ref(a_1,a_2) uu[(a_2)*uu_dim1 + a_1]
+#define evectl_ref(a_1,a_2) evectl[(a_2)*evectl_dim1 + a_1]
+#define evectr_ref(a_1,a_2) evectr[(a_2)*evectr_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
 
     Purpose   
@@ -290,8 +309,7 @@ static integer c__1 = 1;
 
     NTYPES - INTEGER   
              The number of elements in DOTYPE.   If it is zero, DCHKHS   
-             does nothing.  It must be at least zero.  If it is MAXTYP+1 
-  
+             does nothing.  It must be at least zero.  If it is MAXTYP+1   
              and NSIZES is 1, then an additional type, MAXTYP+1 is   
              defined, which is to use whatever matrix is in A.  This   
              is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
@@ -310,14 +328,12 @@ static integer c__1 = 1;
 
     ISEED  - INTEGER array, dimension (4)   
              On entry ISEED specifies the seed of the random number   
-             generator. The array elements should be between 0 and 4095; 
-  
+             generator. The array elements should be between 0 and 4095;   
              if not they will be reduced mod 4096.  Also, ISEED(4) must   
              be odd.  The random number generator uses a linear   
              congruential sequence limited to small integers, and so   
              should produce machine independent random numbers. The   
-             values of ISEED are changed on exit, and can be used in the 
-  
+             values of ISEED are changed on exit, and can be used in the   
              next call to DCHKHS to continue the same random number   
              sequence.   
              Modified.   
@@ -359,8 +375,7 @@ static integer c__1 = 1;
              Modified.   
 
     T2     - DOUBLE PRECISION array, dimension (LDA,max(NN))   
-             The Schur matrix computed by DHSEQR when Z is not computed. 
-  
+             The Schur matrix computed by DHSEQR when Z is not computed.   
              This should be identical to T1.   
              Modified.   
 
@@ -385,16 +400,14 @@ static integer c__1 = 1;
     WI1    - DOUBLE PRECISION array, dimension (max(NN))   
              The real and imaginary parts of the eigenvalues of A,   
              as computed when Z is computed.   
-             On exit, WR1 + WI1*i are the eigenvalues of the matrix in A. 
-  
+             On exit, WR1 + WI1*i are the eigenvalues of the matrix in A.   
              Modified.   
 
     WR3    - DOUBLE PRECISION array, dimension (max(NN))   
     WI3    - DOUBLE PRECISION array, dimension (max(NN))   
              Like WR1, WI1, these arrays contain the eigenvalues of A,   
              but those computed when DHSEQR only computes the   
-             eigenvalues, i.e., not the Schur vectors and no more of the 
-  
+             eigenvalues, i.e., not the Schur vectors and no more of the   
              Schur form than is necessary for computing the   
              eigenvalues.   
              Modified.   
@@ -408,8 +421,7 @@ static integer c__1 = 1;
     EVEZTR - DOUBLE PRECISION array, dimension (LDU,max(NN))   
              The (upper triangular) right eigenvector matrix for the   
              matrix in T1.  For complex conjugate pairs, the real part   
-             is stored in one column and the imaginary part in the next. 
-  
+             is stored in one column and the imaginary part in the next.   
              Modified.   
 
     EVECTY - DOUBLE PRECISION array, dimension (LDU,max(NN))   
@@ -421,8 +433,7 @@ static integer c__1 = 1;
     EVECTX - DOUBLE PRECISION array, dimension (LDU,max(NN))   
              The right eigenvector matrix for the   
              matrix in H.  For complex conjugate pairs, the real part   
-             is stored in one column and the imaginary part in the next. 
-  
+             is stored in one column and the imaginary part in the next.   
              Modified.   
 
     UU     - DOUBLE PRECISION array, dimension (LDU,max(NN))   
@@ -430,8 +441,7 @@ static integer c__1 = 1;
              Modified.   
 
     TAU    - DOUBLE PRECISION array, dimension(max(NN))   
-             Further details of the orthogonal matrix computed by DGEHRD. 
-  
+             Further details of the orthogonal matrix computed by DGEHRD.   
              Modified.   
 
     WORK   - DOUBLE PRECISION array, dimension (NWORK)   
@@ -439,8 +449,7 @@ static integer c__1 = 1;
              Modified.   
 
     NWORK  - INTEGER   
-             The number of entries in WORK.  NWORK >= 4*NN(j)*NN(j) + 2. 
-  
+             The number of entries in WORK.  NWORK >= 4*NN(j)*NN(j) + 2.   
 
     IWORK  - INTEGER array, dimension (max(NN))   
              Workspace.   
@@ -473,8 +482,7 @@ static integer c__1 = 1;
                  eigenvalue or to decompose the problem.   
              Modified.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -512,48 +520,47 @@ static integer c__1 = 1;
        KCONDS(j)       Selects whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     t2_dim1 = *lda;
-    t2_offset = t2_dim1 + 1;
+    t2_offset = 1 + t2_dim1 * 1;
     t2 -= t2_offset;
     t1_dim1 = *lda;
-    t1_offset = t1_dim1 + 1;
+    t1_offset = 1 + t1_dim1 * 1;
     t1 -= t1_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     uu_dim1 = *ldu;
-    uu_offset = uu_dim1 + 1;
+    uu_offset = 1 + uu_dim1 * 1;
     uu -= uu_offset;
     evectx_dim1 = *ldu;
-    evectx_offset = evectx_dim1 + 1;
+    evectx_offset = 1 + evectx_dim1 * 1;
     evectx -= evectx_offset;
     evecty_dim1 = *ldu;
-    evecty_offset = evecty_dim1 + 1;
+    evecty_offset = 1 + evecty_dim1 * 1;
     evecty -= evecty_offset;
     evectr_dim1 = *ldu;
-    evectr_offset = evectr_dim1 + 1;
+    evectr_offset = 1 + evectr_dim1 * 1;
     evectr -= evectr_offset;
     evectl_dim1 = *ldu;
-    evectl_offset = evectl_dim1 + 1;
+    evectl_offset = 1 + evectl_dim1 * 1;
     evectl -= evectl_offset;
     uz_dim1 = *ldu;
-    uz_offset = uz_dim1 + 1;
+    uz_offset = 1 + uz_dim1 * 1;
     uz -= uz_offset;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --wr1;
     --wi1;
@@ -635,6 +642,9 @@ static integer c__1 = 1;
     i__1 = *nsizes;
     for (jsize = 1; jsize <= i__1; ++jsize) {
 	n = nn[jsize];
+	if (n == 0) {
+	    goto L270;
+	}
 	n1 = max(1,n);
 	aninv = 1. / (doublereal) n1;
 
@@ -647,7 +657,7 @@ static integer c__1 = 1;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L190;
+		goto L260;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -674,12 +684,9 @@ static integer c__1 = 1;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -732,7 +739,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L80: */
 		}
 
@@ -742,9 +749,9 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 		    if (jcol > 1) {
-			a[jcol + (jcol - 1) * a_dim1] = 1.;
+			a_ref(jcol, jcol - 1) = 1.;
 		    }
 /* L90: */
 		}
@@ -831,7 +838,7 @@ L70:
 	    if (iinfo != 0) {
 		io___36.ciunit = *nounit;
 		s_wsfe(&io___36);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -845,7 +852,7 @@ L100:
 
 /*           Call DGEHRD to compute H and U, do tests. */
 
-	    dlacpy_(" ", &n, &n, &a[a_offset], lda, &h[h_offset], lda);
+	    dlacpy_(" ", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
 
 	    ntest = 1;
 
@@ -853,31 +860,31 @@ L100:
 	    ihi = n;
 
 	    i__3 = *nwork - n;
-	    dgehrd_(&n, &ilo, &ihi, &h[h_offset], lda, &work[1], &work[n + 1],
-		     &i__3, &iinfo);
+	    dgehrd_(&n, &ilo, &ihi, &h__[h_offset], lda, &work[1], &work[n + 
+		    1], &i__3, &iinfo);
 
 	    if (iinfo != 0) {
 		result[1] = ulpinv;
 		io___39.ciunit = *nounit;
 		s_wsfe(&io___39);
-		do_fio(&c__1, "DGEHRD", 6L);
+		do_fio(&c__1, "DGEHRD", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L250;
 	    }
 
 	    i__3 = n - 1;
 	    for (j = 1; j <= i__3; ++j) {
-		uu[j + 1 + j * uu_dim1] = 0.;
+		uu_ref(j + 1, j) = 0.;
 		i__4 = n;
-		for (i = j + 2; i <= i__4; ++i) {
-		    u[i + j * u_dim1] = h[i + j * h_dim1];
-		    uu[i + j * uu_dim1] = h[i + j * h_dim1];
-		    h[i + j * h_dim1] = 0.;
+		for (i__ = j + 2; i__ <= i__4; ++i__) {
+		    u_ref(i__, j) = h___ref(i__, j);
+		    uu_ref(i__, j) = h___ref(i__, j);
+		    h___ref(i__, j) = 0.;
 /* L110: */
 		}
 /* L120: */
@@ -888,14 +895,14 @@ L100:
 		     &i__3, &iinfo);
 	    ntest = 2;
 
-	    dhst01_(&n, &ilo, &ihi, &a[a_offset], lda, &h[h_offset], lda, &u[
-		    u_offset], ldu, &work[1], nwork, &result[1]);
+	    dhst01_(&n, &ilo, &ihi, &a[a_offset], lda, &h__[h_offset], lda, &
+		    u[u_offset], ldu, &work[1], nwork, &result[1]);
 
 /*           Call DHSEQR to compute T1, T2 and Z, do tests.   
 
              Eigenvalues only (WR3,WI3) */
 
-	    dlacpy_(" ", &n, &n, &h[h_offset], lda, &t2[t2_offset], lda);
+	    dlacpy_(" ", &n, &n, &h__[h_offset], lda, &t2[t2_offset], lda);
 	    ntest = 3;
 	    result[3] = ulpinv;
 
@@ -904,7 +911,7 @@ L100:
 	    if (iinfo != 0) {
 		io___41.ciunit = *nounit;
 		s_wsfe(&io___41);
-		do_fio(&c__1, "DHSEQR(E)", 9L);
+		do_fio(&c__1, "DHSEQR(E)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -912,34 +919,33 @@ L100:
 		e_wsfe();
 		if (iinfo <= n + 2) {
 		    *info = abs(iinfo);
-		    goto L180;
+		    goto L250;
 		}
 	    }
 
 /*           Eigenvalues (WR1,WI1) and Full Schur Form (T2) */
 
-	    dlacpy_(" ", &n, &n, &h[h_offset], lda, &t2[t2_offset], lda);
+	    dlacpy_(" ", &n, &n, &h__[h_offset], lda, &t2[t2_offset], lda);
 
 	    dhseqr_("S", "N", &n, &ilo, &ihi, &t2[t2_offset], lda, &wr1[1], &
 		    wi1[1], &uz[uz_offset], ldu, &work[1], nwork, &iinfo);
 	    if (iinfo != 0 && iinfo <= n + 2) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "DHSEQR(S)", 9L);
+		do_fio(&c__1, "DHSEQR(S)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L250;
 	    }
 
-/*           Eigenvalues (WR1,WI1), Schur Form (T1), and Schur vec
-tors   
+/*           Eigenvalues (WR1,WI1), Schur Form (T1), and Schur vectors   
              (UZ) */
 
-	    dlacpy_(" ", &n, &n, &h[h_offset], lda, &t1[t1_offset], lda);
+	    dlacpy_(" ", &n, &n, &h__[h_offset], lda, &t1[t1_offset], lda);
 	    dlacpy_(" ", &n, &n, &u[u_offset], ldu, &uz[uz_offset], lda);
 
 	    dhseqr_("S", "V", &n, &ilo, &ihi, &t1[t1_offset], lda, &wr1[1], &
@@ -947,27 +953,27 @@ tors
 	    if (iinfo != 0 && iinfo <= n + 2) {
 		io___43.ciunit = *nounit;
 		s_wsfe(&io___43);
-		do_fio(&c__1, "DHSEQR(V)", 9L);
+		do_fio(&c__1, "DHSEQR(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L250;
 	    }
 
 /*           Compute Z = U' UZ */
 
 	    dgemm_("T", "N", &n, &n, &n, &c_b32, &u[u_offset], ldu, &uz[
-		    uz_offset], ldu, &c_b18, &z[z_offset], ldu);
+		    uz_offset], ldu, &c_b18, &z__[z_offset], ldu);
 	    ntest = 8;
 
 /*           Do Tests 3: | H - Z T Z' | / ( |H| n ulp )   
                   and 4: | I - Z Z' | / ( n ulp ) */
 
-	    dhst01_(&n, &ilo, &ihi, &h[h_offset], lda, &t1[t1_offset], lda, &
-		    z[z_offset], ldu, &work[1], nwork, &result[3]);
+	    dhst01_(&n, &ilo, &ihi, &h__[h_offset], lda, &t1[t1_offset], lda, 
+		    &z__[z_offset], ldu, &work[1], nwork, &result[3]);
 
 /*           Do Tests 5: | A - UZ T (UZ)' | / ( |A| n ulp )   
                   and 6: | I - UZ (UZ)' | / ( n ulp ) */
@@ -1008,25 +1014,54 @@ tors
 
 	    ntest = 9;
 	    result[9] = ulpinv;
-	    i__3 = n;
-	    for (j = 1; j <= i__3; ++j) {
-		select[j] = TRUE_;
-/* L140: */
+
+/*           Select last max(N/4,1) real, max(N/4,1) complex eigenvectors */
+
+	    nselc = 0;
+	    nselr = 0;
+	    j = n;
+L140:
+	    if (wi1[j] == 0.) {
+/* Computing MAX */
+		i__3 = n / 4;
+		if (nselr < max(i__3,1)) {
+		    ++nselr;
+		    select[j] = TRUE_;
+		} else {
+		    select[j] = FALSE_;
+		}
+		--j;
+	    } else {
+/* Computing MAX */
+		i__3 = n / 4;
+		if (nselc < max(i__3,1)) {
+		    ++nselc;
+		    select[j] = TRUE_;
+		    select[j - 1] = FALSE_;
+		} else {
+		    select[j] = FALSE_;
+		    select[j - 1] = FALSE_;
+		}
+		j += -2;
 	    }
+	    if (j > 0) {
+		goto L140;
+	    }
+
 	    dtrevc_("Right", "All", &select[1], &n, &t1[t1_offset], lda, 
 		    dumma, ldu, &evectr[evectr_offset], ldu, &n, &in, &work[1]
 		    , &iinfo);
 	    if (iinfo != 0) {
-		io___48.ciunit = *nounit;
-		s_wsfe(&io___48);
-		do_fio(&c__1, "DTREVC(R)", 9L);
+		io___50.ciunit = *nounit;
+		s_wsfe(&io___50);
+		do_fio(&c__1, "DTREVC(R,A)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L250;
 	    }
 
 /*           Test 9:  | TR - RW | / ( |T| |R| ulp ) */
@@ -1035,11 +1070,71 @@ tors
 		    evectr_offset], ldu, &wr1[1], &wi1[1], &work[1], dumma);
 	    result[9] = dumma[0];
 	    if (dumma[1] > *thresh) {
-		io___49.ciunit = *nounit;
-		s_wsfe(&io___49);
-		do_fio(&c__1, "Right", 5L);
-		do_fio(&c__1, "DTREVC", 6L);
+		io___51.ciunit = *nounit;
+		s_wsfe(&io___51);
+		do_fio(&c__1, "Right", (ftnlen)5);
+		do_fio(&c__1, "DTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+/*           Compute selected right eigenvectors and confirm that   
+             they agree with previous right eigenvectors */
+
+	    dtrevc_("Right", "Some", &select[1], &n, &t1[t1_offset], lda, 
+		    dumma, ldu, &evectl[evectl_offset], ldu, &n, &in, &work[1]
+		    , &iinfo);
+	    if (iinfo != 0) {
+		io___52.ciunit = *nounit;
+		s_wsfe(&io___52);
+		do_fio(&c__1, "DTREVC(R,S)", (ftnlen)11);
+		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+		*info = abs(iinfo);
+		goto L250;
+	    }
+
+	    k = 1;
+	    match = TRUE_;
+	    i__3 = n;
+	    for (j = 1; j <= i__3; ++j) {
+		if (select[j] && wi1[j] == 0.) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			if (evectr_ref(jj, j) != evectl_ref(jj, k)) {
+			    match = FALSE_;
+			    goto L180;
+			}
+/* L150: */
+		    }
+		    ++k;
+		} else if (select[j] && wi1[j] != 0.) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			if (evectr_ref(jj, j) != evectl_ref(jj, k) || 
+				evectr_ref(jj, j + 1) != evectl_ref(jj, k + 1)
+				) {
+			    match = FALSE_;
+			    goto L180;
+			}
+/* L160: */
+		    }
+		    k += 2;
+		}
+/* L170: */
+	    }
+L180:
+	    if (! match) {
+		io___56.ciunit = *nounit;
+		s_wsfe(&io___56);
+		do_fio(&c__1, "Right", (ftnlen)5);
+		do_fio(&c__1, "DTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
@@ -1050,25 +1145,20 @@ tors
 
 	    ntest = 10;
 	    result[10] = ulpinv;
-	    i__3 = n;
-	    for (j = 1; j <= i__3; ++j) {
-		select[j] = TRUE_;
-/* L150: */
-	    }
 	    dtrevc_("Left", "All", &select[1], &n, &t1[t1_offset], lda, &
 		    evectl[evectl_offset], ldu, dumma, ldu, &n, &in, &work[1],
 		     &iinfo);
 	    if (iinfo != 0) {
-		io___50.ciunit = *nounit;
-		s_wsfe(&io___50);
-		do_fio(&c__1, "DTREVC(L)", 9L);
+		io___57.ciunit = *nounit;
+		s_wsfe(&io___57);
+		do_fio(&c__1, "DTREVC(L,A)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L250;
 	    }
 
 /*           Test 10:  | LT - WL | / ( |T| |L| ulp ) */
@@ -1078,10 +1168,10 @@ tors
 		    );
 	    result[10] = dumma[2];
 	    if (dumma[3] > *thresh) {
-		io___51.ciunit = *nounit;
-		s_wsfe(&io___51);
-		do_fio(&c__1, "Left", 4L);
-		do_fio(&c__1, "DTREVC", 6L);
+		io___58.ciunit = *nounit;
+		s_wsfe(&io___58);
+		do_fio(&c__1, "Left", (ftnlen)4);
+		do_fio(&c__1, "DTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&dumma[3], (ftnlen)sizeof(doublereal));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1089,24 +1179,83 @@ tors
 		e_wsfe();
 	    }
 
-/*           Call DHSEIN for Right eigenvectors of H, do test 11 
-*/
+/*           Compute selected left eigenvectors and confirm that   
+             they agree with previous left eigenvectors */
+
+	    dtrevc_("Left", "Some", &select[1], &n, &t1[t1_offset], lda, &
+		    evectr[evectr_offset], ldu, dumma, ldu, &n, &in, &work[1],
+		     &iinfo);
+	    if (iinfo != 0) {
+		io___59.ciunit = *nounit;
+		s_wsfe(&io___59);
+		do_fio(&c__1, "DTREVC(L,S)", (ftnlen)11);
+		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+		*info = abs(iinfo);
+		goto L250;
+	    }
+
+	    k = 1;
+	    match = TRUE_;
+	    i__3 = n;
+	    for (j = 1; j <= i__3; ++j) {
+		if (select[j] && wi1[j] == 0.) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			if (evectl_ref(jj, j) != evectr_ref(jj, k)) {
+			    match = FALSE_;
+			    goto L220;
+			}
+/* L190: */
+		    }
+		    ++k;
+		} else if (select[j] && wi1[j] != 0.) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			if (evectl_ref(jj, j) != evectr_ref(jj, k) || 
+				evectl_ref(jj, j + 1) != evectr_ref(jj, k + 1)
+				) {
+			    match = FALSE_;
+			    goto L220;
+			}
+/* L200: */
+		    }
+		    k += 2;
+		}
+/* L210: */
+	    }
+L220:
+	    if (! match) {
+		io___60.ciunit = *nounit;
+		s_wsfe(&io___60);
+		do_fio(&c__1, "Left", (ftnlen)4);
+		do_fio(&c__1, "DTREVC", (ftnlen)6);
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+/*           Call DHSEIN for Right eigenvectors of H, do test 11 */
 
 	    ntest = 11;
 	    result[11] = ulpinv;
 	    i__3 = n;
 	    for (j = 1; j <= i__3; ++j) {
 		select[j] = TRUE_;
-/* L160: */
+/* L230: */
 	    }
 
-	    dhsein_("Right", "Qr", "Ninitv", &select[1], &n, &h[h_offset], 
+	    dhsein_("Right", "Qr", "Ninitv", &select[1], &n, &h__[h_offset], 
 		    lda, &wr3[1], &wi3[1], dumma, ldu, &evectx[evectx_offset],
 		     ldu, &n1, &in, &work[1], &iwork[1], &iwork[1], &iinfo);
 	    if (iinfo != 0) {
-		io___52.ciunit = *nounit;
-		s_wsfe(&io___52);
-		do_fio(&c__1, "DHSEIN(R)", 9L);
+		io___61.ciunit = *nounit;
+		s_wsfe(&io___61);
+		do_fio(&c__1, "DHSEIN(R)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1114,7 +1263,7 @@ tors
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L250;
 		}
 	    } else {
 
@@ -1122,17 +1271,17 @@ tors
 
                           (from inverse iteration) */
 
-		dget22_("N", "N", "N", &n, &h[h_offset], lda, &evectx[
+		dget22_("N", "N", "N", &n, &h__[h_offset], lda, &evectx[
 			evectx_offset], ldu, &wr3[1], &wi3[1], &work[1], 
 			dumma);
 		if (dumma[0] < ulpinv) {
 		    result[11] = dumma[0] * aninv;
 		}
 		if (dumma[1] > *thresh) {
-		    io___53.ciunit = *nounit;
-		    s_wsfe(&io___53);
-		    do_fio(&c__1, "Right", 5L);
-		    do_fio(&c__1, "DHSEIN", 6L);
+		    io___62.ciunit = *nounit;
+		    s_wsfe(&io___62);
+		    do_fio(&c__1, "Right", (ftnlen)5);
+		    do_fio(&c__1, "DHSEIN", (ftnlen)6);
 		    do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(
 			    doublereal));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1150,16 +1299,16 @@ tors
 	    i__3 = n;
 	    for (j = 1; j <= i__3; ++j) {
 		select[j] = TRUE_;
-/* L170: */
+/* L240: */
 	    }
 
-	    dhsein_("Left", "Qr", "Ninitv", &select[1], &n, &h[h_offset], lda,
-		     &wr3[1], &wi3[1], &evecty[evecty_offset], ldu, dumma, 
-		    ldu, &n1, &in, &work[1], &iwork[1], &iwork[1], &iinfo);
+	    dhsein_("Left", "Qr", "Ninitv", &select[1], &n, &h__[h_offset], 
+		    lda, &wr3[1], &wi3[1], &evecty[evecty_offset], ldu, dumma,
+		     ldu, &n1, &in, &work[1], &iwork[1], &iwork[1], &iinfo);
 	    if (iinfo != 0) {
-		io___54.ciunit = *nounit;
-		s_wsfe(&io___54);
-		do_fio(&c__1, "DHSEIN(L)", 9L);
+		io___63.ciunit = *nounit;
+		s_wsfe(&io___63);
+		do_fio(&c__1, "DHSEIN(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1167,7 +1316,7 @@ tors
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L250;
 		}
 	    } else {
 
@@ -1175,17 +1324,17 @@ tors
 
                           (from inverse iteration) */
 
-		dget22_("C", "N", "C", &n, &h[h_offset], lda, &evecty[
+		dget22_("C", "N", "C", &n, &h__[h_offset], lda, &evecty[
 			evecty_offset], ldu, &wr3[1], &wi3[1], &work[1], &
 			dumma[2]);
 		if (dumma[2] < ulpinv) {
 		    result[12] = dumma[2] * aninv;
 		}
 		if (dumma[3] > *thresh) {
-		    io___55.ciunit = *nounit;
-		    s_wsfe(&io___55);
-		    do_fio(&c__1, "Left", 4L);
-		    do_fio(&c__1, "DHSEIN", 6L);
+		    io___64.ciunit = *nounit;
+		    s_wsfe(&io___64);
+		    do_fio(&c__1, "Left", (ftnlen)4);
+		    do_fio(&c__1, "DHSEIN", (ftnlen)6);
 		    do_fio(&c__1, (char *)&dumma[3], (ftnlen)sizeof(
 			    doublereal));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1196,8 +1345,7 @@ tors
 		}
 	    }
 
-/*           Call DORMHR for Right eigenvectors of A, do test 13 
-*/
+/*           Call DORMHR for Right eigenvectors of A, do test 13 */
 
 	    ntest = 13;
 	    result[13] = ulpinv;
@@ -1206,9 +1354,9 @@ tors
 		    , ldu, &tau[1], &evectx[evectx_offset], ldu, &work[1], 
 		    nwork, &iinfo);
 	    if (iinfo != 0) {
-		io___56.ciunit = *nounit;
-		s_wsfe(&io___56);
-		do_fio(&c__1, "DORMHR(R)", 9L);
+		io___65.ciunit = *nounit;
+		s_wsfe(&io___65);
+		do_fio(&c__1, "DORMHR(R)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1216,7 +1364,7 @@ tors
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L250;
 		}
 	    } else {
 
@@ -1241,9 +1389,9 @@ tors
 		    , ldu, &tau[1], &evecty[evecty_offset], ldu, &work[1], 
 		    nwork, &iinfo);
 	    if (iinfo != 0) {
-		io___57.ciunit = *nounit;
-		s_wsfe(&io___57);
-		do_fio(&c__1, "DORMHR(L)", 9L);
+		io___66.ciunit = *nounit;
+		s_wsfe(&io___66);
+		do_fio(&c__1, "DORMHR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1251,7 +1399,7 @@ tors
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L250;
 		}
 	    } else {
 
@@ -1269,16 +1417,17 @@ tors
 
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
-L180:
+L250:
 
 	    ntestt += ntest;
 	    dlafts_("DHS", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
 
-L190:
+L260:
 	    ;
 	}
-/* L200: */
+L270:
+	;
     }
 
 /*     Summary */
@@ -1291,4 +1440,12 @@ L190:
 /*     End of DCHKHS */
 
 } /* dchkhs_ */
+
+#undef evectr_ref
+#undef evectl_ref
+#undef uu_ref
+#undef u_ref
+#undef h___ref
+#undef a_ref
+
 

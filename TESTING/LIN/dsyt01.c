@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,15 +12,15 @@ static doublereal c_b5 = 0.;
 static doublereal c_b6 = 1.;
 
 /* Subroutine */ int dsyt01_(char *uplo, integer *n, doublereal *a, integer *
-	lda, doublereal *afac, integer *ldafac, integer *ipiv, doublereal *c, 
-	integer *ldc, doublereal *rwork, doublereal *resid)
+	lda, doublereal *afac, integer *ldafac, integer *ipiv, doublereal *
+	c__, integer *ldc, doublereal *rwork, doublereal *resid)
 {
     /* System generated locals */
     integer a_dim1, a_offset, afac_dim1, afac_offset, c_dim1, c_offset, i__1, 
 	    i__2;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     extern doublereal dlamch_(char *);
@@ -33,7 +34,11 @@ static doublereal c_b6 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -72,8 +77,7 @@ static doublereal c_b6 = 1.;
             as computed by DSYTRF.   
 
     LDAFAC  (input) INTEGER   
-            The leading dimension of the array AFAC.  LDAFAC >= max(1,N). 
-  
+            The leading dimension of the array AFAC.  LDAFAC >= max(1,N).   
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices from DSYTRF.   
@@ -89,23 +93,22 @@ static doublereal c_b6 = 1.;
             If UPLO = 'L', norm(L*D*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U*D*U' - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --ipiv;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
@@ -121,17 +124,17 @@ static doublereal c_b6 = 1.;
 
 /*     Initialize C to the identity matrix. */
 
-    dlaset_("Full", n, n, &c_b5, &c_b6, &c[c_offset], ldc);
+    dlaset_("Full", n, n, &c_b5, &c_b6, &c__[c_offset], ldc);
 
 /*     Call DLAVSY to form the product D * U' (or D * L' ). */
 
     dlavsy_(uplo, "Transpose", "Non-unit", n, n, &afac[afac_offset], ldafac, &
-	    ipiv[1], &c[c_offset], ldc, &info);
+	    ipiv[1], &c__[c_offset], ldc, &info);
 
 /*     Call DLAVSY again to multiply by U (or L ). */
 
     dlavsy_(uplo, "No transpose", "Unit", n, n, &afac[afac_offset], ldafac, &
-	    ipiv[1], &c[c_offset], ldc, &info);
+	    ipiv[1], &c__[c_offset], ldc, &info);
 
 /*     Compute the difference  C - A . */
 
@@ -139,8 +142,8 @@ static doublereal c_b6 = 1.;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		c[i + j * c_dim1] -= a[i + j * a_dim1];
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		c___ref(i__, j) = c___ref(i__, j) - a_ref(i__, j);
 /* L10: */
 	    }
 /* L20: */
@@ -149,8 +152,8 @@ static doublereal c_b6 = 1.;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		c[i + j * c_dim1] -= a[i + j * a_dim1];
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		c___ref(i__, j) = c___ref(i__, j) - a_ref(i__, j);
 /* L30: */
 	    }
 /* L40: */
@@ -159,7 +162,7 @@ static doublereal c_b6 = 1.;
 
 /*     Compute norm( C - A ) / ( N * norm(A) * EPS ) */
 
-    *resid = dlansy_("1", uplo, n, &c[c_offset], ldc, &rwork[1]);
+    *resid = dlansy_("1", uplo, n, &c__[c_offset], ldc, &rwork[1]);
 
     if (anorm <= 0.) {
 	if (*resid != 0.) {
@@ -174,4 +177,8 @@ static doublereal c_b6 = 1.;
 /*     End of DSYT01 */
 
 } /* dsyt01_ */
+
+#undef c___ref
+#undef a_ref
+
 

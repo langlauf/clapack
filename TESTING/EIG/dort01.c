@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static integer c__1 = 1;
     /* Local variables */
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static integer mnmin;
     extern /* Subroutine */ int dsyrk_(char *, char *, integer *, integer *, 
@@ -38,7 +39,10 @@ static integer c__1 = 1;
     static doublereal eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +51,7 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    DORT01 checks that the matrix U is orthogonal by computing the ratio 
-  
+    DORT01 checks that the matrix U is orthogonal by computing the ratio   
 
        RESID = norm( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R',   
     or   
@@ -69,8 +72,7 @@ static integer c__1 = 1;
     =========   
 
     ROWCOL  (input) CHARACTER   
-            Specifies whether the rows or columns of U should be checked 
-  
+            Specifies whether the rows or columns of U should be checked   
             for orthogonality.  Used only if M = N.   
             = 'R':  Check for orthogonal rows of U   
             = 'C':  Check for orthogonal columns of U   
@@ -82,8 +84,7 @@ static integer c__1 = 1;
             The number of columns of the matrix U.   
 
     U       (input) DOUBLE PRECISION array, dimension (LDU,N)   
-            The orthogonal matrix U.  U is checked for orthogonal columns 
-  
+            The orthogonal matrix U.  U is checked for orthogonal columns   
             if m > n or if m = n and ROWCOL = 'C'.  U is checked for   
             orthogonal rows if m < n or if m = n and ROWCOL = 'R'.   
 
@@ -98,17 +99,15 @@ static integer c__1 = 1;
             ROWCOL = 'R', but the test will be done even if LWORK is 0.   
 
     RESID   (output) DOUBLE PRECISION   
-            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or 
-  
+            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or   
             RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
 
@@ -156,14 +155,13 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		if (i != j) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (i__ != j) {
 		    tmp = 0.;
 		} else {
 		    tmp = 1.;
 		}
-		tmp -= ddot_(m, &u[i * u_dim1 + 1], &c__1, &u[j * u_dim1 + 1],
-			 &c__1);
+		tmp -= ddot_(m, &u_ref(1, i__), &c__1, &u_ref(1, j), &c__1);
 /* Computing MAX */
 		d__1 = *resid, d__2 = abs(tmp);
 		*resid = max(d__1,d__2);
@@ -179,13 +177,13 @@ static integer c__1 = 1;
 	i__1 = *m;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		if (i != j) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (i__ != j) {
 		    tmp = 0.;
 		} else {
 		    tmp = 1.;
 		}
-		tmp -= ddot_(n, &u[j + u_dim1], ldu, &u[i + u_dim1], ldu);
+		tmp -= ddot_(n, &u_ref(j, 1), ldu, &u_ref(i__, 1), ldu);
 /* Computing MAX */
 		d__1 = *resid, d__2 = abs(tmp);
 		*resid = max(d__1,d__2);
@@ -200,4 +198,7 @@ static integer c__1 = 1;
 /*     End of DORT01 */
 
 } /* dort01_ */
+
+#undef u_ref
+
 

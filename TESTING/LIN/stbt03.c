@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,7 +36,12 @@ static integer c__1 = 1;
     static real smlnum, eps, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,11 +50,9 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    STBT03 computes the residual for the solution to a scaled triangular 
-  
+    STBT03 computes the residual for the solution to a scaled triangular   
     system of equations  A*x = s*b  or  A'*x = s*b  when A is a   
-    triangular band matrix. Here A' is the transpose of A, s is a scalar, 
-  
+    triangular band matrix. Here A' is the transpose of A, s is a scalar,   
     and x and b are N by NRHS matrices.  The test ratio is the maximum   
     over the number of right hand sides of   
        norm(s*b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
@@ -58,8 +62,7 @@ static integer c__1 = 1;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -87,13 +90,10 @@ static integer c__1 = 1;
 
     AB      (input) REAL array, dimension (LDAB,N)   
             The upper or lower triangular band matrix A, stored in the   
-            first kd+1 rows of the array. The j-th column of A is stored 
-  
+            first kd+1 rows of the array. The j-th column of A is stored   
             in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
@@ -128,22 +128,21 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - s*b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
 
        Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     --cnorm;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -166,8 +165,8 @@ static integer c__1 = 1;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		r__2 = tnorm, r__3 = *tscal * (r__1 = ab[*kd + 1 + j * 
-			ab_dim1], dabs(r__1)) + cnorm[j];
+		r__2 = tnorm, r__3 = *tscal * (r__1 = ab_ref(*kd + 1, j), 
+			dabs(r__1)) + cnorm[j];
 		tnorm = dmax(r__2,r__3);
 /* L10: */
 	    }
@@ -175,8 +174,8 @@ static integer c__1 = 1;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		r__2 = tnorm, r__3 = *tscal * (r__1 = ab[j * ab_dim1 + 1], 
-			dabs(r__1)) + cnorm[j];
+		r__2 = tnorm, r__3 = *tscal * (r__1 = ab_ref(1, j), dabs(r__1)
+			) + cnorm[j];
 		tnorm = dmax(r__2,r__3);
 /* L20: */
 	    }
@@ -197,21 +196,21 @@ static integer c__1 = 1;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	scopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ix = isamax_(n, &work[1], &c__1);
 /* Computing MAX */
-	r__2 = 1.f, r__3 = (r__1 = x[ix + j * x_dim1], dabs(r__1));
+	r__2 = 1.f, r__3 = (r__1 = x_ref(ix, j), dabs(r__1));
 	xnorm = dmax(r__2,r__3);
 	xscal = 1.f / xnorm / (real) (*kd + 1);
 	sscal_(n, &xscal, &work[1], &c__1);
 	stbmv_(uplo, trans, diag, n, kd, &ab[ab_offset], ldab, &work[1], &
 		c__1);
-	r__1 = -(doublereal)(*scale) * xscal;
-	saxpy_(n, &r__1, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	r__1 = -(*scale) * xscal;
+	saxpy_(n, &r__1, &b_ref(1, j), &c__1, &work[1], &c__1);
 	ix = isamax_(n, &work[1], &c__1);
 	err = *tscal * (r__1 = work[ix], dabs(r__1));
-	ix = isamax_(n, &x[j * x_dim1 + 1], &c__1);
-	xnorm = (r__1 = x[ix + j * x_dim1], dabs(r__1));
+	ix = isamax_(n, &x_ref(1, j), &c__1);
+	xnorm = (r__1 = x_ref(ix, j), dabs(r__1));
 	if (err * smlnum <= xnorm) {
 	    if (xnorm > 0.f) {
 		err /= xnorm;
@@ -239,4 +238,9 @@ static integer c__1 = 1;
 /*     End of STBT03 */
 
 } /* stbt03_ */
+
+#undef ab_ref
+#undef x_ref
+#undef b_ref
+
 

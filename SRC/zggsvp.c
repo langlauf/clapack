@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zggsvp_(char *jobu, char *jobv, char *jobq, integer *m, 
@@ -7,7 +8,7 @@
 	*ldv, doublecomplex *q, integer *ldq, integer *iwork, doublereal *
 	rwork, doublecomplex *tau, doublecomplex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -136,21 +137,16 @@
     Further Details   
     ===============   
 
-    The subroutine uses LAPACK subroutine ZGEQPF for the QR factorization 
-  
+    The subroutine uses LAPACK subroutine ZGEQPF for the QR factorization   
     with column pivoting to detect the effective numerical rank of the   
-    a matrix. It may be replaced by a better rank determination strategy. 
-  
+    a matrix. It may be replaced by a better rank determination strategy.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {0.,0.};
     static doublecomplex c_b2 = {1.,0.};
@@ -162,7 +158,7 @@
     /* Builtin functions */
     double d_imag(doublecomplex *);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static logical wantq, wantu, wantv;
     extern /* Subroutine */ int zgeqr2_(integer *, integer *, doublecomplex *,
@@ -184,20 +180,37 @@
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *), zlapmt_(logical *, integer *, integer *, doublecomplex *,
 	     integer *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --iwork;
+    --rwork;
+    --tau;
+    --work;
 
-#define IWORK(I) iwork[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     wantu = lsame_(jobu, "U");
     wantv = lsame_(jobv, "V");
     wantq = lsame_(jobq, "Q");
@@ -237,25 +250,25 @@
                                              (  0   0  ) */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	IWORK(i) = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	iwork[i__] = 0;
 /* L10: */
     }
-    zgeqpf_(p, n, &B(1,1), ldb, &IWORK(1), &TAU(1), &WORK(1), &RWORK(1), 
+    zgeqpf_(p, n, &b[b_offset], ldb, &iwork[1], &tau[1], &work[1], &rwork[1], 
 	    info);
 
 /*     Update A := A*P */
 
-    zlapmt_(&forwrd, m, n, &A(1,1), lda, &IWORK(1));
+    zlapmt_(&forwrd, m, n, &a[a_offset], lda, &iwork[1]);
 
 /*     Determine the effective rank of matrix B. */
 
     *l = 0;
     i__1 = min(*p,*n);
-    for (i = 1; i <= min(*p,*n); ++i) {
-	i__2 = i + i * b_dim1;
-	if ((d__1 = B(i,i).r, abs(d__1)) + (d__2 = d_imag(&B(i,i))
-		, abs(d__2)) > *tolb) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = b_subscr(i__, i__);
+	if ((d__1 = b[i__2].r, abs(d__1)) + (d__2 = d_imag(&b_ref(i__, i__)), 
+		abs(d__2)) > *tolb) {
 	    ++(*l);
 	}
 /* L20: */
@@ -265,69 +278,68 @@
 
 /*        Copy the details of V, and form V. */
 
-	zlaset_("Full", p, p, &c_b1, &c_b1, &V(1,1), ldv);
+	zlaset_("Full", p, p, &c_b1, &c_b1, &v[v_offset], ldv);
 	if (*p > 1) {
 	    i__1 = *p - 1;
-	    zlacpy_("Lower", &i__1, n, &B(2,1), ldb, &V(2,1), 
-		    ldv);
+	    zlacpy_("Lower", &i__1, n, &b_ref(2, 1), ldb, &v_ref(2, 1), ldv);
 	}
 	i__1 = min(*p,*n);
-	zung2r_(p, p, &i__1, &V(1,1), ldv, &TAU(1), &WORK(1), info);
+	zung2r_(p, p, &i__1, &v[v_offset], ldv, &tau[1], &work[1], info);
     }
 
 /*     Clean up B */
 
     i__1 = *l - 1;
-    for (j = 1; j <= *l-1; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *l;
-	for (i = j + 1; i <= *l; ++i) {
-	    i__3 = i + j * b_dim1;
-	    B(i,j).r = 0., B(i,j).i = 0.;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    i__3 = b_subscr(i__, j);
+	    b[i__3].r = 0., b[i__3].i = 0.;
 /* L30: */
 	}
 /* L40: */
     }
     if (*p > *l) {
 	i__1 = *p - *l;
-	zlaset_("Full", &i__1, n, &c_b1, &c_b1, &B(*l+1,1), ldb);
+	zlaset_("Full", &i__1, n, &c_b1, &c_b1, &b_ref(*l + 1, 1), ldb);
     }
 
     if (wantq) {
 
 /*        Set Q = I and Update Q := Q*P */
 
-	zlaset_("Full", n, n, &c_b1, &c_b2, &Q(1,1), ldq);
-	zlapmt_(&forwrd, n, n, &Q(1,1), ldq, &IWORK(1));
+	zlaset_("Full", n, n, &c_b1, &c_b2, &q[q_offset], ldq);
+	zlapmt_(&forwrd, n, n, &q[q_offset], ldq, &iwork[1]);
     }
 
     if (*p >= *l && *n != *l) {
 
 /*        RQ factorization of ( S11 S12 ) = ( 0 S12 )*Z */
 
-	zgerq2_(l, n, &B(1,1), ldb, &TAU(1), &WORK(1), info);
+	zgerq2_(l, n, &b[b_offset], ldb, &tau[1], &work[1], info);
 
 /*        Update A := A*Z' */
 
-	zunmr2_("Right", "Conjugate transpose", m, n, l, &B(1,1), ldb, &
-		TAU(1), &A(1,1), lda, &WORK(1), info);
+	zunmr2_("Right", "Conjugate transpose", m, n, l, &b[b_offset], ldb, &
+		tau[1], &a[a_offset], lda, &work[1], info);
 	if (wantq) {
 
 /*           Update Q := Q*Z' */
 
-	    zunmr2_("Right", "Conjugate transpose", n, n, l, &B(1,1), 
-		    ldb, &TAU(1), &Q(1,1), ldq, &WORK(1), info);
+	    zunmr2_("Right", "Conjugate transpose", n, n, l, &b[b_offset], 
+		    ldb, &tau[1], &q[q_offset], ldq, &work[1], info);
 	}
 
 /*        Clean up B */
 
 	i__1 = *n - *l;
-	zlaset_("Full", l, &i__1, &c_b1, &c_b1, &B(1,1), ldb);
+	zlaset_("Full", l, &i__1, &c_b1, &c_b1, &b[b_offset], ldb);
 	i__1 = *n;
-	for (j = *n - *l + 1; j <= *n; ++j) {
+	for (j = *n - *l + 1; j <= i__1; ++j) {
 	    i__2 = *l;
-	    for (i = j - *n + *l + 1; i <= *l; ++i) {
-		i__3 = i + j * b_dim1;
-		B(i,j).r = 0., B(i,j).i = 0.;
+	    for (i__ = j - *n + *l + 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		b[i__3].r = 0., b[i__3].i = 0.;
 /* L50: */
 	    }
 /* L60: */
@@ -344,13 +356,13 @@
                         (  0   0  ) */
 
     i__1 = *n - *l;
-    for (i = 1; i <= *n-*l; ++i) {
-	IWORK(i) = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	iwork[i__] = 0;
 /* L70: */
     }
     i__1 = *n - *l;
-    zgeqpf_(m, &i__1, &A(1,1), lda, &IWORK(1), &TAU(1), &WORK(1), &RWORK(
-	    1), info);
+    zgeqpf_(m, &i__1, &a[a_offset], lda, &iwork[1], &tau[1], &work[1], &rwork[
+	    1], info);
 
 /*     Determine the effective rank of A11 */
 
@@ -358,10 +370,10 @@
 /* Computing MIN */
     i__2 = *m, i__3 = *n - *l;
     i__1 = min(i__2,i__3);
-    for (i = 1; i <= min(*m,*n-*l); ++i) {
-	i__2 = i + i * a_dim1;
-	if ((d__1 = A(i,i).r, abs(d__1)) + (d__2 = d_imag(&A(i,i))
-		, abs(d__2)) > *tola) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = a_subscr(i__, i__);
+	if ((d__1 = a[i__2].r, abs(d__1)) + (d__2 = d_imag(&a_ref(i__, i__)), 
+		abs(d__2)) > *tola) {
 	    ++(*k);
 	}
 /* L80: */
@@ -372,24 +384,24 @@
    Computing MIN */
     i__2 = *m, i__3 = *n - *l;
     i__1 = min(i__2,i__3);
-    zunm2r_("Left", "Conjugate transpose", m, l, &i__1, &A(1,1), lda, &
-	    TAU(1), &A(1,*n-*l+1), lda, &WORK(1), info);
+    zunm2r_("Left", "Conjugate transpose", m, l, &i__1, &a[a_offset], lda, &
+	    tau[1], &a_ref(1, *n - *l + 1), lda, &work[1], info);
 
     if (wantu) {
 
 /*        Copy the details of U, and form U */
 
-	zlaset_("Full", m, m, &c_b1, &c_b1, &U(1,1), ldu);
+	zlaset_("Full", m, m, &c_b1, &c_b1, &u[u_offset], ldu);
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *n - *l;
-	    zlacpy_("Lower", &i__1, &i__2, &A(2,1), lda, &U(2,1)
-		    , ldu);
+	    zlacpy_("Lower", &i__1, &i__2, &a_ref(2, 1), lda, &u_ref(2, 1), 
+		    ldu);
 	}
 /* Computing MIN */
 	i__2 = *m, i__3 = *n - *l;
 	i__1 = min(i__2,i__3);
-	zung2r_(m, m, &i__1, &U(1,1), ldu, &TAU(1), &WORK(1), info);
+	zung2r_(m, m, &i__1, &u[u_offset], ldu, &tau[1], &work[1], info);
     }
 
     if (wantq) {
@@ -397,18 +409,18 @@
 /*        Update Q( 1:N, 1:N-L )  = Q( 1:N, 1:N-L )*P1 */
 
 	i__1 = *n - *l;
-	zlapmt_(&forwrd, n, &i__1, &Q(1,1), ldq, &IWORK(1));
+	zlapmt_(&forwrd, n, &i__1, &q[q_offset], ldq, &iwork[1]);
     }
 
 /*     Clean up A: set the strictly lower triangular part of   
        A(1:K, 1:K) = 0, and A( K+1:M, 1:N-L ) = 0. */
 
     i__1 = *k - 1;
-    for (j = 1; j <= *k-1; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *k;
-	for (i = j + 1; i <= *k; ++i) {
-	    i__3 = i + j * a_dim1;
-	    A(i,j).r = 0., A(i,j).i = 0.;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    i__3 = a_subscr(i__, j);
+	    a[i__3].r = 0., a[i__3].i = 0.;
 /* L90: */
 	}
 /* L100: */
@@ -416,7 +428,7 @@
     if (*m > *k) {
 	i__1 = *m - *k;
 	i__2 = *n - *l;
-	zlaset_("Full", &i__1, &i__2, &c_b1, &c_b1, &A(*k+1,1), lda);
+	zlaset_("Full", &i__1, &i__2, &c_b1, &c_b1, &a_ref(*k + 1, 1), lda);
     }
 
     if (*n - *l > *k) {
@@ -424,28 +436,27 @@
 /*        RQ factorization of ( T11 T12 ) = ( 0 T12 )*Z1 */
 
 	i__1 = *n - *l;
-	zgerq2_(k, &i__1, &A(1,1), lda, &TAU(1), &WORK(1), info);
+	zgerq2_(k, &i__1, &a[a_offset], lda, &tau[1], &work[1], info);
 
 	if (wantq) {
 
 /*           Update Q( 1:N,1:N-L ) = Q( 1:N,1:N-L )*Z1' */
 
 	    i__1 = *n - *l;
-	    zunmr2_("Right", "Conjugate transpose", n, &i__1, k, &A(1,1),
-		     lda, &TAU(1), &Q(1,1), ldq, &WORK(1), info)
-		    ;
+	    zunmr2_("Right", "Conjugate transpose", n, &i__1, k, &a[a_offset],
+		     lda, &tau[1], &q[q_offset], ldq, &work[1], info);
 	}
 
 /*        Clean up A */
 
 	i__1 = *n - *l - *k;
-	zlaset_("Full", k, &i__1, &c_b1, &c_b1, &A(1,1), lda);
+	zlaset_("Full", k, &i__1, &c_b1, &c_b1, &a[a_offset], lda);
 	i__1 = *n - *l;
-	for (j = *n - *l - *k + 1; j <= *n-*l; ++j) {
+	for (j = *n - *l - *k + 1; j <= i__1; ++j) {
 	    i__2 = *k;
-	    for (i = j - *n + *l + *k + 1; i <= *k; ++i) {
-		i__3 = i + j * a_dim1;
-		A(i,j).r = 0., A(i,j).i = 0.;
+	    for (i__ = j - *n + *l + *k + 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
+		a[i__3].r = 0., a[i__3].i = 0.;
 /* L110: */
 	    }
 /* L120: */
@@ -458,8 +469,8 @@
 /*        QR factorization of A( K+1:M,N-L+1:N ) */
 
 	i__1 = *m - *k;
-	zgeqr2_(&i__1, l, &A(*k+1,*n-*l+1), lda, &TAU(1), &
-		WORK(1), info);
+	zgeqr2_(&i__1, l, &a_ref(*k + 1, *n - *l + 1), lda, &tau[1], &work[1],
+		 info);
 
 	if (wantu) {
 
@@ -469,17 +480,19 @@
 /* Computing MIN */
 	    i__3 = *m - *k;
 	    i__2 = min(i__3,*l);
-	    zunm2r_("Right", "No transpose", m, &i__1, &i__2, &A(*k+1,*n-*l+1), lda, &TAU(1), &U(1,*k+1), ldu, &WORK(1), info);
+	    zunm2r_("Right", "No transpose", m, &i__1, &i__2, &a_ref(*k + 1, *
+		    n - *l + 1), lda, &tau[1], &u_ref(1, *k + 1), ldu, &work[
+		    1], info);
 	}
 
 /*        Clean up */
 
 	i__1 = *n;
-	for (j = *n - *l + 1; j <= *n; ++j) {
+	for (j = *n - *l + 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = j - *n + *k + *l + 1; i <= *m; ++i) {
-		i__3 = i + j * a_dim1;
-		A(i,j).r = 0., A(i,j).i = 0.;
+	    for (i__ = j - *n + *k + *l + 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
+		a[i__3].r = 0., a[i__3].i = 0.;
 /* L130: */
 	    }
 /* L140: */
@@ -492,4 +505,14 @@
 /*     End of ZGGSVP */
 
 } /* zggsvp_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsytd2_(char *uplo, integer *n, doublereal *a, integer *
-	lda, doublereal *d, doublereal *e, doublereal *tau, integer *info)
+	lda, doublereal *d__, doublereal *e, doublereal *tau, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -28,27 +29,22 @@
             The order of the matrix A.  N >= 0.   
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
             n-by-n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n-by-n lower triangular part of A contains the lower 
-  
+            leading n-by-n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
-            On exit, if UPLO = 'U', the diagonal and first superdiagonal 
-  
+            On exit, if UPLO = 'U', the diagonal and first superdiagonal   
             of A are overwritten by the corresponding elements of the   
             tridiagonal matrix T, and the elements above the first   
             superdiagonal, with the array TAU, represent the orthogonal   
             matrix Q as a product of elementary reflectors; if UPLO   
             = 'L', the diagonal and first subdiagonal of A are over-   
             written by the corresponding elements of the tridiagonal   
-            matrix T, and the elements below the first subdiagonal, with 
-  
-            the array TAU, represent the orthogonal matrix Q as a product 
-  
+            matrix T, and the elements below the first subdiagonal, with   
+            the array TAU, represent the orthogonal matrix Q as a product   
             of elementary reflectors. See Further Details.   
 
     LDA     (input) INTEGER   
@@ -60,12 +56,10 @@
 
     E       (output) DOUBLE PRECISION array, dimension (N-1)   
             The off-diagonal elements of the tridiagonal matrix T:   
-            E(i) = A(i,i+1) if UPLO = 'U', E(i) = A(i+1,i) if UPLO = 'L'. 
-  
+            E(i) = A(i,i+1) if UPLO = 'U', E(i) = A(i+1,i) if UPLO = 'L'.   
 
     TAU     (output) DOUBLE PRECISION array, dimension (N-1)   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     INFO    (output) INTEGER   
@@ -75,8 +69,7 @@
     Further Details   
     ===============   
 
-    If UPLO = 'U', the matrix Q is represented as a product of elementary 
-  
+    If UPLO = 'U', the matrix Q is represented as a product of elementary   
     reflectors   
 
        Q = H(n-1) . . . H(2) H(1).   
@@ -89,8 +82,7 @@
     v(i+1:n) = 0 and v(i) = 1; v(1:i-1) is stored on exit in   
     A(1:i-1,i+1), and tau in TAU(i).   
 
-    If UPLO = 'L', the matrix Q is represented as a product of elementary 
-  
+    If UPLO = 'L', the matrix Q is represented as a product of elementary   
     reflectors   
 
        Q = H(1) H(2) . . . H(n-1).   
@@ -100,8 +92,7 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(1:i) = 0 and v(i+1) = 1; v(i+2:n) is stored on exit in A(i+2:n,i), 
-  
+    v(1:i) = 0 and v(i+1) = 1; v(i+2:n) is stored on exit in A(i+2:n,i),   
     and tau in TAU(i).   
 
     The contents of A on exit are illustrated by the following examples   
@@ -115,19 +106,15 @@
       (              d   e  )              (  v1  v2  e   d      )   
       (                  d  )              (  v1  v2  v3  e   d  )   
 
-    where d and e denote diagonal and off-diagonal elements of T, and vi 
-  
+    where d and e denote diagonal and off-diagonal elements of T, and vi   
     denotes an element of the vector defining H(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b8 = 0.;
@@ -142,7 +129,7 @@
     extern /* Subroutine */ int dsyr2_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer i;
+    static integer i__;
     static doublereal alpha;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
@@ -153,15 +140,17 @@
 	    doublereal *, integer *), dlarfg_(integer *, doublereal *,
 	     doublereal *, integer *, doublereal *), xerbla_(char *, integer *
 	    );
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --d__;
+    --e;
+    --tau;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define TAU(I) tau[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -187,101 +176,99 @@
 
 /*        Reduce the upper triangle of A */
 
-	for (i = *n - 1; i >= 1; --i) {
+	for (i__ = *n - 1; i__ >= 1; --i__) {
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'
-   
+/*           Generate elementary reflector H(i) = I - tau * v * v'   
              to annihilate A(1:i-1,i+1) */
 
-	    dlarfg_(&i, &A(i,i+1), &A(1,i+1), &
-		    c__1, &taui);
-	    E(i) = A(i,i+1);
+	    dlarfg_(&i__, &a_ref(i__, i__ + 1), &a_ref(1, i__ + 1), &c__1, &
+		    taui);
+	    e[i__] = a_ref(i__, i__ + 1);
 
 	    if (taui != 0.) {
 
 /*              Apply H(i) from both sides to A(1:i,1:i) */
 
-		A(i,i+1) = 1.;
+		a_ref(i__, i__ + 1) = 1.;
 
-/*              Compute  x := tau * A * v  storing x in TAU(1:
-i) */
+/*              Compute  x := tau * A * v  storing x in TAU(1:i) */
 
-		dsymv_(uplo, &i, &taui, &A(1,1), lda, &A(1,i+1), &c__1, &c_b8, &TAU(1), &c__1);
+		dsymv_(uplo, &i__, &taui, &a[a_offset], lda, &a_ref(1, i__ + 
+			1), &c__1, &c_b8, &tau[1], &c__1);
 
 /*              Compute  w := x - 1/2 * tau * (x'*v) * v */
 
-		alpha = taui * -.5 * ddot_(&i, &TAU(1), &c__1, &A(1,i+1), &c__1);
-		daxpy_(&i, &alpha, &A(1,i+1), &c__1, &TAU(1), &
+		alpha = taui * -.5 * ddot_(&i__, &tau[1], &c__1, &a_ref(1, 
+			i__ + 1), &c__1);
+		daxpy_(&i__, &alpha, &a_ref(1, i__ + 1), &c__1, &tau[1], &
 			c__1);
 
-/*              Apply the transformation as a rank-2 update: 
-  
+/*              Apply the transformation as a rank-2 update:   
                    A := A - v * w' - w * v' */
 
-		dsyr2_(uplo, &i, &c_b14, &A(1,i+1), &c__1, &
-			TAU(1), &c__1, &A(1,1), lda);
+		dsyr2_(uplo, &i__, &c_b14, &a_ref(1, i__ + 1), &c__1, &tau[1],
+			 &c__1, &a[a_offset], lda);
 
-		A(i,i+1) = E(i);
+		a_ref(i__, i__ + 1) = e[i__];
 	    }
-	    D(i + 1) = A(i+1,i+1);
-	    TAU(i) = taui;
+	    d__[i__ + 1] = a_ref(i__ + 1, i__ + 1);
+	    tau[i__] = taui;
 /* L10: */
 	}
-	D(1) = A(1,1);
+	d__[1] = a_ref(1, 1);
     } else {
 
 /*        Reduce the lower triangle of A */
 
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*           Generate elementary reflector H(i) = I - tau * v * v'
-   
-             to annihilate A(i+2:n,i) */
+/*           Generate elementary reflector H(i) = I - tau * v * v'   
+             to annihilate A(i+2:n,i)   
 
-	    i__2 = *n - i;
-/* Computing MIN */
-	    i__3 = i + 2;
-	    dlarfg_(&i__2, &A(i+1,i), &A(min(i+2,*n),i), &c__1, &taui);
-	    E(i) = A(i+1,i);
+   Computing MIN */
+	    i__2 = i__ + 2;
+	    i__3 = *n - i__;
+	    dlarfg_(&i__3, &a_ref(i__ + 1, i__), &a_ref(min(i__2,*n), i__), &
+		    c__1, &taui);
+	    e[i__] = a_ref(i__ + 1, i__);
 
 	    if (taui != 0.) {
 
-/*              Apply H(i) from both sides to A(i+1:n,i+1:n) 
-*/
+/*              Apply H(i) from both sides to A(i+1:n,i+1:n) */
 
-		A(i+1,i) = 1.;
+		a_ref(i__ + 1, i__) = 1.;
 
-/*              Compute  x := tau * A * v  storing y in TAU(i:
-n-1) */
+/*              Compute  x := tau * A * v  storing y in TAU(i:n-1) */
 
-		i__2 = *n - i;
-		dsymv_(uplo, &i__2, &taui, &A(i+1,i+1), lda, 
-			&A(i+1,i), &c__1, &c_b8, &TAU(i), &c__1);
+		i__2 = *n - i__;
+		dsymv_(uplo, &i__2, &taui, &a_ref(i__ + 1, i__ + 1), lda, &
+			a_ref(i__ + 1, i__), &c__1, &c_b8, &tau[i__], &c__1);
 
 /*              Compute  w := x - 1/2 * tau * (x'*v) * v */
 
-		i__2 = *n - i;
-		alpha = taui * -.5 * ddot_(&i__2, &TAU(i), &c__1, &A(i+1,i), &c__1);
-		i__2 = *n - i;
-		daxpy_(&i__2, &alpha, &A(i+1,i), &c__1, &TAU(i), 
+		i__2 = *n - i__;
+		alpha = taui * -.5 * ddot_(&i__2, &tau[i__], &c__1, &a_ref(
+			i__ + 1, i__), &c__1);
+		i__2 = *n - i__;
+		daxpy_(&i__2, &alpha, &a_ref(i__ + 1, i__), &c__1, &tau[i__], 
 			&c__1);
 
-/*              Apply the transformation as a rank-2 update: 
-  
+/*              Apply the transformation as a rank-2 update:   
                    A := A - v * w' - w * v' */
 
-		i__2 = *n - i;
-		dsyr2_(uplo, &i__2, &c_b14, &A(i+1,i), &c__1, &
-			TAU(i), &c__1, &A(i+1,i+1), lda);
+		i__2 = *n - i__;
+		dsyr2_(uplo, &i__2, &c_b14, &a_ref(i__ + 1, i__), &c__1, &tau[
+			i__], &c__1, &a_ref(i__ + 1, i__ + 1), lda)
+			;
 
-		A(i+1,i) = E(i);
+		a_ref(i__ + 1, i__) = e[i__];
 	    }
-	    D(i) = A(i,i);
-	    TAU(i) = taui;
+	    d__[i__] = a_ref(i__, i__);
+	    tau[i__] = taui;
 /* L20: */
 	}
-	D(*n) = A(*n,*n);
+	d__[*n] = a_ref(*n, *n);
     }
 
     return 0;
@@ -289,4 +276,7 @@ n-1) */
 /*     End of DSYTD2 */
 
 } /* dsytd2_ */
+
+#undef a_ref
+
 

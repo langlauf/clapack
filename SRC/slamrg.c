@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slamrg_(integer *n1, integer *n2, real *a, integer *
 	strd1, integer *strd2, integer *index)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -26,8 +27,7 @@
 
     A      (input) REAL array, dimension (N1+N2)   
            The first N1 elements of A contain a list of numbers which   
-           are sorted in either ascending or descending order.  Likewise 
-  
+           are sorted in either ascending or descending order.  Likewise   
            for the final N2 elements.   
 
     STRD1  (input) INTEGER   
@@ -42,23 +42,19 @@
            if B( I ) = A( INDEX( I ) ) for I=1,N1+N2, then B will be   
            sorted in ascending order.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     /* Local variables */
-    static integer i, ind1, ind2, n1sv, n2sv;
+    static integer i__, ind1, ind2, n1sv, n2sv;
 
+    --index;
+    --a;
 
-#define INDEX(I) index[(I)-1]
-#define A(I) a[(I)-1]
-
-
+    /* Function Body */
     n1sv = *n1;
     n2sv = *n2;
     if (*strd1 > 0) {
@@ -71,18 +67,18 @@
     } else {
 	ind2 = *n1 + *n2;
     }
-    i = 1;
+    i__ = 1;
 /*     while ( (N1SV > 0) & (N2SV > 0) ) */
 L10:
     if (n1sv > 0 && n2sv > 0) {
-	if (A(ind1) <= A(ind2)) {
-	    INDEX(i) = ind1;
-	    ++i;
+	if (a[ind1] <= a[ind2]) {
+	    index[i__] = ind1;
+	    ++i__;
 	    ind1 += *strd1;
 	    --n1sv;
 	} else {
-	    INDEX(i) = ind2;
-	    ++i;
+	    index[i__] = ind2;
+	    ++i__;
 	    ind2 += *strd2;
 	    --n2sv;
 	}
@@ -91,18 +87,18 @@ L10:
 /*     end while */
     if (n1sv == 0) {
 	i__1 = n2sv;
-	for (n1sv = 1; n1sv <= n2sv; ++n1sv) {
-	    INDEX(i) = ind2;
-	    ++i;
+	for (n1sv = 1; n1sv <= i__1; ++n1sv) {
+	    index[i__] = ind2;
+	    ++i__;
 	    ind2 += *strd2;
 /* L20: */
 	}
     } else {
 /*     N2SV .EQ. 0 */
 	i__1 = n1sv;
-	for (n2sv = 1; n2sv <= n1sv; ++n2sv) {
-	    INDEX(i) = ind1;
-	    ++i;
+	for (n2sv = 1; n2sv <= i__1; ++n2sv) {
+	    index[i__] = ind1;
+	    ++i__;
 	    ind1 += *strd1;
 /* L30: */
 	}

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,8 +12,8 @@ static complex c_b1 = {0.f,0.f};
 static complex c_b2 = {1.f,0.f};
 
 /* Subroutine */ int csyt01_(char *uplo, integer *n, complex *a, integer *lda,
-	 complex *afac, integer *ldafac, integer *ipiv, complex *c, integer *
-	ldc, real *rwork, real *resid)
+	 complex *afac, integer *ldafac, integer *ipiv, complex *c__, integer 
+	*ldc, real *rwork, real *resid)
 {
     /* System generated locals */
     integer a_dim1, a_offset, afac_dim1, afac_offset, c_dim1, c_offset, i__1, 
@@ -20,7 +21,7 @@ static complex c_b2 = {1.f,0.f};
     complex q__1;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     extern logical lsame_(char *, char *);
     static real anorm;
     extern doublereal slamch_(char *);
@@ -34,7 +35,13 @@ static complex c_b2 = {1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -43,8 +50,7 @@ static complex c_b2 = {1.f,0.f};
     Purpose   
     =======   
 
-    CSYT01 reconstructs a complex symmetric indefinite matrix A from its 
-  
+    CSYT01 reconstructs a complex symmetric indefinite matrix A from its   
     block L*D*L' or U*D*U' factorization and computes the residual   
        norm( C - A ) / ( N * norm(A) * EPS ),   
     where C is the reconstructed matrix, EPS is the machine epsilon,   
@@ -75,8 +81,7 @@ static complex c_b2 = {1.f,0.f};
             as computed by CSYTRF.   
 
     LDAFAC  (input) INTEGER   
-            The leading dimension of the array AFAC.  LDAFAC >= max(1,N). 
-  
+            The leading dimension of the array AFAC.  LDAFAC >= max(1,N).   
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices from CSYTRF.   
@@ -92,23 +97,22 @@ static complex c_b2 = {1.f,0.f};
             If UPLO = 'L', norm(L*D*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U*D*U' - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --ipiv;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
@@ -124,17 +128,17 @@ static complex c_b2 = {1.f,0.f};
 
 /*     Initialize C to the identity matrix. */
 
-    claset_("Full", n, n, &c_b1, &c_b2, &c[c_offset], ldc);
+    claset_("Full", n, n, &c_b1, &c_b2, &c__[c_offset], ldc);
 
 /*     Call CLAVSY to form the product D * U' (or D * L' ). */
 
     clavsy_(uplo, "Transpose", "Non-unit", n, n, &afac[afac_offset], ldafac, &
-	    ipiv[1], &c[c_offset], ldc, &info);
+	    ipiv[1], &c__[c_offset], ldc, &info);
 
 /*     Call CLAVSY again to multiply by U (or L ). */
 
     clavsy_(uplo, "No transpose", "Unit", n, n, &afac[afac_offset], ldafac, &
-	    ipiv[1], &c[c_offset], ldc, &info);
+	    ipiv[1], &c__[c_offset], ldc, &info);
 
 /*     Compute the difference  C - A . */
 
@@ -142,13 +146,13 @@ static complex c_b2 = {1.f,0.f};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = i + j * a_dim1;
-		q__1.r = c[i__4].r - a[i__5].r, q__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = q__1.r, c[i__3].i = q__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = a_subscr(i__, j);
+		q__1.r = c__[i__4].r - a[i__5].r, q__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = q__1.r, c__[i__3].i = q__1.i;
 /* L10: */
 	    }
 /* L20: */
@@ -157,13 +161,13 @@ static complex c_b2 = {1.f,0.f};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = i + j * a_dim1;
-		q__1.r = c[i__4].r - a[i__5].r, q__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = q__1.r, c[i__3].i = q__1.i;
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = a_subscr(i__, j);
+		q__1.r = c__[i__4].r - a[i__5].r, q__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = q__1.r, c__[i__3].i = q__1.i;
 /* L30: */
 	    }
 /* L40: */
@@ -172,7 +176,7 @@ static complex c_b2 = {1.f,0.f};
 
 /*     Compute norm( C - A ) / ( N * norm(A) * EPS ) */
 
-    *resid = clansy_("1", uplo, n, &c[c_offset], ldc, &rwork[1]);
+    *resid = clansy_("1", uplo, n, &c__[c_offset], ldc, &rwork[1]);
 
     if (anorm <= 0.f) {
 	if (*resid != 0.f) {
@@ -187,4 +191,10 @@ static complex c_b2 = {1.f,0.f};
 /*     End of CSYT01 */
 
 } /* csyt01_ */
+
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
 

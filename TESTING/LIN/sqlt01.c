@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -54,7 +55,12 @@ static real c_b21 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define l_ref(a_1,a_2) l[(a_2)*l_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -63,8 +69,7 @@ static real c_b21 = 1.f;
     Purpose   
     =======   
 
-    SQLT01 tests SGEQLF, which computes the QL factorization of an m-by-n 
-  
+    SQLT01 tests SGEQLF, which computes the QL factorization of an m-by-n   
     matrix A, and partially tests SORGQL which forms the m-by-m   
     orthogonal matrix Q.   
 
@@ -83,8 +88,7 @@ static real c_b21 = 1.f;
             The m-by-n matrix A.   
 
     AF      (output) REAL array, dimension (LDA,N)   
-            Details of the QL factorization of A, as returned by SGEQLF. 
-  
+            Details of the QL factorization of A, as returned by SGEQLF.   
             See SGEQLF for further details.   
 
     Q       (output) REAL array, dimension (LDA,M)   
@@ -97,8 +101,7 @@ static real c_b21 = 1.f;
             LDA >= max(M,N).   
 
     TAU     (output) REAL array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by SGEQLF.   
 
     WORK    (workspace) REAL array, dimension (LWORK)   
@@ -113,22 +116,21 @@ static real c_b21 = 1.f;
             RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS )   
             RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = l_dim1 + 1;
+    l_offset = 1 + l_dim1 * 1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -145,7 +147,7 @@ static real c_b21 = 1.f;
 
 /*     Factorize the matrix A in the array AF. */
 
-    s_copy(srnamc_1.srnamt, "SGEQLF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SGEQLF", (ftnlen)6, (ftnlen)6);
     sgeqlf_(m, n, &af[af_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy details of Q */
@@ -154,27 +156,27 @@ static real c_b21 = 1.f;
     if (*m >= *n) {
 	if (*n < *m && *n > 0) {
 	    i__1 = *m - *n;
-	    slacpy_("Full", &i__1, n, &af[af_offset], lda, &q[(*m - *n + 1) * 
-		    q_dim1 + 1], lda);
+	    slacpy_("Full", &i__1, n, &af[af_offset], lda, &q_ref(1, *m - *n 
+		    + 1), lda);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    slacpy_("Upper", &i__1, &i__2, &af[*m - *n + 1 + (af_dim1 << 1)], 
-		    lda, &q[*m - *n + 1 + (*m - *n + 2) * q_dim1], lda);
+	    slacpy_("Upper", &i__1, &i__2, &af_ref(*m - *n + 1, 2), lda, &
+		    q_ref(*m - *n + 1, *m - *n + 2), lda);
 	}
     } else {
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    slacpy_("Upper", &i__1, &i__2, &af[(*n - *m + 2) * af_dim1 + 1], 
-		    lda, &q[(q_dim1 << 1) + 1], lda);
+	    slacpy_("Upper", &i__1, &i__2, &af_ref(1, *n - *m + 2), lda, &
+		    q_ref(1, 2), lda);
 	}
     }
 
 /*     Generate the m-by-m matrix Q */
 
-    s_copy(srnamc_1.srnamt, "SORGQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORGQL", (ftnlen)6, (ftnlen)6);
     sorgql_(m, m, &minmn, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy L */
@@ -182,8 +184,8 @@ static real c_b21 = 1.f;
     slaset_("Full", m, n, &c_b13, &c_b13, &l[l_offset], lda);
     if (*m >= *n) {
 	if (*n > 0) {
-	    slacpy_("Lower", n, n, &af[*m - *n + 1 + af_dim1], lda, &l[*m - *
-		    n + 1 + l_dim1], lda);
+	    slacpy_("Lower", n, n, &af_ref(*m - *n + 1, 1), lda, &l_ref(*m - *
+		    n + 1, 1), lda);
 	}
     } else {
 	if (*n > *m && *m > 0) {
@@ -191,8 +193,8 @@ static real c_b21 = 1.f;
 	    slacpy_("Full", m, &i__1, &af[af_offset], lda, &l[l_offset], lda);
 	}
 	if (*m > 0) {
-	    slacpy_("Lower", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &l[(
-		    *n - *m + 1) * l_dim1 + 1], lda);
+	    slacpy_("Lower", m, m, &af_ref(1, *n - *m + 1), lda, &l_ref(1, *n 
+		    - *m + 1), lda);
 	}
     }
 
@@ -228,4 +230,9 @@ static real c_b21 = 1.f;
 /*     End of SQLT01 */
 
 } /* sqlt01_ */
+
+#undef af_ref
+#undef q_ref
+#undef l_ref
+
 

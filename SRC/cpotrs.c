@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cpotrs_(char *uplo, integer *n, integer *nrhs, complex *
 	a, integer *lda, complex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -31,8 +32,7 @@
             of the matrix B.  NRHS >= 0.   
 
     A       (input) COMPLEX array, dimension (LDA,N)   
-            The triangular factor U or L from the Cholesky factorization 
-  
+            The triangular factor U or L from the Cholesky factorization   
             A = U**H*U or A = L*L**H, as computed by CPOTRF.   
 
     LDA     (input) INTEGER   
@@ -49,15 +49,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     
@@ -72,11 +69,14 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -109,12 +109,12 @@
           Solve U'*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Upper", "Conjugate transpose", "Non-unit", n, nrhs, &
-		c_b1, &A(1,1), lda, &B(1,1), ldb);
+		c_b1, &a[a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve U*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Upper", "No transpose", "Non-unit", n, nrhs, &c_b1, &
-		A(1,1), lda, &B(1,1), ldb);
+		a[a_offset], lda, &b[b_offset], ldb);
     } else {
 
 /*        Solve A*X = B where A = L*L'.   
@@ -122,12 +122,12 @@
           Solve L*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b1, &
-		A(1,1), lda, &B(1,1), ldb);
+		a[a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve L'*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Lower", "Conjugate transpose", "Non-unit", n, nrhs, &
-		c_b1, &A(1,1), lda, &B(1,1), ldb);
+		c_b1, &a[a_offset], lda, &b[b_offset], ldb);
     }
 
     return 0;

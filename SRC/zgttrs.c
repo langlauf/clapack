@@ -1,13 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgttrs_(char *trans, integer *n, integer *nrhs, 
-	doublecomplex *dl, doublecomplex *d, doublecomplex *du, doublecomplex 
-	*du2, integer *ipiv, doublecomplex *b, integer *ldb, integer *info)
+	doublecomplex *dl, doublecomplex *d__, doublecomplex *du, 
+	doublecomplex *du2, integer *ipiv, doublecomplex *b, integer *ldb, 
+	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -22,13 +24,13 @@
     =========   
 
     TRANS   (input) CHARACTER   
-            Specifies the form of the system of equations:   
+            Specifies the form of the system of equations.   
             = 'N':  A * X = B     (No transpose)   
             = 'T':  A**T * X = B  (Transpose)   
             = 'C':  A**H * X = B  (Conjugate transpose)   
 
     N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+            The order of the matrix A.   
 
     NRHS    (input) INTEGER   
             The number of right hand sides, i.e., the number of columns   
@@ -39,66 +41,71 @@
             LU factorization of A.   
 
     D       (input) COMPLEX*16 array, dimension (N)   
-            The n diagonal elements of the upper triangular matrix U from 
-  
+            The n diagonal elements of the upper triangular matrix U from   
             the LU factorization of A.   
 
     DU      (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) elements of the first superdiagonal of U.   
+            The (n-1) elements of the first super-diagonal of U.   
 
     DU2     (input) COMPLEX*16 array, dimension (N-2)   
-            The (n-2) elements of the second superdiagonal of U.   
+            The (n-2) elements of the second super-diagonal of U.   
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices; for 1 <= i <= n, row i of the matrix was   
-            interchanged with row IPIV(i).  IPIV(i) will always be either 
-  
+            interchanged with row IPIV(i).  IPIV(i) will always be either   
             i or i+1; IPIV(i) = i indicates a row interchange was not   
             required.   
 
     B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS)   
-            On entry, the right hand side matrix B.   
-            On exit, B is overwritten by the solution matrix X.   
+            On entry, the matrix of right hand side vectors B.   
+            On exit, B is overwritten by the solution vectors X.   
 
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
+            < 0:  if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer b_dim1, b_offset, i__1, i__2, i__3, i__4, i__5, i__6, i__7, i__8;
-    doublecomplex z__1, z__2, z__3, z__4, z__5, z__6, z__7, z__8;
-    /* Builtin functions */
-    void z_div(doublecomplex *, doublecomplex *, doublecomplex *), d_cnjg(
-	    doublecomplex *, doublecomplex *);
+    integer b_dim1, b_offset, i__1, i__2, i__3;
     /* Local variables */
-    static doublecomplex temp;
-    static integer i, j;
-    extern logical lsame_(char *, char *);
-    extern /* Subroutine */ int xerbla_(char *, integer *);
+    static integer j, jb, nb;
+    extern /* Subroutine */ int zgtts2_(integer *, integer *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , integer *, doublecomplex *, integer *), xerbla_(char *, integer 
+	    *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    static integer itrans;
     static logical notran;
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
 
-#define DL(I) dl[(I)-1]
-#define D(I) d[(I)-1]
-#define DU(I) du[(I)-1]
-#define DU2(I) du2[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
+    --dl;
+    --d__;
+    --du;
+    --du2;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
-    notran = lsame_(trans, "N");
-    if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, "C")) {
+    notran = *(unsigned char *)trans == 'N' || *(unsigned char *)trans == 'n';
+    if (! notran && ! (*(unsigned char *)trans == 'T' || *(unsigned char *)
+	    trans == 't') && ! (*(unsigned char *)trans == 'C' || *(unsigned 
+	    char *)trans == 'c')) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -119,227 +126,41 @@
 	return 0;
     }
 
+/*     Decode TRANS */
+
     if (notran) {
-
-/*        Solve A*X = B using the LU factorization of A,   
-          overwriting each right hand side vector with its solution. 
-*/
-
-	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve L*x = b. */
-
-	    i__2 = *n - 1;
-	    for (i = 1; i <= *n-1; ++i) {
-		if (IPIV(i) == i) {
-		    i__3 = i + 1 + j * b_dim1;
-		    i__4 = i + 1 + j * b_dim1;
-		    i__5 = i;
-		    i__6 = i + j * b_dim1;
-		    z__2.r = DL(i).r * B(i,j).r - DL(i).i * B(i,j).i, 
-			    z__2.i = DL(i).r * B(i,j).i + DL(i).i * B(i,j).r;
-		    z__1.r = B(i+1,j).r - z__2.r, z__1.i = B(i+1,j).i - z__2.i;
-		    B(i+1,j).r = z__1.r, B(i+1,j).i = z__1.i;
-		} else {
-		    i__3 = i + j * b_dim1;
-		    temp.r = B(i,j).r, temp.i = B(i,j).i;
-		    i__3 = i + j * b_dim1;
-		    i__4 = i + 1 + j * b_dim1;
-		    B(i,j).r = B(i+1,j).r, B(i,j).i = B(i+1,j).i;
-		    i__3 = i + 1 + j * b_dim1;
-		    i__4 = i;
-		    i__5 = i + j * b_dim1;
-		    z__2.r = DL(i).r * B(i,j).r - DL(i).i * B(i,j).i, 
-			    z__2.i = DL(i).r * B(i,j).i + DL(i).i * B(i,j).r;
-		    z__1.r = temp.r - z__2.r, z__1.i = temp.i - z__2.i;
-		    B(i+1,j).r = z__1.r, B(i+1,j).i = z__1.i;
-		}
-/* L10: */
-	    }
-
-/*           Solve U*x = b. */
-
-	    i__2 = *n + j * b_dim1;
-	    z_div(&z__1, &B(*n,j), &D(*n));
-	    B(*n,j).r = z__1.r, B(*n,j).i = z__1.i;
-	    if (*n > 1) {
-		i__2 = *n - 1 + j * b_dim1;
-		i__3 = *n - 1 + j * b_dim1;
-		i__4 = *n - 1;
-		i__5 = *n + j * b_dim1;
-		z__3.r = DU(*n-1).r * B(*n,j).r - DU(*n-1).i * B(*n,j).i, 
-			z__3.i = DU(*n-1).r * B(*n,j).i + DU(*n-1).i * B(*n,j)
-			.r;
-		z__2.r = B(*n-1,j).r - z__3.r, z__2.i = B(*n-1,j).i - z__3.i;
-		z_div(&z__1, &z__2, &D(*n - 1));
-		B(*n-1,j).r = z__1.r, B(*n-1,j).i = z__1.i;
-	    }
-	    for (i = *n - 2; i >= 1; --i) {
-		i__2 = i + j * b_dim1;
-		i__3 = i + j * b_dim1;
-		i__4 = i;
-		i__5 = i + 1 + j * b_dim1;
-		z__4.r = DU(i).r * B(i+1,j).r - DU(i).i * B(i+1,j).i, 
-			z__4.i = DU(i).r * B(i+1,j).i + DU(i).i * B(i+1,j)
-			.r;
-		z__3.r = B(i,j).r - z__4.r, z__3.i = B(i,j).i - z__4.i;
-		i__6 = i;
-		i__7 = i + 2 + j * b_dim1;
-		z__5.r = DU2(i).r * B(i+2,j).r - DU2(i).i * B(i+2,j).i, 
-			z__5.i = DU2(i).r * B(i+2,j).i + DU2(i).i * B(i+2,j).r;
-		z__2.r = z__3.r - z__5.r, z__2.i = z__3.i - z__5.i;
-		z_div(&z__1, &z__2, &D(i));
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L20: */
-	    }
-/* L30: */
-	}
-    } else if (lsame_(trans, "T")) {
-
-/*        Solve A**T * X = B. */
-
-	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve U**T * x = b. */
-
-	    i__2 = j * b_dim1 + 1;
-	    z_div(&z__1, &B(1,j), &D(1));
-	    B(1,j).r = z__1.r, B(1,j).i = z__1.i;
-	    if (*n > 1) {
-		i__2 = j * b_dim1 + 2;
-		i__3 = j * b_dim1 + 2;
-		i__4 = j * b_dim1 + 1;
-		z__3.r = DU(1).r * B(1,j).r - DU(1).i * B(1,j).i, z__3.i = 
-			DU(1).r * B(1,j).i + DU(1).i * B(1,j).r;
-		z__2.r = B(2,j).r - z__3.r, z__2.i = B(2,j).i - z__3.i;
-		z_div(&z__1, &z__2, &D(2));
-		B(2,j).r = z__1.r, B(2,j).i = z__1.i;
-	    }
-	    i__2 = *n;
-	    for (i = 3; i <= *n; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * b_dim1;
-		i__5 = i - 1;
-		i__6 = i - 1 + j * b_dim1;
-		z__4.r = DU(i-1).r * B(i-1,j).r - DU(i-1).i * B(i-1,j).i, 
-			z__4.i = DU(i-1).r * B(i-1,j).i + DU(i-1).i * B(i-1,j)
-			.r;
-		z__3.r = B(i,j).r - z__4.r, z__3.i = B(i,j).i - z__4.i;
-		i__7 = i - 2;
-		i__8 = i - 2 + j * b_dim1;
-		z__5.r = DU2(i-2).r * B(i-2,j).r - DU2(i-2).i * B(i-2,j).i, 
-			z__5.i = DU2(i-2).r * B(i-2,j).i + DU2(i-2).i * B(i-2,j).r;
-		z__2.r = z__3.r - z__5.r, z__2.i = z__3.i - z__5.i;
-		z_div(&z__1, &z__2, &D(i));
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L40: */
-	    }
-
-/*           Solve L**T * x = b. */
-
-	    for (i = *n - 1; i >= 1; --i) {
-		if (IPIV(i) == i) {
-		    i__2 = i + j * b_dim1;
-		    i__3 = i + j * b_dim1;
-		    i__4 = i;
-		    i__5 = i + 1 + j * b_dim1;
-		    z__2.r = DL(i).r * B(i+1,j).r - DL(i).i * B(i+1,j).i, 
-			    z__2.i = DL(i).r * B(i+1,j).i + DL(i).i * B(i+1,j).r;
-		    z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		    B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-		} else {
-		    i__2 = i + 1 + j * b_dim1;
-		    temp.r = B(i+1,j).r, temp.i = B(i+1,j).i;
-		    i__2 = i + 1 + j * b_dim1;
-		    i__3 = i + j * b_dim1;
-		    i__4 = i;
-		    z__2.r = DL(i).r * temp.r - DL(i).i * temp.i, 
-			    z__2.i = DL(i).r * temp.i + DL(i).i * 
-			    temp.r;
-		    z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		    B(i+1,j).r = z__1.r, B(i+1,j).i = z__1.i;
-		    i__2 = i + j * b_dim1;
-		    B(i,j).r = temp.r, B(i,j).i = temp.i;
-		}
-/* L50: */
-	    }
-/* L60: */
-	}
+	itrans = 0;
+    } else if (*(unsigned char *)trans == 'T' || *(unsigned char *)trans == 
+	    't') {
+	itrans = 1;
     } else {
+	itrans = 2;
+    }
 
-/*        Solve A**H * X = B. */
+/*     Determine the number of right-hand sides to solve at a time. */
 
+    if (*nrhs == 1) {
+	nb = 1;
+    } else {
+/* Computing MAX */
+	i__1 = 1, i__2 = ilaenv_(&c__1, "ZGTTRS", trans, n, nrhs, &c_n1, &
+		c_n1, (ftnlen)6, (ftnlen)1);
+	nb = max(i__1,i__2);
+    }
+
+    if (nb >= *nrhs) {
+	zgtts2_(&itrans, n, nrhs, &dl[1], &d__[1], &du[1], &du2[1], &ipiv[1], 
+		&b[b_offset], ldb);
+    } else {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve U**H * x = b. */
-
-	    i__2 = j * b_dim1 + 1;
-	    d_cnjg(&z__2, &D(1));
-	    z_div(&z__1, &B(1,j), &z__2);
-	    B(1,j).r = z__1.r, B(1,j).i = z__1.i;
-	    if (*n > 1) {
-		i__2 = j * b_dim1 + 2;
-		i__3 = j * b_dim1 + 2;
-		d_cnjg(&z__4, &DU(1));
-		i__4 = j * b_dim1 + 1;
-		z__3.r = z__4.r * B(1,j).r - z__4.i * B(1,j).i, z__3.i = 
-			z__4.r * B(1,j).i + z__4.i * B(1,j).r;
-		z__2.r = B(2,j).r - z__3.r, z__2.i = B(2,j).i - z__3.i;
-		d_cnjg(&z__5, &D(2));
-		z_div(&z__1, &z__2, &z__5);
-		B(2,j).r = z__1.r, B(2,j).i = z__1.i;
-	    }
-	    i__2 = *n;
-	    for (i = 3; i <= *n; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * b_dim1;
-		d_cnjg(&z__5, &DU(i - 1));
-		i__5 = i - 1 + j * b_dim1;
-		z__4.r = z__5.r * B(i-1,j).r - z__5.i * B(i-1,j).i, z__4.i = 
-			z__5.r * B(i-1,j).i + z__5.i * B(i-1,j).r;
-		z__3.r = B(i,j).r - z__4.r, z__3.i = B(i,j).i - z__4.i;
-		d_cnjg(&z__7, &DU2(i - 2));
-		i__6 = i - 2 + j * b_dim1;
-		z__6.r = z__7.r * B(i-2,j).r - z__7.i * B(i-2,j).i, z__6.i = 
-			z__7.r * B(i-2,j).i + z__7.i * B(i-2,j).r;
-		z__2.r = z__3.r - z__6.r, z__2.i = z__3.i - z__6.i;
-		d_cnjg(&z__8, &D(i));
-		z_div(&z__1, &z__2, &z__8);
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L70: */
-	    }
-
-/*           Solve L**H * x = b. */
-
-	    for (i = *n - 1; i >= 1; --i) {
-		if (IPIV(i) == i) {
-		    i__2 = i + j * b_dim1;
-		    i__3 = i + j * b_dim1;
-		    d_cnjg(&z__3, &DL(i));
-		    i__4 = i + 1 + j * b_dim1;
-		    z__2.r = z__3.r * B(i+1,j).r - z__3.i * B(i+1,j).i, z__2.i =
-			     z__3.r * B(i+1,j).i + z__3.i * B(i+1,j).r;
-		    z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		    B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-		} else {
-		    i__2 = i + 1 + j * b_dim1;
-		    temp.r = B(i+1,j).r, temp.i = B(i+1,j).i;
-		    i__2 = i + 1 + j * b_dim1;
-		    i__3 = i + j * b_dim1;
-		    d_cnjg(&z__3, &DL(i));
-		    z__2.r = z__3.r * temp.r - z__3.i * temp.i, z__2.i = 
-			    z__3.r * temp.i + z__3.i * temp.r;
-		    z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		    B(i+1,j).r = z__1.r, B(i+1,j).i = z__1.i;
-		    i__2 = i + j * b_dim1;
-		    B(i,j).r = temp.r, B(i,j).i = temp.i;
-		}
-/* L80: */
-	    }
-/* L90: */
+	i__2 = nb;
+	for (j = 1; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
+/* Computing MIN */
+	    i__3 = *nrhs - j + 1;
+	    jb = min(i__3,nb);
+	    zgtts2_(&itrans, n, &jb, &dl[1], &d__[1], &du[1], &du2[1], &ipiv[
+		    1], &b_ref(1, j), ldb);
+/* L10: */
 	}
     }
 
@@ -347,4 +168,8 @@
 
     return 0;
 } /* zgttrs_ */
+
+#undef b_ref
+#undef b_subscr
+
 

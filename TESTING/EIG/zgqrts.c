@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,10 +16,10 @@ static doublereal c_b35 = 1.;
 
 /* Subroutine */ int zgqrts_(integer *n, integer *m, integer *p, 
 	doublecomplex *a, doublecomplex *af, doublecomplex *q, doublecomplex *
-	r, integer *lda, doublecomplex *taua, doublecomplex *b, doublecomplex 
-	*bf, doublecomplex *z, doublecomplex *t, doublecomplex *bwk, integer *
-	ldb, doublecomplex *taub, doublecomplex *work, integer *lwork, 
-	doublereal *rwork, doublereal *result)
+	r__, integer *lda, doublecomplex *taua, doublecomplex *b, 
+	doublecomplex *bf, doublecomplex *z__, doublecomplex *t, 
+	doublecomplex *bwk, integer *ldb, doublecomplex *taub, doublecomplex *
+	work, integer *lwork, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, af_dim1, af_offset, b_dim1, b_offset, bf_dim1, 
@@ -54,7 +55,19 @@ static doublereal c_b35 = 1.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define t_subscr(a_1,a_2) (a_2)*t_dim1 + a_1
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+#define bf_subscr(a_1,a_2) (a_2)*bf_dim1 + a_1
+#define bf_ref(a_1,a_2) bf[bf_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -95,8 +108,7 @@ static doublereal c_b35 = 1.;
             LDA >= max(M,N).   
 
     TAUA    (output) COMPLEX*16 array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by ZGGQRF.   
 
     B       (input) COMPLEX*16 array, dimension (LDB,P)   
@@ -118,8 +130,7 @@ static doublereal c_b35 = 1.;
             LDB >= max(P,N).   
 
     TAUB    (output) COMPLEX*16 array, dimension (min(P,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by DGGRQF.   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
@@ -136,38 +147,37 @@ static doublereal c_b35 = 1.;
               RESULT(3) = norm( I - Q'*Q ) / ( M*ULP )   
               RESULT(4) = norm( I - Z'*Z ) / ( P*ULP )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --taua;
     bwk_dim1 = *ldb;
-    bwk_offset = bwk_dim1 + 1;
+    bwk_offset = 1 + bwk_dim1 * 1;
     bwk -= bwk_offset;
     t_dim1 = *ldb;
-    t_offset = t_dim1 + 1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     z_dim1 = *ldb;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --taub;
     --work;
@@ -199,64 +209,64 @@ static doublereal c_b35 = 1.;
 
     zlaset_("Full", n, n, &c_b3, &c_b3, &q[q_offset], lda);
     i__1 = *n - 1;
-    zlacpy_("Lower", &i__1, m, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda)
-	    ;
+    zlacpy_("Lower", &i__1, m, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
     i__1 = min(*n,*m);
     zungqr_(n, n, &i__1, &q[q_offset], lda, &taua[1], &work[1], lwork, &info);
 
 /*     Generate the P-by-P matrix Z */
 
-    zlaset_("Full", p, p, &c_b3, &c_b3, &z[z_offset], ldb);
+    zlaset_("Full", p, p, &c_b3, &c_b3, &z__[z_offset], ldb);
     if (*n <= *p) {
 	if (*n > 0 && *n < *p) {
 	    i__1 = *p - *n;
-	    zlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z[*p - *n + 1 + 
-		    z_dim1], ldb);
+	    zlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z___ref(*p - *n + 
+		    1, 1), ldb);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    zlacpy_("Lower", &i__1, &i__2, &bf[(*p - *n + 1) * bf_dim1 + 2], 
-		    ldb, &z[*p - *n + 2 + (*p - *n + 1) * z_dim1], ldb);
+	    zlacpy_("Lower", &i__1, &i__2, &bf_ref(2, *p - *n + 1), ldb, &
+		    z___ref(*p - *n + 2, *p - *n + 1), ldb);
 	}
     } else {
 	if (*p > 1) {
 	    i__1 = *p - 1;
 	    i__2 = *p - 1;
-	    zlacpy_("Lower", &i__1, &i__2, &bf[*n - *p + 2 + bf_dim1], ldb, &
-		    z[z_dim1 + 2], ldb);
+	    zlacpy_("Lower", &i__1, &i__2, &bf_ref(*n - *p + 2, 1), ldb, &
+		    z___ref(2, 1), ldb);
 	}
     }
     i__1 = min(*n,*p);
-    zungrq_(p, p, &i__1, &z[z_offset], ldb, &taub[1], &work[1], lwork, &info);
+    zungrq_(p, p, &i__1, &z__[z_offset], ldb, &taub[1], &work[1], lwork, &
+	    info);
 
 /*     Copy R */
 
-    zlaset_("Full", n, m, &c_b1, &c_b1, &r[r_offset], lda);
-    zlacpy_("Upper", n, m, &af[af_offset], lda, &r[r_offset], lda);
+    zlaset_("Full", n, m, &c_b1, &c_b1, &r__[r_offset], lda);
+    zlacpy_("Upper", n, m, &af[af_offset], lda, &r__[r_offset], lda);
 
 /*     Copy T */
 
     zlaset_("Full", n, p, &c_b1, &c_b1, &t[t_offset], ldb);
     if (*n <= *p) {
-	zlacpy_("Upper", n, n, &bf[(*p - *n + 1) * bf_dim1 + 1], ldb, &t[(*p 
-		- *n + 1) * t_dim1 + 1], ldb);
+	zlacpy_("Upper", n, n, &bf_ref(1, *p - *n + 1), ldb, &t_ref(1, *p - *
+		n + 1), ldb);
     } else {
 	i__1 = *n - *p;
 	zlacpy_("Full", &i__1, p, &bf[bf_offset], ldb, &t[t_offset], ldb);
-	zlacpy_("Upper", p, p, &bf[*n - *p + 1 + bf_dim1], ldb, &t[*n - *p + 
-		1 + t_dim1], ldb);
+	zlacpy_("Upper", p, p, &bf_ref(*n - *p + 1, 1), ldb, &t_ref(*n - *p + 
+		1, 1), ldb);
     }
 
 /*     Compute R - Q'*A */
 
     z__1.r = -1., z__1.i = 0.;
     zgemm_("Conjugate transpose", "No transpose", n, m, n, &z__1, &q[q_offset]
-	    , lda, &a[a_offset], lda, &c_b2, &r[r_offset], lda);
+	    , lda, &a[a_offset], lda, &c_b2, &r__[r_offset], lda);
 
 /*     Compute norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP ) . */
 
-    resid = zlange_("1", n, m, &r[r_offset], lda, &rwork[1]);
+    resid = zlange_("1", n, m, &r__[r_offset], lda, &rwork[1]);
     if (anorm > 0.) {
 /* Computing MAX */
 	i__1 = max(1,*m);
@@ -268,7 +278,7 @@ static doublereal c_b35 = 1.;
 /*     Compute T*Z - Q'*B */
 
     zgemm_("No Transpose", "No transpose", n, p, p, &c_b2, &t[t_offset], ldb, 
-	    &z[z_offset], ldb, &c_b1, &bwk[bwk_offset], ldb);
+	    &z__[z_offset], ldb, &c_b1, &bwk[bwk_offset], ldb);
     z__1.r = -1., z__1.i = 0.;
     zgemm_("Conjugate transpose", "No transpose", n, p, n, &z__1, &q[q_offset]
 	    , lda, &b[b_offset], ldb, &c_b2, &bwk[bwk_offset], ldb);
@@ -286,20 +296,20 @@ static doublereal c_b35 = 1.;
 
 /*     Compute I - Q'*Q */
 
-    zlaset_("Full", n, n, &c_b1, &c_b2, &r[r_offset], lda);
+    zlaset_("Full", n, n, &c_b1, &c_b2, &r__[r_offset], lda);
     zherk_("Upper", "Conjugate transpose", n, n, &c_b34, &q[q_offset], lda, &
-	    c_b35, &r[r_offset], lda);
+	    c_b35, &r__[r_offset], lda);
 
 /*     Compute norm( I - Q'*Q ) / ( N * ULP ) . */
 
-    resid = zlanhe_("1", "Upper", n, &r[r_offset], lda, &rwork[1]);
+    resid = zlanhe_("1", "Upper", n, &r__[r_offset], lda, &rwork[1]);
     result[3] = resid / (doublereal) max(1,*n) / ulp;
 
 /*     Compute I - Z'*Z */
 
     zlaset_("Full", p, p, &c_b1, &c_b2, &t[t_offset], ldb);
-    zherk_("Upper", "Conjugate transpose", p, p, &c_b34, &z[z_offset], ldb, &
-	    c_b35, &t[t_offset], ldb);
+    zherk_("Upper", "Conjugate transpose", p, p, &c_b34, &z__[z_offset], ldb, 
+	    &c_b35, &t[t_offset], ldb);
 
 /*     Compute norm( I - Z'*Z ) / ( P*ULP ) . */
 
@@ -311,4 +321,16 @@ static doublereal c_b35 = 1.;
 /*     End of ZGQRTS */
 
 } /* zgqrts_ */
+
+#undef bf_ref
+#undef bf_subscr
+#undef af_ref
+#undef af_subscr
+#undef z___ref
+#undef z___subscr
+#undef t_ref
+#undef t_subscr
+#undef q_ref
+#undef q_subscr
+
 

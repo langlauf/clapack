@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgesv_(integer *n, integer *nrhs, doublereal *a, integer 
 	*lda, integer *ipiv, doublereal *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -19,8 +20,7 @@
     The LU decomposition with partial pivoting and row interchanges is   
     used to factor A as   
        A = P * L * U,   
-    where P is a permutation matrix, L is unit lower triangular, and U is 
-  
+    where P is a permutation matrix, L is unit lower triangular, and U is   
     upper triangular.  The factored form of A is then used to solve the   
     system of equations A * X = B.   
 
@@ -57,20 +57,16 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, U(i,i) is exactly zero.  The factorization 
-  
+            > 0:  if INFO = i, U(i,i) is exactly zero.  The factorization   
                   has been completed, but the factor U is exactly   
                   singular, so the solution could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1;
     /* Local variables */
@@ -78,12 +74,15 @@
 	    integer *, integer *, integer *), xerbla_(char *, integer *), dgetrs_(char *, integer *, integer *, doublereal *, 
 	    integer *, integer *, doublereal *, integer *, integer *);
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -102,12 +101,13 @@
 
 /*     Compute the LU factorization of A. */
 
-    dgetrf_(n, n, &A(1,1), lda, &IPIV(1), info);
+    dgetrf_(n, n, &a[a_offset], lda, &ipiv[1], info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	dgetrs_("No transpose", n, nrhs, &A(1,1), lda, &IPIV(1), &B(1,1), ldb, info);
+	dgetrs_("No transpose", n, nrhs, &a[a_offset], lda, &ipiv[1], &b[
+		b_offset], ldb, info);
     }
     return 0;
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,7 +37,7 @@ static integer c__2 = 2;
     /* Local variables */
     static integer info;
     static real a[4]	/* was [2][2] */, b[2];
-    static integer i, j;
+    static integer i__, j;
     static real w[2], x[2];
     extern /* Subroutine */ int sgeql2_(integer *, integer *, real *, integer 
 	    *, real *, real *, integer *);
@@ -60,7 +61,11 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+#define af_ref(a_1,a_2) af[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -81,8 +86,7 @@ static integer c__2 = 2;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
@@ -93,9 +97,9 @@ static integer c__2 = 2;
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 2; ++j) {
-	for (i = 1; i <= 2; ++i) {
-	    a[i + (j << 1) - 3] = 1.f / (real) (i + j);
-	    af[i + (j << 1) - 3] = 1.f / (real) (i + j);
+	for (i__ = 1; i__ <= 2; ++i__) {
+	    a_ref(i__, j) = 1.f / (real) (i__ + j);
+	    af_ref(i__, j) = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -109,7 +113,7 @@ static integer c__2 = 2;
 
        SGEQLF */
 
-    s_copy(srnamc_1.srnamt, "SGEQLF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SGEQLF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sgeqlf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("SGEQLF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -129,7 +133,7 @@ static integer c__2 = 2;
 
 /*     SGEQL2 */
 
-    s_copy(srnamc_1.srnamt, "SGEQL2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SGEQL2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sgeql2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("SGEQL2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -145,7 +149,7 @@ static integer c__2 = 2;
 
 /*     SGEQLS */
 
-    s_copy(srnamc_1.srnamt, "SGEQLS", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SGEQLS", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sgeqls_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("SGEQLS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -177,7 +181,7 @@ static integer c__2 = 2;
 
 /*     SORGQL */
 
-    s_copy(srnamc_1.srnamt, "SORGQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORGQL", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sorgql_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("SORGQL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -209,7 +213,7 @@ static integer c__2 = 2;
 
 /*     SORG2L */
 
-    s_copy(srnamc_1.srnamt, "SORG2L", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORG2L", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sorg2l_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("SORG2L", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -237,7 +241,7 @@ static integer c__2 = 2;
 
 /*     SORMQL */
 
-    s_copy(srnamc_1.srnamt, "SORMQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORMQL", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sormql_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -301,7 +305,7 @@ static integer c__2 = 2;
 
 /*     SORM2L */
 
-    s_copy(srnamc_1.srnamt, "SORM2L", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "SORM2L", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     sorm2l_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("SORM2L", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -352,4 +356,8 @@ static integer c__2 = 2;
 /*     End of SERRQL */
 
 } /* serrql_ */
+
+#undef af_ref
+#undef a_ref
+
 

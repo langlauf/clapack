@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlaqgb_(integer *m, integer *n, integer *kl, integer *ku,
-	 doublecomplex *ab, integer *ldab, doublereal *r, doublereal *c, 
+	 doublecomplex *ab, integer *ldab, doublereal *r__, doublereal *c__, 
 	doublereal *rowcnd, doublereal *colcnd, doublereal *amax, char *equed)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -14,8 +15,7 @@
     =======   
 
     ZLAQGB equilibrates a general M by N band matrix A with KL   
-    subdiagonals and KU superdiagonals using the row and scaling factors 
-  
+    subdiagonals and KU superdiagonals using the row and scaling factors   
     in the vectors R and C.   
 
     Arguments   
@@ -31,18 +31,15 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     AB      (input/output) COMPLEX*16 array, dimension (LDAB,N)   
-            On entry, the matrix A in band storage, in rows 1 to KL+KU+1. 
-  
+            On entry, the matrix A in band storage, in rows 1 to KL+KU+1.   
             The j-th column of A is stored in the j-th column of the   
             array AB as follows:   
             AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl)   
 
-            On exit, the equilibrated matrix, in the same storage format 
-  
+            On exit, the equilibrated matrix, in the same storage format   
             as A.  See EQUED for the form of the equilibrated matrix.   
 
     LDAB    (input) INTEGER   
@@ -66,11 +63,9 @@
     EQUED   (output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration   
-            = 'R':  Row equilibration, i.e., A has been premultiplied by 
-  
+            = 'R':  Row equilibration, i.e., A has been premultiplied by   
                     diag(R).   
-            = 'C':  Column equilibration, i.e., A has been postmultiplied 
-  
+            = 'C':  Column equilibration, i.e., A has been postmultiplied   
                     by diag(C).   
             = 'B':  Both row and column equilibration, i.e., A has been   
                     replaced by diag(R) * A * diag(C).   
@@ -87,30 +82,30 @@
     should be done based on the absolute size of the largest matrix   
     element.  If AMAX > LARGE or AMAX < SMALL, row scaling is done.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1, i__2, i__3, i__4, i__5, i__6;
     doublereal d__1;
     doublecomplex z__1;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal large, small, cj;
     extern doublereal dlamch_(char *);
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --r__;
+    --c__;
 
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	*(unsigned char *)equed = 'N';
 	return 0;
@@ -135,18 +130,18 @@
 /*           Column scaling */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = C(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = c__[j];
 /* Computing MAX */
 		i__2 = 1, i__3 = j - *ku;
 /* Computing MIN */
 		i__5 = *m, i__6 = j + *kl;
 		i__4 = min(i__5,i__6);
-		for (i = max(1,j-*ku); i <= min(*m,j+*kl); ++i) {
-		    i__2 = *ku + 1 + i - j + j * ab_dim1;
-		    i__3 = *ku + 1 + i - j + j * ab_dim1;
-		    z__1.r = cj * AB(*ku+1+i-j,j).r, z__1.i = cj * AB(*ku+1+i-j,j).i;
-		    AB(*ku+1+i-j,j).r = z__1.r, AB(*ku+1+i-j,j).i = z__1.i;
+		for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
+		    i__2 = ab_subscr(*ku + 1 + i__ - j, j);
+		    i__3 = ab_subscr(*ku + 1 + i__ - j, j);
+		    z__1.r = cj * ab[i__3].r, z__1.i = cj * ab[i__3].i;
+		    ab[i__2].r = z__1.r, ab[i__2].i = z__1.i;
 /* L10: */
 		}
 /* L20: */
@@ -158,18 +153,19 @@
 /*        Row scaling, no column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__4 = 1, i__2 = j - *ku;
 /* Computing MIN */
 	    i__5 = *m, i__6 = j + *kl;
 	    i__3 = min(i__5,i__6);
-	    for (i = max(1,j-*ku); i <= min(*m,j+*kl); ++i) {
-		i__4 = *ku + 1 + i - j + j * ab_dim1;
-		i__2 = i;
-		i__5 = *ku + 1 + i - j + j * ab_dim1;
-		z__1.r = R(i) * AB(*ku+1+i-j,j).r, z__1.i = R(i) * AB(*ku+1+i-j,j).i;
-		AB(*ku+1+i-j,j).r = z__1.r, AB(*ku+1+i-j,j).i = z__1.i;
+	    for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
+		i__4 = ab_subscr(*ku + 1 + i__ - j, j);
+		i__2 = i__;
+		i__5 = ab_subscr(*ku + 1 + i__ - j, j);
+		z__1.r = r__[i__2] * ab[i__5].r, z__1.i = r__[i__2] * ab[i__5]
+			.i;
+		ab[i__4].r = z__1.r, ab[i__4].i = z__1.i;
 /* L30: */
 	    }
 /* L40: */
@@ -180,19 +176,19 @@
 /*        Row and column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    cj = C(j);
+	for (j = 1; j <= i__1; ++j) {
+	    cj = c__[j];
 /* Computing MAX */
 	    i__3 = 1, i__4 = j - *ku;
 /* Computing MIN */
 	    i__5 = *m, i__6 = j + *kl;
 	    i__2 = min(i__5,i__6);
-	    for (i = max(1,j-*ku); i <= min(*m,j+*kl); ++i) {
-		i__3 = *ku + 1 + i - j + j * ab_dim1;
-		d__1 = cj * R(i);
-		i__4 = *ku + 1 + i - j + j * ab_dim1;
-		z__1.r = d__1 * AB(*ku+1+i-j,j).r, z__1.i = d__1 * AB(*ku+1+i-j,j).i;
-		AB(*ku+1+i-j,j).r = z__1.r, AB(*ku+1+i-j,j).i = z__1.i;
+	    for (i__ = max(i__3,i__4); i__ <= i__2; ++i__) {
+		i__3 = ab_subscr(*ku + 1 + i__ - j, j);
+		d__1 = cj * r__[i__];
+		i__4 = ab_subscr(*ku + 1 + i__ - j, j);
+		z__1.r = d__1 * ab[i__4].r, z__1.i = d__1 * ab[i__4].i;
+		ab[i__3].r = z__1.r, ab[i__3].i = z__1.i;
 /* L50: */
 	    }
 /* L60: */
@@ -205,4 +201,8 @@
 /*     End of ZLAQGB */
 
 } /* zlaqgb_ */
+
+#undef ab_ref
+#undef ab_subscr
+
 

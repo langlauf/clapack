@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,7 @@ static integer c__2 = 2;
 {
     /* System generated locals */
     integer i__1;
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1;
 
     /* Builtin functions */
@@ -41,7 +42,7 @@ static integer c__2 = 2;
     /* Local variables */
     static integer info;
     static complex a[4]	/* was [2][2] */, b[2];
-    static integer i, j;
+    static integer i__, j;
     static complex w[2], x[2];
     extern /* Subroutine */ int cgeqr2_(integer *, integer *, complex *, 
 	    integer *, complex *, complex *, integer *), cung2r_(integer *, 
@@ -66,7 +67,13 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -87,8 +94,7 @@ static integer c__2 = 2;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
@@ -99,16 +105,16 @@ static integer c__2 = 2;
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 2; ++j) {
-	for (i = 1; i <= 2; ++i) {
-	    i__1 = i + (j << 1) - 3;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	for (i__ = 1; i__ <= 2; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = i + (j << 1) - 3;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	    i__1 = af_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    af[i__1].r = q__1.r, af[i__1].i = q__1.i;
 /* L10: */
 	}
@@ -126,7 +132,7 @@ static integer c__2 = 2;
 
        CGEQRF */
 
-    s_copy(srnamc_1.srnamt, "CGEQRF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CGEQRF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqrf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("CGEQRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -146,7 +152,7 @@ static integer c__2 = 2;
 
 /*     CGEQR2 */
 
-    s_copy(srnamc_1.srnamt, "CGEQR2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CGEQR2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqr2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("CGEQR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -162,7 +168,7 @@ static integer c__2 = 2;
 
 /*     CGEQRS */
 
-    s_copy(srnamc_1.srnamt, "CGEQRS", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CGEQRS", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cgeqrs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("CGEQRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -194,7 +200,7 @@ static integer c__2 = 2;
 
 /*     CUNGQR */
 
-    s_copy(srnamc_1.srnamt, "CUNGQR", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNGQR", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cungqr_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("CUNGQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -226,7 +232,7 @@ static integer c__2 = 2;
 
 /*     CUNG2R */
 
-    s_copy(srnamc_1.srnamt, "CUNG2R", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNG2R", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cung2r_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("CUNG2R", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -254,7 +260,7 @@ static integer c__2 = 2;
 
 /*     CUNMQR */
 
-    s_copy(srnamc_1.srnamt, "CUNMQR", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNMQR", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cunmqr_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -318,7 +324,7 @@ static integer c__2 = 2;
 
 /*     CUNM2R */
 
-    s_copy(srnamc_1.srnamt, "CUNM2R", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNM2R", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     cunm2r_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("CUNM2R", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -369,4 +375,10 @@ static integer c__2 = 2;
 /*     End of CERRQR */
 
 } /* cerrqr_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

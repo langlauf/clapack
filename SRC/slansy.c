@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda, 
 	real *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
     Purpose   
     =======   
 
-    SLANSY  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    SLANSY  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     real symmetric matrix A.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -58,14 +54,11 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
 
     A       (input) REAL array, dimension (LDA,N)   
             The symmetric matrix A.  If UPLO = 'U', the leading n by n   
-            upper triangular part of A contains the upper triangular part 
-  
-            of the matrix A, and the strictly lower triangular part of A 
-  
+            upper triangular part of A contains the upper triangular part   
+            of the matrix A, and the strictly lower triangular part of A   
             is not referenced.  If UPLO = 'L', the leading n by n lower   
             triangular part of A contains the lower triangular part of   
-            the matrix A, and the strictly upper triangular part of A is 
-  
+            the matrix A, and the strictly upper triangular part of A is   
             not referenced.   
 
     LDA     (input) INTEGER   
@@ -75,13 +68,10 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
             where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise,   
             WORK is not referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -92,20 +82,22 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
     double sqrt(doublereal);
     /* Local variables */
     static real absa;
-    static integer i, j;
+    static integer i__, j;
     static real scale;
     extern logical lsame_(char *, char *);
     static real value;
     extern /* Subroutine */ int slassq_(integer *, real *, integer *, real *, 
 	    real *);
     static real sum;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.f;
     } else if (lsame_(norm, "M")) {
@@ -115,12 +107,11 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
 	value = 0.f;
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= j; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		    r__2 = value, r__3 = (r__1 = A(i,j), dabs(r__1)
-			    );
+		    r__2 = value, r__3 = (r__1 = a_ref(i__, j), dabs(r__1));
 		    value = dmax(r__2,r__3);
 /* L10: */
 		}
@@ -128,59 +119,57 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = j; i <= *n; ++i) {
+		for (i__ = j; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		    r__2 = value, r__3 = (r__1 = A(i,j), dabs(r__1)
-			    );
+		    r__2 = value, r__3 = (r__1 = a_ref(i__, j), dabs(r__1));
 		    value = dmax(r__2,r__3);
 /* L30: */
 		}
 /* L40: */
 	    }
 	}
-    } else if (lsame_(norm, "I") || lsame_(norm, "O") || *(
-	    unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "I") || lsame_(norm, "O") || *(unsigned char *)norm == '1') {
 
 /*        Find normI(A) ( = norm1(A), since A is symmetric). */
 
 	value = 0.f;
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		sum = 0.f;
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    absa = (r__1 = A(i,j), dabs(r__1));
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    absa = (r__1 = a_ref(i__, j), dabs(r__1));
 		    sum += absa;
-		    WORK(i) += absa;
+		    work[i__] += absa;
 /* L50: */
 		}
-		WORK(j) = sum + (r__1 = A(j,j), dabs(r__1));
+		work[j] = sum + (r__1 = a_ref(j, j), dabs(r__1));
 /* L60: */
 	    }
 	    i__1 = *n;
-	    for (i = 1; i <= *n; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		r__1 = value, r__2 = WORK(i);
+		r__1 = value, r__2 = work[i__];
 		value = dmax(r__1,r__2);
 /* L70: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		WORK(i) = 0.f;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		work[i__] = 0.f;
 /* L80: */
 	    }
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		sum = WORK(j) + (r__1 = A(j,j), dabs(r__1));
+	    for (j = 1; j <= i__1; ++j) {
+		sum = work[j] + (r__1 = a_ref(j, j), dabs(r__1));
 		i__2 = *n;
-		for (i = j + 1; i <= *n; ++i) {
-		    absa = (r__1 = A(i,j), dabs(r__1));
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    absa = (r__1 = a_ref(i__, j), dabs(r__1));
 		    sum += absa;
-		    WORK(i) += absa;
+		    work[i__] += absa;
 /* L90: */
 		}
 		value = dmax(value,sum);
@@ -195,22 +184,22 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
 	sum = 1.f;
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 2; j <= *n; ++j) {
+	    for (j = 2; j <= i__1; ++j) {
 		i__2 = j - 1;
-		slassq_(&i__2, &A(1,j), &c__1, &scale, &sum);
+		slassq_(&i__2, &a_ref(1, j), &c__1, &scale, &sum);
 /* L110: */
 	    }
 	} else {
 	    i__1 = *n - 1;
-	    for (j = 1; j <= *n-1; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j;
-		slassq_(&i__2, &A(j+1,j), &c__1, &scale, &sum);
+		slassq_(&i__2, &a_ref(j + 1, j), &c__1, &scale, &sum);
 /* L120: */
 	    }
 	}
 	sum *= 2;
 	i__1 = *lda + 1;
-	slassq_(n, &A(1,1), &i__1, &scale, &sum);
+	slassq_(n, &a[a_offset], &i__1, &scale, &sum);
 	value = scale * sqrt(sum);
     }
 
@@ -220,4 +209,7 @@ doublereal slansy_(char *norm, char *uplo, integer *n, real *a, integer *lda,
 /*     End of SLANSY */
 
 } /* slansy_ */
+
+#undef a_ref
+
 

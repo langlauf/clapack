@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static integer c__1 = 1;
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
@@ -38,7 +39,11 @@ static integer c__1 = 1;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -47,8 +52,7 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    ZPPT03 computes the residual for a Hermitian packed matrix times its 
-  
+    ZPPT03 computes the residual for a Hermitian packed matrix times its   
     inverse:   
        norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
@@ -76,8 +80,7 @@ static integer c__1 = 1;
     WORK    (workspace) COMPLEX*16 array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
 
@@ -88,8 +91,7 @@ static integer c__1 = 1;
     RESID   (output) DOUBLE PRECISION   
             norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -98,7 +100,7 @@ static integer c__1 = 1;
     --a;
     --ainv;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -122,8 +124,7 @@ static integer c__1 = 1;
     *rcond = 1. / anorm / ainvnm;
 
 /*     UPLO = 'U':   
-       Copy the leading N-1 x N-1 submatrix of AINV to WORK(1:N,2:N) and 
-  
+       Copy the leading N-1 x N-1 submatrix of AINV to WORK(1:N,2:N) and   
        expand it to a full matrix, then multiply by A one column at a   
        time, moving the result one column to the left. */
 
@@ -134,12 +135,11 @@ static integer c__1 = 1;
 	jj = 1;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    zcopy_(&j, &ainv[jj], &c__1, &work[(j + 1) * work_dim1 + 1], &
-		    c__1);
+	    zcopy_(&j, &ainv[jj], &c__1, &work_ref(1, j + 1), &c__1);
 	    i__2 = j - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = j + (i + 1) * work_dim1;
-		d_cnjg(&z__1, &ainv[jj + i - 1]);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = work_subscr(j, i__ + 1);
+		d_cnjg(&z__1, &ainv[jj + i__ - 1]);
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L10: */
 	    }
@@ -148,9 +148,9 @@ static integer c__1 = 1;
 	}
 	jj = (*n - 1) * *n / 2 + 1;
 	i__1 = *n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = *n + (i + 1) * work_dim1;
-	    d_cnjg(&z__1, &ainv[jj + i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = work_subscr(*n, i__ + 1);
+	    d_cnjg(&z__1, &ainv[jj + i__ - 1]);
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L30: */
 	}
@@ -160,17 +160,16 @@ static integer c__1 = 1;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    z__1.r = -1., z__1.i = 0.;
-	    zhpmv_("Upper", n, &z__1, &a[1], &work[(j + 1) * work_dim1 + 1], &
-		    c__1, &c_b1, &work[j * work_dim1 + 1], &c__1);
+	    zhpmv_("Upper", n, &z__1, &a[1], &work_ref(1, j + 1), &c__1, &
+		    c_b1, &work_ref(1, j), &c__1);
 /* L40: */
 	}
 	z__1.r = -1., z__1.i = 0.;
-	zhpmv_("Upper", n, &z__1, &a[1], &ainv[jj], &c__1, &c_b1, &work[*n * 
-		work_dim1 + 1], &c__1);
+	zhpmv_("Upper", n, &z__1, &a[1], &ainv[jj], &c__1, &c_b1, &work_ref(1,
+		 *n), &c__1);
 
 /*     UPLO = 'L':   
-       Copy the trailing N-1 x N-1 submatrix of AINV to WORK(1:N,1:N-1
-)   
+       Copy the trailing N-1 x N-1 submatrix of AINV to WORK(1:N,1:N-1)   
        and multiply by A, moving each column to the right. */
 
     } else {
@@ -178,9 +177,9 @@ static integer c__1 = 1;
 /*        Copy AINV */
 
 	i__1 = *n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i * work_dim1 + 1;
-	    d_cnjg(&z__1, &ainv[i + 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = work_subscr(1, i__);
+	    d_cnjg(&z__1, &ainv[i__ + 1]);
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L50: */
 	}
@@ -188,12 +187,11 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 2; j <= i__1; ++j) {
 	    i__2 = *n - j + 1;
-	    zcopy_(&i__2, &ainv[jj], &c__1, &work[j + (j - 1) * work_dim1], &
-		    c__1);
+	    zcopy_(&i__2, &ainv[jj], &c__1, &work_ref(j, j - 1), &c__1);
 	    i__2 = *n - j;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = j + (j + i - 1) * work_dim1;
-		d_cnjg(&z__1, &ainv[jj + i]);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = work_subscr(j, j + i__ - 1);
+		d_cnjg(&z__1, &ainv[jj + i__]);
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L60: */
 	    }
@@ -205,22 +203,22 @@ static integer c__1 = 1;
 
 	for (j = *n; j >= 2; --j) {
 	    z__1.r = -1., z__1.i = 0.;
-	    zhpmv_("Lower", n, &z__1, &a[1], &work[(j - 1) * work_dim1 + 1], &
-		    c__1, &c_b1, &work[j * work_dim1 + 1], &c__1);
+	    zhpmv_("Lower", n, &z__1, &a[1], &work_ref(1, j - 1), &c__1, &
+		    c_b1, &work_ref(1, j), &c__1);
 /* L80: */
 	}
 	z__1.r = -1., z__1.i = 0.;
-	zhpmv_("Lower", n, &z__1, &a[1], &ainv[1], &c__1, &c_b1, &work[
-		work_dim1 + 1], &c__1);
+	zhpmv_("Lower", n, &z__1, &a[1], &ainv[1], &c__1, &c_b1, &work_ref(1, 
+		1), &c__1);
 
     }
 
 /*     Add the identity matrix to WORK . */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * work_dim1;
-	i__3 = i + i * work_dim1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = work_subscr(i__, i__);
+	i__3 = work_subscr(i__, i__);
 	z__1.r = work[i__3].r + 1., z__1.i = work[i__3].i + 0.;
 	work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L90: */
@@ -237,4 +235,8 @@ static integer c__1 = 1;
 /*     End of ZPPT03 */
 
 } /* zppt03_ */
+
+#undef work_ref
+#undef work_subscr
+
 

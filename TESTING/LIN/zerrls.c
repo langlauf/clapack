@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,9 +27,14 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c__1 = 1;
 static integer c_n1 = -1;
+static integer c__10 = 10;
+static integer c__3 = 3;
 
 /* Subroutine */ int zerrls_(char *path, integer *nunit)
 {
+    /* System generated locals */
+    integer i__1;
+
     /* Builtin functions   
        Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsle(cilist *), e_wsle(void);
@@ -48,30 +54,40 @@ static integer c_n1 = -1;
     static doublereal rw[2];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
-	    *, logical *), zgelss_(integer *, integer *, integer *, 
+	    *, logical *), zgelsd_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, integer *, doublecomplex *, integer *,
-	     doublereal *, integer *), zgelsx_(integer *, integer *, integer *
-	    , doublecomplex *, integer *, doublecomplex *, integer *, integer 
-	    *, doublereal *, integer *, doublecomplex *, doublereal *, 
-	    integer *);
+	     doublereal *, integer *, integer *), zgelss_(integer *, integer *
+	    , integer *, doublecomplex *, integer *, doublecomplex *, integer 
+	    *, doublereal *, doublereal *, integer *, doublecomplex *, 
+	    integer *, doublereal *, integer *), zgelsx_(integer *, integer *,
+	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
+	    , integer *, doublereal *, integer *, doublecomplex *, doublereal 
+	    *, integer *), zgelsy_(integer *, integer *, integer *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *,
+	     doublereal *, integer *, doublecomplex *, integer *, doublereal *
+	    , integer *);
 
     /* Fortran I/O blocks */
     static cilist io___3 = { 0, 0, 0, 0, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     ZERRLS tests the error exits for the COMPLEX*16 least squares   
-    driver routines.   
+    driver routines (ZGELS, CGELSS, CGELSX, CGELSY, CGELSD).   
 
     Arguments   
     =========   
@@ -82,16 +98,19 @@ static integer c_n1 = -1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
-    s_copy(c2, path + 1, 2L, 2L);
-    a[0].r = 1., a[0].i = 0.;
-    a[2].r = 2., a[2].i = 0.;
-    a[3].r = 3., a[3].i = 0.;
-    a[1].r = 4., a[1].i = 0.;
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
+    i__1 = a_subscr(1, 1);
+    a[i__1].r = 1., a[i__1].i = 0.;
+    i__1 = a_subscr(1, 2);
+    a[i__1].r = 2., a[i__1].i = 0.;
+    i__1 = a_subscr(2, 2);
+    a[i__1].r = 3., a[i__1].i = 0.;
+    i__1 = a_subscr(2, 1);
+    a[i__1].r = 4., a[i__1].i = 0.;
     infoc_1.ok = TRUE_;
     io___3.ciunit = infoc_1.nout;
     s_wsle(&io___3);
@@ -103,7 +122,7 @@ static integer c_n1 = -1;
 
 /*        ZGELS */
 
-	s_copy(srnamc_1.srnamt, "ZGELS ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGELS ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgels_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, w, &c__1, &info);
 	chkxer_("ZGELS ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -135,7 +154,7 @@ static integer c_n1 = -1;
 
 /*        ZGELSS */
 
-	s_copy(srnamc_1.srnamt, "ZGELSS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGELSS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgelss_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
 		&c__1, rw, &info);
@@ -164,7 +183,7 @@ static integer c_n1 = -1;
 
 /*        ZGELSX */
 
-	s_copy(srnamc_1.srnamt, "ZGELSX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGELSX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zgelsx_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
 		 rw, &info);
@@ -190,6 +209,74 @@ static integer c_n1 = -1;
 		 rw, &info);
 	chkxer_("ZGELSX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+
+/*        ZGELSY */
+
+	s_copy(srnamc_1.srnamt, "ZGELSY", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	zgelsy_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	zgelsy_(&c__0, &c_n1, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	zgelsy_(&c__0, &c__0, &c_n1, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	zgelsy_(&c__2, &c__0, &c__0, a, &c__1, b, &c__2, ip, &rcond, &irnk, w,
+		 &c__10, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	zgelsy_(&c__2, &c__0, &c__0, a, &c__2, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 12;
+	zgelsy_(&c__0, &c__3, &c__0, a, &c__1, b, &c__3, ip, &rcond, &irnk, w,
+		 &c__1, rw, &info);
+	chkxer_("ZGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+
+/*        ZGELSD */
+
+	s_copy(srnamc_1.srnamt, "ZGELSD", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	zgelsd_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	zgelsd_(&c__0, &c_n1, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	zgelsd_(&c__0, &c__0, &c_n1, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	zgelsd_(&c__2, &c__0, &c__0, a, &c__1, b, &c__2, s, &rcond, &irnk, w, 
+		&c__10, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	zgelsd_(&c__2, &c__0, &c__0, a, &c__2, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 12;
+	zgelsd_(&c__2, &c__2, &c__1, a, &c__2, b, &c__2, s, &rcond, &irnk, w, 
+		&c__1, rw, ip, &info);
+	chkxer_("ZGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
     }
 
 /*     Print a summary line. */
@@ -201,4 +288,8 @@ static integer c_n1 = -1;
 /*     End of ZERRLS */
 
 } /* zerrls_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static doublereal c_b14 = 1.;
 	    integer *);
     extern /* Subroutine */ int dspr_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *);
-    static integer i, k;
+    static integer i__, k;
     static doublereal t;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
@@ -36,7 +37,7 @@ static doublereal c_b14 = 1.;
     static integer npp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -67,12 +68,10 @@ static doublereal c_b14 = 1.;
             The original symmetric matrix A, stored as a packed   
             triangular matrix.   
 
-    AFAC    (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2) 
-  
+    AFAC    (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
             On entry, the factor L or U from the L*L' or U'*U   
             factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the 
-  
+            Overwritten with the reconstructed matrix, and then with the   
             difference L*L' - A (or U'*U - A).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
@@ -81,8 +80,7 @@ static doublereal c_b14 = 1.;
             If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
@@ -135,8 +133,7 @@ static doublereal c_b14 = 1.;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of
-   
+/*           Add a multiple of column K of the factor L to each of   
              columns K+1 through N. */
 
 	    if (k < *n) {
@@ -160,8 +157,8 @@ static doublereal c_b14 = 1.;
 
     npp = *n * (*n + 1) / 2;
     i__1 = npp;
-    for (i = 1; i <= i__1; ++i) {
-	afac[i] -= a[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	afac[i__] -= a[i__];
 /* L30: */
     }
 

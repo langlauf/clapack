@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
     static char sub2[6];
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -87,12 +88,10 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
     xORMBR:  VECT // SIDE // TRANS, M, N, K   =>  OPTS, M, N, K   
 
     means that the character string VECT // SIDE // TRANS is passed to   
-    the argument OPTS, and the integer parameters M, N, and K are passed 
-  
+    the argument OPTS, and the integer parameters M, N, and K are passed   
     to the arguments M, N, and K,   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        ---------------------------------------------------------   
@@ -101,8 +100,8 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 
     ret_val = 0.f;
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
     sord = lsame_(c1, "S") || lsame_(c1, "D");
     corz = lsame_(c1, "C") || lsame_(c1, "Z");
     if (*m <= 0 || ! (sord || corz)) {
@@ -113,8 +112,8 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
        Orthogonal matrices   
        ------------------- */
 
-    if (sord && lsamen_(&c__2, c2, "OR") || corz && lsamen_(&c__2, c2,
-	     "UN")) {
+    if (sord && lsamen_(&c__2, c2, "OR") || corz && 
+	    lsamen_(&c__2, c2, "UN")) {
 
 	if (lsamen_(&c__3, c3, "GBR")) {
 
@@ -125,36 +124,33 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "GQR";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		if (*m >= *k) {
 		    ret_val = sopla_(sub2, m, n, k, &c__0, nb);
 		} else {
 		    i__2 = *m - 1;
 		    i__3 = *m - 1;
 		    i__4 = *m - 1;
-		    ret_val = sopla_(sub2, &i__2, &i__3, &i__4, &c__0, nb)
-			    ;
+		    ret_val = sopla_(sub2, &i__2, &i__3, &i__4, &c__0, nb);
 		}
 	    } else {
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "GLQ";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		if (*k < *n) {
 		    ret_val = sopla_(sub2, m, n, k, &c__0, nb);
 		} else {
 		    i__2 = *n - 1;
 		    i__3 = *n - 1;
 		    i__4 = *n - 1;
-		    ret_val = sopla_(sub2, &i__2, &i__3, &i__4, &c__0, nb)
-			    ;
+		    ret_val = sopla_(sub2, &i__2, &i__3, &i__4, &c__0, nb);
 		}
 	    }
 
 	} else if (lsamen_(&c__3, c3, "MBR")) {
 
-/*           -MBR:  VECT // SIDE // TRANS, M, N, K  =>  OPTS, M, N
-, K */
+/*           -MBR:  VECT // SIDE // TRANS, M, N, K  =>  OPTS, M, N, K */
 
 	    *(unsigned char *)vect = *(unsigned char *)opts;
 	    *(unsigned char *)side = *(unsigned char *)&opts[1];
@@ -169,7 +165,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "MQR";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		if (nq >= *k) {
 		    ret_val = sopla_(sub2, m, n, k, &iside, nb);
 		} else if (iside == 0) {
@@ -185,7 +181,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "MLQ";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		if (nq > *k) {
 		    ret_val = sopla_(sub2, m, n, k, &iside, nb);
 		} else if (iside == 0) {
@@ -208,7 +204,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 	    i__1[0] = 3, a__1[0] = subnam;
 	    i__1[1] = 3, a__1[1] = "GQR";
-	    s_cat(sub2, a__1, i__1, &c__2, 6L);
+	    s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 	    i__2 = ihi - ilo;
 	    i__3 = ihi - ilo;
 	    i__4 = ihi - ilo;
@@ -216,8 +212,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 
 	} else if (lsamen_(&c__3, c3, "MHR")) {
 
-/*           -MHR:  SIDE // TRANS, M, N, ILO, IHI  =>  OPTS, M, N,
- K, L */
+/*           -MHR:  SIDE // TRANS, M, N, ILO, IHI  =>  OPTS, M, N, K, L */
 
 	    *(unsigned char *)side = *(unsigned char *)opts;
 	    ilo = *k;
@@ -234,7 +229,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 	    i__1[0] = 3, a__1[0] = subnam;
 	    i__1[1] = 3, a__1[1] = "MQR";
-	    s_cat(sub2, a__1, i__1, &c__2, 6L);
+	    s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 	    i__2 = ihi - ilo;
 	    ret_val = sopla_(sub2, &mi, &ni, &i__2, &iside, nb);
 
@@ -247,7 +242,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "GQL";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		i__2 = *m - 1;
 		i__3 = *m - 1;
 		i__4 = *m - 1;
@@ -256,7 +251,7 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "GQR";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		i__2 = *m - 1;
 		i__3 = *m - 1;
 		i__4 = *m - 1;
@@ -285,16 +280,18 @@ doublereal sopla2_(char *subnam, char *opts, integer *m, integer *n, integer *
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "MQL";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		i__2 = nq - 1;
-		ret_val = sopla_(sub2, &mi, &ni, &i__2, &iside, nb);
+		ret_val = sopla_(sub2, &mi, &ni, &i__2, &iside, nb)
+			;
 	    } else {
 /* Writing concatenation */
 		i__1[0] = 3, a__1[0] = subnam;
 		i__1[1] = 3, a__1[1] = "MQR";
-		s_cat(sub2, a__1, i__1, &c__2, 6L);
+		s_cat(sub2, a__1, i__1, &c__2, (ftnlen)6);
 		i__2 = nq - 1;
-		ret_val = sopla_(sub2, &mi, &ni, &i__2, &iside, nb);
+		ret_val = sopla_(sub2, &mi, &ni, &i__2, &iside, nb)
+			;
 	    }
 
 	}

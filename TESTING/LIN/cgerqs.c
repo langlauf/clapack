@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,13 @@ static complex c_b2 = {1.f,0.f};
 	    *, complex *, integer *, complex *, integer *, integer *);
 
 
-/*  -- LAPACK routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -64,8 +71,7 @@ static complex c_b2 = {1.f,0.f};
             Details of the orthogonal matrix Q.   
 
     B       (input/output) COMPLEX array, dimension (LDB,NRHS)   
-            On entry, the right hand side vectors for the linear system. 
-  
+            On entry, the right hand side vectors for the linear system.   
             On exit, the solution vectors X.  Each solution vector   
             is contained in rows 1:N of a column of B.   
 
@@ -83,19 +89,18 @@ static complex c_b2 = {1.f,0.f};
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -128,8 +133,8 @@ static complex c_b2 = {1.f,0.f};
 
 /*     Solve R*X = B(n-m+1:n,:) */
 
-    ctrsm_("Left", "Upper", "No transpose", "Non-unit", m, nrhs, &c_b2, &a[(*
-	    n - *m + 1) * a_dim1 + 1], lda, &b[*n - *m + 1 + b_dim1], ldb);
+    ctrsm_("Left", "Upper", "No transpose", "Non-unit", m, nrhs, &c_b2, &
+	    a_ref(1, *n - *m + 1), lda, &b_ref(*n - *m + 1, 1), ldb);
 
 /*     Set B(1:n-m,:) to zero */
 
@@ -146,4 +151,10 @@ static complex c_b2 = {1.f,0.f};
 /*     End of CGERQS */
 
 } /* cgerqs_ */
+
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,6 +27,7 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c__1 = 1;
 static integer c_n1 = -1;
+static integer c__10 = 10;
 
 /* Subroutine */ int derrls_(char *path, integer *nunit)
 {
@@ -43,31 +45,40 @@ static integer c_n1 = -1;
     static doublereal rcond;
     static char c2[2];
     static integer ip[2];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+    extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
+	     dgelsd_(integer *, integer *, integer *, doublereal *, integer *,
+	     doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *, integer *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int dgelss_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), 
 	    chkxer_(char *, integer *, integer *, logical *, logical *), dgelsx_(integer *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *);
+	    integer *, doublereal *, integer *), dgelsy_(integer *, integer *,
+	     integer *, doublereal *, integer *, doublereal *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, integer *, 
+	    integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     DERRLS tests the error exits for the DOUBLE PRECISION least squares   
-    driver routines.   
+    driver routines (DGELS, SGELSS, SGELSX, SGELSY, SGELSD).   
 
     Arguments   
     =========   
@@ -78,19 +89,18 @@ static integer c_n1 = -1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
-    a[0] = 1.;
-    a[2] = 2.;
-    a[3] = 3.;
-    a[1] = 4.;
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
+    a_ref(1, 1) = 1.;
+    a_ref(1, 2) = 2.;
+    a_ref(2, 2) = 3.;
+    a_ref(2, 1) = 4.;
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "LS")) {
@@ -99,7 +109,7 @@ static integer c_n1 = -1;
 
           DGELS */
 
-	s_copy(srnamc_1.srnamt, "DGELS ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGELS ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgels_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, w, &c__1, &info);
 	chkxer_("DGELS ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -131,7 +141,7 @@ static integer c_n1 = -1;
 
 /*        DGELSS */
 
-	s_copy(srnamc_1.srnamt, "DGELSS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGELSS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgelss_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
 		&c__1, &info);
@@ -160,7 +170,7 @@ static integer c_n1 = -1;
 
 /*        DGELSX */
 
-	s_copy(srnamc_1.srnamt, "DGELSX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGELSX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgelsx_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
 		 &info);
@@ -186,6 +196,74 @@ static integer c_n1 = -1;
 		 &info);
 	chkxer_("DGELSX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+
+/*        DGELSY */
+
+	s_copy(srnamc_1.srnamt, "DGELSY", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	dgelsy_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	dgelsy_(&c__0, &c_n1, &c__0, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	dgelsy_(&c__0, &c__0, &c_n1, a, &c__1, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	dgelsy_(&c__2, &c__0, &c__0, a, &c__1, b, &c__2, ip, &rcond, &irnk, w,
+		 &c__10, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	dgelsy_(&c__2, &c__0, &c__0, a, &c__2, b, &c__1, ip, &rcond, &irnk, w,
+		 &c__10, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 12;
+	dgelsy_(&c__2, &c__2, &c__1, a, &c__2, b, &c__2, ip, &rcond, &irnk, w,
+		 &c__1, &info);
+	chkxer_("DGELSY", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+
+/*        DGELSD */
+
+	s_copy(srnamc_1.srnamt, "DGELSD", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	dgelsd_(&c_n1, &c__0, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	dgelsd_(&c__0, &c_n1, &c__0, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	dgelsd_(&c__0, &c__0, &c_n1, a, &c__1, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	dgelsd_(&c__2, &c__0, &c__0, a, &c__1, b, &c__2, s, &rcond, &irnk, w, 
+		&c__10, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	dgelsd_(&c__2, &c__0, &c__0, a, &c__2, b, &c__1, s, &rcond, &irnk, w, 
+		&c__10, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 12;
+	dgelsd_(&c__2, &c__2, &c__1, a, &c__2, b, &c__2, s, &rcond, &irnk, w, 
+		&c__1, ip, &info);
+	chkxer_("DGELSD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
     }
 
 /*     Print a summary line. */
@@ -197,4 +275,7 @@ static integer c_n1 = -1;
 /*     End of DERRLS */
 
 } /* derrls_ */
+
+#undef a_ref
+
 

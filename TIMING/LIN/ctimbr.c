@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static integer c_n1 = -1;
 /* Subroutine */ int ctimbr_(char *line, integer *nm, integer *mval, integer *
 	nval, integer *nk, integer *kval, integer *nnb, integer *nbval, 
 	integer *nxval, integer *nlda, integer *ldaval, real *timmin, complex 
-	*a, complex *b, real *d, complex *tau, complex *work, real *reslts, 
+	*a, complex *b, real *d__, complex *tau, complex *work, real *reslts, 
 	integer *ldr1, integer *ldr2, integer *ldr3, integer *nout, ftnlen 
 	line_len)
 {
@@ -59,7 +60,7 @@ static integer c_n1 = -1;
     static char path[3];
     static real time;
     static char vect[1];
-    static integer isub, info2, i, k, m, n;
+    static integer isub, info2, i__, k, m, n;
     static char cname[6];
     static integer iside, itoff, ivect, itran, minmn;
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
@@ -113,7 +114,12 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -131,8 +137,7 @@ static integer c_n1 = -1;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -209,15 +214,13 @@ static integer c_n1 = -1;
             eigenvalues.  See CLATMS for further details.   
 
     COND    REAL   
-            The condition number of the matrix.  The singular values are 
-  
+            The condition number of the matrix.  The singular values are   
             set to values from DMAX to DMAX/COND.   
 
     DMAX    REAL   
             The magnitude of the largest singular value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -228,34 +231,37 @@ static integer c_n1 = -1;
     --ldaval;
     --a;
     --b;
-    --d;
+    --d__;
     --tau;
     --work;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Complex precision", 1L, 17L);
-    s_copy(path + 1, "BR", 2L, 2L);
-    atimin_(path, line, &c__3, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "BR", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__3, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L220;
     }
 
 /*     Check that M <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___10.ciunit = *nout;
 	s_wsfe(&io___10);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L220;
     }
@@ -263,14 +269,14 @@ static integer c_n1 = -1;
 /*     Check that N <= LDA and K <= LDA for SORMBR */
 
     if (timsub[2]) {
-	atimck_(&c__2, cname, nm, &nval[1], nlda, &ldaval[1], nout, &info, 6L)
-		;
-	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info2, 
-		6L);
+	atimck_(&c__2, cname, nm, &nval[1], nlda, &ldaval[1], nout, &info, (
+		ftnlen)6);
+	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info2, (
+		ftnlen)6);
 	if (info > 0 || info2 > 0) {
 	    io___12.ciunit = *nout;
 	    s_wsfe(&io___12);
-	    do_fio(&c__1, subnam + 12, 6L);
+	    do_fio(&c__1, subnam_ref(0, 3), (ftnlen)6);
 	    e_wsfe();
 	    timsub[2] = FALSE_;
 	}
@@ -291,8 +297,7 @@ static integer c_n1 = -1;
 	for (ilda = 1; ilda <= i__2; ++ilda) {
 	    lda = ldaval[ilda];
 
-/*           Do for each pair of values (NB, NX) in NBVAL and NXVA
-L. */
+/*           Do for each pair of values (NB, NX) in NBVAL and NXVAL. */
 
 	    i__3 = *nnb;
 	    for (inb = 1; inb <= i__3; ++inb) {
@@ -307,21 +312,20 @@ L. */
 /*              Generate a test matrix of size M by N. */
 
 		icopy_(&c__4, reseed, &c__1, iseed, &c__1);
-		clatms_(&m, &n, "Uniform", iseed, "Nonsymm", &d[1], &c__3, &
+		clatms_(&m, &n, "Uniform", iseed, "Nonsymm", &d__[1], &c__3, &
 			c_b27, &c_b28, &m, &n, "No packing", &b[1], &lda, &
 			work[1], &info);
 
 		if (timsub[0]) {
 
-/*                 CGEBRD:  Block reduction to bidiagonal 
-form */
+/*                 CGEBRD:  Block reduction to bidiagonal form */
 
 		    clacpy_("Full", &m, &n, &b[1], &lda, &a[1], &lda);
 		    ic = 0;
 		    s1 = second_();
 L10:
-		    cgebrd_(&m, &n, &a[1], &lda, &d[1], &d[minmn], &tau[1], &
-			    tau[minmn + 1], &work[1], &lw, &info);
+		    cgebrd_(&m, &n, &a[1], &lda, &d__[1], &d__[minmn], &tau[1]
+			    , &tau[minmn + 1], &work[1], &lw, &info);
 		    s2 = second_();
 		    time = s2 - s1;
 		    ++ic;
@@ -345,30 +349,25 @@ L20:
 
 		    time = (time - untime) / (real) ic;
 		    ops = sopla_("CGEBRD", &m, &n, &c__0, &c__0, &nb);
-		    reslts[inb + (im + (ilda + reslts_dim3) * reslts_dim2) * 
-			    reslts_dim1] = smflop_(&ops, &time, &info);
+		    reslts_ref(inb, im, ilda, 1) = smflop_(&ops, &time, &info)
+			    ;
 		} else {
 
-/*                 If CGEBRD was not timed, generate a mat
-rix and reduce   
-                   it using CGEBRD anyway so that the orth
-ogonal   
-                   transformations may be used in timing t
-he other   
+/*                 If CGEBRD was not timed, generate a matrix and reduce   
+                   it using CGEBRD anyway so that the orthogonal   
+                   transformations may be used in timing the other   
                    routines. */
 
 		    clacpy_("Full", &m, &n, &b[1], &lda, &a[1], &lda);
-		    cgebrd_(&m, &n, &a[1], &lda, &d[1], &d[minmn], &tau[1], &
-			    tau[minmn + 1], &work[1], &lw, &info);
+		    cgebrd_(&m, &n, &a[1], &lda, &d__[1], &d__[minmn], &tau[1]
+			    , &tau[minmn + 1], &work[1], &lw, &info);
 
 		}
 
 		if (timsub[1]) {
 
-/*                 CUNGBR:  Generate one of the orthogonal
- matrices Q or   
-                   P' from the reduction to bidiagonal for
-m   
+/*                 CUNGBR:  Generate one of the orthogonal matrices Q or   
+                   P' from the reduction to bidiagonal form   
                    A = Q * B * P'. */
 
 		    for (ivect = 1; ivect <= 2; ++ivect) {
@@ -401,8 +400,7 @@ L30:
 			    goto L30;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			icl = 1;
 			s1 = second_();
@@ -443,8 +441,7 @@ L40:
 			    }
 			}
 
-			reslts[inb + (im + (i3 + ilda + (reslts_dim3 << 1)) * 
-				reslts_dim2) * reslts_dim1] = smflop_(&ops, &
+			reslts_ref(inb, im, i3 + ilda, 2) = smflop_(&ops, &
 				time, &info);
 /* L50: */
 		    }
@@ -452,10 +449,8 @@ L40:
 
 		if (timsub[2]) {
 
-/*                 CUNMBR:  Multiply an m by n matrix B by
- one of the   
-                   orthogonal matrices Q or P' from the re
-duction to   
+/*                 CUNMBR:  Multiply an m by n matrix B by one of the   
+                   orthogonal matrices Q or P' from the reduction to   
                    bidiagonal form A = Q * B * P'. */
 
 		    for (ivect = 1; ivect <= 2; ++ivect) {
@@ -500,8 +495,7 @@ duction to
 L60:
 				    cunmbr_(vect, side, trans, &m1, &n1, &k1, 
 					    &a[1], &lda, &tau[1], &b[1], &lda,
-					     &work[1], &lw, &info)
-					    ;
+					     &work[1], &lw, &info);
 				    s2 = second_();
 				    time = s2 - s1;
 				    ++ic;
@@ -511,8 +505,7 @@ L60:
 					goto L60;
 				    }
 
-/*                             Subtract th
-e time used in CTIMMG. */
+/*                             Subtract the time used in CTIMMG. */
 
 				    icl = 1;
 				    s1 = second_();
@@ -529,14 +522,13 @@ L70:
 				    time = (time - untime) / (real) ic;
 				    if (ivect == 1) {
 
-/*                                Op c
-ount for CUNMBR, VECT = 'Q': 
-*/
+/*                                Op count for CUNMBR, VECT = 'Q': */
 
 					if (nq >= k1) {
 					    i__5 = iside - 1;
 					    ops = sopla_("CUNMQR", &m1, &n1, &
-						    k1, &i__5, &nb);
+						    k1, &i__5, &nb)
+						    ;
 					} else if (iside == 1) {
 					    i__5 = m1 - 1;
 					    i__6 = nq - 1;
@@ -552,14 +544,13 @@ ount for CUNMBR, VECT = 'Q':
 					}
 				    } else {
 
-/*                                Op c
-ount for CUNMBR, VECT = 'P': 
-*/
+/*                                Op count for CUNMBR, VECT = 'P': */
 
 					if (nq >= k1) {
 					    i__5 = iside - 1;
 					    ops = sopla_("CUNMLQ", &m1, &n1, &
-						    k1, &i__5, &nb);
+						    k1, &i__5, &nb)
+						    ;
 					} else if (iside == 1) {
 					    i__5 = m1 - 1;
 					    i__6 = nq - 1;
@@ -575,10 +566,9 @@ ount for CUNMBR, VECT = 'P':
 					}
 				    }
 
-				    reslts[inb + (im + (i3 + ilda + (i4 + 
-					    itoff + ik) * reslts_dim3) * 
-					    reslts_dim2) * reslts_dim1] = 
-					    smflop_(&ops, &time, &info);
+				    reslts_ref(inb, im, i3 + ilda, i4 + itoff 
+					    + ik) = smflop_(&ops, &time, &
+					    info);
 				    itoff = *nk;
 /* L80: */
 				}
@@ -605,15 +595,15 @@ ount for CUNMBR, VECT = 'P':
 	}
 	io___47.ciunit = *nout;
 	s_wsfe(&io___47);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___49.ciunit = *nout;
 		s_wsfe(&io___49);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L150: */
 	    }
@@ -623,9 +613,8 @@ ount for CUNMBR, VECT = 'P':
 	    s_wsle(&io___50);
 	    e_wsle();
 	    sprtb4_("(  NB,  NX)", "M", "N", nnb, &nbval[1], &nxval[1], nm, &
-		    mval[1], &nval[1], nlda, &reslts[((isub * reslts_dim3 + 1)
-		     * reslts_dim2 + 1) * reslts_dim1 + 1], ldr1, ldr2, nout, 
-		    11L, 1L, 1L);
+		    mval[1], &nval[1], nlda, &reslts_ref(1, 1, 1, isub), ldr1,
+		     ldr2, nout, (ftnlen)11, (ftnlen)1, (ftnlen)1);
 	} else if (isub == 2) {
 	    for (ivect = 1; ivect <= 2; ++ivect) {
 		i3 = (ivect - 1) * *nlda + 1;
@@ -640,16 +629,16 @@ ount for CUNMBR, VECT = 'P':
 		}
 		io___54.ciunit = *nout;
 		s_wsfe(&io___54);
-		do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-		do_fio(&c__1, vects + (ivect - 1), 1L);
-		do_fio(&c__1, labk, 1L);
-		do_fio(&c__1, labm, 1L);
-		do_fio(&c__1, labn, 1L);
+		do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+		do_fio(&c__1, vects + (ivect - 1), (ftnlen)1);
+		do_fio(&c__1, labk, (ftnlen)1);
+		do_fio(&c__1, labm, (ftnlen)1);
+		do_fio(&c__1, labn, (ftnlen)1);
 		e_wsfe();
 		sprtb4_("(  NB,  NX)", labm, labn, nnb, &nbval[1], &nxval[1], 
-			nm, &mval[1], &nval[1], nlda, &reslts[((i3 + isub * 
-			reslts_dim3) * reslts_dim2 + 1) * reslts_dim1 + 1], 
-			ldr1, ldr2, nout, 11L, 1L, 1L);
+			nm, &mval[1], &nval[1], nlda, &reslts_ref(1, 1, i3, 
+			isub), ldr1, ldr2, nout, (ftnlen)11, (ftnlen)1, (
+			ftnlen)1);
 /* L160: */
 	    }
 	} else if (isub == 3) {
@@ -681,19 +670,18 @@ ount for CUNMBR, VECT = 'P':
 			for (ik = 1; ik <= i__1; ++ik) {
 			    io___55.ciunit = *nout;
 			    s_wsfe(&io___55);
-			    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-			    do_fio(&c__1, vects + (ivect - 1), 1L);
-			    do_fio(&c__1, sides + (iside - 1), 1L);
-			    do_fio(&c__1, transs + (itran - 1), 1L);
-			    do_fio(&c__1, labk, 1L);
+			    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+			    do_fio(&c__1, vects + (ivect - 1), (ftnlen)1);
+			    do_fio(&c__1, sides + (iside - 1), (ftnlen)1);
+			    do_fio(&c__1, transs + (itran - 1), (ftnlen)1);
+			    do_fio(&c__1, labk, (ftnlen)1);
 			    do_fio(&c__1, (char *)&kval[ik], (ftnlen)sizeof(
 				    integer));
 			    e_wsfe();
 			    sprtb5_("NB", labm, labn, nnb, &nbval[1], nm, &
-				    mval[1], &nval[1], nlda, &reslts[((i3 + 
-				    i4 * reslts_dim3) * reslts_dim2 + 1) * 
-				    reslts_dim1 + 1], ldr1, ldr2, nout, 2L, 
-				    1L, 1L);
+				    mval[1], &nval[1], nlda, &reslts_ref(1, 1,
+				     i3, i4), ldr1, ldr2, nout, (ftnlen)2, (
+				    ftnlen)1, (ftnlen)1);
 			    ++i4;
 /* L170: */
 			}
@@ -713,4 +701,8 @@ L220:
 /*     End of CTIMBR */
 
 } /* ctimbr_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

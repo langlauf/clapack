@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static doublereal c_b64 = 1.;
 	integer *knt)
 {
     /* System generated locals */
-    doublereal d__1, d__2, d__3;
+    doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8, d__9;
 
     /* Builtin functions */
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
@@ -30,7 +31,7 @@ static doublereal c_b64 = 1.;
     /* Local variables */
     static integer info;
     static doublereal tnrm, work[32];
-    static integer i, j;
+    static integer i__, j;
     static doublereal q[16]	/* was [4][4] */, t[16]	/* was [4][4] */;
     extern /* Subroutine */ int dhst01_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -48,7 +49,11 @@ static doublereal c_b64 = 1.;
     static doublereal val[9], eps, res;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define t_ref(a_1,a_2) t[(a_2)*4 + a_1 - 5]
+#define t1_ref(a_1,a_2) t1[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -66,8 +71,7 @@ static doublereal c_b64 = 1.;
 
     where C1 is similar to C and A1 is similar to A.  Both A and C are   
     assumed to be in standard form (equal diagonal entries and   
-    offdiagonal with differing signs) and A1 and C1 are returned with the 
-  
+    offdiagonal with differing signs) and A1 and C1 are returned with the   
     same properties.   
 
     The test code verifies these last last assertions, as well as that   
@@ -88,8 +92,7 @@ static doublereal c_b64 = 1.;
     KNT     (output) INTEGER   
             Total number of examples tested.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine parameters   
@@ -116,7 +119,7 @@ static doublereal c_b64 = 1.;
     val[8] = -sqrt(bignum);
     vm[0] = 1.;
     vm[1] = eps * 2. + 1.;
-    dcopy_(&c__16, &val[3], &c__0, t, &c__1);
+    dcopy_(&c__16, &val[3], &c__0, &t_ref(1, 1), &c__1);
 
     ninfo[1] = 0;
     ninfo[2] = 0;
@@ -130,14 +133,15 @@ static doublereal c_b64 = 1.;
 	for (iam = 1; iam <= 2; ++iam) {
 	    for (ib = 1; ib <= 9; ++ib) {
 		for (ic = 1; ic <= 9; ++ic) {
-		    t[0] = val[ia - 1] * vm[iam - 1];
-		    t[5] = val[ic - 1];
-		    t[4] = val[ib - 1];
-		    t[1] = 0.;
+		    t_ref(1, 1) = val[ia - 1] * vm[iam - 1];
+		    t_ref(2, 2) = val[ic - 1];
+		    t_ref(1, 2) = val[ib - 1];
+		    t_ref(2, 1) = 0.;
 /* Computing MAX */
-		    d__1 = abs(t[0]), d__2 = abs(t[5]), d__1 = max(d__1,d__2),
-			     d__2 = abs(t[4]);
-		    tnrm = max(d__1,d__2);
+		    d__4 = (d__1 = t_ref(1, 1), abs(d__1)), d__5 = (d__2 = 
+			    t_ref(2, 2), abs(d__2)), d__4 = max(d__4,d__5), 
+			    d__5 = (d__3 = t_ref(1, 2), abs(d__3));
+		    tnrm = max(d__4,d__5);
 		    dcopy_(&c__16, t, &c__1, t1, &c__1);
 		    dcopy_(&c__16, val, &c__0, q, &c__1);
 		    dcopy_(&c__4, &val[2], &c__0, q, &c__5);
@@ -152,13 +156,13 @@ static doublereal c_b64 = 1.;
 		    if (info != 0) {
 			res += 1. / eps;
 		    }
-		    if (t[0] != t1[5]) {
+		    if (t_ref(1, 1) != t1_ref(2, 2)) {
 			res += 1. / eps;
 		    }
-		    if (t[5] != t1[0]) {
+		    if (t_ref(2, 2) != t1_ref(1, 1)) {
 			res += 1. / eps;
 		    }
-		    if (t[1] != 0.) {
+		    if (t_ref(2, 1) != 0.) {
 			res += 1. / eps;
 		    }
 		    ++(*knt);
@@ -182,24 +186,29 @@ static doublereal c_b64 = 1.;
 		    for (ic12 = 2; ic12 <= 5; ++ic12) {
 			for (ic21 = 2; ic21 <= 4; ++ic21) {
 			    for (ic22 = -1; ic22 <= 1; ic22 += 2) {
-				t[0] = val[ia - 1] * vm[iam - 1];
-				t[4] = val[ib - 1];
-				t[8] = val[ib - 1] * -2.;
-				t[1] = 0.;
-				t[5] = val[ic11 - 1];
-				t[9] = val[ic12 - 1];
-				t[2] = 0.;
-				t[6] = -val[ic21 - 1];
-				t[10] = val[ic11 - 1] * (doublereal) ic22;
+				t_ref(1, 1) = val[ia - 1] * vm[iam - 1];
+				t_ref(1, 2) = val[ib - 1];
+				t_ref(1, 3) = val[ib - 1] * -2.;
+				t_ref(2, 1) = 0.;
+				t_ref(2, 2) = val[ic11 - 1];
+				t_ref(2, 3) = val[ic12 - 1];
+				t_ref(3, 1) = 0.;
+				t_ref(3, 2) = -val[ic21 - 1];
+				t_ref(3, 3) = val[ic11 - 1] * (doublereal) 
+					ic22;
 /* Computing MAX */
-				d__1 = abs(t[0]), d__2 = abs(t[4]), d__1 = 
-					max(d__1,d__2), d__2 = abs(t[8]), 
-					d__1 = max(d__1,d__2), d__2 = abs(t[5]
-					), d__1 = max(d__1,d__2), d__2 = abs(
-					t[9]), d__1 = max(d__1,d__2), d__2 = 
-					abs(t[6]), d__1 = max(d__1,d__2), 
-					d__2 = abs(t[10]);
-				tnrm = max(d__1,d__2);
+				d__8 = (d__1 = t_ref(1, 1), abs(d__1)), d__9 =
+					 (d__2 = t_ref(1, 2), abs(d__2)), 
+					d__8 = max(d__8,d__9), d__9 = (d__3 = 
+					t_ref(1, 3), abs(d__3)), d__8 = max(
+					d__8,d__9), d__9 = (d__4 = t_ref(2, 2)
+					, abs(d__4)), d__8 = max(d__8,d__9), 
+					d__9 = (d__5 = t_ref(2, 3), abs(d__5))
+					, d__8 = max(d__8,d__9), d__9 = (d__6 
+					= t_ref(3, 2), abs(d__6)), d__8 = max(
+					d__8,d__9), d__9 = (d__7 = t_ref(3, 3)
+					, abs(d__7));
+				tnrm = max(d__8,d__9);
 				dcopy_(&c__16, t, &c__1, t1, &c__1);
 				dcopy_(&c__16, val, &c__0, q, &c__1);
 				dcopy_(&c__4, &val[2], &c__0, q, &c__5);
@@ -212,18 +221,19 @@ static doublereal c_b64 = 1.;
 					c__4, q, &c__4, work, &c__32, result);
 				res = result[0] + result[1];
 				if (info == 0) {
-				    if (t1[0] != t[10]) {
+				    if (t1_ref(1, 1) != t_ref(3, 3)) {
 					res += 1. / eps;
 				    }
-				    if (t[2] != 0.) {
+				    if (t_ref(3, 1) != 0.) {
 					res += 1. / eps;
 				    }
-				    if (t[6] != 0.) {
+				    if (t_ref(3, 2) != 0.) {
 					res += 1. / eps;
 				    }
-				    if (t[1] != 0. && (t[0] != t[5] || d_sign(
-					    &c_b64, &t[4]) == d_sign(&c_b64, &
-					    t[1]))) {
+				    if (t_ref(2, 1) != 0. && (t_ref(1, 1) != 
+					    t_ref(2, 2) || d_sign(&c_b64, &
+					    t_ref(1, 2)) == d_sign(&c_b64, &
+					    t_ref(2, 1)))) {
 					res += 1. / eps;
 				    }
 				}
@@ -254,24 +264,29 @@ static doublereal c_b64 = 1.;
 		    for (icm = 1; icm <= 2; ++icm) {
 			for (ib = 1; ib <= 5; ++ib) {
 			    for (ic = 1; ic <= 5; ++ic) {
-				t[0] = val[ia11 - 1];
-				t[4] = val[ia12 - 1];
-				t[8] = val[ib - 1] * -2.;
-				t[1] = -val[ia21 - 1];
-				t[5] = val[ia11 - 1] * (doublereal) ia22;
-				t[9] = val[ib - 1];
-				t[2] = 0.;
-				t[6] = 0.;
-				t[10] = val[ic - 1] * vm[icm - 1];
+				t_ref(1, 1) = val[ia11 - 1];
+				t_ref(1, 2) = val[ia12 - 1];
+				t_ref(1, 3) = val[ib - 1] * -2.;
+				t_ref(2, 1) = -val[ia21 - 1];
+				t_ref(2, 2) = val[ia11 - 1] * (doublereal) 
+					ia22;
+				t_ref(2, 3) = val[ib - 1];
+				t_ref(3, 1) = 0.;
+				t_ref(3, 2) = 0.;
+				t_ref(3, 3) = val[ic - 1] * vm[icm - 1];
 /* Computing MAX */
-				d__1 = abs(t[0]), d__2 = abs(t[4]), d__1 = 
-					max(d__1,d__2), d__2 = abs(t[8]), 
-					d__1 = max(d__1,d__2), d__2 = abs(t[5]
-					), d__1 = max(d__1,d__2), d__2 = abs(
-					t[9]), d__1 = max(d__1,d__2), d__2 = 
-					abs(t[6]), d__1 = max(d__1,d__2), 
-					d__2 = abs(t[10]);
-				tnrm = max(d__1,d__2);
+				d__8 = (d__1 = t_ref(1, 1), abs(d__1)), d__9 =
+					 (d__2 = t_ref(1, 2), abs(d__2)), 
+					d__8 = max(d__8,d__9), d__9 = (d__3 = 
+					t_ref(1, 3), abs(d__3)), d__8 = max(
+					d__8,d__9), d__9 = (d__4 = t_ref(2, 2)
+					, abs(d__4)), d__8 = max(d__8,d__9), 
+					d__9 = (d__5 = t_ref(2, 3), abs(d__5))
+					, d__8 = max(d__8,d__9), d__9 = (d__6 
+					= t_ref(3, 2), abs(d__6)), d__8 = max(
+					d__8,d__9), d__9 = (d__7 = t_ref(3, 3)
+					, abs(d__7));
+				tnrm = max(d__8,d__9);
 				dcopy_(&c__16, t, &c__1, t1, &c__1);
 				dcopy_(&c__16, val, &c__0, q, &c__1);
 				dcopy_(&c__4, &val[2], &c__0, q, &c__5);
@@ -284,18 +299,19 @@ static doublereal c_b64 = 1.;
 					c__4, q, &c__4, work, &c__32, result);
 				res = result[0] + result[1];
 				if (info == 0) {
-				    if (t1[10] != t[0]) {
+				    if (t1_ref(3, 3) != t_ref(1, 1)) {
 					res += 1. / eps;
 				    }
-				    if (t[1] != 0.) {
+				    if (t_ref(2, 1) != 0.) {
 					res += 1. / eps;
 				    }
-				    if (t[2] != 0.) {
+				    if (t_ref(3, 1) != 0.) {
 					res += 1. / eps;
 				    }
-				    if (t[6] != 0. && (t[5] != t[10] || 
-					    d_sign(&c_b64, &t[9]) == d_sign(&
-					    c_b64, &t[6]))) {
+				    if (t_ref(3, 2) != 0. && (t_ref(2, 2) != 
+					    t_ref(3, 3) || d_sign(&c_b64, &
+					    t_ref(2, 3)) == d_sign(&c_b64, &
+					    t_ref(3, 2)))) {
 					res += 1. / eps;
 				    }
 				}
@@ -330,38 +346,41 @@ static doublereal c_b64 = 1.;
 				    for (ic22 = -1; ic22 <= 1; ic22 += 2) {
 					for (icm = 5; icm <= 7; ++icm) {
 					    iam = 1;
-					    t[0] = val[ia11 - 1] * vm[iam - 1]
-						    ;
-					    t[4] = val[ia12 - 1] * vm[iam - 1]
-						    ;
-					    t[8] = val[ib - 1] * -2.;
-					    t[12] = val[ib - 1] * .5;
-					    t[1] = -t[4] * val[ia21 - 1];
-					    t[5] = val[ia11 - 1] * (
+					    t_ref(1, 1) = val[ia11 - 1] * vm[
+						    iam - 1];
+					    t_ref(1, 2) = val[ia12 - 1] * vm[
+						    iam - 1];
+					    t_ref(1, 3) = val[ib - 1] * -2.;
+					    t_ref(1, 4) = val[ib - 1] * .5;
+					    t_ref(2, 1) = -t_ref(1, 2) * val[
+						    ia21 - 1];
+					    t_ref(2, 2) = val[ia11 - 1] * (
 						    doublereal) ia22 * vm[iam 
 						    - 1];
-					    t[9] = val[ib - 1];
-					    t[13] = val[ib - 1] * 3.;
-					    t[2] = 0.;
-					    t[6] = 0.;
-					    t[10] = val[ic11 - 1] * (d__1 = 
-						    val[icm - 1], abs(d__1));
-					    t[14] = val[ic12 - 1] * (d__1 = 
-						    val[icm - 1], abs(d__1));
-					    t[3] = 0.;
-					    t[7] = 0.;
-					    t[11] = -t[14] * val[ic21 - 1] * (
+					    t_ref(2, 3) = val[ib - 1];
+					    t_ref(2, 4) = val[ib - 1] * 3.;
+					    t_ref(3, 1) = 0.;
+					    t_ref(3, 2) = 0.;
+					    t_ref(3, 3) = val[ic11 - 1] * (
 						    d__1 = val[icm - 1], abs(
 						    d__1));
-					    t[15] = val[ic11 - 1] * (
+					    t_ref(3, 4) = val[ic12 - 1] * (
+						    d__1 = val[icm - 1], abs(
+						    d__1));
+					    t_ref(4, 1) = 0.;
+					    t_ref(4, 2) = 0.;
+					    t_ref(4, 3) = -t_ref(3, 4) * val[
+						    ic21 - 1] * (d__1 = val[
+						    icm - 1], abs(d__1));
+					    t_ref(4, 4) = val[ic11 - 1] * (
 						    doublereal) ic22 * (d__1 =
 						     val[icm - 1], abs(d__1));
 					    tnrm = 0.;
-					    for (i = 1; i <= 4; ++i) {
+					    for (i__ = 1; i__ <= 4; ++i__) {
 			  for (j = 1; j <= 4; ++j) {
 /* Computing MAX */
-			      d__2 = tnrm, d__3 = (d__1 = t[i + (j << 2) - 5],
-				       abs(d__1));
+			      d__2 = tnrm, d__3 = (d__1 = t_ref(i__, j), abs(
+				      d__1));
 			      tnrm = max(d__2,d__3);
 /* L190: */
 			  }
@@ -384,24 +403,26 @@ static doublereal c_b64 = 1.;
 						    work, &c__32, result);
 					    res = result[0] + result[1];
 					    if (info == 0) {
-			  if (t[2] != 0.) {
+			  if (t_ref(3, 1) != 0.) {
 			      res += 1. / eps;
 			  }
-			  if (t[3] != 0.) {
+			  if (t_ref(4, 1) != 0.) {
 			      res += 1. / eps;
 			  }
-			  if (t[6] != 0.) {
+			  if (t_ref(3, 2) != 0.) {
 			      res += 1. / eps;
 			  }
-			  if (t[7] != 0.) {
+			  if (t_ref(4, 2) != 0.) {
 			      res += 1. / eps;
 			  }
-			  if (t[1] != 0. && (t[0] != t[5] || d_sign(&c_b64, &
-				  t[4]) == d_sign(&c_b64, &t[1]))) {
+			  if (t_ref(2, 1) != 0. && (t_ref(1, 1) != t_ref(2, 2)
+				   || d_sign(&c_b64, &t_ref(1, 2)) == d_sign(&
+				  c_b64, &t_ref(2, 1)))) {
 			      res += 1. / eps;
 			  }
-			  if (t[11] != 0. && (t[10] != t[15] || d_sign(&c_b64,
-				   &t[14]) == d_sign(&c_b64, &t[11]))) {
+			  if (t_ref(4, 3) != 0. && (t_ref(3, 3) != t_ref(4, 4)
+				   || d_sign(&c_b64, &t_ref(3, 4)) == d_sign(&
+				  c_b64, &t_ref(4, 3)))) {
 			      res += 1. / eps;
 			  }
 					    }
@@ -436,4 +457,8 @@ static doublereal c_b64 = 1.;
 /*     End of DGET34 */
 
 } /* dget34_ */
+
+#undef t1_ref
+#undef t_ref
+
 

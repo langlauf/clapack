@@ -1,31 +1,29 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhpevd_(char *jobz, char *uplo, integer *n, 
-	doublecomplex *ap, doublereal *w, doublecomplex *z, integer *ldz, 
+	doublecomplex *ap, doublereal *w, doublecomplex *z__, integer *ldz, 
 	doublecomplex *work, integer *lwork, doublereal *rwork, integer *
 	lrwork, integer *iwork, integer *liwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZHPEVD computes all the eigenvalues and, optionally, eigenvectors of 
-  
-    a complex Hermitian matrix A in packed storage.  If eigenvectors are 
-  
+    ZHPEVD computes all the eigenvalues and, optionally, eigenvectors of   
+    a complex Hermitian matrix A in packed storage.  If eigenvectors are   
     desired, it uses a divide and conquer algorithm.   
 
     The divide and conquer algorithm makes very mild assumptions about   
     floating point arithmetic. It will work on machines with a guard   
     digit in add/subtract, or on those binary machines without guard   
     digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or   
-    Cray-2. It could conceivably fail on hexadecimal or decimal machines 
-  
+    Cray-2. It could conceivably fail on hexadecimal or decimal machines   
     without guard digits, but we know of none.   
 
     Arguments   
@@ -43,19 +41,15 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the Hermitian matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
 
             On exit, AP is overwritten by values generated during the   
             reduction to tridiagonal form.  If UPLO = 'U', the diagonal   
-            and first superdiagonal of the tridiagonal matrix T overwrite 
-  
+            and first superdiagonal of the tridiagonal matrix T overwrite   
             the corresponding elements of A, and if UPLO = 'L', the   
             diagonal and first subdiagonal of T overwrite the   
             corresponding elements of A.   
@@ -74,7 +68,7 @@
             JOBZ = 'V', LDZ >= max(1,N).   
 
     WORK    (workspace/output) COMPLEX*16 array, dimension (LWORK)   
-            On exit, if LWORK > 0, WORK(1) returns the optimal LWORK.   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of array WORK.   
@@ -82,28 +76,39 @@
             If JOBZ = 'N' and N > 1, LWORK must be at least N.   
             If JOBZ = 'V' and N > 1, LWORK must be at least 2*N.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     RWORK   (workspace/output) DOUBLE PRECISION array,   
                                            dimension (LRWORK)   
-            On exit, if LRWORK > 0, RWORK(1) returns the optimal LRWORK. 
-  
+            On exit, if INFO = 0, RWORK(1) returns the optimal LRWORK.   
 
     LRWORK  (input) INTEGER   
             The dimension of array RWORK.   
             If N <= 1,               LRWORK must be at least 1.   
             If JOBZ = 'N' and N > 1, LRWORK must be at least N.   
             If JOBZ = 'V' and N > 1, LRWORK must be at least   
-                      1 + 4*N + 2*N*lg N + 3*N**2 ,   
-                      where lg( N ) = smallest integer k such   
-                                      that 2**k >= N.   
+                      1 + 5*N + 2*N**2.   
+
+            If LRWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the RWORK array,   
+            returns this value as the first entry of the RWORK array, and   
+            no error message related to LRWORK is issued by XERBLA.   
 
     IWORK   (workspace/output) INTEGER array, dimension (LIWORK)   
-            On exit, if LIWORK > 0, IWORK(1) returns the optimal LIWORK. 
-  
+            On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK.   
 
     LIWORK  (input) INTEGER   
             The dimension of array IWORK.   
             If JOBZ  = 'N' or N <= 1, LIWORK must be at least 1.   
-            If JOBZ  = 'V' and N > 1, LIWORK must be at least 2 + 5*N.   
+            If JOBZ  = 'V' and N > 1, LIWORK must be at least 3 + 5*N.   
+
+            If LIWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the IWORK array,   
+            returns this value as the first entry of the IWORK array, and   
+            no error message related to LIWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -112,25 +117,19 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
-    static integer c__2 = 2;
     static integer c__1 = 1;
     
     /* System generated locals */
     integer z_dim1, z_offset, i__1;
     doublereal d__1;
     /* Builtin functions */
-    double log(doublereal);
-    integer pow_ii(integer *, integer *);
     double sqrt(doublereal);
     /* Local variables */
     static integer inde;
@@ -161,24 +160,28 @@
     static integer indrwk, indwrk, liwmin, lrwmin;
     static doublereal smlnum;
     extern /* Subroutine */ int zhptrd_(char *, integer *, doublecomplex *, 
-	    doublereal *, doublereal *, doublecomplex *, integer *), 
-	    zupmtr_(char *, char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *);
-    static integer lgn;
+	    doublereal *, doublereal *, doublecomplex *, integer *);
+    static logical lquery;
+    extern /* Subroutine */ int zupmtr_(char *, char *, char *, integer *, 
+	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    integer *, doublecomplex *, integer *);
     static doublereal eps;
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    --ap;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
+    --iwork;
 
-#define AP(I) ap[(I)-1]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
+    lquery = *lwork == -1 || *lrwork == -1 || *liwork == -1;
 
     *info = 0;
     if (*n <= 1) {
@@ -186,19 +189,12 @@
 	liwmin = 1;
 	lrwmin = 1;
     } else {
-	lgn = (integer) (log((doublereal) (*n)) / log(2.));
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
 	if (wantz) {
 	    lwmin = *n << 1;
 /* Computing 2nd power */
 	    i__1 = *n;
-	    lrwmin = (*n << 2) + 1 + (*n << 1) * lgn + i__1 * i__1 * 3;
-	    liwmin = *n * 5 + 2;
+	    lrwmin = *n * 5 + 1 + (i__1 * i__1 << 1);
+	    liwmin = *n * 5 + 3;
 	} else {
 	    lwmin = *n;
 	    lrwmin = *n;
@@ -207,39 +203,46 @@
     }
     if (! (wantz || lsame_(jobz, "N"))) {
 	*info = -1;
-    } else if (! (lsame_(uplo, "L") || lsame_(uplo, "U"))) {
+    } else if (! (lsame_(uplo, "L") || lsame_(uplo, 
+	    "U"))) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
     } else if (*ldz < 1 || wantz && *ldz < *n) {
 	*info = -7;
-    } else if (*lwork < lwmin) {
+    } else if (*lwork < lwmin && ! lquery) {
 	*info = -9;
-    } else if (*lrwork < lrwmin) {
+    } else if (*lrwork < lrwmin && ! lquery) {
 	*info = -11;
-    } else if (*liwork < liwmin) {
+    } else if (*liwork < liwmin && ! lquery) {
 	*info = -13;
+    }
+
+    if (*info == 0) {
+	work[1].r = (doublereal) lwmin, work[1].i = 0.;
+	rwork[1] = (doublereal) lrwmin;
+	iwork[1] = liwmin;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
-	xerbla_("ZHPEVD ", &i__1);
-	goto L10;
+	xerbla_("ZHPEVD", &i__1);
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n == 0) {
-	goto L10;
+	return 0;
     }
 
     if (*n == 1) {
-	W(1) = AP(1).r;
+	w[1] = ap[1].r;
 	if (wantz) {
-	    i__1 = z_dim1 + 1;
-	    Z(1,1).r = 1., Z(1,1).i = 0.;
+	    i__1 = z___subscr(1, 1);
+	    z__[i__1].r = 1., z__[i__1].i = 0.;
 	}
-	goto L10;
+	return 0;
     }
 
 /*     Get machine constants. */
@@ -253,7 +256,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = zlanhp_("M", uplo, n, &AP(1), &RWORK(1));
+    anrm = zlanhp_("M", uplo, n, &ap[1], &rwork[1]);
     iscale = 0;
     if (anrm > 0. && anrm < rmin) {
 	iscale = 1;
@@ -264,11 +267,10 @@
     }
     if (iscale == 1) {
 	i__1 = *n * (*n + 1) / 2;
-	zdscal_(&i__1, &sigma, &AP(1), &c__1);
+	zdscal_(&i__1, &sigma, &ap[1], &c__1);
     }
 
-/*     Call ZHPTRD to reduce Hermitian packed matrix to tridiagonal form. 
-*/
+/*     Call ZHPTRD to reduce Hermitian packed matrix to tridiagonal form. */
 
     inde = 1;
     indtau = 1;
@@ -276,18 +278,19 @@
     indwrk = indtau + *n;
     llwrk = *lwork - indwrk + 1;
     llrwk = *lrwork - indrwk + 1;
-    zhptrd_(uplo, n, &AP(1), &W(1), &RWORK(inde), &WORK(indtau), &iinfo);
+    zhptrd_(uplo, n, &ap[1], &w[1], &rwork[inde], &work[indtau], &iinfo);
 
 /*     For eigenvalues only, call DSTERF.  For eigenvectors, first call   
        ZUPGTR to generate the orthogonal matrix, then call ZSTEDC. */
 
     if (! wantz) {
-	dsterf_(n, &W(1), &RWORK(inde), info);
+	dsterf_(n, &w[1], &rwork[inde], info);
     } else {
-	zstedc_("I", n, &W(1), &RWORK(inde), &Z(1,1), ldz, &WORK(indwrk),
-		 &llwrk, &RWORK(indrwk), &llrwk, &IWORK(1), liwork, info);
-	zupmtr_("L", uplo, "N", n, n, &AP(1), &WORK(indtau), &Z(1,1), 
-		ldz, &WORK(indwrk), &iinfo);
+	zstedc_("I", n, &w[1], &rwork[inde], &z__[z_offset], ldz, &work[
+		indwrk], &llwrk, &rwork[indrwk], &llrwk, &iwork[1], liwork, 
+		info);
+	zupmtr_("L", uplo, "N", n, n, &ap[1], &work[indtau], &z__[z_offset], 
+		ldz, &work[indwrk], &iinfo);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -299,22 +302,19 @@
 	    imax = *info - 1;
 	}
 	d__1 = 1. / sigma;
-	dscal_(&imax, &d__1, &W(1), &c__1);
+	dscal_(&imax, &d__1, &w[1], &c__1);
     }
 
-L10:
-    if (*lwork > 0) {
-	WORK(1).r = (doublereal) lwmin, WORK(1).i = 0.;
-    }
-    if (*lrwork > 0) {
-	RWORK(1) = (doublereal) lrwmin;
-    }
-    if (*liwork > 0) {
-	IWORK(1) = liwmin;
-    }
+    work[1].r = (doublereal) lwmin, work[1].i = 0.;
+    rwork[1] = (doublereal) lrwmin;
+    iwork[1] = liwmin;
     return 0;
 
 /*     End of ZHPEVD */
 
 } /* zhpevd_ */
+
+#undef z___ref
+#undef z___subscr
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgeequ_(integer *m, integer *n, doublecomplex *a, 
-	integer *lda, doublereal *r, doublereal *c, doublereal *rowcnd, 
+	integer *lda, doublereal *r__, doublereal *c__, doublereal *rowcnd, 
 	doublereal *colcnd, doublereal *amax, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -70,33 +71,33 @@
                   <= M:  the i-th row of A is exactly zero   
                   >  M:  the (i-M)-th column of A is exactly zero   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     doublereal d__1, d__2, d__3, d__4;
     /* Builtin functions */
     double d_imag(doublecomplex *);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal rcmin, rcmax;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal bignum, smlnum;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --r__;
+    --c__;
 
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -128,22 +129,22 @@
 /*     Compute row scale factors. */
 
     i__1 = *m;
-    for (i = 1; i <= *m; ++i) {
-	R(i) = 0.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	r__[i__] = 0.;
 /* L10: */
     }
 
 /*     Find the maximum element in each row. */
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    i__3 = i + j * a_dim1;
-	    d__3 = R(i), d__4 = (d__1 = A(i,j).r, abs(d__1)) + (d__2 = 
-		    d_imag(&A(i,j)), abs(d__2));
-	    R(i) = max(d__3,d__4);
+	    i__3 = a_subscr(i__, j);
+	    d__3 = r__[i__], d__4 = (d__1 = a[i__3].r, abs(d__1)) + (d__2 = 
+		    d_imag(&a_ref(i__, j)), abs(d__2));
+	    r__[i__] = max(d__3,d__4);
 /* L20: */
 	}
 /* L30: */
@@ -154,12 +155,12 @@
     rcmin = bignum;
     rcmax = 0.;
     i__1 = *m;
-    for (i = 1; i <= *m; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	d__1 = rcmax, d__2 = R(i);
+	d__1 = rcmax, d__2 = r__[i__];
 	rcmax = max(d__1,d__2);
 /* Computing MIN */
-	d__1 = rcmin, d__2 = R(i);
+	d__1 = rcmin, d__2 = r__[i__];
 	rcmin = min(d__1,d__2);
 /* L40: */
     }
@@ -167,13 +168,12 @@
 
     if (rcmin == 0.) {
 
-/*        Find the first zero scale factor and return an error code. 
-*/
+/*        Find the first zero scale factor and return an error code. */
 
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    if (R(i) == 0.) {
-		*info = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (r__[i__] == 0.) {
+		*info = i__;
 		return 0;
 	    }
 /* L50: */
@@ -183,12 +183,12 @@
 /*        Invert the scale factors. */
 
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MIN   
    Computing MAX */
-	    d__2 = R(i);
+	    d__2 = r__[i__];
 	    d__1 = max(d__2,smlnum);
-	    R(i) = 1. / min(d__1,bignum);
+	    r__[i__] = 1. / min(d__1,bignum);
 /* L60: */
 	}
 
@@ -200,8 +200,8 @@
 /*     Compute column scale factors */
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
-	C(j) = 0.;
+    for (j = 1; j <= i__1; ++j) {
+	c__[j] = 0.;
 /* L70: */
     }
 
@@ -209,14 +209,14 @@
        assuming the row scaling computed above. */
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    i__3 = i + j * a_dim1;
-	    d__3 = C(j), d__4 = ((d__1 = A(i,j).r, abs(d__1)) + (d__2 = 
-		    d_imag(&A(i,j)), abs(d__2))) * R(i);
-	    C(j) = max(d__3,d__4);
+	    i__3 = a_subscr(i__, j);
+	    d__3 = c__[j], d__4 = ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = 
+		    d_imag(&a_ref(i__, j)), abs(d__2))) * r__[i__];
+	    c__[j] = max(d__3,d__4);
 /* L80: */
 	}
 /* L90: */
@@ -227,24 +227,23 @@
     rcmin = bignum;
     rcmax = 0.;
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-	d__1 = rcmin, d__2 = C(j);
+	d__1 = rcmin, d__2 = c__[j];
 	rcmin = min(d__1,d__2);
 /* Computing MAX */
-	d__1 = rcmax, d__2 = C(j);
+	d__1 = rcmax, d__2 = c__[j];
 	rcmax = max(d__1,d__2);
 /* L100: */
     }
 
     if (rcmin == 0.) {
 
-/*        Find the first zero scale factor and return an error code. 
-*/
+/*        Find the first zero scale factor and return an error code. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    if (C(j) == 0.) {
+	for (j = 1; j <= i__1; ++j) {
+	    if (c__[j] == 0.) {
 		*info = *m + j;
 		return 0;
 	    }
@@ -255,12 +254,12 @@
 /*        Invert the scale factors. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MIN   
    Computing MAX */
-	    d__2 = C(j);
+	    d__2 = c__[j];
 	    d__1 = max(d__2,smlnum);
-	    C(j) = 1. / min(d__1,bignum);
+	    c__[j] = 1. / min(d__1,bignum);
 /* L120: */
 	}
 
@@ -274,4 +273,8 @@
 /*     End of ZGEEQU */
 
 } /* zgeequ_ */
+
+#undef a_ref
+#undef a_subscr
+
 

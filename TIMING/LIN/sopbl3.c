@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,7 +28,7 @@ doublereal sopbl3_(char *subnam, integer *m, integer *n, integer *k)
     extern logical lsamen_(integer *, char *, char *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -62,21 +63,20 @@ doublereal sopbl3_(char *subnam, integer *m, integer *n, integer *k)
             A is applied on the left or right.  If K <= 0, the matrix   
             is applied on the left, if K > 0, on the right.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible */
 
-    if (*m <= 0 || ! (lsame_(subnam, "S") || lsame_(subnam, "D") || lsame_(subnam, "C") || lsame_(subnam, "Z"))
-	    ) {
+    if (*m <= 0 || ! (lsame_(subnam, "S") || lsame_(
+	    subnam, "D") || lsame_(subnam, "C") || lsame_(subnam, "Z"))) {
 	ret_val = 0.f;
 	return ret_val;
     }
 
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
     mults = 0.f;
     adds = 0.f;
     em = (real) (*m);
@@ -95,8 +95,9 @@ doublereal sopbl3_(char *subnam, integer *m, integer *n, integer *k)
 	    mults = em * ek * en;
 	    adds = em * ek * en;
 
-	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__3, subnam, 
-		"CHE") || lsamen_(&c__3, subnam, "ZHE")) {
+	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&
+		c__3, subnam, "CHE") || lsamen_(&c__3, 
+		subnam, "ZHE")) {
 
 /*           IF K <= 0, assume A multiplies B on the left. */
 
@@ -126,7 +127,9 @@ doublereal sopbl3_(char *subnam, integer *m, integer *n, integer *k)
 
     } else if (lsamen_(&c__3, c3, "RK ")) {
 
-	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__3, subnam, "CHE") || lsamen_(&c__3, subnam, "ZHE")) {
+	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__3, 
+		subnam, "CHE") || lsamen_(&c__3, subnam,
+		 "ZHE")) {
 
 	    mults = ek * em * (em + 1.f) / 2.f;
 	    adds = ek * em * (em + 1.f) / 2.f;
@@ -138,7 +141,9 @@ doublereal sopbl3_(char *subnam, integer *m, integer *n, integer *k)
 
     } else if (lsamen_(&c__3, c3, "R2K")) {
 
-	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__3, subnam, "CHE") || lsamen_(&c__3, subnam, "ZHE")) {
+	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__3, 
+		subnam, "CHE") || lsamen_(&c__3, subnam,
+		 "ZHE")) {
 
 	    mults = ek * em * em;
 	    adds = ek * em * em + em;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,9 +20,9 @@ static integer c__2 = 2;
 static integer c__1 = 1;
 static integer c_n1 = -1;
 
-/* Subroutine */ int dstein_(integer *n, doublereal *d, doublereal *e, 
+/* Subroutine */ int dstein_(integer *n, doublereal *d__, doublereal *e, 
 	integer *m, doublereal *w, integer *iblock, integer *isplit, 
-	doublereal *z, integer *ldz, doublereal *work, integer *iwork, 
+	doublereal *z__, integer *ldz, doublereal *work, integer *iwork, 
 	integer *ifail, integer *info)
 {
     /* System generated locals */
@@ -37,7 +38,7 @@ static integer c_n1 = -1;
 	    integer *);
     static integer jmax;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     static integer iseed[4], gpind, iinfo;
@@ -68,8 +69,10 @@ static integer c_n1 = -1;
     static doublereal xjm, ztr, eps1;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -118,8 +121,7 @@ static integer c_n1 = -1;
             from DSTEBZ is expected here. )   
 
     ISPLIT  (input) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices. 
-  
+            The splitting points, at which T breaks up into submatrices.   
             The first submatrix consists of rows/columns 1 to   
             ISPLIT( 1 ), the second of rows/columns ISPLIT( 1 )+1   
             through ISPLIT( 2 ), etc.   
@@ -128,8 +130,7 @@ static integer c_n1 = -1;
     Z       (output) DOUBLE PRECISION array, dimension (LDZ, M)   
             The computed eigenvectors.  The eigenvector associated   
             with the eigenvalue W(i) is stored in the i-th column of   
-            Z.  Any vector which fails to converge is set to its current 
-  
+            Z.  Any vector which fails to converge is set to its current   
             iterate after MAXITS iterations.   
 
     LDZ     (input) INTEGER   
@@ -162,21 +163,20 @@ static integer c_n1 = -1;
             The number of iterations performed after norm growth   
             criterion is satisfied, should be at least 1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     --w;
     --iblock;
     --isplit;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --work;
     --iwork;
     --ifail;
@@ -184,8 +184,8 @@ static integer c_n1 = -1;
     /* Function Body */
     *info = 0;
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
-	ifail[i] = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	ifail[i__] = 0;
 /* L10: */
     }
 
@@ -227,7 +227,7 @@ L30:
     if (*n == 0 || *m == 0) {
 	return 0;
     } else if (*n == 1) {
-	z[z_dim1 + 1] = 1.;
+	z___ref(1, 1) = 1.;
 	return 0;
     }
 
@@ -237,8 +237,8 @@ L30:
 
 /*     Initialize seed for random number generator DLARNV. */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = 1;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = 1;
 /* L40: */
     }
 
@@ -270,19 +270,18 @@ L30:
 	}
 	gpind = b1;
 
-/*        Compute reorthogonalization criterion and stopping criterion
-. */
+/*        Compute reorthogonalization criterion and stopping criterion. */
 
-	onenrm = (d__1 = d[b1], abs(d__1)) + (d__2 = e[b1], abs(d__2));
+	onenrm = (d__1 = d__[b1], abs(d__1)) + (d__2 = e[b1], abs(d__2));
 /* Computing MAX */
-	d__3 = onenrm, d__4 = (d__1 = d[bn], abs(d__1)) + (d__2 = e[bn - 1], 
-		abs(d__2));
+	d__3 = onenrm, d__4 = (d__1 = d__[bn], abs(d__1)) + (d__2 = e[bn - 1],
+		 abs(d__2));
 	onenrm = max(d__3,d__4);
 	i__2 = bn - 1;
-	for (i = b1 + 1; i <= i__2; ++i) {
+	for (i__ = b1 + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__4 = onenrm, d__5 = (d__1 = d[i], abs(d__1)) + (d__2 = e[i - 1],
-		     abs(d__2)) + (d__3 = e[i], abs(d__3));
+	    d__4 = onenrm, d__5 = (d__1 = d__[i__], abs(d__1)) + (d__2 = e[
+		    i__ - 1], abs(d__2)) + (d__3 = e[i__], abs(d__3));
 	    onenrm = max(d__4,d__5);
 /* L50: */
 	}
@@ -314,8 +313,7 @@ L60:
 		goto L120;
 	    }
 
-/*           If eigenvalues j and j-1 are too close, add a relativ
-ely   
+/*           If eigenvalues j and j-1 are too close, add a relatively   
              small perturbation. */
 
 	    if (jblk > 1) {
@@ -334,31 +332,27 @@ ely
 
 	    dlarnv_(&c__2, iseed, &blksiz, &work[indrv1 + 1]);
 
-/*           Increment opcount for getting random starting vector.
-   
+/*           Increment opcount for getting random starting vector.   
              ( DLARND(2,.) requires 9 flops. ) */
 
 	    latime_1.ops += blksiz * 9;
 
-/*           Copy the matrix T so it won't be destroyed in factori
-zation. */
+/*           Copy the matrix T so it won't be destroyed in factorization. */
 
-	    dcopy_(&blksiz, &d[b1], &c__1, &work[indrv4 + 1], &c__1);
+	    dcopy_(&blksiz, &d__[b1], &c__1, &work[indrv4 + 1], &c__1);
 	    i__3 = blksiz - 1;
 	    dcopy_(&i__3, &e[b1], &c__1, &work[indrv2 + 2], &c__1);
 	    i__3 = blksiz - 1;
 	    dcopy_(&i__3, &e[b1], &c__1, &work[indrv3 + 1], &c__1);
 
-/*           Compute LU factors with partial pivoting  ( PT = LU )
- */
+/*           Compute LU factors with partial pivoting  ( PT = LU ) */
 
 	    tol = 0.;
 	    dlagtf_(&blksiz, &work[indrv4 + 1], &xj, &work[indrv2 + 2], &work[
 		    indrv3 + 1], &tol, &work[indrv5 + 1], &iwork[1], &iinfo);
 
 /*           Increment opcount for computing LU factors.   
-             ( DLAGTF(BLKSIZ,...) requires about 8*BLKSIZ flops. )
- */
+             ( DLAGTF(BLKSIZ,...) requires about 8*BLKSIZ flops. ) */
 
 	    latime_1.ops += blksiz << 3;
 
@@ -384,15 +378,12 @@ L70:
 		    work[indrv3 + 1], &work[indrv5 + 1], &iwork[1], &work[
 		    indrv1 + 1], &tol, &iinfo);
 
-/*           Increment opcount for scaling and solving linear syst
-em.   
-             ( DLAGTS(-1,BLKSIZ,...) requires about 8*BLKSIZ flops
-. ) */
+/*           Increment opcount for scaling and solving linear system.   
+             ( DLAGTS(-1,BLKSIZ,...) requires about 8*BLKSIZ flops. ) */
 
 	    latime_1.ops = latime_1.ops + 3 + blksiz * 10;
 
-/*           Reorthogonalize by modified Gram-Schmidt if eigenvalu
-es are   
+/*           Reorthogonalize by modified Gram-Schmidt if eigenvalues are   
              close enough. */
 
 	    if (jblk == 1) {
@@ -403,10 +394,10 @@ es are
 	    }
 	    if (gpind != j) {
 		i__3 = j - 1;
-		for (i = gpind; i <= i__3; ++i) {
-		    ztr = -ddot_(&blksiz, &work[indrv1 + 1], &c__1, &z[b1 + i 
-			    * z_dim1], &c__1);
-		    daxpy_(&blksiz, &ztr, &z[b1 + i * z_dim1], &c__1, &work[
+		for (i__ = gpind; i__ <= i__3; ++i__) {
+		    ztr = -ddot_(&blksiz, &work[indrv1 + 1], &c__1, &z___ref(
+			    b1, i__), &c__1);
+		    daxpy_(&blksiz, &ztr, &z___ref(b1, i__), &c__1, &work[
 			    indrv1 + 1], &c__1);
 /* L80: */
 		}
@@ -423,8 +414,7 @@ L90:
 	    jmax = idamax_(&blksiz, &work[indrv1 + 1], &c__1);
 	    nrm = (d__1 = work[indrv1 + jmax], abs(d__1));
 
-/*           Continue for additional iterations after norm reaches
-   
+/*           Continue for additional iterations after norm reaches   
              stopping criterion. */
 
 	    if (nrm < dtpcrt) {
@@ -437,8 +427,7 @@ L90:
 
 	    goto L110;
 
-/*           If stopping criterion was not satisfied, update info 
-and   
+/*           If stopping criterion was not satisfied, update info and   
              store eigenvector number in array ifail. */
 
 L100:
@@ -461,13 +450,13 @@ L110:
 
 L120:
 	    i__3 = *n;
-	    for (i = 1; i <= i__3; ++i) {
-		z[i + j * z_dim1] = 0.;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		z___ref(i__, j) = 0.;
 /* L130: */
 	    }
 	    i__3 = blksiz;
-	    for (i = 1; i <= i__3; ++i) {
-		z[b1 + i - 1 + j * z_dim1] = work[indrv1 + i];
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		z___ref(b1 + i__ - 1, j) = work[indrv1 + i__];
 /* L140: */
 	    }
 
@@ -487,4 +476,7 @@ L160:
 /*     End of DSTEIN */
 
 } /* dstein_ */
+
+#undef z___ref
+
 

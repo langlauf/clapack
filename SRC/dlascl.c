@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dlascl_(char *type, integer *kl, integer *ku, doublereal 
-	*cfrom, doublereal *cto, integer *m, integer *n, doublereal *a, 
-	integer *lda, integer *info)
+/* Subroutine */ int dlascl_(char *type__, integer *kl, integer *ku, 
+	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 
+	doublereal *a, integer *lda, integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -14,12 +15,9 @@
     =======   
 
     DLASCL multiplies the M by N real matrix A by the real scalar   
-    CTO/CFROM.  This is done without over/underflow as long as the final 
-  
-    result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that 
-  
-    A may be full, upper triangular, lower triangular, upper Hessenberg, 
-  
+    CTO/CFROM.  This is done without over/underflow as long as the final   
+    result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that   
+    A may be full, upper triangular, lower triangular, upper Hessenberg,   
     or banded.   
 
     Arguments   
@@ -31,16 +29,13 @@
             = 'L':  A is a lower triangular matrix.   
             = 'U':  A is an upper triangular matrix.   
             = 'H':  A is an upper Hessenberg matrix.   
-            = 'B':  A is a symmetric band matrix with lower bandwidth KL 
-  
+            = 'B':  A is a symmetric band matrix with lower bandwidth KL   
                     and upper bandwidth KU and with the only the lower   
                     half stored.   
-            = 'Q':  A is a symmetric band matrix with lower bandwidth KL 
-  
+            = 'Q':  A is a symmetric band matrix with lower bandwidth KL   
                     and upper bandwidth KU and with the only the upper   
                     half stored.   
-            = 'Z':  A is a band matrix with lower bandwidth KL and upper 
-  
+            = 'Z':  A is a band matrix with lower bandwidth KL and upper   
                     bandwidth KU.   
 
     KL      (input) INTEGER   
@@ -75,21 +70,18 @@
             0  - successful exit   
             <0 - if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     /* Local variables */
     static logical done;
     static doublereal ctoc;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer itype, k1, k2, k3, k4;
     static doublereal cfrom1;
@@ -97,26 +89,28 @@
     static doublereal cfromc;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal bignum, smlnum, mul, cto1;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
 
-    if (lsame_(type, "G")) {
+    if (lsame_(type__, "G")) {
 	itype = 0;
-    } else if (lsame_(type, "L")) {
+    } else if (lsame_(type__, "L")) {
 	itype = 1;
-    } else if (lsame_(type, "U")) {
+    } else if (lsame_(type__, "U")) {
 	itype = 2;
-    } else if (lsame_(type, "H")) {
+    } else if (lsame_(type__, "H")) {
 	itype = 3;
-    } else if (lsame_(type, "B")) {
+    } else if (lsame_(type__, "B")) {
 	itype = 4;
-    } else if (lsame_(type, "Q")) {
+    } else if (lsame_(type__, "Q")) {
 	itype = 5;
-    } else if (lsame_(type, "Z")) {
+    } else if (lsame_(type__, "Z")) {
 	itype = 6;
     } else {
 	itype = -1;
@@ -191,10 +185,10 @@ L10:
 /*        Full matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		A(i,j) *= mul;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L20: */
 	    }
 /* L30: */
@@ -205,10 +199,10 @@ L10:
 /*        Lower triangular matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = j; i <= *m; ++i) {
-		A(i,j) *= mul;
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L40: */
 	    }
 /* L50: */
@@ -219,10 +213,10 @@ L10:
 /*        Upper triangular matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = min(j,*m);
-	    for (i = 1; i <= min(j,*m); ++i) {
-		A(i,j) *= mul;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L60: */
 	    }
 /* L70: */
@@ -233,12 +227,12 @@ L10:
 /*        Upper Hessenberg matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 	    i__3 = j + 1;
 	    i__2 = min(i__3,*m);
-	    for (i = 1; i <= min(j+1,*m); ++i) {
-		A(i,j) *= mul;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L80: */
 	    }
 /* L90: */
@@ -251,12 +245,12 @@ L10:
 	k3 = *kl + 1;
 	k4 = *n + 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 	    i__3 = k3, i__4 = k4 - j;
 	    i__2 = min(i__3,i__4);
-	    for (i = 1; i <= min(k3,k4-j); ++i) {
-		A(i,j) *= mul;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L100: */
 	    }
 /* L110: */
@@ -269,12 +263,12 @@ L10:
 	k1 = *ku + 2;
 	k3 = *ku + 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__2 = k1 - j;
 	    i__3 = k3;
-	    for (i = max(k1-j,1); i <= k3; ++i) {
-		A(i,j) *= mul;
+	    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L120: */
 	    }
 /* L130: */
@@ -289,14 +283,14 @@ L10:
 	k3 = (*kl << 1) + *ku + 1;
 	k4 = *kl + *ku + 1 + *m;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__3 = k1 - j;
 /* Computing MIN */
 	    i__4 = k3, i__5 = k4 - j;
 	    i__2 = min(i__4,i__5);
-	    for (i = max(k1-j,k2); i <= min(k3,k4-j); ++i) {
-		A(i,j) *= mul;
+	    for (i__ = max(i__3,k2); i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j) * mul;
 /* L140: */
 	    }
 /* L150: */
@@ -313,4 +307,7 @@ L10:
 /*     End of DLASCL */
 
 } /* dlascl_ */
+
+#undef a_ref
+
 

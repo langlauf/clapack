@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -40,7 +41,7 @@ static integer c__1200 = 1200;
     static complex ttmp[400]	/* was [20][20] */, work[1200], wtmp[20];
     static real wsrt[20];
     static complex tsav1[400]	/* was [20][20] */;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     static complex q[400]	/* was [20][20] */;
     static real s;
     static complex t[400]	/* was [20][20] */;
@@ -80,22 +81,33 @@ static integer c__1200 = 1200;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define qsav_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define qsav_ref(a_1,a_2) qsav[qsav_subscr(a_1,a_2)]
+#define qtmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define qtmp_ref(a_1,a_2) qtmp[qtmp_subscr(a_1,a_2)]
+#define ttmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define ttmp_ref(a_1,a_2) ttmp[ttmp_subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define t_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
+#define tmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define tmp_ref(a_1,a_2) tmp[tmp_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    CGET38 tests CTRSEN, a routine for estimating condition numbers of a 
-  
-    cluster of eigenvalues and/or its associated right invariant subspace 
-  
+    CGET38 tests CTRSEN, a routine for estimating condition numbers of a   
+    cluster of eigenvalues and/or its associated right invariant subspace   
 
-    The test matrices are read from a file with logical unit number NIN. 
-  
+    The test matrices are read from a file with logical unit number NIN.   
 
     Arguments   
     ==========   
@@ -118,9 +130,9 @@ static integer c__1200 = 1200;
             If CTRSEN returns INFO nonzero on example i, LMAX(3)=i   
 
     NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = 1 if CGEHRD returned INFO nonzero   
-            NINFO(2) = 1 if CHSEQR returned INFO nonzero   
-            NINFO(3) = 1 if CTRSEN returned INFO nonzero   
+            NINFO(1) = No. of times CGEHRD returned INFO nonzero   
+            NINFO(2) = No. of times CHSEQR returned INFO nonzero   
+            NINFO(3) = No. of times CTRSEN returned INFO nonzero   
 
     KNT     (output) INTEGER   
             Total number of examples tested.   
@@ -128,8 +140,7 @@ static integer c__1200 = 1200;
     NIN     (input) INTEGER   
             Input logical unit number.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -177,18 +188,19 @@ L10:
     io___9.ciunit = *nin;
     s_rsle(&io___9);
     i__1 = ndim;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&iselec[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&iselec[i__ - 1], (ftnlen)sizeof(integer)
+		);
     }
     e_rsle();
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___12.ciunit = *nin;
 	s_rsle(&io___12);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&tmp[i + j * 20 - 21], (ftnlen)
-		    sizeof(complex));
+	    do_lio(&c__6, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
+		    complex));
 	}
 	e_rsle();
 /* L20: */
@@ -208,8 +220,8 @@ L10:
 	clacpy_("F", &n, &n, tmp, &c__20, t, &c__20);
 	vmul = val[iscl - 1];
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    csscal_(&n, &vmul, &t[i * 20 - 20], &c__1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    csscal_(&n, &vmul, &t_ref(1, i__), &c__1);
 /* L30: */
 	}
 	if (tnrm == 0.f) {
@@ -224,7 +236,7 @@ L10:
 	if (info != 0) {
 	    lmax[1] = *knt;
 	    ++ninfo[1];
-	    return 0;
+	    goto L200;
 	}
 
 /*        Generate unitary matrix */
@@ -238,8 +250,8 @@ L10:
 	i__1 = n - 2;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = n;
-	    for (i = j + 2; i <= i__2; ++i) {
-		i__3 = i + j * 20 - 21;
+	    for (i__ = j + 2; i__ <= i__2; ++i__) {
+		i__3 = t_subscr(i__, j);
 		t[i__3].r = 0.f, t[i__3].i = 0.f;
 /* L40: */
 	    }
@@ -250,53 +262,53 @@ L10:
 	if (info != 0) {
 	    lmax[2] = *knt;
 	    ++ninfo[2];
-	    return 0;
+	    goto L200;
 	}
 
 /*        Sort, select eigenvalues */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    ipnt[i - 1] = i;
-	    select[i - 1] = FALSE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ipnt[i__ - 1] = i__;
+	    select[i__ - 1] = FALSE_;
 /* L60: */
 	}
 	if (isrt == 0) {
 	    i__1 = n;
-	    for (i = 1; i <= i__1; ++i) {
-		i__2 = i - 1;
-		wsrt[i - 1] = w[i__2].r;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = i__ - 1;
+		wsrt[i__ - 1] = w[i__2].r;
 /* L70: */
 	    }
 	} else {
 	    i__1 = n;
-	    for (i = 1; i <= i__1; ++i) {
-		wsrt[i - 1] = r_imag(&w[i - 1]);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		wsrt[i__ - 1] = r_imag(&w[i__ - 1]);
 /* L80: */
 	    }
 	}
 	i__1 = n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    kmin = i;
-	    vmin = wsrt[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    kmin = i__;
+	    vmin = wsrt[i__ - 1];
 	    i__2 = n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		if (wsrt[j - 1] < vmin) {
 		    kmin = j;
 		    vmin = wsrt[j - 1];
 		}
 /* L90: */
 	    }
-	    wsrt[kmin - 1] = wsrt[i - 1];
-	    wsrt[i - 1] = vmin;
-	    itmp = ipnt[i - 1];
-	    ipnt[i - 1] = ipnt[kmin - 1];
+	    wsrt[kmin - 1] = wsrt[i__ - 1];
+	    wsrt[i__ - 1] = vmin;
+	    itmp = ipnt[i__ - 1];
+	    ipnt[i__ - 1] = ipnt[kmin - 1];
 	    ipnt[kmin - 1] = itmp;
 /* L100: */
 	}
 	i__1 = ndim;
-	for (i = 1; i <= i__1; ++i) {
-	    select[ipnt[iselec[i - 1] - 1] - 1] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    select[ipnt[iselec[i__ - 1] - 1] - 1] = TRUE_;
 /* L110: */
 	}
 
@@ -309,7 +321,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L200;
 	}
 	septmp = sep / vmul;
 	stmp = s;
@@ -321,7 +333,9 @@ L10:
 	vmax = dmax(result[0],result[1]);
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
 
 /*        Compare condition number for eigenvalue cluster   
@@ -362,7 +376,9 @@ L10:
 	}
 	if (vmax > rmax[2]) {
 	    rmax[2] = vmax;
-	    lmax[2] = *knt;
+	    if (ninfo[2] == 0) {
+		lmax[2] = *knt;
+	    }
 	}
 
 /*        Compare condition numbers for invariant subspace   
@@ -397,7 +413,9 @@ L10:
 	}
 	if (vmax > rmax[2]) {
 	    rmax[2] = vmax;
-	    lmax[2] = *knt;
+	    if (ninfo[2] == 0) {
+		lmax[2] = *knt;
+	    }
 	}
 
 /*        Compare condition number for eigenvalue cluster   
@@ -418,7 +436,9 @@ L10:
 	}
 	if (vmax > rmax[3]) {
 	    rmax[3] = vmax;
-	    lmax[3] = *knt;
+	    if (ninfo[3] == 0) {
+		lmax[3] = *knt;
+	    }
 	}
 
 /*        Compare condition numbers for invariant subspace   
@@ -439,7 +459,9 @@ L10:
 	}
 	if (vmax > rmax[3]) {
 	    rmax[3] = vmax;
-	    lmax[3] = *knt;
+	    if (ninfo[3] == 0) {
+		lmax[3] = *knt;
+	    }
 	}
 
 /*        Compute eigenvalue condition number only and compare   
@@ -455,7 +477,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L200;
 	}
 	if (s != stmp) {
 	    vmax = 1.f / eps;
@@ -464,16 +486,16 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = ttmp_subscr(i__, j);
+		i__4 = t_subscr(i__, j);
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1.f / eps;
 		}
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = qtmp_subscr(i__, j);
+		i__4 = q_subscr(i__, j);
 		if (qtmp[i__3].r != q[i__4].r || qtmp[i__3].i != q[i__4].i) {
 		    vmax = 1.f / eps;
 		}
@@ -482,8 +504,7 @@ L10:
 /* L130: */
 	}
 
-/*        Compute invariant subspace condition number only and compare
-   
+/*        Compute invariant subspace condition number only and compare   
           Update Q */
 
 	clacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -495,7 +516,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L200;
 	}
 	if (-1.f != stmp) {
 	    vmax = 1.f / eps;
@@ -504,16 +525,16 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = ttmp_subscr(i__, j);
+		i__4 = t_subscr(i__, j);
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1.f / eps;
 		}
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = qtmp_subscr(i__, j);
+		i__4 = q_subscr(i__, j);
 		if (qtmp[i__3].r != q[i__4].r || qtmp[i__3].i != q[i__4].i) {
 		    vmax = 1.f / eps;
 		}
@@ -534,7 +555,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L200;
 	}
 	if (s != stmp) {
 	    vmax = 1.f / eps;
@@ -543,16 +564,16 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = ttmp_subscr(i__, j);
+		i__4 = t_subscr(i__, j);
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1.f / eps;
 		}
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = qtmp_subscr(i__, j);
+		i__4 = qsav_subscr(i__, j);
 		if (qtmp[i__3].r != qsav[i__4].r || qtmp[i__3].i != qsav[i__4]
 			.i) {
 		    vmax = 1.f / eps;
@@ -562,8 +583,7 @@ L10:
 /* L170: */
 	}
 
-/*        Compute invariant subspace condition number only and compare
-   
+/*        Compute invariant subspace condition number only and compare   
           Do not update Q */
 
 	clacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -575,7 +595,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L200;
 	}
 	if (-1.f != stmp) {
 	    vmax = 1.f / eps;
@@ -584,16 +604,16 @@ L10:
 	    vmax = 1.f / eps;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = ttmp_subscr(i__, j);
+		i__4 = t_subscr(i__, j);
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1.f / eps;
 		}
-		i__3 = i + j * 20 - 21;
-		i__4 = i + j * 20 - 21;
+		i__3 = qtmp_subscr(i__, j);
+		i__4 = qsav_subscr(i__, j);
 		if (qtmp[i__3].r != qsav[i__4].r || qtmp[i__3].i != qsav[i__4]
 			.i) {
 		    vmax = 1.f / eps;
@@ -604,13 +624,30 @@ L10:
 	}
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
-/* L200: */
+L200:
+	;
     }
     goto L10;
 
 /*     End of CGET38 */
 
 } /* cget38_ */
+
+#undef tmp_ref
+#undef tmp_subscr
+#undef t_ref
+#undef t_subscr
+#undef q_ref
+#undef q_subscr
+#undef ttmp_ref
+#undef ttmp_subscr
+#undef qtmp_ref
+#undef qtmp_subscr
+#undef qsav_ref
+#undef qsav_subscr
+
 

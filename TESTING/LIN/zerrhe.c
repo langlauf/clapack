@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -43,8 +44,8 @@ static integer c__4 = 4;
     static integer info;
     static doublereal anrm;
     static doublecomplex a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
-    static doublereal r[4];
+    static integer i__, j;
+    static doublereal r__[4];
     static doublecomplex w[8], x[4];
     static doublereal rcond;
     static char c2[2];
@@ -83,7 +84,13 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -104,8 +111,7 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
 
@@ -113,20 +119,20 @@ static integer c__4 = 4;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1. / (doublereal) (i + j);
-	    d__2 = -1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
+	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1. / (doublereal) (i + j);
-	    d__2 = -1. / (doublereal) (i + j);
+	    i__1 = af_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
+	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    af[i__1].r = z__1.r, af[i__1].i = z__1.i;
 /* L10: */
@@ -152,7 +158,7 @@ static integer c__4 = 4;
 
 /*        ZHETRF */
 
-	s_copy(srnamc_1.srnamt, "ZHETRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHETRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("ZHETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -168,7 +174,7 @@ static integer c__4 = 4;
 
 /*        ZHETF2 */
 
-	s_copy(srnamc_1.srnamt, "ZHETF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHETF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("ZHETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -184,7 +190,7 @@ static integer c__4 = 4;
 
 /*        ZHETRI */
 
-	s_copy(srnamc_1.srnamt, "ZHETRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHETRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("ZHETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -200,7 +206,7 @@ static integer c__4 = 4;
 
 /*        ZHETRS */
 
-	s_copy(srnamc_1.srnamt, "ZHETRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHETRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("ZHETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -224,46 +230,46 @@ static integer c__4 = 4;
 
 /*        ZHERFS */
 
-	s_copy(srnamc_1.srnamt, "ZHERFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHERFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zherfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	zherfs_("U", &c_n1, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	zherfs_("U", &c__0, &c_n1, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	zherfs_("U", &c__2, &c__1, a, &c__1, af, &c__2, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	zherfs_("U", &c__2, &c__1, a, &c__2, af, &c__1, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	zherfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__1, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	zherfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__2, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("ZHERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        ZHECON */
 
-	s_copy(srnamc_1.srnamt, "ZHECON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHECON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhecon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZHECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -282,15 +288,14 @@ static integer c__4 = 4;
 	chkxer_("ZHECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the diagonal pivoting
-   
+/*     Test error exits of the routines that use the diagonal pivoting   
        factorization of a Hermitian indefinite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "HP")) {
 
 /*        ZHPTRF */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptrf_("/", &c__0, a, ip, &info);
 	chkxer_("ZHPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -302,7 +307,7 @@ static integer c__4 = 4;
 
 /*        ZHPTRI */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("ZHPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -314,7 +319,7 @@ static integer c__4 = 4;
 
 /*        ZHPTRS */
 
-	s_copy(srnamc_1.srnamt, "ZHPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("ZHPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -334,36 +339,36 @@ static integer c__4 = 4;
 
 /*        ZHPRFS */
 
-	s_copy(srnamc_1.srnamt, "ZHPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("ZHPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	zhprfs_("U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("ZHPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	zhprfs_("U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("ZHPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	zhprfs_("U", &c__2, &c__1, a, af, ip, b, &c__1, x, &c__2, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("ZHPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	zhprfs_("U", &c__2, &c__1, a, af, ip, b, &c__2, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("ZHPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        ZHPCON */
 
-	s_copy(srnamc_1.srnamt, "ZHPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZHPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zhpcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("ZHPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -388,4 +393,10 @@ static integer c__4 = 4;
 /*     End of ZERRHE */
 
 } /* zerrhe_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,7 +16,7 @@ doublereal sget06_(real *rcond, real *rcondc)
     static real rat, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -30,16 +31,14 @@ doublereal sget06_(real *rcond, real *rcondc)
     ==========   
 
     RCOND   (input) REAL   
-            The estimate of the reciprocal of the condition number of A, 
-  
+            The estimate of the reciprocal of the condition number of A,   
             as computed by SGECON.   
 
     RCONDC  (input) REAL   
             The reciprocal of the condition number of A, computed as   
             ( 1/norm(A) ) / norm(inv(A)).   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     eps = slamch_("Epsilon");

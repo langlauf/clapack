@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,10 +18,11 @@ static complex c_b22 = {0.f,0.f};
 
 doublereal cqrt17_(char *trans, integer *iresid, integer *m, integer *n, 
 	integer *nrhs, complex *a, integer *lda, complex *x, integer *ldx, 
-	complex *b, integer *ldb, complex *work, integer *lwork)
+	complex *b, integer *ldb, complex *c__, complex *work, integer *lwork)
 {
     /* System generated locals */
-    integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset, i__1;
+    integer a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, x_dim1, 
+	    x_offset, i__1;
     real ret_val;
 
     /* Local variables */
@@ -44,10 +46,10 @@ doublereal cqrt17_(char *trans, integer *iresid, integer *m, integer *n,
     static real bignum, smlnum, normrs, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -107,28 +109,32 @@ doublereal cqrt17_(char *trans, integer *iresid, integer *m, integer *n,
             If TRANS = 'C', the n-by-nrhs matrix B.   
 
     LDB     (input) INTEGER   
-            The leading dimension of the arry B.   
+            The leading dimension of the array B.   
             If TRANS = 'N', LDB >= M.   
             If TRANS = 'C', LDB >= N.   
+
+    C       (workspace) COMPLEX array, dimension (LDB,NRHS)   
 
     WORK    (workspace) COMPLEX array, dimension (LWORK)   
 
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= NRHS*(M+N).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
+    c_dim1 = *ldb;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -146,7 +152,7 @@ doublereal cqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 	return ret_val;
     }
 
-    if (*lwork < *nrhs * (*m + *n)) {
+    if (*lwork < ncols * *nrhs) {
 	xerbla_("CQRT17", &c__13);
 	return ret_val;
     }
@@ -162,26 +168,24 @@ doublereal cqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 
 /*     compute residual and scale it */
 
-    clacpy_("All", &nrows, nrhs, &b[b_offset], ldb, &work[1], &nrows);
+    clacpy_("All", &nrows, nrhs, &b[b_offset], ldb, &c__[c_offset], ldb);
     cgemm_(trans, "No transpose", &nrows, nrhs, &ncols, &c_b13, &a[a_offset], 
-	    lda, &x[x_offset], ldx, &c_b14, &work[1], &nrows);
-    normrs = clange_("Max", &nrows, nrhs, &work[1], &nrows, rwork);
+	    lda, &x[x_offset], ldx, &c_b14, &c__[c_offset], ldb);
+    normrs = clange_("Max", &nrows, nrhs, &c__[c_offset], ldb, rwork);
     if (normrs > smlnum) {
 	iscl = 1;
-	clascl_("General", &c__0, &c__0, &normrs, &c_b19, &nrows, nrhs, &work[
-		1], &nrows, &info);
+	clascl_("General", &c__0, &c__0, &normrs, &c_b19, &nrows, nrhs, &c__[
+		c_offset], ldb, &info);
     }
 
 /*     compute R'*A */
 
-    cgemm_("Conjugate transpose", trans, nrhs, &ncols, &nrows, &c_b14, &work[
-	    1], &nrows, &a[a_offset], lda, &c_b22, &work[nrows * *nrhs + 1], 
-	    nrhs);
+    cgemm_("Conjugate transpose", trans, nrhs, &ncols, &nrows, &c_b14, &c__[
+	    c_offset], ldb, &a[a_offset], lda, &c_b22, &work[1], nrhs);
 
 /*     compute and properly scale error */
 
-    err = clange_("One-norm", nrhs, &ncols, &work[nrows * *nrhs + 1], nrhs, 
-	    rwork);
+    err = clange_("One-norm", nrhs, &ncols, &work[1], nrhs, rwork);
     if (norma != 0.f) {
 	err /= norma;
     }

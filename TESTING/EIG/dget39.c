@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -39,8 +40,8 @@ static doublereal c_b59 = -1.;
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     static integer info;
-    static doublereal dumm, norm, work[10], b[10], d[20];
-    static integer i, j, k, n;
+    static doublereal dumm, norm, work[10], b[10], d__[20];
+    static integer i__, j, k, n;
     static doublereal t[100]	/* was [10][10] */, scale, w, x[20], y[20];
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
@@ -63,7 +64,11 @@ static doublereal c_b59 = -1.;
     static integer ivm1, ivm2, ivm3, ivm4, ivm5;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define ival_ref(a_1,a_2,a_3) ival[((a_3)*5 + (a_2))*5 + a_1 - 31]
+#define t_ref(a_1,a_2) t[(a_2)*10 + a_1 - 11]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -126,8 +131,7 @@ static doublereal c_b59 = -1.;
     KNT     (output) INTEGER   
             Total number of examples tested.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine parameters */
@@ -185,14 +189,14 @@ static doublereal c_b59 = -1.;
 
 			    n = idim[ndim - 1];
 			    i__1 = n;
-			    for (i = 1; i <= i__1; ++i) {
+			    for (i__ = 1; i__ <= i__1; ++i__) {
 				i__2 = n;
 				for (j = 1; j <= i__2; ++j) {
-				    t[i + j * 10 - 11] = (doublereal) ival[i 
-					    + (j + ndim * 5) * 5 - 31] * vm1[
-					    ivm1 - 1];
-				    if (i >= j) {
-					t[i + j * 10 - 11] *= vm5[ivm5 - 1];
+				    t_ref(i__, j) = (doublereal) ival_ref(i__,
+					     j, ndim) * vm1[ivm1 - 1];
+				    if (i__ >= j) {
+					t_ref(i__, j) = t_ref(i__, j) * vm5[
+						ivm5 - 1];
 				    }
 /* L10: */
 				}
@@ -202,16 +206,16 @@ static doublereal c_b59 = -1.;
 			    w = vm2[ivm2 - 1] * 1.;
 
 			    i__1 = n;
-			    for (i = 1; i <= i__1; ++i) {
-				b[i - 1] = cos((doublereal) i) * vm3[ivm3 - 1]
-					;
+			    for (i__ = 1; i__ <= i__1; ++i__) {
+				b[i__ - 1] = cos((doublereal) i__) * vm3[ivm3 
+					- 1];
 /* L30: */
 			    }
 
 			    i__1 = n << 1;
-			    for (i = 1; i <= i__1; ++i) {
-				d[i - 1] = sin((doublereal) i) * vm4[ivm4 - 1]
-					;
+			    for (i__ = 1; i__ <= i__1; ++i__) {
+				d__[i__ - 1] = sin((doublereal) i__) * vm4[
+					ivm4 - 1];
 /* L40: */
 			    }
 
@@ -220,7 +224,7 @@ static doublereal c_b59 = -1.;
 			    normtb = norm + (d__1 = b[k - 1], abs(d__1)) + 
 				    abs(w);
 
-			    dcopy_(&n, d, &c__1, x, &c__1);
+			    dcopy_(&n, d__, &c__1, x, &c__1);
 			    ++(*knt);
 			    dlaqtr_(&c_false, &c_true, &n, t, &c__10, dum, &
 				    dumm, &scale, x, work, &info);
@@ -229,10 +233,9 @@ static doublereal c_b59 = -1.;
 			    }
 
 /*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,sml
-num/ulp*||T||,smlnum) */
+                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
-			    dcopy_(&n, d, &c__1, y, &c__1);
+			    dcopy_(&n, d__, &c__1, y, &c__1);
 			    d__1 = -scale;
 			    dgemv_("No transpose", &n, &n, &c_b25, t, &c__10, 
 				    x, &c__1, &d__1, y, &c__1);
@@ -248,7 +251,7 @@ num/ulp*||T||,smlnum) */
 				*lmax = *knt;
 			    }
 
-			    dcopy_(&n, d, &c__1, x, &c__1);
+			    dcopy_(&n, d__, &c__1, x, &c__1);
 			    ++(*knt);
 			    dlaqtr_(&c_true, &c_true, &n, t, &c__10, dum, &
 				    dumm, &scale, x, work, &info);
@@ -257,10 +260,9 @@ num/ulp*||T||,smlnum) */
 			    }
 
 /*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,sml
-num/ulp*||T||,smlnum) */
+                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
-			    dcopy_(&n, d, &c__1, y, &c__1);
+			    dcopy_(&n, d__, &c__1, y, &c__1);
 			    d__1 = -scale;
 			    dgemv_("Transpose", &n, &n, &c_b25, t, &c__10, x, 
 				    &c__1, &d__1, y, &c__1);
@@ -277,7 +279,7 @@ num/ulp*||T||,smlnum) */
 			    }
 
 			    i__1 = n << 1;
-			    dcopy_(&i__1, d, &c__1, x, &c__1);
+			    dcopy_(&i__1, d__, &c__1, x, &c__1);
 			    ++(*knt);
 			    dlaqtr_(&c_false, &c_false, &n, t, &c__10, b, &w, 
 				    &scale, x, work, &info);
@@ -285,22 +287,19 @@ num/ulp*||T||,smlnum) */
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - sca
-le*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*
-(||x1||+||x2||),   
-                                    smlnum/ulp * (
-||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
+                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
+                                    smlnum/ulp * (||T||+||B||), smlnum ) */
 
 
 			    i__1 = n << 1;
-			    dcopy_(&i__1, d, &c__1, y, &c__1);
+			    dcopy_(&i__1, d__, &c__1, y, &c__1);
 			    y[0] = ddot_(&n, b, &c__1, &x[n], &c__1) + scale *
 				     y[0];
 			    i__1 = n;
-			    for (i = 2; i <= i__1; ++i) {
-				y[i - 1] = w * x[i + n - 1] + scale * y[i - 1]
-					;
+			    for (i__ = 2; i__ <= i__1; ++i__) {
+				y[i__ - 1] = w * x[i__ + n - 1] + scale * y[
+					i__ - 1];
 /* L50: */
 			    }
 			    dgemv_("No transpose", &n, &n, &c_b25, t, &c__10, 
@@ -309,9 +308,9 @@ le*(d1+i*d2)|| /
 			    y[n] = ddot_(&n, b, &c__1, x, &c__1) - scale * y[
 				    n];
 			    i__1 = n;
-			    for (i = 2; i <= i__1; ++i) {
-				y[i + n - 1] = w * x[i - 1] - scale * y[i + n 
-					- 1];
+			    for (i__ = 2; i__ <= i__1; ++i__) {
+				y[i__ + n - 1] = w * x[i__ - 1] - scale * y[
+					i__ + n - 1];
 /* L60: */
 			    }
 			    dgemv_("No transpose", &n, &n, &c_b25, t, &c__10, 
@@ -332,7 +331,7 @@ le*(d1+i*d2)|| /
 			    }
 
 			    i__1 = n << 1;
-			    dcopy_(&i__1, d, &c__1, x, &c__1);
+			    dcopy_(&i__1, d__, &c__1, x, &c__1);
 			    ++(*knt);
 			    dlaqtr_(&c_true, &c_false, &n, t, &c__10, b, &w, &
 				    scale, x, work, &info);
@@ -340,20 +339,17 @@ le*(d1+i*d2)|| /
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - sca
-le*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*
-(||x1||+||x2||),   
-                                    smlnum/ulp * (
-||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
+                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
+                                    smlnum/ulp * (||T||+||B||), smlnum ) */
 
 			    i__1 = n << 1;
-			    dcopy_(&i__1, d, &c__1, y, &c__1);
+			    dcopy_(&i__1, d__, &c__1, y, &c__1);
 			    y[0] = b[0] * x[n] - scale * y[0];
 			    i__1 = n;
-			    for (i = 2; i <= i__1; ++i) {
-				y[i - 1] = b[i - 1] * x[n] + w * x[i + n - 1] 
-					- scale * y[i - 1];
+			    for (i__ = 2; i__ <= i__1; ++i__) {
+				y[i__ - 1] = b[i__ - 1] * x[n] + w * x[i__ + 
+					n - 1] - scale * y[i__ - 1];
 /* L70: */
 			    }
 			    dgemv_("Transpose", &n, &n, &c_b25, t, &c__10, x, 
@@ -361,9 +357,9 @@ le*(d1+i*d2)|| /
 
 			    y[n] = b[0] * x[0] + scale * y[n];
 			    i__1 = n;
-			    for (i = 2; i <= i__1; ++i) {
-				y[i + n - 1] = b[i - 1] * x[0] + w * x[i - 1] 
-					+ scale * y[i + n - 1];
+			    for (i__ = 2; i__ <= i__1; ++i__) {
+				y[i__ + n - 1] = b[i__ - 1] * x[0] + w * x[
+					i__ - 1] + scale * y[i__ + n - 1];
 /* L80: */
 			    }
 			    dgemv_("Transpose", &n, &n, &c_b25, t, &c__10, &x[
@@ -401,4 +397,8 @@ le*(d1+i*d2)|| /
 /*     End of DGET39 */
 
 } /* dget39_ */
+
+#undef t_ref
+#undef ival_ref
+
 

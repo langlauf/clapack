@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dopmtr_(char *side, char *uplo, char *trans, integer *m, 
-	integer *n, doublereal *ap, doublereal *tau, doublereal *c, integer *
-	ldc, doublereal *work, integer *info)
+	integer *n, doublereal *ap, doublereal *tau, doublereal *c__, integer 
+	*ldc, doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -58,16 +59,14 @@
             returned by DSPTRD.  AP is modified by the routine but   
             restored on exit.   
 
-    TAU     (input) DOUBLE PRECISION array, dimension (M-1) if SIDE = 'L' 
-  
+    TAU     (input) DOUBLE PRECISION array, dimension (M-1) if SIDE = 'L'   
                                        or (N-1) if SIDE = 'R'   
             TAU(i) must contain the scalar factor of the elementary   
             reflector H(i), as returned by DSPTRD.   
 
     C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
             On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q. 
-  
+            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
 
     LDC     (input) INTEGER   
             The leading dimension of the array C. LDC >= max(1,M).   
@@ -80,15 +79,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -96,7 +92,7 @@
     integer c_dim1, c_offset, i__1, i__2;
     /* Local variables */
     static logical left;
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
@@ -107,15 +103,17 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical notran, forwrd;
     static doublereal aii;
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
 
 
+    --ap;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define AP(I) ap[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
@@ -179,30 +177,31 @@
 
 	i__1 = i2;
 	i__2 = i3;
-	for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+	for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 	    if (left) {
 
 /*              H(i) is applied to C(1:i,1:n) */
 
-		mi = i;
+		mi = i__;
 	    } else {
 
 /*              H(i) is applied to C(1:m,1:i) */
 
-		ni = i;
+		ni = i__;
 	    }
 
 /*           Apply H(i) */
 
-	    aii = AP(ii);
-	    AP(ii) = 1.;
-	    dlarf_(side, &mi, &ni, &AP(ii - i + 1), &c__1, &TAU(i), &C(1,1), ldc, &WORK(1));
-	    AP(ii) = aii;
+	    aii = ap[ii];
+	    ap[ii] = 1.;
+	    dlarf_(side, &mi, &ni, &ap[ii - i__ + 1], &c__1, &tau[i__], &c__[
+		    c_offset], ldc, &work[1]);
+	    ap[ii] = aii;
 
 	    if (forwrd) {
-		ii = ii + i + 2;
+		ii = ii + i__ + 2;
 	    } else {
-		ii = ii - i - 1;
+		ii = ii - i__ - 1;
 	    }
 /* L10: */
 	}
@@ -234,32 +233,33 @@
 
 	i__2 = i2;
 	i__1 = i3;
-	for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
-	    aii = AP(ii);
-	    AP(ii) = 1.;
+	for (i__ = i1; i__1 < 0 ? i__ >= i__2 : i__ <= i__2; i__ += i__1) {
+	    aii = ap[ii];
+	    ap[ii] = 1.;
 	    if (left) {
 
 /*              H(i) is applied to C(i+1:m,1:n) */
 
-		mi = *m - i;
-		ic = i + 1;
+		mi = *m - i__;
+		ic = i__ + 1;
 	    } else {
 
 /*              H(i) is applied to C(1:m,i+1:n) */
 
-		ni = *n - i;
-		jc = i + 1;
+		ni = *n - i__;
+		jc = i__ + 1;
 	    }
 
 /*           Apply H(i) */
 
-	    dlarf_(side, &mi, &ni, &AP(ii), &c__1, &TAU(i), &C(ic,jc), ldc, &WORK(1));
-	    AP(ii) = aii;
+	    dlarf_(side, &mi, &ni, &ap[ii], &c__1, &tau[i__], &c___ref(ic, jc)
+		    , ldc, &work[1]);
+	    ap[ii] = aii;
 
 	    if (forwrd) {
-		ii = ii + nq - i + 1;
+		ii = ii + nq - i__ + 1;
 	    } else {
-		ii = ii - nq + i - 2;
+		ii = ii - nq + i__ - 2;
 	    }
 /* L20: */
 	}
@@ -269,4 +269,7 @@
 /*     End of DOPMTR */
 
 } /* dopmtr_ */
+
+#undef c___ref
+
 

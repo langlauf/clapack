@@ -1,22 +1,108 @@
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
+*/
+
 #include "f2c.h"
+
+/* Table of constant values */
+
+static complex c_b1 = {0.f,0.f};
+static complex c_b2 = {1.f,0.f};
+static integer c__6 = 6;
+static integer c__0 = 0;
+static integer c__2 = 2;
+static integer c__1 = 1;
+static integer c_n1 = -1;
 
 /* Subroutine */ int cgesvd_(char *jobu, char *jobvt, integer *m, integer *n, 
 	complex *a, integer *lda, real *s, complex *u, integer *ldu, complex *
 	vt, integer *ldvt, complex *work, integer *lwork, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+    /* System generated locals */
+    address a__1[2];
+    integer a_dim1, a_offset, u_dim1, u_offset, vt_dim1, vt_offset, i__1[2], 
+	    i__2, i__3, i__4;
+    char ch__1[2];
+
+    /* Builtin functions   
+       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
+    double sqrt(doublereal);
+
+    /* Local variables */
+    static complex cdum[1];
+    static integer iscl;
+    static real anrm;
+    static integer ierr, itau, ncvt, nrvt, i__;
+    extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
+	    integer *, complex *, complex *, integer *, complex *, integer *, 
+	    complex *, complex *, integer *);
+    extern logical lsame_(char *, char *);
+    static integer chunk, minmn, wrkbl, itaup, itauq, mnthr, iwork;
+    static logical wntua, wntva, wntun, wntuo, wntvn, wntvo, wntus, wntvs;
+    static integer ie;
+    extern /* Subroutine */ int cgebrd_(integer *, integer *, complex *, 
+	    integer *, real *, real *, complex *, complex *, complex *, 
+	    integer *, integer *);
+    extern doublereal clange_(char *, integer *, integer *, complex *, 
+	    integer *, real *);
+    static integer ir, iu;
+    extern /* Subroutine */ int cgelqf_(integer *, integer *, complex *, 
+	    integer *, complex *, complex *, integer *, integer *), clascl_(
+	    char *, integer *, integer *, real *, real *, integer *, integer *
+	    , complex *, integer *, integer *), cgeqrf_(integer *, 
+	    integer *, complex *, integer *, complex *, complex *, integer *, 
+	    integer *);
+    extern doublereal slamch_(char *);
+    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
+	    *, integer *, complex *, integer *), claset_(char *, 
+	    integer *, integer *, complex *, complex *, complex *, integer *), cbdsqr_(char *, integer *, integer *, integer *, integer 
+	    *, real *, real *, complex *, integer *, complex *, integer *, 
+	    complex *, integer *, real *, integer *), xerbla_(char *, 
+	    integer *), cungbr_(char *, integer *, integer *, integer 
+	    *, complex *, integer *, complex *, complex *, integer *, integer 
+	    *);
+    static real bignum;
+    extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
+	    real *, integer *, integer *, real *, integer *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int cunmbr_(char *, char *, char *, integer *, 
+	    integer *, integer *, complex *, integer *, complex *, complex *, 
+	    integer *, complex *, integer *, integer *), cunglq_(integer *, integer *, integer *, complex *, 
+	    integer *, complex *, complex *, integer *, integer *), cungqr_(
+	    integer *, integer *, integer *, complex *, integer *, complex *, 
+	    complex *, integer *, integer *);
+    static integer ldwrkr, minwrk, ldwrku, maxwrk;
+    static real smlnum;
+    static integer irwork;
+    static logical lquery, wntuas, wntvas;
+    static integer blk, ncu;
+    static real dum[1], eps;
+    static integer nru;
+
+
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define vt_subscr(a_1,a_2) (a_2)*vt_dim1 + a_1
+#define vt_ref(a_1,a_2) vt[vt_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
 
     Purpose   
     =======   
 
     CGESVD computes the singular value decomposition (SVD) of a complex   
-    M-by-N matrix A, optionally computing the left and/or right singular 
-  
+    M-by-N matrix A, optionally computing the left and/or right singular   
     vectors. The SVD is written   
 
          A = U * SIGMA * conjugate-transpose(V)   
@@ -34,8 +120,7 @@
     =========   
 
     JOBU    (input) CHARACTER*1   
-            Specifies options for computing all or part of the matrix U: 
-  
+            Specifies options for computing all or part of the matrix U:   
             = 'A':  all M columns of U are returned in array U:   
             = 'S':  the first min(m,n) columns of U (the left singular   
                     vectors) are returned in the array U;   
@@ -111,8 +196,12 @@
             LWORK >=  2*MIN(M,N)+MAX(M,N).   
             For good performance, LWORK should generally be larger.   
 
-    RWORK   (workspace) REAL array, dimension   
-                                    (max(3*min(M,N),5*min(M,N)-4))   
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
+    RWORK   (workspace) REAL array, dimension (5*min(M,N))   
             On exit, if INFO > 0, RWORK(1:MIN(M,N)-1) contains the   
             unconverged superdiagonal elements of an upper bidiagonal   
             matrix B whose diagonal is in S (not necessarily sorted).   
@@ -124,105 +213,37 @@
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if CBDSQR did not converge, INFO specifies how many   
                   superdiagonals of an intermediate bidiagonal form B   
-                  did not converge to zero. See the description of RWORK 
-  
+                  did not converge to zero. See the description of RWORK   
                   above for details.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
-    /* Table of constant values */
-    static complex c_b1 = {0.f,0.f};
-    static complex c_b2 = {1.f,0.f};
-    static integer c__6 = 6;
-    static integer c__0 = 0;
-    static integer c__2 = 2;
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    
-    /* System generated locals */
-    address a__1[2];
-    integer a_dim1, a_offset, u_dim1, u_offset, vt_dim1, vt_offset, i__1[2], 
-	    i__2, i__3, i__4;
-    char ch__1[2];
-    /* Builtin functions   
-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
-    double sqrt(doublereal);
-    /* Local variables */
-    static complex cdum[1];
-    static integer iscl;
-    static real anrm;
-    static integer ierr, itau, ncvt, nrvt, i;
-    extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
-	    integer *, complex *, complex *, integer *, complex *, integer *, 
-	    complex *, complex *, integer *);
-    extern logical lsame_(char *, char *);
-    static integer chunk, minmn, wrkbl, itaup, itauq, mnthr, iwork;
-    static logical wntua, wntva, wntun, wntuo, wntvn, wntvo, wntus, wntvs;
-    static integer ie;
-    extern /* Subroutine */ int cgebrd_(integer *, integer *, complex *, 
-	    integer *, real *, real *, complex *, complex *, complex *, 
-	    integer *, integer *);
-    extern doublereal clange_(char *, integer *, integer *, complex *, 
-	    integer *, real *);
-    static integer ir, iu;
-    extern /* Subroutine */ int cgelqf_(integer *, integer *, complex *, 
-	    integer *, complex *, complex *, integer *, integer *), clascl_(
-	    char *, integer *, integer *, real *, real *, integer *, integer *
-	    , complex *, integer *, integer *), cgeqrf_(integer *, 
-	    integer *, complex *, integer *, complex *, complex *, integer *, 
-	    integer *);
-    extern doublereal slamch_(char *);
-    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
-	    *, integer *, complex *, integer *), claset_(char *, 
-	    integer *, integer *, complex *, complex *, complex *, integer *), cbdsqr_(char *, integer *, integer *, integer *, integer 
-	    *, real *, real *, complex *, integer *, complex *, integer *, 
-	    complex *, integer *, real *, integer *), xerbla_(char *, 
-	    integer *), cungbr_(char *, integer *, integer *, integer 
-	    *, complex *, integer *, complex *, complex *, integer *, integer 
-	    *);
-    static real bignum;
-    extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
-	    real *, integer *, integer *, real *, integer *, integer *);
-    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-    extern /* Subroutine */ int cunmbr_(char *, char *, char *, integer *, 
-	    integer *, integer *, complex *, integer *, complex *, complex *, 
-	    integer *, complex *, integer *, integer *), cunglq_(integer *, integer *, integer *, complex *, 
-	    integer *, complex *, complex *, integer *, integer *), cungqr_(
-	    integer *, integer *, integer *, complex *, integer *, complex *, 
-	    complex *, integer *, integer *);
-    static integer ldwrkr, minwrk, ldwrku, maxwrk;
-    static real smlnum;
-    static integer irwork;
-    static logical wntuas, wntvas;
-    static integer blk, ncu;
-    static real dum[1], eps;
-    static integer nru;
+       Parameter adjustments */
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --s;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    vt_dim1 = *ldvt;
+    vt_offset = 1 + vt_dim1 * 1;
+    vt -= vt_offset;
+    --work;
+    --rwork;
 
-
-
-#define S(I) s[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define VT(I,J) vt[(I)-1 + ((J)-1)* ( *ldvt)]
-
+    /* Function Body */
     *info = 0;
     minmn = min(*m,*n);
 /* Writing concatenation */
     i__1[0] = 1, a__1[0] = jobu;
     i__1[1] = 1, a__1[1] = jobvt;
-    s_cat(ch__1, a__1, i__1, &c__2, 2L);
-    mnthr = ilaenv_(&c__6, "CGESVD", ch__1, m, n, &c__0, &c__0, 6L, 2L);
+    s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+    mnthr = ilaenv_(&c__6, "CGESVD", ch__1, m, n, &c__0, &c__0, (ftnlen)6, (
+	    ftnlen)2);
     wntua = lsame_(jobu, "A");
     wntus = lsame_(jobu, "S");
     wntuas = wntua || wntus;
@@ -234,6 +255,7 @@
     wntvo = lsame_(jobvt, "O");
     wntvn = lsame_(jobvt, "N");
     minwrk = 1;
+    lquery = *lwork == -1;
 
     if (! (wntua || wntus || wntuo || wntun)) {
 	*info = -1;
@@ -259,50 +281,51 @@
          real workspace. NB refers to the optimal block size for the   
          immediately following subroutine, as returned by ILAENV.) */
 
-    if (*info == 0 && *lwork >= 1 && *m > 0 && *n > 0) {
+    if (*info == 0 && (*lwork >= 1 || lquery) && *m > 0 && *n > 0) {
 	if (*m >= *n) {
 
-/*           Space needed for CBDSQR is BDSPAC = MAX( 3*N, 5*N-4 )
- */
+/*           Space needed for CBDSQR is BDSPAC = 5*N */
 
 	    if (*m >= mnthr) {
 		if (wntun) {
 
-/*                 Path 1 (M much larger than N, JOBU='N')
- */
+/*                 Path 1 (M much larger than N, JOBU='N') */
 
 		    maxwrk = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    maxwrk = max(i__2,i__3);
 		    if (wntvo || wntvas) {
 /* Computing MAX */
 			i__2 = maxwrk, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&
-				c__1, "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+				c__1, "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)
+				6, (ftnlen)1);
 			maxwrk = max(i__2,i__3);
 		    }
 		    minwrk = *n * 3;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntuo && wntvn) {
 
-/*                 Path 2 (M much larger than N, JOBU='O',
- JOBVT='N') */
+/*                 Path 2 (M much larger than N, JOBU='O', JOBVT='N') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *n * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, n, n, &c_n1, 6L, 1L);
+			    " ", m, n, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = *n * *n + wrkbl, i__3 = *n * *n + *m * *n;
@@ -311,27 +334,29 @@
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntuo && wntvas) {
 
-/*                 Path 3 (M much larger than N, JOBU='O',
- JOBVT='S' or   
+/*                 Path 3 (M much larger than N, JOBU='O', JOBVT='S' or   
                    'A') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *n * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, n, n, &c_n1, 6L, 1L);
+			    " ", m, n, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = *n * *n + wrkbl, i__3 = *n * *n + *m * *n;
@@ -340,150 +365,160 @@
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntus && wntvn) {
 
-/*                 Path 4 (M much larger than N, JOBU='S',
- JOBVT='N') */
+/*                 Path 4 (M much larger than N, JOBU='S', JOBVT='N') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *n * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, n, n, &c_n1, 6L, 1L);
+			    " ", m, n, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *n * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntus && wntvo) {
 
-/*                 Path 5 (M much larger than N, JOBU='S',
- JOBVT='O') */
+/*                 Path 5 (M much larger than N, JOBU='S', JOBVT='O') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *n * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, n, n, &c_n1, 6L, 1L);
+			    " ", m, n, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = (*n << 1) * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntus && wntvas) {
 
-/*                 Path 6 (M much larger than N, JOBU='S',
- JOBVT='S' or   
+/*                 Path 6 (M much larger than N, JOBU='S', JOBVT='S' or   
                    'A') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *n * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, n, n, &c_n1, 6L, 1L);
+			    " ", m, n, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *n * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntua && wntvn) {
 
-/*                 Path 7 (M much larger than N, JOBU='A',
- JOBVT='N') */
+/*                 Path 7 (M much larger than N, JOBU='A', JOBVT='N') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *m * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, m, n, &c_n1, 6L, 1L);
+			    " ", m, m, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *n * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntua && wntvo) {
 
-/*                 Path 8 (M much larger than N, JOBU='A',
- JOBVT='O') */
+/*                 Path 8 (M much larger than N, JOBU='A', JOBVT='O') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *m * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, m, n, &c_n1, 6L, 1L);
+			    " ", m, m, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = (*n << 1) * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntua && wntvas) {
 
-/*                 Path 9 (M much larger than N, JOBU='A',
- JOBVT='S' or   
+/*                 Path 9 (M much larger than N, JOBU='A', JOBVT='S' or   
                    'A') */
 
 		    wrkbl = *n + *n * ilaenv_(&c__1, "CGEQRF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *n + *m * ilaenv_(&c__1, "CUNGQR", 
-			    " ", m, m, n, &c_n1, 6L, 1L);
+			    " ", m, m, n, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", n, n, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", n, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", n, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *n * *n + wrkbl;
 		    minwrk = (*n << 1) + *m;
@@ -494,23 +529,26 @@
 /*              Path 10 (M at least N, but not much larger) */
 
 		maxwrk = (*n << 1) + (*m + *n) * ilaenv_(&c__1, "CGEBRD", 
-			" ", m, n, &c_n1, &c_n1, 6L, 1L);
+			" ", m, n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 		if (wntus || wntuo) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*n << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, n, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, n, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    maxwrk = max(i__2,i__3);
 		}
 		if (wntua) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*n << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, n, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, n, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    maxwrk = max(i__2,i__3);
 		}
 		if (! wntvn) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*n << 1) + (*n - 1) * ilaenv_(&
-			    c__1, "CUNGBR", "P", n, n, n, &c_n1, 6L, 1L);
+			    c__1, "CUNGBR", "P", n, n, n, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    maxwrk = max(i__2,i__3);
 		}
 		minwrk = (*n << 1) + *m;
@@ -518,47 +556,48 @@
 	    }
 	} else {
 
-/*           Space needed for CBDSQR is BDSPAC = MAX( 3*M, 5*M-4 )
- */
+/*           Space needed for CBDSQR is BDSPAC = 5*M */
 
 	    if (*n >= mnthr) {
 		if (wntvn) {
 
-/*                 Path 1t(N much larger than M, JOBVT='N'
-) */
+/*                 Path 1t(N much larger than M, JOBVT='N') */
 
 		    maxwrk = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    maxwrk = max(i__2,i__3);
 		    if (wntuo || wntuas) {
 /* Computing MAX */
 			i__2 = maxwrk, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-				"CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+				"CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (
+				ftnlen)1);
 			maxwrk = max(i__2,i__3);
 		    }
 		    minwrk = *m * 3;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntvo && wntun) {
 
-/*                 Path 2t(N much larger than M, JOBU='N',
- JOBVT='O') */
+/*                 Path 2t(N much larger than M, JOBU='N', JOBVT='O') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *m * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", m, n, m, &c_n1, 6L, 1L);
+			    " ", m, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = *m * *m + wrkbl, i__3 = *m * *m + *m * *n;
@@ -567,27 +606,29 @@
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntvo && wntuas) {
 
-/*                 Path 3t(N much larger than M, JOBU='S' 
-or 'A',   
+/*                 Path 3t(N much larger than M, JOBU='S' or 'A',   
                    JOBVT='O') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *m * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", m, n, m, &c_n1, 6L, 1L);
+			    " ", m, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = *m * *m + wrkbl, i__3 = *m * *m + *m * *n;
@@ -596,150 +637,160 @@ or 'A',
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntvs && wntun) {
 
-/*                 Path 4t(N much larger than M, JOBU='N',
- JOBVT='S') */
+/*                 Path 4t(N much larger than M, JOBU='N', JOBVT='S') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *m * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", m, n, m, &c_n1, 6L, 1L);
+			    " ", m, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *m * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntvs && wntuo) {
 
-/*                 Path 5t(N much larger than M, JOBU='O',
- JOBVT='S') */
+/*                 Path 5t(N much larger than M, JOBU='O', JOBVT='S') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *m * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", m, n, m, &c_n1, 6L, 1L);
+			    " ", m, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = (*m << 1) * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntvs && wntuas) {
 
-/*                 Path 6t(N much larger than M, JOBU='S' 
-or 'A',   
+/*                 Path 6t(N much larger than M, JOBU='S' or 'A',   
                    JOBVT='S') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *m * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", m, n, m, &c_n1, 6L, 1L);
+			    " ", m, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *m * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntva && wntun) {
 
-/*                 Path 7t(N much larger than M, JOBU='N',
- JOBVT='A') */
+/*                 Path 7t(N much larger than M, JOBU='N', JOBVT='A') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *n * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", n, n, m, &c_n1, 6L, 1L);
+			    " ", n, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *m * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntva && wntuo) {
 
-/*                 Path 8t(N much larger than M, JOBU='O',
- JOBVT='A') */
+/*                 Path 8t(N much larger than M, JOBU='O', JOBVT='A') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *n * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", n, n, m, &c_n1, 6L, 1L);
+			    " ", n, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = (*m << 1) * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
 		    maxwrk = max(minwrk,maxwrk);
 		} else if (wntva && wntuas) {
 
-/*                 Path 9t(N much larger than M, JOBU='S' 
-or 'A',   
+/*                 Path 9t(N much larger than M, JOBU='S' or 'A',   
                    JOBVT='A') */
 
 		    wrkbl = *m + *m * ilaenv_(&c__1, "CGELQF", " ", m, n, &
-			    c_n1, &c_n1, 6L, 1L);
+			    c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *m + *n * ilaenv_(&c__1, "CUNGLQ", 
-			    " ", n, n, m, &c_n1, 6L, 1L);
+			    " ", n, n, m, &c_n1, (ftnlen)6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m << 1) * ilaenv_(&
-			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, 6L, 1L);
+			    c__1, "CGEBRD", " ", m, m, &c_n1, &c_n1, (ftnlen)
+			    6, (ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&c__1,
-			     "CUNGBR", "P", m, m, m, &c_n1, 6L, 1L);
+			     "CUNGBR", "P", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    wrkbl = max(i__2,i__3);
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    wrkbl = max(i__2,i__3);
 		    maxwrk = *m * *m + wrkbl;
 		    minwrk = (*m << 1) + *n;
@@ -747,42 +798,46 @@ or 'A',
 		}
 	    } else {
 
-/*              Path 10t(N greater than M, but not much larger
-) */
+/*              Path 10t(N greater than M, but not much larger) */
 
 		maxwrk = (*m << 1) + (*m + *n) * ilaenv_(&c__1, "CGEBRD", 
-			" ", m, n, &c_n1, &c_n1, 6L, 1L);
+			" ", m, n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
 		if (wntvs || wntvo) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*m << 1) + *m * ilaenv_(&c__1, 
-			    "CUNGBR", "P", m, n, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "P", m, n, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    maxwrk = max(i__2,i__3);
 		}
 		if (wntva) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*m << 1) + *n * ilaenv_(&c__1, 
-			    "CUNGBR", "P", n, n, m, &c_n1, 6L, 1L);
+			    "CUNGBR", "P", n, n, m, &c_n1, (ftnlen)6, (ftnlen)
+			    1);
 		    maxwrk = max(i__2,i__3);
 		}
 		if (! wntun) {
 /* Computing MAX */
 		    i__2 = maxwrk, i__3 = (*m << 1) + (*m - 1) * ilaenv_(&
-			    c__1, "CUNGBR", "Q", m, m, m, &c_n1, 6L, 1L);
+			    c__1, "CUNGBR", "Q", m, m, m, &c_n1, (ftnlen)6, (
+			    ftnlen)1);
 		    maxwrk = max(i__2,i__3);
 		}
 		minwrk = (*m << 1) + *n;
 		maxwrk = max(minwrk,maxwrk);
 	    }
 	}
-	WORK(1).r = (real) maxwrk, WORK(1).i = 0.f;
+	work[1].r = (real) maxwrk, work[1].i = 0.f;
     }
 
-    if (*lwork < minwrk) {
+    if (*lwork < minwrk && ! lquery) {
 	*info = -13;
     }
     if (*info != 0) {
 	i__2 = -(*info);
 	xerbla_("CGESVD", &i__2);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -790,7 +845,7 @@ or 'A',
 
     if (*m == 0 || *n == 0) {
 	if (*lwork >= 1) {
-	    WORK(1).r = 1.f, WORK(1).i = 0.f;
+	    work[1].r = 1.f, work[1].i = 0.f;
 	}
 	return 0;
     }
@@ -803,22 +858,21 @@ or 'A',
 
 /*     Scale A if max element outside range [SMLNUM,BIGNUM] */
 
-    anrm = clange_("M", m, n, &A(1,1), lda, dum);
+    anrm = clange_("M", m, n, &a[a_offset], lda, dum);
     iscl = 0;
     if (anrm > 0.f && anrm < smlnum) {
 	iscl = 1;
-	clascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &A(1,1), lda, &
+	clascl_("G", &c__0, &c__0, &anrm, &smlnum, m, n, &a[a_offset], lda, &
 		ierr);
     } else if (anrm > bignum) {
 	iscl = 1;
-	clascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &A(1,1), lda, &
+	clascl_("G", &c__0, &c__0, &anrm, &bignum, m, n, &a[a_offset], lda, &
 		ierr);
     }
 
     if (*m >= *n) {
 
-/*        A has at least as many rows as columns. If A has sufficientl
-y   
+/*        A has at least as many rows as columns. If A has sufficiently   
           more rows than columns, first reduce using the QR   
           decomposition (if sufficient workspace available) */
 
@@ -837,14 +891,14 @@ y
                 (RWorkspace: need 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork), &
+		cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork], &
 			i__2, &ierr);
 
 /*              Zero out below R */
 
 		i__2 = *n - 1;
 		i__3 = *n - 1;
-		claset_("L", &i__2, &i__3, &c_b1, &c_b1, &A(2,1), lda);
+		claset_("L", &i__2, &i__3, &c_b1, &c_b1, &a_ref(2, 1), lda);
 		ie = 1;
 		itauq = 1;
 		itaup = itauq + *n;
@@ -855,61 +909,54 @@ y
                 (RWorkspace: need N) */
 
 		i__2 = *lwork - iwork + 1;
-		cgebrd_(n, n, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(
-			itauq), &WORK(itaup), &WORK(iwork), &i__2, &ierr);
+		cgebrd_(n, n, &a[a_offset], lda, &s[1], &rwork[ie], &work[
+			itauq], &work[itaup], &work[iwork], &i__2, &ierr);
 		ncvt = 0;
 		if (wntvo || wntvas) {
 
-/*                 If right singular vectors desired, gene
-rate P'.   
-                   (CWorkspace: need 3*N-1, prefer 2*N+(N-
-1)*NB)   
+/*                 If right singular vectors desired, generate P'.   
+                   (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("P", n, n, n, &A(1,1), lda, &WORK(itaup), &
-			    WORK(iwork), &i__2, &ierr);
+		    cungbr_("P", n, n, n, &a[a_offset], lda, &work[itaup], &
+			    work[iwork], &i__2, &ierr);
 		    ncvt = *n;
 		}
 		irwork = ie + *n;
 
-/*              Perform bidiagonal QR iteration, computing rig
-ht   
+/*              Perform bidiagonal QR iteration, computing right   
                 singular vectors of A in A if desired   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("U", n, &ncvt, &c__0, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, cdum, &c__1, cdum, &c__1, &RWORK(
-			irwork), info);
+		cbdsqr_("U", n, &ncvt, &c__0, &c__0, &s[1], &rwork[ie], &a[
+			a_offset], lda, cdum, &c__1, cdum, &c__1, &rwork[
+			irwork], info);
 
-/*              If right singular vectors desired in VT, copy 
-them there */
+/*              If right singular vectors desired in VT, copy them there */
 
 		if (wntvas) {
-		    clacpy_("F", n, n, &A(1,1), lda, &VT(1,1), 
+		    clacpy_("F", n, n, &a[a_offset], lda, &vt[vt_offset], 
 			    ldvt);
 		}
 
 	    } else if (wntuo && wntvn) {
 
-/*              Path 2 (M much larger than N, JOBU='O', JOBVT=
-'N')   
-                N left singular vectors to be overwritten on A
- and   
+/*              Path 2 (M much larger than N, JOBU='O', JOBVT='N')   
+                N left singular vectors to be overwritten on A and   
                 no right singular vectors to be computed */
 
 		if (*lwork >= *n * *n + *n * 3) {
 
-/*                 Sufficient workspace for a fast algorit
-hm */
+/*                 Sufficient workspace for a fast algorithm */
 
 		    ir = 1;
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *lda * *n;
 		    if (*lwork >= max(i__2,i__3) + *lda * *n) {
 
-/*                    WORK(IU) is LDA by N, WORK(IR) i
-s LDA by N */
+/*                    WORK(IU) is LDA by N, WORK(IR) is LDA by N */
 
 			ldwrku = *lda;
 			ldwrkr = *lda;
@@ -918,15 +965,13 @@ s LDA by N */
 			i__2 = wrkbl, i__3 = *lda * *n;
 			if (*lwork >= max(i__2,i__3) + *n * *n) {
 
-/*                    WORK(IU) is LDA by N, WORK(I
-R) is N by N */
+/*                    WORK(IU) is LDA by N, WORK(IR) is N by N */
 
 			    ldwrku = *lda;
 			    ldwrkr = *n;
 			} else {
 
-/*                    WORK(IU) is LDWRKU by N, WOR
-K(IR) is N by N */
+/*                    WORK(IU) is LDWRKU by N, WORK(IR) is N by N */
 
 			    ldwrku = (*lwork - *n * *n) / *n;
 			    ldwrkr = *n;
@@ -936,93 +981,84 @@ K(IR) is N by N */
 		    iwork = itau + *n;
 
 /*                 Compute A=Q*R   
-                   (CWorkspace: need N*N+2*N, prefer N*N+N
-+N*NB)   
+                   (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__2, &ierr);
 
-/*                 Copy R to WORK(IR) and zero out below i
-t */
+/*                 Copy R to WORK(IR) and zero out below it */
 
-		    clacpy_("U", n, n, &A(1,1), lda, &WORK(ir), &ldwrkr);
+		    clacpy_("U", n, n, &a[a_offset], lda, &work[ir], &ldwrkr);
 		    i__2 = *n - 1;
 		    i__3 = *n - 1;
-		    claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 1), &
+		    claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 1], &
 			    ldwrkr);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need N*N+2*N, prefer N*N+N
-+N*NB)   
+                   (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__2, &ierr);
+		    cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__2, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *n;
 		    iwork = itaup + *n;
 
 /*                 Bidiagonalize R in WORK(IR)   
-                   (CWorkspace: need N*N+3*N, prefer N*N+2
-*N+2*N*NB)   
+                   (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                    (RWorkspace: need N) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgebrd_(n, n, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-			    WORK(itauq), &WORK(itaup), &WORK(iwork), &i__2, &
+		    cgebrd_(n, n, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+			    work[itauq], &work[itaup], &work[iwork], &i__2, &
 			    ierr);
 
-/*                 Generate left vectors bidiagonalizing R
-   
-                   (CWorkspace: need N*N+3*N, prefer N*N+2
-*N+N*NB)   
+/*                 Generate left vectors bidiagonalizing R   
+                   (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                    (RWorkspace: need 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("Q", n, n, n, &WORK(ir), &ldwrkr, &WORK(itauq), &
-			    WORK(iwork), &i__2, &ierr);
+		    cungbr_("Q", n, n, n, &work[ir], &ldwrkr, &work[itauq], &
+			    work[iwork], &i__2, &ierr);
 		    irwork = ie + *n;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
+/*                 Perform bidiagonal QR iteration, computing left   
                    singular vectors of R in WORK(IR)   
                    (CWorkspace: need N*N)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", n, &c__0, n, &c__0, &S(1), &RWORK(ie), cdum, 
-			    &c__1, &WORK(ir), &ldwrkr, cdum, &c__1, &RWORK(
-			    irwork), info);
+		    cbdsqr_("U", n, &c__0, n, &c__0, &s[1], &rwork[ie], cdum, 
+			    &c__1, &work[ir], &ldwrkr, cdum, &c__1, &rwork[
+			    irwork], info);
 		    iu = itauq;
 
-/*                 Multiply Q in A by left singular vector
-s of R in   
-                   WORK(IR), storing result in WORK(IU) an
-d copying to A   
-                   (CWorkspace: need N*N+N, prefer N*N+M*N
-)   
+/*                 Multiply Q in A by left singular vectors of R in   
+                   WORK(IR), storing result in WORK(IU) and copying to A   
+                   (CWorkspace: need N*N+N, prefer N*N+M*N)   
                    (RWorkspace: 0) */
 
 		    i__2 = *m;
 		    i__3 = ldwrku;
-		    for (i = 1; ldwrku < 0 ? i >= *m : i <= *m; i += ldwrku) {
+		    for (i__ = 1; i__3 < 0 ? i__ >= i__2 : i__ <= i__2; i__ +=
+			     i__3) {
 /* Computing MIN */
-			i__4 = *m - i + 1;
+			i__4 = *m - i__ + 1;
 			chunk = min(i__4,ldwrku);
-			cgemm_("N", "N", &chunk, n, n, &c_b2, &A(i,1), 
-				lda, &WORK(ir), &ldwrkr, &c_b1, &WORK(iu), &
+			cgemm_("N", "N", &chunk, n, n, &c_b2, &a_ref(i__, 1), 
+				lda, &work[ir], &ldwrkr, &c_b1, &work[iu], &
 				ldwrku);
-			clacpy_("F", &chunk, n, &WORK(iu), &ldwrku, &A(i,1), lda);
+			clacpy_("F", &chunk, n, &work[iu], &ldwrku, &a_ref(
+				i__, 1), lda);
 /* L10: */
 		    }
 
 		} else {
 
-/*                 Insufficient workspace for a fast algor
-ithm */
+/*                 Insufficient workspace for a fast algorithm */
 
 		    ie = 1;
 		    itauq = 1;
@@ -1030,58 +1066,49 @@ ithm */
 		    iwork = itaup + *n;
 
 /*                 Bidiagonalize A   
-                   (CWorkspace: need 2*N+M, prefer 2*N+(M+
-N)*NB)   
+                   (CWorkspace: need 2*N+M, prefer 2*N+(M+N)*NB)   
                    (RWorkspace: N) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgebrd_(m, n, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(
-			    itauq), &WORK(itaup), &WORK(iwork), &i__3, &ierr);
+		    cgebrd_(m, n, &a[a_offset], lda, &s[1], &rwork[ie], &work[
+			    itauq], &work[itaup], &work[iwork], &i__3, &ierr);
 
-/*                 Generate left vectors bidiagonalizing A
-   
-                   (CWorkspace: need 3*N, prefer 2*N+N*NB)
-   
+/*                 Generate left vectors bidiagonalizing A   
+                   (CWorkspace: need 3*N, prefer 2*N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("Q", m, n, n, &A(1,1), lda, &WORK(itauq), &
-			    WORK(iwork), &i__3, &ierr);
+		    cungbr_("Q", m, n, n, &a[a_offset], lda, &work[itauq], &
+			    work[iwork], &i__3, &ierr);
 		    irwork = ie + *n;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
+/*                 Perform bidiagonal QR iteration, computing left   
                    singular vectors of A in A   
                    (CWorkspace: need 0)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", n, &c__0, m, &c__0, &S(1), &RWORK(ie), cdum, 
-			    &c__1, &A(1,1), lda, cdum, &c__1, &RWORK(
-			    irwork), info);
+		    cbdsqr_("U", n, &c__0, m, &c__0, &s[1], &rwork[ie], cdum, 
+			    &c__1, &a[a_offset], lda, cdum, &c__1, &rwork[
+			    irwork], info);
 
 		}
 
 	    } else if (wntuo && wntvas) {
 
-/*              Path 3 (M much larger than N, JOBU='O', JOBVT=
-'S' or 'A')   
-                N left singular vectors to be overwritten on A
- and   
-                N right singular vectors to be computed in VT 
-*/
+/*              Path 3 (M much larger than N, JOBU='O', JOBVT='S' or 'A')   
+                N left singular vectors to be overwritten on A and   
+                N right singular vectors to be computed in VT */
 
 		if (*lwork >= *n * *n + *n * 3) {
 
-/*                 Sufficient workspace for a fast algorit
-hm */
+/*                 Sufficient workspace for a fast algorithm */
 
 		    ir = 1;
 /* Computing MAX */
 		    i__3 = wrkbl, i__2 = *lda * *n;
 		    if (*lwork >= max(i__3,i__2) + *lda * *n) {
 
-/*                    WORK(IU) is LDA by N and WORK(IR
-) is LDA by N */
+/*                    WORK(IU) is LDA by N and WORK(IR) is LDA by N */
 
 			ldwrku = *lda;
 			ldwrkr = *lda;
@@ -1090,15 +1117,13 @@ hm */
 			i__3 = wrkbl, i__2 = *lda * *n;
 			if (*lwork >= max(i__3,i__2) + *n * *n) {
 
-/*                    WORK(IU) is LDA by N and WOR
-K(IR) is N by N */
+/*                    WORK(IU) is LDA by N and WORK(IR) is N by N */
 
 			    ldwrku = *lda;
 			    ldwrkr = *n;
 			} else {
 
-/*                    WORK(IU) is LDWRKU by N and 
-WORK(IR) is N by N */
+/*                    WORK(IU) is LDWRKU by N and WORK(IR) is N by N */
 
 			    ldwrku = (*lwork - *n * *n) / *n;
 			    ldwrkr = *n;
@@ -1108,184 +1133,165 @@ WORK(IR) is N by N */
 		    iwork = itau + *n;
 
 /*                 Compute A=Q*R   
-                   (CWorkspace: need N*N+2*N, prefer N*N+N
-+N*NB)   
+                   (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__3, &ierr);
 
 /*                 Copy R to VT, zeroing out below it */
 
-		    clacpy_("U", n, n, &A(1,1), lda, &VT(1,1), 
+		    clacpy_("U", n, n, &a[a_offset], lda, &vt[vt_offset], 
 			    ldvt);
 		    i__3 = *n - 1;
 		    i__2 = *n - 1;
-		    claset_("L", &i__3, &i__2, &c_b1, &c_b1, &VT(2,1),
-			     ldvt);
+		    claset_("L", &i__3, &i__2, &c_b1, &c_b1, &vt_ref(2, 1), 
+			    ldvt);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need N*N+2*N, prefer N*N+N
-+N*NB)   
+                   (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__3, &ierr);
+		    cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__3, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *n;
 		    iwork = itaup + *n;
 
-/*                 Bidiagonalize R in VT, copying result t
-o WORK(IR)   
-                   (CWorkspace: need N*N+3*N, prefer N*N+2
-*N+2*N*NB)   
+/*                 Bidiagonalize R in VT, copying result to WORK(IR)   
+                   (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                    (RWorkspace: need N) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgebrd_(n, n, &VT(1,1), ldvt, &S(1), &RWORK(ie), &
-			    WORK(itauq), &WORK(itaup), &WORK(iwork), &i__3, &
+		    cgebrd_(n, n, &vt[vt_offset], ldvt, &s[1], &rwork[ie], &
+			    work[itauq], &work[itaup], &work[iwork], &i__3, &
 			    ierr);
-		    clacpy_("L", n, n, &VT(1,1), ldvt, &WORK(ir), &
+		    clacpy_("L", n, n, &vt[vt_offset], ldvt, &work[ir], &
 			    ldwrkr);
 
-/*                 Generate left vectors bidiagonalizing R
- in WORK(IR)   
-                   (CWorkspace: need N*N+3*N, prefer N*N+2
-*N+N*NB)   
+/*                 Generate left vectors bidiagonalizing R in WORK(IR)   
+                   (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("Q", n, n, n, &WORK(ir), &ldwrkr, &WORK(itauq), &
-			    WORK(iwork), &i__3, &ierr);
+		    cungbr_("Q", n, n, n, &work[ir], &ldwrkr, &work[itauq], &
+			    work[iwork], &i__3, &ierr);
 
-/*                 Generate right vectors bidiagonalizing 
-R in VT   
-                   (CWorkspace: need N*N+3*N-1, prefer N*N
-+2*N+(N-1)*NB)   
+/*                 Generate right vectors bidiagonalizing R in VT   
+                   (CWorkspace: need N*N+3*N-1, prefer N*N+2*N+(N-1)*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(itaup), 
-			    &WORK(iwork), &i__3, &ierr);
+		    cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[itaup], 
+			    &work[iwork], &i__3, &ierr);
 		    irwork = ie + *n;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
-                   singular vectors of R in WORK(IR) and c
-omputing right   
+/*                 Perform bidiagonal QR iteration, computing left   
+                   singular vectors of R in WORK(IR) and computing right   
                    singular vectors of R in VT   
                    (CWorkspace: need N*N)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", n, n, n, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &WORK(ir), &ldwrkr, cdum, &c__1,
-			     &RWORK(irwork), info);
+		    cbdsqr_("U", n, n, n, &c__0, &s[1], &rwork[ie], &vt[
+			    vt_offset], ldvt, &work[ir], &ldwrkr, cdum, &c__1,
+			     &rwork[irwork], info);
 		    iu = itauq;
 
-/*                 Multiply Q in A by left singular vector
-s of R in   
-                   WORK(IR), storing result in WORK(IU) an
-d copying to A   
-                   (CWorkspace: need N*N+N, prefer N*N+M*N
-)   
+/*                 Multiply Q in A by left singular vectors of R in   
+                   WORK(IR), storing result in WORK(IU) and copying to A   
+                   (CWorkspace: need N*N+N, prefer N*N+M*N)   
                    (RWorkspace: 0) */
 
 		    i__3 = *m;
 		    i__2 = ldwrku;
-		    for (i = 1; ldwrku < 0 ? i >= *m : i <= *m; i += ldwrku) {
+		    for (i__ = 1; i__2 < 0 ? i__ >= i__3 : i__ <= i__3; i__ +=
+			     i__2) {
 /* Computing MIN */
-			i__4 = *m - i + 1;
+			i__4 = *m - i__ + 1;
 			chunk = min(i__4,ldwrku);
-			cgemm_("N", "N", &chunk, n, n, &c_b2, &A(i,1), 
-				lda, &WORK(ir), &ldwrkr, &c_b1, &WORK(iu), &
+			cgemm_("N", "N", &chunk, n, n, &c_b2, &a_ref(i__, 1), 
+				lda, &work[ir], &ldwrkr, &c_b1, &work[iu], &
 				ldwrku);
-			clacpy_("F", &chunk, n, &WORK(iu), &ldwrku, &A(i,1), lda);
+			clacpy_("F", &chunk, n, &work[iu], &ldwrku, &a_ref(
+				i__, 1), lda);
 /* L20: */
 		    }
 
 		} else {
 
-/*                 Insufficient workspace for a fast algor
-ithm */
+/*                 Insufficient workspace for a fast algorithm */
 
 		    itau = 1;
 		    iwork = itau + *n;
 
 /*                 Compute A=Q*R   
-                   (CWorkspace: need 2*N, prefer N+N*NB) 
-  
+                   (CWorkspace: need 2*N, prefer N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__2, &ierr);
 
 /*                 Copy R to VT, zeroing out below it */
 
-		    clacpy_("U", n, n, &A(1,1), lda, &VT(1,1), 
+		    clacpy_("U", n, n, &a[a_offset], lda, &vt[vt_offset], 
 			    ldvt);
 		    i__2 = *n - 1;
 		    i__3 = *n - 1;
-		    claset_("L", &i__2, &i__3, &c_b1, &c_b1, &VT(2,1),
-			     ldvt);
+		    claset_("L", &i__2, &i__3, &c_b1, &c_b1, &vt_ref(2, 1), 
+			    ldvt);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need 2*N, prefer N+N*NB) 
-  
+                   (CWorkspace: need 2*N, prefer N+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__2, &ierr);
+		    cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__2, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *n;
 		    iwork = itaup + *n;
 
 /*                 Bidiagonalize R in VT   
-                   (CWorkspace: need 3*N, prefer 2*N+2*N*N
-B)   
+                   (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                    (RWorkspace: N) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgebrd_(n, n, &VT(1,1), ldvt, &S(1), &RWORK(ie), &
-			    WORK(itauq), &WORK(itaup), &WORK(iwork), &i__2, &
+		    cgebrd_(n, n, &vt[vt_offset], ldvt, &s[1], &rwork[ie], &
+			    work[itauq], &work[itaup], &work[iwork], &i__2, &
 			    ierr);
 
-/*                 Multiply Q in A by left vectors bidiago
-nalizing R   
-                   (CWorkspace: need 2*N+M, prefer 2*N+M*N
-B)   
+/*                 Multiply Q in A by left vectors bidiagonalizing R   
+                   (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cunmbr_("Q", "R", "N", m, n, n, &VT(1,1), ldvt, &
-			    WORK(itauq), &A(1,1), lda, &WORK(iwork), &
+		    cunmbr_("Q", "R", "N", m, n, n, &vt[vt_offset], ldvt, &
+			    work[itauq], &a[a_offset], lda, &work[iwork], &
 			    i__2, &ierr);
 
-/*                 Generate right vectors bidiagonalizing 
-R in VT   
-                   (CWorkspace: need 3*N-1, prefer 2*N+(N-
-1)*NB)   
+/*                 Generate right vectors bidiagonalizing R in VT   
+                   (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(itaup), 
-			    &WORK(iwork), &i__2, &ierr);
+		    cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[itaup], 
+			    &work[iwork], &i__2, &ierr);
 		    irwork = ie + *n;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
-                   singular vectors of A in A and computin
-g right   
+/*                 Perform bidiagonal QR iteration, computing left   
+                   singular vectors of A in A and computing right   
                    singular vectors of A in VT   
                    (CWorkspace: 0)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", n, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &A(1,1), lda, cdum, &c__1, 
-			    &RWORK(irwork), info);
+		    cbdsqr_("U", n, n, m, &c__0, &s[1], &rwork[ie], &vt[
+			    vt_offset], ldvt, &a[a_offset], lda, cdum, &c__1, 
+			    &rwork[irwork], info);
 
 		}
 
@@ -1293,17 +1299,13 @@ g right
 
 		if (wntvn) {
 
-/*                 Path 4 (M much larger than N, JOBU='S',
- JOBVT='N')   
-                   N left singular vectors to be computed 
-in U and   
-                   no right singular vectors to be compute
-d */
+/*                 Path 4 (M much larger than N, JOBU='S', JOBVT='N')   
+                   N left singular vectors to be computed in U and   
+                   no right singular vectors to be computed */
 
 		    if (*lwork >= *n * *n + *n * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			ir = 1;
 			if (*lwork >= wrkbl + *lda * *n) {
@@ -1321,106 +1323,93 @@ algorithm */
 			iwork = itau + *n;
 
 /*                    Compute A=Q*R   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy R to WORK(IR), zeroing out 
-below it */
+/*                    Copy R to WORK(IR), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(ir), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[ir], &
 				ldwrkr);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 1]
 				, &ldwrkr);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
 /*                    Bidiagonalize R in WORK(IR)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+2*N*NB)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Generate left vectors bidiagonal
-izing R in WORK(IR)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+N*NB)   
+/*                    Generate left vectors bidiagonalizing R in WORK(IR)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(ir), &ldwrkr, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[ir], &ldwrkr, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IR
-)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IR)   
                       (CWorkspace: need N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, &c__0, n, &c__0, &S(1), &RWORK(ie), 
-				cdum, &c__1, &WORK(ir), &ldwrkr, cdum, &c__1, 
-				&RWORK(irwork), info);
+			cbdsqr_("U", n, &c__0, n, &c__0, &s[1], &rwork[ie], 
+				cdum, &c__1, &work[ir], &ldwrkr, cdum, &c__1, 
+				&rwork[irwork], info);
 
-/*                    Multiply Q in A by left singular
- vectors of R in   
+/*                    Multiply Q in A by left singular vectors of R in   
                       WORK(IR), storing result in U   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &A(1,1), lda, &
-				WORK(ir), &ldwrkr, &c_b1, &U(1,1), ldu);
+			cgemm_("N", "N", m, n, n, &c_b2, &a[a_offset], lda, &
+				work[ir], &ldwrkr, &c_b1, &u[u_offset], ldu);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
@@ -1430,77 +1419,68 @@ N*NB)
 
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &A(2,1), lda);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &a_ref(2, 1),
+				 lda);
 
 /*                    Bidiagonalize R in A   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left vectors 
-bidiagonalizing R   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+/*                    Multiply Q in U by left vectors bidiagonalizing R   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &A(1,1), lda, &
-				WORK(itauq), &U(1,1), ldu, &WORK(iwork), 
-				&i__2, &ierr);
+			cunmbr_("Q", "R", "N", m, n, n, &a[a_offset], lda, &
+				work[itauq], &u[u_offset], ldu, &work[iwork], 
+				&i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
+/*                    Perform bidiagonal QR iteration, computing left   
                       singular vectors of A in U   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, &c__0, m, &c__0, &S(1), &RWORK(ie), 
-				cdum, &c__1, &U(1,1), ldu, cdum, &c__1, &
-				RWORK(irwork), info);
+			cbdsqr_("U", n, &c__0, m, &c__0, &s[1], &rwork[ie], 
+				cdum, &c__1, &u[u_offset], ldu, cdum, &c__1, &
+				rwork[irwork], info);
 
 		    }
 
 		} else if (wntvo) {
 
-/*                 Path 5 (M much larger than N, JOBU='S',
- JOBVT='O')   
-                   N left singular vectors to be computed 
-in U and   
-                   N right singular vectors to be overwrit
-ten on A */
+/*                 Path 5 (M much larger than N, JOBU='S', JOBVT='O')   
+                   N left singular vectors to be computed in U and   
+                   N right singular vectors to be overwritten on A */
 
 		    if (*lwork >= (*n << 1) * *n + *n * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + (*lda << 1) * *n) {
 
-/*                       WORK(IU) is LDA by N and 
-WORK(IR) is LDA by N */
+/*                       WORK(IU) is LDA by N and WORK(IR) is LDA by N */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *n;
 			    ldwrkr = *lda;
 			} else if (*lwork >= wrkbl + (*lda + *n) * *n) {
 
-/*                       WORK(IU) is LDA by N and 
-WORK(IR) is N by N */
+/*                       WORK(IU) is LDA by N and WORK(IR) is N by N */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *n;
 			    ldwrkr = *n;
 			} else {
 
-/*                       WORK(IU) is N by N and WO
-RK(IR) is N by N */
+/*                       WORK(IU) is N by N and WORK(IR) is N by N */
 
 			    ldwrku = *n;
 			    ir = iu + ldwrku * *n;
@@ -1510,134 +1490,114 @@ RK(IR) is N by N */
 			iwork = itau + *n;
 
 /*                    Compute A=Q*R   
-                      (CWorkspace: need 2*N*N+2*N, pre
-fer 2*N*N+N+N*NB)   
+                      (CWorkspace: need 2*N*N+2*N, prefer 2*N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy R to WORK(IU), zeroing out 
-below it */
+/*                    Copy R to WORK(IU), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(iu), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 1]
 				, &ldwrku);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need 2*N*N+2*N, pre
-fer 2*N*N+N+N*NB)   
+                      (CWorkspace: need 2*N*N+2*N, prefer 2*N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
-/*                    Bidiagonalize R in WORK(IU), cop
-ying result to   
+/*                    Bidiagonalize R in WORK(IU), copying result to   
                       WORK(IR)   
-                      (CWorkspace: need   2*N*N+3*N, 
-  
-                                   prefer 2*N*N+2*N+2*
-N*NB)   
+                      (CWorkspace: need   2*N*N+3*N,   
+                                   prefer 2*N*N+2*N+2*N*NB)   
                       (RWorkspace: need   N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("U", n, n, &WORK(iu), &ldwrku, &WORK(ir), &
+			clacpy_("U", n, n, &work[iu], &ldwrku, &work[ir], &
 				ldwrkr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IU)   
-                      (CWorkspace: need 2*N*N+3*N, pre
-fer 2*N*N+2*N+N*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need 2*N*N+3*N, prefer 2*N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(iu), &ldwrku, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[iu], &ldwrku, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IR)   
-                      (CWorkspace: need   2*N*N+3*N-1,
-   
-                                   prefer 2*N*N+2*N+(N
--1)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need   2*N*N+3*N-1,   
+                                   prefer 2*N*N+2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &WORK(ir), &ldwrkr, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &work[ir], &ldwrkr, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IU
-) and computing   
-                      right singular vectors of R in W
-ORK(IR)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IU) and computing   
+                      right singular vectors of R in WORK(IR)   
                       (CWorkspace: need 2*N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, n, &c__0, &S(1), &RWORK(ie), &WORK(
-				ir), &ldwrkr, &WORK(iu), &ldwrku, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", n, n, n, &c__0, &s[1], &rwork[ie], &work[
+				ir], &ldwrkr, &work[iu], &ldwrku, cdum, &c__1,
+				 &rwork[irwork], info);
 
-/*                    Multiply Q in A by left singular
- vectors of R in   
+/*                    Multiply Q in A by left singular vectors of R in   
                       WORK(IU), storing result in U   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &A(1,1), lda, &
-				WORK(iu), &ldwrku, &c_b1, &U(1,1), ldu);
+			cgemm_("N", "N", m, n, n, &c_b2, &a[a_offset], lda, &
+				work[iu], &ldwrku, &c_b1, &u[u_offset], ldu);
 
-/*                    Copy right singular vectors of R
- to A   
+/*                    Copy right singular vectors of R to A   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			clacpy_("F", n, n, &WORK(ir), &ldwrkr, &A(1,1), 
+			clacpy_("F", n, n, &work[ir], &ldwrkr, &a[a_offset], 
 				lda);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
@@ -1647,67 +1607,59 @@ N*NB)
 
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &A(2,1), lda);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &a_ref(2, 1),
+				 lda);
 
 /*                    Bidiagonalize R in A   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left vectors 
-bidiagonalizing R   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+/*                    Multiply Q in U by left vectors bidiagonalizing R   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &A(1,1), lda, &
-				WORK(itauq), &U(1,1), ldu, &WORK(iwork), 
-				&i__2, &ierr);
+			cunmbr_("Q", "R", "N", m, n, n, &a[a_offset], lda, &
+				work[itauq], &u[u_offset], ldu, &work[iwork], 
+				&i__2, &ierr)
+				;
 
-/*                    Generate right vectors bidiagona
-lizing R in A   
-                      (CWorkspace: need 3*N-1, prefer 
-2*N+(N-1)*NB)   
+/*                    Generate right vectors bidiagonalizing R in A   
+                      (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &A(1,1), lda, &WORK(itaup),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &a[a_offset], lda, &work[itaup],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in A   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, m, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, m, &c__0, &s[1], &rwork[ie], &a[
+				a_offset], lda, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
 		} else if (wntvas) {
 
-/*                 Path 6 (M much larger than N, JOBU='S',
- JOBVT='S'   
+/*                 Path 6 (M much larger than N, JOBU='S', JOBVT='S'   
                            or 'A')   
-                   N left singular vectors to be computed 
-in U and   
-                   N right singular vectors to be computed
- in VT */
+                   N left singular vectors to be computed in U and   
+                   N right singular vectors to be computed in VT */
 
 		    if (*lwork >= *n * *n + *n * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + *lda * *n) {
@@ -1725,179 +1677,158 @@ algorithm */
 			iwork = itau + *n;
 
 /*                    Compute A=Q*R   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy R to WORK(IU), zeroing out 
-below it */
+/*                    Copy R to WORK(IU), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(iu), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 1]
 				, &ldwrku);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
-/*                    Bidiagonalize R in WORK(IU), cop
-ying result to VT   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+2*N*NB)   
+/*                    Bidiagonalize R in WORK(IU), copying result to VT   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("U", n, n, &WORK(iu), &ldwrku, &VT(1,1),
+			clacpy_("U", n, n, &work[iu], &ldwrku, &vt[vt_offset],
 				 ldvt);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IU)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+N*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(iu), &ldwrku, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[iu], &ldwrku, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in VT   
-                      (CWorkspace: need   N*N+3*N-1, 
-  
-                                   prefer N*N+2*N+(N-1
-)*NB)   
+/*                    Generate right bidiagonalizing vectors in VT   
+                      (CWorkspace: need   N*N+3*N-1,   
+                                   prefer N*N+2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(
-				itaup), &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[
+				itaup], &work[iwork], &i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IU
-) and computing   
-                      right singular vectors of R in V
-T   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IU) and computing   
+                      right singular vectors of R in VT   
                       (CWorkspace: need N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, n, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &WORK(iu), &ldwrku, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, n, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &work[iu], &ldwrku, cdum, &
+				c__1, &rwork[irwork], info);
 
-/*                    Multiply Q in A by left singular
- vectors of R in   
+/*                    Multiply Q in A by left singular vectors of R in   
                       WORK(IU), storing result in U   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &A(1,1), lda, &
-				WORK(iu), &ldwrku, &c_b1, &U(1,1), ldu);
+			cgemm_("N", "N", m, n, n, &c_b2, &a[a_offset], lda, &
+				work[iu], &ldwrku, &c_b1, &u[u_offset], ldu);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, n, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, n, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy R to VT, zeroing out below 
-it */
+/*                    Copy R to VT, zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("U", n, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &VT(2,1), ldvt);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &vt_ref(2, 1)
+				, ldvt);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
 /*                    Bidiagonalize R in VT   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &VT(1,1), ldvt, &S(1), &RWORK(ie),
-				 &WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &vt[vt_offset], ldvt, &s[1], &rwork[ie],
+				 &work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left bidiagon
-alizing vectors   
+/*                    Multiply Q in U by left bidiagonalizing vectors   
                       in VT   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &VT(1,1), ldvt, 
-				&WORK(itauq), &U(1,1), ldu, &WORK(iwork),
+			cunmbr_("Q", "R", "N", m, n, n, &vt[vt_offset], ldvt, 
+				&work[itauq], &u[u_offset], ldu, &work[iwork],
 				 &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in VT   
-                      (CWorkspace: need 3*N-1, prefer 
-2*N+(N-1)*NB)   
+/*                    Generate right bidiagonalizing vectors in VT   
+                      (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(
-				itaup), &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[
+				itaup], &work[iwork], &i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
@@ -1907,19 +1838,15 @@ omputing right
 
 		if (wntvn) {
 
-/*                 Path 7 (M much larger than N, JOBU='A',
- JOBVT='N')   
-                   M left singular vectors to be computed 
-in U and   
-                   no right singular vectors to be compute
-d   
+/*                 Path 7 (M much larger than N, JOBU='A', JOBVT='N')   
+                   M left singular vectors to be computed in U and   
+                   no right singular vectors to be computed   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *n * 3;
 		    if (*lwork >= *n * *n + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			ir = 1;
 			if (*lwork >= wrkbl + *lda * *n) {
@@ -1936,116 +1863,101 @@ algorithm */
 			itau = ir + ldwrkr * *n;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
-/*                    Copy R to WORK(IR), zeroing out 
-below it */
+/*                    Copy R to WORK(IR), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(ir), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[ir], &
 				ldwrkr);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 1]
 				, &ldwrkr);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need N*N+N+M, prefe
-r N*N+N+M*NB)   
+                      (CWorkspace: need N*N+N+M, prefer N*N+N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
 /*                    Bidiagonalize R in WORK(IR)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+2*N*NB)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IR)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+N*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(ir), &ldwrkr, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[ir], &ldwrkr, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IR
-)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IR)   
                       (CWorkspace: need N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, &c__0, n, &c__0, &S(1), &RWORK(ie), 
-				cdum, &c__1, &WORK(ir), &ldwrkr, cdum, &c__1, 
-				&RWORK(irwork), info);
+			cbdsqr_("U", n, &c__0, n, &c__0, &s[1], &rwork[ie], 
+				cdum, &c__1, &work[ir], &ldwrkr, cdum, &c__1, 
+				&rwork[irwork], info);
 
-/*                    Multiply Q in U by left singular
- vectors of R in   
+/*                    Multiply Q in U by left singular vectors of R in   
                       WORK(IR), storing result in A   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &U(1,1), ldu, &
-				WORK(ir), &ldwrkr, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, n, &c_b2, &u[u_offset], ldu, &
+				work[ir], &ldwrkr, &c_b1, &a[a_offset], lda);
 
-/*                    Copy left singular vectors of A 
-from A to U */
+/*                    Copy left singular vectors of A from A to U */
 
-			clacpy_("F", m, n, &A(1,1), lda, &U(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need N+M, prefer N+
-M*NB)   
+                      (CWorkspace: need N+M, prefer N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
@@ -2055,80 +1967,71 @@ M*NB)
 
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &A(2,1), lda);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &a_ref(2, 1),
+				 lda);
 
 /*                    Bidiagonalize R in A   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left bidiagon
-alizing vectors   
+/*                    Multiply Q in U by left bidiagonalizing vectors   
                       in A   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &A(1,1), lda, &
-				WORK(itauq), &U(1,1), ldu, &WORK(iwork), 
-				&i__2, &ierr);
+			cunmbr_("Q", "R", "N", m, n, n, &a[a_offset], lda, &
+				work[itauq], &u[u_offset], ldu, &work[iwork], 
+				&i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
+/*                    Perform bidiagonal QR iteration, computing left   
                       singular vectors of A in U   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, &c__0, m, &c__0, &S(1), &RWORK(ie), 
-				cdum, &c__1, &U(1,1), ldu, cdum, &c__1, &
-				RWORK(irwork), info);
+			cbdsqr_("U", n, &c__0, m, &c__0, &s[1], &rwork[ie], 
+				cdum, &c__1, &u[u_offset], ldu, cdum, &c__1, &
+				rwork[irwork], info);
 
 		    }
 
 		} else if (wntvo) {
 
-/*                 Path 8 (M much larger than N, JOBU='A',
- JOBVT='O')   
-                   M left singular vectors to be computed 
-in U and   
-                   N right singular vectors to be overwrit
-ten on A   
+/*                 Path 8 (M much larger than N, JOBU='A', JOBVT='O')   
+                   M left singular vectors to be computed in U and   
+                   N right singular vectors to be overwritten on A   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *n * 3;
 		    if (*lwork >= (*n << 1) * *n + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + (*lda << 1) * *n) {
 
-/*                       WORK(IU) is LDA by N and 
-WORK(IR) is LDA by N */
+/*                       WORK(IU) is LDA by N and WORK(IR) is LDA by N */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *n;
 			    ldwrkr = *lda;
 			} else if (*lwork >= wrkbl + (*lda + *n) * *n) {
 
-/*                       WORK(IU) is LDA by N and 
-WORK(IR) is N by N */
+/*                       WORK(IU) is LDA by N and WORK(IR) is N by N */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *n;
 			    ldwrkr = *n;
 			} else {
 
-/*                       WORK(IU) is N by N and WO
-RK(IR) is N by N */
+/*                       WORK(IU) is N by N and WORK(IR) is N by N */
 
 			    ldwrku = *n;
 			    ir = iu + ldwrku * *n;
@@ -2137,142 +2040,120 @@ RK(IR) is N by N */
 			itau = ir + ldwrkr * *n;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N*N+2*N, pre
-fer 2*N*N+N+N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N*N+2*N, prefer 2*N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need 2*N*N+N+M, pre
-fer 2*N*N+N+M*NB)   
+                      (CWorkspace: need 2*N*N+N+M, prefer 2*N*N+N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy R to WORK(IU), zeroing out 
-below it */
+/*                    Copy R to WORK(IU), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(iu), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 1]
 				, &ldwrku);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
-/*                    Bidiagonalize R in WORK(IU), cop
-ying result to   
+/*                    Bidiagonalize R in WORK(IU), copying result to   
                       WORK(IR)   
-                      (CWorkspace: need   2*N*N+3*N, 
-  
-                                   prefer 2*N*N+2*N+2*
-N*NB)   
+                      (CWorkspace: need   2*N*N+3*N,   
+                                   prefer 2*N*N+2*N+2*N*NB)   
                       (RWorkspace: need   N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("U", n, n, &WORK(iu), &ldwrku, &WORK(ir), &
+			clacpy_("U", n, n, &work[iu], &ldwrku, &work[ir], &
 				ldwrkr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IU)   
-                      (CWorkspace: need 2*N*N+3*N, pre
-fer 2*N*N+2*N+N*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need 2*N*N+3*N, prefer 2*N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(iu), &ldwrku, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[iu], &ldwrku, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IR)   
-                      (CWorkspace: need   2*N*N+3*N-1,
-   
-                                   prefer 2*N*N+2*N+(N
--1)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need   2*N*N+3*N-1,   
+                                   prefer 2*N*N+2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &WORK(ir), &ldwrkr, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &work[ir], &ldwrkr, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IU
-) and computing   
-                      right singular vectors of R in W
-ORK(IR)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IU) and computing   
+                      right singular vectors of R in WORK(IR)   
                       (CWorkspace: need 2*N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, n, &c__0, &S(1), &RWORK(ie), &WORK(
-				ir), &ldwrkr, &WORK(iu), &ldwrku, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", n, n, n, &c__0, &s[1], &rwork[ie], &work[
+				ir], &ldwrkr, &work[iu], &ldwrku, cdum, &c__1,
+				 &rwork[irwork], info);
 
-/*                    Multiply Q in U by left singular
- vectors of R in   
+/*                    Multiply Q in U by left singular vectors of R in   
                       WORK(IU), storing result in A   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &U(1,1), ldu, &
-				WORK(iu), &ldwrku, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, n, &c_b2, &u[u_offset], ldu, &
+				work[iu], &ldwrku, &c_b1, &a[a_offset], lda);
 
-/*                    Copy left singular vectors of A 
-from A to U */
+/*                    Copy left singular vectors of A from A to U */
 
-			clacpy_("F", m, n, &A(1,1), lda, &U(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
-/*                    Copy right singular vectors of R
- from WORK(IR) to A */
+/*                    Copy right singular vectors of R from WORK(IR) to A */
 
-			clacpy_("F", n, n, &WORK(ir), &ldwrkr, &A(1,1), 
+			clacpy_("F", n, n, &work[ir], &ldwrkr, &a[a_offset], 
 				lda);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need N+M, prefer N+
-M*NB)   
+                      (CWorkspace: need N+M, prefer N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
@@ -2282,70 +2163,62 @@ M*NB)
 
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &A(2,1), lda);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &a_ref(2, 1),
+				 lda);
 
 /*                    Bidiagonalize R in A   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left bidiagon
-alizing vectors   
+/*                    Multiply Q in U by left bidiagonalizing vectors   
                       in A   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &A(1,1), lda, &
-				WORK(itauq), &U(1,1), ldu, &WORK(iwork), 
-				&i__2, &ierr);
+			cunmbr_("Q", "R", "N", m, n, n, &a[a_offset], lda, &
+				work[itauq], &u[u_offset], ldu, &work[iwork], 
+				&i__2, &ierr)
+				;
 
-/*                    Generate right bidiagonalizing v
-ectors in A   
-                      (CWorkspace: need 3*N-1, prefer 
-2*N+(N-1)*NB)   
+/*                    Generate right bidiagonalizing vectors in A   
+                      (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &A(1,1), lda, &WORK(itaup),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &a[a_offset], lda, &work[itaup],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in A   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, m, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, m, &c__0, &s[1], &rwork[ie], &a[
+				a_offset], lda, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
 		} else if (wntvas) {
 
-/*                 Path 9 (M much larger than N, JOBU='A',
- JOBVT='S'   
+/*                 Path 9 (M much larger than N, JOBU='A', JOBVT='S'   
                            or 'A')   
-                   M left singular vectors to be computed 
-in U and   
-                   N right singular vectors to be computed
- in VT   
+                   M left singular vectors to be computed in U and   
+                   N right singular vectors to be computed in VT   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *n * 3;
 		    if (*lwork >= *n * *n + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + *lda * *n) {
@@ -2362,189 +2235,166 @@ algorithm */
 			itau = iu + ldwrku * *n;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need N*N+2*N, prefe
-r N*N+N+N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need N*N+2*N, prefer N*N+N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need N*N+N+M, prefe
-r N*N+N+M*NB)   
+                      (CWorkspace: need N*N+N+M, prefer N*N+N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy R to WORK(IU), zeroing out 
-below it */
+/*                    Copy R to WORK(IU), zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &WORK(iu), &
+			clacpy_("U", n, n, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 1)
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 1]
 				, &ldwrku);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
-/*                    Bidiagonalize R in WORK(IU), cop
-ying result to VT   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+2*N*NB)   
+/*                    Bidiagonalize R in WORK(IU), copying result to VT   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("U", n, n, &WORK(iu), &ldwrku, &VT(1,1),
+			clacpy_("U", n, n, &work[iu], &ldwrku, &vt[vt_offset],
 				 ldvt);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IU)   
-                      (CWorkspace: need N*N+3*N, prefe
-r N*N+2*N+N*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need N*N+3*N, prefer N*N+2*N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", n, n, n, &WORK(iu), &ldwrku, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", n, n, n, &work[iu], &ldwrku, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in VT   
-                      (CWorkspace: need   N*N+3*N-1, 
-  
-                                   prefer N*N+2*N+(N-1
-)*NB)   
+/*                    Generate right bidiagonalizing vectors in VT   
+                      (CWorkspace: need   N*N+3*N-1,   
+                                   prefer N*N+2*N+(N-1)*NB)   
                       (RWorkspace: need   0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(
-				itaup), &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[
+				itaup], &work[iwork], &i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of R in WORK(IU
-) and computing   
-                      right singular vectors of R in V
-T   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of R in WORK(IU) and computing   
+                      right singular vectors of R in VT   
                       (CWorkspace: need N*N)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, n, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &WORK(iu), &ldwrku, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, n, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &work[iu], &ldwrku, cdum, &
+				c__1, &rwork[irwork], info);
 
-/*                    Multiply Q in U by left singular
- vectors of R in   
+/*                    Multiply Q in U by left singular vectors of R in   
                       WORK(IU), storing result in A   
                       (CWorkspace: need N*N)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, n, &c_b2, &U(1,1), ldu, &
-				WORK(iu), &ldwrku, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, n, &c_b2, &u[u_offset], ldu, &
+				work[iu], &ldwrku, &c_b1, &a[a_offset], lda);
 
-/*                    Copy left singular vectors of A 
-from A to U */
+/*                    Copy left singular vectors of A from A to U */
 
-			clacpy_("F", m, n, &A(1,1), lda, &U(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *n;
 
-/*                    Compute A=Q*R, copying result to
- U   
-                      (CWorkspace: need 2*N, prefer N+
-N*NB)   
+/*                    Compute A=Q*R, copying result to U   
+                      (CWorkspace: need 2*N, prefer N+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgeqrf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("L", m, n, &A(1,1), lda, &U(1,1), 
+			cgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 
 /*                    Generate Q in U   
-                      (CWorkspace: need N+M, prefer N+
-M*NB)   
+                      (CWorkspace: need N+M, prefer N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungqr_(m, m, n, &U(1,1), ldu, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cungqr_(m, m, n, &u[u_offset], ldu, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy R from A to VT, zeroing out
- below it */
+/*                    Copy R from A to VT, zeroing out below it */
 
-			clacpy_("U", n, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("U", n, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 			i__2 = *n - 1;
 			i__3 = *n - 1;
-			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &VT(2,1), ldvt);
+			claset_("L", &i__2, &i__3, &c_b1, &c_b1, &vt_ref(2, 1)
+				, ldvt);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *n;
 			iwork = itaup + *n;
 
 /*                    Bidiagonalize R in VT   
-                      (CWorkspace: need 3*N, prefer 2*
-N+2*N*NB)   
+                      (CWorkspace: need 3*N, prefer 2*N+2*N*NB)   
                       (RWorkspace: need N) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(n, n, &VT(1,1), ldvt, &S(1), &RWORK(ie),
-				 &WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(n, n, &vt[vt_offset], ldvt, &s[1], &rwork[ie],
+				 &work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply Q in U by left bidiagon
-alizing vectors   
+/*                    Multiply Q in U by left bidiagonalizing vectors   
                       in VT   
-                      (CWorkspace: need 2*N+M, prefer 
-2*N+M*NB)   
+                      (CWorkspace: need 2*N+M, prefer 2*N+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("Q", "R", "N", m, n, n, &VT(1,1), ldvt, 
-				&WORK(itauq), &U(1,1), ldu, &WORK(iwork),
+			cunmbr_("Q", "R", "N", m, n, n, &vt[vt_offset], ldvt, 
+				&work[itauq], &u[u_offset], ldu, &work[iwork],
 				 &i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in VT   
-                      (CWorkspace: need 3*N-1, prefer 
-2*N+(N-1)*NB)   
+/*                    Generate right bidiagonalizing vectors in VT   
+                      (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(
-				itaup), &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[
+				itaup], &work[iwork], &i__2, &ierr)
+				;
 			irwork = ie + *n;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", n, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", n, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
@@ -2569,19 +2419,16 @@ omputing right
              (RWorkspace: need N) */
 
 	    i__2 = *lwork - iwork + 1;
-	    cgebrd_(m, n, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(itauq), 
-		    &WORK(itaup), &WORK(iwork), &i__2, &ierr);
+	    cgebrd_(m, n, &a[a_offset], lda, &s[1], &rwork[ie], &work[itauq], 
+		    &work[itaup], &work[iwork], &i__2, &ierr);
 	    if (wntuas) {
 
-/*              If left singular vectors desired in U, copy re
-sult to U   
-                and generate left bidiagonalizing vectors in U
-   
-                (CWorkspace: need 2*N+NCU, prefer 2*N+NCU*NB) 
-  
+/*              If left singular vectors desired in U, copy result to U   
+                and generate left bidiagonalizing vectors in U   
+                (CWorkspace: need 2*N+NCU, prefer 2*N+NCU*NB)   
                 (RWorkspace: 0) */
 
-		clacpy_("L", m, n, &A(1,1), lda, &U(1,1), ldu);
+		clacpy_("L", m, n, &a[a_offset], lda, &u[u_offset], ldu);
 		if (wntus) {
 		    ncu = *n;
 		}
@@ -2589,48 +2436,42 @@ sult to U
 		    ncu = *m;
 		}
 		i__2 = *lwork - iwork + 1;
-		cungbr_("Q", m, &ncu, n, &U(1,1), ldu, &WORK(itauq), &
-			WORK(iwork), &i__2, &ierr);
+		cungbr_("Q", m, &ncu, n, &u[u_offset], ldu, &work[itauq], &
+			work[iwork], &i__2, &ierr);
 	    }
 	    if (wntvas) {
 
-/*              If right singular vectors desired in VT, copy 
-result to   
-                VT and generate right bidiagonalizing vectors 
-in VT   
-                (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB) 
-  
+/*              If right singular vectors desired in VT, copy result to   
+                VT and generate right bidiagonalizing vectors in VT   
+                (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                 (RWorkspace: 0) */
 
-		clacpy_("U", n, n, &A(1,1), lda, &VT(1,1), ldvt);
+		clacpy_("U", n, n, &a[a_offset], lda, &vt[vt_offset], ldvt);
 		i__2 = *lwork - iwork + 1;
-		cungbr_("P", n, n, n, &VT(1,1), ldvt, &WORK(itaup), &
-			WORK(iwork), &i__2, &ierr);
+		cungbr_("P", n, n, n, &vt[vt_offset], ldvt, &work[itaup], &
+			work[iwork], &i__2, &ierr);
 	    }
 	    if (wntuo) {
 
-/*              If left singular vectors desired in A, generat
-e left   
+/*              If left singular vectors desired in A, generate left   
                 bidiagonalizing vectors in A   
                 (CWorkspace: need 3*N, prefer 2*N+N*NB)   
                 (RWorkspace: 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cungbr_("Q", m, n, n, &A(1,1), lda, &WORK(itauq), &WORK(
-			iwork), &i__2, &ierr);
+		cungbr_("Q", m, n, n, &a[a_offset], lda, &work[itauq], &work[
+			iwork], &i__2, &ierr);
 	    }
 	    if (wntvo) {
 
-/*              If right singular vectors desired in A, genera
-te right   
+/*              If right singular vectors desired in A, generate right   
                 bidiagonalizing vectors in A   
-                (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB) 
-  
+                (CWorkspace: need 3*N-1, prefer 2*N+(N-1)*NB)   
                 (RWorkspace: 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cungbr_("P", n, n, n, &A(1,1), lda, &WORK(itaup), &WORK(
-			iwork), &i__2, &ierr);
+		cungbr_("P", n, n, n, &a[a_offset], lda, &work[itaup], &work[
+			iwork], &i__2, &ierr);
 	    }
 	    irwork = ie + *n;
 	    if (wntuas || wntuo) {
@@ -2647,40 +2488,37 @@ te right
 	    }
 	    if (! wntuo && ! wntvo) {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in U and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in U and computing right singular   
                 vectors in VT   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("U", n, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("U", n, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &vt[
+			vt_offset], ldvt, &u[u_offset], ldu, cdum, &c__1, &
+			rwork[irwork], info);
 	    } else if (! wntuo && wntvo) {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in U and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in U and computing right singular   
                 vectors in A   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("U", n, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, &U(1,1), ldu, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("U", n, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &a[
+			a_offset], lda, &u[u_offset], ldu, cdum, &c__1, &
+			rwork[irwork], info);
 	    } else {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in A and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in A and computing right singular   
                 vectors in VT   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("U", n, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &A(1,1), lda, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("U", n, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &vt[
+			vt_offset], ldvt, &a[a_offset], lda, cdum, &c__1, &
+			rwork[irwork], info);
 	    }
 
 	}
@@ -2688,8 +2526,7 @@ omputing
     } else {
 
 /*        A has more columns than rows. If A has sufficiently more   
-          columns than rows, first reduce using the LQ decomposition (
-if   
+          columns than rows, first reduce using the LQ decomposition (if   
           sufficient workspace available) */
 
 	if (*n >= mnthr) {
@@ -2707,15 +2544,14 @@ if
                 (RWorkspace: 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork), &
+		cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork], &
 			i__2, &ierr);
 
 /*              Zero out above L */
 
 		i__2 = *m - 1;
 		i__3 = *m - 1;
-		claset_("U", &i__2, &i__3, &c_b1, &c_b1, &A(1,2)
-			, lda);
+		claset_("U", &i__2, &i__3, &c_b1, &c_b1, &a_ref(1, 2), lda);
 		ie = 1;
 		itauq = 1;
 		itaup = itauq + *m;
@@ -2726,19 +2562,17 @@ if
                 (RWorkspace: need M) */
 
 		i__2 = *lwork - iwork + 1;
-		cgebrd_(m, m, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(
-			itauq), &WORK(itaup), &WORK(iwork), &i__2, &ierr);
+		cgebrd_(m, m, &a[a_offset], lda, &s[1], &rwork[ie], &work[
+			itauq], &work[itaup], &work[iwork], &i__2, &ierr);
 		if (wntuo || wntuas) {
 
-/*                 If left singular vectors desired, gener
-ate Q   
-                   (CWorkspace: need 3*M, prefer 2*M+M*NB)
-   
+/*                 If left singular vectors desired, generate Q   
+                   (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("Q", m, m, m, &A(1,1), lda, &WORK(itauq), &
-			    WORK(iwork), &i__2, &ierr);
+		    cungbr_("Q", m, m, m, &a[a_offset], lda, &work[itauq], &
+			    work[iwork], &i__2, &ierr);
 		}
 		irwork = ie + *m;
 		nru = 0;
@@ -2746,43 +2580,37 @@ ate Q
 		    nru = *m;
 		}
 
-/*              Perform bidiagonal QR iteration, computing lef
-t singular   
+/*              Perform bidiagonal QR iteration, computing left singular   
                 vectors of A in A if desired   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("U", m, &c__0, &nru, &c__0, &S(1), &RWORK(ie), cdum, &
-			c__1, &A(1,1), lda, cdum, &c__1, &RWORK(irwork), 
+		cbdsqr_("U", m, &c__0, &nru, &c__0, &s[1], &rwork[ie], cdum, &
+			c__1, &a[a_offset], lda, cdum, &c__1, &rwork[irwork], 
 			info);
 
-/*              If left singular vectors desired in U, copy th
-em there */
+/*              If left singular vectors desired in U, copy them there */
 
 		if (wntuas) {
-		    clacpy_("F", m, m, &A(1,1), lda, &U(1,1), ldu);
+		    clacpy_("F", m, m, &a[a_offset], lda, &u[u_offset], ldu);
 		}
 
 	    } else if (wntvo && wntun) {
 
-/*              Path 2t(N much larger than M, JOBU='N', JOBVT=
-'O')   
-                M right singular vectors to be overwritten on 
-A and   
+/*              Path 2t(N much larger than M, JOBU='N', JOBVT='O')   
+                M right singular vectors to be overwritten on A and   
                 no left singular vectors to be computed */
 
 		if (*lwork >= *m * *m + *m * 3) {
 
-/*                 Sufficient workspace for a fast algorit
-hm */
+/*                 Sufficient workspace for a fast algorithm */
 
 		    ir = 1;
 /* Computing MAX */
 		    i__2 = wrkbl, i__3 = *lda * *n;
 		    if (*lwork >= max(i__2,i__3) + *lda * *m) {
 
-/*                    WORK(IU) is LDA by N and WORK(IR
-) is LDA by M */
+/*                    WORK(IU) is LDA by N and WORK(IR) is LDA by M */
 
 			ldwrku = *lda;
 			chunk = *n;
@@ -2792,16 +2620,14 @@ hm */
 			i__2 = wrkbl, i__3 = *lda * *n;
 			if (*lwork >= max(i__2,i__3) + *m * *m) {
 
-/*                    WORK(IU) is LDA by N and WOR
-K(IR) is M by M */
+/*                    WORK(IU) is LDA by N and WORK(IR) is M by M */
 
 			    ldwrku = *lda;
 			    chunk = *n;
 			    ldwrkr = *m;
 			} else {
 
-/*                    WORK(IU) is M by CHUNK and W
-ORK(IR) is M by M */
+/*                    WORK(IU) is M by CHUNK and WORK(IR) is M by M */
 
 			    ldwrku = *m;
 			    chunk = (*lwork - *m * *m) / *m;
@@ -2812,93 +2638,84 @@ ORK(IR) is M by M */
 		    iwork = itau + *m;
 
 /*                 Compute A=L*Q   
-                   (CWorkspace: need M*M+2*M, prefer M*M+M
-+M*NB)   
+                   (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__2, &ierr);
 
-/*                 Copy L to WORK(IR) and zero out above i
-t */
+/*                 Copy L to WORK(IR) and zero out above it */
 
-		    clacpy_("L", m, m, &A(1,1), lda, &WORK(ir), &ldwrkr);
+		    clacpy_("L", m, m, &a[a_offset], lda, &work[ir], &ldwrkr);
 		    i__2 = *m - 1;
 		    i__3 = *m - 1;
-		    claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 
-			    ldwrkr), &ldwrkr);
+		    claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 
+			    ldwrkr], &ldwrkr);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need M*M+2*M, prefer M*M+M
-+M*NB)   
+                   (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__2, &ierr);
+		    cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__2, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *m;
 		    iwork = itaup + *m;
 
 /*                 Bidiagonalize L in WORK(IR)   
-                   (CWorkspace: need M*M+3*M, prefer M*M+2
-*M+2*M*NB)   
+                   (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                    (RWorkspace: need M) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgebrd_(m, m, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-			    WORK(itauq), &WORK(itaup), &WORK(iwork), &i__2, &
+		    cgebrd_(m, m, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+			    work[itauq], &work[itaup], &work[iwork], &i__2, &
 			    ierr);
 
-/*                 Generate right vectors bidiagonalizing 
-L   
-                   (CWorkspace: need M*M+3*M-1, prefer M*M
-+2*M+(M-1)*NB)   
+/*                 Generate right vectors bidiagonalizing L   
+                   (CWorkspace: need M*M+3*M-1, prefer M*M+2*M+(M-1)*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("P", m, m, m, &WORK(ir), &ldwrkr, &WORK(itaup), &
-			    WORK(iwork), &i__2, &ierr);
+		    cungbr_("P", m, m, m, &work[ir], &ldwrkr, &work[itaup], &
+			    work[iwork], &i__2, &ierr);
 		    irwork = ie + *m;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing right   
+/*                 Perform bidiagonal QR iteration, computing right   
                    singular vectors of L in WORK(IR)   
                    (CWorkspace: need M*M)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", m, m, &c__0, &c__0, &S(1), &RWORK(ie), &WORK(
-			    ir), &ldwrkr, cdum, &c__1, cdum, &c__1, &RWORK(
-			    irwork), info);
+		    cbdsqr_("U", m, m, &c__0, &c__0, &s[1], &rwork[ie], &work[
+			    ir], &ldwrkr, cdum, &c__1, cdum, &c__1, &rwork[
+			    irwork], info);
 		    iu = itauq;
 
-/*                 Multiply right singular vectors of L in
- WORK(IR) by Q   
-                   in A, storing result in WORK(IU) and co
-pying to A   
-                   (CWorkspace: need M*M+M, prefer M*M+M*N
-)   
+/*                 Multiply right singular vectors of L in WORK(IR) by Q   
+                   in A, storing result in WORK(IU) and copying to A   
+                   (CWorkspace: need M*M+M, prefer M*M+M*N)   
                    (RWorkspace: 0) */
 
 		    i__2 = *n;
 		    i__3 = chunk;
-		    for (i = 1; chunk < 0 ? i >= *n : i <= *n; i += chunk) {
+		    for (i__ = 1; i__3 < 0 ? i__ >= i__2 : i__ <= i__2; i__ +=
+			     i__3) {
 /* Computing MIN */
-			i__4 = *n - i + 1;
+			i__4 = *n - i__ + 1;
 			blk = min(i__4,chunk);
-			cgemm_("N", "N", m, &blk, m, &c_b2, &WORK(ir), &
-				ldwrkr, &A(1,i), lda, &c_b1, &WORK(
-				iu), &ldwrku);
-			clacpy_("F", m, &blk, &WORK(iu), &ldwrku, &A(1,i), lda);
+			cgemm_("N", "N", m, &blk, m, &c_b2, &work[ir], &
+				ldwrkr, &a_ref(1, i__), lda, &c_b1, &work[iu],
+				 &ldwrku);
+			clacpy_("F", m, &blk, &work[iu], &ldwrku, &a_ref(1, 
+				i__), lda);
 /* L30: */
 		    }
 
 		} else {
 
-/*                 Insufficient workspace for a fast algor
-ithm */
+/*                 Insufficient workspace for a fast algorithm */
 
 		    ie = 1;
 		    itauq = 1;
@@ -2906,56 +2723,49 @@ ithm */
 		    iwork = itaup + *m;
 
 /*                 Bidiagonalize A   
-                   (CWorkspace: need 2*M+N, prefer 2*M+(M+
-N)*NB)   
+                   (CWorkspace: need 2*M+N, prefer 2*M+(M+N)*NB)   
                    (RWorkspace: need M) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgebrd_(m, n, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(
-			    itauq), &WORK(itaup), &WORK(iwork), &i__3, &ierr);
+		    cgebrd_(m, n, &a[a_offset], lda, &s[1], &rwork[ie], &work[
+			    itauq], &work[itaup], &work[iwork], &i__3, &ierr);
 
-/*                 Generate right vectors bidiagonalizing 
-A   
-                   (CWorkspace: need 3*M, prefer 2*M+M*NB)
-   
+/*                 Generate right vectors bidiagonalizing A   
+                   (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("P", m, n, m, &A(1,1), lda, &WORK(itaup), &
-			    WORK(iwork), &i__3, &ierr);
+		    cungbr_("P", m, n, m, &a[a_offset], lda, &work[itaup], &
+			    work[iwork], &i__3, &ierr);
 		    irwork = ie + *m;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing right   
+/*                 Perform bidiagonal QR iteration, computing right   
                    singular vectors of A in A   
                    (CWorkspace: 0)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("L", m, n, &c__0, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, cdum, &c__1, cdum, &c__1, &RWORK(
-			    irwork), info);
+		    cbdsqr_("L", m, n, &c__0, &c__0, &s[1], &rwork[ie], &a[
+			    a_offset], lda, cdum, &c__1, cdum, &c__1, &rwork[
+			    irwork], info);
 
 		}
 
 	    } else if (wntvo && wntuas) {
 
-/*              Path 3t(N much larger than M, JOBU='S' or 'A',
- JOBVT='O')   
-                M right singular vectors to be overwritten on 
-A and   
+/*              Path 3t(N much larger than M, JOBU='S' or 'A', JOBVT='O')   
+                M right singular vectors to be overwritten on A and   
                 M left singular vectors to be computed in U */
 
 		if (*lwork >= *m * *m + *m * 3) {
 
-/*                 Sufficient workspace for a fast algorit
-hm */
+/*                 Sufficient workspace for a fast algorithm */
 
 		    ir = 1;
 /* Computing MAX */
 		    i__3 = wrkbl, i__2 = *lda * *n;
 		    if (*lwork >= max(i__3,i__2) + *lda * *m) {
 
-/*                    WORK(IU) is LDA by N and WORK(IR
-) is LDA by M */
+/*                    WORK(IU) is LDA by N and WORK(IR) is LDA by M */
 
 			ldwrku = *lda;
 			chunk = *n;
@@ -2965,16 +2775,14 @@ hm */
 			i__3 = wrkbl, i__2 = *lda * *n;
 			if (*lwork >= max(i__3,i__2) + *m * *m) {
 
-/*                    WORK(IU) is LDA by N and WOR
-K(IR) is M by M */
+/*                    WORK(IU) is LDA by N and WORK(IR) is M by M */
 
 			    ldwrku = *lda;
 			    chunk = *n;
 			    ldwrkr = *m;
 			} else {
 
-/*                    WORK(IU) is M by CHUNK and W
-ORK(IR) is M by M */
+/*                    WORK(IU) is M by CHUNK and WORK(IR) is M by M */
 
 			    ldwrku = *m;
 			    chunk = (*lwork - *m * *m) / *m;
@@ -2985,178 +2793,160 @@ ORK(IR) is M by M */
 		    iwork = itau + *m;
 
 /*                 Compute A=L*Q   
-                   (CWorkspace: need M*M+2*M, prefer M*M+M
-+M*NB)   
+                   (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__3, &ierr);
 
 /*                 Copy L to U, zeroing about above it */
 
-		    clacpy_("L", m, m, &A(1,1), lda, &U(1,1), ldu);
+		    clacpy_("L", m, m, &a[a_offset], lda, &u[u_offset], ldu);
 		    i__3 = *m - 1;
 		    i__2 = *m - 1;
-		    claset_("U", &i__3, &i__2, &c_b1, &c_b1, &U(1,2), ldu);
+		    claset_("U", &i__3, &i__2, &c_b1, &c_b1, &u_ref(1, 2), 
+			    ldu);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need M*M+2*M, prefer M*M+M
-+M*NB)   
+                   (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__3, &ierr);
+		    cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__3, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *m;
 		    iwork = itaup + *m;
 
-/*                 Bidiagonalize L in U, copying result to
- WORK(IR)   
-                   (CWorkspace: need M*M+3*M, prefer M*M+2
-*M+2*M*NB)   
+/*                 Bidiagonalize L in U, copying result to WORK(IR)   
+                   (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                    (RWorkspace: need M) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cgebrd_(m, m, &U(1,1), ldu, &S(1), &RWORK(ie), &WORK(
-			    itauq), &WORK(itaup), &WORK(iwork), &i__3, &ierr);
-		    clacpy_("U", m, m, &U(1,1), ldu, &WORK(ir), &ldwrkr);
+		    cgebrd_(m, m, &u[u_offset], ldu, &s[1], &rwork[ie], &work[
+			    itauq], &work[itaup], &work[iwork], &i__3, &ierr);
+		    clacpy_("U", m, m, &u[u_offset], ldu, &work[ir], &ldwrkr);
 
-/*                 Generate right vectors bidiagonalizing 
-L in WORK(IR)   
-                   (CWorkspace: need M*M+3*M-1, prefer M*M
-+2*M+(M-1)*NB)   
+/*                 Generate right vectors bidiagonalizing L in WORK(IR)   
+                   (CWorkspace: need M*M+3*M-1, prefer M*M+2*M+(M-1)*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("P", m, m, m, &WORK(ir), &ldwrkr, &WORK(itaup), &
-			    WORK(iwork), &i__3, &ierr);
+		    cungbr_("P", m, m, m, &work[ir], &ldwrkr, &work[itaup], &
+			    work[iwork], &i__3, &ierr);
 
-/*                 Generate left vectors bidiagonalizing L
- in U   
-                   (CWorkspace: need M*M+3*M, prefer M*M+2
-*M+M*NB)   
+/*                 Generate left vectors bidiagonalizing L in U   
+                   (CWorkspace: need M*M+3*M, prefer M*M+2*M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__3 = *lwork - iwork + 1;
-		    cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq), &
-			    WORK(iwork), &i__3, &ierr);
+		    cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq], &
+			    work[iwork], &i__3, &ierr);
 		    irwork = ie + *m;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
-                   singular vectors of L in U, and computi
-ng right   
+/*                 Perform bidiagonal QR iteration, computing left   
+                   singular vectors of L in U, and computing right   
                    singular vectors of L in WORK(IR)   
                    (CWorkspace: need M*M)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", m, m, m, &c__0, &S(1), &RWORK(ie), &WORK(ir),
-			     &ldwrkr, &U(1,1), ldu, cdum, &c__1, &RWORK(
-			    irwork), info);
+		    cbdsqr_("U", m, m, m, &c__0, &s[1], &rwork[ie], &work[ir],
+			     &ldwrkr, &u[u_offset], ldu, cdum, &c__1, &rwork[
+			    irwork], info);
 		    iu = itauq;
 
-/*                 Multiply right singular vectors of L in
- WORK(IR) by Q   
-                   in A, storing result in WORK(IU) and co
-pying to A   
-                   (CWorkspace: need M*M+M, prefer M*M+M*N
-))   
+/*                 Multiply right singular vectors of L in WORK(IR) by Q   
+                   in A, storing result in WORK(IU) and copying to A   
+                   (CWorkspace: need M*M+M, prefer M*M+M*N))   
                    (RWorkspace: 0) */
 
 		    i__3 = *n;
 		    i__2 = chunk;
-		    for (i = 1; chunk < 0 ? i >= *n : i <= *n; i += chunk) {
+		    for (i__ = 1; i__2 < 0 ? i__ >= i__3 : i__ <= i__3; i__ +=
+			     i__2) {
 /* Computing MIN */
-			i__4 = *n - i + 1;
+			i__4 = *n - i__ + 1;
 			blk = min(i__4,chunk);
-			cgemm_("N", "N", m, &blk, m, &c_b2, &WORK(ir), &
-				ldwrkr, &A(1,i), lda, &c_b1, &WORK(
-				iu), &ldwrku);
-			clacpy_("F", m, &blk, &WORK(iu), &ldwrku, &A(1,i), lda);
+			cgemm_("N", "N", m, &blk, m, &c_b2, &work[ir], &
+				ldwrkr, &a_ref(1, i__), lda, &c_b1, &work[iu],
+				 &ldwrku);
+			clacpy_("F", m, &blk, &work[iu], &ldwrku, &a_ref(1, 
+				i__), lda);
 /* L40: */
 		    }
 
 		} else {
 
-/*                 Insufficient workspace for a fast algor
-ithm */
+/*                 Insufficient workspace for a fast algorithm */
 
 		    itau = 1;
 		    iwork = itau + *m;
 
 /*                 Compute A=L*Q   
-                   (CWorkspace: need 2*M, prefer M+M*NB) 
-  
+                   (CWorkspace: need 2*M, prefer M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(iwork)
+		    cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[iwork]
 			    , &i__2, &ierr);
 
 /*                 Copy L to U, zeroing out above it */
 
-		    clacpy_("L", m, m, &A(1,1), lda, &U(1,1), ldu);
+		    clacpy_("L", m, m, &a[a_offset], lda, &u[u_offset], ldu);
 		    i__2 = *m - 1;
 		    i__3 = *m - 1;
-		    claset_("U", &i__2, &i__3, &c_b1, &c_b1, &U(1,2), ldu);
+		    claset_("U", &i__2, &i__3, &c_b1, &c_b1, &u_ref(1, 2), 
+			    ldu);
 
 /*                 Generate Q in A   
-                   (CWorkspace: need 2*M, prefer M+M*NB) 
-  
+                   (CWorkspace: need 2*M, prefer M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &WORK(
-			    iwork), &i__2, &ierr);
+		    cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &work[
+			    iwork], &i__2, &ierr);
 		    ie = 1;
 		    itauq = itau;
 		    itaup = itauq + *m;
 		    iwork = itaup + *m;
 
 /*                 Bidiagonalize L in U   
-                   (CWorkspace: need 3*M, prefer 2*M+2*M*N
-B)   
+                   (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                    (RWorkspace: need M) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cgebrd_(m, m, &U(1,1), ldu, &S(1), &RWORK(ie), &WORK(
-			    itauq), &WORK(itaup), &WORK(iwork), &i__2, &ierr);
+		    cgebrd_(m, m, &u[u_offset], ldu, &s[1], &rwork[ie], &work[
+			    itauq], &work[itaup], &work[iwork], &i__2, &ierr);
 
-/*                 Multiply right vectors bidiagonalizing 
-L by Q in A   
-                   (CWorkspace: need 2*M+N, prefer 2*M+N*N
-B)   
+/*                 Multiply right vectors bidiagonalizing L by Q in A   
+                   (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cunmbr_("P", "L", "C", m, n, m, &U(1,1), ldu, &WORK(
-			    itaup), &A(1,1), lda, &WORK(iwork), &i__2, &
+		    cunmbr_("P", "L", "C", m, n, m, &u[u_offset], ldu, &work[
+			    itaup], &a[a_offset], lda, &work[iwork], &i__2, &
 			    ierr);
 
-/*                 Generate left vectors bidiagonalizing L
- in U   
-                   (CWorkspace: need 3*M, prefer 2*M+M*NB)
-   
+/*                 Generate left vectors bidiagonalizing L in U   
+                   (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                    (RWorkspace: 0) */
 
 		    i__2 = *lwork - iwork + 1;
-		    cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq), &
-			    WORK(iwork), &i__2, &ierr);
+		    cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq], &
+			    work[iwork], &i__2, &ierr);
 		    irwork = ie + *m;
 
-/*                 Perform bidiagonal QR iteration, comput
-ing left   
-                   singular vectors of A in U and computin
-g right   
+/*                 Perform bidiagonal QR iteration, computing left   
+                   singular vectors of A in U and computing right   
                    singular vectors of A in A   
                    (CWorkspace: 0)   
                    (RWorkspace: need BDSPAC) */
 
-		    cbdsqr_("U", m, n, m, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, &U(1,1), ldu, cdum, &c__1, &
-			    RWORK(irwork), info);
+		    cbdsqr_("U", m, n, m, &c__0, &s[1], &rwork[ie], &a[
+			    a_offset], lda, &u[u_offset], ldu, cdum, &c__1, &
+			    rwork[irwork], info);
 
 		}
 
@@ -3164,17 +2954,13 @@ g right
 
 		if (wntun) {
 
-/*                 Path 4t(N much larger than M, JOBU='N',
- JOBVT='S')   
-                   M right singular vectors to be computed
- in VT and   
-                   no left singular vectors to be computed
- */
+/*                 Path 4t(N much larger than M, JOBU='N', JOBVT='S')   
+                   M right singular vectors to be computed in VT and   
+                   no left singular vectors to be computed */
 
 		    if (*lwork >= *m * *m + *m * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			ir = 1;
 			if (*lwork >= wrkbl + *lda * *m) {
@@ -3192,109 +2978,97 @@ algorithm */
 			iwork = itau + *m;
 
 /*                    Compute A=L*Q   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy L to WORK(IR), zeroing out 
-above it */
+/*                    Copy L to WORK(IR), zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(ir), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[ir], &
 				ldwrkr);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 
-				ldwrkr), &ldwrkr);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 
+				ldwrkr], &ldwrkr);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
 /*                    Bidiagonalize L in WORK(IR)   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+2*M*NB)   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Generate right vectors bidiagona
-lizing L in   
+/*                    Generate right vectors bidiagonalizing L in   
                       WORK(IR)   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+(M-1)*NB)   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(ir), &ldwrkr, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[ir], &ldwrkr, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing right   
-                      singular vectors of L in WORK(IR
-)   
+/*                    Perform bidiagonal QR iteration, computing right   
+                      singular vectors of L in WORK(IR)   
                       (CWorkspace: need M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, &c__0, &c__0, &S(1), &RWORK(ie), &
-				WORK(ir), &ldwrkr, cdum, &c__1, cdum, &c__1, &
-				RWORK(irwork), info);
+			cbdsqr_("U", m, m, &c__0, &c__0, &s[1], &rwork[ie], &
+				work[ir], &ldwrkr, cdum, &c__1, cdum, &c__1, &
+				rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IR) by   
+/*                    Multiply right singular vectors of L in WORK(IR) by   
                       Q in A, storing result in VT   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(ir), &ldwrkr, &
-				A(1,1), lda, &c_b1, &VT(1,1), ldvt);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[ir], &ldwrkr, &
+				a[a_offset], lda, &c_b1, &vt[vt_offset], ldvt);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
 /*                    Compute A=L*Q   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
 /*                    Copy result to VT */
 
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
@@ -3304,77 +3078,67 @@ M*NB)
 
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &A(1,2), lda);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &a_ref(1, 2),
+				 lda);
 
 /*                    Bidiagonalize L in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right vectors bidiagona
-lizing L by Q in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+/*                    Multiply right vectors bidiagonalizing L by Q in VT   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &A(1,1), lda, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &a[a_offset], lda, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing right   
+/*                    Perform bidiagonal QR iteration, computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, &c__0, &c__0, &S(1), &RWORK(ie), &
-				VT(1,1), ldvt, cdum, &c__1, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", m, n, &c__0, &c__0, &s[1], &rwork[ie], &
+				vt[vt_offset], ldvt, cdum, &c__1, cdum, &c__1,
+				 &rwork[irwork], info);
 
 		    }
 
 		} else if (wntuo) {
 
-/*                 Path 5t(N much larger than M, JOBU='O',
- JOBVT='S')   
-                   M right singular vectors to be computed
- in VT and   
-                   M left singular vectors to be overwritt
-en on A */
+/*                 Path 5t(N much larger than M, JOBU='O', JOBVT='S')   
+                   M right singular vectors to be computed in VT and   
+                   M left singular vectors to be overwritten on A */
 
 		    if (*lwork >= (*m << 1) * *m + *m * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + (*lda << 1) * *m) {
 
-/*                       WORK(IU) is LDA by M and 
-WORK(IR) is LDA by M */
+/*                       WORK(IU) is LDA by M and WORK(IR) is LDA by M */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *m;
 			    ldwrkr = *lda;
 			} else if (*lwork >= wrkbl + (*lda + *m) * *m) {
 
-/*                       WORK(IU) is LDA by M and 
-WORK(IR) is M by M */
+/*                       WORK(IU) is LDA by M and WORK(IR) is M by M */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *m;
 			    ldwrkr = *m;
 			} else {
 
-/*                       WORK(IU) is M by M and WO
-RK(IR) is M by M */
+/*                       WORK(IU) is M by M and WORK(IR) is M by M */
 
 			    ldwrku = *m;
 			    ir = iu + ldwrku * *m;
@@ -3384,134 +3148,114 @@ RK(IR) is M by M */
 			iwork = itau + *m;
 
 /*                    Compute A=L*Q   
-                      (CWorkspace: need 2*M*M+2*M, pre
-fer 2*M*M+M+M*NB)   
+                      (CWorkspace: need 2*M*M+2*M, prefer 2*M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy L to WORK(IU), zeroing out 
-below it */
+/*                    Copy L to WORK(IU), zeroing out below it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(iu), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 
-				ldwrku), &ldwrku);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 
+				ldwrku], &ldwrku);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need 2*M*M+2*M, pre
-fer 2*M*M+M+M*NB)   
+                      (CWorkspace: need 2*M*M+2*M, prefer 2*M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
-/*                    Bidiagonalize L in WORK(IU), cop
-ying result to   
+/*                    Bidiagonalize L in WORK(IU), copying result to   
                       WORK(IR)   
-                      (CWorkspace: need   2*M*M+3*M, 
-  
-                                   prefer 2*M*M+2*M+2*
-M*NB)   
+                      (CWorkspace: need   2*M*M+3*M,   
+                                   prefer 2*M*M+2*M+2*M*NB)   
                       (RWorkspace: need   M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("L", m, m, &WORK(iu), &ldwrku, &WORK(ir), &
+			clacpy_("L", m, m, &work[iu], &ldwrku, &work[ir], &
 				ldwrkr);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IU)   
-                      (CWorkspace: need   2*M*M+3*M-1,
-   
-                                   prefer 2*M*M+2*M+(M
--1)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need   2*M*M+3*M-1,   
+                                   prefer 2*M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(iu), &ldwrku, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[iu], &ldwrku, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IR)   
-                      (CWorkspace: need 2*M*M+3*M, pre
-fer 2*M*M+2*M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need 2*M*M+3*M, prefer 2*M*M+2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &WORK(ir), &ldwrkr, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &work[ir], &ldwrkr, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of L in WORK(IR
-) and computing   
-                      right singular vectors of L in W
-ORK(IU)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of L in WORK(IR) and computing   
+                      right singular vectors of L in WORK(IU)   
                       (CWorkspace: need 2*M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, m, &c__0, &S(1), &RWORK(ie), &WORK(
-				iu), &ldwrku, &WORK(ir), &ldwrkr, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", m, m, m, &c__0, &s[1], &rwork[ie], &work[
+				iu], &ldwrku, &work[ir], &ldwrkr, cdum, &c__1,
+				 &rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IU) by   
+/*                    Multiply right singular vectors of L in WORK(IU) by   
                       Q in A, storing result in VT   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(iu), &ldwrku, &
-				A(1,1), lda, &c_b1, &VT(1,1), ldvt);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[iu], &ldwrku, &
+				a[a_offset], lda, &c_b1, &vt[vt_offset], ldvt);
 
-/*                    Copy left singular vectors of L 
-to A   
+/*                    Copy left singular vectors of L to A   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			clacpy_("F", m, m, &WORK(ir), &ldwrkr, &A(1,1), 
+			clacpy_("F", m, m, &work[ir], &ldwrkr, &a[a_offset], 
 				lda);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
@@ -3521,67 +3265,58 @@ M*NB)
 
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &A(1,2), lda);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &a_ref(1, 2),
+				 lda);
 
 /*                    Bidiagonalize L in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right vectors bidiagona
-lizing L by Q in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+/*                    Multiply right vectors bidiagonalizing L by Q in VT   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &A(1,1), lda, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &a[a_offset], lda, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors of L in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+M*NB)   
+/*                    Generate left bidiagonalizing vectors of L in A   
+                      (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &A(1,1), lda, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &a[a_offset], lda, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in A and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in A and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &A(1,1), lda, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", m, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &a[a_offset], lda, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
 		} else if (wntuas) {
 
-/*                 Path 6t(N much larger than M, JOBU='S' 
-or 'A',   
+/*                 Path 6t(N much larger than M, JOBU='S' or 'A',   
                            JOBVT='S')   
-                   M right singular vectors to be computed
- in VT and   
-                   M left singular vectors to be computed 
-in U */
+                   M right singular vectors to be computed in VT and   
+                   M left singular vectors to be computed in U */
 
 		    if (*lwork >= *m * *m + *m * 3) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + *lda * *m) {
@@ -3599,180 +3334,156 @@ algorithm */
 			iwork = itau + *m;
 
 /*                    Compute A=L*Q   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
 
-/*                    Copy L to WORK(IU), zeroing out 
-above it */
+/*                    Copy L to WORK(IU), zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(iu), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 
-				ldwrku), &ldwrku);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 
+				ldwrku], &ldwrku);
 
 /*                    Generate Q in A   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &A(1,1), lda, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &a[a_offset], lda, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
-/*                    Bidiagonalize L in WORK(IU), cop
-ying result to U   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+2*M*NB)   
+/*                    Bidiagonalize L in WORK(IU), copying result to U   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("L", m, m, &WORK(iu), &ldwrku, &U(1,1), 
+			clacpy_("L", m, m, &work[iu], &ldwrku, &u[u_offset], 
 				ldu);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IU)   
-                      (CWorkspace: need   M*M+3*M-1, 
-  
-                                   prefer M*M+2*M+(M-1
-)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need   M*M+3*M-1,   
+                                   prefer M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(iu), &ldwrku, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[iu], &ldwrku, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in U   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in U   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of L in U and c
-omputing right   
-                      singular vectors of L in WORK(IU
-)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of L in U and computing right   
+                      singular vectors of L in WORK(IU)   
                       (CWorkspace: need M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, m, &c__0, &S(1), &RWORK(ie), &WORK(
-				iu), &ldwrku, &U(1,1), ldu, cdum, &c__1, 
-				&RWORK(irwork), info);
+			cbdsqr_("U", m, m, m, &c__0, &s[1], &rwork[ie], &work[
+				iu], &ldwrku, &u[u_offset], ldu, cdum, &c__1, 
+				&rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IU) by   
+/*                    Multiply right singular vectors of L in WORK(IU) by   
                       Q in A, storing result in VT   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(iu), &ldwrku, &
-				A(1,1), lda, &c_b1, &VT(1,1), ldvt);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[iu], &ldwrku, &
+				a[a_offset], lda, &c_b1, &vt[vt_offset], ldvt);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(m, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(m, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy L to U, zeroing out above i
-t */
+/*                    Copy L to U, zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &U(1,1), 
+			clacpy_("L", m, m, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &U(1,2), ldu);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &u_ref(1, 2),
+				 ldu);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
 /*                    Bidiagonalize L in U   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &U(1,1), ldu, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &u[u_offset], ldu, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right bidiagonalizing v
-ectors in U by Q   
+/*                    Multiply right bidiagonalizing vectors in U by Q   
                       in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &U(1,1), ldu, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &u[u_offset], ldu, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in U   
-                      (CWorkspace: need 3*M, prefer 2*
-M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in U   
+                      (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", m, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
@@ -3782,19 +3493,15 @@ omputing right
 
 		if (wntun) {
 
-/*                 Path 7t(N much larger than M, JOBU='N',
- JOBVT='A')   
-                   N right singular vectors to be computed
- in VT and   
-                   no left singular vectors to be computed
-   
+/*                 Path 7t(N much larger than M, JOBU='N', JOBVT='A')   
+                   N right singular vectors to be computed in VT and   
+                   no left singular vectors to be computed   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *m * 3;
 		    if (*lwork >= *m * *m + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			ir = 1;
 			if (*lwork >= wrkbl + *lda * *m) {
@@ -3811,118 +3518,102 @@ algorithm */
 			itau = ir + ldwrkr * *m;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
-/*                    Copy L to WORK(IR), zeroing out 
-above it */
+/*                    Copy L to WORK(IR), zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(ir), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[ir], &
 				ldwrkr);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(ir + 
-				ldwrkr), &ldwrkr);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[ir + 
+				ldwrkr], &ldwrkr);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need M*M+M+N, prefe
-r M*M+M+N*NB)   
+                      (CWorkspace: need M*M+M+N, prefer M*M+M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
 /*                    Bidiagonalize L in WORK(IR)   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+2*M*NB)   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(ir), &ldwrkr, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[ir], &ldwrkr, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IR)   
-                      (CWorkspace: need   M*M+3*M-1, 
-  
-                                   prefer M*M+2*M+(M-1
-)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need   M*M+3*M-1,   
+                                   prefer M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(ir), &ldwrkr, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[ir], &ldwrkr, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing right   
-                      singular vectors of L in WORK(IR
-)   
+/*                    Perform bidiagonal QR iteration, computing right   
+                      singular vectors of L in WORK(IR)   
                       (CWorkspace: need M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, &c__0, &c__0, &S(1), &RWORK(ie), &
-				WORK(ir), &ldwrkr, cdum, &c__1, cdum, &c__1, &
-				RWORK(irwork), info);
+			cbdsqr_("U", m, m, &c__0, &c__0, &s[1], &rwork[ie], &
+				work[ir], &ldwrkr, cdum, &c__1, cdum, &c__1, &
+				rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IR) by   
+/*                    Multiply right singular vectors of L in WORK(IR) by   
                       Q in VT, storing result in A   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(ir), &ldwrkr, &
-				VT(1,1), ldvt, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[ir], &ldwrkr, &
+				vt[vt_offset], ldvt, &c_b1, &a[a_offset], lda);
 
-/*                    Copy right singular vectors of A
- from A to VT */
+/*                    Copy right singular vectors of A from A to VT */
 
-			clacpy_("F", m, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need M+N, prefer M+
-N*NB)   
+                      (CWorkspace: need M+N, prefer M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
@@ -3932,80 +3623,70 @@ N*NB)
 
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &A(1,2), lda);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &a_ref(1, 2),
+				 lda);
 
 /*                    Bidiagonalize L in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right bidiagonalizing v
-ectors in A by Q   
+/*                    Multiply right bidiagonalizing vectors in A by Q   
                       in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &A(1,1), lda, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &a[a_offset], lda, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing right   
+/*                    Perform bidiagonal QR iteration, computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, &c__0, &c__0, &S(1), &RWORK(ie), &
-				VT(1,1), ldvt, cdum, &c__1, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", m, n, &c__0, &c__0, &s[1], &rwork[ie], &
+				vt[vt_offset], ldvt, cdum, &c__1, cdum, &c__1,
+				 &rwork[irwork], info);
 
 		    }
 
 		} else if (wntuo) {
 
-/*                 Path 8t(N much larger than M, JOBU='O',
- JOBVT='A')   
-                   N right singular vectors to be computed
- in VT and   
-                   M left singular vectors to be overwritt
-en on A   
+/*                 Path 8t(N much larger than M, JOBU='O', JOBVT='A')   
+                   N right singular vectors to be computed in VT and   
+                   M left singular vectors to be overwritten on A   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *m * 3;
 		    if (*lwork >= (*m << 1) * *m + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + (*lda << 1) * *m) {
 
-/*                       WORK(IU) is LDA by M and 
-WORK(IR) is LDA by M */
+/*                       WORK(IU) is LDA by M and WORK(IR) is LDA by M */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *m;
 			    ldwrkr = *lda;
 			} else if (*lwork >= wrkbl + (*lda + *m) * *m) {
 
-/*                       WORK(IU) is LDA by M and 
-WORK(IR) is M by M */
+/*                       WORK(IU) is LDA by M and WORK(IR) is M by M */
 
 			    ldwrku = *lda;
 			    ir = iu + ldwrku * *m;
 			    ldwrkr = *m;
 			} else {
 
-/*                       WORK(IU) is M by M and WO
-RK(IR) is M by M */
+/*                       WORK(IU) is M by M and WORK(IR) is M by M */
 
 			    ldwrku = *m;
 			    ir = iu + ldwrku * *m;
@@ -4014,142 +3695,120 @@ RK(IR) is M by M */
 			itau = ir + ldwrkr * *m;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M*M+2*M, pre
-fer 2*M*M+M+M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M*M+2*M, prefer 2*M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need 2*M*M+M+N, pre
-fer 2*M*M+M+N*NB)   
+                      (CWorkspace: need 2*M*M+M+N, prefer 2*M*M+M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy L to WORK(IU), zeroing out 
-above it */
+/*                    Copy L to WORK(IU), zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(iu), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 
-				ldwrku), &ldwrku);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 
+				ldwrku], &ldwrku);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
-/*                    Bidiagonalize L in WORK(IU), cop
-ying result to   
+/*                    Bidiagonalize L in WORK(IU), copying result to   
                       WORK(IR)   
-                      (CWorkspace: need   2*M*M+3*M, 
-  
-                                   prefer 2*M*M+2*M+2*
-M*NB)   
+                      (CWorkspace: need   2*M*M+3*M,   
+                                   prefer 2*M*M+2*M+2*M*NB)   
                       (RWorkspace: need   M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("L", m, m, &WORK(iu), &ldwrku, &WORK(ir), &
+			clacpy_("L", m, m, &work[iu], &ldwrku, &work[ir], &
 				ldwrkr);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IU)   
-                      (CWorkspace: need   2*M*M+3*M-1,
-   
-                                   prefer 2*M*M+2*M+(M
--1)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need   2*M*M+3*M-1,   
+                                   prefer 2*M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(iu), &ldwrku, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[iu], &ldwrku, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in WORK(IR)   
-                      (CWorkspace: need 2*M*M+3*M, pre
-fer 2*M*M+2*M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in WORK(IR)   
+                      (CWorkspace: need 2*M*M+3*M, prefer 2*M*M+2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &WORK(ir), &ldwrkr, &WORK(itauq)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &work[ir], &ldwrkr, &work[itauq]
+				, &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of L in WORK(IR
-) and computing   
-                      right singular vectors of L in W
-ORK(IU)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of L in WORK(IR) and computing   
+                      right singular vectors of L in WORK(IU)   
                       (CWorkspace: need 2*M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, m, &c__0, &S(1), &RWORK(ie), &WORK(
-				iu), &ldwrku, &WORK(ir), &ldwrkr, cdum, &c__1,
-				 &RWORK(irwork), info);
+			cbdsqr_("U", m, m, m, &c__0, &s[1], &rwork[ie], &work[
+				iu], &ldwrku, &work[ir], &ldwrkr, cdum, &c__1,
+				 &rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IU) by   
+/*                    Multiply right singular vectors of L in WORK(IU) by   
                       Q in VT, storing result in A   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(iu), &ldwrku, &
-				VT(1,1), ldvt, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[iu], &ldwrku, &
+				vt[vt_offset], ldvt, &c_b1, &a[a_offset], lda);
 
-/*                    Copy right singular vectors of A
- from A to VT */
+/*                    Copy right singular vectors of A from A to VT */
 
-			clacpy_("F", m, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
-/*                    Copy left singular vectors of A 
-from WORK(IR) to A */
+/*                    Copy left singular vectors of A from WORK(IR) to A */
 
-			clacpy_("F", m, m, &WORK(ir), &ldwrkr, &A(1,1), 
+			clacpy_("F", m, m, &work[ir], &ldwrkr, &a[a_offset], 
 				lda);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need M+N, prefer M+
-N*NB)   
+                      (CWorkspace: need M+N, prefer M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
@@ -4159,70 +3818,61 @@ N*NB)
 
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &A(1,2), lda);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &a_ref(1, 2),
+				 lda);
 
 /*                    Bidiagonalize L in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &A(1,1), lda, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &a[a_offset], lda, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right bidiagonalizing v
-ectors in A by Q   
+/*                    Multiply right bidiagonalizing vectors in A by Q   
                       in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &A(1,1), lda, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &a[a_offset], lda, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in A   
-                      (CWorkspace: need 3*M, prefer 2*
-M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in A   
+                      (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &A(1,1), lda, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &a[a_offset], lda, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in A and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in A and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &A(1,1), lda, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", m, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &a[a_offset], lda, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
 		} else if (wntuas) {
 
-/*                 Path 9t(N much larger than M, JOBU='S' 
-or 'A',   
+/*                 Path 9t(N much larger than M, JOBU='S' or 'A',   
                            JOBVT='A')   
-                   N right singular vectors to be computed
- in VT and   
-                   M left singular vectors to be computed 
-in U   
+                   N right singular vectors to be computed in VT and   
+                   M left singular vectors to be computed in U   
 
    Computing MAX */
 		    i__2 = *n + *m, i__3 = *m * 3;
 		    if (*lwork >= *m * *m + max(i__2,i__3)) {
 
-/*                    Sufficient workspace for a fast 
-algorithm */
+/*                    Sufficient workspace for a fast algorithm */
 
 			iu = 1;
 			if (*lwork >= wrkbl + *lda * *m) {
@@ -4239,188 +3889,163 @@ algorithm */
 			itau = iu + ldwrku * *m;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need M*M+2*M, prefe
-r M*M+M+M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need M*M+2*M, prefer M*M+M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need M*M+M+N, prefe
-r M*M+M+N*NB)   
+                      (CWorkspace: need M*M+M+N, prefer M*M+M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy L to WORK(IU), zeroing out 
-above it */
+/*                    Copy L to WORK(IU), zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &WORK(iu), &
+			clacpy_("L", m, m, &a[a_offset], lda, &work[iu], &
 				ldwrku);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &WORK(iu + 
-				ldwrku), &ldwrku);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &work[iu + 
+				ldwrku], &ldwrku);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
-/*                    Bidiagonalize L in WORK(IU), cop
-ying result to U   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+2*M*NB)   
+/*                    Bidiagonalize L in WORK(IU), copying result to U   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &WORK(iu), &ldwrku, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &work[iu], &ldwrku, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
-			clacpy_("L", m, m, &WORK(iu), &ldwrku, &U(1,1), 
+			clacpy_("L", m, m, &work[iu], &ldwrku, &u[u_offset], 
 				ldu);
 
-/*                    Generate right bidiagonalizing v
-ectors in WORK(IU)   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+(M-1)*NB)   
+/*                    Generate right bidiagonalizing vectors in WORK(IU)   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+(M-1)*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("P", m, m, m, &WORK(iu), &ldwrku, &WORK(itaup)
-				, &WORK(iwork), &i__2, &ierr);
+			cungbr_("P", m, m, m, &work[iu], &ldwrku, &work[itaup]
+				, &work[iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in U   
-                      (CWorkspace: need M*M+3*M, prefe
-r M*M+2*M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in U   
+                      (CWorkspace: need M*M+3*M, prefer M*M+2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of L in U and c
-omputing right   
-                      singular vectors of L in WORK(IU
-)   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of L in U and computing right   
+                      singular vectors of L in WORK(IU)   
                       (CWorkspace: need M*M)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, m, m, &c__0, &S(1), &RWORK(ie), &WORK(
-				iu), &ldwrku, &U(1,1), ldu, cdum, &c__1, 
-				&RWORK(irwork), info);
+			cbdsqr_("U", m, m, m, &c__0, &s[1], &rwork[ie], &work[
+				iu], &ldwrku, &u[u_offset], ldu, cdum, &c__1, 
+				&rwork[irwork], info);
 
-/*                    Multiply right singular vectors 
-of L in WORK(IU) by   
+/*                    Multiply right singular vectors of L in WORK(IU) by   
                       Q in VT, storing result in A   
                       (CWorkspace: need M*M)   
                       (RWorkspace: 0) */
 
-			cgemm_("N", "N", m, n, m, &c_b2, &WORK(iu), &ldwrku, &
-				VT(1,1), ldvt, &c_b1, &A(1,1), lda);
+			cgemm_("N", "N", m, n, m, &c_b2, &work[iu], &ldwrku, &
+				vt[vt_offset], ldvt, &c_b1, &a[a_offset], lda);
 
-/*                    Copy right singular vectors of A
- from A to VT */
+/*                    Copy right singular vectors of A from A to VT */
 
-			clacpy_("F", m, n, &A(1,1), lda, &VT(1,1), 
+			clacpy_("F", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 		    } else {
 
-/*                    Insufficient workspace for a fas
-t algorithm */
+/*                    Insufficient workspace for a fast algorithm */
 
 			itau = 1;
 			iwork = itau + *m;
 
-/*                    Compute A=L*Q, copying result to
- VT   
-                      (CWorkspace: need 2*M, prefer M+
-M*NB)   
+/*                    Compute A=L*Q, copying result to VT   
+                      (CWorkspace: need 2*M, prefer M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cgelqf_(m, n, &A(1,1), lda, &WORK(itau), &WORK(
-				iwork), &i__2, &ierr);
-			clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), 
+			cgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[
+				iwork], &i__2, &ierr);
+			clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], 
 				ldvt);
 
 /*                    Generate Q in VT   
-                      (CWorkspace: need M+N, prefer M+
-N*NB)   
+                      (CWorkspace: need M+N, prefer M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunglq_(n, n, m, &VT(1,1), ldvt, &WORK(itau), &
-				WORK(iwork), &i__2, &ierr);
+			cunglq_(n, n, m, &vt[vt_offset], ldvt, &work[itau], &
+				work[iwork], &i__2, &ierr);
 
-/*                    Copy L to U, zeroing out above i
-t */
+/*                    Copy L to U, zeroing out above it */
 
-			clacpy_("L", m, m, &A(1,1), lda, &U(1,1), 
+			clacpy_("L", m, m, &a[a_offset], lda, &u[u_offset], 
 				ldu);
 			i__2 = *m - 1;
 			i__3 = *m - 1;
-			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &U(1,2), ldu);
+			claset_("U", &i__2, &i__3, &c_b1, &c_b1, &u_ref(1, 2),
+				 ldu);
 			ie = 1;
 			itauq = itau;
 			itaup = itauq + *m;
 			iwork = itaup + *m;
 
 /*                    Bidiagonalize L in U   
-                      (CWorkspace: need 3*M, prefer 2*
-M+2*M*NB)   
+                      (CWorkspace: need 3*M, prefer 2*M+2*M*NB)   
                       (RWorkspace: need M) */
 
 			i__2 = *lwork - iwork + 1;
-			cgebrd_(m, m, &U(1,1), ldu, &S(1), &RWORK(ie), &
-				WORK(itauq), &WORK(itaup), &WORK(iwork), &
+			cgebrd_(m, m, &u[u_offset], ldu, &s[1], &rwork[ie], &
+				work[itauq], &work[itaup], &work[iwork], &
 				i__2, &ierr);
 
-/*                    Multiply right bidiagonalizing v
-ectors in U by Q   
+/*                    Multiply right bidiagonalizing vectors in U by Q   
                       in VT   
-                      (CWorkspace: need 2*M+N, prefer 
-2*M+N*NB)   
+                      (CWorkspace: need 2*M+N, prefer 2*M+N*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cunmbr_("P", "L", "C", m, n, m, &U(1,1), ldu, &
-				WORK(itaup), &VT(1,1), ldvt, &WORK(
-				iwork), &i__2, &ierr);
+			cunmbr_("P", "L", "C", m, n, m, &u[u_offset], ldu, &
+				work[itaup], &vt[vt_offset], ldvt, &work[
+				iwork], &i__2, &ierr);
 
-/*                    Generate left bidiagonalizing ve
-ctors in U   
-                      (CWorkspace: need 3*M, prefer 2*
-M+M*NB)   
+/*                    Generate left bidiagonalizing vectors in U   
+                      (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                       (RWorkspace: 0) */
 
 			i__2 = *lwork - iwork + 1;
-			cungbr_("Q", m, m, m, &U(1,1), ldu, &WORK(itauq),
-				 &WORK(iwork), &i__2, &ierr);
+			cungbr_("Q", m, m, m, &u[u_offset], ldu, &work[itauq],
+				 &work[iwork], &i__2, &ierr);
 			irwork = ie + *m;
 
-/*                    Perform bidiagonal QR iteration,
- computing left   
-                      singular vectors of A in U and c
-omputing right   
+/*                    Perform bidiagonal QR iteration, computing left   
+                      singular vectors of A in U and computing right   
                       singular vectors of A in VT   
                       (CWorkspace: 0)   
                       (RWorkspace: need BDSPAC) */
 
-			cbdsqr_("U", m, n, m, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &
-				c__1, &RWORK(irwork), info);
+			cbdsqr_("U", m, n, m, &c__0, &s[1], &rwork[ie], &vt[
+				vt_offset], ldvt, &u[u_offset], ldu, cdum, &
+				c__1, &rwork[irwork], info);
 
 		    }
 
@@ -4445,34 +4070,28 @@ omputing right
              (RWorkspace: M) */
 
 	    i__2 = *lwork - iwork + 1;
-	    cgebrd_(m, n, &A(1,1), lda, &S(1), &RWORK(ie), &WORK(itauq), 
-		    &WORK(itaup), &WORK(iwork), &i__2, &ierr);
+	    cgebrd_(m, n, &a[a_offset], lda, &s[1], &rwork[ie], &work[itauq], 
+		    &work[itaup], &work[iwork], &i__2, &ierr);
 	    if (wntuas) {
 
-/*              If left singular vectors desired in U, copy re
-sult to U   
-                and generate left bidiagonalizing vectors in U
-   
-                (CWorkspace: need 3*M-1, prefer 2*M+(M-1)*NB) 
-  
+/*              If left singular vectors desired in U, copy result to U   
+                and generate left bidiagonalizing vectors in U   
+                (CWorkspace: need 3*M-1, prefer 2*M+(M-1)*NB)   
                 (RWorkspace: 0) */
 
-		clacpy_("L", m, m, &A(1,1), lda, &U(1,1), ldu);
+		clacpy_("L", m, m, &a[a_offset], lda, &u[u_offset], ldu);
 		i__2 = *lwork - iwork + 1;
-		cungbr_("Q", m, m, n, &U(1,1), ldu, &WORK(itauq), &WORK(
-			iwork), &i__2, &ierr);
+		cungbr_("Q", m, m, n, &u[u_offset], ldu, &work[itauq], &work[
+			iwork], &i__2, &ierr);
 	    }
 	    if (wntvas) {
 
-/*              If right singular vectors desired in VT, copy 
-result to   
-                VT and generate right bidiagonalizing vectors 
-in VT   
-                (CWorkspace: need 2*M+NRVT, prefer 2*M+NRVT*NB
-)   
+/*              If right singular vectors desired in VT, copy result to   
+                VT and generate right bidiagonalizing vectors in VT   
+                (CWorkspace: need 2*M+NRVT, prefer 2*M+NRVT*NB)   
                 (RWorkspace: 0) */
 
-		clacpy_("U", m, n, &A(1,1), lda, &VT(1,1), ldvt);
+		clacpy_("U", m, n, &a[a_offset], lda, &vt[vt_offset], ldvt);
 		if (wntva) {
 		    nrvt = *n;
 		}
@@ -4480,33 +4099,30 @@ in VT
 		    nrvt = *m;
 		}
 		i__2 = *lwork - iwork + 1;
-		cungbr_("P", &nrvt, n, m, &VT(1,1), ldvt, &WORK(itaup), 
-			&WORK(iwork), &i__2, &ierr);
+		cungbr_("P", &nrvt, n, m, &vt[vt_offset], ldvt, &work[itaup], 
+			&work[iwork], &i__2, &ierr);
 	    }
 	    if (wntuo) {
 
-/*              If left singular vectors desired in A, generat
-e left   
+/*              If left singular vectors desired in A, generate left   
                 bidiagonalizing vectors in A   
-                (CWorkspace: need 3*M-1, prefer 2*M+(M-1)*NB) 
-  
+                (CWorkspace: need 3*M-1, prefer 2*M+(M-1)*NB)   
                 (RWorkspace: 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cungbr_("Q", m, m, n, &A(1,1), lda, &WORK(itauq), &WORK(
-			iwork), &i__2, &ierr);
+		cungbr_("Q", m, m, n, &a[a_offset], lda, &work[itauq], &work[
+			iwork], &i__2, &ierr);
 	    }
 	    if (wntvo) {
 
-/*              If right singular vectors desired in A, genera
-te right   
+/*              If right singular vectors desired in A, generate right   
                 bidiagonalizing vectors in A   
                 (CWorkspace: need 3*M, prefer 2*M+M*NB)   
                 (RWorkspace: 0) */
 
 		i__2 = *lwork - iwork + 1;
-		cungbr_("P", m, n, m, &A(1,1), lda, &WORK(itaup), &WORK(
-			iwork), &i__2, &ierr);
+		cungbr_("P", m, n, m, &a[a_offset], lda, &work[itaup], &work[
+			iwork], &i__2, &ierr);
 	    }
 	    irwork = ie + *m;
 	    if (wntuas || wntuo) {
@@ -4523,40 +4139,37 @@ te right
 	    }
 	    if (! wntuo && ! wntvo) {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in U and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in U and computing right singular   
                 vectors in VT   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("L", m, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &U(1,1), ldu, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("L", m, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &vt[
+			vt_offset], ldvt, &u[u_offset], ldu, cdum, &c__1, &
+			rwork[irwork], info);
 	    } else if (! wntuo && wntvo) {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in U and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in U and computing right singular   
                 vectors in A   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("L", m, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &A(1,1), lda, &U(1,1), ldu, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("L", m, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &a[
+			a_offset], lda, &u[u_offset], ldu, cdum, &c__1, &
+			rwork[irwork], info);
 	    } else {
 
-/*              Perform bidiagonal QR iteration, if desired, c
-omputing   
-                left singular vectors in A and computing right
- singular   
+/*              Perform bidiagonal QR iteration, if desired, computing   
+                left singular vectors in A and computing right singular   
                 vectors in VT   
                 (CWorkspace: 0)   
                 (RWorkspace: need BDSPAC) */
 
-		cbdsqr_("L", m, &ncvt, &nru, &c__0, &S(1), &RWORK(ie), &VT(1,1), ldvt, &A(1,1), lda, cdum, &c__1, &
-			RWORK(irwork), info);
+		cbdsqr_("L", m, &ncvt, &nru, &c__0, &s[1], &rwork[ie], &vt[
+			vt_offset], ldvt, &a[a_offset], lda, cdum, &c__1, &
+			rwork[irwork], info);
 	    }
 
 	}
@@ -4567,32 +4180,40 @@ omputing
 
     if (iscl == 1) {
 	if (anrm > bignum) {
-	    slascl_("G", &c__0, &c__0, &bignum, &anrm, &minmn, &c__1, &S(1), &
+	    slascl_("G", &c__0, &c__0, &bignum, &anrm, &minmn, &c__1, &s[1], &
 		    minmn, &ierr);
 	}
 	if (*info != 0 && anrm > bignum) {
 	    i__2 = minmn - 1;
-	    slascl_("G", &c__0, &c__0, &bignum, &anrm, &i__2, &c__1, &RWORK(
-		    ie), &minmn, &ierr);
+	    slascl_("G", &c__0, &c__0, &bignum, &anrm, &i__2, &c__1, &rwork[
+		    ie], &minmn, &ierr);
 	}
 	if (anrm < smlnum) {
-	    slascl_("G", &c__0, &c__0, &smlnum, &anrm, &minmn, &c__1, &S(1), &
+	    slascl_("G", &c__0, &c__0, &smlnum, &anrm, &minmn, &c__1, &s[1], &
 		    minmn, &ierr);
 	}
 	if (*info != 0 && anrm < smlnum) {
 	    i__2 = minmn - 1;
-	    slascl_("G", &c__0, &c__0, &smlnum, &anrm, &i__2, &c__1, &RWORK(
-		    ie), &minmn, &ierr);
+	    slascl_("G", &c__0, &c__0, &smlnum, &anrm, &i__2, &c__1, &rwork[
+		    ie], &minmn, &ierr);
 	}
     }
 
 /*     Return optimal workspace in WORK(1) */
 
-    WORK(1).r = (real) maxwrk, WORK(1).i = 0.f;
+    work[1].r = (real) maxwrk, work[1].i = 0.f;
 
     return 0;
 
 /*     End of CGESVD */
 
 } /* cgesvd_ */
+
+#undef vt_ref
+#undef vt_subscr
+#undef u_ref
+#undef u_subscr
+#undef a_ref
+#undef a_subscr
+
 

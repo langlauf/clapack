@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static doublecomplex c_b1 = {0.,0.};
 static doublecomplex c_b2 = {1.,0.};
 
 /* Subroutine */ int zspt01_(char *uplo, integer *n, doublecomplex *a, 
-	doublecomplex *afac, integer *ipiv, doublecomplex *c, integer *ldc, 
+	doublecomplex *afac, integer *ipiv, doublecomplex *c__, integer *ldc, 
 	doublereal *rwork, doublereal *resid)
 {
     /* System generated locals */
@@ -19,7 +20,7 @@ static doublecomplex c_b2 = {1.,0.};
     doublecomplex z__1;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     static integer jc;
@@ -36,7 +37,11 @@ static doublecomplex c_b2 = {1.,0.};
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -46,8 +51,7 @@ static doublecomplex c_b2 = {1.,0.};
     =======   
 
     ZSPT01 reconstructs a symmetric indefinite packed matrix A from its   
-    diagonal pivoting factorization A = U*D*U' or A = L*D*L' and computes 
-  
+    diagonal pivoting factorization A = U*D*U' or A = L*D*L' and computes   
     the residual   
        norm( C - A ) / ( N * norm(A) * EPS ),   
     where C is the reconstructed matrix and EPS is the machine epsilon.   
@@ -70,10 +74,8 @@ static doublecomplex c_b2 = {1.,0.};
 
     AFAC    (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
             The factored form of the matrix A, stored as a packed   
-            triangular matrix.  AFAC contains the block diagonal matrix D 
-  
-            and the multipliers used to obtain the factor L or U from the 
-  
+            triangular matrix.  AFAC contains the block diagonal matrix D   
+            and the multipliers used to obtain the factor L or U from the   
             L*D*L' or U*D*U' factorization as computed by ZSPTRF.   
 
     IPIV    (input) INTEGER array, dimension (N)   
@@ -90,8 +92,7 @@ static doublecomplex c_b2 = {1.,0.};
             If UPLO = 'L', norm(L*D*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U*D*U' - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -101,8 +102,8 @@ static doublecomplex c_b2 = {1.,0.};
     --afac;
     --ipiv;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
@@ -118,16 +119,16 @@ static doublecomplex c_b2 = {1.,0.};
 
 /*     Initialize C to the identity matrix. */
 
-    zlaset_("Full", n, n, &c_b1, &c_b2, &c[c_offset], ldc);
+    zlaset_("Full", n, n, &c_b1, &c_b2, &c__[c_offset], ldc);
 
 /*     Call ZLAVSP to form the product D * U' (or D * L' ). */
 
-    zlavsp_(uplo, "Transpose", "Non-unit", n, n, &afac[1], &ipiv[1], &c[
+    zlavsp_(uplo, "Transpose", "Non-unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Call ZLAVSP again to multiply by U ( or L ). */
 
-    zlavsp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c[
+    zlavsp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Compute the difference  C - A . */
@@ -137,13 +138,13 @@ static doublecomplex c_b2 = {1.,0.};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = jc + i;
-		z__1.r = c[i__4].r - a[i__5].r, z__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = z__1.r, c[i__3].i = z__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = jc + i__;
+		z__1.r = c__[i__4].r - a[i__5].r, z__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L10: */
 	    }
 	    jc += j;
@@ -154,13 +155,13 @@ static doublecomplex c_b2 = {1.,0.};
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		i__3 = i + j * c_dim1;
-		i__4 = i + j * c_dim1;
-		i__5 = jc + i - j;
-		z__1.r = c[i__4].r - a[i__5].r, z__1.i = c[i__4].i - a[i__5]
-			.i;
-		c[i__3].r = z__1.r, c[i__3].i = z__1.i;
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		i__3 = c___subscr(i__, j);
+		i__4 = c___subscr(i__, j);
+		i__5 = jc + i__ - j;
+		z__1.r = c__[i__4].r - a[i__5].r, z__1.i = c__[i__4].i - a[
+			i__5].i;
+		c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L30: */
 	    }
 	    jc = jc + *n - j + 1;
@@ -170,7 +171,7 @@ static doublecomplex c_b2 = {1.,0.};
 
 /*     Compute norm( C - A ) / ( N * norm(A) * EPS ) */
 
-    *resid = zlansy_("1", uplo, n, &c[c_offset], ldc, &rwork[1]);
+    *resid = zlansy_("1", uplo, n, &c__[c_offset], ldc, &rwork[1]);
 
     if (anorm <= 0.) {
 	if (*resid != 0.) {
@@ -185,4 +186,8 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZSPT01 */
 
 } /* zspt01_ */
+
+#undef c___ref
+#undef c___subscr
+
 

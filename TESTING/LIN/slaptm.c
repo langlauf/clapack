@@ -1,21 +1,27 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 
-/* Subroutine */ int slaptm_(integer *n, integer *nrhs, real *alpha, real *d, 
-	real *e, real *x, integer *ldx, real *beta, real *b, integer *ldb)
+/* Subroutine */ int slaptm_(integer *n, integer *nrhs, real *alpha, real *
+	d__, real *e, real *x, integer *ldx, real *beta, real *b, integer *
+	ldb)
 {
     /* System generated locals */
     integer b_dim1, b_offset, x_dim1, x_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -25,8 +31,7 @@
     =======   
 
     SLAPTM multiplies an N by NRHS matrix X by a symmetric tridiagonal   
-    matrix A and stores the result in a matrix B.  The operation has the 
-  
+    matrix A and stores the result in a matrix B.  The operation has the   
     form   
 
        B := alpha * A * X + beta * B   
@@ -71,18 +76,17 @@
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(N,1).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
@@ -96,8 +100,8 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		b[i + j * b_dim1] = 0.f;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		b_ref(i__, j) = 0.f;
 /* L10: */
 	    }
 /* L20: */
@@ -106,8 +110,8 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		b[i + j * b_dim1] = -(doublereal)b[i + j * b_dim1];
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		b_ref(i__, j) = -b_ref(i__, j);
 /* L30: */
 	    }
 /* L40: */
@@ -121,17 +125,17 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    if (*n == 1) {
-		b[j * b_dim1 + 1] += d[1] * x[j * x_dim1 + 1];
+		b_ref(1, j) = b_ref(1, j) + d__[1] * x_ref(1, j);
 	    } else {
-		b[j * b_dim1 + 1] = b[j * b_dim1 + 1] + d[1] * x[j * x_dim1 + 
-			1] + e[1] * x[j * x_dim1 + 2];
-		b[*n + j * b_dim1] = b[*n + j * b_dim1] + e[*n - 1] * x[*n - 
-			1 + j * x_dim1] + d[*n] * x[*n + j * x_dim1];
+		b_ref(1, j) = b_ref(1, j) + d__[1] * x_ref(1, j) + e[1] * 
+			x_ref(2, j);
+		b_ref(*n, j) = b_ref(*n, j) + e[*n - 1] * x_ref(*n - 1, j) + 
+			d__[*n] * x_ref(*n, j);
 		i__2 = *n - 1;
-		for (i = 2; i <= i__2; ++i) {
-		    b[i + j * b_dim1] = b[i + j * b_dim1] + e[i - 1] * x[i - 
-			    1 + j * x_dim1] + d[i] * x[i + j * x_dim1] + e[i] 
-			    * x[i + 1 + j * x_dim1];
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    b_ref(i__, j) = b_ref(i__, j) + e[i__ - 1] * x_ref(i__ - 
+			    1, j) + d__[i__] * x_ref(i__, j) + e[i__] * x_ref(
+			    i__ + 1, j);
 /* L50: */
 		}
 	    }
@@ -144,17 +148,17 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    if (*n == 1) {
-		b[j * b_dim1 + 1] -= d[1] * x[j * x_dim1 + 1];
+		b_ref(1, j) = b_ref(1, j) - d__[1] * x_ref(1, j);
 	    } else {
-		b[j * b_dim1 + 1] = b[j * b_dim1 + 1] - d[1] * x[j * x_dim1 + 
-			1] - e[1] * x[j * x_dim1 + 2];
-		b[*n + j * b_dim1] = b[*n + j * b_dim1] - e[*n - 1] * x[*n - 
-			1 + j * x_dim1] - d[*n] * x[*n + j * x_dim1];
+		b_ref(1, j) = b_ref(1, j) - d__[1] * x_ref(1, j) - e[1] * 
+			x_ref(2, j);
+		b_ref(*n, j) = b_ref(*n, j) - e[*n - 1] * x_ref(*n - 1, j) - 
+			d__[*n] * x_ref(*n, j);
 		i__2 = *n - 1;
-		for (i = 2; i <= i__2; ++i) {
-		    b[i + j * b_dim1] = b[i + j * b_dim1] - e[i - 1] * x[i - 
-			    1 + j * x_dim1] - d[i] * x[i + j * x_dim1] - e[i] 
-			    * x[i + 1 + j * x_dim1];
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    b_ref(i__, j) = b_ref(i__, j) - e[i__ - 1] * x_ref(i__ - 
+			    1, j) - d__[i__] * x_ref(i__, j) - e[i__] * x_ref(
+			    i__ + 1, j);
 /* L70: */
 		}
 	    }
@@ -166,4 +170,8 @@
 /*     End of SLAPTM */
 
 } /* slaptm_ */
+
+#undef x_ref
+#undef b_ref
+
 

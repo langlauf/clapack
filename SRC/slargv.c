@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slargv_(integer *n, real *x, integer *incx, real *y, 
-	integer *incy, real *c, integer *incc)
+	integer *incy, real *c__, integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -46,55 +47,55 @@
     INCC    (input) INTEGER   
             The increment between elements of C. INCC > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
-    real r__1, r__2;
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i;
-    static real w;
+    static real f, g;
+    static integer i__;
+    static real t;
     static integer ic, ix, iy;
-    static real xi, yi, tt;
+    static real tt;
 
+    --c__;
+    --y;
+    --x;
 
-#define C(I) c[(I)-1]
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     ix = 1;
     iy = 1;
     ic = 1;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	xi = X(ix);
-	yi = Y(iy);
-	if (xi == 0.f) {
-	    C(ic) = 0.f;
-	    Y(iy) = 1.f;
-	    X(ix) = yi;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	f = x[ix];
+	g = y[iy];
+	if (g == 0.f) {
+	    c__[ic] = 1.f;
+	} else if (f == 0.f) {
+	    c__[ic] = 0.f;
+	    y[iy] = 1.f;
+	    x[ix] = g;
+	} else if (dabs(f) > dabs(g)) {
+	    t = g / f;
+	    tt = sqrt(t * t + 1.f);
+	    c__[ic] = 1.f / tt;
+	    y[iy] = t * c__[ic];
+	    x[ix] = f * tt;
 	} else {
-/* Computing MAX */
-	    r__1 = dabs(xi), r__2 = dabs(yi);
-	    w = dmax(r__1,r__2);
-	    xi /= w;
-	    yi /= w;
-	    tt = sqrt(xi * xi + yi * yi);
-	    C(ic) = xi / tt;
-	    Y(iy) = yi / tt;
-	    X(ix) = w * tt;
+	    t = f / g;
+	    tt = sqrt(t * t + 1.f);
+	    y[iy] = 1.f / tt;
+	    c__[ic] = t * y[iy];
+	    x[ix] = g * tt;
 	}
-	ix += *incx;
-	iy += *incy;
 	ic += *incc;
+	iy += *incy;
+	ix += *incx;
 /* L10: */
     }
     return 0;

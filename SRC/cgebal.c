@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgebal_(char *job, integer *n, complex *a, integer *lda, 
 	integer *ilo, integer *ihi, real *scale, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -77,10 +78,8 @@
                (  0   0   T2 )   
 
     where T1 and T2 are upper triangular matrices whose eigenvalues lie   
-    along the diagonal.  The column indices ILO and IHI mark the starting 
-  
-    and ending columns of the submatrix B. Balancing consists of applying 
-  
+    along the diagonal.  The column indices ILO and IHI mark the starting   
+    and ending columns of the submatrix B. Balancing consists of applying   
     a diagonal similarity transformation inv(D) * B * D to make the   
     1-norms of each row of B and its corresponding column nearly equal.   
     The output matrix is   
@@ -94,15 +93,15 @@
 
     This subroutine is based on the EISPACK routine CBAL.   
 
-    ===================================================================== 
-  
+    Modified by Tzu-Yi Chen, Computer Science Division, University of   
+      California at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -113,9 +112,9 @@
     double r_imag(complex *), c_abs(complex *);
     /* Local variables */
     static integer iexc;
-    static real c, f, g;
-    static integer i, j, k, l, m;
-    static real r, s;
+    static real c__, f, g;
+    static integer i__, j, k, l, m;
+    static real r__, s;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cswap_(integer *, complex *, integer *, 
 	    complex *, integer *);
@@ -126,16 +125,19 @@
 	    *), xerbla_(char *, integer *);
     static logical noconv;
     static integer ica, ira;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --scale;
 
-#define SCALE(I) scale[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
-    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(
-	    job, "S") && ! lsame_(job, "B")) {
+    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(job, "S") 
+	    && ! lsame_(job, "B")) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -157,8 +159,8 @@
 
     if (lsame_(job, "N")) {
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    SCALE(i) = 1.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    scale[i__] = 1.f;
 /* L10: */
 	}
 	goto L210;
@@ -175,14 +177,14 @@
 /*     Row and column exchange. */
 
 L20:
-    SCALE(m) = (real) j;
+    scale[m] = (real) j;
     if (j == m) {
 	goto L30;
     }
 
-    cswap_(&l, &A(1,j), &c__1, &A(1,m), &c__1);
+    cswap_(&l, &a_ref(1, j), &c__1, &a_ref(1, m), &c__1);
     i__1 = *n - k + 1;
-    cswap_(&i__1, &A(j,k), lda, &A(m,k), lda);
+    cswap_(&i__1, &a_ref(j, k), lda, &a_ref(m, k), lda);
 
 L30:
     switch (iexc) {
@@ -202,12 +204,12 @@ L50:
     for (j = l; j >= 1; --j) {
 
 	i__1 = l;
-	for (i = 1; i <= l; ++i) {
-	    if (i == j) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (i__ == j) {
 		goto L60;
 	    }
-	    i__2 = j + i * a_dim1;
-	    if (A(j,i).r != 0.f || r_imag(&A(j,i)) != 0.f) {
+	    i__2 = a_subscr(j, i__);
+	    if (a[i__2].r != 0.f || r_imag(&a_ref(j, i__)) != 0.f) {
 		goto L70;
 	    }
 L60:
@@ -230,15 +232,15 @@ L80:
 
 L90:
     i__1 = l;
-    for (j = k; j <= l; ++j) {
+    for (j = k; j <= i__1; ++j) {
 
 	i__2 = l;
-	for (i = k; i <= l; ++i) {
-	    if (i == j) {
+	for (i__ = k; i__ <= i__2; ++i__) {
+	    if (i__ == j) {
 		goto L100;
 	    }
-	    i__3 = i + j * a_dim1;
-	    if (A(i,j).r != 0.f || r_imag(&A(i,j)) != 0.f) {
+	    i__3 = a_subscr(i__, j);
+	    if (a[i__3].r != 0.f || r_imag(&a_ref(i__, j)) != 0.f) {
 		goto L110;
 	    }
 L100:
@@ -254,8 +256,8 @@ L110:
 
 L120:
     i__1 = l;
-    for (i = k; i <= l; ++i) {
-	SCALE(i) = 1.f;
+    for (i__ = k; i__ <= i__1; ++i__) {
+	scale[i__] = 1.f;
 /* L130: */
     }
 
@@ -269,97 +271,99 @@ L120:
 
     sfmin1 = slamch_("S") / slamch_("P");
     sfmax1 = 1.f / sfmin1;
-    sfmin2 = sfmin1 * 10.f;
+    sfmin2 = sfmin1 * 8.f;
     sfmax2 = 1.f / sfmin2;
 L140:
     noconv = FALSE_;
 
     i__1 = l;
-    for (i = k; i <= l; ++i) {
-	c = 0.f;
-	r = 0.f;
+    for (i__ = k; i__ <= i__1; ++i__) {
+	c__ = 0.f;
+	r__ = 0.f;
 
 	i__2 = l;
-	for (j = k; j <= l; ++j) {
-	    if (j == i) {
+	for (j = k; j <= i__2; ++j) {
+	    if (j == i__) {
 		goto L150;
 	    }
-	    i__3 = j + i * a_dim1;
-	    c += (r__1 = A(j,i).r, dabs(r__1)) + (r__2 = r_imag(&A(j,i)), dabs(r__2));
-	    i__3 = i + j * a_dim1;
-	    r += (r__1 = A(i,j).r, dabs(r__1)) + (r__2 = r_imag(&A(i,j)), dabs(r__2));
+	    i__3 = a_subscr(j, i__);
+	    c__ += (r__1 = a[i__3].r, dabs(r__1)) + (r__2 = r_imag(&a_ref(j, 
+		    i__)), dabs(r__2));
+	    i__3 = a_subscr(i__, j);
+	    r__ += (r__1 = a[i__3].r, dabs(r__1)) + (r__2 = r_imag(&a_ref(i__,
+		     j)), dabs(r__2));
 L150:
 	    ;
 	}
-	ica = icamax_(&l, &A(1,i), &c__1);
-	ca = c_abs(&A(ica,i));
+	ica = icamax_(&l, &a_ref(1, i__), &c__1);
+	ca = c_abs(&a_ref(ica, i__));
 	i__2 = *n - k + 1;
-	ira = icamax_(&i__2, &A(i,k), lda);
-	ra = c_abs(&A(i,ira+k-1));
+	ira = icamax_(&i__2, &a_ref(i__, k), lda);
+	ra = c_abs(&a_ref(i__, ira + k - 1));
 
 /*        Guard against zero C or R due to underflow. */
 
-	if (c == 0.f || r == 0.f) {
+	if (c__ == 0.f || r__ == 0.f) {
 	    goto L200;
 	}
-	g = r / 10.f;
+	g = r__ / 8.f;
 	f = 1.f;
-	s = c + r;
+	s = c__ + r__;
 L160:
 /* Computing MAX */
-	r__1 = max(f,c);
+	r__1 = max(f,c__);
 /* Computing MIN */
-	r__2 = min(r,g);
-	if (c >= g || dmax(r__1,ca) >= sfmax2 || dmin(r__2,ra) <= sfmin2) {
+	r__2 = min(r__,g);
+	if (c__ >= g || dmax(r__1,ca) >= sfmax2 || dmin(r__2,ra) <= sfmin2) {
 	    goto L170;
 	}
-	f *= 10.f;
-	c *= 10.f;
-	ca *= 10.f;
-	r /= 10.f;
-	g /= 10.f;
-	ra /= 10.f;
+	f *= 8.f;
+	c__ *= 8.f;
+	ca *= 8.f;
+	r__ /= 8.f;
+	g /= 8.f;
+	ra /= 8.f;
 	goto L160;
 
 L170:
-	g = c / 10.f;
+	g = c__ / 8.f;
 L180:
 /* Computing MIN */
-	r__1 = min(f,c), r__1 = min(r__1,g);
-	if (g < r || dmax(r,ra) >= sfmax2 || dmin(r__1,ca) <= sfmin2) {
+	r__1 = min(f,c__), r__1 = min(r__1,g);
+	if (g < r__ || dmax(r__,ra) >= sfmax2 || dmin(r__1,ca) <= sfmin2) {
 	    goto L190;
 	}
-	f /= 10.f;
-	c /= 10.f;
-	g /= 10.f;
-	ca /= 10.f;
-	r *= 10.f;
-	ra *= 10.f;
+	f /= 8.f;
+	c__ /= 8.f;
+	g /= 8.f;
+	ca /= 8.f;
+	r__ *= 8.f;
+	ra *= 8.f;
 	goto L180;
 
 /*        Now balance. */
 
 L190:
-	if (c + r >= s * .95f) {
+	if (c__ + r__ >= s * .95f) {
 	    goto L200;
 	}
-	if (f < 1.f && SCALE(i) < 1.f) {
-	    if (f * SCALE(i) <= sfmin1) {
+	if (f < 1.f && scale[i__] < 1.f) {
+	    if (f * scale[i__] <= sfmin1) {
 		goto L200;
 	    }
 	}
-	if (f > 1.f && SCALE(i) > 1.f) {
-	    if (SCALE(i) >= sfmax1 / f) {
+	if (f > 1.f && scale[i__] > 1.f) {
+	    if (scale[i__] >= sfmax1 / f) {
 		goto L200;
 	    }
 	}
 	g = 1.f / f;
-	SCALE(i) *= f;
+	scale[i__] *= f;
 	noconv = TRUE_;
 
 	i__2 = *n - k + 1;
-	csscal_(&i__2, &g, &A(i,k), lda);
-	csscal_(&l, &f, &A(1,i), &c__1);
+	csscal_(&i__2, &g, &a_ref(i__, k), lda);
+	csscal_(&l, &f, &a_ref(1, i__), &c__1);
 
 L200:
 	;
@@ -378,4 +382,8 @@ L210:
 /*     End of CGEBAL */
 
 } /* cgebal_ */
+
+#undef a_ref
+#undef a_subscr
+
 

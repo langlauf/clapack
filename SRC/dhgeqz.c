@@ -1,22 +1,22 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dhgeqz_(char *job, char *compq, char *compz, integer *n, 
 	integer *ilo, integer *ihi, doublereal *a, integer *lda, doublereal *
 	b, integer *ldb, doublereal *alphar, doublereal *alphai, doublereal *
-	beta, doublereal *q, integer *ldq, doublereal *z, integer *ldz, 
+	beta, doublereal *q, integer *ldq, doublereal *z__, integer *ldz, 
 	doublereal *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DHGEQZ implements a single-/double-shift version of the QZ method for 
-  
+    DHGEQZ implements a single-/double-shift version of the QZ method for   
     finding the generalized eigenvalues   
 
     w(j)=(ALPHAR(j) + i*ALPHAI(j))/BETAR(j)   of the equation   
@@ -25,17 +25,14 @@
 
     In addition, the pair A,B may be reduced to generalized Schur form:   
     B is upper triangular, and A is block upper triangular, where the   
-    diagonal blocks are either 1-by-1 or 2-by-2, the 2-by-2 blocks having 
-  
-    complex generalized eigenvalues (see the description of the argument 
-  
+    diagonal blocks are either 1-by-1 or 2-by-2, the 2-by-2 blocks having   
+    complex generalized eigenvalues (see the description of the argument   
     JOB.)   
 
     If JOB='S', then the pair (A,B) is simultaneously reduced to Schur   
     form by applying one orthogonal tranformation (usually called Q) on   
     the left and another (usually called Z) on the right.  The 2-by-2   
-    upper-triangular diagonal blocks of B corresponding to 2-by-2 blocks 
-  
+    upper-triangular diagonal blocks of B corresponding to 2-by-2 blocks   
     of A will be reduced to positive diagonal matrices.  (I.e.,   
     if A(j+1,j) is non-zero, then B(j+1,j)=B(j,j+1)=0 and B(j,j) and   
     B(j+1,j+1) will be positive.)   
@@ -45,15 +42,13 @@
     which are needed to compute ALPHAR, ALPHAI, and BETAR.   
 
     If JOB='S' and COMPQ and COMPZ are 'V' or 'I', then the orthogonal   
-    transformations used to reduce (A,B) are accumulated into the arrays 
-  
+    transformations used to reduce (A,B) are accumulated into the arrays   
     Q and Z s.t.:   
 
          Q(in) A(in) Z(in)* = Q(out) A(out) Z(out)*   
          Q(in) B(in) Z(in)* = Q(out) B(out) Z(out)*   
 
-    Ref: C.B. Moler & G.W. Stewart, "An Algorithm for Generalized Matrix 
-  
+    Ref: C.B. Moler & G.W. Stewart, "An Algorithm for Generalized Matrix   
          Eigenvalue Problems", SIAM J. Numer. Anal., 10(1973),   
          pp. 241--256.   
 
@@ -68,8 +63,7 @@
 
     COMPQ   (input) CHARACTER*1   
             = 'N': do not modify Q.   
-            = 'V': multiply the array Q on the right by the transpose of 
-  
+            = 'V': multiply the array Q on the right by the transpose of   
                    the orthogonal tranformation that is applied to the   
                    left side of A and B to reduce them to Schur form.   
             = 'I': like COMPQ='V', except that Q will be initialized to   
@@ -88,8 +82,7 @@
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            It is assumed that A is already upper triangular in rows and 
-  
+            It is assumed that A is already upper triangular in rows and   
             columns 1:ILO-1 and IHI+1:N.   
             1 <= ILO <= IHI <= N, if N > 0; ILO=1 and IHI=0, if N=0.   
 
@@ -99,8 +92,7 @@
             If JOB='S', then on exit A and B will have been   
                simultaneously reduced to generalized Schur form.   
             If JOB='E', then on exit A will have been destroyed.   
-               The diagonal blocks will be correct, but the off-diagonal 
-  
+               The diagonal blocks will be correct, but the off-diagonal   
                portion will be meaningless.   
 
     LDA     (input) INTEGER   
@@ -117,8 +109,7 @@
                simultaneously reduced to Schur form.   
             If JOB='E', then on exit B will have been destroyed.   
                Elements corresponding to diagonal blocks of A will be   
-               correct, but the off-diagonal portion will be meaningless. 
-  
+               correct, but the off-diagonal portion will be meaningless.   
 
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max( 1, N ).   
@@ -126,11 +117,9 @@
     ALPHAR  (output) DOUBLE PRECISION array, dimension (N)   
             ALPHAR(1:N) will be set to real parts of the diagonal   
             elements of A that would result from reducing A and B to   
-            Schur form and then further reducing them both to triangular 
-  
+            Schur form and then further reducing them both to triangular   
             form using unitary transformations s.t. the diagonal of B   
-            was non-negative real.  Thus, if A(j,j) is in a 1-by-1 block 
-  
+            was non-negative real.  Thus, if A(j,j) is in a 1-by-1 block   
             (i.e., A(j+1,j)=A(j,j+1)=0), then ALPHAR(j)=A(j,j).   
             Note that the (real or complex) values   
             (ALPHAR(j) + i*ALPHAI(j))/BETA(j), j=1,...,N, are the   
@@ -139,11 +128,9 @@
     ALPHAI  (output) DOUBLE PRECISION array, dimension (N)   
             ALPHAI(1:N) will be set to imaginary parts of the diagonal   
             elements of A that would result from reducing A and B to   
-            Schur form and then further reducing them both to triangular 
-  
+            Schur form and then further reducing them both to triangular   
             form using unitary transformations s.t. the diagonal of B   
-            was non-negative real.  Thus, if A(j,j) is in a 1-by-1 block 
-  
+            was non-negative real.  Thus, if A(j,j) is in a 1-by-1 block   
             (i.e., A(j+1,j)=A(j,j+1)=0), then ALPHAR(j)=0.   
             Note that the (real or complex) values   
             (ALPHAR(j) + i*ALPHAI(j))/BETA(j), j=1,...,N, are the   
@@ -175,20 +162,23 @@
     Z       (input/output) DOUBLE PRECISION array, dimension (LDZ, N)   
             If COMPZ='N', then Z will not be referenced.   
             If COMPZ='V' or 'I', then the orthogonal transformations   
-               which are applied to A and B on the right will be applied 
-  
+               which are applied to A and B on the right will be applied   
                to the array Z on the right.   
 
     LDZ     (input) INTEGER   
             The leading dimension of the array Z.  LDZ >= 1.   
             If COMPZ='V' or 'I', then LDZ >= N.   
 
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK) 
-  
+    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
             On exit, if INFO >= 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.  LWORK >= max(1,N).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0: successful exit   
@@ -211,16 +201,13 @@
               changed.  This is therefore reset only when a 1-by-1 or   
               2-by-2 block deflates off the bottom.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
       $                     SAFETY = 1.0E+0 )   
 
        Decode JOB, COMPQ, COMPZ   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b12 = 0.;
     static doublereal c_b13 = 1.;
@@ -241,7 +228,7 @@
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
-    static doublereal temp2, s1inv, c;
+    static doublereal temp2, s1inv, c__;
     static integer j;
     static doublereal s, t, v[3], scale;
     extern logical lsame_(char *, char *);
@@ -290,27 +277,39 @@
     static doublereal a1r;
     static integer istart;
     static logical ilpivt;
-    static doublereal a2r, b1r, b2r, wr2, ad11, ad12, ad21, ad22, c11i, c22i;
+    static doublereal a2r, b1r, b2r;
+    static logical lquery;
+    static doublereal wr2, ad11, ad12, ad21, ad22, c11i, c22i;
     static integer jch;
     static doublereal c11r, c22r, u12l;
     static logical ilq;
     static doublereal tau, sqi;
     static logical ilz;
     static doublereal ulp, sqr, szi, szr;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alphar;
+    --alphai;
+    --beta;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define V(I) v[(I)]
-#define ALPHAR(I) alphar[(I)-1]
-#define ALPHAI(I) alphai[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     if (lsame_(job, "E")) {
 	ilschr = FALSE_;
 	ischur = 1;
@@ -350,6 +349,8 @@
 /*     Check Argument Values */
 
     *info = 0;
+    work[1] = (doublereal) max(1,*n);
+    lquery = *lwork == -1;
     if (ischur == 0) {
 	*info = -1;
     } else if (icompq == 0) {
@@ -370,29 +371,31 @@
 	*info = -15;
     } else if (*ldz < 1 || ilz && *ldz < *n) {
 	*info = -17;
-    } else if (*lwork < max(1,*n)) {
+    } else if (*lwork < max(1,*n) && ! lquery) {
 	*info = -19;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("DHGEQZ", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n <= 0) {
-	WORK(1) = 1.;
+	work[1] = 1.;
 	return 0;
     }
 
 /*     Initialize Q and Z */
 
     if (icompq == 3) {
-	dlaset_("Full", n, n, &c_b12, &c_b13, &Q(1,1), ldq);
+	dlaset_("Full", n, n, &c_b12, &c_b13, &q[q_offset], ldq);
     }
     if (icompz == 3) {
-	dlaset_("Full", n, n, &c_b12, &c_b13, &Z(1,1), ldz);
+	dlaset_("Full", n, n, &c_b12, &c_b13, &z__[z_offset], ldz);
     }
 
 /*     Machine Constants */
@@ -401,8 +404,8 @@
     safmin = dlamch_("S");
     safmax = 1. / safmin;
     ulp = dlamch_("E") * dlamch_("B");
-    anorm = dlanhs_("F", &in, &A(*ilo,*ilo), lda, &WORK(1));
-    bnorm = dlanhs_("F", &in, &B(*ilo,*ilo), ldb, &WORK(1));
+    anorm = dlanhs_("F", &in, &a_ref(*ilo, *ilo), lda, &work[1]);
+    bnorm = dlanhs_("F", &in, &b_ref(*ilo, *ilo), ldb, &work[1]);
 /* Computing MAX */
     d__1 = safmin, d__2 = ulp * anorm;
     atol = max(d__1,d__2);
@@ -415,30 +418,30 @@
 /*     Set Eigenvalues IHI+1:N */
 
     i__1 = *n;
-    for (j = *ihi + 1; j <= *n; ++j) {
-	if (B(j,j) < 0.) {
+    for (j = *ihi + 1; j <= i__1; ++j) {
+	if (b_ref(j, j) < 0.) {
 	    if (ilschr) {
 		i__2 = j;
-		for (jr = 1; jr <= j; ++jr) {
-		    A(jr,j) = -A(jr,j);
-		    B(jr,j) = -B(jr,j);
+		for (jr = 1; jr <= i__2; ++jr) {
+		    a_ref(jr, j) = -a_ref(jr, j);
+		    b_ref(jr, j) = -b_ref(jr, j);
 /* L10: */
 		}
 	    } else {
-		A(j,j) = -A(j,j);
-		B(j,j) = -B(j,j);
+		a_ref(j, j) = -a_ref(j, j);
+		b_ref(j, j) = -b_ref(j, j);
 	    }
 	    if (ilz) {
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    Z(jr,j) = -Z(jr,j);
+		for (jr = 1; jr <= i__2; ++jr) {
+		    z___ref(jr, j) = -z___ref(jr, j);
 /* L20: */
 		}
 	    }
 	}
-	ALPHAR(j) = A(j,j);
-	ALPHAI(j) = 0.;
-	BETA(j) = B(j,j);
+	alphar[j] = a_ref(j, j);
+	alphai[j] = 0.;
+	beta[j] = b_ref(j, j);
 /* L30: */
     }
 
@@ -476,7 +479,7 @@
     maxit = (*ihi - *ilo + 1) * 30;
 
     i__1 = maxit;
-    for (jiter = 1; jiter <= maxit; ++jiter) {
+    for (jiter = 1; jiter <= i__1; ++jiter) {
 
 /*        Split the matrix if possible.   
 
@@ -490,29 +493,29 @@
 
 	    goto L80;
 	} else {
-	    if ((d__1 = A(ilast,ilast-1), abs(d__1)) <= atol) {
-		A(ilast,ilast-1) = 0.;
+	    if ((d__1 = a_ref(ilast, ilast - 1), abs(d__1)) <= atol) {
+		a_ref(ilast, ilast - 1) = 0.;
 		goto L80;
 	    }
 	}
 
-	if ((d__1 = B(ilast,ilast), abs(d__1)) <= btol) {
-	    B(ilast,ilast) = 0.;
+	if ((d__1 = b_ref(ilast, ilast), abs(d__1)) <= btol) {
+	    b_ref(ilast, ilast) = 0.;
 	    goto L70;
 	}
 
 /*        General case: j<ILAST */
 
 	i__2 = *ilo;
-	for (j = ilast - 1; j >= *ilo; --j) {
+	for (j = ilast - 1; j >= i__2; --j) {
 
 /*           Test 1: for A(j,j-1)=0 or j=ILO */
 
 	    if (j == *ilo) {
 		ilazro = TRUE_;
 	    } else {
-		if ((d__1 = A(j,j-1), abs(d__1)) <= atol) {
-		    A(j,j-1) = 0.;
+		if ((d__1 = a_ref(j, j - 1), abs(d__1)) <= atol) {
+		    a_ref(j, j - 1) = 0.;
 		    ilazro = TRUE_;
 		} else {
 		    ilazro = FALSE_;
@@ -521,56 +524,55 @@
 
 /*           Test 2: for B(j,j)=0 */
 
-	    if ((d__1 = B(j,j), abs(d__1)) < btol) {
-		B(j,j) = 0.;
+	    if ((d__1 = b_ref(j, j), abs(d__1)) < btol) {
+		b_ref(j, j) = 0.;
 
-/*              Test 1a: Check for 2 consecutive small subdiag
-onals in A */
+/*              Test 1a: Check for 2 consecutive small subdiagonals in A */
 
 		ilazr2 = FALSE_;
 		if (! ilazro) {
-		    temp = (d__1 = A(j,j-1), abs(d__1));
-		    temp2 = (d__1 = A(j,j), abs(d__1));
+		    temp = (d__1 = a_ref(j, j - 1), abs(d__1));
+		    temp2 = (d__1 = a_ref(j, j), abs(d__1));
 		    tempr = max(temp,temp2);
 		    if (tempr < 1. && tempr != 0.) {
 			temp /= tempr;
 			temp2 /= tempr;
 		    }
-		    if (temp * (ascale * (d__1 = A(j+1,j), abs(
-			    d__1))) <= temp2 * (ascale * atol)) {
+		    if (temp * (ascale * (d__1 = a_ref(j + 1, j), abs(d__1))) 
+			    <= temp2 * (ascale * atol)) {
 			ilazr2 = TRUE_;
 		    }
 		}
 
-/*              If both tests pass (1 & 2), i.e., the leading 
-diagonal   
-                element of B in the block is zero, split a 1x1
- block off   
-                at the top. (I.e., at the J-th row/column) The
- leading   
-                diagonal element of the remainder can also be 
-zero, so   
+/*              If both tests pass (1 & 2), i.e., the leading diagonal   
+                element of B in the block is zero, split a 1x1 block off   
+                at the top. (I.e., at the J-th row/column) The leading   
+                diagonal element of the remainder can also be zero, so   
                 this may have to be done repeatedly. */
 
 		if (ilazro || ilazr2) {
 		    i__3 = ilast - 1;
-		    for (jch = j; jch <= ilast-1; ++jch) {
-			temp = A(jch,jch);
-			dlartg_(&temp, &A(jch+1,jch), &c, &s, &A(jch,jch));
-			A(jch+1,jch) = 0.;
+		    for (jch = j; jch <= i__3; ++jch) {
+			temp = a_ref(jch, jch);
+			dlartg_(&temp, &a_ref(jch + 1, jch), &c__, &s, &a_ref(
+				jch, jch));
+			a_ref(jch + 1, jch) = 0.;
 			i__4 = ilastm - jch;
-			drot_(&i__4, &A(jch,jch+1), lda, &A(jch+1,jch+1), lda, &c, &s);
+			drot_(&i__4, &a_ref(jch, jch + 1), lda, &a_ref(jch + 
+				1, jch + 1), lda, &c__, &s);
 			i__4 = ilastm - jch;
-			drot_(&i__4, &B(jch,jch+1), ldb, &B(jch+1,jch+1), ldb, &c, &s);
+			drot_(&i__4, &b_ref(jch, jch + 1), ldb, &b_ref(jch + 
+				1, jch + 1), ldb, &c__, &s);
 			if (ilq) {
-			    drot_(n, &Q(1,jch), &c__1, &Q(1,jch+1), &c__1, &c, &s);
+			    drot_(n, &q_ref(1, jch), &c__1, &q_ref(1, jch + 1)
+				    , &c__1, &c__, &s);
 			}
 			if (ilazr2) {
-			    A(jch,jch-1) *= c;
+			    a_ref(jch, jch - 1) = a_ref(jch, jch - 1) * c__;
 			}
 			ilazr2 = FALSE_;
-			if ((d__1 = B(jch+1,jch+1), abs(d__1)
-				) >= btol) {
+			if ((d__1 = b_ref(jch + 1, jch + 1), abs(d__1)) >= 
+				btol) {
 			    if (jch + 1 >= ilast) {
 				goto L80;
 			    } else {
@@ -578,44 +580,46 @@ zero, so
 				goto L110;
 			    }
 			}
-			B(jch+1,jch+1) = 0.;
+			b_ref(jch + 1, jch + 1) = 0.;
 /* L40: */
 		    }
 		    goto L70;
 		} else {
 
-/*                 Only test 2 passed -- chase the zero to
- B(ILAST,ILAST)   
-                   Then process as in the case B(ILAST,ILA
-ST)=0 */
+/*                 Only test 2 passed -- chase the zero to B(ILAST,ILAST)   
+                   Then process as in the case B(ILAST,ILAST)=0 */
 
 		    i__3 = ilast - 1;
-		    for (jch = j; jch <= ilast-1; ++jch) {
-			temp = B(jch,jch+1);
-			dlartg_(&temp, &B(jch+1,jch+1), &c, &
-				s, &B(jch,jch+1));
-			B(jch+1,jch+1) = 0.;
+		    for (jch = j; jch <= i__3; ++jch) {
+			temp = b_ref(jch, jch + 1);
+			dlartg_(&temp, &b_ref(jch + 1, jch + 1), &c__, &s, &
+				b_ref(jch, jch + 1));
+			b_ref(jch + 1, jch + 1) = 0.;
 			if (jch < ilastm - 1) {
 			    i__4 = ilastm - jch - 1;
-			    drot_(&i__4, &B(jch,jch+2), ldb, &
-				    B(jch+1,jch+2), ldb, &c, 
-				    &s);
+			    drot_(&i__4, &b_ref(jch, jch + 2), ldb, &b_ref(
+				    jch + 1, jch + 2), ldb, &c__, &s);
 			}
 			i__4 = ilastm - jch + 2;
-			drot_(&i__4, &A(jch,jch-1), lda, &A(jch+1,jch-1), lda, &c, &s);
+			drot_(&i__4, &a_ref(jch, jch - 1), lda, &a_ref(jch + 
+				1, jch - 1), lda, &c__, &s);
 			if (ilq) {
-			    drot_(n, &Q(1,jch), &c__1, &Q(1,jch+1), &c__1, &c, &s);
+			    drot_(n, &q_ref(1, jch), &c__1, &q_ref(1, jch + 1)
+				    , &c__1, &c__, &s);
 			}
-			temp = A(jch+1,jch);
-			dlartg_(&temp, &A(jch+1,jch-1), &c, &
-				s, &A(jch+1,jch));
-			A(jch+1,jch-1) = 0.;
+			temp = a_ref(jch + 1, jch);
+			dlartg_(&temp, &a_ref(jch + 1, jch - 1), &c__, &s, &
+				a_ref(jch + 1, jch));
+			a_ref(jch + 1, jch - 1) = 0.;
 			i__4 = jch + 1 - ifrstm;
-			drot_(&i__4, &A(ifrstm,jch), &c__1, &A(ifrstm,jch-1), &c__1, &c, &s);
+			drot_(&i__4, &a_ref(ifrstm, jch), &c__1, &a_ref(
+				ifrstm, jch - 1), &c__1, &c__, &s);
 			i__4 = jch - ifrstm;
-			drot_(&i__4, &B(ifrstm,jch), &c__1, &B(ifrstm,jch-1), &c__1, &c, &s);
+			drot_(&i__4, &b_ref(ifrstm, jch), &c__1, &b_ref(
+				ifrstm, jch - 1), &c__1, &c__, &s);
 			if (ilz) {
-			    drot_(n, &Z(1,jch), &c__1, &Z(1,jch-1), &c__1, &c, &s);
+			    drot_(n, &z___ref(1, jch), &c__1, &z___ref(1, jch 
+				    - 1), &c__1, &c__, &s);
 			}
 /* L50: */
 		    }
@@ -643,44 +647,48 @@ ST)=0 */
           1x1 block. */
 
 L70:
-	temp = A(ilast,ilast);
-	dlartg_(&temp, &A(ilast,ilast-1), &c, &s, &A(ilast,ilast));
-	A(ilast,ilast-1) = 0.;
+	temp = a_ref(ilast, ilast);
+	dlartg_(&temp, &a_ref(ilast, ilast - 1), &c__, &s, &a_ref(ilast, 
+		ilast));
+	a_ref(ilast, ilast - 1) = 0.;
 	i__2 = ilast - ifrstm;
-	drot_(&i__2, &A(ifrstm,ilast), &c__1, &A(ifrstm,ilast-1), &c__1, &c, &s);
+	drot_(&i__2, &a_ref(ifrstm, ilast), &c__1, &a_ref(ifrstm, ilast - 1), 
+		&c__1, &c__, &s);
 	i__2 = ilast - ifrstm;
-	drot_(&i__2, &B(ifrstm,ilast), &c__1, &B(ifrstm,ilast-1), &c__1, &c, &s);
+	drot_(&i__2, &b_ref(ifrstm, ilast), &c__1, &b_ref(ifrstm, ilast - 1), 
+		&c__1, &c__, &s);
 	if (ilz) {
-	    drot_(n, &Z(1,ilast), &c__1, &Z(1,ilast-1), &c__1, &c, &s);
+	    drot_(n, &z___ref(1, ilast), &c__1, &z___ref(1, ilast - 1), &c__1,
+		     &c__, &s);
 	}
 
 /*        A(ILAST,ILAST-1)=0 -- Standardize B, set ALPHAR, ALPHAI,   
                                 and BETA */
 
 L80:
-	if (B(ilast,ilast) < 0.) {
+	if (b_ref(ilast, ilast) < 0.) {
 	    if (ilschr) {
 		i__2 = ilast;
-		for (j = ifrstm; j <= ilast; ++j) {
-		    A(j,ilast) = -A(j,ilast);
-		    B(j,ilast) = -B(j,ilast);
+		for (j = ifrstm; j <= i__2; ++j) {
+		    a_ref(j, ilast) = -a_ref(j, ilast);
+		    b_ref(j, ilast) = -b_ref(j, ilast);
 /* L90: */
 		}
 	    } else {
-		A(ilast,ilast) = -A(ilast,ilast);
-		B(ilast,ilast) = -B(ilast,ilast);
+		a_ref(ilast, ilast) = -a_ref(ilast, ilast);
+		b_ref(ilast, ilast) = -b_ref(ilast, ilast);
 	    }
 	    if (ilz) {
 		i__2 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    Z(j,ilast) = -Z(j,ilast);
+		for (j = 1; j <= i__2; ++j) {
+		    z___ref(j, ilast) = -z___ref(j, ilast);
 /* L100: */
 		}
 	    }
 	}
-	ALPHAR(ilast) = A(ilast,ilast);
-	ALPHAI(ilast) = 0.;
-	BETA(ilast) = B(ilast,ilast);
+	alphar[ilast] = a_ref(ilast, ilast);
+	alphai[ilast] = 0.;
+	beta[ilast] = b_ref(ilast, ilast);
 
 /*        Go to next block -- exit if finished. */
 
@@ -703,10 +711,8 @@ L80:
 
 /*        QZ step   
 
-          This iteration only involves rows/columns IFIRST:ILAST. We 
-  
-          assume IFIRST < ILAST, and that the diagonal of B is non-zer
-o. */
+          This iteration only involves rows/columns IFIRST:ILAST. We   
+          assume IFIRST < ILAST, and that the diagonal of B is non-zero. */
 
 L110:
 	++iiter;
@@ -716,19 +722,20 @@ L110:
 
 /*        Compute single shifts.   
 
-          At this point, IFIRST < ILAST, and the diagonal elements of 
-  
+          At this point, IFIRST < ILAST, and the diagonal elements of   
           B(IFIRST:ILAST,IFIRST,ILAST) are larger than BTOL (in   
           magnitude) */
 
 	if (iiter / 10 * 10 == iiter) {
 
-/*           Exceptional shift.  Chosen for no particularly good r
-eason.   
+/*           Exceptional shift.  Chosen for no particularly good reason.   
              (Single shift only.) */
 
-	    if ((doublereal) maxit * safmin * (d__1 = A(ilast-1,ilast), abs(d__1)) < (d__2 = B(ilast-1,ilast-1), abs(d__2))) {
-		eshift += A(ilast-1,ilast) / B(ilast-1,ilast-1);
+	    if ((doublereal) maxit * safmin * (d__1 = a_ref(ilast - 1, ilast),
+		     abs(d__1)) < (d__2 = b_ref(ilast - 1, ilast - 1), abs(
+		    d__2))) {
+		eshift += a_ref(ilast - 1, ilast) / b_ref(ilast - 1, ilast - 
+			1);
 	    } else {
 		eshift += 1. / (safmin * (doublereal) maxit);
 	    }
@@ -738,14 +745,12 @@ eason.
 	} else {
 
 /*           Shifts based on the generalized eigenvalues of the   
-             bottom-right 2x2 block of A and B. The first eigenval
-ue   
-             returned by DLAG2 is the Wilkinson shift (AEP p.512),
- */
+             bottom-right 2x2 block of A and B. The first eigenvalue   
+             returned by DLAG2 is the Wilkinson shift (AEP p.512), */
 
 	    d__1 = safmin * 100.;
-	    dlag2_(&A(ilast-1,ilast-1), lda, &B(ilast-1,ilast-1), ldb, &d__1, &s1, &s2, &wr, &wr2, &
-		    wi);
+	    dlag2_(&a_ref(ilast - 1, ilast - 1), lda, &b_ref(ilast - 1, ilast 
+		    - 1), ldb, &d__1, &s1, &s2, &wr, &wr2, &wi);
 
 /* Computing MAX   
    Computing MAX */
@@ -778,18 +783,17 @@ ue
 /*        Now check for two consecutive small subdiagonals. */
 
 	i__2 = ifirst + 1;
-	for (j = ilast - 1; j >= ifirst+1; --j) {
+	for (j = ilast - 1; j >= i__2; --j) {
 	    istart = j;
-	    temp = (d__1 = s1 * A(j,j-1), abs(d__1));
-	    temp2 = (d__1 = s1 * A(j,j) - wr * B(j,j), 
-		    abs(d__1));
+	    temp = (d__1 = s1 * a_ref(j, j - 1), abs(d__1));
+	    temp2 = (d__1 = s1 * a_ref(j, j) - wr * b_ref(j, j), abs(d__1));
 	    tempr = max(temp,temp2);
 	    if (tempr < 1. && tempr != 0.) {
 		temp /= tempr;
 		temp2 /= tempr;
 	    }
-	    if ((d__1 = ascale * A(j+1,j) * temp, abs(d__1)) <= 
-		    ascale * atol * temp2) {
+	    if ((d__1 = ascale * a_ref(j + 1, j) * temp, abs(d__1)) <= ascale 
+		    * atol * temp2) {
 		goto L130;
 	    }
 /* L120: */
@@ -802,68 +806,69 @@ L130:
 
           Initial Q */
 
-	temp = s1 * A(istart,istart) - wr * B(istart,istart);
-	temp2 = s1 * A(istart+1,istart);
-	dlartg_(&temp, &temp2, &c, &s, &tempr);
+	temp = s1 * a_ref(istart, istart) - wr * b_ref(istart, istart);
+	temp2 = s1 * a_ref(istart + 1, istart);
+	dlartg_(&temp, &temp2, &c__, &s, &tempr);
 
 /*        Sweep */
 
 	i__2 = ilast - 1;
-	for (j = istart; j <= ilast-1; ++j) {
+	for (j = istart; j <= i__2; ++j) {
 	    if (j > istart) {
-		temp = A(j,j-1);
-		dlartg_(&temp, &A(j+1,j-1), &c, &s, &A(j,j-1));
-		A(j+1,j-1) = 0.;
+		temp = a_ref(j, j - 1);
+		dlartg_(&temp, &a_ref(j + 1, j - 1), &c__, &s, &a_ref(j, j - 
+			1));
+		a_ref(j + 1, j - 1) = 0.;
 	    }
 
 	    i__3 = ilastm;
-	    for (jc = j; jc <= ilastm; ++jc) {
-		temp = c * A(j,jc) + s * A(j+1,jc);
-		A(j+1,jc) = -s * A(j,jc) + c * A(j+1,jc);
-		A(j,jc) = temp;
-		temp2 = c * B(j,jc) + s * B(j+1,jc);
-		B(j+1,jc) = -s * B(j,jc) + c * B(j+1,jc);
-		B(j,jc) = temp2;
+	    for (jc = j; jc <= i__3; ++jc) {
+		temp = c__ * a_ref(j, jc) + s * a_ref(j + 1, jc);
+		a_ref(j + 1, jc) = -s * a_ref(j, jc) + c__ * a_ref(j + 1, jc);
+		a_ref(j, jc) = temp;
+		temp2 = c__ * b_ref(j, jc) + s * b_ref(j + 1, jc);
+		b_ref(j + 1, jc) = -s * b_ref(j, jc) + c__ * b_ref(j + 1, jc);
+		b_ref(j, jc) = temp2;
 /* L140: */
 	    }
 	    if (ilq) {
 		i__3 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    temp = c * Q(jr,j) + s * Q(jr,j+1);
-		    Q(jr,j+1) = -s * Q(jr,j) + c * 
-			    Q(jr,j+1);
-		    Q(jr,j) = temp;
+		for (jr = 1; jr <= i__3; ++jr) {
+		    temp = c__ * q_ref(jr, j) + s * q_ref(jr, j + 1);
+		    q_ref(jr, j + 1) = -s * q_ref(jr, j) + c__ * q_ref(jr, j 
+			    + 1);
+		    q_ref(jr, j) = temp;
 /* L150: */
 		}
 	    }
 
-	    temp = B(j+1,j+1);
-	    dlartg_(&temp, &B(j+1,j), &c, &s, &B(j+1,j+1));
-	    B(j+1,j) = 0.;
+	    temp = b_ref(j + 1, j + 1);
+	    dlartg_(&temp, &b_ref(j + 1, j), &c__, &s, &b_ref(j + 1, j + 1));
+	    b_ref(j + 1, j) = 0.;
 
 /* Computing MIN */
 	    i__4 = j + 2;
 	    i__3 = min(i__4,ilast);
-	    for (jr = ifrstm; jr <= min(j+2,ilast); ++jr) {
-		temp = c * A(jr,j+1) + s * A(jr,j);
-		A(jr,j) = -s * A(jr,j+1) + c * A(jr,j);
-		A(jr,j+1) = temp;
+	    for (jr = ifrstm; jr <= i__3; ++jr) {
+		temp = c__ * a_ref(jr, j + 1) + s * a_ref(jr, j);
+		a_ref(jr, j) = -s * a_ref(jr, j + 1) + c__ * a_ref(jr, j);
+		a_ref(jr, j + 1) = temp;
 /* L160: */
 	    }
 	    i__3 = j;
-	    for (jr = ifrstm; jr <= j; ++jr) {
-		temp = c * B(jr,j+1) + s * B(jr,j);
-		B(jr,j) = -s * B(jr,j+1) + c * B(jr,j);
-		B(jr,j+1) = temp;
+	    for (jr = ifrstm; jr <= i__3; ++jr) {
+		temp = c__ * b_ref(jr, j + 1) + s * b_ref(jr, j);
+		b_ref(jr, j) = -s * b_ref(jr, j + 1) + c__ * b_ref(jr, j);
+		b_ref(jr, j + 1) = temp;
 /* L170: */
 	    }
 	    if (ilz) {
 		i__3 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    temp = c * Z(jr,j+1) + s * Z(jr,j);
-		    Z(jr,j) = -s * Z(jr,j+1) + c * 
-			    Z(jr,j);
-		    Z(jr,j+1) = temp;
+		for (jr = 1; jr <= i__3; ++jr) {
+		    temp = c__ * z___ref(jr, j + 1) + s * z___ref(jr, j);
+		    z___ref(jr, j) = -s * z___ref(jr, j + 1) + c__ * z___ref(
+			    jr, j);
+		    z___ref(jr, j + 1) = temp;
 /* L180: */
 		}
 	    }
@@ -874,8 +879,7 @@ L130:
 
 /*        Use Francis double-shift   
 
-          Note: the Francis double-shift should work with real shifts,
-   
+          Note: the Francis double-shift should work with real shifts,   
                 but only if the block is at least 3x3.   
                 This code may break if this point is reached with   
                 a 2x2 block with real eigenvalues. */
@@ -883,8 +887,7 @@ L130:
 L200:
 	if (ifirst + 1 == ilast) {
 
-/*           Special case -- 2x2 block with complex eigenvectors 
-  
+/*           Special case -- 2x2 block with complex eigenvectors   
 
              Step 1: Standardize, that is, rotate so that   
 
@@ -892,8 +895,8 @@ L200:
                      B = (         )  with B11 non-negative.   
                          (  0  B22 ) */
 
-	    dlasv2_(&B(ilast-1,ilast-1), &B(ilast-1,ilast), &B(ilast,ilast), &b22, &b11, &
-		    sr, &cr, &sl, &cl);
+	    dlasv2_(&b_ref(ilast - 1, ilast - 1), &b_ref(ilast - 1, ilast), &
+		    b_ref(ilast, ilast), &b22, &b11, &sr, &cr, &sl, &cl);
 
 	    if (b11 < 0.) {
 		cr = -cr;
@@ -903,61 +906,65 @@ L200:
 	    }
 
 	    i__2 = ilastm + 1 - ifirst;
-	    drot_(&i__2, &A(ilast-1,ilast-1), lda, &A(ilast,ilast-1), lda, &cl, &sl);
+	    drot_(&i__2, &a_ref(ilast - 1, ilast - 1), lda, &a_ref(ilast, 
+		    ilast - 1), lda, &cl, &sl);
 	    i__2 = ilast + 1 - ifrstm;
-	    drot_(&i__2, &A(ifrstm,ilast-1), &c__1, &A(ifrstm,ilast), &c__1, &cr, &sr);
+	    drot_(&i__2, &a_ref(ifrstm, ilast - 1), &c__1, &a_ref(ifrstm, 
+		    ilast), &c__1, &cr, &sr);
 
 	    if (ilast < ilastm) {
 		i__2 = ilastm - ilast;
-		drot_(&i__2, &B(ilast-1,ilast+1), ldb, &B(ilast,ilast+1), lda, &cl, &sl);
+		drot_(&i__2, &b_ref(ilast - 1, ilast + 1), ldb, &b_ref(ilast, 
+			ilast + 1), lda, &cl, &sl);
 	    }
 	    if (ifrstm < ilast - 1) {
 		i__2 = ifirst - ifrstm;
-		drot_(&i__2, &B(ifrstm,ilast-1), &c__1, &B(ifrstm,ilast), &c__1, &cr, &sr);
+		drot_(&i__2, &b_ref(ifrstm, ilast - 1), &c__1, &b_ref(ifrstm, 
+			ilast), &c__1, &cr, &sr);
 	    }
 
 	    if (ilq) {
-		drot_(n, &Q(1,ilast-1), &c__1, &Q(1,ilast), &c__1, &cl, &sl);
+		drot_(n, &q_ref(1, ilast - 1), &c__1, &q_ref(1, ilast), &c__1,
+			 &cl, &sl);
 	    }
 	    if (ilz) {
-		drot_(n, &Z(1,ilast-1), &c__1, &Z(1,ilast), &c__1, &cr, &sr);
+		drot_(n, &z___ref(1, ilast - 1), &c__1, &z___ref(1, ilast), &
+			c__1, &cr, &sr);
 	    }
 
-	    B(ilast-1,ilast-1) = b11;
-	    B(ilast-1,ilast) = 0.;
-	    B(ilast,ilast-1) = 0.;
-	    B(ilast,ilast) = b22;
+	    b_ref(ilast - 1, ilast - 1) = b11;
+	    b_ref(ilast - 1, ilast) = 0.;
+	    b_ref(ilast, ilast - 1) = 0.;
+	    b_ref(ilast, ilast) = b22;
 
 /*           If B22 is negative, negate column ILAST */
 
 	    if (b22 < 0.) {
 		i__2 = ilast;
-		for (j = ifrstm; j <= ilast; ++j) {
-		    A(j,ilast) = -A(j,ilast);
-		    B(j,ilast) = -B(j,ilast);
+		for (j = ifrstm; j <= i__2; ++j) {
+		    a_ref(j, ilast) = -a_ref(j, ilast);
+		    b_ref(j, ilast) = -b_ref(j, ilast);
 /* L210: */
 		}
 
 		if (ilz) {
 		    i__2 = *n;
-		    for (j = 1; j <= *n; ++j) {
-			Z(j,ilast) = -Z(j,ilast);
+		    for (j = 1; j <= i__2; ++j) {
+			z___ref(j, ilast) = -z___ref(j, ilast);
 /* L220: */
 		    }
 		}
 	    }
 
-/*           Step 2: Compute ALPHAR, ALPHAI, and BETA (see refs.) 
-  
+/*           Step 2: Compute ALPHAR, ALPHAI, and BETA (see refs.)   
 
              Recompute shift */
 
 	    d__1 = safmin * 100.;
-	    dlag2_(&A(ilast-1,ilast-1), lda, &B(ilast-1,ilast-1), ldb, &d__1, &s1, &temp, &wr, &temp2,
-		     &wi);
+	    dlag2_(&a_ref(ilast - 1, ilast - 1), lda, &b_ref(ilast - 1, ilast 
+		    - 1), ldb, &d__1, &s1, &temp, &wr, &temp2, &wi);
 
-/*           If standardization has perturbed the shift onto real 
-line,   
+/*           If standardization has perturbed the shift onto real line,   
              do another (real single-shift) QR step. */
 
 	    if (wi == 0.) {
@@ -967,10 +974,10 @@ line,
 
 /*           Do EISPACK (QZVAL) computation of alpha and beta */
 
-	    a11 = A(ilast-1,ilast-1);
-	    a21 = A(ilast,ilast-1);
-	    a12 = A(ilast-1,ilast);
-	    a22 = A(ilast,ilast);
+	    a11 = a_ref(ilast - 1, ilast - 1);
+	    a21 = a_ref(ilast, ilast - 1);
+	    a12 = a_ref(ilast - 1, ilast);
+	    a22 = a_ref(ilast, ilast);
 
 /*           Compute complex Givens rotation on right   
              (Assume some element of C = (sA - wB) > unfl )   
@@ -1055,12 +1062,12 @@ line,
 
 /*           Normalize so beta > 0, and Im( alpha1 ) > 0 */
 
-	    BETA(ilast - 1) = b1a;
-	    BETA(ilast) = b2a;
-	    ALPHAR(ilast - 1) = wr * b1a * s1inv;
-	    ALPHAI(ilast - 1) = wi * b1a * s1inv;
-	    ALPHAR(ilast) = wr * b2a * s1inv;
-	    ALPHAI(ilast) = -(wi * b2a) * s1inv;
+	    beta[ilast - 1] = b1a;
+	    beta[ilast] = b2a;
+	    alphar[ilast - 1] = wr * b1a * s1inv;
+	    alphai[ilast - 1] = wi * b1a * s1inv;
+	    alphar[ilast] = wr * b2a * s1inv;
+	    alphai[ilast] = -(wi * b2a) * s1inv;
 
 /*           Step 3: Go to next block -- exit if finished. */
 
@@ -1082,8 +1089,7 @@ line,
 	    goto L350;
 	} else {
 
-/*           Usual case: 3x3 or larger block, using Francis implic
-it   
+/*           Usual case: 3x3 or larger block, using Francis implicit   
                          double-shift   
 
                                       2   
@@ -1095,90 +1101,96 @@ it
 
              We assume that the block is at least 3x3 */
 
-	    ad11 = ascale * A(ilast-1,ilast-1) / (bscale * B(ilast-1,ilast-1));
-	    ad21 = ascale * A(ilast,ilast-1) / (bscale * B(ilast-1,ilast-1));
-	    ad12 = ascale * A(ilast-1,ilast) / (bscale * B(ilast,ilast));
-	    ad22 = ascale * A(ilast,ilast) / (bscale * B(ilast,ilast));
-	    u12 = B(ilast-1,ilast) / B(ilast,ilast);
-	    ad11l = ascale * A(ifirst,ifirst) / (bscale * B(ifirst,ifirst));
-	    ad21l = ascale * A(ifirst+1,ifirst) / (bscale * B(ifirst,ifirst));
-	    ad12l = ascale * A(ifirst,ifirst+1) / (bscale * B(ifirst+1,ifirst+1));
-	    ad22l = ascale * A(ifirst+1,ifirst+1) / (bscale *
-		     B(ifirst+1,ifirst+1));
-	    ad32l = ascale * A(ifirst+2,ifirst+1) / (bscale *
-		     B(ifirst+1,ifirst+1));
-	    u12l = B(ifirst,ifirst+1) / B(ifirst+1,ifirst+1);
+	    ad11 = ascale * a_ref(ilast - 1, ilast - 1) / (bscale * b_ref(
+		    ilast - 1, ilast - 1));
+	    ad21 = ascale * a_ref(ilast, ilast - 1) / (bscale * b_ref(ilast - 
+		    1, ilast - 1));
+	    ad12 = ascale * a_ref(ilast - 1, ilast) / (bscale * b_ref(ilast, 
+		    ilast));
+	    ad22 = ascale * a_ref(ilast, ilast) / (bscale * b_ref(ilast, 
+		    ilast));
+	    u12 = b_ref(ilast - 1, ilast) / b_ref(ilast, ilast);
+	    ad11l = ascale * a_ref(ifirst, ifirst) / (bscale * b_ref(ifirst, 
+		    ifirst));
+	    ad21l = ascale * a_ref(ifirst + 1, ifirst) / (bscale * b_ref(
+		    ifirst, ifirst));
+	    ad12l = ascale * a_ref(ifirst, ifirst + 1) / (bscale * b_ref(
+		    ifirst + 1, ifirst + 1));
+	    ad22l = ascale * a_ref(ifirst + 1, ifirst + 1) / (bscale * b_ref(
+		    ifirst + 1, ifirst + 1));
+	    ad32l = ascale * a_ref(ifirst + 2, ifirst + 1) / (bscale * b_ref(
+		    ifirst + 1, ifirst + 1));
+	    u12l = b_ref(ifirst, ifirst + 1) / b_ref(ifirst + 1, ifirst + 1);
 
-	    V(0) = (ad11 - ad11l) * (ad22 - ad11l) - ad12 * ad21 + ad21 * u12 
+	    v[0] = (ad11 - ad11l) * (ad22 - ad11l) - ad12 * ad21 + ad21 * u12 
 		    * ad11l + (ad12l - ad11l * u12l) * ad21l;
-	    V(1) = (ad22l - ad11l - ad21l * u12l - (ad11 - ad11l) - (ad22 - 
+	    v[1] = (ad22l - ad11l - ad21l * u12l - (ad11 - ad11l) - (ad22 - 
 		    ad11l) + ad21 * u12) * ad21l;
-	    V(2) = ad32l * ad21l;
+	    v[2] = ad32l * ad21l;
 
 	    istart = ifirst;
 
-	    dlarfg_(&c__3, v, &V(1), &c__1, &tau);
-	    V(0) = 1.;
+	    dlarfg_(&c__3, v, &v[1], &c__1, &tau);
+	    v[0] = 1.;
 
 /*           Sweep */
 
 	    i__2 = ilast - 2;
-	    for (j = istart; j <= ilast-2; ++j) {
+	    for (j = istart; j <= i__2; ++j) {
 
-/*              All but last elements: use 3x3 Householder tra
-nsforms.   
+/*              All but last elements: use 3x3 Householder transforms.   
 
                 Zero (j-1)st column of A */
 
 		if (j > istart) {
-		    V(0) = A(j,j-1);
-		    V(1) = A(j+1,j-1);
-		    V(2) = A(j+2,j-1);
+		    v[0] = a_ref(j, j - 1);
+		    v[1] = a_ref(j + 1, j - 1);
+		    v[2] = a_ref(j + 2, j - 1);
 
-		    dlarfg_(&c__3, &A(j,j-1), &V(1), &c__1, &
-			    tau);
-		    V(0) = 1.;
-		    A(j+1,j-1) = 0.;
-		    A(j+2,j-1) = 0.;
+		    dlarfg_(&c__3, &a_ref(j, j - 1), &v[1], &c__1, &tau);
+		    v[0] = 1.;
+		    a_ref(j + 1, j - 1) = 0.;
+		    a_ref(j + 2, j - 1) = 0.;
 		}
 
 		i__3 = ilastm;
-		for (jc = j; jc <= ilastm; ++jc) {
-		    temp = tau * (A(j,jc) + V(1) * A(j+1,jc) + V(2) * A(j+2,jc));
-		    A(j,jc) -= temp;
-		    A(j+1,jc) -= temp * V(1);
-		    A(j+2,jc) -= temp * V(2);
-		    temp2 = tau * (B(j,jc) + V(1) * B(j+1,jc) + V(2) * B(j+2,jc));
-		    B(j,jc) -= temp2;
-		    B(j+1,jc) -= temp2 * V(1);
-		    B(j+2,jc) -= temp2 * V(2);
+		for (jc = j; jc <= i__3; ++jc) {
+		    temp = tau * (a_ref(j, jc) + v[1] * a_ref(j + 1, jc) + v[
+			    2] * a_ref(j + 2, jc));
+		    a_ref(j, jc) = a_ref(j, jc) - temp;
+		    a_ref(j + 1, jc) = a_ref(j + 1, jc) - temp * v[1];
+		    a_ref(j + 2, jc) = a_ref(j + 2, jc) - temp * v[2];
+		    temp2 = tau * (b_ref(j, jc) + v[1] * b_ref(j + 1, jc) + v[
+			    2] * b_ref(j + 2, jc));
+		    b_ref(j, jc) = b_ref(j, jc) - temp2;
+		    b_ref(j + 1, jc) = b_ref(j + 1, jc) - temp2 * v[1];
+		    b_ref(j + 2, jc) = b_ref(j + 2, jc) - temp2 * v[2];
 /* L230: */
 		}
 		if (ilq) {
 		    i__3 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			temp = tau * (Q(jr,j) + V(1) * Q(jr,j+1) + V(2) * Q(jr,j+2)
-				);
-			Q(jr,j) -= temp;
-			Q(jr,j+1) -= temp * V(1);
-			Q(jr,j+2) -= temp * V(2);
+		    for (jr = 1; jr <= i__3; ++jr) {
+			temp = tau * (q_ref(jr, j) + v[1] * q_ref(jr, j + 1) 
+				+ v[2] * q_ref(jr, j + 2));
+			q_ref(jr, j) = q_ref(jr, j) - temp;
+			q_ref(jr, j + 1) = q_ref(jr, j + 1) - temp * v[1];
+			q_ref(jr, j + 2) = q_ref(jr, j + 2) - temp * v[2];
 /* L240: */
 		    }
 		}
 
-/*              Zero j-th column of B (see DLAGBC for details)
-   
+/*              Zero j-th column of B (see DLAGBC for details)   
 
                 Swap rows to pivot */
 
 		ilpivt = FALSE_;
 /* Computing MAX */
-		d__3 = (d__1 = B(j+1,j+1), abs(d__1)), d__4 =
-			 (d__2 = B(j+1,j+2), abs(d__2));
+		d__3 = (d__1 = b_ref(j + 1, j + 1), abs(d__1)), d__4 = (d__2 =
+			 b_ref(j + 1, j + 2), abs(d__2));
 		temp = max(d__3,d__4);
 /* Computing MAX */
-		d__3 = (d__1 = B(j+2,j+1), abs(d__1)), d__4 =
-			 (d__2 = B(j+2,j+2), abs(d__2));
+		d__3 = (d__1 = b_ref(j + 2, j + 1), abs(d__1)), d__4 = (d__2 =
+			 b_ref(j + 2, j + 2), abs(d__2));
 		temp2 = max(d__3,d__4);
 		if (max(temp,temp2) < safmin) {
 		    scale = 0.;
@@ -1186,19 +1198,19 @@ nsforms.
 		    u2 = 0.;
 		    goto L250;
 		} else if (temp >= temp2) {
-		    w11 = B(j+1,j+1);
-		    w21 = B(j+2,j+1);
-		    w12 = B(j+1,j+2);
-		    w22 = B(j+2,j+2);
-		    u1 = B(j+1,j);
-		    u2 = B(j+2,j);
+		    w11 = b_ref(j + 1, j + 1);
+		    w21 = b_ref(j + 2, j + 1);
+		    w12 = b_ref(j + 1, j + 2);
+		    w22 = b_ref(j + 2, j + 2);
+		    u1 = b_ref(j + 1, j);
+		    u2 = b_ref(j + 2, j);
 		} else {
-		    w21 = B(j+1,j+1);
-		    w11 = B(j+2,j+1);
-		    w22 = B(j+1,j+2);
-		    w12 = B(j+2,j+2);
-		    u2 = B(j+1,j);
-		    u1 = B(j+2,j);
+		    w21 = b_ref(j + 1, j + 1);
+		    w11 = b_ref(j + 2, j + 1);
+		    w22 = b_ref(j + 1, j + 2);
+		    w12 = b_ref(j + 2, j + 2);
+		    u2 = b_ref(j + 1, j);
+		    u1 = b_ref(j + 2, j);
 		}
 
 /*              Swap columns if nec. */
@@ -1261,43 +1273,45 @@ L250:
 		t = sqrt(d__1 * d__1 + d__2 * d__2 + d__3 * d__3);
 		tau = scale / t + 1.;
 		vs = -1. / (scale + t);
-		V(0) = 1.;
-		V(1) = vs * u1;
-		V(2) = vs * u2;
+		v[0] = 1.;
+		v[1] = vs * u1;
+		v[2] = vs * u2;
 
 /*              Apply transformations from the right.   
 
    Computing MIN */
 		i__4 = j + 3;
 		i__3 = min(i__4,ilast);
-		for (jr = ifrstm; jr <= min(j+3,ilast); ++jr) {
-		    temp = tau * (A(jr,j) + V(1) * A(jr,j+1) + V(2) * A(jr,j+2));
-		    A(jr,j) -= temp;
-		    A(jr,j+1) -= temp * V(1);
-		    A(jr,j+2) -= temp * V(2);
+		for (jr = ifrstm; jr <= i__3; ++jr) {
+		    temp = tau * (a_ref(jr, j) + v[1] * a_ref(jr, j + 1) + v[
+			    2] * a_ref(jr, j + 2));
+		    a_ref(jr, j) = a_ref(jr, j) - temp;
+		    a_ref(jr, j + 1) = a_ref(jr, j + 1) - temp * v[1];
+		    a_ref(jr, j + 2) = a_ref(jr, j + 2) - temp * v[2];
 /* L260: */
 		}
 		i__3 = j + 2;
-		for (jr = ifrstm; jr <= j+2; ++jr) {
-		    temp = tau * (B(jr,j) + V(1) * B(jr,j+1) + V(2) * B(jr,j+2));
-		    B(jr,j) -= temp;
-		    B(jr,j+1) -= temp * V(1);
-		    B(jr,j+2) -= temp * V(2);
+		for (jr = ifrstm; jr <= i__3; ++jr) {
+		    temp = tau * (b_ref(jr, j) + v[1] * b_ref(jr, j + 1) + v[
+			    2] * b_ref(jr, j + 2));
+		    b_ref(jr, j) = b_ref(jr, j) - temp;
+		    b_ref(jr, j + 1) = b_ref(jr, j + 1) - temp * v[1];
+		    b_ref(jr, j + 2) = b_ref(jr, j + 2) - temp * v[2];
 /* L270: */
 		}
 		if (ilz) {
 		    i__3 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			temp = tau * (Z(jr,j) + V(1) * Z(jr,j+1) + V(2) * Z(jr,j+2)
-				);
-			Z(jr,j) -= temp;
-			Z(jr,j+1) -= temp * V(1);
-			Z(jr,j+2) -= temp * V(2);
+		    for (jr = 1; jr <= i__3; ++jr) {
+			temp = tau * (z___ref(jr, j) + v[1] * z___ref(jr, j + 
+				1) + v[2] * z___ref(jr, j + 2));
+			z___ref(jr, j) = z___ref(jr, j) - temp;
+			z___ref(jr, j + 1) = z___ref(jr, j + 1) - temp * v[1];
+			z___ref(jr, j + 2) = z___ref(jr, j + 2) - temp * v[2];
 /* L280: */
 		    }
 		}
-		B(j+1,j) = 0.;
-		B(j+2,j) = 0.;
+		b_ref(j + 1, j) = 0.;
+		b_ref(j + 2, j) = 0.;
 /* L290: */
 	    }
 
@@ -1306,58 +1320,58 @@ L250:
              Rotations from the left */
 
 	    j = ilast - 1;
-	    temp = A(j,j-1);
-	    dlartg_(&temp, &A(j+1,j-1), &c, &s, &A(j,j-1));
-	    A(j+1,j-1) = 0.;
+	    temp = a_ref(j, j - 1);
+	    dlartg_(&temp, &a_ref(j + 1, j - 1), &c__, &s, &a_ref(j, j - 1));
+	    a_ref(j + 1, j - 1) = 0.;
 
 	    i__2 = ilastm;
-	    for (jc = j; jc <= ilastm; ++jc) {
-		temp = c * A(j,jc) + s * A(j+1,jc);
-		A(j+1,jc) = -s * A(j,jc) + c * A(j+1,jc);
-		A(j,jc) = temp;
-		temp2 = c * B(j,jc) + s * B(j+1,jc);
-		B(j+1,jc) = -s * B(j,jc) + c * B(j+1,jc);
-		B(j,jc) = temp2;
+	    for (jc = j; jc <= i__2; ++jc) {
+		temp = c__ * a_ref(j, jc) + s * a_ref(j + 1, jc);
+		a_ref(j + 1, jc) = -s * a_ref(j, jc) + c__ * a_ref(j + 1, jc);
+		a_ref(j, jc) = temp;
+		temp2 = c__ * b_ref(j, jc) + s * b_ref(j + 1, jc);
+		b_ref(j + 1, jc) = -s * b_ref(j, jc) + c__ * b_ref(j + 1, jc);
+		b_ref(j, jc) = temp2;
 /* L300: */
 	    }
 	    if (ilq) {
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    temp = c * Q(jr,j) + s * Q(jr,j+1);
-		    Q(jr,j+1) = -s * Q(jr,j) + c * 
-			    Q(jr,j+1);
-		    Q(jr,j) = temp;
+		for (jr = 1; jr <= i__2; ++jr) {
+		    temp = c__ * q_ref(jr, j) + s * q_ref(jr, j + 1);
+		    q_ref(jr, j + 1) = -s * q_ref(jr, j) + c__ * q_ref(jr, j 
+			    + 1);
+		    q_ref(jr, j) = temp;
 /* L310: */
 		}
 	    }
 
 /*           Rotations from the right. */
 
-	    temp = B(j+1,j+1);
-	    dlartg_(&temp, &B(j+1,j), &c, &s, &B(j+1,j+1));
-	    B(j+1,j) = 0.;
+	    temp = b_ref(j + 1, j + 1);
+	    dlartg_(&temp, &b_ref(j + 1, j), &c__, &s, &b_ref(j + 1, j + 1));
+	    b_ref(j + 1, j) = 0.;
 
 	    i__2 = ilast;
-	    for (jr = ifrstm; jr <= ilast; ++jr) {
-		temp = c * A(jr,j+1) + s * A(jr,j);
-		A(jr,j) = -s * A(jr,j+1) + c * A(jr,j);
-		A(jr,j+1) = temp;
+	    for (jr = ifrstm; jr <= i__2; ++jr) {
+		temp = c__ * a_ref(jr, j + 1) + s * a_ref(jr, j);
+		a_ref(jr, j) = -s * a_ref(jr, j + 1) + c__ * a_ref(jr, j);
+		a_ref(jr, j + 1) = temp;
 /* L320: */
 	    }
 	    i__2 = ilast - 1;
-	    for (jr = ifrstm; jr <= ilast-1; ++jr) {
-		temp = c * B(jr,j+1) + s * B(jr,j);
-		B(jr,j) = -s * B(jr,j+1) + c * B(jr,j);
-		B(jr,j+1) = temp;
+	    for (jr = ifrstm; jr <= i__2; ++jr) {
+		temp = c__ * b_ref(jr, j + 1) + s * b_ref(jr, j);
+		b_ref(jr, j) = -s * b_ref(jr, j + 1) + c__ * b_ref(jr, j);
+		b_ref(jr, j + 1) = temp;
 /* L330: */
 	    }
 	    if (ilz) {
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    temp = c * Z(jr,j+1) + s * Z(jr,j);
-		    Z(jr,j) = -s * Z(jr,j+1) + c * 
-			    Z(jr,j);
-		    Z(jr,j+1) = temp;
+		for (jr = 1; jr <= i__2; ++jr) {
+		    temp = c__ * z___ref(jr, j + 1) + s * z___ref(jr, j);
+		    z___ref(jr, j) = -s * z___ref(jr, j + 1) + c__ * z___ref(
+			    jr, j);
+		    z___ref(jr, j + 1) = temp;
 /* L340: */
 		}
 	    }
@@ -1388,30 +1402,30 @@ L380:
 /*     Set Eigenvalues 1:ILO-1 */
 
     i__1 = *ilo - 1;
-    for (j = 1; j <= *ilo-1; ++j) {
-	if (B(j,j) < 0.) {
+    for (j = 1; j <= i__1; ++j) {
+	if (b_ref(j, j) < 0.) {
 	    if (ilschr) {
 		i__2 = j;
-		for (jr = 1; jr <= j; ++jr) {
-		    A(jr,j) = -A(jr,j);
-		    B(jr,j) = -B(jr,j);
+		for (jr = 1; jr <= i__2; ++jr) {
+		    a_ref(jr, j) = -a_ref(jr, j);
+		    b_ref(jr, j) = -b_ref(jr, j);
 /* L390: */
 		}
 	    } else {
-		A(j,j) = -A(j,j);
-		B(j,j) = -B(j,j);
+		a_ref(j, j) = -a_ref(j, j);
+		b_ref(j, j) = -b_ref(j, j);
 	    }
 	    if (ilz) {
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    Z(jr,j) = -Z(jr,j);
+		for (jr = 1; jr <= i__2; ++jr) {
+		    z___ref(jr, j) = -z___ref(jr, j);
 /* L400: */
 		}
 	    }
 	}
-	ALPHAR(j) = A(j,j);
-	ALPHAI(j) = 0.;
-	BETA(j) = B(j,j);
+	alphar[j] = a_ref(j, j);
+	alphai[j] = 0.;
+	beta[j] = b_ref(j, j);
 /* L410: */
     }
 
@@ -1419,14 +1433,19 @@ L380:
 
     *info = 0;
 
-/*     Exit (other than argument error) -- return optimal workspace size 
-*/
+/*     Exit (other than argument error) -- return optimal workspace size */
 
 L420:
-    WORK(1) = (doublereal) (*n);
+    work[1] = (doublereal) (*n);
     return 0;
 
 /*     End of DHGEQZ */
 
 } /* dhgeqz_ */
+
+#undef z___ref
+#undef q_ref
+#undef b_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -50,7 +51,10 @@ static integer c__0 = 0;
     static real smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -59,8 +63,7 @@ static integer c__0 = 0;
     Purpose   
     =======   
 
-    SQRT15 generates a matrix with full or deficient rank and of various 
-  
+    SQRT15 generates a matrix with full or deficient rank and of various   
     norms.   
 
     Arguments   
@@ -117,16 +120,15 @@ static integer c__0 = 0;
             length of work space required.   
             LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --s;
     --iseed;
@@ -181,13 +183,13 @@ L20:
 	}
 	slaord_("Decreasing", rank, &s[1], &c__1);
 
-/*        Generate 'rank' columns of a random orthogonal matrix in A 
-*/
+/*        Generate 'rank' columns of a random orthogonal matrix in A */
 
 	slarnv_(&c__2, &iseed[1], m, &work[1]);
 	r__1 = 1.f / snrm2_(m, &work[1], &c__1);
 	sscal_(m, &r__1, &work[1], &c__1);
-	slaset_("Full", m, rank, &c_b18, &c_b19, &a[a_offset], lda);
+	slaset_("Full", m, rank, &c_b18, &c_b19, &a[a_offset], lda)
+		;
 	slarf_("Left", m, rank, &work[1], &c__1, &c_b22, &a[a_offset], lda, &
 		work[*m + 1]);
 
@@ -206,13 +208,13 @@ L20:
 
 	i__1 = *rank;
 	for (j = 1; j <= i__1; ++j) {
-	    sscal_(m, &s[j], &a[j * a_dim1 + 1], &c__1);
+	    sscal_(m, &s[j], &a_ref(1, j), &c__1);
 /* L40: */
 	}
 	if (*rank < *n) {
 	    i__1 = *n - *rank;
-	    slaset_("Full", m, &i__1, &c_b18, &c_b18, &a[(*rank + 1) * a_dim1 
-		    + 1], lda);
+	    slaset_("Full", m, &i__1, &c_b18, &c_b18, &a_ref(1, *rank + 1), 
+		    lda);
 	}
 	slaror_("Right", "No initialization", m, n, &a[a_offset], lda, &iseed[
 		1], &work[1], &info);
@@ -229,7 +231,8 @@ L20:
 /* L50: */
 	}
 	slaset_("Full", m, n, &c_b18, &c_b18, &a[a_offset], lda);
-	slaset_("Full", m, nrhs, &c_b18, &c_b18, &b[b_offset], ldb);
+	slaset_("Full", m, nrhs, &c_b18, &c_b18, &b[b_offset], ldb)
+		;
 
     }
 
@@ -266,11 +269,15 @@ L20:
     }
 
     *norma = sasum_(&mn, &s[1], &c__1);
-    *normb = slange_("One-norm", m, nrhs, &b[b_offset], ldb, dummy);
+    *normb = slange_("One-norm", m, nrhs, &b[b_offset], ldb, dummy)
+	    ;
 
     return 0;
 
 /*     End of SQRT15 */
 
 } /* sqrt15_ */
+
+#undef a_ref
+
 

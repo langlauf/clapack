@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -46,7 +47,7 @@ static integer c__20 = 20;
     static real rmax, vmax, work[120];
     static complex a[400]	/* was [20][20] */, b[400]	/* was [20][
 	    20] */;
-    static integer i, j, n, ihiin, ninfo, iloin;
+    static integer i__, j, n, ihiin, ninfo, iloin;
     static real anorm, bnorm;
     extern /* Subroutine */ int cggbal_(char *, integer *, complex *, integer 
 	    *, complex *, integer *, integer *, integer *, real *, real *, 
@@ -81,7 +82,17 @@ static integer c__20 = 20;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define ain_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define ain_ref(a_1,a_2) ain[ain_subscr(a_1,a_2)]
+#define bin_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define bin_ref(a_1,a_2) bin[bin_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -101,8 +112,7 @@ static integer c__20 = 20;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     lmax[0] = 0;
@@ -124,12 +134,12 @@ L10:
 	goto L90;
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___9.ciunit = *nin;
 	s_rsle(&io___9);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&a[i + j * 20 - 21], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -137,12 +147,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___12.ciunit = *nin;
 	s_rsle(&io___12);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&b[i + j * 20 - 21], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -155,25 +165,25 @@ L10:
     do_lio(&c__3, &c__1, (char *)&ihiin, (ftnlen)sizeof(integer));
     e_rsle();
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___17.ciunit = *nin;
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&ain[i + j * 20 - 21], (ftnlen)
-		    sizeof(complex));
+	    do_lio(&c__6, &c__1, (char *)&ain_ref(i__, j), (ftnlen)sizeof(
+		    complex));
 	}
 	e_rsle();
 /* L40: */
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___19.ciunit = *nin;
 	s_rsle(&io___19);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&bin[i + j * 20 - 21], (ftnlen)
-		    sizeof(complex));
+	    do_lio(&c__6, &c__1, (char *)&bin_ref(i__, j), (ftnlen)sizeof(
+		    complex));
 	}
 	e_rsle();
 /* L50: */
@@ -182,15 +192,15 @@ L10:
     io___21.ciunit = *nin;
     s_rsle(&io___21);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__4, &c__1, (char *)&lsclin[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__4, &c__1, (char *)&lsclin[i__ - 1], (ftnlen)sizeof(real));
     }
     e_rsle();
     io___23.ciunit = *nin;
     s_rsle(&io___23);
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__4, &c__1, (char *)&rsclin[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__4, &c__1, (char *)&rsclin[i__ - 1], (ftnlen)sizeof(real));
     }
     e_rsle();
 
@@ -214,19 +224,19 @@ L10:
 
     vmax = 0.f;
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-	    i__3 = i + j * 20 - 21;
-	    i__4 = i + j * 20 - 21;
+	    i__3 = a_subscr(i__, j);
+	    i__4 = ain_subscr(i__, j);
 	    q__1.r = a[i__3].r - ain[i__4].r, q__1.i = a[i__3].i - ain[i__4]
 		    .i;
 	    r__1 = vmax, r__2 = c_abs(&q__1);
 	    vmax = dmax(r__1,r__2);
 /* Computing MAX */
-	    i__3 = i + j * 20 - 21;
-	    i__4 = i + j * 20 - 21;
+	    i__3 = b_subscr(i__, j);
+	    i__4 = bin_subscr(i__, j);
 	    q__1.r = b[i__3].r - bin[i__4].r, q__1.i = b[i__3].i - bin[i__4]
 		    .i;
 	    r__1 = vmax, r__2 = c_abs(&q__1);
@@ -237,14 +247,14 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	r__2 = vmax, r__3 = (r__1 = lscale[i - 1] - lsclin[i - 1], dabs(r__1))
-		;
+	r__2 = vmax, r__3 = (r__1 = lscale[i__ - 1] - lsclin[i__ - 1], dabs(
+		r__1));
 	vmax = dmax(r__2,r__3);
 /* Computing MAX */
-	r__2 = vmax, r__3 = (r__1 = rscale[i - 1] - rsclin[i - 1], dabs(r__1))
-		;
+	r__2 = vmax, r__3 = (r__1 = rscale[i__ - 1] - rsclin[i__ - 1], dabs(
+		r__1));
 	vmax = dmax(r__2,r__3);
 /* L80: */
     }
@@ -294,4 +304,14 @@ L90:
 /*     End of CCHKGL */
 
 } /* cchkgl_ */
+
+#undef bin_ref
+#undef bin_subscr
+#undef ain_ref
+#undef ain_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,28 +1,27 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cunmbr_(char *vect, char *side, char *trans, integer *m, 
 	integer *n, integer *k, complex *a, integer *lda, complex *tau, 
-	complex *c, integer *ldc, complex *work, integer *lwork, integer *
+	complex *c__, integer *ldc, complex *work, integer *lwork, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    If VECT = 'Q', CUNMBR overwrites the general complex M-by-N matrix C 
-  
+    If VECT = 'Q', CUNMBR overwrites the general complex M-by-N matrix C   
     with   
                     SIDE = 'L'     SIDE = 'R'   
     TRANS = 'N':      Q * C          C * Q   
     TRANS = 'C':      Q**H * C       C * Q**H   
 
-    If VECT = 'P', CUNMBR overwrites the general complex M-by-N matrix C 
-  
+    If VECT = 'P', CUNMBR overwrites the general complex M-by-N matrix C   
     with   
                     SIDE = 'L'     SIDE = 'R'   
     TRANS = 'N':      P * C          C * P   
@@ -108,50 +107,73 @@
             LWORK >= M*NB if SIDE = 'R', where NB is the optimal   
             blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
+    static integer c__2 = 2;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
+    address a__1[2];
+    integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2, i__3[2];
+    char ch__1[2];
+    /* Builtin functions   
+       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
     /* Local variables */
     static logical left;
     extern logical lsame_(char *, char *);
-    static integer iinfo, i1, i2, mi, ni, nq, nw;
-    extern /* Subroutine */ int xerbla_(char *, integer *), cunmlq_(
-	    char *, char *, integer *, integer *, integer *, complex *, 
-	    integer *, complex *, complex *, integer *, complex *, integer *, 
-	    integer *);
+    static integer iinfo, i1, i2, nb, mi, ni, nq, nw;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int cunmlq_(char *, char *, integer *, integer *, 
+	    integer *, complex *, integer *, complex *, complex *, integer *, 
+	    complex *, integer *, integer *);
     static logical notran;
     extern /* Subroutine */ int cunmqr_(char *, char *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, integer *);
     static logical applyq;
     static char transt[1];
+    static integer lwkopt;
+    static logical lquery;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     applyq = lsame_(vect, "Q");
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
+    lquery = *lwork == -1;
 
-/*     NQ is the order of Q or P and NW is the minimum dimension of WORK 
-*/
+/*     NQ is the order of Q or P and NW is the minimum dimension of WORK */
 
     if (left) {
 	nq = *m;
@@ -179,19 +201,67 @@
 	    *info = -8;
 	} else if (*ldc < max(1,*m)) {
 	    *info = -11;
-	} else if (*lwork < max(1,nw)) {
+	} else if (*lwork < max(1,nw) && ! lquery) {
 	    *info = -13;
 	}
     }
+
+    if (*info == 0) {
+	if (applyq) {
+	    if (left) {
+/* Writing concatenation */
+		i__3[0] = 1, a__1[0] = side;
+		i__3[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+		i__1 = *m - 1;
+		i__2 = *m - 1;
+		nb = ilaenv_(&c__1, "CUNMQR", ch__1, &i__1, n, &i__2, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    } else {
+/* Writing concatenation */
+		i__3[0] = 1, a__1[0] = side;
+		i__3[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+		i__1 = *n - 1;
+		i__2 = *n - 1;
+		nb = ilaenv_(&c__1, "CUNMQR", ch__1, m, &i__1, &i__2, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    }
+	} else {
+	    if (left) {
+/* Writing concatenation */
+		i__3[0] = 1, a__1[0] = side;
+		i__3[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+		i__1 = *m - 1;
+		i__2 = *m - 1;
+		nb = ilaenv_(&c__1, "CUNMLQ", ch__1, &i__1, n, &i__2, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    } else {
+/* Writing concatenation */
+		i__3[0] = 1, a__1[0] = side;
+		i__3[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+		i__1 = *n - 1;
+		i__2 = *n - 1;
+		nb = ilaenv_(&c__1, "CUNMLQ", ch__1, m, &i__1, &i__2, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    }
+	}
+	lwkopt = max(1,nw) * nb;
+	work[1].r = (real) lwkopt, work[1].i = 0.f;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CUNMBR", &i__1);
 	return 0;
+    } else if (lquery) {
     }
 
 /*     Quick return if possible */
 
-    WORK(1).r = 1.f, WORK(1).i = 0.f;
+    work[1].r = 1.f, work[1].i = 0.f;
     if (*m == 0 || *n == 0) {
 	return 0;
     }
@@ -204,7 +274,8 @@
 
 /*           Q was determined by a call to CGEBRD with nq >= k */
 
-	    cunmqr_(side, trans, m, n, k, &A(1,1), lda, &TAU(1), &C(1,1), ldc, &WORK(1), lwork, &iinfo);
+	    cunmqr_(side, trans, m, n, k, &a[a_offset], lda, &tau[1], &c__[
+		    c_offset], ldc, &work[1], lwork, &iinfo);
 	} else if (nq > 1) {
 
 /*           Q was determined by a call to CGEBRD with nq < k */
@@ -221,8 +292,8 @@
 		i2 = 2;
 	    }
 	    i__1 = nq - 1;
-	    cunmqr_(side, trans, &mi, &ni, &i__1, &A(2,1), lda, &TAU(1)
-		    , &C(i1,i2), ldc, &WORK(1), lwork, &iinfo);
+	    cunmqr_(side, trans, &mi, &ni, &i__1, &a_ref(2, 1), lda, &tau[1], 
+		    &c___ref(i1, i2), ldc, &work[1], lwork, &iinfo);
 	}
     } else {
 
@@ -237,7 +308,8 @@
 
 /*           P was determined by a call to CGEBRD with nq > k */
 
-	    cunmlq_(side, transt, m, n, k, &A(1,1), lda, &TAU(1), &C(1,1), ldc, &WORK(1), lwork, &iinfo);
+	    cunmlq_(side, transt, m, n, k, &a[a_offset], lda, &tau[1], &c__[
+		    c_offset], ldc, &work[1], lwork, &iinfo);
 	} else if (nq > 1) {
 
 /*           P was determined by a call to CGEBRD with nq <= k */
@@ -254,14 +326,20 @@
 		i2 = 2;
 	    }
 	    i__1 = nq - 1;
-	    cunmlq_(side, transt, &mi, &ni, &i__1, &A(1,2), lda,
-		     &TAU(1), &C(i1,i2), ldc, &WORK(1), lwork, &
-		    iinfo);
+	    cunmlq_(side, transt, &mi, &ni, &i__1, &a_ref(1, 2), lda, &tau[1],
+		     &c___ref(i1, i2), ldc, &work[1], lwork, &iinfo);
 	}
     }
+    work[1].r = (real) lwkopt, work[1].i = 0.f;
     return 0;
 
 /*     End of CUNMBR */
 
 } /* cunmbr_ */
+
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
 

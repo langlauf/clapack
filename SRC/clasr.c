@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clasr_(char *side, char *pivot, char *direct, integer *m,
-	 integer *n, real *c, real *s, complex *a, integer *lda)
+	 integer *n, real *c__, real *s, complex *a, integer *lda)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -20,8 +21,7 @@
 
     where A is an m by n complex matrix and P is an orthogonal matrix,   
     consisting of a sequence of plane rotations determined by the   
-    parameters PIVOT and DIRECT as follows ( z = m when SIDE = 'L' or 'l' 
-  
+    parameters PIVOT and DIRECT as follows ( z = m when SIDE = 'L' or 'l'   
     and z = n when SIDE = 'R' or 'r' ):   
 
     When  DIRECT = 'F' or 'f'  ( Forward sequence ) then   
@@ -43,8 +43,7 @@
        when  PIVOT = 'B' or 'b'  ( Bottom pivot ),   
           the plane ( k, z )   
 
-    c( k ) and s( k )  must contain the  cosine and sine that define the 
-  
+    c( k ) and s( k )  must contain the  cosine and sine that define the   
     matrix  P( k ).  The two by two plane rotation part of the matrix   
     P( k ), R( k ), is assumed to be of the form   
 
@@ -74,8 +73,7 @@
             = 'B':  Bottom pivot, the plane (k,z)   
 
     M       (input) INTEGER   
-            The number of rows of the matrix A.  If m <= 1, an immediate 
-  
+            The number of rows of the matrix A.  If m <= 1, an immediate   
             return is effected.   
 
     N       (input) INTEGER   
@@ -98,40 +96,40 @@
     LDA     (input) INTEGER   
             The leading dimension of the array A.  LDA >= max(1,M).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
     complex q__1, q__2, q__3;
     /* Local variables */
     static integer info;
     static complex temp;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real ctemp, stemp;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    --c__;
+    --s;
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-#define C(I) c[(I)-1]
-#define S(I) s[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     info = 0;
     if (! (lsame_(side, "L") || lsame_(side, "R"))) {
 	info = 1;
-    } else if (! (lsame_(pivot, "V") || lsame_(pivot, "T") || 
-	    lsame_(pivot, "B"))) {
+    } else if (! (lsame_(pivot, "V") || lsame_(pivot, 
+	    "T") || lsame_(pivot, "B"))) {
 	info = 2;
-    } else if (! (lsame_(direct, "F") || lsame_(direct, "B")))
-	     {
+    } else if (! (lsame_(direct, "F") || lsame_(direct, 
+	    "B"))) {
 	info = 3;
     } else if (*m < 0) {
 	info = 4;
@@ -157,28 +155,30 @@
 	if (lsame_(pivot, "V")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m - 1;
-		for (j = 1; j <= *m-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__3 = j + 1 + i * a_dim1;
-			    temp.r = A(j+1,i).r, temp.i = A(j+1,i).i;
-			    i__3 = j + 1 + i * a_dim1;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(j + 1, i__);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(j + 1, i__);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__4 = j + i * a_dim1;
-			    q__3.r = stemp * A(j,i).r, q__3.i = stemp * A(j,i).i;
+			    i__4 = a_subscr(j, i__);
+			    q__3.r = stemp * a[i__4].r, q__3.i = stemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(j+1,i).r = q__1.r, A(j+1,i).i = q__1.i;
-			    i__3 = j + i * a_dim1;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(j, i__);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__4 = j + i * a_dim1;
-			    q__3.r = ctemp * A(j,i).r, q__3.i = ctemp * A(j,i).i;
+			    i__4 = a_subscr(j, i__);
+			    q__3.r = ctemp * a[i__4].r, q__3.i = ctemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L10: */
 			}
 		    }
@@ -186,27 +186,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__2 = j + 1 + i * a_dim1;
-			    temp.r = A(j+1,i).r, temp.i = A(j+1,i).i;
-			    i__2 = j + 1 + i * a_dim1;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(j + 1, i__);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(j + 1, i__);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__3 = j + i * a_dim1;
-			    q__3.r = stemp * A(j,i).r, q__3.i = stemp * A(j,i).i;
+			    i__3 = a_subscr(j, i__);
+			    q__3.r = stemp * a[i__3].r, q__3.i = stemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(j+1,i).r = q__1.r, A(j+1,i).i = q__1.i;
-			    i__2 = j + i * a_dim1;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(j, i__);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__3 = j + i * a_dim1;
-			    q__3.r = ctemp * A(j,i).r, q__3.i = ctemp * A(j,i).i;
+			    i__3 = a_subscr(j, i__);
+			    q__3.r = ctemp * a[i__3].r, q__3.i = ctemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L30: */
 			}
 		    }
@@ -216,28 +218,30 @@
 	} else if (lsame_(pivot, "T")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m;
-		for (j = 2; j <= *m; ++j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		for (j = 2; j <= i__1; ++j) {
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__3 = j + i * a_dim1;
-			    temp.r = A(j,i).r, temp.i = A(j,i).i;
-			    i__3 = j + i * a_dim1;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(j, i__);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(j, i__);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__4 = i * a_dim1 + 1;
-			    q__3.r = stemp * A(1,i).r, q__3.i = stemp * A(1,i).i;
+			    i__4 = a_subscr(1, i__);
+			    q__3.r = stemp * a[i__4].r, q__3.i = stemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
-			    i__3 = i * a_dim1 + 1;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(1, i__);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__4 = i * a_dim1 + 1;
-			    q__3.r = ctemp * A(1,i).r, q__3.i = ctemp * A(1,i).i;
+			    i__4 = a_subscr(1, i__);
+			    q__3.r = ctemp * a[i__4].r, q__3.i = ctemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(1,i).r = q__1.r, A(1,i).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L50: */
 			}
 		    }
@@ -245,27 +249,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m; j >= 2; --j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__2 = j + i * a_dim1;
-			    temp.r = A(j,i).r, temp.i = A(j,i).i;
-			    i__2 = j + i * a_dim1;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(j, i__);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(j, i__);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__3 = i * a_dim1 + 1;
-			    q__3.r = stemp * A(1,i).r, q__3.i = stemp * A(1,i).i;
+			    i__3 = a_subscr(1, i__);
+			    q__3.r = stemp * a[i__3].r, q__3.i = stemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
-			    i__2 = i * a_dim1 + 1;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(1, i__);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__3 = i * a_dim1 + 1;
-			    q__3.r = ctemp * A(1,i).r, q__3.i = ctemp * A(1,i).i;
+			    i__3 = a_subscr(1, i__);
+			    q__3.r = ctemp * a[i__3].r, q__3.i = ctemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(1,i).r = q__1.r, A(1,i).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L70: */
 			}
 		    }
@@ -275,28 +281,30 @@
 	} else if (lsame_(pivot, "B")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m - 1;
-		for (j = 1; j <= *m-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__3 = j + i * a_dim1;
-			    temp.r = A(j,i).r, temp.i = A(j,i).i;
-			    i__3 = j + i * a_dim1;
-			    i__4 = *m + i * a_dim1;
-			    q__2.r = stemp * A(*m,i).r, q__2.i = stemp * A(*m,i).i;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(j, i__);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(j, i__);
+			    i__4 = a_subscr(*m, i__);
+			    q__2.r = stemp * a[i__4].r, q__2.i = stemp * a[
+				    i__4].i;
 			    q__3.r = ctemp * temp.r, q__3.i = ctemp * temp.i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
-			    i__3 = *m + i * a_dim1;
-			    i__4 = *m + i * a_dim1;
-			    q__2.r = ctemp * A(*m,i).r, q__2.i = ctemp * A(*m,i).i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(*m, i__);
+			    i__4 = a_subscr(*m, i__);
+			    q__2.r = ctemp * a[i__4].r, q__2.i = ctemp * a[
+				    i__4].i;
 			    q__3.r = stemp * temp.r, q__3.i = stemp * temp.i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(*m,i).r = q__1.r, A(*m,i).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L90: */
 			}
 		    }
@@ -304,27 +312,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__2 = j + i * a_dim1;
-			    temp.r = A(j,i).r, temp.i = A(j,i).i;
-			    i__2 = j + i * a_dim1;
-			    i__3 = *m + i * a_dim1;
-			    q__2.r = stemp * A(*m,i).r, q__2.i = stemp * A(*m,i).i;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(j, i__);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(j, i__);
+			    i__3 = a_subscr(*m, i__);
+			    q__2.r = stemp * a[i__3].r, q__2.i = stemp * a[
+				    i__3].i;
 			    q__3.r = ctemp * temp.r, q__3.i = ctemp * temp.i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(j,i).r = q__1.r, A(j,i).i = q__1.i;
-			    i__2 = *m + i * a_dim1;
-			    i__3 = *m + i * a_dim1;
-			    q__2.r = ctemp * A(*m,i).r, q__2.i = ctemp * A(*m,i).i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(*m, i__);
+			    i__3 = a_subscr(*m, i__);
+			    q__2.r = ctemp * a[i__3].r, q__2.i = ctemp * a[
+				    i__3].i;
 			    q__3.r = stemp * temp.r, q__3.i = stemp * temp.i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(*m,i).r = q__1.r, A(*m,i).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L110: */
 			}
 		    }
@@ -339,28 +349,30 @@
 	if (lsame_(pivot, "V")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__3 = i + (j + 1) * a_dim1;
-			    temp.r = A(i,j+1).r, temp.i = A(i,j+1).i;
-			    i__3 = i + (j + 1) * a_dim1;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(i__, j + 1);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(i__, j + 1);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__4 = i + j * a_dim1;
-			    q__3.r = stemp * A(i,j).r, q__3.i = stemp * A(i,j).i;
+			    i__4 = a_subscr(i__, j);
+			    q__3.r = stemp * a[i__4].r, q__3.i = stemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,j+1).r = q__1.r, A(i,j+1).i = q__1.i;
-			    i__3 = i + j * a_dim1;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(i__, j);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__4 = i + j * a_dim1;
-			    q__3.r = ctemp * A(i,j).r, q__3.i = ctemp * A(i,j).i;
+			    i__4 = a_subscr(i__, j);
+			    q__3.r = ctemp * a[i__4].r, q__3.i = ctemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L130: */
 			}
 		    }
@@ -368,27 +380,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__2 = i + (j + 1) * a_dim1;
-			    temp.r = A(i,j+1).r, temp.i = A(i,j+1).i;
-			    i__2 = i + (j + 1) * a_dim1;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(i__, j + 1);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(i__, j + 1);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__3 = i + j * a_dim1;
-			    q__3.r = stemp * A(i,j).r, q__3.i = stemp * A(i,j).i;
+			    i__3 = a_subscr(i__, j);
+			    q__3.r = stemp * a[i__3].r, q__3.i = stemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,j+1).r = q__1.r, A(i,j+1).i = q__1.i;
-			    i__2 = i + j * a_dim1;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(i__, j);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__3 = i + j * a_dim1;
-			    q__3.r = ctemp * A(i,j).r, q__3.i = ctemp * A(i,j).i;
+			    i__3 = a_subscr(i__, j);
+			    q__3.r = ctemp * a[i__3].r, q__3.i = ctemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L150: */
 			}
 		    }
@@ -398,28 +412,30 @@
 	} else if (lsame_(pivot, "T")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n;
-		for (j = 2; j <= *n; ++j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		for (j = 2; j <= i__1; ++j) {
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__3 = i + j * a_dim1;
-			    temp.r = A(i,j).r, temp.i = A(i,j).i;
-			    i__3 = i + j * a_dim1;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(i__, j);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(i__, j);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__4 = i + a_dim1;
-			    q__3.r = stemp * A(i,1).r, q__3.i = stemp * A(i,1).i;
+			    i__4 = a_subscr(i__, 1);
+			    q__3.r = stemp * a[i__4].r, q__3.i = stemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
-			    i__3 = i + a_dim1;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(i__, 1);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__4 = i + a_dim1;
-			    q__3.r = ctemp * A(i,1).r, q__3.i = ctemp * A(i,1).i;
+			    i__4 = a_subscr(i__, 1);
+			    q__3.r = ctemp * a[i__4].r, q__3.i = ctemp * a[
+				    i__4].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,1).r = q__1.r, A(i,1).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L170: */
 			}
 		    }
@@ -427,27 +443,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n; j >= 2; --j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__2 = i + j * a_dim1;
-			    temp.r = A(i,j).r, temp.i = A(i,j).i;
-			    i__2 = i + j * a_dim1;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(i__, j);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(i__, j);
 			    q__2.r = ctemp * temp.r, q__2.i = ctemp * temp.i;
-			    i__3 = i + a_dim1;
-			    q__3.r = stemp * A(i,1).r, q__3.i = stemp * A(i,1).i;
+			    i__3 = a_subscr(i__, 1);
+			    q__3.r = stemp * a[i__3].r, q__3.i = stemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
-			    i__2 = i + a_dim1;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(i__, 1);
 			    q__2.r = stemp * temp.r, q__2.i = stemp * temp.i;
-			    i__3 = i + a_dim1;
-			    q__3.r = ctemp * A(i,1).r, q__3.i = ctemp * A(i,1).i;
+			    i__3 = a_subscr(i__, 1);
+			    q__3.r = ctemp * a[i__3].r, q__3.i = ctemp * a[
+				    i__3].i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,1).r = q__1.r, A(i,1).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L190: */
 			}
 		    }
@@ -457,28 +475,30 @@
 	} else if (lsame_(pivot, "B")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__3 = i + j * a_dim1;
-			    temp.r = A(i,j).r, temp.i = A(i,j).i;
-			    i__3 = i + j * a_dim1;
-			    i__4 = i + *n * a_dim1;
-			    q__2.r = stemp * A(i,*n).r, q__2.i = stemp * A(i,*n).i;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = a_subscr(i__, j);
+			    temp.r = a[i__3].r, temp.i = a[i__3].i;
+			    i__3 = a_subscr(i__, j);
+			    i__4 = a_subscr(i__, *n);
+			    q__2.r = stemp * a[i__4].r, q__2.i = stemp * a[
+				    i__4].i;
 			    q__3.r = ctemp * temp.r, q__3.i = ctemp * temp.i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
-			    i__3 = i + *n * a_dim1;
-			    i__4 = i + *n * a_dim1;
-			    q__2.r = ctemp * A(i,*n).r, q__2.i = ctemp * A(i,*n).i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
+			    i__3 = a_subscr(i__, *n);
+			    i__4 = a_subscr(i__, *n);
+			    q__2.r = ctemp * a[i__4].r, q__2.i = ctemp * a[
+				    i__4].i;
 			    q__3.r = stemp * temp.r, q__3.i = stemp * temp.i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,*n).r = q__1.r, A(i,*n).i = q__1.i;
+			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L210: */
 			}
 		    }
@@ -486,27 +506,29 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__2 = i + j * a_dim1;
-			    temp.r = A(i,j).r, temp.i = A(i,j).i;
-			    i__2 = i + j * a_dim1;
-			    i__3 = i + *n * a_dim1;
-			    q__2.r = stemp * A(i,*n).r, q__2.i = stemp * A(i,*n).i;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = a_subscr(i__, j);
+			    temp.r = a[i__2].r, temp.i = a[i__2].i;
+			    i__2 = a_subscr(i__, j);
+			    i__3 = a_subscr(i__, *n);
+			    q__2.r = stemp * a[i__3].r, q__2.i = stemp * a[
+				    i__3].i;
 			    q__3.r = ctemp * temp.r, q__3.i = ctemp * temp.i;
 			    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + 
 				    q__3.i;
-			    A(i,j).r = q__1.r, A(i,j).i = q__1.i;
-			    i__2 = i + *n * a_dim1;
-			    i__3 = i + *n * a_dim1;
-			    q__2.r = ctemp * A(i,*n).r, q__2.i = ctemp * A(i,*n).i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
+			    i__2 = a_subscr(i__, *n);
+			    i__3 = a_subscr(i__, *n);
+			    q__2.r = ctemp * a[i__3].r, q__2.i = ctemp * a[
+				    i__3].i;
 			    q__3.r = stemp * temp.r, q__3.i = stemp * temp.i;
 			    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - 
 				    q__3.i;
-			    A(i,*n).r = q__1.r, A(i,*n).i = q__1.i;
+			    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L230: */
 			}
 		    }
@@ -521,4 +543,8 @@
 /*     End of CLASR */
 
 } /* clasr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

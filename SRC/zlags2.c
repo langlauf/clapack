@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlags2_(logical *upper, doublereal *a1, doublecomplex *
@@ -5,7 +6,7 @@
 	 doublereal *csu, doublecomplex *snu, doublereal *csv, doublecomplex *
 	snv, doublereal *csq, doublecomplex *snq)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -43,8 +44,7 @@
     The rows of the transformed A and B are parallel. Moreover, if the   
     input 2-by-2 matrix A is not zero, then the transformed (1,1) entry   
     of A is not zero. If the input matrices A and B are both not zero,   
-    then the transformed (2,2) element of B is not zero, except when the 
-  
+    then the transformed (2,2) element of B is not zero, except when the   
     first rows of input A and B are parallel and the second rows are   
     zero.   
 
@@ -79,8 +79,7 @@
     SNQ     (output) COMPLEX*16   
             The desired unitary matrix Q.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* System generated locals */
     doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8;
     doublecomplex z__1, z__2, z__3, z__4, z__5;
@@ -90,9 +89,9 @@
     /* Local variables */
     static doublereal aua11, aua12, aua21, aua22, avb12, avb11, avb21, avb22, 
 	    ua11r, ua22r, vb11r, vb22r, a;
-    static doublecomplex b, c;
-    static doublereal d;
-    static doublecomplex r, d1;
+    static doublecomplex b, c__;
+    static doublereal d__;
+    static doublecomplex r__, d1;
     static doublereal s1, s2;
     extern /* Subroutine */ int dlasv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
@@ -113,15 +112,14 @@
                                      ( 0 d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
+	d__ = *a3 * *b1;
 	z__2.r = *b1 * a2->r, z__2.i = *b1 * a2->i;
 	z__3.r = *a1 * b2->r, z__3.i = *a1 * b2->i;
 	z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
 	b.r = z__1.r, b.i = z__1.i;
 	fb = z_abs(&b);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary 
-  
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
           diagonal matrix diag(1,D1). */
 
 	d1.r = 1., d1.i = 0.;
@@ -135,12 +133,11 @@
            ( CSL -SNL )*( A B )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( 0 D ) ( -SNR  CSR )   ( 0 T ) */
 
-	dlasv2_(&a, &fb, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	dlasv2_(&a, &fb, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (abs(csl) >= abs(snl) || abs(csr) >= abs(snr)) {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua11r = csl * *a1;
@@ -169,13 +166,13 @@
 		z__2.r = vb11r, z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &vb12);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else if (abs(vb11r) + ((d__1 = vb12.r, abs(d__1)) + (d__2 = 
 		    d_imag(&vb12), abs(d__2))) == 0.) {
 		z__2.r = ua11r, z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &ua12);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else if (aua12 / (abs(ua11r) + ((d__1 = ua12.r, abs(d__1)) + (
 		    d__2 = d_imag(&ua12), abs(d__2)))) <= avb12 / (abs(vb11r) 
 		    + ((d__3 = vb12.r, abs(d__3)) + (d__4 = d_imag(&vb12), 
@@ -183,12 +180,12 @@
 		z__2.r = ua11r, z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &ua12);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else {
 		z__2.r = vb11r, z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &vb12);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    }
 
 	    *csu = csl;
@@ -202,8 +199,7 @@
 
 	} else {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    d_cnjg(&z__4, &d1);
@@ -239,8 +235,7 @@
 	    avb22 = abs(snr) * ((d__1 = b2->r, abs(d__1)) + (d__2 = d_imag(b2)
 		    , abs(d__2))) + abs(csr) * abs(*b3);
 
-/*           zero (2,2) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (2,2) elements of U'*A and V'*B, and then swap. */
 
 	    if ((d__1 = ua21.r, abs(d__1)) + (d__2 = d_imag(&ua21), abs(d__2))
 		     + ((d__3 = ua22.r, abs(d__3)) + (d__4 = d_imag(&ua22), 
@@ -248,13 +243,13 @@
 		d_cnjg(&z__2, &vb21);
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &vb22);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else if ((d__1 = vb21.r, abs(d__1)) + (d__2 = d_imag(&vb21), 
 		    abs(d__2)) + z_abs(&vb22) == 0.) {
 		d_cnjg(&z__2, &ua21);
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &ua22);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else if (aua22 / ((d__1 = ua21.r, abs(d__1)) + (d__2 = d_imag(&
 		    ua21), abs(d__2)) + ((d__3 = ua22.r, abs(d__3)) + (d__4 = 
 		    d_imag(&ua22), abs(d__4)))) <= avb22 / ((d__5 = vb21.r, 
@@ -264,12 +259,12 @@
 		d_cnjg(&z__2, &ua21);
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &ua22);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    } else {
 		d_cnjg(&z__2, &vb21);
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
 		d_cnjg(&z__3, &vb22);
-		zlartg_(&z__1, &z__3, csq, snq, &r);
+		zlartg_(&z__1, &z__3, csq, snq, &r__);
 	    }
 
 	    *csu = snl;
@@ -289,20 +284,19 @@
                                      ( c d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
+	d__ = *a3 * *b1;
 	z__2.r = *b3 * a2->r, z__2.i = *b3 * a2->i;
 	z__3.r = *a3 * b2->r, z__3.i = *a3 * b2->i;
 	z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
-	c.r = z__1.r, c.i = z__1.i;
-	fc = z_abs(&c);
+	c__.r = z__1.r, c__.i = z__1.i;
+	fc = z_abs(&c__);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary 
-  
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
           diagonal matrix diag(d1,1). */
 
 	d1.r = 1., d1.i = 0.;
 	if (fc != 0.) {
-	    z__1.r = c.r / fc, z__1.i = c.i / fc;
+	    z__1.r = c__.r / fc, z__1.i = c__.i / fc;
 	    d1.r = z__1.r, d1.i = z__1.i;
 	}
 
@@ -311,12 +305,11 @@
            ( CSL -SNL )*( A 0 )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( C D ) ( -SNR  CSR )   ( 0 T ) */
 
-	dlasv2_(&a, &fc, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	dlasv2_(&a, &fc, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (abs(csr) >= abs(snr) || abs(csl) >= abs(snl)) {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    z__4.r = -d1.r, z__4.i = -d1.i;
@@ -345,20 +338,20 @@
 	    if ((d__1 = ua21.r, abs(d__1)) + (d__2 = d_imag(&ua21), abs(d__2))
 		     + abs(ua22r) == 0.) {
 		z__1.r = vb22r, z__1.i = 0.;
-		zlartg_(&z__1, &vb21, csq, snq, &r);
+		zlartg_(&z__1, &vb21, csq, snq, &r__);
 	    } else if ((d__1 = vb21.r, abs(d__1)) + (d__2 = d_imag(&vb21), 
 		    abs(d__2)) + abs(vb22r) == 0.) {
 		z__1.r = ua22r, z__1.i = 0.;
-		zlartg_(&z__1, &ua21, csq, snq, &r);
+		zlartg_(&z__1, &ua21, csq, snq, &r__);
 	    } else if (aua21 / ((d__1 = ua21.r, abs(d__1)) + (d__2 = d_imag(&
 		    ua21), abs(d__2)) + abs(ua22r)) <= avb21 / ((d__3 = 
 		    vb21.r, abs(d__3)) + (d__4 = d_imag(&vb21), abs(d__4)) + 
 		    abs(vb22r))) {
 		z__1.r = ua22r, z__1.i = 0.;
-		zlartg_(&z__1, &ua21, csq, snq, &r);
+		zlartg_(&z__1, &ua21, csq, snq, &r__);
 	    } else {
 		z__1.r = vb22r, z__1.i = 0.;
-		zlartg_(&z__1, &vb21, csq, snq, &r);
+		zlartg_(&z__1, &vb21, csq, snq, &r__);
 	    }
 
 	    *csu = csr;
@@ -374,8 +367,7 @@
 
 	} else {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    d__1 = csr * *a1;
@@ -407,26 +399,25 @@
 	    avb11 = abs(csl) * abs(*b1) + abs(snl) * ((d__1 = b2->r, abs(d__1)
 		    ) + (d__2 = d_imag(b2), abs(d__2)));
 
-/*           zero (1,1) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (1,1) elements of U'*A and V'*B, and then swap. */
 
 	    if ((d__1 = ua11.r, abs(d__1)) + (d__2 = d_imag(&ua11), abs(d__2))
 		     + ((d__3 = ua12.r, abs(d__3)) + (d__4 = d_imag(&ua12), 
 		    abs(d__4))) == 0.) {
-		zlartg_(&vb12, &vb11, csq, snq, &r);
+		zlartg_(&vb12, &vb11, csq, snq, &r__);
 	    } else if ((d__1 = vb11.r, abs(d__1)) + (d__2 = d_imag(&vb11), 
 		    abs(d__2)) + ((d__3 = vb12.r, abs(d__3)) + (d__4 = d_imag(
 		    &vb12), abs(d__4))) == 0.) {
-		zlartg_(&ua12, &ua11, csq, snq, &r);
+		zlartg_(&ua12, &ua11, csq, snq, &r__);
 	    } else if (aua11 / ((d__1 = ua11.r, abs(d__1)) + (d__2 = d_imag(&
 		    ua11), abs(d__2)) + ((d__3 = ua12.r, abs(d__3)) + (d__4 = 
 		    d_imag(&ua12), abs(d__4)))) <= avb11 / ((d__5 = vb11.r, 
 		    abs(d__5)) + (d__6 = d_imag(&vb11), abs(d__6)) + ((d__7 = 
 		    vb12.r, abs(d__7)) + (d__8 = d_imag(&vb12), abs(d__8))))) 
 		    {
-		zlartg_(&ua12, &ua11, csq, snq, &r);
+		zlartg_(&ua12, &ua11, csq, snq, &r__);
 	    } else {
-		zlartg_(&vb12, &vb11, csq, snq, &r);
+		zlartg_(&vb12, &vb11, csq, snq, &r__);
 	    }
 
 	    *csu = snr;

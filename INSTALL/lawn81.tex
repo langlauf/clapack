@@ -59,19 +59,19 @@
 \begin{center}
 %  Edward Anderson\footnote{Current address:  Cray Research Inc.,
 %                           655F Lone Oak Drive, Eagan, MN  55121},
-  Jack Dongarra and Susan Ostrouchov\\
+  Susan Blackford and Jack Dongarra\\
   Department of Computer Science \\
   University of Tennessee \\
   Knoxville, Tennessee  37996-1301 \\
 \end{center}
 \begin{center}
-  REVISED:  VERSION 2.0, September 30, 1994
+  REVISED:  VERSION 3.0, June 30, 1999
 \end{center}
 
 \begin{center}
 Abstract
 \end{center}
-This working note describes how to install, test, and time version 2.0
+This working note describes how to install, test, and time version 3.0
 of LAPACK, a linear algebra package for high-performance
 computers, on a Unix System.  Non-Unix installation instructions and
 further details of the testing and timing suites are only contained in
@@ -111,7 +111,7 @@ person whose
 responsibility is the maintenance of a mathematical software library.
 We assume the installer has experience in compiling and running 
 Fortran programs and in creating object libraries.
-The installation process involves reading the tape or tarring the file, creating a set of
+The installation process involves untarring the file, creating a set of
 libraries, and compiling and running the test and timing programs.
 
 %This guide combines the instructions for the Unix and non-Unix
@@ -121,8 +121,8 @@ libraries, and compiling and running the test and timing programs.
 %after first untarring the Unix tar tape and then following the instructions in
 %Appendix ~\ref{appendixe}.
 
-Section~\ref{fileformat} describes how the files are organized on the tape
-or file, and
+Section~\ref{fileformat} describes how the files are organized in the
+file, and
 Section~\ref{overview} gives a general overview of the parts of the test package.
 Step-by-step instructions appear in Section~\ref{installation}.
 %for the Unix version and in the appendix for the non-Unix version.
@@ -137,10 +137,12 @@ Working Note 41.
 %in this release.  
 %Appendix ~\ref{appendixc} lists the operation counts we have computed 
 %for the BLAS and for some of the LAPACK routines.
-%Appendix ~\ref{appendixd}, entitled ``Caveats'', is a compendium of the known 
-%problems from our own experiences, with suggestions on how to 
-%overcome them.  {\em It is strongly advised that the user read Appendix
-%D before proceeding with the installation process.}
+Appendix ~\ref{appendixd}, entitled ``Caveats'', is a compendium of the known 
+problems from our own experiences, with suggestions on how to 
+overcome them.
+
+{\bf It is strongly advised that the user read Appendix
+A before proceeding with the installation process.}
 %Appendix E contains the execution times of the different test
 %and timing runs on two sample machines.
 %Appendix ~\ref{appendixe} contains the instructions to install LAPACK on a non-Unix
@@ -150,104 +152,35 @@ Working Note 41.
 
 \dent
 Since its first public release in February, 1992, LAPACK has had
-several updates, which have encompassed the introduction of new routines as
-well as extending the functionality of existing routines.  The first update,
+several updates, which have encompassed the introduction of new routines
+as well as extending the functionality of existing routines.  The first
+update,
 June 30, 1992, was version 1.0a; the second update, October 31, 1992,
-was version 1.0b; the third update, March 31, 1993, was version 1.1; and
-finally, September 30, 1994, version 2.0.  All LAPACK routines reflect the current
-version number with the date 
+was version 1.0b; the third update, March 31, 1993, was version 1.1;
+version 2.0 on September 30, 1994, coincided with the release of the
+Second Edition of the LAPACK Users' Guide; and finally, version 3.0 was
+released on June 30, 1999, and coincided with the Third Edition of
+the LAPACK Users' Guide.
+All LAPACK routines reflect the current version number with the date
 on the routine indicating when it was last modified.
-For more information on
-revisions please refer to the LAPACK release\_notes file
-on netlib, or the second edition of the LAPACK Users' Guide.
+For more information on revisions in the latest release, please refer
+to the {\tt revisions.info} file in the lapack directory on netlib.
+\begin{quote}
+{\tt http://www.netlib.org/lapack/revisions.info}
+\end{quote}
 
-We plan to have only one or two updates a year, and provide a PRERELEASE
-directory on netlib to contain new software that is being considered for
-inclusion.  Users can then provide input and experimentation with these
-prerelease routines.  The {\tt tar} file {\tt lapack.tar.z} that is
-available on netlib is always the most up-to-date.
-
-On-line manpages (troff files) for LAPACK driver and computational
-routines, as well as most of the BLAS routines, are available via 
-the {\tt lapack} index on netlib.
-
-%The new routines that have been introduced are
-%driver and computational routines for
-%the generalized nonsymmetric eigenproblem,
-%generalized linear least squares problems,
-%the generalized singular value decomposition,
-%a generalized banded symmetric-definite eigenproblem,
-%and divide-and-conquer methods for symmetric eigenproblems.
-%Additional computational routines include
-%the generalized QR and RQ factorizations, and
-%reduction of a band matrix to bidiagonal form.
-
-%Added functionality has been incorporated into the expert driver
-%routines that involve equilibration (xGESVX, xGBSVX, xPOSVX, xPPSVX,
-%and xPBSVX).  The option FACT = 'F' now permits the user to input a
-%prefactored, pre-equilibrated matrix.  The expert drivers xGESVX and
-%xGBSVX
-%now return the reciprocal of the pivot growth from Gaussian
-%elimination.  xBDSQR has been modified to compute singular values of
-%bidiagonal matrices much more quickly than before, provided singular
-%vectors are not also wanted.
-%The least squares driver
-%routines xGELS, xGELSS, and xGELSX now make available the residual
-%root-sum-squares for each right hand side.
+%The distribution {\tt tar} file {\tt lapack.tar.z} that is
+%available on netlib is always the most up-to-date.
 %
-%\section*{Bug Fixes and Code Modifications:}
-%\begin{itemize}
-%\item CHEGST, CHSEQR, SSTEBZ (and their double precision equivalents)
-%had errors corrected;
-%\item CLANST $\rightarrow$ CLANHT name change to avoid notation
-%confusion;
-%\item Special version of ILAENV was missing from the TESTING and TIMING
-%directories;
-%\item All -EVX drivers and xGESVX had incorrect workspace requirements
-%(WORK for the real routines, and RWORK in the complex routines)
-%specified in their Argument sections;
-%\item xGTCON also had incorrect workspace requirements specified in
-%its Argument section;
-%\item Added functionality has been incorporated into the expert driver
-%routines that involve equilibration (xGESVX, xGBSVX, xPOSVX, xPPSVX,
-%xPBSVX).  The option FACT = 'F' now permits the user to input a
-%prefactored, pre-equilibrated matrix.
-%\item comments added to SLAEBZ and SSTEBZ to enforce SCALAR mode in
-%certain loops; in addition, in front of each such "DO" statement
-%a series of compiler directives has been added which should
-%enforce SCALAR mode on most popular vector computers;
-%\end{itemize}
-%\section*{New Routines:}
-%\begin{itemize}
-%\item xGBBRD, computation routine for the banded reduction to bidiagonal
-%form;
-%\item xGEGS and xGEGV, driver routines for the Generalized Nonsymmetric
-%Eigenvalue Problem with accompanying computational and auxiliary
-%routines xGGBAK, xGGBAL, xGGHRD, xHGEQZ, xTGEVC, and SLAG2;
-%\item xGGQRF and xGGRQF, computational routines for the generalized QR
-%and RQ factorizations;
-%\item xGGSVD, driver routine for the generalized singular value
-%decomposition with accompanying computational and auxiliary routines
-%xGGSVP, xTGSJA, xLAGS2, xLAPLL, and xLAPMT;
-%\item xGGGLM, driver routine for the solution of the generalized linear
-%regression model;
-%\item xGGLSE, driver routine for the solution of the constrained linear
-%least squares problem;
-%\item SSBGV/CHBGV, driver routines for the generalized banded
-%symmetric-definite eigenproblem with accompanying computational routines
-%SSBGST/CHBGST, and xPBSTF;
-%\item xSBEVD, xSPEVD, SSTEVD, and SSYEVD/CHEEVD, divide and conquer
-%routines for symmetric eigenproblem with accompanying auxiliary routines
-%CLACRM, xLAED0, SLAED1, SLAED2, SLAED3, SLAED4, SLAED5, SLAED6, xLAED7,
-%xLAED8, SLAED9, SLAEDA, SLAMRG, SLASQ1, SLASQ2, SLASQ3, SLASQ4, and SLASRT.
-%\end{itemize}
+%On-line manpages (troff files) for LAPACK driver and computational
+%routines, as well as most of the BLAS routines, are available via 
+%the {\tt lapack} index on netlib.
 
 \section{File Format}\label{fileformat}
 
 \dent
 The software for LAPACK is distributed in the form of a
-compressed tar file (via xnetlib, anonymous ftp, or the World Wide Web)
-or a Unix {\tt tar} tape from NAG (Numerical Algorithms Group, Inc.),
+gzipped tar file (via anonymous ftp or the World Wide Web),
 which contains the Fortran source for LAPACK,
 the Basic Linear Algebra Subprograms
 (the Level 1, 2, and 3 BLAS) needed by LAPACK, the testing programs,
@@ -260,46 +193,25 @@ versions.
 %although the overview in section ~\ref{overview} applies to both the Unix and non-Unix
 %versions.
 
-%Xnetlib is an X-version of netlib developed at the University
-%of Tennessee and Oak Ridge National Laboratory.  Unlike netlib, which
-%uses electronic mail to process requests for software and other text,
-%xnetlib uses an X Window graphical user interface and a socket-based
-%connection between the user's machine and the xnetlib server machine to
-%process software requests.
-%To receive a copy of xnetlib send the message "send xnetlib.shar from
-%xnetlib" to netlib@ornl.gov.
-%When you receive the shar file, remove the mail header, save it to a
-%file, type 'sh filename' and follow the instructions in the README
-%file.
-%
-%After installing and invoking xnetlib, select the \fbox{LIBRARY} button
-%in the header menu with your mouse, click your mouse on the word {\tt lapack}
-%in the listing, and the current LAPACK index will appear.
-%At this point you can download any files (for example, the compressed tar
-%file {\tt lapack.tar.z}) by clicking the mouse on the desired file(s),
-%selecting the \fbox{DOWNLOAD} button from the menu, and finally
-%clicking on the \fbox{GET FILES NOW} button.
-%
-%Alternatively, you can retrieve the file via anonymous ftp at netlib.
-%Your instructions are:
-%
-%\begin{verbatim}
-%     ftp netlib2.cs.utk.edu
-%     login:  anonymous
-%     password:  <your email address>
-%     cd lapack
-%     binary
-%     get lapack.tar.z
-%     quit
-%\end{verbatim}
-%
-%And finally, the package may be accessed via the World Wide Web through
-%the URL address:
-%\begin{quote}
-%{\tt http://netlib2.cs.utk.edu/lapack/index.html}
-%\end{quote}
+The package may be accessed via the World Wide Web through
+the URL address:
+\begin{quote}
+{\tt http://www.netlib.org/lapack/lapack.tgz}
+\end{quote}
 
-The software on the {\tt tar} tape or {\tt tar} file
+Or, you can retrieve the file via anonymous ftp at netlib:
+
+\begin{verbatim}
+     ftp ftp.netlib.org
+     login:  anonymous
+     password:  <your email address>
+     cd lapack
+     binary
+     get lapack.tgz
+     quit
+\end{verbatim}
+
+The software in the {\tt tar} file
 is organized in a number of essential directories as shown
 in Figure 1.  Please note that this figure does not reflect everything
 that is contained in the {\tt LAPACK} directory.  Input and instructional
@@ -388,20 +300,32 @@ of the parallelism in the LAPACK routines is contained in the BLAS.
 Therefore,
 the key to getting good performance from LAPACK lies in having an
 efficient version of the BLAS optimized for your particular machine. 
-If you have access to a library containing optimized versions of some
-or all of the BLAS, you should certainly use it (but be sure to run
-the BLAS test programs).
-If an optimized library of the BLAS is not available,
-Fortran source code for the Level 1, 2, and 3 BLAS
-is provided on the tape.
-Users should not expect too much from the Fortran BLAS; these versions
-were written to define the basic operations and do not employ the
-standard tricks for optimizing Fortran code.
+Optimized BLAS libraries are available on a variety of architectures,
+refer to the BLAS FAQ on netlib for further information.
+\begin{quote}
+{\tt http://www.netlib.org/blas/faq.html}
+\end{quote}
+There are also freely available BLAS generators that automatically
+tune a subset of the BLAS for a given architecture.  E.g.,
+\begin{quote}
+{\tt http://www.netlib.org/atlas/}
+\end{quote}
+And, if all else fails, there is the Fortran~77 reference implementation
+of the Level 1, 2, and 3 BLAS available on netlib (also included in
+the LAPACK distribution tar file).
+\begin{quote}
+{\tt http://www.netlib.org/blas/blas.tgz}
+\end{quote}
+No matter which BLAS library is used, the BLAS test programs should
+always be run.
+
+Users should not expect too much from the Fortran~77 reference implementation
+BLAS; these versions were written to define the basic operations and do not
+employ the standard tricks for optimizing Fortran code.
 
 The formal definitions of the Level 1, 2, and 3 BLAS
 are in \cite{BLAS1}, \cite{BLAS2}, and \cite{BLAS3}. 
-Copies of the BLAS Quick Reference card are available from the authors
-or netlib.
+The BLAS Quick Reference card is available on netlib.
 
 \subsection{LAPACK Test Routines}
 
@@ -440,7 +364,7 @@ subroutines.
 Installing, testing, and timing the Unix version of LAPACK
 involves the following steps: 
 \begin{enumerate}
-\item Read the tape or uncompress and tar the file.
+\item Gunzip and tar the file.
 
 \item Edit the file {\tt LAPACK/make.inc}.
  
@@ -500,33 +424,20 @@ involves the following steps:
 %\end{list}
 \end{enumerate}
  
-\subsection{Read the Tape or Untar the File}
-\dent
-If you received a tar tape of LAPACK, type one of the following commands
-to unload the tape
-(the device name may be different at your site):
+\subsection{Untar the File}
 
-\begin{list}{}{}
-\item{{\tt tar  xvf  /dev/rst0 }}    (cartridge tape),  or
-
-\item{{\tt tar  xvf  /dev/rmt8 }}    (9-track tape)
-\end{list}
-
-Alternatively, if you received a tar file of LAPACK via xnetlib, anonymous
-ftp, or the World Wide Web, enter the following two commands to untar the file:
+If you received a tar file of LAPACK via the World Wide
+Web or anonymous ftp, enter the following command:
 
 \begin{list}{}
-\item{{\tt uncompress {\em file} (where {\em file} is the name of the
-compressed tar file)}}
-\item{{\tt tar xvf {\em file} (where {\em file} is the name of the tar
-file)}}
+\item{{\tt gunzip -c lapack.tgz | tar xvf -}}
 \end{list}
 
 \noindent
 This will create a top-level directory called {\tt LAPACK}, which
-requires approximately 33 Mbytes of disk space.
+requires approximately 34 Mbytes of disk space.
 The total space requirements including the object files and executables
-is approximately 80 Mbytes for all four data types.
+is approximately 100 Mbytes for all four data types.
 
 \subsection{Edit the file {\tt LAPACK/make.inc}}
 
@@ -534,22 +445,40 @@ is approximately 80 Mbytes for all four data types.
 Before the libraries can be built, or the testing and timing programs
 run, you must define all machine-specific parameters for the
 architecture to which you are installing LAPACK.  All machine-specific
-parameters are contained in the file {\tt LAPACK/make.inc}.  First, you will
+parameters are contained in the file {\tt LAPACK/make.inc}.
+
+The first line of this {\tt make.inc} file is:
+\begin{quote}
+SHELL = /bin/sh
+\end{quote}
+and it will need to be modified to {\tt SHELL = /sbin/sh} if you are
+installing LAPACK on an SGI architecture.
+Second, you will
 need to modify the {\tt PLAT} definition, which is appended to all
 library names, to specify the architecture to which you are installing
-LAPACK.  This features avoids confusion in library names when you are 
+LAPACK.  This features avoids confusion in library names when you are
 installing LAPACK on more than one architecture.  Next, you will need
-to modify {\tt FORTRAN}, {\tt OPTS}, {\tt NOOPT}, {\tt LOADER},
-{\tt LOADOPTS}, {\tt ARCH}, {\tt ARCHFLAGS}, and {\tt RANLIB} to specify 
-the compiler, compiler options, loader, loader options, archiver, 
+to modify {\tt FORTRAN}, {\tt OPTS}, {\tt DRVOPTS}, {\tt NOOPT}, {\tt LOADER},
+{\tt LOADOPTS}, {\tt ARCH}, {\tt ARCHFLAGS}, and {\tt RANLIB} to specify
+the compiler, compiler options, compiler options for the testing and
+timing main programs, loader, loader options, archiver,
 archiver options, and ranlib for your machine.  If your architecture
 does not require {\tt ranlib} to be run after each archive command (as
-is the case with CRAY computers running UNICOS, or Hewlett Packard
-computers running HP-UX), set {\tt ranlib=echo}.  And finally, you must
+is the case with CRAY computers running UNICOS, Hewlett Packard
+computers running HP-UX, or SUN SPARCstations running Solaris), set
+{\tt ranlib=echo}.  And finally, you must
 modify the {\tt BLASLIB} definition to specify the BLAS library to which
 you will be linking.  If an optimized version of the BLAS is available
 on your machine, you are highly recommended to link to that library.
-Otherwise, by default, {\tt BLASLIB} is set to the Fortran 77 version.
+Otherwise, by default, {\tt BLASLIB} is set to the Fortran 77 version.  \\
+
+{\bf NOTE:}  Example {\tt make.inc} include files are contained in the
+{\tt LAPACK/INSTALL} directory.  Please refer to
+Appendix~\ref{appendixd} for machine-specific installation hints, and/or
+the {\tt release\_notes} file on {\tt netlib}.
+\begin{quote}
+{\tt http://www.netlib.org/lapack/release\_notes}
+\end{quote}
 
 \subsection{Edit the file {\tt LAPACK/Makefile}}\label{toplevelmakefile}
 
@@ -579,17 +508,17 @@ building of all four data types.
 The make command can be run more than once to add another
 data type to the library if necessary.
 
-If you are installing LAPACK on a Silicon Graphics machine, you must
-modify the respective definitions of {\tt testing} and {\tt timing} to be
-\begin{verbatim}
-testing:
-        ( cd TESTING; $(MAKE) -f Makefile.sgi )
-\end{verbatim}
-and
-\begin{verbatim}
-timing:
-        ( cd TIMING; $(MAKE) -f Makefile.sgi )
-\end{verbatim}
+%If you are installing LAPACK on a Silicon Graphics machine, you must
+%modify the respective definitions of {\tt testing} and {\tt timing} to be
+%\begin{verbatim}
+%testing:
+%        ( cd TESTING; $(MAKE) -f Makefile.sgi )
+%\end{verbatim}
+%and
+%\begin{verbatim}
+%timing:
+%        ( cd TIMING; $(MAKE) -f Makefile.sgi )
+%\end{verbatim}
       
 Next, if you will be using a locally available BLAS library, you will need
 to remove {\tt blaslib} from the {\tt lib} definition.  And finally,
@@ -613,7 +542,7 @@ authors as described in Section~\ref{sendresults}.  If test failures
 occur, please refer to the appropriate subsection in
 Section~\ref{furtherdetails}.
 
-If disk space is limited, I would suggest building each data type separately
+If disk space is limited, we suggest building each data type separately
 and/or deleting all object files after building the libraries.  Likewise, all
 testing and timing executables can be deleted after the testing and timing
 process is completed.  The removal of all object files and executables
@@ -632,7 +561,7 @@ on how this may be achieved.
 
 \subsection{Test and Install the Machine-Dependent Routines.}
 \dent
-There are five machine-dependent functions in the test and timing
+There are six machine-dependent functions in the test and timing
 package, at least three of which must be installed.  They are
 
 \begin{tabbing}
@@ -641,7 +570,8 @@ LSAME   \>  LOGICAL      \> Test if two characters are the same regardless of ca
 SLAMCH  \>  REAL  \> Determine machine-dependent parameters \\
 DLAMCH  \>  DOUBLE PRECISION \> Determine machine-dependent parameters \\
 SECOND  \>  REAL  \> Return time in seconds from a fixed starting time \\
-DSECND  \>  DOUBLE PRECISION  \> Return time in seconds from a fixed starting time
+DSECND  \>  DOUBLE PRECISION  \> Return time in seconds from a fixed starting time\\
+ILAENV  \>  INTEGER \> Checks that NaN and infinity arithmetic are IEEE-754 compliant
 \end{tabbing}
 
 \noindent
@@ -649,12 +579,12 @@ If you are working only in single precision, you do not need to install
 DLAMCH and DSECND, and if you are working only in double precision,
 you do not need to install SLAMCH and SECOND.
 
-These five subroutines are provided in {\tt LAPACK/INSTALL},
-along with five test programs.
-To compile the five test programs and run the tests, go to {\tt LAPACK} and
+These six subroutines are provided in {\tt LAPACK/INSTALL},
+along with six test programs.
+To compile the six test programs and run the tests, go to {\tt LAPACK} and
 type {\tt make install}.  The test programs are called
-{\tt testlsame, testslamch, testdlamch, testsecond,} and
-{\tt testdsecnd}. 
+{\tt testlsame, testslamch, testdlamch, testsecond, testdsecnd} and
+{\tt testieee}.
 If you do not wish to run all tests, you will need to modify the 
 {\tt install} definition in the {\tt LAPACK/Makefile} to only include the
 tests you wish to run.  Otherwise, all tests will be performed.
@@ -778,6 +708,13 @@ If ETIME is not available or a better local timing function exists,
 you will have to provide the correct interface to SECOND and DSECND
 on your machine.
 
+{\em On some IBM architectures such as IBM RS/6000s, the timing function
+{\tt ETIME} is instead called {\tt ETIME\_}, and therefore the routines
+{\tt LAPACK/INSTALL/second.f} and {\tt LAPACK/INSTALL/dsecnd.f} should
+be modified.  Usually on HPPA architectures,
+the compiler and loader flag {\tt +U77} should be included to access
+the function {\tt ETIME}}.
+
 The test program in {\tt secondtst.f}
 performs a million operations using 5000 iterations of 
 the SAXPY operation $y := y + \alpha x$ on a vector of length 100.
@@ -791,16 +728,64 @@ appropriate for your machine.
 The files {\tt second.f} and {\tt dsecnd.f} are automatically copied to
 {\tt LAPACK/SRC/} for inclusion in the LAPACK library.
 
+\subsubsection{Testing IEEE arithmetic and ILAENV}\label{testieee}
+
+%{\bf If you are installing LAPACK on a non-IEEE machine, you MUST 
+%modify ILAENV!  Otherwise, ILAENV will crash .  By default, ILAENV
+%assumes an IEEE machine, and does a test for IEEE-754 compliance.}
+
+As some new routines in LAPACK rely on IEEE-754 compliance,
+two settings ({\tt ISPEC=10} and {\tt ISPEC=11}) have been added to ILAENV
+({\tt LAPACK/SRC/ilaenv.f}) to denote IEEE-754 compliance for NaN and
+infinity arithmetic, respectively.  By default, ILAENV assumes an IEEE
+machine, and does a test for IEEE-754 compliance.  {\bf NOTE:  If you
+are installing LAPACK on a non-IEEE machine, you MUST modify ILAENV,
+as this test inside ILAENV will crash!}
+
+If {\tt ILAENV( 10, $\ldots$ )} or {\tt ILAENV( 11, $\ldots$ )} is 
+issued, then {\tt ILAENV=1} is returned to signal IEEE-754 compliance,
+and {\tt ILAENV=0} if the architecture is non-IEEE-754 compliant.
+
+Thus, for non-IEEE machines, the user must hard-code the setting of
+({\tt ILAENV=0}) for ({\tt ISPEC=10} and {\tt ISPEC=11}) in the version
+of {\tt LAPACK/SRC/ilaenv.f} to be put in
+his library.  There are also specialized testing and timing versions of
+ILAENV that will also need to be modified.
+\begin{itemize}
+\item Testing/timing version of {\tt LAPACK/TESTING/LIN/ilaenv.f}
+\item Testing/timing version of {\tt LAPACK/TESTING/EIG/ilaenv.f}
+\item Testing/timing version of {\tt LAPACK/TIMING/LIN/ilaenv.f}
+\item Testing/timing version of {\tt LAPACK/TIMING/EIG/ilaenv.f}
+\end{itemize}
+
+%Some new routines in LAPACK rely on IEEE-754 compliance, and if non-compliance
+%is detected (via a call to the function ILAENV), alternative (slower)
+%algorithms will be chosen.
+%For further details, refer to the leading comments of routines such
+%as {\tt LAPACK/SRC/sstevr.f}.
+
+The test program in {\tt LAPACK/INSTALL/tstiee.f} checks an installation
+architecture
+to see if infinity arithmetic and NaN arithmetic are IEEE-754 compliant.  
+A warning message to the user is printed if non-compliance is detected.
+This same test is performed inside the function ILAENV.  If
+{\tt ILAENV( 10, $\ldots$ )} or {\tt ILAENV( 11, $\ldots$ )} is 
+issued, then {\tt ILAENV=1} is returned to signal IEEE-754 compliance,
+and {\tt ILAENV=0} if the architecture is non-IEEE-754 compliant.
+
+To avoid this IEEE test being run every time you call
+{\tt ILAENV( 10, $\ldots$)} or {\tt ILAENV( 11, $\ldots$ )}, we suggest
+that the user hard-code the setting of
+{\tt ILAENV=1} or {\tt ILAENV=0} in the version of {\tt LAPACK/SRC/ilaenv.f} to be put in
+his library.  As aforementioned, there are also specialized testing and
+timing versions of ILAENV that will also need to be modified.
+
 \subsection{Create the BLAS Library} 
 \dent
 Ideally, a highly optimized version of the BLAS library already
 exists on your machine. 
 In this case you can go directly to Section~\ref{testblas} to
 make the BLAS test programs.  
-You may already have a library containing some of the BLAS,
-but not all (Level 1 and 2, but not Level 3, for example).
-If so, you should use your local version of the BLAS wherever
-possible.
 
 \begin{itemize}
 \item[a)]
@@ -904,7 +889,7 @@ There are two distinct test programs for LAPACK routines
 in each data type, one for the linear equation routines and
 one for the eigensystem routines.
 In each data type, there is one input file for testing the linear
-equation routines and seventeen input files for testing the eigenvalue
+equation routines and eighteen input files for testing the eigenvalue
 routines.
 The input files reside in {\tt LAPACK/TESTING}.
 For more information on the test programs and how to modify the
@@ -918,13 +903,13 @@ testing}.  This will
 compile and run the tests as described in sections~\ref{testlin} 
 and ~\ref{testeig}.
 
-If you are installing LAPACK on a Silicon Graphics machine, you must
-modify the definition of {\tt testing} to be
-\begin{verbatim}
-testing:
-        ( cd TESTING; $(MAKE) -f Makefile.sgi )
-\end{verbatim}
-
+%If you are installing LAPACK on a Silicon Graphics machine, you must
+%modify the definition of {\tt testing} to be
+%\begin{verbatim}
+%testing:
+%        ( cd TESTING; $(MAKE) -f Makefile.sgi )
+%\end{verbatim}
+ 
 \subsubsection{Testing the Linear Equations Routines}\label{testlin}
 
 \begin{itemize}
@@ -963,11 +948,11 @@ in {\tt LAPACK/TESTING}.
 
 \item[b)]
 Go to {\tt LAPACK/TESTING} and run the tests for each data type.
-The tests for the eigensystem routines use seventeen separate input files
+The tests for the eigensystem routines use eighteen separate input files
 for testing the nonsymmetric eigenvalue problem,
 the symmetric eigenvalue problem, the banded symmetric eigenvalue
 problem, the generalized symmetric eigenvalue
-problem, the generalized nonsymmetric eigenvalue problem, the 
+problem, the generalized nonsymmetric eigenvalue problem, the
 singular value decomposition, the banded singular value decomposition,
 the generalized singular value
 decomposition, the generalized QR and RQ factorizations, the generalized
@@ -981,6 +966,7 @@ The tests for the REAL version are as follows:
 \item {\tt xeigtsts  < sec.in > sec.out}
 \item {\tt xeigtsts  < sed.in > sed.out}
 \item {\tt xeigtsts  < sgg.in > sgg.out}
+\item {\tt xeigtsts  < sgd.in > sgd.out}
 \item {\tt xeigtsts  < ssg.in > ssg.out}
 \item {\tt xeigtsts  < ssb.in > ssb.out}
 \item {\tt xeigtsts  < sbb.in > sbb.out}
@@ -1065,12 +1051,12 @@ timing}.  This will compile
 and run the timings for the linear equation routines and the eigensystem
 routines (see Sections~\ref{timelin} and ~\ref{timeeig}). 
 
-If you are installing LAPACK on a Silicon Graphics machine, you must
-modify the definition of {\tt timing} to be
-\begin{verbatim}
-timing:
-        ( cd TIMING; $(MAKE) -f Makefile.sgi )
-\end{verbatim}
+%If you are installing LAPACK on a Silicon Graphics machine, you must
+%modify the definition of {\tt timing} to be
+%\begin{verbatim}
+%timing:
+%        ( cd TIMING; $(MAKE) -f Makefile.sgi )
+%\end{verbatim}
 
 If you encounter failures in any phase of the timing process, please
 feel free to contact the authors as directed in Section~\ref{sendresults}.
@@ -1095,8 +1081,24 @@ are {\tt stime.in}, {\tt sband.in}, and {\tt stime2.in}, respectively,
 and the large data sets are
 {\tt STIME.in}, {\tt SBAND.in}, and {\tt STIME2.in}.
 
+The timing program for the least squares routines uses special instrumented
+versions of the LAPACK routines to time individual sections of the code.
+The first step in compiling the timing program is therefore to make a library
+of the instrumented routines.
+
 \begin{itemize}
 \item[a)]
+\begin{sloppypar}
+To make a library of the instrumented LAPACK routines, first
+go to {\tt LAPACK/TIMING/LIN/LINSRC} and type {\tt make} followed
+by the data types desired, as in the examples of Section~\ref{toplevelmakefile}. 
+The library of instrumented code is created in
+{\tt LAPACK/TIMING/LIN/linsrc\_PLAT.a},
+where {\tt PLAT} is the user-defined architecture suffix specified in the
+file {\tt LAPACK/make.inc}.
+\end{sloppypar}
+
+\item[b)]
 To make the linear equation timing programs,
 go to {\tt LAPACK/TIMING/LIN} and type {\tt make} followed by the data
 types desired, as in the examples in Section~\ref{toplevelmakefile}.
@@ -1104,7 +1106,7 @@ The executable files are called {\tt xlintims},
 {\tt xlintimc}, {\tt xlintimd}, and {\tt xlintimz} and are created
 in {\tt LAPACK/TIMING}.
 
-\item[b)]
+\item[c)]
 Go to {\tt LAPACK/TIMING} and
 make any necessary modifications to the input files.
 You may need to set the minimum time a subroutine will
@@ -1117,7 +1119,7 @@ If it is necessary to also reduce the matrix sizes or the values of
 the blocksize, corresponding changes should be made to the 
 BLAS input files (see Section~\ref{timeblas}).
 
-\item[c)]
+\item[d)]
 Run the programs for each data type you are using. 
 For the REAL version, the commands for the small data sets are
 
@@ -1287,9 +1289,11 @@ Similar commands should be used for the other data types.
 Congratulations!  You have now finished installing, testing, and
 timing LAPACK.  If you encountered failures in any phase of the 
 testing or timing process, please
-consult our release\_notes file on netlib (send email to netlib@ornl.gov
-and in the message type "send release\_notes from lapack").  This file
-contains machine-dependent installation clues which hopefully will 
+consult our {\tt release\_notes} file on netlib.
+\begin{quote}
+{\tt http://www.netlib.org/lapack/release\_notes}
+\end{quote}
+This file contains machine-dependent installation clues which hopefully will 
 alleviate your difficulties or at least let you know that other users
 have had similar difficulties on that machine.  If there is not an entry
 for your machine or the suggestions do not fix your problem, please feel
@@ -1303,7 +1307,7 @@ system, the compiler and compiler options that were used,
 and details of the BLAS library or libraries that you used.  You should
 also include a copy of the output file in which the failure occurs.
 
-We would like to keep our release\_notes file as up-to-date as possible.
+We would like to keep our {\tt release\_notes} file as up-to-date as possible.
 Therefore, if you do not see an entry for your machine, please contact us
 with your testing results.
 
@@ -1311,13 +1315,277 @@ Comments and suggestions are also welcome.
 
 We encourage you to make the LAPACK library available to your
 users and provide us with feedback from their experiences.
-This release of LAPACK is not guaranteed to be compatible
-with any previous test release.
+%This release of LAPACK is not guaranteed to be compatible
+%with any previous test release.
 
 \section*{Acknowledgments}
 
-Ed Anderson of Cray Research Inc. contributed to previous versions of
-this report.
+Ed Anderson contributed to previous versions of this report.
+
+\appendix
+
+\chapter{Caveats}\label{appendixd}
+
+\dent
+In this appendix we list a few of the machine-specific difficulties we
+have
+encountered in our own experience with LAPACK.  A more detailed list
+of machine-dependent problems, bugs, and compiler errors encountered
+in the LAPACK installation process is maintained
+on {\em netlib}.
+\begin{quote}
+{\tt http://www.netlib.org/lapack/release\_notes}
+\end{quote}
+
+We assume the user has installed the machine-specific routines
+correctly and that the Level 1, 2 and 3 BLAS test programs have run
+successfully, so we do not list any warnings associated with those
+routines.
+
+\section{{\tt LAPACK/make.inc}}
+
+All machine-specific
+parameters are specified in the file {\tt LAPACK/make.inc}.
+
+The first line of this {\tt make.inc} file is:
+\begin{quote}
+SHELL = /bin/sh
+\end{quote}
+and will need to be modified to {\tt SHELL = /sbin/sh} if you are
+installing LAPACK on an SGI architecture.
+
+\section{ETIME}
+
+The LAPACK Testing
+and Timing Suites assume the use of the timing function {\tt ETIME}.
+
+On some IBM architectures such as IBM RS/6000s, the timing function
+{\tt ETIME} is instead called {\tt ETIME\_}, and therefore the routines
+{\tt LAPACK/INSTALL/second.f} and {\tt LAPACK/INSTALL/dsecnd.f} should
+be modified.
+
+On HPPA architectures,
+the compiler and loader flag {\tt +U77} should be included to access
+the function {\tt ETIME}.
+
+\section{ILAENV and IEEE-754 compliance}
+
+%By default, ILAENV ({\tt LAPACK/SRC/ilaenv.f}) assumes an IEEE and IEEE-754
+%compliant architecture, and thus sets ({\tt ILAENV=1}) for ({\tt ISPEC=10})
+%and ({\tt ISPEC=11}) settings in ILAENV.
+%
+%If you are installing LAPACK on a non-IEEE machine, you MUST modify ILAENV,
+%as this test inside ILAENV will crash!
+
+As some new routines in LAPACK rely on IEEE-754 compliance,
+two settings ({\tt ISPEC=10} and {\tt ISPEC=11}) have been added to ILAENV
+({\tt LAPACK/SRC/ilaenv.f}) to denote IEEE-754 compliance for NaN and
+infinity arithmetic, respectively.  By default, ILAENV assumes an IEEE
+machine, and does a test for IEEE-754 compliance.  {\bf NOTE:  If you
+are installing LAPACK on a non-IEEE machine, you MUST modify ILAENV,
+as this test inside ILAENV will crash!}
+
+Thus, for non-IEEE machines, the user must hard-code the setting of
+({\tt ILAENV=0}) for ({\tt ISPEC=10} and {\tt ISPEC=11}) in the version
+of {\tt LAPACK/SRC/ilaenv.f} to be put in
+his library.  For further details, refer to section~\ref{testieee}.
+
+Be aware
+that some IEEE compilers by default do not enforce IEEE-754 compliance, and
+a compiler flag must be explicitly set by the user.
+
+On SGIs for example, you must set the {\tt -OPT:IEEE\_NaN\_inf=ON} compiler
+flag to enable IEEE-754 compliance.
+
+And lastly, the test inside ILAENV to detect IEEE-754 compliance, will
+result in IEEE exceptions for ``Divide by Zero'' and ``Invalid Operation''.
+Thus, if the user is installing on a machine that issues IEEE exception
+warning messages (like a Sun SPARCstation), the user can disregard these
+messages.  To avoid these messages, the user can hard-code the values
+inside ILAENV as explained in section~\ref{testieee}.
+
+\section{Lack of {\tt /tmp} space}
+
+If {\tt /tmp} space is small (i.e., less than approximately 16 MB) on your
+architecture, you may run out of space
+when compiling.  There are a few possible solutions to this problem.
+\begin{enumerate}
+\item You can ask your system administrator to increase the size of the
+{\tt /tmp} partition.
+\item You can change the environment variable {\tt TMPDIR} to point to
+your home directory for temporary space.  E.g.,
+\begin{quote}
+{\tt setenv TMPDIR /home/userid/}
+\end{quote}
+where {\tt /home/userid/} is the user's home directory.
+\item If your archive command has an {\tt l} option, you can change the
+archive command to {\tt ar crl} so that the
+archive command will only place temporary files in the current working
+directory rather than in the default temporary directory /tmp.
+\end{enumerate}
+
+\section{BLAS}
+
+If you suspect a BLAS-related problem and you are linking
+with an optimized version of the BLAS, we would strongly suggest
+as a first step that you link to the Fortran 77 version of
+the suspected BLAS routine and see if the error has disappeared.
+
+We have included test programs for the Level 1 BLAS.
+Users should therefore beware of a common problem in machine-specific
+implementations of xNRM2,
+the function to compute the 2-norm of a vector.
+The Fortran version of xNRM2 avoids underflow or overflow
+by scaling intermediate results, but some library versions of xNRM2
+are not so careful about scaling.
+If xNRM2 is implemented without scaling intermediate results, some of
+the LAPACK test ratios may be unusually high, or
+a floating point exception may occur in the problems scaled near
+underflow or overflow.
+The solution to these problems is to link the Fortran version of
+xNRM2 with the test program.  {\em On some CRAY architectures, the Fortran77
+version of xNRM2 should be used.}
+
+\section{Optimization}
+
+If a large numbers of test failures occur for a specific matrix type
+or operation, it could be that there is an optimization problem with
+your compiler.  Thus, the user could try reducing the level of
+optimization or eliminating optimization entirely for those routines
+to see if the failures disappear when you rerun the tests.
+
+%LAPACK is written in Fortran 77.  Prospective users with only a
+%Fortran 66 compiler will not be able to use this package.
+
+\section{Compiling testing/timing drivers}
+
+The testing and timing main programs (xCHKAA, xCHKEE, xTIMAA, and
+xTIMEE)
+allocate large amounts of local variables.  Therefore, it is vitally
+important that the user know if his compiler by default allocates local
+variables statically or on the stack.  It is not uncommon for those
+compilers which place local variables on the stack to cause a stack
+overflow at runtime in the testing or timing process.  The user then
+has two options:  increase your stack size, or force all local variables
+to be allocated statically.
+
+On HPPA architectures, the 
+compiler and loader flag {\tt -K} should be used when compiling these testing
+and timing main programs to avoid such a stack overflow.  I.e., set
+{\tt DRVOPTS = -K} in the {\tt LAPACK/make.inc} file.
+
+For similar reasons,
+on SGI architectures, the compiler and loader flag {\tt -static} should be
+used.  I.e., set {\tt DRVOPTS = -static} in the {\tt LAPACK/make.inc} file.
+
+\section{IEEE arithmetic}
+
+Some of our test matrices are scaled near overflow or underflow,
+but on the Crays, problems with the arithmetic near overflow and
+underflow forced us to scale by only the square root of overflow
+and underflow.
+The LAPACK auxiliary routine SLABAD (or DLABAD) is called to
+take the square root of underflow and overflow in cases where it
+could cause difficulties.
+We assume we are on a Cray if $ \log_{10} ({\rm overflow})$
+is greater than 2000
+and take the square root of underflow and overflow in this case.
+The test in SLABAD is as follows:
+\begin{verbatim}
+      IF( LOG10( LARGE ).GT.2000. ) THEN
+         SMALL = SQRT( SMALL )
+         LARGE = SQRT( LARGE )
+      END IF
+\end{verbatim}
+Users of other machines with similar restrictions on the effective
+range of usable numbers may have to modify this test so that the
+square roots are done on their machine as well.  {\em Usually on
+HPPA architectures, a similar restriction in SLABAD should be enforced
+for all testing involving complex arithmetic.}
+SLABAD is located in {\tt LAPACK/SRC}.
+
+For machines which have a narrow exponent range or lack gradual
+underflow (DEC VAXes for example), it is not uncommon to experience
+failures in sec.out and/or dec.out with SLAQTR/DLAQTR or DTRSYL.
+The failures in SLAQTR/DLAQTR and DTRSYL
+occur with test problems which are very badly scaled when the norm of
+the solution is very close to the underflow
+threshold (or even underflows to zero).  We believe that these failures
+could probably be avoided by an even greater degree of care in scaling,
+but we did not want to delay the release of LAPACK any further.  These
+tests pass successfully on most other machines.  An example failure in
+dec.out on a MicroVAX II looks like the following:
+
+\begin{verbatim}
+Tests of the Nonsymmetric eigenproblem condition estimation routines
+DLALN2, DLASY2, DLANV2, DLAEXC, DTRSYL, DTREXC, DTRSNA, DTRSEN, DLAQTR
+
+Relative machine precision (EPS) =     0.277556D-16
+Safe minimum (SFMIN)             =     0.587747D-38
+
+Routines pass computational tests if test ratio is less than   20.00
+
+DEC routines passed the tests of the error exits ( 35 tests done)
+Error in DTRSYL: RMAX =   0.155D+07
+LMAX =     5323 NINFO=    1600 KNT=   27648
+Error in DLAQTR: RMAX =   0.344D+04
+LMAX =    15792 NINFO=   26720 KNT=   45000
+\end{verbatim}
+
+\section{Timing programs}
+
+In the eigensystem timing program, calls are made to the LINPACK
+and EISPACK equivalents of the LAPACK routines to allow a direct
+comparison of performance measures.
+In some cases we have increased the minimum number of
+iterations in the LINPACK and EISPACK routines to allow
+them to converge for our test problems, but
+even this may not be enough.
+One goal of the LAPACK project is to improve the convergence
+properties of these routines, so error messages in the output
+file indicating that a LINPACK or EISPACK routine did not
+converge should not be regarded with alarm.
+
+In the eigensystem timing program, we have equivalenced some work
+arrays and then passed them to a subroutine, where both arrays are
+modified.  This is a violation of the Fortran 77 standard, which
+says ``if a subprogram reference causes a dummy argument in the
+referenced subprogram to become associated with another dummy
+argument in the referenced subprogram, neither dummy argument may
+become defined during execution of the subprogram.''
+\footnote{ ANSI X3.9-1978, sec. 15.9.3.6}
+If this causes any difficulties, the equivalence
+can be commented out as explained in the comments for the main
+eigensystem timing programs.
+
+%\section*{MACHINE-SPECIFIC DIFFICULTIES}
+%Some IBM compilers do not recognize DBLE as a generic function as used
+%in LAPACK.  The software tools we use to convert from single precision
+%to double precision convert REAL(C) and AIMAG(C), where C is COMPLEX,
+%to DBLE(Z) and DIMAG(Z), where Z is COMPLEX*16, but
+%IBM compilers use DREAL(Z) and DIMAG(Z) to take the real and
+%imaginary parts of a double complex number.
+%IBM users can fix this problem by changing DBLE to DREAL when the
+%argument of DBLE is COMPLEX*16.
+%
+%IBM compilers do not permit the data type COMPLEX*16 in a FUNCTION
+%subprogram definition.  The data type on the first line of the
+%function subprogram must be changed from COMPLEX*16 to DOUBLE COMPLEX
+%for the following functions:
+%
+%\begin{tabbing}
+%\dent ZLATMOO \= from the test matrix generator library \kill
+%\dent ZBEG \> from the Level 2 BLAS test program  \\
+%\dent ZBEG \> from the Level 3 BLAS test program  \\
+%\dent ZLADIV \> from the LAPACK library \\
+%\dent ZLARND \> from the test matrix generator library \\
+%\dent ZLATM2 \> from the test matrix generator library \\
+%\dent ZLATM3 \> from the test matrix generator library
+%\end{tabbing}
+%The functions ZDOTC and ZDOTU from the Level 1 BLAS are already
+%declared DOUBLE COMPLEX.  If that doesn't work, try the declaration
+%COMPLEX FUNCTION*16.
+
 
 \newpage
 \addcontentsline{toc}{section}{Bibliography}
@@ -1328,7 +1596,7 @@ E. Anderson, Z. Bai, C. Bischof, J. Demmel, J. Dongarra,
 J. Du Croz, A. Greenbaum, S. Hammarling, A. McKenney,
 S. Ostrouchov, and D. Sorensen, 
 {\em LAPACK Users' Guide}, Second Edition,
-{SIAM}, Philadelphia, PA, 1994.
+{SIAM}, Philadelphia, PA, 1995.
 
 \bibitem{WN16}
 E. Anderson and J. Dongarra,
@@ -1340,7 +1608,7 @@ University of Tennessee, CS-89-89, November 1989.
 E. Anderson, J. Dongarra, and S. Ostrouchov,
 {\em LAPACK Working Note 41: 
 Installation Guide for LAPACK},
-University of Tennessee, CS-92-151, February 1992 (revised October 1994).
+University of Tennessee, CS-92-151, February 1992 (revised June 1999).
 
 \bibitem{WN5}
 C. Bischof, J. Demmel, J. Dongarra, J. Du Croz, A. Greenbaum,

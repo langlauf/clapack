@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -8,12 +9,12 @@
 /* Table of constant values */
 
 static integer c__1 = 1;
-static complex c_b9 = {-1.f,0.f};
+static complex c_b7 = {-1.f,0.f};
 static complex c_b10 = {1.f,0.f};
 
 /* Subroutine */ int cbdt01_(integer *m, integer *n, integer *kd, complex *a, 
-	integer *lda, complex *q, integer *ldq, real *d, real *e, complex *pt,
-	 integer *ldpt, complex *work, real *rwork, real *resid)
+	integer *lda, complex *q, integer *ldq, real *d__, real *e, complex *
+	pt, integer *ldpt, complex *work, real *rwork, real *resid)
 {
     /* System generated locals */
     integer a_dim1, a_offset, pt_dim1, pt_offset, q_dim1, q_offset, i__1, 
@@ -22,7 +23,7 @@ static complex c_b10 = {1.f,0.f};
     complex q__1, q__2, q__3;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
 	    , complex *, integer *, complex *, integer *, complex *, complex *
 	    , integer *);
@@ -35,7 +36,13 @@ static complex c_b10 = {1.f,0.f};
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define pt_subscr(a_1,a_2) (a_2)*pt_dim1 + a_1
+#define pt_ref(a_1,a_2) pt[pt_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -64,8 +71,7 @@ static complex c_b10 = {1.f,0.f};
 
     KD      (input) INTEGER   
             If KD = 0, B is diagonal and the array E is not referenced.   
-            If KD = 1, the reduction was performed by xGEBRD; B is upper 
-  
+            If KD = 1, the reduction was performed by xGEBRD; B is upper   
             bidiagonal if M >= N, and lower bidiagonal if M < N.   
             If KD = -1, the reduction was performed by xGBBRD; B is   
             always upper bidiagonal.   
@@ -103,26 +109,24 @@ static complex c_b10 = {1.f,0.f};
     RWORK   (workspace) REAL array, dimension (M)   
 
     RESID   (output) REAL   
-            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS ) 
-  
+            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
-    --d;
+    --d__;
     --e;
     pt_dim1 = *ldpt;
-    pt_offset = pt_dim1 + 1;
+    pt_offset = 1 + pt_dim1 * 1;
     pt -= pt_offset;
     --work;
     --rwork;
@@ -146,16 +150,16 @@ static complex c_b10 = {1.f,0.f};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *n - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *m + i;
-		    i__4 = i;
-		    i__5 = i + j * pt_dim1;
-		    q__2.r = d[i__4] * pt[i__5].r, q__2.i = d[i__4] * pt[i__5]
-			    .i;
-		    i__6 = i;
-		    i__7 = i + 1 + j * pt_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *m + i__;
+		    i__4 = i__;
+		    i__5 = pt_subscr(i__, j);
+		    q__2.r = d__[i__4] * pt[i__5].r, q__2.i = d__[i__4] * pt[
+			    i__5].i;
+		    i__6 = i__;
+		    i__7 = pt_subscr(i__ + 1, j);
 		    q__3.r = e[i__6] * pt[i__7].r, q__3.i = e[i__6] * pt[i__7]
 			    .i;
 		    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
@@ -164,10 +168,11 @@ static complex c_b10 = {1.f,0.f};
 		}
 		i__2 = *m + *n;
 		i__3 = *n;
-		i__4 = *n + j * pt_dim1;
-		q__1.r = d[i__3] * pt[i__4].r, q__1.i = d[i__3] * pt[i__4].i;
+		i__4 = pt_subscr(*n, j);
+		q__1.r = d__[i__3] * pt[i__4].r, q__1.i = d__[i__3] * pt[i__4]
+			.i;
 		work[i__2].r = q__1.r, work[i__2].i = q__1.i;
-		cgemv_("No transpose", m, n, &c_b9, &q[q_offset], ldq, &work[*
+		cgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b10, &work[1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = scasum_(m, &work[1], &c__1);
@@ -180,16 +185,16 @@ static complex c_b10 = {1.f,0.f};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *m - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *m + i;
-		    i__4 = i;
-		    i__5 = i + j * pt_dim1;
-		    q__2.r = d[i__4] * pt[i__5].r, q__2.i = d[i__4] * pt[i__5]
-			    .i;
-		    i__6 = i;
-		    i__7 = i + 1 + j * pt_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *m + i__;
+		    i__4 = i__;
+		    i__5 = pt_subscr(i__, j);
+		    q__2.r = d__[i__4] * pt[i__5].r, q__2.i = d__[i__4] * pt[
+			    i__5].i;
+		    i__6 = i__;
+		    i__7 = pt_subscr(i__ + 1, j);
 		    q__3.r = e[i__6] * pt[i__7].r, q__3.i = e[i__6] * pt[i__7]
 			    .i;
 		    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
@@ -198,10 +203,11 @@ static complex c_b10 = {1.f,0.f};
 		}
 		i__2 = *m + *m;
 		i__3 = *m;
-		i__4 = *m + j * pt_dim1;
-		q__1.r = d[i__3] * pt[i__4].r, q__1.i = d[i__3] * pt[i__4].i;
+		i__4 = pt_subscr(*m, j);
+		q__1.r = d__[i__3] * pt[i__4].r, q__1.i = d__[i__3] * pt[i__4]
+			.i;
 		work[i__2].r = q__1.r, work[i__2].i = q__1.i;
-		cgemv_("No transpose", m, m, &c_b9, &q[q_offset], ldq, &work[*
+		cgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b10, &work[1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = scasum_(m, &work[1], &c__1);
@@ -214,27 +220,27 @@ static complex c_b10 = {1.f,0.f};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *m + 1;
-		i__3 = j * pt_dim1 + 1;
-		q__1.r = d[1] * pt[i__3].r, q__1.i = d[1] * pt[i__3].i;
+		i__3 = pt_subscr(1, j);
+		q__1.r = d__[1] * pt[i__3].r, q__1.i = d__[1] * pt[i__3].i;
 		work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 		i__2 = *m;
-		for (i = 2; i <= i__2; ++i) {
-		    i__3 = *m + i;
-		    i__4 = i - 1;
-		    i__5 = i - 1 + j * pt_dim1;
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    i__3 = *m + i__;
+		    i__4 = i__ - 1;
+		    i__5 = pt_subscr(i__ - 1, j);
 		    q__2.r = e[i__4] * pt[i__5].r, q__2.i = e[i__4] * pt[i__5]
 			    .i;
-		    i__6 = i;
-		    i__7 = i + j * pt_dim1;
-		    q__3.r = d[i__6] * pt[i__7].r, q__3.i = d[i__6] * pt[i__7]
-			    .i;
+		    i__6 = i__;
+		    i__7 = pt_subscr(i__, j);
+		    q__3.r = d__[i__6] * pt[i__7].r, q__3.i = d__[i__6] * pt[
+			    i__7].i;
 		    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L50: */
 		}
-		cgemv_("No transpose", m, m, &c_b9, &q[q_offset], ldq, &work[*
+		cgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b10, &work[1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = scasum_(m, &work[1], &c__1);
@@ -249,18 +255,18 @@ static complex c_b10 = {1.f,0.f};
 	if (*m >= *n) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *m + i;
-		    i__4 = i;
-		    i__5 = i + j * pt_dim1;
-		    q__1.r = d[i__4] * pt[i__5].r, q__1.i = d[i__4] * pt[i__5]
-			    .i;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *m + i__;
+		    i__4 = i__;
+		    i__5 = pt_subscr(i__, j);
+		    q__1.r = d__[i__4] * pt[i__5].r, q__1.i = d__[i__4] * pt[
+			    i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L70: */
 		}
-		cgemv_("No transpose", m, n, &c_b9, &q[q_offset], ldq, &work[*
+		cgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b10, &work[1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = scasum_(m, &work[1], &c__1);
@@ -270,18 +276,18 @@ static complex c_b10 = {1.f,0.f};
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ccopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		ccopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *m;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = *m + i;
-		    i__4 = i;
-		    i__5 = i + j * pt_dim1;
-		    q__1.r = d[i__4] * pt[i__5].r, q__1.i = d[i__4] * pt[i__5]
-			    .i;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = *m + i__;
+		    i__4 = i__;
+		    i__5 = pt_subscr(i__, j);
+		    q__1.r = d__[i__4] * pt[i__5].r, q__1.i = d__[i__4] * pt[
+			    i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L90: */
 		}
-		cgemv_("No transpose", m, m, &c_b9, &q[q_offset], ldq, &work[*
+		cgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b10, &work[1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = scasum_(m, &work[1], &c__1);
@@ -321,4 +327,10 @@ static complex c_b10 = {1.f,0.f};
 /*     End of CBDT01 */
 
 } /* cbdt01_ */
+
+#undef pt_ref
+#undef pt_subscr
+#undef a_ref
+#undef a_subscr
+
 

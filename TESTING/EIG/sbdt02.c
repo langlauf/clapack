@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,8 @@ static real c_b7 = -1.f;
 static real c_b9 = 1.f;
 
 /* Subroutine */ int sbdt02_(integer *m, integer *n, real *b, integer *ldb, 
-	real *c, integer *ldc, real *u, integer *ldu, real *work, real *resid)
+	real *c__, integer *ldc, real *u, integer *ldu, real *work, real *
+	resid)
 {
     /* System generated locals */
     integer b_dim1, b_offset, c_dim1, c_offset, u_dim1, u_offset, i__1;
@@ -31,7 +33,11 @@ static real c_b9 = 1.f;
     static real realmn, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -40,13 +46,11 @@ static real c_b9 = 1.f;
     Purpose   
     =======   
 
-    SBDT02 tests the change of basis C = U' * B by computing the residual 
-  
+    SBDT02 tests the change of basis C = U' * B by computing the residual   
 
        RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
 
-    where B and C are M by N matrices, U is an M by M orthogonal matrix, 
-  
+    where B and C are M by N matrices, U is an M by M orthogonal matrix,   
     and EPS is the machine precision.   
 
     Arguments   
@@ -82,21 +86,20 @@ static real c_b9 = 1.f;
     RESID   (output) REAL   
             RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
 
@@ -112,9 +115,9 @@ static real c_b9 = 1.f;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(m, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
-	sgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c[j * c_dim1 
-		+ 1], &c__1, &c_b9, &work[1], &c__1);
+	scopy_(m, &b_ref(1, j), &c__1, &work[1], &c__1);
+	sgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c___ref(1, j),
+		 &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
 	r__1 = *resid, r__2 = sasum_(m, &work[1], &c__1);
 	*resid = dmax(r__1,r__2);
@@ -149,4 +152,8 @@ static real c_b9 = 1.f;
 /*     End of SBDT02 */
 
 } /* sbdt02_ */
+
+#undef c___ref
+#undef b_ref
+
 

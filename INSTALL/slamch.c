@@ -2,7 +2,7 @@
 
 doublereal slamch_(char *cmach)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -131,7 +131,7 @@ nding
 /* Subroutine */ int slamc1_(integer *beta, integer *t, logical *rnd, logical 
 	*ieee1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -344,7 +344,7 @@ L30:
 /* Subroutine */ int slamc2_(integer *beta, integer *t, logical *rnd, real *
 	eps, integer *emin, real *rmin, integer *emax, real *rmax)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -647,7 +647,7 @@ ing
 
 doublereal slamc3_(real *a, real *b)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -688,7 +688,7 @@ doublereal slamc3_(real *a, real *b)
 
 /* Subroutine */ int slamc4_(integer *emin, real *start, integer *base)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -780,7 +780,7 @@ L10:
 /* Subroutine */ int slamc5_(integer *beta, integer *p, integer *emin, 
 	logical *ieee, integer *emax, real *rmax)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   

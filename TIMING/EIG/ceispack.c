@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -77,7 +78,7 @@ static complex c_b364 = {-1.f,0.f};
     extern /* Subroutine */ int cdiv_(real *, real *, real *, real *, real *, 
 	    real *);
     static real norm, opst;
-    static integer i, j, k, s;
+    static integer i__, j, k, s;
     static real x, y, normv;
     static integer ii;
     static real ilambd;
@@ -88,6 +89,14 @@ static complex c_b364 = {-1.f,0.f};
     static real growto, ukroot;
     static integer its;
     static real ulp, eps3;
+
+
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
+#define rm1_ref(a_1,a_2) rm1[(a_2)*rm1_dim1 + a_1]
+#define rm2_ref(a_1,a_2) rm2[(a_2)*rm2_dim1 + a_1]
 
 
 
@@ -131,8 +140,7 @@ static complex c_b364 = {-1.f,0.f};
 
           AR, AI, WI, AND SELECT ARE UNALTERED.   
 
-          WR MAY HAVE BEEN ALTERED SINCE CLOSE EIGENVALUES ARE PERTURBED 
-  
+          WR MAY HAVE BEEN ALTERED SINCE CLOSE EIGENVALUES ARE PERTURBED   
             SLIGHTLY IN SEARCHING FOR INDEPENDENT EIGENVECTORS.   
 
           M IS THE NUMBER OF EIGENVECTORS ACTUALLY FOUND.   
@@ -144,8 +152,7 @@ static complex c_b364 = {-1.f,0.f};
 
           IERR IS SET TO   
             ZERO       FOR NORMAL RETURN,   
-            -(2*N+1)   IF MORE THAN MM EIGENVECTORS HAVE BEEN SPECIFIED, 
-  
+            -(2*N+1)   IF MORE THAN MM EIGENVECTORS HAVE BEEN SPECIFIED,   
             -K         IF THE ITERATION CORRESPONDING TO THE K-TH   
                        VALUE FAILS,   
             -(N+K)     IF BOTH ERROR SITUATIONS OCCUR.   
@@ -158,13 +165,11 @@ static complex c_b364 = {-1.f,0.f};
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
 
        GET ULP FROM SLAMCH FOR NEW SMALL PERTURBATION AS IN LAPACK   
@@ -172,25 +177,25 @@ static complex c_b364 = {-1.f,0.f};
     --rv2;
     --rv1;
     rm2_dim1 = *n;
-    rm2_offset = rm2_dim1 + 1;
+    rm2_offset = 1 + rm2_dim1 * 1;
     rm2 -= rm2_offset;
     rm1_dim1 = *n;
-    rm1_offset = rm1_dim1 + 1;
+    rm1_offset = 1 + rm1_dim1 * 1;
     rm1 -= rm1_offset;
     --select;
     --wi;
     --wr;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
 
     /* Function Body */
@@ -223,8 +228,7 @@ static complex c_b364 = {-1.f,0.f};
 	    if (uk == *n) {
 		goto L140;
 	    }
-	    if (ar[uk + 1 + uk * ar_dim1] == 0.f && ai[uk + 1 + uk * ai_dim1] 
-		    == 0.f) {
+	    if (ar_ref(uk + 1, uk) == 0.f && ai_ref(uk + 1, uk) == 0.f) {
 		goto L140;
 	    }
 /* L120: */
@@ -239,19 +243,19 @@ L140:
 /*        INCREMENT OPCOUNT FOR LOOP 180 */
 	latime_1.ops += uk * 6 * (uk - 1);
 	i__2 = uk;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 	    x = 0.f;
 
 	    i__3 = uk;
 	    for (j = mp; j <= i__3; ++j) {
 /* L160: */
-		x += pythag_(&ar[i + j * ar_dim1], &ai[i + j * ai_dim1]);
+		x += pythag_(&ar_ref(i__, j), &ai_ref(i__, j));
 	    }
 
 	    if (x > norm) {
 		norm = x;
 	    }
-	    mp = i;
+	    mp = i__;
 /* L180: */
 	}
 /*     .......... EPS3 REPLACES ZERO PIVOT IN DECOMPOSITION   
@@ -284,9 +288,9 @@ L220:
 L240:
 	i__2 = km1;
 	for (ii = 1; ii <= i__2; ++ii) {
-	    i = k - ii;
-	    if (select[i] && (r__1 = wr[i] - rlambd, dabs(r__1)) < eps3 && (
-		    r__2 = wi[i] - ilambd, dabs(r__2)) < eps3) {
+	    i__ = k - ii;
+	    if (select[i__] && (r__1 = wr[i__] - rlambd, dabs(r__1)) < eps3 &&
+		     (r__2 = wi[i__] - ilambd, dabs(r__2)) < eps3) {
 		goto L220;
 	    }
 /* L260: */
@@ -305,19 +309,19 @@ L280:
 /*        INCREMENT OP COUNT FOR LOOP 320 */
 	latime_1.ops += uk << 1;
 	i__2 = uk;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 
 	    i__3 = uk;
 	    for (j = mp; j <= i__3; ++j) {
-		rm1[i + j * rm1_dim1] = ar[i + j * ar_dim1];
-		rm2[i + j * rm2_dim1] = ai[i + j * ai_dim1];
+		rm1_ref(i__, j) = ar_ref(i__, j);
+		rm2_ref(i__, j) = ai_ref(i__, j);
 /* L300: */
 	    }
 
-	    rm1[i + i * rm1_dim1] -= rlambd;
-	    rm2[i + i * rm2_dim1] -= ilambd;
-	    mp = i;
-	    rv1[i] = eps3;
+	    rm1_ref(i__, i__) = rm1_ref(i__, i__) - rlambd;
+	    rm2_ref(i__, i__) = rm2_ref(i__, i__) - ilambd;
+	    mp = i__;
+	    rv1[i__] = eps3;
 /* L320: */
 	}
 /*     .......... TRIANGULAR DECOMPOSITION WITH INTERCHANGES,   
@@ -330,42 +334,40 @@ L280:
 /*        INCREMENT OP COUNT FOR LOOP 400 */
 	latime_1.ops += ((uk << 2) + 52) * (uk - 1);
 	i__2 = uk;
-	for (i = 2; i <= i__2; ++i) {
-	    mp = i - 1;
-	    if (pythag_(&rm1[i + mp * rm1_dim1], &rm2[i + mp * rm2_dim1]) <= 
-		    pythag_(&rm1[mp + mp * rm1_dim1], &rm2[mp + mp * rm2_dim1]
-		    )) {
+	for (i__ = 2; i__ <= i__2; ++i__) {
+	    mp = i__ - 1;
+	    if (pythag_(&rm1_ref(i__, mp), &rm2_ref(i__, mp)) <= pythag_(&
+		    rm1_ref(mp, mp), &rm2_ref(mp, mp))) {
 		goto L360;
 	    }
 
 	    i__3 = uk;
 	    for (j = mp; j <= i__3; ++j) {
-		y = rm1[i + j * rm1_dim1];
-		rm1[i + j * rm1_dim1] = rm1[mp + j * rm1_dim1];
-		rm1[mp + j * rm1_dim1] = y;
-		y = rm2[i + j * rm2_dim1];
-		rm2[i + j * rm2_dim1] = rm2[mp + j * rm2_dim1];
-		rm2[mp + j * rm2_dim1] = y;
+		y = rm1_ref(i__, j);
+		rm1_ref(i__, j) = rm1_ref(mp, j);
+		rm1_ref(mp, j) = y;
+		y = rm2_ref(i__, j);
+		rm2_ref(i__, j) = rm2_ref(mp, j);
+		rm2_ref(mp, j) = y;
 /* L340: */
 	    }
 
 L360:
-	    if (rm1[mp + mp * rm1_dim1] == 0.f && rm2[mp + mp * rm2_dim1] == 
-		    0.f) {
-		rm1[mp + mp * rm1_dim1] = eps3;
+	    if (rm1_ref(mp, mp) == 0.f && rm2_ref(mp, mp) == 0.f) {
+		rm1_ref(mp, mp) = eps3;
 	    }
-	    cdiv_(&rm1[i + mp * rm1_dim1], &rm2[i + mp * rm2_dim1], &rm1[mp + 
-		    mp * rm1_dim1], &rm2[mp + mp * rm2_dim1], &x, &y);
+	    cdiv_(&rm1_ref(i__, mp), &rm2_ref(i__, mp), &rm1_ref(mp, mp), &
+		    rm2_ref(mp, mp), &x, &y);
 	    if (x == 0.f && y == 0.f) {
 		goto L400;
 	    }
 
 	    i__3 = uk;
-	    for (j = i; j <= i__3; ++j) {
-		rm1[i + j * rm1_dim1] = rm1[i + j * rm1_dim1] - x * rm1[mp + 
-			j * rm1_dim1] + y * rm2[mp + j * rm2_dim1];
-		rm2[i + j * rm2_dim1] = rm2[i + j * rm2_dim1] - x * rm2[mp + 
-			j * rm2_dim1] - y * rm1[mp + j * rm1_dim1];
+	    for (j = i__; j <= i__3; ++j) {
+		rm1_ref(i__, j) = rm1_ref(i__, j) - x * rm1_ref(mp, j) + y * 
+			rm2_ref(mp, j);
+		rm2_ref(i__, j) = rm2_ref(i__, j) - x * rm2_ref(mp, j) - y * 
+			rm1_ref(mp, j);
 /* L380: */
 	    }
 
@@ -374,9 +376,8 @@ L400:
 	}
 
 L420:
-	if (rm1[uk + uk * rm1_dim1] == 0.f && rm2[uk + uk * rm2_dim1] == 0.f) 
-		{
-	    rm1[uk + uk * rm1_dim1] = eps3;
+	if (rm1_ref(uk, uk) == 0.f && rm2_ref(uk, uk) == 0.f) {
+	    rm1_ref(uk, uk) = eps3;
 	}
 	its = 0;
 /*     .......... BACK SUBSTITUTION   
@@ -384,26 +385,24 @@ L420:
 L660:
 	i__2 = uk;
 	for (ii = 1; ii <= i__2; ++ii) {
-	    i = uk + 1 - ii;
-	    x = rv1[i];
+	    i__ = uk + 1 - ii;
+	    x = rv1[i__];
 	    y = 0.f;
-	    if (i == uk) {
+	    if (i__ == uk) {
 		goto L700;
 	    }
-	    ip1 = i + 1;
+	    ip1 = i__ + 1;
 
 	    i__3 = uk;
 	    for (j = ip1; j <= i__3; ++j) {
-		x = x - rm1[i + j * rm1_dim1] * rv1[j] + rm2[i + j * rm2_dim1]
-			 * rv2[j];
-		y = y - rm1[i + j * rm1_dim1] * rv2[j] - rm2[i + j * rm2_dim1]
-			 * rv1[j];
+		x = x - rm1_ref(i__, j) * rv1[j] + rm2_ref(i__, j) * rv2[j];
+		y = y - rm1_ref(i__, j) * rv2[j] - rm2_ref(i__, j) * rv1[j];
 /* L680: */
 	    }
 
 L700:
-	    cdiv_(&x, &y, &rm1[i + i * rm1_dim1], &rm2[i + i * rm2_dim1], &
-		    rv1[i], &rv2[i]);
+	    cdiv_(&x, &y, &rm1_ref(i__, i__), &rm2_ref(i__, i__), &rv1[i__], &
+		    rv2[i__]);
 /* L720: */
 	}
 
@@ -419,13 +418,13 @@ L700:
 /*        INCREMENT OP COUNT ACCEPTANCE TEST */
 	latime_1.ops += uk * 19;
 	i__2 = uk;
-	for (i = 1; i <= i__2; ++i) {
-	    x = pythag_(&rv1[i], &rv2[i]);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    x = pythag_(&rv1[i__], &rv2[i__]);
 	    if (normv >= x) {
 		goto L760;
 	    }
 	    normv = x;
-	    j = i;
+	    j = i__;
 L760:
 	    norm += x;
 /* L780: */
@@ -442,9 +441,9 @@ L760:
 /*        INCREMENT OP COUNT ACCEPT VECTOR LOOP 820 */
 	latime_1.ops += uk << 4;
 	i__2 = uk;
-	for (i = 1; i <= i__2; ++i) {
-	    cdiv_(&rv1[i], &rv2[i], &x, &y, &zr[i + s * zr_dim1], &zi[i + s * 
-		    zi_dim1]);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    cdiv_(&rv1[i__], &rv2[i__], &x, &y, &zr_ref(i__, s), &zi_ref(i__, 
+		    s));
 /* L820: */
 	}
 
@@ -464,9 +463,9 @@ L840:
 	rv1[1] = eps3;
 
 	i__2 = uk;
-	for (i = 2; i <= i__2; ++i) {
+	for (i__ = 2; i__ <= i__2; ++i__) {
 /* L860: */
-	    rv1[i] = y;
+	    rv1[i__] = y;
 	}
 
 	j = uk - its + 1;
@@ -476,13 +475,12 @@ L840:
 L880:
 	j = 1;
 	*ierr = -k;
-/*     .......... SET REMAINING VECTOR COMPONENTS TO ZERO .......... 
-*/
+/*     .......... SET REMAINING VECTOR COMPONENTS TO ZERO .......... */
 L900:
 	i__2 = *n;
-	for (i = j; i <= i__2; ++i) {
-	    zr[i + s * zr_dim1] = 0.f;
-	    zi[i + s * zi_dim1] = 0.f;
+	for (i__ = j; i__ <= i__2; ++i__) {
+	    zr_ref(i__, s) = 0.f;
+	    zi_ref(i__, s) = 0.f;
 /* L920: */
 	}
 
@@ -508,9 +506,17 @@ L1001:
 /*     COMPUTE FINAL OP COUNT */
     latime_1.ops += opst;
     return 0;
-} /* cinvit_   
+} /* cinvit_ */
 
-   Subroutine */ int comqr_(integer *nm, integer *n, integer *low, integer *
+#undef rm2_ref
+#undef rm1_ref
+#undef zr_ref
+#undef zi_ref
+#undef ar_ref
+#undef ai_ref
+
+
+/* Subroutine */ int comqr_(integer *nm, integer *n, integer *low, integer *
 	igh, real *hr, real *hi, real *wr, real *wi, integer *ierr)
 {
     /* System generated locals */
@@ -521,7 +527,7 @@ L1001:
     extern /* Subroutine */ int cdiv_(real *, real *, real *, real *, real *, 
 	    real *);
     static real unfl, ovfl, norm, opst;
-    static integer i, j, l;
+    static integer i__, j, l;
     static real small;
     static integer en, ll;
     static real si, ti, xi, yi, sr, tr;
@@ -534,6 +540,10 @@ L1001:
     static real ulp, zzi, zzr;
     static integer enm1;
     static real tst1, tst2;
+
+
+#define hi_ref(a_1,a_2) hi[(a_2)*hi_dim1 + a_1]
+#define hr_ref(a_1,a_2) hr[(a_2)*hr_dim1 + a_1]
 
 
 
@@ -592,13 +602,11 @@ L1001:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
 
 
@@ -606,10 +614,10 @@ L1001:
     --wi;
     --wr;
     hi_dim1 = *nm;
-    hi_offset = hi_dim1 + 1;
+    hi_offset = 1 + hi_dim1 * 1;
     hi -= hi_offset;
     hr_dim1 = *nm;
-    hr_offset = hr_dim1 + 1;
+    hr_offset = 1 + hr_dim1 * 1;
     hr -= hr_offset;
 
     /* Function Body */
@@ -626,8 +634,8 @@ L1001:
 /* Computing MIN */
 	i__3 = *igh, i__4 = j + 1;
 	i__2 = min(i__3,i__4);
-	for (i = *low; i <= i__2; ++i) {
-	    sr += pythag_(&hr[i + j * hr_dim1], &hi[i + j * hi_dim1]);
+	for (i__ = *low; i__ <= i__2; ++i__) {
+	    sr += pythag_(&hr_ref(i__, j), &hi_ref(i__, j));
 /* L4: */
 	}
 	norm = dmax(norm,sr);
@@ -661,35 +669,32 @@ L1001:
 /*        INCREMENT OP COUNT FOR LOOP 170 */
     latime_1.ops += ((*igh - *low + 1) * 6 + 32) * (*igh - l + 1);
     i__1 = *igh;
-    for (i = l; i <= i__1; ++i) {
+    for (i__ = l; i__ <= i__1; ++i__) {
 /* Computing MIN */
-	i__2 = i + 1;
+	i__2 = i__ + 1;
 	ll = min(i__2,*igh);
-	if (hi[i + (i - 1) * hi_dim1] == 0.f) {
+	if (hi_ref(i__, i__ - 1) == 0.f) {
 	    goto L170;
 	}
-	norm = pythag_(&hr[i + (i - 1) * hr_dim1], &hi[i + (i - 1) * hi_dim1])
-		;
-	yr = hr[i + (i - 1) * hr_dim1] / norm;
-	yi = hi[i + (i - 1) * hi_dim1] / norm;
-	hr[i + (i - 1) * hr_dim1] = norm;
-	hi[i + (i - 1) * hi_dim1] = 0.f;
+	norm = pythag_(&hr_ref(i__, i__ - 1), &hi_ref(i__, i__ - 1));
+	yr = hr_ref(i__, i__ - 1) / norm;
+	yi = hi_ref(i__, i__ - 1) / norm;
+	hr_ref(i__, i__ - 1) = norm;
+	hi_ref(i__, i__ - 1) = 0.f;
 
 	i__2 = *igh;
-	for (j = i; j <= i__2; ++j) {
-	    si = yr * hi[i + j * hi_dim1] - yi * hr[i + j * hr_dim1];
-	    hr[i + j * hr_dim1] = yr * hr[i + j * hr_dim1] + yi * hi[i + j * 
-		    hi_dim1];
-	    hi[i + j * hi_dim1] = si;
+	for (j = i__; j <= i__2; ++j) {
+	    si = yr * hi_ref(i__, j) - yi * hr_ref(i__, j);
+	    hr_ref(i__, j) = yr * hr_ref(i__, j) + yi * hi_ref(i__, j);
+	    hi_ref(i__, j) = si;
 /* L155: */
 	}
 
 	i__2 = ll;
 	for (j = *low; j <= i__2; ++j) {
-	    si = yr * hi[j + i * hi_dim1] + yi * hr[j + i * hr_dim1];
-	    hr[j + i * hr_dim1] = yr * hr[j + i * hr_dim1] - yi * hi[j + i * 
-		    hi_dim1];
-	    hi[j + i * hi_dim1] = si;
+	    si = yr * hi_ref(j, i__) + yi * hr_ref(j, i__);
+	    hr_ref(j, i__) = yr * hr_ref(j, i__) - yi * hi_ref(j, i__);
+	    hi_ref(j, i__) = si;
 /* L160: */
 	}
 
@@ -699,12 +704,12 @@ L170:
 /*     .......... STORE ROOTS ISOLATED BY CBAL .......... */
 L180:
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	if (i >= *low && i <= *igh) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (i__ >= *low && i__ <= *igh) {
 	    goto L200;
 	}
-	wr[i] = hr[i + i * hr_dim1];
-	wi[i] = hi[i + i * hi_dim1];
+	wr[i__] = hr_ref(i__, i__);
+	wi[i__] = hi_ref(i__, i__);
 L200:
 	;
     }
@@ -729,13 +734,12 @@ L240:
 	if (l == *low) {
 	    goto L300;
 	}
-	tst1 = (r__1 = hr[l - 1 + (l - 1) * hr_dim1], dabs(r__1)) + (r__2 = 
-		hi[l - 1 + (l - 1) * hi_dim1], dabs(r__2)) + (r__3 = hr[l + l 
-		* hr_dim1], dabs(r__3)) + (r__4 = hi[l + l * hi_dim1], dabs(
-		r__4));
+	tst1 = (r__1 = hr_ref(l - 1, l - 1), dabs(r__1)) + (r__2 = hi_ref(l - 
+		1, l - 1), dabs(r__2)) + (r__3 = hr_ref(l, l), dabs(r__3)) + (
+		r__4 = hi_ref(l, l), dabs(r__4));
 /*         TST2 = TST1 + ABS(HR(L,L-1))   
            IF (TST2 .EQ. TST1) GO TO 300 */
-	tst2 = (r__1 = hr[l + (l - 1) * hr_dim1], dabs(r__1));
+	tst2 = (r__1 = hr_ref(l, l - 1), dabs(r__1));
 /* Computing MIN */
 	r__1 = ulp * tst1;
 	if (tst2 <= dmin(r__1,small)) {
@@ -760,15 +764,15 @@ L300:
 
 /*        INCREMENT OPCOUNT FOR FOMING SHIFT */
     opst += 58;
-    sr = hr[en + en * hr_dim1];
-    si = hi[en + en * hi_dim1];
-    xr = hr[enm1 + en * hr_dim1] * hr[en + enm1 * hr_dim1];
-    xi = hi[enm1 + en * hi_dim1] * hr[en + enm1 * hr_dim1];
+    sr = hr_ref(en, en);
+    si = hi_ref(en, en);
+    xr = hr_ref(enm1, en) * hr_ref(en, enm1);
+    xi = hi_ref(enm1, en) * hr_ref(en, enm1);
     if (xr == 0.f && xi == 0.f) {
 	goto L340;
     }
-    yr = (hr[enm1 + enm1 * hr_dim1] - sr) / 2.f;
-    yi = (hi[enm1 + enm1 * hi_dim1] - si) / 2.f;
+    yr = (hr_ref(enm1, enm1) - sr) / 2.f;
+    yi = (hi_ref(enm1, enm1) - si) / 2.f;
 /* Computing 2nd power */
     r__2 = yr;
 /* Computing 2nd power */
@@ -779,8 +783,8 @@ L300:
     if (yr * zzr + yi * zzi >= 0.f) {
 	goto L310;
     }
-    zzr = -(doublereal)zzr;
-    zzi = -(doublereal)zzi;
+    zzr = -zzr;
+    zzi = -zzi;
 L310:
     r__1 = yr + zzr;
     r__2 = yi + zzi;
@@ -790,15 +794,15 @@ L310:
     goto L340;
 /*     .......... FORM EXCEPTIONAL SHIFT .......... */
 L320:
-    sr = (r__1 = hr[en + enm1 * hr_dim1], dabs(r__1)) + (r__2 = hr[enm1 + (en 
-	    - 2) * hr_dim1], dabs(r__2));
+    sr = (r__1 = hr_ref(en, enm1), dabs(r__1)) + (r__2 = hr_ref(enm1, en - 2),
+	     dabs(r__2));
     si = 0.f;
 
 L340:
     i__1 = en;
-    for (i = *low; i <= i__1; ++i) {
-	hr[i + i * hr_dim1] -= sr;
-	hi[i + i * hi_dim1] -= si;
+    for (i__ = *low; i__ <= i__1; ++i__) {
+	hr_ref(i__, i__) = hr_ref(i__, i__) - sr;
+	hi_ref(i__, i__) = hi_ref(i__, i__) - si;
 /* L360: */
     }
 
@@ -819,49 +823,46 @@ L340:
 /*        INCREMENT OPCOUNT FOR REDUCING TO TRIANGULAR, LOOP 500 */
     latime_1.ops += (en - lp1 + 1) * ((en - lp1) * 10 + 61);
     i__1 = en;
-    for (i = lp1; i <= i__1; ++i) {
-	sr = hr[i + (i - 1) * hr_dim1];
-	hr[i + (i - 1) * hr_dim1] = 0.f;
-	r__1 = pythag_(&hr[i - 1 + (i - 1) * hr_dim1], &hi[i - 1 + (i - 1) * 
-		hi_dim1]);
+    for (i__ = lp1; i__ <= i__1; ++i__) {
+	sr = hr_ref(i__, i__ - 1);
+	hr_ref(i__, i__ - 1) = 0.f;
+	r__1 = pythag_(&hr_ref(i__ - 1, i__ - 1), &hi_ref(i__ - 1, i__ - 1));
 	norm = pythag_(&r__1, &sr);
-	xr = hr[i - 1 + (i - 1) * hr_dim1] / norm;
-	wr[i - 1] = xr;
-	xi = hi[i - 1 + (i - 1) * hi_dim1] / norm;
-	wi[i - 1] = xi;
-	hr[i - 1 + (i - 1) * hr_dim1] = norm;
-	hi[i - 1 + (i - 1) * hi_dim1] = 0.f;
-	hi[i + (i - 1) * hi_dim1] = sr / norm;
+	xr = hr_ref(i__ - 1, i__ - 1) / norm;
+	wr[i__ - 1] = xr;
+	xi = hi_ref(i__ - 1, i__ - 1) / norm;
+	wi[i__ - 1] = xi;
+	hr_ref(i__ - 1, i__ - 1) = norm;
+	hi_ref(i__ - 1, i__ - 1) = 0.f;
+	hi_ref(i__, i__ - 1) = sr / norm;
 
 	i__2 = en;
-	for (j = i; j <= i__2; ++j) {
-	    yr = hr[i - 1 + j * hr_dim1];
-	    yi = hi[i - 1 + j * hi_dim1];
-	    zzr = hr[i + j * hr_dim1];
-	    zzi = hi[i + j * hi_dim1];
-	    hr[i - 1 + j * hr_dim1] = xr * yr + xi * yi + hi[i + (i - 1) * 
-		    hi_dim1] * zzr;
-	    hi[i - 1 + j * hi_dim1] = xr * yi - xi * yr + hi[i + (i - 1) * 
-		    hi_dim1] * zzi;
-	    hr[i + j * hr_dim1] = xr * zzr - xi * zzi - hi[i + (i - 1) * 
-		    hi_dim1] * yr;
-	    hi[i + j * hi_dim1] = xr * zzi + xi * zzr - hi[i + (i - 1) * 
-		    hi_dim1] * yi;
+	for (j = i__; j <= i__2; ++j) {
+	    yr = hr_ref(i__ - 1, j);
+	    yi = hi_ref(i__ - 1, j);
+	    zzr = hr_ref(i__, j);
+	    zzi = hi_ref(i__, j);
+	    hr_ref(i__ - 1, j) = xr * yr + xi * yi + hi_ref(i__, i__ - 1) * 
+		    zzr;
+	    hi_ref(i__ - 1, j) = xr * yi - xi * yr + hi_ref(i__, i__ - 1) * 
+		    zzi;
+	    hr_ref(i__, j) = xr * zzr - xi * zzi - hi_ref(i__, i__ - 1) * yr;
+	    hi_ref(i__, j) = xr * zzi + xi * zzr - hi_ref(i__, i__ - 1) * yi;
 /* L490: */
 	}
 
 /* L500: */
     }
 
-    si = hi[en + en * hi_dim1];
+    si = hi_ref(en, en);
     if (si == 0.f) {
 	goto L540;
     }
-    norm = pythag_(&hr[en + en * hr_dim1], &si);
-    sr = hr[en + en * hr_dim1] / norm;
+    norm = pythag_(&hr_ref(en, en), &si);
+    sr = hr_ref(en, en) / norm;
     si /= norm;
-    hr[en + en * hr_dim1] = norm;
-    hi[en + en * hi_dim1] = 0.f;
+    hr_ref(en, en) = norm;
+    hi_ref(en, en) = 0.f;
 
 /*        INCREMENT OPCOUNT */
     opst += 20;
@@ -873,24 +874,20 @@ L540:
 	xi = wi[j - 1];
 
 	i__2 = j;
-	for (i = l; i <= i__2; ++i) {
-	    yr = hr[i + (j - 1) * hr_dim1];
+	for (i__ = l; i__ <= i__2; ++i__) {
+	    yr = hr_ref(i__, j - 1);
 	    yi = 0.f;
-	    zzr = hr[i + j * hr_dim1];
-	    zzi = hi[i + j * hi_dim1];
-	    if (i == j) {
+	    zzr = hr_ref(i__, j);
+	    zzi = hi_ref(i__, j);
+	    if (i__ == j) {
 		goto L560;
 	    }
-	    yi = hi[i + (j - 1) * hi_dim1];
-	    hi[i + (j - 1) * hi_dim1] = xr * yi + xi * yr + hi[j + (j - 1) * 
-		    hi_dim1] * zzi;
+	    yi = hi_ref(i__, j - 1);
+	    hi_ref(i__, j - 1) = xr * yi + xi * yr + hi_ref(j, j - 1) * zzi;
 L560:
-	    hr[i + (j - 1) * hr_dim1] = xr * yr - xi * yi + hi[j + (j - 1) * 
-		    hi_dim1] * zzr;
-	    hr[i + j * hr_dim1] = xr * zzr + xi * zzi - hi[j + (j - 1) * 
-		    hi_dim1] * yr;
-	    hi[i + j * hi_dim1] = xr * zzi - xi * zzr - hi[j + (j - 1) * 
-		    hi_dim1] * yi;
+	    hr_ref(i__, j - 1) = xr * yr - xi * yi + hi_ref(j, j - 1) * zzr;
+	    hr_ref(i__, j) = xr * zzr + xi * zzi - hi_ref(j, j - 1) * yr;
+	    hi_ref(i__, j) = xr * zzi - xi * zzr - hi_ref(j, j - 1) * yi;
 /* L580: */
 	}
 
@@ -908,19 +905,19 @@ L560:
 /*        INCREMENT OP COUNT FOR LOOP 630 */
     latime_1.ops += (en - l + 1) * 6;
     i__1 = en;
-    for (i = l; i <= i__1; ++i) {
-	yr = hr[i + en * hr_dim1];
-	yi = hi[i + en * hi_dim1];
-	hr[i + en * hr_dim1] = sr * yr - si * yi;
-	hi[i + en * hi_dim1] = sr * yi + si * yr;
+    for (i__ = l; i__ <= i__1; ++i__) {
+	yr = hr_ref(i__, en);
+	yi = hi_ref(i__, en);
+	hr_ref(i__, en) = sr * yr - si * yi;
+	hi_ref(i__, en) = sr * yi + si * yr;
 /* L630: */
     }
 
     goto L240;
 /*     .......... A ROOT FOUND .......... */
 L660:
-    wr[en] = hr[en + en * hr_dim1] + tr;
-    wi[en] = hi[en + en * hi_dim1] + ti;
+    wr[en] = hr_ref(en, en) + tr;
+    wi[en] = hi_ref(en, en) + ti;
     en = enm1;
     goto L220;
 /*     .......... SET ERROR -- ALL EIGENVALUES HAVE NOT   
@@ -932,9 +929,13 @@ L1001:
 /*     COMPUTE FINAL OP COUNT */
     latime_1.ops += opst;
     return 0;
-} /* comqr_   
+} /* comqr_ */
 
-   Subroutine */ int comqr2_(integer *nm, integer *n, integer *low, integer *
+#undef hr_ref
+#undef hi_ref
+
+
+/* Subroutine */ int comqr2_(integer *nm, integer *n, integer *low, integer *
 	igh, real *ortr, real *orti, real *hr, real *hi, real *wr, real *wi, 
 	real *zr, real *zi, integer *ierr)
 {
@@ -948,7 +949,7 @@ L1001:
     extern /* Subroutine */ int cdiv_(real *, real *, real *, real *, real *, 
 	    real *);
     static real unfl, ovfl, norm, opst;
-    static integer i, j, k, l, m;
+    static integer i__, j, k, l, m;
     static real small;
     static integer ii, en, jj, ll, nn;
     static real si, ti, xi, yi, sr, tr;
@@ -962,6 +963,12 @@ L1001:
     static real ulp, zzi, zzr;
     static integer enm1;
     static real tst1, tst2;
+
+
+#define hi_ref(a_1,a_2) hi[(a_2)*hi_dim1 + a_1]
+#define hr_ref(a_1,a_2) hr[(a_2)*hr_dim1 + a_1]
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
 
 
 
@@ -997,16 +1004,14 @@ L1001:
 
           ORTR AND ORTI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-   
             FORMATIONS USED IN THE REDUCTION BY  CORTH, IF PERFORMED.   
-            ONLY ELEMENTS LOW THROUGH IGH ARE USED.  IF THE EIGENVECTORS 
-  
+            ONLY ELEMENTS LOW THROUGH IGH ARE USED.  IF THE EIGENVECTORS   
             OF THE HESSENBERG MATRIX ARE DESIRED, SET ORTR(J) AND   
             ORTI(J) TO 0.0E0 FOR THESE ELEMENTS.   
 
           HR AND HI CONTAIN THE REAL AND IMAGINARY PARTS,   
             RESPECTIVELY, OF THE COMPLEX UPPER HESSENBERG MATRIX.   
             THEIR LOWER TRIANGLES BELOW THE SUBDIAGONAL CONTAIN FURTHER   
-            INFORMATION ABOUT THE TRANSFORMATIONS WHICH WERE USED IN THE 
-  
+            INFORMATION ABOUT THE TRANSFORMATIONS WHICH WERE USED IN THE   
             REDUCTION BY  CORTH, IF PERFORMED.  IF THE EIGENVECTORS OF   
             THE HESSENBERG MATRIX ARE DESIRED, THESE ELEMENTS MAY BE   
             ARBITRARY.   
@@ -1036,8 +1041,7 @@ L1001:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
@@ -1055,25 +1059,24 @@ L1001:
 
        ACCORDING TO BURT GARBOW'S SUGGESTION ON NA-NET.   
        ZHAOJUN BAI, NOV.28, 1989   
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
 
 
        Parameter adjustments */
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
     --wi;
     --wr;
     hi_dim1 = *nm;
-    hi_offset = hi_dim1 + 1;
+    hi_offset = 1 + hi_dim1 * 1;
     hi -= hi_offset;
     hr_dim1 = *nm;
-    hr_offset = hr_dim1 + 1;
+    hr_offset = 1 + hr_dim1 * 1;
     hr -= hr_offset;
     --orti;
     --ortr;
@@ -1092,8 +1095,8 @@ L1001:
 /* Computing MIN */
 	i__3 = *n, i__4 = j + 1;
 	i__2 = min(i__3,i__4);
-	for (i = 1; i <= i__2; ++i) {
-	    sr += pythag_(&hr[i + j * hr_dim1], &hi[i + j * hi_dim1]);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    sr += pythag_(&hr_ref(i__, j), &hi_ref(i__, j));
 /* L4: */
 	}
 	norm = dmax(norm,sr);
@@ -1122,12 +1125,12 @@ L1001:
     for (j = 1; j <= i__1; ++j) {
 
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    zr[i + j * zr_dim1] = 0.f;
-	    zi[i + j * zi_dim1] = 0.f;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    zr_ref(i__, j) = 0.f;
+	    zi_ref(i__, j) = 0.f;
 /* L100: */
 	}
-	zr[j + j * zr_dim1] = 1.f;
+	zr_ref(j, j) = 1.f;
 /* L101: */
     }
 /*     .......... FORM THE MATRIX OF ACCUMULATED TRANSFORMATIONS   
@@ -1144,41 +1147,37 @@ L1001:
 L105:
     i__1 = iend;
     for (ii = 1; ii <= i__1; ++ii) {
-	i = *igh - ii;
-	if (ortr[i] == 0.f && orti[i] == 0.f) {
+	i__ = *igh - ii;
+	if (ortr[i__] == 0.f && orti[i__] == 0.f) {
 	    goto L140;
 	}
-	if (hr[i + (i - 1) * hr_dim1] == 0.f && hi[i + (i - 1) * hi_dim1] == 
-		0.f) {
+	if (hr_ref(i__, i__ - 1) == 0.f && hi_ref(i__, i__ - 1) == 0.f) {
 	    goto L140;
 	}
-/*     .......... NORM BELOW IS NEGATIVE OF H FORMED IN CORTH ........
-.. */
-	norm = hr[i + (i - 1) * hr_dim1] * ortr[i] + hi[i + (i - 1) * hi_dim1]
-		 * orti[i];
-	ip1 = i + 1;
+/*     .......... NORM BELOW IS NEGATIVE OF H FORMED IN CORTH .......... */
+	norm = hr_ref(i__, i__ - 1) * ortr[i__] + hi_ref(i__, i__ - 1) * orti[
+		i__];
+	ip1 = i__ + 1;
 
 	i__2 = *igh;
 	for (k = ip1; k <= i__2; ++k) {
-	    ortr[k] = hr[k + (i - 1) * hr_dim1];
-	    orti[k] = hi[k + (i - 1) * hi_dim1];
+	    ortr[k] = hr_ref(k, i__ - 1);
+	    orti[k] = hi_ref(k, i__ - 1);
 /* L110: */
 	}
 
 
 /*        INCREMENT OP COUNT FOR LOOP 130 */
-	latime_1.ops += ((*igh - i + 1 << 4) + 2) * (*igh - i + 1);
+	latime_1.ops += ((*igh - i__ + 1 << 4) + 2) * (*igh - i__ + 1);
 	i__2 = *igh;
-	for (j = i; j <= i__2; ++j) {
+	for (j = i__; j <= i__2; ++j) {
 	    sr = 0.f;
 	    si = 0.f;
 
 	    i__3 = *igh;
-	    for (k = i; k <= i__3; ++k) {
-		sr = sr + ortr[k] * zr[k + j * zr_dim1] + orti[k] * zi[k + j *
-			 zi_dim1];
-		si = si + ortr[k] * zi[k + j * zi_dim1] - orti[k] * zr[k + j *
-			 zr_dim1];
+	    for (k = i__; k <= i__3; ++k) {
+		sr = sr + ortr[k] * zr_ref(k, j) + orti[k] * zi_ref(k, j);
+		si = si + ortr[k] * zi_ref(k, j) - orti[k] * zr_ref(k, j);
 /* L115: */
 	    }
 
@@ -1186,11 +1185,9 @@ L105:
 	    si /= norm;
 
 	    i__3 = *igh;
-	    for (k = i; k <= i__3; ++k) {
-		zr[k + j * zr_dim1] = zr[k + j * zr_dim1] + sr * ortr[k] - si 
-			* orti[k];
-		zi[k + j * zi_dim1] = zi[k + j * zi_dim1] + sr * orti[k] + si 
-			* ortr[k];
+	    for (k = i__; k <= i__3; ++k) {
+		zr_ref(k, j) = zr_ref(k, j) + sr * ortr[k] - si * orti[k];
+		zi_ref(k, j) = zi_ref(k, j) + sr * orti[k] + si * ortr[k];
 /* L120: */
 	    }
 
@@ -1211,44 +1208,40 @@ L150:
 /*        INCREMENT OP COUNT FOR LOOP 170 */
     latime_1.ops += ((*igh - *low + 1) * 12 + 42) * (*igh - l + 1);
     i__1 = *igh;
-    for (i = l; i <= i__1; ++i) {
+    for (i__ = l; i__ <= i__1; ++i__) {
 /* Computing MIN */
-	i__2 = i + 1;
+	i__2 = i__ + 1;
 	ll = min(i__2,*igh);
-	if (hi[i + (i - 1) * hi_dim1] == 0.f) {
+	if (hi_ref(i__, i__ - 1) == 0.f) {
 	    goto L170;
 	}
-	norm = pythag_(&hr[i + (i - 1) * hr_dim1], &hi[i + (i - 1) * hi_dim1])
-		;
-	yr = hr[i + (i - 1) * hr_dim1] / norm;
-	yi = hi[i + (i - 1) * hi_dim1] / norm;
-	hr[i + (i - 1) * hr_dim1] = norm;
-	hi[i + (i - 1) * hi_dim1] = 0.f;
+	norm = pythag_(&hr_ref(i__, i__ - 1), &hi_ref(i__, i__ - 1));
+	yr = hr_ref(i__, i__ - 1) / norm;
+	yi = hi_ref(i__, i__ - 1) / norm;
+	hr_ref(i__, i__ - 1) = norm;
+	hi_ref(i__, i__ - 1) = 0.f;
 
 	i__2 = *n;
-	for (j = i; j <= i__2; ++j) {
-	    si = yr * hi[i + j * hi_dim1] - yi * hr[i + j * hr_dim1];
-	    hr[i + j * hr_dim1] = yr * hr[i + j * hr_dim1] + yi * hi[i + j * 
-		    hi_dim1];
-	    hi[i + j * hi_dim1] = si;
+	for (j = i__; j <= i__2; ++j) {
+	    si = yr * hi_ref(i__, j) - yi * hr_ref(i__, j);
+	    hr_ref(i__, j) = yr * hr_ref(i__, j) + yi * hi_ref(i__, j);
+	    hi_ref(i__, j) = si;
 /* L155: */
 	}
 
 	i__2 = ll;
 	for (j = 1; j <= i__2; ++j) {
-	    si = yr * hi[j + i * hi_dim1] + yi * hr[j + i * hr_dim1];
-	    hr[j + i * hr_dim1] = yr * hr[j + i * hr_dim1] - yi * hi[j + i * 
-		    hi_dim1];
-	    hi[j + i * hi_dim1] = si;
+	    si = yr * hi_ref(j, i__) + yi * hr_ref(j, i__);
+	    hr_ref(j, i__) = yr * hr_ref(j, i__) - yi * hi_ref(j, i__);
+	    hi_ref(j, i__) = si;
 /* L160: */
 	}
 
 	i__2 = *igh;
 	for (j = *low; j <= i__2; ++j) {
-	    si = yr * zi[j + i * zi_dim1] + yi * zr[j + i * zr_dim1];
-	    zr[j + i * zr_dim1] = yr * zr[j + i * zr_dim1] - yi * zi[j + i * 
-		    zi_dim1];
-	    zi[j + i * zi_dim1] = si;
+	    si = yr * zi_ref(j, i__) + yi * zr_ref(j, i__);
+	    zr_ref(j, i__) = yr * zr_ref(j, i__) - yi * zi_ref(j, i__);
+	    zi_ref(j, i__) = si;
 /* L165: */
 	}
 
@@ -1258,12 +1251,12 @@ L170:
 /*     .......... STORE ROOTS ISOLATED BY CBAL .......... */
 L180:
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	if (i >= *low && i <= *igh) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (i__ >= *low && i__ <= *igh) {
 	    goto L200;
 	}
-	wr[i] = hr[i + i * hr_dim1];
-	wi[i] = hi[i + i * hi_dim1];
+	wr[i__] = hr_ref(i__, i__);
+	wi[i__] = hi_ref(i__, i__);
 L200:
 	;
     }
@@ -1288,13 +1281,12 @@ L240:
 	if (l == *low) {
 	    goto L300;
 	}
-	tst1 = (r__1 = hr[l - 1 + (l - 1) * hr_dim1], dabs(r__1)) + (r__2 = 
-		hi[l - 1 + (l - 1) * hi_dim1], dabs(r__2)) + (r__3 = hr[l + l 
-		* hr_dim1], dabs(r__3)) + (r__4 = hi[l + l * hi_dim1], dabs(
-		r__4));
+	tst1 = (r__1 = hr_ref(l - 1, l - 1), dabs(r__1)) + (r__2 = hi_ref(l - 
+		1, l - 1), dabs(r__2)) + (r__3 = hr_ref(l, l), dabs(r__3)) + (
+		r__4 = hi_ref(l, l), dabs(r__4));
 /*         TST2 = TST1 + ABS(HR(L,L-1))   
            IF (TST2 .EQ. TST1) GO TO 300 */
-	tst2 = (r__1 = hr[l + (l - 1) * hr_dim1], dabs(r__1));
+	tst2 = (r__1 = hr_ref(l, l - 1), dabs(r__1));
 /* Computing MIN */
 	r__1 = ulp * tst1;
 	if (tst2 <= dmin(r__1,small)) {
@@ -1319,15 +1311,15 @@ L300:
 
 /*        INCREMENT OPCOUNT FOR FOMING SHIFT */
     opst += 58;
-    sr = hr[en + en * hr_dim1];
-    si = hi[en + en * hi_dim1];
-    xr = hr[enm1 + en * hr_dim1] * hr[en + enm1 * hr_dim1];
-    xi = hi[enm1 + en * hi_dim1] * hr[en + enm1 * hr_dim1];
+    sr = hr_ref(en, en);
+    si = hi_ref(en, en);
+    xr = hr_ref(enm1, en) * hr_ref(en, enm1);
+    xi = hi_ref(enm1, en) * hr_ref(en, enm1);
     if (xr == 0.f && xi == 0.f) {
 	goto L340;
     }
-    yr = (hr[enm1 + enm1 * hr_dim1] - sr) / 2.f;
-    yi = (hi[enm1 + enm1 * hi_dim1] - si) / 2.f;
+    yr = (hr_ref(enm1, enm1) - sr) / 2.f;
+    yi = (hi_ref(enm1, enm1) - si) / 2.f;
 /* Computing 2nd power */
     r__2 = yr;
 /* Computing 2nd power */
@@ -1338,8 +1330,8 @@ L300:
     if (yr * zzr + yi * zzi >= 0.f) {
 	goto L310;
     }
-    zzr = -(doublereal)zzr;
-    zzi = -(doublereal)zzi;
+    zzr = -zzr;
+    zzi = -zzi;
 L310:
     r__1 = yr + zzr;
     r__2 = yi + zzi;
@@ -1349,15 +1341,15 @@ L310:
     goto L340;
 /*     .......... FORM EXCEPTIONAL SHIFT .......... */
 L320:
-    sr = (r__1 = hr[en + enm1 * hr_dim1], dabs(r__1)) + (r__2 = hr[enm1 + (en 
-	    - 2) * hr_dim1], dabs(r__2));
+    sr = (r__1 = hr_ref(en, enm1), dabs(r__1)) + (r__2 = hr_ref(enm1, en - 2),
+	     dabs(r__2));
     si = 0.f;
 
 L340:
     i__1 = en;
-    for (i = *low; i <= i__1; ++i) {
-	hr[i + i * hr_dim1] -= sr;
-	hi[i + i * hi_dim1] -= si;
+    for (i__ = *low; i__ <= i__1; ++i__) {
+	hr_ref(i__, i__) = hr_ref(i__, i__) - sr;
+	hi_ref(i__, i__) = hi_ref(i__, i__) - si;
 /* L360: */
     }
 
@@ -1378,49 +1370,46 @@ L340:
 /*        INCREMENT OPCOUNT FOR REDUCING TO TRIANGULAR, LOOP 500 */
     latime_1.ops += (en - lp1 + 1) * ((en - lp1) * 10 + 61);
     i__1 = en;
-    for (i = lp1; i <= i__1; ++i) {
-	sr = hr[i + (i - 1) * hr_dim1];
-	hr[i + (i - 1) * hr_dim1] = 0.f;
-	r__1 = pythag_(&hr[i - 1 + (i - 1) * hr_dim1], &hi[i - 1 + (i - 1) * 
-		hi_dim1]);
+    for (i__ = lp1; i__ <= i__1; ++i__) {
+	sr = hr_ref(i__, i__ - 1);
+	hr_ref(i__, i__ - 1) = 0.f;
+	r__1 = pythag_(&hr_ref(i__ - 1, i__ - 1), &hi_ref(i__ - 1, i__ - 1));
 	norm = pythag_(&r__1, &sr);
-	xr = hr[i - 1 + (i - 1) * hr_dim1] / norm;
-	wr[i - 1] = xr;
-	xi = hi[i - 1 + (i - 1) * hi_dim1] / norm;
-	wi[i - 1] = xi;
-	hr[i - 1 + (i - 1) * hr_dim1] = norm;
-	hi[i - 1 + (i - 1) * hi_dim1] = 0.f;
-	hi[i + (i - 1) * hi_dim1] = sr / norm;
+	xr = hr_ref(i__ - 1, i__ - 1) / norm;
+	wr[i__ - 1] = xr;
+	xi = hi_ref(i__ - 1, i__ - 1) / norm;
+	wi[i__ - 1] = xi;
+	hr_ref(i__ - 1, i__ - 1) = norm;
+	hi_ref(i__ - 1, i__ - 1) = 0.f;
+	hi_ref(i__, i__ - 1) = sr / norm;
 
 	i__2 = *n;
-	for (j = i; j <= i__2; ++j) {
-	    yr = hr[i - 1 + j * hr_dim1];
-	    yi = hi[i - 1 + j * hi_dim1];
-	    zzr = hr[i + j * hr_dim1];
-	    zzi = hi[i + j * hi_dim1];
-	    hr[i - 1 + j * hr_dim1] = xr * yr + xi * yi + hi[i + (i - 1) * 
-		    hi_dim1] * zzr;
-	    hi[i - 1 + j * hi_dim1] = xr * yi - xi * yr + hi[i + (i - 1) * 
-		    hi_dim1] * zzi;
-	    hr[i + j * hr_dim1] = xr * zzr - xi * zzi - hi[i + (i - 1) * 
-		    hi_dim1] * yr;
-	    hi[i + j * hi_dim1] = xr * zzi + xi * zzr - hi[i + (i - 1) * 
-		    hi_dim1] * yi;
+	for (j = i__; j <= i__2; ++j) {
+	    yr = hr_ref(i__ - 1, j);
+	    yi = hi_ref(i__ - 1, j);
+	    zzr = hr_ref(i__, j);
+	    zzi = hi_ref(i__, j);
+	    hr_ref(i__ - 1, j) = xr * yr + xi * yi + hi_ref(i__, i__ - 1) * 
+		    zzr;
+	    hi_ref(i__ - 1, j) = xr * yi - xi * yr + hi_ref(i__, i__ - 1) * 
+		    zzi;
+	    hr_ref(i__, j) = xr * zzr - xi * zzi - hi_ref(i__, i__ - 1) * yr;
+	    hi_ref(i__, j) = xr * zzi + xi * zzr - hi_ref(i__, i__ - 1) * yi;
 /* L490: */
 	}
 
 /* L500: */
     }
 
-    si = hi[en + en * hi_dim1];
+    si = hi_ref(en, en);
     if (si == 0.f) {
 	goto L540;
     }
-    norm = pythag_(&hr[en + en * hr_dim1], &si);
-    sr = hr[en + en * hr_dim1] / norm;
+    norm = pythag_(&hr_ref(en, en), &si);
+    sr = hr_ref(en, en) / norm;
     si /= norm;
-    hr[en + en * hr_dim1] = norm;
-    hi[en + en * hi_dim1] = 0.f;
+    hr_ref(en, en) = norm;
+    hi_ref(en, en) = 0.f;
 
 /*        INCREMENT OP COUNT */
     opst += 20;
@@ -1434,10 +1423,10 @@ L340:
     opst += (*n - ip1 + 1) * 6;
     i__1 = *n;
     for (j = ip1; j <= i__1; ++j) {
-	yr = hr[en + j * hr_dim1];
-	yi = hi[en + j * hi_dim1];
-	hr[en + j * hr_dim1] = sr * yr + si * yi;
-	hi[en + j * hi_dim1] = sr * yi - si * yr;
+	yr = hr_ref(en, j);
+	yi = hi_ref(en, j);
+	hr_ref(en, j) = sr * yr + si * yi;
+	hi_ref(en, j) = sr * yi - si * yr;
 /* L520: */
     }
 /*     .......... INVERSE OPERATION (COLUMNS) .......... */
@@ -1448,41 +1437,33 @@ L540:
 	xi = wi[j - 1];
 
 	i__2 = j;
-	for (i = 1; i <= i__2; ++i) {
-	    yr = hr[i + (j - 1) * hr_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    yr = hr_ref(i__, j - 1);
 	    yi = 0.f;
-	    zzr = hr[i + j * hr_dim1];
-	    zzi = hi[i + j * hi_dim1];
-	    if (i == j) {
+	    zzr = hr_ref(i__, j);
+	    zzi = hi_ref(i__, j);
+	    if (i__ == j) {
 		goto L560;
 	    }
-	    yi = hi[i + (j - 1) * hi_dim1];
-	    hi[i + (j - 1) * hi_dim1] = xr * yi + xi * yr + hi[j + (j - 1) * 
-		    hi_dim1] * zzi;
+	    yi = hi_ref(i__, j - 1);
+	    hi_ref(i__, j - 1) = xr * yi + xi * yr + hi_ref(j, j - 1) * zzi;
 L560:
-	    hr[i + (j - 1) * hr_dim1] = xr * yr - xi * yi + hi[j + (j - 1) * 
-		    hi_dim1] * zzr;
-	    hr[i + j * hr_dim1] = xr * zzr + xi * zzi - hi[j + (j - 1) * 
-		    hi_dim1] * yr;
-	    hi[i + j * hi_dim1] = xr * zzi - xi * zzr - hi[j + (j - 1) * 
-		    hi_dim1] * yi;
+	    hr_ref(i__, j - 1) = xr * yr - xi * yi + hi_ref(j, j - 1) * zzr;
+	    hr_ref(i__, j) = xr * zzr + xi * zzi - hi_ref(j, j - 1) * yr;
+	    hi_ref(i__, j) = xr * zzi - xi * zzr - hi_ref(j, j - 1) * yi;
 /* L580: */
 	}
 
 	i__2 = *igh;
-	for (i = *low; i <= i__2; ++i) {
-	    yr = zr[i + (j - 1) * zr_dim1];
-	    yi = zi[i + (j - 1) * zi_dim1];
-	    zzr = zr[i + j * zr_dim1];
-	    zzi = zi[i + j * zi_dim1];
-	    zr[i + (j - 1) * zr_dim1] = xr * yr - xi * yi + hi[j + (j - 1) * 
-		    hi_dim1] * zzr;
-	    zi[i + (j - 1) * zi_dim1] = xr * yi + xi * yr + hi[j + (j - 1) * 
-		    hi_dim1] * zzi;
-	    zr[i + j * zr_dim1] = xr * zzr + xi * zzi - hi[j + (j - 1) * 
-		    hi_dim1] * yr;
-	    zi[i + j * zi_dim1] = xr * zzi - xi * zzr - hi[j + (j - 1) * 
-		    hi_dim1] * yi;
+	for (i__ = *low; i__ <= i__2; ++i__) {
+	    yr = zr_ref(i__, j - 1);
+	    yi = zi_ref(i__, j - 1);
+	    zzr = zr_ref(i__, j);
+	    zzi = zi_ref(i__, j);
+	    zr_ref(i__, j - 1) = xr * yr - xi * yi + hi_ref(j, j - 1) * zzr;
+	    zi_ref(i__, j - 1) = xr * yi + xi * yr + hi_ref(j, j - 1) * zzi;
+	    zr_ref(i__, j) = xr * zzr + xi * zzi - hi_ref(j, j - 1) * yr;
+	    zi_ref(i__, j) = xr * zzi - xi * zzr - hi_ref(j, j - 1) * yi;
 /* L590: */
 	}
 
@@ -1501,30 +1482,30 @@ L560:
 /*        INCREMENT OPCOUNT FOR LOOP 630 AND 640 */
     latime_1.ops = latime_1.ops + en * 6 + (*igh - *low + 1) * 6;
     i__1 = en;
-    for (i = 1; i <= i__1; ++i) {
-	yr = hr[i + en * hr_dim1];
-	yi = hi[i + en * hi_dim1];
-	hr[i + en * hr_dim1] = sr * yr - si * yi;
-	hi[i + en * hi_dim1] = sr * yi + si * yr;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	yr = hr_ref(i__, en);
+	yi = hi_ref(i__, en);
+	hr_ref(i__, en) = sr * yr - si * yi;
+	hi_ref(i__, en) = sr * yi + si * yr;
 /* L630: */
     }
 
     i__1 = *igh;
-    for (i = *low; i <= i__1; ++i) {
-	yr = zr[i + en * zr_dim1];
-	yi = zi[i + en * zi_dim1];
-	zr[i + en * zr_dim1] = sr * yr - si * yi;
-	zi[i + en * zi_dim1] = sr * yi + si * yr;
+    for (i__ = *low; i__ <= i__1; ++i__) {
+	yr = zr_ref(i__, en);
+	yi = zi_ref(i__, en);
+	zr_ref(i__, en) = sr * yr - si * yi;
+	zi_ref(i__, en) = sr * yi + si * yr;
 /* L640: */
     }
 
     goto L240;
 /*     .......... A ROOT FOUND .......... */
 L660:
-    hr[en + en * hr_dim1] += tr;
-    wr[en] = hr[en + en * hr_dim1];
-    hi[en + en * hi_dim1] += ti;
-    wi[en] = hi[en + en * hi_dim1];
+    hr_ref(en, en) = hr_ref(en, en) + tr;
+    wr[en] = hr_ref(en, en);
+    hi_ref(en, en) = hi_ref(en, en) + ti;
+    wi[en] = hi_ref(en, en);
     en = enm1;
     goto L220;
 /*     .......... ALL ROOTS FOUND.  BACKSUBSTITUTE TO FIND   
@@ -1536,12 +1517,12 @@ L680:
 /*        INCREMENT OP COUNT FOR LOOP 720 */
     latime_1.ops += *n * (*n + 1) / 2;
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
 	i__2 = *n;
-	for (j = i; j <= i__2; ++j) {
-	    tr = (r__1 = hr[i + j * hr_dim1], dabs(r__1)) + (r__2 = hi[i + j *
-		     hi_dim1], dabs(r__2));
+	for (j = i__; j <= i__2; ++j) {
+	    tr = (r__1 = hr_ref(i__, j), dabs(r__1)) + (r__2 = hi_ref(i__, j),
+		     dabs(r__2));
 	    if (tr > norm) {
 		norm = tr;
 	    }
@@ -1558,8 +1539,8 @@ L680:
 	en = *n + 2 - nn;
 	xr = wr[en];
 	xi = wi[en];
-	hr[en + en * hr_dim1] = 1.f;
-	hi[en + en * hi_dim1] = 0.f;
+	hr_ref(en, en) = 1.f;
+	hi_ref(en, en) = 0.f;
 	enm1 = en - 1;
 /*     .......... FOR I=EN-1 STEP -1 UNTIL 1 DO -- ..........   
 
@@ -1567,25 +1548,25 @@ L680:
 	latime_1.ops += enm1 * 22;
 	i__1 = enm1;
 	for (ii = 1; ii <= i__1; ++ii) {
-	    i = en - ii;
+	    i__ = en - ii;
 	    zzr = 0.f;
 	    zzi = 0.f;
-	    ip1 = i + 1;
+	    ip1 = i__ + 1;
 
 
 /*        INCREMENT OP COUNT FOR LOOP 740 */
 	    latime_1.ops += (en - ip1 + 1) * 7;
 	    i__3 = en;
 	    for (j = ip1; j <= i__3; ++j) {
-		zzr = zzr + hr[i + j * hr_dim1] * hr[j + en * hr_dim1] - hi[i 
-			+ j * hi_dim1] * hi[j + en * hi_dim1];
-		zzi = zzi + hr[i + j * hr_dim1] * hi[j + en * hi_dim1] + hi[i 
-			+ j * hi_dim1] * hr[j + en * hr_dim1];
+		zzr = zzr + hr_ref(i__, j) * hr_ref(j, en) - hi_ref(i__, j) * 
+			hi_ref(j, en);
+		zzi = zzi + hr_ref(i__, j) * hi_ref(j, en) + hi_ref(i__, j) * 
+			hr_ref(j, en);
 /* L740: */
 	    }
 
-	    yr = xr - wr[i];
-	    yi = xi - wi[i];
+	    yr = xr - wr[i__];
+	    yi = xi - wi[i__];
 	    if (yr != 0.f || yi != 0.f) {
 		goto L765;
 	    }
@@ -1598,14 +1579,13 @@ L760:
 		goto L760;
 	    }
 L765:
-	    cdiv_(&zzr, &zzi, &yr, &yi, &hr[i + en * hr_dim1], &hi[i + en * 
-		    hi_dim1]);
+	    cdiv_(&zzr, &zzi, &yr, &yi, &hr_ref(i__, en), &hi_ref(i__, en));
 
 /*        INCREMENT OP COUNT FOR CDIV */
 	    opst += 16;
 /*     .......... OVERFLOW CONTROL .......... */
-	    tr = (r__1 = hr[i + en * hr_dim1], dabs(r__1)) + (r__2 = hi[i + 
-		    en * hi_dim1], dabs(r__2));
+	    tr = (r__1 = hr_ref(i__, en), dabs(r__1)) + (r__2 = hi_ref(i__, 
+		    en), dabs(r__2));
 	    if (tr == 0.f) {
 		goto L780;
 	    }
@@ -1616,11 +1596,11 @@ L765:
 	    }
 
 /*        INCREMENT OP COUNT FOR LOOP 770 */
-	    latime_1.ops += en - i + 1 << 1;
+	    latime_1.ops += en - i__ + 1 << 1;
 	    i__3 = en;
-	    for (j = i; j <= i__3; ++j) {
-		hr[j + en * hr_dim1] /= tr;
-		hi[j + en * hi_dim1] /= tr;
+	    for (j = i__; j <= i__3; ++j) {
+		hr_ref(j, en) = hr_ref(j, en) / tr;
+		hi_ref(j, en) = hi_ref(j, en) / tr;
 /* L770: */
 	    }
 
@@ -1634,16 +1614,16 @@ L780:
     enm1 = *n - 1;
 /*     .......... VECTORS OF ISOLATED ROOTS .......... */
     i__2 = *n;
-    for (i = 1; i <= i__2; ++i) {
-	if (i >= *low && i <= *igh) {
+    for (i__ = 1; i__ <= i__2; ++i__) {
+	if (i__ >= *low && i__ <= *igh) {
 	    goto L840;
 	}
-	ip1 = i + 1;
+	ip1 = i__ + 1;
 
 	i__1 = *n;
-	for (j = i; j <= i__1; ++j) {
-	    zr[i + j * zr_dim1] = hr[i + j * hr_dim1];
-	    zi[i + j * zi_dim1] = hi[i + j * hi_dim1];
+	for (j = i__; j <= i__1; ++j) {
+	    zr_ref(i__, j) = hr_ref(i__, j);
+	    zi_ref(i__, j) = hi_ref(i__, j);
 /* L820: */
 	}
 
@@ -1662,21 +1642,21 @@ L840:
 /*        INCREMENT OP COUNT FOR LOOP 880 */
 	latime_1.ops += (m - *low + 1 << 3) * (*igh - *low + 1);
 	i__1 = *igh;
-	for (i = *low; i <= i__1; ++i) {
+	for (i__ = *low; i__ <= i__1; ++i__) {
 	    zzr = 0.f;
 	    zzi = 0.f;
 
 	    i__3 = m;
 	    for (k = *low; k <= i__3; ++k) {
-		zzr = zzr + zr[i + k * zr_dim1] * hr[k + j * hr_dim1] - zi[i 
-			+ k * zi_dim1] * hi[k + j * hi_dim1];
-		zzi = zzi + zr[i + k * zr_dim1] * hi[k + j * hi_dim1] + zi[i 
-			+ k * zi_dim1] * hr[k + j * hr_dim1];
+		zzr = zzr + zr_ref(i__, k) * hr_ref(k, j) - zi_ref(i__, k) * 
+			hi_ref(k, j);
+		zzi = zzi + zr_ref(i__, k) * hi_ref(k, j) + zi_ref(i__, k) * 
+			hr_ref(k, j);
 /* L860: */
 	    }
 
-	    zr[i + j * zr_dim1] = zzr;
-	    zi[i + j * zi_dim1] = zzi;
+	    zr_ref(i__, j) = zzr;
+	    zi_ref(i__, j) = zzi;
 /* L880: */
 	}
     }
@@ -1691,9 +1671,15 @@ L1001:
 /*     COMPUTE FINAL OP COUNT */
     latime_1.ops += opst;
     return 0;
-} /* comqr2_   
+} /* comqr2_ */
 
-   Subroutine */ int corth_(integer *nm, integer *n, integer *low, integer *
+#undef zr_ref
+#undef zi_ref
+#undef hr_ref
+#undef hi_ref
+
+
+/* Subroutine */ int corth_(integer *nm, integer *n, integer *low, integer *
 	igh, real *ar, real *ai, real *ortr, real *orti)
 {
     /* System generated locals */
@@ -1704,8 +1690,8 @@ L1001:
     double sqrt(doublereal);
 
     /* Local variables */
-    static real f, g, h;
-    static integer i, j, m;
+    static real f, g, h__;
+    static integer i__, j, m;
     static real scale;
     static integer la;
     static real fi;
@@ -1714,6 +1700,10 @@ L1001:
     static integer mp;
     extern doublereal pythag_(real *, real *);
     static integer kp1;
+
+
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
 
 
 
@@ -1761,20 +1751,18 @@ L1001:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
     --orti;
     --ortr;
@@ -1795,17 +1783,16 @@ L1001:
 
     i__1 = la;
     for (m = kp1; m <= i__1; ++m) {
-	h = 0.f;
+	h__ = 0.f;
 	ortr[m] = 0.f;
 	orti[m] = 0.f;
 	scale = 0.f;
-/*     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) .......... 
-*/
+/*     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) .......... */
 	i__2 = *igh;
-	for (i = m; i <= i__2; ++i) {
+	for (i__ = m; i__ <= i__2; ++i__) {
 /* L90: */
-	    scale = scale + (r__1 = ar[i + (m - 1) * ar_dim1], dabs(r__1)) + (
-		    r__2 = ai[i + (m - 1) * ai_dim1], dabs(r__2));
+	    scale = scale + (r__1 = ar_ref(i__, m - 1), dabs(r__1)) + (r__2 = 
+		    ai_ref(i__, m - 1), dabs(r__2));
 	}
 /* **   
           INCREMENT OPCOUNT FOR LOOP 90 */
@@ -1819,10 +1806,10 @@ L1001:
 /*     .......... FOR I=IGH STEP -1 UNTIL M DO -- .......... */
 	i__2 = *igh;
 	for (ii = m; ii <= i__2; ++ii) {
-	    i = mp - ii;
-	    ortr[i] = ar[i + (m - 1) * ar_dim1] / scale;
-	    orti[i] = ai[i + (m - 1) * ai_dim1] / scale;
-	    h = h + ortr[i] * ortr[i] + orti[i] * orti[i];
+	    i__ = mp - ii;
+	    ortr[i__] = ar_ref(i__, m - 1) / scale;
+	    orti[i__] = ai_ref(i__, m - 1) / scale;
+	    h__ = h__ + ortr[i__] * ortr[i__] + orti[i__] * orti[i__];
 /* L100: */
 	}
 /* **   
@@ -1830,12 +1817,12 @@ L1001:
 	latime_1.ops = latime_1.ops + (*igh - m + 1) * 6 + 1;
 /* ** */
 
-	g = sqrt(h);
+	g = sqrt(h__);
 	f = pythag_(&ortr[m], &orti[m]);
 	if (f == 0.f) {
 	    goto L103;
 	}
-	h += f * g;
+	h__ += f * g;
 	g /= f;
 	ortr[m] = (g + 1.f) * ortr[m];
 	orti[m] = (g + 1.f) * orti[m];
@@ -1844,7 +1831,7 @@ L1001:
 
 L103:
 	ortr[m] = g;
-	ar[m + (m - 1) * ar_dim1] = scale;
+	ar_ref(m, m - 1) = scale;
 /*     .......... FORM (I-(U*UT)/H) * A .......... */
 L105:
 	i__2 = *n;
@@ -1854,23 +1841,23 @@ L105:
 /*     .......... FOR I=IGH STEP -1 UNTIL M DO -- .......... */
 	    i__3 = *igh;
 	    for (ii = m; ii <= i__3; ++ii) {
-		i = mp - ii;
-		fr = fr + ortr[i] * ar[i + j * ar_dim1] + orti[i] * ai[i + j *
-			 ai_dim1];
-		fi = fi + ortr[i] * ai[i + j * ai_dim1] - orti[i] * ar[i + j *
-			 ar_dim1];
+		i__ = mp - ii;
+		fr = fr + ortr[i__] * ar_ref(i__, j) + orti[i__] * ai_ref(i__,
+			 j);
+		fi = fi + ortr[i__] * ai_ref(i__, j) - orti[i__] * ar_ref(i__,
+			 j);
 /* L110: */
 	    }
 
-	    fr /= h;
-	    fi /= h;
+	    fr /= h__;
+	    fi /= h__;
 
 	    i__3 = *igh;
-	    for (i = m; i <= i__3; ++i) {
-		ar[i + j * ar_dim1] = ar[i + j * ar_dim1] - fr * ortr[i] + fi 
-			* orti[i];
-		ai[i + j * ai_dim1] = ai[i + j * ai_dim1] - fr * orti[i] - fi 
-			* ortr[i];
+	    for (i__ = m; i__ <= i__3; ++i__) {
+		ar_ref(i__, j) = ar_ref(i__, j) - fr * ortr[i__] + fi * orti[
+			i__];
+		ai_ref(i__, j) = ai_ref(i__, j) - fr * orti[i__] - fi * ortr[
+			i__];
 /* L120: */
 	    }
 
@@ -1878,29 +1865,25 @@ L105:
 	}
 /*     .......... FORM (I-(U*UT)/H)*A*(I-(U*UT)/H) .......... */
 	i__2 = *igh;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 	    fr = 0.f;
 	    fi = 0.f;
 /*     .......... FOR J=IGH STEP -1 UNTIL M DO -- .......... */
 	    i__3 = *igh;
 	    for (jj = m; jj <= i__3; ++jj) {
 		j = mp - jj;
-		fr = fr + ortr[j] * ar[i + j * ar_dim1] - orti[j] * ai[i + j *
-			 ai_dim1];
-		fi = fi + ortr[j] * ai[i + j * ai_dim1] + orti[j] * ar[i + j *
-			 ar_dim1];
+		fr = fr + ortr[j] * ar_ref(i__, j) - orti[j] * ai_ref(i__, j);
+		fi = fi + ortr[j] * ai_ref(i__, j) + orti[j] * ar_ref(i__, j);
 /* L140: */
 	    }
 
-	    fr /= h;
-	    fi /= h;
+	    fr /= h__;
+	    fi /= h__;
 
 	    i__3 = *igh;
 	    for (j = m; j <= i__3; ++j) {
-		ar[i + j * ar_dim1] = ar[i + j * ar_dim1] - fr * ortr[j] - fi 
-			* orti[j];
-		ai[i + j * ai_dim1] = ai[i + j * ai_dim1] + fr * orti[j] - fi 
-			* ortr[j];
+		ar_ref(i__, j) = ar_ref(i__, j) - fr * ortr[j] - fi * orti[j];
+		ai_ref(i__, j) = ai_ref(i__, j) + fr * orti[j] - fi * ortr[j];
 /* L150: */
 	    }
 
@@ -1914,10 +1897,8 @@ L105:
 
 	ortr[m] = scale * ortr[m];
 	orti[m] = scale * orti[m];
-	ar[m + (m - 1) * ar_dim1] = -(doublereal)g * ar[m + (m - 1) * ar_dim1]
-		;
-	ai[m + (m - 1) * ai_dim1] = -(doublereal)g * ai[m + (m - 1) * ai_dim1]
-		;
+	ar_ref(m, m - 1) = -g * ar_ref(m, m - 1);
+	ai_ref(m, m - 1) = -g * ai_ref(m, m - 1);
 L180:
 	;
     }
@@ -1925,9 +1906,13 @@ L180:
 
 L200:
     return 0;
-} /* corth_   
+} /* corth_ */
 
-   Subroutine */ int csroot_(real *xr, real *xi, real *yr, real *yi)
+#undef ar_ref
+#undef ai_ref
+
+
+/* Subroutine */ int csroot_(real *xr, real *xi, real *yr, real *yi)
 {
     /* Builtin functions */
     double sqrt(doublereal);
@@ -1947,7 +1932,7 @@ L200:
 	*yr = s;
     }
     if (ti < 0.f) {
-	s = -(doublereal)s;
+	s = -s;
     }
     if (tr <= 0.f) {
 	*yi = s;
@@ -1970,9 +1955,16 @@ L200:
     real r__1, r__2, r__3;
 
     /* Local variables */
-    static real h;
-    static integer i, j, k, l;
+    static real h__;
+    static integer i__, j, k, l;
     static real s, si;
+
+
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
+#define tau_ref(a_1,a_2) tau[(a_2)*2 + a_1]
 
 
 
@@ -2017,27 +2009,25 @@ L200:
        IS REAL AND THAT VECTOR EUCLIDEAN NORMS ARE PRESERVED.   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     tau -= 3;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
 
     /* Function Body */
@@ -2060,9 +2050,8 @@ L200:
 
 	i__2 = *m;
 	for (j = 1; j <= i__2; ++j) {
-	    zi[k + j * zi_dim1] = -(doublereal)zr[k + j * zr_dim1] * tau[(k <<
-		     1) + 2];
-	    zr[k + j * zr_dim1] *= tau[(k << 1) + 1];
+	    zi_ref(k, j) = -zr_ref(k, j) * tau_ref(2, k);
+	    zr_ref(k, j) = zr_ref(k, j) * tau_ref(1, k);
 /* L50: */
 	}
     }
@@ -2072,10 +2061,10 @@ L200:
     }
 /*     .......... RECOVER AND APPLY THE HOUSEHOLDER MATRICES .......... */
     i__2 = *n;
-    for (i = 2; i <= i__2; ++i) {
-	l = i - 1;
-	h = ai[i + i * ai_dim1];
-	if (h == 0.f) {
+    for (i__ = 2; i__ <= i__2; ++i__) {
+	l = i__ - 1;
+	h__ = ai_ref(i__, i__);
+	if (h__ == 0.f) {
 	    goto L140;
 	}
 
@@ -2086,23 +2075,22 @@ L200:
 
 	    i__3 = l;
 	    for (k = 1; k <= i__3; ++k) {
-		s = s + ar[i + k * ar_dim1] * zr[k + j * zr_dim1] - ai[i + k *
-			 ai_dim1] * zi[k + j * zi_dim1];
-		si = si + ar[i + k * ar_dim1] * zi[k + j * zi_dim1] + ai[i + 
-			k * ai_dim1] * zr[k + j * zr_dim1];
+		s = s + ar_ref(i__, k) * zr_ref(k, j) - ai_ref(i__, k) * 
+			zi_ref(k, j);
+		si = si + ar_ref(i__, k) * zi_ref(k, j) + ai_ref(i__, k) * 
+			zr_ref(k, j);
 /* L110: */
 	    }
-/*     .......... DOUBLE DIVISIONS AVOID POSSIBLE UNDERFLOW ......
-.... */
-	    s = s / h / h;
-	    si = si / h / h;
+/*     .......... DOUBLE DIVISIONS AVOID POSSIBLE UNDERFLOW .......... */
+	    s = s / h__ / h__;
+	    si = si / h__ / h__;
 
 	    i__3 = l;
 	    for (k = 1; k <= i__3; ++k) {
-		zr[k + j * zr_dim1] = zr[k + j * zr_dim1] - s * ar[i + k * 
-			ar_dim1] - si * ai[i + k * ai_dim1];
-		zi[k + j * zi_dim1] = zi[k + j * zi_dim1] - si * ar[i + k * 
-			ar_dim1] + s * ai[i + k * ai_dim1];
+		zr_ref(k, j) = zr_ref(k, j) - s * ar_ref(i__, k) - si * 
+			ai_ref(i__, k);
+		zi_ref(k, j) = zi_ref(k, j) - si * ar_ref(i__, k) + s * 
+			ai_ref(i__, k);
 /* L120: */
 	    }
 
@@ -2115,26 +2103,38 @@ L140:
 
 L200:
     return 0;
-} /* htribk_   
+} /* htribk_ */
 
-   Subroutine */ int htridi_(integer *nm, integer *n, real *ar, real *ai, 
-	real *d, real *e, real *e2, real *tau)
+#undef tau_ref
+#undef zr_ref
+#undef zi_ref
+#undef ar_ref
+#undef ai_ref
+
+
+/* Subroutine */ int htridi_(integer *nm, integer *n, real *ar, real *ai, 
+	real *d__, real *e, real *e2, real *tau)
 {
     /* System generated locals */
     integer ar_dim1, ar_offset, ai_dim1, ai_offset, i__1, i__2, i__3;
-    real r__1, r__2, r__3, r__4, r__5;
+    real r__1, r__2, r__3, r__4;
 
     /* Builtin functions */
     double sqrt(doublereal);
 
     /* Local variables */
-    static real f, g, h;
-    static integer i, j, k, l;
+    static real f, g, h__;
+    static integer i__, j, k, l;
     static real scale, fi, gi, hh;
     static integer ii;
     static real si;
     extern doublereal pythag_(real *, real *);
     static integer jp1;
+
+
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define tau_ref(a_1,a_2) tau[(a_2)*2 + a_1]
 
 
 
@@ -2169,8 +2169,7 @@ L200:
             TRIANGLES.  THEIR STRICT UPPER TRIANGLES AND THE   
             DIAGONAL OF AR ARE UNALTERED.   
 
-          D CONTAINS THE DIAGONAL ELEMENTS OF THE THE TRIDIAGONAL MATRIX. 
-  
+          D CONTAINS THE DIAGONAL ELEMENTS OF THE THE TRIDIAGONAL MATRIX.   
 
           E CONTAINS THE SUBDIAGONAL ELEMENTS OF THE TRIDIAGONAL   
             MATRIX IN ITS LAST N-1 POSITIONS.  E(1) IS SET TO ZERO.   
@@ -2183,51 +2182,49 @@ L200:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
 
        Parameter adjustments */
     tau -= 3;
     --e2;
     --e;
-    --d;
+    --d__;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
 
     /* Function Body   
    Computing MAX   
    Computing 3rd power */
-    r__3 = (real) (*n), r__4 = r__3;
+    r__3 = (real) (*n);
 /* Computing 2nd power */
-    r__5 = (real) (*n);
-    r__1 = 0.f, r__2 = r__4 * (r__3 * r__3) * 5.333333333333333f + r__5 * 
-	    r__5 * 3 + *n * 18.666666666666668f - 61;
+    r__4 = (real) (*n);
+    r__1 = 0.f, r__2 = r__3 * (r__3 * r__3) * 5.333333333333333f + r__4 * 
+	    r__4 * 3 + *n * 18.666666666666668f - 61;
     latime_1.ops += dmax(r__1,r__2);
 
-    tau[(*n << 1) + 1] = 1.f;
-    tau[(*n << 1) + 2] = 0.f;
+    tau_ref(1, *n) = 1.f;
+    tau_ref(2, *n) = 0.f;
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* L100: */
-	d[i] = ar[i + i * ar_dim1];
+	d__[i__] = ar_ref(i__, i__);
     }
 /*     .......... FOR I=N STEP -1 UNTIL 1 DO -- .......... */
     i__1 = *n;
     for (ii = 1; ii <= i__1; ++ii) {
-	i = *n + 1 - ii;
-	l = i - 1;
-	h = 0.f;
+	i__ = *n + 1 - ii;
+	l = i__ - 1;
+	h__ = 0.f;
 	scale = 0.f;
 	if (l < 1) {
 	    goto L130;
@@ -2236,54 +2233,54 @@ L200:
 	i__2 = l;
 	for (k = 1; k <= i__2; ++k) {
 /* L120: */
-	    scale = scale + (r__1 = ar[i + k * ar_dim1], dabs(r__1)) + (r__2 =
-		     ai[i + k * ai_dim1], dabs(r__2));
+	    scale = scale + (r__1 = ar_ref(i__, k), dabs(r__1)) + (r__2 = 
+		    ai_ref(i__, k), dabs(r__2));
 	}
 
 	if (scale != 0.f) {
 	    goto L140;
 	}
-	tau[(l << 1) + 1] = 1.f;
-	tau[(l << 1) + 2] = 0.f;
+	tau_ref(1, l) = 1.f;
+	tau_ref(2, l) = 0.f;
 L130:
-	e[i] = 0.f;
-	e2[i] = 0.f;
+	e[i__] = 0.f;
+	e2[i__] = 0.f;
 	goto L290;
 
 L140:
 	i__2 = l;
 	for (k = 1; k <= i__2; ++k) {
-	    ar[i + k * ar_dim1] /= scale;
-	    ai[i + k * ai_dim1] /= scale;
-	    h = h + ar[i + k * ar_dim1] * ar[i + k * ar_dim1] + ai[i + k * 
-		    ai_dim1] * ai[i + k * ai_dim1];
+	    ar_ref(i__, k) = ar_ref(i__, k) / scale;
+	    ai_ref(i__, k) = ai_ref(i__, k) / scale;
+	    h__ = h__ + ar_ref(i__, k) * ar_ref(i__, k) + ai_ref(i__, k) * 
+		    ai_ref(i__, k);
 /* L150: */
 	}
 
-	e2[i] = scale * scale * h;
-	g = sqrt(h);
-	e[i] = scale * g;
-	f = pythag_(&ar[i + l * ar_dim1], &ai[i + l * ai_dim1]);
+	e2[i__] = scale * scale * h__;
+	g = sqrt(h__);
+	e[i__] = scale * g;
+	f = pythag_(&ar_ref(i__, l), &ai_ref(i__, l));
 /*     .......... FORM NEXT DIAGONAL ELEMENT OF MATRIX T .......... */
 	if (f == 0.f) {
 	    goto L160;
 	}
-	tau[(l << 1) + 1] = (ai[i + l * ai_dim1] * tau[(i << 1) + 2] - ar[i + 
-		l * ar_dim1] * tau[(i << 1) + 1]) / f;
-	si = (ar[i + l * ar_dim1] * tau[(i << 1) + 2] + ai[i + l * ai_dim1] * 
-		tau[(i << 1) + 1]) / f;
-	h += f * g;
+	tau_ref(1, l) = (ai_ref(i__, l) * tau_ref(2, i__) - ar_ref(i__, l) * 
+		tau_ref(1, i__)) / f;
+	si = (ar_ref(i__, l) * tau_ref(2, i__) + ai_ref(i__, l) * tau_ref(1, 
+		i__)) / f;
+	h__ += f * g;
 	g = g / f + 1.f;
-	ar[i + l * ar_dim1] = g * ar[i + l * ar_dim1];
-	ai[i + l * ai_dim1] = g * ai[i + l * ai_dim1];
+	ar_ref(i__, l) = g * ar_ref(i__, l);
+	ai_ref(i__, l) = g * ai_ref(i__, l);
 	if (l == 1) {
 	    goto L270;
 	}
 	goto L170;
 L160:
-	tau[(l << 1) + 1] = -(doublereal)tau[(i << 1) + 1];
-	si = tau[(i << 1) + 2];
-	ar[i + l * ar_dim1] = g;
+	tau_ref(1, l) = -tau_ref(1, i__);
+	si = tau_ref(2, i__);
+	ar_ref(i__, l) = g;
 L170:
 	f = 0.f;
 
@@ -2294,10 +2291,10 @@ L170:
 /*     .......... FORM ELEMENT OF A*U .......... */
 	    i__3 = j;
 	    for (k = 1; k <= i__3; ++k) {
-		g = g + ar[j + k * ar_dim1] * ar[i + k * ar_dim1] + ai[j + k *
-			 ai_dim1] * ai[i + k * ai_dim1];
-		gi = gi - ar[j + k * ar_dim1] * ai[i + k * ai_dim1] + ai[j + 
-			k * ai_dim1] * ar[i + k * ar_dim1];
+		g = g + ar_ref(j, k) * ar_ref(i__, k) + ai_ref(j, k) * ai_ref(
+			i__, k);
+		gi = gi - ar_ref(j, k) * ai_ref(i__, k) + ai_ref(j, k) * 
+			ar_ref(i__, k);
 /* L180: */
 	    }
 
@@ -2308,40 +2305,37 @@ L170:
 
 	    i__3 = l;
 	    for (k = jp1; k <= i__3; ++k) {
-		g = g + ar[k + j * ar_dim1] * ar[i + k * ar_dim1] - ai[k + j *
-			 ai_dim1] * ai[i + k * ai_dim1];
-		gi = gi - ar[k + j * ar_dim1] * ai[i + k * ai_dim1] - ai[k + 
-			j * ai_dim1] * ar[i + k * ar_dim1];
+		g = g + ar_ref(k, j) * ar_ref(i__, k) - ai_ref(k, j) * ai_ref(
+			i__, k);
+		gi = gi - ar_ref(k, j) * ai_ref(i__, k) - ai_ref(k, j) * 
+			ar_ref(i__, k);
 /* L200: */
 	    }
 /*     .......... FORM ELEMENT OF P .......... */
 L220:
-	    e[j] = g / h;
-	    tau[(j << 1) + 2] = gi / h;
-	    f = f + e[j] * ar[i + j * ar_dim1] - tau[(j << 1) + 2] * ai[i + j 
-		    * ai_dim1];
+	    e[j] = g / h__;
+	    tau_ref(2, j) = gi / h__;
+	    f = f + e[j] * ar_ref(i__, j) - tau_ref(2, j) * ai_ref(i__, j);
 /* L240: */
 	}
 
-	hh = f / (h + h);
+	hh = f / (h__ + h__);
 /*     .......... FORM REDUCED A .......... */
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    f = ar[i + j * ar_dim1];
+	    f = ar_ref(i__, j);
 	    g = e[j] - hh * f;
 	    e[j] = g;
-	    fi = -(doublereal)ai[i + j * ai_dim1];
-	    gi = tau[(j << 1) + 2] - hh * fi;
-	    tau[(j << 1) + 2] = -(doublereal)gi;
+	    fi = -ai_ref(i__, j);
+	    gi = tau_ref(2, j) - hh * fi;
+	    tau_ref(2, j) = -gi;
 
 	    i__3 = j;
 	    for (k = 1; k <= i__3; ++k) {
-		ar[j + k * ar_dim1] = ar[j + k * ar_dim1] - f * e[k] - g * ar[
-			i + k * ar_dim1] + fi * tau[(k << 1) + 2] + gi * ai[i 
-			+ k * ai_dim1];
-		ai[j + k * ai_dim1] = ai[j + k * ai_dim1] - f * tau[(k << 1) 
-			+ 2] - g * ai[i + k * ai_dim1] - fi * e[k] - gi * ar[
-			i + k * ar_dim1];
+		ar_ref(j, k) = ar_ref(j, k) - f * e[k] - g * ar_ref(i__, k) + 
+			fi * tau_ref(2, k) + gi * ai_ref(i__, k);
+		ai_ref(j, k) = ai_ref(j, k) - f * tau_ref(2, k) - g * ai_ref(
+			i__, k) - fi * e[k] - gi * ar_ref(i__, k);
 /* L260: */
 	    }
 	}
@@ -2349,24 +2343,29 @@ L220:
 L270:
 	i__3 = l;
 	for (k = 1; k <= i__3; ++k) {
-	    ar[i + k * ar_dim1] = scale * ar[i + k * ar_dim1];
-	    ai[i + k * ai_dim1] = scale * ai[i + k * ai_dim1];
+	    ar_ref(i__, k) = scale * ar_ref(i__, k);
+	    ai_ref(i__, k) = scale * ai_ref(i__, k);
 /* L280: */
 	}
 
-	tau[(l << 1) + 2] = -(doublereal)si;
+	tau_ref(2, l) = -si;
 L290:
-	hh = d[i];
-	d[i] = ar[i + i * ar_dim1];
-	ar[i + i * ar_dim1] = hh;
-	ai[i + i * ai_dim1] = scale * sqrt(h);
+	hh = d__[i__];
+	d__[i__] = ar_ref(i__, i__);
+	ar_ref(i__, i__) = hh;
+	ai_ref(i__, i__) = scale * sqrt(h__);
 /* L300: */
     }
 
     return 0;
-} /* htridi_   
+} /* htridi_ */
 
-   Subroutine */ int imtql1_(integer *n, real *d, real *e, integer *ierr)
+#undef tau_ref
+#undef ar_ref
+#undef ai_ref
+
+
+/* Subroutine */ int imtql1_(integer *n, real *d__, real *e, integer *ierr)
 {
     /* System generated locals */
     integer i__1, i__2, i__3;
@@ -2376,9 +2375,9 @@ L290:
     double r_sign(real *, real *);
 
     /* Local variables */
-    static real b, c, f, g;
-    static integer i, j, l, m;
-    static real p, r, s;
+    static real b, c__, f, g;
+    static integer i__, j, l, m;
+    static real p, r__, s;
     static integer ii;
     extern doublereal slamch_(char *), pythag_(real *, real *);
     static integer mml;
@@ -2433,17 +2432,15 @@ L290:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     --e;
-    --d;
+    --d__;
 
     /* Function Body */
     *ierr = 0;
@@ -2460,9 +2457,9 @@ L290:
     eps = slamch_("EPSILON");
 
     i__1 = *n;
-    for (i = 2; i <= i__1; ++i) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
 /* L100: */
-	e[i - 1] = e[i];
+	e[i__ - 1] = e[i__];
     }
 
     e[*n] = 0.f;
@@ -2478,8 +2475,8 @@ L105:
 		goto L120;
 	    }
 	    tst = (r__1 = e[m], dabs(r__1));
-	    if (tst <= eps * ((r__1 = d[m], dabs(r__1)) + (r__2 = d[m + 1], 
-		    dabs(r__2)))) {
+	    if (tst <= eps * ((r__1 = d__[m], dabs(r__1)) + (r__2 = d__[m + 1]
+		    , dabs(r__2)))) {
 		goto L120;
 	    }
 /*            TST1 = ABS(D(M)) + ABS(D(M+1))   
@@ -2489,7 +2486,7 @@ L105:
 	}
 
 L120:
-	p = d[l];
+	p = d__[l];
 
 /*        INCREMENT OPCOUNT FOR FINDING SMALL SUBDIAGONAL ELEMENT.   
    Computing MIN */
@@ -2503,38 +2500,38 @@ L120:
 	}
 	++j;
 /*     .......... FORM SHIFT .......... */
-	g = (d[l + 1] - p) / (e[l] * 2.f);
-	r = pythag_(&g, &c_b169);
-	g = d[m] - p + e[l] / (g + r_sign(&r, &g));
+	g = (d__[l + 1] - p) / (e[l] * 2.f);
+	r__ = pythag_(&g, &c_b169);
+	g = d__[m] - p + e[l] / (g + r_sign(&r__, &g));
 
 /*        INCREMENT OPCOUNT FOR FORMING SHIFT. */
 	latime_1.ops += 7;
 	s = 1.f;
-	c = 1.f;
+	c__ = 1.f;
 	p = 0.f;
 	mml = m - l;
 /*     .......... FOR I=M-1 STEP -1 UNTIL L DO -- .......... */
 	i__2 = mml;
 	for (ii = 1; ii <= i__2; ++ii) {
-	    i = m - ii;
-	    f = s * e[i];
-	    b = c * e[i];
-	    r = pythag_(&f, &g);
-	    e[i + 1] = r;
-	    if (r == 0.f) {
+	    i__ = m - ii;
+	    f = s * e[i__];
+	    b = c__ * e[i__];
+	    r__ = pythag_(&f, &g);
+	    e[i__ + 1] = r__;
+	    if (r__ == 0.f) {
 		goto L210;
 	    }
-	    s = f / r;
-	    c = g / r;
-	    g = d[i + 1] - p;
-	    r = (d[i] - g) * s + c * 2.f * b;
-	    p = s * r;
-	    d[i + 1] = g + p;
-	    g = c * r - b;
+	    s = f / r__;
+	    c__ = g / r__;
+	    g = d__[i__ + 1] - p;
+	    r__ = (d__[i__] - g) * s + c__ * 2.f * b;
+	    p = s * r__;
+	    d__[i__ + 1] = g + p;
+	    g = c__ * r__ - b;
 /* L200: */
 	}
 
-	d[l] -= p;
+	d__[l] -= p;
 	e[l] = g;
 	e[m] = 0.f;
 
@@ -2546,7 +2543,7 @@ L120:
 	goto L105;
 /*     .......... RECOVER FROM UNDERFLOW .......... */
 L210:
-	d[i + 1] -= p;
+	d__[i__ + 1] -= p;
 	e[m] = 0.f;
 
 /*        INCREMENT OPCOUNT FOR INNER LOOP, WHEN UNDERFLOW OCCURS. */
@@ -2560,18 +2557,18 @@ L215:
 /*     .......... FOR I=L STEP -1 UNTIL 2 DO -- .......... */
 	i__2 = l;
 	for (ii = 2; ii <= i__2; ++ii) {
-	    i = l + 2 - ii;
-	    if (p >= d[i - 1]) {
+	    i__ = l + 2 - ii;
+	    if (p >= d__[i__ - 1]) {
 		goto L270;
 	    }
-	    d[i] = d[i - 1];
+	    d__[i__] = d__[i__ - 1];
 /* L230: */
 	}
 
 L250:
-	i = 1;
+	i__ = 1;
 L270:
-	d[i] = p;
+	d__[i__] = p;
 /* L290: */
     }
 
@@ -2587,8 +2584,8 @@ L1001:
     return 0;
 } /* imtql1_   
 
-   Subroutine */ int imtql2_(integer *nm, integer *n, real *d, real *e, real *
-	z, integer *ierr)
+   Subroutine */ int imtql2_(integer *nm, integer *n, real *d__, real *e, 
+	real *z__, integer *ierr)
 {
     /* System generated locals */
     integer z_dim1, z_offset, i__1, i__2, i__3;
@@ -2598,13 +2595,16 @@ L1001:
     double r_sign(real *, real *);
 
     /* Local variables */
-    static real b, c, f, g;
-    static integer i, j, k, l, m;
-    static real p, r, s;
+    static real b, c__, f, g;
+    static integer i__, j, k, l, m;
+    static real p, r__, s;
     static integer ii;
     extern doublereal slamch_(char *), pythag_(real *, real *);
     static integer mml;
     static real eps, tst;
+
+
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
 /*     EISPACK ROUTINE.  MODIFIED FOR COMPARISON WITH LAPACK.   
@@ -2669,20 +2669,18 @@ L1001:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     z_dim1 = *nm;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --e;
-    --d;
+    --d__;
 
     /* Function Body */
     *ierr = 0;
@@ -2698,9 +2696,9 @@ L1001:
     eps = slamch_("EPSILON");
 
     i__1 = *n;
-    for (i = 2; i <= i__1; ++i) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
 /* L100: */
-	e[i - 1] = e[i];
+	e[i__ - 1] = e[i__];
     }
 
     e[*n] = 0.f;
@@ -2719,15 +2717,15 @@ L105:
               TST2 = TST1 + ABS(E(M))   
               IF (TST2 .EQ. TST1) GO TO 120 */
 	    tst = (r__1 = e[m], dabs(r__1));
-	    if (tst <= eps * ((r__1 = d[m], dabs(r__1)) + (r__2 = d[m + 1], 
-		    dabs(r__2)))) {
+	    if (tst <= eps * ((r__1 = d__[m], dabs(r__1)) + (r__2 = d__[m + 1]
+		    , dabs(r__2)))) {
 		goto L120;
 	    }
 /* L110: */
 	}
 
 L120:
-	p = d[l];
+	p = d__[l];
 
 /*        INCREMENT OPCOUNT FOR FINDING SMALL SUBDIAGONAL ELEMENT. */
 	latime_1.ops += min(m,*n) - l + 1 << 1;
@@ -2739,47 +2737,47 @@ L120:
 	}
 	++j;
 /*     .......... FORM SHIFT .......... */
-	g = (d[l + 1] - p) / (e[l] * 2.f);
-	r = pythag_(&g, &c_b169);
-	g = d[m] - p + e[l] / (g + r_sign(&r, &g));
+	g = (d__[l + 1] - p) / (e[l] * 2.f);
+	r__ = pythag_(&g, &c_b169);
+	g = d__[m] - p + e[l] / (g + r_sign(&r__, &g));
 
 /*        INCREMENT OPCOUNT FOR FORMING SHIFT. */
 	latime_1.ops += 7;
 	s = 1.f;
-	c = 1.f;
+	c__ = 1.f;
 	p = 0.f;
 	mml = m - l;
 /*     .......... FOR I=M-1 STEP -1 UNTIL L DO -- .......... */
 	i__2 = mml;
 	for (ii = 1; ii <= i__2; ++ii) {
-	    i = m - ii;
-	    f = s * e[i];
-	    b = c * e[i];
-	    r = pythag_(&f, &g);
-	    e[i + 1] = r;
-	    if (r == 0.f) {
+	    i__ = m - ii;
+	    f = s * e[i__];
+	    b = c__ * e[i__];
+	    r__ = pythag_(&f, &g);
+	    e[i__ + 1] = r__;
+	    if (r__ == 0.f) {
 		goto L210;
 	    }
-	    s = f / r;
-	    c = g / r;
-	    g = d[i + 1] - p;
-	    r = (d[i] - g) * s + c * 2.f * b;
-	    p = s * r;
-	    d[i + 1] = g + p;
-	    g = c * r - b;
+	    s = f / r__;
+	    c__ = g / r__;
+	    g = d__[i__ + 1] - p;
+	    r__ = (d__[i__] - g) * s + c__ * 2.f * b;
+	    p = s * r__;
+	    d__[i__ + 1] = g + p;
+	    g = c__ * r__ - b;
 /*     .......... FORM VECTOR .......... */
 	    i__3 = *n;
 	    for (k = 1; k <= i__3; ++k) {
-		f = z[k + (i + 1) * z_dim1];
-		z[k + (i + 1) * z_dim1] = s * z[k + i * z_dim1] + c * f;
-		z[k + i * z_dim1] = c * z[k + i * z_dim1] - s * f;
+		f = z___ref(k, i__ + 1);
+		z___ref(k, i__ + 1) = s * z___ref(k, i__) + c__ * f;
+		z___ref(k, i__) = c__ * z___ref(k, i__) - s * f;
 /* L180: */
 	    }
 
 /* L200: */
 	}
 
-	d[l] -= p;
+	d__[l] -= p;
 	e[l] = g;
 	e[m] = 0.f;
 
@@ -2791,7 +2789,7 @@ L120:
 	goto L105;
 /*     .......... RECOVER FROM UNDERFLOW .......... */
 L210:
-	d[i + 1] -= p;
+	d__[i__ + 1] -= p;
 	e[m] = 0.f;
 
 /*        INCREMENT OPCOUNT FOR INNER LOOP, WHEN UNDERFLOW OCCURS. */
@@ -2803,32 +2801,32 @@ L240:
 /*     .......... ORDER EIGENVALUES AND EIGENVECTORS .......... */
     i__1 = *n;
     for (ii = 2; ii <= i__1; ++ii) {
-	i = ii - 1;
-	k = i;
-	p = d[i];
+	i__ = ii - 1;
+	k = i__;
+	p = d__[i__];
 
 	i__2 = *n;
 	for (j = ii; j <= i__2; ++j) {
-	    if (d[j] >= p) {
+	    if (d__[j] >= p) {
 		goto L260;
 	    }
 	    k = j;
-	    p = d[j];
+	    p = d__[j];
 L260:
 	    ;
 	}
 
-	if (k == i) {
+	if (k == i__) {
 	    goto L300;
 	}
-	d[k] = d[i];
-	d[i] = p;
+	d__[k] = d__[i__];
+	d__[i__] = p;
 
 	i__2 = *n;
 	for (j = 1; j <= i__2; ++j) {
-	    p = z[j + i * z_dim1];
-	    z[j + i * z_dim1] = z[j + k * z_dim1];
-	    z[j + k * z_dim1] = p;
+	    p = z___ref(j, i__);
+	    z___ref(j, i__) = z___ref(j, k);
+	    z___ref(j, k) = p;
 /* L280: */
 	}
 
@@ -2848,13 +2846,16 @@ L1001:
     return 0;
 } /* imtql2_ */
 
+#undef z___ref
+
+
 doublereal pythag_(real *a, real *b)
 {
     /* System generated locals */
     real ret_val, r__1, r__2, r__3;
 
     /* Local variables */
-    static real p, r, s, t, u;
+    static real p, r__, s, t, u;
 
 
 /*     FINDS SQRT(A**2+B**2) WITHOUT OVERFLOW OR DESTRUCTIVE UNDERFLOW   
@@ -2872,21 +2873,21 @@ doublereal pythag_(real *a, real *b)
     r__2 = dabs(*a), r__3 = dabs(*b);
 /* Computing 2nd power */
     r__1 = dmin(r__2,r__3) / p;
-    r = r__1 * r__1;
+    r__ = r__1 * r__1;
 
 /*     INCREMENT OPST */
     pythop_1.opst += 2;
 L10:
-    t = r + 4.f;
+    t = r__ + 4.f;
     if (t == 4.f) {
 	goto L20;
     }
-    s = r / t;
+    s = r__ / t;
     u = s * 2.f + 1.f;
     p = u * p;
 /* Computing 2nd power */
     r__1 = s / u;
-    r = r__1 * r__1 * r;
+    r__ = r__1 * r__1 * r__;
 
 /*        INCREMENT OPST */
     pythop_1.opst += 8;
@@ -2902,7 +2903,7 @@ doublereal epslon_(real *x)
     real ret_val, r__1;
 
     /* Local variables */
-    static real a, b, c, eps;
+    static real a, b, c__, eps;
 
 
 /*     ESTIMATE UNIT ROUNDOFF IN QUANTITIES OF SIZE X.   
@@ -2932,8 +2933,8 @@ doublereal epslon_(real *x)
     a = 1.3333333333333333f;
 L10:
     b = a - 1.f;
-    c = b + b + b;
-    eps = (r__1 = c - 1.f, dabs(r__1));
+    c__ = b + b + b;
+    eps = (r__1 = c__ - 1.f, dabs(r__1));
     if (eps == 0.f) {
 	goto L10;
     }
@@ -2941,8 +2942,8 @@ L10:
     return ret_val;
 } /* epslon_   
 
-   Subroutine */ int bisect_(integer *n, real *eps1, real *d, real *e, real *
-	e2, real *lb, real *ub, integer *mm, integer *m, real *w, integer *
+   Subroutine */ int bisect_(integer *n, real *eps1, real *d__, real *e, real 
+	*e2, real *lb, real *ub, integer *mm, integer *m, real *w, integer *
 	ind, integer *ierr, real *rv4, real *rv5)
 {
     /* System generated locals */
@@ -2950,7 +2951,7 @@ L10:
     real r__1, r__2, r__3, r__4;
 
     /* Local variables */
-    static integer i, j, k, l, p, q, r, s;
+    static integer i__, j, k, l, p, q, r__, s;
     static real u, v, atoli, rtoli;
     static integer m1, m2;
     static real tnorm, t1, t2, x0, x1;
@@ -3026,8 +3027,7 @@ L10:
           IND CONTAINS IN ITS FIRST M POSITIONS THE SUBMATRIX INDICES   
             ASSOCIATED WITH THE CORRESPONDING EIGENVALUES IN W --   
             1 FOR EIGENVALUES BELONGING TO THE FIRST SUBMATRIX FROM   
-            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC.. 
-  
+            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC..   
 
           IERR IS SET TO   
             ZERO       FOR NORMAL RETURN,   
@@ -3042,13 +3042,11 @@ L10:
        BISECT, IF MORE THAN N/4 EIGENVALUES ARE TO BE FOUND.   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
           INITIALIZE ITERATION COUNT.   
        Parameter adjustments */
@@ -3056,7 +3054,7 @@ L10:
     --rv4;
     --e2;
     --e;
-    --d;
+    --d__;
     --ind;
     --w;
 
@@ -3071,24 +3069,24 @@ L10:
     t2 = *ub;
 /*     .......... LOOK FOR SMALL SUB-DIAGONAL ENTRIES .......... */
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	if (i == 1) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (i__ == 1) {
 	    goto L20;
 	}
 /* CC         TST1 = ABS(D(I)) + ABS(D(I-1))   
    CC         TST2 = TST1 + ABS(E(I))   
    CC         IF (TST2 .GT. TST1) GO TO 40   
    Computing 2nd power */
-	r__1 = e[i];
+	r__1 = e[i__];
 	tmp1 = r__1 * r__1;
 /* Computing 2nd power */
 	r__2 = ulp;
-	if ((r__1 = d[i] * d[i - 1], dabs(r__1)) * (r__2 * r__2) + safemn <= 
-		tmp1) {
+	if ((r__1 = d__[i__] * d__[i__ - 1], dabs(r__1)) * (r__2 * r__2) + 
+		safemn <= tmp1) {
 	    goto L40;
 	}
 L20:
-	e2[i] = 0.f;
+	e2[i__] = 0.f;
 L40:
 	;
     }
@@ -3096,31 +3094,31 @@ L40:
     latime_1.ops += (*n - 1) * 5;
 
 /*                COMPUTE QUANTITIES NEEDED FOR CONVERGENCE TEST. */
-    tmp1 = d[1] - dabs(e[2]);
-    tmp2 = d[1] + dabs(e[2]);
+    tmp1 = d__[1] - dabs(e[2]);
+    tmp2 = d__[1] + dabs(e[2]);
     pivmin = 1.f;
     i__1 = *n - 1;
-    for (i = 2; i <= i__1; ++i) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MIN */
-	r__3 = tmp1, r__4 = d[i] - (r__1 = e[i], dabs(r__1)) - (r__2 = e[i + 
-		1], dabs(r__2));
+	r__3 = tmp1, r__4 = d__[i__] - (r__1 = e[i__], dabs(r__1)) - (r__2 = 
+		e[i__ + 1], dabs(r__2));
 	tmp1 = dmin(r__3,r__4);
 /* Computing MAX */
-	r__3 = tmp2, r__4 = d[i] + (r__1 = e[i], dabs(r__1)) + (r__2 = e[i + 
-		1], dabs(r__2));
+	r__3 = tmp2, r__4 = d__[i__] + (r__1 = e[i__], dabs(r__1)) + (r__2 = 
+		e[i__ + 1], dabs(r__2));
 	tmp2 = dmax(r__3,r__4);
 /* Computing MAX   
    Computing 2nd power */
-	r__3 = e[i];
+	r__3 = e[i__];
 	r__1 = pivmin, r__2 = r__3 * r__3;
 	pivmin = dmax(r__1,r__2);
 /* L41: */
     }
 /* Computing MIN */
-    r__2 = tmp1, r__3 = d[*n] - (r__1 = e[*n], dabs(r__1));
+    r__2 = tmp1, r__3 = d__[*n] - (r__1 = e[*n], dabs(r__1));
     tmp1 = dmin(r__2,r__3);
 /* Computing MAX */
-    r__2 = tmp2, r__3 = d[*n] + (r__1 = e[*n], dabs(r__1));
+    r__2 = tmp2, r__3 = d__[*n] + (r__1 = e[*n], dabs(r__1));
     tmp2 = dmax(r__2,r__3);
 /* Computing MAX   
    Computing 2nd power */
@@ -3153,17 +3151,17 @@ L80:
 	goto L980;
     }
     q = 0;
-    r = 0;
+    r__ = 0;
 /*     .......... ESTABLISH AND PROCESS NEXT SUBMATRIX, REFINING   
                   INTERVAL BY THE GERSCHGORIN BOUNDS .......... */
 L100:
-    if (r == *m) {
+    if (r__ == *m) {
 	goto L1001;
     }
     ++tag;
     p = q + 1;
-    xu = d[p];
-    x0 = d[p];
+    xu = d__[p];
+    x0 = d__[p];
     u = 0.f;
 
     i__1 = *n;
@@ -3178,10 +3176,10 @@ L100:
 	v = e2[q + 1];
 L110:
 /* Computing MIN */
-	r__1 = d[q] - (x1 + u);
+	r__1 = d__[q] - (x1 + u);
 	xu = dmin(r__1,xu);
 /* Computing MAX */
-	r__1 = d[q] + (x1 + u);
+	r__1 = d__[q] + (x1 + u);
 	x0 = dmax(r__1,x0);
 	if (v == 0.f) {
 	    goto L140;
@@ -3197,18 +3195,18 @@ L140:
     r__1 = dmax(r__2,r__3);
     x1 = epslon_(&r__1);
     if (*eps1 <= 0.f) {
-	*eps1 = -(doublereal)x1;
+	*eps1 = -x1;
     }
     if (p != q) {
 	goto L180;
     }
 /*     .......... CHECK FOR ISOLATED ROOT WITHIN INTERVAL .......... */
-    if (t1 > d[p] || d[p] >= t2) {
+    if (t1 > d__[p] || d__[p] >= t2) {
 	goto L940;
     }
     m1 = p;
     m2 = p;
-    rv5[p] = d[p];
+    rv5[p] = d__[p];
     goto L900;
 L180:
     x1 *= q - p + 1;
@@ -3236,26 +3234,25 @@ L220:
     isturm = 5;
 
     i__1 = m2;
-    for (i = m1; i <= i__1; ++i) {
-	rv5[i] = *ub;
-	rv4[i] = *lb;
+    for (i__ = m1; i__ <= i__1; ++i__) {
+	rv5[i__] = *ub;
+	rv4[i__] = *lb;
 /* L240: */
     }
 /*     .......... LOOP FOR K-TH EIGENVALUE   
                   FOR K=M2 STEP -1 UNTIL M1 DO --   
-                  (-DO- NOT USED TO LEGALIZE -COMPUTED GO TO-) .......... 
-*/
+                  (-DO- NOT USED TO LEGALIZE -COMPUTED GO TO-) .......... */
     k = m2;
 L250:
     xu = *lb;
 /*     .......... FOR I=K STEP -1 UNTIL M1 DO -- .......... */
     i__1 = k;
     for (ii = m1; ii <= i__1; ++ii) {
-	i = m1 + k - ii;
-	if (xu >= rv4[i]) {
+	i__ = m1 + k - ii;
+	if (xu >= rv4[i__]) {
 	    goto L260;
 	}
-	xu = rv4[i];
+	xu = rv4[i__];
 	goto L280;
 L260:
 	;
@@ -3287,19 +3284,19 @@ L320:
     u = 1.f;
 
     i__1 = q;
-    for (i = p; i <= i__1; ++i) {
+    for (i__ = p; i__ <= i__1; ++i__) {
 	if (u != 0.f) {
 	    goto L325;
 	}
-	v = (r__1 = e[i], dabs(r__1)) / epslon_(&c_b169);
-	if (e2[i] == 0.f) {
+	v = (r__1 = e[i__], dabs(r__1)) / epslon_(&c_b169);
+	if (e2[i__] == 0.f) {
 	    v = 0.f;
 	}
 	goto L330;
 L325:
-	v = e2[i] / u;
+	v = e2[i__] / u;
 L330:
-	u = d[i] - x1 - v;
+	u = d__[i__] - x1 - v;
 	if (u < 0.f) {
 	    ++s;
 	}
@@ -3347,12 +3344,12 @@ L420:
 /*     .......... ORDER EIGENVALUES TAGGED WITH THEIR   
                   SUBMATRIX ASSOCIATIONS .......... */
 L900:
-    s = r;
-    r = r + m2 - m1 + 1;
+    s = r__;
+    r__ = r__ + m2 - m1 + 1;
     j = 1;
     k = m1;
 
-    i__1 = r;
+    i__1 = r__;
     for (l = 1; l <= i__1; ++l) {
 	if (j > s) {
 	    goto L910;
@@ -3366,9 +3363,9 @@ L900:
 
 	i__2 = s;
 	for (ii = j; ii <= i__2; ++ii) {
-	    i = l + s - ii;
-	    w[i + 1] = w[i];
-	    ind[i + 1] = ind[i];
+	    i__ = l + s - ii;
+	    w[i__ + 1] = w[i__];
+	    ind[i__ + 1] = ind[i__];
 /* L905: */
 	}
 
@@ -3398,9 +3395,9 @@ L1001:
     return 0;
 } /* bisect_   
 
-   Subroutine */ int tinvit_(integer *nm, integer *n, real *d, real *e, real *
-	e2, integer *m, real *w, integer *ind, real *z, integer *ierr, real *
-	rv1, real *rv2, real *rv3, real *rv4, real *rv6)
+   Subroutine */ int tinvit_(integer *nm, integer *n, real *d__, real *e, 
+	real *e2, integer *m, real *w, integer *ind, real *z__, integer *ierr,
+	 real *rv1, real *rv2, real *rv3, real *rv4, real *rv6)
 {
     /* System generated locals */
     integer z_dim1, z_offset, i__1, i__2, i__3;
@@ -3411,7 +3408,7 @@ L1001:
 
     /* Local variables */
     static real norm;
-    static integer i, j, p, q, r, s;
+    static integer i__, j, p, q, r__, s;
     static real u, v, order;
     static integer group;
     static real x0, x1;
@@ -3420,6 +3417,9 @@ L1001:
     extern doublereal pythag_(real *, real *), epslon_(real *);
     static integer tag, its;
     static real eps2, eps3, eps4;
+
+
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
 /*     EISPACK ROUTINE.   
@@ -3466,14 +3466,12 @@ L1001:
 
           M IS THE NUMBER OF SPECIFIED EIGENVALUES.   
 
-          W CONTAINS THE M EIGENVALUES IN ASCENDING OR DESCENDING ORDER. 
-  
+          W CONTAINS THE M EIGENVALUES IN ASCENDING OR DESCENDING ORDER.   
 
           IND CONTAINS IN ITS FIRST M POSITIONS THE SUBMATRIX INDICES   
             ASSOCIATED WITH THE CORRESPONDING EIGENVALUES IN W --   
             1 FOR EIGENVALUES BELONGING TO THE FIRST SUBMATRIX FROM   
-            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC. 
-  
+            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC.   
 
        ON OUTPUT   
 
@@ -3492,13 +3490,11 @@ L1001:
        CALLS PYTHAG FOR  SQRT(A*A + B*B) .   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
           INITIALIZE ITERATION COUNT.   
        Parameter adjustments */
@@ -3509,10 +3505,10 @@ L1001:
     --rv1;
     --e2;
     --e;
-    --d;
+    --d__;
     z_dim1 = *nm;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --ind;
     --w;
 
@@ -3545,12 +3541,12 @@ L140:
     s = 0;
 
     i__1 = *m;
-    for (r = 1; r <= i__1; ++r) {
-	if (ind[r] != tag) {
+    for (r__ = 1; r__ <= i__1; ++r__) {
+	if (ind[r__] != tag) {
 	    goto L920;
 	}
 	its = 1;
-	x1 = w[r];
+	x1 = w[r__];
 	if (s != 0) {
 	    goto L510;
 	}
@@ -3562,22 +3558,21 @@ L140:
 	rv6[p] = 1.f;
 	goto L870;
 L490:
-	norm = (r__1 = d[p], dabs(r__1));
+	norm = (r__1 = d__[p], dabs(r__1));
 	ip = p + 1;
 
 	i__2 = q;
-	for (i = ip; i <= i__2; ++i) {
+	for (i__ = ip; i__ <= i__2; ++i__) {
 /* L500:   
    Computing MAX */
-	    r__3 = norm, r__4 = (r__1 = d[i], dabs(r__1)) + (r__2 = e[i], 
-		    dabs(r__2));
+	    r__3 = norm, r__4 = (r__1 = d__[i__], dabs(r__1)) + (r__2 = e[i__]
+		    , dabs(r__2));
 	    norm = dmax(r__3,r__4);
 	}
 /*     .......... EPS2 IS THE CRITERION FOR GROUPING,   
                   EPS3 REPLACES ZERO PIVOTS AND EQUAL   
                   ROOTS ARE MODIFIED BY EPS3,   
-                  EPS4 IS TAKEN VERY SMALL TO AVOID OVERFLOW .........
-. */
+                  EPS4 IS TAKEN VERY SMALL TO AVOID OVERFLOW .......... */
 	eps2 = norm * .001f;
 	eps3 = epslon_(&norm);
 	uk = (real) (q - p + 1);
@@ -3604,38 +3599,37 @@ L520:
 	v = 0.f;
 
 	i__2 = q;
-	for (i = p; i <= i__2; ++i) {
-	    rv6[i] = uk;
-	    if (i == p) {
+	for (i__ = p; i__ <= i__2; ++i__) {
+	    rv6[i__] = uk;
+	    if (i__ == p) {
 		goto L560;
 	    }
-	    if ((r__1 = e[i], dabs(r__1)) < dabs(u)) {
+	    if ((r__1 = e[i__], dabs(r__1)) < dabs(u)) {
 		goto L540;
 	    }
 /*     .......... WARNING -- A DIVIDE CHECK MAY OCCUR HERE IF   
-                  E2 ARRAY HAS NOT BEEN SPECIFIED CORRECTLY ......
-.... */
-	    xu = u / e[i];
-	    rv4[i] = xu;
-	    rv1[i - 1] = e[i];
-	    rv2[i - 1] = d[i] - x1;
-	    rv3[i - 1] = 0.f;
-	    if (i != q) {
-		rv3[i - 1] = e[i + 1];
+                  E2 ARRAY HAS NOT BEEN SPECIFIED CORRECTLY .......... */
+	    xu = u / e[i__];
+	    rv4[i__] = xu;
+	    rv1[i__ - 1] = e[i__];
+	    rv2[i__ - 1] = d__[i__] - x1;
+	    rv3[i__ - 1] = 0.f;
+	    if (i__ != q) {
+		rv3[i__ - 1] = e[i__ + 1];
 	    }
-	    u = v - xu * rv2[i - 1];
-	    v = -(doublereal)xu * rv3[i - 1];
+	    u = v - xu * rv2[i__ - 1];
+	    v = -xu * rv3[i__ - 1];
 	    goto L580;
 L540:
-	    xu = e[i] / u;
-	    rv4[i] = xu;
-	    rv1[i - 1] = u;
-	    rv2[i - 1] = v;
-	    rv3[i - 1] = 0.f;
+	    xu = e[i__] / u;
+	    rv4[i__] = xu;
+	    rv1[i__ - 1] = u;
+	    rv2[i__ - 1] = v;
+	    rv3[i__ - 1] = 0.f;
 L560:
-	    u = d[i] - x1 - xu * v;
-	    if (i != q) {
-		v = e[i + 1];
+	    u = d__[i__] - x1 - xu * v;
+	    if (i__ != q) {
+		v = e[i__ + 1];
 	    }
 L580:
 	    ;
@@ -3654,10 +3648,10 @@ L580:
 L600:
 	i__2 = q;
 	for (ii = p; ii <= i__2; ++ii) {
-	    i = p + q - ii;
-	    rv6[i] = (rv6[i] - u * rv2[i] - v * rv3[i]) / rv1[i];
+	    i__ = p + q - ii;
+	    rv6[i__] = (rv6[i__] - u * rv2[i__] - v * rv3[i__]) / rv1[i__];
 	    v = u;
-	    u = rv6[i];
+	    u = rv6[i__];
 /* L620: */
 	}
 /*           INCREMENT OPCOUNT FOR BACK SUBSTITUTION. */
@@ -3667,7 +3661,7 @@ L600:
 	if (group == 0) {
 	    goto L700;
 	}
-	j = r;
+	j = r__;
 
 	i__2 = group;
 	for (jj = 1; jj <= i__2; ++jj) {
@@ -3679,15 +3673,15 @@ L630:
 	    xu = 0.f;
 
 	    i__3 = q;
-	    for (i = p; i <= i__3; ++i) {
+	    for (i__ = p; i__ <= i__3; ++i__) {
 /* L640: */
-		xu += rv6[i] * z[i + j * z_dim1];
+		xu += rv6[i__] * z___ref(i__, j);
 	    }
 
 	    i__3 = q;
-	    for (i = p; i <= i__3; ++i) {
+	    for (i__ = p; i__ <= i__3; ++i__) {
 /* L660: */
-		rv6[i] -= xu * z[i + j * z_dim1];
+		rv6[i__] -= xu * z___ref(i__, j);
 	    }
 
 /*              INCREMENT OPCOUNT FOR ORTHOGONALIZING. */
@@ -3699,9 +3693,9 @@ L700:
 	norm = 0.f;
 
 	i__2 = q;
-	for (i = p; i <= i__2; ++i) {
+	for (i__ = p; i__ <= i__2; ++i__) {
 /* L720: */
-	    norm += (r__1 = rv6[i], dabs(r__1));
+	    norm += (r__1 = rv6[i__], dabs(r__1));
 	}
 /*           INCREMENT OPCOUNT FOR COMPUTING NORM. */
 	latime_1.ops += q - p + 1;
@@ -3726,26 +3720,26 @@ L740:
 	xu = eps4 / norm;
 
 	i__2 = q;
-	for (i = p; i <= i__2; ++i) {
+	for (i__ = p; i__ <= i__2; ++i__) {
 /* L760: */
-	    rv6[i] *= xu;
+	    rv6[i__] *= xu;
 	}
 /*     .......... ELIMINATION OPERATIONS ON NEXT VECTOR   
                   ITERATE .......... */
 L780:
 	i__2 = q;
-	for (i = ip; i <= i__2; ++i) {
-	    u = rv6[i];
+	for (i__ = ip; i__ <= i__2; ++i__) {
+	    u = rv6[i__];
 /*     .......... IF RV1(I-1) .EQ. E(I), A ROW INTERCHANGE   
                   WAS PERFORMED EARLIER IN THE   
                   TRIANGULARIZATION PROCESS .......... */
-	    if (rv1[i - 1] != e[i]) {
+	    if (rv1[i__ - 1] != e[i__]) {
 		goto L800;
 	    }
-	    u = rv6[i - 1];
-	    rv6[i - 1] = rv6[i];
+	    u = rv6[i__ - 1];
+	    rv6[i__ - 1] = rv6[i__];
 L800:
-	    rv6[i] = u - rv4[i] * rv6[i - 1];
+	    rv6[i__] = u - rv4[i__] * rv6[i__ - 1];
 /* L820: */
 	}
 /*           INCREMENT OPCOUNT FOR FORWARD SUBSTITUTION. */
@@ -3757,7 +3751,7 @@ L800:
 	goto L600;
 /*     .......... SET ERROR -- NON-CONVERGED EIGENVECTOR .......... */
 L830:
-	*ierr = -r;
+	*ierr = -r__;
 	xu = 0.f;
 	goto L870;
 /*     .......... NORMALIZE SO THAT SUM OF SQUARES IS   
@@ -3766,24 +3760,24 @@ L840:
 	u = 0.f;
 
 	i__2 = q;
-	for (i = p; i <= i__2; ++i) {
+	for (i__ = p; i__ <= i__2; ++i__) {
 /* L860: */
-	    u = pythag_(&u, &rv6[i]);
+	    u = pythag_(&u, &rv6[i__]);
 	}
 
 	xu = 1.f / u;
 
 L870:
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* L880: */
-	    z[i + r * z_dim1] = 0.f;
+	    z___ref(i__, r__) = 0.f;
 	}
 
 	i__2 = q;
-	for (i = p; i <= i__2; ++i) {
+	for (i__ = p; i__ <= i__2; ++i__) {
 /* L900: */
-	    z[i + r * z_dim1] = rv6[i] * xu;
+	    z___ref(i__, r__) = rv6[i__] * xu;
 	}
 /*           INCREMENT OPCOUNT FOR NORMALIZING. */
 	latime_1.ops += q - p + 1;
@@ -3800,10 +3794,13 @@ L920:
     latime_1.ops += pythop_1.opst;
 L1001:
     return 0;
-} /* tinvit_   
+} /* tinvit_ */
 
-   Subroutine */ int tridib_(integer *n, real *eps1, real *d, real *e, real *
-	e2, real *lb, real *ub, integer *m11, integer *m, real *w, integer *
+#undef z___ref
+
+
+/* Subroutine */ int tridib_(integer *n, real *eps1, real *d__, real *e, real 
+	*e2, real *lb, real *ub, integer *m11, integer *m, real *w, integer *
 	ind, integer *ierr, real *rv4, real *rv5)
 {
     /* System generated locals */
@@ -3811,7 +3808,7 @@ L1001:
     real r__1, r__2, r__3;
 
     /* Local variables */
-    static integer i, j, k, l, p, q, r, s;
+    static integer i__, j, k, l, p, q, r__, s;
     static real u, v, atoli, rtoli;
     static integer m1, m2;
     static real tnorm, t1, t2, x0, x1;
@@ -3887,8 +3884,7 @@ L1001:
           IND CONTAINS IN ITS FIRST M POSITIONS THE SUBMATRIX INDICES   
             ASSOCIATED WITH THE CORRESPONDING EIGENVALUES IN W --   
             1 FOR EIGENVALUES BELONGING TO THE FIRST SUBMATRIX FROM   
-            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC.. 
-  
+            THE TOP, 2 FOR THOSE BELONGING TO THE SECOND SUBMATRIX, ETC..   
 
           IERR IS SET TO   
             ZERO       FOR NORMAL RETURN,   
@@ -3903,13 +3899,11 @@ L1001:
        THAN TRIDIB, IF MORE THAN N/4 EIGENVALUES ARE TO BE FOUND.   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
           INITIALIZE ITERATION COUNT.   
        Parameter adjustments */
@@ -3917,7 +3911,7 @@ L1001:
     --rv4;
     --e2;
     --e;
-    --d;
+    --d__;
     --ind;
     --w;
 
@@ -3928,43 +3922,43 @@ L1001:
     rtoli = ulp * 2.f;
     *ierr = 0;
     tag = 0;
-    xu = d[1];
-    x0 = d[1];
+    xu = d__[1];
+    x0 = d__[1];
     u = 0.f;
 /*     .......... LOOK FOR SMALL SUB-DIAGONAL ENTRIES AND DETERMINE AN   
                   INTERVAL CONTAINING ALL THE EIGENVALUES .......... */
     pivmin = 1.f;
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	x1 = u;
 	u = 0.f;
-	if (i != *n) {
-	    u = (r__1 = e[i + 1], dabs(r__1));
+	if (i__ != *n) {
+	    u = (r__1 = e[i__ + 1], dabs(r__1));
 	}
 /* Computing MIN */
-	r__1 = d[i] - (x1 + u);
+	r__1 = d__[i__] - (x1 + u);
 	xu = dmin(r__1,xu);
 /* Computing MAX */
-	r__1 = d[i] + (x1 + u);
+	r__1 = d__[i__] + (x1 + u);
 	x0 = dmax(r__1,x0);
-	if (i == 1) {
+	if (i__ == 1) {
 	    goto L20;
 	}
 /* CC         TST1 = ABS(D(I)) + ABS(D(I-1))   
    CC         TST2 = TST1 + ABS(E(I))   
    CC         IF (TST2 .GT. TST1) GO TO 40   
    Computing 2nd power */
-	r__1 = e[i];
+	r__1 = e[i__];
 	tmp1 = r__1 * r__1;
 /* Computing 2nd power */
 	r__2 = ulp;
-	if ((r__1 = d[i] * d[i - 1], dabs(r__1)) * (r__2 * r__2) + safemn <= 
-		tmp1) {
+	if ((r__1 = d__[i__] * d__[i__ - 1], dabs(r__1)) * (r__2 * r__2) + 
+		safemn <= tmp1) {
 	    pivmin = dmax(pivmin,tmp1);
 	    goto L40;
 	}
 L20:
-	e2[i] = 0.f;
+	e2[i__] = 0.f;
 L40:
 	;
     }
@@ -4038,17 +4032,17 @@ L85:
     t2 = x1;
 L90:
     q = 0;
-    r = 0;
+    r__ = 0;
 /*     .......... ESTABLISH AND PROCESS NEXT SUBMATRIX, REFINING   
                   INTERVAL BY THE GERSCHGORIN BOUNDS .......... */
 L100:
-    if (r == *m) {
+    if (r__ == *m) {
 	goto L1001;
     }
     ++tag;
     p = q + 1;
-    xu = d[p];
-    x0 = d[p];
+    xu = d__[p];
+    x0 = d__[p];
     u = 0.f;
 
     i__1 = *n;
@@ -4063,10 +4057,10 @@ L100:
 	v = e2[q + 1];
 L110:
 /* Computing MIN */
-	r__1 = d[q] - (x1 + u);
+	r__1 = d__[q] - (x1 + u);
 	xu = dmin(r__1,xu);
 /* Computing MAX */
-	r__1 = d[q] + (x1 + u);
+	r__1 = d__[q] + (x1 + u);
 	x0 = dmax(r__1,x0);
 	if (v == 0.f) {
 	    goto L140;
@@ -4082,18 +4076,18 @@ L140:
     r__1 = dmax(r__2,r__3);
     x1 = epslon_(&r__1);
     if (*eps1 <= 0.f) {
-	*eps1 = -(doublereal)x1;
+	*eps1 = -x1;
     }
     if (p != q) {
 	goto L180;
     }
 /*     .......... CHECK FOR ISOLATED ROOT WITHIN INTERVAL .......... */
-    if (t1 > d[p] || d[p] >= t2) {
+    if (t1 > d__[p] || d__[p] >= t2) {
 	goto L940;
     }
     m1 = p;
     m2 = p;
-    rv5[p] = d[p];
+    rv5[p] = d__[p];
     goto L900;
 L180:
     x1 *= q - p + 1;
@@ -4121,26 +4115,25 @@ L220:
     isturm = 5;
 
     i__1 = m2;
-    for (i = m1; i <= i__1; ++i) {
-	rv5[i] = *ub;
-	rv4[i] = *lb;
+    for (i__ = m1; i__ <= i__1; ++i__) {
+	rv5[i__] = *ub;
+	rv4[i__] = *lb;
 /* L240: */
     }
 /*     .......... LOOP FOR K-TH EIGENVALUE   
                   FOR K=M2 STEP -1 UNTIL M1 DO --   
-                  (-DO- NOT USED TO LEGALIZE -COMPUTED GO TO-) .......... 
-*/
+                  (-DO- NOT USED TO LEGALIZE -COMPUTED GO TO-) .......... */
     k = m2;
 L250:
     xu = *lb;
 /*     .......... FOR I=K STEP -1 UNTIL M1 DO -- .......... */
     i__1 = k;
     for (ii = m1; ii <= i__1; ++ii) {
-	i = m1 + k - ii;
-	if (xu >= rv4[i]) {
+	i__ = m1 + k - ii;
+	if (xu >= rv4[i__]) {
 	    goto L260;
 	}
-	xu = rv4[i];
+	xu = rv4[i__];
 	goto L280;
 L260:
 	;
@@ -4172,19 +4165,19 @@ L320:
     u = 1.f;
 
     i__1 = q;
-    for (i = p; i <= i__1; ++i) {
+    for (i__ = p; i__ <= i__1; ++i__) {
 	if (u != 0.f) {
 	    goto L325;
 	}
-	v = (r__1 = e[i], dabs(r__1)) / epslon_(&c_b169);
-	if (e2[i] == 0.f) {
+	v = (r__1 = e[i__], dabs(r__1)) / epslon_(&c_b169);
+	if (e2[i__] == 0.f) {
 	    v = 0.f;
 	}
 	goto L330;
 L325:
-	v = e2[i] / u;
+	v = e2[i__] / u;
 L330:
-	u = d[i] - x1 - v;
+	u = d__[i__] - x1 - v;
 	if (u < 0.f) {
 	    ++s;
 	}
@@ -4232,12 +4225,12 @@ L420:
 /*     .......... ORDER EIGENVALUES TAGGED WITH THEIR   
                   SUBMATRIX ASSOCIATIONS .......... */
 L900:
-    s = r;
-    r = r + m2 - m1 + 1;
+    s = r__;
+    r__ = r__ + m2 - m1 + 1;
     j = 1;
     k = m1;
 
-    i__1 = r;
+    i__1 = r__;
     for (l = 1; l <= i__1; ++l) {
 	if (j > s) {
 	    goto L910;
@@ -4251,9 +4244,9 @@ L900:
 
 	i__2 = s;
 	for (ii = j; ii <= i__2; ++ii) {
-	    i = l + s - ii;
-	    w[i + 1] = w[i];
-	    ind[i + 1] = ind[i];
+	    i__ = l + s - ii;
+	    w[i__ + 1] = w[i__];
+	    ind[i__ + 1] = ind[i__];
 /* L905: */
 	}
 
@@ -4290,8 +4283,7 @@ L1001:
     /* System generated locals */
     integer x_dim1, x_offset, u_dim1, u_offset, v_dim1, v_offset, i__1, i__2, 
 	    i__3, i__4;
-    real r__1, r__2;
-    doublereal d__1, d__2;
+    real r__1, r__2, r__3, r__4;
     complex q__1, q__2, q__3;
 
     /* Builtin functions */
@@ -4303,11 +4295,11 @@ L1001:
     static integer kase, jobu, iter;
     static real test;
     static integer nctp1;
-    static real b, c;
+    static real b, c__;
     static integer nrtp1;
     static real f, g;
-    static integer i, j, k, l, m;
-    static complex r, t;
+    static integer i__, j, k, l, m;
+    static complex r__, t;
     static real scale;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
@@ -4337,6 +4329,14 @@ L1001:
     static real eps;
     static integer lls, nrt;
     static real emm1, smm1;
+
+
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
 
 
 /*     COMMON BLOCK TO RETURN OPERATION COUNT AND ITERATION COUNT   
@@ -4453,15 +4453,15 @@ L1001:
        GET EPS FROM SLAMCH FOR NEW STOPPING CRITERION   
        Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     --s;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
 
@@ -4526,23 +4526,23 @@ L1001:
 	latime_2.iops += (*n - l + 1 << 2) + 2;
 	i__2 = l;
 	i__3 = *n - l + 1;
-	d__1 = scnrm2_(&i__3, &x[l + l * x_dim1], &c__1);
-	q__1.r = d__1, q__1.i = 0.f;
+	r__1 = scnrm2_(&i__3, &x_ref(l, l), &c__1);
+	q__1.r = r__1, q__1.i = 0.f;
 	s[i__2].r = q__1.r, s[i__2].i = q__1.i;
 	i__2 = l;
 	if ((r__1 = s[i__2].r, dabs(r__1)) + (r__2 = r_imag(&s[l]), dabs(r__2)
 		) == 0.f) {
 	    goto L10;
 	}
-	i__2 = l + l * x_dim1;
-	if ((r__1 = x[i__2].r, dabs(r__1)) + (r__2 = r_imag(&x[l + l * x_dim1]
-		), dabs(r__2)) != 0.f) {
+	i__2 = x_subscr(l, l);
+	if ((r__1 = x[i__2].r, dabs(r__1)) + (r__2 = r_imag(&x_ref(l, l)), 
+		dabs(r__2)) != 0.f) {
 	    i__3 = l;
-	    d__1 = c_abs(&s[l]);
-	    i__4 = l + l * x_dim1;
-	    d__2 = c_abs(&x[l + l * x_dim1]);
-	    q__2.r = x[i__4].r / d__2, q__2.i = x[i__4].i / d__2;
-	    q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	    r__3 = c_abs(&s[l]);
+	    i__4 = x_subscr(l, l);
+	    r__4 = c_abs(&x_ref(l, l));
+	    q__2.r = x[i__4].r / r__4, q__2.i = x[i__4].i / r__4;
+	    q__1.r = r__3 * q__2.r, q__1.i = r__3 * q__2.i;
 	    s[i__3].r = q__1.r, s[i__3].i = q__1.i;
 	}
 
@@ -4550,15 +4550,15 @@ L1001:
 	latime_2.iops += (*n - l + 1) * 6 + 23;
 	i__2 = *n - l + 1;
 	c_div(&q__1, &c_b319, &s[l]);
-	cscal_(&i__2, &q__1, &x[l + l * x_dim1], &c__1);
-	i__2 = l + l * x_dim1;
-	i__3 = l + l * x_dim1;
+	cscal_(&i__2, &q__1, &x_ref(l, l), &c__1);
+	i__2 = x_subscr(l, l);
+	i__3 = x_subscr(l, l);
 	q__1.r = x[i__3].r + 1.f, q__1.i = x[i__3].i + 0.f;
 	x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 L10:
 	i__2 = l;
 	i__3 = l;
-	q__1.r = -(doublereal)s[i__3].r, q__1.i = -(doublereal)s[i__3].i;
+	q__1.r = -s[i__3].r, q__1.i = -s[i__3].i;
 	s[i__2].r = q__1.r, s[i__2].i = q__1.i;
 L20:
 	if (*p < lp1) {
@@ -4581,21 +4581,19 @@ L20:
                 INCREMENT OP COUNT */
 	    latime_2.iops += (*n - l << 4) + 26;
 	    i__3 = *n - l + 1;
-	    cdotc_(&q__3, &i__3, &x[l + l * x_dim1], &c__1, &x[l + j * x_dim1]
-		    , &c__1);
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-	    c_div(&q__1, &q__2, &x[l + l * x_dim1]);
+	    cdotc_(&q__3, &i__3, &x_ref(l, l), &c__1, &x_ref(l, j), &c__1);
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
+	    c_div(&q__1, &q__2, &x_ref(l, l));
 	    t.r = q__1.r, t.i = q__1.i;
 	    i__3 = *n - l + 1;
-	    caxpy_(&i__3, &t, &x[l + l * x_dim1], &c__1, &x[l + j * x_dim1], &
-		    c__1);
+	    caxpy_(&i__3, &t, &x_ref(l, l), &c__1, &x_ref(l, j), &c__1);
 L30:
 
 /*           PLACE THE L-TH ROW OF X INTO  E FOR THE   
              SUBSEQUENT CALCULATION OF THE ROW TRANSFORMATION. */
 
 	    i__3 = j;
-	    r_cnjg(&q__1, &x[l + j * x_dim1]);
+	    r_cnjg(&q__1, &x_ref(l, j));
 	    e[i__3].r = q__1.r, e[i__3].i = q__1.i;
 /* L40: */
 	}
@@ -4608,9 +4606,9 @@ L50:
              MULTIPLICATION. */
 
 	i__2 = *n;
-	for (i = l; i <= i__2; ++i) {
-	    i__3 = i + l * u_dim1;
-	    i__4 = i + l * x_dim1;
+	for (i__ = l; i__ <= i__2; ++i__) {
+	    i__3 = u_subscr(i__, l);
+	    i__4 = x_subscr(i__, l);
 	    u[i__3].r = x[i__4].r, u[i__3].i = x[i__4].i;
 /* L60: */
 	}
@@ -4627,8 +4625,8 @@ L70:
 	latime_2.iops += (*p - l << 2) + 3;
 	i__2 = l;
 	i__3 = *p - l;
-	d__1 = scnrm2_(&i__3, &e[lp1], &c__1);
-	q__1.r = d__1, q__1.i = 0.f;
+	r__1 = scnrm2_(&i__3, &e[lp1], &c__1);
+	q__1.r = r__1, q__1.i = 0.f;
 	e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 	i__2 = l;
 	if ((r__1 = e[i__2].r, dabs(r__1)) + (r__2 = r_imag(&e[l]), dabs(r__2)
@@ -4639,11 +4637,11 @@ L70:
 	if ((r__1 = e[i__2].r, dabs(r__1)) + (r__2 = r_imag(&e[lp1]), dabs(
 		r__2)) != 0.f) {
 	    i__3 = l;
-	    d__1 = c_abs(&e[l]);
+	    r__3 = c_abs(&e[l]);
 	    i__4 = lp1;
-	    d__2 = c_abs(&e[lp1]);
-	    q__2.r = e[i__4].r / d__2, q__2.i = e[i__4].i / d__2;
-	    q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	    r__4 = c_abs(&e[lp1]);
+	    q__2.r = e[i__4].r / r__4, q__2.i = e[i__4].i / r__4;
+	    q__1.r = r__3 * q__2.r, q__1.i = r__3 * q__2.i;
 	    e[i__3].r = q__1.r, e[i__3].i = q__1.i;
 	}
 
@@ -4659,7 +4657,7 @@ L70:
 L80:
 	i__2 = l;
 	r_cnjg(&q__2, &e[l]);
-	q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+	q__1.r = -q__2.r, q__1.i = -q__2.i;
 	e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 	i__2 = l;
 	if (lp1 > *n || (r__1 = e[i__2].r, dabs(r__1)) + (r__2 = r_imag(&e[l])
@@ -4670,8 +4668,8 @@ L80:
 /*              APPLY THE TRANSFORMATION. */
 
 	i__2 = *n;
-	for (i = lp1; i <= i__2; ++i) {
-	    i__3 = i;
+	for (i__ = lp1; i__ <= i__2; ++i__) {
+	    i__3 = i__;
 	    work[i__3].r = 0.f, work[i__3].i = 0.f;
 /* L90: */
 	}
@@ -4681,19 +4679,17 @@ L80:
 	i__2 = *p;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l;
-	    caxpy_(&i__3, &e[j], &x[lp1 + j * x_dim1], &c__1, &work[lp1], &
-		    c__1);
+	    caxpy_(&i__3, &e[j], &x_ref(lp1, j), &c__1, &work[lp1], &c__1);
 /* L100: */
 	}
 	i__2 = *p;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l;
 	    i__4 = j;
-	    q__3.r = -(doublereal)e[i__4].r, q__3.i = -(doublereal)e[i__4].i;
+	    q__3.r = -e[i__4].r, q__3.i = -e[i__4].i;
 	    c_div(&q__2, &q__3, &e[lp1]);
 	    r_cnjg(&q__1, &q__2);
-	    caxpy_(&i__3, &q__1, &work[lp1], &c__1, &x[lp1 + j * x_dim1], &
-		    c__1);
+	    caxpy_(&i__3, &q__1, &work[lp1], &c__1, &x_ref(lp1, j), &c__1);
 /* L110: */
 	}
 L120:
@@ -4705,9 +4701,9 @@ L120:
                 BACK MULTIPLICATION. */
 
 	i__2 = *p;
-	for (i = lp1; i <= i__2; ++i) {
-	    i__3 = i + l * v_dim1;
-	    i__4 = i;
+	for (i__ = lp1; i__ <= i__2; ++i__) {
+	    i__3 = v_subscr(i__, l);
+	    i__4 = i__;
 	    v[i__3].r = e[i__4].r, v[i__3].i = e[i__4].i;
 /* L130: */
 	}
@@ -4727,7 +4723,7 @@ L170:
     nrtp1 = nrt + 1;
     if (nct < *p) {
 	i__1 = nctp1;
-	i__2 = nctp1 + nctp1 * x_dim1;
+	i__2 = x_subscr(nctp1, nctp1);
 	s[i__1].r = x[i__2].r, s[i__1].i = x[i__2].i;
     }
     if (*n < m) {
@@ -4736,7 +4732,7 @@ L170:
     }
     if (nrtp1 < m) {
 	i__1 = nrtp1;
-	i__2 = nrtp1 + m * x_dim1;
+	i__2 = x_subscr(nrtp1, m);
 	e[i__1].r = x[i__2].r, e[i__1].i = x[i__2].i;
     }
     i__1 = m;
@@ -4753,12 +4749,12 @@ L170:
     i__1 = ncu;
     for (j = nctp1; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * u_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = u_subscr(i__, j);
 	    u[i__3].r = 0.f, u[i__3].i = 0.f;
 /* L180: */
 	}
-	i__2 = j + j * u_dim1;
+	i__2 = u_subscr(j, j);
 	u[i__2].r = 1.f, u[i__2].i = 0.f;
 /* L190: */
     }
@@ -4785,21 +4781,19 @@ L200:
 	i__2 = ncu;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l + 1;
-	    cdotc_(&q__3, &i__3, &u[l + l * u_dim1], &c__1, &u[l + j * u_dim1]
-		    , &c__1);
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-	    c_div(&q__1, &q__2, &u[l + l * u_dim1]);
+	    cdotc_(&q__3, &i__3, &u_ref(l, l), &c__1, &u_ref(l, j), &c__1);
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
+	    c_div(&q__1, &q__2, &u_ref(l, l));
 	    t.r = q__1.r, t.i = q__1.i;
 	    i__3 = *n - l + 1;
-	    caxpy_(&i__3, &t, &u[l + l * u_dim1], &c__1, &u[l + j * u_dim1], &
-		    c__1);
+	    caxpy_(&i__3, &t, &u_ref(l, l), &c__1, &u_ref(l, j), &c__1);
 /* L210: */
 	}
 L220:
 	i__2 = *n - l + 1;
-	cscal_(&i__2, &c_b364, &u[l + l * u_dim1], &c__1);
-	i__2 = l + l * u_dim1;
-	i__3 = l + l * u_dim1;
+	cscal_(&i__2, &c_b364, &u_ref(l, l), &c__1);
+	i__2 = u_subscr(l, l);
+	i__3 = u_subscr(l, l);
 	q__1.r = u[i__3].r + 1.f, q__1.i = u[i__3].i + 0.f;
 	u[i__2].r = q__1.r, u[i__2].i = q__1.i;
 	lm1 = l - 1;
@@ -4807,8 +4801,8 @@ L220:
 	    goto L240;
 	}
 	i__2 = lm1;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + l * u_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = u_subscr(i__, l);
 	    u[i__3].r = 0.f, u[i__3].i = 0.f;
 /* L230: */
 	}
@@ -4816,12 +4810,12 @@ L240:
 	goto L270;
 L250:
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + l * u_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = u_subscr(i__, l);
 	    u[i__3].r = 0.f, u[i__3].i = 0.f;
 /* L260: */
 	}
-	i__2 = l + l * u_dim1;
+	i__2 = u_subscr(l, l);
 	u[i__2].r = 1.f, u[i__2].i = 0.f;
 L270:
 /* L280: */
@@ -4853,24 +4847,23 @@ L300:
 	i__2 = *p;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *p - l;
-	    cdotc_(&q__3, &i__3, &v[lp1 + l * v_dim1], &c__1, &v[lp1 + j * 
-		    v_dim1], &c__1);
-	    q__2.r = -(doublereal)q__3.r, q__2.i = -(doublereal)q__3.i;
-	    c_div(&q__1, &q__2, &v[lp1 + l * v_dim1]);
+	    cdotc_(&q__3, &i__3, &v_ref(lp1, l), &c__1, &v_ref(lp1, j), &c__1)
+		    ;
+	    q__2.r = -q__3.r, q__2.i = -q__3.i;
+	    c_div(&q__1, &q__2, &v_ref(lp1, l));
 	    t.r = q__1.r, t.i = q__1.i;
 	    i__3 = *p - l;
-	    caxpy_(&i__3, &t, &v[lp1 + l * v_dim1], &c__1, &v[lp1 + j * 
-		    v_dim1], &c__1);
+	    caxpy_(&i__3, &t, &v_ref(lp1, l), &c__1, &v_ref(lp1, j), &c__1);
 /* L310: */
 	}
 L320:
 	i__2 = *p;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + l * v_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = v_subscr(i__, l);
 	    v[i__3].r = 0.f, v[i__3].i = 0.f;
 /* L330: */
 	}
-	i__2 = l + l * v_dim1;
+	i__2 = v_subscr(l, l);
 	v[i__2].r = 1.f, v[i__2].i = 0.f;
 /* L340: */
     }
@@ -4882,10 +4875,10 @@ L350:
        INCREMENT OP COUNT */
     latime_2.iops += (m << 1) - 1;
     i__1 = m;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i;
-	if ((r__1 = s[i__2].r, dabs(r__1)) + (r__2 = r_imag(&s[i]), dabs(r__2)
-		) == 0.f) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	if ((r__1 = s[i__2].r, dabs(r__1)) + (r__2 = r_imag(&s[i__]), dabs(
+		r__2)) == 0.f) {
 	    goto L360;
 	}
 
@@ -4894,29 +4887,29 @@ L350:
 	if (wantu) {
 	    latime_2.iops += *n * 6;
 	}
-	d__1 = c_abs(&s[i]);
-	q__1.r = d__1, q__1.i = 0.f;
+	r__1 = c_abs(&s[i__]);
+	q__1.r = r__1, q__1.i = 0.f;
 	t.r = q__1.r, t.i = q__1.i;
-	c_div(&q__1, &s[i], &t);
-	r.r = q__1.r, r.i = q__1.i;
-	i__2 = i;
+	c_div(&q__1, &s[i__], &t);
+	r__.r = q__1.r, r__.i = q__1.i;
+	i__2 = i__;
 	s[i__2].r = t.r, s[i__2].i = t.i;
-	if (i < m) {
-	    i__2 = i;
-	    c_div(&q__1, &e[i], &r);
+	if (i__ < m) {
+	    i__2 = i__;
+	    c_div(&q__1, &e[i__], &r__);
 	    e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 	}
 	if (wantu) {
-	    cscal_(n, &r, &u[i * u_dim1 + 1], &c__1);
+	    cscal_(n, &r__, &u_ref(1, i__), &c__1);
 	}
 L360:
 /*     ...EXIT */
-	if (i == m) {
+	if (i__ == m) {
 	    goto L390;
 	}
-	i__2 = i;
-	if ((r__1 = e[i__2].r, dabs(r__1)) + (r__2 = r_imag(&e[i]), dabs(r__2)
-		) == 0.f) {
+	i__2 = i__;
+	if ((r__1 = e[i__2].r, dabs(r__1)) + (r__2 = r_imag(&e[i__]), dabs(
+		r__2)) == 0.f) {
 	    goto L370;
 	}
 
@@ -4925,20 +4918,20 @@ L360:
 	if (wantv) {
 	    latime_2.iops += *p * 6;
 	}
-	d__1 = c_abs(&e[i]);
-	q__1.r = d__1, q__1.i = 0.f;
+	r__1 = c_abs(&e[i__]);
+	q__1.r = r__1, q__1.i = 0.f;
 	t.r = q__1.r, t.i = q__1.i;
-	c_div(&q__1, &t, &e[i]);
-	r.r = q__1.r, r.i = q__1.i;
-	i__2 = i;
+	c_div(&q__1, &t, &e[i__]);
+	r__.r = q__1.r, r__.i = q__1.i;
+	i__2 = i__;
 	e[i__2].r = t.r, e[i__2].i = t.i;
-	i__2 = i + 1;
-	i__3 = i + 1;
-	q__1.r = s[i__3].r * r.r - s[i__3].i * r.i, q__1.i = s[i__3].r * r.i 
-		+ s[i__3].i * r.r;
+	i__2 = i__ + 1;
+	i__3 = i__ + 1;
+	q__1.r = s[i__3].r * r__.r - s[i__3].i * r__.i, q__1.i = s[i__3].r * 
+		r__.i + s[i__3].i * r__.r;
 	s[i__2].r = q__1.r, s[i__2].i = q__1.i;
 	if (wantv) {
-	    cscal_(p, &r, &v[(i + 1) * v_dim1 + 1], &c__1);
+	    cscal_(p, &r__, &v_ref(1, i__ + 1), &c__1);
 	}
 L370:
 /* L380: */
@@ -5041,8 +5034,7 @@ L450:
 	    test += c_abs(&e[ls - 1]);
 	}
 
-/*              REPLACE STOPPING CRITERION WITH NEW ONE AS IN LAPACK 
-  
+/*              REPLACE STOPPING CRITERION WITH NEW ONE AS IN LAPACK   
 
                 ZTEST = TEST + CABS(S(LS))   
                 IF (ZTEST .NE. TEST) GO TO 460 */
@@ -5113,15 +5105,14 @@ L530:
 	    goto L540;
 	}
 	i__2 = k - 1;
-	f = -(doublereal)sn * e[i__2].r;
+	f = -sn * e[i__2].r;
 	i__2 = k - 1;
 	i__3 = k - 1;
 	q__1.r = cs * e[i__3].r, q__1.i = cs * e[i__3].i;
 	e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 L540:
 	if (wantv) {
-	    csrot_(p, &v[k * v_dim1 + 1], &c__1, &v[m * v_dim1 + 1], &c__1, &
-		    cs, &sn);
+	    csrot_(p, &v_ref(1, k), &c__1, &v_ref(1, m), &c__1, &cs, &sn);
 	}
 /* L550: */
     }
@@ -5149,14 +5140,13 @@ L560:
 	q__1.r = t1, q__1.i = 0.f;
 	s[i__2].r = q__1.r, s[i__2].i = q__1.i;
 	i__2 = k;
-	f = -(doublereal)sn * e[i__2].r;
+	f = -sn * e[i__2].r;
 	i__2 = k;
 	i__3 = k;
 	q__1.r = cs * e[i__3].r, q__1.i = cs * e[i__3].i;
 	e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 	if (wantu) {
-	    csrot_(n, &u[k * u_dim1 + 1], &c__1, &u[(l - 1) * u_dim1 + 1], &
-		    c__1, &cs, &sn);
+	    csrot_(n, &u_ref(1, k), &c__1, &u_ref(1, l - 1), &c__1, &cs, &sn);
 	}
 /* L570: */
     }
@@ -5191,18 +5181,18 @@ L580:
     b = ((smm1 + sm) * (smm1 - sm) + r__1 * r__1) / 2.f;
 /* Computing 2nd power */
     r__1 = sm * emm1;
-    c = r__1 * r__1;
+    c__ = r__1 * r__1;
     shift = 0.f;
-    if (b == 0.f && c == 0.f) {
+    if (b == 0.f && c__ == 0.f) {
 	goto L590;
     }
 /* Computing 2nd power */
     r__1 = b;
-    shift = sqrt(r__1 * r__1 + c);
+    shift = sqrt(r__1 * r__1 + c__);
     if (b < 0.f) {
-	shift = -(doublereal)shift;
+	shift = -shift;
     }
-    shift = c / (b + shift);
+    shift = c__ / (b + shift);
 L590:
     f = (sl + sm) * (sl - sm) + shift;
     g = sl * el;
@@ -5248,8 +5238,7 @@ L590:
 	q__1.r = cs * s[i__3].r, q__1.i = cs * s[i__3].i;
 	s[i__2].r = q__1.r, s[i__2].i = q__1.i;
 	if (wantv) {
-	    csrot_(p, &v[k * v_dim1 + 1], &c__1, &v[(k + 1) * v_dim1 + 1], &
-		    c__1, &cs, &sn);
+	    csrot_(p, &v_ref(1, k), &c__1, &v_ref(1, k + 1), &c__1, &cs, &sn);
 	}
 	srotg_(&f, &g, &cs, &sn);
 	i__2 = k;
@@ -5259,9 +5248,9 @@ L590:
 	i__3 = k + 1;
 	f = cs * e[i__2].r + sn * s[i__3].r;
 	i__2 = k + 1;
-	d__1 = -(doublereal)sn;
+	r__1 = -sn;
 	i__3 = k;
-	q__2.r = d__1 * e[i__3].r, q__2.i = d__1 * e[i__3].i;
+	q__2.r = r__1 * e[i__3].r, q__2.i = r__1 * e[i__3].i;
 	i__4 = k + 1;
 	q__3.r = cs * s[i__4].r, q__3.i = cs * s[i__4].i;
 	q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
@@ -5273,8 +5262,7 @@ L590:
 	q__1.r = cs * e[i__3].r, q__1.i = cs * e[i__3].i;
 	e[i__2].r = q__1.r, e[i__2].i = q__1.i;
 	if (wantu && k < *n) {
-	    csrot_(n, &u[k * u_dim1 + 1], &c__1, &u[(k + 1) * u_dim1 + 1], &
-		    c__1, &cs, &sn);
+	    csrot_(n, &u_ref(1, k), &c__1, &u_ref(1, k + 1), &c__1, &cs, &sn);
 	}
 /* L600: */
     }
@@ -5296,7 +5284,7 @@ L610:
     }
     i__1 = l;
     i__2 = l;
-    q__1.r = -(doublereal)s[i__2].r, q__1.i = -(doublereal)s[i__2].i;
+    q__1.r = -s[i__2].r, q__1.i = -s[i__2].i;
     s[i__1].r = q__1.r, s[i__1].i = q__1.i;
 
 /*              INCREMENT OP COUNT */
@@ -5304,7 +5292,7 @@ L610:
 	latime_2.iops += *p * 6;
     }
     if (wantv) {
-	cscal_(p, &c_b364, &v[l * v_dim1 + 1], &c__1);
+	cscal_(p, &c_b364, &v_ref(1, l), &c__1);
     }
 L620:
 
@@ -5328,10 +5316,10 @@ L630:
     i__1 = l + 1;
     s[i__1].r = t.r, s[i__1].i = t.i;
     if (wantv && l < *p) {
-	cswap_(p, &v[l * v_dim1 + 1], &c__1, &v[(l + 1) * v_dim1 + 1], &c__1);
+	cswap_(p, &v_ref(1, l), &c__1, &v_ref(1, l + 1), &c__1);
     }
     if (wantu && l < *n) {
-	cswap_(n, &u[l * u_dim1 + 1], &c__1, &u[(l + 1) * u_dim1 + 1], &c__1);
+	cswap_(n, &u_ref(1, l), &c__1, &u_ref(1, l + 1), &c__1);
     }
     ++l;
     goto L630;
@@ -5345,10 +5333,18 @@ L660:
 /*     COMPUTE FINAL OPCOUNT */
     latime_2.iops += iopst;
     return 0;
-} /* csvdc_   
+} /* csvdc_ */
+
+#undef x_ref
+#undef x_subscr
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
 
 
-       ------------------------------------------------------------------   
+
+/*     ------------------------------------------------------------------   
 
    Subroutine */ int cqzhes_(integer *nm, integer *n, real *ar, real *ai, 
 	real *br, real *bi, logical *matz, real *zr, real *zi)
@@ -5365,8 +5361,8 @@ L660:
 
     /* Local variables */
     static real opst;
-    static integer i, j, k, l;
-    static real r, s, t;
+    static integer i__, j, k, l;
+    static real r__, s, t;
     static integer k1, l1, iopst;
     static real u1, u2;
     static integer lb;
@@ -5375,15 +5371,25 @@ L660:
     static real u1i, rho;
 
 
+#define ai_subscr(a_1,a_2) (a_2)*ai_dim1 + a_1
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define bi_subscr(a_1,a_2) (a_2)*bi_dim1 + a_1
+#define bi_ref(a_1,a_2) bi[(a_2)*bi_dim1 + a_1]
+#define ar_subscr(a_1,a_2) (a_2)*ar_dim1 + a_1
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define br_subscr(a_1,a_2) (a_2)*br_dim1 + a_1
+#define br_ref(a_1,a_2) br[(a_2)*br_dim1 + a_1]
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
 
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+
+
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
        COMMON BLOCK TO RETURN OPERATION COUNT AND ITERATION COUNT   
        ITCNT IS INITIALIZED TO 0, OPS IS ONLY INCREMENTED   
        OPST IS USED TO ACCUMULATE SMALL CONTRIBUTIONS TO OPS   
        TO AVOID ROUNDOFF ERROR   
-       ------------------------ END TIMING CODE ------------------------- 
-  
+       ------------------------ END TIMING CODE -------------------------   
 
 
        THIS SUBROUTINE IS A COMPLEX ANALOGUE OF THE FIRST STEP OF THE   
@@ -5408,8 +5414,7 @@ L660:
 
           B=(BR,BI) CONTAINS A COMPLEX GENERAL MATRIX,   
 
-          MATZ SHOULD BE SET TO .TRUE. IF THE RIGHT HAND TRANSFORMATIONS 
-  
+          MATZ SHOULD BE SET TO .TRUE. IF THE RIGHT HAND TRANSFORMATIONS   
             ARE TO BE ACCUMULATED FOR LATER USE IN COMPUTING   
             EIGENVECTORS, AND TO .FALSE. OTHERWISE.   
 
@@ -5417,8 +5422,7 @@ L660:
 
           A HAS BEEN REDUCED TO UPPER HESSENBERG FORM.  THE ELEMENTS   
             BELOW THE FIRST SUBDIAGONAL HAVE BEEN SET TO ZERO, AND THE   
-            SUBDIAGONAL ELEMENTS HAVE BEEN MADE REAL (AND NON-NEGATIVE), 
-  
+            SUBDIAGONAL ELEMENTS HAVE BEEN MADE REAL (AND NON-NEGATIVE),   
 
           B HAS BEEN REDUCED TO UPPER TRIANGULAR FORM.  THE ELEMENTS   
             BELOW THE MAIN DIAGONAL HAVE BEEN SET TO ZERO,   
@@ -5430,28 +5434,27 @@ L660:
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,   
        APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        ********** INITIALIZE Z **********   
        Parameter adjustments */
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
     bi_dim1 = *nm;
-    bi_offset = bi_dim1 + 1;
+    bi_offset = 1 + bi_dim1 * 1;
     bi -= bi_offset;
     br_dim1 = *nm;
-    br_offset = br_dim1 + 1;
+    br_offset = 1 + br_dim1 * 1;
     br -= br_offset;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
 
     /* Function Body */
@@ -5460,16 +5463,16 @@ L660:
     }
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
 	i__2 = *n;
 	for (j = 1; j <= i__2; ++j) {
-	    zr[i + j * zr_dim1] = 0.f;
-	    zi[i + j * zi_dim1] = 0.f;
+	    zr_ref(i__, j) = 0.f;
+	    zi_ref(i__, j) = 0.f;
 /* L2: */
 	}
 
-	zr[i + i * zr_dim1] = 1.f;
+	zr_ref(i__, i__) = 1.f;
 /* L3: */
     }
 /*     ********** REDUCE B TO UPPER TRIANGULAR FORM WITH   
@@ -5482,25 +5485,21 @@ L10:
 
     i__1 = nm1;
     for (l = 1; l <= i__1; ++l) {
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	iopst = 0;
-/*        ----------------------- END TIMING CODE -------------------
----- */
+/*        ----------------------- END TIMING CODE ----------------------- */
 	l1 = l + 1;
 	s = 0.f;
 
 	i__2 = *n;
-	for (i = l; i <= i__2; ++i) {
-	    s = s + (r__1 = br[i + l * br_dim1], dabs(r__1)) + (r__2 = bi[i + 
-		    l * bi_dim1], dabs(r__2));
+	for (i__ = l; i__ <= i__2; ++i__) {
+	    s = s + (r__1 = br_ref(i__, l), dabs(r__1)) + (r__2 = bi_ref(i__, 
+		    l), dabs(r__2));
 /* L20: */
 	}
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	iopst += *n + 1 - l << 1;
-/*        ----------------------- END TIMING CODE -------------------
----- */
+/*        ----------------------- END TIMING CODE ----------------------- */
 
 	if (s == 0.f) {
 	    goto L100;
@@ -5508,40 +5507,38 @@ L10:
 	rho = 0.f;
 
 	i__2 = *n;
-	for (i = l; i <= i__2; ++i) {
-	    br[i + l * br_dim1] /= s;
-	    bi[i + l * bi_dim1] /= s;
+	for (i__ = l; i__ <= i__2; ++i__) {
+	    br_ref(i__, l) = br_ref(i__, l) / s;
+	    bi_ref(i__, l) = bi_ref(i__, l) / s;
 /* Computing 2nd power */
-	    r__1 = br[i + l * br_dim1];
+	    r__1 = br_ref(i__, l);
 /* Computing 2nd power */
-	    r__2 = bi[i + l * bi_dim1];
+	    r__2 = bi_ref(i__, l);
 	    rho = rho + r__1 * r__1 + r__2 * r__2;
 /* L25: */
 	}
 
-	r = sqrt(rho);
-	i__2 = l + l * br_dim1;
-	i__3 = l + l * bi_dim1;
+	r__ = sqrt(rho);
+	i__2 = br_subscr(l, l);
+	i__3 = bi_subscr(l, l);
 	q__1.r = br[i__2], q__1.i = bi[i__3];
 	xr = c_abs(&q__1);
 	if (xr == 0.f) {
 	    goto L27;
 	}
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	iopst += 8;
-/*        ----------------------- END TIMING CODE -------------------
----- */
-	rho += xr * r;
-	u1 = -(doublereal)br[l + l * br_dim1] / xr;
-	u1i = -(doublereal)bi[l + l * bi_dim1] / xr;
-	yr = r / xr + 1.f;
-	br[l + l * br_dim1] = yr * br[l + l * br_dim1];
-	bi[l + l * bi_dim1] = yr * bi[l + l * bi_dim1];
+/*        ----------------------- END TIMING CODE ----------------------- */
+	rho += xr * r__;
+	u1 = -br_ref(l, l) / xr;
+	u1i = -bi_ref(l, l) / xr;
+	yr = r__ / xr + 1.f;
+	br_ref(l, l) = yr * br_ref(l, l);
+	bi_ref(l, l) = yr * bi_ref(l, l);
 	goto L28;
 
 L27:
-	br[l + l * br_dim1] = r;
+	br_ref(l, l) = r__;
 	u1 = -1.f;
 	u1i = 0.f;
 
@@ -5552,11 +5549,11 @@ L28:
 	    ti = 0.f;
 
 	    i__3 = *n;
-	    for (i = l; i <= i__3; ++i) {
-		t = t + br[i + l * br_dim1] * br[i + j * br_dim1] + bi[i + l *
-			 bi_dim1] * bi[i + j * bi_dim1];
-		ti = ti + br[i + l * br_dim1] * bi[i + j * bi_dim1] - bi[i + 
-			l * bi_dim1] * br[i + j * br_dim1];
+	    for (i__ = l; i__ <= i__3; ++i__) {
+		t = t + br_ref(i__, l) * br_ref(i__, j) + bi_ref(i__, l) * 
+			bi_ref(i__, j);
+		ti = ti + br_ref(i__, l) * bi_ref(i__, j) - bi_ref(i__, l) * 
+			br_ref(i__, j);
 /* L30: */
 	    }
 
@@ -5564,18 +5561,17 @@ L28:
 	    ti /= rho;
 
 	    i__3 = *n;
-	    for (i = l; i <= i__3; ++i) {
-		br[i + j * br_dim1] = br[i + j * br_dim1] - t * br[i + l * 
-			br_dim1] + ti * bi[i + l * bi_dim1];
-		bi[i + j * bi_dim1] = bi[i + j * bi_dim1] - t * bi[i + l * 
-			bi_dim1] - ti * br[i + l * br_dim1];
+	    for (i__ = l; i__ <= i__3; ++i__) {
+		br_ref(i__, j) = br_ref(i__, j) - t * br_ref(i__, l) + ti * 
+			bi_ref(i__, l);
+		bi_ref(i__, j) = bi_ref(i__, j) - t * bi_ref(i__, l) - ti * 
+			br_ref(i__, l);
 /* L40: */
 	    }
 
-	    xi = u1 * bi[l + j * bi_dim1] - u1i * br[l + j * br_dim1];
-	    br[l + j * br_dim1] = u1 * br[l + j * br_dim1] + u1i * bi[l + j * 
-		    bi_dim1];
-	    bi[l + j * bi_dim1] = xi;
+	    xi = u1 * bi_ref(l, j) - u1i * br_ref(l, j);
+	    br_ref(l, j) = u1 * br_ref(l, j) + u1i * bi_ref(l, j);
+	    bi_ref(l, j) = xi;
 /* L50: */
 	}
 
@@ -5585,11 +5581,11 @@ L28:
 	    ti = 0.f;
 
 	    i__3 = *n;
-	    for (i = l; i <= i__3; ++i) {
-		t = t + br[i + l * br_dim1] * ar[i + j * ar_dim1] + bi[i + l *
-			 bi_dim1] * ai[i + j * ai_dim1];
-		ti = ti + br[i + l * br_dim1] * ai[i + j * ai_dim1] - bi[i + 
-			l * bi_dim1] * ar[i + j * ar_dim1];
+	    for (i__ = l; i__ <= i__3; ++i__) {
+		t = t + br_ref(i__, l) * ar_ref(i__, j) + bi_ref(i__, l) * 
+			ai_ref(i__, j);
+		ti = ti + br_ref(i__, l) * ai_ref(i__, j) - bi_ref(i__, l) * 
+			ar_ref(i__, j);
 /* L60: */
 	    }
 
@@ -5597,83 +5593,72 @@ L28:
 	    ti /= rho;
 
 	    i__3 = *n;
-	    for (i = l; i <= i__3; ++i) {
-		ar[i + j * ar_dim1] = ar[i + j * ar_dim1] - t * br[i + l * 
-			br_dim1] + ti * bi[i + l * bi_dim1];
-		ai[i + j * ai_dim1] = ai[i + j * ai_dim1] - t * bi[i + l * 
-			bi_dim1] - ti * br[i + l * br_dim1];
+	    for (i__ = l; i__ <= i__3; ++i__) {
+		ar_ref(i__, j) = ar_ref(i__, j) - t * br_ref(i__, l) + ti * 
+			bi_ref(i__, l);
+		ai_ref(i__, j) = ai_ref(i__, j) - t * bi_ref(i__, l) - ti * 
+			br_ref(i__, l);
 /* L70: */
 	    }
 
-	    xi = u1 * ai[l + j * ai_dim1] - u1i * ar[l + j * ar_dim1];
-	    ar[l + j * ar_dim1] = u1 * ar[l + j * ar_dim1] + u1i * ai[l + j * 
-		    ai_dim1];
-	    ai[l + j * ai_dim1] = xi;
+	    xi = u1 * ai_ref(l, j) - u1i * ar_ref(l, j);
+	    ar_ref(l, j) = u1 * ar_ref(l, j) + u1i * ai_ref(l, j);
+	    ai_ref(l, j) = xi;
 /* L80: */
 	}
 
-	br[l + l * br_dim1] = r * s;
-	bi[l + l * bi_dim1] = 0.f;
+	br_ref(l, l) = r__ * s;
+	bi_ref(l, l) = 0.f;
 
 	i__2 = *n;
-	for (i = l1; i <= i__2; ++i) {
-	    br[i + l * br_dim1] = 0.f;
-	    bi[i + l * bi_dim1] = 0.f;
+	for (i__ = l1; i__ <= i__2; ++i__) {
+	    br_ref(i__, l) = 0.f;
+	    bi_ref(i__, l) = 0.f;
 /* L90: */
 	}
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	latime_1.ops += (real) ((*n - l << 4) + (*n << 4) + 30) * (real) (*n 
 		- l) + (real) (*n * 24 + 13 + iopst);
-/*        ----------------------- END TIMING CODE -------------------
----- */
+/*        ----------------------- END TIMING CODE ----------------------- */
 
 L100:
 	;
     }
-/*     ********** REDUCE A TO UPPER HESSENBERG FORM WITH REAL SUBDIAGONAL 
-  
+/*     ********** REDUCE A TO UPPER HESSENBERG FORM WITH REAL SUBDIAGONAL   
                   ELEMENTS, WHILE KEEPING B TRIANGULAR ********** */
     i__1 = nm1;
     for (k = 1; k <= i__1; ++k) {
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	opst = 0.f;
-/*        ----------------------- END TIMING CODE -------------------
----- */
+/*        ----------------------- END TIMING CODE ----------------------- */
 	k1 = k + 1;
-/*     ********** SET BOTTOM ELEMENT IN K-TH COLUMN OF A REAL *******
-*** */
-	if (ai[*n + k * ai_dim1] == 0.f) {
+/*     ********** SET BOTTOM ELEMENT IN K-TH COLUMN OF A REAL ********** */
+	if (ai_ref(*n, k) == 0.f) {
 	    goto L105;
 	}
-	i__2 = *n + k * ar_dim1;
-	i__3 = *n + k * ai_dim1;
+	i__2 = ar_subscr(*n, k);
+	i__3 = ai_subscr(*n, k);
 	q__1.r = ar[i__2], q__1.i = ai[i__3];
-	r = c_abs(&q__1);
-	u1 = ar[*n + k * ar_dim1] / r;
-	u1i = ai[*n + k * ai_dim1] / r;
-	ar[*n + k * ar_dim1] = r;
-	ai[*n + k * ai_dim1] = 0.f;
+	r__ = c_abs(&q__1);
+	u1 = ar_ref(*n, k) / r__;
+	u1i = ai_ref(*n, k) / r__;
+	ar_ref(*n, k) = r__;
+	ai_ref(*n, k) = 0.f;
 
 	i__2 = *n;
 	for (j = k1; j <= i__2; ++j) {
-	    xi = u1 * ai[*n + j * ai_dim1] - u1i * ar[*n + j * ar_dim1];
-	    ar[*n + j * ar_dim1] = u1 * ar[*n + j * ar_dim1] + u1i * ai[*n + 
-		    j * ai_dim1];
-	    ai[*n + j * ai_dim1] = xi;
+	    xi = u1 * ai_ref(*n, j) - u1i * ar_ref(*n, j);
+	    ar_ref(*n, j) = u1 * ar_ref(*n, j) + u1i * ai_ref(*n, j);
+	    ai_ref(*n, j) = xi;
 /* L103: */
 	}
 
-	xi = u1 * bi[*n + *n * bi_dim1] - u1i * br[*n + *n * br_dim1];
-	br[*n + *n * br_dim1] = u1 * br[*n + *n * br_dim1] + u1i * bi[*n + *n 
-		* bi_dim1];
-	bi[*n + *n * bi_dim1] = xi;
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+	xi = u1 * bi_ref(*n, *n) - u1i * br_ref(*n, *n);
+	br_ref(*n, *n) = u1 * br_ref(*n, *n) + u1i * bi_ref(*n, *n);
+	bi_ref(*n, *n) = xi;
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	opst += (real) ((*n - k) * 6 + 18);
-/*        ----------------------- END TIMING CODE -------------------
----- */
+/*        ----------------------- END TIMING CODE ----------------------- */
 L105:
 	if (k == nm1) {
 	    goto L170;
@@ -5685,136 +5670,127 @@ L105:
 	    l = *n - lb;
 	    l1 = l + 1;
 /*     ********** ZERO A(L+1,K) ********** */
-	    s = (r__1 = ar[l + k * ar_dim1], dabs(r__1)) + (r__2 = ai[l + k * 
-		    ai_dim1], dabs(r__2)) + ar[l1 + k * ar_dim1];
+	    s = (r__1 = ar_ref(l, k), dabs(r__1)) + (r__2 = ai_ref(l, k), 
+		    dabs(r__2)) + ar_ref(l1, k);
 	    if (s == 0.f) {
 		goto L150;
 	    }
-/*           -------------------- BEGIN TIMING CODE -------------
--------- */
+/*           -------------------- BEGIN TIMING CODE --------------------- */
 	    opst += (real) (((*n << 1) - k - l) * 20 + 18);
-/*           --------------------- END TIMING CODE --------------
--------- */
-	    u1 = ar[l + k * ar_dim1] / s;
-	    u1i = ai[l + k * ai_dim1] / s;
-	    u2 = ar[l1 + k * ar_dim1] / s;
-	    r = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
-	    u1 /= r;
-	    u1i /= r;
-	    u2 /= r;
-	    ar[l + k * ar_dim1] = r * s;
-	    ai[l + k * ai_dim1] = 0.f;
-	    ar[l1 + k * ar_dim1] = 0.f;
+/*           --------------------- END TIMING CODE ---------------------- */
+	    u1 = ar_ref(l, k) / s;
+	    u1i = ai_ref(l, k) / s;
+	    u2 = ar_ref(l1, k) / s;
+	    r__ = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
+	    u1 /= r__;
+	    u1i /= r__;
+	    u2 /= r__;
+	    ar_ref(l, k) = r__ * s;
+	    ai_ref(l, k) = 0.f;
+	    ar_ref(l1, k) = 0.f;
 
 	    i__3 = *n;
 	    for (j = k1; j <= i__3; ++j) {
-		xr = ar[l + j * ar_dim1];
-		xi = ai[l + j * ai_dim1];
-		yr = ar[l1 + j * ar_dim1];
-		yi = ai[l1 + j * ai_dim1];
-		ar[l + j * ar_dim1] = u1 * xr + u1i * xi + u2 * yr;
-		ai[l + j * ai_dim1] = u1 * xi - u1i * xr + u2 * yi;
-		ar[l1 + j * ar_dim1] = u1 * yr - u1i * yi - u2 * xr;
-		ai[l1 + j * ai_dim1] = u1 * yi + u1i * yr - u2 * xi;
+		xr = ar_ref(l, j);
+		xi = ai_ref(l, j);
+		yr = ar_ref(l1, j);
+		yi = ai_ref(l1, j);
+		ar_ref(l, j) = u1 * xr + u1i * xi + u2 * yr;
+		ai_ref(l, j) = u1 * xi - u1i * xr + u2 * yi;
+		ar_ref(l1, j) = u1 * yr - u1i * yi - u2 * xr;
+		ai_ref(l1, j) = u1 * yi + u1i * yr - u2 * xi;
 /* L110: */
 	    }
 
-	    xr = br[l + l * br_dim1];
-	    br[l + l * br_dim1] = u1 * xr;
-	    bi[l + l * bi_dim1] = -(doublereal)u1i * xr;
-	    br[l1 + l * br_dim1] = -(doublereal)u2 * xr;
+	    xr = br_ref(l, l);
+	    br_ref(l, l) = u1 * xr;
+	    bi_ref(l, l) = -u1i * xr;
+	    br_ref(l1, l) = -u2 * xr;
 
 	    i__3 = *n;
 	    for (j = l1; j <= i__3; ++j) {
-		xr = br[l + j * br_dim1];
-		xi = bi[l + j * bi_dim1];
-		yr = br[l1 + j * br_dim1];
-		yi = bi[l1 + j * bi_dim1];
-		br[l + j * br_dim1] = u1 * xr + u1i * xi + u2 * yr;
-		bi[l + j * bi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-		br[l1 + j * br_dim1] = u1 * yr - u1i * yi - u2 * xr;
-		bi[l1 + j * bi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+		xr = br_ref(l, j);
+		xi = bi_ref(l, j);
+		yr = br_ref(l1, j);
+		yi = bi_ref(l1, j);
+		br_ref(l, j) = u1 * xr + u1i * xi + u2 * yr;
+		bi_ref(l, j) = u1 * xi - u1i * xr + u2 * yi;
+		br_ref(l1, j) = u1 * yr - u1i * yi - u2 * xr;
+		bi_ref(l1, j) = u1 * yi + u1i * yr - u2 * xi;
 /* L120: */
 	    }
 /*     ********** ZERO B(L+1,L) ********** */
-	    s = (r__1 = br[l1 + l1 * br_dim1], dabs(r__1)) + (r__2 = bi[l1 + 
-		    l1 * bi_dim1], dabs(r__2)) + (r__3 = br[l1 + l * br_dim1],
-		     dabs(r__3));
+	    s = (r__1 = br_ref(l1, l1), dabs(r__1)) + (r__2 = bi_ref(l1, l1), 
+		    dabs(r__2)) + (r__3 = br_ref(l1, l), dabs(r__3));
 	    if (s == 0.f) {
 		goto L150;
 	    }
-/*           -------------------- BEGIN TIMING CODE -------------
--------- */
+/*           -------------------- BEGIN TIMING CODE --------------------- */
 	    opst += (real) ((*n + l) * 20 + 13);
-/*           --------------------- END TIMING CODE --------------
--------- */
-	    u1 = br[l1 + l1 * br_dim1] / s;
-	    u1i = bi[l1 + l1 * bi_dim1] / s;
-	    u2 = br[l1 + l * br_dim1] / s;
-	    r = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
-	    u1 /= r;
-	    u1i /= r;
-	    u2 /= r;
-	    br[l1 + l1 * br_dim1] = r * s;
-	    bi[l1 + l1 * bi_dim1] = 0.f;
-	    br[l1 + l * br_dim1] = 0.f;
+/*           --------------------- END TIMING CODE ---------------------- */
+	    u1 = br_ref(l1, l1) / s;
+	    u1i = bi_ref(l1, l1) / s;
+	    u2 = br_ref(l1, l) / s;
+	    r__ = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
+	    u1 /= r__;
+	    u1i /= r__;
+	    u2 /= r__;
+	    br_ref(l1, l1) = r__ * s;
+	    bi_ref(l1, l1) = 0.f;
+	    br_ref(l1, l) = 0.f;
 
 	    i__3 = l;
-	    for (i = 1; i <= i__3; ++i) {
-		xr = br[i + l1 * br_dim1];
-		xi = bi[i + l1 * bi_dim1];
-		yr = br[i + l * br_dim1];
-		yi = bi[i + l * bi_dim1];
-		br[i + l1 * br_dim1] = u1 * xr + u1i * xi + u2 * yr;
-		bi[i + l1 * bi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-		br[i + l * br_dim1] = u1 * yr - u1i * yi - u2 * xr;
-		bi[i + l * bi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		xr = br_ref(i__, l1);
+		xi = bi_ref(i__, l1);
+		yr = br_ref(i__, l);
+		yi = bi_ref(i__, l);
+		br_ref(i__, l1) = u1 * xr + u1i * xi + u2 * yr;
+		bi_ref(i__, l1) = u1 * xi - u1i * xr + u2 * yi;
+		br_ref(i__, l) = u1 * yr - u1i * yi - u2 * xr;
+		bi_ref(i__, l) = u1 * yi + u1i * yr - u2 * xi;
 /* L130: */
 	    }
 
 	    i__3 = *n;
-	    for (i = 1; i <= i__3; ++i) {
-		xr = ar[i + l1 * ar_dim1];
-		xi = ai[i + l1 * ai_dim1];
-		yr = ar[i + l * ar_dim1];
-		yi = ai[i + l * ai_dim1];
-		ar[i + l1 * ar_dim1] = u1 * xr + u1i * xi + u2 * yr;
-		ai[i + l1 * ai_dim1] = u1 * xi - u1i * xr + u2 * yi;
-		ar[i + l * ar_dim1] = u1 * yr - u1i * yi - u2 * xr;
-		ai[i + l * ai_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		xr = ar_ref(i__, l1);
+		xi = ai_ref(i__, l1);
+		yr = ar_ref(i__, l);
+		yi = ai_ref(i__, l);
+		ar_ref(i__, l1) = u1 * xr + u1i * xi + u2 * yr;
+		ai_ref(i__, l1) = u1 * xi - u1i * xr + u2 * yi;
+		ar_ref(i__, l) = u1 * yr - u1i * yi - u2 * xr;
+		ai_ref(i__, l) = u1 * yi + u1i * yr - u2 * xi;
 /* L140: */
 	    }
 
 	    if (! (*matz)) {
 		goto L150;
 	    }
-/*           -------------------- BEGIN TIMING CODE -------------
--------- */
+/*           -------------------- BEGIN TIMING CODE --------------------- */
 	    opst += *n * 20;
-/*           --------------------- END TIMING CODE --------------
--------- */
+/*           --------------------- END TIMING CODE ---------------------- */
 
 	    i__3 = *n;
-	    for (i = 1; i <= i__3; ++i) {
-		xr = zr[i + l1 * zr_dim1];
-		xi = zi[i + l1 * zi_dim1];
-		yr = zr[i + l * zr_dim1];
-		yi = zi[i + l * zi_dim1];
-		zr[i + l1 * zr_dim1] = u1 * xr + u1i * xi + u2 * yr;
-		zi[i + l1 * zi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-		zr[i + l * zr_dim1] = u1 * yr - u1i * yi - u2 * xr;
-		zi[i + l * zi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		xr = zr_ref(i__, l1);
+		xi = zi_ref(i__, l1);
+		yr = zr_ref(i__, l);
+		yi = zi_ref(i__, l);
+		zr_ref(i__, l1) = u1 * xr + u1i * xi + u2 * yr;
+		zi_ref(i__, l1) = u1 * xi - u1i * xr + u2 * yi;
+		zr_ref(i__, l) = u1 * yr - u1i * yi - u2 * xr;
+		zi_ref(i__, l) = u1 * yi + u1i * yr - u2 * xi;
 /* L145: */
 	    }
 
 L150:
 	    ;
 	}
-/*        ---------------------- BEGIN TIMING CODE ------------------
----- */
+/*        ---------------------- BEGIN TIMING CODE ---------------------- */
 	latime_1.ops += opst + (real) (*n - 1 - k << 1);
-/*        ----------------------- END TIMING CODE -------------------
-----   
+/*        ----------------------- END TIMING CODE -----------------------   
 
    L160: */
     }
@@ -5822,9 +5798,21 @@ L150:
 L170:
     return 0;
 /*     ********** LAST CARD OF CQZHES ********** */
-} /* cqzhes_   
+} /* cqzhes_ */
 
-   Subroutine */ int cqzval_(integer *nm, integer *n, real *ar, real *ai, 
+#undef zr_ref
+#undef zi_ref
+#undef br_ref
+#undef br_subscr
+#undef ar_ref
+#undef ar_subscr
+#undef bi_ref
+#undef bi_subscr
+#undef ai_ref
+#undef ai_subscr
+
+
+/* Subroutine */ int cqzval_(integer *nm, integer *n, real *ar, real *ai, 
 	real *br, real *bi, real *eps1, real *alfr, real *alfi, real *beta, 
 	logical *matz, real *zr, real *zi, integer *ierr)
 {
@@ -5832,8 +5820,7 @@ L170:
     integer ar_dim1, ar_offset, ai_dim1, ai_offset, br_dim1, br_offset, 
 	    bi_dim1, bi_offset, zr_dim1, zr_offset, zi_dim1, zi_offset, i__1, 
 	    i__2;
-    real r__1, r__2, r__3;
-    doublereal d__1, d__2;
+    real r__1, r__2, r__3, r__4;
     complex q__1, q__2, q__3, q__4, q__5, q__6, q__7;
 
     /* Builtin functions */
@@ -5844,8 +5831,8 @@ L170:
 
     /* Local variables */
     static real b3344i, epsa, epsb, opst;
-    static integer i, j, k, l;
-    static real r, s, anorm, bnorm;
+    static integer i__, j, k, l;
+    static real r__, s, anorm, bnorm;
     static integer enorn;
     static real a1, a2;
     static integer k1, k2, l1, iopst;
@@ -5861,15 +5848,25 @@ L170:
     static integer its, enm2, lor1;
 
 
+#define ai_subscr(a_1,a_2) (a_2)*ai_dim1 + a_1
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define bi_subscr(a_1,a_2) (a_2)*bi_dim1 + a_1
+#define bi_ref(a_1,a_2) bi[(a_2)*bi_dim1 + a_1]
+#define ar_subscr(a_1,a_2) (a_2)*ar_dim1 + a_1
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define br_subscr(a_1,a_2) (a_2)*br_dim1 + a_1
+#define br_ref(a_1,a_2) br[(a_2)*br_dim1 + a_1]
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
 
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+
+
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
        COMMON BLOCK TO RETURN OPERATION COUNT AND ITERATION COUNT   
        ITCNT IS INITIALIZED TO 0, OPS IS ONLY INCREMENTED   
        OPST IS USED TO ACCUMULATE SMALL CONTRIBUTIONS TO OPS   
        TO AVOID ROUNDOFF ERROR   
-       ------------------------ END TIMING CODE ------------------------- 
-  
+       ------------------------ END TIMING CODE -------------------------   
 
 
 
@@ -5883,8 +5880,7 @@ L170:
 
        THIS SUBROUTINE ACCEPTS A PAIR OF COMPLEX MATRICES, ONE OF THEM   
        IN UPPER HESSENBERG FORM AND THE OTHER IN UPPER TRIANGULAR FORM,   
-       THE HESSENBERG MATRIX MUST FURTHER HAVE REAL SUBDIAGONAL ELEMENTS. 
-  
+       THE HESSENBERG MATRIX MUST FURTHER HAVE REAL SUBDIAGONAL ELEMENTS.   
        IT REDUCES THE HESSENBERG MATRIX TO TRIANGULAR FORM USING   
        UNITARY TRANSFORMATIONS WHILE MAINTAINING THE TRIANGULAR FORM   
        OF THE OTHER MATRIX AND FURTHER MAKING ITS DIAGONAL ELEMENTS   
@@ -5914,8 +5910,7 @@ L170:
             POSITIVE VALUE OF EPS1 MAY RESULT IN FASTER EXECUTION,   
             BUT LESS ACCURATE RESULTS,   
 
-          MATZ SHOULD BE SET TO .TRUE. IF THE RIGHT HAND TRANSFORMATIONS 
-  
+          MATZ SHOULD BE SET TO .TRUE. IF THE RIGHT HAND TRANSFORMATIONS   
             ARE TO BE ACCUMULATED FOR LATER USE IN COMPUTING   
             EIGENVECTORS, AND TO .FALSE. OTHERWISE,   
 
@@ -5930,8 +5925,7 @@ L170:
             BELOW THE MAIN DIAGONAL HAVE BEEN SET TO ZERO,   
 
           B IS STILL IN UPPER TRIANGULAR FORM, ALTHOUGH ITS ELEMENTS   
-            HAVE BEEN ALTERED.  IN PARTICULAR, ITS DIAGONAL HAS BEEN SET 
-  
+            HAVE BEEN ALTERED.  IN PARTICULAR, ITS DIAGONAL HAS BEEN SET   
             REAL AND NON-NEGATIVE.  THE LOCATION BR(N,1) IS USED TO   
             STORE EPS1 TIMES THE NORM OF B FOR LATER USE BY  CQZVEC,   
 
@@ -5953,30 +5947,29 @@ L170:
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,   
        APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
     --beta;
     --alfi;
     --alfr;
     bi_dim1 = *nm;
-    bi_offset = bi_dim1 + 1;
+    bi_offset = 1 + bi_dim1 * 1;
     bi -= bi_offset;
     br_dim1 = *nm;
-    br_offset = br_dim1 + 1;
+    br_offset = 1 + br_dim1 * 1;
     br -= br_offset;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
 
     /* Function Body */
@@ -5986,19 +5979,19 @@ L170:
     bnorm = 0.f;
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	ani = 0.f;
-	if (i != 1) {
-	    ani = (r__1 = ar[i + (i - 1) * ar_dim1], dabs(r__1));
+	if (i__ != 1) {
+	    ani = (r__1 = ar_ref(i__, i__ - 1), dabs(r__1));
 	}
 	bni = 0.f;
 
 	i__2 = *n;
-	for (j = i; j <= i__2; ++j) {
-	    ani = ani + (r__1 = ar[i + j * ar_dim1], dabs(r__1)) + (r__2 = ai[
-		    i + j * ai_dim1], dabs(r__2));
-	    bni = bni + (r__1 = br[i + j * br_dim1], dabs(r__1)) + (r__2 = bi[
-		    i + j * bi_dim1], dabs(r__2));
+	for (j = i__; j <= i__2; ++j) {
+	    ani = ani + (r__1 = ar_ref(i__, j), dabs(r__1)) + (r__2 = ai_ref(
+		    i__, j), dabs(r__2));
+	    bni = bni + (r__1 = br_ref(i__, j), dabs(r__1)) + (r__2 = bi_ref(
+		    i__, j), dabs(r__2));
 /* L20: */
 	}
 
@@ -6031,14 +6024,12 @@ L40:
 L50:
     epsa = ep * anorm;
     epsb = ep * bnorm;
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
        COUNT OPS FOR NORMS, BUT NOT FOR CALCULATION OF "EP" */
     latime_1.ops += (real) ((*n << 1) * (*n + 1) + 2);
     opst = 0.f;
     latime_1.itcnt = 0.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-  
+/*     ------------------------ END TIMING CODE -------------------------   
        ********** REDUCE A TO TRIANGULAR FORM, WHILE   
                   KEEPING B TRIANGULAR ********** */
     lor1 = 1;
@@ -6058,12 +6049,10 @@ L60:
 /*     ********** CHECK FOR CONVERGENCE OR REDUCIBILITY.   
                   FOR L=EN STEP -1 UNTIL 1 DO -- ********** */
 L70:
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     latime_1.ops += opst;
     opst = 0.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
     i__1 = en;
     for (ll = 1; ll <= i__1; ++ll) {
 	lm1 = en - ll;
@@ -6071,52 +6060,48 @@ L70:
 	if (l == 1) {
 	    goto L95;
 	}
-	if ((r__1 = ar[l + lm1 * ar_dim1], dabs(r__1)) <= epsa) {
+	if ((r__1 = ar_ref(l, lm1), dabs(r__1)) <= epsa) {
 	    goto L90;
 	}
 /* L80: */
     }
 
 L90:
-    ar[l + lm1 * ar_dim1] = 0.f;
+    ar_ref(l, lm1) = 0.f;
 /*     ********** SET DIAGONAL ELEMENT AT TOP OF B REAL ********** */
 L95:
-    i__1 = l + l * br_dim1;
-    i__2 = l + l * bi_dim1;
+    i__1 = br_subscr(l, l);
+    i__2 = bi_subscr(l, l);
     q__1.r = br[i__1], q__1.i = bi[i__2];
     b11 = c_abs(&q__1);
     if (b11 == 0.f) {
 	goto L98;
     }
-    u1 = br[l + l * br_dim1] / b11;
-    u1i = bi[l + l * bi_dim1] / b11;
+    u1 = br_ref(l, l) / b11;
+    u1i = bi_ref(l, l) / b11;
 
     i__1 = enorn;
     for (j = l; j <= i__1; ++j) {
-	xi = u1 * ai[l + j * ai_dim1] - u1i * ar[l + j * ar_dim1];
-	ar[l + j * ar_dim1] = u1 * ar[l + j * ar_dim1] + u1i * ai[l + j * 
-		ai_dim1];
-	ai[l + j * ai_dim1] = xi;
-	xi = u1 * bi[l + j * bi_dim1] - u1i * br[l + j * br_dim1];
-	br[l + j * br_dim1] = u1 * br[l + j * br_dim1] + u1i * bi[l + j * 
-		bi_dim1];
-	bi[l + j * bi_dim1] = xi;
+	xi = u1 * ai_ref(l, j) - u1i * ar_ref(l, j);
+	ar_ref(l, j) = u1 * ar_ref(l, j) + u1i * ai_ref(l, j);
+	ai_ref(l, j) = xi;
+	xi = u1 * bi_ref(l, j) - u1i * br_ref(l, j);
+	br_ref(l, j) = u1 * br_ref(l, j) + u1i * bi_ref(l, j);
+	bi_ref(l, j) = xi;
 /* L97: */
     }
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     opst += (real) ((enorn + 1 - l) * 12 + 7);
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
 
-    bi[l + l * bi_dim1] = 0.f;
+    bi_ref(l, l) = 0.f;
 L98:
     if (l != en) {
 	goto L100;
     }
 /*     ********** 1-BY-1 BLOCK ISOLATED ********** */
-    alfr[en] = ar[en + en * ar_dim1];
-    alfi[en] = ai[en + en * ai_dim1];
+    alfr[en] = ar_ref(en, en);
+    alfi[en] = ai_ref(en, en);
     beta[en] = b11;
     en = na;
     goto L60;
@@ -6126,44 +6111,42 @@ L100:
     if (b11 > epsb) {
 	goto L120;
     }
-    br[l + l * br_dim1] = 0.f;
-    s = (r__1 = ar[l + l * ar_dim1], dabs(r__1)) + (r__2 = ai[l + l * ai_dim1]
-	    , dabs(r__2)) + (r__3 = ar[l1 + l * ar_dim1], dabs(r__3));
-    u1 = ar[l + l * ar_dim1] / s;
-    u1i = ai[l + l * ai_dim1] / s;
-    u2 = ar[l1 + l * ar_dim1] / s;
-    r = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
-    u1 /= r;
-    u1i /= r;
-    u2 /= r;
-    ar[l + l * ar_dim1] = r * s;
-    ai[l + l * ai_dim1] = 0.f;
+    br_ref(l, l) = 0.f;
+    s = (r__1 = ar_ref(l, l), dabs(r__1)) + (r__2 = ai_ref(l, l), dabs(r__2)) 
+	    + (r__3 = ar_ref(l1, l), dabs(r__3));
+    u1 = ar_ref(l, l) / s;
+    u1i = ai_ref(l, l) / s;
+    u2 = ar_ref(l1, l) / s;
+    r__ = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
+    u1 /= r__;
+    u1i /= r__;
+    u2 /= r__;
+    ar_ref(l, l) = r__ * s;
+    ai_ref(l, l) = 0.f;
 
     i__1 = enorn;
     for (j = l1; j <= i__1; ++j) {
-	xr = ar[l + j * ar_dim1];
-	xi = ai[l + j * ai_dim1];
-	yr = ar[l1 + j * ar_dim1];
-	yi = ai[l1 + j * ai_dim1];
-	ar[l + j * ar_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	ai[l + j * ai_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	ar[l1 + j * ar_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	ai[l1 + j * ai_dim1] = u1 * yi + u1i * yr - u2 * xi;
-	xr = br[l + j * br_dim1];
-	xi = bi[l + j * bi_dim1];
-	yr = br[l1 + j * br_dim1];
-	yi = bi[l1 + j * bi_dim1];
-	br[l1 + j * br_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	br[l + j * br_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	bi[l + j * bi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	bi[l1 + j * bi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	xr = ar_ref(l, j);
+	xi = ai_ref(l, j);
+	yr = ar_ref(l1, j);
+	yi = ai_ref(l1, j);
+	ar_ref(l, j) = u1 * xr + u1i * xi + u2 * yr;
+	ai_ref(l, j) = u1 * xi - u1i * xr + u2 * yi;
+	ar_ref(l1, j) = u1 * yr - u1i * yi - u2 * xr;
+	ai_ref(l1, j) = u1 * yi + u1i * yr - u2 * xi;
+	xr = br_ref(l, j);
+	xi = bi_ref(l, j);
+	yr = br_ref(l1, j);
+	yi = bi_ref(l1, j);
+	br_ref(l1, j) = u1 * yr - u1i * yi - u2 * xr;
+	br_ref(l, j) = u1 * xr + u1i * xi + u2 * yr;
+	bi_ref(l, j) = u1 * xi - u1i * xr + u2 * yi;
+	bi_ref(l1, j) = u1 * yi + u1i * yr - u2 * xi;
 /* L110: */
     }
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     opst += (real) ((enorn - l) * 40 + 15);
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
 
     lm1 = l;
     l = l1;
@@ -6177,8 +6160,8 @@ L120:
 	goto L135;
     }
 /*     ********** DETERMINE SHIFT ********** */
-    b33 = br[na + na * br_dim1];
-    b33i = bi[na + na * bi_dim1];
+    b33 = br_ref(na, na);
+    b33i = bi_ref(na, na);
     q__1.r = b33, q__1.i = b33i;
     if (c_abs(&q__1) >= epsb) {
 	goto L122;
@@ -6186,8 +6169,8 @@ L120:
     b33 = epsb;
     b33i = 0.f;
 L122:
-    b44 = br[en + en * br_dim1];
-    b44i = bi[en + en * bi_dim1];
+    b44 = br_ref(en, en);
+    b44i = bi_ref(en, en);
     q__1.r = b44, q__1.i = b44i;
     if (c_abs(&q__1) >= epsb) {
 	goto L124;
@@ -6197,41 +6180,37 @@ L122:
 L124:
     b3344 = b33 * b44 - b33i * b44i;
     b3344i = b33 * b44i + b33i * b44;
-    a33 = ar[na + na * ar_dim1] * b44 - ai[na + na * ai_dim1] * b44i;
-    a33i = ar[na + na * ar_dim1] * b44i + ai[na + na * ai_dim1] * b44;
-    a34 = ar[na + en * ar_dim1] * b33 - ai[na + en * ai_dim1] * b33i - ar[na 
-	    + na * ar_dim1] * br[na + en * br_dim1] + ai[na + na * ai_dim1] * 
-	    bi[na + en * bi_dim1];
-    a34i = ar[na + en * ar_dim1] * b33i + ai[na + en * ai_dim1] * b33 - ar[na 
-	    + na * ar_dim1] * bi[na + en * bi_dim1] - ai[na + na * ai_dim1] * 
-	    br[na + en * br_dim1];
-    a43 = ar[en + na * ar_dim1] * b44;
-    a43i = ar[en + na * ar_dim1] * b44i;
-    a44 = ar[en + en * ar_dim1] * b33 - ai[en + en * ai_dim1] * b33i - ar[en 
-	    + na * ar_dim1] * br[na + en * br_dim1];
-    a44i = ar[en + en * ar_dim1] * b33i + ai[en + en * ai_dim1] * b33 - ar[en 
-	    + na * ar_dim1] * bi[na + en * bi_dim1];
+    a33 = ar_ref(na, na) * b44 - ai_ref(na, na) * b44i;
+    a33i = ar_ref(na, na) * b44i + ai_ref(na, na) * b44;
+    a34 = ar_ref(na, en) * b33 - ai_ref(na, en) * b33i - ar_ref(na, na) * 
+	    br_ref(na, en) + ai_ref(na, na) * bi_ref(na, en);
+    a34i = ar_ref(na, en) * b33i + ai_ref(na, en) * b33 - ar_ref(na, na) * 
+	    bi_ref(na, en) - ai_ref(na, na) * br_ref(na, en);
+    a43 = ar_ref(en, na) * b44;
+    a43i = ar_ref(en, na) * b44i;
+    a44 = ar_ref(en, en) * b33 - ai_ref(en, en) * b33i - ar_ref(en, na) * 
+	    br_ref(na, en);
+    a44i = ar_ref(en, en) * b33i + ai_ref(en, en) * b33 - ar_ref(en, na) * 
+	    bi_ref(na, en);
     sh = a44;
     shi = a44i;
     xr = a34 * a43 - a34i * a43i;
     xi = a34 * a43i + a34i * a43;
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     opst += 54.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
     if (xr == 0.f && xi == 0.f) {
 	goto L140;
     }
     yr = (a33 - sh) / 2.f;
     yi = (a33i - shi) / 2.f;
 /* Computing 2nd power */
-    r__1 = yr;
+    r__2 = yr;
 /* Computing 2nd power */
-    r__2 = yi;
-    d__1 = r__1 * r__1 - r__2 * r__2 + xr;
-    d__2 = yr * 2.f * yi + xi;
-    q__2.r = d__1, q__2.i = d__2;
+    r__3 = yi;
+    r__1 = r__2 * r__2 - r__3 * r__3 + xr;
+    r__4 = yr * 2.f * yi + xi;
+    q__2.r = r__1, q__2.i = r__4;
     c_sqrt(&q__1, &q__2);
     z3.r = q__1.r, z3.i = q__1.i;
     u1 = z3.r;
@@ -6239,14 +6218,14 @@ L124:
     if (yr * u1 + yi * u1i >= 0.f) {
 	goto L125;
     }
-    u1 = -(doublereal)u1;
-    u1i = -(doublereal)u1i;
+    u1 = -u1;
+    u1i = -u1i;
 L125:
     q__3.r = sh, q__3.i = shi;
     q__5.r = xr, q__5.i = xi;
-    d__1 = yr + u1;
-    d__2 = yi + u1i;
-    q__6.r = d__1, q__6.i = d__2;
+    r__1 = yr + u1;
+    r__2 = yi + u1i;
+    q__6.r = r__1, q__6.i = r__2;
     c_div(&q__4, &q__5, &q__6);
     q__2.r = q__3.r - q__4.r, q__2.i = q__3.i - q__4.i;
     q__7.r = b3344, q__7.i = b3344i;
@@ -6254,27 +6233,23 @@ L125:
     z3.r = q__1.r, z3.i = q__1.i;
     sh = z3.r;
     shi = r_imag(&z3);
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     opst += 66.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
     goto L140;
 /*     ********** AD HOC SHIFT ********** */
 L135:
-    sh = ar[en + na * ar_dim1] + ar[na + enm2 * ar_dim1];
+    sh = ar_ref(en, na) + ar_ref(na, enm2);
     shi = 0.f;
 /*     ********** DETERMINE ZEROTH COLUMN OF A ********** */
 L140:
-    a1 = ar[l + l * ar_dim1] / b11 - sh;
-    a1i = ai[l + l * ai_dim1] / b11 - shi;
-    a2 = ar[l1 + l * ar_dim1] / b11;
+    a1 = ar_ref(l, l) / b11 - sh;
+    a1i = ai_ref(l, l) / b11 - shi;
+    a2 = ar_ref(l1, l) / b11;
     ++its;
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     latime_1.itcnt += 1.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
     if (! (*matz)) {
 	lor1 = l;
     }
@@ -6290,105 +6265,104 @@ L140:
 	if (k == l) {
 	    goto L170;
 	}
-	a1 = ar[k + km1 * ar_dim1];
-	a1i = ai[k + km1 * ai_dim1];
-	a2 = ar[k1 + km1 * ar_dim1];
+	a1 = ar_ref(k, km1);
+	a1i = ai_ref(k, km1);
+	a2 = ar_ref(k1, km1);
 L170:
 	s = dabs(a1) + dabs(a1i) + dabs(a2);
 	u1 = a1 / s;
 	u1i = a1i / s;
 	u2 = a2 / s;
-	r = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
-	u1 /= r;
-	u1i /= r;
-	u2 /= r;
+	r__ = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
+	u1 /= r__;
+	u1i /= r__;
+	u2 /= r__;
 
 	i__2 = enorn;
 	for (j = km1; j <= i__2; ++j) {
-	    xr = ar[k + j * ar_dim1];
-	    xi = ai[k + j * ai_dim1];
-	    yr = ar[k1 + j * ar_dim1];
-	    yi = ai[k1 + j * ai_dim1];
-	    ar[k + j * ar_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	    ai[k + j * ai_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	    ar[k1 + j * ar_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	    ai[k1 + j * ai_dim1] = u1 * yi + u1i * yr - u2 * xi;
-	    xr = br[k + j * br_dim1];
-	    xi = bi[k + j * bi_dim1];
-	    yr = br[k1 + j * br_dim1];
-	    yi = bi[k1 + j * bi_dim1];
-	    br[k + j * br_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	    bi[k + j * bi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	    br[k1 + j * br_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	    bi[k1 + j * bi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	    xr = ar_ref(k, j);
+	    xi = ai_ref(k, j);
+	    yr = ar_ref(k1, j);
+	    yi = ai_ref(k1, j);
+	    ar_ref(k, j) = u1 * xr + u1i * xi + u2 * yr;
+	    ai_ref(k, j) = u1 * xi - u1i * xr + u2 * yi;
+	    ar_ref(k1, j) = u1 * yr - u1i * yi - u2 * xr;
+	    ai_ref(k1, j) = u1 * yi + u1i * yr - u2 * xi;
+	    xr = br_ref(k, j);
+	    xi = bi_ref(k, j);
+	    yr = br_ref(k1, j);
+	    yi = bi_ref(k1, j);
+	    br_ref(k, j) = u1 * xr + u1i * xi + u2 * yr;
+	    bi_ref(k, j) = u1 * xi - u1i * xr + u2 * yi;
+	    br_ref(k1, j) = u1 * yr - u1i * yi - u2 * xr;
+	    bi_ref(k1, j) = u1 * yi + u1i * yr - u2 * xi;
 /* L180: */
 	}
 
 	if (k == l) {
 	    goto L240;
 	}
-	ai[k + km1 * ai_dim1] = 0.f;
-	ar[k1 + km1 * ar_dim1] = 0.f;
-	ai[k1 + km1 * ai_dim1] = 0.f;
+	ai_ref(k, km1) = 0.f;
+	ar_ref(k1, km1) = 0.f;
+	ai_ref(k1, km1) = 0.f;
 /*     ********** ZERO B(K+1,K) ********** */
 L240:
-	s = (r__1 = br[k1 + k1 * br_dim1], dabs(r__1)) + (r__2 = bi[k1 + k1 * 
-		bi_dim1], dabs(r__2)) + (r__3 = br[k1 + k * br_dim1], dabs(
-		r__3));
-	u1 = br[k1 + k1 * br_dim1] / s;
-	u1i = bi[k1 + k1 * bi_dim1] / s;
-	u2 = br[k1 + k * br_dim1] / s;
-	r = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
-	u1 /= r;
-	u1i /= r;
-	u2 /= r;
+	s = (r__1 = br_ref(k1, k1), dabs(r__1)) + (r__2 = bi_ref(k1, k1), 
+		dabs(r__2)) + (r__3 = br_ref(k1, k), dabs(r__3));
+	u1 = br_ref(k1, k1) / s;
+	u1i = bi_ref(k1, k1) / s;
+	u2 = br_ref(k1, k) / s;
+	r__ = sqrt(u1 * u1 + u1i * u1i + u2 * u2);
+	u1 /= r__;
+	u1i /= r__;
+	u2 /= r__;
 	if (k == na) {
 	    goto L245;
 	}
-	xr = ar[k2 + k1 * ar_dim1];
-	ar[k2 + k1 * ar_dim1] = u1 * xr;
-	ai[k2 + k1 * ai_dim1] = -(doublereal)u1i * xr;
-	ar[k2 + k * ar_dim1] = -(doublereal)u2 * xr;
+	xr = ar_ref(k2, k1);
+	ar_ref(k2, k1) = u1 * xr;
+	ai_ref(k2, k1) = -u1i * xr;
+	ar_ref(k2, k) = -u2 * xr;
 
 L245:
 	i__2 = k1;
-	for (i = lor1; i <= i__2; ++i) {
-	    xr = ar[i + k1 * ar_dim1];
-	    xi = ai[i + k1 * ai_dim1];
-	    yr = ar[i + k * ar_dim1];
-	    yi = ai[i + k * ai_dim1];
-	    ar[i + k1 * ar_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	    ai[i + k1 * ai_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	    ar[i + k * ar_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	    ai[i + k * ai_dim1] = u1 * yi + u1i * yr - u2 * xi;
-	    xr = br[i + k1 * br_dim1];
-	    xi = bi[i + k1 * bi_dim1];
-	    yr = br[i + k * br_dim1];
-	    yi = bi[i + k * bi_dim1];
-	    br[i + k1 * br_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	    bi[i + k1 * bi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	    br[i + k * br_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	    bi[i + k * bi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	for (i__ = lor1; i__ <= i__2; ++i__) {
+	    xr = ar_ref(i__, k1);
+	    xi = ai_ref(i__, k1);
+	    yr = ar_ref(i__, k);
+	    yi = ai_ref(i__, k);
+	    ar_ref(i__, k1) = u1 * xr + u1i * xi + u2 * yr;
+	    ai_ref(i__, k1) = u1 * xi - u1i * xr + u2 * yi;
+	    ar_ref(i__, k) = u1 * yr - u1i * yi - u2 * xr;
+	    ai_ref(i__, k) = u1 * yi + u1i * yr - u2 * xi;
+	    xr = br_ref(i__, k1);
+	    xi = bi_ref(i__, k1);
+	    yr = br_ref(i__, k);
+	    yi = bi_ref(i__, k);
+	    br_ref(i__, k1) = u1 * xr + u1i * xi + u2 * yr;
+	    bi_ref(i__, k1) = u1 * xi - u1i * xr + u2 * yi;
+	    br_ref(i__, k) = u1 * yr - u1i * yi - u2 * xr;
+	    bi_ref(i__, k) = u1 * yi + u1i * yr - u2 * xi;
 /* L250: */
 	}
 
-	bi[k1 + k1 * bi_dim1] = 0.f;
-	br[k1 + k * br_dim1] = 0.f;
-	bi[k1 + k * bi_dim1] = 0.f;
+	bi_ref(k1, k1) = 0.f;
+	br_ref(k1, k) = 0.f;
+	bi_ref(k1, k) = 0.f;
 	if (! (*matz)) {
 	    goto L260;
 	}
 
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    xr = zr[i + k1 * zr_dim1];
-	    xi = zi[i + k1 * zi_dim1];
-	    yr = zr[i + k * zr_dim1];
-	    yi = zi[i + k * zi_dim1];
-	    zr[i + k1 * zr_dim1] = u1 * xr + u1i * xi + u2 * yr;
-	    zi[i + k1 * zi_dim1] = u1 * xi - u1i * xr + u2 * yi;
-	    zr[i + k * zr_dim1] = u1 * yr - u1i * yi - u2 * xr;
-	    zi[i + k * zi_dim1] = u1 * yi + u1i * yr - u2 * xi;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    xr = zr_ref(i__, k1);
+	    xi = zi_ref(i__, k1);
+	    yr = zr_ref(i__, k);
+	    yi = zi_ref(i__, k);
+	    zr_ref(i__, k1) = u1 * xr + u1i * xi + u2 * yr;
+	    zi_ref(i__, k1) = u1 * xi - u1i * xr + u2 * yi;
+	    zr_ref(i__, k) = u1 * yr - u1i * yi - u2 * xr;
+	    zi_ref(i__, k) = u1 * yi + u1i * yr - u2 * xi;
 /* L255: */
 	}
 
@@ -6396,8 +6370,7 @@ L260:
 	;
     }
 
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
        COUNT OPS FOR STATEMENTS 140 -- 260 */
     iopst = (enorn - lor1 + 4) * 40 + 29;
     if (*matz) {
@@ -6407,40 +6380,34 @@ L260:
     if (l <= 1) {
 	opst += -40;
     }
-/*     ------------------------ END TIMING CODE ------------------------- 
-  
+/*     ------------------------ END TIMING CODE -------------------------   
 
-       ********** SET LAST A SUBDIAGONAL REAL AND END QZ STEP ********** 
-*/
-    if (ai[en + na * ai_dim1] == 0.f) {
+       ********** SET LAST A SUBDIAGONAL REAL AND END QZ STEP ********** */
+    if (ai_ref(en, na) == 0.f) {
 	goto L70;
     }
-    i__1 = en + na * ar_dim1;
-    i__2 = en + na * ai_dim1;
+    i__1 = ar_subscr(en, na);
+    i__2 = ai_subscr(en, na);
     q__1.r = ar[i__1], q__1.i = ai[i__2];
-    r = c_abs(&q__1);
-    u1 = ar[en + na * ar_dim1] / r;
-    u1i = ai[en + na * ai_dim1] / r;
-    ar[en + na * ar_dim1] = r;
-    ai[en + na * ai_dim1] = 0.f;
+    r__ = c_abs(&q__1);
+    u1 = ar_ref(en, na) / r__;
+    u1i = ai_ref(en, na) / r__;
+    ar_ref(en, na) = r__;
+    ai_ref(en, na) = 0.f;
 
     i__1 = enorn;
     for (j = en; j <= i__1; ++j) {
-	xi = u1 * ai[en + j * ai_dim1] - u1i * ar[en + j * ar_dim1];
-	ar[en + j * ar_dim1] = u1 * ar[en + j * ar_dim1] + u1i * ai[en + j * 
-		ai_dim1];
-	ai[en + j * ai_dim1] = xi;
-	xi = u1 * bi[en + j * bi_dim1] - u1i * br[en + j * br_dim1];
-	br[en + j * br_dim1] = u1 * br[en + j * br_dim1] + u1i * bi[en + j * 
-		bi_dim1];
-	bi[en + j * bi_dim1] = xi;
+	xi = u1 * ai_ref(en, j) - u1i * ar_ref(en, j);
+	ar_ref(en, j) = u1 * ar_ref(en, j) + u1i * ai_ref(en, j);
+	ai_ref(en, j) = xi;
+	xi = u1 * bi_ref(en, j) - u1i * br_ref(en, j);
+	br_ref(en, j) = u1 * br_ref(en, j) + u1i * bi_ref(en, j);
+	bi_ref(en, j) = xi;
 /* L270: */
     }
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     opst += (real) ((en + 1 - enorn) * 12 + 7);
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
 
     goto L70;
 /*     ********** SET ERROR -- BOTTOM SUBDIAGONAL ELEMENT HAS NOT   
@@ -6450,19 +6417,29 @@ L1000:
 /*     ********** SAVE EPSB FOR USE BY CQZVEC ********** */
 L1001:
     if (*n > 1) {
-	br[*n + br_dim1] = epsb;
+	br_ref(*n, 1) = epsb;
     }
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-*/
+/*     ----------------------- BEGIN TIMING CODE ------------------------ */
     latime_1.ops += opst;
     opst = 0.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
     return 0;
 /*     ********** LAST CARD OF CQZVAL ********** */
-} /* cqzval_   
+} /* cqzval_ */
 
-   Subroutine */ int cqzvec_(integer *nm, integer *n, real *ar, real *ai, 
+#undef zr_ref
+#undef zi_ref
+#undef br_ref
+#undef br_subscr
+#undef ar_ref
+#undef ar_subscr
+#undef bi_ref
+#undef bi_subscr
+#undef ai_ref
+#undef ai_subscr
+
+
+/* Subroutine */ int cqzvec_(integer *nm, integer *n, real *ar, real *ai, 
 	real *br, real *bi, real *alfr, real *alfi, real *beta, real *zr, 
 	real *zi)
 {
@@ -6478,24 +6455,32 @@ L1001:
 
     /* Local variables */
     static real almi, betm, epsb, almr;
-    static integer i, j, k, m;
-    static real r, t;
+    static integer i__, j, k, m;
+    static real r__, t;
     static complex z3;
     static integer na, ii, en, jj, nn;
     static real ri, ti, xi;
 
 
+#define ai_ref(a_1,a_2) ai[(a_2)*ai_dim1 + a_1]
+#define bi_ref(a_1,a_2) bi[(a_2)*bi_dim1 + a_1]
+#define ar_ref(a_1,a_2) ar[(a_2)*ar_dim1 + a_1]
+#define br_ref(a_1,a_2) br[(a_2)*br_dim1 + a_1]
+#define zi_subscr(a_1,a_2) (a_2)*zi_dim1 + a_1
+#define zi_ref(a_1,a_2) zi[(a_2)*zi_dim1 + a_1]
+#define zr_subscr(a_1,a_2) (a_2)*zr_dim1 + a_1
+#define zr_ref(a_1,a_2) zr[(a_2)*zr_dim1 + a_1]
 
 
 
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+
+
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
        COMMON BLOCK TO RETURN OPERATION COUNT AND ITERATION COUNT   
        ITCNT IS INITIALIZED TO 0, OPS IS ONLY INCREMENTED   
        OPST IS USED TO ACCUMULATE SMALL CONTRIBUTIONS TO OPS   
        TO AVOID ROUNDOFF ERROR   
-       ------------------------ END TIMING CODE ------------------------- 
-  
+       ------------------------ END TIMING CODE -------------------------   
 
 
 
@@ -6505,12 +6490,9 @@ L1001:
        SIAM J. NUMER. ANAL. 10, 241-256(1973) BY MOLER AND STEWART.   
 
        THIS SUBROUTINE ACCEPTS A PAIR OF COMPLEX MATRICES IN UPPER   
-       TRIANGULAR FORM, WHERE ONE OF THEM FURTHER MUST HAVE REAL DIAGONAL 
-  
-       ELEMENTS.  IT COMPUTES THE EIGENVECTORS OF THE TRIANGULAR PROBLEM 
-  
-       AND TRANSFORMS THE RESULTS BACK TO THE ORIGINAL COORDINATE SYSTEM. 
-  
+       TRIANGULAR FORM, WHERE ONE OF THEM FURTHER MUST HAVE REAL DIAGONAL   
+       ELEMENTS.  IT COMPUTES THE EIGENVECTORS OF THE TRIANGULAR PROBLEM   
+       AND TRANSFORMS THE RESULTS BACK TO THE ORIGINAL COORDINATE SYSTEM.   
        IT IS USUALLY PRECEDED BY  CQZHES  AND  CQZVAL.   
 
        ON INPUT-   
@@ -6523,11 +6505,9 @@ L1001:
 
           A=(AR,AI) CONTAINS A COMPLEX UPPER TRIANGULAR MATRIX,   
 
-          B=(BR,BI) CONTAINS A COMPLEX UPPER TRIANGULAR MATRIX WITH REAL 
-  
+          B=(BR,BI) CONTAINS A COMPLEX UPPER TRIANGULAR MATRIX WITH REAL   
             DIAGONAL ELEMENTS.  IN ADDITION, LOCATION BR(N,1) CONTAINS   
-            THE TOLERANCE QUANTITY (EPSB) COMPUTED AND SAVED IN  CQZVAL, 
-  
+            THE TOLERANCE QUANTITY (EPSB) COMPUTED AND SAVED IN  CQZVAL,   
 
           ALFR, ALFI, AND BETA ARE VECTORS WITH COMPONENTS WHOSE   
             RATIOS ((ALFR+I*ALFI)/BETA) ARE THE GENERALIZED   
@@ -6552,37 +6532,36 @@ L1001:
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,   
        APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     zi_dim1 = *nm;
-    zi_offset = zi_dim1 + 1;
+    zi_offset = 1 + zi_dim1 * 1;
     zi -= zi_offset;
     zr_dim1 = *nm;
-    zr_offset = zr_dim1 + 1;
+    zr_offset = 1 + zr_dim1 * 1;
     zr -= zr_offset;
     --beta;
     --alfi;
     --alfr;
     bi_dim1 = *nm;
-    bi_offset = bi_dim1 + 1;
+    bi_offset = 1 + bi_dim1 * 1;
     bi -= bi_offset;
     br_dim1 = *nm;
-    br_offset = br_dim1 + 1;
+    br_offset = 1 + br_dim1 * 1;
     br -= br_offset;
     ai_dim1 = *nm;
-    ai_offset = ai_dim1 + 1;
+    ai_offset = 1 + ai_dim1 * 1;
     ai -= ai_offset;
     ar_dim1 = *nm;
-    ar_offset = ar_dim1 + 1;
+    ar_offset = 1 + ar_dim1 * 1;
     ar -= ar_offset;
 
     /* Function Body */
     if (*n <= 1) {
 	goto L1001;
     }
-    epsb = br[*n + br_dim1];
+    epsb = br_ref(*n, 1);
 /*     ********** FOR EN=N STEP -1 UNTIL 2 DO -- ********** */
     i__1 = *n;
     for (nn = 2; nn <= i__1; ++nn) {
@@ -6594,40 +6573,40 @@ L1001:
 /*     ********** FOR I=EN-1 STEP -1 UNTIL 1 DO -- ********** */
 	i__2 = na;
 	for (ii = 1; ii <= i__2; ++ii) {
-	    i = en - ii;
-	    r = 0.f;
+	    i__ = en - ii;
+	    r__ = 0.f;
 	    ri = 0.f;
-	    m = i + 1;
+	    m = i__ + 1;
 
 	    i__3 = en;
 	    for (j = m; j <= i__3; ++j) {
-		t = betm * ar[i + j * ar_dim1] - almr * br[i + j * br_dim1] + 
-			almi * bi[i + j * bi_dim1];
-		ti = betm * ai[i + j * ai_dim1] - almr * bi[i + j * bi_dim1] 
-			- almi * br[i + j * br_dim1];
+		t = betm * ar_ref(i__, j) - almr * br_ref(i__, j) + almi * 
+			bi_ref(i__, j);
+		ti = betm * ai_ref(i__, j) - almr * bi_ref(i__, j) - almi * 
+			br_ref(i__, j);
 		if (j == en) {
 		    goto L605;
 		}
-		xi = t * bi[j + en * bi_dim1] + ti * br[j + en * br_dim1];
-		t = t * br[j + en * br_dim1] - ti * bi[j + en * bi_dim1];
+		xi = t * bi_ref(j, en) + ti * br_ref(j, en);
+		t = t * br_ref(j, en) - ti * bi_ref(j, en);
 		ti = xi;
 L605:
-		r += t;
+		r__ += t;
 		ri += ti;
 /* L610: */
 	    }
 
-	    t = almr * beta[i] - betm * alfr[i];
-	    ti = almi * beta[i] - betm * alfi[i];
+	    t = almr * beta[i__] - betm * alfr[i__];
+	    ti = almi * beta[i__] - betm * alfi[i__];
 	    if (t == 0.f && ti == 0.f) {
 		t = epsb;
 	    }
-	    q__2.r = r, q__2.i = ri;
+	    q__2.r = r__, q__2.i = ri;
 	    q__3.r = t, q__3.i = ti;
 	    c_div(&q__1, &q__2, &q__3);
 	    z3.r = q__1.r, z3.i = q__1.i;
-	    br[i + en * br_dim1] = z3.r;
-	    bi[i + en * bi_dim1] = r_imag(&z3);
+	    br_ref(i__, en) = z3.r;
+	    bi_ref(i__, en) = r_imag(&z3);
 /* L700: */
 	}
 
@@ -6642,16 +6621,14 @@ L605:
 	m = j - 1;
 
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 
 	    i__3 = m;
 	    for (k = 1; k <= i__3; ++k) {
-		zr[i + j * zr_dim1] = zr[i + j * zr_dim1] + zr[i + k * 
-			zr_dim1] * br[k + j * br_dim1] - zi[i + k * zi_dim1] *
-			 bi[k + j * bi_dim1];
-		zi[i + j * zi_dim1] = zi[i + j * zi_dim1] + zr[i + k * 
-			zr_dim1] * bi[k + j * bi_dim1] + zi[i + k * zi_dim1] *
-			 br[k + j * br_dim1];
+		zr_ref(i__, j) = zr_ref(i__, j) + zr_ref(i__, k) * br_ref(k, 
+			j) - zi_ref(i__, k) * bi_ref(k, j);
+		zi_ref(i__, j) = zi_ref(i__, j) + zr_ref(i__, k) * bi_ref(k, 
+			j) + zi_ref(i__, k) * br_ref(k, j);
 /* L860: */
 	    }
 
@@ -6665,21 +6642,21 @@ L605:
 	t = 0.f;
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    i__3 = i + j * zr_dim1;
-	    i__4 = i + j * zi_dim1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__3 = zr_subscr(i__, j);
+	    i__4 = zi_subscr(i__, j);
 	    q__1.r = zr[i__3], q__1.i = zi[i__4];
-	    r = c_abs(&q__1);
-	    if (r > t) {
-		t = r;
+	    r__ = c_abs(&q__1);
+	    if (r__ > t) {
+		t = r__;
 	    }
 /* L930: */
 	}
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    zr[i + j * zr_dim1] /= t;
-	    zi[i + j * zi_dim1] /= t;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zr_ref(i__, j) = zr_ref(i__, j) / t;
+	    zi_ref(i__, j) = zi_ref(i__, j) / t;
 /* L940: */
 	}
 
@@ -6688,16 +6665,24 @@ L605:
 
 L1001:
 
-/*     ----------------------- BEGIN TIMING CODE ------------------------ 
-  
+/*     ----------------------- BEGIN TIMING CODE ------------------------   
    Computing 2nd power */
     i__2 = *n;
     latime_1.ops += (real) (*n) * (real) (i__2 * i__2 * 14 + *n * 15 - 15) / 
 	    2.f;
-/*     ------------------------ END TIMING CODE ------------------------- 
-*/
+/*     ------------------------ END TIMING CODE ------------------------- */
 
     return 0;
 /*     ********** LAST CARD OF CQZVEC ********** */
 } /* cqzvec_ */
+
+#undef zr_ref
+#undef zr_subscr
+#undef zi_ref
+#undef zi_subscr
+#undef br_ref
+#undef ar_ref
+#undef bi_ref
+#undef ai_ref
+
 

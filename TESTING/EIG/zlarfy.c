@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublecomplex c_b2 = {0.,0.};
 static integer c__1 = 1;
 
 /* Subroutine */ int zlarfy_(char *uplo, integer *n, doublecomplex *v, 
-	integer *incv, doublecomplex *tau, doublecomplex *c, integer *ldc, 
+	integer *incv, doublecomplex *tau, doublecomplex *c__, integer *ldc, 
 	doublecomplex *work)
 {
     /* System generated locals */
@@ -33,7 +34,7 @@ static integer c__1 = 1;
 	    doublecomplex *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -85,15 +86,14 @@ static integer c__1 = 1;
 
     WORK    (workspace) COMPLEX*16 array, dimension (N)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --work;
 
     /* Function Body */
@@ -103,8 +103,8 @@ static integer c__1 = 1;
 
 /*     Form  w:= C * v */
 
-    zhemv_(uplo, n, &c_b1, &c[c_offset], ldc, &v[1], incv, &c_b2, &work[1], &
-	    c__1);
+    zhemv_(uplo, n, &c_b1, &c__[c_offset], ldc, &v[1], incv, &c_b2, &work[1], 
+	    &c__1);
 
     z__3.r = -.5, z__3.i = 0.;
     z__2.r = z__3.r * tau->r - z__3.i * tau->i, z__2.i = z__3.r * tau->i + 
@@ -118,7 +118,7 @@ static integer c__1 = 1;
 /*     C := C - v * w' - w * v' */
 
     z__1.r = -tau->r, z__1.i = -tau->i;
-    zher2_(uplo, n, &z__1, &v[1], incv, &work[1], &c__1, &c[c_offset], ldc);
+    zher2_(uplo, n, &z__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], ldc);
 
     return 0;
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgetf2_(integer *m, integer *n, real *a, integer *lda, 
 	integer *ipiv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        June 30, 1992   
@@ -49,19 +50,15 @@
             < 0: if INFO = -k, the k-th argument had an illegal value   
             > 0: if INFO = k, U(k,k) is exactly zero. The factorization   
                  has been completed, but the factor U is exactly   
-                 singular, and division by zero will occur if it is used 
-  
+                 singular, and division by zero will occur if it is used   
                  to solve a system of equations.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b6 = -1.f;
@@ -78,13 +75,15 @@
     static integer jp;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -106,27 +105,27 @@
     }
 
     i__1 = min(*m,*n);
-    for (j = 1; j <= min(*m,*n); ++j) {
+    for (j = 1; j <= i__1; ++j) {
 
 /*        Find pivot and test for singularity. */
 
 	i__2 = *m - j + 1;
-	jp = j - 1 + isamax_(&i__2, &A(j,j), &c__1);
-	IPIV(j) = jp;
-	if (A(jp,j) != 0.f) {
+	jp = j - 1 + isamax_(&i__2, &a_ref(j, j), &c__1);
+	ipiv[j] = jp;
+	if (a_ref(jp, j) != 0.f) {
 
 /*           Apply the interchange to columns 1:N. */
 
 	    if (jp != j) {
-		sswap_(n, &A(j,1), lda, &A(jp,1), lda);
+		sswap_(n, &a_ref(j, 1), lda, &a_ref(jp, 1), lda);
 	    }
 
 /*           Compute elements J+1:M of J-th column. */
 
 	    if (j < *m) {
 		i__2 = *m - j;
-		r__1 = 1.f / A(j,j);
-		sscal_(&i__2, &r__1, &A(j+1,j), &c__1);
+		r__1 = 1.f / a_ref(j, j);
+		sscal_(&i__2, &r__1, &a_ref(j + 1, j), &c__1);
 	    }
 
 	} else if (*info == 0) {
@@ -140,7 +139,8 @@
 
 	    i__2 = *m - j;
 	    i__3 = *n - j;
-	    sger_(&i__2, &i__3, &c_b6, &A(j+1,j), &c__1, &A(j,j+1), lda, &A(j+1,j+1), lda);
+	    sger_(&i__2, &i__3, &c_b6, &a_ref(j + 1, j), &c__1, &a_ref(j, j + 
+		    1), lda, &a_ref(j + 1, j + 1), lda);
 	}
 /* L10: */
     }
@@ -149,4 +149,7 @@
 /*     End of SGETF2 */
 
 } /* sgetf2_ */
+
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,11 @@ static doublereal c_b7 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -58,18 +63,15 @@ static doublereal c_b7 = 1.;
             The number of rows and columns of the matrix A.  N >= 0.   
 
     KD      (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U', 
-  
+            The number of super-diagonals of the matrix A if UPLO = 'U',   
             or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The original symmetric band matrix A.  If UPLO = 'U', the   
             upper triangular part of A is stored as a band matrix; if   
             UPLO = 'L', the lower triangular part of A is stored.  The   
-            columns of the appropriate triangle are stored in the columns 
-  
-            of A and the diagonals of the triangle are stored in the rows 
-  
+            columns of the appropriate triangle are stored in the columns   
+            of A and the diagonals of the triangle are stored in the rows   
             of A.  See DPBTRF for further details.   
 
     LDA     (input) INTEGER.   
@@ -96,21 +98,20 @@ static doublereal c_b7 = 1.;
             The maximum over the number of right hand sides of   
             norm(B - A*X) / ( norm(A) * norm(X) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --rwork;
 
@@ -133,8 +134,8 @@ static doublereal c_b7 = 1.;
 
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	dsbmv_(uplo, n, kd, &c_b5, &a[a_offset], lda, &x[j * x_dim1 + 1], &
-		c__1, &c_b7, &b[j * b_dim1 + 1], &c__1);
+	dsbmv_(uplo, n, kd, &c_b5, &a[a_offset], lda, &x_ref(1, j), &c__1, &
+		c_b7, &b_ref(1, j), &c__1);
 /* L10: */
     }
 
@@ -144,8 +145,8 @@ static doublereal c_b7 = 1.;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = dasum_(n, &b[j * b_dim1 + 1], &c__1);
-	xnorm = dasum_(n, &x[j * x_dim1 + 1], &c__1);
+	bnorm = dasum_(n, &b_ref(1, j), &c__1);
+	xnorm = dasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -161,4 +162,8 @@ static doublereal c_b7 = 1.;
 /*     End of DPBT02 */
 
 } /* dpbt02_ */
+
+#undef x_ref
+#undef b_ref
+
 

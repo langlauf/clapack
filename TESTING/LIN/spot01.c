@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,7 +21,7 @@ static real c_b14 = 1.f;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
     extern /* Subroutine */ int ssyr_(char *, integer *, real *, real *, 
 	    integer *, real *, integer *);
-    static integer i, j, k;
+    static integer i__, j, k;
     static real t;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
@@ -32,7 +33,11 @@ static real c_b14 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define afac_ref(a_1,a_2) afac[(a_2)*afac_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -68,13 +73,11 @@ static real c_b14 = 1.f;
     AFAC    (input/output) REAL array, dimension (LDAFAC,N)   
             On entry, the factor L or U from the L*L' or U'*U   
             factorization of A.   
-            Overwritten with the reconstructed matrix, and then with the 
-  
+            Overwritten with the reconstructed matrix, and then with the   
             difference L*L' - A (or U'*U - A).   
 
     LDAFAC  (input) INTEGER   
-            The leading dimension of the array AFAC.  LDAFAC >= max(1,N). 
-  
+            The leading dimension of the array AFAC.  LDAFAC >= max(1,N).   
 
     RWORK   (workspace) REAL array, dimension (N)   
 
@@ -82,18 +85,17 @@ static real c_b14 = 1.f;
             If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --rwork;
 
@@ -119,15 +121,14 @@ static real c_b14 = 1.f;
 
 /*           Compute the (K,K) element of the result. */
 
-	    t = sdot_(&k, &afac[k * afac_dim1 + 1], &c__1, &afac[k * 
-		    afac_dim1 + 1], &c__1);
-	    afac[k + k * afac_dim1] = t;
+	    t = sdot_(&k, &afac_ref(1, k), &c__1, &afac_ref(1, k), &c__1);
+	    afac_ref(k, k) = t;
 
 /*           Compute the rest of column K. */
 
 	    i__1 = k - 1;
 	    strmv_("Upper", "Transpose", "Non-unit", &i__1, &afac[afac_offset]
-		    , ldafac, &afac[k * afac_dim1 + 1], &c__1);
+		    , ldafac, &afac_ref(1, k), &c__1);
 
 /* L10: */
 	}
@@ -137,21 +138,20 @@ static real c_b14 = 1.f;
     } else {
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of
-   
+/*           Add a multiple of column K of the factor L to each of   
              columns K+1 through N. */
 
 	    if (k + 1 <= *n) {
 		i__1 = *n - k;
-		ssyr_("Lower", &i__1, &c_b14, &afac[k + 1 + k * afac_dim1], &
-			c__1, &afac[k + 1 + (k + 1) * afac_dim1], ldafac);
+		ssyr_("Lower", &i__1, &c_b14, &afac_ref(k + 1, k), &c__1, &
+			afac_ref(k + 1, k + 1), ldafac);
 	    }
 
 /*           Scale column K by the diagonal element. */
 
-	    t = afac[k + k * afac_dim1];
+	    t = afac_ref(k, k);
 	    i__1 = *n - k + 1;
-	    sscal_(&i__1, &t, &afac[k + k * afac_dim1], &c__1);
+	    sscal_(&i__1, &t, &afac_ref(k, k), &c__1);
 
 /* L20: */
 	}
@@ -163,8 +163,8 @@ static real c_b14 = 1.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		afac[i + j * afac_dim1] -= a[i + j * a_dim1];
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		afac_ref(i__, j) = afac_ref(i__, j) - a_ref(i__, j);
 /* L30: */
 	    }
 /* L40: */
@@ -173,8 +173,8 @@ static real c_b14 = 1.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		afac[i + j * afac_dim1] -= a[i + j * a_dim1];
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		afac_ref(i__, j) = afac_ref(i__, j) - a_ref(i__, j);
 /* L50: */
 	    }
 /* L60: */
@@ -192,4 +192,8 @@ static real c_b14 = 1.f;
 /*     End of SPOT01 */
 
 } /* spot01_ */
+
+#undef afac_ref
+#undef a_ref
+
 

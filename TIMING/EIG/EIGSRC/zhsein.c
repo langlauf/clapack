@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,9 +20,9 @@ static logical c_false = FALSE_;
 static logical c_true = TRUE_;
 
 /* Subroutine */ int zhsein_(char *side, char *eigsrc, char *initv, logical *
-	select, integer *n, doublecomplex *h, integer *ldh, doublecomplex *w, 
-	doublecomplex *vl, integer *ldvl, doublecomplex *vr, integer *ldvr, 
-	integer *mm, integer *m, doublecomplex *work, doublereal *rwork, 
+	select, integer *n, doublecomplex *h__, integer *ldh, doublecomplex *
+	w, doublecomplex *vl, integer *ldvl, doublecomplex *vr, integer *ldvr,
+	 integer *mm, integer *m, doublecomplex *work, doublereal *rwork, 
 	integer *ifaill, integer *ifailr, integer *info)
 {
     /* System generated locals */
@@ -35,7 +36,7 @@ static logical c_true = TRUE_;
 
     /* Local variables */
     static doublereal unfl, opst;
-    static integer i, k;
+    static integer i__, k;
     extern logical lsame_(char *, char *);
     static integer iinfo;
     static logical leftv, bothv;
@@ -58,8 +59,15 @@ static logical c_true = TRUE_;
     static doublereal ulp, eps3;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*vl_dim1 + a_1
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*vr_dim1 + a_1
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -94,8 +102,7 @@ static logical c_true = TRUE_;
                    block-triangular, then the j-th eigenvalue can be   
                    assumed to be an eigenvalue of the block containing   
                    the j-th row/column.  This property allows ZHSEIN to   
-                   perform inverse iteration on just one diagonal block. 
-  
+                   perform inverse iteration on just one diagonal block.   
             = 'N': no assumptions are made on the correspondence   
                    between eigenvalues and diagonal blocks.  In this   
                    case, ZHSEIN must always perform inverse iteration   
@@ -103,8 +110,7 @@ static logical c_true = TRUE_;
 
     INITV   (input) CHARACTER*1   
             = 'N': no initial vectors are supplied;   
-            = 'U': user-supplied initial vectors are stored in the arrays 
-  
+            = 'U': user-supplied initial vectors are stored in the arrays   
                    VL and/or VR.   
 
     SELECT  (input) LOGICAL array, dimension (N)   
@@ -145,8 +151,7 @@ static logical c_true = TRUE_;
     VR      (input/output) COMPLEX*16 array, dimension (LDVR,MM)   
             On entry, if INITV = 'U' and SIDE = 'R' or 'B', VR must   
             contain starting vectors for the inverse iteration for the   
-            right eigenvectors; the starting vector for each eigenvector 
-  
+            right eigenvectors; the starting vector for each eigenvector   
             must be in the same column in which the eigenvector will be   
             stored.   
             On exit, if SIDE = 'R' or 'B', the right eigenvectors   
@@ -162,8 +167,7 @@ static logical c_true = TRUE_;
             The number of columns in the arrays VL and/or VR. MM >= M.   
 
     M       (output) INTEGER   
-            The number of columns in the arrays VL and/or VR required to 
-  
+            The number of columns in the arrays VL and/or VR required to   
             store the eigenvectors (= the number of .TRUE. elements in   
             SELECT).   
 
@@ -199,8 +203,7 @@ static logical c_true = TRUE_;
     magnitude has magnitude 1; here the magnitude of a complex number   
     (x,y) is taken to be |x|+|y|.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters.   
@@ -208,14 +211,14 @@ static logical c_true = TRUE_;
        Parameter adjustments */
     --select;
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     --w;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     --work;
     --rwork;
@@ -302,60 +305,51 @@ static logical c_true = TRUE_;
 
 	    if (fromqr) {
 
-/*              If affiliation of eigenvalues is known, check 
-whether   
+/*              If affiliation of eigenvalues is known, check whether   
                 the matrix splits.   
 
-                Determine KL and KR such that 1 <= KL <= K <= 
-KR <= N   
-                and H(KL,KL-1) and H(KR+1,KR) are zero (or KL 
-= 1 or   
+                Determine KL and KR such that 1 <= KL <= K <= KR <= N   
+                and H(KL,KL-1) and H(KR+1,KR) are zero (or KL = 1 or   
                 KR = N).   
 
-                Then inverse iteration can be performed with t
-he   
-                submatrix H(KL:N,KL:N) for a left eigenvector,
- and with   
-                the submatrix H(1:KR,1:KR) for a right eigenve
-ctor. */
+                Then inverse iteration can be performed with the   
+                submatrix H(KL:N,KL:N) for a left eigenvector, and with   
+                the submatrix H(1:KR,1:KR) for a right eigenvector. */
 
 		i__2 = kl + 1;
-		for (i = k; i >= i__2; --i) {
-		    i__3 = i + (i - 1) * h_dim1;
-		    if (h[i__3].r == 0. && h[i__3].i == 0.) {
+		for (i__ = k; i__ >= i__2; --i__) {
+		    i__3 = h___subscr(i__, i__ - 1);
+		    if (h__[i__3].r == 0. && h__[i__3].i == 0.) {
 			goto L30;
 		    }
 /* L20: */
 		}
 L30:
-		kl = i;
+		kl = i__;
 		if (k > kr) {
 		    i__2 = *n - 1;
-		    for (i = k; i <= i__2; ++i) {
-			i__3 = i + 1 + i * h_dim1;
-			if (h[i__3].r == 0. && h[i__3].i == 0.) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			i__3 = h___subscr(i__ + 1, i__);
+			if (h__[i__3].r == 0. && h__[i__3].i == 0.) {
 			    goto L50;
 			}
 /* L40: */
 		    }
 L50:
-		    kr = i;
+		    kr = i__;
 		}
 	    }
 
 	    if (kl != kln) {
 		kln = kl;
 
-/*              Compute infinity-norm of submatrix H(KL:KR,KL:
-KR) if it   
+/*              Compute infinity-norm of submatrix H(KL:KR,KL:KR) if it   
                 has not ben computed before. */
 
 		i__2 = kr - kl + 1;
-		hnorm = zlanhs_("I", &i__2, &h[kl + kl * h_dim1], ldh, &rwork[
-			1]);
+		hnorm = zlanhs_("I", &i__2, &h___ref(kl, kl), ldh, &rwork[1]);
 /* **   
-       Increment op count for computing the norm of the matrix
- */
+       Increment op count for computing the norm of the matrix */
 		latime_1.ops = latime_1.ops + *n * 5 * (*n + 1) / 2 + (*n - 1 
 			<< 2);
 /* ** */
@@ -374,12 +368,12 @@ KR) if it
 	    wk.r = w[i__2].r, wk.i = w[i__2].i;
 L60:
 	    i__2 = kl;
-	    for (i = k - 1; i >= i__2; --i) {
-		i__3 = i;
+	    for (i__ = k - 1; i__ >= i__2; --i__) {
+		i__3 = i__;
 		z__2.r = w[i__3].r - wk.r, z__2.i = w[i__3].i - wk.i;
 		z__1.r = z__2.r, z__1.i = z__2.i;
-		if (select[i] && (d__1 = z__1.r, abs(d__1)) + (d__2 = d_imag(&
-			z__1), abs(d__2)) < eps3) {
+		if (select[i__] && (d__1 = z__1.r, abs(d__1)) + (d__2 = 
+			d_imag(&z__1), abs(d__2)) < eps3) {
 		    z__1.r = wk.r + eps3, z__1.i = wk.i;
 		    wk.r = z__1.r, wk.i = z__1.i;
 		    goto L60;
@@ -398,9 +392,9 @@ L60:
 /*              Compute left eigenvector. */
 
 		i__2 = *n - kl + 1;
-		zlaein_(&c_false, &noinit, &i__2, &h[kl + kl * h_dim1], ldh, &
-			wk, &vl[kl + ks * vl_dim1], &work[1], &ldwork, &rwork[
-			1], &eps3, &smlnum, &iinfo);
+		zlaein_(&c_false, &noinit, &i__2, &h___ref(kl, kl), ldh, &wk, 
+			&vl_ref(kl, ks), &work[1], &ldwork, &rwork[1], &eps3, 
+			&smlnum, &iinfo);
 		if (iinfo > 0) {
 		    ++(*info);
 		    ifaill[ks] = k;
@@ -408,8 +402,8 @@ L60:
 		    ifaill[ks] = 0;
 		}
 		i__2 = kl - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + ks * vl_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = vl_subscr(i__, ks);
 		    vl[i__3].r = 0., vl[i__3].i = 0.;
 /* L80: */
 		}
@@ -418,8 +412,8 @@ L60:
 
 /*              Compute right eigenvector. */
 
-		zlaein_(&c_true, &noinit, &kr, &h[h_offset], ldh, &wk, &vr[ks 
-			* vr_dim1 + 1], &work[1], &ldwork, &rwork[1], &eps3, &
+		zlaein_(&c_true, &noinit, &kr, &h__[h_offset], ldh, &wk, &
+			vr_ref(1, ks), &work[1], &ldwork, &rwork[1], &eps3, &
 			smlnum, &iinfo);
 		if (iinfo > 0) {
 		    ++(*info);
@@ -428,8 +422,8 @@ L60:
 		    ifailr[ks] = 0;
 		}
 		i__2 = *n;
-		for (i = kr + 1; i <= i__2; ++i) {
-		    i__3 = i + ks * vr_dim1;
+		for (i__ = kr + 1; i__ <= i__2; ++i__) {
+		    i__3 = vr_subscr(i__, ks);
 		    vr[i__3].r = 0., vr[i__3].i = 0.;
 /* L90: */
 		}
@@ -448,4 +442,12 @@ L60:
 /*     End of ZHSEIN */
 
 } /* zhsein_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef h___ref
+#undef h___subscr
+
 

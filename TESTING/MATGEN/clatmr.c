@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static integer c__0 = 0;
 static integer c__1 = 1;
 
 /* Subroutine */ int clatmr_(integer *m, integer *n, char *dist, integer *
-	iseed, char *sym, complex *d, integer *mode, real *cond, complex *
+	iseed, char *sym, complex *d__, integer *mode, real *cond, complex *
 	dmax__, char *rsign, char *grade, complex *dl, integer *model, real *
 	condl, complex *dr, integer *moder, real *condr, char *pivtng, 
 	integer *ipivot, integer *kl, integer *ku, real *sparse, real *anorm, 
@@ -20,7 +21,6 @@ static integer c__1 = 1;
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
     real r__1, r__2;
-    doublereal d__1;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -30,7 +30,7 @@ static integer c__1 = 1;
     /* Local variables */
     static integer isub, jsub;
     static real temp;
-    static integer isym, i, j, k, ipack;
+    static integer isym, i__, j, k, ipack;
     extern logical lsame_(char *, char *);
     static real tempa[1];
     static complex ctemp;
@@ -65,7 +65,11 @@ static integer c__1 = 1;
     static integer irsign, ipvtng, kll, kuu;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -100,8 +104,7 @@ static integer c__1 = 1;
             matrix as specified by SPARSE.   
 
          Make A a band matrix, if desired, by zeroing out the matrix   
-            outside a band of lower bandwidth KL and upper bandwidth KU. 
-  
+            outside a band of lower bandwidth KL and upper bandwidth KU.   
 
          Scale A, if desired, to have maximum entry ANORM.   
 
@@ -141,8 +144,7 @@ static integer c__1 = 1;
              Number of columns of A. Not modified.   
 
     DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used 
-  
+             On entry, DIST specifies the type of distribution to be used   
              to generate a random matrix .   
              'U' => real and imaginary parts are independent   
                     UNIFORM( 0, 1 )  ( 'U' for uniform )   
@@ -237,49 +239,39 @@ static integer c__1 = 1;
              Not modified.   
 
     DL     - COMPLEX array, dimension (M)   
-             If MODEL=0, then on entry this array specifies the diagonal 
-  
+             If MODEL=0, then on entry this array specifies the diagonal   
              entries of a diagonal matrix used as described under GRADE   
              above. If MODEL is not zero, then DL will be set according   
-             to MODEL and CONDL, analogous to the way D is set according 
-  
-             to MODE and COND (except there is no DMAX parameter for DL). 
-  
+             to MODEL and CONDL, analogous to the way D is set according   
+             to MODE and COND (except there is no DMAX parameter for DL).   
              If GRADE='E', then DL cannot have zero entries.   
              Not referenced if GRADE = 'N' or 'R'. Changed on exit.   
 
     MODEL  - INTEGER   
-             This specifies how the diagonal array DL is to be computed, 
-  
+             This specifies how the diagonal array DL is to be computed,   
              just as MODE specifies how D is to be computed.   
              Not modified.   
 
     CONDL  - REAL   
-             When MODEL is not zero, this specifies the condition number 
-  
+             When MODEL is not zero, this specifies the condition number   
              of the computed DL.  Not modified.   
 
     DR     - COMPLEX array, dimension (N)   
-             If MODER=0, then on entry this array specifies the diagonal 
-  
+             If MODER=0, then on entry this array specifies the diagonal   
              entries of a diagonal matrix used as described under GRADE   
              above. If MODER is not zero, then DR will be set according   
-             to MODER and CONDR, analogous to the way D is set according 
-  
-             to MODE and COND (except there is no DMAX parameter for DR). 
-  
+             to MODER and CONDR, analogous to the way D is set according   
+             to MODE and COND (except there is no DMAX parameter for DR).   
              Not referenced if GRADE = 'N', 'L', 'H' or 'S'.   
              Changed on exit.   
 
     MODER  - INTEGER   
-             This specifies how the diagonal array DR is to be computed, 
-  
+             This specifies how the diagonal array DR is to be computed,   
              just as MODE specifies how D is to be computed.   
              Not modified.   
 
     CONDR  - REAL   
-             When MODER is not zero, this specifies the condition number 
-  
+             When MODER is not zero, this specifies the condition number   
              of the computed DR.  Not modified.   
 
     PIVTNG - CHARACTER*1   
@@ -317,8 +309,7 @@ static integer c__1 = 1;
     SPARSE - REAL   
              On entry specifies the sparsity of the matrix if a sparse   
              matrix is to be generated. SPARSE should lie between   
-             0 and 1. To generate a sparse matrix, for each matrix entry 
-  
+             0 and 1. To generate a sparse matrix, for each matrix entry   
              a uniform ( 0, 1 ) random number x is generated and   
              compared to SPARSE; if x is larger the matrix entry   
              is unchanged and if x is smaller the entry is set   
@@ -391,8 +382,7 @@ static integer c__1 = 1;
     LDA    - INTEGER   
              on entry LDA specifies the first dimension of A as   
              declared in the calling program.   
-             If PACK='N', 'U' or 'L', LDA must be at least max ( 1, M ). 
-  
+             If PACK='N', 'U' or 'L', LDA must be at least max ( 1, M ).   
              If PACK='C' or 'R', LDA must be at least 1.   
              If PACK='B', or 'Q', LDA must be MIN ( KU+1, N )   
              If PACK='Z', LDA must be at least KUU+KLL+1, where   
@@ -400,8 +390,7 @@ static integer c__1 = 1;
              Not modified.   
 
     IWORK  - INTEGER array, dimension (N or M)   
-             Workspace. Not referenced if PIVTNG = 'N'. Changed on exit. 
-  
+             Workspace. Not referenced if PIVTNG = 'N'. Changed on exit.   
 
     INFO   - INTEGER   
              Error parameter on exit:   
@@ -414,16 +403,13 @@ static integer c__1 = 1;
               -8 => COND less than 1.0, and MODE neither -6, 0 nor 6   
              -10 => MODE neither -6, 0 nor 6 and RSIGN illegal string   
              -11 => GRADE illegal string, or GRADE='E' and   
-                    M not equal to N, or GRADE='L', 'R', 'B', 'S' or 'E' 
-  
+                    M not equal to N, or GRADE='L', 'R', 'B', 'S' or 'E'   
                     and SYM = 'H', or GRADE='L', 'R', 'B', 'H' or 'E'   
                     and SYM = 'S'   
              -12 => GRADE = 'E' and DL contains zero   
-             -13 => MODEL not in range -6 to 6 and GRADE= 'L', 'B', 'H', 
-  
+             -13 => MODEL not in range -6 to 6 and GRADE= 'L', 'B', 'H',   
                     'S' or 'E'   
-             -14 => CONDL less than 1.0, GRADE='L', 'B', 'H', 'S' or 'E', 
-  
+             -14 => CONDL less than 1.0, GRADE='L', 'B', 'H', 'S' or 'E',   
                     and MODEL neither -6, 0 nor 6   
              -16 => MODER not in range -6 to 6 and GRADE= 'R' or 'B'   
              -17 => CONDR less than 1.0, GRADE='R' or 'B', and   
@@ -434,14 +420,12 @@ static integer c__1 = 1;
              -19 => IPIVOT contains out of range number and   
                     PIVTNG not equal to 'N'   
              -20 => KL negative   
-             -21 => KU negative, or SYM='S' or 'H' and KU not equal to KL 
-  
+             -21 => KU negative, or SYM='S' or 'H' and KU not equal to KL   
              -22 => SPARSE not in range 0. to 1.   
              -24 => PACK illegal string, or PACK='U', 'L', 'B' or 'Q'   
                     and SYM='N', or PACK='C' and SYM='N' and either KL   
                     not equal to 0 or N not equal to M, or PACK='R' and   
-                    SYM='N', and either KU not equal to 0 or N not equal 
-  
+                    SYM='N', and either KU not equal to 0 or N not equal   
                     to M   
              -26 => LDA too small   
                1 => Error return from CLATM1 (computing D)   
@@ -451,8 +435,7 @@ static integer c__1 = 1;
                5 => ANORM is positive, but matrix constructed prior to   
                     attempting to scale it to have norm ANORM, is zero   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Decode and Test the input parameters.   
@@ -460,12 +443,12 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     --iseed;
-    --d;
+    --d__;
     --dl;
     --dr;
     --ipivot;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iwork;
 
@@ -593,8 +576,8 @@ static integer c__1 = 1;
     dzero = FALSE_;
     if (igrade == 4 && *model == 0) {
 	i__1 = *m;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
 	    if (dl[i__2].r == 0.f && dl[i__2].i == 0.f) {
 		dzero = TRUE_;
 	    }
@@ -689,8 +672,8 @@ static integer c__1 = 1;
 
 /*     Initialize random number generator */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i] = (i__1 = iseed[i], abs(i__1)) % 4096;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__] = (i__1 = iseed[i__], abs(i__1)) % 4096;
 /* L30: */
     }
 
@@ -700,7 +683,7 @@ static integer c__1 = 1;
 
                Compute D according to COND and MODE */
 
-    clatm1_(mode, cond, &irsign, &idist, &iseed[1], &d[1], &mnmin, info);
+    clatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], &mnmin, info);
     if (*info != 0) {
 	*info = 1;
 	return 0;
@@ -709,11 +692,11 @@ static integer c__1 = 1;
 
 /*        Scale by DMAX */
 
-	temp = c_abs(&d[1]);
+	temp = c_abs(&d__[1]);
 	i__1 = mnmin;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__1 = temp, r__2 = c_abs(&d[i]);
+	    r__1 = temp, r__2 = c_abs(&d__[i__]);
 	    temp = dmax(r__1,r__2);
 /* L40: */
 	}
@@ -728,12 +711,12 @@ static integer c__1 = 1;
 	    calpha.r = 1.f, calpha.i = 0.f;
 	}
 	i__1 = mnmin;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
-	    q__1.r = calpha.r * d[i__3].r - calpha.i * d[i__3].i, q__1.i = 
-		    calpha.r * d[i__3].i + calpha.i * d[i__3].r;
-	    d[i__2].r = q__1.r, d[i__2].i = q__1.i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    q__1.r = calpha.r * d__[i__3].r - calpha.i * d__[i__3].i, q__1.i =
+		     calpha.r * d__[i__3].i + calpha.i * d__[i__3].r;
+	    d__[i__2].r = q__1.r, d__[i__2].i = q__1.i;
 /* L50: */
 	}
 
@@ -743,11 +726,11 @@ static integer c__1 = 1;
 
     if (isym == 0) {
 	i__1 = mnmin;
-	for (i = 1; i <= i__1; ++i) {
-	    i__2 = i;
-	    i__3 = i;
-	    d__1 = d[i__3].r;
-	    d[i__2].r = d__1, d[i__2].i = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    r__1 = d__[i__3].r;
+	    d__[i__2].r = r__1, d__[i__2].i = 0.f;
 /* L60: */
 	}
     }
@@ -777,24 +760,24 @@ static integer c__1 = 1;
 
     if (ipvtng > 0) {
 	i__1 = npvts;
-	for (i = 1; i <= i__1; ++i) {
-	    iwork[i] = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    iwork[i__] = i__;
 /* L70: */
 	}
 	if (fulbnd) {
 	    i__1 = npvts;
-	    for (i = 1; i <= i__1; ++i) {
-		k = ipivot[i];
-		j = iwork[i];
-		iwork[i] = iwork[k];
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		k = ipivot[i__];
+		j = iwork[i__];
+		iwork[i__] = iwork[k];
 		iwork[k] = j;
 /* L80: */
 	    }
 	} else {
-	    for (i = npvts; i >= 1; --i) {
-		k = ipivot[i];
-		j = iwork[i];
-		iwork[i] = iwork[k];
+	    for (i__ = npvts; i__ >= 1; --i__) {
+		k = ipivot[i__];
+		j = iwork[i__];
+		iwork[i__] = iwork[k];
 		iwork[k] = j;
 /* L90: */
 	    }
@@ -808,8 +791,7 @@ static integer c__1 = 1;
 
     if (fulbnd) {
 
-/*        Use CLATM3 so matrices generated with differing PIVOTing onl
-y   
+/*        Use CLATM3 so matrices generated with differing PIVOTing only   
           differ only in the order of their rows and/or columns. */
 
 	if (ipack == 0) {
@@ -817,14 +799,14 @@ y
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
-			i__3 = isub + jsub * a_dim1;
+			i__3 = a_subscr(isub, jsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
-			i__3 = jsub + isub * a_dim1;
+			i__3 = a_subscr(jsub, isub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L100: */
@@ -835,12 +817,12 @@ y
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= i__2; ++i) {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
-			i__3 = isub + jsub * a_dim1;
+			i__3 = a_subscr(isub, jsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 /* L120: */
 		    }
@@ -850,14 +832,14 @@ y
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
-			i__3 = isub + jsub * a_dim1;
+			i__3 = a_subscr(isub, jsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
-			i__3 = jsub + isub * a_dim1;
+			i__3 = a_subscr(jsub, isub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 /* L140: */
 		    }
@@ -870,23 +852,23 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
 		    if (mxsub == isub && isym == 0) {
-			i__3 = mnsub + mxsub * a_dim1;
+			i__3 = a_subscr(mnsub, mxsub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = mnsub + mxsub * a_dim1;
+			i__3 = a_subscr(mnsub, mxsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 		    }
 		    if (mnsub != mxsub) {
-			i__3 = mxsub + mnsub * a_dim1;
+			i__3 = a_subscr(mxsub, mnsub);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 /* L160: */
@@ -899,23 +881,23 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
 		    if (mxsub == jsub && isym == 0) {
-			i__3 = mxsub + mnsub * a_dim1;
+			i__3 = a_subscr(mxsub, mnsub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = mxsub + mnsub * a_dim1;
+			i__3 = a_subscr(mxsub, mnsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 		    }
 		    if (mnsub != mxsub) {
-			i__3 = mnsub + mxsub * a_dim1;
+			i__3 = a_subscr(mnsub, mxsub);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 /* L180: */
@@ -928,14 +910,13 @@ y
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
 
-/*                 Compute K = location of (ISUB,JSUB) ent
-ry in packed   
+/*                 Compute K = location of (ISUB,JSUB) entry in packed   
                    array */
 
 		    mnsub = min(isub,jsub);
@@ -948,11 +929,11 @@ ry in packed
 		    iisub = k - *lda * (jjsub - 1);
 
 		    if (mxsub == isub && isym == 0) {
-			i__3 = iisub + jjsub * a_dim1;
+			i__3 = a_subscr(iisub, jjsub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = iisub + jjsub * a_dim1;
+			i__3 = a_subscr(iisub, jjsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 		    }
 /* L200: */
@@ -965,14 +946,13 @@ ry in packed
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
 
-/*                 Compute K = location of (I,J) entry in 
-packed array */
+/*                 Compute K = location of (I,J) entry in packed array */
 
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
@@ -989,11 +969,11 @@ packed array */
 		    iisub = k - *lda * (jjsub - 1);
 
 		    if (mxsub == jsub && isym == 0) {
-			i__3 = iisub + jjsub * a_dim1;
+			i__3 = a_subscr(iisub, jjsub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = iisub + jjsub * a_dim1;
+			i__3 = a_subscr(iisub, jjsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 		    }
 /* L220: */
@@ -1006,23 +986,23 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    if (i < 1) {
-			i__3 = j - i + 1 + (i + *n) * a_dim1;
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    if (i__ < 1) {
+			i__3 = a_subscr(j - i__ + 1, i__ + *n);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    } else {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
 			mnsub = min(isub,jsub);
 			mxsub = max(isub,jsub);
 			if (mxsub == jsub && isym == 0) {
-			    i__3 = mxsub - mnsub + 1 + mnsub * a_dim1;
+			    i__3 = a_subscr(mxsub - mnsub + 1, mnsub);
 			    r_cnjg(&q__1, &ctemp);
 			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			} else {
-			    i__3 = mxsub - mnsub + 1 + mnsub * a_dim1;
+			    i__3 = a_subscr(mxsub - mnsub + 1, mnsub);
 			    a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 			}
 		    }
@@ -1036,19 +1016,19 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &idist,
-			     &iseed[1], &d[1], &igrade, &dl[1], &dr[1], &
-			    ipvtng, &iwork[1], sparse);
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+			    idist, &iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+			    , &ipvtng, &iwork[1], sparse);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
 		    mnsub = min(isub,jsub);
 		    mxsub = max(isub,jsub);
 		    if (mxsub == isub && isym == 0) {
-			i__3 = mnsub - mxsub + kuu + 1 + mxsub * a_dim1;
+			i__3 = a_subscr(mnsub - mxsub + kuu + 1, mxsub);
 			r_cnjg(&q__1, &ctemp);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = mnsub - mxsub + kuu + 1 + mxsub * a_dim1;
+			i__3 = a_subscr(mnsub - mxsub + kuu + 1, mxsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 		    }
 /* L260: */
@@ -1062,34 +1042,34 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
 			mnsub = min(isub,jsub);
 			mxsub = max(isub,jsub);
-			if (i < 1) {
-			    i__3 = j - i + 1 + kuu + (i + *n) * a_dim1;
+			if (i__ < 1) {
+			    i__3 = a_subscr(j - i__ + 1 + kuu, i__ + *n);
 			    a[i__3].r = 0.f, a[i__3].i = 0.f;
 			}
 			if (mxsub == isub && isym == 0) {
-			    i__3 = mnsub - mxsub + kuu + 1 + mxsub * a_dim1;
+			    i__3 = a_subscr(mnsub - mxsub + kuu + 1, mxsub);
 			    r_cnjg(&q__1, &ctemp);
 			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			} else {
-			    i__3 = mnsub - mxsub + kuu + 1 + mxsub * a_dim1;
+			    i__3 = a_subscr(mnsub - mxsub + kuu + 1, mxsub);
 			    a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 			}
-			if (i >= 1 && mnsub != mxsub) {
+			if (i__ >= 1 && mnsub != mxsub) {
 			    if (mnsub == isub && isym == 0) {
-				i__3 = mxsub - mnsub + 1 + kuu + mnsub * 
-					a_dim1;
+				i__3 = a_subscr(mxsub - mnsub + 1 + kuu, 
+					mnsub);
 				r_cnjg(&q__1, &ctemp);
 				a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			    } else {
-				i__3 = mxsub - mnsub + 1 + kuu + mnsub * 
-					a_dim1;
+				i__3 = a_subscr(mxsub - mnsub + 1 + kuu, 
+					mnsub);
 				a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 			    }
 			}
@@ -1101,12 +1081,12 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j + kll;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			clatm3_(&q__1, m, n, &i, &j, &isub, &jsub, kl, ku, &
-				idist, &iseed[1], &d[1], &igrade, &dl[1], &dr[
-				1], &ipvtng, &iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			clatm3_(&q__1, m, n, &i__, &j, &isub, &jsub, kl, ku, &
+				idist, &iseed[1], &d__[1], &igrade, &dl[1], &
+				dr[1], &ipvtng, &iwork[1], sparse);
 			ctemp.r = q__1.r, ctemp.i = q__1.i;
-			i__3 = isub - jsub + kuu + 1 + jsub * a_dim1;
+			i__3 = a_subscr(isub - jsub + kuu + 1, jsub);
 			a[i__3].r = ctemp.r, a[i__3].i = ctemp.i;
 /* L300: */
 		    }
@@ -1125,14 +1105,14 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			i__3 = i + j * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
-			i__3 = j + i * a_dim1;
-			r_cnjg(&q__1, &a[i + j * a_dim1]);
+			i__3 = a_subscr(j, i__);
+			r_cnjg(&q__1, &a_ref(i__, j));
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L320: */
 		    }
@@ -1142,11 +1122,11 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= i__2; ++i) {
-			i__3 = i + j * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L340: */
 		    }
@@ -1156,14 +1136,14 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
-			i__3 = i + j * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
-			i__3 = j + i * a_dim1;
-			i__4 = i + j * a_dim1;
+			i__3 = a_subscr(j, i__);
+			i__4 = a_subscr(i__, j);
 			a[i__3].r = a[i__4].r, a[i__3].i = a[i__4].i;
 /* L360: */
 		    }
@@ -1176,14 +1156,14 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
-		    i__3 = i + j * a_dim1;
-		    clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1], &
-			    d[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[1],
-			     sparse);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[1], 
+			    &d__[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[
+			    1], sparse);
 		    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
-		    if (i != j) {
-			i__3 = j + i * a_dim1;
+		    if (i__ != j) {
+			i__3 = a_subscr(j, i__);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 /* L380: */
@@ -1196,23 +1176,23 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 		    if (isym == 0) {
-			i__3 = j + i * a_dim1;
-			clatm2_(&q__2, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+			i__3 = a_subscr(j, i__);
+			clatm2_(&q__2, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			r_cnjg(&q__1, &q__2);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else {
-			i__3 = j + i * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+			i__3 = a_subscr(j, i__);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    }
-		    if (i != j) {
-			i__3 = i + j * a_dim1;
+		    if (i__ != j) {
+			i__3 = a_subscr(i__, j);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 /* L400: */
@@ -1227,16 +1207,16 @@ packed array */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 		    ++isub;
 		    if (isub > *lda) {
 			isub = 1;
 			++jsub;
 		    }
-		    i__3 = isub + jsub * a_dim1;
-		    clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1], &
-			    d[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[1],
-			     sparse);
+		    i__3 = a_subscr(isub, jsub);
+		    clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[1], 
+			    &d__[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[
+			    1], sparse);
 		    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L420: */
 		}
@@ -1249,32 +1229,30 @@ packed array */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= i__2; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 
-/*                    Compute K = location of (I,J) en
-try in packed array */
+/*                    Compute K = location of (I,J) entry in packed array */
 
-			if (i == 1) {
+			if (i__ == 1) {
 			    k = j;
 			} else {
-			    k = *n * (*n + 1) / 2 - (*n - i + 1) * (*n - i + 
-				    2) / 2 + j - i + 1;
+			    k = *n * (*n + 1) / 2 - (*n - i__ + 1) * (*n - 
+				    i__ + 2) / 2 + j - i__ + 1;
 			}
 
-/*                    Convert K to (ISUB,JSUB) locatio
-n */
+/*                    Convert K to (ISUB,JSUB) location */
 
 			jsub = (k - 1) / *lda + 1;
 			isub = k - *lda * (jsub - 1);
 
-			i__3 = isub + jsub * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+			i__3 = a_subscr(isub, jsub);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			if (isym == 0) {
-			    i__3 = isub + jsub * a_dim1;
-			    r_cnjg(&q__1, &a[isub + jsub * a_dim1]);
+			    i__3 = a_subscr(isub, jsub);
+			    r_cnjg(&q__1, &a_ref(isub, jsub));
 			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			}
 /* L440: */
@@ -1287,16 +1265,16 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = j; i <= i__2; ++i) {
+		    for (i__ = j; i__ <= i__2; ++i__) {
 			++isub;
 			if (isub > *lda) {
 			    isub = 1;
 			    ++jsub;
 			}
-			i__3 = isub + jsub * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+			i__3 = a_subscr(isub, jsub);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L460: */
 		    }
@@ -1309,23 +1287,23 @@ n */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    if (i < 1) {
-			i__3 = j - i + 1 + (i + *n) * a_dim1;
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    if (i__ < 1) {
+			i__3 = a_subscr(j - i__ + 1, i__ + *n);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    } else {
 			if (isym == 0) {
-			    i__3 = j - i + 1 + i * a_dim1;
-			    clatm2_(&q__2, m, n, &i, &j, kl, ku, &idist, &
-				    iseed[1], &d[1], &igrade, &dl[1], &dr[1], 
-				    &ipvtng, &iwork[1], sparse);
+			    i__3 = a_subscr(j - i__ + 1, i__);
+			    clatm2_(&q__2, m, n, &i__, &j, kl, ku, &idist, &
+				    iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+				    , &ipvtng, &iwork[1], sparse);
 			    r_cnjg(&q__1, &q__2);
 			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			} else {
-			    i__3 = j - i + 1 + i * a_dim1;
-			    clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &
-				    iseed[1], &d[1], &igrade, &dl[1], &dr[1], 
-				    &ipvtng, &iwork[1], sparse);
+			    i__3 = a_subscr(j - i__ + 1, i__);
+			    clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &
+				    iseed[1], &d__[1], &igrade, &dl[1], &dr[1]
+				    , &ipvtng, &iwork[1], sparse);
 			    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			}
 		    }
@@ -1339,11 +1317,11 @@ n */
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = j - kuu; i <= i__2; ++i) {
-		    i__3 = i - j + kuu + 1 + j * a_dim1;
-		    clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1], &
-			    d[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[1],
-			     sparse);
+		for (i__ = j - kuu; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__ - j + kuu + 1, j);
+		    clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[1], 
+			    &d__[1], &igrade, &dl[1], &dr[1], &ipvtng, &iwork[
+			    1], sparse);
 		    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L500: */
 		}
@@ -1356,25 +1334,24 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			i__3 = i - j + kuu + 1 + j * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__ - j + kuu + 1, j);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
-			if (i < 1) {
-			    i__3 = j - i + 1 + kuu + (i + *n) * a_dim1;
+			if (i__ < 1) {
+			    i__3 = a_subscr(j - i__ + 1 + kuu, i__ + *n);
 			    a[i__3].r = 0.f, a[i__3].i = 0.f;
 			}
-			if (i >= 1 && i != j) {
+			if (i__ >= 1 && i__ != j) {
 			    if (isym == 0) {
-				i__3 = j - i + 1 + kuu + i * a_dim1;
-				r_cnjg(&q__1, &a[i - j + kuu + 1 + j * a_dim1]
-					);
+				i__3 = a_subscr(j - i__ + 1 + kuu, i__);
+				r_cnjg(&q__1, &a_ref(i__ - j + kuu + 1, j));
 				a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			    } else {
-				i__3 = j - i + 1 + kuu + i * a_dim1;
-				i__4 = i - j + kuu + 1 + j * a_dim1;
+				i__3 = a_subscr(j - i__ + 1 + kuu, i__);
+				i__4 = a_subscr(i__ - j + kuu + 1, j);
 				a[i__3].r = a[i__4].r, a[i__3].i = a[i__4].i;
 			    }
 			}
@@ -1386,11 +1363,11 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j + kll;
-		    for (i = j - kuu; i <= i__2; ++i) {
-			i__3 = i - j + kuu + 1 + j * a_dim1;
-			clatm2_(&q__1, m, n, &i, &j, kl, ku, &idist, &iseed[1]
-				, &d[1], &igrade, &dl[1], &dr[1], &ipvtng, &
-				iwork[1], sparse);
+		    for (i__ = j - kuu; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__ - j + kuu + 1, j);
+			clatm2_(&q__1, m, n, &i__, &j, kl, ku, &idist, &iseed[
+				1], &d__[1], &igrade, &dl[1], &dr[1], &ipvtng,
+				 &iwork[1], sparse);
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L540: */
 		    }
@@ -1440,8 +1417,8 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    r__1 = 1.f / onorm;
-		    csscal_(m, &r__1, &a[j * a_dim1 + 1], &c__1);
-		    csscal_(m, anorm, &a[j * a_dim1 + 1], &c__1);
+		    csscal_(m, &r__1, &a_ref(1, j), &c__1);
+		    csscal_(m, anorm, &a_ref(1, j), &c__1);
 /* L560: */
 		}
 
@@ -1459,9 +1436,9 @@ n */
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = kll + kuu + 1;
 		    r__1 = 1.f / onorm;
-		    csscal_(&i__2, &r__1, &a[j * a_dim1 + 1], &c__1);
+		    csscal_(&i__2, &r__1, &a_ref(1, j), &c__1);
 		    i__2 = kll + kuu + 1;
-		    csscal_(&i__2, anorm, &a[j * a_dim1 + 1], &c__1);
+		    csscal_(&i__2, anorm, &a_ref(1, j), &c__1);
 /* L570: */
 		}
 
@@ -1475,7 +1452,7 @@ n */
 		i__1 = *n;
 		for (j = 1; j <= i__1; ++j) {
 		    r__1 = *anorm / onorm;
-		    csscal_(m, &r__1, &a[j * a_dim1 + 1], &c__1);
+		    csscal_(m, &r__1, &a_ref(1, j), &c__1);
 /* L580: */
 		}
 
@@ -1491,7 +1468,7 @@ n */
 		for (j = 1; j <= i__1; ++j) {
 		    i__2 = kll + kuu + 1;
 		    r__1 = *anorm / onorm;
-		    csscal_(&i__2, &r__1, &a[j * a_dim1 + 1], &c__1);
+		    csscal_(&i__2, &r__1, &a_ref(1, j), &c__1);
 /* L590: */
 		}
 	    }
@@ -1504,4 +1481,8 @@ n */
 
     return 0;
 } /* clatmr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cspr_(char *uplo, integer *n, complex *alpha, complex *x,
 	 integer *incx, complex *ap)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -16,8 +17,7 @@
 
        A := alpha*x*conjg( x' ) + A,   
 
-    where alpha is a complex scalar, x is an n element vector and A is an 
-  
+    where alpha is a complex scalar, x is an n element vector and A is an   
     n by n symmetric matrix, supplied in packed form.   
 
     Arguments   
@@ -72,36 +72,31 @@
              and a( 3, 1 ) respectively, and so on. On exit, the array   
              AP is overwritten by the lower triangular part of the   
              updated matrix.   
-             Note that the imaginary parts of the diagonal elements need 
-  
+             Note that the imaginary parts of the diagonal elements need   
              not be set, they are assumed to be zero, and on exit they   
              are set to zero.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
     complex q__1, q__2;
     /* Local variables */
     static integer info;
     static complex temp;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static integer kk, ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
+    --ap;
+    --x;
 
-#define AP(I) ap[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	info = 1;
@@ -129,8 +124,7 @@
 	kx = 1;
     }
 
-/*     Start the operations. In this version the elements of the array AP 
-  
+/*     Start the operations. In this version the elements of the array AP   
        are accessed sequentially with one pass through AP. */
 
     kk = 1;
@@ -140,41 +134,41 @@
 
 	if (*incx == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		if (X(j).r != 0.f || X(j).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = j;
-		    q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, 
-			    q__1.i = alpha->r * X(j).i + alpha->i * X(j)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    k = kk;
 		    i__2 = j - 1;
-		    for (i = 1; i <= j-1; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 			i__3 = k;
 			i__4 = k;
-			i__5 = i;
-			q__2.r = X(i).r * temp.r - X(i).i * temp.i, 
-				q__2.i = X(i).r * temp.i + X(i).i * 
+			i__5 = i__;
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = AP(k).r + q__2.r, q__1.i = AP(k).i + 
+			q__1.r = ap[i__4].r + q__2.r, q__1.i = ap[i__4].i + 
 				q__2.i;
-			AP(k).r = q__1.r, AP(k).i = q__1.i;
+			ap[i__3].r = q__1.r, ap[i__3].i = q__1.i;
 			++k;
 /* L10: */
 		    }
 		    i__2 = kk + j - 1;
 		    i__3 = kk + j - 1;
 		    i__4 = j;
-		    q__2.r = X(j).r * temp.r - X(j).i * temp.i, q__2.i =
-			     X(j).r * temp.i + X(j).i * temp.r;
-		    q__1.r = AP(kk+j-1).r + q__2.r, q__1.i = AP(kk+j-1).i + 
+		    q__2.r = x[i__4].r * temp.r - x[i__4].i * temp.i, q__2.i =
+			     x[i__4].r * temp.i + x[i__4].i * temp.r;
+		    q__1.r = ap[i__3].r + q__2.r, q__1.i = ap[i__3].i + 
 			    q__2.i;
-		    AP(kk+j-1).r = q__1.r, AP(kk+j-1).i = q__1.i;
+		    ap[i__2].r = q__1.r, ap[i__2].i = q__1.i;
 		} else {
 		    i__2 = kk + j - 1;
 		    i__3 = kk + j - 1;
-		    AP(kk+j-1).r = AP(kk+j-1).r, AP(kk+j-1).i = AP(kk+j-1).i;
+		    ap[i__2].r = ap[i__3].r, ap[i__2].i = ap[i__3].i;
 		}
 		kk += j;
 /* L20: */
@@ -182,41 +176,41 @@
 	} else {
 	    jx = kx;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		if (X(jx).r != 0.f || X(jx).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = jx;
-		    q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, 
-			    q__1.i = alpha->r * X(jx).i + alpha->i * X(jx)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    ix = kx;
 		    i__2 = kk + j - 2;
-		    for (k = kk; k <= kk+j-2; ++k) {
+		    for (k = kk; k <= i__2; ++k) {
 			i__3 = k;
 			i__4 = k;
 			i__5 = ix;
-			q__2.r = X(ix).r * temp.r - X(ix).i * temp.i, 
-				q__2.i = X(ix).r * temp.i + X(ix).i * 
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = AP(k).r + q__2.r, q__1.i = AP(k).i + 
+			q__1.r = ap[i__4].r + q__2.r, q__1.i = ap[i__4].i + 
 				q__2.i;
-			AP(k).r = q__1.r, AP(k).i = q__1.i;
+			ap[i__3].r = q__1.r, ap[i__3].i = q__1.i;
 			ix += *incx;
 /* L30: */
 		    }
 		    i__2 = kk + j - 1;
 		    i__3 = kk + j - 1;
 		    i__4 = jx;
-		    q__2.r = X(jx).r * temp.r - X(jx).i * temp.i, q__2.i =
-			     X(jx).r * temp.i + X(jx).i * temp.r;
-		    q__1.r = AP(kk+j-1).r + q__2.r, q__1.i = AP(kk+j-1).i + 
+		    q__2.r = x[i__4].r * temp.r - x[i__4].i * temp.i, q__2.i =
+			     x[i__4].r * temp.i + x[i__4].i * temp.r;
+		    q__1.r = ap[i__3].r + q__2.r, q__1.i = ap[i__3].i + 
 			    q__2.i;
-		    AP(kk+j-1).r = q__1.r, AP(kk+j-1).i = q__1.i;
+		    ap[i__2].r = q__1.r, ap[i__2].i = q__1.i;
 		} else {
 		    i__2 = kk + j - 1;
 		    i__3 = kk + j - 1;
-		    AP(kk+j-1).r = AP(kk+j-1).r, AP(kk+j-1).i = AP(kk+j-1).i;
+		    ap[i__2].r = ap[i__3].r, ap[i__2].i = ap[i__3].i;
 		}
 		jx += *incx;
 		kk += j;
@@ -229,41 +223,41 @@
 
 	if (*incx == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		if (X(j).r != 0.f || X(j).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = j;
-		    q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, 
-			    q__1.i = alpha->r * X(j).i + alpha->i * X(j)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    i__2 = kk;
 		    i__3 = kk;
 		    i__4 = j;
-		    q__2.r = temp.r * X(j).r - temp.i * X(j).i, q__2.i =
-			     temp.r * X(j).i + temp.i * X(j).r;
-		    q__1.r = AP(kk).r + q__2.r, q__1.i = AP(kk).i + 
+		    q__2.r = temp.r * x[i__4].r - temp.i * x[i__4].i, q__2.i =
+			     temp.r * x[i__4].i + temp.i * x[i__4].r;
+		    q__1.r = ap[i__3].r + q__2.r, q__1.i = ap[i__3].i + 
 			    q__2.i;
-		    AP(kk).r = q__1.r, AP(kk).i = q__1.i;
+		    ap[i__2].r = q__1.r, ap[i__2].i = q__1.i;
 		    k = kk + 1;
 		    i__2 = *n;
-		    for (i = j + 1; i <= *n; ++i) {
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
 			i__3 = k;
 			i__4 = k;
-			i__5 = i;
-			q__2.r = X(i).r * temp.r - X(i).i * temp.i, 
-				q__2.i = X(i).r * temp.i + X(i).i * 
+			i__5 = i__;
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = AP(k).r + q__2.r, q__1.i = AP(k).i + 
+			q__1.r = ap[i__4].r + q__2.r, q__1.i = ap[i__4].i + 
 				q__2.i;
-			AP(k).r = q__1.r, AP(k).i = q__1.i;
+			ap[i__3].r = q__1.r, ap[i__3].i = q__1.i;
 			++k;
 /* L50: */
 		    }
 		} else {
 		    i__2 = kk;
 		    i__3 = kk;
-		    AP(kk).r = AP(kk).r, AP(kk).i = AP(kk).i;
+		    ap[i__2].r = ap[i__3].r, ap[i__2].i = ap[i__3].i;
 		}
 		kk = kk + *n - j + 1;
 /* L60: */
@@ -271,41 +265,41 @@
 	} else {
 	    jx = kx;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		if (X(jx).r != 0.f || X(jx).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = jx;
-		    q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, 
-			    q__1.i = alpha->r * X(jx).i + alpha->i * X(jx)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    i__2 = kk;
 		    i__3 = kk;
 		    i__4 = jx;
-		    q__2.r = temp.r * X(jx).r - temp.i * X(jx).i, q__2.i =
-			     temp.r * X(jx).i + temp.i * X(jx).r;
-		    q__1.r = AP(kk).r + q__2.r, q__1.i = AP(kk).i + 
+		    q__2.r = temp.r * x[i__4].r - temp.i * x[i__4].i, q__2.i =
+			     temp.r * x[i__4].i + temp.i * x[i__4].r;
+		    q__1.r = ap[i__3].r + q__2.r, q__1.i = ap[i__3].i + 
 			    q__2.i;
-		    AP(kk).r = q__1.r, AP(kk).i = q__1.i;
+		    ap[i__2].r = q__1.r, ap[i__2].i = q__1.i;
 		    ix = jx;
 		    i__2 = kk + *n - j;
-		    for (k = kk + 1; k <= kk+*n-j; ++k) {
+		    for (k = kk + 1; k <= i__2; ++k) {
 			ix += *incx;
 			i__3 = k;
 			i__4 = k;
 			i__5 = ix;
-			q__2.r = X(ix).r * temp.r - X(ix).i * temp.i, 
-				q__2.i = X(ix).r * temp.i + X(ix).i * 
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = AP(k).r + q__2.r, q__1.i = AP(k).i + 
+			q__1.r = ap[i__4].r + q__2.r, q__1.i = ap[i__4].i + 
 				q__2.i;
-			AP(k).r = q__1.r, AP(k).i = q__1.i;
+			ap[i__3].r = q__1.r, ap[i__3].i = q__1.i;
 /* L70: */
 		    }
 		} else {
 		    i__2 = kk;
 		    i__3 = kk;
-		    AP(kk).r = AP(kk).r, AP(kk).i = AP(kk).i;
+		    ap[i__2].r = ap[i__3].r, ap[i__2].i = ap[i__3].i;
 		}
 		jx += *incx;
 		kk = kk + *n - j + 1;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ static integer c__1 = 1;
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublecomplex s;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zunt01_(char *, integer *, integer *, 
@@ -38,7 +39,13 @@ static integer c__1 = 1;
     static doublereal ulp, res1, res2;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -91,8 +98,7 @@ static integer c__1 = 1;
             0 <= K <= max(MU,MV).   
 
     U       (input) COMPLEX*16 array, dimension (LDU,N)   
-            The first matrix to compare.  If RC = 'R', U is MU by N, and 
-  
+            The first matrix to compare.  If RC = 'R', U is MU by N, and   
             if RC = 'C', U is N by MU.   
 
     LDU     (input) INTEGER   
@@ -100,8 +106,7 @@ static integer c__1 = 1;
             and if RC = 'C', LDU >= max(1,N).   
 
     V       (input) COMPLEX*16 array, dimension (LDV,N)   
-            The second matrix to compare.  If RC = 'R', V is MV by N, and 
-  
+            The second matrix to compare.  If RC = 'R', V is MV by N, and   
             if RC = 'C', V is N by MV.   
 
     LDV     (input) INTEGER   
@@ -125,8 +130,7 @@ static integer c__1 = 1;
             0  indicates a successful exit   
             -k indicates the k-th parameter had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -134,10 +138,10 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
     --rwork;
@@ -191,24 +195,24 @@ static integer c__1 = 1;
 
 	res1 = 0.;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = izamax_(n, &u[i + u_dim1], ldu);
-	    i__2 = i + lmx * v_dim1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = izamax_(n, &u_ref(i__, 1), ldu);
+	    i__2 = v_subscr(i__, lmx);
 	    if (v[i__2].r == 0. && v[i__2].i == 0.) {
 		sv.r = 1., sv.i = 0.;
 	    } else {
-		d__1 = z_abs(&v[i + lmx * v_dim1]);
+		d__1 = z_abs(&v_ref(i__, lmx));
 		z__2.r = d__1, z__2.i = 0.;
-		z_div(&z__1, &z__2, &v[i + lmx * v_dim1]);
+		z_div(&z__1, &z__2, &v_ref(i__, lmx));
 		sv.r = z__1.r, sv.i = z__1.i;
 	    }
-	    i__2 = i + lmx * u_dim1;
+	    i__2 = u_subscr(i__, lmx);
 	    if (u[i__2].r == 0. && u[i__2].i == 0.) {
 		su.r = 1., su.i = 0.;
 	    } else {
-		d__1 = z_abs(&u[i + lmx * u_dim1]);
+		d__1 = z_abs(&u_ref(i__, lmx));
 		z__2.r = d__1, z__2.i = 0.;
-		z_div(&z__1, &z__2, &u[i + lmx * u_dim1]);
+		z_div(&z__1, &z__2, &u_ref(i__, lmx));
 		su.r = z__1.r, su.i = z__1.i;
 	    }
 	    z_div(&z__1, &sv, &su);
@@ -216,8 +220,8 @@ static integer c__1 = 1;
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = i + j * u_dim1;
-		i__4 = i + j * v_dim1;
+		i__3 = u_subscr(i__, j);
+		i__4 = v_subscr(i__, j);
 		z__2.r = s.r * v[i__4].r - s.i * v[i__4].i, z__2.i = s.r * v[
 			i__4].i + s.i * v[i__4].r;
 		z__1.r = u[i__3].r - z__2.r, z__1.i = u[i__3].i - z__2.i;
@@ -240,24 +244,24 @@ static integer c__1 = 1;
 
 	res1 = 0.;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = izamax_(n, &u[i * u_dim1 + 1], &c__1);
-	    i__2 = lmx + i * v_dim1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = izamax_(n, &u_ref(1, i__), &c__1);
+	    i__2 = v_subscr(lmx, i__);
 	    if (v[i__2].r == 0. && v[i__2].i == 0.) {
 		sv.r = 1., sv.i = 0.;
 	    } else {
-		d__1 = z_abs(&v[lmx + i * v_dim1]);
+		d__1 = z_abs(&v_ref(lmx, i__));
 		z__2.r = d__1, z__2.i = 0.;
-		z_div(&z__1, &z__2, &v[lmx + i * v_dim1]);
+		z_div(&z__1, &z__2, &v_ref(lmx, i__));
 		sv.r = z__1.r, sv.i = z__1.i;
 	    }
-	    i__2 = lmx + i * u_dim1;
+	    i__2 = u_subscr(lmx, i__);
 	    if (u[i__2].r == 0. && u[i__2].i == 0.) {
 		su.r = 1., su.i = 0.;
 	    } else {
-		d__1 = z_abs(&u[lmx + i * u_dim1]);
+		d__1 = z_abs(&u_ref(lmx, i__));
 		z__2.r = d__1, z__2.i = 0.;
-		z_div(&z__1, &z__2, &u[lmx + i * u_dim1]);
+		z_div(&z__1, &z__2, &u_ref(lmx, i__));
 		su.r = z__1.r, su.i = z__1.i;
 	    }
 	    z_div(&z__1, &sv, &su);
@@ -265,8 +269,8 @@ static integer c__1 = 1;
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = j + i * u_dim1;
-		i__4 = j + i * v_dim1;
+		i__3 = u_subscr(j, i__);
+		i__4 = v_subscr(j, i__);
 		z__2.r = s.r * v[i__4].r - s.i * v[i__4].i, z__2.i = s.r * v[
 			i__4].i + s.i * v[i__4].r;
 		z__1.r = u[i__3].r - z__2.r, z__1.i = u[i__3].i - z__2.i;
@@ -292,4 +296,10 @@ static integer c__1 = 1;
 /*     End of ZUNT03 */
 
 } /* zunt03_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+
 

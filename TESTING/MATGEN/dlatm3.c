@@ -1,13 +1,14 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 
-doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
+doublereal dlatm3_(integer *m, integer *n, integer *i__, integer *j, integer *
 	isub, integer *jsub, integer *kl, integer *ku, integer *idist, 
-	integer *iseed, doublereal *d, integer *igrade, doublereal *dl, 
+	integer *iseed, doublereal *d__, integer *igrade, doublereal *dl, 
 	doublereal *dr, integer *ipvtng, integer *iwork, doublereal *sparse)
 {
     /* System generated locals */
@@ -18,7 +19,7 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
     extern doublereal dlaran_(integer *), dlarnd_(integer *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -35,31 +36,25 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
        is the final position of the (I,J) entry after pivoting   
        according to IPVTNG and IWORK. DLATM3 is called by the   
        DLATMR routine in order to build random test matrices. No error   
-       checking on parameters is done, because this routine is called in 
-  
+       checking on parameters is done, because this routine is called in   
        a tight loop by DLATMR which has already checked the parameters.   
 
-       Use of DLATM3 differs from SLATM2 in the order in which the random 
-  
+       Use of DLATM3 differs from SLATM2 in the order in which the random   
        number generator is called to fill in random matrix entries.   
-       With DLATM2, the generator is called to fill in the pivoted matrix 
-  
+       With DLATM2, the generator is called to fill in the pivoted matrix   
        columnwise. With DLATM3, the generator is called to fill in the   
        matrix columnwise, after which it is pivoted. Thus, DLATM3 can   
        be used to construct random matrices which differ only in their   
        order of rows and/or columns. DLATM2 is used to construct band   
        matrices while avoiding calling the random number generator for   
-       entries outside the band (and therefore generating random numbers 
-  
+       entries outside the band (and therefore generating random numbers   
        in different orders for different pivot orders).   
 
        The matrix whose (ISUB,JSUB) entry is returned is constructed as   
        follows (this routine only computes one entry):   
 
-         If ISUB is outside (1..M) or JSUB is outside (1..N), return zero 
-  
-            (this is convenient for generating matrices in band format). 
-  
+         If ISUB is outside (1..M) or JSUB is outside (1..N), return zero   
+            (this is convenient for generating matrices in band format).   
 
          Generate a matrix A with random entries of distribution IDIST.   
 
@@ -162,8 +157,7 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
              entries will be set to zero.   
              Not modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -171,8 +165,7 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
 
 
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
 
 
@@ -182,12 +175,12 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
     --iwork;
     --dr;
     --dl;
-    --d;
+    --d__;
     --iseed;
 
     /* Function Body */
-    if (*i < 1 || *i > *m || *j < 1 || *j > *n) {
-	*isub = *i;
+    if (*i__ < 1 || *i__ > *m || *j < 1 || *j > *n) {
+	*isub = *i__;
 	*jsub = *j;
 	ret_val = 0.;
 	return ret_val;
@@ -196,16 +189,16 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
 /*     Compute subscripts depending on IPVTNG */
 
     if (*ipvtng == 0) {
-	*isub = *i;
+	*isub = *i__;
 	*jsub = *j;
     } else if (*ipvtng == 1) {
-	*isub = iwork[*i];
+	*isub = iwork[*i__];
 	*jsub = *j;
     } else if (*ipvtng == 2) {
-	*isub = *i;
+	*isub = *i__;
 	*jsub = iwork[*j];
     } else if (*ipvtng == 3) {
-	*isub = iwork[*i];
+	*isub = iwork[*i__];
 	*jsub = iwork[*j];
     }
 
@@ -227,21 +220,21 @@ doublereal dlatm3_(integer *m, integer *n, integer *i, integer *j, integer *
 
 /*     Compute entry and grade it according to IGRADE */
 
-    if (*i == *j) {
-	temp = d[*i];
+    if (*i__ == *j) {
+	temp = d__[*i__];
     } else {
 	temp = dlarnd_(idist, &iseed[1]);
     }
     if (*igrade == 1) {
-	temp *= dl[*i];
+	temp *= dl[*i__];
     } else if (*igrade == 2) {
 	temp *= dr[*j];
     } else if (*igrade == 3) {
-	temp = temp * dl[*i] * dr[*j];
-    } else if (*igrade == 4 && *i != *j) {
-	temp = temp * dl[*i] / dl[*j];
+	temp = temp * dl[*i__] * dr[*j];
+    } else if (*igrade == 4 && *i__ != *j) {
+	temp = temp * dl[*i__] / dl[*j];
     } else if (*igrade == 5) {
-	temp = temp * dl[*i] * dl[*j];
+	temp = temp * dl[*i__] * dl[*j];
     }
     ret_val = temp;
     return ret_val;

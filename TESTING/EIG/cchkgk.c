@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -50,7 +51,7 @@ static integer c__50 = 50;
     static complex work[2500]	/* was [50][50] */, a[2500]	/* was [50][
 	    50] */, b[2500]	/* was [50][50] */, e[2500]	/* was [50][
 	    50] */, f[2500]	/* was [50][50] */;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *);
@@ -95,7 +96,21 @@ static integer c__50 = 50;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define e_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+#define f_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define f_ref(a_1,a_2) f[f_subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -116,8 +131,7 @@ static integer c__50 = 50;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     lmax[0] = 0;
@@ -141,12 +155,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___10.ciunit = *nin;
 	s_rsle(&io___10);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&a[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -154,12 +168,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___13.ciunit = *nin;
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&b[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -167,12 +181,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___15.ciunit = *nin;
 	s_rsle(&io___15);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&vl[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&vl_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -180,12 +194,12 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___17.ciunit = *nin;
 	s_rsle(&io___17);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&vr[i + j * 50 - 51], (ftnlen)sizeof(
+	    do_lio(&c__6, &c__1, (char *)&vr_ref(i__, j), (ftnlen)sizeof(
 		    complex));
 	}
 	e_rsle();
@@ -241,9 +255,9 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * 50 - 51;
-	    i__4 = i + j * 50 - 51;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = e_subscr(i__, j);
+	    i__4 = f_subscr(i__, j);
 	    q__2.r = e[i__3].r - f[i__4].r, q__2.i = e[i__3].i - f[i__4].i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 /* Computing MAX */
@@ -276,9 +290,9 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * 50 - 51;
-	    i__4 = i + j * 50 - 51;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = e_subscr(i__, j);
+	    i__4 = f_subscr(i__, j);
 	    q__2.r = e[i__3].r - f[i__4].r, q__2.i = e[i__3].i - f[i__4].i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 /* Computing MAX */
@@ -337,4 +351,18 @@ L100:
 /*     End of CCHKGK */
 
 } /* cchkgk_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef f_ref
+#undef f_subscr
+#undef e_ref
+#undef e_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

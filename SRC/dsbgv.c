@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsbgv_(char *jobz, char *uplo, integer *n, integer *ka, 
 	integer *kb, doublereal *ab, integer *ldab, doublereal *bb, integer *
-	ldbb, doublereal *w, doublereal *z, integer *ldz, doublereal *work, 
+	ldbb, doublereal *w, doublereal *z__, integer *ldz, doublereal *work, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -14,8 +15,7 @@
     Purpose   
     =======   
 
-    DSBGV computes all the eigenvalues, and optionally, the eigenvectors 
-  
+    DSBGV computes all the eigenvalues, and optionally, the eigenvectors   
     of a real generalized symmetric-definite banded eigenproblem, of   
     the form A*x=(lambda)*B*x. Here A and B are assumed to be symmetric   
     and banded, and B is also positive definite.   
@@ -45,13 +45,10 @@
     AB      (input/output) DOUBLE PRECISION array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first ka+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(ka+1+i-j,j) = A(i,j) for max(1,j-ka)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+ka). 
-  
+            if UPLO = 'U', AB(ka+1+i-j,j) = A(i,j) for max(1,j-ka)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+ka).   
 
             On exit, the contents of AB are destroyed.   
 
@@ -61,13 +58,10 @@
     BB      (input/output) DOUBLE PRECISION array, dimension (LDBB, N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix B, stored in the first kb+1 rows of the array.  The   
-            j-th column of B is stored in the j-th column of the array BB 
-  
+            j-th column of B is stored in the j-th column of the array BB   
             as follows:   
-            if UPLO = 'U', BB(kb+1+i-j,j) = B(i,j) for max(1,j-kb)<=i<=j; 
-  
-            if UPLO = 'L', BB(1+i-j,j)    = B(i,j) for j<=i<=min(n,j+kb). 
-  
+            if UPLO = 'U', BB(kb+1+i-j,j) = B(i,j) for max(1,j-kb)<=i<=j;   
+            if UPLO = 'L', BB(1+i-j,j)    = B(i,j) for j<=i<=min(n,j+kb).   
 
             On exit, the factor S from the split Cholesky factorization   
             B = S**T*S, as returned by DPBSTF.   
@@ -103,15 +97,12 @@
                       The factorization of B could not be completed and   
                       no eigenvalues or eigenvectors were computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, bb_dim1, bb_offset, z_dim1, z_offset, i__1;
     /* Local variables */
@@ -132,14 +123,19 @@
     extern /* Subroutine */ int dsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    bb_dim1 = *ldbb;
+    bb_offset = 1 + bb_dim1 * 1;
+    bb -= bb_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define BB(I,J) bb[(I)-1 + ((J)-1)* ( *ldbb)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     upper = lsame_(uplo, "U");
 
@@ -175,7 +171,7 @@
 
 /*     Form a split Cholesky factorization of B. */
 
-    dpbstf_(uplo, n, kb, &BB(1,1), ldbb, info);
+    dpbstf_(uplo, n, kb, &bb[bb_offset], ldbb, info);
     if (*info != 0) {
 	*info = *n + *info;
 	return 0;
@@ -185,8 +181,9 @@
 
     inde = 1;
     indwrk = inde + *n;
-    dsbgst_(jobz, uplo, n, ka, kb, &AB(1,1), ldab, &BB(1,1), ldbb,
-	     &Z(1,1), ldz, &WORK(indwrk), &iinfo);
+    dsbgst_(jobz, uplo, n, ka, kb, &ab[ab_offset], ldab, &bb[bb_offset], ldbb,
+	     &z__[z_offset], ldz, &work[indwrk], &iinfo)
+	    ;
 
 /*     Reduce to tridiagonal form. */
 
@@ -195,16 +192,16 @@
     } else {
 	*(unsigned char *)vect = 'N';
     }
-    dsbtrd_(vect, uplo, n, ka, &AB(1,1), ldab, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk), &iinfo);
+    dsbtrd_(vect, uplo, n, ka, &ab[ab_offset], ldab, &w[1], &work[inde], &z__[
+	    z_offset], ldz, &work[indwrk], &iinfo);
 
-/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEQR. 
-*/
+/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEQR. */
 
     if (! wantz) {
-	dsterf_(n, &W(1), &WORK(inde), info);
+	dsterf_(n, &w[1], &work[inde], info);
     } else {
-	dsteqr_(jobz, n, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk),
-		 info);
+	dsteqr_(jobz, n, &w[1], &work[inde], &z__[z_offset], ldz, &work[
+		indwrk], info);
     }
     return 0;
 

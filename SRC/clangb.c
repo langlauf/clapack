@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 	ab, integer *ldab, real *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,12 +13,9 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
     Purpose   
     =======   
 
-    CLANGB  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the element of  largest absolute value  of an 
-  
-    n by n band matrix  A,  with kl sub-diagonals and ku super-diagonals. 
-  
+    CLANGB  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the element of  largest absolute value  of an   
+    n by n band matrix  A,  with kl sub-diagonals and ku super-diagonals.   
 
     Description   
     ===========   
@@ -32,12 +30,9 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -70,13 +65,10 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
             where LWORK >= N when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -86,20 +78,23 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
     /* Builtin functions */
     double c_abs(complex *), sqrt(doublereal);
     /* Local variables */
-    static integer i, j, k, l;
+    static integer i__, j, k, l;
     static real scale;
     extern logical lsame_(char *, char *);
     static real value;
     extern /* Subroutine */ int classq_(integer *, complex *, integer *, real 
 	    *, real *);
     static real sum;
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.f;
     } else if (lsame_(norm, "M")) {
@@ -108,35 +103,36 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 
 	value = 0.f;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__2 = *ku + 2 - j;
 /* Computing MIN */
 	    i__4 = *n + *ku + 1 - j, i__5 = *kl + *ku + 1;
 	    i__3 = min(i__4,i__5);
-	    for (i = max(*ku+2-j,1); i <= min(*n+*ku+1-j,*kl+*ku+1); ++i) {
+	    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-		r__1 = value, r__2 = c_abs(&AB(i,j));
+		r__1 = value, r__2 = c_abs(&ab_ref(i__, j));
 		value = dmax(r__1,r__2);
 /* L10: */
 	    }
 /* L20: */
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
 	value = 0.f;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    sum = 0.f;
 /* Computing MAX */
 	    i__3 = *ku + 2 - j;
 /* Computing MIN */
 	    i__4 = *n + *ku + 1 - j, i__5 = *kl + *ku + 1;
 	    i__2 = min(i__4,i__5);
-	    for (i = max(*ku+2-j,1); i <= min(*n+*ku+1-j,*kl+*ku+1); ++i) {
-		sum += c_abs(&AB(i,j));
+	    for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
+		sum += c_abs(&ab_ref(i__, j));
 /* L30: */
 	    }
 	    value = dmax(value,sum);
@@ -147,29 +143,29 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 /*        Find normI(A). */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    WORK(i) = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    work[i__] = 0.f;
 /* L50: */
 	}
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    k = *ku + 1 - j;
 /* Computing MAX */
 	    i__2 = 1, i__3 = j - *ku;
 /* Computing MIN */
 	    i__5 = *n, i__6 = j + *kl;
 	    i__4 = min(i__5,i__6);
-	    for (i = max(1,j-*ku); i <= min(*n,j+*kl); ++i) {
-		WORK(i) += c_abs(&AB(k+i,j));
+	    for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
+		work[i__] += c_abs(&ab_ref(k + i__, j));
 /* L60: */
 	    }
 /* L70: */
 	}
 	value = 0.f;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__1 = value, r__2 = WORK(i);
+	    r__1 = value, r__2 = work[i__];
 	    value = dmax(r__1,r__2);
 /* L80: */
 	}
@@ -180,7 +176,7 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 	scale = 0.f;
 	sum = 1.f;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    i__4 = 1, i__2 = j - *ku;
 	    l = max(i__4,i__2);
@@ -188,7 +184,7 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 /* Computing MIN */
 	    i__2 = *n, i__3 = j + *kl;
 	    i__4 = min(i__2,i__3) - l + 1;
-	    classq_(&i__4, &AB(k,j), &c__1, &scale, &sum);
+	    classq_(&i__4, &ab_ref(k, j), &c__1, &scale, &sum);
 /* L90: */
 	}
 	value = scale * sqrt(sum);
@@ -200,4 +196,8 @@ doublereal clangb_(char *norm, integer *n, integer *kl, integer *ku, complex *
 /*     End of CLANGB */
 
 } /* clangb_ */
+
+#undef ab_ref
+#undef ab_subscr
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zupgtr_(char *uplo, integer *n, doublecomplex *ap, 
 	doublecomplex *tau, doublecomplex *q, integer *ldq, doublecomplex *
 	work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -14,8 +15,7 @@
     =======   
 
     ZUPGTR generates a complex unitary matrix Q which is defined as the   
-    product of n-1 elementary reflectors H(i) of order n, as returned by 
-  
+    product of n-1 elementary reflectors H(i) of order n, as returned by   
     ZHPTRD using packed storage:   
 
     if UPLO = 'U', Q = H(n-1) . . . H(2) H(1),   
@@ -54,19 +54,16 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer q_dim1, q_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer iinfo;
     static logical upper;
@@ -77,14 +74,17 @@
     extern /* Subroutine */ int zung2r_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), xerbla_(char *, integer *);
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
 
+    --ap;
+    --tau;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --work;
 
-#define AP(I) ap[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -110,73 +110,69 @@
 
 /*        Q was determined by a call to ZHPTRD with UPLO = 'U'   
 
-          Unpack the vectors which define the elementary reflectors an
-d   
-          set the last row and column of Q equal to those of the unit 
-  
+          Unpack the vectors which define the elementary reflectors and   
+          set the last row and column of Q equal to those of the unit   
           matrix */
 
 	ij = 2;
 	i__1 = *n - 1;
-	for (j = 1; j <= *n-1; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
-	    for (i = 1; i <= j-1; ++i) {
-		i__3 = i + j * q_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = q_subscr(i__, j);
 		i__4 = ij;
-		Q(i,j).r = AP(ij).r, Q(i,j).i = AP(ij).i;
+		q[i__3].r = ap[i__4].r, q[i__3].i = ap[i__4].i;
 		++ij;
 /* L10: */
 	    }
 	    ij += 2;
-	    i__2 = *n + j * q_dim1;
-	    Q(*n,j).r = 0., Q(*n,j).i = 0.;
+	    i__2 = q_subscr(*n, j);
+	    q[i__2].r = 0., q[i__2].i = 0.;
 /* L20: */
 	}
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
-	    i__2 = i + *n * q_dim1;
-	    Q(i,*n).r = 0., Q(i,*n).i = 0.;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = q_subscr(i__, *n);
+	    q[i__2].r = 0., q[i__2].i = 0.;
 /* L30: */
 	}
-	i__1 = *n + *n * q_dim1;
-	Q(*n,*n).r = 1., Q(*n,*n).i = 0.;
+	i__1 = q_subscr(*n, *n);
+	q[i__1].r = 1., q[i__1].i = 0.;
 
 /*        Generate Q(1:n-1,1:n-1) */
 
 	i__1 = *n - 1;
 	i__2 = *n - 1;
 	i__3 = *n - 1;
-	zung2l_(&i__1, &i__2, &i__3, &Q(1,1), ldq, &TAU(1), &WORK(1), &
+	zung2l_(&i__1, &i__2, &i__3, &q[q_offset], ldq, &tau[1], &work[1], &
 		iinfo);
 
     } else {
 
 /*        Q was determined by a call to ZHPTRD with UPLO = 'L'.   
 
-          Unpack the vectors which define the elementary reflectors an
-d   
-          set the first row and column of Q equal to those of the unit
-   
+          Unpack the vectors which define the elementary reflectors and   
+          set the first row and column of Q equal to those of the unit   
           matrix */
 
-	i__1 = q_dim1 + 1;
-	Q(1,1).r = 1., Q(1,1).i = 0.;
+	i__1 = q_subscr(1, 1);
+	q[i__1].r = 1., q[i__1].i = 0.;
 	i__1 = *n;
-	for (i = 2; i <= *n; ++i) {
-	    i__2 = i + q_dim1;
-	    Q(i,1).r = 0., Q(i,1).i = 0.;
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    i__2 = q_subscr(i__, 1);
+	    q[i__2].r = 0., q[i__2].i = 0.;
 /* L40: */
 	}
 	ij = 3;
 	i__1 = *n;
-	for (j = 2; j <= *n; ++j) {
-	    i__2 = j * q_dim1 + 1;
-	    Q(1,j).r = 0., Q(1,j).i = 0.;
+	for (j = 2; j <= i__1; ++j) {
+	    i__2 = q_subscr(1, j);
+	    q[i__2].r = 0., q[i__2].i = 0.;
 	    i__2 = *n;
-	    for (i = j + 1; i <= *n; ++i) {
-		i__3 = i + j * q_dim1;
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		i__3 = q_subscr(i__, j);
 		i__4 = ij;
-		Q(i,j).r = AP(ij).r, Q(i,j).i = AP(ij).i;
+		q[i__3].r = ap[i__4].r, q[i__3].i = ap[i__4].i;
 		++ij;
 /* L50: */
 	    }
@@ -190,8 +186,8 @@ d
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    zung2r_(&i__1, &i__2, &i__3, &Q(2,2), ldq, &TAU(1), 
-		    &WORK(1), &iinfo);
+	    zung2r_(&i__1, &i__2, &i__3, &q_ref(2, 2), ldq, &tau[1], &work[1],
+		     &iinfo);
 	}
     }
     return 0;
@@ -199,4 +195,8 @@ d
 /*     End of ZUPGTR */
 
 } /* zupgtr_ */
+
+#undef q_ref
+#undef q_subscr
+
 

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
@@ -6,10 +7,10 @@
 	ldu, real *v, integer *ldv, real *q, integer *ldq, real *work, 
 	integer *iwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -21,8 +22,7 @@
         U'*A*Q = D1*( 0 R ),    V'*B*Q = D2*( 0 R )   
 
     where U, V and Q are orthogonal matrices, and Z' is the transpose   
-    of Z.  Let K+L = the effective numerical rank of the matrix (A',B')', 
-  
+    of Z.  Let K+L = the effective numerical rank of the matrix (A',B')',   
     then R is a K+L-by-K+L nonsingular upper triangular matrix, D1 and   
     D2 are M-by-(K+L) and P-by-(K+L) "diagonal" matrices and of the   
     following structures, respectively:   
@@ -79,13 +79,11 @@
     The routine computes C, S, R, and optionally the orthogonal   
     transformation matrices U, V and Q.   
 
-    In particular, if B is an N-by-N nonsingular matrix, then the GSVD of 
-  
+    In particular, if B is an N-by-N nonsingular matrix, then the GSVD of   
     A and B implicitly gives the SVD of A*inv(B):   
                          A*inv(B) = U*(D1*inv(D2))*V'.   
     If ( A',B')' has orthonormal columns, then the GSVD of A and B is   
-    also equal to the CS decomposition of A and B. Furthermore, the GSVD 
-  
+    also equal to the CS decomposition of A and B. Furthermore, the GSVD   
     can be used to derive the solution of the eigenvalue problem:   
                          A'*A x = lambda* B'*B x.   
     In some literature, the GSVD of A and B is presented in the form   
@@ -186,14 +184,19 @@
     WORK    (workspace) REAL array,   
                         dimension (max(3*N,M,P)+N)   
 
-    IWORK   (workspace) INTEGER array, dimension (N)   
+    IWORK   (workspace/output) INTEGER array, dimension (N)   
+            On exit, IWORK stores the sorting information. More   
+            precisely, the following loop will sort ALPHA   
+               for I = K+1, min(M,K+L)   
+                   swap ALPHA(I) and ALPHA(IWORK(I))   
+               endfor   
+            such that ALPHA(1) >= ALPHA(2) >= ... >= ALPHA(N).   
 
     INFO    (output)INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = 1, the Jacobi-type procedure failed to   
-                  converge.  For further details, see subroutine STGSJA. 
-  
+                  converge.  For further details, see subroutine STGSJA.   
 
     Internal Parameters   
     ===================   
@@ -207,23 +210,37 @@
             The size of TOLA and TOLB may affect the size of backward   
             errors of the decomposition.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    2-96 Based on modifications by   
+       Ming Gu and Huan Ren, Computer Science Division, University of   
+       California at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, q_dim1, q_offset, u_dim1, 
-	    u_offset, v_dim1, v_offset, i__1;
+	    u_offset, v_dim1, v_offset, i__1, i__2;
     /* Local variables */
-    static real tola, tolb, unfl;
+    static integer ibnd;
+    static real tola;
+    static integer isub;
+    static real tolb, unfl, temp, smax;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real anorm, bnorm;
-    static logical wantq, wantu, wantv;
+    static logical wantq;
+    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
+	    integer *);
+    static logical wantu, wantv;
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     static integer ncycle;
@@ -239,17 +256,27 @@
     static real ulp;
 
 
-#define ALPHA(I) alpha[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alpha;
+    --beta;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --work;
+    --iwork;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     wantu = lsame_(jobu, "U");
     wantv = lsame_(jobv, "V");
     wantq = lsame_(jobq, "Q");
@@ -286,8 +313,8 @@
 
 /*     Compute the Frobenius norm of matrices A and B */
 
-    anorm = slange_("1", m, n, &A(1,1), lda, &WORK(1));
-    bnorm = slange_("1", p, n, &B(1,1), ldb, &WORK(1));
+    anorm = slange_("1", m, n, &a[a_offset], lda, &work[1]);
+    bnorm = slange_("1", p, n, &b[b_offset], ldb, &work[1]);
 
 /*     Get machine precision and set up threshold for determining   
        the effective numerical rank of the matrices A and B. */
@@ -299,13 +326,48 @@
 
 /*     Preprocessing */
 
-    sggsvp_(jobu, jobv, jobq, m, p, n, &A(1,1), lda, &B(1,1), ldb, &
-	    tola, &tolb, k, l, &U(1,1), ldu, &V(1,1), ldv, &Q(1,1), ldq, &IWORK(1), &WORK(1), &WORK(*n + 1), info);
+    sggsvp_(jobu, jobv, jobq, m, p, n, &a[a_offset], lda, &b[b_offset], ldb, &
+	    tola, &tolb, k, l, &u[u_offset], ldu, &v[v_offset], ldv, &q[
+	    q_offset], ldq, &iwork[1], &work[1], &work[*n + 1], info);
 
 /*     Compute the GSVD of two upper "triangular" matrices */
 
-    stgsja_(jobu, jobv, jobq, m, p, n, k, l, &A(1,1), lda, &B(1,1), 
-	    ldb, &tola, &tolb, &ALPHA(1), &BETA(1), &U(1,1), ldu, &V(1,1), ldv, &Q(1,1), ldq, &WORK(1), &ncycle, info);
+    stgsja_(jobu, jobv, jobq, m, p, n, k, l, &a[a_offset], lda, &b[b_offset], 
+	    ldb, &tola, &tolb, &alpha[1], &beta[1], &u[u_offset], ldu, &v[
+	    v_offset], ldv, &q[q_offset], ldq, &work[1], &ncycle, info);
+
+/*     Sort the singular values and store the pivot indices in IWORK   
+       Copy ALPHA to WORK, then sort ALPHA in WORK */
+
+    scopy_(n, &alpha[1], &c__1, &work[1], &c__1);
+/* Computing MIN */
+    i__1 = *l, i__2 = *m - *k;
+    ibnd = min(i__1,i__2);
+    i__1 = ibnd;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+
+/*        Scan for largest ALPHA(K+I) */
+
+	isub = i__;
+	smax = work[*k + i__];
+	i__2 = ibnd;
+	for (j = i__ + 1; j <= i__2; ++j) {
+	    temp = work[*k + j];
+	    if (temp > smax) {
+		isub = j;
+		smax = temp;
+	    }
+/* L10: */
+	}
+	if (isub != i__) {
+	    work[*k + isub] = work[*k + i__];
+	    work[*k + i__] = smax;
+	    iwork[*k + i__] = *k + isub;
+	} else {
+	    iwork[*k + i__] = *k + i__;
+	}
+/* L20: */
+    }
 
     return 0;
 

@@ -1,63 +1,42 @@
-
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sspmv_(char *uplo, integer *n, real *alpha, real *ap, 
 	real *x, integer *incx, real *beta, real *y, integer *incy)
 {
-
-
     /* System generated locals */
     integer i__1, i__2;
-
     /* Local variables */
     static integer info;
     static real temp1, temp2;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static integer kk, ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-
-
 /*  Purpose   
     =======   
-
     SSPMV  performs the matrix-vector operation   
-
        y := alpha*A*x + beta*y,   
-
     where alpha and beta are scalars, x and y are n element vectors and   
     A is an n by n symmetric matrix, supplied in packed form.   
-
     Parameters   
     ==========   
-
     UPLO   - CHARACTER*1.   
              On entry, UPLO specifies whether the upper or lower   
              triangular part of the matrix A is supplied in the packed   
              array AP as follows:   
-
                 UPLO = 'U' or 'u'   The upper triangular part of A is   
                                     supplied in AP.   
-
                 UPLO = 'L' or 'l'   The lower triangular part of A is   
                                     supplied in AP.   
-
              Unchanged on exit.   
-
     N      - INTEGER.   
              On entry, N specifies the order of the matrix A.   
              N must be at least zero.   
              Unchanged on exit.   
-
     ALPHA  - REAL            .   
              On entry, ALPHA specifies the scalar alpha.   
              Unchanged on exit.   
-
     AP     - REAL             array of DIMENSION at least   
              ( ( n*( n + 1 ) )/2 ).   
              Before entry with UPLO = 'U' or 'u', the array AP must   
@@ -71,55 +50,40 @@
              contains a( 1, 1 ), AP( 2 ) and AP( 3 ) contain a( 2, 1 )   
              and a( 3, 1 ) respectively, and so on.   
              Unchanged on exit.   
-
     X      - REAL             array of dimension at least   
              ( 1 + ( n - 1 )*abs( INCX ) ).   
              Before entry, the incremented array X must contain the n   
              element vector x.   
              Unchanged on exit.   
-
     INCX   - INTEGER.   
              On entry, INCX specifies the increment for the elements of   
              X. INCX must not be zero.   
              Unchanged on exit.   
-
     BETA   - REAL            .   
              On entry, BETA specifies the scalar beta. When BETA is   
              supplied as zero then Y need not be set on input.   
              Unchanged on exit.   
-
     Y      - REAL             array of dimension at least   
              ( 1 + ( n - 1 )*abs( INCY ) ).   
              Before entry, the incremented array Y must contain the n   
              element vector y. On exit, Y is overwritten by the updated   
              vector y.   
-
     INCY   - INTEGER.   
              On entry, INCY specifies the increment for the elements of   
              Y. INCY must not be zero.   
              Unchanged on exit.   
-
-
     Level 2 Blas routine.   
-
     -- Written on 22-October-1986.   
        Jack Dongarra, Argonne National Lab.   
        Jeremy Du Croz, Nag Central Office.   
        Sven Hammarling, Nag Central Office.   
        Richard Hanson, Sandia National Labs.   
-
-
-
        Test the input parameters.   
-
-    
-   Parameter adjustments   
-       Function Body */
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+       Parameter adjustments */
+    --y;
+    --x;
+    --ap;
+    /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	info = 1;
@@ -134,15 +98,11 @@
 	xerbla_("SSPMV ", &info);
 	return 0;
     }
-
 /*     Quick return if possible. */
-
     if (*n == 0 || *alpha == 0.f && *beta == 1.f) {
 	return 0;
     }
-
 /*     Set up the start points in  X  and  Y. */
-
     if (*incx > 0) {
 	kx = 1;
     } else {
@@ -153,25 +113,21 @@
     } else {
 	ky = 1 - (*n - 1) * *incy;
     }
-
-/*     Start the operations. In this version the elements of the array AP 
-  
+/*     Start the operations. In this version the elements of the array AP   
        are accessed sequentially with one pass through AP.   
-
        First form  y := beta*y. */
-
     if (*beta != 1.f) {
 	if (*incy == 1) {
 	    if (*beta == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    Y(i) = 0.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    y[i__] = 0.f;
 /* L10: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    Y(i) = *beta * Y(i);
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    y[i__] = *beta * y[i__];
 /* L20: */
 		}
 	    }
@@ -179,15 +135,15 @@
 	    iy = ky;
 	    if (*beta == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    Y(iy) = 0.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    y[iy] = 0.f;
 		    iy += *incy;
 /* L30: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    Y(iy) = *beta * Y(iy);
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    y[iy] = *beta * y[iy];
 		    iy += *incy;
 /* L40: */
 		}
@@ -199,23 +155,21 @@
     }
     kk = 1;
     if (lsame_(uplo, "U")) {
-
 /*        Form  y  when AP contains the upper triangle. */
-
 	if (*incx == 1 && *incy == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		temp1 = *alpha * X(j);
+	    for (j = 1; j <= i__1; ++j) {
+		temp1 = *alpha * x[j];
 		temp2 = 0.f;
 		k = kk;
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    Y(i) += temp1 * AP(k);
-		    temp2 += AP(k) * X(i);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    y[i__] += temp1 * ap[k];
+		    temp2 += ap[k] * x[i__];
 		    ++k;
 /* L50: */
 		}
-		Y(j) = Y(j) + temp1 * AP(kk + j - 1) + *alpha * temp2;
+		y[j] = y[j] + temp1 * ap[kk + j - 1] + *alpha * temp2;
 		kk += j;
 /* L60: */
 	    }
@@ -223,20 +177,20 @@
 	    jx = kx;
 	    jy = ky;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		temp1 = *alpha * X(jx);
+	    for (j = 1; j <= i__1; ++j) {
+		temp1 = *alpha * x[jx];
 		temp2 = 0.f;
 		ix = kx;
 		iy = ky;
 		i__2 = kk + j - 2;
-		for (k = kk; k <= kk+j-2; ++k) {
-		    Y(iy) += temp1 * AP(k);
-		    temp2 += AP(k) * X(ix);
+		for (k = kk; k <= i__2; ++k) {
+		    y[iy] += temp1 * ap[k];
+		    temp2 += ap[k] * x[ix];
 		    ix += *incx;
 		    iy += *incy;
 /* L70: */
 		}
-		Y(jy) = Y(jy) + temp1 * AP(kk + j - 1) + *alpha * temp2;
+		y[jy] = y[jy] + temp1 * ap[kk + j - 1] + *alpha * temp2;
 		jx += *incx;
 		jy += *incy;
 		kk += j;
@@ -244,24 +198,22 @@
 	    }
 	}
     } else {
-
 /*        Form  y  when AP contains the lower triangle. */
-
 	if (*incx == 1 && *incy == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		temp1 = *alpha * X(j);
+	    for (j = 1; j <= i__1; ++j) {
+		temp1 = *alpha * x[j];
 		temp2 = 0.f;
-		Y(j) += temp1 * AP(kk);
+		y[j] += temp1 * ap[kk];
 		k = kk + 1;
 		i__2 = *n;
-		for (i = j + 1; i <= *n; ++i) {
-		    Y(i) += temp1 * AP(k);
-		    temp2 += AP(k) * X(i);
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    y[i__] += temp1 * ap[k];
+		    temp2 += ap[k] * x[i__];
 		    ++k;
 /* L90: */
 		}
-		Y(j) += *alpha * temp2;
+		y[j] += *alpha * temp2;
 		kk += *n - j + 1;
 /* L100: */
 	    }
@@ -269,21 +221,21 @@
 	    jx = kx;
 	    jy = ky;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		temp1 = *alpha * X(jx);
+	    for (j = 1; j <= i__1; ++j) {
+		temp1 = *alpha * x[jx];
 		temp2 = 0.f;
-		Y(jy) += temp1 * AP(kk);
+		y[jy] += temp1 * ap[kk];
 		ix = jx;
 		iy = jy;
 		i__2 = kk + *n - j;
-		for (k = kk + 1; k <= kk+*n-j; ++k) {
+		for (k = kk + 1; k <= i__2; ++k) {
 		    ix += *incx;
 		    iy += *incy;
-		    Y(iy) += temp1 * AP(k);
-		    temp2 += AP(k) * X(ix);
+		    y[iy] += temp1 * ap[k];
+		    temp2 += ap[k] * x[ix];
 /* L110: */
 		}
-		Y(jy) += *alpha * temp2;
+		y[jy] += *alpha * temp2;
 		jx += *incx;
 		jy += *incy;
 		kk += *n - j + 1;
@@ -291,10 +243,7 @@
 	    }
 	}
     }
-
     return 0;
-
 /*     End of SSPMV . */
-
 } /* sspmv_ */
 

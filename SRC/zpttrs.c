@@ -1,32 +1,35 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zpttrs_(char *uplo, integer *n, integer *nrhs, 
-	doublereal *d, doublecomplex *e, doublecomplex *b, integer *ldb, 
+	doublereal *d__, doublecomplex *e, doublecomplex *b, integer *ldb, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZPTTRS solves a system of linear equations A * X = B with a   
-    Hermitian positive definite tridiagonal matrix A using the   
-    factorization A = U**H*D*U or A = L*D*L**H computed by ZPTTRF.   
+    ZPTTRS solves a tridiagonal system of the form   
+       A * X = B   
+    using the factorization A = U'*D*U or A = L*D*L' computed by ZPTTRF.   
+    D is a diagonal matrix specified in the vector D, U (or L) is a unit   
+    bidiagonal matrix whose superdiagonal (subdiagonal) is specified in   
+    the vector E, and X and B are N by NRHS matrices.   
 
     Arguments   
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the superdiagonal or the subdiagonal   
-            of the tridiagonal matrix A is stored and the form of the   
-            factorization:   
-            = 'U':  E is the superdiagonal of U, and A = U'*D*U;   
-            = 'L':  E is the subdiagonal of L, and A = L*D*L'.   
-            (The two forms are equivalent if A is real.)   
+            Specifies the form of the factorization and whether the   
+            vector E is the superdiagonal of the upper bidiagonal factor   
+            U or the subdiagonal of the lower bidiagonal factor L.   
+            = 'U':  A = U'*D*U, E is the superdiagonal of U   
+            = 'L':  A = L*D*L', E is the subdiagonal of L   
 
     N       (input) INTEGER   
             The order of the tridiagonal matrix A.  N >= 0.   
@@ -37,53 +40,62 @@
 
     D       (input) DOUBLE PRECISION array, dimension (N)   
             The n diagonal elements of the diagonal matrix D from the   
-            factorization computed by ZPTTRF.   
+            factorization A = U'*D*U or A = L*D*L'.   
 
     E       (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the unit bidiagonal   
-            factor U or L from the factorization computed by ZPTTRF   
-            (see UPLO).   
+            If UPLO = 'U', the (n-1) superdiagonal elements of the unit   
+            bidiagonal factor U from the factorization A = U'*D*U.   
+            If UPLO = 'L', the (n-1) subdiagonal elements of the unit   
+            bidiagonal factor L from the factorization A = L*D*L'.   
 
     B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            On entry, the right hand side matrix B.   
-            On exit, the solution matrix X.   
+            On entry, the right hand side vectors B for the system of   
+            linear equations.   
+            On exit, the solution vectors, X.   
 
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
+            = 0: successful exit   
+            < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments.   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer b_dim1, b_offset, i__1, i__2, i__3, i__4, i__5, i__6;
-    doublecomplex z__1, z__2, z__3, z__4;
-    /* Builtin functions */
-    void d_cnjg(doublecomplex *, doublecomplex *);
+    integer b_dim1, b_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j;
-    extern logical lsame_(char *, char *);
+    static integer j, iuplo;
     static logical upper;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
+    static integer jb, nb;
+    extern /* Subroutine */ int zptts2_(integer *, integer *, integer *, 
+	    doublereal *, doublecomplex *, doublecomplex *, integer *), 
+	    xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
+    --d__;
+    --e;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
-    upper = lsame_(uplo, "U");
-    if (! upper && ! lsame_(uplo, "L")) {
+    upper = *(unsigned char *)uplo == 'U' || *(unsigned char *)uplo == 'u';
+    if (! upper && ! (*(unsigned char *)uplo == 'L' || *(unsigned char *)uplo 
+	    == 'l')) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -100,101 +112,40 @@
 
 /*     Quick return if possible */
 
-    if (*n == 0) {
+    if (*n == 0 || *nrhs == 0) {
 	return 0;
     }
 
-    if (upper) {
+/*     Determine the number of right-hand sides to solve at a time. */
 
-/*        Solve A * X = B using the factorization A = U'*D*U,   
-          overwriting each right hand side vector with its solution. 
-*/
-
-	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve U' * x = b. */
-
-	    i__2 = *n;
-	    for (i = 2; i <= *n; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * b_dim1;
-		i__5 = i - 1 + j * b_dim1;
-		d_cnjg(&z__3, &E(i - 1));
-		z__2.r = B(i-1,j).r * z__3.r - B(i-1,j).i * z__3.i, z__2.i = B(i-1,j).r * z__3.i + B(i-1,j).i * z__3.r;
-		z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L10: */
-	    }
-
-/*           Solve D * U * x = b. */
-
-	    i__2 = *n + j * b_dim1;
-	    i__3 = *n + j * b_dim1;
-	    i__4 = *n;
-	    z__1.r = B(*n,j).r / D(*n), z__1.i = B(*n,j).i / D(*n);
-	    B(*n,j).r = z__1.r, B(*n,j).i = z__1.i;
-	    for (i = *n - 1; i >= 1; --i) {
-		i__2 = i + j * b_dim1;
-		i__3 = i + j * b_dim1;
-		i__4 = i;
-		z__2.r = B(i,j).r / D(i), z__2.i = B(i,j).i / D(i);
-		i__5 = i + 1 + j * b_dim1;
-		i__6 = i;
-		z__3.r = B(i+1,j).r * E(i).r - B(i+1,j).i * E(i).i, 
-			z__3.i = B(i+1,j).r * E(i).i + B(i+1,j).i * E(i)
-			.r;
-		z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L20: */
-	    }
-/* L30: */
-	}
+    if (*nrhs == 1) {
+	nb = 1;
     } else {
+/* Computing MAX */
+	i__1 = 1, i__2 = ilaenv_(&c__1, "ZPTTRS", uplo, n, nrhs, &c_n1, &c_n1,
+		 (ftnlen)6, (ftnlen)1);
+	nb = max(i__1,i__2);
+    }
 
-/*        Solve A * X = B using the factorization A = L*D*L',   
-          overwriting each right hand side vector with its solution. 
-*/
+/*     Decode UPLO */
 
+    if (upper) {
+	iuplo = 1;
+    } else {
+	iuplo = 0;
+    }
+
+    if (nb >= *nrhs) {
+	zptts2_(&iuplo, n, nrhs, &d__[1], &e[1], &b[b_offset], ldb);
+    } else {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-
-/*           Solve L * x = b. */
-
-	    i__2 = *n;
-	    for (i = 2; i <= *n; ++i) {
-		i__3 = i + j * b_dim1;
-		i__4 = i + j * b_dim1;
-		i__5 = i - 1 + j * b_dim1;
-		i__6 = i - 1;
-		z__2.r = B(i-1,j).r * E(i-1).r - B(i-1,j).i * E(i-1).i, 
-			z__2.i = B(i-1,j).r * E(i-1).i + B(i-1,j).i * E(i-1)
-			.r;
-		z__1.r = B(i,j).r - z__2.r, z__1.i = B(i,j).i - z__2.i;
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L40: */
-	    }
-
-/*           Solve D * L' * x = b. */
-
-	    i__2 = *n + j * b_dim1;
-	    i__3 = *n + j * b_dim1;
-	    i__4 = *n;
-	    z__1.r = B(*n,j).r / D(*n), z__1.i = B(*n,j).i / D(*n);
-	    B(*n,j).r = z__1.r, B(*n,j).i = z__1.i;
-	    for (i = *n - 1; i >= 1; --i) {
-		i__2 = i + j * b_dim1;
-		i__3 = i + j * b_dim1;
-		i__4 = i;
-		z__2.r = B(i,j).r / D(i), z__2.i = B(i,j).i / D(i);
-		i__5 = i + 1 + j * b_dim1;
-		d_cnjg(&z__4, &E(i));
-		z__3.r = B(i+1,j).r * z__4.r - B(i+1,j).i * z__4.i, z__3.i = B(i+1,j).r * z__4.i + B(i+1,j).i * z__4.r;
-		z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
-		B(i,j).r = z__1.r, B(i,j).i = z__1.i;
-/* L50: */
-	    }
-/* L60: */
+	i__2 = nb;
+	for (j = 1; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
+/* Computing MIN */
+	    i__3 = *nrhs - j + 1;
+	    jb = min(i__3,nb);
+	    zptts2_(&iuplo, n, &jb, &d__[1], &e[1], &b_ref(1, j), ldb);
+/* L10: */
 	}
     }
 
@@ -203,4 +154,8 @@
 /*     End of ZPTTRS */
 
 } /* zpttrs_ */
+
+#undef b_ref
+#undef b_subscr
+
 

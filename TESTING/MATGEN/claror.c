@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -47,7 +48,11 @@ static integer c__1 = 1;
     static complex xnorms;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -67,8 +72,7 @@ static integer c__1 = 1;
     =========   
 
     SIDE   - CHARACTER*1   
-             SIDE specifies whether A is multiplied on the left or right 
-  
+             SIDE specifies whether A is multiplied on the left or right   
              by U.   
          SIDE = 'L'   Multiply A on the left (premultiply) by U   
          SIDE = 'R'   Multiply A on the right (postmultiply) by U*   
@@ -89,8 +93,7 @@ static integer c__1 = 1;
              in the sense of CDOTC):   
 
              For square matrices, M=N, and SIDE many be either 'L' or   
-             'R'; the rows will be orthogonal to each other, as will the 
-  
+             'R'; the rows will be orthogonal to each other, as will the   
              columns.   
              For rectangular matrices where M < N, SIDE = 'R' will   
              produce a dense matrix whose rows will be orthogonal and   
@@ -111,8 +114,7 @@ static integer c__1 = 1;
              Number of columns of A. Not modified.   
 
     A      - COMPLEX array, dimension ( LDA, N )   
-             Input and output array. Overwritten by U A ( if SIDE = 'L' ) 
-  
+             Input and output array. Overwritten by U A ( if SIDE = 'L' )   
              or by A U ( if SIDE = 'R' )   
              or by U A U* ( if SIDE = 'C')   
              or by U A U' ( if SIDE = 'T') on exit.   
@@ -123,14 +125,12 @@ static integer c__1 = 1;
 
     ISEED  - INTEGER array, dimension ( 4 )   
              On entry ISEED specifies the seed of the random number   
-             generator. The array elements should be between 0 and 4095; 
-  
+             generator. The array elements should be between 0 and 4095;   
              if not they will be reduced mod 4096.  Also, ISEED(4) must   
              be odd.  The random number generator uses a linear   
              congruential sequence limited to small integers, and so   
              should produce machine independent random numbers. The   
-             values of ISEED are changed on exit, and can be used in the 
-  
+             values of ISEED are changed on exit, and can be used in the   
              next call to CLAROR to continue the same random number   
              sequence.   
              Modified.   
@@ -149,18 +149,16 @@ static integer c__1 = 1;
                  problem)   
              -1  if SIDE is not L, R, C, or T.   
              -3  if M is negative.   
-             -4  if N is negative or if SIDE is C or T and N is not equal 
-  
+             -4  if N is negative or if SIDE is C or T and N is not equal   
                  to M.   
              -6  if LDA is less than M.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
     --x;
@@ -239,8 +237,7 @@ static integer c__1 = 1;
 /* L50: */
 	}
 
-/*        Generate a Householder transformation from the random vector
- X */
+/*        Generate a Householder transformation from the random vector X */
 
 	xnorm = scnrm2_(&ixfrm, &x[kbeg], &c__1);
 	xabs = c_abs(&x[kbeg]);
@@ -254,7 +251,7 @@ static integer c__1 = 1;
 	q__1.r = xnorm * csign.r, q__1.i = xnorm * csign.i;
 	xnorms.r = q__1.r, xnorms.i = q__1.i;
 	i__2 = nxfrm + kbeg;
-	q__1.r = -(doublereal)csign.r, q__1.i = -(doublereal)csign.i;
+	q__1.r = -csign.r, q__1.i = -csign.i;
 	x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	factor = xnorm * (xnorm + xabs);
 	if (dabs(factor) < 1e-20f) {
@@ -276,12 +273,12 @@ static integer c__1 = 1;
 
 /*           Apply H(k) on the left of A */
 
-	    cgemv_("C", &ixfrm, n, &c_b2, &a[kbeg + a_dim1], lda, &x[kbeg], &
+	    cgemv_("C", &ixfrm, n, &c_b2, &a_ref(kbeg, 1), lda, &x[kbeg], &
 		    c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
 	    q__2.r = factor, q__2.i = 0.f;
-	    q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+	    q__1.r = -q__2.r, q__1.i = -q__2.i;
 	    cgerc_(&ixfrm, n, &q__1, &x[kbeg], &c__1, &x[(nxfrm << 1) + 1], &
-		    c__1, &a[kbeg + a_dim1], lda);
+		    c__1, &a_ref(kbeg, 1), lda);
 
 	}
 
@@ -293,12 +290,12 @@ static integer c__1 = 1;
 		clacgv_(&ixfrm, &x[kbeg], &c__1);
 	    }
 
-	    cgemv_("N", m, &ixfrm, &c_b2, &a[kbeg * a_dim1 + 1], lda, &x[kbeg]
-		    , &c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
+	    cgemv_("N", m, &ixfrm, &c_b2, &a_ref(1, kbeg), lda, &x[kbeg], &
+		    c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
 	    q__2.r = factor, q__2.i = 0.f;
-	    q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
+	    q__1.r = -q__2.r, q__1.i = -q__2.i;
 	    cgerc_(m, &ixfrm, &q__1, &x[(nxfrm << 1) + 1], &c__1, &x[kbeg], &
-		    c__1, &a[kbeg * a_dim1 + 1], lda);
+		    c__1, &a_ref(1, kbeg), lda);
 
 	}
 /* L60: */
@@ -322,7 +319,7 @@ static integer c__1 = 1;
 	i__1 = *m;
 	for (irow = 1; irow <= i__1; ++irow) {
 	    r_cnjg(&q__1, &x[nxfrm + irow]);
-	    cscal_(n, &q__1, &a[irow + a_dim1], lda);
+	    cscal_(n, &q__1, &a_ref(irow, 1), lda);
 /* L70: */
 	}
     }
@@ -330,7 +327,7 @@ static integer c__1 = 1;
     if (itype == 2 || itype == 3) {
 	i__1 = *n;
 	for (jcol = 1; jcol <= i__1; ++jcol) {
-	    cscal_(m, &x[nxfrm + jcol], &a[jcol * a_dim1 + 1], &c__1);
+	    cscal_(m, &x[nxfrm + jcol], &a_ref(1, jcol), &c__1);
 /* L80: */
 	}
     }
@@ -339,7 +336,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (jcol = 1; jcol <= i__1; ++jcol) {
 	    r_cnjg(&q__1, &x[nxfrm + jcol]);
-	    cscal_(m, &q__1, &a[jcol * a_dim1 + 1], &c__1);
+	    cscal_(m, &q__1, &a_ref(1, jcol), &c__1);
 /* L90: */
 	}
     }
@@ -348,4 +345,8 @@ static integer c__1 = 1;
 /*     End of CLAROR */
 
 } /* claror_ */
+
+#undef a_ref
+#undef a_subscr
+
 

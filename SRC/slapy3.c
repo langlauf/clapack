@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-doublereal slapy3_(real *x, real *y, real *z)
+doublereal slapy3_(real *x, real *y, real *z__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -22,10 +23,8 @@ doublereal slapy3_(real *x, real *y, real *z)
     Z       (input) REAL   
             X, Y and Z specify the values x, y and z.   
 
-    ===================================================================== 
-*/
-/* >>Start of File<<   
-       System generated locals */
+    ===================================================================== */
+    /* System generated locals */
     real ret_val, r__1, r__2, r__3;
     /* Builtin functions */
     double sqrt(doublereal);
@@ -36,7 +35,7 @@ doublereal slapy3_(real *x, real *y, real *z)
 
     xabs = dabs(*x);
     yabs = dabs(*y);
-    zabs = dabs(*z);
+    zabs = dabs(*z__);
 /* Computing MAX */
     r__1 = max(xabs,yabs);
     w = dmax(r__1,zabs);

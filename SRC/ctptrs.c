@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctptrs_(char *uplo, char *trans, char *diag, integer *n, 
 	integer *nrhs, complex *ap, complex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -45,14 +46,11 @@
             of the matrix B.  NRHS >= 0.   
 
     AP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
 
     B       (input/output) COMPLEX array, dimension (LDB,NRHS)   
             On entry, the right hand side matrix B.   
@@ -68,15 +66,12 @@
                   indicating that the matrix is singular and the   
                   solutions X have not been computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -91,20 +86,23 @@
     static integer jc;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical nounit;
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
 
+    --ap;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define AP(I) ap[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     nounit = lsame_(diag, "N");
     if (! upper && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T") &&
-	     ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T") && ! lsame_(trans, "C")) {
 	*info = -2;
     } else if (! nounit && ! lsame_(diag, "U")) {
 	*info = -3;
@@ -135,7 +133,7 @@
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
 		i__2 = jc + *info - 1;
-		if (AP(jc+*info-1).r == 0.f && AP(jc+*info-1).i == 0.f) {
+		if (ap[i__2].r == 0.f && ap[i__2].i == 0.f) {
 		    return 0;
 		}
 		jc += *info;
@@ -146,7 +144,7 @@
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
 		i__2 = jc;
-		if (AP(jc).r == 0.f && AP(jc).i == 0.f) {
+		if (ap[i__2].r == 0.f && ap[i__2].i == 0.f) {
 		    return 0;
 		}
 		jc = jc + *n - *info + 1;
@@ -159,8 +157,8 @@
 /*     Solve  A * x = b,  A**T * x = b,  or  A**H * x = b. */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
-	ctpsv_(uplo, trans, diag, n, &AP(1), &B(1,j), &c__1);
+    for (j = 1; j <= i__1; ++j) {
+	ctpsv_(uplo, trans, diag, n, &ap[1], &b_ref(1, j), &c__1);
 /* L30: */
     }
 
@@ -169,4 +167,8 @@
 /*     End of CTPTRS */
 
 } /* ctptrs_ */
+
+#undef b_ref
+#undef b_subscr
+
 

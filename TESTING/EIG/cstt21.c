@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -40,7 +41,11 @@ static integer c__1 = 1;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -65,8 +70,7 @@ static integer c__1 = 1;
     =========   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, CSTT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, CSTT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -81,12 +85,10 @@ static integer c__1 = 1;
     AE      (input) REAL array, dimension (N-1)   
             The off-diagonal of the original (unfactored) matrix A.  A   
             is assumed to be symmetric tridiagonal.  AE(1) is the (1,2)   
-            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc. 
-  
+            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc.   
 
     SD      (input) REAL array, dimension (N)   
-            The diagonal of the real (symmetric tri-) diagonal matrix S. 
-  
+            The diagonal of the real (symmetric tri-) diagonal matrix S.   
 
     SE      (input) REAL array, dimension (N-1)   
             The off-diagonal of the (symmetric tri-) diagonal matrix S.   
@@ -109,8 +111,7 @@ static integer c__1 = 1;
             values are currently limited to 1/ulp, to avoid overflow.   
             RESULT(1) is always modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Constants   
@@ -121,7 +122,7 @@ static integer c__1 = 1;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --rwork;
@@ -176,8 +177,8 @@ static integer c__1 = 1;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	r__1 = -(doublereal)sd[j];
-	cher_("L", n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1], n);
+	r__1 = -sd[j];
+	cher_("L", n, &r__1, &u_ref(1, j), &c__1, &work[1], n);
 /* L20: */
     }
 
@@ -186,14 +187,15 @@ static integer c__1 = 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
 	    q__2.r = se[i__2], q__2.i = 0.f;
-	    q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
-	    cher2_("L", n, &q__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1], n);
+	    q__1.r = -q__2.r, q__1.i = -q__2.i;
+	    cher2_("L", n, &q__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1], n);
 /* L30: */
 	}
     }
 
-    wnorm = clanhe_("1", "L", n, &work[1], n, &rwork[1]);
+    wnorm = clanhe_("1", "L", n, &work[1], n, &rwork[1])
+	    ;
 
     if (anorm > wnorm) {
 	result[1] = wnorm / anorm / (*n * ulp);
@@ -234,4 +236,8 @@ static integer c__1 = 1;
 /*     End of CSTT21 */
 
 } /* cstt21_ */
+
+#undef u_ref
+#undef u_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int stptri_(char *uplo, char *diag, integer *n, real *ap, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -31,29 +32,24 @@
 
     AP      (input/output) REAL array, dimension (N*(N+1)/2)   
             On entry, the upper or lower triangular matrix A, stored   
-            columnwise in a linear array.  The j-th column of A is stored 
-  
+            columnwise in a linear array.  The j-th column of A is stored   
             in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*((2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*((2*n-j)/2) = A(i,j) for j<=i<=n.   
             See below for further details.   
-            On exit, the (triangular) inverse of the original matrix, in 
-  
+            On exit, the (triangular) inverse of the original matrix, in   
             the same packed storage format.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
             > 0:  if INFO = i, A(i,i) is exactly zero.  The triangular   
-                  matrix is singular and its inverse can not be computed. 
-  
+                  matrix is singular and its inverse can not be computed.   
 
     Further Details   
     ===============   
 
-    A triangular matrix A can be transferred to packed storage using one 
-  
+    A triangular matrix A can be transferred to packed storage using one   
     of the following program segments:   
 
     UPLO = 'U':                      UPLO = 'L':   
@@ -66,15 +62,12 @@
              JC = JC + J                      JC = JC + N - J + 1   
         2 CONTINUE                       2 CONTINUE   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -94,10 +87,9 @@
     static real ajj;
 
 
+    --ap;
 
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     nounit = lsame_(diag, "N");
@@ -122,7 +114,7 @@
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
 		jj += *info;
-		if (AP(jj) == 0.f) {
+		if (ap[jj] == 0.f) {
 		    return 0;
 		}
 /* L10: */
@@ -131,7 +123,7 @@
 	    jj = 1;
 	    i__1 = *n;
 	    for (*info = 1; *info <= i__1; ++(*info)) {
-		if (AP(jj) == 0.f) {
+		if (ap[jj] == 0.f) {
 		    return 0;
 		}
 		jj = jj + *n - *info + 1;
@@ -147,10 +139,10 @@
 
 	jc = 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    if (nounit) {
-		AP(jc + j - 1) = 1.f / AP(jc + j - 1);
-		ajj = -(doublereal)AP(jc + j - 1);
+		ap[jc + j - 1] = 1.f / ap[jc + j - 1];
+		ajj = -ap[jc + j - 1];
 	    } else {
 		ajj = -1.f;
 	    }
@@ -158,10 +150,10 @@
 /*           Compute elements 1:j-1 of j-th column. */
 
 	    i__2 = j - 1;
-	    stpmv_("Upper", "No transpose", diag, &i__2, &AP(1), &AP(jc), &
+	    stpmv_("Upper", "No transpose", diag, &i__2, &ap[1], &ap[jc], &
 		    c__1);
 	    i__2 = j - 1;
-	    sscal_(&i__2, &ajj, &AP(jc), &c__1);
+	    sscal_(&i__2, &ajj, &ap[jc], &c__1);
 	    jc += j;
 /* L30: */
 	}
@@ -173,8 +165,8 @@
 	jc = *n * (*n + 1) / 2;
 	for (j = *n; j >= 1; --j) {
 	    if (nounit) {
-		AP(jc) = 1.f / AP(jc);
-		ajj = -(doublereal)AP(jc);
+		ap[jc] = 1.f / ap[jc];
+		ajj = -ap[jc];
 	    } else {
 		ajj = -1.f;
 	    }
@@ -183,10 +175,10 @@
 /*              Compute elements j+1:n of j-th column. */
 
 		i__1 = *n - j;
-		stpmv_("Lower", "No transpose", diag, &i__1, &AP(jclast), &AP(
-			jc + 1), &c__1);
+		stpmv_("Lower", "No transpose", diag, &i__1, &ap[jclast], &ap[
+			jc + 1], &c__1);
 		i__1 = *n - j;
-		sscal_(&i__1, &ajj, &AP(jc + 1), &c__1);
+		sscal_(&i__1, &ajj, &ap[jc + 1], &c__1);
 	    }
 	    jclast = jc;
 	    jc = jc - *n + j - 2;

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrsen_(char *job, char *compq, logical *select, integer 
@@ -5,10 +6,10 @@
 	doublecomplex *w, integer *m, doublereal *s, doublereal *sep, 
 	doublecomplex *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
@@ -16,8 +17,7 @@
 
     ZTRSEN reorders the Schur factorization of a complex matrix   
     A = Q*T*Q**H, so that a selected cluster of eigenvalues appears in   
-    the leading positions on the diagonal of the upper triangular matrix 
-  
+    the leading positions on the diagonal of the upper triangular matrix   
     T, and the leading columns of Q form an orthonormal basis of the   
     corresponding right invariant subspace.   
 
@@ -41,18 +41,15 @@
             = 'N': do not update Q.   
 
     SELECT  (input) LOGICAL array, dimension (N)   
-            SELECT specifies the eigenvalues in the selected cluster. To 
-  
-            select the j-th eigenvalue, SELECT(j) must be set to .TRUE.. 
-  
+            SELECT specifies the eigenvalues in the selected cluster. To   
+            select the j-th eigenvalue, SELECT(j) must be set to .TRUE..   
 
     N       (input) INTEGER   
             The order of the matrix T. N >= 0.   
 
     T       (input/output) COMPLEX*16 array, dimension (LDT,N)   
             On entry, the upper triangular matrix T.   
-            On exit, T is overwritten by the reordered matrix T, with the 
-  
+            On exit, T is overwritten by the reordered matrix T, with the   
             selected eigenvalues as the leading diagonal elements.   
 
     LDT     (input) INTEGER   
@@ -61,8 +58,7 @@
     Q       (input/output) COMPLEX*16 array, dimension (LDQ,N)   
             On entry, if COMPQ = 'V', the matrix Q of Schur vectors.   
             On exit, if COMPQ = 'V', Q has been postmultiplied by the   
-            unitary transformation matrix which reorders T; the leading M 
-  
+            unitary transformation matrix which reorders T; the leading M   
             columns of Q form an orthonormal basis for the specified   
             invariant subspace.   
             If COMPQ = 'N', Q is not referenced.   
@@ -71,7 +67,7 @@
             The leading dimension of the array Q.   
             LDQ >= 1; and if COMPQ = 'V', LDQ >= N.   
 
-    W       (output) COMPLEX*16   
+    W       (output) COMPLEX*16 array, dimension (N)   
             The reordered eigenvalues of T, in the same order as they   
             appear on the diagonal of T.   
 
@@ -92,14 +88,20 @@
             M = 0 or N, SEP = norm(T).   
             If JOB = 'N' or 'E', SEP is not referenced.   
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
-            If JOB = 'N', WORK is not referenced.   
+    WORK    (workspace/output) COMPLEX*16 array, dimension (LWORK)   
+            If JOB = 'N', WORK is not referenced.  Otherwise,   
+            on exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.   
             If JOB = 'N', LWORK >= 1;   
             if JOB = 'E', LWORK = M*(N-M);   
             if JOB = 'V' or 'B', LWORK >= 2*M*(N-M).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -108,8 +110,7 @@
     Further Details   
     ===============   
 
-    ZTRSEN first collects the selected eigenvalues by computing a unitary 
-  
+    ZTRSEN first collects the selected eigenvalues by computing a unitary   
     transformation Z to move them to the top left corner of T. In other   
     words, the selected eigenvalues are the eigenvalues of T11 in:   
 
@@ -117,8 +118,7 @@
                            (  0  T22 ) n2   
                               n1  n2   
 
-    where N = n1+n2 and Z' means the conjugate transpose of Z. The first 
-  
+    where N = n1+n2 and Z' means the conjugate transpose of Z. The first   
     n1 columns of Z span the specified invariant subspace of T.   
 
     If T has been obtained from the Schur factorization of a matrix   
@@ -126,8 +126,7 @@
     A = (Q*Z)*(Z'*T*Z)*(Q*Z)', and the first n1 columns of Q*Z span the   
     corresponding invariant subspace of A.   
 
-    The reciprocal condition number of the average of the eigenvalues of 
-  
+    The reciprocal condition number of the average of the eigenvalues of   
     T11 may be returned in S. S lies between 0 (very badly conditioned)   
     and 1 (very well conditioned). It is computed as follows. First we   
     compute R so that   
@@ -146,8 +145,7 @@
 
                         (1 + F-norm(R)**2)**(-1/2)   
 
-    on the reciprocal of 2-norm(P), the true reciprocal condition number. 
-  
+    on the reciprocal of 2-norm(P), the true reciprocal condition number.   
     S cannot underestimate 1 / 2-norm(P) by more than a factor of   
     sqrt(N).   
 
@@ -159,8 +157,7 @@
     where EPS is the machine precision.   
 
     The reciprocal condition number of the right invariant subspace   
-    spanned by the first n1 columns of Z (or of Q*Z) is returned in SEP. 
-  
+    spanned by the first n1 columns of Z (or of Q*Z) is returned in SEP.   
     SEP is defined as the separation of T11 and T22:   
 
                        sep( T11, T22 ) = sigma-min( C )   
@@ -171,11 +168,9 @@
        C  = kprod( I(n2), T11 ) - kprod( transpose(T22), I(n1) )   
 
     I(m) is an m by m identity matrix, and kprod denotes the Kronecker   
-    product. We estimate sigma-min(C) by the reciprocal of an estimate of 
-  
+    product. We estimate sigma-min(C) by the reciprocal of an estimate of   
     the 1-norm of inverse(C). The true reciprocal 1-norm of inverse(C)   
-    cannot differ from sigma-min(C) by more than a factor of sqrt(n1*n2). 
-  
+    cannot differ from sigma-min(C) by more than a factor of sqrt(n1*n2).   
 
     When SEP is small, small changes in T can cause large changes in   
     the invariant subspace. An approximate bound on the maximum angular   
@@ -183,15 +178,12 @@
 
                         EPS * norm(T) / SEP   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c_n1 = -1;
     
@@ -203,6 +195,7 @@
     static integer kase, ierr, k;
     static doublereal scale;
     extern logical lsame_(char *, char *);
+    static integer lwmin;
     static logical wantq, wants;
     static doublereal rnorm;
     static integer n1, n2;
@@ -219,21 +212,27 @@
     static logical wantsp;
     extern /* Subroutine */ int ztrexc_(char *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, integer *, integer *, 
-	    integer *), ztrsyl_(char *, char *, integer *, integer *, 
+	    integer *);
+    static logical lquery;
+    extern /* Subroutine */ int ztrsyl_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
 	     doublecomplex *, integer *, doublereal *, integer *);
     static doublereal est;
+#define t_subscr(a_1,a_2) (a_2)*t_dim1 + a_1
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
 
 
+    --select;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --w;
+    --work;
 
-#define RWORK(I) rwork[(I)]
-#define SELECT(I) select[(I)-1]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     wantbh = lsame_(job, "B");
     wants = lsame_(job, "E") || wantbh;
     wantsp = lsame_(job, "V") || wantbh;
@@ -243,8 +242,8 @@
 
     *m = 0;
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
-	if (SELECT(k)) {
+    for (k = 1; k <= i__1; ++k) {
+	if (select[k]) {
 	    ++(*m);
 	}
 /* L10: */
@@ -255,6 +254,18 @@
     nn = n1 * n2;
 
     *info = 0;
+    lquery = *lwork == -1;
+
+    if (wantsp) {
+/* Computing MAX */
+	i__1 = 1, i__2 = nn << 1;
+	lwmin = max(i__1,i__2);
+    } else if (lsame_(job, "N")) {
+	lwmin = 1;
+    } else if (lsame_(job, "E")) {
+	lwmin = max(1,nn);
+    }
+
     if (! lsame_(job, "N") && ! wants && ! wantsp) {
 	*info = -1;
     } else if (! lsame_(compq, "N") && ! wantq) {
@@ -265,13 +276,19 @@
 	*info = -6;
     } else if (*ldq < 1 || wantq && *ldq < *n) {
 	*info = -8;
-    } else if (*lwork < 1 || wants && ! wantsp && *lwork < nn || wantsp && *
-	    lwork < nn << 1) {
+    } else if (*lwork < lwmin && ! lquery) {
 	*info = -14;
     }
+
+    if (*info == 0) {
+	work[1].r = (doublereal) lwmin, work[1].i = 0.;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZTRSEN", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -282,7 +299,7 @@
 	    *s = 1.;
 	}
 	if (wantsp) {
-	    *sep = zlange_("1", n, n, &T(1,1), ldt, rwork);
+	    *sep = zlange_("1", n, n, &t[t_offset], ldt, rwork);
 	}
 	goto L40;
     }
@@ -291,14 +308,14 @@
 
     ks = 0;
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
-	if (SELECT(k)) {
+    for (k = 1; k <= i__1; ++k) {
+	if (select[k]) {
 	    ++ks;
 
 /*           Swap the K-th eigenvalue to position KS. */
 
 	    if (k != ks) {
-		ztrexc_(compq, n, &T(1,1), ldt, &Q(1,1), ldq, &k, &
+		ztrexc_(compq, n, &t[t_offset], ldt, &q[q_offset], ldq, &k, &
 			ks, &ierr);
 	    }
 	}
@@ -311,14 +328,14 @@
 
              T11*R - R*T22 = scale*T12 */
 
-	zlacpy_("F", &n1, &n2, &T(1,n1+1), ldt, &WORK(1), &n1);
-	ztrsyl_("N", "N", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &ierr);
+	zlacpy_("F", &n1, &n2, &t_ref(1, n1 + 1), ldt, &work[1], &n1);
+	ztrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(n1 + 1, 
+		n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 
-/*        Estimate the reciprocal of the condition number of the clust
-er   
+/*        Estimate the reciprocal of the condition number of the cluster   
           of eigenvalues. */
 
-	rnorm = zlange_("F", &n1, &n2, &WORK(1), &n1, rwork);
+	rnorm = zlange_("F", &n1, &n2, &work[1], &n1, rwork);
 	if (rnorm == 0.) {
 	    *s = 1.;
 	} else {
@@ -333,20 +350,20 @@ er
 	est = 0.;
 	kase = 0;
 L30:
-	zlacon_(&nn, &WORK(nn + 1), &WORK(1), &est, &kase);
+	zlacon_(&nn, &work[nn + 1], &work[1], &est, &kase);
 	if (kase != 0) {
 	    if (kase == 1) {
 
 /*              Solve T11*R - R*T22 = scale*X. */
 
-		ztrsyl_("N", "N", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &
-			ierr);
+		ztrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(
+			n1 + 1, n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 	    } else {
 
 /*              Solve T11'*R - R*T22' = scale*X. */
 
-		ztrsyl_("C", "C", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &
-			ierr);
+		ztrsyl_("C", "C", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(
+			n1 + 1, n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 	    }
 	    goto L30;
 	}
@@ -359,15 +376,22 @@ L40:
 /*     Copy reordered eigenvalues to W. */
 
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
+    for (k = 1; k <= i__1; ++k) {
 	i__2 = k;
-	i__3 = k + k * t_dim1;
-	W(k).r = T(k,k).r, W(k).i = T(k,k).i;
+	i__3 = t_subscr(k, k);
+	w[i__2].r = t[i__3].r, w[i__2].i = t[i__3].i;
 /* L50: */
     }
+
+    work[1].r = (doublereal) lwmin, work[1].i = 0.;
+
     return 0;
 
 /*     End of ZTRSEN */
 
 } /* ztrsen_ */
+
+#undef t_ref
+#undef t_subscr
+
 

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhpsvx_(char *fact, char *uplo, integer *n, integer *
@@ -6,10 +7,10 @@
 	doublereal *rcond, doublereal *ferr, doublereal *berr, doublecomplex *
 	work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -28,18 +29,19 @@
 
     The following steps are performed:   
 
-    1. If FACT = 'N', the diagonal pivoting method is used to factor A as 
-  
+    1. If FACT = 'N', the diagonal pivoting method is used to factor A as   
           A = U * D * U**H,  if UPLO = 'U', or   
           A = L * D * L**H,  if UPLO = 'L',   
-       where U (or L) is a product of permutation and unit upper (lower) 
-  
+       where U (or L) is a product of permutation and unit upper (lower)   
        triangular matrices and D is Hermitian and block diagonal with   
        1-by-1 and 2-by-2 diagonal blocks.   
 
-    2. The factored form of A is used to estimate the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 3 and 4 are skipped.   
+    2. If some D(i,i)=0, so that D is exactly singular, then the routine   
+       returns with INFO = i. Otherwise, the factored form of A is used   
+       to estimate the condition number of the matrix A.  If the   
+       reciprocal of the condition number is less than machine precision,   
+       INFO = N+1 is returned as a warning, but the routine still goes on   
+       to solve for X and compute error bounds as described below.   
 
     3. The system of equations is solved for X using the factored form   
        of A.   
@@ -71,50 +73,40 @@
             of the matrices B and X.  NRHS >= 0.   
 
     AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangle of the Hermitian matrix A, packed 
-  
-            columnwise in a linear array.  The j-th column of A is stored 
-  
+            The upper or lower triangle of the Hermitian matrix A, packed   
+            columnwise in a linear array.  The j-th column of A is stored   
             in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
             See below for further details.   
 
     AFP     (input or output) COMPLEX*16 array, dimension (N*(N+1)/2)   
             If FACT = 'F', then AFP is an input argument and on entry   
-            contains the block diagonal matrix D and the multipliers used 
-  
+            contains the block diagonal matrix D and the multipliers used   
             to obtain the factor U or L from the factorization   
-            A = U*D*U**H or A = L*D*L**H as computed by ZHPTRF, stored as 
-  
+            A = U*D*U**H or A = L*D*L**H as computed by ZHPTRF, stored as   
             a packed triangular matrix in the same storage format as A.   
 
             If FACT = 'N', then AFP is an output argument and on exit   
-            contains the block diagonal matrix D and the multipliers used 
-  
+            contains the block diagonal matrix D and the multipliers used   
             to obtain the factor U or L from the factorization   
-            A = U*D*U**H or A = L*D*L**H as computed by ZHPTRF, stored as 
-  
+            A = U*D*U**H or A = L*D*L**H as computed by ZHPTRF, stored as   
             a packed triangular matrix in the same storage format as A.   
 
     IPIV    (input or output) INTEGER array, dimension (N)   
             If FACT = 'F', then IPIV is an input argument and on entry   
-            contains details of the interchanges and the block structure 
-  
+            contains details of the interchanges and the block structure   
             of D, as determined by ZHPTRF.   
             If IPIV(k) > 0, then rows and columns k and IPIV(k) were   
             interchanged and D(k,k) is a 1-by-1 diagonal block.   
             If UPLO = 'U' and IPIV(k) = IPIV(k-1) < 0, then rows and   
-            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k) 
-  
+            columns k-1 and -IPIV(k) were interchanged and D(k-1:k,k-1:k)   
             is a 2-by-2 diagonal block.  If UPLO = 'L' and IPIV(k) =   
             IPIV(k+1) < 0, then rows and columns k+1 and -IPIV(k) were   
             interchanged and D(k:k+1,k:k+1) is a 2-by-2 diagonal block.   
 
             If FACT = 'N', then IPIV is an output argument and on exit   
-            contains details of the interchanges and the block structure 
-  
+            contains details of the interchanges and the block structure   
             of D, as determined by ZHPTRF.   
 
     B       (input) COMPLEX*16 array, dimension (LDB,NRHS)   
@@ -124,28 +116,23 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) COMPLEX*16 array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X.   
+            If INFO = 0 or INFO = N+1, the N-by-NRHS solution matrix X.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     RCOND   (output) DOUBLE PRECISION   
-            The estimate of the reciprocal condition number of the matrix 
-  
+            The estimate of the reciprocal condition number of the matrix   
             A.  If RCOND is less than the machine precision (in   
-            particular, if RCOND = 0), the matrix is singular to working 
-  
+            particular, if RCOND = 0), the matrix is singular to working   
             precision.  This condition is indicated by a return code of   
-            INFO > 0, and the solution and error bounds are not computed. 
-  
+            INFO > 0.   
 
     FERR    (output) DOUBLE PRECISION array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -163,18 +150,18 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0 and <= N: if INFO = i, D(i,i) is exactly zero.  The   
-                 factorization has been completed, but the block diagonal 
-  
-                 matrix D is exactly singular, so the solution and error 
-  
-                 bounds could not be computed.   
-            = N+1: the block diagonal matrix D is nonsingular, but RCOND 
-  
-                 is less than machine precision.  The factorization has   
-                 been completed, but the matrix is singular to working   
-                 precision, so the solution and error bounds have not   
-                 been computed.   
+            > 0:  if INFO = i, and i is   
+                  <= N:  D(i,i) is exactly zero.  The factorization   
+                         has been completed but the factor D is exactly   
+                         singular, so the solution and error bounds could   
+                         not be computed. RCOND = 0 is returned.   
+                  = N+1: D is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
     Further Details   
     ===============   
@@ -193,15 +180,12 @@
 
     AP = [ a11, a12, a22, a13, a23, a33, a14, a24, a34, a44 ]   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -229,23 +213,27 @@
 	    integer *);
 
 
+    --ap;
+    --afp;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --rwork;
 
-#define AP(I) ap[(I)-1]
-#define AFP(I) afp[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
     if (! nofact && ! lsame_(fact, "F")) {
 	*info = -1;
-    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
+    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, 
+	    "L")) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
@@ -267,8 +255,8 @@
 /*        Compute the factorization A = U*D*U' or A = L*D*L'. */
 
 	i__1 = *n * (*n + 1) / 2;
-	zcopy_(&i__1, &AP(1), &c__1, &AFP(1), &c__1);
-	zhptrf_(uplo, n, &AFP(1), &IPIV(1), info);
+	zcopy_(&i__1, &ap[1], &c__1, &afp[1], &c__1);
+	zhptrf_(uplo, n, &afp[1], &ipiv[1], info);
 
 /*        Return if INFO is non-zero. */
 
@@ -282,29 +270,28 @@
 
 /*     Compute the norm of the matrix A. */
 
-    anorm = zlanhp_("I", uplo, n, &AP(1), &RWORK(1));
+    anorm = zlanhp_("I", uplo, n, &ap[1], &rwork[1]);
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    zhpcon_(uplo, n, &AFP(1), &IPIV(1), &anorm, rcond, &WORK(1), info);
+    zhpcon_(uplo, n, &afp[1], &ipiv[1], &anorm, rcond, &work[1], info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < dlamch_("Epsilon")) {
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution vectors X. */
 
-    zlacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    zhptrs_(uplo, n, nrhs, &AFP(1), &IPIV(1), &X(1,1), ldx, info);
+    zlacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    zhptrs_(uplo, n, nrhs, &afp[1], &ipiv[1], &x[x_offset], ldx, info);
 
 /*     Use iterative refinement to improve the computed solutions and   
        compute error bounds and backward error estimates for them. */
 
-    zhprfs_(uplo, n, nrhs, &AP(1), &AFP(1), &IPIV(1), &B(1,1), ldb, &X(1,1), ldx, &FERR(1), &BERR(1), &WORK(1), &RWORK(1), info)
-	    ;
+    zhprfs_(uplo, n, nrhs, &ap[1], &afp[1], &ipiv[1], &b[b_offset], ldb, &x[
+	    x_offset], ldx, &ferr[1], &berr[1], &work[1], &rwork[1], info);
 
     return 0;
 

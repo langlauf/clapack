@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,8 +23,8 @@ static real c_b26 = 0.f;
 
 /* Subroutine */ int slaeda_(integer *n, integer *tlvls, integer *curlvl, 
 	integer *curpbm, integer *prmptr, integer *perm, integer *givptr, 
-	integer *givcol, real *givnum, real *q, integer *qptr, real *z, real *
-	ztemp, integer *info)
+	integer *givcol, real *givnum, real *q, integer *qptr, real *z__, 
+	real *ztemp, integer *info)
 {
     /* System generated locals */
     integer i__1, i__2, i__3;
@@ -36,15 +37,18 @@ static real c_b26 = 0.f;
     static integer curr;
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static integer bsiz1, bsiz2, psiz1, psiz2, i, k, zptr1;
+    static integer bsiz1, bsiz2, psiz1, psiz2, i__, k, zptr1;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *), scopy_(integer *, real *, integer *, real *, integer *), 
 	    xerbla_(char *, integer *);
     static integer mid, ptr;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define givcol_ref(a_1,a_2) givcol[(a_2)*2 + a_1]
+#define givnum_ref(a_1,a_2) givnum[(a_2)*2 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -56,8 +60,7 @@ static real c_b26 = 0.f;
     =======   
 
     SLAEDA computes the Z vector corresponding to the merge step in the   
-    CURLVLth step of the merge process with TLVLS steps for the CURPBMth 
-  
+    CURLVLth step of the merge process with TLVLS steps for the CURPBMth   
     problem.   
 
     Arguments   
@@ -90,13 +93,11 @@ static real c_b26 = 0.f;
 
     GIVPTR (input) INTEGER array, dimension (N lg N)   
            Contains a list of pointers which indicate where in GIVCOL a   
-           level's Givens rotations are stored.  GIVPTR(i+1) - GIVPTR(i) 
-  
+           level's Givens rotations are stored.  GIVPTR(i+1) - GIVPTR(i)   
            indicates the number of Givens rotations.   
 
     GIVCOL (input) INTEGER array, dimension (2, N lg N)   
-           Each pair of numbers indicates a pair of columns to take place 
-  
+           Each pair of numbers indicates a pair of columns to take place   
            in a Givens rotation.   
 
     GIVNUM (input) REAL array, dimension (2, N lg N)   
@@ -123,15 +124,21 @@ static real c_b26 = 0.f;
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     --ztemp;
-    --z;
+    --z__;
     --qptr;
     --q;
     givnum -= 3;
@@ -162,13 +169,11 @@ static real c_b26 = 0.f;
 
     mid = *n / 2 + 1;
 
-/*     Gather last/first rows of appropriate eigenblocks into center of Z 
-*/
+/*     Gather last/first rows of appropriate eigenblocks into center of Z */
 
     ptr = 1;
 
-/*     Determine location of lowest level subproblem in the full storage 
-  
+/*     Determine location of lowest level subproblem in the full storage   
        scheme */
 
     i__1 = *curlvl - 1;
@@ -183,21 +188,20 @@ static real c_b26 = 0.f;
     bsiz2 = (integer) (sqrt((real) (qptr[curr + 2] - qptr[curr + 1])) + .5f);
     i__1 = mid - bsiz1 - 1;
     for (k = 1; k <= i__1; ++k) {
-	z[k] = 0.f;
+	z__[k] = 0.f;
 /* L10: */
     }
-    scopy_(&bsiz1, &q[qptr[curr] + bsiz1 - 1], &bsiz1, &z[mid - bsiz1], &c__1)
-	    ;
-    scopy_(&bsiz2, &q[qptr[curr + 1]], &bsiz2, &z[mid], &c__1);
+    scopy_(&bsiz1, &q[qptr[curr] + bsiz1 - 1], &bsiz1, &z__[mid - bsiz1], &
+	    c__1);
+    scopy_(&bsiz2, &q[qptr[curr + 1]], &bsiz2, &z__[mid], &c__1);
     i__1 = *n;
     for (k = mid + bsiz2; k <= i__1; ++k) {
-	z[k] = 0.f;
+	z__[k] = 0.f;
 /* L20: */
     }
 
 /*     Loop thru remaining levels 1 -> CURLVL applying the Givens   
-       rotations and permutation and then multiplying the center matrices 
-  
+       rotations and permutation and then multiplying the center matrices   
        against the current Z. */
 
     ptr = pow_ii(&c__2, tlvls) + 1;
@@ -215,36 +219,36 @@ static real c_b26 = 0.f;
 
 	latime_1.ops += (givptr[curr + 2] - givptr[curr]) * 6;
 	i__2 = givptr[curr + 1] - 1;
-	for (i = givptr[curr]; i <= i__2; ++i) {
-	    srot_(&c__1, &z[zptr1 + givcol[(i << 1) + 1] - 1], &c__1, &z[
-		    zptr1 + givcol[(i << 1) + 2] - 1], &c__1, &givnum[(i << 1)
-		     + 1], &givnum[(i << 1) + 2]);
+	for (i__ = givptr[curr]; i__ <= i__2; ++i__) {
+	    srot_(&c__1, &z__[zptr1 + givcol_ref(1, i__) - 1], &c__1, &z__[
+		    zptr1 + givcol_ref(2, i__) - 1], &c__1, &givnum_ref(1, 
+		    i__), &givnum_ref(2, i__));
 /* L30: */
 	}
 	i__2 = givptr[curr + 2] - 1;
-	for (i = givptr[curr + 1]; i <= i__2; ++i) {
-	    srot_(&c__1, &z[mid - 1 + givcol[(i << 1) + 1]], &c__1, &z[mid - 
-		    1 + givcol[(i << 1) + 2]], &c__1, &givnum[(i << 1) + 1], &
-		    givnum[(i << 1) + 2]);
+	for (i__ = givptr[curr + 1]; i__ <= i__2; ++i__) {
+	    srot_(&c__1, &z__[mid - 1 + givcol_ref(1, i__)], &c__1, &z__[mid 
+		    - 1 + givcol_ref(2, i__)], &c__1, &givnum_ref(1, i__), &
+		    givnum_ref(2, i__));
 /* L40: */
 	}
 	psiz1 = prmptr[curr + 1] - prmptr[curr];
 	psiz2 = prmptr[curr + 2] - prmptr[curr + 1];
 	i__2 = psiz1 - 1;
-	for (i = 0; i <= i__2; ++i) {
-	    ztemp[i + 1] = z[zptr1 + perm[prmptr[curr] + i] - 1];
+	for (i__ = 0; i__ <= i__2; ++i__) {
+	    ztemp[i__ + 1] = z__[zptr1 + perm[prmptr[curr] + i__] - 1];
 /* L50: */
 	}
 	i__2 = psiz2 - 1;
-	for (i = 0; i <= i__2; ++i) {
-	    ztemp[psiz1 + i + 1] = z[mid + perm[prmptr[curr + 1] + i] - 1];
+	for (i__ = 0; i__ <= i__2; ++i__) {
+	    ztemp[psiz1 + i__ + 1] = z__[mid + perm[prmptr[curr + 1] + i__] - 
+		    1];
 /* L60: */
 	}
 
 /*        Multiply Blocks at CURR and CURR+1   
 
-          Determine size of these matrices.  We add HALF to the value 
-of   
+          Determine size of these matrices.  We add HALF to the value of   
           the SQRT in case the machine underestimates one of these   
           square roots. */
 
@@ -255,17 +259,17 @@ of
 	if (bsiz1 > 0) {
 	    latime_1.ops += (bsiz1 << 1) * bsiz1;
 	    sgemv_("T", &bsiz1, &bsiz1, &c_b24, &q[qptr[curr]], &bsiz1, &
-		    ztemp[1], &c__1, &c_b26, &z[zptr1], &c__1);
+		    ztemp[1], &c__1, &c_b26, &z__[zptr1], &c__1);
 	}
 	i__2 = psiz1 - bsiz1;
-	scopy_(&i__2, &ztemp[bsiz1 + 1], &c__1, &z[zptr1 + bsiz1], &c__1);
+	scopy_(&i__2, &ztemp[bsiz1 + 1], &c__1, &z__[zptr1 + bsiz1], &c__1);
 	if (bsiz2 > 0) {
 	    latime_1.ops += (bsiz2 << 1) * bsiz2;
 	    sgemv_("T", &bsiz2, &bsiz2, &c_b24, &q[qptr[curr + 1]], &bsiz2, &
-		    ztemp[psiz1 + 1], &c__1, &c_b26, &z[mid], &c__1);
+		    ztemp[psiz1 + 1], &c__1, &c_b26, &z__[mid], &c__1);
 	}
 	i__2 = psiz2 - bsiz2;
-	scopy_(&i__2, &ztemp[psiz1 + bsiz2 + 1], &c__1, &z[mid + bsiz2], &
+	scopy_(&i__2, &ztemp[psiz1 + bsiz2 + 1], &c__1, &z__[mid + bsiz2], &
 		c__1);
 
 	i__2 = *tlvls - k;
@@ -278,4 +282,8 @@ of
 /*     End of SLAEDA */
 
 } /* slaeda_ */
+
+#undef givnum_ref
+#undef givcol_ref
+
 

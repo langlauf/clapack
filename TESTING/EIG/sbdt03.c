@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ static real c_b6 = -1.f;
 static integer c__1 = 1;
 static real c_b8 = 0.f;
 
-/* Subroutine */ int sbdt03_(char *uplo, integer *n, integer *kd, real *d, 
+/* Subroutine */ int sbdt03_(char *uplo, integer *n, integer *kd, real *d__, 
 	real *e, real *u, integer *ldu, real *s, real *vt, integer *ldvt, 
 	real *work, real *resid)
 {
@@ -20,7 +21,7 @@ static real c_b8 = 0.f;
     real r__1, r__2, r__3, r__4;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real bnorm;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
@@ -30,7 +31,10 @@ static real c_b8 = 0.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define vt_ref(a_1,a_2) vt[(a_2)*vt_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -51,8 +55,7 @@ static real c_b8 = 0.f;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix B is upper or lower bidiagonal. 
-  
+            Specifies whether the matrix B is upper or lower bidiagonal.   
             = 'U':  Upper bidiagonal   
             = 'L':  Lower bidiagonal   
 
@@ -61,10 +64,8 @@ static real c_b8 = 0.f;
 
     KD      (input) INTEGER   
             The bandwidth of the bidiagonal matrix B.  If KD = 1, the   
-            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is 
-  
-            not referenced.  If KD is greater than 1, it is assumed to be 
-  
+            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is   
+            not referenced.  If KD is greater than 1, it is assumed to be   
             1, and if KD is less than 0, it is assumed to be 0.   
 
     D       (input) REAL array, dimension (N)   
@@ -95,24 +96,22 @@ static real c_b8 = 0.f;
     WORK    (workspace) REAL array, dimension (2*N)   
 
     RESID   (output) REAL   
-            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS ) 
-  
+            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS )   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --s;
     vt_dim1 = *ldvt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     --work;
 
@@ -136,22 +135,22 @@ static real c_b8 = 0.f;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*n + i] = s[i] * vt[i + j * vt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*n + i__] = s[i__] * vt_ref(i__, j);
 /* L10: */
 		}
 		sgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
 			n + 1], &c__1, &c_b8, &work[1], &c__1);
-		work[j] += d[j];
+		work[j] += d__[j];
 		if (j > 1) {
 		    work[j - 1] += e[j - 1];
 /* Computing MAX */
-		    r__3 = bnorm, r__4 = (r__1 = d[j], dabs(r__1)) + (r__2 = 
-			    e[j - 1], dabs(r__2));
+		    r__3 = bnorm, r__4 = (r__1 = d__[j], dabs(r__1)) + (r__2 =
+			     e[j - 1], dabs(r__2));
 		    bnorm = dmax(r__3,r__4);
 		} else {
 /* Computing MAX */
-		    r__2 = bnorm, r__3 = (r__1 = d[j], dabs(r__1));
+		    r__2 = bnorm, r__3 = (r__1 = d__[j], dabs(r__1));
 		    bnorm = dmax(r__2,r__3);
 		}
 /* Computing MAX */
@@ -166,22 +165,22 @@ static real c_b8 = 0.f;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*n + i] = s[i] * vt[i + j * vt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*n + i__] = s[i__] * vt_ref(i__, j);
 /* L30: */
 		}
 		sgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
 			n + 1], &c__1, &c_b8, &work[1], &c__1);
-		work[j] += d[j];
+		work[j] += d__[j];
 		if (j < *n) {
 		    work[j + 1] += e[j];
 /* Computing MAX */
-		    r__3 = bnorm, r__4 = (r__1 = d[j], dabs(r__1)) + (r__2 = 
-			    e[j], dabs(r__2));
+		    r__3 = bnorm, r__4 = (r__1 = d__[j], dabs(r__1)) + (r__2 =
+			     e[j], dabs(r__2));
 		    bnorm = dmax(r__3,r__4);
 		} else {
 /* Computing MAX */
-		    r__2 = bnorm, r__3 = (r__1 = d[j], dabs(r__1));
+		    r__2 = bnorm, r__3 = (r__1 = d__[j], dabs(r__1));
 		    bnorm = dmax(r__2,r__3);
 		}
 /* Computing MAX */
@@ -197,20 +196,20 @@ static real c_b8 = 0.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= i__2; ++i) {
-		work[*n + i] = s[i] * vt[i + j * vt_dim1];
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		work[*n + i__] = s[i__] * vt_ref(i__, j);
 /* L50: */
 	    }
 	    sgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*n + 
 		    1], &c__1, &c_b8, &work[1], &c__1);
-	    work[j] += d[j];
+	    work[j] += d__[j];
 /* Computing MAX */
 	    r__1 = *resid, r__2 = sasum_(n, &work[1], &c__1);
 	    *resid = dmax(r__1,r__2);
 /* L60: */
 	}
-	j = isamax_(n, &d[1], &c__1);
-	bnorm = (r__1 = d[j], dabs(r__1));
+	j = isamax_(n, &d__[1], &c__1);
+	bnorm = (r__1 = d__[j], dabs(r__1));
     }
 
 /*     Compute norm(B - U * S * V') / ( n * norm(B) * EPS ) */
@@ -242,4 +241,7 @@ static real c_b8 = 0.f;
 /*     End of SBDT03 */
 
 } /* sbdt03_ */
+
+#undef vt_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	 doublereal *ab, integer *ldab, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
     Purpose   
     =======   
 
-    DLANTB  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the element of  largest absolute value  of an 
-  
+    DLANTB  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the element of  largest absolute value  of an   
     n by n triangular band matrix A,  with ( k + 1 ) diagonals.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -47,8 +43,7 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
             above.   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -62,10 +57,8 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
             set to zero.   
 
     K       (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U', 
-  
-            or the number of sub-diagonals of the matrix A if UPLO = 'L'. 
-  
+            The number of super-diagonals of the matrix A if UPLO = 'U',   
+            or the number of sub-diagonals of the matrix A if UPLO = 'L'.   
             K >= 0.   
 
     AB      (input) DOUBLE PRECISION array, dimension (LDAB,N)   
@@ -85,13 +78,10 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
             where LWORK >= N when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -101,7 +91,7 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i, j, l;
+    static integer i__, j, l;
     static doublereal scale;
     static logical udiag;
     extern logical lsame_(char *, char *);
@@ -109,13 +99,15 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
     extern /* Subroutine */ int dlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
     static doublereal sum;
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.;
     } else if (lsame_(norm, "M")) {
@@ -126,14 +118,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	    value = 1.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 		    i__2 = *k + 2 - j;
 		    i__3 = *k;
-		    for (i = max(*k+2-j,1); i <= *k; ++i) {
+		    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-			d__2 = value, d__3 = (d__1 = AB(i,j), abs(
-				d__1));
+			d__2 = value, d__3 = (d__1 = ab_ref(i__, j), abs(d__1)
+				);
 			value = max(d__2,d__3);
 /* L10: */
 		    }
@@ -141,14 +133,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__2 = *n + 1 - j, i__4 = *k + 1;
 		    i__3 = min(i__2,i__4);
-		    for (i = 2; i <= min(*n+1-j,*k+1); ++i) {
+		    for (i__ = 2; i__ <= i__3; ++i__) {
 /* Computing MAX */
-			d__2 = value, d__3 = (d__1 = AB(i,j), abs(
-				d__1));
+			d__2 = value, d__3 = (d__1 = ab_ref(i__, j), abs(d__1)
+				);
 			value = max(d__2,d__3);
 /* L30: */
 		    }
@@ -159,14 +151,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	    value = 0.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 		    i__3 = *k + 2 - j;
 		    i__2 = *k + 1;
-		    for (i = max(*k+2-j,1); i <= *k+1; ++i) {
+		    for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__2 = value, d__3 = (d__1 = AB(i,j), abs(
-				d__1));
+			d__2 = value, d__3 = (d__1 = ab_ref(i__, j), abs(d__1)
+				);
 			value = max(d__2,d__3);
 /* L50: */
 		    }
@@ -174,14 +166,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__3 = *n + 1 - j, i__4 = *k + 1;
 		    i__2 = min(i__3,i__4);
-		    for (i = 1; i <= min(*n+1-j,*k+1); ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__2 = value, d__3 = (d__1 = AB(i,j), abs(
-				d__1));
+			d__2 = value, d__3 = (d__1 = ab_ref(i__, j), abs(d__1)
+				);
 			value = max(d__2,d__3);
 /* L70: */
 		    }
@@ -189,7 +181,8 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		}
 	    }
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
@@ -197,14 +190,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	udiag = lsame_(diag, "U");
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.;
 /* Computing MAX */
 		    i__2 = *k + 2 - j;
 		    i__3 = *k;
-		    for (i = max(*k+2-j,1); i <= *k; ++i) {
-			sum += (d__1 = AB(i,j), abs(d__1));
+		    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
+			sum += (d__1 = ab_ref(i__, j), abs(d__1));
 /* L90: */
 		    }
 		} else {
@@ -212,8 +205,8 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 /* Computing MAX */
 		    i__3 = *k + 2 - j;
 		    i__2 = *k + 1;
-		    for (i = max(*k+2-j,1); i <= *k+1; ++i) {
-			sum += (d__1 = AB(i,j), abs(d__1));
+		    for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
+			sum += (d__1 = ab_ref(i__, j), abs(d__1));
 /* L100: */
 		    }
 		}
@@ -222,14 +215,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.;
 /* Computing MIN */
 		    i__3 = *n + 1 - j, i__4 = *k + 1;
 		    i__2 = min(i__3,i__4);
-		    for (i = 2; i <= min(*n+1-j,*k+1); ++i) {
-			sum += (d__1 = AB(i,j), abs(d__1));
+		    for (i__ = 2; i__ <= i__2; ++i__) {
+			sum += (d__1 = ab_ref(i__, j), abs(d__1));
 /* L120: */
 		    }
 		} else {
@@ -237,8 +230,8 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 /* Computing MIN */
 		    i__3 = *n + 1 - j, i__4 = *k + 1;
 		    i__2 = min(i__3,i__4);
-		    for (i = 1; i <= min(*n+1-j,*k+1); ++i) {
-			sum += (d__1 = AB(i,j), abs(d__1));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			sum += (d__1 = ab_ref(i__, j), abs(d__1));
 /* L130: */
 		    }
 		}
@@ -254,38 +247,36 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	if (lsame_(uplo, "U")) {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L150: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    l = *k + 1 - j;
 /* Computing MAX */
 		    i__2 = 1, i__3 = j - *k;
 		    i__4 = j - 1;
-		    for (i = max(1,j-*k); i <= j-1; ++i) {
-			WORK(i) += (d__1 = AB(l+i,j), abs(d__1))
-				;
+		    for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
+			work[i__] += (d__1 = ab_ref(l + i__, j), abs(d__1));
 /* L160: */
 		    }
 /* L170: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L180: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    l = *k + 1 - j;
 /* Computing MAX */
 		    i__4 = 1, i__2 = j - *k;
 		    i__3 = j;
-		    for (i = max(1,j-*k); i <= j; ++i) {
-			WORK(i) += (d__1 = AB(l+i,j), abs(d__1))
-				;
+		    for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
+			work[i__] += (d__1 = ab_ref(l + i__, j), abs(d__1));
 /* L190: */
 		    }
 /* L200: */
@@ -294,38 +285,36 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	} else {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L210: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    l = 1 - j;
 /* Computing MIN */
 		    i__4 = *n, i__2 = j + *k;
 		    i__3 = min(i__4,i__2);
-		    for (i = j + 1; i <= min(*n,j+*k); ++i) {
-			WORK(i) += (d__1 = AB(l+i,j), abs(d__1))
-				;
+		    for (i__ = j + 1; i__ <= i__3; ++i__) {
+			work[i__] += (d__1 = ab_ref(l + i__, j), abs(d__1));
 /* L220: */
 		    }
 /* L230: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L240: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    l = 1 - j;
 /* Computing MIN */
 		    i__4 = *n, i__2 = j + *k;
 		    i__3 = min(i__4,i__2);
-		    for (i = j; i <= min(*n,j+*k); ++i) {
-			WORK(i) += (d__1 = AB(l+i,j), abs(d__1))
-				;
+		    for (i__ = j; i__ <= i__3; ++i__) {
+			work[i__] += (d__1 = ab_ref(l + i__, j), abs(d__1));
 /* L250: */
 		    }
 /* L260: */
@@ -333,9 +322,9 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 	    }
 	}
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = value, d__2 = WORK(i);
+	    d__1 = value, d__2 = work[i__];
 	    value = max(d__1,d__2);
 /* L270: */
 	}
@@ -349,14 +338,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		sum = (doublereal) (*n);
 		if (*k > 0) {
 		    i__1 = *n;
-		    for (j = 2; j <= *n; ++j) {
-/* Computing MIN */
-			i__4 = j - 1;
-			i__3 = min(i__4,*k);
+		    for (j = 2; j <= i__1; ++j) {
 /* Computing MAX */
-			i__2 = *k + 2 - j;
-			dlassq_(&i__3, &AB(max(*k+2-j,1),j), &c__1, 
-				&scale, &sum);
+			i__3 = *k + 2 - j;
+/* Computing MIN */
+			i__2 = j - 1;
+			i__4 = min(i__2,*k);
+			dlassq_(&i__4, &ab_ref(max(i__3,1), j), &c__1, &scale,
+				 &sum);
 /* L280: */
 		    }
 		}
@@ -364,14 +353,14 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		scale = 0.;
 		sum = 1.;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-/* Computing MIN */
-		    i__4 = j, i__2 = *k + 1;
-		    i__3 = min(i__4,i__2);
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		    i__5 = *k + 2 - j;
-		    dlassq_(&i__3, &AB(max(*k+2-j,1),j), &c__1, &
-			    scale, &sum);
+		    i__3 = *k + 2 - j;
+/* Computing MIN */
+		    i__2 = j, i__5 = *k + 1;
+		    i__4 = min(i__2,i__5);
+		    dlassq_(&i__4, &ab_ref(max(i__3,1), j), &c__1, &scale, &
+			    sum);
 /* L290: */
 		}
 	    }
@@ -381,12 +370,11 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		sum = (doublereal) (*n);
 		if (*k > 0) {
 		    i__1 = *n - 1;
-		    for (j = 1; j <= *n-1; ++j) {
+		    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 			i__4 = *n - j;
 			i__3 = min(i__4,*k);
-			dlassq_(&i__3, &AB(2,j), &c__1, &scale, &
-				sum);
+			dlassq_(&i__3, &ab_ref(2, j), &c__1, &scale, &sum);
 /* L300: */
 		    }
 		}
@@ -394,11 +382,11 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 		scale = 0.;
 		sum = 1.;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__4 = *n - j + 1, i__2 = *k + 1;
 		    i__3 = min(i__4,i__2);
-		    dlassq_(&i__3, &AB(1,j), &c__1, &scale, &sum);
+		    dlassq_(&i__3, &ab_ref(1, j), &c__1, &scale, &sum);
 /* L310: */
 		}
 	    }
@@ -412,4 +400,7 @@ doublereal dlantb_(char *norm, char *uplo, char *diag, integer *n, integer *k,
 /*     End of DLANTB */
 
 } /* dlantb_ */
+
+#undef ab_ref
+
 

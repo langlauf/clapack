@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ static real c_b28 = -1.f;
 static real c_b29 = 1.f;
 
 /* Subroutine */ int crqt01_(integer *m, integer *n, complex *a, complex *af, 
-	complex *q, complex *r, integer *lda, complex *tau, complex *work, 
+	complex *q, complex *r__, integer *lda, complex *tau, complex *work, 
 	integer *lwork, real *rwork, real *result)
 {
     /* System generated locals */
@@ -56,7 +57,15 @@ static real c_b29 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define r___subscr(a_1,a_2) (a_2)*r_dim1 + a_1
+#define r___ref(a_1,a_2) r__[r___subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -65,8 +74,7 @@ static real c_b29 = 1.f;
     Purpose   
     =======   
 
-    CRQT01 tests CGERQF, which computes the RQ factorization of an m-by-n 
-  
+    CRQT01 tests CGERQF, which computes the RQ factorization of an m-by-n   
     matrix A, and partially tests CUNGRQ which forms the n-by-n   
     orthogonal matrix Q.   
 
@@ -85,8 +93,7 @@ static real c_b29 = 1.f;
             The m-by-n matrix A.   
 
     AF      (output) COMPLEX array, dimension (LDA,N)   
-            Details of the RQ factorization of A, as returned by CGERQF. 
-  
+            Details of the RQ factorization of A, as returned by CGERQF.   
             See CGERQF for further details.   
 
     Q       (output) COMPLEX array, dimension (LDA,N)   
@@ -99,8 +106,7 @@ static real c_b29 = 1.f;
             LDA >= max(M,N).   
 
     TAU     (output) COMPLEX array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by CGERQF.   
 
     WORK    (workspace) COMPLEX array, dimension (LWORK)   
@@ -115,22 +121,21 @@ static real c_b29 = 1.f;
             RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -147,7 +152,7 @@ static real c_b29 = 1.f;
 
 /*     Factorize the matrix A in the array AF. */
 
-    s_copy(srnamc_1.srnamt, "CGERQF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CGERQF", (ftnlen)6, (ftnlen)6);
     cgerqf_(m, n, &af[af_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy details of Q */
@@ -156,57 +161,58 @@ static real c_b29 = 1.f;
     if (*m <= *n) {
 	if (*m > 0 && *m < *n) {
 	    i__1 = *n - *m;
-	    clacpy_("Full", m, &i__1, &af[af_offset], lda, &q[*n - *m + 1 + 
-		    q_dim1], lda);
+	    clacpy_("Full", m, &i__1, &af[af_offset], lda, &q_ref(*n - *m + 1,
+		     1), lda);
 	}
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    clacpy_("Lower", &i__1, &i__2, &af[(*n - *m + 1) * af_dim1 + 2], 
-		    lda, &q[*n - *m + 2 + (*n - *m + 1) * q_dim1], lda);
+	    clacpy_("Lower", &i__1, &i__2, &af_ref(2, *n - *m + 1), lda, &
+		    q_ref(*n - *m + 2, *n - *m + 1), lda);
 	}
     } else {
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    clacpy_("Lower", &i__1, &i__2, &af[*m - *n + 2 + af_dim1], lda, &
-		    q[q_dim1 + 2], lda);
+	    clacpy_("Lower", &i__1, &i__2, &af_ref(*m - *n + 2, 1), lda, &
+		    q_ref(2, 1), lda);
 	}
     }
 
 /*     Generate the n-by-n matrix Q */
 
-    s_copy(srnamc_1.srnamt, "CUNGRQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNGRQ", (ftnlen)6, (ftnlen)6);
     cungrq_(n, n, &minmn, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy R */
 
-    claset_("Full", m, n, &c_b12, &c_b12, &r[r_offset], lda);
+    claset_("Full", m, n, &c_b12, &c_b12, &r__[r_offset], lda);
     if (*m <= *n) {
 	if (*m > 0) {
-	    clacpy_("Upper", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &r[(
-		    *n - *m + 1) * r_dim1 + 1], lda);
+	    clacpy_("Upper", m, m, &af_ref(1, *n - *m + 1), lda, &r___ref(1, *
+		    n - *m + 1), lda);
 	}
     } else {
 	if (*m > *n && *n > 0) {
 	    i__1 = *m - *n;
-	    clacpy_("Full", &i__1, n, &af[af_offset], lda, &r[r_offset], lda);
+	    clacpy_("Full", &i__1, n, &af[af_offset], lda, &r__[r_offset], 
+		    lda);
 	}
 	if (*n > 0) {
-	    clacpy_("Upper", n, n, &af[*m - *n + 1 + af_dim1], lda, &r[*m - *
-		    n + 1 + r_dim1], lda);
+	    clacpy_("Upper", n, n, &af_ref(*m - *n + 1, 1), lda, &r___ref(*m 
+		    - *n + 1, 1), lda);
 	}
     }
 
 /*     Compute R - A*Q' */
 
     cgemm_("No transpose", "Conjugate transpose", m, n, n, &c_b19, &a[
-	    a_offset], lda, &q[q_offset], lda, &c_b20, &r[r_offset], lda);
+	    a_offset], lda, &q[q_offset], lda, &c_b20, &r__[r_offset], lda);
 
 /*     Compute norm( R - Q'*A ) / ( N * norm(A) * EPS ) . */
 
     anorm = clange_("1", m, n, &a[a_offset], lda, &rwork[1]);
-    resid = clange_("1", m, n, &r[r_offset], lda, &rwork[1]);
+    resid = clange_("1", m, n, &r__[r_offset], lda, &rwork[1]);
     if (anorm > 0.f) {
 	result[1] = resid / (real) max(1,*n) / anorm / eps;
     } else {
@@ -215,13 +221,13 @@ static real c_b29 = 1.f;
 
 /*     Compute I - Q*Q' */
 
-    claset_("Full", n, n, &c_b12, &c_b20, &r[r_offset], lda);
+    claset_("Full", n, n, &c_b12, &c_b20, &r__[r_offset], lda);
     cherk_("Upper", "No transpose", n, n, &c_b28, &q[q_offset], lda, &c_b29, &
-	    r[r_offset], lda);
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q*Q' ) / ( N * EPS ) . */
 
-    resid = clansy_("1", "Upper", n, &r[r_offset], lda, &rwork[1]);
+    resid = clansy_("1", "Upper", n, &r__[r_offset], lda, &rwork[1]);
 
     result[2] = resid / (real) max(1,*n) / eps;
 
@@ -230,4 +236,12 @@ static real c_b29 = 1.f;
 /*     End of CRQT01 */
 
 } /* crqt01_ */
+
+#undef af_ref
+#undef af_subscr
+#undef r___ref
+#undef r___subscr
+#undef q_ref
+#undef q_subscr
+
 

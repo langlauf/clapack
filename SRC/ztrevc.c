@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrevc_(char *side, char *howmny, logical *select, 
@@ -5,29 +6,26 @@
 	integer *ldvl, doublecomplex *vr, integer *ldvr, integer *mm, integer 
 	*m, doublecomplex *work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZTREVC computes some or all of the right and/or left eigenvectors of 
-  
+    ZTREVC computes some or all of the right and/or left eigenvectors of   
     a complex upper triangular matrix T.   
 
-    The right eigenvector x and the left eigenvector y of T corresponding 
-  
+    The right eigenvector x and the left eigenvector y of T corresponding   
     to an eigenvalue w are defined by:   
 
                  T*x = w*x,     y'*T = w*y'   
 
     where y' denotes the conjugate transpose of the vector y.   
 
-    If all eigenvectors are requested, the routine may either return the 
-  
+    If all eigenvectors are requested, the routine may either return the   
     matrices X and/or Y of right or left eigenvectors of T, or the   
     products Q*X and/or Q*Y, where Q is an input unitary   
     matrix. If T was obtained from the Schur factorization of an   
@@ -73,10 +71,12 @@
             Schur vectors returned by ZHSEQR).   
             On exit, if SIDE = 'L' or 'B', VL contains:   
             if HOWMNY = 'A', the matrix Y of left eigenvectors of T;   
+                             VL is lower triangular. The i-th column   
+                             VL(i) of VL is the eigenvector corresponding   
+                             to T(i,i).   
             if HOWMNY = 'B', the matrix Q*Y;   
             if HOWMNY = 'S', the left eigenvectors of T specified by   
-                             SELECT, stored consecutively in the columns 
-  
+                             SELECT, stored consecutively in the columns   
                              of VL, in the same order as their   
                              eigenvalues.   
             If SIDE = 'R', VL is not referenced.   
@@ -91,10 +91,12 @@
             Schur vectors returned by ZHSEQR).   
             On exit, if SIDE = 'R' or 'B', VR contains:   
             if HOWMNY = 'A', the matrix X of right eigenvectors of T;   
+                             VR is upper triangular. The i-th column   
+                             VR(i) of VR is the eigenvector corresponding   
+                             to T(i,i).   
             if HOWMNY = 'B', the matrix Q*X;   
             if HOWMNY = 'S', the right eigenvectors of T specified by   
-                             SELECT, stored consecutively in the columns 
-  
+                             SELECT, stored consecutively in the columns   
                              of VR, in the same order as their   
                              eigenvalues.   
             If SIDE = 'L', VR is not referenced.   
@@ -131,15 +133,12 @@
     magnitude has magnitude 1; here the magnitude of a complex number   
     (x,y) is taken to be |x| + |y|.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b2 = {1.,0.};
     static integer c__1 = 1;
@@ -156,7 +155,7 @@
     static logical allv;
     static doublereal unfl, ovfl, smin;
     static logical over;
-    static integer i, j, k;
+    static integer i__, j, k;
     static doublereal scale;
     extern logical lsame_(char *, char *);
     static doublereal remax;
@@ -180,23 +179,34 @@
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, integer *);
     static doublereal ulp;
+#define t_subscr(a_1,a_2) (a_2)*t_dim1 + a_1
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*vl_dim1 + a_1
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*vr_dim1 + a_1
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
 
 
+    --select;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --work;
+    --rwork;
 
-#define SELECT(I) select[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-
+    /* Function Body */
     bothv = lsame_(side, "B");
     rightv = lsame_(side, "R") || bothv;
     leftv = lsame_(side, "L") || bothv;
 
     allv = lsame_(howmny, "A");
-    over = lsame_(howmny, "B") || lsame_(howmny, "O");
+    over = lsame_(howmny, "B");
     somev = lsame_(howmny, "S");
 
 /*     Set M to the number of columns required to store the selected   
@@ -205,8 +215,8 @@
     if (somev) {
 	*m = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    if (SELECT(j)) {
+	for (j = 1; j <= i__1; ++j) {
+	    if (select[j]) {
 		++(*m);
 	    }
 /* L10: */
@@ -254,21 +264,21 @@
 /*     Store the diagonal elements of T in working array WORK. */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i + *n;
-	i__3 = i + i * t_dim1;
-	WORK(i+*n).r = T(i,i).r, WORK(i+*n).i = T(i,i).i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__ + *n;
+	i__3 = t_subscr(i__, i__);
+	work[i__2].r = t[i__3].r, work[i__2].i = t[i__3].i;
 /* L20: */
     }
 
 /*     Compute 1-norm of each column of strictly upper triangular   
        part of T to control overflow in triangular solver. */
 
-    RWORK(1) = 0.;
+    rwork[1] = 0.;
     i__1 = *n;
-    for (j = 2; j <= *n; ++j) {
+    for (j = 2; j <= i__1; ++j) {
 	i__2 = j - 1;
-	RWORK(j) = dzasum_(&i__2, &T(1,j), &c__1);
+	rwork[j] = dzasum_(&i__2, &t_ref(1, j), &c__1);
 /* L30: */
     }
 
@@ -280,25 +290,26 @@
 	for (ki = *n; ki >= 1; --ki) {
 
 	    if (somev) {
-		if (! SELECT(ki)) {
+		if (! select[ki]) {
 		    goto L80;
 		}
 	    }
 /* Computing MAX */
-	    i__1 = ki + ki * t_dim1;
-	    d__3 = ulp * ((d__1 = T(ki,ki).r, abs(d__1)) + (d__2 = d_imag(&T(ki,ki)), abs(d__2)));
+	    i__1 = t_subscr(ki, ki);
+	    d__3 = ulp * ((d__1 = t[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+		    t_ref(ki, ki)), abs(d__2)));
 	    smin = max(d__3,smlnum);
 
-	    WORK(1).r = 1., WORK(1).i = 0.;
+	    work[1].r = 1., work[1].i = 0.;
 
 /*           Form right-hand side. */
 
 	    i__1 = ki - 1;
-	    for (k = 1; k <= ki-1; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 		i__2 = k;
-		i__3 = k + ki * t_dim1;
-		z__1.r = -T(k,ki).r, z__1.i = -T(k,ki).i;
-		WORK(k).r = z__1.r, WORK(k).i = z__1.i;
+		i__3 = t_subscr(k, ki);
+		z__1.r = -t[i__3].r, z__1.i = -t[i__3].i;
+		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L40: */
 	    }
 
@@ -306,67 +317,69 @@
                 (T(1:KI-1,1:KI-1) - T(KI,KI))*X = SCALE*WORK. */
 
 	    i__1 = ki - 1;
-	    for (k = 1; k <= ki-1; ++k) {
-		i__2 = k + k * t_dim1;
-		i__3 = k + k * t_dim1;
-		i__4 = ki + ki * t_dim1;
-		z__1.r = T(k,k).r - T(ki,ki).r, z__1.i = T(k,k).i - T(ki,ki)
+	    for (k = 1; k <= i__1; ++k) {
+		i__2 = t_subscr(k, k);
+		i__3 = t_subscr(k, k);
+		i__4 = t_subscr(ki, ki);
+		z__1.r = t[i__3].r - t[i__4].r, z__1.i = t[i__3].i - t[i__4]
 			.i;
-		T(k,k).r = z__1.r, T(k,k).i = z__1.i;
-		i__2 = k + k * t_dim1;
-		if ((d__1 = T(k,k).r, abs(d__1)) + (d__2 = d_imag(&T(k,k)), abs(d__2)) < smin) {
-		    i__3 = k + k * t_dim1;
-		    T(k,k).r = smin, T(k,k).i = 0.;
+		t[i__2].r = z__1.r, t[i__2].i = z__1.i;
+		i__2 = t_subscr(k, k);
+		if ((d__1 = t[i__2].r, abs(d__1)) + (d__2 = d_imag(&t_ref(k, 
+			k)), abs(d__2)) < smin) {
+		    i__3 = t_subscr(k, k);
+		    t[i__3].r = smin, t[i__3].i = 0.;
 		}
 /* L50: */
 	    }
 
 	    if (ki > 1) {
 		i__1 = ki - 1;
-		zlatrs_("Upper", "No transpose", "Non-unit", "Y", &i__1, &T(1,1), ldt, &WORK(1), &scale, &RWORK(1), info);
+		zlatrs_("Upper", "No transpose", "Non-unit", "Y", &i__1, &t[
+			t_offset], ldt, &work[1], &scale, &rwork[1], info);
 		i__1 = ki;
-		WORK(ki).r = scale, WORK(ki).i = 0.;
+		work[i__1].r = scale, work[i__1].i = 0.;
 	    }
 
 /*           Copy the vector x or Q*x to VR and normalize. */
 
 	    if (! over) {
-		zcopy_(&ki, &WORK(1), &c__1, &VR(1,is), &c__1);
+		zcopy_(&ki, &work[1], &c__1, &vr_ref(1, is), &c__1);
 
-		ii = izamax_(&ki, &VR(1,is), &c__1);
-		i__1 = ii + is * vr_dim1;
-		remax = 1. / ((d__1 = VR(ii,is).r, abs(d__1)) + (d__2 = d_imag(
-			&VR(ii,is)), abs(d__2)));
-		zdscal_(&ki, &remax, &VR(1,is), &c__1);
+		ii = izamax_(&ki, &vr_ref(1, is), &c__1);
+		i__1 = vr_subscr(ii, is);
+		remax = 1. / ((d__1 = vr[i__1].r, abs(d__1)) + (d__2 = d_imag(
+			&vr_ref(ii, is)), abs(d__2)));
+		zdscal_(&ki, &remax, &vr_ref(1, is), &c__1);
 
 		i__1 = *n;
-		for (k = ki + 1; k <= *n; ++k) {
-		    i__2 = k + is * vr_dim1;
-		    VR(k,is).r = 0., VR(k,is).i = 0.;
+		for (k = ki + 1; k <= i__1; ++k) {
+		    i__2 = vr_subscr(k, is);
+		    vr[i__2].r = 0., vr[i__2].i = 0.;
 /* L60: */
 		}
 	    } else {
 		if (ki > 1) {
 		    i__1 = ki - 1;
 		    z__1.r = scale, z__1.i = 0.;
-		    zgemv_("N", n, &i__1, &c_b2, &VR(1,1), ldvr, &WORK(
-			    1), &c__1, &z__1, &VR(1,ki), &c__1);
+		    zgemv_("N", n, &i__1, &c_b2, &vr[vr_offset], ldvr, &work[
+			    1], &c__1, &z__1, &vr_ref(1, ki), &c__1);
 		}
 
-		ii = izamax_(n, &VR(1,ki), &c__1);
-		i__1 = ii + ki * vr_dim1;
-		remax = 1. / ((d__1 = VR(ii,ki).r, abs(d__1)) + (d__2 = d_imag(
-			&VR(ii,ki)), abs(d__2)));
-		zdscal_(n, &remax, &VR(1,ki), &c__1);
+		ii = izamax_(n, &vr_ref(1, ki), &c__1);
+		i__1 = vr_subscr(ii, ki);
+		remax = 1. / ((d__1 = vr[i__1].r, abs(d__1)) + (d__2 = d_imag(
+			&vr_ref(ii, ki)), abs(d__2)));
+		zdscal_(n, &remax, &vr_ref(1, ki), &c__1);
 	    }
 
 /*           Set back the original diagonal elements of T. */
 
 	    i__1 = ki - 1;
-	    for (k = 1; k <= ki-1; ++k) {
-		i__2 = k + k * t_dim1;
+	    for (k = 1; k <= i__1; ++k) {
+		i__2 = t_subscr(k, k);
 		i__3 = k + *n;
-		T(k,k).r = WORK(k+*n).r, T(k,k).i = WORK(k+*n).i;
+		t[i__2].r = work[i__3].r, t[i__2].i = work[i__3].i;
 /* L70: */
 	    }
 
@@ -382,29 +395,30 @@ L80:
 
 	is = 1;
 	i__1 = *n;
-	for (ki = 1; ki <= *n; ++ki) {
+	for (ki = 1; ki <= i__1; ++ki) {
 
 	    if (somev) {
-		if (! SELECT(ki)) {
+		if (! select[ki]) {
 		    goto L130;
 		}
 	    }
 /* Computing MAX */
-	    i__2 = ki + ki * t_dim1;
-	    d__3 = ulp * ((d__1 = T(ki,ki).r, abs(d__1)) + (d__2 = d_imag(&T(ki,ki)), abs(d__2)));
+	    i__2 = t_subscr(ki, ki);
+	    d__3 = ulp * ((d__1 = t[i__2].r, abs(d__1)) + (d__2 = d_imag(&
+		    t_ref(ki, ki)), abs(d__2)));
 	    smin = max(d__3,smlnum);
 
 	    i__2 = *n;
-	    WORK(*n).r = 1., WORK(*n).i = 0.;
+	    work[i__2].r = 1., work[i__2].i = 0.;
 
 /*           Form right-hand side. */
 
 	    i__2 = *n;
-	    for (k = ki + 1; k <= *n; ++k) {
+	    for (k = ki + 1; k <= i__2; ++k) {
 		i__3 = k;
-		d_cnjg(&z__2, &T(ki,k));
+		d_cnjg(&z__2, &t_ref(ki, k));
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
-		WORK(k).r = z__1.r, WORK(k).i = z__1.i;
+		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L90: */
 	    }
 
@@ -412,17 +426,18 @@ L80:
                 (T(KI+1:N,KI+1:N) - T(KI,KI))'*X = SCALE*WORK. */
 
 	    i__2 = *n;
-	    for (k = ki + 1; k <= *n; ++k) {
-		i__3 = k + k * t_dim1;
-		i__4 = k + k * t_dim1;
-		i__5 = ki + ki * t_dim1;
-		z__1.r = T(k,k).r - T(ki,ki).r, z__1.i = T(k,k).i - T(ki,ki)
+	    for (k = ki + 1; k <= i__2; ++k) {
+		i__3 = t_subscr(k, k);
+		i__4 = t_subscr(k, k);
+		i__5 = t_subscr(ki, ki);
+		z__1.r = t[i__4].r - t[i__5].r, z__1.i = t[i__4].i - t[i__5]
 			.i;
-		T(k,k).r = z__1.r, T(k,k).i = z__1.i;
-		i__3 = k + k * t_dim1;
-		if ((d__1 = T(k,k).r, abs(d__1)) + (d__2 = d_imag(&T(k,k)), abs(d__2)) < smin) {
-		    i__4 = k + k * t_dim1;
-		    T(k,k).r = smin, T(k,k).i = 0.;
+		t[i__3].r = z__1.r, t[i__3].i = z__1.i;
+		i__3 = t_subscr(k, k);
+		if ((d__1 = t[i__3].r, abs(d__1)) + (d__2 = d_imag(&t_ref(k, 
+			k)), abs(d__2)) < smin) {
+		    i__4 = t_subscr(k, k);
+		    t[i__4].r = smin, t[i__4].i = 0.;
 		}
 /* L100: */
 	    }
@@ -430,55 +445,54 @@ L80:
 	    if (ki < *n) {
 		i__2 = *n - ki;
 		zlatrs_("Upper", "Conjugate transpose", "Non-unit", "Y", &
-			i__2, &T(ki+1,ki+1), ldt, &WORK(ki + 
-			1), &scale, &RWORK(1), info);
+			i__2, &t_ref(ki + 1, ki + 1), ldt, &work[ki + 1], &
+			scale, &rwork[1], info);
 		i__2 = ki;
-		WORK(ki).r = scale, WORK(ki).i = 0.;
+		work[i__2].r = scale, work[i__2].i = 0.;
 	    }
 
 /*           Copy the vector x or Q*x to VL and normalize. */
 
 	    if (! over) {
 		i__2 = *n - ki + 1;
-		zcopy_(&i__2, &WORK(ki), &c__1, &VL(ki,is), &c__1)
-			;
+		zcopy_(&i__2, &work[ki], &c__1, &vl_ref(ki, is), &c__1);
 
 		i__2 = *n - ki + 1;
-		ii = izamax_(&i__2, &VL(ki,is), &c__1) + ki - 1;
-		i__2 = ii + is * vl_dim1;
-		remax = 1. / ((d__1 = VL(ii,is).r, abs(d__1)) + (d__2 = d_imag(
-			&VL(ii,is)), abs(d__2)));
+		ii = izamax_(&i__2, &vl_ref(ki, is), &c__1) + ki - 1;
+		i__2 = vl_subscr(ii, is);
+		remax = 1. / ((d__1 = vl[i__2].r, abs(d__1)) + (d__2 = d_imag(
+			&vl_ref(ii, is)), abs(d__2)));
 		i__2 = *n - ki + 1;
-		zdscal_(&i__2, &remax, &VL(ki,is), &c__1);
+		zdscal_(&i__2, &remax, &vl_ref(ki, is), &c__1);
 
 		i__2 = ki - 1;
-		for (k = 1; k <= ki-1; ++k) {
-		    i__3 = k + is * vl_dim1;
-		    VL(k,is).r = 0., VL(k,is).i = 0.;
+		for (k = 1; k <= i__2; ++k) {
+		    i__3 = vl_subscr(k, is);
+		    vl[i__3].r = 0., vl[i__3].i = 0.;
 /* L110: */
 		}
 	    } else {
 		if (ki < *n) {
 		    i__2 = *n - ki;
 		    z__1.r = scale, z__1.i = 0.;
-		    zgemv_("N", n, &i__2, &c_b2, &VL(1,ki+1), 
-			    ldvl, &WORK(ki + 1), &c__1, &z__1, &VL(1,ki), &c__1);
+		    zgemv_("N", n, &i__2, &c_b2, &vl_ref(1, ki + 1), ldvl, &
+			    work[ki + 1], &c__1, &z__1, &vl_ref(1, ki), &c__1);
 		}
 
-		ii = izamax_(n, &VL(1,ki), &c__1);
-		i__2 = ii + ki * vl_dim1;
-		remax = 1. / ((d__1 = VL(ii,ki).r, abs(d__1)) + (d__2 = d_imag(
-			&VL(ii,ki)), abs(d__2)));
-		zdscal_(n, &remax, &VL(1,ki), &c__1);
+		ii = izamax_(n, &vl_ref(1, ki), &c__1);
+		i__2 = vl_subscr(ii, ki);
+		remax = 1. / ((d__1 = vl[i__2].r, abs(d__1)) + (d__2 = d_imag(
+			&vl_ref(ii, ki)), abs(d__2)));
+		zdscal_(n, &remax, &vl_ref(1, ki), &c__1);
 	    }
 
 /*           Set back the original diagonal elements of T. */
 
 	    i__2 = *n;
-	    for (k = ki + 1; k <= *n; ++k) {
-		i__3 = k + k * t_dim1;
+	    for (k = ki + 1; k <= i__2; ++k) {
+		i__3 = t_subscr(k, k);
 		i__4 = k + *n;
-		T(k,k).r = WORK(k+*n).r, T(k,k).i = WORK(k+*n).i;
+		t[i__3].r = work[i__4].r, t[i__3].i = work[i__4].i;
 /* L120: */
 	    }
 
@@ -493,4 +507,12 @@ L130:
 /*     End of ZTREVC */
 
 } /* ztrevc_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef t_ref
+#undef t_subscr
+
 

@@ -1,10 +1,5 @@
 #include "f2c.h"
 #include "fio.h"
-#include "fmt.h"
-#include "fp.h"
-#ifndef VAX
-#include "ctype.h"
-#endif
 
 #ifndef KR_headers
 #undef abs
@@ -12,6 +7,12 @@
 #undef max
 #include "stdlib.h"
 #include "string.h"
+#endif
+
+#include "fmt.h"
+#include "fp.h"
+#ifndef VAX
+#include "ctype.h"
 #endif
 
 #ifdef KR_headers
@@ -23,6 +24,9 @@ wrt_E(ufloat *p, int w, int d, int e, ftnlen len)
 	char buf[FMAX+EXPMAXDIGS+4], *s, *se;
 	int d1, delta, e1, i, sign, signspace;
 	double dd;
+#ifdef WANT_LEAD_0
+	int insert0 = 0;
+#endif
 #ifndef VAX
 	int e0 = e;
 #endif
@@ -53,6 +57,13 @@ wrt_E(ufloat *p, int w, int d, int e, ftnlen len)
 		}
 	delta = w - (2 /* for the . and the d adjustment above */
 			+ 2 /* for the E+ */ + signspace + d + e);
+#ifdef WANT_LEAD_0
+	if (f__scale <= 0 && delta > 0) {
+		delta--;
+		insert0 = 1;
+		}
+	else
+#endif
 	if (delta < 0) {
 nogood:
 		while(--w >= 0)
@@ -91,8 +102,13 @@ nogood:
 	se = buf + d + 3;
 #ifdef GOOD_SPRINTF_EXPONENT /* When possible, exponent has 2 digits. */
 	if (f__scale != 1 && dd)
-#endif
 		sprintf(se, "%+.2d", atoi(se) + 1 - f__scale);
+#else
+	if (dd)
+		sprintf(se, "%+.2d", atoi(se) + 1 - f__scale);
+	else
+		strcpy(se, "+00");
+#endif
 	s = ++se;
 	if (e < 2) {
 		if (*s != '0')
@@ -139,6 +155,10 @@ nogood:
 	s = buf;
 	i = f__scale;
 	if (f__scale <= 0) {
+#ifdef WANT_LEAD_0
+		if (insert0)
+			PUT('0');
+#endif
 		PUT('.');
 		for(; i < 0; ++i)
 			PUT('0');
@@ -211,8 +231,10 @@ wrt_F(ufloat *p, int w, int d, ftnlen len)
 	n = sprintf(b = buf, "%#.*f", d, x) + d1;
 #endif
 
+#ifndef WANT_LEAD_0
 	if (buf[0] == '0' && d)
 		{ ++b; --n; }
+#endif
 	if (sign) {
 		/* check for all zeros */
 		for(s = b;;) {
@@ -229,9 +251,16 @@ wrt_F(ufloat *p, int w, int d, ftnlen len)
 	if (sign || f__cplus)
 		++n;
 	if (n > w) {
-		while(--w >= 0)
-			PUT('*');
-		return 0;
+#ifdef WANT_LEAD_0
+		if (buf[0] == '0' && --n == w)
+			++b;
+		else
+#endif
+		{
+			while(--w >= 0)
+				PUT('*');
+			return 0;
+			}
 		}
 	for(w -= n; --w >= 0; )
 		PUT(' ');

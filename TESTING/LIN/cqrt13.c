@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,8 +17,7 @@ static integer c__0 = 0;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
-    real r__1, r__2;
-    doublereal d__1;
+    real r__1, r__2, r__3;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -39,7 +39,11 @@ static integer c__0 = 0;
     static real smlnum;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -48,8 +52,7 @@ static integer c__0 = 0;
     Purpose   
     =======   
 
-    CQRT13 generates a full-rank matrix that may be scaled to have large 
-  
+    CQRT13 generates a full-rank matrix that may be scaled to have large   
     or small norm.   
 
     Arguments   
@@ -78,13 +81,12 @@ static integer c__0 = 0;
     ISEED   (input/output) integer array, dimension (4)   
             Seed for random number generator   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
 
@@ -97,15 +99,15 @@ static integer c__0 = 0;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	clarnv_(&c__2, &iseed[1], m, &a[j * a_dim1 + 1]);
+	clarnv_(&c__2, &iseed[1], m, &a_ref(1, j));
 	if (j <= *m) {
-	    i__2 = j + j * a_dim1;
-	    i__3 = j + j * a_dim1;
-	    r__1 = scasum_(m, &a[j * a_dim1 + 1], &c__1);
-	    i__4 = j + j * a_dim1;
-	    r__2 = a[i__4].r;
-	    d__1 = r_sign(&r__1, &r__2);
-	    q__2.r = d__1, q__2.i = 0.f;
+	    i__2 = a_subscr(j, j);
+	    i__3 = a_subscr(j, j);
+	    r__2 = scasum_(m, &a_ref(1, j), &c__1);
+	    i__4 = a_subscr(j, j);
+	    r__3 = a[i__4].r;
+	    r__1 = r_sign(&r__2, &r__3);
+	    q__2.r = r__1, q__2.i = 0.f;
 	    q__1.r = a[i__3].r + q__2.r, q__1.i = a[i__3].i + q__2.i;
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	}
@@ -143,4 +145,8 @@ static integer c__0 = 0;
 /*     End of CQRT13 */
 
 } /* cqrt13_ */
+
+#undef a_ref
+#undef a_subscr
+
 

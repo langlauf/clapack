@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,13 @@ static integer c__1 = 1;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -41,8 +48,7 @@ static integer c__1 = 1;
     =======   
 
     CSPT02 computes the residual in the solution of a complex symmetric   
-    system of linear equations  A*x = b  when packed storage is used for 
-  
+    system of linear equations  A*x = b  when packed storage is used for   
     the coefficient matrix.  The ratio computed is   
 
        RESID = norm( B - A*X ) / ( norm(A) * norm(X) * EPS).   
@@ -90,8 +96,7 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(B - A*X) / ( norm(A) * norm(X) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0   
@@ -99,10 +104,10 @@ static integer c__1 = 1;
        Parameter adjustments */
     --a;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --rwork;
 
@@ -126,8 +131,8 @@ static integer c__1 = 1;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
 	q__1.r = -1.f, q__1.i = 0.f;
-	cspmv_(uplo, n, &q__1, &a[1], &x[j * x_dim1 + 1], &c__1, &c_b1, &b[j *
-		 b_dim1 + 1], &c__1);
+	cspmv_(uplo, n, &q__1, &a[1], &x_ref(1, j), &c__1, &c_b1, &b_ref(1, j)
+		, &c__1);
 /* L10: */
     }
 
@@ -137,8 +142,8 @@ static integer c__1 = 1;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = scasum_(n, &b[j * b_dim1 + 1], &c__1);
-	xnorm = scasum_(n, &x[j * x_dim1 + 1], &c__1);
+	bnorm = scasum_(n, &b_ref(1, j), &c__1);
+	xnorm = scasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.f) {
 	    *resid = 1.f / eps;
 	} else {
@@ -154,4 +159,10 @@ static integer c__1 = 1;
 /*     End of CSPT02 */
 
 } /* cspt02_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

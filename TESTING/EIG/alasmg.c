@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -9,7 +10,7 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int alasmg_(char *type, integer *nout, integer *nfail, 
+/* Subroutine */ int alasmg_(char *type__, integer *nout, integer *nfail, 
 	integer *nrun, integer *nerrs)
 {
     /* Format strings */
@@ -29,7 +30,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 5, 1993   
@@ -59,21 +60,20 @@ static integer c__1 = 1;
     NERRS   (input) INTEGER   
             The number of error messages recorded.   
 
-   ====================================================================== 
-*/
+   ====================================================================== */
 
 
     if (*nfail > 0) {
 	io___1.ciunit = *nout;
 	s_wsfe(&io___1);
-	do_fio(&c__1, type, 3L);
+	do_fio(&c__1, type__, (ftnlen)3);
 	do_fio(&c__1, (char *)&(*nfail), (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&(*nrun), (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___2.ciunit = *nout;
 	s_wsfe(&io___2);
-	do_fio(&c__1, type, 3L);
+	do_fio(&c__1, type__, (ftnlen)3);
 	do_fio(&c__1, (char *)&(*nrun), (ftnlen)sizeof(integer));
 	e_wsfe();
     }

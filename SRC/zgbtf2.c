@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgbtf2_(integer *m, integer *n, integer *kl, integer *ku,
 	 doublecomplex *ab, integer *ldab, integer *ipiv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -15,8 +16,7 @@
     ZGBTF2 computes an LU factorization of a complex m-by-n band matrix   
     A using partial pivoting with row interchanges.   
 
-    This is the unblocked version of the algorithm, calling Level 2 BLAS. 
-  
+    This is the unblocked version of the algorithm, calling Level 2 BLAS.   
 
     Arguments   
     =========   
@@ -31,8 +31,7 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     AB      (input/output) COMPLEX*16 array, dimension (LDAB,N)   
             On entry, the matrix A in band storage, in rows KL+1 to   
@@ -57,18 +56,15 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = +i, U(i,i) is exactly zero. The factorization 
-  
+            > 0: if INFO = +i, U(i,i) is exactly zero. The factorization   
                  has been completed, but the factor U is exactly   
-                 singular, and division by zero will occur if it is used 
-  
+                 singular, and division by zero will occur if it is used   
                  to solve a system of equations.   
 
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     M = N = 6, KL = 2, KU = 1:   
 
     On entry:                       On exit:   
@@ -80,23 +76,18 @@
        a21  a32  a43  a54  a65   *      m21  m32  m43  m54  m65   *   
        a31  a42  a53  a64   *    *      m31  m42  m53  m64   *    *   
 
-    Array elements marked * are not used by the routine; elements marked 
-  
-    + need not be set on entry, but are required by the routine to store 
-  
+    Array elements marked * are not used by the routine; elements marked   
+    + need not be set on entry, but are required by the routine to store   
     elements of U, because of fill-in resulting from the row   
     interchanges.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        KV is the number of superdiagonals in the factor U, allowing for   
        fill-in.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -107,7 +98,7 @@
     /* Builtin functions */
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int zscal_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *), zgeru_(integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
@@ -116,13 +107,16 @@
     static integer km, jp, ju, kv;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer izamax_(integer *, doublecomplex *, integer *);
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --ipiv;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     kv = *ku + *kl;
 
 /*     Test the input parameters. */
@@ -156,11 +150,11 @@
        Set fill-in elements in columns KU+2 to KV to zero. */
 
     i__1 = min(kv,*n);
-    for (j = *ku + 2; j <= min(kv,*n); ++j) {
+    for (j = *ku + 2; j <= i__1; ++j) {
 	i__2 = *kl;
-	for (i = kv - j + 2; i <= *kl; ++i) {
-	    i__3 = i + j * ab_dim1;
-	    AB(i,j).r = 0., AB(i,j).i = 0.;
+	for (i__ = kv - j + 2; i__ <= i__2; ++i__) {
+	    i__3 = ab_subscr(i__, j);
+	    ab[i__3].r = 0., ab[i__3].i = 0.;
 /* L10: */
 	}
 /* L20: */
@@ -172,15 +166,15 @@
     ju = 1;
 
     i__1 = min(*m,*n);
-    for (j = 1; j <= min(*m,*n); ++j) {
+    for (j = 1; j <= i__1; ++j) {
 
 /*        Set fill-in elements in column J+KV to zero. */
 
 	if (j + kv <= *n) {
 	    i__2 = *kl;
-	    for (i = 1; i <= *kl; ++i) {
-		i__3 = i + (j + kv) * ab_dim1;
-		AB(i,j+kv).r = 0., AB(i,j+kv).i = 0.;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = ab_subscr(i__, j + kv);
+		ab[i__3].r = 0., ab[i__3].i = 0.;
 /* L30: */
 	    }
 	}
@@ -192,10 +186,10 @@
 	i__2 = *kl, i__3 = *m - j;
 	km = min(i__2,i__3);
 	i__2 = km + 1;
-	jp = izamax_(&i__2, &AB(kv+1,j), &c__1);
-	IPIV(j) = jp + j - 1;
-	i__2 = kv + jp + j * ab_dim1;
-	if (AB(kv+jp,j).r != 0. || AB(kv+jp,j).i != 0.) {
+	jp = izamax_(&i__2, &ab_ref(kv + 1, j), &c__1);
+	ipiv[j] = jp + j - 1;
+	i__2 = ab_subscr(kv + jp, j);
+	if (ab[i__2].r != 0. || ab[i__2].i != 0.) {
 /* Computing MAX   
    Computing MIN */
 	    i__4 = j + *ku + jp - 1;
@@ -208,14 +202,15 @@
 		i__2 = ju - j + 1;
 		i__3 = *ldab - 1;
 		i__4 = *ldab - 1;
-		zswap_(&i__2, &AB(kv+jp,j), &i__3, &AB(kv+1,j), &i__4);
+		zswap_(&i__2, &ab_ref(kv + jp, j), &i__3, &ab_ref(kv + 1, j), 
+			&i__4);
 	    }
 	    if (km > 0) {
 
 /*              Compute multipliers. */
 
-		z_div(&z__1, &c_b1, &AB(kv+1,j));
-		zscal_(&km, &z__1, &AB(kv+2,j), &c__1);
+		z_div(&z__1, &c_b1, &ab_ref(kv + 1, j));
+		zscal_(&km, &z__1, &ab_ref(kv + 2, j), &c__1);
 
 /*              Update trailing submatrix within the band. */
 
@@ -224,14 +219,14 @@
 		    z__1.r = -1., z__1.i = 0.;
 		    i__3 = *ldab - 1;
 		    i__4 = *ldab - 1;
-		    zgeru_(&km, &i__2, &z__1, &AB(kv+2,j), &
-			    c__1, &AB(kv,j+1), &i__3, &AB(kv+1,j+1), &i__4);
+		    zgeru_(&km, &i__2, &z__1, &ab_ref(kv + 2, j), &c__1, &
+			    ab_ref(kv, j + 1), &i__3, &ab_ref(kv + 1, j + 1), 
+			    &i__4);
 		}
 	    }
 	} else {
 
-/*           If pivot is zero, set INFO to the index of the pivot 
-  
+/*           If pivot is zero, set INFO to the index of the pivot   
              unless a zero pivot has already been found. */
 
 	    if (*info == 0) {
@@ -245,4 +240,8 @@
 /*     End of ZGBTF2 */
 
 } /* zgbtf2_ */
+
+#undef ab_ref
+#undef ab_subscr
+
 

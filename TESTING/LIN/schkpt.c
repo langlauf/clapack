@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,14 +27,14 @@ static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c_n1 = -1;
 static integer c__1 = 1;
-static real c_b45 = 1.f;
-static real c_b46 = 0.f;
+static real c_b46 = 1.f;
+static real c_b47 = 0.f;
 static integer c__7 = 7;
 
 /* Subroutine */ int schkpt_(logical *dotype, integer *nn, integer *nval, 
-	integer *nrhs, real *thresh, logical *tsterr, real *a, real *d, real *
-	e, real *b, real *x, real *xact, real *work, real *rwork, integer *
-	nout)
+	integer *nns, integer *nsval, real *thresh, logical *tsterr, real *a, 
+	real *d__, real *e, real *b, real *x, real *xact, real *work, real *
+	rwork, integer *nout)
 {
     /* Initialized data */
 
@@ -42,6 +43,8 @@ static integer c__7 = 7;
     /* Format strings */
     static char fmt_9999[] = "(\002 N =\002,i5,\002, type \002,i2,\002, te"
 	    "st \002,i2,\002, ratio = \002,g12.5)";
+    static char fmt_9998[] = "(\002 N =\002,i5,\002, NRHS=\002,i3,\002, ty"
+	    "pe \002,i2,\002, test(\002,i2,\002) = \002,g12.5)";
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
@@ -56,11 +59,13 @@ static integer c__7 = 7;
     static integer mode;
     static real dmax__;
     static integer imat, info;
-    static char path[3], dist[1], type[1];
-    static integer nrun, i, j, k;
+    static char path[3], dist[1];
+    static integer irhs, nrhs;
+    static char type__[1];
+    static integer nrun, i__, j, k;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer n, nfail, iseed[4];
-    static real z[3], rcond;
+    static real z__[3], rcond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *), sscal_(integer *, real *, 
 	    real *, integer *);
@@ -109,15 +114,15 @@ static integer c__7 = 7;
 
     /* Fortran I/O blocks */
     static cilist io___29 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___35 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___35 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___37 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -129,8 +134,7 @@ static integer c__7 = 7;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -140,9 +144,11 @@ static integer c__7 = 7;
     NVAL    (input) INTEGER array, dimension (NN)   
             The values of the matrix dimension N.   
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+    NNS     (input) INTEGER   
+            The number of values of NRHS contained in the vector NSVAL.   
+
+    NSVAL   (input) INTEGER array, dimension (NNS)   
+            The values of the number of right hand sides NRHS.   
 
     THRESH  (input) REAL   
             The threshold value for the test ratios.  A result is   
@@ -158,23 +164,23 @@ static integer c__7 = 7;
 
     E       (workspace) REAL array, dimension (NMAX*2)   
 
-    B       (workspace) REAL array, dimension (NMAX*NRHS)   
+    B       (workspace) REAL array, dimension (NMAX*NSMAX)   
+            where NSMAX is the largest entry in NSVAL.   
 
-    X       (workspace) REAL array, dimension (NMAX*NRHS)   
+    X       (workspace) REAL array, dimension (NMAX*NSMAX)   
 
-    XACT    (workspace) REAL array, dimension (NMAX*NRHS)   
+    XACT    (workspace) REAL array, dimension (NMAX*NSMAX)   
 
     WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NRHS))   
+                        (NMAX*max(3,NSMAX))   
 
     RWORK   (workspace) REAL array, dimension   
-                        (max(NMAX,2*NRHS))   
+                        (max(NMAX,2*NSMAX))   
 
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --rwork;
@@ -183,20 +189,21 @@ static integer c__7 = 7;
     --x;
     --b;
     --e;
-    --d;
+    --d__;
     --a;
+    --nsval;
     --nval;
     --dotype;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "PT", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "PT", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -225,32 +232,30 @@ static integer c__7 = 7;
 /*           Do the tests only if DOTYPE( IMAT ) is true. */
 
 	    if (n > 0 && ! dotype[imat]) {
-		goto L90;
+		goto L100;
 	    }
 
 /*           Set up parameters with SLATB4. */
 
-	    slatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &cond,
-		     dist);
+	    slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
+		    cond, dist);
 
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Type 1-6:  generate a symmetric tridiagonal ma
-trix of   
-                known condition number in lower triangular ban
-d storage. */
+/*              Type 1-6:  generate a symmetric tridiagonal matrix of   
+                known condition number in lower triangular band storage. */
 
-		s_copy(srnamc_1.srnamt, "SLATMS", 6L, 6L);
-		slatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cond, &
-			anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
+		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
+		slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
+			&anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
 
 /*              Check the error code from SLATMS. */
 
 		if (info != 0) {
 		    alaerh_(path, "SLATMS", &info, &c__0, " ", &n, &n, &kl, &
 			    ku, &c_n1, &imat, &nfail, &nerrs, nout);
-		    goto L90;
+		    goto L100;
 		}
 		izero = 0;
 
@@ -258,115 +263,109 @@ d storage. */
 
 		ia = 1;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    d[i] = a[ia];
-		    e[i] = a[ia + 1];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    d__[i__] = a[ia];
+		    e[i__] = a[ia + 1];
 		    ia += 2;
 /* L20: */
 		}
 		if (n > 0) {
-		    d[n] = a[ia];
+		    d__[n] = a[ia];
 		}
 	    } else {
 
-/*              Type 7-12:  generate a diagonally dominant mat
-rix with   
-                unknown condition number in the vectors D and 
-E. */
+/*              Type 7-12:  generate a diagonally dominant matrix with   
+                unknown condition number in the vectors D and E. */
 
 		if (! zerot || ! dotype[7]) {
 
 /*                 Let D and E have values from [-1,1]. */
 
-		    slarnv_(&c__2, iseed, &n, &d[1]);
+		    slarnv_(&c__2, iseed, &n, &d__[1]);
 		    i__3 = n - 1;
 		    slarnv_(&c__2, iseed, &i__3, &e[1]);
 
-/*                 Make the tridiagonal matrix diagonally 
-dominant. */
+/*                 Make the tridiagonal matrix diagonally dominant. */
 
 		    if (n == 1) {
-			d[1] = dabs(d[1]);
+			d__[1] = dabs(d__[1]);
 		    } else {
-			d[1] = dabs(d[1]) + dabs(e[1]);
-			d[n] = (r__1 = d[n], dabs(r__1)) + (r__2 = e[n - 1], 
-				dabs(r__2));
+			d__[1] = dabs(d__[1]) + dabs(e[1]);
+			d__[n] = (r__1 = d__[n], dabs(r__1)) + (r__2 = e[n - 
+				1], dabs(r__2));
 			i__3 = n - 1;
-			for (i = 2; i <= i__3; ++i) {
-			    d[i] = (r__1 = d[i], dabs(r__1)) + (r__2 = e[i], 
-				    dabs(r__2)) + (r__3 = e[i - 1], dabs(r__3)
-				    );
+			for (i__ = 2; i__ <= i__3; ++i__) {
+			    d__[i__] = (r__1 = d__[i__], dabs(r__1)) + (r__2 =
+				     e[i__], dabs(r__2)) + (r__3 = e[i__ - 1],
+				     dabs(r__3));
 /* L30: */
 			}
 		    }
 
-/*                 Scale D and E so the maximum element is
- ANORM. */
+/*                 Scale D and E so the maximum element is ANORM. */
 
-		    ix = isamax_(&n, &d[1], &c__1);
-		    dmax__ = d[ix];
+		    ix = isamax_(&n, &d__[1], &c__1);
+		    dmax__ = d__[ix];
 		    r__1 = anorm / dmax__;
-		    sscal_(&n, &r__1, &d[1], &c__1);
+		    sscal_(&n, &r__1, &d__[1], &c__1);
 		    i__3 = n - 1;
 		    r__1 = anorm / dmax__;
 		    sscal_(&i__3, &r__1, &e[1], &c__1);
 
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back t
-he zeroed out   
+/*                 Reuse the last matrix by copying back the zeroed out   
                    elements. */
 
 		    if (izero == 1) {
-			d[1] = z[1];
+			d__[1] = z__[1];
 			if (n > 1) {
-			    e[1] = z[2];
+			    e[1] = z__[2];
 			}
 		    } else if (izero == n) {
-			e[n - 1] = z[0];
-			d[n] = z[1];
+			e[n - 1] = z__[0];
+			d__[n] = z__[1];
 		    } else {
-			e[izero - 1] = z[0];
-			d[izero] = z[1];
-			e[izero] = z[2];
+			e[izero - 1] = z__[0];
+			d__[izero] = z__[1];
+			e[izero] = z__[2];
 		    }
 		}
 
-/*              For types 8-10, set one row and column of the 
-matrix to   
+/*              For types 8-10, set one row and column of the matrix to   
                 zero. */
 
 		izero = 0;
 		if (imat == 8) {
 		    izero = 1;
-		    z[1] = d[1];
-		    d[1] = 0.f;
+		    z__[1] = d__[1];
+		    d__[1] = 0.f;
 		    if (n > 1) {
-			z[2] = e[1];
+			z__[2] = e[1];
 			e[1] = 0.f;
 		    }
 		} else if (imat == 9) {
 		    izero = n;
 		    if (n > 1) {
-			z[0] = e[n - 1];
+			z__[0] = e[n - 1];
 			e[n - 1] = 0.f;
 		    }
-		    z[1] = d[n];
-		    d[n] = 0.f;
+		    z__[1] = d__[n];
+		    d__[n] = 0.f;
 		} else if (imat == 10) {
 		    izero = (n + 1) / 2;
 		    if (izero > 1) {
-			z[0] = e[izero - 1];
+			z__[0] = e[izero - 1];
 			e[izero - 1] = 0.f;
-			z[2] = e[izero];
+			z__[2] = e[izero];
 			e[izero] = 0.f;
 		    }
-		    z[1] = d[izero];
-		    d[izero] = 0.f;
+		    z__[1] = d__[izero];
+		    d__[izero] = 0.f;
 		}
 	    }
 
-	    scopy_(&n, &d[1], &c__1, &d[n + 1], &c__1);
+	    scopy_(&n, &d__[1], &c__1, &d__[n + 1], &c__1);
 	    if (n > 1) {
 		i__3 = n - 1;
 		scopy_(&i__3, &e[1], &c__1, &e[n + 1], &c__1);
@@ -376,25 +375,25 @@ matrix to
              Factor A as L*D*L' and compute the ratio   
                 norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
-	    spttrf_(&n, &d[n + 1], &e[n + 1], &info);
+	    spttrf_(&n, &d__[n + 1], &e[n + 1], &info);
 
 /*           Check error code from SPTTRF. */
 
 	    if (info != izero) {
 		alaerh_(path, "SPTTRF", &info, &izero, " ", &n, &n, &c_n1, &
 			c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
-		goto L90;
+		goto L100;
 	    }
 
 	    if (info > 0) {
 		rcondc = 0.f;
-		goto L80;
+		goto L90;
 	    }
 
-	    sptt01_(&n, &d[1], &e[1], &d[n + 1], &e[n + 1], &work[1], result);
+	    sptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &work[1], 
+		    result);
 
-/*           Print the test ratio if greater than or equal to THRE
-SH. */
+/*           Print the test ratio if greater than or equal to THRESH. */
 
 	    if (result[0] >= *thresh) {
 		if (nfail == 0 && nerrs == 0) {
@@ -415,22 +414,22 @@ SH. */
 
              Compute norm(A). */
 
-	    anorm = slanst_("1", &n, &d[1], &e[1]);
+	    anorm = slanst_("1", &n, &d__[1], &e[1]);
 
-/*           Use SPTTRS to solve for one column at a time of inv(A
-),   
+/*           Use SPTTRS to solve for one column at a time of inv(A),   
              computing the maximum column sum as we go. */
 
 	    ainvnm = 0.f;
 	    i__3 = n;
-	    for (i = 1; i <= i__3; ++i) {
+	    for (i__ = 1; i__ <= i__3; ++i__) {
 		i__4 = n;
 		for (j = 1; j <= i__4; ++j) {
 		    x[j] = 0.f;
 /* L40: */
 		}
-		x[i] = 1.f;
-		spttrs_(&n, &c__1, &d[n + 1], &e[n + 1], &x[1], &lda, &info);
+		x[i__] = 1.f;
+		spttrs_(&n, &c__1, &d__[n + 1], &e[n + 1], &x[1], &lda, &info)
+			;
 /* Computing MAX */
 		r__1 = ainvnm, r__2 = sasum_(&n, &x[1], &c__1);
 		ainvnm = dmax(r__1,r__2);
@@ -440,95 +439,102 @@ SH. */
 	    r__1 = 1.f, r__2 = anorm * ainvnm;
 	    rcondc = 1.f / dmax(r__1,r__2);
 
+	    i__3 = *nns;
+	    for (irhs = 1; irhs <= i__3; ++irhs) {
+		nrhs = nsval[irhs];
+
 /*           Generate NRHS random solution vectors. */
 
-	    ix = 1;
-	    i__3 = *nrhs;
-	    for (j = 1; j <= i__3; ++j) {
-		slarnv_(&c__2, iseed, &n, &xact[ix]);
-		ix += lda;
+		ix = 1;
+		i__4 = nrhs;
+		for (j = 1; j <= i__4; ++j) {
+		    slarnv_(&c__2, iseed, &n, &xact[ix]);
+		    ix += lda;
 /* L60: */
-	    }
+		}
 
 /*           Set the right hand side. */
 
-	    slaptm_(&n, nrhs, &c_b45, &d[1], &e[1], &xact[1], &lda, &c_b46, &
-		    b[1], &lda);
+		slaptm_(&n, &nrhs, &c_b46, &d__[1], &e[1], &xact[1], &lda, &
+			c_b47, &b[1], &lda);
 
 /* +    TEST 2   
              Solve A*x = b and compute the residual. */
 
-	    slacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
-	    spttrs_(&n, nrhs, &d[n + 1], &e[n + 1], &x[1], &lda, &info);
+		slacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
+		spttrs_(&n, &nrhs, &d__[n + 1], &e[n + 1], &x[1], &lda, &info)
+			;
 
 /*           Check error code from SPTTRS. */
 
-	    if (info != 0) {
-		alaerh_(path, "SPTTRS", &info, &c__0, " ", &n, &n, &c_n1, &
-			c_n1, nrhs, &imat, &nfail, &nerrs, nout);
-	    }
+		if (info != 0) {
+		    alaerh_(path, "SPTTRS", &info, &c__0, " ", &n, &n, &c_n1, 
+			    &c_n1, &nrhs, &imat, &nfail, &nerrs, nout);
+		}
 
-	    slacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
-	    sptt02_(&n, nrhs, &d[1], &e[1], &x[1], &lda, &work[1], &lda, &
-		    result[1]);
+		slacpy_("Full", &n, &nrhs, &b[1], &lda, &work[1], &lda);
+		sptt02_(&n, &nrhs, &d__[1], &e[1], &x[1], &lda, &work[1], &
+			lda, &result[1]);
 
 /* +    TEST 3   
              Check solution from generated exact solution. */
 
-	    sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &result[2]
-		    );
+		sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
+			result[2]);
 
 /* +    TESTS 4, 5, and 6   
              Use iterative refinement to improve the solution. */
 
-	    s_copy(srnamc_1.srnamt, "SPTRFS", 6L, 6L);
-	    sptrfs_(&n, nrhs, &d[1], &e[1], &d[n + 1], &e[n + 1], &b[1], &lda,
-		     &x[1], &lda, &rwork[1], &rwork[*nrhs + 1], &work[1], &
-		    info);
+		s_copy(srnamc_1.srnamt, "SPTRFS", (ftnlen)6, (ftnlen)6);
+		sptrfs_(&n, &nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &b[
+			1], &lda, &x[1], &lda, &rwork[1], &rwork[nrhs + 1], &
+			work[1], &info);
 
 /*           Check error code from SPTRFS. */
 
-	    if (info != 0) {
-		alaerh_(path, "SPTRFS", &info, &c__0, " ", &n, &n, &c_n1, &
-			c_n1, nrhs, &imat, &nfail, &nerrs, nout);
-	    }
+		if (info != 0) {
+		    alaerh_(path, "SPTRFS", &info, &c__0, " ", &n, &n, &c_n1, 
+			    &c_n1, &nrhs, &imat, &nfail, &nerrs, nout);
+		}
 
-	    sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &result[3]
-		    );
-	    sptt05_(&n, nrhs, &d[1], &e[1], &b[1], &lda, &x[1], &lda, &xact[1]
-		    , &lda, &rwork[1], &rwork[*nrhs + 1], &result[4]);
+		sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
+			result[3]);
+		sptt05_(&n, &nrhs, &d__[1], &e[1], &b[1], &lda, &x[1], &lda, &
+			xact[1], &lda, &rwork[1], &rwork[nrhs + 1], &result[4]
+			);
 
-/*           Print information about the tests that did not pass t
-he   
+/*           Print information about the tests that did not pass the   
              threshold. */
 
-	    for (k = 2; k <= 6; ++k) {
-		if (result[k - 1] >= *thresh) {
-		    if (nfail == 0 && nerrs == 0) {
-			alahd_(nout, path);
+		for (k = 2; k <= 6; ++k) {
+		    if (result[k - 1] >= *thresh) {
+			if (nfail == 0 && nerrs == 0) {
+			    alahd_(nout, path);
+			}
+			io___35.ciunit = *nout;
+			s_wsfe(&io___35);
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&nrhs, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&result[k - 1], (ftnlen)sizeof(
+				real));
+			e_wsfe();
+			++nfail;
 		    }
-		    io___33.ciunit = *nout;
-		    s_wsfe(&io___33);
-		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&result[k - 1], (ftnlen)sizeof(real)
-			    );
-		    e_wsfe();
-		    ++nfail;
-		}
 /* L70: */
+		}
+		nrun += 5;
+/* L80: */
 	    }
-	    nrun += 5;
 
 /* +    TEST 7   
-             Estimate the reciprocal of the condition number of th
-e   
+             Estimate the reciprocal of the condition number of the   
              matrix. */
 
-L80:
-	    s_copy(srnamc_1.srnamt, "SPTCON", 6L, 6L);
-	    sptcon_(&n, &d[n + 1], &e[n + 1], &anorm, &rcond, &rwork[1], &
+L90:
+	    s_copy(srnamc_1.srnamt, "SPTCON", (ftnlen)6, (ftnlen)6);
+	    sptcon_(&n, &d__[n + 1], &e[n + 1], &anorm, &rcond, &rwork[1], &
 		    info);
 
 /*           Check error code from SPTCON. */
@@ -540,15 +546,14 @@ L80:
 
 	    result[6] = sget06_(&rcond, &rcondc);
 
-/*           Print the test ratio if greater than or equal to THRE
-SH. */
+/*           Print the test ratio if greater than or equal to THRESH. */
 
 	    if (result[6] >= *thresh) {
 		if (nfail == 0 && nerrs == 0) {
 		    alahd_(nout, path);
 		}
-		io___35.ciunit = *nout;
-		s_wsfe(&io___35);
+		io___37.ciunit = *nout;
+		s_wsfe(&io___37);
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
@@ -557,10 +562,10 @@ SH. */
 		++nfail;
 	    }
 	    ++nrun;
-L90:
+L100:
 	    ;
 	}
-/* L100: */
+/* L110: */
     }
 
 /*     Print a summary of the results. */

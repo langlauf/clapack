@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,8 +14,8 @@ struct {
 
 #define latime_1 latime_
 
-/* Subroutine */ int slaed5_(integer *i, real *d, real *z, real *delta, real *
-	rho, real *dlam)
+/* Subroutine */ int slaed5_(integer *i__, real *d__, real *z__, real *delta, 
+	real *rho, real *dlam)
 {
     /* System generated locals */
     real r__1;
@@ -23,13 +24,11 @@ struct {
     double sqrt(doublereal);
 
     /* Local variables */
-    static real temp, b, c, w, del, tau;
+    static real temp, b, c__, w, del, tau;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
        September 30, 1994   
 
@@ -39,8 +38,7 @@ struct {
     Purpose   
     =======   
 
-    This subroutine computes the I-th eigenvalue of a symmetric rank-one 
-  
+    This subroutine computes the I-th eigenvalue of a symmetric rank-one   
     modification of a 2-by-2 diagonal matrix   
 
                diag( D )  +  RHO *  Z * transpose(Z) .   
@@ -74,42 +72,49 @@ struct {
     DLAM   (output) REAL   
            The computed lambda_I, the I-th updated eigenvalue.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Parameter adjustments */
     --delta;
-    --z;
-    --d;
+    --z__;
+    --d__;
 
     /* Function Body */
-    del = d[2] - d[1];
-    if (*i == 1) {
-	w = *rho * 2.f * (z[2] * z[2] - z[1] * z[1]) / del + 1.f;
+    del = d__[2] - d__[1];
+    if (*i__ == 1) {
+	w = *rho * 2.f * (z__[2] * z__[2] - z__[1] * z__[1]) / del + 1.f;
 	if (w > 0.f) {
 	    latime_1.ops += 33;
-	    b = del + *rho * (z[1] * z[1] + z[2] * z[2]);
-	    c = *rho * z[1] * z[1] * del;
+	    b = del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	    c__ = *rho * z__[1] * z__[1] * del;
 
 /*           B > ZERO, always */
 
-	    tau = c * 2.f / (b + sqrt((r__1 = b * b - c * 4.f, dabs(r__1))));
-	    *dlam = d[1] + tau;
-	    delta[1] = -(doublereal)z[1] / tau;
-	    delta[2] = z[2] / (del - tau);
+	    tau = c__ * 2.f / (b + sqrt((r__1 = b * b - c__ * 4.f, dabs(r__1))
+		    ));
+	    *dlam = d__[1] + tau;
+	    delta[1] = -z__[1] / tau;
+	    delta[2] = z__[2] / (del - tau);
 	} else {
 	    latime_1.ops += 31;
-	    b = -(doublereal)del + *rho * (z[1] * z[1] + z[2] * z[2]);
-	    c = *rho * z[2] * z[2] * del;
+	    b = -del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	    c__ = *rho * z__[2] * z__[2] * del;
 	    if (b > 0.f) {
-		tau = c * -2.f / (b + sqrt(b * b + c * 4.f));
+		tau = c__ * -2.f / (b + sqrt(b * b + c__ * 4.f));
 	    } else {
-		tau = (b - sqrt(b * b + c * 4.f)) / 2.f;
+		tau = (b - sqrt(b * b + c__ * 4.f)) / 2.f;
 	    }
-	    *dlam = d[2] + tau;
-	    delta[1] = -(doublereal)z[1] / (del + tau);
-	    delta[2] = -(doublereal)z[2] / tau;
+	    *dlam = d__[2] + tau;
+	    delta[1] = -z__[1] / (del + tau);
+	    delta[2] = -z__[2] / tau;
 	}
 	temp = sqrt(delta[1] * delta[1] + delta[2] * delta[2]);
 	delta[1] /= temp;
@@ -119,16 +124,16 @@ struct {
 /*     Now I=2 */
 
 	latime_1.ops += 24;
-	b = -(doublereal)del + *rho * (z[1] * z[1] + z[2] * z[2]);
-	c = *rho * z[2] * z[2] * del;
+	b = -del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	c__ = *rho * z__[2] * z__[2] * del;
 	if (b > 0.f) {
-	    tau = (b + sqrt(b * b + c * 4.f)) / 2.f;
+	    tau = (b + sqrt(b * b + c__ * 4.f)) / 2.f;
 	} else {
-	    tau = c * 2.f / (-(doublereal)b + sqrt(b * b + c * 4.f));
+	    tau = c__ * 2.f / (-b + sqrt(b * b + c__ * 4.f));
 	}
-	*dlam = d[2] + tau;
-	delta[1] = -(doublereal)z[1] / (del + tau);
-	delta[2] = -(doublereal)z[2] / tau;
+	*dlam = d__[2] + tau;
+	delta[1] = -z__[1] / (del + tau);
+	delta[2] = -z__[2] / tau;
 	temp = sqrt(delta[1] * delta[1] + delta[2] * delta[2]);
 	delta[1] /= temp;
 	delta[2] /= temp;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -56,8 +57,8 @@ static integer c__3 = 3;
     static integer mode, imat, info;
     static char path[3];
     static integer kval[4];
-    static char dist[1], type[1];
-    static integer nrun, i;
+    static char dist[1], type__[1];
+    static integer nrun, i__;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer k, m, n;
     extern /* Subroutine */ int dget02_(char *, integer *, integer *, integer 
@@ -105,7 +106,7 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -120,8 +121,7 @@ static integer c__3 = 3;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -161,8 +161,7 @@ static integer c__3 = 3;
             Flag that indicates whether error exits are to be tested.   
 
     NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning 
-  
+            The maximum value permitted for M or N, used in dimensioning   
             the work arrays.   
 
     A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
@@ -192,8 +191,7 @@ static integer c__3 = 3;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -218,13 +216,13 @@ static integer c__3 = 3;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "LQ", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "LQ", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -253,24 +251,22 @@ static integer c__3 = 3;
 	    minmn = min(m,n);
 	    for (imat = 1; imat <= 8; ++imat) {
 
-/*              Do the tests only if DOTYPE( IMAT ) is true. 
-*/
+/*              Do the tests only if DOTYPE( IMAT ) is true. */
 
 		if (! dotype[imat]) {
 		    goto L50;
 		}
 
-/*              Set up parameters with DLATB4 and generate a t
-est matrix   
+/*              Set up parameters with DLATB4 and generate a test matrix   
                 with DLATMS. */
 
-		dlatb4_(path, &imat, &m, &n, type, &kl, &ku, &anorm, &mode, &
-			cndnum, dist);
+		dlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
+			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "DLATMS", 6L, 6L);
-		dlatms_(&m, &n, dist, iseed, type, &rwork[1], &mode, &cndnum, 
-			&anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1],
-			 &info);
+		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		dlatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
+			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
+			work[1], &info);
 
 /*              Check error code from DLATMS. */
 
@@ -280,12 +276,9 @@ est matrix
 		    goto L50;
 		}
 
-/*              Set some values for K: the first value must be
- MINMN,   
-                corresponding to the call of DLQT01; other val
-ues are   
-                used in the calls of DLQT02, and must not exce
-ed MINMN. */
+/*              Set some values for K: the first value must be MINMN,   
+                corresponding to the call of DLQT01; other values are   
+                used in the calls of DLQT02, and must not exceed MINMN. */
 
 		kval[0] = minmn;
 		kval[1] = 0;
@@ -307,8 +300,7 @@ ed MINMN. */
 		for (ik = 1; ik <= i__3; ++ik) {
 		    k = kval[ik - 1];
 
-/*                 Do for each pair of values (NB,NX) in N
-BVAL and NXVAL. */
+/*                 Do for each pair of values (NB,NX) in NBVAL and NXVAL. */
 
 		    i__4 = *nnb;
 		    for (inb = 1; inb <= i__4; ++inb) {
@@ -326,8 +318,7 @@ BVAL and NXVAL. */
 				     result);
 			} else if (m <= n) {
 
-/*                       Test DORGLQ, using factor
-ization   
+/*                       Test DORGLQ, using factorization   
                          returned by DLQT01 */
 
 			    dlqt02_(&m, &n, &k, &a[1], &af[1], &aq[1], &al[1],
@@ -339,8 +330,7 @@ ization
 			}
 			if (m >= k) {
 
-/*                       Test DORMLQ, using factor
-ization returned   
+/*                       Test DORMLQ, using factorization returned   
                          by DLQT01 */
 
 			    dlqt03_(&m, &n, &k, &af[1], &ac[1], &al[1], &aq[1]
@@ -348,19 +338,17 @@ ization returned
 				    1], &result[2]);
 			    nt += 4;
 
-/*                       If M>=N and K=N, call DGE
-LQS to solve a system   
-                         with NRHS right hand side
-s and compute the   
+/*                       If M>=N and K=N, call DGELQS to solve a system   
+                         with NRHS right hand sides and compute the   
                          residual. */
 
 			    if (k == m && inb == 1) {
 
-/*                          Generate a solutio
-n and set the right   
+/*                          Generate a solution and set the right   
                             hand side. */
 
-				s_copy(srnamc_1.srnamt, "DLARHS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
+					ftnlen)6);
 				dlarhs_(path, "New", "Full", "No transpose", &
 					m, &n, &c__0, &c__0, nrhs, &a[1], &
 					lda, &xact[1], &lda, &b[1], &lda, 
@@ -368,12 +356,12 @@ n and set the right
 
 				dlacpy_("Full", &m, nrhs, &b[1], &lda, &x[1], 
 					&lda);
-				s_copy(srnamc_1.srnamt, "DGELQS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DGELQS", (ftnlen)6, (
+					ftnlen)6);
 				dgelqs_(&m, &n, nrhs, &af[1], &lda, &tau[1], &
 					x[1], &lda, &work[1], &lwork, &info);
 
-/*                          Check error code f
-rom DGELQS. */
+/*                          Check error code from DGELQS. */
 
 				if (info != 0) {
 				    alaerh_(path, "DGELQS", &info, &c__0, 
@@ -395,13 +383,12 @@ rom DGELQS. */
 			    result[5] = 0.;
 			}
 
-/*                    Print information about the test
-s that did not   
+/*                    Print information about the tests that did not   
                       pass the threshold. */
 
 			i__5 = nt;
-			for (i = 1; i <= i__5; ++i) {
-			    if (result[i - 1] >= *thresh) {
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    if (result[i__ - 1] >= *thresh) {
 				if (nfail == 0 && nerrs == 0) {
 				    alahd_(nout, path);
 				}
@@ -419,10 +406,10 @@ s that did not
 					integer));
 				do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
 					integer));
-				do_fio(&c__1, (char *)&i, (ftnlen)sizeof(
+				do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 					integer));
-				do_fio(&c__1, (char *)&result[i - 1], (ftnlen)
-					sizeof(doublereal));
+				do_fio(&c__1, (char *)&result[i__ - 1], (
+					ftnlen)sizeof(doublereal));
 				e_wsfe();
 				++nfail;
 			    }

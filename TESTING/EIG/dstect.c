@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,13 +18,13 @@
 
     /* Local variables */
     static doublereal unfl, ovfl, ssun;
-    static integer i;
+    static integer i__;
     static doublereal u, m1, m2;
     extern doublereal dlamch_(char *);
     static doublereal mx, sshift, tmp, tom, sun, sov;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -59,8 +60,7 @@
             The number of eigenvalues of T less than or equal   
             to SHIFT.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine constants   
@@ -77,10 +77,10 @@
 
     mx = abs(a[1]);
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	d__3 = mx, d__4 = (d__1 = a[i + 1], abs(d__1)), d__3 = max(d__3,d__4),
-		 d__4 = (d__2 = b[i], abs(d__2));
+	d__3 = mx, d__4 = (d__1 = a[i__ + 1], abs(d__1)), d__3 = max(d__3,
+		d__4), d__4 = (d__2 = b[i__], abs(d__2));
 	mx = max(d__3,d__4);
 /* L10: */
     }
@@ -127,9 +127,9 @@
 	}
     }
     i__1 = *n;
-    for (i = 2; i <= i__1; ++i) {
-	tmp = b[i - 1] * m1 * m2;
-	u = a[i] * m1 * m2 - tmp * (tmp / u) - sshift;
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	tmp = b[i__ - 1] * m1 * m2;
+	u = a[i__] * m1 * m2 - tmp * (tmp / u) - sshift;
 	if (u <= sun) {
 	    if (u <= 0.) {
 		++(*num);

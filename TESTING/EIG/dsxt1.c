@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,10 +15,10 @@ doublereal dsxt1_(integer *ijob, doublereal *d1, integer *n1, doublereal *d2,
 
     /* Local variables */
     static doublereal temp1, temp2;
-    static integer i, j;
+    static integer i__, j;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -66,8 +67,7 @@ doublereal dsxt1_(integer *ijob, doublereal *d1, integer *n1, doublereal *d2,
             The smallest positive number whose reciprocal does not   
             overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -79,29 +79,29 @@ doublereal dsxt1_(integer *ijob, doublereal *d1, integer *n1, doublereal *d2,
 
     j = 1;
     i__1 = *n1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 L10:
-	if (d2[j] < d1[i] && j < *n2) {
+	if (d2[j] < d1[i__] && j < *n2) {
 	    ++j;
 	    goto L10;
 	}
 	if (j == 1) {
-	    temp2 = (d__1 = d2[j] - d1[i], abs(d__1));
+	    temp2 = (d__1 = d2[j] - d1[i__], abs(d__1));
 	    if (*ijob == 2) {
 /* Computing MAX */
-		d__2 = *unfl, d__3 = *abstol + *ulp * (d__1 = d1[i], abs(d__1)
-			);
+		d__2 = *unfl, d__3 = *abstol + *ulp * (d__1 = d1[i__], abs(
+			d__1));
 		temp2 /= max(d__2,d__3);
 	    }
 	} else {
 /* Computing MIN */
-	    d__3 = (d__1 = d2[j] - d1[i], abs(d__1)), d__4 = (d__2 = d1[i] - 
-		    d2[j - 1], abs(d__2));
+	    d__3 = (d__1 = d2[j] - d1[i__], abs(d__1)), d__4 = (d__2 = d1[i__]
+		     - d2[j - 1], abs(d__2));
 	    temp2 = min(d__3,d__4);
 	    if (*ijob == 2) {
 /* Computing MAX */
-		d__2 = *unfl, d__3 = *abstol + *ulp * (d__1 = d1[i], abs(d__1)
-			);
+		d__2 = *unfl, d__3 = *abstol + *ulp * (d__1 = d1[i__], abs(
+			d__1));
 		temp2 /= max(d__2,d__3);
 	    }
 	}

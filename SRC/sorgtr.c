@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sorgtr_(char *uplo, integer *n, real *a, integer *lda, 
 	real *tau, real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -33,8 +34,7 @@
             The order of the matrix Q. N >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the vectors which define the elementary reflectors, 
-  
+            On entry, the vectors which define the elementary reflectors,   
             as returned by SSYTRD.   
             On exit, the N-by-N orthogonal matrix Q.   
 
@@ -53,38 +53,54 @@
             For optimum performance LWORK >= (N-1)*NB, where NB is   
             the optimal blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer iinfo;
     static logical upper;
-    extern /* Subroutine */ int xerbla_(char *, integer *), sorgql_(
+    static integer nb;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int sorgql_(integer *, integer *, integer *, real 
+	    *, integer *, real *, real *, integer *, integer *), sorgqr_(
 	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, integer *), sorgqr_(integer *, integer *, integer *, 
-	    real *, integer *, real *, real *, integer *, integer *);
+	    , integer *, integer *);
+    static logical lquery;
+    static integer lwkopt;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
+    lquery = *lwork == -1;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
 	*info = -1;
@@ -95,20 +111,43 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = 1, i__2 = *n - 1;
-	if (*lwork < max(i__1,i__2)) {
+	if (*lwork < max(i__1,i__2) && ! lquery) {
 	    *info = -7;
 	}
     }
+
+    if (*info == 0) {
+	if (upper) {
+	    i__1 = *n - 1;
+	    i__2 = *n - 1;
+	    i__3 = *n - 1;
+	    nb = ilaenv_(&c__1, "SORGQL", " ", &i__1, &i__2, &i__3, &c_n1, (
+		    ftnlen)6, (ftnlen)1);
+	} else {
+	    i__1 = *n - 1;
+	    i__2 = *n - 1;
+	    i__3 = *n - 1;
+	    nb = ilaenv_(&c__1, "SORGQR", " ", &i__1, &i__2, &i__3, &c_n1, (
+		    ftnlen)6, (ftnlen)1);
+	}
+/* Computing MAX */
+	i__1 = 1, i__2 = *n - 1;
+	lwkopt = max(i__1,i__2) * nb;
+	work[1] = (real) lwkopt;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SORGTR", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n == 0) {
-	WORK(1) = 1.f;
+	work[1] = 1.f;
 	return 0;
     }
 
@@ -116,60 +155,56 @@
 
 /*        Q was determined by a call to SSYTRD with UPLO = 'U'   
 
-          Shift the vectors which define the elementary reflectors one
-   
-          column to the left, and set the last row and column of Q to 
-  
+          Shift the vectors which define the elementary reflectors one   
+          column to the left, and set the last row and column of Q to   
           those of the unit matrix */
 
 	i__1 = *n - 1;
-	for (j = 1; j <= *n-1; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
-	    for (i = 1; i <= j-1; ++i) {
-		A(i,j) = A(i,j+1);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j + 1);
 /* L10: */
 	    }
-	    A(*n,j) = 0.f;
+	    a_ref(*n, j) = 0.f;
 /* L20: */
 	}
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
-	    A(i,*n) = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    a_ref(i__, *n) = 0.f;
 /* L30: */
 	}
-	A(*n,*n) = 1.f;
+	a_ref(*n, *n) = 1.f;
 
 /*        Generate Q(1:n-1,1:n-1) */
 
 	i__1 = *n - 1;
 	i__2 = *n - 1;
 	i__3 = *n - 1;
-	sorgql_(&i__1, &i__2, &i__3, &A(1,1), lda, &TAU(1), &WORK(1), 
+	sorgql_(&i__1, &i__2, &i__3, &a[a_offset], lda, &tau[1], &work[1], 
 		lwork, &iinfo);
 
     } else {
 
 /*        Q was determined by a call to SSYTRD with UPLO = 'L'.   
 
-          Shift the vectors which define the elementary reflectors one
-   
-          column to the right, and set the first row and column of Q t
-o   
+          Shift the vectors which define the elementary reflectors one   
+          column to the right, and set the first row and column of Q to   
           those of the unit matrix */
 
 	for (j = *n; j >= 2; --j) {
-	    A(1,j) = 0.f;
+	    a_ref(1, j) = 0.f;
 	    i__1 = *n;
-	    for (i = j + 1; i <= *n; ++i) {
-		A(i,j) = A(i,j-1);
+	    for (i__ = j + 1; i__ <= i__1; ++i__) {
+		a_ref(i__, j) = a_ref(i__, j - 1);
 /* L40: */
 	    }
 /* L50: */
 	}
-	A(1,1) = 1.f;
+	a_ref(1, 1) = 1.f;
 	i__1 = *n;
-	for (i = 2; i <= *n; ++i) {
-	    A(i,1) = 0.f;
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    a_ref(i__, 1) = 0.f;
 /* L60: */
 	}
 	if (*n > 1) {
@@ -179,13 +214,17 @@ o
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    sorgqr_(&i__1, &i__2, &i__3, &A(2,2), lda, &TAU(1), 
-		    &WORK(1), lwork, &iinfo);
+	    sorgqr_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &work[1],
+		     lwork, &iinfo);
 	}
     }
+    work[1] = (real) lwkopt;
     return 0;
 
 /*     End of SORGTR */
 
 } /* sorgtr_ */
+
+#undef a_ref
+
 

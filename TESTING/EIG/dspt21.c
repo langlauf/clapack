@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static integer c__1 = 1;
 static doublereal c_b26 = 1.;
 
 /* Subroutine */ int dspt21_(integer *itype, char *uplo, integer *n, integer *
-	kband, doublereal *ap, doublereal *d, doublereal *e, doublereal *u, 
+	kband, doublereal *ap, doublereal *d__, doublereal *e, doublereal *u, 
 	integer *ldu, doublereal *vp, doublereal *tau, doublereal *work, 
 	doublereal *result)
 {
@@ -64,7 +65,10 @@ static doublereal c_b26 = 1.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -77,8 +81,7 @@ static doublereal c_b26 = 1.;
 
             A = U S U'   
 
-    where ' means transpose, A is symmetric (stored in packed format), U 
-  
+    where ' means transpose, A is symmetric (stored in packed format), U   
     is orthogonal, and S is diagonal (if KBAND=0) or symmetric   
     tridiagonal (if KBAND=1).  If ITYPE=1, then U is represented as a   
     dense matrix, otherwise the U is expressed as a product of   
@@ -100,12 +103,10 @@ static doublereal c_b26 = 1.;
 
             RESULT(1) = | I - VU' | / ( n ulp )   
 
-    Packed storage means that, for example, if UPLO='U', then the columns 
-  
+    Packed storage means that, for example, if UPLO='U', then the columns   
     of the upper triangle of A are stored one after another, so that   
     A(1,j+1) immediately follows A(j,j) in the array AP.  Similarly, if   
-    UPLO='L', then the columns of the lower triangle of A are stored one 
-  
+    UPLO='L', then the columns of the lower triangle of A are stored one   
     after another in AP, so that A(j+1,j+1) immediately follows A(n,j)   
     in the array AP.  This means that A(i,j) is stored in:   
 
@@ -131,8 +132,7 @@ static doublereal c_b26 = 1.;
 
            H(j) = I  -  tau(j) v(j) v(j)'   
 
-       and the first j elements of v(j) are 0, the (j+1)-st is 1, and the 
-  
+       and the first j elements of v(j) are 0, the (j+1)-st is 1, and the   
        (j+2)-nd through n-th elements are stored in V(j+2:n,j) (i.e.,   
        in VP( (2*n-j)*(j-1)/2 + j+2 : (2*n-j)*(j-1)/2 + n ) .)   
 
@@ -145,8 +145,7 @@ static doublereal c_b26 = 1.;
                RESULT(1) = | A - U S U' | / ( |A| n ulp )   *and*   
                RESULT(2) = | I - UU' | / ( n ulp )   
 
-            2: U expressed as a product V of Housholder transformations: 
-  
+            2: U expressed as a product V of Housholder transformations:   
                RESULT(1) = | A - V S V' | / ( |A| n ulp )   
 
             3: U expressed both as a dense orthogonal matrix and   
@@ -160,8 +159,7 @@ static doublereal c_b26 = 1.;
             triangle of A and V.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DSPT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, DSPT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -186,8 +184,7 @@ static doublereal c_b26 = 1.;
 
     U       (input) DOUBLE PRECISION array, dimension (LDU, N)   
             If ITYPE=1 or 3, this contains the orthogonal matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2, 
-  
+            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
             then it is not referenced.   
 
     LDU     (input) INTEGER   
@@ -199,10 +196,8 @@ static doublereal c_b26 = 1.;
             Householder vectors used to describe the orthogonal matrix   
             in the decomposition, as described in purpose.   
             *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') 
-  
-            is set to one, and later reset to its original value, during 
-  
+            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
+            is set to one, and later reset to its original value, during   
             the course of the calculation.   
             If ITYPE=1, then it is neither referenced nor modified.   
 
@@ -221,18 +216,17 @@ static doublereal c_b26 = 1.;
             RESULT(1) is always modified.  RESULT(2) is modified only   
             if ITYPE=1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Constants   
 
        Parameter adjustments */
     --ap;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --vp;
     --tau;
@@ -291,8 +285,8 @@ static doublereal c_b26 = 1.;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    d__1 = -d[j];
-	    dspr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
+	    d__1 = -d__[j];
+	    dspr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
 /* L10: */
 	}
 
@@ -300,8 +294,8 @@ static doublereal c_b26 = 1.;
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
 		d__1 = -e[j];
-		dspr2_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) 
-			* u_dim1 + 1], &c__1, &work[1]);
+		dspr2_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1),
+			 &c__1, &work[1]);
 /* L20: */
 	    }
 	}
@@ -316,7 +310,7 @@ static doublereal c_b26 = 1.;
 	dlaset_("Full", n, n, &c_b10, &c_b10, &work[1], n);
 
 	if (lower) {
-	    work[lap] = d[*n];
+	    work[lap] = d__[*n];
 	    for (j = *n - 1; j >= 1; --j) {
 		jp = ((*n << 1) - j) * (j - 1) / 2;
 		jp1 = jp + *n - j;
@@ -347,11 +341,11 @@ static doublereal c_b26 = 1.;
 			    lap + 1], &c__1, &work[jp1 + j + 1]);
 		    vp[jp + j + 1] = vsave;
 		}
-		work[jp + j] = d[j];
+		work[jp + j] = d__[j];
 /* L40: */
 	    }
 	} else {
-	    work[1] = d[1];
+	    work[1] = d__[1];
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
 		jp = j * (j - 1) / 2;
@@ -379,7 +373,7 @@ static doublereal c_b26 = 1.;
 			    , &c__1, &work[1]);
 		    vp[jp1 + j] = vsave;
 		}
-		work[jp1 + j + 1] = d[j + 1];
+		work[jp1 + j + 1] = d__[j + 1];
 /* L60: */
 	    }
 	}
@@ -450,8 +444,7 @@ static doublereal c_b26 = 1.;
 /* Computing MIN   
    Computing 2nd power */
 	i__1 = *n;
-	d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), 
-		d__2 = (doublereal) (*n);
+	d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), d__2 = (doublereal) (*n);
 	result[2] = min(d__1,d__2) / (*n * ulp);
     }
 
@@ -460,4 +453,7 @@ static doublereal c_b26 = 1.;
 /*     End of DSPT21 */
 
 } /* dspt21_ */
+
+#undef u_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -80,8 +81,8 @@ static integer c__7 = 7;
     static doublereal amax;
     static char path[3];
     static integer imat, info;
-    static char dist[1], type[1];
-    static integer nrun, ldafb, i, j, k, n;
+    static char dist[1], type__[1];
+    static integer nrun, ldafb, i__, j, k, n;
     extern /* Subroutine */ int dgbt01_(integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, doublereal *, doublereal *), dgbt02_(char *, integer *,
@@ -182,10 +183,10 @@ static integer c__7 = 7;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -197,8 +198,7 @@ static integer c__7 = 7;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -255,8 +255,7 @@ static integer c__7 = 7;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -277,13 +276,13 @@ static integer c__7 = 7;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "GB", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GB", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -326,10 +325,8 @@ static integer c__7 = 7;
 	i__2 = nkl;
 	for (ikl = 1; ikl <= i__2; ++ikl) {
 
-/*           Do for KL = 0, N-1, (3N-1)/4, and (N+1)/4. This order
- makes   
-             it easier to skip redundant values for small values o
-f N. */
+/*           Do for KL = 0, N-1, (3N-1)/4, and (N+1)/4. This order makes   
+             it easier to skip redundant values for small values of N. */
 
 	    if (ikl == 1) {
 		kl = 0;
@@ -345,10 +342,8 @@ f N. */
 	    i__3 = nku;
 	    for (iku = 1; iku <= i__3; ++iku) {
 
-/*              Do for KU = 0, N-1, (3N-1)/4, and (N+1)/4. Thi
-s order   
-                makes it easier to skip redundant values for s
-mall   
+/*              Do for KU = 0, N-1, (3N-1)/4, and (N+1)/4. This order   
+                makes it easier to skip redundant values for small   
                 values of N. */
 
 		if (iku == 1) {
@@ -363,8 +358,7 @@ mall
 		    ku = (n + 1) / 4;
 		}
 
-/*              Check that A and AFB are big enough to generat
-e this   
+/*              Check that A and AFB are big enough to generate this   
                 matrix. */
 
 		lda = kl + ku + 1;
@@ -399,37 +393,34 @@ e this
 			e_wsfe();
 			++nerrs;
 		    }
-		    goto L140;
+		    goto L130;
 		}
 
 		i__4 = nimat;
 		for (imat = 1; imat <= i__4; ++imat) {
 
-/*                 Do the tests only if DOTYPE( IMAT ) is 
-true. */
+/*                 Do the tests only if DOTYPE( IMAT ) is true. */
 
 		    if (! dotype[imat]) {
-			goto L130;
+			goto L120;
 		    }
 
-/*                 Skip types 2, 3, or 4 if the matrix is 
-too small. */
+/*                 Skip types 2, 3, or 4 if the matrix is too small. */
 
 		    zerot = imat >= 2 && imat <= 4;
 		    if (zerot && n < imat - 1) {
-			goto L130;
+			goto L120;
 		    }
 
-/*                 Set up parameters with DLATB4 and gener
-ate a   
+/*                 Set up parameters with DLATB4 and generate a   
                    test matrix with DLATMS. */
 
-		    dlatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &
+		    dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &
 			    mode, &cndnum, dist);
 		    rcondc = 1. / cndnum;
 
-		    s_copy(srnamc_1.srnamt, "DLATMS", 6L, 6L);
-		    dlatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &
+		    s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
+		    dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			    cndnum, &anorm, &kl, &ku, "Z", &a[1], &lda, &work[
 			    1], &info);
 
@@ -438,13 +429,11 @@ ate a
 		    if (info != 0) {
 			alaerh_(path, "DLATMS", &info, &c__0, " ", &n, &n, &
 				kl, &ku, &c_n1, &imat, &nfail, &nerrs, nout);
-			goto L130;
+			goto L120;
 		    }
 
-/*                 For types 2, 3, and 4, zero one or more
- columns of   
-                   the matrix to test that INFO is returne
-d correctly. */
+/*                 For types 2, 3, and 4, zero one or more columns of   
+                   the matrix to test that INFO is returned correctly. */
 
 		    izero = 0;
 		    if (zerot) {
@@ -464,8 +453,8 @@ d correctly. */
 			    i__5 = kl + ku + 1, i__6 = ku + 1 + (n - izero);
 			    i2 = min(i__5,i__6);
 			    i__5 = i2;
-			    for (i = i1; i <= i__5; ++i) {
-				a[ioff + i] = 0.;
+			    for (i__ = i1; i__ <= i__5; ++i__) {
+				a[ioff + i__] = 0.;
 /* L20: */
 			    }
 			} else {
@@ -476,8 +465,9 @@ d correctly. */
 /* Computing MIN */
 				i__9 = kl + ku + 1, i__10 = ku + 1 + (n - j);
 				i__8 = min(i__9,i__10);
-				for (i = max(i__6,i__7); i <= i__8; ++i) {
-				    a[ioff + i] = 0.;
+				for (i__ = max(i__6,i__7); i__ <= i__8; ++i__)
+					 {
+				    a[ioff + i__] = 0.;
 /* L30: */
 				}
 				ioff += lda;
@@ -510,31 +500,25 @@ d correctly. */
 
 			    if (zerot) {
 				if (prefac) {
-				    goto L110;
+				    goto L100;
 				}
 				rcondo = 0.;
 				rcondi = 0.;
 
 			    } else if (! nofact) {
 
-/*                          Compute the condit
-ion number for comparison   
-                            with the value ret
-urned by DGESVX (FACT =   
-                            'N' reuses the con
-dition number from the   
-                            previous iteration
- with FACT = 'F'). */
+/*                          Compute the condition number for comparison   
+                            with the value returned by DGESVX (FACT =   
+                            'N' reuses the condition number from the   
+                            previous iteration with FACT = 'F'). */
 
 				i__8 = kl + ku + 1;
 				dlacpy_("Full", &i__8, &n, &asav[1], &lda, &
 					afb[kl + 1], &ldafb);
 				if (equil || iequed > 1) {
 
-/*                             Compute row
- and column scale factors to   
-                               equilibrate
- the matrix A. */
+/*                             Compute row and column scale factors to   
+                               equilibrate the matrix A. */
 
 				    dgbequ_(&n, &n, &kl, &ku, &afb[kl + 1], &
 					    ldafb, &s[1], &s[n + 1], &rowcnd, 
@@ -543,18 +527,15 @@ dition number from the
 					if (lsame_(equed, "R")) {
 					    rowcnd = 0.;
 					    colcnd = 1.;
-					} else if (lsame_(equed, "C"))
-						 {
+					} else if (lsame_(equed, "C")) {
 					    rowcnd = 1.;
 					    colcnd = 0.;
-					} else if (lsame_(equed, "B"))
-						 {
+					} else if (lsame_(equed, "B")) {
 					    rowcnd = 0.;
 					    colcnd = 0.;
 					}
 
-/*                                Equi
-librate the matrix. */
+/*                                Equilibrate the matrix. */
 
 					dlaqgb_(&n, &n, &kl, &ku, &afb[kl + 1]
 						, &ldafb, &s[1], &s[n + 1], &
@@ -562,42 +543,37 @@ librate the matrix. */
 				    }
 				}
 
-/*                          Save the condition
- number of the   
-                            non-equilibrated s
-ystem for use in DGET04. */
+/*                          Save the condition number of the   
+                            non-equilibrated system for use in DGET04. */
 
 				if (equil) {
 				    roldo = rcondo;
 				    roldi = rcondi;
 				}
 
-/*                          Compute the 1-norm
- and infinity-norm of A. */
+/*                          Compute the 1-norm and infinity-norm of A. */
 
 				anormo = dlangb_("1", &n, &kl, &ku, &afb[kl + 
 					1], &ldafb, &rwork[1]);
 				anormi = dlangb_("I", &n, &kl, &ku, &afb[kl + 
 					1], &ldafb, &rwork[1]);
 
-/*                          Factor the matrix 
-A. */
+/*                          Factor the matrix A. */
 
 				dgbtrf_(&n, &n, &kl, &ku, &afb[1], &ldafb, &
 					iwork[1], &info);
 
-/*                          Form the inverse o
-f A. */
+/*                          Form the inverse of A. */
 
 				dlaset_("Full", &n, &n, &c_b48, &c_b49, &work[
 					1], &ldb);
-				s_copy(srnamc_1.srnamt, "DGBTRS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DGBTRS", (ftnlen)6, (
+					ftnlen)6);
 				dgbtrs_("No transpose", &n, &kl, &ku, &n, &
 					afb[1], &ldafb, &iwork[1], &work[1], &
 					ldb, &info);
 
-/*                          Compute the 1-norm
- condition number of A. */
+/*                          Compute the 1-norm condition number of A. */
 
 				ainvnm = dlange_("1", &n, &n, &work[1], &ldb, 
 					&rwork[1]);
@@ -607,8 +583,7 @@ f A. */
 				    rcondo = 1. / anormo / ainvnm;
 				}
 
-/*                          Compute the infini
-ty-norm condition number   
+/*                          Compute the infinity-norm condition number   
                             of A. */
 
 				ainvnm = dlange_("I", &n, &n, &work[1], &ldb, 
@@ -619,12 +594,10 @@ ty-norm condition number
 				    rcondi = 1. / anormi / ainvnm;
 				}
 			    }
-/* L50: */
 
 			    for (itran = 1; itran <= 3; ++itran) {
 
-/*                          Do for each value 
-of TRANS. */
+/*                          Do for each value of TRANS. */
 
 				*(unsigned char *)trans = *(unsigned char *)&
 					transs[itran - 1];
@@ -634,18 +607,17 @@ of TRANS. */
 				    rcondc = rcondi;
 				}
 
-/*                          Restore the matrix
- A. */
+/*                          Restore the matrix A. */
 
 				i__8 = kl + ku + 1;
 				dlacpy_("Full", &i__8, &n, &asav[1], &lda, &a[
 					1], &lda);
 
-/*                          Form an exact solu
-tion and set the right hand   
+/*                          Form an exact solution and set the right hand   
                             side. */
 
-				s_copy(srnamc_1.srnamt, "DLARHS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
+					ftnlen)6);
 				dlarhs_(path, xtype, "Full", trans, &n, &n, &
 					kl, &ku, nrhs, &a[1], &lda, &xact[1], 
 					&ldb, &b[1], &ldb, iseed, &info);
@@ -655,13 +627,10 @@ tion and set the right hand
 
 				if (nofact && itran == 1) {
 
-/*                             --- Test DG
-BSV  ---   
+/*                             --- Test DGBSV  ---   
 
-                               Compute the
- LU factorization of the matrix   
-                               and solve t
-he system. */
+                               Compute the LU factorization of the matrix   
+                               and solve the system. */
 
 				    i__8 = kl + ku + 1;
 				    dlacpy_("Full", &i__8, &n, &a[1], &lda, &
@@ -669,13 +638,13 @@ he system. */
 				    dlacpy_("Full", &n, nrhs, &b[1], &ldb, &x[
 					    1], &ldb);
 
-				    s_copy(srnamc_1.srnamt, "DGBSV ", 6L, 6L);
+				    s_copy(srnamc_1.srnamt, "DGBSV ", (ftnlen)
+					    6, (ftnlen)6);
 				    dgbsv_(&n, &kl, &ku, nrhs, &afb[1], &
 					    ldafb, &iwork[1], &x[1], &ldb, &
 					    info);
 
-/*                             Check error
- code from DGBSV . */
+/*                             Check error code from DGBSV . */
 
 				    if (info != izero) {
 					alaerh_(path, "DGBSV ", &info, &izero,
@@ -683,10 +652,8 @@ he system. */
 						&imat, &nfail, &nerrs, nout);
 				    }
 
-/*                             Reconstruct
- matrix from factors and   
-                               compute res
-idual. */
+/*                             Reconstruct matrix from factors and   
+                               compute residual. */
 
 				    dgbt01_(&n, &n, &kl, &ku, &a[1], &lda, &
 					    afb[1], &ldafb, &iwork[1], &work[
@@ -694,11 +661,8 @@ idual. */
 				    nt = 1;
 				    if (izero == 0) {
 
-/*                                Comp
-ute residual of the computed 
-  
-                                  solu
-tion. */
+/*                                Compute residual of the computed   
+                                  solution. */
 
 					dlacpy_("Full", &n, nrhs, &b[1], &ldb,
 						 &work[1], &ldb);
@@ -707,11 +671,8 @@ tion. */
 						&ldb, &work[1], &ldb, &result[
 						1]);
 
-/*                                Chec
-k solution from generated exac
-t   
-                                  solu
-tion. */
+/*                                Check solution from generated exact   
+                                  solution. */
 
 					dget04_(&n, nrhs, &x[1], &ldb, &xact[
 						1], &ldb, &rcondc, &result[2])
@@ -719,10 +680,8 @@ tion. */
 					nt = 3;
 				    }
 
-/*                             Print infor
-mation about the tests that did   
-                               not pass th
-e threshold. */
+/*                             Print information about the tests that did   
+                               not pass the threshold. */
 
 				    i__8 = nt;
 				    for (k = 1; k <= i__8; ++k) {
@@ -732,7 +691,8 @@ e threshold. */
 					    }
 					    io___65.ciunit = *nout;
 					    s_wsfe(&io___65);
-					    do_fio(&c__1, "DGBSV ", 6L);
+					    do_fio(&c__1, "DGBSV ", (ftnlen)6)
+						    ;
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -749,13 +709,12 @@ e threshold. */
 					    e_wsfe();
 					    ++nfail;
 					}
-/* L60: */
+/* L50: */
 				    }
 				    nrun += nt;
 				}
 
-/*                          --- Test DGBSVX -
--- */
+/*                          --- Test DGBSVX --- */
 
 				if (! prefac) {
 				    i__8 = (kl << 1) + ku + 1;
@@ -766,22 +725,19 @@ e threshold. */
 					1], &ldb);
 				if (iequed > 1 && n > 0) {
 
-/*                             Equilibrate
- the matrix if FACT = 'F' and   
-                               EQUED = 'R'
-, 'C', or 'B'. */
+/*                             Equilibrate the matrix if FACT = 'F' and   
+                               EQUED = 'R', 'C', or 'B'. */
 
 				    dlaqgb_(&n, &n, &kl, &ku, &a[1], &lda, &s[
 					    1], &s[n + 1], &rowcnd, &colcnd, &
 					    amax, equed);
 				}
 
-/*                          Solve the system a
-nd compute the condition   
-                            number and error b
-ounds using DGBSVX. */
+/*                          Solve the system and compute the condition   
+                            number and error bounds using DGBSVX. */
 
-				s_copy(srnamc_1.srnamt, "DGBSVX", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DGBSVX", (ftnlen)6, (
+					ftnlen)6);
 				dgbsvx_(fact, trans, &n, &kl, &ku, nrhs, &a[1]
 					, &lda, &afb[1], &ldafb, &iwork[1], 
 					equed, &s[1], &s[n + 1], &b[1], &ldb, 
@@ -789,23 +745,21 @@ ounds using DGBSVX. */
 					rwork[*nrhs + 1], &work[1], &iwork[n 
 					+ 1], &info);
 
-/*                          Check the error co
-de from DGBSVX. */
+/*                          Check the error code from DGBSVX. */
 
 				if (info != izero) {
 /* Writing concatenation */
 				    i__11[0] = 1, a__1[0] = fact;
 				    i__11[1] = 1, a__1[1] = trans;
-				    s_cat(ch__1, a__1, i__11, &c__2, 2L);
+				    s_cat(ch__1, a__1, i__11, &c__2, (ftnlen)
+					    2);
 				    alaerh_(path, "DGBSVX", &info, &izero, 
 					    ch__1, &n, &n, &kl, &ku, nrhs, &
 					    imat, &nfail, &nerrs, nout);
 				}
 
-/*                          Compare WORK(1) fr
-om DGBSVX with the computed   
-                            reciprocal pivot g
-rowth factor RPVGRW */
+/*                          Compare WORK(1) from DGBSVX with the computed   
+                            reciprocal pivot growth factor RPVGRW */
 
 				if (info != 0) {
 				    anrmpv = 0.;
@@ -817,16 +771,16 @@ rowth factor RPVGRW */
 					i__9 = n + ku + 1 - j, i__10 = kl + 
 						ku + 1;
 					i__7 = min(i__9,i__10);
-					for (i = max(i__6,1); i <= i__7; ++i) 
-						{
+					for (i__ = max(i__6,1); i__ <= i__7; 
+						++i__) {
 /* Computing MAX */
-					    d__2 = anrmpv, d__3 = (d__1 = a[i 
-						    + (j - 1) * lda], abs(
+					    d__2 = anrmpv, d__3 = (d__1 = a[
+						    i__ + (j - 1) * lda], abs(
 						    d__1));
 					    anrmpv = max(d__2,d__3);
-/* L70: */
+/* L60: */
 					}
-/* L80: */
+/* L70: */
 				    }
 /* Computing MIN */
 				    i__7 = info - 1, i__6 = kl + ku;
@@ -849,8 +803,7 @@ rowth factor RPVGRW */
 					rpvgrw = 1.;
 				    } else {
 					rpvgrw = dlangb_("M", &n, &kl, &ku, &
-						a[1], &lda, &work[1]) / 
-						rpvgrw;
+						a[1], &lda, &work[1]) / rpvgrw;
 				    }
 				}
 				result[6] = (d__1 = rpvgrw - work[1], abs(
@@ -859,10 +812,8 @@ rowth factor RPVGRW */
 
 				if (! prefac) {
 
-/*                             Reconstruct
- matrix from factors and   
-                               compute res
-idual. */
+/*                             Reconstruct matrix from factors and   
+                               compute residual. */
 
 				    dgbt01_(&n, &n, &kl, &ku, &a[1], &lda, &
 					    afb[1], &ldafb, &iwork[1], &work[
@@ -875,8 +826,7 @@ idual. */
 				if (info == 0) {
 				    trfcon = FALSE_;
 
-/*                             Compute res
-idual of the computed solution. */
+/*                             Compute residual of the computed solution. */
 
 				    dlacpy_("Full", &n, nrhs, &bsav[1], &ldb, 
 					    &work[1], &ldb);
@@ -884,10 +834,8 @@ idual of the computed solution. */
 					    asav[1], &lda, &x[1], &ldb, &work[
 					    1], &ldb, &result[1]);
 
-/*                             Check solut
-ion from generated exact   
-                               solution. 
-*/
+/*                             Check solution from generated exact   
+                               solution. */
 
 				    if (nofact || prefac && lsame_(equed, 
 					    "N")) {
@@ -904,10 +852,8 @@ ion from generated exact
 						1], &ldb, &roldc, &result[2]);
 				    }
 
-/*                             Check the e
-rror bounds from iterative   
-                               refinement.
- */
+/*                             Check the error bounds from iterative   
+                               refinement. */
 
 				    dgbt05_(trans, &n, &kl, &ku, nrhs, &asav[
 					    1], &lda, &b[1], &ldb, &x[1], &
@@ -917,17 +863,13 @@ rror bounds from iterative
 				    trfcon = TRUE_;
 				}
 
-/*                          Compare RCOND from
- DGBSVX with the computed   
-                            value in RCONDC. 
-*/
+/*                          Compare RCOND from DGBSVX with the computed   
+                            value in RCONDC. */
 
 				result[5] = dget06_(&rcond, &rcondc);
 
-/*                          Print information 
-about the tests that did   
-                            not pass the thres
-hold. */
+/*                          Print information about the tests that did   
+                            not pass the threshold. */
 
 				if (! trfcon) {
 				    for (k = k1; k <= 7; ++k) {
@@ -938,13 +880,13 @@ hold. */
 					    if (prefac) {
 			  io___72.ciunit = *nout;
 			  s_wsfe(&io___72);
-			  do_fio(&c__1, "DGBSVX", 6L);
-			  do_fio(&c__1, fact, 1L);
-			  do_fio(&c__1, trans, 1L);
+			  do_fio(&c__1, "DGBSVX", (ftnlen)6);
+			  do_fio(&c__1, fact, (ftnlen)1);
+			  do_fio(&c__1, trans, (ftnlen)1);
 			  do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&kl, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&ku, (ftnlen)sizeof(integer));
-			  do_fio(&c__1, equed, 1L);
+			  do_fio(&c__1, equed, (ftnlen)1);
 			  do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer)
 				  );
 			  do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -954,9 +896,9 @@ hold. */
 					    } else {
 			  io___73.ciunit = *nout;
 			  s_wsfe(&io___73);
-			  do_fio(&c__1, "DGBSVX", 6L);
-			  do_fio(&c__1, fact, 1L);
-			  do_fio(&c__1, trans, 1L);
+			  do_fio(&c__1, "DGBSVX", (ftnlen)6);
+			  do_fio(&c__1, fact, (ftnlen)1);
+			  do_fio(&c__1, trans, (ftnlen)1);
 			  do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&kl, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&ku, (ftnlen)sizeof(integer));
@@ -969,7 +911,7 @@ hold. */
 					    }
 					    ++nfail;
 					}
-/* L90: */
+/* L80: */
 				    }
 				    nrun = nrun + 7 - k1;
 				} else {
@@ -980,16 +922,17 @@ hold. */
 					if (prefac) {
 					    io___74.ciunit = *nout;
 					    s_wsfe(&io___74);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__1, (
@@ -1001,9 +944,10 @@ hold. */
 					} else {
 					    io___75.ciunit = *nout;
 					    s_wsfe(&io___75);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1029,16 +973,17 @@ hold. */
 					if (prefac) {
 					    io___76.ciunit = *nout;
 					    s_wsfe(&io___76);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__6, (
@@ -1050,9 +995,10 @@ hold. */
 					} else {
 					    io___77.ciunit = *nout;
 					    s_wsfe(&io___77);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1078,16 +1024,17 @@ hold. */
 					if (prefac) {
 					    io___78.ciunit = *nout;
 					    s_wsfe(&io___78);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__7, (
@@ -1099,9 +1046,10 @@ hold. */
 					} else {
 					    io___79.ciunit = *nout;
 					    s_wsfe(&io___79);
-					    do_fio(&c__1, "DGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    do_fio(&c__1, "DGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1122,22 +1070,22 @@ hold. */
 				    }
 
 				}
-/* L100: */
+/* L90: */
 			    }
-L110:
+L100:
 			    ;
 			}
-/* L120: */
+/* L110: */
 		    }
-L130:
+L120:
 		    ;
 		}
-L140:
+L130:
 		;
 	    }
-/* L150: */
+/* L140: */
 	}
-/* L160: */
+/* L150: */
     }
 
 /*     Print a summary of the results. */

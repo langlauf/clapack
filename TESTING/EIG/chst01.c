@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,8 +13,8 @@ static complex c_b8 = {0.f,0.f};
 static complex c_b11 = {-1.f,0.f};
 
 /* Subroutine */ int chst01_(integer *n, integer *ilo, integer *ihi, complex *
-	a, integer *lda, complex *h, integer *ldh, complex *q, integer *ldq, 
-	complex *work, integer *lwork, real *rwork, real *result)
+	a, integer *lda, complex *h__, integer *ldh, complex *q, integer *ldq,
+	 complex *work, integer *lwork, real *rwork, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, h_dim1, h_offset, q_dim1, q_offset;
@@ -36,7 +37,7 @@ static complex c_b11 = {-1.f,0.f};
     static real smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -45,8 +46,7 @@ static complex c_b11 = {-1.f,0.f};
     Purpose   
     =======   
 
-    CHST01 tests the reduction of a general matrix A to upper Hessenberg 
-  
+    CHST01 tests the reduction of a general matrix A to upper Hessenberg   
     form:  A = Q*H*Q'.  Two test ratios are computed;   
 
     RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
@@ -102,21 +102,20 @@ static complex c_b11 = {-1.f,0.f};
             RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
             RESULT(2) = norm( I - Q'*Q ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --work;
     --rwork;
@@ -145,7 +144,7 @@ static complex c_b11 = {-1.f,0.f};
 /*     Compute Q*H */
 
     cgemm_("No transpose", "No transpose", n, n, n, &c_b7, &q[q_offset], ldq, 
-	    &h[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
+	    &h__[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
 
 /*     Compute A - Q*H*Q' */
 

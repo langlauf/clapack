@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,7 +29,7 @@ static integer c__1 = 1;
     static integer imax;
     static doublereal unfl, ovfl;
     static logical unit;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static logical upper;
     static doublereal xnorm;
@@ -41,7 +42,15 @@ static integer c__1 = 1;
     static doublereal eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_subscr(a_1,a_2) (a_2)*xact_dim1 + a_1
+#define xact_ref(a_1,a_2) xact[xact_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -67,8 +76,7 @@ static integer c__1 = 1;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -92,15 +100,12 @@ static integer c__1 = 1;
             NRHS >= 0.   
 
     AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-            If DIAG = 'U', the diagonal elements of A are not referenced 
-  
+            If DIAG = 'U', the diagonal elements of A are not referenced   
             and are assumed to be 1.   
 
     B       (input) COMPLEX*16 array, dimension (LDB,NRHS)   
@@ -122,21 +127,17 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     FERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude 
-  
-            of the largest entry in (X - XTRUE) divided by the magnitude 
-  
+            X.  If XTRUE is the true solution, FERR bounds the magnitude   
+            of the largest entry in (X - XTRUE) divided by the magnitude   
             of the largest entry in X.   
 
     BERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
             The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A 
-  
+            vector (i.e., the smallest relative change in any entry of A   
             or B that makes X an exact solution).   
 
     RESLTS  (output) DOUBLE PRECISION array, dimension (2)   
@@ -144,8 +145,7 @@ static integer c__1 = 1;
             RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
             RESLTS(2) = BERR / ( (n+1)*EPS + (*) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
@@ -153,13 +153,13 @@ static integer c__1 = 1;
        Parameter adjustments */
     --ap;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -186,17 +186,17 @@ static integer c__1 = 1;
     errbnd = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = izamax_(n, &x[j * x_dim1 + 1], &c__1);
+	imax = izamax_(n, &x_ref(1, j), &c__1);
 /* Computing MAX */
-	i__2 = imax + j * x_dim1;
-	d__3 = (d__1 = x[i__2].r, abs(d__1)) + (d__2 = d_imag(&x[imax + j * 
-		x_dim1]), abs(d__2));
+	i__2 = x_subscr(imax, j);
+	d__3 = (d__1 = x[i__2].r, abs(d__1)) + (d__2 = d_imag(&x_ref(imax, j))
+		, abs(d__2));
 	xnorm = max(d__3,unfl);
 	diff = 0.;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * x_dim1;
-	    i__4 = i + j * xact_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = x_subscr(i__, j);
+	    i__4 = xact_subscr(i__, j);
 	    z__2.r = x[i__3].r - xact[i__4].r, z__2.i = x[i__3].i - xact[i__4]
 		    .i;
 	    z__1.r = z__2.r, z__1.i = z__2.i;
@@ -229,8 +229,7 @@ L30:
     }
     reslts[1] = errbnd;
 
-/*     Test 2:  Compute the maximum of BERR / ( (n+1)*EPS + (*) ), where 
-  
+/*     Test 2:  Compute the maximum of BERR / ( (n+1)*EPS + (*) ), where   
        (*) = (n+1)*UNFL / (min_i (abs(A)*abs(X) +abs(b))_i ) */
 
     ifu = 0;
@@ -240,87 +239,87 @@ L30:
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + k * b_dim1;
-	    tmp = (d__1 = b[i__3].r, abs(d__1)) + (d__2 = d_imag(&b[i + k * 
-		    b_dim1]), abs(d__2));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = b_subscr(i__, k);
+	    tmp = (d__1 = b[i__3].r, abs(d__1)) + (d__2 = d_imag(&b_ref(i__, 
+		    k)), abs(d__2));
 	    if (upper) {
-		jc = (i - 1) * i / 2;
+		jc = (i__ - 1) * i__ / 2;
 		if (! notran) {
-		    i__3 = i - ifu;
+		    i__3 = i__ - ifu;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = jc + j;
-			i__5 = j + k * x_dim1;
+			i__5 = x_subscr(j, k);
 			tmp += ((d__1 = ap[i__4].r, abs(d__1)) + (d__2 = 
 				d_imag(&ap[jc + j]), abs(d__2))) * ((d__3 = x[
-				i__5].r, abs(d__3)) + (d__4 = d_imag(&x[j + k 
-				* x_dim1]), abs(d__4)));
+				i__5].r, abs(d__3)) + (d__4 = d_imag(&x_ref(j,
+				 k)), abs(d__4)));
 /* L40: */
 		    }
 		    if (unit) {
-			i__3 = i + k * x_dim1;
+			i__3 = x_subscr(i__, k);
 			tmp += (d__1 = x[i__3].r, abs(d__1)) + (d__2 = d_imag(
-				&x[i + k * x_dim1]), abs(d__2));
+				&x_ref(i__, k)), abs(d__2));
 		    }
 		} else {
-		    jc += i;
+		    jc += i__;
 		    if (unit) {
-			i__3 = i + k * x_dim1;
+			i__3 = x_subscr(i__, k);
 			tmp += (d__1 = x[i__3].r, abs(d__1)) + (d__2 = d_imag(
-				&x[i + k * x_dim1]), abs(d__2));
-			jc += i;
+				&x_ref(i__, k)), abs(d__2));
+			jc += i__;
 		    }
 		    i__3 = *n;
-		    for (j = i + ifu; j <= i__3; ++j) {
+		    for (j = i__ + ifu; j <= i__3; ++j) {
 			i__4 = jc;
-			i__5 = j + k * x_dim1;
+			i__5 = x_subscr(j, k);
 			tmp += ((d__1 = ap[i__4].r, abs(d__1)) + (d__2 = 
 				d_imag(&ap[jc]), abs(d__2))) * ((d__3 = x[
-				i__5].r, abs(d__3)) + (d__4 = d_imag(&x[j + k 
-				* x_dim1]), abs(d__4)));
+				i__5].r, abs(d__3)) + (d__4 = d_imag(&x_ref(j,
+				 k)), abs(d__4)));
 			jc += j;
 /* L50: */
 		    }
 		}
 	    } else {
 		if (notran) {
-		    jc = i;
-		    i__3 = i - ifu;
+		    jc = i__;
+		    i__3 = i__ - ifu;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = jc;
-			i__5 = j + k * x_dim1;
+			i__5 = x_subscr(j, k);
 			tmp += ((d__1 = ap[i__4].r, abs(d__1)) + (d__2 = 
 				d_imag(&ap[jc]), abs(d__2))) * ((d__3 = x[
-				i__5].r, abs(d__3)) + (d__4 = d_imag(&x[j + k 
-				* x_dim1]), abs(d__4)));
+				i__5].r, abs(d__3)) + (d__4 = d_imag(&x_ref(j,
+				 k)), abs(d__4)));
 			jc = jc + *n - j;
 /* L60: */
 		    }
 		    if (unit) {
-			i__3 = i + k * x_dim1;
+			i__3 = x_subscr(i__, k);
 			tmp += (d__1 = x[i__3].r, abs(d__1)) + (d__2 = d_imag(
-				&x[i + k * x_dim1]), abs(d__2));
+				&x_ref(i__, k)), abs(d__2));
 		    }
 		} else {
-		    jc = (i - 1) * (*n - i) + i * (i + 1) / 2;
+		    jc = (i__ - 1) * (*n - i__) + i__ * (i__ + 1) / 2;
 		    if (unit) {
-			i__3 = i + k * x_dim1;
+			i__3 = x_subscr(i__, k);
 			tmp += (d__1 = x[i__3].r, abs(d__1)) + (d__2 = d_imag(
-				&x[i + k * x_dim1]), abs(d__2));
+				&x_ref(i__, k)), abs(d__2));
 		    }
 		    i__3 = *n;
-		    for (j = i + ifu; j <= i__3; ++j) {
-			i__4 = jc + j - i;
-			i__5 = j + k * x_dim1;
+		    for (j = i__ + ifu; j <= i__3; ++j) {
+			i__4 = jc + j - i__;
+			i__5 = x_subscr(j, k);
 			tmp += ((d__1 = ap[i__4].r, abs(d__1)) + (d__2 = 
-				d_imag(&ap[jc + j - i]), abs(d__2))) * ((d__3 
-				= x[i__5].r, abs(d__3)) + (d__4 = d_imag(&x[j 
-				+ k * x_dim1]), abs(d__4)));
+				d_imag(&ap[jc + j - i__]), abs(d__2))) * ((
+				d__3 = x[i__5].r, abs(d__3)) + (d__4 = d_imag(
+				&x_ref(j, k)), abs(d__4)));
 /* L70: */
 		    }
 		}
 	    }
-	    if (i == 1) {
+	    if (i__ == 1) {
 		axbi = tmp;
 	    } else {
 		axbi = min(axbi,tmp);
@@ -343,4 +342,12 @@ L30:
 /*     End of ZTPT05 */
 
 } /* ztpt05_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+#undef xact_ref
+#undef xact_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static doublereal c_b13 = 0.;
 
     /* Local variables */
     static doublereal aukj, unfl;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
@@ -33,7 +34,11 @@ static doublereal c_b13 = 0.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +52,7 @@ static doublereal c_b13 = 0.;
         A U = U S   
 
     where A is symmetric tridiagonal, the columns of U are orthogonal,   
-    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1). 
-  
+    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1).   
     Two tests are performed:   
 
        RESULT(1) = | U' A U - S | / ( |A| m ulp )   
@@ -59,8 +63,7 @@ static doublereal c_b13 = 0.;
     =========   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DSTT22 does nothing. 
-  
+            The size of the matrix.  If it is zero, DSTT22 does nothing.   
             It must be at least zero.   
 
     M       (input) INTEGER   
@@ -105,8 +108,7 @@ static doublereal c_b13 = 0.;
             The values computed by the two tests described above.  The   
             values are currently limited to 1/ulp, to avoid overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -115,10 +117,10 @@ static doublereal c_b13 = 0.;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --result;
 
@@ -158,38 +160,37 @@ static doublereal c_b13 = 0.;
 /*     Norm of U'AU - S */
 
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = *m;
 	for (j = 1; j <= i__2; ++j) {
-	    work[i + j * work_dim1] = 0.;
+	    work_ref(i__, j) = 0.;
 	    i__3 = *n;
 	    for (k = 1; k <= i__3; ++k) {
-		aukj = ad[k] * u[k + j * u_dim1];
+		aukj = ad[k] * u_ref(k, j);
 		if (k != *n) {
-		    aukj += ae[k] * u[k + 1 + j * u_dim1];
+		    aukj += ae[k] * u_ref(k + 1, j);
 		}
 		if (k != 1) {
-		    aukj += ae[k - 1] * u[k - 1 + j * u_dim1];
+		    aukj += ae[k - 1] * u_ref(k - 1, j);
 		}
-		work[i + j * work_dim1] += u[k + i * u_dim1] * aukj;
+		work_ref(i__, j) = work_ref(i__, j) + u_ref(k, i__) * aukj;
 /* L20: */
 	    }
 /* L30: */
 	}
-	work[i + i * work_dim1] -= sd[i];
+	work_ref(i__, i__) = work_ref(i__, i__) - sd[i__];
 	if (*kband == 1) {
-	    if (i != 1) {
-		work[i + (i - 1) * work_dim1] -= se[i - 1];
+	    if (i__ != 1) {
+		work_ref(i__, i__ - 1) = work_ref(i__, i__ - 1) - se[i__ - 1];
 	    }
-	    if (i != *n) {
-		work[i + (i + 1) * work_dim1] -= se[i];
+	    if (i__ != *n) {
+		work_ref(i__, i__ + 1) = work_ref(i__, i__ + 1) - se[i__];
 	    }
 	}
 /* L40: */
     }
 
-    wnorm = dlansy_("1", "L", m, &work[work_offset], m, &work[(*m + 1) * 
-	    work_dim1 + 1]);
+    wnorm = dlansy_("1", "L", m, &work[work_offset], m, &work_ref(1, *m + 1));
 
     if (anorm > wnorm) {
 	result[1] = wnorm / anorm / (*m * ulp);
@@ -214,13 +215,13 @@ static doublereal c_b13 = 0.;
 
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
-	work[j + j * work_dim1] += -1.;
+	work_ref(j, j) = work_ref(j, j) - 1.;
 /* L50: */
     }
 
 /* Computing MIN */
     d__1 = (doublereal) (*m), d__2 = dlange_("1", m, m, &work[work_offset], m,
-	     &work[(*m + 1) * work_dim1 + 1]);
+	     &work_ref(1, *m + 1));
     result[2] = min(d__1,d__2) / (*m * ulp);
 
     return 0;
@@ -228,4 +229,8 @@ static doublereal c_b13 = 0.;
 /*     End of DSTT22 */
 
 } /* dstt22_ */
+
+#undef u_ref
+#undef work_ref
+
 

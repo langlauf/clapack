@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static doublereal c_b15 = -1.;
 static doublereal c_b16 = 1.;
 
 /* Subroutine */ int drqt02_(integer *m, integer *n, integer *k, doublereal *
-	a, doublereal *af, doublereal *q, doublereal *r, integer *lda, 
+	a, doublereal *af, doublereal *q, doublereal *r__, integer *lda, 
 	doublereal *tau, doublereal *work, integer *lwork, doublereal *rwork, 
 	doublereal *result)
 {
@@ -55,7 +56,13 @@ static doublereal c_b16 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define r___ref(a_1,a_2) r__[(a_2)*r_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -78,24 +85,21 @@ static doublereal c_b16 = 1.;
     =========   
 
     M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0. 
-  
+            The number of rows of the matrix Q to be generated.  M >= 0.   
 
     N       (input) INTEGER   
             The number of columns of the matrix Q to be generated.   
             N >= M >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The m-by-n matrix A which was factorized by DRQT01.   
 
     AF      (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the RQ factorization of A, as returned by DGERQF. 
-  
+            Details of the RQ factorization of A, as returned by DGERQF.   
             See DGERQF for further details.   
 
     Q       (workspace) DOUBLE PRECISION array, dimension (LDA,N)   
@@ -103,12 +107,10 @@ static doublereal c_b16 = 1.;
     R       (workspace) DOUBLE PRECISION array, dimension (LDA,M)   
 
     LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= N. 
-  
+            The leading dimension of the arrays A, AF, Q and L. LDA >= N.   
 
     TAU     (input) DOUBLE PRECISION array, dimension (M)   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the RQ factorization in AF.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
@@ -123,24 +125,23 @@ static doublereal c_b16 = 1.;
             RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -161,40 +162,40 @@ static doublereal c_b16 = 1.;
     dlaset_("Full", m, n, &c_b4, &c_b4, &q[q_offset], lda);
     if (*k < *n) {
 	i__1 = *n - *k;
-	dlacpy_("Full", k, &i__1, &af[*m - *k + 1 + af_dim1], lda, &q[*m - *k 
-		+ 1 + q_dim1], lda);
+	dlacpy_("Full", k, &i__1, &af_ref(*m - *k + 1, 1), lda, &q_ref(*m - *
+		k + 1, 1), lda);
     }
     if (*k > 1) {
 	i__1 = *k - 1;
 	i__2 = *k - 1;
-	dlacpy_("Lower", &i__1, &i__2, &af[*m - *k + 2 + (*n - *k + 1) * 
-		af_dim1], lda, &q[*m - *k + 2 + (*n - *k + 1) * q_dim1], lda);
+	dlacpy_("Lower", &i__1, &i__2, &af_ref(*m - *k + 2, *n - *k + 1), lda,
+		 &q_ref(*m - *k + 2, *n - *k + 1), lda);
     }
 
 /*     Generate the last n rows of the matrix Q */
 
-    s_copy(srnamc_1.srnamt, "DORGRQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORGRQ", (ftnlen)6, (ftnlen)6);
     dorgrq_(m, n, k, &q[q_offset], lda, &tau[*m - *k + 1], &work[1], lwork, &
 	    info);
 
 /*     Copy R(m-k+1:m,n-m+1:n) */
 
-    dlaset_("Full", k, m, &c_b10, &c_b10, &r[*m - *k + 1 + (*n - *m + 1) * 
-	    r_dim1], lda);
-    dlacpy_("Upper", k, k, &af[*m - *k + 1 + (*n - *k + 1) * af_dim1], lda, &
-	    r[*m - *k + 1 + (*n - *k + 1) * r_dim1], lda);
+    dlaset_("Full", k, m, &c_b10, &c_b10, &r___ref(*m - *k + 1, *n - *m + 1), 
+	    lda);
+    dlacpy_("Upper", k, k, &af_ref(*m - *k + 1, *n - *k + 1), lda, &r___ref(*
+	    m - *k + 1, *n - *k + 1), lda);
 
 /*     Compute R(m-k+1:m,n-m+1:n) - A(m-k+1:m,1:n) * Q(n-m+1:n,1:n)' */
 
-    dgemm_("No transpose", "Transpose", k, m, n, &c_b15, &a[*m - *k + 1 + 
-	    a_dim1], lda, &q[q_offset], lda, &c_b16, &r[*m - *k + 1 + (*n - *
-	    m + 1) * r_dim1], lda);
+    dgemm_("No transpose", "Transpose", k, m, n, &c_b15, &a_ref(*m - *k + 1, 
+	    1), lda, &q[q_offset], lda, &c_b16, &r___ref(*m - *k + 1, *n - *m 
+	    + 1), lda);
 
 /*     Compute norm( R - A*Q' ) / ( N * norm(A) * EPS ) . */
 
-    anorm = dlange_("1", k, n, &a[*m - *k + 1 + a_dim1], lda, &rwork[1]);
-    resid = dlange_("1", k, m, &r[*m - *k + 1 + (*n - *m + 1) * r_dim1], lda, 
-	    &rwork[1]);
+    anorm = dlange_("1", k, n, &a_ref(*m - *k + 1, 1), lda, &rwork[1]);
+    resid = dlange_("1", k, m, &r___ref(*m - *k + 1, *n - *m + 1), lda, &
+	    rwork[1]);
     if (anorm > 0.) {
 	result[1] = resid / (doublereal) max(1,*n) / anorm / eps;
     } else {
@@ -203,13 +204,13 @@ static doublereal c_b16 = 1.;
 
 /*     Compute I - Q*Q' */
 
-    dlaset_("Full", m, m, &c_b10, &c_b16, &r[r_offset], lda);
+    dlaset_("Full", m, m, &c_b10, &c_b16, &r__[r_offset], lda);
     dsyrk_("Upper", "No transpose", m, n, &c_b15, &q[q_offset], lda, &c_b16, &
-	    r[r_offset], lda);
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q*Q' ) / ( N * EPS ) . */
 
-    resid = dlansy_("1", "Upper", m, &r[r_offset], lda, &rwork[1]);
+    resid = dlansy_("1", "Upper", m, &r__[r_offset], lda, &rwork[1]);
 
     result[2] = resid / (doublereal) max(1,*n) / eps;
 
@@ -218,4 +219,10 @@ static doublereal c_b16 = 1.;
 /*     End of DRQT02 */
 
 } /* drqt02_ */
+
+#undef af_ref
+#undef r___ref
+#undef q_ref
+#undef a_ref
+
 

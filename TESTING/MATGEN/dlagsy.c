@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,7 +14,7 @@ static doublereal c_b12 = 0.;
 static doublereal c_b19 = -1.;
 static doublereal c_b26 = 1.;
 
-/* Subroutine */ int dlagsy_(integer *n, integer *k, doublereal *d, 
+/* Subroutine */ int dlagsy_(integer *n, integer *k, doublereal *d__, 
 	doublereal *a, integer *lda, integer *iseed, doublereal *work, 
 	integer *info)
 {
@@ -33,7 +34,7 @@ static doublereal c_b26 = 1.;
     extern /* Subroutine */ int dsyr2_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer i, j;
+    static integer i__, j;
     static doublereal alpha;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dgemv_(char *, integer *, integer *, doublereal *, 
@@ -48,7 +49,10 @@ static doublereal c_b26 = 1.;
     static doublereal tau;
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0)   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary test routine (version 3.0)   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -58,10 +62,8 @@ static doublereal c_b26 = 1.;
     =======   
 
     DLAGSY generates a real symmetric matrix A, by pre- and post-   
-    multiplying a real diagonal matrix D with a random orthogonal matrix: 
-  
-    A = U*D*U'. The semi-bandwidth may then be reduced to k by additional 
-  
+    multiplying a real diagonal matrix D with a random orthogonal matrix:   
+    A = U*D*U'. The semi-bandwidth may then be reduced to k by additional   
     orthogonal transformations.   
 
     Arguments   
@@ -85,8 +87,7 @@ static doublereal c_b26 = 1.;
             The leading dimension of the array A.  LDA >= N.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array 
-  
+            On entry, the seed of the random number generator; the array   
             elements must be between 0 and 4095, and ISEED(4) must be   
             odd.   
             On exit, the seed is updated.   
@@ -97,16 +98,15 @@ static doublereal c_b26 = 1.;
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
        Parameter adjustments */
-    --d;
+    --d__;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
     --work;
@@ -131,34 +131,34 @@ static doublereal c_b26 = 1.;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = j + 1; i <= i__2; ++i) {
-	    a[i + j * a_dim1] = 0.;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    a_ref(i__, j) = 0.;
 /* L10: */
 	}
 /* L20: */
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	a[i + i * a_dim1] = d[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	a_ref(i__, i__) = d__[i__];
 /* L30: */
     }
 
 /*     Generate lower triangle of symmetric matrix */
 
-    for (i = *n - 1; i >= 1; --i) {
+    for (i__ = *n - 1; i__ >= 1; --i__) {
 
 /*        generate random reflection */
 
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	dlarnv_(&c__3, &iseed[1], &i__1, &work[1]);
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	wn = dnrm2_(&i__1, &work[1], &c__1);
 	wa = d_sign(&wn, &work[1]);
 	if (wn == 0.) {
 	    tau = 0.;
 	} else {
 	    wb = work[1] + wa;
-	    i__1 = *n - i;
+	    i__1 = *n - i__;
 	    d__1 = 1. / wb;
 	    dscal_(&i__1, &d__1, &work[2], &c__1);
 	    work[1] = 1.;
@@ -170,88 +170,85 @@ static doublereal c_b26 = 1.;
 
           compute  y := tau * A * u */
 
-	i__1 = *n - i + 1;
-	dsymv_("Lower", &i__1, &tau, &a[i + i * a_dim1], lda, &work[1], &c__1,
-		 &c_b12, &work[*n + 1], &c__1);
+	i__1 = *n - i__ + 1;
+	dsymv_("Lower", &i__1, &tau, &a_ref(i__, i__), lda, &work[1], &c__1, &
+		c_b12, &work[*n + 1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( y, u ) * u */
 
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	alpha = tau * -.5 * ddot_(&i__1, &work[*n + 1], &c__1, &work[1], &
 		c__1);
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	daxpy_(&i__1, &alpha, &work[1], &c__1, &work[*n + 1], &c__1);
 
 /*        apply the transformation as a rank-2 update to A(i:n,i:n) */
 
-	i__1 = *n - i + 1;
+	i__1 = *n - i__ + 1;
 	dsyr2_("Lower", &i__1, &c_b19, &work[1], &c__1, &work[*n + 1], &c__1, 
-		&a[i + i * a_dim1], lda);
+		&a_ref(i__, i__), lda);
 /* L40: */
     }
 
 /*     Reduce number of subdiagonals to K */
 
     i__1 = *n - 1 - *k;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*        generate reflection to annihilate A(k+i+1:n,i) */
 
-	i__2 = *n - *k - i + 1;
-	wn = dnrm2_(&i__2, &a[*k + i + i * a_dim1], &c__1);
-	wa = d_sign(&wn, &a[*k + i + i * a_dim1]);
+	i__2 = *n - *k - i__ + 1;
+	wn = dnrm2_(&i__2, &a_ref(*k + i__, i__), &c__1);
+	wa = d_sign(&wn, &a_ref(*k + i__, i__));
 	if (wn == 0.) {
 	    tau = 0.;
 	} else {
-	    wb = a[*k + i + i * a_dim1] + wa;
-	    i__2 = *n - *k - i;
+	    wb = a_ref(*k + i__, i__) + wa;
+	    i__2 = *n - *k - i__;
 	    d__1 = 1. / wb;
-	    dscal_(&i__2, &d__1, &a[*k + i + 1 + i * a_dim1], &c__1);
-	    a[*k + i + i * a_dim1] = 1.;
+	    dscal_(&i__2, &d__1, &a_ref(*k + i__ + 1, i__), &c__1);
+	    a_ref(*k + i__, i__) = 1.;
 	    tau = wb / wa;
 	}
 
 /*        apply reflection to A(k+i:n,i+1:k+i-1) from the left */
 
-	i__2 = *n - *k - i + 1;
+	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
-	dgemv_("Transpose", &i__2, &i__3, &c_b26, &a[*k + i + (i + 1) * 
-		a_dim1], lda, &a[*k + i + i * a_dim1], &c__1, &c_b12, &work[1]
-		, &c__1);
-	i__2 = *n - *k - i + 1;
+	dgemv_("Transpose", &i__2, &i__3, &c_b26, &a_ref(*k + i__, i__ + 1), 
+		lda, &a_ref(*k + i__, i__), &c__1, &c_b12, &work[1], &c__1);
+	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
 	d__1 = -tau;
-	dger_(&i__2, &i__3, &d__1, &a[*k + i + i * a_dim1], &c__1, &work[1], &
-		c__1, &a[*k + i + (i + 1) * a_dim1], lda);
+	dger_(&i__2, &i__3, &d__1, &a_ref(*k + i__, i__), &c__1, &work[1], &
+		c__1, &a_ref(*k + i__, i__ + 1), lda);
 
-/*        apply reflection to A(k+i:n,k+i:n) from the left and the rig
-ht   
+/*        apply reflection to A(k+i:n,k+i:n) from the left and the right   
 
           compute  y := tau * A * u */
 
-	i__2 = *n - *k - i + 1;
-	dsymv_("Lower", &i__2, &tau, &a[*k + i + (*k + i) * a_dim1], lda, &a[*
-		k + i + i * a_dim1], &c__1, &c_b12, &work[1], &c__1);
+	i__2 = *n - *k - i__ + 1;
+	dsymv_("Lower", &i__2, &tau, &a_ref(*k + i__, *k + i__), lda, &a_ref(*
+		k + i__, i__), &c__1, &c_b12, &work[1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( y, u ) * u */
 
-	i__2 = *n - *k - i + 1;
-	alpha = tau * -.5 * ddot_(&i__2, &work[1], &c__1, &a[*k + i + i * 
-		a_dim1], &c__1);
-	i__2 = *n - *k - i + 1;
-	daxpy_(&i__2, &alpha, &a[*k + i + i * a_dim1], &c__1, &work[1], &c__1)
-		;
+	i__2 = *n - *k - i__ + 1;
+	alpha = tau * -.5 * ddot_(&i__2, &work[1], &c__1, &a_ref(*k + i__, 
+		i__), &c__1);
+	i__2 = *n - *k - i__ + 1;
+	daxpy_(&i__2, &alpha, &a_ref(*k + i__, i__), &c__1, &work[1], &c__1);
 
 /*        apply symmetric rank-2 update to A(k+i:n,k+i:n) */
 
-	i__2 = *n - *k - i + 1;
-	dsyr2_("Lower", &i__2, &c_b19, &a[*k + i + i * a_dim1], &c__1, &work[
-		1], &c__1, &a[*k + i + (*k + i) * a_dim1], lda);
+	i__2 = *n - *k - i__ + 1;
+	dsyr2_("Lower", &i__2, &c_b19, &a_ref(*k + i__, i__), &c__1, &work[1],
+		 &c__1, &a_ref(*k + i__, *k + i__), lda);
 
-	a[*k + i + i * a_dim1] = -wa;
+	a_ref(*k + i__, i__) = -wa;
 	i__2 = *n;
-	for (j = *k + i + 1; j <= i__2; ++j) {
-	    a[j + i * a_dim1] = 0.;
+	for (j = *k + i__ + 1; j <= i__2; ++j) {
+	    a_ref(j, i__) = 0.;
 /* L50: */
 	}
 /* L60: */
@@ -262,8 +259,8 @@ ht
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
-	for (i = j + 1; i <= i__2; ++i) {
-	    a[j + i * a_dim1] = a[i + j * a_dim1];
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    a_ref(j, i__) = a_ref(i__, j);
 /* L70: */
 	}
 /* L80: */
@@ -273,4 +270,7 @@ ht
 /*     End of DLAGSY */
 
 } /* dlagsy_ */
+
+#undef a_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlapll_(integer *n, doublecomplex *x, integer *incx, 
 	doublecomplex *y, integer *incy, doublereal *ssmin)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -42,18 +43,14 @@
             The increment between successive elements of Y. INCY > 0.   
 
     SSMIN   (output) DOUBLE PRECISION   
-            The smallest singular value of the N-by-2 matrix A = ( X Y ). 
-  
+            The smallest singular value of the N-by-2 matrix A = ( X Y ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2, d__3;
@@ -64,7 +61,7 @@
     /* Local variables */
     extern /* Subroutine */ int dlas2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
-    static doublecomplex c;
+    static doublecomplex c__;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
     static doublereal ssmax;
@@ -75,11 +72,10 @@
 	    doublecomplex *, integer *, doublecomplex *);
     static doublecomplex tau;
 
+    --y;
+    --x;
 
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 1) {
 	*ssmin = 0.;
 	return 0;
@@ -87,24 +83,24 @@
 
 /*     Compute the QR factorization of the N-by-2 matrix ( X Y ) */
 
-    zlarfg_(n, &X(1), &X(*incx + 1), incx, &tau);
-    a11.r = X(1).r, a11.i = X(1).i;
-    X(1).r = 1., X(1).i = 0.;
+    zlarfg_(n, &x[1], &x[*incx + 1], incx, &tau);
+    a11.r = x[1].r, a11.i = x[1].i;
+    x[1].r = 1., x[1].i = 0.;
 
     d_cnjg(&z__3, &tau);
     z__2.r = -z__3.r, z__2.i = -z__3.i;
-    zdotc_(&z__4, n, &X(1), incx, &Y(1), incy);
+    zdotc_(&z__4, n, &x[1], incx, &y[1], incy);
     z__1.r = z__2.r * z__4.r - z__2.i * z__4.i, z__1.i = z__2.r * z__4.i + 
 	    z__2.i * z__4.r;
-    c.r = z__1.r, c.i = z__1.i;
-    zaxpy_(n, &c, &X(1), incx, &Y(1), incy);
+    c__.r = z__1.r, c__.i = z__1.i;
+    zaxpy_(n, &c__, &x[1], incx, &y[1], incy);
 
     i__1 = *n - 1;
-    zlarfg_(&i__1, &Y(*incy + 1), &Y((*incy << 1) + 1), incy, &tau);
+    zlarfg_(&i__1, &y[*incy + 1], &y[(*incy << 1) + 1], incy, &tau);
 
-    a12.r = Y(1).r, a12.i = Y(1).i;
+    a12.r = y[1].r, a12.i = y[1].i;
     i__1 = *incy + 1;
-    a22.r = Y(*incy+1).r, a22.i = Y(*incy+1).i;
+    a22.r = y[i__1].r, a22.i = y[i__1].i;
 
 /*     Compute the SVD of 2-by-2 Upper triangular matrix. */
 

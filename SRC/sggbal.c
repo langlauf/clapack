@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sggbal_(char *job, integer *n, real *a, integer *lda, 
 	real *b, integer *ldb, integer *ilo, integer *ihi, real *lscale, real 
 	*rscale, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -16,8 +17,7 @@
     SGGBAL balances a pair of general real matrices (A,B).  This   
     involves, first, permuting A and B by similarity transformations to   
     isolate eigenvalues in the first 1 to ILO$-$1 and last IHI+1 to N   
-    elements on the diagonal; and second, applying a diagonal similarity 
-  
+    elements on the diagonal; and second, applying a diagonal similarity   
     transformation to rows and columns ILO to IHI to make the rows   
     and columns as close in norm as possible. Both steps are optional.   
 
@@ -96,15 +96,12 @@
     See R.C. WARD, Balancing the generalized eigenvalue problem,   
                    SIAM J. Sci. Stat. Comp. 2 (1981), 141-152.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b34 = 10.f;
@@ -122,7 +119,7 @@
     static real basl, cmax;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
     static real coef2, coef5;
-    static integer i, j, k, l, m;
+    static integer i__, j, k, l, m;
     static real gamma, t, alpha;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
@@ -145,19 +142,24 @@
     static integer lsfmin, lsfmax, ip1, jp1, lm1;
     static real cab, rab, ewc, cor, sum;
     static integer nrp2, icab;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --lscale;
+    --rscale;
+    --work;
 
-#define LSCALE(I) lscale[(I)-1]
-#define RSCALE(I) rscale[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
-    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(
-	    job, "S") && ! lsame_(job, "B")) {
+    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(job, "S") 
+	    && ! lsame_(job, "B")) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -185,9 +187,9 @@
 	*ilo = 1;
 	*ihi = *n;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    LSCALE(i) = 1.f;
-	    RSCALE(i) = 1.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lscale[i__] = 1.f;
+	    rscale[i__] = 1.f;
 /* L10: */
 	}
 	return 0;
@@ -196,8 +198,8 @@
     if (k == l) {
 	*ilo = 1;
 	*ihi = 1;
-	LSCALE(1) = 1.f;
-	RSCALE(1) = 1.f;
+	lscale[1] = 1.f;
+	rscale[1] = 1.f;
 	return 0;
     }
 
@@ -217,17 +219,17 @@ L20:
 	goto L30;
     }
 
-    RSCALE(1) = 1.f;
-    LSCALE(1) = 1.f;
+    rscale[1] = 1.f;
+    lscale[1] = 1.f;
     goto L190;
 
 L30:
     lm1 = l - 1;
-    for (i = l; i >= 1; --i) {
+    for (i__ = l; i__ >= 1; --i__) {
 	i__1 = lm1;
-	for (j = 1; j <= lm1; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jp1 = j + 1;
-	    if (A(i,j) != 0.f || B(i,j) != 0.f) {
+	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
 		goto L50;
 	    }
 /* L40: */
@@ -237,8 +239,8 @@ L30:
 
 L50:
 	i__1 = l;
-	for (j = jp1; j <= l; ++j) {
-	    if (A(i,j) != 0.f || B(i,j) != 0.f) {
+	for (j = jp1; j <= i__1; ++j) {
+	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
 		goto L80;
 	    }
 /* L60: */
@@ -261,26 +263,26 @@ L90:
 
 L100:
     i__1 = l;
-    for (j = k; j <= l; ++j) {
+    for (j = k; j <= i__1; ++j) {
 	i__2 = lm1;
-	for (i = k; i <= lm1; ++i) {
-	    ip1 = i + 1;
-	    if (A(i,j) != 0.f || B(i,j) != 0.f) {
+	for (i__ = k; i__ <= i__2; ++i__) {
+	    ip1 = i__ + 1;
+	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
 		goto L120;
 	    }
 /* L110: */
 	}
-	i = l;
+	i__ = l;
 	goto L140;
 L120:
 	i__2 = l;
-	for (i = ip1; i <= l; ++i) {
-	    if (A(i,j) != 0.f || B(i,j) != 0.f) {
+	for (i__ = ip1; i__ <= i__2; ++i__) {
+	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
 		goto L150;
 	    }
 /* L130: */
 	}
-	i = ip1 - 1;
+	i__ = ip1 - 1;
 L140:
 	m = k;
 	iflow = 2;
@@ -293,24 +295,24 @@ L150:
 /*     Permute rows M and I */
 
 L160:
-    LSCALE(m) = (real) i;
-    if (i == m) {
+    lscale[m] = (real) i__;
+    if (i__ == m) {
 	goto L170;
     }
     i__1 = *n - k + 1;
-    sswap_(&i__1, &A(i,k), lda, &A(m,k), lda);
+    sswap_(&i__1, &a_ref(i__, k), lda, &a_ref(m, k), lda);
     i__1 = *n - k + 1;
-    sswap_(&i__1, &B(i,k), ldb, &B(m,k), ldb);
+    sswap_(&i__1, &b_ref(i__, k), ldb, &b_ref(m, k), ldb);
 
 /*     Permute columns M and J */
 
 L170:
-    RSCALE(m) = (real) j;
+    rscale[m] = (real) j;
     if (j == m) {
 	goto L180;
     }
-    sswap_(&l, &A(1,j), &c__1, &A(1,m), &c__1);
-    sswap_(&l, &B(1,j), &c__1, &B(1,m), &c__1);
+    sswap_(&l, &a_ref(1, j), &c__1, &a_ref(1, m), &c__1);
+    sswap_(&l, &b_ref(1, j), &c__1, &b_ref(1, m), &c__1);
 
 L180:
     switch (iflow) {
@@ -334,16 +336,16 @@ L190:
 
     nr = *ihi - *ilo + 1;
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
-	RSCALE(i) = 0.f;
-	LSCALE(i) = 0.f;
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
+	rscale[i__] = 0.f;
+	lscale[i__] = 0.f;
 
-	WORK(i) = 0.f;
-	WORK(i + *n) = 0.f;
-	WORK(i + (*n << 1)) = 0.f;
-	WORK(i + *n * 3) = 0.f;
-	WORK(i + (*n << 2)) = 0.f;
-	WORK(i + *n * 5) = 0.f;
+	work[i__] = 0.f;
+	work[i__ + *n] = 0.f;
+	work[i__ + (*n << 1)] = 0.f;
+	work[i__ + *n * 3] = 0.f;
+	work[i__ + (*n << 2)] = 0.f;
+	work[i__ + *n * 5] = 0.f;
 /* L200: */
     }
 
@@ -351,11 +353,11 @@ L190:
 
     basl = r_lg10(&c_b34);
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *ihi;
-	for (j = *ilo; j <= *ihi; ++j) {
-	    tb = B(i,j);
-	    ta = A(i,j);
+	for (j = *ilo; j <= i__2; ++j) {
+	    tb = b_ref(i__, j);
+	    ta = a_ref(i__, j);
 	    if (ta == 0.f) {
 		goto L210;
 	    }
@@ -368,8 +370,8 @@ L210:
 	    r__1 = dabs(tb);
 	    tb = r_lg10(&r__1) / basl;
 L220:
-	    WORK(i + (*n << 2)) = WORK(i + (*n << 2)) - ta - tb;
-	    WORK(j + *n * 5) = WORK(j + *n * 5) - ta - tb;
+	    work[i__ + (*n << 2)] = work[i__ + (*n << 2)] - ta - tb;
+	    work[j + *n * 5] = work[j + *n * 5] - ta - tb;
 /* L230: */
 	}
 /* L240: */
@@ -386,16 +388,16 @@ L220:
 
 L250:
 
-    gamma = sdot_(&nr, &WORK(*ilo + (*n << 2)), &c__1, &WORK(*ilo + (*n << 2))
-	    , &c__1) + sdot_(&nr, &WORK(*ilo + *n * 5), &c__1, &WORK(*ilo + *
-	    n * 5), &c__1);
+    gamma = sdot_(&nr, &work[*ilo + (*n << 2)], &c__1, &work[*ilo + (*n << 2)]
+	    , &c__1) + sdot_(&nr, &work[*ilo + *n * 5], &c__1, &work[*ilo + *
+	    n * 5], &c__1);
 
     ew = 0.f;
     ewc = 0.f;
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
-	ew += WORK(i + (*n << 2));
-	ewc += WORK(i + *n * 5);
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
+	ew += work[i__ + (*n << 2)];
+	ewc += work[i__ + *n * 5];
 /* L260: */
     }
 
@@ -416,100 +418,100 @@ L250:
     t = coef5 * (ewc - ew * 3.f);
     tc = coef5 * (ew - ewc * 3.f);
 
-    sscal_(&nr, &beta, &WORK(*ilo), &c__1);
-    sscal_(&nr, &beta, &WORK(*ilo + *n), &c__1);
+    sscal_(&nr, &beta, &work[*ilo], &c__1);
+    sscal_(&nr, &beta, &work[*ilo + *n], &c__1);
 
-    saxpy_(&nr, &coef, &WORK(*ilo + (*n << 2)), &c__1, &WORK(*ilo + *n), &
+    saxpy_(&nr, &coef, &work[*ilo + (*n << 2)], &c__1, &work[*ilo + *n], &
 	    c__1);
-    saxpy_(&nr, &coef, &WORK(*ilo + *n * 5), &c__1, &WORK(*ilo), &c__1);
+    saxpy_(&nr, &coef, &work[*ilo + *n * 5], &c__1, &work[*ilo], &c__1);
 
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
-	WORK(i) += tc;
-	WORK(i + *n) += t;
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
+	work[i__] += tc;
+	work[i__ + *n] += t;
 /* L270: */
     }
 
 /*     Apply matrix to vector */
 
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 	kount = 0;
 	sum = 0.f;
 	i__2 = *ihi;
-	for (j = *ilo; j <= *ihi; ++j) {
-	    if (A(i,j) == 0.f) {
+	for (j = *ilo; j <= i__2; ++j) {
+	    if (a_ref(i__, j) == 0.f) {
 		goto L280;
 	    }
 	    ++kount;
-	    sum += WORK(j);
+	    sum += work[j];
 L280:
-	    if (B(i,j) == 0.f) {
+	    if (b_ref(i__, j) == 0.f) {
 		goto L290;
 	    }
 	    ++kount;
-	    sum += WORK(j);
+	    sum += work[j];
 L290:
 	    ;
 	}
-	WORK(i + (*n << 1)) = (real) kount * WORK(i + *n) + sum;
+	work[i__ + (*n << 1)] = (real) kount * work[i__ + *n] + sum;
 /* L300: */
     }
 
     i__1 = *ihi;
-    for (j = *ilo; j <= *ihi; ++j) {
+    for (j = *ilo; j <= i__1; ++j) {
 	kount = 0;
 	sum = 0.f;
 	i__2 = *ihi;
-	for (i = *ilo; i <= *ihi; ++i) {
-	    if (A(i,j) == 0.f) {
+	for (i__ = *ilo; i__ <= i__2; ++i__) {
+	    if (a_ref(i__, j) == 0.f) {
 		goto L310;
 	    }
 	    ++kount;
-	    sum += WORK(i + *n);
+	    sum += work[i__ + *n];
 L310:
-	    if (B(i,j) == 0.f) {
+	    if (b_ref(i__, j) == 0.f) {
 		goto L320;
 	    }
 	    ++kount;
-	    sum += WORK(i + *n);
+	    sum += work[i__ + *n];
 L320:
 	    ;
 	}
-	WORK(j + *n * 3) = (real) kount * WORK(j) + sum;
+	work[j + *n * 3] = (real) kount * work[j] + sum;
 /* L330: */
     }
 
-    sum = sdot_(&nr, &WORK(*ilo + *n), &c__1, &WORK(*ilo + (*n << 1)), &c__1) 
-	    + sdot_(&nr, &WORK(*ilo), &c__1, &WORK(*ilo + *n * 3), &c__1);
+    sum = sdot_(&nr, &work[*ilo + *n], &c__1, &work[*ilo + (*n << 1)], &c__1) 
+	    + sdot_(&nr, &work[*ilo], &c__1, &work[*ilo + *n * 3], &c__1);
     alpha = gamma / sum;
 
 /*     Determine correction to current iteration */
 
     cmax = 0.f;
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
-	cor = alpha * WORK(i + *n);
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
+	cor = alpha * work[i__ + *n];
 	if (dabs(cor) > cmax) {
 	    cmax = dabs(cor);
 	}
-	LSCALE(i) += cor;
-	cor = alpha * WORK(i);
+	lscale[i__] += cor;
+	cor = alpha * work[i__];
 	if (dabs(cor) > cmax) {
 	    cmax = dabs(cor);
 	}
-	RSCALE(i) += cor;
+	rscale[i__] += cor;
 /* L340: */
     }
     if (cmax < .5f) {
 	goto L350;
     }
 
-    r__1 = -(doublereal)alpha;
-    saxpy_(&nr, &r__1, &WORK(*ilo + (*n << 1)), &c__1, &WORK(*ilo + (*n << 2))
+    r__1 = -alpha;
+    saxpy_(&nr, &r__1, &work[*ilo + (*n << 1)], &c__1, &work[*ilo + (*n << 2)]
 	    , &c__1);
-    r__1 = -(doublereal)alpha;
-    saxpy_(&nr, &r__1, &WORK(*ilo + *n * 3), &c__1, &WORK(*ilo + *n * 5), &
+    r__1 = -alpha;
+    saxpy_(&nr, &r__1, &work[*ilo + *n * 3], &c__1, &work[*ilo + *n * 5], &
 	    c__1);
 
     pgamma = gamma;
@@ -526,56 +528,55 @@ L350:
     lsfmin = (integer) (r_lg10(&sfmin) / basl + 1.f);
     lsfmax = (integer) (r_lg10(&sfmax) / basl);
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *n - *ilo + 1;
-	irab = isamax_(&i__2, &A(i,*ilo), lda);
-	rab = (r__1 = A(i,irab+*ilo-1), dabs(r__1));
+	irab = isamax_(&i__2, &a_ref(i__, *ilo), lda);
+	rab = (r__1 = a_ref(i__, irab + *ilo - 1), dabs(r__1));
 	i__2 = *n - *ilo + 1;
-	irab = isamax_(&i__2, &B(i,*ilo), lda);
+	irab = isamax_(&i__2, &b_ref(i__, *ilo), lda);
 /* Computing MAX */
-	r__2 = rab, r__3 = (r__1 = B(i,irab+*ilo-1), dabs(
-		r__1));
+	r__2 = rab, r__3 = (r__1 = b_ref(i__, irab + *ilo - 1), dabs(r__1));
 	rab = dmax(r__2,r__3);
 	r__1 = rab + sfmin;
 	lrab = (integer) (r_lg10(&r__1) / basl + 1.f);
-	ir = LSCALE(i) + r_sign(&c_b70, &LSCALE(i));
+	ir = lscale[i__] + r_sign(&c_b70, &lscale[i__]);
 /* Computing MIN */
 	i__2 = max(ir,lsfmin), i__2 = min(i__2,lsfmax), i__3 = lsfmax - lrab;
 	ir = min(i__2,i__3);
-	LSCALE(i) = pow_ri(&c_b34, &ir);
-	icab = isamax_(ihi, &A(1,i), &c__1);
-	cab = (r__1 = A(icab,i), dabs(r__1));
-	icab = isamax_(ihi, &B(1,i), &c__1);
+	lscale[i__] = pow_ri(&c_b34, &ir);
+	icab = isamax_(ihi, &a_ref(1, i__), &c__1);
+	cab = (r__1 = a_ref(icab, i__), dabs(r__1));
+	icab = isamax_(ihi, &b_ref(1, i__), &c__1);
 /* Computing MAX */
-	r__2 = cab, r__3 = (r__1 = B(icab,i), dabs(r__1));
+	r__2 = cab, r__3 = (r__1 = b_ref(icab, i__), dabs(r__1));
 	cab = dmax(r__2,r__3);
 	r__1 = cab + sfmin;
 	lcab = (integer) (r_lg10(&r__1) / basl + 1.f);
-	jc = RSCALE(i) + r_sign(&c_b70, &RSCALE(i));
+	jc = rscale[i__] + r_sign(&c_b70, &rscale[i__]);
 /* Computing MIN */
 	i__2 = max(jc,lsfmin), i__2 = min(i__2,lsfmax), i__3 = lsfmax - lcab;
 	jc = min(i__2,i__3);
-	RSCALE(i) = pow_ri(&c_b34, &jc);
+	rscale[i__] = pow_ri(&c_b34, &jc);
 /* L360: */
     }
 
 /*     Row scaling of matrices A and B */
 
     i__1 = *ihi;
-    for (i = *ilo; i <= *ihi; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *n - *ilo + 1;
-	sscal_(&i__2, &LSCALE(i), &A(i,*ilo), lda);
+	sscal_(&i__2, &lscale[i__], &a_ref(i__, *ilo), lda);
 	i__2 = *n - *ilo + 1;
-	sscal_(&i__2, &LSCALE(i), &B(i,*ilo), ldb);
+	sscal_(&i__2, &lscale[i__], &b_ref(i__, *ilo), ldb);
 /* L370: */
     }
 
 /*     Column scaling of matrices A and B */
 
     i__1 = *ihi;
-    for (j = *ilo; j <= *ihi; ++j) {
-	sscal_(ihi, &RSCALE(j), &A(1,j), &c__1);
-	sscal_(ihi, &RSCALE(j), &B(1,j), &c__1);
+    for (j = *ilo; j <= i__1; ++j) {
+	sscal_(ihi, &rscale[j], &a_ref(1, j), &c__1);
+	sscal_(ihi, &rscale[j], &b_ref(1, j), &c__1);
 /* L380: */
     }
 
@@ -584,4 +585,8 @@ L350:
 /*     End of SGGBAL */
 
 } /* sggbal_ */
+
+#undef b_ref
+#undef a_ref
+
 

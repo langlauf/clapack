@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,13 +12,13 @@ static real c_b5 = 0.f;
 static real c_b6 = 1.f;
 
 /* Subroutine */ int sspt01_(char *uplo, integer *n, real *a, real *afac, 
-	integer *ipiv, real *c, integer *ldc, real *rwork, real *resid)
+	integer *ipiv, real *c__, integer *ldc, real *rwork, real *resid)
 {
     /* System generated locals */
     integer c_dim1, c_offset, i__1, i__2;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     extern logical lsame_(char *, char *);
     static real anorm;
     static integer jc;
@@ -32,7 +33,10 @@ static real c_b6 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -64,10 +68,8 @@ static real c_b6 = 1.f;
 
     AFAC    (input) REAL array, dimension (N*(N+1)/2)   
             The factored form of the matrix A, stored as a packed   
-            triangular matrix.  AFAC contains the block diagonal matrix D 
-  
-            and the multipliers used to obtain the factor L or U from the 
-  
+            triangular matrix.  AFAC contains the block diagonal matrix D   
+            and the multipliers used to obtain the factor L or U from the   
             block L*D*L' or U*D*U' factorization as computed by SSPTRF.   
 
     IPIV    (input) INTEGER array, dimension (N)   
@@ -84,8 +86,7 @@ static real c_b6 = 1.f;
             If UPLO = 'L', norm(L*D*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U*D*U' - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -95,8 +96,8 @@ static real c_b6 = 1.f;
     --afac;
     --ipiv;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
@@ -112,16 +113,16 @@ static real c_b6 = 1.f;
 
 /*     Initialize C to the identity matrix. */
 
-    slaset_("Full", n, n, &c_b5, &c_b6, &c[c_offset], ldc);
+    slaset_("Full", n, n, &c_b5, &c_b6, &c__[c_offset], ldc);
 
 /*     Call SLAVSP to form the product D * U' (or D * L' ). */
 
-    slavsp_(uplo, "Transpose", "Non-unit", n, n, &afac[1], &ipiv[1], &c[
+    slavsp_(uplo, "Transpose", "Non-unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Call SLAVSP again to multiply by U ( or L ). */
 
-    slavsp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c[
+    slavsp_(uplo, "No transpose", "Unit", n, n, &afac[1], &ipiv[1], &c__[
 	    c_offset], ldc, &info);
 
 /*     Compute the difference  C - A . */
@@ -131,8 +132,8 @@ static real c_b6 = 1.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		c[i + j * c_dim1] -= a[jc + i];
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		c___ref(i__, j) = c___ref(i__, j) - a[jc + i__];
 /* L10: */
 	    }
 	    jc += j;
@@ -143,8 +144,8 @@ static real c_b6 = 1.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		c[i + j * c_dim1] -= a[jc + i - j];
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		c___ref(i__, j) = c___ref(i__, j) - a[jc + i__ - j];
 /* L30: */
 	    }
 	    jc = jc + *n - j + 1;
@@ -154,7 +155,7 @@ static real c_b6 = 1.f;
 
 /*     Compute norm( C - A ) / ( N * norm(A) * EPS ) */
 
-    *resid = slansy_("1", uplo, n, &c[c_offset], ldc, &rwork[1]);
+    *resid = slansy_("1", uplo, n, &c__[c_offset], ldc, &rwork[1]);
 
     if (anorm <= 0.f) {
 	if (*resid != 0.f) {
@@ -169,4 +170,7 @@ static real c_b6 = 1.f;
 /*     End of SSPT01 */
 
 } /* sspt01_ */
+
+#undef c___ref
+
 

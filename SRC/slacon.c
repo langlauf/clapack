@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slacon_(integer *n, real *v, real *x, integer *isgn, 
 	real *est, integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -13,8 +14,7 @@
     =======   
 
     SLACON estimates the 1-norm of a square, real matrix A.   
-    Reverse communication is used for evaluating matrix-vector products. 
-  
+    Reverse communication is used for evaluating matrix-vector products.   
 
     Arguments   
     =========   
@@ -50,19 +50,14 @@
     Contributed by Nick Higham, University of Manchester.   
     Originally named SONEST, dated March 16, 1988.   
 
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of 
-  
-    a real or complex matrix, with applications to condition estimation", 
-  
+    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
+    a real or complex matrix, with applications to condition estimation",   
     ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b11 = 1.f;
@@ -76,7 +71,7 @@
     /* Local variables */
     static integer iter;
     static real temp;
-    static integer jump, i, j, jlast;
+    static integer jump, i__, j, jlast;
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
@@ -84,16 +79,15 @@
     static real altsgn, estold;
 
 
+    --isgn;
+    --x;
+    --v;
 
-#define ISGN(I) isgn[(I)-1]
-#define X(I) x[(I)-1]
-#define V(I) v[(I)-1]
-
-
+    /* Function Body */
     if (*kase == 0) {
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    X(i) = 1.f / (real) (*n);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    x[i__] = 1.f / (real) (*n);
 /* L10: */
 	}
 	*kase = 1;
@@ -114,17 +108,17 @@
 
 L20:
     if (*n == 1) {
-	V(1) = X(1);
-	*est = dabs(V(1));
+	v[1] = x[1];
+	*est = dabs(v[1]);
 /*        ... QUIT */
 	goto L150;
     }
-    *est = sasum_(n, &X(1), &c__1);
+    *est = sasum_(n, &x[1], &c__1);
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = r_sign(&c_b11, &X(i));
-	ISGN(i) = i_nint(&X(i));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = r_sign(&c_b11, &x[i__]);
+	isgn[i__] = i_nint(&x[i__]);
 /* L30: */
     }
     *kase = 2;
@@ -135,18 +129,18 @@ L20:
        FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
 
 L40:
-    j = isamax_(n, &X(1), &c__1);
+    j = isamax_(n, &x[1], &c__1);
     iter = 2;
 
 /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
 
 L50:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = 0.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = 0.f;
 /* L60: */
     }
-    X(j) = 1.f;
+    x[j] = 1.f;
     *kase = 1;
     jump = 3;
     return 0;
@@ -155,13 +149,13 @@ L50:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
-    scopy_(n, &X(1), &c__1, &V(1), &c__1);
+    scopy_(n, &x[1], &c__1, &v[1], &c__1);
     estold = *est;
-    *est = sasum_(n, &V(1), &c__1);
+    *est = sasum_(n, &v[1], &c__1);
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	r__1 = r_sign(&c_b11, &X(i));
-	if (i_nint(&r__1) != ISGN(i)) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	r__1 = r_sign(&c_b11, &x[i__]);
+	if (i_nint(&r__1) != isgn[i__]) {
 	    goto L90;
 	}
 /* L80: */
@@ -176,9 +170,9 @@ L90:
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = r_sign(&c_b11, &X(i));
-	ISGN(i) = i_nint(&X(i));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = r_sign(&c_b11, &x[i__]);
+	isgn[i__] = i_nint(&x[i__]);
 /* L100: */
     }
     *kase = 2;
@@ -190,8 +184,8 @@ L90:
 
 L110:
     jlast = j;
-    j = isamax_(n, &X(1), &c__1);
-    if (X(jlast) != (r__1 = X(j), dabs(r__1)) && iter < 5) {
+    j = isamax_(n, &x[1], &c__1);
+    if (x[jlast] != (r__1 = x[j], dabs(r__1)) && iter < 5) {
 	++iter;
 	goto L50;
     }
@@ -201,9 +195,9 @@ L110:
 L120:
     altsgn = 1.f;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	X(i) = altsgn * ((real) (i - 1) / (real) (*n - 1) + 1.f);
-	altsgn = -(doublereal)altsgn;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	x[i__] = altsgn * ((real) (i__ - 1) / (real) (*n - 1) + 1.f);
+	altsgn = -altsgn;
 /* L130: */
     }
     *kase = 1;
@@ -214,9 +208,9 @@ L120:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L140:
-    temp = sasum_(n, &X(1), &c__1) / (real) (*n * 3) * 2.f;
+    temp = sasum_(n, &x[1], &c__1) / (real) (*n * 3) * 2.f;
     if (temp > *est) {
-	scopy_(n, &X(1), &c__1, &V(1), &c__1);
+	scopy_(n, &x[1], &c__1, &v[1], &c__1);
 	*est = temp;
     }
 

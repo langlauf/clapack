@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlargv_(integer *n, doublereal *x, integer *incx, 
-	doublereal *y, integer *incy, doublereal *c, integer *incc)
+	doublereal *y, integer *incy, doublereal *c__, integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -46,55 +47,55 @@
     INCC    (input) INTEGER   
             The increment between elements of C. INCC > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
-    doublereal d__1, d__2;
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i;
-    static doublereal w;
+    static doublereal f, g;
+    static integer i__;
+    static doublereal t;
     static integer ic, ix, iy;
-    static doublereal xi, yi, tt;
+    static doublereal tt;
 
+    --c__;
+    --y;
+    --x;
 
-#define C(I) c[(I)-1]
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     ix = 1;
     iy = 1;
     ic = 1;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	xi = X(ix);
-	yi = Y(iy);
-	if (xi == 0.) {
-	    C(ic) = 0.;
-	    Y(iy) = 1.;
-	    X(ix) = yi;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	f = x[ix];
+	g = y[iy];
+	if (g == 0.) {
+	    c__[ic] = 1.;
+	} else if (f == 0.) {
+	    c__[ic] = 0.;
+	    y[iy] = 1.;
+	    x[ix] = g;
+	} else if (abs(f) > abs(g)) {
+	    t = g / f;
+	    tt = sqrt(t * t + 1.);
+	    c__[ic] = 1. / tt;
+	    y[iy] = t * c__[ic];
+	    x[ix] = f * tt;
 	} else {
-/* Computing MAX */
-	    d__1 = abs(xi), d__2 = abs(yi);
-	    w = max(d__1,d__2);
-	    xi /= w;
-	    yi /= w;
-	    tt = sqrt(xi * xi + yi * yi);
-	    C(ic) = xi / tt;
-	    Y(iy) = yi / tt;
-	    X(ix) = w * tt;
+	    t = f / g;
+	    tt = sqrt(t * t + 1.);
+	    y[iy] = 1. / tt;
+	    c__[ic] = t * y[iy];
+	    x[ix] = g * tt;
 	}
-	ix += *incx;
-	iy += *incy;
 	ic += *incc;
+	iy += *incy;
+	ix += *incx;
 /* L10: */
     }
     return 0;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ doublereal ctzt02_(integer *m, integer *n, complex *af, integer *lda, complex
     void r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     static real rwork[1];
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *);
@@ -34,7 +35,11 @@ doublereal ctzt02_(integer *m, integer *n, complex *af, integer *lda, complex
 	    *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -72,13 +77,12 @@ doublereal ctzt02_(integer *m, integer *n, complex *af, integer *lda, complex
     LWORK   (input) INTEGER   
             length of WORK array. Must be >= N*N+N   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     --tau;
     --work;
@@ -103,40 +107,44 @@ doublereal ctzt02_(integer *m, integer *n, complex *af, integer *lda, complex
 
 /*     Q := P(1) * ... * P(m) * Q */
 
-    for (i = *m; i >= 1; --i) {
+    for (i__ = *m; i__ >= 1; --i__) {
 	i__1 = *n - *m + 1;
-	clatzm_("Left", &i__1, n, &af[i + (*m + 1) * af_dim1], lda, &tau[i], &
-		work[i], &work[*m + 1], n, &work[*n * *n + 1]);
+	clatzm_("Left", &i__1, n, &af_ref(i__, *m + 1), lda, &tau[i__], &work[
+		i__], &work[*m + 1], n, &work[*n * *n + 1]);
 /* L10: */
     }
 
 /*     Q := P(m)' * ... * P(1)' * Q */
 
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = *n - *m + 1;
-	r_cnjg(&q__1, &tau[i]);
-	clatzm_("Left", &i__2, n, &af[i + (*m + 1) * af_dim1], lda, &q__1, &
-		work[i], &work[*m + 1], n, &work[*n * *n + 1]);
+	r_cnjg(&q__1, &tau[i__]);
+	clatzm_("Left", &i__2, n, &af_ref(i__, *m + 1), lda, &q__1, &work[i__]
+		, &work[*m + 1], n, &work[*n * *n + 1]);
 /* L20: */
     }
 
 /*     Q := Q - I */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = (i - 1) * *n + i;
-	i__3 = (i - 1) * *n + i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = (i__ - 1) * *n + i__;
+	i__3 = (i__ - 1) * *n + i__;
 	q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i;
 	work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L30: */
     }
 
-    ret_val = clange_("One-norm", n, n, &work[1], n, rwork) / (slamch_(
-	    "Epsilon") * (real) max(*m,*n));
+    ret_val = clange_("One-norm", n, n, &work[1], n, rwork) / (
+	    slamch_("Epsilon") * (real) max(*m,*n));
     return ret_val;
 
 /*     End of CTZT02 */
 
 } /* ctzt02_ */
+
+#undef af_ref
+#undef af_subscr
+
 

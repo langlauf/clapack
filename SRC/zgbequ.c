@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgbequ_(integer *m, integer *n, integer *kl, integer *ku,
-	 doublecomplex *ab, integer *ldab, doublereal *r, doublereal *c, 
+	 doublecomplex *ab, integer *ldab, doublereal *r__, doublereal *c__, 
 	doublereal *rowcnd, doublereal *colcnd, doublereal *amax, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        June 30, 1992   
@@ -15,11 +16,9 @@
     =======   
 
     ZGBEQU computes row and column scalings intended to equilibrate an   
-    M-by-N band matrix A and reduce its condition number.  R returns the 
-  
+    M-by-N band matrix A and reduce its condition number.  R returns the   
     row scale factors and C the column scale factors, chosen to try to   
-    make the largest element in each row and column of the matrix B with 
-  
+    make the largest element in each row and column of the matrix B with   
     elements B(i,j)=R(i)*A(i,j)*C(j) have absolute value 1.   
 
     R(i) and C(j) are restricted to be between SMLNUM = smallest safe   
@@ -40,8 +39,7 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     AB      (input) COMPLEX*16 array, dimension (LDAB,N)   
             The band matrix A, stored in rows 1 to KL+KU+1.  The j-th   
@@ -82,34 +80,34 @@
                   <= M:  the i-th row of A is exactly zero   
                   >  M:  the (i-M)-th column of A is exactly zero   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1, i__2, i__3, i__4;
     doublereal d__1, d__2, d__3, d__4;
     /* Builtin functions */
     double d_imag(doublecomplex *);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal rcmin, rcmax;
     static integer kd;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal bignum, smlnum;
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --r__;
+    --c__;
 
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -145,8 +143,8 @@
 /*     Compute row scale factors. */
 
     i__1 = *m;
-    for (i = 1; i <= *m; ++i) {
-	R(i) = 0.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	r__[i__] = 0.;
 /* L10: */
     }
 
@@ -154,18 +152,18 @@
 
     kd = *ku + 1;
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	i__2 = j - *ku;
 /* Computing MIN */
 	i__4 = j + *kl;
 	i__3 = min(i__4,*m);
-	for (i = max(j-*ku,1); i <= min(j+*kl,*m); ++i) {
+	for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-	    i__2 = kd + i - j + j * ab_dim1;
-	    d__3 = R(i), d__4 = (d__1 = AB(kd+i-j,j).r, abs(d__1)) + (d__2 = 
-		    d_imag(&AB(kd+i-j,j)), abs(d__2));
-	    R(i) = max(d__3,d__4);
+	    i__2 = ab_subscr(kd + i__ - j, j);
+	    d__3 = r__[i__], d__4 = (d__1 = ab[i__2].r, abs(d__1)) + (d__2 = 
+		    d_imag(&ab_ref(kd + i__ - j, j)), abs(d__2));
+	    r__[i__] = max(d__3,d__4);
 /* L20: */
 	}
 /* L30: */
@@ -176,12 +174,12 @@
     rcmin = bignum;
     rcmax = 0.;
     i__1 = *m;
-    for (i = 1; i <= *m; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	d__1 = rcmax, d__2 = R(i);
+	d__1 = rcmax, d__2 = r__[i__];
 	rcmax = max(d__1,d__2);
 /* Computing MIN */
-	d__1 = rcmin, d__2 = R(i);
+	d__1 = rcmin, d__2 = r__[i__];
 	rcmin = min(d__1,d__2);
 /* L40: */
     }
@@ -189,13 +187,12 @@
 
     if (rcmin == 0.) {
 
-/*        Find the first zero scale factor and return an error code. 
-*/
+/*        Find the first zero scale factor and return an error code. */
 
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    if (R(i) == 0.) {
-		*info = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (r__[i__] == 0.) {
+		*info = i__;
 		return 0;
 	    }
 /* L50: */
@@ -205,12 +202,12 @@
 /*        Invert the scale factors. */
 
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MIN   
    Computing MAX */
-	    d__2 = R(i);
+	    d__2 = r__[i__];
 	    d__1 = max(d__2,smlnum);
-	    R(i) = 1. / min(d__1,bignum);
+	    r__[i__] = 1. / min(d__1,bignum);
 /* L60: */
 	}
 
@@ -222,8 +219,8 @@
 /*     Compute column scale factors */
 
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
-	C(j) = 0.;
+    for (j = 1; j <= i__1; ++j) {
+	c__[j] = 0.;
 /* L70: */
     }
 
@@ -232,18 +229,18 @@
 
     kd = *ku + 1;
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	i__3 = j - *ku;
 /* Computing MIN */
 	i__4 = j + *kl;
 	i__2 = min(i__4,*m);
-	for (i = max(j-*ku,1); i <= min(j+*kl,*m); ++i) {
+	for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    i__3 = kd + i - j + j * ab_dim1;
-	    d__3 = C(j), d__4 = ((d__1 = AB(kd+i-j,j).r, abs(d__1)) + (d__2 = 
-		    d_imag(&AB(kd+i-j,j)), abs(d__2))) * R(i);
-	    C(j) = max(d__3,d__4);
+	    i__3 = ab_subscr(kd + i__ - j, j);
+	    d__3 = c__[j], d__4 = ((d__1 = ab[i__3].r, abs(d__1)) + (d__2 = 
+		    d_imag(&ab_ref(kd + i__ - j, j)), abs(d__2))) * r__[i__];
+	    c__[j] = max(d__3,d__4);
 /* L80: */
 	}
 /* L90: */
@@ -254,24 +251,23 @@
     rcmin = bignum;
     rcmax = 0.;
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-	d__1 = rcmin, d__2 = C(j);
+	d__1 = rcmin, d__2 = c__[j];
 	rcmin = min(d__1,d__2);
 /* Computing MAX */
-	d__1 = rcmax, d__2 = C(j);
+	d__1 = rcmax, d__2 = c__[j];
 	rcmax = max(d__1,d__2);
 /* L100: */
     }
 
     if (rcmin == 0.) {
 
-/*        Find the first zero scale factor and return an error code. 
-*/
+/*        Find the first zero scale factor and return an error code. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    if (C(j) == 0.) {
+	for (j = 1; j <= i__1; ++j) {
+	    if (c__[j] == 0.) {
 		*info = *m + j;
 		return 0;
 	    }
@@ -282,12 +278,12 @@
 /*        Invert the scale factors. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 /* Computing MIN   
    Computing MAX */
-	    d__2 = C(j);
+	    d__2 = c__[j];
 	    d__1 = max(d__2,smlnum);
-	    C(j) = 1. / min(d__1,bignum);
+	    c__[j] = 1. / min(d__1,bignum);
 /* L120: */
 	}
 
@@ -301,4 +297,8 @@
 /*     End of ZGBEQU */
 
 } /* zgbequ_ */
+
+#undef ab_ref
+#undef ab_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dlaev2_(doublereal *a, doublereal *b, doublereal *c, 
+/* Subroutine */ int dlaev2_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *rt1, doublereal *rt2, doublereal *cs1, doublereal *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -15,10 +16,8 @@
     DLAEV2 computes the eigendecomposition of a 2-by-2 symmetric matrix   
        [  A   B  ]   
        [  B   C  ].   
-    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the 
-  
-    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right 
-  
+    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the   
+    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right   
     eigenvector for RT1, giving the decomposition   
 
        [ CS1  SN1 ] [  A   B  ] [ CS1 -SN1 ]  =  [ RT1  0  ]   
@@ -59,13 +58,11 @@
 
     CS1 and SN1 are accurate to a few ulps barring over/underflow.   
 
-    Overflow is possible only if RT1 is within a factor of 5 of overflow. 
-  
+    Overflow is possible only if RT1 is within a factor of 5 of overflow.   
     Underflow is harmless if the input data is 0 or exceeds   
        underflow_threshold / macheps.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Compute the eigenvalues */
@@ -78,16 +75,16 @@
     static integer sgn1, sgn2;
 
 
-    sm = *a + *c;
-    df = *a - *c;
+    sm = *a + *c__;
+    df = *a - *c__;
     adf = abs(df);
     tb = *b + *b;
     ab = abs(tb);
-    if (abs(*a) > abs(*c)) {
+    if (abs(*a) > abs(*c__)) {
 	acmx = *a;
-	acmn = *c;
+	acmn = *c__;
     } else {
-	acmx = *c;
+	acmx = *c__;
 	acmn = *a;
     }
     if (adf > ab) {

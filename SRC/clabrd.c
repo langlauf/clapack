@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clabrd_(integer *m, integer *n, integer *nb, complex *a, 
-	integer *lda, real *d, real *e, complex *tauq, complex *taup, complex 
-	*x, integer *ldx, complex *y, integer *ldy)
+	integer *lda, real *d__, real *e, complex *tauq, complex *taup, 
+	complex *x, integer *ldx, complex *y, integer *ldy)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -18,8 +19,7 @@
     transformation Q' * A * P, and returns the matrices X and Y which   
     are needed to apply the transformation to the unreduced part of A.   
 
-    If m >= n, A is reduced to upper bidiagonal form; if m < n, to lower 
-  
+    If m >= n, A is reduced to upper bidiagonal form; if m < n, to lower   
     bidiagonal form.   
 
     This is an auxiliary routine called by CGEBRD   
@@ -40,12 +40,10 @@
             On entry, the m by n general matrix to be reduced.   
             On exit, the first NB rows and columns of the matrix are   
             overwritten; the rest of the array is unchanged.   
-            If m >= n, elements on and below the diagonal in the first NB 
-  
+            If m >= n, elements on and below the diagonal in the first NB   
               columns, with the array TAUQ, represent the unitary   
               matrix Q as a product of elementary reflectors; and   
-              elements above the diagonal in the first NB rows, with the 
-  
+              elements above the diagonal in the first NB rows, with the   
               array TAUP, represent the unitary matrix P as a product   
               of elementary reflectors.   
             If m < n, elements below the diagonal in the first NB   
@@ -64,8 +62,7 @@
             the reduced matrix.  D(i) = A(i,i).   
 
     E       (output) REAL array, dimension (NB)   
-            The off-diagonal elements of the first NB rows and columns of 
-  
+            The off-diagonal elements of the first NB rows and columns of   
             the reduced matrix.   
 
     TAUQ    (output) COMPLEX array dimension (NB)   
@@ -113,12 +110,9 @@
     A(i+2:m,i); u(1:i-1) = 0, u(i) = 1, and u(i:n) is stored on exit in   
     A(i,i+1:n); tauq is stored in TAUQ(i) and taup in TAUP(i).   
 
-    The elements of the vectors v and u together form the m-by-nb matrix 
-  
-    V and the nb-by-n matrix U' which are needed, with X and Y, to apply 
-  
-    the transformation to the unreduced part of the matrix, using a block 
-  
+    The elements of the vectors v and u together form the m-by-nb matrix   
+    V and the nb-by-n matrix U' which are needed, with X and Y, to apply   
+    the transformation to the unreduced part of the matrix, using a block   
     update of the form:  A := A - V*Y' - X*U'.   
 
     The contents of A on exit are illustrated by the following examples   
@@ -133,21 +127,16 @@
       (  v1  v2  a   a   a  )           (  v1  v2  a   a   a   a  )   
       (  v1  v2  a   a   a  )   
 
-    where a denotes an element of the original matrix which is unchanged, 
-  
-    vi denotes an element of the vector defining H(i), and ui an element 
-  
+    where a denotes an element of the original matrix which is unchanged,   
+    vi denotes an element of the vector defining H(i), and ui an element   
     of the vector defining G(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {0.f,0.f};
     static complex c_b2 = {1.f,0.f};
@@ -158,25 +147,36 @@
 	    i__3;
     complex q__1;
     /* Local variables */
-    static integer i;
+    static integer i__;
     static complex alpha;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *), cgemv_(char *, integer *, integer *, complex *, 
 	    complex *, integer *, complex *, integer *, complex *, complex *, 
 	    integer *), clarfg_(integer *, complex *, complex *, 
 	    integer *, complex *), clacgv_(integer *, complex *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+#define y_subscr(a_1,a_2) (a_2)*y_dim1 + a_1
+#define y_ref(a_1,a_2) y[y_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --d__;
+    --e;
+    --tauq;
+    --taup;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    y_dim1 = *ldy;
+    y_offset = 1 + y_dim1 * 1;
+    y -= y_offset;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define TAUQ(I) tauq[(I)-1]
-#define TAUP(I) taup[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-#define Y(I,J) y[(I)-1 + ((J)-1)* ( *ldy)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	return 0;
     }
@@ -186,127 +186,139 @@
 /*        Reduce to upper bidiagonal form */
 
 	i__1 = *nb;
-	for (i = 1; i <= *nb; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Update A(i:m,i) */
 
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &Y(i,1), ldy);
-	    i__2 = *m - i + 1;
-	    i__3 = i - 1;
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &y_ref(i__, 1), ldy);
+	    i__2 = *m - i__ + 1;
+	    i__3 = i__ - 1;
 	    q__1.r = -1.f, q__1.i = 0.f;
-	    cgemv_("No transpose", &i__2, &i__3, &q__1, &A(i,1), lda, &
-		    Y(i,1), ldy, &c_b2, &A(i,i), &c__1)
-		    ;
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &Y(i,1), ldy);
-	    i__2 = *m - i + 1;
-	    i__3 = i - 1;
+	    cgemv_("No transpose", &i__2, &i__3, &q__1, &a_ref(i__, 1), lda, &
+		    y_ref(i__, 1), ldy, &c_b2, &a_ref(i__, i__), &c__1);
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &y_ref(i__, 1), ldy);
+	    i__2 = *m - i__ + 1;
+	    i__3 = i__ - 1;
 	    q__1.r = -1.f, q__1.i = 0.f;
-	    cgemv_("No transpose", &i__2, &i__3, &q__1, &X(i,1), ldx, &
-		    A(1,i), &c__1, &c_b2, &A(i,i), &
-		    c__1);
+	    cgemv_("No transpose", &i__2, &i__3, &q__1, &x_ref(i__, 1), ldx, &
+		    a_ref(1, i__), &c__1, &c_b2, &a_ref(i__, i__), &c__1);
 
 /*           Generate reflection Q(i) to annihilate A(i+1:m,i) */
 
-	    i__2 = i + i * a_dim1;
-	    alpha.r = A(i,i).r, alpha.i = A(i,i).i;
-	    i__2 = *m - i + 1;
+	    i__2 = a_subscr(i__, i__);
+	    alpha.r = a[i__2].r, alpha.i = a[i__2].i;
 /* Computing MIN */
-	    i__3 = i + 1;
-	    clarfg_(&i__2, &alpha, &A(min(i+1,*m),i), &c__1, &
-		    TAUQ(i));
-	    i__2 = i;
-	    D(i) = alpha.r;
-	    if (i < *n) {
-		i__2 = i + i * a_dim1;
-		A(i,i).r = 1.f, A(i,i).i = 0.f;
+	    i__2 = i__ + 1;
+	    i__3 = *m - i__ + 1;
+	    clarfg_(&i__3, &alpha, &a_ref(min(i__2,*m), i__), &c__1, &tauq[
+		    i__]);
+	    i__2 = i__;
+	    d__[i__2] = alpha.r;
+	    if (i__ < *n) {
+		i__2 = a_subscr(i__, i__);
+		a[i__2].r = 1.f, a[i__2].i = 0.f;
 
 /*              Compute Y(i+1:n,i) */
 
-		i__2 = *m - i + 1;
-		i__3 = *n - i;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &A(i,i+1), lda, &A(i,i), &c__1, &c_b1,
-			 &Y(i+1,i), &c__1);
-		i__2 = *m - i + 1;
-		i__3 = i - 1;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &A(i,1), lda, &A(i,i), &c__1, &c_b1, &Y(1,i), &c__1);
-		i__2 = *n - i;
-		i__3 = i - 1;
+		i__2 = *m - i__ + 1;
+		i__3 = *n - i__;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(i__,
+			 i__ + 1), lda, &a_ref(i__, i__), &c__1, &c_b1, &
+			y_ref(i__ + 1, i__), &c__1);
+		i__2 = *m - i__ + 1;
+		i__3 = i__ - 1;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(i__,
+			 1), lda, &a_ref(i__, i__), &c__1, &c_b1, &y_ref(1, 
+			i__), &c__1);
+		i__2 = *n - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &Y(i+1,1)
-			, ldy, &Y(1,i), &c__1, &c_b2, &Y(i+1,i), &c__1);
-		i__2 = *m - i + 1;
-		i__3 = i - 1;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &X(i,1), ldx, &A(i,i), &c__1, &c_b1, &Y(1,i), &c__1);
-		i__2 = i - 1;
-		i__3 = *n - i;
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &y_ref(i__ + 1, 1)
+			, ldy, &y_ref(1, i__), &c__1, &c_b2, &y_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = *m - i__ + 1;
+		i__3 = i__ - 1;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &x_ref(i__,
+			 1), ldx, &a_ref(i__, i__), &c__1, &c_b1, &y_ref(1, 
+			i__), &c__1);
+		i__2 = i__ - 1;
+		i__3 = *n - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &A(1,i+1), lda, &Y(1,i), &c__1, &c_b2, 
-			&Y(i+1,i), &c__1);
-		i__2 = *n - i;
-		cscal_(&i__2, &TAUQ(i), &Y(i+1,i), &c__1);
+		cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &a_ref(1, 
+			i__ + 1), lda, &y_ref(1, i__), &c__1, &c_b2, &y_ref(
+			i__ + 1, i__), &c__1);
+		i__2 = *n - i__;
+		cscal_(&i__2, &tauq[i__], &y_ref(i__ + 1, i__), &c__1);
 
 /*              Update A(i,i+1:n) */
 
-		i__2 = *n - i;
-		clacgv_(&i__2, &A(i,i+1), lda);
-		clacgv_(&i, &A(i,1), lda);
-		i__2 = *n - i;
+		i__2 = *n - i__;
+		clacgv_(&i__2, &a_ref(i__, i__ + 1), lda);
+		clacgv_(&i__, &a_ref(i__, 1), lda);
+		i__2 = *n - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i, &q__1, &Y(i+1,1), 
-			ldy, &A(i,1), lda, &c_b2, &A(i,i+1), lda);
-		clacgv_(&i, &A(i,1), lda);
-		i__2 = i - 1;
-		clacgv_(&i__2, &X(i,1), ldx);
-		i__2 = i - 1;
-		i__3 = *n - i;
+		cgemv_("No transpose", &i__2, &i__, &q__1, &y_ref(i__ + 1, 1),
+			 ldy, &a_ref(i__, 1), lda, &c_b2, &a_ref(i__, i__ + 1)
+			, lda);
+		clacgv_(&i__, &a_ref(i__, 1), lda);
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &x_ref(i__, 1), ldx);
+		i__2 = i__ - 1;
+		i__3 = *n - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &A(1,i+1), lda, &X(i,1), ldx, &c_b2, &A(i,i+1), lda);
-		i__2 = i - 1;
-		clacgv_(&i__2, &X(i,1), ldx);
+		cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &a_ref(1, 
+			i__ + 1), lda, &x_ref(i__, 1), ldx, &c_b2, &a_ref(i__,
+			 i__ + 1), lda);
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &x_ref(i__, 1), ldx);
 
-/*              Generate reflection P(i) to annihilate A(i,i+2
-:n) */
+/*              Generate reflection P(i) to annihilate A(i,i+2:n) */
 
-		i__2 = i + (i + 1) * a_dim1;
-		alpha.r = A(i,i+1).r, alpha.i = A(i,i+1).i;
-		i__2 = *n - i;
+		i__2 = a_subscr(i__, i__ + 1);
+		alpha.r = a[i__2].r, alpha.i = a[i__2].i;
 /* Computing MIN */
-		i__3 = i + 2;
-		clarfg_(&i__2, &alpha, &A(i,min(i+2,*n)), lda, &
-			TAUP(i));
-		i__2 = i;
-		E(i) = alpha.r;
-		i__2 = i + (i + 1) * a_dim1;
-		A(i,i+1).r = 1.f, A(i,i+1).i = 0.f;
+		i__2 = i__ + 2;
+		i__3 = *n - i__;
+		clarfg_(&i__3, &alpha, &a_ref(i__, min(i__2,*n)), lda, &taup[
+			i__]);
+		i__2 = i__;
+		e[i__2] = alpha.r;
+		i__2 = a_subscr(i__, i__ + 1);
+		a[i__2].r = 1.f, a[i__2].i = 0.f;
 
 /*              Compute X(i+1:m,i) */
 
-		i__2 = *m - i;
-		i__3 = *n - i;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &A(i+1,i+1), lda, &A(i,i+1), lda, &c_b1,
-			 &X(i+1,i), &c__1);
-		i__2 = *n - i;
-		cgemv_("Conjugate transpose", &i__2, &i, &c_b2, &Y(i+1,1), ldy, &A(i,i+1), lda, &c_b1, &
-			X(1,i), &c__1);
-		i__2 = *m - i;
+		i__2 = *m - i__;
+		i__3 = *n - i__;
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(i__ + 1, 
+			i__ + 1), lda, &a_ref(i__, i__ + 1), lda, &c_b1, &
+			x_ref(i__ + 1, i__), &c__1);
+		i__2 = *n - i__;
+		cgemv_("Conjugate transpose", &i__2, &i__, &c_b2, &y_ref(i__ 
+			+ 1, 1), ldy, &a_ref(i__, i__ + 1), lda, &c_b1, &
+			x_ref(1, i__), &c__1);
+		i__2 = *m - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i, &q__1, &A(i+1,1), 
-			lda, &X(1,i), &c__1, &c_b2, &X(i+1,i), &c__1);
-		i__2 = i - 1;
-		i__3 = *n - i;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &A(1,i+1), lda, &A(i,i+1), lda, &
-			c_b1, &X(1,i), &c__1);
-		i__2 = *m - i;
-		i__3 = i - 1;
+		cgemv_("No transpose", &i__2, &i__, &q__1, &a_ref(i__ + 1, 1),
+			 lda, &x_ref(1, i__), &c__1, &c_b2, &x_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = i__ - 1;
+		i__3 = *n - i__;
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(1, i__ + 1)
+			, lda, &a_ref(i__, i__ + 1), lda, &c_b1, &x_ref(1, 
+			i__), &c__1);
+		i__2 = *m - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &X(i+1,1)
-			, ldx, &X(1,i), &c__1, &c_b2, &X(i+1,i), &c__1);
-		i__2 = *m - i;
-		cscal_(&i__2, &TAUP(i), &X(i+1,i), &c__1);
-		i__2 = *n - i;
-		clacgv_(&i__2, &A(i,i+1), lda);
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &x_ref(i__ + 1, 1)
+			, ldx, &x_ref(1, i__), &c__1, &c_b2, &x_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = *m - i__;
+		cscal_(&i__2, &taup[i__], &x_ref(i__ + 1, i__), &c__1);
+		i__2 = *n - i__;
+		clacgv_(&i__2, &a_ref(i__, i__ + 1), lda);
 	    }
 /* L10: */
 	}
@@ -315,131 +327,144 @@
 /*        Reduce to lower bidiagonal form */
 
 	i__1 = *nb;
-	for (i = 1; i <= *nb; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Update A(i,i:n) */
 
-	    i__2 = *n - i + 1;
-	    clacgv_(&i__2, &A(i,i), lda);
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &A(i,1), lda);
-	    i__2 = *n - i + 1;
-	    i__3 = i - 1;
+	    i__2 = *n - i__ + 1;
+	    clacgv_(&i__2, &a_ref(i__, i__), lda);
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &a_ref(i__, 1), lda);
+	    i__2 = *n - i__ + 1;
+	    i__3 = i__ - 1;
 	    q__1.r = -1.f, q__1.i = 0.f;
-	    cgemv_("No transpose", &i__2, &i__3, &q__1, &Y(i,1), ldy, &
-		    A(i,1), lda, &c_b2, &A(i,i), lda);
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &A(i,1), lda);
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &X(i,1), ldx);
-	    i__2 = i - 1;
-	    i__3 = *n - i + 1;
+	    cgemv_("No transpose", &i__2, &i__3, &q__1, &y_ref(i__, 1), ldy, &
+		    a_ref(i__, 1), lda, &c_b2, &a_ref(i__, i__), lda);
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &a_ref(i__, 1), lda);
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &x_ref(i__, 1), ldx);
+	    i__2 = i__ - 1;
+	    i__3 = *n - i__ + 1;
 	    q__1.r = -1.f, q__1.i = 0.f;
-	    cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &A(1,i), lda, &X(i,1), ldx, &c_b2, &A(i,i),
-		     lda);
-	    i__2 = i - 1;
-	    clacgv_(&i__2, &X(i,1), ldx);
+	    cgemv_("Conjugate transpose", &i__2, &i__3, &q__1, &a_ref(1, i__),
+		     lda, &x_ref(i__, 1), ldx, &c_b2, &a_ref(i__, i__), lda);
+	    i__2 = i__ - 1;
+	    clacgv_(&i__2, &x_ref(i__, 1), ldx);
 
 /*           Generate reflection P(i) to annihilate A(i,i+1:n) */
 
-	    i__2 = i + i * a_dim1;
-	    alpha.r = A(i,i).r, alpha.i = A(i,i).i;
-	    i__2 = *n - i + 1;
+	    i__2 = a_subscr(i__, i__);
+	    alpha.r = a[i__2].r, alpha.i = a[i__2].i;
 /* Computing MIN */
-	    i__3 = i + 1;
-	    clarfg_(&i__2, &alpha, &A(i,min(i+1,*n)), lda, &TAUP(
-		    i));
-	    i__2 = i;
-	    D(i) = alpha.r;
-	    if (i < *m) {
-		i__2 = i + i * a_dim1;
-		A(i,i).r = 1.f, A(i,i).i = 0.f;
+	    i__2 = i__ + 1;
+	    i__3 = *n - i__ + 1;
+	    clarfg_(&i__3, &alpha, &a_ref(i__, min(i__2,*n)), lda, &taup[i__])
+		    ;
+	    i__2 = i__;
+	    d__[i__2] = alpha.r;
+	    if (i__ < *m) {
+		i__2 = a_subscr(i__, i__);
+		a[i__2].r = 1.f, a[i__2].i = 0.f;
 
 /*              Compute X(i+1:m,i) */
 
-		i__2 = *m - i;
-		i__3 = *n - i + 1;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &A(i+1,i), lda, &A(i,i), lda, &c_b1, &X(i+1,i), &c__1);
-		i__2 = *n - i + 1;
-		i__3 = i - 1;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &Y(i,1), ldy, &A(i,i), lda, &c_b1, &X(1,i), &c__1);
-		i__2 = *m - i;
-		i__3 = i - 1;
+		i__2 = *m - i__;
+		i__3 = *n - i__ + 1;
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(i__ + 1, 
+			i__), lda, &a_ref(i__, i__), lda, &c_b1, &x_ref(i__ + 
+			1, i__), &c__1);
+		i__2 = *n - i__ + 1;
+		i__3 = i__ - 1;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &y_ref(i__,
+			 1), ldy, &a_ref(i__, i__), lda, &c_b1, &x_ref(1, i__)
+			, &c__1);
+		i__2 = *m - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &A(i+1,1)
-			, lda, &X(1,i), &c__1, &c_b2, &X(i+1,i), &c__1);
-		i__2 = i - 1;
-		i__3 = *n - i + 1;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &A(1,i)
-			, lda, &A(i,i), lda, &c_b1, &X(1,i), &c__1);
-		i__2 = *m - i;
-		i__3 = i - 1;
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &a_ref(i__ + 1, 1)
+			, lda, &x_ref(1, i__), &c__1, &c_b2, &x_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = i__ - 1;
+		i__3 = *n - i__ + 1;
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(1, i__), 
+			lda, &a_ref(i__, i__), lda, &c_b1, &x_ref(1, i__), &
+			c__1);
+		i__2 = *m - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &X(i+1,1)
-			, ldx, &X(1,i), &c__1, &c_b2, &X(i+1,i), &c__1);
-		i__2 = *m - i;
-		cscal_(&i__2, &TAUP(i), &X(i+1,i), &c__1);
-		i__2 = *n - i + 1;
-		clacgv_(&i__2, &A(i,i), lda);
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &x_ref(i__ + 1, 1)
+			, ldx, &x_ref(1, i__), &c__1, &c_b2, &x_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = *m - i__;
+		cscal_(&i__2, &taup[i__], &x_ref(i__ + 1, i__), &c__1);
+		i__2 = *n - i__ + 1;
+		clacgv_(&i__2, &a_ref(i__, i__), lda);
 
 /*              Update A(i+1:m,i) */
 
-		i__2 = i - 1;
-		clacgv_(&i__2, &Y(i,1), ldy);
-		i__2 = *m - i;
-		i__3 = i - 1;
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &y_ref(i__, 1), ldy);
+		i__2 = *m - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &A(i+1,1)
-			, lda, &Y(i,1), ldy, &c_b2, &A(i+1,i), &c__1);
-		i__2 = i - 1;
-		clacgv_(&i__2, &Y(i,1), ldy);
-		i__2 = *m - i;
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &a_ref(i__ + 1, 1)
+			, lda, &y_ref(i__, 1), ldy, &c_b2, &a_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = i__ - 1;
+		clacgv_(&i__2, &y_ref(i__, 1), ldy);
+		i__2 = *m - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i, &q__1, &X(i+1,1), 
-			ldx, &A(1,i), &c__1, &c_b2, &A(i+1,i), &c__1);
+		cgemv_("No transpose", &i__2, &i__, &q__1, &x_ref(i__ + 1, 1),
+			 ldx, &a_ref(1, i__), &c__1, &c_b2, &a_ref(i__ + 1, 
+			i__), &c__1);
 
-/*              Generate reflection Q(i) to annihilate A(i+2:m
-,i) */
+/*              Generate reflection Q(i) to annihilate A(i+2:m,i) */
 
-		i__2 = i + 1 + i * a_dim1;
-		alpha.r = A(i+1,i).r, alpha.i = A(i+1,i).i;
-		i__2 = *m - i;
+		i__2 = a_subscr(i__ + 1, i__);
+		alpha.r = a[i__2].r, alpha.i = a[i__2].i;
 /* Computing MIN */
-		i__3 = i + 2;
-		clarfg_(&i__2, &alpha, &A(min(i+2,*m),i), &c__1, &
-			TAUQ(i));
-		i__2 = i;
-		E(i) = alpha.r;
-		i__2 = i + 1 + i * a_dim1;
-		A(i+1,i).r = 1.f, A(i+1,i).i = 0.f;
+		i__2 = i__ + 2;
+		i__3 = *m - i__;
+		clarfg_(&i__3, &alpha, &a_ref(min(i__2,*m), i__), &c__1, &
+			tauq[i__]);
+		i__2 = i__;
+		e[i__2] = alpha.r;
+		i__2 = a_subscr(i__ + 1, i__);
+		a[i__2].r = 1.f, a[i__2].i = 0.f;
 
 /*              Compute Y(i+1:n,i) */
 
-		i__2 = *m - i;
-		i__3 = *n - i;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &A(i+1,i+1), lda, &A(i+1,i), &c__1,
-			 &c_b1, &Y(i+1,i), &c__1);
-		i__2 = *m - i;
-		i__3 = i - 1;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &A(i+1,1), lda, &A(i+1,i), &c__1, &c_b1, &
-			Y(1,i), &c__1);
-		i__2 = *n - i;
-		i__3 = i - 1;
+		i__2 = *m - i__;
+		i__3 = *n - i__;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(i__ 
+			+ 1, i__ + 1), lda, &a_ref(i__ + 1, i__), &c__1, &
+			c_b1, &y_ref(i__ + 1, i__), &c__1);
+		i__2 = *m - i__;
+		i__3 = i__ - 1;
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(i__ 
+			+ 1, 1), lda, &a_ref(i__ + 1, i__), &c__1, &c_b1, &
+			y_ref(1, i__), &c__1);
+		i__2 = *n - i__;
+		i__3 = i__ - 1;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("No transpose", &i__2, &i__3, &q__1, &Y(i+1,1)
-			, ldy, &Y(1,i), &c__1, &c_b2, &Y(i+1,i), &c__1);
-		i__2 = *m - i;
-		cgemv_("Conjugate transpose", &i__2, &i, &c_b2, &X(i+1,1), ldx, &A(i+1,i), &c__1, &c_b1, &
-			Y(1,i), &c__1);
-		i__2 = *n - i;
+		cgemv_("No transpose", &i__2, &i__3, &q__1, &y_ref(i__ + 1, 1)
+			, ldy, &y_ref(1, i__), &c__1, &c_b2, &y_ref(i__ + 1, 
+			i__), &c__1);
+		i__2 = *m - i__;
+		cgemv_("Conjugate transpose", &i__2, &i__, &c_b2, &x_ref(i__ 
+			+ 1, 1), ldx, &a_ref(i__ + 1, i__), &c__1, &c_b1, &
+			y_ref(1, i__), &c__1);
+		i__2 = *n - i__;
 		q__1.r = -1.f, q__1.i = 0.f;
-		cgemv_("Conjugate transpose", &i, &i__2, &q__1, &A(1,i+1), lda, &Y(1,i), &c__1, &c_b2, &
-			Y(i+1,i), &c__1);
-		i__2 = *n - i;
-		cscal_(&i__2, &TAUQ(i), &Y(i+1,i), &c__1);
+		cgemv_("Conjugate transpose", &i__, &i__2, &q__1, &a_ref(1, 
+			i__ + 1), lda, &y_ref(1, i__), &c__1, &c_b2, &y_ref(
+			i__ + 1, i__), &c__1);
+		i__2 = *n - i__;
+		cscal_(&i__2, &tauq[i__], &y_ref(i__ + 1, i__), &c__1);
 	    } else {
-		i__2 = *n - i + 1;
-		clacgv_(&i__2, &A(i,i), lda);
+		i__2 = *n - i__ + 1;
+		clacgv_(&i__2, &a_ref(i__, i__), lda);
 	    }
 /* L20: */
 	}
@@ -449,4 +474,12 @@
 /*     End of CLABRD */
 
 } /* clabrd_ */
+
+#undef y_ref
+#undef y_subscr
+#undef x_ref
+#undef x_subscr
+#undef a_ref
+#undef a_subscr
+
 

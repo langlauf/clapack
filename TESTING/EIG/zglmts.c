@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,8 +14,8 @@ static doublecomplex c_b15 = {1.,0.};
 
 /* Subroutine */ int zglmts_(integer *n, integer *m, integer *p, 
 	doublecomplex *a, doublecomplex *af, integer *lda, doublecomplex *b, 
-	doublecomplex *bf, integer *ldb, doublecomplex *d, doublecomplex *df, 
-	doublecomplex *x, doublecomplex *u, doublecomplex *work, integer *
+	doublecomplex *bf, integer *ldb, doublecomplex *d__, doublecomplex *
+	df, doublecomplex *x, doublecomplex *u, doublecomplex *work, integer *
 	lwork, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
@@ -42,7 +43,7 @@ static doublecomplex c_b15 = {1.,0.};
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -106,25 +107,24 @@ static doublecomplex c_b15 = {1.,0.};
               RESULT = -----------------------------------------   
                        (norm(A)+norm(B))*(norm(x)+norm(u))*EPS   
 
-    ==================================================================== 
-  
+    ====================================================================   
 
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
-    --d;
+    --d__;
     --df;
     --x;
     --u;
@@ -146,7 +146,7 @@ static doublecomplex c_b15 = {1.,0.};
 
     zlacpy_("Full", n, m, &a[a_offset], lda, &af[af_offset], lda);
     zlacpy_("Full", n, p, &b[b_offset], ldb, &bf[bf_offset], ldb);
-    zcopy_(n, &d[1], &c__1, &df[1], &c__1);
+    zcopy_(n, &d__[1], &c__1, &df[1], &c__1);
 
 /*     Solve GLM problem */
 
@@ -159,7 +159,7 @@ static doublecomplex c_b15 = {1.,0.};
          RESULT = -----------------------------------------   
                   (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
 
-    zcopy_(n, &d[1], &c__1, &df[1], &c__1);
+    zcopy_(n, &d__[1], &c__1, &df[1], &c__1);
     zgemv_("No transpose", n, m, &c_b13, &a[a_offset], lda, &x[1], &c__1, &
 	    c_b15, &df[1], &c__1);
 

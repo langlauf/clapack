@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,11 @@ static doublecomplex c_b2 = {1.,0.};
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -75,8 +80,7 @@ static doublecomplex c_b2 = {1.,0.};
             =3: RESULT = | I - UU* | / ( n ulp )   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZGET51 does nothing. 
-  
+            The size of the matrix.  If it is zero, ZGET51 does nothing.   
             It must be at least zero.   
 
     A       (input) COMPLEX*16 array, dimension (LDA, N)   
@@ -120,22 +124,21 @@ static doublecomplex c_b2 = {1.,0.};
             value is currently limited to 1/ulp, to avoid overflow.   
             Errors are flagged by RESULT=10/ulp.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
     --rwork;
@@ -194,7 +197,7 @@ static doublecomplex c_b2 = {1.,0.};
 		for (jrow = 1; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = jrow + jcol * a_dim1;
+		    i__5 = a_subscr(jrow, jcol);
 		    z__1.r = work[i__4].r - a[i__5].r, z__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -251,4 +254,8 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGET51 */
 
 } /* zget51_ */
+
+#undef a_ref
+#undef a_subscr
+
 

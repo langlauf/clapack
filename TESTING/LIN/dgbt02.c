@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,7 +36,12 @@ static doublereal c_b10 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -68,8 +74,7 @@ static doublereal c_b10 = 1.;
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     NRHS    (input) INTEGER   
             The number of columns of B.  NRHS >= 0.   
@@ -79,8 +84,7 @@ static doublereal c_b10 = 1.;
             KL+KU+1.   
 
     LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,KL+KU+1). 
-  
+            The leading dimension of the array A.  LDA >= max(1,KL+KU+1).   
 
     X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS)   
             The computed solution vectors for the system of linear   
@@ -103,21 +107,20 @@ static doublereal c_b10 = 1.;
             The maximum over the number of right hand sides of   
             norm(B - A*X) / ( norm(A) * norm(X) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if N = 0 pr NRHS = 0   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
@@ -141,7 +144,7 @@ static doublereal c_b10 = 1.;
 	i2 = min(i__2,i__3);
 /* Computing MAX */
 	i__2 = i2 - i1 + 1;
-	d__1 = anorm, d__2 = dasum_(&i__2, &a[i1 + j * a_dim1], &c__1);
+	d__1 = anorm, d__2 = dasum_(&i__2, &a_ref(i1, j), &c__1);
 	anorm = max(d__1,d__2);
 /* L10: */
     }
@@ -160,8 +163,8 @@ static doublereal c_b10 = 1.;
 
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	dgbmv_(trans, m, n, kl, ku, &c_b8, &a[a_offset], lda, &x[j * x_dim1 + 
-		1], &c__1, &c_b10, &b[j * b_dim1 + 1], &c__1);
+	dgbmv_(trans, m, n, kl, ku, &c_b8, &a[a_offset], lda, &x_ref(1, j), &
+		c__1, &c_b10, &b_ref(1, j), &c__1);
 /* L20: */
     }
 
@@ -171,8 +174,8 @@ static doublereal c_b10 = 1.;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = dasum_(&n1, &b[j * b_dim1 + 1], &c__1);
-	xnorm = dasum_(&n1, &x[j * x_dim1 + 1], &c__1);
+	bnorm = dasum_(&n1, &b_ref(1, j), &c__1);
+	xnorm = dasum_(&n1, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -188,4 +191,9 @@ static doublereal c_b10 = 1.;
 /*     End of DGBT02 */
 
 } /* dgbt02_ */
+
+#undef x_ref
+#undef b_ref
+#undef a_ref
+
 

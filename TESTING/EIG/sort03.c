@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static integer c__1 = 1;
     double r_sign(real *, real *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real s;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sort01_(char *, integer *, integer *, real *, 
@@ -34,7 +35,11 @@ static integer c__1 = 1;
     static real ulp, res1, res2;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -57,8 +62,7 @@ static integer c__1 = 1;
 
        | U(i) - S*V(i) |/ ( N ulp )   
 
-    where S is +-1 (chosen to minimize the expression), U(i) is the i-th 
-  
+    where S is +-1 (chosen to minimize the expression), U(i) is the i-th   
     row (column) of U, and V(i) is the i-th row (column) of V.   
 
     Arguments   
@@ -88,8 +92,7 @@ static integer c__1 = 1;
             0 <= K <= max(MU,MV).   
 
     U       (input) REAL array, dimension (LDU,N)   
-            The first matrix to compare.  If RC = 'R', U is MU by N, and 
-  
+            The first matrix to compare.  If RC = 'R', U is MU by N, and   
             if RC = 'C', U is N by MU.   
 
     LDU     (input) INTEGER   
@@ -97,8 +100,7 @@ static integer c__1 = 1;
             and if RC = 'C', LDU >= max(1,N).   
 
     V       (input) REAL array, dimension (LDV,N)   
-            The second matrix to compare.  If RC = 'R', V is MV by N, and 
-  
+            The second matrix to compare.  If RC = 'R', V is MV by N, and   
             if RC = 'C', V is N by MV.   
 
     LDV     (input) INTEGER   
@@ -120,18 +122,17 @@ static integer c__1 = 1;
             0  indicates a successful exit   
             -k indicates the k-th parameter had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Check inputs   
 
        Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
 
@@ -184,15 +185,15 @@ static integer c__1 = 1;
 
 	res1 = 0.f;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = isamax_(n, &u[i + u_dim1], ldu);
-	    s = r_sign(&c_b7, &u[i + lmx * u_dim1]) * r_sign(&c_b7, &v[i + 
-		    lmx * v_dim1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = isamax_(n, &u_ref(i__, 1), ldu);
+	    s = r_sign(&c_b7, &u_ref(i__, lmx)) * r_sign(&c_b7, &v_ref(i__, 
+		    lmx));
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		r__2 = res1, r__3 = (r__1 = u[i + j * u_dim1] - s * v[i + j * 
-			v_dim1], dabs(r__1));
+		r__2 = res1, r__3 = (r__1 = u_ref(i__, j) - s * v_ref(i__, j),
+			 dabs(r__1));
 		res1 = dmax(r__2,r__3);
 /* L10: */
 	    }
@@ -210,15 +211,15 @@ static integer c__1 = 1;
 
 	res1 = 0.f;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = isamax_(n, &u[i * u_dim1 + 1], &c__1);
-	    s = r_sign(&c_b7, &u[lmx + i * u_dim1]) * r_sign(&c_b7, &v[lmx + 
-		    i * v_dim1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = isamax_(n, &u_ref(1, i__), &c__1);
+	    s = r_sign(&c_b7, &u_ref(lmx, i__)) * r_sign(&c_b7, &v_ref(lmx, 
+		    i__));
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		r__2 = res1, r__3 = (r__1 = u[j + i * u_dim1] - s * v[j + i * 
-			v_dim1], dabs(r__1));
+		r__2 = res1, r__3 = (r__1 = u_ref(j, i__) - s * v_ref(j, i__),
+			 dabs(r__1));
 		res1 = dmax(r__2,r__3);
 /* L30: */
 	    }
@@ -239,4 +240,8 @@ static integer c__1 = 1;
 /*     End of SORT03 */
 
 } /* sort03_ */
+
+#undef v_ref
+#undef u_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int sptcon_(integer *n, real *d, real *e, real *anorm, real *
-	rcond, real *work, integer *info)
+/* Subroutine */ int sptcon_(integer *n, real *d__, real *e, real *anorm, 
+	real *rcond, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -32,8 +33,7 @@
             factorization of A, as computed by SPTTRF.   
 
     E       (input) REAL array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the unit bidiagonal factor 
-  
+            The (n-1) off-diagonal elements of the unit bidiagonal factor   
             U or L from the factorization of A,  as computed by SPTTRF.   
 
     ANORM   (input) REAL   
@@ -57,15 +57,12 @@
     Algorithms for Computing the Condition Number of a Tridiagonal   
     Matrix", SIAM J. Sci. Stat. Comput., Vol. 7, No. 1, January 1986.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -73,18 +70,17 @@
     integer i__1;
     real r__1;
     /* Local variables */
-    static integer i, ix;
+    static integer i__, ix;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
     static real ainvnm;
 
 
+    --work;
+    --e;
+    --d__;
 
-#define WORK(I) work[(I)-1]
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -110,8 +106,8 @@
 /*     Check that D(1:N) is positive. */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (D(i) <= 0.f) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (d__[i__] <= 0.f) {
 	    return 0;
 	}
 /* L10: */
@@ -126,25 +122,26 @@
 
        Solve M(L) * x = e. */
 
-    WORK(1) = 1.f;
+    work[1] = 1.f;
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	WORK(i) = WORK(i - 1) * (r__1 = E(i - 1), dabs(r__1)) + 1.f;
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	work[i__] = work[i__ - 1] * (r__1 = e[i__ - 1], dabs(r__1)) + 1.f;
 /* L20: */
     }
 
 /*     Solve D * M(L)' * x = b. */
 
-    WORK(*n) /= D(*n);
-    for (i = *n - 1; i >= 1; --i) {
-	WORK(i) = WORK(i) / D(i) + WORK(i + 1) * (r__1 = E(i), dabs(r__1));
+    work[*n] /= d__[*n];
+    for (i__ = *n - 1; i__ >= 1; --i__) {
+	work[i__] = work[i__] / d__[i__] + work[i__ + 1] * (r__1 = e[i__], 
+		dabs(r__1));
 /* L30: */
     }
 
 /*     Compute AINVNM = max(x(i)), 1<=i<=n. */
 
-    ix = isamax_(n, &WORK(1), &c__1);
-    ainvnm = (r__1 = WORK(ix), dabs(r__1));
+    ix = isamax_(n, &work[1], &c__1);
+    ainvnm = (r__1 = work[ix], dabs(r__1));
 
 /*     Compute the reciprocal condition number. */
 

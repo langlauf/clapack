@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int slae2_(real *a, real *b, real *c, real *rt1, real *rt2)
+/* Subroutine */ int slae2_(real *a, real *b, real *c__, real *rt1, real *rt2)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -45,13 +46,11 @@
     correctly truncated arithmetic would be needed to compute RT2   
     accurately in all cases.   
 
-    Overflow is possible only if RT1 is within a factor of 5 of overflow. 
-  
+    Overflow is possible only if RT1 is within a factor of 5 of overflow.   
     Underflow is harmless if the input data is 0 or exceeds   
        underflow_threshold / macheps.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Compute the eigenvalues */
@@ -63,16 +62,16 @@
     static real acmn, acmx, ab, df, tb, sm, rt, adf;
 
 
-    sm = *a + *c;
-    df = *a - *c;
+    sm = *a + *c__;
+    df = *a - *c__;
     adf = dabs(df);
     tb = *b + *b;
     ab = dabs(tb);
-    if (dabs(*a) > dabs(*c)) {
+    if (dabs(*a) > dabs(*c__)) {
 	acmx = *a;
-	acmn = *c;
+	acmn = *c__;
     } else {
-	acmx = *c;
+	acmx = *c__;
 	acmn = *a;
     }
     if (adf > ab) {

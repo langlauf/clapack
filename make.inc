@@ -1,25 +1,28 @@
 ####################################################################
 #  LAPACK make include file.                                       #
-#  LAPACK, Version 2.0                                             #
-#  September 30, 1994                                                 #
+#  LAPACK, Version 3.0                                             #
+#  June 30, 1999                                                   #
 ####################################################################
 #
 #  The machine (platform) identifier to append to the library names
 #
-PLAT = _alpha
+PLAT = _SUN4SOL2
 #  
 #  Modify the CC and CFLAGS definitions to refer to the
 #  compiler and desired compiler options for your machine.  NOOPT
 #  refers to the compiler options desired when NO OPTIMIZATION is
-#  selected.  Define LOADER and LOADOPTS to refer to the loader and 
+#  selected.  Define LOADER and LOADOPTS to refer to the loader and
 #  desired load options for your machine.
 #
 #######################################################
 # This is used to compile C libary
 CC        = cc
-CFLAGS    = -O2
+CFLAGS    = -dalign -native -xO2 -xarch=v8plusa
 LOADER    = cc
-LOADOPTS  =
+LOADOPTS  = -dalign -native -xO2 -xarch=v8plusa
+NOOPT     = -dalign -native -xarch=v8plusa
+DRVCFLAGS = $(CFLAGS)
+F2CCFLAGS = $(CFLAGS)
 #######################################################################
 #
 #  The archiver and the flag(s) to use when building archive (library)
@@ -33,9 +36,15 @@ RANLIB   = ranlib
 #  machine-specific, optimized BLAS library should be used whenever
 #  possible.)
 #
+
 BLASLIB      = ../../blas$(PLAT).a
-#BLASLIB     = -lblas
+#BLASLIB      = ../../libfblaswr.a -L/usr/sww/opt/SUNWspro/lib -xlic_lib=sunperf  
+#BLASLIB      = -L/usr/sww/opt/SUNWspro/lib -Bstatic -xlic_lib=sunperf -Bdynamic 
+#BLASLIB      = -L/home/eecs/dbindel/work/ATLAS/lib/SunOS_SunUSX  \
+#               ../../libcblaswr.a -lcblas -latlas
 LAPACKLIB    = lapack$(PLAT).a
+F2CLIB       = ../../F2CLIBS/libF77.a ../../F2CLIBS/libI77.a
 TMGLIB       = tmglib$(PLAT).a
 EIGSRCLIB    = eigsrc$(PLAT).a
-F2CLIB       = ../../F2CLIBS/libF77.a ../../F2CLIBS/libI77.a
+LINSRCLIB    = linsrc$(PLAT).a
+

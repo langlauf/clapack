@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n, 
 	doublecomplex *ap, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
     Purpose   
     =======   
 
-    ZLANTP  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    ZLANTP  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     triangular matrix A, supplied in packed form.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -47,8 +43,7 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
             above.   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -62,10 +57,8 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
             set to zero.   
 
     AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
@@ -77,13 +70,10 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
             where LWORK >= N when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -93,7 +83,7 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
     /* Builtin functions */
     double z_abs(doublecomplex *), sqrt(doublereal);
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
     static doublereal scale;
     static logical udiag;
     extern logical lsame_(char *, char *);
@@ -103,11 +93,10 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
     static doublereal sum;
 
 
+    --work;
+    --ap;
 
-#define WORK(I) work[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     if (*n == 0) {
 	value = 0.;
     } else if (lsame_(norm, "M")) {
@@ -119,11 +108,11 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	    value = 1.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + j - 2;
-		    for (i = k; i <= k+j-2; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&AP(i));
+			d__1 = value, d__2 = z_abs(&ap[i__]);
 			value = max(d__1,d__2);
 /* L10: */
 		    }
@@ -132,11 +121,11 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + *n - j;
-		    for (i = k + 1; i <= k+*n-j; ++i) {
+		    for (i__ = k + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&AP(i));
+			d__1 = value, d__2 = z_abs(&ap[i__]);
 			value = max(d__1,d__2);
 /* L30: */
 		    }
@@ -148,11 +137,11 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	    value = 0.;
 	    if (lsame_(uplo, "U")) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + j - 1;
-		    for (i = k; i <= k+j-1; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&AP(i));
+			d__1 = value, d__2 = z_abs(&ap[i__]);
 			value = max(d__1,d__2);
 /* L50: */
 		    }
@@ -161,11 +150,11 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = k + *n - j;
-		    for (i = k; i <= k+*n-j; ++i) {
+		    for (i__ = k; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			d__1 = value, d__2 = z_abs(&AP(i));
+			d__1 = value, d__2 = z_abs(&ap[i__]);
 			value = max(d__1,d__2);
 /* L70: */
 		    }
@@ -174,7 +163,8 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		}
 	    }
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
@@ -183,19 +173,19 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	udiag = lsame_(diag, "U");
 	if (lsame_(uplo, "U")) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.;
 		    i__2 = k + j - 2;
-		    for (i = k; i <= k+j-2; ++i) {
-			sum += z_abs(&AP(i));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += z_abs(&ap[i__]);
 /* L90: */
 		    }
 		} else {
 		    sum = 0.;
 		    i__2 = k + j - 1;
-		    for (i = k; i <= k+j-1; ++i) {
-			sum += z_abs(&AP(i));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += z_abs(&ap[i__]);
 /* L100: */
 		    }
 		}
@@ -205,19 +195,19 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		if (udiag) {
 		    sum = 1.;
 		    i__2 = k + *n - j;
-		    for (i = k + 1; i <= k+*n-j; ++i) {
-			sum += z_abs(&AP(i));
+		    for (i__ = k + 1; i__ <= i__2; ++i__) {
+			sum += z_abs(&ap[i__]);
 /* L120: */
 		    }
 		} else {
 		    sum = 0.;
 		    i__2 = k + *n - j;
-		    for (i = k; i <= k+*n-j; ++i) {
-			sum += z_abs(&AP(i));
+		    for (i__ = k; i__ <= i__2; ++i__) {
+			sum += z_abs(&ap[i__]);
 /* L130: */
 		    }
 		}
@@ -234,15 +224,15 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	if (lsame_(uplo, "U")) {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L150: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j - 1;
-		    for (i = 1; i <= j-1; ++i) {
-			WORK(i) += z_abs(&AP(k));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&ap[k]);
 			++k;
 /* L160: */
 		    }
@@ -251,15 +241,15 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L180: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = j;
-		    for (i = 1; i <= j; ++i) {
-			WORK(i) += z_abs(&AP(k));
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&ap[k]);
 			++k;
 /* L190: */
 		    }
@@ -269,16 +259,16 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	} else {
 	    if (lsame_(diag, "U")) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 1.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 1.;
 /* L210: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    ++k;
 		    i__2 = *n;
-		    for (i = j + 1; i <= *n; ++i) {
-			WORK(i) += z_abs(&AP(k));
+		    for (i__ = j + 1; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&ap[k]);
 			++k;
 /* L220: */
 		    }
@@ -286,15 +276,15 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(i) = 0.;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    work[i__] = 0.;
 /* L240: */
 		}
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = j; i <= *n; ++i) {
-			WORK(i) += z_abs(&AP(k));
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			work[i__] += z_abs(&ap[k]);
 			++k;
 /* L250: */
 		    }
@@ -304,9 +294,9 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 	}
 	value = 0.;
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = value, d__2 = WORK(i);
+	    d__1 = value, d__2 = work[i__];
 	    value = max(d__1,d__2);
 /* L270: */
 	}
@@ -320,9 +310,9 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		sum = (doublereal) (*n);
 		k = 2;
 		i__1 = *n;
-		for (j = 2; j <= *n; ++j) {
+		for (j = 2; j <= i__1; ++j) {
 		    i__2 = j - 1;
-		    zlassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k += j;
 /* L280: */
 		}
@@ -331,8 +321,8 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		sum = 1.;
 		k = 1;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    zlassq_(&j, &AP(k), &c__1, &scale, &sum);
+		for (j = 1; j <= i__1; ++j) {
+		    zlassq_(&j, &ap[k], &c__1, &scale, &sum);
 		    k += j;
 /* L290: */
 		}
@@ -343,9 +333,9 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		sum = (doublereal) (*n);
 		k = 2;
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n - j;
-		    zlassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k = k + *n - j + 1;
 /* L300: */
 		}
@@ -354,9 +344,9 @@ doublereal zlantp_(char *norm, char *uplo, char *diag, integer *n,
 		sum = 1.;
 		k = 1;
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n - j + 1;
-		    zlassq_(&i__2, &AP(k), &c__1, &scale, &sum);
+		    zlassq_(&i__2, &ap[k], &c__1, &scale, &sum);
 		    k = k + *n - j + 1;
 /* L310: */
 		}

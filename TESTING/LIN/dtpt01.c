@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__1 = 1;
     static doublereal ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +48,7 @@ static integer c__1 = 1;
     ==========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -62,15 +62,13 @@ static integer c__1 = 1;
 
     AP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
             The original upper or lower triangular matrix A, packed   
-            columnwise in a linear array.  The j-th column of A is stored 
-  
+            columnwise in a linear array.  The j-th column of A is stored   
             in the array AP as follows:   
             if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
                AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n.   
 
-    AINVP   (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2) 
-  
+    AINVP   (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
             On entry, the (triangular) inverse of the matrix A, packed   
             columnwise in a linear array as in AP.   
             On exit, the contents of AINVP are destroyed.   
@@ -84,8 +82,7 @@ static integer c__1 = 1;
     RESID   (output) DOUBLE PRECISION   
             norm(A*AINV - I) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   

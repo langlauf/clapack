@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int stgevc_(char *side, char *howmny, logical *select, 
@@ -5,10 +6,10 @@
 	integer *ldvl, real *vr, integer *ldvr, integer *mm, integer *m, real 
 	*work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
 
@@ -26,8 +27,7 @@
 
     where y**H denotes the conjugate tranpose of y.   
 
-    If an eigenvalue w is determined by zero diagonal elements of both A 
-  
+    If an eigenvalue w is determined by zero diagonal elements of both A   
     and B, a unit vector is returned as the corresponding eigenvector.   
 
     If all eigenvectors are requested, the routine may either return   
@@ -67,8 +67,7 @@
             If HOWMNY='A' or 'B', SELECT is not referenced.   
             To select the real eigenvector corresponding to the real   
             eigenvalue w(j), SELECT(j) must be set to .TRUE.  To select   
-            the complex eigenvector corresponding to a complex conjugate 
-  
+            the complex eigenvector corresponding to a complex conjugate   
             pair w(j) and w(j+1), either SELECT(j) or SELECT(j+1) must   
             be set to .TRUE..   
 
@@ -94,11 +93,9 @@
             contain an N-by-N matrix Q (usually the orthogonal matrix Q   
             of left Schur vectors returned by SHGEQZ).   
             On exit, if SIDE = 'L' or 'B', VL contains:   
-            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Q*Y;   
-            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VL, in the same order as their eigenvalues.   
             If SIDE = 'R', VL is not referenced.   
@@ -111,16 +108,14 @@
             The leading dimension of array VL.   
             LDVL >= max(1,N) if SIDE = 'L' or 'B'; LDVL >= 1 otherwise.   
 
-    VR      (input/output) COMPLEX array, dimension (LDVR,MM)   
+    VR      (input/output) REAL array, dimension (LDVR,MM)   
             On entry, if SIDE = 'R' or 'B' and HOWMNY = 'B', VR must   
             contain an N-by-N matrix Q (usually the orthogonal matrix Z   
             of right Schur vectors returned by SHGEQZ).   
             On exit, if SIDE = 'R' or 'B', VR contains:   
-            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Z*X;   
-            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VR, in the same order as their eigenvalues.   
             If SIDE = 'L', VR is not referenced.   
@@ -148,8 +143,7 @@
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  the 2-by-2 block (INFO:INFO+1) does not have a complex 
-  
+            > 0:  the 2-by-2 block (INFO:INFO+1) does not have a complex   
                   eigenvalue.   
 
     Further Details   
@@ -163,8 +157,7 @@
        WORK( 2*N+1:3*N ) = real part of eigenvector   
        WORK( 3*N+1:4*N ) = imaginary part of eigenvector   
        WORK( 4*N+1:5*N ) = real part of back-transformed eigenvector   
-       WORK( 5*N+1:6*N ) = imaginary part of back-transformed eigenvector 
-  
+       WORK( 5*N+1:6*N ) = imaginary part of back-transformed eigenvector   
 
     Rowwise vs. columnwise solution methods:   
     ------- --  ---------- -------- -------   
@@ -172,8 +165,7 @@
     Finding a generalized eigenvector consists basically of solving the   
     singular triangular system   
 
-     (A - w B) x = 0     (for right) or:   (A - w B)**H y = 0  (for left) 
-  
+     (A - w B) x = 0     (for right) or:   (A - w B)**H y = 0  (for left)   
 
     Consider finding the i-th right eigenvector (assume all eigenvalues   
     are real). The equation to be solved is:   
@@ -194,16 +186,14 @@
         (3) v(j) := s / C(j,j)   
 
     Step 2 is sometimes called the "dot product" step, since it is an   
-    inner product between the j-th row and the portion of the eigenvector 
-  
+    inner product between the j-th row and the portion of the eigenvector   
     that has been computed so far.   
 
     The "columnwise" method consists basically in doing the sums   
     for all the rows in parallel.  As each v(j) is computed, the   
     contribution of v(j) times the j-th column of C is added to the   
     partial sums.  Since FORTRAN arrays are stored columnwise, this has   
-    the advantage that at each step, the elements of C that are accessed 
-  
+    the advantage that at each step, the elements of C that are accessed   
     are adjacent to one another, whereas with the rowwise method, the   
     elements accessed at a step are spaced LDA (and LDB) words apart.   
 
@@ -212,21 +202,18 @@
     actually accesses columns of A and B at each step, and so is the   
     preferred method.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static logical c_true = TRUE_;
     static integer c__2 = 2;
-    static real c_b34 = 1.f;
+    static real c_b35 = 1.f;
     static integer c__1 = 1;
-    static real c_b36 = 0.f;
+    static real c_b37 = 0.f;
     static logical c_false = FALSE_;
     
     /* System generated locals */
@@ -240,7 +227,7 @@
     extern /* Subroutine */ int slag2_(real *, integer *, real *, integer *, 
 	    real *, real *, real *, real *, real *, real *);
     static real temp2, bdiag[2];
-    static integer i, j;
+    static integer i__, j;
     static real acoef, scale;
     static logical ilall;
     static integer iside;
@@ -280,17 +267,31 @@
     static real big;
     static logical lsa, lsb;
     static real ulp, sum[4]	/* was [2][2] */;
+#define suma_ref(a_1,a_2) suma[(a_2)*2 + a_1 - 3]
+#define sumb_ref(a_1,a_2) sumb[(a_2)*2 + a_1 - 3]
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
+#define sum_ref(a_1,a_2) sum[(a_2)*2 + a_1 - 3]
 
 
+    --select;
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --work;
 
-#define SELECT(I) select[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-
+    /* Function Body */
     if (lsame_(howmny, "A")) {
 	ihwmny = 1;
 	ilall = TRUE_;
@@ -299,7 +300,8 @@
 	ihwmny = 2;
 	ilall = FALSE_;
 	ilback = FALSE_;
-    } else if (lsame_(howmny, "B") || lsame_(howmny, "T")) {
+    } else if (lsame_(howmny, "B") || lsame_(howmny, 
+	    "T")) {
 	ihwmny = 3;
 	ilall = TRUE_;
 	ilback = TRUE_;
@@ -324,28 +326,46 @@
 	iside = -1;
     }
 
+    *info = 0;
+    if (iside < 0) {
+	*info = -1;
+    } else if (ihwmny < 0) {
+	*info = -2;
+    } else if (*n < 0) {
+	*info = -4;
+    } else if (*lda < max(1,*n)) {
+	*info = -6;
+    } else if (*ldb < max(1,*n)) {
+	*info = -8;
+    }
+    if (*info != 0) {
+	i__1 = -(*info);
+	xerbla_("STGEVC", &i__1);
+	return 0;
+    }
+
 /*     Count the number of eigenvectors to be computed */
 
     if (! ilall) {
 	im = 0;
 	ilcplx = FALSE_;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    if (ilcplx) {
 		ilcplx = FALSE_;
 		goto L10;
 	    }
 	    if (j < *n) {
-		if (A(j+1,j) != 0.f) {
+		if (a_ref(j + 1, j) != 0.f) {
 		    ilcplx = TRUE_;
 		}
 	    }
 	    if (ilcplx) {
-		if (SELECT(j) || SELECT(j + 1)) {
+		if (select[j] || select[j + 1]) {
 		    im += 2;
 		}
 	    } else {
-		if (SELECT(j)) {
+		if (select[j]) {
 		    ++im;
 		}
 	    }
@@ -361,14 +381,14 @@ L10:
     ilabad = FALSE_;
     ilbbad = FALSE_;
     i__1 = *n - 1;
-    for (j = 1; j <= *n-1; ++j) {
-	if (A(j+1,j) != 0.f) {
-	    if (B(j,j) == 0.f || B(j+1,j+1) == 
-		    0.f || B(j,j+1) != 0.f) {
+    for (j = 1; j <= i__1; ++j) {
+	if (a_ref(j + 1, j) != 0.f) {
+	    if (b_ref(j, j) == 0.f || b_ref(j + 1, j + 1) == 0.f || b_ref(j, 
+		    j + 1) != 0.f) {
 		ilbbad = TRUE_;
 	    }
 	    if (j < *n - 1) {
-		if (A(j+2,j+1) != 0.f) {
+		if (a_ref(j + 2, j + 1) != 0.f) {
 		    ilabad = TRUE_;
 		}
 	    }
@@ -376,21 +396,10 @@ L10:
 /* L20: */
     }
 
-    *info = 0;
-    if (iside < 0) {
-	*info = -1;
-    } else if (ihwmny < 0) {
-	*info = -2;
-    } else if (*n < 0) {
-	*info = -4;
-    } else if (ilabad) {
+    if (ilabad) {
 	*info = -5;
-    } else if (*lda < max(1,*n)) {
-	*info = -6;
     } else if (ilbbad) {
 	*info = -7;
-    } else if (*ldb < max(1,*n)) {
-	*info = -8;
     } else if (compl && *ldvl < *n || *ldvl < 1) {
 	*info = -10;
     } else if (compr && *ldvr < *n || *ldvr < 1) {
@@ -421,43 +430,42 @@ L10:
     big = 1.f / small;
     bignum = 1.f / (safmin * *n);
 
-/*     Compute the 1-norm of each column of the strictly upper triangular 
-  
+/*     Compute the 1-norm of each column of the strictly upper triangular   
        part (i.e., excluding all elements belonging to the diagonal   
        blocks) of A and B to check for possible overflow in the   
        triangular solver. */
 
-    anorm = (r__1 = A(1,1), dabs(r__1));
+    anorm = (r__1 = a_ref(1, 1), dabs(r__1));
     if (*n > 1) {
-	anorm += (r__1 = A(2,1), dabs(r__1));
+	anorm += (r__1 = a_ref(2, 1), dabs(r__1));
     }
-    bnorm = (r__1 = B(1,1), dabs(r__1));
-    WORK(1) = 0.f;
-    WORK(*n + 1) = 0.f;
+    bnorm = (r__1 = b_ref(1, 1), dabs(r__1));
+    work[1] = 0.f;
+    work[*n + 1] = 0.f;
 
     i__1 = *n;
-    for (j = 2; j <= *n; ++j) {
+    for (j = 2; j <= i__1; ++j) {
 	temp = 0.f;
 	temp2 = 0.f;
-	if (A(j,j-1) == 0.f) {
+	if (a_ref(j, j - 1) == 0.f) {
 	    iend = j - 1;
 	} else {
 	    iend = j - 2;
 	}
 	i__2 = iend;
-	for (i = 1; i <= iend; ++i) {
-	    temp += (r__1 = A(i,j), dabs(r__1));
-	    temp2 += (r__1 = B(i,j), dabs(r__1));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    temp += (r__1 = a_ref(i__, j), dabs(r__1));
+	    temp2 += (r__1 = b_ref(i__, j), dabs(r__1));
 /* L30: */
 	}
-	WORK(j) = temp;
-	WORK(*n + j) = temp2;
+	work[j] = temp;
+	work[*n + j] = temp2;
 /* Computing MIN */
 	i__3 = j + 1;
 	i__2 = min(i__3,*n);
-	for (i = iend + 1; i <= min(j+1,*n); ++i) {
-	    temp += (r__1 = A(i,j), dabs(r__1));
-	    temp2 += (r__1 = B(i,j), dabs(r__1));
+	for (i__ = iend + 1; i__ <= i__2; ++i__) {
+	    temp += (r__1 = a_ref(i__, j), dabs(r__1));
+	    temp2 += (r__1 = b_ref(i__, j), dabs(r__1));
 /* L40: */
 	}
 	anorm = dmax(anorm,temp);
@@ -477,13 +485,11 @@ L10:
 
 	ilcplx = FALSE_;
 	i__1 = *n;
-	for (je = 1; je <= *n; ++je) {
+	for (je = 1; je <= i__1; ++je) {
 
-/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FAL
-SE., or   
+/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FALSE., or   
              (b) this would be the second of a complex pair.   
-             Check for complex eigenvalue, so as to be sure of whi
-ch   
+             Check for complex eigenvalue, so as to be sure of which   
              entry(-ies) of SELECT to look at. */
 
 	    if (ilcplx) {
@@ -492,7 +498,7 @@ ch
 	    }
 	    nw = 1;
 	    if (je < *n) {
-		if (A(je+1,je) != 0.f) {
+		if (a_ref(je + 1, je) != 0.f) {
 		    ilcplx = TRUE_;
 		    nw = 2;
 		}
@@ -500,32 +506,30 @@ ch
 	    if (ilall) {
 		ilcomp = TRUE_;
 	    } else if (ilcplx) {
-		ilcomp = SELECT(je) || SELECT(je + 1);
+		ilcomp = select[je] || select[je + 1];
 	    } else {
-		ilcomp = SELECT(je);
+		ilcomp = select[je];
 	    }
 	    if (! ilcomp) {
 		goto L220;
 	    }
 
-/*           Decide if (a) singular pencil, (b) real eigenvalue, o
-r   
+/*           Decide if (a) singular pencil, (b) real eigenvalue, or   
              (c) complex eigenvalue. */
 
 	    if (! ilcplx) {
-		if ((r__1 = A(je,je), dabs(r__1)) <= safmin && (
-			r__2 = B(je,je), dabs(r__2)) <= safmin) {
+		if ((r__1 = a_ref(je, je), dabs(r__1)) <= safmin && (r__2 = 
+			b_ref(je, je), dabs(r__2)) <= safmin) {
 
-/*                 Singular matrix pencil -- return unit e
-igenvector */
+/*                 Singular matrix pencil -- return unit eigenvector */
 
 		    ++ieig;
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VL(jr,ieig) = 0.f;
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vl_ref(jr, ieig) = 0.f;
 /* L60: */
 		    }
-		    VL(ieig,ieig) = 1.f;
+		    vl_ref(ieig, ieig) = 1.f;
 		    goto L220;
 		}
 	    }
@@ -533,8 +537,8 @@ igenvector */
 /*           Clear vector */
 
 	    i__2 = nw * *n;
-	    for (jr = 1; jr <= nw**n; ++jr) {
-		WORK((*n << 1) + jr) = 0.f;
+	    for (jr = 1; jr <= i__2; ++jr) {
+		work[(*n << 1) + jr] = 0.f;
 /* L70: */
 	    }
 /*                                                 T   
@@ -547,12 +551,12 @@ igenvector */
 /*              Real eigenvalue   
 
    Computing MAX */
-		r__3 = (r__1 = A(je,je), dabs(r__1)) * ascale, 
-			r__4 = (r__2 = B(je,je), dabs(r__2)) * 
-			bscale, r__3 = max(r__3,r__4);
+		r__3 = (r__1 = a_ref(je, je), dabs(r__1)) * ascale, r__4 = (
+			r__2 = b_ref(je, je), dabs(r__2)) * bscale, r__3 = 
+			max(r__3,r__4);
 		temp = 1.f / dmax(r__3,safmin);
-		salfar = temp * A(je,je) * ascale;
-		sbeta = temp * B(je,je) * bscale;
+		salfar = temp * a_ref(je, je) * ascale;
+		sbeta = temp * b_ref(je, je) * bscale;
 		acoef = sbeta * ascale;
 		bcoefr = salfar * bscale;
 		bcoefi = 0.f;
@@ -594,16 +598,16 @@ igenvector */
 
 /*              First component is 1 */
 
-		WORK((*n << 1) + je) = 1.f;
+		work[(*n << 1) + je] = 1.f;
 		xmax = 1.f;
 	    } else {
 
 /*              Complex eigenvalue */
 
 		r__1 = safmin * 100.f;
-		slag2_(&A(je,je), lda, &B(je,je), ldb, &
-			r__1, &acoef, &temp, &bcoefr, &temp2, &bcoefi);
-		bcoefi = -(doublereal)bcoefi;
+		slag2_(&a_ref(je, je), lda, &b_ref(je, je), ldb, &r__1, &
+			acoef, &temp, &bcoefr, &temp2, &bcoefi);
+		bcoefi = -bcoefi;
 		if (bcoefi == 0.f) {
 		    *info = je;
 		    return 0;
@@ -640,28 +644,27 @@ igenvector */
 
 /*              Compute first two components of eigenvector */
 
-		temp = acoef * A(je+1,je);
-		temp2r = acoef * A(je,je) - bcoefr * B(je,je);
-		temp2i = -(doublereal)bcoefi * B(je,je);
+		temp = acoef * a_ref(je + 1, je);
+		temp2r = acoef * a_ref(je, je) - bcoefr * b_ref(je, je);
+		temp2i = -bcoefi * b_ref(je, je);
 		if (dabs(temp) > dabs(temp2r) + dabs(temp2i)) {
-		    WORK((*n << 1) + je) = 1.f;
-		    WORK(*n * 3 + je) = 0.f;
-		    WORK((*n << 1) + je + 1) = -(doublereal)temp2r / temp;
-		    WORK(*n * 3 + je + 1) = -(doublereal)temp2i / temp;
+		    work[(*n << 1) + je] = 1.f;
+		    work[*n * 3 + je] = 0.f;
+		    work[(*n << 1) + je + 1] = -temp2r / temp;
+		    work[*n * 3 + je + 1] = -temp2i / temp;
 		} else {
-		    WORK((*n << 1) + je + 1) = 1.f;
-		    WORK(*n * 3 + je + 1) = 0.f;
-		    temp = acoef * A(je,je+1);
-		    WORK((*n << 1) + je) = (bcoefr * B(je+1,je+1) - acoef * A(je+1,je+1)) /
-			     temp;
-		    WORK(*n * 3 + je) = bcoefi * B(je+1,je+1)
-			     / temp;
+		    work[(*n << 1) + je + 1] = 1.f;
+		    work[*n * 3 + je + 1] = 0.f;
+		    temp = acoef * a_ref(je, je + 1);
+		    work[(*n << 1) + je] = (bcoefr * b_ref(je + 1, je + 1) - 
+			    acoef * a_ref(je + 1, je + 1)) / temp;
+		    work[*n * 3 + je] = bcoefi * b_ref(je + 1, je + 1) / temp;
 		}
 /* Computing MAX */
-		r__5 = (r__1 = WORK((*n << 1) + je), dabs(r__1)) + (r__2 = 
-			WORK(*n * 3 + je), dabs(r__2)), r__6 = (r__3 = WORK((*
-			n << 1) + je + 1), dabs(r__3)) + (r__4 = WORK(*n * 3 
-			+ je + 1), dabs(r__4));
+		r__5 = (r__1 = work[(*n << 1) + je], dabs(r__1)) + (r__2 = 
+			work[*n * 3 + je], dabs(r__2)), r__6 = (r__3 = work[(*
+			n << 1) + je + 1], dabs(r__3)) + (r__4 = work[*n * 3 
+			+ je + 1], dabs(r__4));
 		xmax = dmax(r__5,r__6);
 	    }
 
@@ -674,51 +677,49 @@ igenvector */
              Triangular solve of  (a A - b B)  y = 0   
 
                                      T   
-             (rowwise in  (a A - b B) , or columnwise in (a A - b 
-B) ) */
+             (rowwise in  (a A - b B) , or columnwise in (a A - b B) ) */
 
 	    il2by2 = FALSE_;
 
 	    i__2 = *n;
-	    for (j = je + nw; j <= *n; ++j) {
+	    for (j = je + nw; j <= i__2; ++j) {
 		if (il2by2) {
 		    il2by2 = FALSE_;
 		    goto L160;
 		}
 
 		na = 1;
-		bdiag[0] = B(j,j);
+		bdiag[0] = b_ref(j, j);
 		if (j < *n) {
-		    if (A(j+1,j) != 0.f) {
+		    if (a_ref(j + 1, j) != 0.f) {
 			il2by2 = TRUE_;
-			bdiag[1] = B(j+1,j+1);
+			bdiag[1] = b_ref(j + 1, j + 1);
 			na = 2;
 		    }
 		}
 
-/*              Check whether scaling is necessary for dot pro
-ducts */
+/*              Check whether scaling is necessary for dot products */
 
 		xscale = 1.f / dmax(1.f,xmax);
 /* Computing MAX */
-		r__1 = WORK(j), r__2 = WORK(*n + j), r__1 = max(r__1,r__2), 
-			r__2 = acoefa * WORK(j) + bcoefa * WORK(*n + j);
+		r__1 = work[j], r__2 = work[*n + j], r__1 = max(r__1,r__2), 
+			r__2 = acoefa * work[j] + bcoefa * work[*n + j];
 		temp = dmax(r__1,r__2);
 		if (il2by2) {
 /* Computing MAX */
-		    r__1 = temp, r__2 = WORK(j + 1), r__1 = max(r__1,r__2), 
-			    r__2 = WORK(*n + j + 1), r__1 = max(r__1,r__2), 
-			    r__2 = acoefa * WORK(j + 1) + bcoefa * WORK(*n + 
-			    j + 1);
+		    r__1 = temp, r__2 = work[j + 1], r__1 = max(r__1,r__2), 
+			    r__2 = work[*n + j + 1], r__1 = max(r__1,r__2), 
+			    r__2 = acoefa * work[j + 1] + bcoefa * work[*n + 
+			    j + 1];
 		    temp = dmax(r__1,r__2);
 		}
 		if (temp > bignum * xscale) {
 		    i__3 = nw - 1;
-		    for (jw = 0; jw <= nw-1; ++jw) {
+		    for (jw = 0; jw <= i__3; ++jw) {
 			i__4 = j - 1;
-			for (jr = je; jr <= j-1; ++jr) {
-			    WORK((jw + 2) * *n + jr) = xscale * WORK((jw + 2) 
-				    * *n + jr);
+			for (jr = je; jr <= i__4; ++jr) {
+			    work[(jw + 2) * *n + jr] = xscale * work[(jw + 2) 
+				    * *n + jr];
 /* L80: */
 			}
 /* L90: */
@@ -729,24 +730,20 @@ ducts */
 /*              Compute dot products   
 
                       j-1   
-                SUM = sum  conjg( a*A(k,j) - b*B(k,j) )*x(k) 
-  
+                SUM = sum  conjg( a*A(k,j) - b*B(k,j) )*x(k)   
                       k=je   
 
                 To reduce the op count, this is done as   
 
                 _        j-1                  _        j-1   
-                a*conjg( sum  A(k,j)*x(k) ) - b*conjg( sum  B(
-k,j)*x(k) )   
+                a*conjg( sum  A(k,j)*x(k) ) - b*conjg( sum  B(k,j)*x(k) )   
                          k=je                          k=je   
 
-                which may cause underflow problems if A or B a
-re close   
+                which may cause underflow problems if A or B are close   
                 to underflow.  (E.g., less than SMALL.)   
 
 
-                A series of compiler directives to defeat vect
-orization   
+                A series of compiler directives to defeat vectorization   
                 for the next loop   
 
    $PL$ CMCHAR=' '   
@@ -762,7 +759,7 @@ orization
    $PL$ CMCHAR='*' */
 
 		i__3 = nw;
-		for (jw = 1; jw <= nw; ++jw) {
+		for (jw = 1; jw <= i__3; ++jw) {
 
 /* $PL$ CMCHAR=' '   
    DIR$             NEXTSCALAR   
@@ -777,14 +774,16 @@ orization
    $PL$ CMCHAR='*' */
 
 		    i__4 = na;
-		    for (ja = 1; ja <= na; ++ja) {
-			suma[ja + (jw << 1) - 3] = 0.f;
-			sumb[ja + (jw << 1) - 3] = 0.f;
+		    for (ja = 1; ja <= i__4; ++ja) {
+			suma_ref(ja, jw) = 0.f;
+			sumb_ref(ja, jw) = 0.f;
 
 			i__5 = j - 1;
-			for (jr = je; jr <= j-1; ++jr) {
-			    suma[ja + (jw << 1) - 3] += A(jr,j+ja-1) * WORK((jw + 1) * *n + jr);
-			    sumb[ja + (jw << 1) - 3] += B(jr,j+ja-1) * WORK((jw + 1) * *n + jr);
+			for (jr = je; jr <= i__5; ++jr) {
+			    suma_ref(ja, jw) = suma_ref(ja, jw) + a_ref(jr, j 
+				    + ja - 1) * work[(jw + 1) * *n + jr];
+			    sumb_ref(ja, jw) = sumb_ref(ja, jw) + b_ref(jr, j 
+				    + ja - 1) * work[(jw + 1) * *n + jr];
 /* L100: */
 			}
 /* L110: */
@@ -805,34 +804,33 @@ orization
    $PL$ CMCHAR='*' */
 
 		i__3 = na;
-		for (ja = 1; ja <= na; ++ja) {
+		for (ja = 1; ja <= i__3; ++ja) {
 		    if (ilcplx) {
-			sum[ja - 1] = -(doublereal)acoef * suma[ja - 1] + 
-				bcoefr * sumb[ja - 1] - bcoefi * sumb[ja + 1];
-			sum[ja + 1] = -(doublereal)acoef * suma[ja + 1] + 
-				bcoefr * sumb[ja + 1] + bcoefi * sumb[ja - 1];
+			sum_ref(ja, 1) = -acoef * suma_ref(ja, 1) + bcoefr * 
+				sumb_ref(ja, 1) - bcoefi * sumb_ref(ja, 2);
+			sum_ref(ja, 2) = -acoef * suma_ref(ja, 2) + bcoefr * 
+				sumb_ref(ja, 2) + bcoefi * sumb_ref(ja, 1);
 		    } else {
-			sum[ja - 1] = -(doublereal)acoef * suma[ja - 1] + 
-				bcoefr * sumb[ja - 1];
+			sum_ref(ja, 1) = -acoef * suma_ref(ja, 1) + bcoefr * 
+				sumb_ref(ja, 1);
 		    }
 /* L130: */
 		}
 
 /*                                  T   
                 Solve  ( a A - b B )  y = SUM(,)   
-                with scaling and perturbation of the denominat
-or */
+                with scaling and perturbation of the denominator */
 
-		slaln2_(&c_true, &na, &nw, &dmin__, &acoef, &A(j,j)
-			, lda, bdiag, &bdiag[1], sum, &c__2, &bcoefr, &bcoefi,
-			 &WORK((*n << 1) + j), n, &scale, &temp, &iinfo);
+		slaln2_(&c_true, &na, &nw, &dmin__, &acoef, &a_ref(j, j), lda,
+			 bdiag, &bdiag[1], sum, &c__2, &bcoefr, &bcoefi, &
+			work[(*n << 1) + j], n, &scale, &temp, &iinfo);
 		if (scale < 1.f) {
 		    i__3 = nw - 1;
-		    for (jw = 0; jw <= nw-1; ++jw) {
+		    for (jw = 0; jw <= i__3; ++jw) {
 			i__4 = j - 1;
-			for (jr = je; jr <= j-1; ++jr) {
-			    WORK((jw + 2) * *n + jr) = scale * WORK((jw + 2) *
-				     *n + jr);
+			for (jr = je; jr <= i__4; ++jr) {
+			    work[(jw + 2) * *n + jr] = scale * work[(jw + 2) *
+				     *n + jr];
 /* L140: */
 			}
 /* L150: */
@@ -850,17 +848,19 @@ L160:
 	    ++ieig;
 	    if (ilback) {
 		i__2 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__2; ++jw) {
 		    i__3 = *n + 1 - je;
-		    sgemv_("N", n, &i__3, &c_b34, &VL(1,je), ldvl,
-			     &WORK((jw + 2) * *n + je), &c__1, &c_b36, &WORK((
-			    jw + 4) * *n + 1), &c__1);
+		    sgemv_("N", n, &i__3, &c_b35, &vl_ref(1, je), ldvl, &work[
+			    (jw + 2) * *n + je], &c__1, &c_b37, &work[(jw + 4)
+			     * *n + 1], &c__1);
 /* L170: */
 		}
-		slacpy_(" ", n, &nw, &WORK((*n << 2) + 1), n, &VL(1,je), ldvl);
+		slacpy_(" ", n, &nw, &work[(*n << 2) + 1], n, &vl_ref(1, je), 
+			ldvl);
 		ibeg = 1;
 	    } else {
-		slacpy_(" ", n, &nw, &WORK((*n << 1) + 1), n, &VL(1,ieig), ldvl);
+		slacpy_(" ", n, &nw, &work[(*n << 1) + 1], n, &vl_ref(1, ieig)
+			, ldvl);
 		ibeg = je;
 	    }
 
@@ -869,20 +869,18 @@ L160:
 	    xmax = 0.f;
 	    if (ilcplx) {
 		i__2 = *n;
-		for (j = ibeg; j <= *n; ++j) {
+		for (j = ibeg; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__3 = xmax, r__4 = (r__1 = VL(j,ieig), dabs(
-			    r__1)) + (r__2 = VL(j,ieig+1), 
-			    dabs(r__2));
+		    r__3 = xmax, r__4 = (r__1 = vl_ref(j, ieig), dabs(r__1)) 
+			    + (r__2 = vl_ref(j, ieig + 1), dabs(r__2));
 		    xmax = dmax(r__3,r__4);
 /* L180: */
 		}
 	    } else {
 		i__2 = *n;
-		for (j = ibeg; j <= *n; ++j) {
+		for (j = ibeg; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__2 = xmax, r__3 = (r__1 = VL(j,ieig), dabs(
-			    r__1));
+		    r__2 = xmax, r__3 = (r__1 = vl_ref(j, ieig), dabs(r__1));
 		    xmax = dmax(r__2,r__3);
 /* L190: */
 		}
@@ -892,10 +890,11 @@ L160:
 		xscale = 1.f / xmax;
 
 		i__2 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__2; ++jw) {
 		    i__3 = *n;
-		    for (jr = ibeg; jr <= *n; ++jr) {
-			VL(jr,ieig+jw) = xscale * VL(jr,ieig+jw);
+		    for (jr = ibeg; jr <= i__3; ++jr) {
+			vl_ref(jr, ieig + jw) = xscale * vl_ref(jr, ieig + jw)
+				;
 /* L200: */
 		    }
 /* L210: */
@@ -918,18 +917,13 @@ L220:
 	ilcplx = FALSE_;
 	for (je = *n; je >= 1; --je) {
 
-/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FAL
-SE., or   
+/*           Skip this iteration if (a) HOWMNY='S' and SELECT=.FALSE., or   
              (b) this would be the second of a complex pair.   
-             Check for complex eigenvalue, so as to be sure of whi
-ch   
-             entry(-ies) of SELECT to look at -- if complex, SELEC
-T(JE)   
+             Check for complex eigenvalue, so as to be sure of which   
+             entry(-ies) of SELECT to look at -- if complex, SELECT(JE)   
              or SELECT(JE-1).   
-             If this is a complex pair, the 2-by-2 diagonal block 
-  
-             corresponding to the eigenvalue is in rows/columns JE
--1:JE */
+             If this is a complex pair, the 2-by-2 diagonal block   
+             corresponding to the eigenvalue is in rows/columns JE-1:JE */
 
 	    if (ilcplx) {
 		ilcplx = FALSE_;
@@ -937,7 +931,7 @@ T(JE)
 	    }
 	    nw = 1;
 	    if (je > 1) {
-		if (A(je,je-1) != 0.f) {
+		if (a_ref(je, je - 1) != 0.f) {
 		    ilcplx = TRUE_;
 		    nw = 2;
 		}
@@ -945,32 +939,30 @@ T(JE)
 	    if (ilall) {
 		ilcomp = TRUE_;
 	    } else if (ilcplx) {
-		ilcomp = SELECT(je) || SELECT(je - 1);
+		ilcomp = select[je] || select[je - 1];
 	    } else {
-		ilcomp = SELECT(je);
+		ilcomp = select[je];
 	    }
 	    if (! ilcomp) {
 		goto L500;
 	    }
 
-/*           Decide if (a) singular pencil, (b) real eigenvalue, o
-r   
+/*           Decide if (a) singular pencil, (b) real eigenvalue, or   
              (c) complex eigenvalue. */
 
 	    if (! ilcplx) {
-		if ((r__1 = A(je,je), dabs(r__1)) <= safmin && (
-			r__2 = B(je,je), dabs(r__2)) <= safmin) {
+		if ((r__1 = a_ref(je, je), dabs(r__1)) <= safmin && (r__2 = 
+			b_ref(je, je), dabs(r__2)) <= safmin) {
 
-/*                 Singular matrix pencil -- unit eigenvec
-tor */
+/*                 Singular matrix pencil -- unit eigenvector */
 
 		    --ieig;
 		    i__1 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VR(jr,ieig) = 0.f;
+		    for (jr = 1; jr <= i__1; ++jr) {
+			vr_ref(jr, ieig) = 0.f;
 /* L230: */
 		    }
-		    VR(ieig,ieig) = 1.f;
+		    vr_ref(ieig, ieig) = 1.f;
 		    goto L500;
 		}
 	    }
@@ -978,10 +970,10 @@ tor */
 /*           Clear vector */
 
 	    i__1 = nw - 1;
-	    for (jw = 0; jw <= nw-1; ++jw) {
+	    for (jw = 0; jw <= i__1; ++jw) {
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    WORK((jw + 2) * *n + jr) = 0.f;
+		for (jr = 1; jr <= i__2; ++jr) {
+		    work[(jw + 2) * *n + jr] = 0.f;
 /* L240: */
 		}
 /* L250: */
@@ -996,12 +988,12 @@ tor */
 /*              Real eigenvalue   
 
    Computing MAX */
-		r__3 = (r__1 = A(je,je), dabs(r__1)) * ascale, 
-			r__4 = (r__2 = B(je,je), dabs(r__2)) * 
-			bscale, r__3 = max(r__3,r__4);
+		r__3 = (r__1 = a_ref(je, je), dabs(r__1)) * ascale, r__4 = (
+			r__2 = b_ref(je, je), dabs(r__2)) * bscale, r__3 = 
+			max(r__3,r__4);
 		temp = 1.f / dmax(r__3,safmin);
-		salfar = temp * A(je,je) * ascale;
-		sbeta = temp * B(je,je) * bscale;
+		salfar = temp * a_ref(je, je) * ascale;
+		sbeta = temp * b_ref(je, je) * bscale;
 		acoef = sbeta * ascale;
 		bcoefr = salfar * bscale;
 		bcoefi = 0.f;
@@ -1043,17 +1035,16 @@ tor */
 
 /*              First component is 1 */
 
-		WORK((*n << 1) + je) = 1.f;
+		work[(*n << 1) + je] = 1.f;
 		xmax = 1.f;
 
-/*              Compute contribution from column JE of A and B
- to sum   
+/*              Compute contribution from column JE of A and B to sum   
                 (See "Further Details", above.) */
 
 		i__1 = je - 1;
-		for (jr = 1; jr <= je-1; ++jr) {
-		    WORK((*n << 1) + jr) = bcoefr * B(jr,je) - 
-			    acoef * A(jr,je);
+		for (jr = 1; jr <= i__1; ++jr) {
+		    work[(*n << 1) + jr] = bcoefr * b_ref(jr, je) - acoef * 
+			    a_ref(jr, je);
 /* L260: */
 		}
 	    } else {
@@ -1061,8 +1052,8 @@ tor */
 /*              Complex eigenvalue */
 
 		r__1 = safmin * 100.f;
-		slag2_(&A(je-1,je-1), lda, &B(je-1,je-1), ldb, &r__1, &acoef, &temp, &bcoefr, &
-			temp2, &bcoefi);
+		slag2_(&a_ref(je - 1, je - 1), lda, &b_ref(je - 1, je - 1), 
+			ldb, &r__1, &acoef, &temp, &bcoefr, &temp2, &bcoefi);
 		if (bcoefi == 0.f) {
 		    *info = je - 1;
 		    return 0;
@@ -1100,53 +1091,53 @@ tor */
 /*              Compute first two components of eigenvector   
                 and contribution to sums */
 
-		temp = acoef * A(je,je-1);
-		temp2r = acoef * A(je,je) - bcoefr * B(je,je);
-		temp2i = -(doublereal)bcoefi * B(je,je);
+		temp = acoef * a_ref(je, je - 1);
+		temp2r = acoef * a_ref(je, je) - bcoefr * b_ref(je, je);
+		temp2i = -bcoefi * b_ref(je, je);
 		if (dabs(temp) >= dabs(temp2r) + dabs(temp2i)) {
-		    WORK((*n << 1) + je) = 1.f;
-		    WORK(*n * 3 + je) = 0.f;
-		    WORK((*n << 1) + je - 1) = -(doublereal)temp2r / temp;
-		    WORK(*n * 3 + je - 1) = -(doublereal)temp2i / temp;
+		    work[(*n << 1) + je] = 1.f;
+		    work[*n * 3 + je] = 0.f;
+		    work[(*n << 1) + je - 1] = -temp2r / temp;
+		    work[*n * 3 + je - 1] = -temp2i / temp;
 		} else {
-		    WORK((*n << 1) + je - 1) = 1.f;
-		    WORK(*n * 3 + je - 1) = 0.f;
-		    temp = acoef * A(je-1,je);
-		    WORK((*n << 1) + je) = (bcoefr * B(je-1,je-1) - acoef * A(je-1,je-1)) /
-			     temp;
-		    WORK(*n * 3 + je) = bcoefi * B(je-1,je-1)
-			     / temp;
+		    work[(*n << 1) + je - 1] = 1.f;
+		    work[*n * 3 + je - 1] = 0.f;
+		    temp = acoef * a_ref(je - 1, je);
+		    work[(*n << 1) + je] = (bcoefr * b_ref(je - 1, je - 1) - 
+			    acoef * a_ref(je - 1, je - 1)) / temp;
+		    work[*n * 3 + je] = bcoefi * b_ref(je - 1, je - 1) / temp;
 		}
 
 /* Computing MAX */
-		r__5 = (r__1 = WORK((*n << 1) + je), dabs(r__1)) + (r__2 = 
-			WORK(*n * 3 + je), dabs(r__2)), r__6 = (r__3 = WORK((*
-			n << 1) + je - 1), dabs(r__3)) + (r__4 = WORK(*n * 3 
-			+ je - 1), dabs(r__4));
+		r__5 = (r__1 = work[(*n << 1) + je], dabs(r__1)) + (r__2 = 
+			work[*n * 3 + je], dabs(r__2)), r__6 = (r__3 = work[(*
+			n << 1) + je - 1], dabs(r__3)) + (r__4 = work[*n * 3 
+			+ je - 1], dabs(r__4));
 		xmax = dmax(r__5,r__6);
 
-/*              Compute contribution from columns JE and JE-1 
-  
+/*              Compute contribution from columns JE and JE-1   
                 of A and B to the sums. */
 
-		creala = acoef * WORK((*n << 1) + je - 1);
-		cimaga = acoef * WORK(*n * 3 + je - 1);
-		crealb = bcoefr * WORK((*n << 1) + je - 1) - bcoefi * WORK(*n 
-			* 3 + je - 1);
-		cimagb = bcoefi * WORK((*n << 1) + je - 1) + bcoefr * WORK(*n 
-			* 3 + je - 1);
-		cre2a = acoef * WORK((*n << 1) + je);
-		cim2a = acoef * WORK(*n * 3 + je);
-		cre2b = bcoefr * WORK((*n << 1) + je) - bcoefi * WORK(*n * 3 
-			+ je);
-		cim2b = bcoefi * WORK((*n << 1) + je) + bcoefr * WORK(*n * 3 
-			+ je);
+		creala = acoef * work[(*n << 1) + je - 1];
+		cimaga = acoef * work[*n * 3 + je - 1];
+		crealb = bcoefr * work[(*n << 1) + je - 1] - bcoefi * work[*n 
+			* 3 + je - 1];
+		cimagb = bcoefi * work[(*n << 1) + je - 1] + bcoefr * work[*n 
+			* 3 + je - 1];
+		cre2a = acoef * work[(*n << 1) + je];
+		cim2a = acoef * work[*n * 3 + je];
+		cre2b = bcoefr * work[(*n << 1) + je] - bcoefi * work[*n * 3 
+			+ je];
+		cim2b = bcoefi * work[(*n << 1) + je] + bcoefr * work[*n * 3 
+			+ je];
 		i__1 = je - 2;
-		for (jr = 1; jr <= je-2; ++jr) {
-		    WORK((*n << 1) + jr) = -(doublereal)creala * A(jr,je-1) + crealb * B(jr,je-1) 
-			    - cre2a * A(jr,je) + cre2b * B(jr,je);
-		    WORK(*n * 3 + jr) = -(doublereal)cimaga * A(jr,je-1) + cimagb * B(jr,je-1) - 
-			    cim2a * A(jr,je) + cim2b * B(jr,je);
+		for (jr = 1; jr <= i__1; ++jr) {
+		    work[(*n << 1) + jr] = -creala * a_ref(jr, je - 1) + 
+			    crealb * b_ref(jr, je - 1) - cre2a * a_ref(jr, je)
+			     + cre2b * b_ref(jr, je);
+		    work[*n * 3 + jr] = -cimaga * a_ref(jr, je - 1) + cimagb *
+			     b_ref(jr, je - 1) - cim2a * a_ref(jr, je) + 
+			    cim2b * b_ref(jr, je);
 /* L270: */
 		}
 	    }
@@ -1161,38 +1152,36 @@ tor */
 	    il2by2 = FALSE_;
 	    for (j = je - nw; j >= 1; --j) {
 
-/*              If a 2-by-2 block, is in position j-1:j, wait 
-until   
-                next iteration to process it (when it will be 
-j:j+1) */
+/*              If a 2-by-2 block, is in position j-1:j, wait until   
+                next iteration to process it (when it will be j:j+1) */
 
 		if (! il2by2 && j > 1) {
-		    if (A(j,j-1) != 0.f) {
+		    if (a_ref(j, j - 1) != 0.f) {
 			il2by2 = TRUE_;
 			goto L370;
 		    }
 		}
-		bdiag[0] = B(j,j);
+		bdiag[0] = b_ref(j, j);
 		if (il2by2) {
 		    na = 2;
-		    bdiag[1] = B(j+1,j+1);
+		    bdiag[1] = b_ref(j + 1, j + 1);
 		} else {
 		    na = 1;
 		}
 
 /*              Compute x(j) (and x(j+1), if 2-by-2 block) */
 
-		slaln2_(&c_false, &na, &nw, &dmin__, &acoef, &A(j,j), lda, bdiag, &bdiag[1], &WORK((*n << 1) + j), 
-			n, &bcoefr, &bcoefi, sum, &c__2, &scale, &temp, &
-			iinfo);
+		slaln2_(&c_false, &na, &nw, &dmin__, &acoef, &a_ref(j, j), 
+			lda, bdiag, &bdiag[1], &work[(*n << 1) + j], n, &
+			bcoefr, &bcoefi, sum, &c__2, &scale, &temp, &iinfo);
 		if (scale < 1.f) {
 
 		    i__1 = nw - 1;
-		    for (jw = 0; jw <= nw-1; ++jw) {
+		    for (jw = 0; jw <= i__1; ++jw) {
 			i__2 = je;
-			for (jr = 1; jr <= je; ++jr) {
-			    WORK((jw + 2) * *n + jr) = scale * WORK((jw + 2) *
-				     *n + jr);
+			for (jr = 1; jr <= i__2; ++jr) {
+			    work[(jw + 2) * *n + jr] = scale * work[(jw + 2) *
+				     *n + jr];
 /* L280: */
 			}
 /* L290: */
@@ -1203,30 +1192,27 @@ j:j+1) */
 		xmax = dmax(r__1,temp);
 
 		i__1 = nw;
-		for (jw = 1; jw <= nw; ++jw) {
+		for (jw = 1; jw <= i__1; ++jw) {
 		    i__2 = na;
-		    for (ja = 1; ja <= na; ++ja) {
-			WORK((jw + 1) * *n + j + ja - 1) = sum[ja + (jw << 1) 
-				- 3];
+		    for (ja = 1; ja <= i__2; ++ja) {
+			work[(jw + 1) * *n + j + ja - 1] = sum_ref(ja, jw);
 /* L300: */
 		    }
 /* L310: */
 		}
 
-/*              w = w + x(j)*(a A(*,j) - b B(*,j) ) with scali
-ng */
+/*              w = w + x(j)*(a A(*,j) - b B(*,j) ) with scaling */
 
 		if (j > 1) {
 
-/*                 Check whether scaling is necessary for 
-sum. */
+/*                 Check whether scaling is necessary for sum. */
 
 		    xscale = 1.f / dmax(1.f,xmax);
-		    temp = acoefa * WORK(j) + bcoefa * WORK(*n + j);
+		    temp = acoefa * work[j] + bcoefa * work[*n + j];
 		    if (il2by2) {
 /* Computing MAX */
-			r__1 = temp, r__2 = acoefa * WORK(j + 1) + bcoefa * 
-				WORK(*n + j + 1);
+			r__1 = temp, r__2 = acoefa * work[j + 1] + bcoefa * 
+				work[*n + j + 1];
 			temp = dmax(r__1,r__2);
 		    }
 /* Computing MAX */
@@ -1235,11 +1221,11 @@ sum. */
 		    if (temp > bignum * xscale) {
 
 			i__1 = nw - 1;
-			for (jw = 0; jw <= nw-1; ++jw) {
+			for (jw = 0; jw <= i__1; ++jw) {
 			    i__2 = je;
-			    for (jr = 1; jr <= je; ++jr) {
-				WORK((jw + 2) * *n + jr) = xscale * WORK((jw 
-					+ 2) * *n + jr);
+			    for (jr = 1; jr <= i__2; ++jr) {
+				work[(jw + 2) * *n + jr] = xscale * work[(jw 
+					+ 2) * *n + jr];
 /* L320: */
 			    }
 /* L330: */
@@ -1247,40 +1233,38 @@ sum. */
 			xmax *= xscale;
 		    }
 
-/*                 Compute the contributions of the off-di
-agonals of   
-                   column j (and j+1, if 2-by-2 block) of 
-A and B to the   
+/*                 Compute the contributions of the off-diagonals of   
+                   column j (and j+1, if 2-by-2 block) of A and B to the   
                    sums. */
 
 
 		    i__1 = na;
-		    for (ja = 1; ja <= na; ++ja) {
+		    for (ja = 1; ja <= i__1; ++ja) {
 			if (ilcplx) {
-			    creala = acoef * WORK((*n << 1) + j + ja - 1);
-			    cimaga = acoef * WORK(*n * 3 + j + ja - 1);
-			    crealb = bcoefr * WORK((*n << 1) + j + ja - 1) - 
-				    bcoefi * WORK(*n * 3 + j + ja - 1);
-			    cimagb = bcoefi * WORK((*n << 1) + j + ja - 1) + 
-				    bcoefr * WORK(*n * 3 + j + ja - 1);
+			    creala = acoef * work[(*n << 1) + j + ja - 1];
+			    cimaga = acoef * work[*n * 3 + j + ja - 1];
+			    crealb = bcoefr * work[(*n << 1) + j + ja - 1] - 
+				    bcoefi * work[*n * 3 + j + ja - 1];
+			    cimagb = bcoefi * work[(*n << 1) + j + ja - 1] + 
+				    bcoefr * work[*n * 3 + j + ja - 1];
 			    i__2 = j - 1;
-			    for (jr = 1; jr <= j-1; ++jr) {
-				WORK((*n << 1) + jr) = WORK((*n << 1) + jr) - 
-					creala * A(jr,j+ja-1)
-					 + crealb * B(jr,j+ja-1);
-				WORK(*n * 3 + jr) = WORK(*n * 3 + jr) - 
-					cimaga * A(jr,j+ja-1)
-					 + cimagb * B(jr,j+ja-1);
+			    for (jr = 1; jr <= i__2; ++jr) {
+				work[(*n << 1) + jr] = work[(*n << 1) + jr] - 
+					creala * a_ref(jr, j + ja - 1) + 
+					crealb * b_ref(jr, j + ja - 1);
+				work[*n * 3 + jr] = work[*n * 3 + jr] - 
+					cimaga * a_ref(jr, j + ja - 1) + 
+					cimagb * b_ref(jr, j + ja - 1);
 /* L340: */
 			    }
 			} else {
-			    creala = acoef * WORK((*n << 1) + j + ja - 1);
-			    crealb = bcoefr * WORK((*n << 1) + j + ja - 1);
+			    creala = acoef * work[(*n << 1) + j + ja - 1];
+			    crealb = bcoefr * work[(*n << 1) + j + ja - 1];
 			    i__2 = j - 1;
-			    for (jr = 1; jr <= j-1; ++jr) {
-				WORK((*n << 1) + jr) = WORK((*n << 1) + jr) - 
-					creala * A(jr,j+ja-1)
-					 + crealb * B(jr,j+ja-1);
+			    for (jr = 1; jr <= i__2; ++jr) {
+				work[(*n << 1) + jr] = work[(*n << 1) + jr] - 
+					creala * a_ref(jr, j + ja - 1) + 
+					crealb * b_ref(jr, j + ja - 1);
 /* L350: */
 			    }
 			}
@@ -1300,25 +1284,24 @@ L370:
 	    if (ilback) {
 
 		i__1 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			WORK((jw + 4) * *n + jr) = WORK((jw + 2) * *n + 1) * 
-				VR(jr,1);
+		    for (jr = 1; jr <= i__2; ++jr) {
+			work[(jw + 4) * *n + jr] = work[(jw + 2) * *n + 1] * 
+				vr_ref(jr, 1);
 /* L380: */
 		    }
 
-/*                 A series of compiler directives to defe
-at   
+/*                 A series of compiler directives to defeat   
                    vectorization for the next loop */
 
 
 		    i__2 = je;
-		    for (jc = 2; jc <= je; ++jc) {
+		    for (jc = 2; jc <= i__2; ++jc) {
 			i__3 = *n;
-			for (jr = 1; jr <= *n; ++jr) {
-			    WORK((jw + 4) * *n + jr) += WORK((jw + 2) * *n + 
-				    jc) * VR(jr,jc);
+			for (jr = 1; jr <= i__3; ++jr) {
+			    work[(jw + 4) * *n + jr] += work[(jw + 2) * *n + 
+				    jc] * vr_ref(jr, jc);
 /* L390: */
 			}
 /* L400: */
@@ -1327,11 +1310,10 @@ at
 		}
 
 		i__1 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VR(jr,ieig+jw) = WORK((jw + 4) * *n + 
-				jr);
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vr_ref(jr, ieig + jw) = work[(jw + 4) * *n + jr];
 /* L420: */
 		    }
 /* L430: */
@@ -1340,11 +1322,10 @@ at
 		iend = *n;
 	    } else {
 		i__1 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = *n;
-		    for (jr = 1; jr <= *n; ++jr) {
-			VR(jr,ieig+jw) = WORK((jw + 2) * *n + 
-				jr);
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vr_ref(jr, ieig + jw) = work[(jw + 2) * *n + jr];
 /* L440: */
 		    }
 /* L450: */
@@ -1358,20 +1339,18 @@ at
 	    xmax = 0.f;
 	    if (ilcplx) {
 		i__1 = iend;
-		for (j = 1; j <= iend; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		    r__3 = xmax, r__4 = (r__1 = VR(j,ieig), dabs(
-			    r__1)) + (r__2 = VR(j,ieig+1), 
-			    dabs(r__2));
+		    r__3 = xmax, r__4 = (r__1 = vr_ref(j, ieig), dabs(r__1)) 
+			    + (r__2 = vr_ref(j, ieig + 1), dabs(r__2));
 		    xmax = dmax(r__3,r__4);
 /* L460: */
 		}
 	    } else {
 		i__1 = iend;
-		for (j = 1; j <= iend; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-		    r__2 = xmax, r__3 = (r__1 = VR(j,ieig), dabs(
-			    r__1));
+		    r__2 = xmax, r__3 = (r__1 = vr_ref(j, ieig), dabs(r__1));
 		    xmax = dmax(r__2,r__3);
 /* L470: */
 		}
@@ -1380,10 +1359,11 @@ at
 	    if (xmax > safmin) {
 		xscale = 1.f / xmax;
 		i__1 = nw - 1;
-		for (jw = 0; jw <= nw-1; ++jw) {
+		for (jw = 0; jw <= i__1; ++jw) {
 		    i__2 = iend;
-		    for (jr = 1; jr <= iend; ++jr) {
-			VR(jr,ieig+jw) = xscale * VR(jr,ieig+jw);
+		    for (jr = 1; jr <= i__2; ++jr) {
+			vr_ref(jr, ieig + jw) = xscale * vr_ref(jr, ieig + jw)
+				;
 /* L480: */
 		    }
 /* L490: */
@@ -1399,4 +1379,13 @@ L500:
 /*     End of STGEVC */
 
 } /* stgevc_ */
+
+#undef sum_ref
+#undef vr_ref
+#undef vl_ref
+#undef b_ref
+#undef a_ref
+#undef sumb_ref
+#undef suma_ref
+
 

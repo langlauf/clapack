@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,6 +30,9 @@ static integer c_n1 = -1;
 
 /* Subroutine */ int zerrtr_(char *path, integer *nunit)
 {
+    /* System generated locals */
+    integer i__1;
+
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
@@ -85,7 +89,11 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -94,8 +102,7 @@ static integer c_n1 = -1;
     Purpose   
     =======   
 
-    ZERRTR tests the error exits for the COMPLEX*16 triangular routines. 
-  
+    ZERRTR tests the error exits for the COMPLEX*16 triangular routines.   
 
     Arguments   
     =========   
@@ -106,19 +113,22 @@ static integer c_n1 = -1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
-    a[0].r = 1., a[0].i = 0.;
-    a[2].r = 2., a[2].i = 0.;
-    a[3].r = 3., a[3].i = 0.;
-    a[1].r = 4., a[1].i = 0.;
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
+    i__1 = a_subscr(1, 1);
+    a[i__1].r = 1., a[i__1].i = 0.;
+    i__1 = a_subscr(1, 2);
+    a[i__1].r = 2., a[i__1].i = 0.;
+    i__1 = a_subscr(2, 2);
+    a[i__1].r = 3., a[i__1].i = 0.;
+    i__1 = a_subscr(2, 1);
+    a[i__1].r = 4., a[i__1].i = 0.;
     infoc_1.ok = TRUE_;
 
 /*     Test error exits for the general triangular routines. */
@@ -127,7 +137,7 @@ static integer c_n1 = -1;
 
 /*        ZTRTRI */
 
-	s_copy(srnamc_1.srnamt, "ZTRTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTRTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrtri_("/", "N", &c__0, a, &c__1, &info);
 	chkxer_("ZTRTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -147,7 +157,7 @@ static integer c_n1 = -1;
 
 /*        ZTRTI2 */
 
-	s_copy(srnamc_1.srnamt, "ZTRTI2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTRTI2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrti2_("/", "N", &c__0, a, &c__1, &info);
 	chkxer_("ZTRTI2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -168,7 +178,7 @@ static integer c_n1 = -1;
 
 /*        ZTRTRS */
 
-	s_copy(srnamc_1.srnamt, "ZTRTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTRTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrtrs_("/", "N", "N", &c__0, &c__0, a, &c__1, x, &c__1, &info);
 	chkxer_("ZTRTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -193,7 +203,7 @@ static integer c_n1 = -1;
 
 /*        ZTRRFS */
 
-	s_copy(srnamc_1.srnamt, "ZTRRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTRRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
 		 r2, w, rw, &info);
@@ -237,7 +247,7 @@ static integer c_n1 = -1;
 
 /*        ZTRCON */
 
-	s_copy(srnamc_1.srnamt, "ZTRCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTRCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztrcon_("/", "U", "N", &c__0, a, &c__1, &rcond, w, rw, &info);
 	chkxer_("ZTRCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -261,7 +271,7 @@ static integer c_n1 = -1;
 
 /*        ZLATRS */
 
-	s_copy(srnamc_1.srnamt, "ZLATRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZLATRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zlatrs_("/", "N", "N", "N", &c__0, a, &c__1, x, &scale, rw, &info);
 	chkxer_("ZLATRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -293,7 +303,7 @@ static integer c_n1 = -1;
 
 /*        ZTPTRI */
 
-	s_copy(srnamc_1.srnamt, "ZTPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztptri_("/", "N", &c__0, a, &info);
 	chkxer_("ZTPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -309,7 +319,7 @@ static integer c_n1 = -1;
 
 /*        ZTPTRS */
 
-	s_copy(srnamc_1.srnamt, "ZTPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztptrs_("/", "N", "N", &c__0, &c__0, a, x, &c__1, &info);
 	chkxer_("ZTPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -337,7 +347,7 @@ static integer c_n1 = -1;
 
 /*        ZTPRFS */
 
-	s_copy(srnamc_1.srnamt, "ZTPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
 		 rw, &info);
@@ -376,7 +386,7 @@ static integer c_n1 = -1;
 
 /*        ZTPCON */
 
-	s_copy(srnamc_1.srnamt, "ZTPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztpcon_("/", "U", "N", &c__0, a, &rcond, w, rw, &info);
 	chkxer_("ZTPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -396,7 +406,7 @@ static integer c_n1 = -1;
 
 /*        ZLATPS */
 
-	s_copy(srnamc_1.srnamt, "ZLATPS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZLATPS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zlatps_("/", "N", "N", "N", &c__0, a, x, &scale, rw, &info);
 	chkxer_("ZLATPS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -424,7 +434,7 @@ static integer c_n1 = -1;
 
 /*        ZTBTRS */
 
-	s_copy(srnamc_1.srnamt, "ZTBTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztbtrs_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, x, &c__1, &info);
 	chkxer_("ZTBTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -460,7 +470,7 @@ static integer c_n1 = -1;
 
 /*        ZTBRFS */
 
-	s_copy(srnamc_1.srnamt, "ZTBRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTBRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztbrfs_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, x, &
 		c__1, r1, r2, w, rw, &info);
@@ -509,7 +519,7 @@ static integer c_n1 = -1;
 
 /*        ZTBCON */
 
-	s_copy(srnamc_1.srnamt, "ZTBCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZTBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ztbcon_("/", "U", "N", &c__0, &c__0, a, &c__1, &rcond, w, rw, &info);
 	chkxer_("ZTBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -537,7 +547,7 @@ static integer c_n1 = -1;
 
 /*        ZLATBS */
 
-	s_copy(srnamc_1.srnamt, "ZLATBS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZLATBS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zlatbs_("/", "N", "N", "N", &c__0, &c__0, a, &c__1, x, &scale, rw, &
 		info);
@@ -584,4 +594,8 @@ static integer c_n1 = -1;
 /*     End of ZERRTR */
 
 } /* zerrtr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

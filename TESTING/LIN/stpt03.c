@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -37,7 +38,11 @@ static integer c__1 = 1;
     static real smlnum, eps, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -46,13 +51,10 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    STPT03 computes the residual for the solution to a scaled triangular 
-  
+    STPT03 computes the residual for the solution to a scaled triangular   
     system of equations A*x = s*b  or  A'*x = s*b  when the triangular   
-    matrix A is stored in packed format.  Here A' is the transpose of A, 
-  
-    s is a scalar, and x and b are N by NRHS matrices.  The test ratio is 
-  
+    matrix A is stored in packed format.  Here A' is the transpose of A,   
+    s is a scalar, and x and b are N by NRHS matrices.  The test ratio is   
     the maximum over the number of right hand sides of   
        norm(s*b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
     where op(A) denotes A or A' and EPS is the machine epsilon.   
@@ -61,8 +63,7 @@ static integer c__1 = 1;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -85,10 +86,8 @@ static integer c__1 = 1;
             of the matrices X and B.  NRHS >= 0.   
 
     AP      (input) REAL array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -124,8 +123,7 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - s*b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -134,10 +132,10 @@ static integer c__1 = 1;
     --ap;
     --cnorm;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -195,20 +193,20 @@ static integer c__1 = 1;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	scopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ix = isamax_(n, &work[1], &c__1);
 /* Computing MAX */
-	r__2 = 1.f, r__3 = (r__1 = x[ix + j * x_dim1], dabs(r__1));
+	r__2 = 1.f, r__3 = (r__1 = x_ref(ix, j), dabs(r__1));
 	xnorm = dmax(r__2,r__3);
 	xscal = 1.f / xnorm / (real) (*n);
 	sscal_(n, &xscal, &work[1], &c__1);
 	stpmv_(uplo, trans, diag, n, &ap[1], &work[1], &c__1);
-	r__1 = -(doublereal)(*scale) * xscal;
-	saxpy_(n, &r__1, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	r__1 = -(*scale) * xscal;
+	saxpy_(n, &r__1, &b_ref(1, j), &c__1, &work[1], &c__1);
 	ix = isamax_(n, &work[1], &c__1);
 	err = *tscal * (r__1 = work[ix], dabs(r__1));
-	ix = isamax_(n, &x[j * x_dim1 + 1], &c__1);
-	xnorm = (r__1 = x[ix + j * x_dim1], dabs(r__1));
+	ix = isamax_(n, &x_ref(1, j), &c__1);
+	xnorm = (r__1 = x_ref(ix, j), dabs(r__1));
 	if (err * smlnum <= xnorm) {
 	    if (xnorm > 0.f) {
 		err /= xnorm;
@@ -236,4 +234,8 @@ static integer c__1 = 1;
 /*     End of STPT03 */
 
 } /* stpt03_ */
+
+#undef x_ref
+#undef b_ref
+
 

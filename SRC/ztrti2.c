@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrti2_(char *uplo, char *diag, integer *n, 
 	doublecomplex *a, integer *lda, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -21,8 +22,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -36,19 +36,16 @@
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the triangular matrix A.  If UPLO = 'U', the   
-            leading n by n upper triangular part of the array A contains 
-  
+            leading n by n upper triangular part of the array A contains   
             the upper triangular matrix, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of the array A contains 
-  
+            leading n by n lower triangular part of the array A contains   
             the lower triangular matrix, and the strictly upper   
             triangular part of A is not referenced.  If DIAG = 'U', the   
             diagonal elements of A are also not referenced and are   
             assumed to be 1.   
 
-            On exit, the (triangular) inverse of the original matrix, in 
-  
+            On exit, the (triangular) inverse of the original matrix, in   
             the same storage format.   
 
     LDA     (input) INTEGER   
@@ -58,15 +55,12 @@
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -86,12 +80,15 @@
 	    doublecomplex *, integer *, doublecomplex *, integer *), xerbla_(char *, integer *);
     static logical nounit;
     static doublecomplex ajj;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     nounit = lsame_(diag, "N");
@@ -115,13 +112,13 @@
 /*        Compute inverse of upper triangular matrix. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    if (nounit) {
-		i__2 = j + j * a_dim1;
-		z_div(&z__1, &c_b1, &A(j,j));
-		A(j,j).r = z__1.r, A(j,j).i = z__1.i;
-		i__2 = j + j * a_dim1;
-		z__1.r = -A(j,j).r, z__1.i = -A(j,j).i;
+		i__2 = a_subscr(j, j);
+		z_div(&z__1, &c_b1, &a_ref(j, j));
+		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
+		i__2 = a_subscr(j, j);
+		z__1.r = -a[i__2].r, z__1.i = -a[i__2].i;
 		ajj.r = z__1.r, ajj.i = z__1.i;
 	    } else {
 		z__1.r = -1., z__1.i = 0.;
@@ -131,10 +128,10 @@
 /*           Compute elements 1:j-1 of j-th column. */
 
 	    i__2 = j - 1;
-	    ztrmv_("Upper", "No transpose", diag, &i__2, &A(1,1), lda, &
-		    A(1,j), &c__1);
+	    ztrmv_("Upper", "No transpose", diag, &i__2, &a[a_offset], lda, &
+		    a_ref(1, j), &c__1);
 	    i__2 = j - 1;
-	    zscal_(&i__2, &ajj, &A(1,j), &c__1);
+	    zscal_(&i__2, &ajj, &a_ref(1, j), &c__1);
 /* L10: */
 	}
     } else {
@@ -143,11 +140,11 @@
 
 	for (j = *n; j >= 1; --j) {
 	    if (nounit) {
-		i__1 = j + j * a_dim1;
-		z_div(&z__1, &c_b1, &A(j,j));
-		A(j,j).r = z__1.r, A(j,j).i = z__1.i;
-		i__1 = j + j * a_dim1;
-		z__1.r = -A(j,j).r, z__1.i = -A(j,j).i;
+		i__1 = a_subscr(j, j);
+		z_div(&z__1, &c_b1, &a_ref(j, j));
+		a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+		i__1 = a_subscr(j, j);
+		z__1.r = -a[i__1].r, z__1.i = -a[i__1].i;
 		ajj.r = z__1.r, ajj.i = z__1.i;
 	    } else {
 		z__1.r = -1., z__1.i = 0.;
@@ -158,9 +155,10 @@
 /*              Compute elements j+1:n of j-th column. */
 
 		i__1 = *n - j;
-		ztrmv_("Lower", "No transpose", diag, &i__1, &A(j+1,j+1), lda, &A(j+1,j), &c__1);
+		ztrmv_("Lower", "No transpose", diag, &i__1, &a_ref(j + 1, j 
+			+ 1), lda, &a_ref(j + 1, j), &c__1);
 		i__1 = *n - j;
-		zscal_(&i__1, &ajj, &A(j+1,j), &c__1);
+		zscal_(&i__1, &ajj, &a_ref(j + 1, j), &c__1);
 	    }
 /* L20: */
 	}
@@ -171,4 +169,8 @@
 /*     End of ZTRTI2 */
 
 } /* ztrti2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

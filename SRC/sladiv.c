@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int sladiv_(real *a, real *b, real *c, real *d, real *p, 
+/* Subroutine */ int sladiv_(real *a, real *b, real *c__, real *d__, real *p, 
 	real *q)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -34,22 +35,21 @@
     Q       (output) REAL   
             The scalars p and q in the above expression.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     static real e, f;
 
 
 
-    if (dabs(*d) < dabs(*c)) {
-	e = *d / *c;
-	f = *c + *d * e;
+    if (dabs(*d__) < dabs(*c__)) {
+	e = *d__ / *c__;
+	f = *c__ + *d__ * e;
 	*p = (*a + *b * e) / f;
 	*q = (*b - *a * e) / f;
     } else {
-	e = *c / *d;
-	f = *d + *c * e;
+	e = *c__ / *d__;
+	f = *d__ + *c__ * e;
 	*p = (*b + *a * e) / f;
-	*q = (-(doublereal)(*a) + *b * e) / f;
+	*q = (-(*a) + *b * e) / f;
     }
 
     return 0;

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,7 @@ static real c_b152 = -1.f;
     /* Local variables */
     static integer info;
     static real anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
+    static integer i__, j;
     static real w[12], x[4], rcond;
     static char c2[2];
     static real r1[4], r2[4], af[16]	/* was [4][4] */;
@@ -70,7 +71,11 @@ static real c_b152 = -1.f;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -91,22 +96,21 @@ static real c_b152 = -1.f;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1.f / (real) (i + j);
-	    af[i + (j << 2) - 5] = 1.f / (real) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1.f / (real) (i__ + j);
+	    af_ref(i__, j) = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -124,13 +128,12 @@ static real c_b152 = -1.f;
 
     if (lsamen_(&c__2, c2, "SY")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman 
-  
+/*        Test error exits of the routines that use the Bunch-Kaufman   
           factorization of a symmetric indefinite matrix.   
 
           SSYTRF */
 
-	s_copy(srnamc_1.srnamt, "SSYTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("SSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -146,7 +149,7 @@ static real c_b152 = -1.f;
 
 /*        SSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "SSYTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("SSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -162,7 +165,7 @@ static real c_b152 = -1.f;
 
 /*        SSYTRI */
 
-	s_copy(srnamc_1.srnamt, "SSYTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("SSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -178,7 +181,7 @@ static real c_b152 = -1.f;
 
 /*        SSYTRS */
 
-	s_copy(srnamc_1.srnamt, "SSYTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("SSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -202,7 +205,7 @@ static real c_b152 = -1.f;
 
 /*        SSYRFS */
 
-	s_copy(srnamc_1.srnamt, "SSYRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -241,7 +244,7 @@ static real c_b152 = -1.f;
 
 /*        SSYCON */
 
-	s_copy(srnamc_1.srnamt, "SSYCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSYCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("SSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -261,13 +264,12 @@ static real c_b152 = -1.f;
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman 
-  
+/*        Test error exits of the routines that use the Bunch-Kaufman   
           factorization of a symmetric indefinite packed matrix.   
 
           SSPTRF */
 
-	s_copy(srnamc_1.srnamt, "SSPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssptrf_("/", &c__0, a, ip, &info);
 	chkxer_("SSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -279,7 +281,7 @@ static real c_b152 = -1.f;
 
 /*        SSPTRI */
 
-	s_copy(srnamc_1.srnamt, "SSPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("SSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -291,7 +293,7 @@ static real c_b152 = -1.f;
 
 /*        SSPTRS */
 
-	s_copy(srnamc_1.srnamt, "SSPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("SSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -311,7 +313,7 @@ static real c_b152 = -1.f;
 
 /*        SSPRFS */
 
-	s_copy(srnamc_1.srnamt, "SSPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ssprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		iw, &info);
@@ -340,7 +342,7 @@ static real c_b152 = -1.f;
 
 /*        SSPCON */
 
-	s_copy(srnamc_1.srnamt, "SSPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "SSPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sspcon_("/", &c__0, a, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("SSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -364,4 +366,8 @@ static real c_b152 = -1.f;
 /*     End of SERRSY */
 
 } /* serrsy_ */
+
+#undef af_ref
+#undef a_ref
+
 

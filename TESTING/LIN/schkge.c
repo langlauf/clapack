@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,12 +28,13 @@ static integer c__0 = 0;
 static integer c_n1 = -1;
 static real c_b21 = 0.f;
 static integer c__1 = 1;
+static integer c__8 = 8;
 
 /* Subroutine */ int schkge_(logical *dotype, integer *nm, integer *mval, 
 	integer *nn, integer *nval, integer *nnb, integer *nbval, integer *
-	nrhs, real *thresh, logical *tsterr, integer *nmax, real *a, real *
-	afac, real *ainv, real *b, real *x, real *xact, real *work, real *
-	rwork, integer *iwork, integer *nout)
+	nns, integer *nsval, real *thresh, logical *tsterr, integer *nmax, 
+	real *a, real *afac, real *ainv, real *b, real *x, real *xact, real *
+	work, real *rwork, integer *iwork, integer *nout)
 {
     /* Initialized data */
 
@@ -41,14 +43,14 @@ static integer c__1 = 1;
 
     /* Format strings */
     static char fmt_9999[] = "(\002 M = \002,i5,\002, N =\002,i5,\002, NB "
-	    "=\002,i4,\002, type \002,i2,\002, test \002,i2,\002, ratio =\002"
-	    ",g12.5)";
+	    "=\002,i4,\002, type \002,i2,\002, test(\002,i2,\002) =\002,g12.5)"
+	    ;
     static char fmt_9998[] = "(\002 TRANS='\002,a1,\002', N =\002,i5,\002, N"
-	    "B =\002,i4,\002, type \002,i2,\002, test \002,i2,\002, ratio "
-	    "=\002,g12.5)";
-    static char fmt_9997[] = "(\002 NORM ='\002,a1,\002', N =\002,i5,\002, N"
-	    "B =\002,i4,\002, type \002,i2,\002, test \002,i2,\002, ratio "
-	    "=\002,g12.5)";
+	    "RHS=\002,i3,\002, type \002,i2,\002, test(\002,i2,\002) =\002,g1"
+	    "2.5)";
+    static char fmt_9997[] = "(\002 NORM ='\002,a1,\002', N =\002,i5,\002"
+	    ",\002,10x,\002 type \002,i2,\002, test(\002,i2,\002) =\002,g12.5)"
+	    ;
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
@@ -59,8 +61,10 @@ static integer c__1 = 1;
 
     /* Local variables */
     static integer ioff, mode, imat, info;
-    static char path[3], dist[1], norm[1], type[1];
-    static integer nrun, i;
+    static char path[3], dist[1];
+    static integer irhs, nrhs;
+    static char norm[1], type__[1];
+    static integer nrun, i__;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer k, m, n, nfail, iseed[4];
     extern /* Subroutine */ int sget01_(integer *, integer *, real *, integer 
@@ -80,7 +84,7 @@ static integer c__1 = 1;
     static real anorm;
     static integer itran;
     static char trans[1];
-    static integer izero, nerrs, k1;
+    static integer izero, nerrs;
     static real dummy;
     static integer lwork;
     static logical zerot;
@@ -127,16 +131,16 @@ static integer c__1 = 1;
     static integer lda, inb;
 
     /* Fortran I/O blocks */
-    static cilist io___40 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___48 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___49 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___46 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___50 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 7, 1999   
 
 
     Purpose   
@@ -148,8 +152,7 @@ static integer c__1 = 1;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -171,9 +174,11 @@ static integer c__1 = 1;
     NBVAL   (input) INTEGER array, dimension (NBVAL)   
             The values of the blocksize NB.   
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+    NNS     (input) INTEGER   
+            The number of values of NRHS contained in the vector NSVAL.   
+
+    NSVAL   (input) INTEGER array, dimension (NNS)   
+            The values of the number of right hand sides NRHS.   
 
     THRESH  (input) REAL   
             The threshold value for the test ratios.  A result is   
@@ -184,8 +189,7 @@ static integer c__1 = 1;
             Flag that indicates whether error exits are to be tested.   
 
     NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning 
-  
+            The maximum value permitted for M or N, used in dimensioning   
             the work arrays.   
 
     A       (workspace) REAL array, dimension (NMAX*NMAX)   
@@ -194,25 +198,25 @@ static integer c__1 = 1;
 
     AINV    (workspace) REAL array, dimension (NMAX*NMAX)   
 
-    B       (workspace) REAL array, dimension (NMAX*NRHS)   
+    B       (workspace) REAL array, dimension (NMAX*NSMAX)   
+            where NSMAX is the largest entry in NSVAL.   
 
-    X       (workspace) REAL array, dimension (NMAX*NRHS)   
+    X       (workspace) REAL array, dimension (NMAX*NSMAX)   
 
-    XACT    (workspace) REAL array, dimension (NMAX*NRHS)   
+    XACT    (workspace) REAL array, dimension (NMAX*NSMAX)   
 
     WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NRHS))   
+                        (NMAX*max(3,NSMAX))   
 
     RWORK   (workspace) REAL array, dimension   
-                        (max(2*NMAX,2*NRHS+NWORK))   
+                        (max(2*NMAX,2*NSMAX+NWORK))   
 
     IWORK   (workspace) INTEGER array, dimension (2*NMAX)   
 
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -224,6 +228,7 @@ static integer c__1 = 1;
     --ainv;
     --afac;
     --a;
+    --nsval;
     --nbval;
     --nval;
     --mval;
@@ -233,13 +238,13 @@ static integer c__1 = 1;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "GE", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GE", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -272,43 +277,39 @@ static integer c__1 = 1;
 	    i__3 = nimat;
 	    for (imat = 1; imat <= i__3; ++imat) {
 
-/*              Do the tests only if DOTYPE( IMAT ) is true. 
-*/
+/*              Do the tests only if DOTYPE( IMAT ) is true. */
 
 		if (! dotype[imat]) {
-		    goto L70;
+		    goto L100;
 		}
 
-/*              Skip types 5, 6, or 7 if the matrix size is to
-o small. */
+/*              Skip types 5, 6, or 7 if the matrix size is too small. */
 
 		zerot = imat >= 5 && imat <= 7;
 		if (zerot && n < imat - 4) {
-		    goto L70;
+		    goto L100;
 		}
 
-/*              Set up parameters with SLATB4 and generate a t
-est matrix   
+/*              Set up parameters with SLATB4 and generate a test matrix   
                 with SLATMS. */
 
-		slatb4_(path, &imat, &m, &n, type, &kl, &ku, &anorm, &mode, &
-			cndnum, dist);
+		slatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
+			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "SLATMS", 6L, 6L);
-		slatms_(&m, &n, dist, iseed, type, &rwork[1], &mode, &cndnum, 
-			&anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1],
-			 &info);
+		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
+		slatms_(&m, &n, dist, iseed, type__, &rwork[1], &mode, &
+			cndnum, &anorm, &kl, &ku, "No packing", &a[1], &lda, &
+			work[1], &info);
 
 /*              Check error code from SLATMS. */
 
 		if (info != 0) {
 		    alaerh_(path, "SLATMS", &info, &c__0, " ", &m, &n, &c_n1, 
 			    &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
-		    goto L70;
+		    goto L100;
 		}
 
-/*              For types 5-7, zero one or more columns of the
- matrix to   
+/*              For types 5-7, zero one or more columns of the matrix to   
                 test that INFO is returned correctly. */
 
 		if (zerot) {
@@ -322,8 +323,8 @@ est matrix
 		    ioff = (izero - 1) * lda;
 		    if (imat < 7) {
 			i__4 = m;
-			for (i = 1; i <= i__4; ++i) {
-			    a[ioff + i] = 0.f;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    a[ioff + i__] = 0.f;
 /* L20: */
 			}
 		    } else {
@@ -335,15 +336,11 @@ est matrix
 		    izero = 0;
 		}
 
-/*              These lines, if used in place of the calls in 
-the DO 60   
-                loop, cause the code to bomb on a Sun SPARCsta
-tion.   
+/*              These lines, if used in place of the calls in the DO 60   
+                loop, cause the code to bomb on a Sun SPARCstation.   
 
-                 ANORMO = SLANGE( 'O', M, N, A, LDA, RWORK ) 
-  
-                 ANORMI = SLANGE( 'I', M, N, A, LDA, RWORK ) 
-  
+                 ANORMO = SLANGE( 'O', M, N, A, LDA, RWORK )   
+                 ANORMI = SLANGE( 'I', M, N, A, LDA, RWORK )   
 
                 Do for each blocksize in NBVAL */
 
@@ -352,11 +349,10 @@ tion.
 		    nb = nbval[inb];
 		    xlaenv_(&c__1, &nb);
 
-/*                 Compute the LU factorization of the mat
-rix. */
+/*                 Compute the LU factorization of the matrix. */
 
 		    slacpy_("Full", &m, &n, &a[1], &lda, &afac[1], &lda);
-		    s_copy(srnamc_1.srnamt, "SGETRF", 6L, 6L);
+		    s_copy(srnamc_1.srnamt, "SGETRF", (ftnlen)6, (ftnlen)6);
 		    sgetrf_(&m, &n, &afac[1], &lda, &iwork[1], &info);
 
 /*                 Check error code from SGETRF. */
@@ -368,8 +364,7 @@ rix. */
 		    trfcon = FALSE_;
 
 /* +    TEST 1   
-                   Reconstruct matrix from factors and com
-pute residual. */
+                   Reconstruct matrix from factors and compute residual. */
 
 		    slacpy_("Full", &m, &n, &afac[1], &lda, &ainv[1], &lda);
 		    sget01_(&m, &n, &a[1], &lda, &ainv[1], &lda, &iwork[1], &
@@ -377,15 +372,16 @@ pute residual. */
 		    nt = 1;
 
 /* +    TEST 2   
-                   Form the inverse if the factorization w
-as successful   
+                   Form the inverse if the factorization was successful   
                    and compute the residual. */
 
 		    if (m == n && info == 0) {
 			slacpy_("Full", &n, &n, &afac[1], &lda, &ainv[1], &
 				lda);
-			s_copy(srnamc_1.srnamt, "SGETRI", 6L, 6L);
-			lwork = *nmax * max(3,*nrhs);
+			s_copy(srnamc_1.srnamt, "SGETRI", (ftnlen)6, (ftnlen)
+				6);
+			nrhs = nsval[1];
+			lwork = *nmax * max(3,nrhs);
 			sgetri_(&n, &ainv[1], &lda, &iwork[1], &work[1], &
 				lwork, &info);
 
@@ -397,18 +393,15 @@ as successful
 				     nout);
 			}
 
-/*                    Compute the residual for the mat
-rix times its   
-                      inverse.  Also compute the 1-nor
-m condition number   
+/*                    Compute the residual for the matrix times its   
+                      inverse.  Also compute the 1-norm condition number   
                       of A. */
 
 			sget03_(&n, &a[1], &lda, &ainv[1], &lda, &work[1], &
 				lda, &rwork[1], &rcondo, &result[1]);
 			anormo = slange_("O", &m, &n, &a[1], &lda, &rwork[1]);
 
-/*                    Compute the infinity-norm condit
-ion number of A. */
+/*                    Compute the infinity-norm condition number of A. */
 
 			anormi = slange_("I", &m, &n, &a[1], &lda, &rwork[1]);
 			ainvnm = slange_("I", &n, &n, &ainv[1], &lda, &rwork[
@@ -421,8 +414,7 @@ ion number of A. */
 			nt = 2;
 		    } else {
 
-/*                    Do only the condition estimate i
-f INFO > 0. */
+/*                    Do only the condition estimate if INFO > 0. */
 
 			trfcon = TRUE_;
 			anormo = slange_("O", &m, &n, &a[1], &lda, &rwork[1]);
@@ -431,8 +423,7 @@ f INFO > 0. */
 			rcondi = 0.f;
 		    }
 
-/*                 Print information about the tests so fa
-r that did not   
+/*                 Print information about the tests so far that did not   
                    pass the threshold. */
 
 		    i__5 = nt;
@@ -441,8 +432,8 @@ r that did not
 			    if (nfail == 0 && nerrs == 0) {
 				alahd_(nout, path);
 			    }
-			    io___40.ciunit = *nout;
-			    s_wsfe(&io___40);
+			    io___41.ciunit = *nout;
+			    s_wsfe(&io___41);
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -462,17 +453,130 @@ r that did not
 		    }
 		    nrun += nt;
 
-/*                 Skip the remaining tests if this is not
- the first   
-                   block size or if M .ne. N. */
+/*                 Skip the remaining tests if this is not the first   
+                   block size or if M .ne. N.  Skip the solve tests if   
+                   the matrix is singular. */
 
 		    if (inb > 1 || m != n) {
-			goto L60;
+			goto L90;
+		    }
+		    if (trfcon) {
+			goto L70;
 		    }
 
-		    for (itran = 1; itran <= 3; ++itran) {
-			*(unsigned char *)trans = *(unsigned char *)&transs[
-				itran - 1];
+		    i__5 = *nns;
+		    for (irhs = 1; irhs <= i__5; ++irhs) {
+			nrhs = nsval[irhs];
+			*(unsigned char *)xtype = 'N';
+
+			for (itran = 1; itran <= 3; ++itran) {
+			    *(unsigned char *)trans = *(unsigned char *)&
+				    transs[itran - 1];
+			    if (itran == 1) {
+				rcondc = rcondo;
+			    } else {
+				rcondc = rcondi;
+			    }
+
+/* +    TEST 3   
+                         Solve and compute residual for A * X = B. */
+
+			    s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (
+				    ftnlen)6);
+			    slarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku,
+				     &nrhs, &a[1], &lda, &xact[1], &lda, &b[1]
+				    , &lda, iseed, &info);
+			    *(unsigned char *)xtype = 'C';
+
+			    slacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
+				    lda);
+			    s_copy(srnamc_1.srnamt, "SGETRS", (ftnlen)6, (
+				    ftnlen)6);
+			    sgetrs_(trans, &n, &nrhs, &afac[1], &lda, &iwork[
+				    1], &x[1], &lda, &info);
+
+/*                       Check error code from SGETRS. */
+
+			    if (info != 0) {
+				alaerh_(path, "SGETRS", &info, &c__0, trans, &
+					n, &n, &c_n1, &c_n1, &nrhs, &imat, &
+					nfail, &nerrs, nout);
+			    }
+
+			    slacpy_("Full", &n, &nrhs, &b[1], &lda, &work[1], 
+				    &lda);
+			    sget02_(trans, &n, &n, &nrhs, &a[1], &lda, &x[1], 
+				    &lda, &work[1], &lda, &rwork[1], &result[
+				    2]);
+
+/* +    TEST 4   
+                         Check solution from generated exact solution. */
+
+			    sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
+				    rcondc, &result[3]);
+
+/* +    TESTS 5, 6, and 7   
+                         Use iterative refinement to improve the   
+                         solution. */
+
+			    s_copy(srnamc_1.srnamt, "SGERFS", (ftnlen)6, (
+				    ftnlen)6);
+			    sgerfs_(trans, &n, &nrhs, &a[1], &lda, &afac[1], &
+				    lda, &iwork[1], &b[1], &lda, &x[1], &lda, 
+				    &rwork[1], &rwork[nrhs + 1], &work[1], &
+				    iwork[n + 1], &info);
+
+/*                       Check error code from SGERFS. */
+
+			    if (info != 0) {
+				alaerh_(path, "SGERFS", &info, &c__0, trans, &
+					n, &n, &c_n1, &c_n1, &nrhs, &imat, &
+					nfail, &nerrs, nout);
+			    }
+
+			    sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
+				    rcondc, &result[4]);
+			    sget07_(trans, &n, &nrhs, &a[1], &lda, &b[1], &
+				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
+				    1], &rwork[nrhs + 1], &result[5]);
+
+/*                       Print information about the tests that did not   
+                         pass the threshold. */
+
+			    for (k = 3; k <= 7; ++k) {
+				if (result[k - 1] >= *thresh) {
+				    if (nfail == 0 && nerrs == 0) {
+					alahd_(nout, path);
+				    }
+				    io___46.ciunit = *nout;
+				    s_wsfe(&io___46);
+				    do_fio(&c__1, trans, (ftnlen)1);
+				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
+					    integer));
+				    do_fio(&c__1, (char *)&nrhs, (ftnlen)
+					    sizeof(integer));
+				    do_fio(&c__1, (char *)&imat, (ftnlen)
+					    sizeof(integer));
+				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
+					    integer));
+				    do_fio(&c__1, (char *)&result[k - 1], (
+					    ftnlen)sizeof(real));
+				    e_wsfe();
+				    ++nfail;
+				}
+/* L40: */
+			    }
+			    nrun += 5;
+/* L50: */
+			}
+/* L60: */
+		    }
+
+/* +    TEST 8   
+                      Get an estimate of RCOND = 1/CNDNUM. */
+
+L70:
+		    for (itran = 1; itran <= 2; ++itran) {
 			if (itran == 1) {
 			    anorm = anormo;
 			    rcondc = rcondo;
@@ -482,162 +586,58 @@ r that did not
 			    rcondc = rcondi;
 			    *(unsigned char *)norm = 'I';
 			}
-			if (trfcon) {
-			    k1 = 8;
-			} else {
-			    k1 = 3;
+			s_copy(srnamc_1.srnamt, "SGECON", (ftnlen)6, (ftnlen)
+				6);
+			sgecon_(norm, &n, &afac[1], &lda, &anorm, &rcond, &
+				work[1], &iwork[n + 1], &info);
 
-/* +    TEST 3   
-                         Solve and compute residua
-l for A * X = B. */
+/*                       Check error code from SGECON. */
 
-			    s_copy(srnamc_1.srnamt, "SLARHS", 6L, 6L);
-			    slarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku,
-				     nrhs, &a[1], &lda, &xact[1], &lda, &b[1],
-				     &lda, iseed, &info);
-			    *(unsigned char *)xtype = 'C';
-
-			    slacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
-				    lda);
-			    s_copy(srnamc_1.srnamt, "SGETRS", 6L, 6L);
-			    sgetrs_(trans, &n, nrhs, &afac[1], &lda, &iwork[1]
-				    , &x[1], &lda, &info);
-
-/*                       Check error code from SGE
-TRS. */
-
-			    if (info != 0) {
-				alaerh_(path, "SGETRS", &info, &c__0, trans, &
-					n, &n, &c_n1, &c_n1, nrhs, &imat, &
-					nfail, &nerrs, nout);
-			    }
-
-			    slacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &
-				    lda);
-			    sget02_(trans, &n, &n, nrhs, &a[1], &lda, &x[1], &
-				    lda, &work[1], &lda, &rwork[1], &result[2]
-				    );
-
-/* +    TEST 4   
-                         Check solution from gener
-ated exact solution. */
-
-			    sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
-				    rcondc, &result[3]);
-
-/* +    TESTS 5, 6, and 7   
-                         Use iterative refinement 
-to improve the   
-                         solution. */
-
-			    s_copy(srnamc_1.srnamt, "SGERFS", 6L, 6L);
-			    sgerfs_(trans, &n, nrhs, &a[1], &lda, &afac[1], &
-				    lda, &iwork[1], &b[1], &lda, &x[1], &lda, 
-				    &rwork[1], &rwork[*nrhs + 1], &work[1], &
-				    iwork[n + 1], &info);
-
-/*                       Check error code from SGE
-RFS. */
-
-			    if (info != 0) {
-				alaerh_(path, "SGERFS", &info, &c__0, trans, &
-					n, &n, &c_n1, &c_n1, nrhs, &imat, &
-					nfail, &nerrs, nout);
-			    }
-
-			    sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
-				    rcondc, &result[4]);
-			    sget07_(trans, &n, nrhs, &a[1], &lda, &b[1], &lda,
-				     &x[1], &lda, &xact[1], &lda, &rwork[1], &
-				    rwork[*nrhs + 1], &result[5]);
-			    nt = 7;
+			if (info != 0) {
+			    alaerh_(path, "SGECON", &info, &c__0, norm, &n, &
+				    n, &c_n1, &c_n1, &c_n1, &imat, &nfail, &
+				    nerrs, nout);
 			}
 
-/* +    TEST 8   
-                      Get an estimate of RCOND = 1/CND
-NUM. */
+/*                       This line is needed on a Sun SPARCstation. */
 
-			if (itran <= 2) {
-			    s_copy(srnamc_1.srnamt, "SGECON", 6L, 6L);
-			    sgecon_(norm, &n, &afac[1], &lda, &anorm, &rcond, 
-				    &work[1], &iwork[n + 1], &info);
+			dummy = rcond;
 
-/*                       Check error code from SGE
-CON. */
+			result[7] = sget06_(&rcond, &rcondc);
 
-			    if (info != 0) {
-				alaerh_(path, "SGECON", &info, &c__0, norm, &
-					n, &n, &c_n1, &c_n1, &c_n1, &imat, &
-					nfail, &nerrs, nout);
-			    }
-
-/*                       This line is needed on a 
-Sun SPARCstation. */
-
-			    dummy = rcond;
-
-			    result[7] = sget06_(&rcond, &rcondc);
-			    nt = 8;
-			}
-
-/*                    Print information about the test
-s that did not pass   
+/*                    Print information about the tests that did not pass   
                       the threshold. */
 
-			i__5 = nt;
-			for (k = k1; k <= i__5; ++k) {
-			    if (result[k - 1] >= *thresh) {
-				if (nfail == 0 && nerrs == 0) {
-				    alahd_(nout, path);
-				}
-				if (k < 8) {
-				    io___48.ciunit = *nout;
-				    s_wsfe(&io___48);
-				    do_fio(&c__1, trans, 1L);
-				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&nb, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&imat, (ftnlen)
-					    sizeof(integer));
-				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&result[k - 1], (
-					    ftnlen)sizeof(real));
-				    e_wsfe();
-				} else {
-				    io___49.ciunit = *nout;
-				    s_wsfe(&io___49);
-				    do_fio(&c__1, norm, 1L);
-				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&nb, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&imat, (ftnlen)
-					    sizeof(integer));
-				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
-					    integer));
-				    do_fio(&c__1, (char *)&result[k - 1], (
-					    ftnlen)sizeof(real));
-				    e_wsfe();
-				}
-				++nfail;
+			if (result[7] >= *thresh) {
+			    if (nfail == 0 && nerrs == 0) {
+				alahd_(nout, path);
 			    }
-/* L40: */
+			    io___50.ciunit = *nout;
+			    s_wsfe(&io___50);
+			    do_fio(&c__1, norm, (ftnlen)1);
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&result[7], (ftnlen)sizeof(
+				    real));
+			    e_wsfe();
+			    ++nfail;
 			}
-			nrun = nrun + nt - k1 + 1;
-/* L50: */
+			++nrun;
+/* L80: */
 		    }
-L60:
+L90:
 		    ;
 		}
-L70:
+L100:
 		;
 	    }
-
-/* L80: */
+/* L110: */
 	}
-/* L90: */
+/* L120: */
     }
 
 /*     Print a summary of the results. */

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer 
 	*lda, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -12,10 +13,8 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
     Purpose   
     =======   
 
-    DLANGE  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    DLANGE  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     real matrix A.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -51,8 +47,7 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
             DLANGE is set to zero.   
 
     N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.  When N = 0, 
-  
+            The number of columns of the matrix A.  N >= 0.  When N = 0,   
             DLANGE is set to zero.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
@@ -65,13 +60,10 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
             where LWORK >= M when NORM = 'I'; otherwise, WORK is not   
             referenced.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -81,20 +73,22 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal scale;
     extern logical lsame_(char *, char *);
     static doublereal value;
     extern /* Subroutine */ int dlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
     static doublereal sum;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
 
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (min(*m,*n) == 0) {
 	value = 0.;
     } else if (lsame_(norm, "M")) {
@@ -103,27 +97,28 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
 
 	value = 0.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		d__2 = value, d__3 = (d__1 = A(i,j), abs(d__1));
+		d__2 = value, d__3 = (d__1 = a_ref(i__, j), abs(d__1));
 		value = max(d__2,d__3);
 /* L10: */
 	    }
 /* L20: */
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
 	value = 0.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    sum = 0.;
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		sum += (d__1 = A(i,j), abs(d__1));
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		sum += (d__1 = a_ref(i__, j), abs(d__1));
 /* L30: */
 	    }
 	    value = max(value,sum);
@@ -134,24 +129,24 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
 /*        Find normI(A). */
 
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
-	    WORK(i) = 0.;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    work[i__] = 0.;
 /* L50: */
 	}
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		WORK(i) += (d__1 = A(i,j), abs(d__1));
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		work[i__] += (d__1 = a_ref(i__, j), abs(d__1));
 /* L60: */
 	    }
 /* L70: */
 	}
 	value = 0.;
 	i__1 = *m;
-	for (i = 1; i <= *m; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = value, d__2 = WORK(i);
+	    d__1 = value, d__2 = work[i__];
 	    value = max(d__1,d__2);
 /* L80: */
 	}
@@ -162,8 +157,8 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
 	scale = 0.;
 	sum = 1.;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    dlassq_(m, &A(1,j), &c__1, &scale, &sum);
+	for (j = 1; j <= i__1; ++j) {
+	    dlassq_(m, &a_ref(1, j), &c__1, &scale, &sum);
 /* L90: */
 	}
 	value = scale * sqrt(sum);
@@ -175,4 +170,7 @@ doublereal dlange_(char *norm, integer *m, integer *n, doublereal *a, integer
 /*     End of DLANGE */
 
 } /* dlange_ */
+
+#undef a_ref
+
 

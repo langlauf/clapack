@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cppcon_(char *uplo, integer *n, complex *ap, real *anorm,
 	 real *rcond, complex *work, real *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -13,8 +14,7 @@
     =======   
 
     CPPCON estimates the reciprocal of the condition number (in the   
-    1-norm) of a complex Hermitian positive definite packed matrix using 
-  
+    1-norm) of a complex Hermitian positive definite packed matrix using   
     the Cholesky factorization A = U**H*U or A = L*L**H computed by   
     CPPTRF.   
 
@@ -32,8 +32,7 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The triangular factor U or L from the Cholesky factorization 
-  
+            The triangular factor U or L from the Cholesky factorization   
             A = U**H*U or A = L*L**H, packed columnwise in a linear   
             array.  The j-th column of U or L is stored in the array AP   
             as follows:   
@@ -56,15 +55,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -95,12 +91,11 @@
     static real smlnum;
 
 
+    --rwork;
+    --work;
+    --ap;
 
-#define RWORK(I) rwork[(I)-1]
-#define WORK(I) work[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -133,45 +128,45 @@
     kase = 0;
     *(unsigned char *)normin = 'N';
 L10:
-    clacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+    clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (upper) {
 
 /*           Multiply by inv(U'). */
 
 	    clatps_("Upper", "Conjugate transpose", "Non-unit", normin, n, &
-		    AP(1), &WORK(1), &scalel, &RWORK(1), info);
+		    ap[1], &work[1], &scalel, &rwork[1], info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(U). */
 
-	    clatps_("Upper", "No transpose", "Non-unit", normin, n, &AP(1), &
-		    WORK(1), &scaleu, &RWORK(1), info);
+	    clatps_("Upper", "No transpose", "Non-unit", normin, n, &ap[1], &
+		    work[1], &scaleu, &rwork[1], info);
 	} else {
 
 /*           Multiply by inv(L). */
 
-	    clatps_("Lower", "No transpose", "Non-unit", normin, n, &AP(1), &
-		    WORK(1), &scalel, &RWORK(1), info);
+	    clatps_("Lower", "No transpose", "Non-unit", normin, n, &ap[1], &
+		    work[1], &scalel, &rwork[1], info);
 	    *(unsigned char *)normin = 'Y';
 
 /*           Multiply by inv(L'). */
 
 	    clatps_("Lower", "Conjugate transpose", "Non-unit", normin, n, &
-		    AP(1), &WORK(1), &scaleu, &RWORK(1), info);
+		    ap[1], &work[1], &scaleu, &rwork[1], info);
 	}
 
 /*        Multiply by 1/SCALE if doing so will not cause overflow. */
 
 	scale = scalel * scaleu;
 	if (scale != 1.f) {
-	    ix = icamax_(n, &WORK(1), &c__1);
+	    ix = icamax_(n, &work[1], &c__1);
 	    i__1 = ix;
-	    if (scale < ((r__1 = WORK(ix).r, dabs(r__1)) + (r__2 = r_imag(&
-		    WORK(ix)), dabs(r__2))) * smlnum || scale == 0.f) {
+	    if (scale < ((r__1 = work[i__1].r, dabs(r__1)) + (r__2 = r_imag(&
+		    work[ix]), dabs(r__2))) * smlnum || scale == 0.f) {
 		goto L20;
 	    }
-	    csrscl_(n, &scale, &WORK(1), &c__1);
+	    csrscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

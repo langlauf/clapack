@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -50,15 +51,18 @@ static integer c__1 = 1;
     /* Local variables */
     static integer mode, info;
     static char path[3];
-    static integer nrun, i;
+    static integer nrun, i__;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer k, m, n, nfail, iseed[4], imode;
     extern doublereal cqrt12_(integer *, integer *, complex *, integer *, 
 	    real *, complex *, integer *, real *);
     static integer mnmin;
-    extern doublereal ctzt01_(integer *, integer *, complex *, complex *, 
-	    integer *, complex *, complex *, integer *), ctzt02_(integer *, 
-	    integer *, complex *, integer *, complex *, complex *, integer *);
+    extern doublereal crzt01_(integer *, integer *, complex *, complex *, 
+	    integer *, complex *, complex *, integer *), crzt02_(integer *, 
+	    integer *, complex *, integer *, complex *, complex *, integer *),
+	     ctzt01_(integer *, integer *, complex *, complex *, integer *, 
+	    complex *, complex *, integer *), ctzt02_(integer *, integer *, 
+	    complex *, integer *, complex *, complex *, integer *);
     static integer nerrs, lwork;
     extern /* Subroutine */ int cgeqr2_(integer *, integer *, complex *, 
 	    integer *, complex *, complex *, integer *);
@@ -72,7 +76,9 @@ static integer c__1 = 1;
 	    , complex *, integer *, complex *, integer *), slaord_(char *, integer *, real *, integer *), 
 	    cerrtz_(char *, integer *), ctzrqf_(integer *, integer *, 
 	    complex *, integer *, complex *, integer *);
-    static real result[3];
+    static real result[6];
+    extern /* Subroutine */ int ctzrzf_(integer *, integer *, complex *, 
+	    integer *, complex *, complex *, integer *, integer *);
     static integer lda;
     static real eps;
 
@@ -81,23 +87,22 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    CCHKTZ tests CTZRQF.   
+    CCHKTZ tests CTZRQF and CTZRZF.   
 
     Arguments   
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -122,8 +127,7 @@ static integer c__1 = 1;
             Flag that indicates whether error exits are to be tested.   
 
     A       (workspace) COMPLEX array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the 
-  
+            where MMAX is the maximum value of M in MVAL and NMAX is the   
             maximum value of N in NVAL.   
 
     COPYA   (workspace) COMPLEX array, dimension (MMAX*NMAX)   
@@ -144,8 +148,7 @@ static integer c__1 = 1;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --rwork;
@@ -163,13 +166,13 @@ static integer c__1 = 1;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'C';
-    s_copy(path + 1, "TZ", 2L, 2L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "TZ", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
     eps = slamch_("Epsilon");
@@ -203,24 +206,23 @@ static integer c__1 = 1;
 	    if (m <= n) {
 		for (imode = 1; imode <= 3; ++imode) {
 
-/*                 Do for each type of singular value dist
-ribution.   
+/*                 Do for each type of singular value distribution.   
                       0:  zero matrix   
                       1:  one small singular value   
                       2:  exponential distribution */
 
 		    mode = imode - 1;
 
-/*                 Generate test matrix of size m by n usi
-ng   
-                   singular value distribution indicated b
-y `mode'. */
+/*                 Test CTZRQF   
+
+                   Generate test matrix of size m by n using   
+                   singular value distribution indicated by `mode'. */
 
 		    if (mode == 0) {
 			claset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
 			i__3 = mnmin;
-			for (i = 1; i <= i__3; ++i) {
-			    copys[i] = 0.f;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    copys[i__] = 0.f;
 /* L20: */
 			}
 		    } else {
@@ -240,11 +242,10 @@ y `mode'. */
 
 		    clacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
 
-/*                 Call CTZRQF to reduce the upper trapezo
-idal matrix to   
+/*                 Call CTZRQF to reduce the upper trapezoidal matrix to   
                    upper triangular form. */
 
-		    s_copy(srnamc_1.srnamt, "CTZRQF", 6L, 6L);
+		    s_copy(srnamc_1.srnamt, "CTZRQF", (ftnlen)6, (ftnlen)6);
 		    ctzrqf_(&m, &n, &a[1], &lda, &tau[1], &info);
 
 /*                 Compute norm(svd(a) - svd(r)) */
@@ -262,11 +263,61 @@ idal matrix to
 		    result[2] = ctzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
 			    , &lwork);
 
-/*                 Print information about the tests that 
-did not pass   
+/*                 Test CTZRZF   
+
+                   Generate test matrix of size m by n using   
+                   singular value distribution indicated by `mode'. */
+
+		    if (mode == 0) {
+			claset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
+			i__3 = mnmin;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    copys[i__] = 0.f;
+/* L30: */
+			}
+		    } else {
+			r__1 = 1.f / eps;
+			clatms_(&m, &n, "Uniform", iseed, "Nonsymmetric", &
+				copys[1], &imode, &r__1, &c_b15, &m, &n, 
+				"No packing", &a[1], &lda, &work[1], &info);
+			cgeqr2_(&m, &n, &a[1], &lda, &work[1], &work[mnmin + 
+				1], &info);
+			i__3 = m - 1;
+			claset_("Lower", &i__3, &n, &c_b10, &c_b10, &a[2], &
+				lda);
+			slaord_("Decreasing", &mnmin, &copys[1], &c__1);
+		    }
+
+/*                 Save A and its singular values */
+
+		    clacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
+
+/*                 Call CTZRZF to reduce the upper trapezoidal matrix to   
+                   upper triangular form. */
+
+		    s_copy(srnamc_1.srnamt, "CTZRZF", (ftnlen)6, (ftnlen)6);
+		    ctzrzf_(&m, &n, &a[1], &lda, &tau[1], &work[1], &lwork, &
+			    info);
+
+/*                 Compute norm(svd(a) - svd(r)) */
+
+		    result[3] = cqrt12_(&m, &m, &a[1], &lda, &copys[1], &work[
+			    1], &lwork, &rwork[1]);
+
+/*                 Compute norm( A - R*Q ) */
+
+		    result[4] = crzt01_(&m, &n, &copya[1], &a[1], &lda, &tau[
+			    1], &work[1], &lwork);
+
+/*                 Compute norm(Q'*Q - I). */
+
+		    result[5] = crzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
+			    , &lwork);
+
+/*                 Print information about the tests that did not pass   
                    the threshold. */
 
-		    for (k = 1; k <= 3; ++k) {
+		    for (k = 1; k <= 6; ++k) {
 			if (result[k - 1] >= *thresh) {
 			    if (nfail == 0 && nerrs == 0) {
 				alahd_(nout, path);
@@ -286,15 +337,15 @@ did not pass
 			    e_wsfe();
 			    ++nfail;
 			}
-/* L30: */
-		    }
-		    nrun += 3;
 /* L40: */
+		    }
+		    nrun += 6;
+/* L50: */
 		}
 	    }
-/* L50: */
-	}
 /* L60: */
+	}
+/* L70: */
     }
 
 /*     Print a summary of the results. */

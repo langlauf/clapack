@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -47,7 +48,7 @@ static real c_b55 = 0.f;
     static real rmax, vmax, work[2500]	/* was [50][50] */, a[2500]	/* 
 	    was [50][50] */, b[2500]	/* was [50][50] */, e[2500]	/* 
 	    was [50][50] */, f[2500]	/* was [50][50] */;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
@@ -88,7 +89,15 @@ static real c_b55 = 0.f;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*50 + a_1 - 51]
+#define b_ref(a_1,a_2) b[(a_2)*50 + a_1 - 51]
+#define e_ref(a_1,a_2) e[(a_2)*50 + a_1 - 51]
+#define f_ref(a_1,a_2) f[(a_2)*50 + a_1 - 51]
+#define vl_ref(a_1,a_2) vl[(a_2)*50 + a_1 - 51]
+#define vr_ref(a_1,a_2) vr[(a_2)*50 + a_1 - 51]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -109,8 +118,7 @@ static real c_b55 = 0.f;
     NOUT    (input) INTEGER   
             The logical unit number for output.  NOUT > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialization */
@@ -136,52 +144,52 @@ L10:
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___10.ciunit = *nin;
 	s_rsle(&io___10);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&a[i + j * 50 - 51], (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(real))
+		    ;
 	}
 	e_rsle();
 /* L20: */
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___13.ciunit = *nin;
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&b[i + j * 50 - 51], (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(real))
+		    ;
 	}
 	e_rsle();
 /* L30: */
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___15.ciunit = *nin;
 	s_rsle(&io___15);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&vl[i + j * 50 - 51], (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&vl_ref(i__, j), (ftnlen)sizeof(real)
+		    );
 	}
 	e_rsle();
 /* L40: */
     }
 
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___17.ciunit = *nin;
 	s_rsle(&io___17);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&vr[i + j * 50 - 51], (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&vr_ref(i__, j), (ftnlen)sizeof(real)
+		    );
 	}
 	e_rsle();
 /* L50: */
@@ -236,10 +244,10 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    r__2 = vmax, r__3 = (r__1 = e[i + j * 50 - 51] - f[i + j * 50 - 
-		    51], dabs(r__1));
+	    r__2 = vmax, r__3 = (r__1 = e_ref(i__, j) - f_ref(i__, j), dabs(
+		    r__1));
 	    vmax = dmax(r__2,r__3);
 /* L60: */
 	}
@@ -267,10 +275,10 @@ L10:
     i__1 = m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    r__2 = vmax, r__3 = (r__1 = e[i + j * 50 - 51] - f[i + j * 50 - 
-		    51], dabs(r__1));
+	    r__2 = vmax, r__3 = (r__1 = e_ref(i__, j) - f_ref(i__, j), dabs(
+		    r__1));
 	    vmax = dmax(r__2,r__3);
 /* L80: */
 	}
@@ -324,4 +332,12 @@ L100:
 /*     End of SCHKGK */
 
 } /* schkgk_ */
+
+#undef vr_ref
+#undef vl_ref
+#undef f_ref
+#undef e_ref
+#undef b_ref
+#undef a_ref
+
 

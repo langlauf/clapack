@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slartv_(integer *n, real *x, integer *incx, real *y, 
-	integer *incy, real *c, real *s, integer *incc)
+	integer *incy, real *c__, real *s, integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,35 +48,31 @@
     INCC    (input) INTEGER   
             The increment between elements of C and S. INCC > 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     /* Local variables */
-    static integer i, ic, ix, iy;
+    static integer i__, ic, ix, iy;
     static real xi, yi;
 
+    --s;
+    --c__;
+    --y;
+    --x;
 
-#define S(I) s[(I)-1]
-#define C(I) c[(I)-1]
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     ix = 1;
     iy = 1;
     ic = 1;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	xi = X(ix);
-	yi = Y(iy);
-	X(ix) = C(ic) * xi + S(ic) * yi;
-	Y(iy) = C(ic) * yi - S(ic) * xi;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	xi = x[ix];
+	yi = y[iy];
+	x[ix] = c__[ic] * xi + s[ic] * yi;
+	y[iy] = c__[ic] * yi - s[ic] * xi;
 	ix += *incx;
 	iy += *incy;
 	ic += *incc;

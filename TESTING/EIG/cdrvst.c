@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,8 +23,9 @@ static integer c__3 = 3;
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, 
 	complex *a, integer *lda, real *d1, real *d2, real *d3, real *wa1, 
 	real *wa2, real *wa3, complex *u, integer *ldu, complex *v, complex *
-	tau, complex *z, complex *work, integer *nwork, real *rwork, integer *
-	iwork, real *result, integer *info)
+	tau, complex *z__, complex *work, integer *lwork, real *rwork, 
+	integer *lrwork, integer *iwork, integer *liwork, real *result, 
+	integer *info)
 {
     /* Initialized data */
 
@@ -44,7 +46,7 @@ static integer c__3 = 3;
     integer a_dim1, a_offset, u_dim1, u_offset, v_dim1, v_offset, z_dim1, 
 	    z_offset, i__1, i__2, i__3, i__4, i__5, i__6, i__7[3];
     real r__1, r__2, r__3, r__4;
-    char ch__1[11], ch__2[13];
+    char ch__1[11], ch__2[13], ch__3[10];
 
     /* Builtin functions */
     double sqrt(doublereal), log(doublereal);
@@ -59,16 +61,24 @@ static integer c__3 = 3;
     static char uplo[1];
     static integer irow;
     static real temp1, temp2, temp3;
-    static integer i, j, idiag, m, n;
+    static integer i__, j, idiag, m, n;
     static logical badnn;
     extern doublereal ssxt1_(integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *);
-    extern /* Subroutine */ int chet21_(integer *, char *, integer *, integer 
-	    *, complex *, integer *, real *, real *, complex *, integer *, 
-	    complex *, integer *, complex *, complex *, real *, real *), chet22_(integer *, char *, integer *, integer *, integer 
-	    *, complex *, integer *, real *, real *, complex *, integer *, 
-	    complex *, integer *, complex *, complex *, real *, real *);
+    extern /* Subroutine */ int chbev_(char *, char *, integer *, integer *, 
+	    complex *, integer *, real *, complex *, integer *, complex *, 
+	    real *, integer *), chet21_(integer *, char *, 
+	    integer *, integer *, complex *, integer *, real *, real *, 
+	    complex *, integer *, complex *, integer *, complex *, complex *, 
+	    real *, real *), cheev_(char *, char *, integer *, 
+	    complex *, integer *, real *, complex *, integer *, real *, 
+	    integer *), chet22_(integer *, char *, integer *, 
+	    integer *, integer *, complex *, integer *, real *, real *, 
+	    complex *, integer *, complex *, integer *, complex *, complex *, 
+	    real *, real *);
     static integer imode, lwedc, iinfo;
+    extern /* Subroutine */ int chpev_(char *, char *, integer *, complex *, 
+	    real *, complex *, integer *, complex *, real *, integer *);
     static real aninv, anorm;
     static integer itemp, nmats, jsize, iuplo, nerrs, itype, j1, j2, jtype, 
 	    m2, m3, ntest, iseed2[4], iseed3[4], kd, il;
@@ -88,16 +98,18 @@ static integer c__3 = 3;
 	    integer *, integer *, integer *, integer *);
     static real vu;
     static integer idumma[1];
-    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
-	    *, integer *, complex *, integer *);
+    extern /* Subroutine */ int cheevr_(char *, char *, char *, integer *, 
+	    complex *, integer *, real *, real *, integer *, integer *, real *
+	    , integer *, real *, complex *, integer *, integer *, complex *, 
+	    integer *, real *, integer *, integer *, integer *, integer *);
     static integer ioldsd[4];
     extern /* Subroutine */ int chbevx_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, real *, complex *
 	    , integer *, complex *, real *, integer *, integer *, integer *);
     static integer lrwedc;
-    extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
-	    *, complex *, complex *, integer *), cheevx_(char *, char 
+    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
+	    *, integer *, complex *, integer *), cheevx_(char *, char 
 	    *, char *, integer *, complex *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, real *, complex *, 
 	    integer *, complex *, integer *, real *, integer *, integer *, 
@@ -105,24 +117,25 @@ static integer c__3 = 3;
     extern doublereal slarnd_(integer *, integer *);
     static real abstol;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
-	    *, integer *), clatmr_(integer *, integer *, char *, 
-	    integer *, char *, complex *, integer *, real *, complex *, char *
-	    , char *, complex *, integer *, real *, complex *, integer *, 
-	    real *, char *, integer *, integer *, integer *, real *, real *, 
-	    char *, complex *, integer *, integer *, integer *), clatms_(integer *, 
-	    integer *, char *, integer *, char *, real *, integer *, real *, 
-	    real *, integer *, integer *, char *, complex *, integer *, 
-	    complex *, integer *), xerbla_(char *, 
-	    integer *), slafts_(char *, integer *, integer *, integer 
-	    *, integer *, real *, integer *, real *, integer *, integer *);
+	    *, integer *), claset_(char *, integer *, integer *, 
+	    complex *, complex *, complex *, integer *), clatmr_(
+	    integer *, integer *, char *, integer *, char *, complex *, 
+	    integer *, real *, complex *, char *, char *, complex *, integer *
+	    , real *, complex *, integer *, real *, char *, integer *, 
+	    integer *, integer *, real *, real *, char *, complex *, integer *
+	    , integer *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
+	    real *, integer *, real *, real *, integer *, integer *, char *, 
+	    complex *, integer *, complex *, integer *), xerbla_(char *, integer *), slafts_(char *, 
+	    integer *, integer *, integer *, integer *, real *, integer *, 
+	    real *, integer *, integer *);
     static integer indwrk;
     extern /* Subroutine */ int chpevx_(char *, char *, char *, integer *, 
 	    complex *, real *, real *, integer *, integer *, real *, integer *
 	    , real *, complex *, integer *, complex *, real *, integer *, 
 	    integer *, integer *);
-    static real rtovfl, rtunfl;
+    static real rtovfl;
     static integer mtypes, ntestt;
-    static real ulpinv;
+    static real rtunfl, ulpinv;
     static integer lgn;
     static real ulp;
 
@@ -152,13 +165,33 @@ static integer c__3 = 3;
     static cilist io___81 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___82 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___83 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___84 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___85 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___86 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___87 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___90 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___92 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___93 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___94 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___95 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 3, 1999   
 
 
     Purpose   
@@ -167,27 +200,42 @@ static integer c__3 = 3;
          CDRVST  checks the Hermitian eigenvalue problem drivers.   
 
                  CHEEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
+                 eigenvectors of a complex Hermitian matrix,   
+                 using a divide-and-conquer algorithm.   
 
                  CHEEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix.   
 
+                 CHEEVR computes selected eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix   
+                 using the Relatively Robust Representation where it can.   
+
                  CHPEVD computes all eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
+                 storage, using a divide-and-conquer algorithm.   
 
                  CHPEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix in packed   
                  storage.   
 
                  CHBEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
+                 eigenvectors of a complex Hermitian band matrix,   
+                 using a divide-and-conquer algorithm.   
 
                  CHBEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian band matrix.   
 
-         When CDRVST is called, a number of matrix "sizes" ("n's") and a 
-  
+                 CHEEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix.   
+
+                 CHPEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix in packed   
+                 storage.   
+
+                 CHBEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian band matrix.   
+
+         When CDRVST is called, a number of matrix "sizes" ("n's") and a   
          number of matrix "types" are specified.  For each size ("n")   
          and each type of matrix, one matrix will be generated and used   
          to test the appropriate drivers.  For each matrix and each   
@@ -203,13 +251,10 @@ static integer c__3 = 3;
          eigenvector option is given and D1 and D2 are the eigenvalues   
          returned with and without the eigenvector option.   
 
-         The "sizes" are specified by an array NN(1:NSIZES); the value of 
-  
+         The "sizes" are specified by an array NN(1:NSIZES); the value of   
          each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES ); 
-  
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. 
-  
+         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
+         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
          Currently, the list of possible types is:   
 
          (1)  The zero matrix.   
@@ -220,21 +265,18 @@ static integer c__3 = 3;
               (ULP = (first number larger than 1) - 1 )   
          (4)  A diagonal matrix with geometrically spaced entries   
               1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP 
-  
+         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
               and random signs.   
 
          (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold ) 
-  
+         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
 
          (8)  A matrix of the form  U* D U, where U is unitary and   
               D has evenly spaced entries 1, ..., ULP with random signs   
               on the diagonal.   
 
          (9)  A matrix of the form  U* D U, where U is unitary and   
-              D has geometrically spaced entries 1, ..., ULP with random 
-  
+              D has geometrically spaced entries 1, ..., ULP with random   
               signs on the diagonal.   
 
          (10) A matrix of the form  U* D U, where U is unitary and   
@@ -242,21 +284,16 @@ static integer c__3 = 3;
               signs on the diagonal.   
 
          (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold ) 
-  
+         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
 
          (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold ) 
-  
-         (15) Same as (13), but multiplied by SQRT( underflow threshold ) 
-  
+         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
+         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
          (16) A band matrix with half bandwidth randomly chosen between   
               0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
               with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold ) 
-  
-         (18) Same as (16), but multiplied by SQRT( underflow threshold ) 
-  
+         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
+         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
 
     Arguments   
     =========   
@@ -317,7 +354,7 @@ static integer c__3 = 3;
             (e.g., if a routine returns IINFO not equal to 0.)   
             Not modified.   
 
-    A       REAL array, dimension (LDA , max(NN))   
+    A       COMPLEX array, dimension (LDA , max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
             computed.  On exit, A contains the last matrix actually   
             used.   
@@ -375,11 +412,11 @@ static integer c__3 = 3;
             CHEEVX, CHPEVD, CHPEVX, CHBEVD, and CHBEVX.   
             Modified.   
 
-    WORK  - COMPLEX array of dimension ( NWORK )   
+    WORK  - COMPLEX array of dimension ( LWORK )   
              Workspace.   
              Modified.   
 
-    NWORK - INTEGER   
+    LWORK - INTEGER   
              The number of entries in WORK.  This must be at least   
              2*max( NN(j), 2 )**2.   
              Not modified.   
@@ -388,11 +425,17 @@ static integer c__3 = 3;
              Workspace.   
              Modified.   
 
+    LRWORK - INTEGER   
+             The number of entries in RWORK.   
+
     IWORK   INTEGER array, dimension (6*max(NN))   
             Workspace.   
             Modified.   
 
-    RESULT  REAL array, dimension (42)   
+    LIWORK - INTEGER   
+             The number of entries in IWORK.   
+
+    RESULT  REAL array, dimension (??)   
             The values computed by the tests described above.   
             The values are currently limited to 1/ulp, to avoid   
             overflow.   
@@ -406,14 +449,13 @@ static integer c__3 = 3;
              -5: THRESH < 0   
              -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
             -16: LDU < 1 or LDU < NMAX.   
-            -21: NWORK too small.   
+            -21: LWORK too small.   
             If  SLATMR, SLATMS, CHETRD, SORGC3, CSTEQR, SSTERF,   
                 or SORMC2 returns an error code, the   
                 absolute value of it is returned.   
             Modified.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -439,8 +481,7 @@ static integer c__3 = 3;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -448,7 +489,7 @@ static integer c__3 = 3;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --d1;
     --d2;
@@ -457,13 +498,13 @@ static integer c__3 = 3;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --tau;
     --work;
@@ -506,7 +547,7 @@ static integer c__3 = 3;
     } else /* if(complicated condition) */ {
 /* Computing 2nd power */
 	i__1 = max(2,nmax);
-	if (i__1 * i__1 << 1 > *nwork) {
+	if (i__1 * i__1 << 1 > *lwork) {
 	    *info = -22;
 	}
     }
@@ -535,9 +576,9 @@ static integer c__3 = 3;
 
 /*     Loop over sizes, types */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed2[i - 1] = iseed[i];
-	iseed3[i - 1] = iseed[i];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed2[i__ - 1] = iseed[i__];
+	iseed3[i__ - 1] = iseed[i__];
 /* L20: */
     }
 
@@ -561,11 +602,11 @@ static integer c__3 = 3;
 /* Computing 2nd power */
 	    i__2 = n;
 	    lrwedc = (n << 2) + 1 + (n << 1) * lgn + i__2 * i__2 * 3;
-	    liwedc = n * 5 + 2;
+	    liwedc = n * 5 + 3;
 	} else {
 	    lwedc = 2;
 	    lrwedc = 8;
-	    liwedc = 7;
+	    liwedc = 8;
 	}
 	aninv = 1.f / (real) max(1,n);
 
@@ -578,7 +619,7 @@ static integer c__3 = 3;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L950;
+		goto L1210;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -601,8 +642,7 @@ static integer c__3 = 3;
              =6         random       (none)   
              =7                      random diagonal   
              =8                      random Hermitian   
-             =9                      band Hermitian, w/ eigenvalue
-s */
+             =9                      band Hermitian, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -650,7 +690,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    a[i__4].r = anorm, a[i__4].i = 0.f;
 /* L80: */
 		}
@@ -695,7 +735,7 @@ L70:
 
 /*              Hermitian banded, eigenvalues specified */
 
-		ihbw = (n - 1) * slarnd_(&c__1, iseed3);
+		ihbw = (integer) ((n - 1) * slarnd_(&c__1, iseed3));
 		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
 			 &anorm, &ihbw, &ihbw, "Z", &u[u_offset], ldu, &work[
 			1], &iinfo);
@@ -706,15 +746,17 @@ L70:
 		i__3 = ihbw;
 		for (idiag = -ihbw; idiag <= i__3; ++idiag) {
 		    irow = ihbw - idiag + 1;
-		    j1 = max(1,idiag);
+/* Computing MAX */
+		    i__4 = 1, i__5 = idiag + 1;
+		    j1 = max(i__4,i__5);
 /* Computing MIN */
 		    i__4 = n, i__5 = n + idiag;
 		    j2 = min(i__4,i__5);
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
-			i = j - idiag;
-			i__5 = i + j * a_dim1;
-			i__6 = irow + j * u_dim1;
+			i__ = j - idiag;
+			i__5 = a_subscr(i__, j);
+			i__6 = u_subscr(irow, j);
 			a[i__5].r = u[i__6].r, a[i__5].i = u[i__6].i;
 /* L90: */
 		    }
@@ -727,7 +769,7 @@ L70:
 	    if (iinfo != 0) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -744,8 +786,8 @@ L110:
 		il = 1;
 		iu = n;
 	    } else {
-		il = (n - 1) * slarnd_(&c__1, iseed2) + 1;
-		iu = (n - 1) * slarnd_(&c__1, iseed2) + 1;
+		il = (integer) ((n - 1) * slarnd_(&c__1, iseed2)) + 1;
+		iu = (integer) ((n - 1) * slarnd_(&c__1, iseed2)) + 1;
 		if (il > iu) {
 		    itemp = il;
 		    il = iu;
@@ -765,8 +807,7 @@ L110:
 
 /*              Call CHEEVD and CHEEVX. */
 
-		clacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu)
-			;
+		clacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
 		cheevd_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], &
@@ -778,8 +819,8 @@ L110:
 		    i__7[0] = 9, a__1[0] = "CHEEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -800,11 +841,10 @@ L110:
 /*              Do tests 1 and 2. */
 
 		chet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
-			d2[1], &a[a_offset], ldu, &z[z_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
 		cheevd_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], &
@@ -816,8 +856,8 @@ L110:
 		    i__7[0] = 9, a__1[0] = "CHEEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -853,8 +893,7 @@ L110:
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
 L130:
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
@@ -895,8 +934,8 @@ L130:
 		}
 
 		cheevx_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m, &wa1[1], &z[z_offset], ldu, &work[1]
-			, nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[
+			1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
 			iinfo);
 		if (iinfo != 0) {
 		    io___57.ciunit = *nounit;
@@ -905,8 +944,8 @@ L130:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -926,18 +965,17 @@ L130:
 
 /*              Do tests 4 and 5. */
 
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		cheevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___59.ciunit = *nounit;
 		    s_wsfe(&io___59);
@@ -945,8 +983,8 @@ L130:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -983,15 +1021,14 @@ L130:
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
 L150:
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
 		cheevx_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___60.ciunit = *nounit;
 		    s_wsfe(&io___60);
@@ -999,8 +1036,8 @@ L150:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1018,19 +1055,18 @@ L150:
 
 /*              Do tests 7 and 8. */
 
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
 		cheevx_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___62.ciunit = *nounit;
 		    s_wsfe(&io___62);
@@ -1038,8 +1074,8 @@ L150:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1073,15 +1109,14 @@ L150:
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
 L160:
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
 		cheevx_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___63.ciunit = *nounit;
 		    s_wsfe(&io___63);
@@ -1089,8 +1124,8 @@ L160:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1108,19 +1143,18 @@ L160:
 
 /*              Do tests 10 and 11. */
 
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
 		cheevx_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___64.ciunit = *nounit;
 		    s_wsfe(&io___64);
@@ -1128,8 +1162,8 @@ L160:
 		    i__7[0] = 11, a__1[0] = "CHEEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1171,11 +1205,9 @@ L170:
 
 /*              Call CHPEVD and CHPEVX. */
 
-		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triang
-ular   
+/*              Load array WORK with the upper or lower triangular   
                 part of the matrix in packed form. */
 
 		if (iuplo == 1) {
@@ -1183,9 +1215,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1198,9 +1230,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1212,9 +1244,9 @@ ular
 
 		++ntest;
 		indwrk = n * (n + 1) / 2 + 1;
-		chpevd_("V", uplo, &n, &work[1], &d1[1], &z[z_offset], ldu, &
-			work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], &
-			liwedc, &iinfo);
+		chpevd_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, 
+			&work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], 
+			&liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___67.ciunit = *nounit;
 		    s_wsfe(&io___67);
@@ -1222,8 +1254,8 @@ ular
 		    i__7[0] = 9, a__1[0] = "CHPEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1244,17 +1276,17 @@ ular
 /*              Do tests 13 and 14. */
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1267,9 +1299,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1281,9 +1313,9 @@ ular
 
 		ntest += 2;
 		indwrk = n * (n + 1) / 2 + 1;
-		chpevd_("N", uplo, &n, &work[1], &d3[1], &z[z_offset], ldu, &
-			work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], &
-			liwedc, &iinfo);
+		chpevd_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, 
+			&work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], 
+			&liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___68.ciunit = *nounit;
 		    s_wsfe(&io___68);
@@ -1291,8 +1323,8 @@ ular
 		    i__7[0] = 9, a__1[0] = "CHPEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1327,8 +1359,7 @@ ular
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array WORK with the upper or lower triang
-ular part   
+/*              Load array WORK with the upper or lower triangular part   
                 of the matrix in packed form. */
 
 L270:
@@ -1337,9 +1368,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1352,9 +1383,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1403,8 +1434,8 @@ L270:
 		}
 
 		chpevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &wa1[1], &z[z_offset], ldu, &v[v_offset], 
-			&rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
+			, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___69.ciunit = *nounit;
 		    s_wsfe(&io___69);
@@ -1412,8 +1443,8 @@ L270:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1434,8 +1465,8 @@ L270:
 /*              Do tests 16 and 17. */
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -1444,9 +1475,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1459,9 +1490,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1472,8 +1503,9 @@ L270:
 		}
 
 		chpevx_("N", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___70.ciunit = *nounit;
 		    s_wsfe(&io___70);
@@ -1481,8 +1513,8 @@ L270:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1525,9 +1557,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1540,9 +1572,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1553,8 +1585,9 @@ L370:
 		}
 
 		chpevx_("V", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___71.ciunit = *nounit;
 		    s_wsfe(&io___71);
@@ -1562,8 +1595,8 @@ L370:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1584,7 +1617,7 @@ L370:
 /*              Do tests 19 and 20. */
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -1594,9 +1627,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1609,9 +1642,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1622,8 +1655,9 @@ L370:
 		}
 
 		chpevx_("N", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___72.ciunit = *nounit;
 		    s_wsfe(&io___72);
@@ -1631,8 +1665,8 @@ L370:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1672,9 +1706,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1687,9 +1721,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1700,8 +1734,9 @@ L460:
 		}
 
 		chpevx_("V", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___73.ciunit = *nounit;
 		    s_wsfe(&io___73);
@@ -1709,8 +1744,8 @@ L460:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1731,7 +1766,7 @@ L460:
 /*              Do tests 22 and 23. */
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -1741,9 +1776,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1756,9 +1791,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1769,8 +1804,9 @@ L460:
 		}
 
 		chpevx_("N", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___74.ciunit = *nounit;
 		    s_wsfe(&io___74);
@@ -1778,8 +1814,8 @@ L460:
 		    i__7[0] = 11, a__1[0] = "CHPEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1831,8 +1867,7 @@ L550:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 		if (iuplo == 1) {
@@ -1841,9 +1876,9 @@ r part
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L560: */
 			}
@@ -1855,9 +1890,9 @@ r part
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L580: */
 			}
@@ -1866,7 +1901,7 @@ r part
 		}
 
 		++ntest;
-		chbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z[
+		chbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &rwork[1], &lrwedc, 
 			&iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1876,8 +1911,8 @@ r part
 		    i__7[0] = 9, a__1[0] = "CHBEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -1899,8 +1934,8 @@ r part
 /*              Do tests 25 and 26. */
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1908,9 +1943,9 @@ r part
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L600: */
 			}
@@ -1922,9 +1957,9 @@ r part
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L620: */
 			}
@@ -1933,7 +1968,7 @@ r part
 		}
 
 		ntest += 2;
-		chbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z[
+		chbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &rwork[1], &lrwedc, 
 			&iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1943,8 +1978,8 @@ r part
 		    i__7[0] = 9, a__1[0] = "CHBEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -1980,8 +2015,7 @@ r part
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L650:
@@ -1991,9 +2025,9 @@ L650:
 /* Computing MAX */
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__6); i <= i__4; ++i) {
-			    i__5 = kd + 1 + i - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L660: */
 			}
@@ -2005,9 +2039,9 @@ L650:
 /* Computing MIN */
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
-			for (i = j; i <= i__4; ++i) {
-			    i__5 = i + 1 - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L680: */
 			}
@@ -2018,8 +2052,8 @@ L650:
 		++ntest;
 		chbevx_("V", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m, &wa1[
-			1], &z[z_offset], ldu, &work[1], &rwork[1], &iwork[1],
-			 &iwork[n * 5 + 1], &iinfo);
+			1], &z__[z_offset], ldu, &work[1], &rwork[1], &iwork[
+			1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___78.ciunit = *nounit;
 		    s_wsfe(&io___78);
@@ -2027,8 +2061,8 @@ L650:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2050,8 +2084,8 @@ L650:
 /*              Do tests 28 and 29. */
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2061,9 +2095,9 @@ L650:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L700: */
 			}
@@ -2075,9 +2109,9 @@ L650:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L720: */
 			}
@@ -2087,7 +2121,7 @@ L650:
 
 		chbevx_("N", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___79.ciunit = *nounit;
@@ -2096,8 +2130,8 @@ L650:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2134,8 +2168,7 @@ L650:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L750:
@@ -2146,9 +2179,9 @@ L750:
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L760: */
 			}
@@ -2160,9 +2193,9 @@ L750:
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L780: */
 			}
@@ -2172,7 +2205,7 @@ L750:
 
 		chbevx_("V", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___80.ciunit = *nounit;
@@ -2181,8 +2214,8 @@ L750:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2204,7 +2237,7 @@ L750:
 /*              Do tests 31 and 32. */
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -2215,9 +2248,9 @@ L750:
 /* Computing MAX */
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__6); i <= i__4; ++i) {
-			    i__5 = kd + 1 + i - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L800: */
 			}
@@ -2229,9 +2262,9 @@ L750:
 /* Computing MIN */
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
-			for (i = j; i <= i__4; ++i) {
-			    i__5 = i + 1 - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L820: */
 			}
@@ -2240,7 +2273,7 @@ L750:
 		}
 		chbevx_("N", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___81.ciunit = *nounit;
@@ -2249,8 +2282,8 @@ L750:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2284,8 +2317,7 @@ L750:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L840:
@@ -2296,9 +2328,9 @@ L840:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L850: */
 			}
@@ -2310,9 +2342,9 @@ L840:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L870: */
 			}
@@ -2321,7 +2353,7 @@ L840:
 		}
 		chbevx_("V", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___82.ciunit = *nounit;
@@ -2330,8 +2362,8 @@ L840:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2353,7 +2385,7 @@ L840:
 /*              Do tests 34 and 35. */
 
 		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -2364,9 +2396,9 @@ L840:
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L890: */
 			}
@@ -2378,9 +2410,9 @@ L840:
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L910: */
 			}
@@ -2389,7 +2421,7 @@ L840:
 		}
 		chbevx_("N", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___83.ciunit = *nounit;
@@ -2398,8 +2430,8 @@ L840:
 		    i__7[0] = 11, a__1[0] = "CHBEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2440,7 +2472,694 @@ L840:
 
 L930:
 
+/*              Call CHEEV */
+
+		clacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
+
+		++ntest;
+		cheev_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], 
+			lwork, &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___84.ciunit = *nounit;
+		    s_wsfe(&io___84);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHEEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L950;
+		    }
+		}
+
+/*              Do tests 37 and 38 */
+
+		chet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		ntest += 2;
+		cheev_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], 
+			lwork, &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___85.ciunit = *nounit;
+		    s_wsfe(&io___85);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHEEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L950;
+		    }
+		}
+
+/*              Do test 39 */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = d3[j], dabs(r__2));
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
 /* L940: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+L950:
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+/*              Call CHPEV   
+
+                Load array WORK with the upper or lower triangular   
+                part of the matrix in packed form. */
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = j;
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L960: */
+			}
+/* L970: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = n;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L980: */
+			}
+/* L990: */
+		    }
+		}
+
+		++ntest;
+		indwrk = n * (n + 1) / 2 + 1;
+		chpev_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, &
+			work[indwrk], &rwork[1], &iinfo)
+			;
+		if (iinfo != 0) {
+		    io___86.ciunit = *nounit;
+		    s_wsfe(&io___86);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHPEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1050;
+		    }
+		}
+
+/*              Do tests 40 and 41. */
+
+		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = j;
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L1000: */
+			}
+/* L1010: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = n;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L1020: */
+			}
+/* L1030: */
+		    }
+		}
+
+		ntest += 2;
+		indwrk = n * (n + 1) / 2 + 1;
+		chpev_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, &
+			work[indwrk], &rwork[1], &iinfo)
+			;
+		if (iinfo != 0) {
+		    io___87.ciunit = *nounit;
+		    s_wsfe(&io___87);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHPEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1050;
+		    }
+		}
+
+/*              Do test 42 */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = d3[j], dabs(r__2));
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L1040: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+L1050:
+
+/*              Call CHBEV */
+
+		if (jtype <= 7) {
+		    kd = 0;
+		} else if (jtype >= 8 && jtype <= 15) {
+/* Computing MAX */
+		    i__3 = n - 1;
+		    kd = max(i__3,0);
+		} else {
+		    kd = ihbw;
+		}
+
+/*              Load array V with the upper or lower triangular part   
+                of the matrix in band form. */
+
+		if (iuplo == 1) {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			i__5 = 1, i__6 = j - kd;
+			i__4 = j;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
+			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
+/* L1060: */
+			}
+/* L1070: */
+		    }
+		} else {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+			i__5 = n, i__6 = j + kd;
+			i__4 = min(i__5,i__6);
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
+			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
+/* L1080: */
+			}
+/* L1090: */
+		    }
+		}
+
+		++ntest;
+		chbev_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
+			z_offset], ldu, &work[1], &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___88.ciunit = *nounit;
+		    s_wsfe(&io___88);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHBEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1140;
+		    }
+		}
+
+/*              Do tests 43 and 44. */
+
+		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		if (iuplo == 1) {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			i__4 = 1, i__5 = j - kd;
+			i__6 = j;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
+			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
+/* L1100: */
+			}
+/* L1110: */
+		    }
+		} else {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+			i__4 = n, i__5 = j + kd;
+			i__6 = min(i__4,i__5);
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
+			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
+/* L1120: */
+			}
+/* L1130: */
+		    }
+		}
+
+		ntest += 2;
+		chbev_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
+			z_offset], ldu, &work[1], &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___89.ciunit = *nounit;
+		    s_wsfe(&io___89);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "CHBEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1140;
+		    }
+		}
+
+L1140:
+
+/*              Do test 45. */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = d3[j], dabs(r__2));
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = d1[j] - d3[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L1150: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+		clacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
+		++ntest;
+		i__3 = *liwork - (n << 1);
+		cheevr_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___90.ciunit = *nounit;
+		    s_wsfe(&io___90);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(V,A,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1170;
+		    }
+		}
+
+/*              Do tests 45 and 46 (or ... ) */
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		i__3 = *liwork - (n << 1);
+		cheevr_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___91.ciunit = *nounit;
+		    s_wsfe(&io___91);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(N,A,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1170;
+		    }
+		}
+
+/*              Do test 47 (or ... ) */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = wa1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = wa2[j], dabs(r__2))
+			    ;
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = wa1[j] - wa2[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L1160: */
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[ntest] = temp2 / dmax(r__1,r__2);
+
+L1170:
+
+		++ntest;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		cheevr_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___92.ciunit = *nounit;
+		    s_wsfe(&io___92);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(V,I,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1180;
+		    }
+		}
+
+/*              Do tests 48 and 49 (or +??) */
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		cheevr_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___93.ciunit = *nounit;
+		    s_wsfe(&io___93);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(N,I,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1180;
+		    }
+		}
+
+/*              Do test 50 (or +??) */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * temp3;
+		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+L1180:
+
+		++ntest;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		cheevr_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___94.ciunit = *nounit;
+		    s_wsfe(&io___94);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(V,V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1190;
+		    }
+		}
+
+/*              Do tests 51 and 52 (or +??) */
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		chet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		cheevr_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___95.ciunit = *nounit;
+		    s_wsfe(&io___95);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "CHEEVR(N,V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1190;
+		    }
+		}
+
+		if (m3 == 0 && n > 0) {
+		    result[ntest] = ulpinv;
+		    goto L1190;
+		}
+
+/*              Do test 52 (or +??) */
+
+		temp1 = ssxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = ssxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+		if (n > 0) {
+/* Computing MAX */
+		    r__2 = dabs(wa1[1]), r__3 = (r__1 = wa1[n], dabs(r__1));
+		    temp3 = dmax(r__2,r__3);
+		} else {
+		    temp3 = 0.f;
+		}
+/* Computing MAX */
+		r__1 = unfl, r__2 = temp3 * ulp;
+		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
+
+		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+
+
+
+/*              Load array V with the upper or lower triangular part   
+                of the matrix in band form. */
+
+L1190:
+
+/* L1200: */
 		;
 	    }
 
@@ -2450,10 +3169,10 @@ L930:
 	    slafts_("CST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
 
-L950:
+L1210:
 	    ;
 	}
-/* L960: */
+/* L1220: */
     }
 
 /*     Summary */
@@ -2466,4 +3185,12 @@ L950:
 /*     End of CDRVST */
 
 } /* cdrvst_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+#undef a_ref
+#undef a_subscr
+
 

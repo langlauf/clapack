@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgecon_(char *norm, integer *n, real *a, integer *lda, 
 	real *anorm, real *rcond, real *work, integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -12,8 +13,7 @@
     Purpose   
     =======   
 
-    SGECON estimates the reciprocal of the condition number of a general 
-  
+    SGECON estimates the reciprocal of the condition number of a general   
     real matrix A, in either the 1-norm or the infinity-norm, using   
     the LU factorization computed by SGETRF.   
 
@@ -56,15 +56,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -91,12 +88,13 @@
     static real smlnum;
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
+    --iwork;
 
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
     if (! onenrm && ! lsame_(norm, "I")) {
@@ -137,43 +135,43 @@
     }
     kase = 0;
 L10:
-    slacon_(n, &WORK(*n + 1), &WORK(1), &IWORK(1), &ainvnm, &kase);
+    slacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (kase == kase1) {
 
 /*           Multiply by inv(L). */
 
-	    slatrs_("Lower", "No transpose", "Unit", normin, n, &A(1,1), 
-		    lda, &WORK(1), &sl, &WORK((*n << 1) + 1), info);
+	    slatrs_("Lower", "No transpose", "Unit", normin, n, &a[a_offset], 
+		    lda, &work[1], &sl, &work[(*n << 1) + 1], info);
 
 /*           Multiply by inv(U). */
 
-	    slatrs_("Upper", "No transpose", "Non-unit", normin, n, &A(1,1), lda, &WORK(1), &su, &WORK(*n * 3 + 1), info);
+	    slatrs_("Upper", "No transpose", "Non-unit", normin, n, &a[
+		    a_offset], lda, &work[1], &su, &work[*n * 3 + 1], info);
 	} else {
 
 /*           Multiply by inv(U'). */
 
-	    slatrs_("Upper", "Transpose", "Non-unit", normin, n, &A(1,1),
-		     lda, &WORK(1), &su, &WORK(*n * 3 + 1), info);
+	    slatrs_("Upper", "Transpose", "Non-unit", normin, n, &a[a_offset],
+		     lda, &work[1], &su, &work[*n * 3 + 1], info);
 
 /*           Multiply by inv(L'). */
 
-	    slatrs_("Lower", "Transpose", "Unit", normin, n, &A(1,1), 
-		    lda, &WORK(1), &sl, &WORK((*n << 1) + 1), info);
+	    slatrs_("Lower", "Transpose", "Unit", normin, n, &a[a_offset], 
+		    lda, &work[1], &sl, &work[(*n << 1) + 1], info);
 	}
 
-/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. 
-*/
+/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. */
 
 	scale = sl * su;
 	*(unsigned char *)normin = 'Y';
 	if (scale != 1.f) {
-	    ix = isamax_(n, &WORK(1), &c__1);
-	    if (scale < (r__1 = WORK(ix), dabs(r__1)) * smlnum || scale == 
+	    ix = isamax_(n, &work[1], &c__1);
+	    if (scale < (r__1 = work[ix], dabs(r__1)) * smlnum || scale == 
 		    0.f) {
 		goto L20;
 	    }
-	    srscl_(n, &scale, &WORK(1), &c__1);
+	    srscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -157,7 +158,7 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -184,14 +185,13 @@ static integer c__8 = 8;
                GLM:  GLM Problem   
                GSV:  Generalized Singular Value Decomposition   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (*iounit <= 0) {
 	return 0;
     }
-    s_copy(c2, path, 3L, 3L);
+    s_copy(c2, path, (ftnlen)3, (ftnlen)3);
 
 /*     First line describing matrices in this path */
 
@@ -199,31 +199,31 @@ static integer c__8 = 8;
 	itype = 1;
 	io___3.ciunit = *iounit;
 	s_wsfe(&io___3);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else if (lsamen_(&c__3, c2, "GRQ")) {
 	itype = 2;
 	io___4.ciunit = *iounit;
 	s_wsfe(&io___4);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else if (lsamen_(&c__3, c2, "LSE")) {
 	itype = 3;
 	io___5.ciunit = *iounit;
 	s_wsfe(&io___5);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else if (lsamen_(&c__3, c2, "GLM")) {
 	itype = 4;
 	io___6.ciunit = *iounit;
 	s_wsfe(&io___6);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else if (lsamen_(&c__3, c2, "GSV")) {
 	itype = 5;
 	io___7.ciunit = *iounit;
 	s_wsfe(&io___7);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -231,7 +231,7 @@ static integer c__8 = 8;
 
     io___8.ciunit = *iounit;
     s_wsfe(&io___8);
-    do_fio(&c__1, "Matrix types: ", 14L);
+    do_fio(&c__1, "Matrix types: ", (ftnlen)14);
     e_wsfe();
 
     if (itype == 1) {
@@ -405,7 +405,7 @@ static integer c__8 = 8;
 
     io___49.ciunit = *iounit;
     s_wsfe(&io___49);
-    do_fio(&c__1, "Test ratios: ", 13L);
+    do_fio(&c__1, "Test ratios: ", (ftnlen)13);
     e_wsfe();
 
     if (itype == 1) {

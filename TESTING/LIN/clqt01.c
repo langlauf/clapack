@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -57,7 +58,13 @@ static real c_b25 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -66,8 +73,7 @@ static real c_b25 = 1.f;
     Purpose   
     =======   
 
-    CLQT01 tests CGELQF, which computes the LQ factorization of an m-by-n 
-  
+    CLQT01 tests CGELQF, which computes the LQ factorization of an m-by-n   
     matrix A, and partially tests CUNGLQ which forms the n-by-n   
     orthogonal matrix Q.   
 
@@ -86,8 +92,7 @@ static real c_b25 = 1.f;
             The m-by-n matrix A.   
 
     AF      (output) COMPLEX array, dimension (LDA,N)   
-            Details of the LQ factorization of A, as returned by CGELQF. 
-  
+            Details of the LQ factorization of A, as returned by CGELQF.   
             See CGELQF for further details.   
 
     Q       (output) COMPLEX array, dimension (LDA,N)   
@@ -100,8 +105,7 @@ static real c_b25 = 1.f;
             LDA >= max(M,N).   
 
     TAU     (output) COMPLEX array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by CGELQF.   
 
     WORK    (workspace) COMPLEX array, dimension (LWORK)   
@@ -116,22 +120,21 @@ static real c_b25 = 1.f;
             RESULT(1) = norm( L - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = l_dim1 + 1;
+    l_offset = 1 + l_dim1 * 1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -148,7 +151,7 @@ static real c_b25 = 1.f;
 
 /*     Factorize the matrix A in the array AF. */
 
-    s_copy(srnamc_1.srnamt, "CGELQF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CGELQF", (ftnlen)6, (ftnlen)6);
     cgelqf_(m, n, &af[af_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy details of Q */
@@ -156,13 +159,12 @@ static real c_b25 = 1.f;
     claset_("Full", n, n, &c_b1, &c_b1, &q[q_offset], lda);
     if (*n > 1) {
 	i__1 = *n - 1;
-	clacpy_("Upper", m, &i__1, &af[(af_dim1 << 1) + 1], lda, &q[(q_dim1 <<
-		 1) + 1], lda);
+	clacpy_("Upper", m, &i__1, &af_ref(1, 2), lda, &q_ref(1, 2), lda);
     }
 
 /*     Generate the n-by-n matrix Q */
 
-    s_copy(srnamc_1.srnamt, "CUNGLQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "CUNGLQ", (ftnlen)6, (ftnlen)6);
     cunglq_(n, n, &minmn, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy L */
@@ -202,4 +204,10 @@ static real c_b25 = 1.f;
 /*     End of CLQT01 */
 
 } /* clqt01_ */
+
+#undef af_ref
+#undef af_subscr
+#undef q_ref
+#undef q_subscr
+
 

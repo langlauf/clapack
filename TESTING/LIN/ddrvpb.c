@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -69,8 +70,8 @@ static doublereal c_b46 = 1.;
     static doublereal amax;
     static char path[3];
     static integer imat, info;
-    static char dist[1], uplo[1], type[1];
-    static integer nrun, i, k, n, ifact;
+    static char dist[1], uplo[1], type__[1];
+    static integer nrun, i__, k, n, ifact;
     extern /* Subroutine */ int dget04_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
     static integer nfail, iseed[4], nfact;
@@ -154,10 +155,10 @@ static doublereal c_b46 = 1.;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -169,8 +170,7 @@ static doublereal c_b46 = 1.;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -222,8 +222,7 @@ static doublereal c_b46 = 1.;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -244,13 +243,13 @@ static doublereal c_b46 = 1.;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "PB", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "PB", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -294,10 +293,8 @@ static doublereal c_b46 = 1.;
 	i__2 = nkd;
 	for (ikd = 1; ikd <= i__2; ++ikd) {
 
-/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This
- order   
-             makes it easier to skip redundant values for small va
-lues   
+/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This order   
+             makes it easier to skip redundant values for small values   
              of N. */
 
 	    kd = kdval[ikd - 1];
@@ -321,34 +318,32 @@ lues
 		i__3 = nimat;
 		for (imat = 1; imat <= i__3; ++imat) {
 
-/*                 Do the tests only if DOTYPE( IMAT ) is 
-true. */
+/*                 Do the tests only if DOTYPE( IMAT ) is true. */
 
 		    if (! dotype[imat]) {
-			goto L90;
+			goto L80;
 		    }
 
-/*                 Skip types 2, 3, or 4 if the matrix siz
-e is too small. */
+/*                 Skip types 2, 3, or 4 if the matrix size is too small. */
 
 		    zerot = imat >= 2 && imat <= 4;
 		    if (zerot && n < imat - 1) {
-			goto L90;
+			goto L80;
 		    }
 
 		    if (! zerot || ! dotype[1]) {
 
-/*                    Set up parameters with DLATB4 an
-d generate a test   
+/*                    Set up parameters with DLATB4 and generate a test   
                       matrix with DLATMS. */
 
-			dlatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &
-				mode, &cndnum, dist);
+			dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm,
+				 &mode, &cndnum, dist);
 
-			s_copy(srnamc_1.srnamt, "DLATMS", 6L, 6L);
-			dlatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &
-				cndnum, &anorm, &kd, &kd, packit, &a[koff], &
-				ldab, &work[1], &info);
+			s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)
+				6);
+			dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode,
+				 &cndnum, &anorm, &kd, &kd, packit, &a[koff], 
+				&ldab, &work[1], &info);
 
 /*                    Check error code from DLATMS. */
 
@@ -356,14 +351,12 @@ d generate a test
 			    alaerh_(path, "DLATMS", &info, &c__0, uplo, &n, &
 				    n, &c_n1, &c_n1, &c_n1, &imat, &nfail, &
 				    nerrs, nout);
-			    goto L90;
+			    goto L80;
 			}
 		    } else if (izero > 0) {
 
-/*                    Use the same matrix for types 3 
-and 4 as for type   
-                      2 by copying back the zeroed out
- column, */
+/*                    Use the same matrix for types 3 and 4 as for type   
+                      2 by copying back the zeroed out column, */
 
 			iw = (lda << 1) + 1;
 			if (iuplo == 1) {
@@ -392,10 +385,8 @@ and 4 as for type
 			}
 		    }
 
-/*                 For types 2-4, zero one row and column 
-of the matrix   
-                   to test that INFO is returned correctly
-. */
+/*                 For types 2-4, zero one row and column of the matrix   
+                   to test that INFO is returned correctly. */
 
 		    izero = 0;
 		    if (zerot) {
@@ -407,15 +398,14 @@ of the matrix
 			    izero = n / 2 + 1;
 			}
 
-/*                    Save the zeroed out row and colu
-mn in WORK(*,3) */
+/*                    Save the zeroed out row and column in WORK(*,3) */
 
 			iw = lda << 1;
 /* Computing MIN */
 			i__5 = (kd << 1) + 1;
 			i__4 = min(i__5,n);
-			for (i = 1; i <= i__4; ++i) {
-			    work[iw + i] = 0.;
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    work[iw + i__] = 0.;
 /* L20: */
 			}
 			++iw;
@@ -476,30 +466,24 @@ mn in WORK(*,3) */
 
 			    if (zerot) {
 				if (prefac) {
-				    goto L70;
+				    goto L60;
 				}
 				rcondc = 0.;
 
 			    } else if (! lsame_(fact, "N")) {
 
-/*                          Compute the condit
-ion number for comparison   
-                            with the value ret
-urned by DPBSVX (FACT =   
-                            'N' reuses the con
-dition number from the   
-                            previous iteration
- with FACT = 'F'). */
+/*                          Compute the condition number for comparison   
+                            with the value returned by DPBSVX (FACT =   
+                            'N' reuses the condition number from the   
+                            previous iteration with FACT = 'F'). */
 
 				i__5 = kd + 1;
 				dlacpy_("Full", &i__5, &n, &asav[1], &ldab, &
 					afac[1], &ldab);
 				if (equil || iequed > 1) {
 
-/*                             Compute row
- and column scale factors to   
-                               equilibrate
- the matrix A. */
+/*                             Compute row and column scale factors to   
+                               equilibrate the matrix A. */
 
 				    dpbequ_(uplo, &n, &kd, &afac[1], &ldab, &
 					    s[1], &scond, &amax, &info);
@@ -508,8 +492,7 @@ dition number from the
 					    scond = 0.;
 					}
 
-/*                                Equi
-librate the matrix. */
+/*                                Equilibrate the matrix. */
 
 					dlaqsb_(uplo, &n, &kd, &afac[1], &
 						ldab, &s[1], &scond, &amax, 
@@ -517,37 +500,32 @@ librate the matrix. */
 				    }
 				}
 
-/*                          Save the condition
- number of the   
-                            non-equilibrated s
-ystem for use in DGET04. */
+/*                          Save the condition number of the   
+                            non-equilibrated system for use in DGET04. */
 
 				if (equil) {
 				    roldc = rcondc;
 				}
 
-/*                          Compute the 1-norm
- of A. */
+/*                          Compute the 1-norm of A. */
 
 				anorm = dlansb_("1", uplo, &n, &kd, &afac[1], 
 					&ldab, &rwork[1]);
 
-/*                          Factor the matrix 
-A. */
+/*                          Factor the matrix A. */
 
 				dpbtrf_(uplo, &n, &kd, &afac[1], &ldab, &info);
 
-/*                          Form the inverse o
-f A. */
+/*                          Form the inverse of A. */
 
 				dlaset_("Full", &n, &n, &c_b45, &c_b46, &a[1],
 					 &lda);
-				s_copy(srnamc_1.srnamt, "DPBTRS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (
+					ftnlen)6);
 				dpbtrs_(uplo, &n, &kd, &n, &afac[1], &ldab, &
 					a[1], &lda, &info);
 
-/*                          Compute the 1-norm
- condition number of A. */
+/*                          Compute the 1-norm condition number of A. */
 
 				ainvnm = dlange_("1", &n, &n, &a[1], &lda, &
 					rwork[1]);
@@ -557,19 +535,18 @@ f A. */
 				    rcondc = 1. / anorm / ainvnm;
 				}
 			    }
-/* L30:   
 
-                         Restore the matrix A. */
+/*                       Restore the matrix A. */
 
 			    i__5 = kd + 1;
 			    dlacpy_("Full", &i__5, &n, &asav[1], &ldab, &a[1],
 				     &ldab);
 
-/*                       Form an exact solution an
-d set the right hand   
+/*                       Form an exact solution and set the right hand   
                          side. */
 
-			    s_copy(srnamc_1.srnamt, "DLARHS", 6L, 6L);
+			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
+				    ftnlen)6);
 			    dlarhs_(path, xtype, uplo, " ", &n, &n, &kd, &kd, 
 				    nrhs, &a[1], &ldab, &xact[1], &lda, &b[1],
 				     &lda, iseed, &info);
@@ -579,13 +556,10 @@ d set the right hand
 
 			    if (nofact) {
 
-/*                          --- Test DPBSV  -
---   
+/*                          --- Test DPBSV  ---   
 
-                            Compute the L*L' o
-r U'*U factorization of the   
-                            matrix and solve t
-he system. */
+                            Compute the L*L' or U'*U factorization of the   
+                            matrix and solve the system. */
 
 				i__5 = kd + 1;
 				dlacpy_("Full", &i__5, &n, &a[1], &ldab, &
@@ -593,31 +567,29 @@ he system. */
 				dlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], 
 					&lda);
 
-				s_copy(srnamc_1.srnamt, "DPBSV ", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DPBSV ", (ftnlen)6, (
+					ftnlen)6);
 				dpbsv_(uplo, &n, &kd, nrhs, &afac[1], &ldab, &
 					x[1], &lda, &info);
 
-/*                          Check error code f
-rom DPBSV . */
+/*                          Check error code from DPBSV . */
 
 				if (info != izero) {
 				    alaerh_(path, "DPBSV ", &info, &izero, 
 					    uplo, &n, &n, &kd, &kd, nrhs, &
 					    imat, &nfail, &nerrs, nout);
-				    goto L50;
+				    goto L40;
 				} else if (info != 0) {
-				    goto L50;
+				    goto L40;
 				}
 
-/*                          Reconstruct matrix
- from factors and compute   
+/*                          Reconstruct matrix from factors and compute   
                             residual. */
 
 				dpbt01_(uplo, &n, &kd, &a[1], &ldab, &afac[1],
 					 &ldab, &rwork[1], result);
 
-/*                          Compute residual o
-f the computed solution. */
+/*                          Compute residual of the computed solution. */
 
 				dlacpy_("Full", &n, nrhs, &b[1], &lda, &work[
 					1], &lda);
@@ -625,17 +597,14 @@ f the computed solution. */
 					1], &lda, &work[1], &lda, &rwork[1], &
 					result[1]);
 
-/*                          Check solution fro
-m generated exact solution. */
+/*                          Check solution from generated exact solution. */
 
 				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
 					 &rcondc, &result[2]);
 				nt = 3;
 
-/*                          Print information 
-about the tests that did   
-                            not pass the thres
-hold. */
+/*                          Print information about the tests that did   
+                            not pass the threshold. */
 
 				i__5 = nt;
 				for (k = 1; k <= i__5; ++k) {
@@ -645,8 +614,8 @@ hold. */
 					}
 					io___57.ciunit = *nout;
 					s_wsfe(&io___57);
-					do_fio(&c__1, "DPBSV ", 6L);
-					do_fio(&c__1, uplo, 1L);
+					do_fio(&c__1, "DPBSV ", (ftnlen)6);
+					do_fio(&c__1, uplo, (ftnlen)1);
 					do_fio(&c__1, (char *)&n, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&kd, (ftnlen)
@@ -660,10 +629,10 @@ hold. */
 					e_wsfe();
 					++nfail;
 				    }
-/* L40: */
+/* L30: */
 				}
 				nrun += nt;
-L50:
+L40:
 				;
 			    }
 
@@ -678,46 +647,41 @@ L50:
 				    lda);
 			    if (iequed > 1 && n > 0) {
 
-/*                          Equilibrate the ma
-trix if FACT='F' and   
+/*                          Equilibrate the matrix if FACT='F' and   
                             EQUED='Y' */
 
 				dlaqsb_(uplo, &n, &kd, &a[1], &ldab, &s[1], &
 					scond, &amax, equed);
 			    }
 
-/*                       Solve the system and comp
-ute the condition   
-                         number and error bounds u
-sing DPBSVX. */
+/*                       Solve the system and compute the condition   
+                         number and error bounds using DPBSVX. */
 
-			    s_copy(srnamc_1.srnamt, "DPBSVX", 6L, 6L);
+			    s_copy(srnamc_1.srnamt, "DPBSVX", (ftnlen)6, (
+				    ftnlen)6);
 			    dpbsvx_(fact, uplo, &n, &kd, nrhs, &a[1], &ldab, &
 				    afac[1], &ldab, equed, &s[1], &b[1], &lda,
 				     &x[1], &lda, &rcond, &rwork[1], &rwork[*
 				    nrhs + 1], &work[1], &iwork[1], &info);
 
-/*                       Check the error code from
- DPBSVX. */
+/*                       Check the error code from DPBSVX. */
 
 			    if (info != izero) {
 /* Writing concatenation */
 				i__7[0] = 1, a__1[0] = fact;
 				i__7[1] = 1, a__1[1] = uplo;
-				s_cat(ch__1, a__1, i__7, &c__2, 2L);
+				s_cat(ch__1, a__1, i__7, &c__2, (ftnlen)2);
 				alaerh_(path, "DPBSVX", &info, &izero, ch__1, 
 					&n, &n, &kd, &kd, nrhs, &imat, &nfail,
 					 &nerrs, nout);
-				goto L70;
+				goto L60;
 			    }
 
 			    if (info == 0) {
 				if (! prefac) {
 
-/*                             Reconstruct
- matrix from factors and   
-                               compute res
-idual. */
+/*                             Reconstruct matrix from factors and   
+                               compute residual. */
 
 				    dpbt01_(uplo, &n, &kd, &a[1], &ldab, &
 					    afac[1], &ldab, &rwork[(*nrhs << 
@@ -727,8 +691,7 @@ idual. */
 				    k1 = 2;
 				}
 
-/*                          Compute residual o
-f the computed solution. */
+/*                          Compute residual of the computed solution. */
 
 				dlacpy_("Full", &n, nrhs, &bsav[1], &lda, &
 					work[1], &lda);
@@ -736,8 +699,7 @@ f the computed solution. */
 					&x[1], &lda, &work[1], &lda, &rwork[(*
 					nrhs << 1) + 1], &result[1]);
 
-/*                          Check solution fro
-m generated exact solution. */
+/*                          Check solution from generated exact solution. */
 
 				if (nofact || prefac && lsame_(equed, "N")) {
 				    dget04_(&n, nrhs, &x[1], &lda, &xact[1], &
@@ -747,8 +709,7 @@ m generated exact solution. */
 					    lda, &roldc, &result[2]);
 				}
 
-/*                          Check the error bo
-unds from iterative   
+/*                          Check the error bounds from iterative   
                             refinement. */
 
 				dpbt05_(uplo, &n, &kd, nrhs, &asav[1], &ldab, 
@@ -759,14 +720,12 @@ unds from iterative
 				k1 = 6;
 			    }
 
-/*                       Compare RCOND from DPBSVX
- with the computed   
+/*                       Compare RCOND from DPBSVX with the computed   
                          value in RCONDC. */
 
 			    result[5] = dget06_(&rcond, &rcondc);
 
-/*                       Print information about t
-he tests that did not   
+/*                       Print information about the tests that did not   
                          pass the threshold. */
 
 			    for (k = k1; k <= 6; ++k) {
@@ -777,14 +736,14 @@ he tests that did not
 				    if (prefac) {
 					io___60.ciunit = *nout;
 					s_wsfe(&io___60);
-					do_fio(&c__1, "DPBSVX", 6L);
-					do_fio(&c__1, fact, 1L);
-					do_fio(&c__1, uplo, 1L);
+					do_fio(&c__1, "DPBSVX", (ftnlen)6);
+					do_fio(&c__1, fact, (ftnlen)1);
+					do_fio(&c__1, uplo, (ftnlen)1);
 					do_fio(&c__1, (char *)&n, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&kd, (ftnlen)
 						sizeof(integer));
-					do_fio(&c__1, equed, 1L);
+					do_fio(&c__1, equed, (ftnlen)1);
 					do_fio(&c__1, (char *)&imat, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&k, (ftnlen)
@@ -795,9 +754,9 @@ he tests that did not
 				    } else {
 					io___61.ciunit = *nout;
 					s_wsfe(&io___61);
-					do_fio(&c__1, "DPBSVX", 6L);
-					do_fio(&c__1, fact, 1L);
-					do_fio(&c__1, uplo, 1L);
+					do_fio(&c__1, "DPBSVX", (ftnlen)6);
+					do_fio(&c__1, fact, (ftnlen)1);
+					do_fio(&c__1, uplo, (ftnlen)1);
 					do_fio(&c__1, (char *)&n, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&kd, (ftnlen)
@@ -812,22 +771,22 @@ he tests that did not
 				    }
 				    ++nfail;
 				}
-/* L60: */
+/* L50: */
 			    }
 			    nrun = nrun + 7 - k1;
-L70:
+L60:
 			    ;
 			}
-/* L80: */
+/* L70: */
 		    }
-L90:
+L80:
 		    ;
 		}
-/* L100: */
+/* L90: */
 	    }
-/* L110: */
+/* L100: */
 	}
-/* L120: */
+/* L110: */
     }
 
 /*     Print a summary of the results. */

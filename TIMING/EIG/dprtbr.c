@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__1 = 1;
 	     s_wsle(cilist *), e_wsle(void);
 
     /* Local variables */
-    static integer i, j, k, iline;
+    static integer i__, j, k, iline;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, fmt_9999, 0 };
@@ -40,7 +41,11 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define reslts_ref(a_1,a_2,a_3) reslts[((a_3)*reslts_dim2 + (a_2))*\
+reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -108,8 +113,7 @@ static integer c__1 = 1;
              The output unit number on which the table   
              is to be printed.  If NOUT <= 0, no output is printed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -119,7 +123,7 @@ static integer c__1 = 1;
     --doline;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
-    reslts_offset = reslts_dim1 * (reslts_dim2 + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * 1);
     reslts -= reslts_offset;
 
     /* Function Body */
@@ -133,9 +137,9 @@ static integer c__1 = 1;
     s_wsfe(&io___1);
     do_fio(&c__1, lab2, lab2_len);
     i__1 = *nsizes;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&mm[i], (ftnlen)sizeof(integer));
-	do_fio(&c__1, (char *)&nn[i], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&mm[i__], (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&nn[i__], (ftnlen)sizeof(integer));
     }
     e_wsfe();
     io___3.ciunit = *nout;
@@ -148,8 +152,8 @@ static integer c__1 = 1;
 	iline = 0;
 	if (dotype[j]) {
 	    i__2 = *nparms;
-	    for (i = 1; i <= i__2; ++i) {
-		if (doline[i]) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (doline[i__]) {
 		    ++iline;
 		    if (iline <= 1) {
 			io___6.ciunit = *nout;
@@ -157,9 +161,8 @@ static integer c__1 = 1;
 			do_fio(&c__1, (char *)&j, (ftnlen)sizeof(integer));
 			i__3 = *nsizes;
 			for (k = 1; k <= i__3; ++k) {
-			    do_fio(&c__1, (char *)&reslts[i + (j + k * 
-				    reslts_dim2) * reslts_dim1], (ftnlen)
-				    sizeof(doublereal));
+			    do_fio(&c__1, (char *)&reslts_ref(i__, j, k), (
+				    ftnlen)sizeof(doublereal));
 			}
 			e_wsfe();
 		    } else {
@@ -167,9 +170,8 @@ static integer c__1 = 1;
 			s_wsfe(&io___8);
 			i__3 = *nsizes;
 			for (k = 1; k <= i__3; ++k) {
-			    do_fio(&c__1, (char *)&reslts[i + (j + k * 
-				    reslts_dim2) * reslts_dim1], (ftnlen)
-				    sizeof(doublereal));
+			    do_fio(&c__1, (char *)&reslts_ref(i__, j, k), (
+				    ftnlen)sizeof(doublereal));
 			}
 			e_wsfe();
 		    }
@@ -190,4 +192,7 @@ static integer c__1 = 1;
 /*     End of DPRTBR */
 
 } /* dprtbr_ */
+
+#undef reslts_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgerq2_(integer *m, integer *n, doublereal *a, integer *
 	lda, doublereal *tau, doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -27,14 +28,10 @@
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
             On entry, the m by n matrix A.   
             On exit, if m <= n, the upper triangle of the subarray   
-            A(1:m,n-m+1:n) contains the m by m upper triangular matrix R; 
-  
-            if m >= n, the elements on and above the (m-n)-th subdiagonal 
-  
-            contain the m by n upper trapezoidal matrix R; the remaining 
-  
-            elements, with the array TAU, represent the orthogonal matrix 
-  
+            A(1:m,n-m+1:n) contains the m by m upper triangular matrix R;   
+            if m >= n, the elements on and above the (m-n)-th subdiagonal   
+            contain the m by n upper trapezoidal matrix R; the remaining   
+            elements, with the array TAU, represent the orthogonal matrix   
             Q as a product of elementary reflectors (see Further   
             Details).   
 
@@ -42,8 +39,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (M)   
@@ -64,35 +60,33 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in 
-  
+    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in   
     A(m-k+i,1:n-k+i-1), and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *), dlarfg_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *), xerbla_(char *, integer *);
     static doublereal aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -109,23 +103,24 @@
 
     k = min(*m,*n);
 
-    for (i = k; i >= 1; --i) {
+    for (i__ = k; i__ >= 1; --i__) {
 
 /*        Generate elementary reflector H(i) to annihilate   
           A(m-k+i,1:n-k+i-1) */
 
-	i__1 = *n - k + i;
-	dlarfg_(&i__1, &A(*m-k+i,*n-k+i), &A(*m-k+i,1), lda, &TAU(i));
+	i__1 = *n - k + i__;
+	dlarfg_(&i__1, &a_ref(*m - k + i__, *n - k + i__), &a_ref(*m - k + 
+		i__, 1), lda, &tau[i__]);
 
 /*        Apply H(i) to A(1:m-k+i-1,1:n-k+i) from the right */
 
-	aii = A(*m-k+i,*n-k+i);
-	A(*m-k+i,*n-k+i) = 1.;
-	i__1 = *m - k + i - 1;
-	i__2 = *n - k + i;
-	dlarf_("Right", &i__1, &i__2, &A(*m-k+i,1), lda, &TAU(i), &
-		A(1,1), lda, &WORK(1));
-	A(*m-k+i,*n-k+i) = aii;
+	aii = a_ref(*m - k + i__, *n - k + i__);
+	a_ref(*m - k + i__, *n - k + i__) = 1.;
+	i__1 = *m - k + i__ - 1;
+	i__2 = *n - k + i__;
+	dlarf_("Right", &i__1, &i__2, &a_ref(*m - k + i__, 1), lda, &tau[i__],
+		 &a[a_offset], lda, &work[1]);
+	a_ref(*m - k + i__, *n - k + i__) = aii;
 /* L10: */
     }
     return 0;
@@ -133,4 +128,7 @@
 /*     End of DGERQ2 */
 
 } /* dgerq2_ */
+
+#undef a_ref
+
 

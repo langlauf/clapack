@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,17 +12,17 @@ static doublecomplex c_b1 = {0.,0.};
 static doublecomplex c_b2 = {1.,0.};
 static integer c__1 = 1;
 
-/* Subroutine */ int zsgt01_(integer *itype, char *uplo, integer *n, 
-	doublecomplex *a, integer *lda, doublecomplex *b, integer *ldb, 
-	doublecomplex *z, integer *ldz, doublereal *d, doublecomplex *work, 
-	doublereal *rwork, doublereal *result)
+/* Subroutine */ int zsgt01_(integer *itype, char *uplo, integer *n, integer *
+	m, doublecomplex *a, integer *lda, doublecomplex *b, integer *ldb, 
+	doublecomplex *z__, integer *ldz, doublereal *d__, doublecomplex *
+	work, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, z_dim1, z_offset, i__1;
     doublecomplex z__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal anorm;
     extern /* Subroutine */ int zhemm_(char *, char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
@@ -35,10 +36,17 @@ static integer c__1 = 1;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
+
+       modified August 1997, a new parameter M is added to the calling   
+       sequence.   
 
 
     Purpose   
@@ -79,6 +87,9 @@ static integer c__1 = 1;
     N       (input) INTEGER   
             The order of the matrix A.  N >= 0.   
 
+    M       (input) INTEGER   
+            The number of eigenvalues found.  M >= 0.   
+
     A       (input) COMPLEX*16 array, dimension (LDA, N)   
             The original Hermitian matrix A.   
 
@@ -91,13 +102,13 @@ static integer c__1 = 1;
     LDB     (input) INTEGER   
             The leading dimension of the array B.  LDB >= max(1,N).   
 
-    Z       (input) COMPLEX*16 array, dimension (LDZ, N)   
+    Z       (input) COMPLEX*16 array, dimension (LDZ, M)   
             The computed eigenvectors of the generalized eigenproblem.   
 
     LDZ     (input) INTEGER   
             The leading dimension of the array Z.  LDZ >= max(1,N).   
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
+    D       (input) DOUBLE PRECISION array, dimension (M)   
             The computed eigenvalues of the generalized eigenproblem.   
 
     WORK    (workspace) COMPLEX*16 array, dimension (N*N)   
@@ -107,21 +118,20 @@ static integer c__1 = 1;
     RESULT  (output) DOUBLE PRECISION array, dimension (1)   
             The test ratio as described above.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
-    --d;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --d__;
     --work;
     --rwork;
     --result;
@@ -136,8 +146,7 @@ static integer c__1 = 1;
 
 /*     Compute product of 1-norms of A and Z. */
 
-    anorm = zlanhe_("1", uplo, n, &a[a_offset], lda, &rwork[1]) * 
-	    zlange_("1", n, n, &z[z_offset], ldz, &rwork[1]);
+    anorm = zlanhe_("1", uplo, n, &a[a_offset], lda, &rwork[1]) * zlange_("1", n, m, &z__[z_offset], ldz, &rwork[1]);
     if (anorm == 0.) {
 	anorm = 1.;
     }
@@ -146,55 +155,53 @@ static integer c__1 = 1;
 
 /*        Norm of AZ - BZD */
 
-	zhemm_("Left", uplo, n, n, &c_b2, &a[a_offset], lda, &z[z_offset], 
+	zhemm_("Left", uplo, n, m, &c_b2, &a[a_offset], lda, &z__[z_offset], 
 		ldz, &c_b1, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    zdscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zdscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L10: */
 	}
 	z__1.r = -1., z__1.i = 0.;
-	zhemm_("Left", uplo, n, n, &c_b2, &b[b_offset], ldb, &z[z_offset], 
+	zhemm_("Left", uplo, n, m, &c_b2, &b[b_offset], ldb, &z__[z_offset], 
 		ldz, &z__1, &work[1], n);
 
-	result[1] = zlange_("1", n, n, &work[1], n, &rwork[1]) / anorm / (
-		*n * ulp);
+	result[1] = zlange_("1", n, m, &work[1], n, &rwork[1]) / 
+		anorm / (*n * ulp);
 
     } else if (*itype == 2) {
 
 /*        Norm of ABZ - ZD */
 
-	zhemm_("Left", uplo, n, n, &c_b2, &b[b_offset], ldb, &z[z_offset], 
+	zhemm_("Left", uplo, n, m, &c_b2, &b[b_offset], ldb, &z__[z_offset], 
 		ldz, &c_b1, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    zdscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zdscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L20: */
 	}
 	z__1.r = -1., z__1.i = 0.;
-	zhemm_("Left", uplo, n, n, &c_b2, &a[a_offset], lda, &work[1], n, &
-		z__1, &z[z_offset], ldz);
+	zhemm_("Left", uplo, n, m, &c_b2, &a[a_offset], lda, &work[1], n, &
+		z__1, &z__[z_offset], ldz);
 
-	result[1] = zlange_("1", n, n, &z[z_offset], ldz, &rwork[1]) / 
-		anorm / (*n * ulp);
+	result[1] = zlange_("1", n, m, &z__[z_offset], ldz, &rwork[1]) / anorm / (*n * ulp);
 
     } else if (*itype == 3) {
 
 /*        Norm of BAZ - ZD */
 
-	zhemm_("Left", uplo, n, n, &c_b2, &a[a_offset], lda, &z[z_offset], 
+	zhemm_("Left", uplo, n, m, &c_b2, &a[a_offset], lda, &z__[z_offset], 
 		ldz, &c_b1, &work[1], n);
-	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    zdscal_(n, &d[i], &z[i * z_dim1 + 1], &c__1);
+	i__1 = *m;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zdscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
 /* L30: */
 	}
 	z__1.r = -1., z__1.i = 0.;
-	zhemm_("Left", uplo, n, n, &c_b2, &b[b_offset], ldb, &work[1], n, &
-		z__1, &z[z_offset], ldz);
+	zhemm_("Left", uplo, n, m, &c_b2, &b[b_offset], ldb, &work[1], n, &
+		z__1, &z__[z_offset], ldz);
 
-	result[1] = zlange_("1", n, n, &z[z_offset], ldz, &rwork[1]) / 
-		anorm / (*n * ulp);
+	result[1] = zlange_("1", n, m, &z__[z_offset], ldz, &rwork[1]) / anorm / (*n * ulp);
     }
 
     return 0;
@@ -202,4 +209,8 @@ static integer c__1 = 1;
 /*     End of CDGT01 */
 
 } /* zsgt01_ */
+
+#undef z___ref
+#undef z___subscr
+
 

@@ -1,11 +1,17 @@
 #include "f2c.h"
 #include "fio.h"
-#include "fmt.h"
-#include "lio.h"
-#include "ctype.h"
-#include "fp.h"
+
+/* Compile with -DF8X_NML_ELIDE_QUOTES to permit eliding quotation */
+/* marks in namelist input a la the Fortran 8X Draft published in  */
+/* the May 1989 issue of Fortran Forum. */
+
 
 extern char *f__fmtbuf;
+
+#ifdef Allow_TYQUAD
+static longint f__llx;
+#endif
+
 #ifdef KR_headers
 extern double atof();
 extern char *malloc(), *realloc();
@@ -15,9 +21,18 @@ int (*f__lioproc)(), (*l_getc)(), (*l_ungetc)();
 #undef min
 #undef max
 #include "stdlib.h"
+#endif
+
+#include "fmt.h"
+#include "lio.h"
+#include "ctype.h"
+#include "fp.h"
+
+#ifndef KR_headers
 int (*f__lioproc)(ftnint*, char*, ftnlen, ftnint), (*l_getc)(void),
 	(*l_ungetc)(int,FILE*);
 #endif
+
 int l_eof;
 
 #define isblnk(x) (f__ltab[x+1]&B)
@@ -73,7 +88,12 @@ integer e_rsle(Void)
 {
 	int ch;
 	if(f__curunit->uend) return(0);
-	while((ch=t_getc())!='\n' && ch!=EOF);
+	while((ch=t_getc())!='\n')
+		if (ch == EOF) {
+			if(feof(f__cf))
+				f__curunit->uend = l_eof = 1;
+			return EOF;
+			}
 	return(0);
 }
 
@@ -85,10 +105,11 @@ double f__lx,f__ly;
 #define GETC(x) (x=(*l_getc)())
 #define Ungetc(x,y) (*l_ungetc)(x,y)
 
+ static int
 #ifdef KR_headers
-l_R(poststar) int poststar;
+l_R(poststar, reqint) int poststar, reqint;
 #else
-l_R(int poststar)
+l_R(int poststar, int reqint)
 #endif
 {
 	char s[FMAX+EXPMAXDIGS+4];
@@ -102,6 +123,9 @@ l_R(int poststar)
 			return(0);
 		f__lcount = 1;
 		}
+#ifdef Allow_TYQUAD
+	f__llx = 0;
+#endif
 	f__ltype = 0;
 	exp = 0;
 	havestar = 0;
@@ -134,6 +158,10 @@ retry:
 		goto retry;
 		}
 	if (ch == '.') {
+#ifndef ALLOW_FLOAT_IN_INTEGER_LIST_INPUT
+		if (reqint)
+			errfl(f__elist->cierr,115,"invalid integer");
+#endif
 		GETC(ch);
 		if (sp == sp1)
 			while(ch == '0') {
@@ -152,6 +180,10 @@ retry:
 	if (issign(ch))
 		goto signonly;
 	if (havenum && isexp(ch)) {
+#ifndef ALLOW_FLOAT_IN_INTEGER_LIST_INPUT
+		if (reqint)
+			errfl(f__elist->cierr,115,"invalid integer");
+#endif
 		GETC(ch);
 		if (issign(ch)) {
 signonly:
@@ -184,6 +216,22 @@ bad:
 		else
 			sp[1] = 0;
 		f__lx = atof(s);
+#ifdef Allow_TYQUAD
+		if (reqint&2 && (se = sp - sp1 + exp) > 14 && se < 20) {
+			/* Assuming 64-bit longint and 32-bit long. */
+			if (exp < 0)
+				sp += exp;
+			if (sp1 <= sp) {
+				f__llx = *sp1 - '0';
+				while(++sp1 <= sp)
+					f__llx = 10*f__llx + (*sp1 - '0');
+				}
+			while(--exp >= 0)
+				f__llx *= 10;
+			if (*s == '-')
+				f__llx = -f__llx;
+			}
+#endif
 		}
 	else
 		f__lx = 0.;
@@ -224,6 +272,7 @@ rd_count(register int ch)
 	return f__lcount <= 0;
 	}
 
+ static int
 l_C(Void)
 {	int ch, nml_save;
 	double lz;
@@ -260,7 +309,7 @@ l_C(Void)
 	Ungetc(ch,f__cf);
 	nml_save = nml_read;
 	nml_read = 0;
-	if (ch = l_R(1))
+	if (ch = l_R(1,0))
 		return ch;
 	if (!f__ltype)
 		errfl(f__elist->cierr,112,"no real part");
@@ -272,7 +321,7 @@ l_C(Void)
 	}
 	while(iswhit(GETC(ch)));
 	(void) Ungetc(ch,f__cf);
-	if (ch = l_R(1))
+	if (ch = l_R(1,0))
 		return ch;
 	if (!f__ltype)
 		errfl(f__elist->cierr,112,"no imaginary part");
@@ -280,9 +329,14 @@ l_C(Void)
 	if(ch!=')') errfl(f__elist->cierr,112,"no )");
 	f__ly = f__lx;
 	f__lx = lz;
+#ifdef Allow_TYQUAD
+	f__llx = 0;
+#endif
 	nml_read = nml_save;
 	return(0);
 }
+
+ static int
 l_L(Void)
 {
 	int ch;
@@ -328,7 +382,10 @@ l_L(Void)
 	(void) Ungetc(ch, f__cf);
 	return(0);
 }
+
 #define BUFSIZE	128
+
+ static int
 l_CHAR(Void)
 {	int ch,size,i;
 	static char rafail[] = "realloc failure";
@@ -352,6 +409,10 @@ l_CHAR(Void)
 				case '*':
 					if (f__lcount == 0) {
 						f__lcount = 1;
+#ifndef F8X_NML_ELIDE_QUOTES
+						if (nml_read)
+							goto no_quote;
+#endif
 						goto noquote;
 						}
 					p = f__lchar;
@@ -370,6 +431,13 @@ l_CHAR(Void)
 				}
 			if (!isdigit(ch)) {
 				f__lcount = 1;
+#ifndef F8X_NML_ELIDE_QUOTES
+				if (nml_read) {
+ no_quote:
+					errfl(f__elist->cierr,112,
+						"undelimited character string");
+					}
+#endif
 				goto noquote;
 				}
 			*p++ = ch;
@@ -386,10 +454,17 @@ l_CHAR(Void)
 	else	(void) Ungetc(ch,f__cf);
  have_lcount:
 	if(GETC(ch)=='\'' || ch=='"') quote=ch;
-	else if(isblnk(ch) || (issep(ch) && ch != '\n') || ch==EOF)
-	{	(void) Ungetc(ch,f__cf);
-		return(0);
-	}
+	else if(isblnk(ch) || (issep(ch) && ch != '\n') || ch==EOF) {
+		Ungetc(ch,f__cf);
+		return 0;
+		}
+#ifndef F8X_NML_ELIDE_QUOTES
+	else if (nml_read > 1) {
+		Ungetc(ch,f__cf);
+		f__lquit = 2;
+		return 0;
+		}
+#endif
 	else {
 		/* Fortran 8x-style unquoted string */
 		*p++ = ch;
@@ -456,12 +531,14 @@ c_le(a) cilist *a;
 c_le(cilist *a)
 #endif
 {
+	if(!f__init)
+		f_init();
 	f__fmtbuf="list io";
+	f__curunit = &f__units[a->ciunit];
 	if(a->ciunit>=MXUNIT || a->ciunit<0)
 		err(a->cierr,101,"stler");
 	f__scale=f__recpos=0;
 	f__elist=a;
-	f__curunit = &f__units[a->ciunit];
 	if(f__curunit->ufd==NULL && fk_open(SEQ,FMT,a->ciunit))
 		err(a->cierr,102,"lio");
 	f__cf=f__curunit->ufd;
@@ -489,7 +566,7 @@ l_read(ftnint *number, char *ptr, ftnlen len, ftnint type)
 				GETC(ch);
 				switch(ch) {
 				case EOF:
-					goto loopend;
+					err(f__elist->ciend,(EOF),"list in")
 				case ' ':
 				case '\t':
 				case '\n':
@@ -512,13 +589,21 @@ l_read(ftnint *number, char *ptr, ftnlen len, ftnint type)
 		case TYINT1:
 		case TYSHORT:
 		case TYLONG:
-#ifdef TYQUAD
-		case TYQUAD:
+#ifndef ALLOW_FLOAT_IN_INTEGER_LIST_INPUT
+			ERR(l_R(0,1));
+			break;
 #endif
 		case TYREAL:
 		case TYDREAL:
-			ERR(l_R(0));
+			ERR(l_R(0,0));
 			break;
+#ifdef TYQUAD
+		case TYQUAD:
+			n = l_R(0,2);
+			if (n)
+				return n;
+			break;
+#endif
 		case TYCOMPLEX:
 		case TYDCOMPLEX:
 			ERR(l_C());
@@ -537,13 +622,9 @@ l_read(ftnint *number, char *ptr, ftnlen len, ftnint type)
 		Ungetc(ch,f__cf);
 	loopend:
 		if(f__lquit) return(0);
-		if(f__cf) {
-			if (feof(f__cf))
-				err(f__elist->ciend,(EOF),"list in")
-			else if(ferror(f__cf)) {
-				clearerr(f__cf);
-				errfl(f__elist->cierr,errno,"list in");
-				}
+		if(f__cf && ferror(f__cf)) {
+			clearerr(f__cf);
+			errfl(f__elist->cierr,errno,"list in");
 			}
 		if(f__ltype==0) goto bump;
 		switch((int)type)
@@ -558,11 +639,12 @@ l_read(ftnint *number, char *ptr, ftnlen len, ftnint type)
 			break;
 		case TYLOGICAL:
 		case TYLONG:
-			Ptr->flint=f__lx;
+			Ptr->flint = (ftnint)f__lx;
 			break;
-#ifdef TYQUAD
+#ifdef Allow_TYQUAD
 		case TYQUAD:
-			Ptr->fllongint = f__lx;
+			if (!(Ptr->fllongint = f__llx))
+				Ptr->fllongint = f__lx;
 			break;
 #endif
 		case TYREAL:
@@ -602,17 +684,18 @@ integer s_rsle(cilist *a)
 {
 	int n;
 
-	if(!f__init) f_init();
-	if(n=c_le(a)) return(n);
 	f__reading=1;
 	f__external=1;
 	f__formatted=1;
+	if(n=c_le(a)) return(n);
 	f__lioproc = l_read;
 	f__lquit = 0;
 	f__lcount = 0;
 	l_eof = 0;
 	if(f__curunit->uwrt && f__nowreading(f__curunit))
 		err(a->cierr,errno,"read start");
+	if(f__curunit->uend)
+		err(f__elist->ciend,(EOF),"read start");
 	l_getc = t_getc;
 	l_ungetc = un_getc;
 	f__doend = xrd_SL;

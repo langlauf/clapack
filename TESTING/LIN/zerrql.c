@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -41,7 +42,7 @@ static integer c__2 = 2;
     /* Local variables */
     static integer info;
     static doublecomplex a[4]	/* was [2][2] */, b[2];
-    static integer i, j;
+    static integer i__, j;
     static doublecomplex w[2], x[2];
     extern /* Subroutine */ int zgeql2_(integer *, integer *, doublecomplex *,
 	     integer *, doublecomplex *, doublecomplex *, integer *);
@@ -68,7 +69,13 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -89,8 +96,7 @@ static integer c__2 = 2;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
@@ -101,15 +107,15 @@ static integer c__2 = 2;
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 2; ++j) {
-	for (i = 1; i <= 2; ++i) {
-	    i__1 = i + (j << 1) - 3;
-	    d__1 = 1. / (doublereal) (i + j);
-	    d__2 = -1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 2; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
+	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
-	    i__1 = i + (j << 1) - 3;
-	    d__1 = 1. / (doublereal) (i + j);
-	    d__2 = -1. / (doublereal) (i + j);
+	    i__1 = af_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
+	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    af[i__1].r = z__1.r, af[i__1].i = z__1.i;
 /* L10: */
@@ -128,7 +134,7 @@ static integer c__2 = 2;
 
        ZGEQLF */
 
-    s_copy(srnamc_1.srnamt, "ZGEQLF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZGEQLF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zgeqlf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("ZGEQLF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -148,7 +154,7 @@ static integer c__2 = 2;
 
 /*     ZGEQL2 */
 
-    s_copy(srnamc_1.srnamt, "ZGEQL2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZGEQL2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zgeql2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("ZGEQL2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -164,7 +170,7 @@ static integer c__2 = 2;
 
 /*     ZGEQLS */
 
-    s_copy(srnamc_1.srnamt, "ZGEQLS", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZGEQLS", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zgeqls_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("ZGEQLS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -196,7 +202,7 @@ static integer c__2 = 2;
 
 /*     ZUNGQL */
 
-    s_copy(srnamc_1.srnamt, "ZUNGQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNGQL", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zungql_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("ZUNGQL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -228,7 +234,7 @@ static integer c__2 = 2;
 
 /*     ZUNG2L */
 
-    s_copy(srnamc_1.srnamt, "ZUNG2L", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNG2L", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zung2l_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("ZUNG2L", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -256,7 +262,7 @@ static integer c__2 = 2;
 
 /*     ZUNMQL */
 
-    s_copy(srnamc_1.srnamt, "ZUNMQL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNMQL", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zunmql_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -320,7 +326,7 @@ static integer c__2 = 2;
 
 /*     ZUNM2L */
 
-    s_copy(srnamc_1.srnamt, "ZUNM2L", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNM2L", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     zunm2l_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("ZUNM2L", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -371,4 +377,10 @@ static integer c__2 = 2;
 /*     End of ZERRQL */
 
 } /* zerrql_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

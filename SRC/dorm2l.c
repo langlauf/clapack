@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dorm2l_(char *side, char *trans, integer *m, integer *n, 
 	integer *k, doublereal *a, integer *lda, doublereal *tau, doublereal *
-	c, integer *ldc, doublereal *work, integer *info)
+	c__, integer *ldc, doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -56,8 +57,7 @@
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,K)   
             The i-th column must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by 
-  
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
             DGEQLF in the last k columns of its array argument A.   
             A is modified by the routine but restored on exit.   
 
@@ -85,15 +85,12 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -101,7 +98,7 @@
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
     /* Local variables */
     static logical left;
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
@@ -110,15 +107,19 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical notran;
     static doublereal aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
@@ -175,25 +176,26 @@
 
     i__1 = i2;
     i__2 = i3;
-    for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+    for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 	if (left) {
 
 /*           H(i) is applied to C(1:m-k+i,1:n) */
 
-	    mi = *m - *k + i;
+	    mi = *m - *k + i__;
 	} else {
 
 /*           H(i) is applied to C(1:m,1:n-k+i) */
 
-	    ni = *n - *k + i;
+	    ni = *n - *k + i__;
 	}
 
 /*        Apply H(i) */
 
-	aii = A(nq-*k+i,i);
-	A(nq-*k+i,i) = 1.;
-	dlarf_(side, &mi, &ni, &A(1,i), &c__1, &TAU(i), &C(1,1), ldc, &WORK(1));
-	A(nq-*k+i,i) = aii;
+	aii = a_ref(nq - *k + i__, i__);
+	a_ref(nq - *k + i__, i__) = 1.;
+	dlarf_(side, &mi, &ni, &a_ref(1, i__), &c__1, &tau[i__], &c__[
+		c_offset], ldc, &work[1]);
+	a_ref(nq - *k + i__, i__) = aii;
 /* L10: */
     }
     return 0;
@@ -201,4 +203,7 @@
 /*     End of DORM2L */
 
 } /* dorm2l_ */
+
+#undef a_ref
+
 

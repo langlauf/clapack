@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sggsvp_(char *jobu, char *jobv, char *jobq, integer *m, 
@@ -6,7 +7,7 @@
 	 real *v, integer *ldv, real *q, integer *ldq, integer *iwork, real *
 	tau, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -134,21 +135,16 @@
     Further Details   
     ===============   
 
-    The subroutine uses LAPACK subroutine SGEQPF for the QR factorization 
-  
+    The subroutine uses LAPACK subroutine SGEQPF for the QR factorization   
     with column pivoting to detect the effective numerical rank of the   
-    a matrix. It may be replaced by a better rank determination strategy. 
-  
+    a matrix. It may be replaced by a better rank determination strategy.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b12 = 0.f;
     static real c_b22 = 1.f;
@@ -158,7 +154,7 @@
 	    u_offset, v_dim1, v_offset, i__1, i__2, i__3;
     real r__1;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static logical wantq, wantu, wantv;
     extern /* Subroutine */ int sgeqr2_(integer *, integer *, real *, integer 
@@ -174,19 +170,32 @@
 	    integer *, real *, real *, real *, integer *), slapmt_(
 	    logical *, integer *, integer *, real *, integer *, integer *);
     static logical forwrd;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --iwork;
+    --tau;
+    --work;
 
-#define IWORK(I) iwork[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     wantu = lsame_(jobu, "U");
     wantv = lsame_(jobv, "V");
     wantq = lsame_(jobq, "Q");
@@ -226,22 +235,22 @@
                                              (  0   0  ) */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	IWORK(i) = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	iwork[i__] = 0;
 /* L10: */
     }
-    sgeqpf_(p, n, &B(1,1), ldb, &IWORK(1), &TAU(1), &WORK(1), info);
+    sgeqpf_(p, n, &b[b_offset], ldb, &iwork[1], &tau[1], &work[1], info);
 
 /*     Update A := A*P */
 
-    slapmt_(&forwrd, m, n, &A(1,1), lda, &IWORK(1));
+    slapmt_(&forwrd, m, n, &a[a_offset], lda, &iwork[1]);
 
 /*     Determine the effective rank of matrix B. */
 
     *l = 0;
     i__1 = min(*p,*n);
-    for (i = 1; i <= min(*p,*n); ++i) {
-	if ((r__1 = B(i,i), dabs(r__1)) > *tolb) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if ((r__1 = b_ref(i__, i__), dabs(r__1)) > *tolb) {
 	    ++(*l);
 	}
 /* L20: */
@@ -251,67 +260,67 @@
 
 /*        Copy the details of V, and form V. */
 
-	slaset_("Full", p, p, &c_b12, &c_b12, &V(1,1), ldv);
+	slaset_("Full", p, p, &c_b12, &c_b12, &v[v_offset], ldv);
 	if (*p > 1) {
 	    i__1 = *p - 1;
-	    slacpy_("Lower", &i__1, n, &B(2,1), ldb, &V(2,1), 
-		    ldv);
+	    slacpy_("Lower", &i__1, n, &b_ref(2, 1), ldb, &v_ref(2, 1), ldv);
 	}
 	i__1 = min(*p,*n);
-	sorg2r_(p, p, &i__1, &V(1,1), ldv, &TAU(1), &WORK(1), info);
+	sorg2r_(p, p, &i__1, &v[v_offset], ldv, &tau[1], &work[1], info);
     }
 
 /*     Clean up B */
 
     i__1 = *l - 1;
-    for (j = 1; j <= *l-1; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *l;
-	for (i = j + 1; i <= *l; ++i) {
-	    B(i,j) = 0.f;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    b_ref(i__, j) = 0.f;
 /* L30: */
 	}
 /* L40: */
     }
     if (*p > *l) {
 	i__1 = *p - *l;
-	slaset_("Full", &i__1, n, &c_b12, &c_b12, &B(*l+1,1), ldb);
+	slaset_("Full", &i__1, n, &c_b12, &c_b12, &b_ref(*l + 1, 1), ldb);
     }
 
     if (wantq) {
 
 /*        Set Q = I and Update Q := Q*P */
 
-	slaset_("Full", n, n, &c_b12, &c_b22, &Q(1,1), ldq);
-	slapmt_(&forwrd, n, n, &Q(1,1), ldq, &IWORK(1));
+	slaset_("Full", n, n, &c_b12, &c_b22, &q[q_offset], ldq);
+	slapmt_(&forwrd, n, n, &q[q_offset], ldq, &iwork[1]);
     }
 
     if (*p >= *l && *n != *l) {
 
 /*        RQ factorization of (S11 S12): ( S11 S12 ) = ( 0 S12 )*Z */
 
-	sgerq2_(l, n, &B(1,1), ldb, &TAU(1), &WORK(1), info);
+	sgerq2_(l, n, &b[b_offset], ldb, &tau[1], &work[1], info);
 
 /*        Update A := A*Z' */
 
-	sormr2_("Right", "Transpose", m, n, l, &B(1,1), ldb, &TAU(1), &A(1,1), lda, &WORK(1), info);
+	sormr2_("Right", "Transpose", m, n, l, &b[b_offset], ldb, &tau[1], &a[
+		a_offset], lda, &work[1], info);
 
 	if (wantq) {
 
 /*           Update Q := Q*Z' */
 
-	    sormr2_("Right", "Transpose", n, n, l, &B(1,1), ldb, &TAU(1),
-		     &Q(1,1), ldq, &WORK(1), info);
+	    sormr2_("Right", "Transpose", n, n, l, &b[b_offset], ldb, &tau[1],
+		     &q[q_offset], ldq, &work[1], info);
 	}
 
 /*        Clean up B */
 
 	i__1 = *n - *l;
-	slaset_("Full", l, &i__1, &c_b12, &c_b12, &B(1,1), ldb);
+	slaset_("Full", l, &i__1, &c_b12, &c_b12, &b[b_offset], ldb);
 	i__1 = *n;
-	for (j = *n - *l + 1; j <= *n; ++j) {
+	for (j = *n - *l + 1; j <= i__1; ++j) {
 	    i__2 = *l;
-	    for (i = j - *n + *l + 1; i <= *l; ++i) {
-		B(i,j) = 0.f;
+	    for (i__ = j - *n + *l + 1; i__ <= i__2; ++i__) {
+		b_ref(i__, j) = 0.f;
 /* L50: */
 	    }
 /* L60: */
@@ -328,12 +337,12 @@
                         (  0   0  ) */
 
     i__1 = *n - *l;
-    for (i = 1; i <= *n-*l; ++i) {
-	IWORK(i) = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	iwork[i__] = 0;
 /* L70: */
     }
     i__1 = *n - *l;
-    sgeqpf_(m, &i__1, &A(1,1), lda, &IWORK(1), &TAU(1), &WORK(1), info);
+    sgeqpf_(m, &i__1, &a[a_offset], lda, &iwork[1], &tau[1], &work[1], info);
 
 /*     Determine the effective rank of A11 */
 
@@ -341,8 +350,8 @@
 /* Computing MIN */
     i__2 = *m, i__3 = *n - *l;
     i__1 = min(i__2,i__3);
-    for (i = 1; i <= min(*m,*n-*l); ++i) {
-	if ((r__1 = A(i,i), dabs(r__1)) > *tola) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if ((r__1 = a_ref(i__, i__), dabs(r__1)) > *tola) {
 	    ++(*k);
 	}
 /* L80: */
@@ -353,23 +362,24 @@
    Computing MIN */
     i__2 = *m, i__3 = *n - *l;
     i__1 = min(i__2,i__3);
-    sorm2r_("Left", "Transpose", m, l, &i__1, &A(1,1), lda, &TAU(1), &A(1,*n-*l+1), lda, &WORK(1), info);
+    sorm2r_("Left", "Transpose", m, l, &i__1, &a[a_offset], lda, &tau[1], &
+	    a_ref(1, *n - *l + 1), lda, &work[1], info);
 
     if (wantu) {
 
 /*        Copy the details of U, and form U */
 
-	slaset_("Full", m, m, &c_b12, &c_b12, &U(1,1), ldu);
+	slaset_("Full", m, m, &c_b12, &c_b12, &u[u_offset], ldu);
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *n - *l;
-	    slacpy_("Lower", &i__1, &i__2, &A(2,1), lda, &U(2,1)
-		    , ldu);
+	    slacpy_("Lower", &i__1, &i__2, &a_ref(2, 1), lda, &u_ref(2, 1), 
+		    ldu);
 	}
 /* Computing MIN */
 	i__2 = *m, i__3 = *n - *l;
 	i__1 = min(i__2,i__3);
-	sorg2r_(m, m, &i__1, &U(1,1), ldu, &TAU(1), &WORK(1), info);
+	sorg2r_(m, m, &i__1, &u[u_offset], ldu, &tau[1], &work[1], info);
     }
 
     if (wantq) {
@@ -377,17 +387,17 @@
 /*        Update Q( 1:N, 1:N-L )  = Q( 1:N, 1:N-L )*P1 */
 
 	i__1 = *n - *l;
-	slapmt_(&forwrd, n, &i__1, &Q(1,1), ldq, &IWORK(1));
+	slapmt_(&forwrd, n, &i__1, &q[q_offset], ldq, &iwork[1]);
     }
 
 /*     Clean up A: set the strictly lower triangular part of   
        A(1:K, 1:K) = 0, and A( K+1:M, 1:N-L ) = 0. */
 
     i__1 = *k - 1;
-    for (j = 1; j <= *k-1; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 	i__2 = *k;
-	for (i = j + 1; i <= *k; ++i) {
-	    A(i,j) = 0.f;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    a_ref(i__, j) = 0.f;
 /* L90: */
 	}
 /* L100: */
@@ -395,8 +405,7 @@
     if (*m > *k) {
 	i__1 = *m - *k;
 	i__2 = *n - *l;
-	slaset_("Full", &i__1, &i__2, &c_b12, &c_b12, &A(*k+1,1), 
-		lda);
+	slaset_("Full", &i__1, &i__2, &c_b12, &c_b12, &a_ref(*k + 1, 1), lda);
     }
 
     if (*n - *l > *k) {
@@ -404,26 +413,26 @@
 /*        RQ factorization of ( T11 T12 ) = ( 0 T12 )*Z1 */
 
 	i__1 = *n - *l;
-	sgerq2_(k, &i__1, &A(1,1), lda, &TAU(1), &WORK(1), info);
+	sgerq2_(k, &i__1, &a[a_offset], lda, &tau[1], &work[1], info);
 
 	if (wantq) {
 
 /*           Update Q( 1:N,1:N-L ) = Q( 1:N,1:N-L )*Z1' */
 
 	    i__1 = *n - *l;
-	    sormr2_("Right", "Transpose", n, &i__1, k, &A(1,1), lda, &
-		    TAU(1), &Q(1,1), ldq, &WORK(1), info);
+	    sormr2_("Right", "Transpose", n, &i__1, k, &a[a_offset], lda, &
+		    tau[1], &q[q_offset], ldq, &work[1], info);
 	}
 
 /*        Clean up A */
 
 	i__1 = *n - *l - *k;
-	slaset_("Full", k, &i__1, &c_b12, &c_b12, &A(1,1), lda);
+	slaset_("Full", k, &i__1, &c_b12, &c_b12, &a[a_offset], lda);
 	i__1 = *n - *l;
-	for (j = *n - *l - *k + 1; j <= *n-*l; ++j) {
+	for (j = *n - *l - *k + 1; j <= i__1; ++j) {
 	    i__2 = *k;
-	    for (i = j - *n + *l + *k + 1; i <= *k; ++i) {
-		A(i,j) = 0.f;
+	    for (i__ = j - *n + *l + *k + 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = 0.f;
 /* L110: */
 	    }
 /* L120: */
@@ -436,8 +445,8 @@
 /*        QR factorization of A( K+1:M,N-L+1:N ) */
 
 	i__1 = *m - *k;
-	sgeqr2_(&i__1, l, &A(*k+1,*n-*l+1), lda, &TAU(1), &
-		WORK(1), info);
+	sgeqr2_(&i__1, l, &a_ref(*k + 1, *n - *l + 1), lda, &tau[1], &work[1],
+		 info);
 
 	if (wantu) {
 
@@ -447,16 +456,18 @@
 /* Computing MIN */
 	    i__3 = *m - *k;
 	    i__2 = min(i__3,*l);
-	    sorm2r_("Right", "No transpose", m, &i__1, &i__2, &A(*k+1,*n-*l+1), lda, &TAU(1), &U(1,*k+1), ldu, &WORK(1), info);
+	    sorm2r_("Right", "No transpose", m, &i__1, &i__2, &a_ref(*k + 1, *
+		    n - *l + 1), lda, &tau[1], &u_ref(1, *k + 1), ldu, &work[
+		    1], info);
 	}
 
 /*        Clean up */
 
 	i__1 = *n;
-	for (j = *n - *l + 1; j <= *n; ++j) {
+	for (j = *n - *l + 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = j - *n + *k + *l + 1; i <= *m; ++i) {
-		A(i,j) = 0.f;
+	    for (i__ = j - *n + *k + *l + 1; i__ <= i__2; ++i__) {
+		a_ref(i__, j) = 0.f;
 /* L130: */
 	    }
 /* L140: */
@@ -469,4 +480,10 @@
 /*     End of SGGSVP */
 
 } /* sggsvp_ */
+
+#undef v_ref
+#undef u_ref
+#undef b_ref
+#undef a_ref
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrcon_(char *norm, char *uplo, char *diag, integer *n, 
 	doublecomplex *a, integer *lda, doublereal *rcond, doublecomplex *
 	work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -44,12 +45,9 @@
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading N-by-N   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading N-by-N lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading N-by-N lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -69,15 +67,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -113,12 +108,13 @@
 	    doublereal *, doublereal *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
+    --rwork;
 
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
@@ -153,7 +149,7 @@
 
 /*     Compute the norm of the triangular matrix A. */
 
-    anorm = zlantr_(norm, uplo, diag, n, n, &A(1,1), lda, &RWORK(1));
+    anorm = zlantr_(norm, uplo, diag, n, n, &a[a_offset], lda, &rwork[1]);
 
 /*     Continue only if ANORM > 0. */
 
@@ -170,34 +166,34 @@
 	}
 	kase = 0;
 L10:
-	zlacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+	zlacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
 	if (kase != 0) {
 	    if (kase == kase1) {
 
 /*              Multiply by inv(A). */
 
-		zlatrs_(uplo, "No transpose", diag, normin, n, &A(1,1), 
-			lda, &WORK(1), &scale, &RWORK(1), info);
+		zlatrs_(uplo, "No transpose", diag, normin, n, &a[a_offset], 
+			lda, &work[1], &scale, &rwork[1], info);
 	    } else {
 
 /*              Multiply by inv(A'). */
 
-		zlatrs_(uplo, "Conjugate transpose", diag, normin, n, &A(1,1), lda, &WORK(1), &scale, &RWORK(1), info);
+		zlatrs_(uplo, "Conjugate transpose", diag, normin, n, &a[
+			a_offset], lda, &work[1], &scale, &rwork[1], info);
 	    }
 	    *(unsigned char *)normin = 'Y';
 
-/*           Multiply by 1/SCALE if doing so will not cause overfl
-ow. */
+/*           Multiply by 1/SCALE if doing so will not cause overflow. */
 
 	    if (scale != 1.) {
-		ix = izamax_(n, &WORK(1), &c__1);
+		ix = izamax_(n, &work[1], &c__1);
 		i__1 = ix;
-		xnorm = (d__1 = WORK(ix).r, abs(d__1)) + (d__2 = d_imag(&
-			WORK(ix)), abs(d__2));
+		xnorm = (d__1 = work[i__1].r, abs(d__1)) + (d__2 = d_imag(&
+			work[ix]), abs(d__2));
 		if (scale < xnorm * smlnum || scale == 0.) {
 		    goto L20;
 		}
-		zdrscl_(n, &scale, &WORK(1), &c__1);
+		zdrscl_(n, &scale, &work[1], &c__1);
 	    }
 	    goto L10;
 	}

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     static integer iscl, info;
     static doublereal anrm;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern doublereal dasum_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *), dgebd2_(integer *, integer *,
@@ -46,7 +47,10 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     static doublereal bignum, smlnum, nrmsvl;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -70,8 +74,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
             The number of columns of the matrix A.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced. 
-  
+            The M-by-N matrix A. Only the upper trapezoid is referenced.   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.   
@@ -85,13 +88,12 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
             The length of the array WORK. LWORK >= M*N + 4*min(M,N) +   
             max(M,N).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --s;
     --work;
@@ -121,8 +123,8 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = a[i + j * a_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = a_ref(i__, j);
 /* L10: */
 	}
 /* L20: */
@@ -177,8 +179,8 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     } else {
 
 	i__1 = mn;
-	for (i = 1; i <= i__1; ++i) {
-	    work[*m * *n + i] = 0.;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    work[*m * *n + i__] = 0.;
 /* L30: */
 	}
     }
@@ -186,8 +188,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 /*     Compare s and singular values of work */
 
     daxpy_(&mn, &c_b33, &s[1], &c__1, &work[*m * *n + 1], &c__1);
-    ret_val = dasum_(&mn, &work[*m * *n + 1], &c__1) / (dlamch_("Epsilon")
-	     * (doublereal) max(*m,*n));
+    ret_val = dasum_(&mn, &work[*m * *n + 1], &c__1) / (dlamch_("Epsilon") * (doublereal) max(*m,*n));
     if (nrmsvl != 0.) {
 	ret_val /= nrmsvl;
     }
@@ -197,4 +198,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 /*     End of DQRT12 */
 
 } /* dqrt12_ */
+
+#undef a_ref
+
 

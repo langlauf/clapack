@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -26,7 +27,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -44,27 +45,25 @@ static integer c__1 = 1;
             The LAPACK path name.   
 
     OK      (input) LOGICAL   
-            The flag from CHKXER that indicates whether or not the tests 
-  
+            The flag from CHKXER that indicates whether or not the tests   
             of error exits passed.   
 
     NOUT    (input) INTEGER   
             The unit number on which results are to be printed.   
             NOUT >= 0.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (*ok) {
 	io___1.ciunit = *nout;
 	s_wsfe(&io___1);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else {
 	io___2.ciunit = *nout;
 	s_wsfe(&io___2);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 

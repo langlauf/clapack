@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhpgv_(integer *itype, char *jobz, char *uplo, integer *
 	n, doublecomplex *ap, doublecomplex *bp, doublereal *w, doublecomplex 
-	*z, integer *ldz, doublecomplex *work, doublereal *rwork, integer *
+	*z__, integer *ldz, doublecomplex *work, doublereal *rwork, integer *
 	info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -14,10 +15,8 @@
     Purpose   
     =======   
 
-    ZHPGV computes all the eigenvalues and, optionally, the eigenvectors 
-  
-    of a complex generalized Hermitian-definite eigenproblem, of the form 
-  
+    ZHPGV computes all the eigenvalues and, optionally, the eigenvectors   
+    of a complex generalized Hermitian-definite eigenproblem, of the form   
     A*x=(lambda)*B*x,  A*Bx=(lambda)*x,  or B*A*x=(lambda)*x.   
     Here A and B are assumed to be Hermitian, stored in packed format,   
     and B is also positive definite.   
@@ -43,26 +42,20 @@
             The order of the matrices A and B.  N >= 0.   
 
     AP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the Hermitian matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
 
             On exit, the contents of AP are destroyed.   
 
     BP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix 
-  
-            B, packed columnwise in a linear array.  The j-th column of B 
-  
+            On entry, the upper or lower triangle of the Hermitian matrix   
+            B, packed columnwise in a linear array.  The j-th column of B   
             is stored in the array BP as follows:   
             if UPLO = 'U', BP(i + (j-1)*j/2) = B(i,j) for 1<=i<=j;   
-            if UPLO = 'L', BP(i + (j-1)*(2*n-j)/2) = B(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', BP(i + (j-1)*(2*n-j)/2) = B(i,j) for j<=i<=n.   
 
             On exit, the triangular factor U or L from the Cholesky   
             factorization B = U**H*U or B = L*L**H, in the same storage   
@@ -84,8 +77,7 @@
 
     WORK    (workspace) COMPLEX*16 array, dimension (max(1, 2*N-1))   
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(1, 3*N-2)) 
-  
+    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(1, 3*N-2))   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -94,21 +86,17 @@
                <= N:  if INFO = i, ZHPEV failed to converge;   
                       i off-diagonal elements of an intermediate   
                       tridiagonal form did not convergeto zero;   
-               > N:   if INFO = N + i, for 1 <= i <= n, then the leading 
-  
+               > N:   if INFO = N + i, for 1 <= i <= n, then the leading   
                       minor of order i of B is not positive definite.   
                       The factorization of B could not be completed and   
                       no eigenvalues or eigenvectors were computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -129,17 +117,20 @@
 	    char *, integer *), zhpgst_(integer *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *), zpptrf_(
 	    char *, integer *, doublecomplex *, integer *);
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    --ap;
+    --bp;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
 
-#define AP(I) ap[(I)-1]
-#define BP(I) bp[(I)-1]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     upper = lsame_(uplo, "U");
 
@@ -169,7 +160,7 @@
 
 /*     Form a Cholesky factorization of B. */
 
-    zpptrf_(uplo, n, &BP(1), info);
+    zpptrf_(uplo, n, &bp[1], info);
     if (*info != 0) {
 	*info = *n + *info;
 	return 0;
@@ -177,9 +168,9 @@
 
 /*     Transform problem to standard eigenvalue problem and solve. */
 
-    zhpgst_(itype, uplo, n, &AP(1), &BP(1), info);
-    zhpev_(jobz, uplo, n, &AP(1), &W(1), &Z(1,1), ldz, &WORK(1), &RWORK(
-	    1), info);
+    zhpgst_(itype, uplo, n, &ap[1], &bp[1], info);
+    zhpev_(jobz, uplo, n, &ap[1], &w[1], &z__[z_offset], ldz, &work[1], &
+	    rwork[1], info);
 
     if (wantz) {
 
@@ -192,8 +183,7 @@
 	if (*itype == 1 || *itype == 2) {
 
 /*           For A*x=(lambda)*B*x and A*B*x=(lambda)*x;   
-             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y
- */
+             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y */
 
 	    if (upper) {
 		*(unsigned char *)trans = 'N';
@@ -202,9 +192,9 @@
 	    }
 
 	    i__1 = neig;
-	    for (j = 1; j <= neig; ++j) {
-		ztpsv_(uplo, trans, "Non-unit", n, &BP(1), &Z(1,j),
-			 &c__1);
+	    for (j = 1; j <= i__1; ++j) {
+		ztpsv_(uplo, trans, "Non-unit", n, &bp[1], &z___ref(1, j), &
+			c__1);
 /* L10: */
 	    }
 
@@ -220,9 +210,9 @@
 	    }
 
 	    i__1 = neig;
-	    for (j = 1; j <= neig; ++j) {
-		ztpmv_(uplo, trans, "Non-unit", n, &BP(1), &Z(1,j),
-			 &c__1);
+	    for (j = 1; j <= i__1; ++j) {
+		ztpmv_(uplo, trans, "Non-unit", n, &bp[1], &z___ref(1, j), &
+			c__1);
 /* L20: */
 	    }
 	}
@@ -232,4 +222,8 @@
 /*     End of ZHPGV */
 
 } /* zhpgv_ */
+
+#undef z___ref
+#undef z___subscr
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cspmv_(char *uplo, integer *n, complex *alpha, complex *
 	ap, complex *x, integer *incx, complex *beta, complex *y, integer *
 	incy)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -86,32 +87,28 @@
              Y. INCY must not be zero.   
              Unchanged on exit.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
     complex q__1, q__2, q__3, q__4;
     /* Local variables */
     static integer info;
     static complex temp1, temp2;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static integer kk, ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
+    --y;
+    --x;
+    --ap;
 
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	info = 1;
@@ -147,8 +144,7 @@
 	ky = 1 - (*n - 1) * *incy;
     }
 
-/*     Start the operations. In this version the elements of the array AP 
-  
+/*     Start the operations. In this version the elements of the array AP   
        are accessed sequentially with one pass through AP.   
 
        First form  y := beta*y. */
@@ -157,20 +153,20 @@
 	if (*incy == 1) {
 	    if (beta->r == 0.f && beta->i == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    i__2 = i;
-		    Y(i).r = 0.f, Y(i).i = 0.f;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    i__2 = i__;
+		    y[i__2].r = 0.f, y[i__2].i = 0.f;
 /* L10: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    i__2 = i;
-		    i__3 = i;
-		    q__1.r = beta->r * Y(i).r - beta->i * Y(i).i, 
-			    q__1.i = beta->r * Y(i).i + beta->i * Y(i)
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    i__2 = i__;
+		    i__3 = i__;
+		    q__1.r = beta->r * y[i__3].r - beta->i * y[i__3].i, 
+			    q__1.i = beta->r * y[i__3].i + beta->i * y[i__3]
 			    .r;
-		    Y(i).r = q__1.r, Y(i).i = q__1.i;
+		    y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 /* L20: */
 		}
 	    }
@@ -178,21 +174,21 @@
 	    iy = ky;
 	    if (beta->r == 0.f && beta->i == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 		    i__2 = iy;
-		    Y(iy).r = 0.f, Y(iy).i = 0.f;
+		    y[i__2].r = 0.f, y[i__2].i = 0.f;
 		    iy += *incy;
 /* L30: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 		    i__2 = iy;
 		    i__3 = iy;
-		    q__1.r = beta->r * Y(iy).r - beta->i * Y(iy).i, 
-			    q__1.i = beta->r * Y(iy).i + beta->i * Y(iy)
+		    q__1.r = beta->r * y[i__3].r - beta->i * y[i__3].i, 
+			    q__1.i = beta->r * y[i__3].i + beta->i * y[i__3]
 			    .r;
-		    Y(iy).r = q__1.r, Y(iy).i = q__1.i;
+		    y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		    iy += *incy;
 /* L40: */
 		}
@@ -209,28 +205,28 @@
 
 	if (*incx == 1 && *incy == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, q__1.i =
-			 alpha->r * X(j).i + alpha->i * X(j).r;
+		q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, q__1.i =
+			 alpha->r * x[i__2].i + alpha->i * x[i__2].r;
 		temp1.r = q__1.r, temp1.i = q__1.i;
 		temp2.r = 0.f, temp2.i = 0.f;
 		k = kk;
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    i__3 = i;
-		    i__4 = i;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = i__;
+		    i__4 = i__;
 		    i__5 = k;
-		    q__2.r = temp1.r * AP(k).r - temp1.i * AP(k).i, 
-			    q__2.i = temp1.r * AP(k).i + temp1.i * AP(k)
+		    q__2.r = temp1.r * ap[i__5].r - temp1.i * ap[i__5].i, 
+			    q__2.i = temp1.r * ap[i__5].i + temp1.i * ap[i__5]
 			    .r;
-		    q__1.r = Y(i).r + q__2.r, q__1.i = Y(i).i + q__2.i;
-		    Y(i).r = q__1.r, Y(i).i = q__1.i;
+		    q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
+		    y[i__3].r = q__1.r, y[i__3].i = q__1.i;
 		    i__3 = k;
-		    i__4 = i;
-		    q__2.r = AP(k).r * X(i).r - AP(k).i * X(i).i, 
-			    q__2.i = AP(k).r * X(i).i + AP(k).i * X(
-			    i).r;
+		    i__4 = i__;
+		    q__2.r = ap[i__3].r * x[i__4].r - ap[i__3].i * x[i__4].i, 
+			    q__2.i = ap[i__3].r * x[i__4].i + ap[i__3].i * x[
+			    i__4].r;
 		    q__1.r = temp2.r + q__2.r, q__1.i = temp2.i + q__2.i;
 		    temp2.r = q__1.r, temp2.i = q__1.i;
 		    ++k;
@@ -239,13 +235,13 @@
 		i__2 = j;
 		i__3 = j;
 		i__4 = kk + j - 1;
-		q__3.r = temp1.r * AP(kk+j-1).r - temp1.i * AP(kk+j-1).i, q__3.i =
-			 temp1.r * AP(kk+j-1).i + temp1.i * AP(kk+j-1).r;
-		q__2.r = Y(j).r + q__3.r, q__2.i = Y(j).i + q__3.i;
+		q__3.r = temp1.r * ap[i__4].r - temp1.i * ap[i__4].i, q__3.i =
+			 temp1.r * ap[i__4].i + temp1.i * ap[i__4].r;
+		q__2.r = y[i__3].r + q__3.r, q__2.i = y[i__3].i + q__3.i;
 		q__4.r = alpha->r * temp2.r - alpha->i * temp2.i, q__4.i = 
 			alpha->r * temp2.i + alpha->i * temp2.r;
 		q__1.r = q__2.r + q__4.r, q__1.i = q__2.i + q__4.i;
-		Y(j).r = q__1.r, Y(j).i = q__1.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		kk += j;
 /* L60: */
 	    }
@@ -253,29 +249,29 @@
 	    jx = kx;
 	    jy = ky;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, q__1.i =
-			 alpha->r * X(jx).i + alpha->i * X(jx).r;
+		q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, q__1.i =
+			 alpha->r * x[i__2].i + alpha->i * x[i__2].r;
 		temp1.r = q__1.r, temp1.i = q__1.i;
 		temp2.r = 0.f, temp2.i = 0.f;
 		ix = kx;
 		iy = ky;
 		i__2 = kk + j - 2;
-		for (k = kk; k <= kk+j-2; ++k) {
+		for (k = kk; k <= i__2; ++k) {
 		    i__3 = iy;
 		    i__4 = iy;
 		    i__5 = k;
-		    q__2.r = temp1.r * AP(k).r - temp1.i * AP(k).i, 
-			    q__2.i = temp1.r * AP(k).i + temp1.i * AP(k)
+		    q__2.r = temp1.r * ap[i__5].r - temp1.i * ap[i__5].i, 
+			    q__2.i = temp1.r * ap[i__5].i + temp1.i * ap[i__5]
 			    .r;
-		    q__1.r = Y(iy).r + q__2.r, q__1.i = Y(iy).i + q__2.i;
-		    Y(iy).r = q__1.r, Y(iy).i = q__1.i;
+		    q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
+		    y[i__3].r = q__1.r, y[i__3].i = q__1.i;
 		    i__3 = k;
 		    i__4 = ix;
-		    q__2.r = AP(k).r * X(ix).r - AP(k).i * X(ix).i, 
-			    q__2.i = AP(k).r * X(ix).i + AP(k).i * X(
-			    ix).r;
+		    q__2.r = ap[i__3].r * x[i__4].r - ap[i__3].i * x[i__4].i, 
+			    q__2.i = ap[i__3].r * x[i__4].i + ap[i__3].i * x[
+			    i__4].r;
 		    q__1.r = temp2.r + q__2.r, q__1.i = temp2.i + q__2.i;
 		    temp2.r = q__1.r, temp2.i = q__1.i;
 		    ix += *incx;
@@ -285,13 +281,13 @@
 		i__2 = jy;
 		i__3 = jy;
 		i__4 = kk + j - 1;
-		q__3.r = temp1.r * AP(kk+j-1).r - temp1.i * AP(kk+j-1).i, q__3.i =
-			 temp1.r * AP(kk+j-1).i + temp1.i * AP(kk+j-1).r;
-		q__2.r = Y(jy).r + q__3.r, q__2.i = Y(jy).i + q__3.i;
+		q__3.r = temp1.r * ap[i__4].r - temp1.i * ap[i__4].i, q__3.i =
+			 temp1.r * ap[i__4].i + temp1.i * ap[i__4].r;
+		q__2.r = y[i__3].r + q__3.r, q__2.i = y[i__3].i + q__3.i;
 		q__4.r = alpha->r * temp2.r - alpha->i * temp2.i, q__4.i = 
 			alpha->r * temp2.i + alpha->i * temp2.r;
 		q__1.r = q__2.r + q__4.r, q__1.i = q__2.i + q__4.i;
-		Y(jy).r = q__1.r, Y(jy).i = q__1.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		jx += *incx;
 		jy += *incy;
 		kk += j;
@@ -304,35 +300,35 @@
 
 	if (*incx == 1 && *incy == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, q__1.i =
-			 alpha->r * X(j).i + alpha->i * X(j).r;
+		q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, q__1.i =
+			 alpha->r * x[i__2].i + alpha->i * x[i__2].r;
 		temp1.r = q__1.r, temp1.i = q__1.i;
 		temp2.r = 0.f, temp2.i = 0.f;
 		i__2 = j;
 		i__3 = j;
 		i__4 = kk;
-		q__2.r = temp1.r * AP(kk).r - temp1.i * AP(kk).i, q__2.i =
-			 temp1.r * AP(kk).i + temp1.i * AP(kk).r;
-		q__1.r = Y(j).r + q__2.r, q__1.i = Y(j).i + q__2.i;
-		Y(j).r = q__1.r, Y(j).i = q__1.i;
+		q__2.r = temp1.r * ap[i__4].r - temp1.i * ap[i__4].i, q__2.i =
+			 temp1.r * ap[i__4].i + temp1.i * ap[i__4].r;
+		q__1.r = y[i__3].r + q__2.r, q__1.i = y[i__3].i + q__2.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		k = kk + 1;
 		i__2 = *n;
-		for (i = j + 1; i <= *n; ++i) {
-		    i__3 = i;
-		    i__4 = i;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__3 = i__;
+		    i__4 = i__;
 		    i__5 = k;
-		    q__2.r = temp1.r * AP(k).r - temp1.i * AP(k).i, 
-			    q__2.i = temp1.r * AP(k).i + temp1.i * AP(k)
+		    q__2.r = temp1.r * ap[i__5].r - temp1.i * ap[i__5].i, 
+			    q__2.i = temp1.r * ap[i__5].i + temp1.i * ap[i__5]
 			    .r;
-		    q__1.r = Y(i).r + q__2.r, q__1.i = Y(i).i + q__2.i;
-		    Y(i).r = q__1.r, Y(i).i = q__1.i;
+		    q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
+		    y[i__3].r = q__1.r, y[i__3].i = q__1.i;
 		    i__3 = k;
-		    i__4 = i;
-		    q__2.r = AP(k).r * X(i).r - AP(k).i * X(i).i, 
-			    q__2.i = AP(k).r * X(i).i + AP(k).i * X(
-			    i).r;
+		    i__4 = i__;
+		    q__2.r = ap[i__3].r * x[i__4].r - ap[i__3].i * x[i__4].i, 
+			    q__2.i = ap[i__3].r * x[i__4].i + ap[i__3].i * x[
+			    i__4].r;
 		    q__1.r = temp2.r + q__2.r, q__1.i = temp2.i + q__2.i;
 		    temp2.r = q__1.r, temp2.i = q__1.i;
 		    ++k;
@@ -342,8 +338,8 @@
 		i__3 = j;
 		q__2.r = alpha->r * temp2.r - alpha->i * temp2.i, q__2.i = 
 			alpha->r * temp2.i + alpha->i * temp2.r;
-		q__1.r = Y(j).r + q__2.r, q__1.i = Y(j).i + q__2.i;
-		Y(j).r = q__1.r, Y(j).i = q__1.i;
+		q__1.r = y[i__3].r + q__2.r, q__1.i = y[i__3].i + q__2.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		kk += *n - j + 1;
 /* L100: */
 	    }
@@ -351,38 +347,38 @@
 	    jx = kx;
 	    jy = ky;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, q__1.i =
-			 alpha->r * X(jx).i + alpha->i * X(jx).r;
+		q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, q__1.i =
+			 alpha->r * x[i__2].i + alpha->i * x[i__2].r;
 		temp1.r = q__1.r, temp1.i = q__1.i;
 		temp2.r = 0.f, temp2.i = 0.f;
 		i__2 = jy;
 		i__3 = jy;
 		i__4 = kk;
-		q__2.r = temp1.r * AP(kk).r - temp1.i * AP(kk).i, q__2.i =
-			 temp1.r * AP(kk).i + temp1.i * AP(kk).r;
-		q__1.r = Y(jy).r + q__2.r, q__1.i = Y(jy).i + q__2.i;
-		Y(jy).r = q__1.r, Y(jy).i = q__1.i;
+		q__2.r = temp1.r * ap[i__4].r - temp1.i * ap[i__4].i, q__2.i =
+			 temp1.r * ap[i__4].i + temp1.i * ap[i__4].r;
+		q__1.r = y[i__3].r + q__2.r, q__1.i = y[i__3].i + q__2.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		ix = jx;
 		iy = jy;
 		i__2 = kk + *n - j;
-		for (k = kk + 1; k <= kk+*n-j; ++k) {
+		for (k = kk + 1; k <= i__2; ++k) {
 		    ix += *incx;
 		    iy += *incy;
 		    i__3 = iy;
 		    i__4 = iy;
 		    i__5 = k;
-		    q__2.r = temp1.r * AP(k).r - temp1.i * AP(k).i, 
-			    q__2.i = temp1.r * AP(k).i + temp1.i * AP(k)
+		    q__2.r = temp1.r * ap[i__5].r - temp1.i * ap[i__5].i, 
+			    q__2.i = temp1.r * ap[i__5].i + temp1.i * ap[i__5]
 			    .r;
-		    q__1.r = Y(iy).r + q__2.r, q__1.i = Y(iy).i + q__2.i;
-		    Y(iy).r = q__1.r, Y(iy).i = q__1.i;
+		    q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
+		    y[i__3].r = q__1.r, y[i__3].i = q__1.i;
 		    i__3 = k;
 		    i__4 = ix;
-		    q__2.r = AP(k).r * X(ix).r - AP(k).i * X(ix).i, 
-			    q__2.i = AP(k).r * X(ix).i + AP(k).i * X(
-			    ix).r;
+		    q__2.r = ap[i__3].r * x[i__4].r - ap[i__3].i * x[i__4].i, 
+			    q__2.i = ap[i__3].r * x[i__4].i + ap[i__3].i * x[
+			    i__4].r;
 		    q__1.r = temp2.r + q__2.r, q__1.i = temp2.i + q__2.i;
 		    temp2.r = q__1.r, temp2.i = q__1.i;
 /* L110: */
@@ -391,8 +387,8 @@
 		i__3 = jy;
 		q__2.r = alpha->r * temp2.r - alpha->i * temp2.i, q__2.i = 
 			alpha->r * temp2.i + alpha->i * temp2.r;
-		q__1.r = Y(jy).r + q__2.r, q__1.i = Y(jy).i + q__2.i;
-		Y(jy).r = q__1.r, Y(jy).i = q__1.i;
+		q__1.r = y[i__3].r + q__2.r, q__1.i = y[i__3].i + q__2.i;
+		y[i__2].r = q__1.r, y[i__2].i = q__1.i;
 		jx += *incx;
 		jy += *incy;
 		kk += *n - j + 1;

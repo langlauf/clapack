@@ -1,11 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dlaed5_(integer *i, doublereal *d, doublereal *z, 
+/* Subroutine */ int dlaed5_(integer *i__, doublereal *d__, doublereal *z__, 
 	doublereal *delta, doublereal *rho, doublereal *dlam)
 {
-/*  -- LAPACK routine (version 2.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
        September 30, 1994   
 
@@ -13,8 +13,7 @@
     Purpose   
     =======   
 
-    This subroutine computes the I-th eigenvalue of a symmetric rank-one 
-  
+    This subroutine computes the I-th eigenvalue of a symmetric rank-one   
     modification of a 2-by-2 diagonal matrix   
 
                diag( D )  +  RHO *  Z * transpose(Z) .   
@@ -48,71 +47,74 @@
     DLAM   (output) DOUBLE PRECISION   
            The computed lambda_I, the I-th updated eigenvalue.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     doublereal d__1;
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static doublereal temp, b, c, w, del, tau;
+    static doublereal temp, b, c__, w, del, tau;
 
+    --delta;
+    --z__;
+    --d__;
 
-#define DELTA(I) delta[(I)-1]
-#define Z(I) z[(I)-1]
-#define D(I) d[(I)-1]
-
-
-    del = D(2) - D(1);
-    if (*i == 1) {
-	w = *rho * 2. * (Z(2) * Z(2) - Z(1) * Z(1)) / del + 1.;
+    /* Function Body */
+    del = d__[2] - d__[1];
+    if (*i__ == 1) {
+	w = *rho * 2. * (z__[2] * z__[2] - z__[1] * z__[1]) / del + 1.;
 	if (w > 0.) {
-	    b = del + *rho * (Z(1) * Z(1) + Z(2) * Z(2));
-	    c = *rho * Z(1) * Z(1) * del;
+	    b = del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	    c__ = *rho * z__[1] * z__[1] * del;
 
 /*           B > ZERO, always */
 
-	    tau = c * 2. / (b + sqrt((d__1 = b * b - c * 4., abs(d__1))));
-	    *dlam = D(1) + tau;
-	    DELTA(1) = -Z(1) / tau;
-	    DELTA(2) = Z(2) / (del - tau);
+	    tau = c__ * 2. / (b + sqrt((d__1 = b * b - c__ * 4., abs(d__1))));
+	    *dlam = d__[1] + tau;
+	    delta[1] = -z__[1] / tau;
+	    delta[2] = z__[2] / (del - tau);
 	} else {
-	    b = -del + *rho * (Z(1) * Z(1) + Z(2) * Z(2));
-	    c = *rho * Z(2) * Z(2) * del;
+	    b = -del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	    c__ = *rho * z__[2] * z__[2] * del;
 	    if (b > 0.) {
-		tau = c * -2. / (b + sqrt(b * b + c * 4.));
+		tau = c__ * -2. / (b + sqrt(b * b + c__ * 4.));
 	    } else {
-		tau = (b - sqrt(b * b + c * 4.)) / 2.;
+		tau = (b - sqrt(b * b + c__ * 4.)) / 2.;
 	    }
-	    *dlam = D(2) + tau;
-	    DELTA(1) = -Z(1) / (del + tau);
-	    DELTA(2) = -Z(2) / tau;
+	    *dlam = d__[2] + tau;
+	    delta[1] = -z__[1] / (del + tau);
+	    delta[2] = -z__[2] / tau;
 	}
-	temp = sqrt(DELTA(1) * DELTA(1) + DELTA(2) * DELTA(2));
-	DELTA(1) /= temp;
-	DELTA(2) /= temp;
+	temp = sqrt(delta[1] * delta[1] + delta[2] * delta[2]);
+	delta[1] /= temp;
+	delta[2] /= temp;
     } else {
 
 /*     Now I=2 */
 
-	b = -del + *rho * (Z(1) * Z(1) + Z(2) * Z(2));
-	c = *rho * Z(2) * Z(2) * del;
+	b = -del + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
+	c__ = *rho * z__[2] * z__[2] * del;
 	if (b > 0.) {
-	    tau = (b + sqrt(b * b + c * 4.)) / 2.;
+	    tau = (b + sqrt(b * b + c__ * 4.)) / 2.;
 	} else {
-	    tau = c * 2. / (-b + sqrt(b * b + c * 4.));
+	    tau = c__ * 2. / (-b + sqrt(b * b + c__ * 4.));
 	}
-	*dlam = D(2) + tau;
-	DELTA(1) = -Z(1) / (del + tau);
-	DELTA(2) = -Z(2) / tau;
-	temp = sqrt(DELTA(1) * DELTA(1) + DELTA(2) * DELTA(2));
-	DELTA(1) /= temp;
-	DELTA(2) /= temp;
+	*dlam = d__[2] + tau;
+	delta[1] = -z__[1] / (del + tau);
+	delta[2] = -z__[2] / tau;
+	temp = sqrt(delta[1] * delta[1] + delta[2] * delta[2]);
+	delta[1] /= temp;
+	delta[2] /= temp;
     }
     return 0;
 

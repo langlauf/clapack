@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -45,7 +46,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -56,15 +57,14 @@ static integer c__1 = 1;
 
     This is a special version of XERBLA to be used only as part of   
     the test program for testing error exits from the LAPACK routines.   
-    Error messages are printed if INFO.NE.INFOT or if SRNAME.NE.SRMANT,   
+    Error messages are printed if INFO.NE.INFOT or if SRNAME.NE.SRNAMT,   
     where INFOT and SRNAMT are values stored in COMMON.   
 
     Arguments   
     =========   
 
     SRNAME  (input) CHARACTER*6   
-            The name of the subroutine calling XERBLA.  This name should 
-  
+            The name of the subroutine calling XERBLA.  This name should   
             match the COMMON variable SRNAMT.   
 
     INFO    (input) INTEGER   
@@ -81,8 +81,7 @@ static integer c__1 = 1;
     NOUT    INTEGER      Unit number for printing error messages   
     OK      LOGICAL      Set to .TRUE. if INFO = INFOT and   
                          SRNAME = SRNAMT, otherwise set to .FALSE.   
-    LERR    LOGICAL      Set to .TRUE., indicating that XERBLA was called 
-  
+    LERR    LOGICAL      Set to .TRUE., indicating that XERBLA was called   
     SRNAMT  CHARACTER*6  Expected name of calling subroutine */
 
 
@@ -92,24 +91,24 @@ static integer c__1 = 1;
 	if (infoc_1.infot != 0) {
 	    io___1.ciunit = infoc_1.nout;
 	    s_wsfe(&io___1);
-	    do_fio(&c__1, srnamc_1.srnamt, 6L);
+	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&infoc_1.infot, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
 	    io___2.ciunit = infoc_1.nout;
 	    s_wsfe(&io___2);
-	    do_fio(&c__1, srname, 6L);
+	    do_fio(&c__1, srname, (ftnlen)6);
 	    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
 	infoc_1.ok = FALSE_;
     }
-    if (s_cmp(srname, srnamc_1.srnamt, 6L, 6L) != 0) {
+    if (s_cmp(srname, srnamc_1.srnamt, (ftnlen)6, (ftnlen)6) != 0) {
 	io___3.ciunit = infoc_1.nout;
 	s_wsfe(&io___3);
-	do_fio(&c__1, srname, 6L);
-	do_fio(&c__1, srnamc_1.srnamt, 6L);
+	do_fio(&c__1, srname, (ftnlen)6);
+	do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
 	e_wsfe();
 	infoc_1.ok = FALSE_;
     }

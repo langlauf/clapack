@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgetf2_(integer *m, integer *n, complex *a, integer *lda,
 	 integer *ipiv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -49,19 +50,15 @@
             < 0: if INFO = -k, the k-th argument had an illegal value   
             > 0: if INFO = k, U(k,k) is exactly zero. The factorization   
                  has been completed, but the factor U is exactly   
-                 singular, and division by zero will occur if it is used 
-  
+                 singular, and division by zero will occur if it is used   
                  to solve a system of equations.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static integer c__1 = 1;
@@ -80,13 +77,16 @@
     static integer jp;
     extern integer icamax_(integer *, complex *, integer *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -108,28 +108,28 @@
     }
 
     i__1 = min(*m,*n);
-    for (j = 1; j <= min(*m,*n); ++j) {
+    for (j = 1; j <= i__1; ++j) {
 
 /*        Find pivot and test for singularity. */
 
 	i__2 = *m - j + 1;
-	jp = j - 1 + icamax_(&i__2, &A(j,j), &c__1);
-	IPIV(j) = jp;
-	i__2 = jp + j * a_dim1;
-	if (A(jp,j).r != 0.f || A(jp,j).i != 0.f) {
+	jp = j - 1 + icamax_(&i__2, &a_ref(j, j), &c__1);
+	ipiv[j] = jp;
+	i__2 = a_subscr(jp, j);
+	if (a[i__2].r != 0.f || a[i__2].i != 0.f) {
 
 /*           Apply the interchange to columns 1:N. */
 
 	    if (jp != j) {
-		cswap_(n, &A(j,1), lda, &A(jp,1), lda);
+		cswap_(n, &a_ref(j, 1), lda, &a_ref(jp, 1), lda);
 	    }
 
 /*           Compute elements J+1:M of J-th column. */
 
 	    if (j < *m) {
 		i__2 = *m - j;
-		c_div(&q__1, &c_b1, &A(j,j));
-		cscal_(&i__2, &q__1, &A(j+1,j), &c__1);
+		c_div(&q__1, &c_b1, &a_ref(j, j));
+		cscal_(&i__2, &q__1, &a_ref(j + 1, j), &c__1);
 	    }
 
 	} else if (*info == 0) {
@@ -144,8 +144,8 @@
 	    i__2 = *m - j;
 	    i__3 = *n - j;
 	    q__1.r = -1.f, q__1.i = 0.f;
-	    cgeru_(&i__2, &i__3, &q__1, &A(j+1,j), &c__1, &A(j,j+1), lda, &A(j+1,j+1), lda)
-		    ;
+	    cgeru_(&i__2, &i__3, &q__1, &a_ref(j + 1, j), &c__1, &a_ref(j, j 
+		    + 1), lda, &a_ref(j + 1, j + 1), lda);
 	}
 /* L10: */
     }
@@ -154,4 +154,8 @@
 /*     End of CGETF2 */
 
 } /* cgetf2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

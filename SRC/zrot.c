@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zrot_(integer *n, doublecomplex *cx, integer *incx, 
-	doublecomplex *cy, integer *incy, doublereal *c, doublecomplex *s)
+	doublecomplex *cy, integer *incy, doublereal *c__, doublecomplex *s)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -42,28 +43,24 @@
                [ -conjg(S)   C  ]   
             where C*C + S*CONJG(S) = 1.0.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     doublecomplex z__1, z__2, z__3, z__4;
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublecomplex stemp;
     static integer ix, iy;
 
+    --cy;
+    --cx;
 
-#define CY(I) cy[(I)-1]
-#define CX(I) cx[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 0) {
 	return 0;
     }
@@ -82,25 +79,25 @@
 	iy = (-(*n) + 1) * *incy + 1;
     }
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = ix;
-	z__2.r = *c * CX(ix).r, z__2.i = *c * CX(ix).i;
+	z__2.r = *c__ * cx[i__2].r, z__2.i = *c__ * cx[i__2].i;
 	i__3 = iy;
-	z__3.r = s->r * CY(iy).r - s->i * CY(iy).i, z__3.i = s->r * CY(
-		iy).i + s->i * CY(iy).r;
+	z__3.r = s->r * cy[i__3].r - s->i * cy[i__3].i, z__3.i = s->r * cy[
+		i__3].i + s->i * cy[i__3].r;
 	z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 	stemp.r = z__1.r, stemp.i = z__1.i;
 	i__2 = iy;
 	i__3 = iy;
-	z__2.r = *c * CY(iy).r, z__2.i = *c * CY(iy).i;
+	z__2.r = *c__ * cy[i__3].r, z__2.i = *c__ * cy[i__3].i;
 	d_cnjg(&z__4, s);
 	i__4 = ix;
-	z__3.r = z__4.r * CX(ix).r - z__4.i * CX(ix).i, z__3.i = z__4.r * 
-		CX(ix).i + z__4.i * CX(ix).r;
+	z__3.r = z__4.r * cx[i__4].r - z__4.i * cx[i__4].i, z__3.i = z__4.r * 
+		cx[i__4].i + z__4.i * cx[i__4].r;
 	z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
-	CY(iy).r = z__1.r, CY(iy).i = z__1.i;
+	cy[i__2].r = z__1.r, cy[i__2].i = z__1.i;
 	i__2 = ix;
-	CX(ix).r = stemp.r, CX(ix).i = stemp.i;
+	cx[i__2].r = stemp.r, cx[i__2].i = stemp.i;
 	ix += *incx;
 	iy += *incy;
 /* L10: */
@@ -111,25 +108,25 @@
 
 L20:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i;
-	z__2.r = *c * CX(i).r, z__2.i = *c * CX(i).i;
-	i__3 = i;
-	z__3.r = s->r * CY(i).r - s->i * CY(i).i, z__3.i = s->r * CY(
-		i).i + s->i * CY(i).r;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	z__2.r = *c__ * cx[i__2].r, z__2.i = *c__ * cx[i__2].i;
+	i__3 = i__;
+	z__3.r = s->r * cy[i__3].r - s->i * cy[i__3].i, z__3.i = s->r * cy[
+		i__3].i + s->i * cy[i__3].r;
 	z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 	stemp.r = z__1.r, stemp.i = z__1.i;
-	i__2 = i;
-	i__3 = i;
-	z__2.r = *c * CY(i).r, z__2.i = *c * CY(i).i;
+	i__2 = i__;
+	i__3 = i__;
+	z__2.r = *c__ * cy[i__3].r, z__2.i = *c__ * cy[i__3].i;
 	d_cnjg(&z__4, s);
-	i__4 = i;
-	z__3.r = z__4.r * CX(i).r - z__4.i * CX(i).i, z__3.i = z__4.r * 
-		CX(i).i + z__4.i * CX(i).r;
+	i__4 = i__;
+	z__3.r = z__4.r * cx[i__4].r - z__4.i * cx[i__4].i, z__3.i = z__4.r * 
+		cx[i__4].i + z__4.i * cx[i__4].r;
 	z__1.r = z__2.r - z__3.r, z__1.i = z__2.i - z__3.i;
-	CY(i).r = z__1.r, CY(i).i = z__1.i;
-	i__2 = i;
-	CX(i).r = stemp.r, CX(i).i = stemp.i;
+	cy[i__2].r = z__1.r, cy[i__2].i = z__1.i;
+	i__2 = i__;
+	cx[i__2].r = stemp.r, cx[i__2].i = stemp.i;
 /* L30: */
     }
     return 0;

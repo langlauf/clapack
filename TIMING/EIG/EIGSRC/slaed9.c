@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,8 +19,8 @@ struct {
 static integer c__1 = 1;
 
 /* Subroutine */ int slaed9_(integer *k, integer *kstart, integer *kstop, 
-	integer *n, real *d, real *q, integer *ldq, real *rho, real *dlamda, 
-	real *w, real *s, integer *lds, integer *info)
+	integer *n, real *d__, real *q, integer *ldq, real *rho, real *dlamda,
+	 real *w, real *s, integer *lds, integer *info)
 {
     /* System generated locals */
     integer q_dim1, q_offset, s_dim1, s_offset, i__1, i__2;
@@ -31,7 +32,7 @@ static integer c__1 = 1;
     /* Local variables */
     static real temp;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *), slaed4_(integer *, integer *, real *, real *, real *, 
 	    real *, real *, integer *);
@@ -39,10 +40,12 @@ static integer c__1 = 1;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define s_ref(a_1,a_2) s[(a_2)*s_dim1 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
        September 30, 1994   
 
@@ -61,8 +64,7 @@ static integer c__1 = 1;
     =========   
 
     K       (input) INTEGER   
-            The number of terms in the rational function to be solved by 
-  
+            The number of terms in the rational function to be solved by   
             SLAED4.  K >= 0.   
 
     KSTART  (input) INTEGER   
@@ -110,21 +112,27 @@ static integer c__1 = 1;
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = 1, an eigenvalue did not converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --dlamda;
     --w;
     s_dim1 = *lds;
-    s_offset = s_dim1 + 1;
+    s_offset = 1 + s_dim1 * 1;
     s -= s_offset;
 
     /* Function Body */
@@ -156,8 +164,7 @@ static integer c__1 = 1;
     }
 
 /*     Modify values DLAMDA(i) to make sure all DLAMDA(i)-DLAMDA(j) can   
-       be computed with high relative accuracy (barring over/underflow). 
-  
+       be computed with high relative accuracy (barring over/underflow).   
        This is a problem on machines without a guard digit in   
        add/subtract (Cray XMP, Cray YMP, Cray C 90 and Cray 2).   
        The following code replaces DLAMDA(I) by 2*DLAMDA(I)-DLAMDA(I),   
@@ -175,15 +182,14 @@ static integer c__1 = 1;
 
     latime_1.ops += *n << 1;
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	dlamda[i] = slamc3_(&dlamda[i], &dlamda[i]) - dlamda[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	dlamda[i__] = slamc3_(&dlamda[i__], &dlamda[i__]) - dlamda[i__];
 /* L10: */
     }
 
     i__1 = *kstop;
     for (j = *kstart; j <= i__1; ++j) {
-	slaed4_(k, &j, &dlamda[1], &w[1], &q[j * q_dim1 + 1], rho, &d[j], 
-		info);
+	slaed4_(k, &j, &dlamda[1], &w[1], &q_ref(1, j), rho, &d__[j], info);
 
 /*        If the zero finder fails, the computation is terminated. */
 
@@ -195,10 +201,10 @@ static integer c__1 = 1;
 
     if (*k == 1 || *k == 2) {
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *k;
 	    for (j = 1; j <= i__2; ++j) {
-		s[j + i * s_dim1] = q[j + i * q_dim1];
+		s_ref(j, i__) = q_ref(j, i__);
 /* L30: */
 	    }
 /* L40: */
@@ -218,21 +224,21 @@ static integer c__1 = 1;
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j - 1;
-	for (i = 1; i <= i__2; ++i) {
-	    w[i] *= q[i + j * q_dim1] / (dlamda[i] - dlamda[j]);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    w[i__] *= q_ref(i__, j) / (dlamda[i__] - dlamda[j]);
 /* L50: */
 	}
 	i__2 = *k;
-	for (i = j + 1; i <= i__2; ++i) {
-	    w[i] *= q[i + j * q_dim1] / (dlamda[i] - dlamda[j]);
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    w[i__] *= q_ref(i__, j) / (dlamda[i__] - dlamda[j]);
 /* L60: */
 	}
 /* L70: */
     }
     i__1 = *k;
-    for (i = 1; i <= i__1; ++i) {
-	r__1 = sqrt(-(doublereal)w[i]);
-	w[i] = r_sign(&r__1, &s[i + s_dim1]);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	r__1 = sqrt(-w[i__]);
+	w[i__] = r_sign(&r__1, &s_ref(i__, 1));
 /* L80: */
     }
 
@@ -242,14 +248,14 @@ static integer c__1 = 1;
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *k;
-	for (i = 1; i <= i__2; ++i) {
-	    q[i + j * q_dim1] = w[i] / q[i + j * q_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    q_ref(i__, j) = w[i__] / q_ref(i__, j);
 /* L90: */
 	}
-	temp = snrm2_(k, &q[j * q_dim1 + 1], &c__1);
+	temp = snrm2_(k, &q_ref(1, j), &c__1);
 	i__2 = *k;
-	for (i = 1; i <= i__2; ++i) {
-	    s[i + j * s_dim1] = q[i + j * q_dim1] / temp;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    s_ref(i__, j) = q_ref(i__, j) / temp;
 /* L100: */
 	}
 /* L110: */
@@ -261,4 +267,8 @@ L120:
 /*     End of SLAED9 */
 
 } /* slaed9_ */
+
+#undef s_ref
+#undef q_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,7 @@ static doublereal c_b152 = -1.;
     /* Local variables */
     static integer info;
     static doublereal anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
+    static integer i__, j;
     static doublereal w[12], x[4], rcond;
     static char c2[2];
     static doublereal r1[4], r2[4], af[16]	/* was [4][4] */;
@@ -73,7 +74,11 @@ static doublereal c_b152 = -1.;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -94,22 +99,21 @@ static doublereal c_b152 = -1.;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
-	    af[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -127,13 +131,12 @@ static doublereal c_b152 = -1.;
 
     if (lsamen_(&c__2, c2, "SY")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman 
-  
+/*        Test error exits of the routines that use the Bunch-Kaufman   
           factorization of a symmetric indefinite matrix.   
 
           DSYTRF */
 
-	s_copy(srnamc_1.srnamt, "DSYTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("DSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -149,7 +152,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "DSYTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("DSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -165,7 +168,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTRI */
 
-	s_copy(srnamc_1.srnamt, "DSYTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("DSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -181,7 +184,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYTRS */
 
-	s_copy(srnamc_1.srnamt, "DSYTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("DSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +208,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYRFS */
 
-	s_copy(srnamc_1.srnamt, "DSYRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
 		c__1, r1, r2, w, iw, &info);
@@ -244,7 +247,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSYCON */
 
-	s_copy(srnamc_1.srnamt, "DSYCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("DSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -264,13 +267,12 @@ static doublereal c_b152 = -1.;
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman 
-  
+/*        Test error exits of the routines that use the Bunch-Kaufman   
           factorization of a symmetric indefinite packed matrix.   
 
           DSPTRF */
 
-	s_copy(srnamc_1.srnamt, "DSPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptrf_("/", &c__0, a, ip, &info);
 	chkxer_("DSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -282,7 +284,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPTRI */
 
-	s_copy(srnamc_1.srnamt, "DSPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("DSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -294,7 +296,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPTRS */
 
-	s_copy(srnamc_1.srnamt, "DSPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("DSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -314,7 +316,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPRFS */
 
-	s_copy(srnamc_1.srnamt, "DSPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
 		iw, &info);
@@ -343,7 +345,7 @@ static doublereal c_b152 = -1.;
 
 /*        DSPCON */
 
-	s_copy(srnamc_1.srnamt, "DSPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspcon_("/", &c__0, a, ip, &anrm, &rcond, w, iw, &info);
 	chkxer_("DSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -367,4 +369,8 @@ static doublereal c_b152 = -1.;
 /*     End of DERRSY */
 
 } /* derrsy_ */
+
+#undef af_ref
+#undef a_ref
+
 

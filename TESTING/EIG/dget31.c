@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,7 +19,7 @@ static integer c__2 = 2;
 
     /* System generated locals */
     doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8, d__9, d__10, 
-	    d__11, d__12, d__13;
+	    d__11, d__12, d__13, d__14, d__15, d__16, d__17;
 
     /* Builtin functions */
     double sqrt(doublereal);
@@ -50,10 +51,15 @@ static integer c__2 = 2;
     static doublereal vwi[4], vwr[4];
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+#define b_ref(a_1,a_2) b[(a_2)*2 + a_1 - 3]
+#define x_ref(a_1,a_2) x[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -63,14 +69,11 @@ static integer c__2 = 2;
 
        (ca A - w D)X = sB   
 
-    where A is an NA by NA matrix (NA=1 or 2 only), w is a real (NW=1) or 
-  
-    complex (NW=2) constant, ca is a real constant, D is an NA by NA real 
-  
+    where A is an NA by NA matrix (NA=1 or 2 only), w is a real (NW=1) or   
+    complex (NW=2) constant, ca is a real constant, D is an NA by NA real   
     diagonal matrix, and B is an NA by NW matrix (when NW=2 the second   
     column of B contains the imaginary part of the solution).  The code   
-    returns X and s, where s is a scale factor, less than or equal to 1, 
-  
+    returns X and s, where s is a scale factor, less than or equal to 1,   
     which is chosen to avoid overflow in X.   
 
     If any singular values of ca A-w D are less than another input   
@@ -82,8 +85,7 @@ static integer c__2 = 2;
               ( max( ulp*norm(ca A-w D), SMIN )*norm(X) )   
 
     should be on the order of 1.  Here, ulp is the machine precision.   
-    Also, it is verified that SCALE is less than or equal to 1, and that 
-  
+    Also, it is verified that SCALE is less than or equal to 1, and that   
     XNORM = infinity-norm(X).   
 
     Arguments   
@@ -102,8 +104,7 @@ static integer c__2 = 2;
     KNT     (output) INTEGER   
             Total number of examples tested.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --ninfo;
@@ -166,12 +167,12 @@ static integer c__2 = 2;
 			na = 1;
 			nw = 1;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a[0] = vab[ia - 1];
+			    a_ref(1, 1) = vab[ia - 1];
 			    for (ib = 1; ib <= 3; ++ib) {
-				b[0] = vab[ib - 1];
+				b_ref(1, 1) = vab[ib - 1];
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1. && d2 == 1. && ca == 1.) {
-					wr = vwr[iwr - 1] * a[0];
+					wr = vwr[iwr - 1] * a_ref(1, 1);
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
@@ -186,29 +187,35 @@ static integer c__2 = 2;
 				    if (info > 0) {
 					++ninfo[2];
 				    }
-				    res = (d__1 = (ca * a[0] - wr * d1) * x[0]
-					     - scale * b[0], abs(d__1));
+				    res = (d__1 = (ca * a_ref(1, 1) - wr * d1)
+					     * x_ref(1, 1) - scale * b_ref(1, 
+					    1), abs(d__1));
 				    if (info == 0) {
 /* Computing MAX */
-					d__2 = eps * (d__1 = (ca * a[0] - wr *
-						 d1) * x[0], abs(d__1));
+					d__2 = eps * (d__1 = (ca * a_ref(1, 1)
+						 - wr * d1) * x_ref(1, 1), 
+						abs(d__1));
 					den = max(d__2,smlnum);
 				    } else {
 /* Computing MAX */
-					d__1 = smin * abs(x[0]);
-					den = max(d__1,smlnum);
+					d__2 = smin * (d__1 = x_ref(1, 1), 
+						abs(d__1));
+					den = max(d__2,smlnum);
 				    }
 				    res /= den;
-				    if (abs(x[0]) < unfl && abs(b[0]) <= 
-					    smlnum * (d__1 = ca * a[0] - wr * 
-					    d1, abs(d__1))) {
+				    if ((d__1 = x_ref(1, 1), abs(d__1)) < 
+					    unfl && (d__3 = b_ref(1, 1), abs(
+					    d__3)) <= smlnum * (d__2 = ca * 
+					    a_ref(1, 1) - wr * d1, abs(d__2)))
+					     {
 					res = 0.;
 				    }
 				    if (scale > 1.) {
 					res += 1. / eps;
 				    }
-				    res += (d__1 = xnorm - abs(x[0]), abs(
-					    d__1)) / max(smlnum,xnorm) / eps;
+				    res += (d__2 = xnorm - (d__1 = x_ref(1, 1)
+					    , abs(d__1)), abs(d__2)) / max(
+					    smlnum,xnorm) / eps;
 				    if (info != 0 && info != 1) {
 					res += 1. / eps;
 				    }
@@ -227,20 +234,20 @@ static integer c__2 = 2;
 			na = 1;
 			nw = 2;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a[0] = vab[ia - 1];
+			    a_ref(1, 1) = vab[ia - 1];
 			    for (ib = 1; ib <= 3; ++ib) {
-				b[0] = vab[ib - 1];
-				b[2] = vab[ib - 1] * -.5;
+				b_ref(1, 1) = vab[ib - 1];
+				b_ref(1, 2) = vab[ib - 1] * -.5;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1. && d2 == 1. && ca == 1.) {
-					wr = vwr[iwr - 1] * a[0];
+					wr = vwr[iwr - 1] * a_ref(1, 1);
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    for (iwi = 1; iwi <= 4; ++iwi) {
 					if (d1 == 1. && d2 == 1. && ca == 1.) 
 						{
-					    wi = vwi[iwi - 1] * a[0];
+					    wi = vwi[iwi - 1] * a_ref(1, 1);
 					} else {
 					    wi = vwi[iwi - 1];
 					}
@@ -254,41 +261,50 @@ static integer c__2 = 2;
 					if (info > 0) {
 					    ++ninfo[2];
 					}
-					res = (d__1 = (ca * a[0] - wr * d1) * 
-						x[0] + wi * d1 * x[2] - scale 
-						* b[0], abs(d__1));
-					res += (d__1 = -wi * d1 * x[0] + (ca *
-						 a[0] - wr * d1) * x[2] - 
-						scale * b[2], abs(d__1));
+					res = (d__1 = (ca * a_ref(1, 1) - wr *
+						 d1) * x_ref(1, 1) + wi * d1 *
+						 x_ref(1, 2) - scale * b_ref(
+						1, 1), abs(d__1));
+					res += (d__1 = -wi * d1 * x_ref(1, 1) 
+						+ (ca * a_ref(1, 1) - wr * d1)
+						 * x_ref(1, 2) - scale * 
+						b_ref(1, 2), abs(d__1));
 					if (info == 0) {
 /* Computing MAX   
    Computing MAX */
-					    d__4 = (d__1 = ca * a[0] - wr * 
-						    d1, abs(d__1)), d__5 = (
-						    d__2 = d1 * wi, abs(d__2))
-						    ;
-					    d__3 = eps * (max(d__4,d__5) * (
-						    abs(x[0]) + abs(x[2])));
-					    den = max(d__3,smlnum);
+					    d__6 = (d__3 = ca * a_ref(1, 1) - 
+						    wr * d1, abs(d__3)), d__7 
+						    = (d__4 = d1 * wi, abs(
+						    d__4));
+					    d__5 = eps * (max(d__6,d__7) * ((
+						    d__1 = x_ref(1, 1), abs(
+						    d__1)) + (d__2 = x_ref(1, 
+						    2), abs(d__2))));
+					    den = max(d__5,smlnum);
 					} else {
 /* Computing MAX */
-					    d__1 = smin * (abs(x[0]) + abs(x[
-						    2]));
-					    den = max(d__1,smlnum);
+					    d__3 = smin * ((d__1 = x_ref(1, 1)
+						    , abs(d__1)) + (d__2 = 
+						    x_ref(1, 2), abs(d__2)));
+					    den = max(d__3,smlnum);
 					}
 					res /= den;
-					if (abs(x[0]) < unfl && abs(x[2]) < 
-						unfl && abs(b[0]) <= smlnum * 
-						(d__1 = ca * a[0] - wr * d1, 
-						abs(d__1))) {
+					if ((d__1 = x_ref(1, 1), abs(d__1)) < 
+						unfl && (d__2 = x_ref(1, 2), 
+						abs(d__2)) < unfl && (d__4 = 
+						b_ref(1, 1), abs(d__4)) <= 
+						smlnum * (d__3 = ca * a_ref(1,
+						 1) - wr * d1, abs(d__3))) {
 					    res = 0.;
 					}
 					if (scale > 1.) {
 					    res += 1. / eps;
 					}
-					res += (d__1 = xnorm - abs(x[0]) - 
-						abs(x[2]), abs(d__1)) / max(
-						smlnum,xnorm) / eps;
+					res += (d__3 = xnorm - (d__1 = x_ref(
+						1, 1), abs(d__1)) - (d__2 = 
+						x_ref(1, 2), abs(d__2)), abs(
+						d__3)) / max(smlnum,xnorm) / 
+						eps;
 					if (info != 0 && info != 1) {
 					    res += 1. / eps;
 					}
@@ -309,16 +325,16 @@ static integer c__2 = 2;
 			na = 2;
 			nw = 1;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a[0] = vab[ia - 1];
-			    a[2] = vab[ia - 1] * -3.;
-			    a[1] = vab[ia - 1] * -7.;
-			    a[3] = vab[ia - 1] * 21.;
+			    a_ref(1, 1) = vab[ia - 1];
+			    a_ref(1, 2) = vab[ia - 1] * -3.;
+			    a_ref(2, 1) = vab[ia - 1] * -7.;
+			    a_ref(2, 2) = vab[ia - 1] * 21.;
 			    for (ib = 1; ib <= 3; ++ib) {
-				b[0] = vab[ib - 1];
-				b[1] = vab[ib - 1] * -2.;
+				b_ref(1, 1) = vab[ib - 1];
+				b_ref(2, 1) = vab[ib - 1] * -2.;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1. && d2 == 1. && ca == 1.) {
-					wr = vwr[iwr - 1] * a[0];
+					wr = vwr[iwr - 1] * a_ref(1, 1);
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
@@ -334,65 +350,79 @@ static integer c__2 = 2;
 					++ninfo[2];
 				    }
 				    if (itrans == 1) {
-					tmp = a[2];
-					a[2] = a[1];
-					a[1] = tmp;
+					tmp = a_ref(1, 2);
+					a_ref(1, 2) = a_ref(2, 1);
+					a_ref(2, 1) = tmp;
 				    }
-				    res = (d__1 = (ca * a[0] - wr * d1) * x[0]
-					     + ca * a[2] * x[1] - scale * b[0]
-					    , abs(d__1));
-				    res += (d__1 = ca * a[1] * x[0] + (ca * a[
-					    3] - wr * d2) * x[1] - scale * b[
-					    1], abs(d__1));
+				    res = (d__1 = (ca * a_ref(1, 1) - wr * d1)
+					     * x_ref(1, 1) + ca * a_ref(1, 2) 
+					    * x_ref(2, 1) - scale * b_ref(1, 
+					    1), abs(d__1));
+				    res += (d__1 = ca * a_ref(2, 1) * x_ref(1,
+					     1) + (ca * a_ref(2, 2) - wr * d2)
+					     * x_ref(2, 1) - scale * b_ref(2, 
+					    1), abs(d__1));
 				    if (info == 0) {
 /* Computing MAX   
    Computing MAX */
-					d__6 = (d__1 = ca * a[0] - wr * d1, 
-						abs(d__1)) + (d__2 = ca * a[2]
-						, abs(d__2)), d__7 = (d__3 = 
-						ca * a[1], abs(d__3)) + (d__4 
-						= ca * a[3] - wr * d2, abs(
+					d__8 = (d__1 = ca * a_ref(1, 1) - wr *
+						 d1, abs(d__1)) + (d__2 = ca *
+						 a_ref(1, 2), abs(d__2)), 
+						d__9 = (d__3 = ca * a_ref(2, 
+						1), abs(d__3)) + (d__4 = ca * 
+						a_ref(2, 2) - wr * d2, abs(
 						d__4));
 /* Computing MAX */
-					d__8 = abs(x[0]), d__9 = abs(x[1]);
-					d__5 = eps * (max(d__6,d__7) * max(
-						d__8,d__9));
-					den = max(d__5,smlnum);
+					d__10 = (d__5 = x_ref(1, 1), abs(d__5)
+						), d__11 = (d__6 = x_ref(2, 1)
+						, abs(d__6));
+					d__7 = eps * (max(d__8,d__9) * max(
+						d__10,d__11));
+					den = max(d__7,smlnum);
 				    } else {
 /* Computing MAX   
    Computing MAX   
    Computing MAX */
-					d__8 = (d__1 = ca * a[0] - wr * d1, 
-						abs(d__1)) + (d__2 = ca * a[2]
-						, abs(d__2)), d__9 = (d__3 = 
-						ca * a[1], abs(d__3)) + (d__4 
-						= ca * a[3] - wr * d2, abs(
+					d__10 = (d__1 = ca * a_ref(1, 1) - wr 
+						* d1, abs(d__1)) + (d__2 = ca 
+						* a_ref(1, 2), abs(d__2)), 
+						d__11 = (d__3 = ca * a_ref(2, 
+						1), abs(d__3)) + (d__4 = ca * 
+						a_ref(2, 2) - wr * d2, abs(
 						d__4));
-					d__6 = smin / eps, d__7 = max(d__8,
-						d__9);
+					d__8 = smin / eps, d__9 = max(d__10,
+						d__11);
 /* Computing MAX */
-					d__10 = abs(x[0]), d__11 = abs(x[1]);
-					d__5 = eps * (max(d__6,d__7) * max(
-						d__10,d__11));
-					den = max(d__5,smlnum);
+					d__12 = (d__5 = x_ref(1, 1), abs(d__5)
+						), d__13 = (d__6 = x_ref(2, 1)
+						, abs(d__6));
+					d__7 = eps * (max(d__8,d__9) * max(
+						d__12,d__13));
+					den = max(d__7,smlnum);
 				    }
 				    res /= den;
-				    if (abs(x[0]) < unfl && abs(x[1]) < unfl 
-					    && abs(b[0]) + abs(b[1]) <= 
-					    smlnum * ((d__1 = ca * a[0] - wr *
-					     d1, abs(d__1)) + (d__2 = ca * a[
-					    2], abs(d__2)) + (d__3 = ca * a[1]
-					    , abs(d__3)) + (d__4 = ca * a[3] 
-					    - wr * d2, abs(d__4)))) {
+				    if ((d__1 = x_ref(1, 1), abs(d__1)) < 
+					    unfl && (d__2 = x_ref(2, 1), abs(
+					    d__2)) < unfl && (d__3 = b_ref(1, 
+					    1), abs(d__3)) + (d__4 = b_ref(2, 
+					    1), abs(d__4)) <= smlnum * ((d__5 
+					    = ca * a_ref(1, 1) - wr * d1, abs(
+					    d__5)) + (d__6 = ca * a_ref(1, 2),
+					     abs(d__6)) + (d__7 = ca * a_ref(
+					    2, 1), abs(d__7)) + (d__8 = ca * 
+					    a_ref(2, 2) - wr * d2, abs(d__8)))
+					    ) {
 					res = 0.;
 				    }
 				    if (scale > 1.) {
 					res += 1. / eps;
 				    }
 /* Computing MAX */
-				    d__2 = abs(x[0]), d__3 = abs(x[1]);
-				    res += (d__1 = xnorm - max(d__2,d__3), 
-					    abs(d__1)) / max(smlnum,xnorm) / 
+				    d__4 = (d__1 = x_ref(1, 1), abs(d__1)), 
+					    d__5 = (d__2 = x_ref(2, 1), abs(
+					    d__2));
+				    res += (d__3 = xnorm - max(d__4,d__5), 
+					    abs(d__3)) / max(smlnum,xnorm) / 
 					    eps;
 				    if (info != 0 && info != 1) {
 					res += 1. / eps;
@@ -412,25 +442,25 @@ static integer c__2 = 2;
 			na = 2;
 			nw = 2;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a[0] = vab[ia - 1] * 2.;
-			    a[2] = vab[ia - 1] * -3.;
-			    a[1] = vab[ia - 1] * -7.;
-			    a[3] = vab[ia - 1] * 21.;
+			    a_ref(1, 1) = vab[ia - 1] * 2.;
+			    a_ref(1, 2) = vab[ia - 1] * -3.;
+			    a_ref(2, 1) = vab[ia - 1] * -7.;
+			    a_ref(2, 2) = vab[ia - 1] * 21.;
 			    for (ib = 1; ib <= 3; ++ib) {
-				b[0] = vab[ib - 1];
-				b[1] = vab[ib - 1] * -2.;
-				b[2] = vab[ib - 1] * 4.;
-				b[3] = vab[ib - 1] * -7.;
+				b_ref(1, 1) = vab[ib - 1];
+				b_ref(2, 1) = vab[ib - 1] * -2.;
+				b_ref(1, 2) = vab[ib - 1] * 4.;
+				b_ref(2, 2) = vab[ib - 1] * -7.;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1. && d2 == 1. && ca == 1.) {
-					wr = vwr[iwr - 1] * a[0];
+					wr = vwr[iwr - 1] * a_ref(1, 1);
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    for (iwi = 1; iwi <= 4; ++iwi) {
 					if (d1 == 1. && d2 == 1. && ca == 1.) 
 						{
-					    wi = vwi[iwi - 1] * a[0];
+					    wi = vwi[iwi - 1] * a_ref(1, 1);
 					} else {
 					    wi = vwi[iwi - 1];
 					}
@@ -445,90 +475,111 @@ static integer c__2 = 2;
 					    ++ninfo[2];
 					}
 					if (itrans == 1) {
-					    tmp = a[2];
-					    a[2] = a[1];
-					    a[1] = tmp;
+					    tmp = a_ref(1, 2);
+					    a_ref(1, 2) = a_ref(2, 1);
+					    a_ref(2, 1) = tmp;
 					}
-					res = (d__1 = (ca * a[0] - wr * d1) * 
-						x[0] + ca * a[2] * x[1] + wi *
-						 d1 * x[2] - scale * b[0], 
-						abs(d__1));
-					res += (d__1 = (ca * a[0] - wr * d1) *
-						 x[2] + ca * a[2] * x[3] - wi 
-						* d1 * x[0] - scale * b[2], 
-						abs(d__1));
-					res += (d__1 = ca * a[1] * x[0] + (ca 
-						* a[3] - wr * d2) * x[1] + wi 
-						* d2 * x[3] - scale * b[1], 
-						abs(d__1));
-					res += (d__1 = ca * a[1] * x[2] + (ca 
-						* a[3] - wr * d2) * x[3] - wi 
-						* d2 * x[1] - scale * b[3], 
-						abs(d__1));
+					res = (d__1 = (ca * a_ref(1, 1) - wr *
+						 d1) * x_ref(1, 1) + ca * 
+						a_ref(1, 2) * x_ref(2, 1) + 
+						wi * d1 * x_ref(1, 2) - scale 
+						* b_ref(1, 1), abs(d__1));
+					res += (d__1 = (ca * a_ref(1, 1) - wr 
+						* d1) * x_ref(1, 2) + ca * 
+						a_ref(1, 2) * x_ref(2, 2) - 
+						wi * d1 * x_ref(1, 1) - scale 
+						* b_ref(1, 2), abs(d__1));
+					res += (d__1 = ca * a_ref(2, 1) * 
+						x_ref(1, 1) + (ca * a_ref(2, 
+						2) - wr * d2) * x_ref(2, 1) + 
+						wi * d2 * x_ref(2, 2) - scale 
+						* b_ref(2, 1), abs(d__1));
+					res += (d__1 = ca * a_ref(2, 1) * 
+						x_ref(1, 2) + (ca * a_ref(2, 
+						2) - wr * d2) * x_ref(2, 2) - 
+						wi * d2 * x_ref(2, 1) - scale 
+						* b_ref(2, 2), abs(d__1));
 					if (info == 0) {
 /* Computing MAX   
    Computing MAX */
-					    d__8 = (d__1 = ca * a[0] - wr * 
-						    d1, abs(d__1)) + (d__2 = 
-						    ca * a[2], abs(d__2)) + (
-						    d__3 = wi * d1, abs(d__3))
-						    , d__9 = (d__4 = ca * a[1]
-						    , abs(d__4)) + (d__5 = ca 
-						    * a[3] - wr * d2, abs(
-						    d__5)) + (d__6 = wi * d2, 
-						    abs(d__6));
+					    d__12 = (d__1 = ca * a_ref(1, 1) 
+						    - wr * d1, abs(d__1)) + (
+						    d__2 = ca * a_ref(1, 2), 
+						    abs(d__2)) + (d__3 = wi * 
+						    d1, abs(d__3)), d__13 = (
+						    d__4 = ca * a_ref(2, 1), 
+						    abs(d__4)) + (d__5 = ca * 
+						    a_ref(2, 2) - wr * d2, 
+						    abs(d__5)) + (d__6 = wi * 
+						    d2, abs(d__6));
 /* Computing MAX */
-					    d__10 = abs(x[0]) + abs(x[1]), 
-						    d__11 = abs(x[2]) + abs(x[
-						    3]);
-					    d__7 = eps * (max(d__8,d__9) * 
-						    max(d__10,d__11));
-					    den = max(d__7,smlnum);
+					    d__14 = (d__7 = x_ref(1, 1), abs(
+						    d__7)) + (d__8 = x_ref(2, 
+						    1), abs(d__8)), d__15 = (
+						    d__9 = x_ref(1, 2), abs(
+						    d__9)) + (d__10 = x_ref(2,
+						     2), abs(d__10));
+					    d__11 = eps * (max(d__12,d__13) * 
+						    max(d__14,d__15));
+					    den = max(d__11,smlnum);
 					} else {
 /* Computing MAX   
    Computing MAX   
    Computing MAX */
-					    d__10 = (d__1 = ca * a[0] - wr * 
-						    d1, abs(d__1)) + (d__2 = 
-						    ca * a[2], abs(d__2)) + (
-						    d__3 = wi * d1, abs(d__3))
-						    , d__11 = (d__4 = ca * a[
-						    1], abs(d__4)) + (d__5 = 
-						    ca * a[3] - wr * d2, abs(
-						    d__5)) + (d__6 = wi * d2, 
-						    abs(d__6));
-					    d__8 = smin / eps, d__9 = max(
-						    d__10,d__11);
+					    d__14 = (d__1 = ca * a_ref(1, 1) 
+						    - wr * d1, abs(d__1)) + (
+						    d__2 = ca * a_ref(1, 2), 
+						    abs(d__2)) + (d__3 = wi * 
+						    d1, abs(d__3)), d__15 = (
+						    d__4 = ca * a_ref(2, 1), 
+						    abs(d__4)) + (d__5 = ca * 
+						    a_ref(2, 2) - wr * d2, 
+						    abs(d__5)) + (d__6 = wi * 
+						    d2, abs(d__6));
+					    d__12 = smin / eps, d__13 = max(
+						    d__14,d__15);
 /* Computing MAX */
-					    d__12 = abs(x[0]) + abs(x[1]), 
-						    d__13 = abs(x[2]) + abs(x[
-						    3]);
-					    d__7 = eps * (max(d__8,d__9) * 
-						    max(d__12,d__13));
-					    den = max(d__7,smlnum);
+					    d__16 = (d__7 = x_ref(1, 1), abs(
+						    d__7)) + (d__8 = x_ref(2, 
+						    1), abs(d__8)), d__17 = (
+						    d__9 = x_ref(1, 2), abs(
+						    d__9)) + (d__10 = x_ref(2,
+						     2), abs(d__10));
+					    d__11 = eps * (max(d__12,d__13) * 
+						    max(d__16,d__17));
+					    den = max(d__11,smlnum);
 					}
 					res /= den;
-					if (abs(x[0]) < unfl && abs(x[1]) < 
-						unfl && abs(x[2]) < unfl && 
-						abs(x[3]) < unfl && abs(b[0]) 
-						+ abs(b[1]) <= smlnum * ((
-						d__1 = ca * a[0] - wr * d1, 
-						abs(d__1)) + (d__2 = ca * a[2]
-						, abs(d__2)) + (d__3 = ca * a[
-						1], abs(d__3)) + (d__4 = ca * 
-						a[3] - wr * d2, abs(d__4)) + (
-						d__5 = wi * d2, abs(d__5)) + (
-						d__6 = wi * d1, abs(d__6)))) {
+					if ((d__1 = x_ref(1, 1), abs(d__1)) < 
+						unfl && (d__2 = x_ref(2, 1), 
+						abs(d__2)) < unfl && (d__3 = 
+						x_ref(1, 2), abs(d__3)) < 
+						unfl && (d__4 = x_ref(2, 2), 
+						abs(d__4)) < unfl && (d__5 = 
+						b_ref(1, 1), abs(d__5)) + (
+						d__6 = b_ref(2, 1), abs(d__6))
+						 <= smlnum * ((d__7 = ca * 
+						a_ref(1, 1) - wr * d1, abs(
+						d__7)) + (d__8 = ca * a_ref(1,
+						 2), abs(d__8)) + (d__9 = ca *
+						 a_ref(2, 1), abs(d__9)) + (
+						d__10 = ca * a_ref(2, 2) - wr 
+						* d2, abs(d__10)) + (d__11 = 
+						wi * d2, abs(d__11)) + (d__12 
+						= wi * d1, abs(d__12)))) {
 					    res = 0.;
 					}
 					if (scale > 1.) {
 					    res += 1. / eps;
 					}
 /* Computing MAX */
-					d__2 = abs(x[0]) + abs(x[2]), d__3 = 
-						abs(x[1]) + abs(x[3]);
-					res += (d__1 = xnorm - max(d__2,d__3),
-						 abs(d__1)) / max(smlnum,
+					d__6 = (d__1 = x_ref(1, 1), abs(d__1))
+						 + (d__2 = x_ref(1, 2), abs(
+						d__2)), d__7 = (d__3 = x_ref(
+						2, 1), abs(d__3)) + (d__4 = 
+						x_ref(2, 2), abs(d__4));
+					res += (d__5 = xnorm - max(d__6,d__7),
+						 abs(d__5)) / max(smlnum,
 						xnorm) / eps;
 					if (info != 0 && info != 1) {
 					    res += 1. / eps;
@@ -562,4 +613,9 @@ static integer c__2 = 2;
 /*     End of DGET31 */
 
 } /* dget31_ */
+
+#undef x_ref
+#undef b_ref
+#undef a_ref
+
 

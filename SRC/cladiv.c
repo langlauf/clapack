@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Complex */ VOID cladiv_(complex * ret_val, complex *x, complex *y)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -11,8 +12,7 @@
     Purpose   
     =======   
 
-    CLADIV := X / Y, where X and Y are complex.  The computation of X / Y 
-  
+    CLADIV := X / Y, where X and Y are complex.  The computation of X / Y   
     will not overflow on an intermediary step unless the results   
     overflows.   
 
@@ -23,8 +23,7 @@
     Y       (input) COMPLEX   
             The complex scalars X and Y.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* System generated locals */
     real r__1, r__2, r__3, r__4;
     complex q__1;

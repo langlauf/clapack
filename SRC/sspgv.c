@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sspgv_(integer *itype, char *jobz, char *uplo, integer *
-	n, real *ap, real *bp, real *w, real *z, integer *ldz, real *work, 
+	n, real *ap, real *bp, real *w, real *z__, integer *ldz, real *work, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    SSPGV computes all the eigenvalues and, optionally, the eigenvectors 
-  
+    SSPGV computes all the eigenvalues and, optionally, the eigenvectors   
     of a real generalized symmetric-definite eigenproblem, of the form   
     A*x=(lambda)*B*x,  A*Bx=(lambda)*x,  or B*A*x=(lambda)*x.   
     Here A and B are assumed to be symmetric, stored in packed format,   
@@ -42,26 +42,20 @@
 
     AP      (input/output) REAL array, dimension   
                               (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array.  The j-th column of A 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array.  The j-th column of A   
             is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
 
             On exit, the contents of AP are destroyed.   
 
     BP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            B, packed columnwise in a linear array.  The j-th column of B 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            B, packed columnwise in a linear array.  The j-th column of B   
             is stored in the array BP as follows:   
             if UPLO = 'U', BP(i + (j-1)*j/2) = B(i,j) for 1<=i<=j;   
-            if UPLO = 'L', BP(i + (j-1)*(2*n-j)/2) = B(i,j) for j<=i<=n. 
-  
+            if UPLO = 'L', BP(i + (j-1)*(2*n-j)/2) = B(i,j) for j<=i<=n.   
 
             On exit, the triangular factor U or L from the Cholesky   
             factorization B = U**T*U or B = L*L**T, in the same storage   
@@ -90,21 +84,17 @@
                <= N:  if INFO = i, SSPEV failed to converge;   
                       i off-diagonal elements of an intermediate   
                       tridiagonal form did not converge to zero.   
-               > N:   if INFO = n + i, for 1 <= i <= n, then the leading 
-  
+               > N:   if INFO = n + i, for 1 <= i <= n, then the leading   
                       minor of order i of B is not positive definite.   
                       The factorization of B could not be completed and   
                       no eigenvalues or eigenvectors were computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -123,16 +113,18 @@
 	     char *, char *, integer *, real *, real *, integer *), xerbla_(char *, integer *), spptrf_(char 
 	    *, integer *, real *, integer *), sspgst_(integer *, char 
 	    *, integer *, real *, real *, integer *);
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
+    --ap;
+    --bp;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define AP(I) ap[(I)-1]
-#define BP(I) bp[(I)-1]
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     upper = lsame_(uplo, "U");
 
@@ -162,7 +154,7 @@
 
 /*     Form a Cholesky factorization of B. */
 
-    spptrf_(uplo, n, &BP(1), info);
+    spptrf_(uplo, n, &bp[1], info);
     if (*info != 0) {
 	*info = *n + *info;
 	return 0;
@@ -170,8 +162,8 @@
 
 /*     Transform problem to standard eigenvalue problem and solve. */
 
-    sspgst_(itype, uplo, n, &AP(1), &BP(1), info);
-    sspev_(jobz, uplo, n, &AP(1), &W(1), &Z(1,1), ldz, &WORK(1), info);
+    sspgst_(itype, uplo, n, &ap[1], &bp[1], info);
+    sspev_(jobz, uplo, n, &ap[1], &w[1], &z__[z_offset], ldz, &work[1], info);
 
     if (wantz) {
 
@@ -184,8 +176,7 @@
 	if (*itype == 1 || *itype == 2) {
 
 /*           For A*x=(lambda)*B*x and A*B*x=(lambda)*x;   
-             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y
- */
+             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y */
 
 	    if (upper) {
 		*(unsigned char *)trans = 'N';
@@ -194,9 +185,9 @@
 	    }
 
 	    i__1 = neig;
-	    for (j = 1; j <= neig; ++j) {
-		stpsv_(uplo, trans, "Non-unit", n, &BP(1), &Z(1,j),
-			 &c__1);
+	    for (j = 1; j <= i__1; ++j) {
+		stpsv_(uplo, trans, "Non-unit", n, &bp[1], &z___ref(1, j), &
+			c__1);
 /* L10: */
 	    }
 
@@ -212,9 +203,9 @@
 	    }
 
 	    i__1 = neig;
-	    for (j = 1; j <= neig; ++j) {
-		stpmv_(uplo, trans, "Non-unit", n, &BP(1), &Z(1,j),
-			 &c__1);
+	    for (j = 1; j <= i__1; ++j) {
+		stpmv_(uplo, trans, "Non-unit", n, &bp[1], &z___ref(1, j), &
+			c__1);
 /* L20: */
 	    }
 	}
@@ -224,4 +215,7 @@
 /*     End of SSPGV */
 
 } /* sspgv_ */
+
+#undef z___ref
+
 

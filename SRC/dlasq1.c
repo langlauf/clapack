@@ -1,108 +1,107 @@
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
+*/
+
 #include "f2c.h"
 
-/* Subroutine */ int dlasq1_(integer *n, doublereal *d, doublereal *e, 
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c__2 = 2;
+static integer c__0 = 0;
+
+/* Subroutine */ int dlasq1_(integer *n, doublereal *d__, doublereal *e, 
 	doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-       Purpose   
-       =======   
-
-       DLASQ1 computes the singular values of a real N-by-N bidiagonal   
-       matrix with diagonal D and off-diagonal E. The singular values are 
-  
-       computed to high relative accuracy, barring over/underflow or   
-       denormalization. The algorithm is described in   
-
-       "Accurate singular values and differential qd algorithms," by   
-       K. V. Fernando and B. N. Parlett,   
-       Numer. Math., Vol-67, No. 2, pp. 191-230,1994.   
-
-       See also   
-       "Implementation of differential qd algorithms," by   
-       K. V. Fernando and B. N. Parlett, Technical Report,   
-       Department of Mathematics, University of California at Berkeley,   
-       1994 (Under preparation).   
-
-       Arguments   
-       =========   
-
-    N       (input) INTEGER   
-            The number of rows and columns in the matrix. N >= 0.   
-
-    D       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, D contains the diagonal elements of the   
-            bidiagonal matrix whose SVD is desired. On normal exit,   
-            D contains the singular values in decreasing order.   
-
-    E       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, elements E(1:N-1) contain the off-diagonal elements 
-  
-            of the bidiagonal matrix whose SVD is desired.   
-            On exit, E is overwritten.   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (2*N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the algorithm did not converge;  i   
-                  specifies how many superdiagonals did not converge.   
-
-    ===================================================================== 
-  
-
-    
-   Parameter adjustments   
-       Function Body */
-    /* Table of constant values */
-    static doublereal c_b8 = .125;
-    static integer c__1 = 1;
-    static integer c__0 = 0;
-    
     /* System generated locals */
     integer i__1, i__2;
-    doublereal d__1, d__2, d__3, d__4;
+    doublereal d__1, d__2, d__3;
+
     /* Builtin functions */
-    double pow_dd(doublereal *, doublereal *), sqrt(doublereal);
+    double sqrt(doublereal);
+
     /* Local variables */
-    static integer kend, ierr;
     extern /* Subroutine */ int dlas2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
-    static integer i, j, m;
-    static doublereal sfmin, sigmn;
+    static integer i__;
+    static doublereal scale;
+    static integer iinfo;
+    static doublereal sigmn;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     static doublereal sigmx;
-    extern /* Subroutine */ int dlasq2_(integer *, doublereal *, doublereal *,
-	     doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, integer *, integer *);
-    static doublereal small2;
-    static integer ke;
-    static doublereal dm;
+    extern /* Subroutine */ int dlasq2_(integer *, doublereal *, integer *);
     extern doublereal dlamch_(char *);
-    static doublereal dx;
     extern /* Subroutine */ int dlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
-    static integer ny;
+    static doublereal safmin;
     extern /* Subroutine */ int xerbla_(char *, integer *), dlasrt_(
 	    char *, integer *, doublereal *, integer *);
-    static doublereal thresh, tolmul;
-    static logical restrt;
-    static doublereal scl, eps, tol, sig1, sig2, tol2;
+    static doublereal eps;
 
 
+/*  -- LAPACK routine (version 3.0) --   
+       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
+       Courant Institute, Argonne National Lab, and Rice University   
+       October 31, 1999   
 
-#define WORK(I) work[(I)-1]
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
+
+    Purpose   
+    =======   
+
+    DLASQ1 computes the singular values of a real N-by-N bidiagonal   
+    matrix with diagonal D and off-diagonal E. The singular values   
+    are computed to high relative accuracy, in the absence of   
+    denormalization, underflow and overflow. The algorithm was first   
+    presented in   
+
+    "Accurate singular values and differential qd algorithms" by K. V.   
+    Fernando and B. N. Parlett, Numer. Math., Vol-67, No. 2, pp. 191-230,   
+    1994,   
+
+    and the present implementation is described in "An implementation of   
+    the dqds Algorithm (Positive Case)", LAPACK Working Note.   
+
+    Arguments   
+    =========   
+
+    N     (input) INTEGER   
+          The number of rows and columns in the matrix. N >= 0.   
+
+    D     (input/output) DOUBLE PRECISION array, dimension (N)   
+          On entry, D contains the diagonal elements of the   
+          bidiagonal matrix whose SVD is desired. On normal exit,   
+          D contains the singular values in decreasing order.   
+
+    E     (input/output) DOUBLE PRECISION array, dimension (N)   
+          On entry, elements E(1:N-1) contain the off-diagonal elements   
+          of the bidiagonal matrix whose SVD is desired.   
+          On exit, E is overwritten.   
+
+    WORK  (workspace) DOUBLE PRECISION array, dimension (4*N)   
+
+    INFO  (output) INTEGER   
+          = 0: successful exit   
+          < 0: if INFO = -i, the i-th argument had an illegal value   
+          > 0: the algorithm failed   
+               = 1, a split was marked by a positive value in E   
+               = 2, current block of Z not diagonalized after 30*N   
+                    iterations (in inner while loop)   
+               = 3, termination criterion of outer while loop not met   
+                    (program created more than N unreduced blocks)   
+
+    =====================================================================   
 
 
+       Parameter adjustments */
+    --work;
+    --e;
+    --d__;
+
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -2;
@@ -112,155 +111,80 @@
     } else if (*n == 0) {
 	return 0;
     } else if (*n == 1) {
-	D(1) = abs(D(1));
+	d__[1] = abs(d__[1]);
 	return 0;
     } else if (*n == 2) {
-	dlas2_(&D(1), &E(1), &D(2), &sigmn, &sigmx);
-	D(1) = sigmx;
-	D(2) = sigmn;
+	dlas2_(&d__[1], &e[1], &d__[2], &sigmn, &sigmx);
+	d__[1] = sigmx;
+	d__[2] = sigmn;
 	return 0;
     }
 
-/*     Estimate the largest singular value */
+/*     Estimate the largest singular value. */
 
     sigmx = 0.;
     i__1 = *n - 1;
-    for (i = 1; i <= *n-1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__[i__] = (d__1 = d__[i__], abs(d__1));
 /* Computing MAX */
-	d__2 = sigmx, d__3 = (d__1 = E(i), abs(d__1));
+	d__2 = sigmx, d__3 = (d__1 = e[i__], abs(d__1));
 	sigmx = max(d__2,d__3);
 /* L10: */
     }
+    d__[*n] = (d__1 = d__[*n], abs(d__1));
 
-/*     Early return if sigmx is zero (matrix is already diagonal) */
+/*     Early return if SIGMX is zero (matrix is already diagonal). */
 
     if (sigmx == 0.) {
-	goto L70;
+	dlasrt_("D", n, &d__[1], &iinfo);
+	return 0;
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	D(i) = (d__1 = D(i), abs(d__1));
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	d__1 = sigmx, d__2 = D(i);
+	d__1 = sigmx, d__2 = d__[i__];
 	sigmx = max(d__1,d__2);
 /* L20: */
     }
 
-/*     Get machine parameters */
+/*     Copy D and E into WORK (in the Z format) and scale (squaring the   
+       input data makes scaling by a power of the radix pointless). */
 
-    eps = dlamch_("EPSILON");
-    sfmin = dlamch_("SAFE MINIMUM");
-
-/*     Compute singular values to relative accuracy TOL   
-       It is assumed that tol**2 does not underflow.   
-
-   Computing MAX   
-   Computing MIN */
-    d__3 = 100., d__4 = pow_dd(&eps, &c_b8);
-    d__1 = 10., d__2 = min(d__3,d__4);
-    tolmul = max(d__1,d__2);
-    tol = tolmul * eps;
-/* Computing 2nd power */
-    d__1 = tol;
-    tol2 = d__1 * d__1;
-
-    thresh = sigmx * sqrt(sfmin) * tol;
-
-/*     Scale matrix so the square of the largest element is   
-       1 / ( 256 * SFMIN ) */
-
-    scl = sqrt(1. / (sfmin * 256.));
-/* Computing 2nd power */
-    d__1 = tolmul;
-    small2 = 1. / (d__1 * d__1 * 256.);
-    dcopy_(n, &D(1), &c__1, &WORK(1), &c__1);
+    eps = dlamch_("Precision");
+    safmin = dlamch_("Safe minimum");
+    scale = sqrt(eps / safmin);
+    dcopy_(n, &d__[1], &c__1, &work[1], &c__2);
     i__1 = *n - 1;
-    dcopy_(&i__1, &E(1), &c__1, &WORK(*n + 1), &c__1);
-    dlascl_("G", &c__0, &c__0, &sigmx, &scl, n, &c__1, &WORK(1), n, &ierr)
-	    ;
-    i__1 = *n - 1;
-    i__2 = *n - 1;
-    dlascl_("G", &c__0, &c__0, &sigmx, &scl, &i__1, &c__1, &WORK(*n + 1), &
-	    i__2, &ierr);
+    dcopy_(&i__1, &e[1], &c__1, &work[2], &c__2);
+    i__1 = (*n << 1) - 1;
+    i__2 = (*n << 1) - 1;
+    dlascl_("G", &c__0, &c__0, &sigmx, &scale, &i__1, &c__1, &work[1], &i__2, 
+	    &iinfo);
 
-/*     Square D and E (the input for the qd algorithm) */
+/*     Compute the q's and e's. */
 
     i__1 = (*n << 1) - 1;
-    for (j = 1; j <= (*n<<1)-1; ++j) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing 2nd power */
-	d__1 = WORK(j);
-	WORK(j) = d__1 * d__1;
+	d__1 = work[i__];
+	work[i__] = d__1 * d__1;
 /* L30: */
     }
+    work[*n * 2] = 0.;
 
-/*     Apply qd algorithm */
+    dlasq2_(n, &work[1], info);
 
-    m = 0;
-    E(*n) = 0.;
-    dx = WORK(1);
-    dm = dx;
-    ke = 0;
-    restrt = FALSE_;
-    i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if ((d__1 = E(i), abs(d__1)) <= thresh || WORK(*n + i) <= tol2 * (dm /
-		 (doublereal) (i - m))) {
-	    ny = i - m;
-	    if (ny == 1) {
-		goto L50;
-	    } else if (ny == 2) {
-		dlas2_(&D(m + 1), &E(m + 1), &D(m + 2), &sig1, &sig2);
-		D(m + 1) = sig1;
-		D(m + 2) = sig2;
-	    } else {
-		kend = ke + 1 - m;
-		dlasq2_(&ny, &D(m + 1), &E(m + 1), &WORK(m + 1), &WORK(m + *n 
-			+ 1), &eps, &tol2, &small2, &dm, &kend, info);
-
-/*                 Return, INFO = number of unconverged superd
-iagonals */
-
-		if (*info != 0) {
-		    *info += i;
-		    return 0;
-		}
-
-/*                 Undo scaling */
-
-		i__2 = m + ny;
-		for (j = m + 1; j <= m+ny; ++j) {
-		    D(j) = sqrt(D(j));
+    if (*info == 0) {
+	i__1 = *n;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] = sqrt(work[i__]);
 /* L40: */
-		}
-		dlascl_("G", &c__0, &c__0, &scl, &sigmx, &ny, &c__1, &D(m + 1)
-			, &ny, &ierr);
-	    }
-L50:
-	    m = i;
-	    if (i != *n) {
-		dx = WORK(i + 1);
-		dm = dx;
-		ke = i;
-		restrt = TRUE_;
-	    }
 	}
-	if (i != *n && ! restrt) {
-	    dx = WORK(i + 1) * (dx / (dx + WORK(*n + i)));
-	    if (dm > dx) {
-		dm = dx;
-		ke = i;
-	    }
-	}
-	restrt = FALSE_;
-/* L60: */
+	dlascl_("G", &c__0, &c__0, &scale, &sigmx, n, &c__1, &d__[1], n, &
+		iinfo);
     }
-    kend = ke + 1;
 
-/*     Sort the singular values into decreasing order */
-
-L70:
-    dlasrt_("D", n, &D(1), info);
     return 0;
 
 /*     End of DLASQ1 */

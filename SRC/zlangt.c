@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
-	d, doublecomplex *du)
+	d__, doublecomplex *du)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -12,10 +13,8 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
     Purpose   
     =======   
 
-    ZLANGT  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    ZLANGT  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     complex tridiagonal matrix A.   
 
     Description   
@@ -31,12 +30,9 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -59,13 +55,10 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
     DU      (input) COMPLEX*16 array, dimension (N-1)   
             The (n-1) super-diagonal elements of A.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -75,7 +68,7 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
     /* Builtin functions */
     double z_abs(doublecomplex *), sqrt(doublereal);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal scale;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
@@ -84,48 +77,48 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
     static doublereal sum;
 
 
+    --du;
+    --d__;
+    --dl;
 
-#define DU(I) du[(I)-1]
-#define D(I) d[(I)-1]
-#define DL(I) dl[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 0) {
 	anorm = 0.;
     } else if (lsame_(norm, "M")) {
 
 /*        Find max(abs(A(i,j))). */
 
-	anorm = z_abs(&D(*n));
+	anorm = z_abs(&d__[*n]);
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__1 = anorm, d__2 = z_abs(&DL(i));
+	    d__1 = anorm, d__2 = z_abs(&dl[i__]);
 	    anorm = max(d__1,d__2);
 /* Computing MAX */
-	    d__1 = anorm, d__2 = z_abs(&D(i));
+	    d__1 = anorm, d__2 = z_abs(&d__[i__]);
 	    anorm = max(d__1,d__2);
 /* Computing MAX */
-	    d__1 = anorm, d__2 = z_abs(&DU(i));
+	    d__1 = anorm, d__2 = z_abs(&du[i__]);
 	    anorm = max(d__1,d__2);
 /* L10: */
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
 	if (*n == 1) {
-	    anorm = z_abs(&D(1));
+	    anorm = z_abs(&d__[1]);
 	} else {
 /* Computing MAX */
-	    d__1 = z_abs(&D(1)) + z_abs(&DL(1)), d__2 = z_abs(&D(*n)) + z_abs(
-		    &DU(*n - 1));
+	    d__1 = z_abs(&d__[1]) + z_abs(&dl[1]), d__2 = z_abs(&d__[*n]) + 
+		    z_abs(&du[*n - 1]);
 	    anorm = max(d__1,d__2);
 	    i__1 = *n - 1;
-	    for (i = 2; i <= *n-1; ++i) {
+	    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		d__1 = anorm, d__2 = z_abs(&D(i)) + z_abs(&DL(i)) + z_abs(&DU(
-			i - 1));
+		d__1 = anorm, d__2 = z_abs(&d__[i__]) + z_abs(&dl[i__]) + 
+			z_abs(&du[i__ - 1]);
 		anorm = max(d__1,d__2);
 /* L20: */
 	    }
@@ -135,17 +128,17 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
 /*        Find normI(A). */
 
 	if (*n == 1) {
-	    anorm = z_abs(&D(1));
+	    anorm = z_abs(&d__[1]);
 	} else {
 /* Computing MAX */
-	    d__1 = z_abs(&D(1)) + z_abs(&DU(1)), d__2 = z_abs(&D(*n)) + z_abs(
-		    &DL(*n - 1));
+	    d__1 = z_abs(&d__[1]) + z_abs(&du[1]), d__2 = z_abs(&d__[*n]) + 
+		    z_abs(&dl[*n - 1]);
 	    anorm = max(d__1,d__2);
 	    i__1 = *n - 1;
-	    for (i = 2; i <= *n-1; ++i) {
+	    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		d__1 = anorm, d__2 = z_abs(&D(i)) + z_abs(&DU(i)) + z_abs(&DL(
-			i - 1));
+		d__1 = anorm, d__2 = z_abs(&d__[i__]) + z_abs(&du[i__]) + 
+			z_abs(&dl[i__ - 1]);
 		anorm = max(d__1,d__2);
 /* L30: */
 	    }
@@ -156,12 +149,12 @@ doublereal zlangt_(char *norm, integer *n, doublecomplex *dl, doublecomplex *
 
 	scale = 0.;
 	sum = 1.;
-	zlassq_(n, &D(1), &c__1, &scale, &sum);
+	zlassq_(n, &d__[1], &c__1, &scale, &sum);
 	if (*n > 1) {
 	    i__1 = *n - 1;
-	    zlassq_(&i__1, &DL(1), &c__1, &scale, &sum);
+	    zlassq_(&i__1, &dl[1], &c__1, &scale, &sum);
 	    i__1 = *n - 1;
-	    zlassq_(&i__1, &DU(1), &c__1, &scale, &sum);
+	    zlassq_(&i__1, &du[1], &c__1, &scale, &sum);
 	}
 	anorm = scale * sqrt(sum);
     }

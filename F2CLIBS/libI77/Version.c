@@ -1,4 +1,4 @@
-static char junk[] = "\n@(#) LIBI77 VERSION pjw,dmg-mods 7 Sept. 1994\n";
+static char junk[] = "\n@(#) LIBI77 VERSION pjw,dmg-mods 19990627\n";
 
 /*
 2.01	$ format added
@@ -95,7 +95,7 @@ wrtfmt.c:
 /* 17 Oct. 1991: change type of length field in sequential unformatted
 		 records from int to long (for systems where sizeof(int)
 		 can vary, depending on the compiler or compiler options). */
-/* 14 Nov. 1991: change uint to Uint in fmt.h, rdfmt.c, wrtfmt.c.
+/* 14 Nov. 1991: change uint to Uint in fmt.h, rdfmt.c, wrtfmt.c. */
 /* 25 Nov. 1991: change uint to Uint in lwrite.c; change sizeof(int) to
 		 sizeof(uioint) in fseeks in sue.c (missed on 17 Oct.). */
 /* 1 Dec. 1991:  uio.c: add test for read failure (seq. unformatted reads);
@@ -197,3 +197,106 @@ wrtfmt.c:
 /* 7 Sept. 1994: typesize.c: adjust to allow types LOGICAL*1, LOGICAL*2,
 		 INTEGER*1, and (under -DAllow_TYQUAD) INTEGER*8
 		 in NAMELISTs. */
+/* 6 Oct. 1994:  util.c: omit f__mvgbt, as it is never used. */
+/* 2 Nov. 1994:  add #ifdef ALWAYS_FLUSH logic. */
+/* 26 Jan. 1995: wref.c: fix glitch in printing the exponent of 0 when
+		 GOOD_SPRINTF_EXPONENT is not #defined. */
+/* 24 Feb. 1995: iio.c: z_getc: insert (unsigned char *) to allow
+		 internal reading of characters with high-bit set
+		 (on machines that sign-extend characters). */
+/* 14 March 1995:lread.c and rsfe.c: adjust s_rsle and s_rsfe to
+		 check for end-of-file (to prevent infinite loops
+		 with empty read statements). */
+/* 26 May 1995:  iio.c: z_wnew: fix bug in handling T format items
+		 in internal writes whose last item is written to
+		 an earlier position than some previous item. */
+/* 29 Aug. 1995: backspace.c: adjust MSDOS logic. */
+/* 6 Sept. 1995: Adjust namelist input to treat a subscripted name
+		 whose subscripts do not involve colons similarly
+		 to the name without a subscript: accept several
+		 values, stored in successive elements starting at
+		 the indicated subscript.  Adjust namelist output
+		 to quote character strings (avoiding confusion with
+		 arrays of character strings).  Adjust f_init calls
+		 for people who don't use libF77's main(); now open and
+		 namelist read statements invoke f_init if needed. */
+/* 7 Sept. 1995: Fix some bugs with -DAllow_TYQUAD (for integer*8).
+		 Add -DNo_Namelist_Comments lines to rsne.c. */
+/* 5 Oct. 1995:  wrtfmt.c: fix bug with t editing (f__cursor was not
+		 always zeroed in mv_cur). */
+/* 11 Oct. 1995: move defs of f__hiwater, f__svic, f__icptr from wrtfmt.c
+		 to err.c */
+/* 15 Mar. 1996: lread.c, rsfe.c: honor END= in READ stmt with empty iolist */
+
+/* 13 May 1996:  add ftell_.c and fseek_.c */
+/* 9 June 1996:  Adjust rsli.c and lread.c so internal list input with
+		 too few items in the input string will honor end= . */
+/* 12 Sept. 1995:fmtlib.c: fix glitch in printing the most negative integer. */
+/* 25 Sept. 1995:fmt.h: for formatted writes of negative integer*1 values,
+		 make ic signed on ANSI systems.  If formatted writes of
+		 integer*1 values trouble you when using a K&R C compiler,
+		 switch to an ANSI compiler or use a compiler flag that
+		 makes characters signed. */
+/* 9 Dec. 1996:	 d[fu]e.c, err.c: complain about non-positive rec=
+		 in direct read and write statements.
+		 ftell_.c: change param "unit" to "Unit" for -DKR_headers. */
+/* 26 Feb. 1997: ftell_.c: on systems that define SEEK_SET, etc., use
+		 SEEK_SET, SEEK_CUR, SEEK_END for *whence = 0, 1, 2. */
+/* 7 Apr. 1997:	 fmt.c: adjust to complain at missing numbers in formats
+		 (but still treat missing ".nnn" as ".0"). */
+/* 11 Apr. 1997: err.c: attempt to make stderr line buffered rather
+		 than fully buffered.  (Buffering is needed for format
+		 items T and TR.) */
+/* 27 May 1997:  ftell_.c: fix typo (that caused the third argument to be
+		 treated as 2 on some systems). */
+/* 5 Aug. 1997:  lread.c: adjust to accord with a change to the Fortran 8X
+		 draft (in 1990 or 1991) that rescinded permission to elide
+		 quote marks in namelist input of character data; compile
+		 with -DF8X_NML_ELIDE_QUOTES to get the old behavior.
+		 wrtfmt.o: wrt_G: tweak to print the right number of 0's
+		 for zero under G format. */
+/* 16 Aug. 1997: iio.c: fix bug in internal writes to an array of character
+		 strings that sometimes caused one more array element than
+		 required by the format to be blank-filled.  Example:
+		 format(1x). */
+/* 16 Sept. 1997:fmt.[ch] rdfmt.c wrtfmt.c: tweak struct syl for machines
+		 with 64-bit pointers and 32-bit ints that did not 64-bit
+		 align struct syl (e.g., Linux on the DEC Alpha). */
+/* 19 Jan. 1998: backspace.c: for b->ufmt==0, change sizeof(int) to
+		 sizeof(uiolen).  On machines where this would make a
+		 difference, it is best for portability to compile libI77 with
+		 -DUIOLEN_int (which will render the change invisible). */
+/* 4 March 1998: open.c: fix glitch in comparing file names under
+		-DNON_UNIX_STDIO */
+/* 17 March 1998: endfile.c, open.c: acquire temporary files from tmpfile(),
+		 unless compiled with -DNON_ANSI_STDIO, which uses mktemp().
+		 New buffering scheme independent of NON_UNIX_STDIO for
+		 handling T format items.  Now -DNON_UNIX_STDIO is no
+		 longer be necessary for Linux, and libf2c no longer
+		 causes stderr to be buffered -- the former setbuf or
+		 setvbuf call for stderr was to make T format items work.
+		 open.c: use the Posix access() function to check existence
+		 or nonexistence of files, except under -DNON_POSIX_STDIO,
+		 where trial fopen calls are used. */
+/* 5 April 1998: wsfe.c: make $ format item work: this was lost in the
+		 changes of 17 March 1998. */
+/* 28 May 1998:	 backspace.c dfe.c due.c iio.c lread.c rsfe.c sue.c wsfe.c:
+		 set f__curunit sooner so various error messages will
+		 correctly identify the I/O unit involved. */
+/* 17 June 1998: lread.c: unless compiled with
+		 ALLOW_FLOAT_IN_INTEGER_LIST_INPUT #defined, treat
+		 floating-point numbers (containing either a decimal point
+		 or an exponent field) as errors when they appear as list
+		 input for integer data. */
+/* 7 Sept. 1998: move e_wdfe from sfe.c to dfe.c, where it was originally.
+		 Why did it ever move to sfe.c? */
+/* 2 May 1999:	 open.c: set f__external (to get "external" versus "internal"
+		 right in the error message if we cannot open the file).
+		 err.c: cast a pointer difference to (int) for %d.
+		 rdfmt.c: omit fixed-length buffer that could be overwritten
+		 by formats Inn or Lnn with nn > 83. */
+/* 3 May 1999:	open.c: insert two casts for machines with 64-bit longs. */
+/* 18 June 1999: backspace.c: allow for b->ufd changing in t_runc */
+/* 27 June 1999: rsne.c: fix bug in namelist input: a misplaced increment */
+/*		 could cause wrong array elements to be assigned; e.g.,	*/
+/*		 "&input k(5)=10*1 &end" assigned k(5) and k(15..23)	*/

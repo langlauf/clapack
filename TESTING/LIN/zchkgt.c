@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,14 +28,15 @@ static integer c__0 = 0;
 static integer c_n1 = -1;
 static integer c__1 = 1;
 static integer c__2 = 2;
-static doublereal c_b48 = 1.;
-static doublereal c_b49 = 0.;
+static integer c__7 = 7;
+static doublereal c_b63 = 1.;
+static doublereal c_b64 = 0.;
 
 /* Subroutine */ int zchkgt_(logical *dotype, integer *nn, integer *nval, 
-	integer *nrhs, doublereal *thresh, logical *tsterr, doublecomplex *a, 
-	doublecomplex *af, doublecomplex *b, doublecomplex *x, doublecomplex *
-	xact, doublecomplex *work, doublereal *rwork, integer *iwork, integer 
-	*nout)
+	integer *nns, integer *nsval, doublereal *thresh, logical *tsterr, 
+	doublecomplex *a, doublecomplex *af, doublecomplex *b, doublecomplex *
+	x, doublecomplex *xact, doublecomplex *work, doublereal *rwork, 
+	integer *iwork, integer *nout)
 {
     /* Initialized data */
 
@@ -42,12 +44,14 @@ static doublereal c_b49 = 0.;
     static char transs[1*3] = "N" "T" "C";
 
     /* Format strings */
-    static char fmt_9999[] = "(\002 N =\002,i5,\002, type \002,i2,\002, te"
-	    "st \002,i2,\002, ratio = \002,g12.5)";
-    static char fmt_9998[] = "(\002 TRANS='\002,a1,\002', N =\002,i5,\002, t"
-	    "ype \002,i2,\002, test \002,i2,\002, ratio = \002,g12.5)";
-    static char fmt_9997[] = "(\002 NORM ='\002,a1,\002', N =\002,i5,\002, t"
-	    "ype \002,i2,\002, test \002,i2,\002, ratio = \002,g12.5)";
+    static char fmt_9999[] = "(12x,\002N =\002,i5,\002,\002,10x,\002 type"
+	    " \002,i2,\002, test(\002,i2,\002) = \002,g12.5)";
+    static char fmt_9997[] = "(\002 NORM ='\002,a1,\002', N =\002,i5,\002"
+	    ",\002,10x,\002 type \002,i2,\002, test(\002,i2,\002) = \002,g12."
+	    "5)";
+    static char fmt_9998[] = "(\002 TRANS='\002,a1,\002', N =\002,i5,\002, N"
+	    "RHS=\002,i3,\002, type \002,i2,\002, test(\002,i2,\002) = \002,g"
+	    "12.5)";
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
@@ -60,11 +64,13 @@ static doublereal c_b49 = 0.;
     /* Local variables */
     static doublereal cond;
     static integer mode, koff, imat, info;
-    static char path[3], dist[1], norm[1], type[1];
-    static integer nrun, i, j, k;
+    static char path[3], dist[1];
+    static integer irhs, nrhs;
+    static char norm[1], type__[1];
+    static integer nrun, i__, j, k;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer m, n, nfail, iseed[4];
-    static doublecomplex z[3];
+    static doublecomplex z__[3];
     extern doublereal dget06_(doublereal *, doublereal *);
     static doublereal rcond;
     static integer nimat;
@@ -78,15 +84,14 @@ static doublereal c_b49 = 0.;
     extern /* Subroutine */ int zgtt01_(integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublereal *, doublereal *);
-    static integer k1;
-    extern /* Subroutine */ int zgtt02_(char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , integer *, doublecomplex *, integer *, doublereal *, doublereal 
-	    *), zgtt05_(char *, integer *, integer *, doublecomplex *,
-	     doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    integer *, doublereal *, doublereal *), zgtt02_(char *, integer *,
+	     integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublereal *, doublereal *);
+	    doublereal *, doublereal *), zgtt05_(char *, integer *, 
+	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, integer *, doublereal *, doublereal *, 
+	    doublereal *);
     static logical zerot;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zlatb4_(char *, integer *, integer *,
@@ -96,12 +101,12 @@ static doublereal c_b49 = 0.;
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static integer ku, ix, nt;
-    static doublereal rcondc;
+    static integer ku, ix;
+    static doublereal rcondc, rcondi;
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
 	    doublecomplex *, integer *), alasum_(char *, integer *, integer *,
 	     integer *, integer *);
-    static doublereal ainvnm;
+    static doublereal rcondo, ainvnm;
     static logical trfcon;
     extern /* Subroutine */ int zerrge_(char *, integer *);
     extern doublereal zlangt_(char *, integer *, doublecomplex *, 
@@ -135,15 +140,15 @@ static doublereal c_b49 = 0.;
 
     /* Fortran I/O blocks */
     static cilist io___29 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___39 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___44 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -155,8 +160,7 @@ static doublereal c_b49 = 0.;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -165,6 +169,12 @@ static doublereal c_b49 = 0.;
 
     NVAL    (input) INTEGER array, dimension (NN)   
             The values of the matrix dimension N.   
+
+    NNS     (input) INTEGER   
+            The number of values of NRHS contained in the vector NSVAL.   
+
+    NSVAL   (input) INTEGER array, dimension (NNS)   
+            The values of the number of right hand sides NRHS.   
 
     THRESH  (input) DOUBLE PRECISION   
             The threshold value for the test ratios.  A result is   
@@ -178,25 +188,25 @@ static doublereal c_b49 = 0.;
 
     AF      (workspace) COMPLEX*16 array, dimension (NMAX*4)   
 
-    B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    B       (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
+            where NSMAX is the largest entry in NSVAL.   
 
-    X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    X       (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
 
-    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
 
     WORK    (workspace) COMPLEX*16 array, dimension   
-                        (NMAX*max(3,NRHS))   
+                        (NMAX*max(3,NSMAX))   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension   
-                        (max(NMAX)+2*NRHS)   
+                        (max(NMAX)+2*NSMAX)   
 
     IWORK   (workspace) INTEGER array, dimension (NMAX)   
 
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -207,18 +217,19 @@ static doublereal c_b49 = 0.;
     --b;
     --af;
     --a;
+    --nsval;
     --nval;
     --dotype;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'Z';
-    s_copy(path + 1, "GT", 2L, 2L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "GT", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -250,26 +261,25 @@ static doublereal c_b49 = 0.;
 /*           Do the tests only if DOTYPE( IMAT ) is true. */
 
 	    if (! dotype[imat]) {
-		goto L90;
+		goto L100;
 	    }
 
 /*           Set up parameters with ZLATB4. */
 
-	    zlatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &cond,
-		     dist);
+	    zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
+		    cond, dist);
 
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Types 1-6:  generate matrices of known conditi
-on number.   
+/*              Types 1-6:  generate matrices of known condition number.   
 
    Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
-		s_copy(srnamc_1.srnamt, "ZLATMS", 6L, 6L);
-		zlatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cond, &
-			anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
+		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
+			&anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
 			info);
 
 /*              Check the error code from ZLATMS. */
@@ -277,7 +287,7 @@ on number.
 		if (info != 0) {
 		    alaerh_(path, "ZLATMS", &info, &c__0, " ", &n, &n, &kl, &
 			    ku, &c_n1, &imat, &nfail, &nerrs, nout);
-		    goto L90;
+		    goto L100;
 		}
 		izero = 0;
 
@@ -290,14 +300,12 @@ on number.
 		zcopy_(&n, &af[2], &c__3, &a[m + 1], &c__1);
 	    } else {
 
-/*              Types 7-12:  generate tridiagonal matrices wit
-h   
+/*              Types 7-12:  generate tridiagonal matrices with   
                 unknown condition numbers. */
 
 		if (! zerot || ! dotype[7]) {
 
-/*                 Generate a matrix with elements whose r
-eal and   
+/*                 Generate a matrix with elements whose real and   
                    imaginary parts are from [-1,1]. */
 
 		    i__3 = n + (m << 1);
@@ -308,52 +316,50 @@ eal and
 		    }
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back t
-he zeroed out   
+/*                 Reuse the last matrix by copying back the zeroed out   
                    elements. */
 
 		    if (izero == 1) {
 			i__3 = n;
-			a[i__3].r = z[1].r, a[i__3].i = z[1].i;
+			a[i__3].r = z__[1].r, a[i__3].i = z__[1].i;
 			if (n > 1) {
-			    a[1].r = z[2].r, a[1].i = z[2].i;
+			    a[1].r = z__[2].r, a[1].i = z__[2].i;
 			}
 		    } else if (izero == n) {
 			i__3 = n * 3 - 2;
-			a[i__3].r = z[0].r, a[i__3].i = z[0].i;
+			a[i__3].r = z__[0].r, a[i__3].i = z__[0].i;
 			i__3 = (n << 1) - 1;
-			a[i__3].r = z[1].r, a[i__3].i = z[1].i;
+			a[i__3].r = z__[1].r, a[i__3].i = z__[1].i;
 		    } else {
 			i__3 = (n << 1) - 2 + izero;
-			a[i__3].r = z[0].r, a[i__3].i = z[0].i;
+			a[i__3].r = z__[0].r, a[i__3].i = z__[0].i;
 			i__3 = n - 1 + izero;
-			a[i__3].r = z[1].r, a[i__3].i = z[1].i;
+			a[i__3].r = z__[1].r, a[i__3].i = z__[1].i;
 			i__3 = izero;
-			a[i__3].r = z[2].r, a[i__3].i = z[2].i;
+			a[i__3].r = z__[2].r, a[i__3].i = z__[2].i;
 		    }
 		}
 
-/*              If IMAT > 7, set one column of the matrix to 0
-. */
+/*              If IMAT > 7, set one column of the matrix to 0. */
 
 		if (! zerot) {
 		    izero = 0;
 		} else if (imat == 8) {
 		    izero = 1;
 		    i__3 = n;
-		    z[1].r = a[i__3].r, z[1].i = a[i__3].i;
+		    z__[1].r = a[i__3].r, z__[1].i = a[i__3].i;
 		    i__3 = n;
 		    a[i__3].r = 0., a[i__3].i = 0.;
 		    if (n > 1) {
-			z[2].r = a[1].r, z[2].i = a[1].i;
+			z__[2].r = a[1].r, z__[2].i = a[1].i;
 			a[1].r = 0., a[1].i = 0.;
 		    }
 		} else if (imat == 9) {
 		    izero = n;
 		    i__3 = n * 3 - 2;
-		    z[0].r = a[i__3].r, z[0].i = a[i__3].i;
+		    z__[0].r = a[i__3].r, z__[0].i = a[i__3].i;
 		    i__3 = (n << 1) - 1;
-		    z[1].r = a[i__3].r, z[1].i = a[i__3].i;
+		    z__[1].r = a[i__3].r, z__[1].i = a[i__3].i;
 		    i__3 = n * 3 - 2;
 		    a[i__3].r = 0., a[i__3].i = 0.;
 		    i__3 = (n << 1) - 1;
@@ -361,12 +367,12 @@ he zeroed out
 		} else {
 		    izero = (n + 1) / 2;
 		    i__3 = n - 1;
-		    for (i = izero; i <= i__3; ++i) {
-			i__4 = (n << 1) - 2 + i;
+		    for (i__ = izero; i__ <= i__3; ++i__) {
+			i__4 = (n << 1) - 2 + i__;
 			a[i__4].r = 0., a[i__4].i = 0.;
-			i__4 = n - 1 + i;
+			i__4 = n - 1 + i__;
 			a[i__4].r = 0., a[i__4].i = 0.;
-			i__4 = i;
+			i__4 = i__;
 			a[i__4].r = 0., a[i__4].i = 0.;
 /* L20: */
 		    }
@@ -383,7 +389,7 @@ he zeroed out
 
 	    i__3 = n + (m << 1);
 	    zcopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
-	    s_copy(srnamc_1.srnamt, "ZGTTRF", 6L, 6L);
+	    s_copy(srnamc_1.srnamt, "ZGTTRF", (ftnlen)6, (ftnlen)6);
 	    zgttrf_(&n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + (m << 1) 
 		    + 1], &iwork[1], &info);
 
@@ -399,9 +405,7 @@ he zeroed out
 		    af[n + m + 1], &af[n + (m << 1) + 1], &iwork[1], &work[1],
 		     &lda, &rwork[1], result);
 
-/*           Print information about the tests so far that did not
-   
-             pass the threshold. */
+/*           Print the test ratio if it is .GE. THRESH. */
 
 	    if (result[0] >= *thresh) {
 		if (nfail == 0 && nerrs == 0) {
@@ -418,19 +422,7 @@ he zeroed out
 	    }
 	    ++nrun;
 
-/*           Generate NRHS random solution vectors. */
-
-	    if (! trfcon) {
-		ix = 1;
-		i__3 = *nrhs;
-		for (j = 1; j <= i__3; ++j) {
-		    zlarnv_(&c__2, iseed, &n, &xact[ix]);
-		    ix += lda;
-/* L30: */
-		}
-	    }
-
-	    for (itran = 1; itran <= 3; ++itran) {
+	    for (itran = 1; itran <= 2; ++itran) {
 		*(unsigned char *)trans = *(unsigned char *)&transs[itran - 1]
 			;
 		if (itran == 1) {
@@ -438,39 +430,23 @@ he zeroed out
 		} else {
 		    *(unsigned char *)norm = 'I';
 		}
+		anorm = zlangt_(norm, &n, &a[1], &a[m + 1], &a[n + m + 1]);
 
-/*              Skip all but the condition estimate if TRFCON 
-is true. */
+		if (! trfcon) {
 
-		if (trfcon) {
-		    k1 = 7;
-		    rcondc = 0.;
-		    goto L60;
-		}
-
-		k1 = 2;
-		if (itran <= 2) {
-
-/*                 Compute RCONDC = 1 / (norm(A) * norm(in
-v(A)) */
-
-		    anorm = zlangt_(norm, &n, &a[1], &a[m + 1], &a[n + m + 1]);
-
-/*                 Use ZGTTRS to solve for one column at a
- time of   
-                   inv(A), computing the maximum column su
-m as we go. */
+/*                 Use ZGTTRS to solve for one column at a time of   
+                   inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    i__5 = j;
 			    x[i__5].r = 0., x[i__5].i = 0.;
-/* L40: */
+/* L30: */
 			}
-			i__4 = i;
+			i__4 = i__;
 			x[i__4].r = 1., x[i__4].i = 0.;
 			zgttrs_(trans, &n, &c__1, &af[1], &af[m + 1], &af[n + 
 				m + 1], &af[n + (m << 1) + 1], &iwork[1], &x[
@@ -478,112 +454,165 @@ m as we go. */
 /* Computing MAX */
 			d__1 = ainvnm, d__2 = dzasum_(&n, &x[1], &c__1);
 			ainvnm = max(d__1,d__2);
-/* L50: */
+/* L40: */
 		    }
+
+/*                 Compute RCONDC = 1 / (norm(A) * norm(inv(A)) */
+
 		    if (anorm <= 0. || ainvnm <= 0.) {
 			rcondc = 1.;
 		    } else {
 			rcondc = 1. / anorm / ainvnm;
 		    }
+		    if (itran == 1) {
+			rcondo = rcondc;
+		    } else {
+			rcondi = rcondc;
+		    }
+		} else {
+		    rcondc = 0.;
 		}
 
-/*              Set the right hand side. */
+/* +    TEST 7   
+                Estimate the reciprocal of the condition number of the   
+                matrix. */
 
-		zlagtm_(trans, &n, nrhs, &c_b48, &a[1], &a[m + 1], &a[n + m + 
-			1], &xact[1], &lda, &c_b49, &b[1], &lda);
+		s_copy(srnamc_1.srnamt, "ZGTCON", (ftnlen)6, (ftnlen)6);
+		zgtcon_(norm, &n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + 
+			(m << 1) + 1], &iwork[1], &anorm, &rcond, &work[1], &
+			info);
+
+/*              Check error code from ZGTCON. */
+
+		if (info != 0) {
+		    alaerh_(path, "ZGTCON", &info, &c__0, norm, &n, &n, &c_n1,
+			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
+		}
+
+		result[6] = dget06_(&rcond, &rcondc);
+
+/*              Print the test ratio if it is .GE. THRESH. */
+
+		if (result[6] >= *thresh) {
+		    if (nfail == 0 && nerrs == 0) {
+			alahd_(nout, path);
+		    }
+		    io___39.ciunit = *nout;
+		    s_wsfe(&io___39);
+		    do_fio(&c__1, norm, (ftnlen)1);
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&result[6], (ftnlen)sizeof(
+			    doublereal));
+		    e_wsfe();
+		    ++nfail;
+		}
+		++nrun;
+/* L50: */
+	    }
+
+/*           Skip the remaining tests if the matrix is singular. */
+
+	    if (trfcon) {
+		goto L100;
+	    }
+
+	    i__3 = *nns;
+	    for (irhs = 1; irhs <= i__3; ++irhs) {
+		nrhs = nsval[irhs];
+
+/*              Generate NRHS random solution vectors. */
+
+		ix = 1;
+		i__4 = nrhs;
+		for (j = 1; j <= i__4; ++j) {
+		    zlarnv_(&c__2, iseed, &n, &xact[ix]);
+		    ix += lda;
+/* L60: */
+		}
+
+		for (itran = 1; itran <= 3; ++itran) {
+		    *(unsigned char *)trans = *(unsigned char *)&transs[itran 
+			    - 1];
+		    if (itran == 1) {
+			rcondc = rcondo;
+		    } else {
+			rcondc = rcondi;
+		    }
+
+/*                 Set the right hand side. */
+
+		    zlagtm_(trans, &n, &nrhs, &c_b63, &a[1], &a[m + 1], &a[n 
+			    + m + 1], &xact[1], &lda, &c_b64, &b[1], &lda);
 
 /* +    TEST 2   
-                Solve op(A) * X = B and compute the residual. 
-*/
+                Solve op(A) * X = B and compute the residual. */
 
-		zlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
-		s_copy(srnamc_1.srnamt, "ZGTTRS", 6L, 6L);
-		zgttrs_(trans, &n, nrhs, &af[1], &af[m + 1], &af[n + m + 1], &
-			af[n + (m << 1) + 1], &iwork[1], &x[1], &lda, &info);
+		    zlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
+		    s_copy(srnamc_1.srnamt, "ZGTTRS", (ftnlen)6, (ftnlen)6);
+		    zgttrs_(trans, &n, &nrhs, &af[1], &af[m + 1], &af[n + m + 
+			    1], &af[n + (m << 1) + 1], &iwork[1], &x[1], &lda,
+			     &info);
 
 /*              Check error code from ZGTTRS. */
 
-		if (info != 0) {
-		    alaerh_(path, "ZGTTRS", &info, &c__0, trans, &n, &n, &
-			    c_n1, &c_n1, nrhs, &imat, &nfail, &nerrs, nout);
-		}
-
-		zlacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
-		zgtt02_(trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m + 1], &x[
-			1], &lda, &work[1], &lda, &rwork[1], &result[1]);
-
-/* +    TEST 3   
-                Check solution from generated exact solution. 
-*/
-
-		zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
-			result[2]);
-
-/* +    TESTS 4, 5, and 6   
-                Use iterative refinement to improve the soluti
-on. */
-
-		s_copy(srnamc_1.srnamt, "ZGTRFS", 6L, 6L);
-		zgtrfs_(trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m + 1], &af[
-			1], &af[m + 1], &af[n + m + 1], &af[n + (m << 1) + 1],
-			 &iwork[1], &b[1], &lda, &x[1], &lda, &rwork[1], &
-			rwork[*nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], 
-			&info);
-
-/*              Check error code from ZGTRFS. */
-
-		if (info != 0) {
-		    alaerh_(path, "ZGTRFS", &info, &c__0, trans, &n, &n, &
-			    c_n1, &c_n1, nrhs, &imat, &nfail, &nerrs, nout);
-		}
-
-		zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
-			result[3]);
-		zgtt05_(trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m + 1], &b[
-			1], &lda, &x[1], &lda, &xact[1], &lda, &rwork[1], &
-			rwork[*nrhs + 1], &result[4]);
-		nt = 6;
-L60:
-
-/* +    TEST 7   
-                Estimate the reciprocal of the condition numbe
-r of the   
-                matrix. */
-
-		if (itran <= 2) {
-		    s_copy(srnamc_1.srnamt, "ZGTCON", 6L, 6L);
-		    zgtcon_(norm, &n, &af[1], &af[m + 1], &af[n + m + 1], &af[
-			    n + (m << 1)], &iwork[1], &anorm, &rcond, &work[1]
-			    , &info);
-
-/*                 Check error code from ZGTCON. */
-
 		    if (info != 0) {
-			alaerh_(path, "ZGTCON", &info, &c__0, norm, &n, &n, &
-				c_n1, &c_n1, &c_n1, &imat, &nfail, &nerrs, 
+			alaerh_(path, "ZGTTRS", &info, &c__0, trans, &n, &n, &
+				c_n1, &c_n1, &nrhs, &imat, &nfail, &nerrs, 
 				nout);
 		    }
 
-		    result[6] = dget06_(&rcond, &rcondc);
-		    nt = 7;
-		}
+		    zlacpy_("Full", &n, &nrhs, &b[1], &lda, &work[1], &lda);
+		    zgtt02_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+			     &x[1], &lda, &work[1], &lda, &rwork[1], &result[
+			    1]);
 
-/*              Print information about the tests that did not
- pass the   
+/* +    TEST 3   
+                Check solution from generated exact solution. */
+
+		    zget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
+			    result[2]);
+
+/* +    TESTS 4, 5, and 6   
+                Use iterative refinement to improve the solution. */
+
+		    s_copy(srnamc_1.srnamt, "ZGTRFS", (ftnlen)6, (ftnlen)6);
+		    zgtrfs_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+			     &af[1], &af[m + 1], &af[n + m + 1], &af[n + (m <<
+			     1) + 1], &iwork[1], &b[1], &lda, &x[1], &lda, &
+			    rwork[1], &rwork[nrhs + 1], &work[1], &rwork[(
+			    nrhs << 1) + 1], &info);
+
+/*              Check error code from ZGTRFS. */
+
+		    if (info != 0) {
+			alaerh_(path, "ZGTRFS", &info, &c__0, trans, &n, &n, &
+				c_n1, &c_n1, &nrhs, &imat, &nfail, &nerrs, 
+				nout);
+		    }
+
+		    zget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
+			    result[3]);
+		    zgtt05_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+			     &b[1], &lda, &x[1], &lda, &xact[1], &lda, &rwork[
+			    1], &rwork[nrhs + 1], &result[4]);
+
+/*              Print information about the tests that did not pass the   
                 threshold. */
 
-		i__3 = nt;
-		for (k = k1; k <= i__3; ++k) {
-		    if (result[k - 1] >= *thresh) {
-			if (nfail == 0 && nerrs == 0) {
-			    alahd_(nout, path);
-			}
-			if (k < 7) {
-			    io___41.ciunit = *nout;
-			    s_wsfe(&io___41);
-			    do_fio(&c__1, trans, 1L);
+		    for (k = 2; k <= 6; ++k) {
+			if (result[k - 1] >= *thresh) {
+			    if (nfail == 0 && nerrs == 0) {
+				alahd_(nout, path);
+			    }
+			    io___44.ciunit = *nout;
+			    s_wsfe(&io___44);
+			    do_fio(&c__1, trans, (ftnlen)1);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
+			    do_fio(&c__1, (char *)&nrhs, (ftnlen)sizeof(
+				    integer));
 			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer))
@@ -591,31 +620,19 @@ r of the
 			    do_fio(&c__1, (char *)&result[k - 1], (ftnlen)
 				    sizeof(doublereal));
 			    e_wsfe();
-			} else {
-			    io___42.ciunit = *nout;
-			    s_wsfe(&io___42);
-			    do_fio(&c__1, norm, 1L);
-			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
-				    ;
-			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
-				    integer));
-			    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer))
-				    ;
-			    do_fio(&c__1, (char *)&result[k - 1], (ftnlen)
-				    sizeof(doublereal));
-			    e_wsfe();
+			    ++nfail;
 			}
-			++nfail;
-		    }
 /* L70: */
-		}
-		nrun = nrun + nt - k1 + 1;
+		    }
+		    nrun += 5;
 /* L80: */
+		}
+/* L90: */
 	    }
-L90:
+L100:
 	    ;
 	}
-/* L100: */
+/* L110: */
     }
 
 /*     Print a summary of the results. */

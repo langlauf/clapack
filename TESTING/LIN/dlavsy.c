@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -35,7 +36,11 @@ static integer c__1 = 1;
     static logical nounit;
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -73,8 +78,7 @@ static integer c__1 = 1;
             matrices.  If the diagonal blocks are assumed to be unit,   
             then A = U or A = L, otherwise A = U*D or A = L*D.   
             = 'U':  Diagonal blocks are assumed to be unit matrices.   
-            = 'N':  Diagonal blocks are assumed to be non-unit matrices. 
-  
+            = 'N':  Diagonal blocks are assumed to be non-unit matrices.   
 
     N       (input) INTEGER   
             The number of rows and columns of the matrix A.  N >= 0.   
@@ -104,29 +108,29 @@ static integer c__1 = 1;
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --ipiv;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
     *info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "T") &&
-	     ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "T") && ! lsame_(trans, "C")) {
 	*info = -2;
-    } else if (! lsame_(diag, "U") && ! lsame_(diag, "N")) {
+    } else if (! lsame_(diag, "U") && ! lsame_(diag, 
+	    "N")) {
 	*info = -3;
     } else if (*n < 0) {
 	*info = -4;
@@ -171,11 +175,10 @@ L10:
 
 /*              1 x 1 pivot block   
 
-                Multiply by the diagonal element if forming U 
-* D. */
+                Multiply by the diagonal element if forming U * D. */
 
 		if (nounit) {
-		    dscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
+		    dscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
 		}
 
 /*              Multiply by  P(K) * inv(U(K))  if K > 1. */
@@ -185,15 +188,14 @@ L10:
 /*                 Apply the transformation. */
 
 		    i__1 = k - 1;
-		    dger_(&i__1, nrhs, &c_b15, &a[k * a_dim1 + 1], &c__1, &b[
-			    k + b_dim1], ldb, &b[b_dim1 + 1], ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(1, k), &c__1, &b_ref(k, 
+			    1), ldb, &b_ref(1, 1), ldb);
 
 /*                 Interchange if P(K) .ne. I. */
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 		}
 		++k;
@@ -201,20 +203,19 @@ L10:
 
 /*              2 x 2 pivot block   
 
-                Multiply by the diagonal block if forming U * 
-D. */
+                Multiply by the diagonal block if forming U * D. */
 
 		if (nounit) {
-		    d11 = a[k + k * a_dim1];
-		    d22 = a[k + 1 + (k + 1) * a_dim1];
-		    d12 = a[k + (k + 1) * a_dim1];
+		    d11 = a_ref(k, k);
+		    d22 = a_ref(k + 1, k + 1);
+		    d12 = a_ref(k, k + 1);
 		    d21 = d12;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			t1 = b[k + j * b_dim1];
-			t2 = b[k + 1 + j * b_dim1];
-			b[k + j * b_dim1] = d11 * t1 + d12 * t2;
-			b[k + 1 + j * b_dim1] = d21 * t1 + d22 * t2;
+			t1 = b_ref(k, j);
+			t2 = b_ref(k + 1, j);
+			b_ref(k, j) = d11 * t1 + d12 * t2;
+			b_ref(k + 1, j) = d21 * t1 + d22 * t2;
 /* L20: */
 		    }
 		}
@@ -226,19 +227,17 @@ D. */
 /*                 Apply the transformations. */
 
 		    i__1 = k - 1;
-		    dger_(&i__1, nrhs, &c_b15, &a[k * a_dim1 + 1], &c__1, &b[
-			    k + b_dim1], ldb, &b[b_dim1 + 1], ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(1, k), &c__1, &b_ref(k, 
+			    1), ldb, &b_ref(1, 1), ldb);
 		    i__1 = k - 1;
-		    dger_(&i__1, nrhs, &c_b15, &a[(k + 1) * a_dim1 + 1], &
-			    c__1, &b[k + 1 + b_dim1], ldb, &b[b_dim1 + 1], 
-			    ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(1, k + 1), &c__1, &
+			    b_ref(k + 1, 1), ldb, &b_ref(1, 1), ldb);
 
 /*                 Interchange if P(K) .ne. I. */
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 		}
 		k += 2;
@@ -260,19 +259,17 @@ L40:
 		goto L60;
 	    }
 
-/*           Test the pivot index.  If greater than zero, a 1 x 1 
-  
+/*           Test the pivot index.  If greater than zero, a 1 x 1   
              pivot was used, otherwise a 2 x 2 pivot was used. */
 
 	    if (ipiv[k] > 0) {
 
 /*              1 x 1 pivot block:   
 
-                Multiply by the diagonal element if forming L 
-* D. */
+                Multiply by the diagonal element if forming L * D. */
 
 		if (nounit) {
-		    dscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
+		    dscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
 		}
 
 /*              Multiply by  P(K) * inv(L(K))  if K < N. */
@@ -283,16 +280,14 @@ L40:
 /*                 Apply the transformation. */
 
 		    i__1 = *n - k;
-		    dger_(&i__1, nrhs, &c_b15, &a[k + 1 + k * a_dim1], &c__1, 
-			    &b[k + b_dim1], ldb, &b[k + 1 + b_dim1], ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(k + 1, k), &c__1, &
+			    b_ref(k, 1), ldb, &b_ref(k + 1, 1), ldb);
 
-/*                 Interchange if a permutation was applie
-d at the   
+/*                 Interchange if a permutation was applied at the   
                    K-th step of the factorization. */
 
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 		}
 		--k;
@@ -301,20 +296,19 @@ d at the
 
 /*              2 x 2 pivot block:   
 
-                Multiply by the diagonal block if forming L * 
-D. */
+                Multiply by the diagonal block if forming L * D. */
 
 		if (nounit) {
-		    d11 = a[k - 1 + (k - 1) * a_dim1];
-		    d22 = a[k + k * a_dim1];
-		    d21 = a[k + (k - 1) * a_dim1];
+		    d11 = a_ref(k - 1, k - 1);
+		    d22 = a_ref(k, k);
+		    d21 = a_ref(k, k - 1);
 		    d12 = d21;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			t1 = b[k - 1 + j * b_dim1];
-			t2 = b[k + j * b_dim1];
-			b[k - 1 + j * b_dim1] = d11 * t1 + d12 * t2;
-			b[k + j * b_dim1] = d21 * t1 + d22 * t2;
+			t1 = b_ref(k - 1, j);
+			t2 = b_ref(k, j);
+			b_ref(k - 1, j) = d11 * t1 + d12 * t2;
+			b_ref(k, j) = d21 * t1 + d22 * t2;
 /* L50: */
 		    }
 		}
@@ -326,21 +320,18 @@ D. */
 /*                 Apply the transformation. */
 
 		    i__1 = *n - k;
-		    dger_(&i__1, nrhs, &c_b15, &a[k + 1 + k * a_dim1], &c__1, 
-			    &b[k + b_dim1], ldb, &b[k + 1 + b_dim1], ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(k + 1, k), &c__1, &
+			    b_ref(k, 1), ldb, &b_ref(k + 1, 1), ldb);
 		    i__1 = *n - k;
-		    dger_(&i__1, nrhs, &c_b15, &a[k + 1 + (k - 1) * a_dim1], &
-			    c__1, &b[k - 1 + b_dim1], ldb, &b[k + 1 + b_dim1],
-			     ldb);
+		    dger_(&i__1, nrhs, &c_b15, &a_ref(k + 1, k - 1), &c__1, &
+			    b_ref(k - 1, 1), ldb, &b_ref(k + 1, 1), ldb);
 
-/*                 Interchange if a permutation was applie
-d at the   
+/*                 Interchange if a permutation was applied at the   
                    K-th step of the factorization. */
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 		}
 		k += -2;
@@ -379,19 +370,18 @@ L70:
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 
 /*                 Apply the transformation */
 
 		    i__1 = k - 1;
 		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[b_offset], 
-			    ldb, &a[k * a_dim1 + 1], &c__1, &c_b15, &b[k + 
-			    b_dim1], ldb);
+			    ldb, &a_ref(1, k), &c__1, &c_b15, &b_ref(k, 1), 
+			    ldb);
 		}
 		if (nounit) {
-		    dscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
+		    dscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
 		}
 		--k;
 
@@ -404,35 +394,35 @@ L70:
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k - 1) {
-			dswap_(nrhs, &b[k - 1 + b_dim1], ldb, &b[kp + b_dim1],
-				 ldb);
+			dswap_(nrhs, &b_ref(k - 1, 1), ldb, &b_ref(kp, 1), 
+				ldb);
 		    }
 
 /*                 Apply the transformations */
 
 		    i__1 = k - 2;
 		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[b_offset], 
-			    ldb, &a[k * a_dim1 + 1], &c__1, &c_b15, &b[k + 
-			    b_dim1], ldb);
+			    ldb, &a_ref(1, k), &c__1, &c_b15, &b_ref(k, 1), 
+			    ldb);
 		    i__1 = k - 2;
 		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[b_offset], 
-			    ldb, &a[(k - 1) * a_dim1 + 1], &c__1, &c_b15, &b[
-			    k - 1 + b_dim1], ldb);
+			    ldb, &a_ref(1, k - 1), &c__1, &c_b15, &b_ref(k - 
+			    1, 1), ldb);
 		}
 
 /*              Multiply by the diagonal block if non-unit. */
 
 		if (nounit) {
-		    d11 = a[k - 1 + (k - 1) * a_dim1];
-		    d22 = a[k + k * a_dim1];
-		    d12 = a[k - 1 + k * a_dim1];
+		    d11 = a_ref(k - 1, k - 1);
+		    d22 = a_ref(k, k);
+		    d12 = a_ref(k - 1, k);
 		    d21 = d12;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			t1 = b[k - 1 + j * b_dim1];
-			t2 = b[k + j * b_dim1];
-			b[k - 1 + j * b_dim1] = d11 * t1 + d12 * t2;
-			b[k + j * b_dim1] = d21 * t1 + d22 * t2;
+			t1 = b_ref(k - 1, j);
+			t2 = b_ref(k, j);
+			b_ref(k - 1, j) = d11 * t1 + d12 * t2;
+			b_ref(k, j) = d21 * t1 + d22 * t2;
 /* L80: */
 		    }
 		}
@@ -465,19 +455,18 @@ L100:
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			dswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
-				ldb);
+			dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 		    }
 
 /*                 Apply the transformation */
 
 		    i__1 = *n - k;
-		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[k + 1 + 
-			    b_dim1], ldb, &a[k + 1 + k * a_dim1], &c__1, &
-			    c_b15, &b[k + b_dim1], ldb);
+		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b_ref(k + 1, 1),
+			     ldb, &a_ref(k + 1, k), &c__1, &c_b15, &b_ref(k, 
+			    1), ldb);
 		}
 		if (nounit) {
-		    dscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
+		    dscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
 		}
 		++k;
 
@@ -490,35 +479,35 @@ L100:
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k + 1) {
-			dswap_(nrhs, &b[k + 1 + b_dim1], ldb, &b[kp + b_dim1],
-				 ldb);
+			dswap_(nrhs, &b_ref(k + 1, 1), ldb, &b_ref(kp, 1), 
+				ldb);
 		    }
 
 /*                 Apply the transformation */
 
 		    i__1 = *n - k - 1;
-		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[k + 2 + 
-			    b_dim1], ldb, &a[k + 2 + (k + 1) * a_dim1], &c__1,
-			     &c_b15, &b[k + 1 + b_dim1], ldb);
+		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b_ref(k + 2, 1),
+			     ldb, &a_ref(k + 2, k + 1), &c__1, &c_b15, &b_ref(
+			    k + 1, 1), ldb);
 		    i__1 = *n - k - 1;
-		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b[k + 2 + 
-			    b_dim1], ldb, &a[k + 2 + k * a_dim1], &c__1, &
-			    c_b15, &b[k + b_dim1], ldb);
+		    dgemv_("Transpose", &i__1, nrhs, &c_b15, &b_ref(k + 2, 1),
+			     ldb, &a_ref(k + 2, k), &c__1, &c_b15, &b_ref(k, 
+			    1), ldb);
 		}
 
 /*              Multiply by the diagonal block if non-unit. */
 
 		if (nounit) {
-		    d11 = a[k + k * a_dim1];
-		    d22 = a[k + 1 + (k + 1) * a_dim1];
-		    d21 = a[k + 1 + k * a_dim1];
+		    d11 = a_ref(k, k);
+		    d22 = a_ref(k + 1, k + 1);
+		    d21 = a_ref(k + 1, k);
 		    d12 = d21;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			t1 = b[k + j * b_dim1];
-			t2 = b[k + 1 + j * b_dim1];
-			b[k + j * b_dim1] = d11 * t1 + d12 * t2;
-			b[k + 1 + j * b_dim1] = d21 * t1 + d22 * t2;
+			t1 = b_ref(k, j);
+			t2 = b_ref(k + 1, j);
+			b_ref(k, j) = d11 * t1 + d12 * t2;
+			b_ref(k + 1, j) = d21 * t1 + d22 * t2;
 /* L110: */
 		    }
 		}
@@ -535,4 +524,8 @@ L120:
 /*     End of DLAVSY */
 
 } /* dlavsy_ */
+
+#undef b_ref
+#undef a_ref
+
 

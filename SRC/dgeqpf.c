@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgeqpf_(integer *m, integer *n, doublereal *a, integer *
 	lda, integer *jpvt, doublereal *tau, doublereal *work, integer *info)
 {
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -11,6 +12,8 @@
 
     Purpose   
     =======   
+
+    This routine is deprecated and has been replaced by routine DGEQP3.   
 
     DGEQPF computes a QR factorization with column pivoting of a   
     real M-by-N matrix A: A*P = Q*R.   
@@ -36,8 +39,7 @@
             The leading dimension of the array A. LDA >= max(1,M).   
 
     JPVT    (input/output) INTEGER array, dimension (N)   
-            On entry, if JPVT(i) .ne. 0, the i-th column of A is permuted 
-  
+            On entry, if JPVT(i) .ne. 0, the i-th column of A is permuted   
             to the front of A*P (a leading column); if JPVT(i) = 0,   
             the i-th column of A is a free column.   
             On exit, if JPVT(i) = k, then the i-th column of A*P   
@@ -64,22 +66,18 @@
        H = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i). 
-  
+    v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i).   
 
     The matrix P is represented in jpvt as follows: If   
        jpvt(j) = i   
     then the jth column of P is the ith canonical unit vector.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -92,7 +90,7 @@
     static doublereal temp;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
     static doublereal temp2;
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
@@ -110,15 +108,17 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal aii;
     static integer pvt;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --jpvt;
+    --tau;
+    --work;
 
-#define JPVT(I) jpvt[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -139,19 +139,18 @@
 
     itemp = 1;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (JPVT(i) != 0) {
-	    if (i != itemp) {
-		dswap_(m, &A(1,i), &c__1, &A(1,itemp), &
-			c__1);
-		JPVT(i) = JPVT(itemp);
-		JPVT(itemp) = i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (jpvt[i__] != 0) {
+	    if (i__ != itemp) {
+		dswap_(m, &a_ref(1, i__), &c__1, &a_ref(1, itemp), &c__1);
+		jpvt[i__] = jpvt[itemp];
+		jpvt[itemp] = i__;
 	    } else {
-		JPVT(i) = i;
+		jpvt[i__] = i__;
 	    }
 	    ++itemp;
 	} else {
-	    JPVT(i) = i;
+	    jpvt[i__] = i__;
 	}
 /* L10: */
     }
@@ -161,11 +160,11 @@
 
     if (itemp > 0) {
 	ma = min(itemp,*m);
-	dgeqr2_(m, &ma, &A(1,1), lda, &TAU(1), &WORK(1), info);
+	dgeqr2_(m, &ma, &a[a_offset], lda, &tau[1], &work[1], info);
 	if (ma < *n) {
 	    i__1 = *n - ma;
-	    dorm2r_("Left", "Transpose", m, &i__1, &ma, &A(1,1), lda, &
-		    TAU(1), &A(1,ma+1), lda, &WORK(1), info);
+	    dorm2r_("Left", "Transpose", m, &i__1, &ma, &a[a_offset], lda, &
+		    tau[1], &a_ref(1, ma + 1), lda, &work[1], info);
 	}
     }
 
@@ -175,82 +174,80 @@
           work store the exact column norms. */
 
 	i__1 = *n;
-	for (i = itemp + 1; i <= *n; ++i) {
+	for (i__ = itemp + 1; i__ <= i__1; ++i__) {
 	    i__2 = *m - itemp;
-	    WORK(i) = dnrm2_(&i__2, &A(itemp+1,i), &c__1);
-	    WORK(*n + i) = WORK(i);
+	    work[i__] = dnrm2_(&i__2, &a_ref(itemp + 1, i__), &c__1);
+	    work[*n + i__] = work[i__];
 /* L20: */
 	}
 
 /*        Compute factorization */
 
 	i__1 = mn;
-	for (i = itemp + 1; i <= mn; ++i) {
+	for (i__ = itemp + 1; i__ <= i__1; ++i__) {
 
 /*           Determine ith pivot column and swap if necessary */
 
-	    i__2 = *n - i + 1;
-	    pvt = i - 1 + idamax_(&i__2, &WORK(i), &c__1);
+	    i__2 = *n - i__ + 1;
+	    pvt = i__ - 1 + idamax_(&i__2, &work[i__], &c__1);
 
-	    if (pvt != i) {
-		dswap_(m, &A(1,pvt), &c__1, &A(1,i), &
-			c__1);
-		itemp = JPVT(pvt);
-		JPVT(pvt) = JPVT(i);
-		JPVT(i) = itemp;
-		WORK(pvt) = WORK(i);
-		WORK(*n + pvt) = WORK(*n + i);
+	    if (pvt != i__) {
+		dswap_(m, &a_ref(1, pvt), &c__1, &a_ref(1, i__), &c__1);
+		itemp = jpvt[pvt];
+		jpvt[pvt] = jpvt[i__];
+		jpvt[i__] = itemp;
+		work[pvt] = work[i__];
+		work[*n + pvt] = work[*n + i__];
 	    }
 
 /*           Generate elementary reflector H(i) */
 
-	    if (i < *m) {
-		i__2 = *m - i + 1;
-		dlarfg_(&i__2, &A(i,i), &A(i+1,i), &
-			c__1, &TAU(i));
+	    if (i__ < *m) {
+		i__2 = *m - i__ + 1;
+		dlarfg_(&i__2, &a_ref(i__, i__), &a_ref(i__ + 1, i__), &c__1, 
+			&tau[i__]);
 	    } else {
-		dlarfg_(&c__1, &A(*m,*m), &A(*m,*m), &
-			c__1, &TAU(*m));
+		dlarfg_(&c__1, &a_ref(*m, *m), &a_ref(*m, *m), &c__1, &tau[*m]
+			);
 	    }
 
-	    if (i < *n) {
+	    if (i__ < *n) {
 
 /*              Apply H(i) to A(i:m,i+1:n) from the left */
 
-		aii = A(i,i);
-		A(i,i) = 1.;
-		i__2 = *m - i + 1;
-		i__3 = *n - i;
-		dlarf_("LEFT", &i__2, &i__3, &A(i,i), &c__1, &TAU(
-			i), &A(i,i+1), lda, &WORK((*n << 1) + 
-			1));
-		A(i,i) = aii;
+		aii = a_ref(i__, i__);
+		a_ref(i__, i__) = 1.;
+		i__2 = *m - i__ + 1;
+		i__3 = *n - i__;
+		dlarf_("LEFT", &i__2, &i__3, &a_ref(i__, i__), &c__1, &tau[
+			i__], &a_ref(i__, i__ + 1), lda, &work[(*n << 1) + 1]);
+		a_ref(i__, i__) = aii;
 	    }
 
 /*           Update partial column norms */
 
 	    i__2 = *n;
-	    for (j = i + 1; j <= *n; ++j) {
-		if (WORK(j) != 0.) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
+		if (work[j] != 0.) {
 /* Computing 2nd power */
-		    d__2 = (d__1 = A(i,j), abs(d__1)) / WORK(j);
+		    d__2 = (d__1 = a_ref(i__, j), abs(d__1)) / work[j];
 		    temp = 1. - d__2 * d__2;
 		    temp = max(temp,0.);
 /* Computing 2nd power */
-		    d__1 = WORK(j) / WORK(*n + j);
+		    d__1 = work[j] / work[*n + j];
 		    temp2 = temp * .05 * (d__1 * d__1) + 1.;
 		    if (temp2 == 1.) {
-			if (*m - i > 0) {
-			    i__3 = *m - i;
-			    WORK(j) = dnrm2_(&i__3, &A(i+1,j), &
-				    c__1);
-			    WORK(*n + j) = WORK(j);
+			if (*m - i__ > 0) {
+			    i__3 = *m - i__;
+			    work[j] = dnrm2_(&i__3, &a_ref(i__ + 1, j), &c__1)
+				    ;
+			    work[*n + j] = work[j];
 			} else {
-			    WORK(j) = 0.;
-			    WORK(*n + j) = 0.;
+			    work[j] = 0.;
+			    work[*n + j] = 0.;
 			}
 		    } else {
-			WORK(j) *= sqrt(temp);
+			work[j] *= sqrt(temp);
 		    }
 		}
 /* L30: */
@@ -264,4 +261,7 @@
 /*     End of DGEQPF */
 
 } /* dgeqpf_ */
+
+#undef a_ref
+
 

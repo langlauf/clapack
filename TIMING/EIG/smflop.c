@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,7 +12,7 @@ doublereal smflop_(real *ops, real *time, integer *info)
     real ret_val, r__1;
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -40,8 +41,7 @@ doublereal smflop_(real *ops, real *time, integer *info)
              routine.  If INFO is not 0, then SMFLOP returns a negative   
              value, indicating an error.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (*time <= 0.f) {
@@ -50,7 +50,7 @@ doublereal smflop_(real *ops, real *time, integer *info)
 	ret_val = *ops / (*time * 1e6f);
     }
     if (*info != 0) {
-	ret_val = -(doublereal)(r__1 = (real) (*info), dabs(r__1));
+	ret_val = -(r__1 = (real) (*info), dabs(r__1));
     }
     return ret_val;
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,6 +17,7 @@ static integer c__3 = 3;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
+    real r__1;
     doublereal d__1, d__2;
     complex q__1, q__2;
 
@@ -24,7 +26,7 @@ static integer c__3 = 3;
 	    doublereal), exp(doublereal), c_abs(complex *);
 
     /* Local variables */
-    static integer kbeg, isdb, kend, isde, klen, i, k;
+    static integer kbeg, isdb, kend, isde, klen, i__, k;
     static real alpha;
     static complex ctemp;
     static integer jc, jd, jr;
@@ -34,7 +36,11 @@ static integer c__3 = 3;
     extern doublereal slaran_(integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -50,8 +56,7 @@ static integer c__3 = 3;
 
     It first generates the diagonal and (possibly) subdiagonal,   
     according to the value of ITYPE, NZ1, NZ2, RSIGN, AMAGN, and RCOND.   
-    It then fills in the upper triangle with random numbers, if TRIANG is 
-  
+    It then fills in the upper triangle with random numbers, if TRIANG is   
     non-zero.   
 
     Arguments   
@@ -69,8 +74,7 @@ static integer c__3 = 3;
             = 2:  a transposed Jordan block.   
             = 3:  If N is odd, then a k+1 x k+1 transposed Jordan block   
                   followed by a k x k identity block, where k=(N-1)/2.   
-                  If N is even, then k=(N-2)/2, and a zero diagonal entry 
-  
+                  If N is even, then k=(N-2)/2, and a zero diagonal entry   
                   is tacked onto the end.   
 
             Diagonal types.  The diagonal consists of NZ1 zeros, then   
@@ -111,13 +115,11 @@ static integer c__3 = 3;
 
     TRIANG  (input) REAL   
             The entries above the diagonal will be random numbers with   
-            magnitude bounded by TRIANG (i.e., random numbers multiplied 
-  
+            magnitude bounded by TRIANG (i.e., random numbers multiplied   
             by TRIANG.)   
 
     IDIST   (input) INTEGER   
-            On entry, DIST specifies the type of distribution to be used 
-  
+            On entry, DIST specifies the type of distribution to be used   
             to generate a random matrix .   
             = 1: real and imaginary parts each UNIFORM( 0, 1 )   
             = 2: real and imaginary parts each UNIFORM( -1, 1 )   
@@ -126,12 +128,10 @@ static integer c__3 = 3;
 
     ISEED   (input/output) INTEGER array, dimension (4)   
             On entry ISEED specifies the seed of the random number   
-            generator.  The values of ISEED are changed on exit, and can 
-  
+            generator.  The values of ISEED are changed on exit, and can   
             be used in the next call to CLATM4 to continue the same   
             random number sequence.   
-            Note: ISEED(4) should be odd, for the random number generator 
-  
+            Note: ISEED(4) should be odd, for the random number generator   
             used at present.   
 
     A       (output) COMPLEX array, dimension (LDA, N)   
@@ -140,14 +140,13 @@ static integer c__3 = 3;
     LDA     (input) INTEGER   
             Leading dimension of A.  Must be at least 1 and at least N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
@@ -203,7 +202,7 @@ static integer c__3 = 3;
 L10:
 	i__1 = *n;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
+	    i__2 = a_subscr(jd, jd);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 /* L20: */
 	}
@@ -214,7 +213,7 @@ L10:
 L30:
 	i__1 = *n - 1;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = jd + 1 + jd * a_dim1;
+	    i__2 = a_subscr(jd + 1, jd);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 /* L40: */
 	}
@@ -222,14 +221,13 @@ L30:
 	isde = *n - 1;
 	goto L220;
 
-/*        |ITYPE| = 3: Transposed Jordan block, followed by the identi
-ty. */
+/*        |ITYPE| = 3: Transposed Jordan block, followed by the identity. */
 
 L50:
 	k = (*n - 1) / 2;
 	i__1 = k;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = jd + 1 + jd * a_dim1;
+	    i__2 = a_subscr(jd + 1, jd);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 /* L60: */
 	}
@@ -237,7 +235,7 @@ L50:
 	isde = k;
 	i__1 = (k << 1) + 1;
 	for (jd = k + 2; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
+	    i__2 = a_subscr(jd, jd);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 /* L70: */
 	}
@@ -248,9 +246,9 @@ L50:
 L80:
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
-	    d__1 = (doublereal) (jd - *nz1);
-	    q__1.r = d__1, q__1.i = 0.f;
+	    i__2 = a_subscr(jd, jd);
+	    i__3 = jd - *nz1;
+	    q__1.r = (real) i__3, q__1.i = 0.f;
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L90: */
 	}
@@ -261,12 +259,12 @@ L80:
 L100:
 	i__1 = kend;
 	for (jd = kbeg + 1; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
+	    i__2 = a_subscr(jd, jd);
 	    q__1.r = *rcond, q__1.i = 0.f;
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L110: */
 	}
-	i__1 = kbeg + kbeg * a_dim1;
+	i__1 = a_subscr(kbeg, kbeg);
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 	goto L220;
 
@@ -275,11 +273,11 @@ L100:
 L120:
 	i__1 = kend - 1;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
+	    i__2 = a_subscr(jd, jd);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 /* L130: */
 	}
-	i__1 = kend + kend * a_dim1;
+	i__1 = a_subscr(kend, kend);
 	q__1.r = *rcond, q__1.i = 0.f;
 	a[i__1].r = q__1.r, a[i__1].i = q__1.i;
 	goto L220;
@@ -287,18 +285,18 @@ L120:
 /*        |ITYPE| = 7: Exponentially distributed D values: */
 
 L140:
-	i__1 = kbeg + kbeg * a_dim1;
+	i__1 = a_subscr(kbeg, kbeg);
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 	if (klen > 1) {
 	    d__1 = (doublereal) (*rcond);
 	    d__2 = (doublereal) (1.f / (real) (klen - 1));
 	    alpha = pow_dd(&d__1, &d__2);
 	    i__1 = klen;
-	    for (i = 2; i <= i__1; ++i) {
-		i__2 = *nz1 + i + (*nz1 + i) * a_dim1;
-		i__3 = i - 1;
-		d__1 = pow_ri(&alpha, &i__3);
-		q__1.r = d__1, q__1.i = 0.f;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = a_subscr(*nz1 + i__, *nz1 + i__);
+		i__3 = i__ - 1;
+		r__1 = pow_ri(&alpha, &i__3);
+		q__1.r = r__1, q__1.i = 0.f;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L150: */
 	    }
@@ -308,31 +306,30 @@ L140:
 /*        |ITYPE| = 8: Arithmetically distributed D values: */
 
 L160:
-	i__1 = kbeg + kbeg * a_dim1;
+	i__1 = a_subscr(kbeg, kbeg);
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 	if (klen > 1) {
 	    alpha = (1.f - *rcond) / (real) (klen - 1);
 	    i__1 = klen;
-	    for (i = 2; i <= i__1; ++i) {
-		i__2 = *nz1 + i + (*nz1 + i) * a_dim1;
-		d__1 = (real) (klen - i) * alpha + *rcond;
-		q__1.r = d__1, q__1.i = 0.f;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = a_subscr(*nz1 + i__, *nz1 + i__);
+		r__1 = (real) (klen - i__) * alpha + *rcond;
+		q__1.r = r__1, q__1.i = 0.f;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L170: */
 	    }
 	}
 	goto L220;
 
-/*        |ITYPE| = 9: Randomly distributed D values on ( RCOND, 1): 
-*/
+/*        |ITYPE| = 9: Randomly distributed D values on ( RCOND, 1): */
 
 L180:
 	alpha = log(*rcond);
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
-	    d__1 = exp(alpha * slaran_(&iseed[1]));
-	    a[i__2].r = d__1, a[i__2].i = 0.f;
+	    i__2 = a_subscr(jd, jd);
+	    r__1 = exp(alpha * slaran_(&iseed[1]));
+	    a[i__2].r = r__1, a[i__2].i = 0.f;
 /* L190: */
 	}
 	goto L220;
@@ -342,7 +339,7 @@ L180:
 L200:
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
+	    i__2 = a_subscr(jd, jd);
 	    clarnd_(&q__1, idist, &iseed[1]);
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 /* L210: */
@@ -354,18 +351,18 @@ L220:
 
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = jd + jd * a_dim1;
-	    i__3 = jd + jd * a_dim1;
-	    d__1 = *amagn * a[i__3].r;
-	    a[i__2].r = d__1, a[i__2].i = 0.f;
+	    i__2 = a_subscr(jd, jd);
+	    i__3 = a_subscr(jd, jd);
+	    r__1 = *amagn * a[i__3].r;
+	    a[i__2].r = r__1, a[i__2].i = 0.f;
 /* L230: */
 	}
 	i__1 = isde;
 	for (jd = isdb; jd <= i__1; ++jd) {
-	    i__2 = jd + 1 + jd * a_dim1;
-	    i__3 = jd + 1 + jd * a_dim1;
-	    d__1 = *amagn * a[i__3].r;
-	    a[i__2].r = d__1, a[i__2].i = 0.f;
+	    i__2 = a_subscr(jd + 1, jd);
+	    i__3 = a_subscr(jd + 1, jd);
+	    r__1 = *amagn * a[i__3].r;
+	    a[i__2].r = r__1, a[i__2].i = 0.f;
 /* L240: */
 	}
 
@@ -375,34 +372,34 @@ L220:
 	if (*rsign) {
 	    i__1 = kend;
 	    for (jd = kbeg; jd <= i__1; ++jd) {
-		i__2 = jd + jd * a_dim1;
+		i__2 = a_subscr(jd, jd);
 		if (a[i__2].r != 0.f) {
 		    clarnd_(&q__1, &c__3, &iseed[1]);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
-		    d__1 = c_abs(&ctemp);
-		    q__1.r = ctemp.r / d__1, q__1.i = ctemp.i / d__1;
+		    r__1 = c_abs(&ctemp);
+		    q__1.r = ctemp.r / r__1, q__1.i = ctemp.i / r__1;
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
-		    i__2 = jd + jd * a_dim1;
-		    i__3 = jd + jd * a_dim1;
-		    d__1 = a[i__3].r;
-		    q__1.r = d__1 * ctemp.r, q__1.i = d__1 * ctemp.i;
+		    i__2 = a_subscr(jd, jd);
+		    i__3 = a_subscr(jd, jd);
+		    r__1 = a[i__3].r;
+		    q__1.r = r__1 * ctemp.r, q__1.i = r__1 * ctemp.i;
 		    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 		}
 /* L250: */
 	    }
 	    i__1 = isde;
 	    for (jd = isdb; jd <= i__1; ++jd) {
-		i__2 = jd + 1 + jd * a_dim1;
+		i__2 = a_subscr(jd + 1, jd);
 		if (a[i__2].r != 0.f) {
 		    clarnd_(&q__1, &c__3, &iseed[1]);
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
-		    d__1 = c_abs(&ctemp);
-		    q__1.r = ctemp.r / d__1, q__1.i = ctemp.i / d__1;
+		    r__1 = c_abs(&ctemp);
+		    q__1.r = ctemp.r / r__1, q__1.i = ctemp.i / r__1;
 		    ctemp.r = q__1.r, ctemp.i = q__1.i;
-		    i__2 = jd + 1 + jd * a_dim1;
-		    i__3 = jd + 1 + jd * a_dim1;
-		    d__1 = a[i__3].r;
-		    q__1.r = d__1 * ctemp.r, q__1.i = d__1 * ctemp.i;
+		    i__2 = a_subscr(jd + 1, jd);
+		    i__3 = a_subscr(jd + 1, jd);
+		    r__1 = a[i__3].r;
+		    q__1.r = r__1 * ctemp.r, q__1.i = r__1 * ctemp.i;
 		    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 		}
 /* L260: */
@@ -414,23 +411,23 @@ L220:
 	if (*itype < 0) {
 	    i__1 = (kbeg + kend - 1) / 2;
 	    for (jd = kbeg; jd <= i__1; ++jd) {
-		i__2 = jd + jd * a_dim1;
+		i__2 = a_subscr(jd, jd);
 		ctemp.r = a[i__2].r, ctemp.i = a[i__2].i;
-		i__2 = jd + jd * a_dim1;
-		i__3 = kbeg + kend - jd + (kbeg + kend - jd) * a_dim1;
+		i__2 = a_subscr(jd, jd);
+		i__3 = a_subscr(kbeg + kend - jd, kbeg + kend - jd);
 		a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
-		i__2 = kbeg + kend - jd + (kbeg + kend - jd) * a_dim1;
+		i__2 = a_subscr(kbeg + kend - jd, kbeg + kend - jd);
 		a[i__2].r = ctemp.r, a[i__2].i = ctemp.i;
 /* L270: */
 	    }
 	    i__1 = (*n - 1) / 2;
 	    for (jd = 1; jd <= i__1; ++jd) {
-		i__2 = jd + 1 + jd * a_dim1;
+		i__2 = a_subscr(jd + 1, jd);
 		ctemp.r = a[i__2].r, ctemp.i = a[i__2].i;
-		i__2 = jd + 1 + jd * a_dim1;
-		i__3 = *n + 1 - jd + (*n - jd) * a_dim1;
+		i__2 = a_subscr(jd + 1, jd);
+		i__3 = a_subscr(*n + 1 - jd, *n - jd);
 		a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
-		i__2 = *n + 1 - jd + (*n - jd) * a_dim1;
+		i__2 = a_subscr(*n + 1 - jd, *n - jd);
 		a[i__2].r = ctemp.r, a[i__2].i = ctemp.i;
 /* L280: */
 	    }
@@ -445,7 +442,7 @@ L220:
 	for (jc = 2; jc <= i__1; ++jc) {
 	    i__2 = jc - 1;
 	    for (jr = 1; jr <= i__2; ++jr) {
-		i__3 = jr + jc * a_dim1;
+		i__3 = a_subscr(jr, jc);
 		clarnd_(&q__2, idist, &iseed[1]);
 		q__1.r = *triang * q__2.r, q__1.i = *triang * q__2.i;
 		a[i__3].r = q__1.r, a[i__3].i = q__1.i;
@@ -460,4 +457,8 @@ L220:
 /*     End of CLATM4 */
 
 } /* clatm4_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,11 @@
 	    cr12, cr21, cr22, ulp, wis, wrs;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -91,18 +96,17 @@
             =3:  same as INFO=2, but  s  and  w  could not be scaled so   
                  as to compute the test.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
@@ -118,14 +122,13 @@
     ulp = dlamch_("Epsilon") * dlamch_("Base");
     absw = abs(wrs) + abs(wis);
 /* Computing MAX */
-    d__5 = (d__1 = a[a_dim1 + 1], abs(d__1)) + (d__2 = a[a_dim1 + 2], abs(
-	    d__2)), d__6 = (d__3 = a[(a_dim1 << 1) + 1], abs(d__3)) + (d__4 = 
-	    a[(a_dim1 << 1) + 2], abs(d__4)), d__5 = max(d__5,d__6);
+    d__5 = (d__1 = a_ref(1, 1), abs(d__1)) + (d__2 = a_ref(2, 1), abs(d__2)), 
+	    d__6 = (d__3 = a_ref(1, 2), abs(d__3)) + (d__4 = a_ref(2, 2), abs(
+	    d__4)), d__5 = max(d__5,d__6);
     anorm = max(d__5,safmin);
 /* Computing MAX */
-    d__4 = (d__1 = b[b_dim1 + 1], abs(d__1)), d__5 = (d__2 = b[(b_dim1 << 1) 
-	    + 1], abs(d__2)) + (d__3 = b[(b_dim1 << 1) + 2], abs(d__3)), d__4 
-	    = max(d__4,d__5);
+    d__4 = (d__3 = b_ref(1, 1), abs(d__3)), d__5 = (d__1 = b_ref(1, 2), abs(
+	    d__1)) + (d__2 = b_ref(2, 2), abs(d__2)), d__4 = max(d__4,d__5);
     bnorm = max(d__4,safmin);
 
 /*     Check for possible overflow. */
@@ -181,13 +184,13 @@
 
 /*     Compute C = s A - w B */
 
-    cr11 = scales * a[a_dim1 + 1] - wrs * b[b_dim1 + 1];
-    ci11 = -wis * b[b_dim1 + 1];
-    cr21 = scales * a[a_dim1 + 2];
-    cr12 = scales * a[(a_dim1 << 1) + 1] - wrs * b[(b_dim1 << 1) + 1];
-    ci12 = -wis * b[(b_dim1 << 1) + 1];
-    cr22 = scales * a[(a_dim1 << 1) + 2] - wrs * b[(b_dim1 << 1) + 2];
-    ci22 = -wis * b[(b_dim1 << 1) + 2];
+    cr11 = scales * a_ref(1, 1) - wrs * b_ref(1, 1);
+    ci11 = -wis * b_ref(1, 1);
+    cr21 = scales * a_ref(2, 1);
+    cr12 = scales * a_ref(1, 2) - wrs * b_ref(1, 2);
+    ci12 = -wis * b_ref(1, 2);
+    cr22 = scales * a_ref(2, 2) - wrs * b_ref(2, 2);
+    ci22 = -wis * b_ref(2, 2);
 
 /*     Compute the smallest singular value of s A - w B:   
 
@@ -211,4 +214,8 @@
 /*     End of DGET53 */
 
 } /* dget53_ */
+
+#undef b_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,7 +33,11 @@ static real c_b7 = -1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -70,18 +75,17 @@ static real c_b7 = -1.f;
     RESULT  (output) REAL   
             RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -97,8 +101,8 @@ static real c_b7 = -1.f;
     wnorm = 0.f;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
-	saxpy_(m, &c_b7, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+	saxpy_(m, &c_b7, &b_ref(1, j), &c__1, &work[1], &c__1);
 /* Computing MAX */
 	r__1 = wnorm, r__2 = sasum_(n, &work[1], &c__1);
 	wnorm = dmax(r__1,r__2);
@@ -128,4 +132,8 @@ static real c_b7 = -1.f;
 /*     End of SGET10 */
 
 } /* sget10_ */
+
+#undef b_ref
+#undef a_ref
+
 

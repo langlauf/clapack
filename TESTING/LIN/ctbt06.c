@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@
     static real bignum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -49,8 +50,7 @@
             CTBCON.   
 
     UPLO    (input) CHARACTER   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -68,13 +68,10 @@
 
     AB      (input) COMPLEX array, dimension (LDAB,N)   
             The upper or lower triangular band matrix A, stored in the   
-            first kd+1 rows of the array. The j-th column of A is stored 
-  
+            first kd+1 rows of the array. The j-th column of A is stored   
             in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
@@ -86,13 +83,12 @@
                RAT = MAX( RCOND, RCONDC )/MIN( RCOND, RCONDC ) - 1.   
             If RAT = 0, the two estimates are exactly the same.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     --rwork;
 
@@ -123,13 +119,10 @@
 
     } else {
 
-/*        One estimate is zero, the other is non-zero.  If the matrix 
-is   
-          ill-conditioned, return the nonzero estimate multiplied by 
-  
+/*        One estimate is zero, the other is non-zero.  If the matrix is   
+          ill-conditioned, return the nonzero estimate multiplied by   
           1/EPS; if the matrix is badly scaled, return the nonzero   
-          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximu
-m   
+          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximum   
           element in absolute value in A. */
 
 	bignum = 1.f / slamch_("Safe minimum");

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -60,7 +61,11 @@ static integer c__1 = 1;
     static logical notran, gen, tri, qrs, sym;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -123,8 +128,7 @@ static integer c__1 = 1;
     KL      (input) INTEGER   
             Used only if A is a band matrix; specifies the number of   
             subdiagonals of A if A is a general band matrix or if A is   
-            symmetric or triangular and UPLO = 'L'; specifies the number 
-  
+            symmetric or triangular and UPLO = 'L'; specifies the number   
             of superdiagonals of A if A is symmetric or triangular and   
             UPLO = 'U'.  0 <= KL <= M-1.   
 
@@ -141,8 +145,7 @@ static integer c__1 = 1;
             = 2:  matrix has unit diagonal   
 
     NRHS    (input) INTEGER   
-            The number of right hand side vectors in the system A*X = B. 
-  
+            The number of right hand side vectors in the system A*X = B.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The test matrix whose type is given by PATH.   
@@ -153,8 +156,7 @@ static integer c__1 = 1;
             If PATH = xPB, xSB, xHB, or xTB, LDA >= KL+1.   
             Otherwise, LDA >= max(1,M).   
 
-    X       (input or output) DOUBLE PRECISION array, dimension(LDX,NRHS) 
-  
+    X       (input or output) DOUBLE PRECISION array, dimension(LDX,NRHS)   
             On entry, if XTYPE = 'C' (for 'Computed'), then X contains   
             the exact solution to the system of linear equations.   
             On exit, if XTYPE = 'N' (for 'New'), then X is initialized   
@@ -181,41 +183,43 @@ static integer c__1 = 1;
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --iseed;
 
     /* Function Body */
     *info = 0;
     *(unsigned char *)c1 = *(unsigned char *)path;
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
     tran = lsame_(trans, "T") || lsame_(trans, "C");
     notran = ! tran;
     gen = lsame_(path + 1, "G");
-    qrs = lsame_(path + 1, "Q") || lsame_(path + 2, "Q");
-    sym = lsame_(path + 1, "P") || lsame_(path + 1, "S");
+    qrs = lsame_(path + 1, "Q") || lsame_(path + 2, 
+	    "Q");
+    sym = lsame_(path + 1, "P") || lsame_(path + 1, 
+	    "S");
     tri = lsame_(path + 1, "T");
     band = lsame_(path + 2, "B");
     if (! lsame_(c1, "Double precision")) {
 	*info = -1;
-    } else if (! (lsame_(xtype, "N") || lsame_(xtype, "C"))) {
+    } else if (! (lsame_(xtype, "N") || lsame_(xtype, 
+	    "C"))) {
 	*info = -2;
-    } else if ((sym || tri) && ! (lsame_(uplo, "U") || lsame_(uplo, 
-	    "L"))) {
+    } else if ((sym || tri) && ! (lsame_(uplo, "U") || 
+	    lsame_(uplo, "L"))) {
 	*info = -3;
     } else if ((gen || qrs) && ! (tran || lsame_(trans, "N"))) {
 	*info = -4;
@@ -255,7 +259,7 @@ static integer c__1 = 1;
     if (! lsame_(xtype, "C")) {
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dlarnv_(&c__2, &iseed[1], n, &x[j * x_dim1 + 1]);
+	    dlarnv_(&c__2, &iseed[1], n, &x_ref(1, j));
 /* L10: */
 	}
     }
@@ -263,15 +267,17 @@ static integer c__1 = 1;
 /*     Multiply X by op( A ) using an appropriate   
        matrix multiply routine. */
 
-    if (lsamen_(&c__2, c2, "GE") || lsamen_(&c__2, c2, "QR") 
-	    || lsamen_(&c__2, c2, "LQ") || lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c2, "RQ")) {
+    if (lsamen_(&c__2, c2, "GE") || lsamen_(&c__2, c2, 
+	    "QR") || lsamen_(&c__2, c2, "LQ") || lsamen_(&c__2, c2, "QL") || 
+	    lsamen_(&c__2, c2, "RQ")) {
 
 /*        General matrix */
 
 	dgemm_(trans, "N", &mb, nrhs, &nx, &c_b32, &a[a_offset], lda, &x[
 		x_offset], ldx, &c_b33, &b[b_offset], ldb);
 
-    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&c__2, c2, "SY")) {
+    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&
+	    c__2, c2, "SY")) {
 
 /*        Symmetric matrix, 2-D storage */
 
@@ -284,9 +290,8 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dgbmv_(trans, &mb, &nx, kl, ku, &c_b32, &a[a_offset], lda, &x[j * 
-		    x_dim1 + 1], &c__1, &c_b33, &b[j * b_dim1 + 1], &c__1)
-		    ;
+	    dgbmv_(trans, &mb, &nx, kl, ku, &c_b32, &a[a_offset], lda, &x_ref(
+		    1, j), &c__1, &c_b33, &b_ref(1, j), &c__1);
 /* L20: */
 	}
 
@@ -296,19 +301,20 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dsbmv_(uplo, n, kl, &c_b32, &a[a_offset], lda, &x[j * x_dim1 + 1],
-		     &c__1, &c_b33, &b[j * b_dim1 + 1], &c__1);
+	    dsbmv_(uplo, n, kl, &c_b32, &a[a_offset], lda, &x_ref(1, j), &
+		    c__1, &c_b33, &b_ref(1, j), &c__1);
 /* L30: */
 	}
 
-    } else if (lsamen_(&c__2, c2, "PP") || lsamen_(&c__2, c2, "SP")) {
+    } else if (lsamen_(&c__2, c2, "PP") || lsamen_(&
+	    c__2, c2, "SP")) {
 
 /*        Symmetric matrix, packed storage */
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dspmv_(uplo, n, &c_b32, &a[a_offset], &x[j * x_dim1 + 1], &c__1, &
-		    c_b33, &b[j * b_dim1 + 1], &c__1);
+	    dspmv_(uplo, n, &c_b32, &a[a_offset], &x_ref(1, j), &c__1, &c_b33,
+		     &b_ref(1, j), &c__1);
 /* L40: */
 	}
 
@@ -325,7 +331,8 @@ static integer c__1 = 1;
 	    *(unsigned char *)diag = 'N';
 	}
 	dtrmm_("Left", uplo, trans, diag, n, nrhs, &c_b32, &a[a_offset], lda, 
-		&b[b_offset], ldb);
+		&b[b_offset], ldb)
+		;
 
     } else if (lsamen_(&c__2, c2, "TP")) {
 
@@ -339,8 +346,7 @@ static integer c__1 = 1;
 	}
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dtpmv_(uplo, trans, diag, n, &a[a_offset], &b[j * b_dim1 + 1], &
-		    c__1);
+	    dtpmv_(uplo, trans, diag, n, &a[a_offset], &b_ref(1, j), &c__1);
 /* L50: */
 	}
 
@@ -356,8 +362,8 @@ static integer c__1 = 1;
 	}
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    dtbmv_(uplo, trans, diag, n, kl, &a[a_offset], lda, &b[j * b_dim1 
-		    + 1], &c__1);
+	    dtbmv_(uplo, trans, diag, n, kl, &a[a_offset], lda, &b_ref(1, j), 
+		    &c__1);
 /* L60: */
 	}
 
@@ -375,4 +381,8 @@ static integer c__1 = 1;
 /*     End of DLARHS */
 
 } /* dlarhs_ */
+
+#undef x_ref
+#undef b_ref
+
 

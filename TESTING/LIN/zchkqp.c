@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -51,7 +52,7 @@ static integer c__1 = 1;
     /* Local variables */
     static integer mode, info;
     static char path[3];
-    static integer ilow, nrun, i;
+    static integer ilow, nrun, i__;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer k, m, n, ihigh, nfail, iseed[4], imode, mnmin, istep, 
 	    nerrs, lwork;
@@ -85,7 +86,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -100,8 +101,7 @@ static integer c__1 = 1;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -126,8 +126,7 @@ static integer c__1 = 1;
             Flag that indicates whether error exits are to be tested.   
 
     A       (workspace) COMPLEX*16 array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the 
-  
+            where MMAX is the maximum value of M in MVAL and NMAX is the   
             maximum value of N in NVAL.   
 
     COPYA   (workspace) COMPLEX*16 array, dimension (MMAX*NMAX)   
@@ -150,8 +149,7 @@ static integer c__1 = 1;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -170,13 +168,13 @@ static integer c__1 = 1;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'Z';
-    s_copy(path + 1, "QP", 2L, 2L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "QP", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
     eps = dlamch_("Epsilon");
@@ -215,8 +213,7 @@ static integer c__1 = 1;
 /*              Do for each type of matrix   
                    1:  zero matrix   
                    2:  one small singular value   
-                   3:  geometric distribution of singular valu
-es   
+                   3:  geometric distribution of singular values   
                    4:  first n/2 columns fixed   
                    5:  last n/2 columns fixed   
                    6:  every second column fixed */
@@ -227,19 +224,18 @@ es
 		}
 
 /*              Generate test matrix of size m by n using   
-                singular value distribution indicated by `mode
-'. */
+                singular value distribution indicated by `mode'. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    iwork[i] = 0;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    iwork[i__] = 0;
 /* L20: */
 		}
 		if (imode == 1) {
 		    zlaset_("Full", &m, &n, &c_b11, &c_b11, &copya[1], &lda);
 		    i__3 = mnmin;
-		    for (i = 1; i <= i__3; ++i) {
-			copys[i] = 0.;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			copys[i__] = 0.;
 /* L30: */
 		    }
 		} else {
@@ -267,9 +263,9 @@ es
 			}
 			i__3 = ihigh;
 			i__4 = istep;
-			for (i = ilow; i__4 < 0 ? i >= i__3 : i <= i__3; i += 
-				i__4) {
-			    iwork[i] = 1;
+			for (i__ = ilow; i__4 < 0 ? i__ >= i__3 : i__ <= i__3;
+				 i__ += i__4) {
+			    iwork[i__] = 1;
 /* L40: */
 			}
 		    }
@@ -280,10 +276,9 @@ es
 
 		zlacpy_("All", &m, &n, &copya[1], &lda, &a[1], &lda);
 
-/*              Compute the QR factorization with pivoting of 
-A */
+/*              Compute the QR factorization with pivoting of A */
 
-		s_copy(srnamc_1.srnamt, "ZGEQPF", 6L, 6L);
+		s_copy(srnamc_1.srnamt, "ZGEQPF", (ftnlen)6, (ftnlen)6);
 		zgeqpf_(&m, &n, &a[1], &lda, &iwork[1], &tau[1], &work[1], &
 			rwork[1], &info);
 
@@ -302,8 +297,7 @@ A */
 		result[2] = zqrt11_(&m, &mnmin, &a[1], &lda, &tau[1], &work[1]
 			, &lwork);
 
-/*              Print information about the tests that did not
- pass   
+/*              Print information about the tests that did not pass   
                 the threshold. */
 
 		for (k = 1; k <= 3; ++k) {

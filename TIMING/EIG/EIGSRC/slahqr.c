@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,18 +19,22 @@ struct {
 static integer c__1 = 1;
 
 /* Subroutine */ int slahqr_(logical *wantt, logical *wantz, integer *n, 
-	integer *ilo, integer *ihi, real *h, integer *ldh, real *wr, real *wi,
-	 integer *iloz, integer *ihiz, real *z, integer *ldz, integer *info)
+	integer *ilo, integer *ihi, real *h__, integer *ldh, real *wr, real *
+	wi, integer *iloz, integer *ihiz, real *z__, integer *ldz, integer *
+	info)
 {
     /* System generated locals */
     integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4;
     real r__1, r__2;
 
+    /* Builtin functions */
+    double sqrt(doublereal), r_sign(real *, real *);
+
     /* Local variables */
-    static real h43h34, unfl, ovfl, work[1], opst;
+    static real h43h34, disc, unfl, ovfl, work[1], opst;
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static integer i, j, k, l, m;
+    static integer i__, j, k, l, m;
     static real s, v[3];
     static integer i1, i2;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
@@ -48,15 +53,19 @@ static integer c__1 = 1;
     extern /* Subroutine */ int slarfg_(integer *, real *, real *, integer *, 
 	    real *);
     extern doublereal slanhs_(char *, integer *, real *, integer *, real *);
-    static real smlnum, h33s, h44s;
+    static real smlnum, ave, h33s, h44s;
     static integer itn, its;
     static real ulp, sum, tst1;
 
 
-/*  -- LAPACK auxiliary routine (instrum. to count ops. version 2.0) --   
+#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary routine (instrum. to count ops. version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
        Common block to return operation count.   
 
@@ -65,8 +74,7 @@ static integer c__1 = 1;
 
     SLAHQR is an auxiliary routine called by SHSEQR to update the   
     eigenvalues and Schur decomposition already computed by SHSEQR, by   
-    dealing with the Hessenberg submatrix in rows and columns ILO to IHI. 
-  
+    dealing with the Hessenberg submatrix in rows and columns ILO to IHI.   
 
     Arguments   
     =========   
@@ -94,8 +102,7 @@ static integer c__1 = 1;
     H       (input/output) REAL array, dimension (LDH,N)   
             On entry, the upper Hessenberg matrix H.   
             On exit, if WANTT is .TRUE., H is upper quasi-triangular in   
-            rows and columns ILO:IHI, with any 2-by-2 diagonal blocks in 
-  
+            rows and columns ILO:IHI, with any 2-by-2 diagonal blocks in   
             standard form. If WANTT is .FALSE., the contents of H are   
             unspecified on exit.   
 
@@ -111,8 +118,7 @@ static integer c__1 = 1;
             elements of WR and WI, say the i-th and (i+1)th, with   
             WI(i) > 0 and WI(i+1) < 0. If WANTT is .TRUE., the   
             eigenvalues are stored in the same order as on the diagonal   
-            of the Schur form returned in H, with WR(i) = H(i,i), and, if 
-  
+            of the Schur form returned in H, with WR(i) = H(i,i), and, if   
             H(i:i+1,i:i+1) is a 2-by-2 diagonal block,   
             WI(i) = sqrt(H(i+1,i)*H(i,i+1)) and WI(i+1) = -WI(i).   
 
@@ -125,8 +131,7 @@ static integer c__1 = 1;
     Z       (input/output) REAL array, dimension (LDZ,N)   
             If WANTZ is .TRUE., on entry Z must contain the current   
             matrix Z of transformations accumulated by SHSEQR, and on   
-            exit Z has been updated; transformations are applied only to 
-  
+            exit Z has been updated; transformations are applied only to   
             the submatrix Z(ILOZ:IHIZ,ILO:IHI).   
             If WANTZ is .FALSE., Z is not referenced.   
 
@@ -135,26 +140,29 @@ static integer c__1 = 1;
 
     INFO    (output) INTEGER   
             = 0: successful exit   
-            > 0: SLAHQR failed to compute all the eigenvalues ILO to IHI 
-  
+            > 0: SLAHQR failed to compute all the eigenvalues ILO to IHI   
                  in a total of 30*(IHI-ILO+1) iterations; if INFO = i,   
-                 elements i+1:ihi of WR and WI contain those eigenvalues 
-  
+                 elements i+1:ihi of WR and WI contain those eigenvalues   
                  which have been successfully computed.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    2-96 Based on modifications by   
+       David Day, Sandia National Laboratory, USA   
+
+    =====================================================================   
 
 
        Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     --wr;
     --wi;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
     /* Function Body */
     *info = 0;
@@ -169,7 +177,7 @@ static integer c__1 = 1;
 	return 0;
     }
     if (*ilo == *ihi) {
-	wr[*ilo] = h[*ilo + *ilo * h_dim1];
+	wr[*ilo] = h___ref(*ilo, *ilo);
 	wi[*ilo] = 0.f;
 	return 0;
     }
@@ -187,8 +195,7 @@ static integer c__1 = 1;
     smlnum = unfl * (nh / ulp);
 
 /*     I1 and I2 are the indices of the first row and last column of H   
-       to which transformations must be applied. If eigenvalues only are 
-  
+       to which transformations must be applied. If eigenvalues only are   
        being computed, I1 and I2 are set inside the main loop. */
 
     if (*wantt) {
@@ -200,17 +207,16 @@ static integer c__1 = 1;
 
     itn = nh * 30;
 
-/*     The main loop begins here. I is the loop index and decreases from 
-  
+/*     The main loop begins here. I is the loop index and decreases from   
        IHI to ILO in steps of 1 or 2. Each iteration of the loop works   
        with the active submatrix in rows and columns L to I.   
        Eigenvalues I+1 to IHI have already converged. Either L = ILO or   
        H(L,L-1) is negligible so that the matrix splits. */
 
-    i = *ihi;
+    i__ = *ihi;
 L10:
     l = *ilo;
-    if (i < *ilo) {
+    if (i__ < *ilo) {
 	goto L150;
     }
 
@@ -224,21 +230,20 @@ L10:
 /*        Look for a single small subdiagonal element. */
 
 	i__2 = l + 1;
-	for (k = i; k >= i__2; --k) {
-	    tst1 = (r__1 = h[k - 1 + (k - 1) * h_dim1], dabs(r__1)) + (r__2 = 
-		    h[k + k * h_dim1], dabs(r__2));
+	for (k = i__; k >= i__2; --k) {
+	    tst1 = (r__1 = h___ref(k - 1, k - 1), dabs(r__1)) + (r__2 = 
+		    h___ref(k, k), dabs(r__2));
 	    if (tst1 == 0.f) {
-		i__3 = i - l + 1;
-		tst1 = slanhs_("1", &i__3, &h[l + l * h_dim1], ldh, work);
+		i__3 = i__ - l + 1;
+		tst1 = slanhs_("1", &i__3, &h___ref(l, l), ldh, work);
 /* **   
                 Increment op count */
-		latime_1.ops += (i - l + 1) * (i - l + 2) / 2;
+		latime_1.ops += (i__ - l + 1) * (i__ - l + 2) / 2;
 /* ** */
 	    }
 /* Computing MAX */
 	    r__2 = ulp * tst1;
-	    if ((r__1 = h[k + (k - 1) * h_dim1], dabs(r__1)) <= dmax(r__2,
-		    smlnum)) {
+	    if ((r__1 = h___ref(k, k - 1), dabs(r__1)) <= dmax(r__2,smlnum)) {
 		goto L30;
 	    }
 /* L20: */
@@ -247,79 +252,105 @@ L30:
 	l = k;
 /* **   
           Increment op count */
-	opst += (i - l + 1) * 3;
+	opst += (i__ - l + 1) * 3;
 /* ** */
 	if (l > *ilo) {
 
 /*           H(L,L-1) is negligible */
 
-	    h[l + (l - 1) * h_dim1] = 0.f;
+	    h___ref(l, l - 1) = 0.f;
 	}
 
-/*        Exit from loop if a submatrix of order 1 or 2 has split off.
- */
+/*        Exit from loop if a submatrix of order 1 or 2 has split off. */
 
-	if (l >= i - 1) {
+	if (l >= i__ - 1) {
 	    goto L140;
 	}
 
-/*        Now the active submatrix is in rows and columns L to I. If 
-  
-          eigenvalues only are being computed, only the active submatr
-ix   
+/*        Now the active submatrix is in rows and columns L to I. If   
+          eigenvalues only are being computed, only the active submatrix   
           need be transformed. */
 
 	if (! (*wantt)) {
 	    i1 = l;
-	    i2 = i;
+	    i2 = i__;
 	}
 
 	if (its == 10 || its == 20) {
 
 /*           Exceptional shift. */
 
-	    s = (r__1 = h[i + (i - 1) * h_dim1], dabs(r__1)) + (r__2 = h[i - 
-		    1 + (i - 2) * h_dim1], dabs(r__2));
-	    h44 = s * .75f;
+	    s = (r__1 = h___ref(i__, i__ - 1), dabs(r__1)) + (r__2 = h___ref(
+		    i__ - 1, i__ - 2), dabs(r__2));
+	    h44 = s * .75f + h___ref(i__, i__);
 	    h33 = h44;
 	    h43h34 = s * -.4375f * s;
 /* **   
              Increment op count */
-	    opst += 4;
+	    opst += 5;
 /* ** */
 	} else {
 
-/*           Prepare to use Wilkinson's double shift */
+/*           Prepare to use Francis' double shift   
+             (i.e. 2nd degree generalized Rayleigh quotient) */
 
-	    h44 = h[i + i * h_dim1];
-	    h33 = h[i - 1 + (i - 1) * h_dim1];
-	    h43h34 = h[i + (i - 1) * h_dim1] * h[i - 1 + i * h_dim1];
+	    h44 = h___ref(i__, i__);
+	    h33 = h___ref(i__ - 1, i__ - 1);
+	    h43h34 = h___ref(i__, i__ - 1) * h___ref(i__ - 1, i__);
+	    s = h___ref(i__ - 1, i__ - 2) * h___ref(i__ - 1, i__ - 2);
+	    disc = (h33 - h44) * .5f;
+	    disc = disc * disc + h43h34;
 /* **   
              Increment op count */
-	    opst += 1;
+	    opst += 6;
 /* ** */
+	    if (disc > 0.f) {
+
+/*              Real roots: use Wilkinson's shift twice */
+
+		disc = sqrt(disc);
+		ave = (h33 + h44) * .5f;
+/* **   
+                Increment op count */
+		opst += 2;
+/* ** */
+		if (dabs(h33) - dabs(h44) > 0.f) {
+		    h33 = h33 * h44 - h43h34;
+		    h44 = h33 / (r_sign(&disc, &ave) + ave);
+/* **   
+                   Increment op count */
+		    opst += 4;
+/* ** */
+		} else {
+		    h44 = r_sign(&disc, &ave) + ave;
+/* **   
+                   Increment op count */
+		    opst += 1;
+/* ** */
+		}
+		h33 = h44;
+		h43h34 = 0.f;
+	    }
 	}
 
 /*        Look for two consecutive small subdiagonal elements. */
 
 	i__2 = l;
-	for (m = i - 2; m >= i__2; --m) {
+	for (m = i__ - 2; m >= i__2; --m) {
 
-/*           Determine the effect of starting the double-shift QR 
-  
-             iteration at row M, and see if this would make H(M,M-
-1)   
+/*           Determine the effect of starting the double-shift QR   
+             iteration at row M, and see if this would make H(M,M-1)   
              negligible. */
 
-	    h11 = h[m + m * h_dim1];
-	    h22 = h[m + 1 + (m + 1) * h_dim1];
-	    h21 = h[m + 1 + m * h_dim1];
-	    h12 = h[m + (m + 1) * h_dim1];
+	    h11 = h___ref(m, m);
+	    h22 = h___ref(m + 1, m + 1);
+	    h21 = h___ref(m + 1, m);
+	    h12 = h___ref(m, m + 1);
 	    h44s = h44 - h11;
 	    h33s = h33 - h11;
 	    v1 = (h33s * h44s - h43h34) / h21 + h12;
 	    v2 = h22 - h11 - h33s - h44s;
-	    v3 = h[m + 2 + (m + 1) * h_dim1];
+	    v3 = h___ref(m + 2, m + 1);
 	    s = dabs(v1) + dabs(v2) + dabs(v3);
 	    v1 /= s;
 	    v2 /= s;
@@ -330,8 +361,8 @@ ix
 	    if (m == l) {
 		goto L50;
 	    }
-	    h00 = h[m - 1 + (m - 1) * h_dim1];
-	    h10 = h[m + (m - 1) * h_dim1];
+	    h00 = h___ref(m - 1, m - 1);
+	    h10 = h___ref(m, m - 1);
 	    tst1 = dabs(v1) * (dabs(h00) + dabs(h11) + dabs(h22));
 	    if (dabs(h10) * (dabs(v2) + dabs(v3)) <= ulp * tst1) {
 		goto L50;
@@ -341,34 +372,28 @@ ix
 L50:
 /* **   
           Increment op count */
-	opst += (i - m - 1) * 20;
+	opst += (i__ - m - 1) * 20;
 /* **   
 
           Double-shift QR step */
 
-	i__2 = i - 1;
+	i__2 = i__ - 1;
 	for (k = m; k <= i__2; ++k) {
 
-/*           The first iteration of this loop determines a reflect
-ion G   
-             from the vector V and applies it from left and right 
-to H,   
-             thus creating a nonzero bulge below the subdiagonal. 
-  
+/*           The first iteration of this loop determines a reflection G   
+             from the vector V and applies it from left and right to H,   
+             thus creating a nonzero bulge below the subdiagonal.   
 
-             Each subsequent iteration determines a reflection G t
-o   
-             restore the Hessenberg form in the (K-1)th column, an
-d thus   
-             chases the bulge one step toward the bottom of the ac
-tive   
+             Each subsequent iteration determines a reflection G to   
+             restore the Hessenberg form in the (K-1)th column, and thus   
+             chases the bulge one step toward the bottom of the active   
              submatrix. NR is the order of G.   
 
    Computing MIN */
-	    i__3 = 3, i__4 = i - k + 1;
+	    i__3 = 3, i__4 = i__ - k + 1;
 	    nr = min(i__3,i__4);
 	    if (k > m) {
-		scopy_(&nr, &h[k + (k - 1) * h_dim1], &c__1, v, &c__1);
+		scopy_(&nr, &h___ref(k, k - 1), &c__1, v, &c__1);
 	    }
 	    slarfg_(&nr, v, &v[1], &c__1, &t1);
 /* **   
@@ -376,14 +401,13 @@ tive
 	    opst = opst + nr * 3 + 9;
 /* ** */
 	    if (k > m) {
-		h[k + (k - 1) * h_dim1] = v[0];
-		h[k + 1 + (k - 1) * h_dim1] = 0.f;
-		if (k < i - 1) {
-		    h[k + 2 + (k - 1) * h_dim1] = 0.f;
+		h___ref(k, k - 1) = v[0];
+		h___ref(k + 1, k - 1) = 0.f;
+		if (k < i__ - 1) {
+		    h___ref(k + 2, k - 1) = 0.f;
 		}
 	    } else if (m > l) {
-		h[k + (k - 1) * h_dim1] = -(doublereal)h[k + (k - 1) * h_dim1]
-			;
+		h___ref(k, k - 1) = -h___ref(k, k - 1);
 	    }
 	    v2 = v[1];
 	    t2 = t1 * v2;
@@ -391,54 +415,51 @@ tive
 		v3 = v[2];
 		t3 = t1 * v3;
 
-/*              Apply G from the left to transform the rows of
- the matrix   
+/*              Apply G from the left to transform the rows of the matrix   
                 in columns K to I2. */
 
 		i__3 = i2;
 		for (j = k; j <= i__3; ++j) {
-		    sum = h[k + j * h_dim1] + v2 * h[k + 1 + j * h_dim1] + v3 
-			    * h[k + 2 + j * h_dim1];
-		    h[k + j * h_dim1] -= sum * t1;
-		    h[k + 1 + j * h_dim1] -= sum * t2;
-		    h[k + 2 + j * h_dim1] -= sum * t3;
+		    sum = h___ref(k, j) + v2 * h___ref(k + 1, j) + v3 * 
+			    h___ref(k + 2, j);
+		    h___ref(k, j) = h___ref(k, j) - sum * t1;
+		    h___ref(k + 1, j) = h___ref(k + 1, j) - sum * t2;
+		    h___ref(k + 2, j) = h___ref(k + 2, j) - sum * t3;
 /* L60: */
 		}
 
-/*              Apply G from the right to transform the column
-s of the   
+/*              Apply G from the right to transform the columns of the   
                 matrix in rows I1 to min(K+3,I).   
 
    Computing MIN */
 		i__4 = k + 3;
-		i__3 = min(i__4,i);
+		i__3 = min(i__4,i__);
 		for (j = i1; j <= i__3; ++j) {
-		    sum = h[j + k * h_dim1] + v2 * h[j + (k + 1) * h_dim1] + 
-			    v3 * h[j + (k + 2) * h_dim1];
-		    h[j + k * h_dim1] -= sum * t1;
-		    h[j + (k + 1) * h_dim1] -= sum * t2;
-		    h[j + (k + 2) * h_dim1] -= sum * t3;
+		    sum = h___ref(j, k) + v2 * h___ref(j, k + 1) + v3 * 
+			    h___ref(j, k + 2);
+		    h___ref(j, k) = h___ref(j, k) - sum * t1;
+		    h___ref(j, k + 1) = h___ref(j, k + 1) - sum * t2;
+		    h___ref(j, k + 2) = h___ref(j, k + 2) - sum * t3;
 /* L70: */
 		}
 /* **   
                 Increment op count   
    Computing MIN */
-		i__3 = 3, i__4 = i - k;
+		i__3 = 3, i__4 = i__ - k;
 		latime_1.ops += (i2 - i1 + 2 + min(i__3,i__4)) * 10;
 /* ** */
 
 		if (*wantz) {
 
-/*                 Accumulate transformations in the matri
-x Z */
+/*                 Accumulate transformations in the matrix Z */
 
 		    i__3 = *ihiz;
 		    for (j = *iloz; j <= i__3; ++j) {
-			sum = z[j + k * z_dim1] + v2 * z[j + (k + 1) * z_dim1]
-				 + v3 * z[j + (k + 2) * z_dim1];
-			z[j + k * z_dim1] -= sum * t1;
-			z[j + (k + 1) * z_dim1] -= sum * t2;
-			z[j + (k + 2) * z_dim1] -= sum * t3;
+			sum = z___ref(j, k) + v2 * z___ref(j, k + 1) + v3 * 
+				z___ref(j, k + 2);
+			z___ref(j, k) = z___ref(j, k) - sum * t1;
+			z___ref(j, k + 1) = z___ref(j, k + 1) - sum * t2;
+			z___ref(j, k + 2) = z___ref(j, k + 2) - sum * t3;
 /* L80: */
 		    }
 /* **   
@@ -448,27 +469,25 @@ x Z */
 		}
 	    } else if (nr == 2) {
 
-/*              Apply G from the left to transform the rows of
- the matrix   
+/*              Apply G from the left to transform the rows of the matrix   
                 in columns K to I2. */
 
 		i__3 = i2;
 		for (j = k; j <= i__3; ++j) {
-		    sum = h[k + j * h_dim1] + v2 * h[k + 1 + j * h_dim1];
-		    h[k + j * h_dim1] -= sum * t1;
-		    h[k + 1 + j * h_dim1] -= sum * t2;
+		    sum = h___ref(k, j) + v2 * h___ref(k + 1, j);
+		    h___ref(k, j) = h___ref(k, j) - sum * t1;
+		    h___ref(k + 1, j) = h___ref(k + 1, j) - sum * t2;
 /* L90: */
 		}
 
-/*              Apply G from the right to transform the column
-s of the   
+/*              Apply G from the right to transform the columns of the   
                 matrix in rows I1 to min(K+3,I). */
 
-		i__3 = i;
+		i__3 = i__;
 		for (j = i1; j <= i__3; ++j) {
-		    sum = h[j + k * h_dim1] + v2 * h[j + (k + 1) * h_dim1];
-		    h[j + k * h_dim1] -= sum * t1;
-		    h[j + (k + 1) * h_dim1] -= sum * t2;
+		    sum = h___ref(j, k) + v2 * h___ref(j, k + 1);
+		    h___ref(j, k) = h___ref(j, k) - sum * t1;
+		    h___ref(j, k + 1) = h___ref(j, k + 1) - sum * t2;
 /* L100: */
 		}
 /* **   
@@ -478,15 +497,13 @@ s of the
 
 		if (*wantz) {
 
-/*                 Accumulate transformations in the matri
-x Z */
+/*                 Accumulate transformations in the matrix Z */
 
 		    i__3 = *ihiz;
 		    for (j = *iloz; j <= i__3; ++j) {
-			sum = z[j + k * z_dim1] + v2 * z[j + (k + 1) * z_dim1]
-				;
-			z[j + k * z_dim1] -= sum * t1;
-			z[j + (k + 1) * z_dim1] -= sum * t2;
+			sum = z___ref(j, k) + v2 * z___ref(j, k + 1);
+			z___ref(j, k) = z___ref(j, k) - sum * t1;
+			z___ref(j, k + 1) = z___ref(j, k + 1) - sum * t2;
 /* L110: */
 		    }
 /* **   
@@ -503,49 +520,51 @@ x Z */
 
 /*     Failure to converge in remaining number of iterations */
 
-    *info = i;
+    *info = i__;
     return 0;
 
 L140:
 
-    if (l == i) {
+    if (l == i__) {
 
 /*        H(I,I-1) is negligible: one eigenvalue has converged. */
 
-	wr[i] = h[i + i * h_dim1];
-	wi[i] = 0.f;
-    } else if (l == i - 1) {
+	wr[i__] = h___ref(i__, i__);
+	wi[i__] = 0.f;
+    } else if (l == i__ - 1) {
 
-/*        H(I-1,I-2) is negligible: a pair of eigenvalues have converg
-ed.   
+/*        H(I-1,I-2) is negligible: a pair of eigenvalues have converged.   
 
           Transform the 2-by-2 submatrix to standard Schur form,   
           and compute and store the eigenvalues. */
 
-	slanv2_(&h[i - 1 + (i - 1) * h_dim1], &h[i - 1 + i * h_dim1], &h[i + (
-		i - 1) * h_dim1], &h[i + i * h_dim1], &wr[i - 1], &wi[i - 1], 
-		&wr[i], &wi[i], &cs, &sn);
+	slanv2_(&h___ref(i__ - 1, i__ - 1), &h___ref(i__ - 1, i__), &h___ref(
+		i__, i__ - 1), &h___ref(i__, i__), &wr[i__ - 1], &wi[i__ - 1],
+		 &wr[i__], &wi[i__], &cs, &sn);
 
 	if (*wantt) {
 
 /*           Apply the transformation to the rest of H. */
 
-	    if (i2 > i) {
-		i__1 = i2 - i;
-		srot_(&i__1, &h[i - 1 + (i + 1) * h_dim1], ldh, &h[i + (i + 1)
-			 * h_dim1], ldh, &cs, &sn);
+	    if (i2 > i__) {
+		i__1 = i2 - i__;
+		srot_(&i__1, &h___ref(i__ - 1, i__ + 1), ldh, &h___ref(i__, 
+			i__ + 1), ldh, &cs, &sn);
 	    }
-	    i__1 = i - i1 - 1;
-	    srot_(&i__1, &h[i1 + (i - 1) * h_dim1], &c__1, &h[i1 + i * h_dim1]
-		    , &c__1, &cs, &sn);
+	    i__1 = i__ - i1 - 1;
+	    srot_(&i__1, &h___ref(i1, i__ - 1), &c__1, &h___ref(i1, i__), &
+		    c__1, &cs, &sn);
 /* **   
              Increment op count */
 	    latime_1.ops += (i2 - i1 - 1) * 6;
 /* ** */
 	}
 	if (*wantz) {
-	    srot_(&nz, &z[*iloz + (i - 1) * z_dim1], &c__1, &z[*iloz + i * 
-		    z_dim1], &c__1, &cs, &sn);
+
+/*           Apply the transformation to Z. */
+
+	    srot_(&nz, &z___ref(*iloz, i__ - 1), &c__1, &z___ref(*iloz, i__), 
+		    &c__1, &cs, &sn);
 /* **   
              Increment op count */
 	    latime_1.ops += nz * 6;
@@ -557,7 +576,7 @@ ed.
        the main loop with new value of I. */
 
     itn -= its;
-    i = l - 1;
+    i__ = l - 1;
     goto L10;
 
 L150:
@@ -570,4 +589,8 @@ L150:
 /*     End of SLAHQR */
 
 } /* slahqr_ */
+
+#undef z___ref
+#undef h___ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static integer c__22 = 22;
 
 /* Subroutine */ int ddrvvx_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, doublereal *thresh, integer *niunit, 
-	integer *nounit, doublereal *a, integer *lda, doublereal *h, 
+	integer *nounit, doublereal *a, integer *lda, doublereal *h__, 
 	doublereal *wr, doublereal *wi, doublereal *wr1, doublereal *wi1, 
 	doublereal *vl, integer *ldvl, doublereal *vr, integer *ldvr, 
 	doublereal *lre, integer *ldlre, doublereal *rcondv, doublereal *
@@ -105,7 +106,7 @@ static integer c__22 = 22;
     static char path[3];
     static integer nmax;
     static doublereal unfl, ovfl;
-    static integer i, j, n;
+    static integer i__, j, n;
     static logical badnn;
     extern /* Subroutine */ int dget23_(logical *, char *, integer *, 
 	    doublereal *, integer *, integer *, integer *, doublereal *, 
@@ -169,7 +170,10 @@ static integer c__22 = 22;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -205,8 +209,7 @@ static integer c__22 = 22;
                  ( -wi  wr  )   
 
          Such a block multiplying an n x 2 matrix  ( ur ui ) on the   
-         right will be the same as multiplying  ur + i*ui  by  wr + i*wi. 
-  
+         right will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
 
        (2)     | A**H * VL - VL * W**H | / ( n |A| ulp )   
 
@@ -230,15 +233,13 @@ static integer c__22 = 22;
 
        (6)     VR(full) = VR(partial)   
 
-         VR(full) denotes the right eigenvectors computed when VL, RCONDV 
-  
+         VR(full) denotes the right eigenvectors computed when VL, RCONDV   
          and RCONDE are computed, and VR(partial) denotes the result   
          when only some of VL and RCONDV are computed.   
 
        (7)     VL(full) = VL(partial)   
 
-         VL(full) denotes the left eigenvectors computed when VR, RCONDV 
-  
+         VL(full) denotes the left eigenvectors computed when VR, RCONDV   
          and RCONDE are computed, and VL(partial) denotes the result   
          when only some of VR and RCONDV are computed.   
 
@@ -247,8 +248,7 @@ static integer c__22 = 22;
                1/ulp otherwise   
 
          SCALE, ILO, IHI and ABNRM describe how the matrix is balanced.   
-         (full) is when VR, VL, RCONDE and RCONDV are also computed, and 
-  
+         (full) is when VR, VL, RCONDE and RCONDV are also computed, and   
          (partial) is when some are not computed.   
 
        (9)     RCONDV(full) = RCONDV(partial)   
@@ -379,8 +379,7 @@ static integer c__22 = 22;
             tested. If it is MAXTYP+1 and NSIZES is 1, then an   
             additional type, MAXTYP+1 is defined, which is to use   
             whatever matrix is in A.  This is only useful if   
-            DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. . 
-  
+            DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. .   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
             If DOTYPE(j) is .TRUE., then for each size in NN a   
@@ -421,8 +420,7 @@ static integer c__22 = 22;
     A       (workspace) DOUBLE PRECISION array, dimension   
                         (LDA, max(NN,12))   
             Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used. 
-  
+            computed.  On exit, A contains the last matrix actually used.   
 
     LDA     (input) INTEGER   
             The leading dimension of the arrays A and H.   
@@ -450,24 +448,21 @@ static integer c__22 = 22;
             VL holds the computed left eigenvectors.   
 
     LDVL    (input) INTEGER   
-            Leading dimension of VL. Must be at least max(1,max(NN,12)). 
-  
+            Leading dimension of VL. Must be at least max(1,max(NN,12)).   
 
     VR      (workspace) DOUBLE PRECISION array, dimension   
                         (LDVR, max(NN,12))   
             VR holds the computed right eigenvectors.   
 
     LDVR    (input) INTEGER   
-            Leading dimension of VR. Must be at least max(1,max(NN,12)). 
-  
+            Leading dimension of VR. Must be at least max(1,max(NN,12)).   
 
     LRE     (workspace) DOUBLE PRECISION array, dimension   
                         (LDLRE, max(NN,12))   
             LRE holds the computed right or left eigenvectors.   
 
     LDLRE   (input) INTEGER   
-            Leading dimension of LRE. Must be at least max(1,max(NN,12)) 
-  
+            Leading dimension of LRE. Must be at least max(1,max(NN,12))   
 
     RCONDV  (workspace) DOUBLE PRECISION array, dimension (N)   
             RCONDV holds the computed reciprocal condition numbers   
@@ -497,8 +492,7 @@ static integer c__22 = 22;
 
     RESULT  (output) DOUBLE PRECISION array, dimension (11)   
             The values computed by the seven tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow. 
-  
+            The values are currently limited to 1/ulp, to avoid overflow.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (NWORK)   
 
@@ -515,8 +509,7 @@ static integer c__22 = 22;
             If >0, DLATMR, SLATMS, SLATME or DGET23 returned an error   
                    code, and INFO is its absolute value.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -542,31 +535,30 @@ static integer c__22 = 22;
        KCONDS(j)       Selectw whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --wr;
     --wi;
     --wr1;
     --wi1;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     lre_dim1 = *ldlre;
-    lre_offset = lre_dim1 + 1;
+    lre_offset = 1 + lre_dim1 * 1;
     lre -= lre_offset;
     --rcondv;
     --rcndv1;
@@ -582,8 +574,8 @@ static integer c__22 = 22;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "VX", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "VX", (ftnlen)2, (ftnlen)2);
 
 /*     Check for errors */
 
@@ -692,12 +684,9 @@ static integer c__22 = 22;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -749,7 +738,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L70: */
 		}
 
@@ -759,9 +748,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 		    if (jcol > 1) {
-			a[jcol + (jcol - 1) * a_dim1] = 1.;
+			a_ref(jcol, jcol - 1) = 1.;
 		    }
 /* L80: */
 		}
@@ -833,13 +822,13 @@ L60:
 		    dlaset_("Full", &c__2, &n, &c_b18, &c_b18, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a[a_dim1 + 
-			    3], lda);
+		    dlaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a_ref(3, 1)
+			    , lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a[(n - 1) *
-			     a_dim1 + 3], lda);
-		    dlaset_("Full", &c__1, &n, &c_b18, &c_b18, &a[n + a_dim1],
-			     lda);
+		    dlaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a_ref(3, n 
+			    - 1), lda);
+		    dlaset_("Full", &c__1, &n, &c_b18, &c_b18, &a_ref(n, 1), 
+			    lda);
 		}
 
 	    } else if (itype == 10) {
@@ -860,7 +849,7 @@ L60:
 	    if (iinfo != 0) {
 		io___33.ciunit = *nounit;
 		s_wsfe(&io___33);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -897,13 +886,12 @@ L90:
 /*                 Perform tests */
 
 		    dget23_(&c_false, balanc, &jtype, thresh, ioldsd, nounit, 
-			    &n, &a[a_offset], lda, &h[h_offset], &wr[1], &wi[
-			    1], &wr1[1], &wi1[1], &vl[vl_offset], ldvl, &vr[
-			    vr_offset], ldvr, &lre[lre_offset], ldlre, &
+			    &n, &a[a_offset], lda, &h__[h_offset], &wr[1], &
+			    wi[1], &wr1[1], &wi1[1], &vl[vl_offset], ldvl, &
+			    vr[vr_offset], ldvr, &lre[lre_offset], ldlre, &
 			    rcondv[1], &rcndv1[1], &rcdvin[1], &rconde[1], &
 			    rcnde1[1], &rcdein[1], &scale[1], &scale1[1], &
-			    result[1], &work[1], &nnwork, &iwork[1], info)
-			    ;
+			    result[1], &work[1], &nnwork, &iwork[1], info);
 
 /*                 Check for RESULT(j) > THRESH */
 
@@ -925,7 +913,7 @@ L90:
 		    if (ntestf == 1) {
 			io___40.ciunit = *nounit;
 			s_wsfe(&io___40);
-			do_fio(&c__1, path, 3L);
+			do_fio(&c__1, path, (ftnlen)3);
 			e_wsfe();
 			io___41.ciunit = *nounit;
 			s_wsfe(&io___41);
@@ -948,7 +936,7 @@ L90:
 			if (result[j] >= *thresh) {
 			    io___45.ciunit = *nounit;
 			    s_wsfe(&io___45);
-			    do_fio(&c__1, balanc, 1L);
+			    do_fio(&c__1, balanc, (ftnlen)1);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&iwk, (ftnlen)sizeof(
@@ -981,10 +969,8 @@ L140:
 
 L160:
 
-/*     Read in data from file to check accuracy of condition estimation. 
-  
-       Assume input eigenvalues are sorted lexicographically (increasing 
-  
+/*     Read in data from file to check accuracy of condition estimation.   
+       Assume input eigenvalues are sorted lexicographically (increasing   
        by real part, then decreasing by imaginary part) */
 
     jtype = 0;
@@ -999,6 +985,9 @@ L170:
 	goto L220;
     }
     i__1 = e_rsle();
+    if (i__1 != 0) {
+	goto L220;
+    }
 
 /*     Read input data until N=0 */
 
@@ -1008,25 +997,27 @@ L170:
     ++jtype;
     iseed[1] = jtype;
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___48.ciunit = *niunit;
 	s_rsle(&io___48);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&a[i + j * a_dim1], (ftnlen)sizeof(
+	    do_lio(&c__5, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
 		    doublereal));
 	}
 	e_rsle();
 /* L180: */
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___49.ciunit = *niunit;
 	s_rsle(&io___49);
-	do_lio(&c__5, &c__1, (char *)&wr1[i], (ftnlen)sizeof(doublereal));
-	do_lio(&c__5, &c__1, (char *)&wi1[i], (ftnlen)sizeof(doublereal));
-	do_lio(&c__5, &c__1, (char *)&rcdein[i], (ftnlen)sizeof(doublereal));
-	do_lio(&c__5, &c__1, (char *)&rcdvin[i], (ftnlen)sizeof(doublereal));
+	do_lio(&c__5, &c__1, (char *)&wr1[i__], (ftnlen)sizeof(doublereal));
+	do_lio(&c__5, &c__1, (char *)&wi1[i__], (ftnlen)sizeof(doublereal));
+	do_lio(&c__5, &c__1, (char *)&rcdein[i__], (ftnlen)sizeof(doublereal))
+		;
+	do_lio(&c__5, &c__1, (char *)&rcdvin[i__], (ftnlen)sizeof(doublereal))
+		;
 	e_rsle();
 /* L190: */
     }
@@ -1034,7 +1025,7 @@ L170:
     i__2 = n;
     i__1 = n * 6 + (i__2 * i__2 << 1);
     dget23_(&c_true, "N", &c__22, thresh, &iseed[1], nounit, &n, &a[a_offset],
-	     lda, &h[h_offset], &wr[1], &wi[1], &wr1[1], &wi1[1], &vl[
+	     lda, &h__[h_offset], &wr[1], &wi[1], &wr1[1], &wi1[1], &vl[
 	    vl_offset], ldvl, &vr[vr_offset], ldvr, &lre[lre_offset], ldlre, &
 	    rcondv[1], &rcndv1[1], &rcdvin[1], &rconde[1], &rcnde1[1], &
 	    rcdein[1], &scale[1], &scale1[1], &result[1], &work[1], &i__1, &
@@ -1060,7 +1051,7 @@ L170:
     if (ntestf == 1) {
 	io___50.ciunit = *nounit;
 	s_wsfe(&io___50);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___51.ciunit = *nounit;
 	s_wsfe(&io___51);
@@ -1107,4 +1098,7 @@ L220:
 /*     End of DDRVVX */
 
 } /* ddrvvx_ */
+
+#undef a_ref
+
 

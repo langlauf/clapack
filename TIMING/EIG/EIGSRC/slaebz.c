@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,9 +16,9 @@ struct {
 
 /* Subroutine */ int slaebz_(integer *ijob, integer *nitmax, integer *n, 
 	integer *mmax, integer *minp, integer *nbmin, real *abstol, real *
-	reltol, real *pivmin, real *d, real *e, real *e2, integer *nval, real 
-	*ab, real *c, integer *mout, integer *nab, real *work, integer *iwork,
-	 integer *info)
+	reltol, real *pivmin, real *d__, real *e, real *e2, integer *nval, 
+	real *ab, real *c__, integer *mout, integer *nab, real *work, integer 
+	*iwork, integer *info)
 {
     /* System generated locals */
     integer nab_dim1, nab_offset, ab_dim1, ab_offset, i__1, i__2, i__3, i__4, 
@@ -29,15 +30,18 @@ struct {
     static real tmp1, tmp2;
 
 
-/*  -- LAPACK auxiliary routine (instrum. to count ops. version 2.0) --   
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+#define nab_ref(a_1,a_2) nab[(a_2)*nab_dim1 + a_1]
+
+
+/*  -- LAPACK auxiliary routine (instrum. to count ops. version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT and OPS are only incremented (not initialized)   
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     Purpose   
     =======   
@@ -59,8 +63,7 @@ struct {
             (AB(j,1),AB(j,2)] for a point  w(j)  such that   
             N(w(j))=NVAL(j), and uses  C(j)  as the starting point of   
             the search.  If such a w(j) is found, then on output   
-            AB(j,1)=AB(j,2)=w.  If no such w(j) is found, then on output 
-  
+            AB(j,1)=AB(j,2)=w.  If no such w(j) is found, then on output   
             (AB(j,1),AB(j,2)] will be a small interval containing the   
             point where N(w) jumps through NVAL(j), unless that point   
             lies outside the initial interval.   
@@ -105,13 +108,11 @@ struct {
             least 1.   
 
     MMAX    (input) INTEGER   
-            The maximum number of intervals.  If more than MMAX intervals 
-  
+            The maximum number of intervals.  If more than MMAX intervals   
             are generated, then SLAEBZ will quit with INFO=MMAX+1.   
 
     MINP    (input) INTEGER   
-            The initial number of intervals.  It may not be greater than 
-  
+            The initial number of intervals.  It may not be greater than   
             MMAX.   
 
     NBMIN   (input) INTEGER   
@@ -127,10 +128,8 @@ struct {
             zero.   
 
     RELTOL  (input) REAL   
-            The minimum relative width of an interval.  When an interval 
-  
-            is narrower than ABSTOL, or than RELTOL times the larger (in 
-  
+            The minimum relative width of an interval.  When an interval   
+            is narrower than ABSTOL, or than RELTOL times the larger (in   
             magnitude) endpoint, then it is considered to be   
             sufficiently small, i.e., converged.  Note: this should   
             always be at least radix*machine epsilon.   
@@ -154,8 +153,7 @@ struct {
 
     NVAL    (input/output) INTEGER array, dimension (MINP)   
             If IJOB=1 or 2, not referenced.   
-            If IJOB=3, the desired values of N(w).  The elements of NVAL 
-  
+            If IJOB=3, the desired values of N(w).  The elements of NVAL   
             will be reordered to correspond with the intervals in AB.   
             Thus, NVAL(j) on output will not, in general be the same as   
             NVAL(j) on input, but it will correspond with the interval   
@@ -180,8 +178,7 @@ struct {
             If IJOB=3, MOUT will equal MINP.   
 
     NAB     (input/output) INTEGER array, dimension (MMAX,2)   
-            If IJOB=1, then on output NAB(i,j) will be set to N(AB(i,j)). 
-  
+            If IJOB=1, then on output NAB(i,j) will be set to N(AB(i,j)).   
             If IJOB=2, then on input, NAB(i,j) should be set.  It must   
                satisfy the condition:   
                N(AB(i,1)) <= NAB(i,1) <= NAB(i,2) <= N(AB(i,2)),   
@@ -190,18 +187,15 @@ struct {
                NAB(i,j)=N(AB(i,j)), from a previous call to SLAEBZ with   
                IJOB=1.   
                On output, NAB(i,j) will contain   
-               max(na(k),min(nb(k),N(AB(i,j)))), where k is the index of 
-  
+               max(na(k),min(nb(k),N(AB(i,j)))), where k is the index of   
                the input interval that the output interval   
                (AB(j,1),AB(j,2)] came from, and na(k) and nb(k) are the   
                the input values of NAB(k,1) and NAB(k,2).   
             If IJOB=3, then on output, NAB(i,j) contains N(AB(i,j)),   
-               unless N(w) > NVAL(i) for all search points  w , in which 
-  
+               unless N(w) > NVAL(i) for all search points  w , in which   
                case NAB(i,1) will not be modified, i.e., the output   
                value will be the same as the input value (modulo   
-               reorderings -- see NVAL and AB), or unless N(w) < NVAL(i) 
-  
+               reorderings -- see NVAL and AB), or unless N(w) < NVAL(i)   
                for all search points  w , in which case NAB(i,2) will   
                not be modified.  Normally, NAB should be set to some   
                distinctive value(s) before SLAEBZ is called.   
@@ -225,10 +219,8 @@ struct {
     for two purposes:   
 
     (a) finding eigenvalues.  In this case, SLAEBZ should have one or   
-        more initial intervals set up in AB, and SLAEBZ should be called 
-  
-        with IJOB=1.  This sets up NAB, and also counts the eigenvalues. 
-  
+        more initial intervals set up in AB, and SLAEBZ should be called   
+        with IJOB=1.  This sets up NAB, and also counts the eigenvalues.   
         Intervals with no eigenvalues would usually be thrown out at   
         this point.  Also, if not all the eigenvalues in an interval i   
         are desired, NAB(i,1) can be increased or NAB(i,2) decreased.   
@@ -239,41 +231,37 @@ struct {
         through NAB(i,2) are approximately AB(i,1) (or AB(i,2)) to the   
         tolerance specified by ABSTOL and RELTOL.   
 
-    (b) finding an interval (a',b'] containing eigenvalues w(f),...,w(l). 
-  
+    (b) finding an interval (a',b'] containing eigenvalues w(f),...,w(l).   
         In this case, start with a Gershgorin interval  (a,b).  Set up   
         AB to contain 2 search intervals, both initially (a,b).  One   
-        NVAL element should contain  f-1  and the other should contain  l 
-  
+        NVAL element should contain  f-1  and the other should contain  l   
         , while C should contain a and b, resp.  NAB(i,1) should be -1   
         and NAB(i,2) should be N+1, to flag an error if the desired   
         interval does not lie in (a,b).  SLAEBZ is then called with   
-        IJOB=3.  On exit, if w(f-1) < w(f), then one of the intervals -- 
-  
+        IJOB=3.  On exit, if w(f-1) < w(f), then one of the intervals --   
         j -- will have AB(j,1)=AB(j,2) and NAB(j,1)=NAB(j,2)=f-1, while   
         if, to the specified tolerance, w(f-k)=...=w(f+r), k > 0 and r   
         >= 0, then the interval will have  N(AB(j,1))=NAB(j,1)=f-k and   
         N(AB(j,2))=NAB(j,2)=f+r.  The cases w(l) < w(l+1) and   
         w(l-r)=...=w(l+k) are handled similarly.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Check for Errors   
 
        Parameter adjustments */
     nab_dim1 = *mmax;
-    nab_offset = nab_dim1 + 1;
+    nab_offset = 1 + nab_dim1 * 1;
     nab -= nab_offset;
     ab_dim1 = *mmax;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
-    --d;
+    --d__;
     --e;
     --e2;
     --nval;
-    --c;
+    --c__;
     --work;
     --iwork;
 
@@ -288,41 +276,40 @@ struct {
 
     if (*ijob == 1) {
 
-/*        Compute the number of eigenvalues in the initial intervals. 
-*/
+/*        Compute the number of eigenvalues in the initial intervals. */
 
 	*mout = 0;
+/* DIR$ NOVECTOR */
 	i__1 = *minp;
 	for (ji = 1; ji <= i__1; ++ji) {
 	    for (jp = 1; jp <= 2; ++jp) {
-		tmp1 = d[1] - ab[ji + jp * ab_dim1];
+		tmp1 = d__[1] - ab_ref(ji, jp);
 		if (dabs(tmp1) < *pivmin) {
-		    tmp1 = -(doublereal)(*pivmin);
+		    tmp1 = -(*pivmin);
 		}
-		nab[ji + jp * nab_dim1] = 0;
+		nab_ref(ji, jp) = 0;
 		if (tmp1 <= 0.f) {
-		    nab[ji + jp * nab_dim1] = 1;
+		    nab_ref(ji, jp) = 1;
 		}
 
 		i__2 = *n;
 		for (j = 2; j <= i__2; ++j) {
-		    tmp1 = d[j] - e2[j - 1] / tmp1 - ab[ji + jp * ab_dim1];
+		    tmp1 = d__[j] - e2[j - 1] / tmp1 - ab_ref(ji, jp);
 		    if (dabs(tmp1) < *pivmin) {
-			tmp1 = -(doublereal)(*pivmin);
+			tmp1 = -(*pivmin);
 		    }
 		    if (tmp1 <= 0.f) {
-			++nab[ji + jp * nab_dim1];
+			nab_ref(ji, jp) = nab_ref(ji, jp) + 1;
 		    }
 /* L10: */
 		}
 /* L20: */
 	    }
-	    *mout = *mout + nab[ji + (nab_dim1 << 1)] - nab[ji + nab_dim1];
+	    *mout = *mout + nab_ref(ji, 2) - nab_ref(ji, 1);
 /* L30: */
 	}
 
-/*        Increment opcount for determining the number of eigenvalues 
-  
+/*        Increment opcount for determining the number of eigenvalues   
           in the initial intervals. */
 
 	latime_1.ops += (*minp << 1) * (*n - 1) * 3;
@@ -344,7 +331,7 @@ struct {
     if (*ijob == 2) {
 	i__1 = *minp;
 	for (ji = 1; ji <= i__1; ++ji) {
-	    c[ji] = (ab[ji + ab_dim1] + ab[ji + (ab_dim1 << 1)]) * .5f;
+	    c__[ji] = (ab_ref(ji, 1) + ab_ref(ji, 2)) * .5f;
 /* L40: */
 	}
 
@@ -367,25 +354,24 @@ struct {
 	    i__2 = kl;
 	    for (ji = kf; ji <= i__2; ++ji) {
 
-/*              Compute N(c), the number of eigenvalues less t
-han c */
+/*              Compute N(c), the number of eigenvalues less than c */
 
-		work[ji] = d[1] - c[ji];
+		work[ji] = d__[1] - c__[ji];
 		iwork[ji] = 0;
 		if (work[ji] <= *pivmin) {
 		    iwork[ji] = 1;
 /* Computing MIN */
-		    r__1 = work[ji], r__2 = -(doublereal)(*pivmin);
+		    r__1 = work[ji], r__2 = -(*pivmin);
 		    work[ji] = dmin(r__1,r__2);
 		}
 
 		i__3 = *n;
 		for (j = 2; j <= i__3; ++j) {
-		    work[ji] = d[j] - e2[j - 1] / work[ji] - c[ji];
+		    work[ji] = d__[j] - e2[j - 1] / work[ji] - c__[ji];
 		    if (work[ji] <= *pivmin) {
 			++iwork[ji];
 /* Computing MIN */
-			r__1 = work[ji], r__2 = -(doublereal)(*pivmin);
+			r__1 = work[ji], r__2 = -(*pivmin);
 			work[ji] = dmin(r__1,r__2);
 		    }
 /* L50: */
@@ -397,16 +383,14 @@ han c */
 
 	    latime_1.itcnt = latime_1.itcnt + kl - kf + 1;
 
-/*           Increment opcount for evaluating Sturm sequences on 
-  
+/*           Increment opcount for evaluating Sturm sequences on   
              each interval. */
 
 	    latime_1.ops += (kl - kf + 1) * (*n - 1) * 3;
 
 	    if (*ijob <= 2) {
 
-/*              IJOB=2: Choose all intervals containing eigenv
-alues. */
+/*              IJOB=2: Choose all intervals containing eigenvalues. */
 
 		klnew = kl;
 		i__2 = kl;
@@ -416,45 +400,39 @@ alues. */
 
    Computing MIN   
    Computing MAX */
-		    i__5 = nab[ji + nab_dim1], i__6 = iwork[ji];
-		    i__3 = nab[ji + (nab_dim1 << 1)], i__4 = max(i__5,i__6);
+		    i__5 = nab_ref(ji, 1), i__6 = iwork[ji];
+		    i__3 = nab_ref(ji, 2), i__4 = max(i__5,i__6);
 		    iwork[ji] = min(i__3,i__4);
 
-/*                 Update the Queue -- add intervals if bo
-th halves   
+/*                 Update the Queue -- add intervals if both halves   
                    contain eigenvalues. */
 
-		    if (iwork[ji] == nab[ji + (nab_dim1 << 1)]) {
+		    if (iwork[ji] == nab_ref(ji, 2)) {
 
-/*                    No eigenvalue in the upper inter
-val:   
+/*                    No eigenvalue in the upper interval:   
                       just use the lower interval. */
 
-			ab[ji + (ab_dim1 << 1)] = c[ji];
+			ab_ref(ji, 2) = c__[ji];
 
-		    } else if (iwork[ji] == nab[ji + nab_dim1]) {
+		    } else if (iwork[ji] == nab_ref(ji, 1)) {
 
-/*                    No eigenvalue in the lower inter
-val:   
+/*                    No eigenvalue in the lower interval:   
                       just use the upper interval. */
 
-			ab[ji + ab_dim1] = c[ji];
+			ab_ref(ji, 1) = c__[ji];
 		    } else {
 			++klnew;
 			if (klnew <= *mmax) {
 
-/*                       Eigenvalue in both interv
-als -- add upper to   
+/*                       Eigenvalue in both intervals -- add upper to   
                          queue. */
 
-			    ab[klnew + (ab_dim1 << 1)] = ab[ji + (ab_dim1 << 
-				    1)];
-			    nab[klnew + (nab_dim1 << 1)] = nab[ji + (nab_dim1 
-				    << 1)];
-			    ab[klnew + ab_dim1] = c[ji];
-			    nab[klnew + nab_dim1] = iwork[ji];
-			    ab[ji + (ab_dim1 << 1)] = c[ji];
-			    nab[ji + (nab_dim1 << 1)] = iwork[ji];
+			    ab_ref(klnew, 2) = ab_ref(ji, 2);
+			    nab_ref(klnew, 2) = nab_ref(ji, 2);
+			    ab_ref(klnew, 1) = c__[ji];
+			    nab_ref(klnew, 1) = iwork[ji];
+			    ab_ref(ji, 2) = c__[ji];
+			    nab_ref(ji, 2) = iwork[ji];
 			} else {
 			    *info = *mmax + 1;
 			}
@@ -467,19 +445,18 @@ als -- add upper to
 		kl = klnew;
 	    } else {
 
-/*              IJOB=3: Binary search.  Keep only the interval
- containing   
+/*              IJOB=3: Binary search.  Keep only the interval containing   
                         w   s.t. N(w) = NVAL */
 
 		i__2 = kl;
 		for (ji = kf; ji <= i__2; ++ji) {
 		    if (iwork[ji] <= nval[ji]) {
-			ab[ji + ab_dim1] = c[ji];
-			nab[ji + nab_dim1] = iwork[ji];
+			ab_ref(ji, 1) = c__[ji];
+			nab_ref(ji, 1) = iwork[ji];
 		    }
 		    if (iwork[ji] >= nval[ji]) {
-			ab[ji + (ab_dim1 << 1)] = c[ji];
-			nab[ji + (nab_dim1 << 1)] = iwork[ji];
+			ab_ref(ji, 2) = c__[ji];
+			nab_ref(ji, 2) = iwork[ji];
 		    }
 /* L80: */
 		}
@@ -495,21 +472,19 @@ als -- add upper to
 	    i__2 = kl;
 	    for (ji = kf; ji <= i__2; ++ji) {
 
-/*              Compute N(w), the number of eigenvalues less t
-han w */
+/*              Compute N(w), the number of eigenvalues less than w */
 
-		tmp1 = c[ji];
-		tmp2 = d[1] - tmp1;
+		tmp1 = c__[ji];
+		tmp2 = d__[1] - tmp1;
 		itmp1 = 0;
 		if (tmp2 <= *pivmin) {
 		    itmp1 = 1;
 /* Computing MIN */
-		    r__1 = tmp2, r__2 = -(doublereal)(*pivmin);
+		    r__1 = tmp2, r__2 = -(*pivmin);
 		    tmp2 = dmin(r__1,r__2);
 		}
 
-/*              A series of compiler directives to defeat vect
-orization   
+/*              A series of compiler directives to defeat vectorization   
                 for the next loop   
 
    $PL$ CMCHAR=' '   
@@ -526,11 +501,11 @@ orization
 
 		i__3 = *n;
 		for (j = 2; j <= i__3; ++j) {
-		    tmp2 = d[j] - e2[j - 1] / tmp2 - tmp1;
+		    tmp2 = d__[j] - e2[j - 1] / tmp2 - tmp1;
 		    if (tmp2 <= *pivmin) {
 			++itmp1;
 /* Computing MIN */
-			r__1 = tmp2, r__2 = -(doublereal)(*pivmin);
+			r__1 = tmp2, r__2 = -(*pivmin);
 			tmp2 = dmin(r__1,r__2);
 		    }
 /* L90: */
@@ -538,67 +513,59 @@ orization
 
 		if (*ijob <= 2) {
 
-/*                 IJOB=2: Choose all intervals containing
- eigenvalues.   
+/*                 IJOB=2: Choose all intervals containing eigenvalues.   
 
                    Insure that N(w) is monotone   
 
    Computing MIN   
    Computing MAX */
-		    i__5 = nab[ji + nab_dim1];
-		    i__3 = nab[ji + (nab_dim1 << 1)], i__4 = max(i__5,itmp1);
+		    i__5 = nab_ref(ji, 1);
+		    i__3 = nab_ref(ji, 2), i__4 = max(i__5,itmp1);
 		    itmp1 = min(i__3,i__4);
 
-/*                 Update the Queue -- add intervals if bo
-th halves   
+/*                 Update the Queue -- add intervals if both halves   
                    contain eigenvalues. */
 
-		    if (itmp1 == nab[ji + (nab_dim1 << 1)]) {
+		    if (itmp1 == nab_ref(ji, 2)) {
 
-/*                    No eigenvalue in the upper inter
-val:   
+/*                    No eigenvalue in the upper interval:   
                       just use the lower interval. */
 
-			ab[ji + (ab_dim1 << 1)] = tmp1;
+			ab_ref(ji, 2) = tmp1;
 
-		    } else if (itmp1 == nab[ji + nab_dim1]) {
+		    } else if (itmp1 == nab_ref(ji, 1)) {
 
-/*                    No eigenvalue in the lower inter
-val:   
+/*                    No eigenvalue in the lower interval:   
                       just use the upper interval. */
 
-			ab[ji + ab_dim1] = tmp1;
+			ab_ref(ji, 1) = tmp1;
 		    } else if (klnew < *mmax) {
 
-/*                    Eigenvalue in both intervals -- 
-add upper to queue. */
+/*                    Eigenvalue in both intervals -- add upper to queue. */
 
 			++klnew;
-			ab[klnew + (ab_dim1 << 1)] = ab[ji + (ab_dim1 << 1)];
-			nab[klnew + (nab_dim1 << 1)] = nab[ji + (nab_dim1 << 
-				1)];
-			ab[klnew + ab_dim1] = tmp1;
-			nab[klnew + nab_dim1] = itmp1;
-			ab[ji + (ab_dim1 << 1)] = tmp1;
-			nab[ji + (nab_dim1 << 1)] = itmp1;
+			ab_ref(klnew, 2) = ab_ref(ji, 2);
+			nab_ref(klnew, 2) = nab_ref(ji, 2);
+			ab_ref(klnew, 1) = tmp1;
+			nab_ref(klnew, 1) = itmp1;
+			ab_ref(ji, 2) = tmp1;
+			nab_ref(ji, 2) = itmp1;
 		    } else {
 			*info = *mmax + 1;
 			return 0;
 		    }
 		} else {
 
-/*                 IJOB=3: Binary search.  Keep only the i
-nterval   
-                           containing  w  s.t. N(w) = NVAL
- */
+/*                 IJOB=3: Binary search.  Keep only the interval   
+                           containing  w  s.t. N(w) = NVAL */
 
 		    if (itmp1 <= nval[ji]) {
-			ab[ji + ab_dim1] = tmp1;
-			nab[ji + nab_dim1] = itmp1;
+			ab_ref(ji, 1) = tmp1;
+			nab_ref(ji, 1) = itmp1;
 		    }
 		    if (itmp1 >= nval[ji]) {
-			ab[ji + (ab_dim1 << 1)] = tmp1;
-			nab[ji + (nab_dim1 << 1)] = itmp1;
+			ab_ref(ji, 2) = tmp1;
+			nab_ref(ji, 2) = itmp1;
 		    }
 		}
 /* L100: */
@@ -608,8 +575,7 @@ nterval
 
 	    latime_1.itcnt = latime_1.itcnt + kl - kf + 1;
 
-/*           Increment opcount for evaluating Sturm sequences on 
-  
+/*           Increment opcount for evaluating Sturm sequences on   
              each interval. */
 
 	    latime_1.ops += (kl - kf + 1) * (*n - 1) * 3;
@@ -624,33 +590,31 @@ nterval
 	kfnew = kf;
 	i__2 = kl;
 	for (ji = kf; ji <= i__2; ++ji) {
-	    tmp1 = (r__1 = ab[ji + (ab_dim1 << 1)] - ab[ji + ab_dim1], dabs(
-		    r__1));
+	    tmp1 = (r__1 = ab_ref(ji, 2) - ab_ref(ji, 1), dabs(r__1));
 /* Computing MAX */
-	    r__3 = (r__1 = ab[ji + (ab_dim1 << 1)], dabs(r__1)), r__4 = (r__2 
-		    = ab[ji + ab_dim1], dabs(r__2));
+	    r__3 = (r__1 = ab_ref(ji, 2), dabs(r__1)), r__4 = (r__2 = ab_ref(
+		    ji, 1), dabs(r__2));
 	    tmp2 = dmax(r__3,r__4);
 /* Computing MAX */
 	    r__1 = max(*abstol,*pivmin), r__2 = *reltol * tmp2;
-	    if (tmp1 < dmax(r__1,r__2) || nab[ji + nab_dim1] >= nab[ji + (
-		    nab_dim1 << 1)]) {
+	    if (tmp1 < dmax(r__1,r__2) || nab_ref(ji, 1) >= nab_ref(ji, 2)) {
 
 /*              Converged -- Swap with position KFNEW,   
                              then increment KFNEW */
 
 		if (ji > kfnew) {
-		    tmp1 = ab[ji + ab_dim1];
-		    tmp2 = ab[ji + (ab_dim1 << 1)];
-		    itmp1 = nab[ji + nab_dim1];
-		    itmp2 = nab[ji + (nab_dim1 << 1)];
-		    ab[ji + ab_dim1] = ab[kfnew + ab_dim1];
-		    ab[ji + (ab_dim1 << 1)] = ab[kfnew + (ab_dim1 << 1)];
-		    nab[ji + nab_dim1] = nab[kfnew + nab_dim1];
-		    nab[ji + (nab_dim1 << 1)] = nab[kfnew + (nab_dim1 << 1)];
-		    ab[kfnew + ab_dim1] = tmp1;
-		    ab[kfnew + (ab_dim1 << 1)] = tmp2;
-		    nab[kfnew + nab_dim1] = itmp1;
-		    nab[kfnew + (nab_dim1 << 1)] = itmp2;
+		    tmp1 = ab_ref(ji, 1);
+		    tmp2 = ab_ref(ji, 2);
+		    itmp1 = nab_ref(ji, 1);
+		    itmp2 = nab_ref(ji, 2);
+		    ab_ref(ji, 1) = ab_ref(kfnew, 1);
+		    ab_ref(ji, 2) = ab_ref(kfnew, 2);
+		    nab_ref(ji, 1) = nab_ref(kfnew, 1);
+		    nab_ref(ji, 2) = nab_ref(kfnew, 2);
+		    ab_ref(kfnew, 1) = tmp1;
+		    ab_ref(kfnew, 2) = tmp2;
+		    nab_ref(kfnew, 1) = itmp1;
+		    nab_ref(kfnew, 2) = itmp2;
 		    if (*ijob == 3) {
 			itmp1 = nval[ji];
 			nval[ji] = nval[kfnew];
@@ -667,12 +631,11 @@ nterval
 
 	i__2 = kl;
 	for (ji = kf; ji <= i__2; ++ji) {
-	    c[ji] = (ab[ji + ab_dim1] + ab[ji + (ab_dim1 << 1)]) * .5f;
+	    c__[ji] = (ab_ref(ji, 1) + ab_ref(ji, 2)) * .5f;
 /* L120: */
 	}
 
-/*        Increment opcount for convergence check and choosing midpoin
-ts. */
+/*        Increment opcount for convergence check and choosing midpoints. */
 
 	latime_1.ops += kl - kf + 1 << 2;
 
@@ -697,4 +660,8 @@ L140:
 /*     End of SLAEBZ */
 
 } /* slaebz_ */
+
+#undef nab_ref
+#undef ab_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublereal c_b22 = 1.;
 static doublereal c_b23 = 0.;
 
 /* Subroutine */ int dsbt21_(char *uplo, integer *n, integer *ka, integer *ks,
-	 doublereal *a, integer *lda, doublereal *d, doublereal *e, 
+	 doublereal *a, integer *lda, doublereal *d__, doublereal *e, 
 	doublereal *u, integer *ldu, doublereal *work, doublereal *result)
 {
     /* System generated locals */
@@ -45,7 +46,11 @@ static doublereal c_b23 = 0.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -77,13 +82,11 @@ static doublereal c_b23 = 0.;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DSBT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, DSBT21 does nothing.   
             It must be at least zero.   
 
     KA      (input) INTEGER   
-            The bandwidth of the matrix A.  It must be at least zero.  If 
-  
+            The bandwidth of the matrix A.  It must be at least zero.  If   
             it is larger than N-1, then max( 0, N-1 ) will be used.   
 
     KS      (input) INTEGER   
@@ -124,20 +127,19 @@ static doublereal c_b23 = 0.;
             The values computed by the two tests described above.  The   
             values are currently limited to 1/ulp, to avoid overflow.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Constants   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --result;
@@ -190,7 +192,7 @@ static doublereal c_b23 = 0.;
 	    i__2 = min(i__3,i__4);
 	    for (jr = 1; jr <= i__2; ++jr) {
 		++j;
-		work[j] = a[jr + jc * a_dim1];
+		work[j] = a_ref(jr, jc);
 /* L10: */
 	    }
 	    i__2 = *n + 1 - jc;
@@ -210,7 +212,7 @@ static doublereal c_b23 = 0.;
 	    i__2 = ika, i__3 = jc - 1;
 	    for (jr = min(i__2,i__3); jr >= 0; --jr) {
 		++j;
-		work[j] = a[ika + 1 - jr + jc * a_dim1];
+		work[j] = a_ref(ika + 1 - jr, jc);
 /* L40: */
 	    }
 	}
@@ -219,8 +221,8 @@ static doublereal c_b23 = 0.;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	d__1 = -d[j];
-	dspr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
+	d__1 = -d__[j];
+	dspr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
 /* L60: */
     }
 
@@ -228,8 +230,8 @@ static doublereal c_b23 = 0.;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    d__1 = -e[j];
-	    dspr2_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1]);
+	    dspr2_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1]);
 /* L70: */
 	}
     }
@@ -265,8 +267,8 @@ static doublereal c_b23 = 0.;
 /* Computing MIN   
    Computing 2nd power */
     i__1 = *n;
-    d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), d__2 =
-	     (doublereal) (*n);
+    d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]),
+	     d__2 = (doublereal) (*n);
     result[2] = min(d__1,d__2) / (*n * ulp);
 
     return 0;
@@ -274,4 +276,8 @@ static doublereal c_b23 = 0.;
 /*     End of DSBT21 */
 
 } /* dsbt21_ */
+
+#undef u_ref
+#undef a_ref
+
 

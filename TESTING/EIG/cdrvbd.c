@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,17 +19,17 @@ static integer c__0 = 0;
 	complex *a, integer *lda, complex *u, integer *ldu, complex *vt, 
 	integer *ldvt, complex *asav, complex *usav, complex *vtsav, real *s, 
 	real *ssav, real *e, complex *work, integer *lwork, real *rwork, 
-	integer *nounit, integer *info)
+	integer *iwork, integer *nounit, integer *info)
 {
     /* Initialized data */
 
     static char cjob[1*4] = "N" "O" "S" "A";
 
     /* Format strings */
-    static char fmt_9995[] = "(\002 CDRVBD: \002,a,\002 returned INFO=\002,i"
+    static char fmt_9996[] = "(\002 CDRVBD: \002,a,\002 returned INFO=\002,i"
 	    "6,\002.\002,/9x,\002M=\002,i6,\002, N=\002,i6,\002, JTYPE=\002,i"
 	    "6,\002, ISEED=(\002,3(i5,\002,\002),i5,\002)\002)";
-    static char fmt_9994[] = "(\002 CDRVBD: \002,a,\002 returned INFO=\002,i"
+    static char fmt_9995[] = "(\002 CDRVBD: \002,a,\002 returned INFO=\002,i"
 	    "6,\002.\002,/9x,\002M=\002,i6,\002, N=\002,i6,\002, JTYPE=\002,i"
 	    "6,\002, LSWORK=\002,i6,/9x,\002ISEED=(\002,3(i5,\002,\002),i5"
 	    ",\002)\002)";
@@ -42,13 +43,19 @@ static integer c__0 = 0;
 	    "artial, VTpartial, and\002,/19x,\002 Spartial are partially comp"
 	    "uted U, VT and S),\002,/)";
     static char fmt_9998[] = "(\002 Tests performed with Test Threshold ="
-	    " \002,f8.2,//\002 1 = | A - U diag(S) VT | / ( |A| max(M,N) ulp "
-	    ") \002,/\002 2 = | I - U**T U | / ( M ulp ) \002,/\002 3 = | I -"
-	    " VT VT**T | / ( N ulp ) \002,/\002 4 = 0 if S contains min(M,N) "
-	    "nonnegative values in\002,\002 decreasing order, else 1/ulp\002,/"
-	    "\002 5 = | U - Upartial | / ( M ulp )\002,/\002 6 = | VT - VTpar"
-	    "tial | / ( N ulp )\002,/\002 7 = | S - Spartial | / ( min(M,N) u"
-	    "lp |S| )\002,//)";
+	    " \002,f8.2,/\002 CGESVD: \002,/\002 1 = | A - U diag(S) VT | / ("
+	    " |A| max(M,N) ulp ) \002,/\002 2 = | I - U**T U | / ( M ulp )"
+	    " \002,/\002 3 = | I - VT VT**T | / ( N ulp ) \002,/\002 4 = 0 if"
+	    " S contains min(M,N) nonnegative values in\002,\002 decreasing o"
+	    "rder, else 1/ulp\002,/\002 5 = | U - Upartial | / ( M ulp )\002,/"
+	    "\002 6 = | VT - VTpartial | / ( N ulp )\002,/\002 7 = | S - Spar"
+	    "tial | / ( min(M,N) ulp |S| )\002,/\002 CGESDD: \002,/\002 8 = |"
+	    " A - U diag(S) VT | / ( |A| max(M,N) ulp ) \002,/\002 9 = | I - "
+	    "U**T U | / ( M ulp ) \002,/\00210 = | I - VT VT**T | / ( N ulp ) "
+	    "\002,/\00211 = 0 if S contains min(M,N) nonnegative values in"
+	    "\002,\002 decreasing order, else 1/ulp\002,/\00212 = | U - Upart"
+	    "ial | / ( M ulp )\002,/\00213 = | VT - VTpartial | / ( N ulp "
+	    ")\002,/\00214 = | S - Spartial | / ( min(M,N) ulp |S| )\002,//)";
     static char fmt_9997[] = "(\002 M=\002,i5,\002, N=\002,i5,\002, type "
 	    "\002,i1,\002, IWS=\002,i1,\002, seed=\002,4(i4,\002,\002),\002 t"
 	    "est(\002,i1,\002)=\002,g11.4)";
@@ -64,10 +71,10 @@ static integer c__0 = 0;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char jobu[1];
+    static char jobq[1], jobu[1];
     static integer mmax, nmax;
     static real unfl, ovfl;
-    static integer ijvt, i, j, m, n;
+    static integer ijvt, i__, j, m, n;
     extern /* Subroutine */ int cbdt01_(integer *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, 
 	    complex *, integer *, complex *, real *, real *);
@@ -82,6 +89,9 @@ static integer c__0 = 0;
     static integer mnmin, mnmax;
     static char jobvt[1];
     static integer iwspc, jsize, nerrs, jtype, ntest, iwtmp;
+    extern /* Subroutine */ int cgesdd_(char *, integer *, integer *, complex 
+	    *, integer *, real *, complex *, integer *, complex *, integer *, 
+	    complex *, integer *, real *, integer *, integer *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int cgesvd_(char *, char *, integer *, integer *, 
 	    complex *, integer *, real *, complex *, integer *, complex *, 
@@ -95,37 +105,38 @@ static integer c__0 = 0;
 	    integer *, real *, real *, integer *, integer *, char *, complex *
 	    , integer *, complex *, integer *);
     static integer ntestf, minwrk;
-    static real ulpinv, result[7];
+    static real ulpinv, result[14];
     static integer lswork, mtypes, ntestt;
     static real dif, div;
-    static integer iju;
+    static integer ijq, iju;
     static real ulp;
 
     /* Fortran I/O blocks */
-    static cilist io___27 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___32 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___40 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___27 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___32 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___39 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___44 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
 
     Purpose   
     =======   
 
-    CDRVBD checks the singular value decomposition (SVD) driver CGESVD.   
-    CGESVD factors A = U diag(S) VT, where U and VT are unitary   
-    and diag(S) is diagonal with the entries of the array S on its   
-    diagonal. The entries of S are the singular values, nonnegative and   
-    stored in decreasing order.  U and VT can be optionally not computed, 
-  
-    overwritten on A, or computed partially.   
+    CDRVBD checks the singular value decomposition (SVD) driver CGESVD   
+    and CGESDD.   
+    CGESVD and CGESDD factors A = U diag(S) VT, where U and VT are   
+    unitary and diag(S) is diagonal with the entries of the array S on   
+    its diagonal. The entries of S are the singular values, nonnegative   
+    and stored in decreasing order.  U and VT can be optionally not   
+    computed, overwritten on A, or computed partially.   
 
     A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN.   
     U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N.   
@@ -133,11 +144,31 @@ static integer c__0 = 0;
     When CDRVBD is called, a number of matrix "sizes" (M's and N's)   
     and a number of matrix "types" are specified.  For each size (M,N)   
     and each type of matrix, and for the minimal workspace as well as   
-    workspace adequate to permit blocking, an  M x N  matrix "A" will be 
-  
-    generated and used to test the SVD routines.  For each matrix, A will 
-  
-    be factored as A = U diag(S) VT and the following 6 tests computed:   
+    workspace adequate to permit blocking, an  M x N  matrix "A" will be   
+    generated and used to test the SVD routines.  For each matrix, A will   
+    be factored as A = U diag(S) VT and the following 12 tests computed:   
+
+    Test for CGESVD:   
+
+    (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+
+    (2)   | I - U'U | / ( M ulp )   
+
+    (3)   | I - VT VT' | / ( N ulp )   
+
+    (4)   S contains MNMIN nonnegative values in decreasing order.   
+          (Return 0 if true, 1/ULP if false.)   
+
+    (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
+          computed U.   
+
+    (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
+          computed VT.   
+
+    (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
+          vector of singular values from the partial SVD   
+
+    Test for CGESDD:   
 
     (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
 
@@ -239,8 +270,7 @@ static integer c__0 = 0;
 
     U       (output) COMPLEX array, dimension (LDU,max(MM))   
             Used to hold the computed matrix of right singular vectors.   
-            On exit, U contains the last such vectors actually computed. 
-  
+            On exit, U contains the last such vectors actually computed.   
 
     LDU     (input) INTEGER   
             The leading dimension of U.  It must be at   
@@ -248,8 +278,7 @@ static integer c__0 = 0;
 
     VT      (output) COMPLEX array, dimension (LDVT,max(NN))   
             Used to hold the computed matrix of left singular vectors.   
-            On exit, VT contains the last such vectors actually computed. 
-  
+            On exit, VT contains the last such vectors actually computed.   
 
     LDVT    (input) INTEGER   
             The leading dimension of VT.  It must be at   
@@ -262,14 +291,12 @@ static integer c__0 = 0;
 
     USAV    (output) COMPLEX array, dimension (LDU,max(MM))   
             Used to hold a different copy of the computed matrix of   
-            right singular vectors. On exit, USAV contains the last such 
-  
+            right singular vectors. On exit, USAV contains the last such   
             vectors actually computed.   
 
     VTSAV   (output) COMPLEX array, dimension (LDVT,max(NN))   
             Used to hold a different copy of the computed matrix of   
-            left singular vectors. On exit, VTSAV contains the last such 
-  
+            left singular vectors. On exit, VTSAV contains the last such   
             vectors actually computed.   
 
     S       (output) REAL array, dimension (max(min(MM,NN)))   
@@ -291,6 +318,8 @@ static integer c__0 = 0;
     RWORK   (workspace) REAL array,   
                         dimension ( 5*max(max(MM,NN)) )   
 
+    IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N)   
+
     RESULT  (output) REAL array, dimension (7)   
             The values computed by the 7 tests described above.   
             The values are currently limited to 1/ULP, to avoid   
@@ -310,8 +339,7 @@ static integer c__0 = 0;
             If  CLATMS, or CGESVD returns an error code, the   
                 absolute value of it is returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mm;
@@ -319,28 +347,29 @@ static integer c__0 = 0;
     --dotype;
     --iseed;
     asav_dim1 = *lda;
-    asav_offset = asav_dim1 + 1;
+    asav_offset = 1 + asav_dim1 * 1;
     asav -= asav_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     usav_dim1 = *ldu;
-    usav_offset = usav_dim1 + 1;
+    usav_offset = 1 + usav_dim1 * 1;
     usav -= usav_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     vtsav_dim1 = *ldvt;
-    vtsav_offset = vtsav_dim1 + 1;
+    vtsav_offset = 1 + vtsav_dim1 * 1;
     vtsav -= vtsav_offset;
     vt_dim1 = *ldvt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     --s;
     --ssav;
     --e;
     --work;
     --rwork;
+    --iwork;
 
     /* Function Body   
 
@@ -455,7 +484,7 @@ static integer c__0 = 0;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L120;
+		goto L170;
 	    }
 	    ntest = 0;
 
@@ -467,7 +496,7 @@ static integer c__0 = 0;
 /*           Compute "A" */
 
 	    if (mtypes > 5) {
-		goto L30;
+		goto L50;
 	    }
 
 	    if (jtype == 1) {
@@ -476,9 +505,9 @@ static integer c__0 = 0;
 
 		claset_("Full", &m, &n, &c_b1, &c_b1, &a[a_offset], lda);
 		i__3 = min(m,n);
-		for (i = 1; i <= i__3; ++i) {
-		    s[i] = 0.f;
-/* L28: */
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    s[i__] = 0.f;
+/* L30: */
 		}
 
 	    } else if (jtype == 2) {
@@ -487,9 +516,9 @@ static integer c__0 = 0;
 
 		claset_("Full", &m, &n, &c_b1, &c_b2, &a[a_offset], lda);
 		i__3 = min(m,n);
-		for (i = 1; i <= i__3; ++i) {
-		    s[i] = 1.f;
-/* L29: */
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    s[i__] = 1.f;
+/* L40: */
 		}
 
 	    } else {
@@ -514,7 +543,7 @@ static integer c__0 = 0;
 		if (iinfo != 0) {
 		    io___27.ciunit = *nounit;
 		    s_wsfe(&io___27);
-		    do_fio(&c__1, "Generator", 9L);
+		    do_fio(&c__1, "Generator", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -527,16 +556,16 @@ static integer c__0 = 0;
 		}
 	    }
 
-L30:
+L50:
 	    clacpy_("F", &m, &n, &a[a_offset], lda, &asav[asav_offset], lda);
 
-/*           Do for minimal and adequate (for blocking) workspace 
-  
+/*           Do for minimal and adequate (for blocking) workspace */
 
-   Computing MAX */
-	    i__3 = min(m,n) * 3 + max(m,n), i__4 = min(m,n) * 5 - 4;
-	    iwtmp = max(i__3,i__4);
 	    for (iwspc = 1; iwspc <= 4; ++iwspc) {
+
+/*              Test for CGESVD */
+
+		iwtmp = (min(m,n) << 1) + max(m,n);
 		lswork = iwtmp + (iwspc - 1) * (*lwork - iwtmp) / 3;
 		lswork = min(lswork,*lwork);
 		lswork = max(lswork,1);
@@ -544,9 +573,9 @@ L30:
 		    lswork = *lwork;
 		}
 
-		for (j = 1; j <= 7; ++j) {
+		for (j = 1; j <= 14; ++j) {
 		    result[j - 1] = -1.f;
-/* L40: */
+/* L60: */
 		}
 
 /*              Factorize A */
@@ -561,7 +590,7 @@ L30:
 		if (iinfo != 0) {
 		    io___32.ciunit = *nounit;
 		    s_wsfe(&io___32);
-		    do_fio(&c__1, "GESVD", 5L);
+		    do_fio(&c__1, "GESVD", (ftnlen)5);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -579,20 +608,22 @@ L30:
 		cbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
 			usav_offset], ldu, &ssav[1], &e[1], &vtsav[
 			vtsav_offset], ldvt, &work[1], &rwork[1], result);
-		cunt01_("Columns", &mnmin, &m, &usav[usav_offset], ldu, &work[
-			1], lwork, &rwork[1], &result[1]);
-		cunt01_("Rows", &mnmin, &n, &vtsav[vtsav_offset], ldvt, &work[
-			1], lwork, &rwork[1], &result[2]);
+		if (m != 0 && n != 0) {
+		    cunt01_("Columns", &mnmin, &m, &usav[usav_offset], ldu, &
+			    work[1], lwork, &rwork[1], &result[1]);
+		    cunt01_("Rows", &mnmin, &n, &vtsav[vtsav_offset], ldvt, &
+			    work[1], lwork, &rwork[1], &result[2]);
+		}
 		result[3] = 0.f;
 		i__3 = mnmin - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    if (ssav[i] < ssav[i + 1]) {
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    if (ssav[i__] < ssav[i__ + 1]) {
 			result[3] = ulpinv;
 		    }
-		    if (ssav[i] < 0.f) {
+		    if (ssav[i__] < 0.f) {
 			result[3] = ulpinv;
 		    }
-/* L50: */
+/* L70: */
 		}
 		if (mnmin >= 1) {
 		    if (ssav[mnmin] < 0.f) {
@@ -600,8 +631,7 @@ L30:
 		    }
 		}
 
-/*              Do partial SVDs, comparing to SSAV, USAV, and 
-VTSAV */
+/*              Do partial SVDs, comparing to SSAV, USAV, and VTSAV */
 
 		result[4] = 0.f;
 		result[5] = 0.f;
@@ -609,7 +639,7 @@ VTSAV */
 		for (iju = 0; iju <= 3; ++iju) {
 		    for (ijvt = 0; ijvt <= 3; ++ijvt) {
 			if (iju == 3 && ijvt == 3 || iju == 1 && ijvt == 1) {
-			    goto L70;
+			    goto L90;
 			}
 			*(unsigned char *)jobu = *(unsigned char *)&cjob[iju];
 			*(unsigned char *)jobvt = *(unsigned char *)&cjob[
@@ -674,58 +704,205 @@ VTSAV */
 				"Safe minimum");
 			div = dmax(r__1,r__2);
 			i__3 = mnmin - 1;
-			for (i = 1; i <= i__3; ++i) {
-			    if (ssav[i] < ssav[i + 1]) {
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    if (ssav[i__] < ssav[i__ + 1]) {
 				dif = ulpinv;
 			    }
-			    if (ssav[i] < 0.f) {
+			    if (ssav[i__] < 0.f) {
 				dif = ulpinv;
 			    }
 /* Computing MAX */
-			    r__2 = dif, r__3 = (r__1 = ssav[i] - s[i], dabs(
-				    r__1)) / div;
+			    r__2 = dif, r__3 = (r__1 = ssav[i__] - s[i__], 
+				    dabs(r__1)) / div;
 			    dif = dmax(r__2,r__3);
-/* L60: */
+/* L80: */
 			}
 			result[6] = dmax(result[6],dif);
-L70:
+L90:
 			;
 		    }
-/* L80: */
+/* L100: */
+		}
+
+/*              Test for CGESDD */
+
+		iwtmp = (mnmin << 1) * mnmin + (mnmin << 1) + max(m,n);
+		lswork = iwtmp + (iwspc - 1) * (*lwork - iwtmp) / 3;
+		lswork = min(lswork,*lwork);
+		lswork = max(lswork,1);
+		if (iwspc == 4) {
+		    lswork = *lwork;
+		}
+
+/*              Factorize A */
+
+		clacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset], 
+			lda);
+		cgesdd_("A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
+			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
+			1], &lswork, &rwork[1], &iwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___39.ciunit = *nounit;
+		    s_wsfe(&io___39);
+		    do_fio(&c__1, "GESDD", (ftnlen)5);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&lswork, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    return 0;
+		}
+
+/*              Do tests 1--4 */
+
+		cbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
+			usav_offset], ldu, &ssav[1], &e[1], &vtsav[
+			vtsav_offset], ldvt, &work[1], &rwork[1], &result[7]);
+		if (m != 0 && n != 0) {
+		    cunt01_("Columns", &mnmin, &m, &usav[usav_offset], ldu, &
+			    work[1], lwork, &rwork[1], &result[8]);
+		    cunt01_("Rows", &mnmin, &n, &vtsav[vtsav_offset], ldvt, &
+			    work[1], lwork, &rwork[1], &result[9]);
+		}
+		result[10] = 0.f;
+		i__3 = mnmin - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    if (ssav[i__] < ssav[i__ + 1]) {
+			result[10] = ulpinv;
+		    }
+		    if (ssav[i__] < 0.f) {
+			result[10] = ulpinv;
+		    }
+/* L110: */
+		}
+		if (mnmin >= 1) {
+		    if (ssav[mnmin] < 0.f) {
+			result[10] = ulpinv;
+		    }
+		}
+
+/*              Do partial SVDs, comparing to SSAV, USAV, and VTSAV */
+
+		result[11] = 0.f;
+		result[12] = 0.f;
+		result[13] = 0.f;
+		for (ijq = 0; ijq <= 2; ++ijq) {
+		    *(unsigned char *)jobq = *(unsigned char *)&cjob[ijq];
+		    clacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
+			    , lda);
+		    cgesdd_(jobq, &m, &n, &a[a_offset], lda, &s[1], &u[
+			    u_offset], ldu, &vt[vt_offset], ldvt, &work[1], &
+			    lswork, &rwork[1], &iwork[1], &iinfo);
+
+/*                 Compare U */
+
+		    dif = 0.f;
+		    if (m > 0 && n > 0) {
+			if (ijq == 1) {
+			    if (m >= n) {
+				cunt03_("C", &m, &mnmin, &m, &mnmin, &usav[
+					usav_offset], ldu, &a[a_offset], lda, 
+					&work[1], lwork, &rwork[1], &dif, &
+					iinfo);
+			    } else {
+				cunt03_("C", &m, &mnmin, &m, &mnmin, &usav[
+					usav_offset], ldu, &u[u_offset], ldu, 
+					&work[1], lwork, &rwork[1], &dif, &
+					iinfo);
+			    }
+			} else if (ijq == 2) {
+			    cunt03_("C", &m, &mnmin, &m, &mnmin, &usav[
+				    usav_offset], ldu, &u[u_offset], ldu, &
+				    work[1], lwork, &rwork[1], &dif, &iinfo);
+			}
+		    }
+		    result[11] = dmax(result[11],dif);
+
+/*                 Compare VT */
+
+		    dif = 0.f;
+		    if (m > 0 && n > 0) {
+			if (ijq == 1) {
+			    if (m >= n) {
+				cunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+					vtsav_offset], ldvt, &vt[vt_offset], 
+					ldvt, &work[1], lwork, &rwork[1], &
+					dif, &iinfo);
+			    } else {
+				cunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+					vtsav_offset], ldvt, &a[a_offset], 
+					lda, &work[1], lwork, &rwork[1], &dif,
+					 &iinfo);
+			    }
+			} else if (ijq == 2) {
+			    cunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+				    vtsav_offset], ldvt, &vt[vt_offset], ldvt,
+				     &work[1], lwork, &rwork[1], &dif, &iinfo);
+			}
+		    }
+		    result[12] = dmax(result[12],dif);
+
+/*                 Compare S */
+
+		    dif = 0.f;
+/* Computing MAX */
+		    r__1 = (real) mnmin * ulp * s[1], r__2 = slamch_("Safe m"
+			    "inimum");
+		    div = dmax(r__1,r__2);
+		    i__3 = mnmin - 1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (ssav[i__] < ssav[i__ + 1]) {
+			    dif = ulpinv;
+			}
+			if (ssav[i__] < 0.f) {
+			    dif = ulpinv;
+			}
+/* Computing MAX */
+			r__2 = dif, r__3 = (r__1 = ssav[i__] - s[i__], dabs(
+				r__1)) / div;
+			dif = dmax(r__2,r__3);
+/* L120: */
+		    }
+		    result[13] = dmax(result[13],dif);
+/* L130: */
 		}
 
 /*              End of Loop -- Check for RESULT(j) > THRESH */
 
 		ntest = 0;
 		nfail = 0;
-		for (j = 1; j <= 7; ++j) {
+		for (j = 1; j <= 14; ++j) {
 		    if (result[j - 1] >= 0.f) {
 			++ntest;
 		    }
 		    if (result[j - 1] >= *thresh) {
 			++nfail;
 		    }
-/* L90: */
+/* L140: */
 		}
 
 		if (nfail > 0) {
 		    ++ntestf;
 		}
 		if (ntestf == 1) {
-		    io___40.ciunit = *nounit;
-		    s_wsfe(&io___40);
+		    io___43.ciunit = *nounit;
+		    s_wsfe(&io___43);
 		    e_wsfe();
-		    io___41.ciunit = *nounit;
-		    s_wsfe(&io___41);
+		    io___44.ciunit = *nounit;
+		    s_wsfe(&io___44);
 		    do_fio(&c__1, (char *)&(*thresh), (ftnlen)sizeof(real));
 		    e_wsfe();
 		    ntestf = 2;
 		}
 
-		for (j = 1; j <= 7; ++j) {
+		for (j = 1; j <= 14; ++j) {
 		    if (result[j - 1] >= *thresh) {
-			io___42.ciunit = *nounit;
-			s_wsfe(&io___42);
+			io___45.ciunit = *nounit;
+			s_wsfe(&io___45);
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
@@ -739,19 +916,19 @@ L70:
 				real));
 			e_wsfe();
 		    }
-/* L100: */
+/* L150: */
 		}
 
 		nerrs += nfail;
 		ntestt += ntest;
 
-/* L110: */
+/* L160: */
 	    }
 
-L120:
+L170:
 	    ;
 	}
-/* L130: */
+/* L180: */
     }
 
 /*     Summary */

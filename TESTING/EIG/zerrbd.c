@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -30,10 +31,10 @@ static integer c__1 = 1;
 /* Subroutine */ int zerrbd_(char *path, integer *nunit)
 {
     /* Format strings */
-    static char fmt_9999[] = "(1x,a3,\002 passed the tests of the error ex"
-	    "its\002)";
-    static char fmt_9998[] = "(\002 *** \002,a3,\002 failed the tests of the"
-	    " error exits ***\002)";
+    static char fmt_9999[] = "(1x,a3,\002 routines passed the tests of the e"
+	    "rror exits (\002,i3,\002 tests done)\002)";
+    static char fmt_9998[] = "(\002 *** \002,a3,\002 routines failed the tes"
+	    "ts of the error \002,\002exits ***\002)";
 
     /* System generated locals */
     integer i__1;
@@ -47,14 +48,12 @@ static integer c__1 = 1;
     /* Local variables */
     static integer info;
     static doublecomplex a[16]	/* was [4][4] */;
-    static doublereal d[4], e[4];
-    static integer i, j;
+    static doublereal d__[4], e[4];
+    static integer i__, j;
     static doublecomplex u[16]	/* was [4][4] */, v[16]	/* was [4][4] */, w[4]
 	    ;
     static char c2[2];
-    extern /* Subroutine */ int zgebd2_(integer *, integer *, doublecomplex *,
-	     integer *, doublereal *, doublereal *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, integer *);
+    static integer nt;
     static doublecomplex tp[4], tq[4];
     static doublereal rw[16];
     extern /* Subroutine */ int zgebrd_(integer *, integer *, doublecomplex *,
@@ -74,22 +73,25 @@ static integer c__1 = 1;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
-    static cilist io___15 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___16 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___16 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___17 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       December 22, 1999   
 
 
     Purpose   
     =======   
 
-    ZERRBD tests the error exits for ZGEBRD, ZUNGBR, CUNMBR, and ZBDSQR. 
-  
+    ZERRBD tests the error exits for ZGEBRD, ZUNGBR, ZUNMBR, and ZBDSQR.   
 
     Arguments   
     =========   
@@ -100,28 +102,28 @@ static integer c__1 = 1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    d__1 = 1. / (doublereal) (i__ + j);
 	    a[i__1].r = d__1, a[i__1].i = 0.;
 /* L10: */
 	}
 /* L20: */
     }
     infoc_1.ok = TRUE_;
+    nt = 0;
 
 /*     Test error exits of the SVD routines. */
 
@@ -129,43 +131,28 @@ static integer c__1 = 1;
 
 /*        ZGEBRD */
 
-	s_copy(srnamc_1.srnamt, "ZGEBRD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZGEBRD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zgebrd_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	zgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("ZGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zgebrd_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	zgebrd_(&c__0, &c_n1, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("ZGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zgebrd_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &c__2, &info);
+	zgebrd_(&c__2, &c__1, a, &c__1, d__, e, tq, tp, w, &c__2, &info);
 	chkxer_("ZGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	zgebrd_(&c__2, &c__1, a, &c__2, d, e, tq, tp, w, &c__1, &info);
+	zgebrd_(&c__2, &c__1, a, &c__2, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("ZGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
-
-/*        ZGEBD2 */
-
-	s_copy(srnamc_1.srnamt, "ZGEBD2", 6L, 6L);
-	infoc_1.infot = 1;
-	zgebd2_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("ZGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
-	infoc_1.infot = 2;
-	zgebd2_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("ZGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
-	infoc_1.infot = 4;
-	zgebd2_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &info);
-	chkxer_("ZGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
-		infoc_1.ok);
+	nt += 4;
 
 /*        ZUNGBR */
 
-	s_copy(srnamc_1.srnamt, "ZUNGBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZUNGBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zungbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("ZUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -206,10 +193,11 @@ static integer c__1 = 1;
 	zungbr_("Q", &c__2, &c__2, &c__1, a, &c__2, tq, w, &c__1, &info);
 	chkxer_("ZUNGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 10;
 
 /*        ZUNMBR */
 
-	s_copy(srnamc_1.srnamt, "ZUNMBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZUNMBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	zunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
 		 &c__1, &info);
@@ -275,63 +263,66 @@ static integer c__1 = 1;
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 13;
 
 /*        ZBDSQR */
 
-	s_copy(srnamc_1.srnamt, "ZBDSQR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "ZBDSQR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	zbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, rw, &info);
+	zbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, rw, &info);
 	chkxer_("ZBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
+	nt += 8;
     }
 
 /*     Print a summary line. */
 
     if (infoc_1.ok) {
-	io___15.ciunit = infoc_1.nout;
-	s_wsfe(&io___15);
-	do_fio(&c__1, path, 3L);
-	e_wsfe();
-    } else {
 	io___16.ciunit = infoc_1.nout;
 	s_wsfe(&io___16);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	e_wsfe();
+    } else {
+	io___17.ciunit = infoc_1.nout;
+	s_wsfe(&io___17);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -341,4 +332,8 @@ static integer c__1 = 1;
 /*     End of ZERRBD */
 
 } /* zerrbd_ */
+
+#undef a_ref
+#undef a_subscr
+
 

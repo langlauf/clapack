@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,8 +20,8 @@ static integer c_n1 = -1;
 /* Subroutine */ int ztimbr_(char *line, integer *nm, integer *mval, integer *
 	nval, integer *nk, integer *kval, integer *nnb, integer *nbval, 
 	integer *nxval, integer *nlda, integer *ldaval, doublereal *timmin, 
-	doublecomplex *a, doublecomplex *b, doublereal *d, doublecomplex *tau,
-	 doublecomplex *work, doublereal *reslts, integer *ldr1, integer *
+	doublecomplex *a, doublecomplex *b, doublereal *d__, doublecomplex *
+	tau, doublecomplex *work, doublereal *reslts, integer *ldr1, integer *
 	ldr2, integer *ldr3, integer *nout, ftnlen line_len)
 {
     /* Initialized data */
@@ -59,7 +60,7 @@ static integer c_n1 = -1;
     static char path[3];
     static doublereal time;
     static char vect[1];
-    static integer isub, info2, i, k, m, n;
+    static integer isub, info2, i__, k, m, n;
     static char cname[6];
     static integer iside;
     extern doublereal dopla_(char *, integer *, integer *, integer *, integer 
@@ -117,7 +118,12 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -135,8 +141,7 @@ static integer c_n1 = -1;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -189,8 +194,7 @@ static integer c_n1 = -1;
     WORK    (workspace) COMPLEX*16 array, dimension (LDAMAX*NBMAX)   
             where NBMAX is the maximum value of NB.   
 
-    RESLTS  (output) DOUBLE PRECISION array, dimension (LDR1,LDR2,LDR3,6) 
-  
+    RESLTS  (output) DOUBLE PRECISION array, dimension (LDR1,LDR2,LDR3,6)   
             The timing results for each subroutine over the relevant   
             values of (M,N), (NB,NX), and LDA.   
 
@@ -214,15 +218,13 @@ static integer c_n1 = -1;
             eigenvalues.  See ZLATMS for further details.   
 
     COND    DOUBLE PRECISION   
-            The condition number of the matrix.  The singular values are 
-  
+            The condition number of the matrix.  The singular values are   
             set to values from DMAX to DMAX/COND.   
 
     DMAX    DOUBLE PRECISION   
             The magnitude of the largest singular value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -233,34 +235,37 @@ static integer c_n1 = -1;
     --ldaval;
     --a;
     --b;
-    --d;
+    --d__;
     --tau;
     --work;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Zomplex precision", 1L, 17L);
-    s_copy(path + 1, "BR", 2L, 2L);
-    atimin_(path, line, &c__3, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "BR", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__3, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L220;
     }
 
 /*     Check that M <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___10.ciunit = *nout;
 	s_wsfe(&io___10);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L220;
     }
@@ -268,14 +273,14 @@ static integer c_n1 = -1;
 /*     Check that N <= LDA and K <= LDA for DORMBR */
 
     if (timsub[2]) {
-	atimck_(&c__2, cname, nm, &nval[1], nlda, &ldaval[1], nout, &info, 6L)
-		;
-	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info2, 
-		6L);
+	atimck_(&c__2, cname, nm, &nval[1], nlda, &ldaval[1], nout, &info, (
+		ftnlen)6);
+	atimck_(&c__3, cname, nk, &kval[1], nlda, &ldaval[1], nout, &info2, (
+		ftnlen)6);
 	if (info > 0 || info2 > 0) {
 	    io___12.ciunit = *nout;
 	    s_wsfe(&io___12);
-	    do_fio(&c__1, subnam + 12, 6L);
+	    do_fio(&c__1, subnam_ref(0, 3), (ftnlen)6);
 	    e_wsfe();
 	    timsub[2] = FALSE_;
 	}
@@ -296,8 +301,7 @@ static integer c_n1 = -1;
 	for (ilda = 1; ilda <= i__2; ++ilda) {
 	    lda = ldaval[ilda];
 
-/*           Do for each pair of values (NB, NX) in NBVAL and NXVA
-L. */
+/*           Do for each pair of values (NB, NX) in NBVAL and NXVAL. */
 
 	    i__3 = *nnb;
 	    for (inb = 1; inb <= i__3; ++inb) {
@@ -312,21 +316,20 @@ L. */
 /*              Generate a test matrix of size M by N. */
 
 		icopy_(&c__4, reseed, &c__1, iseed, &c__1);
-		zlatms_(&m, &n, "Uniform", iseed, "Nonsymm", &d[1], &c__3, &
+		zlatms_(&m, &n, "Uniform", iseed, "Nonsymm", &d__[1], &c__3, &
 			c_b27, &c_b28, &m, &n, "No packing", &b[1], &lda, &
 			work[1], &info);
 
 		if (timsub[0]) {
 
-/*                 ZGEBRD:  Block reduction to bidiagonal 
-form */
+/*                 ZGEBRD:  Block reduction to bidiagonal form */
 
 		    zlacpy_("Full", &m, &n, &b[1], &lda, &a[1], &lda);
 		    ic = 0;
 		    s1 = dsecnd_();
 L10:
-		    zgebrd_(&m, &n, &a[1], &lda, &d[1], &d[minmn], &tau[1], &
-			    tau[minmn + 1], &work[1], &lw, &info);
+		    zgebrd_(&m, &n, &a[1], &lda, &d__[1], &d__[minmn], &tau[1]
+			    , &tau[minmn + 1], &work[1], &lw, &info);
 		    s2 = dsecnd_();
 		    time = s2 - s1;
 		    ++ic;
@@ -350,30 +353,25 @@ L20:
 
 		    time = (time - untime) / (doublereal) ic;
 		    ops = dopla_("ZGEBRD", &m, &n, &c__0, &c__0, &nb);
-		    reslts[inb + (im + (ilda + reslts_dim3) * reslts_dim2) * 
-			    reslts_dim1] = dmflop_(&ops, &time, &info);
+		    reslts_ref(inb, im, ilda, 1) = dmflop_(&ops, &time, &info)
+			    ;
 		} else {
 
-/*                 If ZGEBRD was not timed, generate a mat
-rix and reduce   
-                   it using ZGEBRD anyway so that the orth
-ogonal   
-                   transformations may be used in timing t
-he other   
+/*                 If ZGEBRD was not timed, generate a matrix and reduce   
+                   it using ZGEBRD anyway so that the orthogonal   
+                   transformations may be used in timing the other   
                    routines. */
 
 		    zlacpy_("Full", &m, &n, &b[1], &lda, &a[1], &lda);
-		    zgebrd_(&m, &n, &a[1], &lda, &d[1], &d[minmn], &tau[1], &
-			    tau[minmn + 1], &work[1], &lw, &info);
+		    zgebrd_(&m, &n, &a[1], &lda, &d__[1], &d__[minmn], &tau[1]
+			    , &tau[minmn + 1], &work[1], &lw, &info);
 
 		}
 
 		if (timsub[1]) {
 
-/*                 ZUNGBR:  Generate one of the orthogonal
- matrices Q or   
-                   P' from the reduction to bidiagonal for
-m   
+/*                 ZUNGBR:  Generate one of the orthogonal matrices Q or   
+                   P' from the reduction to bidiagonal form   
                    A = Q * B * P'. */
 
 		    for (ivect = 1; ivect <= 2; ++ivect) {
@@ -406,8 +404,7 @@ L30:
 			    goto L30;
 			}
 
-/*                    Subtract the time used in ZLACPY
-. */
+/*                    Subtract the time used in ZLACPY. */
 
 			icl = 1;
 			s1 = dsecnd_();
@@ -448,8 +445,7 @@ L40:
 			    }
 			}
 
-			reslts[inb + (im + (i3 + ilda + (reslts_dim3 << 1)) * 
-				reslts_dim2) * reslts_dim1] = dmflop_(&ops, &
+			reslts_ref(inb, im, i3 + ilda, 2) = dmflop_(&ops, &
 				time, &info);
 /* L50: */
 		    }
@@ -457,10 +453,8 @@ L40:
 
 		if (timsub[2]) {
 
-/*                 ZUNMBR:  Multiply an m by n matrix B by
- one of the   
-                   orthogonal matrices Q or P' from the re
-duction to   
+/*                 ZUNMBR:  Multiply an m by n matrix B by one of the   
+                   orthogonal matrices Q or P' from the reduction to   
                    bidiagonal form A = Q * B * P'. */
 
 		    for (ivect = 1; ivect <= 2; ++ivect) {
@@ -505,8 +499,7 @@ duction to
 L60:
 				    zunmbr_(vect, side, trans, &m1, &n1, &k1, 
 					    &a[1], &lda, &tau[1], &b[1], &lda,
-					     &work[1], &lw, &info)
-					    ;
+					     &work[1], &lw, &info);
 				    s2 = dsecnd_();
 				    time = s2 - s1;
 				    ++ic;
@@ -516,8 +509,7 @@ L60:
 					goto L60;
 				    }
 
-/*                             Subtract th
-e time used in ZTIMMG. */
+/*                             Subtract the time used in ZTIMMG. */
 
 				    icl = 1;
 				    s1 = dsecnd_();
@@ -534,14 +526,13 @@ L70:
 				    time = (time - untime) / (doublereal) ic;
 				    if (ivect == 1) {
 
-/*                                Op c
-ount for ZUNMBR, VECT = 'Q': 
-*/
+/*                                Op count for ZUNMBR, VECT = 'Q': */
 
 					if (nq >= k1) {
 					    i__5 = iside - 1;
 					    ops = dopla_("ZUNMQR", &m1, &n1, &
-						    k1, &i__5, &nb);
+						    k1, &i__5, &nb)
+						    ;
 					} else if (iside == 1) {
 					    i__5 = m1 - 1;
 					    i__6 = nq - 1;
@@ -557,14 +548,13 @@ ount for ZUNMBR, VECT = 'Q':
 					}
 				    } else {
 
-/*                                Op c
-ount for ZUNMBR, VECT = 'P': 
-*/
+/*                                Op count for ZUNMBR, VECT = 'P': */
 
 					if (nq >= k1) {
 					    i__5 = iside - 1;
 					    ops = dopla_("ZUNMLQ", &m1, &n1, &
-						    k1, &i__5, &nb);
+						    k1, &i__5, &nb)
+						    ;
 					} else if (iside == 1) {
 					    i__5 = m1 - 1;
 					    i__6 = nq - 1;
@@ -580,10 +570,9 @@ ount for ZUNMBR, VECT = 'P':
 					}
 				    }
 
-				    reslts[inb + (im + (i3 + ilda + (i4 + 
-					    itoff + ik) * reslts_dim3) * 
-					    reslts_dim2) * reslts_dim1] = 
-					    dmflop_(&ops, &time, &info);
+				    reslts_ref(inb, im, i3 + ilda, i4 + itoff 
+					    + ik) = dmflop_(&ops, &time, &
+					    info);
 				    itoff = *nk;
 /* L80: */
 				}
@@ -610,15 +599,15 @@ ount for ZUNMBR, VECT = 'P':
 	}
 	io___47.ciunit = *nout;
 	s_wsfe(&io___47);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___49.ciunit = *nout;
 		s_wsfe(&io___49);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L150: */
 	    }
@@ -628,9 +617,8 @@ ount for ZUNMBR, VECT = 'P':
 	    s_wsle(&io___50);
 	    e_wsle();
 	    dprtb4_("(  NB,  NX)", "M", "N", nnb, &nbval[1], &nxval[1], nm, &
-		    mval[1], &nval[1], nlda, &reslts[((isub * reslts_dim3 + 1)
-		     * reslts_dim2 + 1) * reslts_dim1 + 1], ldr1, ldr2, nout, 
-		    11L, 1L, 1L);
+		    mval[1], &nval[1], nlda, &reslts_ref(1, 1, 1, isub), ldr1,
+		     ldr2, nout, (ftnlen)11, (ftnlen)1, (ftnlen)1);
 	} else if (isub == 2) {
 	    for (ivect = 1; ivect <= 2; ++ivect) {
 		i3 = (ivect - 1) * *nlda + 1;
@@ -645,16 +633,16 @@ ount for ZUNMBR, VECT = 'P':
 		}
 		io___54.ciunit = *nout;
 		s_wsfe(&io___54);
-		do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-		do_fio(&c__1, vects + (ivect - 1), 1L);
-		do_fio(&c__1, labk, 1L);
-		do_fio(&c__1, labm, 1L);
-		do_fio(&c__1, labn, 1L);
+		do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+		do_fio(&c__1, vects + (ivect - 1), (ftnlen)1);
+		do_fio(&c__1, labk, (ftnlen)1);
+		do_fio(&c__1, labm, (ftnlen)1);
+		do_fio(&c__1, labn, (ftnlen)1);
 		e_wsfe();
 		dprtb4_("(  NB,  NX)", labm, labn, nnb, &nbval[1], &nxval[1], 
-			nm, &mval[1], &nval[1], nlda, &reslts[((i3 + isub * 
-			reslts_dim3) * reslts_dim2 + 1) * reslts_dim1 + 1], 
-			ldr1, ldr2, nout, 11L, 1L, 1L);
+			nm, &mval[1], &nval[1], nlda, &reslts_ref(1, 1, i3, 
+			isub), ldr1, ldr2, nout, (ftnlen)11, (ftnlen)1, (
+			ftnlen)1);
 /* L160: */
 	    }
 	} else if (isub == 3) {
@@ -686,19 +674,18 @@ ount for ZUNMBR, VECT = 'P':
 			for (ik = 1; ik <= i__1; ++ik) {
 			    io___55.ciunit = *nout;
 			    s_wsfe(&io___55);
-			    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-			    do_fio(&c__1, vects + (ivect - 1), 1L);
-			    do_fio(&c__1, sides + (iside - 1), 1L);
-			    do_fio(&c__1, transs + (itran - 1), 1L);
-			    do_fio(&c__1, labk, 1L);
+			    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+			    do_fio(&c__1, vects + (ivect - 1), (ftnlen)1);
+			    do_fio(&c__1, sides + (iside - 1), (ftnlen)1);
+			    do_fio(&c__1, transs + (itran - 1), (ftnlen)1);
+			    do_fio(&c__1, labk, (ftnlen)1);
 			    do_fio(&c__1, (char *)&kval[ik], (ftnlen)sizeof(
 				    integer));
 			    e_wsfe();
 			    dprtb5_("NB", labm, labn, nnb, &nbval[1], nm, &
-				    mval[1], &nval[1], nlda, &reslts[((i3 + 
-				    i4 * reslts_dim3) * reslts_dim2 + 1) * 
-				    reslts_dim1 + 1], ldr1, ldr2, nout, 2L, 
-				    1L, 1L);
+				    mval[1], &nval[1], nlda, &reslts_ref(1, 1,
+				     i3, i4), ldr1, ldr2, nout, (ftnlen)2, (
+				    ftnlen)1, (ftnlen)1);
 			    ++i4;
 /* L170: */
 			}
@@ -718,4 +705,8 @@ L220:
 /*     End of ZTIMBR */
 
 } /* ztimbr_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int slasrt_(char *id, integer *n, real *d, integer *info)
+/* Subroutine */ int slasrt_(char *id, integer *n, real *d__, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -37,19 +38,16 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input paramters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     /* Local variables */
-    static integer endd, i, j;
+    static integer endd, i__, j;
     extern logical lsame_(char *, char *);
     static integer stack[64]	/* was [2][32] */;
     static real dmnmx, d1, d2, d3;
@@ -57,13 +55,11 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static integer stkpnt, dir;
     static real tmp;
+#define stack_ref(a_1,a_2) stack[(a_2)*2 + a_1 - 3]
 
+    --d__;
 
-#define STACK(I) stack[(I)]
-#define WAS(I) was[(I)]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     dir = -1;
     if (lsame_(id, "D")) {
@@ -89,11 +85,11 @@
     }
 
     stkpnt = 1;
-    STACK(0) = 1;
-    STACK(1) = *n;
+    stack_ref(1, 1) = 1;
+    stack_ref(2, 1) = *n;
 L10:
-    start = STACK((stkpnt << 1) - 2);
-    endd = STACK((stkpnt << 1) - 1);
+    start = stack_ref(1, stkpnt);
+    endd = stack_ref(2, stkpnt);
     --stkpnt;
     if (endd - start <= 20 && endd - start > 0) {
 
@@ -104,13 +100,13 @@ L10:
 /*           Sort into decreasing order */
 
 	    i__1 = endd;
-	    for (i = start + 1; i <= endd; ++i) {
+	    for (i__ = start + 1; i__ <= i__1; ++i__) {
 		i__2 = start + 1;
-		for (j = i; j >= start+1; --j) {
-		    if (D(j) > D(j - 1)) {
-			dmnmx = D(j);
-			D(j) = D(j - 1);
-			D(j - 1) = dmnmx;
+		for (j = i__; j >= i__2; --j) {
+		    if (d__[j] > d__[j - 1]) {
+			dmnmx = d__[j];
+			d__[j] = d__[j - 1];
+			d__[j - 1] = dmnmx;
 		    } else {
 			goto L30;
 		    }
@@ -125,13 +121,13 @@ L30:
 /*           Sort into increasing order */
 
 	    i__1 = endd;
-	    for (i = start + 1; i <= endd; ++i) {
+	    for (i__ = start + 1; i__ <= i__1; ++i__) {
 		i__2 = start + 1;
-		for (j = i; j >= start+1; --j) {
-		    if (D(j) < D(j - 1)) {
-			dmnmx = D(j);
-			D(j) = D(j - 1);
-			D(j - 1) = dmnmx;
+		for (j = i__; j >= i__2; --j) {
+		    if (d__[j] < d__[j - 1]) {
+			dmnmx = d__[j];
+			d__[j] = d__[j - 1];
+			d__[j - 1] = dmnmx;
 		    } else {
 			goto L50;
 		    }
@@ -145,15 +141,14 @@ L50:
 
     } else if (endd - start > 20) {
 
-/*        Partition D( START:ENDD ) and stack parts, largest one first
-   
+/*        Partition D( START:ENDD ) and stack parts, largest one first   
 
           Choose partition entry as median of 3 */
 
-	d1 = D(start);
-	d2 = D(endd);
-	i = (start + endd) / 2;
-	d3 = D(i);
+	d1 = d__[start];
+	d2 = d__[endd];
+	i__ = (start + endd) / 2;
+	d3 = d__[i__];
 	if (d1 < d2) {
 	    if (d3 < d1) {
 		dmnmx = d1;
@@ -176,77 +171,77 @@ L50:
 
 /*           Sort into decreasing order */
 
-	    i = start - 1;
+	    i__ = start - 1;
 	    j = endd + 1;
 L60:
 L70:
 	    --j;
-	    if (D(j) < dmnmx) {
+	    if (d__[j] < dmnmx) {
 		goto L70;
 	    }
 L80:
-	    ++i;
-	    if (D(i) > dmnmx) {
+	    ++i__;
+	    if (d__[i__] > dmnmx) {
 		goto L80;
 	    }
-	    if (i < j) {
-		tmp = D(i);
-		D(i) = D(j);
-		D(j) = tmp;
+	    if (i__ < j) {
+		tmp = d__[i__];
+		d__[i__] = d__[j];
+		d__[j] = tmp;
 		goto L60;
 	    }
 	    if (j - start > endd - j - 1) {
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = start;
-		STACK((stkpnt << 1) - 1) = j;
+		stack_ref(1, stkpnt) = start;
+		stack_ref(2, stkpnt) = j;
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = j + 1;
-		STACK((stkpnt << 1) - 1) = endd;
+		stack_ref(1, stkpnt) = j + 1;
+		stack_ref(2, stkpnt) = endd;
 	    } else {
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = j + 1;
-		STACK((stkpnt << 1) - 1) = endd;
+		stack_ref(1, stkpnt) = j + 1;
+		stack_ref(2, stkpnt) = endd;
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = start;
-		STACK((stkpnt << 1) - 1) = j;
+		stack_ref(1, stkpnt) = start;
+		stack_ref(2, stkpnt) = j;
 	    }
 	} else {
 
 /*           Sort into increasing order */
 
-	    i = start - 1;
+	    i__ = start - 1;
 	    j = endd + 1;
 L90:
 L100:
 	    --j;
-	    if (D(j) > dmnmx) {
+	    if (d__[j] > dmnmx) {
 		goto L100;
 	    }
 L110:
-	    ++i;
-	    if (D(i) < dmnmx) {
+	    ++i__;
+	    if (d__[i__] < dmnmx) {
 		goto L110;
 	    }
-	    if (i < j) {
-		tmp = D(i);
-		D(i) = D(j);
-		D(j) = tmp;
+	    if (i__ < j) {
+		tmp = d__[i__];
+		d__[i__] = d__[j];
+		d__[j] = tmp;
 		goto L90;
 	    }
 	    if (j - start > endd - j - 1) {
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = start;
-		STACK((stkpnt << 1) - 1) = j;
+		stack_ref(1, stkpnt) = start;
+		stack_ref(2, stkpnt) = j;
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = j + 1;
-		STACK((stkpnt << 1) - 1) = endd;
+		stack_ref(1, stkpnt) = j + 1;
+		stack_ref(2, stkpnt) = endd;
 	    } else {
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = j + 1;
-		STACK((stkpnt << 1) - 1) = endd;
+		stack_ref(1, stkpnt) = j + 1;
+		stack_ref(2, stkpnt) = endd;
 		++stkpnt;
-		STACK((stkpnt << 1) - 2) = start;
-		STACK((stkpnt << 1) - 1) = j;
+		stack_ref(1, stkpnt) = start;
+		stack_ref(2, stkpnt) = j;
 	    }
 	}
     }
@@ -258,4 +253,7 @@ L110:
 /*     End of SLASRT */
 
 } /* slasrt_ */
+
+#undef stack_ref
+
 

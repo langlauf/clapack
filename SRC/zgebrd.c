@@ -1,14 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgebrd_(integer *m, integer *n, doublecomplex *a, 
-	integer *lda, doublereal *d, doublereal *e, doublecomplex *tauq, 
+	integer *lda, doublereal *d__, doublereal *e, doublecomplex *tauq, 
 	doublecomplex *taup, doublecomplex *work, integer *lwork, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -33,20 +34,16 @@
             On exit,   
             if m >= n, the diagonal and the first superdiagonal are   
               overwritten with the upper bidiagonal matrix B; the   
-              elements below the diagonal, with the array TAUQ, represent 
-  
+              elements below the diagonal, with the array TAUQ, represent   
               the unitary matrix Q as a product of elementary   
-              reflectors, and the elements above the first superdiagonal, 
-  
+              reflectors, and the elements above the first superdiagonal,   
               with the array TAUP, represent the unitary matrix P as   
               a product of elementary reflectors;   
             if m < n, the diagonal and the first subdiagonal are   
               overwritten with the lower bidiagonal matrix B; the   
-              elements below the first subdiagonal, with the array TAUQ, 
-  
+              elements below the first subdiagonal, with the array TAUQ,   
               represent the unitary matrix Q as a product of   
-              elementary reflectors, and the elements above the diagonal, 
-  
+              elementary reflectors, and the elements above the diagonal,   
               with the array TAUP, represent the unitary matrix P as   
               a product of elementary reflectors.   
             See Further Details.   
@@ -79,6 +76,11 @@
             For optimum performance LWORK >= (M+N)*NB, where NB   
             is the optimal blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
@@ -99,8 +101,7 @@
 
     where tauq and taup are complex scalars, and v and u are complex   
     vectors; v(1:i-1) = 0, v(i) = 1, and v(i+1:m) is stored on exit in   
-    A(i+1:m,i); u(1:i) = 0, u(i+1) = 1, and u(i+2:n) is stored on exit in 
-  
+    A(i+1:m,i); u(1:i) = 0, u(i+1) = 1, and u(i+2:n) is stored on exit in   
     A(i,i+2:n); tauq is stored in TAUQ(i) and taup in TAUP(i).   
 
     If m < n,   
@@ -113,12 +114,10 @@
 
     where tauq and taup are complex scalars, and v and u are complex   
     vectors; v(1:i) = 0, v(i+1) = 1, and v(i+2:m) is stored on exit in   
-    A(i+2:m,i); u(1:i-1) = 0, u(i) = 1, and u(i+1:n) is stored on exit in 
-  
+    A(i+2:m,i); u(1:i-1) = 0, u(i) = 1, and u(i+1:n) is stored on exit in   
     A(i,i+1:n); tauq is stored in TAUQ(i) and taup in TAUP(i).   
 
-    The contents of A on exit are illustrated by the following examples: 
-  
+    The contents of A on exit are illustrated by the following examples:   
 
     m = 6 and n = 5 (m > n):          m = 5 and n = 6 (m < n):   
 
@@ -130,19 +129,15 @@
       (  v1  v2  v3  v4  v5 )   
 
     where d and e denote diagonal and off-diagonal elements of B, vi   
-    denotes an element of the vector defining H(i), and ui an element of 
-  
+    denotes an element of the vector defining H(i), and ui an element of   
     the vector defining G(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -152,9 +147,10 @@
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
+    doublereal d__1;
     doublecomplex z__1;
     /* Local variables */
-    static integer i, j, nbmin, iinfo, minmn;
+    static integer i__, j, nbmin, iinfo, minmn;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
@@ -169,19 +165,31 @@
 	    doublecomplex *, integer *, doublecomplex *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
-    static integer ldwrkx, ldwrky;
+    static integer ldwrkx, ldwrky, lwkopt;
+    static logical lquery;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --d__;
+    --e;
+    --tauq;
+    --taup;
+    --work;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define TAUQ(I) tauq[(I)-1]
-#define TAUP(I) taup[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
+/* Computing MAX */
+    i__1 = 1, i__2 = ilaenv_(&c__1, "ZGEBRD", " ", m, n, &c_n1, &c_n1, (
+	    ftnlen)6, (ftnlen)1);
+    nb = max(i__1,i__2);
+    lwkopt = (*m + *n) * nb;
+    d__1 = (doublereal) lwkopt;
+    work[1].r = d__1, work[1].i = 0.;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*n < 0) {
@@ -191,7 +199,7 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = max(1,*m);
-	if (*lwork < max(i__1,*n)) {
+	if (*lwork < max(i__1,*n) && ! lquery) {
 	    *info = -10;
 	}
     }
@@ -199,13 +207,15 @@
 	i__1 = -(*info);
 	xerbla_("ZGEBRD", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     minmn = min(*m,*n);
     if (minmn == 0) {
-	WORK(1).r = 1., WORK(1).i = 0.;
+	work[1].r = 1., work[1].i = 0.;
 	return 0;
     }
 
@@ -213,31 +223,26 @@
     ldwrkx = *m;
     ldwrky = *n;
 
-/*     Set the block size NB and the crossover point NX.   
-
-   Computing MAX */
-    i__1 = 1, i__2 = ilaenv_(&c__1, "ZGEBRD", " ", m, n, &c_n1, &c_n1, 6L, 1L)
-	    ;
-    nb = max(i__1,i__2);
-
     if (nb > 1 && nb < minmn) {
 
-/*        Determine when to switch from blocked to unblocked code.   
+/*        Set the crossover point NX.   
 
    Computing MAX */
-	i__1 = nb, i__2 = ilaenv_(&c__3, "ZGEBRD", " ", m, n, &c_n1, &c_n1, 
-		6L, 1L);
+	i__1 = nb, i__2 = ilaenv_(&c__3, "ZGEBRD", " ", m, n, &c_n1, &c_n1, (
+		ftnlen)6, (ftnlen)1);
 	nx = max(i__1,i__2);
+
+/*        Determine when to switch from blocked to unblocked code. */
+
 	if (nx < minmn) {
 	    ws = (doublereal) ((*m + *n) * nb);
 	    if ((doublereal) (*lwork) < ws) {
 
-/*              Not enough work space for the optimal NB, cons
-ider using   
+/*              Not enough work space for the optimal NB, consider using   
                 a smaller block size. */
 
-		nbmin = ilaenv_(&c__2, "ZGEBRD", " ", m, n, &c_n1, &c_n1, 6L, 
-			1L);
+		nbmin = ilaenv_(&c__2, "ZGEBRD", " ", m, n, &c_n1, &c_n1, (
+			ftnlen)6, (ftnlen)1);
 		if (*lwork >= (*m + *n) * nbmin) {
 		    nb = *lwork / (*m + *n);
 		} else {
@@ -252,58 +257,56 @@ ider using
 
     i__1 = minmn - nx;
     i__2 = nb;
-    for (i = 1; nb < 0 ? i >= minmn-nx : i <= minmn-nx; i += nb) {
+    for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 
-/*        Reduce rows and columns i:i+ib-1 to bidiagonal form and retu
-rn   
-          the matrices X and Y which are needed to update the unreduce
-d   
+/*        Reduce rows and columns i:i+ib-1 to bidiagonal form and return   
+          the matrices X and Y which are needed to update the unreduced   
           part of the matrix */
 
-	i__3 = *m - i + 1;
-	i__4 = *n - i + 1;
-	zlabrd_(&i__3, &i__4, &nb, &A(i,i), lda, &D(i), &E(i), &
-		TAUQ(i), &TAUP(i), &WORK(1), &ldwrkx, &WORK(ldwrkx * nb + 1), 
-		&ldwrky);
+	i__3 = *m - i__ + 1;
+	i__4 = *n - i__ + 1;
+	zlabrd_(&i__3, &i__4, &nb, &a_ref(i__, i__), lda, &d__[i__], &e[i__], 
+		&tauq[i__], &taup[i__], &work[1], &ldwrkx, &work[ldwrkx * nb 
+		+ 1], &ldwrky);
 
 /*        Update the trailing submatrix A(i+ib:m,i+ib:n), using   
           an update of the form  A := A - V*Y' - X*U' */
 
-	i__3 = *m - i - nb + 1;
-	i__4 = *n - i - nb + 1;
+	i__3 = *m - i__ - nb + 1;
+	i__4 = *n - i__ - nb + 1;
 	z__1.r = -1., z__1.i = 0.;
 	zgemm_("No transpose", "Conjugate transpose", &i__3, &i__4, &nb, &
-		z__1, &A(i+nb,i), lda, &WORK(ldwrkx * nb + nb + 
-		1), &ldwrky, &c_b1, &A(i+nb,i+nb), lda);
-	i__3 = *m - i - nb + 1;
-	i__4 = *n - i - nb + 1;
+		z__1, &a_ref(i__ + nb, i__), lda, &work[ldwrkx * nb + nb + 1],
+		 &ldwrky, &c_b1, &a_ref(i__ + nb, i__ + nb), lda);
+	i__3 = *m - i__ - nb + 1;
+	i__4 = *n - i__ - nb + 1;
 	z__1.r = -1., z__1.i = 0.;
 	zgemm_("No transpose", "No transpose", &i__3, &i__4, &nb, &z__1, &
-		WORK(nb + 1), &ldwrkx, &A(i,i+nb), lda, &c_b1, 
-		&A(i+nb,i+nb), lda);
+		work[nb + 1], &ldwrkx, &a_ref(i__, i__ + nb), lda, &c_b1, &
+		a_ref(i__ + nb, i__ + nb), lda);
 
 /*        Copy diagonal and off-diagonal elements of B back into A */
 
 	if (*m >= *n) {
-	    i__3 = i + nb - 1;
-	    for (j = i; j <= i+nb-1; ++j) {
-		i__4 = j + j * a_dim1;
+	    i__3 = i__ + nb - 1;
+	    for (j = i__; j <= i__3; ++j) {
+		i__4 = a_subscr(j, j);
 		i__5 = j;
-		A(j,j).r = D(j), A(j,j).i = 0.;
-		i__4 = j + (j + 1) * a_dim1;
+		a[i__4].r = d__[i__5], a[i__4].i = 0.;
+		i__4 = a_subscr(j, j + 1);
 		i__5 = j;
-		A(j,j+1).r = E(j), A(j,j+1).i = 0.;
+		a[i__4].r = e[i__5], a[i__4].i = 0.;
 /* L10: */
 	    }
 	} else {
-	    i__3 = i + nb - 1;
-	    for (j = i; j <= i+nb-1; ++j) {
-		i__4 = j + j * a_dim1;
+	    i__3 = i__ + nb - 1;
+	    for (j = i__; j <= i__3; ++j) {
+		i__4 = a_subscr(j, j);
 		i__5 = j;
-		A(j,j).r = D(j), A(j,j).i = 0.;
-		i__4 = j + 1 + j * a_dim1;
+		a[i__4].r = d__[i__5], a[i__4].i = 0.;
+		i__4 = a_subscr(j + 1, j);
 		i__5 = j;
-		A(j+1,j).r = E(j), A(j+1,j).i = 0.;
+		a[i__4].r = e[i__5], a[i__4].i = 0.;
 /* L20: */
 	    }
 	}
@@ -312,14 +315,18 @@ d
 
 /*     Use unblocked code to reduce the remainder of the matrix */
 
-    i__2 = *m - i + 1;
-    i__1 = *n - i + 1;
-    zgebd2_(&i__2, &i__1, &A(i,i), lda, &D(i), &E(i), &TAUQ(i), &
-	    TAUP(i), &WORK(1), &iinfo);
-    WORK(1).r = ws, WORK(1).i = 0.;
+    i__2 = *m - i__ + 1;
+    i__1 = *n - i__ + 1;
+    zgebd2_(&i__2, &i__1, &a_ref(i__, i__), lda, &d__[i__], &e[i__], &tauq[
+	    i__], &taup[i__], &work[1], &iinfo);
+    work[1].r = ws, work[1].i = 0.;
     return 0;
 
 /*     End of ZGEBRD */
 
 } /* zgebrd_ */
+
+#undef a_ref
+#undef a_subscr
+
 

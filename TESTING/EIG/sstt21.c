@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,10 @@ static real c_b19 = 1.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -51,10 +55,8 @@ static real c_b19 = 1.f;
 
        A = U S U'   
 
-    where ' means transpose, A is symmetric tridiagonal, U is orthogonal, 
-  
-    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1). 
-  
+    where ' means transpose, A is symmetric tridiagonal, U is orthogonal,   
+    and S is diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1).   
     Two tests are performed:   
 
        RESULT(1) = | A - U S U' | / ( |A| n ulp )   
@@ -65,8 +67,7 @@ static real c_b19 = 1.f;
     =========   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SSTT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, SSTT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -81,8 +82,7 @@ static real c_b19 = 1.f;
     AE      (input) REAL array, dimension (N-1)   
             The off-diagonal of the original (unfactored) matrix A.  A   
             is assumed to be symmetric tridiagonal.  AE(1) is the (1,2)   
-            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc. 
-  
+            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc.   
 
     SD      (input) REAL array, dimension (N)   
             The diagonal of the (symmetric tri-) diagonal matrix S.   
@@ -106,8 +106,7 @@ static real c_b19 = 1.f;
             values are currently limited to 1/ulp, to avoid overflow.   
             RESULT(1) is always modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Constants   
@@ -118,7 +117,7 @@ static real c_b19 = 1.f;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --work;
     --result;
@@ -166,17 +165,17 @@ static real c_b19 = 1.f;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	r__1 = -(doublereal)sd[j];
-	ssyr_("L", n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1], n);
+	r__1 = -sd[j];
+	ssyr_("L", n, &r__1, &u_ref(1, j), &c__1, &work[1], n);
 /* L20: */
     }
 
     if (*n > 1 && *kband == 1) {
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    r__1 = -(doublereal)se[j];
-	    ssyr2_("L", n, &r__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
-		    u_dim1 + 1], &c__1, &work[1], n);
+	    r__1 = -se[j];
+	    ssyr2_("L", n, &r__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
+		    c__1, &work[1], n);
 /* L30: */
 	}
     }
@@ -224,4 +223,7 @@ static real c_b19 = 1.f;
 /*     End of SSTT21 */
 
 } /* sstt21_ */
+
+#undef u_ref
+
 

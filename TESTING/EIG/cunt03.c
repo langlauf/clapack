@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,7 +18,6 @@ static integer c__1 = 1;
     /* System generated locals */
     integer u_dim1, u_offset, v_dim1, v_offset, i__1, i__2, i__3, i__4;
     real r__1, r__2;
-    doublereal d__1;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -25,7 +25,7 @@ static integer c__1 = 1;
     void c_div(complex *, complex *, complex *);
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static complex s;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cunt01_(char *, integer *, integer *, complex 
@@ -38,7 +38,13 @@ static integer c__1 = 1;
     static real ulp, res1, res2;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -91,8 +97,7 @@ static integer c__1 = 1;
             0 <= K <= max(MU,MV).   
 
     U       (input) COMPLEX array, dimension (LDU,N)   
-            The first matrix to compare.  If RC = 'R', U is MU by N, and 
-  
+            The first matrix to compare.  If RC = 'R', U is MU by N, and   
             if RC = 'C', U is N by MU.   
 
     LDU     (input) INTEGER   
@@ -100,8 +105,7 @@ static integer c__1 = 1;
             and if RC = 'C', LDU >= max(1,N).   
 
     V       (input) COMPLEX array, dimension (LDV,N)   
-            The second matrix to compare.  If RC = 'R', V is MV by N, and 
-  
+            The second matrix to compare.  If RC = 'R', V is MV by N, and   
             if RC = 'C', V is N by MV.   
 
     LDV     (input) INTEGER   
@@ -125,8 +129,7 @@ static integer c__1 = 1;
             0  indicates a successful exit   
             -k indicates the k-th parameter had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -134,10 +137,10 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
     --rwork;
@@ -191,24 +194,24 @@ static integer c__1 = 1;
 
 	res1 = 0.f;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = icamax_(n, &u[i + u_dim1], ldu);
-	    i__2 = i + lmx * v_dim1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = icamax_(n, &u_ref(i__, 1), ldu);
+	    i__2 = v_subscr(i__, lmx);
 	    if (v[i__2].r == 0.f && v[i__2].i == 0.f) {
 		sv.r = 1.f, sv.i = 0.f;
 	    } else {
-		d__1 = c_abs(&v[i + lmx * v_dim1]);
-		q__2.r = d__1, q__2.i = 0.f;
-		c_div(&q__1, &q__2, &v[i + lmx * v_dim1]);
+		r__1 = c_abs(&v_ref(i__, lmx));
+		q__2.r = r__1, q__2.i = 0.f;
+		c_div(&q__1, &q__2, &v_ref(i__, lmx));
 		sv.r = q__1.r, sv.i = q__1.i;
 	    }
-	    i__2 = i + lmx * u_dim1;
+	    i__2 = u_subscr(i__, lmx);
 	    if (u[i__2].r == 0.f && u[i__2].i == 0.f) {
 		su.r = 1.f, su.i = 0.f;
 	    } else {
-		d__1 = c_abs(&u[i + lmx * u_dim1]);
-		q__2.r = d__1, q__2.i = 0.f;
-		c_div(&q__1, &q__2, &u[i + lmx * u_dim1]);
+		r__1 = c_abs(&u_ref(i__, lmx));
+		q__2.r = r__1, q__2.i = 0.f;
+		c_div(&q__1, &q__2, &u_ref(i__, lmx));
 		su.r = q__1.r, su.i = q__1.i;
 	    }
 	    c_div(&q__1, &sv, &su);
@@ -216,8 +219,8 @@ static integer c__1 = 1;
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = i + j * u_dim1;
-		i__4 = i + j * v_dim1;
+		i__3 = u_subscr(i__, j);
+		i__4 = v_subscr(i__, j);
 		q__2.r = s.r * v[i__4].r - s.i * v[i__4].i, q__2.i = s.r * v[
 			i__4].i + s.i * v[i__4].r;
 		q__1.r = u[i__3].r - q__2.r, q__1.i = u[i__3].i - q__2.i;
@@ -240,24 +243,24 @@ static integer c__1 = 1;
 
 	res1 = 0.f;
 	i__1 = *k;
-	for (i = 1; i <= i__1; ++i) {
-	    lmx = icamax_(n, &u[i * u_dim1 + 1], &c__1);
-	    i__2 = lmx + i * v_dim1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    lmx = icamax_(n, &u_ref(1, i__), &c__1);
+	    i__2 = v_subscr(lmx, i__);
 	    if (v[i__2].r == 0.f && v[i__2].i == 0.f) {
 		sv.r = 1.f, sv.i = 0.f;
 	    } else {
-		d__1 = c_abs(&v[lmx + i * v_dim1]);
-		q__2.r = d__1, q__2.i = 0.f;
-		c_div(&q__1, &q__2, &v[lmx + i * v_dim1]);
+		r__1 = c_abs(&v_ref(lmx, i__));
+		q__2.r = r__1, q__2.i = 0.f;
+		c_div(&q__1, &q__2, &v_ref(lmx, i__));
 		sv.r = q__1.r, sv.i = q__1.i;
 	    }
-	    i__2 = lmx + i * u_dim1;
+	    i__2 = u_subscr(lmx, i__);
 	    if (u[i__2].r == 0.f && u[i__2].i == 0.f) {
 		su.r = 1.f, su.i = 0.f;
 	    } else {
-		d__1 = c_abs(&u[lmx + i * u_dim1]);
-		q__2.r = d__1, q__2.i = 0.f;
-		c_div(&q__1, &q__2, &u[lmx + i * u_dim1]);
+		r__1 = c_abs(&u_ref(lmx, i__));
+		q__2.r = r__1, q__2.i = 0.f;
+		c_div(&q__1, &q__2, &u_ref(lmx, i__));
 		su.r = q__1.r, su.i = q__1.i;
 	    }
 	    c_div(&q__1, &sv, &su);
@@ -265,8 +268,8 @@ static integer c__1 = 1;
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = j + i * u_dim1;
-		i__4 = j + i * v_dim1;
+		i__3 = u_subscr(j, i__);
+		i__4 = v_subscr(j, i__);
 		q__2.r = s.r * v[i__4].r - s.i * v[i__4].i, q__2.i = s.r * v[
 			i__4].i + s.i * v[i__4].r;
 		q__1.r = u[i__3].r - q__2.r, q__1.i = u[i__3].i - q__2.i;
@@ -292,4 +295,10 @@ static integer c__1 = 1;
 /*     End of CUNT03 */
 
 } /* cunt03_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+
 

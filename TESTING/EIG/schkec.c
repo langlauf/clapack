@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -99,7 +100,7 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -114,8 +115,7 @@ static integer c__3 = 3;
 
     In all cases, the routine runs through a fixed set of numerical   
     examples, subjects them to various tests, and compares the test   
-    results to a threshold THRESH. In addition, STREXC, STRSNA and STRSEN 
-  
+    results to a threshold THRESH. In addition, STREXC, STRSNA and STRSEN   
     are tested by reading in precomputed examples from a file (on input   
     unit NIN).  Output is written to output unit NOUT.   
 
@@ -135,12 +135,11 @@ static integer c__3 = 3;
     NOUT    (input) INTEGER   
             The logical unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "EC", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "EC", (ftnlen)2, (ftnlen)2);
     eps = slamch_("P");
     sfmin = slamch_("S");
 
@@ -281,7 +280,7 @@ static integer c__3 = 3;
     if (ok) {
 	io___54.ciunit = *nout;
 	s_wsfe(&io___54);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&ntests, (ftnlen)sizeof(integer));
 	e_wsfe();
     }

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clapmt_(logical *forwrd, integer *m, integer *n, complex 
 	*x, integer *ldx, integer *k)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -45,31 +46,31 @@
     K       (input) INTEGER array, dimension (N)   
             On entry, K contains the permutation vector.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer x_dim1, x_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
     static complex temp;
-    static integer i, j, ii, in;
+    static integer i__, j, ii, in;
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
 
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --k;
 
-#define K(I) k[(I)-1]
-
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     if (*n <= 1) {
 	return 0;
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	K(i) = -K(i);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	k[i__] = -k[i__];
 /* L10: */
     }
 
@@ -78,36 +79,36 @@
 /*        Forward permutation */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
-	    if (K(i) > 0) {
+	    if (k[i__] > 0) {
 		goto L40;
 	    }
 
-	    j = i;
-	    K(j) = -K(j);
-	    in = K(j);
+	    j = i__;
+	    k[j] = -k[j];
+	    in = k[j];
 
 L20:
-	    if (K(in) > 0) {
+	    if (k[in] > 0) {
 		goto L40;
 	    }
 
 	    i__2 = *m;
-	    for (ii = 1; ii <= *m; ++ii) {
-		i__3 = ii + j * x_dim1;
-		temp.r = X(ii,j).r, temp.i = X(ii,j).i;
-		i__3 = ii + j * x_dim1;
-		i__4 = ii + in * x_dim1;
-		X(ii,j).r = X(ii,in).r, X(ii,j).i = X(ii,in).i;
-		i__3 = ii + in * x_dim1;
-		X(ii,in).r = temp.r, X(ii,in).i = temp.i;
+	    for (ii = 1; ii <= i__2; ++ii) {
+		i__3 = x_subscr(ii, j);
+		temp.r = x[i__3].r, temp.i = x[i__3].i;
+		i__3 = x_subscr(ii, j);
+		i__4 = x_subscr(ii, in);
+		x[i__3].r = x[i__4].r, x[i__3].i = x[i__4].i;
+		i__3 = x_subscr(ii, in);
+		x[i__3].r = temp.r, x[i__3].i = temp.i;
 /* L30: */
 	    }
 
-	    K(in) = -K(in);
+	    k[in] = -k[in];
 	    j = in;
-	    in = K(in);
+	    in = k[in];
 	    goto L20;
 
 L40:
@@ -121,33 +122,33 @@ L40:
 /*        Backward permutation */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
-	    if (K(i) > 0) {
+	    if (k[i__] > 0) {
 		goto L100;
 	    }
 
-	    K(i) = -K(i);
-	    j = K(i);
+	    k[i__] = -k[i__];
+	    j = k[i__];
 L80:
-	    if (j == i) {
+	    if (j == i__) {
 		goto L100;
 	    }
 
 	    i__2 = *m;
-	    for (ii = 1; ii <= *m; ++ii) {
-		i__3 = ii + i * x_dim1;
-		temp.r = X(ii,i).r, temp.i = X(ii,i).i;
-		i__3 = ii + i * x_dim1;
-		i__4 = ii + j * x_dim1;
-		X(ii,i).r = X(ii,j).r, X(ii,i).i = X(ii,j).i;
-		i__3 = ii + j * x_dim1;
-		X(ii,j).r = temp.r, X(ii,j).i = temp.i;
+	    for (ii = 1; ii <= i__2; ++ii) {
+		i__3 = x_subscr(ii, i__);
+		temp.r = x[i__3].r, temp.i = x[i__3].i;
+		i__3 = x_subscr(ii, i__);
+		i__4 = x_subscr(ii, j);
+		x[i__3].r = x[i__4].r, x[i__3].i = x[i__4].i;
+		i__3 = x_subscr(ii, j);
+		x[i__3].r = temp.r, x[i__3].i = temp.i;
 /* L90: */
 	    }
 
-	    K(j) = -K(j);
-	    j = K(j);
+	    k[j] = -k[j];
+	    j = k[j];
 	    goto L80;
 
 L100:
@@ -162,4 +163,8 @@ L100:
 /*     End of CLAPMT */
 
 } /* clapmt_ */
+
+#undef x_ref
+#undef x_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublereal c_b7 = -1.;
 static doublereal c_b9 = 1.;
 
 /* Subroutine */ int dbdt01_(integer *m, integer *n, integer *kd, doublereal *
-	a, integer *lda, doublereal *q, integer *ldq, doublereal *d, 
+	a, integer *lda, doublereal *q, integer *ldq, doublereal *d__, 
 	doublereal *e, doublereal *pt, integer *ldpt, doublereal *work, 
 	doublereal *resid)
 {
@@ -22,7 +23,7 @@ static doublereal c_b9 = 1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
@@ -35,7 +36,11 @@ static doublereal c_b9 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define pt_ref(a_1,a_2) pt[(a_2)*pt_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -64,8 +69,7 @@ static doublereal c_b9 = 1.;
 
     KD      (input) INTEGER   
             If KD = 0, B is diagonal and the array E is not referenced.   
-            If KD = 1, the reduction was performed by xGEBRD; B is upper 
-  
+            If KD = 1, the reduction was performed by xGEBRD; B is upper   
             bidiagonal if M >= N, and lower bidiagonal if M < N.   
             If KD = -1, the reduction was performed by xGBBRD; B is   
             always upper bidiagonal.   
@@ -101,26 +105,24 @@ static doublereal c_b9 = 1.;
     WORK    (workspace) DOUBLE PRECISION array, dimension (M+N)   
 
     RESID   (output) DOUBLE PRECISION   
-            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS ) 
-  
+            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
-    --d;
+    --d__;
     --e;
     pt_dim1 = *ldpt;
-    pt_offset = pt_dim1 + 1;
+    pt_offset = 1 + pt_dim1 * 1;
     pt -= pt_offset;
     --work;
 
@@ -143,14 +145,14 @@ static doublereal c_b9 = 1.;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *n - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*m + i] = d[i] * pt[i + j * pt_dim1] + e[i] * pt[i + 
-			    1 + j * pt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*m + i__] = d__[i__] * pt_ref(i__, j) + e[i__] * 
+			    pt_ref(i__ + 1, j);
 /* L10: */
 		}
-		work[*m + *n] = d[*n] * pt[*n + j * pt_dim1];
+		work[*m + *n] = d__[*n] * pt_ref(*n, j);
 		dgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
@@ -164,14 +166,14 @@ static doublereal c_b9 = 1.;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *m - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*m + i] = d[i] * pt[i + j * pt_dim1] + e[i] * pt[i + 
-			    1 + j * pt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*m + i__] = d__[i__] * pt_ref(i__, j) + e[i__] * 
+			    pt_ref(i__ + 1, j);
 /* L30: */
 		}
-		work[*m + *m] = d[*m] * pt[*m + j * pt_dim1];
+		work[*m + *m] = d__[*m] * pt_ref(*m, j);
 		dgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
@@ -185,12 +187,12 @@ static doublereal c_b9 = 1.;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
-		work[*m + 1] = d[1] * pt[j * pt_dim1 + 1];
+		dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		work[*m + 1] = d__[1] * pt_ref(1, j);
 		i__2 = *m;
-		for (i = 2; i <= i__2; ++i) {
-		    work[*m + i] = e[i - 1] * pt[i - 1 + j * pt_dim1] + d[i] *
-			     pt[i + j * pt_dim1];
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    work[*m + i__] = e[i__ - 1] * pt_ref(i__ - 1, j) + d__[
+			    i__] * pt_ref(i__, j);
 /* L50: */
 		}
 		dgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
@@ -208,10 +210,10 @@ static doublereal c_b9 = 1.;
 	if (*m >= *n) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *n;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*m + i] = d[i] * pt[i + j * pt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*m + i__] = d__[i__] * pt_ref(i__, j);
 /* L70: */
 		}
 		dgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
@@ -224,10 +226,10 @@ static doublereal c_b9 = 1.;
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
 		i__2 = *m;
-		for (i = 1; i <= i__2; ++i) {
-		    work[*m + i] = d[i] * pt[i + j * pt_dim1];
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*m + i__] = d__[i__] * pt_ref(i__, j);
 /* L90: */
 		}
 		dgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
@@ -270,4 +272,8 @@ static doublereal c_b9 = 1.;
 /*     End of DBDT01 */
 
 } /* dbdt01_ */
+
+#undef pt_ref
+#undef a_ref
+
 

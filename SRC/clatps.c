@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clatps_(char *uplo, char *trans, char *diag, char *
 	normin, integer *n, complex *ap, complex *x, real *scale, real *cnorm,
 	 integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -31,8 +32,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -57,10 +57,8 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
@@ -73,22 +71,18 @@
             The scaling factor s for the triangular system   
                A * x = s*b,  A**T * x = s*b,  or  A**H * x = s*b.   
             If SCALE = 0, the matrix A is singular or badly scaled, and   
-            the vector x is an exact or approximate solution to A*x = 0. 
-  
+            the vector x is an exact or approximate solution to A*x = 0.   
 
     CNORM   (input or output) REAL array, dimension (N)   
 
             If NORMIN = 'Y', CNORM is an input argument and CNORM(j)   
-            contains the norm of the off-diagonal part of the j-th column 
-  
-            of A.  If TRANS = 'N', CNORM(j) must be greater than or equal 
-  
+            contains the norm of the off-diagonal part of the j-th column   
+            of A.  If TRANS = 'N', CNORM(j) must be greater than or equal   
             to the infinity-norm, and if TRANS = 'T' or 'C', CNORM(j)   
             must be greater than or equal to the 1-norm.   
 
             If NORMIN = 'N', CNORM is an output argument and CNORM(j)   
-            returns the 1-norm of the offdiagonal part of the j-th column 
-  
+            returns the 1-norm of the offdiagonal part of the j-th column   
             of A.   
 
     INFO    (output) INTEGER   
@@ -98,14 +92,11 @@
     Further Details   
     ======= =======   
 
-    A rough bound on x is computed; if that is less than overflow, CTPSV 
-  
-    is called, otherwise, specific code is used which checks for possible 
-  
+    A rough bound on x is computed; if that is less than overflow, CTPSV   
+    is called, otherwise, specific code is used which checks for possible   
     overflow or divide-by-zero at every operation.   
 
-    A columnwise scheme is used for solving A*x = b.  The basic algorithm 
-  
+    A columnwise scheme is used for solving A*x = b.  The basic algorithm   
     if A is lower triangular is   
 
          x[1:n] := b[1:n]   
@@ -114,8 +105,7 @@
               x[j+1:n] := x[j+1:n] - x(j) * A[j+1:n,j]   
          end   
 
-    Define bounds on the components of x after j iterations of the loop: 
-  
+    Define bounds on the components of x after j iterations of the loop:   
        M(j) = bound on x[1:j]   
        G(j) = bound on x[j+1:n]   
     Initially, let M(0) = 0 and G(0) = max{x(i), i=1,...,n}.   
@@ -132,8 +122,7 @@
                     1<=i<=j   
     and   
 
-       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + CNORM(i) / |A(i,i)| ) 
-  
+       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + CNORM(i) / |A(i,i)| )   
                                      1<=i< j   
 
     Since |x(j)| <= M(j), we use the Level 2 BLAS routine CTPSV if the   
@@ -143,8 +132,7 @@
     The bound on x(j) is also used to determine when a step in the   
     columnwise method can be performed without fear of overflow.  If   
     the computed bound is greater than a large constant, x is scaled to   
-    prevent overflow, but if the bound overflows, x is set to 0, x(j) to 
-  
+    prevent overflow, but if the bound overflows, x is set to 0, x(j) to   
     1, and scale to 0, and a non-trivial solution to A*x = 0 is found.   
 
     Similarly, a row-wise scheme is used to solve A**T *x = b  or   
@@ -170,13 +158,10 @@
     and we can safely call CTPSV if 1/M(n) and 1/G(n) are both greater   
     than max(underflow, 1/overflow).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b36 = .5f;
@@ -195,7 +180,7 @@
     static real tmax;
     static complex tjjs;
     static real xmax, grow;
-    static integer i, j;
+    static integer i__, j;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern logical lsame_(char *, char *);
@@ -229,12 +214,11 @@
     static real rec, tjj;
 
 
+    --cnorm;
+    --x;
+    --ap;
 
-#define CNORM(I) cnorm[(I)-1]
-#define X(I) x[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     notran = lsame_(trans, "N");
@@ -244,13 +228,13 @@
 
     if (! upper && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, 
-	    "C")) {
+    } else if (! notran && ! lsame_(trans, "T") && ! 
+	    lsame_(trans, "C")) {
 	*info = -2;
     } else if (! nounit && ! lsame_(diag, "U")) {
 	*info = -3;
-    } else if (! lsame_(normin, "Y") && ! lsame_(normin, "N"))
-	     {
+    } else if (! lsame_(normin, "Y") && ! lsame_(normin,
+	     "N")) {
 	*info = -4;
     } else if (*n < 0) {
 	*info = -5;
@@ -278,8 +262,7 @@
 
     if (lsame_(normin, "N")) {
 
-/*        Compute the 1-norm of each column, not including the diagona
-l. */
+/*        Compute the 1-norm of each column, not including the diagonal. */
 
 	if (upper) {
 
@@ -287,9 +270,9 @@ l. */
 
 	    ip = 1;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		CNORM(j) = scasum_(&i__2, &AP(ip), &c__1);
+		cnorm[j] = scasum_(&i__2, &ap[ip], &c__1);
 		ip += j;
 /* L10: */
 	    }
@@ -299,27 +282,26 @@ l. */
 
 	    ip = 1;
 	    i__1 = *n - 1;
-	    for (j = 1; j <= *n-1; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j;
-		CNORM(j) = scasum_(&i__2, &AP(ip + 1), &c__1);
+		cnorm[j] = scasum_(&i__2, &ap[ip + 1], &c__1);
 		ip = ip + *n - j + 1;
 /* L20: */
 	    }
-	    CNORM(*n) = 0.f;
+	    cnorm[*n] = 0.f;
 	}
     }
 
-/*     Scale the column norms by TSCAL if the maximum element in CNORM is 
-  
+/*     Scale the column norms by TSCAL if the maximum element in CNORM is   
        greater than BIGNUM/2. */
 
-    imax = isamax_(n, &CNORM(1), &c__1);
-    tmax = CNORM(imax);
+    imax = isamax_(n, &cnorm[1], &c__1);
+    tmax = cnorm[imax];
     if (tmax <= bignum * .5f) {
 	tscal = 1.f;
     } else {
 	tscal = .5f / (smlnum * tmax);
-	sscal_(n, &tscal, &CNORM(1), &c__1);
+	sscal_(n, &tscal, &cnorm[1], &c__1);
     }
 
 /*     Compute a bound on the computed solution vector to see if the   
@@ -327,11 +309,11 @@ l. */
 
     xmax = 0.f;
     i__1 = *n;
-    for (j = 1; j <= *n; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	i__2 = j;
-	r__3 = xmax, r__4 = (r__1 = X(j).r / 2.f, dabs(r__1)) + (r__2 = 
-		r_imag(&X(j)) / 2.f, dabs(r__2));
+	r__3 = xmax, r__4 = (r__1 = x[i__2].r / 2.f, dabs(r__1)) + (r__2 = 
+		r_imag(&x[j]) / 2.f, dabs(r__2));
 	xmax = dmax(r__3,r__4);
 /* L30: */
     }
@@ -368,17 +350,16 @@ l. */
 	    jlen = *n;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L60;
 		}
 
 		i__3 = ip;
-		tjjs.r = AP(ip).r, tjjs.i = AP(ip).i;
+		tjjs.r = ap[i__3].r, tjjs.i = ap[i__3].i;
 		tjj = (r__1 = tjjs.r, dabs(r__1)) + (r__2 = r_imag(&tjjs), 
 			dabs(r__2));
 
@@ -396,12 +377,11 @@ l. */
 		    xbnd = 0.f;
 		}
 
-		if (tjj + CNORM(j) >= smlnum) {
+		if (tjj + cnorm[j] >= smlnum) {
 
-/*                 G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,
-j)) ) */
+/*                 G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) ) */
 
-		    grow *= tjj / (tjj + CNORM(j));
+		    grow *= tjj / (tjj + cnorm[j]);
 		} else {
 
 /*                 G(j) could overflow, set GROW to 0. */
@@ -417,18 +397,16 @@ j)) ) */
 
 /*           A is unit triangular.   
 
-             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...
-,n}.   
+             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.   
 
    Computing MIN */
 	    r__1 = 1.f, r__2 = .5f / dmax(xbnd,smlnum);
 	    grow = dmin(r__1,r__2);
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L60;
@@ -436,7 +414,7 @@ l. */
 
 /*              G(j) = G(j-1)*( 1 + CNORM(j) ) */
 
-		grow *= 1.f / (CNORM(j) + 1.f);
+		grow *= 1.f / (cnorm[j] + 1.f);
 /* L50: */
 	    }
 	}
@@ -475,32 +453,29 @@ L60:
 	    jlen = 1;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L90;
 		}
 
-/*              G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) ) 
-*/
+/*              G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) ) */
 
-		xj = CNORM(j) + 1.f;
+		xj = cnorm[j] + 1.f;
 /* Computing MIN */
 		r__1 = grow, r__2 = xbnd / xj;
 		grow = dmin(r__1,r__2);
 
 		i__3 = ip;
-		tjjs.r = AP(ip).r, tjjs.i = AP(ip).i;
+		tjjs.r = ap[i__3].r, tjjs.i = ap[i__3].i;
 		tjj = (r__1 = tjjs.r, dabs(r__1)) + (r__2 = r_imag(&tjjs), 
 			dabs(r__2));
 
 		if (tjj >= smlnum) {
 
-/*                 M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(
-j,j)) */
+/*                 M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j)) */
 
 		    if (xj > tjj) {
 			xbnd *= tjj / xj;
@@ -520,18 +495,16 @@ j,j)) */
 
 /*           A is unit triangular.   
 
-             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...
-,n}.   
+             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.   
 
    Computing MIN */
 	    r__1 = 1.f, r__2 = .5f / dmax(xbnd,smlnum);
 	    grow = dmin(r__1,r__2);
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L90;
@@ -539,7 +512,7 @@ l. */
 
 /*              G(j) = ( 1 + CNORM(j) )*G(j-1) */
 
-		xj = CNORM(j) + 1.f;
+		xj = cnorm[j] + 1.f;
 		grow /= xj;
 /* L80: */
 	    }
@@ -550,23 +523,21 @@ L90:
 
     if (grow * tscal > smlnum) {
 
-/*        Use the Level 2 BLAS solve if the reciprocal of the bound on
-   
+/*        Use the Level 2 BLAS solve if the reciprocal of the bound on   
           elements of X is not too small. */
 
-	ctpsv_(uplo, trans, diag, n, &AP(1), &X(1), &c__1);
+	ctpsv_(uplo, trans, diag, n, &ap[1], &x[1], &c__1);
     } else {
 
 /*        Use a Level 1 BLAS solve, scaling intermediate results. */
 
 	if (xmax > bignum * .5f) {
 
-/*           Scale X so that its components are less than or equal
- to   
+/*           Scale X so that its components are less than or equal to   
              BIGNUM in absolute value. */
 
 	    *scale = bignum * .5f / xmax;
-	    csscal_(n, scale, &X(1), &c__1);
+	    csscal_(n, scale, &x[1], &c__1);
 	    xmax = bignum;
 	} else {
 	    xmax *= 2.f;
@@ -579,17 +550,16 @@ L90:
 	    ip = jfirst * (jfirst + 1) / 2;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Compute x(j) = b(j) / A(j,j), scaling x if nec
-essary. */
+/*              Compute x(j) = b(j) / A(j,j), scaling x if necessary. */
 
 		i__3 = j;
-		xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)), 
+		xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]), 
 			dabs(r__2));
 		if (nounit) {
 		    i__3 = ip;
-		    q__1.r = tscal * AP(ip).r, q__1.i = tscal * AP(ip).i;
+		    q__1.r = tscal * ap[i__3].r, q__1.i = tscal * ap[i__3].i;
 		    tjjs.r = q__1.r, tjjs.i = q__1.i;
 		} else {
 		    tjjs.r = tscal, tjjs.i = 0.f;
@@ -609,16 +579,16 @@ essary. */
 /*                          Scale x by 1/b(j). */
 
 			    rec = 1.f / xj;
-			    csscal_(n, &rec, &X(1), &c__1);
+			    csscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
 		    i__3 = j;
-		    cladiv_(&q__1, &X(j), &tjjs);
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    cladiv_(&q__1, &x[j], &tjjs);
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    i__3 = j;
-		    xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)
+		    xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]
 			    ), dabs(r__2));
 		} else if (tjj > 0.f) {
 
@@ -626,71 +596,64 @@ essary. */
 
 		    if (xj > tjj * bignum) {
 
-/*                       Scale x by (1/abs(x(j)))*abs(
-A(j,j))*BIGNUM   
-                         to avoid overflow when dividi
-ng by A(j,j). */
+/*                       Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM   
+                         to avoid overflow when dividing by A(j,j). */
 
 			rec = tjj * bignum / xj;
-			if (CNORM(j) > 1.f) {
+			if (cnorm[j] > 1.f) {
 
-/*                          Scale by 1/CNORM(j) to
- avoid overflow when   
-                            multiplying x(j) times
- column j. */
+/*                          Scale by 1/CNORM(j) to avoid overflow when   
+                            multiplying x(j) times column j. */
 
-			    rec /= CNORM(j);
+			    rec /= cnorm[j];
 			}
-			csscal_(n, &rec, &X(1), &c__1);
+			csscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 			xmax *= rec;
 		    }
 		    i__3 = j;
-		    cladiv_(&q__1, &X(j), &tjjs);
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    cladiv_(&q__1, &x[j], &tjjs);
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    i__3 = j;
-		    xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)
+		    xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]
 			    ), dabs(r__2));
 		} else {
 
-/*                    A(j,j) = 0:  Set x(1:n) = 0, x(j) = 
-1, and   
-                      scale = 0, and compute a solution to
- A*x = 0. */
+/*                    A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and   
+                      scale = 0, and compute a solution to A*x = 0. */
 
 		    i__3 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			i__4 = i;
-			X(i).r = 0.f, X(i).i = 0.f;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			x[i__4].r = 0.f, x[i__4].i = 0.f;
 /* L100: */
 		    }
 		    i__3 = j;
-		    X(j).r = 1.f, X(j).i = 0.f;
+		    x[i__3].r = 1.f, x[i__3].i = 0.f;
 		    xj = 1.f;
 		    *scale = 0.f;
 		    xmax = 0.f;
 		}
 L105:
 
-/*              Scale x if necessary to avoid overflow when ad
-ding a   
+/*              Scale x if necessary to avoid overflow when adding a   
                 multiple of column j of A. */
 
 		if (xj > 1.f) {
 		    rec = 1.f / xj;
-		    if (CNORM(j) > (bignum - xmax) * rec) {
+		    if (cnorm[j] > (bignum - xmax) * rec) {
 
 /*                    Scale x by 1/(2*abs(x(j))). */
 
 			rec *= .5f;
-			csscal_(n, &rec, &X(1), &c__1);
+			csscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 		    }
-		} else if (xj * CNORM(j) > bignum - xmax) {
+		} else if (xj * cnorm[j] > bignum - xmax) {
 
 /*                 Scale x by 1/2. */
 
-		    csscal_(n, &c_b36, &X(1), &c__1);
+		    csscal_(n, &c_b36, &x[1], &c__1);
 		    *scale *= .5f;
 		}
 
@@ -698,42 +661,38 @@ ding a
 		    if (j > 1) {
 
 /*                    Compute the update   
-                         x(1:j-1) := x(1:j-1) - x(j) *
- A(1:j-1,j) */
+                         x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j) */
 
 			i__3 = j - 1;
 			i__4 = j;
-			q__2.r = -(doublereal)X(j).r, q__2.i = -(
-				doublereal)X(j).i;
+			q__2.r = -x[i__4].r, q__2.i = -x[i__4].i;
 			q__1.r = tscal * q__2.r, q__1.i = tscal * q__2.i;
-			caxpy_(&i__3, &q__1, &AP(ip - j + 1), &c__1, &X(1), &
+			caxpy_(&i__3, &q__1, &ap[ip - j + 1], &c__1, &x[1], &
 				c__1);
 			i__3 = j - 1;
-			i = icamax_(&i__3, &X(1), &c__1);
-			i__3 = i;
-			xmax = (r__1 = X(i).r, dabs(r__1)) + (r__2 = 
-				r_imag(&X(i)), dabs(r__2));
+			i__ = icamax_(&i__3, &x[1], &c__1);
+			i__3 = i__;
+			xmax = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = 
+				r_imag(&x[i__]), dabs(r__2));
 		    }
 		    ip -= j;
 		} else {
 		    if (j < *n) {
 
 /*                    Compute the update   
-                         x(j+1:n) := x(j+1:n) - x(j) *
- A(j+1:n,j) */
+                         x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j) */
 
 			i__3 = *n - j;
 			i__4 = j;
-			q__2.r = -(doublereal)X(j).r, q__2.i = -(
-				doublereal)X(j).i;
+			q__2.r = -x[i__4].r, q__2.i = -x[i__4].i;
 			q__1.r = tscal * q__2.r, q__1.i = tscal * q__2.i;
-			caxpy_(&i__3, &q__1, &AP(ip + 1), &c__1, &X(j + 1), &
+			caxpy_(&i__3, &q__1, &ap[ip + 1], &c__1, &x[j + 1], &
 				c__1);
 			i__3 = *n - j;
-			i = j + icamax_(&i__3, &X(j + 1), &c__1);
-			i__3 = i;
-			xmax = (r__1 = X(i).r, dabs(r__1)) + (r__2 = 
-				r_imag(&X(i)), dabs(r__2));
+			i__ = j + icamax_(&i__3, &x[j + 1], &c__1);
+			i__3 = i__;
+			xmax = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = 
+				r_imag(&x[i__]), dabs(r__2));
 		    }
 		    ip = ip + *n - j + 1;
 		}
@@ -748,25 +707,24 @@ ding a
 	    jlen = 1;
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
 /*              Compute x(j) = b(j) - sum A(k,j)*x(k).   
                                       k<>j */
 
 		i__3 = j;
-		xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)), 
+		xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]), 
 			dabs(r__2));
 		uscal.r = tscal, uscal.i = 0.f;
 		rec = 1.f / dmax(xmax,1.f);
-		if (CNORM(j) > (bignum - xj) * rec) {
+		if (cnorm[j] > (bignum - xj) * rec) {
 
-/*                 If x(j) could overflow, scale x by 1/(2
-*XMAX). */
+/*                 If x(j) could overflow, scale x by 1/(2*XMAX). */
 
 		    rec *= .5f;
 		    if (nounit) {
 			i__3 = ip;
-			q__1.r = tscal * AP(ip).r, q__1.i = tscal * AP(ip)
+			q__1.r = tscal * ap[i__3].r, q__1.i = tscal * ap[i__3]
 				.i;
 			tjjs.r = q__1.r, tjjs.i = q__1.i;
 		    } else {
@@ -776,8 +734,7 @@ ding a
 			     dabs(r__2));
 		    if (tjj > 1.f) {
 
-/*                       Divide by A(j,j) when scaling
- x if A(j,j) > 1.   
+/*                       Divide by A(j,j) when scaling x if A(j,j) > 1.   
 
    Computing MIN */
 			r__1 = 1.f, r__2 = rec * tjj;
@@ -786,7 +743,7 @@ ding a
 			uscal.r = q__1.r, uscal.i = q__1.i;
 		    }
 		    if (rec < 1.f) {
-			csscal_(n, &rec, &X(1), &c__1);
+			csscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 			xmax *= rec;
 		    }
@@ -795,38 +752,35 @@ ding a
 		csumj.r = 0.f, csumj.i = 0.f;
 		if (uscal.r == 1.f && uscal.i == 0.f) {
 
-/*                 If the scaling needed for A in the dot 
-product is 1,   
-                   call CDOTU to perform the dot product. 
-*/
+/*                 If the scaling needed for A in the dot product is 1,   
+                   call CDOTU to perform the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			cdotu_(&q__1, &i__3, &AP(ip - j + 1), &c__1, &X(1), &
+			cdotu_(&q__1, &i__3, &ap[ip - j + 1], &c__1, &x[1], &
 				c__1);
 			csumj.r = q__1.r, csumj.i = q__1.i;
 		    } else if (j < *n) {
 			i__3 = *n - j;
-			cdotu_(&q__1, &i__3, &AP(ip + 1), &c__1, &X(j + 1), &
+			cdotu_(&q__1, &i__3, &ap[ip + 1], &c__1, &x[j + 1], &
 				c__1);
 			csumj.r = q__1.r, csumj.i = q__1.i;
 		    }
 		} else {
 
-/*                 Otherwise, use in-line code for the dot
- product. */
+/*                 Otherwise, use in-line code for the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			for (i = 1; i <= j-1; ++i) {
-			    i__4 = ip - j + i;
-			    q__3.r = AP(ip-j+i).r * uscal.r - AP(ip-j+i).i * 
-				    uscal.i, q__3.i = AP(ip-j+i).r * uscal.i + 
-				    AP(ip-j+i).i * uscal.r;
-			    i__5 = i;
-			    q__2.r = q__3.r * X(i).r - q__3.i * X(i).i, 
-				    q__2.i = q__3.r * X(i).i + q__3.i * X(
-				    i).r;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = ip - j + i__;
+			    q__3.r = ap[i__4].r * uscal.r - ap[i__4].i * 
+				    uscal.i, q__3.i = ap[i__4].r * uscal.i + 
+				    ap[i__4].i * uscal.r;
+			    i__5 = i__;
+			    q__2.r = q__3.r * x[i__5].r - q__3.i * x[i__5].i, 
+				    q__2.i = q__3.r * x[i__5].i + q__3.i * x[
+				    i__5].r;
 			    q__1.r = csumj.r + q__2.r, q__1.i = csumj.i + 
 				    q__2.i;
 			    csumj.r = q__1.r, csumj.i = q__1.i;
@@ -834,15 +788,15 @@ product is 1,
 			}
 		    } else if (j < *n) {
 			i__3 = *n - j;
-			for (i = 1; i <= *n-j; ++i) {
-			    i__4 = ip + i;
-			    q__3.r = AP(ip+i).r * uscal.r - AP(ip+i).i * 
-				    uscal.i, q__3.i = AP(ip+i).r * uscal.i + 
-				    AP(ip+i).i * uscal.r;
-			    i__5 = j + i;
-			    q__2.r = q__3.r * X(j+i).r - q__3.i * X(j+i).i, 
-				    q__2.i = q__3.r * X(j+i).i + q__3.i * X(
-				    j+i).r;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = ip + i__;
+			    q__3.r = ap[i__4].r * uscal.r - ap[i__4].i * 
+				    uscal.i, q__3.i = ap[i__4].r * uscal.i + 
+				    ap[i__4].i * uscal.r;
+			    i__5 = j + i__;
+			    q__2.r = q__3.r * x[i__5].r - q__3.i * x[i__5].i, 
+				    q__2.i = q__3.r * x[i__5].i + q__3.i * x[
+				    i__5].r;
 			    q__1.r = csumj.r + q__2.r, q__1.i = csumj.i + 
 				    q__2.i;
 			    csumj.r = q__1.r, csumj.i = q__1.i;
@@ -854,26 +808,23 @@ product is 1,
 		q__1.r = tscal, q__1.i = 0.f;
 		if (uscal.r == q__1.r && uscal.i == q__1.i) {
 
-/*                 Compute x(j) := ( x(j) - CSUMJ ) / A(j,
-j) if 1/A(j,j)   
-                   was not used to scale the dotproduct. 
-*/
+/*                 Compute x(j) := ( x(j) - CSUMJ ) / A(j,j) if 1/A(j,j)   
+                   was not used to scale the dotproduct. */
 
 		    i__3 = j;
 		    i__4 = j;
-		    q__1.r = X(j).r - csumj.r, q__1.i = X(j).i - 
+		    q__1.r = x[i__4].r - csumj.r, q__1.i = x[i__4].i - 
 			    csumj.i;
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    i__3 = j;
-		    xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)
+		    xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]
 			    ), dabs(r__2));
 		    if (nounit) {
 
-/*                    Compute x(j) = x(j) / A(j,j), sc
-aling if necessary. */
+/*                    Compute x(j) = x(j) / A(j,j), scaling if necessary. */
 
 			i__3 = ip;
-			q__1.r = tscal * AP(ip).r, q__1.i = tscal * AP(ip)
+			q__1.r = tscal * ap[i__3].r, q__1.i = tscal * ap[i__3]
 				.i;
 			tjjs.r = q__1.r, tjjs.i = q__1.i;
 		    } else {
@@ -891,50 +842,46 @@ aling if necessary. */
 			if (tjj < 1.f) {
 			    if (xj > tjj * bignum) {
 
-/*                             Scale X by 1/ab
-s(x(j)). */
+/*                             Scale X by 1/abs(x(j)). */
 
 				rec = 1.f / xj;
-				csscal_(n, &rec, &X(1), &c__1);
+				csscal_(n, &rec, &x[1], &c__1);
 				*scale *= rec;
 				xmax *= rec;
 			    }
 			}
 			i__3 = j;
-			cladiv_(&q__1, &X(j), &tjjs);
-			X(j).r = q__1.r, X(j).i = q__1.i;
+			cladiv_(&q__1, &x[j], &tjjs);
+			x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    } else if (tjj > 0.f) {
 
 /*                       0 < abs(A(j,j)) <= SMLNUM: */
 
 			if (xj > tjj * bignum) {
 
-/*                          Scale x by (1/abs(x(j)
-))*abs(A(j,j))*BIGNUM. */
+/*                          Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM. */
 
 			    rec = tjj * bignum / xj;
-			    csscal_(n, &rec, &X(1), &c__1);
+			    csscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 			i__3 = j;
-			cladiv_(&q__1, &X(j), &tjjs);
-			X(j).r = q__1.r, X(j).i = q__1.i;
+			cladiv_(&q__1, &x[j], &tjjs);
+			x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    } else {
 
-/*                       A(j,j) = 0:  Set x(1:n) = 0, 
-x(j) = 1, and   
-                         scale = 0 and compute a solut
-ion to A**T *x = 0. */
+/*                       A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and   
+                         scale = 0 and compute a solution to A**T *x = 0. */
 
 			i__3 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__4 = i;
-			    X(i).r = 0.f, X(i).i = 0.f;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    x[i__4].r = 0.f, x[i__4].i = 0.f;
 /* L140: */
 			}
 			i__3 = j;
-			X(j).r = 1.f, X(j).i = 0.f;
+			x[i__3].r = 1.f, x[i__3].i = 0.f;
 			*scale = 0.f;
 			xmax = 0.f;
 		    }
@@ -942,20 +889,18 @@ L145:
 		    ;
 		} else {
 
-/*                 Compute x(j) := x(j) / A(j,j) - CSUMJ i
-f the dot   
-                   product has already been divided by 1/A
-(j,j). */
+/*                 Compute x(j) := x(j) / A(j,j) - CSUMJ if the dot   
+                   product has already been divided by 1/A(j,j). */
 
 		    i__3 = j;
-		    cladiv_(&q__2, &X(j), &tjjs);
+		    cladiv_(&q__2, &x[j], &tjjs);
 		    q__1.r = q__2.r - csumj.r, q__1.i = q__2.i - csumj.i;
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		}
 /* Computing MAX */
 		i__3 = j;
-		r__3 = xmax, r__4 = (r__1 = X(j).r, dabs(r__1)) + (r__2 = 
-			r_imag(&X(j)), dabs(r__2));
+		r__3 = xmax, r__4 = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = 
+			r_imag(&x[j]), dabs(r__2));
 		xmax = dmax(r__3,r__4);
 		++jlen;
 		ip += jinc * jlen;
@@ -970,24 +915,23 @@ f the dot
 	    jlen = 1;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
 /*              Compute x(j) = b(j) - sum A(k,j)*x(k).   
                                       k<>j */
 
 		i__3 = j;
-		xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)), 
+		xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]), 
 			dabs(r__2));
 		uscal.r = tscal, uscal.i = 0.f;
 		rec = 1.f / dmax(xmax,1.f);
-		if (CNORM(j) > (bignum - xj) * rec) {
+		if (cnorm[j] > (bignum - xj) * rec) {
 
-/*                 If x(j) could overflow, scale x by 1/(2
-*XMAX). */
+/*                 If x(j) could overflow, scale x by 1/(2*XMAX). */
 
 		    rec *= .5f;
 		    if (nounit) {
-			r_cnjg(&q__2, &AP(ip));
+			r_cnjg(&q__2, &ap[ip]);
 			q__1.r = tscal * q__2.r, q__1.i = tscal * q__2.i;
 			tjjs.r = q__1.r, tjjs.i = q__1.i;
 		    } else {
@@ -997,8 +941,7 @@ f the dot
 			     dabs(r__2));
 		    if (tjj > 1.f) {
 
-/*                       Divide by A(j,j) when scaling
- x if A(j,j) > 1.   
+/*                       Divide by A(j,j) when scaling x if A(j,j) > 1.   
 
    Computing MIN */
 			r__1 = 1.f, r__2 = rec * tjj;
@@ -1007,7 +950,7 @@ f the dot
 			uscal.r = q__1.r, uscal.i = q__1.i;
 		    }
 		    if (rec < 1.f) {
-			csscal_(n, &rec, &X(1), &c__1);
+			csscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 			xmax *= rec;
 		    }
@@ -1016,38 +959,35 @@ f the dot
 		csumj.r = 0.f, csumj.i = 0.f;
 		if (uscal.r == 1.f && uscal.i == 0.f) {
 
-/*                 If the scaling needed for A in the dot 
-product is 1,   
-                   call CDOTC to perform the dot product. 
-*/
+/*                 If the scaling needed for A in the dot product is 1,   
+                   call CDOTC to perform the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			cdotc_(&q__1, &i__3, &AP(ip - j + 1), &c__1, &X(1), &
+			cdotc_(&q__1, &i__3, &ap[ip - j + 1], &c__1, &x[1], &
 				c__1);
 			csumj.r = q__1.r, csumj.i = q__1.i;
 		    } else if (j < *n) {
 			i__3 = *n - j;
-			cdotc_(&q__1, &i__3, &AP(ip + 1), &c__1, &X(j + 1), &
+			cdotc_(&q__1, &i__3, &ap[ip + 1], &c__1, &x[j + 1], &
 				c__1);
 			csumj.r = q__1.r, csumj.i = q__1.i;
 		    }
 		} else {
 
-/*                 Otherwise, use in-line code for the dot
- product. */
+/*                 Otherwise, use in-line code for the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			for (i = 1; i <= j-1; ++i) {
-			    r_cnjg(&q__4, &AP(ip - j + i));
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    r_cnjg(&q__4, &ap[ip - j + i__]);
 			    q__3.r = q__4.r * uscal.r - q__4.i * uscal.i, 
 				    q__3.i = q__4.r * uscal.i + q__4.i * 
 				    uscal.r;
-			    i__4 = i;
-			    q__2.r = q__3.r * X(i).r - q__3.i * X(i).i, 
-				    q__2.i = q__3.r * X(i).i + q__3.i * X(
-				    i).r;
+			    i__4 = i__;
+			    q__2.r = q__3.r * x[i__4].r - q__3.i * x[i__4].i, 
+				    q__2.i = q__3.r * x[i__4].i + q__3.i * x[
+				    i__4].r;
 			    q__1.r = csumj.r + q__2.r, q__1.i = csumj.i + 
 				    q__2.i;
 			    csumj.r = q__1.r, csumj.i = q__1.i;
@@ -1055,15 +995,15 @@ product is 1,
 			}
 		    } else if (j < *n) {
 			i__3 = *n - j;
-			for (i = 1; i <= *n-j; ++i) {
-			    r_cnjg(&q__4, &AP(ip + i));
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    r_cnjg(&q__4, &ap[ip + i__]);
 			    q__3.r = q__4.r * uscal.r - q__4.i * uscal.i, 
 				    q__3.i = q__4.r * uscal.i + q__4.i * 
 				    uscal.r;
-			    i__4 = j + i;
-			    q__2.r = q__3.r * X(j+i).r - q__3.i * X(j+i).i, 
-				    q__2.i = q__3.r * X(j+i).i + q__3.i * X(
-				    j+i).r;
+			    i__4 = j + i__;
+			    q__2.r = q__3.r * x[i__4].r - q__3.i * x[i__4].i, 
+				    q__2.i = q__3.r * x[i__4].i + q__3.i * x[
+				    i__4].r;
 			    q__1.r = csumj.r + q__2.r, q__1.i = csumj.i + 
 				    q__2.i;
 			    csumj.r = q__1.r, csumj.i = q__1.i;
@@ -1075,25 +1015,22 @@ product is 1,
 		q__1.r = tscal, q__1.i = 0.f;
 		if (uscal.r == q__1.r && uscal.i == q__1.i) {
 
-/*                 Compute x(j) := ( x(j) - CSUMJ ) / A(j,
-j) if 1/A(j,j)   
-                   was not used to scale the dotproduct. 
-*/
+/*                 Compute x(j) := ( x(j) - CSUMJ ) / A(j,j) if 1/A(j,j)   
+                   was not used to scale the dotproduct. */
 
 		    i__3 = j;
 		    i__4 = j;
-		    q__1.r = X(j).r - csumj.r, q__1.i = X(j).i - 
+		    q__1.r = x[i__4].r - csumj.r, q__1.i = x[i__4].i - 
 			    csumj.i;
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    i__3 = j;
-		    xj = (r__1 = X(j).r, dabs(r__1)) + (r__2 = r_imag(&X(j)
+		    xj = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = r_imag(&x[j]
 			    ), dabs(r__2));
 		    if (nounit) {
 
-/*                    Compute x(j) = x(j) / A(j,j), sc
-aling if necessary. */
+/*                    Compute x(j) = x(j) / A(j,j), scaling if necessary. */
 
-			r_cnjg(&q__2, &AP(ip));
+			r_cnjg(&q__2, &ap[ip]);
 			q__1.r = tscal * q__2.r, q__1.i = tscal * q__2.i;
 			tjjs.r = q__1.r, tjjs.i = q__1.i;
 		    } else {
@@ -1111,50 +1048,46 @@ aling if necessary. */
 			if (tjj < 1.f) {
 			    if (xj > tjj * bignum) {
 
-/*                             Scale X by 1/ab
-s(x(j)). */
+/*                             Scale X by 1/abs(x(j)). */
 
 				rec = 1.f / xj;
-				csscal_(n, &rec, &X(1), &c__1);
+				csscal_(n, &rec, &x[1], &c__1);
 				*scale *= rec;
 				xmax *= rec;
 			    }
 			}
 			i__3 = j;
-			cladiv_(&q__1, &X(j), &tjjs);
-			X(j).r = q__1.r, X(j).i = q__1.i;
+			cladiv_(&q__1, &x[j], &tjjs);
+			x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    } else if (tjj > 0.f) {
 
 /*                       0 < abs(A(j,j)) <= SMLNUM: */
 
 			if (xj > tjj * bignum) {
 
-/*                          Scale x by (1/abs(x(j)
-))*abs(A(j,j))*BIGNUM. */
+/*                          Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM. */
 
 			    rec = tjj * bignum / xj;
-			    csscal_(n, &rec, &X(1), &c__1);
+			    csscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 			i__3 = j;
-			cladiv_(&q__1, &X(j), &tjjs);
-			X(j).r = q__1.r, X(j).i = q__1.i;
+			cladiv_(&q__1, &x[j], &tjjs);
+			x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		    } else {
 
-/*                       A(j,j) = 0:  Set x(1:n) = 0, 
-x(j) = 1, and   
-                         scale = 0 and compute a solut
-ion to A**H *x = 0. */
+/*                       A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and   
+                         scale = 0 and compute a solution to A**H *x = 0. */
 
 			i__3 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    i__4 = i;
-			    X(i).r = 0.f, X(i).i = 0.f;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    x[i__4].r = 0.f, x[i__4].i = 0.f;
 /* L180: */
 			}
 			i__3 = j;
-			X(j).r = 1.f, X(j).i = 0.f;
+			x[i__3].r = 1.f, x[i__3].i = 0.f;
 			*scale = 0.f;
 			xmax = 0.f;
 		    }
@@ -1162,20 +1095,18 @@ L185:
 		    ;
 		} else {
 
-/*                 Compute x(j) := x(j) / A(j,j) - CSUMJ i
-f the dot   
-                   product has already been divided by 1/A
-(j,j). */
+/*                 Compute x(j) := x(j) / A(j,j) - CSUMJ if the dot   
+                   product has already been divided by 1/A(j,j). */
 
 		    i__3 = j;
-		    cladiv_(&q__2, &X(j), &tjjs);
+		    cladiv_(&q__2, &x[j], &tjjs);
 		    q__1.r = q__2.r - csumj.r, q__1.i = q__2.i - csumj.i;
-		    X(j).r = q__1.r, X(j).i = q__1.i;
+		    x[i__3].r = q__1.r, x[i__3].i = q__1.i;
 		}
 /* Computing MAX */
 		i__3 = j;
-		r__3 = xmax, r__4 = (r__1 = X(j).r, dabs(r__1)) + (r__2 = 
-			r_imag(&X(j)), dabs(r__2));
+		r__3 = xmax, r__4 = (r__1 = x[i__3].r, dabs(r__1)) + (r__2 = 
+			r_imag(&x[j]), dabs(r__2));
 		xmax = dmax(r__3,r__4);
 		++jlen;
 		ip += jinc * jlen;
@@ -1189,7 +1120,7 @@ f the dot
 
     if (tscal != 1.f) {
 	r__1 = 1.f / tscal;
-	sscal_(n, &r__1, &CNORM(1), &c__1);
+	sscal_(n, &r__1, &cnorm[1], &c__1);
     }
 
     return 0;

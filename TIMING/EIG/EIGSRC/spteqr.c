@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,8 +21,8 @@ static real c_b8 = 1.f;
 static integer c__0 = 0;
 static integer c__1 = 1;
 
-/* Subroutine */ int spteqr_(char *compz, integer *n, real *d, real *e, real *
-	z, integer *ldz, real *work, integer *info)
+/* Subroutine */ int spteqr_(char *compz, integer *n, real *d__, real *e, 
+	real *z__, integer *ldz, real *work, integer *info)
 {
     /* System generated locals */
     integer z_dim1, z_offset, i__1;
@@ -30,8 +31,8 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static real c[1]	/* was [1][1] */;
-    static integer i;
+    static real c__[1]	/* was [1][1] */;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static real vt[1]	/* was [1][1] */;
     extern /* Subroutine */ int xerbla_(char *, integer *), slaset_(
@@ -43,11 +44,13 @@ static integer c__1 = 1;
     static integer nru;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
@@ -56,27 +59,21 @@ static integer c__1 = 1;
     =======   
 
     SPTEQR computes all eigenvalues and, optionally, eigenvectors of a   
-    symmetric positive definite tridiagonal matrix by first factoring the 
-  
-    matrix using SPTTRF, and then calling SBDSQR to compute the singular 
-  
+    symmetric positive definite tridiagonal matrix by first factoring the   
+    matrix using SPTTRF, and then calling SBDSQR to compute the singular   
     values of the bidiagonal factor.   
 
     This routine computes the eigenvalues of the positive definite   
-    tridiagonal matrix to high relative accuracy.  This means that if the 
-  
+    tridiagonal matrix to high relative accuracy.  This means that if the   
     eigenvalues range over many orders of magnitude in size, then the   
     small eigenvalues and corresponding eigenvectors will be computed   
     more accurately than, for example, with the standard QR method.   
 
-    The eigenvectors of a full or band symmetric positive definite matrix 
-  
+    The eigenvectors of a full or band symmetric positive definite matrix   
     can also be found if SSYTRD, SSPTRD, or SSBTRD has been used to   
-    reduce this matrix to tridiagonal form. (The reduction to tridiagonal 
-  
+    reduce this matrix to tridiagonal form. (The reduction to tridiagonal   
     form, however, may preclude the possibility of obtaining high   
-    relative accuracy in the small eigenvalues of the original matrix, if 
-  
+    relative accuracy in the small eigenvalues of the original matrix, if   
     these eigenvalues range over many orders of magnitude.)   
 
     Arguments   
@@ -107,8 +104,7 @@ static integer c__1 = 1;
     Z       (input/output) REAL array, dimension (LDZ, N)   
             On entry, if COMPZ = 'V', the orthogonal matrix used in the   
             reduction to tridiagonal form.   
-            On exit, if COMPZ = 'V', the orthonormal eigenvectors of the 
-  
+            On exit, if COMPZ = 'V', the orthonormal eigenvectors of the   
             original symmetric matrix;   
             if COMPZ = 'I', the orthonormal eigenvectors of the   
             tridiagonal matrix.   
@@ -120,34 +116,30 @@ static integer c__1 = 1;
             The leading dimension of the array Z.  LDZ >= 1, and if   
             COMPZ = 'V' or 'I', LDZ >= max(1,N).   
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
-            If  COMPZ = 'N', then LWORK = 2*N   
-            If  COMPZ = 'V' or 'I', then LWORK = MAX(1,4*N-4)   
+    WORK    (workspace) REAL array, dimension (4*N)   
 
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = i, and i is:   
                   <= N  the Cholesky factorization of the matrix could   
-                        not be performed because the i-th principal minor 
-  
+                        not be performed because the i-th principal minor   
                         was not positive definite.   
                   > N   the SVD algorithm failed to converge;   
                         if INFO = N+i, i off-diagonal elements of the   
                         bidiagonal factor did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --work;
 
     /* Function Body */
@@ -183,29 +175,29 @@ static integer c__1 = 1;
 
     if (*n == 1) {
 	if (icompz > 0) {
-	    z[z_dim1 + 1] = 1.f;
+	    z___ref(1, 1) = 1.f;
 	}
 	return 0;
     }
     if (icompz == 2) {
-	slaset_("Full", n, n, &c_b7, &c_b8, &z[z_offset], ldz);
+	slaset_("Full", n, n, &c_b7, &c_b8, &z__[z_offset], ldz);
     }
 
 /*     Call SPTTRF to factor the matrix. */
 
     latime_1.ops = latime_1.ops + *n * 5 - 4;
-    spttrf_(n, &d[1], &e[1], info);
+    spttrf_(n, &d__[1], &e[1], info);
     if (*info != 0) {
 	return 0;
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	d[i] = sqrt(d[i]);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__[i__] = sqrt(d__[i__]);
 /* L10: */
     }
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	e[i] *= d[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	e[i__] *= d__[i__];
 /* L20: */
     }
 
@@ -217,16 +209,16 @@ static integer c__1 = 1;
     } else {
 	nru = 0;
     }
-    sbdsqr_("Lower", n, &c__0, &nru, &c__0, &d[1], &e[1], vt, &c__1, &z[
-	    z_offset], ldz, c, &c__1, &work[1], info);
+    sbdsqr_("Lower", n, &c__0, &nru, &c__0, &d__[1], &e[1], vt, &c__1, &z__[
+	    z_offset], ldz, c__, &c__1, &work[1], info);
 
 /*     Square the singular values. */
 
     if (*info == 0) {
 	latime_1.ops += *n;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] *= d[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] *= d__[i__];
 /* L30: */
 	}
     } else {
@@ -238,4 +230,7 @@ static integer c__1 = 1;
 /*     End of SPTEQR */
 
 } /* spteqr_ */
+
+#undef z___ref
+
 

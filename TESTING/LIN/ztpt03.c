@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -41,7 +42,13 @@ static integer c__1 = 1;
     static doublereal smlnum, eps, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -50,24 +57,20 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    ZTPT03 computes the residual for the solution to a scaled triangular 
-  
+    ZTPT03 computes the residual for the solution to a scaled triangular   
     system of equations A*x = s*b,  A**T *x = s*b,  or  A**H *x = s*b,   
     when the triangular matrix A is stored in packed format.  Here A**T   
     denotes the transpose of A, A**H denotes the conjugate transpose of   
-    A, s is a scalar, and x and b are N by NRHS matrices.  The test ratio 
-  
+    A, s is a scalar, and x and b are N by NRHS matrices.  The test ratio   
     is the maximum over the number of right hand sides of   
        norm(s*b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
-    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon. 
-  
+    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon.   
 
     Arguments   
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -90,10 +93,8 @@ static integer c__1 = 1;
             of the matrices X and B.  NRHS >= 0.   
 
     AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -129,8 +130,7 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - s*b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -139,10 +139,10 @@ static integer c__1 = 1;
     --ap;
     --cnorm;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -196,21 +196,21 @@ static integer c__1 = 1;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	zcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	zcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ix = izamax_(n, &work[1], &c__1);
 /* Computing MAX */
-	d__1 = 1., d__2 = z_abs(&x[ix + j * x_dim1]);
+	d__1 = 1., d__2 = z_abs(&x_ref(ix, j));
 	xnorm = max(d__1,d__2);
 	xscal = 1. / xnorm / (doublereal) (*n);
 	zdscal_(n, &xscal, &work[1], &c__1);
 	ztpmv_(uplo, trans, diag, n, &ap[1], &work[1], &c__1);
 	d__1 = -(*scale) * xscal;
 	z__1.r = d__1, z__1.i = 0.;
-	zaxpy_(n, &z__1, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	zaxpy_(n, &z__1, &b_ref(1, j), &c__1, &work[1], &c__1);
 	ix = izamax_(n, &work[1], &c__1);
 	err = *tscal * z_abs(&work[ix]);
-	ix = izamax_(n, &x[j * x_dim1 + 1], &c__1);
-	xnorm = z_abs(&x[ix + j * x_dim1]);
+	ix = izamax_(n, &x_ref(1, j), &c__1);
+	xnorm = z_abs(&x_ref(ix, j));
 	if (err * smlnum <= xnorm) {
 	    if (xnorm > 0.) {
 		err /= xnorm;
@@ -238,4 +238,10 @@ static integer c__1 = 1;
 /*     End of ZTPT03 */
 
 } /* ztpt03_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,7 +15,7 @@ struct {
 #define latime_1 latime_
 
 /* Subroutine */ int slaed6_(integer *kniter, logical *orgati, real *rho, 
-	real *d, real *z, real *finit, real *tau, integer *info)
+	real *d__, real *z__, real *finit, real *tau, integer *info)
 {
     /* Initialized data */
 
@@ -30,21 +31,19 @@ struct {
     /* Local variables */
     static real base;
     static integer iter;
-    static real temp, temp1, temp2, temp3, a, b, c, f;
-    static integer i;
+    static real temp, temp1, temp2, temp3, temp4, a, b, c__, f;
+    static integer i__;
     static logical scale;
     static integer niter;
     static real small1, small2, fc, df, sminv1, sminv2, dscale[3], sclfac;
     extern doublereal slamch_(char *);
-    static real zscale[3], erretm, sclinv, pretau, ddf, eta, eps;
+    static real zscale[3], erretm, sclinv, ddf, eta, eps;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is unchanged, OPS is only incremented   
@@ -52,8 +51,7 @@ struct {
     Purpose   
     =======   
 
-    SLAED6 computes the positive or negative root (closest to the origin) 
-  
+    SLAED6 computes the positive or negative root (closest to the origin)   
     of   
                      z(1)        z(2)        z(3)   
     f(x) =   rho + --------- + ---------- + ---------   
@@ -64,10 +62,8 @@ struct {
           if ORGATI = .true. the root is between d(2) and d(3);   
           otherwise it is between d(1) and d(2)   
 
-    This routine will be called by SLAED4 when necessary. In most cases, 
-  
-    the root sought is the smallest in magnitude, though it might not be 
-  
+    This routine will be called by SLAED4 when necessary. In most cases,   
+    the root sought is the smallest in magnitude, though it might not be   
     in some extremely rare situations.   
 
     Arguments   
@@ -102,12 +98,18 @@ struct {
                  = 0: successful exit   
                  > 0: if INFO = 1, failure to converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
        Parameter adjustments */
-    --z;
-    --d;
+    --z__;
+    --d__;
 
     /* Function Body */
 
@@ -116,32 +118,40 @@ struct {
     niter = 1;
     *tau = 0.f;
     if (*kniter == 2) {
-	latime_1.ops += 25;
 	if (*orgati) {
-	    temp = (d[3] - d[2]) / 2.f;
-	    c = *rho + z[1] / (d[1] - d[2] - temp);
-	    a = c * (d[2] + d[3]) + z[2] + z[3];
-	    b = c * d[2] * d[3] + z[2] * d[3] + z[3] * d[2];
+	    temp = (d__[3] - d__[2]) / 2.f;
+	    c__ = *rho + z__[1] / (d__[1] - d__[2] - temp);
+	    a = c__ * (d__[2] + d__[3]) + z__[2] + z__[3];
+	    b = c__ * d__[2] * d__[3] + z__[2] * d__[3] + z__[3] * d__[2];
 	} else {
-	    temp = (d[1] - d[2]) / 2.f;
-	    c = *rho + z[3] / (d[3] - d[2] - temp);
-	    a = c * (d[1] + d[2]) + z[1] + z[2];
-	    b = c * d[1] * d[2] + z[1] * d[2] + z[2] * d[1];
+	    temp = (d__[1] - d__[2]) / 2.f;
+	    c__ = *rho + z__[3] / (d__[3] - d__[2] - temp);
+	    a = c__ * (d__[1] + d__[2]) + z__[1] + z__[2];
+	    b = c__ * d__[1] * d__[2] + z__[1] * d__[2] + z__[2] * d__[1];
 	}
-	if (c == 0.f) {
-	    latime_1.ops += 1;
+/* Computing MAX */
+	r__1 = dabs(a), r__2 = dabs(b), r__1 = max(r__1,r__2), r__2 = dabs(
+		c__);
+	temp = dmax(r__1,r__2);
+	a /= temp;
+	b /= temp;
+	c__ /= temp;
+	latime_1.ops += 19;
+	if (c__ == 0.f) {
 	    *tau = b / a;
+	    latime_1.ops += 1;
 	} else if (a <= 0.f) {
 	    latime_1.ops += 8;
-	    *tau = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (c *
-		     2.f);
+	    *tau = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) / (
+		    c__ * 2.f);
 	} else {
 	    latime_1.ops += 8;
-	    *tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)
-		    )));
+	    *tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
+		    r__1))));
 	}
-	temp = *rho + z[1] / (d[1] - *tau) + z[2] / (d[2] - *tau) + z[3] / (d[
-		3] - *tau);
+	latime_1.ops += 9;
+	temp = *rho + z__[1] / (d__[1] - *tau) + z__[2] / (d__[2] - *tau) + 
+		z__[3] / (d__[3] - *tau);
 	if (dabs(*finit) <= dabs(temp)) {
 	    *tau = 0.f;
 	}
@@ -153,13 +163,13 @@ struct {
     if (first) {
 	eps = slamch_("Epsilon");
 	base = slamch_("Base");
-	i__1 = (integer) (log(slamch_("SafMin")) / log(base) / 3.f);
+	i__1 = (integer) (log(slamch_("SafMin")) / log(base) / 3.f)
+		;
 	small1 = pow_ri(&base, &i__1);
 	sminv1 = 1.f / small1;
 	small2 = small1 * small1;
 	sminv2 = sminv1 * sminv1;
 	first = FALSE_;
-	latime_1.ops += 8;
     }
 
 /*     Determine if scaling of inputs necessary to avoid overflow   
@@ -168,13 +178,13 @@ struct {
     latime_1.ops += 2;
     if (*orgati) {
 /* Computing MIN */
-	r__3 = (r__1 = d[2] - *tau, dabs(r__1)), r__4 = (r__2 = d[3] - *tau, 
-		dabs(r__2));
+	r__3 = (r__1 = d__[2] - *tau, dabs(r__1)), r__4 = (r__2 = d__[3] - *
+		tau, dabs(r__2));
 	temp = dmin(r__3,r__4);
     } else {
 /* Computing MIN */
-	r__3 = (r__1 = d[1] - *tau, dabs(r__1)), r__4 = (r__2 = d[2] - *tau, 
-		dabs(r__2));
+	r__3 = (r__1 = d__[1] - *tau, dabs(r__1)), r__4 = (r__2 = d__[2] - *
+		tau, dabs(r__2));
 	temp = dmin(r__3,r__4);
     }
     scale = FALSE_;
@@ -194,13 +204,12 @@ struct {
 	    sclinv = small1;
 	}
 
-/*        Scaling up safe because D, Z, TAU scaled elsewhere to be O(1
-) */
+/*        Scaling up safe because D, Z, TAU scaled elsewhere to be O(1) */
 
 	latime_1.ops += 7;
-	for (i = 1; i <= 3; ++i) {
-	    dscale[i - 1] = d[i] * sclfac;
-	    zscale[i - 1] = z[i] * sclfac;
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    dscale[i__ - 1] = d__[i__] * sclfac;
+	    zscale[i__ - 1] = z__[i__] * sclfac;
 /* L10: */
 	}
 	*tau *= sclfac;
@@ -208,9 +217,9 @@ struct {
 
 /*        Copy D and Z to DSCALE and ZSCALE */
 
-	for (i = 1; i <= 3; ++i) {
-	    dscale[i - 1] = d[i];
-	    zscale[i - 1] = z[i];
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    dscale[i__ - 1] = d__[i__];
+	    zscale[i__ - 1] = z__[i__];
 /* L20: */
 	}
     }
@@ -218,13 +227,13 @@ struct {
     fc = 0.f;
     df = 0.f;
     ddf = 0.f;
-    latime_1.ops += 29;
-    for (i = 1; i <= 3; ++i) {
-	temp = 1.f / (dscale[i - 1] - *tau);
-	temp1 = zscale[i - 1] * temp;
+    latime_1.ops += 11;
+    for (i__ = 1; i__ <= 3; ++i__) {
+	temp = 1.f / (dscale[i__ - 1] - *tau);
+	temp1 = zscale[i__ - 1] * temp;
 	temp2 = temp1 * temp;
 	temp3 = temp2 * temp;
-	fc += temp1 / dscale[i - 1];
+	fc += temp1 / dscale[i__ - 1];
 	df += temp2;
 	ddf += temp3;
 /* L30: */
@@ -249,7 +258,7 @@ struct {
 
     for (niter = iter; niter <= 20; ++niter) {
 
-	latime_1.ops += 56;
+	latime_1.ops += 18;
 	if (*orgati) {
 	    temp1 = dscale[1] - *tau;
 	    temp2 = dscale[2] - *tau;
@@ -259,64 +268,74 @@ struct {
 	}
 	a = (temp1 + temp2) * f - temp1 * temp2 * df;
 	b = temp1 * temp2 * f;
-	c = f - (temp1 + temp2) * df + temp1 * temp2 * ddf;
-	if (c == 0.f) {
+	c__ = f - (temp1 + temp2) * df + temp1 * temp2 * ddf;
+/* Computing MAX */
+	r__1 = dabs(a), r__2 = dabs(b), r__1 = max(r__1,r__2), r__2 = dabs(
+		c__);
+	temp = dmax(r__1,r__2);
+	a /= temp;
+	b /= temp;
+	c__ /= temp;
+	if (c__ == 0.f) {
 	    latime_1.ops += 1;
 	    eta = b / a;
 	} else if (a <= 0.f) {
 	    latime_1.ops += 8;
-	    eta = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (c * 
-		    2.f);
+	    eta = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) / (
+		    c__ * 2.f);
 	} else {
 	    latime_1.ops += 8;
-	    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1))
-		    ));
+	    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
+		    r__1))));
 	}
 	if (f * eta >= 0.f) {
 	    latime_1.ops += 1;
-	    eta = -(doublereal)f / df;
+	    eta = -f / df;
 	}
 
+	latime_1.ops += 1;
 	temp = eta + *tau;
 	if (*orgati) {
 	    if (eta > 0.f && temp >= dscale[2]) {
-		eta = (dscale[2] - *tau) / 2.f;
 		latime_1.ops += 2;
+		eta = (dscale[2] - *tau) / 2.f;
 	    }
 	    if (eta < 0.f && temp <= dscale[1]) {
-		eta = (dscale[1] - *tau) / 2.f;
 		latime_1.ops += 2;
+		eta = (dscale[1] - *tau) / 2.f;
 	    }
 	} else {
 	    if (eta > 0.f && temp >= dscale[1]) {
-		eta = (dscale[1] - *tau) / 2.f;
 		latime_1.ops += 2;
+		eta = (dscale[1] - *tau) / 2.f;
 	    }
 	    if (eta < 0.f && temp <= dscale[0]) {
-		eta = (dscale[0] - *tau) / 2.f;
 		latime_1.ops += 2;
+		eta = (dscale[0] - *tau) / 2.f;
 	    }
 	}
-	pretau = *tau;
+	latime_1.ops += 1;
 	*tau += eta;
 
 	fc = 0.f;
-	erretm = dabs(*rho);
+	erretm = 0.f;
 	df = 0.f;
 	ddf = 0.f;
-	for (i = 1; i <= 3; ++i) {
-	    temp = 1.f / (dscale[i - 1] - *tau);
-	    temp1 = zscale[i - 1] * temp;
+	latime_1.ops += 37;
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    temp = 1.f / (dscale[i__ - 1] - *tau);
+	    temp1 = zscale[i__ - 1] * temp;
 	    temp2 = temp1 * temp;
 	    temp3 = temp2 * temp;
-	    fc += temp1 / (dscale[i - 1] - pretau);
-	    erretm += dabs(temp1);
+	    temp4 = temp1 / dscale[i__ - 1];
+	    fc += temp4;
+	    erretm += dabs(temp4);
 	    df += temp2;
 	    ddf += temp3;
 /* L40: */
 	}
-	f += eta * fc;
-	erretm = erretm * 8.f + dabs(*tau) * df;
+	f = *finit + *tau * fc;
+	erretm = (dabs(*finit) + dabs(*tau) * erretm) * 8.f + dabs(*tau) * df;
 	if (dabs(f) <= eps * erretm) {
 	    goto L60;
 	}
@@ -328,8 +347,8 @@ L60:
 /*     Undo scaling */
 
     if (scale) {
-	*tau *= sclinv;
 	latime_1.ops += 1;
+	*tau *= sclinv;
     }
     return 0;
 

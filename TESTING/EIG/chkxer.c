@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,7 +37,7 @@ static integer c__1 = 1;
 	io___1.ciunit = *nout;
 	s_wsfe(&io___1);
 	do_fio(&c__1, (char *)&(*infot), (ftnlen)sizeof(integer));
-	do_fio(&c__1, srnamt, 6L);
+	do_fio(&c__1, srnamt, (ftnlen)6);
 	e_wsfe();
 	*ok = FALSE_;
     }

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,17 +19,18 @@ struct {
 static integer c__1 = 1;
 static integer c__4 = 4;
 static integer c__3 = 3;
-static integer c__12 = 12;
-static integer c__5000 = 5000;
 static integer c__6 = 6;
-static integer c_b170 = 362400;
+static integer c__5000 = 5000;
+static integer c_b172 = 272384;
 static integer c__2 = 2;
 
 /* Main program */ MAIN__(void)
 {
     /* Format strings */
-    static char fmt_9983[] = "(\002 LAPACK VERSION 2.0, released September 3"
-	    "0, 1994 \002,/)";
+    static char fmt_9983[] = "(\002 LAPACK VERSION 3.0, released June 30, 19"
+	    "99 \002,/)";
+    static char fmt_9992[] = "(\002 The following parameter values will be u"
+	    "sed:\002)";
     static char fmt_9999[] = "(\002 Too many values of \002,a,\002 using "
 	    "\002,a,\002 = \002,i2)";
     static char fmt_9991[] = "(4x,a7,1x,10i6,/12x,10i6)";
@@ -76,24 +78,30 @@ static integer c__2 = 2;
     static integer need, nlda;
     static logical blas;
     static char line[80];
-    static integer kval[12], mval[12], maxk, nval[12], maxm, maxn;
-    static complex a[1087200]	/* was [362400][3] */;
-    static real d[1200];
-    static complex e[1200];
-    static integer i, l;
+    static integer kval[6], mval[6], maxk, nval[6], maxm, maxn;
+    static complex work[270336]	/* was [512][528] */, a[817152]	/* was [
+	    272384][3] */, b[817152]	/* was [272384][3] */;
+    static real d__[1024];
+    static complex e[1024];
+    static integer i__, l;
+    static real s[1024];
     static logical ldaok;
     extern logical lsame_(char *, char *);
-    static integer nbval[12], maxnb, mkmax;
+    static integer nbval[6], maxnb, mkmax;
     static char c1[1], c2[2], c3[3];
-    static integer nxval[12], i2, j2, iwork[10000];
-    static real s1, s2;
+    static integer nxval[6], i2, j2, iwork[10000];
+    static real s1, s2, rwork[76812];
     extern /* Subroutine */ int ctimb2_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
 	    *, integer *, integer *, real *, complex *, complex *, complex *, 
 	    real *, integer *, integer *, integer *, ftnlen), ctimb3_(char *, 
 	    integer *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, real *, complex *, complex *, complex *, 
-	    real *, integer *, integer *, integer *, ftnlen);
+	    real *, integer *, integer *, integer *, ftnlen), ctimq3_(char *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, real *, complex *, complex *, complex *, 
+	    complex *, real *, integer *, real *, integer *, integer *, 
+	    integer *, ftnlen);
     static integer nk, nm, nn, ldaval[4];
     extern /* Subroutine */ int ctimgb_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, integer 
@@ -122,69 +130,77 @@ static integer c__2 = 2;
 	    ftnlen), ctimtb_(char *, integer *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, real *, complex *, 
 	    complex *, real *, integer *, integer *, integer *, integer *, 
-	    ftnlen), ctimhp_(char *, integer *, integer *, integer *, integer 
-	    *, integer *, real *, complex *, complex *, complex *, integer *, 
-	    real *, integer *, integer *, integer *, integer *, ftnlen), 
-	    ctimtd_(char *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *, real *, 
-	    complex *, complex *, real *, complex *, complex *, real *, 
-	    integer *, integer *, integer *, integer *, ftnlen), ctimhr_(char 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, real *, complex *, complex *, 
-	    complex *, complex *, real *, real *, integer *, integer *, 
-	    integer *, integer *, ftnlen), ctimgt_(char *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, real *, complex *, 
-	    complex *, integer *, real *, integer *, integer *, integer *, 
-	    integer *, ftnlen), ctimlq_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
-	    *, integer *, real *, complex *, complex *, complex *, complex *, 
-	    real *, real *, integer *, integer *, integer *, integer *, 
-	    ftnlen), ctimmm_(char *, char *, integer *, integer *, integer *, 
-	    integer *, real *, complex *, complex *, complex *, real *, 
-	    integer *, integer *, integer *, ftnlen, ftnlen), ctimpo_(char *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, real *, complex *, complex *, integer *, 
-	    real *, integer *, integer *, integer *, integer *, ftnlen), 
-	    ctimpp_(char *, integer *, integer *, integer *, integer *, 
-	    integer *, real *, complex *, complex *, integer *, real *, 
-	    integer *, integer *, integer *, integer *, ftnlen);
-    static real timmin;
-    extern /* Subroutine */ int ctimql_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
-	    *, integer *, real *, complex *, complex *, complex *, complex *, 
-	    real *, real *, integer *, integer *, integer *, integer *, 
 	    ftnlen);
+    static real flptbl[1088640], opctbl[1088640];
+    extern /* Subroutine */ int ctimhp_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, complex *, 
+	    integer *, real *, integer *, integer *, integer *, integer *, 
+	    ftnlen), ctimgt_(char *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, integer *, 
+	    real *, integer *, integer *, integer *, integer *, ftnlen), 
+	    ctimhr_(char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, real *, 
+	    complex *, complex *, complex *, complex *, real *, real *, 
+	    integer *, integer *, integer *, integer *, ftnlen), ctimlq_(char 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, real *, complex *, 
+	    complex *, complex *, complex *, real *, real *, integer *, 
+	    integer *, integer *, integer *, ftnlen);
+    static real timtbl[1088640];
+    extern /* Subroutine */ int ctimls_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, complex *, 
+	    complex *, real *, real *, real *, real *, real *, complex *, 
+	    real *, integer *, integer *, ftnlen);
+    static real timmin;
+    extern /* Subroutine */ int ctimmm_(char *, char *, integer *, integer *, 
+	    integer *, integer *, real *, complex *, complex *, complex *, 
+	    real *, integer *, integer *, integer *, ftnlen, ftnlen);
     static logical nxnbok;
     extern /* Subroutine */ int ctimmv_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, real *, complex *, integer *, 
 	    complex *, complex *, real *, integer *, integer *, integer *, 
-	    ftnlen), ctimpt_(char *, integer *, integer *, integer *, integer 
-	    *, integer *, integer *, real *, real *, complex *, complex *, 
+	    ftnlen), ctimpo_(char *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, integer *, real *, complex *, 
+	    complex *, integer *, real *, integer *, integer *, integer *, 
+	    integer *, ftnlen), ctimpp_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, integer *, 
 	    real *, integer *, integer *, integer *, integer *, ftnlen), 
-	    ctimqp_(char *, integer *, integer *, integer *, integer *, 
-	    integer *, real *, complex *, complex *, complex *, complex *, 
-	    real *, integer *, real *, integer *, integer *, integer *, 
-	    ftnlen), ctimqr_(char *, integer *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, integer 
-	    *, real *, complex *, complex *, complex *, complex *, real *, 
-	    real *, integer *, integer *, integer *, integer *, ftnlen), 
-	    ctimrq_(char *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *, integer *, integer *, 
-	    real *, complex *, complex *, complex *, complex *, real *, real *
-	    , integer *, integer *, integer *, integer *, ftnlen), ctimsp_(
+	    ctimpt_(char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, real *, real *, complex *, complex *, real *
+	    , integer *, integer *, integer *, integer *, ftnlen), ctimql_(
 	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    real *, complex *, complex *, complex *, integer *, real *, 
-	    integer *, integer *, integer *, integer *, ftnlen), ctimtp_(char 
+	    integer *, integer *, integer *, integer *, integer *, real *, 
+	    complex *, complex *, complex *, complex *, real *, real *, 
+	    integer *, integer *, integer *, integer *, ftnlen), ctimqp_(char 
 	    *, integer *, integer *, integer *, integer *, integer *, real *, 
-	    complex *, complex *, real *, integer *, integer *, integer *, 
-	    integer *, ftnlen), ctimtr_(char *, integer *, integer *, integer 
-	    *, integer *, integer *, integer *, integer *, integer *, real *, 
-	    complex *, complex *, real *, integer *, integer *, integer *, 
+	    complex *, complex *, complex *, complex *, real *, integer *, 
+	    real *, integer *, integer *, integer *, ftnlen), ctimqr_(char *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, real *, complex *, 
+	    complex *, complex *, complex *, real *, real *, integer *, 
+	    integer *, integer *, integer *, ftnlen), ctimrq_(char *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, integer *, real *, complex *, complex *, 
+	    complex *, complex *, real *, real *, integer *, integer *, 
+	    integer *, integer *, ftnlen), ctimsp_(char *, integer *, integer 
+	    *, integer *, integer *, integer *, real *, complex *, complex *, 
+	    complex *, integer *, real *, integer *, integer *, integer *, 
 	    integer *, ftnlen), ctimsy_(char *, integer *, integer *, integer 
 	    *, integer *, integer *, integer *, integer *, integer *, real *, 
 	    complex *, complex *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *, ftnlen);
-    static real reslts[55296]	/* was [12][12][8][48] */;
+	    integer *, integer *, integer *, ftnlen), ctimtd_(char *, integer 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, real *, 
+	    complex *, complex *, real *, integer *, integer *, integer *, 
+	    integer *, ftnlen);
+    static real reslts[6912]	/* was [6][6][8][24] */;
+    extern /* Subroutine */ int ctimtp_(char *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, real *, 
+	    integer *, integer *, integer *, integer *, ftnlen), ctimtr_(char 
+	    *, integer *, integer *, integer *, integer *, integer *, integer 
+	    *, integer *, integer *, real *, complex *, complex *, real *, 
+	    integer *, integer *, integer *, integer *, ftnlen);
     static integer nnb;
     static logical mok, nok;
     static integer ldr1, ldr2, ldr3;
@@ -193,65 +209,72 @@ static integer c__2 = 2;
     static cilist io___5 = { 0, 6, 0, fmt_9983, 0 };
     static cilist io___6 = { 0, 5, 0, "( A80 )", 0 };
     static cilist io___10 = { 0, 6, 0, "( 1X, A, / )", 0 };
-    static cilist io___11 = { 0, 5, 0, 0, 0 };
-    static cilist io___13 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___14 = { 0, 5, 0, 0, 0 };
-    static cilist io___17 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___20 = { 0, 6, 0, fmt_9997, 0 };
-    static cilist io___21 = { 0, 6, 0, 0, 0 };
-    static cilist io___22 = { 0, 5, 0, 0, 0 };
-    static cilist io___24 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___25 = { 0, 5, 0, 0, 0 };
-    static cilist io___27 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___30 = { 0, 6, 0, fmt_9997, 0 };
-    static cilist io___31 = { 0, 6, 0, 0, 0 };
-    static cilist io___32 = { 0, 5, 0, 0, 0 };
-    static cilist io___34 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___35 = { 0, 5, 0, 0, 0 };
-    static cilist io___37 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___40 = { 0, 5, 0, 0, 0 };
-    static cilist io___42 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___43 = { 0, 5, 0, 0, 0 };
-    static cilist io___46 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___48 = { 0, 5, 0, 0, 0 };
-    static cilist io___49 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___11 = { 0, 6, 0, fmt_9992, 0 };
+    static cilist io___12 = { 0, 5, 0, 0, 0 };
+    static cilist io___14 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___15 = { 0, 5, 0, 0, 0 };
+    static cilist io___18 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___21 = { 0, 6, 0, fmt_9997, 0 };
+    static cilist io___22 = { 0, 6, 0, 0, 0 };
+    static cilist io___23 = { 0, 5, 0, 0, 0 };
+    static cilist io___25 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___26 = { 0, 5, 0, 0, 0 };
+    static cilist io___28 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___31 = { 0, 6, 0, fmt_9997, 0 };
+    static cilist io___32 = { 0, 6, 0, 0, 0 };
+    static cilist io___33 = { 0, 5, 0, 0, 0 };
+    static cilist io___35 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___36 = { 0, 5, 0, 0, 0 };
+    static cilist io___38 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___41 = { 0, 5, 0, 0, 0 };
+    static cilist io___43 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___44 = { 0, 5, 0, 0, 0 };
+    static cilist io___47 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___49 = { 0, 5, 0, 0, 0 };
     static cilist io___50 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___51 = { 0, 5, 0, 0, 0 };
-    static cilist io___53 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___54 = { 0, 5, 0, 0, 0 };
-    static cilist io___56 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___59 = { 0, 6, 0, fmt_9998, 0 };
-    static cilist io___60 = { 0, 6, 0, 0, 0 };
-    static cilist io___63 = { 0, 6, 0, fmt_9995, 0 };
-    static cilist io___65 = { 0, 6, 0, fmt_9994, 0 };
-    static cilist io___67 = { 0, 6, 0, fmt_9996, 0 };
-    static cilist io___68 = { 0, 6, 0, fmt_9984, 0 };
-    static cilist io___69 = { 0, 6, 0, 0, 0 };
+    static cilist io___51 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___52 = { 0, 5, 0, 0, 0 };
+    static cilist io___54 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___55 = { 0, 5, 0, 0, 0 };
+    static cilist io___57 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___60 = { 0, 6, 0, fmt_9998, 0 };
+    static cilist io___61 = { 0, 6, 0, 0, 0 };
+    static cilist io___64 = { 0, 6, 0, fmt_9995, 0 };
+    static cilist io___66 = { 0, 6, 0, fmt_9994, 0 };
+    static cilist io___68 = { 0, 6, 0, fmt_9996, 0 };
+    static cilist io___69 = { 0, 6, 0, fmt_9984, 0 };
     static cilist io___70 = { 0, 6, 0, 0, 0 };
-    static cilist io___71 = { 0, 5, 0, 0, 0 };
-    static cilist io___73 = { 0, 6, 0, fmt_9993, 0 };
-    static cilist io___74 = { 0, 6, 0, 0, 0 };
-    static cilist io___75 = { 0, 5, 1, "(A)", 0 };
+    static cilist io___71 = { 0, 6, 0, 0, 0 };
+    static cilist io___72 = { 0, 5, 0, 0, 0 };
+    static cilist io___74 = { 0, 6, 0, fmt_9993, 0 };
+    static cilist io___75 = { 0, 6, 0, 0, 0 };
     static cilist io___76 = { 0, 5, 1, "(A)", 0 };
-    static cilist io___77 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___82 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___83 = { 0, 5, 1, "(A)", 0 };
-    static cilist io___84 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___88 = { 0, 6, 0, fmt_9987, 0 };
-    static cilist io___92 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___93 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___77 = { 0, 5, 1, "(A)", 0 };
+    static cilist io___78 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___83 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___84 = { 0, 5, 1, "(A)", 0 };
+    static cilist io___85 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___89 = { 0, 6, 0, fmt_9987, 0 };
+    static cilist io___93 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___94 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___95 = { 0, 6, 0, fmt_9987, 0 };
-    static cilist io___96 = { 0, 5, 1, "(A)", 0 };
-    static cilist io___98 = { 0, 6, 0, fmt_9986, 0 };
-    static cilist io___99 = { 0, 6, 0, fmt_9985, 0 };
+    static cilist io___95 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___103 = { 0, 6, 0, fmt_9987, 0 };
+    static cilist io___104 = { 0, 5, 1, "(A)", 0 };
+    static cilist io___106 = { 0, 6, 0, fmt_9986, 0 };
+    static cilist io___107 = { 0, 6, 0, fmt_9985, 0 };
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*272384 + a_1 - 272385
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*272384 + a_1 - 272385
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
     Purpose   
     =======   
@@ -260,8 +283,7 @@ static integer c__2 = 2;
     routines.  This program collects performance data for the factor,   
     solve, and inverse routines used in solving systems of linear   
     equations, and also for the orthogonal factorization and reduction   
-    routines used in solving least squares problems and matrix eigenvalue 
-  
+    routines used in solving least squares problems and matrix eigenvalue   
     problems.   
 
     The subprograms call a REAL function SECOND with no   
@@ -274,14 +296,10 @@ static integer c__2 = 2;
     for each subroutine is included for timing small problems or for   
     obtaining results on a machine with an inaccurate SECOND function.   
 
-    The matrix dimensions M, N, and K correspond to the three dimensions 
-  
-    m, n, and k in the Level 3 BLAS.  When timing the LAPACK routines for 
-  
-    square matrices, M and N correspond to the matrix dimensions m and n, 
-  
-    and K is the number of right-hand sides (nrhs) for the solves.  When 
-  
+    The matrix dimensions M, N, and K correspond to the three dimensions   
+    m, n, and k in the Level 3 BLAS.  When timing the LAPACK routines for   
+    square matrices, M and N correspond to the matrix dimensions m and n,   
+    and K is the number of right-hand sides (nrhs) for the solves.  When   
     timing the LAPACK routines for band matrices, M is the matrix order   
     m, N is the half-bandwidth (kl, ku, or kd in the LAPACK notation),   
     and K is again the number of right-hand sides.   
@@ -296,13 +314,10 @@ static integer c__2 = 2;
     records, the first 6 characters are reserved for the path or   
     subroutine name.  If a path name is used, the characters after the   
     path name indicate the routines in the path to be timed, where   
-    'T' or 't' means 'Time this routine'.  If the line is blank after the 
-  
+    'T' or 't' means 'Time this routine'.  If the line is blank after the   
     path name, all routines in the path are timed.  If fewer characters   
-    appear than routines in a path, the remaining characters are assumed 
-  
-    to be 'F'.  For example, the following 3 lines are equivalent ways of 
-  
+    appear than routines in a path, the remaining characters are assumed   
+    to be 'F'.  For example, the following 3 lines are equivalent ways of   
     requesting timing of CGETRF:   
     CGE    T F F   
     CGE    T   
@@ -340,12 +355,11 @@ static integer c__2 = 2;
     CHR    T T F F   
     CTD    T T F F   
     CBR    T F F   
+    CLS    T T T T T T   
 
     The routines are timed for all combinations of applicable values of   
-    M, N, K, NB, NX, and LDA, and for all combinations of options such as 
-  
-    UPLO and TRANS.  For Level 2 BLAS timings, values of NB are used for 
-  
+    M, N, K, NB, NX, and LDA, and for all combinations of options such as   
+    UPLO and TRANS.  For Level 2 BLAS timings, values of NB are used for   
     INCX.  Certain subroutines, such as the QR factorization, treat the   
     values of M and N as ordered pairs and operate on M x N matrices.   
 
@@ -372,16 +386,14 @@ static integer c__2 = 2;
             The unit number for input.  Currently set to 5 (std input).   
 
     NOUT    INTEGER   
-            The unit number for output.  Currently set to 6 (std output). 
-  
+            The unit number for output.  Currently set to 6 (std output).   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     s1 = second_();
-    ldr1 = 12;
-    ldr2 = 12;
+    ldr1 = 6;
+    ldr2 = 6;
     ldr3 = 8;
     s_wsfe(&io___5);
     e_wsfe();
@@ -391,7 +403,7 @@ static integer c__2 = 2;
        data file format is assumed. */
 
     s_rsfe(&io___6);
-    do_fio(&c__1, line, 80L);
+    do_fio(&c__1, line, (ftnlen)80);
     e_rsfe();
     blas = lsamen_(&c__4, line, "BLAS");
 
@@ -409,31 +421,33 @@ L20:
     s_wsfe(&io___10);
     do_fio(&c__1, line, l);
     e_wsfe();
+    s_wsfe(&io___11);
+    e_wsfe();
 
 /*     Read in NM and the values for M. */
 
-    s_rsle(&io___11);
+    s_rsle(&io___12);
     do_lio(&c__3, &c__1, (char *)&nm, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nm > 12) {
-	s_wsfe(&io___13);
-	do_fio(&c__1, "M", 1L);
-	do_fio(&c__1, "NM", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+    if (nm > 6) {
+	s_wsfe(&io___14);
+	do_fio(&c__1, "M", (ftnlen)1);
+	do_fio(&c__1, "NM", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nm = 12;
+	nm = 6;
     }
-    s_rsle(&io___14);
+    s_rsle(&io___15);
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
-    s_wsfe(&io___17);
-    do_fio(&c__1, "M:     ", 7L);
+    s_wsfe(&io___18);
+    do_fio(&c__1, "M:     ", (ftnlen)7);
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -442,14 +456,14 @@ L20:
     mok = TRUE_;
     maxm = 0;
     i__1 = nm;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = mval[i - 1];
+	i__2 = mval[i__ - 1];
 	maxm = max(i__2,maxm);
-	if (mval[i - 1] > 5000) {
-	    s_wsfe(&io___20);
-	    do_fio(&c__1, "M", 1L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+	if (mval[i__ - 1] > 5000) {
+	    s_wsfe(&io___21);
+	    do_fio(&c__1, "M", (ftnlen)1);
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__5000, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    mok = FALSE_;
@@ -457,34 +471,34 @@ L20:
 /* L30: */
     }
     if (! mok) {
-	s_wsle(&io___21);
+	s_wsle(&io___22);
 	e_wsle();
     }
 
 /*     Read in NN and the values for N. */
 
-    s_rsle(&io___22);
+    s_rsle(&io___23);
     do_lio(&c__3, &c__1, (char *)&nn, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nn > 12) {
-	s_wsfe(&io___24);
-	do_fio(&c__1, "N", 1L);
-	do_fio(&c__1, "NN", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+    if (nn > 6) {
+	s_wsfe(&io___25);
+	do_fio(&c__1, "N", (ftnlen)1);
+	do_fio(&c__1, "NN", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nn = 12;
+	nn = 6;
     }
-    s_rsle(&io___25);
+    s_rsle(&io___26);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
-    s_wsfe(&io___27);
-    do_fio(&c__1, "N:     ", 7L);
+    s_wsfe(&io___28);
+    do_fio(&c__1, "N:     ", (ftnlen)7);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -493,14 +507,14 @@ L20:
     nok = TRUE_;
     maxn = 0;
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = nval[i - 1];
+	i__2 = nval[i__ - 1];
 	maxn = max(i__2,maxn);
-	if (nval[i - 1] > 5000) {
-	    s_wsfe(&io___30);
-	    do_fio(&c__1, "N", 1L);
-	    do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+	if (nval[i__ - 1] > 5000) {
+	    s_wsfe(&io___31);
+	    do_fio(&c__1, "N", (ftnlen)1);
+	    do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__5000, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    nok = FALSE_;
@@ -508,34 +522,34 @@ L20:
 /* L40: */
     }
     if (! nok) {
-	s_wsle(&io___31);
+	s_wsle(&io___32);
 	e_wsle();
     }
 
 /*     Read in NK and the values for K. */
 
-    s_rsle(&io___32);
+    s_rsle(&io___33);
     do_lio(&c__3, &c__1, (char *)&nk, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nk > 12) {
-	s_wsfe(&io___34);
-	do_fio(&c__1, "K", 1L);
-	do_fio(&c__1, "NK", 2L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+    if (nk > 6) {
+	s_wsfe(&io___35);
+	do_fio(&c__1, "K", (ftnlen)1);
+	do_fio(&c__1, "NK", (ftnlen)2);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nk = 12;
+	nk = 6;
     }
-    s_rsle(&io___35);
+    s_rsle(&io___36);
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
-    s_wsfe(&io___37);
-    do_fio(&c__1, "K:     ", 7L);
+    s_wsfe(&io___38);
+    do_fio(&c__1, "K:     ", (ftnlen)7);
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -543,9 +557,9 @@ L20:
 
     maxk = 0;
     i__1 = nk;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = kval[i - 1];
+	i__2 = kval[i__ - 1];
 	maxk = max(i__2,maxk);
 /* L50: */
     }
@@ -554,21 +568,22 @@ L20:
 /*     Read in NNB and the values for NB.  For the BLAS input files,   
        NBVAL is used to store values for INCX and INCY. */
 
-    s_rsle(&io___40);
+    s_rsle(&io___41);
     do_lio(&c__3, &c__1, (char *)&nnb, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nnb > 12) {
-	s_wsfe(&io___42);
-	do_fio(&c__1, "NB", 2L);
-	do_fio(&c__1, "NNB", 3L);
-	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
+    if (nnb > 6) {
+	s_wsfe(&io___43);
+	do_fio(&c__1, "NB", (ftnlen)2);
+	do_fio(&c__1, "NNB", (ftnlen)3);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	nnb = 12;
+	nnb = 6;
     }
-    s_rsle(&io___43);
+    s_rsle(&io___44);
     i__1 = nnb;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer))
+		;
     }
     e_rsle();
 
@@ -576,78 +591,79 @@ L20:
 
     maxnb = 0;
     i__1 = nnb;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = nbval[i - 1];
+	i__2 = nbval[i__ - 1];
 	maxnb = max(i__2,maxnb);
 /* L60: */
     }
 
     if (blas) {
-	s_wsfe(&io___46);
-	do_fio(&c__1, "INCX:  ", 7L);
+	s_wsfe(&io___47);
+	do_fio(&c__1, "INCX:  ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    nxval[i - 1] = 0;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nxval[i__ - 1] = 0;
 /* L70: */
 	}
     } else {
 
 /*        LAPACK data files:  Read in the values for NX. */
 
-	s_rsle(&io___48);
+	s_rsle(&io___49);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 
-	s_wsfe(&io___49);
-	do_fio(&c__1, "NB:    ", 7L);
+	s_wsfe(&io___50);
+	do_fio(&c__1, "NB:    ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
-	s_wsfe(&io___50);
-	do_fio(&c__1, "NX:    ", 7L);
+	s_wsfe(&io___51);
+	do_fio(&c__1, "NX:    ", (ftnlen)7);
 	i__1 = nnb;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     }
 
 /*     Read in NLDA and the values for LDA. */
 
-    s_rsle(&io___51);
+    s_rsle(&io___52);
     do_lio(&c__3, &c__1, (char *)&nlda, (ftnlen)sizeof(integer));
     e_rsle();
     if (nlda > 4) {
-	s_wsfe(&io___53);
-	do_fio(&c__1, "LDA", 3L);
-	do_fio(&c__1, "NLDA", 4L);
+	s_wsfe(&io___54);
+	do_fio(&c__1, "LDA", (ftnlen)3);
+	do_fio(&c__1, "NLDA", (ftnlen)4);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
 	nlda = 4;
     }
-    s_rsle(&io___54);
+    s_rsle(&io___55);
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer)
+		);
     }
     e_rsle();
-    s_wsfe(&io___56);
-    do_fio(&c__1, "LDA:   ", 7L);
+    s_wsfe(&io___57);
+    do_fio(&c__1, "LDA:   ", (ftnlen)7);
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -656,20 +672,20 @@ L20:
     ldaok = TRUE_;
     maxlda = 0;
     i__1 = nlda;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	i__2 = ldaval[i - 1];
+	i__2 = ldaval[i__ - 1];
 	maxlda = max(i__2,maxlda);
-	if (ldaval[i - 1] <= 0) {
-	    s_wsfe(&io___59);
-	    do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+	if (ldaval[i__ - 1] <= 0) {
+	    s_wsfe(&io___60);
+	    do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    ldaok = FALSE_;
 	}
 /* L80: */
     }
     if (! ldaok) {
-	s_wsle(&io___60);
+	s_wsle(&io___61);
 	e_wsle();
     }
 
@@ -677,8 +693,8 @@ L20:
 
     ldanok = TRUE_;
     need = maxlda * maxn;
-    if (need > 362400) {
-	s_wsfe(&io___63);
+    if (need > 272384) {
+	s_wsfe(&io___64);
 	do_fio(&c__1, (char *)&maxlda, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&need, (ftnlen)sizeof(integer));
@@ -690,9 +706,9 @@ L20:
 
     ldamok = TRUE_;
     need = maxlda * maxm + maxm * maxk;
-    if (need > 1087200) {
+    if (need > 817152) {
 	need = (need + 2) / 3;
-	s_wsfe(&io___65);
+	s_wsfe(&io___66);
 	do_fio(&c__1, (char *)&maxlda, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxm, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxk, (ftnlen)sizeof(integer));
@@ -705,8 +721,8 @@ L20:
 
     nxnbok = TRUE_;
     need = maxn * maxnb;
-    if (need > 362400) {
-	s_wsfe(&io___67);
+    if (need > 272384) {
+	s_wsfe(&io___68);
 	do_fio(&c__1, (char *)&maxn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&maxnb, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&need, (ftnlen)sizeof(integer));
@@ -715,35 +731,35 @@ L20:
     }
 
     if (! (mok && nok && ldaok && ldanok && nxnbok)) {
-	s_wsfe(&io___68);
+	s_wsfe(&io___69);
 	e_wsfe();
 	goto L110;
     }
     if (! ldamok) {
-	s_wsle(&io___69);
+	s_wsle(&io___70);
 	e_wsle();
     }
 
 /*     Read the minimum time to time a subroutine. */
 
-    s_wsle(&io___70);
+    s_wsle(&io___71);
     e_wsle();
-    s_rsle(&io___71);
+    s_rsle(&io___72);
     do_lio(&c__4, &c__1, (char *)&timmin, (ftnlen)sizeof(real));
     e_rsle();
-    s_wsfe(&io___73);
+    s_wsfe(&io___74);
     do_fio(&c__1, (char *)&timmin, (ftnlen)sizeof(real));
     e_wsfe();
-    s_wsle(&io___74);
+    s_wsle(&io___75);
     e_wsle();
 
 /*     Read the first input line. */
 
-    i__1 = s_rsfe(&io___75);
+    i__1 = s_rsfe(&io___76);
     if (i__1 != 0) {
 	goto L100;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
 	goto L100;
     }
@@ -756,11 +772,11 @@ L20:
        next line but don't time CGEMV and CGEMM. */
 
     if (lsamen_(&c__4, line, "NONE")) {
-	i__1 = s_rsfe(&io___76);
+	i__1 = s_rsfe(&io___77);
 	if (i__1 != 0) {
 	    goto L100;
 	}
-	i__1 = do_fio(&c__1, line, 80L);
+	i__1 = do_fio(&c__1, line, (ftnlen)80);
 	if (i__1 != 0) {
 	    goto L100;
 	}
@@ -769,39 +785,39 @@ L20:
 	    goto L100;
 	}
     } else {
-	s_wsfe(&io___77);
+	s_wsfe(&io___78);
 	e_wsfe();
 
-/*        If the first record is the special signal 'BAND', then time 
-  
+/*        If the first record is the special signal 'BAND', then time   
           the band routine CGBMV and CGEMM with N = K. */
 
 	if (lsamen_(&c__4, line, "BAND")) {
 	    if (ldamok) {
-		if (mkmax > 362400) {
-		    i2 = 724800 - mkmax + 1;
+		if (mkmax > 272384) {
+		    i2 = 544768 - mkmax + 1;
 		    j2 = 2;
 		} else {
-		    i2 = 362400 - mkmax + 1;
+		    i2 = 272384 - mkmax + 1;
 		    j2 = 3;
 		}
 		i__1 = mkmax / 2;
 		ctimmv_("CGBMV ", &nm, mval, &nn, nval, &nlda, ldaval, &
-			timmin, a, &i__1, &a[i2 + j2 * 362400 - 362401], &a[
-			362400 - mkmax / 2 + 724800], reslts, &ldr1, &ldr2, &
-			c__6, 6L);
+			timmin, &a_ref(1, 1), &i__1, &a_ref(i2, j2), &a_ref(
+			272384 - mkmax / 2 + 1, 3), reslts, &ldr1, &ldr2, &
+			c__6, (ftnlen)6);
 	    } else {
-		s_wsfe(&io___82);
-		do_fio(&c__1, "CGBMV ", 6L);
+		s_wsfe(&io___83);
+		do_fio(&c__1, "CGBMV ", (ftnlen)6);
 		e_wsfe();
 	    }
-	    ctimmm_("CGEMM ", "K", &nn, nval, &nlda, ldaval, &timmin, a, &a[
-		    362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 6L, 1L);
-	    i__1 = s_rsfe(&io___83);
+	    ctimmm_("CGEMM ", "K", &nn, nval, &nlda, ldaval, &timmin, &a_ref(
+		    1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &
+		    c__6, (ftnlen)6, (ftnlen)1);
+	    i__1 = s_rsfe(&io___84);
 	    if (i__1 != 0) {
 		goto L100;
 	    }
-	    i__1 = do_fio(&c__1, line, 80L);
+	    i__1 = do_fio(&c__1, line, (ftnlen)80);
 	    if (i__1 != 0) {
 		goto L100;
 	    }
@@ -815,117 +831,145 @@ L20:
 /*           Otherwise time CGEMV and CGEMM. */
 
 	    ctimmv_("CGEMV ", &nn, nval, &nnb, nbval, &nlda, ldaval, &timmin, 
-		    a, &c_b170, &a[362400], &a[724800], reslts, &ldr1, &ldr2, 
-		    &c__6, 6L);
-	    ctimmm_("CGEMM ", "N", &nn, nval, &nlda, ldaval, &timmin, a, &a[
-		    362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 6L, 1L);
+		    &a_ref(1, 1), &c_b172, &a_ref(1, 2), &a_ref(1, 3), reslts,
+		     &ldr1, &ldr2, &c__6, (ftnlen)6);
+	    ctimmm_("CGEMM ", "N", &nn, nval, &nlda, ldaval, &timmin, &a_ref(
+		    1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &ldr2, &
+		    c__6, (ftnlen)6, (ftnlen)1);
 	}
     }
 
 /*     Call the appropriate timing routine for each input line. */
 
-    s_wsfe(&io___84);
+    s_wsfe(&io___85);
     e_wsfe();
 L90:
     *(unsigned char *)c1 = *(unsigned char *)line;
-    s_copy(c2, line + 1, 2L, 2L);
-    s_copy(c3, line + 3, 3L, 3L);
+    s_copy(c2, line + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, line + 3, (ftnlen)3, (ftnlen)3);
 
 /*     Check first character for correct precision. */
 
     if (! lsame_(c1, "Complex precision")) {
-	s_wsfe(&io___88);
-	do_fio(&c__1, line, 6L);
+	s_wsfe(&io___89);
+	do_fio(&c__1, line, (ftnlen)6);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, c2, "B2") || lsamen_(&c__3, c3, "MV ") || lsamen_(&c__3, c3, "SV ") || lsamen_(&c__3, c3,
-	     "R  ") || lsamen_(&c__3, c3, "RC ") || lsamen_(&
-	    c__3, c3, "RU ") || lsamen_(&c__3, c3, "R2 ")) {
+    } else if (lsamen_(&c__2, c2, "B2") || lsamen_(&
+	    c__3, c3, "MV ") || lsamen_(&c__3, c3, 
+	    "SV ") || lsamen_(&c__3, c3, "R  ") || lsamen_(&c__3, c3, "RC ") 
+	    || lsamen_(&c__3, c3, "RU ") || lsamen_(&
+	    c__3, c3, "R2 ")) {
 
 /*        Level 2 BLAS */
 
 	ctimb2_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda, 
-		ldaval, &c_b170, &timmin, a, &a[362400], &a[724800], reslts, &
-		ldr1, &ldr2, &c__6, 80L);
+		ldaval, &c_b172, &timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(
+		1, 3), reslts, &ldr1, &ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "B3") || lsamen_(&c__3, c3, "MM ") || lsamen_(&c__3, c3, "SM ") || lsamen_(&c__3, c3,
-	     "RK ") || lsamen_(&c__3, c3, "R2K")) {
+    } else if (lsamen_(&c__2, c2, "B3") || lsamen_(&
+	    c__3, c3, "MM ") || lsamen_(&c__3, c3, 
+	    "SM ") || lsamen_(&c__3, c3, "RK ") || lsamen_(&c__3, c3, "R2K")) 
+	    {
 
 /*        Level 3 BLAS */
 
 	ctimb3_(line, &nm, mval, &nn, nval, &nk, kval, &nlda, ldaval, &timmin,
-		 a, &a[362400], &a[724800], reslts, &ldr1, &ldr2, &c__6, 80L);
+		 &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), reslts, &ldr1, &
+		ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QR") || lsamen_(&c__2, c3, "QR") || lsamen_(&c__2, c3 + 1, "QR")) {
+    } else if (lsamen_(&c__2, c2, "QR") || lsamen_(&
+	    c__2, c3, "QR") || lsamen_(&c__2, c3 + 1, 
+	    "QR")) {
 
 /*        QR routines */
 
 	ctimqr_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, e, &a[362400], &a[724800], d, reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), e, &a_ref(1, 2), &a_ref(1, 3), 
+		d__, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "LQ") || lsamen_(&c__2, c3, "LQ") || lsamen_(&c__2, c3 + 1, "LQ")) {
+    } else if (lsamen_(&c__2, c2, "LQ") || lsamen_(&
+	    c__2, c3, "LQ") || lsamen_(&c__2, c3 + 1, 
+	    "LQ")) {
 
 /*        LQ routines */
 
 	ctimlq_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, e, &a[362400], &a[724800], d, reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), e, &a_ref(1, 2), &a_ref(1, 3), 
+		d__, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c3, "QL") || lsamen_(&c__2, c3 + 1, "QL")) {
+    } else if (lsamen_(&c__2, c2, "QL") || lsamen_(&
+	    c__2, c3, "QL") || lsamen_(&c__2, c3 + 1, 
+	    "QL")) {
 
 /*        QL routines */
 
 	ctimql_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, e, &a[362400], &a[724800], d, reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), e, &a_ref(1, 2), &a_ref(1, 3), 
+		d__, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "RQ") || lsamen_(&c__2, c3, "RQ") || lsamen_(&c__2, c3 + 1, "RQ")) {
+    } else if (lsamen_(&c__2, c2, "RQ") || lsamen_(&
+	    c__2, c3, "RQ") || lsamen_(&c__2, c3 + 1, 
+	    "RQ")) {
 
 /*        RQ routines */
 
 	ctimrq_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, e, &a[362400], &a[724800], d, reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), e, &a_ref(1, 2), &a_ref(1, 3), 
+		d__, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "QP") || lsamen_(&c__3, c3, "QPF")) {
+    } else if (lsamen_(&c__2, c2, "QP") || lsamen_(&
+	    c__3, c3, "QPF")) {
 
 /*        QR with column pivoting */
 
-	ctimqp_(line, &nm, mval, nval, &nlda, ldaval, &timmin, a, &a[362400], 
-		e, &a[724800], d, iwork, reslts, &ldr1, &ldr2, &c__6, 80L);
+	ctimqp_(line, &nm, mval, nval, &nlda, ldaval, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), e, &a_ref(1, 3), d__, iwork, reslts, &ldr1, &
+		ldr2, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "HR") || lsamen_(&c__3, c3, "HRD") || lsamen_(&c__2, c3 + 1, "HR")) {
+/*        Rank-Revealing QR factorization */
+
+	ctimq3_(line, &nm, mval, nval, &nnb, nbval, nxval, &nlda, ldaval, &
+		timmin, &a_ref(1, 1), &a_ref(1, 2), e, &a_ref(1, 3), d__, 
+		iwork, reslts, &ldr1, &ldr2, &c__6, (ftnlen)80);
+
+    } else if (lsamen_(&c__2, c2, "HR") || lsamen_(&
+	    c__3, c3, "HRD") || lsamen_(&c__2, c3 + 1, 
+	    "HR")) {
 
 /*        Reduction to Hessenberg form */
 
 	ctimhr_(line, &nn, nval, &nk, kval, &nnb, nbval, nxval, &nlda, ldaval,
-		 &timmin, a, e, &a[362400], &a[724800], d, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		 &timmin, &a_ref(1, 1), e, &a_ref(1, 2), &a_ref(1, 3), d__, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "TD") || lsamen_(&c__3, c3, "TRD") || lsamen_(&c__2, c3 + 1, "TR")) {
+    } else if (lsamen_(&c__2, c2, "TD") || lsamen_(&
+	    c__3, c3, "TRD") || lsamen_(&c__2, c3 + 1, 
+	    "TR")) {
 
 /*        Reduction to tridiagonal form */
 
 	ctimtd_(line, &nn, nval, &nk, kval, &nnb, nbval, nxval, &nlda, ldaval,
-		 &timmin, a, &a[362400], d, e, &a[724800], reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		 &timmin, &a_ref(1, 1), &a_ref(1, 2), d__, e, &a_ref(1, 3), 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
-    } else if (lsamen_(&c__2, c2, "BR") || lsamen_(&c__3, c3, "BRD") || lsamen_(&c__2, c3 + 1, "BR")) {
+    } else if (lsamen_(&c__2, c2, "BR") || lsamen_(&
+	    c__3, c3, "BRD") || lsamen_(&c__2, c3 + 1, 
+	    "BR")) {
 
 /*        Reduction to bidiagonal form */
 
 	ctimbr_(line, &nn, mval, nval, &nk, kval, &nnb, nbval, nxval, &nlda, 
-		ldaval, &timmin, a, &a[362400], d, e, &a[724800], reslts, &
-		ldr1, &ldr2, &ldr3, &c__6, 80L);
+		ldaval, &timmin, &a_ref(1, 1), &a_ref(1, 2), d__, e, &a_ref(1,
+		 3), reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "GE")) {
 
 /*        Routines for general matrices */
 
 	ctimge_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], &a[724800], iwork, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), iwork, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
@@ -933,11 +977,12 @@ L90:
 
 	if (ldamok) {
 	    ctimgb_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda,
-		     ldaval, &timmin, a, &a[362400 - mkmax + 724800], iwork, 
-		    reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+		     ldaval, &timmin, &a_ref(1, 1), &a_ref(272384 - mkmax + 1,
+		     3), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)
+		    80);
 	} else {
-	    s_wsfe(&io___92);
-	    do_fio(&c__1, line, 6L);
+	    s_wsfe(&io___93);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
@@ -945,42 +990,44 @@ L90:
 
 /*        Routines for general tridiagonal matrices */
 
-	ctimgt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, a, &a[
-		362400], iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimgt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, &a_ref(1, 
+		1), &a_ref(1, 2), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (
+		ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PO")) {
 
 /*        Positive definite matrices */
 
 	ctimpo_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], iwork, reslts, &ldr1, &ldr2, &ldr3, &
-		c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), iwork, reslts, &ldr1, &
+		ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
 /*        Positive definite packed matrices */
 
-	ctimpp_(line, &nn, nval, &nk, kval, &c_b170, &timmin, a, &a[362400], 
-		iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimpp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, (
+		ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
 /*        Positive definite banded matrices */
 
 	if (ldamok) {
-	    if (mkmax > 362400) {
+	    if (mkmax > 272384) {
 		j2 = 2;
-		i2 = 724800 - mkmax + 1;
+		i2 = 544768 - mkmax + 1;
 	    } else {
 		j2 = 3;
-		i2 = 362400 - mkmax + 1;
+		i2 = 272384 - mkmax + 1;
 	    }
 	    ctimpb_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, &nlda,
-		     ldaval, &timmin, a, &a[i2 + j2 * 362400 - 362401], iwork,
-		     reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+		     ldaval, &timmin, &a_ref(1, 1), &a_ref(i2, j2), iwork, 
+		    reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 	} else {
-	    s_wsfe(&io___93);
-	    do_fio(&c__1, line, 6L);
+	    s_wsfe(&io___94);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
@@ -988,89 +1035,101 @@ L90:
 
 /*        Routines for positive definite tridiagonal matrices */
 
-	ctimpt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, d, a, &a[
-		362400], reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimpt_(line, &nn, nval, &nk, kval, &nlda, ldaval, &timmin, d__, &
+		a_ref(1, 1), &a_ref(1, 2), reslts, &ldr1, &ldr2, &ldr3, &c__6,
+		 (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "HE")) {
 
 /*        Hermitian indefinite matrices */
 
 	ctimhe_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], &a[724800], iwork, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), iwork, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "HP")) {
 
 /*        Hermitian indefinite packed matrices */
 
-	ctimhp_(line, &nn, nval, &nk, kval, &c_b170, &timmin, a, &a[362400], &
-		a[724800], iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimhp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), &a_ref(1, 3), iwork, reslts, &ldr1, &ldr2, &ldr3,
+		 &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "SY")) {
 
 /*        Symmetric indefinite matrices */
 
 	ctimsy_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], &a[724800], iwork, reslts, &ldr1, &
-		ldr2, &ldr3, &c__6, 80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), iwork, 
+		reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
 /*        Symmetric indefinite packed matrices */
 
-	ctimsp_(line, &nn, nval, &nk, kval, &c_b170, &timmin, a, &a[362400], &
-		a[724800], iwork, reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimsp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), &a_ref(1, 3), iwork, reslts, &ldr1, &ldr2, &ldr3,
+		 &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TR")) {
 
 /*        Triangular matrices */
 
 	ctimtr_(line, &nn, nval, &nk, kval, &nnb, nbval, &nlda, ldaval, &
-		timmin, a, &a[362400], reslts, &ldr1, &ldr2, &ldr3, &c__6, 
-		80L);
+		timmin, &a_ref(1, 1), &a_ref(1, 2), reslts, &ldr1, &ldr2, &
+		ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TP")) {
 
 /*        Triangular packed matrices */
 
-	ctimtp_(line, &nn, nval, &nk, kval, &c_b170, &timmin, a, &a[362400], 
-		reslts, &ldr1, &ldr2, &ldr3, &c__6, 80L);
+	ctimtp_(line, &nn, nval, &nk, kval, &c_b172, &timmin, &a_ref(1, 1), &
+		a_ref(1, 2), reslts, &ldr1, &ldr2, &ldr3, &c__6, (ftnlen)80);
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
 /*        Triangular band matrices */
 
 	if (ldamok) {
-	    if (mkmax > 362400) {
+	    if (mkmax > 272384) {
 		j2 = 2;
-		i2 = 724800 - mkmax + 1;
+		i2 = 544768 - mkmax + 1;
 	    } else {
 		j2 = 3;
-		i2 = 362400 - mkmax + 1;
+		i2 = 272384 - mkmax + 1;
 	    }
 	    ctimtb_(line, &nm, mval, &nn, nval, &nk, kval, &nlda, ldaval, &
-		    timmin, a, &a[i2 + j2 * 362400 - 362401], reslts, &ldr1, &
-		    ldr2, &ldr3, &c__6, 80L);
+		    timmin, &a_ref(1, 1), &a_ref(i2, j2), reslts, &ldr1, &
+		    ldr2, &ldr3, &c__6, (ftnlen)80);
 	} else {
-	    s_wsfe(&io___94);
-	    do_fio(&c__1, line, 6L);
+	    s_wsfe(&io___95);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	}
 
+    } else if (lsamen_(&c__2, c2, "LS")) {
+
+/*        Least squares drivers */
+
+	ctimls_(line, &nm, mval, &nn, nval, &nk, kval, &nnb, nbval, nxval, &
+		nlda, ldaval, &timmin, &a_ref(1, 1), &a_ref(1, 2), &b_ref(1, 
+		1), &b_ref(1, 2), s, &s[512], opctbl, timtbl, flptbl, work, 
+		rwork, iwork, &c__6, (ftnlen)80);
+
     } else {
 
-	s_wsfe(&io___95);
-	do_fio(&c__1, line, 6L);
+	s_wsfe(&io___103);
+	do_fio(&c__1, line, (ftnlen)6);
 	e_wsfe();
     }
 
 /*     Read the next line of the input file. */
 
-    i__1 = s_rsfe(&io___96);
+    i__1 = s_rsfe(&io___104);
     if (i__1 != 0) {
 	goto L100;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
 	goto L100;
     }
@@ -1084,19 +1143,24 @@ L90:
 
 L100:
     s2 = second_();
-    s_wsfe(&io___98);
+    s_wsfe(&io___106);
     e_wsfe();
-    s_wsfe(&io___99);
+    s_wsfe(&io___107);
     r__1 = s2 - s1;
     do_fio(&c__1, (char *)&r__1, (ftnlen)sizeof(real));
     e_wsfe();
 L110:
 
-/* L9992:   
 
-       End of CTIMAA */
+/*     End of CTIMAA */
 
     return 0;
-} /* MAIN__   
+} /* MAIN__ */
 
-   Main program alias */ int ctimaa_ () { MAIN__ (); return 0; }
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
+
+/* Main program alias */ int ctimaa_ () { MAIN__ (); return 0; }

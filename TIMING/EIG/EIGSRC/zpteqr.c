@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,8 +21,8 @@ static doublecomplex c_b2 = {1.,0.};
 static integer c__0 = 0;
 static integer c__1 = 1;
 
-/* Subroutine */ int zpteqr_(char *compz, integer *n, doublereal *d, 
-	doublereal *e, doublecomplex *z, integer *ldz, doublereal *work, 
+/* Subroutine */ int zpteqr_(char *compz, integer *n, doublereal *d__, 
+	doublereal *e, doublecomplex *z__, integer *ldz, doublereal *work, 
 	integer *info)
 {
     /* System generated locals */
@@ -31,8 +32,8 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublecomplex c[1]	/* was [1][1] */;
-    static integer i;
+    static doublecomplex c__[1]	/* was [1][1] */;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static doublecomplex vt[1]	/* was [1][1] */;
     extern /* Subroutine */ int xerbla_(char *, integer *);
@@ -46,11 +47,14 @@ static integer c__1 = 1;
     static integer nru;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
@@ -59,24 +63,20 @@ static integer c__1 = 1;
     =======   
 
     ZPTEQR computes all eigenvalues and, optionally, eigenvectors of a   
-    symmetric positive definite tridiagonal matrix by first factoring the 
-  
+    symmetric positive definite tridiagonal matrix by first factoring the   
     matrix using DPTTRF and then calling ZBDSQR to compute the singular   
     values of the bidiagonal factor.   
 
     This routine computes the eigenvalues of the positive definite   
-    tridiagonal matrix to high relative accuracy.  This means that if the 
-  
+    tridiagonal matrix to high relative accuracy.  This means that if the   
     eigenvalues range over many orders of magnitude in size, then the   
     small eigenvalues and corresponding eigenvectors will be computed   
     more accurately than, for example, with the standard QR method.   
 
-    The eigenvectors of a full or band positive definite Hermitian matrix 
-  
+    The eigenvectors of a full or band positive definite Hermitian matrix   
     can also be found if ZHETRD, ZHPTRD, or ZHBTRD has been used to   
     reduce this matrix to tridiagonal form.  (The reduction to   
-    tridiagonal form, however, may preclude the possibility of obtaining 
-  
+    tridiagonal form, however, may preclude the possibility of obtaining   
     high relative accuracy in the small eigenvalues of the original   
     matrix, if these eigenvalues range over many orders of magnitude.)   
 
@@ -95,8 +95,7 @@ static integer c__1 = 1;
             The order of the matrix.  N >= 0.   
 
     D       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, the n diagonal elements of the tridiagonal matrix. 
-  
+            On entry, the n diagonal elements of the tridiagonal matrix.   
             On normal exit, D contains the eigenvalues, in descending   
             order.   
 
@@ -108,8 +107,7 @@ static integer c__1 = 1;
     Z       (input/output) COMPLEX*16 array, dimension (LDZ, N)   
             On entry, if COMPZ = 'V', the unitary matrix used in the   
             reduction to tridiagonal form.   
-            On exit, if COMPZ = 'V', the orthonormal eigenvectors of the 
-  
+            On exit, if COMPZ = 'V', the orthonormal eigenvectors of the   
             original Hermitian matrix;   
             if COMPZ = 'I', the orthonormal eigenvectors of the   
             tridiagonal matrix.   
@@ -121,34 +119,30 @@ static integer c__1 = 1;
             The leading dimension of the array Z.  LDZ >= 1, and if   
             COMPZ = 'V' or 'I', LDZ >= max(1,N).   
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
-            If  COMPZ = 'N', then LWORK = 2*N   
-            If  COMPZ = 'V' or 'I', then LWORK = MAX(1,4*N-4)   
+    WORK    (workspace) DOUBLE PRECISION array, dimension (4*N)   
 
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = i, and i is:   
                   <= N  the Cholesky factorization of the matrix could   
-                        not be performed because the i-th principal minor 
-  
+                        not be performed because the i-th principal minor   
                         was not positive definite.   
                   > N   the SVD algorithm failed to converge;   
                         if INFO = N+i, i off-diagonal elements of the   
                         bidiagonal factor did not converge to zero.   
 
-    ==================================================================== 
-  
+    ====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     --work;
 
     /* Function Body */
@@ -184,30 +178,30 @@ static integer c__1 = 1;
 
     if (*n == 1) {
 	if (icompz > 0) {
-	    i__1 = z_dim1 + 1;
-	    z[i__1].r = 1., z[i__1].i = 0.;
+	    i__1 = z___subscr(1, 1);
+	    z__[i__1].r = 1., z__[i__1].i = 0.;
 	}
 	return 0;
     }
     if (icompz == 2) {
-	zlaset_("Full", n, n, &c_b1, &c_b2, &z[z_offset], ldz);
+	zlaset_("Full", n, n, &c_b1, &c_b2, &z__[z_offset], ldz);
     }
 
 /*     Call DPTTRF to factor the matrix. */
 
     latime_1.ops = latime_1.ops + *n * 5 - 4;
-    dpttrf_(n, &d[1], &e[1], info);
+    dpttrf_(n, &d__[1], &e[1], info);
     if (*info != 0) {
 	return 0;
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	d[i] = sqrt(d[i]);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__[i__] = sqrt(d__[i__]);
 /* L10: */
     }
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	e[i] *= d[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	e[i__] *= d__[i__];
 /* L20: */
     }
 
@@ -219,16 +213,16 @@ static integer c__1 = 1;
     } else {
 	nru = 0;
     }
-    zbdsqr_("Lower", n, &c__0, &nru, &c__0, &d[1], &e[1], vt, &c__1, &z[
-	    z_offset], ldz, c, &c__1, &work[1], info);
+    zbdsqr_("Lower", n, &c__0, &nru, &c__0, &d__[1], &e[1], vt, &c__1, &z__[
+	    z_offset], ldz, c__, &c__1, &work[1], info);
 
 /*     Square the singular values. */
 
     if (*info == 0) {
 	latime_1.ops += *n;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    d[i] *= d[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    d__[i__] *= d__[i__];
 /* L30: */
 	}
     } else {
@@ -240,4 +234,8 @@ static integer c__1 = 1;
 /*     End of ZPTEQR */
 
 } /* zpteqr_ */
+
+#undef z___ref
+#undef z___subscr
+
 

@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgerqf_(integer *m, integer *n, real *a, integer *lda, 
 	real *tau, real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -28,10 +29,8 @@
             On entry, the M-by-N matrix A.   
             On exit,   
             if m <= n, the upper triangle of the subarray   
-            A(1:m,n-m+1:n) contains the M-by-M upper triangular matrix R; 
-  
-            if m >= n, the elements on and above the (m-n)-th subdiagonal 
-  
+            A(1:m,n-m+1:n) contains the M-by-M upper triangular matrix R;   
+            if m >= n, the elements on and above the (m-n)-th subdiagonal   
             contain the M-by-N upper trapezoidal matrix R;   
             the remaining elements, with the array TAU, represent the   
             orthogonal matrix Q as a product of min(m,n) elementary   
@@ -41,8 +40,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) REAL array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace/output) REAL array, dimension (LWORK)   
@@ -52,6 +50,11 @@
             The dimension of the array WORK.  LWORK >= max(1,M).   
             For optimum performance LWORK >= M*NB, where NB is   
             the optimal blocksize.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -69,19 +72,15 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in 
-  
+    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in   
     A(m-k+i,1:n-k+i-1), and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -91,7 +90,7 @@
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
-    static integer i, k, nbmin, iinfo;
+    static integer i__, k, nbmin, iinfo;
     extern /* Subroutine */ int sgerq2_(integer *, integer *, real *, integer 
 	    *, real *, real *, integer *);
     static integer ib, nb, ki, kk, mu, nu, nx;
@@ -102,28 +101,39 @@
 	    integer *, integer *, ftnlen, ftnlen);
     extern /* Subroutine */ int slarft_(char *, char *, integer *, integer *, 
 	    real *, integer *, real *, real *, integer *);
-    static integer ldwork, iws;
+    static integer ldwork, lwkopt;
+    static logical lquery;
+    static integer iws;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
+    nb = ilaenv_(&c__1, "SGERQF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)
+	    1);
+    lwkopt = *m * nb;
+    work[1] = (real) lwkopt;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
     } else if (*lda < max(1,*m)) {
 	*info = -4;
-    } else if (*lwork < max(1,*m)) {
+    } else if (*lwork < max(1,*m) && ! lquery) {
 	*info = -7;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("SGERQF", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -131,42 +141,36 @@
 
     k = min(*m,*n);
     if (k == 0) {
-	WORK(1) = 1.f;
+	work[1] = 1.f;
 	return 0;
     }
 
-/*     Determine the block size. */
-
-    nb = ilaenv_(&c__1, "SGERQF", " ", m, n, &c_n1, &c_n1, 6L, 1L);
     nbmin = 2;
     nx = 1;
     iws = *m;
     if (nb > 1 && nb < k) {
 
-/*        Determine when to cross over from blocked to unblocked code.
-   
+/*        Determine when to cross over from blocked to unblocked code.   
 
    Computing MAX */
-	i__1 = 0, i__2 = ilaenv_(&c__3, "SGERQF", " ", m, n, &c_n1, &c_n1, 6L,
-		 1L);
+	i__1 = 0, i__2 = ilaenv_(&c__3, "SGERQF", " ", m, n, &c_n1, &c_n1, (
+		ftnlen)6, (ftnlen)1);
 	nx = max(i__1,i__2);
 	if (nx < k) {
 
-/*           Determine if workspace is large enough for blocked co
-de. */
+/*           Determine if workspace is large enough for blocked code. */
 
 	    ldwork = *m;
 	    iws = ldwork * nb;
 	    if (*lwork < iws) {
 
-/*              Not enough workspace to use optimal NB:  reduc
-e NB and   
+/*              Not enough workspace to use optimal NB:  reduce NB and   
                 determine the minimum value of NB. */
 
 		nb = *lwork / ldwork;
 /* Computing MAX */
 		i__1 = 2, i__2 = ilaenv_(&c__2, "SGERQF", " ", m, n, &c_n1, &
-			c_n1, 6L, 1L);
+			c_n1, (ftnlen)6, (ftnlen)1);
 		nbmin = max(i__1,i__2);
 	    }
 	}
@@ -184,40 +188,39 @@ e NB and
 
 	i__1 = k - kk + 1;
 	i__2 = -nb;
-	for (i = k - kk + ki + 1; -nb < 0 ? i >= k-kk+1 : i <= k-kk+1; i += -nb)
-		 {
+	for (i__ = k - kk + ki + 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ 
+		+= i__2) {
 /* Computing MIN */
-	    i__3 = k - i + 1;
+	    i__3 = k - i__ + 1;
 	    ib = min(i__3,nb);
 
 /*           Compute the RQ factorization of the current block   
              A(m-k+i:m-k+i+ib-1,1:n-k+i+ib-1) */
 
-	    i__3 = *n - k + i + ib - 1;
-	    sgerq2_(&ib, &i__3, &A(*m-k+i,1), lda, &TAU(i), &WORK(
-		    1), &iinfo);
-	    if (*m - k + i > 1) {
+	    i__3 = *n - k + i__ + ib - 1;
+	    sgerq2_(&ib, &i__3, &a_ref(*m - k + i__, 1), lda, &tau[i__], &
+		    work[1], &iinfo);
+	    if (*m - k + i__ > 1) {
 
-/*              Form the triangular factor of the block reflec
-tor   
+/*              Form the triangular factor of the block reflector   
                 H = H(i+ib-1) . . . H(i+1) H(i) */
 
-		i__3 = *n - k + i + ib - 1;
-		slarft_("Backward", "Rowwise", &i__3, &ib, &A(*m-k+i,1), lda, &TAU(i), &WORK(1), &ldwork);
+		i__3 = *n - k + i__ + ib - 1;
+		slarft_("Backward", "Rowwise", &i__3, &ib, &a_ref(*m - k + 
+			i__, 1), lda, &tau[i__], &work[1], &ldwork);
 
-/*              Apply H to A(1:m-k+i-1,1:n-k+i+ib-1) from the 
-right */
+/*              Apply H to A(1:m-k+i-1,1:n-k+i+ib-1) from the right */
 
-		i__3 = *m - k + i - 1;
-		i__4 = *n - k + i + ib - 1;
+		i__3 = *m - k + i__ - 1;
+		i__4 = *n - k + i__ + ib - 1;
 		slarfb_("Right", "No transpose", "Backward", "Rowwise", &i__3,
-			 &i__4, &ib, &A(*m-k+i,1), lda, &WORK(1), &
-			ldwork, &A(1,1), lda, &WORK(ib + 1), &ldwork);
+			 &i__4, &ib, &a_ref(*m - k + i__, 1), lda, &work[1], &
+			ldwork, &a[a_offset], lda, &work[ib + 1], &ldwork);
 	    }
 /* L10: */
 	}
-	mu = *m - k + i + nb - 1;
-	nu = *n - k + i + nb - 1;
+	mu = *m - k + i__ + nb - 1;
+	nu = *n - k + i__ + nb - 1;
     } else {
 	mu = *m;
 	nu = *n;
@@ -226,13 +229,16 @@ right */
 /*     Use unblocked code to factor the last or only block */
 
     if (mu > 0 && nu > 0) {
-	sgerq2_(&mu, &nu, &A(1,1), lda, &TAU(1), &WORK(1), &iinfo);
+	sgerq2_(&mu, &nu, &a[a_offset], lda, &tau[1], &work[1], &iinfo);
     }
 
-    WORK(1) = (real) iws;
+    work[1] = (real) iws;
     return 0;
 
 /*     End of SGERQF */
 
 } /* sgerqf_ */
+
+#undef a_ref
+
 

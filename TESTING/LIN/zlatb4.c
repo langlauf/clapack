@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,8 +11,8 @@
 static integer c__2 = 2;
 
 /* Subroutine */ int zlatb4_(char *path, integer *imat, integer *m, integer *
-	n, char *type, integer *kl, integer *ku, doublereal *anorm, integer *
-	mode, doublereal *cndnum, char *dist)
+	n, char *type__, integer *kl, integer *ku, doublereal *anorm, integer 
+	*mode, doublereal *cndnum, char *dist)
 {
     /* Initialized data */
 
@@ -34,7 +35,7 @@ static integer c__2 = 2;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -43,8 +44,7 @@ static integer c__2 = 2;
     Purpose   
     =======   
 
-    ZLATB4 sets parameters for the matrix generator based on the type of 
-  
+    ZLATB4 sets parameters for the matrix generator based on the type of   
     matrix to be generated.   
 
     Arguments   
@@ -76,8 +76,7 @@ static integer c__2 = 2;
             The upper band width of the matrix to be generated.   
 
     ANORM   (output) DOUBLE PRECISION   
-            The desired norm of the matrix to be generated.  The diagonal 
-  
+            The desired norm of the matrix to be generated.  The diagonal   
             matrix of singular values or eigenvalues is scaled by this   
             value.   
 
@@ -91,8 +90,7 @@ static integer c__2 = 2;
             The type of distribution to be used by the random number   
             generator.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Set some constants for use in the subroutine. */
@@ -113,7 +111,7 @@ static integer c__2 = 2;
 	large = 1. / small;
     }
 
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set some parameters we don't plan to change. */
 
@@ -123,12 +121,12 @@ static integer c__2 = 2;
 /*     xQR, xLQ, xQL, xRQ:  Set parameters to generate a general   
                             M x N matrix. */
 
-    if (lsamen_(&c__2, c2, "QR") || lsamen_(&c__2, c2, "LQ") 
-	    || lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c2, "RQ")) {
+    if (lsamen_(&c__2, c2, "QR") || lsamen_(&c__2, c2, 
+	    "LQ") || lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c2, "RQ")) {
 
 /*        Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the lower and upper bandwidths. */
 
@@ -178,7 +176,7 @@ static integer c__2 = 2;
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the lower and upper bandwidths. */
 
@@ -228,7 +226,7 @@ static integer c__2 = 2;
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the condition number and norm. */
 
@@ -250,12 +248,11 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "GT")) {
 
-/*        xGT:  Set parameters to generate a general tridiagonal matri
-x.   
+/*        xGT:  Set parameters to generate a general tridiagonal matrix.   
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the lower and upper bandwidths. */
 
@@ -284,17 +281,16 @@ x.
 	    *anorm = 1.;
 	}
 
-    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&c__2, c2, "PP") || lsamen_(&c__2, c2, "HE") || lsamen_(&c__2, c2, 
-	    "HP") || lsamen_(&c__2, c2, "SY") || lsamen_(&
-	    c__2, c2, "SP")) {
+    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&
+	    c__2, c2, "PP") || lsamen_(&c__2, c2, "HE") || lsamen_(&c__2, c2, "HP") || lsamen_(&c__2, c2, "SY") || 
+	    lsamen_(&c__2, c2, "SP")) {
 
-/*        xPO, xPP, xHE, xHP, xSY, xSP: Set parameters to generate a 
-  
+/*        xPO, xPP, xHE, xHP, xSY, xSP: Set parameters to generate a   
           symmetric or Hermitian matrix.   
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = *(unsigned char *)c2;
+	*(unsigned char *)type__ = *(unsigned char *)c2;
 
 /*        Set the lower and upper bandwidths. */
 
@@ -331,7 +327,7 @@ x.
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'P';
+	*(unsigned char *)type__ = 'P';
 
 /*        Set the norm and condition number. */
 
@@ -353,11 +349,10 @@ x.
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        xPT:  Set parameters to generate a symmetric positive defini
-te   
+/*        xPT:  Set parameters to generate a symmetric positive definite   
           tridiagonal matrix. */
 
-	*(unsigned char *)type = 'P';
+	*(unsigned char *)type__ = 'P';
 	if (*imat == 1) {
 	    *kl = 0;
 	} else {
@@ -383,13 +378,14 @@ te
 	    *anorm = 1.;
 	}
 
-    } else if (lsamen_(&c__2, c2, "TR") || lsamen_(&c__2, c2, "TP")) {
+    } else if (lsamen_(&c__2, c2, "TR") || lsamen_(&
+	    c__2, c2, "TP")) {
 
 /*        xTR, xTP:  Set parameters to generate a triangular matrix   
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the lower and upper bandwidths. */
 
@@ -429,12 +425,11 @@ te
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
-/*        xTB:  Set parameters to generate a triangular band matrix. 
-  
+/*        xTB:  Set parameters to generate a triangular band matrix.   
 
           Set TYPE, the type of matrix to be generated. */
 
-	*(unsigned char *)type = 'N';
+	*(unsigned char *)type__ = 'N';
 
 /*        Set the norm and condition number. */
 

@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ssbev_(char *jobz, char *uplo, integer *n, integer *kd, 
-	real *ab, integer *ldab, real *w, real *z, integer *ldz, real *work, 
-	integer *info)
+	real *ab, integer *ldab, real *w, real *z__, integer *ldz, real *work,
+	 integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -37,13 +38,10 @@
     AB      (input/output) REAL array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, AB is overwritten by values generated during the   
             reduction to tridiagonal form.  If UPLO = 'U', the first   
@@ -77,15 +75,12 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b11 = 1.f;
     static integer c__1 = 1;
@@ -122,15 +117,20 @@
     extern /* Subroutine */ int ssteqr_(char *, integer *, real *, real *, 
 	    real *, integer *, real *, integer *);
     static real eps;
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     lower = lsame_(uplo, "L");
 
@@ -162,9 +162,13 @@
     }
 
     if (*n == 1) {
-	W(1) = AB(1,1);
+	if (lower) {
+	    w[1] = ab_ref(1, 1);
+	} else {
+	    w[1] = ab_ref(*kd + 1, 1);
+	}
 	if (wantz) {
-	    Z(1,1) = 1.f;
+	    z___ref(1, 1) = 1.f;
 	}
 	return 0;
     }
@@ -180,7 +184,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = slansb_("M", uplo, n, kd, &AB(1,1), ldab, &WORK(1));
+    anrm = slansb_("M", uplo, n, kd, &ab[ab_offset], ldab, &work[1]);
     iscale = 0;
     if (anrm > 0.f && anrm < rmin) {
 	iscale = 1;
@@ -191,10 +195,10 @@
     }
     if (iscale == 1) {
 	if (lower) {
-	    slascl_("B", kd, kd, &c_b11, &sigma, n, n, &AB(1,1), ldab, 
+	    slascl_("B", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	} else {
-	    slascl_("Q", kd, kd, &c_b11, &sigma, n, n, &AB(1,1), ldab, 
+	    slascl_("Q", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	}
     }
@@ -203,16 +207,16 @@
 
     inde = 1;
     indwrk = inde + *n;
-    ssbtrd_(jobz, uplo, n, kd, &AB(1,1), ldab, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk), &iinfo);
+    ssbtrd_(jobz, uplo, n, kd, &ab[ab_offset], ldab, &w[1], &work[inde], &z__[
+	    z_offset], ldz, &work[indwrk], &iinfo);
 
-/*     For eigenvalues only, call SSTERF.  For eigenvectors, call SSTEQR. 
-*/
+/*     For eigenvalues only, call SSTERF.  For eigenvectors, call SSTEQR. */
 
     if (! wantz) {
-	ssterf_(n, &W(1), &WORK(inde), info);
+	ssterf_(n, &w[1], &work[inde], info);
     } else {
-	ssteqr_(jobz, n, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk),
-		 info);
+	ssteqr_(jobz, n, &w[1], &work[inde], &z__[z_offset], ldz, &work[
+		indwrk], info);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
@@ -224,7 +228,7 @@
 	    imax = *info - 1;
 	}
 	r__1 = 1.f / sigma;
-	sscal_(&imax, &r__1, &W(1), &c__1);
+	sscal_(&imax, &r__1, &w[1], &c__1);
     }
 
     return 0;
@@ -232,4 +236,8 @@
 /*     End of SSBEV */
 
 } /* ssbev_ */
+
+#undef ab_ref
+#undef z___ref
+
 

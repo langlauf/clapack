@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgebak_(char *job, char *side, integer *n, integer *ilo, 
 	integer *ihi, doublereal *scale, integer *m, doublereal *v, integer *
 	ldv, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    DGEBAK forms the right or left eigenvectors of a real general matrix 
-  
+    DGEBAK forms the right or left eigenvectors of a real general matrix   
     by backward transformation on the computed eigenvectors of the   
     balanced matrix output by DGEBAL.   
 
@@ -28,8 +28,7 @@
             = 'S', do backward transformation for scaling only;   
             = 'B', do backward transformations for both permutation and   
                    scaling.   
-            JOB must be the same as the argument JOB supplied to DGEBAL. 
-  
+            JOB must be the same as the argument JOB supplied to DGEBAL.   
 
     SIDE    (input) CHARACTER*1   
             = 'R':  V contains right eigenvectors;   
@@ -62,19 +61,16 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer v_dim1, v_offset, i__1;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     static doublereal s;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
@@ -85,18 +81,20 @@
     static integer ii;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical rightv;
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
 
+    --scale;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
 
-#define SCALE(I) scale[(I)-1]
-
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-
+    /* Function Body */
     rightv = lsame_(side, "R");
     leftv = lsame_(side, "L");
 
     *info = 0;
-    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(
-	    job, "S") && ! lsame_(job, "B")) {
+    if (! lsame_(job, "N") && ! lsame_(job, "P") && ! lsame_(job, "S") 
+	    && ! lsame_(job, "B")) {
 	*info = -1;
     } else if (! rightv && ! leftv) {
 	*info = -2;
@@ -139,18 +137,18 @@
 
 	if (rightv) {
 	    i__1 = *ihi;
-	    for (i = *ilo; i <= *ihi; ++i) {
-		s = SCALE(i);
-		dscal_(m, &s, &V(i,1), ldv);
+	    for (i__ = *ilo; i__ <= i__1; ++i__) {
+		s = scale[i__];
+		dscal_(m, &s, &v_ref(i__, 1), ldv);
 /* L10: */
 	    }
 	}
 
 	if (leftv) {
 	    i__1 = *ihi;
-	    for (i = *ilo; i <= *ihi; ++i) {
-		s = 1. / SCALE(i);
-		dscal_(m, &s, &V(i,1), ldv);
+	    for (i__ = *ilo; i__ <= i__1; ++i__) {
+		s = 1. / scale[i__];
+		dscal_(m, &s, &v_ref(i__, 1), ldv);
 /* L20: */
 	    }
 	}
@@ -166,19 +164,19 @@ L30:
     if (lsame_(job, "P") || lsame_(job, "B")) {
 	if (rightv) {
 	    i__1 = *n;
-	    for (ii = 1; ii <= *n; ++ii) {
-		i = ii;
-		if (i >= *ilo && i <= *ihi) {
+	    for (ii = 1; ii <= i__1; ++ii) {
+		i__ = ii;
+		if (i__ >= *ilo && i__ <= *ihi) {
 		    goto L40;
 		}
-		if (i < *ilo) {
-		    i = *ilo - ii;
+		if (i__ < *ilo) {
+		    i__ = *ilo - ii;
 		}
-		k = (integer) SCALE(i);
-		if (k == i) {
+		k = (integer) scale[i__];
+		if (k == i__) {
 		    goto L40;
 		}
-		dswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		dswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L40:
 		;
 	    }
@@ -186,19 +184,19 @@ L40:
 
 	if (leftv) {
 	    i__1 = *n;
-	    for (ii = 1; ii <= *n; ++ii) {
-		i = ii;
-		if (i >= *ilo && i <= *ihi) {
+	    for (ii = 1; ii <= i__1; ++ii) {
+		i__ = ii;
+		if (i__ >= *ilo && i__ <= *ihi) {
 		    goto L50;
 		}
-		if (i < *ilo) {
-		    i = *ilo - ii;
+		if (i__ < *ilo) {
+		    i__ = *ilo - ii;
 		}
-		k = (integer) SCALE(i);
-		if (k == i) {
+		k = (integer) scale[i__];
+		if (k == i__) {
 		    goto L50;
 		}
-		dswap_(m, &V(i,1), ldv, &V(k,1), ldv);
+		dswap_(m, &v_ref(i__, 1), ldv, &v_ref(k, 1), ldv);
 L50:
 		;
 	    }
@@ -210,4 +208,7 @@ L50:
 /*     End of DGEBAK */
 
 } /* dgebak_ */
+
+#undef v_ref
+
 

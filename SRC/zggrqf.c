@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zggrqf_(integer *m, integer *p, integer *n, 
@@ -5,17 +6,16 @@
 	 integer *ldb, doublecomplex *taub, doublecomplex *work, integer *
 	lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZGGRQF computes a generalized RQ factorization of an M-by-N matrix A 
-  
+    ZGGRQF computes a generalized RQ factorization of an M-by-N matrix A   
     and a P-by-N matrix B:   
 
                 A = R*Q,        B = Z*T*Q,   
@@ -35,14 +35,12 @@
 
     where T11 is upper triangular.   
 
-    In particular, if B is square and nonsingular, the GRQ factorization 
-  
+    In particular, if B is square and nonsingular, the GRQ factorization   
     of A and B implicitly gives the RQ factorization of A*inv(B):   
 
                  A*inv(B) = (R*inv(T))*Z'   
 
-    where inv(B) denotes the inverse of the matrix B, and Z' denotes the 
-  
+    where inv(B) denotes the inverse of the matrix B, and Z' denotes the   
     conjugate transpose of the matrix Z.   
 
     Arguments   
@@ -60,12 +58,9 @@
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the M-by-N matrix A.   
             On exit, if M <= N, the upper triangle of the subarray   
-            A(1:M,N-M+1:N) contains the M-by-M upper triangular matrix R; 
-  
-            if M > N, the elements on and above the (M-N)-th subdiagonal 
-  
-            contain the M-by-N upper trapezoidal matrix R; the remaining 
-  
+            A(1:M,N-M+1:N) contains the M-by-M upper triangular matrix R;   
+            if M > N, the elements on and above the (M-N)-th subdiagonal   
+            contain the M-by-N upper trapezoidal matrix R; the remaining   
             elements, with the array TAUA, represent the unitary   
             matrix Q as a product of elementary reflectors (see Further   
             Details).   
@@ -79,11 +74,9 @@
 
     B       (input/output) COMPLEX*16 array, dimension (LDB,N)   
             On entry, the P-by-N matrix B.   
-            On exit, the elements on and above the diagonal of the array 
-  
+            On exit, the elements on and above the diagonal of the array   
             contain the min(P,N)-by-N upper trapezoidal matrix T (T is   
-            upper triangular if P >= N); the elements below the diagonal, 
-  
+            upper triangular if P >= N); the elements below the diagonal,   
             with the array TAUB, represent the unitary matrix Z as a   
             product of elementary reflectors (see Further Details).   
 
@@ -99,12 +92,16 @@
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK. LWORK >= max(1,N,M,P).   
-            For optimum performance LWORK >= max(N,M,P)*max(NB1,NB2,NB3), 
-  
+            For optimum performance LWORK >= max(N,M,P)*max(NB1,NB2,NB3),   
             where NB1 is the optimal blocksize for the RQ factorization   
             of an M-by-N matrix, NB2 is the optimal blocksize for the   
             QR factorization of a P-by-N matrix, and NB3 is the optimal   
             blocksize for a call of ZUNMRQ.   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -122,8 +119,7 @@
        H(i) = I - taua * v * v'   
 
     where taua is a complex scalar, and v is a complex vector with   
-    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in 
-  
+    v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in   
     A(m-k+i,1:n-k+i-1), and taua in TAUA(i).   
     To form Q explicitly, use LAPACK subroutine ZUNGRQ.   
     To use Q to update another matrix, use LAPACK subroutine ZUNMRQ.   
@@ -137,44 +133,66 @@
        H(i) = I - taub * v * v'   
 
     where taub is a complex scalar, and v is a complex vector with   
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:p) is stored on exit in B(i+1:p,i), 
-  
+    v(1:i-1) = 0 and v(i) = 1; v(i+1:p) is stored on exit in B(i+1:p,i),   
     and taub in TAUB(i).   
     To form Z explicitly, use LAPACK subroutine ZUNGQR.   
     To use Z to update another matrix, use LAPACK subroutine ZUNMQR.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
-    doublereal d__1;
     /* Local variables */
-    static integer lopt;
-    extern /* Subroutine */ int xerbla_(char *, integer *), zgeqrf_(
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
-	     doublecomplex *, integer *, integer *), zgerqf_(integer *, 
+    static integer lopt, nb;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int zgeqrf_(integer *, integer *, doublecomplex *,
+	     integer *, doublecomplex *, doublecomplex *, integer *, integer *
+	    ), zgerqf_(integer *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, doublecomplex *, integer *, integer *);
+    static integer nb1, nb2, nb3, lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int zunmrq_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
-	    doublecomplex *, integer *, integer *), zunmrq_(char *, char *, 
-	    integer *, integer *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, integer *);
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
-#define TAUA(I) taua[(I)-1]
-#define TAUB(I) taub[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --taua;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --taub;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
+    nb1 = ilaenv_(&c__1, "ZGERQF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb2 = ilaenv_(&c__1, "ZGEQRF", " ", p, n, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb3 = ilaenv_(&c__1, "ZUNMRQ", " ", m, n, p, &c_n1, (ftnlen)6, (ftnlen)1);
+/* Computing MAX */
+    i__1 = max(nb1,nb2);
+    nb = max(i__1,nb3);
+/* Computing MAX */
+    i__1 = max(*n,*m);
+    lwkopt = max(i__1,*p) * nb;
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*p < 0) {
@@ -188,7 +206,7 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = max(1,*m), i__1 = max(i__1,*p);
-	if (*lwork < max(i__1,*n)) {
+	if (*lwork < max(i__1,*n) && ! lquery) {
 	    *info = -11;
 	}
     }
@@ -196,34 +214,41 @@
 	i__1 = -(*info);
 	xerbla_("ZGGRQF", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     RQ factorization of M-by-N matrix A: A = R*Q */
 
-    zgerqf_(m, n, &A(1,1), lda, &TAUA(1), &WORK(1), lwork, info);
-    lopt = (integer) WORK(1).r;
+    zgerqf_(m, n, &a[a_offset], lda, &taua[1], &work[1], lwork, info);
+    lopt = (integer) work[1].r;
 
-/*     Update B := B*Q' */
+/*     Update B := B*Q'   
 
-    i__1 = min(*m,*n);
+   Computing MAX */
+    i__1 = 1, i__2 = *m - *n + 1;
+    i__3 = min(*m,*n);
+    zunmrq_("Right", "Conjugate Transpose", p, n, &i__3, &a_ref(max(i__1,i__2)
+	    , 1), lda, &taua[1], &b[b_offset], ldb, &work[1], lwork, info);
 /* Computing MAX */
-    i__2 = 1, i__3 = *m - *n + 1;
-    zunmrq_("Right", "Conjugate Transpose", p, n, &i__1, &A(max(1,*m-*n+1),1), lda, &TAUA(1), &B(1,1), ldb, &WORK(1), lwork, info);
-/* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(1).r;
+    i__1 = lopt, i__2 = (integer) work[1].r;
     lopt = max(i__1,i__2);
 
 /*     QR factorization of P-by-N matrix B: B = Z*T */
 
-    zgeqrf_(p, n, &B(1,1), ldb, &TAUB(1), &WORK(1), lwork, info);
+    zgeqrf_(p, n, &b[b_offset], ldb, &taub[1], &work[1], lwork, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(1).r;
-    d__1 = (doublereal) max(i__1,i__2);
-    WORK(1).r = d__1, WORK(1).i = 0.;
+    i__2 = lopt, i__3 = (integer) work[1].r;
+    i__1 = max(i__2,i__3);
+    work[1].r = (doublereal) i__1, work[1].i = 0.;
 
     return 0;
 
 /*     End of ZGGRQF */
 
 } /* zggrqf_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,9 +23,9 @@ static integer c__2 = 2;
 
     /* Local variables */
     static real beta;
-    static complex a, b, c;
+    static complex a, b, c__;
     static integer j;
-    static complex r;
+    static complex r__;
     static real alpha;
     static integer n5;
     static real alpha3;
@@ -32,7 +33,7 @@ static integer c__2 = 2;
     extern /* Complex */ VOID clarnd_(complex *, integer *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -42,15 +43,13 @@ static integer c__2 = 2;
     =======   
 
     CLATSP generates a special test matrix for the complex symmetric   
-    (indefinite) factorization for packed matrices.  The pivot blocks of 
-  
+    (indefinite) factorization for packed matrices.  The pivot blocks of   
     the generated matrix will be in the following order:   
        2x2 pivot block, non diagonalizable   
        1x1 pivot block   
        2x2 pivot block, diagonalizable   
        (cycle repeats)   
-    A row interchange is required for each non-diagonalizable 2x2 block. 
-  
+    A row interchange is required for each non-diagonalizable 2x2 block.   
 
     Arguments   
     =========   
@@ -71,12 +70,10 @@ static integer c__2 = 2;
             diagonal blocks is zero.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed for the random number generator.  The last 
-  
+            On entry, the seed for the random number generator.  The last   
             of the four integers must be odd.  (modified on exit)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize constants   
@@ -118,9 +115,9 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
 	    i__2 = jj;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
 	    i__2 = jj - 2;
@@ -130,10 +127,10 @@ static integer c__2 = 2;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    i__2 = jj - 1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
 	    jj -= j - 1;
 	    i__2 = jj;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
 	    jj -= j - 2;
 	    i__2 = jj;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
@@ -171,9 +168,9 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
 	    i__1 = jj;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
 	    i__1 = jj - 2;
@@ -183,10 +180,10 @@ static integer c__2 = 2;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    i__1 = jj - 1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
 	    jj -= j - 1;
 	    i__1 = jj;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
 	    jj -= j - 2;
 	    j += -3;
 	}
@@ -236,9 +233,9 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
 	    i__2 = jj;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
 	    i__2 = jj + 2;
@@ -248,10 +245,10 @@ static integer c__2 = 2;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    i__2 = jj + 1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
 	    jj += *n - j;
 	    i__2 = jj;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
 	    jj += *n - j - 1;
 	    i__2 = jj;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
@@ -289,9 +286,9 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
 	    i__1 = jj;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
 	    i__1 = jj + 2;
@@ -301,10 +298,10 @@ static integer c__2 = 2;
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    i__1 = jj + 1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
 	    jj += *n - j;
 	    i__1 = jj;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
 	    jj += *n - j - 1;
 	    j += 3;
 	}

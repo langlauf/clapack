@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,9 +23,9 @@ static integer c__2 = 2;
 
     /* Local variables */
     static doublereal beta;
-    static doublecomplex a, b, c;
+    static doublecomplex a, b, c__;
     static integer j;
-    static doublecomplex r;
+    static doublecomplex r__;
     static doublereal alpha;
     static integer n5;
     static doublereal alpha3;
@@ -33,7 +34,7 @@ static integer c__2 = 2;
 	    integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -43,15 +44,13 @@ static integer c__2 = 2;
     =======   
 
     ZLATSP generates a special test matrix for the complex symmetric   
-    (indefinite) factorization for packed matrices.  The pivot blocks of 
-  
+    (indefinite) factorization for packed matrices.  The pivot blocks of   
     the generated matrix will be in the following order:   
        2x2 pivot block, non diagonalizable   
        1x1 pivot block   
        2x2 pivot block, diagonalizable   
        (cycle repeats)   
-    A row interchange is required for each non-diagonalizable 2x2 block. 
-  
+    A row interchange is required for each non-diagonalizable 2x2 block.   
 
     Arguments   
     =========   
@@ -72,12 +71,10 @@ static integer c__2 = 2;
             diagonal blocks is zero.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed for the random number generator.  The last 
-  
+            On entry, the seed for the random number generator.  The last   
             of the four integers must be odd.  (modified on exit)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize constants   
@@ -119,9 +116,9 @@ static integer c__2 = 2;
 	    z__2.r = z__3.r * 0. - z__3.i * 1., z__2.i = z__3.r * 1. + z__3.i 
 		    * 0.;
 	    z__1.r = a.r - z__2.r, z__1.i = a.i - z__2.i;
-	    c.r = z__1.r, c.i = z__1.i;
-	    z__1.r = c.r / beta, z__1.i = c.i / beta;
-	    r.r = z__1.r, r.i = z__1.i;
+	    c__.r = z__1.r, c__.i = z__1.i;
+	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
+	    r__.r = z__1.r, r__.i = z__1.i;
 	    i__2 = jj;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
 	    i__2 = jj - 2;
@@ -131,10 +128,10 @@ static integer c__2 = 2;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    i__2 = jj - 1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
 	    jj -= j - 1;
 	    i__2 = jj;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
 	    jj -= j - 2;
 	    i__2 = jj;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
@@ -172,9 +169,9 @@ static integer c__2 = 2;
 	    z__2.r = z__3.r * 0. - z__3.i * 1., z__2.i = z__3.r * 1. + z__3.i 
 		    * 0.;
 	    z__1.r = a.r - z__2.r, z__1.i = a.i - z__2.i;
-	    c.r = z__1.r, c.i = z__1.i;
-	    z__1.r = c.r / beta, z__1.i = c.i / beta;
-	    r.r = z__1.r, r.i = z__1.i;
+	    c__.r = z__1.r, c__.i = z__1.i;
+	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
+	    r__.r = z__1.r, r__.i = z__1.i;
 	    i__1 = jj;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
 	    i__1 = jj - 2;
@@ -184,10 +181,10 @@ static integer c__2 = 2;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    i__1 = jj - 1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
 	    jj -= j - 1;
 	    i__1 = jj;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
 	    jj -= j - 2;
 	    j += -3;
 	}
@@ -237,9 +234,9 @@ static integer c__2 = 2;
 	    z__2.r = z__3.r * 0. - z__3.i * 1., z__2.i = z__3.r * 1. + z__3.i 
 		    * 0.;
 	    z__1.r = a.r - z__2.r, z__1.i = a.i - z__2.i;
-	    c.r = z__1.r, c.i = z__1.i;
-	    z__1.r = c.r / beta, z__1.i = c.i / beta;
-	    r.r = z__1.r, r.i = z__1.i;
+	    c__.r = z__1.r, c__.i = z__1.i;
+	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
+	    r__.r = z__1.r, r__.i = z__1.i;
 	    i__2 = jj;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
 	    i__2 = jj + 2;
@@ -249,10 +246,10 @@ static integer c__2 = 2;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    i__2 = jj + 1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
 	    jj += *n - j;
 	    i__2 = jj;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
 	    jj += *n - j - 1;
 	    i__2 = jj;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
@@ -290,9 +287,9 @@ static integer c__2 = 2;
 	    z__2.r = z__3.r * 0. - z__3.i * 1., z__2.i = z__3.r * 1. + z__3.i 
 		    * 0.;
 	    z__1.r = a.r - z__2.r, z__1.i = a.i - z__2.i;
-	    c.r = z__1.r, c.i = z__1.i;
-	    z__1.r = c.r / beta, z__1.i = c.i / beta;
-	    r.r = z__1.r, r.i = z__1.i;
+	    c__.r = z__1.r, c__.i = z__1.i;
+	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
+	    r__.r = z__1.r, r__.i = z__1.i;
 	    i__1 = jj;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
 	    i__1 = jj + 2;
@@ -302,10 +299,10 @@ static integer c__2 = 2;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    i__1 = jj + 1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
 	    jj += *n - j;
 	    i__1 = jj;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
 	    jj += *n - j - 1;
 	    j += 3;
 	}

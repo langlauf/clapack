@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -53,6 +54,12 @@ static integer c__2 = 2;
 static integer c__4 = 4;
 static integer c__8 = 8;
 static integer c__89760 = 89760;
+static integer c__9 = 9;
+static integer c__25 = 25;
+static integer c__20064 = 20064;
+static integer c__18 = 18;
+static integer c__400 = 400;
+static integer c__20062 = 20062;
 static integer c__264 = 264;
 
 /* Main program */ MAIN__(void)
@@ -82,6 +89,14 @@ static integer c__264 = 264;
 	    " condition\002,\002 numbers)\002)";
     static char fmt_9975[] = "(/\002 Tests of the Generalized Nonsymmetric E"
 	    "igenvalue \002,\002Problem routines\002)";
+    static char fmt_9964[] = "(/\002 Tests of the Generalized Nonsymmetric E"
+	    "igenvalue \002,\002Problem Driver ZGGES\002)";
+    static char fmt_9965[] = "(/\002 Tests of the Generalized Nonsymmetric E"
+	    "igenvalue \002,\002Problem Expert Driver ZGGESX\002)";
+    static char fmt_9963[] = "(/\002 Tests of the Generalized Nonsymmetric E"
+	    "igenvalue \002,\002Problem Driver ZGGEV\002)";
+    static char fmt_9962[] = "(/\002 Tests of the Generalized Nonsymmetric E"
+	    "igenvalue \002,\002Problem Expert Driver ZGGEVX\002)";
     static char fmt_9974[] = "(\002 Tests of ZHBTRD\002,/\002 (reduction of "
 	    "a Hermitian band \002,\002matrix to real tridiagonal form)\002)";
     static char fmt_9967[] = "(\002 Tests of ZGBBRD\002,/\002 (reduction of "
@@ -95,8 +110,8 @@ static integer c__264 = 264;
     static char fmt_9968[] = "(/\002 Tests of the Linear Least Squares routi"
 	    "nes\002)";
     static char fmt_9992[] = "(1x,a3,\002:  Unrecognized path name\002)";
-    static char fmt_9972[] = "(/\002 LAPACK VERSION 2.0, released September "
-	    "30, 1994 \002)";
+    static char fmt_9972[] = "(/\002 LAPACK VERSION 3.0, released June 30, 1"
+	    "999 \002)";
     static char fmt_9984[] = "(/\002 The following parameter values will be "
 	    "used:\002)";
     static char fmt_9989[] = "(\002 Invalid input value: \002,a6,\002=\002,i"
@@ -152,9 +167,10 @@ static integer c__264 = 264;
     static doublecomplex taub[132];
     static integer pval[20], itmp, nrhs;
     static doublecomplex work[89760], a[243936]	/* was [17424][14] */, b[
-	    87120]	/* was [17424][5] */;
-    static integer i, k;
-    static doublereal alpha[132];
+	    87120]	/* was [17424][5] */, c__[160000]	/* was [400][
+	    400] */;
+    static integer i__, k;
+    static doublereal s[17424], alpha[132];
     static logical fatal;
     static doublecomplex x[660];
     static integer iseed[4], nbcol[20], nbval[20], nbmin[20];
@@ -165,7 +181,7 @@ static integer c__264 = 264;
     static doublereal s1, s2, rwork[89760];
     static doublecomplex dc[792]	/* was [132][6] */;
     static integer ic;
-    static doublereal dr[1452]	/* was [132][11] */;
+    static doublereal dr[1584]	/* was [132][12] */;
     extern doublereal dlamch_(char *);
     static integer nk, nn;
     extern doublereal dsecnd_(void);
@@ -224,7 +240,7 @@ static integer c__264 = 264;
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublereal *, 
 	    doublereal *, doublecomplex *, integer *, doublereal *, integer *,
-	     integer *);
+	     integer *, integer *);
     static logical tstdif;
     static doublereal thresh;
     extern /* Subroutine */ int xlaenv_(integer *, integer *);
@@ -236,14 +252,12 @@ static integer c__264 = 264;
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublereal *, integer *, 
-	    integer *, integer *), zdrvgg_(integer *, integer *, integer *, 
-	    logical *, integer *, doublereal *, doublereal *, integer *, 
+	    integer *, integer *), zdrges_(integer *, integer *, integer *, 
+	    logical *, integer *, doublereal *, integer *, doublecomplex *, 
+	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , doublecomplex *, integer *, doublereal *, doublereal *, integer 
-	    *);
+	    doublecomplex *, doublecomplex *, integer *, doublereal *, 
+	    doublereal *, logical *, integer *);
     static logical dotype[30], logwrk[132];
     static doublereal thrshn;
     extern /* Subroutine */ int zchkst_(integer *, integer *, integer *, 
@@ -253,196 +267,248 @@ static integer c__264 = 264;
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , integer *, doublereal *, integer *, doublereal *, integer *), 
-	    zckgsv_(integer *, integer *, integer *, integer *, integer *, 
-	    integer *, doublereal *, integer *, doublecomplex *, 
+	    , integer *, doublereal *, integer *, integer *, integer *, 
+	    doublereal *, integer *), zckgsv_(integer *, integer *, integer *,
+	     integer *, integer *, integer *, doublereal *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , doublecomplex *, doublecomplex *, doublereal *, doublereal *, 
-	    doublecomplex *, integer *, doublecomplex *, doublereal *, 
-	    integer *, integer *, integer *), zerred_(char *, integer *), zerrgg_(char *, integer *), zdrves_(integer *, 
-	    integer *, integer *, logical *, integer *, doublereal *, integer 
-	    *, doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
+	    , doublecomplex *, doublecomplex *, doublecomplex *, doublereal *,
+	     doublereal *, doublecomplex *, integer *, doublecomplex *, 
+	    doublereal *, integer *, integer *, integer *), zdrgev_(integer *,
+	     integer *, integer *, logical *, integer *, doublereal *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, integer *,
-	     logical *, integer *);
-    static doublereal result[105];
+	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , integer *, doublereal *, doublereal *, integer *), zdrvgg_(
+	    integer *, integer *, integer *, logical *, integer *, doublereal 
+	    *, doublereal *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    doublereal *, doublereal *, integer *), zerred_(char *, integer *), zdrves_(integer *, integer *, integer *, logical *, 
+	    integer *, doublereal *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , doublecomplex *, integer *, doublereal *, doublecomplex *, 
+	    integer *, doublereal *, integer *, logical *, integer *);
+    static doublereal result[500];
     extern /* Subroutine */ int zdrvsg_(integer *, integer *, integer *, 
 	    logical *, integer *, doublereal *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), zdrvev_(
-	    integer *, integer *, integer *, logical *, integer *, doublereal 
-	    *, integer *, doublecomplex *, integer *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, integer *,
-	     integer *), zerrhs_(char *, integer *);
+	    doublereal *, integer *, integer *, integer *, doublereal *, 
+	    integer *), zdrvev_(integer *, integer *, integer *, logical *, 
+	    integer *, doublereal *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , integer *, doublecomplex *, integer *, doublecomplex *, integer 
+	    *, doublereal *, doublecomplex *, integer *, doublereal *, 
+	    integer *, integer *), zdrgsx_(integer *, integer *, doublereal *,
+	     integer *, integer *, doublecomplex *, integer *, doublecomplex *
+	    , doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , integer *, doublereal *, doublecomplex *, integer *, doublereal 
+	    *, integer *, integer *, logical *, integer *);
     static integer maxtyp;
     static logical tsterr;
     static integer ntypes;
     static logical tstdrv;
-    extern /* Subroutine */ int zerrst_(char *, integer *), zdrvst_(
+    extern /* Subroutine */ int zdrgvx_(integer *, doublereal *, integer *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+	    , doublecomplex *, doublecomplex *, integer *, integer *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *, 
+	    doublereal *, doublereal *, doublecomplex *, integer *, 
+	    doublereal *, integer *, integer *, doublereal *, logical *, 
+	    integer *), zerrgg_(char *, integer *), zerrhs_(char *, 
+	    integer *), zerrst_(char *, integer *), zdrvst_(
 	    integer *, integer *, integer *, logical *, integer *, doublereal 
 	    *, integer *, doublecomplex *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), zdrvsx_(
-	    integer *, integer *, integer *, logical *, integer *, doublereal 
-	    *, integer *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, logical *,
-	     integer *), zdrvvx_(integer *, integer *, integer *, logical *, 
+	    doublereal *, integer *, integer *, integer *, doublereal *, 
+	    integer *), zdrvsx_(integer *, integer *, integer *, logical *, 
 	    integer *, doublereal *, integer *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
+	    doublereal *, logical *, integer *), zdrvvx_(integer *, integer *,
+	     integer *, logical *, integer *, doublereal *, integer *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublecomplex *, 
-	    integer *, doublereal *, integer *);
-    static logical zbb, glm, nep, lse, zbk, sep, zbl, gqr, zgg, zgk, svd, zgl,
+	    doublereal *, doublereal *, doublereal *, doublereal *, 
+	    doublereal *, doublecomplex *, integer *, doublereal *, integer *)
+	    ;
+    static logical zbb, glm, nep, lse, zbk, zbl, sep, gqr, zgg, zgk, zgl, svd,
 	     zhb, gsv;
     static doublereal eps;
-    static logical zes, zev, zsx, zvx;
+    static logical zes, zgs, zev, zgv, zgx, zsx, zvx, zxv;
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 5, 1, "(A80)", 0 };
-    static cilist io___26 = { 0, 6, 0, fmt_9987, 0 };
-    static cilist io___27 = { 0, 6, 0, fmt_9986, 0 };
-    static cilist io___28 = { 0, 6, 0, fmt_9985, 0 };
-    static cilist io___29 = { 0, 6, 0, fmt_9979, 0 };
-    static cilist io___30 = { 0, 6, 0, fmt_9978, 0 };
-    static cilist io___31 = { 0, 6, 0, fmt_9977, 0 };
-    static cilist io___32 = { 0, 6, 0, fmt_9976, 0 };
-    static cilist io___33 = { 0, 6, 0, fmt_9975, 0 };
-    static cilist io___34 = { 0, 6, 0, fmt_9974, 0 };
-    static cilist io___35 = { 0, 6, 0, fmt_9967, 0 };
-    static cilist io___36 = { 0, 6, 0, fmt_9971, 0 };
-    static cilist io___37 = { 0, 6, 0, fmt_9970, 0 };
-    static cilist io___38 = { 0, 6, 0, fmt_9969, 0 };
-    static cilist io___39 = { 0, 6, 0, fmt_9968, 0 };
-    static cilist io___40 = { 0, 5, 0, 0, 0 };
-    static cilist io___43 = { 0, 6, 0, fmt_9992, 0 };
-    static cilist io___44 = { 0, 6, 0, fmt_9972, 0 };
-    static cilist io___45 = { 0, 6, 0, fmt_9984, 0 };
-    static cilist io___46 = { 0, 5, 0, 0, 0 };
-    static cilist io___48 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___49 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___50 = { 0, 5, 0, 0, 0 };
-    static cilist io___54 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___55 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___56 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___57 = { 0, 5, 0, 0, 0 };
-    static cilist io___59 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___60 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___61 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___62 = { 0, 5, 0, 0, 0 };
-    static cilist io___64 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___65 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___66 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___67 = { 0, 5, 0, 0, 0 };
-    static cilist io___69 = { 0, 5, 0, 0, 0 };
-    static cilist io___71 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___72 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___73 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___74 = { 0, 5, 0, 0, 0 };
+    static cilist io___30 = { 0, 6, 0, fmt_9987, 0 };
+    static cilist io___31 = { 0, 6, 0, fmt_9986, 0 };
+    static cilist io___32 = { 0, 6, 0, fmt_9985, 0 };
+    static cilist io___33 = { 0, 6, 0, fmt_9979, 0 };
+    static cilist io___34 = { 0, 6, 0, fmt_9978, 0 };
+    static cilist io___35 = { 0, 6, 0, fmt_9977, 0 };
+    static cilist io___36 = { 0, 6, 0, fmt_9976, 0 };
+    static cilist io___37 = { 0, 6, 0, fmt_9975, 0 };
+    static cilist io___38 = { 0, 6, 0, fmt_9964, 0 };
+    static cilist io___39 = { 0, 6, 0, fmt_9965, 0 };
+    static cilist io___40 = { 0, 6, 0, fmt_9963, 0 };
+    static cilist io___41 = { 0, 6, 0, fmt_9962, 0 };
+    static cilist io___42 = { 0, 6, 0, fmt_9974, 0 };
+    static cilist io___43 = { 0, 6, 0, fmt_9967, 0 };
+    static cilist io___44 = { 0, 6, 0, fmt_9971, 0 };
+    static cilist io___45 = { 0, 6, 0, fmt_9970, 0 };
+    static cilist io___46 = { 0, 6, 0, fmt_9969, 0 };
+    static cilist io___47 = { 0, 6, 0, fmt_9968, 0 };
+    static cilist io___48 = { 0, 5, 0, 0, 0 };
+    static cilist io___51 = { 0, 6, 0, fmt_9992, 0 };
+    static cilist io___52 = { 0, 6, 0, fmt_9972, 0 };
+    static cilist io___53 = { 0, 6, 0, fmt_9984, 0 };
+    static cilist io___54 = { 0, 5, 0, 0, 0 };
+    static cilist io___56 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___57 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___58 = { 0, 5, 0, 0, 0 };
+    static cilist io___62 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___63 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___64 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___65 = { 0, 5, 0, 0, 0 };
+    static cilist io___67 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___68 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___69 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___70 = { 0, 5, 0, 0, 0 };
+    static cilist io___72 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___73 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___74 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___75 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___76 = { 0, 5, 0, 0, 0 };
+    static cilist io___78 = { 0, 5, 0, 0, 0 };
     static cilist io___80 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___81 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___82 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___83 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___84 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___85 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___86 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___87 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___88 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___89 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___90 = { 0, 5, 0, 0, 0 };
+    static cilist io___81 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___82 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___83 = { 0, 5, 0, 0, 0 };
+    static cilist io___89 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___90 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___91 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___92 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___93 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___94 = { 0, 5, 0, 0, 0 };
-    static cilist io___95 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___96 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___93 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___94 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___95 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___96 = { 0, 6, 0, fmt_9983, 0 };
     static cilist io___97 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___98 = { 0, 5, 0, 0, 0 };
-    static cilist io___99 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___100 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___101 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___102 = { 0, 5, 0, 0, 0 };
-    static cilist io___103 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___104 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___105 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___106 = { 0, 5, 0, 0, 0 };
-    static cilist io___107 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___108 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___109 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___110 = { 0, 5, 0, 0, 0 };
-    static cilist io___111 = { 0, 6, 0, fmt_9989, 0 };
-    static cilist io___112 = { 0, 6, 0, fmt_9988, 0 };
-    static cilist io___113 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___114 = { 0, 5, 0, 0, 0 };
+    static cilist io___98 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___99 = { 0, 5, 0, 0, 0 };
+    static cilist io___101 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___102 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___103 = { 0, 5, 0, 0, 0 };
+    static cilist io___104 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___105 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___106 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___107 = { 0, 5, 0, 0, 0 };
+    static cilist io___108 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___109 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___110 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___111 = { 0, 5, 0, 0, 0 };
+    static cilist io___112 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___113 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___114 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___115 = { 0, 5, 0, 0, 0 };
     static cilist io___116 = { 0, 6, 0, fmt_9989, 0 };
     static cilist io___117 = { 0, 6, 0, fmt_9988, 0 };
     static cilist io___118 = { 0, 6, 0, fmt_9983, 0 };
-    static cilist io___119 = { 0, 6, 0, 0, 0 };
-    static cilist io___121 = { 0, 6, 0, fmt_9981, 0 };
-    static cilist io___122 = { 0, 6, 0, fmt_9981, 0 };
-    static cilist io___123 = { 0, 6, 0, fmt_9981, 0 };
-    static cilist io___124 = { 0, 5, 0, 0, 0 };
-    static cilist io___125 = { 0, 6, 0, fmt_9982, 0 };
-    static cilist io___126 = { 0, 5, 0, 0, 0 };
-    static cilist io___128 = { 0, 5, 0, 0, 0 };
-    static cilist io___130 = { 0, 5, 0, 0, 0 };
-    static cilist io___131 = { 0, 5, 0, 0, 0 };
+    static cilist io___119 = { 0, 5, 0, 0, 0 };
+    static cilist io___120 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___121 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___122 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___123 = { 0, 5, 0, 0, 0 };
+    static cilist io___125 = { 0, 6, 0, fmt_9989, 0 };
+    static cilist io___126 = { 0, 6, 0, fmt_9988, 0 };
+    static cilist io___127 = { 0, 6, 0, fmt_9983, 0 };
+    static cilist io___128 = { 0, 6, 0, 0, 0 };
+    static cilist io___130 = { 0, 6, 0, fmt_9981, 0 };
+    static cilist io___131 = { 0, 6, 0, fmt_9981, 0 };
+    static cilist io___132 = { 0, 6, 0, fmt_9981, 0 };
     static cilist io___133 = { 0, 5, 0, 0, 0 };
-    static cilist io___135 = { 0, 6, 0, fmt_9999, 0 };
-    static cilist io___136 = { 0, 5, 1, "(A80)", 0 };
-    static cilist io___145 = { 0, 6, 0, fmt_9991, 0 };
-    static cilist io___146 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___149 = { 0, 6, 0, fmt_9998, 0 };
-    static cilist io___158 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___159 = { 0, 6, 0, fmt_9997, 0 };
-    static cilist io___161 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___162 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___163 = { 0, 6, 0, fmt_9997, 0 };
-    static cilist io___164 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___166 = { 0, 6, 0, fmt_9995, 0 };
+    static cilist io___134 = { 0, 6, 0, fmt_9982, 0 };
+    static cilist io___135 = { 0, 5, 0, 0, 0 };
+    static cilist io___137 = { 0, 5, 0, 0, 0 };
+    static cilist io___139 = { 0, 5, 0, 0, 0 };
+    static cilist io___140 = { 0, 5, 0, 0, 0 };
+    static cilist io___142 = { 0, 5, 0, 0, 0 };
+    static cilist io___144 = { 0, 6, 0, fmt_9999, 0 };
+    static cilist io___145 = { 0, 5, 1, "(A80)", 0 };
+    static cilist io___154 = { 0, 6, 0, fmt_9991, 0 };
+    static cilist io___155 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___158 = { 0, 6, 0, fmt_9998, 0 };
     static cilist io___167 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___168 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___169 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___170 = { 0, 6, 0, fmt_9973, 0 };
-    static cilist io___171 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___172 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___173 = { 0, 6, 0, fmt_9973, 0 };
-    static cilist io___174 = { 0, 6, 0, fmt_9990, 0 };
-    static cilist io___175 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___176 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___168 = { 0, 6, 0, fmt_9997, 0 };
+    static cilist io___170 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___171 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___172 = { 0, 6, 0, fmt_9997, 0 };
+    static cilist io___173 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___175 = { 0, 6, 0, fmt_9995, 0 };
+    static cilist io___176 = { 0, 6, 0, fmt_9980, 0 };
     static cilist io___177 = { 0, 6, 0, fmt_9990, 0 };
     static cilist io___178 = { 0, 6, 0, fmt_9980, 0 };
     static cilist io___179 = { 0, 6, 0, fmt_9973, 0 };
-    static cilist io___180 = { 0, 6, 0, fmt_9996, 0 };
-    static cilist io___183 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___180 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___181 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___182 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___183 = { 0, 6, 0, fmt_9990, 0 };
     static cilist io___184 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___185 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___186 = { 0, 6, 0, fmt_9966, 0 };
+    static cilist io___185 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___186 = { 0, 6, 0, fmt_9990, 0 };
     static cilist io___187 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___190 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___188 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___189 = { 0, 6, 0, fmt_9996, 0 };
+    static cilist io___192 = { 0, 6, 0, fmt_9980, 0 };
     static cilist io___193 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___196 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___197 = { 0, 6, 0, fmt_9980, 0 };
-    static cilist io___198 = { 0, 6, 0, 0, 0 };
-    static cilist io___199 = { 0, 6, 0, 0, 0 };
-    static cilist io___200 = { 0, 6, 0, fmt_9992, 0 };
-    static cilist io___201 = { 0, 6, 0, fmt_9994, 0 };
-    static cilist io___203 = { 0, 6, 0, fmt_9993, 0 };
+    static cilist io___194 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___195 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___196 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___197 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___200 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___201 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___202 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___203 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___204 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___205 = { 0, 6, 0, fmt_9990, 0 };
+    static cilist io___206 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___207 = { 0, 6, 0, fmt_9973, 0 };
+    static cilist io___208 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___209 = { 0, 6, 0, fmt_9966, 0 };
+    static cilist io___210 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___213 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___216 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___219 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___220 = { 0, 6, 0, fmt_9980, 0 };
+    static cilist io___221 = { 0, 6, 0, 0, 0 };
+    static cilist io___222 = { 0, 6, 0, 0, 0 };
+    static cilist io___223 = { 0, 6, 0, fmt_9992, 0 };
+    static cilist io___224 = { 0, 6, 0, fmt_9994, 0 };
+    static cilist io___226 = { 0, 6, 0, fmt_9993, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*17424 + a_1 - 17425
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*17424 + a_1 - 17425
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define dc_subscr(a_1,a_2) (a_2)*132 + a_1 - 133
+#define dc_ref(a_1,a_2) dc[dc_subscr(a_1,a_2)]
+#define dr_ref(a_1,a_2) dr[(a_2)*132 + a_1 - 133]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
     Purpose   
     =======   
@@ -460,7 +526,7 @@ static integer c__264 = 264;
 
     SVD (Singular Value Decomposition):   
         Test ZGEBRD, ZUNGBR, and ZBDSQR   
-        and the driver routine ZGESVD   
+        and the drivers ZGESVD, ZGESDD   
 
     ZEV (Nonsymmetric Eigenvalue/eigenvector Driver):   
         Test ZGEEV   
@@ -478,8 +544,21 @@ static integer c__264 = 264;
         Test ZGGHRD, ZGGBAL, ZGGBAK, ZHGEQZ, and ZTGEVC   
         and the driver routines ZGEGS and ZGEGV   
 
+    ZGS (Generalized Nonsymmetric Schur form Driver):   
+        Test ZGGES   
+
+    ZGV (Generalized Nonsymmetric Eigenvalue/eigenvector Driver):   
+        Test ZGGEV   
+
+    ZGX (Generalized Nonsymmetric Schur form Expert Driver):   
+        Test ZGGESX   
+
+    ZXV (Generalized Nonsymmetric Eigenvalue/eigenvector Expert Driver):   
+        Test ZGGEVX   
+
     ZSG (Hermitian Generalized Eigenvalue Problem):   
-        Test ZHEGST, ZHEGV, ZHPGST, ZHPGV, ZHBGST, and ZHBGV   
+        Test ZHEGST, ZHEGV, ZHEGVD, ZHEGVX, ZHPGST, ZHPGV, ZHPGVD,   
+        ZHPGVX, ZHBGST, ZHBGV, ZHBGVD, and ZHBGVX   
 
     ZHB (Hermitian Band Eigenvalue Problem):   
         Test ZHBTRD   
@@ -516,14 +595,11 @@ static integer c__264 = 264;
 
     Each test path has a different set of inputs, but the data sets for   
     the driver routines xEV, xES, xVX, and xSX can be concatenated in a   
-    single input file.  The first line of input should contain one of the 
-  
-    3-character path names in columns 1-3.  The number of remaining lines 
-  
+    single input file.  The first line of input should contain one of the   
+    3-character path names in columns 1-3.  The number of remaining lines   
     depends on what is found on the first line.   
 
-    The number of matrix types used in testing is often controllable from 
-  
+    The number of matrix types used in testing is often controllable from   
     the input file.  The number of matrix types for each path, and the   
     test routine that describes them, is as follows:   
 
@@ -540,6 +616,10 @@ static integer c__264 = 264;
     ZSX             21     ZDRVSX   
     ZGG             26     ZCHKGG (routines)   
                     26     ZDRVGG (drivers)   
+    ZGS             26     ZDRGES   
+    ZGX              5     ZDRGSX   
+    ZGV             26     ZDRGEV   
+    ZXV              2     ZDRGVX   
     ZSG             21     ZDRVSG   
     ZHB             15     ZCHKHB   
     ZBB             15     ZCHKBB   
@@ -553,8 +633,7 @@ static integer c__264 = 264;
     GSV              8     ZCKGSV   
     LSE              8     ZCKLSE   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     NEP input file:   
 
@@ -581,21 +660,18 @@ static integer c__264 = 264;
              The values for the number of shifts.   
 
     line 9:  MXBVAL, INTEGER array, dimension (NPARMS)   
-             The values for MAXB, used in determining minimum blocksize. 
-  
+             The values for MAXB, used in determining minimum blocksize.   
 
     line 10: THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.  To have all of the test   
              ratios printed, use THRESH = 0.0 .   
 
     line 11: NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -604,15 +680,13 @@ static integer c__264 = 264;
     line 12: INTEGER array, dimension (4)   
              Four integer values for the random number seed.   
 
-    lines 12-EOF:  The remaining lines occur in sets of 1 or 2 and allow 
-  
+    lines 12-EOF:  The remaining lines occur in sets of 1 or 2 and allow   
              the user to specify the matrix types.  Each line contains   
              a 3-character path name in columns 1-3, and the number   
              of matrix types must be the first nonblank item in columns   
              4-80.  If the number of matrix types is at least 1 but is   
              less than the maximum number of possible types, a second   
-             line will be read to get the numbers of the matrix types to 
-  
+             line will be read to get the numbers of the matrix types to   
              be used.  For example,   
     NEP 21   
              requests all of the matrix types for the nonsymmetric   
@@ -621,12 +695,10 @@ static integer c__264 = 264;
     9 10 11 12   
              requests only matrices of type 9, 10, 11, and 12.   
 
-             The valid 3-character path names are 'NEP' or 'ZHS' for the 
-  
+             The valid 3-character path names are 'NEP' or 'ZHS' for the   
              nonsymmetric eigenvalue routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     SEP or ZSG input file:   
 
@@ -650,17 +722,14 @@ static integer c__264 = 264;
 
     line 8:  THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 9:  TSTCHK, LOGICAL   
-             Flag indicating whether or not to test the LAPACK routines. 
-  
+             Flag indicating whether or not to test the LAPACK routines.   
 
     line 10: TSTDRV, LOGICAL   
-             Flag indicating whether or not to test the driver routines. 
-  
+             Flag indicating whether or not to test the driver routines.   
 
     line 11: TSTERR, LOGICAL   
              Flag indicating whether or not to test the error exits for   
@@ -669,8 +738,7 @@ static integer c__264 = 264;
     line 12: NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -680,14 +748,12 @@ static integer c__264 = 264;
              Four integer values for the random number seed.   
 
     lines 13-EOF:  Lines specifying matrix types, as for NEP.   
-             The valid 3-character path names are 'SEP' or 'ZST' for the 
-  
+             The valid 3-character path names are 'SEP' or 'ZST' for the   
              Hermitian eigenvalue routines and driver routines, and   
              'ZSG' for the routines for the Hermitian generalized   
              eigenvalue problem.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     SVD input file:   
 
@@ -717,17 +783,14 @@ static integer c__264 = 264;
 
     line 10: THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 11: TSTCHK, LOGICAL   
-             Flag indicating whether or not to test the LAPACK routines. 
-  
+             Flag indicating whether or not to test the LAPACK routines.   
 
     line 12: TSTDRV, LOGICAL   
-             Flag indicating whether or not to test the driver routines. 
-  
+             Flag indicating whether or not to test the driver routines.   
 
     line 13: TSTERR, LOGICAL   
              Flag indicating whether or not to test the error exits for   
@@ -736,8 +799,7 @@ static integer c__264 = 264;
     line 14: NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -750,8 +812,7 @@ static integer c__264 = 264;
              The 3-character path names are 'SVD' or 'ZBD' for both the   
              SVD routines and the SVD driver routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZEV and ZES data files:   
 
@@ -782,8 +843,7 @@ static integer c__264 = 264;
     line 6:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -793,11 +853,10 @@ static integer c__264 = 264;
              Four integer values for the random number seed.   
 
     lines 8 and following:  Lines specifying matrix types, as for NEP.   
-             The 3-character path name is 'ZEV' to test ZGEEV, or   
-             'ZES' to test ZGEES.   
+             The 3-character path name is 'ZEV' to test CGEEV, or   
+             'ZES' to test CGEES.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     The ZVX data has two parts. The first part is identical to ZEV,   
     and the second part consists of test matrices with precomputed   
@@ -828,31 +887,24 @@ static integer c__264 = 264;
              generated examples is done, but any precomputed examples   
              are tested.   
 
-    remaining lines : Each matrix is stored on 1+N+N**2 lines, where N is 
-  
+    remaining lines : Each matrix is stored on 1+N+N**2 lines, where N is   
              its dimension. The first line contains the dimension N and   
-             ISRT (two integers). ISRT indicates whether the last N lines 
-  
+             ISRT (two integers). ISRT indicates whether the last N lines   
              are sorted by increasing real part of the eigenvalue   
-             (ISRT=0) or by increasing imaginary part (ISRT=1). The next 
-  
+             (ISRT=0) or by increasing imaginary part (ISRT=1). The next   
              N**2 lines contain the matrix rowwise, one entry per line.   
              The last N lines correspond to each eigenvalue. Each of   
-             these last N lines contains 4 real values: the real part of 
-  
+             these last N lines contains 4 real values: the real part of   
              the eigenvalues, the imaginary part of the eigenvalue, the   
              reciprocal condition number of the eigenvalues, and the   
              reciprocal condition number of the vector eigenvector. The   
              end of data is indicated by dimension N=0. Even if no data   
-             is to be tested, there must be at least one line containing 
-  
+             is to be tested, there must be at least one line containing   
              N=0.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
-    The ZSX data is like ZVX. The first part is identical to ZEV, and the 
-  
+    The ZSX data is like ZVX. The first part is identical to ZEV, and the   
     second part consists of test matrices with precomputed solutions.   
 
     line 1:  'ZSX' in columns 1-3.   
@@ -881,28 +933,21 @@ static integer c__264 = 264;
              are tested.   
 
     remaining lines : Each matrix is stored on 3+N**2 lines, where N is   
-             its dimension. The first line contains the dimension N, the 
-  
+             its dimension. The first line contains the dimension N, the   
              dimension M of an invariant subspace, and ISRT. The second   
-             line contains M integers, identifying the eigenvalues in the 
-  
+             line contains M integers, identifying the eigenvalues in the   
              invariant subspace (by their position in a list of   
              eigenvalues ordered by increasing real part (if ISRT=0) or   
              by increasing imaginary part (if ISRT=1)). The next N**2   
-             lines contain the matrix rowwise. The last line contains the 
-  
-             reciprocal condition number for the average of the selected 
-  
+             lines contain the matrix rowwise. The last line contains the   
+             reciprocal condition number for the average of the selected   
              eigenvalues, and the reciprocal condition number for the   
              corresponding right invariant subspace. The end of data in   
-             indicated by a line containing N=0, M=0, and ISRT = 0.  Even 
-  
-             if no data is to be tested, there must be at least one line 
-  
+             indicated by a line containing N=0, M=0, and ISRT = 0.  Even   
+             if no data is to be tested, there must be at least one line   
              containing N=0, M=0 and ISRT=0.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZGG input file:   
 
@@ -913,23 +958,20 @@ static integer c__264 = 264;
              The values for the matrix dimension N.   
 
     line 4:  NPARMS, INTEGER   
-             Number of values of the parameters NB, NBMIN, NBCOL, NS, and 
-  
+             Number of values of the parameters NB, NBMIN, NBCOL, NS, and   
              MAXB.   
 
     line 5:  NBVAL, INTEGER array, dimension (NPARMS)   
              The values for the blocksize NB.   
 
     line 6:  NBMIN, INTEGER array, dimension (NPARMS)   
-             The values for NBMIN, the minimum row dimension for blocks. 
-  
+             The values for NBMIN, the minimum row dimension for blocks.   
 
     line 7:  NSVAL, INTEGER array, dimension (NPARMS)   
              The values for the number of shifts.   
 
     line 8:  MXBVAL, INTEGER array, dimension (NPARMS)   
-             The values for MAXB, used in determining minimum blocksize. 
-  
+             The values for MAXB, used in determining minimum blocksize.   
 
     line 9:  NBCOL, INTEGER array, dimension (NPARMS)   
              The values for NBCOL, the minimum column dimension for   
@@ -937,17 +979,14 @@ static integer c__264 = 264;
 
     line 10: THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 11: TSTCHK, LOGICAL   
-             Flag indicating whether or not to test the LAPACK routines. 
-  
+             Flag indicating whether or not to test the LAPACK routines.   
 
     line 12: TSTDRV, LOGICAL   
-             Flag indicating whether or not to test the driver routines. 
-  
+             Flag indicating whether or not to test the driver routines.   
 
     line 13: TSTERR, LOGICAL   
              Flag indicating whether or not to test the error exits for   
@@ -956,8 +995,7 @@ static integer c__264 = 264;
     line 14: NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -970,8 +1008,161 @@ static integer c__264 = 264;
              The 3-character path name is 'ZGG' for the generalized   
              eigenvalue problem routines and driver routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
+
+    ZGS and ZGV input files:   
+
+    line 1:  'ZGS' or 'ZGV' in columns 1 to 3.   
+
+    line 2:  NN, INTEGER   
+             Number of values of N.   
+
+    line 3:  NVAL, INTEGER array, dimension(NN)   
+             Dimensions of matrices to be tested.   
+
+    line 4:  NB, NBMIN, NX, NS, NBCOL, INTEGERs   
+             These integer parameters determine how blocking is done   
+             (see ILAENV for details)   
+             NB     : block size   
+             NBMIN  : minimum block size   
+             NX     : minimum dimension for blocking   
+             NS     : number of shifts in xHGEQR   
+             NBCOL  : minimum column dimension for blocking   
+
+    line 5:  THRESH, REAL   
+             The test threshold against which computed residuals are   
+             compared. Should generally be in the range from 10. to 20.   
+             If it is 0., all test case data will be printed.   
+
+    line 6:  TSTERR, LOGICAL   
+             Flag indicating whether or not to test the error exits.   
+
+    line 7:  NEWSD, INTEGER   
+             A code indicating how to set the random number seed.   
+             = 0:  Set the seed to a default value before each run   
+             = 1:  Initialize the seed to a default value only before the   
+                   first run   
+             = 2:  Like 1, but use the seed values on the next line   
+
+    If line 17 was 2:   
+
+    line 7:  INTEGER array, dimension (4)   
+             Four integer values for the random number seed.   
+
+    lines 7-EOF:  Lines specifying matrix types, as for NEP.   
+             The 3-character path name is 'ZGS' for the generalized   
+             eigenvalue problem routines and driver routines.   
+
+   -----------------------------------------------------------------------   
+
+    ZGX input file:   
+    line 1:  'ZGX' in columns 1 to 3.   
+
+    line 2:  N, INTEGER   
+             Value of N.   
+
+    line 3:  NB, NBMIN, NX, NS, NBCOL, INTEGERs   
+             These integer parameters determine how blocking is done   
+             (see ILAENV for details)   
+             NB     : block size   
+             NBMIN  : minimum block size   
+             NX     : minimum dimension for blocking   
+             NS     : number of shifts in xHGEQR   
+             NBCOL  : minimum column dimension for blocking   
+
+    line 4:  THRESH, REAL   
+             The test threshold against which computed residuals are   
+             compared. Should generally be in the range from 10. to 20.   
+             Information will be printed about each test for which the   
+             test ratio is greater than or equal to the threshold.   
+
+    line 5:  TSTERR, LOGICAL   
+             Flag indicating whether or not to test the error exits for   
+             the LAPACK routines and driver routines.   
+
+    line 6:  NEWSD, INTEGER   
+             A code indicating how to set the random number seed.   
+             = 0:  Set the seed to a default value before each run   
+             = 1:  Initialize the seed to a default value only before the   
+                   first run   
+             = 2:  Like 1, but use the seed values on the next line   
+
+    If line 6 was 2:   
+
+    line 7: INTEGER array, dimension (4)   
+             Four integer values for the random number seed.   
+
+    If line 2 was 0:   
+
+    line 7-EOF: Precomputed examples are tested.   
+
+    remaining lines : Each example is stored on 3+2*N*N lines, where N is   
+             its dimension. The first line contains the dimension (a   
+             single integer).  The next line contains an integer k such   
+             that only the last k eigenvalues will be selected and appear   
+             in the leading diagonal blocks of $A$ and $B$. The next N*N   
+             lines contain the matrix A, one element per line. The next N*N   
+             lines contain the matrix B. The last line contains the   
+             reciprocal of the eigenvalue cluster condition number and the   
+             reciprocal of the deflating subspace (associated with the   
+             selected eigencluster) condition number.  The end of data is   
+             indicated by dimension N=0.  Even if no data is to be tested,   
+             there must be at least one line containing N=0.   
+
+   -----------------------------------------------------------------------   
+
+    ZXV input files:   
+    line 1:  'ZXV' in columns 1 to 3.   
+
+    line 2:  N, INTEGER   
+             Value of N.   
+
+    line 3:  NB, NBMIN, NX, NS, NBCOL, INTEGERs   
+             These integer parameters determine how blocking is done   
+             (see ILAENV for details)   
+             NB     : block size   
+             NBMIN  : minimum block size   
+             NX     : minimum dimension for blocking   
+             NS     : number of shifts in xHGEQR   
+             NBCOL  : minimum column dimension for blocking   
+
+    line 4:  THRESH, REAL   
+             The test threshold against which computed residuals are   
+             compared. Should generally be in the range from 10. to 20.   
+             Information will be printed about each test for which the   
+             test ratio is greater than or equal to the threshold.   
+
+    line 5:  TSTERR, LOGICAL   
+             Flag indicating whether or not to test the error exits for   
+             the LAPACK routines and driver routines.   
+
+    line 6:  NEWSD, INTEGER   
+             A code indicating how to set the random number seed.   
+             = 0:  Set the seed to a default value before each run   
+             = 1:  Initialize the seed to a default value only before the   
+                   first run   
+             = 2:  Like 1, but use the seed values on the next line   
+
+    If line 6 was 2:   
+
+    line 7: INTEGER array, dimension (4)   
+             Four integer values for the random number seed.   
+
+    If line 2 was 0:   
+
+    line 7-EOF: Precomputed examples are tested.   
+
+    remaining lines : Each example is stored on 3+2*N*N lines, where N is   
+             its dimension. The first line contains the dimension (a   
+             single integer). The next N*N lines contain the matrix A, one   
+             element per line. The next N*N lines contain the matrix B.   
+             The next line contains the reciprocals of the eigenvalue   
+             condition numbers.  The last line contains the reciprocals of   
+             the eigenvector condition numbers.  The end of data is   
+             indicated by dimension N=0.  Even if no data is to be tested,   
+             there must be at least one line containing N=0.   
+
+   -----------------------------------------------------------------------   
 
     ZHB input file:   
 
@@ -989,15 +1180,13 @@ static integer c__264 = 264;
 
     line 6:  THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 7:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1009,8 +1198,7 @@ static integer c__264 = 264;
     lines 8-EOF:  Lines specifying matrix types, as for NEP.   
              The 3-character path name is 'ZHB'.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZBB input file:   
 
@@ -1037,15 +1225,13 @@ static integer c__264 = 264;
 
     line 8:  THRESH   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 9:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1057,15 +1243,13 @@ static integer c__264 = 264;
     lines 10-EOF:  Lines specifying matrix types, as for SVD.   
              The 3-character path name is 'ZBB'.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZEC input file:   
 
     line  2: THRESH, REAL   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     lines  3-EOF:   
@@ -1074,18 +1258,16 @@ static integer c__264 = 264;
     specially constructed test cases and their solutions.  The data   
     format is not intended to be modified by the user.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZBL and ZBK input files:   
 
-    line 1:  'ZBL' in columns 1-3 to test ZGEBAL, or 'ZBK' in   
-             columns 1-3 to test ZGEBAK.   
+    line 1:  'ZBL' in columns 1-3 to test CGEBAL, or 'ZBK' in   
+             columns 1-3 to test CGEBAK.   
 
     The remaining lines consist of specially constructed test cases.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     ZGL and ZGK input files:   
 
@@ -1094,8 +1276,7 @@ static integer c__264 = 264;
 
     The remaining lines consist of specially constructed test cases.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     GLM data file:   
 
@@ -1115,8 +1296,7 @@ static integer c__264 = 264;
 
     line 6:  THRESH, REAL   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 7:  TSTERR, LOGICAL   
@@ -1126,8 +1306,7 @@ static integer c__264 = 264;
     line 8:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1140,8 +1319,7 @@ static integer c__264 = 264;
              The 3-character path name is 'GLM' for the generalized   
              linear regression model routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     GQR data file:   
 
@@ -1161,8 +1339,7 @@ static integer c__264 = 264;
 
     line 6:  THRESH, REAL   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 7:  TSTERR, LOGICAL   
@@ -1172,8 +1349,7 @@ static integer c__264 = 264;
     line 8:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1186,8 +1362,7 @@ static integer c__264 = 264;
              The 3-character path name is 'GQR' for the generalized   
              QR and RQ routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     GSV data file:   
 
@@ -1207,8 +1382,7 @@ static integer c__264 = 264;
 
     line 6:  THRESH, REAL   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 7:  TSTERR, LOGICAL   
@@ -1218,8 +1392,7 @@ static integer c__264 = 264;
     line 8:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1232,8 +1405,7 @@ static integer c__264 = 264;
              The 3-character path name is 'GSV' for the generalized   
              SVD routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     LSE data file:   
 
@@ -1253,8 +1425,7 @@ static integer c__264 = 264;
 
     line 6:  THRESH, REAL   
              Threshold value for the test ratios.  Information will be   
-             printed about each test for which the test ratio is greater 
-  
+             printed about each test for which the test ratio is greater   
              than or equal to the threshold.   
 
     line 7:  TSTERR, LOGICAL   
@@ -1264,8 +1435,7 @@ static integer c__264 = 264;
     line 8:  NEWSD, INTEGER   
              A code indicating how to set the random number seed.   
              = 0:  Set the seed to a default value before each run   
-             = 1:  Initialize the seed to a default value only before the 
-  
+             = 1:  Initialize the seed to a default value only before the   
                    first run   
              = 2:  Like 1, but use the seed values on the next line   
 
@@ -1278,18 +1448,14 @@ static integer c__264 = 264;
              The 3-character path name is 'GSV' for the generalized   
              SVD routines.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
-    NMAX is currently set to 132 and must be at least 12 for some of the 
-  
+    NMAX is currently set to 132 and must be at least 12 for some of the   
     precomputed examples, and LWORK = NMAX*(5*NMAX+20) in the parameter   
     statements below.  For SVD, we assume NRHS may be as big as N.  The   
-    parameter NEED is set to 14 to allow for 14 N-by-N matrices for ZGG. 
-  
+    parameter NEED is set to 14 to allow for 14 N-by-N matrices for ZGG.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     s1 = dsecnd_();
@@ -1304,29 +1470,37 @@ L10:
 
     i__1 = s_rsfe(&io___5);
     if (i__1 != 0) {
-	goto L370;
+	goto L380;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
-	goto L370;
+	goto L380;
     }
     i__1 = e_rsfe();
     if (i__1 != 0) {
-	goto L370;
+	goto L380;
     }
-    s_copy(path, line, 3L, 3L);
-    nep = lsamen_(&c__3, path, "NEP") || lsamen_(&c__3, path, "ZHS");
-    sep = lsamen_(&c__3, path, "SEP") || lsamen_(&c__3, path, "ZST") || lsamen_(&c__3, path, "ZSG");
-    svd = lsamen_(&c__3, path, "SVD") || lsamen_(&c__3, path, "ZBD");
+    s_copy(path, line, (ftnlen)3, (ftnlen)3);
+    nep = lsamen_(&c__3, path, "NEP") || lsamen_(&c__3, 
+	    path, "ZHS");
+    sep = lsamen_(&c__3, path, "SEP") || lsamen_(&c__3, 
+	    path, "ZST") || lsamen_(&c__3, path, "ZSG");
+    svd = lsamen_(&c__3, path, "SVD") || lsamen_(&c__3, 
+	    path, "ZBD");
     zev = lsamen_(&c__3, path, "ZEV");
     zes = lsamen_(&c__3, path, "ZES");
     zvx = lsamen_(&c__3, path, "ZVX");
     zsx = lsamen_(&c__3, path, "ZSX");
     zgg = lsamen_(&c__3, path, "ZGG");
+    zgs = lsamen_(&c__3, path, "ZGS");
+    zgx = lsamen_(&c__3, path, "ZGX");
+    zgv = lsamen_(&c__3, path, "ZGV");
+    zxv = lsamen_(&c__3, path, "ZXV");
     zhb = lsamen_(&c__3, path, "ZHB");
     zbb = lsamen_(&c__3, path, "ZBB");
     glm = lsamen_(&c__3, path, "GLM");
-    gqr = lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, path, "GRQ");
+    gqr = lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, 
+	    path, "GRQ");
     gsv = lsamen_(&c__3, path, "GSV");
     lse = lsamen_(&c__3, path, "LSE");
     zbl = lsamen_(&c__3, path, "ZBL");
@@ -1336,111 +1510,123 @@ L10:
 
 /*     Report values of parameters. */
 
-    if (s_cmp(path, "   ", 3L, 3L) == 0) {
+    if (s_cmp(path, "   ", (ftnlen)3, (ftnlen)3) == 0) {
 	goto L10;
     } else if (nep) {
-	s_wsfe(&io___26);
-	e_wsfe();
-    } else if (sep) {
-	s_wsfe(&io___27);
-	e_wsfe();
-    } else if (svd) {
-	s_wsfe(&io___28);
-	e_wsfe();
-    } else if (zev) {
-	s_wsfe(&io___29);
-	e_wsfe();
-    } else if (zes) {
 	s_wsfe(&io___30);
 	e_wsfe();
-    } else if (zvx) {
+    } else if (sep) {
 	s_wsfe(&io___31);
 	e_wsfe();
-    } else if (zsx) {
+    } else if (svd) {
 	s_wsfe(&io___32);
 	e_wsfe();
-    } else if (zgg) {
+    } else if (zev) {
 	s_wsfe(&io___33);
 	e_wsfe();
-    } else if (zhb) {
+    } else if (zes) {
 	s_wsfe(&io___34);
 	e_wsfe();
-    } else if (zbb) {
+    } else if (zvx) {
 	s_wsfe(&io___35);
 	e_wsfe();
-    } else if (glm) {
+    } else if (zsx) {
 	s_wsfe(&io___36);
 	e_wsfe();
-    } else if (gqr) {
+    } else if (zgg) {
 	s_wsfe(&io___37);
 	e_wsfe();
-    } else if (gsv) {
+    } else if (zgs) {
 	s_wsfe(&io___38);
 	e_wsfe();
-    } else if (lse) {
+    } else if (zgx) {
 	s_wsfe(&io___39);
+	e_wsfe();
+    } else if (zgv) {
+	s_wsfe(&io___40);
+	e_wsfe();
+    } else if (zxv) {
+	s_wsfe(&io___41);
+	e_wsfe();
+    } else if (zhb) {
+	s_wsfe(&io___42);
+	e_wsfe();
+    } else if (zbb) {
+	s_wsfe(&io___43);
+	e_wsfe();
+    } else if (glm) {
+	s_wsfe(&io___44);
+	e_wsfe();
+    } else if (gqr) {
+	s_wsfe(&io___45);
+	e_wsfe();
+    } else if (gsv) {
+	s_wsfe(&io___46);
+	e_wsfe();
+    } else if (lse) {
+	s_wsfe(&io___47);
 	e_wsfe();
     } else if (zbl) {
 
 /*        ZGEBAL:  Balancing */
 
 	zchkbl_(&c__5, &c__6);
-	goto L370;
+	goto L380;
     } else if (zbk) {
 
 /*        ZGEBAK:  Back transformation */
 
 	zchkbk_(&c__5, &c__6);
-	goto L370;
+	goto L380;
     } else if (zgl) {
 
 /*        ZGGBAL:  Balancing */
 
 	zchkgl_(&c__5, &c__6);
-	goto L370;
+	goto L380;
     } else if (zgk) {
 
 /*        ZGGBAK:  Back transformation */
 
 	zchkgk_(&c__5, &c__6);
-	goto L370;
+	goto L380;
     } else if (lsamen_(&c__3, path, "ZEC")) {
 
 /*        ZEC:  Eigencondition estimation */
 
-	s_rsle(&io___40);
+	s_rsle(&io___48);
 	do_lio(&c__5, &c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
 	e_rsle();
 	tsterr = TRUE_;
 	zchkec_(&thresh, &tsterr, &c__5, &c__6);
-	goto L370;
+	goto L380;
     } else {
-	s_wsfe(&io___43);
-	do_fio(&c__1, path, 3L);
+	s_wsfe(&io___51);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	goto L370;
+	goto L380;
     }
-    s_wsfe(&io___44);
+    s_wsfe(&io___52);
     e_wsfe();
-    s_wsfe(&io___45);
+    s_wsfe(&io___53);
     e_wsfe();
 
 /*     Read the number of values of M, P, and N. */
 
-    s_rsle(&io___46);
+    s_rsle(&io___54);
     do_lio(&c__3, &c__1, (char *)&nn, (ftnlen)sizeof(integer));
     e_rsle();
-    if (nn < 1) {
-	s_wsfe(&io___48);
-	do_fio(&c__1, "   NN ", 6L);
+    if (nn < 0) {
+	s_wsfe(&io___56);
+	do_fio(&c__1, "   NN ", (ftnlen)6);
 	do_fio(&c__1, (char *)&nn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	nn = 0;
 	fatal = TRUE_;
     } else if (nn > 20) {
-	s_wsfe(&io___49);
-	do_fio(&c__1, "   NN ", 6L);
+	s_wsfe(&io___57);
+	do_fio(&c__1, "   NN ", (ftnlen)6);
 	do_fio(&c__1, (char *)&nn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__20, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -1450,78 +1636,85 @@ L10:
 
 /*     Read the values of M */
 
-    s_rsle(&io___50);
-    i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
-    }
-    e_rsle();
-    if (svd) {
-	s_copy(vname, "    M ", 6L, 6L);
-    } else {
-	s_copy(vname, "    N ", 6L, 6L);
-    }
-    i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	if (mval[i - 1] < 0) {
-	    s_wsfe(&io___54);
-	    do_fio(&c__1, vname, 6L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
-	    e_wsfe();
-	    fatal = TRUE_;
-	} else if (mval[i - 1] > 132) {
-	    s_wsfe(&io___55);
-	    do_fio(&c__1, vname, 6L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
-	    e_wsfe();
-	    fatal = TRUE_;
+    if (! (zgx || zxv)) {
+	s_rsle(&io___58);
+	i__1 = nn;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(
+		    integer));
 	}
+	e_rsle();
+	if (svd) {
+	    s_copy(vname, "    M ", (ftnlen)6, (ftnlen)6);
+	} else {
+	    s_copy(vname, "    N ", (ftnlen)6, (ftnlen)6);
+	}
+	i__1 = nn;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (mval[i__ - 1] < 0) {
+		s_wsfe(&io___62);
+		do_fio(&c__1, vname, (ftnlen)6);
+		do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer))
+			;
+		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
+		e_wsfe();
+		fatal = TRUE_;
+	    } else if (mval[i__ - 1] > 132) {
+		s_wsfe(&io___63);
+		do_fio(&c__1, vname, (ftnlen)6);
+		do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer))
+			;
+		do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
+		e_wsfe();
+		fatal = TRUE_;
+	    }
 /* L20: */
+	}
+	s_wsfe(&io___64);
+	do_fio(&c__1, "M:    ", (ftnlen)6);
+	i__1 = nn;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
+	}
+	e_wsfe();
     }
-    s_wsfe(&io___56);
-    do_fio(&c__1, "M:    ", 6L);
-    i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
-    }
-    e_wsfe();
 
 /*     Read the values of P */
 
     if (glm || gqr || gsv || lse) {
-	s_rsle(&io___57);
+	s_rsle(&io___65);
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&pval[i - 1], (ftnlen)sizeof(integer)
-		    );
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&pval[i__ - 1], (ftnlen)sizeof(
+		    integer));
 	}
 	e_rsle();
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    if (pval[i - 1] < 0) {
-		s_wsfe(&io___59);
-		do_fio(&c__1, " P  ", 4L);
-		do_fio(&c__1, (char *)&pval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (pval[i__ - 1] < 0) {
+		s_wsfe(&io___67);
+		do_fio(&c__1, " P  ", (ftnlen)4);
+		do_fio(&c__1, (char *)&pval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
-	    } else if (pval[i - 1] > 132) {
-		s_wsfe(&io___60);
-		do_fio(&c__1, " P  ", 4L);
-		do_fio(&c__1, (char *)&pval[i - 1], (ftnlen)sizeof(integer));
+	    } else if (pval[i__ - 1] > 132) {
+		s_wsfe(&io___68);
+		do_fio(&c__1, " P  ", (ftnlen)4);
+		do_fio(&c__1, (char *)&pval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
 	    }
 /* L30: */
 	}
-	s_wsfe(&io___61);
-	do_fio(&c__1, "P:    ", 6L);
+	s_wsfe(&io___69);
+	do_fio(&c__1, "P:    ", (ftnlen)6);
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&pval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&pval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     }
@@ -1529,26 +1722,28 @@ L10:
 /*     Read the values of N */
 
     if (svd || zbb || glm || gqr || gsv || lse) {
-	s_rsle(&io___62);
+	s_rsle(&io___70);
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer)
-		    );
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(
+		    integer));
 	}
 	e_rsle();
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    if (nval[i - 1] < 0) {
-		s_wsfe(&io___64);
-		do_fio(&c__1, "    N ", 6L);
-		do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (nval[i__ - 1] < 0) {
+		s_wsfe(&io___72);
+		do_fio(&c__1, "    N ", (ftnlen)6);
+		do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
-	    } else if (nval[i - 1] > 132) {
-		s_wsfe(&io___65);
-		do_fio(&c__1, "    N ", 6L);
-		do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+	    } else if (nval[i__ - 1] > 132) {
+		s_wsfe(&io___73);
+		do_fio(&c__1, "    N ", (ftnlen)6);
+		do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -1557,66 +1752,75 @@ L10:
 	}
     } else {
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    nval[i - 1] = mval[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nval[i__ - 1] = mval[i__ - 1];
 /* L50: */
 	}
     }
-    s_wsfe(&io___66);
-    do_fio(&c__1, "N:    ", 6L);
-    i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    if (! (zgx || zxv)) {
+	s_wsfe(&io___74);
+	do_fio(&c__1, "N:    ", (ftnlen)6);
+	i__1 = nn;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
+	}
+	e_wsfe();
+    } else {
+	s_wsfe(&io___75);
+	do_fio(&c__1, "N:    ", (ftnlen)6);
+	do_fio(&c__1, (char *)&nn, (ftnlen)sizeof(integer));
+	e_wsfe();
     }
-    e_wsfe();
 
 /*     Read the number of values of K, followed by the values of K */
 
     if (zhb || zbb) {
-	s_rsle(&io___67);
+	s_rsle(&io___76);
 	do_lio(&c__3, &c__1, (char *)&nk, (ftnlen)sizeof(integer));
 	e_rsle();
-	s_rsle(&io___69);
+	s_rsle(&io___78);
 	i__1 = nk;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer)
-		    );
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(
+		    integer));
 	}
 	e_rsle();
 	i__1 = nk;
-	for (i = 1; i <= i__1; ++i) {
-	    if (kval[i - 1] < 0) {
-		s_wsfe(&io___71);
-		do_fio(&c__1, "    K ", 6L);
-		do_fio(&c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (kval[i__ - 1] < 0) {
+		s_wsfe(&io___80);
+		do_fio(&c__1, "    K ", (ftnlen)6);
+		do_fio(&c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
-	    } else if (kval[i - 1] > 132) {
-		s_wsfe(&io___72);
-		do_fio(&c__1, "    K ", 6L);
-		do_fio(&c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+	    } else if (kval[i__ - 1] > 132) {
+		s_wsfe(&io___81);
+		do_fio(&c__1, "    K ", (ftnlen)6);
+		do_fio(&c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
 	    }
 /* L60: */
 	}
-	s_wsfe(&io___73);
-	do_fio(&c__1, "K:    ", 6L);
+	s_wsfe(&io___82);
+	do_fio(&c__1, "K:    ", (ftnlen)6);
 	i__1 = nk;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&kval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&kval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     }
 
-    if (zev || zes || zvx || zsx) {
+    if (zev || zes || zvx || zsx || zgs || zgx || zgv || zxv) {
 
 /*        For the nonsymmetric driver routines, only one set of   
           parameters is allowed. */
 
-	s_rsle(&io___74);
+	s_rsle(&io___83);
 	do_lio(&c__3, &c__1, (char *)&nbval[0], (ftnlen)sizeof(integer));
 	do_lio(&c__3, &c__1, (char *)&nbmin[0], (ftnlen)sizeof(integer));
 	do_lio(&c__3, &c__1, (char *)&nxval[0], (ftnlen)sizeof(integer));
@@ -1624,36 +1828,36 @@ L10:
 	do_lio(&c__3, &c__1, (char *)&mxbval[0], (ftnlen)sizeof(integer));
 	e_rsle();
 	if (nbval[0] < 1) {
-	    s_wsfe(&io___80);
-	    do_fio(&c__1, "   NB ", 6L);
+	    s_wsfe(&io___89);
+	    do_fio(&c__1, "   NB ", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nbval[0], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
 	} else if (nbmin[0] < 1) {
-	    s_wsfe(&io___81);
-	    do_fio(&c__1, "NBMIN ", 6L);
+	    s_wsfe(&io___90);
+	    do_fio(&c__1, "NBMIN ", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nbmin[0], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
 	} else if (nxval[0] < 1) {
-	    s_wsfe(&io___82);
-	    do_fio(&c__1, "   NX ", 6L);
+	    s_wsfe(&io___91);
+	    do_fio(&c__1, "   NX ", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nxval[0], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
 	} else if (nsval[0] < 2) {
-	    s_wsfe(&io___83);
-	    do_fio(&c__1, "   NS ", 6L);
+	    s_wsfe(&io___92);
+	    do_fio(&c__1, "   NS ", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nsval[0], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
 	} else if (mxbval[0] < 1) {
-	    s_wsfe(&io___84);
-	    do_fio(&c__1, " MAXB ", 6L);
+	    s_wsfe(&io___93);
+	    do_fio(&c__1, " MAXB ", (ftnlen)6);
 	    do_fio(&c__1, (char *)&mxbval[0], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -1664,47 +1868,45 @@ L10:
 	xlaenv_(&c__3, nxval);
 	xlaenv_(&c__4, nsval);
 	xlaenv_(&c__8, mxbval);
-	s_wsfe(&io___85);
-	do_fio(&c__1, "NB:   ", 6L);
+	s_wsfe(&io___94);
+	do_fio(&c__1, "NB:   ", (ftnlen)6);
 	do_fio(&c__1, (char *)&nbval[0], (ftnlen)sizeof(integer));
 	e_wsfe();
-	s_wsfe(&io___86);
-	do_fio(&c__1, "NBMIN:", 6L);
+	s_wsfe(&io___95);
+	do_fio(&c__1, "NBMIN:", (ftnlen)6);
 	do_fio(&c__1, (char *)&nbmin[0], (ftnlen)sizeof(integer));
 	e_wsfe();
-	s_wsfe(&io___87);
-	do_fio(&c__1, "NX:   ", 6L);
+	s_wsfe(&io___96);
+	do_fio(&c__1, "NX:   ", (ftnlen)6);
 	do_fio(&c__1, (char *)&nxval[0], (ftnlen)sizeof(integer));
 	e_wsfe();
-	s_wsfe(&io___88);
-	do_fio(&c__1, "NS:   ", 6L);
+	s_wsfe(&io___97);
+	do_fio(&c__1, "NS:   ", (ftnlen)6);
 	do_fio(&c__1, (char *)&nsval[0], (ftnlen)sizeof(integer));
 	e_wsfe();
-	s_wsfe(&io___89);
-	do_fio(&c__1, "MAXB: ", 6L);
+	s_wsfe(&io___98);
+	do_fio(&c__1, "MAXB: ", (ftnlen)6);
 	do_fio(&c__1, (char *)&mxbval[0], (ftnlen)sizeof(integer));
 	e_wsfe();
     } else if (! zhb && ! glm && ! gqr && ! gsv && ! lse) {
 
-/*        For the other paths, the number of parameters can be varied 
-  
-          from the input file.  Read the number of parameter values. 
-*/
+/*        For the other paths, the number of parameters can be varied   
+          from the input file.  Read the number of parameter values. */
 
-	s_rsle(&io___90);
+	s_rsle(&io___99);
 	do_lio(&c__3, &c__1, (char *)&nparms, (ftnlen)sizeof(integer));
 	e_rsle();
 	if (nparms < 1) {
-	    s_wsfe(&io___92);
-	    do_fio(&c__1, "NPARMS", 6L);
+	    s_wsfe(&io___101);
+	    do_fio(&c__1, "NPARMS", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nparms, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    nparms = 0;
 	    fatal = TRUE_;
 	} else if (nparms > 20) {
-	    s_wsfe(&io___93);
-	    do_fio(&c__1, "NPARMS", 6L);
+	    s_wsfe(&io___102);
+	    do_fio(&c__1, "NPARMS", (ftnlen)6);
 	    do_fio(&c__1, (char *)&nparms, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__20, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -1715,27 +1917,27 @@ L10:
 /*        Read the values of NB */
 
 	if (! zbb) {
-	    s_rsle(&io___94);
+	    s_rsle(&io___103);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (nbval[i - 1] < 0) {
-		    s_wsfe(&io___95);
-		    do_fio(&c__1, "   NB ", 6L);
-		    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (nbval[i__ - 1] < 0) {
+		    s_wsfe(&io___104);
+		    do_fio(&c__1, "   NB ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (nbval[i - 1] > 132) {
-		    s_wsfe(&io___96);
-		    do_fio(&c__1, "   NB ", 6L);
-		    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(
+		} else if (nbval[i__ - 1] > 132) {
+		    s_wsfe(&io___105);
+		    do_fio(&c__1, "   NB ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1743,11 +1945,12 @@ L10:
 		}
 /* L70: */
 	    }
-	    s_wsfe(&io___97);
-	    do_fio(&c__1, "NB:   ", 6L);
+	    s_wsfe(&io___106);
+	    do_fio(&c__1, "NB:   ", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer)
+			);
 	    }
 	    e_wsfe();
 	}
@@ -1755,27 +1958,27 @@ L10:
 /*        Read the values of NBMIN */
 
 	if (nep || sep || svd || zgg) {
-	    s_rsle(&io___98);
+	    s_rsle(&io___107);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (nbmin[i - 1] < 0) {
-		    s_wsfe(&io___99);
-		    do_fio(&c__1, "NBMIN ", 6L);
-		    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (nbmin[i__ - 1] < 0) {
+		    s_wsfe(&io___108);
+		    do_fio(&c__1, "NBMIN ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (nbmin[i - 1] > 132) {
-		    s_wsfe(&io___100);
-		    do_fio(&c__1, "NBMIN ", 6L);
-		    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(
+		} else if (nbmin[i__ - 1] > 132) {
+		    s_wsfe(&io___109);
+		    do_fio(&c__1, "NBMIN ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1783,17 +1986,18 @@ L10:
 		}
 /* L80: */
 	    }
-	    s_wsfe(&io___101);
-	    do_fio(&c__1, "NBMIN:", 6L);
+	    s_wsfe(&io___110);
+	    do_fio(&c__1, "NBMIN:", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer)
+			);
 	    }
 	    e_wsfe();
 	} else {
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		nbmin[i - 1] = 1;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		nbmin[i__ - 1] = 1;
 /* L90: */
 	    }
 	}
@@ -1801,27 +2005,27 @@ L10:
 /*        Read the values of NX */
 
 	if (nep || sep || svd) {
-	    s_rsle(&io___102);
+	    s_rsle(&io___111);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (nxval[i - 1] < 0) {
-		    s_wsfe(&io___103);
-		    do_fio(&c__1, "   NX ", 6L);
-		    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (nxval[i__ - 1] < 0) {
+		    s_wsfe(&io___112);
+		    do_fio(&c__1, "   NX ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (nxval[i - 1] > 132) {
-		    s_wsfe(&io___104);
-		    do_fio(&c__1, "   NX ", 6L);
-		    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(
+		} else if (nxval[i__ - 1] > 132) {
+		    s_wsfe(&io___113);
+		    do_fio(&c__1, "   NX ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1829,17 +2033,18 @@ L10:
 		}
 /* L100: */
 	    }
-	    s_wsfe(&io___105);
-	    do_fio(&c__1, "NX:   ", 6L);
+	    s_wsfe(&io___114);
+	    do_fio(&c__1, "NX:   ", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer)
+			);
 	    }
 	    e_wsfe();
 	} else {
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		nxval[i - 1] = 1;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		nxval[i__ - 1] = 1;
 /* L110: */
 	    }
 	}
@@ -1848,27 +2053,27 @@ L10:
           or ZBB). */
 
 	if (nep || svd || zbb || zgg) {
-	    s_rsle(&io___106);
+	    s_rsle(&io___115);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (nsval[i - 1] < 0) {
-		    s_wsfe(&io___107);
-		    do_fio(&c__1, "   NS ", 6L);
-		    do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (nsval[i__ - 1] < 0) {
+		    s_wsfe(&io___116);
+		    do_fio(&c__1, "   NS ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (nsval[i - 1] > 132) {
-		    s_wsfe(&io___108);
-		    do_fio(&c__1, "   NS ", 6L);
-		    do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(
+		} else if (nsval[i__ - 1] > 132) {
+		    s_wsfe(&io___117);
+		    do_fio(&c__1, "   NS ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1876,17 +2081,18 @@ L10:
 		}
 /* L120: */
 	    }
-	    s_wsfe(&io___109);
-	    do_fio(&c__1, "NS:   ", 6L);
+	    s_wsfe(&io___118);
+	    do_fio(&c__1, "NS:   ", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(integer));
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(integer)
+			);
 	    }
 	    e_wsfe();
 	} else {
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		nsval[i - 1] = 1;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		nsval[i__ - 1] = 1;
 /* L130: */
 	    }
 	}
@@ -1894,27 +2100,27 @@ L10:
 /*        Read the values for MAXB. */
 
 	if (nep || zgg) {
-	    s_rsle(&io___110);
+	    s_rsle(&io___119);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (mxbval[i - 1] < 0) {
-		    s_wsfe(&io___111);
-		    do_fio(&c__1, " MAXB ", 6L);
-		    do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (mxbval[i__ - 1] < 0) {
+		    s_wsfe(&io___120);
+		    do_fio(&c__1, " MAXB ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (mxbval[i - 1] > 132) {
-		    s_wsfe(&io___112);
-		    do_fio(&c__1, " MAXB ", 6L);
-		    do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(
+		} else if (mxbval[i__ - 1] > 132) {
+		    s_wsfe(&io___121);
+		    do_fio(&c__1, " MAXB ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1922,18 +2128,18 @@ L10:
 		}
 /* L140: */
 	    }
-	    s_wsfe(&io___113);
-	    do_fio(&c__1, "MAXB: ", 6L);
+	    s_wsfe(&io___122);
+	    do_fio(&c__1, "MAXB: ", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(integer))
-			;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
+			integer));
 	    }
 	    e_wsfe();
 	} else {
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		mxbval[i - 1] = 1;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		mxbval[i__ - 1] = 1;
 /* L150: */
 	    }
 	}
@@ -1941,27 +2147,27 @@ L10:
 /*        Read the values for NBCOL. */
 
 	if (zgg) {
-	    s_rsle(&io___114);
+	    s_rsle(&io___123);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_lio(&c__3, &c__1, (char *)&nbcol[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_lio(&c__3, &c__1, (char *)&nbcol[i__ - 1], (ftnlen)sizeof(
 			integer));
 	    }
 	    e_rsle();
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		if (nbcol[i - 1] < 0) {
-		    s_wsfe(&io___116);
-		    do_fio(&c__1, "NBCOL ", 6L);
-		    do_fio(&c__1, (char *)&nbcol[i - 1], (ftnlen)sizeof(
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (nbcol[i__ - 1] < 0) {
+		    s_wsfe(&io___125);
+		    do_fio(&c__1, "NBCOL ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbcol[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    fatal = TRUE_;
-		} else if (nbcol[i - 1] > 132) {
-		    s_wsfe(&io___117);
-		    do_fio(&c__1, "NBCOL ", 6L);
-		    do_fio(&c__1, (char *)&nbcol[i - 1], (ftnlen)sizeof(
+		} else if (nbcol[i__ - 1] > 132) {
+		    s_wsfe(&io___126);
+		    do_fio(&c__1, "NBCOL ", (ftnlen)6);
+		    do_fio(&c__1, (char *)&nbcol[i__ - 1], (ftnlen)sizeof(
 			    integer));
 		    do_fio(&c__1, (char *)&c__132, (ftnlen)sizeof(integer));
 		    e_wsfe();
@@ -1969,17 +2175,18 @@ L10:
 		}
 /* L160: */
 	    }
-	    s_wsfe(&io___118);
-	    do_fio(&c__1, "NBCOL:", 6L);
+	    s_wsfe(&io___127);
+	    do_fio(&c__1, "NBCOL:", (ftnlen)6);
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		do_fio(&c__1, (char *)&nbcol[i - 1], (ftnlen)sizeof(integer));
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		do_fio(&c__1, (char *)&nbcol[i__ - 1], (ftnlen)sizeof(integer)
+			);
 	    }
 	    e_wsfe();
 	} else {
 	    i__1 = nparms;
-	    for (i = 1; i <= i__1; ++i) {
-		nbcol[i - 1] = 1;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		nbcol[i__ - 1] = 1;
 /* L170: */
 	    }
 	}
@@ -1987,155 +2194,165 @@ L10:
 
 /*     Calculate and print the machine dependent constants. */
 
-    s_wsle(&io___119);
+    s_wsle(&io___128);
     e_wsle();
     eps = dlamch_("Underflow threshold");
-    s_wsfe(&io___121);
-    do_fio(&c__1, "underflow", 9L);
+    s_wsfe(&io___130);
+    do_fio(&c__1, "underflow", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
     eps = dlamch_("Overflow threshold");
-    s_wsfe(&io___122);
-    do_fio(&c__1, "overflow ", 9L);
+    s_wsfe(&io___131);
+    do_fio(&c__1, "overflow ", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
     eps = dlamch_("Epsilon");
-    s_wsfe(&io___123);
-    do_fio(&c__1, "precision", 9L);
+    s_wsfe(&io___132);
+    do_fio(&c__1, "precision", (ftnlen)9);
     do_fio(&c__1, (char *)&eps, (ftnlen)sizeof(doublereal));
     e_wsfe();
 
 /*     Read the threshold value for the test ratios. */
 
-    s_rsle(&io___124);
+    s_rsle(&io___133);
     do_lio(&c__5, &c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
     e_rsle();
-    s_wsfe(&io___125);
+    s_wsfe(&io___134);
     do_fio(&c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
     e_wsfe();
     if (sep || svd || zgg) {
 
-/*        Read the flag that indicates whether to test LAPACK routines
-. */
+/*        Read the flag that indicates whether to test LAPACK routines. */
 
-	s_rsle(&io___126);
+	s_rsle(&io___135);
 	do_lio(&c__8, &c__1, (char *)&tstchk, (ftnlen)sizeof(logical));
 	e_rsle();
 
-/*        Read the flag that indicates whether to test driver routines
-. */
+/*        Read the flag that indicates whether to test driver routines. */
 
-	s_rsle(&io___128);
+	s_rsle(&io___137);
 	do_lio(&c__8, &c__1, (char *)&tstdrv, (ftnlen)sizeof(logical));
 	e_rsle();
     }
 
 /*     Read the flag that indicates whether to test the error exits. */
 
-    s_rsle(&io___130);
+    s_rsle(&io___139);
     do_lio(&c__8, &c__1, (char *)&tsterr, (ftnlen)sizeof(logical));
     e_rsle();
 
 /*     Read the code describing how to set the random number seed. */
 
-    s_rsle(&io___131);
+    s_rsle(&io___140);
     do_lio(&c__3, &c__1, (char *)&newsd, (ftnlen)sizeof(integer));
     e_rsle();
 
 /*     If NEWSD = 2, read another line with 4 integers for the seed. */
 
     if (newsd == 2) {
-	s_rsle(&io___133);
-	for (i = 1; i <= 4; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&ioldsd[i - 1], (ftnlen)sizeof(
+	s_rsle(&io___142);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&ioldsd[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
     }
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = ioldsd[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = ioldsd[i__ - 1];
 /* L180: */
     }
 
     if (fatal) {
-	s_wsfe(&io___135);
+	s_wsfe(&io___144);
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
 
-/*     Read the input lines indicating the test path and its parameters. 
-  
-       The first three characters indicate the test path, and the number 
-  
+/*     Read the input lines indicating the test path and its parameters.   
+       The first three characters indicate the test path, and the number   
        of test matrix types must be the first nonblank item in columns   
        4-80. */
 
 L190:
-    i__1 = s_rsfe(&io___136);
-    if (i__1 != 0) {
-	goto L370;
-    }
-    i__1 = do_fio(&c__1, line, 80L);
-    if (i__1 != 0) {
-	goto L370;
-    }
-    i__1 = e_rsfe();
-    if (i__1 != 0) {
-	goto L370;
-    }
-    s_copy(c3, line, 3L, 3L);
-    lenp = i_len(line, 80L);
-    i = 3;
-    itmp = 0;
-    i1 = 0;
+
+    if (! (zgx || zxv)) {
+
 L200:
-    ++i;
-    if (i > lenp) {
-	if (i1 > 0) {
-	    goto L230;
-	} else {
-	    ntypes = 30;
-	    goto L230;
+	i__1 = s_rsfe(&io___145);
+	if (i__1 != 0) {
+	    goto L380;
 	}
-    }
-    if (*(unsigned char *)&line[i - 1] != ' ' && *(unsigned char *)&line[i - 
-	    1] != ',') {
-	i1 = i;
-	*(unsigned char *)c1 = *(unsigned char *)&line[i1 - 1];
+	i__1 = do_fio(&c__1, line, (ftnlen)80);
+	if (i__1 != 0) {
+	    goto L380;
+	}
+	i__1 = e_rsfe();
+	if (i__1 != 0) {
+	    goto L380;
+	}
+	s_copy(c3, line, (ftnlen)3, (ftnlen)3);
+	lenp = i_len(line, (ftnlen)80);
+	i__ = 3;
+	itmp = 0;
+	i1 = 0;
+L210:
+	++i__;
+	if (i__ > lenp) {
+	    if (i1 > 0) {
+		goto L240;
+	    } else {
+		ntypes = 30;
+		goto L240;
+	    }
+	}
+	if (*(unsigned char *)&line[i__ - 1] != ' ' && *(unsigned char *)&
+		line[i__ - 1] != ',') {
+	    i1 = i__;
+	    *(unsigned char *)c1 = *(unsigned char *)&line[i1 - 1];
 
 /*        Check that a valid integer was read */
 
-	for (k = 1; k <= 10; ++k) {
-	    if (*(unsigned char *)c1 == *(unsigned char *)&intstr[k - 1]) {
-		ic = k - 1;
-		goto L220;
+	    for (k = 1; k <= 10; ++k) {
+		if (*(unsigned char *)c1 == *(unsigned char *)&intstr[k - 1]) 
+			{
+		    ic = k - 1;
+		    goto L230;
+		}
+/* L220: */
 	    }
-/* L210: */
-	}
-	s_wsfe(&io___145);
-	do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	do_fio(&c__1, line, 80L);
-	e_wsfe();
-	goto L190;
-L220:
-	itmp = itmp * 10 + ic;
-	goto L200;
-    } else if (i1 > 0) {
-	goto L230;
-    } else {
-	goto L200;
-    }
+	    s_wsfe(&io___154);
+	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	    do_fio(&c__1, line, (ftnlen)80);
+	    e_wsfe();
+	    goto L200;
 L230:
-    ntypes = itmp;
+	    itmp = itmp * 10 + ic;
+	    goto L210;
+	} else if (i1 > 0) {
+	    goto L240;
+	} else {
+	    goto L210;
+	}
+L240:
+	ntypes = itmp;
 
 /*     Skip the tests if NTYPES is <= 0. */
 
-    if (! (zev || zes || zvx || zsx) && ntypes <= 0) {
-	s_wsfe(&io___146);
-	do_fio(&c__1, c3, 3L);
-	e_wsfe();
-	goto L190;
+	if (! (zev || zes || zvx || zsx || zgv || zgs) && ntypes <= 0) {
+	    s_wsfe(&io___155);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    e_wsfe();
+	    goto L200;
+	}
+
+    } else {
+	if (zgx) {
+	    s_copy(c3, "ZGX", (ftnlen)3, (ftnlen)3);
+	}
+	if (zxv) {
+	    s_copy(c3, "ZXV", (ftnlen)3, (ftnlen)3);
+	}
     }
 
 /*     Reset the random number seed. */
@@ -2143,12 +2360,12 @@ L230:
     if (newsd == 0) {
 	for (k = 1; k <= 4; ++k) {
 	    iseed[k - 1] = ioldsd[k - 1];
-/* L240: */
+/* L250: */
 	}
     }
 
-    if (lsamen_(&c__3, c3, "ZHS") || lsamen_(&c__3, c3, "NEP")
-	    ) {
+    if (lsamen_(&c__3, c3, "ZHS") || lsamen_(&c__3, c3, 
+	    "NEP")) {
 
 /*        -------------------------------------   
           NEP:  Nonsymmetric Eigenvalue Problem   
@@ -2167,42 +2384,44 @@ L230:
 	    zerrhs_("ZHSEQR", &c__6);
 	}
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    xlaenv_(&c__1, &nbval[i - 1]);
-	    xlaenv_(&c__2, &nbmin[i - 1]);
-	    xlaenv_(&c__3, &nxval[i - 1]);
-	    xlaenv_(&c__4, &nsval[i - 1]);
-	    xlaenv_(&c__8, &mxbval[i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    xlaenv_(&c__1, &nbval[i__ - 1]);
+	    xlaenv_(&c__2, &nbmin[i__ - 1]);
+	    xlaenv_(&c__3, &nxval[i__ - 1]);
+	    xlaenv_(&c__4, &nsval[i__ - 1]);
+	    xlaenv_(&c__8, &mxbval[i__ - 1]);
 
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L250: */
+/* L260: */
 		}
 	    }
-	    s_wsfe(&io___149);
-	    do_fio(&c__1, c3, 3L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(integer));
+	    s_wsfe(&io___158);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
-	    zchkhs_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, a, &
-		    c__132, &a[17424], &a[34848], &a[52272], &a[69696], &
-		    c__132, &a[87120], &a[104544], dc, &dc[132], &a[121968], &
-		    a[139392], &a[156816], &a[174240], &a[191664], &dc[264], 
-		    work, &c__89760, rwork, iwork, logwrk, result, &info);
+	    zchkhs_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, &a_ref(
+		    1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 3), &a_ref(1, 4), 
+		    &a_ref(1, 5), &c__132, &a_ref(1, 6), &a_ref(1, 7), &
+		    dc_ref(1, 1), &dc_ref(1, 2), &a_ref(1, 8), &a_ref(1, 9), &
+		    a_ref(1, 10), &a_ref(1, 11), &a_ref(1, 12), &dc_ref(1, 3),
+		     work, &c__89760, rwork, iwork, logwrk, result, &info);
 	    if (info != 0) {
-		s_wsfe(&io___158);
-		do_fio(&c__1, "ZCHKHS", 6L);
+		s_wsfe(&io___167);
+		do_fio(&c__1, "ZCHKHS", (ftnlen)6);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
-/* L260: */
+/* L270: */
 	}
 
-    } else if (lsamen_(&c__3, c3, "ZST") || lsamen_(&c__3, c3, "SEP")) {
+    } else if (lsamen_(&c__3, c3, "ZST") || lsamen_(&
+	    c__3, c3, "SEP")) {
 
 /*        ----------------------------------   
           SEP:  Symmetric Eigenvalue Problem   
@@ -2212,58 +2431,62 @@ L230:
              NBMIN = minimum block size   
              NX    = crossover point */
 
-	maxtyp = 15;
+	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
 	alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	xlaenv_(&c__9, &c__25);
 	if (tsterr) {
 	    zerrst_("ZST", &c__6);
 	}
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    xlaenv_(&c__1, &nbval[i - 1]);
-	    xlaenv_(&c__2, &nbmin[i - 1]);
-	    xlaenv_(&c__3, &nxval[i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    xlaenv_(&c__1, &nbval[i__ - 1]);
+	    xlaenv_(&c__2, &nbmin[i__ - 1]);
+	    xlaenv_(&c__3, &nxval[i__ - 1]);
 
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L270: */
+/* L280: */
 		}
 	    }
-	    s_wsfe(&io___159);
-	    do_fio(&c__1, c3, 3L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	    s_wsfe(&io___168);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    if (tstchk) {
-		zchkst_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, a, 
-			&c__132, &a[17424], dr, &dr[132], &dr[264], &dr[396], 
-			&dr[528], &dr[660], &dr[792], &dr[924], &dr[1056], &
-			dr[1188], &dr[1320], &a[34848], &c__132, &a[52272], &
-			a[69696], dc, &a[87120], work, &c__89760, rwork, 
-			iwork, result, &info);
+		zchkst_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, &
+			a_ref(1, 1), &c__132, &a_ref(1, 2), &dr_ref(1, 1), &
+			dr_ref(1, 2), &dr_ref(1, 3), &dr_ref(1, 4), &dr_ref(1,
+			 5), &dr_ref(1, 6), &dr_ref(1, 7), &dr_ref(1, 8), &
+			dr_ref(1, 9), &dr_ref(1, 10), &dr_ref(1, 11), &a_ref(
+			1, 3), &c__132, &a_ref(1, 4), &a_ref(1, 5), &dc_ref(1,
+			 1), &a_ref(1, 6), work, &c__89760, rwork, &c__89760, 
+			iwork, &c__20064, result, &info);
 		if (info != 0) {
-		    s_wsfe(&io___161);
-		    do_fio(&c__1, "ZCHKST", 6L);
+		    s_wsfe(&io___170);
+		    do_fio(&c__1, "ZCHKST", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
 	    if (tstdrv) {
-		zdrvst_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, a, 
-			&c__132, &dr[264], &dr[396], &dr[528], &dr[924], &dr[
-			1056], &dr[1188], &a[17424], &c__132, &a[34848], dc, &
-			a[52272], work, &c__89760, rwork, iwork, result, &
-			info);
+		zdrvst_(&nn, nval, &c__18, dotype, iseed, &thresh, &c__6, &
+			a_ref(1, 1), &c__132, &dr_ref(1, 3), &dr_ref(1, 4), &
+			dr_ref(1, 5), &dr_ref(1, 8), &dr_ref(1, 9), &dr_ref(1,
+			 10), &a_ref(1, 2), &c__132, &a_ref(1, 3), &dc_ref(1, 
+			1), &a_ref(1, 4), work, &c__89760, rwork, &c__89760, 
+			iwork, &c__20064, result, &info);
 		if (info != 0) {
-		    s_wsfe(&io___162);
-		    do_fio(&c__1, "ZDRVST", 6L);
+		    s_wsfe(&io___171);
+		    do_fio(&c__1, "ZDRVST", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
-/* L280: */
+/* L290: */
 	}
 
     } else if (lsamen_(&c__3, c3, "ZSG")) {
@@ -2279,40 +2502,43 @@ L230:
 	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
 	alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	xlaenv_(&c__9, &c__25);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    xlaenv_(&c__1, &nbval[i - 1]);
-	    xlaenv_(&c__2, &nbmin[i - 1]);
-	    xlaenv_(&c__3, &nxval[i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    xlaenv_(&c__1, &nbval[i__ - 1]);
+	    xlaenv_(&c__2, &nbmin[i__ - 1]);
+	    xlaenv_(&c__3, &nxval[i__ - 1]);
 
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L290: */
+/* L300: */
 		}
 	    }
-	    s_wsfe(&io___163);
-	    do_fio(&c__1, c3, 3L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	    s_wsfe(&io___172);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    if (tstchk) {
-		zdrvsg_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, a, 
-			&c__132, &a[17424], &c__132, &dr[264], &a[34848], &
-			c__132, &a[52272], &a[69696], &a[87120], &a[104544], 
-			work, &c__89760, rwork, iwork, result, &info);
+		zdrvsg_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, &
+			a_ref(1, 1), &c__132, &a_ref(1, 2), &c__132, &dr_ref(
+			1, 3), &a_ref(1, 3), &c__132, &a_ref(1, 4), &a_ref(1, 
+			5), &a_ref(1, 6), &a_ref(1, 7), work, &c__89760, 
+			rwork, &c__89760, iwork, &c__20064, result, &info);
 		if (info != 0) {
-		    s_wsfe(&io___164);
-		    do_fio(&c__1, "ZDRVSG", 6L);
+		    s_wsfe(&io___173);
+		    do_fio(&c__1, "ZDRVSG", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
-/* L300: */
+/* L310: */
 	}
 
-    } else if (lsamen_(&c__3, c3, "ZBD") || lsamen_(&c__3, c3, "SVD")) {
+    } else if (lsamen_(&c__3, c3, "ZBD") || lsamen_(&
+	    c__3, c3, "SVD")) {
 
 /*        ----------------------------------   
           SVD:  Singular Value Decomposition   
@@ -2326,55 +2552,58 @@ L230:
 	maxtyp = 16;
 	ntypes = min(maxtyp,ntypes);
 	alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	xlaenv_(&c__9, &c__25);
 
 /*        Test the error exits */
 
 	if (tsterr && tstchk) {
-	    zerrbd_("ZBDSQR", &c__6);
+	    zerrbd_("ZBD", &c__6);
 	}
 	if (tsterr && tstdrv) {
-	    zerred_("ZBDSQR", &c__6);
+	    zerred_("ZBD", &c__6);
 	}
 
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    nrhs = nsval[i - 1];
-	    xlaenv_(&c__1, &nbval[i - 1]);
-	    xlaenv_(&c__2, &nbmin[i - 1]);
-	    xlaenv_(&c__3, &nxval[i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nrhs = nsval[i__ - 1];
+	    xlaenv_(&c__1, &nbval[i__ - 1]);
+	    xlaenv_(&c__2, &nbmin[i__ - 1]);
+	    xlaenv_(&c__3, &nxval[i__ - 1]);
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L310: */
+/* L320: */
 		}
 	    }
-	    s_wsfe(&io___166);
-	    do_fio(&c__1, c3, 3L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nxval[i - 1], (ftnlen)sizeof(integer));
+	    s_wsfe(&io___175);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nxval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&nrhs, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    if (tstchk) {
 		zchkbd_(&nn, mval, nval, &maxtyp, dotype, &nrhs, iseed, &
-			thresh, a, &c__132, dr, &dr[132], &dr[264], &dr[396], 
-			&a[17424], &c__132, &a[34848], &a[52272], &a[69696], &
-			c__132, &a[87120], &c__132, &a[104544], &a[121968], 
-			work, &c__89760, rwork, &c__6, &info);
+			thresh, &a_ref(1, 1), &c__132, &dr_ref(1, 1), &dr_ref(
+			1, 2), &dr_ref(1, 3), &dr_ref(1, 4), &a_ref(1, 2), &
+			c__132, &a_ref(1, 3), &a_ref(1, 4), &a_ref(1, 5), &
+			c__132, &a_ref(1, 6), &c__132, &a_ref(1, 7), &a_ref(1,
+			 8), work, &c__89760, rwork, &c__6, &info);
 		if (info != 0) {
-		    s_wsfe(&io___167);
-		    do_fio(&c__1, "ZCHKBD", 6L);
+		    s_wsfe(&io___176);
+		    do_fio(&c__1, "ZCHKBD", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
 	    if (tstdrv) {
-		zdrvbd_(&nn, mval, nval, &maxtyp, dotype, iseed, &thresh, a, &
-			c__132, &a[17424], &c__132, &a[34848], &c__132, &a[
-			52272], &a[69696], &a[87120], dr, &dr[132], &dr[264], 
-			work, &c__89760, rwork, &c__6, &info);
+		zdrvbd_(&nn, mval, nval, &maxtyp, dotype, iseed, &thresh, &
+			a_ref(1, 1), &c__132, &a_ref(1, 2), &c__132, &a_ref(1,
+			 3), &c__132, &a_ref(1, 4), &a_ref(1, 5), &a_ref(1, 6)
+			, &dr_ref(1, 1), &dr_ref(1, 2), &dr_ref(1, 3), work, &
+			c__89760, rwork, iwork, &c__6, &info);
 	    }
-/* L320: */
+/* L330: */
 	}
 
     } else if (lsamen_(&c__3, c3, "ZEV")) {
@@ -2387,26 +2616,27 @@ L230:
 	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
 	if (ntypes <= 0) {
-	    s_wsfe(&io___168);
-	    do_fio(&c__1, c3, 3L);
+	    s_wsfe(&io___177);
+	    do_fio(&c__1, c3, (ftnlen)3);
 	    e_wsfe();
 	} else {
 	    if (tsterr) {
 		zerred_(c3, &c__6);
 	    }
 	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
-	    zdrvev_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__6, a, &
-		    c__132, &a[17424], dc, &dc[132], &a[34848], &c__132, &a[
-		    52272], &c__132, &a[69696], &c__132, result, work, &
-		    c__89760, rwork, iwork, &info);
+	    zdrvev_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__6, &a_ref(
+		    1, 1), &c__132, &a_ref(1, 2), &dc_ref(1, 1), &dc_ref(1, 2)
+		    , &a_ref(1, 3), &c__132, &a_ref(1, 4), &c__132, &a_ref(1, 
+		    5), &c__132, result, work, &c__89760, rwork, iwork, &info)
+		    ;
 	    if (info != 0) {
-		s_wsfe(&io___169);
-		do_fio(&c__1, "ZGEEV", 5L);
+		s_wsfe(&io___178);
+		do_fio(&c__1, "ZGEEV", (ftnlen)5);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
 	}
-	s_wsfe(&io___170);
+	s_wsfe(&io___179);
 	e_wsfe();
 	goto L10;
 
@@ -2420,44 +2650,41 @@ L230:
 	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
 	if (ntypes <= 0) {
-	    s_wsfe(&io___171);
-	    do_fio(&c__1, c3, 3L);
+	    s_wsfe(&io___180);
+	    do_fio(&c__1, c3, (ftnlen)3);
 	    e_wsfe();
 	} else {
 	    if (tsterr) {
 		zerred_(c3, &c__6);
 	    }
 	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
-	    zdrves_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__6, a, &
-		    c__132, &a[17424], &a[34848], dc, &dc[132], &a[52272], &
-		    c__132, result, work, &c__89760, rwork, iwork, logwrk, &
-		    info);
+	    zdrves_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__6, &a_ref(
+		    1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 3), &dc_ref(1, 1),
+		     &dc_ref(1, 2), &a_ref(1, 4), &c__132, result, work, &
+		    c__89760, rwork, iwork, logwrk, &info);
 	    if (info != 0) {
-		s_wsfe(&io___172);
-		do_fio(&c__1, "ZGEES", 5L);
+		s_wsfe(&io___181);
+		do_fio(&c__1, "ZGEES", (ftnlen)5);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
 	}
-	s_wsfe(&io___173);
+	s_wsfe(&io___182);
 	e_wsfe();
 	goto L10;
 
     } else if (lsamen_(&c__3, c3, "ZVX")) {
 
-/*        -----------------------------------------------------------
----   
+/*        --------------------------------------------------------------   
           ZVX:  Nonsymmetric Eigenvalue Problem Expert Driver   
-                ZGEEVX (eigenvalues, eigenvectors and condition number
-s)   
-          -----------------------------------------------------------
---- */
+                ZGEEVX (eigenvalues, eigenvectors and condition numbers)   
+          -------------------------------------------------------------- */
 
 	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
-	if (ntypes <= 0) {
-	    s_wsfe(&io___174);
-	    do_fio(&c__1, c3, 3L);
+	if (ntypes < 0) {
+	    s_wsfe(&io___183);
+	    do_fio(&c__1, c3, (ftnlen)3);
 	    e_wsfe();
 	} else {
 	    if (tsterr) {
@@ -2465,18 +2692,20 @@ s)
 	    }
 	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
 	    zdrvvx_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__5, &c__6, 
-		    a, &c__132, &a[17424], dc, &dc[132], &a[34848], &c__132, &
-		    a[52272], &c__132, &a[69696], &c__132, dr, &dr[132], &dr[
-		    264], &dr[396], &dr[528], &dr[660], &dr[792], &dr[924], 
-		    result, work, &c__89760, rwork, &info);
+		    &a_ref(1, 1), &c__132, &a_ref(1, 2), &dc_ref(1, 1), &
+		    dc_ref(1, 2), &a_ref(1, 3), &c__132, &a_ref(1, 4), &
+		    c__132, &a_ref(1, 5), &c__132, &dr_ref(1, 1), &dr_ref(1, 
+		    2), &dr_ref(1, 3), &dr_ref(1, 4), &dr_ref(1, 5), &dr_ref(
+		    1, 6), &dr_ref(1, 7), &dr_ref(1, 8), result, work, &
+		    c__89760, rwork, &info);
 	    if (info != 0) {
-		s_wsfe(&io___175);
-		do_fio(&c__1, "ZGEEVX", 6L);
+		s_wsfe(&io___184);
+		do_fio(&c__1, "ZGEEVX", (ftnlen)6);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
 	}
-	s_wsfe(&io___176);
+	s_wsfe(&io___185);
 	e_wsfe();
 	goto L10;
 
@@ -2489,9 +2718,9 @@ s)
 
 	maxtyp = 21;
 	ntypes = min(maxtyp,ntypes);
-	if (ntypes <= 0) {
-	    s_wsfe(&io___177);
-	    do_fio(&c__1, c3, 3L);
+	if (ntypes < 0) {
+	    s_wsfe(&io___186);
+	    do_fio(&c__1, c3, (ftnlen)3);
 	    e_wsfe();
 	} else {
 	    if (tsterr) {
@@ -2499,17 +2728,18 @@ s)
 	    }
 	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
 	    zdrvsx_(&nn, nval, &ntypes, dotype, iseed, &thresh, &c__5, &c__6, 
-		    a, &c__132, &a[17424], &a[34848], dc, &dc[132], &dc[264], 
-		    &a[52272], &c__132, &a[69696], result, work, &c__89760, 
-		    rwork, logwrk, &info);
+		    &a_ref(1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 3), &
+		    dc_ref(1, 1), &dc_ref(1, 2), &dc_ref(1, 3), &a_ref(1, 4), 
+		    &c__132, &a_ref(1, 5), result, work, &c__89760, rwork, 
+		    logwrk, &info);
 	    if (info != 0) {
-		s_wsfe(&io___178);
-		do_fio(&c__1, "ZGEESX", 6L);
+		s_wsfe(&io___187);
+		do_fio(&c__1, "ZGEESX", (ftnlen)6);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
 	}
-	s_wsfe(&io___179);
+	s_wsfe(&io___188);
 	e_wsfe();
 	goto L10;
 
@@ -2532,59 +2762,200 @@ s)
 	    zerrgg_(c3, &c__6);
 	}
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    xlaenv_(&c__1, &nbval[i - 1]);
-	    xlaenv_(&c__2, &nbmin[i - 1]);
-	    xlaenv_(&c__4, &nsval[i - 1]);
-	    xlaenv_(&c__8, &mxbval[i - 1]);
-	    xlaenv_(&c__5, &nbcol[i - 1]);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    xlaenv_(&c__1, &nbval[i__ - 1]);
+	    xlaenv_(&c__2, &nbmin[i__ - 1]);
+	    xlaenv_(&c__4, &nsval[i__ - 1]);
+	    xlaenv_(&c__8, &mxbval[i__ - 1]);
+	    xlaenv_(&c__5, &nbcol[i__ - 1]);
 
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L330: */
+/* L340: */
 		}
 	    }
-	    s_wsfe(&io___180);
-	    do_fio(&c__1, c3, 3L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbmin[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&nbcol[i - 1], (ftnlen)sizeof(integer));
+	    s_wsfe(&io___189);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbmin[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&nbcol[i__ - 1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    tstdif = FALSE_;
 	    thrshn = 10.;
 	    if (tstchk) {
 		zchkgg_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &tstdif, &
-			thrshn, &c__6, a, &c__132, &a[17424], &a[34848], &a[
-			52272], &a[69696], &a[87120], &a[104544], &a[121968], 
-			&a[139392], &c__132, &a[156816], &a[174240], &a[
-			191664], dc, &dc[132], &dc[264], &dc[396], &a[209088],
-			 &a[226512], work, &c__89760, rwork, logwrk, result, &
-			info);
+			thrshn, &c__6, &a_ref(1, 1), &c__132, &a_ref(1, 2), &
+			a_ref(1, 3), &a_ref(1, 4), &a_ref(1, 5), &a_ref(1, 6),
+			 &a_ref(1, 7), &a_ref(1, 8), &a_ref(1, 9), &c__132, &
+			a_ref(1, 10), &a_ref(1, 11), &a_ref(1, 12), &dc_ref(1,
+			 1), &dc_ref(1, 2), &dc_ref(1, 3), &dc_ref(1, 4), &
+			a_ref(1, 13), &a_ref(1, 14), work, &c__89760, rwork, 
+			logwrk, result, &info);
 		if (info != 0) {
-		    s_wsfe(&io___183);
-		    do_fio(&c__1, "ZCHKGG", 6L);
+		    s_wsfe(&io___192);
+		    do_fio(&c__1, "ZCHKGG", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
 	    if (tstdrv) {
 		zdrvgg_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &thrshn, &
-			c__6, a, &c__132, &a[17424], &a[34848], &a[52272], &a[
-			69696], &a[87120], &a[104544], &c__132, &a[121968], 
-			dc, &dc[132], &dc[264], &dc[396], &a[121968], &a[
-			139392], work, &c__89760, rwork, result, &info);
+			c__6, &a_ref(1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 
+			3), &a_ref(1, 4), &a_ref(1, 5), &a_ref(1, 6), &a_ref(
+			1, 7), &c__132, &a_ref(1, 8), &dc_ref(1, 1), &dc_ref(
+			1, 2), &dc_ref(1, 3), &dc_ref(1, 4), &a_ref(1, 8), &
+			a_ref(1, 9), work, &c__89760, rwork, result, &info);
 		if (info != 0) {
-		    s_wsfe(&io___184);
-		    do_fio(&c__1, "ZDRVGG", 6L);
+		    s_wsfe(&io___193);
+		    do_fio(&c__1, "ZDRVGG", (ftnlen)6);
 		    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
 	    }
-/* L340: */
+/* L350: */
 	}
+
+    } else if (lsamen_(&c__3, c3, "ZGS")) {
+
+/*        -------------------------------------------------   
+          ZGS:  Generalized Nonsymmetric Eigenvalue Problem   
+                ZGGES (Schur form)   
+          ------------------------------------------------- */
+
+	maxtyp = 26;
+	ntypes = min(maxtyp,ntypes);
+	if (ntypes <= 0) {
+	    s_wsfe(&io___194);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    e_wsfe();
+	} else {
+	    if (tsterr) {
+		zerrgg_(c3, &c__6);
+	    }
+	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	    zdrges_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, &a_ref(
+		    1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 3), &a_ref(1, 4), 
+		    &a_ref(1, 7), &c__132, &a_ref(1, 8), &dc_ref(1, 1), &
+		    dc_ref(1, 2), work, &c__89760, rwork, result, logwrk, &
+		    info);
+
+	    if (info != 0) {
+		s_wsfe(&io___195);
+		do_fio(&c__1, "ZDRGES", (ftnlen)6);
+		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+	}
+	s_wsfe(&io___196);
+	e_wsfe();
+	goto L10;
+
+    } else if (zgx) {
+
+/*        -------------------------------------------------   
+          ZGX  Generalized Nonsymmetric Eigenvalue Problem   
+                ZGGESX (Schur form and condition numbers)   
+          ------------------------------------------------- */
+
+	maxtyp = 5;
+	ntypes = maxtyp;
+	if (nn < 0) {
+	    s_wsfe(&io___197);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    e_wsfe();
+	} else {
+	    if (tsterr) {
+		zerrgg_(c3, &c__6);
+	    }
+	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	    zdrgsx_(&nn, &c__20, &thresh, &c__5, &c__6, &a_ref(1, 1), &c__132,
+		     &a_ref(1, 2), &a_ref(1, 3), &a_ref(1, 4), &a_ref(1, 5), &
+		    a_ref(1, 6), &dc_ref(1, 1), &dc_ref(1, 2), c__, &c__400, 
+		    s, work, &c__89760, rwork, iwork, &c__20064, logwrk, &
+		    info);
+	    if (info != 0) {
+		s_wsfe(&io___200);
+		do_fio(&c__1, "ZDRGSX", (ftnlen)6);
+		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+	}
+	s_wsfe(&io___201);
+	e_wsfe();
+	goto L10;
+
+    } else if (lsamen_(&c__3, c3, "ZGV")) {
+
+/*        -------------------------------------------------   
+          ZGV:  Generalized Nonsymmetric Eigenvalue Problem   
+                ZGGEV (Eigenvalue/vector form)   
+          ------------------------------------------------- */
+
+	maxtyp = 26;
+	ntypes = min(maxtyp,ntypes);
+	if (ntypes <= 0) {
+	    s_wsfe(&io___202);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    e_wsfe();
+	} else {
+	    if (tsterr) {
+		zerrgg_(c3, &c__6);
+	    }
+	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	    zdrgev_(&nn, nval, &maxtyp, dotype, iseed, &thresh, &c__6, &a_ref(
+		    1, 1), &c__132, &a_ref(1, 2), &a_ref(1, 3), &a_ref(1, 4), 
+		    &a_ref(1, 7), &c__132, &a_ref(1, 8), &a_ref(1, 9), &
+		    c__132, &dc_ref(1, 1), &dc_ref(1, 2), &dc_ref(1, 3), &
+		    dc_ref(1, 4), work, &c__89760, rwork, result, &info);
+	    if (info != 0) {
+		s_wsfe(&io___203);
+		do_fio(&c__1, "ZDRGEV", (ftnlen)6);
+		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+	}
+	s_wsfe(&io___204);
+	e_wsfe();
+	goto L10;
+
+    } else if (zxv) {
+
+/*        -------------------------------------------------   
+          ZXV:  Generalized Nonsymmetric Eigenvalue Problem   
+                ZGGEVX (eigenvalue/vector with condition numbers)   
+          ------------------------------------------------- */
+
+	maxtyp = 2;
+	ntypes = maxtyp;
+	if (nn < 0) {
+	    s_wsfe(&io___205);
+	    do_fio(&c__1, c3, (ftnlen)3);
+	    e_wsfe();
+	} else {
+	    if (tsterr) {
+		zerrgg_(c3, &c__6);
+	    }
+	    alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
+	    zdrgvx_(&nn, &thresh, &c__5, &c__6, &a_ref(1, 1), &c__132, &a_ref(
+		    1, 2), &a_ref(1, 3), &a_ref(1, 4), &dc_ref(1, 1), &dc_ref(
+		    1, 2), &a_ref(1, 5), &a_ref(1, 6), iwork, &iwork[1], &
+		    dr_ref(1, 1), &dr_ref(1, 2), &dr_ref(1, 3), &dr_ref(1, 4),
+		     &dr_ref(1, 5), &dr_ref(1, 6), work, &c__89760, rwork, &
+		    iwork[2], &c__20062, result, logwrk, &info);
+
+	    if (info != 0) {
+		s_wsfe(&io___206);
+		do_fio(&c__1, "ZDRGVX", (ftnlen)6);
+		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+	}
+	s_wsfe(&io___207);
+	e_wsfe();
+	goto L10;
 
     } else if (lsamen_(&c__3, c3, "ZHB")) {
 
@@ -2599,11 +2970,11 @@ s)
 	    zerrst_("ZHB", &c__6);
 	}
 	zchkhb_(&nn, nval, &nk, kval, &maxtyp, dotype, iseed, &thresh, &c__6, 
-		a, &c__132, dr, &dr[132], &a[17424], &c__132, work, &c__89760,
-		 rwork, result, &info);
+		&a_ref(1, 1), &c__132, &dr_ref(1, 1), &dr_ref(1, 2), &a_ref(1,
+		 2), &c__132, work, &c__89760, rwork, result, &info);
 	if (info != 0) {
-	    s_wsfe(&io___185);
-	    do_fio(&c__1, "ZCHKHB", 6L);
+	    s_wsfe(&io___208);
+	    do_fio(&c__1, "ZCHKHB", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -2618,31 +2989,31 @@ s)
 	ntypes = min(maxtyp,ntypes);
 	alareq_(c3, &ntypes, dotype, &maxtyp, &c__5, &c__6);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    nrhs = nsval[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nrhs = nsval[i__ - 1];
 
 	    if (newsd == 0) {
 		for (k = 1; k <= 4; ++k) {
 		    iseed[k - 1] = ioldsd[k - 1];
-/* L350: */
+/* L360: */
 		}
 	    }
-	    s_wsfe(&io___186);
-	    do_fio(&c__1, c3, 3L);
+	    s_wsfe(&io___209);
+	    do_fio(&c__1, c3, (ftnlen)3);
 	    do_fio(&c__1, (char *)&nrhs, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    zchkbb_(&nn, mval, nval, &nk, kval, &maxtyp, dotype, &nrhs, iseed,
-		     &thresh, &c__6, a, &c__132, &a[17424], &c__264, dr, &dr[
-		    132], &a[52272], &c__132, &a[69696], &c__132, &a[87120], &
-		    c__132, &a[104544], work, &c__89760, rwork, result, &info)
-		    ;
+		     &thresh, &c__6, &a_ref(1, 1), &c__132, &a_ref(1, 2), &
+		    c__264, &dr_ref(1, 1), &dr_ref(1, 2), &a_ref(1, 4), &
+		    c__132, &a_ref(1, 5), &c__132, &a_ref(1, 6), &c__132, &
+		    a_ref(1, 7), work, &c__89760, rwork, result, &info);
 	    if (info != 0) {
-		s_wsfe(&io___187);
-		do_fio(&c__1, "ZCHKBB", 6L);
+		s_wsfe(&io___210);
+		do_fio(&c__1, "ZCHKBB", (ftnlen)6);
 		do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 		e_wsfe();
 	    }
-/* L360: */
+/* L370: */
 	}
 
     } else if (lsamen_(&c__3, c3, "GLM")) {
@@ -2654,11 +3025,12 @@ s)
 	if (tsterr) {
 	    zerrgg_("GLM", &c__6);
 	}
-	zckglm_(&nn, nval, mval, pval, &ntypes, iseed, &thresh, &c__132, a, &
-		a[17424], b, &b[17424], x, work, dr, &c__5, &c__6, &info);
+	zckglm_(&nn, nval, mval, pval, &ntypes, iseed, &thresh, &c__132, &
+		a_ref(1, 1), &a_ref(1, 2), &b_ref(1, 1), &b_ref(1, 2), x, 
+		work, &dr_ref(1, 1), &c__5, &c__6, &info);
 	if (info != 0) {
-	    s_wsfe(&io___190);
-	    do_fio(&c__1, "ZCKGLM", 6L);
+	    s_wsfe(&io___213);
+	    do_fio(&c__1, "ZCKGLM", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -2673,12 +3045,13 @@ s)
 	    zerrgg_("GQR", &c__6);
 	}
 	zckgqr_(&nn, mval, &nn, pval, &nn, nval, &ntypes, iseed, &thresh, &
-		c__132, a, &a[17424], &a[34848], &a[52272], taua, b, &b[17424]
-		, &b[34848], &b[52272], &b[69696], taub, work, dr, &c__5, &
-		c__6, &info);
+		c__132, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), &a_ref(1, 4)
+		, taua, &b_ref(1, 1), &b_ref(1, 2), &b_ref(1, 3), &b_ref(1, 4)
+		, &b_ref(1, 5), taub, work, &dr_ref(1, 1), &c__5, &c__6, &
+		info);
 	if (info != 0) {
-	    s_wsfe(&io___193);
-	    do_fio(&c__1, "ZCKGQR", 6L);
+	    s_wsfe(&io___216);
+	    do_fio(&c__1, "ZCKGQR", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -2692,12 +3065,13 @@ s)
 	if (tsterr) {
 	    zerrgg_("GSV", &c__6);
 	}
-	zckgsv_(&nn, mval, pval, nval, &ntypes, iseed, &thresh, &c__132, a, &
-		a[17424], b, &b[17424], &a[34848], &b[34848], &a[52272], 
-		alpha, beta, &b[52272], iwork, work, dr, &c__5, &c__6, &info);
+	zckgsv_(&nn, mval, pval, nval, &ntypes, iseed, &thresh, &c__132, &
+		a_ref(1, 1), &a_ref(1, 2), &b_ref(1, 1), &b_ref(1, 2), &a_ref(
+		1, 3), &b_ref(1, 3), &a_ref(1, 4), alpha, beta, &b_ref(1, 4), 
+		iwork, work, &dr_ref(1, 1), &c__5, &c__6, &info);
 	if (info != 0) {
-	    s_wsfe(&io___196);
-	    do_fio(&c__1, "ZCKGSV", 6L);
+	    s_wsfe(&io___219);
+	    do_fio(&c__1, "ZCKGSV", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -2711,29 +3085,32 @@ s)
 	if (tsterr) {
 	    zerrgg_("LSE", &c__6);
 	}
-	zcklse_(&nn, mval, pval, nval, &ntypes, iseed, &thresh, &c__132, a, &
-		a[17424], b, &b[17424], x, work, dr, &c__5, &c__6, &info);
+	zcklse_(&nn, mval, pval, nval, &ntypes, iseed, &thresh, &c__132, &
+		a_ref(1, 1), &a_ref(1, 2), &b_ref(1, 1), &b_ref(1, 2), x, 
+		work, &dr_ref(1, 1), &c__5, &c__6, &info);
 	if (info != 0) {
-	    s_wsfe(&io___197);
-	    do_fio(&c__1, "ZCKLSE", 6L);
+	    s_wsfe(&io___220);
+	    do_fio(&c__1, "ZCKLSE", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
     } else {
-	s_wsle(&io___198);
+	s_wsle(&io___221);
 	e_wsle();
-	s_wsle(&io___199);
+	s_wsle(&io___222);
 	e_wsle();
-	s_wsfe(&io___200);
-	do_fio(&c__1, c3, 3L);
+	s_wsfe(&io___223);
+	do_fio(&c__1, c3, (ftnlen)3);
 	e_wsfe();
     }
-    goto L190;
-L370:
-    s_wsfe(&io___201);
+    if (! (zgx || zxv)) {
+	goto L190;
+    }
+L380:
+    s_wsfe(&io___224);
     e_wsfe();
     s2 = dsecnd_();
-    s_wsfe(&io___203);
+    s_wsfe(&io___226);
     d__1 = s2 - s1;
     do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
     e_wsfe();
@@ -2742,6 +3119,15 @@ L370:
 /*     End of ZCHKEE */
 
     return 0;
-} /* MAIN__   
+} /* MAIN__ */
 
-   Main program alias */ int zchkee_ () { MAIN__ (); return 0; }
+#undef dr_ref
+#undef dc_ref
+#undef dc_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
+
+/* Main program alias */ int zchkee_ () { MAIN__ (); return 0; }

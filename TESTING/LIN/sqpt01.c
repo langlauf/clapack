@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     real ret_val;
 
     /* Local variables */
-    static integer info, i, j;
+    static integer info, i__, j;
     static real norma;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
@@ -33,7 +34,11 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
 	    , real *, real *, integer *, real *, integer *, integer *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -43,12 +48,10 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     =======   
 
     SQPT01 tests the QR-factorization with pivoting of a matrix A.  The   
-    array AF contains the (possibly partial) QR-factorization of A, where 
-  
+    array AF contains the (possibly partial) QR-factorization of A, where   
     the upper triangle of AF(1:k,1:k) is a partial triangular factor,   
     the entries below the diagonal in the first k columns are the   
-    Householder vectors, and the rest of AF contains a partially updated 
-  
+    Householder vectors, and the rest of AF contains a partially updated   
     matrix.   
 
     This function returns ||A*P - Q*R||/(||norm(A)||*eps*M)   
@@ -70,11 +73,9 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
             The original matrix A.   
 
     AF      (input) REAL array, dimension (LDA,N)   
-            The (possibly partial) output of SGEQPF.  The upper triangle 
-  
+            The (possibly partial) output of SGEQPF.  The upper triangle   
             of AF(1:k,1:k) is a partial triangular factor, the entries   
-            below the diagonal in the first k columns are the Householder 
-  
+            below the diagonal in the first k columns are the Householder   
             vectors, and the rest of AF contains a partially updated   
             matrix.   
 
@@ -93,16 +94,15 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= M*N+N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --jpvt;
@@ -129,21 +129,20 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     i__1 = *k;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = af[i + j * af_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = af_ref(i__, j);
 /* L10: */
 	}
 	i__2 = *m;
-	for (i = j + 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = 0.f;
+	for (i__ = j + 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = 0.f;
 /* L20: */
 	}
 /* L30: */
     }
     i__1 = *n;
     for (j = *k + 1; j <= i__1; ++j) {
-	scopy_(m, &af[j * af_dim1 + 1], &c__1, &work[(j - 1) * *m + 1], &c__1)
-		;
+	scopy_(m, &af_ref(1, j), &c__1, &work[(j - 1) * *m + 1], &c__1);
 /* L40: */
     }
 
@@ -156,13 +155,13 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
 
 /*        Compare i-th column of QR and jpvt(i)-th column of A */
 
-	saxpy_(m, &c_b14, &a[jpvt[j] * a_dim1 + 1], &c__1, &work[(j - 1) * *m 
-		+ 1], &c__1);
+	saxpy_(m, &c_b14, &a_ref(1, jpvt[j]), &c__1, &work[(j - 1) * *m + 1], 
+		&c__1);
 /* L50: */
     }
 
-    ret_val = slange_("One-norm", m, n, &work[1], m, rwork) / ((real) max(
-	    *m,*n) * slamch_("Epsilon"));
+    ret_val = slange_("One-norm", m, n, &work[1], m, rwork) / ((
+	    real) max(*m,*n) * slamch_("Epsilon"));
     if (norma != 0.f) {
 	ret_val /= norma;
     }
@@ -172,4 +171,8 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
 /*     End of SQPT01 */
 
 } /* sqpt01_ */
+
+#undef af_ref
+#undef a_ref
+
 

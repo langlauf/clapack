@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int csyr_(char *uplo, integer *n, complex *alpha, complex *x,
 	 integer *incx, complex *a, integer *lda)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -16,8 +17,7 @@
 
        A := alpha*x*( x' ) + A,   
 
-    where alpha is a complex scalar, x is an n element vector and A is an 
-  
+    where alpha is a complex scalar, x is an n element vector and A is an   
     n by n symmetric matrix.   
 
     Arguments   
@@ -58,52 +58,49 @@
 
     A      - COMPLEX array, dimension ( LDA, N )   
              Before entry, with  UPLO = 'U' or 'u', the leading n by n   
-             upper triangular part of the array A must contain the upper 
-  
+             upper triangular part of the array A must contain the upper   
              triangular part of the symmetric matrix and the strictly   
              lower triangular part of A is not referenced. On exit, the   
              upper triangular part of the array A is overwritten by the   
              upper triangular part of the updated matrix.   
              Before entry, with UPLO = 'L' or 'l', the leading n by n   
-             lower triangular part of the array A must contain the lower 
-  
+             lower triangular part of the array A must contain the lower   
              triangular part of the symmetric matrix and the strictly   
              upper triangular part of A is not referenced. On exit, the   
              lower triangular part of the array A is overwritten by the   
              lower triangular part of the updated matrix.   
 
     LDA    - INTEGER   
-             On entry, LDA specifies the first dimension of A as declared 
-  
+             On entry, LDA specifies the first dimension of A as declared   
              in the calling (sub) program. LDA must be at least   
              max( 1, N ).   
              Unchanged on exit.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     complex q__1, q__2;
     /* Local variables */
     static integer info;
     static complex temp;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    --x;
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-#define X(I) x[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	info = 1;
@@ -143,25 +140,25 @@
 
 	if (*incx == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		if (X(j).r != 0.f || X(j).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = j;
-		    q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, 
-			    q__1.i = alpha->r * X(j).i + alpha->i * X(j)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    i__2 = j;
-		    for (i = 1; i <= j; ++i) {
-			i__3 = i + j * a_dim1;
-			i__4 = i + j * a_dim1;
-			i__5 = i;
-			q__2.r = X(i).r * temp.r - X(i).i * temp.i, 
-				q__2.i = X(i).r * temp.i + X(i).i * 
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			i__4 = a_subscr(i__, j);
+			i__5 = i__;
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = A(i,j).r + q__2.r, q__1.i = A(i,j).i + 
+			q__1.r = a[i__4].r + q__2.r, q__1.i = a[i__4].i + 
 				q__2.i;
-			A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L10: */
 		    }
 		}
@@ -170,26 +167,26 @@
 	} else {
 	    jx = kx;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		if (X(jx).r != 0.f || X(jx).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = jx;
-		    q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, 
-			    q__1.i = alpha->r * X(jx).i + alpha->i * X(jx)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    ix = kx;
 		    i__2 = j;
-		    for (i = 1; i <= j; ++i) {
-			i__3 = i + j * a_dim1;
-			i__4 = i + j * a_dim1;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			i__4 = a_subscr(i__, j);
 			i__5 = ix;
-			q__2.r = X(ix).r * temp.r - X(ix).i * temp.i, 
-				q__2.i = X(ix).r * temp.i + X(ix).i * 
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = A(i,j).r + q__2.r, q__1.i = A(i,j).i + 
+			q__1.r = a[i__4].r + q__2.r, q__1.i = a[i__4].i + 
 				q__2.i;
-			A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			ix += *incx;
 /* L30: */
 		    }
@@ -204,25 +201,25 @@
 
 	if (*incx == 1) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		if (X(j).r != 0.f || X(j).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = j;
-		    q__1.r = alpha->r * X(j).r - alpha->i * X(j).i, 
-			    q__1.i = alpha->r * X(j).i + alpha->i * X(j)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    i__2 = *n;
-		    for (i = j; i <= *n; ++i) {
-			i__3 = i + j * a_dim1;
-			i__4 = i + j * a_dim1;
-			i__5 = i;
-			q__2.r = X(i).r * temp.r - X(i).i * temp.i, 
-				q__2.i = X(i).r * temp.i + X(i).i * 
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			i__4 = a_subscr(i__, j);
+			i__5 = i__;
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = A(i,j).r + q__2.r, q__1.i = A(i,j).i + 
+			q__1.r = a[i__4].r + q__2.r, q__1.i = a[i__4].i + 
 				q__2.i;
-			A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L50: */
 		    }
 		}
@@ -231,26 +228,26 @@
 	} else {
 	    jx = kx;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = jx;
-		if (X(jx).r != 0.f || X(jx).i != 0.f) {
+		if (x[i__2].r != 0.f || x[i__2].i != 0.f) {
 		    i__2 = jx;
-		    q__1.r = alpha->r * X(jx).r - alpha->i * X(jx).i, 
-			    q__1.i = alpha->r * X(jx).i + alpha->i * X(jx)
+		    q__1.r = alpha->r * x[i__2].r - alpha->i * x[i__2].i, 
+			    q__1.i = alpha->r * x[i__2].i + alpha->i * x[i__2]
 			    .r;
 		    temp.r = q__1.r, temp.i = q__1.i;
 		    ix = jx;
 		    i__2 = *n;
-		    for (i = j; i <= *n; ++i) {
-			i__3 = i + j * a_dim1;
-			i__4 = i + j * a_dim1;
+		    for (i__ = j; i__ <= i__2; ++i__) {
+			i__3 = a_subscr(i__, j);
+			i__4 = a_subscr(i__, j);
 			i__5 = ix;
-			q__2.r = X(ix).r * temp.r - X(ix).i * temp.i, 
-				q__2.i = X(ix).r * temp.i + X(ix).i * 
+			q__2.r = x[i__5].r * temp.r - x[i__5].i * temp.i, 
+				q__2.i = x[i__5].r * temp.i + x[i__5].i * 
 				temp.r;
-			q__1.r = A(i,j).r + q__2.r, q__1.i = A(i,j).i + 
+			q__1.r = a[i__4].r + q__2.r, q__1.i = a[i__4].i + 
 				q__2.i;
-			A(i,j).r = q__1.r, A(i,j).i = q__1.i;
+			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 			ix += *incx;
 /* L70: */
 		    }
@@ -266,4 +263,8 @@
 /*     End of CSYR */
 
 } /* csyr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

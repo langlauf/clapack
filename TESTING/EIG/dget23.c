@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static integer c__4 = 4;
 
 /* Subroutine */ int dget23_(logical *comp, char *balanc, integer *jtype, 
 	doublereal *thresh, integer *iseed, integer *nounit, integer *n, 
-	doublereal *a, integer *lda, doublereal *h, doublereal *wr, 
+	doublereal *a, integer *lda, doublereal *h__, doublereal *wr, 
 	doublereal *wi, doublereal *wr1, doublereal *wi1, doublereal *vl, 
 	integer *ldvl, doublereal *vr, integer *ldvr, doublereal *lre, 
 	integer *ldlre, doublereal *rcondv, doublereal *rcndv1, doublereal *
@@ -44,7 +45,7 @@ static integer c__4 = 4;
     static integer kmin;
     static doublereal vmax, tnrm, vrmx, vtst;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i, j;
+    static integer i__, j;
     static doublereal v;
     static logical balok, nobal;
     extern /* Subroutine */ int dget22_(char *, char *, char *, integer *, 
@@ -85,7 +86,12 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
+#define lre_ref(a_1,a_2) lre[(a_2)*lre_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -94,8 +100,7 @@ static integer c__4 = 4;
     Purpose   
     =======   
 
-       DGET23  checks the nonsymmetric eigenvalue problem driver SGEEVX. 
-  
+       DGET23  checks the nonsymmetric eigenvalue problem driver SGEEVX.   
        If COMP = .FALSE., the first 8 of the following tests will be   
        performed on the input matrix A, and also test 9 if LWORK is   
        sufficiently large.   
@@ -114,8 +119,7 @@ static integer c__4 = 4;
                  ( -wi  wr  )   
 
          Such a block multiplying an n x 2 matrix  ( ur ui ) on the   
-         right will be the same as multiplying  ur + i*ui  by  wr + i*wi. 
-  
+         right will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
 
        (2)     | A**H * VL - VL * W**H | / ( n |A| ulp )   
 
@@ -139,15 +143,13 @@ static integer c__4 = 4;
 
        (6)     0 if VR(full) = VR(partial), 1/ulp otherwise   
 
-         VR(full) denotes the right eigenvectors computed when VL, RCONDV 
-  
+         VR(full) denotes the right eigenvectors computed when VL, RCONDV   
          and RCONDE are computed, and VR(partial) denotes the result   
          when only some of VL and RCONDV are computed.   
 
        (7)     0 if VL(full) = VL(partial), 1/ulp otherwise   
 
-         VL(full) denotes the left eigenvectors computed when VR, RCONDV 
-  
+         VL(full) denotes the left eigenvectors computed when VR, RCONDV   
          and RCONDE are computed, and VL(partial) denotes the result   
          when only some of VR and RCONDV are computed.   
 
@@ -156,8 +158,7 @@ static integer c__4 = 4;
                1/ulp otherwise   
 
          SCALE, ILO, IHI and ABNRM describe how the matrix is balanced.   
-         (full) is when VR, VL, RCONDE and RCONDV are also computed, and 
-  
+         (full) is when VR, VL, RCONDE and RCONDV are also computed, and   
          (partial) is when some are not computed.   
 
        (9)     0 if RCONDV(full) = RCONDV(partial), 1/ulp otherwise   
@@ -317,30 +318,29 @@ static integer c__4 = 4;
             If >0, DGEEVX returned an error code, the absolute   
                    value of which is returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --iseed;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --wr;
     --wi;
     --wr1;
     --wi1;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     lre_dim1 = *ldlre;
-    lre_offset = lre_dim1 + 1;
+    lre_offset = 1 + lre_dim1 * 1;
     lre -= lre_offset;
     --rcondv;
     --rcndv1;
@@ -359,7 +359,8 @@ static integer c__4 = 4;
        Check for errors */
 
     nobal = lsame_(balanc, "N");
-    balok = nobal || lsame_(balanc, "P") || lsame_(balanc, "S") || lsame_(balanc, "B");
+    balok = nobal || lsame_(balanc, "P") || lsame_(
+	    balanc, "S") || lsame_(balanc, "B");
     *info = 0;
     if (! balok) {
 	*info = -2;
@@ -389,8 +390,8 @@ static integer c__4 = 4;
 
 /*     Quick return if nothing to do */
 
-    for (i = 1; i <= 11; ++i) {
-	result[i] = -1.;
+    for (i__ = 1; i__ <= 11; ++i__) {
+	result[i__] = -1.;
 /* L10: */
     }
 
@@ -413,8 +414,8 @@ static integer c__4 = 4;
 	*(unsigned char *)sense = 'E';
 	isensm = 1;
     }
-    dlacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-    dgeevx_(balanc, "V", "V", sense, n, &h[h_offset], lda, &wr[1], &wi[1], &
+    dlacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+    dgeevx_(balanc, "V", "V", sense, n, &h__[h_offset], lda, &wr[1], &wi[1], &
 	    vl[vl_offset], ldvl, &vr[vr_offset], ldvr, &ilo, &ihi, &scale[1], 
 	    &abnrm, &rconde[1], &rcondv[1], &work[1], lwork, &iwork[1], &
 	    iinfo);
@@ -423,17 +424,17 @@ static integer c__4 = 4;
 	if (*jtype != 22) {
 	    io___14.ciunit = *nounit;
 	    s_wsfe(&io___14);
-	    do_fio(&c__1, "DGEEVX1", 7L);
+	    do_fio(&c__1, "DGEEVX1", (ftnlen)7);
 	    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
-	    do_fio(&c__1, balanc, 1L);
+	    do_fio(&c__1, balanc, (ftnlen)1);
 	    do_fio(&c__4, (char *)&iseed[1], (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
 	    io___15.ciunit = *nounit;
 	    s_wsfe(&io___15);
-	    do_fio(&c__1, "DGEEVX1", 7L);
+	    do_fio(&c__1, "DGEEVX1", (ftnlen)7);
 	    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -461,10 +462,10 @@ static integer c__4 = 4;
     for (j = 1; j <= i__1; ++j) {
 	tnrm = 1.;
 	if (wi[j] == 0.) {
-	    tnrm = dnrm2_(n, &vr[j * vr_dim1 + 1], &c__1);
+	    tnrm = dnrm2_(n, &vr_ref(1, j), &c__1);
 	} else if (wi[j] > 0.) {
-	    d__1 = dnrm2_(n, &vr[j * vr_dim1 + 1], &c__1);
-	    d__2 = dnrm2_(n, &vr[(j + 1) * vr_dim1 + 1], &c__1);
+	    d__1 = dnrm2_(n, &vr_ref(1, j), &c__1);
+	    d__2 = dnrm2_(n, &vr_ref(1, j + 1), &c__1);
 	    tnrm = dlapy2_(&d__1, &d__2);
 	}
 /* Computing MAX   
@@ -477,14 +478,13 @@ static integer c__4 = 4;
 	    vrmx = 0.;
 	    i__2 = *n;
 	    for (jj = 1; jj <= i__2; ++jj) {
-		vtst = dlapy2_(&vr[jj + j * vr_dim1], &vr[jj + (j + 1) * 
-			vr_dim1]);
+		vtst = dlapy2_(&vr_ref(jj, j), &vr_ref(jj, j + 1));
 		if (vtst > vmx) {
 		    vmx = vtst;
 		}
-		if (vr[jj + (j + 1) * vr_dim1] == 0. && (d__1 = vr[jj + j * 
-			vr_dim1], abs(d__1)) > vrmx) {
-		    vrmx = (d__2 = vr[jj + j * vr_dim1], abs(d__2));
+		if (vr_ref(jj, j + 1) == 0. && (d__1 = vr_ref(jj, j), abs(
+			d__1)) > vrmx) {
+		    vrmx = (d__2 = vr_ref(jj, j), abs(d__2));
 		}
 /* L20: */
 	    }
@@ -501,10 +501,10 @@ static integer c__4 = 4;
     for (j = 1; j <= i__1; ++j) {
 	tnrm = 1.;
 	if (wi[j] == 0.) {
-	    tnrm = dnrm2_(n, &vl[j * vl_dim1 + 1], &c__1);
+	    tnrm = dnrm2_(n, &vl_ref(1, j), &c__1);
 	} else if (wi[j] > 0.) {
-	    d__1 = dnrm2_(n, &vl[j * vl_dim1 + 1], &c__1);
-	    d__2 = dnrm2_(n, &vl[(j + 1) * vl_dim1 + 1], &c__1);
+	    d__1 = dnrm2_(n, &vl_ref(1, j), &c__1);
+	    d__2 = dnrm2_(n, &vl_ref(1, j + 1), &c__1);
 	    tnrm = dlapy2_(&d__1, &d__2);
 	}
 /* Computing MAX   
@@ -517,14 +517,13 @@ static integer c__4 = 4;
 	    vrmx = 0.;
 	    i__2 = *n;
 	    for (jj = 1; jj <= i__2; ++jj) {
-		vtst = dlapy2_(&vl[jj + j * vl_dim1], &vl[jj + (j + 1) * 
-			vl_dim1]);
+		vtst = dlapy2_(&vl_ref(jj, j), &vl_ref(jj, j + 1));
 		if (vtst > vmx) {
 		    vmx = vtst;
 		}
-		if (vl[jj + (j + 1) * vl_dim1] == 0. && (d__1 = vl[jj + j * 
-			vl_dim1], abs(d__1)) > vrmx) {
-		    vrmx = (d__2 = vl[jj + j * vl_dim1], abs(d__2));
+		if (vl_ref(jj, j + 1) == 0. && (d__1 = vl_ref(jj, j), abs(
+			d__1)) > vrmx) {
+		    vrmx = (d__2 = vl_ref(jj, j), abs(d__2));
 		}
 /* L40: */
 	    }
@@ -544,26 +543,27 @@ static integer c__4 = 4;
 
 /*        Compute eigenvalues only, and test them */
 
-	dlacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-	dgeevx_(balanc, "N", "N", sense, n, &h[h_offset], lda, &wr1[1], &wi1[
-		1], dum, &c__1, dum, &c__1, &ilo1, &ihi1, &scale1[1], &abnrm1,
-		 &rcnde1[1], &rcndv1[1], &work[1], lwork, &iwork[1], &iinfo);
+	dlacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+	dgeevx_(balanc, "N", "N", sense, n, &h__[h_offset], lda, &wr1[1], &
+		wi1[1], dum, &c__1, dum, &c__1, &ilo1, &ihi1, &scale1[1], &
+		abnrm1, &rcnde1[1], &rcndv1[1], &work[1], lwork, &iwork[1], &
+		iinfo);
 	if (iinfo != 0) {
 	    result[1] = ulpinv;
 	    if (*jtype != 22) {
 		io___28.ciunit = *nounit;
 		s_wsfe(&io___28);
-		do_fio(&c__1, "DGEEVX2", 7L);
+		do_fio(&c__1, "DGEEVX2", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
-		do_fio(&c__1, balanc, 1L);
+		do_fio(&c__1, balanc, (ftnlen)1);
 		do_fio(&c__4, (char *)&iseed[1], (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
 		io___29.ciunit = *nounit;
 		s_wsfe(&io___29);
-		do_fio(&c__1, "DGEEVX2", 7L);
+		do_fio(&c__1, "DGEEVX2", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -618,9 +618,9 @@ static integer c__4 = 4;
 
 /*        Compute eigenvalues and right eigenvectors, and test them */
 
-	dlacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-	dgeevx_(balanc, "N", "V", sense, n, &h[h_offset], lda, &wr1[1], &wi1[
-		1], dum, &c__1, &lre[lre_offset], ldlre, &ilo1, &ihi1, &
+	dlacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+	dgeevx_(balanc, "N", "V", sense, n, &h__[h_offset], lda, &wr1[1], &
+		wi1[1], dum, &c__1, &lre[lre_offset], ldlre, &ilo1, &ihi1, &
 		scale1[1], &abnrm1, &rcnde1[1], &rcndv1[1], &work[1], lwork, &
 		iwork[1], &iinfo);
 	if (iinfo != 0) {
@@ -628,17 +628,17 @@ static integer c__4 = 4;
 	    if (*jtype != 22) {
 		io___30.ciunit = *nounit;
 		s_wsfe(&io___30);
-		do_fio(&c__1, "DGEEVX3", 7L);
+		do_fio(&c__1, "DGEEVX3", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
-		do_fio(&c__1, balanc, 1L);
+		do_fio(&c__1, balanc, (ftnlen)1);
 		do_fio(&c__4, (char *)&iseed[1], (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
 		io___31.ciunit = *nounit;
 		s_wsfe(&io___31);
-		do_fio(&c__1, "DGEEVX3", 7L);
+		do_fio(&c__1, "DGEEVX3", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -664,7 +664,7 @@ static integer c__4 = 4;
 	for (j = 1; j <= i__2; ++j) {
 	    i__3 = *n;
 	    for (jj = 1; jj <= i__3; ++jj) {
-		if (vr[j + jj * vr_dim1] != lre[j + jj * lre_dim1]) {
+		if (vr_ref(j, jj) != lre_ref(j, jj)) {
 		    result[6] = ulpinv;
 		}
 /* L100: */
@@ -707,9 +707,9 @@ static integer c__4 = 4;
 
 /*        Compute eigenvalues and left eigenvectors, and test them */
 
-	dlacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-	dgeevx_(balanc, "V", "N", sense, n, &h[h_offset], lda, &wr1[1], &wi1[
-		1], &lre[lre_offset], ldlre, dum, &c__1, &ilo1, &ihi1, &
+	dlacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+	dgeevx_(balanc, "V", "N", sense, n, &h__[h_offset], lda, &wr1[1], &
+		wi1[1], &lre[lre_offset], ldlre, dum, &c__1, &ilo1, &ihi1, &
 		scale1[1], &abnrm1, &rcnde1[1], &rcndv1[1], &work[1], lwork, &
 		iwork[1], &iinfo);
 	if (iinfo != 0) {
@@ -717,17 +717,17 @@ static integer c__4 = 4;
 	    if (*jtype != 22) {
 		io___32.ciunit = *nounit;
 		s_wsfe(&io___32);
-		do_fio(&c__1, "DGEEVX4", 7L);
+		do_fio(&c__1, "DGEEVX4", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*jtype), (ftnlen)sizeof(integer));
-		do_fio(&c__1, balanc, 1L);
+		do_fio(&c__1, balanc, (ftnlen)1);
 		do_fio(&c__4, (char *)&iseed[1], (ftnlen)sizeof(integer));
 		e_wsfe();
 	    } else {
 		io___33.ciunit = *nounit;
 		s_wsfe(&io___33);
-		do_fio(&c__1, "DGEEVX4", 7L);
+		do_fio(&c__1, "DGEEVX4", (ftnlen)7);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -753,7 +753,7 @@ static integer c__4 = 4;
 	for (j = 1; j <= i__2; ++j) {
 	    i__3 = *n;
 	    for (jj = 1; jj <= i__3; ++jj) {
-		if (vl[j + jj * vl_dim1] != lre[j + jj * lre_dim1]) {
+		if (vl_ref(j, jj) != lre_ref(j, jj)) {
 		    result[7] = ulpinv;
 		}
 /* L150: */
@@ -803,16 +803,16 @@ L190:
 /*     If COMP, compare condition numbers to precomputed ones */
 
     if (*comp) {
-	dlacpy_("F", n, n, &a[a_offset], lda, &h[h_offset], lda);
-	dgeevx_("N", "V", "V", "B", n, &h[h_offset], lda, &wr[1], &wi[1], &vl[
-		vl_offset], ldvl, &vr[vr_offset], ldvr, &ilo, &ihi, &scale[1],
-		 &abnrm, &rconde[1], &rcondv[1], &work[1], lwork, &iwork[1], &
-		iinfo);
+	dlacpy_("F", n, n, &a[a_offset], lda, &h__[h_offset], lda);
+	dgeevx_("N", "V", "V", "B", n, &h__[h_offset], lda, &wr[1], &wi[1], &
+		vl[vl_offset], ldvl, &vr[vr_offset], ldvr, &ilo, &ihi, &scale[
+		1], &abnrm, &rconde[1], &rcondv[1], &work[1], lwork, &iwork[1]
+		, &iinfo);
 	if (iinfo != 0) {
 	    result[1] = ulpinv;
 	    io___34.ciunit = *nounit;
 	    s_wsfe(&io___34);
-	    do_fio(&c__1, "DGEEVX5", 7L);
+	    do_fio(&c__1, "DGEEVX5", (ftnlen)7);
 	    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&(*n), (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&iseed[1], (ftnlen)sizeof(integer));
@@ -825,12 +825,12 @@ L190:
           to compare with inputs */
 
 	i__1 = *n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    kmin = i;
-	    vrmin = wr[i];
-	    vimin = wi[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    kmin = i__;
+	    vrmin = wr[i__];
+	    vimin = wi[i__];
 	    i__2 = *n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		if (wr[j] < vrmin) {
 		    kmin = j;
 		    vrmin = wr[j];
@@ -838,16 +838,16 @@ L190:
 		}
 /* L210: */
 	    }
-	    wr[kmin] = wr[i];
-	    wi[kmin] = wi[i];
-	    wr[i] = vrmin;
-	    wi[i] = vimin;
+	    wr[kmin] = wr[i__];
+	    wi[kmin] = wi[i__];
+	    wr[i__] = vrmin;
+	    wi[i__] = vimin;
 	    vrmin = rconde[kmin];
-	    rconde[kmin] = rconde[i];
-	    rconde[i] = vrmin;
+	    rconde[kmin] = rconde[i__];
+	    rconde[i__] = vrmin;
 	    vrmin = rcondv[kmin];
-	    rcondv[kmin] = rcondv[i];
-	    rcondv[i] = vrmin;
+	    rcondv[kmin] = rcondv[i__];
+	    rcondv[i__] = vrmin;
 /* L220: */
 	}
 
@@ -863,16 +863,16 @@ L190:
 	    v = 1.;
 	}
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (v > rcondv[i] * rconde[i]) {
-		tol = rcondv[i];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (v > rcondv[i__] * rconde[i__]) {
+		tol = rcondv[i__];
 	    } else {
-		tol = v / rconde[i];
+		tol = v / rconde[i__];
 	    }
-	    if (v > rcdvin[i] * rcdein[i]) {
-		tolin = rcdvin[i];
+	    if (v > rcdvin[i__] * rcdein[i__]) {
+		tolin = rcdvin[i__];
 	    } else {
-		tolin = v / rcdein[i];
+		tolin = v / rcdein[i__];
 	    }
 /* Computing MAX */
 	    d__1 = tol, d__2 = smlnum / eps;
@@ -880,14 +880,14 @@ L190:
 /* Computing MAX */
 	    d__1 = tolin, d__2 = smlnum / eps;
 	    tolin = max(d__1,d__2);
-	    if (eps * (rcdvin[i] - tolin) > rcondv[i] + tol) {
+	    if (eps * (rcdvin[i__] - tolin) > rcondv[i__] + tol) {
 		vmax = 1. / eps;
-	    } else if (rcdvin[i] - tolin > rcondv[i] + tol) {
-		vmax = (rcdvin[i] - tolin) / (rcondv[i] + tol);
-	    } else if (rcdvin[i] + tolin < eps * (rcondv[i] - tol)) {
+	    } else if (rcdvin[i__] - tolin > rcondv[i__] + tol) {
+		vmax = (rcdvin[i__] - tolin) / (rcondv[i__] + tol);
+	    } else if (rcdvin[i__] + tolin < eps * (rcondv[i__] - tol)) {
 		vmax = 1. / eps;
-	    } else if (rcdvin[i] + tolin < rcondv[i] - tol) {
-		vmax = (rcondv[i] - tol) / (rcdvin[i] + tolin);
+	    } else if (rcdvin[i__] + tolin < rcondv[i__] - tol) {
+		vmax = (rcondv[i__] - tol) / (rcdvin[i__] + tolin);
 	    } else {
 		vmax = 1.;
 	    }
@@ -900,16 +900,16 @@ L190:
 
 	result[11] = 0.;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (v > rcondv[i]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (v > rcondv[i__]) {
 		tol = 1.;
 	    } else {
-		tol = v / rcondv[i];
+		tol = v / rcondv[i__];
 	    }
-	    if (v > rcdvin[i]) {
+	    if (v > rcdvin[i__]) {
 		tolin = 1.;
 	    } else {
-		tolin = v / rcdvin[i];
+		tolin = v / rcdvin[i__];
 	    }
 /* Computing MAX */
 	    d__1 = tol, d__2 = smlnum / eps;
@@ -917,14 +917,14 @@ L190:
 /* Computing MAX */
 	    d__1 = tolin, d__2 = smlnum / eps;
 	    tolin = max(d__1,d__2);
-	    if (eps * (rcdein[i] - tolin) > rconde[i] + tol) {
+	    if (eps * (rcdein[i__] - tolin) > rconde[i__] + tol) {
 		vmax = 1. / eps;
-	    } else if (rcdein[i] - tolin > rconde[i] + tol) {
-		vmax = (rcdein[i] - tolin) / (rconde[i] + tol);
-	    } else if (rcdein[i] + tolin < eps * (rconde[i] - tol)) {
+	    } else if (rcdein[i__] - tolin > rconde[i__] + tol) {
+		vmax = (rcdein[i__] - tolin) / (rconde[i__] + tol);
+	    } else if (rcdein[i__] + tolin < eps * (rconde[i__] - tol)) {
 		vmax = 1. / eps;
-	    } else if (rcdein[i] + tolin < rconde[i] - tol) {
-		vmax = (rconde[i] - tol) / (rcdein[i] + tolin);
+	    } else if (rcdein[i__] + tolin < rconde[i__] - tol) {
+		vmax = (rconde[i__] - tol) / (rcdein[i__] + tolin);
 	    } else {
 		vmax = 1.;
 	    }
@@ -942,4 +942,9 @@ L250:
 /*     End of DGET23 */
 
 } /* dget23_ */
+
+#undef lre_ref
+#undef vr_ref
+#undef vl_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,7 @@ static real c_b25 = 0.f;
 static complex c_b62 = {0.f,0.f};
 
 /* Subroutine */ int cdrvpt_(logical *dotype, integer *nn, integer *nval, 
-	integer *nrhs, real *thresh, logical *tsterr, complex *a, real *d, 
+	integer *nrhs, real *thresh, logical *tsterr, complex *a, real *d__, 
 	complex *e, complex *b, complex *x, complex *xact, complex *work, 
 	real *rwork, integer *nout)
 {
@@ -60,12 +61,12 @@ static complex c_b62 = {0.f,0.f};
     static integer mode;
     static real dmax__;
     static integer imat, info;
-    static char path[3], dist[1], type[1];
-    static integer nrun, i, j, k, n, ifact;
+    static char path[3], dist[1], type__[1];
+    static integer nrun, i__, j, k, n, ifact;
     extern /* Subroutine */ int cget04_(integer *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *);
     static integer nfail, iseed[4];
-    static real z[3], rcond;
+    static real z__[3], rcond;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static integer nimat;
     extern doublereal sget06_(real *, real *);
@@ -125,7 +126,7 @@ static complex c_b62 = {0.f,0.f};
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -140,8 +141,7 @@ static complex c_b62 = {0.f,0.f};
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -183,8 +183,7 @@ static complex c_b62 = {0.f,0.f};
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --rwork;
@@ -193,20 +192,20 @@ static complex c_b62 = {0.f,0.f};
     --x;
     --b;
     --e;
-    --d;
+    --d__;
     --a;
     --nval;
     --dotype;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'C';
-    s_copy(path + 1, "PT", 2L, 2L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "PT", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -240,20 +239,18 @@ static complex c_b62 = {0.f,0.f};
 
 /*           Set up parameters with CLATB4. */
 
-	    clatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &cond,
-		     dist);
+	    clatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
+		    cond, dist);
 
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Type 1-6:  generate a symmetric tridiagonal ma
-trix of   
-                known condition number in lower triangular ban
-d storage. */
+/*              Type 1-6:  generate a symmetric tridiagonal matrix of   
+                known condition number in lower triangular band storage. */
 
-		s_copy(srnamc_1.srnamt, "CLATMS", 6L, 6L);
-		clatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cond, &
-			anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
+		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		clatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
+			&anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
 
 /*              Check the error code from CLATMS. */
 
@@ -268,11 +265,11 @@ d storage. */
 
 		ia = 1;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    i__4 = i;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    i__4 = i__;
 		    i__5 = ia;
-		    d[i__4] = a[i__5].r;
-		    i__4 = i;
+		    d__[i__4] = a[i__5].r;
+		    i__4 = i__;
 		    i__5 = ia + 1;
 		    e[i__4].r = a[i__5].r, e[i__4].i = a[i__5].i;
 		    ia += 2;
@@ -281,46 +278,43 @@ d storage. */
 		if (n > 0) {
 		    i__3 = n;
 		    i__4 = ia;
-		    d[i__3] = a[i__4].r;
+		    d__[i__3] = a[i__4].r;
 		}
 	    } else {
 
-/*              Type 7-12:  generate a diagonally dominant mat
-rix with   
-                unknown condition number in the vectors D and 
-E. */
+/*              Type 7-12:  generate a diagonally dominant matrix with   
+                unknown condition number in the vectors D and E. */
 
 		if (! zerot || ! dotype[7]) {
 
 /*                 Let D and E have values from [-1,1]. */
 
-		    slarnv_(&c__2, iseed, &n, &d[1]);
+		    slarnv_(&c__2, iseed, &n, &d__[1]);
 		    i__3 = n - 1;
 		    clarnv_(&c__2, iseed, &i__3, &e[1]);
 
-/*                 Make the tridiagonal matrix diagonally 
-dominant. */
+/*                 Make the tridiagonal matrix diagonally dominant. */
 
 		    if (n == 1) {
-			d[1] = dabs(d[1]);
+			d__[1] = dabs(d__[1]);
 		    } else {
-			d[1] = dabs(d[1]) + c_abs(&e[1]);
-			d[n] = (r__1 = d[n], dabs(r__1)) + c_abs(&e[n - 1]);
+			d__[1] = dabs(d__[1]) + c_abs(&e[1]);
+			d__[n] = (r__1 = d__[n], dabs(r__1)) + c_abs(&e[n - 1]
+				);
 			i__3 = n - 1;
-			for (i = 2; i <= i__3; ++i) {
-			    d[i] = (r__1 = d[i], dabs(r__1)) + c_abs(&e[i]) + 
-				    c_abs(&e[i - 1]);
+			for (i__ = 2; i__ <= i__3; ++i__) {
+			    d__[i__] = (r__1 = d__[i__], dabs(r__1)) + c_abs(&
+				    e[i__]) + c_abs(&e[i__ - 1]);
 /* L30: */
 			}
 		    }
 
-/*                 Scale D and E so the maximum element is
- ANORM. */
+/*                 Scale D and E so the maximum element is ANORM. */
 
-		    ix = isamax_(&n, &d[1], &c__1);
-		    dmax__ = d[ix];
+		    ix = isamax_(&n, &d__[1], &c__1);
+		    dmax__ = d__[ix];
 		    r__1 = anorm / dmax__;
-		    sscal_(&n, &r__1, &d[1], &c__1);
+		    sscal_(&n, &r__1, &d__[1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			r__1 = anorm / dmax__;
@@ -329,65 +323,63 @@ dominant. */
 
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back t
-he zeroed out   
+/*                 Reuse the last matrix by copying back the zeroed out   
                    elements. */
 
 		    if (izero == 1) {
-			d[1] = z[1];
+			d__[1] = z__[1];
 			if (n > 1) {
-			    e[1].r = z[2], e[1].i = 0.f;
+			    e[1].r = z__[2], e[1].i = 0.f;
 			}
 		    } else if (izero == n) {
 			i__3 = n - 1;
-			e[i__3].r = z[0], e[i__3].i = 0.f;
-			d[n] = z[1];
+			e[i__3].r = z__[0], e[i__3].i = 0.f;
+			d__[n] = z__[1];
 		    } else {
 			i__3 = izero - 1;
-			e[i__3].r = z[0], e[i__3].i = 0.f;
-			d[izero] = z[1];
+			e[i__3].r = z__[0], e[i__3].i = 0.f;
+			d__[izero] = z__[1];
 			i__3 = izero;
-			e[i__3].r = z[2], e[i__3].i = 0.f;
+			e[i__3].r = z__[2], e[i__3].i = 0.f;
 		    }
 		}
 
-/*              For types 8-10, set one row and column of the 
-matrix to   
+/*              For types 8-10, set one row and column of the matrix to   
                 zero. */
 
 		izero = 0;
 		if (imat == 8) {
 		    izero = 1;
-		    z[1] = d[1];
-		    d[1] = 0.f;
+		    z__[1] = d__[1];
+		    d__[1] = 0.f;
 		    if (n > 1) {
-			z[2] = e[1].r;
+			z__[2] = e[1].r;
 			e[1].r = 0.f, e[1].i = 0.f;
 		    }
 		} else if (imat == 9) {
 		    izero = n;
 		    if (n > 1) {
 			i__3 = n - 1;
-			z[0] = e[i__3].r;
+			z__[0] = e[i__3].r;
 			i__3 = n - 1;
 			e[i__3].r = 0.f, e[i__3].i = 0.f;
 		    }
-		    z[1] = d[n];
-		    d[n] = 0.f;
+		    z__[1] = d__[n];
+		    d__[n] = 0.f;
 		} else if (imat == 10) {
 		    izero = (n + 1) / 2;
 		    if (izero > 1) {
 			i__3 = izero - 1;
-			z[0] = e[i__3].r;
+			z__[0] = e[i__3].r;
 			i__3 = izero - 1;
 			e[i__3].r = 0.f, e[i__3].i = 0.f;
 			i__3 = izero;
-			z[2] = e[i__3].r;
+			z__[2] = e[i__3].r;
 			i__3 = izero;
 			e[i__3].r = 0.f, e[i__3].i = 0.f;
 		    }
-		    z[1] = d[izero];
-		    d[izero] = 0.f;
+		    z__[1] = d__[izero];
+		    d__[izero] = 0.f;
 		}
 	    }
 
@@ -403,8 +395,8 @@ matrix to
 
 /*           Set the right hand side. */
 
-	    claptm_("Lower", &n, nrhs, &c_b24, &d[1], &e[1], &xact[1], &lda, &
-		    c_b25, &b[1], &lda);
+	    claptm_("Lower", &n, nrhs, &c_b24, &d__[1], &e[1], &xact[1], &lda,
+		     &c_b25, &b[1], &lda);
 
 	    for (ifact = 1; ifact <= 2; ++ifact) {
 		if (ifact == 1) {
@@ -413,8 +405,7 @@ matrix to
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison wi
-th   
+/*              Compute the condition number for comparison with   
                 the value returned by CPTSVX. */
 
 		if (zerot) {
@@ -427,9 +418,9 @@ th
 
 /*                 Compute the 1-norm of A. */
 
-		    anorm = clanht_("1", &n, &d[1], &e[1]);
+		    anorm = clanht_("1", &n, &d__[1], &e[1]);
 
-		    scopy_(&n, &d[1], &c__1, &d[n + 1], &c__1);
+		    scopy_(&n, &d__[1], &c__1, &d__[n + 1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			ccopy_(&i__3, &e[1], &c__1, &e[n + 1], &c__1);
@@ -437,34 +428,31 @@ th
 
 /*                 Factor the matrix A. */
 
-		    cpttrf_(&n, &d[n + 1], &e[n + 1], &info);
+		    cpttrf_(&n, &d__[n + 1], &e[n + 1], &info);
 
-/*                 Use CPTTRS to solve for one column at a
- time of   
-                   inv(A), computing the maximum column su
-m as we go. */
+/*                 Use CPTTRS to solve for one column at a time of   
+                   inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    i__5 = j;
 			    x[i__5].r = 0.f, x[i__5].i = 0.f;
 /* L50: */
 			}
-			i__4 = i;
+			i__4 = i__;
 			x[i__4].r = 1.f, x[i__4].i = 0.f;
-			cpttrs_("Lower", &n, &c__1, &d[n + 1], &e[n + 1], &x[
-				1], &lda, &info);
+			cpttrs_("Lower", &n, &c__1, &d__[n + 1], &e[n + 1], &
+				x[1], &lda, &info);
 /* Computing MAX */
 			r__1 = ainvnm, r__2 = scasum_(&n, &x[1], &c__1);
 			ainvnm = dmax(r__1,r__2);
 /* L60: */
 		    }
 
-/*                 Compute the 1-norm condition number of 
-A. */
+/*                 Compute the 1-norm condition number of A. */
 
 		    if (anorm <= 0.f || ainvnm <= 0.f) {
 			rcondc = 1.f;
@@ -477,19 +465,18 @@ A. */
 
 /*                 --- Test CPTSV -- */
 
-		    scopy_(&n, &d[1], &c__1, &d[n + 1], &c__1);
+		    scopy_(&n, &d__[1], &c__1, &d__[n + 1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			ccopy_(&i__3, &e[1], &c__1, &e[n + 1], &c__1);
 		    }
 		    clacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
 
-/*                 Factor A as L*D*L' and solve the system
- A*X = B. */
+/*                 Factor A as L*D*L' and solve the system A*X = B. */
 
-		    s_copy(srnamc_1.srnamt, "CPTSV ", 6L, 6L);
-		    cptsv_(&n, nrhs, &d[n + 1], &e[n + 1], &x[1], &lda, &info)
-			    ;
+		    s_copy(srnamc_1.srnamt, "CPTSV ", (ftnlen)6, (ftnlen)6);
+		    cptsv_(&n, nrhs, &d__[n + 1], &e[n + 1], &x[1], &lda, &
+			    info);
 
 /*                 Check error code from CPTSV . */
 
@@ -501,31 +488,26 @@ A. */
 		    nt = 0;
 		    if (izero == 0) {
 
-/*                    Check the factorization by compu
-ting the ratio   
-                         norm(L*D*L' - A) / (n * norm(
-A) * EPS ) */
+/*                    Check the factorization by computing the ratio   
+                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
-			cptt01_(&n, &d[1], &e[1], &d[n + 1], &e[n + 1], &work[
-				1], result);
+			cptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
+				work[1], result);
 
-/*                    Compute the residual in the solu
-tion. */
+/*                    Compute the residual in the solution. */
 
 			clacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
-			cptt02_("Lower", &n, nrhs, &d[1], &e[1], &x[1], &lda, 
-				&work[1], &lda, &result[1]);
+			cptt02_("Lower", &n, nrhs, &d__[1], &e[1], &x[1], &
+				lda, &work[1], &lda, &result[1]);
 
-/*                    Check solution from generated ex
-act solution. */
+/*                    Check solution from generated exact solution. */
 
 			cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
 				rcondc, &result[2]);
 			nt = 3;
 		    }
 
-/*                 Print information about the tests that 
-did not pass   
+/*                 Print information about the tests that did not pass   
                    the threshold. */
 
 		    i__3 = nt;
@@ -536,7 +518,7 @@ did not pass
 			    }
 			    io___35.ciunit = *nout;
 			    s_wsfe(&io___35);
-			    do_fio(&c__1, "CPTSV ", 6L);
+			    do_fio(&c__1, "CPTSV ", (ftnlen)6);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
@@ -557,31 +539,29 @@ did not pass
 
 		if (ifact > 1) {
 
-/*                 Initialize D( N+1:2*N ) and E( N+1:2*N 
-) to zero. */
+/*                 Initialize D( N+1:2*N ) and E( N+1:2*N ) to zero. */
 
 		    i__3 = n - 1;
-		    for (i = 1; i <= i__3; ++i) {
-			d[n + i] = 0.f;
-			i__4 = n + i;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			d__[n + i__] = 0.f;
+			i__4 = n + i__;
 			e[i__4].r = 0.f, e[i__4].i = 0.f;
 /* L80: */
 		    }
 		    if (n > 0) {
-			d[n + n] = 0.f;
+			d__[n + n] = 0.f;
 		    }
 		}
 
 		claset_("Full", &n, nrhs, &c_b62, &c_b62, &x[1], &lda);
 
-/*              Solve the system and compute the condition num
-ber and   
+/*              Solve the system and compute the condition number and   
                 error bounds using CPTSVX. */
 
-		s_copy(srnamc_1.srnamt, "CPTSVX", 6L, 6L);
-		cptsvx_(fact, &n, nrhs, &d[1], &e[1], &d[n + 1], &e[n + 1], &
-			b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[*
-			nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], &info);
+		s_copy(srnamc_1.srnamt, "CPTSVX", (ftnlen)6, (ftnlen)6);
+		cptsvx_(fact, &n, nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1]
+			, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
+			*nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], &info);
 
 /*              Check the error code from CPTSVX. */
 
@@ -592,49 +572,41 @@ ber and
 		if (izero == 0) {
 		    if (ifact == 2) {
 
-/*                    Check the factorization by compu
-ting the ratio   
-                         norm(L*D*L' - A) / (n * norm(
-A) * EPS ) */
+/*                    Check the factorization by computing the ratio   
+                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			k1 = 1;
-			cptt01_(&n, &d[1], &e[1], &d[n + 1], &e[n + 1], &work[
-				1], result);
+			cptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
+				work[1], result);
 		    } else {
 			k1 = 2;
 		    }
 
-/*                 Compute the residual in the solution. 
-*/
+/*                 Compute the residual in the solution. */
 
-		    clacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda)
-			    ;
-		    cptt02_("Lower", &n, nrhs, &d[1], &e[1], &x[1], &lda, &
+		    clacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
+		    cptt02_("Lower", &n, nrhs, &d__[1], &e[1], &x[1], &lda, &
 			    work[1], &lda, &result[1]);
 
-/*                 Check solution from generated exact sol
-ution. */
+/*                 Check solution from generated exact solution. */
 
 		    cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
 			    result[2]);
 
-/*                 Check error bounds from iterative refin
-ement. */
+/*                 Check error bounds from iterative refinement. */
 
-		    cptt05_(&n, nrhs, &d[1], &e[1], &b[1], &lda, &x[1], &lda, 
-			    &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1], &
-			    result[3]);
+		    cptt05_(&n, nrhs, &d__[1], &e[1], &b[1], &lda, &x[1], &
+			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1],
+			     &result[3]);
 		} else {
 		    k1 = 6;
 		}
 
-/*              Check the reciprocal of the condition number. 
-*/
+/*              Check the reciprocal of the condition number. */
 
 		result[5] = sget06_(&rcond, &rcondc);
 
-/*              Print information about the tests that did not
- pass   
+/*              Print information about the tests that did not pass   
                 the threshold. */
 
 		for (k = k1; k <= 6; ++k) {
@@ -644,8 +616,8 @@ ement. */
 			}
 			io___38.ciunit = *nout;
 			s_wsfe(&io___38);
-			do_fio(&c__1, "CPTSVX", 6L);
-			do_fio(&c__1, fact, 1L);
+			do_fio(&c__1, "CPTSVX", (ftnlen)6);
+			do_fio(&c__1, fact, (ftnlen)1);
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlartg_(doublereal *f, doublereal *g, doublereal *cs, 
-	doublereal *sn, doublereal *r)
+	doublereal *sn, doublereal *r__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -45,8 +46,7 @@
     R       (output) DOUBLE PRECISION   
             The nonzero component of the rotated vector.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* Initialized data */
     static logical first = TRUE_;
     /* System generated locals */
@@ -55,7 +55,7 @@
     /* Builtin functions */
     double log(doublereal), pow_di(doublereal *, integer *), sqrt(doublereal);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal scale;
     static integer count;
     static doublereal f1, g1, safmn2, safmx2;
@@ -69,18 +69,19 @@
 	safmin = dlamch_("S");
 	eps = dlamch_("E");
 	d__1 = dlamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(dlamch_("B")) / 2.);
+	i__1 = (integer) (log(safmin / eps) / log(dlamch_("B")) / 
+		2.);
 	safmn2 = pow_di(&d__1, &i__1);
 	safmx2 = 1. / safmn2;
     }
     if (*g == 0.) {
 	*cs = 1.;
 	*sn = 0.;
-	*r = *f;
+	*r__ = *f;
     } else if (*f == 0.) {
 	*cs = 0.;
 	*sn = 1.;
-	*r = *g;
+	*r__ = *g;
     } else {
 	f1 = *f;
 	g1 = *g;
@@ -103,12 +104,12 @@ L10:
 	    d__1 = f1;
 /* Computing 2nd power */
 	    d__2 = g1;
-	    *r = sqrt(d__1 * d__1 + d__2 * d__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(d__1 * d__1 + d__2 * d__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	    i__1 = count;
-	    for (i = 1; i <= count; ++i) {
-		*r *= safmx2;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		*r__ *= safmx2;
 /* L20: */
 	    }
 	} else if (scale <= safmn2) {
@@ -127,12 +128,12 @@ L30:
 	    d__1 = f1;
 /* Computing 2nd power */
 	    d__2 = g1;
-	    *r = sqrt(d__1 * d__1 + d__2 * d__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(d__1 * d__1 + d__2 * d__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	    i__1 = count;
-	    for (i = 1; i <= count; ++i) {
-		*r *= safmn2;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		*r__ *= safmn2;
 /* L40: */
 	    }
 	} else {
@@ -140,14 +141,14 @@ L30:
 	    d__1 = f1;
 /* Computing 2nd power */
 	    d__2 = g1;
-	    *r = sqrt(d__1 * d__1 + d__2 * d__2);
-	    *cs = f1 / *r;
-	    *sn = g1 / *r;
+	    *r__ = sqrt(d__1 * d__1 + d__2 * d__2);
+	    *cs = f1 / *r__;
+	    *sn = g1 / *r__;
 	}
 	if (abs(*f) > abs(*g) && *cs < 0.) {
 	    *cs = -(*cs);
 	    *sn = -(*sn);
-	    *r = -(*r);
+	    *r__ = -(*r__);
 	}
     }
     return 0;

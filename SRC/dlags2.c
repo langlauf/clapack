@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlags2_(logical *upper, doublereal *a1, doublereal *a2, 
@@ -5,7 +6,7 @@
 	doublereal *csu, doublereal *snu, doublereal *csv, doublereal *snv, 
 	doublereal *csq, doublereal *snq)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -70,13 +71,12 @@
     SNQ     (output) DOUBLE PRECISION   
             The desired orthogonal matrix Q.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     /* System generated locals */
     doublereal d__1;
     /* Local variables */
-    static doublereal aua11, aua12, aua21, aua22, avb12, avb11, avb21, avb22, 
-	    ua11r, ua22r, vb11r, vb22r, a, b, c, d, r, s1, s2;
+    static doublereal aua11, aua12, aua21, aua22, avb11, avb12, avb21, avb22, 
+	    ua11r, ua22r, vb11r, vb22r, a, b, c__, d__, r__, s1, s2;
     extern /* Subroutine */ int dlasv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *), dlartg_(doublereal *, 
@@ -94,7 +94,7 @@
                                      ( 0 d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
+	d__ = *a3 * *b1;
 	b = *a2 * *b1 - *a1 * *b2;
 
 /*        The SVD of real 2-by-2 triangular C   
@@ -102,12 +102,11 @@
            ( CSL -SNL )*( A B )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( 0 D ) ( -SNR  CSR )   ( 0 T ) */
 
-	dlasv2_(&a, &b, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	dlasv2_(&a, &b, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (abs(csl) >= abs(snl) || abs(csr) >= abs(snr)) {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua11r = csl * *a1;
@@ -125,14 +124,14 @@
 		if (aua12 / (abs(ua11r) + abs(ua12)) <= avb12 / (abs(vb11r) + 
 			abs(vb12))) {
 		    d__1 = -ua11r;
-		    dlartg_(&d__1, &ua12, csq, snq, &r);
+		    dlartg_(&d__1, &ua12, csq, snq, &r__);
 		} else {
 		    d__1 = -vb11r;
-		    dlartg_(&d__1, &vb12, csq, snq, &r);
+		    dlartg_(&d__1, &vb12, csq, snq, &r__);
 		}
 	    } else {
 		d__1 = -vb11r;
-		dlartg_(&d__1, &vb12, csq, snq, &r);
+		dlartg_(&d__1, &vb12, csq, snq, &r__);
 	    }
 
 	    *csu = csl;
@@ -142,8 +141,7 @@
 
 	} else {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua21 = -snl * *a1;
@@ -155,21 +153,20 @@
 	    aua22 = abs(snl) * abs(*a2) + abs(csl) * abs(*a3);
 	    avb22 = abs(snr) * abs(*b2) + abs(csr) * abs(*b3);
 
-/*           zero (2,2) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (2,2) elements of U'*A and V'*B, and then swap. */
 
 	    if (abs(ua21) + abs(ua22) != 0.) {
 		if (aua22 / (abs(ua21) + abs(ua22)) <= avb22 / (abs(vb21) + 
 			abs(vb22))) {
 		    d__1 = -ua21;
-		    dlartg_(&d__1, &ua22, csq, snq, &r);
+		    dlartg_(&d__1, &ua22, csq, snq, &r__);
 		} else {
 		    d__1 = -vb21;
-		    dlartg_(&d__1, &vb22, csq, snq, &r);
+		    dlartg_(&d__1, &vb22, csq, snq, &r__);
 		}
 	    } else {
 		d__1 = -vb21;
-		dlartg_(&d__1, &vb22, csq, snq, &r);
+		dlartg_(&d__1, &vb22, csq, snq, &r__);
 	    }
 
 	    *csu = snl;
@@ -187,20 +184,19 @@
                                      ( c d ) */
 
 	a = *a1 * *b3;
-	d = *a3 * *b1;
-	c = *a2 * *b3 - *a3 * *b2;
+	d__ = *a3 * *b1;
+	c__ = *a2 * *b3 - *a3 * *b2;
 
 /*        The SVD of real 2-by-2 triangular C   
 
            ( CSL -SNL )*( A 0 )*(  CSR  SNR ) = ( R 0 )   
            ( SNL  CSL ) ( C D ) ( -SNR  CSR )   ( 0 T ) */
 
-	dlasv2_(&a, &c, &d, &s1, &s2, &snr, &csr, &snl, &csl);
+	dlasv2_(&a, &c__, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (abs(csr) >= abs(snr) || abs(csl) >= abs(snl)) {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B
-,   
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
              and (2,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua21 = -snr * *a1 + csr * *a2;
@@ -217,12 +213,12 @@
 	    if (abs(ua21) + abs(ua22r) != 0.) {
 		if (aua21 / (abs(ua21) + abs(ua22r)) <= avb21 / (abs(vb21) + 
 			abs(vb22r))) {
-		    dlartg_(&ua22r, &ua21, csq, snq, &r);
+		    dlartg_(&ua22r, &ua21, csq, snq, &r__);
 		} else {
-		    dlartg_(&vb22r, &vb21, csq, snq, &r);
+		    dlartg_(&vb22r, &vb21, csq, snq, &r__);
 		}
 	    } else {
-		dlartg_(&vb22r, &vb21, csq, snq, &r);
+		dlartg_(&vb22r, &vb21, csq, snq, &r__);
 	    }
 
 	    *csu = csr;
@@ -232,8 +228,7 @@
 
 	} else {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B
-,   
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
              and (1,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua11 = csr * *a1 + snr * *a2;
@@ -245,18 +240,17 @@
 	    aua11 = abs(csr) * abs(*a1) + abs(snr) * abs(*a2);
 	    avb11 = abs(csl) * abs(*b1) + abs(snl) * abs(*b2);
 
-/*           zero (1,1) elements of U'*A and V'*B, and then swap. 
-*/
+/*           zero (1,1) elements of U'*A and V'*B, and then swap. */
 
 	    if (abs(ua11) + abs(ua12) != 0.) {
 		if (aua11 / (abs(ua11) + abs(ua12)) <= avb11 / (abs(vb11) + 
 			abs(vb12))) {
-		    dlartg_(&ua12, &ua11, csq, snq, &r);
+		    dlartg_(&ua12, &ua11, csq, snq, &r__);
 		} else {
-		    dlartg_(&vb12, &vb11, csq, snq, &r);
+		    dlartg_(&vb12, &vb11, csq, snq, &r__);
 		}
 	    } else {
-		dlartg_(&vb12, &vb11, csq, snq, &r);
+		dlartg_(&vb12, &vb11, csq, snq, &r__);
 	    }
 
 	    *csu = snr;

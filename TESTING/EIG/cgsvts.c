@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,31 +12,34 @@ static complex c_b1 = {0.f,0.f};
 static complex c_b2 = {1.f,0.f};
 static real c_b36 = -1.f;
 static real c_b37 = 1.f;
+static integer c__1 = 1;
 
 /* Subroutine */ int cgsvts_(integer *m, integer *p, integer *n, complex *a, 
 	complex *af, integer *lda, complex *b, complex *bf, integer *ldb, 
 	complex *u, integer *ldu, complex *v, integer *ldv, complex *q, 
-	integer *ldq, real *alpha, real *beta, complex *r, integer *ldr, 
+	integer *ldq, real *alpha, real *beta, complex *r__, integer *ldr, 
 	integer *iwork, complex *work, integer *lwork, real *rwork, real *
 	result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, af_dim1, af_offset, b_dim1, b_offset, bf_dim1, 
-	    bf_offset, u_dim1, u_offset, v_dim1, v_offset, q_dim1, q_offset, 
-	    r_dim1, r_offset, i__1, i__2, i__3, i__4, i__5, i__6;
+	    bf_offset, q_dim1, q_offset, r_dim1, r_offset, u_dim1, u_offset, 
+	    v_dim1, v_offset, i__1, i__2, i__3, i__4, i__5, i__6;
     real r__1;
     complex q__1, q__2;
 
     /* Local variables */
     static integer info;
-    static real unfl;
-    static integer i, j, k, l;
+    static real unfl, temp;
+    static integer i__, j, k, l;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *), cherk_(char *, 
 	    char *, integer *, integer *, real *, complex *, integer *, real *
 	    , complex *, integer *);
     static real resid, anorm, bnorm;
+    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
+	    integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), clanhe_(char *, char *, integer *, 
 	    complex *, integer *, real *), slamch_(char *);
@@ -46,13 +50,25 @@ static real c_b37 = 1.f;
 	    integer *, real *, real *, complex *, integer *, complex *, 
 	    integer *, complex *, integer *, complex *, real *, integer *, 
 	    integer *);
-    static real ulp;
+    static real ulpinv, ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define r___subscr(a_1,a_2) (a_2)*r_dim1 + a_1
+#define r___ref(a_1,a_2) r__[r___subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+#define bf_subscr(a_1,a_2) (a_2)*bf_dim1 + a_1
+#define bf_ref(a_1,a_2) bf[bf_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -143,38 +159,39 @@ static real c_b37 = 1.f;
             RESULT(3) = norm( I - U'*U ) / ( M*ULP )   
             RESULT(4) = norm( I - V'*V ) / ( P*ULP )   
             RESULT(5) = norm( I - Q'*Q ) / ( N*ULP )   
+            RESULT(6) = 0        if ALPHA is in decreasing order;   
+                      = ULPINV   otherwise.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --alpha;
     --beta;
     r_dim1 = *ldr;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     --iwork;
     --work;
     --rwork;
@@ -182,6 +199,7 @@ static real c_b37 = 1.f;
 
     /* Function Body */
     ulp = slamch_("Precision");
+    ulpinv = 1.f / ulp;
     unfl = slamch_("Safe minimum");
 
 /*     Copy the matrix A to the array AF. */
@@ -208,12 +226,12 @@ static real c_b37 = 1.f;
    Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    i__3 = i + j * r_dim1;
-	    i__4 = i + (*n - k - l + j) * af_dim1;
-	    r[i__3].r = af[i__4].r, r[i__3].i = af[i__4].i;
+	for (j = i__; j <= i__2; ++j) {
+	    i__3 = r___subscr(i__, j);
+	    i__4 = af_subscr(i__, *n - k - l + j);
+	    r__[i__3].r = af[i__4].r, r__[i__3].i = af[i__4].i;
 /* L10: */
 	}
 /* L20: */
@@ -221,12 +239,12 @@ static real c_b37 = 1.f;
 
     if (*m - k - l < 0) {
 	i__1 = k + l;
-	for (i = *m + 1; i <= i__1; ++i) {
+	for (i__ = *m + 1; i__ <= i__1; ++i__) {
 	    i__2 = k + l;
-	    for (j = i; j <= i__2; ++j) {
-		i__3 = i + j * r_dim1;
-		i__4 = i - k + (*n - k - l + j) * bf_dim1;
-		r[i__3].r = bf[i__4].r, r[i__3].i = bf[i__4].i;
+	    for (j = i__; j <= i__2; ++j) {
+		i__3 = r___subscr(i__, j);
+		i__4 = bf_subscr(i__ - k, *n - k - l + j);
+		r__[i__3].r = bf[i__4].r, r__[i__3].i = bf[i__4].i;
 /* L30: */
 	    }
 /* L40: */
@@ -242,13 +260,14 @@ static real c_b37 = 1.f;
 	    , ldu, &work[1], lda, &c_b1, &a[a_offset], lda);
 
     i__1 = k;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    i__3 = i + (*n - k - l + j) * a_dim1;
-	    i__4 = i + (*n - k - l + j) * a_dim1;
-	    i__5 = i + j * r_dim1;
-	    q__1.r = a[i__4].r - r[i__5].r, q__1.i = a[i__4].i - r[i__5].i;
+	for (j = i__; j <= i__2; ++j) {
+	    i__3 = a_subscr(i__, *n - k - l + j);
+	    i__4 = a_subscr(i__, *n - k - l + j);
+	    i__5 = r___subscr(i__, j);
+	    q__1.r = a[i__4].r - r__[i__5].r, q__1.i = a[i__4].i - r__[i__5]
+		    .i;
 	    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L50: */
 	}
@@ -258,15 +277,15 @@ static real c_b37 = 1.f;
 /* Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
-    for (i = k + 1; i <= i__1; ++i) {
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    i__3 = i + (*n - k - l + j) * a_dim1;
-	    i__4 = i + (*n - k - l + j) * a_dim1;
-	    i__5 = i;
-	    i__6 = i + j * r_dim1;
-	    q__2.r = alpha[i__5] * r[i__6].r, q__2.i = alpha[i__5] * r[i__6]
-		    .i;
+	for (j = i__; j <= i__2; ++j) {
+	    i__3 = a_subscr(i__, *n - k - l + j);
+	    i__4 = a_subscr(i__, *n - k - l + j);
+	    i__5 = i__;
+	    i__6 = r___subscr(i__, j);
+	    q__2.r = alpha[i__5] * r__[i__6].r, q__2.i = alpha[i__5] * r__[
+		    i__6].i;
 	    q__1.r = a[i__4].r - q__2.r, q__1.i = a[i__4].i - q__2.i;
 	    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L70: */
@@ -294,14 +313,15 @@ static real c_b37 = 1.f;
 	    , ldv, &work[1], ldb, &c_b1, &b[b_offset], ldb);
 
     i__1 = l;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = l;
-	for (j = i; j <= i__2; ++j) {
-	    i__3 = i + (*n - l + j) * b_dim1;
-	    i__4 = i + (*n - l + j) * b_dim1;
-	    i__5 = k + i;
-	    i__6 = k + i + (k + j) * r_dim1;
-	    q__2.r = beta[i__5] * r[i__6].r, q__2.i = beta[i__5] * r[i__6].i;
+	for (j = i__; j <= i__2; ++j) {
+	    i__3 = b_subscr(i__, *n - l + j);
+	    i__4 = b_subscr(i__, *n - l + j);
+	    i__5 = k + i__;
+	    i__6 = r___subscr(k + i__, k + j);
+	    q__2.r = beta[i__5] * r__[i__6].r, q__2.i = beta[i__5] * r__[i__6]
+		    .i;
 	    q__1.r = b[i__4].r - q__2.r, q__1.i = b[i__4].i - q__2.i;
 	    b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L90: */
@@ -353,9 +373,48 @@ static real c_b37 = 1.f;
     resid = clanhe_("1", "Upper", n, &work[1], ldq, &rwork[1]);
     result[5] = resid / (real) max(1,*n) / ulp;
 
+/*     Check sorting */
+
+    scopy_(n, &alpha[1], &c__1, &rwork[1], &c__1);
+/* Computing MIN */
+    i__2 = k + l;
+    i__1 = min(i__2,*m);
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
+	j = iwork[i__];
+	if (i__ != j) {
+	    temp = rwork[i__];
+	    rwork[i__] = rwork[j];
+	    rwork[j] = temp;
+	}
+/* L110: */
+    }
+
+    result[6] = 0.f;
+/* Computing MIN */
+    i__2 = k + l;
+    i__1 = min(i__2,*m) - 1;
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
+	if (rwork[i__] < rwork[i__ + 1]) {
+	    result[6] = ulpinv;
+	}
+/* L120: */
+    }
+
     return 0;
 
 /*     End of CGSVTS */
 
 } /* cgsvts_ */
+
+#undef bf_ref
+#undef bf_subscr
+#undef af_ref
+#undef af_subscr
+#undef r___ref
+#undef r___subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

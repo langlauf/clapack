@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dpptri_(char *uplo, integer *n, doublereal *ap, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -26,11 +27,9 @@
     N       (input) INTEGER   
             The order of the matrix A.  N >= 0.   
 
-    AP      (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2) 
-  
+    AP      (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
             On entry, the triangular factor U or L from the Cholesky   
-            factorization A = U**T*U or A = L*L**T, packed columnwise as 
-  
+            factorization A = U**T*U or A = L*L**T, packed columnwise as   
             a linear array.  The j-th column of U or L is stored in the   
             array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j;   
@@ -42,19 +41,15 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is 
-  
+            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
                   zero, and the inverse could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b8 = 1.;
     static integer c__1 = 1;
@@ -80,10 +75,9 @@
     static integer jjn;
 
 
+    --ap;
 
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -105,7 +99,7 @@
 
 /*     Invert the triangular Cholesky factor U or L. */
 
-    dtptri_(uplo, "Non-unit", n, &AP(1), info);
+    dtptri_(uplo, "Non-unit", n, &ap[1], info);
     if (*info > 0) {
 	return 0;
     }
@@ -116,15 +110,15 @@
 
 	jj = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jc = jj + 1;
 	    jj += j;
 	    if (j > 1) {
 		i__2 = j - 1;
-		dspr_("Upper", &i__2, &c_b8, &AP(jc), &c__1, &AP(1));
+		dspr_("Upper", &i__2, &c_b8, &ap[jc], &c__1, &ap[1]);
 	    }
-	    ajj = AP(jj);
-	    dscal_(&j, &ajj, &AP(jc), &c__1);
+	    ajj = ap[jj];
+	    dscal_(&j, &ajj, &ap[jc], &c__1);
 /* L10: */
 	}
 
@@ -134,14 +128,14 @@
 
 	jj = 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jjn = jj + *n - j + 1;
 	    i__2 = *n - j + 1;
-	    AP(jj) = ddot_(&i__2, &AP(jj), &c__1, &AP(jj), &c__1);
+	    ap[jj] = ddot_(&i__2, &ap[jj], &c__1, &ap[jj], &c__1);
 	    if (j < *n) {
 		i__2 = *n - j;
-		dtpmv_("Lower", "Transpose", "Non-unit", &i__2, &AP(jjn), &AP(
-			jj + 1), &c__1);
+		dtpmv_("Lower", "Transpose", "Non-unit", &i__2, &ap[jjn], &ap[
+			jj + 1], &c__1);
 	    }
 	    jj = jjn;
 /* L20: */

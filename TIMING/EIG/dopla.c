@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
     /* Local variables */
     static doublereal adds;
     static logical sord, corz;
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static char c1[1], c2[2], c3[3];
     static doublereal mults, addfac, ek, em, en, wl, mulfac, wu;
@@ -31,7 +32,7 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
     static doublereal emn;
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -83,8 +84,7 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
     means that arguments N and NRHS in DGETRS are passed to arguments   
     M and N in this procedure.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        --------------------------------------------------------   
@@ -95,8 +95,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
     mults = 0.;
     adds = 0.;
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
     sord = lsame_(c1, "S") || lsame_(c1, "D");
     corz = lsame_(c1, "C") || lsame_(c1, "Z");
     if (*m <= 0 || ! (sord || corz)) {
@@ -151,9 +151,9 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        xGEQRF or xGEQLF:  M, N  =>  M, N */
 
-	} else if (lsamen_(&c__3, c3, "QRF") || lsamen_(&c__3, c3, 
-		"QR2") || lsamen_(&c__3, c3, "QLF") || 
-		lsamen_(&c__3, c3, "QL2")) {
+	} else if (lsamen_(&c__3, c3, "QRF") || lsamen_(
+		&c__3, c3, "QR2") || lsamen_(&c__3, c3, 
+		"QLF") || lsamen_(&c__3, c3, "QL2")) {
 	    if (*m >= *n) {
 		mults = en * (em + 3.8333333333333335 + en / 2. + en * (em - 
 			en / 3.));
@@ -167,9 +167,9 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        xGERQF or xGELQF:  M, N  =>  M, N */
 
-	} else if (lsamen_(&c__3, c3, "RQF") || lsamen_(&c__3, c3, 
-		"RQ2") || lsamen_(&c__3, c3, "LQF") || 
-		lsamen_(&c__3, c3, "LQ2")) {
+	} else if (lsamen_(&c__3, c3, "RQF") || lsamen_(
+		&c__3, c3, "RQ2") || lsamen_(&c__3, c3, 
+		"LQF") || lsamen_(&c__3, c3, "LQ2")) {
 	    if (*m >= *n) {
 		mults = en * (em + 4.833333333333333 + en / 2. + en * (em - 
 			en / 3.));
@@ -193,15 +193,15 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        xGEQRS or xGERQS:  M, N, NRHS  =>  M, N, KL */
 
-	} else if (lsamen_(&c__3, c3, "QRS") || lsamen_(&c__3, c3, 
-		"RQS")) {
+	} else if (lsamen_(&c__3, c3, "QRS") || lsamen_(
+		&c__3, c3, "RQS")) {
 	    mults = ek * (en * (2. - ek) + em * (en * 2. + (em + 1.) / 2.));
 	    adds = ek * (en * (1. - ek) + em * (en * 2. + (em - 1.) / 2.));
 
 /*        xGELQS or xGEQLS:  M, N, NRHS  =>  M, N, KL */
 
-	} else if (lsamen_(&c__3, c3, "LQS") || lsamen_(&c__3, c3, 
-		"QLS")) {
+	} else if (lsamen_(&c__3, c3, "LQS") || lsamen_(
+		&c__3, c3, "QLS")) {
 	    mults = ek * (em * (2. - ek) + en * (em * 2. + (en + 1.) / 2.));
 	    adds = ek * (em * (1. - ek) + en * (em * 2. + (en - 1.) / 2.));
 
@@ -247,15 +247,15 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 /*        xGBTRF:  M, N, KL, KU  =>  M, N, KL, KU */
 
 	if (lsamen_(&c__3, c3, "TRF")) {
-	    for (i = min(*m,*n); i >= 1; --i) {
+	    for (i__ = min(*m,*n); i__ >= 1; --i__) {
 /* Computing MAX   
    Computing MIN */
-		i__3 = *kl, i__4 = *m - i;
+		i__3 = *kl, i__4 = *m - i__;
 		i__1 = 0, i__2 = min(i__3,i__4);
 		wl = (doublereal) max(i__1,i__2);
 /* Computing MAX   
    Computing MIN */
-		i__3 = *kl + *ku, i__4 = *n - i;
+		i__3 = *kl + *ku, i__4 = *n - i__;
 		i__1 = 0, i__2 = min(i__3,i__4);
 		wu = (doublereal) max(i__1,i__2);
 		mults += wl * (wu + 1.);
@@ -288,7 +288,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
        PP:  Positive definite Packed matrices   
        -------------------------------------- */
 
-    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&c__2, c2, "PP")) {
+    } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&
+	    c__2, c2, "PP")) {
 
 /*        xPOTRF:  N  =>  M */
 
@@ -342,9 +343,10 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
        HP:  Hermitian indefinite Packed matrices (complex only)   
        -------------------------------------------------------- */
 
-    } else if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, c2, "SP") || lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3,
-	     subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP") 
-	    || lsamen_(&c__3, subnam, "ZHP")) {
+    } else if (lsamen_(&c__2, c2, "SY") || lsamen_(&
+	    c__2, c2, "SP") || lsamen_(&c__3, subnam, 
+	    "ZHE") || lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP") || lsamen_(&c__3, subnam, "ZHP")) 
+	    {
 
 /*        xSYTRF:  N  =>  M */
 
@@ -367,8 +369,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        xSYTRD, xSYTD2:  N  =>  M */
 
-	} else if (lsamen_(&c__3, c3, "TRD") || lsamen_(&c__3, c3, 
-		"TD2")) {
+	} else if (lsamen_(&c__3, c3, "TRD") || lsamen_(
+		&c__3, c3, "TD2")) {
 	    if (*m == 1) {
 		mults = 0.;
 		adds = 0.;
@@ -384,7 +386,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
        Triangular matrices   
        ------------------- */
 
-    } else if (lsamen_(&c__2, c2, "TR") || lsamen_(&c__2, c2, "TP")) {
+    } else if (lsamen_(&c__2, c2, "TR") || lsamen_(&
+	    c__2, c2, "TP")) {
 
 /*        xTRTRS:  N, NRHS  =>  M, N */
 
@@ -432,16 +435,15 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
        Orthogonal matrices   
        ------------------- */
 
-    } else if (sord && lsamen_(&c__2, c2, "OR") || corz && lsamen_(&
-	    c__2, c2, "UN")) {
+    } else if (sord && lsamen_(&c__2, c2, "OR") || corz 
+	    && lsamen_(&c__2, c2, "UN")) {
 
-/*        -MQR, -MLQ, -MQL, or -MRQ:  M, N, K, SIDE  =>  M, N, KL, KU 
-  
+/*        -MQR, -MLQ, -MQL, or -MRQ:  M, N, K, SIDE  =>  M, N, KL, KU   
              where KU<= 0 indicates SIDE = 'L'   
              and   KU> 0  indicates SIDE = 'R' */
 
-	if (lsamen_(&c__3, c3, "MQR") || lsamen_(&c__3, c3, "MLQ") || lsamen_(&c__3, c3, "MQL") || lsamen_(&c__3, 
-		c3, "MRQ")) {
+	if (lsamen_(&c__3, c3, "MQR") || lsamen_(&c__3, 
+		c3, "MLQ") || lsamen_(&c__3, c3, "MQL") || lsamen_(&c__3, c3, "MRQ")) {
 	    if (*ku <= 0) {
 		mults = ek * en * (em * 2. + 2. - ek);
 		adds = ek * en * (em * 2. + 1. - ek);
@@ -453,8 +455,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        -GQR or -GQL:  M, N, K  =>  M, N, KL */
 
-	} else if (lsamen_(&c__3, c3, "GQR") || lsamen_(&c__3, c3, 
-		"GQL")) {
+	} else if (lsamen_(&c__3, c3, "GQR") || lsamen_(
+		&c__3, c3, "GQL")) {
 	    mults = ek * (en * 2. - ek - 1.6666666666666667 + (em * 2. * en + 
 		    ek * (ek * .66666666666666663 - em - en)));
 	    adds = ek * (en - em + .33333333333333331 + (em * 2. * en + ek * (
@@ -462,8 +464,8 @@ doublereal dopla_(char *subnam, integer *m, integer *n, integer *kl, integer *
 
 /*        -GLQ or -GRQ:  M, N, K  =>  M, N, KL */
 
-	} else if (lsamen_(&c__3, c3, "GLQ") || lsamen_(&c__3, c3, 
-		"GRQ")) {
+	} else if (lsamen_(&c__3, c3, "GLQ") || lsamen_(
+		&c__3, c3, "GRQ")) {
 	    mults = ek * (em + en - ek - .66666666666666663 + (em * 2. * en + 
 		    ek * (ek * .66666666666666663 - em - en)));
 	    adds = ek * (em - en + .33333333333333331 + (em * 2. * en + ek * (

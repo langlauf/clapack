@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -30,7 +31,7 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     static real anrm;
     static logical tpsd;
     static real xnrm;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real rwork[1];
     extern /* Subroutine */ int cgelq2_(integer *, integer *, complex *, 
@@ -48,7 +49,11 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     static real err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -59,10 +64,8 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 
     CQRT14 checks whether X is in the row space of A or A'.  It does so   
     by scaling both X and A such that their norms are in the range   
-    [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X] 
-  
-    (if TRANS = 'C') or an LQ factorization of [A',X]' (if TRANS = 'N'), 
-  
+    [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X]   
+    (if TRANS = 'C') or an LQ factorization of [A',X]' (if TRANS = 'N'),   
     and returning the norm of the trailing triangle, scaled by   
     MAX(M,N,NRHS)*eps.   
 
@@ -71,8 +74,7 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 
     TRANS   (input) CHARACTER*1   
             = 'N':  No transpose, check for X in the row space of A   
-            = 'C':  Conjugate transpose, check for X in row space of A'. 
-  
+            = 'C':  Conjugate transpose, check for X in row space of A'.   
 
     M       (input) INTEGER   
             The number of rows of the matrix A.   
@@ -104,16 +106,15 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
             If TRANS = 'N', LWORK >= (M+NRHS)*(N+2);   
             if TRANS = 'C', LWORK >= (N+NRHS)*(M+2).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     --work;
 
@@ -182,9 +183,9 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	i__1 = *n + *nrhs;
 	for (j = *n + 1; j <= i__1; ++j) {
 	    i__2 = min(*m,j);
-	    for (i = *n + 1; i <= i__2; ++i) {
+	    for (i__ = *n + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		r__1 = err, r__2 = c_abs(&work[i + (j - 1) * *m]);
+		r__1 = err, r__2 = c_abs(&work[i__ + (j - 1) * *m]);
 		err = dmax(r__1,r__2);
 /* L10: */
 	    }
@@ -196,18 +197,19 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 /*        Copy X' into rows m+1:m+nrhs of work */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *nrhs;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = *m + j + (i - 1) * ldwork;
-		r_cnjg(&q__1, &x[i + j * x_dim1]);
+		i__3 = *m + j + (i__ - 1) * ldwork;
+		r_cnjg(&q__1, &x_ref(i__, j));
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L30: */
 	    }
 /* L40: */
 	}
 
-	xnrm = clange_("M", nrhs, n, &work[*m + 1], &ldwork, rwork);
+	xnrm = clange_("M", nrhs, n, &work[*m + 1], &ldwork, rwork)
+		;
 	if (xnrm != 0.f) {
 	    clascl_("G", &c__0, &c__0, &xnrm, &c_b15, nrhs, n, &work[*m + 1], 
 		    &ldwork, &info);
@@ -225,9 +227,9 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	i__1 = *n;
 	for (j = *m + 1; j <= i__1; ++j) {
 	    i__2 = ldwork;
-	    for (i = j; i <= i__2; ++i) {
+	    for (i__ = j; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		r__1 = err, r__2 = c_abs(&work[i + (j - 1) * ldwork]);
+		r__1 = err, r__2 = c_abs(&work[i__ + (j - 1) * ldwork]);
 		err = dmax(r__1,r__2);
 /* L50: */
 	    }
@@ -245,4 +247,8 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 /*     End of CQRT14 */
 
 } /* cqrt14_ */
+
+#undef x_ref
+#undef x_subscr
+
 

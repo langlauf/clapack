@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,7 +21,7 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
     real ret_val;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static real norma, rwork[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
@@ -31,7 +32,11 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 	    real *, real *, real *, integer *, real *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -72,16 +77,15 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= m*n + m.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -108,8 +112,8 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j;
-	for (i = 1; i <= i__2; ++i) {
-	    work[(j - 1) * *m + i] = af[i + j * af_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    work[(j - 1) * *m + i__] = af_ref(i__, j);
 /* L10: */
 	}
 /* L20: */
@@ -118,10 +122,10 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 /*     R = R * P(1) * ... *P(m) */
 
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = *n - *m + 1;
-	slatzm_("Right", &i, &i__2, &af[i + (*m + 1) * af_dim1], lda, &tau[i],
-		 &work[(i - 1) * *m + 1], &work[*m * *m + 1], m, &work[*m * *
+	slatzm_("Right", &i__, &i__2, &af_ref(i__, *m + 1), lda, &tau[i__], &
+		work[(i__ - 1) * *m + 1], &work[*m * *m + 1], m, &work[*m * *
 		n + 1]);
 /* L30: */
     }
@@ -129,9 +133,9 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 /*     R = R - A */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	saxpy_(m, &c_b13, &a[i * a_dim1 + 1], &c__1, &work[(i - 1) * *m + 1], 
-		&c__1);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	saxpy_(m, &c_b13, &a_ref(1, i__), &c__1, &work[(i__ - 1) * *m + 1], &
+		c__1);
 /* L40: */
     }
 
@@ -147,4 +151,8 @@ doublereal stzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 /*     End of STZT01 */
 
 } /* stzt01_ */
+
+#undef af_ref
+#undef a_ref
+
 

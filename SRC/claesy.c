@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int claesy_(complex *a, complex *b, complex *c, complex *rt1,
-	 complex *rt2, complex *evscal, complex *cs1, complex *sn1)
+/* Subroutine */ int claesy_(complex *a, complex *b, complex *c__, complex *
+	rt1, complex *rt2, complex *evscal, complex *cs1, complex *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -44,25 +45,19 @@
             The eigenvalue of smaller modulus.   
 
     EVSCAL  (output) COMPLEX   
-            The complex value by which the eigenvector matrix was scaled 
-  
-            to make it orthonormal.  If EVSCAL is zero, the eigenvectors 
-  
-            were not computed.  This means one of two things:  the 2-by-2 
-  
+            The complex value by which the eigenvector matrix was scaled   
+            to make it orthonormal.  If EVSCAL is zero, the eigenvectors   
+            were not computed.  This means one of two things:  the 2-by-2   
             matrix could not be diagonalized, or the norm of the matrix   
-            of eigenvectors before scaling was larger than the threshold 
-  
+            of eigenvectors before scaling was larger than the threshold   
             value THRESH (set below).   
 
     CS1     (output) COMPLEX   
     SN1     (output) COMPLEX   
-            If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector 
-  
+            If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector   
             for RT1.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
 
@@ -73,8 +68,7 @@
     static integer c__2 = 2;
     
     /* System generated locals */
-    real r__1;
-    doublereal d__1;
+    real r__1, r__2;
     complex q__1, q__2, q__3, q__4, q__5, q__6, q__7;
     /* Builtin functions */
     double c_abs(complex *);
@@ -83,14 +77,14 @@
     /* Local variables */
     static real babs, tabs;
     static complex s, t;
-    static real z, evnorm;
+    static real z__, evnorm;
     static complex tmp;
 
 
 
     if (c_abs(b) == 0.f) {
 	rt1->r = a->r, rt1->i = a->i;
-	rt2->r = c->r, rt2->i = c->i;
+	rt2->r = c__->r, rt2->i = c__->i;
 	if (c_abs(rt1) < c_abs(rt2)) {
 	    tmp.r = rt1->r, tmp.i = rt1->i;
 	    rt1->r = rt2->r, rt1->i = rt2->i;
@@ -108,10 +102,10 @@
              lambda **2 - (A+C) lambda + (A*C - B*B)   
           and we solve it using the quadratic formula. */
 
-	q__2.r = a->r + c->r, q__2.i = a->i + c->i;
+	q__2.r = a->r + c__->r, q__2.i = a->i + c__->i;
 	q__1.r = q__2.r * .5f, q__1.i = q__2.i * .5f;
 	s.r = q__1.r, s.i = q__1.i;
-	q__2.r = a->r - c->r, q__2.i = a->i - c->i;
+	q__2.r = a->r - c__->r, q__2.i = a->i - c__->i;
 	q__1.r = q__2.r * .5f, q__1.i = q__2.i * .5f;
 	t.r = q__1.r, t.i = q__1.i;
 
@@ -119,15 +113,15 @@
 
 	babs = c_abs(b);
 	tabs = c_abs(&t);
-	z = dmax(babs,tabs);
-	if (z > 0.f) {
-	    q__5.r = t.r / z, q__5.i = t.i / z;
+	z__ = dmax(babs,tabs);
+	if (z__ > 0.f) {
+	    q__5.r = t.r / z__, q__5.i = t.i / z__;
 	    pow_ci(&q__4, &q__5, &c__2);
-	    q__7.r = b->r / z, q__7.i = b->i / z;
+	    q__7.r = b->r / z__, q__7.i = b->i / z__;
 	    pow_ci(&q__6, &q__7, &c__2);
 	    q__3.r = q__4.r + q__6.r, q__3.i = q__4.i + q__6.i;
 	    c_sqrt(&q__2, &q__3);
-	    q__1.r = z * q__2.r, q__1.i = z * q__2.i;
+	    q__1.r = z__ * q__2.r, q__1.i = z__ * q__2.i;
 	    t.r = q__1.r, t.i = q__1.i;
 	}
 
@@ -144,13 +138,10 @@
 	    rt2->r = tmp.r, rt2->i = tmp.i;
 	}
 
-/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then 
-  
-          scale the components of this eigenvector so that the matrix 
-  
+/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then   
+          scale the components of this eigenvector so that the matrix   
           of eigenvectors X satisfies  X * X' = I .  (No scaling is   
-          done if the norm of the eigenvalue matrix is less than THRES
-H.) */
+          done if the norm of the eigenvalue matrix is less than THRESH.) */
 
 	q__2.r = rt1->r - a->r, q__2.i = rt1->i - a->i;
 	c_div(&q__1, &q__2, b);
@@ -158,11 +149,11 @@ H.) */
 	tabs = c_abs(sn1);
 	if (tabs > 1.f) {
 /* Computing 2nd power */
-	    r__1 = 1.f / tabs;
-	    d__1 = r__1 * r__1;
+	    r__2 = 1.f / tabs;
+	    r__1 = r__2 * r__2;
 	    q__5.r = sn1->r / tabs, q__5.i = sn1->i / tabs;
 	    pow_ci(&q__4, &q__5, &c__2);
-	    q__3.r = d__1 + q__4.r, q__3.i = q__4.i;
+	    q__3.r = r__1 + q__4.r, q__3.i = q__4.i;
 	    c_sqrt(&q__2, &q__3);
 	    q__1.r = tabs * q__2.r, q__1.i = tabs * q__2.i;
 	    t.r = q__1.r, t.i = q__1.i;

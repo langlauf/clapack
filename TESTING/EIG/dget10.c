@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,7 +33,11 @@ static doublereal c_b7 = -1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -70,18 +75,17 @@ static doublereal c_b7 = -1.;
     RESULT  (output) DOUBLE PRECISION   
             RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -97,8 +101,8 @@ static doublereal c_b7 = -1.;
     wnorm = 0.;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
-	daxpy_(m, &c_b7, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+	daxpy_(m, &c_b7, &b_ref(1, j), &c__1, &work[1], &c__1);
 /* Computing MAX */
 	d__1 = wnorm, d__2 = dasum_(n, &work[1], &c__1);
 	wnorm = max(d__1,d__2);
@@ -128,4 +132,8 @@ static doublereal c_b7 = -1.;
 /*     End of DGET10 */
 
 } /* dget10_ */
+
+#undef b_ref
+#undef a_ref
+
 

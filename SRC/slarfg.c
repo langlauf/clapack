@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slarfg_(integer *n, real *alpha, real *x, integer *incx, 
 	real *tau)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -27,8 +28,7 @@
     where tau is a real scalar and v is a real (n-1)-element   
     vector.   
 
-    If the elements of x are all zero, then tau = 0 and H is taken to be 
-  
+    If the elements of x are all zero, then tau = 0 and H is taken to be   
     the unit matrix.   
 
     Otherwise  1 <= tau <= 2.   
@@ -54,13 +54,10 @@
     TAU     (output) REAL   
             The value tau.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1;
@@ -76,17 +73,16 @@
     static real safmin, rsafmn;
     static integer knt;
 
+    --x;
 
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 1) {
 	*tau = 0.f;
 	return 0;
     }
 
     i__1 = *n - 1;
-    xnorm = snrm2_(&i__1, &X(1), incx);
+    xnorm = snrm2_(&i__1, &x[1], incx);
 
     if (xnorm == 0.f) {
 
@@ -98,19 +94,18 @@
 /*        general case */
 
 	r__1 = slapy2_(alpha, &xnorm);
-	beta = -(doublereal)r_sign(&r__1, alpha);
+	beta = -r_sign(&r__1, alpha);
 	safmin = slamch_("S") / slamch_("E");
 	if (dabs(beta) < safmin) {
 
-/*           XNORM, BETA may be inaccurate; scale X and recompute 
-them */
+/*           XNORM, BETA may be inaccurate; scale X and recompute them */
 
 	    rsafmn = 1.f / safmin;
 	    knt = 0;
 L10:
 	    ++knt;
 	    i__1 = *n - 1;
-	    sscal_(&i__1, &rsafmn, &X(1), incx);
+	    sscal_(&i__1, &rsafmn, &x[1], incx);
 	    beta *= rsafmn;
 	    *alpha *= rsafmn;
 	    if (dabs(beta) < safmin) {
@@ -120,20 +115,19 @@ L10:
 /*           New BETA is at most 1, at least SAFMIN */
 
 	    i__1 = *n - 1;
-	    xnorm = snrm2_(&i__1, &X(1), incx);
+	    xnorm = snrm2_(&i__1, &x[1], incx);
 	    r__1 = slapy2_(alpha, &xnorm);
-	    beta = -(doublereal)r_sign(&r__1, alpha);
+	    beta = -r_sign(&r__1, alpha);
 	    *tau = (beta - *alpha) / beta;
 	    i__1 = *n - 1;
 	    r__1 = 1.f / (*alpha - beta);
-	    sscal_(&i__1, &r__1, &X(1), incx);
+	    sscal_(&i__1, &r__1, &x[1], incx);
 
-/*           If ALPHA is subnormal, it may lose relative accuracy 
-*/
+/*           If ALPHA is subnormal, it may lose relative accuracy */
 
 	    *alpha = beta;
 	    i__1 = knt;
-	    for (j = 1; j <= knt; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		*alpha *= safmin;
 /* L20: */
 	    }
@@ -141,7 +135,7 @@ L10:
 	    *tau = (beta - *alpha) / beta;
 	    i__1 = *n - 1;
 	    r__1 = 1.f / (*alpha - beta);
-	    sscal_(&i__1, &r__1, &X(1), incx);
+	    sscal_(&i__1, &r__1, &x[1], incx);
 	    *alpha = beta;
 	}
     }

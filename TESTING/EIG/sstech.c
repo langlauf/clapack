@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,7 +15,7 @@
 
     /* Local variables */
     static real emin;
-    static integer isub, bpnt, numl, numu, tpnt, i, j, count;
+    static integer isub, bpnt, numl, numu, tpnt, i__, j, count;
     static real lower, upper, tuppr, mx;
     extern doublereal slamch_(char *);
     static real unflep;
@@ -23,7 +24,7 @@
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -33,19 +34,16 @@
     =======   
 
        Let T be the tridiagonal matrix with diagonal entries A(1) ,...,   
-       A(N) and offdiagonal entries B(1) ,..., B(N-1)).  SSTECH checks to 
-  
+       A(N) and offdiagonal entries B(1) ,..., B(N-1)).  SSTECH checks to   
        see if EIG(1) ,..., EIG(N) are indeed accurate eigenvalues of T.   
        It does this by expanding each EIG(I) into an interval   
        [SVD(I) - EPS, SVD(I) + EPS], merging overlapping intervals if   
        any, and using Sturm sequences to count and verify whether each   
        resulting interval has the correct number of eigenvalues (using   
        SSTECT).  Here EPS = TOL*MACHEPS*MAXEIG, where MACHEPS is the   
-       machine precision and MAXEIG is the absolute value of the largest 
-  
+       machine precision and MAXEIG is the absolute value of the largest   
        eigenvalue. If each interval contains the correct number of   
-       eigenvalues, INFO = 0 is returned, otherwise INFO is the index of 
-  
+       eigenvalues, INFO = 0 is returned, otherwise INFO is the index of   
        the first eigenvalue in the first bad interval.   
 
     Arguments   
@@ -75,8 +73,7 @@
             >0 if the interval containing the INFO-th eigenvalue   
                contains the incorrect number of eigenvalues.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Check input parameters   
@@ -111,9 +108,9 @@
 
     mx = dabs(eig[1]);
     i__1 = *n;
-    for (i = 2; i <= i__1; ++i) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	r__2 = mx, r__3 = (r__1 = eig[i], dabs(r__1));
+	r__2 = mx, r__3 = (r__1 = eig[i__], dabs(r__1));
 	mx = dmax(r__2,r__3);
 /* L10: */
     }
@@ -124,15 +121,15 @@
 /*     Sort eigenvalues from EIG into WORK */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	work[i] = eig[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	work[i__] = eig[i__];
 /* L20: */
     }
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	isub = 1;
 	emin = work[1];
-	i__2 = *n + 1 - i;
+	i__2 = *n + 1 - i__;
 	for (j = 2; j <= i__2; ++j) {
 	    if (work[j] < emin) {
 		isub = j;
@@ -140,9 +137,9 @@
 	    }
 /* L30: */
 	}
-	if (isub != *n + 1 - i) {
-	    work[isub] = work[*n + 1 - i];
-	    work[*n + 1 - i] = emin;
+	if (isub != *n + 1 - i__) {
+	    work[isub] = work[*n + 1 - i__];
+	    work[*n + 1 - i__] = emin;
 	}
 /* L40: */
     }

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -8,7 +9,7 @@
 /* Complex */ VOID clarnd_(complex * ret_val, integer *idist, integer *iseed)
 {
     /* System generated locals */
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1, q__2, q__3;
 
     /* Builtin functions */
@@ -20,7 +21,7 @@
     extern doublereal slaran_(integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -44,8 +45,7 @@
             = 5:  uniformly distributed on the circle abs(z) = 1   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array 
-  
+            On entry, the seed of the random number generator; the array   
             elements must be between 0 and 4095, and ISEED(4) must be   
             odd.   
             On exit, the seed is updated.   
@@ -53,15 +53,11 @@
     Further Details   
     ===============   
 
-    This routine calls the auxiliary routine SLARAN to generate a random 
-  
-    real number from a uniform (0,1) distribution. The Box-Muller method 
-  
-    is used to transform numbers from a uniform to a normal distribution. 
-  
+    This routine calls the auxiliary routine SLARAN to generate a random   
+    real number from a uniform (0,1) distribution. The Box-Muller method   
+    is used to transform numbers from a uniform to a normal distribution.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Generate a pair of real random numbers from a uniform (0,1)   
@@ -84,36 +80,36 @@
 
 /*        real and imaginary parts each uniform (-1,1) */
 
-	d__1 = t1 * 2.f - 1.f;
-	d__2 = t2 * 2.f - 1.f;
-	q__1.r = d__1, q__1.i = d__2;
+	r__1 = t1 * 2.f - 1.f;
+	r__2 = t2 * 2.f - 1.f;
+	q__1.r = r__1, q__1.i = r__2;
 	 ret_val->r = q__1.r,  ret_val->i = q__1.i;
     } else if (*idist == 3) {
 
 /*        real and imaginary parts each normal (0,1) */
 
-	d__1 = sqrt(log(t1) * -2.f);
-	d__2 = t2 * 6.2831853071795864769252867663f;
-	q__3.r = 0.f, q__3.i = d__2;
+	r__1 = sqrt(log(t1) * -2.f);
+	r__2 = t2 * 6.2831853071795864769252867663f;
+	q__3.r = 0.f, q__3.i = r__2;
 	c_exp(&q__2, &q__3);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	 ret_val->r = q__1.r,  ret_val->i = q__1.i;
     } else if (*idist == 4) {
 
 /*        uniform distribution on the unit disc abs(z) <= 1 */
 
-	d__1 = sqrt(t1);
-	d__2 = t2 * 6.2831853071795864769252867663f;
-	q__3.r = 0.f, q__3.i = d__2;
+	r__1 = sqrt(t1);
+	r__2 = t2 * 6.2831853071795864769252867663f;
+	q__3.r = 0.f, q__3.i = r__2;
 	c_exp(&q__2, &q__3);
-	q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+	q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 	 ret_val->r = q__1.r,  ret_val->i = q__1.i;
     } else if (*idist == 5) {
 
 /*        uniform distribution on the unit circle abs(z) = 1 */
 
-	d__1 = t2 * 6.2831853071795864769252867663f;
-	q__2.r = 0.f, q__2.i = d__1;
+	r__1 = t2 * 6.2831853071795864769252867663f;
+	q__2.r = 0.f, q__2.i = r__1;
 	c_exp(&q__1, &q__2);
 	 ret_val->r = q__1.r,  ret_val->i = q__1.i;
     }

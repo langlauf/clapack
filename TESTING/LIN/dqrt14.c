@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -25,7 +26,7 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     static doublereal anrm;
     static logical tpsd;
     static doublereal xnrm;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal rwork[1];
     extern /* Subroutine */ int dgelq2_(integer *, integer *, doublereal *, 
@@ -43,7 +44,10 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     static doublereal err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -54,10 +58,8 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 
     DQRT14 checks whether X is in the row space of A or A'.  It does so   
     by scaling both X and A such that their norms are in the range   
-    [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X] 
-  
-    (if TRANS = 'T') or an LQ factorization of [A',X]' (if TRANS = 'N'), 
-  
+    [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X]   
+    (if TRANS = 'T') or an LQ factorization of [A',X]' (if TRANS = 'N'),   
     and returning the norm of the trailing triangle, scaled by   
     MAX(M,N,NRHS)*eps.   
 
@@ -98,16 +100,15 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
             If TRANS = 'N', LWORK >= (M+NRHS)*(N+2);   
             if TRANS = 'T', LWORK >= (N+NRHS)*(M+2).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     --work;
 
@@ -176,9 +177,10 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	i__1 = *n + *nrhs;
 	for (j = *n + 1; j <= i__1; ++j) {
 	    i__2 = min(*m,j);
-	    for (i = *n + 1; i <= i__2; ++i) {
+	    for (i__ = *n + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		d__2 = err, d__3 = (d__1 = work[i + (j - 1) * *m], abs(d__1));
+		d__2 = err, d__3 = (d__1 = work[i__ + (j - 1) * *m], abs(d__1)
+			);
 		err = max(d__2,d__3);
 /* L10: */
 	    }
@@ -190,16 +192,17 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 /*        Copy X' into rows m+1:m+nrhs of work */
 
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *nrhs;
 	    for (j = 1; j <= i__2; ++j) {
-		work[*m + j + (i - 1) * ldwork] = x[i + j * x_dim1];
+		work[*m + j + (i__ - 1) * ldwork] = x_ref(i__, j);
 /* L30: */
 	    }
 /* L40: */
 	}
 
-	xnrm = dlange_("M", nrhs, n, &work[*m + 1], &ldwork, rwork);
+	xnrm = dlange_("M", nrhs, n, &work[*m + 1], &ldwork, rwork)
+		;
 	if (xnrm != 0.) {
 	    dlascl_("G", &c__0, &c__0, &xnrm, &c_b15, nrhs, n, &work[*m + 1], 
 		    &ldwork, &info);
@@ -217,9 +220,9 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	i__1 = *n;
 	for (j = *m + 1; j <= i__1; ++j) {
 	    i__2 = ldwork;
-	    for (i = j; i <= i__2; ++i) {
+	    for (i__ = j; i__ <= i__2; ++i__) {
 /* Computing MAX */
-		d__2 = err, d__3 = (d__1 = work[i + (j - 1) * ldwork], abs(
+		d__2 = err, d__3 = (d__1 = work[i__ + (j - 1) * ldwork], abs(
 			d__1));
 		err = max(d__2,d__3);
 /* L50: */
@@ -238,4 +241,7 @@ doublereal dqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 /*     End of DQRT14 */
 
 } /* dqrt14_ */
+
+#undef x_ref
+
 

@@ -36,41 +36,39 @@ include ../../../make.inc
 #  entering (for example)
 #       make single FRC=FRC
 #
-#----------------------------------------------------------------------
-#
-#  Edward Anderson, University of Tennessee
-#  March 26, 1990.
-#  Susan Ostrouchov, Last updated September 30, 1994
-#
 #######################################################################
 
-SCIGSRC = sbdsqr.o slaebz.o slaed0.o slaed1.o slaed2.o slaed3.o \
+SCIGSRC = sbdsdc.o sbdsqr.o slaebz.o slaed0.o slaed1.o slaed2.o slaed3.o \
           slaed4.o slaed5.o slaed6.o slaed7.o slaed8.o \
-          slaed9.o slaeda.o slasq1.o slasq2.o slasq3.o slasq4.o \
-          sstebz.o sstedc.o ssteqr.o ssterf.o
+          slaed9.o slaeda.o slasd0.o slasd1.o slasd2.o slasd3.o \
+          slasd4.o slasd5.o slasdq.o slasq1.o slasq2.o slasq3.o slasq4.o \
+          slasq5.o slasq6.o sstebz.o sstedc.o ssteqr.o ssterf.o
 
-DZIGSRC = dbdsqr.o dlaebz.o dlaed0.o dlaed1.o dlaed2.o dlaed3.o \
+DZIGSRC = dbdsdc.o dbdsqr.o dlaebz.o dlaed0.o dlaed1.o dlaed2.o dlaed3.o \
           dlaed4.o dlaed5.o dlaed6.o dlaed7.o dlaed8.o \
-          dlaed9.o dlaeda.o dlasq1.o dlasq2.o dlasq3.o dlasq4.o \
-          dstebz.o dstedc.o dsteqr.o dsterf.o
+          dlaed9.o dlaeda.o dlasd0.o dlasd1.o dlasd2.o dlasd3.o \
+          dlasd4.o dlasd5.o dlasdq.o dlasq1.o dlasq2.o dlasq3.o dlasq4.o \
+          dlasq5.o dlasq6.o dstebz.o dstedc.o dsteqr.o dsterf.o
  
 SEIGSRC = \
-   sgghrd.o shgeqz.o shsein.o shseqr.o \
-   slaein.o slahqr.o spteqr.o sstein.o stgevc.o strevc.o
+   sgesdd.o sgghrd.o shgeqz.o shsein.o shseqr.o \
+   slaein.o slahqr.o slar1v.o slarrb.o slarre.o slarrf.o slarrv.o \
+   spteqr.o sstegr.o sstein.o stgevc.o strevc.o
 
 CEIGSRC = \
-   cbdsqr.o cgghrd.o chgeqz.o chsein.o chseqr.o \
-   claed0.o claed7.o claed8.o claein.o clahqr.o \
-   cpteqr.o cstedc.o cstein.o csteqr.o ctgevc.o ctrevc.o
+   cbdsqr.o cgesdd.o cgghrd.o chgeqz.o chsein.o chseqr.o \
+   claed0.o claed7.o claed8.o claein.o clahqr.o clar1v.o clarrv.o \
+   cpteqr.o cstedc.o cstegr.o cstein.o csteqr.o ctgevc.o ctrevc.o
 
 DEIGSRC = \
-   dgghrd.o dhgeqz.o dhsein.o dhseqr.o \
-   dlaein.o dlahqr.o dpteqr.o dstein.o dtgevc.o dtrevc.o
+   dgesdd.o dgghrd.o dhgeqz.o dhsein.o dhseqr.o \
+   dlaein.o dlahqr.o dlar1v.o dlarrb.o dlarre.o dlarrf.o dlarrv.o \
+   dpteqr.o dstegr.o dstein.o dtgevc.o dtrevc.o
 
 ZEIGSRC = \
-   zbdsqr.o zgghrd.o zhgeqz.o zhsein.o zhseqr.o \
-   zlaed0.o zlaed7.o zlaed8.o zlaein.o zlahqr.o \
-   zpteqr.o zstedc.o zstein.o zsteqr.o ztgevc.o ztrevc.o
+   zbdsqr.o zgesdd.o zgghrd.o zhgeqz.o zhsein.o zhseqr.o \
+   zlaed0.o zlaed7.o zlaed8.o zlaein.o zlahqr.o zlar1v.o zlarrv.o \
+   zpteqr.o zstedc.o zstegr.o zstein.o zsteqr.o ztgevc.o ztrevc.o
 
 all: single complex double complex16
 
@@ -103,5 +101,5 @@ FRC:
 clean:
 	rm -f *.o
 
-.c.o: 
+.c.o:
 	$(CC) -c $(CFLAGS) $<

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,12 +18,12 @@ struct {
 
 static doublereal c_b15 = -.125;
 static integer c__1 = 1;
-static real c_b48 = 1.f;
-static real c_b71 = -1.f;
+static real c_b49 = 1.f;
+static real c_b72 = -1.f;
 
 /* Subroutine */ int cbdsqr_(char *uplo, integer *n, integer *ncvt, integer *
-	nru, integer *ncc, real *d, real *e, complex *vt, integer *ldvt, 
-	complex *u, integer *ldu, complex *c, integer *ldc, real *rwork, 
+	nru, integer *ncc, real *d__, real *e, complex *vt, integer *ldvt, 
+	complex *u, integer *ldu, complex *c__, integer *ldc, real *rwork, 
 	integer *info)
 {
     /* System generated locals */
@@ -43,12 +44,11 @@ static real c_b71 = -1.f;
     static real cosl;
     static integer isub, iter;
     static real unfl, sinl, cosr, smin, smax, sinr;
-    static integer irot;
     extern /* Subroutine */ int slas2_(real *, real *, real *, real *, real *)
 	    ;
-    static real f, g, h;
-    static integer i, j, m;
-    static real r;
+    static real f, g, h__;
+    static integer i__, j, m;
+    static real r__;
     extern logical lsame_(char *, char *);
     static real oldcs;
     extern /* Subroutine */ int clasr_(char *, char *, char *, integer *, 
@@ -59,7 +59,7 @@ static real c_b71 = -1.f;
 	    complex *, integer *);
     static integer maxit;
     static real sminl, sigmx;
-    static integer iuplo;
+    static logical lower;
     extern /* Subroutine */ int csrot_(integer *, complex *, integer *, 
 	    complex *, integer *, real *, real *), slasq1_(integer *, real *, 
 	    real *, real *, integer *), slasv2_(real *, real *, real *, real *
@@ -82,11 +82,18 @@ static real c_b71 = -1.f;
     static real eps, sll, tol;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define vt_subscr(a_1,a_2) (a_2)*vt_dim1 + a_1
+#define vt_ref(a_1,a_2) vt[vt_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
@@ -132,8 +139,7 @@ static real c_b71 = -1.f;
             The number of columns of the matrix C. NCC >= 0.   
 
     D       (input/output) REAL array, dimension (N)   
-            On entry, the n diagonal elements of the bidiagonal matrix B. 
-  
+            On entry, the n diagonal elements of the bidiagonal matrix B.   
             On exit, if INFO=0, the singular values of B in decreasing   
             order.   
 
@@ -172,10 +178,7 @@ static real c_b71 = -1.f;
             The leading dimension of the array C.   
             LDC >= max(1,N) if NCC > 0; LDC >=1 if NCC = 0.   
 
-    RWORK   (workspace) REAL array, dimension   
-              2*N  if only singular values wanted (NCVT = NRU = NCC = 0) 
-  
-              max( 1, 4*N-4 ) otherwise   
+    RWORK   (workspace) REAL array, dimension (4*N)   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -209,36 +212,29 @@ static real c_b71 = -1.f;
             (and so fails to converge) if the number of passes   
             through the inner loop exceeds MAXITR*N**2.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     vt_dim1 = *ldvt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --rwork;
 
     /* Function Body */
     *info = 0;
-    iuplo = 0;
-    if (lsame_(uplo, "U")) {
-	iuplo = 1;
-    }
-    if (lsame_(uplo, "L")) {
-	iuplo = 2;
-    }
-    if (iuplo == 0) {
+    lower = lsame_(uplo, "L");
+    if (! lsame_(uplo, "U") && ! lower) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -264,7 +260,7 @@ static real c_b71 = -1.f;
 	return 0;
     }
     if (*n == 1) {
-	goto L150;
+	goto L160;
     }
 
 /*     ROTATE is true if any singular vectors desired, false otherwise */
@@ -274,13 +270,14 @@ static real c_b71 = -1.f;
 /*     If no singular vectors desired, use qd algorithm */
 
     if (! rotate) {
-	slasq1_(n, &d[1], &e[1], &rwork[1], info);
+	slasq1_(n, &d__[1], &e[1], &rwork[1], info);
 	return 0;
     }
 
     nm1 = *n - 1;
     nm12 = nm1 + nm1;
     nm13 = nm12 + nm1;
+    idir = 0;
 
 /*     Get machine constants */
 
@@ -290,16 +287,16 @@ static real c_b71 = -1.f;
 /*     If matrix lower bidiagonal, rotate to be upper bidiagonal   
        by applying Givens rotations on the left */
 
-    if (iuplo == 2) {
+    if (lower) {
 	latime_1.ops += (real) (*n - 1) * ((*nru + *ncc) * 12 + 8);
 	i__1 = *n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    slartg_(&d[i], &e[i], &cs, &sn, &r);
-	    d[i] = r;
-	    e[i] = sn * d[i + 1];
-	    d[i + 1] = cs * d[i + 1];
-	    rwork[i] = cs;
-	    rwork[nm1 + i] = sn;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    slartg_(&d__[i__], &e[i__], &cs, &sn, &r__);
+	    d__[i__] = r__;
+	    e[i__] = sn * d__[i__ + 1];
+	    d__[i__ + 1] = cs * d__[i__ + 1];
+	    rwork[i__] = cs;
+	    rwork[nm1 + i__] = sn;
 /* L10: */
 	}
 
@@ -310,15 +307,14 @@ static real c_b71 = -1.f;
 		     ldu);
 	}
 	if (*ncc > 0) {
-	    clasr_("L", "V", "F", n, ncc, &rwork[1], &rwork[*n], &c[c_offset],
-		     ldc);
+	    clasr_("L", "V", "F", n, ncc, &rwork[1], &rwork[*n], &c__[
+		    c_offset], ldc);
 	}
     }
 
 /*     Compute singular values to relative accuracy TOL   
        (By setting TOL to be negative, algorithm will compute   
-       singular values to absolute accuracy ABS(TOL)*norm(input matrix)) 
-*/
+       singular values to absolute accuracy ABS(TOL)*norm(input matrix)) */
 
     latime_1.ops += 4;
 /* Computing MAX   
@@ -331,37 +327,43 @@ static real c_b71 = -1.f;
 
 /*     Compute approximate maximum, minimum singular values */
 
-    smax = (r__1 = d[*n], dabs(r__1));
-    i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
+    smax = 0.f;
+    i__1 = *n;
+    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	r__3 = smax, r__4 = (r__1 = d[i], dabs(r__1)), r__3 = max(r__3,r__4), 
-		r__4 = (r__2 = e[i], dabs(r__2));
-	smax = dmax(r__3,r__4);
+	r__2 = smax, r__3 = (r__1 = d__[i__], dabs(r__1));
+	smax = dmax(r__2,r__3);
 /* L20: */
+    }
+    i__1 = *n - 1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+/* Computing MAX */
+	r__2 = smax, r__3 = (r__1 = e[i__], dabs(r__1));
+	smax = dmax(r__2,r__3);
+/* L30: */
     }
     sminl = 0.f;
     if (tol >= 0.f) {
 
 /*        Relative accuracy desired */
 
-	sminoa = dabs(d[1]);
+	sminoa = dabs(d__[1]);
 	if (sminoa == 0.f) {
-	    goto L40;
+	    goto L50;
 	}
 	mu = sminoa;
 	latime_1.ops = latime_1.ops + *n * 3 - 1;
 	i__1 = *n;
-	for (i = 2; i <= i__1; ++i) {
-	    mu = (r__1 = d[i], dabs(r__1)) * (mu / (mu + (r__2 = e[i - 1], 
-		    dabs(r__2))));
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    mu = (r__2 = d__[i__], dabs(r__2)) * (mu / (mu + (r__1 = e[i__ - 
+		    1], dabs(r__1))));
 	    sminoa = dmin(sminoa,mu);
 	    if (sminoa == 0.f) {
-		goto L40;
+		goto L50;
 	    }
-/* L30: */
+/* L40: */
 	}
-L40:
+L50:
 	sminoa /= sqrt((real) (*n));
 /* Computing MAX */
 	r__1 = tol * sminoa, r__2 = *n * 6 * *n * unfl;
@@ -390,58 +392,56 @@ L40:
 
 /*     Begin main iteration loop */
 
-L50:
+L60:
 
 /*     Check for convergence or exceeding iteration count */
 
     if (m <= 1) {
-	goto L150;
+	goto L160;
     }
     if (iter > maxit) {
-	goto L190;
+	goto L200;
     }
 
 /*     Find diagonal block of matrix to work on */
 
-    if (tol < 0.f && (r__1 = d[m], dabs(r__1)) <= thresh) {
-	d[m] = 0.f;
+    if (tol < 0.f && (r__1 = d__[m], dabs(r__1)) <= thresh) {
+	d__[m] = 0.f;
     }
-    smax = (r__1 = d[m], dabs(r__1));
+    smax = (r__1 = d__[m], dabs(r__1));
     smin = smax;
-    i__1 = m;
+    i__1 = m - 1;
     for (lll = 1; lll <= i__1; ++lll) {
 	ll = m - lll;
-	if (ll == 0) {
-	    goto L80;
-	}
-	abss = (r__1 = d[ll], dabs(r__1));
+	abss = (r__1 = d__[ll], dabs(r__1));
 	abse = (r__1 = e[ll], dabs(r__1));
 	if (tol < 0.f && abss <= thresh) {
-	    d[ll] = 0.f;
+	    d__[ll] = 0.f;
 	}
 	if (abse <= thresh) {
-	    goto L70;
+	    goto L80;
 	}
 	smin = dmin(smin,abss);
 /* Computing MAX */
 	r__1 = max(smax,abss);
 	smax = dmax(r__1,abse);
-/* L60: */
+/* L70: */
     }
-L70:
+    ll = 0;
+    goto L90;
+L80:
     e[ll] = 0.f;
 
 /*     Matrix splits since E(LL) = 0 */
 
     if (ll == m - 1) {
 
-/*        Convergence of bottom singular value, return to top of loop 
-*/
+/*        Convergence of bottom singular value, return to top of loop */
 
 	--m;
-	goto L50;
+	goto L60;
     }
-L80:
+L90:
     ++ll;
 
 /*     E(LL) through E(M-1) are nonzero, E(LL-1) is zero */
@@ -451,44 +451,42 @@ L80:
 /*        2 by 2 block, handle separately */
 
 	latime_1.ops = latime_1.ops + 37 + (*ncvt + *nru + *ncc) * 12;
-	slasv2_(&d[m - 1], &e[m - 1], &d[m], &sigmn, &sigmx, &sinr, &cosr, &
-		sinl, &cosl);
-	d[m - 1] = sigmx;
+	slasv2_(&d__[m - 1], &e[m - 1], &d__[m], &sigmn, &sigmx, &sinr, &cosr,
+		 &sinl, &cosl);
+	d__[m - 1] = sigmx;
 	e[m - 1] = 0.f;
-	d[m] = sigmn;
+	d__[m] = sigmn;
 
 /*        Compute singular vectors, if desired */
 
 	if (*ncvt > 0) {
-	    csrot_(ncvt, &vt[m - 1 + vt_dim1], ldvt, &vt[m + vt_dim1], ldvt, &
-		    cosr, &sinr);
+	    csrot_(ncvt, &vt_ref(m - 1, 1), ldvt, &vt_ref(m, 1), ldvt, &cosr, 
+		    &sinr);
 	}
 	if (*nru > 0) {
-	    csrot_(nru, &u[(m - 1) * u_dim1 + 1], &c__1, &u[m * u_dim1 + 1], &
-		    c__1, &cosl, &sinl);
+	    csrot_(nru, &u_ref(1, m - 1), &c__1, &u_ref(1, m), &c__1, &cosl, &
+		    sinl);
 	}
 	if (*ncc > 0) {
-	    csrot_(ncc, &c[m - 1 + c_dim1], ldc, &c[m + c_dim1], ldc, &cosl, &
+	    csrot_(ncc, &c___ref(m - 1, 1), ldc, &c___ref(m, 1), ldc, &cosl, &
 		    sinl);
 	}
 	m += -2;
-	goto L50;
+	goto L60;
     }
 
 /*     If working on new submatrix, choose shift direction   
        (from larger end diagonal element towards smaller) */
 
     if (ll > oldm || m < oldll) {
-	if ((r__1 = d[ll], dabs(r__1)) >= (r__2 = d[m], dabs(r__2))) {
+	if ((r__1 = d__[ll], dabs(r__1)) >= (r__2 = d__[m], dabs(r__2))) {
 
-/*           Chase bulge from top (big end) to bottom (small end) 
-*/
+/*           Chase bulge from top (big end) to bottom (small end) */
 
 	    idir = 1;
 	} else {
 
-/*           Chase bulge from bottom (big end) to top (small end) 
-*/
+/*           Chase bulge from bottom (big end) to top (small end) */
 
 	    idir = 2;
 	}
@@ -502,11 +500,11 @@ L80:
           First apply standard test to bottom of matrix */
 
 	latime_1.ops += 1;
-	if ((r__1 = e[m - 1], dabs(r__1)) <= dabs(tol) * (r__2 = d[m], dabs(
-		r__2)) || tol < 0.f && (r__3 = e[m - 1], dabs(r__3)) <= 
+	if ((r__2 = e[m - 1], dabs(r__2)) <= dabs(tol) * (r__1 = d__[m], dabs(
+		r__1)) || tol < 0.f && (r__3 = e[m - 1], dabs(r__3)) <= 
 		thresh) {
 	    e[m - 1] = 0.f;
-	    goto L50;
+	    goto L60;
 	}
 
 	if (tol >= 0.f) {
@@ -514,20 +512,20 @@ L80:
 /*           If relative accuracy desired,   
              apply convergence criterion forward */
 
-	    mu = (r__1 = d[ll], dabs(r__1));
+	    mu = (r__1 = d__[ll], dabs(r__1));
 	    sminl = mu;
 	    i__1 = m - 1;
 	    for (lll = ll; lll <= i__1; ++lll) {
 		if ((r__1 = e[lll], dabs(r__1)) <= tol * mu) {
 		    e[lll] = 0.f;
-		    goto L50;
+		    goto L60;
 		}
 		sminlo = sminl;
 		latime_1.ops += 4;
-		mu = (r__1 = d[lll + 1], dabs(r__1)) * (mu / (mu + (r__2 = e[
-			lll], dabs(r__2))));
+		mu = (r__2 = d__[lll + 1], dabs(r__2)) * (mu / (mu + (r__1 = 
+			e[lll], dabs(r__1))));
 		sminl = dmin(sminl,mu);
-/* L90: */
+/* L100: */
 	    }
 	}
 
@@ -537,10 +535,10 @@ L80:
           First apply standard test to top of matrix */
 
 	latime_1.ops += 1;
-	if ((r__1 = e[ll], dabs(r__1)) <= dabs(tol) * (r__2 = d[ll], dabs(
-		r__2)) || tol < 0.f && (r__3 = e[ll], dabs(r__3)) <= thresh) {
+	if ((r__2 = e[ll], dabs(r__2)) <= dabs(tol) * (r__1 = d__[ll], dabs(
+		r__1)) || tol < 0.f && (r__3 = e[ll], dabs(r__3)) <= thresh) {
 	    e[ll] = 0.f;
-	    goto L50;
+	    goto L60;
 	}
 
 	if (tol >= 0.f) {
@@ -548,20 +546,20 @@ L80:
 /*           If relative accuracy desired,   
              apply convergence criterion backward */
 
-	    mu = (r__1 = d[m], dabs(r__1));
+	    mu = (r__1 = d__[m], dabs(r__1));
 	    sminl = mu;
 	    i__1 = ll;
 	    for (lll = m - 1; lll >= i__1; --lll) {
 		if ((r__1 = e[lll], dabs(r__1)) <= tol * mu) {
 		    e[lll] = 0.f;
-		    goto L50;
+		    goto L60;
 		}
 		sminlo = sminl;
 		latime_1.ops += 4;
-		mu = (r__1 = d[lll], dabs(r__1)) * (mu / (mu + (r__2 = e[lll],
-			 dabs(r__2))));
+		mu = (r__2 = d__[lll], dabs(r__2)) * (mu / (mu + (r__1 = e[
+			lll], dabs(r__1))));
 		sminl = dmin(sminl,mu);
-/* L100: */
+/* L110: */
 	    }
 	}
     }
@@ -585,11 +583,11 @@ L80:
 
 	latime_1.ops += 20;
 	if (idir == 1) {
-	    sll = (r__1 = d[ll], dabs(r__1));
-	    slas2_(&d[m - 1], &e[m - 1], &d[m], &shift, &r);
+	    sll = (r__1 = d__[ll], dabs(r__1));
+	    slas2_(&d__[m - 1], &e[m - 1], &d__[m], &shift, &r__);
 	} else {
-	    sll = (r__1 = d[m], dabs(r__1));
-	    slas2_(&d[ll], &e[ll], &d[ll + 1], &shift, &r);
+	    sll = (r__1 = d__[m], dabs(r__1));
+	    slas2_(&d__[ll], &e[ll], &d__[ll + 1], &shift, &r__);
 	}
 
 /*        Test if shift negligible, and if so set to zero */
@@ -615,56 +613,46 @@ L80:
 	if (idir == 1) {
 
 /*           Chase bulge from top to bottom   
-             Save cosines and sines for later singular vector upda
-tes */
+             Save cosines and sines for later singular vector updates */
 
 	    cs = 1.f;
 	    oldcs = 1.f;
-	    r__1 = d[ll] * cs;
-	    slartg_(&r__1, &e[ll], &cs, &sn, &r);
-	    r__1 = oldcs * r;
-	    r__2 = d[ll + 1] * sn;
-	    slartg_(&r__1, &r__2, &oldcs, &oldsn, &d[ll]);
-	    rwork[1] = cs;
-	    rwork[nm1 + 1] = sn;
-	    rwork[nm12 + 1] = oldcs;
-	    rwork[nm13 + 1] = oldsn;
-	    irot = 1;
 	    i__1 = m - 1;
-	    for (i = ll + 1; i <= i__1; ++i) {
-		r__1 = d[i] * cs;
-		slartg_(&r__1, &e[i], &cs, &sn, &r);
-		e[i - 1] = oldsn * r;
-		r__1 = oldcs * r;
-		r__2 = d[i + 1] * sn;
-		slartg_(&r__1, &r__2, &oldcs, &oldsn, &d[i]);
-		++irot;
-		rwork[irot] = cs;
-		rwork[irot + nm1] = sn;
-		rwork[irot + nm12] = oldcs;
-		rwork[irot + nm13] = oldsn;
-/* L110: */
+	    for (i__ = ll; i__ <= i__1; ++i__) {
+		r__1 = d__[i__] * cs;
+		slartg_(&r__1, &e[i__], &cs, &sn, &r__);
+		if (i__ > ll) {
+		    e[i__ - 1] = oldsn * r__;
+		}
+		r__1 = oldcs * r__;
+		r__2 = d__[i__ + 1] * sn;
+		slartg_(&r__1, &r__2, &oldcs, &oldsn, &d__[i__]);
+		rwork[i__ - ll + 1] = cs;
+		rwork[i__ - ll + 1 + nm1] = sn;
+		rwork[i__ - ll + 1 + nm12] = oldcs;
+		rwork[i__ - ll + 1 + nm13] = oldsn;
+/* L120: */
 	    }
-	    h = d[m] * cs;
-	    d[m] = h * oldcs;
-	    e[m - 1] = h * oldsn;
+	    h__ = d__[m] * cs;
+	    d__[m] = h__ * oldcs;
+	    e[m - 1] = h__ * oldsn;
 
 /*           Update singular vectors */
 
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
-		clasr_("L", "V", "F", &i__1, ncvt, &rwork[1], &rwork[*n], &vt[
-			ll + vt_dim1], ldvt);
+		clasr_("L", "V", "F", &i__1, ncvt, &rwork[1], &rwork[*n], &
+			vt_ref(ll, 1), ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
 		clasr_("R", "V", "F", nru, &i__1, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &u[ll * u_dim1 + 1], ldu);
+			nm13 + 1], &u_ref(1, ll), ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
 		clasr_("L", "V", "F", &i__1, ncc, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &c[ll + c_dim1], ldc);
+			nm13 + 1], &c___ref(ll, 1), ldc);
 	    }
 
 /*           Test convergence */
@@ -676,56 +664,46 @@ tes */
 	} else {
 
 /*           Chase bulge from bottom to top   
-             Save cosines and sines for later singular vector upda
-tes */
+             Save cosines and sines for later singular vector updates */
 
 	    cs = 1.f;
 	    oldcs = 1.f;
-	    r__1 = d[m] * cs;
-	    slartg_(&r__1, &e[m - 1], &cs, &sn, &r);
-	    r__1 = oldcs * r;
-	    r__2 = d[m - 1] * sn;
-	    slartg_(&r__1, &r__2, &oldcs, &oldsn, &d[m]);
-	    rwork[m - ll] = cs;
-	    rwork[m - ll + nm1] = -(doublereal)sn;
-	    rwork[m - ll + nm12] = oldcs;
-	    rwork[m - ll + nm13] = -(doublereal)oldsn;
-	    irot = m - ll;
 	    i__1 = ll + 1;
-	    for (i = m - 1; i >= i__1; --i) {
-		r__1 = d[i] * cs;
-		slartg_(&r__1, &e[i - 1], &cs, &sn, &r);
-		e[i] = oldsn * r;
-		r__1 = oldcs * r;
-		r__2 = d[i - 1] * sn;
-		slartg_(&r__1, &r__2, &oldcs, &oldsn, &d[i]);
-		--irot;
-		rwork[irot] = cs;
-		rwork[irot + nm1] = -(doublereal)sn;
-		rwork[irot + nm12] = oldcs;
-		rwork[irot + nm13] = -(doublereal)oldsn;
-/* L120: */
+	    for (i__ = m; i__ >= i__1; --i__) {
+		r__1 = d__[i__] * cs;
+		slartg_(&r__1, &e[i__ - 1], &cs, &sn, &r__);
+		if (i__ < m) {
+		    e[i__] = oldsn * r__;
+		}
+		r__1 = oldcs * r__;
+		r__2 = d__[i__ - 1] * sn;
+		slartg_(&r__1, &r__2, &oldcs, &oldsn, &d__[i__]);
+		rwork[i__ - ll] = cs;
+		rwork[i__ - ll + nm1] = -sn;
+		rwork[i__ - ll + nm12] = oldcs;
+		rwork[i__ - ll + nm13] = -oldsn;
+/* L130: */
 	    }
-	    h = d[ll] * cs;
-	    d[ll] = h * oldcs;
-	    e[ll] = h * oldsn;
+	    h__ = d__[ll] * cs;
+	    d__[ll] = h__ * oldcs;
+	    e[ll] = h__ * oldsn;
 
 /*           Update singular vectors */
 
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
 		clasr_("L", "V", "B", &i__1, ncvt, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &vt[ll + vt_dim1], ldvt);
+			nm13 + 1], &vt_ref(ll, 1), ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
-		clasr_("R", "V", "B", nru, &i__1, &rwork[1], &rwork[*n], &u[
-			ll * u_dim1 + 1], ldu);
+		clasr_("R", "V", "B", nru, &i__1, &rwork[1], &rwork[*n], &
+			u_ref(1, ll), ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
-		clasr_("L", "V", "B", &i__1, ncc, &rwork[1], &rwork[*n], &c[
-			ll + c_dim1], ldc);
+		clasr_("L", "V", "B", &i__1, ncc, &rwork[1], &rwork[*n], &
+			c___ref(ll, 1), ldc);
 	    }
 
 /*           Test convergence */
@@ -743,82 +721,53 @@ tes */
 	if (idir == 1) {
 
 /*           Chase bulge from top to bottom   
-             Save cosines and sines for later singular vector upda
-tes */
+             Save cosines and sines for later singular vector updates */
 
-	    f = ((r__1 = d[ll], dabs(r__1)) - shift) * (r_sign(&c_b48, &d[ll])
-		     + shift / d[ll]);
+	    f = ((r__1 = d__[ll], dabs(r__1)) - shift) * (r_sign(&c_b49, &d__[
+		    ll]) + shift / d__[ll]);
 	    g = e[ll];
-	    slartg_(&f, &g, &cosr, &sinr, &r);
-	    f = cosr * d[ll] + sinr * e[ll];
-	    e[ll] = cosr * e[ll] - sinr * d[ll];
-	    g = sinr * d[ll + 1];
-	    d[ll + 1] = cosr * d[ll + 1];
-	    slartg_(&f, &g, &cosl, &sinl, &r);
-	    d[ll] = r;
-	    f = cosl * e[ll] + sinl * d[ll + 1];
-	    d[ll + 1] = cosl * d[ll + 1] - sinl * e[ll];
-	    g = sinl * e[ll + 1];
-	    e[ll + 1] = cosl * e[ll + 1];
-	    rwork[1] = cosr;
-	    rwork[nm1 + 1] = sinr;
-	    rwork[nm12 + 1] = cosl;
-	    rwork[nm13 + 1] = sinl;
-	    irot = 1;
-	    i__1 = m - 2;
-	    for (i = ll + 1; i <= i__1; ++i) {
-		slartg_(&f, &g, &cosr, &sinr, &r);
-		e[i - 1] = r;
-		f = cosr * d[i] + sinr * e[i];
-		e[i] = cosr * e[i] - sinr * d[i];
-		g = sinr * d[i + 1];
-		d[i + 1] = cosr * d[i + 1];
-		slartg_(&f, &g, &cosl, &sinl, &r);
-		d[i] = r;
-		f = cosl * e[i] + sinl * d[i + 1];
-		d[i + 1] = cosl * d[i + 1] - sinl * e[i];
-		g = sinl * e[i + 1];
-		e[i + 1] = cosl * e[i + 1];
-		++irot;
-		rwork[irot] = cosr;
-		rwork[irot + nm1] = sinr;
-		rwork[irot + nm12] = cosl;
-		rwork[irot + nm13] = sinl;
-/* L130: */
+	    i__1 = m - 1;
+	    for (i__ = ll; i__ <= i__1; ++i__) {
+		slartg_(&f, &g, &cosr, &sinr, &r__);
+		if (i__ > ll) {
+		    e[i__ - 1] = r__;
+		}
+		f = cosr * d__[i__] + sinr * e[i__];
+		e[i__] = cosr * e[i__] - sinr * d__[i__];
+		g = sinr * d__[i__ + 1];
+		d__[i__ + 1] = cosr * d__[i__ + 1];
+		slartg_(&f, &g, &cosl, &sinl, &r__);
+		d__[i__] = r__;
+		f = cosl * e[i__] + sinl * d__[i__ + 1];
+		d__[i__ + 1] = cosl * d__[i__ + 1] - sinl * e[i__];
+		if (i__ < m - 1) {
+		    g = sinl * e[i__ + 1];
+		    e[i__ + 1] = cosl * e[i__ + 1];
+		}
+		rwork[i__ - ll + 1] = cosr;
+		rwork[i__ - ll + 1 + nm1] = sinr;
+		rwork[i__ - ll + 1 + nm12] = cosl;
+		rwork[i__ - ll + 1 + nm13] = sinl;
+/* L140: */
 	    }
-	    slartg_(&f, &g, &cosr, &sinr, &r);
-	    e[m - 2] = r;
-	    f = cosr * d[m - 1] + sinr * e[m - 1];
-	    e[m - 1] = cosr * e[m - 1] - sinr * d[m - 1];
-	    g = sinr * d[m];
-	    d[m] = cosr * d[m];
-	    slartg_(&f, &g, &cosl, &sinl, &r);
-	    d[m - 1] = r;
-	    f = cosl * e[m - 1] + sinl * d[m];
-	    d[m] = cosl * d[m] - sinl * e[m - 1];
-	    ++irot;
-	    rwork[irot] = cosr;
-	    rwork[irot + nm1] = sinr;
-	    rwork[irot + nm12] = cosl;
-	    rwork[irot + nm13] = sinl;
 	    e[m - 1] = f;
 
 /*           Update singular vectors */
 
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
-		clasr_("L", "V", "F", &i__1, ncvt, &rwork[1], &rwork[*n], &vt[
-			ll + vt_dim1], ldvt);
+		clasr_("L", "V", "F", &i__1, ncvt, &rwork[1], &rwork[*n], &
+			vt_ref(ll, 1), ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
 		clasr_("R", "V", "F", nru, &i__1, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &u[ll * u_dim1 + 1], ldu);
+			nm13 + 1], &u_ref(1, ll), ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
 		clasr_("L", "V", "F", &i__1, ncc, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &c[ll + c_dim1], ldc);
+			nm13 + 1], &c___ref(ll, 1), ldc);
 	    }
 
 /*           Test convergence */
@@ -830,64 +779,35 @@ tes */
 	} else {
 
 /*           Chase bulge from bottom to top   
-             Save cosines and sines for later singular vector upda
-tes */
+             Save cosines and sines for later singular vector updates */
 
-	    f = ((r__1 = d[m], dabs(r__1)) - shift) * (r_sign(&c_b48, &d[m]) 
-		    + shift / d[m]);
+	    f = ((r__1 = d__[m], dabs(r__1)) - shift) * (r_sign(&c_b49, &d__[
+		    m]) + shift / d__[m]);
 	    g = e[m - 1];
-	    slartg_(&f, &g, &cosr, &sinr, &r);
-	    f = cosr * d[m] + sinr * e[m - 1];
-	    e[m - 1] = cosr * e[m - 1] - sinr * d[m];
-	    g = sinr * d[m - 1];
-	    d[m - 1] = cosr * d[m - 1];
-	    slartg_(&f, &g, &cosl, &sinl, &r);
-	    d[m] = r;
-	    f = cosl * e[m - 1] + sinl * d[m - 1];
-	    d[m - 1] = cosl * d[m - 1] - sinl * e[m - 1];
-	    g = sinl * e[m - 2];
-	    e[m - 2] = cosl * e[m - 2];
-	    rwork[m - ll] = cosr;
-	    rwork[m - ll + nm1] = -(doublereal)sinr;
-	    rwork[m - ll + nm12] = cosl;
-	    rwork[m - ll + nm13] = -(doublereal)sinl;
-	    irot = m - ll;
-	    i__1 = ll + 2;
-	    for (i = m - 1; i >= i__1; --i) {
-		slartg_(&f, &g, &cosr, &sinr, &r);
-		e[i] = r;
-		f = cosr * d[i] + sinr * e[i - 1];
-		e[i - 1] = cosr * e[i - 1] - sinr * d[i];
-		g = sinr * d[i - 1];
-		d[i - 1] = cosr * d[i - 1];
-		slartg_(&f, &g, &cosl, &sinl, &r);
-		d[i] = r;
-		f = cosl * e[i - 1] + sinl * d[i - 1];
-		d[i - 1] = cosl * d[i - 1] - sinl * e[i - 1];
-		g = sinl * e[i - 2];
-		e[i - 2] = cosl * e[i - 2];
-		--irot;
-		rwork[irot] = cosr;
-		rwork[irot + nm1] = -(doublereal)sinr;
-		rwork[irot + nm12] = cosl;
-		rwork[irot + nm13] = -(doublereal)sinl;
-/* L140: */
+	    i__1 = ll + 1;
+	    for (i__ = m; i__ >= i__1; --i__) {
+		slartg_(&f, &g, &cosr, &sinr, &r__);
+		if (i__ < m) {
+		    e[i__] = r__;
+		}
+		f = cosr * d__[i__] + sinr * e[i__ - 1];
+		e[i__ - 1] = cosr * e[i__ - 1] - sinr * d__[i__];
+		g = sinr * d__[i__ - 1];
+		d__[i__ - 1] = cosr * d__[i__ - 1];
+		slartg_(&f, &g, &cosl, &sinl, &r__);
+		d__[i__] = r__;
+		f = cosl * e[i__ - 1] + sinl * d__[i__ - 1];
+		d__[i__ - 1] = cosl * d__[i__ - 1] - sinl * e[i__ - 1];
+		if (i__ > ll + 1) {
+		    g = sinl * e[i__ - 2];
+		    e[i__ - 2] = cosl * e[i__ - 2];
+		}
+		rwork[i__ - ll] = cosr;
+		rwork[i__ - ll + nm1] = -sinr;
+		rwork[i__ - ll + nm12] = cosl;
+		rwork[i__ - ll + nm13] = -sinl;
+/* L150: */
 	    }
-	    slartg_(&f, &g, &cosr, &sinr, &r);
-	    e[ll + 1] = r;
-	    f = cosr * d[ll + 1] + sinr * e[ll];
-	    e[ll] = cosr * e[ll] - sinr * d[ll + 1];
-	    g = sinr * d[ll];
-	    d[ll] = cosr * d[ll];
-	    slartg_(&f, &g, &cosl, &sinl, &r);
-	    d[ll + 1] = r;
-	    f = cosl * e[ll] + sinl * d[ll];
-	    d[ll] = cosl * d[ll] - sinl * e[ll];
-	    --irot;
-	    rwork[irot] = cosr;
-	    rwork[irot + nm1] = -(doublereal)sinr;
-	    rwork[irot + nm12] = cosl;
-	    rwork[irot + nm13] = -(doublereal)sinl;
 	    e[ll] = f;
 
 /*           Test convergence */
@@ -901,100 +821,107 @@ tes */
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
 		clasr_("L", "V", "B", &i__1, ncvt, &rwork[nm12 + 1], &rwork[
-			nm13 + 1], &vt[ll + vt_dim1], ldvt);
+			nm13 + 1], &vt_ref(ll, 1), ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
-		clasr_("R", "V", "B", nru, &i__1, &rwork[1], &rwork[*n], &u[
-			ll * u_dim1 + 1], ldu);
+		clasr_("R", "V", "B", nru, &i__1, &rwork[1], &rwork[*n], &
+			u_ref(1, ll), ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
-		clasr_("L", "V", "B", &i__1, ncc, &rwork[1], &rwork[*n], &c[
-			ll + c_dim1], ldc);
+		clasr_("L", "V", "B", &i__1, ncc, &rwork[1], &rwork[*n], &
+			c___ref(ll, 1), ldc);
 	    }
 	}
     }
 
 /*     QR iteration finished, go back and check convergence */
 
-    goto L50;
+    goto L60;
 
 /*     All singular values converged, so make them positive */
 
-L150:
+L160:
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	if (d[i] < 0.f) {
-	    d[i] = -(doublereal)d[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (d__[i__] < 0.f) {
+	    d__[i__] = -d__[i__];
 
 /*           Change sign of singular vectors, if desired */
 
 	    latime_1.ops += *ncvt;
 	    if (*ncvt > 0) {
-		csscal_(ncvt, &c_b71, &vt[i + vt_dim1], ldvt);
+		csscal_(ncvt, &c_b72, &vt_ref(i__, 1), ldvt);
 	    }
 	}
-/* L160: */
+/* L170: */
     }
 
-/*     Sort the singular values into decreasing order (insertion sort on 
-  
+/*     Sort the singular values into decreasing order (insertion sort on   
        singular values, but only one transposition per singular vector) */
 
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*        Scan for smallest D(I) */
 
 	isub = 1;
-	smin = d[1];
-	i__2 = *n + 1 - i;
+	smin = d__[1];
+	i__2 = *n + 1 - i__;
 	for (j = 2; j <= i__2; ++j) {
-	    if (d[j] <= smin) {
+	    if (d__[j] <= smin) {
 		isub = j;
-		smin = d[j];
+		smin = d__[j];
 	    }
-/* L170: */
+/* L180: */
 	}
-	if (isub != *n + 1 - i) {
+	if (isub != *n + 1 - i__) {
 
 /*           Swap singular values and vectors */
 
-	    d[isub] = d[*n + 1 - i];
-	    d[*n + 1 - i] = smin;
+	    d__[isub] = d__[*n + 1 - i__];
+	    d__[*n + 1 - i__] = smin;
 	    if (*ncvt > 0) {
-		cswap_(ncvt, &vt[isub + vt_dim1], ldvt, &vt[*n + 1 - i + 
-			vt_dim1], ldvt);
+		cswap_(ncvt, &vt_ref(isub, 1), ldvt, &vt_ref(*n + 1 - i__, 1),
+			 ldvt);
 	    }
 	    if (*nru > 0) {
-		cswap_(nru, &u[isub * u_dim1 + 1], &c__1, &u[(*n + 1 - i) * 
-			u_dim1 + 1], &c__1);
+		cswap_(nru, &u_ref(1, isub), &c__1, &u_ref(1, *n + 1 - i__), &
+			c__1);
 	    }
 	    if (*ncc > 0) {
-		cswap_(ncc, &c[isub + c_dim1], ldc, &c[*n + 1 - i + c_dim1], 
-			ldc);
+		cswap_(ncc, &c___ref(isub, 1), ldc, &c___ref(*n + 1 - i__, 1),
+			 ldc);
 	    }
 	}
-/* L180: */
+/* L190: */
     }
-    goto L210;
+    goto L220;
 
 /*     Maximum number of iterations exceeded, failure to converge */
 
-L190:
+L200:
     *info = 0;
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	if (e[i] != 0.f) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (e[i__] != 0.f) {
 	    ++(*info);
 	}
-/* L200: */
+/* L210: */
     }
-L210:
+L220:
     return 0;
 
 /*     End of CBDSQR */
 
 } /* cbdsqr_ */
+
+#undef vt_ref
+#undef vt_subscr
+#undef u_ref
+#undef u_subscr
+#undef c___ref
+#undef c___subscr
+
 

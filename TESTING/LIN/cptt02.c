@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -11,9 +12,9 @@ static real c_b4 = -1.f;
 static real c_b5 = 1.f;
 static integer c__1 = 1;
 
-/* Subroutine */ int cptt02_(char *uplo, integer *n, integer *nrhs, real *d, 
-	complex *e, complex *x, integer *ldx, complex *b, integer *ldb, real *
-	resid)
+/* Subroutine */ int cptt02_(char *uplo, integer *n, integer *nrhs, real *d__,
+	 complex *e, complex *x, integer *ldx, complex *b, integer *ldb, real 
+	*resid)
 {
     /* System generated locals */
     integer b_dim1, b_offset, x_dim1, x_offset, i__1;
@@ -31,7 +32,13 @@ static integer c__1 = 1;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        June 30, 1992   
@@ -49,8 +56,7 @@ static integer c__1 = 1;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the superdiagonal or the subdiagonal of the 
-  
+            Specifies whether the superdiagonal or the subdiagonal of the   
             tridiagonal matrix A is stored.   
             = 'U':  E is the superdiagonal of A   
             = 'L':  E is the subdiagonal of A   
@@ -75,8 +81,7 @@ static integer c__1 = 1;
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     B       (input/output) COMPLEX array, dimension (LDB,NRHS)   
-            On entry, the n by nrhs matrix of right hand side vectors B. 
-  
+            On entry, the n by nrhs matrix of right hand side vectors B.   
             On exit, B is overwritten with the difference B - A*X.   
 
     LDB     (input) INTEGER   
@@ -85,20 +90,19 @@ static integer c__1 = 1;
     RESID   (output) REAL   
             norm(B - A*X) / (norm(A) * norm(X) * EPS)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
-    --d;
+    --d__;
     --e;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
 
     /* Function Body */
@@ -109,7 +113,7 @@ static integer c__1 = 1;
 
 /*     Compute the 1-norm of the tridiagonal matrix A. */
 
-    anorm = clanht_("1", n, &d[1], &e[1]);
+    anorm = clanht_("1", n, &d__[1], &e[1]);
 
 /*     Exit with RESID = 1/EPS if ANORM = 0. */
 
@@ -121,8 +125,8 @@ static integer c__1 = 1;
 
 /*     Compute B - A*X. */
 
-    claptm_(uplo, n, nrhs, &c_b4, &d[1], &e[1], &x[x_offset], ldx, &c_b5, &b[
-	    b_offset], ldb);
+    claptm_(uplo, n, nrhs, &c_b4, &d__[1], &e[1], &x[x_offset], ldx, &c_b5, &
+	    b[b_offset], ldb);
 
 /*     Compute the maximum over the number of right hand sides of   
           norm(B - A*X) / ( norm(A) * norm(X) * EPS ). */
@@ -130,8 +134,8 @@ static integer c__1 = 1;
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = scasum_(n, &b[j * b_dim1 + 1], &c__1);
-	xnorm = scasum_(n, &x[j * x_dim1 + 1], &c__1);
+	bnorm = scasum_(n, &b_ref(1, j), &c__1);
+	xnorm = scasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.f) {
 	    *resid = 1.f / eps;
 	} else {
@@ -147,4 +151,10 @@ static integer c__1 = 1;
 /*     End of CPTT02 */
 
 } /* cptt02_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int strti2_(char *uplo, char *diag, integer *n, real *a, 
 	integer *lda, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -21,8 +22,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -36,19 +36,16 @@
 
     A       (input/output) REAL array, dimension (LDA,N)   
             On entry, the triangular matrix A.  If UPLO = 'U', the   
-            leading n by n upper triangular part of the array A contains 
-  
+            leading n by n upper triangular part of the array A contains   
             the upper triangular matrix, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of the array A contains 
-  
+            leading n by n lower triangular part of the array A contains   
             the lower triangular matrix, and the strictly upper   
             triangular part of A is not referenced.  If DIAG = 'U', the   
             diagonal elements of A are also not referenced and are   
             assumed to be 1.   
 
-            On exit, the (triangular) inverse of the original matrix, in 
-  
+            On exit, the (triangular) inverse of the original matrix, in   
             the same storage format.   
 
     LDA     (input) INTEGER   
@@ -58,15 +55,12 @@
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -82,12 +76,14 @@
 	    xerbla_(char *, integer *);
     static logical nounit;
     static real ajj;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     nounit = lsame_(diag, "N");
@@ -111,10 +107,10 @@
 /*        Compute inverse of upper triangular matrix. */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    if (nounit) {
-		A(j,j) = 1.f / A(j,j);
-		ajj = -(doublereal)A(j,j);
+		a_ref(j, j) = 1.f / a_ref(j, j);
+		ajj = -a_ref(j, j);
 	    } else {
 		ajj = -1.f;
 	    }
@@ -122,10 +118,10 @@
 /*           Compute elements 1:j-1 of j-th column. */
 
 	    i__2 = j - 1;
-	    strmv_("Upper", "No transpose", diag, &i__2, &A(1,1), lda, &
-		    A(1,j), &c__1);
+	    strmv_("Upper", "No transpose", diag, &i__2, &a[a_offset], lda, &
+		    a_ref(1, j), &c__1);
 	    i__2 = j - 1;
-	    sscal_(&i__2, &ajj, &A(1,j), &c__1);
+	    sscal_(&i__2, &ajj, &a_ref(1, j), &c__1);
 /* L10: */
 	}
     } else {
@@ -134,8 +130,8 @@
 
 	for (j = *n; j >= 1; --j) {
 	    if (nounit) {
-		A(j,j) = 1.f / A(j,j);
-		ajj = -(doublereal)A(j,j);
+		a_ref(j, j) = 1.f / a_ref(j, j);
+		ajj = -a_ref(j, j);
 	    } else {
 		ajj = -1.f;
 	    }
@@ -144,9 +140,10 @@
 /*              Compute elements j+1:n of j-th column. */
 
 		i__1 = *n - j;
-		strmv_("Lower", "No transpose", diag, &i__1, &A(j+1,j+1), lda, &A(j+1,j), &c__1);
+		strmv_("Lower", "No transpose", diag, &i__1, &a_ref(j + 1, j 
+			+ 1), lda, &a_ref(j + 1, j), &c__1);
 		i__1 = *n - j;
-		sscal_(&i__1, &ajj, &A(j+1,j), &c__1);
+		sscal_(&i__1, &ajj, &a_ref(j + 1, j), &c__1);
 	    }
 /* L20: */
 	}
@@ -157,4 +154,7 @@
 /*     End of STRTI2 */
 
 } /* strti2_ */
+
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ static integer c__1 = 1;
     static real diff, axbi;
     static integer imax;
     static real unfl, ovfl;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static logical upper;
     static real xnorm;
@@ -34,7 +35,13 @@ static integer c__1 = 1;
     static real eps, tmp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define xact_ref(a_1,a_2) xact[(a_2)*xact_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -55,8 +62,7 @@ static integer c__1 = 1;
     RESLTS(2) = residual from the iterative refinement routine   
               = the maximum of BERR / ( NZ*EPS + (*) ), where   
                 (*) = NZ*UNFL / (min_i (abs(A)*abs(X) +abs(b))_i )   
-                and NZ = max. number of nonzeros in any row of A, plus 1 
-  
+                and NZ = max. number of nonzeros in any row of A, plus 1   
 
     Arguments   
     =========   
@@ -72,8 +78,7 @@ static integer c__1 = 1;
             order of the matrix A.  N >= 0.   
 
     KD      (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U', 
-  
+            The number of super-diagonals of the matrix A if UPLO = 'U',   
             or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
 
     NRHS    (input) INTEGER   
@@ -82,14 +87,10 @@ static integer c__1 = 1;
 
     AB      (input) REAL array, dimension (LDAB,N)   
             The upper or lower triangle of the symmetric band matrix A,   
-            stored in the first KD+1 rows of the array.  The j-th column 
-  
-            of A is stored in the j-th column of the array AB as follows: 
-  
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            stored in the first KD+1 rows of the array.  The j-th column   
+            of A is stored in the j-th column of the array AB as follows:   
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
@@ -113,21 +114,17 @@ static integer c__1 = 1;
             column of the matrix XACT.   
 
     LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N). 
-  
+            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
 
     FERR    (input) REAL array, dimension (NRHS)   
             The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude 
-  
-            of the largest entry in (X - XTRUE) divided by the magnitude 
-  
+            X.  If XTRUE is the true solution, FERR bounds the magnitude   
+            of the largest entry in (X - XTRUE) divided by the magnitude   
             of the largest entry in X.   
 
     BERR    (input) REAL array, dimension (NRHS)   
             The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A 
-  
+            vector (i.e., the smallest relative change in any entry of A   
             or B that makes X an exact solution).   
 
     RESLTS  (output) REAL array, dimension (2)   
@@ -135,24 +132,23 @@ static integer c__1 = 1;
             RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
             RESLTS(2) = BERR / ( NZ*EPS + (*) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0.   
 
        Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = xact_dim1 + 1;
+    xact_offset = 1 + xact_dim1 * 1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -180,16 +176,16 @@ static integer c__1 = 1;
     errbnd = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = isamax_(n, &x[j * x_dim1 + 1], &c__1);
+	imax = isamax_(n, &x_ref(1, j), &c__1);
 /* Computing MAX */
-	r__2 = (r__1 = x[imax + j * x_dim1], dabs(r__1));
+	r__2 = (r__1 = x_ref(imax, j), dabs(r__1));
 	xnorm = dmax(r__2,unfl);
 	diff = 0.f;
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    r__2 = diff, r__3 = (r__1 = x[i + j * x_dim1] - xact[i + j * 
-		    xact_dim1], dabs(r__1));
+	    r__2 = diff, r__3 = (r__1 = x_ref(i__, j) - xact_ref(i__, j), 
+		    dabs(r__1));
 	    diff = dmax(r__2,r__3);
 /* L10: */
 	}
@@ -222,44 +218,44 @@ L30:
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	i__2 = *n;
-	for (i = 1; i <= i__2; ++i) {
-	    tmp = (r__1 = b[i + k * b_dim1], dabs(r__1));
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    tmp = (r__1 = b_ref(i__, k), dabs(r__1));
 	    if (upper) {
 /* Computing MAX */
-		i__3 = i - *kd;
-		i__4 = i;
+		i__3 = i__ - *kd;
+		i__4 = i__;
 		for (j = max(i__3,1); j <= i__4; ++j) {
-		    tmp += (r__1 = ab[*kd + 1 - i + j + i * ab_dim1], dabs(
-			    r__1)) * (r__2 = x[j + k * x_dim1], dabs(r__2));
+		    tmp += (r__1 = ab_ref(*kd + 1 - i__ + j, i__), dabs(r__1))
+			     * (r__2 = x_ref(j, k), dabs(r__2));
 /* L40: */
 		}
 /* Computing MIN */
-		i__3 = i + *kd;
+		i__3 = i__ + *kd;
 		i__4 = min(i__3,*n);
-		for (j = i + 1; j <= i__4; ++j) {
-		    tmp += (r__1 = ab[*kd + 1 + i - j + j * ab_dim1], dabs(
-			    r__1)) * (r__2 = x[j + k * x_dim1], dabs(r__2));
+		for (j = i__ + 1; j <= i__4; ++j) {
+		    tmp += (r__1 = ab_ref(*kd + 1 + i__ - j, j), dabs(r__1)) *
+			     (r__2 = x_ref(j, k), dabs(r__2));
 /* L50: */
 		}
 	    } else {
 /* Computing MAX */
-		i__4 = i - *kd;
-		i__3 = i - 1;
+		i__4 = i__ - *kd;
+		i__3 = i__ - 1;
 		for (j = max(i__4,1); j <= i__3; ++j) {
-		    tmp += (r__1 = ab[i + 1 - j + j * ab_dim1], dabs(r__1)) * 
-			    (r__2 = x[j + k * x_dim1], dabs(r__2));
+		    tmp += (r__1 = ab_ref(i__ + 1 - j, j), dabs(r__1)) * (
+			    r__2 = x_ref(j, k), dabs(r__2));
 /* L60: */
 		}
 /* Computing MIN */
-		i__4 = i + *kd;
+		i__4 = i__ + *kd;
 		i__3 = min(i__4,*n);
-		for (j = i; j <= i__3; ++j) {
-		    tmp += (r__1 = ab[j + 1 - i + i * ab_dim1], dabs(r__1)) * 
-			    (r__2 = x[j + k * x_dim1], dabs(r__2));
+		for (j = i__; j <= i__3; ++j) {
+		    tmp += (r__1 = ab_ref(j + 1 - i__, i__), dabs(r__1)) * (
+			    r__2 = x_ref(j, k), dabs(r__2));
 /* L70: */
 		}
 	    }
-	    if (i == 1) {
+	    if (i__ == 1) {
 		axbi = tmp;
 	    } else {
 		axbi = dmin(axbi,tmp);
@@ -282,4 +278,10 @@ L30:
 /*     End of SPBT05 */
 
 } /* spbt05_ */
+
+#undef ab_ref
+#undef x_ref
+#undef b_ref
+#undef xact_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static doublereal c_b8 = 0.;
 	    i__1;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
@@ -29,18 +30,20 @@ static doublereal c_b8 = 0.;
     static doublereal ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DGET03 computes the residual for a general matrix times its inverse: 
-  
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
+    DGET03 computes the residual for a general matrix times its inverse:   
+       norm( I - AINV*A ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
 
     Arguments   
@@ -59,14 +62,12 @@ static doublereal c_b8 = 0.;
             The inverse of the matrix A.   
 
     LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N). 
-  
+            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
 
@@ -75,23 +76,22 @@ static doublereal c_b8 = 0.;
             ( 1/norm(A) ) / norm(AINV).   
 
     RESID   (output) DOUBLE PRECISION   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+            norm(I - AINV*A) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = ainv_dim1 + 1;
+    ainv_offset = 1 + ainv_dim1 * 1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -116,15 +116,15 @@ static doublereal c_b8 = 0.;
 
 /*     Compute I - A * AINV */
 
-    dgemm_("No transpose", "No transpose", n, n, n, &c_b7, &a[a_offset], lda, 
-	    &ainv[ainv_offset], ldainv, &c_b8, &work[work_offset], ldwork);
+    dgemm_("No transpose", "No transpose", n, n, n, &c_b7, &ainv[ainv_offset],
+	     ldainv, &a[a_offset], lda, &c_b8, &work[work_offset], ldwork);
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	work[i + i * work_dim1] += 1.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	work_ref(i__, i__) = work_ref(i__, i__) + 1.;
 /* L10: */
     }
 
-/*     Compute norm(I - A*AINV) / (N * norm(A) * norm(AINV) * EPS) */
+/*     Compute norm(I - AINV*A) / (N * norm(A) * norm(AINV) * EPS) */
 
     *resid = dlange_("1", n, n, &work[work_offset], ldwork, &rwork[1]);
 
@@ -135,4 +135,7 @@ static doublereal c_b8 = 0.;
 /*     End of DGET03 */
 
 } /* dget03_ */
+
+#undef work_ref
+
 

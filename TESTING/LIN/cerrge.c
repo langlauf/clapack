@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -33,7 +34,7 @@ static integer c__4 = 4;
 {
     /* System generated locals */
     integer i__1;
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1;
 
     /* Builtin functions */
@@ -44,8 +45,8 @@ static integer c__4 = 4;
     static integer info;
     static real anrm;
     static complex a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
-    static real r[4], ccond;
+    static integer i__, j;
+    static real r__[4], ccond;
     static complex w[8], x[4];
     static real rcond;
     static char c2[2];
@@ -87,7 +88,13 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -108,29 +115,28 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	    i__1 = af_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    af[i__1].r = q__1.r, af[i__1].i = q__1.i;
 /* L10: */
 	}
@@ -154,7 +160,7 @@ static integer c__4 = 4;
 
 /*        CGETRF */
 
-	s_copy(srnamc_1.srnamt, "CGETRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGETRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetrf_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGETRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -170,7 +176,7 @@ static integer c__4 = 4;
 
 /*        CGETF2 */
 
-	s_copy(srnamc_1.srnamt, "CGETF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGETF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetf2_(&c_n1, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGETF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -186,7 +192,7 @@ static integer c__4 = 4;
 
 /*        CGETRI */
 
-	s_copy(srnamc_1.srnamt, "CGETRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGETRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetri_(&c_n1, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("CGETRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -202,7 +208,7 @@ static integer c__4 = 4;
 
 /*        CGETRS */
 
-	s_copy(srnamc_1.srnamt, "CGETRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGETRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgetrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CGETRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -226,62 +232,65 @@ static integer c__4 = 4;
 
 /*        CGERFS */
 
-	s_copy(srnamc_1.srnamt, "CGERFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGERFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgerfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	cgerfs_("N", &c_n1, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	cgerfs_("N", &c__0, &c_n1, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	cgerfs_("N", &c__2, &c__1, a, &c__1, af, &c__2, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	cgerfs_("N", &c__2, &c__1, a, &c__2, af, &c__1, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	cgerfs_("N", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__1, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	cgerfs_("N", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__2, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CGERFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CGECON */
 
-	s_copy(srnamc_1.srnamt, "CGECON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGECON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgecon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r, &info);
+	cgecon_("/", &c__0, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CGECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgecon_("1", &c_n1, a, &c__1, &anrm, &rcond, w, r, &info);
+	cgecon_("1", &c_n1, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CGECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgecon_("1", &c__2, a, &c__1, &anrm, &rcond, w, r, &info);
+	cgecon_("1", &c__2, a, &c__1, &anrm, &rcond, w, r__, &info)
+		;
 	chkxer_("CGECON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CGEEQU */
 
-	s_copy(srnamc_1.srnamt, "CGEEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGEEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgeequ_(&c_n1, &c__0, a, &c__1, r1, r2, &rcond, &ccond, &anrm, &info);
 	chkxer_("CGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -295,15 +304,14 @@ static integer c__4 = 4;
 	chkxer_("CGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the LU decomposition 
-  
+/*     Test error exits of the routines that use the LU decomposition   
        of a general band matrix. */
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
 /*        CGBTRF */
 
-	s_copy(srnamc_1.srnamt, "CGBTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtrf_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGBTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -327,7 +335,7 @@ static integer c__4 = 4;
 
 /*        CGBTF2 */
 
-	s_copy(srnamc_1.srnamt, "CGBTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtf2_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, &info);
 	chkxer_("CGBTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -351,7 +359,7 @@ static integer c__4 = 4;
 
 /*        CGBTRS */
 
-	s_copy(srnamc_1.srnamt, "CGBTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbtrs_("/", &c__0, &c__0, &c__0, &c__1, a, &c__1, ip, b, &c__1, &
 		info);
@@ -390,85 +398,85 @@ static integer c__4 = 4;
 
 /*        CGBRFS */
 
-	s_copy(srnamc_1.srnamt, "CGBRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbrfs_("/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__1, r1, r2, w, r, &info);
+		c__1, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	cgbrfs_("N", &c_n1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__1, r1, r2, w, r, &info);
+		c__1, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	cgbrfs_("N", &c__1, &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__1, r1, r2, w, r, &info);
+		c__1, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
 	cgbrfs_("N", &c__1, &c__0, &c_n1, &c__0, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__1, r1, r2, w, r, &info);
+		c__1, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	cgbrfs_("N", &c__1, &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__1, r1, r2, w, r, &info);
+		c__1, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	cgbrfs_("N", &c__2, &c__1, &c__1, &c__1, a, &c__2, af, &c__4, ip, b, &
-		c__2, x, &c__2, r1, r2, w, r, &info);
+		c__2, x, &c__2, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
 	cgbrfs_("N", &c__2, &c__1, &c__1, &c__1, a, &c__3, af, &c__3, ip, b, &
-		c__2, x, &c__2, r1, r2, w, r, &info);
+		c__2, x, &c__2, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	cgbrfs_("N", &c__2, &c__0, &c__0, &c__1, a, &c__1, af, &c__1, ip, b, &
-		c__1, x, &c__2, r1, r2, w, r, &info);
+		c__1, x, &c__2, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	cgbrfs_("N", &c__2, &c__0, &c__0, &c__1, a, &c__1, af, &c__1, ip, b, &
-		c__2, x, &c__1, r1, r2, w, r, &info);
+		c__2, x, &c__1, r1, r2, w, r__, &info);
 	chkxer_("CGBRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CGBCON */
 
-	s_copy(srnamc_1.srnamt, "CGBCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r, &
-		info);
+	cgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r, &
-		info);
+	cgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r, &
-		info);
+	cgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r, &
-		info);
+	cgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r__,
+		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r, &
-		info);
+	cgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r__,
+		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CGBEQU */
 
-	s_copy(srnamc_1.srnamt, "CGBEQU", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGBEQU", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgbequ_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, r1, r2, &rcond, &ccond, 
 		&anrm, &info);
@@ -505,4 +513,10 @@ static integer c__4 = 4;
 /*     End of CERRGE */
 
 } /* cerrge_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

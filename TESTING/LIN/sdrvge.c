@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -69,8 +70,8 @@ static integer c__7 = 7;
     static real amax;
     static char path[3];
     static integer imat, info;
-    static char dist[1], type[1];
-    static integer nrun, i, k, n, ifact, nfail, iseed[4], nfact;
+    static char dist[1], type__[1];
+    static integer nrun, i__, k, n, ifact, nfail, iseed[4], nfact;
     extern logical lsame_(char *, char *);
     static char equed[1];
     static integer nbmin;
@@ -161,10 +162,10 @@ static integer c__7 = 7;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -176,8 +177,7 @@ static integer c__7 = 7;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -229,8 +229,7 @@ static integer c__7 = 7;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -251,13 +250,13 @@ static integer c__7 = 7;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "GE", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GE", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -293,27 +292,25 @@ static integer c__7 = 7;
 /*           Do the tests only if DOTYPE( IMAT ) is true. */
 
 	    if (! dotype[imat]) {
-		goto L90;
+		goto L80;
 	    }
 
-/*           Skip types 5, 6, or 7 if the matrix size is too small
-. */
+/*           Skip types 5, 6, or 7 if the matrix size is too small. */
 
 	    zerot = imat >= 5 && imat <= 7;
 	    if (zerot && n < imat - 4) {
-		goto L90;
+		goto L80;
 	    }
 
-/*           Set up parameters with SLATB4 and generate a test mat
-rix   
+/*           Set up parameters with SLATB4 and generate a test matrix   
              with SLATMS. */
 
-	    slatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &
+	    slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
 		    cndnum, dist);
 	    rcondc = 1.f / cndnum;
 
-	    s_copy(srnamc_1.srnamt, "SLATMS", 6L, 6L);
-	    slatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cndnum, &
+	    s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
+	    slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cndnum, &
 		    anorm, &kl, &ku, "No packing", &a[1], &lda, &work[1], &
 		    info);
 
@@ -322,11 +319,10 @@ rix
 	    if (info != 0) {
 		alaerh_(path, "SLATMS", &info, &c__0, " ", &n, &n, &c_n1, &
 			c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
-		goto L90;
+		goto L80;
 	    }
 
-/*           For types 5-7, zero one or more columns of the matrix
- to   
+/*           For types 5-7, zero one or more columns of the matrix to   
              test that INFO is returned correctly. */
 
 	    if (zerot) {
@@ -340,8 +336,8 @@ rix
 		ioff = (izero - 1) * lda;
 		if (imat < 7) {
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
-			a[ioff + i] = 0.f;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			a[ioff + i__] = 0.f;
 /* L20: */
 		    }
 		} else {
@@ -376,34 +372,30 @@ rix
 
 		    if (zerot) {
 			if (prefac) {
-			    goto L70;
+			    goto L60;
 			}
 			rcondo = 0.f;
 			rcondi = 0.f;
 
 		    } else if (! nofact) {
 
-/*                    Compute the condition number for
- comparison with   
-                      the value returned by SGESVX (FA
-CT = 'N' reuses   
-                      the condition number from the pr
-evious iteration   
+/*                    Compute the condition number for comparison with   
+                      the value returned by SGESVX (FACT = 'N' reuses   
+                      the condition number from the previous iteration   
                       with FACT = 'F'). */
 
 			slacpy_("Full", &n, &n, &asav[1], &lda, &afac[1], &
 				lda);
 			if (equil || iequed > 1) {
 
-/*                       Compute row and column sc
-ale factors to   
-                         equilibrate the matrix A.
- */
+/*                       Compute row and column scale factors to   
+                         equilibrate the matrix A. */
 
 			    sgeequ_(&n, &n, &afac[1], &lda, &s[1], &s[n + 1], 
 				    &rowcnd, &colcnd, &amax, &info);
 			    if (info == 0 && n > 0) {
-				if (lsame_(equed, "R")) {
+				if (lsame_(equed, "R")) 
+					{
 				    rowcnd = 0.f;
 				    colcnd = 1.f;
 				} else if (lsame_(equed, "C")) {
@@ -414,16 +406,14 @@ ale factors to
 				    colcnd = 0.f;
 				}
 
-/*                          Equilibrate the ma
-trix. */
+/*                          Equilibrate the matrix. */
 
 				slaqge_(&n, &n, &afac[1], &lda, &s[1], &s[n + 
 					1], &rowcnd, &colcnd, &amax, equed);
 			    }
 			}
 
-/*                    Save the condition number of the
- non-equilibrated   
+/*                    Save the condition number of the non-equilibrated   
                       system for use in SGET04. */
 
 			if (equil) {
@@ -431,8 +421,7 @@ trix. */
 			    roldi = rcondi;
 			}
 
-/*                    Compute the 1-norm and infinity-
-norm of A. */
+/*                    Compute the 1-norm and infinity-norm of A. */
 
 			anormo = slange_("1", &n, &n, &afac[1], &lda, &rwork[
 				1]);
@@ -450,8 +439,7 @@ norm of A. */
 			sgetri_(&n, &a[1], &lda, &iwork[1], &work[1], &lwork, 
 				&info);
 
-/*                    Compute the 1-norm condition num
-ber of A. */
+/*                    Compute the 1-norm condition number of A. */
 
 			ainvnm = slange_("1", &n, &n, &a[1], &lda, &rwork[1]);
 			if (anormo <= 0.f || ainvnm <= 0.f) {
@@ -460,8 +448,7 @@ ber of A. */
 			    rcondo = 1.f / anormo / ainvnm;
 			}
 
-/*                    Compute the infinity-norm condit
-ion number of A. */
+/*                    Compute the infinity-norm condition number of A. */
 
 			ainvnm = slange_("I", &n, &n, &a[1], &lda, &rwork[1]);
 			if (anormi <= 0.f || ainvnm <= 0.f) {
@@ -470,7 +457,6 @@ ion number of A. */
 			    rcondi = 1.f / anormi / ainvnm;
 			}
 		    }
-/* L30: */
 
 		    for (itran = 1; itran <= 3; ++itran) {
 
@@ -488,10 +474,10 @@ ion number of A. */
 
 			slacpy_("Full", &n, &n, &asav[1], &lda, &a[1], &lda);
 
-/*                    Form an exact solution and set t
-he right hand side. */
+/*                    Form an exact solution and set the right hand side. */
 
-			s_copy(srnamc_1.srnamt, "SLARHS", 6L, 6L);
+			s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (ftnlen)
+				6);
 			slarhs_(path, xtype, "Full", trans, &n, &n, &kl, &ku, 
 				nrhs, &a[1], &lda, &xact[1], &lda, &b[1], &
 				lda, iseed, &info);
@@ -502,8 +488,7 @@ he right hand side. */
 
 /*                       --- Test SGESV  ---   
 
-                         Compute the LU factorizat
-ion of the matrix and   
+                         Compute the LU factorization of the matrix and   
                          solve the system. */
 
 			    slacpy_("Full", &n, &n, &a[1], &lda, &afac[1], &
@@ -511,12 +496,12 @@ ion of the matrix and
 			    slacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
 				    lda);
 
-			    s_copy(srnamc_1.srnamt, "SGESV ", 6L, 6L);
+			    s_copy(srnamc_1.srnamt, "SGESV ", (ftnlen)6, (
+				    ftnlen)6);
 			    sgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1],
 				     &lda, &info);
 
-/*                       Check error code from SGE
-SV . */
+/*                       Check error code from SGESV . */
 
 			    if (info != izero) {
 				alaerh_(path, "SGESV ", &info, &izero, " ", &
@@ -524,8 +509,7 @@ SV . */
 					nfail, &nerrs, nout);
 			    }
 
-/*                       Reconstruct matrix from f
-actors and compute   
+/*                       Reconstruct matrix from factors and compute   
                          residual. */
 
 			    sget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
@@ -533,8 +517,7 @@ actors and compute
 			    nt = 1;
 			    if (izero == 0) {
 
-/*                          Compute residual o
-f the computed solution. */
+/*                          Compute residual of the computed solution. */
 
 				slacpy_("Full", &n, nrhs, &b[1], &lda, &work[
 					1], &lda);
@@ -542,16 +525,14 @@ f the computed solution. */
 					lda, &x[1], &lda, &work[1], &lda, &
 					rwork[1], &result[1]);
 
-/*                          Check solution fro
-m generated exact solution. */
+/*                          Check solution from generated exact solution. */
 
 				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
 					 &rcondc, &result[2]);
 				nt = 3;
 			    }
 
-/*                       Print information about t
-he tests that did not   
+/*                       Print information about the tests that did not   
                          pass the threshold. */
 
 			    i__4 = nt;
@@ -562,7 +543,7 @@ he tests that did not
 				    }
 				    io___55.ciunit = *nout;
 				    s_wsfe(&io___55);
-				    do_fio(&c__1, "SGESV ", 6L);
+				    do_fio(&c__1, "SGESV ", (ftnlen)6);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
@@ -574,7 +555,7 @@ he tests that did not
 				    e_wsfe();
 				    ++nfail;
 				}
-/* L40: */
+/* L30: */
 			    }
 			    nrun += nt;
 			}
@@ -588,44 +569,38 @@ he tests that did not
 			slaset_("Full", &n, nrhs, &c_b20, &c_b20, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if
- FACT = 'F' and   
-                         EQUED = 'R', 'C', or 'B'.
- */
+/*                       Equilibrate the matrix if FACT = 'F' and   
+                         EQUED = 'R', 'C', or 'B'. */
 
 			    slaqge_(&n, &n, &a[1], &lda, &s[1], &s[n + 1], &
 				    rowcnd, &colcnd, &amax, equed);
 			}
 
-/*                    Solve the system and compute the
- condition number   
-                      and error bounds using SGESVX. 
-*/
+/*                    Solve the system and compute the condition number   
+                      and error bounds using SGESVX. */
 
-			s_copy(srnamc_1.srnamt, "SGESVX", 6L, 6L);
+			s_copy(srnamc_1.srnamt, "SGESVX", (ftnlen)6, (ftnlen)
+				6);
 			sgesvx_(fact, trans, &n, nrhs, &a[1], &lda, &afac[1], 
 				&lda, &iwork[1], equed, &s[1], &s[n + 1], &b[
 				1], &lda, &x[1], &lda, &rcond, &rwork[1], &
 				rwork[*nrhs + 1], &work[1], &iwork[n + 1], &
 				info);
 
-/*                    Check the error code from SGESVX
-. */
+/*                    Check the error code from SGESVX. */
 
 			if (info != izero) {
 /* Writing concatenation */
 			    i__5[0] = 1, a__1[0] = fact;
 			    i__5[1] = 1, a__1[1] = trans;
-			    s_cat(ch__1, a__1, i__5, &c__2, 2L);
+			    s_cat(ch__1, a__1, i__5, &c__2, (ftnlen)2);
 			    alaerh_(path, "SGESVX", &info, &izero, ch__1, &n, 
 				    &n, &c_n1, &c_n1, nrhs, &imat, &nfail, &
 				    nerrs, nout);
 			}
 
-/*                    Compare WORK(1) from SGESVX with
- the computed   
-                      reciprocal pivot growth factor R
-PVGRW */
+/*                    Compare WORK(1) from SGESVX with the computed   
+                      reciprocal pivot growth factor RPVGRW */
 
 			if (info != 0) {
 			    rpvgrw = slantr_("M", "U", "N", &info, &info, &
@@ -647,12 +622,12 @@ PVGRW */
 			    }
 			}
 			result[6] = (r__1 = rpvgrw - work[1], dabs(r__1)) / 
-				dmax(work[1],rpvgrw) / slamch_("E");
+				dmax(work[1],rpvgrw) / slamch_("E")
+				;
 
 			if (! prefac) {
 
-/*                       Reconstruct matrix from f
-actors and compute   
+/*                       Reconstruct matrix from factors and compute   
                          residual. */
 
 			    sget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
@@ -666,8 +641,7 @@ actors and compute
 			if (info == 0) {
 			    trfcon = FALSE_;
 
-/*                       Compute residual of the c
-omputed solution. */
+/*                       Compute residual of the computed solution. */
 
 			    slacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
 				    , &lda);
@@ -675,11 +649,9 @@ omputed solution. */
 				    , &lda, &work[1], &lda, &rwork[(*nrhs << 
 				    1) + 1], &result[1]);
 
-/*                       Check solution from gener
-ated exact solution. */
+/*                       Check solution from generated exact solution. */
 
-			    if (nofact || prefac && lsame_(equed, "N")
-				    ) {
+			    if (nofact || prefac && lsame_(equed, "N")) {
 				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
 					 &rcondc, &result[2]);
 			    } else {
@@ -692,8 +664,7 @@ ated exact solution. */
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds fr
-om iterative   
+/*                       Check the error bounds from iterative   
                          refinement. */
 
 			    sget07_(trans, &n, nrhs, &asav[1], &lda, &b[1], &
@@ -703,14 +674,12 @@ om iterative
 			    trfcon = TRUE_;
 			}
 
-/*                    Compare RCOND from SGESVX with t
-he computed value   
+/*                    Compare RCOND from SGESVX with the computed value   
                       in RCONDC. */
 
 			result[5] = sget06_(&rcond, &rcondc);
 
-/*                    Print information about the test
-s that did not pass   
+/*                    Print information about the tests that did not pass   
                       the threshold. */
 
 			if (! trfcon) {
@@ -722,12 +691,12 @@ s that did not pass
 				    if (prefac) {
 					io___61.ciunit = *nout;
 					s_wsfe(&io___61);
-					do_fio(&c__1, "SGESVX", 6L);
-					do_fio(&c__1, fact, 1L);
-					do_fio(&c__1, trans, 1L);
+					do_fio(&c__1, "SGESVX", (ftnlen)6);
+					do_fio(&c__1, fact, (ftnlen)1);
+					do_fio(&c__1, trans, (ftnlen)1);
 					do_fio(&c__1, (char *)&n, (ftnlen)
 						sizeof(integer));
-					do_fio(&c__1, equed, 1L);
+					do_fio(&c__1, equed, (ftnlen)1);
 					do_fio(&c__1, (char *)&imat, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&k, (ftnlen)
@@ -738,9 +707,9 @@ s that did not pass
 				    } else {
 					io___62.ciunit = *nout;
 					s_wsfe(&io___62);
-					do_fio(&c__1, "SGESVX", 6L);
-					do_fio(&c__1, fact, 1L);
-					do_fio(&c__1, trans, 1L);
+					do_fio(&c__1, "SGESVX", (ftnlen)6);
+					do_fio(&c__1, fact, (ftnlen)1);
+					do_fio(&c__1, trans, (ftnlen)1);
 					do_fio(&c__1, (char *)&n, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&imat, (ftnlen)
@@ -753,7 +722,7 @@ s that did not pass
 				    }
 				    ++nfail;
 				}
-/* L50: */
+/* L40: */
 			    }
 			    nrun = nrun + 7 - k1;
 			} else {
@@ -764,12 +733,12 @@ s that did not pass
 				if (prefac) {
 				    io___63.ciunit = *nout;
 				    s_wsfe(&io___63);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, equed, 1L);
+				    do_fio(&c__1, equed, (ftnlen)1);
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
 					    sizeof(integer));
 				    do_fio(&c__1, (char *)&c__1, (ftnlen)
@@ -780,9 +749,9 @@ s that did not pass
 				} else {
 				    io___64.ciunit = *nout;
 				    s_wsfe(&io___64);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
@@ -803,12 +772,12 @@ s that did not pass
 				if (prefac) {
 				    io___65.ciunit = *nout;
 				    s_wsfe(&io___65);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, equed, 1L);
+				    do_fio(&c__1, equed, (ftnlen)1);
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
 					    sizeof(integer));
 				    do_fio(&c__1, (char *)&c__6, (ftnlen)
@@ -819,9 +788,9 @@ s that did not pass
 				} else {
 				    io___66.ciunit = *nout;
 				    s_wsfe(&io___66);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
@@ -842,12 +811,12 @@ s that did not pass
 				if (prefac) {
 				    io___67.ciunit = *nout;
 				    s_wsfe(&io___67);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, equed, 1L);
+				    do_fio(&c__1, equed, (ftnlen)1);
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
 					    sizeof(integer));
 				    do_fio(&c__1, (char *)&c__7, (ftnlen)
@@ -858,9 +827,9 @@ s that did not pass
 				} else {
 				    io___68.ciunit = *nout;
 				    s_wsfe(&io___68);
-				    do_fio(&c__1, "SGESVX", 6L);
-				    do_fio(&c__1, fact, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, "SGESVX", (ftnlen)6);
+				    do_fio(&c__1, fact, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&imat, (ftnlen)
@@ -877,17 +846,17 @@ s that did not pass
 
 			}
 
-/* L60: */
+/* L50: */
 		    }
-L70:
+L60:
 		    ;
 		}
-/* L80: */
+/* L70: */
 	    }
-L90:
+L80:
 	    ;
 	}
-/* L100: */
+/* L90: */
     }
 
 /*     Print a summary of the results. */

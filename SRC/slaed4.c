@@ -1,13 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int slaed4_(integer *n, integer *i, real *d, real *z, real *
-	delta, real *rho, real *dlam, integer *info)
+/* Subroutine */ int slaed4_(integer *n, integer *i__, real *d__, real *z__, 
+	real *delta, real *rho, real *dlam, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
+       December 23, 1999   
 
 
     Purpose   
@@ -76,8 +76,14 @@
      MAXIT is the maximum number of iterations allowed for each   
      eigenvalue.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Since this routine is called in an inner loop, we do no argument   
@@ -85,9 +91,7 @@
 
        Quick return for N=1 and 2.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1;
@@ -96,9 +100,9 @@
     /* Local variables */
     static real dphi, dpsi;
     static integer iter;
-    static real temp, prew, temp1, a, b, c;
+    static real temp, prew, temp1, a, b, c__;
     static integer j;
-    static real w;
+    static real w, dltlb, dltub, midpt;
     static integer niter;
     static logical swtch;
     extern /* Subroutine */ int slaed5_(integer *, real *, real *, real *, 
@@ -115,23 +119,22 @@
     static real del, eta, phi, eps, tau, psi;
     static integer iim1, iip1;
 
+    --delta;
+    --z__;
+    --d__;
 
-#define DELTA(I) delta[(I)-1]
-#define Z(I) z[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     if (*n == 1) {
 
 /*         Presumably, I=1 upon entry */
 
-	*dlam = D(1) + *rho * Z(1) * Z(1);
-	DELTA(1) = 1.f;
+	*dlam = d__[1] + *rho * z__[1] * z__[1];
+	delta[1] = 1.f;
 	return 0;
     }
     if (*n == 2) {
-	slaed5_(i, &D(1), &Z(1), &DELTA(1), rho, dlam);
+	slaed5_(i__, &d__[1], &z__[1], &delta[1], rho, dlam);
 	return 0;
     }
 
@@ -142,7 +145,7 @@
 
 /*     The case I = N */
 
-    if (*i == *n) {
+    if (*i__ == *n) {
 
 /*        Initialize some basic variables */
 
@@ -151,65 +154,70 @@
 
 /*        Calculate initial guess */
 
-	temp = *rho / 2.f;
+	midpt = *rho / 2.f;
 
 /*        If ||Z||_2 is not one, then TEMP should be set to   
           RHO * ||Z||_2^2 / TWO */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    DELTA(j) = D(j) - D(*i) - temp;
+	for (j = 1; j <= i__1; ++j) {
+	    delta[j] = d__[j] - d__[*i__] - midpt;
 /* L10: */
 	}
 
 	psi = 0.f;
 	i__1 = *n - 2;
-	for (j = 1; j <= *n-2; ++j) {
-	    psi += Z(j) * Z(j) / DELTA(j);
+	for (j = 1; j <= i__1; ++j) {
+	    psi += z__[j] * z__[j] / delta[j];
 /* L20: */
 	}
 
-	c = rhoinv + psi;
-	w = c + Z(ii) * Z(ii) / DELTA(ii) + Z(*n) * Z(*n) / DELTA(*n);
+	c__ = rhoinv + psi;
+	w = c__ + z__[ii] * z__[ii] / delta[ii] + z__[*n] * z__[*n] / delta[*
+		n];
 
 	if (w <= 0.f) {
-	    temp = Z(*n - 1) * Z(*n - 1) / (D(*n) - D(*n - 1) + *rho) + Z(*n) 
-		    * Z(*n) / *rho;
-	    if (c <= temp) {
+	    temp = z__[*n - 1] * z__[*n - 1] / (d__[*n] - d__[*n - 1] + *rho) 
+		    + z__[*n] * z__[*n] / *rho;
+	    if (c__ <= temp) {
 		tau = *rho;
 	    } else {
-		del = D(*n) - D(*n - 1);
-		a = -(doublereal)c * del + Z(*n - 1) * Z(*n - 1) + Z(*n) * Z(*
-			n);
-		b = Z(*n) * Z(*n) * del;
+		del = d__[*n] - d__[*n - 1];
+		a = -c__ * del + z__[*n - 1] * z__[*n - 1] + z__[*n] * z__[*n]
+			;
+		b = z__[*n] * z__[*n] * del;
 		if (a < 0.f) {
-		    tau = b * 2.f / (sqrt(a * a + b * 4.f * c) - a);
+		    tau = b * 2.f / (sqrt(a * a + b * 4.f * c__) - a);
 		} else {
-		    tau = (a + sqrt(a * a + b * 4.f * c)) / (c * 2.f);
+		    tau = (a + sqrt(a * a + b * 4.f * c__)) / (c__ * 2.f);
 		}
 	    }
 
 /*           It can be proved that   
                  D(N)+RHO/2 <= LAMBDA(N) < D(N)+TAU <= D(N)+RHO */
 
+	    dltlb = midpt;
+	    dltub = *rho;
 	} else {
-	    del = D(*n) - D(*n - 1);
-	    a = -(doublereal)c * del + Z(*n - 1) * Z(*n - 1) + Z(*n) * Z(*n);
-	    b = Z(*n) * Z(*n) * del;
+	    del = d__[*n] - d__[*n - 1];
+	    a = -c__ * del + z__[*n - 1] * z__[*n - 1] + z__[*n] * z__[*n];
+	    b = z__[*n] * z__[*n] * del;
 	    if (a < 0.f) {
-		tau = b * 2.f / (sqrt(a * a + b * 4.f * c) - a);
+		tau = b * 2.f / (sqrt(a * a + b * 4.f * c__) - a);
 	    } else {
-		tau = (a + sqrt(a * a + b * 4.f * c)) / (c * 2.f);
+		tau = (a + sqrt(a * a + b * 4.f * c__)) / (c__ * 2.f);
 	    }
 
 /*           It can be proved that   
                  D(N) < D(N)+TAU < LAMBDA(N) < D(N)+RHO/2 */
 
+	    dltlb = 0.f;
+	    dltub = midpt;
 	}
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    DELTA(j) = D(j) - D(*i) - tau;
+	for (j = 1; j <= i__1; ++j) {
+	    delta[j] = d__[j] - d__[*i__] - tau;
 /* L30: */
 	}
 
@@ -219,9 +227,9 @@
 	psi = 0.f;
 	erretm = 0.f;
 	i__1 = ii;
-	for (j = 1; j <= ii; ++j) {
-	    temp = Z(j) / DELTA(j);
-	    psi += Z(j) * temp;
+	for (j = 1; j <= i__1; ++j) {
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L40: */
@@ -230,40 +238,47 @@
 
 /*        Evaluate PHI and the derivative DPHI */
 
-	temp = Z(*n) / DELTA(*n);
-	phi = Z(*n) * temp;
+	temp = z__[*n] / delta[*n];
+	phi = z__[*n] * temp;
 	dphi = temp * temp;
-	erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		dabs(tau) * (dpsi + dphi);
+	erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * (
+		dpsi + dphi);
 
 	w = rhoinv + phi + psi;
 
 /*        Test for convergence */
 
 	if (dabs(w) <= eps * erretm) {
-	    *dlam = D(*i) + tau;
+	    *dlam = d__[*i__] + tau;
 	    goto L250;
+	}
+
+	if (w <= 0.f) {
+	    dltlb = dmax(dltlb,tau);
+	} else {
+	    dltub = dmin(dltub,tau);
 	}
 
 /*        Calculate the new step */
 
 	++niter;
-	c = w - DELTA(*n - 1) * dpsi - DELTA(*n) * dphi;
-	a = (DELTA(*n - 1) + DELTA(*n)) * w - DELTA(*n - 1) * DELTA(*n) * (
+	c__ = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
+	a = (delta[*n - 1] + delta[*n]) * w - delta[*n - 1] * delta[*n] * (
 		dpsi + dphi);
-	b = DELTA(*n - 1) * DELTA(*n) * w;
-	if (c < 0.f) {
-	    c = dabs(c);
+	b = delta[*n - 1] * delta[*n] * w;
+	if (c__ < 0.f) {
+	    c__ = dabs(c__);
 	}
-	if (c == 0.f) {
-/*          ETA = B/A */
-	    eta = *rho - tau;
+	if (c__ == 0.f) {
+/*          ETA = B/A   
+             ETA = RHO - TAU */
+	    eta = dltub - tau;
 	} else if (a >= 0.f) {
-	    eta = (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (c * 
-		    2.f);
+	    eta = (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) / (
+		    c__ * 2.f);
 	} else {
-	    eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1))
-		    ));
+	    eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(
+		    r__1))));
 	}
 
 /*        Note, eta should be positive if w is negative, and   
@@ -273,15 +288,19 @@
           will guarantee eta*w < 0. */
 
 	if (w * eta > 0.f) {
-	    eta = -(doublereal)w / (dpsi + dphi);
+	    eta = -w / (dpsi + dphi);
 	}
 	temp = tau + eta;
-	if (temp > *rho) {
-	    eta = *rho - tau;
+	if (temp > dltub || temp < dltlb) {
+	    if (w < 0.f) {
+		eta = (dltub - tau) / 2.f;
+	    } else {
+		eta = (dltlb - tau) / 2.f;
+	    }
 	}
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    DELTA(j) -= eta;
+	for (j = 1; j <= i__1; ++j) {
+	    delta[j] -= eta;
 /* L50: */
 	}
 
@@ -293,9 +312,9 @@
 	psi = 0.f;
 	erretm = 0.f;
 	i__1 = ii;
-	for (j = 1; j <= ii; ++j) {
-	    temp = Z(j) / DELTA(j);
-	    psi += Z(j) * temp;
+	for (j = 1; j <= i__1; ++j) {
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L60: */
@@ -304,11 +323,11 @@
 
 /*        Evaluate PHI and the derivative DPHI */
 
-	temp = Z(*n) / DELTA(*n);
-	phi = Z(*n) * temp;
+	temp = z__[*n] / delta[*n];
+	phi = z__[*n] * temp;
 	dphi = temp * temp;
-	erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		dabs(tau) * (dpsi + dphi);
+	erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * (
+		dpsi + dphi);
 
 	w = rhoinv + phi + psi;
 
@@ -316,26 +335,32 @@
 
 	iter = niter + 1;
 
-	for (niter = iter; niter <= 20; ++niter) {
+	for (niter = iter; niter <= 30; ++niter) {
 
 /*           Test for convergence */
 
 	    if (dabs(w) <= eps * erretm) {
-		*dlam = D(*i) + tau;
+		*dlam = d__[*i__] + tau;
 		goto L250;
+	    }
+
+	    if (w <= 0.f) {
+		dltlb = dmax(dltlb,tau);
+	    } else {
+		dltub = dmin(dltub,tau);
 	    }
 
 /*           Calculate the new step */
 
-	    c = w - DELTA(*n - 1) * dpsi - DELTA(*n) * dphi;
-	    a = (DELTA(*n - 1) + DELTA(*n)) * w - DELTA(*n - 1) * DELTA(*n) * 
+	    c__ = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
+	    a = (delta[*n - 1] + delta[*n]) * w - delta[*n - 1] * delta[*n] * 
 		    (dpsi + dphi);
-	    b = DELTA(*n - 1) * DELTA(*n) * w;
+	    b = delta[*n - 1] * delta[*n] * w;
 	    if (a >= 0.f) {
-		eta = (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		eta = (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    } else {
-		eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    }
 
@@ -346,15 +371,19 @@
              will guarantee eta*w < 0. */
 
 	    if (w * eta > 0.f) {
-		eta = -(doublereal)w / (dpsi + dphi);
+		eta = -w / (dpsi + dphi);
 	    }
 	    temp = tau + eta;
-	    if (temp <= 0.f) {
-		eta /= 2.f;
+	    if (temp > dltub || temp < dltlb) {
+		if (w < 0.f) {
+		    eta = (dltub - tau) / 2.f;
+		} else {
+		    eta = (dltlb - tau) / 2.f;
+		}
 	    }
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		DELTA(j) -= eta;
+	    for (j = 1; j <= i__1; ++j) {
+		delta[j] -= eta;
 /* L70: */
 	    }
 
@@ -366,9 +395,9 @@
 	    psi = 0.f;
 	    erretm = 0.f;
 	    i__1 = ii;
-	    for (j = 1; j <= ii; ++j) {
-		temp = Z(j) / DELTA(j);
-		psi += Z(j) * temp;
+	    for (j = 1; j <= i__1; ++j) {
+		temp = z__[j] / delta[j];
+		psi += z__[j] * temp;
 		dpsi += temp * temp;
 		erretm += psi;
 /* L80: */
@@ -377,11 +406,11 @@
 
 /*           Evaluate PHI and the derivative DPHI */
 
-	    temp = Z(*n) / DELTA(*n);
-	    phi = Z(*n) * temp;
+	    temp = z__[*n] / delta[*n];
+	    phi = z__[*n] * temp;
 	    dphi = temp * temp;
-	    erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		    dabs(tau) * (dpsi + dphi);
+	    erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * 
+		    (dpsi + dphi);
 
 	    w = rhoinv + phi + psi;
 /* L90: */
@@ -390,7 +419,7 @@
 /*        Return with INFO = 1, NITER = MAXIT and not converged */
 
 	*info = 1;
-	*dlam = D(*i) + tau;
+	*dlam = d__[*i__] + tau;
 	goto L250;
 
 /*        End for the case I = N */
@@ -400,32 +429,34 @@
 /*        The case for I < N */
 
 	niter = 1;
-	ip1 = *i + 1;
+	ip1 = *i__ + 1;
 
 /*        Calculate initial guess */
 
-	temp = (D(ip1) - D(*i)) / 2.f;
+	del = d__[ip1] - d__[*i__];
+	midpt = del / 2.f;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    DELTA(j) = D(j) - D(*i) - temp;
+	for (j = 1; j <= i__1; ++j) {
+	    delta[j] = d__[j] - d__[*i__] - midpt;
 /* L100: */
 	}
 
 	psi = 0.f;
-	i__1 = *i - 1;
-	for (j = 1; j <= *i-1; ++j) {
-	    psi += Z(j) * Z(j) / DELTA(j);
+	i__1 = *i__ - 1;
+	for (j = 1; j <= i__1; ++j) {
+	    psi += z__[j] * z__[j] / delta[j];
 /* L110: */
 	}
 
 	phi = 0.f;
-	i__1 = *i + 2;
-	for (j = *n; j >= *i+2; --j) {
-	    phi += Z(j) * Z(j) / DELTA(j);
+	i__1 = *i__ + 2;
+	for (j = *n; j >= i__1; --j) {
+	    phi += z__[j] * z__[j] / delta[j];
 /* L120: */
 	}
-	c = rhoinv + psi + phi;
-	w = c + Z(*i) * Z(*i) / DELTA(*i) + Z(ip1) * Z(ip1) / DELTA(ip1);
+	c__ = rhoinv + psi + phi;
+	w = c__ + z__[*i__] * z__[*i__] / delta[*i__] + z__[ip1] * z__[ip1] / 
+		delta[ip1];
 
 	if (w > 0.f) {
 
@@ -434,16 +465,17 @@
              We choose d(i) as origin. */
 
 	    orgati = TRUE_;
-	    del = D(ip1) - D(*i);
-	    a = c * del + Z(*i) * Z(*i) + Z(ip1) * Z(ip1);
-	    b = Z(*i) * Z(*i) * del;
+	    a = c__ * del + z__[*i__] * z__[*i__] + z__[ip1] * z__[ip1];
+	    b = z__[*i__] * z__[*i__] * del;
 	    if (a > 0.f) {
-		tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    } else {
-		tau = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		tau = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    }
+	    dltlb = 0.f;
+	    dltub = midpt;
 	} else {
 
 /*           (d(i)+d(i+1))/2 <= the ith eigenvalue < d(i+1)   
@@ -451,35 +483,36 @@
              We choose d(i+1) as origin. */
 
 	    orgati = FALSE_;
-	    del = D(ip1) - D(*i);
-	    a = c * del - Z(*i) * Z(*i) - Z(ip1) * Z(ip1);
-	    b = Z(ip1) * Z(ip1) * del;
+	    a = c__ * del - z__[*i__] * z__[*i__] - z__[ip1] * z__[ip1];
+	    b = z__[ip1] * z__[ip1] * del;
 	    if (a < 0.f) {
-		tau = b * 2.f / (a - sqrt((r__1 = a * a + b * 4.f * c, dabs(
+		tau = b * 2.f / (a - sqrt((r__1 = a * a + b * 4.f * c__, dabs(
 			r__1))));
 	    } else {
-		tau = -(doublereal)(a + sqrt((r__1 = a * a + b * 4.f * c, 
-			dabs(r__1)))) / (c * 2.f);
+		tau = -(a + sqrt((r__1 = a * a + b * 4.f * c__, dabs(r__1)))) 
+			/ (c__ * 2.f);
 	    }
+	    dltlb = -midpt;
+	    dltub = 0.f;
 	}
 
 	if (orgati) {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		DELTA(j) = D(j) - D(*i) - tau;
+	    for (j = 1; j <= i__1; ++j) {
+		delta[j] = d__[j] - d__[*i__] - tau;
 /* L130: */
 	    }
 	} else {
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		DELTA(j) = D(j) - D(ip1) - tau;
+	    for (j = 1; j <= i__1; ++j) {
+		delta[j] = d__[j] - d__[ip1] - tau;
 /* L140: */
 	    }
 	}
 	if (orgati) {
-	    ii = *i;
+	    ii = *i__;
 	} else {
-	    ii = *i + 1;
+	    ii = *i__ + 1;
 	}
 	iim1 = ii - 1;
 	iip1 = ii + 1;
@@ -490,9 +523,9 @@
 	psi = 0.f;
 	erretm = 0.f;
 	i__1 = iim1;
-	for (j = 1; j <= iim1; ++j) {
-	    temp = Z(j) / DELTA(j);
-	    psi += Z(j) * temp;
+	for (j = 1; j <= i__1; ++j) {
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L150: */
@@ -504,9 +537,9 @@
 	dphi = 0.f;
 	phi = 0.f;
 	i__1 = iip1;
-	for (j = *n; j >= iip1; --j) {
-	    temp = Z(j) / DELTA(j);
-	    phi += Z(j) * temp;
+	for (j = *n; j >= i__1; --j) {
+	    temp = z__[j] / delta[j];
+	    phi += z__[j] * temp;
 	    dphi += temp * temp;
 	    erretm += phi;
 /* L160: */
@@ -531,9 +564,9 @@
 	    swtch3 = FALSE_;
 	}
 
-	temp = Z(ii) / DELTA(ii);
+	temp = z__[ii] / delta[ii];
 	dw = dpsi + dphi + temp * temp;
-	temp = Z(ii) * temp;
+	temp = z__[ii] * temp;
 	w += temp;
 	erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 3.f 
 		+ dabs(tau) * dw;
@@ -542,11 +575,17 @@
 
 	if (dabs(w) <= eps * erretm) {
 	    if (orgati) {
-		*dlam = D(*i) + tau;
+		*dlam = d__[*i__] + tau;
 	    } else {
-		*dlam = D(ip1) + tau;
+		*dlam = d__[ip1] + tau;
 	    }
 	    goto L250;
+	}
+
+	if (w <= 0.f) {
+	    dltlb = dmax(dltlb,tau);
+	} else {
+	    dltub = dmin(dltub,tau);
 	}
 
 /*        Calculate the new step */
@@ -555,31 +594,34 @@
 	if (! swtch3) {
 	    if (orgati) {
 /* Computing 2nd power */
-		r__1 = Z(*i) / DELTA(*i);
-		c = w - DELTA(ip1) * dw - (D(*i) - D(ip1)) * (r__1 * r__1);
+		r__1 = z__[*i__] / delta[*i__];
+		c__ = w - delta[ip1] * dw - (d__[*i__] - d__[ip1]) * (r__1 * 
+			r__1);
 	    } else {
 /* Computing 2nd power */
-		r__1 = Z(ip1) / DELTA(ip1);
-		c = w - DELTA(*i) * dw - (D(ip1) - D(*i)) * (r__1 * r__1);
+		r__1 = z__[ip1] / delta[ip1];
+		c__ = w - delta[*i__] * dw - (d__[ip1] - d__[*i__]) * (r__1 * 
+			r__1);
 	    }
-	    a = (DELTA(*i) + DELTA(ip1)) * w - DELTA(*i) * DELTA(ip1) * dw;
-	    b = DELTA(*i) * DELTA(ip1) * w;
-	    if (c == 0.f) {
+	    a = (delta[*i__] + delta[ip1]) * w - delta[*i__] * delta[ip1] * 
+		    dw;
+	    b = delta[*i__] * delta[ip1] * w;
+	    if (c__ == 0.f) {
 		if (a == 0.f) {
 		    if (orgati) {
-			a = Z(*i) * Z(*i) + DELTA(ip1) * DELTA(ip1) * (dpsi + 
-				dphi);
+			a = z__[*i__] * z__[*i__] + delta[ip1] * delta[ip1] * 
+				(dpsi + dphi);
 		    } else {
-			a = Z(ip1) * Z(ip1) + DELTA(*i) * DELTA(*i) * (dpsi + 
-				dphi);
+			a = z__[ip1] * z__[ip1] + delta[*i__] * delta[*i__] * 
+				(dpsi + dphi);
 		    }
 		}
 		eta = b / a;
 	    } else if (a <= 0.f) {
-		eta = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		eta = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    } else {
-		eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    }
 	} else {
@@ -588,22 +630,22 @@
 
 	    temp = rhoinv + psi + phi;
 	    if (orgati) {
-		temp1 = Z(iim1) / DELTA(iim1);
+		temp1 = z__[iim1] / delta[iim1];
 		temp1 *= temp1;
-		c = temp - DELTA(iip1) * (dpsi + dphi) - (D(iim1) - D(iip1)) *
-			 temp1;
-		zz[0] = Z(iim1) * Z(iim1);
-		zz[2] = DELTA(iip1) * DELTA(iip1) * (dpsi - temp1 + dphi);
+		c__ = temp - delta[iip1] * (dpsi + dphi) - (d__[iim1] - d__[
+			iip1]) * temp1;
+		zz[0] = z__[iim1] * z__[iim1];
+		zz[2] = delta[iip1] * delta[iip1] * (dpsi - temp1 + dphi);
 	    } else {
-		temp1 = Z(iip1) / DELTA(iip1);
+		temp1 = z__[iip1] / delta[iip1];
 		temp1 *= temp1;
-		c = temp - DELTA(iim1) * (dpsi + dphi) - (D(iip1) - D(iim1)) *
-			 temp1;
-		zz[0] = DELTA(iim1) * DELTA(iim1) * (dpsi + (dphi - temp1));
-		zz[2] = Z(iip1) * Z(iip1);
+		c__ = temp - delta[iim1] * (dpsi + dphi) - (d__[iip1] - d__[
+			iim1]) * temp1;
+		zz[0] = delta[iim1] * delta[iim1] * (dpsi + (dphi - temp1));
+		zz[2] = z__[iip1] * z__[iip1];
 	    }
-	    zz[1] = Z(ii) * Z(ii);
-	    slaed6_(&niter, &orgati, &c, &DELTA(iim1), zz, &w, &eta, info);
+	    zz[1] = z__[ii] * z__[ii];
+	    slaed6_(&niter, &orgati, &c__, &delta[iim1], zz, &w, &eta, info);
 	    if (*info != 0) {
 		goto L250;
 	    }
@@ -616,23 +658,14 @@
           will guarantee eta*w < 0. */
 
 	if (w * eta >= 0.f) {
-	    eta = -(doublereal)w / dw;
+	    eta = -w / dw;
 	}
 	temp = tau + eta;
-	del = (D(ip1) - D(*i)) / 2.f;
-	if (orgati) {
-	    if (temp >= del) {
-		eta = del - tau;
-	    }
-	    if (temp <= 0.f) {
-		eta /= 2.f;
-	    }
-	} else {
-	    if (temp <= -(doublereal)del) {
-		eta = -(doublereal)del - tau;
-	    }
-	    if (temp >= 0.f) {
-		eta /= 2.f;
+	if (temp > dltub || temp < dltlb) {
+	    if (w < 0.f) {
+		eta = (dltub - tau) / 2.f;
+	    } else {
+		eta = (dltlb - tau) / 2.f;
 	    }
 	}
 
@@ -640,8 +673,8 @@
 
 /* L170: */
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    DELTA(j) -= eta;
+	for (j = 1; j <= i__1; ++j) {
+	    delta[j] -= eta;
 /* L180: */
 	}
 
@@ -651,9 +684,9 @@
 	psi = 0.f;
 	erretm = 0.f;
 	i__1 = iim1;
-	for (j = 1; j <= iim1; ++j) {
-	    temp = Z(j) / DELTA(j);
-	    psi += Z(j) * temp;
+	for (j = 1; j <= i__1; ++j) {
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L190: */
@@ -665,24 +698,24 @@
 	dphi = 0.f;
 	phi = 0.f;
 	i__1 = iip1;
-	for (j = *n; j >= iip1; --j) {
-	    temp = Z(j) / DELTA(j);
-	    phi += Z(j) * temp;
+	for (j = *n; j >= i__1; --j) {
+	    temp = z__[j] / delta[j];
+	    phi += z__[j] * temp;
 	    dphi += temp * temp;
 	    erretm += phi;
 /* L200: */
 	}
 
-	temp = Z(ii) / DELTA(ii);
+	temp = z__[ii] / delta[ii];
 	dw = dpsi + dphi + temp * temp;
-	temp = Z(ii) * temp;
+	temp = z__[ii] * temp;
 	w = rhoinv + phi + psi + temp;
 	erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 3.f 
 		+ (r__1 = tau + eta, dabs(r__1)) * dw;
 
 	swtch = FALSE_;
 	if (orgati) {
-	    if (-(doublereal)w > dabs(prew) / 10.f) {
+	    if (-w > dabs(prew) / 10.f) {
 		swtch = TRUE_;
 	    }
 	} else {
@@ -697,17 +730,23 @@
 
 	iter = niter + 1;
 
-	for (niter = iter; niter <= 20; ++niter) {
+	for (niter = iter; niter <= 30; ++niter) {
 
 /*           Test for convergence */
 
 	    if (dabs(w) <= eps * erretm) {
 		if (orgati) {
-		    *dlam = D(*i) + tau;
+		    *dlam = d__[*i__] + tau;
 		} else {
-		    *dlam = D(ip1) + tau;
+		    *dlam = d__[ip1] + tau;
 		}
 		goto L250;
+	    }
+
+	    if (w <= 0.f) {
+		dltlb = dmax(dltlb,tau);
+	    } else {
+		dltub = dmin(dltub,tau);
 	    }
 
 /*           Calculate the new step */
@@ -716,81 +755,80 @@
 		if (! swtch) {
 		    if (orgati) {
 /* Computing 2nd power */
-			r__1 = Z(*i) / DELTA(*i);
-			c = w - DELTA(ip1) * dw - (D(*i) - D(ip1)) * (r__1 * 
-				r__1);
+			r__1 = z__[*i__] / delta[*i__];
+			c__ = w - delta[ip1] * dw - (d__[*i__] - d__[ip1]) * (
+				r__1 * r__1);
 		    } else {
 /* Computing 2nd power */
-			r__1 = Z(ip1) / DELTA(ip1);
-			c = w - DELTA(*i) * dw - (D(ip1) - D(*i)) * (r__1 * 
-				r__1);
+			r__1 = z__[ip1] / delta[ip1];
+			c__ = w - delta[*i__] * dw - (d__[ip1] - d__[*i__]) * 
+				(r__1 * r__1);
 		    }
 		} else {
-		    temp = Z(ii) / DELTA(ii);
+		    temp = z__[ii] / delta[ii];
 		    if (orgati) {
 			dpsi += temp * temp;
 		    } else {
 			dphi += temp * temp;
 		    }
-		    c = w - DELTA(*i) * dpsi - DELTA(ip1) * dphi;
+		    c__ = w - delta[*i__] * dpsi - delta[ip1] * dphi;
 		}
-		a = (DELTA(*i) + DELTA(ip1)) * w - DELTA(*i) * DELTA(ip1) * 
-			dw;
-		b = DELTA(*i) * DELTA(ip1) * w;
-		if (c == 0.f) {
+		a = (delta[*i__] + delta[ip1]) * w - delta[*i__] * delta[ip1] 
+			* dw;
+		b = delta[*i__] * delta[ip1] * w;
+		if (c__ == 0.f) {
 		    if (a == 0.f) {
 			if (! swtch) {
 			    if (orgati) {
-				a = Z(*i) * Z(*i) + DELTA(ip1) * DELTA(ip1) * 
-					(dpsi + dphi);
+				a = z__[*i__] * z__[*i__] + delta[ip1] * 
+					delta[ip1] * (dpsi + dphi);
 			    } else {
-				a = Z(ip1) * Z(ip1) + DELTA(*i) * DELTA(*i) * 
-					(dpsi + dphi);
+				a = z__[ip1] * z__[ip1] + delta[*i__] * delta[
+					*i__] * (dpsi + dphi);
 			    }
 			} else {
-			    a = DELTA(*i) * DELTA(*i) * dpsi + DELTA(ip1) * 
-				    DELTA(ip1) * dphi;
+			    a = delta[*i__] * delta[*i__] * dpsi + delta[ip1] 
+				    * delta[ip1] * dphi;
 			}
 		    }
 		    eta = b / a;
 		} else if (a <= 0.f) {
-		    eta = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1))))
-			     / (c * 2.f);
+		    eta = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1))
+			    )) / (c__ * 2.f);
 		} else {
-		    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, 
+		    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, 
 			    dabs(r__1))));
 		}
 	    } else {
 
-/*              Interpolation using THREE most relevant poles 
-*/
+/*              Interpolation using THREE most relevant poles */
 
 		temp = rhoinv + psi + phi;
 		if (swtch) {
-		    c = temp - DELTA(iim1) * dpsi - DELTA(iip1) * dphi;
-		    zz[0] = DELTA(iim1) * DELTA(iim1) * dpsi;
-		    zz[2] = DELTA(iip1) * DELTA(iip1) * dphi;
+		    c__ = temp - delta[iim1] * dpsi - delta[iip1] * dphi;
+		    zz[0] = delta[iim1] * delta[iim1] * dpsi;
+		    zz[2] = delta[iip1] * delta[iip1] * dphi;
 		} else {
 		    if (orgati) {
-			temp1 = Z(iim1) / DELTA(iim1);
+			temp1 = z__[iim1] / delta[iim1];
 			temp1 *= temp1;
-			c = temp - DELTA(iip1) * (dpsi + dphi) - (D(iim1) - D(
-				iip1)) * temp1;
-			zz[0] = Z(iim1) * Z(iim1);
-			zz[2] = DELTA(iip1) * DELTA(iip1) * (dpsi - temp1 + 
+			c__ = temp - delta[iip1] * (dpsi + dphi) - (d__[iim1] 
+				- d__[iip1]) * temp1;
+			zz[0] = z__[iim1] * z__[iim1];
+			zz[2] = delta[iip1] * delta[iip1] * (dpsi - temp1 + 
 				dphi);
 		    } else {
-			temp1 = Z(iip1) / DELTA(iip1);
+			temp1 = z__[iip1] / delta[iip1];
 			temp1 *= temp1;
-			c = temp - DELTA(iim1) * (dpsi + dphi) - (D(iip1) - D(
-				iim1)) * temp1;
-			zz[0] = DELTA(iim1) * DELTA(iim1) * (dpsi + (dphi - 
+			c__ = temp - delta[iim1] * (dpsi + dphi) - (d__[iip1] 
+				- d__[iim1]) * temp1;
+			zz[0] = delta[iim1] * delta[iim1] * (dpsi + (dphi - 
 				temp1));
-			zz[2] = Z(iip1) * Z(iip1);
+			zz[2] = z__[iip1] * z__[iip1];
 		    }
 		}
-		slaed6_(&niter, &orgati, &c, &DELTA(iim1), zz, &w, &eta, info)
-			;
+		slaed6_(&niter, &orgati, &c__, &delta[iim1], zz, &w, &eta, 
+			info);
 		if (*info != 0) {
 		    goto L250;
 		}
@@ -803,29 +841,20 @@
              will guarantee eta*w < 0. */
 
 	    if (w * eta >= 0.f) {
-		eta = -(doublereal)w / dw;
+		eta = -w / dw;
 	    }
 	    temp = tau + eta;
-	    del = (D(ip1) - D(*i)) / 2.f;
-	    if (orgati) {
-		if (temp >= del) {
-		    eta = del - tau;
-		}
-		if (temp <= 0.f) {
-		    eta /= 2.f;
-		}
-	    } else {
-		if (temp <= -(doublereal)del) {
-		    eta = -(doublereal)del - tau;
-		}
-		if (temp >= 0.f) {
-		    eta /= 2.f;
+	    if (temp > dltub || temp < dltlb) {
+		if (w < 0.f) {
+		    eta = (dltub - tau) / 2.f;
+		} else {
+		    eta = (dltlb - tau) / 2.f;
 		}
 	    }
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		DELTA(j) -= eta;
+	    for (j = 1; j <= i__1; ++j) {
+		delta[j] -= eta;
 /* L210: */
 	    }
 
@@ -838,9 +867,9 @@
 	    psi = 0.f;
 	    erretm = 0.f;
 	    i__1 = iim1;
-	    for (j = 1; j <= iim1; ++j) {
-		temp = Z(j) / DELTA(j);
-		psi += Z(j) * temp;
+	    for (j = 1; j <= i__1; ++j) {
+		temp = z__[j] / delta[j];
+		psi += z__[j] * temp;
 		dpsi += temp * temp;
 		erretm += psi;
 /* L220: */
@@ -852,17 +881,17 @@
 	    dphi = 0.f;
 	    phi = 0.f;
 	    i__1 = iip1;
-	    for (j = *n; j >= iip1; --j) {
-		temp = Z(j) / DELTA(j);
-		phi += Z(j) * temp;
+	    for (j = *n; j >= i__1; --j) {
+		temp = z__[j] / delta[j];
+		phi += z__[j] * temp;
 		dphi += temp * temp;
 		erretm += phi;
 /* L230: */
 	    }
 
-	    temp = Z(ii) / DELTA(ii);
+	    temp = z__[ii] / delta[ii];
 	    dw = dpsi + dphi + temp * temp;
-	    temp = Z(ii) * temp;
+	    temp = z__[ii] * temp;
 	    w = rhoinv + phi + psi + temp;
 	    erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 
 		    3.f + dabs(tau) * dw;
@@ -877,14 +906,15 @@
 
 	*info = 1;
 	if (orgati) {
-	    *dlam = D(*i) + tau;
+	    *dlam = d__[*i__] + tau;
 	} else {
-	    *dlam = D(ip1) + tau;
+	    *dlam = d__[ip1] + tau;
 	}
 
     }
 
 L250:
+
     return 0;
 
 /*     End of SLAED4 */

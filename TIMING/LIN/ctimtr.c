@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -44,7 +45,7 @@ static integer c__0 = 0;
     static real time;
     static integer isub, nrhs;
     static char uplo[1];
-    static integer i, n;
+    static integer i__, n;
     static char cname[6];
     extern logical lsame_(char *, char *);
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
@@ -80,7 +81,12 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -98,8 +104,7 @@ static integer c__0 = 0;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NN      (input) INTEGER   
@@ -152,8 +157,7 @@ static integer c__0 = 0;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nval;
@@ -165,28 +169,31 @@ static integer c__0 = 0;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Complex precision", 1L, 17L);
-    s_copy(path + 1, "TR", 2L, 2L);
-    atimin_(path, line, &c__2, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "TR", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__2, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L130;
     }
 
 /*     Check that N <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__2, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__2, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___7.ciunit = *nout;
 	s_wsfe(&io___7);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L130;
     }
@@ -214,10 +221,8 @@ static integer c__0 = 0;
 		lda = ldaval[ilda];
 		i3 = (iuplo - 1) * *nlda + ilda;
 
-/*              Do for each value of NB in NBVAL.  Only the bl
-ocked   
-                routines are timed in this loop since the othe
-r routines   
+/*              Do for each value of NB in NBVAL.  Only the blocked   
+                routines are timed in this loop since the other routines   
                 are independent of NB. */
 
 		if (timsub[0]) {
@@ -241,8 +246,7 @@ L10:
 			    goto L10;
 			}
 
-/*                    Subtract the time used in CTIMMG
-. */
+/*                    Subtract the time used in CTIMMG. */
 
 			icl = 1;
 			s1 = second_();
@@ -257,8 +261,8 @@ L20:
 
 			time = (time - untime) / (real) ic;
 			ops = sopla_("CTRTRI", &n, &n, &c__0, &c__0, &nb);
-			reslts[inb + (in + (i3 + reslts_dim3) * reslts_dim2) *
-				 reslts_dim1] = smflop_(&ops, &time, &info);
+			reslts_ref(inb, in, i3, 1) = smflop_(&ops, &time, &
+				info);
 /* L30: */
 		    }
 		} else {
@@ -272,8 +276,8 @@ L20:
 
 		if (timsub[1]) {
 		    i__3 = *nns;
-		    for (i = 1; i <= i__3; ++i) {
-			nrhs = nsval[i];
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			nrhs = nsval[i__];
 			ldb = lda;
 			ctimmg_(&c__0, &n, &nrhs, &b[1], &ldb, &c__0, &c__0);
 			ic = 0;
@@ -290,8 +294,7 @@ L40:
 			    goto L40;
 			}
 
-/*                    Subtract the time used in CTIMMG
-. */
+/*                    Subtract the time used in CTIMMG. */
 
 			icl = 1;
 			s1 = second_();
@@ -307,9 +310,8 @@ L50:
 
 			time = (time - untime) / (real) ic;
 			ops = sopla_("CTRTRS", &n, &nrhs, &c__0, &c__0, &c__0);
-			reslts[i + (in + (i3 + (reslts_dim3 << 1)) * 
-				reslts_dim2) * reslts_dim1] = smflop_(&ops, &
-				time, &info);
+			reslts_ref(i__, in, i3, 2) = smflop_(&ops, &time, &
+				info);
 /* L60: */
 		    }
 		}
@@ -328,15 +330,15 @@ L50:
 	}
 	io___29.ciunit = *nout;
 	s_wsfe(&io___29);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___30.ciunit = *nout;
 		s_wsfe(&io___30);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L100: */
 	    }
@@ -347,18 +349,18 @@ L50:
 	for (iuplo = 1; iuplo <= 2; ++iuplo) {
 	    io___32.ciunit = *nout;
 	    s_wsfe(&io___32);
-	    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-	    do_fio(&c__1, uplos + (iuplo - 1), 1L);
+	    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+	    do_fio(&c__1, uplos + (iuplo - 1), (ftnlen)1);
 	    e_wsfe();
 	    i3 = (iuplo - 1) * *nlda + 1;
 	    if (isub == 1) {
 		sprtbl_("NB", "N", nnb, &nbval[1], nn, &nval[1], nlda, &
-			reslts[((i3 + reslts_dim3) * reslts_dim2 + 1) * 
-			reslts_dim1 + 1], ldr1, ldr2, nout, 2L, 1L);
+			reslts_ref(1, 1, i3, 1), ldr1, ldr2, nout, (ftnlen)2, 
+			(ftnlen)1);
 	    } else if (isub == 2) {
 		sprtbl_("NRHS", "N", nns, &nsval[1], nn, &nval[1], nlda, &
-			reslts[((i3 + (reslts_dim3 << 1)) * reslts_dim2 + 1) *
-			 reslts_dim1 + 1], ldr1, ldr2, nout, 4L, 1L);
+			reslts_ref(1, 1, i3, 2), ldr1, ldr2, nout, (ftnlen)4, 
+			(ftnlen)1);
 	    }
 /* L110: */
 	}
@@ -372,4 +374,8 @@ L130:
 /*     End of CTIMTR */
 
 } /* ctimtr_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

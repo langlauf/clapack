@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cpptri_(char *uplo, integer *n, complex *ap, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -12,8 +13,7 @@
     Purpose   
     =======   
 
-    CPPTRI computes the inverse of a complex Hermitian positive definite 
-  
+    CPPTRI computes the inverse of a complex Hermitian positive definite   
     matrix A using the Cholesky factorization A = U**H*U or A = L*L**H   
     computed by CPPTRF.   
 
@@ -29,8 +29,7 @@
 
     AP      (input/output) COMPLEX array, dimension (N*(N+1)/2)   
             On entry, the triangular factor U or L from the Cholesky   
-            factorization A = U**H*U or A = L*L**H, packed columnwise as 
-  
+            factorization A = U**H*U or A = L*L**H, packed columnwise as   
             a linear array.  The j-th column of U or L is stored in the   
             array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j;   
@@ -42,26 +41,22 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is 
-  
+            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
                   zero, and the inverse could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b8 = 1.f;
     static integer c__1 = 1;
     
     /* System generated locals */
     integer i__1, i__2, i__3;
-    doublereal d__1;
+    real r__1;
     complex q__1;
     /* Local variables */
     extern /* Subroutine */ int chpr_(char *, integer *, real *, complex *, 
@@ -81,10 +76,9 @@
     static integer jjn;
 
 
+    --ap;
 
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -106,7 +100,7 @@
 
 /*     Invert the triangular Cholesky factor U or L. */
 
-    ctptri_(uplo, "Non-unit", n, &AP(1), info);
+    ctptri_(uplo, "Non-unit", n, &ap[1], info);
     if (*info > 0) {
 	return 0;
     }
@@ -116,16 +110,16 @@
 
 	jj = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jc = jj + 1;
 	    jj += j;
 	    if (j > 1) {
 		i__2 = j - 1;
-		chpr_("Upper", &i__2, &c_b8, &AP(jc), &c__1, &AP(1));
+		chpr_("Upper", &i__2, &c_b8, &ap[jc], &c__1, &ap[1]);
 	    }
 	    i__2 = jj;
-	    ajj = AP(jj).r;
-	    csscal_(&j, &ajj, &AP(jc), &c__1);
+	    ajj = ap[i__2].r;
+	    csscal_(&j, &ajj, &ap[jc], &c__1);
 /* L10: */
 	}
 
@@ -135,17 +129,17 @@
 
 	jj = 1;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    jjn = jj + *n - j + 1;
 	    i__2 = jj;
 	    i__3 = *n - j + 1;
-	    cdotc_(&q__1, &i__3, &AP(jj), &c__1, &AP(jj), &c__1);
-	    d__1 = q__1.r;
-	    AP(jj).r = d__1, AP(jj).i = 0.f;
+	    cdotc_(&q__1, &i__3, &ap[jj], &c__1, &ap[jj], &c__1);
+	    r__1 = q__1.r;
+	    ap[i__2].r = r__1, ap[i__2].i = 0.f;
 	    if (j < *n) {
 		i__2 = *n - j;
-		ctpmv_("Lower", "Conjugate transpose", "Non-unit", &i__2, &AP(
-			jjn), &AP(jj + 1), &c__1);
+		ctpmv_("Lower", "Conjugate transpose", "Non-unit", &i__2, &ap[
+			jjn], &ap[jj + 1], &c__1);
 	    }
 	    jj = jjn;
 /* L20: */

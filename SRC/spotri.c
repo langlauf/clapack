@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spotri_(char *uplo, integer *n, real *a, integer *lda, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -39,19 +40,15 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is 
-  
+            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
                   zero, and the inverse could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1;
     /* Local variables */
@@ -60,10 +57,11 @@
 	    char *, integer *, real *, integer *, integer *), strtri_(
 	    char *, char *, integer *, real *, integer *, integer *);
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
@@ -86,14 +84,14 @@
 
 /*     Invert the triangular Cholesky factor U or L. */
 
-    strtri_(uplo, "Non-unit", n, &A(1,1), lda, info);
+    strtri_(uplo, "Non-unit", n, &a[a_offset], lda, info);
     if (*info > 0) {
 	return 0;
     }
 
 /*     Form inv(U)*inv(U)' or inv(L)'*inv(L). */
 
-    slauum_(uplo, n, &A(1,1), lda, info);
+    slauum_(uplo, n, &a[a_offset], lda, info);
 
     return 0;
 

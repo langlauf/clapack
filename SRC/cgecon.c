@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cgecon_(char *norm, integer *n, complex *a, integer *lda,
 	 real *anorm, real *rcond, complex *work, real *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -12,8 +13,7 @@
     Purpose   
     =======   
 
-    CGECON estimates the reciprocal of the condition number of a general 
-  
+    CGECON estimates the reciprocal of the condition number of a general   
     complex matrix A, in either the 1-norm or the infinity-norm, using   
     the LU factorization computed by CGETRF.   
 
@@ -56,15 +56,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -95,12 +92,13 @@
     static real smlnum;
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --work;
+    --rwork;
 
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
     if (! onenrm && ! lsame_(norm, "I")) {
@@ -141,42 +139,44 @@
     }
     kase = 0;
 L10:
-    clacon_(n, &WORK(*n + 1), &WORK(1), &ainvnm, &kase);
+    clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (kase == kase1) {
 
 /*           Multiply by inv(L). */
 
-	    clatrs_("Lower", "No transpose", "Unit", normin, n, &A(1,1), 
-		    lda, &WORK(1), &sl, &RWORK(1), info);
+	    clatrs_("Lower", "No transpose", "Unit", normin, n, &a[a_offset], 
+		    lda, &work[1], &sl, &rwork[1], info);
 
 /*           Multiply by inv(U). */
 
-	    clatrs_("Upper", "No transpose", "Non-unit", normin, n, &A(1,1), lda, &WORK(1), &su, &RWORK(*n + 1), info);
+	    clatrs_("Upper", "No transpose", "Non-unit", normin, n, &a[
+		    a_offset], lda, &work[1], &su, &rwork[*n + 1], info);
 	} else {
 
 /*           Multiply by inv(U'). */
 
-	    clatrs_("Upper", "Conjugate transpose", "Non-unit", normin, n, &A(1,1), lda, &WORK(1), &su, &RWORK(*n + 1), info);
+	    clatrs_("Upper", "Conjugate transpose", "Non-unit", normin, n, &a[
+		    a_offset], lda, &work[1], &su, &rwork[*n + 1], info);
 
 /*           Multiply by inv(L'). */
 
-	    clatrs_("Lower", "Conjugate transpose", "Unit", normin, n, &A(1,1), lda, &WORK(1), &sl, &RWORK(1), info);
+	    clatrs_("Lower", "Conjugate transpose", "Unit", normin, n, &a[
+		    a_offset], lda, &work[1], &sl, &rwork[1], info);
 	}
 
-/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. 
-*/
+/*        Divide X by 1/(SL*SU) if doing so will not cause overflow. */
 
 	scale = sl * su;
 	*(unsigned char *)normin = 'Y';
 	if (scale != 1.f) {
-	    ix = icamax_(n, &WORK(1), &c__1);
+	    ix = icamax_(n, &work[1], &c__1);
 	    i__1 = ix;
-	    if (scale < ((r__1 = WORK(ix).r, dabs(r__1)) + (r__2 = r_imag(&
-		    WORK(ix)), dabs(r__2))) * smlnum || scale == 0.f) {
+	    if (scale < ((r__1 = work[i__1].r, dabs(r__1)) + (r__2 = r_imag(&
+		    work[ix]), dabs(r__2))) * smlnum || scale == 0.f) {
 		goto L20;
 	    }
-	    csrscl_(n, &scale, &WORK(1), &c__1);
+	    csrscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }

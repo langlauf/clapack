@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaed7_(integer *icompq, integer *n, integer *qsiz, 
-	integer *tlvls, integer *curlvl, integer *curpbm, real *d, real *q, 
+	integer *tlvls, integer *curlvl, integer *curpbm, real *d__, real *q, 
 	integer *ldq, integer *indxq, real *rho, integer *cutpnt, real *
 	qstore, integer *qptr, integer *prmptr, integer *perm, integer *
 	givptr, integer *givcol, real *givnum, real *work, integer *iwork, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -24,8 +25,7 @@
     the case in which all eigenvalues and eigenvectors of a symmetric   
     tridiagonal matrix are desired.   
 
-      T = Q(in) ( D(in) + RHO * Z*Z' ) Q'(in) = Q(out) * D(out) * Q'(out) 
-  
+      T = Q(in) ( D(in) + RHO * Z*Z' ) Q'(in) = Q(out) * D(out) * Q'(out)   
 
        where Z = Q'u, u is a vector of length N with ones in the   
        CUTPNT and CUTPNT + 1 th elements and zeros elsewhere.   
@@ -45,8 +45,7 @@
           This routine also calculates the eigenvectors of the current   
           problem.   
 
-          The final stage consists of computing the updated eigenvectors 
-  
+          The final stage consists of computing the updated eigenvectors   
           directly using the updated eigenvalues.  The eigenvectors for   
           the current problem are multiplied with the eigenvectors from   
           the overall problem.   
@@ -56,10 +55,8 @@
 
     ICOMPQ  (input) INTEGER   
             = 0:  Compute eigenvalues only.   
-            = 1:  Compute eigenvectors of original dense symmetric matrix 
-  
-                  also.  On entry, Q contains the orthogonal matrix used 
-  
+            = 1:  Compute eigenvectors of original dense symmetric matrix   
+                  also.  On entry, Q contains the orthogonal matrix used   
                   to reduce the original matrix to tridiagonal form.   
 
     N      (input) INTEGER   
@@ -67,8 +64,7 @@
 
     QSIZ   (input) INTEGER   
            The dimension of the orthogonal matrix used to reduce   
-           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1. 
-  
+           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1.   
 
     TLVLS  (input) INTEGER   
            The total number of merging levels in the overall divide and   
@@ -88,8 +84,7 @@
 
     Q      (input/output) REAL array, dimension (LDQ, N)   
            On entry, the eigenvectors of the rank-1-perturbed matrix.   
-           On exit, the eigenvectors of the repaired tridiagonal matrix. 
-  
+           On exit, the eigenvectors of the repaired tridiagonal matrix.   
 
     LDQ    (input) INTEGER   
            The leading dimension of the array Q.  LDQ >= max(1,N).   
@@ -130,13 +125,11 @@
 
     GIVPTR (input) INTEGER array, dimension (N lg N)   
            Contains a list of pointers which indicate where in GIVCOL a   
-           level's Givens rotations are stored.  GIVPTR(i+1) - GIVPTR(i) 
-  
+           level's Givens rotations are stored.  GIVPTR(i+1) - GIVPTR(i)   
            indicates the number of Givens rotations.   
 
     GIVCOL (input) INTEGER array, dimension (2, N lg N)   
-           Each pair of numbers indicates a pair of columns to take place 
-  
+           Each pair of numbers indicates a pair of columns to take place   
            in a Givens rotation.   
 
     GIVNUM (input) REAL array, dimension (2, N lg N)   
@@ -152,15 +145,19 @@
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
             > 0:  if INFO = 1, an eigenvalue did not converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__2 = 2;
     static integer c__1 = 1;
@@ -173,7 +170,7 @@
     /* Builtin functions */
     integer pow_ii(integer *, integer *);
     /* Local variables */
-    static integer indx, curr, i, k, indxc;
+    static integer indx, curr, i__, k, indxc;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
@@ -191,21 +188,26 @@
     extern /* Subroutine */ int xerbla_(char *, integer *), slamrg_(
 	    integer *, integer *, real *, integer *, integer *, integer *);
     static integer coltyp, iq2, ptr, ldq2;
+#define givcol_ref(a_1,a_2) givcol[(a_2)*2 + a_1]
+#define givnum_ref(a_1,a_2) givnum[(a_2)*2 + a_1]
 
 
+    --d__;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --indxq;
+    --qstore;
+    --qptr;
+    --prmptr;
+    --perm;
+    --givptr;
+    givcol -= 3;
+    givnum -= 3;
+    --work;
+    --iwork;
 
-#define D(I) d[(I)-1]
-#define INDXQ(I) indxq[(I)-1]
-#define QSTORE(I) qstore[(I)-1]
-#define QPTR(I) qptr[(I)-1]
-#define PRMPTR(I) prmptr[(I)-1]
-#define PERM(I) perm[(I)-1]
-#define GIVPTR(I) givptr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     *info = 0;
 
     if (*icompq < 0 || *icompq > 1) {
@@ -231,8 +233,7 @@
 	return 0;
     }
 
-/*     The following values are for bookkeeping purposes only.  They are 
-  
+/*     The following values are for bookkeeping purposes only.  They are   
        integer pointers which indicate the portion of the workspace   
        used by a particular array in SLAED8 and SLAED9. */
 
@@ -258,64 +259,62 @@
 
     ptr = pow_ii(&c__2, tlvls) + 1;
     i__1 = *curlvl - 1;
-    for (i = 1; i <= *curlvl-1; ++i) {
-	i__2 = *tlvls - i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = *tlvls - i__;
 	ptr += pow_ii(&c__2, &i__2);
 /* L10: */
     }
     curr = ptr + *curpbm;
-    slaeda_(n, tlvls, curlvl, curpbm, &PRMPTR(1), &PERM(1), &GIVPTR(1), &
-	    givcol[3], &givnum[3], &QSTORE(1), &QPTR(1), &WORK(iz), &WORK(iz 
-	    + *n), info);
+    slaeda_(n, tlvls, curlvl, curpbm, &prmptr[1], &perm[1], &givptr[1], &
+	    givcol[3], &givnum[3], &qstore[1], &qptr[1], &work[iz], &work[iz 
+	    + *n], info);
 
-/*     When solving the final problem, we no longer need the stored data, 
-  
-       so we will overwrite the data from this level onto the previously 
-  
+/*     When solving the final problem, we no longer need the stored data,   
+       so we will overwrite the data from this level onto the previously   
        used storage space. */
 
     if (*curlvl == *tlvls) {
-	QPTR(curr) = 1;
-	PRMPTR(curr) = 1;
-	GIVPTR(curr) = 1;
+	qptr[curr] = 1;
+	prmptr[curr] = 1;
+	givptr[curr] = 1;
     }
 
 /*     Sort and Deflate eigenvalues. */
 
-    slaed8_(icompq, &k, n, qsiz, &D(1), &Q(1,1), ldq, &INDXQ(1), rho, 
-	    cutpnt, &WORK(iz), &WORK(idlmda), &WORK(iq2), &ldq2, &WORK(iw), &
-	    PERM(PRMPTR(curr)), &GIVPTR(curr + 1), &givcol[(GIVPTR(curr) << 1)
-	     + 1], &givnum[(GIVPTR(curr) << 1) + 1], &IWORK(indxp), &IWORK(
-	    indx), info);
-    PRMPTR(curr + 1) = PRMPTR(curr) + *n;
-    GIVPTR(curr + 1) += GIVPTR(curr);
+    slaed8_(icompq, &k, n, qsiz, &d__[1], &q[q_offset], ldq, &indxq[1], rho, 
+	    cutpnt, &work[iz], &work[idlmda], &work[iq2], &ldq2, &work[iw], &
+	    perm[prmptr[curr]], &givptr[curr + 1], &givcol_ref(1, givptr[curr]
+	    ), &givnum_ref(1, givptr[curr]), &iwork[indxp], &iwork[indx], 
+	    info);
+    prmptr[curr + 1] = prmptr[curr] + *n;
+    givptr[curr + 1] += givptr[curr];
 
 /*     Solve Secular Equation. */
 
     if (k != 0) {
-	slaed9_(&k, &c__1, &k, n, &D(1), &WORK(is), &k, rho, &WORK(idlmda), &
-		WORK(iw), &QSTORE(QPTR(curr)), &k, info);
+	slaed9_(&k, &c__1, &k, n, &d__[1], &work[is], &k, rho, &work[idlmda], 
+		&work[iw], &qstore[qptr[curr]], &k, info);
 	if (*info != 0) {
 	    goto L30;
 	}
 	if (*icompq == 1) {
-	    sgemm_("N", "N", qsiz, &k, &k, &c_b10, &WORK(iq2), &ldq2, &QSTORE(
-		    QPTR(curr)), &k, &c_b11, &Q(1,1), ldq);
+	    sgemm_("N", "N", qsiz, &k, &k, &c_b10, &work[iq2], &ldq2, &qstore[
+		    qptr[curr]], &k, &c_b11, &q[q_offset], ldq);
 	}
 /* Computing 2nd power */
 	i__1 = k;
-	QPTR(curr + 1) = QPTR(curr) + i__1 * i__1;
+	qptr[curr + 1] = qptr[curr] + i__1 * i__1;
 
 /*     Prepare the INDXQ sorting permutation. */
 
 	n1 = k;
 	n2 = *n - k;
-	slamrg_(&n1, &n2, &D(1), &c__1, &c_n1, &INDXQ(1));
+	slamrg_(&n1, &n2, &d__[1], &c__1, &c_n1, &indxq[1]);
     } else {
-	QPTR(curr + 1) = QPTR(curr);
+	qptr[curr + 1] = qptr[curr];
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    INDXQ(i) = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    indxq[i__] = i__;
 /* L20: */
 	}
     }
@@ -326,4 +325,8 @@ L30:
 /*     End of SLAED7 */
 
 } /* slaed7_ */
+
+#undef givnum_ref
+#undef givcol_ref
+
 

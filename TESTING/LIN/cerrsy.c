@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,8 +33,7 @@ static integer c__4 = 4;
 {
     /* System generated locals */
     integer i__1;
-    real r__1;
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1;
 
     /* Builtin functions */
@@ -44,8 +44,8 @@ static integer c__4 = 4;
     static integer info;
     static real anrm;
     static complex a[16]	/* was [4][4] */, b[4];
-    static integer i, j;
-    static real r[4];
+    static integer i__, j;
+    static real r__[4];
     static complex w[8], x[4];
     static real rcond;
     static char c2[2];
@@ -79,7 +79,13 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -100,29 +106,28 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = i + (j << 2) - 5;
-	    d__1 = 1.f / (real) (i + j);
-	    d__2 = -1.f / (real) (i + j);
-	    q__1.r = d__1, q__1.i = d__2;
+	    i__1 = af_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    r__2 = -1.f / (real) (i__ + j);
+	    q__1.r = r__1, q__1.i = r__2;
 	    af[i__1].r = q__1.r, af[i__1].i = q__1.i;
 /* L10: */
 	}
@@ -147,7 +152,7 @@ static integer c__4 = 4;
 
 /*        CSYTRF */
 
-	s_copy(srnamc_1.srnamt, "CSYTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytrf_("/", &c__0, a, &c__1, ip, w, &c__1, &info);
 	chkxer_("CSYTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -163,7 +168,7 @@ static integer c__4 = 4;
 
 /*        CSYTF2 */
 
-	s_copy(srnamc_1.srnamt, "CSYTF2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYTF2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytf2_("/", &c__0, a, &c__1, ip, &info);
 	chkxer_("CSYTF2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -179,7 +184,7 @@ static integer c__4 = 4;
 
 /*        CSYTRI */
 
-	s_copy(srnamc_1.srnamt, "CSYTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytri_("/", &c__0, a, &c__1, ip, w, &info);
 	chkxer_("CSYTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -195,7 +200,7 @@ static integer c__4 = 4;
 
 /*        CSYTRS */
 
-	s_copy(srnamc_1.srnamt, "CSYTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csytrs_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("CSYTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -219,46 +224,46 @@ static integer c__4 = 4;
 
 /*        CSYRFS */
 
-	s_copy(srnamc_1.srnamt, "CSYRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csyrfs_("/", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	csyrfs_("U", &c_n1, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	csyrfs_("U", &c__0, &c_n1, a, &c__1, af, &c__1, ip, b, &c__1, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	csyrfs_("U", &c__2, &c__1, a, &c__1, af, &c__2, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	csyrfs_("U", &c__2, &c__1, a, &c__2, af, &c__1, ip, b, &c__2, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	csyrfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__1, x, &
-		c__2, r1, r2, w, r, &info);
+		c__2, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	csyrfs_("U", &c__2, &c__1, a, &c__2, af, &c__2, ip, b, &c__2, x, &
-		c__1, r1, r2, w, r, &info);
+		c__1, r1, r2, w, r__, &info);
 	chkxer_("CSYRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CSYCON */
 
-	s_copy(srnamc_1.srnamt, "CSYCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSYCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csycon_("/", &c__0, a, &c__1, ip, &anrm, &rcond, w, &info);
 	chkxer_("CSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -272,20 +277,19 @@ static integer c__4 = 4;
 	chkxer_("CSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	r__1 = -(doublereal)anrm;
+	r__1 = -anrm;
 	csycon_("U", &c__1, a, &c__1, ip, &r__1, &rcond, w, &info);
 	chkxer_("CSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the diagonal pivoting
-   
+/*     Test error exits of the routines that use the diagonal pivoting   
        factorization of a symmetric indefinite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
 /*        CSPTRF */
 
-	s_copy(srnamc_1.srnamt, "CSPTRF", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptrf_("/", &c__0, a, ip, &info);
 	chkxer_("CSPTRF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -297,7 +301,7 @@ static integer c__4 = 4;
 
 /*        CSPTRI */
 
-	s_copy(srnamc_1.srnamt, "CSPTRI", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptri_("/", &c__0, a, ip, w, &info);
 	chkxer_("CSPTRI", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -309,7 +313,7 @@ static integer c__4 = 4;
 
 /*        CSPTRS */
 
-	s_copy(srnamc_1.srnamt, "CSPTRS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSPTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csptrs_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("CSPTRS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -329,36 +333,36 @@ static integer c__4 = 4;
 
 /*        CSPRFS */
 
-	s_copy(srnamc_1.srnamt, "CSPRFS", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	csprfs_("/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("CSPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	csprfs_("U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("CSPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	csprfs_("U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("CSPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	csprfs_("U", &c__2, &c__1, a, af, ip, b, &c__1, x, &c__2, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("CSPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	csprfs_("U", &c__2, &c__1, a, af, ip, b, &c__2, x, &c__1, r1, r2, w, 
-		r, &info);
+		r__, &info);
 	chkxer_("CSPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        CSPCON */
 
-	s_copy(srnamc_1.srnamt, "CSPCON", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CSPCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cspcon_("/", &c__0, a, ip, &anrm, &rcond, w, &info);
 	chkxer_("CSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -368,7 +372,7 @@ static integer c__4 = 4;
 	chkxer_("CSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	r__1 = -(doublereal)anrm;
+	r__1 = -anrm;
 	cspcon_("U", &c__1, a, ip, &r__1, &rcond, w, &info);
 	chkxer_("CSPCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -383,4 +387,10 @@ static integer c__4 = 4;
 /*     End of CERRSY */
 
 } /* cerrsy_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,7 +14,7 @@ static logical c_true = TRUE_;
 static logical c_false = FALSE_;
 
 /* Subroutine */ int slatms_(integer *m, integer *n, char *dist, integer *
-	iseed, char *sym, real *d, integer *mode, real *cond, real *dmax__, 
+	iseed, char *sym, real *d__, integer *mode, real *cond, real *dmax__, 
 	integer *kl, integer *ku, char *pack, real *a, integer *lda, real *
 	work, integer *info)
 {
@@ -29,8 +30,8 @@ static logical c_false = FALSE_;
     static integer ilda, icol;
     static real temp;
     static integer irow, isym;
-    static real c;
-    static integer i, j, k;
+    static real c__;
+    static integer i__, j, k;
     static real s, alpha, angle;
     static integer ipack, ioffg;
     extern logical lsame_(char *, char *);
@@ -60,7 +61,10 @@ static logical c_false = FALSE_;
     static integer ir1, ir2, isympk, jch, llb, jkl, jku, uub;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -102,11 +106,9 @@ static logical c_false = FALSE_;
 
          Method A is chosen if the bandwidth is a large fraction of the   
              order of the matrix, and LDA is at least M (so a dense   
-             matrix can be stored.)  Method B is chosen if the bandwidth 
-  
+             matrix can be stored.)  Method B is chosen if the bandwidth   
              is small (< 1/2 N for symmetric, < .3 N+M for   
-             non-symmetric), or LDA is less than M and not less than the 
-  
+             non-symmetric), or LDA is less than M and not less than the   
              bandwidth.   
 
          Pack the matrix if desired. Options specified by PACK are:   
@@ -123,8 +125,7 @@ static logical c_false = FALSE_;
                   or upper triangular)   
             store the entire matrix in banded format   
          If Method B is chosen, and band format is specified, then the   
-            matrix will be generated in the band format, so no repacking 
-  
+            matrix will be generated in the band format, so no repacking   
             will be necessary.   
 
     Arguments   
@@ -137,8 +138,7 @@ static logical c_false = FALSE_;
              The number of columns of A. Not modified.   
 
     DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used 
-  
+             On entry, DIST specifies the type of distribution to be used   
              to generate the random eigen-/singular values.   
              'U' => UNIFORM( 0, 1 )  ( 'U' for uniform )   
              'S' => UNIFORM( -1, 1 ) ( 'S' for symmetric )   
@@ -177,8 +177,7 @@ static logical c_false = FALSE_;
              Modified if MODE is nonzero.   
 
     MODE   - INTEGER   
-             On entry this describes how the singular/eigenvalues are to 
-  
+             On entry this describes how the singular/eigenvalues are to   
              be specified:   
              MODE = 0 means use D as input   
              MODE = 1 sets D(1)=1 and D(2:N)=1.0/COND   
@@ -206,20 +205,16 @@ static logical c_false = FALSE_;
     DMAX   - REAL   
              If MODE is neither -6, 0 nor 6, the contents of D, as   
              computed according to MODE and COND, will be scaled by   
-             DMAX / max(abs(D(i))); thus, the maximum absolute eigen- or 
-  
-             singular value (which is to say the norm) will be abs(DMAX). 
-  
+             DMAX / max(abs(D(i))); thus, the maximum absolute eigen- or   
+             singular value (which is to say the norm) will be abs(DMAX).   
              Note that DMAX need not be positive: if DMAX is negative   
-             (or zero), D will be scaled by a negative number (or zero). 
-  
+             (or zero), D will be scaled by a negative number (or zero).   
              Not modified.   
 
     KL     - INTEGER   
              This specifies the lower bandwidth of the  matrix. For   
              example, KL=0 implies upper triangular, KL=1 implies upper   
-             Hessenberg, and KL being at least M-1 means that the matrix 
-  
+             Hessenberg, and KL being at least M-1 means that the matrix   
              has full lower bandwidth.  KL must equal KU if the matrix   
              is symmetric.   
              Not modified.   
@@ -227,8 +222,7 @@ static logical c_false = FALSE_;
     KU     - INTEGER   
              This specifies the upper bandwidth of the  matrix. For   
              example, KU=0 implies lower triangular, KU=1 implies lower   
-             Hessenberg, and KU being at least N-1 means that the matrix 
-  
+             Hessenberg, and KU being at least N-1 means that the matrix   
              has full upper bandwidth.  KL must equal KU if the matrix   
              is symmetric.   
              Not modified.   
@@ -239,11 +233,9 @@ static logical c_false = FALSE_;
              'U' => zero out all subdiagonal entries (if symmetric)   
              'L' => zero out all superdiagonal entries (if symmetric)   
              'C' => store the upper triangle columnwise   
-                    (only if the matrix is symmetric or upper triangular) 
-  
+                    (only if the matrix is symmetric or upper triangular)   
              'R' => store the lower triangle columnwise   
-                    (only if the matrix is symmetric or lower triangular) 
-  
+                    (only if the matrix is symmetric or lower triangular)   
              'B' => store the lower triangle in band storage scheme   
                     (only if matrix symmetric or lower triangular)   
              'Q' => store the upper triangle in band storage scheme   
@@ -264,8 +256,7 @@ static logical c_false = FALSE_;
              Not modified.   
 
     A      - REAL array, dimension ( LDA, N )   
-             On exit A is the desired test matrix.  A is first generated 
-  
+             On exit A is the desired test matrix.  A is first generated   
              in full (unpacked) form, and then packed, if so specified   
              by PACK.  Thus, the first M elements of the first N   
              columns will always be modified.  If PACK specifies a   
@@ -299,24 +290,19 @@ static logical c_false = FALSE_;
               -7 => MODE not in range -6 to 6   
               -8 => COND less than 1.0, and MODE neither -6, 0 nor 6   
              -10 => KL negative   
-             -11 => KU negative, or SYM='S' or 'H' and KU not equal to KL 
-  
-             -12 => PACK illegal string, or PACK='U' or 'L', and SYM='N'; 
-  
+             -11 => KU negative, or SYM='S' or 'H' and KU not equal to KL   
+             -12 => PACK illegal string, or PACK='U' or 'L', and SYM='N';   
                     or PACK='C' or 'Q' and SYM='N' and KL is not zero;   
                     or PACK='R' or 'B' and SYM='N' and KU is not zero;   
-                    or PACK='U', 'L', 'C', 'R', 'B', or 'Q', and M is not 
-  
+                    or PACK='U', 'L', 'C', 'R', 'B', or 'Q', and M is not   
                     N.   
-             -14 => LDA is less than M, or PACK='Z' and LDA is less than 
-  
+             -14 => LDA is less than M, or PACK='Z' and LDA is less than   
                     MIN(KU,N-1) + MIN(KL,M-1) + 1.   
               1  => Error return from SLATM1   
               2  => Cannot scale to DMAX (max. sing. value is 0)   
               3  => Error return from SLAGGE or SLAGSY   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Decode and Test the input parameters.   
@@ -324,9 +310,9 @@ static logical c_false = FALSE_;
 
        Parameter adjustments */
     --iseed;
-    --d;
+    --d__;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --work;
 
@@ -477,8 +463,8 @@ static logical c_false = FALSE_;
 
 /*     Initialize random number generator */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i] = (i__1 = iseed[i], abs(i__1)) % 4096;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__] = (i__1 = iseed[i__], abs(i__1)) % 4096;
 /* L10: */
     }
 
@@ -490,7 +476,7 @@ static logical c_false = FALSE_;
 
                Compute D according to COND and MODE */
 
-    slatm1_(mode, cond, &irsign, &idist, &iseed[1], &d[1], &mnmin, &iinfo);
+    slatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], &mnmin, &iinfo);
     if (iinfo != 0) {
 	*info = 1;
 	return 0;
@@ -499,7 +485,7 @@ static logical c_false = FALSE_;
 /*     Choose Top-Down if D is (apparently) increasing,   
        Bottom-Up if D is (apparently) decreasing. */
 
-    if (dabs(d[1]) <= (r__1 = d[mnmin], dabs(r__1))) {
+    if (dabs(d__[1]) <= (r__1 = d__[mnmin], dabs(r__1))) {
 	topdwn = TRUE_;
     } else {
 	topdwn = FALSE_;
@@ -509,11 +495,11 @@ static logical c_false = FALSE_;
 
 /*        Scale by DMAX */
 
-	temp = dabs(d[1]);
+	temp = dabs(d__[1]);
 	i__1 = mnmin;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__2 = temp, r__3 = (r__1 = d[i], dabs(r__1));
+	    r__2 = temp, r__3 = (r__1 = d__[i__], dabs(r__1));
 	    temp = dmax(r__2,r__3);
 /* L20: */
 	}
@@ -525,7 +511,7 @@ static logical c_false = FALSE_;
 	    return 0;
 	}
 
-	sscal_(&mnmin, &alpha, &d[1], &c__1);
+	sscal_(&mnmin, &alpha, &d__[1], &c__1);
 
     }
 
@@ -564,7 +550,7 @@ static logical c_false = FALSE_;
 
     if (llb == 0 && uub == 0) {
 	i__1 = ilda + 1;
-	scopy_(&mnmin, &d[1], &c__1, &a[1 - iskew + ioffst + a_dim1], &i__1);
+	scopy_(&mnmin, &d__[1], &c__1, &a_ref(1 - iskew + ioffst, 1), &i__1);
 	if (ipack <= 2 || ipack >= 5) {
 	    ipackg = ipack;
 	}
@@ -585,7 +571,7 @@ static logical c_false = FALSE_;
 	    }
 
 	    i__1 = ilda + 1;
-	    scopy_(&mnmin, &d[1], &c__1, &a[1 - iskew + ioffst + a_dim1], &
+	    scopy_(&mnmin, &d__[1], &c__1, &a_ref(1 - iskew + ioffst, 1), &
 		    i__1);
 
 	    if (topdwn) {
@@ -593,12 +579,10 @@ static logical c_false = FALSE_;
 		i__1 = uub;
 		for (jku = 1; jku <= i__1; ++jku) {
 
-/*                 Transform from bandwidth JKL, JKU-1 to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL, JKU-1 to JKL, JKU   
 
                    Last row actually rotated is M   
-                   Last column actually rotated is MIN( M+
-JKU, N )   
+                   Last column actually rotated is MIN( M+JKU, N )   
 
    Computing MIN */
 		    i__3 = *m + jku;
@@ -607,7 +591,7 @@ JKU, N )
 			extra = 0.f;
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
+			c__ = cos(angle);
 			s = sin(angle);
 /* Computing MAX */
 			i__3 = 1, i__4 = jr - jkl;
@@ -617,9 +601,9 @@ JKU, N )
 			    i__3 = *n, i__4 = jr + jku;
 			    il = min(i__3,i__4) + 1 - icol;
 			    L__1 = jr > jkl;
-			    slarot_(&c_true, &L__1, &c_false, &il, &c, &s, &a[
-				    jr - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &extra, &dummy);
+			    slarot_(&c_true, &L__1, &c_false, &il, &c__, &s, &
+				    a_ref(jr - iskew * icol + ioffst, icol), &
+				    ilda, &extra, &dummy);
 			}
 
 /*                    Chase "EXTRA" back up */
@@ -630,9 +614,9 @@ JKU, N )
 			for (jch = jr - jkl; i__3 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__3) {
 			    if (ir < *m) {
-				slartg_(&a[ir + 1 - iskew * (ic + 1) + ioffst 
-					+ (ic + 1) * a_dim1], &extra, &c, &s, 
-					&dummy);
+				slartg_(&a_ref(ir + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &extra, &c__, &s, &
+					dummy);
 			    }
 /* Computing MAX */
 			    i__4 = 1, i__5 = jch - jku;
@@ -640,25 +624,24 @@ JKU, N )
 			    il = ir + 2 - irow;
 			    temp = 0.f;
 			    iltemp = jch > jku;
-			    r__1 = -(doublereal)s;
-			    slarot_(&c_false, &iltemp, &c_true, &il, &c, &
-				    r__1, &a[irow - iskew * ic + ioffst + ic *
-				     a_dim1], &ilda, &temp, &extra);
+			    r__1 = -s;
+			    slarot_(&c_false, &iltemp, &c_true, &il, &c__, &
+				    r__1, &a_ref(irow - iskew * ic + ioffst, 
+				    ic), &ilda, &temp, &extra);
 			    if (iltemp) {
-				slartg_(&a[irow + 1 - iskew * (ic + 1) + 
-					ioffst + (ic + 1) * a_dim1], &temp, &
-					c, &s, &dummy);
+				slartg_(&a_ref(irow + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &temp, &c__, &s, &
+					dummy);
 /* Computing MAX */
 				i__4 = 1, i__5 = jch - jku - jkl;
 				icol = max(i__4,i__5);
 				il = ic + 2 - icol;
 				extra = 0.f;
 				L__1 = jch > jku + jkl;
-				r__1 = -(doublereal)s;
-				slarot_(&c_true, &L__1, &c_true, &il, &c, &
-					r__1, &a[irow - iskew * icol + ioffst 
-					+ icol * a_dim1], &ilda, &extra, &
-					temp);
+				r__1 = -s;
+				slarot_(&c_true, &L__1, &c_true, &il, &c__, &
+					r__1, &a_ref(irow - iskew * icol + 
+					ioffst, icol), &ilda, &extra, &temp);
 				ic = icol;
 				ir = irow;
 			    }
@@ -673,8 +656,7 @@ JKU, N )
 		i__1 = llb;
 		for (jkl = 1; jkl <= i__1; ++jkl) {
 
-/*                 Transform from bandwidth JKL-1, JKU to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL-1, JKU to JKL, JKU   
 
    Computing MIN */
 		    i__3 = *n + jkl;
@@ -683,7 +665,7 @@ JKL, JKU
 			extra = 0.f;
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
+			c__ = cos(angle);
 			s = sin(angle);
 /* Computing MAX */
 			i__3 = 1, i__4 = jc - jku;
@@ -693,9 +675,9 @@ JKL, JKU
 			    i__3 = *m, i__4 = jc + jkl;
 			    il = min(i__3,i__4) + 1 - irow;
 			    L__1 = jc > jku;
-			    slarot_(&c_false, &L__1, &c_false, &il, &c, &s, &
-				    a[irow - iskew * jc + ioffst + jc * 
-				    a_dim1], &ilda, &extra, &dummy);
+			    slarot_(&c_false, &L__1, &c_false, &il, &c__, &s, 
+				    &a_ref(irow - iskew * jc + ioffst, jc), &
+				    ilda, &extra, &dummy);
 			}
 
 /*                    Chase "EXTRA" back up */
@@ -706,9 +688,9 @@ JKL, JKU
 			for (jch = jc - jku; i__3 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__3) {
 			    if (ic < *n) {
-				slartg_(&a[ir + 1 - iskew * (ic + 1) + ioffst 
-					+ (ic + 1) * a_dim1], &extra, &c, &s, 
-					&dummy);
+				slartg_(&a_ref(ir + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &extra, &c__, &s, &
+					dummy);
 			    }
 /* Computing MAX */
 			    i__4 = 1, i__5 = jch - jkl;
@@ -716,25 +698,24 @@ JKL, JKU
 			    il = ic + 2 - icol;
 			    temp = 0.f;
 			    iltemp = jch > jkl;
-			    r__1 = -(doublereal)s;
-			    slarot_(&c_true, &iltemp, &c_true, &il, &c, &r__1,
-				     &a[ir - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &temp, &extra);
+			    r__1 = -s;
+			    slarot_(&c_true, &iltemp, &c_true, &il, &c__, &
+				    r__1, &a_ref(ir - iskew * icol + ioffst, 
+				    icol), &ilda, &temp, &extra);
 			    if (iltemp) {
-				slartg_(&a[ir + 1 - iskew * (icol + 1) + 
-					ioffst + (icol + 1) * a_dim1], &temp, 
-					&c, &s, &dummy);
+				slartg_(&a_ref(ir + 1 - iskew * (icol + 1) + 
+					ioffst, icol + 1), &temp, &c__, &s, &
+					dummy);
 /* Computing MAX */
 				i__4 = 1, i__5 = jch - jkl - jku;
 				irow = max(i__4,i__5);
 				il = ir + 2 - irow;
 				extra = 0.f;
 				L__1 = jch > jkl + jku;
-				r__1 = -(doublereal)s;
-				slarot_(&c_false, &L__1, &c_true, &il, &c, &
-					r__1, &a[irow - iskew * icol + ioffst 
-					+ icol * a_dim1], &ilda, &extra, &
-					temp);
+				r__1 = -s;
+				slarot_(&c_false, &L__1, &c_true, &il, &c__, &
+					r__1, &a_ref(irow - iskew * icol + 
+					ioffst, icol), &ilda, &extra, &temp);
 				ic = icol;
 				ir = irow;
 			    }
@@ -753,12 +734,10 @@ JKL, JKU
 		i__1 = uub;
 		for (jku = 1; jku <= i__1; ++jku) {
 
-/*                 Transform from bandwidth JKL, JKU-1 to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL, JKU-1 to JKL, JKU   
 
                    First row actually rotated is M   
-                   First column actually rotated is MIN( M
-+JKU, N )   
+                   First column actually rotated is MIN( M+JKU, N )   
 
    Computing MIN */
 		    i__2 = *m, i__3 = *n + jkl;
@@ -770,7 +749,7 @@ JKL, JKU
 			extra = 0.f;
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
+			c__ = cos(angle);
 			s = sin(angle);
 /* Computing MAX */
 			i__2 = 1, i__4 = jc - jku + 1;
@@ -780,9 +759,9 @@ JKL, JKU
 			    i__2 = *m, i__4 = jc + jkl + 1;
 			    il = min(i__2,i__4) + 1 - irow;
 			    L__1 = jc + jkl < *m;
-			    slarot_(&c_false, &c_false, &L__1, &il, &c, &s, &
-				    a[irow - iskew * jc + ioffst + jc * 
-				    a_dim1], &ilda, &dummy, &extra);
+			    slarot_(&c_false, &c_false, &L__1, &il, &c__, &s, 
+				    &a_ref(irow - iskew * jc + ioffst, jc), &
+				    ilda, &dummy, &extra);
 			}
 
 /*                    Chase "EXTRA" back down */
@@ -794,8 +773,8 @@ JKL, JKU
 				i__2; jch += i__4) {
 			    ilextr = ic > 0;
 			    if (ilextr) {
-				slartg_(&a[jch - iskew * ic + ioffst + ic * 
-					a_dim1], &extra, &c, &s, &dummy);
+				slartg_(&a_ref(jch - iskew * ic + ioffst, ic),
+					 &extra, &c__, &s, &dummy);
 			    }
 			    ic = max(1,ic);
 /* Computing MIN */
@@ -804,20 +783,20 @@ JKL, JKU
 			    iltemp = jch + jku < *n;
 			    temp = 0.f;
 			    i__5 = icol + 2 - ic;
-			    slarot_(&c_true, &ilextr, &iltemp, &i__5, &c, &s, 
-				    &a[jch - iskew * ic + ioffst + ic * 
-				    a_dim1], &ilda, &extra, &temp);
+			    slarot_(&c_true, &ilextr, &iltemp, &i__5, &c__, &
+				    s, &a_ref(jch - iskew * ic + ioffst, ic), 
+				    &ilda, &extra, &temp);
 			    if (iltemp) {
-				slartg_(&a[jch - iskew * icol + ioffst + icol 
-					* a_dim1], &temp, &c, &s, &dummy);
+				slartg_(&a_ref(jch - iskew * icol + ioffst, 
+					icol), &temp, &c__, &s, &dummy);
 /* Computing MIN */
 				i__5 = iendch, i__6 = jch + jkl + jku;
 				il = min(i__5,i__6) + 2 - jch;
 				extra = 0.f;
 				L__1 = jch + jkl + jku <= iendch;
-				slarot_(&c_false, &c_true, &L__1, &il, &c, &s,
-					 &a[jch - iskew * icol + ioffst + 
-					icol * a_dim1], &ilda, &temp, &extra);
+				slarot_(&c_false, &c_true, &L__1, &il, &c__, &
+					s, &a_ref(jch - iskew * icol + ioffst,
+					 icol), &ilda, &temp, &extra);
 				ic = icol;
 			    }
 /* L90: */
@@ -831,11 +810,9 @@ JKL, JKU
 		i__1 = llb;
 		for (jkl = 1; jkl <= i__1; ++jkl) {
 
-/*                 Transform from bandwidth JKL-1, JKU to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL-1, JKU to JKL, JKU   
 
-                   First row actually rotated is MIN( N+JK
-L, M )   
+                   First row actually rotated is MIN( N+JKL, M )   
                    First column actually rotated is N   
 
    Computing MIN */
@@ -848,7 +825,7 @@ L, M )
 			extra = 0.f;
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
+			c__ = cos(angle);
 			s = sin(angle);
 /* Computing MAX */
 			i__3 = 1, i__2 = jr - jkl + 1;
@@ -858,9 +835,9 @@ L, M )
 			    i__3 = *n, i__2 = jr + jku + 1;
 			    il = min(i__3,i__2) + 1 - icol;
 			    L__1 = jr + jku < *n;
-			    slarot_(&c_true, &c_false, &L__1, &il, &c, &s, &a[
-				    jr - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &dummy, &extra);
+			    slarot_(&c_true, &c_false, &L__1, &il, &c__, &s, &
+				    a_ref(jr - iskew * icol + ioffst, icol), &
+				    ilda, &dummy, &extra);
 			}
 
 /*                    Chase "EXTRA" back down */
@@ -872,8 +849,8 @@ L, M )
 				i__3; jch += i__2) {
 			    ilextr = ir > 0;
 			    if (ilextr) {
-				slartg_(&a[ir - iskew * jch + ioffst + jch * 
-					a_dim1], &extra, &c, &s, &dummy);
+				slartg_(&a_ref(ir - iskew * jch + ioffst, jch)
+					, &extra, &c__, &s, &dummy);
 			    }
 			    ir = max(1,ir);
 /* Computing MIN */
@@ -882,20 +859,20 @@ L, M )
 			    iltemp = jch + jkl < *m;
 			    temp = 0.f;
 			    i__5 = irow + 2 - ir;
-			    slarot_(&c_false, &ilextr, &iltemp, &i__5, &c, &s,
-				     &a[ir - iskew * jch + ioffst + jch * 
-				    a_dim1], &ilda, &extra, &temp);
+			    slarot_(&c_false, &ilextr, &iltemp, &i__5, &c__, &
+				    s, &a_ref(ir - iskew * jch + ioffst, jch),
+				     &ilda, &extra, &temp);
 			    if (iltemp) {
-				slartg_(&a[irow - iskew * jch + ioffst + jch *
-					 a_dim1], &temp, &c, &s, &dummy);
+				slartg_(&a_ref(irow - iskew * jch + ioffst, 
+					jch), &temp, &c__, &s, &dummy);
 /* Computing MIN */
 				i__5 = iendch, i__6 = jch + jkl + jku;
 				il = min(i__5,i__6) + 2 - jch;
 				extra = 0.f;
 				L__1 = jch + jkl + jku <= iendch;
-				slarot_(&c_true, &c_true, &L__1, &il, &c, &s, 
-					&a[irow - iskew * jch + ioffst + jch *
-					 a_dim1], &ilda, &temp, &extra);
+				slarot_(&c_true, &c_true, &L__1, &il, &c__, &
+					s, &a_ref(irow - iskew * jch + ioffst,
+					 jch), &ilda, &temp, &extra);
 				ir = irow;
 			    }
 /* L120: */
@@ -924,7 +901,7 @@ L, M )
 		    ipackg = 1;
 		}
 		i__1 = ilda + 1;
-		scopy_(&mnmin, &d[1], &c__1, &a[1 - iskew + ioffg + a_dim1], &
+		scopy_(&mnmin, &d__[1], &c__1, &a_ref(1 - iskew + ioffg, 1), &
 			i__1);
 
 		i__1 = uub;
@@ -938,40 +915,38 @@ L, M )
 			i__2 = jc + 1, i__3 = k + 2;
 			il = min(i__2,i__3);
 			extra = 0.f;
-			temp = a[jc - iskew * (jc + 1) + ioffg + (jc + 1) * 
-				a_dim1];
+			temp = a_ref(jc - iskew * (jc + 1) + ioffg, jc + 1);
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
+			c__ = cos(angle);
 			s = sin(angle);
 			L__1 = jc > k;
-			slarot_(&c_false, &L__1, &c_true, &il, &c, &s, &a[
-				irow - iskew * jc + ioffg + jc * a_dim1], &
-				ilda, &extra, &temp);
+			slarot_(&c_false, &L__1, &c_true, &il, &c__, &s, &
+				a_ref(irow - iskew * jc + ioffg, jc), &ilda, &
+				extra, &temp);
 /* Computing MIN */
 			i__3 = k, i__5 = *n - jc;
 			i__2 = min(i__3,i__5) + 1;
-			slarot_(&c_true, &c_true, &c_false, &i__2, &c, &s, &a[
-				(1 - iskew) * jc + ioffg + jc * a_dim1], &
-				ilda, &temp, &dummy);
+			slarot_(&c_true, &c_true, &c_false, &i__2, &c__, &s, &
+				a_ref((1 - iskew) * jc + ioffg, jc), &ilda, &
+				temp, &dummy);
 
-/*                    Chase EXTRA back up the matrix 
-*/
+/*                    Chase EXTRA back up the matrix */
 
 			icol = jc;
 			i__2 = -k;
 			for (jch = jc - k; i__2 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__2) {
-			    slartg_(&a[jch + 1 - iskew * (icol + 1) + ioffg + 
-				    (icol + 1) * a_dim1], &extra, &c, &s, &
+			    slartg_(&a_ref(jch + 1 - iskew * (icol + 1) + 
+				    ioffg, icol + 1), &extra, &c__, &s, &
 				    dummy);
-			    temp = a[jch - iskew * (jch + 1) + ioffg + (jch + 
-				    1) * a_dim1];
+			    temp = a_ref(jch - iskew * (jch + 1) + ioffg, jch 
+				    + 1);
 			    i__3 = k + 2;
-			    r__1 = -(doublereal)s;
-			    slarot_(&c_true, &c_true, &c_true, &i__3, &c, &
-				    r__1, &a[(1 - iskew) * jch + ioffg + jch *
-				     a_dim1], &ilda, &temp, &extra);
+			    r__1 = -s;
+			    slarot_(&c_true, &c_true, &c_true, &i__3, &c__, &
+				    r__1, &a_ref((1 - iskew) * jch + ioffg, 
+				    jch), &ilda, &temp, &extra);
 /* Computing MAX */
 			    i__3 = 1, i__5 = jch - k;
 			    irow = max(i__3,i__5);
@@ -980,10 +955,10 @@ L, M )
 			    il = min(i__3,i__5);
 			    extra = 0.f;
 			    L__1 = jch > k;
-			    r__1 = -(doublereal)s;
-			    slarot_(&c_false, &L__1, &c_true, &il, &c, &r__1, 
-				    &a[irow - iskew * jch + ioffg + jch * 
-				    a_dim1], &ilda, &extra, &temp);
+			    r__1 = -s;
+			    slarot_(&c_false, &L__1, &c_true, &il, &c__, &
+				    r__1, &a_ref(irow - iskew * jch + ioffg, 
+				    jch), &ilda, &extra, &temp);
 			    icol = jch;
 /* L150: */
 			}
@@ -992,10 +967,8 @@ L, M )
 /* L170: */
 		}
 
-/*              If we need lower triangle, copy from upper. No
-te that   
-                the order of copying is chosen to work for 'q'
- -> 'b' */
+/*              If we need lower triangle, copy from upper. Note that   
+                the order of copying is chosen to work for 'q' -> 'b' */
 
 		if (ipack != ipackg && ipack != 3) {
 		    i__1 = *n;
@@ -1005,8 +978,8 @@ te that
 			i__2 = *n, i__3 = jc + uub;
 			i__4 = min(i__2,i__3);
 			for (jr = jc; jr <= i__4; ++jr) {
-			    a[jr + irow + jc * a_dim1] = a[jc - iskew * jr + 
-				    ioffg + jr * a_dim1];
+			    a_ref(jr + irow, jc) = a_ref(jc - iskew * jr + 
+				    ioffg, jr);
 /* L180: */
 			}
 /* L190: */
@@ -1016,7 +989,7 @@ te that
 			for (jc = *n - uub + 1; jc <= i__1; ++jc) {
 			    i__4 = uub + 1;
 			    for (jr = *n + 2 - jc; jr <= i__4; ++jr) {
-				a[jr + jc * a_dim1] = 0.f;
+				a_ref(jr, jc) = 0.f;
 /* L200: */
 			    }
 /* L210: */
@@ -1041,7 +1014,7 @@ te that
 		    ipackg = 2;
 		}
 		i__1 = ilda + 1;
-		scopy_(&mnmin, &d[1], &c__1, &a[1 - iskew + ioffg + a_dim1], &
+		scopy_(&mnmin, &d__[1], &c__1, &a_ref(1 - iskew + ioffg, 1), &
 			i__1);
 
 		i__1 = uub;
@@ -1051,47 +1024,45 @@ te that
 			i__4 = *n + 1 - jc, i__2 = k + 2;
 			il = min(i__4,i__2);
 			extra = 0.f;
-			temp = a[(1 - iskew) * jc + 1 + ioffg + jc * a_dim1];
+			temp = a_ref((1 - iskew) * jc + 1 + ioffg, jc);
 			angle = slarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663f;
-			c = cos(angle);
-			s = -(doublereal)sin(angle);
+			c__ = cos(angle);
+			s = -sin(angle);
 			L__1 = *n - jc > k;
-			slarot_(&c_false, &c_true, &L__1, &il, &c, &s, &a[(1 
-				- iskew) * jc + ioffg + jc * a_dim1], &ilda, &
+			slarot_(&c_false, &c_true, &L__1, &il, &c__, &s, &
+				a_ref((1 - iskew) * jc + ioffg, jc), &ilda, &
 				temp, &extra);
 /* Computing MAX */
 			i__4 = 1, i__2 = jc - k + 1;
 			icol = max(i__4,i__2);
 			i__4 = jc + 2 - icol;
-			slarot_(&c_true, &c_false, &c_true, &i__4, &c, &s, &a[
-				jc - iskew * icol + ioffg + icol * a_dim1], &
-				ilda, &dummy, &temp);
+			slarot_(&c_true, &c_false, &c_true, &i__4, &c__, &s, &
+				a_ref(jc - iskew * icol + ioffg, icol), &ilda,
+				 &dummy, &temp);
 
-/*                    Chase EXTRA back down the matrix
- */
+/*                    Chase EXTRA back down the matrix */
 
 			icol = jc;
 			i__4 = *n - 1;
 			i__2 = k;
 			for (jch = jc + k; i__2 < 0 ? jch >= i__4 : jch <= 
 				i__4; jch += i__2) {
-			    slartg_(&a[jch - iskew * icol + ioffg + icol * 
-				    a_dim1], &extra, &c, &s, &dummy);
-			    temp = a[(1 - iskew) * jch + 1 + ioffg + jch * 
-				    a_dim1];
+			    slartg_(&a_ref(jch - iskew * icol + ioffg, icol), 
+				    &extra, &c__, &s, &dummy);
+			    temp = a_ref((1 - iskew) * jch + 1 + ioffg, jch);
 			    i__3 = k + 2;
-			    slarot_(&c_true, &c_true, &c_true, &i__3, &c, &s, 
-				    &a[jch - iskew * icol + ioffg + icol * 
-				    a_dim1], &ilda, &extra, &temp);
+			    slarot_(&c_true, &c_true, &c_true, &i__3, &c__, &
+				    s, &a_ref(jch - iskew * icol + ioffg, 
+				    icol), &ilda, &extra, &temp);
 /* Computing MIN */
 			    i__3 = *n + 1 - jch, i__5 = k + 2;
 			    il = min(i__3,i__5);
 			    extra = 0.f;
 			    L__1 = *n - jch > k;
-			    slarot_(&c_false, &c_true, &L__1, &il, &c, &s, &a[
-				    (1 - iskew) * jch + ioffg + jch * a_dim1],
-				     &ilda, &temp, &extra);
+			    slarot_(&c_false, &c_true, &L__1, &il, &c__, &s, &
+				    a_ref((1 - iskew) * jch + ioffg, jch), &
+				    ilda, &temp, &extra);
 			    icol = jch;
 /* L220: */
 			}
@@ -1100,10 +1071,8 @@ te that
 /* L240: */
 		}
 
-/*              If we need upper triangle, copy from lower. No
-te that   
-                the order of copying is chosen to work for 'b'
- -> 'q' */
+/*              If we need upper triangle, copy from lower. Note that   
+                the order of copying is chosen to work for 'b' -> 'q' */
 
 		if (ipack != ipackg && ipack != 4) {
 		    for (jc = *n; jc >= 1; --jc) {
@@ -1112,8 +1081,8 @@ te that
 			i__2 = 1, i__4 = jc - uub;
 			i__1 = max(i__2,i__4);
 			for (jr = jc; jr >= i__1; --jr) {
-			    a[jr + irow + jc * a_dim1] = a[jc - iskew * jr + 
-				    ioffg + jr * a_dim1];
+			    a_ref(jr + irow, jc) = a_ref(jc - iskew * jr + 
+				    ioffg, jr);
 /* L250: */
 			}
 /* L260: */
@@ -1123,7 +1092,7 @@ te that
 			for (jc = 1; jc <= i__1; ++jc) {
 			    i__2 = uub + 1 - jc;
 			    for (jr = 1; jr <= i__2; ++jr) {
-				a[jr + jc * a_dim1] = 0.f;
+				a_ref(jr, jc) = 0.f;
 /* L270: */
 			    }
 /* L280: */
@@ -1151,14 +1120,14 @@ te that
 
 /*           Non-symmetric -- A = U D V */
 
-	    slagge_(&mr, &nc, &llb, &uub, &d[1], &a[a_offset], lda, &iseed[1],
-		     &work[1], &iinfo);
+	    slagge_(&mr, &nc, &llb, &uub, &d__[1], &a[a_offset], lda, &iseed[
+		    1], &work[1], &iinfo);
 	} else {
 
 /*           Symmetric -- A = U D U' */
 
-	    slagsy_(m, &llb, &d[1], &a[a_offset], lda, &iseed[1], &work[1], &
-		    iinfo);
+	    slagsy_(m, &llb, &d__[1], &a[a_offset], lda, &iseed[1], &work[1], 
+		    &iinfo);
 
 	}
 	if (iinfo != 0) {
@@ -1177,8 +1146,8 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *m;
-		for (i = j + 1; i <= i__2; ++i) {
-		    a[i + j * a_dim1] = 0.f;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = 0.f;
 /* L290: */
 		}
 /* L300: */
@@ -1191,8 +1160,8 @@ te that
 	    i__1 = *m;
 	    for (j = 2; j <= i__1; ++j) {
 		i__2 = j - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    a[i + j * a_dim1] = 0.f;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    a_ref(i__, j) = 0.f;
 /* L310: */
 		}
 /* L320: */
@@ -1207,13 +1176,13 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 		    ++irow;
 		    if (irow > *lda) {
 			irow = 1;
 			++icol;
 		    }
-		    a[irow + icol * a_dim1] = a[i + j * a_dim1];
+		    a_ref(irow, icol) = a_ref(i__, j);
 /* L330: */
 		}
 /* L340: */
@@ -1228,13 +1197,13 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *m;
-		for (i = j; i <= i__2; ++i) {
+		for (i__ = j; i__ <= i__2; ++i__) {
 		    ++irow;
 		    if (irow > *lda) {
 			irow = 1;
 			++icol;
 		    }
-		    a[irow + icol * a_dim1] = a[i + j * a_dim1];
+		    a_ref(irow, icol) = a_ref(i__, j);
 /* L350: */
 		}
 /* L360: */
@@ -1242,12 +1211,9 @@ te that
 
 	} else if (ipack >= 5) {
 
-/*           'B' -- The lower triangle is packed as a band matrix.
-   
-             'Q' -- The upper triangle is packed as a band matrix.
-   
-             'Z' -- The whole matrix is packed as a band matrix. 
-*/
+/*           'B' -- The lower triangle is packed as a band matrix.   
+             'Q' -- The upper triangle is packed as a band matrix.   
+             'Z' -- The whole matrix is packed as a band matrix. */
 
 	    if (ipack == 5) {
 		uub = 0;
@@ -1260,8 +1226,8 @@ te that
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__2 = j + llb;
-		for (i = min(i__2,*m); i >= 1; --i) {
-		    a[i - j + uub + 1 + j * a_dim1] = a[i + j * a_dim1];
+		for (i__ = min(i__2,*m); i__ >= 1; --i__) {
+		    a_ref(i__ - j + uub + 1, j) = a_ref(i__, j);
 /* L370: */
 		}
 /* L380: */
@@ -1272,8 +1238,8 @@ te that
 /* Computing MIN */
 		i__4 = j + llb;
 		i__2 = min(i__4,*m);
-		for (i = j - uub; i <= i__2; ++i) {
-		    a[i - j + uub + 1 + j * a_dim1] = a[i + j * a_dim1];
+		for (i__ = j - uub; i__ <= i__2; ++i__) {
+		    a_ref(i__ - j + uub + 1, j) = a_ref(i__, j);
 /* L390: */
 		}
 /* L400: */
@@ -1290,7 +1256,7 @@ te that
 	    for (jc = icol; jc <= i__1; ++jc) {
 		i__2 = *lda;
 		for (jr = irow + 1; jr <= i__2; ++jr) {
-		    a[jr + jc * a_dim1] = 0.f;
+		    a_ref(jr, jc) = 0.f;
 /* L410: */
 		}
 		irow = 0;
@@ -1302,8 +1268,7 @@ te that
 /*           Packed Band --   
                 1st row is now in A( UUB+2-j, j), zero above it   
                 m-th row is now in A( M+UUB-j,j), zero below it   
-                last non-zero diagonal is now in A( UUB+LLB+1,j ),
-   
+                last non-zero diagonal is now in A( UUB+LLB+1,j ),   
                    zero below it, too. */
 
 	    ir1 = uub + llb + 2;
@@ -1312,7 +1277,7 @@ te that
 	    for (jc = 1; jc <= i__1; ++jc) {
 		i__2 = uub + 1 - jc;
 		for (jr = 1; jr <= i__2; ++jr) {
-		    a[jr + jc * a_dim1] = 0.f;
+		    a_ref(jr, jc) = 0.f;
 /* L430: */
 		}
 /* Computing MAX   
@@ -1321,7 +1286,7 @@ te that
 		i__2 = 1, i__4 = min(i__3,i__5);
 		i__6 = *lda;
 		for (jr = max(i__2,i__4); jr <= i__6; ++jr) {
-		    a[jr + jc * a_dim1] = 0.f;
+		    a_ref(jr, jc) = 0.f;
 /* L440: */
 		}
 /* L450: */
@@ -1334,4 +1299,7 @@ te that
 /*     End of SLATMS */
 
 } /* slatms_ */
+
+#undef a_ref
+
 

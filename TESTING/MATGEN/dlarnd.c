@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,7 +19,7 @@ doublereal dlarnd_(integer *idist, integer *iseed)
     extern doublereal dlaran_(integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -40,8 +41,7 @@ doublereal dlarnd_(integer *idist, integer *iseed)
             = 3:  normal (0,1)   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array 
-  
+            On entry, the seed of the random number generator; the array   
             elements must be between 0 and 4095, and ISEED(4) must be   
             odd.   
             On exit, the seed is updated.   
@@ -49,15 +49,11 @@ doublereal dlarnd_(integer *idist, integer *iseed)
     Further Details   
     ===============   
 
-    This routine calls the auxiliary routine DLARAN to generate a random 
-  
-    real number from a uniform (0,1) distribution. The Box-Muller method 
-  
-    is used to transform numbers from a uniform to a normal distribution. 
-  
+    This routine calls the auxiliary routine DLARAN to generate a random   
+    real number from a uniform (0,1) distribution. The Box-Muller method   
+    is used to transform numbers from a uniform to a normal distribution.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Generate a real random number from a uniform (0,1) distribution   

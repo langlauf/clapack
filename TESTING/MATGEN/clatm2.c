@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -6,9 +7,9 @@
 #include "f2c.h"
 
 /* Complex */ VOID clatm2_(complex * ret_val, integer *m, integer *n, integer 
-	*i, integer *j, integer *kl, integer *ku, integer *idist, integer *
-	iseed, complex *d, integer *igrade, complex *dl, complex *dr, integer 
-	*ipvtng, integer *iwork, real *sparse)
+	*i__, integer *j, integer *kl, integer *ku, integer *idist, integer *
+	iseed, complex *d__, integer *igrade, complex *dl, complex *dr, 
+	integer *ipvtng, integer *iwork, real *sparse)
 {
     /* System generated locals */
     integer i__1, i__2;
@@ -24,7 +25,7 @@
     extern doublereal slaran_(integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -39,29 +40,24 @@
        CLATM2 returns the (I,J) entry of a random matrix of dimension   
        (M, N) described by the other paramters. It is called by the   
        CLATMR routine in order to build random test matrices. No error   
-       checking on parameters is done, because this routine is called in 
-  
+       checking on parameters is done, because this routine is called in   
        a tight loop by CLATMR which has already checked the parameters.   
 
-       Use of CLATM2 differs from CLATM3 in the order in which the random 
-  
+       Use of CLATM2 differs from CLATM3 in the order in which the random   
        number generator is called to fill in random matrix entries.   
-       With CLATM2, the generator is called to fill in the pivoted matrix 
-  
+       With CLATM2, the generator is called to fill in the pivoted matrix   
        columnwise. With CLATM3, the generator is called to fill in the   
        matrix columnwise, after which it is pivoted. Thus, CLATM3 can   
        be used to construct random matrices which differ only in their   
        order of rows and/or columns. CLATM2 is used to construct band   
        matrices while avoiding calling the random number generator for   
-       entries outside the band (and therefore generating random numbers 
-  
+       entries outside the band (and therefore generating random numbers   
 
        The matrix whose (I,J) entry is returned is constructed as   
        follows (this routine only computes one entry):   
 
          If I is outside (1..M) or J is outside (1..N), return zero   
-            (this is convenient for generating matrices in band format). 
-  
+            (this is convenient for generating matrices in band format).   
 
          Generate a matrix A with random entries of distribution IDIST.   
 
@@ -161,8 +157,7 @@
              entries will be set to zero.   
              Not modified.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -172,8 +167,7 @@
 
 
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
 
 
@@ -183,18 +177,18 @@
     --iwork;
     --dr;
     --dl;
-    --d;
+    --d__;
     --iseed;
 
     /* Function Body */
-    if (*i < 1 || *i > *m || *j < 1 || *j > *n) {
+    if (*i__ < 1 || *i__ > *m || *j < 1 || *j > *n) {
 	 ret_val->r = 0.f,  ret_val->i = 0.f;
 	return ;
     }
 
 /*     Check for banding */
 
-    if (*j > *i + *ku || *j < *i - *kl) {
+    if (*j > *i__ + *ku || *j < *i__ - *kl) {
 	 ret_val->r = 0.f,  ret_val->i = 0.f;
 	return ;
     }
@@ -211,16 +205,16 @@
 /*     Compute subscripts depending on IPVTNG */
 
     if (*ipvtng == 0) {
-	isub = *i;
+	isub = *i__;
 	jsub = *j;
     } else if (*ipvtng == 1) {
-	isub = iwork[*i];
+	isub = iwork[*i__];
 	jsub = *j;
     } else if (*ipvtng == 2) {
-	isub = *i;
+	isub = *i__;
 	jsub = iwork[*j];
     } else if (*ipvtng == 3) {
-	isub = iwork[*i];
+	isub = iwork[*i__];
 	jsub = iwork[*j];
     }
 
@@ -228,7 +222,7 @@
 
     if (isub == jsub) {
 	i__1 = isub;
-	ctemp.r = d[i__1].r, ctemp.i = d[i__1].i;
+	ctemp.r = d__[i__1].r, ctemp.i = d__[i__1].i;
     } else {
 	clarnd_(&q__1, idist, &iseed[1]);
 	ctemp.r = q__1.r, ctemp.i = q__1.i;

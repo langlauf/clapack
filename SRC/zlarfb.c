@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlarfb_(char *side, char *trans, char *direct, char *
 	storev, integer *m, integer *n, integer *k, doublecomplex *v, integer 
-	*ldv, doublecomplex *t, integer *ldt, doublecomplex *c, integer *ldc, 
-	doublecomplex *work, integer *ldwork)
+	*ldv, doublecomplex *t, integer *ldt, doublecomplex *c__, integer *
+	ldc, doublecomplex *work, integer *ldwork)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -52,10 +53,8 @@
 
     V       (input) COMPLEX*16 array, dimension   
                                   (LDV,K) if STOREV = 'C'   
-                                  (LDV,M) if STOREV = 'R' and SIDE = 'L' 
-  
-                                  (LDV,N) if STOREV = 'R' and SIDE = 'R' 
-  
+                                  (LDV,M) if STOREV = 'R' and SIDE = 'L'   
+                                  (LDV,N) if STOREV = 'R' and SIDE = 'R'   
             The matrix V. See further details.   
 
     LDV     (input) INTEGER   
@@ -85,15 +84,12 @@
             If SIDE = 'L', LDWORK >= max(1,N);   
             if SIDE = 'R', LDWORK >= max(1,M).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -105,7 +101,7 @@
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -116,15 +112,28 @@
 	    doublecomplex *, integer *, doublecomplex *, integer *), zlacgv_(integer *, doublecomplex *, 
 	    integer *);
     static char transt[1];
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
 
 
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    work_dim1 = *ldwork;
+    work_offset = 1 + work_dim1 * 1;
+    work -= work_offset;
 
-
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-#define WORK(I,J) work[(I)-1 + ((J)-1)* ( *ldwork)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	return 0;
     }
@@ -148,35 +157,35 @@
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in 
-WORK)   
+                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
 
                 W := C1' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(n, &C(j,1), ldc, &WORK(1,j), &
-			    c__1);
-		    zlacgv_(n, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(n, &c___ref(j, 1), ldc, &work_ref(1, j), &c__1);
+		    zlacgv_(n, &work_ref(1, j), &c__1);
 /* L10: */
 		}
 
 /*              W := W * V1 */
 
 		ztrmm_("Right", "Lower", "No transpose", "Unit", n, k, &c_b1, 
-			&V(1,1), ldv, &WORK(1,1), ldwork);
+			&v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*m > *k) {
 
 /*                 W := W + C2'*V2 */
 
 		    i__1 = *m - *k;
 		    zgemm_("Conjugate transpose", "No transpose", n, k, &i__1,
-			     &c_b1, &C(*k+1,1), ldc, &V(*k+1,1), ldv, &c_b1, &WORK(1,1), ldwork);
+			     &c_b1, &c___ref(*k + 1, 1), ldc, &v_ref(*k + 1, 
+			    1), ldv, &c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		ztrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V * W' */
 
@@ -187,27 +196,27 @@ WORK)
 		    i__1 = *m - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "Conjugate transpose", &i__1, n, k,
-			     &z__1, &V(*k+1,1), ldv, &WORK(1,1), ldwork, &c_b1, &C(*k+1,1), 
-			    ldc);
+			     &z__1, &v_ref(*k + 1, 1), ldv, &work[work_offset]
+			    , ldwork, &c_b1, &c___ref(*k + 1, 1), ldc);
 		}
 
 /*              W := W * V1' */
 
 		ztrmm_("Right", "Lower", "Conjugate transpose", "Unit", n, k, 
-			&c_b1, &V(1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			i__3 = j + i * c_dim1;
-			i__4 = j + i * c_dim1;
-			d_cnjg(&z__2, &WORK(i,j));
-			z__1.r = C(j,i).r - z__2.r, z__1.i = C(j,i).i - 
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(j, i__);
+			i__4 = c___subscr(j, i__);
+			d_cnjg(&z__2, &work_ref(i__, j));
+			z__1.r = c__[i__4].r - z__2.r, z__1.i = c__[i__4].i - 
 				z__2.i;
-			C(j,i).r = z__1.r, C(j,i).i = z__1.i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L20: */
 		    }
 /* L30: */
@@ -215,36 +224,36 @@ WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V  =  (C1*V1 + C2*V2)  (stored in WOR
-K)   
+                W := C * V  =  (C1*V1 + C2*V2)  (stored in WORK)   
 
                 W := C1 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(m, &C(1,j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(m, &c___ref(1, j), &c__1, &work_ref(1, j), &c__1);
 /* L40: */
 		}
 
 /*              W := W * V1 */
 
 		ztrmm_("Right", "Lower", "No transpose", "Unit", m, k, &c_b1, 
-			&V(1,1), ldv, &WORK(1,1), ldwork);
+			&v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*n > *k) {
 
 /*                 W := W + C2 * V2 */
 
 		    i__1 = *n - *k;
 		    zgemm_("No transpose", "No transpose", m, k, &i__1, &c_b1,
-			     &C(1,*k+1), ldc, &V(*k+1,1), ldv, &c_b1, &WORK(1,1), ldwork);
+			     &c___ref(1, *k + 1), ldc, &v_ref(*k + 1, 1), ldv,
+			     &c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		ztrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V' */
 
@@ -255,27 +264,27 @@ K)
 		    i__1 = *n - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "Conjugate transpose", m, &i__1, k,
-			     &z__1, &WORK(1,1), ldwork, &V(*k+1,1), ldv, &c_b1, &C(1,*k+1), 
-			    ldc);
+			     &z__1, &work[work_offset], ldwork, &v_ref(*k + 1,
+			     1), ldv, &c_b1, &c___ref(1, *k + 1), ldc);
 		}
 
 /*              W := W * V1' */
 
 		ztrmm_("Right", "Lower", "Conjugate transpose", "Unit", m, k, 
-			&c_b1, &V(1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + j * c_dim1;
-			i__4 = i + j * c_dim1;
-			i__5 = i + j * work_dim1;
-			z__1.r = C(i,j).r - WORK(i,j).r, z__1.i = C(i,j).i 
-				- WORK(i,j).i;
-			C(i,j).r = z__1.r, C(i,j).i = z__1.i;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(i__, j);
+			i__4 = c___subscr(i__, j);
+			i__5 = work_subscr(i__, j);
+			z__1.r = c__[i__4].r - work[i__5].r, z__1.i = c__[
+				i__4].i - work[i__5].i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L50: */
 		    }
 /* L60: */
@@ -293,22 +302,22 @@ K)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in 
-WORK)   
+                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
 
                 W := C2' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(n, &C(*m-*k+j,1), ldc, &WORK(1,j), &c__1);
-		    zlacgv_(n, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(n, &c___ref(*m - *k + j, 1), ldc, &work_ref(1, j), 
+			    &c__1);
+		    zlacgv_(n, &work_ref(1, j), &c__1);
 /* L70: */
 		}
 
 /*              W := W * V2 */
 
 		ztrmm_("Right", "Upper", "No transpose", "Unit", n, k, &c_b1, 
-			&V(*m-*k+1,1), ldv, &WORK(1,1), 
+			&v_ref(*m - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 		if (*m > *k) {
 
@@ -316,13 +325,14 @@ WORK)
 
 		    i__1 = *m - *k;
 		    zgemm_("Conjugate transpose", "No transpose", n, k, &i__1,
-			     &c_b1, &C(1,1), ldc, &V(1,1), ldv, &
-			    c_b1, &WORK(1,1), ldwork);
+			     &c_b1, &c__[c_offset], ldc, &v[v_offset], ldv, &
+			    c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		ztrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V * W' */
 
@@ -333,27 +343,29 @@ WORK)
 		    i__1 = *m - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "Conjugate transpose", &i__1, n, k,
-			     &z__1, &V(1,1), ldv, &WORK(1,1), 
-			    ldwork, &c_b1, &C(1,1), ldc);
+			     &z__1, &v[v_offset], ldv, &work[work_offset], 
+			    ldwork, &c_b1, &c__[c_offset], ldc);
 		}
 
 /*              W := W * V2' */
 
 		ztrmm_("Right", "Upper", "Conjugate transpose", "Unit", n, k, 
-			&c_b1, &V(*m-*k+1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v_ref(*m - *k + 1, 1), ldv, &work[work_offset]
+			, ldwork)
+			;
 
 /*              C2 := C2 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			i__3 = *m - *k + j + i * c_dim1;
-			i__4 = *m - *k + j + i * c_dim1;
-			d_cnjg(&z__2, &WORK(i,j));
-			z__1.r = C(*m-*k+j,i).r - z__2.r, z__1.i = C(*m-*k+j,i).i - 
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(*m - *k + j, i__);
+			i__4 = c___subscr(*m - *k + j, i__);
+			d_cnjg(&z__2, &work_ref(i__, j));
+			z__1.r = c__[i__4].r - z__2.r, z__1.i = c__[i__4].i - 
 				z__2.i;
-			C(*m-*k+j,i).r = z__1.r, C(*m-*k+j,i).i = z__1.i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L80: */
 		    }
 /* L90: */
@@ -361,24 +373,23 @@ WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V  =  (C1*V1 + C2*V2)  (stored in WOR
-K)   
+                W := C * V  =  (C1*V1 + C2*V2)  (stored in WORK)   
 
                 W := C2 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(m, &C(1,*n-*k+j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(m, &c___ref(1, *n - *k + j), &c__1, &work_ref(1, j)
+			    , &c__1);
 /* L100: */
 		}
 
 /*              W := W * V2 */
 
 		ztrmm_("Right", "Upper", "No transpose", "Unit", m, k, &c_b1, 
-			&V(*n-*k+1,1), ldv, &WORK(1,1), 
+			&v_ref(*n - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 		if (*n > *k) {
 
@@ -386,13 +397,15 @@ K)
 
 		    i__1 = *n - *k;
 		    zgemm_("No transpose", "No transpose", m, k, &i__1, &c_b1,
-			     &C(1,1), ldc, &V(1,1), ldv, &c_b1, &
-			    WORK(1,1), ldwork);
+			     &c__[c_offset], ldc, &v[v_offset], ldv, &c_b1, &
+			    work[work_offset], ldwork)
+			    ;
 		}
 
 /*              W := W * T  or  W * T' */
 
-		ztrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V' */
 
@@ -403,27 +416,29 @@ K)
 		    i__1 = *n - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "Conjugate transpose", m, &i__1, k,
-			     &z__1, &WORK(1,1), ldwork, &V(1,1), 
-			    ldv, &c_b1, &C(1,1), ldc);
+			     &z__1, &work[work_offset], ldwork, &v[v_offset], 
+			    ldv, &c_b1, &c__[c_offset], ldc);
 		}
 
 /*              W := W * V2' */
 
 		ztrmm_("Right", "Upper", "Conjugate transpose", "Unit", m, k, 
-			&c_b1, &V(*n-*k+1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v_ref(*n - *k + 1, 1), ldv, &work[work_offset]
+			, ldwork)
+			;
 
 /*              C2 := C2 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + (*n - *k + j) * c_dim1;
-			i__4 = i + (*n - *k + j) * c_dim1;
-			i__5 = i + j * work_dim1;
-			z__1.r = C(i,*n-*k+j).r - WORK(i,j).r, z__1.i = C(i,*n-*k+j).i 
-				- WORK(i,j).i;
-			C(i,*n-*k+j).r = z__1.r, C(i,*n-*k+j).i = z__1.i;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(i__, *n - *k + j);
+			i__4 = c___subscr(i__, *n - *k + j);
+			i__5 = work_subscr(i__, j);
+			z__1.r = c__[i__4].r - work[i__5].r, z__1.i = c__[
+				i__4].i - work[i__5].i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L110: */
 		    }
 /* L120: */
@@ -443,36 +458,35 @@ K)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored i
-n WORK)   
+                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
 
                 W := C1' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(n, &C(j,1), ldc, &WORK(1,j), &
-			    c__1);
-		    zlacgv_(n, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(n, &c___ref(j, 1), ldc, &work_ref(1, j), &c__1);
+		    zlacgv_(n, &work_ref(1, j), &c__1);
 /* L130: */
 		}
 
 /*              W := W * V1' */
 
 		ztrmm_("Right", "Upper", "Conjugate transpose", "Unit", n, k, 
-			&c_b1, &V(1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*m > *k) {
 
 /*                 W := W + C2'*V2' */
 
 		    i__1 = *m - *k;
 		    zgemm_("Conjugate transpose", "Conjugate transpose", n, k,
-			     &i__1, &c_b1, &C(*k+1,1), ldc, &V(1,*k+1), ldv, &c_b1, &WORK(1,1), 
-			    ldwork);
+			     &i__1, &c_b1, &c___ref(*k + 1, 1), ldc, &v_ref(1,
+			     *k + 1), ldv, &c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		ztrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V' * W' */
 
@@ -483,27 +497,28 @@ n WORK)
 		    i__1 = *m - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("Conjugate transpose", "Conjugate transpose", &
-			    i__1, n, k, &z__1, &V(1,*k+1), ldv,
-			     &WORK(1,1), ldwork, &c_b1, &C(*k+1,1), ldc);
+			    i__1, n, k, &z__1, &v_ref(1, *k + 1), ldv, &work[
+			    work_offset], ldwork, &c_b1, &c___ref(*k + 1, 1), 
+			    ldc);
 		}
 
 /*              W := W * V1 */
 
 		ztrmm_("Right", "Upper", "No transpose", "Unit", n, k, &c_b1, 
-			&V(1,1), ldv, &WORK(1,1), ldwork);
+			&v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			i__3 = j + i * c_dim1;
-			i__4 = j + i * c_dim1;
-			d_cnjg(&z__2, &WORK(i,j));
-			z__1.r = C(j,i).r - z__2.r, z__1.i = C(j,i).i - 
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(j, i__);
+			i__4 = c___subscr(j, i__);
+			d_cnjg(&z__2, &work_ref(i__, j));
+			z__1.r = c__[i__4].r - z__2.r, z__1.i = c__[i__4].i - 
 				z__2.i;
-			C(j,i).r = z__1.r, C(j,i).i = z__1.i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L140: */
 		    }
 /* L150: */
@@ -511,37 +526,36 @@ n WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V'  =  (C1*V1' + C2*V2')  (stored in 
-WORK)   
+                W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
 
                 W := C1 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(m, &C(1,j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(m, &c___ref(1, j), &c__1, &work_ref(1, j), &c__1);
 /* L160: */
 		}
 
 /*              W := W * V1' */
 
 		ztrmm_("Right", "Upper", "Conjugate transpose", "Unit", m, k, 
-			&c_b1, &V(1,1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*n > *k) {
 
 /*                 W := W + C2 * V2' */
 
 		    i__1 = *n - *k;
 		    zgemm_("No transpose", "Conjugate transpose", m, k, &i__1,
-			     &c_b1, &C(1,*k+1), ldc, &V(1,*k+1), ldv, &c_b1, &WORK(1,1), 
-			    ldwork);
+			     &c_b1, &c___ref(1, *k + 1), ldc, &v_ref(1, *k + 
+			    1), ldv, &c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		ztrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V */
 
@@ -552,26 +566,27 @@ WORK)
 		    i__1 = *n - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "No transpose", m, &i__1, k, &z__1,
-			     &WORK(1,1), ldwork, &V(1,*k+1), ldv, &c_b1, &C(1,*k+1), ldc);
+			     &work[work_offset], ldwork, &v_ref(1, *k + 1), 
+			    ldv, &c_b1, &c___ref(1, *k + 1), ldc);
 		}
 
 /*              W := W * V1 */
 
 		ztrmm_("Right", "Upper", "No transpose", "Unit", m, k, &c_b1, 
-			&V(1,1), ldv, &WORK(1,1), ldwork);
+			&v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + j * c_dim1;
-			i__4 = i + j * c_dim1;
-			i__5 = i + j * work_dim1;
-			z__1.r = C(i,j).r - WORK(i,j).r, z__1.i = C(i,j).i 
-				- WORK(i,j).i;
-			C(i,j).r = z__1.r, C(i,j).i = z__1.i;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(i__, j);
+			i__4 = c___subscr(i__, j);
+			i__5 = work_subscr(i__, j);
+			z__1.r = c__[i__4].r - work[i__5].r, z__1.i = c__[
+				i__4].i - work[i__5].i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L170: */
 		    }
 /* L180: */
@@ -589,35 +604,38 @@ WORK)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored i
-n WORK)   
+                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
 
                 W := C2' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(n, &C(*m-*k+j,1), ldc, &WORK(1,j), &c__1);
-		    zlacgv_(n, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(n, &c___ref(*m - *k + j, 1), ldc, &work_ref(1, j), 
+			    &c__1);
+		    zlacgv_(n, &work_ref(1, j), &c__1);
 /* L190: */
 		}
 
 /*              W := W * V2' */
 
 		ztrmm_("Right", "Lower", "Conjugate transpose", "Unit", n, k, 
-			&c_b1, &V(1,*m-*k+1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v_ref(1, *m - *k + 1), ldv, &work[work_offset]
+			, ldwork)
+			;
 		if (*m > *k) {
 
 /*                 W := W + C1'*V1' */
 
 		    i__1 = *m - *k;
 		    zgemm_("Conjugate transpose", "Conjugate transpose", n, k,
-			     &i__1, &c_b1, &C(1,1), ldc, &V(1,1), 
-			    ldv, &c_b1, &WORK(1,1), ldwork);
+			     &i__1, &c_b1, &c__[c_offset], ldc, &v[v_offset], 
+			    ldv, &c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		ztrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V' * W' */
 
@@ -628,26 +646,28 @@ n WORK)
 		    i__1 = *m - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("Conjugate transpose", "Conjugate transpose", &
-			    i__1, n, k, &z__1, &V(1,1), ldv, &WORK(1,1), ldwork, &c_b1, &C(1,1), ldc);
+			    i__1, n, k, &z__1, &v[v_offset], ldv, &work[
+			    work_offset], ldwork, &c_b1, &c__[c_offset], ldc);
 		}
 
 /*              W := W * V2 */
 
 		ztrmm_("Right", "Lower", "No transpose", "Unit", n, k, &c_b1, 
-			&V(1,*m-*k+1), ldv, &WORK(1,1), ldwork);
+			&v_ref(1, *m - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 
 /*              C2 := C2 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			i__3 = *m - *k + j + i * c_dim1;
-			i__4 = *m - *k + j + i * c_dim1;
-			d_cnjg(&z__2, &WORK(i,j));
-			z__1.r = C(*m-*k+j,i).r - z__2.r, z__1.i = C(*m-*k+j,i).i - 
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(*m - *k + j, i__);
+			i__4 = c___subscr(*m - *k + j, i__);
+			d_cnjg(&z__2, &work_ref(i__, j));
+			z__1.r = c__[i__4].r - z__2.r, z__1.i = c__[i__4].i - 
 				z__2.i;
-			C(*m-*k+j,i).r = z__1.r, C(*m-*k+j,i).i = z__1.i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L200: */
 		    }
 /* L210: */
@@ -655,37 +675,39 @@ n WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V'  =  (C1*V1' + C2*V2')  (stored in 
-WORK)   
+                W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
 
                 W := C2 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    zcopy_(m, &C(1,*n-*k+j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    zcopy_(m, &c___ref(1, *n - *k + j), &c__1, &work_ref(1, j)
+			    , &c__1);
 /* L220: */
 		}
 
 /*              W := W * V2' */
 
 		ztrmm_("Right", "Lower", "Conjugate transpose", "Unit", m, k, 
-			&c_b1, &V(1,*n-*k+1), ldv, &WORK(1,1), ldwork);
+			&c_b1, &v_ref(1, *n - *k + 1), ldv, &work[work_offset]
+			, ldwork)
+			;
 		if (*n > *k) {
 
 /*                 W := W + C1 * V1' */
 
 		    i__1 = *n - *k;
 		    zgemm_("No transpose", "Conjugate transpose", m, k, &i__1,
-			     &c_b1, &C(1,1), ldc, &V(1,1), ldv, &
-			    c_b1, &WORK(1,1), ldwork);
+			     &c_b1, &c__[c_offset], ldc, &v[v_offset], ldv, &
+			    c_b1, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		ztrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b1, &T(1,1), ldt, &WORK(1,1), ldwork);
+		ztrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b1, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V */
 
@@ -696,27 +718,29 @@ WORK)
 		    i__1 = *n - *k;
 		    z__1.r = -1., z__1.i = 0.;
 		    zgemm_("No transpose", "No transpose", m, &i__1, k, &z__1,
-			     &WORK(1,1), ldwork, &V(1,1), ldv, &
-			    c_b1, &C(1,1), ldc);
+			     &work[work_offset], ldwork, &v[v_offset], ldv, &
+			    c_b1, &c__[c_offset], ldc)
+			    ;
 		}
 
 /*              W := W * V2 */
 
 		ztrmm_("Right", "Lower", "No transpose", "Unit", m, k, &c_b1, 
-			&V(1,*n-*k+1), ldv, &WORK(1,1), ldwork);
+			&v_ref(1, *n - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + (*n - *k + j) * c_dim1;
-			i__4 = i + (*n - *k + j) * c_dim1;
-			i__5 = i + j * work_dim1;
-			z__1.r = C(i,*n-*k+j).r - WORK(i,j).r, z__1.i = C(i,*n-*k+j).i 
-				- WORK(i,j).i;
-			C(i,*n-*k+j).r = z__1.r, C(i,*n-*k+j).i = z__1.i;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = c___subscr(i__, *n - *k + j);
+			i__4 = c___subscr(i__, *n - *k + j);
+			i__5 = work_subscr(i__, j);
+			z__1.r = c__[i__4].r - work[i__5].r, z__1.i = c__[
+				i__4].i - work[i__5].i;
+			c__[i__3].r = z__1.r, c__[i__3].i = z__1.i;
 /* L230: */
 		    }
 /* L240: */
@@ -732,4 +756,12 @@ WORK)
 /*     End of ZLARFB */
 
 } /* zlarfb_ */
+
+#undef v_ref
+#undef v_subscr
+#undef c___ref
+#undef c___subscr
+#undef work_ref
+#undef work_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -37,7 +38,10 @@ static integer c__0 = 0;
     static doublereal smlnum;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -46,8 +50,7 @@ static integer c__0 = 0;
     Purpose   
     =======   
 
-    DQRT13 generates a full-rank matrix that may be scaled to have large 
-  
+    DQRT13 generates a full-rank matrix that may be scaled to have large   
     or small norm.   
 
     Arguments   
@@ -76,13 +79,12 @@ static integer c__0 = 0;
     ISEED   (input/output) integer array, dimension (4)   
             Seed for random number generator   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
 
@@ -95,10 +97,10 @@ static integer c__0 = 0;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	dlarnv_(&c__2, &iseed[1], m, &a[j * a_dim1 + 1]);
+	dlarnv_(&c__2, &iseed[1], m, &a_ref(1, j));
 	if (j <= *m) {
-	    d__1 = dasum_(m, &a[j * a_dim1 + 1], &c__1);
-	    a[j + j * a_dim1] += d_sign(&d__1, &a[j + j * a_dim1]);
+	    d__1 = dasum_(m, &a_ref(1, j), &c__1);
+	    a_ref(j, j) = a_ref(j, j) + d_sign(&d__1, &a_ref(j, j));
 	}
 /* L10: */
     }
@@ -134,4 +136,7 @@ static integer c__0 = 0;
 /*     End of DQRT13 */
 
 } /* dqrt13_ */
+
+#undef a_ref
+
 

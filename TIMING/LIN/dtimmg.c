@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -25,7 +26,7 @@ static integer c__1 = 1;
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer i, j, k;
+    static integer i__, j, k;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     static integer jj, jn, mj, mu;
@@ -33,7 +34,10 @@ static integer c__1 = 1;
 	    doublereal *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -79,8 +83,7 @@ static integer c__1 = 1;
 
             If the absolute value of IFLAG is 1, 3, or 6, the leading   
             M x N (or N x N) subblock is used to store the matrix.   
-            If the matrix is symmetric, only the upper or lower triangle 
-  
+            If the matrix is symmetric, only the upper or lower triangle   
             of this block is referenced.   
 
             If the absolute value of IFLAG is 4 or 7, the matrix is   
@@ -110,12 +113,11 @@ static integer c__1 = 1;
     KU      (input) INTEGER   
             The number of superdiagonals if IFLAG = 2, 5, or -5.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
@@ -129,18 +131,17 @@ static integer c__1 = 1;
 
           Set first column and row to random values. */
 
-	dlarnv_(&c__2, iseed, m, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, m, &a_ref(1, 1));
 	i__1 = *n;
 	i__2 = *m;
 	for (j = 2; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 /* Computing MIN */
 	    i__3 = *m, i__4 = *n - j + 1;
 	    mj = min(i__3,i__4);
-	    dlarnv_(&c__2, iseed, &mj, &a[j * a_dim1 + 1]);
+	    dlarnv_(&c__2, iseed, &mj, &a_ref(1, j));
 	    if (mj > 1) {
 		i__3 = mj - 1;
-		dcopy_(&i__3, &a[j * a_dim1 + 2], &c__1, &a[(j + 1) * a_dim1 
-			+ 1], lda);
+		dcopy_(&i__3, &a_ref(2, j), &c__1, &a_ref(1, j + 1), lda);
 	    }
 /* L10: */
 	}
@@ -150,8 +151,8 @@ static integer c__1 = 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *m;
-	    for (i = 2; i <= i__1; ++i) {
-		a[i + j * a_dim1] = a[i - 1 + (j - 1) * a_dim1];
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		a_ref(i__, j) = a_ref(i__ - 1, j - 1);
 /* L20: */
 	    }
 /* L30: */
@@ -169,23 +170,22 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__1 = *m, i__3 = *kl + 1;
 	i__2 = min(i__1,i__3);
-	dlarnv_(&c__2, iseed, &i__2, &a[k + a_dim1]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(k, 1));
 /* Computing MIN */
 	i__2 = *n - 1;
 	mu = min(i__2,*ku);
 	i__2 = mu + 1;
-	dlarnv_(&c__2, iseed, &i__2, &a[k - mu + *n * a_dim1]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(k - mu, *n));
 	i__2 = *n - 1;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__1 = j - 1;
 	    mu = min(i__1,*ku);
-	    dcopy_(&mu, &a[k - mu + *n * a_dim1], &c__1, &a[k - mu + j * 
-		    a_dim1], &c__1);
+	    dcopy_(&mu, &a_ref(k - mu, *n), &c__1, &a_ref(k - mu, j), &c__1);
 /* Computing MIN */
 	    i__3 = *m - j + 1, i__4 = *kl + 1;
 	    i__1 = min(i__3,i__4);
-	    dcopy_(&i__1, &a[k + a_dim1], &c__1, &a[k + j * a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(k, 1), &c__1, &a_ref(k, j), &c__1);
 /* L40: */
 	}
 
@@ -194,11 +194,10 @@ static integer c__1 = 1;
 /*        Symmetric positive definite, upper triangle */
 
 	i__2 = *n - 1;
-	dlarnv_(&c__2, iseed, &i__2, &a[*n * a_dim1 + 1]);
-	a[*n + *n * a_dim1] = (doublereal) (*n);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(1, *n));
+	a_ref(*n, *n) = (doublereal) (*n);
 	for (j = *n - 1; j >= 1; --j) {
-	    dcopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    dcopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L50: */
 	}
 
@@ -206,15 +205,15 @@ static integer c__1 = 1;
 
 /*        Symmetric positive definite, lower triangle */
 
-	a[a_dim1 + 1] = (doublereal) (*n);
+	a_ref(1, 1) = (doublereal) (*n);
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    dlarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    dlarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L60: */
 	}
 
@@ -224,13 +223,13 @@ static integer c__1 = 1;
 
 	jn = (*n - 1) * *n / 2 + 1;
 	i__2 = *n - 1;
-	dlarnv_(&c__2, iseed, &i__2, &a[jn + a_dim1]);
-	a[jn + *n - 1 + a_dim1] = (doublereal) (*n);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(jn, 1));
+	a_ref(jn + *n - 1, 1) = (doublereal) (*n);
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    dcopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L70: */
 	}
 
@@ -238,16 +237,16 @@ static integer c__1 = 1;
 
 /*        Symmetric positive definite packed, lower triangle */
 
-	a[a_dim1 + 1] = (doublereal) (*n);
+	a_ref(1, 1) = (doublereal) (*n);
 	if (*n > 1) {
 	    i__2 = *n - 1;
-	    dlarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	    dlarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	}
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L80: */
 	}
@@ -260,14 +259,14 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__2 = *n - 1;
 	mu = min(i__2,k);
-	dlarnv_(&c__2, iseed, &mu, &a[k + 1 - mu + *n * a_dim1]);
-	a[k + 1 + *n * a_dim1] = (doublereal) (*n);
+	dlarnv_(&c__2, iseed, &mu, &a_ref(k + 1 - mu, *n));
+	a_ref(k + 1, *n) = (doublereal) (*n);
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    dcopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    dcopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L90: */
 	}
 
@@ -276,17 +275,17 @@ static integer c__1 = 1;
 /*        Symmetric positive definite banded, lower triangle */
 
 	k = *kl;
-	a[a_dim1 + 1] = (doublereal) (*n);
+	a_ref(1, 1) = (doublereal) (*n);
 /* Computing MIN */
 	i__1 = *n - 1;
 	i__2 = min(i__1,k);
-	dlarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 2]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(2, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L100: */
 	}
 
@@ -294,10 +293,9 @@ static integer c__1 = 1;
 
 /*        Symmetric indefinite, upper triangle */
 
-	dlarnv_(&c__2, iseed, n, &a[*n * a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, *n));
 	for (j = *n - 1; j >= 1; --j) {
-	    dcopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    dcopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L110: */
 	}
 
@@ -305,11 +303,11 @@ static integer c__1 = 1;
 
 /*        Symmetric indefinite, lower triangle */
 
-	dlarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L120: */
 	}
 
@@ -318,12 +316,12 @@ static integer c__1 = 1;
 /*        Symmetric indefinite packed, upper triangle */
 
 	jn = (*n - 1) * *n / 2 + 1;
-	dlarnv_(&c__2, iseed, n, &a[jn + a_dim1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(jn, 1));
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    dcopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L130: */
 	}
 
@@ -331,12 +329,12 @@ static integer c__1 = 1;
 
 /*        Symmetric indefinite packed, lower triangle */
 
-	dlarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L140: */
 	}
@@ -349,13 +347,13 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__2 = *n, i__1 = k + 1;
 	mu = min(i__2,i__1);
-	dlarnv_(&c__2, iseed, &mu, &a[k + 2 - mu + *n * a_dim1]);
+	dlarnv_(&c__2, iseed, &mu, &a_ref(k + 2 - mu, *n));
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    dcopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    dcopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L150: */
 	}
 
@@ -367,13 +365,13 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__1 = *n, i__3 = k + 1;
 	i__2 = min(i__1,i__3);
-	dlarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L160: */
 	}
 
@@ -381,12 +379,11 @@ static integer c__1 = 1;
 
 /*        Upper triangular */
 
-	dlarnv_(&c__2, iseed, n, &a[*n * a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, *n));
 	d__1 = (doublereal) (*n);
-	a[*n + *n * a_dim1] = d_sign(&d__1, &a[*n + *n * a_dim1]);
+	a_ref(*n, *n) = d_sign(&d__1, &a_ref(*n, *n));
 	for (j = *n - 1; j >= 1; --j) {
-	    dcopy_(&j, &a[*n - j + 1 + *n * a_dim1], &c__1, &a[j * a_dim1 + 1]
-		    , &c__1);
+	    dcopy_(&j, &a_ref(*n - j + 1, *n), &c__1, &a_ref(1, j), &c__1);
 /* L170: */
 	}
 
@@ -394,13 +391,13 @@ static integer c__1 = 1;
 
 /*        Lower triangular */
 
-	dlarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	d__1 = (doublereal) (*n);
-	a[a_dim1 + 1] = d_sign(&d__1, &a[a_dim1 + 1]);
+	a_ref(1, 1) = d_sign(&d__1, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j + j * a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(j, j), &c__1);
 /* L180: */
 	}
 
@@ -409,14 +406,14 @@ static integer c__1 = 1;
 /*        Upper triangular packed */
 
 	jn = (*n - 1) * *n / 2 + 1;
-	dlarnv_(&c__2, iseed, n, &a[jn + a_dim1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(jn, 1));
 	d__1 = (doublereal) (*n);
-	a[jn + *n - 1 + a_dim1] = d_sign(&d__1, &a[jn + *n - 1 + a_dim1]);
+	a_ref(jn + *n - 1, 1) = d_sign(&d__1, &a_ref(jn + *n - 1, 1));
 	jj = jn;
 	for (j = *n - 1; j >= 1; --j) {
 	    jj -= j;
 	    ++jn;
-	    dcopy_(&j, &a[jn + a_dim1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&j, &a_ref(jn, 1), &c__1, &a_ref(jj, 1), &c__1);
 /* L190: */
 	}
 
@@ -424,14 +421,14 @@ static integer c__1 = 1;
 
 /*        Lower triangular packed */
 
-	dlarnv_(&c__2, iseed, n, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, n, &a_ref(1, 1));
 	d__1 = (doublereal) (*n);
-	a[a_dim1 + 1] = d_sign(&d__1, &a[a_dim1 + 1]);
+	a_ref(1, 1) = d_sign(&d__1, &a_ref(1, 1));
 	jj = *n + 1;
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 	    i__1 = *n - j + 1;
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[jj + a_dim1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(jj, 1), &c__1);
 	    jj = jj + *n - j + 1;
 /* L200: */
 	}
@@ -444,15 +441,15 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__2 = *n, i__1 = k + 1;
 	mu = min(i__2,i__1);
-	dlarnv_(&c__2, iseed, &mu, &a[k + 2 - mu + *n * a_dim1]);
+	dlarnv_(&c__2, iseed, &mu, &a_ref(k + 2 - mu, *n));
 	d__1 = (doublereal) (k + 1);
-	a[k + 1 + *n * a_dim1] = d_sign(&d__1, &a[k + 1 + *n * a_dim1]);
+	a_ref(k + 1, *n) = d_sign(&d__1, &a_ref(k + 1, *n));
 	for (j = *n - 1; j >= 1; --j) {
 /* Computing MIN */
 	    i__2 = j, i__1 = k + 1;
 	    mu = min(i__2,i__1);
-	    dcopy_(&mu, &a[k + 2 - mu + *n * a_dim1], &c__1, &a[k + 2 - mu + 
-		    j * a_dim1], &c__1);
+	    dcopy_(&mu, &a_ref(k + 2 - mu, *n), &c__1, &a_ref(k + 2 - mu, j), 
+		    &c__1);
 /* L210: */
 	}
 
@@ -464,15 +461,15 @@ static integer c__1 = 1;
 /* Computing MIN */
 	i__1 = *n, i__3 = k + 1;
 	i__2 = min(i__1,i__3);
-	dlarnv_(&c__2, iseed, &i__2, &a[a_dim1 + 1]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(1, 1));
 	d__1 = (doublereal) (k + 1);
-	a[a_dim1 + 1] = d_sign(&d__1, &a[a_dim1 + 1]);
+	a_ref(1, 1) = d_sign(&d__1, &a_ref(1, 1));
 	i__2 = *n;
 	for (j = 2; j <= i__2; ++j) {
 /* Computing MIN */
 	    i__3 = *n - j + 1, i__4 = k + 1;
 	    i__1 = min(i__3,i__4);
-	    dcopy_(&i__1, &a[a_dim1 + 1], &c__1, &a[j * a_dim1 + 1], &c__1);
+	    dcopy_(&i__1, &a_ref(1, 1), &c__1, &a_ref(1, j), &c__1);
 /* L220: */
 	}
 
@@ -489,11 +486,11 @@ static integer c__1 = 1;
 
 	i__2 = *n;
 	for (j = 1; j <= i__2; ++j) {
-	    a[j + a_dim1] = 2.;
+	    a_ref(j, 1) = 2.;
 /* L230: */
 	}
 	i__2 = *n - 1;
-	dlarnv_(&c__2, iseed, &i__2, &a[*n + 1 + a_dim1]);
+	dlarnv_(&c__2, iseed, &i__2, &a_ref(*n + 1, 1));
     }
 
     return 0;
@@ -501,4 +498,7 @@ static integer c__1 = 1;
 /*     End of DTIMMG */
 
 } /* dtimmg_ */
+
+#undef a_ref
+
 

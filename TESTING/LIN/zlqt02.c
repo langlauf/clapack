@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -57,7 +58,13 @@ static doublereal c_b23 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -79,24 +86,21 @@ static doublereal c_b23 = 1.;
     =========   
 
     M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0. 
-  
+            The number of rows of the matrix Q to be generated.  M >= 0.   
 
     N       (input) INTEGER   
             The number of columns of the matrix Q to be generated.   
             N >= M >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The m-by-n matrix A which was factorized by ZLQT01.   
 
     AF      (input) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the LQ factorization of A, as returned by ZGELQF. 
-  
+            Details of the LQ factorization of A, as returned by ZGELQF.   
             See ZGELQF for further details.   
 
     Q       (workspace) COMPLEX*16 array, dimension (LDA,N)   
@@ -104,12 +108,10 @@ static doublereal c_b23 = 1.;
     L       (workspace) COMPLEX*16 array, dimension (LDA,M)   
 
     LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= N. 
-  
+            The leading dimension of the arrays A, AF, Q and L. LDA >= N.   
 
     TAU     (input) COMPLEX*16 array, dimension (M)   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the LQ factorization in AF.   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
@@ -124,22 +126,21 @@ static doublereal c_b23 = 1.;
             RESULT(1) = norm( L - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = l_dim1 + 1;
+    l_offset = 1 + l_dim1 * 1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -153,12 +154,11 @@ static doublereal c_b23 = 1.;
 
     zlaset_("Full", m, n, &c_b1, &c_b1, &q[q_offset], lda);
     i__1 = *n - 1;
-    zlacpy_("Upper", k, &i__1, &af[(af_dim1 << 1) + 1], lda, &q[(q_dim1 << 1) 
-	    + 1], lda);
+    zlacpy_("Upper", k, &i__1, &af_ref(1, 2), lda, &q_ref(1, 2), lda);
 
 /*     Generate the first n columns of the matrix Q */
 
-    s_copy(srnamc_1.srnamt, "ZUNGLQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNGLQ", (ftnlen)6, (ftnlen)6);
     zunglq_(m, n, k, &q[q_offset], lda, &tau[1], &work[1], lwork, &info);
 
 /*     Copy L(1:k,1:m) */
@@ -198,4 +198,10 @@ static doublereal c_b23 = 1.;
 /*     End of ZLQT02 */
 
 } /* zlqt02_ */
+
+#undef af_ref
+#undef af_subscr
+#undef q_ref
+#undef q_subscr
+
 

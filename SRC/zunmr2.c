@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zunmr2_(char *side, char *trans, integer *m, integer *n, 
 	integer *k, doublecomplex *a, integer *lda, doublecomplex *tau, 
-	doublecomplex *c, integer *ldc, doublecomplex *work, integer *info)
+	doublecomplex *c__, integer *ldc, doublecomplex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -58,8 +59,7 @@
                                  (LDA,M) if SIDE = 'L',   
                                  (LDA,N) if SIDE = 'R'   
             The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by 
-  
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
             ZGERQF in the last k rows of its array argument A.   
             A is modified by the routine but restored on exit.   
 
@@ -85,15 +85,12 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2, i__3;
     doublecomplex z__1;
@@ -102,7 +99,7 @@
     /* Local variables */
     static logical left;
     static doublecomplex taui;
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zlarf_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
@@ -112,14 +109,19 @@
 	    integer *, doublecomplex *, integer *);
     static logical notran;
     static doublecomplex aii;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
@@ -176,40 +178,40 @@
 
     i__1 = i2;
     i__2 = i3;
-    for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+    for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 	if (left) {
 
 /*           H(i) or H(i)' is applied to C(1:m-k+i,1:n) */
 
-	    mi = *m - *k + i;
+	    mi = *m - *k + i__;
 	} else {
 
 /*           H(i) or H(i)' is applied to C(1:m,1:n-k+i) */
 
-	    ni = *n - *k + i;
+	    ni = *n - *k + i__;
 	}
 
 /*        Apply H(i) or H(i)' */
 
 	if (notran) {
-	    d_cnjg(&z__1, &TAU(i));
+	    d_cnjg(&z__1, &tau[i__]);
 	    taui.r = z__1.r, taui.i = z__1.i;
 	} else {
-	    i__3 = i;
-	    taui.r = TAU(i).r, taui.i = TAU(i).i;
+	    i__3 = i__;
+	    taui.r = tau[i__3].r, taui.i = tau[i__3].i;
 	}
-	i__3 = nq - *k + i - 1;
-	zlacgv_(&i__3, &A(i,1), lda);
-	i__3 = i + (nq - *k + i) * a_dim1;
-	aii.r = A(i,nq-*k+i).r, aii.i = A(i,nq-*k+i).i;
-	i__3 = i + (nq - *k + i) * a_dim1;
-	A(i,nq-*k+i).r = 1., A(i,nq-*k+i).i = 0.;
-	zlarf_(side, &mi, &ni, &A(i,1), lda, &taui, &C(1,1), ldc, 
-		&WORK(1));
-	i__3 = i + (nq - *k + i) * a_dim1;
-	A(i,nq-*k+i).r = aii.r, A(i,nq-*k+i).i = aii.i;
-	i__3 = nq - *k + i - 1;
-	zlacgv_(&i__3, &A(i,1), lda);
+	i__3 = nq - *k + i__ - 1;
+	zlacgv_(&i__3, &a_ref(i__, 1), lda);
+	i__3 = a_subscr(i__, nq - *k + i__);
+	aii.r = a[i__3].r, aii.i = a[i__3].i;
+	i__3 = a_subscr(i__, nq - *k + i__);
+	a[i__3].r = 1., a[i__3].i = 0.;
+	zlarf_(side, &mi, &ni, &a_ref(i__, 1), lda, &taui, &c__[c_offset], 
+		ldc, &work[1]);
+	i__3 = a_subscr(i__, nq - *k + i__);
+	a[i__3].r = aii.r, a[i__3].i = aii.i;
+	i__3 = nq - *k + i__ - 1;
+	zlacgv_(&i__3, &a_ref(i__, 1), lda);
 /* L10: */
     }
     return 0;
@@ -217,4 +219,8 @@
 /*     End of ZUNMR2 */
 
 } /* zunmr2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

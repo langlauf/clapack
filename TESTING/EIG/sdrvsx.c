@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,8 +32,8 @@ static integer c__22 = 22;
 
 /* Subroutine */ int sdrvsx_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *niunit, 
-	integer *nounit, real *a, integer *lda, real *h, real *ht, real *wr, 
-	real *wi, real *wrt, real *wit, real *wrtmp, real *witmp, real *vs, 
+	integer *nounit, real *a, integer *lda, real *h__, real *ht, real *wr,
+	 real *wi, real *wrt, real *wit, real *wrtmp, real *witmp, real *vs, 
 	integer *ldvs, real *vs1, real *result, real *work, integer *lwork, 
 	integer *iwork, logical *bwork, integer *info)
 {
@@ -118,7 +119,7 @@ static integer c__22 = 22;
     static char path[3];
     static integer nmax;
     static real unfl, ovfl;
-    static integer i, j, n;
+    static integer i__, j, n;
     static logical badnn;
     static integer nfail, imode, iinfo;
     static real conds;
@@ -181,7 +182,10 @@ static integer c__22 = 22;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -234,8 +238,7 @@ static integer c__22 = 22;
          Here VS is the matrix of Schur eigenvectors, and T is in Schur   
          form  (with sorting of eigenvalues).   
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). 
-  
+       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
 
        (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
                1/ulp otherwise   
@@ -251,8 +254,7 @@ static integer c__22 = 22;
 
        (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
                1/ulp otherwise   
-               If workspace sufficient, also compare VS with and without 
-  
+               If workspace sufficient, also compare VS with and without   
                reciprocal condition numbers   
                (with sorting of eigenvalues)   
 
@@ -261,11 +263,9 @@ static integer c__22 = 22;
                If workspace sufficient, also compare SDIM with and   
                without reciprocal condition numbers   
 
-       (14)    if RCONDE the same no matter if VS and/or RCONDV computed 
-  
+       (14)    if RCONDE the same no matter if VS and/or RCONDV computed   
 
-       (15)    if RCONDV the same no matter if VS and/or RCONDE computed 
-  
+       (15)    if RCONDV the same no matter if VS and/or RCONDE computed   
 
        The "sizes" are specified by an array NN(1:NSIZES); the value of   
        each element NN(j) specifies one size.   
@@ -389,8 +389,7 @@ static integer c__22 = 22;
             tested. If it is MAXTYP+1 and NSIZES is 1, then an   
             additional type, MAXTYP+1 is defined, which is to use   
             whatever matrix is in A.  This is only useful if   
-            DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. . 
-  
+            DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. .   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
             If DOTYPE(j) is .TRUE., then for each size in NN a   
@@ -430,8 +429,7 @@ static integer c__22 = 22;
 
     A       (workspace) REAL array, dimension (LDA, max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used. 
-  
+            computed.  On exit, A contains the last matrix actually used.   
 
     LDA     (input) INTEGER   
             The leading dimension of A, and H. LDA must be at   
@@ -469,8 +467,7 @@ static integer c__22 = 22;
 
     RESULT  (output) REAL array, dimension (17)   
             The values computed by the 17 tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow. 
-  
+            The values are currently limited to 1/ulp, to avoid overflow.   
 
     WORK    (workspace) REAL array, dimension (LWORK)   
 
@@ -486,8 +483,7 @@ static integer c__22 = 22;
               >0,  SLATMR, SLATMS, SLATME or SGET24 returned an error   
                    code and INFO is its absolute value   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -511,21 +507,20 @@ static integer c__22 = 22;
        KCONDS(j)       Selectw whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = ht_dim1 + 1;
+    ht_offset = 1 + ht_dim1 * 1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --wr;
     --wi;
@@ -534,10 +529,10 @@ static integer c__22 = 22;
     --wrtmp;
     --witmp;
     vs1_dim1 = *ldvs;
-    vs1_offset = vs1_dim1 + 1;
+    vs1_offset = 1 + vs1_dim1 * 1;
     vs1 -= vs1_offset;
     vs_dim1 = *ldvs;
-    vs_offset = vs_dim1 + 1;
+    vs_offset = 1 + vs_dim1 * 1;
     vs -= vs_offset;
     --result;
     --work;
@@ -546,8 +541,8 @@ static integer c__22 = 22;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "SX", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "SX", (ftnlen)2, (ftnlen)2);
 
 /*     Check for errors */
 
@@ -658,12 +653,9 @@ static integer c__22 = 22;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -715,7 +707,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L70: */
 		}
 
@@ -725,9 +717,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 		    if (jcol > 1) {
-			a[jcol + (jcol - 1) * a_dim1] = 1.f;
+			a_ref(jcol, jcol - 1) = 1.f;
 		    }
 /* L80: */
 		}
@@ -799,13 +791,13 @@ L60:
 		    slaset_("Full", &c__2, &n, &c_b18, &c_b18, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a[a_dim1 + 
-			    3], lda);
+		    slaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a_ref(3, 1)
+			    , lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a[(n - 1) *
-			     a_dim1 + 3], lda);
-		    slaset_("Full", &c__1, &n, &c_b18, &c_b18, &a[n + a_dim1],
-			     lda);
+		    slaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a_ref(3, n 
+			    - 1), lda);
+		    slaset_("Full", &c__1, &n, &c_b18, &c_b18, &a_ref(n, 1), 
+			    lda);
 		}
 
 	    } else if (itype == 10) {
@@ -826,7 +818,7 @@ L60:
 	    if (iinfo != 0) {
 		io___32.ciunit = *nounit;
 		s_wsfe(&io___32);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -851,8 +843,8 @@ L90:
 		nnwork = max(nnwork,1);
 
 		sget24_(&c_false, &jtype, thresh, ioldsd, nounit, &n, &a[
-			a_offset], lda, &h[h_offset], &ht[ht_offset], &wr[1], 
-			&wi[1], &wrt[1], &wit[1], &wrtmp[1], &witmp[1], &vs[
+			a_offset], lda, &h__[h_offset], &ht[ht_offset], &wr[1]
+			, &wi[1], &wrt[1], &wit[1], &wrtmp[1], &witmp[1], &vs[
 			vs_offset], ldvs, &vs1[vs1_offset], &rcdein, &rcdvin, 
 			&nslct, islct, &result[1], &work[1], &nnwork, &iwork[
 			1], &bwork[1], info);
@@ -877,7 +869,7 @@ L90:
 		if (ntestf == 1) {
 		    io___41.ciunit = *nounit;
 		    s_wsfe(&io___41);
-		    do_fio(&c__1, path, 3L);
+		    do_fio(&c__1, path, (ftnlen)3);
 		    e_wsfe();
 		    io___42.ciunit = *nounit;
 		    s_wsfe(&io___42);
@@ -948,6 +940,9 @@ L160:
 	goto L200;
     }
     i__1 = e_rsle();
+    if (i__1 != 0) {
+	goto L200;
+    }
     if (n == 0) {
 	goto L200;
     }
@@ -957,20 +952,20 @@ L160:
 	io___49.ciunit = *niunit;
 	s_rsle(&io___49);
 	i__1 = nslct;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&islct[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&islct[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___51.ciunit = *niunit;
 	s_rsle(&io___51);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&a[i + j * a_dim1], (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(real))
+		    ;
 	}
 	e_rsle();
 /* L170: */
@@ -982,8 +977,8 @@ L160:
     e_rsle();
 
     sget24_(&c_true, &c__22, thresh, &iseed[1], nounit, &n, &a[a_offset], lda,
-	     &h[h_offset], &ht[ht_offset], &wr[1], &wi[1], &wrt[1], &wit[1], &
-	    wrtmp[1], &witmp[1], &vs[vs_offset], ldvs, &vs1[vs1_offset], &
+	     &h__[h_offset], &ht[ht_offset], &wr[1], &wi[1], &wrt[1], &wit[1],
+	     &wrtmp[1], &witmp[1], &vs[vs_offset], ldvs, &vs1[vs1_offset], &
 	    rcdein, &rcdvin, &nslct, islct, &result[1], &work[1], lwork, &
 	    iwork[1], &bwork[1], info);
 
@@ -1007,7 +1002,7 @@ L160:
     if (ntestf == 1) {
 	io___53.ciunit = *nounit;
 	s_wsfe(&io___53);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___54.ciunit = *nounit;
 	s_wsfe(&io___54);
@@ -1056,4 +1051,7 @@ L200:
 /*     End of SDRVSX */
 
 } /* sdrvsx_ */
+
+#undef a_ref
+
 

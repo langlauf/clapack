@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,7 +16,7 @@ static real c_b19 = 1.f;
 {
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
-    doublereal d__1;
+    real r__1;
     complex q__1;
 
     /* Builtin functions */
@@ -24,7 +25,7 @@ static real c_b19 = 1.f;
     /* Local variables */
     extern /* Subroutine */ int chpr_(char *, integer *, real *, complex *, 
 	    integer *, complex *);
-    static integer i, k;
+    static integer i__, k;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
@@ -41,7 +42,7 @@ static real c_b19 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -76,8 +77,7 @@ static real c_b19 = 1.f;
     AFAC    (input/output) COMPLEX array, dimension (N*(N+1)/2)   
             On entry, the factor L or U from the L*L' or U'*U   
             factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the 
-  
+            Overwritten with the reconstructed matrix, and then with the   
             difference L*L' - A (or U'*U - A).   
 
     RWORK   (workspace) REAL array, dimension (N)   
@@ -86,8 +86,7 @@ static real c_b19 = 1.f;
             If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
@@ -112,8 +111,7 @@ static real c_b19 = 1.f;
 	return 0;
     }
 
-/*     Check the imaginary parts of the diagonal elements and return with 
-  
+/*     Check the imaginary parts of the diagonal elements and return with   
        an error code if any are nonzero. */
 
     kc = 1;
@@ -169,10 +167,10 @@ static real c_b19 = 1.f;
 	i__1 = *n;
 	for (k = 1; k <= i__1; ++k) {
 	    i__2 = k - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = kc + i - 1;
-		i__4 = kc + i - 1;
-		i__5 = kc + i - 1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = kc + i__ - 1;
+		i__4 = kc + i__ - 1;
+		i__5 = kc + i__ - 1;
 		q__1.r = afac[i__4].r - a[i__5].r, q__1.i = afac[i__4].i - a[
 			i__5].i;
 		afac[i__3].r = q__1.r, afac[i__3].i = q__1.i;
@@ -181,8 +179,8 @@ static real c_b19 = 1.f;
 	    i__2 = kc + k - 1;
 	    i__3 = kc + k - 1;
 	    i__4 = kc + k - 1;
-	    d__1 = a[i__4].r;
-	    q__1.r = afac[i__3].r - d__1, q__1.i = afac[i__3].i;
+	    r__1 = a[i__4].r;
+	    q__1.r = afac[i__3].r - r__1, q__1.i = afac[i__3].i;
 	    afac[i__2].r = q__1.r, afac[i__2].i = q__1.i;
 	    kc += k;
 /* L50: */
@@ -194,8 +192,7 @@ static real c_b19 = 1.f;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of
-   
+/*           Add a multiple of column K of the factor L to each of   
              columns K+1 through N. */
 
 	    if (k < *n) {
@@ -223,14 +220,14 @@ static real c_b19 = 1.f;
 	    i__2 = kc;
 	    i__3 = kc;
 	    i__4 = kc;
-	    d__1 = a[i__4].r;
-	    q__1.r = afac[i__3].r - d__1, q__1.i = afac[i__3].i;
+	    r__1 = a[i__4].r;
+	    q__1.r = afac[i__3].r - r__1, q__1.i = afac[i__3].i;
 	    afac[i__2].r = q__1.r, afac[i__2].i = q__1.i;
 	    i__2 = *n;
-	    for (i = k + 1; i <= i__2; ++i) {
-		i__3 = kc + i - k;
-		i__4 = kc + i - k;
-		i__5 = kc + i - k;
+	    for (i__ = k + 1; i__ <= i__2; ++i__) {
+		i__3 = kc + i__ - k;
+		i__4 = kc + i__ - k;
+		i__5 = kc + i__ - k;
 		q__1.r = afac[i__4].r - a[i__5].r, q__1.i = afac[i__4].i - a[
 			i__5].i;
 		afac[i__3].r = q__1.r, afac[i__3].i = q__1.i;

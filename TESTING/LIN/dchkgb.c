@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,13 +29,14 @@ static integer c__0 = 0;
 static integer c_n1 = -1;
 static doublereal c_b63 = 0.;
 static doublereal c_b64 = 1.;
+static integer c__7 = 7;
 
 /* Subroutine */ int dchkgb_(logical *dotype, integer *nm, integer *mval, 
 	integer *nn, integer *nval, integer *nnb, integer *nbval, integer *
-	nrhs, doublereal *thresh, logical *tsterr, doublereal *a, integer *la,
-	 doublereal *afac, integer *lafac, doublereal *b, doublereal *x, 
-	doublereal *xact, doublereal *work, doublereal *rwork, integer *iwork,
-	 integer *nout)
+	nns, integer *nsval, doublereal *thresh, logical *tsterr, doublereal *
+	a, integer *la, doublereal *afac, integer *lafac, doublereal *b, 
+	doublereal *x, doublereal *xact, doublereal *work, doublereal *rwork, 
+	integer *iwork, integer *nout)
 {
     /* Initialized data */
 
@@ -48,15 +50,15 @@ static doublereal c_b64 = 1.;
     static char fmt_9998[] = "(\002 *** In DCHKGB, LAFAC=\002,i5,\002 is too"
 	    " small for M=\002,i5,\002, N=\002,i5,\002, KL=\002,i4,\002, KU"
 	    "=\002,i4,/\002 ==> Increase LAFAC to at least \002,i5)";
-    static char fmt_9997[] = "(\002 M=\002,i5,\002,N=\002,i5,\002,KL=\002,"
-	    "i5,\002,KU=\002,i5,\002, NB=\002,i4,\002, type \002,i1,\002, tes"
-	    "t \002,i1,\002, ratio=\002,g12.5)";
-    static char fmt_9996[] = "(\002 TRANS= '\002,a1,\002', N =\002,i5,\002, "
-	    "KL =\002,i5,\002, KU =\002,i5,\002, type \002,i1,\002, test \002"
-	    ",i1,\002, ratio=\002,g12.5)";
-    static char fmt_9995[] = "(\002 NORM = '\002,a1,\002', N =\002,i5,\002, "
-	    "KL =\002,i5,\002, KU =\002,i5,\002, type \002,i1,\002, test \002"
-	    ",i1,\002, ratio=\002,g12.5)";
+    static char fmt_9997[] = "(\002 M =\002,i5,\002, N =\002,i5,\002, KL="
+	    "\002,i5,\002, KU=\002,i5,\002, NB =\002,i4,\002, type \002,i1"
+	    ",\002, test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9996[] = "(\002 TRANS='\002,a1,\002', N=\002,i5,\002, "
+	    "KL=\002,i5,\002, KU=\002,i5,\002, NRHS=\002,i3,\002, type \002,i"
+	    "1,\002, test(\002,i1,\002)=\002,g12.5)";
+    static char fmt_9995[] = "(\002 NORM ='\002,a1,\002', N=\002,i5,\002, "
+	    "KL=\002,i5,\002, KU=\002,i5,\002,\002,10x,\002 type \002,i1,\002"
+	    ", test(\002,i1,\002)=\002,g12.5)";
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5, i__6, i__7, i__8, i__9, i__10, 
@@ -68,8 +70,10 @@ static doublereal c_b64 = 1.;
 
     /* Local variables */
     static integer ioff, mode, koff, imat, info;
-    static char path[3], dist[1], norm[1], type[1];
-    static integer nrun, i, j, k;
+    static char path[3], dist[1];
+    static integer irhs, nrhs;
+    static char norm[1], type__[1];
+    static integer nrun, i__, j, k;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer m, n;
     extern /* Subroutine */ int dgbt01_(integer *, integer *, integer *, 
@@ -93,7 +97,7 @@ static doublereal c_b64 = 1.;
 	    doublereal *, integer *);
     static integer kuval[4];
     static char trans[1];
-    static integer izero, nerrs, i1, i2, k1;
+    static integer izero, nerrs, i1, i2;
     static logical zerot;
     static char xtype[1];
     extern /* Subroutine */ int dlatb4_(char *, integer *, integer *, integer 
@@ -108,7 +112,7 @@ static doublereal c_b64 = 1.;
 	    integer *, integer *, integer *, integer *), dgbcon_(char *, integer *, integer *, integer *, 
 	    doublereal *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, integer *);
-    static integer ku, nt;
+    static integer ku;
     extern /* Subroutine */ int dgbrfs_(char *, integer *, integer *, integer 
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
@@ -144,16 +148,16 @@ static doublereal c_b64 = 1.;
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___26 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___46 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9996, 0 };
     static cilist io___61 = { 0, 0, 0, fmt_9995, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 7, 1999   
 
 
     Purpose   
@@ -165,8 +169,7 @@ static doublereal c_b64 = 1.;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -185,12 +188,14 @@ static doublereal c_b64 = 1.;
     NNB     (input) INTEGER   
             The number of values of NB contained in the vector NBVAL.   
 
-    NBVAL   (input) INTEGER array, dimension (NBVAL)   
+    NBVAL   (input) INTEGER array, dimension (NNB)   
             The values of the blocksize NB.   
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+    NNS     (input) INTEGER   
+            The number of values of NRHS contained in the vector NSVAL.   
+
+    NSVAL   (input) INTEGER array, dimension (NNS)   
+            The values of the number of right hand sides NRHS.   
 
     THRESH  (input) DOUBLE PRECISION   
             The threshold value for the test ratios.  A result is   
@@ -205,37 +210,36 @@ static doublereal c_b64 = 1.;
     LA      (input) INTEGER   
             The length of the array A.  LA >= (KLMAX+KUMAX+1)*NMAX   
             where KLMAX is the largest entry in the local array KLVAL,   
-                  KUMAX is the largest entry in local array KUVAL and   
-                  NMAX is the largest entry in input array NVAL.   
+                  KUMAX is the largest entry in the local array KUVAL and   
+                  NMAX is the largest entry in the input array NVAL.   
 
     AFAC    (workspace) DOUBLE PRECISION array, dimension (LAFAC)   
 
     LAFAC   (input) INTEGER   
-            The length of the array AFAC. LAFAC >= (2*KLMAX+KUMAX+1)*NMAX 
-  
-            where KLMAX is the largest entry in local array KLVAL,   
-                  KUMAX is the largest entry in local array KUVAL and   
-                  NMAX is the largest entry in input array NVAL.   
+            The length of the array AFAC. LAFAC >= (2*KLMAX+KUMAX+1)*NMAX   
+            where KLMAX is the largest entry in the local array KLVAL,   
+                  KUMAX is the largest entry in the local array KUVAL and   
+                  NMAX is the largest entry in the input array NVAL.   
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
+            where NSMAX is the largest entry in NSVAL.   
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (NMAX*max(3,NRHS,NMAX))   
+                        (NMAX*max(3,NSMAX,NMAX))   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension   
-                        (max(NMAX,2*NRHS))   
+                        (max(NMAX,2*NSMAX))   
 
     IWORK   (workspace) INTEGER array, dimension (2*NMAX)   
 
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -246,6 +250,7 @@ static doublereal c_b64 = 1.;
     --b;
     --afac;
     --a;
+    --nsval;
     --nbval;
     --nval;
     --mval;
@@ -255,13 +260,13 @@ static doublereal c_b64 = 1.;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "GB", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GB", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -331,26 +336,21 @@ static doublereal c_b64 = 1.;
 	    i__3 = nkl;
 	    for (ikl = 1; ikl <= i__3; ++ikl) {
 
-/*              Do for KL = 0, (5*M+1)/4, (3M-1)/4, and (M+1)/
-4. This   
-                order makes it easier to skip redundant values
- for small   
+/*              Do for KL = 0, (5*M+1)/4, (3M-1)/4, and (M+1)/4. This   
+                order makes it easier to skip redundant values for small   
                 values of M. */
 
 		kl = klval[ikl - 1];
 		i__4 = nku;
 		for (iku = 1; iku <= i__4; ++iku) {
 
-/*                 Do for KU = 0, (5*N+1)/4, (3N-1)/4, and
- (N+1)/4. This   
-                   order makes it easier to skip redundant
- values for   
+/*                 Do for KU = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This   
+                   order makes it easier to skip redundant values for   
                    small values of N. */
 
 		    ku = kuval[iku - 1];
 
-/*                 Check that A and AFAC are big enough to
- generate this   
+/*                 Check that A and AFAC are big enough to generate this   
                    matrix. */
 
 		    lda = kl + ku + 1;
@@ -397,75 +397,67 @@ static doublereal c_b64 = 1.;
 			    e_wsfe();
 			    ++nerrs;
 			}
-			goto L100;
+			goto L130;
 		    }
 
 		    i__5 = nimat;
 		    for (imat = 1; imat <= i__5; ++imat) {
 
-/*                    Do the tests only if DOTYPE( IMA
-T ) is true. */
+/*                    Do the tests only if DOTYPE( IMAT ) is true. */
 
 			if (! dotype[imat]) {
-			    goto L90;
+			    goto L120;
 			}
 
-/*                    Skip types 2, 3, or 4 if the mat
-rix size is too   
+/*                    Skip types 2, 3, or 4 if the matrix size is too   
                       small. */
 
 			zerot = imat >= 2 && imat <= 4;
 			if (zerot && n < imat - 1) {
-			    goto L90;
+			    goto L120;
 			}
 
 			if (! zerot || ! dotype[1]) {
 
-/*                       Set up parameters with DL
-ATB4 and generate a   
-                         test matrix with DLATMS. 
-*/
+/*                       Set up parameters with DLATB4 and generate a   
+                         test matrix with DLATMS. */
 
-			    dlatb4_(path, &imat, &m, &n, type, &kl, &ku, &
+			    dlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &
 				    anorm, &mode, &cndnum, dist);
 
 /* Computing MAX */
 			    i__6 = 1, i__7 = ku + 2 - n;
 			    koff = max(i__6,i__7);
 			    i__6 = koff - 1;
-			    for (i = 1; i <= i__6; ++i) {
-				a[i] = 0.;
+			    for (i__ = 1; i__ <= i__6; ++i__) {
+				a[i__] = 0.;
 /* L20: */
 			    }
-			    s_copy(srnamc_1.srnamt, "DLATMS", 6L, 6L);
-			    dlatms_(&m, &n, dist, iseed, type, &rwork[1], &
+			    s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (
+				    ftnlen)6);
+			    dlatms_(&m, &n, dist, iseed, type__, &rwork[1], &
 				    mode, &cndnum, &anorm, &kl, &ku, "Z", &a[
 				    koff], &lda, &work[1], &info);
 
-/*                       Check the error code from
- DLATMS. */
+/*                       Check the error code from DLATMS. */
 
 			    if (info != 0) {
 				alaerh_(path, "DLATMS", &info, &c__0, " ", &m,
 					 &n, &kl, &ku, &c_n1, &imat, &nfail, &
 					nerrs, nout);
-				goto L90;
+				goto L120;
 			    }
 			} else if (izero > 0) {
 
-/*                       Use the same matrix for t
-ypes 3 and 4 as for   
-                         type 2 by copying back th
-e zeroed out column. */
+/*                       Use the same matrix for types 3 and 4 as for   
+                         type 2 by copying back the zeroed out column. */
 
 			    i__6 = i2 - i1 + 1;
 			    dcopy_(&i__6, &b[1], &c__1, &a[ioff + i1], &c__1);
 			}
 
-/*                    For types 2, 3, and 4, zero one 
-or more columns of   
-                      the matrix to test that INFO is 
-returned correctly. */
+/*                    For types 2, 3, and 4, zero one or more columns of   
+                      the matrix to test that INFO is returned correctly. */
 
 			izero = 0;
 			if (zerot) {
@@ -479,8 +471,7 @@ returned correctly. */
 			    ioff = (izero - 1) * lda;
 			    if (imat < 4) {
 
-/*                          Store the column t
-o be zeroed out in B.   
+/*                          Store the column to be zeroed out in B.   
 
    Computing MAX */
 				i__6 = 1, i__7 = ku + 2 - izero;
@@ -494,8 +485,8 @@ o be zeroed out in B.
 					c__1);
 
 				i__6 = i2;
-				for (i = i1; i <= i__6; ++i) {
-				    a[ioff + i] = 0.;
+				for (i__ = i1; i__ <= i__6; ++i__) {
+				    a[ioff + i__] = 0.;
 /* L30: */
 				}
 			    } else {
@@ -507,8 +498,9 @@ o be zeroed out in B.
 				    i__10 = kl + ku + 1, i__11 = ku + 1 + (m 
 					    - j);
 				    i__9 = min(i__10,i__11);
-				    for (i = max(i__7,i__8); i <= i__9; ++i) {
-					a[ioff + i] = 0.;
+				    for (i__ = max(i__7,i__8); i__ <= i__9; 
+					    ++i__) {
+					a[ioff + i__] = 0.;
 /* L40: */
 				    }
 				    ioff += lda;
@@ -517,39 +509,33 @@ o be zeroed out in B.
 			    }
 			}
 
-/*                    These lines, if used in place of
- the calls in the   
-                      loop over INB, cause the code to
- bomb on a Sun   
+/*                    These lines, if used in place of the calls in the   
+                      loop over INB, cause the code to bomb on a Sun   
                       SPARCstation.   
 
-                       ANORMO = DLANGB( 'O', N, KL, KU
-, A, LDA, RWORK )   
-                       ANORMI = DLANGB( 'I', N, KL, KU
-, A, LDA, RWORK )   
+                       ANORMO = DLANGB( 'O', N, KL, KU, A, LDA, RWORK )   
+                       ANORMI = DLANGB( 'I', N, KL, KU, A, LDA, RWORK )   
 
-                      Do for each blocksize in NBVAL 
-*/
+                      Do for each blocksize in NBVAL */
 
 			i__6 = *nnb;
 			for (inb = 1; inb <= i__6; ++inb) {
 			    nb = nbval[inb];
 			    xlaenv_(&c__1, &nb);
 
-/*                       Compute the LU factorizat
-ion of the band matrix. */
+/*                       Compute the LU factorization of the band matrix. */
 
 			    if (m > 0 && n > 0) {
 				i__9 = kl + ku + 1;
 				dlacpy_("Full", &i__9, &n, &a[1], &lda, &afac[
 					kl + 1], &ldafac);
 			    }
-			    s_copy(srnamc_1.srnamt, "DGBTRF", 6L, 6L);
+			    s_copy(srnamc_1.srnamt, "DGBTRF", (ftnlen)6, (
+				    ftnlen)6);
 			    dgbtrf_(&m, &n, &kl, &ku, &afac[1], &ldafac, &
 				    iwork[1], &info);
 
-/*                       Check error code from DGB
-TRF. */
+/*                       Check error code from DGBTRF. */
 
 			    if (info != izero) {
 				alaerh_(path, "DGBTRF", &info, &izero, " ", &
@@ -559,25 +545,21 @@ TRF. */
 			    trfcon = FALSE_;
 
 /* +    TEST 1   
-                         Reconstruct matrix from f
-actors and compute   
+                         Reconstruct matrix from factors and compute   
                          residual. */
 
 			    dgbt01_(&m, &n, &kl, &ku, &a[1], &lda, &afac[1], &
 				    ldafac, &iwork[1], &work[1], result);
-			    nt = 1;
 
-/*                       Print information about t
-he tests so far that   
-                         did not pass the threshol
-d. */
+/*                       Print information about the tests so far that   
+                         did not pass the threshold. */
 
 			    if (result[0] >= *thresh) {
 				if (nfail == 0 && nerrs == 0) {
 				    alahd_(nout, path);
 				}
-				io___46.ciunit = *nout;
-				s_wsfe(&io___46);
+				io___45.ciunit = *nout;
+				s_wsfe(&io___45);
 				do_fio(&c__1, (char *)&m, (ftnlen)sizeof(
 					integer));
 				do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
@@ -599,13 +581,11 @@ d. */
 			    }
 			    ++nrun;
 
-/*                       Skip the remaining tests 
-if this is not the   
-                         first block size or if M 
-.ne. N. */
+/*                       Skip the remaining tests if this is not the   
+                         first block size or if M .ne. N. */
 
 			    if (inb > 1 || m != n) {
-				goto L80;
+				goto L110;
 			    }
 
 			    anormo = dlangb_("O", &n, &kl, &ku, &a[1], &lda, &
@@ -615,21 +595,19 @@ if this is not the
 
 			    if (info == 0) {
 
-/*                          Form the inverse o
-f A so we can get a good   
-                            estimate of CNDNUM
- = norm(A) * norm(inv(A)). */
+/*                          Form the inverse of A so we can get a good   
+                            estimate of CNDNUM = norm(A) * norm(inv(A)). */
 
 				ldb = max(1,n);
 				dlaset_("Full", &n, &n, &c_b63, &c_b64, &work[
 					1], &ldb);
-				s_copy(srnamc_1.srnamt, "DGBTRS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "DGBTRS", (ftnlen)6, (
+					ftnlen)6);
 				dgbtrs_("No transpose", &n, &kl, &ku, &n, &
 					afac[1], &ldafac, &iwork[1], &work[1],
 					 &ldb, &info);
 
-/*                          Compute the 1-norm
- condition number of A. */
+/*                          Compute the 1-norm condition number of A. */
 
 				ainvnm = dlange_("O", &n, &n, &work[1], &ldb, 
 					&rwork[1]);
@@ -639,8 +617,7 @@ f A so we can get a good
 				    rcondo = 1. / anormo / ainvnm;
 				}
 
-/*                          Compute the infini
-ty-norm condition number of   
+/*                          Compute the infinity-norm condition number of   
                             A. */
 
 				ainvnm = dlange_("I", &n, &n, &work[1], &ldb, 
@@ -652,17 +629,142 @@ ty-norm condition number of
 				}
 			    } else {
 
-/*                          Do only the condit
-ion estimate if INFO.NE.0. */
+/*                          Do only the condition estimate if INFO.NE.0. */
 
 				trfcon = TRUE_;
 				rcondo = 0.;
 				rcondi = 0.;
 			    }
 
-			    for (itran = 1; itran <= 3; ++itran) {
-				*(unsigned char *)trans = *(unsigned char *)&
-					transs[itran - 1];
+/*                       Skip the solve tests if the matrix is singular. */
+
+			    if (trfcon) {
+				goto L90;
+			    }
+
+			    i__9 = *nns;
+			    for (irhs = 1; irhs <= i__9; ++irhs) {
+				nrhs = nsval[irhs];
+				*(unsigned char *)xtype = 'N';
+
+				for (itran = 1; itran <= 3; ++itran) {
+				    *(unsigned char *)trans = *(unsigned char 
+					    *)&transs[itran - 1];
+				    if (itran == 1) {
+					rcondc = rcondo;
+					*(unsigned char *)norm = 'O';
+				    } else {
+					rcondc = rcondi;
+					*(unsigned char *)norm = 'I';
+				    }
+
+/* +    TEST 2:   
+                               Solve and compute residual for A * X = B. */
+
+				    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)
+					    6, (ftnlen)6);
+				    dlarhs_(path, xtype, " ", trans, &n, &n, &
+					    kl, &ku, &nrhs, &a[1], &lda, &
+					    xact[1], &ldb, &b[1], &ldb, iseed,
+					     &info);
+				    *(unsigned char *)xtype = 'C';
+				    dlacpy_("Full", &n, &nrhs, &b[1], &ldb, &
+					    x[1], &ldb);
+
+				    s_copy(srnamc_1.srnamt, "DGBTRS", (ftnlen)
+					    6, (ftnlen)6);
+				    dgbtrs_(trans, &n, &kl, &ku, &nrhs, &afac[
+					    1], &ldafac, &iwork[1], &x[1], &
+					    ldb, &info);
+
+/*                             Check error code from DGBTRS. */
+
+				    if (info != 0) {
+					alaerh_(path, "DGBTRS", &info, &c__0, 
+						trans, &n, &n, &kl, &ku, &
+						c_n1, &imat, &nfail, &nerrs, 
+						nout);
+				    }
+
+				    dlacpy_("Full", &n, &nrhs, &b[1], &ldb, &
+					    work[1], &ldb);
+				    dgbt02_(trans, &m, &n, &kl, &ku, &nrhs, &
+					    a[1], &lda, &x[1], &ldb, &work[1],
+					     &ldb, &result[1]);
+
+/* +    TEST 3:   
+                               Check solution from generated exact   
+                               solution. */
+
+				    dget04_(&n, &nrhs, &x[1], &ldb, &xact[1], 
+					    &ldb, &rcondc, &result[2]);
+
+/* +    TESTS 4, 5, 6:   
+                               Use iterative refinement to improve the   
+                               solution. */
+
+				    s_copy(srnamc_1.srnamt, "DGBRFS", (ftnlen)
+					    6, (ftnlen)6);
+				    dgbrfs_(trans, &n, &kl, &ku, &nrhs, &a[1],
+					     &lda, &afac[1], &ldafac, &iwork[
+					    1], &b[1], &ldb, &x[1], &ldb, &
+					    rwork[1], &rwork[nrhs + 1], &work[
+					    1], &iwork[n + 1], &info);
+
+/*                             Check error code from DGBRFS. */
+
+				    if (info != 0) {
+					alaerh_(path, "DGBRFS", &info, &c__0, 
+						trans, &n, &n, &kl, &ku, &
+						nrhs, &imat, &nfail, &nerrs, 
+						nout);
+				    }
+
+				    dget04_(&n, &nrhs, &x[1], &ldb, &xact[1], 
+					    &ldb, &rcondc, &result[3]);
+				    dgbt05_(trans, &n, &kl, &ku, &nrhs, &a[1],
+					     &lda, &b[1], &ldb, &x[1], &ldb, &
+					    xact[1], &ldb, &rwork[1], &rwork[
+					    nrhs + 1], &result[4]);
+				    for (k = 2; k <= 6; ++k) {
+					if (result[k - 1] >= *thresh) {
+					    if (nfail == 0 && nerrs == 0) {
+			  alahd_(nout, path);
+					    }
+					    io___59.ciunit = *nout;
+					    s_wsfe(&io___59);
+					    do_fio(&c__1, trans, (ftnlen)1);
+					    do_fio(&c__1, (char *)&n, (ftnlen)
+						    sizeof(integer));
+					    do_fio(&c__1, (char *)&kl, (
+						    ftnlen)sizeof(integer));
+					    do_fio(&c__1, (char *)&ku, (
+						    ftnlen)sizeof(integer));
+					    do_fio(&c__1, (char *)&nrhs, (
+						    ftnlen)sizeof(integer));
+					    do_fio(&c__1, (char *)&imat, (
+						    ftnlen)sizeof(integer));
+					    do_fio(&c__1, (char *)&k, (ftnlen)
+						    sizeof(integer));
+					    do_fio(&c__1, (char *)&result[k - 
+						    1], (ftnlen)sizeof(
+						    doublereal));
+					    e_wsfe();
+					    ++nfail;
+					}
+/* L60: */
+				    }
+				    nrun += 5;
+/* L70: */
+				}
+/* L80: */
+			    }
+
+/* +    TEST 7:   
+                            Get an estimate of RCOND = 1/CNDNUM. */
+
+L90:
+			    for (itran = 1; itran <= 2; ++itran) {
 				if (itran == 1) {
 				    anorm = anormo;
 				    rcondc = rcondo;
@@ -672,179 +774,65 @@ ion estimate if INFO.NE.0. */
 				    rcondc = rcondi;
 				    *(unsigned char *)norm = 'I';
 				}
-				if (trfcon) {
-				    k1 = 7;
-				} else {
-				    k1 = 2;
+				s_copy(srnamc_1.srnamt, "DGBCON", (ftnlen)6, (
+					ftnlen)6);
+				dgbcon_(norm, &n, &kl, &ku, &afac[1], &ldafac,
+					 &iwork[1], &anorm, &rcond, &work[1], 
+					&iwork[n + 1], &info);
 
-/* +    TEST 2:   
-                               Solve and c
-ompute residual for A * X = B. */
+/*                             Check error code from DGBCON. */
 
-				    s_copy(srnamc_1.srnamt, "DLARHS", 6L, 6L);
-				    dlarhs_(path, xtype, " ", trans, &n, &n, &
-					    kl, &ku, nrhs, &a[1], &lda, &xact[
-					    1], &ldb, &b[1], &ldb, iseed, &
-					    info);
-				    *(unsigned char *)xtype = 'C';
-				    dlacpy_("Full", &n, nrhs, &b[1], &ldb, &x[
-					    1], &ldb);
-
-				    s_copy(srnamc_1.srnamt, "DGBTRS", 6L, 6L);
-				    dgbtrs_(trans, &n, &kl, &ku, nrhs, &afac[
-					    1], &ldafac, &iwork[1], &x[1], &
-					    ldb, &info);
-
-/*                             Check error
- code from DGBTRS. */
-
-				    if (info != 0) {
-					alaerh_(path, "DGBTRS", &info, &c__0, 
-						trans, &n, &n, &kl, &ku, &
-						c_n1, &imat, &nfail, &nerrs, 
-						nout);
-				    }
-
-				    dlacpy_("Full", &n, nrhs, &b[1], &ldb, &
-					    work[1], &ldb);
-				    dgbt02_(trans, &m, &n, &kl, &ku, nrhs, &a[
-					    1], &lda, &x[1], &ldb, &work[1], &
-					    ldb, &result[1]);
-
-/* +    TEST 3:   
-                               Check solut
-ion from generated exact   
-                               solution. 
-*/
-
-				    dget04_(&n, nrhs, &x[1], &ldb, &xact[1], &
-					    ldb, &rcondc, &result[2]);
-
-/* +    TESTS 4, 5, 6:   
-                               Use iterati
-ve refinement to improve the   
-                               solution. 
-*/
-
-				    s_copy(srnamc_1.srnamt, "DGBRFS", 6L, 6L);
-				    dgbrfs_(trans, &n, &kl, &ku, nrhs, &a[1], 
-					    &lda, &afac[1], &ldafac, &iwork[1]
-					    , &b[1], &ldb, &x[1], &ldb, &
-					    rwork[1], &rwork[*nrhs + 1], &
-					    work[1], &iwork[n + 1], &info)
-					    ;
-
-/*                             Check error
- code from DGBRFS. */
-
-				    if (info != 0) {
-					alaerh_(path, "DGBRFS", &info, &c__0, 
-						trans, &n, &n, &kl, &ku, nrhs,
-						 &imat, &nfail, &nerrs, nout);
-				    }
-
-				    dget04_(&n, nrhs, &x[1], &ldb, &xact[1], &
-					    ldb, &rcondc, &result[3]);
-				    dgbt05_(trans, &n, &kl, &ku, nrhs, &a[1], 
-					    &lda, &b[1], &ldb, &x[1], &ldb, &
-					    xact[1], &ldb, &rwork[1], &rwork[*
-					    nrhs + 1], &result[4]);
-				    nt = 6;
+				if (info != 0) {
+				    alaerh_(path, "DGBCON", &info, &c__0, 
+					    norm, &n, &n, &kl, &ku, &c_n1, &
+					    imat, &nfail, &nerrs, nout);
 				}
 
-/* +    TEST 7:   
-                            Get an estimate of
- RCOND = 1/CNDNUM. */
+				result[6] = dget06_(&rcond, &rcondc);
 
-				if (itran <= 2) {
-				    s_copy(srnamc_1.srnamt, "DGBCON", 6L, 6L);
-				    dgbcon_(norm, &n, &kl, &ku, &afac[1], &
-					    ldafac, &iwork[1], &anorm, &rcond,
-					     &work[1], &iwork[n + 1], &info);
+/*                          Print information about the tests that did   
+                            not pass the threshold. */
 
-/*                             Check error
- code from DGBCON. */
-
-				    if (info != 0) {
-					alaerh_(path, "DGBCON", &info, &c__0, 
-						norm, &n, &n, &kl, &ku, &c_n1,
-						 &imat, &nfail, &nerrs, nout);
+				if (result[6] >= *thresh) {
+				    if (nfail == 0 && nerrs == 0) {
+					alahd_(nout, path);
 				    }
-
-				    result[6] = dget06_(&rcond, &rcondc);
-				    nt = 7;
+				    io___61.ciunit = *nout;
+				    s_wsfe(&io___61);
+				    do_fio(&c__1, norm, (ftnlen)1);
+				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
+					    integer));
+				    do_fio(&c__1, (char *)&kl, (ftnlen)sizeof(
+					    integer));
+				    do_fio(&c__1, (char *)&ku, (ftnlen)sizeof(
+					    integer));
+				    do_fio(&c__1, (char *)&imat, (ftnlen)
+					    sizeof(integer));
+				    do_fio(&c__1, (char *)&c__7, (ftnlen)
+					    sizeof(integer));
+				    do_fio(&c__1, (char *)&result[6], (ftnlen)
+					    sizeof(doublereal));
+				    e_wsfe();
+				    ++nfail;
 				}
-
-/*                          Print information 
-about the tests that did   
-                            not pass the thres
-hold. */
-
-				i__9 = nt;
-				for (k = k1; k <= i__9; ++k) {
-				    if (result[k - 1] >= *thresh) {
-					if (nfail == 0 && nerrs == 0) {
-					    alahd_(nout, path);
-					}
-					if (k < 7) {
-					    io___60.ciunit = *nout;
-					    s_wsfe(&io___60);
-					    do_fio(&c__1, trans, 1L);
-					    do_fio(&c__1, (char *)&n, (ftnlen)
-						    sizeof(integer));
-					    do_fio(&c__1, (char *)&kl, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&ku, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&imat, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&k, (ftnlen)
-						    sizeof(integer));
-					    do_fio(&c__1, (char *)&result[k - 
-						    1], (ftnlen)sizeof(
-						    doublereal));
-					    e_wsfe();
-					} else {
-					    io___61.ciunit = *nout;
-					    s_wsfe(&io___61);
-					    do_fio(&c__1, norm, 1L);
-					    do_fio(&c__1, (char *)&n, (ftnlen)
-						    sizeof(integer));
-					    do_fio(&c__1, (char *)&kl, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&ku, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&imat, (
-						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, (char *)&k, (ftnlen)
-						    sizeof(integer));
-					    do_fio(&c__1, (char *)&result[k - 
-						    1], (ftnlen)sizeof(
-						    doublereal));
-					    e_wsfe();
-					}
-					++nfail;
-				    }
-/* L60: */
-				}
-				nrun = nrun + nt - k1 + 1;
-/* L70: */
+				++nrun;
+/* L100: */
 			    }
-L80:
+
+L110:
 			    ;
 			}
-
-L90:
+L120:
 			;
 		    }
-L100:
+L130:
 		    ;
 		}
-/* L110: */
+/* L140: */
 	    }
-/* L120: */
+/* L150: */
 	}
-/* L130: */
+/* L160: */
     }
 
 /*     Print a summary of the results. */

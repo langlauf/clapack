@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int slaev2_(real *a, real *b, real *c, real *rt1, real *rt2, 
-	real *cs1, real *sn1)
+/* Subroutine */ int slaev2_(real *a, real *b, real *c__, real *rt1, real *
+	rt2, real *cs1, real *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -15,10 +16,8 @@
     SLAEV2 computes the eigendecomposition of a 2-by-2 symmetric matrix   
        [  A   B  ]   
        [  B   C  ].   
-    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the 
-  
-    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right 
-  
+    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the   
+    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right   
     eigenvector for RT1, giving the decomposition   
 
        [ CS1  SN1 ] [  A   B  ] [ CS1 -SN1 ]  =  [ RT1  0  ]   
@@ -59,13 +58,11 @@
 
     CS1 and SN1 are accurate to a few ulps barring over/underflow.   
 
-    Overflow is possible only if RT1 is within a factor of 5 of overflow. 
-  
+    Overflow is possible only if RT1 is within a factor of 5 of overflow.   
     Underflow is harmless if the input data is 0 or exceeds   
        underflow_threshold / macheps.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Compute the eigenvalues */
@@ -78,16 +75,16 @@
     static integer sgn1, sgn2;
 
 
-    sm = *a + *c;
-    df = *a - *c;
+    sm = *a + *c__;
+    df = *a - *c__;
     adf = dabs(df);
     tb = *b + *b;
     ab = dabs(tb);
-    if (dabs(*a) > dabs(*c)) {
+    if (dabs(*a) > dabs(*c__)) {
 	acmx = *a;
-	acmn = *c;
+	acmn = *c__;
     } else {
-	acmx = *c;
+	acmx = *c__;
 	acmn = *a;
     }
     if (adf > ab) {
@@ -142,7 +139,7 @@
     }
     acs = dabs(cs);
     if (acs > ab) {
-	ct = -(doublereal)tb / cs;
+	ct = -tb / cs;
 	*sn1 = 1.f / sqrt(ct * ct + 1.f);
 	*cs1 = ct * *sn1;
     } else {
@@ -150,14 +147,14 @@
 	    *cs1 = 1.f;
 	    *sn1 = 0.f;
 	} else {
-	    tn = -(doublereal)cs / tb;
+	    tn = -cs / tb;
 	    *cs1 = 1.f / sqrt(tn * tn + 1.f);
 	    *sn1 = tn * *cs1;
 	}
     }
     if (sgn1 == sgn2) {
 	tn = *cs1;
-	*cs1 = -(doublereal)(*sn1);
+	*cs1 = -(*sn1);
 	*sn1 = tn;
     }
     return 0;

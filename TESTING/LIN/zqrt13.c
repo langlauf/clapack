@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -38,7 +39,11 @@ static integer c__0 = 0;
 	    doublecomplex *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +52,7 @@ static integer c__0 = 0;
     Purpose   
     =======   
 
-    ZQRT13 generates a full-rank matrix that may be scaled to have large 
-  
+    ZQRT13 generates a full-rank matrix that may be scaled to have large   
     or small norm.   
 
     Arguments   
@@ -77,13 +81,12 @@ static integer c__0 = 0;
     ISEED   (input/output) integer array, dimension (4)   
             Seed for random number generator   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --iseed;
 
@@ -96,12 +99,12 @@ static integer c__0 = 0;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	zlarnv_(&c__2, &iseed[1], m, &a[j * a_dim1 + 1]);
+	zlarnv_(&c__2, &iseed[1], m, &a_ref(1, j));
 	if (j <= *m) {
-	    i__2 = j + j * a_dim1;
-	    i__3 = j + j * a_dim1;
-	    d__2 = dzasum_(m, &a[j * a_dim1 + 1], &c__1);
-	    i__4 = j + j * a_dim1;
+	    i__2 = a_subscr(j, j);
+	    i__3 = a_subscr(j, j);
+	    d__2 = dzasum_(m, &a_ref(1, j), &c__1);
+	    i__4 = a_subscr(j, j);
 	    d__3 = a[i__4].r;
 	    d__1 = d_sign(&d__2, &d__3);
 	    z__2.r = d__1, z__2.i = 0.;
@@ -142,4 +145,8 @@ static integer c__0 = 0;
 /*     End of ZQRT13 */
 
 } /* zqrt13_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,21 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlaed6_(integer *kniter, logical *orgati, doublereal *
-	rho, doublereal *d, doublereal *z, doublereal *finit, doublereal *tau,
-	 integer *info)
+	rho, doublereal *d__, doublereal *z__, doublereal *finit, doublereal *
+	tau, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DLAED6 computes the positive or negative root (closest to the origin) 
-  
+    DLAED6 computes the positive or negative root (closest to the origin)   
     of   
                      z(1)        z(2)        z(3)   
     f(x) =   rho + --------- + ---------- + ---------   
@@ -26,10 +25,8 @@
           if ORGATI = .true. the root is between d(2) and d(3);   
           otherwise it is between d(1) and d(2)   
 
-    This routine will be called by DLAED4 when necessary. In most cases, 
-  
-    the root sought is the smallest in magnitude, though it might not be 
-  
+    This routine will be called by DLAED4 when necessary. In most cases,   
+    the root sought is the smallest in magnitude, though it might not be   
     in some extremely rare situations.   
 
     Arguments   
@@ -64,12 +61,16 @@
                  = 0: successful exit   
                  > 0: if INFO = 1, failure to converge   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
 
-    
-   Parameter adjustments   
-       Function Body */
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
+
+       Parameter adjustments */
     /* Initialized data */
     static logical first = TRUE_;
     /* System generated locals */
@@ -80,22 +81,19 @@
     /* Local variables */
     static doublereal base;
     static integer iter;
-    static doublereal temp, temp1, temp2, temp3, a, b, c, f;
-    static integer i;
+    static doublereal temp, temp1, temp2, temp3, temp4, a, b, c__, f;
+    static integer i__;
     static logical scale;
     static integer niter;
     static doublereal small1, small2, fc, df, sminv1, sminv2;
     extern doublereal dlamch_(char *);
-    static doublereal dscale[3], sclfac, zscale[3], erretm, sclinv, pretau, 
-	    ddf, eta, eps;
+    static doublereal dscale[3], sclfac, zscale[3], erretm, sclinv, ddf, eta, 
+	    eps;
 
+    --z__;
+    --d__;
 
-#define DSCALE(I) dscale[(I)]
-#define ZSCALE(I) zscale[(I)]
-#define Z(I) z[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
 
     *info = 0;
 
@@ -103,27 +101,33 @@
     *tau = 0.;
     if (*kniter == 2) {
 	if (*orgati) {
-	    temp = (D(3) - D(2)) / 2.;
-	    c = *rho + Z(1) / (D(1) - D(2) - temp);
-	    a = c * (D(2) + D(3)) + Z(2) + Z(3);
-	    b = c * D(2) * D(3) + Z(2) * D(3) + Z(3) * D(2);
+	    temp = (d__[3] - d__[2]) / 2.;
+	    c__ = *rho + z__[1] / (d__[1] - d__[2] - temp);
+	    a = c__ * (d__[2] + d__[3]) + z__[2] + z__[3];
+	    b = c__ * d__[2] * d__[3] + z__[2] * d__[3] + z__[3] * d__[2];
 	} else {
-	    temp = (D(1) - D(2)) / 2.;
-	    c = *rho + Z(3) / (D(3) - D(2) - temp);
-	    a = c * (D(1) + D(2)) + Z(1) + Z(2);
-	    b = c * D(1) * D(2) + Z(1) * D(2) + Z(2) * D(1);
+	    temp = (d__[1] - d__[2]) / 2.;
+	    c__ = *rho + z__[3] / (d__[3] - d__[2] - temp);
+	    a = c__ * (d__[1] + d__[2]) + z__[1] + z__[2];
+	    b = c__ * d__[1] * d__[2] + z__[1] * d__[2] + z__[2] * d__[1];
 	}
-	if (c == 0.) {
+/* Computing MAX */
+	d__1 = abs(a), d__2 = abs(b), d__1 = max(d__1,d__2), d__2 = abs(c__);
+	temp = max(d__1,d__2);
+	a /= temp;
+	b /= temp;
+	c__ /= temp;
+	if (c__ == 0.) {
 	    *tau = b / a;
 	} else if (a <= 0.) {
-	    *tau = (a - sqrt((d__1 = a * a - b * 4. * c, abs(d__1)))) / (c * 
-		    2.);
+	    *tau = (a - sqrt((d__1 = a * a - b * 4. * c__, abs(d__1)))) / (
+		    c__ * 2.);
 	} else {
-	    *tau = b * 2. / (a + sqrt((d__1 = a * a - b * 4. * c, abs(d__1))))
-		    ;
+	    *tau = b * 2. / (a + sqrt((d__1 = a * a - b * 4. * c__, abs(d__1))
+		    ));
 	}
-	temp = *rho + Z(1) / (D(1) - *tau) + Z(2) / (D(2) - *tau) + Z(3) / (D(
-		3) - *tau);
+	temp = *rho + z__[1] / (d__[1] - *tau) + z__[2] / (d__[2] - *tau) + 
+		z__[3] / (d__[3] - *tau);
 	if (abs(*finit) <= abs(temp)) {
 	    *tau = 0.;
 	}
@@ -148,13 +152,13 @@
 
     if (*orgati) {
 /* Computing MIN */
-	d__3 = (d__1 = D(2) - *tau, abs(d__1)), d__4 = (d__2 = D(3) - *tau, 
-		abs(d__2));
+	d__3 = (d__1 = d__[2] - *tau, abs(d__1)), d__4 = (d__2 = d__[3] - *
+		tau, abs(d__2));
 	temp = min(d__3,d__4);
     } else {
 /* Computing MIN */
-	d__3 = (d__1 = D(1) - *tau, abs(d__1)), d__4 = (d__2 = D(2) - *tau, 
-		abs(d__2));
+	d__3 = (d__1 = d__[1] - *tau, abs(d__1)), d__4 = (d__2 = d__[2] - *
+		tau, abs(d__2));
 	temp = min(d__3,d__4);
     }
     scale = FALSE_;
@@ -174,12 +178,11 @@
 	    sclinv = small1;
 	}
 
-/*        Scaling up safe because D, Z, TAU scaled elsewhere to be O(1
-) */
+/*        Scaling up safe because D, Z, TAU scaled elsewhere to be O(1) */
 
-	for (i = 1; i <= 3; ++i) {
-	    DSCALE(i - 1) = D(i) * sclfac;
-	    ZSCALE(i - 1) = Z(i) * sclfac;
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    dscale[i__ - 1] = d__[i__] * sclfac;
+	    zscale[i__ - 1] = z__[i__] * sclfac;
 /* L10: */
 	}
 	*tau *= sclfac;
@@ -187,9 +190,9 @@
 
 /*        Copy D and Z to DSCALE and ZSCALE */
 
-	for (i = 1; i <= 3; ++i) {
-	    DSCALE(i - 1) = D(i);
-	    ZSCALE(i - 1) = Z(i);
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    dscale[i__ - 1] = d__[i__];
+	    zscale[i__ - 1] = z__[i__];
 /* L20: */
 	}
     }
@@ -197,12 +200,12 @@
     fc = 0.;
     df = 0.;
     ddf = 0.;
-    for (i = 1; i <= 3; ++i) {
-	temp = 1. / (DSCALE(i - 1) - *tau);
-	temp1 = ZSCALE(i - 1) * temp;
+    for (i__ = 1; i__ <= 3; ++i__) {
+	temp = 1. / (dscale[i__ - 1] - *tau);
+	temp1 = zscale[i__ - 1] * temp;
 	temp2 = temp1 * temp;
 	temp3 = temp2 * temp;
-	fc += temp1 / DSCALE(i - 1);
+	fc += temp1 / dscale[i__ - 1];
 	df += temp2;
 	ddf += temp3;
 /* L30: */
@@ -228,22 +231,29 @@
     for (niter = iter; niter <= 20; ++niter) {
 
 	if (*orgati) {
-	    temp1 = DSCALE(1) - *tau;
-	    temp2 = DSCALE(2) - *tau;
+	    temp1 = dscale[1] - *tau;
+	    temp2 = dscale[2] - *tau;
 	} else {
-	    temp1 = DSCALE(0) - *tau;
-	    temp2 = DSCALE(1) - *tau;
+	    temp1 = dscale[0] - *tau;
+	    temp2 = dscale[1] - *tau;
 	}
 	a = (temp1 + temp2) * f - temp1 * temp2 * df;
 	b = temp1 * temp2 * f;
-	c = f - (temp1 + temp2) * df + temp1 * temp2 * ddf;
-	if (c == 0.) {
+	c__ = f - (temp1 + temp2) * df + temp1 * temp2 * ddf;
+/* Computing MAX */
+	d__1 = abs(a), d__2 = abs(b), d__1 = max(d__1,d__2), d__2 = abs(c__);
+	temp = max(d__1,d__2);
+	a /= temp;
+	b /= temp;
+	c__ /= temp;
+	if (c__ == 0.) {
 	    eta = b / a;
 	} else if (a <= 0.) {
-	    eta = (a - sqrt((d__1 = a * a - b * 4. * c, abs(d__1)))) / (c * 
-		    2.);
+	    eta = (a - sqrt((d__1 = a * a - b * 4. * c__, abs(d__1)))) / (c__ 
+		    * 2.);
 	} else {
-	    eta = b * 2. / (a + sqrt((d__1 = a * a - b * 4. * c, abs(d__1))));
+	    eta = b * 2. / (a + sqrt((d__1 = a * a - b * 4. * c__, abs(d__1)))
+		    );
 	}
 	if (f * eta >= 0.) {
 	    eta = -f / df;
@@ -251,40 +261,40 @@
 
 	temp = eta + *tau;
 	if (*orgati) {
-	    if (eta > 0. && temp >= DSCALE(2)) {
-		eta = (DSCALE(2) - *tau) / 2.;
+	    if (eta > 0. && temp >= dscale[2]) {
+		eta = (dscale[2] - *tau) / 2.;
 	    }
-	    if (eta < 0. && temp <= DSCALE(1)) {
-		eta = (DSCALE(1) - *tau) / 2.;
+	    if (eta < 0. && temp <= dscale[1]) {
+		eta = (dscale[1] - *tau) / 2.;
 	    }
 	} else {
-	    if (eta > 0. && temp >= DSCALE(1)) {
-		eta = (DSCALE(1) - *tau) / 2.;
+	    if (eta > 0. && temp >= dscale[1]) {
+		eta = (dscale[1] - *tau) / 2.;
 	    }
-	    if (eta < 0. && temp <= DSCALE(0)) {
-		eta = (DSCALE(0) - *tau) / 2.;
+	    if (eta < 0. && temp <= dscale[0]) {
+		eta = (dscale[0] - *tau) / 2.;
 	    }
 	}
-	pretau = *tau;
 	*tau += eta;
 
 	fc = 0.;
-	erretm = abs(*rho);
+	erretm = 0.;
 	df = 0.;
 	ddf = 0.;
-	for (i = 1; i <= 3; ++i) {
-	    temp = 1. / (DSCALE(i - 1) - *tau);
-	    temp1 = ZSCALE(i - 1) * temp;
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    temp = 1. / (dscale[i__ - 1] - *tau);
+	    temp1 = zscale[i__ - 1] * temp;
 	    temp2 = temp1 * temp;
 	    temp3 = temp2 * temp;
-	    fc += temp1 / (DSCALE(i - 1) - pretau);
-	    erretm += abs(temp1);
+	    temp4 = temp1 / dscale[i__ - 1];
+	    fc += temp4;
+	    erretm += abs(temp4);
 	    df += temp2;
 	    ddf += temp3;
 /* L40: */
 	}
-	f += eta * fc;
-	erretm = erretm * 8. + abs(*tau) * df;
+	f = *finit + *tau * fc;
+	erretm = (abs(*finit) + abs(*tau) * erretm) * 8. + abs(*tau) * df;
 	if (abs(f) <= eps * erretm) {
 	    goto L60;
 	}

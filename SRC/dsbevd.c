@@ -1,31 +1,29 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsbevd_(char *jobz, char *uplo, integer *n, integer *kd, 
-	doublereal *ab, integer *ldab, doublereal *w, doublereal *z, integer *
-	ldz, doublereal *work, integer *lwork, integer *iwork, integer *
-	liwork, integer *info)
+	doublereal *ab, integer *ldab, doublereal *w, doublereal *z__, 
+	integer *ldz, doublereal *work, integer *lwork, integer *iwork, 
+	integer *liwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DSBEVD computes all the eigenvalues and, optionally, eigenvectors of 
-  
-    a real symmetric band matrix A. If eigenvectors are desired, it uses 
-  
+    DSBEVD computes all the eigenvalues and, optionally, eigenvectors of   
+    a real symmetric band matrix A. If eigenvectors are desired, it uses   
     a divide and conquer algorithm.   
 
     The divide and conquer algorithm makes very mild assumptions about   
     floating point arithmetic. It will work on machines with a guard   
     digit in add/subtract, or on those binary machines without guard   
     digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or   
-    Cray-2. It could conceivably fail on hexadecimal or decimal machines 
-  
+    Cray-2. It could conceivably fail on hexadecimal or decimal machines   
     without guard digits, but we know of none.   
 
     Arguments   
@@ -49,13 +47,10 @@
     AB      (input/output) DOUBLE PRECISION array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, AB is overwritten by values generated during the   
             reduction to tridiagonal form.  If UPLO = 'U', the first   
@@ -82,25 +77,32 @@
 
     WORK    (workspace/output) DOUBLE PRECISION array,   
                                            dimension (LWORK)   
-            On exit, if LWORK > 0, WORK(1) returns the optimal LWORK.   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.   
             IF N <= 1,                LWORK must be at least 1.   
             If JOBZ  = 'N' and N > 2, LWORK must be at least 2*N.   
             If JOBZ  = 'V' and N > 2, LWORK must be at least   
-                           ( 1 + 4*N + 2*N*lg N + 3*N**2 ),   
-                           where lg( N ) = smallest integer k such   
-                                           that 2**k >= N.   
+                           ( 1 + 5*N + 2*N**2 ).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     IWORK   (workspace/output) INTEGER array, dimension (LIWORK)   
-            On exit, if LIWORK > 0, IWORK(1) returns the optimal LIWORK. 
-  
+            On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK.   
 
     LIWORK  (input) INTEGER   
             The dimension of the array LIWORK.   
             If JOBZ  = 'N' or N <= 1, LIWORK must be at least 1.   
-            If JOBZ  = 'V' and N > 2, LIWORK must be at least 2 + 5*N.   
+            If JOBZ  = 'V' and N > 2, LIWORK must be at least 3 + 5*N.   
+
+            If LIWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the IWORK array,   
+            returns this value as the first entry of the IWORK array, and   
+            no error message related to LIWORK is issued by XERBLA.   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -109,27 +111,21 @@
                   off-diagonal elements of an intermediate tridiagonal   
                   form did not converge to zero.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
-    static integer c__2 = 2;
-    static doublereal c_b14 = 1.;
-    static doublereal c_b21 = 0.;
+    static doublereal c_b11 = 1.;
+    static doublereal c_b18 = 0.;
     static integer c__1 = 1;
     
     /* System generated locals */
     integer ab_dim1, ab_offset, z_dim1, z_offset, i__1;
     doublereal d__1;
     /* Builtin functions */
-    double log(doublereal);
-    integer pow_ii(integer *, integer *);
     double sqrt(doublereal);
     /* Local variables */
     static integer inde;
@@ -163,39 +159,37 @@
 	    integer *, doublereal *, doublereal *, integer *);
     static integer indwrk, liwmin;
     static doublereal smlnum;
-    static integer lgn;
+    static logical lquery;
     static doublereal eps;
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --iwork;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     lower = lsame_(uplo, "L");
+    lquery = *lwork == -1 || *liwork == -1;
 
     *info = 0;
     if (*n <= 1) {
-	lgn = 0;
 	liwmin = 1;
 	lwmin = 1;
     } else {
-	lgn = (integer) (log((doublereal) (*n)) / log(2.));
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
-	if (pow_ii(&c__2, &lgn) < *n) {
-	    ++lgn;
-	}
 	if (wantz) {
-	    liwmin = *n * 5 + 2;
+	    liwmin = *n * 5 + 3;
 /* Computing 2nd power */
 	    i__1 = *n;
-	    lwmin = (*n << 2) + 1 + (*n << 1) * lgn + i__1 * i__1 * 3;
+	    lwmin = *n * 5 + 1 + (i__1 * i__1 << 1);
 	} else {
 	    liwmin = 1;
 	    lwmin = *n << 1;
@@ -213,30 +207,37 @@
 	*info = -6;
     } else if (*ldz < 1 || wantz && *ldz < *n) {
 	*info = -9;
-    } else if (*lwork < lwmin) {
+    } else if (*lwork < lwmin && ! lquery) {
 	*info = -11;
-    } else if (*liwork < liwmin) {
+    } else if (*liwork < liwmin && ! lquery) {
 	*info = -13;
+    }
+
+    if (*info == 0) {
+	work[1] = (doublereal) lwmin;
+	iwork[1] = liwmin;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
-	xerbla_("DSBEVD ", &i__1);
-	goto L10;
+	xerbla_("DSBEVD", &i__1);
+	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*n == 0) {
-	goto L10;
+	return 0;
     }
 
     if (*n == 1) {
-	W(1) = AB(1,1);
+	w[1] = ab_ref(1, 1);
 	if (wantz) {
-	    Z(1,1) = 1.;
+	    z___ref(1, 1) = 1.;
 	}
-	goto L10;
+	return 0;
     }
 
 /*     Get machine constants. */
@@ -250,7 +251,7 @@
 
 /*     Scale matrix to allowable range, if necessary. */
 
-    anrm = dlansb_("M", uplo, n, kd, &AB(1,1), ldab, &WORK(1));
+    anrm = dlansb_("M", uplo, n, kd, &ab[ab_offset], ldab, &work[1]);
     iscale = 0;
     if (anrm > 0. && anrm < rmin) {
 	iscale = 1;
@@ -261,10 +262,10 @@
     }
     if (iscale == 1) {
 	if (lower) {
-	    dlascl_("B", kd, kd, &c_b14, &sigma, n, n, &AB(1,1), ldab, 
+	    dlascl_("B", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	} else {
-	    dlascl_("Q", kd, kd, &c_b14, &sigma, n, n, &AB(1,1), ldab, 
+	    dlascl_("Q", kd, kd, &c_b11, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	}
     }
@@ -275,38 +276,37 @@
     indwrk = inde + *n;
     indwk2 = indwrk + *n * *n;
     llwrk2 = *lwork - indwk2 + 1;
-    dsbtrd_(jobz, uplo, n, kd, &AB(1,1), ldab, &W(1), &WORK(inde), &Z(1,1), ldz, &WORK(indwrk), &iinfo);
+    dsbtrd_(jobz, uplo, n, kd, &ab[ab_offset], ldab, &w[1], &work[inde], &z__[
+	    z_offset], ldz, &work[indwrk], &iinfo);
 
-/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEDC. 
-*/
+/*     For eigenvalues only, call DSTERF.  For eigenvectors, call SSTEDC. */
 
     if (! wantz) {
-	dsterf_(n, &W(1), &WORK(inde), info);
+	dsterf_(n, &w[1], &work[inde], info);
     } else {
-	dstedc_("I", n, &W(1), &WORK(inde), &WORK(indwrk), n, &WORK(indwk2), &
-		llwrk2, &IWORK(1), liwork, info);
-	dgemm_("N", "N", n, n, n, &c_b14, &Z(1,1), ldz, &WORK(indwrk), n,
-		 &c_b21, &WORK(indwk2), n);
-	dlacpy_("A", n, n, &WORK(indwk2), n, &Z(1,1), ldz);
+	dstedc_("I", n, &w[1], &work[inde], &work[indwrk], n, &work[indwk2], &
+		llwrk2, &iwork[1], liwork, info);
+	dgemm_("N", "N", n, n, n, &c_b11, &z__[z_offset], ldz, &work[indwrk], 
+		n, &c_b18, &work[indwk2], n);
+	dlacpy_("A", n, n, &work[indwk2], n, &z__[z_offset], ldz);
     }
 
 /*     If matrix was scaled, then rescale eigenvalues appropriately. */
 
     if (iscale == 1) {
 	d__1 = 1. / sigma;
-	dscal_(n, &d__1, &W(1), &c__1);
+	dscal_(n, &d__1, &w[1], &c__1);
     }
 
-L10:
-    if (*lwork > 0) {
-	WORK(1) = (doublereal) lwmin;
-    }
-    if (*liwork > 0) {
-	IWORK(1) = liwmin;
-    }
+    work[1] = (doublereal) lwmin;
+    iwork[1] = liwmin;
     return 0;
 
 /*     End of DSBEVD */
 
 } /* dsbevd_ */
+
+#undef ab_ref
+#undef z___ref
+
 

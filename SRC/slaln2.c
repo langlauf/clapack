@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaln2_(logical *ltrans, integer *na, integer *nw, real *
@@ -5,7 +6,7 @@
 	integer *ldb, real *wr, real *wi, real *x, integer *ldx, real *scale, 
 	real *xnorm, integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -34,12 +35,10 @@
 
     If both singular values of (ca A - w D) are less than SMIN,   
     SMIN*identity will be used instead of (ca A - w D).  If only one   
-    singular value is less than SMIN, one element of (ca A - w D) will be 
-  
+    singular value is less than SMIN, one element of (ca A - w D) will be   
     perturbed enough to make the smallest singular value roughly SMIN.   
     If both singular values are at least SMIN, (ca A - w D) will not be   
-    perturbed.  In any case, the perturbation will be at most some small 
-  
+    perturbed.  In any case, the perturbation will be at most some small   
     multiple of max( SMIN, ulp*norm(ca A - w D) ).  The singular values   
     are computed by infinity-norm approximations, and thus will only be   
     correct to a factor of 2 or so.   
@@ -80,8 +79,7 @@
             The 1,1 element in the diagonal matrix D.   
 
     D2      (input) REAL   
-            The 2,2 element in the diagonal matrix D.  Not used if NW=1. 
-  
+            The 2,2 element in the diagonal matrix D.  Not used if NW=1.   
 
     B       (input) REAL array, dimension (LDB,NW)   
             The NA x NW matrix B (right-hand side).  If NW=2 ("w" is   
@@ -128,12 +126,9 @@
             NOTE: In the interests of speed, this routine does not   
                   check the inputs for errors.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Initialized data */
     static logical cswap[4] = { FALSE_,FALSE_,TRUE_,TRUE_ };
     static logical rswap[4] = { FALSE_,TRUE_,FALSE_,TRUE_ };
@@ -160,19 +155,28 @@
 #define civ (equiv_0)
     static real csr, ur11, ur12, ur22;
 #define crv (equiv_1)
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+#define ci_ref(a_1,a_2) ci[(a_2)*2 + a_1 - 3]
+#define cr_ref(a_1,a_2) cr[(a_2)*2 + a_1 - 3]
+#define ipivot_ref(a_1,a_2) ipivot[(a_2)*4 + a_1 - 5]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
 
-#define IPIVOT(I) ipivot[(I)]
-#define WAS(I) was[(I)]
+    /* Function Body   
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
+       Compute BIGNUM */
 
-
-/*     Compute BIGNUM */
-
-    smlnum = slamch_("Safe minimum") * 2.f;
+    smlnum = 2.f * slamch_("Safe minimum");
     bignum = 1.f / smlnum;
     smini = dmax(*smin,smlnum);
 
@@ -194,7 +198,7 @@
 
              C = ca A - w D */
 
-	    csr = *ca * A(1,1) - *wr * *d1;
+	    csr = *ca * a_ref(1, 1) - *wr * *d1;
 	    cnorm = dabs(csr);
 
 /*           If | C | < SMINI, use C = SMINI */
@@ -207,7 +211,7 @@
 
 /*           Check scaling for  X = B / C */
 
-	    bnorm = (r__1 = B(1,1), dabs(r__1));
+	    bnorm = (r__1 = b_ref(1, 1), dabs(r__1));
 	    if (cnorm < 1.f && bnorm > 1.f) {
 		if (bnorm > bignum * cnorm) {
 		    *scale = 1.f / bnorm;
@@ -216,16 +220,16 @@
 
 /*           Compute X */
 
-	    X(1,1) = B(1,1) * *scale / csr;
-	    *xnorm = (r__1 = X(1,1), dabs(r__1));
+	    x_ref(1, 1) = b_ref(1, 1) * *scale / csr;
+	    *xnorm = (r__1 = x_ref(1, 1), dabs(r__1));
 	} else {
 
 /*           Complex 1x1 system (w is complex)   
 
              C = ca A - w D */
 
-	    csr = *ca * A(1,1) - *wr * *d1;
-	    csi = -(doublereal)(*wi) * *d1;
+	    csr = *ca * a_ref(1, 1) - *wr * *d1;
+	    csi = -(*wi) * *d1;
 	    cnorm = dabs(csr) + dabs(csi);
 
 /*           If | C | < SMINI, use C = SMINI */
@@ -239,7 +243,8 @@
 
 /*           Check scaling for  X = B / C */
 
-	    bnorm = (r__1 = B(1,1), dabs(r__1)) + (r__2 = B(1,2), dabs(r__2));
+	    bnorm = (r__1 = b_ref(1, 1), dabs(r__1)) + (r__2 = b_ref(1, 2), 
+		    dabs(r__2));
 	    if (cnorm < 1.f && bnorm > 1.f) {
 		if (bnorm > bignum * cnorm) {
 		    *scale = 1.f / bnorm;
@@ -248,27 +253,27 @@
 
 /*           Compute X */
 
-	    r__1 = *scale * B(1,1);
-	    r__2 = *scale * B(1,2);
-	    sladiv_(&r__1, &r__2, &csr, &csi, &X(1,1), &X(1,2));
-	    *xnorm = (r__1 = X(1,1), dabs(r__1)) + (r__2 = X(1,2), dabs(r__2));
+	    r__1 = *scale * b_ref(1, 1);
+	    r__2 = *scale * b_ref(1, 2);
+	    sladiv_(&r__1, &r__2, &csr, &csi, &x_ref(1, 1), &x_ref(1, 2));
+	    *xnorm = (r__1 = x_ref(1, 1), dabs(r__1)) + (r__2 = x_ref(1, 2), 
+		    dabs(r__2));
 	}
 
     } else {
 
 /*        2x2 System   
 
-          Compute the real part of  C = ca A - w D  (or  ca A' - w D )
- */
+          Compute the real part of  C = ca A - w D  (or  ca A' - w D ) */
 
-	cr[0] = *ca * A(1,1) - *wr * *d1;
-	cr[3] = *ca * A(2,2) - *wr * *d2;
+	cr_ref(1, 1) = *ca * a_ref(1, 1) - *wr * *d1;
+	cr_ref(2, 2) = *ca * a_ref(2, 2) - *wr * *d2;
 	if (*ltrans) {
-	    cr[2] = *ca * A(2,1);
-	    cr[1] = *ca * A(1,2);
+	    cr_ref(1, 2) = *ca * a_ref(2, 1);
+	    cr_ref(2, 1) = *ca * a_ref(1, 2);
 	} else {
-	    cr[1] = *ca * A(2,1);
-	    cr[2] = *ca * A(1,2);
+	    cr_ref(2, 1) = *ca * a_ref(2, 1);
+	    cr_ref(1, 2) = *ca * a_ref(1, 2);
 	}
 
 	if (*nw == 1) {
@@ -292,7 +297,8 @@
 
 	    if (cmax < smini) {
 /* Computing MAX */
-		r__3 = (r__1 = B(1,1), dabs(r__1)), r__4 = (r__2 = B(2,1), dabs(r__2));
+		r__3 = (r__1 = b_ref(1, 1), dabs(r__1)), r__4 = (r__2 = b_ref(
+			2, 1), dabs(r__2));
 		bnorm = dmax(r__3,r__4);
 		if (smini < 1.f && bnorm > 1.f) {
 		    if (bnorm > bignum * smini) {
@@ -300,8 +306,8 @@
 		    }
 		}
 		temp = *scale / smini;
-		X(1,1) = temp * B(1,1);
-		X(2,1) = temp * B(2,1);
+		x_ref(1, 1) = temp * b_ref(1, 1);
+		x_ref(2, 1) = temp * b_ref(2, 1);
 		*xnorm = temp * bnorm;
 		*info = 1;
 		return 0;
@@ -310,9 +316,9 @@
 /*           Gaussian elimination with complete pivoting. */
 
 	    ur11 = crv[icmax - 1];
-	    cr21 = crv[IPIVOT((icmax << 2) - 3) - 1];
-	    ur12 = crv[IPIVOT((icmax << 2) - 2) - 1];
-	    cr22 = crv[IPIVOT((icmax << 2) - 1) - 1];
+	    cr21 = crv[ipivot_ref(2, icmax) - 1];
+	    ur12 = crv[ipivot_ref(3, icmax) - 1];
+	    cr22 = crv[ipivot_ref(4, icmax) - 1];
 	    ur11r = 1.f / ur11;
 	    lr21 = ur11r * cr21;
 	    ur22 = cr22 - ur12 * lr21;
@@ -324,11 +330,11 @@
 		*info = 1;
 	    }
 	    if (rswap[icmax - 1]) {
-		br1 = B(2,1);
-		br2 = B(1,1);
+		br1 = b_ref(2, 1);
+		br2 = b_ref(1, 1);
 	    } else {
-		br1 = B(1,1);
-		br2 = B(2,1);
+		br1 = b_ref(1, 1);
+		br2 = b_ref(2, 1);
 	    }
 	    br2 -= lr21 * br1;
 /* Computing MAX */
@@ -344,11 +350,11 @@
 	    xr2 = br2 * *scale / ur22;
 	    xr1 = *scale * br1 * ur11r - xr2 * (ur11r * ur12);
 	    if (cswap[icmax - 1]) {
-		X(1,1) = xr2;
-		X(2,1) = xr1;
+		x_ref(1, 1) = xr2;
+		x_ref(2, 1) = xr1;
 	    } else {
-		X(1,1) = xr1;
-		X(2,1) = xr2;
+		x_ref(1, 1) = xr1;
+		x_ref(2, 1) = xr2;
 	    }
 /* Computing MAX */
 	    r__1 = dabs(xr1), r__2 = dabs(xr2);
@@ -359,8 +365,8 @@
 	    if (*xnorm > 1.f && cmax > 1.f) {
 		if (*xnorm > bignum / cmax) {
 		    temp = cmax / bignum;
-		    X(1,1) = temp * X(1,1);
-		    X(2,1) = temp * X(2,1);
+		    x_ref(1, 1) = temp * x_ref(1, 1);
+		    x_ref(2, 1) = temp * x_ref(2, 1);
 		    *xnorm = temp * *xnorm;
 		    *scale = temp * *scale;
 		}
@@ -371,10 +377,10 @@
 
              Find the largest element in C */
 
-	    ci[0] = -(doublereal)(*wi) * *d1;
-	    ci[1] = 0.f;
-	    ci[2] = 0.f;
-	    ci[3] = -(doublereal)(*wi) * *d2;
+	    ci_ref(1, 1) = -(*wi) * *d1;
+	    ci_ref(2, 1) = 0.f;
+	    ci_ref(1, 2) = 0.f;
+	    ci_ref(2, 2) = -(*wi) * *d2;
 	    cmax = 0.f;
 	    icmax = 0;
 
@@ -392,9 +398,9 @@
 
 	    if (cmax < smini) {
 /* Computing MAX */
-		r__5 = (r__1 = B(1,1), dabs(r__1)) + (r__2 = B(1,2), dabs(r__2)), r__6 = (r__3 = B(2,1),
-			 dabs(r__3)) + (r__4 = B(2,2), dabs(
-			r__4));
+		r__5 = (r__1 = b_ref(1, 1), dabs(r__1)) + (r__2 = b_ref(1, 2),
+			 dabs(r__2)), r__6 = (r__3 = b_ref(2, 1), dabs(r__3)) 
+			+ (r__4 = b_ref(2, 2), dabs(r__4));
 		bnorm = dmax(r__5,r__6);
 		if (smini < 1.f && bnorm > 1.f) {
 		    if (bnorm > bignum * smini) {
@@ -402,10 +408,10 @@
 		    }
 		}
 		temp = *scale / smini;
-		X(1,1) = temp * B(1,1);
-		X(2,1) = temp * B(2,1);
-		X(1,2) = temp * B(1,2);
-		X(2,2) = temp * B(2,2);
+		x_ref(1, 1) = temp * b_ref(1, 1);
+		x_ref(2, 1) = temp * b_ref(2, 1);
+		x_ref(1, 2) = temp * b_ref(1, 2);
+		x_ref(2, 2) = temp * b_ref(2, 2);
 		*xnorm = temp * bnorm;
 		*info = 1;
 		return 0;
@@ -415,29 +421,28 @@
 
 	    ur11 = crv[icmax - 1];
 	    ui11 = civ[icmax - 1];
-	    cr21 = crv[IPIVOT((icmax << 2) - 3) - 1];
-	    ci21 = civ[IPIVOT((icmax << 2) - 3) - 1];
-	    ur12 = crv[IPIVOT((icmax << 2) - 2) - 1];
-	    ui12 = civ[IPIVOT((icmax << 2) - 2) - 1];
-	    cr22 = crv[IPIVOT((icmax << 2) - 1) - 1];
-	    ci22 = civ[IPIVOT((icmax << 2) - 1) - 1];
+	    cr21 = crv[ipivot_ref(2, icmax) - 1];
+	    ci21 = civ[ipivot_ref(2, icmax) - 1];
+	    ur12 = crv[ipivot_ref(3, icmax) - 1];
+	    ui12 = civ[ipivot_ref(3, icmax) - 1];
+	    cr22 = crv[ipivot_ref(4, icmax) - 1];
+	    ci22 = civ[ipivot_ref(4, icmax) - 1];
 	    if (icmax == 1 || icmax == 4) {
 
-/*              Code when off-diagonals of pivoted C are real 
-*/
+/*              Code when off-diagonals of pivoted C are real */
 
 		if (dabs(ur11) > dabs(ui11)) {
 		    temp = ui11 / ur11;
 /* Computing 2nd power */
 		    r__1 = temp;
 		    ur11r = 1.f / (ur11 * (r__1 * r__1 + 1.f));
-		    ui11r = -(doublereal)temp * ur11r;
+		    ui11r = -temp * ur11r;
 		} else {
 		    temp = ur11 / ui11;
 /* Computing 2nd power */
 		    r__1 = temp;
 		    ui11r = -1.f / (ui11 * (r__1 * r__1 + 1.f));
-		    ur11r = -(doublereal)temp * ui11r;
+		    ur11r = -temp * ui11r;
 		}
 		lr21 = cr21 * ur11r;
 		li21 = cr21 * ui11r;
@@ -456,7 +461,7 @@
 		ur12s = ur12 * ur11r;
 		ui12s = ui12 * ur11r;
 		ur22 = cr22 - ur12 * lr21 + ui12 * li21;
-		ui22 = -(doublereal)ur12 * li21 - ui12 * lr21;
+		ui22 = -ur12 * li21 - ui12 * lr21;
 	    }
 	    u22abs = dabs(ur22) + dabs(ui22);
 
@@ -468,15 +473,15 @@
 		*info = 1;
 	    }
 	    if (rswap[icmax - 1]) {
-		br2 = B(1,1);
-		br1 = B(2,1);
-		bi2 = B(1,2);
-		bi1 = B(2,2);
+		br2 = b_ref(1, 1);
+		br1 = b_ref(2, 1);
+		bi2 = b_ref(1, 2);
+		bi1 = b_ref(2, 2);
 	    } else {
-		br1 = B(1,1);
-		br2 = B(2,1);
-		bi1 = B(1,2);
-		bi2 = B(2,2);
+		br1 = b_ref(1, 1);
+		br2 = b_ref(2, 1);
+		bi1 = b_ref(1, 2);
+		bi2 = b_ref(2, 2);
 	    }
 	    br2 = br2 - lr21 * br1 + li21 * bi1;
 	    bi2 = bi2 - li21 * br1 - lr21 * bi1;
@@ -498,15 +503,15 @@
 	    xr1 = ur11r * br1 - ui11r * bi1 - ur12s * xr2 + ui12s * xi2;
 	    xi1 = ui11r * br1 + ur11r * bi1 - ui12s * xr2 - ur12s * xi2;
 	    if (cswap[icmax - 1]) {
-		X(1,1) = xr2;
-		X(2,1) = xr1;
-		X(1,2) = xi2;
-		X(2,2) = xi1;
+		x_ref(1, 1) = xr2;
+		x_ref(2, 1) = xr1;
+		x_ref(1, 2) = xi2;
+		x_ref(2, 2) = xi1;
 	    } else {
-		X(1,1) = xr1;
-		X(2,1) = xr2;
-		X(1,2) = xi1;
-		X(2,2) = xi2;
+		x_ref(1, 1) = xr1;
+		x_ref(2, 1) = xr2;
+		x_ref(1, 2) = xi1;
+		x_ref(2, 2) = xi2;
 	    }
 /* Computing MAX */
 	    r__1 = dabs(xr1) + dabs(xi1), r__2 = dabs(xr2) + dabs(xi2);
@@ -517,10 +522,10 @@
 	    if (*xnorm > 1.f && cmax > 1.f) {
 		if (*xnorm > bignum / cmax) {
 		    temp = cmax / bignum;
-		    X(1,1) = temp * X(1,1);
-		    X(2,1) = temp * X(2,1);
-		    X(1,2) = temp * X(1,2);
-		    X(2,2) = temp * X(2,2);
+		    x_ref(1, 1) = temp * x_ref(1, 1);
+		    x_ref(2, 1) = temp * x_ref(2, 1);
+		    x_ref(1, 2) = temp * x_ref(1, 2);
+		    x_ref(2, 2) = temp * x_ref(2, 2);
 		    *xnorm = temp * *xnorm;
 		    *scale = temp * *scale;
 		}
@@ -534,6 +539,12 @@
 
 } /* slaln2_ */
 
+#undef ipivot_ref
+#undef cr_ref
+#undef ci_ref
+#undef x_ref
+#undef b_ref
+#undef a_ref
 #undef crv
 #undef civ
 #undef cr

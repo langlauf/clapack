@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,8 +14,8 @@ struct {
 
 #define latime_1 latime_
 
-/* Subroutine */ int slaed4_(integer *n, integer *i, real *d, real *z, real *
-	delta, real *rho, real *dlam, integer *info)
+/* Subroutine */ int slaed4_(integer *n, integer *i__, real *d__, real *z__, 
+	real *delta, real *rho, real *dlam, integer *info)
 {
     /* System generated locals */
     integer i__1;
@@ -26,7 +27,7 @@ struct {
     /* Local variables */
     static real dphi, dpsi;
     static integer iter;
-    static real temp, prew, temp1, a, b, c;
+    static real temp, prew, temp1, a, b, c__;
     static integer j;
     static real w;
     static integer niter;
@@ -46,12 +47,10 @@ struct {
     static integer iim1, iip1;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
        Common block to return operation count and iteration count   
        ITCNT is unchanged, OPS is only incremented   
@@ -122,8 +121,14 @@ struct {
      MAXIT is the maximum number of iterations allowed for each   
      eigenvalue.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Ren-Cang Li, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
        Since this routine is called in an inner loop, we do no argument   
@@ -133,8 +138,8 @@ struct {
 
        Parameter adjustments */
     --delta;
-    --z;
-    --d;
+    --z__;
+    --d__;
 
     /* Function Body */
     *info = 0;
@@ -143,12 +148,12 @@ struct {
 /*         Presumably, I=1 upon entry */
 
 	latime_1.ops += 3;
-	*dlam = d[1] + *rho * z[1] * z[1];
+	*dlam = d__[1] + *rho * z__[1] * z__[1];
 	delta[1] = 1.f;
 	return 0;
     }
     if (*n == 2) {
-	slaed5_(i, &d[1], &z[1], &delta[1], rho, dlam);
+	slaed5_(i__, &d__[1], &z__[1], &delta[1], rho, dlam);
 	return 0;
     }
 
@@ -160,7 +165,7 @@ struct {
 
 /*     The case I = N */
 
-    if (*i == *n) {
+    if (*i__ == *n) {
 
 /*        Initialize some basic variables */
 
@@ -177,36 +182,37 @@ struct {
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    delta[j] = d[j] - d[*i] - temp;
+	    delta[j] = d__[j] - d__[*i__] - temp;
 /* L10: */
 	}
 
 	psi = 0.f;
 	i__1 = *n - 2;
 	for (j = 1; j <= i__1; ++j) {
-	    psi += z[j] * z[j] / delta[j];
+	    psi += z__[j] * z__[j] / delta[j];
 /* L20: */
 	}
 
-	c = rhoinv + psi;
-	w = c + z[ii] * z[ii] / delta[ii] + z[*n] * z[*n] / delta[*n];
+	c__ = rhoinv + psi;
+	w = c__ + z__[ii] * z__[ii] / delta[ii] + z__[*n] * z__[*n] / delta[*
+		n];
 
 	if (w <= 0.f) {
 	    latime_1.ops += 7;
-	    temp = z[*n - 1] * z[*n - 1] / (d[*n] - d[*n - 1] + *rho) + z[*n] 
-		    * z[*n] / *rho;
-	    if (c <= temp) {
+	    temp = z__[*n - 1] * z__[*n - 1] / (d__[*n] - d__[*n - 1] + *rho) 
+		    + z__[*n] * z__[*n] / *rho;
+	    if (c__ <= temp) {
 		tau = *rho;
 	    } else {
 		latime_1.ops += 14;
-		del = d[*n] - d[*n - 1];
-		a = -(doublereal)c * del + z[*n - 1] * z[*n - 1] + z[*n] * z[*
-			n];
-		b = z[*n] * z[*n] * del;
+		del = d__[*n] - d__[*n - 1];
+		a = -c__ * del + z__[*n - 1] * z__[*n - 1] + z__[*n] * z__[*n]
+			;
+		b = z__[*n] * z__[*n] * del;
 		if (a < 0.f) {
-		    tau = b * 2.f / (sqrt(a * a + b * 4.f * c) - a);
+		    tau = b * 2.f / (sqrt(a * a + b * 4.f * c__) - a);
 		} else {
-		    tau = (a + sqrt(a * a + b * 4.f * c)) / (c * 2.f);
+		    tau = (a + sqrt(a * a + b * 4.f * c__)) / (c__ * 2.f);
 		}
 	    }
 
@@ -215,13 +221,13 @@ struct {
 
 	} else {
 	    latime_1.ops += 16;
-	    del = d[*n] - d[*n - 1];
-	    a = -(doublereal)c * del + z[*n - 1] * z[*n - 1] + z[*n] * z[*n];
-	    b = z[*n] * z[*n] * del;
+	    del = d__[*n] - d__[*n - 1];
+	    a = -c__ * del + z__[*n - 1] * z__[*n - 1] + z__[*n] * z__[*n];
+	    b = z__[*n] * z__[*n] * del;
 	    if (a < 0.f) {
-		tau = b * 2.f / (sqrt(a * a + b * 4.f * c) - a);
+		tau = b * 2.f / (sqrt(a * a + b * 4.f * c__) - a);
 	    } else {
-		tau = (a + sqrt(a * a + b * 4.f * c)) / (c * 2.f);
+		tau = (a + sqrt(a * a + b * 4.f * c__)) / (c__ * 2.f);
 	    }
 
 /*           It can be proved that   
@@ -232,7 +238,7 @@ struct {
 	latime_1.ops = latime_1.ops + (*n << 1) + ii * 6 + 14;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    delta[j] = d[j] - d[*i] - tau;
+	    delta[j] = d__[j] - d__[*i__] - tau;
 /* L30: */
 	}
 
@@ -243,8 +249,8 @@ struct {
 	erretm = 0.f;
 	i__1 = ii;
 	for (j = 1; j <= i__1; ++j) {
-	    temp = z[j] / delta[j];
-	    psi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L40: */
@@ -253,11 +259,11 @@ struct {
 
 /*        Evaluate PHI and the derivative DPHI */
 
-	temp = z[*n] / delta[*n];
-	phi = z[*n] * temp;
+	temp = z__[*n] / delta[*n];
+	phi = z__[*n] * temp;
 	dphi = temp * temp;
-	erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		dabs(tau) * (dpsi + dphi);
+	erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * (
+		dpsi + dphi);
 
 	w = rhoinv + phi + psi;
 
@@ -265,7 +271,7 @@ struct {
 
 	if (dabs(w) <= eps * erretm) {
 	    latime_1.ops += 1;
-	    *dlam = d[*i] + tau;
+	    *dlam = d__[*i__] + tau;
 	    goto L250;
 	}
 
@@ -273,25 +279,25 @@ struct {
 
 	latime_1.ops += 12;
 	++niter;
-	c = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
+	c__ = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
 	a = (delta[*n - 1] + delta[*n]) * w - delta[*n - 1] * delta[*n] * (
 		dpsi + dphi);
 	b = delta[*n - 1] * delta[*n] * w;
-	if (c < 0.f) {
-	    c = dabs(c);
+	if (c__ < 0.f) {
+	    c__ = dabs(c__);
 	}
-	if (c == 0.f) {
+	if (c__ == 0.f) {
 /*           ETA = B/A */
 	    latime_1.ops += 1;
 	    eta = *rho - tau;
 	} else if (a >= 0.f) {
 	    latime_1.ops += 8;
-	    eta = (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (c * 
-		    2.f);
+	    eta = (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) / (
+		    c__ * 2.f);
 	} else {
 	    latime_1.ops += 8;
-	    eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1))
-		    ));
+	    eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(
+		    r__1))));
 	}
 
 /*        Note, eta should be positive if w is negative, and   
@@ -303,7 +309,7 @@ struct {
 	latime_1.ops = latime_1.ops + *n + ii * 6 + 16;
 	if (w * eta > 0.f) {
 	    latime_1.ops += 2;
-	    eta = -(doublereal)w / (dpsi + dphi);
+	    eta = -w / (dpsi + dphi);
 	}
 	temp = tau + eta;
 	if (temp > *rho) {
@@ -325,8 +331,8 @@ struct {
 	erretm = 0.f;
 	i__1 = ii;
 	for (j = 1; j <= i__1; ++j) {
-	    temp = z[j] / delta[j];
-	    psi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L60: */
@@ -335,11 +341,11 @@ struct {
 
 /*        Evaluate PHI and the derivative DPHI */
 
-	temp = z[*n] / delta[*n];
-	phi = z[*n] * temp;
+	temp = z__[*n] / delta[*n];
+	phi = z__[*n] * temp;
 	dphi = temp * temp;
-	erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		dabs(tau) * (dpsi + dphi);
+	erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * (
+		dpsi + dphi);
 
 	w = rhoinv + phi + psi;
 
@@ -354,22 +360,22 @@ struct {
 	    latime_1.ops += 1;
 	    if (dabs(w) <= eps * erretm) {
 		latime_1.ops += 1;
-		*dlam = d[*i] + tau;
+		*dlam = d__[*i__] + tau;
 		goto L250;
 	    }
 
 /*           Calculate the new step */
 
 	    latime_1.ops = latime_1.ops + 36 + *n + ii * 6;
-	    c = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
+	    c__ = w - delta[*n - 1] * dpsi - delta[*n] * dphi;
 	    a = (delta[*n - 1] + delta[*n]) * w - delta[*n - 1] * delta[*n] * 
 		    (dpsi + dphi);
 	    b = delta[*n - 1] * delta[*n] * w;
 	    if (a >= 0.f) {
-		eta = (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		eta = (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    } else {
-		eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		eta = b * 2.f / (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    }
 
@@ -380,7 +386,7 @@ struct {
              will guarantee eta*w < 0. */
 
 	    if (w * eta > 0.f) {
-		eta = -(doublereal)w / (dpsi + dphi);
+		eta = -w / (dpsi + dphi);
 	    }
 	    temp = tau + eta;
 	    if (temp <= 0.f) {
@@ -401,8 +407,8 @@ struct {
 	    erretm = 0.f;
 	    i__1 = ii;
 	    for (j = 1; j <= i__1; ++j) {
-		temp = z[j] / delta[j];
-		psi += z[j] * temp;
+		temp = z__[j] / delta[j];
+		psi += z__[j] * temp;
 		dpsi += temp * temp;
 		erretm += psi;
 /* L80: */
@@ -411,11 +417,11 @@ struct {
 
 /*           Evaluate PHI and the derivative DPHI */
 
-	    temp = z[*n] / delta[*n];
-	    phi = z[*n] * temp;
+	    temp = z__[*n] / delta[*n];
+	    phi = z__[*n] * temp;
 	    dphi = temp * temp;
-	    erretm = (-(doublereal)phi - psi) * 8.f + erretm - phi + rhoinv + 
-		    dabs(tau) * (dpsi + dphi);
+	    erretm = (-phi - psi) * 8.f + erretm - phi + rhoinv + dabs(tau) * 
+		    (dpsi + dphi);
 
 	    w = rhoinv + phi + psi;
 /* L90: */
@@ -425,7 +431,7 @@ struct {
 
 	*info = 1;
 	latime_1.ops += 1;
-	*dlam = d[*i] + tau;
+	*dlam = d__[*i__] + tau;
 	goto L250;
 
 /*        End for the case I = N */
@@ -434,34 +440,34 @@ struct {
 
 /*        The case for I < N */
 
-	latime_1.ops = latime_1.ops + *n * 13 + (iim1 - iip1) * 6 + 45;
 	niter = 1;
-	ip1 = *i + 1;
+	ip1 = *i__ + 1;
 
 /*        Calculate initial guess */
 
-	temp = (d[ip1] - d[*i]) / 2.f;
+	temp = (d__[ip1] - d__[*i__]) / 2.f;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    delta[j] = d[j] - d[*i] - temp;
+	    delta[j] = d__[j] - d__[*i__] - temp;
 /* L100: */
 	}
 
 	psi = 0.f;
-	i__1 = *i - 1;
+	i__1 = *i__ - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    psi += z[j] * z[j] / delta[j];
+	    psi += z__[j] * z__[j] / delta[j];
 /* L110: */
 	}
 
 	phi = 0.f;
-	i__1 = *i + 2;
+	i__1 = *i__ + 2;
 	for (j = *n; j >= i__1; --j) {
-	    phi += z[j] * z[j] / delta[j];
+	    phi += z__[j] * z__[j] / delta[j];
 /* L120: */
 	}
-	c = rhoinv + psi + phi;
-	w = c + z[*i] * z[*i] / delta[*i] + z[ip1] * z[ip1] / delta[ip1];
+	c__ = rhoinv + psi + phi;
+	w = c__ + z__[*i__] * z__[*i__] / delta[*i__] + z__[ip1] * z__[ip1] / 
+		delta[ip1];
 
 	if (w > 0.f) {
 
@@ -470,15 +476,15 @@ struct {
              We choose d(i) as origin. */
 
 	    orgati = TRUE_;
-	    del = d[ip1] - d[*i];
-	    a = c * del + z[*i] * z[*i] + z[ip1] * z[ip1];
-	    b = z[*i] * z[*i] * del;
+	    del = d__[ip1] - d__[*i__];
+	    a = c__ * del + z__[*i__] * z__[*i__] + z__[ip1] * z__[ip1];
+	    b = z__[*i__] * z__[*i__] * del;
 	    if (a > 0.f) {
-		tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		tau = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    } else {
-		tau = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		tau = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    }
 	} else {
 
@@ -487,38 +493,39 @@ struct {
              We choose d(i+1) as origin. */
 
 	    orgati = FALSE_;
-	    del = d[ip1] - d[*i];
-	    a = c * del - z[*i] * z[*i] - z[ip1] * z[ip1];
-	    b = z[ip1] * z[ip1] * del;
+	    del = d__[ip1] - d__[*i__];
+	    a = c__ * del - z__[*i__] * z__[*i__] - z__[ip1] * z__[ip1];
+	    b = z__[ip1] * z__[ip1] * del;
 	    if (a < 0.f) {
-		tau = b * 2.f / (a - sqrt((r__1 = a * a + b * 4.f * c, dabs(
+		tau = b * 2.f / (a - sqrt((r__1 = a * a + b * 4.f * c__, dabs(
 			r__1))));
 	    } else {
-		tau = -(doublereal)(a + sqrt((r__1 = a * a + b * 4.f * c, 
-			dabs(r__1)))) / (c * 2.f);
+		tau = -(a + sqrt((r__1 = a * a + b * 4.f * c__, dabs(r__1)))) 
+			/ (c__ * 2.f);
 	    }
 	}
 
 	if (orgati) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		delta[j] = d[j] - d[*i] - tau;
+		delta[j] = d__[j] - d__[*i__] - tau;
 /* L130: */
 	    }
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		delta[j] = d[j] - d[ip1] - tau;
+		delta[j] = d__[j] - d__[ip1] - tau;
 /* L140: */
 	    }
 	}
 	if (orgati) {
-	    ii = *i;
+	    ii = *i__;
 	} else {
-	    ii = *i + 1;
+	    ii = *i__ + 1;
 	}
 	iim1 = ii - 1;
 	iip1 = ii + 1;
+	latime_1.ops = latime_1.ops + *n * 13 + (iim1 - iip1) * 6 + 45;
 
 /*        Evaluate PSI and the derivative DPSI */
 
@@ -527,8 +534,8 @@ struct {
 	erretm = 0.f;
 	i__1 = iim1;
 	for (j = 1; j <= i__1; ++j) {
-	    temp = z[j] / delta[j];
-	    psi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L150: */
@@ -541,8 +548,8 @@ struct {
 	phi = 0.f;
 	i__1 = iip1;
 	for (j = *n; j >= i__1; --j) {
-	    temp = z[j] / delta[j];
-	    phi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    phi += z__[j] * temp;
 	    dphi += temp * temp;
 	    erretm += phi;
 /* L160: */
@@ -567,9 +574,9 @@ struct {
 	    swtch3 = FALSE_;
 	}
 
-	temp = z[ii] / delta[ii];
+	temp = z__[ii] / delta[ii];
 	dw = dpsi + dphi + temp * temp;
-	temp = z[ii] * temp;
+	temp = z__[ii] * temp;
 	w += temp;
 	erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 3.f 
 		+ dabs(tau) * dw;
@@ -578,9 +585,9 @@ struct {
 
 	if (dabs(w) <= eps * erretm) {
 	    if (orgati) {
-		*dlam = d[*i] + tau;
+		*dlam = d__[*i__] + tau;
 	    } else {
-		*dlam = d[ip1] + tau;
+		*dlam = d__[ip1] + tau;
 	    }
 	    goto L250;
 	}
@@ -592,34 +599,37 @@ struct {
 	if (! swtch3) {
 	    if (orgati) {
 /* Computing 2nd power */
-		r__1 = z[*i] / delta[*i];
-		c = w - delta[ip1] * dw - (d[*i] - d[ip1]) * (r__1 * r__1);
+		r__1 = z__[*i__] / delta[*i__];
+		c__ = w - delta[ip1] * dw - (d__[*i__] - d__[ip1]) * (r__1 * 
+			r__1);
 	    } else {
 /* Computing 2nd power */
-		r__1 = z[ip1] / delta[ip1];
-		c = w - delta[*i] * dw - (d[ip1] - d[*i]) * (r__1 * r__1);
+		r__1 = z__[ip1] / delta[ip1];
+		c__ = w - delta[*i__] * dw - (d__[ip1] - d__[*i__]) * (r__1 * 
+			r__1);
 	    }
-	    a = (delta[*i] + delta[ip1]) * w - delta[*i] * delta[ip1] * dw;
-	    b = delta[*i] * delta[ip1] * w;
-	    if (c == 0.f) {
+	    a = (delta[*i__] + delta[ip1]) * w - delta[*i__] * delta[ip1] * 
+		    dw;
+	    b = delta[*i__] * delta[ip1] * w;
+	    if (c__ == 0.f) {
 		if (a == 0.f) {
 		    latime_1.ops += 5;
 		    if (orgati) {
-			a = z[*i] * z[*i] + delta[ip1] * delta[ip1] * (dpsi + 
-				dphi);
+			a = z__[*i__] * z__[*i__] + delta[ip1] * delta[ip1] * 
+				(dpsi + dphi);
 		    } else {
-			a = z[ip1] * z[ip1] + delta[*i] * delta[*i] * (dpsi + 
-				dphi);
+			a = z__[ip1] * z__[ip1] + delta[*i__] * delta[*i__] * 
+				(dpsi + dphi);
 		    }
 		}
 		eta = b / a;
 	    } else if (a <= 0.f) {
 		latime_1.ops += 8;
-		eta = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1)))) / (
-			c * 2.f);
+		eta = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1)))) /
+			 (c__ * 2.f);
 	    } else {
 		latime_1.ops += 8;
-		eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, dabs(
+		eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, dabs(
 			r__1))));
 	    }
 	} else {
@@ -629,22 +639,22 @@ struct {
 	    latime_1.ops += 15;
 	    temp = rhoinv + psi + phi;
 	    if (orgati) {
-		temp1 = z[iim1] / delta[iim1];
+		temp1 = z__[iim1] / delta[iim1];
 		temp1 *= temp1;
-		c = temp - delta[iip1] * (dpsi + dphi) - (d[iim1] - d[iip1]) *
-			 temp1;
-		zz[0] = z[iim1] * z[iim1];
+		c__ = temp - delta[iip1] * (dpsi + dphi) - (d__[iim1] - d__[
+			iip1]) * temp1;
+		zz[0] = z__[iim1] * z__[iim1];
 		zz[2] = delta[iip1] * delta[iip1] * (dpsi - temp1 + dphi);
 	    } else {
-		temp1 = z[iip1] / delta[iip1];
+		temp1 = z__[iip1] / delta[iip1];
 		temp1 *= temp1;
-		c = temp - delta[iim1] * (dpsi + dphi) - (d[iip1] - d[iim1]) *
-			 temp1;
+		c__ = temp - delta[iim1] * (dpsi + dphi) - (d__[iip1] - d__[
+			iim1]) * temp1;
 		zz[0] = delta[iim1] * delta[iim1] * (dpsi + (dphi - temp1));
-		zz[2] = z[iip1] * z[iip1];
+		zz[2] = z__[iip1] * z__[iip1];
 	    }
-	    zz[1] = z[ii] * z[ii];
-	    slaed6_(&niter, &orgati, &c, &delta[iim1], zz, &w, &eta, info);
+	    zz[1] = z__[ii] * z__[ii];
+	    slaed6_(&niter, &orgati, &c__, &delta[iim1], zz, &w, &eta, info);
 	    if (*info != 0) {
 		goto L250;
 	    }
@@ -659,10 +669,10 @@ struct {
 	latime_1.ops = latime_1.ops + 18 + *n * 7 + (iim1 - iip1) * 6;
 	if (w * eta >= 0.f) {
 	    latime_1.ops += 1;
-	    eta = -(doublereal)w / dw;
+	    eta = -w / dw;
 	}
 	temp = tau + eta;
-	del = (d[ip1] - d[*i]) / 2.f;
+	del = (d__[ip1] - d__[*i__]) / 2.f;
 	if (orgati) {
 	    if (temp >= del) {
 		latime_1.ops += 1;
@@ -673,9 +683,9 @@ struct {
 		eta /= 2.f;
 	    }
 	} else {
-	    if (temp <= -(doublereal)del) {
+	    if (temp <= -del) {
 		latime_1.ops += 1;
-		eta = -(doublereal)del - tau;
+		eta = -del - tau;
 	    }
 	    if (temp >= 0.f) {
 		latime_1.ops += 1;
@@ -699,8 +709,8 @@ struct {
 	erretm = 0.f;
 	i__1 = iim1;
 	for (j = 1; j <= i__1; ++j) {
-	    temp = z[j] / delta[j];
-	    psi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    psi += z__[j] * temp;
 	    dpsi += temp * temp;
 	    erretm += psi;
 /* L190: */
@@ -713,23 +723,23 @@ struct {
 	phi = 0.f;
 	i__1 = iip1;
 	for (j = *n; j >= i__1; --j) {
-	    temp = z[j] / delta[j];
-	    phi += z[j] * temp;
+	    temp = z__[j] / delta[j];
+	    phi += z__[j] * temp;
 	    dphi += temp * temp;
 	    erretm += phi;
 /* L200: */
 	}
 
-	temp = z[ii] / delta[ii];
+	temp = z__[ii] / delta[ii];
 	dw = dpsi + dphi + temp * temp;
-	temp = z[ii] * temp;
+	temp = z__[ii] * temp;
 	w = rhoinv + phi + psi + temp;
 	erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 3.f 
 		+ (r__1 = tau + eta, dabs(r__1)) * dw;
 
 	swtch = FALSE_;
 	if (orgati) {
-	    if (-(doublereal)w > dabs(prew) / 10.f) {
+	    if (-w > dabs(prew) / 10.f) {
 		swtch = TRUE_;
 	    }
 	} else {
@@ -752,9 +762,9 @@ struct {
 	    if (dabs(w) <= eps * erretm) {
 		latime_1.ops += 1;
 		if (orgati) {
-		    *dlam = d[*i] + tau;
+		    *dlam = d__[*i__] + tau;
 		} else {
-		    *dlam = d[ip1] + tau;
+		    *dlam = d__[ip1] + tau;
 		}
 		goto L250;
 	    }
@@ -766,88 +776,87 @@ struct {
 		if (! swtch) {
 		    if (orgati) {
 /* Computing 2nd power */
-			r__1 = z[*i] / delta[*i];
-			c = w - delta[ip1] * dw - (d[*i] - d[ip1]) * (r__1 * 
-				r__1);
+			r__1 = z__[*i__] / delta[*i__];
+			c__ = w - delta[ip1] * dw - (d__[*i__] - d__[ip1]) * (
+				r__1 * r__1);
 		    } else {
 /* Computing 2nd power */
-			r__1 = z[ip1] / delta[ip1];
-			c = w - delta[*i] * dw - (d[ip1] - d[*i]) * (r__1 * 
-				r__1);
+			r__1 = z__[ip1] / delta[ip1];
+			c__ = w - delta[*i__] * dw - (d__[ip1] - d__[*i__]) * 
+				(r__1 * r__1);
 		    }
 		} else {
-		    temp = z[ii] / delta[ii];
+		    temp = z__[ii] / delta[ii];
 		    if (orgati) {
 			dpsi += temp * temp;
 		    } else {
 			dphi += temp * temp;
 		    }
-		    c = w - delta[*i] * dpsi - delta[ip1] * dphi;
+		    c__ = w - delta[*i__] * dpsi - delta[ip1] * dphi;
 		}
-		a = (delta[*i] + delta[ip1]) * w - delta[*i] * delta[ip1] * 
-			dw;
-		b = delta[*i] * delta[ip1] * w;
-		if (c == 0.f) {
+		a = (delta[*i__] + delta[ip1]) * w - delta[*i__] * delta[ip1] 
+			* dw;
+		b = delta[*i__] * delta[ip1] * w;
+		if (c__ == 0.f) {
 		    if (a == 0.f) {
 			latime_1.ops += 5;
 			if (! swtch) {
 			    if (orgati) {
-				a = z[*i] * z[*i] + delta[ip1] * delta[ip1] * 
-					(dpsi + dphi);
+				a = z__[*i__] * z__[*i__] + delta[ip1] * 
+					delta[ip1] * (dpsi + dphi);
 			    } else {
-				a = z[ip1] * z[ip1] + delta[*i] * delta[*i] * 
-					(dpsi + dphi);
+				a = z__[ip1] * z__[ip1] + delta[*i__] * delta[
+					*i__] * (dpsi + dphi);
 			    }
 			} else {
-			    a = delta[*i] * delta[*i] * dpsi + delta[ip1] * 
-				    delta[ip1] * dphi;
+			    a = delta[*i__] * delta[*i__] * dpsi + delta[ip1] 
+				    * delta[ip1] * dphi;
 			}
 		    }
 		    latime_1.ops += 1;
 		    eta = b / a;
 		} else if (a <= 0.f) {
 		    latime_1.ops += 8;
-		    eta = (a - sqrt((r__1 = a * a - b * 4.f * c, dabs(r__1))))
-			     / (c * 2.f);
+		    eta = (a - sqrt((r__1 = a * a - b * 4.f * c__, dabs(r__1))
+			    )) / (c__ * 2.f);
 		} else {
 		    latime_1.ops += 8;
-		    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c, 
+		    eta = b * 2.f / (a + sqrt((r__1 = a * a - b * 4.f * c__, 
 			    dabs(r__1))));
 		}
 	    } else {
 
-/*              Interpolation using THREE most relevant poles 
-*/
+/*              Interpolation using THREE most relevant poles */
 
 		latime_1.ops += 2;
 		temp = rhoinv + psi + phi;
 		if (swtch) {
 		    latime_1.ops += 10;
-		    c = temp - delta[iim1] * dpsi - delta[iip1] * dphi;
+		    c__ = temp - delta[iim1] * dpsi - delta[iip1] * dphi;
 		    zz[0] = delta[iim1] * delta[iim1] * dpsi;
 		    zz[2] = delta[iip1] * delta[iip1] * dphi;
 		} else {
 		    latime_1.ops += 14;
 		    if (orgati) {
-			temp1 = z[iim1] / delta[iim1];
+			temp1 = z__[iim1] / delta[iim1];
 			temp1 *= temp1;
-			c = temp - delta[iip1] * (dpsi + dphi) - (d[iim1] - d[
-				iip1]) * temp1;
-			zz[0] = z[iim1] * z[iim1];
+			c__ = temp - delta[iip1] * (dpsi + dphi) - (d__[iim1] 
+				- d__[iip1]) * temp1;
+			zz[0] = z__[iim1] * z__[iim1];
 			zz[2] = delta[iip1] * delta[iip1] * (dpsi - temp1 + 
 				dphi);
 		    } else {
-			temp1 = z[iip1] / delta[iip1];
+			temp1 = z__[iip1] / delta[iip1];
 			temp1 *= temp1;
-			c = temp - delta[iim1] * (dpsi + dphi) - (d[iip1] - d[
-				iim1]) * temp1;
+			c__ = temp - delta[iim1] * (dpsi + dphi) - (d__[iip1] 
+				- d__[iim1]) * temp1;
 			zz[0] = delta[iim1] * delta[iim1] * (dpsi + (dphi - 
 				temp1));
-			zz[2] = z[iip1] * z[iip1];
+			zz[2] = z__[iip1] * z__[iip1];
 		    }
 		}
-		slaed6_(&niter, &orgati, &c, &delta[iim1], zz, &w, &eta, info)
-			;
+		slaed6_(&niter, &orgati, &c__, &delta[iim1], zz, &w, &eta, 
+			info);
 		if (*info != 0) {
 		    goto L250;
 		}
@@ -862,10 +871,10 @@ struct {
 	    latime_1.ops = latime_1.ops + *n * 7 + (iim1 - iip1) * 6 + 18;
 	    if (w * eta >= 0.f) {
 		latime_1.ops += 1;
-		eta = -(doublereal)w / dw;
+		eta = -w / dw;
 	    }
 	    temp = tau + eta;
-	    del = (d[ip1] - d[*i]) / 2.f;
+	    del = (d__[ip1] - d__[*i__]) / 2.f;
 	    if (orgati) {
 		if (temp >= del) {
 		    eta = del - tau;
@@ -876,8 +885,8 @@ struct {
 		    latime_1.ops += 1;
 		}
 	    } else {
-		if (temp <= -(doublereal)del) {
-		    eta = -(doublereal)del - tau;
+		if (temp <= -del) {
+		    eta = -del - tau;
 		    latime_1.ops += 1;
 		}
 		if (temp >= 0.f) {
@@ -902,8 +911,8 @@ struct {
 	    erretm = 0.f;
 	    i__1 = iim1;
 	    for (j = 1; j <= i__1; ++j) {
-		temp = z[j] / delta[j];
-		psi += z[j] * temp;
+		temp = z__[j] / delta[j];
+		psi += z__[j] * temp;
 		dpsi += temp * temp;
 		erretm += psi;
 /* L220: */
@@ -916,16 +925,16 @@ struct {
 	    phi = 0.f;
 	    i__1 = iip1;
 	    for (j = *n; j >= i__1; --j) {
-		temp = z[j] / delta[j];
-		phi += z[j] * temp;
+		temp = z__[j] / delta[j];
+		phi += z__[j] * temp;
 		dphi += temp * temp;
 		erretm += phi;
 /* L230: */
 	    }
 
-	    temp = z[ii] / delta[ii];
+	    temp = z__[ii] / delta[ii];
 	    dw = dpsi + dphi + temp * temp;
-	    temp = z[ii] * temp;
+	    temp = z__[ii] * temp;
 	    w = rhoinv + phi + psi + temp;
 	    erretm = (phi - psi) * 8.f + erretm + rhoinv * 2.f + dabs(temp) * 
 		    3.f + dabs(tau) * dw;
@@ -941,9 +950,9 @@ struct {
 	*info = 1;
 	latime_1.ops += 1;
 	if (orgati) {
-	    *dlam = d[*i] + tau;
+	    *dlam = d__[*i__] + tau;
 	} else {
-	    *dlam = d[ip1] + tau;
+	    *dlam = d__[ip1] + tau;
 	}
 
     }

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 integer icamax_(integer *n, complex *cx, integer *incx)
@@ -9,15 +10,14 @@ integer icamax_(integer *n, complex *cx, integer *incx)
     double r_imag(complex *);
     /* Local variables */
     static real smax;
-    static integer i, ix;
+    static integer i__, ix;
 /*     finds the index of element having max. absolute value.   
        jack dongarra, linpack, 3/11/78.   
        modified 3/93 to return if incx .le. 0.   
        modified 12/3/93, array(1) declarations changed to array(*)   
-    
-   Parameter adjustments   
-       Function Body */
-#define CX(I) cx[(I)-1]
+       Parameter adjustments */
+    --cx;
+    /* Function Body */
     ret_val = 0;
     if (*n < 1 || *incx <= 0) {
 	return ret_val;
@@ -31,18 +31,18 @@ integer icamax_(integer *n, complex *cx, integer *incx)
     }
 /*        code for increment not equal to 1 */
     ix = 1;
-    smax = (r__1 = CX(1).r, dabs(r__1)) + (r__2 = r_imag(&CX(1)), dabs(r__2));
+    smax = (r__1 = cx[1].r, dabs(r__1)) + (r__2 = r_imag(&cx[1]), dabs(r__2));
     ix += *incx;
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
 	i__2 = ix;
-	if ((r__1 = CX(ix).r, dabs(r__1)) + (r__2 = r_imag(&CX(ix)), dabs(
+	if ((r__1 = cx[i__2].r, dabs(r__1)) + (r__2 = r_imag(&cx[ix]), dabs(
 		r__2)) <= smax) {
 	    goto L5;
 	}
-	ret_val = i;
+	ret_val = i__;
 	i__2 = ix;
-	smax = (r__1 = CX(ix).r, dabs(r__1)) + (r__2 = r_imag(&CX(ix)), 
+	smax = (r__1 = cx[i__2].r, dabs(r__1)) + (r__2 = r_imag(&cx[ix]), 
 		dabs(r__2));
 L5:
 	ix += *incx;
@@ -51,22 +51,21 @@ L5:
     return ret_val;
 /*        code for increment equal to 1 */
 L20:
-    smax = (r__1 = CX(1).r, dabs(r__1)) + (r__2 = r_imag(&CX(1)), dabs(r__2));
+    smax = (r__1 = cx[1].r, dabs(r__1)) + (r__2 = r_imag(&cx[1]), dabs(r__2));
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	i__2 = i;
-	if ((r__1 = CX(i).r, dabs(r__1)) + (r__2 = r_imag(&CX(i)), dabs(
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	if ((r__1 = cx[i__2].r, dabs(r__1)) + (r__2 = r_imag(&cx[i__]), dabs(
 		r__2)) <= smax) {
 	    goto L30;
 	}
-	ret_val = i;
-	i__2 = i;
-	smax = (r__1 = CX(i).r, dabs(r__1)) + (r__2 = r_imag(&CX(i)), dabs(
-		r__2));
+	ret_val = i__;
+	i__2 = i__;
+	smax = (r__1 = cx[i__2].r, dabs(r__1)) + (r__2 = r_imag(&cx[i__]), 
+		dabs(r__2));
 L30:
 	;
     }
     return ret_val;
 } /* icamax_ */
-
 

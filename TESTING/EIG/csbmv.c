@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,13 +17,17 @@
     /* Local variables */
     static integer info;
     static complex temp1, temp2;
-    static integer i, j, l;
+    static integer i__, j, l;
     extern logical lsame_(char *, char *);
     static integer kplus1, ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -73,14 +78,11 @@
              by n part of the array A must contain the upper triangular   
              band part of the symmetric matrix, supplied column by   
              column, with the leading diagonal of the matrix in row   
-             ( k + 1 ) of the array, the first super-diagonal starting at 
-  
-             position 2 in row k, and so on. The top left k by k triangle 
-  
+             ( k + 1 ) of the array, the first super-diagonal starting at   
+             position 2 in row k, and so on. The top left k by k triangle   
              of the array A is not referenced.   
              The following program segment will transfer the upper   
-             triangular part of a symmetric band matrix from conventional 
-  
+             triangular part of a symmetric band matrix from conventional   
              full matrix storage to band storage:   
 
                    DO 20, J = 1, N   
@@ -93,15 +95,12 @@
              Before entry with UPLO = 'L' or 'l', the leading ( k + 1 )   
              by n part of the array A must contain the lower triangular   
              band part of the symmetric matrix, supplied column by   
-             column, with the leading diagonal of the matrix in row 1 of 
-  
-             the array, the first sub-diagonal starting at position 1 in 
-  
+             column, with the leading diagonal of the matrix in row 1 of   
+             the array, the first sub-diagonal starting at position 1 in   
              row 2, and so on. The bottom right k by k triangle of the   
              array A is not referenced.   
              The following program segment will transfer the lower   
-             triangular part of a symmetric band matrix from conventional 
-  
+             triangular part of a symmetric band matrix from conventional   
              full matrix storage to band storage:   
 
                    DO 20, J = 1, N   
@@ -114,8 +113,7 @@
              Unchanged on exit.   
 
     LDA    - INTEGER   
-             On entry, LDA specifies the first dimension of A as declared 
-  
+             On entry, LDA specifies the first dimension of A as declared   
              in the calling (sub) program. LDA must be at least   
              ( k + 1 ).   
              Unchanged on exit.   
@@ -138,23 +136,21 @@
     Y      - COMPLEX array, dimension at least   
              ( 1 + ( N - 1 )*abs( INCY ) ).   
              Before entry, the incremented array Y must contain the   
-             vector y. On exit, Y is overwritten by the updated vector y. 
-  
+             vector y. On exit, Y is overwritten by the updated vector y.   
 
     INCY   - INTEGER   
              On entry, INCY specifies the increment for the elements of   
              Y. INCY must not be zero.   
              Unchanged on exit.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --x;
     --y;
@@ -199,8 +195,7 @@
 	ky = 1 - (*n - 1) * *incy;
     }
 
-/*     Start the operations. In this version the elements of the array A 
-  
+/*     Start the operations. In this version the elements of the array A   
        are accessed sequentially with one pass through A.   
 
        First form  y := beta*y. */
@@ -209,16 +204,16 @@
 	if (*incy == 1) {
 	    if (beta->r == 0.f && beta->i == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= i__1; ++i) {
-		    i__2 = i;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    i__2 = i__;
 		    y[i__2].r = 0.f, y[i__2].i = 0.f;
 /* L10: */
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= i__1; ++i) {
-		    i__2 = i;
-		    i__3 = i;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    i__2 = i__;
+		    i__3 = i__;
 		    q__1.r = beta->r * y[i__3].r - beta->i * y[i__3].i, 
 			    q__1.i = beta->r * y[i__3].i + beta->i * y[i__3]
 			    .r;
@@ -230,7 +225,7 @@
 	    iy = ky;
 	    if (beta->r == 0.f && beta->i == 0.f) {
 		i__1 = *n;
-		for (i = 1; i <= i__1; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 		    i__2 = iy;
 		    y[i__2].r = 0.f, y[i__2].i = 0.f;
 		    iy += *incy;
@@ -238,7 +233,7 @@
 		}
 	    } else {
 		i__1 = *n;
-		for (i = 1; i <= i__1; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 		    i__2 = iy;
 		    i__3 = iy;
 		    q__1.r = beta->r * y[i__3].r - beta->i * y[i__3].i, 
@@ -271,17 +266,17 @@
 /* Computing MAX */
 		i__2 = 1, i__3 = j - *k;
 		i__4 = j - 1;
-		for (i = max(i__2,i__3); i <= i__4; ++i) {
-		    i__2 = i;
-		    i__3 = i;
-		    i__5 = l + i + j * a_dim1;
+		for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
+		    i__2 = i__;
+		    i__3 = i__;
+		    i__5 = a_subscr(l + i__, j);
 		    q__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    q__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    q__1.r = y[i__3].r + q__2.r, q__1.i = y[i__3].i + q__2.i;
 		    y[i__2].r = q__1.r, y[i__2].i = q__1.i;
-		    i__2 = l + i + j * a_dim1;
-		    i__3 = i;
+		    i__2 = a_subscr(l + i__, j);
+		    i__3 = i__;
 		    q__2.r = a[i__2].r * x[i__3].r - a[i__2].i * x[i__3].i, 
 			    q__2.i = a[i__2].r * x[i__3].i + a[i__2].i * x[
 			    i__3].r;
@@ -291,7 +286,7 @@
 		}
 		i__4 = j;
 		i__2 = j;
-		i__3 = kplus1 + j * a_dim1;
+		i__3 = a_subscr(kplus1, j);
 		q__3.r = temp1.r * a[i__3].r - temp1.i * a[i__3].i, q__3.i = 
 			temp1.r * a[i__3].i + temp1.i * a[i__3].r;
 		q__2.r = y[i__2].r + q__3.r, q__2.i = y[i__2].i + q__3.i;
@@ -317,16 +312,16 @@
 /* Computing MAX */
 		i__4 = 1, i__2 = j - *k;
 		i__3 = j - 1;
-		for (i = max(i__4,i__2); i <= i__3; ++i) {
+		for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
 		    i__4 = iy;
 		    i__2 = iy;
-		    i__5 = l + i + j * a_dim1;
+		    i__5 = a_subscr(l + i__, j);
 		    q__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    q__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    q__1.r = y[i__2].r + q__2.r, q__1.i = y[i__2].i + q__2.i;
 		    y[i__4].r = q__1.r, y[i__4].i = q__1.i;
-		    i__4 = l + i + j * a_dim1;
+		    i__4 = a_subscr(l + i__, j);
 		    i__2 = ix;
 		    q__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    q__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
@@ -339,7 +334,7 @@
 		}
 		i__3 = jy;
 		i__4 = jy;
-		i__2 = kplus1 + j * a_dim1;
+		i__2 = a_subscr(kplus1, j);
 		q__3.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, q__3.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		q__2.r = y[i__4].r + q__3.r, q__2.i = y[i__4].i + q__3.i;
@@ -370,7 +365,7 @@
 		temp2.r = 0.f, temp2.i = 0.f;
 		i__3 = j;
 		i__4 = j;
-		i__2 = j * a_dim1 + 1;
+		i__2 = a_subscr(1, j);
 		q__2.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, q__2.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
@@ -379,17 +374,17 @@
 /* Computing MIN */
 		i__4 = *n, i__2 = j + *k;
 		i__3 = min(i__4,i__2);
-		for (i = j + 1; i <= i__3; ++i) {
-		    i__4 = i;
-		    i__2 = i;
-		    i__5 = l + i + j * a_dim1;
+		for (i__ = j + 1; i__ <= i__3; ++i__) {
+		    i__4 = i__;
+		    i__2 = i__;
+		    i__5 = a_subscr(l + i__, j);
 		    q__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    q__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    q__1.r = y[i__2].r + q__2.r, q__1.i = y[i__2].i + q__2.i;
 		    y[i__4].r = q__1.r, y[i__4].i = q__1.i;
-		    i__4 = l + i + j * a_dim1;
-		    i__2 = i;
+		    i__4 = a_subscr(l + i__, j);
+		    i__2 = i__;
 		    q__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    q__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
 			    i__2].r;
@@ -417,7 +412,7 @@
 		temp2.r = 0.f, temp2.i = 0.f;
 		i__3 = jy;
 		i__4 = jy;
-		i__2 = j * a_dim1 + 1;
+		i__2 = a_subscr(1, j);
 		q__2.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, q__2.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		q__1.r = y[i__4].r + q__2.r, q__1.i = y[i__4].i + q__2.i;
@@ -428,18 +423,18 @@
 /* Computing MIN */
 		i__4 = *n, i__2 = j + *k;
 		i__3 = min(i__4,i__2);
-		for (i = j + 1; i <= i__3; ++i) {
+		for (i__ = j + 1; i__ <= i__3; ++i__) {
 		    ix += *incx;
 		    iy += *incy;
 		    i__4 = iy;
 		    i__2 = iy;
-		    i__5 = l + i + j * a_dim1;
+		    i__5 = a_subscr(l + i__, j);
 		    q__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    q__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    q__1.r = y[i__2].r + q__2.r, q__1.i = y[i__2].i + q__2.i;
 		    y[i__4].r = q__1.r, y[i__4].i = q__1.i;
-		    i__4 = l + i + j * a_dim1;
+		    i__4 = a_subscr(l + i__, j);
 		    i__2 = ix;
 		    q__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    q__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
@@ -466,4 +461,8 @@
 /*     End of CSBMV */
 
 } /* csbmv_ */
+
+#undef a_ref
+#undef a_subscr
+
 

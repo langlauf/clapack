@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -34,7 +35,11 @@ static doublereal c_b10 = -1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -55,8 +60,7 @@ static doublereal c_b10 = -1.;
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -84,13 +88,10 @@ static doublereal c_b10 = -1.;
 
     AB      (input) DOUBLE PRECISION array, dimension (LDAB,N)   
             The upper or lower triangular band matrix A, stored in the   
-            first kd+1 rows of the array. The j-th column of A is stored 
-  
+            first kd+1 rows of the array. The j-th column of A is stored   
             in the j-th column of the array AB as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
@@ -115,21 +116,20 @@ static doublereal c_b10 = -1.;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0 or NRHS = 0   
 
        Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = ab_dim1 + 1;
+    ab_offset = 1 + ab_dim1 * 1;
     ab -= ab_offset;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -163,12 +163,12 @@ static doublereal c_b10 = -1.;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	dcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	dtbmv_(uplo, trans, diag, n, kd, &ab[ab_offset], ldab, &work[1], &
 		c__1);
-	daxpy_(n, &c_b10, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	daxpy_(n, &c_b10, &b_ref(1, j), &c__1, &work[1], &c__1);
 	bnorm = dasum_(n, &work[1], &c__1);
-	xnorm = dasum_(n, &x[j * x_dim1 + 1], &c__1);
+	xnorm = dasum_(n, &x_ref(1, j), &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -184,4 +184,8 @@ static doublereal c_b10 = -1.;
 /*     End of DTBT02 */
 
 } /* dtbt02_ */
+
+#undef x_ref
+#undef b_ref
+
 

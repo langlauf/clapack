@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgtrfs_(char *trans, integer *n, integer *nrhs, real *dl,
-	 real *d, real *du, real *dlf, real *df, real *duf, real *du2, 
+	 real *d__, real *du, real *dlf, real *df, real *duf, real *du2, 
 	integer *ipiv, real *b, integer *ldb, real *x, integer *ldx, real *
 	ferr, real *berr, real *work, integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -48,8 +49,7 @@
             LU factorization of A as computed by SGTTRF.   
 
     DF      (input) REAL array, dimension (N)   
-            The n diagonal elements of the upper triangular matrix U from 
-  
+            The n diagonal elements of the upper triangular matrix U from   
             the LU factorization of A.   
 
     DUF     (input) REAL array, dimension (N-1)   
@@ -60,8 +60,7 @@
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices; for 1 <= i <= n, row i of the matrix was   
-            interchanged with row IPIV(i).  IPIV(i) will always be either 
-  
+            interchanged with row IPIV(i).  IPIV(i) will always be either   
             i or i+1; IPIV(i) = i indicates a row interchange was not   
             required.   
 
@@ -81,10 +80,8 @@
     FERR    (output) REAL array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -108,15 +105,12 @@
 
     ITMAX is the maximum number of steps of iterative refinement.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b18 = -1.f;
@@ -128,7 +122,7 @@
     /* Local variables */
     static integer kase;
     static real safe1, safe2;
-    static integer i, j;
+    static integer i__, j;
     static real s;
     extern logical lsame_(char *, char *);
     static integer count;
@@ -148,28 +142,34 @@
     extern /* Subroutine */ int sgttrs_(char *, integer *, integer *, real *, 
 	    real *, real *, real *, integer *, real *, integer *, integer *);
     static real eps;
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
 
 
+    --dl;
+    --d__;
+    --du;
+    --dlf;
+    --df;
+    --duf;
+    --du2;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --iwork;
 
-#define DL(I) dl[(I)-1]
-#define D(I) d[(I)-1]
-#define DU(I) du[(I)-1]
-#define DLF(I) dlf[(I)-1]
-#define DF(I) df[(I)-1]
-#define DUF(I) duf[(I)-1]
-#define DU2(I) du2[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     notran = lsame_(trans, "N");
-    if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, "C")) {
+    if (! notran && ! lsame_(trans, "T") && ! lsame_(
+	    trans, "C")) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -190,9 +190,9 @@
 
     if (*n == 0 || *nrhs == 0) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    FERR(j) = 0.f;
-	    BERR(j) = 0.f;
+	for (j = 1; j <= i__1; ++j) {
+	    ferr[j] = 0.f;
+	    berr[j] = 0.f;
 /* L10: */
 	}
 	return 0;
@@ -217,7 +217,7 @@
 /*     Do for each right hand side */
 
     i__1 = *nrhs;
-    for (j = 1; j <= *nrhs; ++j) {
+    for (j = 1; j <= i__1; ++j) {
 
 	count = 1;
 	lstres = 3.f;
@@ -228,102 +228,96 @@ L20:
           Compute residual R = B - op(A) * X,   
           where op(A) = A, A**T, or A**H, depending on TRANS. */
 
-	scopy_(n, &B(1,j), &c__1, &WORK(*n + 1), &c__1);
-	slagtm_(trans, n, &c__1, &c_b18, &DL(1), &D(1), &DU(1), &X(1,j), ldx, &c_b19, &WORK(*n + 1), n);
+	scopy_(n, &b_ref(1, j), &c__1, &work[*n + 1], &c__1);
+	slagtm_(trans, n, &c__1, &c_b18, &dl[1], &d__[1], &du[1], &x_ref(1, j)
+		, ldx, &c_b19, &work[*n + 1], n);
 
-/*        Compute abs(op(A))*abs(x) + abs(b) for use in the backward 
-  
+/*        Compute abs(op(A))*abs(x) + abs(b) for use in the backward   
           error bound. */
 
 	if (notran) {
 	    if (*n == 1) {
-		WORK(1) = (r__1 = B(1,j), dabs(r__1)) + (r__2 = D(
-			1) * X(1,j), dabs(r__2));
+		work[1] = (r__1 = b_ref(1, j), dabs(r__1)) + (r__2 = d__[1] * 
+			x_ref(1, j), dabs(r__2));
 	    } else {
-		WORK(1) = (r__1 = B(1,j), dabs(r__1)) + (r__2 = D(
-			1) * X(1,j), dabs(r__2)) + (r__3 = DU(1) * 
-			X(2,j), dabs(r__3));
+		work[1] = (r__1 = b_ref(1, j), dabs(r__1)) + (r__2 = d__[1] * 
+			x_ref(1, j), dabs(r__2)) + (r__3 = du[1] * x_ref(2, j)
+			, dabs(r__3));
 		i__2 = *n - 1;
-		for (i = 2; i <= *n-1; ++i) {
-		    WORK(i) = (r__1 = B(i,j), dabs(r__1)) + (r__2 =
-			     DL(i - 1) * X(i-1,j), dabs(r__2)) + 
-			    (r__3 = D(i) * X(i,j), dabs(r__3)) + (
-			    r__4 = DU(i) * X(i+1,j), dabs(r__4));
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    work[i__] = (r__1 = b_ref(i__, j), dabs(r__1)) + (r__2 = 
+			    dl[i__ - 1] * x_ref(i__ - 1, j), dabs(r__2)) + (
+			    r__3 = d__[i__] * x_ref(i__, j), dabs(r__3)) + (
+			    r__4 = du[i__] * x_ref(i__ + 1, j), dabs(r__4));
 /* L30: */
 		}
-		WORK(*n) = (r__1 = B(*n,j), dabs(r__1)) + (r__2 = 
-			DL(*n - 1) * X(*n-1,j), dabs(r__2)) + (
-			r__3 = D(*n) * X(*n,j), dabs(r__3));
+		work[*n] = (r__1 = b_ref(*n, j), dabs(r__1)) + (r__2 = dl[*n 
+			- 1] * x_ref(*n - 1, j), dabs(r__2)) + (r__3 = d__[*n]
+			 * x_ref(*n, j), dabs(r__3));
 	    }
 	} else {
 	    if (*n == 1) {
-		WORK(1) = (r__1 = B(1,j), dabs(r__1)) + (r__2 = D(
-			1) * X(1,j), dabs(r__2));
+		work[1] = (r__1 = b_ref(1, j), dabs(r__1)) + (r__2 = d__[1] * 
+			x_ref(1, j), dabs(r__2));
 	    } else {
-		WORK(1) = (r__1 = B(1,j), dabs(r__1)) + (r__2 = D(
-			1) * X(1,j), dabs(r__2)) + (r__3 = DL(1) * 
-			X(2,j), dabs(r__3));
+		work[1] = (r__1 = b_ref(1, j), dabs(r__1)) + (r__2 = d__[1] * 
+			x_ref(1, j), dabs(r__2)) + (r__3 = dl[1] * x_ref(2, j)
+			, dabs(r__3));
 		i__2 = *n - 1;
-		for (i = 2; i <= *n-1; ++i) {
-		    WORK(i) = (r__1 = B(i,j), dabs(r__1)) + (r__2 =
-			     DU(i - 1) * X(i-1,j), dabs(r__2)) + 
-			    (r__3 = D(i) * X(i,j), dabs(r__3)) + (
-			    r__4 = DL(i) * X(i+1,j), dabs(r__4));
+		for (i__ = 2; i__ <= i__2; ++i__) {
+		    work[i__] = (r__1 = b_ref(i__, j), dabs(r__1)) + (r__2 = 
+			    du[i__ - 1] * x_ref(i__ - 1, j), dabs(r__2)) + (
+			    r__3 = d__[i__] * x_ref(i__, j), dabs(r__3)) + (
+			    r__4 = dl[i__] * x_ref(i__ + 1, j), dabs(r__4));
 /* L40: */
 		}
-		WORK(*n) = (r__1 = B(*n,j), dabs(r__1)) + (r__2 = 
-			DU(*n - 1) * X(*n-1,j), dabs(r__2)) + (
-			r__3 = D(*n) * X(*n,j), dabs(r__3));
+		work[*n] = (r__1 = b_ref(*n, j), dabs(r__1)) + (r__2 = du[*n 
+			- 1] * x_ref(*n - 1, j), dabs(r__2)) + (r__3 = d__[*n]
+			 * x_ref(*n, j), dabs(r__3));
 	    }
 	}
 
-/*        Compute componentwise relative backward error from formula 
-  
+/*        Compute componentwise relative backward error from formula   
 
           max(i) ( abs(R(i)) / ( abs(op(A))*abs(X) + abs(B) )(i) )   
 
-          where abs(Z) is the componentwise absolute value of the matr
-ix   
-          or vector Z.  If the i-th component of the denominator is le
-ss   
-          than SAFE2, then SAFE1 is added to the i-th components of th
-e   
+          where abs(Z) is the componentwise absolute value of the matrix   
+          or vector Z.  If the i-th component of the denominator is less   
+          than SAFE2, then SAFE1 is added to the i-th components of the   
           numerator and denominator before dividing. */
 
 	s = 0.f;
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (WORK(i) > safe2) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (work[i__] > safe2) {
 /* Computing MAX */
-		r__2 = s, r__3 = (r__1 = WORK(*n + i), dabs(r__1)) / WORK(i);
+		r__2 = s, r__3 = (r__1 = work[*n + i__], dabs(r__1)) / work[
+			i__];
 		s = dmax(r__2,r__3);
 	    } else {
 /* Computing MAX */
-		r__2 = s, r__3 = ((r__1 = WORK(*n + i), dabs(r__1)) + safe1) /
-			 (WORK(i) + safe1);
+		r__2 = s, r__3 = ((r__1 = work[*n + i__], dabs(r__1)) + safe1)
+			 / (work[i__] + safe1);
 		s = dmax(r__2,r__3);
 	    }
 /* L50: */
 	}
-	BERR(j) = s;
+	berr[j] = s;
 
 /*        Test stopping criterion. Continue iterating if   
-             1) The residual BERR(J) is larger than machine epsilon, a
-nd   
-             2) BERR(J) decreased by at least a factor of 2 during the
-   
+             1) The residual BERR(J) is larger than machine epsilon, and   
+             2) BERR(J) decreased by at least a factor of 2 during the   
                 last iteration, and   
              3) At most ITMAX iterations tried. */
 
-	if (BERR(j) > eps && BERR(j) * 2.f <= lstres && count <= 5) {
+	if (berr[j] > eps && berr[j] * 2.f <= lstres && count <= 5) {
 
 /*           Update solution and try again. */
 
-	    sgttrs_(trans, n, &c__1, &DLF(1), &DF(1), &DUF(1), &DU2(1), &IPIV(
-		    1), &WORK(*n + 1), n, info);
-	    saxpy_(n, &c_b19, &WORK(*n + 1), &c__1, &X(1,j), &c__1)
-		    ;
-	    lstres = BERR(j);
+	    sgttrs_(trans, n, &c__1, &dlf[1], &df[1], &duf[1], &du2[1], &ipiv[
+		    1], &work[*n + 1], n, info);
+	    saxpy_(n, &c_b19, &work[*n + 1], &c__1, &x_ref(1, j), &c__1);
+	    lstres = berr[j];
 	    ++count;
 	    goto L20;
 	}
@@ -332,21 +326,17 @@ nd
 
           norm(X - XTRUE) / norm(X) .le. FERR =   
           norm( abs(inv(op(A)))*   
-             ( abs(R) + NZ*EPS*( abs(op(A))*abs(X)+abs(B) ))) / norm(X
-)   
+             ( abs(R) + NZ*EPS*( abs(op(A))*abs(X)+abs(B) ))) / norm(X)   
 
           where   
             norm(Z) is the magnitude of the largest component of Z   
             inv(op(A)) is the inverse of op(A)   
-            abs(Z) is the componentwise absolute value of the matrix o
-r   
+            abs(Z) is the componentwise absolute value of the matrix or   
                vector Z   
-            NZ is the maximum number of nonzeros in any row of A, plus
- 1   
+            NZ is the maximum number of nonzeros in any row of A, plus 1   
             EPS is machine epsilon   
 
-          The i-th component of abs(R)+NZ*EPS*(abs(op(A))*abs(X)+abs(B
-))   
+          The i-th component of abs(R)+NZ*EPS*(abs(op(A))*abs(X)+abs(B))   
           is incremented by SAFE1 if the i-th component of   
           abs(op(A))*abs(X) + abs(B) is less than SAFE2.   
 
@@ -355,31 +345,31 @@ r
           where W = abs(R) + NZ*EPS*( abs(op(A))*abs(X)+abs(B) ))) */
 
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (WORK(i) > safe2) {
-		WORK(i) = (r__1 = WORK(*n + i), dabs(r__1)) + nz * eps * WORK(
-			i);
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (work[i__] > safe2) {
+		work[i__] = (r__1 = work[*n + i__], dabs(r__1)) + nz * eps * 
+			work[i__];
 	    } else {
-		WORK(i) = (r__1 = WORK(*n + i), dabs(r__1)) + nz * eps * WORK(
-			i) + safe1;
+		work[i__] = (r__1 = work[*n + i__], dabs(r__1)) + nz * eps * 
+			work[i__] + safe1;
 	    }
 /* L60: */
 	}
 
 	kase = 0;
 L70:
-	slacon_(n, &WORK((*n << 1) + 1), &WORK(*n + 1), &IWORK(1), &FERR(j), &
+	slacon_(n, &work[(*n << 1) + 1], &work[*n + 1], &iwork[1], &ferr[j], &
 		kase);
 	if (kase != 0) {
 	    if (kase == 1) {
 
 /*              Multiply by diag(W)*inv(op(A)**T). */
 
-		sgttrs_(transt, n, &c__1, &DLF(1), &DF(1), &DUF(1), &DU2(1), &
-			IPIV(1), &WORK(*n + 1), n, info);
+		sgttrs_(transt, n, &c__1, &dlf[1], &df[1], &duf[1], &du2[1], &
+			ipiv[1], &work[*n + 1], n, info);
 		i__2 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(*n + i) = WORK(i) * WORK(*n + i);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*n + i__] = work[i__] * work[*n + i__];
 /* L80: */
 		}
 	    } else {
@@ -387,12 +377,12 @@ L70:
 /*              Multiply by inv(op(A))*diag(W). */
 
 		i__2 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    WORK(*n + i) = WORK(i) * WORK(*n + i);
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work[*n + i__] = work[i__] * work[*n + i__];
 /* L90: */
 		}
-		sgttrs_(transn, n, &c__1, &DLF(1), &DF(1), &DUF(1), &DU2(1), &
-			IPIV(1), &WORK(*n + 1), n, info);
+		sgttrs_(transn, n, &c__1, &dlf[1], &df[1], &duf[1], &du2[1], &
+			ipiv[1], &work[*n + 1], n, info);
 	    }
 	    goto L70;
 	}
@@ -401,14 +391,14 @@ L70:
 
 	lstres = 0.f;
 	i__2 = *n;
-	for (i = 1; i <= *n; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    r__2 = lstres, r__3 = (r__1 = X(i,j), dabs(r__1));
+	    r__2 = lstres, r__3 = (r__1 = x_ref(i__, j), dabs(r__1));
 	    lstres = dmax(r__2,r__3);
 /* L100: */
 	}
 	if (lstres != 0.f) {
-	    FERR(j) /= lstres;
+	    ferr[j] /= lstres;
 	}
 
 /* L110: */
@@ -419,4 +409,8 @@ L70:
 /*     End of SGTRFS */
 
 } /* sgtrfs_ */
+
+#undef x_ref
+#undef b_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
     doublereal ret_val;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal norma, rwork[1];
     extern /* Subroutine */ int zaxpy_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
@@ -35,7 +36,13 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
 	    integer *, doublecomplex *);
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -76,16 +83,15 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= m*n + m.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -112,9 +118,9 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = (j - 1) * *m + i;
-	    i__4 = i + j * af_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = (j - 1) * *m + i__;
+	    i__4 = af_subscr(i__, j);
 	    work[i__3].r = af[i__4].r, work[i__3].i = af[i__4].i;
 /* L10: */
 	}
@@ -124,10 +130,10 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
 /*     R = R * P(1) * ... *P(m) */
 
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = *n - *m + 1;
-	zlatzm_("Right", &i, &i__2, &af[i + (*m + 1) * af_dim1], lda, &tau[i],
-		 &work[(i - 1) * *m + 1], &work[*m * *m + 1], m, &work[*m * *
+	zlatzm_("Right", &i__, &i__2, &af_ref(i__, *m + 1), lda, &tau[i__], &
+		work[(i__ - 1) * *m + 1], &work[*m * *m + 1], m, &work[*m * *
 		n + 1]);
 /* L30: */
     }
@@ -135,9 +141,9 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
 /*     R = R - A */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	zaxpy_(m, &c_b15, &a[i * a_dim1 + 1], &c__1, &work[(i - 1) * *m + 1], 
-		&c__1);
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	zaxpy_(m, &c_b15, &a_ref(1, i__), &c__1, &work[(i__ - 1) * *m + 1], &
+		c__1);
 /* L40: */
     }
 
@@ -153,4 +159,10 @@ doublereal ztzt01_(integer *m, integer *n, doublecomplex *a, doublecomplex *
 /*     End of ZTZT01 */
 
 } /* ztzt01_ */
+
+#undef af_ref
+#undef af_subscr
+#undef a_ref
+#undef a_subscr
+
 

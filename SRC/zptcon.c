@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int zptcon_(integer *n, doublereal *d, doublecomplex *e, 
+/* Subroutine */ int zptcon_(integer *n, doublereal *d__, doublecomplex *e, 
 	doublereal *anorm, doublereal *rcond, doublereal *rwork, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -33,8 +34,7 @@
             factorization of A, as computed by ZPTTRF.   
 
     E       (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the unit bidiagonal factor 
-  
+            The (n-1) off-diagonal elements of the unit bidiagonal factor   
             U or L from the factorization of A, as computed by ZPTTRF.   
 
     ANORM   (input) DOUBLE PRECISION   
@@ -58,15 +58,12 @@
     Algorithms for Computing the Condition Number of a Tridiagonal   
     Matrix", SIAM J. Sci. Stat. Comput., Vol. 7, No. 1, January 1986.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -76,18 +73,17 @@
     /* Builtin functions */
     double z_abs(doublecomplex *);
     /* Local variables */
-    static integer i, ix;
+    static integer i__, ix;
     extern integer idamax_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal ainvnm;
 
 
+    --rwork;
+    --e;
+    --d__;
 
-#define RWORK(I) rwork[(I)-1]
-#define E(I) e[(I)-1]
-#define D(I) d[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -113,8 +109,8 @@
 /*     Check that D(1:N) is positive. */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (D(i) <= 0.) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (d__[i__] <= 0.) {
 	    return 0;
 	}
 /* L10: */
@@ -129,25 +125,25 @@
 
        Solve M(L) * x = e. */
 
-    RWORK(1) = 1.;
+    rwork[1] = 1.;
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	RWORK(i) = RWORK(i - 1) * z_abs(&E(i - 1)) + 1.;
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	rwork[i__] = rwork[i__ - 1] * z_abs(&e[i__ - 1]) + 1.;
 /* L20: */
     }
 
 /*     Solve D * M(L)' * x = b. */
 
-    RWORK(*n) /= D(*n);
-    for (i = *n - 1; i >= 1; --i) {
-	RWORK(i) = RWORK(i) / D(i) + RWORK(i + 1) * z_abs(&E(i));
+    rwork[*n] /= d__[*n];
+    for (i__ = *n - 1; i__ >= 1; --i__) {
+	rwork[i__] = rwork[i__] / d__[i__] + rwork[i__ + 1] * z_abs(&e[i__]);
 /* L30: */
     }
 
 /*     Compute AINVNM = max(x(i)), 1<=i<=n. */
 
-    ix = idamax_(n, &RWORK(1), &c__1);
-    ainvnm = (d__1 = RWORK(ix), abs(d__1));
+    ix = idamax_(n, &rwork[1], &c__1);
+    ainvnm = (d__1 = rwork[ix], abs(d__1));
 
 /*     Compute the reciprocal condition number. */
 

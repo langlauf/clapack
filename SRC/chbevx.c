@@ -1,15 +1,16 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int chbevx_(char *jobz, char *range, char *uplo, integer *n, 
 	integer *kd, complex *ab, integer *ldab, complex *q, integer *ldq, 
 	real *vl, real *vu, integer *il, integer *iu, real *abstol, integer *
-	m, real *w, complex *z, integer *ldz, complex *work, real *rwork, 
+	m, real *w, complex *z__, integer *ldz, complex *work, real *rwork, 
 	integer *iwork, integer *ifail, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -17,8 +18,7 @@
 
     CHBEVX computes selected eigenvalues and, optionally, eigenvectors   
     of a complex Hermitian band matrix A.  Eigenvalues and eigenvectors   
-    can be selected by specifying either a range of values or a range of 
-  
+    can be selected by specifying either a range of values or a range of   
     indices for the desired eigenvalues.   
 
     Arguments   
@@ -48,13 +48,10 @@
     AB      (input/output) COMPLEX array, dimension (LDAB, N)   
             On entry, the upper or lower triangle of the Hermitian band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, AB is overwritten by values generated during the   
             reduction to tridiagonal form.   
@@ -98,8 +95,7 @@
             by reducing AB to tridiagonal form.   
 
             Eigenvalues will be computed most accurately when ABSTOL is   
-            set to twice the underflow threshold 2*SLAMCH('S'), not zero. 
-  
+            set to twice the underflow threshold 2*SLAMCH('S'), not zero.   
             If this routine returns with INFO>0, indicating that some   
             eigenvectors did not converge, try setting ABSTOL to   
             2*SLAMCH('S').   
@@ -122,14 +118,11 @@
             corresponding to the selected eigenvalues, with the i-th   
             column of Z holding the eigenvector associated with W(i).   
             If an eigenvector fails to converge, then that column of Z   
-            contains the latest approximation to the eigenvector, and the 
-  
+            contains the latest approximation to the eigenvector, and the   
             index of the eigenvector is returned in IFAIL.   
             If JOBZ = 'N', then Z is not referenced.   
-            Note: the user must ensure that at least max(1,M) columns are 
-  
-            supplied in the array Z; if RANGE = 'V', the exact value of M 
-  
+            Note: the user must ensure that at least max(1,M) columns are   
+            supplied in the array Z; if RANGE = 'V', the exact value of M   
             is not known in advance and an upper bound must be used.   
 
     LDZ     (input) INTEGER   
@@ -154,15 +147,12 @@
             > 0:  if INFO = i, then i eigenvectors failed to converge.   
                   Their indices are stored in array IFAIL.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {0.f,0.f};
     static complex c_b2 = {1.f,0.f};
@@ -180,7 +170,8 @@
     static real anrm;
     static integer imax;
     static real rmin, rmax;
-    static integer itmp1, i, j, indee;
+    static complex ctmp1;
+    static integer itmp1, i__, j, indee;
     static real sigma;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
@@ -226,19 +217,28 @@
 	    integer *, real *, integer *, integer *, real *, integer *, 
 	    integer *);
     static real smlnum, eps, vll, vuu, tmp1;
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --w;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --rwork;
+    --iwork;
+    --ifail;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-#define IFAIL(I) ifail[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     alleig = lsame_(range, "A");
     valeig = lsame_(range, "V");
@@ -258,16 +258,25 @@
 	*info = -5;
     } else if (*ldab < *kd + 1) {
 	*info = -7;
-    } else if (*ldq < *n) {
+    } else if (wantz && *ldq < max(1,*n)) {
 	*info = -9;
-    } else if (valeig && *n > 0 && *vu <= *vl) {
-	*info = -11;
-    } else if (indeig && *il < 1) {
-	*info = -12;
-    } else if (indeig && (*iu < min(*n,*il) || *iu > *n)) {
-	*info = -13;
-    } else if (*ldz < 1 || wantz && *ldz < *n) {
-	*info = -18;
+    } else {
+	if (valeig) {
+	    if (*n > 0 && *vu <= *vl) {
+		*info = -11;
+	    }
+	} else if (indeig) {
+	    if (*il < 1 || *il > max(1,*n)) {
+		*info = -12;
+	    } else if (*iu < min(*n,*il) || *iu > *n) {
+		*info = -13;
+	    }
+	}
+    }
+    if (*info == 0) {
+	if (*ldz < 1 || wantz && *ldz < *n) {
+	    *info = -18;
+	}
     }
 
     if (*info != 0) {
@@ -284,22 +293,26 @@
     }
 
     if (*n == 1) {
-	if (alleig || indeig) {
-	    *m = 1;
-	    i__1 = ab_dim1 + 1;
-	    W(1) = AB(1,1).r;
+	*m = 1;
+	if (lower) {
+	    i__1 = ab_subscr(1, 1);
+	    ctmp1.r = ab[i__1].r, ctmp1.i = ab[i__1].i;
 	} else {
-	    i__1 = ab_dim1 + 1;
-	    i__2 = ab_dim1 + 1;
-	    if (*vl < AB(1,1).r && *vu >= AB(1,1).r) {
-		*m = 1;
-		i__1 = ab_dim1 + 1;
-		W(1) = AB(1,1).r;
+	    i__1 = ab_subscr(*kd + 1, 1);
+	    ctmp1.r = ab[i__1].r, ctmp1.i = ab[i__1].i;
+	}
+	tmp1 = ctmp1.r;
+	if (valeig) {
+	    if (! (*vl < tmp1 && *vu >= tmp1)) {
+		*m = 0;
 	    }
 	}
-	if (wantz) {
-	    i__1 = z_dim1 + 1;
-	    Z(1,1).r = 1.f, Z(1,1).i = 0.f;
+	if (*m == 1) {
+	    w[1] = ctmp1.r;
+	    if (wantz) {
+		i__1 = z___subscr(1, 1);
+		z__[i__1].r = 1.f, z__[i__1].i = 0.f;
+	    }
 	}
 	return 0;
     }
@@ -322,8 +335,11 @@
     if (valeig) {
 	vll = *vl;
 	vuu = *vu;
+    } else {
+	vll = 0.f;
+	vuu = 0.f;
     }
-    anrm = clanhb_("M", uplo, n, kd, &AB(1,1), ldab, &RWORK(1));
+    anrm = clanhb_("M", uplo, n, kd, &ab[ab_offset], ldab, &rwork[1]);
     if (anrm > 0.f && anrm < rmin) {
 	iscale = 1;
 	sigma = rmin / anrm;
@@ -333,10 +349,10 @@
     }
     if (iscale == 1) {
 	if (lower) {
-	    clascl_("B", kd, kd, &c_b16, &sigma, n, n, &AB(1,1), ldab, 
+	    clascl_("B", kd, kd, &c_b16, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	} else {
-	    clascl_("Q", kd, kd, &c_b16, &sigma, n, n, &AB(1,1), ldab, 
+	    clascl_("Q", kd, kd, &c_b16, &sigma, n, n, &ab[ab_offset], ldab, 
 		    info);
 	}
 	if (*abstol > 0.f) {
@@ -354,30 +370,30 @@
     inde = indd + *n;
     indrwk = inde + *n;
     indwrk = 1;
-    chbtrd_(jobz, uplo, n, kd, &AB(1,1), ldab, &RWORK(indd), &RWORK(
-	    inde), &Q(1,1), ldq, &WORK(indwrk), &iinfo);
+    chbtrd_(jobz, uplo, n, kd, &ab[ab_offset], ldab, &rwork[indd], &rwork[
+	    inde], &q[q_offset], ldq, &work[indwrk], &iinfo);
 
 /*     If all eigenvalues are desired and ABSTOL is less than or equal   
        to zero, then call SSTERF or CSTEQR.  If this fails for some   
        eigenvalue, then try SSTEBZ. */
 
     if ((alleig || indeig && *il == 1 && *iu == *n) && *abstol <= 0.f) {
-	scopy_(n, &RWORK(indd), &c__1, &W(1), &c__1);
+	scopy_(n, &rwork[indd], &c__1, &w[1], &c__1);
 	indee = indrwk + (*n << 1);
 	if (! wantz) {
 	    i__1 = *n - 1;
-	    scopy_(&i__1, &RWORK(inde), &c__1, &RWORK(indee), &c__1);
-	    ssterf_(n, &W(1), &RWORK(indee), info);
+	    scopy_(&i__1, &rwork[inde], &c__1, &rwork[indee], &c__1);
+	    ssterf_(n, &w[1], &rwork[indee], info);
 	} else {
-	    clacpy_("A", n, n, &Q(1,1), ldq, &Z(1,1), ldz);
+	    clacpy_("A", n, n, &q[q_offset], ldq, &z__[z_offset], ldz);
 	    i__1 = *n - 1;
-	    scopy_(&i__1, &RWORK(inde), &c__1, &RWORK(indee), &c__1);
-	    csteqr_(jobz, n, &W(1), &RWORK(indee), &Z(1,1), ldz, &RWORK(
-		    indrwk), info);
+	    scopy_(&i__1, &rwork[inde], &c__1, &rwork[indee], &c__1);
+	    csteqr_(jobz, n, &w[1], &rwork[indee], &z__[z_offset], ldz, &
+		    rwork[indrwk], info);
 	    if (*info == 0) {
 		i__1 = *n;
-		for (i = 1; i <= *n; ++i) {
-		    IFAIL(i) = 0;
+		for (i__ = 1; i__ <= i__1; ++i__) {
+		    ifail[i__] = 0;
 /* L10: */
 		}
 	    }
@@ -399,23 +415,23 @@
     indibl = 1;
     indisp = indibl + *n;
     indiwk = indisp + *n;
-    sstebz_(range, order, n, &vll, &vuu, il, iu, &abstll, &RWORK(indd), &
-	    RWORK(inde), m, &nsplit, &W(1), &IWORK(indibl), &IWORK(indisp), &
-	    RWORK(indrwk), &IWORK(indiwk), info);
+    sstebz_(range, order, n, &vll, &vuu, il, iu, &abstll, &rwork[indd], &
+	    rwork[inde], m, &nsplit, &w[1], &iwork[indibl], &iwork[indisp], &
+	    rwork[indrwk], &iwork[indiwk], info);
 
     if (wantz) {
-	cstein_(n, &RWORK(indd), &RWORK(inde), m, &W(1), &IWORK(indibl), &
-		IWORK(indisp), &Z(1,1), ldz, &RWORK(indrwk), &IWORK(
-		indiwk), &IFAIL(1), info);
+	cstein_(n, &rwork[indd], &rwork[inde], m, &w[1], &iwork[indibl], &
+		iwork[indisp], &z__[z_offset], ldz, &rwork[indrwk], &iwork[
+		indiwk], &ifail[1], info);
 
 /*        Apply unitary matrix used in reduction to tridiagonal   
           form to eigenvectors returned by CSTEIN. */
 
 	i__1 = *m;
-	for (j = 1; j <= *m; ++j) {
-	    ccopy_(n, &Z(1,j), &c__1, &WORK(1), &c__1);
-	    cgemv_("N", n, n, &c_b2, &Q(1,1), ldq, &WORK(1), &c__1, &
-		    c_b1, &Z(1,j), &c__1);
+	for (j = 1; j <= i__1; ++j) {
+	    ccopy_(n, &z___ref(1, j), &c__1, &work[1], &c__1);
+	    cgemv_("N", n, n, &c_b2, &q[q_offset], ldq, &work[1], &c__1, &
+		    c_b1, &z___ref(1, j), &c__1);
 /* L20: */
 	}
     }
@@ -430,7 +446,7 @@ L30:
 	    imax = *info - 1;
 	}
 	r__1 = 1.f / sigma;
-	sscal_(&imax, &r__1, &W(1), &c__1);
+	sscal_(&imax, &r__1, &w[1], &c__1);
     }
 
 /*     If eigenvalues are not in order, then sort them, along with   
@@ -438,30 +454,29 @@ L30:
 
     if (wantz) {
 	i__1 = *m - 1;
-	for (j = 1; j <= *m-1; ++j) {
-	    i = 0;
-	    tmp1 = W(j);
+	for (j = 1; j <= i__1; ++j) {
+	    i__ = 0;
+	    tmp1 = w[j];
 	    i__2 = *m;
-	    for (jj = j + 1; jj <= *m; ++jj) {
-		if (W(jj) < tmp1) {
-		    i = jj;
-		    tmp1 = W(jj);
+	    for (jj = j + 1; jj <= i__2; ++jj) {
+		if (w[jj] < tmp1) {
+		    i__ = jj;
+		    tmp1 = w[jj];
 		}
 /* L40: */
 	    }
 
-	    if (i != 0) {
-		itmp1 = IWORK(indibl + i - 1);
-		W(i) = W(j);
-		IWORK(indibl + i - 1) = IWORK(indibl + j - 1);
-		W(j) = tmp1;
-		IWORK(indibl + j - 1) = itmp1;
-		cswap_(n, &Z(1,i), &c__1, &Z(1,j), &
-			c__1);
+	    if (i__ != 0) {
+		itmp1 = iwork[indibl + i__ - 1];
+		w[i__] = w[j];
+		iwork[indibl + i__ - 1] = iwork[indibl + j - 1];
+		w[j] = tmp1;
+		iwork[indibl + j - 1] = itmp1;
+		cswap_(n, &z___ref(1, i__), &c__1, &z___ref(1, j), &c__1);
 		if (*info != 0) {
-		    itmp1 = IFAIL(i);
-		    IFAIL(i) = IFAIL(j);
-		    IFAIL(j) = itmp1;
+		    itmp1 = ifail[i__];
+		    ifail[i__] = ifail[j];
+		    ifail[j] = itmp1;
 		}
 	    }
 /* L50: */
@@ -473,4 +488,10 @@ L30:
 /*     End of CHBEVX */
 
 } /* chbevx_ */
+
+#undef ab_ref
+#undef ab_subscr
+#undef z___ref
+#undef z___subscr
+
 

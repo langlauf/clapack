@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dtrsen_(char *job, char *compq, logical *select, integer 
@@ -6,10 +7,10 @@
 	*sep, doublereal *work, integer *lwork, integer *iwork, integer *
 	liwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -46,8 +47,7 @@
             = 'N': do not update Q.   
 
     SELECT  (input) LOGICAL array, dimension (N)   
-            SELECT specifies the eigenvalues in the selected cluster. To 
-  
+            SELECT specifies the eigenvalues in the selected cluster. To   
             select a real eigenvalue w(j), SELECT(j) must be set to   
             .TRUE.. To select a complex conjugate pair of eigenvalues   
             w(j) and w(j+1), corresponding to a 2-by-2 diagonal block,   
@@ -61,8 +61,7 @@
     T       (input/output) DOUBLE PRECISION array, dimension (LDT,N)   
             On entry, the upper quasi-triangular matrix T, in Schur   
             canonical form.   
-            On exit, T is overwritten by the reordered matrix T, again in 
-  
+            On exit, T is overwritten by the reordered matrix T, again in   
             Schur canonical form, with the selected eigenvalues in the   
             leading diagonal blocks.   
 
@@ -83,8 +82,7 @@
 
     WR      (output) DOUBLE PRECISION array, dimension (N)   
     WI      (output) DOUBLE PRECISION array, dimension (N)   
-            The real and imaginary parts, respectively, of the reordered 
-  
+            The real and imaginary parts, respectively, of the reordered   
             eigenvalues of T. The eigenvalues are stored in the same   
             order as on the diagonal of T, with WR(i) = T(i,i) and, if   
             T(i:i+1,i:i+1) is a 2-by-2 diagonal block, WI(i) > 0 and   
@@ -109,13 +107,19 @@
             M = 0 or N, SEP = norm(T).   
             If JOB = 'N' or 'E', SEP is not referenced.   
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
+            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
             The dimension of the array WORK.   
             If JOB = 'N', LWORK >= max(1,N);   
             if JOB = 'E', LWORK >= M*(N-M);   
             if JOB = 'V' or 'B', LWORK >= 2*M*(N-M).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     IWORK   (workspace) INTEGER array, dimension (LIWORK)   
             IF JOB = 'N' or 'E', IWORK is not referenced.   
@@ -125,24 +129,25 @@
             If JOB = 'N' or 'E', LIWORK >= 1;   
             if JOB = 'V' or 'B', LIWORK >= M*(N-M).   
 
+            If LIWORK = -1, then a workspace query is assumed; the   
+            routine only calculates the optimal size of the IWORK array,   
+            returns this value as the first entry of the IWORK array, and   
+            no error message related to LIWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            = 1: reordering of T failed because some eigenvalues are too 
-  
-                 close to separate (the problem is very ill-conditioned); 
-  
+            = 1: reordering of T failed because some eigenvalues are too   
+                 close to separate (the problem is very ill-conditioned);   
                  T may have been partially reordered, and WR and WI   
-                 contain the eigenvalues in the same order as in T; S and 
-  
+                 contain the eigenvalues in the same order as in T; S and   
                  SEP (if requested) are set to zero.   
 
     Further Details   
     ===============   
 
     DTRSEN first collects the selected eigenvalues by computing an   
-    orthogonal transformation Z to move them to the top left corner of T. 
-  
+    orthogonal transformation Z to move them to the top left corner of T.   
     In other words, the selected eigenvalues are the eigenvalues of T11   
     in:   
 
@@ -150,19 +155,15 @@
                            (  0  T22 ) n2   
                               n1  n2   
 
-    where N = n1+n2 and Z' means the transpose of Z. The first n1 columns 
-  
+    where N = n1+n2 and Z' means the transpose of Z. The first n1 columns   
     of Z span the specified invariant subspace of T.   
 
-    If T has been obtained from the real Schur factorization of a matrix 
-  
-    A = Q*T*Q', then the reordered real Schur factorization of A is given 
-  
+    If T has been obtained from the real Schur factorization of a matrix   
+    A = Q*T*Q', then the reordered real Schur factorization of A is given   
     by A = (Q*Z)*(Z'*T*Z)*(Q*Z)', and the first n1 columns of Q*Z span   
     the corresponding invariant subspace of A.   
 
-    The reciprocal condition number of the average of the eigenvalues of 
-  
+    The reciprocal condition number of the average of the eigenvalues of   
     T11 may be returned in S. S lies between 0 (very badly conditioned)   
     and 1 (very well conditioned). It is computed as follows. First we   
     compute R so that   
@@ -181,8 +182,7 @@
 
                         (1 + F-norm(R)**2)**(-1/2)   
 
-    on the reciprocal of 2-norm(P), the true reciprocal condition number. 
-  
+    on the reciprocal of 2-norm(P), the true reciprocal condition number.   
     S cannot underestimate 1 / 2-norm(P) by more than a factor of   
     sqrt(N).   
 
@@ -194,8 +194,7 @@
     where EPS is the machine precision.   
 
     The reciprocal condition number of the right invariant subspace   
-    spanned by the first n1 columns of Z (or of Q*Z) is returned in SEP. 
-  
+    spanned by the first n1 columns of Z (or of Q*Z) is returned in SEP.   
     SEP is defined as the separation of T11 and T22:   
 
                        sep( T11, T22 ) = sigma-min( C )   
@@ -206,11 +205,9 @@
        C  = kprod( I(n2), T11 ) - kprod( transpose(T22), I(n1) )   
 
     I(m) is an m by m identity matrix, and kprod denotes the Kronecker   
-    product. We estimate sigma-min(C) by the reciprocal of an estimate of 
-  
+    product. We estimate sigma-min(C) by the reciprocal of an estimate of   
     the 1-norm of inverse(C). The true reciprocal 1-norm of inverse(C)   
-    cannot differ from sigma-min(C) by more than a factor of sqrt(n1*n2). 
-  
+    cannot differ from sigma-min(C) by more than a factor of sqrt(n1*n2).   
 
     When SEP is small, small changes in T can cause large changes in   
     the invariant subspace. An approximate bound on the maximum angular   
@@ -218,20 +215,17 @@
 
                         EPS * norm(T) / SEP   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c_n1 = -1;
     
     /* System generated locals */
-    integer q_dim1, q_offset, t_dim1, t_offset, i__1;
+    integer q_dim1, q_offset, t_dim1, t_offset, i__1, i__2;
     doublereal d__1, d__2;
     /* Builtin functions */
     double sqrt(doublereal);
@@ -243,6 +237,7 @@
     static integer k;
     static doublereal scale;
     extern logical lsame_(char *, char *);
+    static integer lwmin;
     static logical wantq, wants;
     static doublereal rnorm;
     static integer n1, n2, kk;
@@ -256,29 +251,35 @@
     extern /* Subroutine */ int dtrexc_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *, 
 	    doublereal *, integer *);
-    static logical wantsp;
+    static integer liwmin;
+    static logical wantsp, lquery;
     extern /* Subroutine */ int dtrsyl_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
     static doublereal est;
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
 
 
+    --select;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --wr;
+    --wi;
+    --work;
+    --iwork;
 
-#define SELECT(I) select[(I)-1]
-#define WR(I) wr[(I)-1]
-#define WI(I) wi[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     wantbh = lsame_(job, "B");
     wants = lsame_(job, "E") || wantbh;
     wantsp = lsame_(job, "V") || wantbh;
     wantq = lsame_(compq, "V");
 
     *info = 0;
+    lquery = *lwork == -1;
     if (! lsame_(job, "N") && ! wants && ! wantsp) {
 	*info = -1;
     } else if (! lsame_(compq, "N") && ! wantq) {
@@ -291,30 +292,29 @@
 	*info = -8;
     } else {
 
-/*        Set M to the dimension of the specified invariant subspace, 
-  
+/*        Set M to the dimension of the specified invariant subspace,   
           and test LWORK and LIWORK. */
 
 	*m = 0;
 	pair = FALSE_;
 	i__1 = *n;
-	for (k = 1; k <= *n; ++k) {
+	for (k = 1; k <= i__1; ++k) {
 	    if (pair) {
 		pair = FALSE_;
 	    } else {
 		if (k < *n) {
-		    if (T(k+1,k) == 0.) {
-			if (SELECT(k)) {
+		    if (t_ref(k + 1, k) == 0.) {
+			if (select[k]) {
 			    ++(*m);
 			}
 		    } else {
 			pair = TRUE_;
-			if (SELECT(k) || SELECT(k + 1)) {
+			if (select[k] || select[k + 1]) {
 			    *m += 2;
 			}
 		    }
 		} else {
-		    if (SELECT(*n)) {
+		    if (select[*n]) {
 			++(*m);
 		    }
 		}
@@ -326,16 +326,36 @@
 	n2 = *n - *m;
 	nn = n1 * n2;
 
-	if (*lwork < 1 || wants && ! wantsp && *lwork < nn || wantsp && *
-		lwork < nn << 1) {
+	if (wantsp) {
+/* Computing MAX */
+	    i__1 = 1, i__2 = nn << 1;
+	    lwmin = max(i__1,i__2);
+	    liwmin = max(1,nn);
+	} else if (lsame_(job, "N")) {
+	    lwmin = max(1,*n);
+	    liwmin = 1;
+	} else if (lsame_(job, "E")) {
+	    lwmin = max(1,nn);
+	    liwmin = 1;
+	}
+
+	if (*lwork < lwmin && ! lquery) {
 	    *info = -15;
-	} else if (*liwork < 1 || wantsp && *liwork < nn) {
+	} else if (*liwork < liwmin && ! lquery) {
 	    *info = -17;
 	}
     }
+
+    if (*info == 0) {
+	work[1] = (doublereal) lwmin;
+	iwork[1] = liwmin;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("DTRSEN", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -346,7 +366,7 @@
 	    *s = 1.;
 	}
 	if (wantsp) {
-	    *sep = dlange_("1", n, n, &T(1,1), ldt, &WORK(1));
+	    *sep = dlange_("1", n, n, &t[t_offset], ldt, &work[1]);
 	}
 	goto L40;
     }
@@ -356,15 +376,15 @@
     ks = 0;
     pair = FALSE_;
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
+    for (k = 1; k <= i__1; ++k) {
 	if (pair) {
 	    pair = FALSE_;
 	} else {
-	    swap = SELECT(k);
+	    swap = select[k];
 	    if (k < *n) {
-		if (T(k+1,k) != 0.) {
+		if (t_ref(k + 1, k) != 0.) {
 		    pair = TRUE_;
-		    swap = swap || SELECT(k + 1);
+		    swap = swap || select[k + 1];
 		}
 	    }
 	    if (swap) {
@@ -375,8 +395,8 @@
 		ierr = 0;
 		kk = k;
 		if (k != ks) {
-		    dtrexc_(compq, n, &T(1,1), ldt, &Q(1,1), ldq, &
-			    kk, &ks, &WORK(1), &ierr);
+		    dtrexc_(compq, n, &t[t_offset], ldt, &q[q_offset], ldq, &
+			    kk, &ks, &work[1], &ierr);
 		}
 		if (ierr == 1 || ierr == 2) {
 
@@ -405,14 +425,14 @@
 
              T11*R - R*T22 = scale*T12 */
 
-	dlacpy_("F", &n1, &n2, &T(1,n1+1), ldt, &WORK(1), &n1);
-	dtrsyl_("N", "N", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &ierr);
+	dlacpy_("F", &n1, &n2, &t_ref(1, n1 + 1), ldt, &work[1], &n1);
+	dtrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(n1 + 1, 
+		n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 
-/*        Estimate the reciprocal of the condition number of the clust
-er   
+/*        Estimate the reciprocal of the condition number of the cluster   
           of eigenvalues. */
 
-	rnorm = dlange_("F", &n1, &n2, &WORK(1), &n1, &WORK(1));
+	rnorm = dlange_("F", &n1, &n2, &work[1], &n1, &work[1]);
 	if (rnorm == 0.) {
 	    *s = 1.;
 	} else {
@@ -427,20 +447,20 @@ er
 	est = 0.;
 	kase = 0;
 L30:
-	dlacon_(&nn, &WORK(nn + 1), &WORK(1), &IWORK(1), &est, &kase);
+	dlacon_(&nn, &work[nn + 1], &work[1], &iwork[1], &est, &kase);
 	if (kase != 0) {
 	    if (kase == 1) {
 
 /*              Solve  T11*R - R*T22 = scale*X. */
 
-		dtrsyl_("N", "N", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &
-			ierr);
+		dtrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(
+			n1 + 1, n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 	    } else {
 
 /*              Solve  T11'*R - R*T22' = scale*X. */
 
-		dtrsyl_("T", "T", &c_n1, &n1, &n2, &T(1,1), ldt, &T(n1+1,n1+1), ldt, &WORK(1), &n1, &scale, &
-			ierr);
+		dtrsyl_("T", "T", &c_n1, &n1, &n2, &t[t_offset], ldt, &t_ref(
+			n1 + 1, n1 + 1), ldt, &work[1], &n1, &scale, &ierr);
 	    }
 	    goto L30;
 	}
@@ -453,23 +473,30 @@ L40:
 /*     Store the output eigenvalues in WR and WI. */
 
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
-	WR(k) = T(k,k);
-	WI(k) = 0.;
+    for (k = 1; k <= i__1; ++k) {
+	wr[k] = t_ref(k, k);
+	wi[k] = 0.;
 /* L50: */
     }
     i__1 = *n - 1;
-    for (k = 1; k <= *n-1; ++k) {
-	if (T(k+1,k) != 0.) {
-	    WI(k) = sqrt((d__1 = T(k,k+1), abs(d__1))) * sqrt((
-		    d__2 = T(k+1,k), abs(d__2)));
-	    WI(k + 1) = -WI(k);
+    for (k = 1; k <= i__1; ++k) {
+	if (t_ref(k + 1, k) != 0.) {
+	    wi[k] = sqrt((d__1 = t_ref(k, k + 1), abs(d__1))) * sqrt((d__2 = 
+		    t_ref(k + 1, k), abs(d__2)));
+	    wi[k + 1] = -wi[k];
 	}
 /* L60: */
     }
+
+    work[1] = (doublereal) lwmin;
+    iwork[1] = liwmin;
+
     return 0;
 
 /*     End of DTRSEN */
 
 } /* dtrsen_ */
+
+#undef t_ref
+
 

@@ -1,14 +1,14 @@
-#ifdef KR_headers
-extern FILE *fdopen();
-#else
+#ifndef KR_headers
 #ifdef MSDOS
 #include "io.h"
+#ifndef WATCOM
 #define close _close
 #define creat _creat
 #define open _open
 #define read _read
 #define write _write
-#endif
+#endif /*WATCOM*/
+#endif /*MSDOS*/
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,7 +24,7 @@ extern int unlink(const char*);
 extern FILE *fdopen(int, const char*);
 #endif
 #endif
-#endif
+#endif /*KR_HEADERS*/
 
 extern char *mktemp(char*);
 

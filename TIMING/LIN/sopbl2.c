@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,7 +29,7 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
     extern logical lsamen_(integer *, char *, char *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -65,21 +66,20 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
             The upper band width of the coefficient matrix.   
             KU is set to max( 0, min( N-1, KKU ) ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible */
 
-    if (*m <= 0 || ! (lsame_(subnam, "S") || lsame_(subnam, "D") || lsame_(subnam, "C") || lsame_(subnam, "Z"))
-	    ) {
+    if (*m <= 0 || ! (lsame_(subnam, "S") || lsame_(
+	    subnam, "D") || lsame_(subnam, "C") || lsame_(subnam, "Z"))) {
 	ret_val = 0.f;
 	return ret_val;
     }
 
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
     mults = 0.f;
     adds = 0.f;
 /* Computing MAX   
@@ -118,22 +118,23 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
 	    adds = em * (en + 1.f) - (em - 1.f - kl) * (em - kl) / 2.f - (en 
 		    - 1.f - ku) * (en - ku) / 2.f;
 
-	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, c2, 
-		"SP") || lsamen_(&c__3, subnam, "CHE") || 
-		lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3, 
-		subnam, "CHP") || lsamen_(&c__3, subnam, "ZHP")) {
+	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&
+		c__2, c2, "SP") || lsamen_(&c__3, 
+		subnam, "CHE") || lsamen_(&c__3, subnam,
+		 "ZHE") || lsamen_(&c__3, subnam, "CHP") || lsamen_(&c__3, subnam, "ZHP")) {
 
 	    mults = em * (em + 1.f);
 	    adds = em * em;
 
-	} else if (lsamen_(&c__2, c2, "SB") || lsamen_(&c__3, subnam, 
-		"CHB") || lsamen_(&c__3, subnam, "ZHB")) {
+	} else if (lsamen_(&c__2, c2, "SB") || lsamen_(&
+		c__3, subnam, "CHB") || lsamen_(&c__3, 
+		subnam, "ZHB")) {
 
 	    mults = em * (em + 1.f) - (em - 1.f - ek) * (em - ek);
 	    adds = em * em - (em - 1.f - ek) * (em - ek);
 
-	} else if (lsamen_(&c__2, c2, "TR") || lsamen_(&c__2, c2, 
-		"TP")) {
+	} else if (lsamen_(&c__2, c2, "TR") || lsamen_(&
+		c__2, c2, "TP")) {
 
 	    mults = em * (em + 1.f) / 2.f;
 	    adds = (em - 1.f) * em / 2.f;
@@ -151,7 +152,8 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
 
     } else if (lsamen_(&c__3, c3, "SV ")) {
 
-	if (lsamen_(&c__2, c2, "TR") || lsamen_(&c__2, c2, "TP")) {
+	if (lsamen_(&c__2, c2, "TR") || lsamen_(&c__2, 
+		c2, "TP")) {
 
 	    mults = em * (em + 1.f) / 2.f;
 	    adds = (em - 1.f) * em / 2.f;
@@ -169,26 +171,27 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
 
     } else if (lsamen_(&c__3, c3, "R  ")) {
 
-	if (lsamen_(&c__3, subnam, "SGE") || lsamen_(&c__3, subnam, 
-		"DGE")) {
+	if (lsamen_(&c__3, subnam, "SGE") || lsamen_(&
+		c__3, subnam, "DGE")) {
 
 	    mults = em * en + dmin(em,en);
 	    adds = em * en;
 
-	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, c2, 
-		"SP") || lsamen_(&c__3, subnam, "CHE") || 
-		lsamen_(&c__3, subnam, "CHP") || lsamen_(&c__3, 
-		subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP")) {
+	} else if (lsamen_(&c__2, c2, "SY") || lsamen_(&
+		c__2, c2, "SP") || lsamen_(&c__3, 
+		subnam, "CHE") || lsamen_(&c__3, subnam,
+		 "CHP") || lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP")) {
 
 	    mults = em * (em + 1.f) / 2.f + em;
 	    adds = em * (em + 1.f) / 2.f;
 
 	}
 
-    } else if (lsamen_(&c__3, c3, "RC ") || lsamen_(&c__3, c3, "RU ")) {
+    } else if (lsamen_(&c__3, c3, "RC ") || lsamen_(&
+	    c__3, c3, "RU ")) {
 
-	if (lsamen_(&c__3, subnam, "CGE") || lsamen_(&c__3, subnam, 
-		"ZGE")) {
+	if (lsamen_(&c__3, subnam, "CGE") || lsamen_(&
+		c__3, subnam, "ZGE")) {
 
 	    mults = em * en + dmin(em,en);
 	    adds = em * en;
@@ -200,8 +203,9 @@ doublereal sopbl2_(char *subnam, integer *m, integer *n, integer *kkl,
        ---------------- */
 
     } else if (lsamen_(&c__3, c3, "R2 ")) {
-	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, c2, "SP") || lsamen_(&c__3, subnam, "CHE") || lsamen_(&c__3,
-		 subnam, "CHP") || lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP")) {
+	if (lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, 
+		c2, "SP") || lsamen_(&c__3, subnam, 
+		"CHE") || lsamen_(&c__3, subnam, "CHP") || lsamen_(&c__3, subnam, "ZHE") || lsamen_(&c__3, subnam, "ZHP")) {
 
 	    mults = em * (em + 1.f) + em * 2.f;
 	    adds = em * (em + 1.f);

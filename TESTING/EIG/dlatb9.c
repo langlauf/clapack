@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,8 +11,8 @@
 static integer c__3 = 3;
 
 /* Subroutine */ int dlatb9_(char *path, integer *imat, integer *m, integer *
-	p, integer *n, char *type, integer *kla, integer *kua, integer *klb, 
-	integer *kub, doublereal *anorm, doublereal *bnorm, integer *modea, 
+	p, integer *n, char *type__, integer *kla, integer *kua, integer *klb,
+	 integer *kub, doublereal *anorm, doublereal *bnorm, integer *modea, 
 	integer *modeb, doublereal *cndnma, doublereal *cndnmb, char *dista, 
 	char *distb)
 {
@@ -33,7 +34,7 @@ static integer c__3 = 3;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -42,8 +43,7 @@ static integer c__3 = 3;
     Purpose   
     =======   
 
-    DLATB9 sets parameters for the matrix generator based on the type of 
-  
+    DLATB9 sets parameters for the matrix generator based on the type of   
     matrix to be generated.   
 
     Arguments   
@@ -75,8 +75,7 @@ static integer c__3 = 3;
             The upper band width of the matrix to be generated.   
 
     ANORM   (output) DOUBLE PRECISION   
-            The desired norm of the matrix to be generated.  The diagonal 
-  
+            The desired norm of the matrix to be generated.  The diagonal   
             matrix of singular values or eigenvalues is scaled by this   
             value.   
 
@@ -90,8 +89,7 @@ static integer c__3 = 3;
             The type of distribution to be used by the random number   
             generator.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Set some constants for use in the subroutine. */
@@ -114,7 +112,7 @@ static integer c__3 = 3;
 
 /*     Set some parameters we don't plan to change. */
 
-    *(unsigned char *)type = 'N';
+    *(unsigned char *)type__ = 'N';
     *(unsigned char *)dista = 'S';
     *(unsigned char *)distb = 'S';
     *modea = 3;
@@ -122,7 +120,8 @@ static integer c__3 = 3;
 
 /*     Set the lower and upper bandwidths. */
 
-    if (lsamen_(&c__3, path, "GRQ") || lsamen_(&c__3, path, "LSE") || lsamen_(&c__3, path, "GSV")) {
+    if (lsamen_(&c__3, path, "GRQ") || lsamen_(&c__3, 
+	    path, "LSE") || lsamen_(&c__3, path, "GSV")) {
 
 /*        A: M by N, B: P by N */
 
@@ -182,8 +181,8 @@ static integer c__3 = 3;
 
 	}
 
-    } else if (lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, path, 
-	    "GLM")) {
+    } else if (lsamen_(&c__3, path, "GQR") || lsamen_(&
+	    c__3, path, "GLM")) {
 
 /*        A: N by M, B: N by P */
 
@@ -245,7 +244,8 @@ static integer c__3 = 3;
 
     *cndnma = 100.;
     *cndnmb = 10.;
-    if (lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, path, "GRQ") || lsamen_(&c__3, path, "GSV")) {
+    if (lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, 
+	    path, "GRQ") || lsamen_(&c__3, path, "GSV")) {
 	if (*imat == 5) {
 	    *cndnma = badc1;
 	    *cndnmb = badc1;
@@ -263,7 +263,8 @@ static integer c__3 = 3;
 
     *anorm = 10.;
     *bnorm = 1e3;
-    if (lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, path, "GRQ")) {
+    if (lsamen_(&c__3, path, "GQR") || lsamen_(&c__3, 
+	    path, "GRQ")) {
 	if (*imat == 7) {
 	    *anorm = small;
 	    *bnorm = large;

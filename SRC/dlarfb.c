@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlarfb_(char *side, char *trans, char *direct, char *
 	storev, integer *m, integer *n, integer *k, doublereal *v, integer *
-	ldv, doublereal *t, integer *ldt, doublereal *c, integer *ldc, 
+	ldv, doublereal *t, integer *ldt, doublereal *c__, integer *ldc, 
 	doublereal *work, integer *ldwork)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -52,10 +53,8 @@
 
     V       (input) DOUBLE PRECISION array, dimension   
                                   (LDV,K) if STOREV = 'C'   
-                                  (LDV,M) if STOREV = 'R' and SIDE = 'L' 
-  
-                                  (LDV,N) if STOREV = 'R' and SIDE = 'R' 
-  
+                                  (LDV,M) if STOREV = 'R' and SIDE = 'L'   
+                                  (LDV,N) if STOREV = 'R' and SIDE = 'R'   
             The matrix V. See further details.   
 
     LDV     (input) INTEGER   
@@ -85,15 +84,12 @@
             If SIDE = 'L', LDWORK >= max(1,N);   
             if SIDE = 'R', LDWORK >= max(1,M).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b14 = 1.;
@@ -103,7 +99,7 @@
     integer c_dim1, c_offset, t_dim1, t_offset, v_dim1, v_offset, work_dim1, 
 	    work_offset, i__1, i__2;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
@@ -113,15 +109,25 @@
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *);
     static char transt[1];
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
 
 
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    work_dim1 = *ldwork;
+    work_offset = 1 + work_dim1 * 1;
+    work -= work_offset;
 
-
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-#define WORK(I,J) work[(I)-1 + ((J)-1)* ( *ldwork)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	return 0;
     }
@@ -145,35 +151,34 @@
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in 
-WORK)   
+                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
 
                 W := C1' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(n, &C(j,1), ldc, &WORK(1,j), &
-			    c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(n, &c___ref(j, 1), ldc, &work_ref(1, j), &c__1);
 /* L10: */
 		}
 
 /*              W := W * V1 */
 
 		dtrmm_("Right", "Lower", "No transpose", "Unit", n, k, &c_b14,
-			 &V(1,1), ldv, &WORK(1,1), ldwork);
+			 &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*m > *k) {
 
 /*                 W := W + C2'*V2 */
 
 		    i__1 = *m - *k;
 		    dgemm_("Transpose", "No transpose", n, k, &i__1, &c_b14, &
-			    C(*k+1,1), ldc, &V(*k+1,1), ldv,
-			     &c_b14, &WORK(1,1), ldwork);
+			    c___ref(*k + 1, 1), ldc, &v_ref(*k + 1, 1), ldv, &
+			    c_b14, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		dtrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V * W' */
 
@@ -183,23 +188,22 @@ WORK)
 
 		    i__1 = *m - *k;
 		    dgemm_("No transpose", "Transpose", &i__1, n, k, &c_b25, &
-			    V(*k+1,1), ldv, &WORK(1,1), 
-			    ldwork, &c_b14, &C(*k+1,1), ldc)
-			    ;
+			    v_ref(*k + 1, 1), ldv, &work[work_offset], ldwork,
+			     &c_b14, &c___ref(*k + 1, 1), ldc);
 		}
 
 /*              W := W * V1' */
 
 		dtrmm_("Right", "Lower", "Transpose", "Unit", n, k, &c_b14, &
-			V(1,1), ldv, &WORK(1,1), ldwork);
+			v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			C(j,i) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(j, i__) = c___ref(j, i__) - work_ref(i__, j);
 /* L20: */
 		    }
 /* L30: */
@@ -207,37 +211,36 @@ WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V  =  (C1*V1 + C2*V2)  (stored in WOR
-K)   
+                W := C * V  =  (C1*V1 + C2*V2)  (stored in WORK)   
 
                 W := C1 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(m, &C(1,j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(m, &c___ref(1, j), &c__1, &work_ref(1, j), &c__1);
 /* L40: */
 		}
 
 /*              W := W * V1 */
 
 		dtrmm_("Right", "Lower", "No transpose", "Unit", m, k, &c_b14,
-			 &V(1,1), ldv, &WORK(1,1), ldwork);
+			 &v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*n > *k) {
 
 /*                 W := W + C2 * V2 */
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "No transpose", m, k, &i__1, &
-			    c_b14, &C(1,*k+1), ldc, &V(*k+1,1), ldv, &c_b14, &WORK(1,1), 
-			    ldwork);
+			    c_b14, &c___ref(1, *k + 1), ldc, &v_ref(*k + 1, 1)
+			    , ldv, &c_b14, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		dtrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V' */
 
@@ -247,22 +250,22 @@ K)
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "Transpose", m, &i__1, k, &c_b25, &
-			    WORK(1,1), ldwork, &V(*k+1,1), 
-			    ldv, &c_b14, &C(1,*k+1), ldc);
+			    work[work_offset], ldwork, &v_ref(*k + 1, 1), ldv,
+			     &c_b14, &c___ref(1, *k + 1), ldc);
 		}
 
 /*              W := W * V1' */
 
 		dtrmm_("Right", "Lower", "Transpose", "Unit", m, k, &c_b14, &
-			V(1,1), ldv, &WORK(1,1), ldwork);
+			v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			C(i,j) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(i__, j) = c___ref(i__, j) - work_ref(i__, j);
 /* L50: */
 		    }
 /* L60: */
@@ -280,21 +283,21 @@ K)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in 
-WORK)   
+                W := C' * V  =  (C1'*V1 + C2'*V2)  (stored in WORK)   
 
                 W := C2' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(n, &C(*m-*k+j,1), ldc, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(n, &c___ref(*m - *k + j, 1), ldc, &work_ref(1, j), 
+			    &c__1);
 /* L70: */
 		}
 
 /*              W := W * V2 */
 
 		dtrmm_("Right", "Upper", "No transpose", "Unit", n, k, &c_b14,
-			 &V(*m-*k+1,1), ldv, &WORK(1,1), 
+			 &v_ref(*m - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 		if (*m > *k) {
 
@@ -302,13 +305,14 @@ WORK)
 
 		    i__1 = *m - *k;
 		    dgemm_("Transpose", "No transpose", n, k, &i__1, &c_b14, &
-			    C(1,1), ldc, &V(1,1), ldv, &c_b14, &
-			    WORK(1,1), ldwork);
+			    c__[c_offset], ldc, &v[v_offset], ldv, &c_b14, &
+			    work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		dtrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V * W' */
 
@@ -318,24 +322,25 @@ WORK)
 
 		    i__1 = *m - *k;
 		    dgemm_("No transpose", "Transpose", &i__1, n, k, &c_b25, &
-			    V(1,1), ldv, &WORK(1,1), ldwork, &
-			    c_b14, &C(1,1), ldc);
+			    v[v_offset], ldv, &work[work_offset], ldwork, &
+			    c_b14, &c__[c_offset], ldc)
+			    ;
 		}
 
 /*              W := W * V2' */
 
 		dtrmm_("Right", "Upper", "Transpose", "Unit", n, k, &c_b14, &
-			V(*m-*k+1,1), ldv, &WORK(1,1), 
+			v_ref(*m - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 
 /*              C2 := C2 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			C(*m-*k+j,i) -= WORK(i,j)
-				;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(*m - *k + j, i__) = c___ref(*m - *k + j, i__) 
+				- work_ref(i__, j);
 /* L80: */
 		    }
 /* L90: */
@@ -343,24 +348,23 @@ WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V  =  (C1*V1 + C2*V2)  (stored in WOR
-K)   
+                W := C * V  =  (C1*V1 + C2*V2)  (stored in WORK)   
 
                 W := C2 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(m, &C(1,*n-*k+j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(m, &c___ref(1, *n - *k + j), &c__1, &work_ref(1, j)
+			    , &c__1);
 /* L100: */
 		}
 
 /*              W := W * V2 */
 
 		dtrmm_("Right", "Upper", "No transpose", "Unit", m, k, &c_b14,
-			 &V(*n-*k+1,1), ldv, &WORK(1,1), 
+			 &v_ref(*n - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 		if (*n > *k) {
 
@@ -368,13 +372,14 @@ K)
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "No transpose", m, k, &i__1, &
-			    c_b14, &C(1,1), ldc, &V(1,1), ldv, &
-			    c_b14, &WORK(1,1), ldwork);
+			    c_b14, &c__[c_offset], ldc, &v[v_offset], ldv, &
+			    c_b14, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		dtrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V' */
 
@@ -384,23 +389,25 @@ K)
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "Transpose", m, &i__1, k, &c_b25, &
-			    WORK(1,1), ldwork, &V(1,1), ldv, &
-			    c_b14, &C(1,1), ldc);
+			    work[work_offset], ldwork, &v[v_offset], ldv, &
+			    c_b14, &c__[c_offset], ldc)
+			    ;
 		}
 
 /*              W := W * V2' */
 
 		dtrmm_("Right", "Upper", "Transpose", "Unit", m, k, &c_b14, &
-			V(*n-*k+1,1), ldv, &WORK(1,1), 
+			v_ref(*n - *k + 1, 1), ldv, &work[work_offset], 
 			ldwork);
 
 /*              C2 := C2 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			C(i,*n-*k+j) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(i__, *n - *k + j) = c___ref(i__, *n - *k + j) 
+				- work_ref(i__, j);
 /* L110: */
 		    }
 /* L120: */
@@ -420,34 +427,34 @@ K)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored i
-n WORK)   
+                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
 
                 W := C1' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(n, &C(j,1), ldc, &WORK(1,j), &
-			    c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(n, &c___ref(j, 1), ldc, &work_ref(1, j), &c__1);
 /* L130: */
 		}
 
 /*              W := W * V1' */
 
 		dtrmm_("Right", "Upper", "Transpose", "Unit", n, k, &c_b14, &
-			V(1,1), ldv, &WORK(1,1), ldwork);
+			v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*m > *k) {
 
 /*                 W := W + C2'*V2' */
 
 		    i__1 = *m - *k;
-		    dgemm_("Transpose", "Transpose", n, k, &i__1, &c_b14, &C(*k+1,1), ldc, &V(1,*k+1), 
-			    ldv, &c_b14, &WORK(1,1), ldwork);
+		    dgemm_("Transpose", "Transpose", n, k, &i__1, &c_b14, &
+			    c___ref(*k + 1, 1), ldc, &v_ref(1, *k + 1), ldv, &
+			    c_b14, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		dtrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Upper", transt, "Non-unit", n, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V' * W' */
 
@@ -456,22 +463,23 @@ n WORK)
 /*                 C2 := C2 - V2' * W' */
 
 		    i__1 = *m - *k;
-		    dgemm_("Transpose", "Transpose", &i__1, n, k, &c_b25, &V(1,*k+1), ldv, &WORK(1,1), 
-			    ldwork, &c_b14, &C(*k+1,1), ldc);
+		    dgemm_("Transpose", "Transpose", &i__1, n, k, &c_b25, &
+			    v_ref(1, *k + 1), ldv, &work[work_offset], ldwork,
+			     &c_b14, &c___ref(*k + 1, 1), ldc);
 		}
 
 /*              W := W * V1 */
 
 		dtrmm_("Right", "Upper", "No transpose", "Unit", n, k, &c_b14,
-			 &V(1,1), ldv, &WORK(1,1), ldwork);
+			 &v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			C(j,i) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(j, i__) = c___ref(j, i__) - work_ref(i__, j);
 /* L140: */
 		    }
 /* L150: */
@@ -479,37 +487,36 @@ n WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V'  =  (C1*V1' + C2*V2')  (stored in 
-WORK)   
+                W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
 
                 W := C1 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(m, &C(1,j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(m, &c___ref(1, j), &c__1, &work_ref(1, j), &c__1);
 /* L160: */
 		}
 
 /*              W := W * V1' */
 
 		dtrmm_("Right", "Upper", "Transpose", "Unit", m, k, &c_b14, &
-			V(1,1), ldv, &WORK(1,1), ldwork);
+			v[v_offset], ldv, &work[work_offset], ldwork);
 		if (*n > *k) {
 
 /*                 W := W + C2 * V2' */
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "Transpose", m, k, &i__1, &c_b14, &
-			    C(1,*k+1), ldc, &V(1,*k+1), ldv, &c_b14, &WORK(1,1), 
-			    ldwork);
+			    c___ref(1, *k + 1), ldc, &v_ref(1, *k + 1), ldv, &
+			    c_b14, &work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		dtrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Upper", trans, "Non-unit", m, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V */
 
@@ -519,21 +526,22 @@ WORK)
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "No transpose", m, &i__1, k, &
-			    c_b25, &WORK(1,1), ldwork, &V(1,*k+1), ldv, &c_b14, &C(1,*k+1), ldc);
+			    c_b25, &work[work_offset], ldwork, &v_ref(1, *k + 
+			    1), ldv, &c_b14, &c___ref(1, *k + 1), ldc);
 		}
 
 /*              W := W * V1 */
 
 		dtrmm_("Right", "Upper", "No transpose", "Unit", m, k, &c_b14,
-			 &V(1,1), ldv, &WORK(1,1), ldwork);
+			 &v[v_offset], ldv, &work[work_offset], ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			C(i,j) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(i__, j) = c___ref(i__, j) - work_ref(i__, j);
 /* L170: */
 		    }
 /* L180: */
@@ -551,33 +559,36 @@ WORK)
 /*              Form  H * C  or  H' * C  where  C = ( C1 )   
                                                     ( C2 )   
 
-                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored i
-n WORK)   
+                W := C' * V'  =  (C1'*V1' + C2'*V2') (stored in WORK)   
 
                 W := C2' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(n, &C(*m-*k+j,1), ldc, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(n, &c___ref(*m - *k + j, 1), ldc, &work_ref(1, j), 
+			    &c__1);
 /* L190: */
 		}
 
 /*              W := W * V2' */
 
 		dtrmm_("Right", "Lower", "Transpose", "Unit", n, k, &c_b14, &
-			V(1,*m-*k+1), ldv, &WORK(1,1)
-			, ldwork);
+			v_ref(1, *m - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 		if (*m > *k) {
 
 /*                 W := W + C1'*V1' */
 
 		    i__1 = *m - *k;
-		    dgemm_("Transpose", "Transpose", n, k, &i__1, &c_b14, &C(1,1), ldc, &V(1,1), ldv, &c_b14, &WORK(1,1), ldwork);
+		    dgemm_("Transpose", "Transpose", n, k, &i__1, &c_b14, &
+			    c__[c_offset], ldc, &v[v_offset], ldv, &c_b14, &
+			    work[work_offset], ldwork);
 		}
 
 /*              W := W * T'  or  W * T */
 
-		dtrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Lower", transt, "Non-unit", n, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - V' * W' */
 
@@ -586,23 +597,25 @@ n WORK)
 /*                 C1 := C1 - V1' * W' */
 
 		    i__1 = *m - *k;
-		    dgemm_("Transpose", "Transpose", &i__1, n, k, &c_b25, &V(1,1), ldv, &WORK(1,1), ldwork, &
-			    c_b14, &C(1,1), ldc);
+		    dgemm_("Transpose", "Transpose", &i__1, n, k, &c_b25, &v[
+			    v_offset], ldv, &work[work_offset], ldwork, &
+			    c_b14, &c__[c_offset], ldc);
 		}
 
 /*              W := W * V2 */
 
 		dtrmm_("Right", "Lower", "No transpose", "Unit", n, k, &c_b14,
-			 &V(1,*m-*k+1), ldv, &WORK(1,1), ldwork);
+			 &v_ref(1, *m - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 
 /*              C2 := C2 - W' */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			C(*m-*k+j,i) -= WORK(i,j)
-				;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(*m - *k + j, i__) = c___ref(*m - *k + j, i__) 
+				- work_ref(i__, j);
 /* L200: */
 		    }
 /* L210: */
@@ -610,38 +623,38 @@ n WORK)
 
 	    } else if (lsame_(side, "R")) {
 
-/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )
-   
+/*              Form  C * H  or  C * H'  where  C = ( C1  C2 )   
 
-                W := C * V'  =  (C1*V1' + C2*V2')  (stored in 
-WORK)   
+                W := C * V'  =  (C1*V1' + C2*V2')  (stored in WORK)   
 
                 W := C2 */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
-		    dcopy_(m, &C(1,*n-*k+j), &c__1, &WORK(1,j), &c__1);
+		for (j = 1; j <= i__1; ++j) {
+		    dcopy_(m, &c___ref(1, *n - *k + j), &c__1, &work_ref(1, j)
+			    , &c__1);
 /* L220: */
 		}
 
 /*              W := W * V2' */
 
 		dtrmm_("Right", "Lower", "Transpose", "Unit", m, k, &c_b14, &
-			V(1,*n-*k+1), ldv, &WORK(1,1)
-			, ldwork);
+			v_ref(1, *n - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 		if (*n > *k) {
 
 /*                 W := W + C1 * V1' */
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "Transpose", m, k, &i__1, &c_b14, &
-			    C(1,1), ldc, &V(1,1), ldv, &c_b14, &
-			    WORK(1,1), ldwork);
+			    c__[c_offset], ldc, &v[v_offset], ldv, &c_b14, &
+			    work[work_offset], ldwork);
 		}
 
 /*              W := W * T  or  W * T' */
 
-		dtrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b14, &T(1,1), ldt, &WORK(1,1), ldwork);
+		dtrmm_("Right", "Lower", trans, "Non-unit", m, k, &c_b14, &t[
+			t_offset], ldt, &work[work_offset], ldwork);
 
 /*              C := C - W * V */
 
@@ -651,22 +664,24 @@ WORK)
 
 		    i__1 = *n - *k;
 		    dgemm_("No transpose", "No transpose", m, &i__1, k, &
-			    c_b25, &WORK(1,1), ldwork, &V(1,1), 
-			    ldv, &c_b14, &C(1,1), ldc);
+			    c_b25, &work[work_offset], ldwork, &v[v_offset], 
+			    ldv, &c_b14, &c__[c_offset], ldc);
 		}
 
 /*              W := W * V2 */
 
 		dtrmm_("Right", "Lower", "No transpose", "Unit", m, k, &c_b14,
-			 &V(1,*n-*k+1), ldv, &WORK(1,1), ldwork);
+			 &v_ref(1, *n - *k + 1), ldv, &work[work_offset], 
+			ldwork);
 
 /*              C1 := C1 - W */
 
 		i__1 = *k;
-		for (j = 1; j <= *k; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			C(i,*n-*k+j) -= WORK(i,j);
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			c___ref(i__, *n - *k + j) = c___ref(i__, *n - *k + j) 
+				- work_ref(i__, j);
 /* L230: */
 		    }
 /* L240: */
@@ -682,4 +697,9 @@ WORK)
 /*     End of DLARFB */
 
 } /* dlarfb_ */
+
+#undef v_ref
+#undef c___ref
+#undef work_ref
+
 

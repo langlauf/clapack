@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zsysv_(char *uplo, integer *n, integer *nrhs, 
 	doublecomplex *a, integer *lda, integer *ipiv, doublecomplex *b, 
 	integer *ldb, doublecomplex *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -42,13 +43,11 @@
             of the matrix B.  NRHS >= 0.   
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
             N-by-N upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of A contains the lower 
-  
+            leading N-by-N lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -61,16 +60,12 @@
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     IPIV    (output) INTEGER array, dimension (N)   
-            Details of the interchanges and the block structure of D, as 
-  
-            determined by ZSYTRF.  If IPIV(k) > 0, then rows and columns 
-  
+            Details of the interchanges and the block structure of D, as   
+            determined by ZSYTRF.  If IPIV(k) > 0, then rows and columns   
             k and IPIV(k) were interchanged, and D(k,k) is a 1-by-1   
             diagonal block.  If UPLO = 'U' and IPIV(k) = IPIV(k-1) < 0,   
-            then rows and columns k-1 and -IPIV(k) were interchanged and 
-  
-            D(k-1:k,k-1:k) is a 2-by-2 diagonal block.  If UPLO = 'L' and 
-  
+            then rows and columns k-1 and -IPIV(k) were interchanged and   
+            D(k-1:k,k-1:k) is a 2-by-2 diagonal block.  If UPLO = 'L' and   
             IPIV(k) = IPIV(k+1) < 0, then rows and columns k+1 and   
             -IPIV(k) were interchanged and D(k:k+1,k:k+1) is a 2-by-2   
             diagonal block.   
@@ -90,42 +85,55 @@
             LWORK >= N*NB, where NB is the optimal blocksize for   
             ZSYTRF.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, D(i,i) is exactly zero.  The factorization 
-  
+            > 0: if INFO = i, D(i,i) is exactly zero.  The factorization   
                  has been completed, but the block diagonal matrix D is   
-                 exactly singular, so the solution could not be computed. 
-  
+                 exactly singular, so the solution could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1;
     /* Local variables */
     extern logical lsame_(char *, char *);
-    extern /* Subroutine */ int xerbla_(char *, integer *), zsytrf_(
-	    char *, integer *, doublecomplex *, integer *, integer *, 
-	    doublecomplex *, integer *, integer *), zsytrs_(char *, 
-	    integer *, integer *, doublecomplex *, integer *, integer *, 
-	    doublecomplex *, integer *, integer *);
+    static integer nb;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    static integer lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int zsytrf_(char *, integer *, doublecomplex *, 
+	    integer *, integer *, doublecomplex *, integer *, integer *), zsytrs_(char *, integer *, integer *, doublecomplex *, 
+	    integer *, integer *, doublecomplex *, integer *, integer *);
 
 
-#define IPIV(I) ipiv[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
+    lquery = *lwork == -1;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
     } else if (*n < 0) {
@@ -136,26 +144,39 @@
 	*info = -5;
     } else if (*ldb < max(1,*n)) {
 	*info = -8;
-    } else if (*lwork < 1) {
+    } else if (*lwork < 1 && ! lquery) {
 	*info = -10;
     }
+
+    if (*info == 0) {
+	nb = ilaenv_(&c__1, "ZSYTRF", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6,
+		 (ftnlen)1);
+	lwkopt = *n * nb;
+	work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZSYSV ", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Compute the factorization A = U*D*U' or A = L*D*L'. */
 
-    zsytrf_(uplo, n, &A(1,1), lda, &IPIV(1), &WORK(1), lwork, info);
+    zsytrf_(uplo, n, &a[a_offset], lda, &ipiv[1], &work[1], lwork, info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	zsytrs_(uplo, n, nrhs, &A(1,1), lda, &IPIV(1), &B(1,1), ldb,
+	zsytrs_(uplo, n, nrhs, &a[a_offset], lda, &ipiv[1], &b[b_offset], ldb,
 		 info);
 
     }
+
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+
     return 0;
 
 /*     End of ZSYSV */

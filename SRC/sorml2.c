@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sorml2_(char *side, char *trans, integer *m, integer *n, 
-	integer *k, real *a, integer *lda, real *tau, real *c, integer *ldc, 
-	real *work, integer *info)
+	integer *k, real *a, integer *lda, real *tau, real *c__, integer *ldc,
+	 real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -58,8 +59,7 @@
                                  (LDA,M) if SIDE = 'L',   
                                  (LDA,N) if SIDE = 'R'   
             The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by 
-  
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
             SGELQF in the first k rows of its array argument A.   
             A is modified by the routine but restored on exit.   
 
@@ -85,20 +85,17 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
     /* Local variables */
     static logical left;
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int slarf_(char *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *);
@@ -106,14 +103,19 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical notran;
     static real aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
@@ -172,27 +174,28 @@
 
     i__1 = i2;
     i__2 = i3;
-    for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+    for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 	if (left) {
 
 /*           H(i) is applied to C(i:m,1:n) */
 
-	    mi = *m - i + 1;
-	    ic = i;
+	    mi = *m - i__ + 1;
+	    ic = i__;
 	} else {
 
 /*           H(i) is applied to C(1:m,i:n) */
 
-	    ni = *n - i + 1;
-	    jc = i;
+	    ni = *n - i__ + 1;
+	    jc = i__;
 	}
 
 /*        Apply H(i) */
 
-	aii = A(i,i);
-	A(i,i) = 1.f;
-	slarf_(side, &mi, &ni, &A(i,i), lda, &TAU(i), &C(ic,jc), ldc, &WORK(1));
-	A(i,i) = aii;
+	aii = a_ref(i__, i__);
+	a_ref(i__, i__) = 1.f;
+	slarf_(side, &mi, &ni, &a_ref(i__, i__), lda, &tau[i__], &c___ref(ic, 
+		jc), ldc, &work[1]);
+	a_ref(i__, i__) = aii;
 /* L10: */
     }
     return 0;
@@ -200,4 +203,8 @@
 /*     End of SORML2 */
 
 } /* sorml2_ */
+
+#undef c___ref
+#undef a_ref
+
 

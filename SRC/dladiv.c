@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dladiv_(doublereal *a, doublereal *b, doublereal *c, 
-	doublereal *d, doublereal *p, doublereal *q)
+/* Subroutine */ int dladiv_(doublereal *a, doublereal *b, doublereal *c__, 
+	doublereal *d__, doublereal *p, doublereal *q)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -34,20 +35,19 @@
     Q       (output) DOUBLE PRECISION   
             The scalars p and q in the above expression.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
     static doublereal e, f;
 
 
 
-    if (abs(*d) < abs(*c)) {
-	e = *d / *c;
-	f = *c + *d * e;
+    if (abs(*d__) < abs(*c__)) {
+	e = *d__ / *c__;
+	f = *c__ + *d__ * e;
 	*p = (*a + *b * e) / f;
 	*q = (*b - *a * e) / f;
     } else {
-	e = *c / *d;
-	f = *d + *c * e;
+	e = *c__ / *d__;
+	f = *d__ + *c__ * e;
 	*p = (*b + *a * e) / f;
 	*q = (-(*a) + *b * e) / f;
     }

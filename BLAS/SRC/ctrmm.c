@@ -1,190 +1,121 @@
-
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctrmm_(char *side, char *uplo, char *transa, char *diag, 
 	integer *m, integer *n, complex *alpha, complex *a, integer *lda, 
 	complex *b, integer *ldb)
 {
-
-
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3, i__4, i__5, 
 	    i__6;
     complex q__1, q__2, q__3;
-
     /* Builtin functions */
     void r_cnjg(complex *, complex *);
-
     /* Local variables */
     static integer info;
     static complex temp;
-    static integer i, j, k;
+    static integer i__, j, k;
     extern logical lsame_(char *, char *);
     static logical lside;
     static integer nrowa;
     static logical upper;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical noconj, nounit;
-
-
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 /*  Purpose   
     =======   
-
     CTRMM  performs one of the matrix-matrix operations   
-
        B := alpha*op( A )*B,   or   B := alpha*B*op( A )   
-
-    where  alpha  is a scalar,  B  is an m by n matrix,  A  is a unit, or 
-  
-    non-unit,  upper or lower triangular matrix  and  op( A )  is one  of 
-  
-
+    where  alpha  is a scalar,  B  is an m by n matrix,  A  is a unit, or   
+    non-unit,  upper or lower triangular matrix  and  op( A )  is one  of   
        op( A ) = A   or   op( A ) = A'   or   op( A ) = conjg( A' ).   
-
     Parameters   
     ==========   
-
     SIDE   - CHARACTER*1.   
-             On entry,  SIDE specifies whether  op( A ) multiplies B from 
-  
+             On entry,  SIDE specifies whether  op( A ) multiplies B from   
              the left or right as follows:   
-
                 SIDE = 'L' or 'l'   B := alpha*op( A )*B.   
-
                 SIDE = 'R' or 'r'   B := alpha*B*op( A ).   
-
              Unchanged on exit.   
-
     UPLO   - CHARACTER*1.   
-             On entry, UPLO specifies whether the matrix A is an upper or 
-  
+             On entry, UPLO specifies whether the matrix A is an upper or   
              lower triangular matrix as follows:   
-
                 UPLO = 'U' or 'u'   A is an upper triangular matrix.   
-
                 UPLO = 'L' or 'l'   A is a lower triangular matrix.   
-
              Unchanged on exit.   
-
     TRANSA - CHARACTER*1.   
-             On entry, TRANSA specifies the form of op( A ) to be used in 
-  
+             On entry, TRANSA specifies the form of op( A ) to be used in   
              the matrix multiplication as follows:   
-
                 TRANSA = 'N' or 'n'   op( A ) = A.   
-
                 TRANSA = 'T' or 't'   op( A ) = A'.   
-
                 TRANSA = 'C' or 'c'   op( A ) = conjg( A' ).   
-
              Unchanged on exit.   
-
     DIAG   - CHARACTER*1.   
-             On entry, DIAG specifies whether or not A is unit triangular 
-  
+             On entry, DIAG specifies whether or not A is unit triangular   
              as follows:   
-
                 DIAG = 'U' or 'u'   A is assumed to be unit triangular.   
-
                 DIAG = 'N' or 'n'   A is not assumed to be unit   
                                     triangular.   
-
              Unchanged on exit.   
-
     M      - INTEGER.   
-             On entry, M specifies the number of rows of B. M must be at 
-  
+             On entry, M specifies the number of rows of B. M must be at   
              least zero.   
              Unchanged on exit.   
-
     N      - INTEGER.   
-             On entry, N specifies the number of columns of B.  N must be 
-  
+             On entry, N specifies the number of columns of B.  N must be   
              at least zero.   
              Unchanged on exit.   
-
     ALPHA  - COMPLEX         .   
-             On entry,  ALPHA specifies the scalar  alpha. When  alpha is 
-  
-             zero then  A is not referenced and  B need not be set before 
-  
+             On entry,  ALPHA specifies the scalar  alpha. When  alpha is   
+             zero then  A is not referenced and  B need not be set before   
              entry.   
              Unchanged on exit.   
-
-    A      - COMPLEX          array of DIMENSION ( LDA, k ), where k is m 
-  
-             when  SIDE = 'L' or 'l'  and is  n  when  SIDE = 'R' or 'r'. 
-  
-             Before entry  with  UPLO = 'U' or 'u',  the  leading  k by k 
-  
-             upper triangular part of the array  A must contain the upper 
-  
-             triangular matrix  and the strictly lower triangular part of 
-  
+    A      - COMPLEX          array of DIMENSION ( LDA, k ), where k is m   
+             when  SIDE = 'L' or 'l'  and is  n  when  SIDE = 'R' or 'r'.   
+             Before entry  with  UPLO = 'U' or 'u',  the  leading  k by k   
+             upper triangular part of the array  A must contain the upper   
+             triangular matrix  and the strictly lower triangular part of   
              A is not referenced.   
-             Before entry  with  UPLO = 'L' or 'l',  the  leading  k by k 
-  
-             lower triangular part of the array  A must contain the lower 
-  
-             triangular matrix  and the strictly upper triangular part of 
-  
+             Before entry  with  UPLO = 'L' or 'l',  the  leading  k by k   
+             lower triangular part of the array  A must contain the lower   
+             triangular matrix  and the strictly upper triangular part of   
              A is not referenced.   
-             Note that when  DIAG = 'U' or 'u',  the diagonal elements of 
-  
-             A  are not referenced either,  but are assumed to be  unity. 
-  
+             Note that when  DIAG = 'U' or 'u',  the diagonal elements of   
+             A  are not referenced either,  but are assumed to be  unity.   
              Unchanged on exit.   
-
     LDA    - INTEGER.   
-             On entry, LDA specifies the first dimension of A as declared 
-  
-             in the calling (sub) program.  When  SIDE = 'L' or 'l'  then 
-  
-             LDA  must be at least  max( 1, m ),  when  SIDE = 'R' or 'r' 
-  
+             On entry, LDA specifies the first dimension of A as declared   
+             in the calling (sub) program.  When  SIDE = 'L' or 'l'  then   
+             LDA  must be at least  max( 1, m ),  when  SIDE = 'R' or 'r'   
              then LDA must be at least max( 1, n ).   
              Unchanged on exit.   
-
     B      - COMPLEX          array of DIMENSION ( LDB, n ).   
-             Before entry,  the leading  m by n part of the array  B must 
-  
-             contain the matrix  B,  and  on exit  is overwritten  by the 
-  
+             Before entry,  the leading  m by n part of the array  B must   
+             contain the matrix  B,  and  on exit  is overwritten  by the   
              transformed matrix.   
-
     LDB    - INTEGER.   
-             On entry, LDB specifies the first dimension of B as declared 
-  
-             in  the  calling  (sub)  program.   LDB  must  be  at  least 
-  
+             On entry, LDB specifies the first dimension of B as declared   
+             in  the  calling  (sub)  program.   LDB  must  be  at  least   
              max( 1, m ).   
              Unchanged on exit.   
-
-
     Level 3 Blas routine.   
-
     -- Written on 8-February-1989.   
        Jack Dongarra, Argonne National Laboratory.   
        Iain Duff, AERE Harwell.   
        Jeremy Du Croz, Numerical Algorithms Group Ltd.   
        Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-
-
        Test the input parameters.   
-
-    
-   Parameter adjustments   
-       Function Body */
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+       Parameter adjustments */
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    /* Function Body */
     lside = lsame_(side, "L");
     if (lside) {
 	nrowa = *m;
@@ -194,16 +125,16 @@
     noconj = lsame_(transa, "T");
     nounit = lsame_(diag, "N");
     upper = lsame_(uplo, "U");
-
     info = 0;
     if (! lside && ! lsame_(side, "R")) {
 	info = 1;
     } else if (! upper && ! lsame_(uplo, "L")) {
 	info = 2;
-    } else if (! lsame_(transa, "N") && ! lsame_(transa, "T") 
-	    && ! lsame_(transa, "C")) {
+    } else if (! lsame_(transa, "N") && ! lsame_(transa,
+	     "T") && ! lsame_(transa, "C")) {
 	info = 3;
-    } else if (! lsame_(diag, "U") && ! lsame_(diag, "N")) {
+    } else if (! lsame_(diag, "U") && ! lsame_(diag, 
+	    "N")) {
 	info = 4;
     } else if (*m < 0) {
 	info = 5;
@@ -218,70 +149,62 @@
 	xerbla_("CTRMM ", &info);
 	return 0;
     }
-
 /*     Quick return if possible. */
-
     if (*n == 0) {
 	return 0;
     }
-
 /*     And when  alpha.eq.zero. */
-
     if (alpha->r == 0.f && alpha->i == 0.f) {
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		i__3 = i + j * b_dim1;
-		B(i,j).r = 0.f, B(i,j).i = 0.f;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = b_subscr(i__, j);
+		b[i__3].r = 0.f, b[i__3].i = 0.f;
 /* L10: */
 	    }
 /* L20: */
 	}
 	return 0;
     }
-
 /*     Start the operations. */
-
     if (lside) {
 	if (lsame_(transa, "N")) {
-
 /*           Form  B := alpha*A*B. */
-
 	    if (upper) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (k = 1; k <= *m; ++k) {
-			i__3 = k + j * b_dim1;
-			if (B(k,j).r != 0.f || B(k,j).i != 0.f) {
-			    i__3 = k + j * b_dim1;
-			    q__1.r = alpha->r * B(k,j).r - alpha->i * B(k,j)
-				    .i, q__1.i = alpha->r * B(k,j).i + 
-				    alpha->i * B(k,j).r;
+		    for (k = 1; k <= i__2; ++k) {
+			i__3 = b_subscr(k, j);
+			if (b[i__3].r != 0.f || b[i__3].i != 0.f) {
+			    i__3 = b_subscr(k, j);
+			    q__1.r = alpha->r * b[i__3].r - alpha->i * b[i__3]
+				    .i, q__1.i = alpha->r * b[i__3].i + 
+				    alpha->i * b[i__3].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
 			    i__3 = k - 1;
-			    for (i = 1; i <= k-1; ++i) {
-				i__4 = i + j * b_dim1;
-				i__5 = i + j * b_dim1;
-				i__6 = i + k * a_dim1;
-				q__2.r = temp.r * A(i,k).r - temp.i * A(i,k)
-					.i, q__2.i = temp.r * A(i,k).i + 
-					temp.i * A(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = 1; i__ <= i__3; ++i__) {
+				i__4 = b_subscr(i__, j);
+				i__5 = b_subscr(i__, j);
+				i__6 = a_subscr(i__, k);
+				q__2.r = temp.r * a[i__6].r - temp.i * a[i__6]
+					.i, q__2.i = temp.r * a[i__6].i + 
+					temp.i * a[i__6].r;
+				q__1.r = b[i__5].r + q__2.r, q__1.i = b[i__5]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__4].r = q__1.r, b[i__4].i = q__1.i;
 /* L30: */
 			    }
 			    if (nounit) {
-				i__3 = k + k * a_dim1;
-				q__1.r = temp.r * A(k,k).r - temp.i * A(k,k)
-					.i, q__1.i = temp.r * A(k,k).i + 
-					temp.i * A(k,k).r;
+				i__3 = a_subscr(k, k);
+				q__1.r = temp.r * a[i__3].r - temp.i * a[i__3]
+					.i, q__1.i = temp.r * a[i__3].i + 
+					temp.i * a[i__3].r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
-			    i__3 = k + j * b_dim1;
-			    B(k,j).r = temp.r, B(k,j).i = temp.i;
+			    i__3 = b_subscr(k, j);
+			    b[i__3].r = temp.r, b[i__3].i = temp.i;
 			}
 /* L40: */
 		    }
@@ -289,36 +212,37 @@
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    for (k = *m; k >= 1; --k) {
-			i__2 = k + j * b_dim1;
-			if (B(k,j).r != 0.f || B(k,j).i != 0.f) {
-			    i__2 = k + j * b_dim1;
-			    q__1.r = alpha->r * B(k,j).r - alpha->i * B(k,j)
-				    .i, q__1.i = alpha->r * B(k,j).i + 
-				    alpha->i * B(k,j).r;
+			i__2 = b_subscr(k, j);
+			if (b[i__2].r != 0.f || b[i__2].i != 0.f) {
+			    i__2 = b_subscr(k, j);
+			    q__1.r = alpha->r * b[i__2].r - alpha->i * b[i__2]
+				    .i, q__1.i = alpha->r * b[i__2].i + 
+				    alpha->i * b[i__2].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
-			    i__2 = k + j * b_dim1;
-			    B(k,j).r = temp.r, B(k,j).i = temp.i;
+			    i__2 = b_subscr(k, j);
+			    b[i__2].r = temp.r, b[i__2].i = temp.i;
 			    if (nounit) {
-				i__2 = k + j * b_dim1;
-				i__3 = k + j * b_dim1;
-				i__4 = k + k * a_dim1;
-				q__1.r = B(k,j).r * A(k,k).r - B(k,j).i * 
-					A(k,k).i, q__1.i = B(k,j).r * A(k,k).i + B(k,j).i * A(k,k).r;
-				B(k,j).r = q__1.r, B(k,j).i = q__1.i;
+				i__2 = b_subscr(k, j);
+				i__3 = b_subscr(k, j);
+				i__4 = a_subscr(k, k);
+				q__1.r = b[i__3].r * a[i__4].r - b[i__3].i * 
+					a[i__4].i, q__1.i = b[i__3].r * a[
+					i__4].i + b[i__3].i * a[i__4].r;
+				b[i__2].r = q__1.r, b[i__2].i = q__1.i;
 			    }
 			    i__2 = *m;
-			    for (i = k + 1; i <= *m; ++i) {
-				i__3 = i + j * b_dim1;
-				i__4 = i + j * b_dim1;
-				i__5 = i + k * a_dim1;
-				q__2.r = temp.r * A(i,k).r - temp.i * A(i,k)
-					.i, q__2.i = temp.r * A(i,k).i + 
-					temp.i * A(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = k + 1; i__ <= i__2; ++i__) {
+				i__3 = b_subscr(i__, j);
+				i__4 = b_subscr(i__, j);
+				i__5 = a_subscr(i__, k);
+				q__2.r = temp.r * a[i__5].r - temp.i * a[i__5]
+					.i, q__2.i = temp.r * a[i__5].i + 
+					temp.i * a[i__5].r;
+				q__1.r = b[i__4].r + q__2.r, q__1.i = b[i__4]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L60: */
 			    }
 			}
@@ -328,30 +252,28 @@
 		}
 	    }
 	} else {
-
-/*           Form  B := alpha*B*A'   or   B := alpha*B*conjg( A' )
-. */
-
+/*           Form  B := alpha*A'*B   or   B := alpha*conjg( A' )*B. */
 	    if (upper) {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
-		    for (i = *m; i >= 1; --i) {
-			i__2 = i + j * b_dim1;
-			temp.r = B(i,j).r, temp.i = B(i,j).i;
+		for (j = 1; j <= i__1; ++j) {
+		    for (i__ = *m; i__ >= 1; --i__) {
+			i__2 = b_subscr(i__, j);
+			temp.r = b[i__2].r, temp.i = b[i__2].i;
 			if (noconj) {
 			    if (nounit) {
-				i__2 = i + i * a_dim1;
-				q__1.r = temp.r * A(i,i).r - temp.i * A(i,i)
-					.i, q__1.i = temp.r * A(i,i).i + 
-					temp.i * A(i,i).r;
+				i__2 = a_subscr(i__, i__);
+				q__1.r = temp.r * a[i__2].r - temp.i * a[i__2]
+					.i, q__1.i = temp.r * a[i__2].i + 
+					temp.i * a[i__2].r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
-			    i__2 = i - 1;
-			    for (k = 1; k <= i-1; ++k) {
-				i__3 = k + i * a_dim1;
-				i__4 = k + j * b_dim1;
-				q__2.r = A(k,i).r * B(k,j).r - A(k,i).i * 
-					B(k,j).i, q__2.i = A(k,i).r * B(k,j).i + A(k,i).i * B(k,j).r;
+			    i__2 = i__ - 1;
+			    for (k = 1; k <= i__2; ++k) {
+				i__3 = a_subscr(k, i__);
+				i__4 = b_subscr(k, j);
+				q__2.r = a[i__3].r * b[i__4].r - a[i__3].i * 
+					b[i__4].i, q__2.i = a[i__3].r * b[
+					i__4].i + a[i__3].i * b[i__4].r;
 				q__1.r = temp.r + q__2.r, q__1.i = temp.i + 
 					q__2.i;
 				temp.r = q__1.r, temp.i = q__1.i;
@@ -359,55 +281,56 @@
 			    }
 			} else {
 			    if (nounit) {
-				r_cnjg(&q__2, &A(i,i));
+				r_cnjg(&q__2, &a_ref(i__, i__));
 				q__1.r = temp.r * q__2.r - temp.i * q__2.i, 
 					q__1.i = temp.r * q__2.i + temp.i * 
 					q__2.r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
-			    i__2 = i - 1;
-			    for (k = 1; k <= i-1; ++k) {
-				r_cnjg(&q__3, &A(k,i));
-				i__3 = k + j * b_dim1;
-				q__2.r = q__3.r * B(k,j).r - q__3.i * B(k,j)
-					.i, q__2.i = q__3.r * B(k,j).i + 
-					q__3.i * B(k,j).r;
+			    i__2 = i__ - 1;
+			    for (k = 1; k <= i__2; ++k) {
+				r_cnjg(&q__3, &a_ref(k, i__));
+				i__3 = b_subscr(k, j);
+				q__2.r = q__3.r * b[i__3].r - q__3.i * b[i__3]
+					.i, q__2.i = q__3.r * b[i__3].i + 
+					q__3.i * b[i__3].r;
 				q__1.r = temp.r + q__2.r, q__1.i = temp.i + 
 					q__2.i;
 				temp.r = q__1.r, temp.i = q__1.i;
 /* L100: */
 			    }
 			}
-			i__2 = i + j * b_dim1;
+			i__2 = b_subscr(i__, j);
 			q__1.r = alpha->r * temp.r - alpha->i * temp.i, 
 				q__1.i = alpha->r * temp.i + alpha->i * 
 				temp.r;
-			B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+			b[i__2].r = q__1.r, b[i__2].i = q__1.i;
 /* L110: */
 		    }
 /* L120: */
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + j * b_dim1;
-			temp.r = B(i,j).r, temp.i = B(i,j).i;
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			temp.r = b[i__3].r, temp.i = b[i__3].i;
 			if (noconj) {
 			    if (nounit) {
-				i__3 = i + i * a_dim1;
-				q__1.r = temp.r * A(i,i).r - temp.i * A(i,i)
-					.i, q__1.i = temp.r * A(i,i).i + 
-					temp.i * A(i,i).r;
+				i__3 = a_subscr(i__, i__);
+				q__1.r = temp.r * a[i__3].r - temp.i * a[i__3]
+					.i, q__1.i = temp.r * a[i__3].i + 
+					temp.i * a[i__3].r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
 			    i__3 = *m;
-			    for (k = i + 1; k <= *m; ++k) {
-				i__4 = k + i * a_dim1;
-				i__5 = k + j * b_dim1;
-				q__2.r = A(k,i).r * B(k,j).r - A(k,i).i * 
-					B(k,j).i, q__2.i = A(k,i).r * B(k,j).i + A(k,i).i * B(k,j).r;
+			    for (k = i__ + 1; k <= i__3; ++k) {
+				i__4 = a_subscr(k, i__);
+				i__5 = b_subscr(k, j);
+				q__2.r = a[i__4].r * b[i__5].r - a[i__4].i * 
+					b[i__5].i, q__2.i = a[i__4].r * b[
+					i__5].i + a[i__4].i * b[i__5].r;
 				q__1.r = temp.r + q__2.r, q__1.i = temp.i + 
 					q__2.i;
 				temp.r = q__1.r, temp.i = q__1.i;
@@ -415,30 +338,30 @@
 			    }
 			} else {
 			    if (nounit) {
-				r_cnjg(&q__2, &A(i,i));
+				r_cnjg(&q__2, &a_ref(i__, i__));
 				q__1.r = temp.r * q__2.r - temp.i * q__2.i, 
 					q__1.i = temp.r * q__2.i + temp.i * 
 					q__2.r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
 			    i__3 = *m;
-			    for (k = i + 1; k <= *m; ++k) {
-				r_cnjg(&q__3, &A(k,i));
-				i__4 = k + j * b_dim1;
-				q__2.r = q__3.r * B(k,j).r - q__3.i * B(k,j)
-					.i, q__2.i = q__3.r * B(k,j).i + 
-					q__3.i * B(k,j).r;
+			    for (k = i__ + 1; k <= i__3; ++k) {
+				r_cnjg(&q__3, &a_ref(k, i__));
+				i__4 = b_subscr(k, j);
+				q__2.r = q__3.r * b[i__4].r - q__3.i * b[i__4]
+					.i, q__2.i = q__3.r * b[i__4].i + 
+					q__3.i * b[i__4].r;
 				q__1.r = temp.r + q__2.r, q__1.i = temp.i + 
 					q__2.i;
 				temp.r = q__1.r, temp.i = q__1.i;
 /* L140: */
 			    }
 			}
-			i__3 = i + j * b_dim1;
+			i__3 = b_subscr(i__, j);
 			q__1.r = alpha->r * temp.r - alpha->i * temp.i, 
 				q__1.i = alpha->r * temp.i + alpha->i * 
 				temp.r;
-			B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+			b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L150: */
 		    }
 /* L160: */
@@ -447,49 +370,47 @@
 	}
     } else {
 	if (lsame_(transa, "N")) {
-
 /*           Form  B := alpha*B*A. */
-
 	    if (upper) {
 		for (j = *n; j >= 1; --j) {
 		    temp.r = alpha->r, temp.i = alpha->i;
 		    if (nounit) {
-			i__1 = j + j * a_dim1;
-			q__1.r = temp.r * A(j,j).r - temp.i * A(j,j).i, 
-				q__1.i = temp.r * A(j,j).i + temp.i * A(j,j)
+			i__1 = a_subscr(j, j);
+			q__1.r = temp.r * a[i__1].r - temp.i * a[i__1].i, 
+				q__1.i = temp.r * a[i__1].i + temp.i * a[i__1]
 				.r;
 			temp.r = q__1.r, temp.i = q__1.i;
 		    }
 		    i__1 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__2 = i + j * b_dim1;
-			i__3 = i + j * b_dim1;
-			q__1.r = temp.r * B(i,j).r - temp.i * B(i,j).i, 
-				q__1.i = temp.r * B(i,j).i + temp.i * B(i,j)
+		    for (i__ = 1; i__ <= i__1; ++i__) {
+			i__2 = b_subscr(i__, j);
+			i__3 = b_subscr(i__, j);
+			q__1.r = temp.r * b[i__3].r - temp.i * b[i__3].i, 
+				q__1.i = temp.r * b[i__3].i + temp.i * b[i__3]
 				.r;
-			B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+			b[i__2].r = q__1.r, b[i__2].i = q__1.i;
 /* L170: */
 		    }
 		    i__1 = j - 1;
-		    for (k = 1; k <= j-1; ++k) {
-			i__2 = k + j * a_dim1;
-			if (A(k,j).r != 0.f || A(k,j).i != 0.f) {
-			    i__2 = k + j * a_dim1;
-			    q__1.r = alpha->r * A(k,j).r - alpha->i * A(k,j)
-				    .i, q__1.i = alpha->r * A(k,j).i + 
-				    alpha->i * A(k,j).r;
+		    for (k = 1; k <= i__1; ++k) {
+			i__2 = a_subscr(k, j);
+			if (a[i__2].r != 0.f || a[i__2].i != 0.f) {
+			    i__2 = a_subscr(k, j);
+			    q__1.r = alpha->r * a[i__2].r - alpha->i * a[i__2]
+				    .i, q__1.i = alpha->r * a[i__2].i + 
+				    alpha->i * a[i__2].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
 			    i__2 = *m;
-			    for (i = 1; i <= *m; ++i) {
-				i__3 = i + j * b_dim1;
-				i__4 = i + j * b_dim1;
-				i__5 = i + k * b_dim1;
-				q__2.r = temp.r * B(i,k).r - temp.i * B(i,k)
-					.i, q__2.i = temp.r * B(i,k).i + 
-					temp.i * B(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = 1; i__ <= i__2; ++i__) {
+				i__3 = b_subscr(i__, j);
+				i__4 = b_subscr(i__, j);
+				i__5 = b_subscr(i__, k);
+				q__2.r = temp.r * b[i__5].r - temp.i * b[i__5]
+					.i, q__2.i = temp.r * b[i__5].i + 
+					temp.i * b[i__5].r;
+				q__1.r = b[i__4].r + q__2.r, q__1.i = b[i__4]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L180: */
 			    }
 			}
@@ -499,45 +420,45 @@
 		}
 	    } else {
 		i__1 = *n;
-		for (j = 1; j <= *n; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 		    temp.r = alpha->r, temp.i = alpha->i;
 		    if (nounit) {
-			i__2 = j + j * a_dim1;
-			q__1.r = temp.r * A(j,j).r - temp.i * A(j,j).i, 
-				q__1.i = temp.r * A(j,j).i + temp.i * A(j,j)
+			i__2 = a_subscr(j, j);
+			q__1.r = temp.r * a[i__2].r - temp.i * a[i__2].i, 
+				q__1.i = temp.r * a[i__2].i + temp.i * a[i__2]
 				.r;
 			temp.r = q__1.r, temp.i = q__1.i;
 		    }
 		    i__2 = *m;
-		    for (i = 1; i <= *m; ++i) {
-			i__3 = i + j * b_dim1;
-			i__4 = i + j * b_dim1;
-			q__1.r = temp.r * B(i,j).r - temp.i * B(i,j).i, 
-				q__1.i = temp.r * B(i,j).i + temp.i * B(i,j)
+		    for (i__ = 1; i__ <= i__2; ++i__) {
+			i__3 = b_subscr(i__, j);
+			i__4 = b_subscr(i__, j);
+			q__1.r = temp.r * b[i__4].r - temp.i * b[i__4].i, 
+				q__1.i = temp.r * b[i__4].i + temp.i * b[i__4]
 				.r;
-			B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+			b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L210: */
 		    }
 		    i__2 = *n;
-		    for (k = j + 1; k <= *n; ++k) {
-			i__3 = k + j * a_dim1;
-			if (A(k,j).r != 0.f || A(k,j).i != 0.f) {
-			    i__3 = k + j * a_dim1;
-			    q__1.r = alpha->r * A(k,j).r - alpha->i * A(k,j)
-				    .i, q__1.i = alpha->r * A(k,j).i + 
-				    alpha->i * A(k,j).r;
+		    for (k = j + 1; k <= i__2; ++k) {
+			i__3 = a_subscr(k, j);
+			if (a[i__3].r != 0.f || a[i__3].i != 0.f) {
+			    i__3 = a_subscr(k, j);
+			    q__1.r = alpha->r * a[i__3].r - alpha->i * a[i__3]
+				    .i, q__1.i = alpha->r * a[i__3].i + 
+				    alpha->i * a[i__3].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
 			    i__3 = *m;
-			    for (i = 1; i <= *m; ++i) {
-				i__4 = i + j * b_dim1;
-				i__5 = i + j * b_dim1;
-				i__6 = i + k * b_dim1;
-				q__2.r = temp.r * B(i,k).r - temp.i * B(i,k)
-					.i, q__2.i = temp.r * B(i,k).i + 
-					temp.i * B(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = 1; i__ <= i__3; ++i__) {
+				i__4 = b_subscr(i__, j);
+				i__5 = b_subscr(i__, j);
+				i__6 = b_subscr(i__, k);
+				q__2.r = temp.r * b[i__6].r - temp.i * b[i__6]
+					.i, q__2.i = temp.r * b[i__6].i + 
+					temp.i * b[i__6].r;
+				q__1.r = b[i__5].r + q__2.r, q__1.i = b[i__5]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__4].r = q__1.r, b[i__4].i = q__1.i;
 /* L220: */
 			    }
 			}
@@ -547,40 +468,38 @@
 		}
 	    }
 	} else {
-
-/*           Form  B := alpha*B*A'   or   B := alpha*B*conjg( A' )
-. */
-
+/*           Form  B := alpha*B*A'   or   B := alpha*B*conjg( A' ). */
 	    if (upper) {
 		i__1 = *n;
-		for (k = 1; k <= *n; ++k) {
+		for (k = 1; k <= i__1; ++k) {
 		    i__2 = k - 1;
-		    for (j = 1; j <= k-1; ++j) {
-			i__3 = j + k * a_dim1;
-			if (A(j,k).r != 0.f || A(j,k).i != 0.f) {
+		    for (j = 1; j <= i__2; ++j) {
+			i__3 = a_subscr(j, k);
+			if (a[i__3].r != 0.f || a[i__3].i != 0.f) {
 			    if (noconj) {
-				i__3 = j + k * a_dim1;
-				q__1.r = alpha->r * A(j,k).r - alpha->i * A(j,k).i, q__1.i = alpha->r * A(j,k)
-					.i + alpha->i * A(j,k).r;
+				i__3 = a_subscr(j, k);
+				q__1.r = alpha->r * a[i__3].r - alpha->i * a[
+					i__3].i, q__1.i = alpha->r * a[i__3]
+					.i + alpha->i * a[i__3].r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    } else {
-				r_cnjg(&q__2, &A(j,k));
+				r_cnjg(&q__2, &a_ref(j, k));
 				q__1.r = alpha->r * q__2.r - alpha->i * 
 					q__2.i, q__1.i = alpha->r * q__2.i + 
 					alpha->i * q__2.r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
 			    i__3 = *m;
-			    for (i = 1; i <= *m; ++i) {
-				i__4 = i + j * b_dim1;
-				i__5 = i + j * b_dim1;
-				i__6 = i + k * b_dim1;
-				q__2.r = temp.r * B(i,k).r - temp.i * B(i,k)
-					.i, q__2.i = temp.r * B(i,k).i + 
-					temp.i * B(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = 1; i__ <= i__3; ++i__) {
+				i__4 = b_subscr(i__, j);
+				i__5 = b_subscr(i__, j);
+				i__6 = b_subscr(i__, k);
+				q__2.r = temp.r * b[i__6].r - temp.i * b[i__6]
+					.i, q__2.i = temp.r * b[i__6].i + 
+					temp.i * b[i__6].r;
+				q__1.r = b[i__5].r + q__2.r, q__1.i = b[i__5]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__4].r = q__1.r, b[i__4].i = q__1.i;
 /* L250: */
 			    }
 			}
@@ -589,12 +508,13 @@
 		    temp.r = alpha->r, temp.i = alpha->i;
 		    if (nounit) {
 			if (noconj) {
-			    i__2 = k + k * a_dim1;
-			    q__1.r = temp.r * A(k,k).r - temp.i * A(k,k).i, 
-				    q__1.i = temp.r * A(k,k).i + temp.i * A(k,k).r;
+			    i__2 = a_subscr(k, k);
+			    q__1.r = temp.r * a[i__2].r - temp.i * a[i__2].i, 
+				    q__1.i = temp.r * a[i__2].i + temp.i * a[
+				    i__2].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
 			} else {
-			    r_cnjg(&q__2, &A(k,k));
+			    r_cnjg(&q__2, &a_ref(k, k));
 			    q__1.r = temp.r * q__2.r - temp.i * q__2.i, 
 				    q__1.i = temp.r * q__2.i + temp.i * 
 				    q__2.r;
@@ -603,12 +523,13 @@
 		    }
 		    if (temp.r != 1.f || temp.i != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__3 = i + k * b_dim1;
-			    i__4 = i + k * b_dim1;
-			    q__1.r = temp.r * B(i,k).r - temp.i * B(i,k).i, 
-				    q__1.i = temp.r * B(i,k).i + temp.i * B(i,k).r;
-			    B(i,k).r = q__1.r, B(i,k).i = q__1.i;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    i__3 = b_subscr(i__, k);
+			    i__4 = b_subscr(i__, k);
+			    q__1.r = temp.r * b[i__4].r - temp.i * b[i__4].i, 
+				    q__1.i = temp.r * b[i__4].i + temp.i * b[
+				    i__4].r;
+			    b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L270: */
 			}
 		    }
@@ -617,32 +538,33 @@
 	    } else {
 		for (k = *n; k >= 1; --k) {
 		    i__1 = *n;
-		    for (j = k + 1; j <= *n; ++j) {
-			i__2 = j + k * a_dim1;
-			if (A(j,k).r != 0.f || A(j,k).i != 0.f) {
+		    for (j = k + 1; j <= i__1; ++j) {
+			i__2 = a_subscr(j, k);
+			if (a[i__2].r != 0.f || a[i__2].i != 0.f) {
 			    if (noconj) {
-				i__2 = j + k * a_dim1;
-				q__1.r = alpha->r * A(j,k).r - alpha->i * A(j,k).i, q__1.i = alpha->r * A(j,k)
-					.i + alpha->i * A(j,k).r;
+				i__2 = a_subscr(j, k);
+				q__1.r = alpha->r * a[i__2].r - alpha->i * a[
+					i__2].i, q__1.i = alpha->r * a[i__2]
+					.i + alpha->i * a[i__2].r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    } else {
-				r_cnjg(&q__2, &A(j,k));
+				r_cnjg(&q__2, &a_ref(j, k));
 				q__1.r = alpha->r * q__2.r - alpha->i * 
 					q__2.i, q__1.i = alpha->r * q__2.i + 
 					alpha->i * q__2.r;
 				temp.r = q__1.r, temp.i = q__1.i;
 			    }
 			    i__2 = *m;
-			    for (i = 1; i <= *m; ++i) {
-				i__3 = i + j * b_dim1;
-				i__4 = i + j * b_dim1;
-				i__5 = i + k * b_dim1;
-				q__2.r = temp.r * B(i,k).r - temp.i * B(i,k)
-					.i, q__2.i = temp.r * B(i,k).i + 
-					temp.i * B(i,k).r;
-				q__1.r = B(i,j).r + q__2.r, q__1.i = B(i,j)
+			    for (i__ = 1; i__ <= i__2; ++i__) {
+				i__3 = b_subscr(i__, j);
+				i__4 = b_subscr(i__, j);
+				i__5 = b_subscr(i__, k);
+				q__2.r = temp.r * b[i__5].r - temp.i * b[i__5]
+					.i, q__2.i = temp.r * b[i__5].i + 
+					temp.i * b[i__5].r;
+				q__1.r = b[i__4].r + q__2.r, q__1.i = b[i__4]
 					.i + q__2.i;
-				B(i,j).r = q__1.r, B(i,j).i = q__1.i;
+				b[i__3].r = q__1.r, b[i__3].i = q__1.i;
 /* L290: */
 			    }
 			}
@@ -651,12 +573,13 @@
 		    temp.r = alpha->r, temp.i = alpha->i;
 		    if (nounit) {
 			if (noconj) {
-			    i__1 = k + k * a_dim1;
-			    q__1.r = temp.r * A(k,k).r - temp.i * A(k,k).i, 
-				    q__1.i = temp.r * A(k,k).i + temp.i * A(k,k).r;
+			    i__1 = a_subscr(k, k);
+			    q__1.r = temp.r * a[i__1].r - temp.i * a[i__1].i, 
+				    q__1.i = temp.r * a[i__1].i + temp.i * a[
+				    i__1].r;
 			    temp.r = q__1.r, temp.i = q__1.i;
 			} else {
-			    r_cnjg(&q__2, &A(k,k));
+			    r_cnjg(&q__2, &a_ref(k, k));
 			    q__1.r = temp.r * q__2.r - temp.i * q__2.i, 
 				    q__1.i = temp.r * q__2.i + temp.i * 
 				    q__2.r;
@@ -665,12 +588,13 @@
 		    }
 		    if (temp.r != 1.f || temp.i != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    i__2 = i + k * b_dim1;
-			    i__3 = i + k * b_dim1;
-			    q__1.r = temp.r * B(i,k).r - temp.i * B(i,k).i, 
-				    q__1.i = temp.r * B(i,k).i + temp.i * B(i,k).r;
-			    B(i,k).r = q__1.r, B(i,k).i = q__1.i;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    i__2 = b_subscr(i__, k);
+			    i__3 = b_subscr(i__, k);
+			    q__1.r = temp.r * b[i__3].r - temp.i * b[i__3].i, 
+				    q__1.i = temp.r * b[i__3].i + temp.i * b[
+				    i__3].r;
+			    b[i__2].r = q__1.r, b[i__2].i = q__1.i;
 /* L310: */
 			}
 		    }
@@ -679,10 +603,11 @@
 	    }
 	}
     }
-
     return 0;
-
 /*     End of CTRMM . */
-
 } /* ctrmm_ */
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
 

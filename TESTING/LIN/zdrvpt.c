@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,9 +33,9 @@ static doublecomplex c_b62 = {0.,0.};
 
 /* Subroutine */ int zdrvpt_(logical *dotype, integer *nn, integer *nval, 
 	integer *nrhs, doublereal *thresh, logical *tsterr, doublecomplex *a, 
-	doublereal *d, doublecomplex *e, doublecomplex *b, doublecomplex *x, 
-	doublecomplex *xact, doublecomplex *work, doublereal *rwork, integer *
-	nout)
+	doublereal *d__, doublecomplex *e, doublecomplex *b, doublecomplex *x,
+	 doublecomplex *xact, doublecomplex *work, doublereal *rwork, integer 
+	*nout)
 {
     /* Initialized data */
 
@@ -61,12 +62,12 @@ static doublecomplex c_b62 = {0.,0.};
     static integer mode;
     static doublereal dmax__;
     static integer imat, info;
-    static char path[3], dist[1], type[1];
-    static integer nrun, i, j, k, n, ifact;
+    static char path[3], dist[1], type__[1];
+    static integer nrun, i__, j, k, n, ifact;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     static integer nfail, iseed[4];
-    static doublereal z[3];
+    static doublereal z__[3];
     extern doublereal dget06_(doublereal *, doublereal *);
     static doublereal rcond;
     static integer nimat;
@@ -135,7 +136,7 @@ static doublecomplex c_b62 = {0.,0.};
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -150,8 +151,7 @@ static doublecomplex c_b62 = {0.,0.};
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -193,8 +193,7 @@ static doublecomplex c_b62 = {0.,0.};
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --rwork;
@@ -203,20 +202,20 @@ static doublecomplex c_b62 = {0.,0.};
     --x;
     --b;
     --e;
-    --d;
+    --d__;
     --a;
     --nval;
     --dotype;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'Z';
-    s_copy(path + 1, "PT", 2L, 2L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "PT", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -250,20 +249,18 @@ static doublecomplex c_b62 = {0.,0.};
 
 /*           Set up parameters with ZLATB4. */
 
-	    zlatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &cond,
-		     dist);
+	    zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
+		    cond, dist);
 
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Type 1-6:  generate a symmetric tridiagonal ma
-trix of   
-                known condition number in lower triangular ban
-d storage. */
+/*              Type 1-6:  generate a symmetric tridiagonal matrix of   
+                known condition number in lower triangular band storage. */
 
-		s_copy(srnamc_1.srnamt, "ZLATMS", 6L, 6L);
-		zlatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cond, &
-			anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
+		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
+			&anorm, &kl, &ku, "B", &a[1], &c__2, &work[1], &info);
 
 /*              Check the error code from ZLATMS. */
 
@@ -278,11 +275,11 @@ d storage. */
 
 		ia = 1;
 		i__3 = n - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    i__4 = i;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    i__4 = i__;
 		    i__5 = ia;
-		    d[i__4] = a[i__5].r;
-		    i__4 = i;
+		    d__[i__4] = a[i__5].r;
+		    i__4 = i__;
 		    i__5 = ia + 1;
 		    e[i__4].r = a[i__5].r, e[i__4].i = a[i__5].i;
 		    ia += 2;
@@ -291,46 +288,43 @@ d storage. */
 		if (n > 0) {
 		    i__3 = n;
 		    i__4 = ia;
-		    d[i__3] = a[i__4].r;
+		    d__[i__3] = a[i__4].r;
 		}
 	    } else {
 
-/*              Type 7-12:  generate a diagonally dominant mat
-rix with   
-                unknown condition number in the vectors D and 
-E. */
+/*              Type 7-12:  generate a diagonally dominant matrix with   
+                unknown condition number in the vectors D and E. */
 
 		if (! zerot || ! dotype[7]) {
 
 /*                 Let D and E have values from [-1,1]. */
 
-		    dlarnv_(&c__2, iseed, &n, &d[1]);
+		    dlarnv_(&c__2, iseed, &n, &d__[1]);
 		    i__3 = n - 1;
 		    zlarnv_(&c__2, iseed, &i__3, &e[1]);
 
-/*                 Make the tridiagonal matrix diagonally 
-dominant. */
+/*                 Make the tridiagonal matrix diagonally dominant. */
 
 		    if (n == 1) {
-			d[1] = abs(d[1]);
+			d__[1] = abs(d__[1]);
 		    } else {
-			d[1] = abs(d[1]) + z_abs(&e[1]);
-			d[n] = (d__1 = d[n], abs(d__1)) + z_abs(&e[n - 1]);
+			d__[1] = abs(d__[1]) + z_abs(&e[1]);
+			d__[n] = (d__1 = d__[n], abs(d__1)) + z_abs(&e[n - 1])
+				;
 			i__3 = n - 1;
-			for (i = 2; i <= i__3; ++i) {
-			    d[i] = (d__1 = d[i], abs(d__1)) + z_abs(&e[i]) + 
-				    z_abs(&e[i - 1]);
+			for (i__ = 2; i__ <= i__3; ++i__) {
+			    d__[i__] = (d__1 = d__[i__], abs(d__1)) + z_abs(&
+				    e[i__]) + z_abs(&e[i__ - 1]);
 /* L30: */
 			}
 		    }
 
-/*                 Scale D and E so the maximum element is
- ANORM. */
+/*                 Scale D and E so the maximum element is ANORM. */
 
-		    ix = idamax_(&n, &d[1], &c__1);
-		    dmax__ = d[ix];
+		    ix = idamax_(&n, &d__[1], &c__1);
+		    dmax__ = d__[ix];
 		    d__1 = anorm / dmax__;
-		    dscal_(&n, &d__1, &d[1], &c__1);
+		    dscal_(&n, &d__1, &d__[1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			d__1 = anorm / dmax__;
@@ -339,65 +333,63 @@ dominant. */
 
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back t
-he zeroed out   
+/*                 Reuse the last matrix by copying back the zeroed out   
                    elements. */
 
 		    if (izero == 1) {
-			d[1] = z[1];
+			d__[1] = z__[1];
 			if (n > 1) {
-			    e[1].r = z[2], e[1].i = 0.;
+			    e[1].r = z__[2], e[1].i = 0.;
 			}
 		    } else if (izero == n) {
 			i__3 = n - 1;
-			e[i__3].r = z[0], e[i__3].i = 0.;
-			d[n] = z[1];
+			e[i__3].r = z__[0], e[i__3].i = 0.;
+			d__[n] = z__[1];
 		    } else {
 			i__3 = izero - 1;
-			e[i__3].r = z[0], e[i__3].i = 0.;
-			d[izero] = z[1];
+			e[i__3].r = z__[0], e[i__3].i = 0.;
+			d__[izero] = z__[1];
 			i__3 = izero;
-			e[i__3].r = z[2], e[i__3].i = 0.;
+			e[i__3].r = z__[2], e[i__3].i = 0.;
 		    }
 		}
 
-/*              For types 8-10, set one row and column of the 
-matrix to   
+/*              For types 8-10, set one row and column of the matrix to   
                 zero. */
 
 		izero = 0;
 		if (imat == 8) {
 		    izero = 1;
-		    z[1] = d[1];
-		    d[1] = 0.;
+		    z__[1] = d__[1];
+		    d__[1] = 0.;
 		    if (n > 1) {
-			z[2] = e[1].r;
+			z__[2] = e[1].r;
 			e[1].r = 0., e[1].i = 0.;
 		    }
 		} else if (imat == 9) {
 		    izero = n;
 		    if (n > 1) {
 			i__3 = n - 1;
-			z[0] = e[i__3].r;
+			z__[0] = e[i__3].r;
 			i__3 = n - 1;
 			e[i__3].r = 0., e[i__3].i = 0.;
 		    }
-		    z[1] = d[n];
-		    d[n] = 0.;
+		    z__[1] = d__[n];
+		    d__[n] = 0.;
 		} else if (imat == 10) {
 		    izero = (n + 1) / 2;
 		    if (izero > 1) {
 			i__3 = izero - 1;
-			z[0] = e[i__3].r;
+			z__[0] = e[i__3].r;
 			i__3 = izero - 1;
 			e[i__3].r = 0., e[i__3].i = 0.;
 			i__3 = izero;
-			z[2] = e[i__3].r;
+			z__[2] = e[i__3].r;
 			i__3 = izero;
 			e[i__3].r = 0., e[i__3].i = 0.;
 		    }
-		    z[1] = d[izero];
-		    d[izero] = 0.;
+		    z__[1] = d__[izero];
+		    d__[izero] = 0.;
 		}
 	    }
 
@@ -413,8 +405,8 @@ matrix to
 
 /*           Set the right hand side. */
 
-	    zlaptm_("Lower", &n, nrhs, &c_b24, &d[1], &e[1], &xact[1], &lda, &
-		    c_b25, &b[1], &lda);
+	    zlaptm_("Lower", &n, nrhs, &c_b24, &d__[1], &e[1], &xact[1], &lda,
+		     &c_b25, &b[1], &lda);
 
 	    for (ifact = 1; ifact <= 2; ++ifact) {
 		if (ifact == 1) {
@@ -423,8 +415,7 @@ matrix to
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison wi
-th   
+/*              Compute the condition number for comparison with   
                 the value returned by ZPTSVX. */
 
 		if (zerot) {
@@ -437,9 +428,9 @@ th
 
 /*                 Compute the 1-norm of A. */
 
-		    anorm = zlanht_("1", &n, &d[1], &e[1]);
+		    anorm = zlanht_("1", &n, &d__[1], &e[1]);
 
-		    dcopy_(&n, &d[1], &c__1, &d[n + 1], &c__1);
+		    dcopy_(&n, &d__[1], &c__1, &d__[n + 1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			zcopy_(&i__3, &e[1], &c__1, &e[n + 1], &c__1);
@@ -447,34 +438,31 @@ th
 
 /*                 Factor the matrix A. */
 
-		    zpttrf_(&n, &d[n + 1], &e[n + 1], &info);
+		    zpttrf_(&n, &d__[n + 1], &e[n + 1], &info);
 
-/*                 Use ZPTTRS to solve for one column at a
- time of   
-                   inv(A), computing the maximum column su
-m as we go. */
+/*                 Use ZPTTRS to solve for one column at a time of   
+                   inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    i__5 = j;
 			    x[i__5].r = 0., x[i__5].i = 0.;
 /* L50: */
 			}
-			i__4 = i;
+			i__4 = i__;
 			x[i__4].r = 1., x[i__4].i = 0.;
-			zpttrs_("Lower", &n, &c__1, &d[n + 1], &e[n + 1], &x[
-				1], &lda, &info);
+			zpttrs_("Lower", &n, &c__1, &d__[n + 1], &e[n + 1], &
+				x[1], &lda, &info);
 /* Computing MAX */
 			d__1 = ainvnm, d__2 = dzasum_(&n, &x[1], &c__1);
 			ainvnm = max(d__1,d__2);
 /* L60: */
 		    }
 
-/*                 Compute the 1-norm condition number of 
-A. */
+/*                 Compute the 1-norm condition number of A. */
 
 		    if (anorm <= 0. || ainvnm <= 0.) {
 			rcondc = 1.;
@@ -487,19 +475,18 @@ A. */
 
 /*                 --- Test ZPTSV -- */
 
-		    dcopy_(&n, &d[1], &c__1, &d[n + 1], &c__1);
+		    dcopy_(&n, &d__[1], &c__1, &d__[n + 1], &c__1);
 		    if (n > 1) {
 			i__3 = n - 1;
 			zcopy_(&i__3, &e[1], &c__1, &e[n + 1], &c__1);
 		    }
 		    zlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
 
-/*                 Factor A as L*D*L' and solve the system
- A*X = B. */
+/*                 Factor A as L*D*L' and solve the system A*X = B. */
 
-		    s_copy(srnamc_1.srnamt, "ZPTSV ", 6L, 6L);
-		    zptsv_(&n, nrhs, &d[n + 1], &e[n + 1], &x[1], &lda, &info)
-			    ;
+		    s_copy(srnamc_1.srnamt, "ZPTSV ", (ftnlen)6, (ftnlen)6);
+		    zptsv_(&n, nrhs, &d__[n + 1], &e[n + 1], &x[1], &lda, &
+			    info);
 
 /*                 Check error code from ZPTSV . */
 
@@ -511,31 +498,26 @@ A. */
 		    nt = 0;
 		    if (izero == 0) {
 
-/*                    Check the factorization by compu
-ting the ratio   
-                         norm(L*D*L' - A) / (n * norm(
-A) * EPS ) */
+/*                    Check the factorization by computing the ratio   
+                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
-			zptt01_(&n, &d[1], &e[1], &d[n + 1], &e[n + 1], &work[
-				1], result);
+			zptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
+				work[1], result);
 
-/*                    Compute the residual in the solu
-tion. */
+/*                    Compute the residual in the solution. */
 
 			zlacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
-			zptt02_("Lower", &n, nrhs, &d[1], &e[1], &x[1], &lda, 
-				&work[1], &lda, &result[1]);
+			zptt02_("Lower", &n, nrhs, &d__[1], &e[1], &x[1], &
+				lda, &work[1], &lda, &result[1]);
 
-/*                    Check solution from generated ex
-act solution. */
+/*                    Check solution from generated exact solution. */
 
 			zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
 				rcondc, &result[2]);
 			nt = 3;
 		    }
 
-/*                 Print information about the tests that 
-did not pass   
+/*                 Print information about the tests that did not pass   
                    the threshold. */
 
 		    i__3 = nt;
@@ -546,7 +528,7 @@ did not pass
 			    }
 			    io___35.ciunit = *nout;
 			    s_wsfe(&io___35);
-			    do_fio(&c__1, "ZPTSV ", 6L);
+			    do_fio(&c__1, "ZPTSV ", (ftnlen)6);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
@@ -567,31 +549,29 @@ did not pass
 
 		if (ifact > 1) {
 
-/*                 Initialize D( N+1:2*N ) and E( N+1:2*N 
-) to zero. */
+/*                 Initialize D( N+1:2*N ) and E( N+1:2*N ) to zero. */
 
 		    i__3 = n - 1;
-		    for (i = 1; i <= i__3; ++i) {
-			d[n + i] = 0.;
-			i__4 = n + i;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			d__[n + i__] = 0.;
+			i__4 = n + i__;
 			e[i__4].r = 0., e[i__4].i = 0.;
 /* L80: */
 		    }
 		    if (n > 0) {
-			d[n + n] = 0.;
+			d__[n + n] = 0.;
 		    }
 		}
 
 		zlaset_("Full", &n, nrhs, &c_b62, &c_b62, &x[1], &lda);
 
-/*              Solve the system and compute the condition num
-ber and   
+/*              Solve the system and compute the condition number and   
                 error bounds using ZPTSVX. */
 
-		s_copy(srnamc_1.srnamt, "ZPTSVX", 6L, 6L);
-		zptsvx_(fact, &n, nrhs, &d[1], &e[1], &d[n + 1], &e[n + 1], &
-			b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[*
-			nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], &info);
+		s_copy(srnamc_1.srnamt, "ZPTSVX", (ftnlen)6, (ftnlen)6);
+		zptsvx_(fact, &n, nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1]
+			, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
+			*nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], &info);
 
 /*              Check the error code from ZPTSVX. */
 
@@ -602,49 +582,41 @@ ber and
 		if (izero == 0) {
 		    if (ifact == 2) {
 
-/*                    Check the factorization by compu
-ting the ratio   
-                         norm(L*D*L' - A) / (n * norm(
-A) * EPS ) */
+/*                    Check the factorization by computing the ratio   
+                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			k1 = 1;
-			zptt01_(&n, &d[1], &e[1], &d[n + 1], &e[n + 1], &work[
-				1], result);
+			zptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
+				work[1], result);
 		    } else {
 			k1 = 2;
 		    }
 
-/*                 Compute the residual in the solution. 
-*/
+/*                 Compute the residual in the solution. */
 
-		    zlacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda)
-			    ;
-		    zptt02_("Lower", &n, nrhs, &d[1], &e[1], &x[1], &lda, &
+		    zlacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
+		    zptt02_("Lower", &n, nrhs, &d__[1], &e[1], &x[1], &lda, &
 			    work[1], &lda, &result[1]);
 
-/*                 Check solution from generated exact sol
-ution. */
+/*                 Check solution from generated exact solution. */
 
 		    zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
 			    result[2]);
 
-/*                 Check error bounds from iterative refin
-ement. */
+/*                 Check error bounds from iterative refinement. */
 
-		    zptt05_(&n, nrhs, &d[1], &e[1], &b[1], &lda, &x[1], &lda, 
-			    &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1], &
-			    result[3]);
+		    zptt05_(&n, nrhs, &d__[1], &e[1], &b[1], &lda, &x[1], &
+			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1],
+			     &result[3]);
 		} else {
 		    k1 = 6;
 		}
 
-/*              Check the reciprocal of the condition number. 
-*/
+/*              Check the reciprocal of the condition number. */
 
 		result[5] = dget06_(&rcond, &rcondc);
 
-/*              Print information about the tests that did not
- pass   
+/*              Print information about the tests that did not pass   
                 the threshold. */
 
 		for (k = k1; k <= 6; ++k) {
@@ -654,8 +626,8 @@ ement. */
 			}
 			io___38.ciunit = *nout;
 			s_wsfe(&io___38);
-			do_fio(&c__1, "ZPTSVX", 6L);
-			do_fio(&c__1, fact, 1L);
+			do_fio(&c__1, "ZPTSVX", (ftnlen)6);
+			do_fio(&c__1, fact, (ftnlen)1);
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));

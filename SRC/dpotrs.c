@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dpotrs_(char *uplo, integer *n, integer *nrhs, 
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -32,8 +33,7 @@
             of the matrix B.  NRHS >= 0.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The triangular factor U or L from the Cholesky factorization 
-  
+            The triangular factor U or L from the Cholesky factorization   
             A = U**T*U or A = L*L**T, as computed by DPOTRF.   
 
     LDA     (input) INTEGER   
@@ -50,15 +50,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b9 = 1.;
     
@@ -73,11 +70,14 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -109,12 +109,13 @@
 
           Solve U'*X = B, overwriting B with X. */
 
-	dtrsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b9, &A(1,1), lda, &B(1,1), ldb);
+	dtrsm_("Left", "Upper", "Transpose", "Non-unit", n, nrhs, &c_b9, &a[
+		a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve U*X = B, overwriting B with X. */
 
 	dtrsm_("Left", "Upper", "No transpose", "Non-unit", n, nrhs, &c_b9, &
-		A(1,1), lda, &B(1,1), ldb);
+		a[a_offset], lda, &b[b_offset], ldb);
     } else {
 
 /*        Solve A*X = B where A = L*L'.   
@@ -122,11 +123,12 @@
           Solve L*X = B, overwriting B with X. */
 
 	dtrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b9, &
-		A(1,1), lda, &B(1,1), ldb);
+		a[a_offset], lda, &b[b_offset], ldb);
 
 /*        Solve L'*X = B, overwriting B with X. */
 
-	dtrsm_("Left", "Lower", "Transpose", "Non-unit", n, nrhs, &c_b9, &A(1,1), lda, &B(1,1), ldb);
+	dtrsm_("Left", "Lower", "Transpose", "Non-unit", n, nrhs, &c_b9, &a[
+		a_offset], lda, &b[b_offset], ldb);
     }
 
     return 0;

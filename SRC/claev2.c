@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int claev2_(complex *a, complex *b, complex *c, real *rt1, 
+/* Subroutine */ int claev2_(complex *a, complex *b, complex *c__, real *rt1, 
 	real *rt2, real *cs1, complex *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -15,16 +16,12 @@
     CLAEV2 computes the eigendecomposition of a 2-by-2 Hermitian matrix   
        [  A         B  ]   
        [  CONJG(B)  C  ].   
-    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the 
-  
-    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right 
-  
+    On return, RT1 is the eigenvalue of larger absolute value, RT2 is the   
+    eigenvalue of smaller absolute value, and (CS1,SN1) is the unit right   
     eigenvector for RT1, giving the decomposition   
 
-    [ CS1  CONJG(SN1) ] [    A     B ] [ CS1 -CONJG(SN1) ] = [ RT1  0  ] 
-  
-    [-SN1     CS1     ] [ CONJG(B) C ] [ SN1     CS1     ]   [  0  RT2 ]. 
-  
+    [ CS1  CONJG(SN1) ] [    A     B ] [ CS1 -CONJG(SN1) ] = [ RT1  0  ]   
+    [-SN1     CS1     ] [ CONJG(B) C ] [ SN1     CS1     ]   [  0  RT2 ].   
 
     Arguments   
     =========   
@@ -61,16 +58,13 @@
 
     CS1 and SN1 are accurate to a few ulps barring over/underflow.   
 
-    Overflow is possible only if RT1 is within a factor of 5 of overflow. 
-  
+    Overflow is possible only if RT1 is within a factor of 5 of overflow.   
     Underflow is harmless if the input data is 0 or exceeds   
        underflow_threshold / macheps.   
 
-   ===================================================================== 
-*/
+   ===================================================================== */
     /* System generated locals */
     real r__1, r__2, r__3;
-    doublereal d__1;
     complex q__1, q__2;
     /* Builtin functions */
     double c_abs(complex *);
@@ -87,13 +81,13 @@
 	w.r = 1.f, w.i = 0.f;
     } else {
 	r_cnjg(&q__2, b);
-	d__1 = c_abs(b);
-	q__1.r = q__2.r / d__1, q__1.i = q__2.i / d__1;
+	r__1 = c_abs(b);
+	q__1.r = q__2.r / r__1, q__1.i = q__2.i / r__1;
 	w.r = q__1.r, w.i = q__1.i;
     }
     r__1 = a->r;
     r__2 = c_abs(b);
-    r__3 = c->r;
+    r__3 = c__->r;
     slaev2_(&r__1, &r__2, &r__3, rt1, rt2, cs1, &t);
     q__1.r = t * w.r, q__1.i = t * w.i;
     sn1->r = q__1.r, sn1->i = q__1.i;

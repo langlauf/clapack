@@ -1,32 +1,22 @@
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int crotg_(complex *ca, complex *cb, real *c, complex *s)
+/* Subroutine */ int crotg_(complex *ca, complex *cb, real *c__, complex *s)
 {
-
-
     /* System generated locals */
     real r__1, r__2;
-    doublereal d__1;
     complex q__1, q__2, q__3;
-
     /* Builtin functions */
     double c_abs(complex *), sqrt(doublereal);
     void r_cnjg(complex *, complex *);
-
     /* Local variables */
     static real norm;
     static complex alpha;
     static real scale;
-
     if (c_abs(ca) != 0.f) {
 	goto L10;
     }
-    *c = 0.f;
+    *c__ = 0.f;
     s->r = 1.f, s->i = 0.f;
     ca->r = cb->r, ca->i = cb->i;
     goto L20;
@@ -39,10 +29,10 @@ L10:
 /* Computing 2nd power */
     r__2 = c_abs(&q__2);
     norm = scale * sqrt(r__1 * r__1 + r__2 * r__2);
-    d__1 = c_abs(ca);
-    q__1.r = ca->r / d__1, q__1.i = ca->i / d__1;
+    r__1 = c_abs(ca);
+    q__1.r = ca->r / r__1, q__1.i = ca->i / r__1;
     alpha.r = q__1.r, alpha.i = q__1.i;
-    *c = c_abs(ca) / norm;
+    *c__ = c_abs(ca) / norm;
     r_cnjg(&q__3, cb);
     q__2.r = alpha.r * q__3.r - alpha.i * q__3.i, q__2.i = alpha.r * q__3.i + 
 	    alpha.i * q__3.r;

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dpoequ_(integer *n, doublereal *a, integer *lda, 
 	doublereal *s, doublereal *scond, doublereal *amax, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -13,8 +14,7 @@
     =======   
 
     DPOEQU computes row and column scalings intended to equilibrate a   
-    symmetric positive definite matrix A and reduce its condition number 
-  
+    symmetric positive definite matrix A and reduce its condition number   
     (with respect to the two-norm).  S contains the scale factors,   
     S(i) = 1/sqrt(A(i,i)), chosen so that the scaled matrix B with   
     elements B(i,j) = S(i)*A(i,j)*S(j) has ones on the diagonal.  This   
@@ -30,8 +30,7 @@
 
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The N-by-N symmetric positive definite matrix whose scaling   
-            factors are to be computed.  Only the diagonal elements of A 
-  
+            factors are to be computed.  Only the diagonal elements of A   
             are referenced.   
 
     LDA     (input) INTEGER   
@@ -53,18 +52,14 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the i-th diagonal element is nonpositive. 
-  
+            > 0:  if INFO = i, the i-th diagonal element is nonpositive.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1;
     doublereal d__1, d__2;
@@ -72,14 +67,16 @@
     double sqrt(doublereal);
     /* Local variables */
     static doublereal smin;
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --s;
 
-#define S(I) s[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -102,17 +99,17 @@
 
 /*     Find the minimum and maximum diagonal elements. */
 
-    S(1) = A(1,1);
-    smin = S(1);
-    *amax = S(1);
+    s[1] = a_ref(1, 1);
+    smin = s[1];
+    *amax = s[1];
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	S(i) = A(i,i);
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	s[i__] = a_ref(i__, i__);
 /* Computing MIN */
-	d__1 = smin, d__2 = S(i);
+	d__1 = smin, d__2 = s[i__];
 	smin = min(d__1,d__2);
 /* Computing MAX */
-	d__1 = *amax, d__2 = S(i);
+	d__1 = *amax, d__2 = s[i__];
 	*amax = max(d__1,d__2);
 /* L10: */
     }
@@ -122,9 +119,9 @@
 /*        Find the first non-positive diagonal element and return. */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    if (S(i) <= 0.) {
-		*info = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (s[i__] <= 0.) {
+		*info = i__;
 		return 0;
 	    }
 /* L20: */
@@ -135,8 +132,8 @@
           of the diagonal elements. */
 
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    S(i) = 1. / sqrt(S(i));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    s[i__] = 1. / sqrt(s[i__]);
 /* L30: */
 	}
 
@@ -149,4 +146,7 @@
 /*     End of DPOEQU */
 
 } /* dpoequ_ */
+
+#undef a_ref
+
 

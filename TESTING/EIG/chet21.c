@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static complex c_b2 = {1.f,0.f};
 static integer c__1 = 1;
 
 /* Subroutine */ int chet21_(integer *itype, char *uplo, integer *n, integer *
-	kband, complex *a, integer *lda, real *d, real *e, complex *u, 
+	kband, complex *a, integer *lda, real *d__, real *e, complex *u, 
 	integer *ldu, complex *v, integer *ldv, complex *tau, complex *work, 
 	real *rwork, real *result)
 {
@@ -58,7 +59,15 @@ static integer c__1 = 1;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -71,16 +80,13 @@ static integer c__1 = 1;
 
        A = U S U*   
 
-    where * means conjugate transpose, A is hermitian, U is unitary, and 
-  
+    where * means conjugate transpose, A is hermitian, U is unitary, and   
     S is diagonal (if KBAND=0) or (real) symmetric tridiagonal (if   
     KBAND=1).   
 
     If ITYPE=1, then U is represented as a dense matrix; otherwise U is   
-    expressed as a product of Householder transformations, whose vectors 
-  
-    are stored in the array "V" and whose scaling constants are in "TAU". 
-  
+    expressed as a product of Householder transformations, whose vectors   
+    are stored in the array "V" and whose scaling constants are in "TAU".   
     We shall use the letter "V" to refer to the product of Householder   
     transformations (which should be equal to U).   
 
@@ -99,8 +105,7 @@ static integer c__1 = 1;
 
     For ITYPE > 1, the transformation U is expressed as a product   
     V = H(1)...H(n-2),  where H(j) = I  -  tau(j) v(j) v(j)*  and each   
-    vector v(j) has its first j elements 0 and the remaining n-j elements 
-  
+    vector v(j) has its first j elements 0 and the remaining n-j elements   
     stored in V(j+1:n,j).   
 
     Arguments   
@@ -112,8 +117,7 @@ static integer c__1 = 1;
                RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and*   
                RESULT(2) = | I - UU* | / ( n ulp )   
 
-            2: U expressed as a product V of Housholder transformations: 
-  
+            2: U expressed as a product V of Housholder transformations:   
                RESULT(1) = | A - V S V* | / ( |A| n ulp )   
 
             3: U expressed both as a dense unitary matrix and   
@@ -127,8 +131,7 @@ static integer c__1 = 1;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, CHET21 does nothing. 
-  
+            The size of the matrix.  If it is zero, CHET21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -156,8 +159,7 @@ static integer c__1 = 1;
 
     U       (input) COMPLEX array, dimension (LDU, N)   
             If ITYPE=1 or 3, this contains the unitary matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2, 
-  
+            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
             then it is not referenced.   
 
     LDU     (input) INTEGER   
@@ -171,10 +173,8 @@ static integer c__1 = 1;
             the lower triangle, if UPLO='U', then in the upper   
             triangle.   
             *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') 
-  
-            is set to one, and later reset to its original value, during 
-  
+            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
+            is set to one, and later reset to its original value, during   
             the course of the calculation.   
             If ITYPE=1, then it is neither referenced nor modified.   
 
@@ -198,21 +198,20 @@ static integer c__1 = 1;
             RESULT(1) is always modified.  RESULT(2) is modified only   
             if ITYPE=1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --tau;
     --work;
@@ -269,9 +268,8 @@ static integer c__1 = 1;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    r__1 = -(doublereal)d[j];
-	    cher_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1], n)
-		    ;
+	    r__1 = -d__[j];
+	    cher_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &work[1], n);
 /* L10: */
 	}
 
@@ -280,9 +278,9 @@ static integer c__1 = 1;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
 		q__2.r = e[i__2], q__2.i = 0.f;
-		q__1.r = -(doublereal)q__2.r, q__1.i = -(doublereal)q__2.i;
-		cher2_(cuplo, n, &q__1, &u[j * u_dim1 + 1], &c__1, &u[(j - 1) 
-			* u_dim1 + 1], &c__1, &work[1], n);
+		q__1.r = -q__2.r, q__1.i = -q__2.i;
+		cher2_(cuplo, n, &q__1, &u_ref(1, j), &c__1, &u_ref(1, j - 1),
+			 &c__1, &work[1], n);
 /* L20: */
 	    }
 	}
@@ -299,7 +297,7 @@ static integer c__1 = 1;
 	    i__2 = *n;
 	    i__1 = i__2 * i__2;
 	    i__3 = *n;
-	    work[i__1].r = d[i__3], work[i__1].i = 0.f;
+	    work[i__1].r = d__[i__3], work[i__1].i = 0.f;
 	    for (j = *n - 1; j >= 1; --j) {
 		if (*kband == 1) {
 		    i__1 = (*n + 1) * (j - 1) + 2;
@@ -312,11 +310,10 @@ static integer c__1 = 1;
 		    for (jr = j + 2; jr <= i__1; ++jr) {
 			i__2 = (j - 1) * *n + jr;
 			i__3 = j;
-			q__3.r = -(doublereal)tau[i__3].r, q__3.i = -(
-				doublereal)tau[i__3].i;
+			q__3.r = -tau[i__3].r, q__3.i = -tau[i__3].i;
 			i__4 = j;
 			q__2.r = e[i__4] * q__3.r, q__2.i = e[i__4] * q__3.i;
-			i__5 = jr + j * v_dim1;
+			i__5 = v_subscr(jr, j);
 			q__1.r = q__2.r * v[i__5].r - q__2.i * v[i__5].i, 
 				q__1.i = q__2.r * v[i__5].i + q__2.i * v[i__5]
 				.r;
@@ -325,25 +322,25 @@ static integer c__1 = 1;
 		    }
 		}
 
-		i__1 = j + 1 + j * v_dim1;
+		i__1 = v_subscr(j + 1, j);
 		vsave.r = v[i__1].r, vsave.i = v[i__1].i;
-		i__1 = j + 1 + j * v_dim1;
+		i__1 = v_subscr(j + 1, j);
 		v[i__1].r = 1.f, v[i__1].i = 0.f;
 		i__1 = *n - j;
 /* Computing 2nd power */
 		i__2 = *n;
-		clarfy_("L", &i__1, &v[j + 1 + j * v_dim1], &c__1, &tau[j], &
-			work[(*n + 1) * j + 1], n, &work[i__2 * i__2 + 1])
+		clarfy_("L", &i__1, &v_ref(j + 1, j), &c__1, &tau[j], &work[(*
+			n + 1) * j + 1], n, &work[i__2 * i__2 + 1])
 			;
-		i__1 = j + 1 + j * v_dim1;
+		i__1 = v_subscr(j + 1, j);
 		v[i__1].r = vsave.r, v[i__1].i = vsave.i;
 		i__1 = (*n + 1) * (j - 1) + 1;
 		i__2 = j;
-		work[i__1].r = d[i__2], work[i__1].i = 0.f;
+		work[i__1].r = d__[i__2], work[i__1].i = 0.f;
 /* L40: */
 	    }
 	} else {
-	    work[1].r = d[1], work[1].i = 0.f;
+	    work[1].r = d__[1], work[1].i = 0.f;
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*kband == 1) {
@@ -357,11 +354,10 @@ static integer c__1 = 1;
 		    for (jr = 1; jr <= i__2; ++jr) {
 			i__3 = j * *n + jr;
 			i__4 = j;
-			q__3.r = -(doublereal)tau[i__4].r, q__3.i = -(
-				doublereal)tau[i__4].i;
+			q__3.r = -tau[i__4].r, q__3.i = -tau[i__4].i;
 			i__5 = j;
 			q__2.r = e[i__5] * q__3.r, q__2.i = e[i__5] * q__3.i;
-			i__6 = jr + (j + 1) * v_dim1;
+			i__6 = v_subscr(jr, j + 1);
 			q__1.r = q__2.r * v[i__6].r - q__2.i * v[i__6].i, 
 				q__1.i = q__2.r * v[i__6].i + q__2.i * v[i__6]
 				.r;
@@ -370,19 +366,19 @@ static integer c__1 = 1;
 		    }
 		}
 
-		i__2 = j + (j + 1) * v_dim1;
+		i__2 = v_subscr(j, j + 1);
 		vsave.r = v[i__2].r, vsave.i = v[i__2].i;
-		i__2 = j + (j + 1) * v_dim1;
+		i__2 = v_subscr(j, j + 1);
 		v[i__2].r = 1.f, v[i__2].i = 0.f;
 /* Computing 2nd power */
 		i__2 = *n;
-		clarfy_("U", &j, &v[(j + 1) * v_dim1 + 1], &c__1, &tau[j], &
-			work[1], n, &work[i__2 * i__2 + 1]);
-		i__2 = j + (j + 1) * v_dim1;
+		clarfy_("U", &j, &v_ref(1, j + 1), &c__1, &tau[j], &work[1], 
+			n, &work[i__2 * i__2 + 1]);
+		i__2 = v_subscr(j, j + 1);
 		v[i__2].r = vsave.r, v[i__2].i = vsave.i;
 		i__2 = (*n + 1) * j + 1;
 		i__3 = j + 1;
-		work[i__2].r = d[i__3], work[i__2].i = 0.f;
+		work[i__2].r = d__[i__3], work[i__2].i = 0.f;
 /* L60: */
 	    }
 	}
@@ -394,7 +390,7 @@ static integer c__1 = 1;
 		for (jrow = jcol; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = jrow + jcol * a_dim1;
+		    i__5 = a_subscr(jrow, jcol);
 		    q__1.r = work[i__4].r - a[i__5].r, q__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -405,7 +401,7 @@ static integer c__1 = 1;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = jrow + jcol * a_dim1;
+		    i__5 = a_subscr(jrow, jcol);
 		    q__1.r = work[i__4].r - a[i__5].r, q__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -429,15 +425,15 @@ static integer c__1 = 1;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    cunm2r_("R", "C", n, &i__1, &i__2, &v[v_dim1 + 2], ldv, &tau[1], &
+	    cunm2r_("R", "C", n, &i__1, &i__2, &v_ref(2, 1), ldv, &tau[1], &
 		    work[*n + 1], n, &work[i__3 * i__3 + 1], &iinfo);
 	} else {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    cunm2l_("R", "C", n, &i__1, &i__2, &v[(v_dim1 << 1) + 1], ldv, &
-		    tau[1], &work[1], n, &work[i__3 * i__3 + 1], &iinfo);
+	    cunm2l_("R", "C", n, &i__1, &i__2, &v_ref(1, 2), ldv, &tau[1], &
+		    work[1], n, &work[i__3 * i__3 + 1], &iinfo);
 	}
 	if (iinfo != 0) {
 	    result[1] = 10.f / ulp;
@@ -488,8 +484,8 @@ static integer c__1 = 1;
 	}
 
 /* Computing MIN */
-	r__1 = clange_("1", n, n, &work[1], n, &rwork[1]), r__2 = (real) (
-		*n);
+	r__1 = clange_("1", n, n, &work[1], n, &rwork[1]), r__2 = (
+		real) (*n);
 	result[2] = dmin(r__1,r__2) / (*n * ulp);
     }
 
@@ -498,4 +494,12 @@ static integer c__1 = 1;
 /*     End of CHET21 */
 
 } /* chet21_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+#undef a_ref
+#undef a_subscr
+
 

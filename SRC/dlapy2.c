@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 doublereal dlapy2_(doublereal *x, doublereal *y)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -11,8 +12,7 @@ doublereal dlapy2_(doublereal *x, doublereal *y)
     Purpose   
     =======   
 
-    DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary 
-  
+    DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary   
     overflow.   
 
     Arguments   
@@ -22,27 +22,25 @@ doublereal dlapy2_(doublereal *x, doublereal *y)
     Y       (input) DOUBLE PRECISION   
             X and Y specify the values x and y.   
 
-    ===================================================================== 
-*/
-/* >>Start of File<<   
-       System generated locals */
+    ===================================================================== */
+    /* System generated locals */
     doublereal ret_val, d__1;
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static doublereal xabs, yabs, w, z;
+    static doublereal xabs, yabs, w, z__;
 
 
 
     xabs = abs(*x);
     yabs = abs(*y);
     w = max(xabs,yabs);
-    z = min(xabs,yabs);
-    if (z == 0.) {
+    z__ = min(xabs,yabs);
+    if (z__ == 0.) {
 	ret_val = w;
     } else {
 /* Computing 2nd power */
-	d__1 = z / w;
+	d__1 = z__ / w;
 	ret_val = w * sqrt(d__1 * d__1 + 1.);
     }
     return ret_val;

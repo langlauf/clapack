@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -37,7 +38,7 @@ static integer c__0 = 0;
     static doublereal wrin[20], vmul, stmp[20];
     static doublecomplex work[1200], wtmp[20];
     static doublereal wsrt[20];
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     static doublereal s[20];
     static doublecomplex t[400]	/* was [20][20] */;
     static doublereal v;
@@ -84,10 +85,20 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define t_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
+#define le_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define le_ref(a_1,a_2) le[le_subscr(a_1,a_2)]
+#define re_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define re_ref(a_1,a_2) re[re_subscr(a_1,a_2)]
+#define tmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
+#define tmp_ref(a_1,a_2) tmp[tmp_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -96,8 +107,7 @@ static integer c__0 = 0;
     ZGET37 tests ZTRSNA, a routine for estimating condition numbers of   
     eigenvalues and/or right eigenvectors of a matrix.   
 
-    The test matrices are read from a file with logical unit number NIN. 
-  
+    The test matrices are read from a file with logical unit number NIN.   
 
     Arguments   
     ==========   
@@ -119,9 +129,9 @@ static integer c__0 = 0;
             If ZTRSNA returns INFO nonzero on example i, LMAX(3)=i   
 
     NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = 1 if ZGEHRD returned INFO nonzero   
-            NINFO(2) = 1 if ZHSEQR returned INFO nonzero   
-            NINFO(3) = 1 if ZTRSNA returned INFO nonzero   
+            NINFO(1) = No. of times ZGEHRD returned INFO nonzero   
+            NINFO(2) = No. of times ZHSEQR returned INFO nonzero   
+            NINFO(3) = No. of times ZTRSNA returned INFO nonzero   
 
     KNT     (output) INTEGER   
             Total number of examples tested.   
@@ -129,8 +139,7 @@ static integer c__0 = 0;
     NIN     (input) INTEGER   
             Input logical unit number   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -175,29 +184,29 @@ L10:
 	return 0;
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___9.ciunit = *nin;
 	s_rsle(&io___9);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&tmp[i + j * 20 - 21], (ftnlen)
-		    sizeof(doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
+		    doublecomplex));
 	}
 	e_rsle();
 /* L20: */
     }
     i__1 = n;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	io___12.ciunit = *nin;
 	s_rsle(&io___12);
-	do_lio(&c__5, &c__1, (char *)&wrin[i - 1], (ftnlen)sizeof(doublereal))
-		;
-	do_lio(&c__5, &c__1, (char *)&wiin[i - 1], (ftnlen)sizeof(doublereal))
-		;
-	do_lio(&c__5, &c__1, (char *)&sin__[i - 1], (ftnlen)sizeof(doublereal)
-		);
-	do_lio(&c__5, &c__1, (char *)&sepin[i - 1], (ftnlen)sizeof(doublereal)
-		);
+	do_lio(&c__5, &c__1, (char *)&wrin[i__ - 1], (ftnlen)sizeof(
+		doublereal));
+	do_lio(&c__5, &c__1, (char *)&wiin[i__ - 1], (ftnlen)sizeof(
+		doublereal));
+	do_lio(&c__5, &c__1, (char *)&sin__[i__ - 1], (ftnlen)sizeof(
+		doublereal));
+	do_lio(&c__5, &c__1, (char *)&sepin[i__ - 1], (ftnlen)sizeof(
+		doublereal));
 	e_rsle();
 /* L30: */
     }
@@ -210,8 +219,8 @@ L10:
 	zlacpy_("F", &n, &n, tmp, &c__20, t, &c__20);
 	vmul = val[iscl - 1];
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    zdscal_(&n, &vmul, &t[i * 20 - 20], &c__1);
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    zdscal_(&n, &vmul, &t_ref(1, i__), &c__1);
 /* L40: */
 	}
 	if (tnrm == 0.) {
@@ -225,13 +234,13 @@ L10:
 	if (info != 0) {
 	    lmax[1] = *knt;
 	    ++ninfo[1];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n - 2;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = n;
-	    for (i = j + 2; i <= i__2; ++i) {
-		i__3 = i + j * 20 - 21;
+	    for (i__ = j + 2; i__ <= i__2; ++i__) {
+		i__3 = t_subscr(i__, j);
 		t[i__3].r = 0., t[i__3].i = 0.;
 /* L50: */
 	    }
@@ -245,14 +254,14 @@ L10:
 	if (info != 0) {
 	    lmax[2] = *knt;
 	    ++ninfo[2];
-	    return 0;
+	    goto L260;
 	}
 
 /*        Compute eigenvectors */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    select[i - 1] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    select[i__ - 1] = TRUE_;
 /* L70: */
 	}
 	ztrevc_("B", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, &n, &
@@ -265,7 +274,7 @@ L10:
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 
 /*        Sort eigenvalues and condition numbers lexicographically   
@@ -277,9 +286,9 @@ L10:
 /*           Sort by increasing real part */
 
 	    i__1 = n;
-	    for (i = 1; i <= i__1; ++i) {
-		i__2 = i - 1;
-		wsrt[i - 1] = w[i__2].r;
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = i__ - 1;
+		wsrt[i__ - 1] = w[i__2].r;
 /* L80: */
 	    }
 	} else {
@@ -287,8 +296,8 @@ L10:
 /*           Sort by increasing imaginary part */
 
 	    i__1 = n;
-	    for (i = 1; i <= i__1; ++i) {
-		wsrt[i - 1] = d_imag(&w[i - 1]);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		wsrt[i__ - 1] = d_imag(&w[i__ - 1]);
 /* L90: */
 	    }
 	}
@@ -297,32 +306,32 @@ L10:
 	d__1 = 1. / vmul;
 	dscal_(&n, &d__1, septmp, &c__1);
 	i__1 = n - 1;
-	for (i = 1; i <= i__1; ++i) {
-	    kmin = i;
-	    vmin = wsrt[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    kmin = i__;
+	    vmin = wsrt[i__ - 1];
 	    i__2 = n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		if (wsrt[j - 1] < vmin) {
 		    kmin = j;
 		    vmin = wsrt[j - 1];
 		}
 /* L100: */
 	    }
-	    wsrt[kmin - 1] = wsrt[i - 1];
-	    wsrt[i - 1] = vmin;
-	    i__2 = i - 1;
+	    wsrt[kmin - 1] = wsrt[i__ - 1];
+	    wsrt[i__ - 1] = vmin;
+	    i__2 = i__ - 1;
 	    vcmin = wtmp[i__2].r;
-	    i__2 = i - 1;
+	    i__2 = i__ - 1;
 	    i__3 = kmin - 1;
 	    wtmp[i__2].r = w[i__3].r, wtmp[i__2].i = w[i__3].i;
 	    i__2 = kmin - 1;
 	    wtmp[i__2].r = vcmin, wtmp[i__2].i = 0.;
 	    vmin = stmp[kmin - 1];
-	    stmp[kmin - 1] = stmp[i - 1];
-	    stmp[i - 1] = vmin;
+	    stmp[kmin - 1] = stmp[i__ - 1];
+	    stmp[i__ - 1] = vmin;
 	    vmin = septmp[kmin - 1];
-	    septmp[kmin - 1] = septmp[i - 1];
-	    septmp[i - 1] = vmin;
+	    septmp[kmin - 1] = septmp[i__ - 1];
+	    septmp[i__ - 1] = vmin;
 /* L110: */
 	}
 
@@ -336,16 +345,16 @@ L10:
 	    v = 1.;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (v > septmp[i - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (v > septmp[i__ - 1]) {
 		tol = 1.;
 	    } else {
-		tol = v / septmp[i - 1];
+		tol = v / septmp[i__ - 1];
 	    }
-	    if (v > sepin[i - 1]) {
+	    if (v > sepin[i__ - 1]) {
 		tolin = 1.;
 	    } else {
-		tolin = v / sepin[i - 1];
+		tolin = v / sepin[i__ - 1];
 	    }
 /* Computing MAX */
 	    d__1 = tol, d__2 = smlnum / eps;
@@ -353,20 +362,22 @@ L10:
 /* Computing MAX */
 	    d__1 = tolin, d__2 = smlnum / eps;
 	    tolin = max(d__1,d__2);
-	    if (eps * (sin__[i - 1] - tolin) > stmp[i - 1] + tol) {
+	    if (eps * (sin__[i__ - 1] - tolin) > stmp[i__ - 1] + tol) {
 		vmax = 1. / eps;
-	    } else if (sin__[i - 1] - tolin > stmp[i - 1] + tol) {
-		vmax = (sin__[i - 1] - tolin) / (stmp[i - 1] + tol);
-	    } else if (sin__[i - 1] + tolin < eps * (stmp[i - 1] - tol)) {
+	    } else if (sin__[i__ - 1] - tolin > stmp[i__ - 1] + tol) {
+		vmax = (sin__[i__ - 1] - tolin) / (stmp[i__ - 1] + tol);
+	    } else if (sin__[i__ - 1] + tolin < eps * (stmp[i__ - 1] - tol)) {
 		vmax = 1. / eps;
-	    } else if (sin__[i - 1] + tolin < stmp[i - 1] - tol) {
-		vmax = (stmp[i - 1] - tol) / (sin__[i - 1] + tolin);
+	    } else if (sin__[i__ - 1] + tolin < stmp[i__ - 1] - tol) {
+		vmax = (stmp[i__ - 1] - tol) / (sin__[i__ - 1] + tolin);
 	    } else {
 		vmax = 1.;
 	    }
 	    if (vmax > rmax[2]) {
 		rmax[2] = vmax;
-		lmax[2] = *knt;
+		if (ninfo[2] == 0) {
+		    lmax[2] = *knt;
+		}
 	    }
 /* L120: */
 	}
@@ -375,16 +386,16 @@ L10:
           taking their condition numbers into account */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (v > septmp[i - 1] * stmp[i - 1]) {
-		tol = septmp[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (v > septmp[i__ - 1] * stmp[i__ - 1]) {
+		tol = septmp[i__ - 1];
 	    } else {
-		tol = v / stmp[i - 1];
+		tol = v / stmp[i__ - 1];
 	    }
-	    if (v > sepin[i - 1] * sin__[i - 1]) {
-		tolin = sepin[i - 1];
+	    if (v > sepin[i__ - 1] * sin__[i__ - 1]) {
+		tolin = sepin[i__ - 1];
 	    } else {
-		tolin = v / sin__[i - 1];
+		tolin = v / sin__[i__ - 1];
 	    }
 /* Computing MAX */
 	    d__1 = tol, d__2 = smlnum / eps;
@@ -392,20 +403,23 @@ L10:
 /* Computing MAX */
 	    d__1 = tolin, d__2 = smlnum / eps;
 	    tolin = max(d__1,d__2);
-	    if (eps * (sepin[i - 1] - tolin) > septmp[i - 1] + tol) {
+	    if (eps * (sepin[i__ - 1] - tolin) > septmp[i__ - 1] + tol) {
 		vmax = 1. / eps;
-	    } else if (sepin[i - 1] - tolin > septmp[i - 1] + tol) {
-		vmax = (sepin[i - 1] - tolin) / (septmp[i - 1] + tol);
-	    } else if (sepin[i - 1] + tolin < eps * (septmp[i - 1] - tol)) {
+	    } else if (sepin[i__ - 1] - tolin > septmp[i__ - 1] + tol) {
+		vmax = (sepin[i__ - 1] - tolin) / (septmp[i__ - 1] + tol);
+	    } else if (sepin[i__ - 1] + tolin < eps * (septmp[i__ - 1] - tol))
+		     {
 		vmax = 1. / eps;
-	    } else if (sepin[i - 1] + tolin < septmp[i - 1] - tol) {
-		vmax = (septmp[i - 1] - tol) / (sepin[i - 1] + tolin);
+	    } else if (sepin[i__ - 1] + tolin < septmp[i__ - 1] - tol) {
+		vmax = (septmp[i__ - 1] - tol) / (sepin[i__ - 1] + tolin);
 	    } else {
 		vmax = 1.;
 	    }
 	    if (vmax > rmax[2]) {
 		rmax[2] = vmax;
-		lmax[2] = *knt;
+		if (ninfo[2] == 0) {
+		    lmax[2] = *knt;
+		}
 	    }
 /* L130: */
 	}
@@ -414,24 +428,26 @@ L10:
           without taking their condition numbers into account */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (sin__[i - 1] <= (doublereal) (n << 1) * eps && stmp[i - 1] <= 
-		    (doublereal) (n << 1) * eps) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (sin__[i__ - 1] <= (doublereal) (n << 1) * eps && stmp[i__ - 1]
+		     <= (doublereal) (n << 1) * eps) {
 		vmax = 1.;
-	    } else if (eps * sin__[i - 1] > stmp[i - 1]) {
+	    } else if (eps * sin__[i__ - 1] > stmp[i__ - 1]) {
 		vmax = 1. / eps;
-	    } else if (sin__[i - 1] > stmp[i - 1]) {
-		vmax = sin__[i - 1] / stmp[i - 1];
-	    } else if (sin__[i - 1] < eps * stmp[i - 1]) {
+	    } else if (sin__[i__ - 1] > stmp[i__ - 1]) {
+		vmax = sin__[i__ - 1] / stmp[i__ - 1];
+	    } else if (sin__[i__ - 1] < eps * stmp[i__ - 1]) {
 		vmax = 1. / eps;
-	    } else if (sin__[i - 1] < stmp[i - 1]) {
-		vmax = stmp[i - 1] / sin__[i - 1];
+	    } else if (sin__[i__ - 1] < stmp[i__ - 1]) {
+		vmax = stmp[i__ - 1] / sin__[i__ - 1];
 	    } else {
 		vmax = 1.;
 	    }
 	    if (vmax > rmax[3]) {
 		rmax[3] = vmax;
-		lmax[3] = *knt;
+		if (ninfo[3] == 0) {
+		    lmax[3] = *knt;
+		}
 	    }
 /* L140: */
 	}
@@ -440,23 +456,25 @@ L10:
           without taking their condition numbers into account */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (sepin[i - 1] <= v && septmp[i - 1] <= v) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (sepin[i__ - 1] <= v && septmp[i__ - 1] <= v) {
 		vmax = 1.;
-	    } else if (eps * sepin[i - 1] > septmp[i - 1]) {
+	    } else if (eps * sepin[i__ - 1] > septmp[i__ - 1]) {
 		vmax = 1. / eps;
-	    } else if (sepin[i - 1] > septmp[i - 1]) {
-		vmax = sepin[i - 1] / septmp[i - 1];
-	    } else if (sepin[i - 1] < eps * septmp[i - 1]) {
+	    } else if (sepin[i__ - 1] > septmp[i__ - 1]) {
+		vmax = sepin[i__ - 1] / septmp[i__ - 1];
+	    } else if (sepin[i__ - 1] < eps * septmp[i__ - 1]) {
 		vmax = 1. / eps;
-	    } else if (sepin[i - 1] < septmp[i - 1]) {
-		vmax = septmp[i - 1] / sepin[i - 1];
+	    } else if (sepin[i__ - 1] < septmp[i__ - 1]) {
+		vmax = septmp[i__ - 1] / sepin[i__ - 1];
 	    } else {
 		vmax = 1.;
 	    }
 	    if (vmax > rmax[3]) {
 		rmax[3] = vmax;
-		lmax[3] = *knt;
+		if (ninfo[3] == 0) {
+		    lmax[3] = *knt;
+		}
 	    }
 /* L150: */
 	}
@@ -468,18 +486,19 @@ L10:
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
 	ztrsna_("E", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (stmp[i - 1] != s[i - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (stmp[i__ - 1] != s[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != dum[0]) {
+	    if (septmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
 /* L160: */
@@ -490,18 +509,19 @@ L10:
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
 	ztrsna_("V", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (stmp[i - 1] != dum[0]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (stmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != sep[i - 1]) {
+	    if (septmp[i__ - 1] != sep[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
 /* L170: */
@@ -510,85 +530,88 @@ L10:
 /*        Compute all condition numbers using SELECT and compare */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    select[i - 1] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    select[i__ - 1] = TRUE_;
 /* L180: */
 	}
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
 	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (septmp[i - 1] != sep[i - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (septmp[i__ - 1] != sep[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
-	    if (stmp[i - 1] != s[i - 1]) {
+	    if (stmp[i__ - 1] != s[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
 /* L190: */
 	}
 
-/*        Compute eigenvalue condition numbers using SELECT and compar
-e */
+/*        Compute eigenvalue condition numbers using SELECT and compare */
 
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
 	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (stmp[i - 1] != s[i - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (stmp[i__ - 1] != s[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != dum[0]) {
+	    if (septmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
 /* L200: */
 	}
 
-/*        Compute eigenvector condition numbers using SELECT and compa
-re */
+/*        Compute eigenvector condition numbers using SELECT and compare */
 
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
 	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    if (stmp[i - 1] != dum[0]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (stmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != sep[i - 1]) {
+	    if (septmp[i__ - 1] != sep[i__ - 1]) {
 		vmax = 1. / eps;
 	    }
 /* L210: */
 	}
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
 
 /*        Select second and next to last eigenvalues */
 
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    select[i - 1] = FALSE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    select[i__ - 1] = FALSE_;
 /* L220: */
 	}
 	icmp = 0;
@@ -596,15 +619,15 @@ re */
 	    icmp = 1;
 	    lcmp[0] = 2;
 	    select[1] = TRUE_;
-	    zcopy_(&n, &re[20], &c__1, re, &c__1);
-	    zcopy_(&n, &le[20], &c__1, le, &c__1);
+	    zcopy_(&n, &re_ref(1, 2), &c__1, &re_ref(1, 1), &c__1);
+	    zcopy_(&n, &le_ref(1, 2), &c__1, &le_ref(1, 1), &c__1);
 	}
 	if (n > 3) {
 	    icmp = 2;
 	    lcmp[1] = n - 1;
 	    select[n - 2] = TRUE_;
-	    zcopy_(&n, &re[(n - 1) * 20 - 20], &c__1, &re[20], &c__1);
-	    zcopy_(&n, &le[(n - 1) * 20 - 20], &c__1, &le[20], &c__1);
+	    zcopy_(&n, &re_ref(1, n - 1), &c__1, &re_ref(1, 2), &c__1);
+	    zcopy_(&n, &le_ref(1, n - 1), &c__1, &le_ref(1, 2), &c__1);
 	}
 
 /*        Compute all selected condition numbers */
@@ -612,19 +635,20 @@ re */
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
 	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = icmp;
-	for (i = 1; i <= i__1; ++i) {
-	    j = lcmp[i - 1];
-	    if (septmp[i - 1] != sep[j - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    j = lcmp[i__ - 1];
+	    if (septmp[i__ - 1] != sep[j - 1]) {
 		vmax = 1. / eps;
 	    }
-	    if (stmp[i - 1] != s[j - 1]) {
+	    if (stmp[i__ - 1] != s[j - 1]) {
 		vmax = 1. / eps;
 	    }
 /* L230: */
@@ -635,19 +659,20 @@ re */
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
 	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = icmp;
-	for (i = 1; i <= i__1; ++i) {
-	    j = lcmp[i - 1];
-	    if (stmp[i - 1] != s[j - 1]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    j = lcmp[i__ - 1];
+	    if (stmp[i__ - 1] != s[j - 1]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != dum[0]) {
+	    if (septmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
 /* L240: */
@@ -658,32 +683,46 @@ re */
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
 	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
-		 septmp, &n, &m, work, &n, rwork, &info);
+		 septmp, &n, &m, work, &n, rwork, &info)
+		;
 	if (info != 0) {
 	    lmax[3] = *knt;
 	    ++ninfo[3];
-	    return 0;
+	    goto L260;
 	}
 	i__1 = icmp;
-	for (i = 1; i <= i__1; ++i) {
-	    j = lcmp[i - 1];
-	    if (stmp[i - 1] != dum[0]) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    j = lcmp[i__ - 1];
+	    if (stmp[i__ - 1] != dum[0]) {
 		vmax = 1. / eps;
 	    }
-	    if (septmp[i - 1] != sep[j - 1]) {
+	    if (septmp[i__ - 1] != sep[j - 1]) {
 		vmax = 1. / eps;
 	    }
 /* L250: */
 	}
 	if (vmax > rmax[1]) {
 	    rmax[1] = vmax;
-	    lmax[1] = *knt;
+	    if (ninfo[1] == 0) {
+		lmax[1] = *knt;
+	    }
 	}
-/* L260: */
+L260:
+	;
     }
     goto L10;
 
 /*     End of ZGET37 */
 
 } /* zget37_ */
+
+#undef tmp_ref
+#undef tmp_subscr
+#undef re_ref
+#undef re_subscr
+#undef le_ref
+#undef le_subscr
+#undef t_ref
+#undef t_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,11 +18,13 @@ struct {
 
 static complex c_b1 = {1.f,0.f};
 static complex c_b2 = {2.f,0.f};
-static integer c__16 = 16;
+static integer c__17 = 17;
 static integer c__1 = 1;
-static real c_b25 = 1.f;
+static integer c__9 = 9;
+static integer c__25 = 25;
+static real c_b27 = 1.f;
 static integer c__6 = 6;
-static real c_b30 = 0.f;
+static real c_b32 = 0.f;
 static integer c__0 = 0;
 static integer c__5 = 5;
 static integer c__2 = 2;
@@ -34,20 +37,20 @@ static integer c__21 = 21;
 /* Subroutine */ int ctim26_(char *line, integer *nsizes, integer *nn, 
 	integer *mm, integer *ntypes, logical *dotype, integer *nparms, 
 	integer *nnb, integer *ldas, real *timmin, integer *nout, integer *
-	iseed, complex *a, complex *h, complex *u, complex *vt, real *d, 
+	iseed, complex *a, complex *h__, complex *u, complex *vt, real *d__, 
 	complex *dc, real *e, complex *ec, complex *taup, complex *tauq, 
-	complex *work, integer *lwork, real *rwork, logical *llwork, real *
-	times, integer *ldt1, integer *ldt2, integer *ldt3, real *opcnts, 
-	integer *ldo1, integer *ldo2, integer *ldo3, integer *info, ftnlen 
-	line_len)
+	complex *work, integer *lwork, real *rwork, integer *iwork, logical *
+	llwork, real *times, integer *ldt1, integer *ldt2, integer *ldt3, 
+	real *opcnts, integer *ldo1, integer *ldo2, integer *ldo3, integer *
+	info, ftnlen line_len)
 {
     /* Initialized data */
 
-    static char subnam[9*16] = "CGEBRD   " "CBDSQR   " "CBDSQR(L)" "CBDSQR(R)"
+    static char subnam[9*17] = "CGEBRD   " "CBDSQR   " "CBDSQR(L)" "CBDSQR(R)"
 	     "CBDSQR(B)" "CBDSQR(V)" "LAPSVD   " "LAPSVD(l)" "LAPSVD(L)" 
-	    "LAPSVD(R)" "LAPSVD(B)" "LINSVD   " "LINSVD(l)" "LINSVD(L)" "LIN"
-	    "SVD(R)" "LINSVD(B)";
-    static integer inparm[16] = { 2,1,1,1,1,1,2,2,2,2,2,1,1,1,1,1 };
+	    "LAPSVD(R)" "LAPSVD(B)" "CGESDD(B)" "LINSVD   " "LINSVD(l)" "LIN"
+	    "SVD(L)" "LINSVD(R)" "LINSVD(B)";
+    static integer inparm[17] = { 2,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1 };
     static char pnames[4*2] = "LDA " "NB  ";
     static integer kmode[3] = { 4,3,1 };
 
@@ -63,7 +66,6 @@ static integer c__21 = 21;
 	    times_dim2, times_dim3, times_offset, i__1, i__2, i__3, i__4, 
 	    i__5, i__6, i__7;
     real r__1;
-    doublereal d__1;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -75,7 +77,7 @@ static integer c__21 = 21;
     static real time;
     static integer jdum[1], isub;
     static char uplo[1];
-    static integer iqvt, j, m, n, imode;
+    static integer j, m, n, imode;
     extern /* Subroutine */ int csvdc_(complex *, integer *, integer *, 
 	    integer *, complex *, complex *, complex *, integer *, complex *, 
 	    integer *, complex *, integer *, integer *);
@@ -84,7 +86,7 @@ static integer c__21 = 21;
     static integer minmn;
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
 	    *, integer *);
-    static integer maxmn, itype, j1, j2, j3, j4;
+    static integer itype, j1, j2, j3, j4;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
     static real s1, s2;
@@ -94,7 +96,11 @@ static integer c__21 = 21;
     extern /* Subroutine */ int cgebrd_(integer *, integer *, complex *, 
 	    integer *, real *, real *, complex *, complex *, complex *, 
 	    integer *, integer *);
-    static integer in, ku;
+    static integer in;
+    extern /* Subroutine */ int cgesdd_(char *, integer *, integer *, complex 
+	    *, integer *, real *, complex *, integer *, complex *, integer *, 
+	    complex *, integer *, real *, integer *, integer *);
+    static integer ku;
     extern /* Complex */ VOID clarnd_(complex *, integer *, integer *);
     extern doublereal slamch_(char *), second_(void);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
@@ -120,21 +126,25 @@ static integer c__21 = 21;
     static integer lastnl;
     extern /* Subroutine */ int xlaenv_(integer *, integer *);
     static real untime;
-    static logical timsub[16];
+    static logical timsub[17];
     static real ulpinv;
     extern /* Subroutine */ int sprtbv_(char *, integer *, logical *, integer 
 	    *, integer *, integer *, integer *, char *, integer *, integer *, 
 	    integer *, real *, integer *, integer *, real *, integer *, 
 	    integer *, real *, logical *, integer *, ftnlen, ftnlen);
-    static integer mtypes, lda, ldh, iqu;
+    static integer mtypes, lda;
     static real ulp;
     static integer kvt;
 
     /* Fortran I/O blocks */
     static cilist io___7 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___9 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___39 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___36 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___40 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___42 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___44 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___46 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___47 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___48 = { 0, 0, 0, fmt_9998, 0 };
@@ -147,16 +157,20 @@ static integer c__21 = 21;
     static cilist io___55 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___56 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___57 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___58 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___59 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define times_ref(a_1,a_2,a_3,a_4) times[(((a_4)*times_dim3 + (a_3))*\
+times_dim2 + (a_2))*times_dim1 + a_1]
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*9 + a_0 - 9]
+#define opcnts_ref(a_1,a_2,a_3,a_4) opcnts[(((a_4)*opcnts_dim3 + (a_3))*\
+opcnts_dim2 + (a_2))*opcnts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -213,19 +227,24 @@ static integer c__21 = 21;
                                          left singular vectors and N   
                                          right singular vectors)   
                 (labeled LAPSVD(B) in the output)   
+            12: CGESDD (singular values and min(M,N) left singular   
+                        vectors and N right singular vectors if M>=N,   
+                        singular values and M left singular vectors   
+                        and min(M,N) right singular vectors otherwise.)   
+                (labeled CGESDD(B) in the output)   
             LINPACK:   
-            12: CSVDC (singular values only) (comparable to 7 above)   
+            13: CSVDC (singular values only) (comparable to 7 above)   
                 (labeled LINSVD in the output)   
-            13: CSVDC (singular values and min(M,N) left singular   
+            14: CSVDC (singular values and min(M,N) left singular   
                        vectors) (comparable to 8 above)   
                 (labeled LINSVD(l) in the output)   
-            14: CSVDC (singular values and M left singular vectors)   
+            15: CSVDC (singular values and M left singular vectors)   
                        (comparable to 9 above)   
                 (labeled LINSVD(L) in the output)   
-            15: CSVDC (singular values and N right singular vectors)   
+            16: CSVDC (singular values and N right singular vectors)   
                        (comparable to 10 above)   
                 (labeled LINSVD(R) in the output)   
-            16: CSVDC (singular values and min(M,N) left singular   
+            17: CSVDC (singular values and min(M,N) left singular   
                        vectors and N right singular vectors)   
                        (comparable to 11 above)   
                 (labeled LINSVD(B) in the output)   
@@ -350,6 +369,8 @@ static integer c__21 = 21;
     RWORK   (workspace) REAL array, dimension( LWORK )   
             May be equivalenced to WORK in calling routine.   
 
+    IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N).   
+
     LLWORK  (workspace) LOGICAL array, dimension( NPARMS ),   
 
     TIMES   (output) REAL array,   
@@ -385,8 +406,7 @@ static integer c__21 = 21;
     INFO    (output) INTEGER   
             Error flag.  It will be set to zero if no error occurred.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
@@ -396,10 +416,10 @@ static integer c__21 = 21;
     --ldas;
     --iseed;
     --a;
-    --h;
+    --h__;
     --u;
     --vt;
-    --d;
+    --d__;
     --dc;
     --e;
     --ec;
@@ -407,16 +427,18 @@ static integer c__21 = 21;
     --tauq;
     --work;
     --rwork;
+    --iwork;
     --llwork;
     times_dim1 = *ldt1;
     times_dim2 = *ldt2;
     times_dim3 = *ldt3;
-    times_offset = times_dim1 * (times_dim2 * (times_dim3 + 1) + 1) + 1;
+    times_offset = 1 + times_dim1 * (1 + times_dim2 * (1 + times_dim3 * 1));
     times -= times_offset;
     opcnts_dim1 = *ldo1;
     opcnts_dim2 = *ldo2;
     opcnts_dim3 = *ldo3;
-    opcnts_offset = opcnts_dim1 * (opcnts_dim2 * (opcnts_dim3 + 1) + 1) + 1;
+    opcnts_offset = 1 + opcnts_dim1 * (1 + opcnts_dim2 * (1 + opcnts_dim3 * 1)
+	    );
     opcnts -= opcnts_offset;
 
     /* Function Body   
@@ -424,7 +446,8 @@ static integer c__21 = 21;
 
        Extract the timing request from the input line. */
 
-    atimin_("CBD", line, &c__16, subnam, timsub, nout, info, 3L, 80L, 9L);
+    atimin_("CBD", line, &c__17, subnam, timsub, nout, info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)9);
     if (*info != 0) {
 	return 0;
     }
@@ -445,7 +468,7 @@ static integer c__21 = 21;
 	    *info = -24;
 	    io___7.ciunit = *nout;
 	    s_wsfe(&io___7);
-	    do_fio(&c__1, line, 6L);
+	    do_fio(&c__1, line, (ftnlen)6);
 	    e_wsfe();
 	    return 0;
 	}
@@ -457,7 +480,7 @@ static integer c__21 = 21;
 		*info = -9;
 		io___9.ciunit = *nout;
 		s_wsfe(&io___9);
-		do_fio(&c__1, line, 6L);
+		do_fio(&c__1, line, (ftnlen)6);
 		e_wsfe();
 		return 0;
 	    }
@@ -487,20 +510,19 @@ static integer c__21 = 21;
 
     ulp = slamch_("Epsilon") * slamch_("Base");
     ulpinv = 1.f / ulp;
+    xlaenv_(&c__9, &c__25);
 
 /*     Zero out OPCNTS, TIMES */
 
-    for (j4 = 1; j4 <= 16; ++j4) {
+    for (j4 = 1; j4 <= 17; ++j4) {
 	i__1 = *nsizes;
 	for (j3 = 1; j3 <= i__1; ++j3) {
 	    i__2 = *ntypes;
 	    for (j2 = 1; j2 <= i__2; ++j2) {
 		i__3 = *nparms;
 		for (j1 = 1; j1 <= i__3; ++j1) {
-		    opcnts[j1 + (j2 + (j3 + j4 * opcnts_dim3) * opcnts_dim2) *
-			     opcnts_dim1] = 0.f;
-		    times[j1 + (j2 + (j3 + j4 * times_dim3) * times_dim2) * 
-			    times_dim1] = 0.f;
+		    opcnts_ref(j1, j2, j3, j4) = 0.f;
+		    times_ref(j1, j2, j3, j4) = 0.f;
 /* L30: */
 		}
 /* L40: */
@@ -518,29 +540,18 @@ static integer c__21 = 21;
 	n = nn[in];
 	m = mm[in];
 	minmn = min(m,n);
-	maxmn = max(m,n);
 	if (m >= n) {
 	    *(unsigned char *)uplo = 'U';
 	    ku = minmn;
 /* Computing MAX */
 	    i__2 = minmn - 1;
 	    kvt = max(i__2,0);
-	    iqu = 0;
-	    iqvt = 1;
-	    if (n == 0) {
-		iqvt = 0;
-	    }
 	} else {
 	    *(unsigned char *)uplo = 'L';
 /* Computing MAX */
 	    i__2 = minmn - 1;
 	    ku = max(i__2,0);
 	    kvt = minmn;
-	    iqu = 1;
-	    iqvt = 0;
-	    if (m == 0) {
-		iqu = 0;
-	    }
 	}
 
 /*        Do for each .TRUE. value in DOTYPE: */
@@ -552,7 +563,7 @@ static integer c__21 = 21;
 	i__2 = mtypes;
 	for (itype = 1; itype <= i__2; ++itype) {
 	    if (! dotype[itype]) {
-		goto L670;
+		goto L700;
 	    }
 
 /*           Save random number seed for error messages */
@@ -562,8 +573,7 @@ static integer c__21 = 21;
 /* L70: */
 	    }
 
-/* --------------------------------------------------------------
----------   
+/* -----------------------------------------------------------------------   
 
              Time the LAPACK Routines   
 
@@ -572,8 +582,8 @@ static integer c__21 = 21;
 	    if (itype <= 5) {
 		if (itype >= 1 && itype <= 3) {
 		    imode = kmode[itype - 1];
-		    clatms_(&m, &n, "U", &iseed[1], "N", &d[1], &imode, &
-			    ulpinv, &c_b25, &m, &n, "N", &a[1], &m, &work[1], 
+		    clatms_(&m, &n, "U", &iseed[1], "N", &d__[1], &imode, &
+			    ulpinv, &c_b27, &m, &n, "N", &a[1], &m, &work[1], 
 			    info);
 		} else if (itype >= 4 && itype <= 5) {
 		    if (itype == 4) {
@@ -583,8 +593,8 @@ static integer c__21 = 21;
 			conds = ulp;
 		    }
 		    clatmr_(&m, &n, "S", &iseed[1], "N", &dc[1], &c__6, &
-			    c_b30, &c_b1, "T", "N", &dc[1], &c__0, &c_b25, &
-			    dc[1], &c__0, &c_b25, "N", jdum, &m, &n, &c_b30, &
+			    c_b32, &c_b1, "T", "N", &dc[1], &c__0, &c_b27, &
+			    dc[1], &c__0, &c_b27, "N", jdum, &m, &n, &c_b32, &
 			    conds, "N", &a[1], &m, jdum, info);
 		    if (itype == 5) {
 			conds = log(ulp) * -2.f;
@@ -594,8 +604,8 @@ static integer c__21 = 21;
 				i__4) {
 			    i__5 = j;
 			    clarnd_(&q__2, &c__5, &iseed[1]);
-			    d__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
-			    q__1.r = d__1 * q__2.r, q__1.i = d__1 * q__2.i;
+			    r__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
+			    q__1.r = r__1 * q__2.r, q__1.i = r__1 * q__2.i;
 			    a[i__5].r = q__1.r, a[i__5].i = q__1.i;
 /* L80: */
 			}
@@ -606,8 +616,8 @@ static integer c__21 = 21;
 				    j += i__3) {
 				i__5 = j;
 				clarnd_(&q__2, &c__5, &iseed[1]);
-				d__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
-				q__1.r = d__1 * q__2.r, q__1.i = d__1 * 
+				r__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
+				q__1.r = r__1 * q__2.r, q__1.i = r__1 * 
 					q__2.i;
 				a[i__5].r = q__1.r, a[i__5].i = q__1.i;
 /* L90: */
@@ -619,8 +629,8 @@ static integer c__21 = 21;
 				     i__4) {
 				i__5 = j;
 				clarnd_(&q__2, &c__5, &iseed[1]);
-				d__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
-				q__1.r = d__1 * q__2.r, q__1.i = d__1 * 
+				r__1 = exp(conds * slarnd_(&c__1, &iseed[1]));
+				q__1.r = r__1 * q__2.r, q__1.i = r__1 * 
 					q__2.i;
 				a[i__5].r = q__1.r, a[i__5].i = q__1.i;
 /* L100: */
@@ -649,13 +659,13 @@ static integer c__21 = 21;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L110:
-		    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-		    cgebrd_(&m, &n, &h[1], &lda, &d[1], &e[1], &tauq[1], &
+		    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+		    cgebrd_(&m, &n, &h__[1], &lda, &d__[1], &e[1], &tauq[1], &
 			    taup[1], &work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___39.ciunit = *nout;
-			s_wsfe(&io___39);
-			do_fio(&c__1, subnam, 9L);
+			io___36.ciunit = *nout;
+			s_wsfe(&io___36);
+			do_fio(&c__1, subnam_ref(0, 1), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -667,7 +677,7 @@ L110:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
 
 		    s2 = second_();
@@ -690,23 +700,22 @@ L110:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3) * times_dim2) * 
-			    times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3) * opcnts_dim2) *
-			     opcnts_dim1] = sopla_("CGEBRD", &m, &n, &c__0, &
-			    c__0, &nb);
+		    times_ref(ipar, itype, in, 1) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 1) = sopla_("CGEBRD", &m, &n, 
+			    &c__0, &c__0, &nb);
 /* L130: */
 		}
-		ldh = lda;
 	    } else {
 		if (runbrd) {
-		    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &m);
-		    cgebrd_(&m, &n, &h[1], &m, &d[1], &e[1], &tauq[1], &taup[
-			    1], &work[1], lwork, &iinfo);
+		    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &m)
+			    ;
+		    cgebrd_(&m, &n, &h__[1], &m, &d__[1], &e[1], &tauq[1], &
+			    taup[1], &work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___44.ciunit = *nout;
-			s_wsfe(&io___44);
-			do_fio(&c__1, subnam, 9L);
+			io___40.ciunit = *nout;
+			s_wsfe(&io___40);
+			do_fio(&c__1, subnam_ref(0, 1), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -718,9 +727,8 @@ L110:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
-		    ldh = m;
 		}
 	    }
 
@@ -735,8 +743,7 @@ L110:
 		    i__3 = n, i__5 = nnb[ipar];
 		    nb = min(i__3,i__5);
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -750,23 +757,22 @@ re, just
 
 		    if (lastnl == 0) {
 
-/*                    Time CBDSQR (singular values onl
-y) */
+/*                    Time CBDSQR (singular values only) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
 L150:
-			scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			i__3 = minmn - 1;
 			scopy_(&i__3, &e[1], &c__1, &rwork[minmn + 1], &c__1);
 			cbdsqr_(uplo, &minmn, &c__0, &c__0, &c__0, &rwork[1], 
 				&rwork[minmn + 1], &vt[1], &lda, &u[1], &lda, 
 				&u[1], &lda, &rwork[(minmn << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___46.ciunit = *nout;
-			    s_wsfe(&io___46);
-			    do_fio(&c__1, subnam + 9, 9L);
+			    io___42.ciunit = *nout;
+			    s_wsfe(&io___42);
+			    do_fio(&c__1, subnam_ref(0, 2), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -781,7 +787,7 @@ L150:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
@@ -790,13 +796,12 @@ L150:
 			    goto L150;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
-			    scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = minmn - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[minmn + 1], &
 				    c__1);
@@ -807,32 +812,24 @@ L150:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + (times_dim3 << 1)) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 2) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 2) = latime_1.ops / (real)
+				 ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + (times_dim3 << 1)) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + (times_dim3 << 1)) * times_dim2)
-				 * times_dim1];
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 2) = times_ref(lastnl, 
+				itype, in, 2);
+			opcnts_ref(ipar, itype, in, 2) = opcnts_ref(lastnl, 
+				itype, in, 2);
 		    }
 /* L170: */
 		}
 	    }
 
-/*           Time CBDSQR (singular values and left singular vector
-s,   
-             assume original matrix square) for each pair NNB(j), 
-LDAS(j) */
+/*           Time CBDSQR (singular values and left singular vectors,   
+             assume original matrix square) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[2] || timsub[7] || timsub[8]) {
 		i__4 = *nparms;
@@ -842,8 +839,7 @@ LDAS(j) */
 		    i__3 = n, i__5 = nnb[ipar];
 		    nb = min(i__3,i__5);
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -857,26 +853,24 @@ re, just
 
 		    if (lastnl == 0) {
 
-/*                    Time CBDSQR (singular values and
- left singular   
-                      vectors, assume original matrix 
-square) */
+/*                    Time CBDSQR (singular values and left singular   
+                      vectors, assume original matrix square) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
 L190:
 			claset_("Full", &m, &minmn, &c_b1, &c_b2, &u[1], &lda);
-			scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			i__3 = minmn - 1;
 			scopy_(&i__3, &e[1], &c__1, &rwork[minmn + 1], &c__1);
 			cbdsqr_(uplo, &minmn, &c__0, &m, &c__0, &rwork[1], &
 				rwork[minmn + 1], &vt[1], &lda, &u[1], &lda, &
 				u[1], &lda, &rwork[(minmn << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___47.ciunit = *nout;
-			    s_wsfe(&io___47);
-			    do_fio(&c__1, subnam + 18, 9L);
+			    io___43.ciunit = *nout;
+			    s_wsfe(&io___43);
+			    do_fio(&c__1, subnam_ref(0, 3), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -891,7 +885,7 @@ L190:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
@@ -900,15 +894,14 @@ L190:
 			    goto L190;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
 			    claset_("Full", &m, &minmn, &c_b1, &c_b2, &u[1], &
 				    lda);
-			    scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = minmn - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[minmn + 1], &
 				    c__1);
@@ -919,32 +912,24 @@ L190:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 3) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 3) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 3) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 3) = latime_1.ops / (real)
+				 ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 3) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 3) * times_dim2) * 
-				times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 3) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 3) * opcnts_dim2)
-				 * opcnts_dim1];
+			times_ref(ipar, itype, in, 3) = times_ref(lastnl, 
+				itype, in, 3);
+			opcnts_ref(ipar, itype, in, 3) = opcnts_ref(lastnl, 
+				itype, in, 3);
 		    }
 /* L210: */
 		}
 	    }
 
-/*           Time CBDSQR (singular values and right singular vecto
-rs,   
-             assume original matrix square) for each pair NNB(j), 
-LDAS(j) */
+/*           Time CBDSQR (singular values and right singular vectors,   
+             assume original matrix square) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[3] || timsub[9]) {
 		i__4 = *nparms;
@@ -954,8 +939,7 @@ LDAS(j) */
 		    i__3 = n, i__5 = nnb[ipar];
 		    nb = min(i__3,i__5);
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -969,10 +953,8 @@ re, just
 
 		    if (lastnl == 0) {
 
-/*                    Time CBDSQR (singular values and
- right singular   
-                      vectors, assume original matrix 
-square) */
+/*                    Time CBDSQR (singular values and right singular   
+                      vectors, assume original matrix square) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
@@ -980,16 +962,16 @@ square) */
 L230:
 			claset_("Full", &minmn, &n, &c_b1, &c_b2, &vt[1], &
 				lda);
-			scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			i__3 = minmn - 1;
 			scopy_(&i__3, &e[1], &c__1, &rwork[minmn + 1], &c__1);
 			cbdsqr_(uplo, &minmn, &n, &c__0, &c__0, &rwork[1], &
 				rwork[minmn + 1], &vt[1], &lda, &u[1], &lda, &
 				u[1], &lda, &rwork[(minmn << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___48.ciunit = *nout;
-			    s_wsfe(&io___48);
-			    do_fio(&c__1, subnam + 27, 9L);
+			    io___44.ciunit = *nout;
+			    s_wsfe(&io___44);
+			    do_fio(&c__1, subnam_ref(0, 4), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1004,7 +986,7 @@ L230:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
@@ -1013,15 +995,14 @@ L230:
 			    goto L230;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
 			    claset_("Full", &minmn, &n, &c_b1, &c_b2, &vt[1], 
 				    &lda);
-			    scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = minmn - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[minmn + 1], &
 				    c__1);
@@ -1032,32 +1013,24 @@ L230:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + (times_dim3 << 2)) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 4) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 4) = latime_1.ops / (real)
+				 ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + (times_dim3 << 2)) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + (times_dim3 << 2)) * times_dim2)
-				 * times_dim1];
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 4) = times_ref(lastnl, 
+				itype, in, 4);
+			opcnts_ref(ipar, itype, in, 4) = opcnts_ref(lastnl, 
+				itype, in, 4);
 		    }
 /* L250: */
 		}
 	    }
 
-/*           Time CBDSQR (singular values and left and right singu
-lar   
-             vectors,assume original matrix square) for each pair 
-  
+/*           Time CBDSQR (singular values and left and right singular   
+             vectors,assume original matrix square) for each pair   
              NNB(j), LDAS(j) */
 
 	    if (timsub[4] || timsub[10]) {
@@ -1068,8 +1041,7 @@ lar
 		    i__3 = n, i__5 = nnb[ipar];
 		    nb = min(i__3,i__5);
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -1083,10 +1055,8 @@ re, just
 
 		    if (lastnl == 0) {
 
-/*                    Time CBDSQR (singular values and
- left and right   
-                      singular vectors, assume origina
-l matrix square) */
+/*                    Time CBDSQR (singular values and left and right   
+                      singular vectors, assume original matrix square) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
@@ -1095,16 +1065,16 @@ L270:
 			claset_("Full", &minmn, &n, &c_b1, &c_b2, &vt[1], &
 				lda);
 			claset_("Full", &m, &minmn, &c_b1, &c_b2, &u[1], &lda);
-			scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			i__3 = minmn - 1;
 			scopy_(&i__3, &e[1], &c__1, &rwork[minmn + 1], &c__1);
 			cbdsqr_(uplo, &minmn, &n, &m, &c__0, &rwork[1], &
 				rwork[minmn + 1], &vt[1], &lda, &u[1], &lda, &
 				u[1], &lda, &rwork[(minmn << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___49.ciunit = *nout;
-			    s_wsfe(&io___49);
-			    do_fio(&c__1, subnam + 36, 9L);
+			    io___45.ciunit = *nout;
+			    s_wsfe(&io___45);
+			    do_fio(&c__1, subnam_ref(0, 5), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1119,7 +1089,7 @@ L270:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
@@ -1128,8 +1098,7 @@ L270:
 			    goto L270;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
@@ -1138,7 +1107,7 @@ L270:
 				    &lda);
 			    claset_("Full", &m, &minmn, &c_b1, &c_b2, &u[1], &
 				    lda);
-			    scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = minmn - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[minmn + 1], &
 				    c__1);
@@ -1149,32 +1118,24 @@ L270:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 5) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 5) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 5) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 5) = latime_1.ops / (real)
+				 ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 5) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 5) * times_dim2) * 
-				times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 5) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 5) * opcnts_dim2)
-				 * opcnts_dim1];
+			times_ref(ipar, itype, in, 5) = times_ref(lastnl, 
+				itype, in, 5);
+			opcnts_ref(ipar, itype, in, 5) = opcnts_ref(lastnl, 
+				itype, in, 5);
 		    }
 /* L290: */
 		}
 	    }
 
-/*           Time CBDSQR (singular values and multiply square matr
-ix   
-             by transpose of left singular vectors) for each pair 
-  
+/*           Time CBDSQR (singular values and multiply square matrix   
+             by transpose of left singular vectors) for each pair   
              NNB(j), LDAS(j) */
 
 	    if (timsub[5]) {
@@ -1185,8 +1146,7 @@ ix
 		    i__3 = n, i__5 = nnb[ipar];
 		    nb = min(i__3,i__5);
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -1200,10 +1160,8 @@ re, just
 
 		    if (lastnl == 0) {
 
-/*                    Time CBDSQR (singular values and
- multiply square   
-                      matrix by transpose of left sing
-ular vectors) */
+/*                    Time CBDSQR (singular values and multiply square   
+                      matrix by transpose of left singular vectors) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
@@ -1211,7 +1169,7 @@ ular vectors) */
 L310:
 			claset_("Full", &minmn, &minmn, &c_b1, &c_b2, &u[1], &
 				lda);
-			scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			i__3 = minmn - 1;
 			scopy_(&i__3, &e[1], &c__1, &rwork[minmn + 1], &c__1);
 			cbdsqr_(uplo, &minmn, &c__0, &c__0, &minmn, &rwork[1],
@@ -1219,9 +1177,9 @@ L310:
 				 &u[1], &lda, &rwork[(minmn << 1) + 1], &
 				iinfo);
 			if (iinfo != 0) {
-			    io___50.ciunit = *nout;
-			    s_wsfe(&io___50);
-			    do_fio(&c__1, subnam + 45, 9L);
+			    io___46.ciunit = *nout;
+			    s_wsfe(&io___46);
+			    do_fio(&c__1, subnam_ref(0, 6), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1236,7 +1194,7 @@ L310:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
@@ -1245,15 +1203,14 @@ L310:
 			    goto L310;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
 			    claset_("Full", &minmn, &minmn, &c_b1, &c_b2, &u[
 				    1], &lda);
-			    scopy_(&minmn, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&minmn, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = minmn - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[minmn + 1], &
 				    c__1);
@@ -1264,53 +1221,38 @@ L310:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 6) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 6) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 6) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 6) = latime_1.ops / (real)
+				 ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 6) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 6) * times_dim2) * 
-				times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 6) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 6) * opcnts_dim2)
-				 * opcnts_dim1];
+			times_ref(ipar, itype, in, 6) = times_ref(lastnl, 
+				itype, in, 6);
+			opcnts_ref(ipar, itype, in, 6) = opcnts_ref(lastnl, 
+				itype, in, 6);
 		    }
 /* L330: */
 		}
 	    }
 
-/*           Time CGEBRD+CBDSQR (singular values only) for each pa
-ir   
+/*           Time CGEBRD+CBDSQR (singular values only) for each pair   
              NNB(j), LDAS(j) */
 
 	    if (timsub[6]) {
 		i__4 = *nparms;
 		for (ipar = 1; ipar <= i__4; ++ipar) {
-		    times[ipar + (itype + (in + times_dim3 * 7) * times_dim2) 
-			    * times_dim1] = times[ipar + (itype + (in + 
-			    times_dim3) * times_dim2) * times_dim1] + times[
-			    ipar + (itype + (in + (times_dim3 << 1)) * 
-			    times_dim2) * times_dim1];
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 7) * 
-			    opcnts_dim2) * opcnts_dim1] = opcnts[ipar + (
-			    itype + (in + opcnts_dim3) * opcnts_dim2) * 
-			    opcnts_dim1] + opcnts[ipar + (itype + (in + (
-			    opcnts_dim3 << 1)) * opcnts_dim2) * opcnts_dim1];
+		    times_ref(ipar, itype, in, 7) = times_ref(ipar, itype, in,
+			     1) + times_ref(ipar, itype, in, 2);
+		    opcnts_ref(ipar, itype, in, 7) = opcnts_ref(ipar, itype, 
+			    in, 1) + opcnts_ref(ipar, itype, in, 2);
 /* L340: */
 		}
 	    }
 
-/*           Time CGEBRD+CUNGBR+CBDSQR (singular values and min(M,
-N)   
-             left singular vectors) for each pair NNB(j), LDAS(j) 
-*/
+/*           Time CGEBRD+CUNGBR+CBDSQR (singular values and min(M,N)   
+             left singular vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[7]) {
 		i__4 = *nparms;
@@ -1323,21 +1265,20 @@ N)
 		    xlaenv_(&c__2, &c__2);
 		    xlaenv_(&c__3, &nb);
 
-/*                 Time CGEBRD+CUNGBR+CBDSQR (singular val
-ues and   
+/*                 Time CGEBRD+CUNGBR+CBDSQR (singular values and   
                    min(M,N) left singular vectors) */
 
 		    ic = 0;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L350:
-		    clacpy_("L", &m, &minmn, &h[1], &lda, &u[1], &lda);
+		    clacpy_("L", &m, &minmn, &h__[1], &lda, &u[1], &lda);
 		    cungbr_("Q", &m, &minmn, &ku, &u[1], &lda, &tauq[1], &
 			    work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___51.ciunit = *nout;
-			s_wsfe(&io___51);
-			do_fio(&c__1, subnam + 63, 9L);
+			io___47.ciunit = *nout;
+			s_wsfe(&io___47);
+			do_fio(&c__1, subnam_ref(0, 8), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -1349,7 +1290,7 @@ L350:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
 		    s2 = second_();
 		    time = s2 - s1;
@@ -1363,8 +1304,7 @@ L350:
 		    s1 = second_();
 		    i__3 = ic;
 		    for (j = 1; j <= i__3; ++j) {
-			clacpy_("L", &m, &minmn, &h[1], &lda, &u[1], &lda)
-				;
+			clacpy_("L", &m, &minmn, &h__[1], &lda, &u[1], &lda);
 /* L360: */
 		    }
 		    s2 = second_();
@@ -1372,26 +1312,19 @@ L350:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + (times_dim3 << 3)) * 
-			    times_dim2) * times_dim1] = dmax(r__1,0.f) / (
-			    real) ic + times[ipar + (itype + (in + times_dim3)
-			     * times_dim2) * times_dim1] + times[ipar + (
-			    itype + (in + times_dim3 * 3) * times_dim2) * 
-			    times_dim1];
-		    opcnts[ipar + (itype + (in + (opcnts_dim3 << 3)) * 
-			    opcnts_dim2) * opcnts_dim1] = sopla2_("CUNGBR", 
-			    "Q", &m, &minmn, &ku, &c__0, &nb) + 
-			    opcnts[ipar + (itype + (in + opcnts_dim3) * 
-			    opcnts_dim2) * opcnts_dim1] + opcnts[ipar + (
-			    itype + (in + opcnts_dim3 * 3) * opcnts_dim2) * 
-			    opcnts_dim1];
+		    times_ref(ipar, itype, in, 8) = dmax(r__1,0.f) / (real) 
+			    ic + times_ref(ipar, itype, in, 1) + times_ref(
+			    ipar, itype, in, 3);
+		    opcnts_ref(ipar, itype, in, 8) = sopla2_("CUNGBR", "Q", &
+			    m, &minmn, &ku, &c__0, &nb) 
+			    + opcnts_ref(ipar, itype, in, 1) + opcnts_ref(
+			    ipar, itype, in, 3);
 /* L370: */
 		}
 	    }
 
 /*           Time CGEBRD+CUNGBR+CBDSQR (singular values and M   
-             left singular vectors) for each pair NNB(j), LDAS(j) 
-*/
+             left singular vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[8]) {
 		i__4 = *nparms;
@@ -1404,21 +1337,20 @@ L350:
 		    xlaenv_(&c__2, &c__2);
 		    xlaenv_(&c__3, &nb);
 
-/*                 Time CGEBRD+CUNGBR+CBDSQR (singular val
-ues and   
+/*                 Time CGEBRD+CUNGBR+CBDSQR (singular values and   
                    M left singular vectors) */
 
 		    ic = 0;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L380:
-		    clacpy_("L", &m, &minmn, &h[1], &lda, &u[1], &lda);
+		    clacpy_("L", &m, &minmn, &h__[1], &lda, &u[1], &lda);
 		    cungbr_("Q", &m, &m, &ku, &u[1], &lda, &tauq[1], &work[1],
 			     lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___52.ciunit = *nout;
-			s_wsfe(&io___52);
-			do_fio(&c__1, subnam + 72, 9L);
+			io___48.ciunit = *nout;
+			s_wsfe(&io___48);
+			do_fio(&c__1, subnam_ref(0, 9), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -1430,7 +1362,7 @@ L380:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
 		    s2 = second_();
 		    time = s2 - s1;
@@ -1444,8 +1376,7 @@ L380:
 		    s1 = second_();
 		    i__3 = ic;
 		    for (j = 1; j <= i__3; ++j) {
-			clacpy_("L", &m, &minmn, &h[1], &lda, &u[1], &lda)
-				;
+			clacpy_("L", &m, &minmn, &h__[1], &lda, &u[1], &lda);
 /* L390: */
 		    }
 		    s2 = second_();
@@ -1453,24 +1384,19 @@ L380:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 9) * times_dim2) 
-			    * times_dim1] = dmax(r__1,0.f) / (real) ic + 
-			    times[ipar + (itype + (in + times_dim3) * 
-			    times_dim2) * times_dim1] + times[ipar + (itype + 
-			    (in + times_dim3 * 3) * times_dim2) * times_dim1];
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 9) * 
-			    opcnts_dim2) * opcnts_dim1] = sopla2_("CUNGBR", 
-			    "Q", &m, &m, &ku, &c__0, &nb) + opcnts[
-			    ipar + (itype + (in + opcnts_dim3) * opcnts_dim2) 
-			    * opcnts_dim1] + opcnts[ipar + (itype + (in + 
-			    opcnts_dim3 * 3) * opcnts_dim2) * opcnts_dim1];
+		    times_ref(ipar, itype, in, 9) = dmax(r__1,0.f) / (real) 
+			    ic + times_ref(ipar, itype, in, 1) + times_ref(
+			    ipar, itype, in, 3);
+		    opcnts_ref(ipar, itype, in, 9) = sopla2_("CUNGBR", "Q", &
+			    m, &m, &ku, &c__0, &nb) + 
+			    opcnts_ref(ipar, itype, in, 1) + opcnts_ref(ipar, 
+			    itype, in, 3);
 /* L400: */
 		}
 	    }
 
 /*           Time CGEBRD+CUNGBR+CBDSQR (singular values and N   
-             right singular vectors) for each pair NNB(j), LDAS(j)
- */
+             right singular vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[9]) {
 		i__4 = *nparms;
@@ -1483,21 +1409,20 @@ L380:
 		    xlaenv_(&c__2, &c__2);
 		    xlaenv_(&c__3, &nb);
 
-/*                 Time CGEBRD+CUNGBR+CBDSQR (singular val
-ues and   
+/*                 Time CGEBRD+CUNGBR+CBDSQR (singular values and   
                    N right singular vectors) */
 
 		    ic = 0;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L410:
-		    clacpy_("U", &minmn, &n, &h[1], &lda, &vt[1], &lda);
+		    clacpy_("U", &minmn, &n, &h__[1], &lda, &vt[1], &lda);
 		    cungbr_("P", &n, &n, &kvt, &vt[1], &lda, &taup[1], &work[
 			    1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___53.ciunit = *nout;
-			s_wsfe(&io___53);
-			do_fio(&c__1, subnam + 81, 9L);
+			io___49.ciunit = *nout;
+			s_wsfe(&io___49);
+			do_fio(&c__1, subnam_ref(0, 10), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -1509,7 +1434,7 @@ L410:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
 		    s2 = second_();
 		    time = s2 - s1;
@@ -1523,7 +1448,7 @@ L410:
 		    s1 = second_();
 		    i__3 = ic;
 		    for (j = 1; j <= i__3; ++j) {
-			clacpy_("U", &minmn, &n, &h[1], &lda, &vt[1], &lda);
+			clacpy_("U", &minmn, &n, &h__[1], &lda, &vt[1], &lda);
 /* L420: */
 		    }
 		    s2 = second_();
@@ -1531,26 +1456,19 @@ L410:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 10) * times_dim2)
-			     * times_dim1] = dmax(r__1,0.f) / (real) ic + 
-			    times[ipar + (itype + (in + times_dim3) * 
-			    times_dim2) * times_dim1] + times[ipar + (itype + 
-			    (in + (times_dim3 << 2)) * times_dim2) * 
-			    times_dim1];
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 10) * 
-			    opcnts_dim2) * opcnts_dim1] = sopla2_("CUNGBR", 
-			    "P", &n, &n, &kvt, &c__0, &nb) + opcnts[
-			    ipar + (itype + (in + opcnts_dim3) * opcnts_dim2) 
-			    * opcnts_dim1] + opcnts[ipar + (itype + (in + (
-			    opcnts_dim3 << 2)) * opcnts_dim2) * opcnts_dim1];
+		    times_ref(ipar, itype, in, 10) = dmax(r__1,0.f) / (real) 
+			    ic + times_ref(ipar, itype, in, 1) + times_ref(
+			    ipar, itype, in, 4);
+		    opcnts_ref(ipar, itype, in, 10) = sopla2_("CUNGBR", "P", &
+			    n, &n, &kvt, &c__0, &nb) + 
+			    opcnts_ref(ipar, itype, in, 1) + opcnts_ref(ipar, 
+			    itype, in, 4);
 /* L430: */
 		}
 	    }
 
-/*           Time CGEBRD+CUNGBR+CBDSQR (singular values and min(M,
-N) left   
-             singular vectors and N right singular vectors) for ea
-ch pair   
+/*           Time CGEBRD+CUNGBR+CBDSQR (singular values and min(M,N) left   
+             singular vectors and N right singular vectors) for each pair   
              NNB(j), LDAS(j) */
 
 	    if (timsub[10]) {
@@ -1564,23 +1482,21 @@ ch pair
 		    xlaenv_(&c__2, &c__2);
 		    xlaenv_(&c__3, &nb);
 
-/*                 Time CGEBRD+CUNGBR+CBDSQR (singular val
-ues and   
-                   min(M,N) left singular vectors and N ri
-ght singular   
+/*                 Time CGEBRD+CUNGBR+CBDSQR (singular values and   
+                   min(M,N) left singular vectors and N right singular   
                    vectors) */
 
 		    ic = 0;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L440:
-		    clacpy_("L", &m, &minmn, &h[1], &lda, &u[1], &lda);
+		    clacpy_("L", &m, &minmn, &h__[1], &lda, &u[1], &lda);
 		    cungbr_("Q", &m, &minmn, &ku, &u[1], &lda, &tauq[1], &
 			    work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___54.ciunit = *nout;
-			s_wsfe(&io___54);
-			do_fio(&c__1, subnam + 90, 9L);
+			io___50.ciunit = *nout;
+			s_wsfe(&io___50);
+			do_fio(&c__1, subnam_ref(0, 11), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -1592,15 +1508,15 @@ L440:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
-		    clacpy_("U", &minmn, &n, &h[1], &lda, &vt[1], &lda);
+		    clacpy_("U", &minmn, &n, &h__[1], &lda, &vt[1], &lda);
 		    cungbr_("P", &n, &n, &kvt, &vt[1], &lda, &taup[1], &work[
 			    1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___55.ciunit = *nout;
-			s_wsfe(&io___55);
-			do_fio(&c__1, subnam + 90, 9L);
+			io___51.ciunit = *nout;
+			s_wsfe(&io___51);
+			do_fio(&c__1, subnam_ref(0, 11), (ftnlen)9);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
@@ -1612,7 +1528,7 @@ L440:
 				integer));
 			e_wsfe();
 			*info = abs(iinfo);
-			goto L670;
+			goto L700;
 		    }
 		    s2 = second_();
 		    time = s2 - s1;
@@ -1626,7 +1542,7 @@ L440:
 		    s1 = second_();
 		    i__3 = ic;
 		    for (j = 1; j <= i__3; ++j) {
-			clacpy_("L", &minmn, &minmn, &h[1], &lda, &vt[1], &
+			clacpy_("L", &minmn, &minmn, &h__[1], &lda, &vt[1], &
 				lda);
 /* L450: */
 		    }
@@ -1635,129 +1551,100 @@ L440:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 11) * times_dim2)
-			     * times_dim1] = dmax(r__1,0.f) / (real) ic + 
-			    times[ipar + (itype + (in + times_dim3) * 
-			    times_dim2) * times_dim1] + times[ipar + (itype + 
-			    (in + times_dim3 * 5) * times_dim2) * times_dim1];
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 11) * 
-			    opcnts_dim2) * opcnts_dim1] = sopla2_("CUNGBR", 
-			    "Q", &m, &minmn, &ku, &c__0, &nb) + 
-			    sopla2_("CUNGBR", "P", &n, &n, &kvt, &c__0, &nb) + opcnts[ipar + (itype + (in + 
-			    opcnts_dim3) * opcnts_dim2) * opcnts_dim1] + 
-			    opcnts[ipar + (itype + (in + opcnts_dim3 * 5) * 
-			    opcnts_dim2) * opcnts_dim1];
+		    times_ref(ipar, itype, in, 11) = dmax(r__1,0.f) / (real) 
+			    ic + times_ref(ipar, itype, in, 1) + times_ref(
+			    ipar, itype, in, 5);
+		    opcnts_ref(ipar, itype, in, 11) = sopla2_("CUNGBR", "Q", &
+			    m, &minmn, &ku, &c__0, &nb) 
+			    + sopla2_("CUNGBR", "P", &n, &n, &kvt, &c__0, &nb) + opcnts_ref(ipar, itype, 
+			    in, 1) + opcnts_ref(ipar, itype, in, 5);
 /* L460: */
 		}
 	    }
 
-/*           Time CSVDC (singular values only) for each pair   
+/*           Time CGESDD( singular values and min(M,N) left singular   
+             vectors and N right singular vectors when M>=N,   
+             singular values and M left singular vectors and min(M,N)   
+             right singular vectors otherwise) for each pair   
              NNB(j), LDAS(j) */
 
 	    if (timsub[11]) {
 		i__4 = *nparms;
 		for (ipar = 1; ipar <= i__4; ++ipar) {
 		    lda = ldas[ipar];
+/* Computing MIN */
+		    i__3 = n, i__5 = nnb[ipar];
+		    nb = min(i__3,i__5);
+		    xlaenv_(&c__1, &nb);
+		    xlaenv_(&c__2, &c__2);
+		    xlaenv_(&c__3, &nb);
 
-/*                 If this value of LDA has been used befo
-re, just   
-                   use that value */
+/*                 Time CGESDD (singular values and   
+                   min(M,N) left singular vectors and N right singular   
+                   vectors) */
 
-		    lastnl = 0;
-		    i__3 = ipar - 1;
-		    for (j = 1; j <= i__3; ++j) {
-			if (lda == ldas[j]) {
-			    lastnl = j;
-			}
-/* L470: */
+		    ic = 0;
+		    latime_1.ops = 0.f;
+		    s1 = second_();
+L470:
+		    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+		    cgesdd_("S", &m, &n, &h__[1], &lda, &rwork[1], &u[1], &
+			    lda, &vt[1], &lda, &work[1], lwork, &rwork[(minmn 
+			    << 1) + 1], &iwork[1], &iinfo);
+		    s2 = second_();
+		    if (iinfo != 0) {
+			io___52.ciunit = *nout;
+			s_wsfe(&io___52);
+			do_fio(&c__1, subnam_ref(0, 12), (ftnlen)9);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&itype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&ipar, (ftnlen)sizeof(integer));
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			goto L700;
+		    }
+		    time = s2 - s1;
+		    ++ic;
+		    if (time < *timmin) {
+			goto L470;
 		    }
 
-		    if (lastnl == 0) {
+/*                 Subtract the time used in CLACPY. */
 
-/*                    Time CSVDC (singular values only
-) */
-
-			ic = 0;
-			latime_1.ops = 0.f;
-			s1 = second_();
-L480:
-			clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-			csvdc_(&h[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
-				lda, &vt[1], &lda, &work[1], &c__0, &iinfo);
-			if (iinfo != 0) {
-			    io___56.ciunit = *nout;
-			    s_wsfe(&io___56);
-			    do_fio(&c__1, subnam + 99, 9L);
-			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
-				    integer));
-			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
-				    ;
-			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
-				    ;
-			    do_fio(&c__1, (char *)&itype, (ftnlen)sizeof(
-				    integer));
-			    do_fio(&c__1, (char *)&ipar, (ftnlen)sizeof(
-				    integer));
-			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
-				    integer));
-			    e_wsfe();
-			    *info = abs(iinfo);
-			    goto L670;
-			}
-			s2 = second_();
-			time = s2 - s1;
-			++ic;
-			if (time < *timmin) {
-			    goto L480;
-			}
-
-/*                    Subtract the time used in CLACPY
-. */
-
-			s1 = second_();
-			i__3 = ic;
-			for (j = 1; j <= i__3; ++j) {
-			    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-/* L490: */
-			}
-			s2 = second_();
-			untime = s2 - s1;
+		    s1 = second_();
+		    i__3 = ic;
+		    for (j = 1; j <= i__3; ++j) {
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L480: */
+		    }
+		    s2 = second_();
+		    untime = s2 - s1;
 
 /* Computing MAX */
-			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 12) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
-				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 12) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
-
-		    } else {
-
-			times[ipar + (itype + (in + times_dim3 * 12) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 12) * times_dim2) *
-				 times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 12) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 12) * 
-				opcnts_dim2) * opcnts_dim1];
-		    }
-/* L500: */
+		    r__1 = time - untime;
+		    times_ref(ipar, itype, in, 12) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 12) = latime_1.ops / (real) 
+			    ic;
+/* L490: */
 		}
 	    }
 
-/*           Time CSVDC (singular values and min(M,N) left singula
-r   
-             vectors) for each pair NNB(j), LDAS(j) */
+/*           Time CSVDC (singular values only) for each pair   
+             NNB(j), LDAS(j) */
 
 	    if (timsub[12]) {
 		i__4 = *nparms;
 		for (ipar = 1; ipar <= i__4; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -1766,26 +1653,24 @@ re, just
 			if (lda == ldas[j]) {
 			    lastnl = j;
 			}
-/* L510: */
+/* L500: */
 		    }
 
 		    if (lastnl == 0) {
 
-/*                    Time CSVDC (singular values and 
-min(M,N) left   
-                      singular vectors) */
+/*                    Time CSVDC (singular values only) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L520:
-			clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-			csvdc_(&h[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
-				lda, &vt[1], &lda, &work[1], &c__20, &iinfo);
+L510:
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+			csvdc_(&h__[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
+				lda, &vt[1], &lda, &work[1], &c__0, &iinfo);
 			if (iinfo != 0) {
-			    io___57.ciunit = *nout;
-			    s_wsfe(&io___57);
-			    do_fio(&c__1, subnam + 108, 9L);
+			    io___53.ciunit = *nout;
+			    s_wsfe(&io___53);
+			    do_fio(&c__1, subnam_ref(0, 13), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1800,52 +1685,45 @@ L520:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L520;
+			    goto L510;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
-			    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-/* L530: */
+			    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L520: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 13) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 13) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 13) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 13) = latime_1.ops / (
 				real) ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 13) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 13) * times_dim2) *
-				 times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 13) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 13) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 13) = times_ref(lastnl, 
+				itype, in, 13);
+			opcnts_ref(ipar, itype, in, 13) = opcnts_ref(lastnl, 
+				itype, in, 13);
 		    }
-/* L540: */
+/* L530: */
 		}
 	    }
 
-/*           Time CSVDC (singular values and M left singular   
+/*           Time CSVDC (singular values and min(M,N) left singular   
              vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[13]) {
@@ -1853,8 +1731,7 @@ L520:
 		for (ipar = 1; ipar <= i__4; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -1863,26 +1740,25 @@ re, just
 			if (lda == ldas[j]) {
 			    lastnl = j;
 			}
-/* L550: */
+/* L540: */
 		    }
 
 		    if (lastnl == 0) {
 
-/*                    Time CSVDC (singular values and 
-M left singular   
-                      vectors) */
+/*                    Time CSVDC (singular values and min(M,N) left   
+                      singular vectors) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L560:
-			clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-			csvdc_(&h[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
-				lda, &vt[1], &lda, &work[1], &c__10, &iinfo);
+L550:
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+			csvdc_(&h__[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
+				lda, &vt[1], &lda, &work[1], &c__20, &iinfo);
 			if (iinfo != 0) {
-			    io___58.ciunit = *nout;
-			    s_wsfe(&io___58);
-			    do_fio(&c__1, subnam + 117, 9L);
+			    io___54.ciunit = *nout;
+			    s_wsfe(&io___54);
+			    do_fio(&c__1, subnam_ref(0, 14), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1897,52 +1773,45 @@ L560:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L560;
+			    goto L550;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
-			    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-/* L570: */
+			    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L560: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 14) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 14) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 14) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 14) = latime_1.ops / (
 				real) ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 14) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 14) * times_dim2) *
-				 times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 14) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 14) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 14) = times_ref(lastnl, 
+				itype, in, 14);
+			opcnts_ref(ipar, itype, in, 14) = opcnts_ref(lastnl, 
+				itype, in, 14);
 		    }
-/* L580: */
+/* L570: */
 		}
 	    }
 
-/*           Time CSVDC (singular values and N right singular   
+/*           Time CSVDC (singular values and M left singular   
              vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[14]) {
@@ -1950,8 +1819,7 @@ L560:
 		for (ipar = 1; ipar <= i__4; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -1960,26 +1828,25 @@ re, just
 			if (lda == ldas[j]) {
 			    lastnl = j;
 			}
-/* L590: */
+/* L580: */
 		    }
 
 		    if (lastnl == 0) {
 
-/*                    Time CSVDC (singular values and 
-N right singular   
+/*                    Time CSVDC (singular values and M left singular   
                       vectors) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L600:
-			clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-			csvdc_(&h[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
-				lda, &vt[1], &lda, &work[1], &c__1, &iinfo);
+L590:
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+			csvdc_(&h__[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
+				lda, &vt[1], &lda, &work[1], &c__10, &iinfo);
 			if (iinfo != 0) {
-			    io___59.ciunit = *nout;
-			    s_wsfe(&io___59);
-			    do_fio(&c__1, subnam + 126, 9L);
+			    io___55.ciunit = *nout;
+			    s_wsfe(&io___55);
+			    do_fio(&c__1, subnam_ref(0, 14), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -1994,64 +1861,53 @@ L600:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L600;
+			    goto L590;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
-			    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-/* L610: */
+			    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L600: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 15) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 15) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 15) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 15) = latime_1.ops / (
 				real) ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + times_dim3 * 15) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + times_dim3 * 15) * times_dim2) *
-				 times_dim1];
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 15) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + opcnts_dim3 * 15) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 15) = times_ref(lastnl, 
+				itype, in, 15);
+			opcnts_ref(ipar, itype, in, 15) = opcnts_ref(lastnl, 
+				itype, in, 15);
 		    }
-/* L620: */
+/* L610: */
 		}
 	    }
 
-/*           Time CSVDC (singular values and min(M,N) left singula
-r   
-             vectors and N right singular vectors) for each pair 
-  
-             NNB(j), LDAS(j) */
+/*           Time CSVDC (singular values and N right singular   
+             vectors) for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[15]) {
 		i__4 = *nparms;
 		for (ipar = 1; ipar <= i__4; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has been used befo
-re, just   
+/*                 If this value of LDA has been used before, just   
                    use that value */
 
 		    lastnl = 0;
@@ -2060,27 +1916,25 @@ re, just
 			if (lda == ldas[j]) {
 			    lastnl = j;
 			}
-/* L630: */
+/* L620: */
 		    }
 
 		    if (lastnl == 0) {
 
-/*                    Time CSVDC (singular values and 
-min(M,N) left   
-                      singular vectors and N right sin
-gular vectors) */
+/*                    Time CSVDC (singular values and N right singular   
+                      vectors) */
 
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L640:
-			clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-			csvdc_(&h[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
-				lda, &vt[1], &lda, &work[1], &c__21, &iinfo);
+L630:
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+			csvdc_(&h__[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
+				lda, &vt[1], &lda, &work[1], &c__1, &iinfo);
 			if (iinfo != 0) {
-			    io___60.ciunit = *nout;
-			    s_wsfe(&io___60);
-			    do_fio(&c__1, subnam + 135, 9L);
+			    io___56.ciunit = *nout;
+			    s_wsfe(&io___56);
+			    do_fio(&c__1, subnam_ref(0, 15), (ftnlen)9);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
@@ -2095,72 +1949,152 @@ L640:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L670;
+			    goto L700;
 			}
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L640;
+			    goto L630;
 			}
 
-/*                    Subtract the time used in CLACPY
-. */
+/*                    Subtract the time used in CLACPY. */
 
 			s1 = second_();
 			i__3 = ic;
 			for (j = 1; j <= i__3; ++j) {
-			    clacpy_("Full", &m, &n, &a[1], &m, &h[1], &lda);
-/* L650: */
+			    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L640: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + (times_dim3 << 4)) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 16) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 4)) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 16) = latime_1.ops / (
 				real) ic;
 
 		    } else {
 
-			times[ipar + (itype + (in + (times_dim3 << 4)) * 
-				times_dim2) * times_dim1] = times[lastnl + (
-				itype + (in + (times_dim3 << 4)) * times_dim2)
-				 * times_dim1];
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 4)) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastnl + 
-				(itype + (in + (opcnts_dim3 << 4)) * 
-				opcnts_dim2) * opcnts_dim1];
+			times_ref(ipar, itype, in, 16) = times_ref(lastnl, 
+				itype, in, 16);
+			opcnts_ref(ipar, itype, in, 16) = opcnts_ref(lastnl, 
+				itype, in, 16);
 		    }
-/* L660: */
+/* L650: */
 		}
 	    }
 
+/*           Time CSVDC (singular values and min(M,N) left singular   
+             vectors and N right singular vectors) for each pair   
+             NNB(j), LDAS(j) */
+
+	    if (timsub[16]) {
+		i__4 = *nparms;
+		for (ipar = 1; ipar <= i__4; ++ipar) {
+		    lda = ldas[ipar];
+
+/*                 If this value of LDA has been used before, just   
+                   use that value */
+
+		    lastnl = 0;
+		    i__3 = ipar - 1;
+		    for (j = 1; j <= i__3; ++j) {
+			if (lda == ldas[j]) {
+			    lastnl = j;
+			}
+/* L660: */
+		    }
+
+		    if (lastnl == 0) {
+
+/*                    Time CSVDC (singular values and min(M,N) left   
+                      singular vectors and N right singular vectors) */
+
+			ic = 0;
+			latime_1.ops = 0.f;
+			s1 = second_();
 L670:
+			clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+			csvdc_(&h__[1], &lda, &m, &n, &dc[1], &ec[1], &u[1], &
+				lda, &vt[1], &lda, &work[1], &c__21, &iinfo);
+			if (iinfo != 0) {
+			    io___57.ciunit = *nout;
+			    s_wsfe(&io___57);
+			    do_fio(&c__1, subnam_ref(0, 16), (ftnlen)9);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&itype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&ipar, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    goto L700;
+			}
+			s2 = second_();
+			time = s2 - s1;
+			++ic;
+			if (time < *timmin) {
+			    goto L670;
+			}
+
+/*                    Subtract the time used in CLACPY. */
+
+			s1 = second_();
+			i__3 = ic;
+			for (j = 1; j <= i__3; ++j) {
+			    clacpy_("Full", &m, &n, &a[1], &m, &h__[1], &lda);
+/* L680: */
+			}
+			s2 = second_();
+			untime = s2 - s1;
+
+/* Computing MAX */
+			r__1 = time - untime;
+			times_ref(ipar, itype, in, 16) = dmax(r__1,0.f) / (
+				real) ic;
+			opcnts_ref(ipar, itype, in, 16) = latime_1.ops / (
+				real) ic;
+
+		    } else {
+
+			times_ref(ipar, itype, in, 16) = times_ref(lastnl, 
+				itype, in, 16);
+			opcnts_ref(ipar, itype, in, 16) = opcnts_ref(lastnl, 
+				itype, in, 16);
+		    }
+/* L690: */
+		}
+	    }
+
+L700:
 	    ;
 	}
-/* L680: */
+/* L710: */
     }
 
-/* -----------------------------------------------------------------------
-   
+/* -----------------------------------------------------------------------   
 
        Print a table of results for each timed routine. */
 
-    for (isub = 1; isub <= 16; ++isub) {
+    for (isub = 1; isub <= 17; ++isub) {
 	if (timsub[isub - 1]) {
-	    sprtbv_(subnam + (isub - 1) * 9, ntypes, &dotype[1], nsizes, &mm[
-		    1], &nn[1], &inparm[isub - 1], pnames, nparms, &ldas[1], &
-		    nnb[1], &opcnts[((isub * opcnts_dim3 + 1) * opcnts_dim2 + 
-		    1) * opcnts_dim1 + 1], ldo1, ldo2, &times[((isub * 
-		    times_dim3 + 1) * times_dim2 + 1) * times_dim1 + 1], ldt1,
-		     ldt2, &rwork[1], &llwork[1], nout, 9L, 4L);
+	    sprtbv_(subnam_ref(0, isub), ntypes, &dotype[1], nsizes, &mm[1], &
+		    nn[1], &inparm[isub - 1], pnames, nparms, &ldas[1], &nnb[
+		    1], &opcnts_ref(1, 1, 1, isub), ldo1, ldo2, &times_ref(1, 
+		    1, 1, isub), ldt1, ldt2, &rwork[1], &llwork[1], nout, (
+		    ftnlen)9, (ftnlen)4);
 	}
-/* L690: */
+/* L720: */
     }
 
     return 0;
@@ -2169,4 +2103,9 @@ L670:
 
 
 } /* ctim26_ */
+
+#undef opcnts_ref
+#undef subnam_ref
+#undef times_ref
+
 

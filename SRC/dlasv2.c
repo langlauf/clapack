@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dlasv2_(doublereal *f, doublereal *g, doublereal *h, 
+/* Subroutine */ int dlasv2_(doublereal *f, doublereal *g, doublereal *h__, 
 	doublereal *ssmin, doublereal *ssmax, doublereal *snr, doublereal *
 	csr, doublereal *snl, doublereal *csl)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -17,10 +18,8 @@
     triangular matrix   
        [  F   G  ]   
        [  0   H  ].   
-    On return, abs(SSMAX) is the larger singular value, abs(SSMIN) is the 
-  
-    smaller singular value, and (CSL,SNL) and (CSR,SNR) are the left and 
-  
+    On return, abs(SSMAX) is the larger singular value, abs(SSMIN) is the   
+    smaller singular value, and (CSL,SNL) and (CSR,SNR) are the left and   
     right singular vectors for abs(SSMAX), giving the decomposition   
 
        [ CSL  SNL ] [  F   G  ] [ CSR -SNR ]  =  [ SSMAX   0   ]   
@@ -46,14 +45,12 @@
 
     SNL     (output) DOUBLE PRECISION   
     CSL     (output) DOUBLE PRECISION   
-            The vector (CSL, SNL) is a unit left singular vector for the 
-  
+            The vector (CSL, SNL) is a unit left singular vector for the   
             singular value abs(SSMAX).   
 
     SNR     (output) DOUBLE PRECISION   
     CSR     (output) DOUBLE PRECISION   
-            The vector (CSR, SNR) is a unit right singular vector for the 
-  
+            The vector (CSR, SNR) is a unit right singular vector for the   
             singular value abs(SSMAX).   
 
     Further Details   
@@ -61,13 +58,11 @@
 
     Any input parameter may be aliased with any output parameter.   
 
-    Barring over/underflow and assuming a guard digit in subtraction, all 
-  
+    Barring over/underflow and assuming a guard digit in subtraction, all   
     output quantities are correct to within a few units in the last   
     place (ulps).   
 
-    In IEEE arithmetic, the code works correctly if one matrix element is 
-  
+    In IEEE arithmetic, the code works correctly if one matrix element is   
     infinite.   
 
     Overflow will not occur unless the largest singular value itself   
@@ -79,8 +74,7 @@
     may correspond to a matrix modified by perturbations of size near   
     the underflow threshold.   
 
-   ===================================================================== 
-*/
+   ===================================================================== */
     /* Table of constant values */
     static doublereal c_b3 = 2.;
     static doublereal c_b4 = 1.;
@@ -93,7 +87,7 @@
     static integer pmax;
     static doublereal temp;
     static logical swap;
-    static doublereal a, d, l, m, r, s, t, tsign, fa, ga, ha;
+    static doublereal a, d__, l, m, r__, s, t, tsign, fa, ga, ha;
     extern doublereal dlamch_(char *);
     static doublereal ft, gt, ht, mm;
     static logical gasmal;
@@ -104,8 +98,8 @@
 
     ft = *f;
     fa = abs(ft);
-    ht = *h;
-    ha = abs(*h);
+    ht = *h__;
+    ha = abs(*h__);
 
 /*     PMAX points to the maximum absolute element of matrix   
          PMAX = 1 if F largest in absolute values   
@@ -163,14 +157,14 @@
 
 /*           Normal case */
 
-	    d = fa - ha;
-	    if (d == fa) {
+	    d__ = fa - ha;
+	    if (d__ == fa) {
 
 /*              Copes with infinite F or H */
 
 		l = 1.;
 	    } else {
-		l = d / fa;
+		l = d__ / fa;
 	    }
 
 /*           Note that 0 .le. L .le. 1 */
@@ -190,14 +184,14 @@
 /*           Note that 1 .le. S .le. 1 + 1/macheps */
 
 	    if (l == 0.) {
-		r = abs(m);
+		r__ = abs(m);
 	    } else {
-		r = sqrt(l * l + mm);
+		r__ = sqrt(l * l + mm);
 	    }
 
 /*           Note that 0 .le. R .le. 1 + 1/macheps */
 
-	    a = (s + r) * .5;
+	    a = (s + r__) * .5;
 
 /*           Note that 1 .le. A .le. 1 + abs(M) */
 
@@ -210,10 +204,10 @@
 		if (l == 0.) {
 		    t = d_sign(&c_b3, &ft) * d_sign(&c_b4, &gt);
 		} else {
-		    t = gt / d_sign(&d, &ft) + m / t;
+		    t = gt / d_sign(&d__, &ft) + m / t;
 		}
 	    } else {
-		t = (m / (s + t) + m / (r + l)) * (a + 1.);
+		t = (m / (s + t) + m / (r__ + l)) * (a + 1.);
 	    }
 	    l = sqrt(t * t + 4.);
 	    crt = 2. / l;
@@ -243,10 +237,10 @@
 	tsign = d_sign(&c_b4, snr) * d_sign(&c_b4, csl) * d_sign(&c_b4, g);
     }
     if (pmax == 3) {
-	tsign = d_sign(&c_b4, snr) * d_sign(&c_b4, snl) * d_sign(&c_b4, h);
+	tsign = d_sign(&c_b4, snr) * d_sign(&c_b4, snl) * d_sign(&c_b4, h__);
     }
     *ssmax = d_sign(ssmax, &tsign);
-    d__1 = tsign * d_sign(&c_b4, f) * d_sign(&c_b4, h);
+    d__1 = tsign * d_sign(&c_b4, f) * d_sign(&c_b4, h__);
     *ssmin = d_sign(ssmin, &d__1);
     return 0;
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static integer c_n1 = -1;
     /* Local variables */
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer i, j, k;
+    static integer i__, j, k;
     static doublereal t;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dgemv_(char *, integer *, integer *, doublereal *, 
@@ -37,7 +38,11 @@ static integer c_n1 = -1;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define afac_ref(a_1,a_2) afac[(a_2)*afac_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -67,16 +72,13 @@ static integer c_n1 = -1;
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     AFAC    (input/output) DOUBLE PRECISION array, dimension (LDAFAC,N)   
-            The factored form of the matrix A.  AFAC contains the factors 
-  
+            The factored form of the matrix A.  AFAC contains the factors   
             L and U from the L*U factorization as computed by DGETRF.   
-            Overwritten with the reconstructed matrix, and then with the 
-  
+            Overwritten with the reconstructed matrix, and then with the   
             difference L*U - A.   
 
     LDAFAC  (input) INTEGER   
-            The leading dimension of the array AFAC.  LDAFAC >= max(1,M). 
-  
+            The leading dimension of the array AFAC.  LDAFAC >= max(1,M).   
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices from DGETRF.   
@@ -86,8 +88,7 @@ static integer c_n1 = -1;
     RESID   (output) DOUBLE PRECISION   
             norm(L*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -95,10 +96,10 @@ static integer c_n1 = -1;
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     afac_dim1 = *ldafac;
-    afac_offset = afac_dim1 + 1;
+    afac_offset = 1 + afac_dim1 * 1;
     afac -= afac_offset;
     --ipiv;
     --rwork;
@@ -121,33 +122,33 @@ static integer c_n1 = -1;
     for (k = *n; k >= 1; --k) {
 	if (k > *m) {
 	    dtrmv_("Lower", "No transpose", "Unit", m, &afac[afac_offset], 
-		    ldafac, &afac[k * afac_dim1 + 1], &c__1);
+		    ldafac, &afac_ref(1, k), &c__1);
 	} else {
 
 /*           Compute elements (K+1:M,K) */
 
-	    t = afac[k + k * afac_dim1];
+	    t = afac_ref(k, k);
 	    if (k + 1 <= *m) {
 		i__1 = *m - k;
-		dscal_(&i__1, &t, &afac[k + 1 + k * afac_dim1], &c__1);
+		dscal_(&i__1, &t, &afac_ref(k + 1, k), &c__1);
 		i__1 = *m - k;
 		i__2 = k - 1;
-		dgemv_("No transpose", &i__1, &i__2, &c_b11, &afac[k + 1 + 
-			afac_dim1], ldafac, &afac[k * afac_dim1 + 1], &c__1, &
-			c_b11, &afac[k + 1 + k * afac_dim1], &c__1);
+		dgemv_("No transpose", &i__1, &i__2, &c_b11, &afac_ref(k + 1, 
+			1), ldafac, &afac_ref(1, k), &c__1, &c_b11, &afac_ref(
+			k + 1, k), &c__1);
 	    }
 
 /*           Compute the (K,K) element */
 
 	    i__1 = k - 1;
-	    afac[k + k * afac_dim1] = t + ddot_(&i__1, &afac[k + afac_dim1], 
-		    ldafac, &afac[k * afac_dim1 + 1], &c__1);
+	    afac_ref(k, k) = t + ddot_(&i__1, &afac_ref(k, 1), ldafac, &
+		    afac_ref(1, k), &c__1);
 
 /*           Compute elements (1:K-1,K) */
 
 	    i__1 = k - 1;
 	    dtrmv_("Lower", "No transpose", "Unit", &i__1, &afac[afac_offset],
-		     ldafac, &afac[k * afac_dim1 + 1], &c__1);
+		     ldafac, &afac_ref(1, k), &c__1);
 	}
 /* L10: */
     }
@@ -159,8 +160,8 @@ static integer c_n1 = -1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= i__2; ++i) {
-	    afac[i + j * afac_dim1] -= a[i + j * a_dim1];
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    afac_ref(i__, j) = afac_ref(i__, j) - a_ref(i__, j);
 /* L20: */
 	}
 /* L30: */
@@ -183,4 +184,8 @@ static integer c_n1 = -1;
 /*     End of DGET01 */
 
 } /* dget01_ */
+
+#undef afac_ref
+#undef a_ref
+
 

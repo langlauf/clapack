@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -15,33 +16,37 @@ struct {
 
 /* Table of constant values */
 
+static integer c__12 = 12;
+static integer c__10 = 10;
+static integer c__0 = 0;
 static integer c__11 = 11;
 static integer c__1 = 1;
+static integer c__9 = 9;
+static integer c__25 = 25;
 static integer c__2 = 2;
-static real c_b27 = 1.f;
-static integer c__0 = 0;
+static real c_b43 = 1.f;
 static integer c__4 = 4;
 static integer c__3 = 3;
-static real c_b303 = 0.f;
+static real c_b342 = 0.f;
 
 /* Subroutine */ int ctim22_(char *line, integer *nsizes, integer *nn, 
 	integer *ntypes, logical *dotype, integer *nparms, integer *nnb, 
 	integer *ldas, real *timmin, integer *nout, integer *iseed, complex *
-	a, real *d, real *e, real *e2, complex *u, real *ure, real *uim, 
-	complex *tau, real *taure, complex *z, real *zre, real *zim, complex *
-	work, integer *lwork, real *rwork, logical *llwork, integer *iwork, 
-	real *times, integer *ldt1, integer *ldt2, integer *ldt3, real *
-	opcnts, integer *ldo1, integer *ldo2, integer *ldo3, integer *info, 
+	a, real *d__, real *e, real *e2, complex *u, real *ure, real *uim, 
+	complex *tau, real *taure, complex *z__, real *zre, real *zim, 
+	complex *work, integer *lwork, real *rwork, logical *llwork, integer *
+	iwork, real *times, integer *ldt1, integer *ldt2, integer *ldt3, real 
+	*opcnts, integer *ldo1, integer *ldo2, integer *ldo3, integer *info, 
 	ftnlen line_len)
 {
     /* Initialized data */
 
-    static char subnam[20*11] = "CHETRD              " "CSTEQR(N)           " 
+    static char subnam[20*12] = "CHETRD              " "CSTEQR(N)           " 
 	    "CUNGTR+CSTEQR(V)    " "CPTEQR(N)           " "CUNGTR+CPTEQR(V) "
 	    "   " "SSTEBZ+CSTEIN+CUNMTR" "CUNGTR+CSTEDC(V)    " "CSTEDC(I)+CU"
-	    "NMTR    " "HTRIDI              " "IMTQL1              " "IMTQL2+"
-	    "HTRIBK       ";
-    static integer inparm[11] = { 2,1,2,1,2,2,1,1,1,1,1 };
+	    "NMTR    " "CSTEGR(V)           " "HTRIDI              " "IMTQL1 "
+	    "             " "IMTQL2+HTRIBK       ";
+    static integer inparm[12] = { 2,1,2,1,2,2,1,1,1,1,1,1 };
     static char pnames[4*4] = "LDA " "NB  " "bad1" "bad2";
     static integer kmode[4] = { 4,3,1,5 };
 
@@ -71,10 +76,10 @@ static real c_b303 = 0.f;
     static real time;
     static integer isub;
     static char uplo[1];
-    static integer i, j, m, n, imode, lwedc, iinfo;
+    static integer i__, j, m, n, imode, lwedc, iinfo;
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
 	    *, integer *);
-    static integer lastl, itype, j1, j2, j3, j4;
+    static integer lastl, itype, j1, j2, j3, j4, lwevr;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
     static real s1, s2;
@@ -93,77 +98,91 @@ static real c_b303 = 0.f;
     static integer idumma[1];
     extern doublereal second_(void);
     static integer ioldsd[4];
-    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
-	    *, integer *, complex *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     static integer lrwedc;
     extern /* Subroutine */ int atimin_(char *, char *, integer *, char *, 
-	    logical *, integer *, integer *, ftnlen, ftnlen, ftnlen);
+	    logical *, integer *, integer *, ftnlen, ftnlen, ftnlen), clacpy_(
+	    char *, integer *, integer *, complex *, integer *, complex *, 
+	    integer *);
     static real abstol;
     extern /* Subroutine */ int clatms_(integer *, integer *, char *, integer 
 	    *, char *, real *, integer *, real *, real *, integer *, integer *
-	    , char *, complex *, integer *, complex *, integer *), cstein_(integer *, real *, real *, integer *, 
+	    , char *, complex *, integer *, complex *, integer *), cstegr_(char *, char *, integer *, real *, real *
+	    , real *, real *, integer *, integer *, real *, integer *, real *,
+	     complex *, integer *, integer *, real *, integer *, integer *, 
+	    integer *, integer *);
+    static integer infsok, nansok;
+    extern /* Subroutine */ int cstein_(integer *, real *, real *, integer *, 
 	    real *, integer *, integer *, complex *, integer *, real *, 
 	    integer *, integer *, integer *), htribk_(integer *, integer *, 
-	    real *, real *, real *, integer *, real *, real *), htridi_(
-	    integer *, integer *, real *, real *, real *, real *, real *, 
-	    real *), slaset_(char *, integer *, integer *, real *, real *, 
-	    real *, integer *), cpteqr_(char *, integer *, real *, 
-	    real *, complex *, integer *, real *, integer *), sprtbe_(
-	    char *, integer *, logical *, integer *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    real *, integer *, integer *, real *, integer *, integer *, real *
-	    , logical *, integer *, ftnlen, ftnlen);
+	    real *, real *, real *, integer *, real *, real *), cpteqr_(char *
+	    , integer *, real *, real *, complex *, integer *, real *, 
+	    integer *), htridi_(integer *, integer *, real *, real *, 
+	    real *, real *, real *, real *);
     static real untime;
     extern /* Subroutine */ int csteqr_(char *, integer *, real *, real *, 
 	    complex *, integer *, real *, integer *);
-    static logical timsub[11];
+    static logical timsub[12];
     extern /* Subroutine */ int cungtr_(char *, integer *, complex *, integer 
 	    *, complex *, complex *, integer *, integer *);
-    static integer ilwork;
+    static integer ilwork, liwevr, nsplit;
     extern /* Subroutine */ int cunmtr_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, integer *);
-    static integer nsplit;
+    static real ulpinv;
+    static logical runtrd;
+    extern /* Subroutine */ int slaset_(char *, integer *, integer *, real *, 
+	    real *, real *, integer *), sprtbe_(char *, integer *, 
+	    logical *, integer *, integer *, integer *, char *, integer *, 
+	    integer *, integer *, integer *, integer *, real *, integer *, 
+	    integer *, real *, integer *, integer *, real *, logical *, 
+	    integer *, ftnlen, ftnlen);
+    static integer mtypes;
+    static logical runhtr;
     extern /* Subroutine */ int sstebz_(char *, char *, integer *, real *, 
 	    real *, integer *, integer *, real *, real *, real *, integer *, 
 	    integer *, real *, integer *, integer *, real *, integer *, 
-	    integer *);
-    static real ulpinv;
-    static logical runtrd;
-    extern /* Subroutine */ int xlaenv_(integer *, integer *);
-    static integer mtypes;
-    static logical runhtr;
+	    integer *), xlaenv_(integer *, integer *);
     static integer lda, lgn, ldu;
     static real ulp;
 
     /* Fortran I/O blocks */
-    static cilist io___8 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___10 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___30 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___36 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___43 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___44 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___10 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___12 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___34 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___40 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___45 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___47 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___48 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___49 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___57 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___58 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___59 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___51 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___52 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___53 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___61 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___62 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___63 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___64 = { 0, 0, 0, fmt_9997, 0 };
     static cilist io___65 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___66 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___67 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___68 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___69 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___70 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define times_ref(a_1,a_2,a_3,a_4) times[(((a_4)*times_dim3 + (a_3))*\
+times_dim2 + (a_2))*times_dim1 + a_1]
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*20 + a_0 - 20]
+#define opcnts_ref(a_1,a_2,a_3,a_4) opcnts[(((a_4)*opcnts_dim3 + (a_3))*\
+opcnts_dim2 + (a_2))*opcnts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       February 20, 2000   
 
 
     Purpose   
@@ -173,8 +192,7 @@ static real c_b303 = 0.f;
        eigenvalue problem.   
 
        For each N value in NN(1:NSIZES) and .TRUE. value in   
-       DOTYPE(1:NTYPES), a matrix will be generated and used to test the 
-  
+       DOTYPE(1:NTYPES), a matrix will be generated and used to test the   
        selected routines.  Thus, NSIZES*(number of .TRUE. values in   
        DOTYPE) matrices will be generated.   
 
@@ -185,9 +203,9 @@ static real c_b303 = 0.f;
             On entry, LINE contains the input line which requested   
             this routine.  This line may contain a subroutine name,   
             such as CHETRD, indicating that only routine CHETRD will   
-            be timed, or it may contain a generic name, such as SST.   
+            be timed, or it may contain a generic name, such as CST.   
             In this case, the rest of the line is scanned for the   
-            first 11 non-blank characters, corresponding to the eleven   
+            first 12 non-blank characters, corresponding to the twelve   
             combinations of subroutine and options:   
             LAPACK:   
                1: CHETRD   
@@ -198,10 +216,11 @@ static real c_b303 = 0.f;
                6. SSTEBZ+CSTEIN+CUNMTR   
                7. CUNGTR+CSTEDC(COMPQ='V')   
                8. CSTEDC(COMPQ='I')+CUNMTR   
+               9. CSTEGR(COMPQ='V')   
             EISPACK:   
-               9: HTRIDI (compare with CHETRD)   
-              10: IMTQL1 (compare w/ CSTEQR -- VECT='N')   
-              11: IMTQL2+HTRIBK (compare w/ CUNGTR+CSTEQR(VECT='V') )   
+              10: HTRIDI (compare with CHETRD)   
+              11: IMTQL1 (compare w/ CSTEQR -- VECT='N')   
+              12: IMTQL2+HTRIBK (compare w/ CUNGTR+CSTEQR(VECT='V') )   
             If a character is 'T' or 't', the corresponding routine in   
             this path is timed.  If the entire line is blank, all the   
             routines in the path are timed.   
@@ -281,8 +300,7 @@ static real c_b303 = 0.f;
 
     URE     (workspace) REAL array,   
                         dimension( max(NN)*max(LDAS) )   
-            The array of the real parts of Householder vectors output by 
-  
+            The array of the real parts of Householder vectors output by   
             HTRIDI.  This array is used only when U is not -- see the   
             note description of U.   
 
@@ -328,7 +346,7 @@ static real c_b303 = 0.f;
             max( (NNB + 2 )*LDAS, max(LDAS)*max(LDAS) )   
 
     RWORK   (workspace) REAL array, dimension   
-                     ( max( 4*max(LDAS), NSIZES*NTYPES*NPARMS ),   
+                     ( max( 6*max(LDAS), NSIZES*NTYPES*NPARMS ),   
                        ( 1 + 3 * M + 2 * M * lg M + 3 * M**2 ) ),   
             where  M = max(lDAS), and lg M is the smallest integer k   
             such that 2^k >= N.   
@@ -372,8 +390,7 @@ static real c_b303 = 0.f;
     INFO    (output) INTEGER   
             Error flag.  It will be set to zero if no error occurred.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
@@ -382,7 +399,7 @@ static real c_b303 = 0.f;
     --ldas;
     --iseed;
     --a;
-    --d;
+    --d__;
     --e;
     --e2;
     --u;
@@ -390,7 +407,7 @@ static real c_b303 = 0.f;
     --uim;
     --tau;
     --taure;
-    --z;
+    --z__;
     --zre;
     --zim;
     --work;
@@ -400,12 +417,13 @@ static real c_b303 = 0.f;
     times_dim1 = *ldt1;
     times_dim2 = *ldt2;
     times_dim3 = *ldt3;
-    times_offset = times_dim1 * (times_dim2 * (times_dim3 + 1) + 1) + 1;
+    times_offset = 1 + times_dim1 * (1 + times_dim2 * (1 + times_dim3 * 1));
     times -= times_offset;
     opcnts_dim1 = *ldo1;
     opcnts_dim2 = *ldo2;
     opcnts_dim3 = *ldo3;
-    opcnts_offset = opcnts_dim1 * (opcnts_dim2 * (opcnts_dim3 + 1) + 1) + 1;
+    opcnts_offset = 1 + opcnts_dim1 * (1 + opcnts_dim2 * (1 + opcnts_dim3 * 1)
+	    );
     opcnts -= opcnts_offset;
 
     /* Function Body   
@@ -413,7 +431,19 @@ static real c_b303 = 0.f;
 
        Extract the timing request from the input line. */
 
-    atimin_("CST", line, &c__11, subnam, timsub, nout, info, 3L, 80L, 20L);
+    atimin_("CST", line, &c__12, subnam, timsub, nout, info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)20);
+
+/*     Disable timing of CSTEGR if we're non-IEEE-754 compliant. */
+
+    nansok = ilaenv_(&c__10, "CSTEGR", " ", &c__0, &c__0, &c__0, &c__0, (
+	    ftnlen)6, (ftnlen)1);
+    infsok = ilaenv_(&c__11, "CSTEGR", " ", &c__0, &c__0, &c__0, &c__0, (
+	    ftnlen)6, (ftnlen)1);
+    if (nansok != 1 || infsok != 1) {
+	timsub[8] = FALSE_;
+    }
+
     if (*info != 0) {
 	return 0;
     }
@@ -426,9 +456,9 @@ static real c_b303 = 0.f;
 	for (j1 = 1; j1 <= i__2; ++j1) {
 	    if (nn[j2] > ldas[j1]) {
 		*info = -8;
-		io___8.ciunit = *nout;
-		s_wsfe(&io___8);
-		do_fio(&c__1, line, 6L);
+		io___10.ciunit = *nout;
+		s_wsfe(&io___10);
+		do_fio(&c__1, line, (ftnlen)6);
 		e_wsfe();
 		return 0;
 	    }
@@ -449,9 +479,9 @@ static real c_b303 = 0.f;
     }
     if (ilwork > *lwork) {
 	*info = -18;
-	io___10.ciunit = *nout;
-	s_wsfe(&io___10);
-	do_fio(&c__1, line, 6L);
+	io___12.ciunit = *nout;
+	s_wsfe(&io___12);
+	do_fio(&c__1, line, (ftnlen)6);
 	e_wsfe();
 	return 0;
     }
@@ -461,7 +491,8 @@ static real c_b303 = 0.f;
        RUNTRD -- if CHETRD must be run. */
 
     runtrd = FALSE_;
-    if (timsub[1] || timsub[2] || timsub[3] || timsub[4]) {
+    if (timsub[1] || timsub[2] || timsub[3] || timsub[4] || timsub[5] || 
+	    timsub[6] || timsub[7] || timsub[8]) {
 	runtrd = TRUE_;
     }
 
@@ -470,7 +501,7 @@ static real c_b303 = 0.f;
        RUNHTR -- if HTRIDI must be run. */
 
     runhtr = FALSE_;
-    if (timsub[6] || timsub[7]) {
+    if (timsub[9] || timsub[10] || timsub[11]) {
 	runhtr = TRUE_;
     }
 
@@ -478,20 +509,19 @@ static real c_b303 = 0.f;
 
     ulp = slamch_("Epsilon") * slamch_("Base");
     ulpinv = 1.f / ulp;
+    xlaenv_(&c__9, &c__25);
 
 /*     Zero out OPCNTS, TIMES */
 
-    for (j4 = 1; j4 <= 11; ++j4) {
+    for (j4 = 1; j4 <= 12; ++j4) {
 	i__1 = *nsizes;
 	for (j3 = 1; j3 <= i__1; ++j3) {
 	    i__2 = *ntypes;
 	    for (j2 = 1; j2 <= i__2; ++j2) {
 		i__3 = *nparms;
 		for (j1 = 1; j1 <= i__3; ++j1) {
-		    opcnts[j1 + (j2 + (j3 + j4 * opcnts_dim3) * opcnts_dim2) *
-			     opcnts_dim1] = 0.f;
-		    times[j1 + (j2 + (j3 + j4 * times_dim3) * times_dim2) * 
-			    times_dim1] = 0.f;
+		    opcnts_ref(j1, j2, j3, j4) = 0.f;
+		    times_ref(j1, j2, j3, j4) = 0.f;
 /* L40: */
 		}
 /* L50: */
@@ -522,10 +552,14 @@ static real c_b303 = 0.f;
 	    i__2 = n;
 	    lrwedc = n * 3 + 1 + (n << 1) * lgn + i__2 * i__2 * 3;
 	    liwedc = n * 6 + 6 + n * 5 * lgn;
+	    lwevr = n * 18;
+	    liwevr = n * 10;
 	} else {
 	    lwedc = 8;
 	    lrwedc = 7;
 	    liwedc = 12;
+	    lwevr = 1;
+	    liwevr = 1;
 	}
 
 /*        Do for each .TRUE. value in DOTYPE: */
@@ -537,7 +571,7 @@ static real c_b303 = 0.f;
 	i__2 = mtypes;
 	for (itype = 1; itype <= i__2; ++itype) {
 	    if (! dotype[itype]) {
-		goto L610;
+		goto L640;
 	    }
 
 /*           Save random number seed for error messages */
@@ -547,8 +581,7 @@ static real c_b303 = 0.f;
 /* L80: */
 	    }
 
-/* --------------------------------------------------------------
----------   
+/* -----------------------------------------------------------------------   
 
              Time the LAPACK Routines   
 
@@ -558,12 +591,12 @@ static real c_b303 = 0.f;
 	    if (itype <= 4) {
 		imode = kmode[itype - 1];
 		clatms_(&n, &n, "S", &iseed[1], "S", &rwork[1], &imode, &
-			ulpinv, &c_b27, &n, &n, uplo, &a[1], &n, &work[1], &
+			ulpinv, &c_b43, &n, &n, uplo, &a[1], &n, &work[1], &
 			iinfo);
 		if (iinfo != 0) {
-		    io___30.ciunit = *nout;
-		    s_wsfe(&io___30);
-		    do_fio(&c__1, "CLATMS", 6L);
+		    io___34.ciunit = *nout;
+		    s_wsfe(&io___34);
+		    do_fio(&c__1, "CLATMS", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&itype, (ftnlen)sizeof(integer));
@@ -572,7 +605,7 @@ static real c_b303 = 0.f;
 			    ;
 		    e_wsfe();
 		    *info = abs(iinfo);
-		    goto L610;
+		    goto L640;
 		}
 	    }
 
@@ -596,12 +629,12 @@ static real c_b303 = 0.f;
 		    s1 = second_();
 L90:
 		    clacpy_(uplo, &n, &n, &a[1], &n, &u[1], &lda);
-		    chetrd_(uplo, &n, &u[1], &lda, &d[1], &e[1], &tau[1], &
+		    chetrd_(uplo, &n, &u[1], &lda, &d__[1], &e[1], &tau[1], &
 			    work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___36.ciunit = *nout;
-			s_wsfe(&io___36);
-			do_fio(&c__1, subnam, 20L);
+			io___40.ciunit = *nout;
+			s_wsfe(&io___40);
+			do_fio(&c__1, subnam_ref(0, 1), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -627,7 +660,7 @@ L90:
 		    s1 = second_();
 		    i__4 = ic;
 		    for (j = 1; j <= i__4; ++j) {
-			clacpy_(uplo, &n, &n, &a[1], &n, &z[1], &lda);
+			clacpy_(uplo, &n, &n, &a[1], &n, &z__[1], &lda);
 /* L100: */
 		    }
 		    s2 = second_();
@@ -635,23 +668,22 @@ L90:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3) * times_dim2) * 
-			    times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3) * opcnts_dim2) *
-			     opcnts_dim1] = sopla_("CHETRD", &n, &c__0, &c__0,
-			     &c__0, &nb);
+		    times_ref(ipar, itype, in, 1) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 1) = sopla_("CHETRD", &n, &
+			    c__0, &c__0, &c__0, &nb);
 		    ldu = lda;
 /* L110: */
 		}
 	    } else {
 		if (runtrd) {
 		    clacpy_(uplo, &n, &n, &a[1], &n, &u[1], &n);
-		    chetrd_(uplo, &n, &u[1], &n, &d[1], &e[1], &tau[1], &work[
-			    1], lwork, &iinfo);
+		    chetrd_(uplo, &n, &u[1], &n, &d__[1], &e[1], &tau[1], &
+			    work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___41.ciunit = *nout;
-			s_wsfe(&io___41);
-			do_fio(&c__1, subnam, 20L);
+			io___45.ciunit = *nout;
+			s_wsfe(&io___45);
+			do_fio(&c__1, subnam_ref(0, 1), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -675,8 +707,7 @@ L90:
 		for (ipar = 1; ipar <= i__3; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has come up before
-, just use   
+/*                 If this value of LDA has come up before, just use   
                    the value previously computed. */
 
 		    lastl = 0;
@@ -695,15 +726,15 @@ L90:
 			latime_1.ops = 0.f;
 			s1 = second_();
 L130:
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__4 = n - 1;
 			scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			csteqr_("N", &n, &rwork[1], &rwork[lda + 1], &z[1], &
-				lda, &rwork[(lda << 1) + 1], &iinfo);
+			csteqr_("N", &n, &rwork[1], &rwork[lda + 1], &z__[1], 
+				&lda, &rwork[(lda << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___43.ciunit = *nout;
-			    s_wsfe(&io___43);
-			    do_fio(&c__1, subnam + 20, 20L);
+			    io___47.ciunit = *nout;
+			    s_wsfe(&io___47);
+			    do_fio(&c__1, subnam_ref(0, 2), (ftnlen)20);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -725,13 +756,12 @@ L130:
 			    goto L130;
 			}
 
-/*                    Subtract the time used in SCOPY.
- */
+/*                    Subtract the time used in SCOPY. */
 
 			s1 = second_();
 			i__4 = ic;
 			for (j = 1; j <= i__4; ++j) {
-			    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = n - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &
 				    c__1);
@@ -742,29 +772,22 @@ L130:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + (times_dim3 << 1)) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 2) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 2) = latime_1.ops / (real)
+				 ic;
 		    } else {
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastl + (
-				itype + (in + (opcnts_dim3 << 1)) * 
-				opcnts_dim2) * opcnts_dim1];
-			times[ipar + (itype + (in + (times_dim3 << 1)) * 
-				times_dim2) * times_dim1] = times[lastl + (
-				itype + (in + (times_dim3 << 1)) * times_dim2)
-				 * times_dim1];
+			opcnts_ref(ipar, itype, in, 2) = opcnts_ref(lastl, 
+				itype, in, 2);
+			times_ref(ipar, itype, in, 2) = times_ref(lastl, 
+				itype, in, 2);
 		    }
 L150:
 		    ;
 		}
 	    }
 
-/*           Time CUNGTR + CSTEQR(VECT='V') for each pair NNB(j), 
-LDAS(j) */
+/*           Time CUNGTR + CSTEQR(VECT='V') for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[2]) {
 		i__3 = *nparms;
@@ -783,13 +806,13 @@ LDAS(j) */
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L160:
-		    clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
-		    cungtr_("L", &n, &z[1], &lda, &tau[1], &work[1], lwork, &
-			    iinfo);
+		    clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
+		    cungtr_("L", &n, &z__[1], &lda, &tau[1], &work[1], lwork, 
+			    &iinfo);
 		    if (iinfo != 0) {
-			io___44.ciunit = *nout;
-			s_wsfe(&io___44);
-			do_fio(&c__1, "CUNGTR", 6L);
+			io___48.ciunit = *nout;
+			s_wsfe(&io___48);
+			do_fio(&c__1, "CUNGTR", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -802,15 +825,15 @@ L160:
 			*info = abs(iinfo);
 			goto L180;
 		    }
-		    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+		    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 		    i__4 = n - 1;
 		    scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-		    csteqr_("V", &n, &rwork[1], &rwork[lda + 1], &z[1], &lda, 
-			    &rwork[(lda << 1) + 1], &iinfo);
+		    csteqr_("V", &n, &rwork[1], &rwork[lda + 1], &z__[1], &
+			    lda, &rwork[(lda << 1) + 1], &iinfo);
 		    if (iinfo != 0) {
-			io___45.ciunit = *nout;
-			s_wsfe(&io___45);
-			do_fio(&c__1, subnam + 40, 20L);
+			io___49.ciunit = *nout;
+			s_wsfe(&io___49);
+			do_fio(&c__1, subnam_ref(0, 3), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -836,10 +859,10 @@ L160:
 		    s1 = second_();
 		    i__4 = ic;
 		    for (j = 1; j <= i__4; ++j) {
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__5 = n - 1;
 			scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
+			clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
 /* L170: */
 		    }
 		    s2 = second_();
@@ -847,11 +870,9 @@ L160:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 3) * times_dim2) 
-			    * times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 3) * 
-			    opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-			    real) ic;
+		    times_ref(ipar, itype, in, 3) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 3) = latime_1.ops / (real) ic;
 		    ldu = lda;
 L180:
 		    ;
@@ -867,8 +888,7 @@ L190:
 		for (ipar = 1; ipar <= i__3; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has come up before
-, just use   
+/*                 If this value of LDA has come up before, just use   
                    the value previously computed. */
 
 		    lastl = 0;
@@ -884,19 +904,18 @@ L190:
 /*                    Time CPTEQR with VECT='N'   
 
 
-                      Modify the tridiagonal matrix to
- make it   
+                      Modify the tridiagonal matrix to make it   
                       positive definite. */
-			e2[1] = dabs(d[1]) + dabs(e[1]);
+			e2[1] = dabs(d__[1]) + dabs(e[1]);
 			i__4 = n - 1;
-			for (i = 2; i <= i__4; ++i) {
-			    e2[i] = (r__1 = d[i], dabs(r__1)) + (r__2 = e[i], 
-				    dabs(r__2)) + (r__3 = e[i - 1], dabs(r__3)
-				    );
+			for (i__ = 2; i__ <= i__4; ++i__) {
+			    e2[i__] = (r__1 = d__[i__], dabs(r__1)) + (r__2 = 
+				    e[i__], dabs(r__2)) + (r__3 = e[i__ - 1], 
+				    dabs(r__3));
 /* L210: */
 			}
-			e2[n] = (r__1 = d[n], dabs(r__1)) + (r__2 = e[n - 1], 
-				dabs(r__2));
+			e2[n] = (r__1 = d__[n], dabs(r__1)) + (r__2 = e[n - 1]
+				, dabs(r__2));
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
@@ -904,12 +923,12 @@ L220:
 			scopy_(&n, &e2[1], &c__1, &rwork[1], &c__1);
 			i__4 = n - 1;
 			scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			cpteqr_("N", &n, &rwork[1], &rwork[lda + 1], &z[1], &
-				lda, &rwork[(lda << 1) + 1], &iinfo);
+			cpteqr_("N", &n, &rwork[1], &rwork[lda + 1], &z__[1], 
+				&lda, &rwork[(lda << 1) + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___47.ciunit = *nout;
-			    s_wsfe(&io___47);
-			    do_fio(&c__1, subnam + 60, 20L);
+			    io___51.ciunit = *nout;
+			    s_wsfe(&io___51);
+			    do_fio(&c__1, subnam_ref(0, 4), (ftnlen)20);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -931,8 +950,7 @@ L220:
 			    goto L220;
 			}
 
-/*                    Subtract the time used in SCOPY.
- */
+/*                    Subtract the time used in SCOPY. */
 
 			s1 = second_();
 			i__4 = ic;
@@ -948,29 +966,22 @@ L220:
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + (times_dim3 << 2)) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 4) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-				real) ic;
+			opcnts_ref(ipar, itype, in, 4) = latime_1.ops / (real)
+				 ic;
 		    } else {
-			opcnts[ipar + (itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastl + (
-				itype + (in + (opcnts_dim3 << 2)) * 
-				opcnts_dim2) * opcnts_dim1];
-			times[ipar + (itype + (in + (times_dim3 << 2)) * 
-				times_dim2) * times_dim1] = times[lastl + (
-				itype + (in + (times_dim3 << 2)) * times_dim2)
-				 * times_dim1];
+			opcnts_ref(ipar, itype, in, 4) = opcnts_ref(lastl, 
+				itype, in, 4);
+			times_ref(ipar, itype, in, 4) = times_ref(lastl, 
+				itype, in, 4);
 		    }
 L240:
 		    ;
 		}
 	    }
 
-/*           Time CUNGTR + CPTEQR(VECT='V') for each pair NNB(j), 
-LDAS(j) */
+/*           Time CUNGTR + CPTEQR(VECT='V') for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[4]) {
 		i__3 = *nparms;
@@ -989,13 +1000,13 @@ LDAS(j) */
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L250:
-		    clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
-		    cungtr_("L", &n, &z[1], &lda, &tau[1], &work[1], lwork, &
-			    iinfo);
+		    clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
+		    cungtr_("L", &n, &z__[1], &lda, &tau[1], &work[1], lwork, 
+			    &iinfo);
 		    if (iinfo != 0) {
-			io___48.ciunit = *nout;
-			s_wsfe(&io___48);
-			do_fio(&c__1, "CUNGTR", 6L);
+			io___52.ciunit = *nout;
+			s_wsfe(&io___52);
+			do_fio(&c__1, "CUNGTR", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1009,28 +1020,28 @@ L250:
 			goto L290;
 		    }
 
-/*                 Modify the tridiagonal matrix to make i
-t   
+/*                 Modify the tridiagonal matrix to make it   
                    positive definite. */
-		    e2[1] = dabs(d[1]) + dabs(e[1]);
+		    e2[1] = dabs(d__[1]) + dabs(e[1]);
 		    i__4 = n - 1;
-		    for (i = 2; i <= i__4; ++i) {
-			e2[i] = (r__1 = d[i], dabs(r__1)) + (r__2 = e[i], 
-				dabs(r__2)) + (r__3 = e[i - 1], dabs(r__3));
+		    for (i__ = 2; i__ <= i__4; ++i__) {
+			e2[i__] = (r__1 = d__[i__], dabs(r__1)) + (r__2 = e[
+				i__], dabs(r__2)) + (r__3 = e[i__ - 1], dabs(
+				r__3));
 /* L260: */
 		    }
-		    e2[n] = (r__1 = d[n], dabs(r__1)) + (r__2 = e[n - 1], 
+		    e2[n] = (r__1 = d__[n], dabs(r__1)) + (r__2 = e[n - 1], 
 			    dabs(r__2));
 
 		    scopy_(&n, &e2[1], &c__1, &rwork[1], &c__1);
 		    i__4 = n - 1;
 		    scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-		    cpteqr_("V", &n, &rwork[1], &rwork[lda + 1], &z[1], &lda, 
-			    &rwork[(lda << 1) + 1], &iinfo);
+		    cpteqr_("V", &n, &rwork[1], &rwork[lda + 1], &z__[1], &
+			    lda, &rwork[(lda << 1) + 1], &iinfo);
 		    if (iinfo != 0) {
-			io___49.ciunit = *nout;
-			s_wsfe(&io___49);
-			do_fio(&c__1, subnam + 80, 20L);
+			io___53.ciunit = *nout;
+			s_wsfe(&io___53);
+			do_fio(&c__1, subnam_ref(0, 5), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1056,21 +1067,21 @@ t
 		    s1 = second_();
 		    i__4 = ic;
 		    for (j = 1; j <= i__4; ++j) {
-			e2[1] = dabs(d[1]) + dabs(e[1]);
+			e2[1] = dabs(d__[1]) + dabs(e[1]);
 			i__5 = n - 1;
-			for (i = 2; i <= i__5; ++i) {
-			    e2[i] = (r__1 = d[i], dabs(r__1)) + (r__2 = e[i], 
-				    dabs(r__2)) + (r__3 = e[i - 1], dabs(r__3)
-				    );
+			for (i__ = 2; i__ <= i__5; ++i__) {
+			    e2[i__] = (r__1 = d__[i__], dabs(r__1)) + (r__2 = 
+				    e[i__], dabs(r__2)) + (r__3 = e[i__ - 1], 
+				    dabs(r__3));
 /* L270: */
 			}
-			e2[n] = (r__1 = d[n], dabs(r__1)) + (r__2 = e[n - 1], 
-				dabs(r__2));
+			e2[n] = (r__1 = d__[n], dabs(r__1)) + (r__2 = e[n - 1]
+				, dabs(r__2));
 
 			scopy_(&n, &e2[1], &c__1, &rwork[1], &c__1);
 			i__5 = n - 1;
 			scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
+			clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
 /* L280: */
 		    }
 		    s2 = second_();
@@ -1078,19 +1089,16 @@ t
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 5) * times_dim2) 
-			    * times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 5) * 
-			    opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-			    real) ic;
+		    times_ref(ipar, itype, in, 5) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 5) = latime_1.ops / (real) ic;
 		    ldu = lda;
 L290:
 		    ;
 		}
 	    }
 
-/*           Time SSTEBZ+CSTEIN+CUNMTR for each pair NNB(j), LDAS(
-j) */
+/*           Time SSTEBZ+CSTEIN+CUNMTR for each pair NNB(j), LDAS(j) */
 
 	    if (timsub[5]) {
 		vl = 0.f;
@@ -1114,14 +1122,14 @@ j) */
 		    s1 = second_();
 L300:
 
-		    sstebz_("A", "B", &n, &vl, &vu, &il, &iu, &abstol, &d[1], 
-			    &e[1], &m, &nsplit, &rwork[1], &iwork[1], &iwork[
-			    n + 1], &rwork[(n << 1) + 1], &iwork[(n << 1) + 1]
-			    , &iinfo);
+		    sstebz_("A", "B", &n, &vl, &vu, &il, &iu, &abstol, &d__[1]
+			    , &e[1], &m, &nsplit, &rwork[1], &iwork[1], &
+			    iwork[n + 1], &rwork[(n << 1) + 1], &iwork[(n << 
+			    1) + 1], &iinfo);
 		    if (iinfo != 0) {
-			io___57.ciunit = *nout;
-			s_wsfe(&io___57);
-			do_fio(&c__1, "SSTEBZ", 6L);
+			io___61.ciunit = *nout;
+			s_wsfe(&io___61);
+			do_fio(&c__1, "SSTEBZ", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1135,13 +1143,13 @@ L300:
 			goto L310;
 		    }
 
-		    cstein_(&n, &d[1], &e[1], &n, &rwork[1], &iwork[1], &
-			    iwork[n + 1], &z[1], &lda, &rwork[n + 1], &iwork[(
-			    n << 1) + 1], &iwork[n * 3 + 1], &iinfo);
+		    cstein_(&n, &d__[1], &e[1], &n, &rwork[1], &iwork[1], &
+			    iwork[n + 1], &z__[1], &lda, &rwork[n + 1], &
+			    iwork[(n << 1) + 1], &iwork[n * 3 + 1], &iinfo);
 		    if (iinfo != 0) {
-			io___58.ciunit = *nout;
-			s_wsfe(&io___58);
-			do_fio(&c__1, subnam + 100, 20L);
+			io___62.ciunit = *nout;
+			s_wsfe(&io___62);
+			do_fio(&c__1, subnam_ref(0, 6), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1155,12 +1163,12 @@ L300:
 			goto L310;
 		    }
 
-		    cunmtr_("L", "L", "N", &n, &n, &u[1], &ldu, &tau[1], &z[1]
-			    , &lda, &work[1], lwork, &iinfo);
+		    cunmtr_("L", "L", "N", &n, &n, &u[1], &ldu, &tau[1], &z__[
+			    1], &lda, &work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___59.ciunit = *nout;
-			s_wsfe(&io___59);
-			do_fio(&c__1, "CUNMTR", 6L);
+			io___63.ciunit = *nout;
+			s_wsfe(&io___63);
+			do_fio(&c__1, "CUNMTR", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1184,19 +1192,16 @@ L300:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 6) * times_dim2) 
-			    * times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 6) * 
-			    opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-			    real) ic;
+		    times_ref(ipar, itype, in, 6) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 6) = latime_1.ops / (real) ic;
 		    ldu = lda;
 L310:
 		    ;
 		}
 	    }
 
-/*           Time CUNGTR + CSTEDC(COMPQ='V') for each pair NNB(j),
-   
+/*           Time CUNGTR + CSTEDC(COMPQ='V') for each pair NNB(j),   
              LDAS(j) */
 
 	    if (timsub[6]) {
@@ -1216,13 +1221,13 @@ L310:
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L320:
-		    clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
-		    cungtr_("L", &n, &z[1], &lda, &tau[1], &work[1], lwork, &
-			    iinfo);
+		    clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
+		    cungtr_("L", &n, &z__[1], &lda, &tau[1], &work[1], lwork, 
+			    &iinfo);
 		    if (iinfo != 0) {
-			io___60.ciunit = *nout;
-			s_wsfe(&io___60);
-			do_fio(&c__1, "CUNGTR", 6L);
+			io___64.ciunit = *nout;
+			s_wsfe(&io___64);
+			do_fio(&c__1, "CUNGTR", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1235,16 +1240,16 @@ L320:
 			*info = abs(iinfo);
 			goto L340;
 		    }
-		    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+		    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 		    i__4 = n - 1;
 		    scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-		    cstedc_("V", &n, &rwork[1], &rwork[lda + 1], &z[1], &lda, 
-			    &work[1], &lwedc, &rwork[(lda << 1) + 1], &lrwedc,
-			     &iwork[1], &liwedc, &iinfo);
+		    cstedc_("V", &n, &rwork[1], &rwork[lda + 1], &z__[1], &
+			    lda, &work[1], &lwedc, &rwork[(lda << 1) + 1], &
+			    lrwedc, &iwork[1], &liwedc, &iinfo);
 		    if (iinfo != 0) {
-			io___61.ciunit = *nout;
-			s_wsfe(&io___61);
-			do_fio(&c__1, subnam + 120, 20L);
+			io___65.ciunit = *nout;
+			s_wsfe(&io___65);
+			do_fio(&c__1, subnam_ref(0, 7), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1270,10 +1275,10 @@ L320:
 		    s1 = second_();
 		    i__4 = ic;
 		    for (j = 1; j <= i__4; ++j) {
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__5 = n - 1;
 			scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			clacpy_("L", &n, &n, &a[1], &n, &z[1], &lda);
+			clacpy_("L", &n, &n, &a[1], &n, &z__[1], &lda);
 /* L330: */
 		    }
 		    s2 = second_();
@@ -1281,19 +1286,16 @@ L320:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + times_dim3 * 7) * times_dim2) 
-			    * times_dim1] = dmax(r__1,0.f) / (real) ic;
-		    opcnts[ipar + (itype + (in + opcnts_dim3 * 7) * 
-			    opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-			    real) ic;
+		    times_ref(ipar, itype, in, 7) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 7) = latime_1.ops / (real) ic;
 		    ldu = lda;
 L340:
 		    ;
 		}
 	    }
 
-/*           Time CSTEDC(COMPQ='I') + CUNMTR for each pair NNB(j),
-   
+/*           Time CSTEDC(COMPQ='I') + CUNMTR for each pair NNB(j),   
              LDAS(j) */
 
 	    if (timsub[7]) {
@@ -1307,22 +1309,22 @@ L340:
 		    xlaenv_(&c__2, &c__2);
 		    xlaenv_(&c__3, &nb);
 
-/*                 Time  CSTEQR + CUNMTR */
+/*                 Time  CSTEDC + CUNMTR */
 
 		    ic = 0;
 		    latime_1.ops = 0.f;
 		    s1 = second_();
 L350:
-		    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+		    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 		    i__4 = n - 1;
 		    scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-		    cstedc_("I", &n, &rwork[1], &rwork[lda + 1], &z[1], &lda, 
-			    &work[1], &lwedc, &rwork[(lda << 1) + 1], &lrwedc,
-			     &iwork[1], &liwedc, &iinfo);
+		    cstedc_("I", &n, &rwork[1], &rwork[lda + 1], &z__[1], &
+			    lda, &work[1], &lwedc, &rwork[(lda << 1) + 1], &
+			    lrwedc, &iwork[1], &liwedc, &iinfo);
 		    if (iinfo != 0) {
-			io___62.ciunit = *nout;
-			s_wsfe(&io___62);
-			do_fio(&c__1, subnam + 140, 20L);
+			io___66.ciunit = *nout;
+			s_wsfe(&io___66);
+			do_fio(&c__1, subnam_ref(0, 8), (ftnlen)20);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1336,12 +1338,12 @@ L350:
 			goto L370;
 		    }
 
-		    cunmtr_("L", "L", "N", &n, &n, &u[1], &ldu, &tau[1], &z[1]
-			    , &lda, &work[1], lwork, &iinfo);
+		    cunmtr_("L", "L", "N", &n, &n, &u[1], &ldu, &tau[1], &z__[
+			    1], &lda, &work[1], lwork, &iinfo);
 		    if (iinfo != 0) {
-			io___63.ciunit = *nout;
-			s_wsfe(&io___63);
-			do_fio(&c__1, "CUNMTR", 6L);
+			io___67.ciunit = *nout;
+			s_wsfe(&io___67);
+			do_fio(&c__1, "CUNMTR", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1367,7 +1369,7 @@ L350:
 		    s1 = second_();
 		    i__4 = ic;
 		    for (j = 1; j <= i__4; ++j) {
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__5 = n - 1;
 			scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &c__1);
 /* L360: */
@@ -1377,38 +1379,108 @@ L350:
 
 /* Computing MAX */
 		    r__1 = time - untime;
-		    times[ipar + (itype + (in + (times_dim3 << 3)) * 
-			    times_dim2) * times_dim1] = dmax(r__1,0.f) / (
-			    real) ic;
-		    opcnts[ipar + (itype + (in + (opcnts_dim3 << 3)) * 
-			    opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
-			    real) ic;
+		    times_ref(ipar, itype, in, 8) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 8) = latime_1.ops / (real) ic;
 		    ldu = lda;
 L370:
 		    ;
 		}
 	    }
 
-/* --------------------------------------------------------------
----------   
+/*           Time CSTEGR(COMPQ='V') for each pair NNB(j), LDAS(j) */
+
+	    if (timsub[8]) {
+		i__3 = *nparms;
+		for (ipar = 1; ipar <= i__3; ++ipar) {
+		    lda = ldas[ipar];
+/* Computing MIN */
+		    i__4 = n, i__5 = nnb[ipar];
+		    nb = min(i__4,i__5);
+		    xlaenv_(&c__1, &nb);
+		    xlaenv_(&c__2, &c__2);
+		    xlaenv_(&c__3, &nb);
+
+		    abstol = 0.f;
+		    vl = 0.f;
+		    vu = 0.f;
+		    il = 1;
+		    iu = n;
+		    ic = 0;
+		    latime_1.ops = 0.f;
+		    s1 = second_();
+L380:
+		    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
+		    i__4 = n - 1;
+		    scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
+		    cstegr_("V", "A", &n, &rwork[1], &rwork[lda + 1], &vl, &
+			    vu, &il, &iu, &abstol, &m, &rwork[(lda << 1) + 1],
+			     &z__[1], &lda, &iwork[1], &rwork[lda * 3 + 1], &
+			    lwevr, &iwork[(lda << 1) + 1], &liwevr, info);
+		    if (iinfo != 0) {
+			io___68.ciunit = *nout;
+			s_wsfe(&io___68);
+			do_fio(&c__1, subnam_ref(0, 9), (ftnlen)20);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&itype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&ipar, (ftnlen)sizeof(integer));
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			goto L400;
+		    }
+		    s2 = second_();
+		    time = s2 - s1;
+		    ++ic;
+		    if (time < *timmin) {
+			goto L380;
+		    }
+
+/*                 Subtract the time used in SCOPY. */
+
+		    s1 = second_();
+		    i__4 = ic;
+		    for (j = 1; j <= i__4; ++j) {
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
+			i__5 = n - 1;
+			scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &c__1);
+/* L390: */
+		    }
+		    s2 = second_();
+		    untime = s2 - s1;
+
+/* Computing MAX */
+		    r__1 = time - untime;
+		    times_ref(ipar, itype, in, 9) = dmax(r__1,0.f) / (real) 
+			    ic;
+		    opcnts_ref(ipar, itype, in, 9) = latime_1.ops / (real) ic;
+L400:
+		    ;
+		}
+	    }
+
+/* -----------------------------------------------------------------------   
 
              Time the EISPACK Routines   
 
              Skip routines if N <= 0 (EISPACK requirement) */
 
 	    if (n <= 0) {
-		goto L610;
+		goto L640;
 	    }
 
 /*           Time HTRIDI for each LDAS(j) */
 
-	    if (timsub[8]) {
+	    if (timsub[9]) {
 		i__3 = *nparms;
 		for (ipar = 1; ipar <= i__3; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has come up before
-, just use   
+/*                 If this value of LDA has come up before, just use   
                    the value previously computed. */
 
 		    lastl = 0;
@@ -1417,7 +1489,7 @@ L370:
 			if (lda == ldas[j]) {
 			    lastl = j;
 			}
-/* L380: */
+/* L410: */
 		    }
 
 		    if (lastl == 0) {
@@ -1427,7 +1499,7 @@ L370:
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L390:
+L420:
 			i__4 = n - 1;
 			for (j2 = 0; j2 <= i__4; ++j2) {
 			    i__5 = n;
@@ -1435,21 +1507,20 @@ L390:
 				i__6 = j1 + n * j2;
 				ure[j1 + lda * j2] = a[i__6].r;
 				uim[j1 + lda * j2] = r_imag(&a[j1 + n * j2]);
-/* L400: */
+/* L430: */
 			    }
-/* L410: */
+/* L440: */
 			}
-			htridi_(&lda, &n, &ure[1], &uim[1], &d[1], &e[1], &
+			htridi_(&lda, &n, &ure[1], &uim[1], &d__[1], &e[1], &
 				rwork[1], &taure[1]);
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L390;
+			    goto L420;
 			}
 
-/*                    Subtract the time used in copyin
-g A. */
+/*                    Subtract the time used in copying A. */
 
 			s1 = second_();
 			i__4 = ic;
@@ -1462,34 +1533,28 @@ g A. */
 				    zre[j1 + lda * j2] = a[i__7].r;
 				    zim[j1 + lda * j2] = r_imag(&a[j1 + n * 
 					    j2]);
-/* L420: */
+/* L450: */
 				}
-/* L430: */
+/* L460: */
 			    }
-/* L440: */
+/* L470: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 9) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 10) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 9) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 10) = latime_1.ops / (
 				real) ic;
 			ldu = lda;
 		    } else {
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 9) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastl + (
-				itype + (in + opcnts_dim3 * 9) * opcnts_dim2) 
-				* opcnts_dim1];
-			times[ipar + (itype + (in + times_dim3 * 9) * 
-				times_dim2) * times_dim1] = times[lastl + (
-				itype + (in + times_dim3 * 9) * times_dim2) * 
-				times_dim1];
+			opcnts_ref(ipar, itype, in, 10) = opcnts_ref(lastl, 
+				itype, in, 10);
+			times_ref(ipar, itype, in, 10) = times_ref(lastl, 
+				itype, in, 10);
 		    }
-/* L450: */
+/* L480: */
 		}
 	    } else {
 		if (runhtr) {
@@ -1500,25 +1565,24 @@ g A. */
 			    i__5 = j1 + n * j2;
 			    ure[j1 + n * j2] = a[i__5].r;
 			    uim[j1 + n * j2] = r_imag(&a[j1 + n * j2]);
-/* L460: */
+/* L490: */
 			}
-/* L470: */
+/* L500: */
 		    }
-		    htridi_(&n, &n, &ure[1], &uim[1], &d[1], &e[1], &rwork[1],
-			     &taure[1]);
+		    htridi_(&n, &n, &ure[1], &uim[1], &d__[1], &e[1], &rwork[
+			    1], &taure[1]);
 		    ldu = n;
 		}
 	    }
 
 /*           Time IMTQL1 for each LDAS(j) */
 
-	    if (timsub[9]) {
+	    if (timsub[10]) {
 		i__3 = *nparms;
 		for (ipar = 1; ipar <= i__3; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has come up before
-, just use   
+/*                 If this value of LDA has come up before, just use   
                    the value previously computed. */
 
 		    lastl = 0;
@@ -1527,7 +1591,7 @@ g A. */
 			if (lda == ldas[j]) {
 			    lastl = j;
 			}
-/* L480: */
+/* L510: */
 		    }
 
 		    if (lastl == 0) {
@@ -1537,15 +1601,15 @@ g A. */
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L490:
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+L520:
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__4 = n - 1;
 			scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
 			imtql1_(&n, &rwork[1], &rwork[lda + 1], &iinfo);
 			if (iinfo != 0) {
-			    io___64.ciunit = *nout;
-			    s_wsfe(&io___64);
-			    do_fio(&c__1, subnam + 180, 20L);
+			    io___69.ciunit = *nout;
+			    s_wsfe(&io___69);
+			    do_fio(&c__1, subnam_ref(0, 11), (ftnlen)20);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -1558,62 +1622,54 @@ L490:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L520;
+			    goto L550;
 			}
 			s2 = second_();
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L490;
+			    goto L520;
 			}
 
-/*                    Subtract the time used in SCOPY 
-*/
+/*                    Subtract the time used in SCOPY */
 
 			s1 = second_();
 			i__4 = ic;
 			for (j = 1; j <= i__4; ++j) {
-			    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = n - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &
 				    c__1);
-/* L500: */
+/* L530: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 10) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 11) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 10) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 11) = latime_1.ops / (
 				real) ic;
 		    } else {
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 10) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastl + (
-				itype + (in + opcnts_dim3 * 10) * opcnts_dim2)
-				 * opcnts_dim1];
-			times[ipar + (itype + (in + times_dim3 * 10) * 
-				times_dim2) * times_dim1] = times[lastl + (
-				itype + (in + times_dim3 * 10) * times_dim2) *
-				 times_dim1];
+			opcnts_ref(ipar, itype, in, 11) = opcnts_ref(lastl, 
+				itype, in, 11);
+			times_ref(ipar, itype, in, 11) = times_ref(lastl, 
+				itype, in, 11);
 		    }
-/* L510: */
+/* L540: */
 		}
 	    }
-L520:
+L550:
 
 /*           Time IMTQL2 + HTRIBK for each LDAS(j) */
 
-	    if (timsub[10]) {
+	    if (timsub[11]) {
 		i__3 = *nparms;
 		for (ipar = 1; ipar <= i__3; ++ipar) {
 		    lda = ldas[ipar];
 
-/*                 If this value of LDA has come up before
-, just use   
+/*                 If this value of LDA has come up before, just use   
                    the value previously computed. */
 
 		    lastl = 0;
@@ -1622,7 +1678,7 @@ L520:
 			if (lda == ldas[j]) {
 			    lastl = j;
 			}
-/* L530: */
+/* L560: */
 		    }
 
 		    if (lastl == 0) {
@@ -1634,9 +1690,9 @@ L520:
 				for (j1 = n; j1 >= 1; --j1) {
 				    ure[j1 + lda * j2] = ure[j1 + ldu * j2];
 				    uim[j1 + lda * j2] = uim[j1 + ldu * j2];
-/* L540: */
+/* L570: */
 				}
-/* L550: */
+/* L580: */
 			    }
 			    ldu = lda;
 			} else if (lda < ldu) {
@@ -1646,9 +1702,9 @@ L520:
 				for (j1 = 1; j1 <= i__5; ++j1) {
 				    ure[j1 + lda * j2] = ure[j1 + ldu * j2];
 				    uim[j1 + lda * j2] = uim[j1 + ldu * j2];
-/* L560: */
+/* L590: */
 				}
-/* L570: */
+/* L600: */
 			    }
 			    ldu = lda;
 			}
@@ -1658,18 +1714,18 @@ L520:
 			ic = 0;
 			latime_1.ops = 0.f;
 			s1 = second_();
-L580:
-			scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+L610:
+			scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			i__4 = n - 1;
 			scopy_(&i__4, &e[1], &c__1, &rwork[lda + 1], &c__1);
-			slaset_("Full", &n, &n, &c_b303, &c_b27, &zre[1], &
+			slaset_("Full", &n, &n, &c_b342, &c_b43, &zre[1], &
 				lda);
 			imtql2_(&lda, &n, &rwork[1], &rwork[lda + 1], &zre[1],
 				 &iinfo);
 			if (iinfo != 0) {
-			    io___65.ciunit = *nout;
-			    s_wsfe(&io___65);
-			    do_fio(&c__1, subnam + 160, 20L);
+			    io___70.ciunit = *nout;
+			    s_wsfe(&io___70);
+			    do_fio(&c__1, subnam_ref(0, 12), (ftnlen)20);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -1682,7 +1738,7 @@ L580:
 				    integer));
 			    e_wsfe();
 			    *info = abs(iinfo);
-			    goto L610;
+			    goto L640;
 			}
 			htribk_(&lda, &n, &ure[1], &uim[1], &taure[1], &n, &
 				zre[1], &zim[1]);
@@ -1690,69 +1746,60 @@ L580:
 			time = s2 - s1;
 			++ic;
 			if (time < *timmin) {
-			    goto L580;
+			    goto L610;
 			}
 
-/*                    Subtract the time used in copyin
-g */
+/*                    Subtract the time used in copying */
 
 			s1 = second_();
 			i__4 = ic;
 			for (j = 1; j <= i__4; ++j) {
-			    scopy_(&n, &d[1], &c__1, &rwork[1], &c__1);
+			    scopy_(&n, &d__[1], &c__1, &rwork[1], &c__1);
 			    i__5 = n - 1;
 			    scopy_(&i__5, &e[1], &c__1, &rwork[lda + 1], &
 				    c__1);
-			    slaset_("Full", &n, &n, &c_b303, &c_b27, &zre[1], 
+			    slaset_("Full", &n, &n, &c_b342, &c_b43, &zre[1], 
 				    &lda);
-/* L590: */
+/* L620: */
 			}
 			s2 = second_();
 			untime = s2 - s1;
 
 /* Computing MAX */
 			r__1 = time - untime;
-			times[ipar + (itype + (in + times_dim3 * 11) * 
-				times_dim2) * times_dim1] = dmax(r__1,0.f) / (
+			times_ref(ipar, itype, in, 12) = dmax(r__1,0.f) / (
 				real) ic;
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 11) * 
-				opcnts_dim2) * opcnts_dim1] = latime_1.ops / (
+			opcnts_ref(ipar, itype, in, 12) = latime_1.ops / (
 				real) ic;
 		    } else {
-			opcnts[ipar + (itype + (in + opcnts_dim3 * 11) * 
-				opcnts_dim2) * opcnts_dim1] = opcnts[lastl + (
-				itype + (in + opcnts_dim3 * 11) * opcnts_dim2)
-				 * opcnts_dim1];
-			times[ipar + (itype + (in + times_dim3 * 11) * 
-				times_dim2) * times_dim1] = times[lastl + (
-				itype + (in + times_dim3 * 11) * times_dim2) *
-				 times_dim1];
+			opcnts_ref(ipar, itype, in, 12) = opcnts_ref(lastl, 
+				itype, in, 12);
+			times_ref(ipar, itype, in, 12) = times_ref(lastl, 
+				itype, in, 12);
 		    }
-/* L600: */
+/* L630: */
 		}
 	    }
 
-L610:
+L640:
 	    ;
 	}
-/* L620: */
+/* L650: */
     }
 
-/* -----------------------------------------------------------------------
-   
+/* -----------------------------------------------------------------------   
 
        Print a table of results for each timed routine. */
 
-    for (isub = 1; isub <= 11; ++isub) {
+    for (isub = 1; isub <= 12; ++isub) {
 	if (timsub[isub - 1]) {
-	    sprtbe_(subnam + (isub - 1) * 20, &mtypes, &dotype[1], nsizes, &
-		    nn[1], &inparm[isub - 1], pnames, nparms, &ldas[1], &nnb[
-		    1], idumma, idumma, &opcnts[((isub * opcnts_dim3 + 1) * 
-		    opcnts_dim2 + 1) * opcnts_dim1 + 1], ldo1, ldo2, &times[((
-		    isub * times_dim3 + 1) * times_dim2 + 1) * times_dim1 + 1]
-		    , ldt1, ldt2, &rwork[1], &llwork[1], nout, 20L, 4L);
+	    sprtbe_(subnam_ref(0, isub), &mtypes, &dotype[1], nsizes, &nn[1], 
+		    &inparm[isub - 1], pnames, nparms, &ldas[1], &nnb[1], 
+		    idumma, idumma, &opcnts_ref(1, 1, 1, isub), ldo1, ldo2, &
+		    times_ref(1, 1, 1, isub), ldt1, ldt2, &rwork[1], &llwork[
+		    1], nout, (ftnlen)20, (ftnlen)4);
 	}
-/* L630: */
+/* L660: */
     }
 
 
@@ -1761,4 +1808,9 @@ L610:
 /*     End of CTIM22 */
 
 } /* ctim22_ */
+
+#undef opcnts_ref
+#undef subnam_ref
+#undef times_ref
+
 

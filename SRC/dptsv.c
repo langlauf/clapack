@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int dptsv_(integer *n, integer *nrhs, doublereal *d, 
+/* Subroutine */ int dptsv_(integer *n, integer *nrhs, doublereal *d__, 
 	doublereal *e, doublereal *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       February 25, 1997   
 
 
     Purpose   
     =======   
 
     DPTSV computes the solution to a real system of linear equations   
-    A*X = B, where A is an N-by-N symmetric positive definite tridiagonal 
-  
+    A*X = B, where A is an N-by-N symmetric positive definite tridiagonal   
     matrix, and X and B are N-by-NRHS matrices.   
 
     A is factored as A = L*D*L**T, and the factored form of A is then   
@@ -39,11 +39,10 @@
             On entry, the (n-1) subdiagonal elements of the tridiagonal   
             matrix A.  On exit, the (n-1) subdiagonal elements of the   
             unit bidiagonal factor L from the L*D*L**T factorization of   
-            A.  (E can also be regarded as the superdiagonal of the unit 
-  
+            A.  (E can also be regarded as the superdiagonal of the unit   
             bidiagonal factor U from the U**T*D*U factorization of A.)   
 
-    B       (input/output) DOUBLE PRECISION array, dimension (LDB,N)   
+    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
             On entry, the N-by-NRHS right hand side matrix B.   
             On exit, if INFO = 0, the N-by-NRHS solution matrix X.   
 
@@ -58,15 +57,12 @@
                   computed.  The factorization has not been completed   
                   unless i = N.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer b_dim1, b_offset, i__1;
     /* Local variables */
@@ -75,12 +71,13 @@
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *, integer *);
 
+    --d__;
+    --e;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -97,12 +94,12 @@
 
 /*     Compute the L*D*L' (or U'*D*U) factorization of A. */
 
-    dpttrf_(n, &D(1), &E(1), info);
+    dpttrf_(n, &d__[1], &e[1], info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	dpttrs_(n, nrhs, &D(1), &E(1), &B(1,1), ldb, info);
+	dpttrs_(n, nrhs, &d__[1], &e[1], &b[b_offset], ldb, info);
     }
     return 0;
 

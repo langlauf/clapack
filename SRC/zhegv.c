@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhegv_(integer *itype, char *jobz, char *uplo, integer *
@@ -5,19 +6,17 @@
 	doublereal *w, doublecomplex *work, integer *lwork, doublereal *rwork,
 	 integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    ZHEGV computes all the eigenvalues, and optionally, the eigenvectors 
-  
-    of a complex generalized Hermitian-definite eigenproblem, of the form 
-  
+    ZHEGV computes all the eigenvalues, and optionally, the eigenvectors   
+    of a complex generalized Hermitian-definite eigenproblem, of the form   
     A*x=(lambda)*B*x,  A*Bx=(lambda)*x,  or B*A*x=(lambda)*x.   
     Here A and B are assumed to be Hermitian and B is also   
     positive definite.   
@@ -54,8 +53,7 @@
             as follows:   
             if ITYPE = 1 or 2, Z**H*B*Z = I;   
             if ITYPE = 3, Z**H*inv(B)*Z = I.   
-            If JOBZ = 'N', then on exit the upper triangle (if UPLO='U') 
-  
+            If JOBZ = 'N', then on exit the upper triangle (if UPLO='U')   
             or the lower triangle (if UPLO='L') of A, including the   
             diagonal, is destroyed.   
 
@@ -63,16 +61,14 @@
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     B       (input/output) COMPLEX*16 array, dimension (LDB, N)   
-            On entry, the Hermitian matrix B.  If UPLO = 'U', the   
-            leading N-by-N upper triangular part of B contains the   
-            upper triangular part of the matrix B.  If UPLO = 'L',   
-            the leading N-by-N lower triangular part of B contains   
-            the lower triangular part of the matrix B.   
+            On entry, the Hermitian positive definite matrix B.   
+            If UPLO = 'U', the leading N-by-N upper triangular part of B   
+            contains the upper triangular part of the matrix B.   
+            If UPLO = 'L', the leading N-by-N lower triangular part of B   
+            contains the lower triangular part of the matrix B.   
 
-            On exit, if INFO <= N, the part of B containing the matrix is 
-  
-            overwritten by the triangular factor U or L from the Cholesky 
-  
+            On exit, if INFO <= N, the part of B containing the matrix is   
+            overwritten by the triangular factor U or L from the Cholesky   
             factorization B = U**H*U or B = L*L**H.   
 
     LDB     (input) INTEGER   
@@ -89,8 +85,12 @@
             For optimal efficiency, LWORK >= (NB+1)*N,   
             where NB is the blocksize for ZHETRD returned by ILAENV.   
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(1, 3*N-2)) 
-  
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
+    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(1, 3*N-2))   
 
     INFO    (output) INTEGER   
             = 0:  successful exit   
@@ -99,23 +99,21 @@
                <= N:  if INFO = i, ZHEEV failed to converge;   
                       i off-diagonal elements of an intermediate   
                       tridiagonal form did not converge to zero;   
-               > N:   if INFO = N + i, for 1 <= i <= N, then the leading 
-  
+               > N:   if INFO = N + i, for 1 <= i <= N, then the leading   
                       minor of order i of B is not positive definite.   
                       The factorization of B could not be completed and   
                       no eigenvalues or eigenvectors were computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2;
@@ -132,25 +130,36 @@
 	     doublecomplex *, integer *), 
 	    ztrsm_(char *, char *, char *, char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *), xerbla_(char *, 
-	    integer *), zhegst_(integer *, char *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, integer *), zpotrf_(char *, integer *, doublecomplex *, integer *, 
 	    integer *);
+    static integer nb;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int zhegst_(integer *, char *, integer *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int zpotrf_(char *, integer *, doublecomplex *, 
+	    integer *, integer *);
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --w;
+    --work;
+    --rwork;
 
-#define W(I) w[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     wantz = lsame_(jobz, "V");
     upper = lsame_(uplo, "U");
+    lquery = *lwork == -1;
 
     *info = 0;
-    if (*itype < 0 || *itype > 3) {
+    if (*itype < 1 || *itype > 3) {
 	*info = -1;
     } else if (! (wantz || lsame_(jobz, "N"))) {
 	*info = -2;
@@ -165,10 +174,18 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = 1, i__2 = (*n << 1) - 1;
-	if (*lwork < max(i__1,i__2)) {
+	if (*lwork < max(i__1,i__2) && ! lquery) {
 	    *info = -11;
 	}
     }
+
+    if (*info == 0) {
+	nb = ilaenv_(&c__1, "ZHETRD", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6,
+		 (ftnlen)1);
+	lwkopt = (nb + 1) * *n;
+	work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZHEGV ", &i__1);
@@ -183,7 +200,7 @@
 
 /*     Form a Cholesky factorization of B. */
 
-    zpotrf_(uplo, n, &B(1,1), ldb, info);
+    zpotrf_(uplo, n, &b[b_offset], ldb, info);
     if (*info != 0) {
 	*info = *n + *info;
 	return 0;
@@ -191,8 +208,8 @@
 
 /*     Transform problem to standard eigenvalue problem and solve. */
 
-    zhegst_(itype, uplo, n, &A(1,1), lda, &B(1,1), ldb, info);
-    zheev_(jobz, uplo, n, &A(1,1), lda, &W(1), &WORK(1), lwork, &RWORK(1)
+    zhegst_(itype, uplo, n, &a[a_offset], lda, &b[b_offset], ldb, info);
+    zheev_(jobz, uplo, n, &a[a_offset], lda, &w[1], &work[1], lwork, &rwork[1]
 	    , info);
 
     if (wantz) {
@@ -206,8 +223,7 @@
 	if (*itype == 1 || *itype == 2) {
 
 /*           For A*x=(lambda)*B*x and A*B*x=(lambda)*x;   
-             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y
- */
+             backtransform eigenvectors: x = inv(L)'*y or inv(U)*y */
 
 	    if (upper) {
 		*(unsigned char *)trans = 'N';
@@ -215,7 +231,8 @@
 		*(unsigned char *)trans = 'C';
 	    }
 
-	    ztrsm_("Left", uplo, trans, "Non-unit", n, &neig, &c_b1, &B(1,1), ldb, &A(1,1), lda);
+	    ztrsm_("Left", uplo, trans, "Non-unit", n, &neig, &c_b1, &b[
+		    b_offset], ldb, &a[a_offset], lda);
 
 	} else if (*itype == 3) {
 
@@ -228,9 +245,13 @@
 		*(unsigned char *)trans = 'N';
 	    }
 
-	    ztrmm_("Left", uplo, trans, "Non-unit", n, &neig, &c_b1, &B(1,1), ldb, &A(1,1), lda);
+	    ztrmm_("Left", uplo, trans, "Non-unit", n, &neig, &c_b1, &b[
+		    b_offset], ldb, &a[a_offset], lda);
 	}
     }
+
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+
     return 0;
 
 /*     End of ZHEGV */

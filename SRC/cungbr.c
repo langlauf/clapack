@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cungbr_(char *vect, integer *m, integer *n, integer *k, 
 	complex *a, integer *lda, complex *tau, complex *work, integer *lwork,
 	 integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -27,8 +28,7 @@
 
     If VECT = 'P', A is assumed to have been a K-by-N matrix, and P**H   
     is of order N:   
-    if k < n, P**H = G(k) . . . G(2) G(1) and CUNGBR returns the first m 
-  
+    if k < n, P**H = G(k) . . . G(2) G(1) and CUNGBR returns the first m   
     rows of P**H, where n >= m >= k;   
     if k >= n, P**H = G(n-1) . . . G(2) G(1) and CUNGBR returns P**H as   
     an N-by-N matrix.   
@@ -38,8 +38,7 @@
 
     VECT    (input) CHARACTER*1   
             Specifies whether the matrix Q or the matrix P**H is   
-            required, as defined in the transformation applied by CGEBRD: 
-  
+            required, as defined in the transformation applied by CGEBRD:   
             = 'Q':  generate Q;   
             = 'P':  generate P**H.   
 
@@ -48,8 +47,7 @@
             M >= 0.   
 
     N       (input) INTEGER   
-            The number of columns of the matrix Q or P**H to be returned. 
-  
+            The number of columns of the matrix Q or P**H to be returned.   
             N >= 0.   
             If VECT = 'Q', M >= N >= min(M,K);   
             if VECT = 'P', N >= M >= min(N,K).   
@@ -62,8 +60,7 @@
             K >= 0.   
 
     A       (input/output) COMPLEX array, dimension (LDA,N)   
-            On entry, the vectors which define the elementary reflectors, 
-  
+            On entry, the vectors which define the elementary reflectors,   
             as returned by CGEBRD.   
             On exit, the M-by-N matrix Q or P**H.   
 
@@ -85,40 +82,57 @@
             For optimum performance LWORK >= min(M,N)*NB, where NB   
             is the optimal blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer iinfo;
     static logical wantq;
-    extern /* Subroutine */ int xerbla_(char *, integer *), cunglq_(
-	    integer *, integer *, integer *, complex *, integer *, complex *, 
-	    complex *, integer *, integer *), cungqr_(integer *, integer *, 
-	    integer *, complex *, integer *, complex *, complex *, integer *, 
-	    integer *);
+    static integer nb, mn;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    extern /* Subroutine */ int cunglq_(integer *, integer *, integer *, 
+	    complex *, integer *, complex *, complex *, integer *, integer *),
+	     cungqr_(integer *, integer *, integer *, complex *, integer *, 
+	    complex *, complex *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     wantq = lsame_(vect, "Q");
+    mn = min(*m,*n);
+    lquery = *lwork == -1;
     if (! wantq && ! lsame_(vect, "P")) {
 	*info = -1;
     } else if (*m < 0) {
@@ -130,67 +144,75 @@
 	*info = -4;
     } else if (*lda < max(1,*m)) {
 	*info = -6;
-    } else /* if(complicated condition) */ {
-/* Computing MAX */
-	i__1 = 1, i__2 = min(*m,*n);
-	if (*lwork < max(i__1,i__2)) {
-	    *info = -9;
-	}
+    } else if (*lwork < max(1,mn) && ! lquery) {
+	*info = -9;
     }
+
+    if (*info == 0) {
+	if (wantq) {
+	    nb = ilaenv_(&c__1, "CUNGQR", " ", m, n, k, &c_n1, (ftnlen)6, (
+		    ftnlen)1);
+	} else {
+	    nb = ilaenv_(&c__1, "CUNGLQ", " ", m, n, k, &c_n1, (ftnlen)6, (
+		    ftnlen)1);
+	}
+	lwkopt = max(1,mn) * nb;
+	work[1].r = (real) lwkopt, work[1].i = 0.f;
+    }
+
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("CUNGBR", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*m == 0 || *n == 0) {
-	WORK(1).r = 1.f, WORK(1).i = 0.f;
+	work[1].r = 1.f, work[1].i = 0.f;
 	return 0;
     }
 
     if (wantq) {
 
-/*        Form Q, determined by a call to CGEBRD to reduce an m-by-k 
-  
+/*        Form Q, determined by a call to CGEBRD to reduce an m-by-k   
           matrix */
 
 	if (*m >= *k) {
 
 /*           If m >= k, assume m >= n >= k */
 
-	    cungqr_(m, n, k, &A(1,1), lda, &TAU(1), &WORK(1), lwork, &
+	    cungqr_(m, n, k, &a[a_offset], lda, &tau[1], &work[1], lwork, &
 		    iinfo);
 
 	} else {
 
 /*           If m < k, assume m = n   
 
-             Shift the vectors which define the elementary reflect
-ors one   
-             column to the right, and set the first row and column
- of Q   
+             Shift the vectors which define the elementary reflectors one   
+             column to the right, and set the first row and column of Q   
              to those of the unit matrix */
 
 	    for (j = *m; j >= 2; --j) {
-		i__1 = j * a_dim1 + 1;
-		A(1,j).r = 0.f, A(1,j).i = 0.f;
+		i__1 = a_subscr(1, j);
+		a[i__1].r = 0.f, a[i__1].i = 0.f;
 		i__1 = *m;
-		for (i = j + 1; i <= *m; ++i) {
-		    i__2 = i + j * a_dim1;
-		    i__3 = i + (j - 1) * a_dim1;
-		    A(i,j).r = A(i,j-1).r, A(i,j).i = A(i,j-1).i;
+		for (i__ = j + 1; i__ <= i__1; ++i__) {
+		    i__2 = a_subscr(i__, j);
+		    i__3 = a_subscr(i__, j - 1);
+		    a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
 /* L10: */
 		}
 /* L20: */
 	    }
-	    i__1 = a_dim1 + 1;
-	    A(1,1).r = 1.f, A(1,1).i = 0.f;
+	    i__1 = a_subscr(1, 1);
+	    a[i__1].r = 1.f, a[i__1].i = 0.f;
 	    i__1 = *m;
-	    for (i = 2; i <= *m; ++i) {
-		i__2 = i + a_dim1;
-		A(i,1).r = 0.f, A(i,1).i = 0.f;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = a_subscr(i__, 1);
+		a[i__2].r = 0.f, a[i__2].i = 0.f;
 /* L30: */
 	    }
 	    if (*m > 1) {
@@ -200,51 +222,48 @@ ors one
 		i__1 = *m - 1;
 		i__2 = *m - 1;
 		i__3 = *m - 1;
-		cungqr_(&i__1, &i__2, &i__3, &A(2,2), lda, &TAU(
-			1), &WORK(1), lwork, &iinfo);
+		cungqr_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &
+			work[1], lwork, &iinfo);
 	    }
 	}
     } else {
 
-/*        Form P', determined by a call to CGEBRD to reduce a k-by-n 
-  
+/*        Form P', determined by a call to CGEBRD to reduce a k-by-n   
           matrix */
 
 	if (*k < *n) {
 
 /*           If k < n, assume k <= m <= n */
 
-	    cunglq_(m, n, k, &A(1,1), lda, &TAU(1), &WORK(1), lwork, &
+	    cunglq_(m, n, k, &a[a_offset], lda, &tau[1], &work[1], lwork, &
 		    iinfo);
 
 	} else {
 
 /*           If k >= n, assume m = n   
 
-             Shift the vectors which define the elementary reflect
-ors one   
-             row downward, and set the first row and column of P' 
-to   
+             Shift the vectors which define the elementary reflectors one   
+             row downward, and set the first row and column of P' to   
              those of the unit matrix */
 
-	    i__1 = a_dim1 + 1;
-	    A(1,1).r = 1.f, A(1,1).i = 0.f;
+	    i__1 = a_subscr(1, 1);
+	    a[i__1].r = 1.f, a[i__1].i = 0.f;
 	    i__1 = *n;
-	    for (i = 2; i <= *n; ++i) {
-		i__2 = i + a_dim1;
-		A(i,1).r = 0.f, A(i,1).i = 0.f;
+	    for (i__ = 2; i__ <= i__1; ++i__) {
+		i__2 = a_subscr(i__, 1);
+		a[i__2].r = 0.f, a[i__2].i = 0.f;
 /* L40: */
 	    }
 	    i__1 = *n;
-	    for (j = 2; j <= *n; ++j) {
-		for (i = j - 1; i >= 2; --i) {
-		    i__2 = i + j * a_dim1;
-		    i__3 = i - 1 + j * a_dim1;
-		    A(i,j).r = A(i-1,j).r, A(i,j).i = A(i-1,j).i;
+	    for (j = 2; j <= i__1; ++j) {
+		for (i__ = j - 1; i__ >= 2; --i__) {
+		    i__2 = a_subscr(i__, j);
+		    i__3 = a_subscr(i__ - 1, j);
+		    a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
 /* L50: */
 		}
-		i__2 = j * a_dim1 + 1;
-		A(1,j).r = 0.f, A(1,j).i = 0.f;
+		i__2 = a_subscr(1, j);
+		a[i__2].r = 0.f, a[i__2].i = 0.f;
 /* L60: */
 	    }
 	    if (*n > 1) {
@@ -254,14 +273,19 @@ to
 		i__1 = *n - 1;
 		i__2 = *n - 1;
 		i__3 = *n - 1;
-		cunglq_(&i__1, &i__2, &i__3, &A(2,2), lda, &TAU(
-			1), &WORK(1), lwork, &iinfo);
+		cunglq_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &
+			work[1], lwork, &iinfo);
 	    }
 	}
     }
+    work[1].r = (real) lwkopt, work[1].i = 0.f;
     return 0;
 
 /*     End of CUNGBR */
 
 } /* cungbr_ */
+
+#undef a_ref
+#undef a_subscr
+
 

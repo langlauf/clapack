@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ztrsna_(char *job, char *howmny, logical *select, 
@@ -6,7 +7,7 @@
 	doublereal *sep, integer *mm, integer *m, doublecomplex *work, 
 	integer *ldwork, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -62,8 +63,7 @@
             LDVL >= 1; and if JOB = 'E' or 'B', LDVL >= N.   
 
     VR      (input) COMPLEX*16 array, dimension (LDVR,M)   
-            If JOB = 'E' or 'B', VR must contain right eigenvectors of T 
-  
+            If JOB = 'E' or 'B', VR must contain right eigenvectors of T   
             (or of any Q*T*Q**H with Q unitary), corresponding to the   
             eigenpairs specified by HOWMNY and SELECT. The eigenvectors   
             must be stored in consecutive columns of VR, as returned by   
@@ -75,12 +75,10 @@
             LDVR >= 1; and if JOB = 'E' or 'B', LDVR >= N.   
 
     S       (output) DOUBLE PRECISION array, dimension (MM)   
-            If JOB = 'E' or 'B', the reciprocal condition numbers of the 
-  
+            If JOB = 'E' or 'B', the reciprocal condition numbers of the   
             selected eigenvalues, stored in consecutive elements of the   
             array. Thus S(j), SEP(j), and the j-th columns of VL and VR   
-            all correspond to the same eigenpair (but not in general the 
-  
+            all correspond to the same eigenpair (but not in general the   
             j-th eigenpair, unless all eigenpairs are selected).   
             If JOB = 'V', S is not referenced.   
 
@@ -91,8 +89,7 @@
             If JOB = 'E', SEP is not referenced.   
 
     MM      (input) INTEGER   
-            The number of elements in the arrays S (if JOB = 'E' or 'B') 
-  
+            The number of elements in the arrays S (if JOB = 'E' or 'B')   
              and/or SEP (if JOB = 'V' or 'B'). MM >= M.   
 
     M       (output) INTEGER   
@@ -122,16 +119,13 @@
 
             S(lambda) = |v'*u| / (norm(u)*norm(v))   
 
-    where u and v are the right and left eigenvectors of T corresponding 
-  
+    where u and v are the right and left eigenvectors of T corresponding   
     to lambda; v' denotes the conjugate transpose of v, and norm(u)   
-    denotes the Euclidean norm. These reciprocal condition numbers always 
-  
+    denotes the Euclidean norm. These reciprocal condition numbers always   
     lie between zero (very badly conditioned) and one (very well   
     conditioned). If n = 1, S(lambda) is defined to be 1.   
 
-    An approximate error bound for a computed eigenvalue W(i) is given by 
-  
+    An approximate error bound for a computed eigenvalue W(i) is given by   
 
                         EPS * norm(T) / S(i)   
 
@@ -157,15 +151,12 @@
 
                         EPS * norm(T) / SEP(i)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -180,7 +171,7 @@
     static integer kase, ierr;
     static doublecomplex prod;
     static doublereal lnrm, rnrm;
-    static integer i, j, k;
+    static integer i__, j, k;
     static doublereal scale;
     extern logical lsame_(char *, char *);
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
@@ -211,35 +202,48 @@
 	    doublereal *, doublereal *, integer *), ztrexc_(char *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, integer *, integer *, integer *);
     static doublereal eps, est;
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+#define t_subscr(a_1,a_2) (a_2)*t_dim1 + a_1
+#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*vl_dim1 + a_1
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*vr_dim1 + a_1
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
 
 
+    --select;
+    t_dim1 = *ldt;
+    t_offset = 1 + t_dim1 * 1;
+    t -= t_offset;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --s;
+    --sep;
+    work_dim1 = *ldwork;
+    work_offset = 1 + work_dim1 * 1;
+    work -= work_offset;
+    --rwork;
 
-#define DUMMY(I) dummy[(I)]
-#define SELECT(I) select[(I)-1]
-#define S(I) s[(I)-1]
-#define SEP(I) sep[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define T(I,J) t[(I)-1 + ((J)-1)* ( *ldt)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-#define WORK(I,J) work[(I)-1 + ((J)-1)* ( *ldwork)]
-
+    /* Function Body */
     wantbh = lsame_(job, "B");
     wants = lsame_(job, "E") || wantbh;
     wantsp = lsame_(job, "V") || wantbh;
 
     somcon = lsame_(howmny, "S");
 
-/*     Set M to the number of eigenpairs for which condition numbers are 
-  
+/*     Set M to the number of eigenpairs for which condition numbers are   
        to be computed. */
 
     if (somcon) {
 	*m = 0;
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    if (SELECT(j)) {
+	for (j = 1; j <= i__1; ++j) {
+	    if (select[j]) {
 		++(*m);
 	    }
 /* L10: */
@@ -280,15 +284,15 @@
 
     if (*n == 1) {
 	if (somcon) {
-	    if (! SELECT(1)) {
+	    if (! select[1]) {
 		return 0;
 	    }
 	}
 	if (wants) {
-	    S(1) = 1.;
+	    s[1] = 1.;
 	}
 	if (wantsp) {
-	    SEP(1) = z_abs(&T(1,1));
+	    sep[1] = z_abs(&t_ref(1, 1));
 	}
 	return 0;
     }
@@ -302,69 +306,64 @@
 
     ks = 1;
     i__1 = *n;
-    for (k = 1; k <= *n; ++k) {
+    for (k = 1; k <= i__1; ++k) {
 
 	if (somcon) {
-	    if (! SELECT(k)) {
+	    if (! select[k]) {
 		goto L50;
 	    }
 	}
 
 	if (wants) {
 
-/*           Compute the reciprocal condition number of the k-th 
-  
+/*           Compute the reciprocal condition number of the k-th   
              eigenvalue. */
 
-	    zdotc_(&z__1, n, &VR(1,ks), &c__1, &VL(1,ks), &c__1);
+	    zdotc_(&z__1, n, &vr_ref(1, ks), &c__1, &vl_ref(1, ks), &c__1);
 	    prod.r = z__1.r, prod.i = z__1.i;
-	    rnrm = dznrm2_(n, &VR(1,ks), &c__1);
-	    lnrm = dznrm2_(n, &VL(1,ks), &c__1);
-	    S(ks) = z_abs(&prod) / (rnrm * lnrm);
+	    rnrm = dznrm2_(n, &vr_ref(1, ks), &c__1);
+	    lnrm = dznrm2_(n, &vl_ref(1, ks), &c__1);
+	    s[ks] = z_abs(&prod) / (rnrm * lnrm);
 
 	}
 
 	if (wantsp) {
 
-/*           Estimate the reciprocal condition number of the k-th 
-  
+/*           Estimate the reciprocal condition number of the k-th   
              eigenvector.   
 
-             Copy the matrix T to the array WORK and swap the k-th
-   
+             Copy the matrix T to the array WORK and swap the k-th   
              diagonal element to the (1,1) position. */
 
-	    zlacpy_("Full", n, n, &T(1,1), ldt, &WORK(1,1), 
+	    zlacpy_("Full", n, n, &t[t_offset], ldt, &work[work_offset], 
 		    ldwork);
-	    ztrexc_("No Q", n, &WORK(1,1), ldwork, dummy, &c__1, &k, &
+	    ztrexc_("No Q", n, &work[work_offset], ldwork, dummy, &c__1, &k, &
 		    c__1, &ierr);
 
 /*           Form  C = T22 - lambda*I in WORK(2:N,2:N). */
 
 	    i__2 = *n;
-	    for (i = 2; i <= *n; ++i) {
-		i__3 = i + i * work_dim1;
-		i__4 = i + i * work_dim1;
-		i__5 = work_dim1 + 1;
-		z__1.r = WORK(i,i).r - WORK(1,1).r, z__1.i = WORK(i,i).i - 
-			WORK(1,1).i;
-		WORK(i,i).r = z__1.r, WORK(i,i).i = z__1.i;
+	    for (i__ = 2; i__ <= i__2; ++i__) {
+		i__3 = work_subscr(i__, i__);
+		i__4 = work_subscr(i__, i__);
+		i__5 = work_subscr(1, 1);
+		z__1.r = work[i__4].r - work[i__5].r, z__1.i = work[i__4].i - 
+			work[i__5].i;
+		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 /* L20: */
 	    }
 
-/*           Estimate a lower bound for the 1-norm of inv(C'). The
- 1st   
-             and (N+1)th columns of WORK are used to store work ve
-ctors. */
+/*           Estimate a lower bound for the 1-norm of inv(C'). The 1st   
+             and (N+1)th columns of WORK are used to store work vectors. */
 
-	    SEP(ks) = 0.;
+	    sep[ks] = 0.;
 	    est = 0.;
 	    kase = 0;
 	    *(unsigned char *)normin = 'N';
 L30:
 	    i__2 = *n - 1;
-	    zlacon_(&i__2, &WORK(1,*n+1), &WORK(1,1)
-		    , &est, &kase);
+	    zlacon_(&i__2, &work_ref(1, *n + 1), &work[work_offset], &est, &
+		    kase);
 
 	    if (kase != 0) {
 		if (kase == 1) {
@@ -373,37 +372,37 @@ L30:
 
 		    i__2 = *n - 1;
 		    zlatrs_("Upper", "Conjugate transpose", "Nonunit", normin,
-			     &i__2, &WORK(2,2), ldwork, &
-			    WORK(1,1), &scale, &RWORK(1), &ierr);
+			     &i__2, &work_ref(2, 2), ldwork, &work[
+			    work_offset], &scale, &rwork[1], &ierr);
 		} else {
 
 /*                 Solve C*x = scale*b */
 
 		    i__2 = *n - 1;
 		    zlatrs_("Upper", "No transpose", "Nonunit", normin, &i__2,
-			     &WORK(2,2), ldwork, &WORK(1,1), &scale, &RWORK(1), &ierr);
+			     &work_ref(2, 2), ldwork, &work[work_offset], &
+			    scale, &rwork[1], &ierr);
 		}
 		*(unsigned char *)normin = 'Y';
 		if (scale != 1.) {
 
-/*                 Multiply by 1/SCALE if doing so will no
-t cause   
+/*                 Multiply by 1/SCALE if doing so will not cause   
                    overflow. */
 
 		    i__2 = *n - 1;
-		    ix = izamax_(&i__2, &WORK(1,1), &c__1);
-		    i__2 = ix + work_dim1;
-		    xnorm = (d__1 = WORK(ix,1).r, abs(d__1)) + (d__2 = d_imag(
-			    &WORK(ix,1)), abs(d__2));
+		    ix = izamax_(&i__2, &work[work_offset], &c__1);
+		    i__2 = work_subscr(ix, 1);
+		    xnorm = (d__1 = work[i__2].r, abs(d__1)) + (d__2 = d_imag(
+			    &work_ref(ix, 1)), abs(d__2));
 		    if (scale < xnorm * smlnum || scale == 0.) {
 			goto L40;
 		    }
-		    zdrscl_(n, &scale, &WORK(1,1), &c__1);
+		    zdrscl_(n, &scale, &work[work_offset], &c__1);
 		}
 		goto L30;
 	    }
 
-	    SEP(ks) = 1. / max(est,smlnum);
+	    sep[ks] = 1. / max(est,smlnum);
 	}
 
 L40:
@@ -416,4 +415,14 @@ L50:
 /*     End of ZTRSNA */
 
 } /* ztrsna_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef t_ref
+#undef t_subscr
+#undef work_ref
+#undef work_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,996 +14,332 @@ struct {
 
 #define latime_1 latime_
 
-/* Table of constant values */
-
-static integer c__1 = 1;
-static integer c_n1 = -1;
-
-/* Subroutine */ int slasq3_(integer *n, real *q, real *e, real *qq, real *ee,
-	 real *sup, real *sigma, integer *kend, integer *off, integer *iphase,
-	 integer *iconv, real *eps, real *tol2, real *small2)
+/* Subroutine */ int slasq3_(integer *i0, integer *n0, real *z__, integer *pp,
+	 real *dmin__, real *sigma, real *desig, real *qmax, integer *nfail, 
+	integer *iter, integer *ndiv, logical *ieee)
 {
+    /* Initialized data */
+
+    static integer ttype = 0;
+    static real dmin1 = 0.f;
+    static real dmin2 = 0.f;
+    static real dn = 0.f;
+    static real dn1 = 0.f;
+    static real dn2 = 0.f;
+    static real tau = 0.f;
+
     /* System generated locals */
-    integer i__1, i__2;
-    real r__1, r__2, r__3, r__4;
+    integer i__1;
+    real r__1, r__2;
 
     /* Builtin functions */
     double sqrt(doublereal);
 
     /* Local variables */
-    static logical ldef;
-    static integer icnt;
-    static real tolx, toly, tolz;
-    static integer k1end, k2end;
-    static real d;
-    static integer i;
-    static real qemax;
-    static integer maxit;
-    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
-	    integer *);
-    static integer n1, n2;
-    static real t1;
-    extern /* Subroutine */ int slasq4_(integer *, real *, real *, real *, 
-	    real *);
-    static integer ic, ke;
-    static real dm;
-    static integer ip, ks;
-    static real xx, yy;
-    static logical lsplit;
-    static integer ifl;
-    static real tau;
-    static integer isp;
+    static real temp, s, t;
+    static integer j4;
+    extern /* Subroutine */ int slasq4_(integer *, integer *, real *, integer 
+	    *, integer *, real *, real *, real *, real *, real *, real *, 
+	    real *, integer *), slasq5_(integer *, integer *, real *, integer 
+	    *, real *, real *, real *, real *, real *, real *, real *, 
+	    logical *), slasq6_(integer *, integer *, real *, integer *, real 
+	    *, real *, real *, real *, real *, real *);
+    static integer nn;
+    extern doublereal slamch_(char *);
+    static real safmin, eps, tol;
+    static integer n0in, ipn4;
+    static real tol2;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+/*  -- LAPACK auxiliary routine (instrumented to count ops, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       May 17, 2000   
 
-       Common block to return operation count and iteration count   
-       ITCNT is initialized to 0, OPS is only incremented   
 
-       Purpose   
-       =======   
+    Purpose   
+    =======   
 
-       SLASQ3 is the workhorse of the whole bidiagonal SVD algorithm.   
-       This can be described as the differential qd with shifts.   
+    SLASQ3 checks for deflation, computes a shift (TAU) and calls dqds.   
+    In case of failure it changes shifts, and tries again until output   
+    is positive.   
 
-       Arguments   
-       =========   
+    Arguments   
+    =========   
 
-    N       (input/output) INTEGER   
-            On entry, N specifies the number of rows and columns   
-            in the matrix. N must be at least 3.   
-            On exit N is non-negative and less than the input value.   
+    I0     (input) INTEGER   
+           First index.   
 
-    Q       (input/output) REAL array, dimension (N)   
-            Q array in ping (see IPHASE below)   
+    N0     (input) INTEGER   
+           Last index.   
 
-    E       (input/output) REAL array, dimension (N)   
-            E array in ping (see IPHASE below)   
+    Z      (input) REAL array, dimension ( 4*N )   
+           Z holds the qd array.   
 
-    QQ      (input/output) REAL array, dimension (N)   
-            Q array in pong (see IPHASE below)   
+    PP     (input) INTEGER   
+           PP=0 for ping, PP=1 for pong.   
 
-    EE      (input/output) REAL array, dimension (N)   
-            E array in pong (see IPHASE below)   
+    DMIN   (output) REAL   
+           Minimum value of d.   
 
-    SUP     (input/output) REAL   
-            Upper bound for the smallest eigenvalue   
+    SIGMA  (output) REAL   
+           Sum of shifts used in current segment.   
 
-    SIGMA   (input/output) REAL   
-            Accumulated shift for the present submatrix   
+    DESIG  (input/output) REAL   
+           Lower order part of SIGMA   
 
-    KEND    (input/output) INTEGER   
-            Index where minimum D(i) occurs in recurrence for   
-            splitting criterion   
+    QMAX   (input) REAL   
+           Maximum value of q.   
 
-    OFF     (input/output) INTEGER   
-            Offset for arrays   
+    NFAIL  (output) INTEGER   
+           Number of times shift was too big.   
 
-    IPHASE  (input/output) INTEGER   
-            If IPHASE = 1 (ping) then data is in Q and E arrays   
-            If IPHASE = 2 (pong) then data is in QQ and EE arrays   
+    ITER   (output) INTEGER   
+           Number of iterations.   
 
-    ICONV   (input) INTEGER   
-            If ICONV = 0 a bottom part of a matrix (with a split)   
-            If ICONV =-3 a top part of a matrix (with a split)   
+    NDIV   (output) INTEGER   
+           Number of divisions.   
 
-    EPS     (input) REAL   
-            Machine epsilon   
+    TTYPE  (output) INTEGER   
+           Shift type.   
 
-    TOL2    (input) REAL   
-            Square of the relative tolerance TOL as defined in SLASQ1   
+    IEEE   (input) LOGICAL   
+           Flag for IEEE or non IEEE arithmetic (passed to SLASQ5).   
 
-    SMALL2  (input) REAL   
-            A threshold value as defined in SLASQ1   
-
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
-    --ee;
-    --qq;
-    --e;
-    --q;
+    --z__;
 
     /* Function Body */
-    icnt = 0;
-    tau = 0.f;
-    dm = *sup;
-    latime_1.ops += 2;
-    tolx = *sigma * *tol2;
-    tolz = dmax(*small2,*sigma) * *tol2;
 
-/*     Set maximum number of iterations */
+    latime_1.ops += 2.f;
+    n0in = *n0;
+    eps = slamch_("Precision");
+    safmin = slamch_("Safe minimum");
+    tol = eps * 100.f;
+/* Computing 2nd power */
+    r__1 = tol;
+    tol2 = r__1 * r__1;
 
-    maxit = *n * 100;
+/*     Check for deflation. */
 
-/*     Flipping */
+L10:
 
-    ic = 2;
-    if (*n > 3) {
-	if (*iphase == 1) {
-	    i__1 = *n - 2;
-	    for (i = 1; i <= i__1; ++i) {
-		if (q[i] > q[i + 1]) {
-		    ++ic;
-		}
-		if (e[i] > e[i + 1]) {
-		    ++ic;
-		}
-/* L10: */
-	    }
-	    if (q[*n - 1] > q[*n]) {
-		++ic;
-	    }
-	    if (ic < *n) {
-		scopy_(n, &q[1], &c__1, &qq[1], &c_n1);
-		i__1 = *n - 1;
-		scopy_(&i__1, &e[1], &c__1, &ee[1], &c_n1);
-		if (*kend != 0) {
-		    *kend = *n - *kend + 1;
-		}
-		*iphase = 2;
-	    }
-	} else {
-	    i__1 = *n - 2;
-	    for (i = 1; i <= i__1; ++i) {
-		if (qq[i] > qq[i + 1]) {
-		    ++ic;
-		}
-		if (ee[i] > ee[i + 1]) {
-		    ++ic;
-		}
-/* L20: */
-	    }
-	    if (qq[*n - 1] > qq[*n]) {
-		++ic;
-	    }
-	    if (ic < *n) {
-		scopy_(n, &qq[1], &c__1, &q[1], &c_n1);
-		i__1 = *n - 1;
-		scopy_(&i__1, &ee[1], &c__1, &e[1], &c_n1);
-		if (*kend != 0) {
-		    *kend = *n - *kend + 1;
-		}
-		*iphase = 1;
-	    }
-	}
+    if (*n0 < *i0) {
+	return 0;
     }
-    if (*iconv == -3) {
-	if (*iphase == 1) {
-	    goto L220;
-	} else {
-	    goto L100;
-	}
+    if (*n0 == *i0) {
+	goto L20;
     }
-    if (*iphase == 2) {
-	goto L150;
+    nn = (*n0 << 2) + *pp;
+    if (*n0 == *i0 + 1) {
+	goto L40;
     }
 
-/*     The ping section of the code */
+/*     Check whether E(N0-1) is negligible, 1 eigenvalue. */
+
+    latime_1.ops += 3.f;
+    if (z__[nn - 5] > tol2 * (*sigma + z__[nn - 3]) && z__[nn - (*pp << 1) - 
+	    4] > tol2 * z__[nn - 7]) {
+	goto L30;
+    }
+
+L20:
+
+    latime_1.ops += 1.f;
+    z__[(*n0 << 2) - 3] = z__[(*n0 << 2) + *pp - 3] + *sigma;
+    --(*n0);
+    goto L10;
+
+/*     Check  whether E(N0-2) is negligible, 2 eigenvalues. */
 
 L30:
-    ifl = 0;
 
-/*     Compute the shift */
-
-    if (*kend == 0 || *sup == 0.f) {
-	tau = 0.f;
-    } else if (icnt > 0 && dm <= tolz) {
-	tau = 0.f;
-    } else {
-/* Computing MAX */
-	i__1 = 5, i__2 = *n / 32;
-	ip = max(i__1,i__2);
-	n2 = (ip << 1) + 1;
-	if (n2 >= *n) {
-	    n1 = 1;
-	    n2 = *n;
-	} else if (*kend + ip > *n) {
-	    n1 = *n - (ip << 1);
-	} else if (*kend - ip < 1) {
-	    n1 = 1;
-	} else {
-	    n1 = *kend - ip;
-	}
-	slasq4_(&n2, &q[n1], &e[n1], &tau, sup);
+    latime_1.ops += 2.f;
+    if (z__[nn - 9] > tol2 * *sigma && z__[nn - (*pp << 1) - 8] > tol2 * z__[
+	    nn - 11]) {
+	goto L50;
     }
+
 L40:
-    ++icnt;
-    if (icnt > maxit) {
-	*sup = -1.f;
-	return 0;
+
+    if (z__[nn - 3] > z__[nn - 7]) {
+	s = z__[nn - 3];
+	z__[nn - 3] = z__[nn - 7];
+	z__[nn - 7] = s;
     }
-    if (tau == 0.f) {
-
-/*     dqd algorithm */
-
-	d = q[1];
-	dm = d;
-	ke = 0;
-	latime_1.ops = latime_1.ops + *n * 3 - 3;
-	i__1 = *n - 3;
-	for (i = 1; i <= i__1; ++i) {
-	    qq[i] = d + e[i];
-	    d = d / qq[i] * q[i + 1];
-	    if (dm > d) {
-		dm = d;
-		ke = i;
-	    }
-/* L50: */
+    latime_1.ops += 3.f;
+    if (z__[nn - 5] > z__[nn - 3] * tol2) {
+	latime_1.ops += 5.f;
+	t = (z__[nn - 7] - z__[nn - 3] + z__[nn - 5]) * .5f;
+	s = z__[nn - 3] * (z__[nn - 5] / t);
+	if (s <= t) {
+	    latime_1.ops += 7.f;
+	    s = z__[nn - 3] * (z__[nn - 5] / (t * (sqrt(s / t + 1.f) + 1.f)));
+	} else {
+	    latime_1.ops += 6.f;
+	    s = z__[nn - 3] * (z__[nn - 5] / (t + sqrt(t) * sqrt(t + s)));
 	}
-	++ke;
+	latime_1.ops += 4.f;
+	t = z__[nn - 7] + (s + z__[nn - 5]);
+	z__[nn - 3] *= z__[nn - 7] / t;
+	z__[nn - 7] = t;
+    }
+    z__[(*n0 << 2) - 7] = z__[nn - 7] + *sigma;
+    z__[(*n0 << 2) - 3] = z__[nn - 3] + *sigma;
+    *n0 += -2;
+    goto L10;
 
-/*     Penultimate dqd step (in ping) */
+L50:
 
-	k2end = ke;
-	qq[*n - 2] = d + e[*n - 2];
-	d = d / qq[*n - 2] * q[*n - 1];
-	if (dm > d) {
-	    dm = d;
-	    ke = *n - 1;
-	}
+/*     Reverse the qd-array, if warranted. */
 
-/*     Final dqd step (in ping) */
-
-	k1end = ke;
-	qq[*n - 1] = d + e[*n - 1];
-	d = d / qq[*n - 1] * q[*n];
-	if (dm > d) {
-	    dm = d;
-	    ke = *n;
-	}
-	qq[*n] = d;
-    } else {
-
-/*     The dqds algorithm (in ping) */
-
-	d = q[1] - tau;
-	dm = d;
-	ke = 0;
-	if (d < 0.f) {
-	    goto L140;
-	}
-	latime_1.ops += *n - 3 << 2;
-	i__1 = *n - 3;
-	for (i = 1; i <= i__1; ++i) {
-	    qq[i] = d + e[i];
-	    d = d / qq[i] * q[i + 1] - tau;
-	    if (dm > d) {
-		dm = d;
-		ke = i;
-		if (d < 0.f) {
-		    goto L70;
-		}
-	    }
+    if (*dmin__ <= 0.f || *n0 < n0in) {
+	latime_1.ops += 1.f;
+	if (z__[(*i0 << 2) + *pp - 3] * 1.5f < z__[(*n0 << 2) + *pp - 3]) {
+	    ipn4 = *i0 + *n0 << 2;
+	    i__1 = *i0 + *n0 - 1 << 1;
+	    for (j4 = *i0 << 2; j4 <= i__1; j4 += 4) {
+		temp = z__[j4 - 3];
+		z__[j4 - 3] = z__[ipn4 - j4 - 3];
+		z__[ipn4 - j4 - 3] = temp;
+		temp = z__[j4 - 2];
+		z__[j4 - 2] = z__[ipn4 - j4 - 2];
+		z__[ipn4 - j4 - 2] = temp;
+		temp = z__[j4 - 1];
+		z__[j4 - 1] = z__[ipn4 - j4 - 5];
+		z__[ipn4 - j4 - 5] = temp;
+		temp = z__[j4];
+		z__[j4] = z__[ipn4 - j4 - 4];
+		z__[ipn4 - j4 - 4] = temp;
 /* L60: */
+	    }
+	    if (*n0 - *i0 <= 4) {
+		z__[(*n0 << 2) + *pp - 1] = z__[(*i0 << 2) + *pp - 1];
+		z__[(*n0 << 2) - *pp] = z__[(*i0 << 2) - *pp];
+	    }
+/* Computing MIN */
+	    r__1 = dmin2, r__2 = z__[(*n0 << 2) + *pp - 1];
+	    dmin2 = dmin(r__1,r__2);
+/* Computing MIN */
+	    r__1 = z__[(*n0 << 2) + *pp - 1], r__2 = z__[(*i0 << 2) + *pp - 1]
+		    , r__1 = min(r__1,r__2), r__2 = z__[(*i0 << 2) + *pp + 3];
+	    z__[(*n0 << 2) + *pp - 1] = dmin(r__1,r__2);
+/* Computing MIN */
+	    r__1 = z__[(*n0 << 2) - *pp], r__2 = z__[(*i0 << 2) - *pp], r__1 =
+		     min(r__1,r__2), r__2 = z__[(*i0 << 2) - *pp + 4];
+	    z__[(*n0 << 2) - *pp] = dmin(r__1,r__2);
+/* Computing MAX */
+	    r__1 = *qmax, r__2 = z__[(*i0 << 2) + *pp - 3], r__1 = max(r__1,
+		    r__2), r__2 = z__[(*i0 << 2) + *pp + 1];
+	    *qmax = dmax(r__1,r__2);
+	    *dmin__ = 0.f;
 	}
-	++ke;
-	goto L80;
-L70:
-	latime_1.ops -= *n - 3 - ke << 2;
-	goto L140;
+    }
+
+/* L70:   
+
+   Computing MIN */
+    r__1 = z__[(*n0 << 2) + *pp - 1], r__2 = z__[(*n0 << 2) + *pp - 9], r__1 =
+	     min(r__1,r__2), r__2 = dmin2 + z__[(*n0 << 2) - *pp];
+    if (*dmin__ < 0.f || safmin * *qmax < dmin(r__1,r__2)) {
+
+/*        Choose a shift. */
+
+	slasq4_(i0, n0, &z__[1], pp, &n0in, dmin__, &dmin1, &dmin2, &dn, &dn1,
+		 &dn2, &tau, &ttype);
+
+/*        Call dqds until DMIN > 0. */
+
 L80:
 
-/*     Penultimate dqds step (in ping) */
+	slasq5_(i0, n0, &z__[1], pp, &tau, dmin__, &dmin1, &dmin2, &dn, &dn1, 
+		&dn2, ieee);
 
-	latime_1.ops += 4;
-	k2end = ke;
-	qq[*n - 2] = d + e[*n - 2];
-	d = d / qq[*n - 2] * q[*n - 1] - tau;
-	if (dm > d) {
-	    dm = d;
-	    ke = *n - 1;
-	    if (d < 0.f) {
-		goto L140;
+	*ndiv += *n0 - *i0 + 2;
+	++(*iter);
+
+/*        Check status. */
+
+	if (*dmin__ >= 0.f && dmin1 > 0.f) {
+
+/*           Success. */
+
+	    goto L100;
+
+	} else if (*dmin__ < 0.f && dmin1 > 0.f && z__[(*n0 - 1 << 2) - *pp] <
+		 tol * (*sigma + dn1) && dabs(dn) < tol * *sigma) {
+
+/*           Convergence hidden by negative DN. */
+
+	    latime_1.ops += 2.f;
+	    z__[(*n0 - 1 << 2) - *pp + 2] = 0.f;
+	    *dmin__ = 0.f;
+	    goto L100;
+	} else if (*dmin__ < 0.f) {
+
+/*           TAU too big. Select new TAU and try again. */
+
+	    ++(*nfail);
+	    if (ttype < -22) {
+
+/*              Failed twice. Play it safe. */
+
+		tau = 0.f;
+	    } else if (dmin1 > 0.f) {
+
+/*              Late failure. Gives excellent shift. */
+
+		latime_1.ops += 4.f;
+		tau = (tau + *dmin__) * (1.f - eps * 2.f);
+		ttype += -11;
+	    } else {
+
+/*              Early failure. Divide by 4. */
+
+		latime_1.ops += 1.f;
+		tau *= .25f;
+		ttype += -12;
 	    }
+	    goto L80;
+	} else if (*dmin__ != *dmin__) {
+
+/*           NaN. */
+
+	    tau = 0.f;
+	    goto L80;
+	} else {
+
+/*           Possible underflow. Play it safe. */
+
+	    goto L90;
 	}
-
-/*     Final dqds step (in ping) */
-
-	latime_1.ops += 4;
-	k1end = ke;
-	qq[*n - 1] = d + e[*n - 1];
-	d = d / qq[*n - 1] * q[*n] - tau;
-	if (dm > d) {
-	    dm = d;
-	    ke = *n;
-	}
-	qq[*n] = d;
     }
 
-/*        Convergence when QQ(N) is small (in ping) */
+/*     Risk of underflow. */
 
-    latime_1.ops += 1;
-    if ((r__1 = qq[*n], dabs(r__1)) <= *sigma * *tol2) {
-	qq[*n] = 0.f;
-	dm = 0.f;
-	ke = *n;
-    }
-    if (qq[*n] < 0.f) {
-	goto L140;
-    }
+L90:
+    slasq6_(i0, n0, &z__[1], pp, dmin__, &dmin1, &dmin2, &dn, &dn1, &dn2);
+    *ndiv += *n0 - *i0 + 2;
+    ++(*iter);
+    tau = 0.f;
 
-/*     Non-negative qd array: Update the e's */
-
-    latime_1.ops += *n - 1 << 1;
-    i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	ee[i] = e[i] / qq[i] * q[i + 1];
-/* L90: */
-    }
-
-/*     Updating sigma and iphase in ping */
-
-    latime_1.ops += 1;
-    *sigma += tau;
-    *iphase = 2;
 L100:
-    tolx = *sigma * *tol2;
-    toly = *sigma * *eps;
-    tolz = dmax(*sigma,*small2) * *tol2;
-    latime_1.ops += 3;
-
-/*     Checking for deflation and convergence (in ping) */
-
-L110:
-    if (*n <= 2) {
-	return 0;
-    }
-
-/*        Deflation: bottom 1x1 (in ping) */
-
-    ldef = FALSE_;
-    if (ee[*n - 1] <= tolz) {
-	ldef = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 2;
-	if (ee[*n - 1] <= *eps * (*sigma + qq[*n])) {
-	    latime_1.ops += 5;
-	    if (ee[*n - 1] * (qq[*n] / (qq[*n] + *sigma)) <= *tol2 * (qq[*n] 
-		    + *sigma)) {
-		ldef = TRUE_;
-	    }
-	}
+    latime_1.ops += 4.f;
+    if (tau < *sigma) {
+	*desig += tau;
+	t = *sigma + *desig;
+	*desig -= t - *sigma;
     } else {
-	latime_1.ops += 1;
-	if (ee[*n - 1] <= qq[*n] * *tol2) {
-	    ldef = TRUE_;
-	}
+	t = *sigma + tau;
+	*desig = *sigma - (t - tau) + *desig;
     }
-    if (ldef) {
-	latime_1.ops += 1;
-	q[*n] = qq[*n] + *sigma;
-	--(*n);
-	++(*iconv);
-	goto L110;
-    }
+    *sigma = t;
 
-/*        Deflation: bottom 2x2 (in ping) */
-
-    ldef = FALSE_;
-    if (ee[*n - 2] <= tolz) {
-	ldef = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 7;
-	t1 = *sigma + ee[*n - 1] * (*sigma / (*sigma + qq[*n]));
-	if (ee[*n - 2] * (t1 / (qq[*n - 1] + t1)) <= toly) {
-	    latime_1.ops += 3;
-	    if (ee[*n - 2] * (qq[*n - 1] / (qq[*n - 1] + t1)) <= tolx) {
-		ldef = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 5;
-	if (ee[*n - 2] <= qq[*n] / (qq[*n] + ee[*n - 1] + qq[*n - 1]) * qq[*n 
-		- 1] * *tol2) {
-	    ldef = TRUE_;
-	}
-    }
-    if (ldef) {
-/* Computing MAX */
-	r__1 = qq[*n], r__2 = qq[*n - 1], r__1 = max(r__1,r__2), r__2 = ee[*n 
-		- 1];
-	qemax = dmax(r__1,r__2);
-	if (qemax != 0.f) {
-	    latime_1.ops += 15;
-	    if (qemax == qq[*n - 1]) {
-/* Computing 2nd power */
-		r__1 = (qq[*n] - qq[*n - 1] + ee[*n - 1]) / qemax;
-		xx = (qq[*n] + qq[*n - 1] + ee[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + ee[*n - 1] * 4.f / qemax)) * .5f;
-	    } else if (qemax == qq[*n]) {
-/* Computing 2nd power */
-		r__1 = (qq[*n - 1] - qq[*n] + ee[*n - 1]) / qemax;
-		xx = (qq[*n] + qq[*n - 1] + ee[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + ee[*n - 1] * 4.f / qemax)) * .5f;
-	    } else {
-/* Computing 2nd power */
-		r__1 = (qq[*n] - qq[*n - 1] + ee[*n - 1]) / qemax;
-		xx = (qq[*n] + qq[*n - 1] + ee[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + qq[*n - 1] * 4.f / qemax)) * .5f;
-	    }
-/* Computing MAX */
-	    r__1 = qq[*n], r__2 = qq[*n - 1];
-/* Computing MIN */
-	    r__3 = qq[*n], r__4 = qq[*n - 1];
-	    yy = dmax(r__1,r__2) / xx * dmin(r__3,r__4);
-	} else {
-	    xx = 0.f;
-	    yy = 0.f;
-	}
-	latime_1.ops += 2;
-	q[*n - 1] = *sigma + xx;
-	q[*n] = yy + *sigma;
-	*n += -2;
-	*iconv += 2;
-	goto L110;
-    }
-
-/*     Updating bounds before going to pong */
-
-    if (*iconv == 0) {
-	*kend = ke;
-/* Computing MIN */
-	r__1 = dm, r__2 = *sup - tau;
-	*sup = dmin(r__1,r__2);
-    } else if (*iconv > 0) {
-/* Computing MIN */
-	r__1 = qq[*n], r__2 = qq[*n - 1], r__1 = min(r__1,r__2), r__2 = qq[*n 
-		- 2], r__1 = min(r__1,r__2), r__1 = min(r__1,qq[1]), r__1 = 
-		min(r__1,qq[2]);
-	*sup = dmin(r__1,qq[3]);
-	if (*iconv == 1) {
-	    *kend = k1end;
-	} else if (*iconv == 2) {
-	    *kend = k2end;
-	} else {
-	    *kend = *n;
-	}
-	icnt = 0;
-	maxit = *n * 100;
-    }
-
-/*     Checking for splitting in ping */
-
-    lsplit = FALSE_;
-    for (ks = *n - 3; ks >= 3; --ks) {
-	if (ee[ks] <= toly) {
-	    latime_1.ops += 3;
-/* Computing MIN */
-	    r__1 = qq[ks + 1], r__2 = qq[ks];
-/* Computing MIN */
-	    r__3 = qq[ks + 1], r__4 = qq[ks];
-	    if (ee[ks] * (dmin(r__1,r__2) / (dmin(r__3,r__4) + *sigma)) <= 
-		    tolx) {
-		lsplit = TRUE_;
-		goto L130;
-	    }
-	}
-/* L120: */
-    }
-
-    ks = 2;
-    if (ee[2] <= tolz) {
-	lsplit = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 7;
-	t1 = *sigma + ee[1] * (*sigma / (*sigma + qq[1]));
-	if (ee[2] * (t1 / (qq[1] + t1)) <= toly) {
-	    latime_1.ops += 3;
-	    if (ee[2] * (qq[1] / (qq[1] + t1)) <= tolx) {
-		lsplit = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 5;
-	if (ee[2] <= qq[1] / (qq[1] + ee[1] + qq[2]) * qq[2] * *tol2) {
-	    lsplit = TRUE_;
-	}
-    }
-    if (lsplit) {
-	goto L130;
-    }
-
-    ks = 1;
-    if (ee[1] <= tolz) {
-	lsplit = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 2;
-	if (ee[1] <= *eps * (*sigma + qq[1])) {
-	    latime_1.ops += 5;
-	    if (ee[1] * (qq[1] / (qq[1] + *sigma)) <= *tol2 * (qq[1] + *sigma)
-		    ) {
-		lsplit = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 1;
-	if (ee[1] <= qq[1] * *tol2) {
-	    lsplit = TRUE_;
-	}
-    }
-
-L130:
-    if (lsplit) {
-/* Computing MIN */
-	r__1 = qq[*n], r__2 = qq[*n - 1], r__1 = min(r__1,r__2), r__2 = qq[*n 
-		- 2];
-	*sup = dmin(r__1,r__2);
-	isp = -(*off + 1);
-	*off += ks;
-	*n -= ks;
-/* Computing MAX */
-	i__1 = 1, i__2 = *kend - ks;
-	*kend = max(i__1,i__2);
-	e[ks] = *sigma;
-	ee[ks] = (real) isp;
-	*iconv = 0;
-	return 0;
-    }
-
-/*     Coincidence */
-
-    if (tau == 0.f && dm <= tolz && *kend != *n && *iconv == 0 && icnt > 0) {
-	i__1 = *n - ke;
-	scopy_(&i__1, &e[ke], &c__1, &qq[ke], &c__1);
-	qq[*n] = 0.f;
-	i__1 = *n - ke;
-	scopy_(&i__1, &q[ke + 1], &c__1, &ee[ke], &c__1);
-	*sup = 0.f;
-    }
-    *iconv = 0;
-    goto L150;
-
-/*     A new shift when the previous failed (in ping) */
-
-L140:
-    ++ifl;
-    *sup = tau;
-
-/*     SUP is small or   
-       Too many bad shifts (ping) */
-
-    if (*sup <= tolz || ifl >= 2) {
-	tau = 0.f;
-	goto L40;
-
-/*     The asymptotic shift (in ping) */
-
-    } else {
-/* Computing MAX */
-	r__1 = tau + d;
-	tau = dmax(r__1,0.f);
-	if (tau <= tolz) {
-	    tau = 0.f;
-	}
-	goto L40;
-    }
-
-/*     the pong section of the code */
-
-L150:
-    ifl = 0;
-
-/*     Compute the shift (in pong) */
-
-    if (*kend == 0 && *sup == 0.f) {
-	tau = 0.f;
-    } else if (icnt > 0 && dm <= tolz) {
-	tau = 0.f;
-    } else {
-/* Computing MAX */
-	i__1 = 5, i__2 = *n / 32;
-	ip = max(i__1,i__2);
-	n2 = (ip << 1) + 1;
-	if (n2 >= *n) {
-	    n1 = 1;
-	    n2 = *n;
-	} else if (*kend + ip > *n) {
-	    n1 = *n - (ip << 1);
-	} else if (*kend - ip < 1) {
-	    n1 = 1;
-	} else {
-	    n1 = *kend - ip;
-	}
-	slasq4_(&n2, &qq[n1], &ee[n1], &tau, sup);
-    }
-L160:
-    ++icnt;
-    if (icnt > maxit) {
-	*sup = -(doublereal)(*sup);
-	return 0;
-    }
-    if (tau == 0.f) {
-
-/*     The dqd algorithm (in pong) */
-
-	d = qq[1];
-	dm = d;
-	ke = 0;
-	latime_1.ops = latime_1.ops + *n * 3 - 3;
-	i__1 = *n - 3;
-	for (i = 1; i <= i__1; ++i) {
-	    q[i] = d + ee[i];
-	    d = d / q[i] * qq[i + 1];
-	    if (dm > d) {
-		dm = d;
-		ke = i;
-	    }
-/* L170: */
-	}
-	++ke;
-
-/*     Penultimate dqd step (in pong) */
-
-	k2end = ke;
-	q[*n - 2] = d + ee[*n - 2];
-	d = d / q[*n - 2] * qq[*n - 1];
-	if (dm > d) {
-	    dm = d;
-	    ke = *n - 1;
-	}
-
-/*     Final dqd step (in pong) */
-
-	k1end = ke;
-	q[*n - 1] = d + ee[*n - 1];
-	d = d / q[*n - 1] * qq[*n];
-	if (dm > d) {
-	    dm = d;
-	    ke = *n;
-	}
-	q[*n] = d;
-    } else {
-
-/*     The dqds algorithm (in pong) */
-
-	latime_1.ops = latime_1.ops + 1 + (*n - 3 << 2);
-	d = qq[1] - tau;
-	dm = d;
-	ke = 0;
-	if (d < 0.f) {
-	    goto L260;
-	}
-	i__1 = *n - 3;
-	for (i = 1; i <= i__1; ++i) {
-	    q[i] = d + ee[i];
-	    d = d / q[i] * qq[i + 1] - tau;
-	    if (dm > d) {
-		dm = d;
-		ke = i;
-		if (d < 0.f) {
-		    goto L190;
-		}
-	    }
-/* L180: */
-	}
-	++ke;
-	goto L200;
-L190:
-	latime_1.ops -= *n - 3 - ke << 2;
-	goto L260;
-L200:
-
-/*     Penultimate dqds step (in pong) */
-
-	k2end = ke;
-	latime_1.ops += 4;
-	q[*n - 2] = d + ee[*n - 2];
-	d = d / q[*n - 2] * qq[*n - 1] - tau;
-	if (dm > d) {
-	    dm = d;
-	    ke = *n - 1;
-	    if (d < 0.f) {
-		goto L260;
-	    }
-	}
-
-/*     Final dqds step (in pong) */
-
-	k1end = ke;
-	latime_1.ops += 4;
-	q[*n - 1] = d + ee[*n - 1];
-	d = d / q[*n - 1] * qq[*n] - tau;
-	if (dm > d) {
-	    dm = d;
-	    ke = *n;
-	}
-	q[*n] = d;
-    }
-
-/*        Convergence when is small (in pong) */
-
-    latime_1.ops += 1;
-    if ((r__1 = q[*n], dabs(r__1)) <= *sigma * *tol2) {
-	q[*n] = 0.f;
-	dm = 0.f;
-	ke = *n;
-    }
-    if (q[*n] < 0.f) {
-	goto L260;
-    }
-
-/*     Non-negative qd array: Update the e's */
-
-    latime_1.ops = latime_1.ops + (*n << 1) - 1;
-    i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	e[i] = ee[i] / q[i] * qq[i + 1];
-/* L210: */
-    }
-
-/*     Updating sigma and iphase in pong */
-
-    *sigma += tau;
-L220:
-    *iphase = 1;
-    latime_1.ops += 2;
-    tolx = *sigma * *tol2;
-    toly = *sigma * *eps;
-
-/*     Checking for deflation and convergence (in pong) */
-
-L230:
-    if (*n <= 2) {
-	return 0;
-    }
-
-/*        Deflation: bottom 1x1 (in pong) */
-
-    ldef = FALSE_;
-    if (e[*n - 1] <= tolz) {
-	ldef = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 2;
-	if (e[*n - 1] <= *eps * (*sigma + q[*n])) {
-	    latime_1.ops += 5;
-	    if (e[*n - 1] * (q[*n] / (q[*n] + *sigma)) <= *tol2 * (q[*n] + *
-		    sigma)) {
-		ldef = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 1;
-	if (e[*n - 1] <= q[*n] * *tol2) {
-	    ldef = TRUE_;
-	}
-    }
-    if (ldef) {
-	latime_1.ops += 1;
-	q[*n] += *sigma;
-	--(*n);
-	++(*iconv);
-	goto L230;
-    }
-
-/*        Deflation: bottom 2x2 (in pong) */
-
-    ldef = FALSE_;
-    if (e[*n - 2] <= tolz) {
-	ldef = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 7;
-	t1 = *sigma + e[*n - 1] * (*sigma / (*sigma + q[*n]));
-	if (e[*n - 2] * (t1 / (q[*n - 1] + t1)) <= toly) {
-	    latime_1.ops += 3;
-	    if (e[*n - 2] * (q[*n - 1] / (q[*n - 1] + t1)) <= tolx) {
-		ldef = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 5;
-	if (e[*n - 2] <= q[*n] / (q[*n] + ee[*n - 1] + q[*n - 1]) * q[*n - 1] 
-		* *tol2) {
-	    ldef = TRUE_;
-	}
-    }
-    if (ldef) {
-/* Computing MAX */
-	r__1 = q[*n], r__2 = q[*n - 1], r__1 = max(r__1,r__2), r__2 = e[*n - 
-		1];
-	qemax = dmax(r__1,r__2);
-	if (qemax != 0.f) {
-	    latime_1.ops += 15;
-	    if (qemax == q[*n - 1]) {
-/* Computing 2nd power */
-		r__1 = (q[*n] - q[*n - 1] + e[*n - 1]) / qemax;
-		xx = (q[*n] + q[*n - 1] + e[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + e[*n - 1] * 4.f / qemax)) * .5f;
-	    } else if (qemax == q[*n]) {
-/* Computing 2nd power */
-		r__1 = (q[*n - 1] - q[*n] + e[*n - 1]) / qemax;
-		xx = (q[*n] + q[*n - 1] + e[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + e[*n - 1] * 4.f / qemax)) * .5f;
-	    } else {
-/* Computing 2nd power */
-		r__1 = (q[*n] - q[*n - 1] + e[*n - 1]) / qemax;
-		xx = (q[*n] + q[*n - 1] + e[*n - 1] + qemax * sqrt(r__1 * 
-			r__1 + q[*n - 1] * 4.f / qemax)) * .5f;
-	    }
-/* Computing MAX */
-	    r__1 = q[*n], r__2 = q[*n - 1];
-/* Computing MIN */
-	    r__3 = q[*n], r__4 = q[*n - 1];
-	    yy = dmax(r__1,r__2) / xx * dmin(r__3,r__4);
-	} else {
-	    xx = 0.f;
-	    yy = 0.f;
-	}
-	latime_1.ops += 2;
-	q[*n - 1] = *sigma + xx;
-	q[*n] = yy + *sigma;
-	*n += -2;
-	*iconv += 2;
-	goto L230;
-    }
-
-/*     Updating bounds before going to pong */
-
-    if (*iconv == 0) {
-	*kend = ke;
-/* Computing MIN */
-	r__1 = dm, r__2 = *sup - tau;
-	*sup = dmin(r__1,r__2);
-    } else if (*iconv > 0) {
-/* Computing MIN */
-	r__1 = q[*n], r__2 = q[*n - 1], r__1 = min(r__1,r__2), r__2 = q[*n - 
-		2], r__1 = min(r__1,r__2), r__1 = min(r__1,q[1]), r__1 = min(
-		r__1,q[2]);
-	*sup = dmin(r__1,q[3]);
-	if (*iconv == 1) {
-	    *kend = k1end;
-	} else if (*iconv == 2) {
-	    *kend = k2end;
-	} else {
-	    *kend = *n;
-	}
-	icnt = 0;
-	maxit = *n * 100;
-    }
-
-/*     Checking for splitting in pong */
-
-    lsplit = FALSE_;
-    for (ks = *n - 3; ks >= 3; --ks) {
-	latime_1.ops += 3;
-	if (e[ks] <= toly) {
-/* Computing MIN */
-	    r__1 = q[ks + 1], r__2 = q[ks];
-/* Computing MIN */
-	    r__3 = q[ks + 1], r__4 = q[ks];
-	    if (e[ks] * (dmin(r__1,r__2) / (dmin(r__3,r__4) + *sigma)) <= 
-		    tolx) {
-		lsplit = TRUE_;
-		goto L250;
-	    }
-	}
-/* L240: */
-    }
-
-    ks = 2;
-    if (e[2] <= tolz) {
-	lsplit = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 7;
-	t1 = *sigma + e[1] * (*sigma / (*sigma + q[1]));
-	if (e[2] * (t1 / (q[1] + t1)) <= toly) {
-	    latime_1.ops += 3;
-	    if (e[2] * (q[1] / (q[1] + t1)) <= tolx) {
-		lsplit = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 5;
-	if (e[2] <= q[1] / (q[1] + e[1] + q[2]) * q[2] * *tol2) {
-	    lsplit = TRUE_;
-	}
-    }
-    if (lsplit) {
-	goto L250;
-    }
-
-    ks = 1;
-    if (e[1] <= tolz) {
-	lsplit = TRUE_;
-    } else if (*sigma > 0.f) {
-	latime_1.ops += 2;
-	if (e[1] <= *eps * (*sigma + q[1])) {
-	    latime_1.ops += 5;
-	    if (e[1] * (q[1] / (q[1] + *sigma)) <= *tol2 * (q[1] + *sigma)) {
-		lsplit = TRUE_;
-	    }
-	}
-    } else {
-	latime_1.ops += 1;
-	if (e[1] <= q[1] * *tol2) {
-	    lsplit = TRUE_;
-	}
-    }
-
-L250:
-    if (lsplit) {
-/* Computing MIN */
-	r__1 = q[*n], r__2 = q[*n - 1], r__1 = min(r__1,r__2), r__2 = q[*n - 
-		2];
-	*sup = dmin(r__1,r__2);
-	isp = *off + 1;
-	*off += ks;
-/* Computing MAX */
-	i__1 = 1, i__2 = *kend - ks;
-	*kend = max(i__1,i__2);
-	*n -= ks;
-	e[ks] = *sigma;
-	ee[ks] = (real) isp;
-	*iconv = 0;
-	return 0;
-    }
-
-/*     Coincidence */
-
-    if (tau == 0.f && dm <= tolz && *kend != *n && *iconv == 0 && icnt > 0) {
-	i__1 = *n - ke;
-	scopy_(&i__1, &ee[ke], &c__1, &q[ke], &c__1);
-	q[*n] = 0.f;
-	i__1 = *n - ke;
-	scopy_(&i__1, &qq[ke + 1], &c__1, &e[ke], &c__1);
-	*sup = 0.f;
-    }
-    *iconv = 0;
-    goto L30;
-
-/*     Computation of a new shift when the previous failed (in pong) */
-
-L260:
-    ++ifl;
-    *sup = tau;
-
-/*     SUP is small or   
-       Too many bad shifts (in pong) */
-
-    if (*sup <= tolz || ifl >= 2) {
-	tau = 0.f;
-	goto L160;
-
-/*     The asymptotic shift (in pong) */
-
-    } else {
-	latime_1.ops += 1;
-/* Computing MAX */
-	r__1 = tau + d;
-	tau = dmax(r__1,0.f);
-	if (tau <= tolz) {
-	    tau = 0.f;
-	}
-	goto L160;
-    }
+    return 0;
 
 /*     End of SLASQ3 */
 
-    return 0;
 } /* slasq3_ */
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,9 +13,9 @@ static doublecomplex c_b2 = {1.,0.};
 static integer c__1 = 1;
 
 /* Subroutine */ int zhpt21_(integer *itype, char *uplo, integer *n, integer *
-	kband, doublecomplex *ap, doublereal *d, doublereal *e, doublecomplex 
-	*u, integer *ldu, doublecomplex *vp, doublecomplex *tau, 
-	doublecomplex *work, doublereal *rwork, doublereal *result)
+	kband, doublecomplex *ap, doublereal *d__, doublereal *e, 
+	doublecomplex *u, integer *ldu, doublecomplex *vp, doublecomplex *tau,
+	 doublecomplex *work, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
     integer u_dim1, u_offset, i__1, i__2, i__3, i__4, i__5, i__6;
@@ -65,7 +66,11 @@ static integer c__1 = 1;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -100,12 +105,10 @@ static integer c__1 = 1;
 
             RESULT(1) = | I - UV* | / ( n ulp )   
 
-    Packed storage means that, for example, if UPLO='U', then the columns 
-  
+    Packed storage means that, for example, if UPLO='U', then the columns   
     of the upper triangle of A are stored one after another, so that   
     A(1,j+1) immediately follows A(j,j) in the array AP.  Similarly, if   
-    UPLO='L', then the columns of the lower triangle of A are stored one 
-  
+    UPLO='L', then the columns of the lower triangle of A are stored one   
     after another in AP, so that A(j+1,j+1) immediately follows A(n,j)   
     in the array AP.  This means that A(i,j) is stored in:   
 
@@ -131,8 +134,7 @@ static integer c__1 = 1;
 
            H(j) = I  -  tau(j) v(j) v(j)*   
 
-       and the first j elements of v(j) are 0, the (j+1)-st is 1, and the 
-  
+       and the first j elements of v(j) are 0, the (j+1)-st is 1, and the   
        (j+2)-nd through n-th elements are stored in V(j+2:n,j) (i.e.,   
        in VP( (2*n-j)*(j-1)/2 + j+2 : (2*n-j)*(j-1)/2 + n ) .)   
 
@@ -145,8 +147,7 @@ static integer c__1 = 1;
                RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and*   
                RESULT(2) = | I - UU* | / ( n ulp )   
 
-            2: U expressed as a product V of Housholder transformations: 
-  
+            2: U expressed as a product V of Housholder transformations:   
                RESULT(1) = | A - V S V* | / ( |A| n ulp )   
 
             3: U expressed both as a dense unitary matrix and   
@@ -160,8 +161,7 @@ static integer c__1 = 1;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZHPT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, ZHPT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -186,8 +186,7 @@ static integer c__1 = 1;
 
     U       (input) COMPLEX*16 array, dimension (LDU, N)   
             If ITYPE=1 or 3, this contains the unitary matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2, 
-  
+            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
             then it is not referenced.   
 
     LDU     (input) INTEGER   
@@ -199,10 +198,8 @@ static integer c__1 = 1;
             Householder vectors used to describe the unitary matrix   
             in the decomposition, as described in purpose.   
             *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') 
-  
-            is set to one, and later reset to its original value, during 
-  
+            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
+            is set to one, and later reset to its original value, during   
             the course of the calculation.   
             If ITYPE=1, then it is neither referenced nor modified.   
 
@@ -224,18 +221,17 @@ static integer c__1 = 1;
             RESULT(1) is always modified.  RESULT(2) is modified only   
             if ITYPE=1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Constants   
 
        Parameter adjustments */
     --ap;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --vp;
     --tau;
@@ -280,7 +276,8 @@ static integer c__1 = 1;
 	anorm = 1.;
     } else {
 /* Computing MAX */
-	d__1 = zlanhp_("1", cuplo, n, &ap[1], &rwork[1]);
+	d__1 = zlanhp_("1", cuplo, n, &ap[1], &rwork[1])
+		;
 	anorm = max(d__1,unfl);
     }
 
@@ -295,8 +292,8 @@ static integer c__1 = 1;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    d__1 = -d[j];
-	    zhpr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
+	    d__1 = -d__[j];
+	    zhpr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
 /* L10: */
 	}
 
@@ -306,8 +303,8 @@ static integer c__1 = 1;
 		i__2 = j;
 		z__2.r = e[i__2], z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
-		zhpr2_(cuplo, n, &z__1, &u[j * u_dim1 + 1], &c__1, &u[(j - 1) 
-			* u_dim1 + 1], &c__1, &work[1]);
+		zhpr2_(cuplo, n, &z__1, &u_ref(1, j), &c__1, &u_ref(1, j - 1),
+			 &c__1, &work[1]);
 /* L20: */
 	    }
 	}
@@ -322,7 +319,7 @@ static integer c__1 = 1;
 	if (lower) {
 	    i__1 = lap;
 	    i__2 = *n;
-	    work[i__1].r = d[i__2], work[i__1].i = 0.;
+	    work[i__1].r = d__[i__2], work[i__1].i = 0.;
 	    for (j = *n - 1; j >= 1; --j) {
 		jp = ((*n << 1) - j) * (j - 1) / 2;
 		jp1 = jp + *n - j;
@@ -380,11 +377,11 @@ static integer c__1 = 1;
 		}
 		i__1 = jp + j;
 		i__2 = j;
-		work[i__1].r = d[i__2], work[i__1].i = 0.;
+		work[i__1].r = d__[i__2], work[i__1].i = 0.;
 /* L40: */
 	    }
 	} else {
-	    work[1].r = d[1], work[1].i = 0.;
+	    work[1].r = d__[1], work[1].i = 0.;
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
 		jp = j * (j - 1) / 2;
@@ -438,7 +435,7 @@ static integer c__1 = 1;
 		}
 		i__2 = jp1 + j + 1;
 		i__3 = j + 1;
-		work[i__2].r = d[i__3], work[i__2].i = 0.;
+		work[i__2].r = d__[i__3], work[i__2].i = 0.;
 /* L60: */
 	    }
 	}
@@ -526,4 +523,8 @@ static integer c__1 = 1;
 /*     End of ZHPT21 */
 
 } /* zhpt21_ */
+
+#undef u_ref
+#undef u_subscr
+
 

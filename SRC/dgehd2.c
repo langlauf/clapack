@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgehd2_(integer *n, integer *ilo, integer *ihi, 
 	doublereal *a, integer *lda, doublereal *tau, doublereal *work, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -13,8 +14,7 @@
     Purpose   
     =======   
 
-    DGEHD2 reduces a real general matrix A to upper Hessenberg form H by 
-  
+    DGEHD2 reduces a real general matrix A to upper Hessenberg form H by   
     an orthogonal similarity transformation:  Q' * A * Q = H .   
 
     Arguments   
@@ -36,16 +36,14 @@
             On exit, the upper triangle and the first subdiagonal of A   
             are overwritten with the upper Hessenberg matrix H, and the   
             elements below the first subdiagonal, with the array TAU,   
-            represent the orthogonal matrix Q as a product of elementary 
-  
+            represent the orthogonal matrix Q as a product of elementary   
             reflectors. See Further Details.   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.  LDA >= max(1,N).   
 
     TAU     (output) DOUBLE PRECISION array, dimension (N-1)   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (N)   
@@ -84,39 +82,37 @@
     (                         a )    (                          a )   
 
     where a denotes an element of the original matrix A, h denotes a   
-    modified element of the upper Hessenberg matrix H, and vi denotes an 
-  
+    modified element of the upper Hessenberg matrix H, and vi denotes an   
     element of the vector defining H(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *), dlarfg_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *), xerbla_(char *, integer *);
     static doublereal aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -134,33 +130,32 @@
     }
 
     i__1 = *ihi - 1;
-    for (i = *ilo; i <= *ihi-1; ++i) {
+    for (i__ = *ilo; i__ <= i__1; ++i__) {
 
-/*        Compute elementary reflector H(i) to annihilate A(i+2:ihi,i)
- */
+/*        Compute elementary reflector H(i) to annihilate A(i+2:ihi,i)   
 
-	i__2 = *ihi - i;
-/* Computing MIN */
-	i__3 = i + 2;
-	dlarfg_(&i__2, &A(i+1,i), &A(min(i+2,*n),i), 
-		&c__1, &TAU(i));
-	aii = A(i+1,i);
-	A(i+1,i) = 1.;
+   Computing MIN */
+	i__2 = i__ + 2;
+	i__3 = *ihi - i__;
+	dlarfg_(&i__3, &a_ref(i__ + 1, i__), &a_ref(min(i__2,*n), i__), &c__1,
+		 &tau[i__]);
+	aii = a_ref(i__ + 1, i__);
+	a_ref(i__ + 1, i__) = 1.;
 
 /*        Apply H(i) to A(1:ihi,i+1:ihi) from the right */
 
-	i__2 = *ihi - i;
-	dlarf_("Right", ihi, &i__2, &A(i+1,i), &c__1, &TAU(i), &
-		A(1,i+1), lda, &WORK(1));
+	i__2 = *ihi - i__;
+	dlarf_("Right", ihi, &i__2, &a_ref(i__ + 1, i__), &c__1, &tau[i__], &
+		a_ref(1, i__ + 1), lda, &work[1]);
 
 /*        Apply H(i) to A(i+1:ihi,i+1:n) from the left */
 
-	i__2 = *ihi - i;
-	i__3 = *n - i;
-	dlarf_("Left", &i__2, &i__3, &A(i+1,i), &c__1, &TAU(i), &
-		A(i+1,i+1), lda, &WORK(1));
+	i__2 = *ihi - i__;
+	i__3 = *n - i__;
+	dlarf_("Left", &i__2, &i__3, &a_ref(i__ + 1, i__), &c__1, &tau[i__], &
+		a_ref(i__ + 1, i__ + 1), lda, &work[1]);
 
-	A(i+1,i) = aii;
+	a_ref(i__ + 1, i__) = aii;
 /* L10: */
     }
 
@@ -169,4 +164,7 @@
 /*     End of DGEHD2 */
 
 } /* dgehd2_ */
+
+#undef a_ref
+
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgbtrs_(char *trans, integer *n, integer *kl, integer *
 	ku, integer *nrhs, doublereal *ab, integer *ldab, integer *ipiv, 
 	doublereal *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -34,8 +35,7 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     NRHS    (input) INTEGER   
             The number of right hand sides, i.e., the number of columns   
@@ -43,8 +43,7 @@
 
     AB      (input) DOUBLE PRECISION array, dimension (LDAB,N)   
             Details of the LU factorization of the band matrix A, as   
-            computed by DGBTRF.  U is stored as an upper triangular band 
-  
+            computed by DGBTRF.  U is stored as an upper triangular band   
             matrix with KL+KU superdiagonals in rows 1 to KL+KU+1, and   
             the multipliers used during the factorization are stored in   
             rows KL+KU+2 to 2*KL+KU+1.   
@@ -67,15 +66,12 @@
             = 0:  successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b7 = -1.;
     static integer c__1 = 1;
@@ -87,7 +83,7 @@
     extern /* Subroutine */ int dger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer i, j, l;
+    static integer i__, j, l;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
@@ -99,17 +95,23 @@
     static integer kd, lm;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical notran;
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     notran = lsame_(trans, "N");
-    if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, "C")) {
+    if (! notran && ! lsame_(trans, "T") && ! lsame_(
+	    trans, "C")) {
 	*info = -1;
     } else if (*n < 0) {
 	*info = -2;
@@ -145,36 +147,35 @@
 
           Solve L*X = B, overwriting B with X.   
 
-          L is represented as a product of permutations and unit lower
-   
-          triangular matrices L = P(1) * L(1) * ... * P(n-1) * L(n-1),
-   
-          where each transformation L(i) is a rank-one modification of
-   
+          L is represented as a product of permutations and unit lower   
+          triangular matrices L = P(1) * L(1) * ... * P(n-1) * L(n-1),   
+          where each transformation L(i) is a rank-one modification of   
           the identity matrix. */
 
 	if (lnoti) {
 	    i__1 = *n - 1;
-	    for (j = 1; j <= *n-1; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__2 = *kl, i__3 = *n - j;
 		lm = min(i__2,i__3);
-		l = IPIV(j);
+		l = ipiv[j];
 		if (l != j) {
-		    dswap_(nrhs, &B(l,1), ldb, &B(j,1), ldb);
+		    dswap_(nrhs, &b_ref(l, 1), ldb, &b_ref(j, 1), ldb);
 		}
-		dger_(&lm, nrhs, &c_b7, &AB(kd+1,j), &c__1, &B(j,1), ldb, &B(j+1,1), ldb);
+		dger_(&lm, nrhs, &c_b7, &ab_ref(kd + 1, j), &c__1, &b_ref(j, 
+			1), ldb, &b_ref(j + 1, 1), ldb);
 /* L10: */
 	    }
 	}
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve U*X = B, overwriting B with X. */
 
 	    i__2 = *kl + *ku;
-	    dtbsv_("Upper", "No transpose", "Non-unit", n, &i__2, &AB(1,1), ldab, &B(1,i), &c__1);
+	    dtbsv_("Upper", "No transpose", "Non-unit", n, &i__2, &ab[
+		    ab_offset], ldab, &b_ref(1, i__), &c__1);
 /* L20: */
 	}
 
@@ -183,13 +184,13 @@
 /*        Solve A'*X = B. */
 
 	i__1 = *nrhs;
-	for (i = 1; i <= *nrhs; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Solve U'*X = B, overwriting B with X. */
 
 	    i__2 = *kl + *ku;
-	    dtbsv_("Upper", "Transpose", "Non-unit", n, &i__2, &AB(1,1),
-		     ldab, &B(1,i), &c__1);
+	    dtbsv_("Upper", "Transpose", "Non-unit", n, &i__2, &ab[ab_offset],
+		     ldab, &b_ref(1, i__), &c__1);
 /* L30: */
 	}
 
@@ -200,11 +201,11 @@
 /* Computing MIN */
 		i__1 = *kl, i__2 = *n - j;
 		lm = min(i__1,i__2);
-		dgemv_("Transpose", &lm, nrhs, &c_b7, &B(j+1,1), ldb,
-			 &AB(kd+1,j), &c__1, &c_b23, &B(j,1), ldb);
-		l = IPIV(j);
+		dgemv_("Transpose", &lm, nrhs, &c_b7, &b_ref(j + 1, 1), ldb, &
+			ab_ref(kd + 1, j), &c__1, &c_b23, &b_ref(j, 1), ldb);
+		l = ipiv[j];
 		if (l != j) {
-		    dswap_(nrhs, &B(l,1), ldb, &B(j,1), ldb);
+		    dswap_(nrhs, &b_ref(l, 1), ldb, &b_ref(j, 1), ldb);
 		}
 /* L40: */
 	    }
@@ -215,4 +216,8 @@
 /*     End of DGBTRS */
 
 } /* dgbtrs_ */
+
+#undef ab_ref
+#undef b_ref
+
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int cpotrf_(char *uplo, integer *n, complex *a, integer *lda,
 	 integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -33,13 +34,11 @@
             The order of the matrix A.  N >= 0.   
 
     A       (input/output) COMPLEX array, dimension (LDA,N)   
-            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading   
             N-by-N upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of A contains the lower 
-  
+            leading N-by-N lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -56,15 +55,12 @@
                   positive definite, and the factorization could not be   
                   completed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static integer c__1 = 1;
@@ -93,12 +89,15 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -122,12 +121,13 @@
 
 /*     Determine the block size for this environment. */
 
-    nb = ilaenv_(&c__1, "CPOTRF", uplo, n, &c_n1, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "CPOTRF", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
     if (nb <= 1 || nb >= *n) {
 
 /*        Use unblocked code. */
 
-	cpotf2_(uplo, n, &A(1,1), lda, info);
+	cpotf2_(uplo, n, &a[a_offset], lda, info);
     } else {
 
 /*        Use blocked code. */
@@ -138,18 +138,18 @@
 
 	    i__1 = *n;
 	    i__2 = nb;
-	    for (j = 1; nb < 0 ? j >= *n : j <= *n; j += nb) {
+	    for (j = 1; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Update and factorize the current diagonal bloc
-k and test   
+/*              Update and factorize the current diagonal block and test   
                 for non-positive-definiteness.   
 
    Computing MIN */
 		i__3 = nb, i__4 = *n - j + 1;
 		jb = min(i__3,i__4);
 		i__3 = j - 1;
-		cherk_("Upper", "Conjugate transpose", &jb, &i__3, &c_b14, &A(1,j), lda, &c_b15, &A(j,j), lda);
-		cpotf2_("Upper", &jb, &A(j,j), lda, info);
+		cherk_("Upper", "Conjugate transpose", &jb, &i__3, &c_b14, &
+			a_ref(1, j), lda, &c_b15, &a_ref(j, j), lda);
+		cpotf2_("Upper", &jb, &a_ref(j, j), lda, info);
 		if (*info != 0) {
 		    goto L30;
 		}
@@ -161,10 +161,12 @@ k and test
 		    i__4 = j - 1;
 		    q__1.r = -1.f, q__1.i = 0.f;
 		    cgemm_("Conjugate transpose", "No transpose", &jb, &i__3, 
-			    &i__4, &q__1, &A(1,j), lda, &A(1,j+jb), lda, &c_b1, &A(j,j+jb), lda);
+			    &i__4, &q__1, &a_ref(1, j), lda, &a_ref(1, j + jb)
+			    , lda, &c_b1, &a_ref(j, j + jb), lda);
 		    i__3 = *n - j - jb + 1;
 		    ctrsm_("Left", "Upper", "Conjugate transpose", "Non-unit",
-			     &jb, &i__3, &c_b1, &A(j,j), lda, &A(j,j+jb), lda);
+			     &jb, &i__3, &c_b1, &a_ref(j, j), lda, &a_ref(j, 
+			    j + jb), lda);
 		}
 /* L10: */
 	    }
@@ -175,18 +177,18 @@ k and test
 
 	    i__2 = *n;
 	    i__1 = nb;
-	    for (j = 1; nb < 0 ? j >= *n : j <= *n; j += nb) {
+	    for (j = 1; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
-/*              Update and factorize the current diagonal bloc
-k and test   
+/*              Update and factorize the current diagonal block and test   
                 for non-positive-definiteness.   
 
    Computing MIN */
 		i__3 = nb, i__4 = *n - j + 1;
 		jb = min(i__3,i__4);
 		i__3 = j - 1;
-		cherk_("Lower", "No transpose", &jb, &i__3, &c_b14, &A(j,1), lda, &c_b15, &A(j,j), lda);
-		cpotf2_("Lower", &jb, &A(j,j), lda, info);
+		cherk_("Lower", "No transpose", &jb, &i__3, &c_b14, &a_ref(j, 
+			1), lda, &c_b15, &a_ref(j, j), lda);
+		cpotf2_("Lower", &jb, &a_ref(j, j), lda, info);
 		if (*info != 0) {
 		    goto L30;
 		}
@@ -198,10 +200,12 @@ k and test
 		    i__4 = j - 1;
 		    q__1.r = -1.f, q__1.i = 0.f;
 		    cgemm_("No transpose", "Conjugate transpose", &i__3, &jb, 
-			    &i__4, &q__1, &A(j+jb,1), lda, &A(j,1), lda, &c_b1, &A(j+jb,j), lda);
+			    &i__4, &q__1, &a_ref(j + jb, 1), lda, &a_ref(j, 1)
+			    , lda, &c_b1, &a_ref(j + jb, j), lda);
 		    i__3 = *n - j - jb + 1;
 		    ctrsm_("Right", "Lower", "Conjugate transpose", "Non-unit"
-			    , &i__3, &jb, &c_b1, &A(j,j), lda, &A(j+jb,j), lda);
+			    , &i__3, &jb, &c_b1, &a_ref(j, j), lda, &a_ref(j 
+			    + jb, j), lda);
 		}
 /* L20: */
 	    }
@@ -218,4 +222,8 @@ L40:
 /*     End of CPOTRF */
 
 } /* cpotrf_ */
+
+#undef a_ref
+#undef a_subscr
+
 

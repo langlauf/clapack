@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,7 +28,7 @@ static integer c__2 = 2;
 
 /* Subroutine */ int ddrves_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, doublereal *thresh, integer *nounit, 
-	doublereal *a, integer *lda, doublereal *h, doublereal *ht, 
+	doublereal *a, integer *lda, doublereal *h__, doublereal *ht, 
 	doublereal *wr, doublereal *wi, doublereal *wrt, doublereal *wit, 
 	doublereal *vs, integer *ldvs, doublereal *result, doublereal *work, 
 	integer *nwork, integer *iwork, logical *bwork, integer *info)
@@ -108,7 +109,7 @@ static integer c__2 = 2;
     static doublereal unfl, ovfl;
     static integer rsub;
     static char sort[1];
-    static integer i, j, n;
+    static integer i__, j, n;
     static logical badnn;
     extern /* Subroutine */ int dgees_(char *, char *, L_fp, integer *, 
 	    doublereal *, integer *, integer *, doublereal *, doublereal *, 
@@ -170,7 +171,12 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
+#define ht_ref(a_1,a_2) ht[(a_2)*ht_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -218,8 +224,7 @@ static integer c__2 = 2;
          Here VS is the matrix of Schur eigenvectors, and T is in Schur   
          form  (with sorting of eigenvalues).   
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). 
-  
+       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
 
        (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
                1/ulp otherwise   
@@ -364,22 +369,18 @@ static integer c__2 = 2;
             The FORTRAN unit number for printing out error messages   
             (e.g., if a routine returns INFO not equal to 0.)   
 
-    A       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    A       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used. 
-  
+            computed.  On exit, A contains the last matrix actually used.   
 
     LDA     (input) INTEGER   
             The leading dimension of A, and H. LDA must be at   
             least 1 and at least max(NN).   
 
-    H       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    H       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             Another copy of the test matrix A, modified by DGEES.   
 
-    HT      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    HT      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             Yet another copy of the test matrix A, modified by DGEES.   
 
     WR      (workspace) DOUBLE PRECISION array, dimension (max(NN))   
@@ -393,8 +394,7 @@ static integer c__2 = 2;
             but those computed when DGEES only computes a partial   
             eigendecomposition, i.e. not Schur vectors   
 
-    VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, max(NN)) 
-  
+    VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, max(NN))   
             VS holds the computed Schur vectors.   
 
     LDVS    (input) INTEGER   
@@ -402,8 +402,7 @@ static integer c__2 = 2;
 
     RESULT  (output) DOUBLE PRECISION array, dimension (13)   
             The values computed by the 13 tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow. 
-  
+            The values are currently limited to 1/ulp, to avoid overflow.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (NWORK)   
 
@@ -425,8 +424,7 @@ static integer c__2 = 2;
             If  DLATMR, SLATMS, SLATME or DGEES returns an error code,   
                 the absolute value of it is returned.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -452,28 +450,27 @@ static integer c__2 = 2;
        KCONDS(j)       Selectw whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = ht_dim1 + 1;
+    ht_offset = 1 + ht_dim1 * 1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --wr;
     --wi;
     --wrt;
     --wit;
     vs_dim1 = *ldvs;
-    vs_offset = vs_dim1 + 1;
+    vs_offset = 1 + vs_dim1 * 1;
     vs -= vs_offset;
     --result;
     --work;
@@ -482,8 +479,8 @@ static integer c__2 = 2;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "ES", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "ES", (ftnlen)2, (ftnlen)2);
 
 /*     Check for errors */
 
@@ -586,12 +583,9 @@ static integer c__2 = 2;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -643,7 +637,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L70: */
 		}
 
@@ -653,9 +647,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 		    if (jcol > 1) {
-			a[jcol + (jcol - 1) * a_dim1] = 1.;
+			a_ref(jcol, jcol - 1) = 1.;
 		    }
 /* L80: */
 		}
@@ -727,13 +721,13 @@ L60:
 		    dlaset_("Full", &c__2, &n, &c_b17, &c_b17, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a[a_dim1 + 
-			    3], lda);
+		    dlaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a_ref(3, 1)
+			    , lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a[(n - 1) *
-			     a_dim1 + 3], lda);
-		    dlaset_("Full", &c__1, &n, &c_b17, &c_b17, &a[n + a_dim1],
-			     lda);
+		    dlaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a_ref(3, n 
+			    - 1), lda);
+		    dlaset_("Full", &c__1, &n, &c_b17, &c_b17, &a_ref(n, 1), 
+			    lda);
 		}
 
 	    } else if (itype == 10) {
@@ -754,7 +748,7 @@ L60:
 	    if (iinfo != 0) {
 		io___32.ciunit = *nounit;
 		s_wsfe(&io___32);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -785,8 +779,7 @@ L90:
 /* L100: */
 		}
 
-/*              Test with and without sorting of eigenvalues 
-*/
+/*              Test with and without sorting of eigenvalues */
 
 		for (isort = 0; isort <= 1; ++isort) {
 		    if (isort == 0) {
@@ -797,18 +790,18 @@ L90:
 			rsub = 6;
 		    }
 
-/*                 Compute Schur form and Schur vectors, a
-nd test them */
+/*                 Compute Schur form and Schur vectors, and test them */
 
-		    dlacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda);
-		    dgees_("V", sort, (L_fp)dslect_, &n, &h[h_offset], lda, &
-			    sdim, &wr[1], &wi[1], &vs[vs_offset], ldvs, &work[
-			    1], &nnwork, &bwork[1], &iinfo);
+		    dlacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], 
+			    lda);
+		    dgees_("V", sort, (L_fp)dslect_, &n, &h__[h_offset], lda, 
+			    &sdim, &wr[1], &wi[1], &vs[vs_offset], ldvs, &
+			    work[1], &nnwork, &bwork[1], &iinfo);
 		    if (iinfo != 0 && iinfo != n + 2) {
 			result[rsub + 1] = ulpinv;
 			io___39.ciunit = *nounit;
 			s_wsfe(&io___39);
-			do_fio(&c__1, "DGEES1", 6L);
+			do_fio(&c__1, "DGEES1", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -827,8 +820,8 @@ nd test them */
 		    i__3 = n - 2;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j + 2; i <= i__4; ++i) {
-			    if (h[i + j * h_dim1] != 0.) {
+			for (i__ = j + 2; i__ <= i__4; ++i__) {
+			    if (h___ref(i__, j) != 0.) {
 				result[rsub + 1] = ulpinv;
 			    }
 /* L110: */
@@ -836,34 +829,32 @@ nd test them */
 /* L120: */
 		    }
 		    i__3 = n - 2;
-		    for (i = 1; i <= i__3; ++i) {
-			if (h[i + 1 + i * h_dim1] != 0. && h[i + 2 + (i + 1) *
-				 h_dim1] != 0.) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (h___ref(i__ + 1, i__) != 0. && h___ref(i__ + 2, 
+				i__ + 1) != 0.) {
 			    result[rsub + 1] = ulpinv;
 			}
 /* L130: */
 		    }
 		    i__3 = n - 1;
-		    for (i = 1; i <= i__3; ++i) {
-			if (h[i + 1 + i * h_dim1] != 0.) {
-			    if (h[i + i * h_dim1] != h[i + 1 + (i + 1) * 
-				    h_dim1] || h[i + (i + 1) * h_dim1] == 0. 
-				    || d_sign(&c_b31, &h[i + 1 + i * h_dim1]) 
-				    == d_sign(&c_b31, &h[i + (i + 1) * h_dim1]
-				    )) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (h___ref(i__ + 1, i__) != 0.) {
+			    if (h___ref(i__, i__) != h___ref(i__ + 1, i__ + 1)
+				     || h___ref(i__, i__ + 1) == 0. || d_sign(
+				    &c_b31, &h___ref(i__ + 1, i__)) == d_sign(
+				    &c_b31, &h___ref(i__, i__ + 1))) {
 				result[rsub + 1] = ulpinv;
 			    }
 			}
 /* L140: */
 		    }
 
-/*                 Do Tests (2) and (3) or Tests (8) and (
-9)   
+/*                 Do Tests (2) and (3) or Tests (8) and (9)   
 
    Computing MAX */
 		    i__3 = 1, i__4 = (n << 1) * n;
 		    lwork = max(i__3,i__4);
-		    dhst01_(&n, &c__1, &n, &a[a_offset], lda, &h[h_offset], 
+		    dhst01_(&n, &c__1, &n, &a[a_offset], lda, &h__[h_offset], 
 			    lda, &vs[vs_offset], ldvs, &work[1], &lwork, res);
 		    result[rsub + 2] = res[0];
 		    result[rsub + 3] = res[1];
@@ -872,41 +863,41 @@ nd test them */
 
 		    result[rsub + 4] = 0.;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
-			if (h[i + i * h_dim1] != wr[i]) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (h___ref(i__, i__) != wr[i__]) {
 			    result[rsub + 4] = ulpinv;
 			}
 /* L150: */
 		    }
 		    if (n > 1) {
-			if (h[h_dim1 + 2] == 0. && wi[1] != 0.) {
+			if (h___ref(2, 1) == 0. && wi[1] != 0.) {
 			    result[rsub + 4] = ulpinv;
 			}
-			if (h[n + (n - 1) * h_dim1] == 0. && wi[n] != 0.) {
+			if (h___ref(n, n - 1) == 0. && wi[n] != 0.) {
 			    result[rsub + 4] = ulpinv;
 			}
 		    }
 		    i__3 = n - 1;
-		    for (i = 1; i <= i__3; ++i) {
-			if (h[i + 1 + i * h_dim1] != 0.) {
-			    tmp = sqrt((d__1 = h[i + 1 + i * h_dim1], abs(
-				    d__1))) * sqrt((d__2 = h[i + (i + 1) * 
-				    h_dim1], abs(d__2)));
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (h___ref(i__ + 1, i__) != 0.) {
+			    tmp = sqrt((d__1 = h___ref(i__ + 1, i__), abs(
+				    d__1))) * sqrt((d__2 = h___ref(i__, i__ + 
+				    1), abs(d__2)));
 /* Computing MAX   
    Computing MAX */
 			    d__4 = ulp * tmp;
-			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i] - 
+			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__] - 
 				    tmp, abs(d__1)) / max(d__4,unfl);
 			    result[rsub + 4] = max(d__2,d__3);
 /* Computing MAX   
    Computing MAX */
 			    d__4 = ulp * tmp;
-			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i + 1] 
-				    + tmp, abs(d__1)) / max(d__4,unfl);
+			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__ + 
+				    1] + tmp, abs(d__1)) / max(d__4,unfl);
 			    result[rsub + 4] = max(d__2,d__3);
-			} else if (i > 1) {
-			    if (h[i + 1 + i * h_dim1] == 0. && h[i + (i - 1) *
-				     h_dim1] == 0. && wi[i] != 0.) {
+			} else if (i__ > 1) {
+			    if (h___ref(i__ + 1, i__) == 0. && h___ref(i__, 
+				    i__ - 1) == 0. && wi[i__] != 0.) {
 				result[rsub + 4] = ulpinv;
 			    }
 			}
@@ -924,7 +915,7 @@ nd test them */
 			result[rsub + 5] = ulpinv;
 			io___44.ciunit = *nounit;
 			s_wsfe(&io___44);
-			do_fio(&c__1, "DGEES2", 6L);
+			do_fio(&c__1, "DGEES2", (ftnlen)6);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -941,8 +932,8 @@ nd test them */
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = 1; i <= i__4; ++i) {
-			    if (h[i + j * h_dim1] != ht[i + j * ht_dim1]) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
+			    if (h___ref(i__, j) != ht_ref(i__, j)) {
 				result[rsub + 5] = ulpinv;
 			    }
 /* L170: */
@@ -954,8 +945,8 @@ nd test them */
 
 		    result[rsub + 6] = 0.;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
-			if (wr[i] != wrt[i] || wi[i] != wit[i]) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (wr[i__] != wrt[i__] || wi[i__] != wit[i__]) {
 			    result[rsub + 6] = ulpinv;
 			}
 /* L190: */
@@ -967,19 +958,20 @@ nd test them */
 			result[13] = 0.;
 			knteig = 0;
 			i__3 = n;
-			for (i = 1; i <= i__3; ++i) {
-			    d__1 = -wi[i];
-			    if (dslect_(&wr[i], &wi[i]) || dslect_(&wr[i], &
-				    d__1)) {
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    d__1 = -wi[i__];
+			    if (dslect_(&wr[i__], &wi[i__]) || dslect_(&wr[
+				    i__], &d__1)) {
 				++knteig;
 			    }
-			    if (i < n) {
-				d__1 = -wi[i + 1];
-				d__2 = -wi[i];
-				if ((dslect_(&wr[i + 1], &wi[i + 1]) || 
-					dslect_(&wr[i + 1], &d__1)) && ! (
-					dslect_(&wr[i], &wi[i]) || dslect_(&
-					wr[i], &d__2)) && iinfo != n + 2) {
+			    if (i__ < n) {
+				d__1 = -wi[i__ + 1];
+				d__2 = -wi[i__];
+				if ((dslect_(&wr[i__ + 1], &wi[i__ + 1]) || 
+					dslect_(&wr[i__ + 1], &d__1)) && ! (
+					dslect_(&wr[i__], &wi[i__]) || 
+					dslect_(&wr[i__], &d__2)) && iinfo != 
+					n + 2) {
 				    result[13] = ulpinv;
 				}
 			    }
@@ -1015,7 +1007,7 @@ L220:
 		if (ntestf == 1) {
 		    io___48.ciunit = *nounit;
 		    s_wsfe(&io___48);
-		    do_fio(&c__1, path, 3L);
+		    do_fio(&c__1, path, (ftnlen)3);
 		    e_wsfe();
 		    io___49.ciunit = *nounit;
 		    s_wsfe(&io___49);
@@ -1077,4 +1069,9 @@ L260:
 /*     End of DDRVES */
 
 } /* ddrves_ */
+
+#undef ht_ref
+#undef h___ref
+#undef a_ref
+
 

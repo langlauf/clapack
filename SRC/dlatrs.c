@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlatrs_(char *uplo, char *trans, char *diag, char *
 	normin, integer *n, doublereal *a, integer *lda, doublereal *x, 
 	doublereal *scale, doublereal *cnorm, integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        June 30, 1992   
@@ -22,8 +23,7 @@
     n-element vectors, and s is a scaling factor, usually less than   
     or equal to 1, chosen so that the components of x will be less than   
     the overflow threshold.  If the unscaled problem will not cause   
-    overflow, the Level 2 BLAS routine DTRSV is called.  If the matrix A 
-  
+    overflow, the Level 2 BLAS routine DTRSV is called.  If the matrix A   
     is singular (A(j,j) = 0 for some j), then s is set to 0 and a   
     non-trivial solution to A*x = 0 is returned.   
 
@@ -31,8 +31,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -40,8 +39,7 @@
             Specifies the operation applied to A.   
             = 'N':  Solve A * x = s*b  (No transpose)   
             = 'T':  Solve A'* x = s*b  (Transpose)   
-            = 'C':  Solve A'* x = s*b  (Conjugate transpose = Transpose) 
-  
+            = 'C':  Solve A'* x = s*b  (Conjugate transpose = Transpose)   
 
     DIAG    (input) CHARACTER*1   
             Specifies whether or not the matrix A is unit triangular.   
@@ -60,12 +58,9 @@
     A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading n by n   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading n by n lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading n by n lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -81,22 +76,18 @@
             The scaling factor s for the triangular system   
                A * x = s*b  or  A'* x = s*b.   
             If SCALE = 0, the matrix A is singular or badly scaled, and   
-            the vector x is an exact or approximate solution to A*x = 0. 
-  
+            the vector x is an exact or approximate solution to A*x = 0.   
 
     CNORM   (input or output) DOUBLE PRECISION array, dimension (N)   
 
             If NORMIN = 'Y', CNORM is an input argument and CNORM(j)   
-            contains the norm of the off-diagonal part of the j-th column 
-  
-            of A.  If TRANS = 'N', CNORM(j) must be greater than or equal 
-  
+            contains the norm of the off-diagonal part of the j-th column   
+            of A.  If TRANS = 'N', CNORM(j) must be greater than or equal   
             to the infinity-norm, and if TRANS = 'T' or 'C', CNORM(j)   
             must be greater than or equal to the 1-norm.   
 
             If NORMIN = 'N', CNORM is an output argument and CNORM(j)   
-            returns the 1-norm of the offdiagonal part of the j-th column 
-  
+            returns the 1-norm of the offdiagonal part of the j-th column   
             of A.   
 
     INFO    (output) INTEGER   
@@ -106,14 +97,11 @@
     Further Details   
     ======= =======   
 
-    A rough bound on x is computed; if that is less than overflow, DTRSV 
-  
-    is called, otherwise, specific code is used which checks for possible 
-  
+    A rough bound on x is computed; if that is less than overflow, DTRSV   
+    is called, otherwise, specific code is used which checks for possible   
     overflow or divide-by-zero at every operation.   
 
-    A columnwise scheme is used for solving A*x = b.  The basic algorithm 
-  
+    A columnwise scheme is used for solving A*x = b.  The basic algorithm   
     if A is lower triangular is   
 
          x[1:n] := b[1:n]   
@@ -122,8 +110,7 @@
               x[j+1:n] := x[j+1:n] - x(j) * A[j+1:n,j]   
          end   
 
-    Define bounds on the components of x after j iterations of the loop: 
-  
+    Define bounds on the components of x after j iterations of the loop:   
        M(j) = bound on x[1:j]   
        G(j) = bound on x[j+1:n]   
     Initially, let M(0) = 0 and G(0) = max{x(i), i=1,...,n}.   
@@ -140,8 +127,7 @@
                     1<=i<=j   
     and   
 
-       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + CNORM(i) / |A(i,i)| ) 
-  
+       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + CNORM(i) / |A(i,i)| )   
                                      1<=i< j   
 
     Since |x(j)| <= M(j), we use the Level 2 BLAS routine DTRSV if the   
@@ -151,8 +137,7 @@
     The bound on x(j) is also used to determine when a step in the   
     columnwise method can be performed without fear of overflow.  If   
     the computed bound is greater than a large constant, x is scaled to   
-    prevent overflow, but if the bound overflows, x is set to 0, x(j) to 
-  
+    prevent overflow, but if the bound overflows, x is set to 0, x(j) to   
     1, and scale to 0, and a non-trivial solution to A*x = 0 is found.   
 
     Similarly, a row-wise scheme is used to solve A'*x = b.  The basic   
@@ -178,13 +163,10 @@
     and we can safely call DTRSV if 1/M(n) and 1/G(n) are both greater   
     than max(underflow, 1/overflow).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b36 = .5;
@@ -199,7 +181,7 @@
     static doublereal xbnd;
     static integer imax;
     static doublereal tmax, tjjs, xmax, grow, sumj;
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical lsame_(char *, char *);
@@ -221,14 +203,16 @@
     static doublereal smlnum;
     static logical nounit;
     static doublereal rec, tjj;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --x;
+    --cnorm;
 
-#define X(I) x[(I)-1]
-#define CNORM(I) cnorm[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     notran = lsame_(trans, "N");
@@ -238,13 +222,13 @@
 
     if (! upper && ! lsame_(uplo, "L")) {
 	*info = -1;
-    } else if (! notran && ! lsame_(trans, "T") && ! lsame_(trans, 
-	    "C")) {
+    } else if (! notran && ! lsame_(trans, "T") && ! 
+	    lsame_(trans, "C")) {
 	*info = -2;
     } else if (! nounit && ! lsame_(diag, "U")) {
 	*info = -3;
-    } else if (! lsame_(normin, "Y") && ! lsame_(normin, "N"))
-	     {
+    } else if (! lsame_(normin, "Y") && ! lsame_(normin,
+	     "N")) {
 	*info = -4;
     } else if (*n < 0) {
 	*info = -5;
@@ -271,17 +255,16 @@
 
     if (lsame_(normin, "N")) {
 
-/*        Compute the 1-norm of each column, not including the diagona
-l. */
+/*        Compute the 1-norm of each column, not including the diagonal. */
 
 	if (upper) {
 
 /*           A is upper triangular. */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		CNORM(j) = dasum_(&i__2, &A(1,j), &c__1);
+		cnorm[j] = dasum_(&i__2, &a_ref(1, j), &c__1);
 /* L10: */
 	    }
 	} else {
@@ -289,33 +272,32 @@ l. */
 /*           A is lower triangular. */
 
 	    i__1 = *n - 1;
-	    for (j = 1; j <= *n-1; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n - j;
-		CNORM(j) = dasum_(&i__2, &A(j+1,j), &c__1);
+		cnorm[j] = dasum_(&i__2, &a_ref(j + 1, j), &c__1);
 /* L20: */
 	    }
-	    CNORM(*n) = 0.;
+	    cnorm[*n] = 0.;
 	}
     }
 
-/*     Scale the column norms by TSCAL if the maximum element in CNORM is 
-  
+/*     Scale the column norms by TSCAL if the maximum element in CNORM is   
        greater than BIGNUM. */
 
-    imax = idamax_(n, &CNORM(1), &c__1);
-    tmax = CNORM(imax);
+    imax = idamax_(n, &cnorm[1], &c__1);
+    tmax = cnorm[imax];
     if (tmax <= bignum) {
 	tscal = 1.;
     } else {
 	tscal = 1. / (smlnum * tmax);
-	dscal_(n, &tscal, &CNORM(1), &c__1);
+	dscal_(n, &tscal, &cnorm[1], &c__1);
     }
 
 /*     Compute a bound on the computed solution vector to see if the   
        Level 2 BLAS routine DTRSV can be used. */
 
-    j = idamax_(n, &X(1), &c__1);
-    xmax = (d__1 = X(j), abs(d__1));
+    j = idamax_(n, &x[1], &c__1);
+    xmax = (d__1 = x[j], abs(d__1));
     xbnd = xmax;
     if (notran) {
 
@@ -347,10 +329,9 @@ l. */
 	    xbnd = grow;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L50;
@@ -358,16 +339,15 @@ l. */
 
 /*              M(j) = G(j-1) / abs(A(j,j)) */
 
-		tjj = (d__1 = A(j,j), abs(d__1));
+		tjj = (d__1 = a_ref(j, j), abs(d__1));
 /* Computing MIN */
 		d__1 = xbnd, d__2 = min(1.,tjj) * grow;
 		xbnd = min(d__1,d__2);
-		if (tjj + CNORM(j) >= smlnum) {
+		if (tjj + cnorm[j] >= smlnum) {
 
-/*                 G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,
-j)) ) */
+/*                 G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) ) */
 
-		    grow *= tjj / (tjj + CNORM(j));
+		    grow *= tjj / (tjj + cnorm[j]);
 		} else {
 
 /*                 G(j) could overflow, set GROW to 0. */
@@ -381,18 +361,16 @@ j)) ) */
 
 /*           A is unit triangular.   
 
-             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...
-,n}.   
+             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.   
 
    Computing MIN */
 	    d__1 = 1., d__2 = 1. / max(xbnd,smlnum);
 	    grow = min(d__1,d__2);
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L50;
@@ -400,7 +378,7 @@ l. */
 
 /*              G(j) = G(j-1)*( 1 + CNORM(j) ) */
 
-		grow *= 1. / (CNORM(j) + 1.);
+		grow *= 1. / (cnorm[j] + 1.);
 /* L40: */
 	    }
 	}
@@ -437,27 +415,24 @@ L50:
 	    xbnd = grow;
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L80;
 		}
 
-/*              G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) ) 
-*/
+/*              G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) ) */
 
-		xj = CNORM(j) + 1.;
+		xj = cnorm[j] + 1.;
 /* Computing MIN */
 		d__1 = grow, d__2 = xbnd / xj;
 		grow = min(d__1,d__2);
 
-/*              M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j)) 
-*/
+/*              M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j)) */
 
-		tjj = (d__1 = A(j,j), abs(d__1));
+		tjj = (d__1 = a_ref(j, j), abs(d__1));
 		if (xj > tjj) {
 		    xbnd *= tjj / xj;
 		}
@@ -468,18 +443,16 @@ l. */
 
 /*           A is unit triangular.   
 
-             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...
-,n}.   
+             Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.   
 
    Computing MIN */
 	    d__1 = 1., d__2 = 1. / max(xbnd,smlnum);
 	    grow = min(d__1,d__2);
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
-/*              Exit the loop if the growth factor is too smal
-l. */
+/*              Exit the loop if the growth factor is too small. */
 
 		if (grow <= smlnum) {
 		    goto L80;
@@ -487,7 +460,7 @@ l. */
 
 /*              G(j) = ( 1 + CNORM(j) )*G(j-1) */
 
-		xj = CNORM(j) + 1.;
+		xj = cnorm[j] + 1.;
 		grow /= xj;
 /* L70: */
 	    }
@@ -498,23 +471,21 @@ L80:
 
     if (grow * tscal > smlnum) {
 
-/*        Use the Level 2 BLAS solve if the reciprocal of the bound on
-   
+/*        Use the Level 2 BLAS solve if the reciprocal of the bound on   
           elements of X is not too small. */
 
-	dtrsv_(uplo, trans, diag, n, &A(1,1), lda, &X(1), &c__1);
+	dtrsv_(uplo, trans, diag, n, &a[a_offset], lda, &x[1], &c__1);
     } else {
 
 /*        Use a Level 1 BLAS solve, scaling intermediate results. */
 
 	if (xmax > bignum) {
 
-/*           Scale X so that its components are less than or equal
- to   
+/*           Scale X so that its components are less than or equal to   
              BIGNUM in absolute value. */
 
 	    *scale = bignum / xmax;
-	    dscal_(n, scale, &X(1), &c__1);
+	    dscal_(n, scale, &x[1], &c__1);
 	    xmax = bignum;
 	}
 
@@ -524,14 +495,13 @@ L80:
 
 	    i__1 = jlast;
 	    i__2 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__2 < 0 ? j >= i__1 : j <= i__1; j += i__2) {
 
-/*              Compute x(j) = b(j) / A(j,j), scaling x if nec
-essary. */
+/*              Compute x(j) = b(j) / A(j,j), scaling x if necessary. */
 
-		xj = (d__1 = X(j), abs(d__1));
+		xj = (d__1 = x[j], abs(d__1));
 		if (nounit) {
-		    tjjs = A(j,j) * tscal;
+		    tjjs = a_ref(j, j) * tscal;
 		} else {
 		    tjjs = tscal;
 		    if (tscal == 1.) {
@@ -549,78 +519,71 @@ essary. */
 /*                          Scale x by 1/b(j). */
 
 			    rec = 1. / xj;
-			    dscal_(n, &rec, &X(1), &c__1);
+			    dscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
 		    }
-		    X(j) /= tjjs;
-		    xj = (d__1 = X(j), abs(d__1));
+		    x[j] /= tjjs;
+		    xj = (d__1 = x[j], abs(d__1));
 		} else if (tjj > 0.) {
 
 /*                    0 < abs(A(j,j)) <= SMLNUM: */
 
 		    if (xj > tjj * bignum) {
 
-/*                       Scale x by (1/abs(x(j)))*abs(
-A(j,j))*BIGNUM   
-                         to avoid overflow when dividi
-ng by A(j,j). */
+/*                       Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM   
+                         to avoid overflow when dividing by A(j,j). */
 
 			rec = tjj * bignum / xj;
-			if (CNORM(j) > 1.) {
+			if (cnorm[j] > 1.) {
 
-/*                          Scale by 1/CNORM(j) to
- avoid overflow when   
-                            multiplying x(j) times
- column j. */
+/*                          Scale by 1/CNORM(j) to avoid overflow when   
+                            multiplying x(j) times column j. */
 
-			    rec /= CNORM(j);
+			    rec /= cnorm[j];
 			}
-			dscal_(n, &rec, &X(1), &c__1);
+			dscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 			xmax *= rec;
 		    }
-		    X(j) /= tjjs;
-		    xj = (d__1 = X(j), abs(d__1));
+		    x[j] /= tjjs;
+		    xj = (d__1 = x[j], abs(d__1));
 		} else {
 
-/*                    A(j,j) = 0:  Set x(1:n) = 0, x(j) = 
-1, and   
-                      scale = 0, and compute a solution to
- A*x = 0. */
+/*                    A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and   
+                      scale = 0, and compute a solution to A*x = 0. */
 
 		    i__3 = *n;
-		    for (i = 1; i <= *n; ++i) {
-			X(i) = 0.;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			x[i__] = 0.;
 /* L90: */
 		    }
-		    X(j) = 1.;
+		    x[j] = 1.;
 		    xj = 1.;
 		    *scale = 0.;
 		    xmax = 0.;
 		}
 L100:
 
-/*              Scale x if necessary to avoid overflow when ad
-ding a   
+/*              Scale x if necessary to avoid overflow when adding a   
                 multiple of column j of A. */
 
 		if (xj > 1.) {
 		    rec = 1. / xj;
-		    if (CNORM(j) > (bignum - xmax) * rec) {
+		    if (cnorm[j] > (bignum - xmax) * rec) {
 
 /*                    Scale x by 1/(2*abs(x(j))). */
 
 			rec *= .5;
-			dscal_(n, &rec, &X(1), &c__1);
+			dscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 		    }
-		} else if (xj * CNORM(j) > bignum - xmax) {
+		} else if (xj * cnorm[j] > bignum - xmax) {
 
 /*                 Scale x by 1/2. */
 
-		    dscal_(n, &c_b36, &X(1), &c__1);
+		    dscal_(n, &c_b36, &x[1], &c__1);
 		    *scale *= .5;
 		}
 
@@ -628,31 +591,29 @@ ding a
 		    if (j > 1) {
 
 /*                    Compute the update   
-                         x(1:j-1) := x(1:j-1) - x(j) *
- A(1:j-1,j) */
+                         x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j) */
 
 			i__3 = j - 1;
-			d__1 = -X(j) * tscal;
-			daxpy_(&i__3, &d__1, &A(1,j), &c__1, &X(1),
-				 &c__1);
+			d__1 = -x[j] * tscal;
+			daxpy_(&i__3, &d__1, &a_ref(1, j), &c__1, &x[1], &
+				c__1);
 			i__3 = j - 1;
-			i = idamax_(&i__3, &X(1), &c__1);
-			xmax = (d__1 = X(i), abs(d__1));
+			i__ = idamax_(&i__3, &x[1], &c__1);
+			xmax = (d__1 = x[i__], abs(d__1));
 		    }
 		} else {
 		    if (j < *n) {
 
 /*                    Compute the update   
-                         x(j+1:n) := x(j+1:n) - x(j) *
- A(j+1:n,j) */
+                         x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j) */
 
 			i__3 = *n - j;
-			d__1 = -X(j) * tscal;
-			daxpy_(&i__3, &d__1, &A(j+1,j), &c__1, &
-				X(j + 1), &c__1);
+			d__1 = -x[j] * tscal;
+			daxpy_(&i__3, &d__1, &a_ref(j + 1, j), &c__1, &x[j + 
+				1], &c__1);
 			i__3 = *n - j;
-			i = j + idamax_(&i__3, &X(j + 1), &c__1);
-			xmax = (d__1 = X(i), abs(d__1));
+			i__ = j + idamax_(&i__3, &x[j + 1], &c__1);
+			xmax = (d__1 = x[i__], abs(d__1));
 		    }
 		}
 /* L110: */
@@ -664,30 +625,28 @@ ding a
 
 	    i__2 = jlast;
 	    i__1 = jinc;
-	    for (j = jfirst; jinc < 0 ? j >= jlast : j <= jlast; j += jinc) {
+	    for (j = jfirst; i__1 < 0 ? j >= i__2 : j <= i__2; j += i__1) {
 
 /*              Compute x(j) = b(j) - sum A(k,j)*x(k).   
                                       k<>j */
 
-		xj = (d__1 = X(j), abs(d__1));
+		xj = (d__1 = x[j], abs(d__1));
 		uscal = tscal;
 		rec = 1. / max(xmax,1.);
-		if (CNORM(j) > (bignum - xj) * rec) {
+		if (cnorm[j] > (bignum - xj) * rec) {
 
-/*                 If x(j) could overflow, scale x by 1/(2
-*XMAX). */
+/*                 If x(j) could overflow, scale x by 1/(2*XMAX). */
 
 		    rec *= .5;
 		    if (nounit) {
-			tjjs = A(j,j) * tscal;
+			tjjs = a_ref(j, j) * tscal;
 		    } else {
 			tjjs = tscal;
 		    }
 		    tjj = abs(tjjs);
 		    if (tjj > 1.) {
 
-/*                       Divide by A(j,j) when scaling
- x if A(j,j) > 1.   
+/*                       Divide by A(j,j) when scaling x if A(j,j) > 1.   
 
    Computing MIN */
 			d__1 = 1., d__2 = rec * tjj;
@@ -695,7 +654,7 @@ ding a
 			uscal /= tjjs;
 		    }
 		    if (rec < 1.) {
-			dscal_(n, &rec, &X(1), &c__1);
+			dscal_(n, &rec, &x[1], &c__1);
 			*scale *= rec;
 			xmax *= rec;
 		    }
@@ -704,35 +663,32 @@ ding a
 		sumj = 0.;
 		if (uscal == 1.) {
 
-/*                 If the scaling needed for A in the dot 
-product is 1,   
-                   call DDOT to perform the dot product. 
-*/
+/*                 If the scaling needed for A in the dot product is 1,   
+                   call DDOT to perform the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			sumj = ddot_(&i__3, &A(1,j), &c__1, &X(1), 
-				&c__1);
+			sumj = ddot_(&i__3, &a_ref(1, j), &c__1, &x[1], &c__1)
+				;
 		    } else if (j < *n) {
 			i__3 = *n - j;
-			sumj = ddot_(&i__3, &A(j+1,j), &c__1, &X(
-				j + 1), &c__1);
+			sumj = ddot_(&i__3, &a_ref(j + 1, j), &c__1, &x[j + 1]
+				, &c__1);
 		    }
 		} else {
 
-/*                 Otherwise, use in-line code for the dot
- product. */
+/*                 Otherwise, use in-line code for the dot product. */
 
 		    if (upper) {
 			i__3 = j - 1;
-			for (i = 1; i <= j-1; ++i) {
-			    sumj += A(i,j) * uscal * X(i);
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    sumj += a_ref(i__, j) * uscal * x[i__];
 /* L120: */
 			}
 		    } else if (j < *n) {
 			i__3 = *n;
-			for (i = j + 1; i <= *n; ++i) {
-			    sumj += A(i,j) * uscal * X(i);
+			for (i__ = j + 1; i__ <= i__3; ++i__) {
+			    sumj += a_ref(i__, j) * uscal * x[i__];
 /* L130: */
 			}
 		    }
@@ -740,15 +696,13 @@ product is 1,
 
 		if (uscal == tscal) {
 
-/*                 Compute x(j) := ( x(j) - sumj ) / A(j,j
-) if 1/A(j,j)   
-                   was not used to scale the dotproduct. 
-*/
+/*                 Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)   
+                   was not used to scale the dotproduct. */
 
-		    X(j) -= sumj;
-		    xj = (d__1 = X(j), abs(d__1));
+		    x[j] -= sumj;
+		    xj = (d__1 = x[j], abs(d__1));
 		    if (nounit) {
-			tjjs = A(j,j) * tscal;
+			tjjs = a_ref(j, j) * tscal;
 		    } else {
 			tjjs = tscal;
 			if (tscal == 1.) {
@@ -756,8 +710,7 @@ product is 1,
 			}
 		    }
 
-/*                    Compute x(j) = x(j) / A(j,j), scalin
-g if necessary. */
+/*                    Compute x(j) = x(j) / A(j,j), scaling if necessary. */
 
 		    tjj = abs(tjjs);
 		    if (tjj > smlnum) {
@@ -767,44 +720,40 @@ g if necessary. */
 			if (tjj < 1.) {
 			    if (xj > tjj * bignum) {
 
-/*                             Scale X by 1/ab
-s(x(j)). */
+/*                             Scale X by 1/abs(x(j)). */
 
 				rec = 1. / xj;
-				dscal_(n, &rec, &X(1), &c__1);
+				dscal_(n, &rec, &x[1], &c__1);
 				*scale *= rec;
 				xmax *= rec;
 			    }
 			}
-			X(j) /= tjjs;
+			x[j] /= tjjs;
 		    } else if (tjj > 0.) {
 
 /*                       0 < abs(A(j,j)) <= SMLNUM: */
 
 			if (xj > tjj * bignum) {
 
-/*                          Scale x by (1/abs(x(j)
-))*abs(A(j,j))*BIGNUM. */
+/*                          Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM. */
 
 			    rec = tjj * bignum / xj;
-			    dscal_(n, &rec, &X(1), &c__1);
+			    dscal_(n, &rec, &x[1], &c__1);
 			    *scale *= rec;
 			    xmax *= rec;
 			}
-			X(j) /= tjjs;
+			x[j] /= tjjs;
 		    } else {
 
-/*                       A(j,j) = 0:  Set x(1:n) = 0, 
-x(j) = 1, and   
-                         scale = 0, and compute a solu
-tion to A'*x = 0. */
+/*                       A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and   
+                         scale = 0, and compute a solution to A'*x = 0. */
 
 			i__3 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    X(i) = 0.;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    x[i__] = 0.;
 /* L140: */
 			}
-			X(j) = 1.;
+			x[j] = 1.;
 			*scale = 0.;
 			xmax = 0.;
 		    }
@@ -812,15 +761,13 @@ L150:
 		    ;
 		} else {
 
-/*                 Compute x(j) := x(j) / A(j,j)  - sumj i
-f the dot   
-                   product has already been divided by 1/A
-(j,j). */
+/*                 Compute x(j) := x(j) / A(j,j)  - sumj if the dot   
+                   product has already been divided by 1/A(j,j). */
 
-		    X(j) = X(j) / tjjs - sumj;
+		    x[j] = x[j] / tjjs - sumj;
 		}
 /* Computing MAX */
-		d__2 = xmax, d__3 = (d__1 = X(j), abs(d__1));
+		d__2 = xmax, d__3 = (d__1 = x[j], abs(d__1));
 		xmax = max(d__2,d__3);
 /* L160: */
 	    }
@@ -832,7 +779,7 @@ f the dot
 
     if (tscal != 1.) {
 	d__1 = 1. / tscal;
-	dscal_(n, &d__1, &CNORM(1), &c__1);
+	dscal_(n, &d__1, &cnorm[1], &c__1);
     }
 
     return 0;
@@ -840,4 +787,7 @@ f the dot
 /*     End of DLATRS */
 
 } /* dlatrs_ */
+
+#undef a_ref
+
 

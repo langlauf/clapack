@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static complex c_b2 = {0.f,0.f};
 static integer c__1 = 1;
 
 /* Subroutine */ int clarfy_(char *uplo, integer *n, complex *v, integer *
-	incv, complex *tau, complex *c, integer *ldc, complex *work)
+	incv, complex *tau, complex *c__, integer *ldc, complex *work)
 {
     /* System generated locals */
     integer c_dim1, c_offset;
@@ -30,7 +31,7 @@ static integer c__1 = 1;
 	    complex *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -82,15 +83,14 @@ static integer c__1 = 1;
 
     WORK    (workspace) COMPLEX array, dimension (N)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --work;
 
     /* Function Body */
@@ -100,8 +100,8 @@ static integer c__1 = 1;
 
 /*     Form  w:= C * v */
 
-    chemv_(uplo, n, &c_b1, &c[c_offset], ldc, &v[1], incv, &c_b2, &work[1], &
-	    c__1);
+    chemv_(uplo, n, &c_b1, &c__[c_offset], ldc, &v[1], incv, &c_b2, &work[1], 
+	    &c__1);
 
     q__3.r = -.5f, q__3.i = 0.f;
     q__2.r = q__3.r * tau->r - q__3.i * tau->i, q__2.i = q__3.r * tau->i + 
@@ -114,8 +114,8 @@ static integer c__1 = 1;
 
 /*     C := C - v * w' - w * v' */
 
-    q__1.r = -(doublereal)tau->r, q__1.i = -(doublereal)tau->i;
-    cher2_(uplo, n, &q__1, &v[1], incv, &work[1], &c__1, &c[c_offset], ldc);
+    q__1.r = -tau->r, q__1.i = -tau->i;
+    cher2_(uplo, n, &q__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], ldc);
 
     return 0;
 

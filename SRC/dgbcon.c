@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgbcon_(char *norm, integer *n, integer *kl, integer *ku,
 	 doublereal *ab, integer *ldab, integer *ipiv, doublereal *anorm, 
 	doublereal *rcond, doublereal *work, integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -37,13 +38,11 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     AB      (input) DOUBLE PRECISION array, dimension (LDAB,N)   
             Details of the LU factorization of the band matrix A, as   
-            computed by DGBTRF.  U is stored as an upper triangular band 
-  
+            computed by DGBTRF.  U is stored as an upper triangular band   
             matrix with KL+KU superdiagonals in rows 1 to KL+KU+1, and   
             the multipliers used during the factorization are stored in   
             rows KL+KU+2 to 2*KL+KU+1.   
@@ -71,15 +70,12 @@
             = 0:  successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -111,15 +107,17 @@
     static logical onenrm;
     static char normin[1];
     static doublereal smlnum;
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --ipiv;
+    --work;
+    --iwork;
 
-#define IPIV(I) ipiv[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
     if (! onenrm && ! lsame_(norm, "I")) {
@@ -166,7 +164,7 @@
     lnoti = *kl > 0;
     kase = 0;
 L10:
-    dlacon_(n, &WORK(*n + 1), &WORK(1), &IWORK(1), &ainvnm, &kase);
+    dlacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (kase == kase1) {
 
@@ -174,19 +172,19 @@ L10:
 
 	    if (lnoti) {
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
+		for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		    i__2 = *kl, i__3 = *n - j;
 		    lm = min(i__2,i__3);
-		    jp = IPIV(j);
-		    t = WORK(jp);
+		    jp = ipiv[j];
+		    t = work[jp];
 		    if (jp != j) {
-			WORK(jp) = WORK(j);
-			WORK(j) = t;
+			work[jp] = work[j];
+			work[j] = t;
 		    }
 		    d__1 = -t;
-		    daxpy_(&lm, &d__1, &AB(kd+1,j), &c__1, &
-			    WORK(j + 1), &c__1);
+		    daxpy_(&lm, &d__1, &ab_ref(kd + 1, j), &c__1, &work[j + 1]
+			    , &c__1);
 /* L20: */
 		}
 	    }
@@ -195,14 +193,15 @@ L10:
 
 	    i__1 = *kl + *ku;
 	    dlatbs_("Upper", "No transpose", "Non-unit", normin, n, &i__1, &
-		    AB(1,1), ldab, &WORK(1), &scale, &WORK((*n << 1) + 
-		    1), info);
+		    ab[ab_offset], ldab, &work[1], &scale, &work[(*n << 1) + 
+		    1], info);
 	} else {
 
 /*           Multiply by inv(U'). */
 
 	    i__1 = *kl + *ku;
-	    dlatbs_("Upper", "Transpose", "Non-unit", normin, n, &i__1, &AB(1,1), ldab, &WORK(1), &scale, &WORK((*n << 1) + 1), 
+	    dlatbs_("Upper", "Transpose", "Non-unit", normin, n, &i__1, &ab[
+		    ab_offset], ldab, &work[1], &scale, &work[(*n << 1) + 1], 
 		    info);
 
 /*           Multiply by inv(L'). */
@@ -212,13 +211,13 @@ L10:
 /* Computing MIN */
 		    i__1 = *kl, i__2 = *n - j;
 		    lm = min(i__1,i__2);
-		    WORK(j) -= ddot_(&lm, &AB(kd+1,j), &c__1, &
-			    WORK(j + 1), &c__1);
-		    jp = IPIV(j);
+		    work[j] -= ddot_(&lm, &ab_ref(kd + 1, j), &c__1, &work[j 
+			    + 1], &c__1);
+		    jp = ipiv[j];
 		    if (jp != j) {
-			t = WORK(jp);
-			WORK(jp) = WORK(j);
-			WORK(j) = t;
+			t = work[jp];
+			work[jp] = work[j];
+			work[j] = t;
 		    }
 /* L30: */
 		}
@@ -229,12 +228,12 @@ L10:
 
 	*(unsigned char *)normin = 'Y';
 	if (scale != 1.) {
-	    ix = idamax_(n, &WORK(1), &c__1);
-	    if (scale < (d__1 = WORK(ix), abs(d__1)) * smlnum || scale == 0.) 
+	    ix = idamax_(n, &work[1], &c__1);
+	    if (scale < (d__1 = work[ix], abs(d__1)) * smlnum || scale == 0.) 
 		    {
 		goto L40;
 	    }
-	    drscl_(n, &scale, &WORK(1), &c__1);
+	    drscl_(n, &scale, &work[1], &c__1);
 	}
 	goto L10;
     }
@@ -251,4 +250,7 @@ L40:
 /*     End of DGBCON */
 
 } /* dgbcon_ */
+
+#undef ab_ref
+
 

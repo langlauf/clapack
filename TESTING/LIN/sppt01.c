@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -20,7 +21,7 @@ static real c_b14 = 1.f;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
     extern /* Subroutine */ int sspr_(char *, integer *, real *, real *, 
 	    integer *, real *);
-    static integer i, k;
+    static integer i__, k;
     static real t;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
@@ -34,7 +35,7 @@ static real c_b14 = 1.f;
     static integer npp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -68,8 +69,7 @@ static real c_b14 = 1.f;
     AFAC    (input/output) REAL array, dimension (N*(N+1)/2)   
             On entry, the factor L or U from the L*L' or U'*U   
             factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the 
-  
+            Overwritten with the reconstructed matrix, and then with the   
             difference L*L' - A (or U'*U - A).   
 
     RWORK   (workspace) REAL array, dimension (N)   
@@ -78,8 +78,7 @@ static real c_b14 = 1.f;
             If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
             If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
@@ -132,8 +131,7 @@ static real c_b14 = 1.f;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of
-   
+/*           Add a multiple of column K of the factor L to each of   
              columns K+1 through N. */
 
 	    if (k < *n) {
@@ -157,8 +155,8 @@ static real c_b14 = 1.f;
 
     npp = *n * (*n + 1) / 2;
     i__1 = npp;
-    for (i = 1; i <= i__1; ++i) {
-	afac[i] -= a[i];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	afac[i__] -= a[i__];
 /* L30: */
     }
 

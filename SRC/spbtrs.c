@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spbtrs_(char *uplo, integer *n, integer *kd, integer *
 	nrhs, real *ab, integer *ldab, real *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -35,16 +36,12 @@
             of the matrix B.  NRHS >= 0.   
 
     AB      (input) REAL array, dimension (LDAB,N)   
-            The triangular factor U or L from the Cholesky factorization 
-  
-            A = U**T*U or A = L*L**T of the band matrix A, stored in the 
-  
+            The triangular factor U or L from the Cholesky factorization   
+            A = U**T*U or A = L*L**T of the band matrix A, stored in the   
             first KD+1 rows of the array.  The j-th column of U or L is   
             stored in the j-th column of the array AB as follows:   
-            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd).   
 
     LDAB    (input) INTEGER   
             The leading dimension of the array AB.  LDAB >= KD+1.   
@@ -60,15 +57,12 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -80,13 +74,17 @@
     static logical upper;
     extern /* Subroutine */ int stbsv_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *), xerbla_(char *, integer *);
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -119,17 +117,17 @@
 /*        Solve A*X = B where A = U'*U. */
 
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
 /*           Solve U'*X = B, overwriting B with X. */
 
-	    stbsv_("Upper", "Transpose", "Non-unit", n, kd, &AB(1,1), 
-		    ldab, &B(1,j), &c__1);
+	    stbsv_("Upper", "Transpose", "Non-unit", n, kd, &ab[ab_offset], 
+		    ldab, &b_ref(1, j), &c__1);
 
 /*           Solve U*X = B, overwriting B with X. */
 
-	    stbsv_("Upper", "No transpose", "Non-unit", n, kd, &AB(1,1),
-		     ldab, &B(1,j), &c__1);
+	    stbsv_("Upper", "No transpose", "Non-unit", n, kd, &ab[ab_offset],
+		     ldab, &b_ref(1, j), &c__1);
 /* L10: */
 	}
     } else {
@@ -137,17 +135,17 @@
 /*        Solve A*X = B where A = L*L'. */
 
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
 /*           Solve L*X = B, overwriting B with X. */
 
-	    stbsv_("Lower", "No transpose", "Non-unit", n, kd, &AB(1,1),
-		     ldab, &B(1,j), &c__1);
+	    stbsv_("Lower", "No transpose", "Non-unit", n, kd, &ab[ab_offset],
+		     ldab, &b_ref(1, j), &c__1);
 
 /*           Solve L'*X = B, overwriting B with X. */
 
-	    stbsv_("Lower", "Transpose", "Non-unit", n, kd, &AB(1,1), 
-		    ldab, &B(1,j), &c__1);
+	    stbsv_("Lower", "Transpose", "Non-unit", n, kd, &ab[ab_offset], 
+		    ldab, &b_ref(1, j), &c__1);
 /* L20: */
 	}
     }
@@ -157,4 +155,7 @@
 /*     End of SPBTRS */
 
 } /* spbtrs_ */
+
+#undef b_ref
+
 

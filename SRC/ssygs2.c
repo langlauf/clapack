@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ssygs2_(integer *itype, char *uplo, integer *n, real *a, 
 	integer *lda, real *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -32,8 +33,7 @@
 
     UPLO    (input) CHARACTER   
             Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is stored, and how B has been factorized. 
-  
+            symmetric matrix A is stored, and how B has been factorized.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -41,13 +41,11 @@
             The order of the matrices A and B.  N >= 0.   
 
     A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
             n by n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of A contains the lower 
-  
+            leading n by n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -68,15 +66,12 @@
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static real c_b6 = -1.f;
     static integer c__1 = 1;
@@ -100,13 +95,18 @@
     static real ct;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static real akk, bkk;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (*itype < 1 || *itype > 3) {
@@ -132,31 +132,33 @@
 /*           Compute inv(U')*A*inv(U) */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the upper triangle of A(k:n,k:n) */
 
-		akk = A(k,k);
-		bkk = B(k,k);
+		akk = a_ref(k, k);
+		bkk = b_ref(k, k);
 /* Computing 2nd power */
 		r__1 = bkk;
 		akk /= r__1 * r__1;
-		A(k,k) = akk;
+		a_ref(k, k) = akk;
 		if (k < *n) {
 		    i__2 = *n - k;
 		    r__1 = 1.f / bkk;
-		    sscal_(&i__2, &r__1, &A(k,k+1), lda);
+		    sscal_(&i__2, &r__1, &a_ref(k, k + 1), lda);
 		    ct = akk * -.5f;
 		    i__2 = *n - k;
-		    saxpy_(&i__2, &ct, &B(k,k+1), ldb, &A(k,k+1), lda);
+		    saxpy_(&i__2, &ct, &b_ref(k, k + 1), ldb, &a_ref(k, k + 1)
+			    , lda);
 		    i__2 = *n - k;
-		    ssyr2_(uplo, &i__2, &c_b6, &A(k,k+1), lda, 
-			    &B(k,k+1), ldb, &A(k+1,k+1), lda);
+		    ssyr2_(uplo, &i__2, &c_b6, &a_ref(k, k + 1), lda, &b_ref(
+			    k, k + 1), ldb, &a_ref(k + 1, k + 1), lda);
 		    i__2 = *n - k;
-		    saxpy_(&i__2, &ct, &B(k,k+1), ldb, &A(k,k+1), lda);
+		    saxpy_(&i__2, &ct, &b_ref(k, k + 1), ldb, &a_ref(k, k + 1)
+			    , lda);
 		    i__2 = *n - k;
-		    strsv_(uplo, "Transpose", "Non-unit", &i__2, &B(k+1,k+1), ldb, &A(k,k+1), 
-			    lda);
+		    strsv_(uplo, "Transpose", "Non-unit", &i__2, &b_ref(k + 1,
+			     k + 1), ldb, &a_ref(k, k + 1), lda);
 		}
 /* L10: */
 	    }
@@ -165,31 +167,33 @@
 /*           Compute inv(L)*A*inv(L') */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the lower triangle of A(k:n,k:n) */
 
-		akk = A(k,k);
-		bkk = B(k,k);
+		akk = a_ref(k, k);
+		bkk = b_ref(k, k);
 /* Computing 2nd power */
 		r__1 = bkk;
 		akk /= r__1 * r__1;
-		A(k,k) = akk;
+		a_ref(k, k) = akk;
 		if (k < *n) {
 		    i__2 = *n - k;
 		    r__1 = 1.f / bkk;
-		    sscal_(&i__2, &r__1, &A(k+1,k), &c__1);
+		    sscal_(&i__2, &r__1, &a_ref(k + 1, k), &c__1);
 		    ct = akk * -.5f;
 		    i__2 = *n - k;
-		    saxpy_(&i__2, &ct, &B(k+1,k), &c__1, &A(k+1,k), &c__1);
+		    saxpy_(&i__2, &ct, &b_ref(k + 1, k), &c__1, &a_ref(k + 1, 
+			    k), &c__1);
 		    i__2 = *n - k;
-		    ssyr2_(uplo, &i__2, &c_b6, &A(k+1,k), &c__1, 
-			    &B(k+1,k), &c__1, &A(k+1,k+1), lda);
+		    ssyr2_(uplo, &i__2, &c_b6, &a_ref(k + 1, k), &c__1, &
+			    b_ref(k + 1, k), &c__1, &a_ref(k + 1, k + 1), lda);
 		    i__2 = *n - k;
-		    saxpy_(&i__2, &ct, &B(k+1,k), &c__1, &A(k+1,k), &c__1);
+		    saxpy_(&i__2, &ct, &b_ref(k + 1, k), &c__1, &a_ref(k + 1, 
+			    k), &c__1);
 		    i__2 = *n - k;
-		    strsv_(uplo, "No transpose", "Non-unit", &i__2, &B(k+1,k+1), ldb, &A(k+1,k), 
-			    &c__1);
+		    strsv_(uplo, "No transpose", "Non-unit", &i__2, &b_ref(k 
+			    + 1, k + 1), ldb, &a_ref(k + 1, k), &c__1);
 		}
 /* L20: */
 	    }
@@ -200,27 +204,28 @@
 /*           Compute U*A*U' */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the upper triangle of A(1:k,1:k) */
 
-		akk = A(k,k);
-		bkk = B(k,k);
+		akk = a_ref(k, k);
+		bkk = b_ref(k, k);
 		i__2 = k - 1;
-		strmv_(uplo, "No transpose", "Non-unit", &i__2, &B(1,1), 
-			ldb, &A(1,k), &c__1);
+		strmv_(uplo, "No transpose", "Non-unit", &i__2, &b[b_offset], 
+			ldb, &a_ref(1, k), &c__1);
 		ct = akk * .5f;
 		i__2 = k - 1;
-		saxpy_(&i__2, &ct, &B(1,k), &c__1, &A(1,k), &c__1);
+		saxpy_(&i__2, &ct, &b_ref(1, k), &c__1, &a_ref(1, k), &c__1);
 		i__2 = k - 1;
-		ssyr2_(uplo, &i__2, &c_b27, &A(1,k), &c__1, &B(1,k), &c__1, &A(1,1), lda);
+		ssyr2_(uplo, &i__2, &c_b27, &a_ref(1, k), &c__1, &b_ref(1, k),
+			 &c__1, &a[a_offset], lda);
 		i__2 = k - 1;
-		saxpy_(&i__2, &ct, &B(1,k), &c__1, &A(1,k), &c__1);
+		saxpy_(&i__2, &ct, &b_ref(1, k), &c__1, &a_ref(1, k), &c__1);
 		i__2 = k - 1;
-		sscal_(&i__2, &bkk, &A(1,k), &c__1);
+		sscal_(&i__2, &bkk, &a_ref(1, k), &c__1);
 /* Computing 2nd power */
 		r__1 = bkk;
-		A(k,k) = akk * (r__1 * r__1);
+		a_ref(k, k) = akk * (r__1 * r__1);
 /* L30: */
 	    }
 	} else {
@@ -228,27 +233,28 @@
 /*           Compute L'*A*L */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the lower triangle of A(1:k,1:k) */
 
-		akk = A(k,k);
-		bkk = B(k,k);
+		akk = a_ref(k, k);
+		bkk = b_ref(k, k);
 		i__2 = k - 1;
-		strmv_(uplo, "Transpose", "Non-unit", &i__2, &B(1,1), 
-			ldb, &A(k,1), lda);
+		strmv_(uplo, "Transpose", "Non-unit", &i__2, &b[b_offset], 
+			ldb, &a_ref(k, 1), lda);
 		ct = akk * .5f;
 		i__2 = k - 1;
-		saxpy_(&i__2, &ct, &B(k,1), ldb, &A(k,1), lda);
+		saxpy_(&i__2, &ct, &b_ref(k, 1), ldb, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		ssyr2_(uplo, &i__2, &c_b27, &A(k,1), lda, &B(k,1), ldb, &A(1,1), lda);
+		ssyr2_(uplo, &i__2, &c_b27, &a_ref(k, 1), lda, &b_ref(k, 1), 
+			ldb, &a[a_offset], lda);
 		i__2 = k - 1;
-		saxpy_(&i__2, &ct, &B(k,1), ldb, &A(k,1), lda);
+		saxpy_(&i__2, &ct, &b_ref(k, 1), ldb, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		sscal_(&i__2, &bkk, &A(k,1), lda);
+		sscal_(&i__2, &bkk, &a_ref(k, 1), lda);
 /* Computing 2nd power */
 		r__1 = bkk;
-		A(k,k) = akk * (r__1 * r__1);
+		a_ref(k, k) = akk * (r__1 * r__1);
 /* L40: */
 	    }
 	}
@@ -258,4 +264,8 @@
 /*     End of SSYGS2 */
 
 } /* ssygs2_ */
+
+#undef b_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -49,8 +50,7 @@
             CTRCON.   
 
     UPLO    (input) CHARACTER   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -65,12 +65,9 @@
     A       (input) COMPLEX array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading n by n   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading n by n lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading n by n lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -85,13 +82,12 @@
                RAT = MAX( RCOND, RCONDC )/MIN( RCOND, RCONDC ) - 1.   
             If RAT = 0, the two estimates are exactly the same.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --rwork;
 
@@ -122,13 +118,10 @@
 
     } else {
 
-/*        One estimate is zero, the other is non-zero.  If the matrix 
-is   
-          ill-conditioned, return the nonzero estimate multiplied by 
-  
+/*        One estimate is zero, the other is non-zero.  If the matrix is   
+          ill-conditioned, return the nonzero estimate multiplied by   
           1/EPS; if the matrix is badly scaled, return the nonzero   
-          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximu
-m   
+          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximum   
           element in absolute value in A. */
 
 	bignum = 1.f / slamch_("Safe minimum");

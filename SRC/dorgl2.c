@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dorgl2_(integer *m, integer *n, integer *k, doublereal *
 	a, integer *lda, doublereal *tau, doublereal *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -30,15 +31,12 @@
             The number of columns of the matrix Q. N >= M.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the i-th row must contain the vector which defines 
-  
-            the elementary reflector H(i), for i = 1,2,...,k, as returned 
-  
+            On entry, the i-th row must contain the vector which defines   
+            the elementary reflector H(i), for i = 1,2,...,k, as returned   
             by DGELQF in the first k rows of its array argument A.   
             On exit, the m-by-n matrix Q.   
 
@@ -55,30 +53,29 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument has an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     doublereal d__1;
     /* Local variables */
-    static integer i, j, l;
+    static integer i__, j, l;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dlarf_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *), xerbla_(char *, integer *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -106,42 +103,42 @@
 /*        Initialise rows k+1:m to rows of the unit matrix */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (l = *k + 1; l <= *m; ++l) {
-		A(l,j) = 0.;
+	    for (l = *k + 1; l <= i__2; ++l) {
+		a_ref(l, j) = 0.;
 /* L10: */
 	    }
 	    if (j > *k && j <= *m) {
-		A(j,j) = 1.;
+		a_ref(j, j) = 1.;
 	    }
 /* L20: */
 	}
     }
 
-    for (i = *k; i >= 1; --i) {
+    for (i__ = *k; i__ >= 1; --i__) {
 
 /*        Apply H(i) to A(i:m,i:n) from the right */
 
-	if (i < *n) {
-	    if (i < *m) {
-		A(i,i) = 1.;
-		i__1 = *m - i;
-		i__2 = *n - i + 1;
-		dlarf_("Right", &i__1, &i__2, &A(i,i), lda, &TAU(i)
-			, &A(i+1,i), lda, &WORK(1));
+	if (i__ < *n) {
+	    if (i__ < *m) {
+		a_ref(i__, i__) = 1.;
+		i__1 = *m - i__;
+		i__2 = *n - i__ + 1;
+		dlarf_("Right", &i__1, &i__2, &a_ref(i__, i__), lda, &tau[i__]
+			, &a_ref(i__ + 1, i__), lda, &work[1]);
 	    }
-	    i__1 = *n - i;
-	    d__1 = -TAU(i);
-	    dscal_(&i__1, &d__1, &A(i,i+1), lda);
+	    i__1 = *n - i__;
+	    d__1 = -tau[i__];
+	    dscal_(&i__1, &d__1, &a_ref(i__, i__ + 1), lda);
 	}
-	A(i,i) = 1. - TAU(i);
+	a_ref(i__, i__) = 1. - tau[i__];
 
-/*        Set A(1:i-1,i) to zero */
+/*        Set A(i,1:i-1) to zero */
 
-	i__1 = i - 1;
-	for (l = 1; l <= i-1; ++l) {
-	    A(i,l) = 0.;
+	i__1 = i__ - 1;
+	for (l = 1; l <= i__1; ++l) {
+	    a_ref(i__, l) = 0.;
 /* L30: */
 	}
 /* L40: */
@@ -151,4 +148,7 @@
 /*     End of DORGL2 */
 
 } /* dorgl2_ */
+
+#undef a_ref
+
 

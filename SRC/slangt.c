@@ -1,8 +1,9 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
+doublereal slangt_(char *norm, integer *n, real *dl, real *d__, real *du)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -11,10 +12,8 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
     Purpose   
     =======   
 
-    SLANGT  returns the value of the one norm,  or the Frobenius norm, or 
-  
-    the  infinity norm,  or the  element of  largest absolute value  of a 
-  
+    SLANGT  returns the value of the one norm,  or the Frobenius norm, or   
+    the  infinity norm,  or the  element of  largest absolute value  of a   
     real tridiagonal matrix A.   
 
     Description   
@@ -30,12 +29,9 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
                 (   
                 ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
 
-    where  norm1  denotes the  one norm of a matrix (maximum column sum), 
-  
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and 
-  
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of 
-  
+    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
 
     Arguments   
@@ -58,13 +54,10 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
     DU      (input) REAL array, dimension (N-1)   
             The (n-1) super-diagonal elements of A.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -74,7 +67,7 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
     /* Builtin functions */
     double sqrt(doublereal);
     /* Local variables */
-    static integer i;
+    static integer i__;
     static real scale;
     extern logical lsame_(char *, char *);
     static real anorm;
@@ -83,48 +76,49 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
     static real sum;
 
 
+    --du;
+    --d__;
+    --dl;
 
-#define DU(I) du[(I)-1]
-#define D(I) d[(I)-1]
-#define DL(I) dl[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 0) {
 	anorm = 0.f;
     } else if (lsame_(norm, "M")) {
 
 /*        Find max(abs(A(i,j))). */
 
-	anorm = (r__1 = D(*n), dabs(r__1));
+	anorm = (r__1 = d__[*n], dabs(r__1));
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    r__2 = anorm, r__3 = (r__1 = DL(i), dabs(r__1));
+	    r__2 = anorm, r__3 = (r__1 = dl[i__], dabs(r__1));
 	    anorm = dmax(r__2,r__3);
 /* Computing MAX */
-	    r__2 = anorm, r__3 = (r__1 = D(i), dabs(r__1));
+	    r__2 = anorm, r__3 = (r__1 = d__[i__], dabs(r__1));
 	    anorm = dmax(r__2,r__3);
 /* Computing MAX */
-	    r__2 = anorm, r__3 = (r__1 = DU(i), dabs(r__1));
+	    r__2 = anorm, r__3 = (r__1 = du[i__], dabs(r__1));
 	    anorm = dmax(r__2,r__3);
 /* L10: */
 	}
-    } else if (lsame_(norm, "O") || *(unsigned char *)norm == '1') {
+    } else if (lsame_(norm, "O") || *(unsigned char *)
+	    norm == '1') {
 
 /*        Find norm1(A). */
 
 	if (*n == 1) {
-	    anorm = dabs(D(1));
+	    anorm = dabs(d__[1]);
 	} else {
 /* Computing MAX */
-	    r__3 = dabs(D(1)) + dabs(DL(1)), r__4 = (r__1 = D(*n), dabs(r__1))
-		     + (r__2 = DU(*n - 1), dabs(r__2));
+	    r__3 = dabs(d__[1]) + dabs(dl[1]), r__4 = (r__1 = d__[*n], dabs(
+		    r__1)) + (r__2 = du[*n - 1], dabs(r__2));
 	    anorm = dmax(r__3,r__4);
 	    i__1 = *n - 1;
-	    for (i = 2; i <= *n-1; ++i) {
+	    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		r__4 = anorm, r__5 = (r__1 = D(i), dabs(r__1)) + (r__2 = DL(i)
-			, dabs(r__2)) + (r__3 = DU(i - 1), dabs(r__3));
+		r__4 = anorm, r__5 = (r__1 = d__[i__], dabs(r__1)) + (r__2 = 
+			dl[i__], dabs(r__2)) + (r__3 = du[i__ - 1], dabs(r__3)
+			);
 		anorm = dmax(r__4,r__5);
 /* L20: */
 	    }
@@ -134,17 +128,18 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
 /*        Find normI(A). */
 
 	if (*n == 1) {
-	    anorm = dabs(D(1));
+	    anorm = dabs(d__[1]);
 	} else {
 /* Computing MAX */
-	    r__3 = dabs(D(1)) + dabs(DU(1)), r__4 = (r__1 = D(*n), dabs(r__1))
-		     + (r__2 = DL(*n - 1), dabs(r__2));
+	    r__3 = dabs(d__[1]) + dabs(du[1]), r__4 = (r__1 = d__[*n], dabs(
+		    r__1)) + (r__2 = dl[*n - 1], dabs(r__2));
 	    anorm = dmax(r__3,r__4);
 	    i__1 = *n - 1;
-	    for (i = 2; i <= *n-1; ++i) {
+	    for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		r__4 = anorm, r__5 = (r__1 = D(i), dabs(r__1)) + (r__2 = DU(i)
-			, dabs(r__2)) + (r__3 = DL(i - 1), dabs(r__3));
+		r__4 = anorm, r__5 = (r__1 = d__[i__], dabs(r__1)) + (r__2 = 
+			du[i__], dabs(r__2)) + (r__3 = dl[i__ - 1], dabs(r__3)
+			);
 		anorm = dmax(r__4,r__5);
 /* L30: */
 	    }
@@ -155,12 +150,12 @@ doublereal slangt_(char *norm, integer *n, real *dl, real *d, real *du)
 
 	scale = 0.f;
 	sum = 1.f;
-	slassq_(n, &D(1), &c__1, &scale, &sum);
+	slassq_(n, &d__[1], &c__1, &scale, &sum);
 	if (*n > 1) {
 	    i__1 = *n - 1;
-	    slassq_(&i__1, &DL(1), &c__1, &scale, &sum);
+	    slassq_(&i__1, &dl[1], &c__1, &scale, &sum);
 	    i__1 = *n - 1;
-	    slassq_(&i__1, &DU(1), &c__1, &scale, &sum);
+	    slassq_(&i__1, &du[1], &c__1, &scale, &sum);
 	}
 	anorm = scale * sqrt(sum);
     }

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int ctgsja_(char *jobu, char *jobv, char *jobq, integer *m, 
@@ -7,10 +8,10 @@
 	complex *q, integer *ldq, complex *work, integer *ncycle, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -93,14 +94,12 @@
     S = diag( BETA(K+1),  ... , BETA(M) ),   
     C**2 + S**2 = I.   
 
-    R = ( R11 R12 R13 ) is stored in A(1:M, N-K-L+1:N) and R33 is stored 
-  
+    R = ( R11 R12 R13 ) is stored in A(1:M, N-K-L+1:N) and R33 is stored   
         (  0  R22 R23 )   
     in B(M-K+1:L,N+M-K-L+1:N) on exit.   
 
     The computation of the unitary transformation matrices U, V or Q   
-    is optional.  These matrices may either be formed explicitly, or they 
-  
+    is optional.  These matrices may either be formed explicitly, or they   
     may be postmultiplied into input matrices U1, V1, or Q1.   
 
     Arguments   
@@ -138,8 +137,7 @@
 
     K       (input) INTEGER   
     L       (input) INTEGER   
-            K and L specify the subblocks in the input matrices A and B: 
-  
+            K and L specify the subblocks in the input matrices A and B:   
             A23 = A(K+1:MIN(K+L,M),N-L+1:N) and B13 = B(1:L,,N-L+1:N)   
             of A and B, whose GSVD is going to be computed by CTGSJA.   
             See Further details.   
@@ -185,8 +183,7 @@
               BETA(K+L+1:N)  = 0.   
 
     U       (input/output) COMPLEX array, dimension (LDU,M)   
-            On entry, if JOBU = 'U', U must contain a matrix U1 (usually 
-  
+            On entry, if JOBU = 'U', U must contain a matrix U1 (usually   
             the unitary matrix returned by CGGSVP).   
             On exit,   
             if JOBU = 'I', U contains the unitary matrix U;   
@@ -198,8 +195,7 @@
             JOBU = 'U'; LDU >= 1 otherwise.   
 
     V       (input/output) COMPLEX array, dimension (LDV,P)   
-            On entry, if JOBV = 'V', V must contain a matrix V1 (usually 
-  
+            On entry, if JOBV = 'V', V must contain a matrix V1 (usually   
             the unitary matrix returned by CGGSVP).   
             On exit,   
             if JOBV = 'I', V contains the unitary matrix V;   
@@ -211,8 +207,7 @@
             JOBV = 'V'; LDV >= 1 otherwise.   
 
     Q       (input/output) COMPLEX array, dimension (LDQ,N)   
-            On entry, if JOBQ = 'Q', Q must contain a matrix Q1 (usually 
-  
+            On entry, if JOBQ = 'Q', Q must contain a matrix Q1 (usually   
             the unitary matrix returned by CGGSVP).   
             On exit,   
             if JOBQ = 'I', Q contains the unitary matrix Q;   
@@ -237,16 +232,14 @@
     ===================   
 
     MAXIT   INTEGER   
-            MAXIT specifies the total loops that the iterative procedure 
-  
+            MAXIT specifies the total loops that the iterative procedure   
             may take. If after MAXIT cycles, the routine fails to   
             converge, we return INFO = 1.   
 
     Further Details   
     ===============   
 
-    CTGSJA essentially uses a variant of Kogbetliantz algorithm to reduce 
-  
+    CTGSJA essentially uses a variant of Kogbetliantz algorithm to reduce   
     min(L,M-K)-by-L triangular (or trapezoidal) matrix A23 and L-by-L   
     matrix B13 to the form:   
 
@@ -259,16 +252,13 @@
 
     and R1 is an L-by-L nonsingular upper triangular matrix.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
        Decode and test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {0.f,0.f};
     static complex c_b2 = {1.f,0.f};
@@ -280,14 +270,13 @@
     integer a_dim1, a_offset, b_dim1, b_offset, q_dim1, q_offset, u_dim1, 
 	    u_offset, v_dim1, v_offset, i__1, i__2, i__3, i__4;
     real r__1;
-    doublereal d__1;
     complex q__1;
     /* Builtin functions */
     void r_cnjg(complex *, complex *);
     /* Local variables */
     extern /* Subroutine */ int crot_(integer *, complex *, integer *, 
 	    complex *, integer *, real *, complex *);
-    static integer i, j;
+    static integer i__, j;
     static real gamma;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
@@ -313,19 +302,38 @@
     static complex snq;
     static real rwk;
     static complex snu, snv;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alpha;
+    --beta;
+    u_dim1 = *ldu;
+    u_offset = 1 + u_dim1 * 1;
+    u -= u_offset;
+    v_dim1 = *ldv;
+    v_offset = 1 + v_dim1 * 1;
+    v -= v_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --work;
 
-#define ALPHA(I) alpha[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define U(I,J) u[(I)-1 + ((J)-1)* ( *ldu)]
-#define V(I,J) v[(I)-1 + ((J)-1)* ( *ldv)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     initu = lsame_(jobu, "I");
     wantu = initu || lsame_(jobu, "U");
 
@@ -338,9 +346,11 @@
     *info = 0;
     if (! (initu || wantu || lsame_(jobu, "N"))) {
 	*info = -1;
-    } else if (! (initv || wantv || lsame_(jobv, "N"))) {
+    } else if (! (initv || wantv || lsame_(jobv, "N"))) 
+	    {
 	*info = -2;
-    } else if (! (initq || wantq || lsame_(jobq, "N"))) {
+    } else if (! (initq || wantq || lsame_(jobq, "N"))) 
+	    {
 	*info = -3;
     } else if (*m < 0) {
 	*info = -4;
@@ -368,13 +378,13 @@
 /*     Initialize U, V and Q, if necessary */
 
     if (initu) {
-	claset_("Full", m, m, &c_b1, &c_b2, &U(1,1), ldu);
+	claset_("Full", m, m, &c_b1, &c_b2, &u[u_offset], ldu);
     }
     if (initv) {
-	claset_("Full", p, p, &c_b1, &c_b2, &V(1,1), ldv);
+	claset_("Full", p, p, &c_b1, &c_b2, &v[v_offset], ldv);
     }
     if (initq) {
-	claset_("Full", n, n, &c_b1, &c_b2, &Q(1,1), ldq);
+	claset_("Full", n, n, &c_b1, &c_b2, &q[q_offset], ldq);
     }
 
 /*     Loop until convergence */
@@ -385,124 +395,126 @@
 	upper = ! upper;
 
 	i__1 = *l - 1;
-	for (i = 1; i <= *l-1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = *l;
-	    for (j = i + 1; j <= *l; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 
 		a1 = 0.f;
 		a2.r = 0.f, a2.i = 0.f;
 		a3 = 0.f;
-		if (*k + i <= *m) {
-		    i__3 = *k + i + (*n - *l + i) * a_dim1;
-		    a1 = A(*k+i,*n-*l+i).r;
+		if (*k + i__ <= *m) {
+		    i__3 = a_subscr(*k + i__, *n - *l + i__);
+		    a1 = a[i__3].r;
 		}
 		if (*k + j <= *m) {
-		    i__3 = *k + j + (*n - *l + j) * a_dim1;
-		    a3 = A(*k+j,*n-*l+j).r;
+		    i__3 = a_subscr(*k + j, *n - *l + j);
+		    a3 = a[i__3].r;
 		}
 
-		i__3 = i + (*n - *l + i) * b_dim1;
-		b1 = B(i,*n-*l+i).r;
-		i__3 = j + (*n - *l + j) * b_dim1;
-		b3 = B(j,*n-*l+j).r;
+		i__3 = b_subscr(i__, *n - *l + i__);
+		b1 = b[i__3].r;
+		i__3 = b_subscr(j, *n - *l + j);
+		b3 = b[i__3].r;
 
 		if (upper) {
-		    if (*k + i <= *m) {
-			i__3 = *k + i + (*n - *l + j) * a_dim1;
-			a2.r = A(*k+i,*n-*l+j).r, a2.i = A(*k+i,*n-*l+j).i;
+		    if (*k + i__ <= *m) {
+			i__3 = a_subscr(*k + i__, *n - *l + j);
+			a2.r = a[i__3].r, a2.i = a[i__3].i;
 		    }
-		    i__3 = i + (*n - *l + j) * b_dim1;
-		    b2.r = B(i,*n-*l+j).r, b2.i = B(i,*n-*l+j).i;
+		    i__3 = b_subscr(i__, *n - *l + j);
+		    b2.r = b[i__3].r, b2.i = b[i__3].i;
 		} else {
 		    if (*k + j <= *m) {
-			i__3 = *k + j + (*n - *l + i) * a_dim1;
-			a2.r = A(*k+j,*n-*l+i).r, a2.i = A(*k+j,*n-*l+i).i;
+			i__3 = a_subscr(*k + j, *n - *l + i__);
+			a2.r = a[i__3].r, a2.i = a[i__3].i;
 		    }
-		    i__3 = j + (*n - *l + i) * b_dim1;
-		    b2.r = B(j,*n-*l+i).r, b2.i = B(j,*n-*l+i).i;
+		    i__3 = b_subscr(j, *n - *l + i__);
+		    b2.r = b[i__3].r, b2.i = b[i__3].i;
 		}
 
 		clags2_(&upper, &a1, &a2, &a3, &b1, &b2, &b3, &csu, &snu, &
 			csv, &snv, &csq, &snq);
 
-/*              Update (K+I)-th and (K+J)-th rows of matrix A:
- U'*A */
+/*              Update (K+I)-th and (K+J)-th rows of matrix A: U'*A */
 
 		if (*k + j <= *m) {
 		    r_cnjg(&q__1, &snu);
-		    crot_(l, &A(*k+j,*n-*l+1), lda, &A(*k+i,*n-*l+1), lda, &csu, &q__1);
+		    crot_(l, &a_ref(*k + j, *n - *l + 1), lda, &a_ref(*k + 
+			    i__, *n - *l + 1), lda, &csu, &q__1);
 		}
 
 /*              Update I-th and J-th rows of matrix B: V'*B */
 
 		r_cnjg(&q__1, &snv);
-		crot_(l, &B(j,*n-*l+1), ldb, &B(i,*n-*l+1), ldb, &csv, &q__1);
+		crot_(l, &b_ref(j, *n - *l + 1), ldb, &b_ref(i__, *n - *l + 1)
+			, ldb, &csv, &q__1);
 
-/*              Update (N-L+I)-th and (N-L+J)-th columns of ma
-trices   
+/*              Update (N-L+I)-th and (N-L+J)-th columns of matrices   
                 A and B: A*Q and B*Q   
 
    Computing MIN */
 		i__4 = *k + *l;
 		i__3 = min(i__4,*m);
-		crot_(&i__3, &A(1,*n-*l+j), &c__1, &A(1,*n-*l+i), &c__1, &csq, &snq);
+		crot_(&i__3, &a_ref(1, *n - *l + j), &c__1, &a_ref(1, *n - *l 
+			+ i__), &c__1, &csq, &snq);
 
-		crot_(l, &B(1,*n-*l+j), &c__1, &B(1,*n-*l+i), &c__1, &csq, &snq);
+		crot_(l, &b_ref(1, *n - *l + j), &c__1, &b_ref(1, *n - *l + 
+			i__), &c__1, &csq, &snq);
 
 		if (upper) {
-		    if (*k + i <= *m) {
-			i__3 = *k + i + (*n - *l + j) * a_dim1;
-			A(*k+i,*n-*l+j).r = 0.f, A(*k+i,*n-*l+j).i = 0.f;
+		    if (*k + i__ <= *m) {
+			i__3 = a_subscr(*k + i__, *n - *l + j);
+			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
-		    i__3 = i + (*n - *l + j) * b_dim1;
-		    B(i,*n-*l+j).r = 0.f, B(i,*n-*l+j).i = 0.f;
+		    i__3 = b_subscr(i__, *n - *l + j);
+		    b[i__3].r = 0.f, b[i__3].i = 0.f;
 		} else {
 		    if (*k + j <= *m) {
-			i__3 = *k + j + (*n - *l + i) * a_dim1;
-			A(*k+j,*n-*l+i).r = 0.f, A(*k+j,*n-*l+i).i = 0.f;
+			i__3 = a_subscr(*k + j, *n - *l + i__);
+			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
-		    i__3 = j + (*n - *l + i) * b_dim1;
-		    B(j,*n-*l+i).r = 0.f, B(j,*n-*l+i).i = 0.f;
+		    i__3 = b_subscr(j, *n - *l + i__);
+		    b[i__3].r = 0.f, b[i__3].i = 0.f;
 		}
 
-/*              Ensure that the diagonal elements of A and B a
-re real. */
+/*              Ensure that the diagonal elements of A and B are real. */
 
-		if (*k + i <= *m) {
-		    i__3 = *k + i + (*n - *l + i) * a_dim1;
-		    i__4 = *k + i + (*n - *l + i) * a_dim1;
-		    d__1 = A(*k+i,*n-*l+i).r;
-		    A(*k+i,*n-*l+i).r = d__1, A(*k+i,*n-*l+i).i = 0.f;
+		if (*k + i__ <= *m) {
+		    i__3 = a_subscr(*k + i__, *n - *l + i__);
+		    i__4 = a_subscr(*k + i__, *n - *l + i__);
+		    r__1 = a[i__4].r;
+		    a[i__3].r = r__1, a[i__3].i = 0.f;
 		}
 		if (*k + j <= *m) {
-		    i__3 = *k + j + (*n - *l + j) * a_dim1;
-		    i__4 = *k + j + (*n - *l + j) * a_dim1;
-		    d__1 = A(*k+j,*n-*l+j).r;
-		    A(*k+j,*n-*l+j).r = d__1, A(*k+j,*n-*l+j).i = 0.f;
+		    i__3 = a_subscr(*k + j, *n - *l + j);
+		    i__4 = a_subscr(*k + j, *n - *l + j);
+		    r__1 = a[i__4].r;
+		    a[i__3].r = r__1, a[i__3].i = 0.f;
 		}
-		i__3 = i + (*n - *l + i) * b_dim1;
-		i__4 = i + (*n - *l + i) * b_dim1;
-		d__1 = B(i,*n-*l+i).r;
-		B(i,*n-*l+i).r = d__1, B(i,*n-*l+i).i = 0.f;
-		i__3 = j + (*n - *l + j) * b_dim1;
-		i__4 = j + (*n - *l + j) * b_dim1;
-		d__1 = B(j,*n-*l+j).r;
-		B(j,*n-*l+j).r = d__1, B(j,*n-*l+j).i = 0.f;
+		i__3 = b_subscr(i__, *n - *l + i__);
+		i__4 = b_subscr(i__, *n - *l + i__);
+		r__1 = b[i__4].r;
+		b[i__3].r = r__1, b[i__3].i = 0.f;
+		i__3 = b_subscr(j, *n - *l + j);
+		i__4 = b_subscr(j, *n - *l + j);
+		r__1 = b[i__4].r;
+		b[i__3].r = r__1, b[i__3].i = 0.f;
 
-/*              Update unitary matrices U, V, Q, if desired. 
-*/
+/*              Update unitary matrices U, V, Q, if desired. */
 
 		if (wantu && *k + j <= *m) {
-		    crot_(m, &U(1,*k+j), &c__1, &U(1,*k+i), &c__1, &csu, &snu);
+		    crot_(m, &u_ref(1, *k + j), &c__1, &u_ref(1, *k + i__), &
+			    c__1, &csu, &snu);
 		}
 
 		if (wantv) {
-		    crot_(p, &V(1,j), &c__1, &V(1,i), &
-			    c__1, &csv, &snv);
+		    crot_(p, &v_ref(1, j), &c__1, &v_ref(1, i__), &c__1, &csv,
+			     &snv);
 		}
 
 		if (wantq) {
-		    crot_(n, &Q(1,*n-*l+j), &c__1, &Q(1,*n-*l+i), &c__1, &csq, &snq);
+		    crot_(n, &q_ref(1, *n - *l + j), &c__1, &q_ref(1, *n - *l 
+			    + i__), &c__1, &csq, &snq);
 		}
 
 /* L10: */
@@ -512,32 +524,30 @@ re real. */
 
 	if (! upper) {
 
-/*           The matrices A13 and B13 were lower triangular at the
- start   
+/*           The matrices A13 and B13 were lower triangular at the start   
              of the cycle, and are now upper triangular.   
 
-             Convergence test: test the parallelism of the corresp
-onding   
+             Convergence test: test the parallelism of the corresponding   
              rows of A and B. */
 
 	    error = 0.f;
 /* Computing MIN */
 	    i__2 = *l, i__3 = *m - *k;
 	    i__1 = min(i__2,i__3);
-	    for (i = 1; i <= min(*l,*m-*k); ++i) {
-		i__2 = *l - i + 1;
-		ccopy_(&i__2, &A(*k+i,*n-*l+i), lda, &WORK(
-			1), &c__1);
-		i__2 = *l - i + 1;
-		ccopy_(&i__2, &B(i,*n-*l+i), ldb, &WORK(*l + 
-			1), &c__1);
-		i__2 = *l - i + 1;
-		clapll_(&i__2, &WORK(1), &c__1, &WORK(*l + 1), &c__1, &ssmin);
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		i__2 = *l - i__ + 1;
+		ccopy_(&i__2, &a_ref(*k + i__, *n - *l + i__), lda, &work[1], 
+			&c__1);
+		i__2 = *l - i__ + 1;
+		ccopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &work[*l + 1], 
+			&c__1);
+		i__2 = *l - i__ + 1;
+		clapll_(&i__2, &work[1], &c__1, &work[*l + 1], &c__1, &ssmin);
 		error = dmax(error,ssmin);
 /* L30: */
 	    }
 
-	    if (dabs(error) <= (real) (*n) * dmin(*tola,*tolb)) {
+	    if (dabs(error) <= dmin(*tola,*tolb)) {
 		goto L50;
 	    }
 	}
@@ -550,63 +560,64 @@ onding
 /*     The algorithm has not converged after MAXIT cycles. */
 
     *info = 1;
-    goto L90;
+    goto L100;
 
 L50:
 
-/*     If ERROR <= N*MIN(TOLA,TOLB), then the algorithm has converged.   
+/*     If ERROR <= MIN(TOLA,TOLB), then the algorithm has converged.   
        Compute the generalized singular value pairs (ALPHA, BETA), and   
        set the triangular matrix R to array A. */
 
     i__1 = *k;
-    for (i = 1; i <= *k; ++i) {
-	ALPHA(i) = 1.f;
-	BETA(i) = 0.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	alpha[i__] = 1.f;
+	beta[i__] = 0.f;
 /* L60: */
     }
 
 /* Computing MIN */
     i__2 = *l, i__3 = *m - *k;
     i__1 = min(i__2,i__3);
-    for (i = 1; i <= min(*l,*m-*k); ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
-	i__2 = *k + i + (*n - *l + i) * a_dim1;
-	a1 = A(*k+i,*n-*l+i).r;
-	i__2 = i + (*n - *l + i) * b_dim1;
-	b1 = B(i,*n-*l+i).r;
+	i__2 = a_subscr(*k + i__, *n - *l + i__);
+	a1 = a[i__2].r;
+	i__2 = b_subscr(i__, *n - *l + i__);
+	b1 = b[i__2].r;
 
 	if (a1 != 0.f) {
 	    gamma = b1 / a1;
 
 	    if (gamma < 0.f) {
-		i__2 = *l - i + 1;
-		csscal_(&i__2, &c_b39, &B(i,*n-*l+i), ldb);
+		i__2 = *l - i__ + 1;
+		csscal_(&i__2, &c_b39, &b_ref(i__, *n - *l + i__), ldb);
 		if (wantv) {
-		    csscal_(p, &c_b39, &V(1,i), &c__1);
+		    csscal_(p, &c_b39, &v_ref(1, i__), &c__1);
 		}
 	    }
 
 	    r__1 = dabs(gamma);
-	    slartg_(&r__1, &c_b42, &BETA(*k + i), &ALPHA(*k + i), &rwk);
+	    slartg_(&r__1, &c_b42, &beta[*k + i__], &alpha[*k + i__], &rwk);
 
-	    if (ALPHA(*k + i) >= BETA(*k + i)) {
-		i__2 = *l - i + 1;
-		r__1 = 1.f / ALPHA(*k + i);
-		csscal_(&i__2, &r__1, &A(*k+i,*n-*l+i), 
-			lda);
+	    if (alpha[*k + i__] >= beta[*k + i__]) {
+		i__2 = *l - i__ + 1;
+		r__1 = 1.f / alpha[*k + i__];
+		csscal_(&i__2, &r__1, &a_ref(*k + i__, *n - *l + i__), lda);
 	    } else {
-		i__2 = *l - i + 1;
-		r__1 = 1.f / BETA(*k + i);
-		csscal_(&i__2, &r__1, &B(i,*n-*l+i), ldb);
-		i__2 = *l - i + 1;
-		ccopy_(&i__2, &B(i,*n-*l+i), ldb, &A(*k+i,*n-*l+i), lda);
+		i__2 = *l - i__ + 1;
+		r__1 = 1.f / beta[*k + i__];
+		csscal_(&i__2, &r__1, &b_ref(i__, *n - *l + i__), ldb);
+		i__2 = *l - i__ + 1;
+		ccopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &a_ref(*k + 
+			i__, *n - *l + i__), lda);
 	    }
 
 	} else {
-	    ALPHA(*k + i) = 0.f;
-	    BETA(*k + i) = 1.f;
-	    i__2 = *l - i + 1;
-	    ccopy_(&i__2, &B(i,*n-*l+i), ldb, &A(*k+i,*n-*l+i), lda);
+	    alpha[*k + i__] = 0.f;
+	    beta[*k + i__] = 1.f;
+	    i__2 = *l - i__ + 1;
+	    ccopy_(&i__2, &b_ref(i__, *n - *l + i__), ldb, &a_ref(*k + i__, *
+		    n - *l + i__), lda);
 	}
 /* L70: */
     }
@@ -614,22 +625,22 @@ L50:
 /*     Post-assignment */
 
     i__1 = *k + *l;
-    for (i = *m + 1; i <= *k+*l; ++i) {
-	ALPHA(i) = 0.f;
-	BETA(i) = 1.f;
+    for (i__ = *m + 1; i__ <= i__1; ++i__) {
+	alpha[i__] = 0.f;
+	beta[i__] = 1.f;
 /* L80: */
     }
 
     if (*k + *l < *n) {
 	i__1 = *n;
-	for (i = *k + *l + 1; i <= *n; ++i) {
-	    ALPHA(i) = 0.f;
-	    BETA(i) = 0.f;
-/* L85: */
+	for (i__ = *k + *l + 1; i__ <= i__1; ++i__) {
+	    alpha[i__] = 0.f;
+	    beta[i__] = 0.f;
+/* L90: */
 	}
     }
 
-L90:
+L100:
     *ncycle = kcycle;
 
     return 0;
@@ -637,4 +648,16 @@ L90:
 /*     End of CTGSJA */
 
 } /* ctgsja_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+#undef q_ref
+#undef q_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

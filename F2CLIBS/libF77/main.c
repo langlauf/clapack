@@ -1,7 +1,7 @@
 /* STARTUP PROCEDURE FOR UNIX FORTRAN PROGRAMS */
 
 #include "stdio.h"
-#include "signal.h"
+#include "signal1.h"
 
 #ifndef SIGIOT
 #ifdef SIGABRT
@@ -10,15 +10,21 @@
 #endif
 
 #ifndef KR_headers
+#undef VOID
 #include "stdlib.h"
 #endif
+
+#ifndef VOID
+#define VOID void
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef NO__STDC
 #define ONEXIT onexit
-extern void f_exit();
+extern VOID f_exit();
 #else
 #ifndef KR_headers
 extern void f_exit(void);
@@ -29,13 +35,13 @@ extern int atexit(void (*)(void));
 #else
 #ifndef NO_ONEXIT
 #define ONEXIT onexit
-extern void f_exit();
+extern VOID f_exit();
 #endif
 #endif
 #endif
 
 #ifdef KR_headers
-extern void f_init(), sig_die();
+extern VOID f_init(), sig_die();
 extern int MAIN__();
 #define Int /* int */
 #else
@@ -44,38 +50,44 @@ extern int MAIN__(void);
 #define Int int
 #endif
 
-static void sigfdie(Int n)
+static VOID sigfdie(Sigarg)
 {
+Use_Sigarg;
 sig_die("Floating Exception", 1);
 }
 
 
-static void sigidie(Int n)
+static VOID sigidie(Sigarg)
 {
+Use_Sigarg;
 sig_die("IOT Trap", 1);
 }
 
 #ifdef SIGQUIT
-static void sigqdie(Int n)
+static VOID sigqdie(Sigarg)
 {
+Use_Sigarg;
 sig_die("Quit signal", 1);
 }
 #endif
 
 
-static void sigindie(Int n)
+static VOID sigindie(Sigarg)
 {
+Use_Sigarg;
 sig_die("Interrupt", 0);
 }
 
-static void sigtdie(Int n)
+static VOID sigtdie(Sigarg)
 {
+Use_Sigarg;
 sig_die("Killed", 0);
 }
 
 #ifdef SIGTRAP
-static void sigtrdie(Int n)
+static VOID sigtrdie(Sigarg)
 {
+Use_Sigarg;
 sig_die("Trace trap", 1);
 }
 #endif
@@ -83,6 +95,10 @@ sig_die("Trace trap", 1);
 
 int xargc;
 char **xargv;
+
+#ifdef __cplusplus
+	}
+#endif
 
 #ifdef KR_headers
 main(argc, argv) int argc; char **argv;
@@ -92,20 +108,20 @@ main(int argc, char **argv)
 {
 xargc = argc;
 xargv = argv;
-signal(SIGFPE, sigfdie);	/* ignore underflow, enable overflow */
+signal1(SIGFPE, sigfdie);	/* ignore underflow, enable overflow */
 #ifdef SIGIOT
-signal(SIGIOT, sigidie);
+signal1(SIGIOT, sigidie);
 #endif
 #ifdef SIGTRAP
-signal(SIGTRAP, sigtrdie);
+signal1(SIGTRAP, sigtrdie);
 #endif
 #ifdef SIGQUIT
-if(signal(SIGQUIT,sigqdie) == SIG_IGN)
-	signal(SIGQUIT, SIG_IGN);
+if(signal1(SIGQUIT,sigqdie) == SIG_IGN)
+	signal1(SIGQUIT, SIG_IGN);
 #endif
-if(signal(SIGINT, sigindie) == SIG_IGN)
-	signal(SIGINT, SIG_IGN);
-signal(SIGTERM,sigtdie);
+if(signal1(SIGINT, sigindie) == SIG_IGN)
+	signal1(SIGINT, SIG_IGN);
+signal1(SIGTERM,sigtdie);
 
 #ifdef pdp11
 	ldfps(01200); /* detect overflow as an exception */
@@ -123,6 +139,3 @@ exit(0);	/* exit(0) rather than return(0) to bypass Cray bug */
 return 0;	/* For compilers that complain of missing return values; */
 		/* others will complain that this is unreachable code. */
 }
-#ifdef __cplusplus
-	}
-#endif

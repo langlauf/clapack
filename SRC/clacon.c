@@ -1,20 +1,20 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clacon_(integer *n, complex *v, complex *x, real *est, 
 	integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
     CLACON estimates the 1-norm of a square, complex matrix A.   
-    Reverse communication is used for evaluating matrix-vector products. 
-  
+    Reverse communication is used for evaluating matrix-vector products.   
 
     Arguments   
     =========   
@@ -48,34 +48,31 @@
     Contributed by Nick Higham, University of Manchester.   
     Originally named CONEST, dated March 16, 1988.   
 
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of 
-  
-    a real or complex matrix, with applications to condition estimation", 
-  
+    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
+    a real or complex matrix, with applications to condition estimation",   
     ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
 
-    ===================================================================== 
-  
+    Last modified:  April, 1999   
+
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
-    integer i__1, i__2;
-    real r__1;
-    doublereal d__1;
-    complex q__1, q__2;
+    integer i__1, i__2, i__3;
+    real r__1, r__2;
+    complex q__1;
     /* Builtin functions */
-    double c_abs(complex *);
-    void c_div(complex *, complex *, complex *);
+    double c_abs(complex *), r_imag(complex *);
     /* Local variables */
     static integer iter;
     static real temp;
-    static integer jump, i, j, jlast;
+    static integer jump, i__, j;
+    static real absxi;
+    static integer jlast;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *);
     extern integer icmax1_(integer *, complex *, integer *);
@@ -84,19 +81,18 @@
     static real safmin, altsgn, estold;
 
 
+    --x;
+    --v;
 
-#define X(I) x[(I)-1]
-#define V(I) v[(I)-1]
-
-
+    /* Function Body */
     safmin = slamch_("Safe minimum");
     if (*kase == 0) {
 	i__1 = *n;
-	for (i = 1; i <= *n; ++i) {
-	    i__2 = i;
-	    d__1 = 1.f / (real) (*n);
-	    q__1.r = d__1, q__1.i = 0.f;
-	    X(i).r = q__1.r, X(i).i = q__1.i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    i__2 = i__;
+	    r__1 = 1.f / (real) (*n);
+	    q__1.r = r__1, q__1.i = 0.f;
+	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 /* L10: */
 	}
 	*kase = 1;
@@ -117,24 +113,26 @@
 
 L20:
     if (*n == 1) {
-	V(1).r = X(1).r, V(1).i = X(1).i;
-	*est = c_abs(&V(1));
+	v[1].r = x[1].r, v[1].i = x[1].i;
+	*est = c_abs(&v[1]);
 /*        ... QUIT */
 	goto L130;
     }
-    *est = scsum1_(n, &X(1), &c__1);
+    *est = scsum1_(n, &x[1], &c__1);
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (c_abs(&X(i)) > safmin) {
-	    i__2 = i;
-	    d__1 = c_abs(&X(i));
-	    q__2.r = d__1, q__2.i = 0.f;
-	    c_div(&q__1, &X(i), &q__2);
-	    X(i).r = q__1.r, X(i).i = q__1.i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	absxi = c_abs(&x[i__]);
+	if (absxi > safmin) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    r__1 = x[i__3].r / absxi;
+	    r__2 = r_imag(&x[i__]) / absxi;
+	    q__1.r = r__1, q__1.i = r__2;
+	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	} else {
-	    i__2 = i;
-	    X(i).r = 1.f, X(i).i = 0.f;
+	    i__2 = i__;
+	    x[i__2].r = 1.f, x[i__2].i = 0.f;
 	}
 /* L30: */
     }
@@ -146,20 +144,20 @@ L20:
        FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY CTRANS(A)*X. */
 
 L40:
-    j = icmax1_(n, &X(1), &c__1);
+    j = icmax1_(n, &x[1], &c__1);
     iter = 2;
 
 /*     MAIN LOOP - ITERATIONS 2,3,...,ITMAX. */
 
 L50:
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i;
-	X(i).r = 0.f, X(i).i = 0.f;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	x[i__2].r = 0.f, x[i__2].i = 0.f;
 /* L60: */
     }
     i__1 = j;
-    X(j).r = 1.f, X(j).i = 0.f;
+    x[i__1].r = 1.f, x[i__1].i = 0.f;
     *kase = 1;
     jump = 3;
     return 0;
@@ -168,9 +166,9 @@ L50:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
-    ccopy_(n, &X(1), &c__1, &V(1), &c__1);
+    ccopy_(n, &x[1], &c__1, &v[1], &c__1);
     estold = *est;
-    *est = scsum1_(n, &V(1), &c__1);
+    *est = scsum1_(n, &v[1], &c__1);
 
 /*     TEST FOR CYCLING. */
     if (*est <= estold) {
@@ -178,16 +176,18 @@ L70:
     }
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (c_abs(&X(i)) > safmin) {
-	    i__2 = i;
-	    d__1 = c_abs(&X(i));
-	    q__2.r = d__1, q__2.i = 0.f;
-	    c_div(&q__1, &X(i), &q__2);
-	    X(i).r = q__1.r, X(i).i = q__1.i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	absxi = c_abs(&x[i__]);
+	if (absxi > safmin) {
+	    i__2 = i__;
+	    i__3 = i__;
+	    r__1 = x[i__3].r / absxi;
+	    r__2 = r_imag(&x[i__]) / absxi;
+	    q__1.r = r__1, q__1.i = r__2;
+	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	} else {
-	    i__2 = i;
-	    X(i).r = 1.f, X(i).i = 0.f;
+	    i__2 = i__;
+	    x[i__2].r = 1.f, x[i__2].i = 0.f;
 	}
 /* L80: */
     }
@@ -200,10 +200,8 @@ L70:
 
 L90:
     jlast = j;
-    j = icmax1_(n, &X(1), &c__1);
-    i__1 = jlast;
-    i__2 = j;
-    if (X(jlast).r != (r__1 = X(j).r, dabs(r__1)) && iter < 5) {
+    j = icmax1_(n, &x[1], &c__1);
+    if (c_abs(&x[jlast]) != c_abs(&x[j]) && iter < 5) {
 	++iter;
 	goto L50;
     }
@@ -213,12 +211,12 @@ L90:
 L100:
     altsgn = 1.f;
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	i__2 = i;
-	d__1 = altsgn * ((real) (i - 1) / (real) (*n - 1) + 1.f);
-	q__1.r = d__1, q__1.i = 0.f;
-	X(i).r = q__1.r, X(i).i = q__1.i;
-	altsgn = -(doublereal)altsgn;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	r__1 = altsgn * ((real) (i__ - 1) / (real) (*n - 1) + 1.f);
+	q__1.r = r__1, q__1.i = 0.f;
+	x[i__2].r = q__1.r, x[i__2].i = q__1.i;
+	altsgn = -altsgn;
 /* L110: */
     }
     *kase = 1;
@@ -229,9 +227,9 @@ L100:
        X HAS BEEN OVERWRITTEN BY A*X. */
 
 L120:
-    temp = scsum1_(n, &X(1), &c__1) / (real) (*n * 3) * 2.f;
+    temp = scsum1_(n, &x[1], &c__1) / (real) (*n * 3) * 2.f;
     if (temp > *est) {
-	ccopy_(n, &X(1), &c__1, &V(1), &c__1);
+	ccopy_(n, &x[1], &c__1, &v[1], &c__1);
 	*est = temp;
     }
 

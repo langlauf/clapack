@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -19,7 +20,7 @@ static doublereal c_b15 = 0.;
     integer work_dim1, work_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static doublereal anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
@@ -33,7 +34,10 @@ static doublereal c_b15 = 0.;
     static doublereal ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -42,8 +46,7 @@ static doublereal c_b15 = 0.;
     Purpose   
     =======   
 
-    DPPT03 computes the residual for a symmetric packed matrix times its 
-  
+    DPPT03 computes the residual for a symmetric packed matrix times its   
     inverse:   
        norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
     where EPS is the machine epsilon.   
@@ -71,8 +74,7 @@ static doublereal c_b15 = 0.;
     WORK    (workspace) DOUBLE PRECISION array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
 
@@ -83,8 +85,7 @@ static doublereal c_b15 = 0.;
     RESID   (output) DOUBLE PRECISION   
             norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -93,7 +94,7 @@ static doublereal c_b15 = 0.;
     --a;
     --ainv;
     work_dim1 = *ldwork;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -117,8 +118,7 @@ static doublereal c_b15 = 0.;
     *rcond = 1. / anorm / ainvnm;
 
 /*     UPLO = 'U':   
-       Copy the leading N-1 x N-1 submatrix of AINV to WORK(1:N,2:N) and 
-  
+       Copy the leading N-1 x N-1 submatrix of AINV to WORK(1:N,2:N) and   
        expand it to a full matrix, then multiply by A one column at a   
        time, moving the result one column to the left. */
 
@@ -129,32 +129,29 @@ static doublereal c_b15 = 0.;
 	jj = 1;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    dcopy_(&j, &ainv[jj], &c__1, &work[(j + 1) * work_dim1 + 1], &
-		    c__1);
+	    dcopy_(&j, &ainv[jj], &c__1, &work_ref(1, j + 1), &c__1);
 	    i__2 = j - 1;
-	    dcopy_(&i__2, &ainv[jj], &c__1, &work[j + (work_dim1 << 1)], 
-		    ldwork);
+	    dcopy_(&i__2, &ainv[jj], &c__1, &work_ref(j, 2), ldwork);
 	    jj += j;
 /* L10: */
 	}
 	jj = (*n - 1) * *n / 2 + 1;
 	i__1 = *n - 1;
-	dcopy_(&i__1, &ainv[jj], &c__1, &work[*n + (work_dim1 << 1)], ldwork);
+	dcopy_(&i__1, &ainv[jj], &c__1, &work_ref(*n, 2), ldwork);
 
 /*        Multiply by A */
 
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
-	    dspmv_("Upper", n, &c_b13, &a[1], &work[(j + 1) * work_dim1 + 1], 
-		    &c__1, &c_b15, &work[j * work_dim1 + 1], &c__1);
+	    dspmv_("Upper", n, &c_b13, &a[1], &work_ref(1, j + 1), &c__1, &
+		    c_b15, &work_ref(1, j), &c__1);
 /* L20: */
 	}
-	dspmv_("Upper", n, &c_b13, &a[1], &ainv[jj], &c__1, &c_b15, &work[*n *
-		 work_dim1 + 1], &c__1);
+	dspmv_("Upper", n, &c_b13, &a[1], &ainv[jj], &c__1, &c_b15, &work_ref(
+		1, *n), &c__1);
 
 /*     UPLO = 'L':   
-       Copy the trailing N-1 x N-1 submatrix of AINV to WORK(1:N,1:N-1
-)   
+       Copy the trailing N-1 x N-1 submatrix of AINV to WORK(1:N,1:N-1)   
        and multiply by A, moving each column to the right. */
 
     } else {
@@ -162,16 +159,14 @@ static doublereal c_b15 = 0.;
 /*        Copy AINV */
 
 	i__1 = *n - 1;
-	dcopy_(&i__1, &ainv[2], &c__1, &work[work_dim1 + 1], ldwork);
+	dcopy_(&i__1, &ainv[2], &c__1, &work_ref(1, 1), ldwork);
 	jj = *n + 1;
 	i__1 = *n;
 	for (j = 2; j <= i__1; ++j) {
 	    i__2 = *n - j + 1;
-	    dcopy_(&i__2, &ainv[jj], &c__1, &work[j + (j - 1) * work_dim1], &
-		    c__1);
+	    dcopy_(&i__2, &ainv[jj], &c__1, &work_ref(j, j - 1), &c__1);
 	    i__2 = *n - j;
-	    dcopy_(&i__2, &ainv[jj + 1], &c__1, &work[j + j * work_dim1], 
-		    ldwork);
+	    dcopy_(&i__2, &ainv[jj + 1], &c__1, &work_ref(j, j), ldwork);
 	    jj = jj + *n - j + 1;
 /* L30: */
 	}
@@ -179,20 +174,20 @@ static doublereal c_b15 = 0.;
 /*        Multiply by A */
 
 	for (j = *n; j >= 2; --j) {
-	    dspmv_("Lower", n, &c_b13, &a[1], &work[(j - 1) * work_dim1 + 1], 
-		    &c__1, &c_b15, &work[j * work_dim1 + 1], &c__1);
+	    dspmv_("Lower", n, &c_b13, &a[1], &work_ref(1, j - 1), &c__1, &
+		    c_b15, &work_ref(1, j), &c__1);
 /* L40: */
 	}
-	dspmv_("Lower", n, &c_b13, &a[1], &ainv[1], &c__1, &c_b15, &work[
-		work_dim1 + 1], &c__1);
+	dspmv_("Lower", n, &c_b13, &a[1], &ainv[1], &c__1, &c_b15, &work_ref(
+		1, 1), &c__1);
 
     }
 
 /*     Add the identity matrix to WORK . */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	work[i + i * work_dim1] += 1.;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	work_ref(i__, i__) = work_ref(i__, i__) + 1.;
 /* L50: */
     }
 
@@ -207,4 +202,7 @@ static doublereal c_b15 = 0.;
 /*     End of DPPT03 */
 
 } /* dppt03_ */
+
+#undef work_ref
+
 

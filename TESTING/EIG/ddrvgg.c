@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@ static logical c_false = FALSE_;
 	logical *dotype, integer *iseed, doublereal *thresh, doublereal *
 	thrshn, integer *nounit, doublereal *a, integer *lda, doublereal *b, 
 	doublereal *s, doublereal *t, doublereal *s2, doublereal *t2, 
-	doublereal *q, integer *ldq, doublereal *z, doublereal *alphr1, 
+	doublereal *q, integer *ldq, doublereal *z__, doublereal *alphr1, 
 	doublereal *alphi1, doublereal *beta1, doublereal *alphr2, doublereal 
 	*alphi2, doublereal *beta2, doublereal *vl, doublereal *vr, 
 	doublereal *work, integer *lwork, doublereal *result, integer *info)
@@ -67,11 +68,11 @@ static logical c_false = FALSE_;
 	    " \002,a,\002 incorrectly \002,\002normalized.\002,/\002 Bits of "
 	    "error=\002,0p,g10.3,\002,\002,9x,\002N=\002,i6,\002, JTYPE=\002,"
 	    "i6,\002, ISEED=(\002,3(i5,\002,\002),i5,\002)\002)";
-    static char fmt_9994[] = "(/1x,a3,\002 -- Real Generalized eigenvalue pr"
+    static char fmt_9995[] = "(/1x,a3,\002 -- Real Generalized eigenvalue pr"
 	    "oblem driver\002)";
-    static char fmt_9993[] = "(\002 Matrix types (see DDRVGG for details):"
+    static char fmt_9994[] = "(\002 Matrix types (see DDRVGG for details):"
 	    " \002)";
-    static char fmt_9992[] = "(\002 Special Matrices:\002,23x,\002(J'=transp"
+    static char fmt_9993[] = "(\002 Special Matrices:\002,23x,\002(J'=transp"
 	    "osed Jordan block)\002,/\002   1=(0,0)  2=(I,0)  3=(0,I)  4=(I,I"
 	    ")  5=(J',J')  \002,\0026=(diag(J',I), diag(I,J'))\002,/\002 Diag"
 	    "onal Matrices:  ( \002,\002D=diag(0,1,2,...) )\002,/\002   7=(D,"
@@ -79,7 +80,7 @@ static logical c_false = FALSE_;
 	    "arge*D, large*I)\002,/\002   8=(I,D)  10=(small*D, large*I)  12="
 	    "(small*I, large*D) \002,\002 14=(small*D, small*I)\002,/\002  15"
 	    "=(D, reversed D)\002)";
-    static char fmt_9991[] = "(\002 Matrices Rotated by Random \002,a,\002 M"
+    static char fmt_9992[] = "(\002 Matrices Rotated by Random \002,a,\002 M"
 	    "atrices U, V:\002,/\002  16=Transposed Jordan Blocks            "
 	    " 19=geometric \002,\002alpha, beta=0,1\002,/\002  17=arithm. alp"
 	    "ha&beta             \002,\002      20=arithmetic alpha, beta=0,"
@@ -88,7 +89,7 @@ static logical c_false = FALSE_;
 	    "/\002  22=(large, small)   \002,\00223=(small,large)    24=(smal"
 	    "l,small)    25=(large,large)\002,/\002  26=random O(1) matrices"
 	    ".\002)";
-    static char fmt_9990[] = "(/\002 Tests performed:  (S is Schur, T is tri"
+    static char fmt_9991[] = "(/\002 Tests performed:  (S is Schur, T is tri"
 	    "angular, \002,\002Q and Z are \002,a,\002,\002,/20x,\002l and r "
 	    "are the appropriate left and right\002,/19x,\002eigenvectors, re"
 	    "sp., a is alpha, b is beta, and\002,/19x,a,\002 means \002,a,"
@@ -99,11 +100,11 @@ static logical c_false = FALSE_;
 	    ") and diagonals of\002,\002 (S,T)\002,/\002 6 = max | ( b A - a "
 	    "B )\002,a,\002 l | / const.   7 = max | ( b A - a B ) r | / cons"
 	    "t.\002,/1x)";
-    static char fmt_9989[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
-	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i2,\002 is\002"
+    static char fmt_9990[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
+	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i3,\002 is\002"
 	    ",0p,f8.2)";
-    static char fmt_9988[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
-	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i2,\002 is\002"
+    static char fmt_9989[] = "(\002 Matrix order=\002,i5,\002, type=\002,i2"
+	    ",\002, seed=\002,4(i4,\002,\002),\002 result \002,i3,\002 is\002"
 	    ",1p,d10.3)";
 
     /* System generated locals */
@@ -177,20 +178,28 @@ static logical c_false = FALSE_;
     static cilist io___51 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___52 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___53 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___54 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___55 = { 0, 0, 0, fmt_9993, 0 };
-    static cilist io___56 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___57 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___58 = { 0, 0, 0, fmt_9990, 0 };
-    static cilist io___59 = { 0, 0, 0, fmt_9989, 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9988, 0 };
+    static cilist io___54 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___55 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9993, 0 };
+    static cilist io___57 = { 0, 0, 0, fmt_9992, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9991, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9990, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9989, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define s_ref(a_1,a_2) s[(a_2)*s_dim1 + a_1]
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -250,10 +259,8 @@ static logical c_false = FALSE_;
 
     if alpha(j) is complex:   
                                     | det( s S - w T ) |   
-              D(j) = --------------------------------------------------- 
-  
-                     ulp max( s norm(S), |w| norm(T) )*norm( s S - w T ) 
-  
+              D(j) = ---------------------------------------------------   
+                     ulp max( s norm(S), |w| norm(T) )*norm( s S - w T )   
 
               and S and T are here the 2 x 2 diagonal blocks of S and T   
               corresponding to the j-th eigenvalue.   
@@ -262,8 +269,7 @@ static logical c_false = FALSE_;
 
     (6)   max over all left eigenvalue/-vector pairs (beta/alpha,l) of   
 
-       | l**H * (beta A - alpha B) | / ( ulp max( |beta A|, |alpha B| ) ) 
-  
+       | l**H * (beta A - alpha B) | / ( ulp max( |beta A|, |alpha B| ) )   
 
           where l**H is the conjugate tranpose of l.   
 
@@ -301,8 +307,7 @@ static logical c_false = FALSE_;
                           matrix with those diagonal entries.)   
     (8)  ( I, D )   
 
-    (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big 
-  
+    (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big   
 
     (10) ( small*D, big*I )   
 
@@ -317,11 +322,9 @@ static logical c_false = FALSE_;
     (15) ( D1, D2 )        where D1 is diag( 0, 0, 1, ..., N-3, 0 ) and   
                            D2 is diag( 0, N-3, N-4,..., 1, 0, 0 )   
               t   t   
-    (16) Q ( J , J ) Z     where Q and Z are random orthogonal matrices. 
-  
+    (16) Q ( J , J ) Z     where Q and Z are random orthogonal matrices.   
 
-    (17) Q ( T1, T2 ) Z    where T1 and T2 are upper triangular matrices 
-  
+    (17) Q ( T1, T2 ) Z    where T1 and T2 are upper triangular matrices   
                            with random O(1) entries above the diagonal   
                            and diagonal entries diag(T1) =   
                            ( 0, 0, 1, ..., N-3, 0 ) and diag(T2) =   
@@ -331,8 +334,7 @@ static logical c_false = FALSE_;
                            diag(T2) = ( 0, 1, 0, 1,..., 1, 0 )   
                            s = machine precision.   
 
-    (19) Q ( T1, T2 ) Z    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 ) 
-  
+    (19) Q ( T1, T2 ) Z    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 )   
                            diag(T2) = ( 0, 1, 0, 1, ..., 1, 0 )   
 
                                                            N-5   
@@ -343,20 +345,16 @@ static logical c_false = FALSE_;
                            diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 )   
                            where r1,..., r(N-4) are random.   
 
-    (22) Q ( big*T1, small*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) 
-  
+    (22) Q ( big*T1, small*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
                                      diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
 
-    (23) Q ( small*T1, big*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) 
-  
+    (23) Q ( small*T1, big*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
                                      diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
 
-    (24) Q ( small*T1, small*T2 ) Z  diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) 
-  
+    (24) Q ( small*T1, small*T2 ) Z  diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
                                      diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
 
-    (25) Q ( big*T1, big*T2 ) Z      diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) 
-  
+    (25) Q ( big*T1, big*T2 ) Z      diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
                                      diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
 
     (26) Q ( T1, T2 ) Z     where T1 and T2 are random upper-triangular   
@@ -438,30 +436,25 @@ static logical c_false = FALSE_;
             if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and   
             DOTYPE(MAXTYP+1)=.TRUE.   
 
-    S       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    S       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             The Schur form matrix computed from A by DGEGS.  On exit, S   
             contains the Schur form matrix corresponding to the matrix   
             in A.   
 
-    T       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    T       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             The upper triangular matrix computed from B by DGEGS.   
 
-    S2      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    S2      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             The matrix computed from A by DGEGV.  This will be the   
             Schur form of some matrix related to A, but will not, in   
             general, be the same as S.   
 
-    T2      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) 
-  
+    T2      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
             The matrix computed from B by DGEGV.  This will be the   
             Schur form of some matrix related to B, but will not, in   
             general, be the same as T.   
 
-    Q       (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN)) 
-  
+    Q       (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN))   
             The (left) orthogonal matrix computed by DGEGS.   
 
     LDQ     (input) INTEGER   
@@ -488,13 +481,11 @@ static logical c_false = FALSE_;
             ( ALPHR2(k)+ALPHI2(k)*i ) / BETA2(k) is the k-th   
             generalized eigenvalue of the matrices in A and B.   
 
-    VL      (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN)) 
-  
+    VL      (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN))   
             The (block lower triangular) left eigenvector matrix for   
             the matrices in A and B.  (See DTGEVC for the format.)   
 
-    VR      (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN)) 
-  
+    VR      (workspace) DOUBLE PRECISION array, dimension (LDQ, max(NN))   
             The (block upper triangular) right eigenvector matrix for   
             the matrices in A and B.  (See DTGEVC for the format.)   
 
@@ -519,42 +510,41 @@ static logical c_false = FALSE_;
             > 0:  A routine returned an error code.  INFO is the   
                   absolute value of the INFO value returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     t2_dim1 = *lda;
-    t2_offset = t2_dim1 + 1;
+    t2_offset = 1 + t2_dim1 * 1;
     t2 -= t2_offset;
     s2_dim1 = *lda;
-    s2_offset = s2_dim1 + 1;
+    s2_offset = 1 + s2_dim1 * 1;
     s2 -= s2_offset;
     t_dim1 = *lda;
-    t_offset = t_dim1 + 1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     s_dim1 = *lda;
-    s_offset = s_dim1 + 1;
+    s_offset = 1 + s_dim1 * 1;
     s -= s_offset;
     b_dim1 = *lda;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     vr_dim1 = *ldq;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     vl_dim1 = *ldq;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     z_dim1 = *ldq;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --alphr1;
     --alphi1;
@@ -584,19 +574,20 @@ static logical c_false = FALSE_;
 /* L10: */
     }
 
-/*     Maximum blocksize and shift -- we assume that blocksize and number 
-  
+/*     Maximum blocksize and shift -- we assume that blocksize and number   
        of shifts are monotone increasing functions of N.   
 
    Computing MAX */
     i__1 = 1, i__2 = ilaenv_(&c__1, "DGEQRF", " ", &nmax, &nmax, &c_n1, &c_n1,
-	     6L, 1L), i__1 = max(i__1,i__2), i__2 = ilaenv_(&c__1, "DORMQR", 
-	    "LT", &nmax, &nmax, &nmax, &c_n1, 6L, 2L), i__1 = max(i__1,i__2), 
-	    i__2 = ilaenv_(&c__1, "DORGQR", " ", &nmax, &nmax, &nmax, &c_n1, 
-	    6L, 1L);
+	     (ftnlen)6, (ftnlen)1), i__1 = max(i__1,i__2), i__2 = ilaenv_(&
+	    c__1, "DORMQR", "LT", &nmax, &nmax, &nmax, &c_n1, (ftnlen)6, (
+	    ftnlen)2), i__1 = max(i__1,i__2), i__2 = ilaenv_(&c__1, "DORGQR", 
+	    " ", &nmax, &nmax, &nmax, &c_n1, (ftnlen)6, (ftnlen)1);
     nb = max(i__1,i__2);
-    nbz = ilaenv_(&c__1, "DHGEQZ", "SII", &nmax, &c__1, &nmax, &c__0, 6L, 3L);
-    ns = ilaenv_(&c__4, "DHGEQZ", "SII", &nmax, &c__1, &nmax, &c__0, 6L, 3L);
+    nbz = ilaenv_(&c__1, "DHGEQZ", "SII", &nmax, &c__1, &nmax, &c__0, (ftnlen)
+	    6, (ftnlen)3);
+    ns = ilaenv_(&c__4, "DHGEQZ", "SII", &nmax, &c__1, &nmax, &c__0, (ftnlen)
+	    6, (ftnlen)3);
     i1 = nbz + ns;
 /* Computing MAX */
     i__1 = nmax * 6, i__2 = nmax * (nb + 1), i__1 = max(i__1,i__2), i__2 = ((
@@ -690,35 +681,23 @@ static logical c_false = FALSE_;
 
              Description of control parameters:   
 
-             KZLASS: =1 means w/o rotation, =2 means w/ rotation, 
-  
+             KZLASS: =1 means w/o rotation, =2 means w/ rotation,   
                      =3 means random.   
-             KATYPE: the "type" to be passed to DLATM4 for computi
-ng A.   
-             KAZERO: the pattern of zeros on the diagonal for A: 
-  
-                     =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0
- ),   
-                     =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 )
-,   
-                     =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string
- of   
+             KATYPE: the "type" to be passed to DLATM4 for computing A.   
+             KAZERO: the pattern of zeros on the diagonal for A:   
+                     =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0 ),   
+                     =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 ),   
+                     =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string of   
                      non-zero entries.)   
-             KAMAGN: the magnitude of the matrix: =0: zero, =1: O(
-1),   
+             KAMAGN: the magnitude of the matrix: =0: zero, =1: O(1),   
                      =2: large, =3: small.   
              IASIGN: 1 if the diagonal elements of A are to be   
-                     multiplied by a random magnitude 1 number, =2
- if   
-                     randomly chosen diagonal blocks are to be rot
-ated   
+                     multiplied by a random magnitude 1 number, =2 if   
+                     randomly chosen diagonal blocks are to be rotated   
                      to form 2x2 blocks.   
-             KBTYPE, KBZERO, KBMAGN, IBSIGN: the same, but for B. 
-  
-             KTRIAN: =0: don't fill in the upper triangle, =1: do.
-   
-             KZ1, KZ2, KADD: used to implement KAZERO and KBZERO. 
-  
+             KBTYPE, KBZERO, KBMAGN, IBSIGN: the same, but for B.   
+             KTRIAN: =0: don't fill in the upper triangle, =1: do.   
+             KZ1, KZ2, KADD: used to implement KAZERO and KBZERO.   
              RMAGN: used to implement KAMAGN and KBMAGN. */
 
 	    if (mtypes > 26) {
@@ -745,7 +724,7 @@ ated
 			a_offset], lda);
 		iadd = kadd[kazero[jtype - 1] - 1];
 		if (iadd > 0 && iadd <= n) {
-		    a[iadd + iadd * a_dim1] = 1.;
+		    a_ref(iadd, iadd) = 1.;
 		}
 
 /*              Generate B (w/o rotation) */
@@ -766,44 +745,41 @@ ated
 			b_offset], lda);
 		iadd = kadd[kbzero[jtype - 1] - 1];
 		if (iadd != 0 && iadd <= n) {
-		    b[iadd + iadd * b_dim1] = 1.;
+		    b_ref(iadd, iadd) = 1.;
 		}
 
 		if (kclass[jtype - 1] == 2 && n > 0) {
 
 /*                 Include rotations   
 
-                   Generate Q, Z as Householder transforma
-tions times   
+                   Generate Q, Z as Householder transformations times   
                    a diagonal matrix. */
 
 		    i__3 = n - 1;
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = jc; jr <= i__4; ++jr) {
-			    q[jr + jc * q_dim1] = dlarnd_(&c__3, &iseed[1]);
-			    z[jr + jc * z_dim1] = dlarnd_(&c__3, &iseed[1]);
+			    q_ref(jr, jc) = dlarnd_(&c__3, &iseed[1]);
+			    z___ref(jr, jc) = dlarnd_(&c__3, &iseed[1]);
 /* L40: */
 			}
 			i__4 = n + 1 - jc;
-			dlarfg_(&i__4, &q[jc + jc * q_dim1], &q[jc + 1 + jc * 
-				q_dim1], &c__1, &work[jc]);
-			work[(n << 1) + jc] = d_sign(&c_b42, &q[jc + jc * 
-				q_dim1]);
-			q[jc + jc * q_dim1] = 1.;
+			dlarfg_(&i__4, &q_ref(jc, jc), &q_ref(jc + 1, jc), &
+				c__1, &work[jc]);
+			work[(n << 1) + jc] = d_sign(&c_b42, &q_ref(jc, jc));
+			q_ref(jc, jc) = 1.;
 			i__4 = n + 1 - jc;
-			dlarfg_(&i__4, &z[jc + jc * z_dim1], &z[jc + 1 + jc * 
-				z_dim1], &c__1, &work[n + jc]);
-			work[n * 3 + jc] = d_sign(&c_b42, &z[jc + jc * z_dim1]
-				);
-			z[jc + jc * z_dim1] = 1.;
+			dlarfg_(&i__4, &z___ref(jc, jc), &z___ref(jc + 1, jc),
+				 &c__1, &work[n + jc]);
+			work[n * 3 + jc] = d_sign(&c_b42, &z___ref(jc, jc));
+			z___ref(jc, jc) = 1.;
 /* L50: */
 		    }
-		    q[n + n * q_dim1] = 1.;
+		    q_ref(n, n) = 1.;
 		    work[n] = 0.;
 		    d__1 = dlarnd_(&c__2, &iseed[1]);
 		    work[n * 3] = d_sign(&c_b42, &d__1);
-		    z[n + n * z_dim1] = 1.;
+		    z___ref(n, n) = 1.;
 		    work[n * 2] = 0.;
 		    d__1 = dlarnd_(&c__2, &iseed[1]);
 		    work[n * 4] = d_sign(&c_b42, &d__1);
@@ -814,10 +790,10 @@ tions times
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = 1; jr <= i__4; ++jr) {
-			    a[jr + jc * a_dim1] = work[(n << 1) + jr] * work[
-				    n * 3 + jc] * a[jr + jc * a_dim1];
-			    b[jr + jc * b_dim1] = work[(n << 1) + jr] * work[
-				    n * 3 + jc] * b[jr + jc * b_dim1];
+			    a_ref(jr, jc) = work[(n << 1) + jr] * work[n * 3 
+				    + jc] * a_ref(jr, jc);
+			    b_ref(jr, jc) = work[(n << 1) + jr] * work[n * 3 
+				    + jc] * b_ref(jr, jc);
 /* L60: */
 			}
 /* L70: */
@@ -830,9 +806,9 @@ tions times
 			goto L100;
 		    }
 		    i__3 = n - 1;
-		    dorm2r_("R", "T", &n, &n, &i__3, &z[z_offset], ldq, &work[
-			    n + 1], &a[a_offset], lda, &work[(n << 1) + 1], &
-			    iinfo);
+		    dorm2r_("R", "T", &n, &n, &i__3, &z__[z_offset], ldq, &
+			    work[n + 1], &a[a_offset], lda, &work[(n << 1) + 
+			    1], &iinfo);
 		    if (iinfo != 0) {
 			goto L100;
 		    }
@@ -844,9 +820,9 @@ tions times
 			goto L100;
 		    }
 		    i__3 = n - 1;
-		    dorm2r_("R", "T", &n, &n, &i__3, &z[z_offset], ldq, &work[
-			    n + 1], &b[b_offset], lda, &work[(n << 1) + 1], &
-			    iinfo);
+		    dorm2r_("R", "T", &n, &n, &i__3, &z__[z_offset], ldq, &
+			    work[n + 1], &b[b_offset], lda, &work[(n << 1) + 
+			    1], &iinfo);
 		    if (iinfo != 0) {
 			goto L100;
 		    }
@@ -859,10 +835,10 @@ tions times
 		for (jc = 1; jc <= i__3; ++jc) {
 		    i__4 = n;
 		    for (jr = 1; jr <= i__4; ++jr) {
-			a[jr + jc * a_dim1] = rmagn[kamagn[jtype - 1]] * 
-				dlarnd_(&c__2, &iseed[1]);
-			b[jr + jc * b_dim1] = rmagn[kbmagn[jtype - 1]] * 
-				dlarnd_(&c__2, &iseed[1]);
+			a_ref(jr, jc) = rmagn[kamagn[jtype - 1]] * dlarnd_(&
+				c__2, &iseed[1]);
+			b_ref(jr, jc) = rmagn[kbmagn[jtype - 1]] * dlarnd_(&
+				c__2, &iseed[1]);
 /* L80: */
 		    }
 /* L90: */
@@ -874,7 +850,7 @@ L100:
 	    if (iinfo != 0) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -894,12 +870,12 @@ L110:
 	    result[1] = ulpinv;
 
 	    dgegs_("V", "V", &n, &s[s_offset], lda, &t[t_offset], lda, &
-		    alphr1[1], &alphi1[1], &beta1[1], &q[q_offset], ldq, &z[
+		    alphr1[1], &alphi1[1], &beta1[1], &q[q_offset], ldq, &z__[
 		    z_offset], ldq, &work[1], lwork, &iinfo);
 	    if (iinfo != 0) {
 		io___43.ciunit = *nounit;
 		s_wsfe(&io___43);
-		do_fio(&c__1, "DGEGS", 5L);
+		do_fio(&c__1, "DGEGS", (ftnlen)5);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -914,13 +890,16 @@ L110:
 /*           Do tests 1--4 */
 
 	    dget51_(&c__1, &n, &a[a_offset], lda, &s[s_offset], lda, &q[
-		    q_offset], ldq, &z[z_offset], ldq, &work[1], &result[1]);
+		    q_offset], ldq, &z__[z_offset], ldq, &work[1], &result[1])
+		    ;
 	    dget51_(&c__1, &n, &b[b_offset], lda, &t[t_offset], lda, &q[
-		    q_offset], ldq, &z[z_offset], ldq, &work[1], &result[2]);
+		    q_offset], ldq, &z__[z_offset], ldq, &work[1], &result[2])
+		    ;
 	    dget51_(&c__3, &n, &b[b_offset], lda, &t[t_offset], lda, &q[
 		    q_offset], ldq, &q[q_offset], ldq, &work[1], &result[3]);
-	    dget51_(&c__3, &n, &b[b_offset], lda, &t[t_offset], lda, &z[
-		    z_offset], ldq, &z[z_offset], ldq, &work[1], &result[4]);
+	    dget51_(&c__3, &n, &b[b_offset], lda, &t[t_offset], lda, &z__[
+		    z_offset], ldq, &z__[z_offset], ldq, &work[1], &result[4])
+		    ;
 
 /*           Do test 5: compare eigenvalues with diagonals.   
              Also check Schur form of A. */
@@ -933,22 +912,22 @@ L110:
 		if (alphi1[j] == 0.) {
 /* Computing MAX */
 		    d__7 = safmin, d__8 = (d__2 = alphr1[j], abs(d__2)), d__7 
-			    = max(d__7,d__8), d__8 = (d__3 = s[j + j * s_dim1]
-			    , abs(d__3));
+			    = max(d__7,d__8), d__8 = (d__3 = s_ref(j, j), abs(
+			    d__3));
 /* Computing MAX */
 		    d__9 = safmin, d__10 = (d__5 = beta1[j], abs(d__5)), d__9 
-			    = max(d__9,d__10), d__10 = (d__6 = t[j + j * 
-			    t_dim1], abs(d__6));
-		    temp2 = ((d__1 = alphr1[j] - s[j + j * s_dim1], abs(d__1))
-			     / max(d__7,d__8) + (d__4 = beta1[j] - t[j + j * 
-			    t_dim1], abs(d__4)) / max(d__9,d__10)) / ulp;
+			    = max(d__9,d__10), d__10 = (d__6 = t_ref(j, j), 
+			    abs(d__6));
+		    temp2 = ((d__1 = alphr1[j] - s_ref(j, j), abs(d__1)) / 
+			    max(d__7,d__8) + (d__4 = beta1[j] - t_ref(j, j), 
+			    abs(d__4)) / max(d__9,d__10)) / ulp;
 		    if (j < n) {
-			if (s[j + 1 + j * s_dim1] != 0.) {
+			if (s_ref(j + 1, j) != 0.) {
 			    ilabad = TRUE_;
 			}
 		    }
 		    if (j > 1) {
-			if (s[j + (j - 1) * s_dim1] != 0.) {
+			if (s_ref(j, j - 1) != 0.) {
 			    ilabad = TRUE_;
 			}
 		    }
@@ -961,18 +940,18 @@ L110:
 		    if (i1 <= 0 || i1 >= n) {
 			ilabad = TRUE_;
 		    } else if (i1 < n - 1) {
-			if (s[i1 + 2 + (i1 + 1) * s_dim1] != 0.) {
+			if (s_ref(i1 + 2, i1 + 1) != 0.) {
 			    ilabad = TRUE_;
 			}
 		    } else if (i1 > 1) {
-			if (s[i1 + (i1 - 1) * s_dim1] != 0.) {
+			if (s_ref(i1, i1 - 1) != 0.) {
 			    ilabad = TRUE_;
 			}
 		    }
 		    if (! ilabad) {
-			dget53_(&s[i1 + i1 * s_dim1], lda, &t[i1 + i1 * 
-				t_dim1], lda, &beta1[j], &alphr1[j], &alphi1[
-				j], &temp2, &iinfo);
+			dget53_(&s_ref(i1, i1), lda, &t_ref(i1, i1), lda, &
+				beta1[j], &alphr1[j], &alphi1[j], &temp2, &
+				iinfo);
 			if (iinfo >= 3) {
 			    io___47.ciunit = *nounit;
 			    s_wsfe(&io___47);
@@ -1008,8 +987,7 @@ L110:
 	    }
 	    result[5] = temp1;
 
-/*           Call DGEGV to compute S2, T2, VL, and VR, do tests. 
-  
+/*           Call DGEGV to compute S2, T2, VL, and VR, do tests.   
 
              Eigenvalues and Eigenvectors */
 
@@ -1024,7 +1002,7 @@ L110:
 	    if (iinfo != 0) {
 		io___49.ciunit = *nounit;
 		s_wsfe(&io___49);
-		do_fio(&c__1, "DGEGV", 5L);
+		do_fio(&c__1, "DGEGV", (ftnlen)5);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1045,8 +1023,8 @@ L110:
 	    if (dumma[1] > *thrshn) {
 		io___51.ciunit = *nounit;
 		s_wsfe(&io___51);
-		do_fio(&c__1, "Left", 4L);
-		do_fio(&c__1, "DGEGV", 5L);
+		do_fio(&c__1, "Left", (ftnlen)4);
+		do_fio(&c__1, "DGEGV", (ftnlen)5);
 		do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(doublereal));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1061,8 +1039,8 @@ L110:
 	    if (dumma[1] > *thresh) {
 		io___52.ciunit = *nounit;
 		s_wsfe(&io___52);
-		do_fio(&c__1, "Right", 5L);
-		do_fio(&c__1, "DGEGV", 5L);
+		do_fio(&c__1, "Right", (ftnlen)5);
+		do_fio(&c__1, "DGEGV", (ftnlen)5);
 		do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(doublereal));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1119,7 +1097,7 @@ L140:
 		    if (nerrs == 0) {
 			io___54.ciunit = *nounit;
 			s_wsfe(&io___54);
-			do_fio(&c__1, "DGG", 3L);
+			do_fio(&c__1, "DGG", (ftnlen)3);
 			e_wsfe();
 
 /*                    Matrix types */
@@ -1132,18 +1110,18 @@ L140:
 			e_wsfe();
 			io___57.ciunit = *nounit;
 			s_wsfe(&io___57);
-			do_fio(&c__1, "Orthogonal", 10L);
+			do_fio(&c__1, "Orthogonal", (ftnlen)10);
 			e_wsfe();
 
 /*                    Tests performed */
 
 			io___58.ciunit = *nounit;
 			s_wsfe(&io___58);
-			do_fio(&c__1, "orthogonal", 10L);
-			do_fio(&c__1, "'", 1L);
-			do_fio(&c__1, "transpose", 9L);
+			do_fio(&c__1, "orthogonal", (ftnlen)10);
+			do_fio(&c__1, "'", (ftnlen)1);
+			do_fio(&c__1, "transpose", (ftnlen)9);
 			for (j = 1; j <= 5; ++j) {
-			    do_fio(&c__1, "'", 1L);
+			    do_fio(&c__1, "'", (ftnlen)1);
 			}
 			e_wsfe();
 
@@ -1193,13 +1171,19 @@ L160:
 
 
 
-/* L9995:   
 
 
 
 
-
-       End of DDRVGG */
+/*     End of DDRVGG */
 
 } /* ddrvgg_ */
+
+#undef z___ref
+#undef t_ref
+#undef s_ref
+#undef q_ref
+#undef b_ref
+#undef a_ref
+
 

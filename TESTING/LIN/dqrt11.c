@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -31,7 +32,7 @@ doublereal dqrt11_(integer *m, integer *k, doublereal *a, integer *lda,
     static doublereal rdummy[1];
 
 
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -49,8 +50,7 @@ doublereal dqrt11_(integer *m, integer *k, doublereal *a, integer *lda,
 
        H(k) = I - tau(k) v(k) v(k)'   
 
-    where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form 
-  
+    where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form   
     [ 0 ... 0 1 x(k) ]', where x(k) is a vector of length m-k stored   
     in A(k+1:m,k).   
 
@@ -71,8 +71,7 @@ doublereal dqrt11_(integer *m, integer *k, doublereal *a, integer *lda,
             The leading dimension of the array A.   
 
     TAU     (input) DOUBLE PRECISION array, dimension (K)   
-            The scaling factors tau for the elementary transformations as 
-  
+            The scaling factors tau for the elementary transformations as   
             computed by the QR factorization routine.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
@@ -80,13 +79,12 @@ doublereal dqrt11_(integer *m, integer *k, doublereal *a, integer *lda,
     LWORK   (input) INTEGER   
             The length of the array WORK.  LWORK >= M*M + M.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;

@@ -1,25 +1,12 @@
-/*  -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
+#include "blaswrap.h"
 #include "f2c.h"
 
 logical lsame_(char *ca, char *cb)
 {
-
-
-    /* System generated locals */
-    logical ret_val;
-
-    /* Local variables */
-    static integer inta, intb, zcode;
-
-
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       January 31, 1994   
+       September 30, 1994   
 
 
     Purpose   
@@ -40,6 +27,11 @@ logical lsame_(char *ca, char *cb)
 
 
        Test if the characters are equal */
+    /* System generated locals */
+    logical ret_val;
+    /* Local variables */
+    static integer inta, intb, zcode;
+
 
     ret_val = *(unsigned char *)ca == *(unsigned char *)cb;
     if (ret_val) {

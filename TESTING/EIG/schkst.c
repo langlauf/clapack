@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,14 +17,16 @@ static integer c__6 = 6;
 static real c_b39 = 1.f;
 static integer c__4 = 4;
 static integer c__3 = 3;
+static integer c__10 = 10;
+static integer c__11 = 11;
 
 /* Subroutine */ int schkst_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, real *
 	a, integer *lda, real *ap, real *sd, real *se, real *d1, real *d2, 
 	real *d3, real *d4, real *d5, real *wa1, real *wa2, real *wa3, real *
-	wr, real *u, integer *ldu, real *v, real *vp, real *tau, real *z, 
-	real *work, integer *lwork, integer *iwork, real *result, integer *
-	info)
+	wr, real *u, integer *ldu, real *v, real *vp, real *tau, real *z__, 
+	real *work, integer *lwork, integer *iwork, integer *liwork, real *
+	result, integer *info)
 {
     /* Initialized data */
 
@@ -59,37 +62,8 @@ static integer c__3 = 3;
 	    "\002,/\002 20=Positive definite, large evenly spaced eigenvalue"
 	    "s\002,/\002 21=Diagonally dominant tridiagonal, geometrically"
 	    "\002,\002 spaced eigenvalues\002)";
-    static char fmt_9993[] = "(/\002 Tests performed:   \002,\002(S is Tridi"
-	    "ag, D is diagonal, U and Z are \002,a,\002,\002,/20x,a,\002, W i"
-	    "s a diagonal matrix of eigenvalues,\002,/20x,\002 V is U represe"
-	    "nted by Householder vectors, and\002,/20x,\002 Y is a matrix of "
-	    "eigenvectors of S.)\002,/\002 SSYTRD, UPLO='U':\002,/\002  1= | "
-	    "A - V S V\002,a1,\002 | / ( |A| n ulp )     \002,\002  2= | I - "
-	    "U V\002,a1,\002 | / ( n ulp )\002,/\002 SSYTRD, UPLO='L':\002,"
-	    "/\002  3= | A - V S V\002,a1,\002 | / ( |A| n ulp )     \002,"
-	    "\002  4= | I - U V\002,a1,\002 | / ( n ulp )\002)";
-    static char fmt_9992[] = "(\002 SSPTRD, UPLO='U':\002,/\002  5= | A - V "
-	    "S V\002,a1,\002 | / ( |A| n ulp )     \002,\002  6= | I - U V"
-	    "\002,a1,\002 | / ( n ulp )\002,/\002 SSPTRD, UPLO='L':\002,/\002"
-	    "  7= | A - V S V\002,a1,\002 | / ( |A| n ulp )     \002,\002  8="
-	    " | I - U V\002,a1,\002 | / ( n ulp )\002,/\002  9= | S - Z D "
-	    "Z\002,a1,\002 | / ( |S| n ulp )     \002,\002 10= | I - Z Z\002,"
-	    "a1,\002 | / ( n ulp )\002,/\002 11= |D(with Z) - D(w/o Z)| / (|D"
-	    "| ulp) \002,\002 12= | D(PWK) - D(QR) | / (|D| ulp)\002,/\002 13"
-	    "=   Sturm sequence test on W         \002)";
-    static char fmt_9991[] = "(\002 14= | S - Z4 D4 Z4\002,a1,\002 | / (|S| "
-	    "n ulp)\002,/\002 15= | I - Z4 Z4\002,a1,\002 | / (n ulp ) \002"
-	    ",\002 16= | D4 - D5 | / ( 100 |D4| ulp ) \002,/\002 17= max | D4"
-	    "(i) - WR(i) | / ( |D4(i)| (2n-1) ulp )\002,/\002 18= | WA1 - D3 "
-	    "| / ( |D3| ulp )\002,/\002 19= max | WA2(i) - WA3(ii) | / ( |D3|"
-	    " ulp )\002,/\002 20= | S - Y WA1 Y\002,a1,\002 | / ( |S| n ulp "
-	    ")\002,/\002 21= | I - Y Y\002,a1,\002 | / ( n ulp )\002)";
-    static char fmt_9989[] = "(\002 22= | S - Z D Z\002,a1,\002| / ( |S| n u"
-	    "lp ) for SSTEDC(I)\002,/\002 23= | I - Z Z\002,a1,\002| / ( n ul"
-	    "p )       for SSTEDC(I)\002,/\002 24= | S - Z D Z\002,a1,\002| /"
-	    " ( |S| n ulp ) for SSTEDC(V)\002,/\002 25= | I - Z Z\002,a1,\002"
-	    "| / ( n ulp )       for SSTEDC(V)\002,/\002 26= | D1(SSTEDC(V)) "
-	    "- D2(SSTEDC(N)) | / ( |D1| ulp )\002)";
+    static char fmt_9988[] = "(/\002Test performed:  see SCHKST for details"
+	    ".\002,/)";
     static char fmt_9990[] = "(\002 N=\002,i5,\002, seed=\002,4(i4,\002,\002"
 	    "),\002 type \002,i2,\002, test(\002,i2,\002)=\002,g10.3)";
 
@@ -107,7 +81,7 @@ static integer c__3 = 3;
     static real cond;
     static integer nmax;
     static real unfl, ovfl, temp1, temp2, temp3, temp4;
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     static logical badnn;
     extern doublereal ssxt1_(integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *);
@@ -120,10 +94,11 @@ static integer c__3 = 3;
 	    integer *), sspt21_(integer *, char *, integer *, integer *, real 
 	    *, real *, real *, real *, integer *, real *, real *, real *, 
 	    real *), sstt21_(integer *, integer *, real *, real *, 
-	    real *, real *, real *, integer *, real *, real *), ssyt21_(
-	    integer *, char *, integer *, integer *, real *, integer *, real *
-	    , real *, real *, integer *, real *, integer *, real *, real *, 
-	    real *);
+	    real *, real *, real *, integer *, real *, real *), sstt22_(
+	    integer *, integer *, integer *, real *, real *, real *, real *, 
+	    real *, integer *, real *, integer *, real *), ssyt21_(integer *, 
+	    char *, integer *, integer *, real *, integer *, real *, real *, 
+	    real *, integer *, real *, integer *, real *, real *, real *);
     static integer iseed2[4], log2ui, jc, il;
     extern /* Subroutine */ int slabad_(real *, real *);
     static integer jr, iu;
@@ -154,8 +129,10 @@ static integer c__3 = 3;
 	    integer *, real *, integer *), slasum_(
 	    char *, integer *, integer *, integer *), sstein_(integer 
 	    *, real *, real *, integer *, real *, integer *, integer *, real *
-	    , integer *, real *, integer *, integer *, integer *), ssterf_(
-	    integer *, real *, real *, integer *);
+	    , integer *, real *, integer *, integer *, integer *), sstegr_(
+	    char *, char *, integer *, real *, real *, real *, real *, 
+	    integer *, integer *, real *, integer *, real *, real *, integer *
+	    , integer *, real *, integer *, integer *, integer *, integer *);
     static integer nsplit;
     static real rtovfl;
     static integer mtypes, ntestt;
@@ -169,8 +146,9 @@ static integer c__3 = 3;
 	    , char *, integer *, real *, real *, integer *, integer *, real *,
 	     real *, real *, integer *, integer *, real *, integer *, integer 
 	    *, real *, integer *, integer *), ssteqr_(char *, 
-	    integer *, real *, real *, real *, integer *, real *, integer *), ssytrd_(char *, integer *, real *, integer *, real *, 
-	    real *, real *, real *, integer *, integer *);
+	    integer *, real *, real *, real *, integer *, real *, integer *), ssterf_(integer *, real *, real *, integer *), ssytrd_(
+	    char *, integer *, real *, integer *, real *, real *, real *, 
+	    real *, integer *, integer *);
     static integer nap, lgn;
     static real ulp;
 
@@ -198,23 +176,31 @@ static integer c__3 = 3;
     static cilist io___74 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___75 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___76 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___77 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___78 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___79 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___80 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___81 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___82 = { 0, 0, 0, fmt_9993, 0 };
-    static cilist io___83 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___84 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___85 = { 0, 0, 0, fmt_9989, 0 };
-    static cilist io___86 = { 0, 0, 0, fmt_9990, 0 };
+    static cilist io___77 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___78 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___79 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___80 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___81 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___82 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___83 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___84 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___85 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___86 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___87 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___90 = { 0, 0, 0, fmt_9988, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9990, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -266,70 +252,123 @@ static integer c__3 = 3;
        from SSYTRD/SORGTR or SSPTRD/SOPGTR ('V' option). It may   
        also just compute eigenvalues ('N' option).   
 
+       SSTEGR factors S as Z D1 Z' , where Z is the orthogonal   
+       matrix of eigenvectors and D1 is a diagonal matrix with   
+       the eigenvalues on the diagonal ('I' option).  SSTEGR   
+       uses the Relatively Robust Representation whenever possible.   
+
     When SCHKST is called, a number of matrix "sizes" ("n's") and a   
     number of matrix "types" are specified.  For each size ("n")   
     and each type of matrix, one matrix will be generated and used   
     to test the symmetric eigenroutines.  For each matrix, a number   
     of tests will be performed:   
 
-    (1)     | A - V S V' | / ( |A| n ulp )  computed by SSYTRD with   
-                                            UPLO='U'   
+    (1)     | A - V S V' | / ( |A| n ulp ) SSYTRD( UPLO='U', ... )   
 
-    (2)     | I - UV' | / ( n ulp )         test of SORGTR w/ UPLO='U'   
+    (2)     | I - UV' | / ( n ulp )        SORGTR( UPLO='U', ... )   
 
-    (3)     | A - V S V' | / ( |A| n ulp )  computed by SSYTRD with   
-                                            UPLO='L'   
+    (3)     | A - V S V' | / ( |A| n ulp ) SSYTRD( UPLO='L', ... )   
 
-    (4)     | I - UV' | / ( n ulp )         test of SORGTR w/ UPLO='L'   
+    (4)     | I - UV' | / ( n ulp )        SORGTR( UPLO='L', ... )   
 
-    (5-8)   Same, but for SSPTRD and SOPGTR.   
+    (5-8)   Same as 1-4, but for SSPTRD and SOPGTR.   
 
-    (9)     | S - Z D Z' | / ( |S| n ulp )   
+    (9)     | S - Z D Z' | / ( |S| n ulp ) SSTEQR('V',...)   
 
-    (10)    | I - ZZ' | / ( n ulp )   
+    (10)    | I - ZZ' | / ( n ulp )        SSTEQR('V',...)   
 
-    (11)    | D1 - D2 | / ( |D1| ulp )   
+    (11)    | D1 - D2 | / ( |D1| ulp )        SSTEQR('N',...)   
 
-    (12)    | D1 - D3 | / ( |D1| ulp )   
+    (12)    | D1 - D3 | / ( |D1| ulp )        SSTERF   
 
-    (13)    0 if the true eigenvalues of S are within THRESH of   
+    (13)    0 if the true eigenvalues (computed by sturm count)   
+            of S are within THRESH of   
             those in D1.  2*THRESH if they are not.  (Tested using   
             SSTECH)   
 
     For S positive definite,   
 
-    (14)    | S - Z4 D4 Z4' | / ( |S| n ulp )   
+    (14)    | S - Z4 D4 Z4' | / ( |S| n ulp ) SPTEQR('V',...)   
 
-    (15)    | I - Z4 Z4' | / ( n ulp )   
+    (15)    | I - Z4 Z4' | / ( n ulp )        SPTEQR('V',...)   
 
-    (16)    | D4 - D5 | / ( 100 |D4| ulp )   
+    (16)    | D4 - D5 | / ( 100 |D4| ulp )       SPTEQR('N',...)   
 
     When S is also diagonally dominant by the factor gamma < 1,   
 
     (17)    max | D4(i) - WR(i) | / ( |D4(i)| omega ) ,   
              i   
             omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
+                                                 SSTEBZ( 'A', 'E', ...)   
 
-    (18)    | WA1 - D3 | / ( |D3| ulp )   
+    (18)    | WA1 - D3 | / ( |D3| ulp )          SSTEBZ( 'A', 'E', ...)   
 
     (19)    ( max { min | WA2(i)-WA3(j) | } +   
                i     j   
               max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
                i     j   
+                                                 SSTEBZ( 'I', 'E', ...)   
 
-    (20)    | S - Y WA1 Y' | / ( |S| n ulp )   
+    (20)    | S - Y WA1 Y' | / ( |S| n ulp )  SSTEBZ, SSTEIN   
 
-    (21)    | I - Y Y' | / ( n ulp )   
+    (21)    | I - Y Y' | / ( n ulp )          SSTEBZ, SSTEIN   
 
-    (22)    | S - Z D Z' | / ( |S| n ulp ) for SSTEDC('I')   
+    (22)    | S - Z D Z' | / ( |S| n ulp )    SSTEDC('I')   
 
-    (23)    | I - ZZ' | / ( n ulp ) for SSTEDC('I')   
+    (23)    | I - ZZ' | / ( n ulp )           SSTEDC('I')   
 
-    (24)    | S - Z D Z' | / ( |S| n ulp ) for SSTEDC('V')   
+    (24)    | S - Z D Z' | / ( |S| n ulp )    SSTEDC('V')   
 
-    (25)    | I - ZZ' | / ( n ulp ) for SSTEDC('V')   
+    (25)    | I - ZZ' | / ( n ulp )           SSTEDC('V')   
 
-    (26)    | D1 - D2 | / ( |D1| ulp ) for SSTEDC('V') and SSTEDC('N')   
+    (26)    | D1 - D2 | / ( |D1| ulp )           SSTEDC('V') and   
+                                                 SSTEDC('N')   
+
+    Test 27 is disabled at the moment because SSTEGR does not   
+    guarantee high relatvie accuracy.   
+
+    (27)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) ,   
+             i   
+            omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
+                                                 SSTEGR('V', 'A')   
+
+    (28)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) ,   
+             i   
+            omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
+                                                 SSTEGR('V', 'I')   
+
+    Tests 29 through 34 are disable at present because @9pre)STEGR   
+    does not handle partial specturm requests.   
+
+    (29)    | S - Z D Z' | / ( |S| n ulp )    SSTEGR('V', 'I')   
+
+    (30)    | I - ZZ' | / ( n ulp )           SSTEGR('V', 'I')   
+
+    (31)    ( max { min | WA2(i)-WA3(j) | } +   
+               i     j   
+              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
+               i     j   
+            SSTEGR('N', 'I') vs. SSTEGR('V', 'I')   
+
+    (32)    | S - Z D Z' | / ( |S| n ulp )    SSTEGR('V', 'V')   
+
+    (33)    | I - ZZ' | / ( n ulp )           SSTEGR('V', 'V')   
+
+    (34)    ( max { min | WA2(i)-WA3(j) | } +   
+               i     j   
+              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
+               i     j   
+            SSTEGR('N', 'V') vs. SSTEGR('V', 'V')   
+
+    (35)    | S - Z D Z' | / ( |S| n ulp )    SSTEGR('V', 'A')   
+
+    (36)    | I - ZZ' | / ( n ulp )           SSTEGR('V', 'A')   
+
+    (37)    ( max { min | WA2(i)-WA3(j) | } +   
+               i     j   
+              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
+               i     j   
+            SSTEGR('N', 'A') vs. SSTEGR('V', 'A')   
 
     The "sizes" are specified by an array NN(1:NSIZES); the value of   
     each element NN(j) specifies one size.   
@@ -390,7 +429,7 @@ static integer c__3 = 3;
             zero.   
 
     NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, SCHK22   
+            The number of elements in DOTYPE.   If it is zero, SCHKST   
             does nothing.  It must be at least zero.  If it is MAXTYP+1   
             and NSIZES is 1, then an additional type, MAXTYP+1 is   
             defined, which is to use whatever matrix is in A.  This   
@@ -477,16 +516,14 @@ static integer c__3 = 3;
             The orthogonal matrix computed by SSYTRD + SORGTR.   
 
     LDU     (input) INTEGER   
-            The leading dimension of U, Z, and V.  It must be at least 1 
-  
+            The leading dimension of U, Z, and V.  It must be at least 1   
             and at least max( NN ).   
 
     V       (workspace/output) REAL array of   
                                dimension( LDU, max(NN) ).   
             The Housholder vectors computed by SSYTRD in reducing A to   
             tridiagonal form.  The vectors computed with UPLO='U' are   
-            in the upper triangle, and the vectors computed with UPLO='L' 
-  
+            in the upper triangle, and the vectors computed with UPLO='L'   
             are in the lower triangle.  (As described in SSYTRD, the   
             sub- and superdiagonal are not set to 1, although the   
             true Householder vector has a 1 in that position.  The   
@@ -507,16 +544,15 @@ static integer c__3 = 3;
             The orthogonal matrix of eigenvectors computed by SSTEQR,   
             SPTEQR, and SSTEIN.   
 
-    WORK    (workspace) REAL array of   
+    WORK    (workspace/output) REAL array of   
                         dimension( LWORK )   
-            Workspace.   
 
     LWORK   (input) INTEGER   
             The number of entries in WORK.  This must be at least   
             1 + 4 * Nmax + 2 * Nmax * lg Nmax + 3 * Nmax**2   
             where Nmax = max( NN(j), 2 ) and lg = log base 2.   
 
-    IWORK   (workspace) INTEGER array,   
+    IWORK   (workspace/output) INTEGER array,   
                dimension (6 + 6*Nmax + 5 * Nmax * lg Nmax )   
             where Nmax = max( NN(j), 2 ) and lg = log base 2.   
             Workspace.   
@@ -539,8 +575,7 @@ static integer c__3 = 3;
                 or SORMC2 returns an error code, the   
                 absolute value of it is returned.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -567,15 +602,14 @@ static integer c__3 = 3;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --ap;
     --sd;
@@ -590,13 +624,13 @@ static integer c__3 = 3;
     --wa3;
     --wr;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --vp;
     --tau;
@@ -606,7 +640,10 @@ static integer c__3 = 3;
 
     /* Function Body   
 
-       Check for errors */
+       Keep ftnchek happy */
+    idumma[0] = 1;
+
+/*     Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -626,8 +663,8 @@ static integer c__3 = 3;
 /* L10: */
     }
 
-    nblock = ilaenv_(&c__1, "SSYTRD", "L", &nmax, &c_n1, &c_n1, &c_n1, 6L, 1L)
-	    ;
+    nblock = ilaenv_(&c__1, "SSYTRD", "L", &nmax, &c_n1, &c_n1, &c_n1, (
+	    ftnlen)6, (ftnlen)1);
 /* Computing MIN */
     i__1 = nmax, i__2 = max(1,nblock);
     nblock = min(i__1,i__2);
@@ -677,8 +714,8 @@ static integer c__3 = 3;
 
 /*     Loop over sizes, types */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed2[i - 1] = iseed[i];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed2[i__ - 1] = iseed[i__];
 /* L20: */
     }
     nerrs = 0;
@@ -715,7 +752,7 @@ static integer c__3 = 3;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L240;
+		goto L300;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -739,8 +776,7 @@ static integer c__3 = 3;
              =7                      random diagonal   
              =8                      random symmetric   
              =9                      positive definite   
-             =10                     diagonally dominant tridiagon
-al */
+             =10                     diagonally dominant tridiagonal */
 
 	    if (mtypes > 21) {
 		goto L100;
@@ -792,7 +828,7 @@ L70:
 
 		i__3 = n;
 		for (jc = 1; jc <= i__3; ++jc) {
-		    a[jc + jc * a_dim1] = anorm;
+		    a_ref(jc, jc) = anorm;
 /* L80: */
 		}
 
@@ -803,6 +839,7 @@ L70:
 		slatms_(&n, &n, "S", &iseed[1], "S", &work[1], &imode, &cond, 
 			&anorm, &c__0, &c__0, "N", &a[a_offset], lda, &work[n 
 			+ 1], &iinfo);
+
 
 	    } else if (itype == 5) {
 
@@ -842,22 +879,20 @@ L70:
 
 	    } else if (itype == 10) {
 
-/*              Positive definite tridiagonal, eigenvalues spe
-cified. */
+/*              Positive definite tridiagonal, eigenvalues specified. */
 
 		slatms_(&n, &n, "S", &iseed[1], "P", &work[1], &imode, &cond, 
 			&anorm, &c__1, &c__1, "N", &a[a_offset], lda, &work[n 
 			+ 1], &iinfo);
 		i__3 = n;
-		for (i = 2; i <= i__3; ++i) {
-		    temp1 = (r__1 = a[i - 1 + i * a_dim1], dabs(r__1)) / sqrt(
-			    (r__2 = a[i - 1 + (i - 1) * a_dim1] * a[i + i * 
-			    a_dim1], dabs(r__2)));
+		for (i__ = 2; i__ <= i__3; ++i__) {
+		    temp1 = (r__1 = a_ref(i__ - 1, i__), dabs(r__1)) / sqrt((
+			    r__2 = a_ref(i__ - 1, i__ - 1) * a_ref(i__, i__), 
+			    dabs(r__2)));
 		    if (temp1 > .5f) {
-			a[i - 1 + i * a_dim1] = sqrt((r__1 = a[i - 1 + (i - 1)
-				 * a_dim1] * a[i + i * a_dim1], dabs(r__1))) *
-				 .5f;
-			a[i + (i - 1) * a_dim1] = a[i - 1 + i * a_dim1];
+			a_ref(i__ - 1, i__) = sqrt((r__1 = a_ref(i__ - 1, i__ 
+				- 1) * a_ref(i__, i__), dabs(r__1))) * .5f;
+			a_ref(i__, i__ - 1) = a_ref(i__ - 1, i__);
 		    }
 /* L90: */
 		}
@@ -870,7 +905,7 @@ cified. */
 	    if (iinfo != 0) {
 		io___39.ciunit = *nounit;
 		s_wsfe(&io___39);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -894,7 +929,7 @@ L100:
 	    if (iinfo != 0) {
 		io___40.ciunit = *nounit;
 		s_wsfe(&io___40);
-		do_fio(&c__1, "SSYTRD(U)", 9L);
+		do_fio(&c__1, "SSYTRD(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -905,7 +940,7 @@ L100:
 		    return 0;
 		} else {
 		    result[1] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -917,7 +952,7 @@ L100:
 	    if (iinfo != 0) {
 		io___41.ciunit = *nounit;
 		s_wsfe(&io___41);
-		do_fio(&c__1, "SORGTR(U)", 9L);
+		do_fio(&c__1, "SORGTR(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -928,7 +963,7 @@ L100:
 		    return 0;
 		} else {
 		    result[2] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -953,7 +988,7 @@ L100:
 	    if (iinfo != 0) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "SSYTRD(L)", 9L);
+		do_fio(&c__1, "SSYTRD(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -964,7 +999,7 @@ L100:
 		    return 0;
 		} else {
 		    result[3] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -976,7 +1011,7 @@ L100:
 	    if (iinfo != 0) {
 		io___43.ciunit = *nounit;
 		s_wsfe(&io___43);
-		do_fio(&c__1, "SORGTR(L)", 9L);
+		do_fio(&c__1, "SORGTR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -987,7 +1022,7 @@ L100:
 		    return 0;
 		} else {
 		    result[4] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1000,13 +1035,13 @@ L100:
 
 /*           Store the upper triangle of A in AP */
 
-	    i = 0;
+	    i__ = 0;
 	    i__3 = n;
 	    for (jc = 1; jc <= i__3; ++jc) {
 		i__4 = jc;
 		for (jr = 1; jr <= i__4; ++jr) {
-		    ++i;
-		    ap[i] = a[jr + jc * a_dim1];
+		    ++i__;
+		    ap[i__] = a_ref(jr, jc);
 /* L110: */
 		}
 /* L120: */
@@ -1022,7 +1057,7 @@ L100:
 	    if (iinfo != 0) {
 		io___45.ciunit = *nounit;
 		s_wsfe(&io___45);
-		do_fio(&c__1, "SSPTRD(U)", 9L);
+		do_fio(&c__1, "SSPTRD(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1033,7 +1068,7 @@ L100:
 		    return 0;
 		} else {
 		    result[5] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1043,7 +1078,7 @@ L100:
 	    if (iinfo != 0) {
 		io___46.ciunit = *nounit;
 		s_wsfe(&io___46);
-		do_fio(&c__1, "SOPGTR(U)", 9L);
+		do_fio(&c__1, "SOPGTR(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1054,28 +1089,26 @@ L100:
 		    return 0;
 		} else {
 		    result[6] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 /*           Do tests 5 and 6 */
 
 	    sspt21_(&c__2, "Upper", &n, &c__1, &ap[1], &sd[1], &se[1], &u[
-		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[5])
-		    ;
+		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[5]);
 	    sspt21_(&c__3, "Upper", &n, &c__1, &ap[1], &sd[1], &se[1], &u[
-		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[6])
-		    ;
+		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[6]);
 
 /*           Store the lower triangle of A in AP */
 
-	    i = 0;
+	    i__ = 0;
 	    i__3 = n;
 	    for (jc = 1; jc <= i__3; ++jc) {
 		i__4 = n;
 		for (jr = jc; jr <= i__4; ++jr) {
-		    ++i;
-		    ap[i] = a[jr + jc * a_dim1];
+		    ++i__;
+		    ap[i__] = a_ref(jr, jc);
 /* L130: */
 		}
 /* L140: */
@@ -1091,7 +1124,7 @@ L100:
 	    if (iinfo != 0) {
 		io___47.ciunit = *nounit;
 		s_wsfe(&io___47);
-		do_fio(&c__1, "SSPTRD(L)", 9L);
+		do_fio(&c__1, "SSPTRD(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1102,7 +1135,7 @@ L100:
 		    return 0;
 		} else {
 		    result[7] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1112,7 +1145,7 @@ L100:
 	    if (iinfo != 0) {
 		io___48.ciunit = *nounit;
 		s_wsfe(&io___48);
-		do_fio(&c__1, "SOPGTR(L)", 9L);
+		do_fio(&c__1, "SOPGTR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1123,16 +1156,14 @@ L100:
 		    return 0;
 		} else {
 		    result[8] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 	    sspt21_(&c__2, "Lower", &n, &c__1, &ap[1], &sd[1], &se[1], &u[
-		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[7])
-		    ;
+		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[7]);
 	    sspt21_(&c__3, "Lower", &n, &c__1, &ap[1], &sd[1], &se[1], &u[
-		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[8])
-		    ;
+		    u_offset], ldu, &vp[1], &tau[1], &work[1], &result[8]);
 
 /*           Call SSTEQR to compute D1, D2, and Z, do tests.   
 
@@ -1143,15 +1174,15 @@ L100:
 		i__3 = n - 1;
 		scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
 	    }
-	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z[z_offset], ldu);
+	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
 
 	    ntest = 9;
-	    ssteqr_("V", &n, &d1[1], &work[1], &z[z_offset], ldu, &work[n + 1]
-		    , &iinfo);
+	    ssteqr_("V", &n, &d1[1], &work[1], &z__[z_offset], ldu, &work[n + 
+		    1], &iinfo);
 	    if (iinfo != 0) {
 		io___49.ciunit = *nounit;
 		s_wsfe(&io___49);
-		do_fio(&c__1, "SSTEQR(V)", 9L);
+		do_fio(&c__1, "SSTEQR(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1162,7 +1193,7 @@ L100:
 		    return 0;
 		} else {
 		    result[9] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1180,7 +1211,7 @@ L100:
 	    if (iinfo != 0) {
 		io___50.ciunit = *nounit;
 		s_wsfe(&io___50);
-		do_fio(&c__1, "SSTEQR(N)", 9L);
+		do_fio(&c__1, "SSTEQR(N)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1191,7 +1222,7 @@ L100:
 		    return 0;
 		} else {
 		    result[11] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1208,7 +1239,7 @@ L100:
 	    if (iinfo != 0) {
 		io___51.ciunit = *nounit;
 		s_wsfe(&io___51);
-		do_fio(&c__1, "SSTERF", 6L);
+		do_fio(&c__1, "SSTERF", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1219,13 +1250,13 @@ L100:
 		    return 0;
 		} else {
 		    result[12] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 /*           Do Tests 9 and 10 */
 
-	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z[z_offset], 
+	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[z_offset], 
 		    ldu, &work[1], &result[9]);
 
 /*           Do Tests 11 and 12 */
@@ -1262,8 +1293,7 @@ L100:
 	    result[12] = temp4 / dmax(r__1,r__2);
 
 /*           Do Test 13 -- Sturm Sequence Test of Eigenvalues   
-                           Go up by factors of two until it succee
-ds */
+                           Go up by factors of two until it succeeds */
 
 	    ntest = 13;
 	    temp1 = *thresh * (.5f - ulp);
@@ -1281,8 +1311,7 @@ ds */
 L170:
 	    result[13] = temp1;
 
-/*           For positive definite matrices ( JTYPE.GT.15 ) call S
-PTEQR   
+/*           For positive definite matrices ( JTYPE.GT.15 ) call SPTEQR   
              and do tests 14, 15, and 16 . */
 
 	    if (jtype > 15) {
@@ -1294,16 +1323,15 @@ PTEQR
 		    i__3 = n - 1;
 		    scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
 		}
-		slaset_("Full", &n, &n, &c_b25, &c_b39, &z[z_offset], ldu)
-			;
+		slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
 
 		ntest = 14;
-		spteqr_("V", &n, &d4[1], &work[1], &z[z_offset], ldu, &work[n 
-			+ 1], &iinfo);
+		spteqr_("V", &n, &d4[1], &work[1], &z__[z_offset], ldu, &work[
+			n + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___56.ciunit = *nounit;
 		    s_wsfe(&io___56);
-		    do_fio(&c__1, "SPTEQR(V)", 9L);
+		    do_fio(&c__1, "SPTEQR(V)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1315,14 +1343,14 @@ PTEQR
 			return 0;
 		    } else {
 			result[14] = ulpinv;
-			goto L220;
+			goto L280;
 		    }
 		}
 
 /*              Do Tests 14 and 15 */
 
-		sstt21_(&n, &c__0, &sd[1], &se[1], &d4[1], dumma, &z[z_offset]
-			, ldu, &work[1], &result[14]);
+		sstt21_(&n, &c__0, &sd[1], &se[1], &d4[1], dumma, &z__[
+			z_offset], ldu, &work[1], &result[14]);
 
 /*              Compute D5 */
 
@@ -1333,12 +1361,12 @@ PTEQR
 		}
 
 		ntest = 16;
-		spteqr_("N", &n, &d5[1], &work[1], &z[z_offset], ldu, &work[n 
-			+ 1], &iinfo);
+		spteqr_("N", &n, &d5[1], &work[1], &z__[z_offset], ldu, &work[
+			n + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___57.ciunit = *nounit;
 		    s_wsfe(&io___57);
-		    do_fio(&c__1, "SPTEQR(N)", 9L);
+		    do_fio(&c__1, "SPTEQR(N)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1350,7 +1378,7 @@ PTEQR
 			return 0;
 		    } else {
 			result[16] = ulpinv;
-			goto L220;
+			goto L280;
 		    }
 		}
 
@@ -1379,13 +1407,10 @@ PTEQR
 		result[16] = 0.f;
 	    }
 
-/*           Call SSTEBZ with different options and do tests 17-18
-.   
+/*           Call SSTEBZ with different options and do tests 17-18.   
 
-                If S is positive definite and diagonally dominant,
-   
-                ask for all eigenvalues with high relative accurac
-y. */
+                If S is positive definite and diagonally dominant,   
+                ask for all eigenvalues with high relative accuracy. */
 
 	    vl = 0.f;
 	    vu = 0.f;
@@ -1400,7 +1425,7 @@ y. */
 		if (iinfo != 0) {
 		    io___65.ciunit = *nounit;
 		    s_wsfe(&io___65);
-		    do_fio(&c__1, "SSTEBZ(A,rel)", 13L);
+		    do_fio(&c__1, "SSTEBZ(A,rel)", (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1412,7 +1437,7 @@ y. */
 			return 0;
 		    } else {
 			result[17] = ulpinv;
-			goto L220;
+			goto L280;
 		    }
 		}
 
@@ -1424,8 +1449,8 @@ y. */
 		i__3 = n;
 		for (j = 1; j <= i__3; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = d4[j] - wr[n - j + 1], dabs(
-			    r__1)) / (abstol + (r__2 = d4[j], dabs(r__2)));
+		    r__3 = temp1, r__4 = (r__2 = d4[j] - wr[n - j + 1], dabs(
+			    r__2)) / (abstol + (r__1 = d4[j], dabs(r__1)));
 		    temp1 = dmax(r__3,r__4);
 /* L190: */
 		}
@@ -1435,18 +1460,17 @@ y. */
 		result[17] = 0.f;
 	    }
 
-/*           Now ask for all eigenvalues with high absolute accura
-cy. */
+/*           Now ask for all eigenvalues with high absolute accuracy. */
 
 	    ntest = 18;
-	    abstol = 0.f;
+	    abstol = unfl + unfl;
 	    sstebz_("A", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
 		     &m, &nsplit, &wa1[1], &iwork[1], &iwork[n + 1], &work[1],
 		     &iwork[(n << 1) + 1], &iinfo);
 	    if (iinfo != 0) {
 		io___66.ciunit = *nounit;
 		s_wsfe(&io___66);
-		do_fio(&c__1, "SSTEBZ(A)", 9L);
+		do_fio(&c__1, "SSTEBZ(A)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1457,7 +1481,7 @@ cy. */
 		    return 0;
 		} else {
 		    result[18] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1481,8 +1505,7 @@ cy. */
 	    r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 	    result[18] = temp2 / dmax(r__1,r__2);
 
-/*           Choose random values for IL and IU, and ask for the 
-  
+/*           Choose random values for IL and IU, and ask for the   
              IL-th through IU-th eigenvalues. */
 
 	    ntest = 19;
@@ -1490,8 +1513,8 @@ cy. */
 		il = 1;
 		iu = n;
 	    } else {
-		il = (n - 1) * slarnd_(&c__1, iseed2) + 1;
-		iu = (n - 1) * slarnd_(&c__1, iseed2) + 1;
+		il = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
+		iu = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
 		if (iu < il) {
 		    itemp = iu;
 		    iu = il;
@@ -1505,7 +1528,7 @@ cy. */
 	    if (iinfo != 0) {
 		io___69.ciunit = *nounit;
 		s_wsfe(&io___69);
-		do_fio(&c__1, "SSTEBZ(I)", 9L);
+		do_fio(&c__1, "SSTEBZ(I)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1516,14 +1539,12 @@ cy. */
 		    return 0;
 		} else {
 		    result[19] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
-/*           Determine the values VL and VU of the IL-th and IU-th
-   
-             eigenvalues and ask for all eigenvalues in this range
-. */
+/*           Determine the values VL and VU of the IL-th and IU-th   
+             eigenvalues and ask for all eigenvalues in this range. */
 
 	    if (n > 0) {
 		if (il != 1) {
@@ -1559,7 +1580,7 @@ cy. */
 	    if (iinfo != 0) {
 		io___71.ciunit = *nounit;
 		s_wsfe(&io___71);
-		do_fio(&c__1, "SSTEBZ(V)", 9L);
+		do_fio(&c__1, "SSTEBZ(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1570,13 +1591,13 @@ cy. */
 		    return 0;
 		} else {
 		    result[19] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 	    if (m3 == 0 && n != 0) {
 		result[19] = ulpinv;
-		goto L220;
+		goto L280;
 	    }
 
 /*           Do test 19 */
@@ -1597,12 +1618,9 @@ cy. */
 	    r__1 = unfl, r__2 = temp3 * ulp;
 	    result[19] = (temp1 + temp2) / dmax(r__1,r__2);
 
-/*           Call SSTEIN to compute eigenvectors corresponding to 
-  
-             eigenvalues in WA1.  (First call SSTEBZ again, to mak
-e sure   
-             it returns these eigenvalues in the correct order.) 
-*/
+/*           Call SSTEIN to compute eigenvectors corresponding to   
+             eigenvalues in WA1.  (First call SSTEBZ again, to make sure   
+             it returns these eigenvalues in the correct order.) */
 
 	    ntest = 21;
 	    sstebz_("A", "B", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
@@ -1611,7 +1629,7 @@ e sure
 	    if (iinfo != 0) {
 		io___72.ciunit = *nounit;
 		s_wsfe(&io___72);
-		do_fio(&c__1, "SSTEBZ(A,B)", 11L);
+		do_fio(&c__1, "SSTEBZ(A,B)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1623,17 +1641,17 @@ e sure
 		} else {
 		    result[20] = ulpinv;
 		    result[21] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 	    sstein_(&n, &sd[1], &se[1], &m, &wa1[1], &iwork[1], &iwork[n + 1],
-		     &z[z_offset], ldu, &work[1], &iwork[(n << 1) + 1], &
+		     &z__[z_offset], ldu, &work[1], &iwork[(n << 1) + 1], &
 		    iwork[n * 3 + 1], &iinfo);
 	    if (iinfo != 0) {
 		io___73.ciunit = *nounit;
 		s_wsfe(&io___73);
-		do_fio(&c__1, "SSTEIN", 6L);
+		do_fio(&c__1, "SSTEIN", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1645,14 +1663,14 @@ e sure
 		} else {
 		    result[20] = ulpinv;
 		    result[21] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 /*           Do tests 20 and 21 */
 
-	    sstt21_(&n, &c__0, &sd[1], &se[1], &wa1[1], dumma, &z[z_offset], 
-		    ldu, &work[1], &result[20]);
+	    sstt21_(&n, &c__0, &sd[1], &se[1], &wa1[1], dumma, &z__[z_offset],
+		     ldu, &work[1], &result[20]);
 
 /*           Call SSTEDC(I) to compute D1 and Z, do tests.   
 
@@ -1663,16 +1681,16 @@ e sure
 		i__3 = n - 1;
 		scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
 	    }
-	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z[z_offset], ldu);
+	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
 
 	    ntest = 22;
 	    i__3 = lwedc - n;
-	    sstedc_("I", &n, &d1[1], &work[1], &z[z_offset], ldu, &work[n + 1]
-		    , &i__3, &iwork[1], &liwedc, &iinfo);
+	    sstedc_("I", &n, &d1[1], &work[1], &z__[z_offset], ldu, &work[n + 
+		    1], &i__3, &iwork[1], &liwedc, &iinfo);
 	    if (iinfo != 0) {
 		io___74.ciunit = *nounit;
 		s_wsfe(&io___74);
-		do_fio(&c__1, "SSTEDC(I)", 9L);
+		do_fio(&c__1, "SSTEDC(I)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1683,13 +1701,13 @@ e sure
 		    return 0;
 		} else {
 		    result[22] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 /*           Do Tests 22 and 23 */
 
-	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z[z_offset], 
+	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[z_offset], 
 		    ldu, &work[1], &result[22]);
 
 /*           Call SSTEDC(V) to compute D1 and Z, do tests.   
@@ -1701,16 +1719,16 @@ e sure
 		i__3 = n - 1;
 		scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
 	    }
-	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z[z_offset], ldu);
+	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
 
 	    ntest = 24;
 	    i__3 = lwedc - n;
-	    sstedc_("V", &n, &d1[1], &work[1], &z[z_offset], ldu, &work[n + 1]
-		    , &i__3, &iwork[1], &liwedc, &iinfo);
+	    sstedc_("V", &n, &d1[1], &work[1], &z__[z_offset], ldu, &work[n + 
+		    1], &i__3, &iwork[1], &liwedc, &iinfo);
 	    if (iinfo != 0) {
 		io___75.ciunit = *nounit;
 		s_wsfe(&io___75);
-		do_fio(&c__1, "SSTEDC(V)", 9L);
+		do_fio(&c__1, "SSTEDC(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1721,13 +1739,13 @@ e sure
 		    return 0;
 		} else {
 		    result[24] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
 /*           Do Tests 24 and 25 */
 
-	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z[z_offset], 
+	    sstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[z_offset], 
 		    ldu, &work[1], &result[24]);
 
 /*           Call SSTEDC(N) to compute D2, do tests.   
@@ -1739,16 +1757,16 @@ e sure
 		i__3 = n - 1;
 		scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
 	    }
-	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z[z_offset], ldu);
+	    slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
 
 	    ntest = 26;
 	    i__3 = lwedc - n;
-	    sstedc_("N", &n, &d2[1], &work[1], &z[z_offset], ldu, &work[n + 1]
-		    , &i__3, &iwork[1], &liwedc, &iinfo);
+	    sstedc_("N", &n, &d2[1], &work[1], &z__[z_offset], ldu, &work[n + 
+		    1], &i__3, &iwork[1], &liwedc, &iinfo);
 	    if (iinfo != 0) {
 		io___76.ciunit = *nounit;
 		s_wsfe(&io___76);
-		do_fio(&c__1, "SSTEDC(N)", 9L);
+		do_fio(&c__1, "SSTEDC(N)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1759,7 +1777,7 @@ e sure
 		    return 0;
 		} else {
 		    result[26] = ulpinv;
-		    goto L220;
+		    goto L280;
 		}
 	    }
 
@@ -1784,12 +1802,501 @@ e sure
 	    r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 	    result[26] = temp2 / dmax(r__1,r__2);
 
-/*           End of Loop -- Check for RESULT(j) > THRESH */
+/*           Only test SSTEGR if IEEE compliant */
 
-L220:
+	    if (ilaenv_(&c__10, "SSTEGR", "VA", &c__1, &c__0, &c__0, &c__0, (
+		    ftnlen)6, (ftnlen)2) == 1 && ilaenv_(&c__11, "SSTEGR", 
+		    "VA", &c__1, &c__0, &c__0, &c__0, (ftnlen)6, (ftnlen)2) ==
+		     1) {
+
+/*           Call SSTEGR, do test 27 (relative eigenvalue accuracy)   
+
+                If S is positive definite and diagonally dominant,   
+                ask for all eigenvalues with high relative accuracy. */
+
+		vl = 0.f;
+		vu = 0.f;
+		il = 0;
+		iu = 0;
+		if (FALSE_) {
+		    ntest = 27;
+		    abstol = unfl + unfl;
+		    i__3 = *lwork - (n << 1);
+		    sstegr_("V", "A", &n, &sd[1], &se[1], &vl, &vu, &il, &iu, 
+			    &abstol, &m, &wr[1], &z__[z_offset], ldu, &iwork[
+			    1], &work[1], lwork, &iwork[(n << 1) + 1], &i__3, 
+			    &iinfo);
+		    if (iinfo != 0) {
+			io___77.ciunit = *nounit;
+			s_wsfe(&io___77);
+			do_fio(&c__1, "SSTEGR(V,A,rel)", (ftnlen)15);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[27] = ulpinv;
+			    goto L270;
+			}
+		    }
+
+/*              Do test 27 */
+
+		    temp2 = (n * 2.f - 1.f) * 2.f * ulp * 3.f / .0625f;
+
+		    temp1 = 0.f;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			r__3 = temp1, r__4 = (r__2 = d4[j] - wr[n - j + 1], 
+				dabs(r__2)) / (abstol + (r__1 = d4[j], dabs(
+				r__1)));
+			temp1 = dmax(r__3,r__4);
+/* L220: */
+		    }
+
+		    result[27] = temp1 / temp2;
+
+		    il = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
+		    iu = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
+		    if (iu < il) {
+			itemp = iu;
+			iu = il;
+			il = itemp;
+		    }
+
+		    if (FALSE_) {
+			ntest = 28;
+			abstol = unfl + unfl;
+			i__3 = *lwork - (n << 1);
+			sstegr_("V", "I", &n, &sd[1], &se[1], &vl, &vu, &il, &
+				iu, &abstol, &m, &wr[1], &z__[z_offset], ldu, 
+				&iwork[1], &work[1], lwork, &iwork[(n << 1) + 
+				1], &i__3, &iinfo);
+
+			if (iinfo != 0) {
+			    io___78.ciunit = *nounit;
+			    s_wsfe(&io___78);
+			    do_fio(&c__1, "SSTEGR(V,I,rel)", (ftnlen)15);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    if (iinfo < 0) {
+				return 0;
+			    } else {
+				result[28] = ulpinv;
+				goto L270;
+			    }
+			}
+
+
+/*                 Do test 28 */
+
+			temp2 = (n * 2.f - 1.f) * 2.f * ulp * 3.f / .0625f;
+
+			temp1 = 0.f;
+			i__3 = iu;
+			for (j = il; j <= i__3; ++j) {
+/* Computing MAX */
+			    r__3 = temp1, r__4 = (r__2 = wr[j - il + 1] - d4[
+				    n - j + 1], dabs(r__2)) / (abstol + (r__1 
+				    = wr[j - il + 1], dabs(r__1)));
+			    temp1 = dmax(r__3,r__4);
+/* L230: */
+			}
+
+			result[28] = temp1 / temp2;
+		    } else {
+			result[28] = 0.f;
+		    }
+		} else {
+		    result[27] = 0.f;
+		    result[28] = 0.f;
+		}
+
+/*           Call SSTEGR(V,I) to compute D1 and Z, do tests.   
+
+             Compute D1 and Z */
+
+		scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		if (n > 0) {
+		    i__3 = n - 1;
+		    scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		}
+		slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], ldu);
+
+		if (FALSE_) {
+		    ntest = 29;
+		    il = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
+		    iu = (n - 1) * (integer) slarnd_(&c__1, iseed2) + 1;
+		    if (iu < il) {
+			itemp = iu;
+			iu = il;
+			il = itemp;
+		    }
+		    i__3 = *lwork - n;
+		    i__4 = *liwork - (n << 1);
+		    sstegr_("V", "I", &n, &d5[1], &work[1], &vl, &vu, &il, &
+			    iu, &abstol, &m, &d1[1], &z__[z_offset], ldu, &
+			    iwork[1], &work[n + 1], &i__3, &iwork[(n << 1) + 
+			    1], &i__4, &iinfo);
+		    if (iinfo != 0) {
+			io___79.ciunit = *nounit;
+			s_wsfe(&io___79);
+			do_fio(&c__1, "SSTEGR(V,I)", (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[29] = ulpinv;
+			    goto L280;
+			}
+		    }
+
+/*           Do Tests 29 and 30 */
+
+		    sstt22_(&n, &m, &c__0, &sd[1], &se[1], &d1[1], dumma, &
+			    z__[z_offset], ldu, &work[1], &m, &result[29]);
+
+/*           Call SSTEGR to compute D2, do tests.   
+
+             Compute D2 */
+
+		    scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		    if (n > 0) {
+			i__3 = n - 1;
+			scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		    }
+
+		    ntest = 31;
+		    i__3 = *lwork - n;
+		    i__4 = *liwork - (n << 1);
+		    sstegr_("N", "I", &n, &d5[1], &work[1], &vl, &vu, &il, &
+			    iu, &abstol, &m, &d2[1], &z__[z_offset], ldu, &
+			    iwork[1], &work[n + 1], &i__3, &iwork[(n << 1) + 
+			    1], &i__4, &iinfo);
+		    if (iinfo != 0) {
+			io___80.ciunit = *nounit;
+			s_wsfe(&io___80);
+			do_fio(&c__1, "SSTEGR(N,I)", (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[31] = ulpinv;
+			    goto L280;
+			}
+		    }
+
+/*           Do Test 31 */
+
+		    temp1 = 0.f;
+		    temp2 = 0.f;
+
+		    i__3 = iu - il + 1;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 
+				= max(r__3,r__4), r__4 = (r__2 = d2[j], dabs(
+				r__2));
+			temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+			r__2 = temp2, r__3 = (r__1 = d1[j] - d2[j], dabs(r__1)
+				);
+			temp2 = dmax(r__2,r__3);
+/* L240: */
+		    }
+
+/* Computing MAX */
+		    r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		    result[31] = temp2 / dmax(r__1,r__2);
+
+
+/*           Call SSTEGR(V,V) to compute D1 and Z, do tests.   
+
+             Compute D1 and Z */
+
+		    scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		    if (n > 0) {
+			i__3 = n - 1;
+			scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		    }
+		    slaset_("Full", &n, &n, &c_b25, &c_b39, &z__[z_offset], 
+			    ldu);
+
+		    ntest = 32;
+
+		    if (n > 0) {
+			if (il != 1) {
+/* Computing MAX */
+			    r__1 = (d2[il] - d2[il - 1]) * .5f, r__2 = ulp * 
+				    anorm, r__1 = max(r__1,r__2), r__2 = 
+				    rtunfl * 2.f;
+			    vl = d2[il] - dmax(r__1,r__2);
+			} else {
+/* Computing MAX */
+			    r__1 = (d2[n] - d2[1]) * .5f, r__2 = ulp * anorm, 
+				    r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				    2.f;
+			    vl = d2[1] - dmax(r__1,r__2);
+			}
+			if (iu != n) {
+/* Computing MAX */
+			    r__1 = (d2[iu + 1] - d2[iu]) * .5f, r__2 = ulp * 
+				    anorm, r__1 = max(r__1,r__2), r__2 = 
+				    rtunfl * 2.f;
+			    vu = d2[iu] + dmax(r__1,r__2);
+			} else {
+/* Computing MAX */
+			    r__1 = (d2[n] - d2[1]) * .5f, r__2 = ulp * anorm, 
+				    r__1 = max(r__1,r__2), r__2 = rtunfl * 
+				    2.f;
+			    vu = d2[n] + dmax(r__1,r__2);
+			}
+		    } else {
+			vl = 0.f;
+			vu = 1.f;
+		    }
+
+		    i__3 = *lwork - n;
+		    i__4 = *liwork - (n << 1);
+		    sstegr_("V", "V", &n, &d5[1], &work[1], &vl, &vu, &il, &
+			    iu, &abstol, &m, &d1[1], &z__[z_offset], ldu, &
+			    iwork[1], &work[n + 1], &i__3, &iwork[(n << 1) + 
+			    1], &i__4, &iinfo);
+		    if (iinfo != 0) {
+			io___81.ciunit = *nounit;
+			s_wsfe(&io___81);
+			do_fio(&c__1, "SSTEGR(V,V)", (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[32] = ulpinv;
+			    goto L280;
+			}
+		    }
+
+/*           Do Tests 32 and 33 */
+
+		    sstt22_(&n, &m, &c__0, &sd[1], &se[1], &d1[1], dumma, &
+			    z__[z_offset], ldu, &work[1], &m, &result[32]);
+
+/*           Call SSTEGR to compute D2, do tests.   
+
+             Compute D2 */
+
+		    scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		    if (n > 0) {
+			i__3 = n - 1;
+			scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		    }
+
+		    ntest = 34;
+		    i__3 = *lwork - n;
+		    i__4 = *liwork - (n << 1);
+		    sstegr_("N", "V", &n, &d5[1], &work[1], &vl, &vu, &il, &
+			    iu, &abstol, &m, &d2[1], &z__[z_offset], ldu, &
+			    iwork[1], &work[n + 1], &i__3, &iwork[(n << 1) + 
+			    1], &i__4, &iinfo);
+		    if (iinfo != 0) {
+			io___82.ciunit = *nounit;
+			s_wsfe(&io___82);
+			do_fio(&c__1, "SSTEGR(N,V)", (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[34] = ulpinv;
+			    goto L280;
+			}
+		    }
+
+/*           Do Test 34 */
+
+		    temp1 = 0.f;
+		    temp2 = 0.f;
+
+		    i__3 = iu - il + 1;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 
+				= max(r__3,r__4), r__4 = (r__2 = d2[j], dabs(
+				r__2));
+			temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+			r__2 = temp2, r__3 = (r__1 = d1[j] - d2[j], dabs(r__1)
+				);
+			temp2 = dmax(r__2,r__3);
+/* L250: */
+		    }
+
+/* Computing MAX */
+		    r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		    result[34] = temp2 / dmax(r__1,r__2);
+		} else {
+		    result[29] = 0.f;
+		    result[30] = 0.f;
+		    result[31] = 0.f;
+		    result[32] = 0.f;
+		    result[33] = 0.f;
+		    result[34] = 0.f;
+		}
+
+
+/*           Call SSTEGR(V,A) to compute D1 and Z, do tests.   
+
+             Compute D1 and Z */
+
+		scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		if (n > 0) {
+		    i__3 = n - 1;
+		    scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		}
+
+		ntest = 35;
+
+		i__3 = *lwork - n;
+		i__4 = *liwork - (n << 1);
+		sstegr_("V", "A", &n, &d5[1], &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m, &d1[1], &z__[z_offset], ldu, &iwork[1], &
+			work[n + 1], &i__3, &iwork[(n << 1) + 1], &i__4, &
+			iinfo);
+		if (iinfo != 0) {
+		    io___83.ciunit = *nounit;
+		    s_wsfe(&io___83);
+		    do_fio(&c__1, "SSTEGR(V,A)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[35] = ulpinv;
+			goto L280;
+		    }
+		}
+
+/*           Do Tests 35 and 36 */
+
+		sstt22_(&n, &m, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[
+			z_offset], ldu, &work[1], &m, &result[35]);
+
+/*           Call SSTEGR to compute D2, do tests.   
+
+             Compute D2 */
+
+		scopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
+		if (n > 0) {
+		    i__3 = n - 1;
+		    scopy_(&i__3, &se[1], &c__1, &work[1], &c__1);
+		}
+
+		ntest = 37;
+		i__3 = *lwork - n;
+		i__4 = *liwork - (n << 1);
+		sstegr_("N", "A", &n, &d5[1], &work[1], &vl, &vu, &il, &iu, &
+			abstol, &m, &d2[1], &z__[z_offset], ldu, &iwork[1], &
+			work[n + 1], &i__3, &iwork[(n << 1) + 1], &i__4, &
+			iinfo);
+		if (iinfo != 0) {
+		    io___84.ciunit = *nounit;
+		    s_wsfe(&io___84);
+		    do_fio(&c__1, "SSTEGR(N,A)", (ftnlen)11);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[37] = ulpinv;
+			goto L280;
+		    }
+		}
+
+/*           Do Test 34 */
+
+		temp1 = 0.f;
+		temp2 = 0.f;
+
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    r__3 = temp1, r__4 = (r__1 = d1[j], dabs(r__1)), r__3 = 
+			    max(r__3,r__4), r__4 = (r__2 = d2[j], dabs(r__2));
+		    temp1 = dmax(r__3,r__4);
+/* Computing MAX */
+		    r__2 = temp2, r__3 = (r__1 = d1[j] - d2[j], dabs(r__1));
+		    temp2 = dmax(r__2,r__3);
+/* L260: */
+		}
+
+/* Computing MAX */
+		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
+		result[37] = temp2 / dmax(r__1,r__2);
+	    }
+L270:
+L280:
 	    ntestt += ntest;
 
-/*           Print out tests which fail. */
+/*           End of Loop -- Check for RESULT(j) > THRESH   
+
+
+             Print out tests which fail. */
 
 	    i__3 = ntest;
 	    for (jr = 1; jr <= i__3; ++jr) {
@@ -1799,56 +2306,33 @@ L220:
                    print a header to the data file. */
 
 		    if (nerrs == 0) {
-			io___77.ciunit = *nounit;
-			s_wsfe(&io___77);
-			do_fio(&c__1, "SST", 3L);
+			io___85.ciunit = *nounit;
+			s_wsfe(&io___85);
+			do_fio(&c__1, "SST", (ftnlen)3);
 			e_wsfe();
-			io___78.ciunit = *nounit;
-			s_wsfe(&io___78);
+			io___86.ciunit = *nounit;
+			s_wsfe(&io___86);
 			e_wsfe();
-			io___79.ciunit = *nounit;
-			s_wsfe(&io___79);
+			io___87.ciunit = *nounit;
+			s_wsfe(&io___87);
 			e_wsfe();
-			io___80.ciunit = *nounit;
-			s_wsfe(&io___80);
-			do_fio(&c__1, "Symmetric", 9L);
+			io___88.ciunit = *nounit;
+			s_wsfe(&io___88);
+			do_fio(&c__1, "Symmetric", (ftnlen)9);
 			e_wsfe();
-			io___81.ciunit = *nounit;
-			s_wsfe(&io___81);
+			io___89.ciunit = *nounit;
+			s_wsfe(&io___89);
 			e_wsfe();
 
 /*                    Tests performed */
 
-			io___82.ciunit = *nounit;
-			s_wsfe(&io___82);
-			do_fio(&c__1, "orthogonal", 10L);
-			do_fio(&c__1, "'=transpose", 11L);
-			for (j = 1; j <= 4; ++j) {
-			    do_fio(&c__1, "'", 1L);
-			}
-			e_wsfe();
-			io___83.ciunit = *nounit;
-			s_wsfe(&io___83);
-			for (j = 1; j <= 6; ++j) {
-			    do_fio(&c__1, "'", 1L);
-			}
-			e_wsfe();
-			io___84.ciunit = *nounit;
-			s_wsfe(&io___84);
-			for (j = 1; j <= 4; ++j) {
-			    do_fio(&c__1, "'", 1L);
-			}
-			e_wsfe();
-			io___85.ciunit = *nounit;
-			s_wsfe(&io___85);
-			for (j = 1; j <= 4; ++j) {
-			    do_fio(&c__1, "'", 1L);
-			}
+			io___90.ciunit = *nounit;
+			s_wsfe(&io___90);
 			e_wsfe();
 		    }
 		    ++nerrs;
-		    io___86.ciunit = *nounit;
-		    s_wsfe(&io___86);
+		    io___91.ciunit = *nounit;
+		    s_wsfe(&io___91);
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
 			    ;
@@ -1857,13 +2341,12 @@ L220:
 		    do_fio(&c__1, (char *)&result[jr], (ftnlen)sizeof(real));
 		    e_wsfe();
 		}
-/* L230: */
+/* L290: */
 	    }
-
-L240:
+L300:
 	    ;
 	}
-/* L250: */
+/* L310: */
     }
 
 /*     Summary */
@@ -1874,8 +2357,15 @@ L240:
 
 
 
+/* L9993:   
+   L9992:   
+   L9991:   
+   L9989:   
 
-/*     End of SCHKST */
+       End of SCHKST */
 
 } /* schkst_ */
+
+#undef a_ref
+
 

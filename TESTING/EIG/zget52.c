@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -47,7 +48,11 @@ static integer c__1 = 1;
     static doublereal enrmer, errnrm, ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define e_subscr(a_1,a_2) (a_2)*e_dim1 + a_1
+#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -77,8 +82,7 @@ static integer c__1 = 1;
     of its elements is 1, where in this case, "absolute value"   
     of a complex value x is  |Re(x)| + |Im(x)| ; let us call this   
     maximum "absolute value" norm of a vector v  M(v).   
-    If a(i)=b(i)=0, then the eigenvector is set to be the jth coordinate 
-  
+    If a(i)=b(i)=0, then the eigenvector is set to be the jth coordinate   
     vector. The normalization test is:   
 
             RESULT(2) =      max       | M(v(i)) - 1 | / ( n ulp )   
@@ -136,19 +140,18 @@ static integer c__1 = 1;
             B E is likely to overflow, then RESULT(1:2) is set to   
             10 / ulp.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     e_dim1 = *lde;
-    e_offset = e_dim1 + 1;
+    e_offset = 1 + e_dim1 * 1;
     e -= e_offset;
     --alpha;
     --beta;
@@ -227,11 +230,11 @@ static integer c__1 = 1;
 	    d_cnjg(&z__1, &bcoeff);
 	    bcoeff.r = z__1.r, bcoeff.i = z__1.i;
 	}
-	zgemv_(trans, n, n, &acoeff, &a[a_offset], lda, &e[jvec * e_dim1 + 1],
-		 &c__1, &c_b1, &work[*n * (jvec - 1) + 1], &c__1);
+	zgemv_(trans, n, n, &acoeff, &a[a_offset], lda, &e_ref(1, jvec), &
+		c__1, &c_b1, &work[*n * (jvec - 1) + 1], &c__1);
 	z__1.r = -bcoeff.r, z__1.i = -bcoeff.i;
-	zgemv_(trans, n, n, &z__1, &b[b_offset], lda, &e[jvec * e_dim1 + 1], &
-		c__1, &c_b2, &work[*n * (jvec - 1) + 1], &c__1);
+	zgemv_(trans, n, n, &z__1, &b[b_offset], lda, &e_ref(1, jvec), &c__1, 
+		&c_b2, &work[*n * (jvec - 1) + 1], &c__1);
 /* L10: */
     }
 
@@ -250,9 +253,9 @@ static integer c__1 = 1;
 	i__2 = *n;
 	for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-	    i__3 = j + jvec * e_dim1;
+	    i__3 = e_subscr(j, jvec);
 	    d__3 = temp1, d__4 = (d__1 = e[i__3].r, abs(d__1)) + (d__2 = 
-		    d_imag(&e[j + jvec * e_dim1]), abs(d__2));
+		    d_imag(&e_ref(j, jvec)), abs(d__2));
 	    temp1 = max(d__3,d__4);
 /* L20: */
 	}
@@ -271,4 +274,8 @@ static integer c__1 = 1;
 /*     End of ZGET52 */
 
 } /* zget52_ */
+
+#undef e_ref
+#undef e_subscr
+
 

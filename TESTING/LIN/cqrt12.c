@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
     static integer iscl, info;
     static real anrm;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int cgebd2_(integer *, integer *, complex *, 
 	    integer *, real *, real *, complex *, complex *, complex *, 
 	    integer *);
@@ -49,7 +50,11 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
     static real smlnum, nrmsvl;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -73,8 +78,7 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
             The number of columns of the matrix A.   
 
     A       (input) COMPLEX array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced. 
-  
+            The M-by-N matrix A. Only the upper trapezoid is referenced.   
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.   
@@ -90,13 +94,12 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
 
     RWORK   (workspace) REAL array, dimension (4*min(M,N))   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --s;
     --work;
@@ -127,9 +130,9 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = (j - 1) * *m + i;
-	    i__4 = i + j * a_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = (j - 1) * *m + i__;
+	    i__4 = a_subscr(i__, j);
 	    work[i__3].r = a[i__4].r, work[i__3].i = a[i__4].i;
 /* L10: */
 	}
@@ -185,8 +188,8 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
     } else {
 
 	i__1 = mn;
-	for (i = 1; i <= i__1; ++i) {
-	    rwork[i] = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    rwork[i__] = 0.f;
 /* L30: */
 	}
     }
@@ -194,8 +197,8 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
 /*     Compare s and singular values of work */
 
     saxpy_(&mn, &c_b33, &s[1], &c__1, &rwork[1], &c__1);
-    ret_val = sasum_(&mn, &rwork[1], &c__1) / (slamch_("Epsilon") * (real)
-	     max(*m,*n));
+    ret_val = sasum_(&mn, &rwork[1], &c__1) / (slamch_("Epsilon") *
+	     (real) max(*m,*n));
     if (nrmsvl != 0.f) {
 	ret_val /= nrmsvl;
     }
@@ -205,4 +208,8 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
 /*     End of CQRT12 */
 
 } /* cqrt12_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,14 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zunmtr_(char *side, char *uplo, char *trans, integer *m, 
 	integer *n, doublecomplex *a, integer *lda, doublecomplex *tau, 
-	doublecomplex *c, integer *ldc, doublecomplex *work, integer *lwork, 
-	integer *info)
+	doublecomplex *c__, integer *ldc, doublecomplex *work, integer *lwork,
+	 integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -59,8 +60,7 @@
 
     LDA     (input) INTEGER   
             The leading dimension of the array A.   
-            LDA >= max(1,M) if SIDE = 'L'; LDA >= max(1,N) if SIDE = 'R'. 
-  
+            LDA >= max(1,M) if SIDE = 'L'; LDA >= max(1,N) if SIDE = 'R'.   
 
     TAU     (input) COMPLEX*16 array, dimension   
                                  (M-1) if SIDE = 'L'   
@@ -70,8 +70,7 @@
 
     C       (input/output) COMPLEX*16 array, dimension (LDC,N)   
             On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q**H*C or C*Q**H or C*Q. 
-  
+            On exit, C is overwritten by Q*C or Q**H*C or C*Q**H or C*Q.   
 
     LDC     (input) INTEGER   
             The leading dimension of the array C. LDC >= max(1,M).   
@@ -87,45 +86,68 @@
             LWORK >=M*NB if SIDE = 'R', where NB is the optimal   
             blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
+       Parameter adjustments */
+    /* Table of constant values */
+    static integer c__1 = 1;
+    static integer c_n1 = -1;
+    static integer c__2 = 2;
     
-   Parameter adjustments   
-       Function Body */
     /* System generated locals */
-    integer a_dim1, a_offset, c_dim1, c_offset, i__1;
+    address a__1[2];
+    integer a_dim1, a_offset, c_dim1, c_offset, i__1[2], i__2, i__3;
+    char ch__1[2];
+    /* Builtin functions   
+       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
     /* Local variables */
     static logical left;
     extern logical lsame_(char *, char *);
     static integer iinfo, i1;
     static logical upper;
-    static integer i2, mi, ni, nq, nw;
-    extern /* Subroutine */ int xerbla_(char *, integer *), zunmql_(
-	    char *, char *, integer *, integer *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, integer *), zunmqr_(
-	    char *, char *, integer *, integer *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, integer *);
+    static integer i2, nb, mi, ni, nq, nw;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    static integer lwkopt;
+    static logical lquery;
+    extern /* Subroutine */ int zunmql_(char *, char *, integer *, integer *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *), zunmqr_(char *, char *, integer *, integer *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     upper = lsame_(uplo, "U");
+    lquery = *lwork == -1;
 
 /*     NQ is the order of Q and NW is the minimum dimension of WORK */
 
@@ -140,7 +162,8 @@
 	*info = -1;
     } else if (! upper && ! lsame_(uplo, "L")) {
 	*info = -2;
-    } else if (! lsame_(trans, "N") && ! lsame_(trans, "C")) {
+    } else if (! lsame_(trans, "N") && ! lsame_(trans, 
+	    "C")) {
 	*info = -3;
     } else if (*m < 0) {
 	*info = -4;
@@ -150,19 +173,68 @@
 	*info = -7;
     } else if (*ldc < max(1,*m)) {
 	*info = -10;
-    } else if (*lwork < max(1,nw)) {
+    } else if (*lwork < max(1,nw) && ! lquery) {
 	*info = -12;
     }
+
+    if (*info == 0) {
+	if (upper) {
+	    if (left) {
+/* Writing concatenation */
+		i__1[0] = 1, a__1[0] = side;
+		i__1[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+		i__2 = *m - 1;
+		i__3 = *m - 1;
+		nb = ilaenv_(&c__1, "ZUNMQL", ch__1, &i__2, n, &i__3, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    } else {
+/* Writing concatenation */
+		i__1[0] = 1, a__1[0] = side;
+		i__1[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+		i__2 = *n - 1;
+		i__3 = *n - 1;
+		nb = ilaenv_(&c__1, "ZUNMQL", ch__1, m, &i__2, &i__3, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    }
+	} else {
+	    if (left) {
+/* Writing concatenation */
+		i__1[0] = 1, a__1[0] = side;
+		i__1[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+		i__2 = *m - 1;
+		i__3 = *m - 1;
+		nb = ilaenv_(&c__1, "ZUNMQR", ch__1, &i__2, n, &i__3, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    } else {
+/* Writing concatenation */
+		i__1[0] = 1, a__1[0] = side;
+		i__1[1] = 1, a__1[1] = trans;
+		s_cat(ch__1, a__1, i__1, &c__2, (ftnlen)2);
+		i__2 = *n - 1;
+		i__3 = *n - 1;
+		nb = ilaenv_(&c__1, "ZUNMQR", ch__1, m, &i__2, &i__3, &c_n1, (
+			ftnlen)6, (ftnlen)2);
+	    }
+	}
+	lwkopt = max(1,nw) * nb;
+	work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    }
+
     if (*info != 0) {
-	i__1 = -(*info);
-	xerbla_("ZUNMTR", &i__1);
+	i__2 = -(*info);
+	xerbla_("ZUNMTR", &i__2);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*m == 0 || *n == 0 || nq == 1) {
-	WORK(1).r = 1., WORK(1).i = 0.;
+	work[1].r = 1., work[1].i = 0.;
 	return 0;
     }
 
@@ -178,9 +250,9 @@
 
 /*        Q was determined by a call to ZHETRD with UPLO = 'U' */
 
-	i__1 = nq - 1;
-	zunmql_(side, trans, &mi, &ni, &i__1, &A(1,2), lda, &
-		TAU(1), &C(1,1), ldc, &WORK(1), lwork, &iinfo);
+	i__2 = nq - 1;
+	zunmql_(side, trans, &mi, &ni, &i__2, &a_ref(1, 2), lda, &tau[1], &
+		c__[c_offset], ldc, &work[1], lwork, &iinfo);
     } else {
 
 /*        Q was determined by a call to ZHETRD with UPLO = 'L' */
@@ -192,13 +264,20 @@
 	    i1 = 1;
 	    i2 = 2;
 	}
-	i__1 = nq - 1;
-	zunmqr_(side, trans, &mi, &ni, &i__1, &A(2,1), lda, &TAU(1), &
-		C(i1,i2), ldc, &WORK(1), lwork, &iinfo);
+	i__2 = nq - 1;
+	zunmqr_(side, trans, &mi, &ni, &i__2, &a_ref(2, 1), lda, &tau[1], &
+		c___ref(i1, i2), ldc, &work[1], lwork, &iinfo);
     }
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
     return 0;
 
 /*     End of ZUNMTR */
 
 } /* zunmtr_ */
+
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
 

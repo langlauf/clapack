@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int zstein_(integer *n, doublereal *d, doublereal *e, 
+/* Subroutine */ int zstein_(integer *n, doublereal *d__, doublereal *e, 
 	integer *m, doublereal *w, integer *iblock, integer *isplit, 
-	doublecomplex *z, integer *ldz, doublereal *work, integer *iwork, 
+	doublecomplex *z__, integer *ldz, doublereal *work, integer *iwork, 
 	integer *ifail, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -58,8 +59,7 @@
             from DSTEBZ is expected here. )   
 
     ISPLIT  (input) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices. 
-  
+            The splitting points, at which T breaks up into submatrices.   
             The first submatrix consists of rows/columns 1 to   
             ISPLIT( 1 ), the second of rows/columns ISPLIT( 1 )+1   
             through ISPLIT( 2 ), etc.   
@@ -68,8 +68,7 @@
     Z       (output) COMPLEX*16 array, dimension (LDZ, M)   
             The computed eigenvectors.  The eigenvector associated   
             with the eigenvalue W(i) is stored in the i-th column of   
-            Z.  Any vector which fails to converge is set to its current 
-  
+            Z.  Any vector which fails to converge is set to its current   
             iterate after MAXITS iterations.   
             The imaginary parts of the eigenvectors are set to zero.   
 
@@ -103,15 +102,12 @@
             The number of iterations performed after norm growth   
             criterion is satisfied, should be at least 1.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__2 = 2;
     static integer c__1 = 1;
@@ -126,7 +122,7 @@
     /* Local variables */
     static integer jblk, nblk, jmax;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     static integer iseed[4], gpind, iinfo;
@@ -153,25 +149,27 @@
     static doublereal onenrm, dtpcrt, pertol, scl, eps, sep, nrm, tol;
     static integer its;
     static doublereal xjm, ztr, eps1;
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
 
 
+    --d__;
+    --e;
+    --w;
+    --iblock;
+    --isplit;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --work;
+    --iwork;
+    --ifail;
 
-#define ISEED(I) iseed[(I)]
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define W(I) w[(I)-1]
-#define IBLOCK(I) iblock[(I)-1]
-#define ISPLIT(I) isplit[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-#define IFAIL(I) ifail[(I)-1]
-
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     *info = 0;
     i__1 = *m;
-    for (i = 1; i <= *m; ++i) {
-	IFAIL(i) = 0;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	ifail[i__] = 0;
 /* L10: */
     }
 
@@ -183,12 +181,12 @@
 	*info = -9;
     } else {
 	i__1 = *m;
-	for (j = 2; j <= *m; ++j) {
-	    if (IBLOCK(j) < IBLOCK(j - 1)) {
+	for (j = 2; j <= i__1; ++j) {
+	    if (iblock[j] < iblock[j - 1]) {
 		*info = -6;
 		goto L30;
 	    }
-	    if (IBLOCK(j) == IBLOCK(j - 1) && W(j) < W(j - 1)) {
+	    if (iblock[j] == iblock[j - 1] && w[j] < w[j - 1]) {
 		*info = -5;
 		goto L30;
 	    }
@@ -209,8 +207,8 @@ L30:
     if (*n == 0 || *m == 0) {
 	return 0;
     } else if (*n == 1) {
-	i__1 = z_dim1 + 1;
-	Z(1,1).r = 1., Z(1,1).i = 0.;
+	i__1 = z___subscr(1, 1);
+	z__[i__1].r = 1., z__[i__1].i = 0.;
 	return 0;
     }
 
@@ -220,8 +218,8 @@ L30:
 
 /*     Initialize seed for random number generator DLARNV. */
 
-    for (i = 1; i <= 4; ++i) {
-	ISEED(i - 1) = 1;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = 1;
 /* L40: */
     }
 
@@ -236,36 +234,35 @@ L30:
 /*     Compute eigenvectors of matrix blocks. */
 
     j1 = 1;
-    i__1 = IBLOCK(*m);
-    for (nblk = 1; nblk <= IBLOCK(*m); ++nblk) {
+    i__1 = iblock[*m];
+    for (nblk = 1; nblk <= i__1; ++nblk) {
 
 /*        Find starting and ending indices of block nblk. */
 
 	if (nblk == 1) {
 	    b1 = 1;
 	} else {
-	    b1 = ISPLIT(nblk - 1) + 1;
+	    b1 = isplit[nblk - 1] + 1;
 	}
-	bn = ISPLIT(nblk);
+	bn = isplit[nblk];
 	blksiz = bn - b1 + 1;
 	if (blksiz == 1) {
 	    goto L60;
 	}
 	gpind = b1;
 
-/*        Compute reorthogonalization criterion and stopping criterion
-. */
+/*        Compute reorthogonalization criterion and stopping criterion. */
 
-	onenrm = (d__1 = D(b1), abs(d__1)) + (d__2 = E(b1), abs(d__2));
+	onenrm = (d__1 = d__[b1], abs(d__1)) + (d__2 = e[b1], abs(d__2));
 /* Computing MAX */
-	d__3 = onenrm, d__4 = (d__1 = D(bn), abs(d__1)) + (d__2 = E(bn - 1), 
-		abs(d__2));
+	d__3 = onenrm, d__4 = (d__1 = d__[bn], abs(d__1)) + (d__2 = e[bn - 1],
+		 abs(d__2));
 	onenrm = max(d__3,d__4);
 	i__2 = bn - 1;
-	for (i = b1 + 1; i <= bn-1; ++i) {
+	for (i__ = b1 + 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__4 = onenrm, d__5 = (d__1 = D(i), abs(d__1)) + (d__2 = E(i - 1),
-		     abs(d__2)) + (d__3 = E(i), abs(d__3));
+	    d__4 = onenrm, d__5 = (d__1 = d__[i__], abs(d__1)) + (d__2 = e[
+		    i__ - 1], abs(d__2)) + (d__3 = e[i__], abs(d__3));
 	    onenrm = max(d__4,d__5);
 /* L50: */
 	}
@@ -278,23 +275,22 @@ L30:
 L60:
 	jblk = 0;
 	i__2 = *m;
-	for (j = j1; j <= *m; ++j) {
-	    if (IBLOCK(j) != nblk) {
+	for (j = j1; j <= i__2; ++j) {
+	    if (iblock[j] != nblk) {
 		j1 = j;
 		goto L180;
 	    }
 	    ++jblk;
-	    xj = W(j);
+	    xj = w[j];
 
 /*           Skip all the work if the block size is one. */
 
 	    if (blksiz == 1) {
-		WORK(indrv1 + 1) = 1.;
+		work[indrv1 + 1] = 1.;
 		goto L140;
 	    }
 
-/*           If eigenvalues j and j-1 are too close, add a relativ
-ely   
+/*           If eigenvalues j and j-1 are too close, add a relatively   
              small perturbation. */
 
 	    if (jblk > 1) {
@@ -311,23 +307,21 @@ ely
 
 /*           Get random starting vector. */
 
-	    dlarnv_(&c__2, iseed, &blksiz, &WORK(indrv1 + 1));
+	    dlarnv_(&c__2, iseed, &blksiz, &work[indrv1 + 1]);
 
-/*           Copy the matrix T so it won't be destroyed in factori
-zation. */
+/*           Copy the matrix T so it won't be destroyed in factorization. */
 
-	    dcopy_(&blksiz, &D(b1), &c__1, &WORK(indrv4 + 1), &c__1);
+	    dcopy_(&blksiz, &d__[b1], &c__1, &work[indrv4 + 1], &c__1);
 	    i__3 = blksiz - 1;
-	    dcopy_(&i__3, &E(b1), &c__1, &WORK(indrv2 + 2), &c__1);
+	    dcopy_(&i__3, &e[b1], &c__1, &work[indrv2 + 2], &c__1);
 	    i__3 = blksiz - 1;
-	    dcopy_(&i__3, &E(b1), &c__1, &WORK(indrv3 + 1), &c__1);
+	    dcopy_(&i__3, &e[b1], &c__1, &work[indrv3 + 1], &c__1);
 
-/*           Compute LU factors with partial pivoting  ( PT = LU )
- */
+/*           Compute LU factors with partial pivoting  ( PT = LU ) */
 
 	    tol = 0.;
-	    dlagtf_(&blksiz, &WORK(indrv4 + 1), &xj, &WORK(indrv2 + 2), &WORK(
-		    indrv3 + 1), &tol, &WORK(indrv5 + 1), &IWORK(1), &iinfo);
+	    dlagtf_(&blksiz, &work[indrv4 + 1], &xj, &work[indrv2 + 2], &work[
+		    indrv3 + 1], &tol, &work[indrv5 + 1], &iwork[1], &iinfo);
 
 /*           Update iteration count. */
 
@@ -340,19 +334,18 @@ L70:
 /*           Normalize and scale the righthand side vector Pb.   
 
    Computing MAX */
-	    d__2 = eps, d__3 = (d__1 = WORK(indrv4 + blksiz), abs(d__1));
-	    scl = blksiz * onenrm * max(d__2,d__3) / dasum_(&blksiz, &WORK(
-		    indrv1 + 1), &c__1);
-	    dscal_(&blksiz, &scl, &WORK(indrv1 + 1), &c__1);
+	    d__2 = eps, d__3 = (d__1 = work[indrv4 + blksiz], abs(d__1));
+	    scl = blksiz * onenrm * max(d__2,d__3) / dasum_(&blksiz, &work[
+		    indrv1 + 1], &c__1);
+	    dscal_(&blksiz, &scl, &work[indrv1 + 1], &c__1);
 
 /*           Solve the system LU = Pb. */
 
-	    dlagts_(&c_n1, &blksiz, &WORK(indrv4 + 1), &WORK(indrv2 + 2), &
-		    WORK(indrv3 + 1), &WORK(indrv5 + 1), &IWORK(1), &WORK(
-		    indrv1 + 1), &tol, &iinfo);
+	    dlagts_(&c_n1, &blksiz, &work[indrv4 + 1], &work[indrv2 + 2], &
+		    work[indrv3 + 1], &work[indrv5 + 1], &iwork[1], &work[
+		    indrv1 + 1], &tol, &iinfo);
 
-/*           Reorthogonalize by modified Gram-Schmidt if eigenvalu
-es are   
+/*           Reorthogonalize by modified Gram-Schmidt if eigenvalues are   
              close enough. */
 
 	    if (jblk == 1) {
@@ -363,18 +356,18 @@ es are
 	    }
 	    if (gpind != j) {
 		i__3 = j - 1;
-		for (i = gpind; i <= j-1; ++i) {
+		for (i__ = gpind; i__ <= i__3; ++i__) {
 		    ztr = 0.;
 		    i__4 = blksiz;
-		    for (jr = 1; jr <= blksiz; ++jr) {
-			i__5 = b1 - 1 + jr + i * z_dim1;
-			ztr += WORK(indrv1 + jr) * Z(b1-1+jr,i).r;
+		    for (jr = 1; jr <= i__4; ++jr) {
+			i__5 = z___subscr(b1 - 1 + jr, i__);
+			ztr += work[indrv1 + jr] * z__[i__5].r;
 /* L80: */
 		    }
 		    i__4 = blksiz;
-		    for (jr = 1; jr <= blksiz; ++jr) {
-			i__5 = b1 - 1 + jr + i * z_dim1;
-			WORK(indrv1 + jr) -= ztr * Z(b1-1+jr,i).r;
+		    for (jr = 1; jr <= i__4; ++jr) {
+			i__5 = z___subscr(b1 - 1 + jr, i__);
+			work[indrv1 + jr] -= ztr * z__[i__5].r;
 /* L90: */
 		    }
 /* L100: */
@@ -384,11 +377,10 @@ es are
 /*           Check the infinity norm of the iterate. */
 
 L110:
-	    jmax = idamax_(&blksiz, &WORK(indrv1 + 1), &c__1);
-	    nrm = (d__1 = WORK(indrv1 + jmax), abs(d__1));
+	    jmax = idamax_(&blksiz, &work[indrv1 + 1], &c__1);
+	    nrm = (d__1 = work[indrv1 + jmax], abs(d__1));
 
-/*           Continue for additional iterations after norm reaches
-   
+/*           Continue for additional iterations after norm reaches   
              stopping criterion. */
 
 	    if (nrm < dtpcrt) {
@@ -401,36 +393,35 @@ L110:
 
 	    goto L130;
 
-/*           If stopping criterion was not satisfied, update info 
-and   
+/*           If stopping criterion was not satisfied, update info and   
              store eigenvector number in array ifail. */
 
 L120:
 	    ++(*info);
-	    IFAIL(*info) = j;
+	    ifail[*info] = j;
 
 /*           Accept iterate as jth eigenvector. */
 
 L130:
-	    scl = 1. / dnrm2_(&blksiz, &WORK(indrv1 + 1), &c__1);
-	    jmax = idamax_(&blksiz, &WORK(indrv1 + 1), &c__1);
-	    if (WORK(indrv1 + jmax) < 0.) {
+	    scl = 1. / dnrm2_(&blksiz, &work[indrv1 + 1], &c__1);
+	    jmax = idamax_(&blksiz, &work[indrv1 + 1], &c__1);
+	    if (work[indrv1 + jmax] < 0.) {
 		scl = -scl;
 	    }
-	    dscal_(&blksiz, &scl, &WORK(indrv1 + 1), &c__1);
+	    dscal_(&blksiz, &scl, &work[indrv1 + 1], &c__1);
 L140:
 	    i__3 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		i__4 = i + j * z_dim1;
-		Z(i,j).r = 0., Z(i,j).i = 0.;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		i__4 = z___subscr(i__, j);
+		z__[i__4].r = 0., z__[i__4].i = 0.;
 /* L150: */
 	    }
 	    i__3 = blksiz;
-	    for (i = 1; i <= blksiz; ++i) {
-		i__4 = b1 + i - 1 + j * z_dim1;
-		i__5 = indrv1 + i;
-		z__1.r = WORK(indrv1+i), z__1.i = 0.;
-		Z(b1+i-1,j).r = z__1.r, Z(b1+i-1,j).i = z__1.i;
+	    for (i__ = 1; i__ <= i__3; ++i__) {
+		i__4 = z___subscr(b1 + i__ - 1, j);
+		i__5 = indrv1 + i__;
+		z__1.r = work[i__5], z__1.i = 0.;
+		z__[i__4].r = z__1.r, z__[i__4].i = z__1.i;
 /* L160: */
 	    }
 
@@ -450,4 +441,8 @@ L180:
 /*     End of ZSTEIN */
 
 } /* zstein_ */
+
+#undef z___ref
+#undef z___subscr
+
 

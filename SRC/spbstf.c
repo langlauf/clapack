@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int spbstf_(char *uplo, integer *n, integer *kd, real *ab, 
 	integer *ldab, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -17,8 +18,7 @@
 
     This routine is designed to be used in conjunction with SSBGST.   
 
-    The factorization has the form  A = S**T*S  where S is a band matrix 
-  
+    The factorization has the form  A = S**T*S  where S is a band matrix   
     of the same bandwidth as A and the following structure:   
 
       S = ( U    )   
@@ -44,13 +44,10 @@
     AB      (input/output) REAL array, dimension (LDAB,N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first kd+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, if INFO = 0, the factor S from the split Cholesky   
             factorization A = S**T*S. See Further Details.   
@@ -68,8 +65,7 @@
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     N = 7, KD = 2:   
 
     S = ( s11  s12  s13                     )   
@@ -84,33 +80,26 @@
 
     on entry:                          on exit:   
 
-     *    *   a13  a24  a35  a46  a57   *    *   s13  s24  s53  s64  s75 
-  
-     *   a12  a23  a34  a45  a56  a67   *   s12  s23  s34  s54  s65  s76 
-  
-    a11  a22  a33  a44  a55  a66  a77  s11  s22  s33  s44  s55  s66  s77 
-  
+     *    *   a13  a24  a35  a46  a57   *    *   s13  s24  s53  s64  s75   
+     *   a12  a23  a34  a45  a56  a67   *   s12  s23  s34  s54  s65  s76   
+    a11  a22  a33  a44  a55  a66  a77  s11  s22  s33  s44  s55  s66  s77   
 
     If UPLO = 'L', the array AB holds:   
 
     on entry:                          on exit:   
 
-    a11  a22  a33  a44  a55  a66  a77  s11  s22  s33  s44  s55  s66  s77 
-  
+    a11  a22  a33  a44  a55  a66  a77  s11  s22  s33  s44  s55  s66  s77   
     a21  a32  a43  a54  a65  a76   *   s12  s23  s34  s54  s65  s76   *   
     a31  a42  a53  a64  a64   *    *   s13  s24  s53  s64  s75   *    *   
 
     Array elements marked * are not used by the routine.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static real c_b9 = -1.f;
@@ -131,12 +120,14 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static real ajj;
     static integer kld;
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
 
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -170,124 +161,115 @@
 
     if (upper) {
 
-/*        Factorize A(m+1:n,m+1:n) as L**T*L, and update A(1:m,1:m). 
-*/
+/*        Factorize A(m+1:n,m+1:n) as L**T*L, and update A(1:m,1:m). */
 
 	i__1 = m + 1;
-	for (j = *n; j >= m+1; --j) {
+	for (j = *n; j >= i__1; --j) {
 
-/*           Compute s(j,j) and test for non-positive-definiteness
-. */
+/*           Compute s(j,j) and test for non-positive-definiteness. */
 
-	    ajj = AB(*kd+1,j);
+	    ajj = ab_ref(*kd + 1, j);
 	    if (ajj <= 0.f) {
 		goto L50;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(*kd+1,j) = ajj;
+	    ab_ref(*kd + 1, j) = ajj;
 /* Computing MIN */
 	    i__2 = j - 1;
 	    km = min(i__2,*kd);
 
-/*           Compute elements j-km:j-1 of the j-th column and upda
-te the   
+/*           Compute elements j-km:j-1 of the j-th column and update the   
              the leading submatrix within the band. */
 
 	    r__1 = 1.f / ajj;
-	    sscal_(&km, &r__1, &AB(*kd+1-km,j), &c__1);
-	    ssyr_("Upper", &km, &c_b9, &AB(*kd+1-km,j), &c__1,
-		     &AB(*kd+1,j-km), &kld);
+	    sscal_(&km, &r__1, &ab_ref(*kd + 1 - km, j), &c__1);
+	    ssyr_("Upper", &km, &c_b9, &ab_ref(*kd + 1 - km, j), &c__1, &
+		    ab_ref(*kd + 1, j - km), &kld);
 /* L10: */
 	}
 
 /*        Factorize the updated submatrix A(1:m,1:m) as U**T*U. */
 
 	i__1 = m;
-	for (j = 1; j <= m; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute s(j,j) and test for non-positive-definiteness
-. */
+/*           Compute s(j,j) and test for non-positive-definiteness. */
 
-	    ajj = AB(*kd+1,j);
+	    ajj = ab_ref(*kd + 1, j);
 	    if (ajj <= 0.f) {
 		goto L50;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(*kd+1,j) = ajj;
+	    ab_ref(*kd + 1, j) = ajj;
 /* Computing MIN */
 	    i__2 = *kd, i__3 = m - j;
 	    km = min(i__2,i__3);
 
-/*           Compute elements j+1:j+km of the j-th row and update 
-the   
+/*           Compute elements j+1:j+km of the j-th row and update the   
              trailing submatrix within the band. */
 
 	    if (km > 0) {
 		r__1 = 1.f / ajj;
-		sscal_(&km, &r__1, &AB(*kd,j+1), &kld);
-		ssyr_("Upper", &km, &c_b9, &AB(*kd,j+1), &kld,
-			 &AB(*kd+1,j+1), &kld);
+		sscal_(&km, &r__1, &ab_ref(*kd, j + 1), &kld);
+		ssyr_("Upper", &km, &c_b9, &ab_ref(*kd, j + 1), &kld, &ab_ref(
+			*kd + 1, j + 1), &kld);
 	    }
 /* L20: */
 	}
     } else {
 
-/*        Factorize A(m+1:n,m+1:n) as L**T*L, and update A(1:m,1:m). 
-*/
+/*        Factorize A(m+1:n,m+1:n) as L**T*L, and update A(1:m,1:m). */
 
 	i__1 = m + 1;
-	for (j = *n; j >= m+1; --j) {
+	for (j = *n; j >= i__1; --j) {
 
-/*           Compute s(j,j) and test for non-positive-definiteness
-. */
+/*           Compute s(j,j) and test for non-positive-definiteness. */
 
-	    ajj = AB(1,j);
+	    ajj = ab_ref(1, j);
 	    if (ajj <= 0.f) {
 		goto L50;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(1,j) = ajj;
+	    ab_ref(1, j) = ajj;
 /* Computing MIN */
 	    i__2 = j - 1;
 	    km = min(i__2,*kd);
 
-/*           Compute elements j-km:j-1 of the j-th row and update 
-the   
+/*           Compute elements j-km:j-1 of the j-th row and update the   
              trailing submatrix within the band. */
 
 	    r__1 = 1.f / ajj;
-	    sscal_(&km, &r__1, &AB(km+1,j-km), &kld);
-	    ssyr_("Lower", &km, &c_b9, &AB(km+1,j-km), &kld,
-		     &AB(1,j-km), &kld);
+	    sscal_(&km, &r__1, &ab_ref(km + 1, j - km), &kld);
+	    ssyr_("Lower", &km, &c_b9, &ab_ref(km + 1, j - km), &kld, &ab_ref(
+		    1, j - km), &kld);
 /* L30: */
 	}
 
 /*        Factorize the updated submatrix A(1:m,1:m) as U**T*U. */
 
 	i__1 = m;
-	for (j = 1; j <= m; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 
-/*           Compute s(j,j) and test for non-positive-definiteness
-. */
+/*           Compute s(j,j) and test for non-positive-definiteness. */
 
-	    ajj = AB(1,j);
+	    ajj = ab_ref(1, j);
 	    if (ajj <= 0.f) {
 		goto L50;
 	    }
 	    ajj = sqrt(ajj);
-	    AB(1,j) = ajj;
+	    ab_ref(1, j) = ajj;
 /* Computing MIN */
 	    i__2 = *kd, i__3 = m - j;
 	    km = min(i__2,i__3);
 
-/*           Compute elements j+1:j+km of the j-th column and upda
-te the   
+/*           Compute elements j+1:j+km of the j-th column and update the   
              trailing submatrix within the band. */
 
 	    if (km > 0) {
 		r__1 = 1.f / ajj;
-		sscal_(&km, &r__1, &AB(2,j), &c__1);
-		ssyr_("Lower", &km, &c_b9, &AB(2,j), &c__1, &AB(1,j+1), &kld);
+		sscal_(&km, &r__1, &ab_ref(2, j), &c__1);
+		ssyr_("Lower", &km, &c_b9, &ab_ref(2, j), &c__1, &ab_ref(1, j 
+			+ 1), &kld);
 	    }
 /* L40: */
 	}
@@ -301,4 +283,7 @@ L50:
 /*     End of SPBSTF */
 
 } /* spbstf_ */
+
+#undef ab_ref
+
 

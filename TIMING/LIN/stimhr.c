@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -54,7 +55,7 @@ static integer c_n1 = -1;
     static integer info;
     static char path[3];
     static real time;
-    static integer isub, i, m, n;
+    static integer isub, i__, m, n;
     static char cname[6];
     static integer iside, itoff, itran;
     extern doublereal sopla_(char *, integer *, integer *, integer *, integer 
@@ -110,7 +111,12 @@ static integer c_n1 = -1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -129,8 +135,7 @@ static integer c_n1 = -1;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -200,15 +205,13 @@ static integer c_n1 = -1;
             eigenvalues.  See CLATMS for further details.   
 
     COND    REAL   
-            The condition number of the matrix.  The singular values are 
-  
+            The condition number of the matrix.  The singular values are   
             set to values from DMAX to DMAX/COND.   
 
     DMAX    REAL   
             The magnitude of the largest singular value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -223,28 +226,31 @@ static integer c_n1 = -1;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Single precision", 1L, 16L);
-    s_copy(path + 1, "HR", 2L, 2L);
-    atimin_(path, line, &c__4, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "HR", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__4, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L210;
     }
 
 /*     Check that N <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__2, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__2, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___9.ciunit = *nout;
 	s_wsfe(&io___9);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	goto L210;
     }
@@ -252,12 +258,12 @@ static integer c_n1 = -1;
 /*     Check that K <= LDA for SORMHR */
 
     if (timsub[3]) {
-	atimck_(&c__3, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, 6L)
-		;
+	atimck_(&c__3, cname, nn, &nval[1], nlda, &ldaval[1], nout, &info, (
+		ftnlen)6);
 	if (info > 0) {
 	    io___10.ciunit = *nout;
 	    s_wsfe(&io___10);
-	    do_fio(&c__1, subnam + 18, 6L);
+	    do_fio(&c__1, subnam_ref(0, 4), (ftnlen)6);
 	    e_wsfe();
 	    timsub[3] = FALSE_;
 	}
@@ -278,8 +284,7 @@ static integer c_n1 = -1;
 	for (ilda = 1; ilda <= i__2; ++ilda) {
 	    lda = ldaval[ilda];
 
-/*           Do for each pair of values (NB, NX) in NBVAL and NXVA
-L. */
+/*           Do for each pair of values (NB, NX) in NBVAL and NXVAL. */
 
 	    i__3 = *nnb;
 	    for (inb = 1; inb <= i__3; ++inb) {
@@ -300,8 +305,7 @@ L. */
 
 		if (timsub[1] && inb == 1) {
 
-/*                 ORTHES:  Eispack reduction using orthog
-onal   
+/*                 ORTHES:  Eispack reduction using orthogonal   
                    transformations. */
 
 		    slacpy_("Full", &m, &m, &b[1], &lda, &a[1], &lda);
@@ -332,9 +336,8 @@ L20:
 
 		    time = (time - untime) / (real) ic;
 		    ops = sopla_("SGEHRD", &m, &ilo, &ihi, &c__0, &nb);
-		    reslts[inb + (im + (ilda + (reslts_dim3 << 1)) * 
-			    reslts_dim2) * reslts_dim1] = smflop_(&ops, &time,
-			     &info);
+		    reslts_ref(inb, im, ilda, 2) = smflop_(&ops, &time, &info)
+			    ;
 		}
 
 		if (timsub[0]) {
@@ -370,16 +373,13 @@ L40:
 
 		    time = (time - untime) / (real) ic;
 		    ops = sopla_("SGEHRD", &m, &ilo, &ihi, &c__0, &nb);
-		    reslts[inb + (im + (ilda + reslts_dim3) * reslts_dim2) * 
-			    reslts_dim1] = smflop_(&ops, &time, &info);
+		    reslts_ref(inb, im, ilda, 1) = smflop_(&ops, &time, &info)
+			    ;
 		} else {
 
-/*                 If SGEHRD was not timed, generate a mat
-rix and factor   
-                   it using SGEHRD anyway so that the fact
-ored form of   
-                   the matrix can be used in timing the ot
-her routines. */
+/*                 If SGEHRD was not timed, generate a matrix and factor   
+                   it using SGEHRD anyway so that the factored form of   
+                   the matrix can be used in timing the other routines. */
 
 		    slacpy_("Full", &m, &m, &b[1], &lda, &a[1], &lda);
 		    sgehrd_(&m, &ilo, &ihi, &a[1], &lda, &tau[1], &work[1], &
@@ -388,10 +388,8 @@ her routines. */
 
 		if (timsub[2]) {
 
-/*                 SORGHR:  Generate the orthogonal matrix
- Q from the   
-                   reduction to Hessenberg form A = Q*H*Q'
- */
+/*                 SORGHR:  Generate the orthogonal matrix Q from the   
+                   reduction to Hessenberg form A = Q*H*Q' */
 
 		    slacpy_("Full", &m, &m, &a[1], &lda, &b[1], &lda);
 		    ic = 0;
@@ -423,21 +421,19 @@ L60:
 		    time = (time - untime) / (real) ic;
 
 /*                 Op count for SORGHR:  same as   
-                      SORGQR( IHI-ILO, IHI-ILO, IHI-ILO, .
-.. ) */
+                      SORGQR( IHI-ILO, IHI-ILO, IHI-ILO, ... ) */
 
 		    i__4 = ihi - ilo;
 		    i__5 = ihi - ilo;
 		    i__6 = ihi - ilo;
 		    ops = sopla_("SORGQR", &i__4, &i__5, &i__6, &c__0, &nb);
-		    reslts[inb + (im + (ilda + reslts_dim3 * 3) * reslts_dim2)
-			     * reslts_dim1] = smflop_(&ops, &time, &info);
+		    reslts_ref(inb, im, ilda, 3) = smflop_(&ops, &time, &info)
+			    ;
 		}
 
 		if (timsub[3]) {
 
-/*                 SORMHR:  Multiply by Q stored as a prod
-uct of   
+/*                 SORMHR:  Multiply by Q stored as a product of   
                    elementary transformations */
 
 		    i4 = 3;
@@ -478,8 +474,7 @@ L70:
 				    goto L70;
 				}
 
-/*                          Subtract the time 
-used in STIMMG. */
+/*                          Subtract the time used in STIMMG. */
 
 				icl = 1;
 				s1 = second_();
@@ -495,15 +490,11 @@ L80:
 
 				time = (time - untime) / (real) ic;
 
-/*                          Op count for SORMH
-R, SIDE='L':  same as   
-                            SORMQR( 'L', TRANS
-, IHI-ILO, N, IHI-ILO, ...)   
+/*                          Op count for SORMHR, SIDE='L':  same as   
+                            SORMQR( 'L', TRANS, IHI-ILO, N, IHI-ILO, ...)   
 
-                            Op count for SORMH
-R, SIDE='R':  same as   
-                            SORMQR( 'R', TRANS
-, M, IHI-ILO, IHI-ILO, ...) */
+                            Op count for SORMHR, SIDE='R':  same as   
+                            SORMQR( 'R', TRANS, M, IHI-ILO, IHI-ILO, ...) */
 
 				if (iside == 1) {
 				    i__5 = ihi - ilo;
@@ -517,10 +508,8 @@ R, SIDE='R':  same as
 					    &c__1, &nb);
 				}
 
-				reslts[inb + (im + (ilda + (i4 + itoff + in) *
-					 reslts_dim3) * reslts_dim2) * 
-					reslts_dim1] = smflop_(&ops, &time, &
-					info);
+				reslts_ref(inb, im, ilda, i4 + itoff + in) = 
+					smflop_(&ops, &time, &info);
 				itoff = *nn;
 /* L90: */
 			    }
@@ -546,15 +535,15 @@ R, SIDE='R':  same as
 	}
 	io___40.ciunit = *nout;
 	s_wsfe(&io___40);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___42.ciunit = *nout;
 		s_wsfe(&io___42);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L150: */
 	    }
@@ -564,12 +553,12 @@ R, SIDE='R':  same as
 	e_wsfe();
 	if (isub == 2) {
 	    sprtb3_(" ", "N", &c__1, &nbval[1], &nxval[1], nm, &mval[1], nlda,
-		     &reslts[((isub * reslts_dim3 + 1) * reslts_dim2 + 1) * 
-		    reslts_dim1 + 1], ldr1, ldr2, nout, 1L, 1L);
+		     &reslts_ref(1, 1, 1, isub), ldr1, ldr2, nout, (ftnlen)1, 
+		    (ftnlen)1);
 	} else {
 	    sprtb3_("(  NB,  NX)", "N", nnb, &nbval[1], &nxval[1], nm, &mval[
-		    1], nlda, &reslts[((isub * reslts_dim3 + 1) * reslts_dim2 
-		    + 1) * reslts_dim1 + 1], ldr1, ldr2, nout, 11L, 1L);
+		    1], nlda, &reslts_ref(1, 1, 1, isub), ldr1, ldr2, nout, (
+		    ftnlen)11, (ftnlen)1);
 	}
 L160:
 	;
@@ -587,14 +576,14 @@ L160:
 		if (*nlda > 1) {
 		    io___46.ciunit = *nout;
 		    s_wsfe(&io___46);
-		    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+		    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 		    e_wsfe();
 		    i__1 = *nlda;
-		    for (i = 1; i <= i__1; ++i) {
+		    for (i__ = 1; i__ <= i__1; ++i__) {
 			io___47.ciunit = *nout;
 			s_wsfe(&io___47);
-			do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-			do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(
+			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(
 				integer));
 			e_wsfe();
 /* L170: */
@@ -612,16 +601,15 @@ L160:
 		for (in = 1; in <= i__1; ++in) {
 		    io___49.ciunit = *nout;
 		    s_wsfe(&io___49);
-		    do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
-		    do_fio(&c__1, sides + (iside - 1), 1L);
-		    do_fio(&c__1, transs + (itran - 1), 1L);
-		    do_fio(&c__1, lab2, 1L);
+		    do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
+		    do_fio(&c__1, sides + (iside - 1), (ftnlen)1);
+		    do_fio(&c__1, transs + (itran - 1), (ftnlen)1);
+		    do_fio(&c__1, lab2, (ftnlen)1);
 		    do_fio(&c__1, (char *)&nval[in], (ftnlen)sizeof(integer));
 		    e_wsfe();
 		    sprtbl_("NB", lab1, nnb, &nbval[1], nm, &mval[1], nlda, &
-			    reslts[(((i4 + in) * reslts_dim3 + 1) * 
-			    reslts_dim2 + 1) * reslts_dim1 + 1], ldr1, ldr2, 
-			    nout, 2L, 1L);
+			    reslts_ref(1, 1, 1, i4 + in), ldr1, ldr2, nout, (
+			    ftnlen)2, (ftnlen)1);
 /* L180: */
 		}
 		i4 += *nn;
@@ -639,4 +627,8 @@ L210:
 /*     End of STIMHR */
 
 } /* stimhr_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

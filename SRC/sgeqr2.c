@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sgeqr2_(integer *m, integer *n, real *a, integer *lda, 
 	real *tau, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -26,11 +27,9 @@
 
     A       (input/output) REAL array, dimension (LDA,N)   
             On entry, the m by n matrix A.   
-            On exit, the elements on and above the diagonal of the array 
-  
+            On exit, the elements on and above the diagonal of the array   
             contain the min(m,n) by n upper trapezoidal matrix R (R is   
-            upper triangular if m >= n); the elements below the diagonal, 
-  
+            upper triangular if m >= n); the elements below the diagonal,   
             with the array TAU, represent the orthogonal matrix Q as a   
             product of elementary reflectors (see Further Details).   
 
@@ -38,8 +37,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) REAL array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) REAL array, dimension (N)   
@@ -60,39 +58,37 @@
        H(i) = I - tau * v * v'   
 
     where tau is a real scalar, and v is a real vector with   
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i), 
-  
+    v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i),   
     and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     extern /* Subroutine */ int slarf_(char *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *), xerbla_(
 	    char *, integer *), slarfg_(integer *, real *, real *, 
 	    integer *, real *);
     static real aii;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -110,27 +106,26 @@
     k = min(*m,*n);
 
     i__1 = k;
-    for (i = 1; i <= k; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 
-/*        Generate elementary reflector H(i) to annihilate A(i+1:m,i) 
-*/
+/*        Generate elementary reflector H(i) to annihilate A(i+1:m,i)   
 
-	i__2 = *m - i + 1;
-/* Computing MIN */
-	i__3 = i + 1;
-	slarfg_(&i__2, &A(i,i), &A(min(i+1,*m),i), &
-		c__1, &TAU(i));
-	if (i < *n) {
+   Computing MIN */
+	i__2 = i__ + 1;
+	i__3 = *m - i__ + 1;
+	slarfg_(&i__3, &a_ref(i__, i__), &a_ref(min(i__2,*m), i__), &c__1, &
+		tau[i__]);
+	if (i__ < *n) {
 
 /*           Apply H(i) to A(i:m,i+1:n) from the left */
 
-	    aii = A(i,i);
-	    A(i,i) = 1.f;
-	    i__2 = *m - i + 1;
-	    i__3 = *n - i;
-	    slarf_("Left", &i__2, &i__3, &A(i,i), &c__1, &TAU(i), &
-		    A(i,i+1), lda, &WORK(1));
-	    A(i,i) = aii;
+	    aii = a_ref(i__, i__);
+	    a_ref(i__, i__) = 1.f;
+	    i__2 = *m - i__ + 1;
+	    i__3 = *n - i__;
+	    slarf_("Left", &i__2, &i__3, &a_ref(i__, i__), &c__1, &tau[i__], &
+		    a_ref(i__, i__ + 1), lda, &work[1]);
+	    a_ref(i__, i__) = aii;
 	}
 /* L10: */
     }
@@ -139,4 +134,7 @@
 /*     End of SGEQR2 */
 
 } /* sgeqr2_ */
+
+#undef a_ref
+
 

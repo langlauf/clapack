@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 integer izmax1_(integer *n, doublecomplex *cx, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -31,26 +32,23 @@ integer izmax1_(integer *n, doublecomplex *cx, integer *incx)
     INCX    (input) INTEGER   
             The spacing between successive values of CX.  INCX >= 1.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
        NEXT LINE IS THE ONLY MODIFICATION.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
-    integer ret_val, i__1, i__2;
-    doublereal d__1;
+    integer ret_val, i__1;
+    /* Builtin functions */
+    double z_abs(doublecomplex *);
     /* Local variables */
     static doublereal smax;
-    static integer i, ix;
+    static integer i__, ix;
 
+    --cx;
 
-#define CX(I) cx[(I)-1]
-
-
+    /* Function Body */
     ret_val = 0;
     if (*n < 1) {
 	return ret_val;
@@ -66,17 +64,15 @@ integer izmax1_(integer *n, doublecomplex *cx, integer *incx)
 /*     CODE FOR INCREMENT NOT EQUAL TO 1 */
 
     ix = 1;
-    smax = (d__1 = CX(1).r, abs(d__1));
+    smax = z_abs(&cx[1]);
     ix += *incx;
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	i__2 = ix;
-	if ((d__1 = CX(ix).r, abs(d__1)) <= smax) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	if (z_abs(&cx[ix]) <= smax) {
 	    goto L10;
 	}
-	ret_val = i;
-	i__2 = ix;
-	smax = (d__1 = CX(ix).r, abs(d__1));
+	ret_val = i__;
+	smax = z_abs(&cx[ix]);
 L10:
 	ix += *incx;
 /* L20: */
@@ -86,16 +82,14 @@ L10:
 /*     CODE FOR INCREMENT EQUAL TO 1 */
 
 L30:
-    smax = (d__1 = CX(1).r, abs(d__1));
+    smax = z_abs(&cx[1]);
     i__1 = *n;
-    for (i = 2; i <= *n; ++i) {
-	i__2 = i;
-	if ((d__1 = CX(i).r, abs(d__1)) <= smax) {
+    for (i__ = 2; i__ <= i__1; ++i__) {
+	if (z_abs(&cx[i__]) <= smax) {
 	    goto L40;
 	}
-	ret_val = i;
-	i__2 = i;
-	smax = (d__1 = CX(i).r, abs(d__1));
+	ret_val = i__;
+	smax = z_abs(&cx[i__]);
 L40:
 	;
     }

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,7 +14,7 @@ static real c_b19 = 1.f;
 	integer *knt)
 {
     /* System generated locals */
-    real r__1, r__2, r__3;
+    real r__1, r__2, r__3, r__4, r__5, r__6;
 
     /* Builtin functions */
     double r_sign(real *, real *);
@@ -33,7 +34,13 @@ static real c_b19 = 1.f;
     static real smlnum, wi1, wi2, wr1, wr2, val[4], eps, res, sum;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_ref(a_1,a_2) q[(a_2)*2 + a_1 - 3]
+#define t_ref(a_1,a_2) t[(a_2)*2 + a_1 - 3]
+#define t1_ref(a_1,a_2) t1[(a_2)*2 + a_1 - 3]
+#define t2_ref(a_1,a_2) t2[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -69,8 +76,7 @@ static real c_b19 = 1.f;
     KNT     (output) INTEGER   
             Total number of examples tested.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Get machine parameters */
@@ -105,57 +111,62 @@ static real c_b19 = 1.f;
 			for (im2 = 1; im2 <= 3; ++im2) {
 			    for (im3 = 1; im3 <= 3; ++im3) {
 				for (im4 = 1; im4 <= 3; ++im4) {
-				    t[0] = val[i1 - 1] * vm[im1 - 1];
-				    t[2] = val[i2 - 1] * vm[im2 - 1];
-				    t[1] = -(doublereal)val[i3 - 1] * vm[im3 
-					    - 1];
-				    t[3] = val[i4 - 1] * vm[im4 - 1];
+				    t_ref(1, 1) = val[i1 - 1] * vm[im1 - 1];
+				    t_ref(1, 2) = val[i2 - 1] * vm[im2 - 1];
+				    t_ref(2, 1) = -val[i3 - 1] * vm[im3 - 1];
+				    t_ref(2, 2) = val[i4 - 1] * vm[im4 - 1];
 /* Computing MAX */
-				    r__1 = dabs(t[0]), r__2 = dabs(t[2]), 
-					    r__1 = max(r__1,r__2), r__2 = 
-					    dabs(t[1]), r__1 = max(r__1,r__2),
-					     r__2 = dabs(t[3]);
-				    tnrm = dmax(r__1,r__2);
-				    t1[0] = t[0];
-				    t1[2] = t[2];
-				    t1[1] = t[1];
-				    t1[3] = t[3];
-				    q[0] = 1.f;
-				    q[2] = 0.f;
-				    q[1] = 0.f;
-				    q[3] = 1.f;
+				    r__5 = (r__1 = t_ref(1, 1), dabs(r__1)), 
+					    r__6 = (r__2 = t_ref(1, 2), dabs(
+					    r__2)), r__5 = max(r__5,r__6), 
+					    r__6 = (r__3 = t_ref(2, 1), dabs(
+					    r__3)), r__5 = max(r__5,r__6), 
+					    r__6 = (r__4 = t_ref(2, 2), dabs(
+					    r__4));
+				    tnrm = dmax(r__5,r__6);
+				    t1_ref(1, 1) = t_ref(1, 1);
+				    t1_ref(1, 2) = t_ref(1, 2);
+				    t1_ref(2, 1) = t_ref(2, 1);
+				    t1_ref(2, 2) = t_ref(2, 2);
+				    q_ref(1, 1) = 1.f;
+				    q_ref(1, 2) = 0.f;
+				    q_ref(2, 1) = 0.f;
+				    q_ref(2, 2) = 1.f;
 
-				    slanv2_(t, &t[2], &t[1], &t[3], &wr1, &
+				    slanv2_(&t_ref(1, 1), &t_ref(1, 2), &
+					    t_ref(2, 1), &t_ref(2, 2), &wr1, &
 					    wi1, &wr2, &wi2, &cs, &sn);
 				    for (j1 = 1; j1 <= 2; ++j1) {
-					res = q[j1 - 1] * cs + q[j1 + 1] * sn;
-					q[j1 + 1] = -(doublereal)q[j1 - 1] * 
-						sn + q[j1 + 1] * cs;
-					q[j1 - 1] = res;
+					res = q_ref(j1, 1) * cs + q_ref(j1, 2)
+						 * sn;
+					q_ref(j1, 2) = -q_ref(j1, 1) * sn + 
+						q_ref(j1, 2) * cs;
+					q_ref(j1, 1) = res;
 /* L10: */
 				    }
 
 				    res = 0.f;
 /* Computing 2nd power */
-				    r__2 = q[0];
+				    r__2 = q_ref(1, 1);
 /* Computing 2nd power */
-				    r__3 = q[2];
+				    r__3 = q_ref(1, 2);
 				    res += (r__1 = r__2 * r__2 + r__3 * r__3 
 					    - 1.f, dabs(r__1)) / eps;
 /* Computing 2nd power */
-				    r__2 = q[3];
+				    r__2 = q_ref(2, 2);
 /* Computing 2nd power */
-				    r__3 = q[1];
+				    r__3 = q_ref(2, 1);
 				    res += (r__1 = r__2 * r__2 + r__3 * r__3 
 					    - 1.f, dabs(r__1)) / eps;
-				    res += (r__1 = q[0] * q[1] + q[2] * q[3], 
-					    dabs(r__1)) / eps;
+				    res += (r__1 = q_ref(1, 1) * q_ref(2, 1) 
+					    + q_ref(1, 2) * q_ref(2, 2), dabs(
+					    r__1)) / eps;
 				    for (j1 = 1; j1 <= 2; ++j1) {
 					for (j2 = 1; j2 <= 2; ++j2) {
-					    t2[j1 + (j2 << 1) - 3] = 0.f;
+					    t2_ref(j1, j2) = 0.f;
 					    for (j3 = 1; j3 <= 2; ++j3) {
-			  t2[j1 + (j2 << 1) - 3] += t1[j1 + (j3 << 1) - 3] * 
-				  q[j3 + (j2 << 1) - 3];
+			  t2_ref(j1, j2) = t2_ref(j1, j2) + t1_ref(j1, j3) * 
+				  q_ref(j3, j2);
 /* L20: */
 					    }
 /* L30: */
@@ -164,10 +175,9 @@ static real c_b19 = 1.f;
 				    }
 				    for (j1 = 1; j1 <= 2; ++j1) {
 					for (j2 = 1; j2 <= 2; ++j2) {
-					    sum = t[j1 + (j2 << 1) - 3];
+					    sum = t_ref(j1, j2);
 					    for (j3 = 1; j3 <= 2; ++j3) {
-			  sum -= q[j3 + (j1 << 1) - 3] * t2[j3 + (j2 << 1) - 
-				  3];
+			  sum -= q_ref(j3, j1) * t2_ref(j3, j2);
 /* L50: */
 					    }
 					    res += dabs(sum) / eps / tnrm;
@@ -175,9 +185,10 @@ static real c_b19 = 1.f;
 					}
 /* L70: */
 				    }
-				    if (t[1] != 0.f && (t[0] != t[3] || 
-					    r_sign(&c_b19, &t[2]) * r_sign(&
-					    c_b19, &t[1]) > 0.f)) {
+				    if (t_ref(2, 1) != 0.f && (t_ref(1, 1) != 
+					    t_ref(2, 2) || r_sign(&c_b19, &
+					    t_ref(1, 2)) * r_sign(&c_b19, &
+					    t_ref(2, 1)) > 0.f)) {
 					res += 1.f / eps;
 				    }
 				    ++(*knt);
@@ -207,4 +218,10 @@ static real c_b19 = 1.f;
 /*     End of SGET33 */
 
 } /* sget33_ */
+
+#undef t2_ref
+#undef t1_ref
+#undef t_ref
+#undef q_ref
+
 

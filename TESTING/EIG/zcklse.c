@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,8 +37,8 @@ static integer c__0 = 0;
 
     /* Local variables */
     static integer imat;
-    static char path[3], type[1];
-    static integer nrun, i, m, n, p, modea, modeb, nfail;
+    static char path[3], type__[1];
+    static integer nrun, i__, m, n, p, modea, modeb, nfail;
     static char dista[1], distb[1];
     static integer iinfo;
     static doublereal anorm, bnorm;
@@ -79,7 +80,7 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -108,19 +109,15 @@ static integer c__0 = 0;
             The values of the matrix column(row) dimension N.   
 
     NMATS   (input) INTEGER   
-            The number of matrix types to be tested for each combination 
-  
+            The number of matrix types to be tested for each combination   
             of matrix dimensions.  If NMATS >= NTYPES (the maximum   
             number of matrix types), then all the different types are   
-            generated for testing.  If NMATS < NTYPES, another input line 
-  
+            generated for testing.  If NMATS < NTYPES, another input line   
             is read to get the numbers of the matrix types to be used.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator.  The array 
-  
-            elements should be between 0 and 4095, otherwise they will be 
-  
+            On entry, the seed of the random number generator.  The array   
+            elements should be between 0 and 4095, otherwise they will be   
             reduced mod 4096, and ISEED(4) must be odd.   
             On exit, the next seed in the random number sequence after   
             all the test matrices have been generated.   
@@ -131,8 +128,7 @@ static integer c__0 = 0;
             every test ratio printed, use THRESH = 0.   
 
     NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning 
-  
+            The maximum value permitted for M or N, used in dimensioning   
             the work arrays.   
 
     A       (workspace) COMPLEX*16 array, dimension (NMAX*NMAX)   
@@ -160,8 +156,7 @@ static integer c__0 = 0;
             > 0 :  If ZLATMS returns an error code, the absolute value   
                    of it is returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize constants and the random number seed.   
@@ -180,7 +175,7 @@ static integer c__0 = 0;
     --mval;
 
     /* Function Body */
-    s_copy(path, "LSE", 3L, 3L);
+    s_copy(path, "LSE", (ftnlen)3, (ftnlen)3);
     *info = 0;
     nrun = 0;
     nfail = 0;
@@ -237,11 +232,11 @@ static integer c__0 = 0;
 /*           Set up parameters with DLATB9 and generate test   
              matrices A and B with ZLATMS. */
 
-	    dlatb9_(path, &imat, &m, &p, &n, type, &kla, &kua, &klb, &kub, &
+	    dlatb9_(path, &imat, &m, &p, &n, type__, &kla, &kua, &klb, &kub, &
 		    anorm, &bnorm, &modea, &modeb, &cndnma, &cndnmb, dista, 
 		    distb);
 
-	    zlatms_(&m, &n, dista, &iseed[1], type, &rwork[1], &modea, &
+	    zlatms_(&m, &n, dista, &iseed[1], type__, &rwork[1], &modea, &
 		    cndnma, &anorm, &kla, &kua, "No packing", &a[1], &lda, &
 		    work[1], &iinfo);
 	    if (iinfo != 0) {
@@ -253,7 +248,7 @@ static integer c__0 = 0;
 		goto L30;
 	    }
 
-	    zlatms_(&p, &n, distb, &iseed[1], type, &rwork[1], &modeb, &
+	    zlatms_(&p, &n, distb, &iseed[1], type__, &rwork[1], &modeb, &
 		    cndnmb, &bnorm, &klb, &kub, "No packing", &b[1], &ldb, &
 		    work[1], &iinfo);
 	    if (iinfo != 0) {
@@ -302,8 +297,8 @@ static integer c__0 = 0;
              pass the threshold. */
 
 	    i__2 = nt;
-	    for (i = 1; i <= i__2; ++i) {
-		if (result[i - 1] >= *thresh) {
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		if (result[i__ - 1] >= *thresh) {
 		    if (nfail == 0 && firstt) {
 			firstt = FALSE_;
 			alahdg_(nout, path);
@@ -314,8 +309,8 @@ static integer c__0 = 0;
 		    do_fio(&c__1, (char *)&p, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, (char *)&result[i - 1], (ftnlen)sizeof(
+		    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&result[i__ - 1], (ftnlen)sizeof(
 			    doublereal));
 		    e_wsfe();
 		    ++nfail;

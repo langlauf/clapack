@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slasr_(char *side, char *pivot, char *direct, integer *m,
-	 integer *n, real *c, real *s, real *a, integer *lda)
+	 integer *n, real *c__, real *s, real *a, integer *lda)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -20,8 +21,7 @@
 
     where A is an m by n real matrix and P is an orthogonal matrix,   
     consisting of a sequence of plane rotations determined by the   
-    parameters PIVOT and DIRECT as follows ( z = m when SIDE = 'L' or 'l' 
-  
+    parameters PIVOT and DIRECT as follows ( z = m when SIDE = 'L' or 'l'   
     and z = n when SIDE = 'R' or 'r' ):   
 
     When  DIRECT = 'F' or 'f'  ( Forward sequence ) then   
@@ -43,8 +43,7 @@
        when  PIVOT = 'B' or 'b'  ( Bottom pivot ),   
           the plane ( k, z )   
 
-    c( k ) and s( k )  must contain the  cosine and sine that define the 
-  
+    c( k ) and s( k )  must contain the  cosine and sine that define the   
     matrix  P( k ).  The two by two plane rotation part of the matrix   
     P( k ), R( k ), is assumed to be of the form   
 
@@ -76,8 +75,7 @@
             = 'B':  Bottom pivot, the plane (k,z)   
 
     M       (input) INTEGER   
-            The number of rows of the matrix A.  If m <= 1, an immediate 
-  
+            The number of rows of the matrix A.  If m <= 1, an immediate   
             return is effected.   
 
     N       (input) INTEGER   
@@ -100,39 +98,38 @@
     LDA     (input) INTEGER   
             The leading dimension of the array A.  LDA >= max(1,M).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     /* Local variables */
     static integer info;
     static real temp;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real ctemp, stemp;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
+    --c__;
+    --s;
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-#define C(I) c[(I)-1]
-#define S(I) s[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     info = 0;
     if (! (lsame_(side, "L") || lsame_(side, "R"))) {
 	info = 1;
-    } else if (! (lsame_(pivot, "V") || lsame_(pivot, "T") || 
-	    lsame_(pivot, "B"))) {
+    } else if (! (lsame_(pivot, "V") || lsame_(pivot, 
+	    "T") || lsame_(pivot, "B"))) {
 	info = 2;
-    } else if (! (lsame_(direct, "F") || lsame_(direct, "B")))
-	     {
+    } else if (! (lsame_(direct, "F") || lsame_(direct, 
+	    "B"))) {
 	info = 3;
     } else if (*m < 0) {
 	info = 4;
@@ -158,15 +155,17 @@
 	if (lsame_(pivot, "V")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m - 1;
-		for (j = 1; j <= *m-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j+1,i);
-			    A(j+1,i) = ctemp * temp - stemp * A(j,i);
-			    A(j,i) = stemp * temp + ctemp * A(j,i);
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(j + 1, i__);
+			    a_ref(j + 1, i__) = ctemp * temp - stemp * a_ref(
+				    j, i__);
+			    a_ref(j, i__) = stemp * temp + ctemp * a_ref(j, 
+				    i__);
 /* L10: */
 			}
 		    }
@@ -174,14 +173,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j+1,i);
-			    A(j+1,i) = ctemp * temp - stemp * A(j,i);
-			    A(j,i) = stemp * temp + ctemp * A(j,i);
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(j + 1, i__);
+			    a_ref(j + 1, i__) = ctemp * temp - stemp * a_ref(
+				    j, i__);
+			    a_ref(j, i__) = stemp * temp + ctemp * a_ref(j, 
+				    i__);
 /* L30: */
 			}
 		    }
@@ -191,15 +192,17 @@
 	} else if (lsame_(pivot, "T")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m;
-		for (j = 2; j <= *m; ++j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		for (j = 2; j <= i__1; ++j) {
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j,i);
-			    A(j,i) = ctemp * temp - stemp * A(1,i);
-			    A(1,i) = stemp * temp + ctemp * A(1,i);
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(j, i__);
+			    a_ref(j, i__) = ctemp * temp - stemp * a_ref(1, 
+				    i__);
+			    a_ref(1, i__) = stemp * temp + ctemp * a_ref(1, 
+				    i__);
 /* L50: */
 			}
 		    }
@@ -207,14 +210,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m; j >= 2; --j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j,i);
-			    A(j,i) = ctemp * temp - stemp * A(1,i);
-			    A(1,i) = stemp * temp + ctemp * A(1,i);
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(j, i__);
+			    a_ref(j, i__) = ctemp * temp - stemp * a_ref(1, 
+				    i__);
+			    a_ref(1, i__) = stemp * temp + ctemp * a_ref(1, 
+				    i__);
 /* L70: */
 			}
 		    }
@@ -224,17 +229,17 @@
 	} else if (lsame_(pivot, "B")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *m - 1;
-		for (j = 1; j <= *m-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j,i);
-			    A(j,i) = stemp * A(*m,i) + 
-				    ctemp * temp;
-			    A(*m,i) = ctemp * A(*m,i) - 
-				    stemp * temp;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(j, i__);
+			    a_ref(j, i__) = stemp * a_ref(*m, i__) + ctemp * 
+				    temp;
+			    a_ref(*m, i__) = ctemp * a_ref(*m, i__) - stemp * 
+				    temp;
 /* L90: */
 			}
 		    }
@@ -242,16 +247,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *m - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *n;
-			for (i = 1; i <= *n; ++i) {
-			    temp = A(j,i);
-			    A(j,i) = stemp * A(*m,i) + 
-				    ctemp * temp;
-			    A(*m,i) = ctemp * A(*m,i) - 
-				    stemp * temp;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(j, i__);
+			    a_ref(j, i__) = stemp * a_ref(*m, i__) + ctemp * 
+				    temp;
+			    a_ref(*m, i__) = ctemp * a_ref(*m, i__) - stemp * 
+				    temp;
 /* L110: */
 			}
 		    }
@@ -266,16 +271,17 @@
 	if (lsame_(pivot, "V")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j+1);
-			    A(i,j+1) = ctemp * temp - stemp * 
-				    A(i,j);
-			    A(i,j) = stemp * temp + ctemp * A(i,j);
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(i__, j + 1);
+			    a_ref(i__, j + 1) = ctemp * temp - stemp * a_ref(
+				    i__, j);
+			    a_ref(i__, j) = stemp * temp + ctemp * a_ref(i__, 
+				    j);
 /* L130: */
 			}
 		    }
@@ -283,15 +289,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j+1);
-			    A(i,j+1) = ctemp * temp - stemp * 
-				    A(i,j);
-			    A(i,j) = stemp * temp + ctemp * A(i,j);
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(i__, j + 1);
+			    a_ref(i__, j + 1) = ctemp * temp - stemp * a_ref(
+				    i__, j);
+			    a_ref(i__, j) = stemp * temp + ctemp * a_ref(i__, 
+				    j);
 /* L150: */
 			}
 		    }
@@ -301,15 +308,17 @@
 	} else if (lsame_(pivot, "T")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n;
-		for (j = 2; j <= *n; ++j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		for (j = 2; j <= i__1; ++j) {
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j);
-			    A(i,j) = ctemp * temp - stemp * A(i,1);
-			    A(i,1) = stemp * temp + ctemp * A(i,1);
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(i__, j);
+			    a_ref(i__, j) = ctemp * temp - stemp * a_ref(i__, 
+				    1);
+			    a_ref(i__, 1) = stemp * temp + ctemp * a_ref(i__, 
+				    1);
 /* L170: */
 			}
 		    }
@@ -317,14 +326,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n; j >= 2; --j) {
-		    ctemp = C(j - 1);
-		    stemp = S(j - 1);
+		    ctemp = c__[j - 1];
+		    stemp = s[j - 1];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j);
-			    A(i,j) = ctemp * temp - stemp * A(i,1);
-			    A(i,1) = stemp * temp + ctemp * A(i,1);
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(i__, j);
+			    a_ref(i__, j) = ctemp * temp - stemp * a_ref(i__, 
+				    1);
+			    a_ref(i__, 1) = stemp * temp + ctemp * a_ref(i__, 
+				    1);
 /* L190: */
 			}
 		    }
@@ -334,17 +345,17 @@
 	} else if (lsame_(pivot, "B")) {
 	    if (lsame_(direct, "F")) {
 		i__1 = *n - 1;
-		for (j = 1; j <= *n-1; ++j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		for (j = 1; j <= i__1; ++j) {
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__2 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j);
-			    A(i,j) = stemp * A(i,*n) + 
-				    ctemp * temp;
-			    A(i,*n) = ctemp * A(i,*n) - 
-				    stemp * temp;
+			for (i__ = 1; i__ <= i__2; ++i__) {
+			    temp = a_ref(i__, j);
+			    a_ref(i__, j) = stemp * a_ref(i__, *n) + ctemp * 
+				    temp;
+			    a_ref(i__, *n) = ctemp * a_ref(i__, *n) - stemp * 
+				    temp;
 /* L210: */
 			}
 		    }
@@ -352,16 +363,16 @@
 		}
 	    } else if (lsame_(direct, "B")) {
 		for (j = *n - 1; j >= 1; --j) {
-		    ctemp = C(j);
-		    stemp = S(j);
+		    ctemp = c__[j];
+		    stemp = s[j];
 		    if (ctemp != 1.f || stemp != 0.f) {
 			i__1 = *m;
-			for (i = 1; i <= *m; ++i) {
-			    temp = A(i,j);
-			    A(i,j) = stemp * A(i,*n) + 
-				    ctemp * temp;
-			    A(i,*n) = ctemp * A(i,*n) - 
-				    stemp * temp;
+			for (i__ = 1; i__ <= i__1; ++i__) {
+			    temp = a_ref(i__, j);
+			    a_ref(i__, j) = stemp * a_ref(i__, *n) + ctemp * 
+				    temp;
+			    a_ref(i__, *n) = ctemp * a_ref(i__, *n) - stemp * 
+				    temp;
 /* L230: */
 			}
 		    }
@@ -376,4 +387,7 @@
 /*     End of SLASR */
 
 } /* slasr_ */
+
+#undef a_ref
+
 

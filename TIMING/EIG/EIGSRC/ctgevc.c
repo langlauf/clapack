@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -32,7 +33,7 @@ static integer c__1 = 1;
 
     /* Builtin functions */
     double r_imag(complex *);
-    void r_cnjg(complex *, complex *), c_div(complex *, complex *, complex *);
+    void r_cnjg(complex *, complex *);
 
     /* Local variables */
     static integer ibeg, ieig, iend;
@@ -41,8 +42,8 @@ static integer c__1 = 1;
     static real temp;
     static complex suma, sumb;
     static real xmax;
-    static complex d;
-    static integer i, j;
+    static complex d__;
+    static integer i__, j;
     static real scale;
     static logical ilall;
     static integer iside;
@@ -67,6 +68,7 @@ static integer c__1 = 1;
     extern /* Subroutine */ int slabad_(real *, real *);
     static real ascale, bscale;
     static integer jr;
+    extern /* Complex */ VOID cladiv_(complex *, complex *, complex *);
     extern doublereal slamch_(char *);
     static complex salpha;
     static real safmin;
@@ -80,21 +82,28 @@ static integer c__1 = 1;
     static complex sum;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*vl_dim1 + a_1
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*vr_dim1 + a_1
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
-       ----------------------- Begin Timing Code ------------------------ 
-  
+       ----------------------- Begin Timing Code ------------------------   
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
        OPST is used to accumulate small contributions to OPS   
        to avoid roundoff error   
-       ------------------------ End Timing Code ------------------------- 
-  
+       ------------------------ End Timing Code -------------------------   
 
 
     Purpose   
@@ -111,8 +120,7 @@ static integer c__1 = 1;
 
     where y**H denotes the conjugate tranpose of y.   
 
-    If an eigenvalue w is determined by zero diagonal elements of both A 
-  
+    If an eigenvalue w is determined by zero diagonal elements of both A   
     and B, a unit vector is returned as the corresponding eigenvector.   
 
     If all eigenvectors are requested, the routine may either return   
@@ -168,11 +176,9 @@ static integer c__1 = 1;
             contain an N-by-N matrix Q (usually the unitary matrix Q   
             of left Schur vectors returned by CHGEQZ).   
             On exit, if SIDE = 'L' or 'B', VL contains:   
-            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix Y of left eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Q*Y;   
-            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the left eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VL, in the same order as their eigenvalues.   
             If SIDE = 'R', VL is not referenced.   
@@ -186,11 +192,9 @@ static integer c__1 = 1;
             contain an N-by-N matrix Q (usually the unitary matrix Z   
             of right Schur vectors returned by CHGEQZ).   
             On exit, if SIDE = 'R' or 'B', VR contains:   
-            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B); 
-  
+            if HOWMNY = 'A', the matrix X of right eigenvectors of (A,B);   
             if HOWMNY = 'B', the matrix Z*X;   
-            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by 
-  
+            if HOWMNY = 'S', the right eigenvectors of (A,B) specified by   
                         SELECT, stored consecutively in the columns of   
                         VR, in the same order as their eigenvalues.   
             If SIDE = 'L', VR is not referenced.   
@@ -206,8 +210,7 @@ static integer c__1 = 1;
     M       (output) INTEGER   
             The number of columns in the arrays VL and/or VR actually   
             used to store the eigenvectors.  If HOWMNY = 'A' or 'B', M   
-            is set to N.  Each selected eigenvector occupies one column. 
-  
+            is set to N.  Each selected eigenvector occupies one column.   
 
     WORK    (workspace) COMPLEX array, dimension (2*N)   
 
@@ -217,8 +220,7 @@ static integer c__1 = 1;
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode and Test the input parameters   
@@ -226,16 +228,16 @@ static integer c__1 = 1;
        Parameter adjustments */
     --select;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     --work;
     --rwork;
@@ -249,7 +251,8 @@ static integer c__1 = 1;
 	ihwmny = 2;
 	ilall = FALSE_;
 	ilback = FALSE_;
-    } else if (lsame_(howmny, "B") || lsame_(howmny, "T")) {
+    } else if (lsame_(howmny, "B") || lsame_(howmny, 
+	    "T")) {
 	ihwmny = 3;
 	ilall = TRUE_;
 	ilback = TRUE_;
@@ -273,6 +276,24 @@ static integer c__1 = 1;
 	iside = -1;
     }
 
+    *info = 0;
+    if (iside < 0) {
+	*info = -1;
+    } else if (ihwmny < 0) {
+	*info = -2;
+    } else if (*n < 0) {
+	*info = -4;
+    } else if (*lda < max(1,*n)) {
+	*info = -6;
+    } else if (*ldb < max(1,*n)) {
+	*info = -8;
+    }
+    if (*info != 0) {
+	i__1 = -(*info);
+	xerbla_("CTGEVC", &i__1);
+	return 0;
+    }
+
 /*     Count the number of eigenvectors */
 
     if (! ilall) {
@@ -293,25 +314,14 @@ static integer c__1 = 1;
     ilbbad = FALSE_;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (r_imag(&b[j + j * b_dim1]) != 0.f) {
+	if (r_imag(&b_ref(j, j)) != 0.f) {
 	    ilbbad = TRUE_;
 	}
 /* L20: */
     }
 
-    *info = 0;
-    if (iside < 0) {
-	*info = -1;
-    } else if (ihwmny < 0) {
-	*info = -2;
-    } else if (*n < 0) {
-	*info = -4;
-    } else if (*lda < max(1,*n)) {
-	*info = -6;
-    } else if (ilbbad) {
+    if (ilbbad) {
 	*info = -7;
-    } else if (*ldb < max(1,*n)) {
-	*info = -8;
     } else if (compl && *ldvl < *n || *ldvl < 1) {
 	*info = -10;
     } else if (compr && *ldvr < *n || *ldvr < 1) {
@@ -342,16 +352,15 @@ static integer c__1 = 1;
     big = 1.f / small;
     bignum = 1.f / (safmin * *n);
 
-/*     Compute the 1-norm of each column of the strictly upper triangular 
-  
+/*     Compute the 1-norm of each column of the strictly upper triangular   
        part of A and B to check for possible overflow in the triangular   
        solver. */
 
-    i__1 = a_dim1 + 1;
-    anorm = (r__1 = a[i__1].r, dabs(r__1)) + (r__2 = r_imag(&a[a_dim1 + 1]), 
+    i__1 = a_subscr(1, 1);
+    anorm = (r__1 = a[i__1].r, dabs(r__1)) + (r__2 = r_imag(&a_ref(1, 1)), 
 	    dabs(r__2));
-    i__1 = b_dim1 + 1;
-    bnorm = (r__1 = b[i__1].r, dabs(r__1)) + (r__2 = r_imag(&b[b_dim1 + 1]), 
+    i__1 = b_subscr(1, 1);
+    bnorm = (r__1 = b[i__1].r, dabs(r__1)) + (r__2 = r_imag(&b_ref(1, 1)), 
 	    dabs(r__2));
     rwork[1] = 0.f;
     rwork[*n + 1] = 0.f;
@@ -360,37 +369,35 @@ static integer c__1 = 1;
 	rwork[j] = 0.f;
 	rwork[*n + j] = 0.f;
 	i__2 = j - 1;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * a_dim1;
-	    rwork[j] += (r__1 = a[i__3].r, dabs(r__1)) + (r__2 = r_imag(&a[i 
-		    + j * a_dim1]), dabs(r__2));
-	    i__3 = i + j * b_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = a_subscr(i__, j);
+	    rwork[j] += (r__1 = a[i__3].r, dabs(r__1)) + (r__2 = r_imag(&
+		    a_ref(i__, j)), dabs(r__2));
+	    i__3 = b_subscr(i__, j);
 	    rwork[*n + j] += (r__1 = b[i__3].r, dabs(r__1)) + (r__2 = r_imag(&
-		    b[i + j * b_dim1]), dabs(r__2));
+		    b_ref(i__, j)), dabs(r__2));
 /* L30: */
 	}
 /* Computing MAX */
-	i__2 = j + j * a_dim1;
+	i__2 = a_subscr(j, j);
 	r__3 = anorm, r__4 = rwork[j] + ((r__1 = a[i__2].r, dabs(r__1)) + (
-		r__2 = r_imag(&a[j + j * a_dim1]), dabs(r__2)));
+		r__2 = r_imag(&a_ref(j, j)), dabs(r__2)));
 	anorm = dmax(r__3,r__4);
 /* Computing MAX */
-	i__2 = j + j * b_dim1;
+	i__2 = b_subscr(j, j);
 	r__3 = bnorm, r__4 = rwork[*n + j] + ((r__1 = b[i__2].r, dabs(r__1)) 
-		+ (r__2 = r_imag(&b[j + j * b_dim1]), dabs(r__2)));
+		+ (r__2 = r_imag(&b_ref(j, j)), dabs(r__2)));
 	bnorm = dmax(r__3,r__4);
 /* L40: */
     }
 
     ascale = 1.f / dmax(anorm,safmin);
     bscale = 1.f / dmax(bnorm,safmin);
-/*     ---------------------- Begin Timing Code ------------------------- 
-  
+/*     ---------------------- Begin Timing Code -------------------------   
    Computing 2nd power */
     i__1 = *n;
     latime_1.ops += (real) ((i__1 * i__1 << 1) + (*n << 1) + 6);
-/*     ----------------------- End Timing Code -------------------------- 
-  
+/*     ----------------------- End Timing Code --------------------------   
 
        Left eigenvectors */
 
@@ -409,22 +416,21 @@ static integer c__1 = 1;
 	    if (ilcomp) {
 		++ieig;
 
-		i__2 = je + je * a_dim1;
-		i__3 = je + je * b_dim1;
-		if ((r__1 = a[i__2].r, dabs(r__1)) + (r__2 = r_imag(&a[je + 
-			je * a_dim1]), dabs(r__2)) <= safmin && (r__3 = b[
-			i__3].r, dabs(r__3)) <= safmin) {
+		i__2 = a_subscr(je, je);
+		i__3 = b_subscr(je, je);
+		if ((r__2 = a[i__2].r, dabs(r__2)) + (r__3 = r_imag(&a_ref(je,
+			 je)), dabs(r__3)) <= safmin && (r__1 = b[i__3].r, 
+			dabs(r__1)) <= safmin) {
 
-/*                 Singular matrix pencil -- return unit e
-igenvector */
+/*                 Singular matrix pencil -- return unit eigenvector */
 
 		    i__2 = *n;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			i__3 = jr + ieig * vl_dim1;
+			i__3 = vl_subscr(jr, ieig);
 			vl[i__3].r = 0.f, vl[i__3].i = 0.f;
 /* L50: */
 		    }
-		    i__2 = ieig + ieig * vl_dim1;
+		    i__2 = vl_subscr(ieig, ieig);
 		    vl[i__2].r = 1.f, vl[i__2].i = 0.f;
 		    goto L140;
 		}
@@ -435,18 +441,18 @@ igenvector */
                    y  ( a A - b B ) = 0   
 
    Computing MAX */
-		i__2 = je + je * a_dim1;
-		i__3 = je + je * b_dim1;
-		r__4 = ((r__1 = a[i__2].r, dabs(r__1)) + (r__2 = r_imag(&a[je 
-			+ je * a_dim1]), dabs(r__2))) * ascale, r__5 = (r__3 =
-			 b[i__3].r, dabs(r__3)) * bscale, r__4 = max(r__4,
-			r__5);
+		i__2 = a_subscr(je, je);
+		i__3 = b_subscr(je, je);
+		r__4 = ((r__2 = a[i__2].r, dabs(r__2)) + (r__3 = r_imag(&
+			a_ref(je, je)), dabs(r__3))) * ascale, r__5 = (r__1 = 
+			b[i__3].r, dabs(r__1)) * bscale, r__4 = max(r__4,r__5)
+			;
 		temp = 1.f / dmax(r__4,safmin);
-		i__2 = je + je * a_dim1;
+		i__2 = a_subscr(je, je);
 		q__2.r = temp * a[i__2].r, q__2.i = temp * a[i__2].i;
 		q__1.r = ascale * q__2.r, q__1.i = ascale * q__2.i;
 		salpha.r = q__1.r, salpha.i = q__1.i;
-		i__2 = je + je * b_dim1;
+		i__2 = b_subscr(je, je);
 		sbeta = temp * b[i__2].r * bscale;
 		acoeff = sbeta * ascale;
 		q__1.r = bscale * salpha.r, q__1.i = bscale * salpha.i;
@@ -491,14 +497,12 @@ igenvector */
 			q__1.r = scale * bcoeff.r, q__1.i = scale * bcoeff.i;
 			bcoeff.r = q__1.r, bcoeff.i = q__1.i;
 		    }
-/*                 ----------------- Begin Timing Code --
-----------------   
+/*                 ----------------- Begin Timing Code ------------------   
                    Calculation of SALPHA through DMIN */
 		    iopst = 34;
 		} else {
 		    iopst = 20;
-/*                 ------------------ End Timing Code ---
----------------- */
+/*                 ------------------ End Timing Code ------------------- */
 		}
 
 		acoefa = dabs(acoeff);
@@ -522,16 +526,14 @@ igenvector */
                 Triangular solve of  (a A - b B)  y = 0   
 
                                         H   
-                (rowwise in  (a A - b B) , or columnwise in a 
-A - b B) */
+                (rowwise in  (a A - b B) , or columnwise in a A - b B) */
 
 		i__2 = *n;
 		for (j = je + 1; j <= i__2; ++j) {
 
 /*                 Compute   
                          j-1   
-                   SUM = sum  conjg( a*A(k,j) - b*B(k,j) )
-*x(k)   
+                   SUM = sum  conjg( a*A(k,j) - b*B(k,j) )*x(k)   
                          k=je   
                    (Scale if necessary) */
 
@@ -548,25 +550,23 @@ A - b B) */
 /* L70: */
 			}
 			xmax = 1.f;
-/*                    ---------------- Begin Timing Co
-de ---------------- */
+/*                    ---------------- Begin Timing Code ---------------- */
 			iopst += j - je << 1;
-/*                    ----------------- End Timing Cod
-e ----------------- */
+/*                    ----------------- End Timing Code ----------------- */
 		    }
 		    suma.r = 0.f, suma.i = 0.f;
 		    sumb.r = 0.f, sumb.i = 0.f;
 
 		    i__3 = j - 1;
 		    for (jr = je; jr <= i__3; ++jr) {
-			r_cnjg(&q__3, &a[jr + j * a_dim1]);
+			r_cnjg(&q__3, &a_ref(jr, j));
 			i__4 = jr;
 			q__2.r = q__3.r * work[i__4].r - q__3.i * work[i__4]
 				.i, q__2.i = q__3.r * work[i__4].i + q__3.i * 
 				work[i__4].r;
 			q__1.r = suma.r + q__2.r, q__1.i = suma.i + q__2.i;
 			suma.r = q__1.r, suma.i = q__1.i;
-			r_cnjg(&q__3, &b[jr + j * b_dim1]);
+			r_cnjg(&q__3, &b_ref(jr, j));
 			i__4 = jr;
 			q__2.r = q__3.r * work[i__4].r - q__3.i * work[i__4]
 				.i, q__2.i = q__3.r * work[i__4].i + q__3.i * 
@@ -582,32 +582,30 @@ e ----------------- */
 		    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - q__3.i;
 		    sum.r = q__1.r, sum.i = q__1.i;
 
-/*                 Form x(j) = - SUM / conjg( a*A(j,j) - b
-*B(j,j) )   
+/*                 Form x(j) = - SUM / conjg( a*A(j,j) - b*B(j,j) )   
 
-                   with scaling and perturbation of the de
-nominator */
+                   with scaling and perturbation of the denominator */
 
-		    i__3 = j + j * a_dim1;
+		    i__3 = a_subscr(j, j);
 		    q__3.r = acoeff * a[i__3].r, q__3.i = acoeff * a[i__3].i;
-		    i__4 = j + j * b_dim1;
+		    i__4 = b_subscr(j, j);
 		    q__4.r = bcoeff.r * b[i__4].r - bcoeff.i * b[i__4].i, 
 			    q__4.i = bcoeff.r * b[i__4].i + bcoeff.i * b[i__4]
 			    .r;
 		    q__2.r = q__3.r - q__4.r, q__2.i = q__3.i - q__4.i;
 		    r_cnjg(&q__1, &q__2);
-		    d.r = q__1.r, d.i = q__1.i;
-		    if ((r__1 = d.r, dabs(r__1)) + (r__2 = r_imag(&d), dabs(
-			    r__2)) <= dmin__) {
+		    d__.r = q__1.r, d__.i = q__1.i;
+		    if ((r__1 = d__.r, dabs(r__1)) + (r__2 = r_imag(&d__), 
+			    dabs(r__2)) <= dmin__) {
 			q__1.r = dmin__, q__1.i = 0.f;
-			d.r = q__1.r, d.i = q__1.i;
+			d__.r = q__1.r, d__.i = q__1.i;
 		    }
 
-		    if ((r__1 = d.r, dabs(r__1)) + (r__2 = r_imag(&d), dabs(
-			    r__2)) < 1.f) {
+		    if ((r__1 = d__.r, dabs(r__1)) + (r__2 = r_imag(&d__), 
+			    dabs(r__2)) < 1.f) {
 			if ((r__1 = sum.r, dabs(r__1)) + (r__2 = r_imag(&sum),
-				 dabs(r__2)) >= bignum * ((r__3 = d.r, dabs(
-				r__3)) + (r__4 = r_imag(&d), dabs(r__4)))) {
+				 dabs(r__2)) >= bignum * ((r__3 = d__.r, dabs(
+				r__3)) + (r__4 = r_imag(&d__), dabs(r__4)))) {
 			    temp = 1.f / ((r__1 = sum.r, dabs(r__1)) + (r__2 =
 				     r_imag(&sum), dabs(r__2)));
 			    i__3 = j - 1;
@@ -622,16 +620,14 @@ nominator */
 			    xmax = temp * xmax;
 			    q__1.r = temp * sum.r, q__1.i = temp * sum.i;
 			    sum.r = q__1.r, sum.i = q__1.i;
-/*                       -------------- Begin Timi
-ng Code --------------- */
+/*                       -------------- Begin Timing Code --------------- */
 			    iopst = iopst + (j - je << 1) + 5;
-/*                       --------------- End Timin
-g Code ---------------- */
+/*                       --------------- End Timing Code ---------------- */
 			}
 		    }
 		    i__3 = j;
-		    q__2.r = -(doublereal)sum.r, q__2.i = -(doublereal)sum.i;
-		    c_div(&q__1, &q__2, &d);
+		    q__2.r = -sum.r, q__2.i = -sum.i;
+		    cladiv_(&q__1, &q__2, &d__);
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* Computing MAX */
 		    i__3 = j;
@@ -645,23 +641,19 @@ g Code ---------------- */
 
 		if (ilback) {
 		    i__2 = *n + 1 - je;
-		    cgemv_("N", n, &i__2, &c_b2, &vl[je * vl_dim1 + 1], ldvl, 
-			    &work[je], &c__1, &c_b1, &work[*n + 1], &c__1)
-			    ;
+		    cgemv_("N", n, &i__2, &c_b2, &vl_ref(1, je), ldvl, &work[
+			    je], &c__1, &c_b1, &work[*n + 1], &c__1);
 		    isrc = 2;
 		    ibeg = 1;
-/*                 ----------------- Begin Timing Code --
----------------- */
+/*                 ----------------- Begin Timing Code ------------------ */
 		    iopst += (*n << 3) * (*n + 1 - je);
-/*                 ------------------ End Timing Code ---
----------------- */
+/*                 ------------------ End Timing Code ------------------- */
 		} else {
 		    isrc = 1;
 		    ibeg = je;
 		}
 
-/*              Copy and scale eigenvector into column of VL 
-*/
+/*              Copy and scale eigenvector into column of VL */
 
 		xmax = 0.f;
 		i__2 = *n;
@@ -679,7 +671,7 @@ g Code ---------------- */
 		    temp = 1.f / xmax;
 		    i__2 = *n;
 		    for (jr = ibeg; jr <= i__2; ++jr) {
-			i__3 = jr + ieig * vl_dim1;
+			i__3 = vl_subscr(jr, ieig);
 			i__4 = (isrc - 1) * *n + jr;
 			q__1.r = temp * work[i__4].r, q__1.i = temp * work[
 				i__4].i;
@@ -692,17 +684,15 @@ g Code ---------------- */
 
 		i__2 = ibeg - 1;
 		for (jr = 1; jr <= i__2; ++jr) {
-		    i__3 = jr + ieig * vl_dim1;
+		    i__3 = vl_subscr(jr, ieig);
 		    vl[i__3].r = 0.f, vl[i__3].i = 0.f;
 /* L130: */
 		}
 
-/*              ------------------- Begin Timing Code -------
------------- */
+/*              ------------------- Begin Timing Code ------------------- */
 		latime_1.ops += (real) ((*n - je) * 36 + (*n - je << 3) * (*n 
 			+ 1 - je) + (*n + 1 - ibeg) * 3 + 1) + (real) iopst;
-/*              -------------------- End Timing Code --------
------------- */
+/*              -------------------- End Timing Code -------------------- */
 	    }
 L140:
 	    ;
@@ -725,22 +715,21 @@ L140:
 	    if (ilcomp) {
 		--ieig;
 
-		i__1 = je + je * a_dim1;
-		i__2 = je + je * b_dim1;
-		if ((r__1 = a[i__1].r, dabs(r__1)) + (r__2 = r_imag(&a[je + 
-			je * a_dim1]), dabs(r__2)) <= safmin && (r__3 = b[
-			i__2].r, dabs(r__3)) <= safmin) {
+		i__1 = a_subscr(je, je);
+		i__2 = b_subscr(je, je);
+		if ((r__2 = a[i__1].r, dabs(r__2)) + (r__3 = r_imag(&a_ref(je,
+			 je)), dabs(r__3)) <= safmin && (r__1 = b[i__2].r, 
+			dabs(r__1)) <= safmin) {
 
-/*                 Singular matrix pencil -- return unit e
-igenvector */
+/*                 Singular matrix pencil -- return unit eigenvector */
 
 		    i__1 = *n;
 		    for (jr = 1; jr <= i__1; ++jr) {
-			i__2 = jr + ieig * vr_dim1;
+			i__2 = vr_subscr(jr, ieig);
 			vr[i__2].r = 0.f, vr[i__2].i = 0.f;
 /* L150: */
 		    }
-		    i__1 = ieig + ieig * vr_dim1;
+		    i__1 = vr_subscr(ieig, ieig);
 		    vr[i__1].r = 1.f, vr[i__1].i = 0.f;
 		    goto L250;
 		}
@@ -751,18 +740,18 @@ igenvector */
                 ( a A - b B ) x  = 0   
 
    Computing MAX */
-		i__1 = je + je * a_dim1;
-		i__2 = je + je * b_dim1;
-		r__4 = ((r__1 = a[i__1].r, dabs(r__1)) + (r__2 = r_imag(&a[je 
-			+ je * a_dim1]), dabs(r__2))) * ascale, r__5 = (r__3 =
-			 b[i__2].r, dabs(r__3)) * bscale, r__4 = max(r__4,
-			r__5);
+		i__1 = a_subscr(je, je);
+		i__2 = b_subscr(je, je);
+		r__4 = ((r__2 = a[i__1].r, dabs(r__2)) + (r__3 = r_imag(&
+			a_ref(je, je)), dabs(r__3))) * ascale, r__5 = (r__1 = 
+			b[i__2].r, dabs(r__1)) * bscale, r__4 = max(r__4,r__5)
+			;
 		temp = 1.f / dmax(r__4,safmin);
-		i__1 = je + je * a_dim1;
+		i__1 = a_subscr(je, je);
 		q__2.r = temp * a[i__1].r, q__2.i = temp * a[i__1].i;
 		q__1.r = ascale * q__2.r, q__1.i = ascale * q__2.i;
 		salpha.r = q__1.r, salpha.i = q__1.i;
-		i__1 = je + je * b_dim1;
+		i__1 = b_subscr(je, je);
 		sbeta = temp * b[i__1].r * bscale;
 		acoeff = sbeta * ascale;
 		q__1.r = bscale * salpha.r, q__1.i = bscale * salpha.i;
@@ -807,14 +796,12 @@ igenvector */
 			q__1.r = scale * bcoeff.r, q__1.i = scale * bcoeff.i;
 			bcoeff.r = q__1.r, bcoeff.i = q__1.i;
 		    }
-/*                 ----------------- Begin Timing Code --
-----------------   
+/*                 ----------------- Begin Timing Code ------------------   
                    Calculation of SALPHA through DMIN */
 		    iopst = 34;
 		} else {
 		    iopst = 20;
-/*                 ------------------ End Timing Code ---
----------------- */
+/*                 ------------------ End Timing Code ------------------- */
 		}
 
 		acoefa = dabs(acoeff);
@@ -834,8 +821,7 @@ igenvector */
 			r__1 = max(r__1,r__2);
 		dmin__ = dmax(r__1,safmin);
 
-/*              Triangular solve of  (a A - b B) x = 0  (colum
-nwise)   
+/*              Triangular solve of  (a A - b B) x = 0  (columnwise)   
 
                 WORK(1:j-1) contains sums w,   
                 WORK(j+1:JE) contains x */
@@ -843,9 +829,9 @@ nwise)
 		i__1 = je - 1;
 		for (jr = 1; jr <= i__1; ++jr) {
 		    i__2 = jr;
-		    i__3 = jr + je * a_dim1;
+		    i__3 = a_subscr(jr, je);
 		    q__2.r = acoeff * a[i__3].r, q__2.i = acoeff * a[i__3].i;
-		    i__4 = jr + je * b_dim1;
+		    i__4 = b_subscr(jr, je);
 		    q__3.r = bcoeff.r * b[i__4].r - bcoeff.i * b[i__4].i, 
 			    q__3.i = bcoeff.r * b[i__4].i + bcoeff.i * b[i__4]
 			    .r;
@@ -859,30 +845,29 @@ nwise)
 		for (j = je - 1; j >= 1; --j) {
 
 /*                 Form x(j) := - w(j) / d   
-                   with scaling and perturbation of the de
-nominator */
+                   with scaling and perturbation of the denominator */
 
-		    i__1 = j + j * a_dim1;
+		    i__1 = a_subscr(j, j);
 		    q__2.r = acoeff * a[i__1].r, q__2.i = acoeff * a[i__1].i;
-		    i__2 = j + j * b_dim1;
+		    i__2 = b_subscr(j, j);
 		    q__3.r = bcoeff.r * b[i__2].r - bcoeff.i * b[i__2].i, 
 			    q__3.i = bcoeff.r * b[i__2].i + bcoeff.i * b[i__2]
 			    .r;
 		    q__1.r = q__2.r - q__3.r, q__1.i = q__2.i - q__3.i;
-		    d.r = q__1.r, d.i = q__1.i;
-		    if ((r__1 = d.r, dabs(r__1)) + (r__2 = r_imag(&d), dabs(
-			    r__2)) <= dmin__) {
+		    d__.r = q__1.r, d__.i = q__1.i;
+		    if ((r__1 = d__.r, dabs(r__1)) + (r__2 = r_imag(&d__), 
+			    dabs(r__2)) <= dmin__) {
 			q__1.r = dmin__, q__1.i = 0.f;
-			d.r = q__1.r, d.i = q__1.i;
+			d__.r = q__1.r, d__.i = q__1.i;
 		    }
 
-		    if ((r__1 = d.r, dabs(r__1)) + (r__2 = r_imag(&d), dabs(
-			    r__2)) < 1.f) {
+		    if ((r__1 = d__.r, dabs(r__1)) + (r__2 = r_imag(&d__), 
+			    dabs(r__2)) < 1.f) {
 			i__1 = j;
 			if ((r__1 = work[i__1].r, dabs(r__1)) + (r__2 = 
 				r_imag(&work[j]), dabs(r__2)) >= bignum * ((
-				r__3 = d.r, dabs(r__3)) + (r__4 = r_imag(&d), 
-				dabs(r__4)))) {
+				r__3 = d__.r, dabs(r__3)) + (r__4 = r_imag(&
+				d__), dabs(r__4)))) {
 			    i__1 = j;
 			    temp = 1.f / ((r__1 = work[i__1].r, dabs(r__1)) + 
 				    (r__2 = r_imag(&work[j]), dabs(r__2)));
@@ -895,27 +880,23 @@ nominator */
 				work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L180: */
 			    }
-/*                       -------------- Begin Timi
-ng Code --------------- */
+/*                       -------------- Begin Timing Code --------------- */
 			    iopst = iopst + (je << 1) + 5;
 			} else {
 			    iopst += 3;
-/*                       --------------- End Timin
-g Code ---------------- */
+/*                       --------------- End Timing Code ---------------- */
 			}
 		    }
 
 		    i__1 = j;
 		    i__2 = j;
-		    q__2.r = -(doublereal)work[i__2].r, q__2.i = -(doublereal)
-			    work[i__2].i;
-		    c_div(&q__1, &q__2, &d);
+		    q__2.r = -work[i__2].r, q__2.i = -work[i__2].i;
+		    cladiv_(&q__1, &q__2, &d__);
 		    work[i__1].r = q__1.r, work[i__1].i = q__1.i;
 
 		    if (j > 1) {
 
-/*                    w = w + x(j)*(a A(*,j) - b B(*,j
-) ) with scaling */
+/*                    w = w + x(j)*(a A(*,j) - b B(*,j) ) with scaling */
 
 			i__1 = j;
 			if ((r__1 = work[i__1].r, dabs(r__1)) + (r__2 = 
@@ -935,13 +916,11 @@ g Code ---------------- */
 					    q__1.i;
 /* L190: */
 				}
-/*                          ------------- Begi
-n Timing Code ------------- */
+/*                          ------------- Begin Timing Code ------------- */
 				iopst = iopst + (je << 1) + 6;
 			    } else {
 				iopst += 6;
-/*                          -------------- End
- Timing Code -------------- */
+/*                          -------------- End Timing Code -------------- */
 			    }
 			}
 
@@ -958,13 +937,13 @@ n Timing Code ------------- */
 			for (jr = 1; jr <= i__1; ++jr) {
 			    i__2 = jr;
 			    i__3 = jr;
-			    i__4 = jr + j * a_dim1;
+			    i__4 = a_subscr(jr, j);
 			    q__3.r = ca.r * a[i__4].r - ca.i * a[i__4].i, 
 				    q__3.i = ca.r * a[i__4].i + ca.i * a[i__4]
 				    .r;
 			    q__2.r = work[i__3].r + q__3.r, q__2.i = work[
 				    i__3].i + q__3.i;
-			    i__5 = jr + j * b_dim1;
+			    i__5 = b_subscr(jr, j);
 			    q__4.r = cb.r * b[i__5].r - cb.i * b[i__5].i, 
 				    q__4.i = cb.r * b[i__5].i + cb.i * b[i__5]
 				    .r;
@@ -984,18 +963,15 @@ n Timing Code ------------- */
 			     &c__1, &c_b1, &work[*n + 1], &c__1);
 		    isrc = 2;
 		    iend = *n;
-/*                 ----------------- Begin Timing Code --
----------------- */
+/*                 ----------------- Begin Timing Code ------------------ */
 		    iopst += (*n << 3) * je;
-/*                 ------------------ End Timing Code ---
----------------- */
+/*                 ------------------ End Timing Code ------------------- */
 		} else {
 		    isrc = 1;
 		    iend = je;
 		}
 
-/*              Copy and scale eigenvector into column of VR 
-*/
+/*              Copy and scale eigenvector into column of VR */
 
 		xmax = 0.f;
 		i__1 = iend;
@@ -1013,7 +989,7 @@ n Timing Code ------------- */
 		    temp = 1.f / xmax;
 		    i__1 = iend;
 		    for (jr = 1; jr <= i__1; ++jr) {
-			i__2 = jr + ieig * vr_dim1;
+			i__2 = vr_subscr(jr, ieig);
 			i__3 = (isrc - 1) * *n + jr;
 			q__1.r = temp * work[i__3].r, q__1.i = temp * work[
 				i__3].i;
@@ -1026,17 +1002,15 @@ n Timing Code ------------- */
 
 		i__1 = *n;
 		for (jr = iend + 1; jr <= i__1; ++jr) {
-		    i__2 = jr + ieig * vr_dim1;
+		    i__2 = vr_subscr(jr, ieig);
 		    vr[i__2].r = 0.f, vr[i__2].i = 0.f;
 /* L240: */
 		}
 
-/*              ------------------- Begin Timing Code -------
------------- */
+/*              ------------------- Begin Timing Code ------------------- */
 		latime_1.ops += (real) ((je - 2) * 30 + (je - 1 << 3) * (je - 
 			2) + iend * 3 + 22) + (real) iopst;
-/*              -------------------- End Timing Code --------
------------- */
+/*              -------------------- End Timing Code -------------------- */
 	    }
 L250:
 	    ;
@@ -1048,4 +1022,14 @@ L250:
 /*     End of CTGEVC */
 
 } /* ctgevc_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

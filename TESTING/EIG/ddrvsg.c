@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -7,22 +8,22 @@
 
 /* Table of constant values */
 
-static doublereal c_b17 = 0.;
+static doublereal c_b18 = 0.;
 static integer c__0 = 0;
 static integer c__6 = 6;
-static doublereal c_b34 = 1.;
+static doublereal c_b35 = 1.;
 static integer c__1 = 1;
 static integer c__4 = 4;
 static integer c__5 = 5;
-static doublereal c_b79 = 10.;
+static doublereal c_b82 = 10.;
 static integer c__3 = 3;
 
 /* Subroutine */ int ddrvsg_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, doublereal *thresh, integer *nounit, 
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, doublereal *
-	d, doublereal *u, integer *ldu, doublereal *bb, doublereal *v, 
-	doublereal *z, doublereal *uz, doublereal *work, integer *nwork, 
-	integer *iwork, doublereal *result, integer *info)
+	d__, doublereal *z__, integer *ldz, doublereal *ab, doublereal *bb, 
+	doublereal *ap, doublereal *bp, doublereal *work, integer *nwork, 
+	integer *iwork, integer *liwork, doublereal *result, integer *info)
 {
     /* Initialized data */
 
@@ -37,10 +38,10 @@ static integer c__3 = 3;
 
     /* System generated locals */
     address a__1[3];
-    integer a_dim1, a_offset, b_dim1, b_offset, bb_dim1, bb_offset, v_dim1, 
-	    v_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4, i__5, i__6[3],
-	     i__7;
-    char ch__1[10];
+    integer a_dim1, a_offset, ab_dim1, ab_offset, b_dim1, b_offset, bb_dim1, 
+	    bb_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4, i__5, i__6[3]
+	    , i__7;
+    char ch__1[10], ch__2[11], ch__3[12], ch__4[13];
 
     /* Builtin functions */
     double sqrt(doublereal);
@@ -52,29 +53,38 @@ static integer c__3 = 3;
     static integer jcol, nmax;
     static doublereal unfl, ovfl;
     static char uplo[1];
-    static integer i, j, n;
+    static integer i__, j, m, n;
     static logical badnn;
     static integer imode;
     extern logical lsame_(char *, char *);
-    extern /* Subroutine */ int dsgt01_(integer *, char *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, doublereal *);
+    extern /* Subroutine */ int dsgt01_(integer *, char *, integer *, integer 
+	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
+	     integer *, doublereal *, doublereal *, doublereal *);
     static integer iinfo;
     extern /* Subroutine */ int dsbgv_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     static doublereal aninv, anorm;
-    static integer nmats;
+    static integer itemp, nmats;
     extern /* Subroutine */ int dspgv_(integer *, char *, char *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 	     doublereal *, integer *);
     static integer jsize, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int dsygv_(integer *, char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *, integer *), dlabad_(
-	    doublereal *, doublereal *);
-    static integer ka, kb, ij;
+	    doublereal *, integer *, integer *);
+    static integer iseed2[4];
+    extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
+    static integer ka, kb, ij, il;
     extern doublereal dlamch_(char *);
+    static integer iu;
+    static doublereal vl;
+    extern doublereal dlarnd_(integer *, integer *);
+    extern /* Subroutine */ int dsbgvd_(char *, char *, integer *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, integer *, 
+	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
+	    integer *, integer *, integer *);
+    static doublereal vu;
     static integer idumma[1];
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
@@ -88,28 +98,80 @@ static integer c__3 = 3;
 	    doublereal *, char *, char *, doublereal *, integer *, doublereal 
 	    *, doublereal *, integer *, doublereal *, char *, integer *, 
 	    integer *, integer *, doublereal *, doublereal *, char *, 
-	    doublereal *, integer *, integer *, integer *), dlatms_(integer *, integer *, 
-	    char *, integer *, char *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *, integer *, char *, doublereal *, integer 
-	    *, doublereal *, integer *), dlasum_(char 
-	    *, integer *, integer *, integer *);
-    static integer ibuplo, ibtype, ka9, kb9;
+	    doublereal *, integer *, integer *, integer *);
+    static doublereal abstol;
+    extern /* Subroutine */ int dlasum_(char *, integer *, integer *, integer 
+	    *), dlatms_(integer *, integer *, char *, integer *, char 
+	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
+	     integer *, char *, doublereal *, integer *, doublereal *, 
+	    integer *), dspgvd_(integer *, char *, 
+	    char *, integer *, doublereal *, doublereal *, doublereal *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *, integer *);
+    static integer ibuplo, ibtype;
+    extern /* Subroutine */ int dsbgvx_(char *, char *, char *, integer *, 
+	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
+	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *), dsygvd_(integer *, char *, 
+	    char *, integer *, doublereal *, integer *, doublereal *, integer 
+	    *, doublereal *, doublereal *, integer *, integer *, integer *, 
+	    integer *);
+    static integer ka9, kb9;
     static doublereal rtunfl, rtovfl, ulpinv;
+    extern /* Subroutine */ int dspgvx_(integer *, char *, char *, char *, 
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	     integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *);
     static integer mtypes, ntestt;
+    extern /* Subroutine */ int dsygvx_(integer *, char *, char *, char *, 
+	    integer *, doublereal *, integer *, doublereal *, integer *, 
+	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
+	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
+	    integer *, integer *, integer *, integer *);
     static doublereal ulp;
 
     /* Fortran I/O blocks */
-    static cilist io___34 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___38 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___36 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___44 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___49 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___50 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___51 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___53 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___54 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___55 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___61 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+#define bb_ref(a_1,a_2) bb[(a_2)*bb_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
+
+   ******************************************************************   
+
+       modified August 1997, a new parameter LIWORK is added   
+       in the calling sequence.   
+
+       test routine DDGT01 is also modified   
+
+   ******************************************************************   
 
 
     Purpose   
@@ -122,7 +184,24 @@ static integer c__3 = 3;
                  eigenvectors of a real symmetric-definite generalized   
                  eigenproblem.   
 
+                 DSYGVD computes all eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite generalized   
+                 eigenproblem using a divide and conquer algorithm.   
+
+                 DSYGVX computes selected eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite generalized   
+                 eigenproblem.   
+
                  DSPGV computes all eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite generalized   
+                 eigenproblem in packed storage.   
+
+                 DSPGVD computes all eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite generalized   
+                 eigenproblem in packed storage using a divide and   
+                 conquer algorithm.   
+
+                 DSPGVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a real symmetric-definite generalized   
                  eigenproblem in packed storage.   
 
@@ -130,13 +209,19 @@ static integer c__3 = 3;
                  eigenvectors of a real symmetric-definite banded   
                  generalized eigenproblem.   
 
-         When DDRVSG is called, a number of matrix "sizes" ("n's") and a 
-  
+                 DSBGVD computes all eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite banded   
+                 generalized eigenproblem using a divide and conquer   
+                 algorithm.   
+
+                 DSBGVX computes selected eigenvalues and, optionally,   
+                 eigenvectors of a real symmetric-definite banded   
+                 generalized eigenproblem.   
+
+         When DDRVSG is called, a number of matrix "sizes" ("n's") and a   
          number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix A of the given type will be 
-  
-         generated; a random well-conditioned matrix B is also generated 
-  
+         and each type of matrix, one matrix A of the given type will be   
+         generated; a random well-conditioned matrix B is also generated   
          and the pair (A,B) is used to test the drivers.   
 
          For each pair (A,B), the following tests are performed:   
@@ -167,15 +252,16 @@ static integer c__3 = 3;
          (13) as (11) but with UPLO = 'L'   
          (14) as (13) but calling DSPGV   
 
-         The "sizes" are specified by an array NN(1:NSIZES); the value of 
-  
-         each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES ); 
-  
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. 
-  
-         This type is used for the matrix A which has half-bandwidth KA. 
-  
+         DSYGVD, DSPGVD and DSBGVD performed the same 14 tests.   
+
+         DSYGVX, DSPGVX and DSBGVX performed the above 14 tests with   
+         the parameter RANGE = 'A', 'N' and 'I', respectively.   
+
+         The "sizes" are specified by an array NN(1:NSIZES); the value   
+         of each element NN(j) specifies one size.   
+         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
+         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
+         This type is used for the matrix A which has half-bandwidth KA.   
          B is generated as a well-conditioned positive definite matrix   
          with half-bandwidth KB (<= KA).   
          Currently, the list of possible types for A is:   
@@ -188,21 +274,18 @@ static integer c__3 = 3;
               (ULP = (first number larger than 1) - 1 )   
          (4)  A diagonal matrix with geometrically spaced entries   
               1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP 
-  
-              and random signs.   
+         (5)  A diagonal matrix with "clustered" entries   
+              1, ULP, ..., ULP and random signs.   
 
          (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold ) 
-  
+         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
 
          (8)  A matrix of the form  U* D U, where U is orthogonal and   
               D has evenly spaced entries 1, ..., ULP with random signs   
               on the diagonal.   
 
          (9)  A matrix of the form  U* D U, where U is orthogonal and   
-              D has geometrically spaced entries 1, ..., ULP with random 
-  
+              D has geometrically spaced entries 1, ..., ULP with random   
               signs on the diagonal.   
 
          (10) A matrix of the form  U* D U, where U is orthogonal and   
@@ -210,14 +293,11 @@ static integer c__3 = 3;
               signs on the diagonal.   
 
          (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold ) 
-  
+         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
 
          (13) symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold ) 
-  
-         (15) Same as (13), but multiplied by SQRT( underflow threshold ) 
-  
+         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
+         (15) Same as (13), but multiplied by SQRT( underflow threshold)   
 
          (16) Same as (8), but with KA = 1 and KB = 1   
          (17) Same as (8), but with KA = 2 and KB = 1   
@@ -292,7 +372,7 @@ static integer c__3 = 3;
             Modified.   
 
     LDA     INTEGER   
-            The leading dimension of A.  It must be at   
+            The leading dimension of A and AB.  It must be at   
             least 1 and at least max( NN ).   
             Not modified.   
 
@@ -304,7 +384,7 @@ static integer c__3 = 3;
             Modified.   
 
     LDB     INTEGER   
-            The leading dimension of B.  It must be at   
+            The leading dimension of B and BB.  It must be at   
             least 1 and at least max( NN ).   
             Not modified.   
 
@@ -313,28 +393,28 @@ static integer c__3 = 3;
             correspond with the matrix in A.   
             Modified.   
 
-    U       DOUBLE PRECISION array, dimension (LDU, max(NN))   
-            Workspace.   
-            Modified.   
-
-    LDU     INTEGER   
-            The leading dimension of U, BB, V, Z and UZ.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    BB      DOUBLE PRECISION array, dimension (LDU, max(NN))   
-            Workspace.   
-            Modified.   
-
-    V       DOUBLE PRECISION array, dimension (LDU, max(NN))   
-            Workspace.   
-            Modified.   
-
-    Z       DOUBLE PRECISION array, dimension (LDU, max(NN))   
+    Z       DOUBLE PRECISION array, dimension (LDZ, max(NN))   
             The matrix of eigenvectors.   
             Modified.   
 
-    UZ      DOUBLE PRECISION array, dimension (LDU, max(NN))   
+    LDZ     INTEGER   
+            The leading dimension of Z.  It must be at least 1 and   
+            at least max( NN ).   
+            Not modified.   
+
+    AB      DOUBLE PRECISION array, dimension (LDA, max(NN))   
+            Workspace.   
+            Modified.   
+
+    BB      DOUBLE PRECISION array, dimension (LDB, max(NN))   
+            Workspace.   
+            Modified.   
+
+    AP      DOUBLE PRECISION array, dimension (max(NN)**2)   
+            Workspace.   
+            Modified.   
+
+    BP      DOUBLE PRECISION array, dimension (max(NN)**2)   
             Workspace.   
             Modified.   
 
@@ -344,17 +424,20 @@ static integer c__3 = 3;
 
     NWORK   INTEGER   
             The number of entries in WORK.  This must be at least   
-            2*max( NN(j), 3 )**2.   
+            1+5*N+2*N*lg(N)+3*N**2 where N = max( NN(j) ) and   
+            lg( N ) = smallest integer k such that 2**k >= N.   
             Not modified.   
 
-    IWORK   INTEGER array, dimension (max(NN))   
+    IWORK   INTEGER array, dimension (LIWORK)   
             Workspace.   
             Modified.   
 
-    RESULT  DOUBLE PRECISION array, dimension (14)   
-            The values computed by the 14 tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
+    LIWORK  INTEGER   
+            The number of entries in WORK.  This must be at least 6*N.   
+            Not modified.   
+
+    RESULT  DOUBLE PRECISION array, dimension (70)   
+            The values computed by the 70 tests described above.   
             Modified.   
 
     INFO    INTEGER   
@@ -364,15 +447,15 @@ static integer c__3 = 3;
              -3: NTYPES < 0   
              -5: THRESH < 0   
              -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDU < 1 or LDU < NMAX.   
+            -16: LDZ < 1 or LDZ < NMAX.   
             -21: NWORK too small.   
-            If  DLATMR, SLATMS, DSYGV, DSPGV or DSBGV   
-                returns an error code, the   
-                absolute value of it is returned.   
+            -23: LIWORK too small.   
+            If  DLATMR, SLATMS, DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD,   
+                DSBGVD, DSYGVX, DSPGVX or SSBGVX returns an error code,   
+                the absolute value of it is returned.   
             Modified.   
 
-   -----------------------------------------------------------------------
-   
+   ----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -398,31 +481,30 @@ static integer c__3 = 3;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
+    ab_dim1 = *lda;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bb_dim1 = *ldb;
-    bb_offset = bb_dim1 + 1;
+    bb_offset = 1 + bb_dim1 * 1;
     bb -= bb_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
-    --d;
-    --u;
-    z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
-    v_dim1 = *ldu;
-    v_offset = v_dim1 + 1;
-    v -= v_offset;
-    --uz;
+    --d__;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
+    --ap;
+    --bp;
     --work;
     --iwork;
     --result;
@@ -457,13 +539,19 @@ static integer c__3 = 3;
 	*info = -3;
     } else if (*lda <= 1 || *lda < nmax) {
 	*info = -9;
-    } else if (*ldu <= 1 || *ldu < nmax) {
+    } else if (*ldz <= 1 || *ldz < nmax) {
 	*info = -16;
     } else /* if(complicated condition) */ {
 /* Computing 2nd power */
 	i__1 = max(nmax,3);
 	if (i__1 * i__1 << 1 > *nwork) {
 	    *info = -21;
+	} else /* if(complicated condition) */ {
+/* Computing 2nd power */
+	    i__1 = max(nmax,3);
+	    if (i__1 * i__1 << 1 > *liwork) {
+		*info = -23;
+	    }
 	}
     }
 
@@ -489,6 +577,11 @@ static integer c__3 = 3;
     rtunfl = sqrt(unfl);
     rtovfl = sqrt(ovfl);
 
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed2[i__ - 1] = iseed[i__];
+/* L20: */
+    }
+
 /*     Loop over sizes, types */
 
     nerrs = 0;
@@ -510,14 +603,14 @@ static integer c__3 = 3;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L230;
+		goto L640;
 	    }
 	    ++nmats;
 	    ntest = 0;
 
 	    for (j = 1; j <= 4; ++j) {
 		ioldsd[j - 1] = iseed[j];
-/* L20: */
+/* L30: */
 	    }
 
 /*           2)      Compute "A"   
@@ -536,7 +629,7 @@ static integer c__3 = 3;
              =9                      banded, w/ eigenvalues */
 
 	    if (mtypes > 21) {
-		goto L80;
+		goto L90;
 	    }
 
 	    itype = ktype[jtype - 1];
@@ -545,24 +638,24 @@ static integer c__3 = 3;
 /*           Compute norm */
 
 	    switch (kmagn[jtype - 1]) {
-		case 1:  goto L30;
-		case 2:  goto L40;
-		case 3:  goto L50;
+		case 1:  goto L40;
+		case 2:  goto L50;
+		case 3:  goto L60;
 	    }
 
-L30:
-	    anorm = 1.;
-	    goto L60;
-
 L40:
-	    anorm = rtovfl * ulp * aninv;
-	    goto L60;
+	    anorm = 1.;
+	    goto L70;
 
 L50:
-	    anorm = rtunfl * n * ulpinv;
-	    goto L60;
+	    anorm = rtovfl * ulp * aninv;
+	    goto L70;
 
 L60:
+	    anorm = rtunfl * n * ulpinv;
+	    goto L70;
+
+L70:
 
 	    iinfo = 0;
 	    cond = ulpinv;
@@ -575,7 +668,7 @@ L60:
 
 		ka = 0;
 		kb = 0;
-		dlaset_("Full", lda, &n, &c_b17, &c_b17, &a[a_offset], lda);
+		dlaset_("Full", lda, &n, &c_b18, &c_b18, &a[a_offset], lda);
 
 	    } else if (itype == 2) {
 
@@ -583,11 +676,11 @@ L60:
 
 		ka = 0;
 		kb = 0;
-		dlaset_("Full", lda, &n, &c_b17, &c_b17, &a[a_offset], lda);
+		dlaset_("Full", lda, &n, &c_b18, &c_b18, &a[a_offset], lda);
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
-/* L70: */
+		    a_ref(jcol, jcol) = anorm;
+/* L80: */
 		}
 
 	    } else if (itype == 4) {
@@ -618,10 +711,10 @@ L60:
 
 		ka = 0;
 		kb = 0;
-		dlatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &c_b34, 
-			&c_b34, "T", "N", &work[n + 1], &c__1, &c_b34, &work[(
-			n << 1) + 1], &c__1, &c_b34, "N", idumma, &c__0, &
-			c__0, &c_b17, &anorm, "NO", &a[a_offset], lda, &iwork[
+		dlatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &c_b35, 
+			&c_b35, "T", "N", &work[n + 1], &c__1, &c_b35, &work[(
+			n << 1) + 1], &c__1, &c_b35, "N", idumma, &c__0, &
+			c__0, &c_b18, &anorm, "NO", &a[a_offset], lda, &iwork[
 			1], &iinfo);
 
 	    } else if (itype == 8) {
@@ -632,18 +725,17 @@ L60:
 		i__3 = 0, i__4 = n - 1;
 		ka = max(i__3,i__4);
 		kb = ka;
-		dlatmr_(&n, &n, "S", &iseed[1], "H", &work[1], &c__6, &c_b34, 
-			&c_b34, "T", "N", &work[n + 1], &c__1, &c_b34, &work[(
-			n << 1) + 1], &c__1, &c_b34, "N", idumma, &n, &n, &
-			c_b17, &anorm, "NO", &a[a_offset], lda, &iwork[1], &
+		dlatmr_(&n, &n, "S", &iseed[1], "H", &work[1], &c__6, &c_b35, 
+			&c_b35, "T", "N", &work[n + 1], &c__1, &c_b35, &work[(
+			n << 1) + 1], &c__1, &c_b35, "N", idumma, &n, &n, &
+			c_b18, &anorm, "NO", &a[a_offset], lda, &iwork[1], &
 			iinfo);
 
 	    } else if (itype == 9) {
 
 /*              symmetric banded, eigenvalues specified   
 
-                The following values are used for the half-ban
-dwidths:   
+                The following values are used for the half-bandwidths:   
 
                   ka = 1   kb = 1   
                   ka = 2   kb = 1   
@@ -677,9 +769,9 @@ dwidths:
 	    }
 
 	    if (iinfo != 0) {
-		io___34.ciunit = *nounit;
-		s_wsfe(&io___34);
-		do_fio(&c__1, "Generator", 9L);
+		io___36.ciunit = *nounit;
+		s_wsfe(&io___36);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -689,12 +781,26 @@ dwidths:
 		return 0;
 	    }
 
-L80:
+L90:
 
-/*           3) Call DSYGV, DSPGV and DSBGV to compute S and U, do
- tests.   
+	    abstol = unfl + unfl;
+	    if (n <= 1) {
+		il = 1;
+		iu = n;
+	    } else {
+		il = (integer) ((n - 1) * dlarnd_(&c__1, iseed2) + 1);
+		iu = (integer) ((n - 1) * dlarnd_(&c__1, iseed2) + 1);
+		if (il > iu) {
+		    itemp = il;
+		    il = iu;
+		    iu = itemp;
+		}
+	    }
 
-                 loop over the three generalized problems   
+/*           3) Call DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD, SSBGVD,   
+                DSYGVX, DSPGVX, and DSBGVX, do tests.   
+
+             loop over the three generalized problems   
                    IBTYPE = 1: A*x = (lambda)*B*x   
                    IBTYPE = 2: A*B*x = (lambda)*x   
                    IBTYPE = 3: B*A*x = (lambda)*x */
@@ -711,32 +817,33 @@ L80:
 			*(unsigned char *)uplo = 'L';
 		    }
 
-/*                 Generate random well-conditioned positi
-ve definite   
-                   matrix B, of bandwidth not greater than
- that of A. */
+/*                 Generate random well-conditioned positive definite   
+                   matrix B, of bandwidth not greater than that of A. */
 
 		    dlatms_(&n, &n, "U", &iseed[1], "P", &work[1], &c__5, &
-			    c_b79, &c_b34, &kb, &kb, uplo, &b[b_offset], ldb, 
+			    c_b82, &c_b35, &kb, &kb, uplo, &b[b_offset], ldb, 
 			    &work[n + 1], &iinfo);
+
+/*                 Test DSYGV */
 
 		    ++ntest;
 
-		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &z[z_offset], ldu);
+		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &z__[z_offset], 
+			    ldz);
 		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
 			    ldb);
 
-		    dsygv_(&ibtype, "V", uplo, &n, &z[z_offset], ldu, &bb[
-			    bb_offset], ldb, &d[1], &work[1], nwork, &iinfo);
+		    dsygv_(&ibtype, "V", uplo, &n, &z__[z_offset], ldz, &bb[
+			    bb_offset], ldb, &d__[1], &work[1], nwork, &iinfo);
 		    if (iinfo != 0) {
-			io___38.ciunit = *nounit;
-			s_wsfe(&io___38);
+			io___44.ciunit = *nounit;
+			s_wsfe(&io___44);
 /* Writing concatenation */
 			i__6[0] = 8, a__1[0] = "DSYGV(V,";
 			i__6[1] = 1, a__1[1] = uplo;
 			i__6[2] = 1, a__1[2] = ")";
-			s_cat(ch__1, a__1, i__6, &c__3, 10L);
-			do_fio(&c__1, ch__1, 10L);
+			s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+			do_fio(&c__1, ch__1, (ftnlen)10);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -750,61 +857,245 @@ ve definite
 			    return 0;
 			} else {
 			    result[ntest] = ulpinv;
-			    goto L90;
+			    goto L100;
 			}
 		    }
 
 /*                 Do Test */
 
-		    dsgt01_(&ibtype, uplo, &n, &a[a_offset], lda, &b[b_offset]
-			    , ldb, &z[z_offset], ldu, &d[1], &uz[1], &result[
-			    ntest]);
+		    dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
 
-L90:
+/*                 Test DSYGVD */
+
 		    ++ntest;
 
-/*                 Copy the matrices into packed storage. 
-*/
+		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &z__[z_offset], 
+			    ldz);
+		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
+			    ldb);
+
+		    dsygvd_(&ibtype, "V", uplo, &n, &z__[z_offset], ldz, &bb[
+			    bb_offset], ldb, &d__[1], &work[1], nwork, &iwork[
+			    1], liwork, &iinfo);
+		    if (iinfo != 0) {
+			io___45.ciunit = *nounit;
+			s_wsfe(&io___45);
+/* Writing concatenation */
+			i__6[0] = 9, a__1[0] = "DSYGVD(V,";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)11);
+			do_fio(&c__1, ch__2, (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L100;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+/*                 Test DSYGVX */
+
+		    ++ntest;
+
+		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &ab[ab_offset], 
+			    lda);
+		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
+			    ldb);
+
+		    dsygvx_(&ibtype, "V", "A", uplo, &n, &ab[ab_offset], lda, 
+			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			     &iwork[n + 1], &iwork[1], &iinfo);
+		    if (iinfo != 0) {
+			io___49.ciunit = *nounit;
+			s_wsfe(&io___49);
+/* Writing concatenation */
+			i__6[0] = 10, a__1[0] = "DSYGVX(V,A";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			do_fio(&c__1, ch__3, (ftnlen)12);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L100;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+		    ++ntest;
+
+		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &ab[ab_offset], 
+			    lda);
+		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
+			    ldb);
+
+/*                 since we do not know the exact eigenvalues of this   
+                   eigenpair, we just set VL and VU as constants.   
+                   It is quite possible that there are no eigenvalues   
+                   in this interval. */
+
+		    vl = 0.;
+		    vu = anorm;
+		    dsygvx_(&ibtype, "V", "V", uplo, &n, &ab[ab_offset], lda, 
+			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			     &iwork[n + 1], &iwork[1], &iinfo);
+		    if (iinfo != 0) {
+			io___50.ciunit = *nounit;
+			s_wsfe(&io___50);
+/* Writing concatenation */
+			i__6[0] = 11, a__1[0] = "DSYGVX(V,V,";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__4, a__1, i__6, &c__3, (ftnlen)13);
+			do_fio(&c__1, ch__4, (ftnlen)13);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L100;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+		    ++ntest;
+
+		    dlacpy_(" ", &n, &n, &a[a_offset], lda, &ab[ab_offset], 
+			    lda);
+		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
+			    ldb);
+
+		    dsygvx_(&ibtype, "V", "I", uplo, &n, &ab[ab_offset], lda, 
+			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			     &iwork[n + 1], &iwork[1], &iinfo);
+		    if (iinfo != 0) {
+			io___51.ciunit = *nounit;
+			s_wsfe(&io___51);
+/* Writing concatenation */
+			i__6[0] = 11, a__1[0] = "DSYGVX(V,I,";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__4, a__1, i__6, &c__3, (ftnlen)13);
+			do_fio(&c__1, ch__4, (ftnlen)13);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L100;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+L100:
+
+/*                 Test DSPGV */
+
+		    ++ntest;
+
+/*                 Copy the matrices into packed storage. */
 
 		    if (lsame_(uplo, "U")) {
 			ij = 1;
 			i__3 = n;
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
-			    for (i = 1; i <= i__4; ++i) {
-				uz[ij] = a[i + j * a_dim1];
-				u[ij] = b[i + j * b_dim1];
+			    for (i__ = 1; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
 				++ij;
-/* L100: */
-			    }
 /* L110: */
+			    }
+/* L120: */
 			}
 		    } else {
 			ij = 1;
 			i__3 = n;
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
-			    for (i = j; i <= i__4; ++i) {
-				uz[ij] = a[i + j * a_dim1];
-				u[ij] = b[i + j * b_dim1];
+			    for (i__ = j; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
 				++ij;
-/* L120: */
-			    }
 /* L130: */
+			    }
+/* L140: */
 			}
 		    }
 
-		    dspgv_(&ibtype, "V", uplo, &n, &uz[1], &u[1], &d[1], &z[
-			    z_offset], ldu, &work[1], &iinfo);
+		    dspgv_(&ibtype, "V", uplo, &n, &ap[1], &bp[1], &d__[1], &
+			    z__[z_offset], ldz, &work[1], &iinfo);
 		    if (iinfo != 0) {
-			io___41.ciunit = *nounit;
-			s_wsfe(&io___41);
+			io___53.ciunit = *nounit;
+			s_wsfe(&io___53);
 /* Writing concatenation */
 			i__6[0] = 8, a__1[0] = "DSPGV(V,";
 			i__6[1] = 1, a__1[1] = uplo;
 			i__6[2] = 1, a__1[2] = ")";
-			s_cat(ch__1, a__1, i__6, &c__3, 10L);
-			do_fio(&c__1, ch__1, 10L);
+			s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+			do_fio(&c__1, ch__1, (ftnlen)10);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -818,22 +1109,302 @@ L90:
 			    return 0;
 			} else {
 			    result[ntest] = ulpinv;
-			    goto L140;
+			    goto L310;
 			}
 		    }
 
 /*                 Do Test */
 
-		    dsgt01_(&ibtype, uplo, &n, &a[a_offset], lda, &b[b_offset]
-			    , ldb, &z[z_offset], ldu, &d[1], &uz[1], &result[
-			    ntest]);
+		    dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
 
-L140:
+/*                 Test DSPGVD */
+
+		    ++ntest;
+
+/*                 Copy the matrices into packed storage. */
+
+		    if (lsame_(uplo, "U")) {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = j;
+			    for (i__ = 1; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L150: */
+			    }
+/* L160: */
+			}
+		    } else {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = n;
+			    for (i__ = j; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L170: */
+			    }
+/* L180: */
+			}
+		    }
+
+		    dspgvd_(&ibtype, "V", uplo, &n, &ap[1], &bp[1], &d__[1], &
+			    z__[z_offset], ldz, &work[1], nwork, &iwork[1], 
+			    liwork, &iinfo);
+		    if (iinfo != 0) {
+			io___54.ciunit = *nounit;
+			s_wsfe(&io___54);
+/* Writing concatenation */
+			i__6[0] = 9, a__1[0] = "DSPGVD(V,";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)11);
+			do_fio(&c__1, ch__2, (ftnlen)11);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L310;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+/*                 Test DSPGVX */
+
+		    ++ntest;
+
+/*                 Copy the matrices into packed storage. */
+
+		    if (lsame_(uplo, "U")) {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = j;
+			    for (i__ = 1; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L190: */
+			    }
+/* L200: */
+			}
+		    } else {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = n;
+			    for (i__ = j; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L210: */
+			    }
+/* L220: */
+			}
+		    }
+
+		    dspgvx_(&ibtype, "V", "A", uplo, &n, &ap[1], &bp[1], &vl, 
+			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
+			    , info);
+		    if (iinfo != 0) {
+			io___55.ciunit = *nounit;
+			s_wsfe(&io___55);
+/* Writing concatenation */
+			i__6[0] = 10, a__1[0] = "DSPGVX(V,A";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			do_fio(&c__1, ch__3, (ftnlen)12);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L310;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+		    ++ntest;
+
+/*                 Copy the matrices into packed storage. */
+
+		    if (lsame_(uplo, "U")) {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = j;
+			    for (i__ = 1; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L230: */
+			    }
+/* L240: */
+			}
+		    } else {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = n;
+			    for (i__ = j; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L250: */
+			    }
+/* L260: */
+			}
+		    }
+
+		    vl = 0.;
+		    vu = anorm;
+		    dspgvx_(&ibtype, "V", "V", uplo, &n, &ap[1], &bp[1], &vl, 
+			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
+			    , info);
+		    if (iinfo != 0) {
+			io___56.ciunit = *nounit;
+			s_wsfe(&io___56);
+/* Writing concatenation */
+			i__6[0] = 10, a__1[0] = "DSPGVX(V,V";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			do_fio(&c__1, ch__3, (ftnlen)12);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L310;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+		    ++ntest;
+
+/*                 Copy the matrices into packed storage. */
+
+		    if (lsame_(uplo, "U")) {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = j;
+			    for (i__ = 1; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L270: */
+			    }
+/* L280: */
+			}
+		    } else {
+			ij = 1;
+			i__3 = n;
+			for (j = 1; j <= i__3; ++j) {
+			    i__4 = n;
+			    for (i__ = j; i__ <= i__4; ++i__) {
+				ap[ij] = a_ref(i__, j);
+				bp[ij] = b_ref(i__, j);
+				++ij;
+/* L290: */
+			    }
+/* L300: */
+			}
+		    }
+
+		    dspgvx_(&ibtype, "V", "I", uplo, &n, &ap[1], &bp[1], &vl, 
+			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
+			    , info);
+		    if (iinfo != 0) {
+			io___57.ciunit = *nounit;
+			s_wsfe(&io___57);
+/* Writing concatenation */
+			i__6[0] = 10, a__1[0] = "DSPGVX(V,I";
+			i__6[1] = 1, a__1[1] = uplo;
+			i__6[2] = 1, a__1[2] = ")";
+			s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			do_fio(&c__1, ch__3, (ftnlen)12);
+			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
+				;
+			do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				integer));
+			e_wsfe();
+			*info = abs(iinfo);
+			if (iinfo < 0) {
+			    return 0;
+			} else {
+			    result[ntest] = ulpinv;
+			    goto L310;
+			}
+		    }
+
+/*                 Do Test */
+
+		    dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+			    b_offset], ldb, &z__[z_offset], ldz, &d__[1], &
+			    work[1], &result[ntest]);
+
+L310:
+
 		    if (ibtype == 1) {
+
+/*                    TEST DSBGV */
+
 			++ntest;
 
-/*                    Copy the matrices into band stor
-age. */
+/*                    Copy the matrices into band storage. */
 
 			if (lsame_(uplo, "U")) {
 			    i__3 = n;
@@ -841,20 +1412,22 @@ age. */
 /* Computing MAX */
 				i__4 = 1, i__5 = j - ka;
 				i__7 = j;
-				for (i = max(i__4,i__5); i <= i__7; ++i) {
-				    v[ka + 1 + i - j + j * v_dim1] = a[i + j *
-					     a_dim1];
-/* L150: */
+				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
+					 {
+				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
+					    j);
+/* L320: */
 				}
 /* Computing MAX */
 				i__7 = 1, i__4 = j - kb;
 				i__5 = j;
-				for (i = max(i__7,i__4); i <= i__5; ++i) {
-				    bb[kb + 1 + i - j + j * bb_dim1] = b[i + 
-					    j * b_dim1];
-/* L160: */
+				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
+					 {
+				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
+					    j);
+/* L330: */
 				}
-/* L170: */
+/* L340: */
 			    }
 			} else {
 			    i__3 = n;
@@ -862,35 +1435,33 @@ age. */
 /* Computing MIN */
 				i__7 = n, i__4 = j + ka;
 				i__5 = min(i__7,i__4);
-				for (i = j; i <= i__5; ++i) {
-				    v[i + 1 - j + j * v_dim1] = a[i + j * 
-					    a_dim1];
-/* L180: */
+				for (i__ = j; i__ <= i__5; ++i__) {
+				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L350: */
 				}
 /* Computing MIN */
 				i__7 = n, i__4 = j + kb;
 				i__5 = min(i__7,i__4);
-				for (i = j; i <= i__5; ++i) {
-				    bb[i + 1 - j + j * bb_dim1] = b[i + j * 
-					    b_dim1];
-/* L190: */
+				for (i__ = j; i__ <= i__5; ++i__) {
+				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+/* L360: */
 				}
-/* L200: */
+/* L370: */
 			    }
 			}
 
-			dsbgv_("V", uplo, &n, &ka, &kb, &v[v_offset], ldu, &
-				bb[bb_offset], ldb, &d[1], &z[z_offset], ldu, 
-				&work[1], &iinfo);
+			dsbgv_("V", uplo, &n, &ka, &kb, &ab[ab_offset], lda, &
+				bb[bb_offset], ldb, &d__[1], &z__[z_offset], 
+				ldz, &work[1], &iinfo);
 			if (iinfo != 0) {
-			    io___42.ciunit = *nounit;
-			    s_wsfe(&io___42);
+			    io___58.ciunit = *nounit;
+			    s_wsfe(&io___58);
 /* Writing concatenation */
 			    i__6[0] = 8, a__1[0] = "DSBGV(V,";
 			    i__6[1] = 1, a__1[1] = uplo;
 			    i__6[2] = 1, a__1[2] = ")";
-			    s_cat(ch__1, a__1, i__6, &c__3, 10L);
-			    do_fio(&c__1, ch__1, 10L);
+			    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)10);
+			    do_fio(&c__1, ch__1, (ftnlen)10);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -905,21 +1476,375 @@ age. */
 				return 0;
 			    } else {
 				result[ntest] = ulpinv;
-				goto L210;
+				goto L620;
 			    }
 			}
 
 /*                    Do Test */
 
-			dsgt01_(&ibtype, uplo, &n, &a[a_offset], lda, &b[
-				b_offset], ldb, &z[z_offset], ldu, &d[1], &uz[
-				1], &result[ntest]);
+			dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+				b_offset], ldb, &z__[z_offset], ldz, &d__[1], 
+				&work[1], &result[ntest]);
+
+/*                    TEST DSBGVD */
+
+			++ntest;
+
+/*                    Copy the matrices into band storage. */
+
+			if (lsame_(uplo, "U")) {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+				i__5 = 1, i__7 = j - ka;
+				i__4 = j;
+				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
+					 {
+				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
+					    j);
+/* L380: */
+				}
+/* Computing MAX */
+				i__4 = 1, i__5 = j - kb;
+				i__7 = j;
+				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
+					 {
+				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
+					    j);
+/* L390: */
+				}
+/* L400: */
+			    }
+			} else {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+				i__4 = n, i__5 = j + ka;
+				i__7 = min(i__4,i__5);
+				for (i__ = j; i__ <= i__7; ++i__) {
+				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L410: */
+				}
+/* Computing MIN */
+				i__4 = n, i__5 = j + kb;
+				i__7 = min(i__4,i__5);
+				for (i__ = j; i__ <= i__7; ++i__) {
+				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+/* L420: */
+				}
+/* L430: */
+			    }
+			}
+
+			dsbgvd_("V", uplo, &n, &ka, &kb, &ab[ab_offset], lda, 
+				&bb[bb_offset], ldb, &d__[1], &z__[z_offset], 
+				ldz, &work[1], nwork, &iwork[1], liwork, &
+				iinfo);
+			if (iinfo != 0) {
+			    io___59.ciunit = *nounit;
+			    s_wsfe(&io___59);
+/* Writing concatenation */
+			    i__6[0] = 9, a__1[0] = "DSBGVD(V,";
+			    i__6[1] = 1, a__1[1] = uplo;
+			    i__6[2] = 1, a__1[2] = ")";
+			    s_cat(ch__2, a__1, i__6, &c__3, (ftnlen)11);
+			    do_fio(&c__1, ch__2, (ftnlen)11);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    if (iinfo < 0) {
+				return 0;
+			    } else {
+				result[ntest] = ulpinv;
+				goto L620;
+			    }
+			}
+
+/*                    Do Test */
+
+			dsgt01_(&ibtype, uplo, &n, &n, &a[a_offset], lda, &b[
+				b_offset], ldb, &z__[z_offset], ldz, &d__[1], 
+				&work[1], &result[ntest]);
+
+/*                    Test DSBGVX */
+
+			++ntest;
+
+/*                    Copy the matrices into band storage. */
+
+			if (lsame_(uplo, "U")) {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+				i__7 = 1, i__4 = j - ka;
+				i__5 = j;
+				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
+					 {
+				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
+					    j);
+/* L440: */
+				}
+/* Computing MAX */
+				i__5 = 1, i__7 = j - kb;
+				i__4 = j;
+				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
+					 {
+				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
+					    j);
+/* L450: */
+				}
+/* L460: */
+			    }
+			} else {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+				i__5 = n, i__7 = j + ka;
+				i__4 = min(i__5,i__7);
+				for (i__ = j; i__ <= i__4; ++i__) {
+				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L470: */
+				}
+/* Computing MIN */
+				i__5 = n, i__7 = j + kb;
+				i__4 = min(i__5,i__7);
+				for (i__ = j; i__ <= i__4; ++i__) {
+				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+/* L480: */
+				}
+/* L490: */
+			    }
+			}
+
+			i__3 = max(1,n);
+			dsbgvx_("V", "A", uplo, &n, &ka, &kb, &ab[ab_offset], 
+				lda, &bb[bb_offset], ldb, &bp[1], &i__3, &vl, 
+				&vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+				z_offset], ldz, &work[1], &iwork[n + 1], &
+				iwork[1], &iinfo);
+			if (iinfo != 0) {
+			    io___60.ciunit = *nounit;
+			    s_wsfe(&io___60);
+/* Writing concatenation */
+			    i__6[0] = 10, a__1[0] = "DSBGVX(V,A";
+			    i__6[1] = 1, a__1[1] = uplo;
+			    i__6[2] = 1, a__1[2] = ")";
+			    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			    do_fio(&c__1, ch__3, (ftnlen)12);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    if (iinfo < 0) {
+				return 0;
+			    } else {
+				result[ntest] = ulpinv;
+				goto L620;
+			    }
+			}
+
+/*                    Do Test */
+
+			dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+				b_offset], ldb, &z__[z_offset], ldz, &d__[1], 
+				&work[1], &result[ntest]);
+
+
+			++ntest;
+
+/*                    Copy the matrices into band storage. */
+
+			if (lsame_(uplo, "U")) {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+				i__4 = 1, i__5 = j - ka;
+				i__7 = j;
+				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
+					 {
+				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
+					    j);
+/* L500: */
+				}
+/* Computing MAX */
+				i__7 = 1, i__4 = j - kb;
+				i__5 = j;
+				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
+					 {
+				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
+					    j);
+/* L510: */
+				}
+/* L520: */
+			    }
+			} else {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+				i__7 = n, i__4 = j + ka;
+				i__5 = min(i__7,i__4);
+				for (i__ = j; i__ <= i__5; ++i__) {
+				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L530: */
+				}
+/* Computing MIN */
+				i__7 = n, i__4 = j + kb;
+				i__5 = min(i__7,i__4);
+				for (i__ = j; i__ <= i__5; ++i__) {
+				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+/* L540: */
+				}
+/* L550: */
+			    }
+			}
+
+			vl = 0.;
+			vu = anorm;
+			i__3 = max(1,n);
+			dsbgvx_("V", "V", uplo, &n, &ka, &kb, &ab[ab_offset], 
+				lda, &bb[bb_offset], ldb, &bp[1], &i__3, &vl, 
+				&vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+				z_offset], ldz, &work[1], &iwork[n + 1], &
+				iwork[1], &iinfo);
+			if (iinfo != 0) {
+			    io___61.ciunit = *nounit;
+			    s_wsfe(&io___61);
+/* Writing concatenation */
+			    i__6[0] = 10, a__1[0] = "DSBGVX(V,V";
+			    i__6[1] = 1, a__1[1] = uplo;
+			    i__6[2] = 1, a__1[2] = ")";
+			    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			    do_fio(&c__1, ch__3, (ftnlen)12);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    if (iinfo < 0) {
+				return 0;
+			    } else {
+				result[ntest] = ulpinv;
+				goto L620;
+			    }
+			}
+
+/*                    Do Test */
+
+			dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+				b_offset], ldb, &z__[z_offset], ldz, &d__[1], 
+				&work[1], &result[ntest]);
+
+			++ntest;
+
+/*                    Copy the matrices into band storage. */
+
+			if (lsame_(uplo, "U")) {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+				i__5 = 1, i__7 = j - ka;
+				i__4 = j;
+				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
+					 {
+				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
+					    j);
+/* L560: */
+				}
+/* Computing MAX */
+				i__4 = 1, i__5 = j - kb;
+				i__7 = j;
+				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
+					 {
+				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
+					    j);
+/* L570: */
+				}
+/* L580: */
+			    }
+			} else {
+			    i__3 = n;
+			    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+				i__4 = n, i__5 = j + ka;
+				i__7 = min(i__4,i__5);
+				for (i__ = j; i__ <= i__7; ++i__) {
+				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+/* L590: */
+				}
+/* Computing MIN */
+				i__4 = n, i__5 = j + kb;
+				i__7 = min(i__4,i__5);
+				for (i__ = j; i__ <= i__7; ++i__) {
+				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+/* L600: */
+				}
+/* L610: */
+			    }
+			}
+
+			i__3 = max(1,n);
+			dsbgvx_("V", "I", uplo, &n, &ka, &kb, &ab[ab_offset], 
+				lda, &bb[bb_offset], ldb, &bp[1], &i__3, &vl, 
+				&vu, &il, &iu, &abstol, &m, &d__[1], &z__[
+				z_offset], ldz, &work[1], &iwork[n + 1], &
+				iwork[1], &iinfo);
+			if (iinfo != 0) {
+			    io___62.ciunit = *nounit;
+			    s_wsfe(&io___62);
+/* Writing concatenation */
+			    i__6[0] = 10, a__1[0] = "DSBGVX(V,I";
+			    i__6[1] = 1, a__1[1] = uplo;
+			    i__6[2] = 1, a__1[2] = ")";
+			    s_cat(ch__3, a__1, i__6, &c__3, (ftnlen)12);
+			    do_fio(&c__1, ch__3, (ftnlen)12);
+			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
+				    ;
+			    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(
+				    integer));
+			    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(
+				    integer));
+			    e_wsfe();
+			    *info = abs(iinfo);
+			    if (iinfo < 0) {
+				return 0;
+			    } else {
+				result[ntest] = ulpinv;
+				goto L620;
+			    }
+			}
+
+/*                    Do Test */
+
+			dsgt01_(&ibtype, uplo, &n, &m, &a[a_offset], lda, &b[
+				b_offset], ldb, &z__[z_offset], ldz, &d__[1], 
+				&work[1], &result[ntest]);
+
 		    }
 
-L210:
+L620:
 		    ;
 		}
-/* L220: */
+/* L630: */
 	    }
 
 /*           End of Loop -- Check for RESULT(j) > THRESH */
@@ -927,10 +1852,10 @@ L210:
 	    ntestt += ntest;
 	    dlafts_("DSG", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
-L230:
+L640:
 	    ;
 	}
-/* L240: */
+/* L650: */
     }
 
 /*     Summary */
@@ -942,4 +1867,10 @@ L230:
 /*     End of DDRVSG */
 
 } /* ddrvsg_ */
+
+#undef bb_ref
+#undef ab_ref
+#undef b_ref
+#undef a_ref
+
 

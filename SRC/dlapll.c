@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlapll_(integer *n, doublereal *x, integer *incx, 
 	doublereal *y, integer *incy, doublereal *ssmin)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -44,18 +45,14 @@
             The increment between successive elements of Y. INCY > 0.   
 
     SSMIN   (output) DOUBLE PRECISION   
-            The smallest singular value of the N-by-2 matrix A = ( X Y ). 
-  
+            The smallest singular value of the N-by-2 matrix A = ( X Y ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     /* Local variables */
@@ -63,7 +60,7 @@
 	    integer *);
     extern /* Subroutine */ int dlas2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
-    static doublereal c;
+    static doublereal c__;
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
     static doublereal ssmax, a11, a12, a22;
@@ -71,11 +68,10 @@
 	     integer *, doublereal *);
     static doublereal tau;
 
+    --y;
+    --x;
 
-#define Y(I) y[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n <= 1) {
 	*ssmin = 0.;
 	return 0;
@@ -83,18 +79,18 @@
 
 /*     Compute the QR factorization of the N-by-2 matrix ( X Y ) */
 
-    dlarfg_(n, &X(1), &X(*incx + 1), incx, &tau);
-    a11 = X(1);
-    X(1) = 1.;
+    dlarfg_(n, &x[1], &x[*incx + 1], incx, &tau);
+    a11 = x[1];
+    x[1] = 1.;
 
-    c = -tau * ddot_(n, &X(1), incx, &Y(1), incy);
-    daxpy_(n, &c, &X(1), incx, &Y(1), incy);
+    c__ = -tau * ddot_(n, &x[1], incx, &y[1], incy);
+    daxpy_(n, &c__, &x[1], incx, &y[1], incy);
 
     i__1 = *n - 1;
-    dlarfg_(&i__1, &Y(*incy + 1), &Y((*incy << 1) + 1), incy, &tau);
+    dlarfg_(&i__1, &y[*incy + 1], &y[(*incy << 1) + 1], incy, &tau);
 
-    a12 = Y(1);
-    a22 = Y(*incy + 1);
+    a12 = y[1];
+    a22 = y[*incy + 1];
 
 /*     Compute the SVD of 2-by-2 Upper triangular matrix. */
 

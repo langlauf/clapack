@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlaesy_(doublecomplex *a, doublecomplex *b, 
-	doublecomplex *c, doublecomplex *rt1, doublecomplex *rt2, 
+	doublecomplex *c__, doublecomplex *rt1, doublecomplex *rt2, 
 	doublecomplex *evscal, doublecomplex *cs1, doublecomplex *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -45,25 +46,19 @@
             The eigenvalue of smaller modulus.   
 
     EVSCAL  (output) COMPLEX*16   
-            The complex value by which the eigenvector matrix was scaled 
-  
-            to make it orthonormal.  If EVSCAL is zero, the eigenvectors 
-  
-            were not computed.  This means one of two things:  the 2-by-2 
-  
+            The complex value by which the eigenvector matrix was scaled   
+            to make it orthonormal.  If EVSCAL is zero, the eigenvectors   
+            were not computed.  This means one of two things:  the 2-by-2   
             matrix could not be diagonalized, or the norm of the matrix   
-            of eigenvectors before scaling was larger than the threshold 
-  
+            of eigenvectors before scaling was larger than the threshold   
             value THRESH (set below).   
 
     CS1     (output) COMPLEX*16   
     SN1     (output) COMPLEX*16   
-            If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector 
-  
+            If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector   
             for RT1.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
 
@@ -84,14 +79,14 @@
     /* Local variables */
     static doublereal babs, tabs;
     static doublecomplex s, t;
-    static doublereal z, evnorm;
+    static doublereal z__, evnorm;
     static doublecomplex tmp;
 
 
 
     if (z_abs(b) == 0.) {
 	rt1->r = a->r, rt1->i = a->i;
-	rt2->r = c->r, rt2->i = c->i;
+	rt2->r = c__->r, rt2->i = c__->i;
 	if (z_abs(rt1) < z_abs(rt2)) {
 	    tmp.r = rt1->r, tmp.i = rt1->i;
 	    rt1->r = rt2->r, rt1->i = rt2->i;
@@ -109,10 +104,10 @@
              lambda **2 - (A+C) lambda + (A*C - B*B)   
           and we solve it using the quadratic formula. */
 
-	z__2.r = a->r + c->r, z__2.i = a->i + c->i;
+	z__2.r = a->r + c__->r, z__2.i = a->i + c__->i;
 	z__1.r = z__2.r * .5, z__1.i = z__2.i * .5;
 	s.r = z__1.r, s.i = z__1.i;
-	z__2.r = a->r - c->r, z__2.i = a->i - c->i;
+	z__2.r = a->r - c__->r, z__2.i = a->i - c__->i;
 	z__1.r = z__2.r * .5, z__1.i = z__2.i * .5;
 	t.r = z__1.r, t.i = z__1.i;
 
@@ -120,15 +115,15 @@
 
 	babs = z_abs(b);
 	tabs = z_abs(&t);
-	z = max(babs,tabs);
-	if (z > 0.) {
-	    z__5.r = t.r / z, z__5.i = t.i / z;
+	z__ = max(babs,tabs);
+	if (z__ > 0.) {
+	    z__5.r = t.r / z__, z__5.i = t.i / z__;
 	    pow_zi(&z__4, &z__5, &c__2);
-	    z__7.r = b->r / z, z__7.i = b->i / z;
+	    z__7.r = b->r / z__, z__7.i = b->i / z__;
 	    pow_zi(&z__6, &z__7, &c__2);
 	    z__3.r = z__4.r + z__6.r, z__3.i = z__4.i + z__6.i;
 	    z_sqrt(&z__2, &z__3);
-	    z__1.r = z * z__2.r, z__1.i = z * z__2.i;
+	    z__1.r = z__ * z__2.r, z__1.i = z__ * z__2.i;
 	    t.r = z__1.r, t.i = z__1.i;
 	}
 
@@ -145,13 +140,10 @@
 	    rt2->r = tmp.r, rt2->i = tmp.i;
 	}
 
-/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then 
-  
-          scale the components of this eigenvector so that the matrix 
-  
+/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then   
+          scale the components of this eigenvector so that the matrix   
           of eigenvectors X satisfies  X * X' = I .  (No scaling is   
-          done if the norm of the eigenvalue matrix is less than THRES
-H.) */
+          done if the norm of the eigenvalue matrix is less than THRESH.) */
 
 	z__2.r = rt1->r - a->r, z__2.i = rt1->i - a->i;
 	z_div(&z__1, &z__2, b);

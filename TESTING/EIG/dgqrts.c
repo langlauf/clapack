@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -13,8 +14,8 @@ static doublereal c_b30 = -1.;
 static doublereal c_b31 = 1.;
 
 /* Subroutine */ int dgqrts_(integer *n, integer *m, integer *p, doublereal *
-	a, doublereal *af, doublereal *q, doublereal *r, integer *lda, 
-	doublereal *taua, doublereal *b, doublereal *bf, doublereal *z, 
+	a, doublereal *af, doublereal *q, doublereal *r__, integer *lda, 
+	doublereal *taua, doublereal *b, doublereal *bf, doublereal *z__, 
 	doublereal *t, doublereal *bwk, integer *ldb, doublereal *taub, 
 	doublereal *work, integer *lwork, doublereal *rwork, doublereal *
 	result)
@@ -52,7 +53,14 @@ static doublereal c_b31 = 1.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+#define bf_ref(a_1,a_2) bf[(a_2)*bf_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -86,16 +94,14 @@ static doublereal c_b31 = 1.;
     Q       (output) DOUBLE PRECISION array, dimension (LDA,N)   
             The M-by-M orthogonal matrix Q.   
 
-    R       (workspace) DOUBLE PRECISION array, dimension (LDA,MAX(M,N)) 
-  
+    R       (workspace) DOUBLE PRECISION array, dimension (LDA,MAX(M,N))   
 
     LDA     (input) INTEGER   
             The leading dimension of the arrays A, AF, R and Q.   
             LDA >= max(M,N).   
 
     TAUA    (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by DGGQRF.   
 
     B       (input) DOUBLE PRECISION array, dimension (LDB,P)   
@@ -108,8 +114,7 @@ static doublereal c_b31 = 1.;
     Z       (output) DOUBLE PRECISION array, dimension (LDB,P)   
             The P-by-P orthogonal matrix Z.   
 
-    T       (workspace) DOUBLE PRECISION array, dimension (LDB,max(P,N)) 
-  
+    T       (workspace) DOUBLE PRECISION array, dimension (LDB,max(P,N))   
 
     BWK     (workspace) DOUBLE PRECISION array, dimension (LDB,N)   
 
@@ -118,8 +123,7 @@ static doublereal c_b31 = 1.;
             LDB >= max(P,N).   
 
     TAUB    (output) DOUBLE PRECISION array, dimension (min(P,N))   
-            The scalar factors of the elementary reflectors, as returned 
-  
+            The scalar factors of the elementary reflectors, as returned   
             by DGGRQF.   
 
     WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
@@ -136,38 +140,37 @@ static doublereal c_b31 = 1.;
               RESULT(3) = norm( I - Q'*Q ) / ( M*ULP )   
               RESULT(4) = norm( I - Z'*Z ) / ( P*ULP )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --taua;
     bwk_dim1 = *ldb;
-    bwk_offset = bwk_dim1 + 1;
+    bwk_offset = 1 + bwk_dim1 * 1;
     bwk -= bwk_offset;
     t_dim1 = *ldb;
-    t_offset = t_dim1 + 1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     z_dim1 = *ldb;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --taub;
     --work;
@@ -199,63 +202,63 @@ static doublereal c_b31 = 1.;
 
     dlaset_("Full", n, n, &c_b9, &c_b9, &q[q_offset], lda);
     i__1 = *n - 1;
-    dlacpy_("Lower", &i__1, m, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda)
-	    ;
+    dlacpy_("Lower", &i__1, m, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
     i__1 = min(*n,*m);
     dorgqr_(n, n, &i__1, &q[q_offset], lda, &taua[1], &work[1], lwork, &info);
 
 /*     Generate the P-by-P matrix Z */
 
-    dlaset_("Full", p, p, &c_b9, &c_b9, &z[z_offset], ldb);
+    dlaset_("Full", p, p, &c_b9, &c_b9, &z__[z_offset], ldb);
     if (*n <= *p) {
 	if (*n > 0 && *n < *p) {
 	    i__1 = *p - *n;
-	    dlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z[*p - *n + 1 + 
-		    z_dim1], ldb);
+	    dlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z___ref(*p - *n + 
+		    1, 1), ldb);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &bf[(*p - *n + 1) * bf_dim1 + 2], 
-		    ldb, &z[*p - *n + 2 + (*p - *n + 1) * z_dim1], ldb);
+	    dlacpy_("Lower", &i__1, &i__2, &bf_ref(2, *p - *n + 1), ldb, &
+		    z___ref(*p - *n + 2, *p - *n + 1), ldb);
 	}
     } else {
 	if (*p > 1) {
 	    i__1 = *p - 1;
 	    i__2 = *p - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &bf[*n - *p + 2 + bf_dim1], ldb, &
-		    z[z_dim1 + 2], ldb);
+	    dlacpy_("Lower", &i__1, &i__2, &bf_ref(*n - *p + 2, 1), ldb, &
+		    z___ref(2, 1), ldb);
 	}
     }
     i__1 = min(*n,*p);
-    dorgrq_(p, p, &i__1, &z[z_offset], ldb, &taub[1], &work[1], lwork, &info);
+    dorgrq_(p, p, &i__1, &z__[z_offset], ldb, &taub[1], &work[1], lwork, &
+	    info);
 
 /*     Copy R */
 
-    dlaset_("Full", n, m, &c_b19, &c_b19, &r[r_offset], lda);
-    dlacpy_("Upper", n, m, &af[af_offset], lda, &r[r_offset], lda);
+    dlaset_("Full", n, m, &c_b19, &c_b19, &r__[r_offset], lda);
+    dlacpy_("Upper", n, m, &af[af_offset], lda, &r__[r_offset], lda);
 
 /*     Copy T */
 
     dlaset_("Full", n, p, &c_b19, &c_b19, &t[t_offset], ldb);
     if (*n <= *p) {
-	dlacpy_("Upper", n, n, &bf[(*p - *n + 1) * bf_dim1 + 1], ldb, &t[(*p 
-		- *n + 1) * t_dim1 + 1], ldb);
+	dlacpy_("Upper", n, n, &bf_ref(1, *p - *n + 1), ldb, &t_ref(1, *p - *
+		n + 1), ldb);
     } else {
 	i__1 = *n - *p;
 	dlacpy_("Full", &i__1, p, &bf[bf_offset], ldb, &t[t_offset], ldb);
-	dlacpy_("Upper", p, p, &bf[*n - *p + 1 + bf_dim1], ldb, &t[*n - *p + 
-		1 + t_dim1], ldb);
+	dlacpy_("Upper", p, p, &bf_ref(*n - *p + 1, 1), ldb, &t_ref(*n - *p + 
+		1, 1), ldb);
     }
 
 /*     Compute R - Q'*A */
 
     dgemm_("Transpose", "No transpose", n, m, n, &c_b30, &q[q_offset], lda, &
-	    a[a_offset], lda, &c_b31, &r[r_offset], lda);
+	    a[a_offset], lda, &c_b31, &r__[r_offset], lda);
 
 /*     Compute norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP ) . */
 
-    resid = dlange_("1", n, m, &r[r_offset], lda, &rwork[1]);
+    resid = dlange_("1", n, m, &r__[r_offset], lda, &rwork[1]);
     if (anorm > 0.) {
 /* Computing MAX */
 	i__1 = max(1,*m);
@@ -267,7 +270,7 @@ static doublereal c_b31 = 1.;
 /*     Compute T*Z - Q'*B */
 
     dgemm_("No Transpose", "No transpose", n, p, p, &c_b31, &t[t_offset], ldb,
-	     &z[z_offset], ldb, &c_b19, &bwk[bwk_offset], ldb);
+	     &z__[z_offset], ldb, &c_b19, &bwk[bwk_offset], ldb);
     dgemm_("Transpose", "No transpose", n, p, n, &c_b30, &q[q_offset], lda, &
 	    b[b_offset], ldb, &c_b31, &bwk[bwk_offset], ldb);
 
@@ -284,20 +287,20 @@ static doublereal c_b31 = 1.;
 
 /*     Compute I - Q'*Q */
 
-    dlaset_("Full", n, n, &c_b19, &c_b31, &r[r_offset], lda);
-    dsyrk_("Upper", "Transpose", n, n, &c_b30, &q[q_offset], lda, &c_b31, &r[
-	    r_offset], lda);
+    dlaset_("Full", n, n, &c_b19, &c_b31, &r__[r_offset], lda);
+    dsyrk_("Upper", "Transpose", n, n, &c_b30, &q[q_offset], lda, &c_b31, &
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q'*Q ) / ( N * ULP ) . */
 
-    resid = dlansy_("1", "Upper", n, &r[r_offset], lda, &rwork[1]);
+    resid = dlansy_("1", "Upper", n, &r__[r_offset], lda, &rwork[1]);
     result[3] = resid / (doublereal) max(1,*n) / ulp;
 
 /*     Compute I - Z'*Z */
 
     dlaset_("Full", p, p, &c_b19, &c_b31, &t[t_offset], ldb);
-    dsyrk_("Upper", "Transpose", p, p, &c_b30, &z[z_offset], ldb, &c_b31, &t[
-	    t_offset], ldb);
+    dsyrk_("Upper", "Transpose", p, p, &c_b30, &z__[z_offset], ldb, &c_b31, &
+	    t[t_offset], ldb);
 
 /*     Compute norm( I - Z'*Z ) / ( P*ULP ) . */
 
@@ -309,4 +312,11 @@ static doublereal c_b31 = 1.;
 /*     End of DGQRTS */
 
 } /* dgqrts_ */
+
+#undef bf_ref
+#undef af_ref
+#undef z___ref
+#undef t_ref
+#undef q_ref
+
 

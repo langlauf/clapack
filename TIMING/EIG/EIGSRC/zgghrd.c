@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -21,7 +22,7 @@ static integer c__1 = 1;
 
 /* Subroutine */ int zgghrd_(char *compq, char *compz, integer *n, integer *
 	ilo, integer *ihi, doublecomplex *a, integer *lda, doublecomplex *b, 
-	integer *ldb, doublecomplex *q, integer *ldq, doublecomplex *z, 
+	integer *ldb, doublecomplex *q, integer *ldq, doublecomplex *z__, 
 	integer *ldz, integer *info)
 {
     /* System generated locals */
@@ -38,7 +39,7 @@ static integer c__1 = 1;
     static integer jrow;
     extern /* Subroutine */ int zrot_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *);
-    static doublereal c;
+    static doublereal c__;
     static doublecomplex s;
     extern logical lsame_(char *, char *);
     static doublecomplex ctemp;
@@ -50,27 +51,33 @@ static integer c__1 = 1;
     static logical ilq, ilz;
 
 
-/*  -- LAPACK routine (instrumented to count operations, version 2.0) -- 
-  
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
+#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+
+
+/*  -- LAPACK routine (instrumented to count operations, version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
 
-       ---------------------- Begin Timing Code ------------------------- 
-  
+       ---------------------- Begin Timing Code -------------------------   
        Common block to return operation count and iteration count   
        ITCNT is initialized to 0, OPS is only incremented   
        OPST is used to accumulate small contributions to OPS   
        to avoid roundoff error   
-       ----------------------- End Timing Code -------------------------- 
-  
+       ----------------------- End Timing Code --------------------------   
 
 
     Purpose   
     =======   
 
-    ZGGHRD reduces a pair of complex matrices (A,B) to generalized upper 
-  
+    ZGGHRD reduces a pair of complex matrices (A,B) to generalized upper   
     Hessenberg form using unitary transformations, where A is a   
     general matrix and B is upper triangular:  Q' * A * Z = H and   
     Q' * B * Z = T, where H is upper Hessenberg, T is upper triangular,   
@@ -105,8 +112,7 @@ static integer c__1 = 1;
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            It is assumed that A is already upper triangular in rows and 
-  
+            It is assumed that A is already upper triangular in rows and   
             columns 1:ILO-1 and IHI+1:N.  ILO and IHI are normally set   
             by a previous call to ZGGBAL; otherwise they should be set   
             to 1 and N respectively.   
@@ -166,25 +172,24 @@ static integer c__1 = 1;
     an unblocked reduction, as described in _Matrix_Computations_,   
     by Golub and van Loan (Johns Hopkins Press).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode COMPQ   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     z_dim1 = *ldz;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
     /* Function Body */
     if (lsame_(compq, "N")) {
@@ -249,7 +254,7 @@ static integer c__1 = 1;
 	zlaset_("Full", n, n, &c_b2, &c_b1, &q[q_offset], ldq);
     }
     if (icompz == 3) {
-	zlaset_("Full", n, n, &c_b2, &c_b1, &z[z_offset], ldz);
+	zlaset_("Full", n, n, &c_b2, &c_b1, &z__[z_offset], ldz);
     }
 
 /*     Quick return if possible */
@@ -264,7 +269,7 @@ static integer c__1 = 1;
     for (jcol = 1; jcol <= i__1; ++jcol) {
 	i__2 = *n;
 	for (jrow = jcol + 1; jrow <= i__2; ++jrow) {
-	    i__3 = jrow + jcol * b_dim1;
+	    i__3 = b_subscr(jrow, jcol);
 	    b[i__3].r = 0., b[i__3].i = 0.;
 /* L10: */
 	}
@@ -279,52 +284,49 @@ static integer c__1 = 1;
 	i__2 = jcol + 2;
 	for (jrow = *ihi; jrow >= i__2; --jrow) {
 
-/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL)
- */
+/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL) */
 
-	    i__3 = jrow - 1 + jcol * a_dim1;
+	    i__3 = a_subscr(jrow - 1, jcol);
 	    ctemp.r = a[i__3].r, ctemp.i = a[i__3].i;
-	    zlartg_(&ctemp, &a[jrow + jcol * a_dim1], &c, &s, &a[jrow - 1 + 
-		    jcol * a_dim1]);
-	    i__3 = jrow + jcol * a_dim1;
+	    zlartg_(&ctemp, &a_ref(jrow, jcol), &c__, &s, &a_ref(jrow - 1, 
+		    jcol));
+	    i__3 = a_subscr(jrow, jcol);
 	    a[i__3].r = 0., a[i__3].i = 0.;
 	    i__3 = *n - jcol;
-	    zrot_(&i__3, &a[jrow - 1 + (jcol + 1) * a_dim1], lda, &a[jrow + (
-		    jcol + 1) * a_dim1], lda, &c, &s);
+	    zrot_(&i__3, &a_ref(jrow - 1, jcol + 1), lda, &a_ref(jrow, jcol + 
+		    1), lda, &c__, &s);
 	    i__3 = *n + 2 - jrow;
-	    zrot_(&i__3, &b[jrow - 1 + (jrow - 1) * b_dim1], ldb, &b[jrow + (
-		    jrow - 1) * b_dim1], ldb, &c, &s);
+	    zrot_(&i__3, &b_ref(jrow - 1, jrow - 1), ldb, &b_ref(jrow, jrow - 
+		    1), ldb, &c__, &s);
 	    if (ilq) {
 		d_cnjg(&z__1, &s);
-		zrot_(n, &q[(jrow - 1) * q_dim1 + 1], &c__1, &q[jrow * q_dim1 
-			+ 1], &c__1, &c, &z__1);
+		zrot_(n, &q_ref(1, jrow - 1), &c__1, &q_ref(1, jrow), &c__1, &
+			c__, &z__1);
 	    }
 
-/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JR
-OW-1) */
+/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JROW-1) */
 
-	    i__3 = jrow + jrow * b_dim1;
+	    i__3 = b_subscr(jrow, jrow);
 	    ctemp.r = b[i__3].r, ctemp.i = b[i__3].i;
-	    zlartg_(&ctemp, &b[jrow + (jrow - 1) * b_dim1], &c, &s, &b[jrow + 
-		    jrow * b_dim1]);
-	    i__3 = jrow + (jrow - 1) * b_dim1;
+	    zlartg_(&ctemp, &b_ref(jrow, jrow - 1), &c__, &s, &b_ref(jrow, 
+		    jrow));
+	    i__3 = b_subscr(jrow, jrow - 1);
 	    b[i__3].r = 0., b[i__3].i = 0.;
-	    zrot_(ihi, &a[jrow * a_dim1 + 1], &c__1, &a[(jrow - 1) * a_dim1 + 
-		    1], &c__1, &c, &s);
+	    zrot_(ihi, &a_ref(1, jrow), &c__1, &a_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    i__3 = jrow - 1;
-	    zrot_(&i__3, &b[jrow * b_dim1 + 1], &c__1, &b[(jrow - 1) * b_dim1 
-		    + 1], &c__1, &c, &s);
+	    zrot_(&i__3, &b_ref(1, jrow), &c__1, &b_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    if (ilz) {
-		zrot_(n, &z[jrow * z_dim1 + 1], &c__1, &z[(jrow - 1) * z_dim1 
-			+ 1], &c__1, &c, &s);
+		zrot_(n, &z___ref(1, jrow), &c__1, &z___ref(1, jrow - 1), &
+			c__1, &c__, &s);
 	    }
 /* L30: */
 	}
 /* L40: */
     }
 
-/*     ---------------------- Begin Timing Code ------------------------- 
-  
+/*     ---------------------- Begin Timing Code -------------------------   
        Operation count:                                          factor   
        * number of calls to ZLARTG   TEMP                          *32   
        * total number of rows/cols   
@@ -344,12 +346,21 @@ OW-1) */
 	    * temp;
     latime_1.itcnt = 0.;
 
-/*     ----------------------- End Timing Code -------------------------- 
-*/
+/*     ----------------------- End Timing Code -------------------------- */
 
     return 0;
 
 /*     End of ZGGHRD */
 
 } /* zgghrd_ */
+
+#undef z___ref
+#undef z___subscr
+#undef q_ref
+#undef q_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

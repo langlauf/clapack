@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -76,32 +77,22 @@ static integer c__2 = 2;
 	    "\002,\002 14=Matrix with large random entries.\002,/\002 11=Larg"
 	    "e, evenly spaced eigenvals.     \002,\002 15=Matrix \002,\002wit"
 	    "h small random entries.\002)";
-    static char fmt_9980[] = "(/\002 Tests performed:   \002,\002(S is Tridi"
-	    "ag, D is diagonal,\002,\002 U and Z are \002,a,\002,\002,/20x,a"
-	    ",\002, W is a diagonal matr\002,\002ix of eigenvalues)\002,/\002"
-	    "  1= | A - U S U\002,a1,\002 | / ( |A\002,\002| n ulp )     \002,"
-	    "\002  2= | I - U U\002,a1,\002 | / ( n ulp )\002,/\002  3= | S -"
-	    " Z D Z\002,a1,\002 | / ( |S| n ulp )     \002,\002  4=\002,\002 "
-	    "| I - Z Z\002,a1,\002 | / ( n ulp )\002,/\002  5= | A - UZ D (UZ)"
-	    "\002,a1,\002 | / ( |A| n ulp ) \002,\002  6=\002,\002 | I - UZ ("
-	    "UZ)\002,a1,\002 | / ( n ulp )\002,/\002  7= |D(with Z)\002,\002 "
-	    "- D(w/o Z)| / (|D| ulp) \002,\002  8= | D(PWK) - D(QR) | / (|"
-	    "\002,\002D| ulp)\002,/\002  9=   Sturm sequence test on W       "
-	    "  \002,\002 10= | Z(inv it.) - Z(QR) | / (|Z| ulp)\002)";
+    static char fmt_9968[] = "(/\002 Tests performed:  See sdrvst.f\002)";
     static char fmt_9995[] = "(/1x,a3,\002 -- Complex Hermitian eigenvalue p"
 	    "roblem\002)";
+    static char fmt_9967[] = "(/\002 Tests performed:  See cdrvst.f\002)";
     static char fmt_9992[] = "(/1x,a3,\002 -- Real Symmetric Generalized eig"
 	    "envalue \002,\002problem\002)";
-    static char fmt_9979[] = "(\002 Matrix types (see xDRVSG for details):"
+    static char fmt_9980[] = "(\002 Matrix types (see xDRVSG for details):"
 	    " \002)";
-    static char fmt_9978[] = "(/\002 Special Matrices:\002,/\002  1=Zero mat"
+    static char fmt_9979[] = "(/\002 Special Matrices:\002,/\002  1=Zero mat"
 	    "rix.             \002,\002           \002,\002  5=Diagonal: clus"
 	    "tered entries.\002,/\002  2=\002,\002Identity matrix.           "
 	    "         \002,\002  6=Diagonal: lar\002,\002ge, evenly spaced"
 	    ".\002,/\002  3=Diagonal: evenly spaced entri\002,\002es.    \002,"
 	    "\002  7=Diagonal: small, evenly spaced.\002,/\002  4=D\002,\002i"
 	    "agonal: geometr. spaced entries.\002)";
-    static char fmt_9977[] = "(\002 Dense or Banded \002,a,\002 Matrices:"
+    static char fmt_9978[] = "(\002 Dense or Banded \002,a,\002 Matrices:"
 	    " \002,/\002  8=Evenly spaced eigenvals.         \002,\002 15=Mat"
 	    "rix with small random entries.\002,/\002  9=Geometrically spaced"
 	    " eigenvals.  \002,\002 16=Evenly spaced eigenvals, KA=1, KB=1"
@@ -113,7 +104,7 @@ static integer c__2 = 2;
 	    " O(1) entries. \002,\002 20=Evenly spaced eigenvals, KA=3, KB=2"
 	    ".\002,/\002 14=Matrix with large random entries.\002,\002 21=Eve"
 	    "nly spaced eigenvals, KA=3, KB=3.\002)";
-    static char fmt_9976[] = "(/\002 Tests performed:   \002,/\002( For each"
+    static char fmt_9977[] = "(/\002 Tests performed:   \002,/\002( For each"
 	    " pair (A,B), where A is of the given type \002,/\002 and B is a "
 	    "random well-conditioned matrix. D is \002,/\002 diagonal, and Z "
 	    "is orthogonal. )\002,/\002 1 = DSYGV, with ITYPE=1 and UPLO='U'"
@@ -126,7 +117,7 @@ static integer c__2 = 2;
 	    " and UPLO='L':\002,\002  | A Z - B Z D | / ( |A| |Z| n ulp )     "
 	    "\002,/\002 6 = DSBGV, with ITYPE=1 and UPLO='L':\002,\002  | A Z"
 	    " - B Z D | / ( |A| |Z| n ulp )     \002)";
-    static char fmt_9975[] = "(\002 7 = DSYGV, with ITYPE=2 and UPLO='U':"
+    static char fmt_9976[] = "(\002 7 = DSYGV, with ITYPE=2 and UPLO='U':"
 	    "\002,\002  | A B Z - Z D | / ( |A| |Z| n ulp )     \002,/\002 8 "
 	    "= DSPGV, with ITYPE=2 and UPLO='U':\002,\002  | A B Z - Z D | / "
 	    "( |A| |Z| n ulp )     \002,/\002 9 = DSPGV, with ITYPE=2 and UPL"
@@ -141,7 +132,7 @@ static integer c__2 = 2;
 	    " | B A Z - Z D | / ( |A| |Z| n ulp )     \002)";
     static char fmt_9991[] = "(/1x,a3,\002 -- Complex Hermitian Generalized "
 	    "eigenvalue \002,\002problem\002)";
-    static char fmt_9974[] = "(/\002 Tests performed:   \002,/\002( For each"
+    static char fmt_9975[] = "(/\002 Tests performed:   \002,/\002( For each"
 	    " pair (A,B), where A is of the given type \002,/\002 and B is a "
 	    "random well-conditioned matrix. D is \002,/\002 diagonal, and Z "
 	    "is unitary. )\002,/\002 1 = ZHEGV, with ITYPE=1 and UPLO='U':"
@@ -154,7 +145,7 @@ static integer c__2 = 2;
 	    " and UPLO='L':\002,\002  | A Z - B Z D | / ( |A| |Z| n ulp )     "
 	    "\002,/\002 6 = ZHBGV, with ITYPE=1 and UPLO='L':\002,\002  | A Z"
 	    " - B Z D | / ( |A| |Z| n ulp )     \002)";
-    static char fmt_9973[] = "(\002 7 = ZHEGV, with ITYPE=2 and UPLO='U':"
+    static char fmt_9974[] = "(\002 7 = ZHEGV, with ITYPE=2 and UPLO='U':"
 	    "\002,\002  | A B Z - Z D | / ( |A| |Z| n ulp )     \002,/\002 8 "
 	    "= ZHPGV, with ITYPE=2 and UPLO='U':\002,\002  | A B Z - Z D | / "
 	    "( |A| |Z| n ulp )     \002,/\002 9 = ZHPGV, with ITYPE=2 and UPL"
@@ -169,7 +160,7 @@ static integer c__2 = 2;
 	    " | B A Z - Z D | / ( |A| |Z| n ulp )     \002)";
     static char fmt_9994[] = "(/1x,a3,\002 -- Real Singular Value Decomposit"
 	    "ion\002)";
-    static char fmt_9972[] = "(\002 Matrix types (see xCHKBD for details)"
+    static char fmt_9973[] = "(\002 Matrix types (see xCHKBD for details)"
 	    ":\002,/\002 Diagonal matrices:\002,/\002   1: Zero\002,28x,\002 "
 	    "5: Clustered entries\002,/\002   2: Identity\002,24x,\002 6: Lar"
 	    "ge, evenly spaced entries\002,/\002   3: Evenly spaced entrie"
@@ -181,7 +172,7 @@ static integer c__2 = 2;
 	    " vals.\002,11x,\00214: Random, scaled near overflow\002,/\002  1"
 	    "1: Large, evenly spaced sing vals  \002,\00215: Random, scaled n"
 	    "ear underflow\002)";
-    static char fmt_9971[] = "(/\002 Test ratios:  \002,\002(B: bidiagonal, "
+    static char fmt_9972[] = "(/\002 Test ratios:  \002,\002(B: bidiagonal, "
 	    "S: diagonal, Q, P, U, and V: \002,a10,/16x,\002X: m x nrhs, Y = "
 	    "Q' X, and Z = U' Y)\002,/\002   1: norm( A - Q B P' ) / ( norm(A"
 	    ") max(m,n) ulp )\002,/\002   2: norm( I - Q' Q )   / ( m ulp "
@@ -190,7 +181,7 @@ static integer c__2 = 2;
 	    "( Y - U Z )    / ( norm(Z) max(min(m,n),k) ulp )\002,/\002   6: "
 	    "norm( I - U' U )   / ( min(m,n) ulp )\002,/\002   7: norm( I - V"
 	    "' V )   / ( min(m,n) ulp )\002)";
-    static char fmt_9970[] = "(\002   8: Test ordering of S  (0 if nondecrea"
+    static char fmt_9971[] = "(\002   8: Test ordering of S  (0 if nondecrea"
 	    "sing, 1/ulp \002,\002 otherwise)\002,/\002   9: norm( S - S2 )  "
 	    "   / ( norm(S) ulp ),\002,\002 where S2 is computed\002,/44x,"
 	    "\002without computing U and V'\002,/\002  10: Sturm sequence tes"
@@ -203,7 +194,7 @@ static integer c__2 = 2;
 	    "sition\002)";
     static char fmt_9990[] = "(/1x,a3,\002 -- Real Band reduc. to bidiagonal"
 	    " form\002)";
-    static char fmt_9969[] = "(\002 Matrix types (see xCHKBB for details)"
+    static char fmt_9970[] = "(\002 Matrix types (see xCHKBB for details)"
 	    ":\002,/\002 Diagonal matrices:\002,/\002   1: Zero\002,28x,\002 "
 	    "5: Clustered entries\002,/\002   2: Identity\002,24x,\002 6: Lar"
 	    "ge, evenly spaced entries\002,/\002   3: Evenly spaced entrie"
@@ -215,7 +206,7 @@ static integer c__2 = 2;
 	    " vals.\002,11x,\00214: Random, scaled near overflow\002,/\002  1"
 	    "1: Large, evenly spaced sing vals  \002,\00215: Random, scaled n"
 	    "ear underflow\002)";
-    static char fmt_9968[] = "(/\002 Test ratios:  \002,\002(B: upper bidiag"
+    static char fmt_9969[] = "(/\002 Test ratios:  \002,\002(B: upper bidiag"
 	    "onal, Q and P: \002,a10,/16x,\002C: m x nrhs, PT = P', Y = Q' C"
 	    ")\002,/\002 1: norm( A - Q B PT ) / ( norm(A) max(m,n) ulp )\002"
 	    ",/\002 2: norm( I - Q' Q )   / ( m ulp )\002,/\002 3: norm( I - "
@@ -253,38 +244,38 @@ static integer c__2 = 2;
     static cilist io___19 = { 0, 0, 0, fmt_9983, 0 };
     static cilist io___20 = { 0, 0, 0, fmt_9982, 0 };
     static cilist io___21 = { 0, 0, 0, fmt_9981, 0 };
-    static cilist io___22 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___22 = { 0, 0, 0, fmt_9968, 0 };
     static cilist io___23 = { 0, 0, 0, fmt_9995, 0 };
     static cilist io___24 = { 0, 0, 0, fmt_9983, 0 };
     static cilist io___25 = { 0, 0, 0, fmt_9982, 0 };
     static cilist io___26 = { 0, 0, 0, fmt_9981, 0 };
-    static cilist io___27 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___27 = { 0, 0, 0, fmt_9967, 0 };
     static cilist io___28 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___29 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___30 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___31 = { 0, 0, 0, fmt_9977, 0 };
-    static cilist io___32 = { 0, 0, 0, fmt_9976, 0 };
-    static cilist io___33 = { 0, 0, 0, fmt_9975, 0 };
+    static cilist io___29 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___30 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___31 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___32 = { 0, 0, 0, fmt_9977, 0 };
+    static cilist io___33 = { 0, 0, 0, fmt_9976, 0 };
     static cilist io___34 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___35 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___36 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___37 = { 0, 0, 0, fmt_9977, 0 };
-    static cilist io___38 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___39 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___35 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___36 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___37 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___38 = { 0, 0, 0, fmt_9975, 0 };
+    static cilist io___39 = { 0, 0, 0, fmt_9974, 0 };
     static cilist io___40 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___41 = { 0, 0, 0, fmt_9972, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_9971, 0 };
-    static cilist io___43 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___42 = { 0, 0, 0, fmt_9972, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9971, 0 };
     static cilist io___44 = { 0, 0, 0, fmt_9993, 0 };
-    static cilist io___45 = { 0, 0, 0, fmt_9972, 0 };
-    static cilist io___46 = { 0, 0, 0, fmt_9971, 0 };
-    static cilist io___47 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___46 = { 0, 0, 0, fmt_9972, 0 };
+    static cilist io___47 = { 0, 0, 0, fmt_9971, 0 };
     static cilist io___48 = { 0, 0, 0, fmt_9990, 0 };
-    static cilist io___49 = { 0, 0, 0, fmt_9969, 0 };
-    static cilist io___50 = { 0, 0, 0, fmt_9968, 0 };
+    static cilist io___49 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___50 = { 0, 0, 0, fmt_9969, 0 };
     static cilist io___51 = { 0, 0, 0, fmt_9989, 0 };
-    static cilist io___52 = { 0, 0, 0, fmt_9969, 0 };
-    static cilist io___53 = { 0, 0, 0, fmt_9968, 0 };
+    static cilist io___52 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___53 = { 0, 0, 0, fmt_9969, 0 };
     static cilist io___54 = { 0, 0, 0, fmt_9999, 0 };
 
 
@@ -320,8 +311,7 @@ static integer c__2 = 2;
             These paths also are supplied in double precision (replace   
             leading S by D and leading C by Z in path names).   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (*iounit <= 0) {
@@ -332,10 +322,10 @@ static integer c__2 = 2;
     if (! sord && ! corz) {
 	io___3.ciunit = *iounit;
 	s_wsfe(&io___3);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
     if (lsamen_(&c__2, c2, "HS")) {
 	if (sord) {
@@ -344,7 +334,7 @@ static integer c__2 = 2;
 
 	    io___5.ciunit = *iounit;
 	    s_wsfe(&io___5);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -357,10 +347,10 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___8.ciunit = *iounit;
 	    s_wsfe(&io___8);
-	    do_fio(&c__1, "pairs ", 6L);
-	    do_fio(&c__1, "pairs ", 6L);
-	    do_fio(&c__1, "prs.", 4L);
-	    do_fio(&c__1, "prs.", 4L);
+	    do_fio(&c__1, "pairs ", (ftnlen)6);
+	    do_fio(&c__1, "pairs ", (ftnlen)6);
+	    do_fio(&c__1, "prs.", (ftnlen)4);
+	    do_fio(&c__1, "prs.", (ftnlen)4);
 	    e_wsfe();
 	    io___9.ciunit = *iounit;
 	    s_wsfe(&io___9);
@@ -370,10 +360,10 @@ static integer c__2 = 2;
 
 	    io___10.ciunit = *iounit;
 	    s_wsfe(&io___10);
-	    do_fio(&c__1, "orthogonal", 10L);
-	    do_fio(&c__1, "'=transpose", 11L);
+	    do_fio(&c__1, "orthogonal", (ftnlen)10);
+	    do_fio(&c__1, "'=transpose", (ftnlen)11);
 	    for (j = 1; j <= 6; ++j) {
-		do_fio(&c__1, "'", 1L);
+		do_fio(&c__1, "'", (ftnlen)1);
 	    }
 	    e_wsfe();
 
@@ -383,7 +373,7 @@ static integer c__2 = 2;
 
 	    io___12.ciunit = *iounit;
 	    s_wsfe(&io___12);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -396,10 +386,10 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___15.ciunit = *iounit;
 	    s_wsfe(&io___15);
-	    do_fio(&c__1, "e.vals", 6L);
-	    do_fio(&c__1, "e.vals", 6L);
-	    do_fio(&c__1, "e.vs", 4L);
-	    do_fio(&c__1, "e.vs", 4L);
+	    do_fio(&c__1, "e.vals", (ftnlen)6);
+	    do_fio(&c__1, "e.vals", (ftnlen)6);
+	    do_fio(&c__1, "e.vs", (ftnlen)4);
+	    do_fio(&c__1, "e.vs", (ftnlen)4);
 	    e_wsfe();
 	    io___16.ciunit = *iounit;
 	    s_wsfe(&io___16);
@@ -409,10 +399,10 @@ static integer c__2 = 2;
 
 	    io___17.ciunit = *iounit;
 	    s_wsfe(&io___17);
-	    do_fio(&c__1, "unitary", 7L);
-	    do_fio(&c__1, "*=conj.transp.", 14L);
+	    do_fio(&c__1, "unitary", (ftnlen)7);
+	    do_fio(&c__1, "*=conj.transp.", (ftnlen)14);
 	    for (j = 1; j <= 6; ++j) {
-		do_fio(&c__1, "*", 1L);
+		do_fio(&c__1, "*", (ftnlen)1);
 	    }
 	    e_wsfe();
 	}
@@ -425,7 +415,7 @@ static integer c__2 = 2;
 
 	    io___18.ciunit = *iounit;
 	    s_wsfe(&io___18);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -438,18 +428,13 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___21.ciunit = *iounit;
 	    s_wsfe(&io___21);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 
 /*           Tests performed */
 
 	    io___22.ciunit = *iounit;
 	    s_wsfe(&io___22);
-	    do_fio(&c__1, "orthogonal", 10L);
-	    do_fio(&c__1, "'=transpose", 11L);
-	    for (j = 1; j <= 6; ++j) {
-		do_fio(&c__1, "'", 1L);
-	    }
 	    e_wsfe();
 
 	} else {
@@ -458,7 +443,7 @@ static integer c__2 = 2;
 
 	    io___23.ciunit = *iounit;
 	    s_wsfe(&io___23);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -471,18 +456,13 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___26.ciunit = *iounit;
 	    s_wsfe(&io___26);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 
 /*           Tests performed */
 
 	    io___27.ciunit = *iounit;
 	    s_wsfe(&io___27);
-	    do_fio(&c__1, "unitary", 7L);
-	    do_fio(&c__1, "*=conj.transp.", 14L);
-	    for (j = 1; j <= 6; ++j) {
-		do_fio(&c__1, "*", 1L);
-	    }
 	    e_wsfe();
 	}
 
@@ -494,7 +474,7 @@ static integer c__2 = 2;
 
 	    io___28.ciunit = *iounit;
 	    s_wsfe(&io___28);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -507,7 +487,7 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___31.ciunit = *iounit;
 	    s_wsfe(&io___31);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 
 /*           Tests performed */
@@ -525,7 +505,7 @@ static integer c__2 = 2;
 
 	    io___34.ciunit = *iounit;
 	    s_wsfe(&io___34);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -538,7 +518,7 @@ static integer c__2 = 2;
 	    e_wsfe();
 	    io___37.ciunit = *iounit;
 	    s_wsfe(&io___37);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 
 /*           Tests performed */
@@ -560,7 +540,7 @@ static integer c__2 = 2;
 
 	    io___40.ciunit = *iounit;
 	    s_wsfe(&io___40);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -573,7 +553,7 @@ static integer c__2 = 2;
 
 	    io___42.ciunit = *iounit;
 	    s_wsfe(&io___42);
-	    do_fio(&c__1, "orthogonal", 10L);
+	    do_fio(&c__1, "orthogonal", (ftnlen)10);
 	    e_wsfe();
 	    io___43.ciunit = *iounit;
 	    s_wsfe(&io___43);
@@ -584,7 +564,7 @@ static integer c__2 = 2;
 
 	    io___44.ciunit = *iounit;
 	    s_wsfe(&io___44);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -597,7 +577,7 @@ static integer c__2 = 2;
 
 	    io___46.ciunit = *iounit;
 	    s_wsfe(&io___46);
-	    do_fio(&c__1, "unitary   ", 10L);
+	    do_fio(&c__1, "unitary   ", (ftnlen)10);
 	    e_wsfe();
 	    io___47.ciunit = *iounit;
 	    s_wsfe(&io___47);
@@ -612,7 +592,7 @@ static integer c__2 = 2;
 
 	    io___48.ciunit = *iounit;
 	    s_wsfe(&io___48);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -625,7 +605,7 @@ static integer c__2 = 2;
 
 	    io___50.ciunit = *iounit;
 	    s_wsfe(&io___50);
-	    do_fio(&c__1, "orthogonal", 10L);
+	    do_fio(&c__1, "orthogonal", (ftnlen)10);
 	    e_wsfe();
 	} else {
 
@@ -633,7 +613,7 @@ static integer c__2 = 2;
 
 	    io___51.ciunit = *iounit;
 	    s_wsfe(&io___51);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 
 /*           Matrix types */
@@ -646,7 +626,7 @@ static integer c__2 = 2;
 
 	    io___53.ciunit = *iounit;
 	    s_wsfe(&io___53);
-	    do_fio(&c__1, "unitary   ", 10L);
+	    do_fio(&c__1, "unitary   ", (ftnlen)10);
 	    e_wsfe();
 	}
 
@@ -654,7 +634,7 @@ static integer c__2 = 2;
 
 	io___54.ciunit = *iounit;
 	s_wsfe(&io___54);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	return 0;
     }
@@ -665,7 +645,6 @@ static integer c__2 = 2;
 
 
 /*     Symmetric/Hermitian eigenproblem   
-
 
 
 

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int sgtcon_(char *norm, integer *n, real *dl, real *d, real *
-	du, real *du2, integer *ipiv, real *anorm, real *rcond, real *work, 
-	integer *iwork, integer *info)
+/* Subroutine */ int sgtcon_(char *norm, integer *n, real *dl, real *d__, 
+	real *du, real *du2, integer *ipiv, real *anorm, real *rcond, real *
+	work, integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -37,8 +38,7 @@
             LU factorization of A as computed by SGTTRF.   
 
     D       (input) REAL array, dimension (N)   
-            The n diagonal elements of the upper triangular matrix U from 
-  
+            The n diagonal elements of the upper triangular matrix U from   
             the LU factorization of A.   
 
     DU      (input) REAL array, dimension (N-1)   
@@ -49,8 +49,7 @@
 
     IPIV    (input) INTEGER array, dimension (N)   
             The pivot indices; for 1 <= i <= n, row i of the matrix was   
-            interchanged with row IPIV(i).  IPIV(i) will always be either 
-  
+            interchanged with row IPIV(i).  IPIV(i) will always be either   
             i or i+1; IPIV(i) = i indicates a row interchange was not   
             required.   
 
@@ -71,22 +70,19 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
     /* System generated locals */
     integer i__1;
     /* Local variables */
-    static integer kase, kase1, i;
+    static integer kase, kase1, i__;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int xerbla_(char *, integer *), slacon_(
 	    integer *, real *, real *, integer *, real *, integer *);
@@ -96,16 +92,15 @@
 	    real *, real *, real *, integer *, real *, integer *, integer *);
 
 
+    --iwork;
+    --work;
+    --ipiv;
+    --du2;
+    --du;
+    --d__;
+    --dl;
 
-#define IWORK(I) iwork[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-#define DU2(I) du2[(I)-1]
-#define DU(I) du[(I)-1]
-#define D(I) d[(I)-1]
-#define DL(I) dl[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     onenrm = *(unsigned char *)norm == '1' || lsame_(norm, "O");
     if (! onenrm && ! lsame_(norm, "I")) {
@@ -134,8 +129,8 @@
 /*     Check that D(1:N) is non-zero. */
 
     i__1 = *n;
-    for (i = 1; i <= *n; ++i) {
-	if (D(i) == 0.f) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (d__[i__] == 0.f) {
 	    return 0;
 	}
 /* L10: */
@@ -149,20 +144,20 @@
     }
     kase = 0;
 L20:
-    slacon_(n, &WORK(*n + 1), &WORK(1), &IWORK(1), &ainvnm, &kase);
+    slacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
     if (kase != 0) {
 	if (kase == kase1) {
 
 /*           Multiply by inv(U)*inv(L). */
 
-	    sgttrs_("No transpose", n, &c__1, &DL(1), &D(1), &DU(1), &DU2(1), 
-		    &IPIV(1), &WORK(1), n, info);
+	    sgttrs_("No transpose", n, &c__1, &dl[1], &d__[1], &du[1], &du2[1]
+		    , &ipiv[1], &work[1], n, info);
 	} else {
 
 /*           Multiply by inv(L')*inv(U'). */
 
-	    sgttrs_("Transpose", n, &c__1, &DL(1), &D(1), &DU(1), &DU2(1), &
-		    IPIV(1), &WORK(1), n, info);
+	    sgttrs_("Transpose", n, &c__1, &dl[1], &d__[1], &du[1], &du2[1], &
+		    ipiv[1], &work[1], n, info);
 	}
 	goto L20;
     }

@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dlaic1_(integer *job, integer *j, doublereal *x, 
 	doublereal *sest, doublereal *w, doublereal *gamma, doublereal *
-	sestpr, doublereal *s, doublereal *c)
+	sestpr, doublereal *s, doublereal *c__)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -16,8 +17,7 @@
     DLAIC1 applies one step of incremental condition estimation in   
     its simplest version:   
 
-    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j 
-  
+    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j   
     lower triangular matrix L, such that   
              twonorm(L*x) = sest   
     Then DLAIC1 computes sestpr, s, c such that   
@@ -44,10 +44,8 @@
     =========   
 
     JOB     (input) INTEGER   
-            = 1: an estimate for the largest singular value is computed. 
-  
-            = 2: an estimate for the smallest singular value is computed. 
-  
+            = 1: an estimate for the largest singular value is computed.   
+            = 2: an estimate for the smallest singular value is computed.   
 
     J       (input) INTEGER   
             Length of X and W   
@@ -73,13 +71,10 @@
     C       (output) DOUBLE PRECISION   
             Cosine needed in forming xhat.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static doublereal c_b5 = 1.;
@@ -96,13 +91,12 @@
     static doublereal absgam, absalp, cosine, absest, eps, tmp;
 
 
+    --w;
+    --x;
 
-#define W(I) w[(I)-1]
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     eps = dlamch_("Epsilon");
-    alpha = ddot_(j, &X(1), &c__1, &W(1), &c__1);
+    alpha = ddot_(j, &x[1], &c__1, &w[1], &c__1);
 
     absalp = abs(alpha);
     absgam = abs(*gamma);
@@ -118,20 +112,20 @@
 	    s1 = max(absgam,absalp);
 	    if (s1 == 0.) {
 		*s = 0.;
-		*c = 1.;
+		*c__ = 1.;
 		*sestpr = 0.;
 	    } else {
 		*s = alpha / s1;
-		*c = *gamma / s1;
-		tmp = sqrt(*s * *s + *c * *c);
+		*c__ = *gamma / s1;
+		tmp = sqrt(*s * *s + *c__ * *c__);
 		*s /= tmp;
-		*c /= tmp;
+		*c__ /= tmp;
 		*sestpr = s1 * tmp;
 	    }
 	    return 0;
 	} else if (absgam <= eps * absest) {
 	    *s = 1.;
-	    *c = 0.;
+	    *c__ = 0.;
 	    tmp = max(absest,absalp);
 	    s1 = absest / tmp;
 	    s2 = absalp / tmp;
@@ -142,11 +136,11 @@
 	    s2 = absest;
 	    if (s1 <= s2) {
 		*s = 1.;
-		*c = 0.;
+		*c__ = 0.;
 		*sestpr = s2;
 	    } else {
 		*s = 0.;
-		*c = 1.;
+		*c__ = 1.;
 		*sestpr = s1;
 	    }
 	    return 0;
@@ -157,14 +151,14 @@
 		tmp = s1 / s2;
 		*s = sqrt(tmp * tmp + 1.);
 		*sestpr = s2 * *s;
-		*c = *gamma / s2 / *s;
+		*c__ = *gamma / s2 / *s;
 		*s = d_sign(&c_b5, &alpha) / *s;
 	    } else {
 		tmp = s2 / s1;
-		*c = sqrt(tmp * tmp + 1.);
-		*sestpr = s1 * *c;
-		*s = alpha / s1 / *c;
-		*c = d_sign(&c_b5, gamma) / *c;
+		*c__ = sqrt(tmp * tmp + 1.);
+		*sestpr = s1 * *c__;
+		*s = alpha / s1 / *c__;
+		*c__ = d_sign(&c_b5, gamma) / *c__;
 	    }
 	    return 0;
 	} else {
@@ -175,18 +169,18 @@
 	    zeta2 = *gamma / absest;
 
 	    b = (1. - zeta1 * zeta1 - zeta2 * zeta2) * .5;
-	    *c = zeta1 * zeta1;
+	    *c__ = zeta1 * zeta1;
 	    if (b > 0.) {
-		t = *c / (b + sqrt(b * b + *c));
+		t = *c__ / (b + sqrt(b * b + *c__));
 	    } else {
-		t = sqrt(b * b + *c) - b;
+		t = sqrt(b * b + *c__) - b;
 	    }
 
 	    sine = -zeta1 / t;
 	    cosine = -zeta2 / (t + 1.);
 	    tmp = sqrt(sine * sine + cosine * cosine);
 	    *s = sine / tmp;
-	    *c = cosine / tmp;
+	    *c__ = cosine / tmp;
 	    *sestpr = sqrt(t + 1.) * absest;
 	    return 0;
 	}
@@ -210,14 +204,14 @@
 	    d__1 = abs(sine), d__2 = abs(cosine);
 	    s1 = max(d__1,d__2);
 	    *s = sine / s1;
-	    *c = cosine / s1;
-	    tmp = sqrt(*s * *s + *c * *c);
+	    *c__ = cosine / s1;
+	    tmp = sqrt(*s * *s + *c__ * *c__);
 	    *s /= tmp;
-	    *c /= tmp;
+	    *c__ /= tmp;
 	    return 0;
 	} else if (absgam <= eps * absest) {
 	    *s = 0.;
-	    *c = 1.;
+	    *c__ = 1.;
 	    *sestpr = absgam;
 	    return 0;
 	} else if (absalp <= eps * absest) {
@@ -225,11 +219,11 @@
 	    s2 = absest;
 	    if (s1 <= s2) {
 		*s = 0.;
-		*c = 1.;
+		*c__ = 1.;
 		*sestpr = s1;
 	    } else {
 		*s = 1.;
-		*c = 0.;
+		*c__ = 0.;
 		*sestpr = s2;
 	    }
 	    return 0;
@@ -238,15 +232,15 @@
 	    s2 = absalp;
 	    if (s1 <= s2) {
 		tmp = s1 / s2;
-		*c = sqrt(tmp * tmp + 1.);
-		*sestpr = absest * (tmp / *c);
-		*s = -(*gamma / s2) / *c;
-		*c = d_sign(&c_b5, &alpha) / *c;
+		*c__ = sqrt(tmp * tmp + 1.);
+		*sestpr = absest * (tmp / *c__);
+		*s = -(*gamma / s2) / *c__;
+		*c__ = d_sign(&c_b5, &alpha) / *c__;
 	    } else {
 		tmp = s2 / s1;
 		*s = sqrt(tmp * tmp + 1.);
 		*sestpr = absest / *s;
-		*c = alpha / s1 / *s;
+		*c__ = alpha / s1 / *s;
 		*s = -d_sign(&c_b5, gamma) / *s;
 	    }
 	    return 0;
@@ -270,8 +264,8 @@
 /*              root is close to zero, compute directly */
 
 		b = (zeta1 * zeta1 + zeta2 * zeta2 + 1.) * .5;
-		*c = zeta2 * zeta2;
-		t = *c / (b + sqrt((d__1 = b * b - *c, abs(d__1))));
+		*c__ = zeta2 * zeta2;
+		t = *c__ / (b + sqrt((d__1 = b * b - *c__, abs(d__1))));
 		sine = zeta1 / (1. - t);
 		cosine = -zeta2 / t;
 		*sestpr = sqrt(t + eps * 4. * eps * norma) * absest;
@@ -280,11 +274,11 @@
 /*              root is closer to ONE, shift by that amount */
 
 		b = (zeta2 * zeta2 + zeta1 * zeta1 - 1.) * .5;
-		*c = zeta1 * zeta1;
+		*c__ = zeta1 * zeta1;
 		if (b >= 0.) {
-		    t = -(*c) / (b + sqrt(b * b + *c));
+		    t = -(*c__) / (b + sqrt(b * b + *c__));
 		} else {
-		    t = b - sqrt(b * b + *c);
+		    t = b - sqrt(b * b + *c__);
 		}
 		sine = -zeta1 / t;
 		cosine = -zeta2 / (t + 1.);
@@ -292,7 +286,7 @@
 	    }
 	    tmp = sqrt(sine * sine + cosine * cosine);
 	    *s = sine / tmp;
-	    *c = cosine / tmp;
+	    *c__ = cosine / tmp;
 	    return 0;
 
 	}

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,7 +37,7 @@ static integer c__2 = 2;
     /* Local variables */
     static integer info;
     static doublereal a[4]	/* was [2][2] */, b[2];
-    static integer i, j;
+    static integer i__, j;
     static doublereal w[2], x[2];
     extern /* Subroutine */ int dgerq2_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *), dorgr2_(
@@ -62,7 +63,11 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+#define af_ref(a_1,a_2) af[(a_2)*2 + a_1 - 3]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -83,8 +88,7 @@ static integer c__2 = 2;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
@@ -95,9 +99,9 @@ static integer c__2 = 2;
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 2; ++j) {
-	for (i = 1; i <= 2; ++i) {
-	    a[i + (j << 1) - 3] = 1. / (doublereal) (i + j);
-	    af[i + (j << 1) - 3] = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 2; ++i__) {
+	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -111,7 +115,7 @@ static integer c__2 = 2;
 
        DGERQF */
 
-    s_copy(srnamc_1.srnamt, "DGERQF", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DGERQF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dgerqf_(&c_n1, &c__0, a, &c__1, b, w, &c__1, &info);
     chkxer_("DGERQF", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -131,7 +135,7 @@ static integer c__2 = 2;
 
 /*     DGERQ2 */
 
-    s_copy(srnamc_1.srnamt, "DGERQ2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DGERQ2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dgerq2_(&c_n1, &c__0, a, &c__1, b, w, &info);
     chkxer_("DGERQ2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -147,7 +151,7 @@ static integer c__2 = 2;
 
 /*     DGERQS */
 
-    s_copy(srnamc_1.srnamt, "DGERQS", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DGERQS", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dgerqs_(&c_n1, &c__0, &c__0, a, &c__1, x, b, &c__1, w, &c__1, &info);
     chkxer_("DGERQS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -179,7 +183,7 @@ static integer c__2 = 2;
 
 /*     DORGRQ */
 
-    s_copy(srnamc_1.srnamt, "DORGRQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORGRQ", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dorgrq_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &c__1, &info);
     chkxer_("DORGRQ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -211,7 +215,7 @@ static integer c__2 = 2;
 
 /*     DORGR2 */
 
-    s_copy(srnamc_1.srnamt, "DORGR2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORGR2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dorgr2_(&c_n1, &c__0, &c__0, a, &c__1, x, w, &info);
     chkxer_("DORGR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -239,7 +243,7 @@ static integer c__2 = 2;
 
 /*     DORMRQ */
 
-    s_copy(srnamc_1.srnamt, "DORMRQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORMRQ", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dormrq_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &c__1, &
 	    info);
@@ -303,7 +307,7 @@ static integer c__2 = 2;
 
 /*     DORMR2 */
 
-    s_copy(srnamc_1.srnamt, "DORMR2", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DORMR2", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dormr2_("/", "N", &c__0, &c__0, &c__0, a, &c__1, x, af, &c__1, w, &info);
     chkxer_("DORMR2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -354,4 +358,8 @@ static integer c__2 = 2;
 /*     End of DERRRQ */
 
 } /* derrrq_ */
+
+#undef af_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -56,7 +57,7 @@ static integer c__5 = 5;
     static integer info, sdim;
     static doublereal a[16]	/* was [4][4] */;
     static logical b[4];
-    static integer i, j;
+    static integer i__, j;
     static doublereal s[4], u[16]	/* was [4][4] */, w[16];
     extern /* Subroutine */ int dgees_(char *, char *, L_fp, integer *, 
 	    doublereal *, integer *, integer *, doublereal *, doublereal *, 
@@ -68,6 +69,10 @@ static integer c__5 = 5;
     static doublereal abnrm;
     static char c2[2];
     static doublereal r1[4], r2[4];
+    extern /* Subroutine */ int dgesdd_(char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *);
     static integer iw[8];
     static doublereal wi[4];
     static integer nt;
@@ -94,13 +99,20 @@ static integer c__5 = 5;
     static cilist io___1 = { 0, 0, 0, 0, 0 };
     static cilist io___24 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___25 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___26 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___27 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___28 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___29 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       December 22, 1999   
 
 
     Purpose   
@@ -116,6 +128,8 @@ static integer c__5 = 5;
     SVX   DGEEVX   SGEEV + balancing and condition estimation   
     SSX   DGEESX   SGEES + balancing and condition estimation   
     DBD   DGESVD   compute SVD of an M-by-N matrix A   
+          DGESDD   compute SVD of an M-by-N matrix A (by divide and   
+                   conquer)   
 
     Arguments   
     =========   
@@ -126,27 +140,26 @@ static integer c__5 = 5;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Initialize A */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 0.;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 0.;
 /* L10: */
 	}
 /* L20: */
     }
-    for (i = 1; i <= 4; ++i) {
-	a[i + (i << 2) - 5] = 1.;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	a_ref(i__, i__) = 1.;
 /* L30: */
     }
     infoc_1.ok = TRUE_;
@@ -156,7 +169,7 @@ static integer c__5 = 5;
 
 /*        Test DGEEV */
 
-	s_copy(srnamc_1.srnamt, "DGEEV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEEV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgeev_("X", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &c__1, w, &
 		c__1, &info);
@@ -198,7 +211,7 @@ static integer c__5 = 5;
 
 /*        Test DGEES */
 
-	s_copy(srnamc_1.srnamt, "DGEES ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEES ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgees_("X", "N", (L_fp)dslect_, &c__0, a, &c__1, &sdim, wr, wi, vl, &
 		c__1, w, &c__1, b, &info);
@@ -235,7 +248,7 @@ static integer c__5 = 5;
 
 /*        Test DGEEVX */
 
-	s_copy(srnamc_1.srnamt, "DGEEVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEEVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgeevx_("X", "N", "N", "N", &c__0, a, &c__1, wr, wi, vl, &c__1, vr, &
 		c__1, &ilo, &ihi, s, &abnrm, r1, r2, w, &c__1, iw, &info);
@@ -297,7 +310,7 @@ static integer c__5 = 5;
 
 /*        Test DGEESX */
 
-	s_copy(srnamc_1.srnamt, "DGEESX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEESX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgeesx_("X", "N", (L_fp)dslect_, "N", &c__0, a, &c__1, &sdim, wr, wi, 
 		vl, &c__1, r1, r2, w, &c__1, iw, &c__1, b, &info);
@@ -339,7 +352,7 @@ static integer c__5 = 5;
 
 /*        Test DGESVD */
 
-	s_copy(srnamc_1.srnamt, "DGESVD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGESVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgesvd_("X", "N", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &
 		c__1, &info);
@@ -381,24 +394,86 @@ static integer c__5 = 5;
 	chkxer_("DGESVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 8;
+	if (infoc_1.ok) {
+	    io___24.ciunit = infoc_1.nout;
+	    s_wsfe(&io___24);
+	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	} else {
+	    io___25.ciunit = infoc_1.nout;
+	    s_wsfe(&io___25);
+	    e_wsfe();
+	}
+
+/*        Test DGESDD */
+
+	s_copy(srnamc_1.srnamt, "DGESDD", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	dgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	dgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	dgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 5;
+	dgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 8;
+	dgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 10;
+	dgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+		 iw, &info);
+	chkxer_("DGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	nt += -2;
+	if (infoc_1.ok) {
+	    io___26.ciunit = infoc_1.nout;
+	    s_wsfe(&io___26);
+	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	} else {
+	    io___27.ciunit = infoc_1.nout;
+	    s_wsfe(&io___27);
+	    e_wsfe();
+	}
     }
 
 /*     Print a summary line. */
 
-    if (infoc_1.ok) {
-	io___24.ciunit = infoc_1.nout;
-	s_wsfe(&io___24);
-	do_fio(&c__1, srnamc_1.srnamt, 6L);
-	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
-	e_wsfe();
-    } else {
-	io___25.ciunit = infoc_1.nout;
-	s_wsfe(&io___25);
-	e_wsfe();
+    if (! lsamen_(&c__2, c2, "BD")) {
+	if (infoc_1.ok) {
+	    io___28.ciunit = infoc_1.nout;
+	    s_wsfe(&io___28);
+	    do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
+	    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
+	    e_wsfe();
+	} else {
+	    io___29.ciunit = infoc_1.nout;
+	    s_wsfe(&io___29);
+	    e_wsfe();
+	}
     }
 
     return 0;
 
 /*     End of DERRED */
 } /* derred_ */
+
+#undef a_ref
+
 

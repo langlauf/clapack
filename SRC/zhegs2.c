@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhegs2_(integer *itype, char *uplo, integer *n, 
 	doublecomplex *a, integer *lda, doublecomplex *b, integer *ldb, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -33,8 +34,7 @@
 
     UPLO    (input) CHARACTER   
             Specifies whether the upper or lower triangular part of the   
-            Hermitian matrix A is stored, and how B has been factorized. 
-  
+            Hermitian matrix A is stored, and how B has been factorized.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -42,13 +42,11 @@
             The order of the matrices A and B.  N >= 0.   
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
-            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading 
-  
+            On entry, the Hermitian matrix A.  If UPLO = 'U', the leading   
             n by n upper triangular part of A contains the upper   
             triangular part of the matrix A, and the strictly lower   
             triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading n by n lower triangular part of A contains the lower 
-  
+            leading n by n lower triangular part of A contains the lower   
             triangular part of the matrix A, and the strictly upper   
             triangular part of A is not referenced.   
 
@@ -69,15 +67,12 @@
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {1.,0.};
     static integer c__1 = 1;
@@ -104,13 +99,20 @@
 	    integer *, doublereal *, doublecomplex *, integer *), zlacgv_(
 	    integer *, doublecomplex *, integer *);
     static doublereal akk, bkk;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (*itype < 1 || *itype > 3) {
@@ -136,43 +138,46 @@
 /*           Compute inv(U')*A*inv(U) */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the upper triangle of A(k:n,k:n) */
 
-		i__2 = k + k * a_dim1;
-		akk = A(k,k).r;
-		i__2 = k + k * b_dim1;
-		bkk = B(k,k).r;
+		i__2 = a_subscr(k, k);
+		akk = a[i__2].r;
+		i__2 = b_subscr(k, k);
+		bkk = b[i__2].r;
 /* Computing 2nd power */
 		d__1 = bkk;
 		akk /= d__1 * d__1;
-		i__2 = k + k * a_dim1;
-		A(k,k).r = akk, A(k,k).i = 0.;
+		i__2 = a_subscr(k, k);
+		a[i__2].r = akk, a[i__2].i = 0.;
 		if (k < *n) {
 		    i__2 = *n - k;
 		    d__1 = 1. / bkk;
-		    zdscal_(&i__2, &d__1, &A(k,k+1), lda);
+		    zdscal_(&i__2, &d__1, &a_ref(k, k + 1), lda);
 		    d__1 = akk * -.5;
 		    ct.r = d__1, ct.i = 0.;
 		    i__2 = *n - k;
-		    zlacgv_(&i__2, &A(k,k+1), lda);
+		    zlacgv_(&i__2, &a_ref(k, k + 1), lda);
 		    i__2 = *n - k;
-		    zlacgv_(&i__2, &B(k,k+1), ldb);
+		    zlacgv_(&i__2, &b_ref(k, k + 1), ldb);
 		    i__2 = *n - k;
-		    zaxpy_(&i__2, &ct, &B(k,k+1), ldb, &A(k,k+1), lda);
+		    zaxpy_(&i__2, &ct, &b_ref(k, k + 1), ldb, &a_ref(k, k + 1)
+			    , lda);
 		    i__2 = *n - k;
 		    z__1.r = -1., z__1.i = 0.;
-		    zher2_(uplo, &i__2, &z__1, &A(k,k+1), lda, 
-			    &B(k,k+1), ldb, &A(k+1,k+1), lda);
+		    zher2_(uplo, &i__2, &z__1, &a_ref(k, k + 1), lda, &b_ref(
+			    k, k + 1), ldb, &a_ref(k + 1, k + 1), lda);
 		    i__2 = *n - k;
-		    zaxpy_(&i__2, &ct, &B(k,k+1), ldb, &A(k,k+1), lda);
+		    zaxpy_(&i__2, &ct, &b_ref(k, k + 1), ldb, &a_ref(k, k + 1)
+			    , lda);
 		    i__2 = *n - k;
-		    zlacgv_(&i__2, &B(k,k+1), ldb);
+		    zlacgv_(&i__2, &b_ref(k, k + 1), ldb);
 		    i__2 = *n - k;
-		    ztrsv_(uplo, "Conjugate transpose", "Non-unit", &i__2, &B(k+1,k+1), ldb, &A(k,k+1), lda);
+		    ztrsv_(uplo, "Conjugate transpose", "Non-unit", &i__2, &
+			    b_ref(k + 1, k + 1), ldb, &a_ref(k, k + 1), lda);
 		    i__2 = *n - k;
-		    zlacgv_(&i__2, &A(k,k+1), lda);
+		    zlacgv_(&i__2, &a_ref(k, k + 1), lda);
 		}
 /* L10: */
 	    }
@@ -181,36 +186,38 @@
 /*           Compute inv(L)*A*inv(L') */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the lower triangle of A(k:n,k:n) */
 
-		i__2 = k + k * a_dim1;
-		akk = A(k,k).r;
-		i__2 = k + k * b_dim1;
-		bkk = B(k,k).r;
+		i__2 = a_subscr(k, k);
+		akk = a[i__2].r;
+		i__2 = b_subscr(k, k);
+		bkk = b[i__2].r;
 /* Computing 2nd power */
 		d__1 = bkk;
 		akk /= d__1 * d__1;
-		i__2 = k + k * a_dim1;
-		A(k,k).r = akk, A(k,k).i = 0.;
+		i__2 = a_subscr(k, k);
+		a[i__2].r = akk, a[i__2].i = 0.;
 		if (k < *n) {
 		    i__2 = *n - k;
 		    d__1 = 1. / bkk;
-		    zdscal_(&i__2, &d__1, &A(k+1,k), &c__1);
+		    zdscal_(&i__2, &d__1, &a_ref(k + 1, k), &c__1);
 		    d__1 = akk * -.5;
 		    ct.r = d__1, ct.i = 0.;
 		    i__2 = *n - k;
-		    zaxpy_(&i__2, &ct, &B(k+1,k), &c__1, &A(k+1,k), &c__1);
+		    zaxpy_(&i__2, &ct, &b_ref(k + 1, k), &c__1, &a_ref(k + 1, 
+			    k), &c__1);
 		    i__2 = *n - k;
 		    z__1.r = -1., z__1.i = 0.;
-		    zher2_(uplo, &i__2, &z__1, &A(k+1,k), &c__1, 
-			    &B(k+1,k), &c__1, &A(k+1,k+1), lda);
+		    zher2_(uplo, &i__2, &z__1, &a_ref(k + 1, k), &c__1, &
+			    b_ref(k + 1, k), &c__1, &a_ref(k + 1, k + 1), lda);
 		    i__2 = *n - k;
-		    zaxpy_(&i__2, &ct, &B(k+1,k), &c__1, &A(k+1,k), &c__1);
+		    zaxpy_(&i__2, &ct, &b_ref(k + 1, k), &c__1, &a_ref(k + 1, 
+			    k), &c__1);
 		    i__2 = *n - k;
-		    ztrsv_(uplo, "No transpose", "Non-unit", &i__2, &B(k+1,k+1), ldb, &A(k+1,k), 
-			    &c__1);
+		    ztrsv_(uplo, "No transpose", "Non-unit", &i__2, &b_ref(k 
+			    + 1, k + 1), ldb, &a_ref(k + 1, k), &c__1);
 		}
 /* L20: */
 	    }
@@ -221,32 +228,33 @@
 /*           Compute U*A*U' */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the upper triangle of A(1:k,1:k) */
 
-		i__2 = k + k * a_dim1;
-		akk = A(k,k).r;
-		i__2 = k + k * b_dim1;
-		bkk = B(k,k).r;
+		i__2 = a_subscr(k, k);
+		akk = a[i__2].r;
+		i__2 = b_subscr(k, k);
+		bkk = b[i__2].r;
 		i__2 = k - 1;
-		ztrmv_(uplo, "No transpose", "Non-unit", &i__2, &B(1,1), 
-			ldb, &A(1,k), &c__1);
+		ztrmv_(uplo, "No transpose", "Non-unit", &i__2, &b[b_offset], 
+			ldb, &a_ref(1, k), &c__1);
 		d__1 = akk * .5;
 		ct.r = d__1, ct.i = 0.;
 		i__2 = k - 1;
-		zaxpy_(&i__2, &ct, &B(1,k), &c__1, &A(1,k), &c__1);
+		zaxpy_(&i__2, &ct, &b_ref(1, k), &c__1, &a_ref(1, k), &c__1);
 		i__2 = k - 1;
-		zher2_(uplo, &i__2, &c_b1, &A(1,k), &c__1, &B(1,k), &c__1, &A(1,1), lda);
+		zher2_(uplo, &i__2, &c_b1, &a_ref(1, k), &c__1, &b_ref(1, k), 
+			&c__1, &a[a_offset], lda);
 		i__2 = k - 1;
-		zaxpy_(&i__2, &ct, &B(1,k), &c__1, &A(1,k), &c__1);
+		zaxpy_(&i__2, &ct, &b_ref(1, k), &c__1, &a_ref(1, k), &c__1);
 		i__2 = k - 1;
-		zdscal_(&i__2, &bkk, &A(1,k), &c__1);
-		i__2 = k + k * a_dim1;
+		zdscal_(&i__2, &bkk, &a_ref(1, k), &c__1);
+		i__2 = a_subscr(k, k);
 /* Computing 2nd power */
 		d__2 = bkk;
 		d__1 = akk * (d__2 * d__2);
-		A(k,k).r = d__1, A(k,k).i = 0.;
+		a[i__2].r = d__1, a[i__2].i = 0.;
 /* L30: */
 	    }
 	} else {
@@ -254,40 +262,41 @@
 /*           Compute L'*A*L */
 
 	    i__1 = *n;
-	    for (k = 1; k <= *n; ++k) {
+	    for (k = 1; k <= i__1; ++k) {
 
 /*              Update the lower triangle of A(1:k,1:k) */
 
-		i__2 = k + k * a_dim1;
-		akk = A(k,k).r;
-		i__2 = k + k * b_dim1;
-		bkk = B(k,k).r;
+		i__2 = a_subscr(k, k);
+		akk = a[i__2].r;
+		i__2 = b_subscr(k, k);
+		bkk = b[i__2].r;
 		i__2 = k - 1;
-		zlacgv_(&i__2, &A(k,1), lda);
+		zlacgv_(&i__2, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		ztrmv_(uplo, "Conjugate transpose", "Non-unit", &i__2, &B(1,1), ldb, &A(k,1), lda);
+		ztrmv_(uplo, "Conjugate transpose", "Non-unit", &i__2, &b[
+			b_offset], ldb, &a_ref(k, 1), lda);
 		d__1 = akk * .5;
 		ct.r = d__1, ct.i = 0.;
 		i__2 = k - 1;
-		zlacgv_(&i__2, &B(k,1), ldb);
+		zlacgv_(&i__2, &b_ref(k, 1), ldb);
 		i__2 = k - 1;
-		zaxpy_(&i__2, &ct, &B(k,1), ldb, &A(k,1), lda);
+		zaxpy_(&i__2, &ct, &b_ref(k, 1), ldb, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		zher2_(uplo, &i__2, &c_b1, &A(k,1), lda, &B(k,1)
-			, ldb, &A(1,1), lda);
+		zher2_(uplo, &i__2, &c_b1, &a_ref(k, 1), lda, &b_ref(k, 1), 
+			ldb, &a[a_offset], lda);
 		i__2 = k - 1;
-		zaxpy_(&i__2, &ct, &B(k,1), ldb, &A(k,1), lda);
+		zaxpy_(&i__2, &ct, &b_ref(k, 1), ldb, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		zlacgv_(&i__2, &B(k,1), ldb);
+		zlacgv_(&i__2, &b_ref(k, 1), ldb);
 		i__2 = k - 1;
-		zdscal_(&i__2, &bkk, &A(k,1), lda);
+		zdscal_(&i__2, &bkk, &a_ref(k, 1), lda);
 		i__2 = k - 1;
-		zlacgv_(&i__2, &A(k,1), lda);
-		i__2 = k + k * a_dim1;
+		zlacgv_(&i__2, &a_ref(k, 1), lda);
+		i__2 = a_subscr(k, k);
 /* Computing 2nd power */
 		d__2 = bkk;
 		d__1 = akk * (d__2 * d__2);
-		A(k,k).r = d__1, A(k,k).i = 0.;
+		a[i__2].r = d__1, a[i__2].i = 0.;
 /* L40: */
 	    }
 	}
@@ -297,4 +306,10 @@
 /*     End of ZHEGS2 */
 
 } /* zhegs2_ */
+
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

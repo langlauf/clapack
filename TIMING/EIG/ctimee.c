@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -29,7 +30,7 @@ static integer c__400 = 400;
 static integer c__420 = 420;
 static integer c__4 = 4;
 static integer c__6 = 6;
-static integer c_b226 = 640800;
+static integer c_b226 = 649241;
 static integer c__10 = 10;
 
 /* Main program */ MAIN__(void)
@@ -49,8 +50,8 @@ static integer c__10 = 10;
     static char fmt_9990[] = "(\002 Timing the Generalized Eigenvalue Proble"
 	    "m routines\002,/\002    CGGHRD, CHGEQZ, and CTGEVC \002)";
     static char fmt_9996[] = "(1x,a3,\002:  Unrecognized path name\002)";
-    static char fmt_9985[] = "(/\002 LAPACK VERSION 2.0, released September "
-	    "30, 1994 \002)";
+    static char fmt_9985[] = "(/\002 LAPACK VERSION 3.0, released June 30, 1"
+	    "999 \002)";
     static char fmt_9989[] = "(/\002 The following parameter values will be "
 	    "used:\002)";
     static char fmt_9995[] = "(\002 *** Invalid input value: \002,a6,\002"
@@ -72,8 +73,8 @@ static integer c__10 = 10;
     /* System generated locals */
     integer i__1;
     real r__1;
-    static complex equiv_0[1008000], equiv_1[2400], equiv_2[640800];
-    static real equiv_3[488401];
+    static complex equiv_0[1008000], equiv_1[2400], equiv_2[649241];
+    static real equiv_3[489601];
 
     /* Builtin functions */
     integer s_rsfe(cilist *), do_fio(integer *, char *, ftnlen), e_rsfe(void),
@@ -91,8 +92,8 @@ static integer c__10 = 10;
     static integer mval[12], nval[12];
 #define work (equiv_2)
 #define a (equiv_0)
-#define d_ (equiv_1)
-    static integer i;
+#define d__ (equiv_1)
+    static integer i__;
     static logical fatal;
     extern /* Subroutine */ int ctim21_(char *, integer *, integer *, integer 
 	    *, logical *, integer *, integer *, integer *, integer *, integer 
@@ -121,9 +122,9 @@ static integer c__10 = 10;
 	    logical *, integer *, integer *, integer *, real *, integer *, 
 	    integer *, complex *, complex *, complex *, complex *, real *, 
 	    complex *, real *, complex *, complex *, complex *, complex *, 
-	    integer *, real *, logical *, real *, integer *, integer *, 
-	    integer *, real *, integer *, integer *, integer *, integer *, 
-	    ftnlen);
+	    integer *, real *, integer *, logical *, real *, integer *, 
+	    integer *, integer *, real *, integer *, integer *, integer *, 
+	    integer *, ftnlen);
     static char vname[6];
     static integer nsval[10];
     static char c3[3];
@@ -212,10 +213,19 @@ static integer c__10 = 10;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*168000 + a_1 - 168001
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define d___subscr(a_1,a_2) (a_2)*400 + a_1 - 401
+#define d___ref(a_1,a_2) d__[d___subscr(a_1,a_2)]
+#define workr_ref(a_1,a_2) workr[(a_2)*649241 + a_1 - 649242]
+#define ar_ref(a_1,a_2) ar[(a_2)*168000 + a_1 - 168001]
+#define dr_ref(a_1,a_2) dr[(a_2)*400 + a_1 - 401]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
     Purpose   
     =======   
@@ -232,19 +242,17 @@ static integer c__10 = 10;
         Includes CHETRD, CSTEQR, and SSTERF   
 
     SVD (Singular Value Decomposition):   
-        Includes CGEBRD, CUNGBR, and CBDSQR   
+        Includes CGEBRD, CUNGBR, CBDSQR, and CGESDD   
 
     GEP (Generalized nonsymmetric Eigenvalue Problem):   
         Includes CGGHRD, CHGEQZ, and CTGEVC   
 
     Each test path has a different input file.  The first line of the   
     input file should contain the characters NEP, SEP, SVD, or GEP in   
-    columns 1-3.  The number of remaining lines depends on what is found 
-  
+    columns 1-3.  The number of remaining lines depends on what is found   
     on the first line.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     NEP input file:   
 
@@ -264,8 +272,7 @@ static integer c__10 = 10;
              The values for the number of shifts.   
 
     line 7:  MXBVAL, INTEGER array, dimension (NPARM)   
-             The values for MAXB, used in determining whether multishift 
-  
+             The values for MAXB, used in determining whether multishift   
              will be used.   
 
     line 8:  LDAVAL, INTEGER array, dimension (NPARM)   
@@ -273,8 +280,7 @@ static integer c__10 = 10;
 
     line 9:  TIMMIN, REAL   
              The minimum time (in seconds) that a subroutine will be   
-             timed.  If TIMMIN is zero, each routine should be timed only 
-  
+             timed.  If TIMMIN is zero, each routine should be timed only   
              once.   
 
     line 10: NTYPES, INTEGER   
@@ -284,27 +290,20 @@ static integer c__10 = 10;
     If 0 < NTYPES < MAXTYP, then line 11 specifies NTYPES integer   
     values, which are the numbers of the matrix types to be used.   
 
-    The remaining lines specify a path name and the specific routines to 
-  
-    be timed.  For the nonsymmetric eigenvalue problem, the path name is 
-  
-    'CHS'.  A line to request all the routines in this path has the form 
-  
+    The remaining lines specify a path name and the specific routines to   
+    be timed.  For the nonsymmetric eigenvalue problem, the path name is   
+    'CHS'.  A line to request all the routines in this path has the form   
        CHS   T T T T T T T T T T T T   
-    where the first 3 characters specify the path name, and up to MAXTYP 
-  
+    where the first 3 characters specify the path name, and up to MAXTYP   
     nonblank characters may appear in columns 4-80.  If the k-th such   
-    character is 'T' or 't', the k-th routine will be timed.  If at least 
-  
+    character is 'T' or 't', the k-th routine will be timed.  If at least   
     one but fewer than 12 nonblank characters are specified, the   
-    remaining routines will not be timed.  If columns 4-80 are blank, all 
-  
+    remaining routines will not be timed.  If columns 4-80 are blank, all   
     the routines will be timed, so the input line   
        CHS   
     is equivalent to the line above.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     SEP input file:   
 
@@ -325,8 +324,7 @@ static integer c__10 = 10;
 
     line 7:  TIMMIN, REAL   
              The minimum time (in seconds) that a subroutine will be   
-             timed.  If TIMMIN is zero, each routine should be timed only 
-  
+             timed.  If TIMMIN is zero, each routine should be timed only   
              once.   
 
     line 8:  NTYPES, INTEGER   
@@ -336,13 +334,11 @@ static integer c__10 = 10;
     If 0 < NTYPES < MAXTYP, then line 9 specifies NTYPES integer   
     values, which are the numbers of the matrix types to be used.   
 
-    The remaining lines specify a path name and the specific routines to 
-  
+    The remaining lines specify a path name and the specific routines to   
     be timed as for the NEP input file.  For the symmetric eigenvalue   
     problem, the path name is 'CST' and up to 8 routines may be timed.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     SVD input file:   
 
@@ -366,8 +362,7 @@ static integer c__10 = 10;
 
     line 8:  TIMMIN, REAL   
              The minimum time (in seconds) that a subroutine will be   
-             timed.  If TIMMIN is zero, each routine should be timed only 
-  
+             timed.  If TIMMIN is zero, each routine should be timed only   
              once.   
 
     line 9:  NTYPES, INTEGER   
@@ -377,14 +372,12 @@ static integer c__10 = 10;
     If 0 < NTYPES < MAXTYP, then line 10 specifies NTYPES integer   
     values, which are the numbers of the matrix types to be used.   
 
-    The remaining lines specify a path name and the specific routines to 
-  
+    The remaining lines specify a path name and the specific routines to   
     be timed as for the NEP input file.  For the singular value   
     decomposition the path name is 'CBD' and up to 16 routines may be   
     timed.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
     GEP input file:   
 
@@ -404,13 +397,11 @@ static integer c__10 = 10;
              The values for the number of shifts.   
 
     line 7:  NEIVAL, INTEGER array, dimension (NPARM)   
-             The values for NEISP, used in determining whether multishift 
-  
+             The values for NEISP, used in determining whether multishift   
              will be used.   
 
     line 8:  NBMVAL, INTEGER array, dimension (NPARM)   
-             The values for MINNB, used in determining minimum blocksize. 
-  
+             The values for MINNB, used in determining minimum blocksize.   
 
     line 9:  NBKVAL, INTEGER array, dimension (NPARM)   
              The values for MINBLK, also used in determining minimum   
@@ -421,8 +412,7 @@ static integer c__10 = 10;
 
     line 11: TIMMIN, REAL   
              The minimum time (in seconds) that a subroutine will be   
-             timed.  If TIMMIN is zero, each routine should be timed only 
-  
+             timed.  If TIMMIN is zero, each routine should be timed only   
              once.   
 
     line 12: NTYPES, INTEGER   
@@ -432,27 +422,20 @@ static integer c__10 = 10;
     If 0 < NTYPES < MAXTYP, then line 13 specifies NTYPES integer   
     values, which are the numbers of the matrix types to be used.   
 
-    The remaining lines specify a path name and the specific routines to 
-  
-    be timed.  For the nonsymmetric eigenvalue problem, the path name is 
-  
-    'CHG'.  A line to request all the routines in this path has the form 
-  
+    The remaining lines specify a path name and the specific routines to   
+    be timed.  For the nonsymmetric eigenvalue problem, the path name is   
+    'CHG'.  A line to request all the routines in this path has the form   
        CHG   T T T T T T T T T T T T T T T T T T   
-    where the first 3 characters specify the path name, and up to MAXTYP 
-  
+    where the first 3 characters specify the path name, and up to MAXTYP   
     nonblank characters may appear in columns 4-80.  If the k-th such   
-    character is 'T' or 't', the k-th routine will be timed.  If at least 
-  
+    character is 'T' or 't', the k-th routine will be timed.  If at least   
     one but fewer than 18 nonblank characters are specified, the   
-    remaining routines will not be timed.  If columns 4-80 are blank, all 
-  
+    remaining routines will not be timed.  If columns 4-80 are blank, all   
     the routines will be timed, so the input line   
        CHG   
     is equivalent to the line above.   
 
-   =======================================================================
-   
+   =======================================================================   
 
     The workspace requirements in terms of square matrices for the   
     different test paths are as follows:   
@@ -471,11 +454,9 @@ static integer c__10 = 10;
     as N.  The parameter NEED is set to 6 to allow for 4 NxN matrices   
     for GEP.   
 
-    The EISPACK routines tested use two real arrays to represent complex 
-  
+    The EISPACK routines tested use two real arrays to represent complex   
     data, whereas the LAPACK routines use complex arrays.  The LAPACK   
-    arrays are called A, D, and WORK and the corresponding EISPACK arrays 
-  
+    arrays are called A, D, and WORK and the corresponding EISPACK arrays   
     are called AR, DR, and WORKR.  To conserve space, we have   
     EQUIVALENCEd the real arrays to their complex analogs.   
                           !!!*** Note ***!!!   
@@ -487,8 +468,7 @@ static integer c__10 = 10;
 
     The work arrays RWORK and RWORK1 are also equivalenced to get the   
     effect of one array with length = max( MAXN, MAXIN*MAXT*MAXPRM ).   
-    Generally, RWORK1 will be the larger, and even if MAXN is so large as 
-  
+    Generally, RWORK1 will be the larger, and even if MAXN is so large as   
     to make RWORK larger, most machines will not complain.  If this   
     becomes a problem, though, pass RWORK instead of RWORK1 to CTIM21. */
 
@@ -507,7 +487,7 @@ static integer c__10 = 10;
     if (i__1 != 0) {
 	goto L160;
     }
-    i__1 = do_fio(&c__1, path, 3L);
+    i__1 = do_fio(&c__1, path, (ftnlen)3);
     if (i__1 != 0) {
 	goto L160;
     }
@@ -515,10 +495,14 @@ static integer c__10 = 10;
     if (i__1 != 0) {
 	goto L160;
     }
-    nep = lsamen_(&c__3, path, "NEP") || lsamen_(&c__3, path, "CHS");
-    sep = lsamen_(&c__3, path, "SEP") || lsamen_(&c__3, path, "CST");
-    svd = lsamen_(&c__3, path, "SVD") || lsamen_(&c__3, path, "CBD");
-    gep = lsamen_(&c__3, path, "GEP") || lsamen_(&c__3, path, "CHG");
+    nep = lsamen_(&c__3, path, "NEP") || lsamen_(&c__3, 
+	    path, "CHS");
+    sep = lsamen_(&c__3, path, "SEP") || lsamen_(&c__3, 
+	    path, "CST");
+    svd = lsamen_(&c__3, path, "SVD") || lsamen_(&c__3, 
+	    path, "CBD");
+    gep = lsamen_(&c__3, path, "GEP") || lsamen_(&c__3, 
+	    path, "CHG");
 
 /*     Report values of parameters as they are read. */
 
@@ -536,9 +520,9 @@ static integer c__10 = 10;
 	e_wsfe();
     } else {
 	s_wsfe(&io___23);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
     s_wsfe(&io___24);
     e_wsfe();
@@ -552,7 +536,7 @@ static integer c__10 = 10;
     e_rsle();
     if (nn < 1) {
 	s_wsfe(&io___28);
-	do_fio(&c__1, "NN  ", 4L);
+	do_fio(&c__1, "NN  ", (ftnlen)4);
 	do_fio(&c__1, (char *)&nn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -560,7 +544,7 @@ static integer c__10 = 10;
 	fatal = TRUE_;
     } else if (nn > 12) {
 	s_wsfe(&io___29);
-	do_fio(&c__1, "NN  ", 4L);
+	do_fio(&c__1, "NN  ", (ftnlen)4);
 	do_fio(&c__1, (char *)&nn, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -572,28 +556,28 @@ static integer c__10 = 10;
 
     s_rsle(&io___30);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
     if (svd) {
-	s_copy(vname, "  M", 6L, 3L);
+	s_copy(vname, "  M", (ftnlen)6, (ftnlen)3);
     } else {
-	s_copy(vname, "  N", 6L, 3L);
+	s_copy(vname, "  N", (ftnlen)6, (ftnlen)3);
     }
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	if (mval[i - 1] < 0) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (mval[i__ - 1] < 0) {
 	    s_wsfe(&io___34);
-	    do_fio(&c__1, vname, 6L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, vname, (ftnlen)6);
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
-	} else if (mval[i - 1] > 400) {
+	} else if (mval[i__ - 1] > 400) {
 	    s_wsfe(&io___35);
-	    do_fio(&c__1, vname, 6L);
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, vname, (ftnlen)6);
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__400, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
@@ -605,32 +589,34 @@ static integer c__10 = 10;
 
     if (svd) {
 	s_wsfe(&io___36);
-	do_fio(&c__1, "M   ", 4L);
+	do_fio(&c__1, "M   ", (ftnlen)4);
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&mval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&mval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 	s_rsle(&io___37);
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer)
-		    );
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(
+		    integer));
 	}
 	e_rsle();
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    if (nval[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (nval[i__ - 1] < 0) {
 		s_wsfe(&io___39);
-		do_fio(&c__1, "N   ", 4L);
-		do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+		do_fio(&c__1, "N   ", (ftnlen)4);
+		do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
-	    } else if (nval[i - 1] > 400) {
+	    } else if (nval[i__ - 1] > 400) {
 		s_wsfe(&io___40);
-		do_fio(&c__1, "N   ", 4L);
-		do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+		do_fio(&c__1, "N   ", (ftnlen)4);
+		do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer))
+			;
 		do_fio(&c__1, (char *)&c__400, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -639,16 +625,16 @@ static integer c__10 = 10;
 	}
     } else {
 	i__1 = nn;
-	for (i = 1; i <= i__1; ++i) {
-	    nval[i - 1] = mval[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nval[i__ - 1] = mval[i__ - 1];
 /* L30: */
 	}
     }
     s_wsfe(&io___41);
-    do_fio(&c__1, "N   ", 4L);
+    do_fio(&c__1, "N   ", (ftnlen)4);
     i__1 = nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -659,7 +645,7 @@ static integer c__10 = 10;
     e_rsle();
     if (nparms < 1) {
 	s_wsfe(&io___44);
-	do_fio(&c__1, "NPARMS", 6L);
+	do_fio(&c__1, "NPARMS", (ftnlen)6);
 	do_fio(&c__1, (char *)&nparms, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -667,7 +653,7 @@ static integer c__10 = 10;
 	fatal = TRUE_;
     } else if (nparms > 12) {
 	s_wsfe(&io___45);
-	do_fio(&c__1, "NPARMS", 6L);
+	do_fio(&c__1, "NPARMS", (ftnlen)6);
 	do_fio(&c__1, (char *)&nparms, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__12, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -679,16 +665,17 @@ static integer c__10 = 10;
 
     s_rsle(&io___46);
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer))
+		;
     }
     e_rsle();
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	if (nbval[i - 1] < 0) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (nbval[i__ - 1] < 0) {
 	    s_wsfe(&io___48);
-	    do_fio(&c__1, "NB  ", 4L);
-	    do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, "NB  ", (ftnlen)4);
+	    do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
@@ -696,10 +683,10 @@ static integer c__10 = 10;
 /* L40: */
     }
     s_wsfe(&io___49);
-    do_fio(&c__1, "NB  ", 4L);
+    do_fio(&c__1, "NB  ", (ftnlen)4);
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nbval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nbval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -709,17 +696,18 @@ static integer c__10 = 10;
 
 	s_rsle(&io___50);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    if (nsval[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (nsval[i__ - 1] < 0) {
 		s_wsfe(&io___52);
-		do_fio(&c__1, "NS  ", 4L);
-		do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(integer));
+		do_fio(&c__1, "NS  ", (ftnlen)4);
+		do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(integer)
+			);
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -727,10 +715,10 @@ static integer c__10 = 10;
 /* L50: */
 	}
 	s_wsfe(&io___53);
-	do_fio(&c__1, "NS  ", 4L);
+	do_fio(&c__1, "NS  ", (ftnlen)4);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nsval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nsval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 
@@ -738,18 +726,18 @@ static integer c__10 = 10;
 
 	s_rsle(&io___54);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    if (mxbval[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (mxbval[i__ - 1] < 0) {
 		s_wsfe(&io___56);
-		do_fio(&c__1, "MAXB", 4L);
-		do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(integer))
-			;
+		do_fio(&c__1, "MAXB", (ftnlen)4);
+		do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(
+			integer));
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -757,17 +745,17 @@ static integer c__10 = 10;
 /* L60: */
 	}
 	s_wsfe(&io___57);
-	do_fio(&c__1, "MAXB", 4L);
+	do_fio(&c__1, "MAXB", (ftnlen)4);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&mxbval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&mxbval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     } else {
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    nsval[i - 1] = 1;
-	    mxbval[i - 1] = 1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nsval[i__ - 1] = 1;
+	    mxbval[i__ - 1] = 1;
 /* L70: */
 	}
     }
@@ -778,18 +766,18 @@ static integer c__10 = 10;
 
 	s_rsle(&io___58);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nbmval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nbmval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    if (nbmval[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (nbmval[i__ - 1] < 0) {
 		s_wsfe(&io___60);
-		do_fio(&c__1, "NBMIN", 5L);
-		do_fio(&c__1, (char *)&nbmval[i - 1], (ftnlen)sizeof(integer))
-			;
+		do_fio(&c__1, "NBMIN", (ftnlen)5);
+		do_fio(&c__1, (char *)&nbmval[i__ - 1], (ftnlen)sizeof(
+			integer));
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -797,10 +785,10 @@ static integer c__10 = 10;
 /* L80: */
 	}
 	s_wsfe(&io___61);
-	do_fio(&c__1, "NBMIN", 5L);
+	do_fio(&c__1, "NBMIN", (ftnlen)5);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbmval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbmval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
 
@@ -808,18 +796,18 @@ static integer c__10 = 10;
 
 	s_rsle(&io___62);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&nbkval[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&nbkval[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    if (nbkval[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (nbkval[i__ - 1] < 0) {
 		s_wsfe(&io___64);
-		do_fio(&c__1, "MINBLK", 6L);
-		do_fio(&c__1, (char *)&nbkval[i - 1], (ftnlen)sizeof(integer))
-			;
+		do_fio(&c__1, "MINBLK", (ftnlen)6);
+		do_fio(&c__1, (char *)&nbkval[i__ - 1], (ftnlen)sizeof(
+			integer));
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
@@ -827,17 +815,17 @@ static integer c__10 = 10;
 /* L90: */
 	}
 	s_wsfe(&io___65);
-	do_fio(&c__1, "MINBLK", 6L);
+	do_fio(&c__1, "MINBLK", (ftnlen)6);
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    do_fio(&c__1, (char *)&nbkval[i - 1], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_fio(&c__1, (char *)&nbkval[i__ - 1], (ftnlen)sizeof(integer));
 	}
 	e_wsfe();
     } else {
 	i__1 = nparms;
-	for (i = 1; i <= i__1; ++i) {
-	    nbmval[i - 1] = 401;
-	    nbkval[i - 1] = 401;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nbmval[i__ - 1] = 401;
+	    nbkval[i__ - 1] = 401;
 /* L100: */
 	}
     }
@@ -846,23 +834,24 @@ static integer c__10 = 10;
 
     s_rsle(&io___66);
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer)
+		);
     }
     e_rsle();
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	if (ldaval[i - 1] < 0) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (ldaval[i__ - 1] < 0) {
 	    s_wsfe(&io___68);
-	    do_fio(&c__1, "LDA ", 4L);
-	    do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, "LDA ", (ftnlen)4);
+	    do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
-	} else if (ldaval[i - 1] > 420) {
+	} else if (ldaval[i__ - 1] > 420) {
 	    s_wsfe(&io___69);
-	    do_fio(&c__1, "LDA ", 4L);
-	    do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+	    do_fio(&c__1, "LDA ", (ftnlen)4);
+	    do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&c__420, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	    fatal = TRUE_;
@@ -870,10 +859,10 @@ static integer c__10 = 10;
 /* L110: */
     }
     s_wsfe(&io___70);
-    do_fio(&c__1, "LDA ", 4L);
+    do_fio(&c__1, "LDA ", (ftnlen)4);
     i__1 = nparms;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&ldaval[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&ldaval[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
 
@@ -893,7 +882,7 @@ static integer c__10 = 10;
     e_rsle();
     if (ntypes < 0) {
 	s_wsfe(&io___76);
-	do_fio(&c__1, "NTYPES", 6L);
+	do_fio(&c__1, "NTYPES", (ftnlen)6);
 	do_fio(&c__1, (char *)&ntypes, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -915,41 +904,43 @@ static integer c__10 = 10;
     if (ntypes < maxtyp) {
 	s_rsle(&io___78);
 	i__1 = ntypes;
-	for (i = 1; i <= i__1; ++i) {
-	    do_lio(&c__3, &c__1, (char *)&iwork[i - 1], (ftnlen)sizeof(
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    do_lio(&c__3, &c__1, (char *)&iwork[i__ - 1], (ftnlen)sizeof(
 		    integer));
 	}
 	e_rsle();
 	i__1 = maxtyp;
-	for (i = 1; i <= i__1; ++i) {
-	    dotype[i - 1] = FALSE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    dotype[i__ - 1] = FALSE_;
 /* L120: */
 	}
 	i__1 = ntypes;
-	for (i = 1; i <= i__1; ++i) {
-	    if (iwork[i - 1] < 0) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (iwork[i__ - 1] < 0) {
 		s_wsfe(&io___81);
-		do_fio(&c__1, "TYPE", 4L);
-		do_fio(&c__1, (char *)&iwork[i - 1], (ftnlen)sizeof(integer));
+		do_fio(&c__1, "TYPE", (ftnlen)4);
+		do_fio(&c__1, (char *)&iwork[i__ - 1], (ftnlen)sizeof(integer)
+			);
 		do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
-	    } else if (iwork[i - 1] > maxtyp) {
+	    } else if (iwork[i__ - 1] > maxtyp) {
 		s_wsfe(&io___82);
-		do_fio(&c__1, "TYPE", 4L);
-		do_fio(&c__1, (char *)&iwork[i - 1], (ftnlen)sizeof(integer));
+		do_fio(&c__1, "TYPE", (ftnlen)4);
+		do_fio(&c__1, (char *)&iwork[i__ - 1], (ftnlen)sizeof(integer)
+			);
 		do_fio(&c__1, (char *)&maxtyp, (ftnlen)sizeof(integer));
 		e_wsfe();
 		fatal = TRUE_;
 	    } else {
-		dotype[iwork[i - 1] - 1] = TRUE_;
+		dotype[iwork[i__ - 1] - 1] = TRUE_;
 	    }
 /* L130: */
 	}
     } else {
 	ntypes = maxtyp;
-	for (i = 1; i <= 10; ++i) {
-	    dotype[i - 1] = TRUE_;
+	for (i__ = 1; i__ <= 10; ++i__) {
+	    dotype[i__ - 1] = TRUE_;
 /* L140: */
 	}
     }
@@ -957,7 +948,7 @@ static integer c__10 = 10;
     if (fatal) {
 	s_wsfe(&io___83);
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
 
 /*     Read the input lines indicating the test path and the routines   
@@ -968,7 +959,7 @@ L150:
     if (i__1 != 0) {
 	goto L160;
     }
-    i__1 = do_fio(&c__1, line, 80L);
+    i__1 = do_fio(&c__1, line, (ftnlen)80);
     if (i__1 != 0) {
 	goto L160;
     }
@@ -976,23 +967,25 @@ L150:
     if (i__1 != 0) {
 	goto L160;
     }
-    s_copy(c3, line, 3L, 3L);
+    s_copy(c3, line, (ftnlen)3, (ftnlen)3);
 
 /*     -------------------------------------   
        NEP:  Nonsymmetric Eigenvalue Problem   
        ------------------------------------- */
 
-    if (lsamen_(&c__3, c3, "CHS") || lsamen_(&c__3, c3, "NEP")
-	    ) {
+    if (lsamen_(&c__3, c3, "CHS") || lsamen_(&c__3, c3, 
+	    "NEP")) {
 	ctim21_(line, &nn, nval, &maxtyp, dotype, &nparms, nbval, nsval, 
-		mxbval, ldaval, &timmin, &c__6, iseed, a, ar, &ar[168000], &a[
-		168000], &ar[336000], &ar[504000], &a[336000], &ar[672000], &
-		ar[840000], d_, dr, &dr[800], work, workr, &workr[640800], &
-		c_b226, rwork1, logwrk, iwork2, result, &c__10, &c__10, &
-		c__12, opcnts, &c__10, &c__10, &c__12, &info, 80L);
+		mxbval, ldaval, &timmin, &c__6, iseed, &a_ref(1, 1), &ar_ref(
+		1, 1), &ar_ref(1, 2), &a_ref(1, 2), &ar_ref(1, 3), &ar_ref(1, 
+		4), &a_ref(1, 3), &ar_ref(1, 5), &ar_ref(1, 6), &d___ref(1, 1)
+		, &dr_ref(1, 1), &dr_ref(1, 3), work, &workr_ref(1, 1), &
+		workr_ref(1, 2), &c_b226, rwork1, logwrk, iwork2, result, &
+		c__10, &c__10, &c__12, opcnts, &c__10, &c__10, &c__12, &info, 
+		(ftnlen)80);
 	if (info != 0) {
 	    s_wsfe(&io___92);
-	    do_fio(&c__1, "CTIM21", 6L);
+	    do_fio(&c__1, "CTIM21", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -1001,16 +994,18 @@ L150:
        SEP:  Symmetric Eigenvalue Problem   
        ---------------------------------- */
 
-    } else if (lsamen_(&c__3, c3, "CST") || lsamen_(&c__3, c3, "SEP")) {
+    } else if (lsamen_(&c__3, c3, "CST") || lsamen_(&
+	    c__3, c3, "SEP")) {
 	ctim22_(line, &nn, nval, &maxtyp, dotype, &nparms, nbval, ldaval, &
-		timmin, &c__6, iseed, a, &dr[800], &dr[1200], e2, &a[168000], 
-		&ar[336000], &ar[504000], d_, dr, &a[336000], &ar[672000], &
-		ar[840000], work, &c_b226, rwork1, logwrk, iwork2, result, &
-		c__10, &c__10, &c__12, opcnts, &c__10, &c__10, &c__12, &info, 
-		80L);
+		timmin, &c__6, iseed, &a_ref(1, 1), &dr_ref(1, 3), &dr_ref(1, 
+		4), e2, &a_ref(1, 2), &ar_ref(1, 3), &ar_ref(1, 4), &d___ref(
+		1, 1), &dr_ref(1, 1), &a_ref(1, 3), &ar_ref(1, 5), &ar_ref(1, 
+		6), work, &c_b226, rwork1, logwrk, iwork2, result, &c__10, &
+		c__10, &c__12, opcnts, &c__10, &c__10, &c__12, &info, (ftnlen)
+		80);
 	if (info != 0) {
 	    s_wsfe(&io___94);
-	    do_fio(&c__1, "CTIM22", 6L);
+	    do_fio(&c__1, "CTIM22", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -1019,15 +1014,17 @@ L150:
        SVD:  Singular Value Decomposition   
        ---------------------------------- */
 
-    } else if (lsamen_(&c__3, c3, "CBD") || lsamen_(&c__3, c3, "SVD")) {
+    } else if (lsamen_(&c__3, c3, "CBD") || lsamen_(&
+	    c__3, c3, "SVD")) {
 	ctim26_(line, &nn, nval, mval, &maxtyp, dotype, &nparms, nbval, 
-		ldaval, &timmin, &c__6, iseed, a, &a[168000], &a[336000], &a[
-		504000], dr, d_, &dr[800], &d_[400], &d_[800], &d_[1200], 
-		work, &c_b226, workr, logwrk, result, &c__10, &c__10, &c__12, 
-		opcnts, &c__10, &c__10, &c__12, &info, 80L);
+		ldaval, &timmin, &c__6, iseed, &a_ref(1, 1), &a_ref(1, 2), &
+		a_ref(1, 3), &a_ref(1, 4), &dr_ref(1, 1), &d___ref(1, 1), &
+		dr_ref(1, 3), &d___ref(1, 2), &d___ref(1, 3), &d___ref(1, 4), 
+		work, &c_b226, workr, iwork, logwrk, result, &c__10, &c__10, &
+		c__12, opcnts, &c__10, &c__10, &c__12, &info, (ftnlen)80);
 	if (info != 0) {
 	    s_wsfe(&io___95);
-	    do_fio(&c__1, "CTIM26", 6L);
+	    do_fio(&c__1, "CTIM26", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -1036,18 +1033,20 @@ L150:
        GEP:  Nonsymmetric Eigenvalue Problem   
        ------------------------------------- */
 
-    } else if (lsamen_(&c__3, c3, "CHG") || lsamen_(&c__3, c3, "GEP")) {
+    } else if (lsamen_(&c__3, c3, "CHG") || lsamen_(&
+	    c__3, c3, "GEP")) {
 	ctim51_(line, &nn, nval, &maxtyp, dotype, &nparms, nbval, nsval, 
-		mxbval, nbmval, nbkval, ldaval, &timmin, &c__6, iseed, a, ar, 
-		&ar[168000], &a[168000], &ar[336000], &ar[504000], &a[336000],
-		 &ar[672000], &ar[840000], &a[504000], &ar[1008000], &ar[
-		1176000], &a[672000], &ar[1344000], &ar[1512000], &a[840000], 
-		&ar[1680000], &ar[1848000], d_, dr, work, &c_b226, rwork1, 
-		logwrk, result, &c__10, &c__10, &c__12, opcnts, &c__10, &
-		c__10, &c__12, &info, 80L);
+		mxbval, nbmval, nbkval, ldaval, &timmin, &c__6, iseed, &a_ref(
+		1, 1), &ar_ref(1, 1), &ar_ref(1, 2), &a_ref(1, 2), &ar_ref(1, 
+		3), &ar_ref(1, 4), &a_ref(1, 3), &ar_ref(1, 5), &ar_ref(1, 6),
+		 &a_ref(1, 4), &ar_ref(1, 7), &ar_ref(1, 8), &a_ref(1, 5), &
+		ar_ref(1, 9), &ar_ref(1, 10), &a_ref(1, 6), &ar_ref(1, 11), &
+		ar_ref(1, 12), d__, dr, work, &c_b226, rwork1, logwrk, result,
+		 &c__10, &c__10, &c__12, opcnts, &c__10, &c__10, &c__12, &
+		info, (ftnlen)80);
 	if (info != 0) {
 	    s_wsfe(&io___96);
-	    do_fio(&c__1, "CTIM51", 6L);
+	    do_fio(&c__1, "CTIM51", (ftnlen)6);
 	    do_fio(&c__1, (char *)&info, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
@@ -1057,7 +1056,7 @@ L150:
 	s_wsle(&io___98);
 	e_wsle();
 	s_wsfe(&io___99);
-	do_fio(&c__1, c3, 3L);
+	do_fio(&c__1, c3, (ftnlen)3);
 	e_wsfe();
     }
     goto L150;
@@ -1076,12 +1075,19 @@ L160:
     return 0;
 } /* MAIN__ */
 
+#undef dr_ref
+#undef ar_ref
+#undef workr_ref
+#undef d___ref
+#undef d___subscr
+#undef a_ref
+#undef a_subscr
 #undef dr
 #undef rwork1
 #undef ar
 #undef workr
 #undef rwork
-#undef d_
+#undef d__
 #undef a
 #undef work
 

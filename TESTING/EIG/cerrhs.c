@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -39,7 +40,7 @@ static integer c__4 = 4;
 
     /* System generated locals */
     integer i__1;
-    doublereal d__1;
+    real r__1;
 
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
@@ -48,8 +49,8 @@ static integer c__4 = 4;
 
     /* Local variables */
     static integer info;
-    static complex a[9]	/* was [3][3] */, c[9]	/* was [3][3] */;
-    static integer i, j, m;
+    static complex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    static integer i__, j, m;
     static real s[3];
     static complex w[9], x[3];
     static char c2[2];
@@ -89,7 +90,11 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -110,23 +115,22 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 3; ++j) {
-	for (i = 1; i <= 3; ++i) {
-	    i__1 = i + j * 3 - 4;
-	    d__1 = 1.f / (real) (i + j);
-	    a[i__1].r = d__1, a[i__1].i = 0.f;
+	for (i__ = 1; i__ <= 3; ++i__) {
+	    i__1 = a_subscr(i__, j);
+	    r__1 = 1.f / (real) (i__ + j);
+	    a[i__1].r = r__1, a[i__1].i = 0.f;
 /* L10: */
 	}
 	sel[j - 1] = TRUE_;
@@ -141,7 +145,7 @@ static integer c__4 = 4;
 
 /*        CGEBAL */
 
-	s_copy(srnamc_1.srnamt, "CGEBAL", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGEBAL", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgebal_("/", &c__0, a, &c__1, &ilo, &ihi, s, &info);
 	chkxer_("CGEBAL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -158,7 +162,7 @@ static integer c__4 = 4;
 
 /*        CGEBAK */
 
-	s_copy(srnamc_1.srnamt, "CGEBAK", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGEBAK", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgebak_("/", "R", &c__0, &c__1, &c__0, s, &c__0, a, &c__1, &info);
 	chkxer_("CGEBAK", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -199,7 +203,7 @@ static integer c__4 = 4;
 
 /*        CGEHRD */
 
-	s_copy(srnamc_1.srnamt, "CGEHRD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CGEHRD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cgehrd_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("CGEHRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -232,7 +236,7 @@ static integer c__4 = 4;
 
 /*        CUNGHR */
 
-	s_copy(srnamc_1.srnamt, "CUNGHR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CUNGHR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	cunghr_(&c_n1, &c__1, &c__1, a, &c__1, tau, w, &c__1, &info);
 	chkxer_("CUNGHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -265,134 +269,134 @@ static integer c__4 = 4;
 
 /*        CUNMHR */
 
-	s_copy(srnamc_1.srnamt, "CUNMHR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CUNMHR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("/", "N", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cunmhr_("L", "/", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "/", &c__0, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cunmhr_("L", "N", &c_n1, &c__0, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c_n1, &c__0, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cunmhr_("L", "N", &c__0, &c_n1, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__0, &c_n1, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cunmhr_("L", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cunmhr_("L", "N", &c__0, &c__0, &c__2, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__0, &c__0, &c__2, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cunmhr_("L", "N", &c__1, &c__2, &c__2, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__2, &info);
+	cunmhr_("L", "N", &c__1, &c__2, &c__2, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__2, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cunmhr_("R", "N", &c__2, &c__1, &c__2, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__2, &info);
+	cunmhr_("R", "N", &c__2, &c__1, &c__2, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__2, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cunmhr_("L", "N", &c__1, &c__1, &c__1, &c__0, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__1, &c__1, &c__1, &c__0, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cunmhr_("L", "N", &c__0, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__0, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cunmhr_("R", "N", &c__1, &c__0, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("R", "N", &c__1, &c__0, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cunmhr_("R", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("R", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	cunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__2, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__2, &c__1, &c__1, &c__1, a, &c__2, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	cunmhr_("L", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c, &c__1,
-		 w, &c__1, &info);
+	cunmhr_("L", "N", &c__1, &c__2, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__1, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	cunmhr_("R", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c, &c__2,
-		 w, &c__1, &info);
+	cunmhr_("R", "N", &c__2, &c__1, &c__1, &c__1, a, &c__1, tau, c__, &
+		c__2, w, &c__1, &info);
 	chkxer_("CUNMHR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 16;
 
 /*        CHSEQR */
 
-	s_copy(srnamc_1.srnamt, "CHSEQR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CHSEQR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	chseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("/", "N", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	chseqr_("E", "/", &c__0, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "/", &c__0, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	chseqr_("E", "N", &c_n1, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "N", &c_n1, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	chseqr_("E", "N", &c__0, &c__0, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "N", &c__0, &c__0, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	chseqr_("E", "N", &c__0, &c__2, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "N", &c__0, &c__2, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	chseqr_("E", "N", &c__1, &c__1, &c__0, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "N", &c__1, &c__1, &c__0, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	chseqr_("E", "N", &c__1, &c__1, &c__2, a, &c__1, x, c, &c__1, w, &
+	chseqr_("E", "N", &c__1, &c__1, &c__2, a, &c__1, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	chseqr_("E", "N", &c__2, &c__1, &c__2, a, &c__1, x, c, &c__2, w, &
+	chseqr_("E", "N", &c__2, &c__1, &c__2, a, &c__1, x, c__, &c__2, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	chseqr_("E", "V", &c__2, &c__1, &c__2, a, &c__2, x, c, &c__1, w, &
+	chseqr_("E", "V", &c__2, &c__1, &c__2, a, &c__2, x, c__, &c__1, w, &
 		c__1, &info);
 	chkxer_("CHSEQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -400,7 +404,7 @@ static integer c__4 = 4;
 
 /*        CHSEIN */
 
-	s_copy(srnamc_1.srnamt, "CHSEIN", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CHSEIN", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	chsein_("/", "N", "N", sel, &c__0, a, &c__1, x, vl, &c__1, vr, &c__1, 
 		&c__0, &m, w, rw, ifaill, ifailr, &info);
@@ -445,7 +449,7 @@ static integer c__4 = 4;
 
 /*        CTREVC */
 
-	s_copy(srnamc_1.srnamt, "CTREVC", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "CTREVC", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	ctrevc_("/", "A", sel, &c__0, a, &c__1, vl, &c__1, vr, &c__1, &c__0, &
 		m, w, rw, &info);
@@ -489,13 +493,13 @@ static integer c__4 = 4;
     if (infoc_1.ok) {
 	io___22.ciunit = infoc_1.nout;
 	s_wsfe(&io___22);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___23.ciunit = infoc_1.nout;
 	s_wsfe(&io___23);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -505,4 +509,8 @@ static integer c__4 = 4;
 /*     End of CERRHS */
 
 } /* cerrhs_ */
+
+#undef a_ref
+#undef a_subscr
+
 

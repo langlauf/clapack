@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static doublecomplex c_b8 = {0.,0.};
 static doublecomplex c_b11 = {-1.,0.};
 
 /* Subroutine */ int zhst01_(integer *n, integer *ilo, integer *ihi, 
-	doublecomplex *a, integer *lda, doublecomplex *h, integer *ldh, 
+	doublecomplex *a, integer *lda, doublecomplex *h__, integer *ldh, 
 	doublecomplex *q, integer *ldq, doublecomplex *work, integer *lwork, 
 	doublereal *rwork, doublereal *result)
 {
@@ -38,7 +39,7 @@ static doublecomplex c_b11 = {-1.,0.};
     static doublereal smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +48,7 @@ static doublecomplex c_b11 = {-1.,0.};
     Purpose   
     =======   
 
-    ZHST01 tests the reduction of a general matrix A to upper Hessenberg 
-  
+    ZHST01 tests the reduction of a general matrix A to upper Hessenberg   
     form:  A = Q*H*Q'.  Two test ratios are computed;   
 
     RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
@@ -104,21 +104,20 @@ static doublecomplex c_b11 = {-1.,0.};
             RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
             RESULT(2) = norm( I - Q'*Q ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --work;
     --rwork;
@@ -147,7 +146,7 @@ static doublecomplex c_b11 = {-1.,0.};
 /*     Compute Q*H */
 
     zgemm_("No transpose", "No transpose", n, n, n, &c_b7, &q[q_offset], ldq, 
-	    &h[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
+	    &h__[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
 
 /*     Compute A - Q*H*Q' */
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -36,7 +37,10 @@ static doublereal c_b13 = -1.;
     static doublereal ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -73,8 +77,7 @@ static doublereal c_b13 = -1.;
             =3: RESULT = | I - UU' | / ( n ulp )   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DGET51 does nothing. 
-  
+            The size of the matrix.  If it is zero, DGET51 does nothing.   
             It must be at least zero.   
 
     A       (input) DOUBLE PRECISION array, dimension (LDA, N)   
@@ -116,22 +119,21 @@ static doublereal c_b13 = -1.;
             value is currently limited to 1/ulp, to avoid overflow.   
             Errors are flagged by RESULT=10/ulp.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --work;
 
@@ -186,7 +188,7 @@ static doublereal c_b13 = -1.;
 	    for (jcol = 1; jcol <= i__1; ++jcol) {
 		i__2 = *n;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
-		    work[jrow + *n * (jcol - 1)] -= a[jrow + jcol * a_dim1];
+		    work[jrow + *n * (jcol - 1)] -= a_ref(jrow, jcol);
 /* L10: */
 		}
 /* L20: */
@@ -231,8 +233,7 @@ static doublereal c_b13 = -1.;
 /* Computing MIN   
    Computing 2nd power */
 	i__1 = *n;
-	d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), 
-		d__2 = (doublereal) (*n);
+	d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), d__2 = (doublereal) (*n);
 	*result = min(d__1,d__2) / (*n * ulp);
     }
 
@@ -241,4 +242,7 @@ static doublereal c_b13 = -1.;
 /*     End of DGET51 */
 
 } /* dget51_ */
+
+#undef a_ref
+
 

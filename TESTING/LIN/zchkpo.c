@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -25,13 +26,14 @@ struct {
 static integer c__0 = 0;
 static integer c_n1 = -1;
 static integer c__1 = 1;
+static integer c__8 = 8;
 
 /* Subroutine */ int zchkpo_(logical *dotype, integer *nn, integer *nval, 
-	integer *nnb, integer *nbval, integer *nrhs, doublereal *thresh, 
-	logical *tsterr, integer *nmax, doublecomplex *a, doublecomplex *afac,
-	 doublecomplex *ainv, doublecomplex *b, doublecomplex *x, 
-	doublecomplex *xact, doublecomplex *work, doublereal *rwork, integer *
-	nout)
+	integer *nnb, integer *nbval, integer *nns, integer *nsval, 
+	doublereal *thresh, logical *tsterr, integer *nmax, doublecomplex *a, 
+	doublecomplex *afac, doublecomplex *ainv, doublecomplex *b, 
+	doublecomplex *x, doublecomplex *xact, doublecomplex *work, 
+	doublereal *rwork, integer *nout)
 {
     /* Initialized data */
 
@@ -42,6 +44,12 @@ static integer c__1 = 1;
     static char fmt_9999[] = "(\002 UPLO = '\002,a1,\002', N =\002,i5,\002, "
 	    "NB =\002,i4,\002, type \002,i2,\002, test \002,i2,\002, ratio "
 	    "=\002,g12.5)";
+    static char fmt_9998[] = "(\002 UPLO = '\002,a1,\002', N =\002,i5,\002, "
+	    "NRHS=\002,i3,\002, type \002,i2,\002, test(\002,i2,\002) =\002,g"
+	    "12.5)";
+    static char fmt_9997[] = "(\002 UPLO = '\002,a1,\002', N =\002,i5,\002"
+	    ",\002,10x,\002 type \002,i2,\002, test(\002,i2,\002) =\002,g12.5)"
+	    ;
 
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
@@ -52,8 +60,10 @@ static integer c__1 = 1;
 
     /* Local variables */
     static integer ioff, mode, imat, info;
-    static char path[3], dist[1], uplo[1], type[1];
-    static integer nrun, i;
+    static char path[3], dist[1];
+    static integer irhs, nrhs;
+    static char uplo[1], type__[1];
+    static integer nrun, i__;
     extern /* Subroutine */ int alahd_(integer *, char *);
     static integer k, n, nfail, iseed[4];
     extern doublereal dget06_(doublereal *, doublereal *);
@@ -83,7 +93,7 @@ static integer c__1 = 1;
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static integer ku, nt;
+    static integer ku;
     static doublereal rcondc;
     extern doublereal zlanhe_(char *, char *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
@@ -114,14 +124,16 @@ static integer c__1 = 1;
     static integer lda, inb;
 
     /* Fortran I/O blocks */
-    static cilist io___35 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___36 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___38 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 7, 1999   
 
 
     Purpose   
@@ -133,8 +145,7 @@ static integer c__1 = 1;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -150,9 +161,11 @@ static integer c__1 = 1;
     NBVAL   (input) INTEGER array, dimension (NBVAL)   
             The values of the blocksize NB.   
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+    NNS     (input) INTEGER   
+            The number of values of NRHS contained in the vector NSVAL.   
+
+    NSVAL   (input) INTEGER array, dimension (NNS)   
+            The values of the number of right hand sides NRHS.   
 
     THRESH  (input) DOUBLE PRECISION   
             The threshold value for the test ratios.  A result is   
@@ -172,23 +185,23 @@ static integer c__1 = 1;
 
     AINV    (workspace) COMPLEX*16 array, dimension (NMAX*NMAX)   
 
-    B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    B       (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
+            where NSMAX is the largest entry in NSVAL.   
 
-    X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    X       (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
 
-    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NSMAX)   
 
     WORK    (workspace) COMPLEX*16 array, dimension   
-                        (NMAX*max(3,NRHS))   
+                        (NMAX*max(3,NSMAX))   
 
     RWORK   (workspace) DOUBLE PRECISION array, dimension   
-                        (max(NMAX,2*NRHS))   
+                        (max(NMAX,2*NSMAX))   
 
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --rwork;
@@ -199,6 +212,7 @@ static integer c__1 = 1;
     --ainv;
     --afac;
     --a;
+    --nsval;
     --nbval;
     --nval;
     --dotype;
@@ -207,13 +221,13 @@ static integer c__1 = 1;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'Z';
-    s_copy(path + 1, "PO", 2L, 2L);
+    s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "PO", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -243,15 +257,14 @@ static integer c__1 = 1;
 /*           Do the tests only if DOTYPE( IMAT ) is true. */
 
 	    if (! dotype[imat]) {
-		goto L100;
+		goto L110;
 	    }
 
-/*           Skip types 3, 4, or 5 if the matrix size is too small
-. */
+/*           Skip types 3, 4, or 5 if the matrix size is too small. */
 
 	    zerot = imat >= 3 && imat <= 5;
 	    if (zerot && n < imat - 2) {
-		goto L100;
+		goto L110;
 	    }
 
 /*           Do first for UPLO = 'U', then for UPLO = 'L' */
@@ -259,27 +272,26 @@ static integer c__1 = 1;
 	    for (iuplo = 1; iuplo <= 2; ++iuplo) {
 		*(unsigned char *)uplo = *(unsigned char *)&uplos[iuplo - 1];
 
-/*              Set up parameters with ZLATB4 and generate a t
-est matrix   
+/*              Set up parameters with ZLATB4 and generate a test matrix   
                 with ZLATMS. */
 
-		zlatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &
-			cndnum, dist);
+		zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
+			&cndnum, dist);
 
-		s_copy(srnamc_1.srnamt, "ZLATMS", 6L, 6L);
-		zlatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cndnum, 
-			&anorm, &kl, &ku, uplo, &a[1], &lda, &work[1], &info);
+		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
+		zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
+			cndnum, &anorm, &kl, &ku, uplo, &a[1], &lda, &work[1],
+			 &info);
 
 /*              Check error code from ZLATMS. */
 
 		if (info != 0) {
 		    alaerh_(path, "ZLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
-		    goto L90;
+		    goto L100;
 		}
 
-/*              For types 3-5, zero one row and column of the 
-matrix to   
+/*              For types 3-5, zero one row and column of the matrix to   
                 test that INFO is returned correctly. */
 
 		if (zerot) {
@@ -296,14 +308,14 @@ matrix to
 
 		    if (iuplo == 1) {
 			i__3 = izero - 1;
-			for (i = 1; i <= i__3; ++i) {
-			    i__4 = ioff + i;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = ioff + i__;
 			    a[i__4].r = 0., a[i__4].i = 0.;
 /* L20: */
 			}
 			ioff += izero;
 			i__3 = n;
-			for (i = izero; i <= i__3; ++i) {
+			for (i__ = izero; i__ <= i__3; ++i__) {
 			    i__4 = ioff;
 			    a[i__4].r = 0., a[i__4].i = 0.;
 			    ioff += lda;
@@ -312,7 +324,7 @@ matrix to
 		    } else {
 			ioff = izero;
 			i__3 = izero - 1;
-			for (i = 1; i <= i__3; ++i) {
+			for (i__ = 1; i__ <= i__3; ++i__) {
 			    i__4 = ioff;
 			    a[i__4].r = 0., a[i__4].i = 0.;
 			    ioff += lda;
@@ -320,8 +332,8 @@ matrix to
 			}
 			ioff -= izero;
 			i__3 = n;
-			for (i = izero; i <= i__3; ++i) {
-			    i__4 = ioff + i;
+			for (i__ = izero; i__ <= i__3; ++i__) {
+			    i__4 = ioff + i__;
 			    a[i__4].r = 0., a[i__4].i = 0.;
 /* L50: */
 			}
@@ -342,11 +354,10 @@ matrix to
 		    nb = nbval[inb];
 		    xlaenv_(&c__1, &nb);
 
-/*                 Compute the L*L' or U'*U factorization 
-of the matrix. */
+/*                 Compute the L*L' or U'*U factorization of the matrix. */
 
 		    zlacpy_(uplo, &n, &n, &a[1], &lda, &afac[1], &lda);
-		    s_copy(srnamc_1.srnamt, "ZPOTRF", 6L, 6L);
+		    s_copy(srnamc_1.srnamt, "ZPOTRF", (ftnlen)6, (ftnlen)6);
 		    zpotrf_(uplo, &n, &afac[1], &lda, &info);
 
 /*                 Check error code from ZPOTRF. */
@@ -354,29 +365,27 @@ of the matrix. */
 		    if (info != izero) {
 			alaerh_(path, "ZPOTRF", &info, &izero, uplo, &n, &n, &
 				c_n1, &c_n1, &nb, &imat, &nfail, &nerrs, nout);
-			goto L80;
+			goto L90;
 		    }
 
 /*                 Skip the tests if INFO is not 0. */
 
 		    if (info != 0) {
-			goto L80;
+			goto L90;
 		    }
 
 /* +    TEST 1   
-                   Reconstruct matrix from factors and com
-pute residual. */
+                   Reconstruct matrix from factors and compute residual. */
 
 		    zlacpy_(uplo, &n, &n, &afac[1], &lda, &ainv[1], &lda);
 		    zpot01_(uplo, &n, &a[1], &lda, &ainv[1], &lda, &rwork[1], 
 			    result);
 
 /* +    TEST 2   
-                   Form the inverse and compute the residu
-al. */
+                   Form the inverse and compute the residual. */
 
 		    zlacpy_(uplo, &n, &n, &afac[1], &lda, &ainv[1], &lda);
-		    s_copy(srnamc_1.srnamt, "ZPOTRI", 6L, 6L);
+		    s_copy(srnamc_1.srnamt, "ZPOTRI", (ftnlen)6, (ftnlen)6);
 		    zpotri_(uplo, &n, &ainv[1], &lda, &info);
 
 /*                 Check error code from ZPOTRI. */
@@ -390,106 +399,17 @@ al. */
 		    zpot03_(uplo, &n, &a[1], &lda, &ainv[1], &lda, &work[1], &
 			    lda, &rwork[1], &rcondc, &result[1]);
 
-/*                 Skip the rest of the tests unless this 
-is the first   
-                   blocksize. */
-
-		    if (inb != 1) {
-			nt = 2;
-			goto L60;
-		    }
-
-/* +    TEST 3   
-                   Solve and compute residual for A * X = 
-B . */
-
-		    s_copy(srnamc_1.srnamt, "ZLARHS", 6L, 6L);
-		    zlarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, nrhs, &
-			    a[1], &lda, &xact[1], &lda, &b[1], &lda, iseed, &
-			    info);
-		    *(unsigned char *)xtype = 'C';
-		    zlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
-
-		    s_copy(srnamc_1.srnamt, "ZPOTRS", 6L, 6L);
-		    zpotrs_(uplo, &n, nrhs, &afac[1], &lda, &x[1], &lda, &
-			    info);
-
-/*                 Check error code from ZPOTRS. */
-
-		    if (info != 0) {
-			alaerh_(path, "ZPOTRS", &info, &c__0, uplo, &n, &n, &
-				c_n1, &c_n1, nrhs, &imat, &nfail, &nerrs, 
-				nout);
-		    }
-
-		    zlacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda)
-			    ;
-		    zpot02_(uplo, &n, nrhs, &a[1], &lda, &x[1], &lda, &work[1]
-			    , &lda, &rwork[1], &result[2]);
-
-/* +    TEST 4   
-                   Check solution from generated exact sol
-ution. */
-
-		    zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
-			    result[3]);
-
-/* +    TESTS 5, 6, and 7   
-                   Use iterative refinement to improve the
- solution. */
-
-		    s_copy(srnamc_1.srnamt, "ZPORFS", 6L, 6L);
-		    zporfs_(uplo, &n, nrhs, &a[1], &lda, &afac[1], &lda, &b[1]
-			    , &lda, &x[1], &lda, &rwork[1], &rwork[*nrhs + 1],
-			     &work[1], &rwork[(*nrhs << 1) + 1], &info);
-
-/*                 Check error code from ZPORFS. */
-
-		    if (info != 0) {
-			alaerh_(path, "ZPORFS", &info, &c__0, uplo, &n, &n, &
-				c_n1, &c_n1, nrhs, &imat, &nfail, &nerrs, 
-				nout);
-		    }
-
-		    zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
-			    result[4]);
-		    zpot05_(uplo, &n, nrhs, &a[1], &lda, &b[1], &lda, &x[1], &
-			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1],
-			     &result[5]);
-
-/* +    TEST 8   
-                   Get an estimate of RCOND = 1/CNDNUM. */
-
-		    anorm = zlanhe_("1", uplo, &n, &a[1], &lda, &rwork[1]);
-		    s_copy(srnamc_1.srnamt, "ZPOCON", 6L, 6L);
-		    zpocon_(uplo, &n, &afac[1], &lda, &anorm, &rcond, &work[1]
-			    , &rwork[1], &info);
-
-/*                 Check error code from ZPOCON. */
-
-		    if (info != 0) {
-			alaerh_(path, "ZPOCON", &info, &c__0, uplo, &n, &n, &
-				c_n1, &c_n1, &c_n1, &imat, &nfail, &nerrs, 
-				nout);
-		    }
-
-		    result[7] = dget06_(&rcond, &rcondc);
-		    nt = 8;
-
-/*                 Print information about the tests that 
-did not pass   
+/*                 Print information about the tests that did not pass   
                    the threshold. */
 
-L60:
-		    i__4 = nt;
-		    for (k = 1; k <= i__4; ++k) {
+		    for (k = 1; k <= 2; ++k) {
 			if (result[k - 1] >= *thresh) {
 			    if (nfail == 0 && nerrs == 0) {
 				alahd_(nout, path);
 			    }
-			    io___35.ciunit = *nout;
-			    s_wsfe(&io___35);
-			    do_fio(&c__1, uplo, 1L);
+			    io___33.ciunit = *nout;
+			    s_wsfe(&io___33);
+			    do_fio(&c__1, uplo, (ftnlen)1);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&nb, (ftnlen)sizeof(integer)
@@ -503,21 +423,155 @@ L60:
 			    e_wsfe();
 			    ++nfail;
 			}
-/* L70: */
+/* L60: */
 		    }
-		    nrun += nt;
+		    nrun += 2;
 
-L80:
+/*                 Skip the rest of the tests unless this is the first   
+                   blocksize. */
+
+		    if (inb != 1) {
+			goto L90;
+		    }
+
+		    i__4 = *nns;
+		    for (irhs = 1; irhs <= i__4; ++irhs) {
+			nrhs = nsval[irhs];
+
+/* +    TEST 3   
+                   Solve and compute residual for A * X = B . */
+
+			s_copy(srnamc_1.srnamt, "ZLARHS", (ftnlen)6, (ftnlen)
+				6);
+			zlarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, &
+				nrhs, &a[1], &lda, &xact[1], &lda, &b[1], &
+				lda, iseed, &info);
+			zlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
+
+			s_copy(srnamc_1.srnamt, "ZPOTRS", (ftnlen)6, (ftnlen)
+				6);
+			zpotrs_(uplo, &n, &nrhs, &afac[1], &lda, &x[1], &lda, 
+				&info);
+
+/*                 Check error code from ZPOTRS. */
+
+			if (info != 0) {
+			    alaerh_(path, "ZPOTRS", &info, &c__0, uplo, &n, &
+				    n, &c_n1, &c_n1, &nrhs, &imat, &nfail, &
+				    nerrs, nout);
+			}
+
+			zlacpy_("Full", &n, &nrhs, &b[1], &lda, &work[1], &
+				lda);
+			zpot02_(uplo, &n, &nrhs, &a[1], &lda, &x[1], &lda, &
+				work[1], &lda, &rwork[1], &result[2]);
+
+/* +    TEST 4   
+                   Check solution from generated exact solution. */
+
+			zget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
+				rcondc, &result[3]);
+
+/* +    TESTS 5, 6, and 7   
+                   Use iterative refinement to improve the solution. */
+
+			s_copy(srnamc_1.srnamt, "ZPORFS", (ftnlen)6, (ftnlen)
+				6);
+			zporfs_(uplo, &n, &nrhs, &a[1], &lda, &afac[1], &lda, 
+				&b[1], &lda, &x[1], &lda, &rwork[1], &rwork[
+				nrhs + 1], &work[1], &rwork[(nrhs << 1) + 1], 
+				&info);
+
+/*                 Check error code from ZPORFS. */
+
+			if (info != 0) {
+			    alaerh_(path, "ZPORFS", &info, &c__0, uplo, &n, &
+				    n, &c_n1, &c_n1, &nrhs, &imat, &nfail, &
+				    nerrs, nout);
+			}
+
+			zget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
+				rcondc, &result[4]);
+			zpot05_(uplo, &n, &nrhs, &a[1], &lda, &b[1], &lda, &x[
+				1], &lda, &xact[1], &lda, &rwork[1], &rwork[
+				nrhs + 1], &result[5]);
+
+/*                    Print information about the tests that did not pass   
+                      the threshold. */
+
+			for (k = 3; k <= 7; ++k) {
+			    if (result[k - 1] >= *thresh) {
+				if (nfail == 0 && nerrs == 0) {
+				    alahd_(nout, path);
+				}
+				io___36.ciunit = *nout;
+				s_wsfe(&io___36);
+				do_fio(&c__1, uplo, (ftnlen)1);
+				do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
+					integer));
+				do_fio(&c__1, (char *)&nrhs, (ftnlen)sizeof(
+					integer));
+				do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
+					integer));
+				do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
+					integer));
+				do_fio(&c__1, (char *)&result[k - 1], (ftnlen)
+					sizeof(doublereal));
+				e_wsfe();
+				++nfail;
+			    }
+/* L70: */
+			}
+			nrun += 5;
+/* L80: */
+		    }
+
+/* +    TEST 8   
+                   Get an estimate of RCOND = 1/CNDNUM. */
+
+		    anorm = zlanhe_("1", uplo, &n, &a[1], &lda, &rwork[1]);
+		    s_copy(srnamc_1.srnamt, "ZPOCON", (ftnlen)6, (ftnlen)6);
+		    zpocon_(uplo, &n, &afac[1], &lda, &anorm, &rcond, &work[1]
+			    , &rwork[1], &info);
+
+/*                 Check error code from ZPOCON. */
+
+		    if (info != 0) {
+			alaerh_(path, "ZPOCON", &info, &c__0, uplo, &n, &n, &
+				c_n1, &c_n1, &c_n1, &imat, &nfail, &nerrs, 
+				nout);
+		    }
+
+		    result[7] = dget06_(&rcond, &rcondc);
+
+/*                 Print the test ratio if it is .GE. THRESH. */
+
+		    if (result[7] >= *thresh) {
+			if (nfail == 0 && nerrs == 0) {
+			    alahd_(nout, path);
+			}
+			io___38.ciunit = *nout;
+			s_wsfe(&io___38);
+			do_fio(&c__1, uplo, (ftnlen)1);
+			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
+			do_fio(&c__1, (char *)&result[7], (ftnlen)sizeof(
+				doublereal));
+			e_wsfe();
+			++nfail;
+		    }
+		    ++nrun;
+L90:
 		    ;
 		}
-
-L90:
+L100:
 		;
 	    }
-L100:
+L110:
 	    ;
 	}
-/* L110: */
+/* L120: */
     }
 
 /*     Print a summary of the results. */

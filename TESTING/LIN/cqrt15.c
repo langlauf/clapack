@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -56,7 +57,11 @@ static integer c__0 = 0;
     static real smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -65,8 +70,7 @@ static integer c__0 = 0;
     Purpose   
     =======   
 
-    CQRT15 generates a matrix with full or deficient rank and of various 
-  
+    CQRT15 generates a matrix with full or deficient rank and of various   
     norms.   
 
     Arguments   
@@ -123,16 +127,15 @@ static integer c__0 = 0;
             length of work space required.   
             LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --s;
     --iseed;
@@ -188,8 +191,7 @@ L20:
 	}
 	slaord_("Decreasing", rank, &s[1], &c__1);
 
-/*        Generate 'rank' columns of a random orthogonal matrix in A 
-*/
+/*        Generate 'rank' columns of a random orthogonal matrix in A */
 
 	clarnv_(&c__2, &iseed[1], m, &work[1]);
 	r__1 = 1.f / scnrm2_(m, &work[1], &c__1);
@@ -213,13 +215,12 @@ L20:
 
 	i__1 = *rank;
 	for (j = 1; j <= i__1; ++j) {
-	    csscal_(m, &s[j], &a[j * a_dim1 + 1], &c__1);
+	    csscal_(m, &s[j], &a_ref(1, j), &c__1);
 /* L40: */
 	}
 	if (*rank < *n) {
 	    i__1 = *n - *rank;
-	    claset_("Full", m, &i__1, &c_b1, &c_b1, &a[(*rank + 1) * a_dim1 + 
-		    1], lda);
+	    claset_("Full", m, &i__1, &c_b1, &c_b1, &a_ref(1, *rank + 1), lda);
 	}
 	claror_("Right", "No initialization", m, n, &a[a_offset], lda, &iseed[
 		1], &work[1], &info);
@@ -273,11 +274,16 @@ L20:
     }
 
     *norma = sasum_(&mn, &s[1], &c__1);
-    *normb = clange_("One-norm", m, nrhs, &b[b_offset], ldb, dummy);
+    *normb = clange_("One-norm", m, nrhs, &b[b_offset], ldb, dummy)
+	    ;
 
     return 0;
 
 /*     End of CQRT15 */
 
 } /* cqrt15_ */
+
+#undef a_ref
+#undef a_subscr
+
 

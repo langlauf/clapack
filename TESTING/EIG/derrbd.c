@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -42,17 +43,20 @@ static integer c__1 = 1;
 
     /* Local variables */
     static integer info;
-    static doublereal a[16]	/* was [4][4] */, d[4], e[4];
-    static integer i, j;
-    static doublereal u[16]	/* was [4][4] */, v[16]	/* was [4][4] */, w[4]
-	    ;
+    static doublereal a[16]	/* was [4][4] */, d__[4], e[4];
+    static integer i__, j;
+    static doublereal q[16]	/* was [4][4] */, u[16]	/* was [4][4] */, v[
+	    16]	/* was [4][4] */, w[4];
     static char c2[2];
     extern /* Subroutine */ int dgebd2_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, integer *), dgebrd_(integer *, integer *, 
+	     doublereal *, integer *), dbdsdc_(char *, char *, integer *, 
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	     integer *, doublereal *, integer *, doublereal *, integer *, 
+	    integer *), dgebrd_(integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *, integer *);
-    static integer nt;
+    static integer iq[16]	/* was [4][4] */, iw[4], nt;
     static doublereal tp[4], tq[4];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int dbdsqr_(char *, integer *, integer *, integer 
@@ -68,22 +72,25 @@ static integer c__1 = 1;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
-    static cilist io___15 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___16 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___18 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___19 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DERRBD tests the error exits for DGEBRD, DORGBR, DORMBR, and DBDSQR. 
-  
+    DERRBD tests the error exits for DGEBRD, DORGBR, DORMBR, DBDSQR and   
+    DBDSDC.   
 
     Arguments   
     =========   
@@ -94,21 +101,20 @@ static integer c__1 = 1;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 /* L20: */
@@ -122,45 +128,45 @@ static integer c__1 = 1;
 
 /*        DGEBRD */
 
-	s_copy(srnamc_1.srnamt, "DGEBRD", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEBRD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgebrd_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	dgebrd_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("DGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgebrd_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &c__1, &info);
+	dgebrd_(&c__0, &c_n1, a, &c__1, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("DGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dgebrd_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &c__2, &info);
+	dgebrd_(&c__2, &c__1, a, &c__1, d__, e, tq, tp, w, &c__2, &info);
 	chkxer_("DGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dgebrd_(&c__2, &c__1, a, &c__2, d, e, tq, tp, w, &c__1, &info);
+	dgebrd_(&c__2, &c__1, a, &c__2, d__, e, tq, tp, w, &c__1, &info);
 	chkxer_("DGEBRD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 4;
 
 /*        DGEBD2 */
 
-	s_copy(srnamc_1.srnamt, "DGEBD2", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGEBD2", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgebd2_(&c_n1, &c__0, a, &c__1, d, e, tq, tp, w, &info);
+	dgebd2_(&c_n1, &c__0, a, &c__1, d__, e, tq, tp, w, &info);
 	chkxer_("DGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgebd2_(&c__0, &c_n1, a, &c__1, d, e, tq, tp, w, &info);
+	dgebd2_(&c__0, &c_n1, a, &c__1, d__, e, tq, tp, w, &info);
 	chkxer_("DGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dgebd2_(&c__2, &c__1, a, &c__1, d, e, tq, tp, w, &info);
+	dgebd2_(&c__2, &c__1, a, &c__1, d__, e, tq, tp, w, &info);
 	chkxer_("DGEBD2", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 3;
 
 /*        DORGBR */
 
-	s_copy(srnamc_1.srnamt, "DORGBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DORGBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dorgbr_("/", &c__0, &c__0, &c__0, a, &c__1, tq, w, &c__1, &info);
 	chkxer_("DORGBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -205,7 +211,7 @@ static integer c__1 = 1;
 
 /*        DORMBR */
 
-	s_copy(srnamc_1.srnamt, "DORMBR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DORMBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dormbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
 		 &c__1, &info);
@@ -275,62 +281,92 @@ static integer c__1 = 1;
 
 /*        DBDSQR */
 
-	s_copy(srnamc_1.srnamt, "DBDSQR", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DBDSQR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("/", &c__0, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c_n1, &c__0, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__0, &c_n1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__0, &c__0, &c_n1, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__0, &c__0, &c__0, &c_n1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	dbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__2, &c__1, &c__0, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__0, &c__0, &c__2, &c__0, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d, e, v, &c__1, u, &c__1, a, 
-		&c__1, w, &info);
+	dbdsqr_("U", &c__2, &c__0, &c__0, &c__1, d__, e, v, &c__1, u, &c__1, 
+		a, &c__1, w, &info);
 	chkxer_("DBDSQR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 8;
+
+/*        DBDSDC */
+
+	s_copy(srnamc_1.srnamt, "DBDSDC", (ftnlen)6, (ftnlen)6);
+	infoc_1.infot = 1;
+	dbdsdc_("/", "N", &c__0, d__, e, u, &c__1, v, &c__1, q, iq, w, iw, &
+		info);
+	chkxer_("DBDSDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 2;
+	dbdsdc_("U", "/", &c__0, d__, e, u, &c__1, v, &c__1, q, iq, w, iw, &
+		info);
+	chkxer_("DBDSDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 3;
+	dbdsdc_("U", "N", &c_n1, d__, e, u, &c__1, v, &c__1, q, iq, w, iw, &
+		info);
+	chkxer_("DBDSDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 7;
+	dbdsdc_("U", "I", &c__2, d__, e, u, &c__1, v, &c__1, q, iq, w, iw, &
+		info);
+	chkxer_("DBDSDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	infoc_1.infot = 9;
+	dbdsdc_("U", "I", &c__2, d__, e, u, &c__2, v, &c__1, q, iq, w, iw, &
+		info);
+	chkxer_("DBDSDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
+		infoc_1.ok);
+	nt += 5;
     }
 
 /*     Print a summary line. */
 
     if (infoc_1.ok) {
-	io___15.ciunit = infoc_1.nout;
-	s_wsfe(&io___15);
-	do_fio(&c__1, path, 3L);
+	io___18.ciunit = infoc_1.nout;
+	s_wsfe(&io___18);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
-	io___16.ciunit = infoc_1.nout;
-	s_wsfe(&io___16);
-	do_fio(&c__1, path, 3L);
+	io___19.ciunit = infoc_1.nout;
+	s_wsfe(&io___19);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -340,4 +376,7 @@ static integer c__1 = 1;
 /*     End of DERRBD */
 
 } /* derrbd_ */
+
+#undef a_ref
+
 

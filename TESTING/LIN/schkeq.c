@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -42,10 +43,10 @@ static integer c__1 = 1;
     /* Local variables */
     static integer info;
     static char path[3];
-    static real norm, rpow[11], a[25]	/* was [5][5] */, c[5];
-    static integer i, j, m, n;
-    static real r[5], ccond, rcond, rcmin, rcmax, ratio, ab[65]	/* was [13][5]
-	     */, ap[15];
+    static real norm, rpow[11], a[25]	/* was [5][5] */, c__[5];
+    static integer i__, j, m, n;
+    static real r__[5], ccond, rcond, rcmin, rcmax, ratio, ab[65]	/* 
+	    was [13][5] */, ap[15];
     static integer kl;
     static logical ok;
     static integer ku;
@@ -73,7 +74,11 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*5 + a_1 - 6]
+#define ab_ref(a_1,a_2) ab[(a_2)*13 + a_1 - 14]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -93,22 +98,21 @@ static integer c__1 = 1;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "EQ", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "EQ", (ftnlen)2, (ftnlen)2);
 
     eps = slamch_("P");
-    for (i = 1; i <= 5; ++i) {
-	reslts[i - 1] = 0.f;
+    for (i__ = 1; i__ <= 5; ++i__) {
+	reslts[i__ - 1] = 0.f;
 /* L10: */
     }
-    for (i = 1; i <= 11; ++i) {
-	i__1 = i - 1;
-	pow[i - 1] = pow_ri(&c_b7, &i__1);
-	rpow[i - 1] = 1.f / pow[i - 1];
+    for (i__ = 1; i__ <= 11; ++i__) {
+	i__1 = i__ - 1;
+	pow[i__ - 1] = pow_ri(&c_b7, &i__1);
+	rpow[i__ - 1] = 1.f / pow[i__ - 1];
 /* L20: */
     }
 
@@ -118,19 +122,19 @@ static integer c__1 = 1;
 	for (m = 0; m <= 5; ++m) {
 
 	    for (j = 1; j <= 5; ++j) {
-		for (i = 1; i <= 5; ++i) {
-		    if (i <= m && j <= n) {
-			i__1 = i + j;
-			a[i + j * 5 - 6] = pow[i + j] * pow_ii(&c_n1, &i__1);
+		for (i__ = 1; i__ <= 5; ++i__) {
+		    if (i__ <= m && j <= n) {
+			i__1 = i__ + j;
+			a_ref(i__, j) = pow[i__ + j] * pow_ii(&c_n1, &i__1);
 		    } else {
-			a[i + j * 5 - 6] = 0.f;
+			a_ref(i__, j) = 0.f;
 		    }
 /* L30: */
 		}
 /* L40: */
 	    }
 
-	    sgeequ_(&m, &n, a, &c__5, r, c, &rcond, &ccond, &norm, &info);
+	    sgeequ_(&m, &n, a, &c__5, r__, c__, &rcond, &ccond, &norm, &info);
 
 	    if (info != 0) {
 		reslts[0] = 1.f;
@@ -149,18 +153,18 @@ static integer c__1 = 1;
 			    pow[n + m], dabs(r__1));
 		    reslts[0] = dmax(r__2,r__3);
 		    i__1 = m;
-		    for (i = 1; i <= i__1; ++i) {
+		    for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-			r__2 = reslts[0], r__3 = (r__1 = (r[i - 1] - rpow[i + 
-				n]) / rpow[i + n], dabs(r__1));
+			r__2 = reslts[0], r__3 = (r__1 = (r__[i__ - 1] - rpow[
+				i__ + n]) / rpow[i__ + n], dabs(r__1));
 			reslts[0] = dmax(r__2,r__3);
 /* L50: */
 		    }
 		    i__1 = n;
 		    for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-			r__2 = reslts[0], r__3 = (r__1 = (c[j - 1] - pow[n - 
-				j]) / pow[n - j], dabs(r__1));
+			r__2 = reslts[0], r__3 = (r__1 = (c__[j - 1] - pow[n 
+				- j]) / pow[n - j], dabs(r__1));
 			reslts[0] = dmax(r__2,r__3);
 /* L60: */
 		    }
@@ -175,23 +179,23 @@ static integer c__1 = 1;
 /*     Test with zero rows and columns */
 
     for (j = 1; j <= 5; ++j) {
-	a[4 + j * 5 - 6] = 0.f;
+	a_ref(4, j) = 0.f;
 /* L90: */
     }
-    sgeequ_(&c__5, &c__5, a, &c__5, r, c, &rcond, &ccond, &norm, &info);
+    sgeequ_(&c__5, &c__5, a, &c__5, r__, c__, &rcond, &ccond, &norm, &info);
     if (info != 4) {
 	reslts[0] = 1.f;
     }
 
     for (j = 1; j <= 5; ++j) {
-	a[4 + j * 5 - 6] = 1.f;
+	a_ref(4, j) = 1.f;
 /* L100: */
     }
-    for (i = 1; i <= 5; ++i) {
-	a[i + 20 - 6] = 0.f;
+    for (i__ = 1; i__ <= 5; ++i__) {
+	a_ref(i__, 4) = 0.f;
 /* L110: */
     }
-    sgeequ_(&c__5, &c__5, a, &c__5, r, c, &rcond, &ccond, &norm, &info);
+    sgeequ_(&c__5, &c__5, a, &c__5, r__, c__, &rcond, &ccond, &norm, &info);
     if (info != 9) {
 	reslts[0] = 1.f;
     }
@@ -211,8 +215,8 @@ static integer c__1 = 1;
 		for (ku = 0; ku <= i__2; ++ku) {
 
 		    for (j = 1; j <= 5; ++j) {
-			for (i = 1; i <= 13; ++i) {
-			    ab[i + j * 13 - 14] = 0.f;
+			for (i__ = 1; i__ <= 13; ++i__) {
+			    ab_ref(i__, j) = 0.f;
 /* L120: */
 			}
 /* L130: */
@@ -220,23 +224,23 @@ static integer c__1 = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = m;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 /* Computing MIN */
 			    i__5 = m, i__6 = j + kl;
 /* Computing MAX */
 			    i__7 = 1, i__8 = j - ku;
-			    if (i <= min(i__5,i__6) && i >= max(i__7,i__8) && 
-				    j <= n) {
-				i__5 = i + j;
-				ab[ku + 1 + i - j + j * 13 - 14] = pow[i + j] 
-					* pow_ii(&c_n1, &i__5);
+			    if (i__ <= min(i__5,i__6) && i__ >= max(i__7,i__8)
+				     && j <= n) {
+				i__5 = i__ + j;
+				ab_ref(ku + 1 + i__ - j, j) = pow[i__ + j] * 
+					pow_ii(&c_n1, &i__5);
 			    }
 /* L140: */
 			}
 /* L150: */
 		    }
 
-		    sgbequ_(&m, &n, &kl, &ku, ab, &c__13, r, c, &rcond, &
+		    sgbequ_(&m, &n, &kl, &ku, ab, &c__13, r__, c__, &rcond, &
 			    ccond, &norm, &info);
 
 		    if (info != 0) {
@@ -247,15 +251,15 @@ static integer c__1 = 1;
 		    } else {
 			if (n != 0 && m != 0) {
 
-			    rcmin = r[0];
-			    rcmax = r[0];
+			    rcmin = r__[0];
+			    rcmax = r__[0];
 			    i__3 = m;
-			    for (i = 1; i <= i__3; ++i) {
+			    for (i__ = 1; i__ <= i__3; ++i__) {
 /* Computing MIN */
-				r__1 = rcmin, r__2 = r[i - 1];
+				r__1 = rcmin, r__2 = r__[i__ - 1];
 				rcmin = dmin(r__1,r__2);
 /* Computing MAX */
-				r__1 = rcmax, r__2 = r[i - 1];
+				r__1 = rcmax, r__2 = r__[i__ - 1];
 				rcmax = dmax(r__1,r__2);
 /* L160: */
 			    }
@@ -265,15 +269,15 @@ static integer c__1 = 1;
 				     ratio, dabs(r__1));
 			    reslts[1] = dmax(r__2,r__3);
 
-			    rcmin = c[0];
-			    rcmax = c[0];
+			    rcmin = c__[0];
+			    rcmax = c__[0];
 			    i__3 = n;
 			    for (j = 1; j <= i__3; ++j) {
 /* Computing MIN */
-				r__1 = rcmin, r__2 = c[j - 1];
+				r__1 = rcmin, r__2 = c__[j - 1];
 				rcmin = dmin(r__1,r__2);
 /* Computing MAX */
-				r__1 = rcmax, r__2 = c[j - 1];
+				r__1 = rcmax, r__2 = c__[j - 1];
 				rcmax = dmax(r__1,r__2);
 /* L170: */
 			    }
@@ -288,13 +292,14 @@ static integer c__1 = 1;
 				    m]) / pow[n + m], dabs(r__1));
 			    reslts[1] = dmax(r__2,r__3);
 			    i__3 = m;
-			    for (i = 1; i <= i__3; ++i) {
+			    for (i__ = 1; i__ <= i__3; ++i__) {
 				rcmax = 0.f;
 				i__4 = n;
 				for (j = 1; j <= i__4; ++j) {
-				    if (i <= j + kl && i >= j - ku) {
-					ratio = (r__1 = r[i - 1] * pow[i + j] 
-						* c[j - 1], dabs(r__1));
+				    if (i__ <= j + kl && i__ >= j - ku) {
+					ratio = (r__1 = r__[i__ - 1] * pow[
+						i__ + j] * c__[j - 1], dabs(
+						r__1));
 					rcmax = dmax(rcmax,ratio);
 				    }
 /* L180: */
@@ -310,10 +315,11 @@ static integer c__1 = 1;
 			    for (j = 1; j <= i__3; ++j) {
 				rcmax = 0.f;
 				i__4 = m;
-				for (i = 1; i <= i__4; ++i) {
-				    if (i <= j + kl && i >= j - ku) {
-					ratio = (r__1 = r[i - 1] * pow[i + j] 
-						* c[j - 1], dabs(r__1));
+				for (i__ = 1; i__ <= i__4; ++i__) {
+				    if (i__ <= j + kl && i__ >= j - ku) {
+					ratio = (r__1 = r__[i__ - 1] * pow[
+						i__ + j] * c__[j - 1], dabs(
+						r__1));
 					rcmax = dmax(rcmax,ratio);
 				    }
 /* L200: */
@@ -341,20 +347,20 @@ static integer c__1 = 1;
 
     for (n = 0; n <= 5; ++n) {
 
-	for (i = 1; i <= 5; ++i) {
+	for (i__ = 1; i__ <= 5; ++i__) {
 	    for (j = 1; j <= 5; ++j) {
-		if (i <= n && j == i) {
-		    i__1 = i + j;
-		    a[i + j * 5 - 6] = pow[i + j] * pow_ii(&c_n1, &i__1);
+		if (i__ <= n && j == i__) {
+		    i__1 = i__ + j;
+		    a_ref(i__, j) = pow[i__ + j] * pow_ii(&c_n1, &i__1);
 		} else {
-		    a[i + j * 5 - 6] = 0.f;
+		    a_ref(i__, j) = 0.f;
 		}
 /* L260: */
 	    }
 /* L270: */
 	}
 
-	spoequ_(&n, a, &c__5, r, &rcond, &norm, &info);
+	spoequ_(&n, a, &c__5, r__, &rcond, &norm, &info);
 
 	if (info != 0) {
 	    reslts[2] = 1.f;
@@ -369,10 +375,10 @@ static integer c__1 = 1;
 			 2], dabs(r__1));
 		reslts[2] = dmax(r__2,r__3);
 		i__1 = n;
-		for (i = 1; i <= i__1; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		    r__2 = reslts[2], r__3 = (r__1 = (r[i - 1] - rpow[i]) / 
-			    rpow[i], dabs(r__1));
+		    r__2 = reslts[2], r__3 = (r__1 = (r__[i__ - 1] - rpow[i__]
+			    ) / rpow[i__], dabs(r__1));
 		    reslts[2] = dmax(r__2,r__3);
 /* L280: */
 		}
@@ -380,8 +386,8 @@ static integer c__1 = 1;
 	}
 /* L290: */
     }
-    a[18] = -1.f;
-    spoequ_(&c__5, a, &c__5, r, &rcond, &norm, &info);
+    a_ref(4, 4) = -1.f;
+    spoequ_(&c__5, a, &c__5, r__, &rcond, &norm, &info);
     if (info != 4) {
 	reslts[2] = 1.f;
     }
@@ -394,17 +400,17 @@ static integer c__1 = 1;
 /*        Upper triangular packed storage */
 
 	i__1 = n * (n + 1) / 2;
-	for (i = 1; i <= i__1; ++i) {
-	    ap[i - 1] = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ap[i__ - 1] = 0.f;
 /* L300: */
 	}
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    ap[i * (i + 1) / 2 - 1] = pow[i * 2];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ap[i__ * (i__ + 1) / 2 - 1] = pow[i__ * 2];
 /* L310: */
 	}
 
-	sppequ_("U", &n, ap, r, &rcond, &norm, &info);
+	sppequ_("U", &n, ap, r__, &rcond, &norm, &info);
 
 	if (info != 0) {
 	    reslts[3] = 1.f;
@@ -419,10 +425,10 @@ static integer c__1 = 1;
 			 2], dabs(r__1));
 		reslts[3] = dmax(r__2,r__3);
 		i__1 = n;
-		for (i = 1; i <= i__1; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		    r__2 = reslts[3], r__3 = (r__1 = (r[i - 1] - rpow[i]) / 
-			    rpow[i], dabs(r__1));
+		    r__2 = reslts[3], r__3 = (r__1 = (r__[i__ - 1] - rpow[i__]
+			    ) / rpow[i__], dabs(r__1));
 		    reslts[3] = dmax(r__2,r__3);
 /* L320: */
 		}
@@ -432,19 +438,19 @@ static integer c__1 = 1;
 /*        Lower triangular packed storage */
 
 	i__1 = n * (n + 1) / 2;
-	for (i = 1; i <= i__1; ++i) {
-	    ap[i - 1] = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ap[i__ - 1] = 0.f;
 /* L330: */
 	}
 	j = 1;
 	i__1 = n;
-	for (i = 1; i <= i__1; ++i) {
-	    ap[j - 1] = pow[i * 2];
-	    j += n - i + 1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    ap[j - 1] = pow[i__ * 2];
+	    j += n - i__ + 1;
 /* L340: */
 	}
 
-	sppequ_("L", &n, ap, r, &rcond, &norm, &info);
+	sppequ_("L", &n, ap, r__, &rcond, &norm, &info);
 
 	if (info != 0) {
 	    reslts[3] = 1.f;
@@ -459,10 +465,10 @@ static integer c__1 = 1;
 			 2], dabs(r__1));
 		reslts[3] = dmax(r__2,r__3);
 		i__1 = n;
-		for (i = 1; i <= i__1; ++i) {
+		for (i__ = 1; i__ <= i__1; ++i__) {
 /* Computing MAX */
-		    r__2 = reslts[3], r__3 = (r__1 = (r[i - 1] - rpow[i]) / 
-			    rpow[i], dabs(r__1));
+		    r__2 = reslts[3], r__3 = (r__1 = (r__[i__ - 1] - rpow[i__]
+			    ) / rpow[i__], dabs(r__1));
 		    reslts[3] = dmax(r__2,r__3);
 /* L350: */
 		}
@@ -471,9 +477,9 @@ static integer c__1 = 1;
 
 /* L360: */
     }
-    i = 13;
-    ap[i - 1] = -1.f;
-    sppequ_("L", &c__5, ap, r, &rcond, &norm, &info);
+    i__ = 13;
+    ap[i__ - 1] = -1.f;
+    sppequ_("L", &c__5, ap, r__, &rcond, &norm, &info);
     if (info != 4) {
 	reslts[3] = 1.f;
     }
@@ -490,19 +496,19 @@ static integer c__1 = 1;
 /*           Test upper triangular storage */
 
 	    for (j = 1; j <= 5; ++j) {
-		for (i = 1; i <= 13; ++i) {
-		    ab[i + j * 13 - 14] = 0.f;
+		for (i__ = 1; i__ <= 13; ++i__) {
+		    ab_ref(i__, j) = 0.f;
 /* L370: */
 		}
 /* L380: */
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		ab[kl + 1 + j * 13 - 14] = pow[j * 2];
+		ab_ref(kl + 1, j) = pow[j * 2];
 /* L390: */
 	    }
 
-	    spbequ_("U", &n, &kl, ab, &c__13, r, &rcond, &norm, &info);
+	    spbequ_("U", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 
 	    if (info != 0) {
 		reslts[4] = 1.f;
@@ -517,10 +523,10 @@ static integer c__1 = 1;
 			    pow[n * 2], dabs(r__1));
 		    reslts[4] = dmax(r__2,r__3);
 		    i__2 = n;
-		    for (i = 1; i <= i__2; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = reslts[4], r__3 = (r__1 = (r[i - 1] - rpow[i]) 
-				/ rpow[i], dabs(r__1));
+			r__2 = reslts[4], r__3 = (r__1 = (r__[i__ - 1] - rpow[
+				i__]) / rpow[i__], dabs(r__1));
 			reslts[4] = dmax(r__2,r__3);
 /* L400: */
 		    }
@@ -529,9 +535,8 @@ static integer c__1 = 1;
 	    if (n != 0) {
 /* Computing MAX */
 		i__2 = n - 1;
-		ab[kl + 1 + max(i__2,1) * 13 - 14] = -1.f;
-		spbequ_("U", &n, &kl, ab, &c__13, r, &rcond, &norm, &info)
-			;
+		ab_ref(kl + 1, max(i__2,1)) = -1.f;
+		spbequ_("U", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
 		if (info != max(i__2,1)) {
@@ -542,19 +547,19 @@ static integer c__1 = 1;
 /*           Test lower triangular storage */
 
 	    for (j = 1; j <= 5; ++j) {
-		for (i = 1; i <= 13; ++i) {
-		    ab[i + j * 13 - 14] = 0.f;
+		for (i__ = 1; i__ <= 13; ++i__) {
+		    ab_ref(i__, j) = 0.f;
 /* L410: */
 		}
 /* L420: */
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		ab[j * 13 - 13] = pow[j * 2];
+		ab_ref(1, j) = pow[j * 2];
 /* L430: */
 	    }
 
-	    spbequ_("L", &n, &kl, ab, &c__13, r, &rcond, &norm, &info);
+	    spbequ_("L", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 
 	    if (info != 0) {
 		reslts[4] = 1.f;
@@ -569,10 +574,10 @@ static integer c__1 = 1;
 			    pow[n * 2], dabs(r__1));
 		    reslts[4] = dmax(r__2,r__3);
 		    i__2 = n;
-		    for (i = 1; i <= i__2; ++i) {
+		    for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-			r__2 = reslts[4], r__3 = (r__1 = (r[i - 1] - rpow[i]) 
-				/ rpow[i], dabs(r__1));
+			r__2 = reslts[4], r__3 = (r__1 = (r__[i__ - 1] - rpow[
+				i__]) / rpow[i__], dabs(r__1));
 			reslts[4] = dmax(r__2,r__3);
 /* L440: */
 		    }
@@ -581,9 +586,8 @@ static integer c__1 = 1;
 	    if (n != 0) {
 /* Computing MAX */
 		i__2 = n - 1;
-		ab[max(i__2,1) * 13 - 13] = -1.f;
-		spbequ_("L", &n, &kl, ab, &c__13, r, &rcond, &norm, &info)
-			;
+		ab_ref(1, max(i__2,1)) = -1.f;
+		spbequ_("L", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
 		if (info != max(i__2,1)) {
@@ -603,7 +607,7 @@ static integer c__1 = 1;
     if (ok) {
 	io___26.ciunit = *nout;
 	s_wsfe(&io___26);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else {
 	if (reslts[0] > *thresh) {
@@ -647,4 +651,8 @@ static integer c__1 = 1;
 /*     End of SCHKEQ */
 
 } /* schkeq_ */
+
+#undef ab_ref
+#undef a_ref
+
 

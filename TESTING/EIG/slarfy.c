@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static real c_b3 = 0.f;
 static integer c__1 = 1;
 
 /* Subroutine */ int slarfy_(char *uplo, integer *n, real *v, integer *incv, 
-	real *tau, real *c, integer *ldc, real *work)
+	real *tau, real *c__, integer *ldc, real *work)
 {
     /* System generated locals */
     integer c_dim1, c_offset;
@@ -28,7 +29,7 @@ static integer c__1 = 1;
 	    integer *, real *, integer *, real *, real *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -80,15 +81,14 @@ static integer c__1 = 1;
 
     WORK    (workspace) REAL array, dimension (N)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --work;
 
     /* Function Body */
@@ -98,16 +98,16 @@ static integer c__1 = 1;
 
 /*     Form  w:= C * v */
 
-    ssymv_(uplo, n, &c_b2, &c[c_offset], ldc, &v[1], incv, &c_b3, &work[1], &
-	    c__1);
+    ssymv_(uplo, n, &c_b2, &c__[c_offset], ldc, &v[1], incv, &c_b3, &work[1], 
+	    &c__1);
 
     alpha = *tau * -.5f * sdot_(n, &work[1], &c__1, &v[1], incv);
     saxpy_(n, &alpha, &v[1], incv, &work[1], &c__1);
 
 /*     C := C - v * w' - w * v' */
 
-    r__1 = -(doublereal)(*tau);
-    ssyr2_(uplo, n, &r__1, &v[1], incv, &work[1], &c__1, &c[c_offset], ldc);
+    r__1 = -(*tau);
+    ssyr2_(uplo, n, &r__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], ldc);
 
     return 0;
 

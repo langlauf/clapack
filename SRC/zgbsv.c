@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgbsv_(integer *n, integer *kl, integer *ku, integer *
 	nrhs, doublecomplex *ab, integer *ldab, integer *ipiv, doublecomplex *
 	b, integer *ldb, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -34,8 +35,7 @@
             The number of subdiagonals within the band of A.  KL >= 0.   
 
     KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0. 
-  
+            The number of superdiagonals within the band of A.  KU >= 0.   
 
     NRHS    (input) INTEGER   
             The number of right hand sides, i.e., the number of columns   
@@ -70,16 +70,14 @@
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, U(i,i) is exactly zero.  The factorization 
-  
+            > 0:  if INFO = i, U(i,i) is exactly zero.  The factorization   
                   has been completed, but the factor U is exactly   
                   singular, and the solution has not been computed.   
 
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     M = N = 6, KL = 2, KU = 1:   
 
     On entry:                       On exit:   
@@ -91,22 +89,16 @@
        a21  a32  a43  a54  a65   *      m21  m32  m43  m54  m65   *   
        a31  a42  a53  a64   *    *      m31  m42  m53  m64   *    *   
 
-    Array elements marked * are not used by the routine; elements marked 
-  
-    + need not be set on entry, but are required by the routine to store 
-  
-    elements of U because of fill-in resulting from the row interchanges. 
-  
+    Array elements marked * are not used by the routine; elements marked   
+    + need not be set on entry, but are required by the routine to store   
+    elements of U because of fill-in resulting from the row interchanges.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, b_dim1, b_offset, i__1;
     /* Local variables */
@@ -116,12 +108,15 @@
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
 	    integer *, doublecomplex *, integer *, integer *);
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define IPIV(I) ipiv[(I)-1]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     if (*n < 0) {
 	*info = -1;
@@ -144,13 +139,13 @@
 
 /*     Compute the LU factorization of the band matrix A. */
 
-    zgbtrf_(n, n, kl, ku, &AB(1,1), ldab, &IPIV(1), info);
+    zgbtrf_(n, n, kl, ku, &ab[ab_offset], ldab, &ipiv[1], info);
     if (*info == 0) {
 
 /*        Solve the system A*X = B, overwriting B with X. */
 
-	zgbtrs_("No transpose", n, kl, ku, nrhs, &AB(1,1), ldab, &IPIV(
-		1), &B(1,1), ldb, info);
+	zgbtrs_("No transpose", n, kl, ku, nrhs, &ab[ab_offset], ldab, &ipiv[
+		1], &b[b_offset], ldb, info);
     }
     return 0;
 

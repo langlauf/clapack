@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dpbtrf_(char *uplo, integer *n, integer *kd, doublereal *
 	ab, integer *ldab, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -37,13 +38,10 @@
     AB      (input/output) DOUBLE PRECISION array, dimension (LDAB,N)   
             On entry, the upper or lower triangle of the symmetric band   
             matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB 
-  
+            j-th column of A is stored in the j-th column of the array AB   
             as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; 
-  
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). 
-  
+            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
+            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
 
             On exit, if INFO = 0, the triangular factor U or L from the   
             Cholesky factorization A = U**T*U or A = L*L**T of the band   
@@ -62,8 +60,7 @@
     Further Details   
     ===============   
 
-    The band storage scheme is illustrated by the following example, when 
-  
+    The band storage scheme is illustrated by the following example, when   
     N = 6, KD = 2, and UPLO = 'U':   
 
     On entry:                       On exit:   
@@ -85,15 +82,12 @@
     Contributed by   
     Peter Mayes and Giuseppe Radicati, IBM ECSEC, Rome, March 23, 1989   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -105,7 +99,7 @@
     integer ab_dim1, ab_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
     static doublereal work[1056]	/* was [33][32] */;
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
@@ -123,14 +117,15 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
+#define work_ref(a_1,a_2) work[(a_2)*33 + a_1 - 34]
+#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
 
 
+    ab_dim1 = *ldab;
+    ab_offset = 1 + ab_dim1 * 1;
+    ab -= ab_offset;
 
-#define WORK(I) work[(I)]
-#define WAS(I) was[(I)]
-
-#define AB(I,J) ab[(I)-1 + ((J)-1)* ( *ldab)]
-
+    /* Function Body */
     *info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
 	*info = -1;
@@ -155,10 +150,10 @@
 
 /*     Determine the block size for this environment */
 
-    nb = ilaenv_(&c__1, "DPBTRF", uplo, n, kd, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "DPBTRF", uplo, n, kd, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
 
-/*     The block size must not exceed the semi-bandwidth KD, and must not 
-  
+/*     The block size must not exceed the semi-bandwidth KD, and must not   
        exceed the limit set by the size of the local array WORK. */
 
     nb = min(nb,32);
@@ -167,77 +162,67 @@
 
 /*        Use unblocked code */
 
-	dpbtf2_(uplo, n, kd, &AB(1,1), ldab, info);
+	dpbtf2_(uplo, n, kd, &ab[ab_offset], ldab, info);
     } else {
 
 /*        Use blocked code */
 
 	if (lsame_(uplo, "U")) {
 
-/*           Compute the Cholesky factorization of a symmetric ban
-d   
-             matrix, given the upper triangle of the matrix in ban
-d   
+/*           Compute the Cholesky factorization of a symmetric band   
+             matrix, given the upper triangle of the matrix in band   
              storage.   
 
              Zero the upper triangle of the work array. */
 
 	    i__1 = nb;
-	    for (j = 1; j <= nb; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
-		for (i = 1; i <= j-1; ++i) {
-		    WORK(i + j * 33 - 34) = 0.;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    work_ref(i__, j) = 0.;
 /* L10: */
 		}
 /* L20: */
 	    }
 
-/*           Process the band matrix one diagonal block at a time.
- */
+/*           Process the band matrix one diagonal block at a time. */
 
 	    i__1 = *n;
 	    i__2 = nb;
-	    for (i = 1; nb < 0 ? i >= *n : i <= *n; i += nb) {
+	    for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 /* Computing MIN */
-		i__3 = nb, i__4 = *n - i + 1;
+		i__3 = nb, i__4 = *n - i__ + 1;
 		ib = min(i__3,i__4);
 
 /*              Factorize the diagonal block */
 
 		i__3 = *ldab - 1;
-		dpotf2_(uplo, &ib, &AB(*kd+1,i), &i__3, &ii)
-			;
+		dpotf2_(uplo, &ib, &ab_ref(*kd + 1, i__), &i__3, &ii);
 		if (ii != 0) {
-		    *info = i + ii - 1;
+		    *info = i__ + ii - 1;
 		    goto L150;
 		}
-		if (i + ib <= *n) {
+		if (i__ + ib <= *n) {
 
-/*                 Update the relevant part of the trailin
-g submatrix.   
-                   If A11 denotes the diagonal block which
- has just been   
-                   factorized, then we need to update the 
-remaining   
+/*                 Update the relevant part of the trailing submatrix.   
+                   If A11 denotes the diagonal block which has just been   
+                   factorized, then we need to update the remaining   
                    blocks in the diagram:   
 
                       A11   A12   A13   
                             A22   A23   
                                   A33   
 
-                   The numbers of rows and columns in the 
-partitioning   
-                   are IB, I2, I3 respectively. The blocks
- A12, A22 and   
-                   A23 are empty if IB = KD. The upper tri
-angle of A13   
+                   The numbers of rows and columns in the partitioning   
+                   are IB, I2, I3 respectively. The blocks A12, A22 and   
+                   A23 are empty if IB = KD. The upper triangle of A13   
                    lies outside the band.   
 
    Computing MIN */
-		    i__3 = *kd - ib, i__4 = *n - i - ib + 1;
+		    i__3 = *kd - ib, i__4 = *n - i__ - ib + 1;
 		    i2 = min(i__3,i__4);
 /* Computing MIN */
-		    i__3 = ib, i__4 = *n - i - *kd + 1;
+		    i__3 = ib, i__4 = *n - i__ - *kd + 1;
 		    i3 = min(i__3,i__4);
 
 		    if (i2 > 0) {
@@ -247,41 +232,39 @@ angle of A13
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
 			dtrsm_("Left", "Upper", "Transpose", "Non-unit", &ib, 
-				&i2, &c_b18, &AB(*kd+1,i), &
-				i__3, &AB(*kd+1-ib,i+ib), 
-				&i__4);
+				&i2, &c_b18, &ab_ref(*kd + 1, i__), &i__3, &
+				ab_ref(*kd + 1 - ib, i__ + ib), &i__4);
 
 /*                    Update A22 */
 
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
-			dsyrk_("Upper", "Transpose", &i2, &ib, &c_b21, &AB(*kd+1-ib,i+ib), &i__3, &
-				c_b18, &AB(*kd+1,i+ib), &
-				i__4);
+			dsyrk_("Upper", "Transpose", &i2, &ib, &c_b21, &
+				ab_ref(*kd + 1 - ib, i__ + ib), &i__3, &c_b18,
+				 &ab_ref(*kd + 1, i__ + ib), &i__4);
 		    }
 
 		    if (i3 > 0) {
 
-/*                    Copy the lower triangle of A13 i
-nto the work array. */
+/*                    Copy the lower triangle of A13 into the work array. */
 
 			i__3 = i3;
-			for (jj = 1; jj <= i3; ++jj) {
+			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = ib;
-			    for (ii = jj; ii <= ib; ++ii) {
-				WORK(ii + jj * 33 - 34) = AB(ii-jj+1,jj+i+*kd-1);
+			    for (ii = jj; ii <= i__4; ++ii) {
+				work_ref(ii, jj) = ab_ref(ii - jj + 1, jj + 
+					i__ + *kd - 1);
 /* L30: */
 			    }
 /* L40: */
 			}
 
-/*                    Update A13 (in the work array). 
-*/
+/*                    Update A13 (in the work array). */
 
 			i__3 = *ldab - 1;
 			dtrsm_("Left", "Upper", "Transpose", "Non-unit", &ib, 
-				&i3, &c_b18, &AB(*kd+1,i), &
-				i__3, work, &c__33);
+				&i3, &c_b18, &ab_ref(*kd + 1, i__), &i__3, 
+				work, &c__33);
 
 /*                    Update A23 */
 
@@ -289,25 +272,26 @@ nto the work array. */
 			    i__3 = *ldab - 1;
 			    i__4 = *ldab - 1;
 			    dgemm_("Transpose", "No Transpose", &i2, &i3, &ib,
-				     &c_b21, &AB(*kd+1-ib,i+ib), &i__3, work, &c__33, &c_b18, &
-				    AB(ib+1,i+*kd), &i__4);
+				     &c_b21, &ab_ref(*kd + 1 - ib, i__ + ib), 
+				    &i__3, work, &c__33, &c_b18, &ab_ref(ib + 
+				    1, i__ + *kd), &i__4);
 			}
 
 /*                    Update A33 */
 
 			i__3 = *ldab - 1;
 			dsyrk_("Upper", "Transpose", &i3, &ib, &c_b21, work, &
-				c__33, &c_b18, &AB(*kd+1,i+*kd), &i__3);
+				c__33, &c_b18, &ab_ref(*kd + 1, i__ + *kd), &
+				i__3);
 
-/*                    Copy the lower triangle of A13 b
-ack into place. */
+/*                    Copy the lower triangle of A13 back into place. */
 
 			i__3 = i3;
-			for (jj = 1; jj <= i3; ++jj) {
+			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = ib;
-			    for (ii = jj; ii <= ib; ++ii) {
-				AB(ii-jj+1,jj+i+*kd-1)
-					 = WORK(ii + jj * 33 - 34);
+			    for (ii = jj; ii <= i__4; ++ii) {
+				ab_ref(ii - jj + 1, jj + i__ + *kd - 1) = 
+					work_ref(ii, jj);
 /* L50: */
 			    }
 /* L60: */
@@ -318,69 +302,60 @@ ack into place. */
 	    }
 	} else {
 
-/*           Compute the Cholesky factorization of a symmetric ban
-d   
-             matrix, given the lower triangle of the matrix in ban
-d   
+/*           Compute the Cholesky factorization of a symmetric band   
+             matrix, given the lower triangle of the matrix in band   
              storage.   
 
              Zero the lower triangle of the work array. */
 
 	    i__2 = nb;
-	    for (j = 1; j <= nb; ++j) {
+	    for (j = 1; j <= i__2; ++j) {
 		i__1 = nb;
-		for (i = j + 1; i <= nb; ++i) {
-		    WORK(i + j * 33 - 34) = 0.;
+		for (i__ = j + 1; i__ <= i__1; ++i__) {
+		    work_ref(i__, j) = 0.;
 /* L80: */
 		}
 /* L90: */
 	    }
 
-/*           Process the band matrix one diagonal block at a time.
- */
+/*           Process the band matrix one diagonal block at a time. */
 
 	    i__2 = *n;
 	    i__1 = nb;
-	    for (i = 1; nb < 0 ? i >= *n : i <= *n; i += nb) {
+	    for (i__ = 1; i__1 < 0 ? i__ >= i__2 : i__ <= i__2; i__ += i__1) {
 /* Computing MIN */
-		i__3 = nb, i__4 = *n - i + 1;
+		i__3 = nb, i__4 = *n - i__ + 1;
 		ib = min(i__3,i__4);
 
 /*              Factorize the diagonal block */
 
 		i__3 = *ldab - 1;
-		dpotf2_(uplo, &ib, &AB(1,i), &i__3, &ii);
+		dpotf2_(uplo, &ib, &ab_ref(1, i__), &i__3, &ii);
 		if (ii != 0) {
-		    *info = i + ii - 1;
+		    *info = i__ + ii - 1;
 		    goto L150;
 		}
-		if (i + ib <= *n) {
+		if (i__ + ib <= *n) {
 
-/*                 Update the relevant part of the trailin
-g submatrix.   
-                   If A11 denotes the diagonal block which
- has just been   
-                   factorized, then we need to update the 
-remaining   
+/*                 Update the relevant part of the trailing submatrix.   
+                   If A11 denotes the diagonal block which has just been   
+                   factorized, then we need to update the remaining   
                    blocks in the diagram:   
 
                       A11   
                       A21   A22   
                       A31   A32   A33   
 
-                   The numbers of rows and columns in the 
-partitioning   
-                   are IB, I2, I3 respectively. The blocks
- A21, A22 and   
-                   A32 are empty if IB = KD. The lower tri
-angle of A31   
+                   The numbers of rows and columns in the partitioning   
+                   are IB, I2, I3 respectively. The blocks A21, A22 and   
+                   A32 are empty if IB = KD. The lower triangle of A31   
                    lies outside the band.   
 
    Computing MIN */
-		    i__3 = *kd - ib, i__4 = *n - i - ib + 1;
+		    i__3 = *kd - ib, i__4 = *n - i__ - ib + 1;
 		    i2 = min(i__3,i__4);
 /* Computing MIN */
-		    i__3 = ib, i__4 = *n - i - *kd + 1;
+		    i__3 = ib, i__4 = *n - i__ - *kd + 1;
 		    i3 = min(i__3,i__4);
 
 		    if (i2 > 0) {
@@ -390,38 +365,39 @@ angle of A31
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
 			dtrsm_("Right", "Lower", "Transpose", "Non-unit", &i2,
-				 &ib, &c_b18, &AB(1,i), &i__3, &
-				AB(ib+1,i), &i__4);
+				 &ib, &c_b18, &ab_ref(1, i__), &i__3, &ab_ref(
+				ib + 1, i__), &i__4);
 
 /*                    Update A22 */
 
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
-			dsyrk_("Lower", "No Transpose", &i2, &ib, &c_b21, &AB(ib+1,i), &i__3, &c_b18, &AB(1,i+ib), &i__4);
+			dsyrk_("Lower", "No Transpose", &i2, &ib, &c_b21, &
+				ab_ref(ib + 1, i__), &i__3, &c_b18, &ab_ref(1,
+				 i__ + ib), &i__4);
 		    }
 
 		    if (i3 > 0) {
 
-/*                    Copy the upper triangle of A31 i
-nto the work array. */
+/*                    Copy the upper triangle of A31 into the work array. */
 
 			i__3 = ib;
-			for (jj = 1; jj <= ib; ++jj) {
+			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = min(jj,i3);
-			    for (ii = 1; ii <= min(jj,i3); ++ii) {
-				WORK(ii + jj * 33 - 34) = AB(*kd+1-jj+ii,jj+i-1);
+			    for (ii = 1; ii <= i__4; ++ii) {
+				work_ref(ii, jj) = ab_ref(*kd + 1 - jj + ii, 
+					jj + i__ - 1);
 /* L100: */
 			    }
 /* L110: */
 			}
 
-/*                    Update A31 (in the work array). 
-*/
+/*                    Update A31 (in the work array). */
 
 			i__3 = *ldab - 1;
 			dtrsm_("Right", "Lower", "Transpose", "Non-unit", &i3,
-				 &ib, &c_b18, &AB(1,i), &i__3, 
-				work, &c__33);
+				 &ib, &c_b18, &ab_ref(1, i__), &i__3, work, &
+				c__33);
 
 /*                    Update A32 */
 
@@ -429,24 +405,26 @@ nto the work array. */
 			    i__3 = *ldab - 1;
 			    i__4 = *ldab - 1;
 			    dgemm_("No transpose", "Transpose", &i3, &i2, &ib,
-				     &c_b21, work, &c__33, &AB(ib+1,i), &i__3, &c_b18, &AB(*kd+1-ib,i+ib), &i__4);
+				     &c_b21, work, &c__33, &ab_ref(ib + 1, 
+				    i__), &i__3, &c_b18, &ab_ref(*kd + 1 - ib,
+				     i__ + ib), &i__4);
 			}
 
 /*                    Update A33 */
 
 			i__3 = *ldab - 1;
 			dsyrk_("Lower", "No Transpose", &i3, &ib, &c_b21, 
-				work, &c__33, &c_b18, &AB(1,i+*kd), &i__3);
+				work, &c__33, &c_b18, &ab_ref(1, i__ + *kd), &
+				i__3);
 
-/*                    Copy the upper triangle of A31 b
-ack into place. */
+/*                    Copy the upper triangle of A31 back into place. */
 
 			i__3 = ib;
-			for (jj = 1; jj <= ib; ++jj) {
+			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = min(jj,i3);
-			    for (ii = 1; ii <= min(jj,i3); ++ii) {
-				AB(*kd+1-jj+ii,jj+i-1)
-					 = WORK(ii + jj * 33 - 34);
+			    for (ii = 1; ii <= i__4; ++ii) {
+				ab_ref(*kd + 1 - jj + ii, jj + i__ - 1) = 
+					work_ref(ii, jj);
 /* L120: */
 			    }
 /* L130: */
@@ -465,4 +443,8 @@ L150:
 /*     End of DPBTRF */
 
 } /* dpbtrf_ */
+
+#undef ab_ref
+#undef work_ref
+
 

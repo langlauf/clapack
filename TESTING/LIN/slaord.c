@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,12 +13,12 @@
 
     /* Local variables */
     static real temp;
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     static integer ix, ixnext, inc;
 
 
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -47,8 +48,7 @@
     INCX    (input) INTEGER   
             The spacing between successive elements of X.  INCX >= 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -61,8 +61,8 @@
 /*        Sort in increasing order */
 
 	i__1 = *n;
-	for (i = 2; i <= i__1; ++i) {
-	    ix = (i - 1) * inc + 1;
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    ix = (i__ - 1) * inc + 1;
 L10:
 	    if (ix == 1) {
 		goto L20;
@@ -86,8 +86,8 @@ L20:
 /*        Sort in decreasing order */
 
 	i__1 = *n;
-	for (i = 2; i <= i__1; ++i) {
-	    ix = (i - 1) * inc + 1;
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    ix = (i__ - 1) * inc + 1;
 L30:
 	    if (ix == 1) {
 		goto L40;

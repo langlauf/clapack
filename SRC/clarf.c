@@ -1,9 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clarf_(char *side, integer *m, integer *n, complex *v, 
-	integer *incv, complex *tau, complex *c, integer *ldc, complex *work)
+	integer *incv, complex *tau, complex *c__, integer *ldc, complex *
+	work)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,8 +15,7 @@
     =======   
 
     CLARF applies a complex elementary reflector H to a complex M-by-N   
-    matrix C, from either the left or the right. H is represented in the 
-  
+    matrix C, from either the left or the right. H is represented in the   
     form   
 
           H = I - tau * v * v'   
@@ -23,8 +24,7 @@
 
     If tau = 0, then H is taken to be the unit matrix.   
 
-    To apply H' (the conjugate transpose of H), supply conjg(tau) instead 
-  
+    To apply H' (the conjugate transpose of H), supply conjg(tau) instead   
     tau.   
 
     Arguments   
@@ -54,8 +54,7 @@
 
     C       (input/output) COMPLEX array, dimension (LDC,N)   
             On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by the matrix H * C if SIDE = 'L', 
-  
+            On exit, C is overwritten by the matrix H * C if SIDE = 'L',   
             or C * H if SIDE = 'R'.   
 
     LDC     (input) INTEGER   
@@ -65,13 +64,10 @@
                            (N) if SIDE = 'L'   
                         or (M) if SIDE = 'R'   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static complex c_b2 = {0.f,0.f};
@@ -88,12 +84,13 @@
     extern logical lsame_(char *, char *);
 
 
+    --v;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define V(I) v[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     if (lsame_(side, "L")) {
 
 /*        Form  H * C */
@@ -102,13 +99,13 @@
 
 /*           w := C' * v */
 
-	    cgemv_("Conjugate transpose", m, n, &c_b1, &C(1,1), ldc, &V(
-		    1), incv, &c_b2, &WORK(1), &c__1);
+	    cgemv_("Conjugate transpose", m, n, &c_b1, &c__[c_offset], ldc, &
+		    v[1], incv, &c_b2, &work[1], &c__1);
 
 /*           C := C - v * w' */
 
-	    q__1.r = -(doublereal)tau->r, q__1.i = -(doublereal)tau->i;
-	    cgerc_(m, n, &q__1, &V(1), incv, &WORK(1), &c__1, &C(1,1), 
+	    q__1.r = -tau->r, q__1.i = -tau->i;
+	    cgerc_(m, n, &q__1, &v[1], incv, &work[1], &c__1, &c__[c_offset], 
 		    ldc);
 	}
     } else {
@@ -119,13 +116,13 @@
 
 /*           w := C * v */
 
-	    cgemv_("No transpose", m, n, &c_b1, &C(1,1), ldc, &V(1), 
-		    incv, &c_b2, &WORK(1), &c__1);
+	    cgemv_("No transpose", m, n, &c_b1, &c__[c_offset], ldc, &v[1], 
+		    incv, &c_b2, &work[1], &c__1);
 
 /*           C := C - w * v' */
 
-	    q__1.r = -(doublereal)tau->r, q__1.i = -(doublereal)tau->i;
-	    cgerc_(m, n, &q__1, &WORK(1), &c__1, &V(1), incv, &C(1,1), 
+	    q__1.r = -tau->r, q__1.i = -tau->i;
+	    cgerc_(m, n, &q__1, &work[1], &c__1, &v[1], incv, &c__[c_offset], 
 		    ldc);
 	}
     }

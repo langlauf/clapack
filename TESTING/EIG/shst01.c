@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static real c_b8 = 0.f;
 static real c_b11 = -1.f;
 
 /* Subroutine */ int shst01_(integer *n, integer *ilo, integer *ihi, real *a, 
-	integer *lda, real *h, integer *ldh, real *q, integer *ldq, real *
+	integer *lda, real *h__, integer *ldh, real *q, integer *ldq, real *
 	work, integer *lwork, real *result)
 {
     /* System generated locals */
@@ -37,7 +38,7 @@ static real c_b11 = -1.f;
     static real smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -46,8 +47,7 @@ static real c_b11 = -1.f;
     Purpose   
     =======   
 
-    SHST01 tests the reduction of a general matrix A to upper Hessenberg 
-  
+    SHST01 tests the reduction of a general matrix A to upper Hessenberg   
     form:  A = Q*H*Q'.  Two test ratios are computed;   
 
     RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
@@ -56,8 +56,7 @@ static real c_b11 = -1.f;
     The matrix Q is assumed to be given explicitly as it would be   
     following SGEHRD + SORGHR.   
 
-    In this version, ILO and IHI are not used and are assumed to be 1 and 
-  
+    In this version, ILO and IHI are not used and are assumed to be 1 and   
     N, respectively.   
 
     Arguments   
@@ -102,21 +101,20 @@ static real c_b11 = -1.f;
             RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
             RESULT(2) = norm( I - Q'*Q ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     h_dim1 = *ldh;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --work;
     --result;
@@ -144,13 +142,12 @@ static real c_b11 = -1.f;
 /*     Compute Q*H */
 
     sgemm_("No transpose", "No transpose", n, n, n, &c_b7, &q[q_offset], ldq, 
-	    &h[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
+	    &h__[h_offset], ldh, &c_b8, &work[ldwork * *n + 1], &ldwork);
 
 /*     Compute A - Q*H*Q' */
 
     sgemm_("No transpose", "Transpose", n, n, n, &c_b11, &work[ldwork * *n + 
-	    1], &ldwork, &q[q_offset], ldq, &c_b7, &work[1], &ldwork)
-	    ;
+	    1], &ldwork, &q[q_offset], ldq, &c_b7, &work[1], &ldwork);
 
 /* Computing MAX */
     r__1 = slange_("1", n, n, &a[a_offset], lda, &work[ldwork * *n + 1]);

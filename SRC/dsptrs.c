@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dsptrs_(char *uplo, integer *n, integer *nrhs, 
 	doublereal *ap, integer *ipiv, doublereal *b, integer *ldb, integer *
 	info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -21,8 +22,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored 
-  
+            Specifies whether the details of the factorization are stored   
             as an upper or lower triangular matrix.   
             = 'U':  Upper triangular, form is A = U*D*U**T;   
             = 'L':  Lower triangular, form is A = L*D*L**T.   
@@ -54,13 +54,10 @@
             = 0:  successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b7 = -1.;
     static integer c__1 = 1;
@@ -88,14 +85,16 @@
     static integer kc, kp;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static doublereal akm1, bkm1;
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    --ap;
+    --ipiv;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
 
-#define AP(I) ap[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -125,8 +124,7 @@
 
           First solve U*D*X = B, overwriting B with X.   
 
-          K is the main loop index, decreasing from N to 1 in steps of
-   
+          K is the main loop index, decreasing from N to 1 in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = *n;
@@ -140,28 +138,28 @@ L10:
 	}
 
 	kc -= k;
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
              Interchange rows K and IPIV(K). */
 
-	    kp = IPIV(k);
+	    kp = ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 
-/*           Multiply by inv(U(K)), where U(K) is the transformati
-on   
+/*           Multiply by inv(U(K)), where U(K) is the transformation   
              stored in column K of A. */
 
 	    i__1 = k - 1;
-	    dger_(&i__1, nrhs, &c_b7, &AP(kc), &c__1, &B(k,1), ldb, &B(1,1), ldb);
+	    dger_(&i__1, nrhs, &c_b7, &ap[kc], &c__1, &b_ref(k, 1), ldb, &
+		    b_ref(1, 1), ldb);
 
 /*           Multiply by the inverse of the diagonal block. */
 
-	    d__1 = 1. / AP(kc + k - 1);
-	    dscal_(nrhs, &d__1, &B(k,1), ldb);
+	    d__1 = 1. / ap[kc + k - 1];
+	    dscal_(nrhs, &d__1, &b_ref(k, 1), ldb);
 	    --k;
 	} else {
 
@@ -169,32 +167,33 @@ on
 
              Interchange rows K-1 and -IPIV(K). */
 
-	    kp = -IPIV(k);
+	    kp = -ipiv[k];
 	    if (kp != k - 1) {
-		dswap_(nrhs, &B(k-1,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k - 1, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 
-/*           Multiply by inv(U(K)), where U(K) is the transformati
-on   
+/*           Multiply by inv(U(K)), where U(K) is the transformation   
              stored in columns K-1 and K of A. */
 
 	    i__1 = k - 2;
-	    dger_(&i__1, nrhs, &c_b7, &AP(kc), &c__1, &B(k,1), ldb, &B(1,1), ldb);
+	    dger_(&i__1, nrhs, &c_b7, &ap[kc], &c__1, &b_ref(k, 1), ldb, &
+		    b_ref(1, 1), ldb);
 	    i__1 = k - 2;
-	    dger_(&i__1, nrhs, &c_b7, &AP(kc - (k - 1)), &c__1, &B(k-1,1), ldb, &B(1,1), ldb);
+	    dger_(&i__1, nrhs, &c_b7, &ap[kc - (k - 1)], &c__1, &b_ref(k - 1, 
+		    1), ldb, &b_ref(1, 1), ldb);
 
 /*           Multiply by the inverse of the diagonal block. */
 
-	    akm1k = AP(kc + k - 2);
-	    akm1 = AP(kc - 1) / akm1k;
-	    ak = AP(kc + k - 1) / akm1k;
+	    akm1k = ap[kc + k - 2];
+	    akm1 = ap[kc - 1] / akm1k;
+	    ak = ap[kc + k - 1] / akm1k;
 	    denom = akm1 * ak - 1.;
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
-		bkm1 = B(k-1,j) / akm1k;
-		bk = B(k,j) / akm1k;
-		B(k-1,j) = (ak * bkm1 - bk) / denom;
-		B(k,j) = (akm1 * bk - bkm1) / denom;
+	    for (j = 1; j <= i__1; ++j) {
+		bkm1 = b_ref(k - 1, j) / akm1k;
+		bk = b_ref(k, j) / akm1k;
+		b_ref(k - 1, j) = (ak * bkm1 - bk) / denom;
+		b_ref(k, j) = (akm1 * bk - bkm1) / denom;
 /* L20: */
 	    }
 	    kc = kc - k + 1;
@@ -206,8 +205,7 @@ L30:
 
 /*        Next solve U'*X = B, overwriting B with X.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = 1;
@@ -220,23 +218,22 @@ L40:
 	    goto L50;
 	}
 
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
-             Multiply by inv(U'(K)), where U(K) is the transformat
-ion   
+             Multiply by inv(U'(K)), where U(K) is the transformation   
              stored in column K of A. */
 
 	    i__1 = k - 1;
-	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(1,1), ldb, &AP(kc)
-		    , &c__1, &c_b19, &B(k,1), ldb);
+	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &b[b_offset], ldb, &ap[kc]
+		    , &c__1, &c_b19, &b_ref(k, 1), ldb);
 
 /*           Interchange rows K and IPIV(K). */
 
-	    kp = IPIV(k);
+	    kp = ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 	    kc += k;
 	    ++k;
@@ -244,22 +241,21 @@ ion
 
 /*           2 x 2 diagonal block   
 
-             Multiply by inv(U'(K+1)), where U(K+1) is the transfo
-rmation   
+             Multiply by inv(U'(K+1)), where U(K+1) is the transformation   
              stored in columns K and K+1 of A. */
 
 	    i__1 = k - 1;
-	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(1,1), ldb, &AP(kc)
-		    , &c__1, &c_b19, &B(k,1), ldb);
+	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &b[b_offset], ldb, &ap[kc]
+		    , &c__1, &c_b19, &b_ref(k, 1), ldb);
 	    i__1 = k - 1;
-	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(1,1), ldb, &AP(kc 
-		    + k), &c__1, &c_b19, &B(k+1,1), ldb);
+	    dgemv_("Transpose", &i__1, nrhs, &c_b7, &b[b_offset], ldb, &ap[kc 
+		    + k], &c__1, &c_b19, &b_ref(k + 1, 1), ldb);
 
 /*           Interchange rows K and -IPIV(K). */
 
-	    kp = -IPIV(k);
+	    kp = -ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 	    kc = kc + (k << 1) + 1;
 	    k += 2;
@@ -275,8 +271,7 @@ L50:
 
           First solve L*D*X = B, overwriting B with X.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = 1;
@@ -289,31 +284,30 @@ L60:
 	    goto L80;
 	}
 
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
              Interchange rows K and IPIV(K). */
 
-	    kp = IPIV(k);
+	    kp = ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 
-/*           Multiply by inv(L(K)), where L(K) is the transformati
-on   
+/*           Multiply by inv(L(K)), where L(K) is the transformation   
              stored in column K of A. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		dger_(&i__1, nrhs, &c_b7, &AP(kc + 1), &c__1, &B(k,1), 
-			ldb, &B(k+1,1), ldb);
+		dger_(&i__1, nrhs, &c_b7, &ap[kc + 1], &c__1, &b_ref(k, 1), 
+			ldb, &b_ref(k + 1, 1), ldb);
 	    }
 
 /*           Multiply by the inverse of the diagonal block. */
 
-	    d__1 = 1. / AP(kc);
-	    dscal_(nrhs, &d__1, &B(k,1), ldb);
+	    d__1 = 1. / ap[kc];
+	    dscal_(nrhs, &d__1, &b_ref(k, 1), ldb);
 	    kc = kc + *n - k + 1;
 	    ++k;
 	} else {
@@ -322,35 +316,35 @@ on
 
              Interchange rows K+1 and -IPIV(K). */
 
-	    kp = -IPIV(k);
+	    kp = -ipiv[k];
 	    if (kp != k + 1) {
-		dswap_(nrhs, &B(k+1,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k + 1, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 
-/*           Multiply by inv(L(K)), where L(K) is the transformati
-on   
+/*           Multiply by inv(L(K)), where L(K) is the transformation   
              stored in columns K and K+1 of A. */
 
 	    if (k < *n - 1) {
 		i__1 = *n - k - 1;
-		dger_(&i__1, nrhs, &c_b7, &AP(kc + 2), &c__1, &B(k,1), 
-			ldb, &B(k+2,1), ldb);
+		dger_(&i__1, nrhs, &c_b7, &ap[kc + 2], &c__1, &b_ref(k, 1), 
+			ldb, &b_ref(k + 2, 1), ldb);
 		i__1 = *n - k - 1;
-		dger_(&i__1, nrhs, &c_b7, &AP(kc + *n - k + 2), &c__1, &B(k+1,1), ldb, &B(k+2,1), ldb);
+		dger_(&i__1, nrhs, &c_b7, &ap[kc + *n - k + 2], &c__1, &b_ref(
+			k + 1, 1), ldb, &b_ref(k + 2, 1), ldb);
 	    }
 
 /*           Multiply by the inverse of the diagonal block. */
 
-	    akm1k = AP(kc + 1);
-	    akm1 = AP(kc) / akm1k;
-	    ak = AP(kc + *n - k + 1) / akm1k;
+	    akm1k = ap[kc + 1];
+	    akm1 = ap[kc] / akm1k;
+	    ak = ap[kc + *n - k + 1] / akm1k;
 	    denom = akm1 * ak - 1.;
 	    i__1 = *nrhs;
-	    for (j = 1; j <= *nrhs; ++j) {
-		bkm1 = B(k,j) / akm1k;
-		bk = B(k+1,j) / akm1k;
-		B(k,j) = (ak * bkm1 - bk) / denom;
-		B(k+1,j) = (akm1 * bk - bkm1) / denom;
+	    for (j = 1; j <= i__1; ++j) {
+		bkm1 = b_ref(k, j) / akm1k;
+		bk = b_ref(k + 1, j) / akm1k;
+		b_ref(k, j) = (ak * bkm1 - bk) / denom;
+		b_ref(k + 1, j) = (akm1 * bk - bkm1) / denom;
 /* L70: */
 	    }
 	    kc = kc + (*n - k << 1) + 1;
@@ -362,8 +356,7 @@ L80:
 
 /*        Next solve L'*X = B, overwriting B with X.   
 
-          K is the main loop index, decreasing from N to 1 in steps of
-   
+          K is the main loop index, decreasing from N to 1 in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = *n;
@@ -377,49 +370,48 @@ L90:
 	}
 
 	kc -= *n - k + 1;
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
-             Multiply by inv(L'(K)), where L(K) is the transformat
-ion   
+             Multiply by inv(L'(K)), where L(K) is the transformation   
              stored in column K of A. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(k+1,1), 
-			ldb, &AP(kc + 1), &c__1, &c_b19, &B(k,1), ldb);
+		dgemv_("Transpose", &i__1, nrhs, &c_b7, &b_ref(k + 1, 1), ldb,
+			 &ap[kc + 1], &c__1, &c_b19, &b_ref(k, 1), ldb);
 	    }
 
 /*           Interchange rows K and IPIV(K). */
 
-	    kp = IPIV(k);
+	    kp = ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 	    --k;
 	} else {
 
 /*           2 x 2 diagonal block   
 
-             Multiply by inv(L'(K-1)), where L(K-1) is the transfo
-rmation   
+             Multiply by inv(L'(K-1)), where L(K-1) is the transformation   
              stored in columns K-1 and K of A. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(k+1,1), 
-			ldb, &AP(kc + 1), &c__1, &c_b19, &B(k,1), ldb);
+		dgemv_("Transpose", &i__1, nrhs, &c_b7, &b_ref(k + 1, 1), ldb,
+			 &ap[kc + 1], &c__1, &c_b19, &b_ref(k, 1), ldb);
 		i__1 = *n - k;
-		dgemv_("Transpose", &i__1, nrhs, &c_b7, &B(k+1,1), 
-			ldb, &AP(kc - (*n - k)), &c__1, &c_b19, &B(k-1,1), ldb);
+		dgemv_("Transpose", &i__1, nrhs, &c_b7, &b_ref(k + 1, 1), ldb,
+			 &ap[kc - (*n - k)], &c__1, &c_b19, &b_ref(k - 1, 1), 
+			ldb);
 	    }
 
 /*           Interchange rows K and -IPIV(K). */
 
-	    kp = -IPIV(k);
+	    kp = -ipiv[k];
 	    if (kp != k) {
-		dswap_(nrhs, &B(k,1), ldb, &B(kp,1), ldb);
+		dswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
 	    }
 	    kc -= *n - k + 2;
 	    k += -2;
@@ -435,4 +427,7 @@ L100:
 /*     End of DSPTRS */
 
 } /* dsptrs_ */
+
+#undef b_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -40,7 +41,15 @@ static integer c__1 = 1;
     static doublereal smlnum, eps, err;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -49,26 +58,20 @@ static integer c__1 = 1;
     Purpose   
     =======   
 
-    ZTRT03 computes the residual for the solution to a scaled triangular 
-  
+    ZTRT03 computes the residual for the solution to a scaled triangular   
     system of equations A*x = s*b,  A**T *x = s*b,  or  A**H *x = s*b.   
-    Here A is a triangular matrix, A**T denotes the transpose of A, A**H 
-  
-    denotes the conjugate transpose of A, s is a scalar, and x and b are 
-  
-    N by NRHS matrices.  The test ratio is the maximum over the number of 
-  
+    Here A is a triangular matrix, A**T denotes the transpose of A, A**H   
+    denotes the conjugate transpose of A, s is a scalar, and x and b are   
+    N by NRHS matrices.  The test ratio is the maximum over the number of   
     right hand sides of   
        norm(s*b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
-    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon. 
-  
+    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon.   
 
     Arguments   
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -93,12 +96,9 @@ static integer c__1 = 1;
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The triangular matrix A.  If UPLO = 'U', the leading n by n   
             upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of 
-  
-            A is not referenced.  If UPLO = 'L', the leading n by n lower 
-  
-            triangular part of the array A contains the lower triangular 
-  
+            triangular matrix, and the strictly lower triangular part of   
+            A is not referenced.  If UPLO = 'L', the leading n by n lower   
+            triangular part of the array A contains the lower triangular   
             matrix, and the strictly upper triangular part of A is not   
             referenced.  If DIAG = 'U', the diagonal elements of A are   
             also not referenced and are assumed to be 1.   
@@ -136,22 +136,21 @@ static integer c__1 = 1;
             The maximum over the number of right hand sides of   
             norm(op(A)*x - s*b) / ( norm(op(A)) * norm(x) * EPS ).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0   
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --cnorm;
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --work;
 
@@ -171,8 +170,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
-	    d__1 = tnorm, d__2 = *tscal * z_abs(&a[j + j * a_dim1]) + cnorm[j]
-		    ;
+	    d__1 = tnorm, d__2 = *tscal * z_abs(&a_ref(j, j)) + cnorm[j];
 	    tnorm = max(d__1,d__2);
 /* L10: */
 	}
@@ -192,21 +190,21 @@ static integer c__1 = 1;
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	zcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
+	zcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
 	ix = izamax_(n, &work[1], &c__1);
 /* Computing MAX */
-	d__1 = 1., d__2 = z_abs(&x[ix + j * x_dim1]);
+	d__1 = 1., d__2 = z_abs(&x_ref(ix, j));
 	xnorm = max(d__1,d__2);
 	xscal = 1. / xnorm / (doublereal) (*n);
 	zdscal_(n, &xscal, &work[1], &c__1);
 	ztrmv_(uplo, trans, diag, n, &a[a_offset], lda, &work[1], &c__1);
 	d__1 = -(*scale) * xscal;
 	z__1.r = d__1, z__1.i = 0.;
-	zaxpy_(n, &z__1, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	zaxpy_(n, &z__1, &b_ref(1, j), &c__1, &work[1], &c__1);
 	ix = izamax_(n, &work[1], &c__1);
 	err = *tscal * z_abs(&work[ix]);
-	ix = izamax_(n, &x[j * x_dim1 + 1], &c__1);
-	xnorm = z_abs(&x[ix + j * x_dim1]);
+	ix = izamax_(n, &x_ref(1, j), &c__1);
+	xnorm = z_abs(&x_ref(ix, j));
 	if (err * smlnum <= xnorm) {
 	    if (xnorm > 0.) {
 		err /= xnorm;
@@ -234,4 +232,12 @@ static integer c__1 = 1;
 /*     End of ZTRT03 */
 
 } /* ztrt03_ */
+
+#undef x_ref
+#undef x_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

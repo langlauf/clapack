@@ -1,11 +1,12 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 
-/* Subroutine */ int dptt01_(integer *n, doublereal *d, doublereal *e, 
+/* Subroutine */ int dptt01_(integer *n, doublereal *d__, doublereal *e, 
 	doublereal *df, doublereal *ef, doublereal *work, doublereal *resid)
 {
     /* System generated locals */
@@ -13,13 +14,13 @@
     doublereal d__1, d__2, d__3, d__4, d__5;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
     static doublereal anorm, de;
     extern doublereal dlamch_(char *);
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -58,8 +59,7 @@
     RESID   (output) DOUBLE PRECISION   
             norm(L*D*L' - A) / (n * norm(A) * EPS)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
@@ -69,7 +69,7 @@
     --ef;
     --df;
     --e;
-    --d;
+    --d__;
 
     /* Function Body */
     if (*n <= 0) {
@@ -81,23 +81,24 @@
 
 /*     Construct the difference L*D*L' - A. */
 
-    work[1] = df[1] - d[1];
+    work[1] = df[1] - d__[1];
     i__1 = *n - 1;
-    for (i = 1; i <= i__1; ++i) {
-	de = df[i] * ef[i];
-	work[*n + i] = de - e[i];
-	work[i + 1] = de * ef[i] + df[i + 1] - d[i + 1];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	de = df[i__] * ef[i__];
+	work[*n + i__] = de - e[i__];
+	work[i__ + 1] = de * ef[i__] + df[i__ + 1] - d__[i__ + 1];
 /* L10: */
     }
 
 /*     Compute the 1-norms of the tridiagonal matrices A and WORK. */
 
     if (*n == 1) {
-	anorm = d[1];
+	anorm = d__[1];
 	*resid = abs(work[1]);
     } else {
 /* Computing MAX */
-	d__2 = d[1] + abs(e[1]), d__3 = d[*n] + (d__1 = e[*n - 1], abs(d__1));
+	d__2 = d__[1] + abs(e[1]), d__3 = d__[*n] + (d__1 = e[*n - 1], abs(
+		d__1));
 	anorm = max(d__2,d__3);
 /* Computing MAX */
 	d__4 = abs(work[1]) + (d__1 = work[*n + 1], abs(d__1)), d__5 = (d__2 =
@@ -105,14 +106,15 @@
 		);
 	*resid = max(d__4,d__5);
 	i__1 = *n - 1;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__3 = anorm, d__4 = d[i] + (d__1 = e[i], abs(d__1)) + (d__2 = e[
-		    i - 1], abs(d__2));
+	    d__3 = anorm, d__4 = d__[i__] + (d__1 = e[i__], abs(d__1)) + (
+		    d__2 = e[i__ - 1], abs(d__2));
 	    anorm = max(d__3,d__4);
 /* Computing MAX */
-	    d__4 = *resid, d__5 = (d__1 = work[i], abs(d__1)) + (d__2 = work[*
-		    n + i - 1], abs(d__2)) + (d__3 = work[*n + i], abs(d__3));
+	    d__4 = *resid, d__5 = (d__1 = work[i__], abs(d__1)) + (d__2 = 
+		    work[*n + i__ - 1], abs(d__2)) + (d__3 = work[*n + i__], 
+		    abs(d__3));
 	    *resid = max(d__4,d__5);
 /* L20: */
 	}

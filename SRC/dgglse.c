@@ -1,14 +1,15 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgglse_(integer *m, integer *n, integer *p, doublereal *
-	a, integer *lda, doublereal *b, integer *ldb, doublereal *c, 
-	doublereal *d, doublereal *x, doublereal *work, integer *lwork, 
+	a, integer *lda, doublereal *b, integer *ldb, doublereal *c__, 
+	doublereal *d__, doublereal *x, doublereal *work, integer *lwork, 
 	integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -27,8 +28,7 @@
                                   ( ( B ) )   
 
     These conditions ensure that the LSE problem has a unique solution,   
-    which is obtained using a GRQ factorization of the matrices B and A. 
-  
+    which is obtained using a GRQ factorization of the matrices B and A.   
 
     Arguments   
     =========   
@@ -71,8 +71,7 @@
     X       (output) DOUBLE PRECISION array, dimension (N)   
             On exit, X is the solution of the LSE problem.   
 
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK) 
-  
+    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
             On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
 
     LWORK   (input) INTEGER   
@@ -81,23 +80,26 @@
             where NB is an upper bound for the optimal blocksizes for   
             DGEQRF, SGERQF, DORMQR and SORMRQ.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
-    static doublereal c_b11 = -1.;
-    static doublereal c_b13 = 1.;
+    static integer c_n1 = -1;
+    static doublereal c_b29 = -1.;
+    static doublereal c_b31 = 1.;
     
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2;
@@ -112,29 +114,52 @@
 	    *, doublereal *, integer *), dtrsv_(char *
 	    , char *, char *, integer *, doublereal *, integer *, doublereal *
 	    , integer *);
-    static integer mn, nr;
+    static integer nb, mn, nr;
     extern /* Subroutine */ int dggrqf_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *), xerbla_(char *,
-	     integer *), dormqr_(char *, char *, integer *, integer *,
-	     integer *, doublereal *, integer *, doublereal *, doublereal *, 
+	     integer *);
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
+    static integer nb1, nb2, nb3, nb4;
+    extern /* Subroutine */ int dormqr_(char *, char *, integer *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *), 
 	    dormrq_(char *, char *, integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *, integer *);
+    static integer lwkopt;
+    static logical lquery;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --c__;
+    --d__;
+    --x;
+    --work;
 
-#define C(I) c[(I)-1]
-#define D(I) d[(I)-1]
-#define X(I) x[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-
+    /* Function Body */
     *info = 0;
     mn = min(*m,*n);
+    nb1 = ilaenv_(&c__1, "DGEQRF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb2 = ilaenv_(&c__1, "DGERQF", " ", m, n, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
+    nb3 = ilaenv_(&c__1, "DORMQR", " ", m, n, p, &c_n1, (ftnlen)6, (ftnlen)1);
+    nb4 = ilaenv_(&c__1, "DORMRQ", " ", m, n, p, &c_n1, (ftnlen)6, (ftnlen)1);
+/* Computing MAX */
+    i__1 = max(nb1,nb2), i__1 = max(i__1,nb3);
+    nb = max(i__1,nb4);
+    lwkopt = *p + mn + max(*m,*n) * nb;
+    work[1] = (doublereal) lwkopt;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*n < 0) {
@@ -148,13 +173,15 @@
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = 1, i__2 = *m + *n + *p;
-	if (*lwork < max(i__1,i__2)) {
+	if (*lwork < max(i__1,i__2) && ! lquery) {
 	    *info = -12;
 	}
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("DGGLSE", &i__1);
+	return 0;
+    } else if (lquery) {
 	return 0;
     }
 
@@ -174,68 +201,74 @@
        orthogonal. */
 
     i__1 = *lwork - *p - mn;
-    dggrqf_(p, m, n, &B(1,1), ldb, &WORK(1), &A(1,1), lda, &WORK(*p 
-	    + 1), &WORK(*p + mn + 1), &i__1, info);
-    lopt = (integer) WORK(*p + mn + 1);
+    dggrqf_(p, m, n, &b[b_offset], ldb, &work[1], &a[a_offset], lda, &work[*p 
+	    + 1], &work[*p + mn + 1], &i__1, info);
+    lopt = (integer) work[*p + mn + 1];
 
 /*     Update c = Z'*c = ( c1 ) N-P   
                          ( c2 ) M+P-N */
 
     i__1 = max(1,*m);
     i__2 = *lwork - *p - mn;
-    dormqr_("Left", "Transpose", m, &c__1, &mn, &A(1,1), lda, &WORK(*p + 
-	    1), &C(1), &i__1, &WORK(*p + mn + 1), &i__2, info);
+    dormqr_("Left", "Transpose", m, &c__1, &mn, &a[a_offset], lda, &work[*p + 
+	    1], &c__[1], &i__1, &work[*p + mn + 1], &i__2, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(*p + mn + 1);
+    i__1 = lopt, i__2 = (integer) work[*p + mn + 1];
     lopt = max(i__1,i__2);
 
 /*     Solve T12*x2 = d for x2 */
 
-    dtrsv_("Upper", "No transpose", "Non unit", p, &B(1,*n-*p+1), ldb, &D(1), &c__1);
+    dtrsv_("Upper", "No transpose", "Non unit", p, &b_ref(1, *n - *p + 1), 
+	    ldb, &d__[1], &c__1);
 
 /*     Update c1 */
 
     i__1 = *n - *p;
-    dgemv_("No transpose", &i__1, p, &c_b11, &A(1,*n-*p+1), 
-	    lda, &D(1), &c__1, &c_b13, &C(1), &c__1);
+    dgemv_("No transpose", &i__1, p, &c_b29, &a_ref(1, *n - *p + 1), lda, &
+	    d__[1], &c__1, &c_b31, &c__[1], &c__1);
 
 /*     Sovle R11*x1 = c1 for x1 */
 
     i__1 = *n - *p;
-    dtrsv_("Upper", "No transpose", "Non unit", &i__1, &A(1,1), lda, &C(
-	    1), &c__1);
+    dtrsv_("Upper", "No transpose", "Non unit", &i__1, &a[a_offset], lda, &
+	    c__[1], &c__1);
 
 /*     Put the solutions in X */
 
     i__1 = *n - *p;
-    dcopy_(&i__1, &C(1), &c__1, &X(1), &c__1);
-    dcopy_(p, &D(1), &c__1, &X(*n - *p + 1), &c__1);
+    dcopy_(&i__1, &c__[1], &c__1, &x[1], &c__1);
+    dcopy_(p, &d__[1], &c__1, &x[*n - *p + 1], &c__1);
 
 /*     Compute the residual vector: */
 
     if (*m < *n) {
 	nr = *m + *p - *n;
 	i__1 = *n - *m;
-	dgemv_("No transpose", &nr, &i__1, &c_b11, &A(*n-*p+1,*m+1), lda, &D(nr + 1), &c__1, &c_b13, &C(*n - *p + 1), &
-		c__1);
+	dgemv_("No transpose", &nr, &i__1, &c_b29, &a_ref(*n - *p + 1, *m + 1)
+		, lda, &d__[nr + 1], &c__1, &c_b31, &c__[*n - *p + 1], &c__1);
     } else {
 	nr = *p;
     }
-    dtrmv_("Upper", "No transpose", "Non unit", &nr, &A(*n-*p+1,*n-*p+1), lda, &D(1), &c__1);
-    daxpy_(&nr, &c_b11, &D(1), &c__1, &C(*n - *p + 1), &c__1);
+    dtrmv_("Upper", "No transpose", "Non unit", &nr, &a_ref(*n - *p + 1, *n - 
+	    *p + 1), lda, &d__[1], &c__1);
+    daxpy_(&nr, &c_b29, &d__[1], &c__1, &c__[*n - *p + 1], &c__1);
 
 /*     Backward transformation x = Q'*x */
 
     i__1 = *lwork - *p - mn;
-    dormrq_("Left", "Transpose", n, &c__1, p, &B(1,1), ldb, &WORK(1), &X(
-	    1), n, &WORK(*p + mn + 1), &i__1, info);
+    dormrq_("Left", "Transpose", n, &c__1, p, &b[b_offset], ldb, &work[1], &x[
+	    1], n, &work[*p + mn + 1], &i__1, info);
 /* Computing MAX */
-    i__1 = lopt, i__2 = (integer) WORK(*p + mn + 1);
-    WORK(1) = (doublereal) (*p + mn + max(i__1,i__2));
+    i__1 = lopt, i__2 = (integer) work[*p + mn + 1];
+    work[1] = (doublereal) (*p + mn + max(i__1,i__2));
 
     return 0;
 
 /*     End of DGGLSE */
 
 } /* dgglse_ */
+
+#undef b_ref
+#undef a_ref
+
 

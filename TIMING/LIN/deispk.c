@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -16,10 +17,13 @@
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal f, g, h;
-    static integer i, j, m;
+    static doublereal f, g, h__;
+    static integer i__, j, m;
     static doublereal scale;
     static integer la, ii, jj, mp, kp1;
+
+
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
 
@@ -57,17 +61,15 @@
             ONLY ELEMENTS LOW THROUGH IGH ARE USED.   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     a_dim1 = *nm;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --ort;
 
@@ -80,15 +82,14 @@
 
     i__1 = la;
     for (m = kp1; m <= i__1; ++m) {
-	h = 0.;
+	h__ = 0.;
 	ort[m] = 0.;
 	scale = 0.;
-/*     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) .......... 
-*/
+/*     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) .......... */
 	i__2 = *igh;
-	for (i = m; i <= i__2; ++i) {
+	for (i__ = m; i__ <= i__2; ++i__) {
 /* L90: */
-	    scale += (d__1 = a[i + (m - 1) * a_dim1], abs(d__1));
+	    scale += (d__1 = a_ref(i__, m - 1), abs(d__1));
 	}
 
 	if (scale == 0.) {
@@ -98,15 +99,15 @@
 /*     .......... FOR I=IGH STEP -1 UNTIL M DO -- .......... */
 	i__2 = *igh;
 	for (ii = m; ii <= i__2; ++ii) {
-	    i = mp - ii;
-	    ort[i] = a[i + (m - 1) * a_dim1] / scale;
-	    h += ort[i] * ort[i];
+	    i__ = mp - ii;
+	    ort[i__] = a_ref(i__, m - 1) / scale;
+	    h__ += ort[i__] * ort[i__];
 /* L100: */
 	}
 
-	d__1 = sqrt(h);
+	d__1 = sqrt(h__);
 	g = -d_sign(&d__1, &ort[m]);
-	h -= ort[m] * g;
+	h__ -= ort[m] * g;
 	ort[m] -= g;
 /*     .......... FORM (I-(U*UT)/H) * A .......... */
 	i__2 = *n;
@@ -115,56 +116,59 @@
 /*     .......... FOR I=IGH STEP -1 UNTIL M DO -- .......... */
 	    i__3 = *igh;
 	    for (ii = m; ii <= i__3; ++ii) {
-		i = mp - ii;
-		f += ort[i] * a[i + j * a_dim1];
+		i__ = mp - ii;
+		f += ort[i__] * a_ref(i__, j);
 /* L110: */
 	    }
 
-	    f /= h;
+	    f /= h__;
 
 	    i__3 = *igh;
-	    for (i = m; i <= i__3; ++i) {
+	    for (i__ = m; i__ <= i__3; ++i__) {
 /* L120: */
-		a[i + j * a_dim1] -= f * ort[i];
+		a_ref(i__, j) = a_ref(i__, j) - f * ort[i__];
 	    }
 
 /* L130: */
 	}
 /*     .......... FORM (I-(U*UT)/H)*A*(I-(U*UT)/H) .......... */
 	i__2 = *igh;
-	for (i = 1; i <= i__2; ++i) {
+	for (i__ = 1; i__ <= i__2; ++i__) {
 	    f = 0.;
 /*     .......... FOR J=IGH STEP -1 UNTIL M DO -- .......... */
 	    i__3 = *igh;
 	    for (jj = m; jj <= i__3; ++jj) {
 		j = mp - jj;
-		f += ort[j] * a[i + j * a_dim1];
+		f += ort[j] * a_ref(i__, j);
 /* L140: */
 	    }
 
-	    f /= h;
+	    f /= h__;
 
 	    i__3 = *igh;
 	    for (j = m; j <= i__3; ++j) {
 /* L150: */
-		a[i + j * a_dim1] -= f * ort[j];
+		a_ref(i__, j) = a_ref(i__, j) - f * ort[j];
 	    }
 
 /* L160: */
 	}
 
 	ort[m] = scale * ort[m];
-	a[m + (m - 1) * a_dim1] = scale * g;
+	a_ref(m, m - 1) = scale * g;
 L180:
 	;
     }
 
 L200:
     return 0;
-} /* orthes_   
+} /* orthes_ */
 
-   Subroutine */ int tred1_(integer *nm, integer *n, doublereal *a, 
-	doublereal *d, doublereal *e, doublereal *e2)
+#undef a_ref
+
+
+/* Subroutine */ int tred1_(integer *nm, integer *n, doublereal *a, 
+	doublereal *d__, doublereal *e, doublereal *e2)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
@@ -174,10 +178,13 @@ L200:
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal f, g, h;
-    static integer i, j, k, l;
+    static doublereal f, g, h__;
+    static integer i__, j, k, l;
     static doublereal scale;
     static integer ii, jp1;
+
+
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
 
@@ -215,35 +222,33 @@ L200:
             E2 MAY COINCIDE WITH E IF THE SQUARES ARE NOT NEEDED.   
 
        QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO BURTON S. GARBOW,   
-       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY 
-  
+       MATHEMATICS AND COMPUTER SCIENCE DIV, ARGONNE NATIONAL LABORATORY   
 
        THIS VERSION DATED AUGUST 1983.   
 
-       ------------------------------------------------------------------ 
-  
+       ------------------------------------------------------------------   
 
        Parameter adjustments */
     --e2;
     --e;
-    --d;
+    --d__;
     a_dim1 = *nm;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	d[i] = a[*n + i * a_dim1];
-	a[*n + i * a_dim1] = a[i + i * a_dim1];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__[i__] = a_ref(*n, i__);
+	a_ref(*n, i__) = a_ref(i__, i__);
 /* L100: */
     }
 /*     .......... FOR I=N STEP -1 UNTIL 1 DO -- .......... */
     i__1 = *n;
     for (ii = 1; ii <= i__1; ++ii) {
-	i = *n + 1 - ii;
-	l = i - 1;
-	h = 0.;
+	i__ = *n + 1 - ii;
+	l = i__ - 1;
+	h__ = 0.;
 	scale = 0.;
 	if (l < 1) {
 	    goto L130;
@@ -252,7 +257,7 @@ L200:
 	i__2 = l;
 	for (k = 1; k <= i__2; ++k) {
 /* L120: */
-	    scale += (d__1 = d[k], abs(d__1));
+	    scale += (d__1 = d__[k], abs(d__1));
 	}
 
 	if (scale != 0.) {
@@ -261,32 +266,32 @@ L200:
 
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    d[j] = a[l + j * a_dim1];
-	    a[l + j * a_dim1] = a[i + j * a_dim1];
-	    a[i + j * a_dim1] = 0.;
+	    d__[j] = a_ref(l, j);
+	    a_ref(l, j) = a_ref(i__, j);
+	    a_ref(i__, j) = 0.;
 /* L125: */
 	}
 
 L130:
-	e[i] = 0.;
-	e2[i] = 0.;
+	e[i__] = 0.;
+	e2[i__] = 0.;
 	goto L300;
 
 L140:
 	i__2 = l;
 	for (k = 1; k <= i__2; ++k) {
-	    d[k] /= scale;
-	    h += d[k] * d[k];
+	    d__[k] /= scale;
+	    h__ += d__[k] * d__[k];
 /* L150: */
 	}
 
-	e2[i] = scale * scale * h;
-	f = d[l];
-	d__1 = sqrt(h);
+	e2[i__] = scale * scale * h__;
+	f = d__[l];
+	d__1 = sqrt(h__);
 	g = -d_sign(&d__1, &f);
-	e[i] = scale * g;
-	h -= f * g;
-	d[l] = f - g;
+	e[i__] = scale * g;
+	h__ -= f * g;
+	d__[l] = f - g;
 	if (l == 1) {
 	    goto L285;
 	}
@@ -299,8 +304,8 @@ L140:
 
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    f = d[j];
-	    g = e[j] + a[j + j * a_dim1] * f;
+	    f = d__[j];
+	    g = e[j] + a_ref(j, j) * f;
 	    jp1 = j + 1;
 	    if (l < jp1) {
 		goto L220;
@@ -308,8 +313,8 @@ L140:
 
 	    i__3 = l;
 	    for (k = jp1; k <= i__3; ++k) {
-		g += a[k + j * a_dim1] * d[k];
-		e[k] += a[k + j * a_dim1] * f;
+		g += a_ref(k, j) * d__[k];
+		e[k] += a_ref(k, j) * f;
 /* L200: */
 	    }
 
@@ -322,28 +327,28 @@ L220:
 
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    e[j] /= h;
-	    f += e[j] * d[j];
+	    e[j] /= h__;
+	    f += e[j] * d__[j];
 /* L245: */
 	}
 
-	h = f / (h + h);
+	h__ = f / (h__ + h__);
 /*     .......... FORM Q .......... */
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
 /* L250: */
-	    e[j] -= h * d[j];
+	    e[j] -= h__ * d__[j];
 	}
 /*     .......... FORM REDUCED A .......... */
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    f = d[j];
+	    f = d__[j];
 	    g = e[j];
 
 	    i__3 = l;
 	    for (k = j; k <= i__3; ++k) {
 /* L260: */
-		a[k + j * a_dim1] = a[k + j * a_dim1] - f * e[k] - g * d[k];
+		a_ref(k, j) = a_ref(k, j) - f * e[k] - g * d__[k];
 	    }
 
 /* L280: */
@@ -352,10 +357,10 @@ L220:
 L285:
 	i__2 = l;
 	for (j = 1; j <= i__2; ++j) {
-	    f = d[j];
-	    d[j] = a[l + j * a_dim1];
-	    a[l + j * a_dim1] = a[i + j * a_dim1];
-	    a[i + j * a_dim1] = f * scale;
+	    f = d__[j];
+	    d__[j] = a_ref(l, j);
+	    a_ref(l, j) = a_ref(i__, j);
+	    a_ref(i__, j) = f * scale;
 /* L290: */
 	}
 
@@ -365,4 +370,7 @@ L300:
 
     return 0;
 } /* tred1_ */
+
+#undef a_ref
+
 

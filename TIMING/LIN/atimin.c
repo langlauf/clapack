@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -27,7 +28,7 @@ static integer c__1 = 1;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer isub, i;
+    static integer isub, i__;
     static char cname[6];
     extern logical lsame_(char *, char *);
     static integer lpath, istop, lcname, lnames;
@@ -41,7 +42,10 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define names_ref(a_0,a_1) &names[(a_1)*names_len + a_0]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -61,13 +65,11 @@ static integer c__1 = 1;
             The LAPACK path name of the calling routine.  The path name   
             may be at most 6 characters long.  If LINE(1:LEN(PATH)) is   
             the same as PATH, then the input line is searched for NSUBS   
-            non-blank characters, otherwise, the input line is assumed to 
-  
+            non-blank characters, otherwise, the input line is assumed to   
             specify a single subroutine name.   
 
     LINE    (input) CHARACTER*80   
-            The input line to be evaluated.  The path or subroutine name 
-  
+            The input line to be evaluated.  The path or subroutine name   
             must begin in column 1 and the part of the line after the   
             name is used to indicate the routines to be timed.   
             See below for further details.   
@@ -98,8 +100,7 @@ static integer c__1 = 1;
     ======= =======   
 
     An input line begins with a subroutine or path name, optionally   
-    followed by one or more non-blank characters indicating the specific 
-  
+    followed by one or more non-blank characters indicating the specific   
     routines to be timed.   
 
     If the character string in PATH appears at the beginning of LINE,   
@@ -113,19 +114,14 @@ static integer c__1 = 1;
     requests timing of the first 4 subroutines in the SGE path.   
 
     If the character string in PATH does not appear at the beginning of   
-    LINE, then LINE is assumed to begin with a subroutine name.  The name 
-  
+    LINE, then LINE is assumed to begin with a subroutine name.  The name   
     is assumed to end in column 6 or in column i if column i+1 is blank   
-    and i+1 <= 6.  If LINE is completely blank after the subroutine name, 
-  
-    the routine will be timed.  If LINE is not blank after the subroutine 
-  
-    name, then the subroutine will be timed if the first non-blank after 
-  
+    and i+1 <= 6.  If LINE is completely blank after the subroutine name,   
+    the routine will be timed.  If LINE is not blank after the subroutine   
+    name, then the subroutine will be timed if the first non-blank after   
     the name is 't' or 'T'.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
 
@@ -138,11 +134,11 @@ static integer c__1 = 1;
     /* Function Body */
     *info = 0;
     lcname = 1;
-    for (i = 2; i <= 6; ++i) {
-	if (*(unsigned char *)&line[i - 1] == ' ') {
+    for (i__ = 2; i__ <= 6; ++i__) {
+	if (*(unsigned char *)&line[i__ - 1] == ' ') {
 	    goto L20;
 	}
-	lcname = i;
+	lcname = i__;
 /* L10: */
     }
 L20:
@@ -150,13 +146,13 @@ L20:
     i__1 = lcname + 1, i__2 = i_len(path, path_len);
     lpath = min(i__1,i__2);
 /* Computing MIN */
-    i__1 = lcname + 1, i__2 = i_len(names + names_len, names_len);
+    i__1 = lcname + 1, i__2 = i_len(names_ref(0, 1), names_len);
     lnames = min(i__1,i__2);
-    s_copy(cname, line, 6L, lcname);
+    s_copy(cname, line, (ftnlen)6, lcname);
 
     i__1 = *nsubs;
-    for (i = 1; i <= i__1; ++i) {
-	timsub[i] = FALSE_;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	timsub[i__] = FALSE_;
 /* L30: */
     }
     istop = 0;
@@ -166,13 +162,12 @@ L20:
     if (lcname <= i_len(path, path_len) && lsamen_(&lpath, cname, path)) {
 	istart = 1;
 	istop = *nsubs;
-    } else if (lcname <= i_len(names + names_len, names_len)) {
+    } else if (lcname <= i_len(names_ref(0, 1), names_len)) {
 	i__1 = *nsubs;
-	for (i = 1; i <= i__1; ++i) {
-	    if (lsamen_(&lnames, cname, names + i * names_len))
-		     {
-		istart = i;
-		istop = i;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (lsamen_(&lnames, cname, names_ref(0, i__))) {
+		istart = i__;
+		istop = i__;
 	    }
 /* L40: */
 	}
@@ -181,7 +176,7 @@ L20:
     if (istop == 0) {
 	io___8.ciunit = *nout;
 	s_wsfe(&io___8);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
 	*info = -1;
 	goto L110;
@@ -191,9 +186,10 @@ L20:
        characters, where 'T' or 't' means 'Time this routine'. */
 
     isub = istart;
-    for (i = lcname + 1; i <= 80; ++i) {
-	if (*(unsigned char *)&line[i - 1] != ' ') {
-	    timsub[isub] = lsame_(line + (i - 1), "T");
+    for (i__ = lcname + 1; i__ <= 80; ++i__) {
+	if (*(unsigned char *)&line[i__ - 1] != ' ') {
+	    timsub[isub] = lsame_(line + (i__ - 1), "T")
+		    ;
 	    ++isub;
 	    if (isub > istop) {
 		goto L60;
@@ -208,8 +204,8 @@ L60:
 
     if (isub == istart) {
 	i__1 = istop;
-	for (i = istart; i <= i__1; ++i) {
-	    timsub[i] = TRUE_;
+	for (i__ = istart; i__ <= i__1; ++i__) {
+	    timsub[i__] = TRUE_;
 /* L70: */
 	}
     } else {
@@ -218,27 +214,26 @@ L60:
 
 	req = FALSE_;
 	i__1 = isub - 1;
-	for (i = istart; i <= i__1; ++i) {
-	    req = req || timsub[i];
+	for (i__ = istart; i__ <= i__1; ++i__) {
+	    req = req || timsub[i__];
 /* L80: */
 	}
 	if (! req) {
 	    io___11.ciunit = *nout;
 	    s_wsfe(&io___11);
-	    do_fio(&c__1, cname, 6L);
+	    do_fio(&c__1, cname, (ftnlen)6);
 	    e_wsfe();
 	    *info = 1;
 	    goto L110;
 	}
 /* L90:   
 
-         If fewer than NSUBS characters are specified for a path name,
-   
+         If fewer than NSUBS characters are specified for a path name,   
          the rest are assumed to be 'F'. */
 
 	i__1 = istop;
-	for (i = isub; i <= i__1; ++i) {
-	    timsub[i] = FALSE_;
+	for (i__ = isub; i__ <= i__1; ++i__) {
+	    timsub[i__] = FALSE_;
 /* L100: */
 	}
     }
@@ -248,4 +243,7 @@ L110:
 /*     End of ATIMIN */
 
 } /* atimin_ */
+
+#undef names_ref
+
 

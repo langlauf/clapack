@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,7 +24,7 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
     /* Local variables */
     static real adds;
     static logical sord, corz;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static char c1[1], c2[2], c3[3];
     static real mults, addfac;
@@ -32,7 +33,7 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
     extern logical lsamen_(integer *, char *, char *);
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -65,8 +66,7 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
     IPIV    (input)  INTEGER array, dimension (min(M,N))   
             The vector of pivot indices from SGBTRF or CGBTRF.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -77,8 +77,8 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
     mults = 0.f;
     adds = 0.f;
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
     sord = lsame_(c1, "S") || lsame_(c1, "D");
     corz = lsame_(c1, "C") || lsame_(c1, "Z");
     if (! (sord || corz)) {
@@ -133,8 +133,8 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
 	    mults = (real) (*m - 1 << 1);
 	    adds = (real) (*m - 1);
 	    i__1 = *m - 2;
-	    for (i = 1; i <= i__1; ++i) {
-		if (ipiv[i] != i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (ipiv[i__] != i__) {
 		    mults += 1;
 		}
 /* L20: */
@@ -152,8 +152,8 @@ doublereal sopgb_(char *subnam, integer *m, integer *n, integer *kl, integer *
 	    mults = (real) (((*n << 2) + 2) * (*m - 1));
 	    adds = (real) ((*n * 3 + 1) * (*m - 1));
 	    i__1 = *m - 2;
-	    for (i = 1; i <= i__1; ++i) {
-		if (ipiv[i] != i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
+		if (ipiv[i__] != i__) {
 		    mults += 1;
 		}
 /* L30: */

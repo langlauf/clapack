@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -24,7 +25,7 @@ static doublereal c_b24 = 1.;
 
 /* Subroutine */ int zrqt02_(integer *m, integer *n, integer *k, 
 	doublecomplex *a, doublecomplex *af, doublecomplex *q, doublecomplex *
-	r, integer *lda, doublecomplex *tau, doublecomplex *work, integer *
+	r__, integer *lda, doublecomplex *tau, doublecomplex *work, integer *
 	lwork, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
@@ -57,7 +58,17 @@ static doublereal c_b24 = 1.;
     static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
+#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
+#define r___subscr(a_1,a_2) (a_2)*r_dim1 + a_1
+#define r___ref(a_1,a_2) r__[r___subscr(a_1,a_2)]
+#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
+#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -80,24 +91,21 @@ static doublereal c_b24 = 1.;
     =========   
 
     M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0. 
-  
+            The number of rows of the matrix Q to be generated.  M >= 0.   
 
     N       (input) INTEGER   
             The number of columns of the matrix Q to be generated.   
             N >= M >= 0.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input) COMPLEX*16 array, dimension (LDA,N)   
             The m-by-n matrix A which was factorized by ZRQT01.   
 
     AF      (input) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the RQ factorization of A, as returned by ZGERQF. 
-  
+            Details of the RQ factorization of A, as returned by ZGERQF.   
             See ZGERQF for further details.   
 
     Q       (workspace) COMPLEX*16 array, dimension (LDA,N)   
@@ -105,12 +113,10 @@ static doublereal c_b24 = 1.;
     R       (workspace) COMPLEX*16 array, dimension (LDA,M)   
 
     LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= N. 
-  
+            The leading dimension of the arrays A, AF, Q and L. LDA >= N.   
 
     TAU     (input) COMPLEX*16 array, dimension (M)   
-            The scalar factors of the elementary reflectors corresponding 
-  
+            The scalar factors of the elementary reflectors corresponding   
             to the RQ factorization in AF.   
 
     WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
@@ -125,24 +131,23 @@ static doublereal c_b24 = 1.;
             RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS )   
             RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
        Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -163,40 +168,40 @@ static doublereal c_b24 = 1.;
     zlaset_("Full", m, n, &c_b1, &c_b1, &q[q_offset], lda);
     if (*k < *n) {
 	i__1 = *n - *k;
-	zlacpy_("Full", k, &i__1, &af[*m - *k + 1 + af_dim1], lda, &q[*m - *k 
-		+ 1 + q_dim1], lda);
+	zlacpy_("Full", k, &i__1, &af_ref(*m - *k + 1, 1), lda, &q_ref(*m - *
+		k + 1, 1), lda);
     }
     if (*k > 1) {
 	i__1 = *k - 1;
 	i__2 = *k - 1;
-	zlacpy_("Lower", &i__1, &i__2, &af[*m - *k + 2 + (*n - *k + 1) * 
-		af_dim1], lda, &q[*m - *k + 2 + (*n - *k + 1) * q_dim1], lda);
+	zlacpy_("Lower", &i__1, &i__2, &af_ref(*m - *k + 2, *n - *k + 1), lda,
+		 &q_ref(*m - *k + 2, *n - *k + 1), lda);
     }
 
 /*     Generate the last n rows of the matrix Q */
 
-    s_copy(srnamc_1.srnamt, "ZUNGRQ", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "ZUNGRQ", (ftnlen)6, (ftnlen)6);
     zungrq_(m, n, k, &q[q_offset], lda, &tau[*m - *k + 1], &work[1], lwork, &
 	    info);
 
 /*     Copy R(m-k+1:m,n-m+1:n) */
 
-    zlaset_("Full", k, m, &c_b9, &c_b9, &r[*m - *k + 1 + (*n - *m + 1) * 
-	    r_dim1], lda);
-    zlacpy_("Upper", k, k, &af[*m - *k + 1 + (*n - *k + 1) * af_dim1], lda, &
-	    r[*m - *k + 1 + (*n - *k + 1) * r_dim1], lda);
+    zlaset_("Full", k, m, &c_b9, &c_b9, &r___ref(*m - *k + 1, *n - *m + 1), 
+	    lda);
+    zlacpy_("Upper", k, k, &af_ref(*m - *k + 1, *n - *k + 1), lda, &r___ref(*
+	    m - *k + 1, *n - *k + 1), lda);
 
 /*     Compute R(m-k+1:m,n-m+1:n) - A(m-k+1:m,1:n) * Q(n-m+1:n,1:n)' */
 
-    zgemm_("No transpose", "Conjugate transpose", k, m, n, &c_b14, &a[*m - *k 
-	    + 1 + a_dim1], lda, &q[q_offset], lda, &c_b15, &r[*m - *k + 1 + (*
-	    n - *m + 1) * r_dim1], lda);
+    zgemm_("No transpose", "Conjugate transpose", k, m, n, &c_b14, &a_ref(*m 
+	    - *k + 1, 1), lda, &q[q_offset], lda, &c_b15, &r___ref(*m - *k + 
+	    1, *n - *m + 1), lda);
 
 /*     Compute norm( R - A*Q' ) / ( N * norm(A) * EPS ) . */
 
-    anorm = zlange_("1", k, n, &a[*m - *k + 1 + a_dim1], lda, &rwork[1]);
-    resid = zlange_("1", k, m, &r[*m - *k + 1 + (*n - *m + 1) * r_dim1], lda, 
-	    &rwork[1]);
+    anorm = zlange_("1", k, n, &a_ref(*m - *k + 1, 1), lda, &rwork[1]);
+    resid = zlange_("1", k, m, &r___ref(*m - *k + 1, *n - *m + 1), lda, &
+	    rwork[1]);
     if (anorm > 0.) {
 	result[1] = resid / (doublereal) max(1,*n) / anorm / eps;
     } else {
@@ -205,13 +210,13 @@ static doublereal c_b24 = 1.;
 
 /*     Compute I - Q*Q' */
 
-    zlaset_("Full", m, m, &c_b9, &c_b15, &r[r_offset], lda);
+    zlaset_("Full", m, m, &c_b9, &c_b15, &r__[r_offset], lda);
     zherk_("Upper", "No transpose", m, n, &c_b23, &q[q_offset], lda, &c_b24, &
-	    r[r_offset], lda);
+	    r__[r_offset], lda);
 
 /*     Compute norm( I - Q*Q' ) / ( N * EPS ) . */
 
-    resid = zlansy_("1", "Upper", m, &r[r_offset], lda, &rwork[1]);
+    resid = zlansy_("1", "Upper", m, &r__[r_offset], lda, &rwork[1]);
 
     result[2] = resid / (doublereal) max(1,*n) / eps;
 
@@ -220,4 +225,14 @@ static doublereal c_b24 = 1.;
 /*     End of ZRQT02 */
 
 } /* zrqt02_ */
+
+#undef af_ref
+#undef af_subscr
+#undef r___ref
+#undef r___subscr
+#undef q_ref
+#undef q_subscr
+#undef a_ref
+#undef a_subscr
+
 

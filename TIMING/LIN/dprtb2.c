@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -30,7 +31,7 @@ static integer c__1 = 1;
     integer s_wsle(cilist *), e_wsle(void);
 
     /* Local variables */
-    static integer i, j, k, ic;
+    static integer i__, j, k, ic;
     static char collab[6];
     static integer inb, lnb;
 
@@ -44,7 +45,11 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define reslts_ref(a_1,a_2,a_3) reslts[((a_3)*reslts_dim2 + (a_2))*\
+reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -72,8 +77,7 @@ static integer c__1 = 1;
             N or K).   
 
     NN      (input) INTEGER   
-            The number of values of NVAL, and also the number of columns 
-  
+            The number of values of NVAL, and also the number of columns   
             of the table.   
 
     NVAL    (input) INTEGER array, dimension (NN)   
@@ -83,8 +87,7 @@ static integer c__1 = 1;
             The number of values of LDA, hence the number of rows for   
             each value of NRHS.   
 
-    RESLTS  (input) DOUBLE PRECISION array, dimension (LDR1, LDR2, NLDA) 
-  
+    RESLTS  (input) DOUBLE PRECISION array, dimension (LDR1, LDR2, NLDA)   
             The timing results for each value of N, K, and LDA.   
 
     LDR1    (input) INTEGER   
@@ -97,15 +100,14 @@ static integer c__1 = 1;
             The unit number on which the table is to be printed.   
             NOUT >= 0.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     --nval;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
-    reslts_offset = reslts_dim1 * (reslts_dim2 + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * 1);
     reslts -= reslts_offset;
 
     /* Function Body */
@@ -116,8 +118,8 @@ static integer c__1 = 1;
     s_wsfe(&io___1);
     do_fio(&c__1, lab2, lab2_len);
     i__1 = *nn;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&nval[i], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&nval[i__], (ftnlen)sizeof(integer));
     }
     e_wsfe();
     io___3.ciunit = *nout;
@@ -129,12 +131,12 @@ static integer c__1 = 1;
 
     inb = 0;
     i__1 = i_len(lab3, lab3_len);
-    for (i = 1; i <= i__1; ++i) {
-	if (inb == 0 && *(unsigned char *)&lab3[i - 1] != ' ') {
-	    inb = i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (inb == 0 && *(unsigned char *)&lab3[i__ - 1] != ' ') {
+	    inb = i__;
 	}
-	if (*(unsigned char *)&lab3[i - 1] != ' ') {
-	    lnb = i;
+	if (*(unsigned char *)&lab3[i__ - 1] != ' ') {
+	    lnb = i__;
 	}
 /* L10: */
     }
@@ -143,13 +145,13 @@ static integer c__1 = 1;
 	lnb = 1;
     }
 
-    for (i = 1; i <= 4; ++i) {
-	if (i == 1) {
-	    s_copy(collab, "     1", 6L, 6L);
-	} else if (i == 2) {
-	    s_copy(collab, "     2", 6L, 6L);
-	} else if (i == 3) {
-	    s_copy(collab, "    /2", 6L, 6L);
+    for (i__ = 1; i__ <= 4; ++i__) {
+	if (i__ == 1) {
+	    s_copy(collab, "     1", (ftnlen)6, (ftnlen)6);
+	} else if (i__ == 2) {
+	    s_copy(collab, "     2", (ftnlen)6, (ftnlen)6);
+	} else if (i__ == 3) {
+	    s_copy(collab, "    /2", (ftnlen)6, (ftnlen)6);
 /* Computing MAX */
 	    i__2 = inb, i__3 = lnb - 3;
 	    i__1 = max(i__2,i__3);
@@ -159,8 +161,8 @@ static integer c__1 = 1;
 			- 1];
 /* L20: */
 	    }
-	} else if (i == 4) {
-	    s_copy(collab, " ", 6L, 1L);
+	} else if (i__ == 4) {
+	    s_copy(collab, " ", (ftnlen)6, (ftnlen)1);
 /* Computing MAX */
 	    i__2 = inb, i__3 = lnb - 5;
 	    i__1 = max(i__2,i__3);
@@ -173,11 +175,11 @@ static integer c__1 = 1;
 	}
 	io___9.ciunit = *nout;
 	s_wsfe(&io___9);
-	do_fio(&c__1, collab, 6L);
+	do_fio(&c__1, collab, (ftnlen)6);
 	i__1 = *nn;
 	for (j = 1; j <= i__1; ++j) {
-	    do_fio(&c__1, (char *)&reslts[i + (j + reslts_dim2) * reslts_dim1]
-		    , (ftnlen)sizeof(doublereal));
+	    do_fio(&c__1, (char *)&reslts_ref(i__, j, 1), (ftnlen)sizeof(
+		    doublereal));
 	}
 	e_wsfe();
 	i__1 = *nlda;
@@ -186,8 +188,8 @@ static integer c__1 = 1;
 	    s_wsfe(&io___11);
 	    i__2 = *nn;
 	    for (j = 1; j <= i__2; ++j) {
-		do_fio(&c__1, (char *)&reslts[i + (j + k * reslts_dim2) * 
-			reslts_dim1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&reslts_ref(i__, j, k), (ftnlen)sizeof(
+			doublereal));
 	    }
 	    e_wsfe();
 /* L40: */
@@ -211,4 +213,7 @@ static integer c__1 = 1;
 /*     End of DPRTB2 */
 
 } /* dprtb2_ */
+
+#undef reslts_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -43,7 +44,7 @@ static integer c__1 = 1;
 
     /* Local variables */
     static char line[80];
-    static integer lenp, nreq[100], i, j, k;
+    static integer lenp, nreq[100], i__, j, k;
     static char c1[1];
     static integer i1, ic, nt;
     static logical firstt;
@@ -62,7 +63,7 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 5, 1993   
@@ -103,8 +104,7 @@ static integer c__1 = 1;
     NOUT    (input) INTEGER   
             The unit number for output.  NOUT >= 1.   
 
-   ====================================================================== 
-  
+   ======================================================================   
 
        Parameter adjustments */
     --dotype;
@@ -116,14 +116,14 @@ static integer c__1 = 1;
 /*        Test everything if NMATS >= NTYPES. */
 
 	i__1 = *ntypes;
-	for (i = 1; i <= i__1; ++i) {
-	    dotype[i] = TRUE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    dotype[i__] = TRUE_;
 /* L10: */
 	}
     } else {
 	i__1 = *ntypes;
-	for (i = 1; i <= i__1; ++i) {
-	    dotype[i] = FALSE_;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    dotype[i__] = FALSE_;
 /* L20: */
 	}
 	firstt = TRUE_;
@@ -136,7 +136,7 @@ static integer c__1 = 1;
 	    if (i__1 != 0) {
 		goto L90;
 	    }
-	    i__1 = do_fio(&c__1, line, 80L);
+	    i__1 = do_fio(&c__1, line, (ftnlen)80);
 	    if (i__1 != 0) {
 		goto L90;
 	    }
@@ -144,21 +144,21 @@ static integer c__1 = 1;
 	    if (i__1 != 0) {
 		goto L90;
 	    }
-	    lenp = i_len(line, 80L);
-	    i = 0;
+	    lenp = i_len(line, (ftnlen)80);
+	    i__ = 0;
 	    i__1 = *nmats;
 	    for (j = 1; j <= i__1; ++j) {
 		nreq[j - 1] = 0;
 		i1 = 0;
 L30:
-		++i;
-		if (i > lenp) {
+		++i__;
+		if (i__ > lenp) {
 		    if (j == *nmats && i1 > 0) {
 			goto L60;
 		    } else {
 			io___10.ciunit = *nout;
 			s_wsfe(&io___10);
-			do_fio(&c__1, line, 80L);
+			do_fio(&c__1, line, (ftnlen)80);
 			e_wsfe();
 			io___11.ciunit = *nout;
 			s_wsfe(&io___11);
@@ -168,9 +168,9 @@ L30:
 			goto L80;
 		    }
 		}
-		if (*(unsigned char *)&line[i - 1] != ' ' && *(unsigned char *
-			)&line[i - 1] != ',') {
-		    i1 = i;
+		if (*(unsigned char *)&line[i__ - 1] != ' ' && *(unsigned 
+			char *)&line[i__ - 1] != ',') {
+		    i1 = i__;
 		    *(unsigned char *)c1 = *(unsigned char *)&line[i1 - 1];
 
 /*              Check that a valid integer was read */
@@ -185,8 +185,8 @@ L30:
 		    }
 		    io___15.ciunit = *nout;
 		    s_wsfe(&io___15);
-		    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, line, 80L);
+		    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, line, (ftnlen)80);
 		    e_wsfe();
 		    io___16.ciunit = *nout;
 		    s_wsfe(&io___16);
@@ -206,8 +206,8 @@ L60:
 	    }
 	}
 	i__1 = *nmats;
-	for (i = 1; i <= i__1; ++i) {
-	    nt = nreq[i - 1];
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    nt = nreq[i__ - 1];
 	    if (nt > 0 && nt <= *ntypes) {
 		if (dotype[nt]) {
 		    if (firstt) {
@@ -219,14 +219,14 @@ L60:
 		    io___19.ciunit = *nout;
 		    s_wsfe(&io___19);
 		    do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
-		    do_fio(&c__1, path, 3L);
+		    do_fio(&c__1, path, (ftnlen)3);
 		    e_wsfe();
 		}
 		dotype[nt] = TRUE_;
 	    } else {
 		io___20.ciunit = *nout;
 		s_wsfe(&io___20);
-		do_fio(&c__1, path, 3L);
+		do_fio(&c__1, path, (ftnlen)3);
 		do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&(*ntypes), (ftnlen)sizeof(integer));
 		e_wsfe();
@@ -241,12 +241,12 @@ L80:
 L90:
     io___21.ciunit = *nout;
     s_wsfe(&io___21);
-    do_fio(&c__1, path, 3L);
+    do_fio(&c__1, path, (ftnlen)3);
     e_wsfe();
     io___22.ciunit = *nout;
     s_wsle(&io___22);
     e_wsle();
-    s_stop("", 0L);
+    s_stop("", (ftnlen)0);
 
 /*     End of ALARQG */
 

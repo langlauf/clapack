@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -199,6 +200,8 @@ static integer c__8 = 8;
     static char fmt_9968[] = "(\002 Matrix types (2-3 have condition 1/EPS)"
 	    ":\002,/4x,\0021. Zero matrix\002,/4x,\0022. One small eigenvalu"
 	    "e\002,/4x,\0023. Geometric distribution\002)";
+    static char fmt_9929[] = "(\002 Test ratios (1-3: \002,a1,\002TZRQF, 4-6"
+	    ": \002,a1,\002TZRZF):\002)";
     static char fmt_9937[] = "(3x,i2,\002: norm( A - R*Q )       / ( M * nor"
 	    "m(A) * EPS )\002)";
     static char fmt_9984[] = "(/1x,a3,\002:  Least squares driver routine"
@@ -207,8 +210,9 @@ static integer c__8 = 8;
 	    "deficient):\002,/4x,\0021 and 4. Normal scaling\002,/4x,\0022 an"
 	    "d 5. Scaled near overflow\002,/4x,\0023 and 6. Scaled near under"
 	    "flow\002)";
-    static char fmt_9936[] = "(\002 Test ratios (1-2: \002,a1,\002GELS, 3-"
-	    "6: \002,a1,\002GELSS, 7-10: \002,a1,\002GELSX):\002)";
+    static char fmt_9921[] = "(\002 Test ratios:\002,/\002    (1-2: \002,a1"
+	    ",\002GELS, 3-6: \002,a1,\002GELSX, 7-10: \002,a1,\002GELSY, 11-1"
+	    "4: \002,a1,\002GELSS, 15-18: \002,a1,\002GELSD)\002)";
     static char fmt_9935[] = "(3x,i2,\002: norm( B - A * X )   / \002,\002( "
 	    "max(M,N) * norm(A) * norm(X) * EPS )\002)";
     static char fmt_9931[] = "(3x,i2,\002: norm( (A*X-B)' *A ) / \002,\002( "
@@ -222,7 +226,8 @@ static integer c__8 = 8;
 	    "max(M,N,NRHS) * norm(A) * norm(B) * EPS )\002)";
     static char fmt_9932[] = "(3x,i2,\002: Check if X is in the row space of"
 	    " A or A'\002)";
-    static char fmt_9930[] = "(3x,\002 7-10: same as 3-6\002)";
+    static char fmt_9920[] = "(3x,\002 7-10: same as 3-6\002,3x,\002 11-14: "
+	    "same as 3-6\002,3x,\002 15-18: same as 3-6\002)";
     static char fmt_9983[] = "(/1x,a3,\002:  LU factorization variants\002)";
     static char fmt_9982[] = "(/1x,a3,\002:  Cholesky factorization variant"
 	    "s\002)";
@@ -440,46 +445,50 @@ static integer c__8 = 8;
     static cilist io___192 = { 0, 0, 0, "( ' Messages:' )", 0 };
     static cilist io___193 = { 0, 0, 0, fmt_9985, 0 };
     static cilist io___194 = { 0, 0, 0, fmt_9968, 0 };
-    static cilist io___195 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___196 = { 0, 0, 0, fmt_9940, 0 };
-    static cilist io___197 = { 0, 0, 0, fmt_9937, 0 };
-    static cilist io___198 = { 0, 0, 0, fmt_9938, 0 };
-    static cilist io___199 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___200 = { 0, 0, 0, fmt_9984, 0 };
-    static cilist io___201 = { 0, 0, 0, fmt_9967, 0 };
-    static cilist io___202 = { 0, 0, 0, fmt_9936, 0 };
-    static cilist io___203 = { 0, 0, 0, fmt_9935, 0 };
-    static cilist io___204 = { 0, 0, 0, fmt_9931, 0 };
-    static cilist io___205 = { 0, 0, 0, fmt_9933, 0 };
-    static cilist io___206 = { 0, 0, 0, fmt_9935, 0 };
-    static cilist io___207 = { 0, 0, 0, fmt_9934, 0 };
-    static cilist io___208 = { 0, 0, 0, fmt_9932, 0 };
-    static cilist io___209 = { 0, 0, 0, fmt_9930, 0 };
-    static cilist io___210 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___211 = { 0, 0, 0, fmt_9983, 0 };
-    static cilist io___212 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___213 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___214 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
-    static cilist io___215 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___216 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___217 = { 0, 0, 0, fmt_9982, 0 };
-    static cilist io___218 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___219 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___220 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
-    static cilist io___221 = { 0, 0, 0, fmt_9954, 0 };
-    static cilist io___222 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___223 = { 0, 0, 0, fmt_9981, 0 };
-    static cilist io___224 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___225 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___226 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___227 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___195 = { 0, 0, 0, fmt_9929, 0 };
+    static cilist io___196 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
+    static cilist io___197 = { 0, 0, 0, fmt_9940, 0 };
+    static cilist io___198 = { 0, 0, 0, fmt_9937, 0 };
+    static cilist io___199 = { 0, 0, 0, fmt_9938, 0 };
+    static cilist io___200 = { 0, 0, 0, fmt_9940, 0 };
+    static cilist io___201 = { 0, 0, 0, fmt_9937, 0 };
+    static cilist io___202 = { 0, 0, 0, fmt_9938, 0 };
+    static cilist io___203 = { 0, 0, 0, "( ' Messages:' )", 0 };
+    static cilist io___204 = { 0, 0, 0, fmt_9984, 0 };
+    static cilist io___205 = { 0, 0, 0, fmt_9967, 0 };
+    static cilist io___206 = { 0, 0, 0, fmt_9921, 0 };
+    static cilist io___207 = { 0, 0, 0, fmt_9935, 0 };
+    static cilist io___208 = { 0, 0, 0, fmt_9931, 0 };
+    static cilist io___209 = { 0, 0, 0, fmt_9933, 0 };
+    static cilist io___210 = { 0, 0, 0, fmt_9935, 0 };
+    static cilist io___211 = { 0, 0, 0, fmt_9934, 0 };
+    static cilist io___212 = { 0, 0, 0, fmt_9932, 0 };
+    static cilist io___213 = { 0, 0, 0, fmt_9920, 0 };
+    static cilist io___214 = { 0, 0, 0, "( ' Messages:' )", 0 };
+    static cilist io___215 = { 0, 0, 0, fmt_9983, 0 };
+    static cilist io___216 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
+    static cilist io___217 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___218 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
+    static cilist io___219 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___220 = { 0, 0, 0, "( ' Messages:' )", 0 };
+    static cilist io___221 = { 0, 0, 0, fmt_9982, 0 };
+    static cilist io___222 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
+    static cilist io___223 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___224 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
+    static cilist io___225 = { 0, 0, 0, fmt_9954, 0 };
+    static cilist io___226 = { 0, 0, 0, "( ' Messages:' )", 0 };
+    static cilist io___227 = { 0, 0, 0, fmt_9981, 0 };
+    static cilist io___228 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
+    static cilist io___229 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___230 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
+    static cilist io___231 = { 0, 0, 0, fmt_9980, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1998   
 
 
     Purpose   
@@ -503,8 +512,7 @@ static integer c__8 = 8;
                _PO:  Symmetric or Hermitian positive definite   
                _PP:  Symmetric or Hermitian positive definite packed   
                _PB:  Symmetric or Hermitian positive definite band   
-               _PT:  Symmetric or Hermitian positive definite tridiagonal 
-  
+               _PT:  Symmetric or Hermitian positive definite tridiagonal   
                _SY:  Symmetric indefinite   
                _SP:  Symmetric indefinite packed   
                _HE:  (complex) Hermitian indefinite   
@@ -522,12 +530,10 @@ static integer c__8 = 8;
                _LU:  LU variants   
                _CH:  Cholesky variants   
                _QS:  QR variants   
-            The first character must be one of S, D, C, or Z (C or Z only 
-  
+            The first character must be one of S, D, C, or Z (C or Z only   
             if complex).   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     if (*iounit <= 0) {
@@ -535,7 +541,7 @@ static integer c__8 = 8;
     }
     *(unsigned char *)c1 = *(unsigned char *)path;
     *(unsigned char *)c3 = *(unsigned char *)&path[2];
-    s_copy(p2, path + 1, 2L, 2L);
+    s_copy(p2, path + 1, (ftnlen)2, (ftnlen)2);
     sord = lsame_(c1, "S") || lsame_(c1, "D");
     corz = lsame_(c1, "C") || lsame_(c1, "Z");
     if (! (sord || corz)) {
@@ -548,7 +554,7 @@ static integer c__8 = 8;
 
 	io___6.ciunit = *iounit;
 	s_wsfe(&io___6);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___7.ciunit = *iounit;
 	s_wsfe(&io___7);
@@ -601,7 +607,7 @@ static integer c__8 = 8;
 
 	io___19.ciunit = *iounit;
 	s_wsfe(&io___19);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___20.ciunit = *iounit;
 	s_wsfe(&io___20);
@@ -650,7 +656,7 @@ static integer c__8 = 8;
 
 	io___31.ciunit = *iounit;
 	s_wsfe(&io___31);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___32.ciunit = *iounit;
 	s_wsfe(&io___32);
@@ -690,27 +696,28 @@ static integer c__8 = 8;
 	s_wsfe(&io___41);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&c__2, p2, "PP")) {
+    } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&
+	    c__2, p2, "PP")) {
 
 /*        PO: Positive definite full   
           PP: Positive definite packed */
 
 	if (sord) {
-	    s_copy(sym, "Symmetric", 9L, 9L);
+	    s_copy(sym, "Symmetric", (ftnlen)9, (ftnlen)9);
 	} else {
-	    s_copy(sym, "Hermitian", 9L, 9L);
+	    s_copy(sym, "Hermitian", (ftnlen)9, (ftnlen)9);
 	}
 	if (lsame_(c3, "O")) {
 	    io___43.ciunit = *iounit;
 	    s_wsfe(&io___43);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, sym, 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___44.ciunit = *iounit;
 	    s_wsfe(&io___44);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, sym, 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	}
 	io___45.ciunit = *iounit;
@@ -718,7 +725,7 @@ static integer c__8 = 8;
 	e_wsfe();
 	io___46.ciunit = *iounit;
 	s_wsfe(&io___46);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___47.ciunit = *iounit;
 	s_wsfe(&io___47);
@@ -766,14 +773,14 @@ static integer c__8 = 8;
 	if (sord) {
 	    io___57.ciunit = *iounit;
 	    s_wsfe(&io___57);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___58.ciunit = *iounit;
 	    s_wsfe(&io___58);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___59.ciunit = *iounit;
@@ -781,7 +788,7 @@ static integer c__8 = 8;
 	e_wsfe();
 	io___60.ciunit = *iounit;
 	s_wsfe(&io___60);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___61.ciunit = *iounit;
 	s_wsfe(&io___61);
@@ -825,14 +832,14 @@ static integer c__8 = 8;
 	if (sord) {
 	    io___70.ciunit = *iounit;
 	    s_wsfe(&io___70);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___71.ciunit = *iounit;
 	    s_wsfe(&io___71);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___72.ciunit = *iounit;
@@ -873,7 +880,8 @@ static integer c__8 = 8;
 	s_wsfe(&io___81);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&c__2, p2, "SP")) {
+    } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&
+	    c__2, p2, "SP")) {
 
 /*        SY: Symmetric indefinite full   
           SP: Symmetric indefinite packed */
@@ -881,14 +889,14 @@ static integer c__8 = 8;
 	if (lsame_(c3, "Y")) {
 	    io___82.ciunit = *iounit;
 	    s_wsfe(&io___82);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___83.ciunit = *iounit;
 	    s_wsfe(&io___83);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Symmetric", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___84.ciunit = *iounit;
@@ -942,7 +950,8 @@ static integer c__8 = 8;
 	s_wsfe(&io___96);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "HE") || lsamen_(&c__2, p2, "HP")) {
+    } else if (lsamen_(&c__2, p2, "HE") || lsamen_(&
+	    c__2, p2, "HP")) {
 
 /*        HE: Hermitian indefinite full   
           HP: Hermitian indefinite packed */
@@ -950,14 +959,14 @@ static integer c__8 = 8;
 	if (lsame_(c3, "E")) {
 	    io___97.ciunit = *iounit;
 	    s_wsfe(&io___97);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	} else {
 	    io___98.ciunit = *iounit;
 	    s_wsfe(&io___98);
-	    do_fio(&c__1, path, 3L);
-	    do_fio(&c__1, "Hermitian", 9L);
+	    do_fio(&c__1, path, (ftnlen)3);
+	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
 	io___99.ciunit = *iounit;
@@ -1005,7 +1014,8 @@ static integer c__8 = 8;
 	s_wsfe(&io___110);
 	e_wsfe();
 
-    } else if (lsamen_(&c__2, p2, "TR") || lsamen_(&c__2, p2, "TP")) {
+    } else if (lsamen_(&c__2, p2, "TR") || lsamen_(&
+	    c__2, p2, "TP")) {
 
 /*        TR: Triangular full   
           TP: Triangular packed */
@@ -1013,29 +1023,29 @@ static integer c__8 = 8;
 	if (lsame_(c3, "R")) {
 	    io___111.ciunit = *iounit;
 	    s_wsfe(&io___111);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 /* Writing concatenation */
 	    i__1[0] = 1, a__1[0] = path;
 	    i__1[1] = 5, a__1[1] = "LATRS";
-	    s_cat(subnam, a__1, i__1, &c__2, 6L);
+	    s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
 	} else {
 	    io___113.ciunit = *iounit;
 	    s_wsfe(&io___113);
-	    do_fio(&c__1, path, 3L);
+	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 /* Writing concatenation */
 	    i__1[0] = 1, a__1[0] = path;
 	    i__1[1] = 5, a__1[1] = "LATPS";
-	    s_cat(subnam, a__1, i__1, &c__2, 6L);
+	    s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
 	}
 	io___114.ciunit = *iounit;
 	s_wsfe(&io___114);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___115.ciunit = *iounit;
 	s_wsfe(&io___115);
-	do_fio(&c__1, subnam, 6L);
+	do_fio(&c__1, subnam, (ftnlen)6);
 	e_wsfe();
 	io___116.ciunit = *iounit;
 	s_wsfe(&io___116);
@@ -1070,7 +1080,7 @@ static integer c__8 = 8;
 	e_wsfe();
 	io___124.ciunit = *iounit;
 	s_wsfe(&io___124);
-	do_fio(&c__1, subnam, 6L);
+	do_fio(&c__1, subnam, (ftnlen)6);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___125.ciunit = *iounit;
@@ -1083,19 +1093,19 @@ static integer c__8 = 8;
 
 	io___126.ciunit = *iounit;
 	s_wsfe(&io___126);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 /* Writing concatenation */
 	i__1[0] = 1, a__1[0] = path;
 	i__1[1] = 5, a__1[1] = "LATBS";
-	s_cat(subnam, a__1, i__1, &c__2, 6L);
+	s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
 	io___127.ciunit = *iounit;
 	s_wsfe(&io___127);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___128.ciunit = *iounit;
 	s_wsfe(&io___128);
-	do_fio(&c__1, subnam, 6L);
+	do_fio(&c__1, subnam, (ftnlen)6);
 	e_wsfe();
 	io___129.ciunit = *iounit;
 	s_wsfe(&io___129);
@@ -1126,7 +1136,7 @@ static integer c__8 = 8;
 	e_wsfe();
 	io___136.ciunit = *iounit;
 	s_wsfe(&io___136);
-	do_fio(&c__1, subnam, 6L);
+	do_fio(&c__1, subnam, (ftnlen)6);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___137.ciunit = *iounit;
@@ -1139,8 +1149,8 @@ static integer c__8 = 8;
 
 	io___138.ciunit = *iounit;
 	s_wsfe(&io___138);
-	do_fio(&c__1, path, 3L);
-	do_fio(&c__1, "QR", 2L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, "QR", (ftnlen)2);
 	e_wsfe();
 	io___139.ciunit = *iounit;
 	s_wsfe(&io___139);
@@ -1162,22 +1172,22 @@ static integer c__8 = 8;
 	io___144.ciunit = *iounit;
 	s_wsfe(&io___144);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___145.ciunit = *iounit;
 	s_wsfe(&io___145);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___146.ciunit = *iounit;
 	s_wsfe(&io___146);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___147.ciunit = *iounit;
 	s_wsfe(&io___147);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___148.ciunit = *iounit;
 	s_wsfe(&io___148);
@@ -1193,8 +1203,8 @@ static integer c__8 = 8;
 
 	io___150.ciunit = *iounit;
 	s_wsfe(&io___150);
-	do_fio(&c__1, path, 3L);
-	do_fio(&c__1, "LQ", 2L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, "LQ", (ftnlen)2);
 	e_wsfe();
 	io___151.ciunit = *iounit;
 	s_wsfe(&io___151);
@@ -1216,22 +1226,22 @@ static integer c__8 = 8;
 	io___156.ciunit = *iounit;
 	s_wsfe(&io___156);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___157.ciunit = *iounit;
 	s_wsfe(&io___157);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___158.ciunit = *iounit;
 	s_wsfe(&io___158);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___159.ciunit = *iounit;
 	s_wsfe(&io___159);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___160.ciunit = *iounit;
 	s_wsfe(&io___160);
@@ -1247,8 +1257,8 @@ static integer c__8 = 8;
 
 	io___162.ciunit = *iounit;
 	s_wsfe(&io___162);
-	do_fio(&c__1, path, 3L);
-	do_fio(&c__1, "QL", 2L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, "QL", (ftnlen)2);
 	e_wsfe();
 	io___163.ciunit = *iounit;
 	s_wsfe(&io___163);
@@ -1270,22 +1280,22 @@ static integer c__8 = 8;
 	io___168.ciunit = *iounit;
 	s_wsfe(&io___168);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___169.ciunit = *iounit;
 	s_wsfe(&io___169);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___170.ciunit = *iounit;
 	s_wsfe(&io___170);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___171.ciunit = *iounit;
 	s_wsfe(&io___171);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "M", 1L);
+	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
 	io___172.ciunit = *iounit;
 	s_wsfe(&io___172);
@@ -1301,8 +1311,8 @@ static integer c__8 = 8;
 
 	io___174.ciunit = *iounit;
 	s_wsfe(&io___174);
-	do_fio(&c__1, path, 3L);
-	do_fio(&c__1, "RQ", 2L);
+	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, "RQ", (ftnlen)2);
 	e_wsfe();
 	io___175.ciunit = *iounit;
 	s_wsfe(&io___175);
@@ -1324,22 +1334,22 @@ static integer c__8 = 8;
 	io___180.ciunit = *iounit;
 	s_wsfe(&io___180);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___181.ciunit = *iounit;
 	s_wsfe(&io___181);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___182.ciunit = *iounit;
 	s_wsfe(&io___182);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___183.ciunit = *iounit;
 	s_wsfe(&io___183);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
 	io___184.ciunit = *iounit;
 	s_wsfe(&io___184);
@@ -1355,7 +1365,7 @@ static integer c__8 = 8;
 
 	io___186.ciunit = *iounit;
 	s_wsfe(&io___186);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___187.ciunit = *iounit;
 	s_wsfe(&io___187);
@@ -1385,88 +1395,90 @@ static integer c__8 = 8;
 
 	io___193.ciunit = *iounit;
 	s_wsfe(&io___193);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___194.ciunit = *iounit;
 	s_wsfe(&io___194);
 	e_wsfe();
 	io___195.ciunit = *iounit;
 	s_wsfe(&io___195);
+	do_fio(&c__1, c1, (ftnlen)1);
+	do_fio(&c__1, c1, (ftnlen)1);
 	e_wsfe();
 	io___196.ciunit = *iounit;
 	s_wsfe(&io___196);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___197.ciunit = *iounit;
 	s_wsfe(&io___197);
-	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___198.ciunit = *iounit;
 	s_wsfe(&io___198);
-	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___199.ciunit = *iounit;
 	s_wsfe(&io___199);
+	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___200.ciunit = *iounit;
+	s_wsfe(&io___200);
+	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___201.ciunit = *iounit;
+	s_wsfe(&io___201);
+	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___202.ciunit = *iounit;
+	s_wsfe(&io___202);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___203.ciunit = *iounit;
+	s_wsfe(&io___203);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "LS")) {
 
-/*        LS:  Least Squares driver routines */
+/*        LS:  Least Squares driver routines for   
+               LS, LSD, LSS, LSX and LSY. */
 
-	io___200.ciunit = *iounit;
-	s_wsfe(&io___200);
-	do_fio(&c__1, path, 3L);
-	e_wsfe();
-	io___201.ciunit = *iounit;
-	s_wsfe(&io___201);
-	e_wsfe();
-	io___202.ciunit = *iounit;
-	s_wsfe(&io___202);
-	do_fio(&c__1, c1, 1L);
-	do_fio(&c__1, c1, 1L);
-	do_fio(&c__1, c1, 1L);
-	e_wsfe();
-	io___203.ciunit = *iounit;
-	s_wsfe(&io___203);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
-	e_wsfe();
 	io___204.ciunit = *iounit;
 	s_wsfe(&io___204);
-	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___205.ciunit = *iounit;
 	s_wsfe(&io___205);
-	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___206.ciunit = *iounit;
 	s_wsfe(&io___206);
-	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
+	do_fio(&c__1, c1, (ftnlen)1);
+	do_fio(&c__1, c1, (ftnlen)1);
+	do_fio(&c__1, c1, (ftnlen)1);
+	do_fio(&c__1, c1, (ftnlen)1);
+	do_fio(&c__1, c1, (ftnlen)1);
 	e_wsfe();
 	io___207.ciunit = *iounit;
 	s_wsfe(&io___207);
-	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___208.ciunit = *iounit;
 	s_wsfe(&io___208);
-	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___209.ciunit = *iounit;
 	s_wsfe(&io___209);
+	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___210.ciunit = *iounit;
 	s_wsfe(&io___210);
+	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-
-    } else if (lsamen_(&c__2, p2, "LU")) {
-
-/*        LU factorization variants */
-
 	io___211.ciunit = *iounit;
 	s_wsfe(&io___211);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___212.ciunit = *iounit;
 	s_wsfe(&io___212);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___213.ciunit = *iounit;
 	s_wsfe(&io___213);
@@ -1474,64 +1486,82 @@ static integer c__8 = 8;
 	io___214.ciunit = *iounit;
 	s_wsfe(&io___214);
 	e_wsfe();
+
+    } else if (lsamen_(&c__2, p2, "LU")) {
+
+/*        LU factorization variants */
+
 	io___215.ciunit = *iounit;
 	s_wsfe(&io___215);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___216.ciunit = *iounit;
 	s_wsfe(&io___216);
 	e_wsfe();
-
-    } else if (lsamen_(&c__2, p2, "CH")) {
-
-/*        Cholesky factorization variants */
-
 	io___217.ciunit = *iounit;
 	s_wsfe(&io___217);
-	do_fio(&c__1, path, 3L);
 	e_wsfe();
 	io___218.ciunit = *iounit;
 	s_wsfe(&io___218);
 	e_wsfe();
 	io___219.ciunit = *iounit;
 	s_wsfe(&io___219);
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___220.ciunit = *iounit;
 	s_wsfe(&io___220);
 	e_wsfe();
+
+    } else if (lsamen_(&c__2, p2, "CH")) {
+
+/*        Cholesky factorization variants */
+
 	io___221.ciunit = *iounit;
 	s_wsfe(&io___221);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 	io___222.ciunit = *iounit;
 	s_wsfe(&io___222);
 	e_wsfe();
-
-    } else if (lsamen_(&c__2, p2, "QS")) {
-
-/*        QR factorization variants */
-
 	io___223.ciunit = *iounit;
 	s_wsfe(&io___223);
-	do_fio(&c__1, path, 3L);
 	e_wsfe();
 	io___224.ciunit = *iounit;
 	s_wsfe(&io___224);
 	e_wsfe();
 	io___225.ciunit = *iounit;
 	s_wsfe(&io___225);
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___226.ciunit = *iounit;
 	s_wsfe(&io___226);
+	e_wsfe();
+
+    } else if (lsamen_(&c__2, p2, "QS")) {
+
+/*        QR factorization variants */
+
+	io___227.ciunit = *iounit;
+	s_wsfe(&io___227);
+	do_fio(&c__1, path, (ftnlen)3);
+	e_wsfe();
+	io___228.ciunit = *iounit;
+	s_wsfe(&io___228);
+	e_wsfe();
+	io___229.ciunit = *iounit;
+	s_wsfe(&io___229);
+	e_wsfe();
+	io___230.ciunit = *iounit;
+	s_wsfe(&io___230);
 	e_wsfe();
 
     } else {
 
 /*        Print error message if no header is available. */
 
-	io___227.ciunit = *iounit;
-	s_wsfe(&io___227);
-	do_fio(&c__1, path, 3L);
+	io___231.ciunit = *iounit;
+	s_wsfe(&io___231);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -1583,8 +1613,10 @@ static integer c__8 = 8;
        TB matrix types   
 
 
-       Test ratios */
+       Test ratios   
 
+   L9936:   
+   L9930: */
 
     return 0;
 

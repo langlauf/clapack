@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,7 +23,7 @@
     static doublereal smlnum, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -50,8 +51,7 @@
             DTPCON.   
 
     UPLO    (input) CHARACTER   
-            Specifies whether the matrix A is upper or lower triangular. 
-  
+            Specifies whether the matrix A is upper or lower triangular.   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
 
@@ -64,10 +64,8 @@
             The order of the matrix A.  N >= 0.   
 
     AP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in 
-  
-            a linear array.  The j-th column of A is stored in the array 
-  
+            The upper or lower triangular matrix A, packed columnwise in   
+            a linear array.  The j-th column of A is stored in the array   
             AP as follows:   
             if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -80,8 +78,7 @@
                RAT = MAX( RCOND, RCONDC )/MIN( RCOND, RCONDC ) - 1.   
             If RAT = 0, the two estimates are exactly the same.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -115,13 +112,10 @@
 
     } else {
 
-/*        One estimate is zero, the other is non-zero.  If the matrix 
-is   
-          ill-conditioned, return the nonzero estimate multiplied by 
-  
+/*        One estimate is zero, the other is non-zero.  If the matrix is   
+          ill-conditioned, return the nonzero estimate multiplied by   
           1/EPS; if the matrix is badly scaled, return the nonzero   
-          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximu
-m   
+          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximum   
           element in absolute value in A. */
 
 	smlnum = dlamch_("Safe minimum");

@@ -1,11 +1,12 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int dgghrd_(char *compq, char *compz, integer *n, integer *
 	ilo, integer *ihi, doublereal *a, integer *lda, doublereal *b, 
-	integer *ldb, doublereal *q, integer *ldq, doublereal *z, integer *
+	integer *ldb, doublereal *q, integer *ldq, doublereal *z__, integer *
 	ldz, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -20,8 +21,7 @@
     Q' * B * Z = T, where H is upper Hessenberg, T is upper triangular,   
     and Q and Z are orthogonal, and ' means transpose.   
 
-    The orthogonal matrices Q and Z are determined as products of Givens 
-  
+    The orthogonal matrices Q and Z are determined as products of Givens   
     rotations.  They may either be formed explicitly, or they may be   
     postmultiplied into input matrices Q1 and Z1, so that   
 
@@ -50,8 +50,7 @@
 
     ILO     (input) INTEGER   
     IHI     (input) INTEGER   
-            It is assumed that A is already upper triangular in rows and 
-  
+            It is assumed that A is already upper triangular in rows and   
             columns 1:ILO-1 and IHI+1:N.  ILO and IHI are normally set   
             by a previous call to DGGBAL; otherwise they should be set   
             to 1 and N respectively.   
@@ -80,8 +79,7 @@
                            contains the orthogonal matrix Q, where Q'   
                            is the product of the Givens transformations   
                            which are applied to A and B on the left.   
-            If COMPQ='V':  on entry, Q must contain an orthogonal matrix 
-  
+            If COMPQ='V':  on entry, Q must contain an orthogonal matrix   
                            Q1, and on exit this is overwritten by Q1*Q.   
 
     LDQ     (input) INTEGER   
@@ -94,8 +92,7 @@
                            contains the orthogonal matrix Z, which is   
                            the product of the Givens transformations   
                            which are applied to A and B on the right.   
-            If COMPZ='V':  on entry, Z must contain an orthogonal matrix 
-  
+            If COMPZ='V':  on entry, Z must contain an orthogonal matrix   
                            Z1, and on exit this is overwritten by Z1*Z.   
 
     LDZ     (input) INTEGER   
@@ -113,15 +110,12 @@
     an unblocked reduction, as described in _Matrix_Computations_,   
     by Golub and Van Loan (Johns Hopkins Press.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode COMPQ   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublereal c_b10 = 0.;
     static doublereal c_b11 = 1.;
@@ -136,7 +130,7 @@
     extern /* Subroutine */ int drot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *);
     static integer jrow;
-    static doublereal c, s;
+    static doublereal c__, s;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
@@ -144,15 +138,26 @@
 	    doublereal *), xerbla_(char *, integer *);
     static integer icompq, icompz;
     static logical ilq, ilz;
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    z_dim1 = *ldz;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-#define Z(I,J) z[(I)-1 + ((J)-1)* ( *ldz)]
-
+    /* Function Body */
     if (lsame_(compq, "N")) {
 	ilq = FALSE_;
 	icompq = 1;
@@ -212,10 +217,10 @@
 /*     Initialize Q and Z if desired. */
 
     if (icompq == 3) {
-	dlaset_("Full", n, n, &c_b10, &c_b11, &Q(1,1), ldq);
+	dlaset_("Full", n, n, &c_b10, &c_b11, &q[q_offset], ldq);
     }
     if (icompz == 3) {
-	dlaset_("Full", n, n, &c_b10, &c_b11, &Z(1,1), ldz);
+	dlaset_("Full", n, n, &c_b10, &c_b11, &z__[z_offset], ldz);
     }
 
 /*     Quick return if possible */
@@ -227,10 +232,10 @@
 /*     Zero out lower triangle of B */
 
     i__1 = *n - 1;
-    for (jcol = 1; jcol <= *n-1; ++jcol) {
+    for (jcol = 1; jcol <= i__1; ++jcol) {
 	i__2 = *n;
-	for (jrow = jcol + 1; jrow <= *n; ++jrow) {
-	    B(jrow,jcol) = 0.;
+	for (jrow = jcol + 1; jrow <= i__2; ++jrow) {
+	    b_ref(jrow, jcol) = 0.;
 /* L10: */
 	}
 /* L20: */
@@ -239,36 +244,42 @@
 /*     Reduce A and B */
 
     i__1 = *ihi - 2;
-    for (jcol = *ilo; jcol <= *ihi-2; ++jcol) {
+    for (jcol = *ilo; jcol <= i__1; ++jcol) {
 
 	i__2 = jcol + 2;
-	for (jrow = *ihi; jrow >= jcol+2; --jrow) {
+	for (jrow = *ihi; jrow >= i__2; --jrow) {
 
-/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL)
- */
+/*           Step 1: rotate rows JROW-1, JROW to kill A(JROW,JCOL) */
 
-	    temp = A(jrow-1,jcol);
-	    dlartg_(&temp, &A(jrow,jcol), &c, &s, &A(jrow-1,jcol));
-	    A(jrow,jcol) = 0.;
+	    temp = a_ref(jrow - 1, jcol);
+	    dlartg_(&temp, &a_ref(jrow, jcol), &c__, &s, &a_ref(jrow - 1, 
+		    jcol));
+	    a_ref(jrow, jcol) = 0.;
 	    i__3 = *n - jcol;
-	    drot_(&i__3, &A(jrow-1,jcol+1), lda, &A(jrow,jcol+1), lda, &c, &s);
+	    drot_(&i__3, &a_ref(jrow - 1, jcol + 1), lda, &a_ref(jrow, jcol + 
+		    1), lda, &c__, &s);
 	    i__3 = *n + 2 - jrow;
-	    drot_(&i__3, &B(jrow-1,jrow-1), ldb, &B(jrow,jrow-1), ldb, &c, &s);
+	    drot_(&i__3, &b_ref(jrow - 1, jrow - 1), ldb, &b_ref(jrow, jrow - 
+		    1), ldb, &c__, &s);
 	    if (ilq) {
-		drot_(n, &Q(1,jrow-1), &c__1, &Q(1,jrow), &c__1, &c, &s);
+		drot_(n, &q_ref(1, jrow - 1), &c__1, &q_ref(1, jrow), &c__1, &
+			c__, &s);
 	    }
 
-/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JR
-OW-1) */
+/*           Step 2: rotate columns JROW, JROW-1 to kill B(JROW,JROW-1) */
 
-	    temp = B(jrow,jrow);
-	    dlartg_(&temp, &B(jrow,jrow-1), &c, &s, &B(jrow,jrow));
-	    B(jrow,jrow-1) = 0.;
-	    drot_(ihi, &A(1,jrow), &c__1, &A(1,jrow-1), &c__1, &c, &s);
+	    temp = b_ref(jrow, jrow);
+	    dlartg_(&temp, &b_ref(jrow, jrow - 1), &c__, &s, &b_ref(jrow, 
+		    jrow));
+	    b_ref(jrow, jrow - 1) = 0.;
+	    drot_(ihi, &a_ref(1, jrow), &c__1, &a_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    i__3 = jrow - 1;
-	    drot_(&i__3, &B(1,jrow), &c__1, &B(1,jrow-1), &c__1, &c, &s);
+	    drot_(&i__3, &b_ref(1, jrow), &c__1, &b_ref(1, jrow - 1), &c__1, &
+		    c__, &s);
 	    if (ilz) {
-		drot_(n, &Z(1,jrow), &c__1, &Z(1,jrow-1), &c__1, &c, &s);
+		drot_(n, &z___ref(1, jrow), &c__1, &z___ref(1, jrow - 1), &
+			c__1, &c__, &s);
 	    }
 /* L30: */
 	}
@@ -280,4 +291,10 @@ OW-1) */
 /*     End of DGGHRD */
 
 } /* dgghrd_ */
+
+#undef z___ref
+#undef q_ref
+#undef b_ref
+#undef a_ref
+
 

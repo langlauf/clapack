@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
-/* Subroutine */ int sptsvx_(char *fact, integer *n, integer *nrhs, real *d, 
-	real *e, real *df, real *ef, real *b, integer *ldb, real *x, integer *
-	ldx, real *rcond, real *ferr, real *berr, real *work, integer *info)
+/* Subroutine */ int sptsvx_(char *fact, integer *n, integer *nrhs, real *d__,
+	 real *e, real *df, real *ef, real *b, integer *ldb, real *x, integer 
+	*ldx, real *rcond, real *ferr, real *berr, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -31,9 +32,13 @@
        factorization can also be regarded as having the form   
        A = U**T*D*U.   
 
-    2. The factored form of A is used to compute the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 3 and 4 are skipped.   
+    2. If the leading i-by-i principal minor is not positive definite,   
+       then the routine returns with INFO = i. Otherwise, the factored   
+       form of A is used to estimate the condition number of the matrix   
+       A.  If the reciprocal of the condition number is less than machine   
+       precision, INFO = N+1 is returned as a warning, but the routine   
+       still goes on to solve for X and compute error bounds as   
+       described below.   
 
     3. The system of equations is solved for X using the factored form   
        of A.   
@@ -89,7 +94,7 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) REAL array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X.   
+            If INFO = 0 of INFO = N+1, the N-by-NRHS solution matrix X.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
@@ -98,16 +103,13 @@
             The reciprocal condition number of the matrix A.  If RCOND   
             is less than the machine precision (in particular, if   
             RCOND = 0), the matrix is singular to working precision.   
-            This condition is indicated by a return code of INFO > 0,   
-            and the solution and error bounds are not computed.   
+            This condition is indicated by a return code of INFO > 0.   
 
     FERR    (output) REAL array, dimension (NRHS)   
             The forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).   
 
@@ -122,24 +124,24 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
             > 0:  if INFO = i, and i is   
-                  <= N  the leading minor of order i of A is not   
-                  positive definite, so the factorization could not be   
-                  completed unless i = N, and the solution and error   
-                  bounds could not be computed.   
-                  = N+1 RCOND is less than machine precision.  The   
-                  factorization has been completed, but the matrix is   
-                  singular to working precision, and the solution and   
-                  error bounds have not been computed.   
+                  <= N:  the leading minor of order i of A is   
+                         not positive definite, so the factorization   
+                         could not be completed, and the solution has not   
+                         been computed. RCOND = 0 is returned.   
+                  = N+1: U is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -164,18 +166,21 @@
 	    real *, integer *, integer *);
 
 
+    --d__;
+    --e;
+    --df;
+    --ef;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
 
-#define D(I) d[(I)-1]
-#define E(I) e[(I)-1]
-#define DF(I) df[(I)-1]
-#define EF(I) ef[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
     if (! nofact && ! lsame_(fact, "F")) {
@@ -199,12 +204,12 @@
 
 /*        Compute the L*D*L' (or U'*D*U) factorization of A. */
 
-	scopy_(n, &D(1), &c__1, &DF(1), &c__1);
+	scopy_(n, &d__[1], &c__1, &df[1], &c__1);
 	if (*n > 1) {
 	    i__1 = *n - 1;
-	    scopy_(&i__1, &E(1), &c__1, &EF(1), &c__1);
+	    scopy_(&i__1, &e[1], &c__1, &ef[1], &c__1);
 	}
-	spttrf_(n, &DF(1), &EF(1), info);
+	spttrf_(n, &df[1], &ef[1], info);
 
 /*        Return if INFO is non-zero. */
 
@@ -218,28 +223,28 @@
 
 /*     Compute the norm of the matrix A. */
 
-    anorm = slanst_("1", n, &D(1), &E(1));
+    anorm = slanst_("1", n, &d__[1], &e[1]);
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    sptcon_(n, &DF(1), &EF(1), &anorm, rcond, &WORK(1), info);
+    sptcon_(n, &df[1], &ef[1], &anorm, rcond, &work[1], info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < slamch_("Epsilon")) {
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution vectors X. */
 
-    slacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    spttrs_(n, nrhs, &DF(1), &EF(1), &X(1,1), ldx, info);
+    slacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    spttrs_(n, nrhs, &df[1], &ef[1], &x[x_offset], ldx, info);
 
 /*     Use iterative refinement to improve the computed solutions and   
        compute error bounds and backward error estimates for them. */
 
-    sptrfs_(n, nrhs, &D(1), &E(1), &DF(1), &EF(1), &B(1,1), ldb, &X(1,1), ldx, &FERR(1), &BERR(1), &WORK(1), info);
+    sptrfs_(n, nrhs, &d__[1], &e[1], &df[1], &ef[1], &b[b_offset], ldb, &x[
+	    x_offset], ldx, &ferr[1], &berr[1], &work[1], info);
 
     return 0;
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -17,7 +18,7 @@ static integer c__2 = 2;
 
 /* Subroutine */ int sdrvev_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, real *
-	a, integer *lda, real *h, real *wr, real *wi, real *wr1, real *wi1, 
+	a, integer *lda, real *h__, real *wr, real *wi, real *wr1, real *wi1, 
 	real *vl, integer *ldvl, real *vr, integer *ldvr, real *lre, integer *
 	ldlre, real *result, real *work, integer *nwork, integer *iwork, 
 	integer *info)
@@ -145,7 +146,13 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
+#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
+#define lre_ref(a_1,a_2) lre[(a_2)*lre_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -175,8 +182,7 @@ static integer c__2 = 2;
                  ( -wi  wr  )   
 
          Such a block multiplying an n x 2 matrix  ( ur ui ) on the   
-         right will be the same as multiplying  ur + i*ui  by  wr + i*wi. 
-  
+         right will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
 
        (2)     | A**H * VL - VL * W**H | / ( n |A| ulp )   
 
@@ -340,8 +346,7 @@ static integer c__2 = 2;
 
     A       (workspace) REAL array, dimension (LDA, max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used. 
-  
+            computed.  On exit, A contains the last matrix actually used.   
 
     LDA     (input) INTEGER   
             The leading dimension of A, and H. LDA must be at   
@@ -382,8 +387,7 @@ static integer c__2 = 2;
 
     RESULT  (output) REAL array, dimension (7)   
             The values computed by the seven tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow. 
-  
+            The values are currently limited to 1/ulp, to avoid overflow.   
 
     WORK    (workspace) REAL array, dimension (NWORK)   
 
@@ -407,8 +411,7 @@ static integer c__2 = 2;
             If  SLATMR, SLATMS, SLATME or SGEEV returns an error code,   
                 the absolute value of it is returned.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -434,31 +437,30 @@ static integer c__2 = 2;
        KCONDS(j)       Selectw whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --wr;
     --wi;
     --wr1;
     --wi1;
     vl_dim1 = *ldvl;
-    vl_offset = vl_dim1 + 1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = vr_dim1 + 1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     lre_dim1 = *ldlre;
-    lre_offset = lre_dim1 + 1;
+    lre_offset = 1 + lre_dim1 * 1;
     lre -= lre_offset;
     --result;
     --work;
@@ -466,8 +468,8 @@ static integer c__2 = 2;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "EV", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "EV", (ftnlen)2, (ftnlen)2);
 
 /*     Check for errors */
 
@@ -574,12 +576,9 @@ static integer c__2 = 2;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   symmetric, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   symmetric, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random symmetric   
          =9                              random general   
@@ -631,7 +630,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 /* L70: */
 		}
 
@@ -641,9 +640,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a[jcol + jcol * a_dim1] = anorm;
+		    a_ref(jcol, jcol) = anorm;
 		    if (jcol > 1) {
-			a[jcol + (jcol - 1) * a_dim1] = 1.f;
+			a_ref(jcol, jcol - 1) = 1.f;
 		    }
 /* L80: */
 		}
@@ -715,13 +714,13 @@ L60:
 		    slaset_("Full", &c__2, &n, &c_b17, &c_b17, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a[a_dim1 + 
-			    3], lda);
+		    slaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a_ref(3, 1)
+			    , lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a[(n - 1) *
-			     a_dim1 + 3], lda);
-		    slaset_("Full", &c__1, &n, &c_b17, &c_b17, &a[n + a_dim1],
-			     lda);
+		    slaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a_ref(3, n 
+			    - 1), lda);
+		    slaset_("Full", &c__1, &n, &c_b17, &c_b17, &a_ref(n, 1), 
+			    lda);
 		}
 
 	    } else if (itype == 10) {
@@ -742,7 +741,7 @@ L60:
 	    if (iinfo != 0) {
 		io___32.ciunit = *nounit;
 		s_wsfe(&io___32);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -773,19 +772,17 @@ L90:
 /* L100: */
 		}
 
-/*              Compute eigenvalues and eigenvectors, and test
- them */
+/*              Compute eigenvalues and eigenvectors, and test them */
 
-		slacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda)
-			;
-		sgeev_("V", "V", &n, &h[h_offset], lda, &wr[1], &wi[1], &vl[
+		slacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
+		sgeev_("V", "V", &n, &h__[h_offset], lda, &wr[1], &wi[1], &vl[
 			vl_offset], ldvl, &vr[vr_offset], ldvr, &work[1], &
 			nnwork, &iinfo);
 		if (iinfo != 0) {
 		    result[1] = ulpinv;
 		    io___35.ciunit = *nounit;
 		    s_wsfe(&io___35);
-		    do_fio(&c__1, "SGEEV1", 6L);
+		    do_fio(&c__1, "SGEEV1", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -814,10 +811,10 @@ L90:
 		for (j = 1; j <= i__3; ++j) {
 		    tnrm = 1.f;
 		    if (wi[j] == 0.f) {
-			tnrm = snrm2_(&n, &vr[j * vr_dim1 + 1], &c__1);
+			tnrm = snrm2_(&n, &vr_ref(1, j), &c__1);
 		    } else if (wi[j] > 0.f) {
-			r__1 = snrm2_(&n, &vr[j * vr_dim1 + 1], &c__1);
-			r__2 = snrm2_(&n, &vr[(j + 1) * vr_dim1 + 1], &c__1);
+			r__1 = snrm2_(&n, &vr_ref(1, j), &c__1);
+			r__2 = snrm2_(&n, &vr_ref(1, j + 1), &c__1);
 			tnrm = slapy2_(&r__1, &r__2);
 		    }
 /* Computing MAX   
@@ -831,16 +828,14 @@ L90:
 			vrmx = 0.f;
 			i__4 = n;
 			for (jj = 1; jj <= i__4; ++jj) {
-			    vtst = slapy2_(&vr[jj + j * vr_dim1], &vr[jj + (j 
-				    + 1) * vr_dim1]);
+			    vtst = slapy2_(&vr_ref(jj, j), &vr_ref(jj, j + 1))
+				    ;
 			    if (vtst > vmx) {
 				vmx = vtst;
 			    }
-			    if (vr[jj + (j + 1) * vr_dim1] == 0.f && (r__1 = 
-				    vr[jj + j * vr_dim1], dabs(r__1)) > vrmx) 
-				    {
-				vrmx = (r__2 = vr[jj + j * vr_dim1], dabs(
-					r__2));
+			    if (vr_ref(jj, j + 1) == 0.f && (r__1 = vr_ref(jj,
+				     j), dabs(r__1)) > vrmx) {
+				vrmx = (r__2 = vr_ref(jj, j), dabs(r__2));
 			    }
 /* L110: */
 			}
@@ -857,10 +852,10 @@ L90:
 		for (j = 1; j <= i__3; ++j) {
 		    tnrm = 1.f;
 		    if (wi[j] == 0.f) {
-			tnrm = snrm2_(&n, &vl[j * vl_dim1 + 1], &c__1);
+			tnrm = snrm2_(&n, &vl_ref(1, j), &c__1);
 		    } else if (wi[j] > 0.f) {
-			r__1 = snrm2_(&n, &vl[j * vl_dim1 + 1], &c__1);
-			r__2 = snrm2_(&n, &vl[(j + 1) * vl_dim1 + 1], &c__1);
+			r__1 = snrm2_(&n, &vl_ref(1, j), &c__1);
+			r__2 = snrm2_(&n, &vl_ref(1, j + 1), &c__1);
 			tnrm = slapy2_(&r__1, &r__2);
 		    }
 /* Computing MAX   
@@ -874,16 +869,14 @@ L90:
 			vrmx = 0.f;
 			i__4 = n;
 			for (jj = 1; jj <= i__4; ++jj) {
-			    vtst = slapy2_(&vl[jj + j * vl_dim1], &vl[jj + (j 
-				    + 1) * vl_dim1]);
+			    vtst = slapy2_(&vl_ref(jj, j), &vl_ref(jj, j + 1))
+				    ;
 			    if (vtst > vmx) {
 				vmx = vtst;
 			    }
-			    if (vl[jj + (j + 1) * vl_dim1] == 0.f && (r__1 = 
-				    vl[jj + j * vl_dim1], dabs(r__1)) > vrmx) 
-				    {
-				vrmx = (r__2 = vl[jj + j * vl_dim1], dabs(
-					r__2));
+			    if (vl_ref(jj, j + 1) == 0.f && (r__1 = vl_ref(jj,
+				     j), dabs(r__1)) > vrmx) {
+				vrmx = (r__2 = vl_ref(jj, j), dabs(r__2));
 			    }
 /* L130: */
 			}
@@ -896,16 +889,14 @@ L90:
 
 /*              Compute eigenvalues only, and test them */
 
-		slacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda)
-			;
-		sgeev_("N", "N", &n, &h[h_offset], lda, &wr1[1], &wi1[1], dum,
-			 &c__1, dum, &c__1, &work[1], &nnwork, &iinfo)
-			;
+		slacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
+		sgeev_("N", "N", &n, &h__[h_offset], lda, &wr1[1], &wi1[1], 
+			dum, &c__1, dum, &c__1, &work[1], &nnwork, &iinfo);
 		if (iinfo != 0) {
 		    result[1] = ulpinv;
 		    io___43.ciunit = *nounit;
 		    s_wsfe(&io___43);
-		    do_fio(&c__1, "SGEEV2", 6L);
+		    do_fio(&c__1, "SGEEV2", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -926,19 +917,17 @@ L90:
 /* L150: */
 		}
 
-/*              Compute eigenvalues and right eigenvectors, an
-d test them */
+/*              Compute eigenvalues and right eigenvectors, and test them */
 
-		slacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda)
-			;
-		sgeev_("N", "V", &n, &h[h_offset], lda, &wr1[1], &wi1[1], dum,
-			 &c__1, &lre[lre_offset], ldlre, &work[1], &nnwork, &
-			iinfo);
+		slacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
+		sgeev_("N", "V", &n, &h__[h_offset], lda, &wr1[1], &wi1[1], 
+			dum, &c__1, &lre[lre_offset], ldlre, &work[1], &
+			nnwork, &iinfo);
 		if (iinfo != 0) {
 		    result[1] = ulpinv;
 		    io___44.ciunit = *nounit;
 		    s_wsfe(&io___44);
-		    do_fio(&c__1, "SGEEV3", 6L);
+		    do_fio(&c__1, "SGEEV3", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -965,7 +954,7 @@ d test them */
 		for (j = 1; j <= i__3; ++j) {
 		    i__4 = n;
 		    for (jj = 1; jj <= i__4; ++jj) {
-			if (vr[j + jj * vr_dim1] != lre[j + jj * lre_dim1]) {
+			if (vr_ref(j, jj) != lre_ref(j, jj)) {
 			    result[6] = ulpinv;
 			}
 /* L170: */
@@ -973,19 +962,17 @@ d test them */
 /* L180: */
 		}
 
-/*              Compute eigenvalues and left eigenvectors, and
- test them */
+/*              Compute eigenvalues and left eigenvectors, and test them */
 
-		slacpy_("F", &n, &n, &a[a_offset], lda, &h[h_offset], lda)
-			;
-		sgeev_("V", "N", &n, &h[h_offset], lda, &wr1[1], &wi1[1], &
+		slacpy_("F", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
+		sgeev_("V", "N", &n, &h__[h_offset], lda, &wr1[1], &wi1[1], &
 			lre[lre_offset], ldlre, dum, &c__1, &work[1], &nnwork,
 			 &iinfo);
 		if (iinfo != 0) {
 		    result[1] = ulpinv;
 		    io___45.ciunit = *nounit;
 		    s_wsfe(&io___45);
-		    do_fio(&c__1, "SGEEV4", 6L);
+		    do_fio(&c__1, "SGEEV4", (ftnlen)6);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1012,7 +999,7 @@ d test them */
 		for (j = 1; j <= i__3; ++j) {
 		    i__4 = n;
 		    for (jj = 1; jj <= i__4; ++jj) {
-			if (vl[j + jj * vl_dim1] != lre[j + jj * lre_dim1]) {
+			if (vl_ref(j, jj) != lre_ref(j, jj)) {
 			    result[7] = ulpinv;
 			}
 /* L200: */
@@ -1042,7 +1029,7 @@ L220:
 		if (ntestf == 1) {
 		    io___48.ciunit = *nounit;
 		    s_wsfe(&io___48);
-		    do_fio(&c__1, path, 3L);
+		    do_fio(&c__1, path, (ftnlen)3);
 		    e_wsfe();
 		    io___49.ciunit = *nounit;
 		    s_wsfe(&io___49);
@@ -1100,4 +1087,10 @@ L260:
 /*     End of SDRVEV */
 
 } /* sdrvev_ */
+
+#undef lre_ref
+#undef vr_ref
+#undef vl_ref
+#undef a_ref
+
 

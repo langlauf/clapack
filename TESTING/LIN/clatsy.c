@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,16 +23,20 @@ static integer c__2 = 2;
 
     /* Local variables */
     static real beta;
-    static complex a, b, c;
-    static integer i, j;
-    static complex r;
+    static complex a, b, c__;
+    static integer i__, j;
+    static complex r__;
     static real alpha;
     static integer n5;
     static real alpha3;
     extern /* Complex */ VOID clarnd_(complex *, integer *, integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
+#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
+#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK auxiliary test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -41,15 +46,13 @@ static integer c__2 = 2;
     =======   
 
     CLATSY generates a special test matrix for the complex symmetric   
-    (indefinite) factorization.  The pivot blocks of the generated matrix 
-  
+    (indefinite) factorization.  The pivot blocks of the generated matrix   
     will be in the following order:   
        2x2 pivot block, non diagonalizable   
        1x1 pivot block   
        2x2 pivot block, diagonalizable   
        (cycle repeats)   
-    A row interchange is required for each non-diagonalizable 2x2 block. 
-  
+    A row interchange is required for each non-diagonalizable 2x2 block.   
 
     Arguments   
     =========   
@@ -72,19 +75,17 @@ static integer c__2 = 2;
             The leading dimension of the array X.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed for the random number generator.  The last 
-  
+            On entry, the seed for the random number generator.  The last   
             of the four integers must be odd.  (modified on exit)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Initialize constants   
 
        Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     --iseed;
 
@@ -102,8 +103,8 @@ static integer c__2 = 2;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * x_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = x_subscr(i__, j);
 		x[i__3].r = 0.f, x[i__3].i = 0.f;
 /* L10: */
 	    }
@@ -113,7 +114,7 @@ static integer c__2 = 2;
 	n5 = *n - n5 * 5 + 1;
 
 	i__1 = n5;
-	for (i = *n; i >= i__1; i += -5) {
+	for (i__ = *n; i__ >= i__1; i__ += -5) {
 	    clarnd_(&q__2, &c__5, &iseed[1]);
 	    q__1.r = alpha3 * q__2.r, q__1.i = alpha3 * q__2.i;
 	    a.r = q__1.r, a.i = q__1.i;
@@ -124,35 +125,35 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
-	    i__2 = i + i * x_dim1;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
+	    i__2 = x_subscr(i__, i__);
 	    x[i__2].r = a.r, x[i__2].i = a.i;
-	    i__2 = i - 2 + i * x_dim1;
+	    i__2 = x_subscr(i__ - 2, i__);
 	    x[i__2].r = b.r, x[i__2].i = b.i;
-	    i__2 = i - 2 + (i - 1) * x_dim1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
-	    i__2 = i - 2 + (i - 2) * x_dim1;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
-	    i__2 = i - 1 + (i - 1) * x_dim1;
+	    i__2 = x_subscr(i__ - 2, i__ - 1);
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
+	    i__2 = x_subscr(i__ - 2, i__ - 2);
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
+	    i__2 = x_subscr(i__ - 1, i__ - 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    i__2 = i - 3 + (i - 3) * x_dim1;
+	    i__2 = x_subscr(i__ - 3, i__ - 3);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    i__2 = i - 4 + (i - 4) * x_dim1;
+	    i__2 = x_subscr(i__ - 4, i__ - 4);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    if (c_abs(&x[i - 3 + (i - 3) * x_dim1]) > c_abs(&x[i - 4 + (i - 4)
-		     * x_dim1])) {
-		i__2 = i - 4 + (i - 3) * x_dim1;
-		i__3 = i - 3 + (i - 3) * x_dim1;
+	    if (c_abs(&x_ref(i__ - 3, i__ - 3)) > c_abs(&x_ref(i__ - 4, i__ - 
+		    4))) {
+		i__2 = x_subscr(i__ - 4, i__ - 3);
+		i__3 = x_subscr(i__ - 3, i__ - 3);
 		q__1.r = x[i__3].r * 2.f, q__1.i = x[i__3].i * 2.f;
 		x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    } else {
-		i__2 = i - 4 + (i - 3) * x_dim1;
-		i__3 = i - 4 + (i - 4) * x_dim1;
+		i__2 = x_subscr(i__ - 4, i__ - 3);
+		i__3 = x_subscr(i__ - 4, i__ - 4);
 		q__1.r = x[i__3].r * 2.f, q__1.i = x[i__3].i * 2.f;
 		x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    }
@@ -161,8 +162,8 @@ static integer c__2 = 2;
 
 /*        Clean-up for N not a multiple of 5. */
 
-	i = n5 - 1;
-	if (i > 2) {
+	i__ = n5 - 1;
+	if (i__ > 2) {
 	    clarnd_(&q__2, &c__5, &iseed[1]);
 	    q__1.r = alpha3 * q__2.r, q__1.i = alpha3 * q__2.i;
 	    a.r = q__1.r, a.i = q__1.i;
@@ -173,47 +174,46 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
-	    i__1 = i + i * x_dim1;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
+	    i__1 = x_subscr(i__, i__);
 	    x[i__1].r = a.r, x[i__1].i = a.i;
-	    i__1 = i - 2 + i * x_dim1;
+	    i__1 = x_subscr(i__ - 2, i__);
 	    x[i__1].r = b.r, x[i__1].i = b.i;
-	    i__1 = i - 2 + (i - 1) * x_dim1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
-	    i__1 = i - 2 + (i - 2) * x_dim1;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
-	    i__1 = i - 1 + (i - 1) * x_dim1;
+	    i__1 = x_subscr(i__ - 2, i__ - 1);
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
+	    i__1 = x_subscr(i__ - 2, i__ - 2);
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
+	    i__1 = x_subscr(i__ - 1, i__ - 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    i += -3;
+	    i__ += -3;
 	}
-	if (i > 1) {
-	    i__1 = i + i * x_dim1;
+	if (i__ > 1) {
+	    i__1 = x_subscr(i__, i__);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    i__1 = i - 1 + (i - 1) * x_dim1;
+	    i__1 = x_subscr(i__ - 1, i__ - 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    if (c_abs(&x[i + i * x_dim1]) > c_abs(&x[i - 1 + (i - 1) * x_dim1]
-		    )) {
-		i__1 = i - 1 + i * x_dim1;
-		i__2 = i + i * x_dim1;
+	    if (c_abs(&x_ref(i__, i__)) > c_abs(&x_ref(i__ - 1, i__ - 1))) {
+		i__1 = x_subscr(i__ - 1, i__);
+		i__2 = x_subscr(i__, i__);
 		q__1.r = x[i__2].r * 2.f, q__1.i = x[i__2].i * 2.f;
 		x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    } else {
-		i__1 = i - 1 + i * x_dim1;
-		i__2 = i - 1 + (i - 1) * x_dim1;
+		i__1 = x_subscr(i__ - 1, i__);
+		i__2 = x_subscr(i__ - 1, i__ - 1);
 		q__1.r = x[i__2].r * 2.f, q__1.i = x[i__2].i * 2.f;
 		x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    }
-	    i += -2;
-	} else if (i == 1) {
-	    i__1 = i + i * x_dim1;
+	    i__ += -2;
+	} else if (i__ == 1) {
+	    i__1 = x_subscr(i__, i__);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    --i;
+	    --i__;
 	}
 
 /*     UPLO = 'L':  Lower triangular storage */
@@ -225,8 +225,8 @@ static integer c__2 = 2;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = j; i <= i__2; ++i) {
-		i__3 = i + j * x_dim1;
+	    for (i__ = j; i__ <= i__2; ++i__) {
+		i__3 = x_subscr(i__, j);
 		x[i__3].r = 0.f, x[i__3].i = 0.f;
 /* L40: */
 	    }
@@ -236,7 +236,7 @@ static integer c__2 = 2;
 	n5 *= 5;
 
 	i__1 = n5;
-	for (i = 1; i <= i__1; i += 5) {
+	for (i__ = 1; i__ <= i__1; i__ += 5) {
 	    clarnd_(&q__2, &c__5, &iseed[1]);
 	    q__1.r = alpha3 * q__2.r, q__1.i = alpha3 * q__2.i;
 	    a.r = q__1.r, a.i = q__1.i;
@@ -247,35 +247,35 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
-	    i__2 = i + i * x_dim1;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
+	    i__2 = x_subscr(i__, i__);
 	    x[i__2].r = a.r, x[i__2].i = a.i;
-	    i__2 = i + 2 + i * x_dim1;
+	    i__2 = x_subscr(i__ + 2, i__);
 	    x[i__2].r = b.r, x[i__2].i = b.i;
-	    i__2 = i + 2 + (i + 1) * x_dim1;
-	    x[i__2].r = r.r, x[i__2].i = r.i;
-	    i__2 = i + 2 + (i + 2) * x_dim1;
-	    x[i__2].r = c.r, x[i__2].i = c.i;
-	    i__2 = i + 1 + (i + 1) * x_dim1;
+	    i__2 = x_subscr(i__ + 2, i__ + 1);
+	    x[i__2].r = r__.r, x[i__2].i = r__.i;
+	    i__2 = x_subscr(i__ + 2, i__ + 2);
+	    x[i__2].r = c__.r, x[i__2].i = c__.i;
+	    i__2 = x_subscr(i__ + 1, i__ + 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    i__2 = i + 3 + (i + 3) * x_dim1;
+	    i__2 = x_subscr(i__ + 3, i__ + 3);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    i__2 = i + 4 + (i + 4) * x_dim1;
+	    i__2 = x_subscr(i__ + 4, i__ + 4);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__2].r = q__1.r, x[i__2].i = q__1.i;
-	    if (c_abs(&x[i + 3 + (i + 3) * x_dim1]) > c_abs(&x[i + 4 + (i + 4)
-		     * x_dim1])) {
-		i__2 = i + 4 + (i + 3) * x_dim1;
-		i__3 = i + 3 + (i + 3) * x_dim1;
+	    if (c_abs(&x_ref(i__ + 3, i__ + 3)) > c_abs(&x_ref(i__ + 4, i__ + 
+		    4))) {
+		i__2 = x_subscr(i__ + 4, i__ + 3);
+		i__3 = x_subscr(i__ + 3, i__ + 3);
 		q__1.r = x[i__3].r * 2.f, q__1.i = x[i__3].i * 2.f;
 		x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    } else {
-		i__2 = i + 4 + (i + 3) * x_dim1;
-		i__3 = i + 4 + (i + 4) * x_dim1;
+		i__2 = x_subscr(i__ + 4, i__ + 3);
+		i__3 = x_subscr(i__ + 4, i__ + 4);
 		q__1.r = x[i__3].r * 2.f, q__1.i = x[i__3].i * 2.f;
 		x[i__2].r = q__1.r, x[i__2].i = q__1.i;
 	    }
@@ -284,8 +284,8 @@ static integer c__2 = 2;
 
 /*        Clean-up for N not a multiple of 5. */
 
-	i = n5 + 1;
-	if (i < *n - 1) {
+	i__ = n5 + 1;
+	if (i__ < *n - 1) {
 	    clarnd_(&q__2, &c__5, &iseed[1]);
 	    q__1.r = alpha3 * q__2.r, q__1.i = alpha3 * q__2.i;
 	    a.r = q__1.r, a.i = q__1.i;
@@ -296,47 +296,46 @@ static integer c__2 = 2;
 	    q__2.r = q__3.r * 0.f - q__3.i * 1.f, q__2.i = q__3.r * 1.f + 
 		    q__3.i * 0.f;
 	    q__1.r = a.r - q__2.r, q__1.i = a.i - q__2.i;
-	    c.r = q__1.r, c.i = q__1.i;
-	    q__1.r = c.r / beta, q__1.i = c.i / beta;
-	    r.r = q__1.r, r.i = q__1.i;
-	    i__1 = i + i * x_dim1;
+	    c__.r = q__1.r, c__.i = q__1.i;
+	    q__1.r = c__.r / beta, q__1.i = c__.i / beta;
+	    r__.r = q__1.r, r__.i = q__1.i;
+	    i__1 = x_subscr(i__, i__);
 	    x[i__1].r = a.r, x[i__1].i = a.i;
-	    i__1 = i + 2 + i * x_dim1;
+	    i__1 = x_subscr(i__ + 2, i__);
 	    x[i__1].r = b.r, x[i__1].i = b.i;
-	    i__1 = i + 2 + (i + 1) * x_dim1;
-	    x[i__1].r = r.r, x[i__1].i = r.i;
-	    i__1 = i + 2 + (i + 2) * x_dim1;
-	    x[i__1].r = c.r, x[i__1].i = c.i;
-	    i__1 = i + 1 + (i + 1) * x_dim1;
+	    i__1 = x_subscr(i__ + 2, i__ + 1);
+	    x[i__1].r = r__.r, x[i__1].i = r__.i;
+	    i__1 = x_subscr(i__ + 2, i__ + 2);
+	    x[i__1].r = c__.r, x[i__1].i = c__.i;
+	    i__1 = x_subscr(i__ + 1, i__ + 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    i += 3;
+	    i__ += 3;
 	}
-	if (i < *n) {
-	    i__1 = i + i * x_dim1;
+	if (i__ < *n) {
+	    i__1 = x_subscr(i__, i__);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    i__1 = i + 1 + (i + 1) * x_dim1;
+	    i__1 = x_subscr(i__ + 1, i__ + 1);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    if (c_abs(&x[i + i * x_dim1]) > c_abs(&x[i + 1 + (i + 1) * x_dim1]
-		    )) {
-		i__1 = i + 1 + i * x_dim1;
-		i__2 = i + i * x_dim1;
+	    if (c_abs(&x_ref(i__, i__)) > c_abs(&x_ref(i__ + 1, i__ + 1))) {
+		i__1 = x_subscr(i__ + 1, i__);
+		i__2 = x_subscr(i__, i__);
 		q__1.r = x[i__2].r * 2.f, q__1.i = x[i__2].i * 2.f;
 		x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    } else {
-		i__1 = i + 1 + i * x_dim1;
-		i__2 = i + 1 + (i + 1) * x_dim1;
+		i__1 = x_subscr(i__ + 1, i__);
+		i__2 = x_subscr(i__ + 1, i__ + 1);
 		q__1.r = x[i__2].r * 2.f, q__1.i = x[i__2].i * 2.f;
 		x[i__1].r = q__1.r, x[i__1].i = q__1.i;
 	    }
-	    i += 2;
-	} else if (i == *n) {
-	    i__1 = i + i * x_dim1;
+	    i__ += 2;
+	} else if (i__ == *n) {
+	    i__1 = x_subscr(i__, i__);
 	    clarnd_(&q__1, &c__2, &iseed[1]);
 	    x[i__1].r = q__1.r, x[i__1].i = q__1.i;
-	    ++i;
+	    ++i__;
 	}
     }
 
@@ -345,4 +344,8 @@ static integer c__2 = 2;
 /*     End of CLATSY */
 
 } /* clatsy_ */
+
+#undef x_ref
+#undef x_subscr
+
 

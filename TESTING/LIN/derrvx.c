@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -44,9 +45,9 @@ static integer c__4 = 4;
 
     /* Local variables */
     static integer info;
-    static doublereal a[16]	/* was [4][4] */, b[4], c[4];
-    static integer i, j;
-    static doublereal r[4], w[8], x[4], rcond;
+    static doublereal a[16]	/* was [4][4] */, b[4], c__[4];
+    static integer i__, j;
+    static doublereal r__[4], w[8], x[4], rcond;
     extern /* Subroutine */ int dgbsv_(integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), dgesv_(integer *, integer *, doublereal *, 
@@ -114,7 +115,11 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        October 31, 1992   
@@ -123,8 +128,7 @@ static integer c__4 = 4;
     Purpose   
     =======   
 
-    DERRVX tests the error exits for the DOUBLE PRECISION driver routines 
-  
+    DERRVX tests the error exits for the DOUBLE PRECISION driver routines   
     for solving linear systems of equations.   
 
     Arguments   
@@ -136,22 +140,21 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
-    s_copy(c2, path + 1, 2L, 2L);
+    s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
 
 /*     Set the variables to innocuous values. */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
-	    af[i + (j << 2) - 5] = 1. / (doublereal) (i + j);
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -159,8 +162,8 @@ static integer c__4 = 4;
 	r2[j - 1] = 0.;
 	w[j - 1] = 0.;
 	x[j - 1] = 0.;
-	c[j - 1] = 0.;
-	r[j - 1] = 0.;
+	c__[j - 1] = 0.;
+	r__[j - 1] = 0.;
 	ip[j - 1] = j;
 /* L20: */
     }
@@ -170,7 +173,7 @@ static integer c__4 = 4;
 
 /*        DGESV */
 
-	s_copy(srnamc_1.srnamt, "DGESV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGESV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgesv_(&c_n1, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("DGESV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -190,63 +193,63 @@ static integer c__4 = 4;
 
 /*        DGESVX */
 
-	s_copy(srnamc_1.srnamt, "DGESVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGESVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgesvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dgesvx_("N", "N", &c_n1, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c_n1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dgesvx_("N", "N", &c__0, &c_n1, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c__0, &c_n1, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dgesvx_("N", "N", &c__2, &c__1, a, &c__1, af, &c__2, ip, eq, r, c, b, 
-		&c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c__2, &c__1, a, &c__1, af, &c__2, ip, eq, r__, c__,
+		 b, &c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__1, ip, eq, r, c, b, 
-		&c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__1, ip, eq, r__, c__,
+		 b, &c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	*(unsigned char *)eq = '/';
-	dgesvx_("F", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("F", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
 	*(unsigned char *)eq = 'R';
-	dgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	*(unsigned char *)eq = 'C';
-	dgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+		 b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
-	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r, c, b, 
-		&c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__,
+		 b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r, c, b, 
-		&c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__,
+		 b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -254,7 +257,7 @@ static integer c__4 = 4;
 
 /*        DGBSV */
 
-	s_copy(srnamc_1.srnamt, "DGBSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGBSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgbsv_(&c_n1, &c__0, &c__0, &c__0, a, &c__1, ip, b, &c__1, &info);
 	chkxer_("DGBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -282,73 +285,86 @@ static integer c__4 = 4;
 
 /*        DGBSVX */
 
-	s_copy(srnamc_1.srnamt, "DGBSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGBSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	dgbsvx_("N", "/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	dgbsvx_("N", "N", &c_n1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
 	dgbsvx_("N", "N", &c__1, &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	dgbsvx_("N", "N", &c__1, &c__0, &c_n1, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
 	dgbsvx_("N", "N", &c__0, &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	dgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__2, af, &c__4, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	dgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__3, af, &c__3, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	*(unsigned char *)eq = '/';
 	dgbsvx_("F", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
 	*(unsigned char *)eq = 'R';
 	dgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	*(unsigned char *)eq = 'C';
 	dgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	dgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
 	dgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
-		 eq, r, c, b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
+		 eq, r__, c__, b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &
+		info);
 	chkxer_("DGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -356,51 +372,60 @@ static integer c__4 = 4;
 
 /*        DGTSV */
 
-	s_copy(srnamc_1.srnamt, "DGTSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgtsv_(&c_n1, &c__0, a, &a[4], &a[8], b, &c__1, &info);
+	dgtsv_(&c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
+		c__1, &info);
 	chkxer_("DGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgtsv_(&c__0, &c_n1, a, &a[4], &a[8], b, &c__1, &info);
+	dgtsv_(&c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
+		c__1, &info);
 	chkxer_("DGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	dgtsv_(&c__2, &c__0, a, &a[4], &a[8], b, &c__1, &info);
+	dgtsv_(&c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
+		c__1, &info);
 	chkxer_("DGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DGTSVX */
 
-	s_copy(srnamc_1.srnamt, "DGTSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DGTSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dgtsvx_("/", "N", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("/", "N", &c__0, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dgtsvx_("N", "/", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("N", "/", &c__0, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dgtsvx_("N", "N", &c_n1, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("N", "N", &c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dgtsvx_("N", "N", &c__0, &c_n1, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("N", "N", &c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
-	dgtsvx_("N", "N", &c__2, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("N", "N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	dgtsvx_("N", "N", &c__2, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
-		af[12], ip, b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dgtsvx_("N", "N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
+		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
+		, ip, b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -408,7 +433,7 @@ static integer c__4 = 4;
 
 /*        DPOSV */
 
-	s_copy(srnamc_1.srnamt, "DPOSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dposv_("/", &c__0, &c__0, a, &c__1, b, &c__1, &info);
 	chkxer_("DPOSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -432,57 +457,57 @@ static integer c__4 = 4;
 
 /*        DPOSVX */
 
-	s_copy(srnamc_1.srnamt, "DPOSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPOSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dposvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dposvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dposvx_("N", "U", &c_n1, &c__0, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c_n1, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dposvx_("N", "U", &c__0, &c_n1, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c__0, &c_n1, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dposvx_("N", "U", &c__2, &c__0, a, &c__1, af, &c__2, eq, c, b, &c__2, 
-		x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c__2, &c__0, a, &c__1, af, &c__2, eq, c__, b, &
+		c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__1, eq, c, b, &c__2, 
-		x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__1, eq, c__, b, &
+		c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
 	*(unsigned char *)eq = '/';
-	dposvx_("F", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("F", "U", &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	*(unsigned char *)eq = 'Y';
-	dposvx_("F", "U", &c__1, &c__0, a, &c__1, af, &c__1, eq, c, b, &c__1, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("F", "U", &c__1, &c__0, a, &c__1, af, &c__1, eq, c__, b, &
+		c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
-	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__2, eq, c, b, &c__1, 
-		x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__2, eq, c__, b, &
+		c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
-	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__2, eq, c, b, &c__2, 
-		x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dposvx_("N", "U", &c__2, &c__0, a, &c__2, af, &c__2, eq, c__, b, &
+		c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPOSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -490,7 +515,7 @@ static integer c__4 = 4;
 
 /*        DPPSV */
 
-	s_copy(srnamc_1.srnamt, "DPPSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dppsv_("/", &c__0, &c__0, a, b, &c__1, &info);
 	chkxer_("DPPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -510,46 +535,46 @@ static integer c__4 = 4;
 
 /*        DPPSVX */
 
-	s_copy(srnamc_1.srnamt, "DPPSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPPSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dppsvx_("/", "U", &c__0, &c__0, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("/", "U", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dppsvx_("N", "/", &c__0, &c__0, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("N", "/", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dppsvx_("N", "U", &c_n1, &c__0, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("N", "U", &c_n1, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dppsvx_("N", "U", &c__0, &c_n1, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("N", "U", &c__0, &c_n1, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	*(unsigned char *)eq = '/';
-	dppsvx_("F", "U", &c__0, &c__0, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("F", "U", &c__0, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	*(unsigned char *)eq = 'Y';
-	dppsvx_("F", "U", &c__1, &c__0, a, af, eq, c, b, &c__1, x, &c__1, &
+	dppsvx_("F", "U", &c__1, &c__0, a, af, eq, c__, b, &c__1, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dppsvx_("N", "U", &c__2, &c__0, a, af, eq, c, b, &c__1, x, &c__2, &
+	dppsvx_("N", "U", &c__2, &c__0, a, af, eq, c__, b, &c__1, x, &c__2, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
-	dppsvx_("N", "U", &c__2, &c__0, a, af, eq, c, b, &c__2, x, &c__1, &
+	dppsvx_("N", "U", &c__2, &c__0, a, af, eq, c__, b, &c__2, x, &c__1, &
 		rcond, r1, r2, w, iw, &info);
 	chkxer_("DPPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -558,90 +583,96 @@ static integer c__4 = 4;
 
 /*        DPBSV */
 
-	s_copy(srnamc_1.srnamt, "DPBSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dpbsv_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info);
+	dpbsv_("/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dpbsv_("U", &c_n1, &c__0, &c__0, a, &c__1, b, &c__1, &info);
+	dpbsv_("U", &c_n1, &c__0, &c__0, a, &c__1, b, &c__1, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dpbsv_("U", &c__1, &c_n1, &c__0, a, &c__1, b, &c__1, &info);
+	dpbsv_("U", &c__1, &c_n1, &c__0, a, &c__1, b, &c__1, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dpbsv_("U", &c__0, &c__0, &c_n1, a, &c__1, b, &c__1, &info);
+	dpbsv_("U", &c__0, &c__0, &c_n1, a, &c__1, b, &c__1, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dpbsv_("U", &c__1, &c__1, &c__0, a, &c__1, b, &c__2, &info);
+	dpbsv_("U", &c__1, &c__1, &c__0, a, &c__1, b, &c__2, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dpbsv_("U", &c__2, &c__0, &c__0, a, &c__1, b, &c__1, &info);
+	dpbsv_("U", &c__2, &c__0, &c__0, a, &c__1, b, &c__1, &info)
+		;
 	chkxer_("DPBSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DPBSVX */
 
-	s_copy(srnamc_1.srnamt, "DPBSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPBSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dpbsvx_("/", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("/", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dpbsvx_("N", "/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "/", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dpbsvx_("N", "U", &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dpbsvx_("N", "U", &c__1, &c_n1, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__1, &c_n1, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dpbsvx_("N", "U", &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	dpbsvx_("N", "U", &c__1, &c__1, &c__0, a, &c__1, af, &c__2, eq, c, b, 
-		&c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__1, &c__1, &c__0, a, &c__1, af, &c__2, eq, c__, 
+		b, &c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	dpbsvx_("N", "U", &c__1, &c__1, &c__0, a, &c__2, af, &c__1, eq, c, b, 
-		&c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__1, &c__1, &c__0, a, &c__2, af, &c__1, eq, c__, 
+		b, &c__2, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	*(unsigned char *)eq = '/';
-	dpbsvx_("F", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("F", "U", &c__0, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
 	*(unsigned char *)eq = 'Y';
-	dpbsvx_("F", "U", &c__1, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("F", "U", &c__1, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dpbsvx_("N", "U", &c__2, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__2, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__1, x, &c__2, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	dpbsvx_("N", "U", &c__2, &c__0, &c__0, a, &c__1, af, &c__1, eq, c, b, 
-		&c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
+	dpbsvx_("N", "U", &c__2, &c__0, &c__0, a, &c__1, af, &c__1, eq, c__, 
+		b, &c__2, x, &c__1, &rcond, r1, r2, w, iw, &info);
 	chkxer_("DPBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -649,46 +680,46 @@ static integer c__4 = 4;
 
 /*        DPTSV */
 
-	s_copy(srnamc_1.srnamt, "DPTSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dptsv_(&c_n1, &c__0, a, &a[4], b, &c__1, &info);
+	dptsv_(&c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), b, &c__1, &info);
 	chkxer_("DPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dptsv_(&c__0, &c_n1, a, &a[4], b, &c__1, &info);
+	dptsv_(&c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), b, &c__1, &info);
 	chkxer_("DPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dptsv_(&c__2, &c__0, a, &a[4], b, &c__1, &info);
+	dptsv_(&c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), b, &c__1, &info);
 	chkxer_("DPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DPTSVX */
 
-	s_copy(srnamc_1.srnamt, "DPTSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DPTSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dptsvx_("/", &c__0, &c__0, a, &a[4], af, &af[4], b, &c__1, x, &c__1, &
-		rcond, r1, r2, w, &info);
+	dptsvx_("/", &c__0, &c__0, &a_ref(1, 1), &a_ref(1, 2), &af_ref(1, 1), 
+		&af_ref(1, 2), b, &c__1, x, &c__1, &rcond, r1, r2, w, &info);
 	chkxer_("DPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dptsvx_("N", &c_n1, &c__0, a, &a[4], af, &af[4], b, &c__1, x, &c__1, &
-		rcond, r1, r2, w, &info);
+	dptsvx_("N", &c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), &af_ref(1, 1), 
+		&af_ref(1, 2), b, &c__1, x, &c__1, &rcond, r1, r2, w, &info);
 	chkxer_("DPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dptsvx_("N", &c__0, &c_n1, a, &a[4], af, &af[4], b, &c__1, x, &c__1, &
-		rcond, r1, r2, w, &info);
+	dptsvx_("N", &c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), &af_ref(1, 1), 
+		&af_ref(1, 2), b, &c__1, x, &c__1, &rcond, r1, r2, w, &info);
 	chkxer_("DPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	dptsvx_("N", &c__2, &c__0, a, &a[4], af, &af[4], b, &c__1, x, &c__2, &
-		rcond, r1, r2, w, &info);
+	dptsvx_("N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &af_ref(1, 1), 
+		&af_ref(1, 2), b, &c__1, x, &c__2, &rcond, r1, r2, w, &info);
 	chkxer_("DPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dptsvx_("N", &c__2, &c__0, a, &a[4], af, &af[4], b, &c__2, x, &c__1, &
-		rcond, r1, r2, w, &info);
+	dptsvx_("N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &af_ref(1, 1), 
+		&af_ref(1, 2), b, &c__2, x, &c__1, &rcond, r1, r2, w, &info);
 	chkxer_("DPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -696,31 +727,27 @@ static integer c__4 = 4;
 
 /*        DSYSV */
 
-	s_copy(srnamc_1.srnamt, "DSYSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dsysv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info)
-		;
+	dsysv_("/", &c__0, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("DSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dsysv_("U", &c_n1, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info)
-		;
+	dsysv_("U", &c_n1, &c__0, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("DSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dsysv_("U", &c__0, &c_n1, a, &c__1, ip, b, &c__1, w, &c__1, &info)
-		;
+	dsysv_("U", &c__0, &c_n1, a, &c__1, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("DSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dsysv_("U", &c__2, &c__0, a, &c__2, ip, b, &c__1, w, &c__1, &info)
-		;
+	dsysv_("U", &c__2, &c__0, a, &c__2, ip, b, &c__1, w, &c__1, &info);
 	chkxer_("DSYSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
 /*        DSYSVX */
 
-	s_copy(srnamc_1.srnamt, "DSYSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSYSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dsysvx_("/", "U", &c__0, &c__0, a, &c__1, af, &c__1, ip, b, &c__1, x, 
 		&c__1, &rcond, r1, r2, w, &c__1, iw, &info);
@@ -771,7 +798,7 @@ static integer c__4 = 4;
 
 /*        DSPSV */
 
-	s_copy(srnamc_1.srnamt, "DSPSV ", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspsv_("/", &c__0, &c__0, a, ip, b, &c__1, &info);
 	chkxer_("DSPSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -791,7 +818,7 @@ static integer c__4 = 4;
 
 /*        DSPSVX */
 
-	s_copy(srnamc_1.srnamt, "DSPSVX", 6L, 6L);
+	s_copy(srnamc_1.srnamt, "DSPSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	dspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
 		 r1, r2, w, iw, &info);
@@ -829,12 +856,12 @@ static integer c__4 = 4;
     if (infoc_1.ok) {
 	io___19.ciunit = infoc_1.nout;
 	s_wsfe(&io___19);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     } else {
 	io___20.ciunit = infoc_1.nout;
 	s_wsfe(&io___20);
-	do_fio(&c__1, path, 3L);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -844,4 +871,8 @@ static integer c__4 = 4;
 /*     End of DERRVX */
 
 } /* derrvx_ */
+
+#undef af_ref
+#undef a_ref
+
 

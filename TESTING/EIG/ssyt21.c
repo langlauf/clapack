@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,8 +13,8 @@ static integer c__1 = 1;
 static real c_b42 = 1.f;
 
 /* Subroutine */ int ssyt21_(integer *itype, char *uplo, integer *n, integer *
-	kband, real *a, integer *lda, real *d, real *e, real *u, integer *ldu,
-	 real *v, integer *ldv, real *tau, real *work, real *result)
+	kband, real *a, integer *lda, real *d__, real *e, real *u, integer *
+	ldu, real *v, integer *ldv, real *tau, real *work, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, u_dim1, u_offset, v_dim1, v_offset, i__1, i__2, 
@@ -57,7 +58,12 @@ static real c_b42 = 1.f;
     static real ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -74,10 +80,8 @@ static real c_b42 = 1.f;
     diagonal (if KBAND=0) or symmetric tridiagonal (if KBAND=1).   
 
     If ITYPE=1, then U is represented as a dense matrix; otherwise U is   
-    expressed as a product of Householder transformations, whose vectors 
-  
-    are stored in the array "V" and whose scaling constants are in "TAU". 
-  
+    expressed as a product of Householder transformations, whose vectors   
+    are stored in the array "V" and whose scaling constants are in "TAU".   
     We shall use the letter "V" to refer to the product of Householder   
     transformations (which should be equal to U).   
 
@@ -96,8 +100,7 @@ static real c_b42 = 1.f;
 
     For ITYPE > 1, the transformation U is expressed as a product   
     V = H(1)...H(n-2),  where H(j) = I  -  tau(j) v(j) v(j)' and each   
-    vector v(j) has its first j elements 0 and the remaining n-j elements 
-  
+    vector v(j) has its first j elements 0 and the remaining n-j elements   
     stored in V(j+1:n,j).   
 
     Arguments   
@@ -109,8 +112,7 @@ static real c_b42 = 1.f;
                RESULT(1) = | A - U S U' | / ( |A| n ulp )   *and*   
                RESULT(2) = | I - UU' | / ( n ulp )   
 
-            2: U expressed as a product V of Housholder transformations: 
-  
+            2: U expressed as a product V of Housholder transformations:   
                RESULT(1) = | A - V S V' | / ( |A| n ulp )   
 
             3: U expressed both as a dense orthogonal matrix and   
@@ -124,8 +126,7 @@ static real c_b42 = 1.f;
             the (strictly) upper triangle will not be referenced.   
 
     N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SSYT21 does nothing. 
-  
+            The size of the matrix.  If it is zero, SSYT21 does nothing.   
             It must be at least zero.   
 
     KBAND   (input) INTEGER   
@@ -153,8 +154,7 @@ static real c_b42 = 1.f;
 
     U       (input) REAL array, dimension (LDU, N)   
             If ITYPE=1 or 3, this contains the orthogonal matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2, 
-  
+            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
             then it is not referenced.   
 
     LDU     (input) INTEGER   
@@ -168,10 +168,8 @@ static real c_b42 = 1.f;
             the lower triangle, if UPLO='U', then in the upper   
             triangle.   
             *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') 
-  
-            is set to one, and later reset to its original value, during 
-  
+            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
+            is set to one, and later reset to its original value, during   
             the course of the calculation.   
             If ITYPE=1, then it is neither referenced nor modified.   
 
@@ -193,21 +191,20 @@ static real c_b42 = 1.f;
             RESULT(1) is always modified.  RESULT(2) is modified only   
             if ITYPE=1.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
-    --d;
+    --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --tau;
     --work;
@@ -263,18 +260,17 @@ static real c_b42 = 1.f;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    r__1 = -(doublereal)d[j];
-	    ssyr_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1], n)
-		    ;
+	    r__1 = -d__[j];
+	    ssyr_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &work[1], n);
 /* L10: */
 	}
 
 	if (*n > 1 && *kband == 1) {
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
-		r__1 = -(doublereal)e[j];
-		ssyr2_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) 
-			* u_dim1 + 1], &c__1, &work[1], n);
+		r__1 = -e[j];
+		ssyr2_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1),
+			 &c__1, &work[1], n);
 /* L20: */
 	    }
 	}
@@ -291,52 +287,51 @@ static real c_b42 = 1.f;
 	if (lower) {
 /* Computing 2nd power */
 	    i__1 = *n;
-	    work[i__1 * i__1] = d[*n];
+	    work[i__1 * i__1] = d__[*n];
 	    for (j = *n - 1; j >= 1; --j) {
 		if (*kband == 1) {
 		    work[(*n + 1) * (j - 1) + 2] = (1.f - tau[j]) * e[j];
 		    i__1 = *n;
 		    for (jr = j + 2; jr <= i__1; ++jr) {
-			work[(j - 1) * *n + jr] = -(doublereal)tau[j] * e[j] *
-				 v[jr + j * v_dim1];
+			work[(j - 1) * *n + jr] = -tau[j] * e[j] * v_ref(jr, 
+				j);
 /* L30: */
 		    }
 		}
 
-		vsave = v[j + 1 + j * v_dim1];
-		v[j + 1 + j * v_dim1] = 1.f;
+		vsave = v_ref(j + 1, j);
+		v_ref(j + 1, j) = 1.f;
 		i__1 = *n - j;
 /* Computing 2nd power */
 		i__2 = *n;
-		slarfy_("L", &i__1, &v[j + 1 + j * v_dim1], &c__1, &tau[j], &
-			work[(*n + 1) * j + 1], n, &work[i__2 * i__2 + 1])
+		slarfy_("L", &i__1, &v_ref(j + 1, j), &c__1, &tau[j], &work[(*
+			n + 1) * j + 1], n, &work[i__2 * i__2 + 1])
 			;
-		v[j + 1 + j * v_dim1] = vsave;
-		work[(*n + 1) * (j - 1) + 1] = d[j];
+		v_ref(j + 1, j) = vsave;
+		work[(*n + 1) * (j - 1) + 1] = d__[j];
 /* L40: */
 	    }
 	} else {
-	    work[1] = d[1];
+	    work[1] = d__[1];
 	    i__1 = *n - 1;
 	    for (j = 1; j <= i__1; ++j) {
 		if (*kband == 1) {
 		    work[(*n + 1) * j] = (1.f - tau[j]) * e[j];
 		    i__2 = j - 1;
 		    for (jr = 1; jr <= i__2; ++jr) {
-			work[j * *n + jr] = -(doublereal)tau[j] * e[j] * v[jr 
-				+ (j + 1) * v_dim1];
+			work[j * *n + jr] = -tau[j] * e[j] * v_ref(jr, j + 1);
 /* L50: */
 		    }
 		}
 
-		vsave = v[j + (j + 1) * v_dim1];
-		v[j + (j + 1) * v_dim1] = 1.f;
+		vsave = v_ref(j, j + 1);
+		v_ref(j, j + 1) = 1.f;
 /* Computing 2nd power */
 		i__2 = *n;
-		slarfy_("U", &j, &v[(j + 1) * v_dim1 + 1], &c__1, &tau[j], &
-			work[1], n, &work[i__2 * i__2 + 1]);
-		v[j + (j + 1) * v_dim1] = vsave;
-		work[(*n + 1) * j + 1] = d[j + 1];
+		slarfy_("U", &j, &v_ref(1, j + 1), &c__1, &tau[j], &work[1], 
+			n, &work[i__2 * i__2 + 1]);
+		v_ref(j, j + 1) = vsave;
+		work[(*n + 1) * j + 1] = d__[j + 1];
 /* L60: */
 	    }
 	}
@@ -346,13 +341,13 @@ static real c_b42 = 1.f;
 	    if (lower) {
 		i__2 = *n;
 		for (jrow = jcol; jrow <= i__2; ++jrow) {
-		    work[jrow + *n * (jcol - 1)] -= a[jrow + jcol * a_dim1];
+		    work[jrow + *n * (jcol - 1)] -= a_ref(jrow, jcol);
 /* L70: */
 		}
 	    } else {
 		i__2 = jcol;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
-		    work[jrow + *n * (jcol - 1)] -= a[jrow + jcol * a_dim1];
+		    work[jrow + *n * (jcol - 1)] -= a_ref(jrow, jcol);
 /* L80: */
 		}
 	    }
@@ -375,15 +370,15 @@ static real c_b42 = 1.f;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    sorm2r_("R", "T", n, &i__1, &i__2, &v[v_dim1 + 2], ldv, &tau[1], &
+	    sorm2r_("R", "T", n, &i__1, &i__2, &v_ref(2, 1), ldv, &tau[1], &
 		    work[*n + 1], n, &work[i__3 * i__3 + 1], &iinfo);
 	} else {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    sorm2l_("R", "T", n, &i__1, &i__2, &v[(v_dim1 << 1) + 1], ldv, &
-		    tau[1], &work[1], n, &work[i__3 * i__3 + 1], &iinfo);
+	    sorm2l_("R", "T", n, &i__1, &i__2, &v_ref(1, 2), ldv, &tau[1], &
+		    work[1], n, &work[i__3 * i__3 + 1], &iinfo);
 	}
 	if (iinfo != 0) {
 	    result[1] = 10.f / ulp;
@@ -432,8 +427,7 @@ static real c_b42 = 1.f;
 /* Computing MIN   
    Computing 2nd power */
 	i__1 = *n;
-	r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), 
-		r__2 = (real) (*n);
+	r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), r__2 = (real) (*n);
 	result[2] = dmin(r__1,r__2) / (*n * ulp);
     }
 
@@ -442,4 +436,9 @@ static real c_b42 = 1.f;
 /*     End of SSYT21 */
 
 } /* ssyt21_ */
+
+#undef v_ref
+#undef u_ref
+#undef a_ref
+
 

@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgegv_(char *jobvl, char *jobvr, integer *n, 
@@ -6,14 +7,16 @@
 	*ldvl, doublecomplex *vr, integer *ldvr, doublecomplex *work, integer 
 	*lwork, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
     =======   
+
+    This routine is deprecated and has been replaced by routine ZGGEV.   
 
     ZGEGV computes for a pair of N-by-N complex nonsymmetric matrices A   
     and B, the generalized eigenvalues (alpha, beta), and optionally,   
@@ -97,7 +100,7 @@
             if JOBVL = 'V', LDVL >= N.   
 
     VR      (output) COMPLEX*16 array, dimension (LDVR,N)   
-            If JOBVL = 'V', the right generalized eigenvectors.  (See   
+            If JOBVR = 'V', the right generalized eigenvectors.  (See   
             "Purpose", above.)   
             Each eigenvector will be scaled so the largest component   
             will have abs(real part) + abs(imag. part) = 1, *except*   
@@ -117,9 +120,13 @@
             For good performance, LWORK must generally be larger.   
             To compute the optimal value of LWORK, call ILAENV to get   
             blocksizes (for ZGEQRF, ZUNMQR, and CUNGQR.)  Then compute:   
-            NB  -- MAX of the blocksizes for ZGEQRF, ZUNMQR, and CUNGQR; 
-  
+            NB  -- MAX of the blocksizes for ZGEQRF, ZUNMQR, and CUNGQR;   
             The optimal LWORK is  MAX( 2*N, N*(NB+1) ).   
+
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
 
     RWORK   (workspace/output) DOUBLE PRECISION array, dimension (8*N)   
 
@@ -166,28 +173,24 @@
     -------- -- - --- - -- ----   
 
     If any eigenvectors are computed (either JOBVL='V' or JOBVR='V' or   
-    both), then on exit the arrays A and B will contain the complex Schur 
-  
+    both), then on exit the arrays A and B will contain the complex Schur   
     form[*] of the "balanced" versions of A and B.  If no eigenvectors   
     are computed, then only the diagonal blocks will be correct.   
 
     [*] In other words, upper triangular form.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Decode the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b1 = {0.,0.};
     static doublecomplex c_b2 = {1.,0.};
-    static integer c_n1 = -1;
-    static doublereal c_b16 = 1.;
     static integer c__1 = 1;
+    static integer c_n1 = -1;
+    static doublereal c_b29 = 1.;
     
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, vl_dim1, vl_offset, vr_dim1, 
@@ -201,9 +204,10 @@
     static integer itau;
     static doublereal temp;
     static logical ilvl, ilvr;
+    static integer lopt;
     static doublereal anrm1, anrm2, bnrm1, bnrm2, absai, scale, absar, sbeta;
     extern logical lsame_(char *, char *);
-    static integer ileft, iinfo, icols, iwork, irows, jc, in;
+    static integer ileft, iinfo, icols, iwork, irows, jc, nb, in;
     extern doublereal dlamch_(char *);
     static integer jr;
     static doublereal salfai;
@@ -217,6 +221,8 @@
     static doublereal safmax;
     static char chtemp[1];
     static logical ldumma[1];
+    extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
+	    integer *, integer *, ftnlen, ftnlen);
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
     static integer ijobvl, iright;
@@ -231,7 +237,7 @@
     extern /* Subroutine */ int zgeqrf_(integer *, integer *, doublecomplex *,
 	     integer *, doublecomplex *, doublecomplex *, integer *, integer *
 	    );
-    static integer lwkmin;
+    static integer lwkmin, nb1, nb2, nb3;
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
@@ -245,6 +251,7 @@
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, integer *);
     static integer irwork, lwkopt;
+    static logical lquery;
     extern /* Subroutine */ int zungqr_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *), zunmqr_(char *, char *, integer *, integer 
@@ -253,19 +260,34 @@
     static integer ihi, ilo;
     static doublereal eps;
     static logical ilv;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define vl_subscr(a_1,a_2) (a_2)*vl_dim1 + a_1
+#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
+#define vr_subscr(a_1,a_2) (a_2)*vr_dim1 + a_1
+#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    --alpha;
+    --beta;
+    vl_dim1 = *ldvl;
+    vl_offset = 1 + vl_dim1 * 1;
+    vl -= vl_offset;
+    vr_dim1 = *ldvr;
+    vr_offset = 1 + vr_dim1 * 1;
+    vr -= vr_offset;
+    --work;
+    --rwork;
 
-#define ALPHA(I) alpha[(I)-1]
-#define BETA(I) beta[(I)-1]
-#define WORK(I) work[(I)-1]
-#define RWORK(I) rwork[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define VL(I,J) vl[(I)-1 + ((J)-1)* ( *ldvl)]
-#define VR(I,J) vr[(I)-1 + ((J)-1)* ( *ldvr)]
-
+    /* Function Body */
     if (lsame_(jobvl, "N")) {
 	ijobvl = 1;
 	ilvl = FALSE_;
@@ -295,6 +317,8 @@
     i__1 = *n << 1;
     lwkmin = max(i__1,1);
     lwkopt = lwkmin;
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    lquery = *lwork == -1;
     *info = 0;
     if (ijobvl <= 0) {
 	*info = -1;
@@ -310,19 +334,36 @@
 	*info = -11;
     } else if (*ldvr < 1 || ilvr && *ldvr < *n) {
 	*info = -13;
-    } else if (*lwork < lwkmin) {
+    } else if (*lwork < lwkmin && ! lquery) {
 	*info = -15;
+    }
+
+    if (*info == 0) {
+	nb1 = ilaenv_(&c__1, "ZGEQRF", " ", n, n, &c_n1, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+	nb2 = ilaenv_(&c__1, "ZUNMQR", " ", n, n, n, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+	nb3 = ilaenv_(&c__1, "ZUNGQR", " ", n, n, n, &c_n1, (ftnlen)6, (
+		ftnlen)1);
+/* Computing MAX */
+	i__1 = max(nb1,nb2);
+	nb = max(i__1,nb3);
+/* Computing MAX */
+	i__1 = *n << 1, i__2 = *n * (nb + 1);
+	lopt = max(i__1,i__2);
+	work[1].r = (doublereal) lopt, work[1].i = 0.;
     }
 
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZGEGV ", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
-    WORK(1).r = (doublereal) lwkopt, WORK(1).i = 0.;
     if (*n == 0) {
 	return 0;
     }
@@ -336,7 +377,7 @@
 
 /*     Scale A */
 
-    anrm = zlange_("M", n, n, &A(1,1), lda, &RWORK(1));
+    anrm = zlange_("M", n, n, &a[a_offset], lda, &rwork[1]);
     anrm1 = anrm;
     anrm2 = 1.;
     if (anrm < 1.) {
@@ -347,7 +388,7 @@
     }
 
     if (anrm > 0.) {
-	zlascl_("G", &c_n1, &c_n1, &anrm, &c_b16, n, n, &A(1,1), lda, &
+	zlascl_("G", &c_n1, &c_n1, &anrm, &c_b29, n, n, &a[a_offset], lda, &
 		iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 10;
@@ -357,7 +398,7 @@
 
 /*     Scale B */
 
-    bnrm = zlange_("M", n, n, &B(1,1), ldb, &RWORK(1));
+    bnrm = zlange_("M", n, n, &b[b_offset], ldb, &rwork[1]);
     bnrm1 = bnrm;
     bnrm2 = 1.;
     if (bnrm < 1.) {
@@ -368,7 +409,7 @@
     }
 
     if (bnrm > 0.) {
-	zlascl_("G", &c_n1, &c_n1, &bnrm, &c_b16, n, n, &B(1,1), ldb, &
+	zlascl_("G", &c_n1, &c_n1, &bnrm, &c_b29, n, n, &b[b_offset], ldb, &
 		iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 10;
@@ -382,8 +423,8 @@
     ileft = 1;
     iright = *n + 1;
     irwork = iright + *n;
-    zggbal_("B", n, &A(1,1), lda, &B(1,1), ldb, &ilo, &ihi, &RWORK(
-	    ileft), &RWORK(iright), &RWORK(irwork), &iinfo);
+    zggbal_("P", n, &a[a_offset], lda, &b[b_offset], ldb, &ilo, &ihi, &rwork[
+	    ileft], &rwork[iright], &rwork[irwork], &iinfo);
     if (iinfo != 0) {
 	*info = *n + 1;
 	goto L80;
@@ -400,12 +441,12 @@
     itau = 1;
     iwork = itau + irows;
     i__1 = *lwork + 1 - iwork;
-    zgeqrf_(&irows, &icols, &B(ilo,ilo), ldb, &WORK(itau), &WORK(
-	    iwork), &i__1, &iinfo);
+    zgeqrf_(&irows, &icols, &b_ref(ilo, ilo), ldb, &work[itau], &work[iwork], 
+	    &i__1, &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
 	i__3 = iwork;
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork).r + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[i__3].r + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -414,13 +455,12 @@
     }
 
     i__1 = *lwork + 1 - iwork;
-    zunmqr_("L", "C", &irows, &icols, &irows, &B(ilo,ilo), ldb, &
-	    WORK(itau), &A(ilo,ilo), lda, &WORK(iwork), &i__1, &
-	    iinfo);
+    zunmqr_("L", "C", &irows, &icols, &irows, &b_ref(ilo, ilo), ldb, &work[
+	    itau], &a_ref(ilo, ilo), lda, &work[iwork], &i__1, &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
 	i__3 = iwork;
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork).r + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[i__3].r + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -429,17 +469,18 @@
     }
 
     if (ilvl) {
-	zlaset_("Full", n, n, &c_b1, &c_b2, &VL(1,1), ldvl);
+	zlaset_("Full", n, n, &c_b1, &c_b2, &vl[vl_offset], ldvl);
 	i__1 = irows - 1;
 	i__2 = irows - 1;
-	zlacpy_("L", &i__1, &i__2, &B(ilo+1,ilo), ldb, &VL(ilo+1,ilo), ldvl);
+	zlacpy_("L", &i__1, &i__2, &b_ref(ilo + 1, ilo), ldb, &vl_ref(ilo + 1,
+		 ilo), ldvl);
 	i__1 = *lwork + 1 - iwork;
-	zungqr_(&irows, &irows, &irows, &VL(ilo,ilo), ldvl, &WORK(
-		itau), &WORK(iwork), &i__1, &iinfo);
+	zungqr_(&irows, &irows, &irows, &vl_ref(ilo, ilo), ldvl, &work[itau], 
+		&work[iwork], &i__1, &iinfo);
 	if (iinfo >= 0) {
 /* Computing MAX */
 	    i__3 = iwork;
-	    i__1 = lwkopt, i__2 = (integer) WORK(iwork).r + iwork - 1;
+	    i__1 = lwkopt, i__2 = (integer) work[i__3].r + iwork - 1;
 	    lwkopt = max(i__1,i__2);
 	}
 	if (iinfo != 0) {
@@ -449,7 +490,7 @@
     }
 
     if (ilvr) {
-	zlaset_("Full", n, n, &c_b1, &c_b2, &VR(1,1), ldvr);
+	zlaset_("Full", n, n, &c_b1, &c_b2, &vr[vr_offset], ldvr);
     }
 
 /*     Reduce to generalized Hessenberg form */
@@ -458,11 +499,12 @@
 
 /*        Eigenvectors requested -- work on whole matrix. */
 
-	zgghrd_(jobvl, jobvr, n, &ilo, &ihi, &A(1,1), lda, &B(1,1), 
-		ldb, &VL(1,1), ldvl, &VR(1,1), ldvr, &iinfo);
+	zgghrd_(jobvl, jobvr, n, &ilo, &ihi, &a[a_offset], lda, &b[b_offset], 
+		ldb, &vl[vl_offset], ldvl, &vr[vr_offset], ldvr, &iinfo);
     } else {
-	zgghrd_("N", "N", &irows, &c__1, &irows, &A(ilo,ilo), lda, 
-		&B(ilo,ilo), ldb, &VL(1,1), ldvl, &VR(1,1), ldvr, &iinfo);
+	zgghrd_("N", "N", &irows, &c__1, &irows, &a_ref(ilo, ilo), lda, &
+		b_ref(ilo, ilo), ldb, &vl[vl_offset], ldvl, &vr[vr_offset], 
+		ldvr, &iinfo);
     }
     if (iinfo != 0) {
 	*info = *n + 5;
@@ -478,11 +520,13 @@
 	*(unsigned char *)chtemp = 'E';
     }
     i__1 = *lwork + 1 - iwork;
-    zhgeqz_(chtemp, jobvl, jobvr, n, &ilo, &ihi, &A(1,1), lda, &B(1,1), ldb, &ALPHA(1), &BETA(1), &VL(1,1), ldvl, &VR(1,1), ldvr, &WORK(iwork), &i__1, &RWORK(irwork), &iinfo);
+    zhgeqz_(chtemp, jobvl, jobvr, n, &ilo, &ihi, &a[a_offset], lda, &b[
+	    b_offset], ldb, &alpha[1], &beta[1], &vl[vl_offset], ldvl, &vr[
+	    vr_offset], ldvr, &work[iwork], &i__1, &rwork[irwork], &iinfo);
     if (iinfo >= 0) {
 /* Computing MAX */
 	i__3 = iwork;
-	i__1 = lwkopt, i__2 = (integer) WORK(iwork).r + iwork - 1;
+	i__1 = lwkopt, i__2 = (integer) work[i__3].r + iwork - 1;
 	lwkopt = max(i__1,i__2);
     }
     if (iinfo != 0) {
@@ -510,9 +554,9 @@
 	    *(unsigned char *)chtemp = 'R';
 	}
 
-	ztgevc_(chtemp, "B", ldumma, n, &A(1,1), lda, &B(1,1), ldb, 
-		&VL(1,1), ldvl, &VR(1,1), ldvr, n, &in, &WORK(
-		iwork), &RWORK(irwork), &iinfo);
+	ztgevc_(chtemp, "B", ldumma, n, &a[a_offset], lda, &b[b_offset], ldb, 
+		&vl[vl_offset], ldvl, &vr[vr_offset], ldvr, n, &in, &work[
+		iwork], &rwork[irwork], &iinfo);
 	if (iinfo != 0) {
 	    *info = *n + 7;
 	    goto L80;
@@ -521,21 +565,21 @@
 /*        Undo balancing on VL and VR, rescale */
 
 	if (ilvl) {
-	    zggbak_("B", "L", n, &ilo, &ihi, &RWORK(ileft), &RWORK(iright), n,
-		     &VL(1,1), ldvl, &iinfo);
+	    zggbak_("P", "L", n, &ilo, &ihi, &rwork[ileft], &rwork[iright], n,
+		     &vl[vl_offset], ldvl, &iinfo);
 	    if (iinfo != 0) {
 		*info = *n + 8;
 		goto L80;
 	    }
 	    i__1 = *n;
-	    for (jc = 1; jc <= *n; ++jc) {
+	    for (jc = 1; jc <= i__1; ++jc) {
 		temp = 0.;
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
+		for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-		    i__3 = jr + jc * vl_dim1;
-		    d__3 = temp, d__4 = (d__1 = VL(jr,jc).r, abs(d__1)) + (
-			    d__2 = d_imag(&VL(jr,jc)), abs(d__2));
+		    i__3 = vl_subscr(jr, jc);
+		    d__3 = temp, d__4 = (d__1 = vl[i__3].r, abs(d__1)) + (
+			    d__2 = d_imag(&vl_ref(jr, jc)), abs(d__2));
 		    temp = max(d__3,d__4);
 /* L10: */
 		}
@@ -544,11 +588,11 @@
 		}
 		temp = 1. / temp;
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    i__3 = jr + jc * vl_dim1;
-		    i__4 = jr + jc * vl_dim1;
-		    z__1.r = temp * VL(jr,jc).r, z__1.i = temp * VL(jr,jc).i;
-		    VL(jr,jc).r = z__1.r, VL(jr,jc).i = z__1.i;
+		for (jr = 1; jr <= i__2; ++jr) {
+		    i__3 = vl_subscr(jr, jc);
+		    i__4 = vl_subscr(jr, jc);
+		    z__1.r = temp * vl[i__4].r, z__1.i = temp * vl[i__4].i;
+		    vl[i__3].r = z__1.r, vl[i__3].i = z__1.i;
 /* L20: */
 		}
 L30:
@@ -556,21 +600,21 @@ L30:
 	    }
 	}
 	if (ilvr) {
-	    zggbak_("B", "R", n, &ilo, &ihi, &RWORK(ileft), &RWORK(iright), n,
-		     &VR(1,1), ldvr, &iinfo);
+	    zggbak_("P", "R", n, &ilo, &ihi, &rwork[ileft], &rwork[iright], n,
+		     &vr[vr_offset], ldvr, &iinfo);
 	    if (iinfo != 0) {
 		*info = *n + 9;
 		goto L80;
 	    }
 	    i__1 = *n;
-	    for (jc = 1; jc <= *n; ++jc) {
+	    for (jc = 1; jc <= i__1; ++jc) {
 		temp = 0.;
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
+		for (jr = 1; jr <= i__2; ++jr) {
 /* Computing MAX */
-		    i__3 = jr + jc * vr_dim1;
-		    d__3 = temp, d__4 = (d__1 = VR(jr,jc).r, abs(d__1)) + (
-			    d__2 = d_imag(&VR(jr,jc)), abs(d__2));
+		    i__3 = vr_subscr(jr, jc);
+		    d__3 = temp, d__4 = (d__1 = vr[i__3].r, abs(d__1)) + (
+			    d__2 = d_imag(&vr_ref(jr, jc)), abs(d__2));
 		    temp = max(d__3,d__4);
 /* L40: */
 		}
@@ -579,11 +623,11 @@ L30:
 		}
 		temp = 1. / temp;
 		i__2 = *n;
-		for (jr = 1; jr <= *n; ++jr) {
-		    i__3 = jr + jc * vr_dim1;
-		    i__4 = jr + jc * vr_dim1;
-		    z__1.r = temp * VR(jr,jc).r, z__1.i = temp * VR(jr,jc).i;
-		    VR(jr,jc).r = z__1.r, VR(jr,jc).i = z__1.i;
+		for (jr = 1; jr <= i__2; ++jr) {
+		    i__3 = vr_subscr(jr, jc);
+		    i__4 = vr_subscr(jr, jc);
+		    z__1.r = temp * vr[i__4].r, z__1.i = temp * vr[i__4].i;
+		    vr[i__3].r = z__1.r, vr[i__3].i = z__1.i;
 /* L50: */
 		}
 L60:
@@ -604,22 +648,21 @@ L60:
        if they are significant. */
 
     i__1 = *n;
-    for (jc = 1; jc <= *n; ++jc) {
+    for (jc = 1; jc <= i__1; ++jc) {
 	i__2 = jc;
-	absar = (d__1 = ALPHA(jc).r, abs(d__1));
-	absai = (d__1 = d_imag(&ALPHA(jc)), abs(d__1));
+	absar = (d__1 = alpha[i__2].r, abs(d__1));
+	absai = (d__1 = d_imag(&alpha[jc]), abs(d__1));
 	i__2 = jc;
-	absb = (d__1 = BETA(jc).r, abs(d__1));
+	absb = (d__1 = beta[i__2].r, abs(d__1));
 	i__2 = jc;
-	salfar = anrm * ALPHA(jc).r;
-	salfai = anrm * d_imag(&ALPHA(jc));
+	salfar = anrm * alpha[i__2].r;
+	salfai = anrm * d_imag(&alpha[jc]);
 	i__2 = jc;
-	sbeta = bnrm * BETA(jc).r;
+	sbeta = bnrm * beta[i__2].r;
 	ilimit = FALSE_;
 	scale = 1.;
 
-/*        Check for significant underflow in imaginary part of ALPHA 
-  
+/*        Check for significant underflow in imaginary part of ALPHA   
 
    Computing MAX */
 	d__1 = safmin, d__2 = eps * absar, d__1 = max(d__1,d__2), d__2 = eps *
@@ -678,27 +721,37 @@ L60:
 
 	if (ilimit) {
 	    i__2 = jc;
-	    salfar = scale * ALPHA(jc).r * anrm;
-	    salfai = scale * d_imag(&ALPHA(jc)) * anrm;
+	    salfar = scale * alpha[i__2].r * anrm;
+	    salfai = scale * d_imag(&alpha[jc]) * anrm;
 	    i__2 = jc;
-	    z__2.r = scale * BETA(jc).r, z__2.i = scale * BETA(jc).i;
+	    z__2.r = scale * beta[i__2].r, z__2.i = scale * beta[i__2].i;
 	    z__1.r = bnrm * z__2.r, z__1.i = bnrm * z__2.i;
 	    sbeta = z__1.r;
 	}
 	i__2 = jc;
 	z__1.r = salfar, z__1.i = salfai;
-	ALPHA(jc).r = z__1.r, ALPHA(jc).i = z__1.i;
+	alpha[i__2].r = z__1.r, alpha[i__2].i = z__1.i;
 	i__2 = jc;
-	BETA(jc).r = sbeta, BETA(jc).i = 0.;
+	beta[i__2].r = sbeta, beta[i__2].i = 0.;
 /* L70: */
     }
 
 L80:
-    WORK(1).r = (doublereal) lwkopt, WORK(1).i = 0.;
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
 
     return 0;
 
 /*     End of ZGEGV */
 
 } /* zgegv_ */
+
+#undef vr_ref
+#undef vr_subscr
+#undef vl_ref
+#undef vl_subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
 

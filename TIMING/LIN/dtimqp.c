@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -45,7 +46,7 @@ static integer c__2 = 2;
     static integer info;
     static char path[3];
     static doublereal time;
-    static integer i, m, n;
+    static integer i__, m, n;
     static char cname[6];
     static integer imode;
     extern doublereal dopla_(char *, integer *, integer *, integer *, integer 
@@ -57,7 +58,7 @@ static integer c__2 = 2;
     extern /* Subroutine */ int dprtb5_(char *, char *, char *, integer *, 
 	    integer *, integer *, integer *, integer *, integer *, doublereal 
 	    *, integer *, integer *, integer *, ftnlen, ftnlen, ftnlen);
-    static integer ic, nb, im;
+    static integer ic, im;
     extern doublereal dlamch_(char *), dsecnd_(void);
     extern /* Subroutine */ int dgeqpf_(integer *, integer *, doublereal *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *), 
@@ -77,28 +78,31 @@ static integer c__2 = 2;
 
     /* Fortran I/O blocks */
     static cilist io___8 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___28 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___29 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___30 = { 0, 0, 0, 0, 0 };
+    static cilist io___27 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___28 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___29 = { 0, 0, 0, 0, 0 };
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3) reslts[((a_3)*reslts_dim2 + (a_2))*\
+reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
     =======   
 
-    DTIMQP times the LAPACK routines to perform the QR factorization with 
-  
+    DTIMQP times the LAPACK routines to perform the QR factorization with   
     column pivoting of a DOUBLE PRECISION general matrix.   
 
     Two matrix types may be used for timing.  The number of types is   
-    set in the parameter NMODE and the matrix types are set in the vector 
-  
+    set in the parameter NMODE and the matrix types are set in the vector   
     MODES, using the following key:   
        2.  BREAK1    D(1:N-1)=1 and D(N)=1.0/COND in DLATMS   
        3.  GEOM      D(I)=COND**(-(I-1)/(N-1)) in DLATMS   
@@ -112,8 +116,7 @@ static integer c__2 = 2;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -160,8 +163,7 @@ static integer c__2 = 2;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -174,30 +176,32 @@ static integer c__2 = 2;
     --iwork;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
-    reslts_offset = reslts_dim1 * (reslts_dim2 + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * 1);
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Double precision", 1L, 16L);
-    s_copy(path + 1, "QP", 2L, 2L);
-    atimin_(path, line, &c__1, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "QP", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__1, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (! timsub[0] || info != 0) {
-	goto L90;
+	goto L80;
     }
 
 /*     Check that M <= LDA for the input values. */
 
-    s_copy(cname, line, 6L, 6L);
-    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L);
+    s_copy(cname, line, (ftnlen)6, (ftnlen)6);
+    atimck_(&c__1, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+	    ftnlen)6);
     if (info > 0) {
 	io___8.ciunit = *nout;
 	s_wsfe(&io___8);
-	do_fio(&c__1, cname, 6L);
+	do_fio(&c__1, cname, (ftnlen)6);
 	e_wsfe();
-	goto L90;
+	goto L80;
     }
 
 /*     Set the condition number and scaling factor for the matrices   
@@ -222,22 +226,19 @@ static integer c__2 = 2;
 	    for (imode = 1; imode <= 2; ++imode) {
 		mode = modes[imode - 1];
 
-/*              Generate a test matrix of size m by n using th
-e   
-                singular value distribution indicated by MODE.
- */
+/*              Generate a test matrix of size m by n using the   
+                singular value distribution indicated by MODE. */
 
 		i__3 = n;
-		for (i = 1; i <= i__3; ++i) {
-		    iwork[n + i] = 0;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    iwork[n + i__] = 0;
 /* L10: */
 		}
 		dlatms_(&m, &n, "Uniform", iseed, "Nonsymm", &tau[1], &mode, &
 			cond, &dmax__, &m, &n, "No packing", &copya[1], &lda, 
 			&work[1], &info);
 
-/*              DGEQPF:  QR factorization with column pivoting
- */
+/*              DGEQPF:  QR factorization with column pivoting */
 
 		dlacpy_("All", &m, &n, &copya[1], &lda, &a[1], &lda);
 		icopy_(&n, &iwork[n + 1], &c__1, &iwork[1], &c__1);
@@ -270,9 +271,9 @@ L30:
 		}
 
 		time = (time - untime) / (doublereal) ic;
-		ops = dopla_("DGEQPF", &m, &n, &c__0, &c__0, &nb);
-		reslts[imode + (im + ilda * reslts_dim2) * reslts_dim1] = 
-			dmflop_(&ops, &time, &info);
+		ops = dopla_("DGEQPF", &m, &n, &c__0, &c__0, &c__1)
+			;
+		reslts_ref(imode, im, ilda) = dmflop_(&ops, &time, &info);
 
 /* L40: */
 	    }
@@ -283,31 +284,35 @@ L30:
 
 /*     Print tables of results */
 
-    io___28.ciunit = *nout;
-    s_wsfe(&io___28);
-    do_fio(&c__1, subnam, 6L);
+    io___27.ciunit = *nout;
+    s_wsfe(&io___27);
+    do_fio(&c__1, subnam_ref(0, 1), (ftnlen)6);
     e_wsfe();
     if (*nlda > 1) {
 	i__1 = *nlda;
-	for (i = 1; i <= i__1; ++i) {
-	    io___29.ciunit = *nout;
-	    s_wsfe(&io___29);
-	    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    io___28.ciunit = *nout;
+	    s_wsfe(&io___28);
+	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	    do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 	    e_wsfe();
 /* L70: */
 	}
     }
-    io___30.ciunit = *nout;
-    s_wsle(&io___30);
+    io___29.ciunit = *nout;
+    s_wsle(&io___29);
     e_wsle();
     dprtb5_("Type", "M", "N", &c__2, modes, nm, &mval[1], &nval[1], nlda, &
-	    reslts[reslts_offset], ldr1, ldr2, nout, 4L, 1L, 1L);
-/* L80: */
-L90:
+	    reslts[reslts_offset], ldr1, ldr2, nout, (ftnlen)4, (ftnlen)1, (
+	    ftnlen)1);
+L80:
     return 0;
 
 /*     End of DTIMQP */
 
 } /* dtimqp_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -80,8 +81,10 @@ static integer c__7 = 7;
     static real amax;
     static char path[3];
     static integer imat, info;
-    static char dist[1], type[1];
-    static integer nrun, ldafb, i, j, k, n;
+    static char dist[1];
+    static real rdum[1];
+    static char type__[1];
+    static integer nrun, ldafb, i__, j, k, n;
     extern /* Subroutine */ int cgbt01_(integer *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, integer *, 
 	    complex *, real *), cgbt02_(char *, integer *, integer *, integer 
@@ -116,7 +119,8 @@ static integer c__7 = 7;
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
 	    ), aladhd_(integer *, char *);
     static integer nb;
-    extern doublereal clangb_();
+    extern doublereal clangb_(char *, integer *, integer *, integer *, 
+	    complex *, integer *, real *);
     static integer in, kl;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
@@ -129,7 +133,7 @@ static integer c__7 = 7;
     static integer ku, nt;
     static real colcnd;
     extern doublereal clantb_(char *, char *, char *, integer *, integer *, 
-	    complex *, integer *, complex *);
+	    complex *, integer *, real *);
     extern /* Subroutine */ int cgbequ_(integer *, integer *, integer *, 
 	    integer *, complex *, integer *, real *, real *, real *, real *, 
 	    real *, integer *);
@@ -169,21 +173,21 @@ static integer c__7 = 7;
     static cilist io___26 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___27 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___65 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___72 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___73 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___74 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___75 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___76 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___77 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___78 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___79 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___73 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___74 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___75 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___76 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___77 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___78 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___79 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___80 = { 0, 0, 0, fmt_9996, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -195,8 +199,7 @@ static integer c__7 = 7;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -253,8 +256,7 @@ static integer c__7 = 7;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -275,13 +277,13 @@ static integer c__7 = 7;
 
        Initialize constants and the random number seed. */
 
-    *(unsigned char *)path = 'C';
-    s_copy(path + 1, "GB", 2L, 2L);
+    s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
+    s_copy(path + 1, "GB", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -324,10 +326,8 @@ static integer c__7 = 7;
 	i__2 = nkl;
 	for (ikl = 1; ikl <= i__2; ++ikl) {
 
-/*           Do for KL = 0, N-1, (3N-1)/4, and (N+1)/4. This order
- makes   
-             it easier to skip redundant values for small values o
-f N. */
+/*           Do for KL = 0, N-1, (3N-1)/4, and (N+1)/4. This order makes   
+             it easier to skip redundant values for small values of N. */
 
 	    if (ikl == 1) {
 		kl = 0;
@@ -343,10 +343,8 @@ f N. */
 	    i__3 = nku;
 	    for (iku = 1; iku <= i__3; ++iku) {
 
-/*              Do for KU = 0, N-1, (3N-1)/4, and (N+1)/4. Thi
-s order   
-                makes it easier to skip redundant values for s
-mall   
+/*              Do for KU = 0, N-1, (3N-1)/4, and (N+1)/4. This order   
+                makes it easier to skip redundant values for small   
                 values of N. */
 
 		if (iku == 1) {
@@ -361,8 +359,7 @@ mall
 		    ku = (n + 1) / 4;
 		}
 
-/*              Check that A and AFB are big enough to generat
-e this   
+/*              Check that A and AFB are big enough to generate this   
                 matrix. */
 
 		lda = kl + ku + 1;
@@ -397,37 +394,34 @@ e this
 			e_wsfe();
 			++nerrs;
 		    }
-		    goto L140;
+		    goto L130;
 		}
 
 		i__4 = nimat;
 		for (imat = 1; imat <= i__4; ++imat) {
 
-/*                 Do the tests only if DOTYPE( IMAT ) is 
-true. */
+/*                 Do the tests only if DOTYPE( IMAT ) is true. */
 
 		    if (! dotype[imat]) {
-			goto L130;
+			goto L120;
 		    }
 
-/*                 Skip types 2, 3, or 4 if the matrix is 
-too small. */
+/*                 Skip types 2, 3, or 4 if the matrix is too small. */
 
 		    zerot = imat >= 2 && imat <= 4;
 		    if (zerot && n < imat - 1) {
-			goto L130;
+			goto L120;
 		    }
 
-/*                 Set up parameters with CLATB4 and gener
-ate a   
+/*                 Set up parameters with CLATB4 and generate a   
                    test matrix with CLATMS. */
 
-		    clatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &
+		    clatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &
 			    mode, &cndnum, dist);
 		    rcondc = 1.f / cndnum;
 
-		    s_copy(srnamc_1.srnamt, "CLATMS", 6L, 6L);
-		    clatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &
+		    s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
+		    clatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
 			    cndnum, &anorm, &kl, &ku, "Z", &a[1], &lda, &work[
 			    1], &info);
 
@@ -436,13 +430,11 @@ ate a
 		    if (info != 0) {
 			alaerh_(path, "CLATMS", &info, &c__0, " ", &n, &n, &
 				kl, &ku, &c_n1, &imat, &nfail, &nerrs, nout);
-			goto L130;
+			goto L120;
 		    }
 
-/*                 For types 2, 3, and 4, zero one or more
- columns of   
-                   the matrix to test that INFO is returne
-d correctly. */
+/*                 For types 2, 3, and 4, zero one or more columns of   
+                   the matrix to test that INFO is returned correctly. */
 
 		    izero = 0;
 		    if (zerot) {
@@ -462,8 +454,8 @@ d correctly. */
 			    i__5 = kl + ku + 1, i__6 = ku + 1 + (n - izero);
 			    i2 = min(i__5,i__6);
 			    i__5 = i2;
-			    for (i = i1; i <= i__5; ++i) {
-				i__6 = ioff + i;
+			    for (i__ = i1; i__ <= i__5; ++i__) {
+				i__6 = ioff + i__;
 				a[i__6].r = 0.f, a[i__6].i = 0.f;
 /* L20: */
 			    }
@@ -475,8 +467,9 @@ d correctly. */
 /* Computing MIN */
 				i__9 = kl + ku + 1, i__10 = ku + 1 + (n - j);
 				i__8 = min(i__9,i__10);
-				for (i = max(i__6,i__7); i <= i__8; ++i) {
-				    i__6 = ioff + i;
+				for (i__ = max(i__6,i__7); i__ <= i__8; ++i__)
+					 {
+				    i__6 = ioff + i__;
 				    a[i__6].r = 0.f, a[i__6].i = 0.f;
 /* L30: */
 				}
@@ -510,31 +503,25 @@ d correctly. */
 
 			    if (zerot) {
 				if (prefac) {
-				    goto L110;
+				    goto L100;
 				}
 				rcondo = 0.f;
 				rcondi = 0.f;
 
 			    } else if (! nofact) {
 
-/*                          Compute the condit
-ion number for comparison   
-                            with the value ret
-urned by SGESVX (FACT =   
-                            'N' reuses the con
-dition number from the   
-                            previous iteration
- with FACT = 'F'). */
+/*                          Compute the condition number for comparison   
+                            with the value returned by SGESVX (FACT =   
+                            'N' reuses the condition number from the   
+                            previous iteration with FACT = 'F'). */
 
 				i__8 = kl + ku + 1;
 				clacpy_("Full", &i__8, &n, &asav[1], &lda, &
 					afb[kl + 1], &ldafb);
 				if (equil || iequed > 1) {
 
-/*                             Compute row
- and column scale factors to   
-                               equilibrate
- the matrix A. */
+/*                             Compute row and column scale factors to   
+                               equilibrate the matrix A. */
 
 				    cgbequ_(&n, &n, &kl, &ku, &afb[kl + 1], &
 					    ldafb, &s[1], &s[n + 1], &rowcnd, 
@@ -543,18 +530,15 @@ dition number from the
 					if (lsame_(equed, "R")) {
 					    rowcnd = 0.f;
 					    colcnd = 1.f;
-					} else if (lsame_(equed, "C"))
-						 {
+					} else if (lsame_(equed, "C")) {
 					    rowcnd = 1.f;
 					    colcnd = 0.f;
-					} else if (lsame_(equed, "B"))
-						 {
+					} else if (lsame_(equed, "B")) {
 					    rowcnd = 0.f;
 					    colcnd = 0.f;
 					}
 
-/*                                Equi
-librate the matrix. */
+/*                                Equilibrate the matrix. */
 
 					claqgb_(&n, &n, &kl, &ku, &afb[kl + 1]
 						, &ldafb, &s[1], &s[n + 1], &
@@ -562,42 +546,37 @@ librate the matrix. */
 				    }
 				}
 
-/*                          Save the condition
- number of the   
-                            non-equilibrated s
-ystem for use in CGET04. */
+/*                          Save the condition number of the   
+                            non-equilibrated system for use in CGET04. */
 
 				if (equil) {
 				    roldo = rcondo;
 				    roldi = rcondi;
 				}
 
-/*                          Compute the 1-norm
- and infinity-norm of A. */
+/*                          Compute the 1-norm and infinity-norm of A. */
 
 				anormo = clangb_("1", &n, &kl, &ku, &afb[kl + 
 					1], &ldafb, &rwork[1]);
 				anormi = clangb_("I", &n, &kl, &ku, &afb[kl + 
 					1], &ldafb, &rwork[1]);
 
-/*                          Factor the matrix 
-A. */
+/*                          Factor the matrix A. */
 
 				cgbtrf_(&n, &n, &kl, &ku, &afb[1], &ldafb, &
 					iwork[1], &info);
 
-/*                          Form the inverse o
-f A. */
+/*                          Form the inverse of A. */
 
 				claset_("Full", &n, &n, &c_b48, &c_b49, &work[
 					1], &ldb);
-				s_copy(srnamc_1.srnamt, "CGBTRS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "CGBTRS", (ftnlen)6, (
+					ftnlen)6);
 				cgbtrs_("No transpose", &n, &kl, &ku, &n, &
 					afb[1], &ldafb, &iwork[1], &work[1], &
 					ldb, &info);
 
-/*                          Compute the 1-norm
- condition number of A. */
+/*                          Compute the 1-norm condition number of A. */
 
 				ainvnm = clange_("1", &n, &n, &work[1], &ldb, 
 					&rwork[1]);
@@ -607,8 +586,7 @@ f A. */
 				    rcondo = 1.f / anormo / ainvnm;
 				}
 
-/*                          Compute the infini
-ty-norm condition number   
+/*                          Compute the infinity-norm condition number   
                             of A. */
 
 				ainvnm = clange_("I", &n, &n, &work[1], &ldb, 
@@ -619,12 +597,10 @@ ty-norm condition number
 				    rcondi = 1.f / anormi / ainvnm;
 				}
 			    }
-/* L50: */
 
 			    for (itran = 1; itran <= 3; ++itran) {
 
-/*                          Do for each value 
-of TRANS. */
+/*                          Do for each value of TRANS. */
 
 				*(unsigned char *)trans = *(unsigned char *)&
 					transs[itran - 1];
@@ -634,18 +610,17 @@ of TRANS. */
 				    rcondc = rcondi;
 				}
 
-/*                          Restore the matrix
- A. */
+/*                          Restore the matrix A. */
 
 				i__8 = kl + ku + 1;
 				clacpy_("Full", &i__8, &n, &asav[1], &lda, &a[
 					1], &lda);
 
-/*                          Form an exact solu
-tion and set the right hand   
+/*                          Form an exact solution and set the right hand   
                             side. */
 
-				s_copy(srnamc_1.srnamt, "CLARHS", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (
+					ftnlen)6);
 				clarhs_(path, xtype, "Full", trans, &n, &n, &
 					kl, &ku, nrhs, &a[1], &lda, &xact[1], 
 					&ldb, &b[1], &ldb, iseed, &info);
@@ -655,13 +630,10 @@ tion and set the right hand
 
 				if (nofact && itran == 1) {
 
-/*                             --- Test CG
-BSV  ---   
+/*                             --- Test CGBSV  ---   
 
-                               Compute the
- LU factorization of the matrix   
-                               and solve t
-he system. */
+                               Compute the LU factorization of the matrix   
+                               and solve the system. */
 
 				    i__8 = kl + ku + 1;
 				    clacpy_("Full", &i__8, &n, &a[1], &lda, &
@@ -669,13 +641,13 @@ he system. */
 				    clacpy_("Full", &n, nrhs, &b[1], &ldb, &x[
 					    1], &ldb);
 
-				    s_copy(srnamc_1.srnamt, "CGBSV ", 6L, 6L);
+				    s_copy(srnamc_1.srnamt, "CGBSV ", (ftnlen)
+					    6, (ftnlen)6);
 				    cgbsv_(&n, &kl, &ku, nrhs, &afb[1], &
 					    ldafb, &iwork[1], &x[1], &ldb, &
 					    info);
 
-/*                             Check error
- code from CGBSV . */
+/*                             Check error code from CGBSV . */
 
 				    if (info != izero) {
 					alaerh_(path, "CGBSV ", &info, &izero,
@@ -683,10 +655,8 @@ he system. */
 						&imat, &nfail, &nerrs, nout);
 				    }
 
-/*                             Reconstruct
- matrix from factors and   
-                               compute res
-idual. */
+/*                             Reconstruct matrix from factors and   
+                               compute residual. */
 
 				    cgbt01_(&n, &n, &kl, &ku, &a[1], &lda, &
 					    afb[1], &ldafb, &iwork[1], &work[
@@ -694,11 +664,8 @@ idual. */
 				    nt = 1;
 				    if (izero == 0) {
 
-/*                                Comp
-ute residual of the computed 
-  
-                                  solu
-tion. */
+/*                                Compute residual of the computed   
+                                  solution. */
 
 					clacpy_("Full", &n, nrhs, &b[1], &ldb,
 						 &work[1], &ldb);
@@ -707,11 +674,8 @@ tion. */
 						&ldb, &work[1], &ldb, &result[
 						1]);
 
-/*                                Chec
-k solution from generated exac
-t   
-                                  solu
-tion. */
+/*                                Check solution from generated exact   
+                                  solution. */
 
 					cget04_(&n, nrhs, &x[1], &ldb, &xact[
 						1], &ldb, &rcondc, &result[2])
@@ -719,10 +683,8 @@ tion. */
 					nt = 3;
 				    }
 
-/*                             Print infor
-mation about the tests that did   
-                               not pass th
-e threshold. */
+/*                             Print information about the tests that did   
+                               not pass the threshold. */
 
 				    i__8 = nt;
 				    for (k = 1; k <= i__8; ++k) {
@@ -732,7 +694,8 @@ e threshold. */
 					    }
 					    io___65.ciunit = *nout;
 					    s_wsfe(&io___65);
-					    do_fio(&c__1, "CGBSV ", 6L);
+					    do_fio(&c__1, "CGBSV ", (ftnlen)6)
+						    ;
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -748,13 +711,12 @@ e threshold. */
 					    e_wsfe();
 					    ++nfail;
 					}
-/* L60: */
+/* L50: */
 				    }
 				    nrun += nt;
 				}
 
-/*                          --- Test CGBSVX -
--- */
+/*                          --- Test CGBSVX --- */
 
 				if (! prefac) {
 				    i__8 = (kl << 1) + ku + 1;
@@ -765,22 +727,19 @@ e threshold. */
 					1], &ldb);
 				if (iequed > 1 && n > 0) {
 
-/*                             Equilibrate
- the matrix if FACT = 'F' and   
-                               EQUED = 'R'
-, 'C', or 'B'. */
+/*                             Equilibrate the matrix if FACT = 'F' and   
+                               EQUED = 'R', 'C', or 'B'. */
 
 				    claqgb_(&n, &n, &kl, &ku, &a[1], &lda, &s[
 					    1], &s[n + 1], &rowcnd, &colcnd, &
 					    amax, equed);
 				}
 
-/*                          Solve the system a
-nd compute the condition   
-                            number and error b
-ounds using CGBSVX. */
+/*                          Solve the system and compute the condition   
+                            number and error bounds using CGBSVX. */
 
-				s_copy(srnamc_1.srnamt, "CGBSVX", 6L, 6L);
+				s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)6, (
+					ftnlen)6);
 				cgbsvx_(fact, trans, &n, &kl, &ku, nrhs, &a[1]
 					, &lda, &afb[1], &ldafb, &iwork[1], 
 					equed, &s[1], &s[ldb + 1], &b[1], &
@@ -788,22 +747,20 @@ ounds using CGBSVX. */
 					rwork[*nrhs + 1], &work[1], &rwork[(*
 					nrhs << 1) + 1], &info);
 
-/*                          Check the error co
-de from CGBSVX. */
+/*                          Check the error code from CGBSVX. */
 
 				if (info != izero) {
 /* Writing concatenation */
 				    i__11[0] = 1, a__1[0] = fact;
 				    i__11[1] = 1, a__1[1] = trans;
-				    s_cat(ch__1, a__1, i__11, &c__2, 2L);
+				    s_cat(ch__1, a__1, i__11, &c__2, (ftnlen)
+					    2);
 				    alaerh_(path, "CGBSVX", &info, &izero, 
 					    ch__1, &n, &n, &kl, &ku, nrhs, &
 					    imat, &nfail, &nerrs, nout);
 				}
-/*                          Compare RWORK(2*NR
-HS+1) from CGBSVX with the   
-                            computed reciproca
-l pivot growth RPVGRW */
+/*                          Compare RWORK(2*NRHS+1) from CGBSVX with the   
+                            computed reciprocal pivot growth RPVGRW */
 
 				if (info != 0) {
 				    anrmpv = 0.f;
@@ -815,15 +772,15 @@ l pivot growth RPVGRW */
 					i__9 = n + ku + 1 - j, i__10 = kl + 
 						ku + 1;
 					i__7 = min(i__9,i__10);
-					for (i = max(i__6,1); i <= i__7; ++i) 
-						{
+					for (i__ = max(i__6,1); i__ <= i__7; 
+						++i__) {
 /* Computing MAX */
-					    r__1 = anrmpv, r__2 = c_abs(&a[i 
-						    + (j - 1) * lda]);
+					    r__1 = anrmpv, r__2 = c_abs(&a[
+						    i__ + (j - 1) * lda]);
 					    anrmpv = dmax(r__1,r__2);
-/* L70: */
+/* L60: */
 					}
-/* L80: */
+/* L70: */
 				    }
 /* Computing MIN */
 				    i__7 = info - 1, i__6 = kl + ku;
@@ -832,7 +789,7 @@ l pivot growth RPVGRW */
 				    i__9 = 1, i__10 = kl + ku + 2 - info;
 				    rpvgrw = clantb_("M", "U", "N", &info, &
 					    i__8, &afb[max(i__9,i__10)], &
-					    ldafb, &work[1]);
+					    ldafb, rdum);
 				    if (rpvgrw == 0.f) {
 					rpvgrw = 1.f;
 				    } else {
@@ -841,13 +798,13 @@ l pivot growth RPVGRW */
 				} else {
 				    i__8 = kl + ku;
 				    rpvgrw = clantb_("M", "U", "N", &n, &i__8,
-					     &afb[1], &ldafb, &work[1]);
+					     &afb[1], &ldafb, rdum);
 				    if (rpvgrw == 0.f) {
 					rpvgrw = 1.f;
 				    } else {
 					rpvgrw = clangb_("M", &n, &kl, &ku, &
-						a[1], &lda, &work[1]) / 
-						rpvgrw;
+						a[1], &lda, rdum) /
+						 rpvgrw;
 				    }
 				}
 /* Computing MAX */
@@ -858,10 +815,8 @@ l pivot growth RPVGRW */
 
 				if (! prefac) {
 
-/*                             Reconstruct
- matrix from factors and   
-                               compute res
-idual. */
+/*                             Reconstruct matrix from factors and   
+                               compute residual. */
 
 				    cgbt01_(&n, &n, &kl, &ku, &a[1], &lda, &
 					    afb[1], &ldafb, &iwork[1], &work[
@@ -874,8 +829,7 @@ idual. */
 				if (info == 0) {
 				    trfcon = FALSE_;
 
-/*                             Compute res
-idual of the computed solution. */
+/*                             Compute residual of the computed solution. */
 
 				    clacpy_("Full", &n, nrhs, &bsav[1], &ldb, 
 					    &work[1], &ldb);
@@ -883,10 +837,8 @@ idual of the computed solution. */
 					    asav[1], &lda, &x[1], &ldb, &work[
 					    1], &ldb, &result[1]);
 
-/*                             Check solut
-ion from generated exact   
-                               solution. 
-*/
+/*                             Check solution from generated exact   
+                               solution. */
 
 				    if (nofact || prefac && lsame_(equed, 
 					    "N")) {
@@ -903,10 +855,8 @@ ion from generated exact
 						1], &ldb, &roldc, &result[2]);
 				    }
 
-/*                             Check the e
-rror bounds from iterative   
-                               refinement.
- */
+/*                             Check the error bounds from iterative   
+                               refinement. */
 
 				    cgbt05_(trans, &n, &kl, &ku, nrhs, &asav[
 					    1], &lda, &bsav[1], &ldb, &x[1], &
@@ -916,17 +866,13 @@ rror bounds from iterative
 				    trfcon = TRUE_;
 				}
 
-/*                          Compare RCOND from
- CGBSVX with the computed   
-                            value in RCONDC. 
-*/
+/*                          Compare RCOND from CGBSVX with the computed   
+                            value in RCONDC. */
 
 				result[5] = sget06_(&rcond, &rcondc);
 
-/*                          Print information 
-about the tests that did   
-                            not pass the thres
-hold. */
+/*                          Print information about the tests that did   
+                            not pass the threshold. */
 
 				if (! trfcon) {
 				    for (k = k1; k <= 7; ++k) {
@@ -935,15 +881,15 @@ hold. */
 			  aladhd_(nout, path);
 					    }
 					    if (prefac) {
-			  io___72.ciunit = *nout;
-			  s_wsfe(&io___72);
-			  do_fio(&c__1, "CGBSVX", 6L);
-			  do_fio(&c__1, fact, 1L);
-			  do_fio(&c__1, trans, 1L);
+			  io___73.ciunit = *nout;
+			  s_wsfe(&io___73);
+			  do_fio(&c__1, "CGBSVX", (ftnlen)6);
+			  do_fio(&c__1, fact, (ftnlen)1);
+			  do_fio(&c__1, trans, (ftnlen)1);
 			  do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&kl, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&ku, (ftnlen)sizeof(integer));
-			  do_fio(&c__1, equed, 1L);
+			  do_fio(&c__1, equed, (ftnlen)1);
 			  do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer)
 				  );
 			  do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -951,11 +897,11 @@ hold. */
 				  sizeof(real));
 			  e_wsfe();
 					    } else {
-			  io___73.ciunit = *nout;
-			  s_wsfe(&io___73);
-			  do_fio(&c__1, "CGBSVX", 6L);
-			  do_fio(&c__1, fact, 1L);
-			  do_fio(&c__1, trans, 1L);
+			  io___74.ciunit = *nout;
+			  s_wsfe(&io___74);
+			  do_fio(&c__1, "CGBSVX", (ftnlen)6);
+			  do_fio(&c__1, fact, (ftnlen)1);
+			  do_fio(&c__1, trans, (ftnlen)1);
 			  do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&kl, (ftnlen)sizeof(integer));
 			  do_fio(&c__1, (char *)&ku, (ftnlen)sizeof(integer));
@@ -968,7 +914,7 @@ hold. */
 					    }
 					    ++nfail;
 					}
-/* L90: */
+/* L80: */
 				    }
 				    nrun = nrun + 7 - k1;
 				} else {
@@ -977,18 +923,19 @@ hold. */
 					    aladhd_(nout, path);
 					}
 					if (prefac) {
-					    io___74.ciunit = *nout;
-					    s_wsfe(&io___74);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___75.ciunit = *nout;
+					    s_wsfe(&io___75);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__1, (
@@ -997,11 +944,12 @@ hold. */
 						    (ftnlen)sizeof(real));
 					    e_wsfe();
 					} else {
-					    io___75.ciunit = *nout;
-					    s_wsfe(&io___75);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___76.ciunit = *nout;
+					    s_wsfe(&io___76);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1024,18 +972,19 @@ hold. */
 					    aladhd_(nout, path);
 					}
 					if (prefac) {
-					    io___76.ciunit = *nout;
-					    s_wsfe(&io___76);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___77.ciunit = *nout;
+					    s_wsfe(&io___77);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__6, (
@@ -1044,11 +993,12 @@ hold. */
 						    (ftnlen)sizeof(real));
 					    e_wsfe();
 					} else {
-					    io___77.ciunit = *nout;
-					    s_wsfe(&io___77);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___78.ciunit = *nout;
+					    s_wsfe(&io___78);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1071,18 +1021,19 @@ hold. */
 					    aladhd_(nout, path);
 					}
 					if (prefac) {
-					    io___78.ciunit = *nout;
-					    s_wsfe(&io___78);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___79.ciunit = *nout;
+					    s_wsfe(&io___79);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&ku, (
 						    ftnlen)sizeof(integer));
-					    do_fio(&c__1, equed, 1L);
+					    do_fio(&c__1, equed, (ftnlen)1);
 					    do_fio(&c__1, (char *)&imat, (
 						    ftnlen)sizeof(integer));
 					    do_fio(&c__1, (char *)&c__7, (
@@ -1091,11 +1042,12 @@ hold. */
 						    (ftnlen)sizeof(real));
 					    e_wsfe();
 					} else {
-					    io___79.ciunit = *nout;
-					    s_wsfe(&io___79);
-					    do_fio(&c__1, "CGBSVX", 6L);
-					    do_fio(&c__1, fact, 1L);
-					    do_fio(&c__1, trans, 1L);
+					    io___80.ciunit = *nout;
+					    s_wsfe(&io___80);
+					    do_fio(&c__1, "CGBSVX", (ftnlen)6)
+						    ;
+					    do_fio(&c__1, fact, (ftnlen)1);
+					    do_fio(&c__1, trans, (ftnlen)1);
 					    do_fio(&c__1, (char *)&n, (ftnlen)
 						    sizeof(integer));
 					    do_fio(&c__1, (char *)&kl, (
@@ -1114,22 +1066,22 @@ hold. */
 					++nrun;
 				    }
 				}
-/* L100: */
+/* L90: */
 			    }
-L110:
+L100:
 			    ;
 			}
-/* L120: */
+/* L110: */
 		    }
-L130:
+L120:
 		    ;
 		}
-L140:
+L130:
 		;
 	    }
-/* L150: */
+/* L140: */
 	}
-/* L160: */
+/* L150: */
     }
 
 /*     Print a summary of the results. */

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int clauum_(char *uplo, integer *n, complex *a, integer *lda,
 	 integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -16,11 +17,9 @@
     factor U or L is stored in the upper or lower triangular part of   
     the array A.   
 
-    If UPLO = 'U' or 'u' then the upper triangle of the result is stored, 
-  
+    If UPLO = 'U' or 'u' then the upper triangle of the result is stored,   
     overwriting the factor U in A.   
-    If UPLO = 'L' or 'l' then the lower triangle of the result is stored, 
-  
+    If UPLO = 'L' or 'l' then the lower triangle of the result is stored,   
     overwriting the factor L in A.   
 
     This is the blocked form of the algorithm, calling Level 3 BLAS.   
@@ -29,8 +28,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the triangular factor stored in the array A 
-  
+            Specifies whether the triangular factor stored in the array A   
             is upper or lower triangular:   
             = 'U':  Upper triangular   
             = 'L':  Lower triangular   
@@ -52,15 +50,12 @@
             = 0: successful exit   
             < 0: if INFO = -k, the k-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static complex c_b1 = {1.f,0.f};
     static integer c__1 = 1;
@@ -70,7 +65,7 @@
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
     /* Local variables */
-    static integer i;
+    static integer i__;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *), cherk_(char *, 
@@ -87,12 +82,15 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *, ftnlen, ftnlen);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
 
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -116,13 +114,14 @@
 
 /*     Determine the block size for this environment. */
 
-    nb = ilaenv_(&c__1, "CLAUUM", uplo, n, &c_n1, &c_n1, &c_n1, 6L, 1L);
+    nb = ilaenv_(&c__1, "CLAUUM", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
+	    ftnlen)1);
 
     if (nb <= 1 || nb >= *n) {
 
 /*        Use unblocked code */
 
-	clauu2_(uplo, n, &A(1,1), lda, info);
+	clauu2_(uplo, n, &a[a_offset], lda, info);
     } else {
 
 /*        Use blocked code */
@@ -133,21 +132,25 @@
 
 	    i__1 = *n;
 	    i__2 = nb;
-	    for (i = 1; nb < 0 ? i >= *n : i <= *n; i += nb) {
+	    for (i__ = 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 /* Computing MIN */
-		i__3 = nb, i__4 = *n - i + 1;
+		i__3 = nb, i__4 = *n - i__ + 1;
 		ib = min(i__3,i__4);
-		i__3 = i - 1;
+		i__3 = i__ - 1;
 		ctrmm_("Right", "Upper", "Conjugate transpose", "Non-unit", &
-			i__3, &ib, &c_b1, &A(i,i), lda, &A(1,i), lda);
-		clauu2_("Upper", &ib, &A(i,i), lda, info);
-		if (i + ib <= *n) {
-		    i__3 = i - 1;
-		    i__4 = *n - i - ib + 1;
+			i__3, &ib, &c_b1, &a_ref(i__, i__), lda, &a_ref(1, 
+			i__), lda);
+		clauu2_("Upper", &ib, &a_ref(i__, i__), lda, info);
+		if (i__ + ib <= *n) {
+		    i__3 = i__ - 1;
+		    i__4 = *n - i__ - ib + 1;
 		    cgemm_("No transpose", "Conjugate transpose", &i__3, &ib, 
-			    &i__4, &c_b1, &A(1,i+ib), lda, &A(i,i+ib), lda, &c_b1, &A(1,i), lda);
-		    i__3 = *n - i - ib + 1;
-		    cherk_("Upper", "No transpose", &ib, &i__3, &c_b21, &A(i,i+ib), lda, &c_b21, &A(i,i), lda);
+			    &i__4, &c_b1, &a_ref(1, i__ + ib), lda, &a_ref(
+			    i__, i__ + ib), lda, &c_b1, &a_ref(1, i__), lda);
+		    i__3 = *n - i__ - ib + 1;
+		    cherk_("Upper", "No transpose", &ib, &i__3, &c_b21, &
+			    a_ref(i__, i__ + ib), lda, &c_b21, &a_ref(i__, 
+			    i__), lda);
 		}
 /* L10: */
 	    }
@@ -157,22 +160,25 @@
 
 	    i__2 = *n;
 	    i__1 = nb;
-	    for (i = 1; nb < 0 ? i >= *n : i <= *n; i += nb) {
+	    for (i__ = 1; i__1 < 0 ? i__ >= i__2 : i__ <= i__2; i__ += i__1) {
 /* Computing MIN */
-		i__3 = nb, i__4 = *n - i + 1;
+		i__3 = nb, i__4 = *n - i__ + 1;
 		ib = min(i__3,i__4);
-		i__3 = i - 1;
+		i__3 = i__ - 1;
 		ctrmm_("Left", "Lower", "Conjugate transpose", "Non-unit", &
-			ib, &i__3, &c_b1, &A(i,i), lda, &A(i,1), lda);
-		clauu2_("Lower", &ib, &A(i,i), lda, info);
-		if (i + ib <= *n) {
-		    i__3 = i - 1;
-		    i__4 = *n - i - ib + 1;
+			ib, &i__3, &c_b1, &a_ref(i__, i__), lda, &a_ref(i__, 
+			1), lda);
+		clauu2_("Lower", &ib, &a_ref(i__, i__), lda, info);
+		if (i__ + ib <= *n) {
+		    i__3 = i__ - 1;
+		    i__4 = *n - i__ - ib + 1;
 		    cgemm_("Conjugate transpose", "No transpose", &ib, &i__3, 
-			    &i__4, &c_b1, &A(i+ib,i), lda, &A(i+ib,1), lda, &c_b1, &A(i,1), lda);
-		    i__3 = *n - i - ib + 1;
+			    &i__4, &c_b1, &a_ref(i__ + ib, i__), lda, &a_ref(
+			    i__ + ib, 1), lda, &c_b1, &a_ref(i__, 1), lda);
+		    i__3 = *n - i__ - ib + 1;
 		    cherk_("Lower", "Conjugate transpose", &ib, &i__3, &c_b21,
-			     &A(i+ib,i), lda, &c_b21, &A(i,i), lda);
+			     &a_ref(i__ + ib, i__), lda, &c_b21, &a_ref(i__, 
+			    i__), lda);
 		}
 /* L20: */
 	    }
@@ -184,4 +190,8 @@
 /*     End of CLAUUM */
 
 } /* clauum_ */
+
+#undef a_ref
+#undef a_subscr
+
 

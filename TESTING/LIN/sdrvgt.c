@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -62,9 +63,9 @@ static real c_b44 = 0.f;
     static char fact[1];
     static real cond;
     static integer mode, koff, imat, info;
-    static char path[3], dist[1], type[1];
-    static integer nrun, i, j, k, m, n, ifact, nfail, iseed[4];
-    static real z[3], rcond;
+    static char path[3], dist[1], type__[1];
+    static integer nrun, i__, j, k, m, n, ifact, nfail, iseed[4];
+    static real z__[3], rcond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *), sscal_(integer *, real *, 
 	    real *, integer *);
@@ -130,7 +131,7 @@ static real c_b44 = 0.f;
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -145,8 +146,7 @@ static real c_b44 = 0.f;
     =========   
 
     DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j 
-  
+            The matrix types to be used for testing.  Matrices of type j   
             (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
             .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
 
@@ -185,8 +185,7 @@ static real c_b44 = 0.f;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --iwork;
@@ -202,13 +201,13 @@ static real c_b44 = 0.f;
 
     /* Function Body */
 
-    *(unsigned char *)path = 'S';
-    s_copy(path + 1, "GT", 2L, 2L);
+    s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GT", (ftnlen)2, (ftnlen)2);
     nrun = 0;
     nfail = 0;
     nerrs = 0;
-    for (i = 1; i <= 4; ++i) {
-	iseed[i - 1] = iseedy[i - 1];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__ - 1] = iseedy[i__ - 1];
 /* L10: */
     }
 
@@ -245,21 +244,20 @@ static real c_b44 = 0.f;
 
 /*           Set up parameters with SLATB4. */
 
-	    slatb4_(path, &imat, &n, &n, type, &kl, &ku, &anorm, &mode, &cond,
-		     dist);
+	    slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
+		    cond, dist);
 
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Types 1-6:  generate matrices of known conditi
-on number.   
+/*              Types 1-6:  generate matrices of known condition number.   
 
    Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
-		s_copy(srnamc_1.srnamt, "SLATMS", 6L, 6L);
-		slatms_(&n, &n, dist, iseed, type, &rwork[1], &mode, &cond, &
-			anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
+		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
+		slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
+			&anorm, &kl, &ku, "Z", &af[koff], &c__3, &work[1], &
 			info);
 
 /*              Check the error code from SLATMS. */
@@ -280,14 +278,12 @@ on number.
 		scopy_(&n, &af[2], &c__3, &a[m + 1], &c__1);
 	    } else {
 
-/*              Types 7-12:  generate tridiagonal matrices wit
-h   
+/*              Types 7-12:  generate tridiagonal matrices with   
                 unknown condition numbers. */
 
 		if (! zerot || ! dotype[7]) {
 
-/*                 Generate a matrix with elements from [-
-1,1]. */
+/*                 Generate a matrix with elements from [-1,1]. */
 
 		    i__3 = n + (m << 1);
 		    slarnv_(&c__2, iseed, &i__3, &a[1]);
@@ -297,51 +293,49 @@ h
 		    }
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back t
-he zeroed out   
+/*                 Reuse the last matrix by copying back the zeroed out   
                    elements. */
 
 		    if (izero == 1) {
-			a[n] = z[1];
+			a[n] = z__[1];
 			if (n > 1) {
-			    a[1] = z[2];
+			    a[1] = z__[2];
 			}
 		    } else if (izero == n) {
-			a[n * 3 - 2] = z[0];
-			a[(n << 1) - 1] = z[1];
+			a[n * 3 - 2] = z__[0];
+			a[(n << 1) - 1] = z__[1];
 		    } else {
-			a[(n << 1) - 2 + izero] = z[0];
-			a[n - 1 + izero] = z[1];
-			a[izero] = z[2];
+			a[(n << 1) - 2 + izero] = z__[0];
+			a[n - 1 + izero] = z__[1];
+			a[izero] = z__[2];
 		    }
 		}
 
-/*              If IMAT > 7, set one column of the matrix to 0
-. */
+/*              If IMAT > 7, set one column of the matrix to 0. */
 
 		if (! zerot) {
 		    izero = 0;
 		} else if (imat == 8) {
 		    izero = 1;
-		    z[1] = a[n];
+		    z__[1] = a[n];
 		    a[n] = 0.f;
 		    if (n > 1) {
-			z[2] = a[1];
+			z__[2] = a[1];
 			a[1] = 0.f;
 		    }
 		} else if (imat == 9) {
 		    izero = n;
-		    z[0] = a[n * 3 - 2];
-		    z[1] = a[(n << 1) - 1];
+		    z__[0] = a[n * 3 - 2];
+		    z__[1] = a[(n << 1) - 1];
 		    a[n * 3 - 2] = 0.f;
 		    a[(n << 1) - 1] = 0.f;
 		} else {
 		    izero = (n + 1) / 2;
 		    i__3 = n - 1;
-		    for (i = izero; i <= i__3; ++i) {
-			a[(n << 1) - 2 + i] = 0.f;
-			a[n - 1 + i] = 0.f;
-			a[i] = 0.f;
+		    for (i__ = izero; i__ <= i__3; ++i__) {
+			a[(n << 1) - 2 + i__] = 0.f;
+			a[n - 1 + i__] = 0.f;
+			a[i__] = 0.f;
 /* L20: */
 		    }
 		    a[n * 3 - 2] = 0.f;
@@ -356,8 +350,7 @@ he zeroed out
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison wi
-th   
+/*              Compute the condition number for comparison with   
                 the value returned by SGTSVX. */
 
 		if (zerot) {
@@ -371,8 +364,7 @@ th
 		    i__3 = n + (m << 1);
 		    scopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
 
-/*                 Compute the 1-norm and infinity-norm of
- A. */
+/*                 Compute the 1-norm and infinity-norm of A. */
 
 		    anormo = slangt_("1", &n, &a[1], &a[m + 1], &a[n + m + 1]);
 		    anormi = slangt_("I", &n, &a[1], &a[m + 1], &a[n + m + 1]);
@@ -382,20 +374,18 @@ th
 		    sgttrf_(&n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + (
 			    m << 1) + 1], &iwork[1], &info);
 
-/*                 Use SGTTRS to solve for one column at a
- time of   
-                   inv(A), computing the maximum column su
-m as we go. */
+/*                 Use SGTTRS to solve for one column at a time of   
+                   inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    x[j] = 0.f;
 /* L30: */
 			}
-			x[i] = 1.f;
+			x[i__] = 1.f;
 			sgttrs_("No transpose", &n, &c__1, &af[1], &af[m + 1],
 				 &af[n + m + 1], &af[n + (m << 1) + 1], &
 				iwork[1], &x[1], &lda, &info);
@@ -405,8 +395,7 @@ m as we go. */
 /* L40: */
 		    }
 
-/*                 Compute the 1-norm condition number of 
-A. */
+/*                 Compute the 1-norm condition number of A. */
 
 		    if (anormo <= 0.f || ainvnm <= 0.f) {
 			rcondo = 1.f;
@@ -414,20 +403,18 @@ A. */
 			rcondo = 1.f / anormo / ainvnm;
 		    }
 
-/*                 Use SGTTRS to solve for one column at a
- time of   
-                   inv(A'), computing the maximum column s
-um as we go. */
+/*                 Use SGTTRS to solve for one column at a time of   
+                   inv(A'), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
-		    for (i = 1; i <= i__3; ++i) {
+		    for (i__ = 1; i__ <= i__3; ++i__) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    x[j] = 0.f;
 /* L50: */
 			}
-			x[i] = 1.f;
+			x[i__] = 1.f;
 			sgttrs_("Transpose", &n, &c__1, &af[1], &af[m + 1], &
 				af[n + m + 1], &af[n + (m << 1) + 1], &iwork[
 				1], &x[1], &lda, &info);
@@ -437,8 +424,7 @@ um as we go. */
 /* L60: */
 		    }
 
-/*                 Compute the infinity-norm condition num
-ber of A. */
+/*                 Compute the infinity-norm condition number of A. */
 
 		    if (anormi <= 0.f || ainvnm <= 0.f) {
 			rcondi = 1.f;
@@ -456,8 +442,7 @@ ber of A. */
 			rcondc = rcondi;
 		    }
 
-/*                 Generate NRHS random solution vectors. 
-*/
+/*                 Generate NRHS random solution vectors. */
 
 		    ix = 1;
 		    i__3 = *nrhs;
@@ -476,15 +461,15 @@ ber of A. */
 
 /*                    --- Test SGTSV  ---   
 
-                      Solve the system using Gaussian 
-elimination with   
+                      Solve the system using Gaussian elimination with   
                       partial pivoting. */
 
 			i__3 = n + (m << 1);
 			scopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
 			slacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &lda);
 
-			s_copy(srnamc_1.srnamt, "SGTSV ", 6L, 6L);
+			s_copy(srnamc_1.srnamt, "SGTSV ", (ftnlen)6, (ftnlen)
+				6);
 			sgtsv_(&n, nrhs, &af[1], &af[m + 1], &af[n + m + 1], &
 				x[1], &lda, &info);
 
@@ -498,8 +483,7 @@ elimination with
 			nt = 1;
 			if (izero == 0) {
 
-/*                       Check residual of compute
-d solution. */
+/*                       Check residual of computed solution. */
 
 			    slacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &
 				    lda);
@@ -507,16 +491,14 @@ d solution. */
 				    m + 1], &x[1], &lda, &work[1], &lda, &
 				    rwork[1], &result[1]);
 
-/*                       Check solution from gener
-ated exact solution. */
+/*                       Check solution from generated exact solution. */
 
 			    sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[2]);
 			    nt = 3;
 			}
 
-/*                    Print information about the test
-s that did not pass   
+/*                    Print information about the tests that did not pass   
                       the threshold. */
 
 			i__3 = nt;
@@ -527,7 +509,7 @@ s that did not pass
 				}
 				io___42.ciunit = *nout;
 				s_wsfe(&io___42);
-				do_fio(&c__1, "SGTSV ", 6L);
+				do_fio(&c__1, "SGTSV ", (ftnlen)6);
 				do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					integer));
 				do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
@@ -551,19 +533,17 @@ s that did not pass
 /*                    Initialize AF to zero. */
 
 			i__3 = n * 3 - 2;
-			for (i = 1; i <= i__3; ++i) {
-			    af[i] = 0.f;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    af[i__] = 0.f;
 /* L90: */
 			}
 		    }
-		    slaset_("Full", &n, nrhs, &c_b44, &c_b44, &x[1], &lda)
-			    ;
+		    slaset_("Full", &n, nrhs, &c_b44, &c_b44, &x[1], &lda);
 
-/*                 Solve the system and compute the condit
-ion number and   
+/*                 Solve the system and compute the condition number and   
                    error bounds using SGTSVX. */
 
-		    s_copy(srnamc_1.srnamt, "SGTSVX", 6L, 6L);
+		    s_copy(srnamc_1.srnamt, "SGTSVX", (ftnlen)6, (ftnlen)6);
 		    sgtsvx_(fact, trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m 
 			    + 1], &af[1], &af[m + 1], &af[n + m + 1], &af[n + 
 			    (m << 1) + 1], &iwork[1], &b[1], &lda, &x[1], &
@@ -576,7 +556,7 @@ ion number and
 /* Writing concatenation */
 			i__5[0] = 1, a__1[0] = fact;
 			i__5[1] = 1, a__1[1] = trans;
-			s_cat(ch__1, a__1, i__5, &c__2, 2L);
+			s_cat(ch__1, a__1, i__5, &c__2, (ftnlen)2);
 			alaerh_(path, "SGTSVX", &info, &izero, ch__1, &n, &n, 
 				&c__1, &c__1, nrhs, &imat, &nfail, &nerrs, 
 				nout);
@@ -584,8 +564,7 @@ ion number and
 
 		    if (ifact >= 2) {
 
-/*                    Reconstruct matrix from factors 
-and compute   
+/*                    Reconstruct matrix from factors and compute   
                       residual. */
 
 			sgtt01_(&n, &a[1], &a[m + 1], &a[n + m + 1], &af[1], &
@@ -600,22 +579,19 @@ and compute
 		    if (info == 0) {
 			trfcon = FALSE_;
 
-/*                    Check residual of computed solut
-ion. */
+/*                    Check residual of computed solution. */
 
 			slacpy_("Full", &n, nrhs, &b[1], &lda, &work[1], &lda);
 			sgtt02_(trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m + 
 				1], &x[1], &lda, &work[1], &lda, &rwork[1], &
 				result[1]);
 
-/*                    Check solution from generated ex
-act solution. */
+/*                    Check solution from generated exact solution. */
 
 			sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, &
 				rcondc, &result[2]);
 
-/*                    Check the error bounds from iter
-ative refinement. */
+/*                    Check the error bounds from iterative refinement. */
 
 			sgtt05_(trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m + 
 				1], &b[1], &lda, &x[1], &lda, &xact[1], &lda, 
@@ -623,8 +599,7 @@ ative refinement. */
 			nt = 5;
 		    }
 
-/*                 Print information about the tests that 
-did not pass   
+/*                 Print information about the tests that did not pass   
                    the threshold. */
 
 		    i__3 = nt;
@@ -635,9 +610,9 @@ did not pass
 			    }
 			    io___46.ciunit = *nout;
 			    s_wsfe(&io___46);
-			    do_fio(&c__1, "SGTSVX", 6L);
-			    do_fio(&c__1, fact, 1L);
-			    do_fio(&c__1, trans, 1L);
+			    do_fio(&c__1, "SGTSVX", (ftnlen)6);
+			    do_fio(&c__1, fact, (ftnlen)1);
+			    do_fio(&c__1, trans, (ftnlen)1);
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
 				    ;
 			    do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(
@@ -652,8 +627,7 @@ did not pass
 /* L100: */
 		    }
 
-/*                 Check the reciprocal of the condition n
-umber. */
+/*                 Check the reciprocal of the condition number. */
 
 		    result[5] = sget06_(&rcond, &rcondc);
 		    if (result[5] >= *thresh) {
@@ -662,9 +636,9 @@ umber. */
 			}
 			io___47.ciunit = *nout;
 			s_wsfe(&io___47);
-			do_fio(&c__1, "SGTSVX", 6L);
-			do_fio(&c__1, fact, 1L);
-			do_fio(&c__1, trans, 1L);
+			do_fio(&c__1, "SGTSVX", (ftnlen)6);
+			do_fio(&c__1, fact, (ftnlen)1);
+			do_fio(&c__1, trans, (ftnlen)1);
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&imat, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));

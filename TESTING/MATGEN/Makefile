@@ -31,30 +31,27 @@ include ../../make.inc
 #  entering (for example)
 #       make single FRC=FRC
 #
-#----------------------------------------------------------------------
-#
-#  Edward Anderson, University of Tennessee
-#  Susan Ostrouchov, Last updated September 30, 1994
-#
 #######################################################################
  
 SCATGEN = slatm1.o slaran.o slarnd.o
 
 SMATGEN = slatms.o slatme.o slatmr.o \
-   slagge.o slagsy.o slarge.o slaror.o slarot.o slatm2.o slatm3.o
+   slagge.o slagsy.o slakf2.o slarge.o slaror.o slarot.o slatm2.o \
+   slatm3.o slatm5.o slatm6.o
 
 CMATGEN = clatms.o clatme.o clatmr.o \
-   clagge.o claghe.o clagsy.o clarge.o claror.o clarot.o clatm1.o \
-   clarnd.o clatm2.o clatm3.o
+   clagge.o claghe.o clagsy.o clakf2.o clarge.o claror.o clarot.o \
+   clatm1.o clarnd.o clatm2.o clatm3.o clatm5.o clatm6.o
 
 DZATGEN = dlatm1.o dlaran.o dlarnd.o
 
 DMATGEN = dlatms.o dlatme.o dlatmr.o \
-   dlagge.o dlagsy.o dlarge.o dlaror.o dlarot.o dlatm2.o dlatm3.o
+   dlagge.o dlagsy.o dlakf2.o dlarge.o dlaror.o dlarot.o dlatm2.o \
+   dlatm3.o dlatm5.o dlatm6.o
 
 ZMATGEN = zlatms.o zlatme.o zlatmr.o \
-   zlagge.o zlaghe.o zlagsy.o zlarge.o zlaror.o zlarot.o zlatm1.o \
-   zlarnd.o zlatm2.o zlatm3.o
+   zlagge.o zlaghe.o zlagsy.o zlakf2.o zlarge.o zlaror.o zlarot.o \
+   zlatm1.o zlarnd.o zlatm2.o zlatm3.o zlatm5.o zlatm6.o
 
 all: single complex double complex16
 
@@ -88,3 +85,4 @@ clean: ; \
         rm -f *.o
 
 .c.o: ; $(CC) -c $(CFLAGS) $<
+

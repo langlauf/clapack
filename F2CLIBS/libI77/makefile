@@ -1,24 +1,41 @@
-.SUFFIXES: .c .o
-CC = cc
-CFLAGS = -O2
-SHELL = /bin/sh
+include ../../make.inc
+
+# .SUFFIXES: .c .o
+# CC = cc
+# CFLAGS = -O
+# CFLAGS = -dalign -native -xO5 -xarch=v8plusa
+# SHELL = /bin/sh
 
 # compile, then strip unnecessary symbols
 .c.o:
-	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
-	ld -r -x -o $*.xxx $*.o
-	mv $*.xxx $*.o
+	cc -c -DSkip_f2c_Undefs $(F2CCFLAGS) $*.c
+#	ld -r -o $*.xxx $*.o
+#	mv $*.xxx $*.o
+
+## Under Solaris (and other systems that do not understand ld -x),
+## omit -x in the ld line above.
+## If your system does not have the ld command, comment out
+## or remove both the ld and mv lines above.
 
 OBJ =	Version.o backspace.o close.o dfe.o dolio.o due.o endfile.o err.o \
-	fmt.o fmtlib.o iio.o ilnw.o inquire.o lread.o lwrite.o open.o \
-	rdfmt.o rewind.o rsfe.o rsli.o rsne.o sfe.o sue.o typesize.o uio.o \
-	util.o wref.o wrtfmt.o wsfe.o wsle.o wsne.o xwsne.o
+	fmt.o fmtlib.o ftell_.o iio.o ilnw.o inquire.o lread.o lwrite.o \
+	open.o rdfmt.o rewind.o rsfe.o rsli.o rsne.o sfe.o sue.o typesize.o \
+	uio.o util.o wref.o wrtfmt.o wsfe.o wsle.o wsne.o xwsne.o
+
+all: libI77.a clapack_install
+
 libI77.a:	$(OBJ)
-		ar r ../libI77.a $?
-		ranlib ../libI77.a
+		ar r libI77.a $?
+		$(RANLIB) libI77.a
+
+### If your system lacks ranlib, you don't need it; see README.
+
 install:	libI77.a
 	cp libI77.a /usr/lib/libI77.a
-	ranlib /usr/lib/libI77.a
+	$(RANLIB) /usr/lib/libI77.a
+
+clapack_install: libI77.a
+	cp libI77.a ..
 
 Version.o: Version.c
 	$(CC) -c Version.c
@@ -29,7 +46,7 @@ f2c.h: f2ch.add
 
 
 clean:
-	rm -f *.o ../libI77.a
+	rm -f $(OBJ) libI77.a
 
 clobber:	clean
 	rm -f libI77.a
@@ -43,6 +60,7 @@ endfile.o:	fio.h rawio.h
 err.o:		fio.h rawio.h
 fmt.o:		fio.h
 fmt.o:		fmt.h
+ftell_.o:	fio.h
 iio.o:		fio.h
 iio.o:		fmt.h
 ilnw.o:		fio.h
@@ -89,8 +107,8 @@ xwsne.o:	fmt.h
 check:
 	xsum Notice README Version.c backspace.c close.c dfe.c dolio.c \
 	due.c endfile.c err.c f2ch.add fio.h fmt.c fmt.h fmtlib.c fp.h \
-	iio.c ilnw.c inquire.c lio.h lread.c lwrite.c makefile open.c \
-	rawio.h rdfmt.c rewind.c rsfe.c rsli.c rsne.c sfe.c sue.c \
+	ftell_.c iio.c ilnw.c inquire.c lio.h lread.c lwrite.c makefile \
+	open.c rawio.h rdfmt.c rewind.c rsfe.c rsli.c rsne.c sfe.c sue.c \
 	typesize.c uio.c util.c wref.c wrtfmt.c wsfe.c wsle.c wsne.c \
 	xwsne.c >zap
 	cmp zap libI77.xsum && rm zap || diff libI77.xsum zap

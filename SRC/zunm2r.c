@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zunm2r_(char *side, char *trans, integer *m, integer *n, 
 	integer *k, doublecomplex *a, integer *lda, doublecomplex *tau, 
-	doublecomplex *c, integer *ldc, doublecomplex *work, integer *info)
+	doublecomplex *c__, integer *ldc, doublecomplex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -56,8 +57,7 @@
 
     A       (input) COMPLEX*16 array, dimension (LDA,K)   
             The i-th column must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by 
-  
+            elementary reflector H(i), for i = 1,2,...,k, as returned by   
             ZGEQRF in the first k columns of its array argument A.   
             A is modified by the routine but restored on exit.   
 
@@ -85,15 +85,12 @@
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -105,7 +102,7 @@
     /* Local variables */
     static logical left;
     static doublecomplex taui;
-    static integer i;
+    static integer i__;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zlarf_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
@@ -114,15 +111,22 @@
     extern /* Subroutine */ int xerbla_(char *, integer *);
     static logical notran;
     static doublecomplex aii;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    c_dim1 = *ldc;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-#define C(I,J) c[(I)-1 + ((J)-1)* ( *ldc)]
-
+    /* Function Body */
     *info = 0;
     left = lsame_(side, "L");
     notran = lsame_(trans, "N");
@@ -181,37 +185,38 @@
 
     i__1 = i2;
     i__2 = i3;
-    for (i = i1; i3 < 0 ? i >= i2 : i <= i2; i += i3) {
+    for (i__ = i1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += i__2) {
 	if (left) {
 
 /*           H(i) or H(i)' is applied to C(i:m,1:n) */
 
-	    mi = *m - i + 1;
-	    ic = i;
+	    mi = *m - i__ + 1;
+	    ic = i__;
 	} else {
 
 /*           H(i) or H(i)' is applied to C(1:m,i:n) */
 
-	    ni = *n - i + 1;
-	    jc = i;
+	    ni = *n - i__ + 1;
+	    jc = i__;
 	}
 
 /*        Apply H(i) or H(i)' */
 
 	if (notran) {
-	    i__3 = i;
-	    taui.r = TAU(i).r, taui.i = TAU(i).i;
+	    i__3 = i__;
+	    taui.r = tau[i__3].r, taui.i = tau[i__3].i;
 	} else {
-	    d_cnjg(&z__1, &TAU(i));
+	    d_cnjg(&z__1, &tau[i__]);
 	    taui.r = z__1.r, taui.i = z__1.i;
 	}
-	i__3 = i + i * a_dim1;
-	aii.r = A(i,i).r, aii.i = A(i,i).i;
-	i__3 = i + i * a_dim1;
-	A(i,i).r = 1., A(i,i).i = 0.;
-	zlarf_(side, &mi, &ni, &A(i,i), &c__1, &taui, &C(ic,jc), ldc, &WORK(1));
-	i__3 = i + i * a_dim1;
-	A(i,i).r = aii.r, A(i,i).i = aii.i;
+	i__3 = a_subscr(i__, i__);
+	aii.r = a[i__3].r, aii.i = a[i__3].i;
+	i__3 = a_subscr(i__, i__);
+	a[i__3].r = 1., a[i__3].i = 0.;
+	zlarf_(side, &mi, &ni, &a_ref(i__, i__), &c__1, &taui, &c___ref(ic, 
+		jc), ldc, &work[1]);
+	i__3 = a_subscr(i__, i__);
+	a[i__3].r = aii.r, a[i__3].i = aii.i;
 /* L10: */
     }
     return 0;
@@ -219,4 +224,10 @@
 /*     End of ZUNM2R */
 
 } /* zunm2r_ */
+
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
 

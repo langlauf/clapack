@@ -1,10 +1,11 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zlaqge_(integer *m, integer *n, doublecomplex *a, 
-	integer *lda, doublereal *r, doublereal *c, doublereal *rowcnd, 
+	integer *lda, doublereal *r__, doublereal *c__, doublereal *rowcnd, 
 	doublereal *colcnd, doublereal *amax, char *equed)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -27,8 +28,7 @@
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the M by N matrix A.   
-            On exit, the equilibrated matrix.  See EQUED for the form of 
-  
+            On exit, the equilibrated matrix.  See EQUED for the form of   
             the equilibrated matrix.   
 
     LDA     (input) INTEGER   
@@ -52,11 +52,9 @@
     EQUED   (output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration   
-            = 'R':  Row equilibration, i.e., A has been premultiplied by 
-  
+            = 'R':  Row equilibration, i.e., A has been premultiplied by   
                     diag(R).   
-            = 'C':  Column equilibration, i.e., A has been postmultiplied 
-  
+            = 'C':  Column equilibration, i.e., A has been postmultiplied   
                     by diag(C).   
             = 'B':  Both row and column equilibration, i.e., A has been   
                     replaced by diag(R) * A * diag(C).   
@@ -73,30 +71,30 @@
     should be done based on the absolute size of the largest matrix   
     element.  If AMAX > LARGE or AMAX < SMALL, row scaling is done.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick return if possible   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     doublereal d__1;
     doublecomplex z__1;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     static doublereal large, small, cj;
     extern doublereal dlamch_(char *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --r__;
+    --c__;
 
-#define R(I) r[(I)-1]
-#define C(I) c[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     if (*m <= 0 || *n <= 0) {
 	*(unsigned char *)equed = 'N';
 	return 0;
@@ -121,14 +119,14 @@
 /*           Column scaling */
 
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
-		cj = C(j);
+	    for (j = 1; j <= i__1; ++j) {
+		cj = c__[j];
 		i__2 = *m;
-		for (i = 1; i <= *m; ++i) {
-		    i__3 = i + j * a_dim1;
-		    i__4 = i + j * a_dim1;
-		    z__1.r = cj * A(i,j).r, z__1.i = cj * A(i,j).i;
-		    A(i,j).r = z__1.r, A(i,j).i = z__1.i;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__3 = a_subscr(i__, j);
+		    i__4 = a_subscr(i__, j);
+		    z__1.r = cj * a[i__4].r, z__1.i = cj * a[i__4].i;
+		    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L10: */
 		}
 /* L20: */
@@ -140,14 +138,15 @@
 /*        Row scaling, no column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		i__3 = i + j * a_dim1;
-		i__4 = i;
-		i__5 = i + j * a_dim1;
-		z__1.r = R(i) * A(i,j).r, z__1.i = R(i) * A(i,j).i;
-		A(i,j).r = z__1.r, A(i,j).i = z__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
+		i__4 = i__;
+		i__5 = a_subscr(i__, j);
+		z__1.r = r__[i__4] * a[i__5].r, z__1.i = r__[i__4] * a[i__5]
+			.i;
+		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L30: */
 	    }
 /* L40: */
@@ -158,15 +157,15 @@
 /*        Row and column scaling */
 
 	i__1 = *n;
-	for (j = 1; j <= *n; ++j) {
-	    cj = C(j);
+	for (j = 1; j <= i__1; ++j) {
+	    cj = c__[j];
 	    i__2 = *m;
-	    for (i = 1; i <= *m; ++i) {
-		i__3 = i + j * a_dim1;
-		d__1 = cj * R(i);
-		i__4 = i + j * a_dim1;
-		z__1.r = d__1 * A(i,j).r, z__1.i = d__1 * A(i,j).i;
-		A(i,j).r = z__1.r, A(i,j).i = z__1.i;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
+		d__1 = cj * r__[i__];
+		i__4 = a_subscr(i__, j);
+		z__1.r = d__1 * a[i__4].r, z__1.i = d__1 * a[i__4].i;
+		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L50: */
 	    }
 /* L60: */
@@ -179,4 +178,8 @@
 /*     End of ZLAQGE */
 
 } /* zlaqge_ */
+
+#undef a_ref
+#undef a_subscr
+
 

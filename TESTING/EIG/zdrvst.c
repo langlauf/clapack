@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -23,8 +24,9 @@ static integer c__3 = 3;
 	doublecomplex *a, integer *lda, doublereal *d1, doublereal *d2, 
 	doublereal *d3, doublereal *wa1, doublereal *wa2, doublereal *wa3, 
 	doublecomplex *u, integer *ldu, doublecomplex *v, doublecomplex *tau, 
-	doublecomplex *z, doublecomplex *work, integer *nwork, doublereal *
-	rwork, integer *iwork, doublereal *result, integer *info)
+	doublecomplex *z__, doublecomplex *work, integer *lwork, doublereal *
+	rwork, integer *lrwork, integer *iwork, integer *liwork, doublereal *
+	result, integer *info)
 {
     /* Initialized data */
 
@@ -45,7 +47,7 @@ static integer c__3 = 3;
     integer a_dim1, a_offset, u_dim1, u_offset, v_dim1, v_offset, z_dim1, 
 	    z_offset, i__1, i__2, i__3, i__4, i__5, i__6, i__7[3];
     doublereal d__1, d__2, d__3, d__4;
-    char ch__1[11], ch__2[13];
+    char ch__1[11], ch__2[13], ch__3[10];
 
     /* Builtin functions */
     double sqrt(doublereal), log(doublereal);
@@ -62,7 +64,7 @@ static integer c__3 = 3;
     static doublereal temp1, temp2, temp3;
     extern doublereal dsxt1_(integer *, doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *);
-    static integer i, j, idiag, m, n;
+    static integer i__, j, idiag, m, n;
     static logical badnn;
     static integer imode, lwedc, iinfo;
     static doublereal aninv, anorm;
@@ -71,13 +73,20 @@ static integer c__3 = 3;
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublereal *);
     static integer itemp;
-    extern /* Subroutine */ int zhet22_(integer *, char *, integer *, integer 
-	    *, integer *, doublecomplex *, integer *, doublereal *, 
-	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, doublecomplex *, doublereal *, 
-	    doublereal *);
+    extern /* Subroutine */ int zhbev_(char *, char *, integer *, integer *, 
+	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
+	    integer *, doublecomplex *, doublereal *, integer *), zhet22_(integer *, char *, integer *, integer *, integer 
+	    *, doublecomplex *, integer *, doublereal *, doublereal *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, 
+	    doublecomplex *, doublecomplex *, doublereal *, doublereal *), zheev_(char *, char *, integer *, doublecomplex *, 
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
+	     integer *);
     static integer nmats, jsize, iuplo, nerrs, itype, j1, j2, jtype, m2, m3, 
-	    ntest, iseed2[4], iseed3[4];
+	    ntest;
+    extern /* Subroutine */ int zhpev_(char *, char *, integer *, 
+	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
+	    doublecomplex *, doublereal *, integer *);
+    static integer iseed2[4], iseed3[4];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     static integer kd, il;
     extern doublereal dlamch_(char *);
@@ -108,16 +117,20 @@ static integer c__3 = 3;
 	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *), zlacpy_(char *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *), zlaset_(char *, integer *, integer *, doublecomplex *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *), zheevr_(char *, char *, char *, integer *, 
+	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
+	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
+	    , integer *, integer *, doublecomplex *, integer *, doublereal *, 
+	    integer *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *), zhbevx_(
 	    char *, char *, char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, doublereal *, 
 	    integer *, integer *, integer *);
-    static doublereal rtovfl, rtunfl;
+    static doublereal rtovfl;
     static integer mtypes, ntestt;
-    static doublereal ulpinv;
+    static doublereal rtunfl, ulpinv;
     extern /* Subroutine */ int zheevx_(char *, char *, char *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
 	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
@@ -164,13 +177,33 @@ static integer c__3 = 3;
     static cilist io___81 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___82 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___83 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___84 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___85 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___86 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___87 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___90 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___92 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___93 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___94 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___95 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
+#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       December 3, 1999   
 
 
     Purpose   
@@ -179,27 +212,42 @@ static integer c__3 = 3;
          ZDRVST  checks the Hermitian eigenvalue problem drivers.   
 
                  ZHEEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
+                 eigenvectors of a complex Hermitian matrix,   
+                 using a divide-and-conquer algorithm.   
 
                  ZHEEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix.   
 
+                 ZHEEVR computes selected eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix   
+                 using the Relatively Robust Representation where it can.   
+
                  ZHPEVD computes all eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
+                 storage, using a divide-and-conquer algorithm.   
 
                  ZHPEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian matrix in packed   
                  storage.   
 
                  ZHBEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
+                 eigenvectors of a complex Hermitian band matrix,   
+                 using a divide-and-conquer algorithm.   
 
                  ZHBEVX computes selected eigenvalues and, optionally,   
                  eigenvectors of a complex Hermitian band matrix.   
 
-         When ZDRVST is called, a number of matrix "sizes" ("n's") and a 
-  
+                 ZHEEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix.   
+
+                 ZHPEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian matrix in packed   
+                 storage.   
+
+                 ZHBEV computes all eigenvalues and, optionally,   
+                 eigenvectors of a complex Hermitian band matrix.   
+
+         When ZDRVST is called, a number of matrix "sizes" ("n's") and a   
          number of matrix "types" are specified.  For each size ("n")   
          and each type of matrix, one matrix will be generated and used   
          to test the appropriate drivers.  For each matrix and each   
@@ -215,13 +263,10 @@ static integer c__3 = 3;
          eigenvector option is given and D1 and D2 are the eigenvalues   
          returned with and without the eigenvector option.   
 
-         The "sizes" are specified by an array NN(1:NSIZES); the value of 
-  
+         The "sizes" are specified by an array NN(1:NSIZES); the value of   
          each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES ); 
-  
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. 
-  
+         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
+         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
          Currently, the list of possible types is:   
 
          (1)  The zero matrix.   
@@ -232,21 +277,18 @@ static integer c__3 = 3;
               (ULP = (first number larger than 1) - 1 )   
          (4)  A diagonal matrix with geometrically spaced entries   
               1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP 
-  
+         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
               and random signs.   
 
          (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold ) 
-  
+         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
 
          (8)  A matrix of the form  U* D U, where U is unitary and   
               D has evenly spaced entries 1, ..., ULP with random signs   
               on the diagonal.   
 
          (9)  A matrix of the form  U* D U, where U is unitary and   
-              D has geometrically spaced entries 1, ..., ULP with random 
-  
+              D has geometrically spaced entries 1, ..., ULP with random   
               signs on the diagonal.   
 
          (10) A matrix of the form  U* D U, where U is unitary and   
@@ -254,21 +296,16 @@ static integer c__3 = 3;
               signs on the diagonal.   
 
          (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold ) 
-  
+         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
 
          (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold ) 
-  
-         (15) Same as (13), but multiplied by SQRT( underflow threshold ) 
-  
+         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
+         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
          (16) A band matrix with half bandwidth randomly chosen between   
               0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
               with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold ) 
-  
-         (18) Same as (16), but multiplied by SQRT( underflow threshold ) 
-  
+         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
+         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
 
     Arguments   
     =========   
@@ -329,7 +366,7 @@ static integer c__3 = 3;
             (e.g., if a routine returns IINFO not equal to 0.)   
             Not modified.   
 
-    A       DOUBLE PRECISION array, dimension (LDA , max(NN))   
+    A       COMPLEX*16 array, dimension (LDA , max(NN))   
             Used to hold the matrix whose eigenvalues are to be   
             computed.  On exit, A contains the last matrix actually   
             used.   
@@ -387,11 +424,11 @@ static integer c__3 = 3;
             ZHEEVX, ZHPEVD, CHPEVX, ZHBEVD, and CHBEVX.   
             Modified.   
 
-    WORK  - COMPLEX*16 array of dimension ( NWORK )   
+    WORK  - COMPLEX*16 array of dimension ( LWORK )   
              Workspace.   
              Modified.   
 
-    NWORK - INTEGER   
+    LWORK - INTEGER   
              The number of entries in WORK.  This must be at least   
              2*max( NN(j), 2 )**2.   
              Not modified.   
@@ -400,11 +437,17 @@ static integer c__3 = 3;
              Workspace.   
              Modified.   
 
+    LRWORK - INTEGER   
+             The number of entries in RWORK.   
+
     IWORK   INTEGER array, dimension (6*max(NN))   
             Workspace.   
             Modified.   
 
-    RESULT  DOUBLE PRECISION array, dimension (42)   
+    LIWORK - INTEGER   
+             The number of entries in IWORK.   
+
+    RESULT  DOUBLE PRECISION array, dimension (??)   
             The values computed by the tests described above.   
             The values are currently limited to 1/ulp, to avoid   
             overflow.   
@@ -418,14 +461,13 @@ static integer c__3 = 3;
              -5: THRESH < 0   
              -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
             -16: LDU < 1 or LDU < NMAX.   
-            -21: NWORK too small.   
+            -21: LWORK too small.   
             If  DLATMR, SLATMS, ZHETRD, DORGC3, ZSTEQR, DSTERF,   
                 or DORMC2 returns an error code, the   
                 absolute value of it is returned.   
             Modified.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
          Some Local Variables and Parameters:   
          ---- ----- --------- --- ----------   
@@ -451,8 +493,7 @@ static integer c__3 = 3;
          KMAGN(j)        The order of magnitude ( O(1),   
                          O(overflow^(1/2) ), O(underflow^(1/2) )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
@@ -460,7 +501,7 @@ static integer c__3 = 3;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --d1;
     --d2;
@@ -469,13 +510,13 @@ static integer c__3 = 3;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --tau;
     --work;
@@ -518,7 +559,7 @@ static integer c__3 = 3;
     } else /* if(complicated condition) */ {
 /* Computing 2nd power */
 	i__1 = max(2,nmax);
-	if (i__1 * i__1 << 1 > *nwork) {
+	if (i__1 * i__1 << 1 > *lwork) {
 	    *info = -22;
 	}
     }
@@ -547,9 +588,9 @@ static integer c__3 = 3;
 
 /*     Loop over sizes, types */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed2[i - 1] = iseed[i];
-	iseed3[i - 1] = iseed[i];
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed2[i__ - 1] = iseed[i__];
+	iseed3[i__ - 1] = iseed[i__];
 /* L20: */
     }
 
@@ -573,11 +614,11 @@ static integer c__3 = 3;
 /* Computing 2nd power */
 	    i__2 = n;
 	    lrwedc = (n << 2) + 1 + (n << 1) * lgn + i__2 * i__2 * 3;
-	    liwedc = n * 5 + 2;
+	    liwedc = n * 5 + 3;
 	} else {
 	    lwedc = 2;
 	    lrwedc = 8;
-	    liwedc = 7;
+	    liwedc = 8;
 	}
 	aninv = 1. / (doublereal) max(1,n);
 
@@ -590,7 +631,7 @@ static integer c__3 = 3;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L950;
+		goto L1210;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -613,8 +654,7 @@ static integer c__3 = 3;
              =6         random       (none)   
              =7                      random diagonal   
              =8                      random Hermitian   
-             =9                      band Hermitian, w/ eigenvalue
-s */
+             =9                      band Hermitian, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -662,7 +702,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 /* L80: */
 		}
@@ -718,15 +758,17 @@ L70:
 		i__3 = ihbw;
 		for (idiag = -ihbw; idiag <= i__3; ++idiag) {
 		    irow = ihbw - idiag + 1;
-		    j1 = max(1,idiag);
+/* Computing MAX */
+		    i__4 = 1, i__5 = idiag + 1;
+		    j1 = max(i__4,i__5);
 /* Computing MIN */
 		    i__4 = n, i__5 = n + idiag;
 		    j2 = min(i__4,i__5);
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
-			i = j - idiag;
-			i__5 = i + j * a_dim1;
-			i__6 = irow + j * u_dim1;
+			i__ = j - idiag;
+			i__5 = a_subscr(i__, j);
+			i__6 = u_subscr(irow, j);
 			a[i__5].r = u[i__6].r, a[i__5].i = u[i__6].i;
 /* L90: */
 		    }
@@ -739,7 +781,7 @@ L70:
 	    if (iinfo != 0) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -756,8 +798,8 @@ L110:
 		il = 1;
 		iu = n;
 	    } else {
-		il = (integer) ((n - 1) * dlarnd_(&c__1, iseed2) + 1);
-		iu = (integer) ((n - 1) * dlarnd_(&c__1, iseed2) + 1);
+		il = (integer) ((n - 1) * dlarnd_(&c__1, iseed2)) + 1;
+		iu = (integer) ((n - 1) * dlarnd_(&c__1, iseed2)) + 1;
 		if (il > iu) {
 		    itemp = il;
 		    il = iu;
@@ -777,8 +819,7 @@ L110:
 
 /*              Call ZHEEVD and CHEEVX. */
 
-		zlacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu)
-			;
+		zlacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
 		++ntest;
 		zheevd_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], &
@@ -790,8 +831,8 @@ L110:
 		    i__7[0] = 9, a__1[0] = "ZHEEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -812,11 +853,10 @@ L110:
 /*              Do tests 1 and 2. */
 
 		zhet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
-			d2[1], &a[a_offset], ldu, &z[z_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		ntest += 2;
 		zheevd_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], &
@@ -828,8 +868,8 @@ L110:
 		    i__7[0] = 9, a__1[0] = "ZHEEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -865,8 +905,7 @@ L110:
 		result[ntest] = temp2 / max(d__1,d__2);
 
 L130:
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
@@ -905,8 +944,8 @@ L130:
 		}
 
 		zheevx_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m, &wa1[1], &z[z_offset], ldu, &work[1]
-			, nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &work[
+			1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
 			iinfo);
 		if (iinfo != 0) {
 		    io___57.ciunit = *nounit;
@@ -915,8 +954,8 @@ L130:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -936,18 +975,17 @@ L130:
 
 /*              Do tests 4 and 5. */
 
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		zheevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___59.ciunit = *nounit;
 		    s_wsfe(&io___59);
@@ -955,8 +993,8 @@ L130:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -992,15 +1030,14 @@ L130:
 		result[ntest] = temp2 / max(d__1,d__2);
 
 L150:
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
 		zheevx_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___60.ciunit = *nounit;
 		    s_wsfe(&io___60);
@@ -1008,8 +1045,8 @@ L150:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1027,19 +1064,18 @@ L150:
 
 /*              Do tests 7 and 8. */
 
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
 		zheevx_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___62.ciunit = *nounit;
 		    s_wsfe(&io___62);
@@ -1047,8 +1083,8 @@ L150:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1082,15 +1118,14 @@ L150:
 		result[ntest] = (temp1 + temp2) / max(d__1,d__2);
 
 L160:
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		++ntest;
 
 		zheevx_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m2, &wa2[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___63.ciunit = *nounit;
 		    s_wsfe(&io___63);
@@ -1098,8 +1133,8 @@ L160:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1117,19 +1152,18 @@ L160:
 
 /*              Do tests 10 and 11. */
 
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
 		zheevx_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
-			&iu, &abstol, &m3, &wa3[1], &z[z_offset], ldu, &work[
-			1], nwork, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
-			iinfo);
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			work[1], lwork, &rwork[1], &iwork[1], &iwork[n * 5 + 
+			1], &iinfo);
 		if (iinfo != 0) {
 		    io___64.ciunit = *nounit;
 		    s_wsfe(&io___64);
@@ -1137,8 +1171,8 @@ L160:
 		    i__7[0] = 11, a__1[0] = "ZHEEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1180,11 +1214,9 @@ L170:
 
 /*              Call ZHPEVD and CHPEVX. */
 
-		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda)
-			;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triang
-ular   
+/*              Load array WORK with the upper or lower triangular   
                 part of the matrix in packed form. */
 
 		if (iuplo == 1) {
@@ -1192,9 +1224,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1207,9 +1239,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1221,9 +1253,9 @@ ular
 
 		++ntest;
 		indwrk = n * (n + 1) / 2 + 1;
-		zhpevd_("V", uplo, &n, &work[1], &d1[1], &z[z_offset], ldu, &
-			work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], &
-			liwedc, &iinfo);
+		zhpevd_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, 
+			&work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], 
+			&liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___67.ciunit = *nounit;
 		    s_wsfe(&io___67);
@@ -1231,8 +1263,8 @@ ular
 		    i__7[0] = 9, a__1[0] = "ZHPEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1253,17 +1285,17 @@ ular
 /*              Do tests 13 and 14. */
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1276,9 +1308,9 @@ ular
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1290,9 +1322,9 @@ ular
 
 		ntest += 2;
 		indwrk = n * (n + 1) / 2 + 1;
-		zhpevd_("N", uplo, &n, &work[1], &d3[1], &z[z_offset], ldu, &
-			work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], &
-			liwedc, &iinfo);
+		zhpevd_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, 
+			&work[indwrk], &lwedc, &rwork[1], &lrwedc, &iwork[1], 
+			&liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___68.ciunit = *nounit;
 		    s_wsfe(&io___68);
@@ -1300,8 +1332,8 @@ ular
 		    i__7[0] = 9, a__1[0] = "ZHPEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1336,8 +1368,7 @@ ular
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array WORK with the upper or lower triang
-ular part   
+/*              Load array WORK with the upper or lower triangular part   
                 of the matrix in packed form. */
 
 L270:
@@ -1346,9 +1377,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1361,9 +1392,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1410,8 +1441,8 @@ L270:
 		}
 
 		zhpevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &wa1[1], &z[z_offset], ldu, &v[v_offset], 
-			&rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
+			, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___69.ciunit = *nounit;
 		    s_wsfe(&io___69);
@@ -1419,8 +1450,8 @@ L270:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1441,8 +1472,8 @@ L270:
 /*              Do tests 16 and 17. */
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -1451,9 +1482,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1466,9 +1497,9 @@ L270:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1479,8 +1510,9 @@ L270:
 		}
 
 		zhpevx_("N", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___70.ciunit = *nounit;
 		    s_wsfe(&io___70);
@@ -1488,8 +1520,8 @@ L270:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1531,9 +1563,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1546,9 +1578,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1559,8 +1591,9 @@ L370:
 		}
 
 		zhpevx_("V", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___71.ciunit = *nounit;
 		    s_wsfe(&io___71);
@@ -1568,8 +1601,8 @@ L370:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1590,7 +1623,7 @@ L370:
 /*              Do tests 19 and 20. */
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -1600,9 +1633,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1615,9 +1648,9 @@ L370:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1628,8 +1661,9 @@ L370:
 		}
 
 		zhpevx_("N", "I", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___72.ciunit = *nounit;
 		    s_wsfe(&io___72);
@@ -1637,8 +1671,8 @@ L370:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1678,9 +1712,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1693,9 +1727,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1706,8 +1740,9 @@ L460:
 		}
 
 		zhpevx_("V", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m2, &wa2[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m2, &wa2[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___73.ciunit = *nounit;
 		    s_wsfe(&io___73);
@@ -1715,8 +1750,8 @@ L460:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1737,7 +1772,7 @@ L460:
 /*              Do tests 22 and 23. */
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -1747,9 +1782,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
-			for (i = 1; i <= i__4; ++i) {
+			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1762,9 +1797,9 @@ L460:
 		    i__3 = n;
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
-			for (i = j; i <= i__4; ++i) {
+			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = i + j * a_dim1;
+			    i__6 = a_subscr(i__, j);
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1775,8 +1810,9 @@ L460:
 		}
 
 		zhpevx_("N", "V", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
-			abstol, &m3, &wa3[1], &z[z_offset], ldu, &v[v_offset],
-			 &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+			abstol, &m3, &wa3[1], &z__[z_offset], ldu, &v[
+			v_offset], &rwork[1], &iwork[1], &iwork[n * 5 + 1], &
+			iinfo);
 		if (iinfo != 0) {
 		    io___74.ciunit = *nounit;
 		    s_wsfe(&io___74);
@@ -1784,8 +1820,8 @@ L460:
 		    i__7[0] = 11, a__1[0] = "ZHPEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1837,8 +1873,7 @@ L550:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 		if (iuplo == 1) {
@@ -1847,9 +1882,9 @@ r part
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L560: */
 			}
@@ -1861,9 +1896,9 @@ r part
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L580: */
 			}
@@ -1872,7 +1907,7 @@ r part
 		}
 
 		++ntest;
-		zhbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z[
+		zhbevd_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &rwork[1], &lrwedc, 
 			&iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1882,8 +1917,8 @@ r part
 		    i__7[0] = 9, a__1[0] = "ZHBEVD(V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -1905,8 +1940,8 @@ r part
 /*              Do tests 25 and 26. */
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1914,9 +1949,9 @@ r part
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L600: */
 			}
@@ -1928,9 +1963,9 @@ r part
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L620: */
 			}
@@ -1939,7 +1974,7 @@ r part
 		}
 
 		ntest += 2;
-		zhbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z[
+		zhbevd_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
 			z_offset], ldu, &work[1], &lwedc, &rwork[1], &lrwedc, 
 			&iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
@@ -1949,8 +1984,8 @@ r part
 		    i__7[0] = 9, a__1[0] = "ZHBEVD(N,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__1, a__1, i__7, &c__3, 11L);
-		    do_fio(&c__1, ch__1, 11L);
+		    s_cat(ch__1, a__1, i__7, &c__3, (ftnlen)11);
+		    do_fio(&c__1, ch__1, (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -1986,8 +2021,7 @@ r part
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L650:
@@ -1997,9 +2031,9 @@ L650:
 /* Computing MAX */
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__6); i <= i__4; ++i) {
-			    i__5 = kd + 1 + i - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L660: */
 			}
@@ -2011,9 +2045,9 @@ L650:
 /* Computing MIN */
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
-			for (i = j; i <= i__4; ++i) {
-			    i__5 = i + 1 - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L680: */
 			}
@@ -2024,8 +2058,8 @@ L650:
 		++ntest;
 		zhbevx_("V", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m, &wa1[
-			1], &z[z_offset], ldu, &work[1], &rwork[1], &iwork[1],
-			 &iwork[n * 5 + 1], &iinfo);
+			1], &z__[z_offset], ldu, &work[1], &rwork[1], &iwork[
+			1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___78.ciunit = *nounit;
 		    s_wsfe(&io___78);
@@ -2033,8 +2067,8 @@ L650:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(V,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2056,8 +2090,8 @@ L650:
 /*              Do tests 28 and 29. */
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
-			d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &tau[1], 
-			&work[1], &rwork[1], &result[ntest]);
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2067,9 +2101,9 @@ L650:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L700: */
 			}
@@ -2081,9 +2115,9 @@ L650:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L720: */
 			}
@@ -2093,7 +2127,7 @@ L650:
 
 		zhbevx_("N", "A", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___79.ciunit = *nounit;
@@ -2102,8 +2136,8 @@ L650:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(N,A,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2139,8 +2173,7 @@ L650:
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L750:
@@ -2151,9 +2184,9 @@ L750:
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L760: */
 			}
@@ -2165,9 +2198,9 @@ L750:
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L780: */
 			}
@@ -2177,7 +2210,7 @@ L750:
 
 		zhbevx_("V", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___80.ciunit = *nounit;
@@ -2186,8 +2219,8 @@ L750:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(V,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2209,7 +2242,7 @@ L750:
 /*              Do tests 31 and 32. */
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -2220,9 +2253,9 @@ L750:
 /* Computing MAX */
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
-			for (i = max(i__5,i__6); i <= i__4; ++i) {
-			    i__5 = kd + 1 + i - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L800: */
 			}
@@ -2234,9 +2267,9 @@ L750:
 /* Computing MIN */
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
-			for (i = j; i <= i__4; ++i) {
-			    i__5 = i + 1 - j + j * v_dim1;
-			    i__6 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L820: */
 			}
@@ -2245,7 +2278,7 @@ L750:
 		}
 		zhbevx_("N", "I", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___81.ciunit = *nounit;
@@ -2254,8 +2287,8 @@ L750:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(N,I,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2289,8 +2322,7 @@ L750:
 		d__1 = unfl, d__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangula
-r part   
+/*              Load array V with the upper or lower triangular part   
                 of the matrix in band form. */
 
 L840:
@@ -2301,9 +2333,9 @@ L840:
 /* Computing MAX */
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
-			for (i = max(i__4,i__5); i <= i__6; ++i) {
-			    i__4 = kd + 1 + i - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L850: */
 			}
@@ -2315,9 +2347,9 @@ L840:
 /* Computing MIN */
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
-			for (i = j; i <= i__6; ++i) {
-			    i__4 = i + 1 - j + j * v_dim1;
-			    i__5 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L870: */
 			}
@@ -2326,7 +2358,7 @@ L840:
 		}
 		zhbevx_("V", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m2, &
-			wa2[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa2[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___82.ciunit = *nounit;
@@ -2335,8 +2367,8 @@ L840:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(V,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2358,7 +2390,7 @@ L840:
 /*              Do tests 34 and 35. */
 
 		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
-			1], &d2[1], &z[z_offset], ldu, &v[v_offset], ldu, &
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
 			tau[1], &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
@@ -2369,9 +2401,9 @@ L840:
 /* Computing MAX */
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
-			for (i = max(i__6,i__4); i <= i__5; ++i) {
-			    i__6 = kd + 1 + i - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(kd + 1 + i__ - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L890: */
 			}
@@ -2383,9 +2415,9 @@ L840:
 /* Computing MIN */
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
-			for (i = j; i <= i__5; ++i) {
-			    i__6 = i + 1 - j + j * v_dim1;
-			    i__4 = i + j * a_dim1;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = v_subscr(i__ + 1 - j, j);
+			    i__4 = a_subscr(i__, j);
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L910: */
 			}
@@ -2394,7 +2426,7 @@ L840:
 		}
 		zhbevx_("N", "V", uplo, &n, &kd, &v[v_offset], ldu, &u[
 			u_offset], ldu, &vl, &vu, &il, &iu, &abstol, &m3, &
-			wa3[1], &z[z_offset], ldu, &work[1], &rwork[1], &
+			wa3[1], &z__[z_offset], ldu, &work[1], &rwork[1], &
 			iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___83.ciunit = *nounit;
@@ -2403,8 +2435,8 @@ L840:
 		    i__7[0] = 11, a__1[0] = "ZHBEVX(N,V,";
 		    i__7[1] = 1, a__1[1] = uplo;
 		    i__7[2] = 1, a__1[2] = ")";
-		    s_cat(ch__2, a__1, i__7, &c__3, 13L);
-		    do_fio(&c__1, ch__2, 13L);
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
@@ -2445,7 +2477,693 @@ L840:
 
 L930:
 
+/*              Call ZHEEV */
+
+		zlacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
+
+		++ntest;
+		zheev_("V", uplo, &n, &a[a_offset], ldu, &d1[1], &work[1], 
+			lwork, &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___84.ciunit = *nounit;
+		    s_wsfe(&io___84);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHEEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L950;
+		    }
+		}
+
+/*              Do tests 37 and 38 */
+
+		zhet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
+			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		ntest += 2;
+		zheev_("N", uplo, &n, &a[a_offset], ldu, &d3[1], &work[1], 
+			lwork, &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___85.ciunit = *nounit;
+		    s_wsfe(&io___85);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHEEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L950;
+		    }
+		}
+
+/*              Do test 39 */
+
+		temp1 = 0.;
+		temp2 = 0.;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    d__3 = temp1, d__4 = (d__1 = d1[j], abs(d__1)), d__3 = 
+			    max(d__3,d__4), d__4 = (d__2 = d3[j], abs(d__2));
+		    temp1 = max(d__3,d__4);
+/* Computing MAX */
+		    d__2 = temp2, d__3 = (d__1 = d1[j] - d3[j], abs(d__1));
+		    temp2 = max(d__2,d__3);
 /* L940: */
+		}
+/* Computing MAX */
+		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
+		result[ntest] = temp2 / max(d__1,d__2);
+
+L950:
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+/*              Call ZHPEV   
+
+                Load array WORK with the upper or lower triangular   
+                part of the matrix in packed form. */
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = j;
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L960: */
+			}
+/* L970: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = n;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L980: */
+			}
+/* L990: */
+		    }
+		}
+
+		++ntest;
+		indwrk = n * (n + 1) / 2 + 1;
+		zhpev_("V", uplo, &n, &work[1], &d1[1], &z__[z_offset], ldu, &
+			work[indwrk], &rwork[1], &iinfo)
+			;
+		if (iinfo != 0) {
+		    io___86.ciunit = *nounit;
+		    s_wsfe(&io___86);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHPEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1050;
+		    }
+		}
+
+/*              Do tests 40 and 41. */
+
+		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		if (iuplo == 1) {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = j;
+			for (i__ = 1; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L1000: */
+			}
+/* L1010: */
+		    }
+		} else {
+		    indx = 1;
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+			i__5 = n;
+			for (i__ = j; i__ <= i__5; ++i__) {
+			    i__6 = indx;
+			    i__4 = a_subscr(i__, j);
+			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
+				    .i;
+			    ++indx;
+/* L1020: */
+			}
+/* L1030: */
+		    }
+		}
+
+		ntest += 2;
+		indwrk = n * (n + 1) / 2 + 1;
+		zhpev_("N", uplo, &n, &work[1], &d3[1], &z__[z_offset], ldu, &
+			work[indwrk], &rwork[1], &iinfo)
+			;
+		if (iinfo != 0) {
+		    io___87.ciunit = *nounit;
+		    s_wsfe(&io___87);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHPEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1050;
+		    }
+		}
+
+/*              Do test 42 */
+
+		temp1 = 0.;
+		temp2 = 0.;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    d__3 = temp1, d__4 = (d__1 = d1[j], abs(d__1)), d__3 = 
+			    max(d__3,d__4), d__4 = (d__2 = d3[j], abs(d__2));
+		    temp1 = max(d__3,d__4);
+/* Computing MAX */
+		    d__2 = temp2, d__3 = (d__1 = d1[j] - d3[j], abs(d__1));
+		    temp2 = max(d__2,d__3);
+/* L1040: */
+		}
+/* Computing MAX */
+		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
+		result[ntest] = temp2 / max(d__1,d__2);
+
+L1050:
+
+/*              Call ZHBEV */
+
+		if (jtype <= 7) {
+		    kd = 0;
+		} else if (jtype >= 8 && jtype <= 15) {
+/* Computing MAX */
+		    i__3 = n - 1;
+		    kd = max(i__3,0);
+		} else {
+		    kd = ihbw;
+		}
+
+/*              Load array V with the upper or lower triangular part   
+                of the matrix in band form. */
+
+		if (iuplo == 1) {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			i__5 = 1, i__6 = j - kd;
+			i__4 = j;
+			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(kd + 1 + i__ - j, j);
+			    i__6 = a_subscr(i__, j);
+			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
+/* L1060: */
+			}
+/* L1070: */
+		    }
+		} else {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+			i__5 = n, i__6 = j + kd;
+			i__4 = min(i__5,i__6);
+			for (i__ = j; i__ <= i__4; ++i__) {
+			    i__5 = v_subscr(i__ + 1 - j, j);
+			    i__6 = a_subscr(i__, j);
+			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
+/* L1080: */
+			}
+/* L1090: */
+		    }
+		}
+
+		++ntest;
+		zhbev_("V", uplo, &n, &kd, &v[v_offset], ldu, &d1[1], &z__[
+			z_offset], ldu, &work[1], &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___88.ciunit = *nounit;
+		    s_wsfe(&io___88);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHBEV(V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1140;
+		    }
+		}
+
+/*              Do tests 43 and 44. */
+
+		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		if (iuplo == 1) {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+			i__4 = 1, i__5 = j - kd;
+			i__6 = j;
+			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(kd + 1 + i__ - j, j);
+			    i__5 = a_subscr(i__, j);
+			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
+/* L1100: */
+			}
+/* L1110: */
+		    }
+		} else {
+		    i__3 = n;
+		    for (j = 1; j <= i__3; ++j) {
+/* Computing MIN */
+			i__4 = n, i__5 = j + kd;
+			i__6 = min(i__4,i__5);
+			for (i__ = j; i__ <= i__6; ++i__) {
+			    i__4 = v_subscr(i__ + 1 - j, j);
+			    i__5 = a_subscr(i__, j);
+			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
+/* L1120: */
+			}
+/* L1130: */
+		    }
+		}
+
+		ntest += 2;
+		zhbev_("N", uplo, &n, &kd, &v[v_offset], ldu, &d3[1], &z__[
+			z_offset], ldu, &work[1], &rwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___89.ciunit = *nounit;
+		    s_wsfe(&io___89);
+/* Writing concatenation */
+		    i__7[0] = 8, a__1[0] = "ZHBEV(N,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__3, a__1, i__7, &c__3, (ftnlen)10);
+		    do_fio(&c__1, ch__3, (ftnlen)10);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&kd, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1140;
+		    }
+		}
+
+L1140:
+
+/*              Do test 45. */
+
+		temp1 = 0.;
+		temp2 = 0.;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    d__3 = temp1, d__4 = (d__1 = d1[j], abs(d__1)), d__3 = 
+			    max(d__3,d__4), d__4 = (d__2 = d3[j], abs(d__2));
+		    temp1 = max(d__3,d__4);
+/* Computing MAX */
+		    d__2 = temp2, d__3 = (d__1 = d1[j] - d3[j], abs(d__1));
+		    temp2 = max(d__2,d__3);
+/* L1150: */
+		}
+/* Computing MAX */
+		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
+		result[ntest] = temp2 / max(d__1,d__2);
+
+		zlacpy_(" ", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
+		++ntest;
+		i__3 = *liwork - (n << 1);
+		zheevr_("V", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m, &wa1[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___90.ciunit = *nounit;
+		    s_wsfe(&io___90);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(V,A,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1170;
+		    }
+		}
+
+/*              Do tests 45 and 46 (or ... ) */
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
+			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
+			, &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		i__3 = *liwork - (n << 1);
+		zheevr_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___91.ciunit = *nounit;
+		    s_wsfe(&io___91);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(N,A,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1170;
+		    }
+		}
+
+/*              Do test 47 (or ... ) */
+
+		temp1 = 0.;
+		temp2 = 0.;
+		i__3 = n;
+		for (j = 1; j <= i__3; ++j) {
+/* Computing MAX */
+		    d__3 = temp1, d__4 = (d__1 = wa1[j], abs(d__1)), d__3 = 
+			    max(d__3,d__4), d__4 = (d__2 = wa2[j], abs(d__2));
+		    temp1 = max(d__3,d__4);
+/* Computing MAX */
+		    d__2 = temp2, d__3 = (d__1 = wa1[j] - wa2[j], abs(d__1));
+		    temp2 = max(d__2,d__3);
+/* L1160: */
+		}
+/* Computing MAX */
+		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
+		result[ntest] = temp2 / max(d__1,d__2);
+
+L1170:
+
+		++ntest;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		zheevr_("V", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___92.ciunit = *nounit;
+		    s_wsfe(&io___92);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(V,I,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1180;
+		    }
+		}
+
+/*              Do tests 48 and 49 (or +??) */
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		zheevr_("N", "I", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___93.ciunit = *nounit;
+		    s_wsfe(&io___93);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(N,I,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1180;
+		    }
+		}
+
+/*              Do test 50 (or +??) */
+
+		temp1 = dsxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = dsxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+/* Computing MAX */
+		d__1 = unfl, d__2 = ulp * temp3;
+		result[ntest] = (temp1 + temp2) / max(d__1,d__2);
+L1180:
+
+		++ntest;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		zheevr_("V", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m2, &wa2[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___94.ciunit = *nounit;
+		    s_wsfe(&io___94);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(V,V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			result[ntest + 1] = ulpinv;
+			result[ntest + 2] = ulpinv;
+			goto L1190;
+		    }
+		}
+
+/*              Do tests 51 and 52 (or +??) */
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+		zhet22_(&c__1, uplo, &n, &m2, &c__0, &a[a_offset], ldu, &wa2[
+			1], &d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &
+			tau[1], &work[1], &rwork[1], &result[ntest]);
+
+		ntest += 2;
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+		i__3 = *liwork - (n << 1);
+		zheevr_("N", "V", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
+			&iu, &abstol, &m3, &wa3[1], &z__[z_offset], ldu, &
+			iwork[1], &work[1], lwork, &rwork[1], lrwork, &iwork[(
+			n << 1) + 1], &i__3, &iinfo);
+		if (iinfo != 0) {
+		    io___95.ciunit = *nounit;
+		    s_wsfe(&io___95);
+/* Writing concatenation */
+		    i__7[0] = 11, a__1[0] = "ZHEEVR(N,V,";
+		    i__7[1] = 1, a__1[1] = uplo;
+		    i__7[2] = 1, a__1[2] = ")";
+		    s_cat(ch__2, a__1, i__7, &c__3, (ftnlen)13);
+		    do_fio(&c__1, ch__2, (ftnlen)13);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    if (iinfo < 0) {
+			return 0;
+		    } else {
+			result[ntest] = ulpinv;
+			goto L1190;
+		    }
+		}
+
+		if (m3 == 0 && n > 0) {
+		    result[ntest] = ulpinv;
+		    goto L1190;
+		}
+
+/*              Do test 52 (or +??) */
+
+		temp1 = dsxt1_(&c__1, &wa2[1], &m2, &wa3[1], &m3, &abstol, &
+			ulp, &unfl);
+		temp2 = dsxt1_(&c__1, &wa3[1], &m3, &wa2[1], &m2, &abstol, &
+			ulp, &unfl);
+		if (n > 0) {
+/* Computing MAX */
+		    d__2 = abs(wa1[1]), d__3 = (d__1 = wa1[n], abs(d__1));
+		    temp3 = max(d__2,d__3);
+		} else {
+		    temp3 = 0.;
+		}
+/* Computing MAX */
+		d__1 = unfl, d__2 = temp3 * ulp;
+		result[ntest] = (temp1 + temp2) / max(d__1,d__2);
+
+		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
+
+
+
+
+/*              Load array V with the upper or lower triangular part   
+                of the matrix in band form. */
+
+L1190:
+
+/* L1200: */
 		;
 	    }
 
@@ -2455,10 +3173,10 @@ L930:
 	    dlafts_("ZST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
 
-L950:
+L1210:
 	    ;
 	}
-/* L960: */
+/* L1220: */
     }
 
 /*     Summary */
@@ -2471,4 +3189,12 @@ L950:
 /*     End of ZDRVST */
 
 } /* zdrvst_ */
+
+#undef v_ref
+#undef v_subscr
+#undef u_ref
+#undef u_subscr
+#undef a_ref
+#undef a_subscr
+
 

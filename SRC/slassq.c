@@ -1,12 +1,13 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slassq_(integer *n, real *x, integer *incx, real *scale, 
 	real *sumsq)
 {
-/*  -- LAPACK auxiliary routine (version 2.0) --   
+/*  -- LAPACK auxiliary routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -14,8 +15,7 @@
 
     SLASSQ  returns the values  scl  and  smsq  such that   
 
-       ( scl**2 )*smsq = x( 1 )**2 +...+ x( n )**2 + ( scale**2 )*sumsq, 
-  
+       ( scl**2 )*smsq = x( 1 )**2 +...+ x( n )**2 + ( scale**2 )*sumsq,   
 
     where  x( i ) = X( 1 + ( i - 1 )*INCX ). The value of  sumsq  is   
     assumed to be non-negative and  scl  returns the value   
@@ -33,7 +33,7 @@
     N       (input) INTEGER   
             The number of elements to be used from the vector X.   
 
-    X       (input) REAL   
+    X       (input) REAL array, dimension (N)   
             The vector for which a scaled sum of squares is computed.   
                x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n.   
 
@@ -43,8 +43,7 @@
 
     SCALE   (input/output) REAL   
             On entry, the value  scale  in the equation above.   
-            On exit, SCALE is overwritten with  scl , the scaling factor 
-  
+            On exit, SCALE is overwritten with  scl , the scaling factor   
             for the sum of squares.   
 
     SUMSQ   (input/output) REAL   
@@ -52,13 +51,10 @@
             On exit, SUMSQ is overwritten with  smsq , the basic sum of   
             squares from which  scl  has been factored out.   
 
-   ===================================================================== 
-  
+   =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     real r__1;
@@ -66,16 +62,15 @@
     static real absxi;
     static integer ix;
 
+    --x;
 
-#define X(I) x[(I)-1]
-
-
+    /* Function Body */
     if (*n > 0) {
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
-	for (ix = 1; *incx < 0 ? ix >= (*n-1)**incx+1 : ix <= (*n-1)**incx+1; ix += *incx) {
-	    if (X(ix) != 0.f) {
-		absxi = (r__1 = X(ix), dabs(r__1));
+	for (ix = 1; i__2 < 0 ? ix >= i__1 : ix <= i__1; ix += i__2) {
+	    if (x[ix] != 0.f) {
+		absxi = (r__1 = x[ix], dabs(r__1));
 		if (*scale < absxi) {
 /* Computing 2nd power */
 		    r__1 = *scale / absxi;

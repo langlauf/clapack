@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -10,30 +11,32 @@
 static real c_b17 = 1.f;
 static real c_b18 = 0.f;
 static real c_b44 = -1.f;
+static integer c__1 = 1;
 
 /* Subroutine */ int sgsvts_(integer *m, integer *p, integer *n, real *a, 
 	real *af, integer *lda, real *b, real *bf, integer *ldb, real *u, 
 	integer *ldu, real *v, integer *ldv, real *q, integer *ldq, real *
-	alpha, real *beta, real *r, integer *ldr, integer *iwork, real *work, 
-	integer *lwork, real *rwork, real *result)
+	alpha, real *beta, real *r__, integer *ldr, integer *iwork, real *
+	work, integer *lwork, real *rwork, real *result)
 {
     /* System generated locals */
     integer a_dim1, a_offset, af_dim1, af_offset, b_dim1, b_offset, bf_dim1, 
-	    bf_offset, u_dim1, u_offset, v_dim1, v_offset, q_dim1, q_offset, 
-	    r_dim1, r_offset, i__1, i__2;
+	    bf_offset, q_dim1, q_offset, r_dim1, r_offset, u_dim1, u_offset, 
+	    v_dim1, v_offset, i__1, i__2;
     real r__1;
 
     /* Local variables */
     static integer info;
-    static real unfl;
-    static integer i, j, k, l;
+    static real unfl, temp;
+    static integer i__, j, k, l;
     static real resid;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
     static real anorm, bnorm;
-    extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
-	    real *, real *, integer *, real *, real *, integer *);
+    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
+	    integer *), ssyrk_(char *, char *, integer *, integer *, real *, 
+	    real *, integer *, real *, real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
@@ -45,13 +48,20 @@ static real c_b44 = -1.f;
 	    integer *, integer *);
     extern doublereal slansy_(char *, char *, integer *, real *, integer *, 
 	    real *);
-    static real ulp;
+    static real ulpinv, ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define r___ref(a_1,a_2) r__[(a_2)*r_dim1 + a_1]
+#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+#define bf_ref(a_1,a_2) bf[(a_2)*bf_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -135,45 +145,46 @@ static real c_b44 = -1.f;
 
     RWORK   (workspace) REAL array, dimension (max(M,P,N))   
 
-    RESULT  (output) REAL array, dimension (5)   
+    RESULT  (output) REAL array, dimension (6)   
             The test ratios:   
             RESULT(1) = norm( U'*A*Q - D1*R ) / ( MAX(M,N)*norm(A)*ULP)   
             RESULT(2) = norm( V'*B*Q - D2*R ) / ( MAX(P,N)*norm(B)*ULP)   
             RESULT(3) = norm( I - U'*U ) / ( M*ULP )   
             RESULT(4) = norm( I - V'*V ) / ( P*ULP )   
             RESULT(5) = norm( I - Q'*Q ) / ( N*ULP )   
+            RESULT(6) = 0        if ALPHA is in decreasing order;   
+                      = ULPINV   otherwise.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = v_dim1 + 1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --alpha;
     --beta;
     r_dim1 = *ldr;
-    r_offset = r_dim1 + 1;
-    r -= r_offset;
+    r_offset = 1 + r_dim1 * 1;
+    r__ -= r_offset;
     --iwork;
     --work;
     --rwork;
@@ -181,6 +192,7 @@ static real c_b44 = -1.f;
 
     /* Function Body */
     ulp = slamch_("Precision");
+    ulpinv = 1.f / ulp;
     unfl = slamch_("Safe minimum");
 
 /*     Copy the matrix A to the array AF. */
@@ -206,10 +218,10 @@ static real c_b44 = -1.f;
    Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    r[i + j * r_dim1] = af[i + (*n - k - l + j) * af_dim1];
+	for (j = i__; j <= i__2; ++j) {
+	    r___ref(i__, j) = af_ref(i__, *n - k - l + j);
 /* L10: */
 	}
 /* L20: */
@@ -217,10 +229,10 @@ static real c_b44 = -1.f;
 
     if (*m - k - l < 0) {
 	i__1 = k + l;
-	for (i = *m + 1; i <= i__1; ++i) {
+	for (i__ = *m + 1; i__ <= i__1; ++i__) {
 	    i__2 = k + l;
-	    for (j = i; j <= i__2; ++j) {
-		r[i + j * r_dim1] = bf[i - k + (*n - k - l + j) * bf_dim1];
+	    for (j = i__; j <= i__2; ++j) {
+		r___ref(i__, j) = bf_ref(i__ - k, *n - k - l + j);
 /* L30: */
 	    }
 /* L40: */
@@ -230,16 +242,18 @@ static real c_b44 = -1.f;
 /*     Compute A:= U'*A*Q - D1*R */
 
     sgemm_("No transpose", "No transpose", m, n, n, &c_b17, &a[a_offset], lda,
-	     &q[q_offset], ldq, &c_b18, &work[1], lda);
+	     &q[q_offset], ldq, &c_b18, &work[1], lda)
+	    ;
 
     sgemm_("Transpose", "No transpose", m, n, m, &c_b17, &u[u_offset], ldu, &
 	    work[1], lda, &c_b18, &a[a_offset], lda);
 
     i__1 = k;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    a[i + (*n - k - l + j) * a_dim1] -= r[i + j * r_dim1];
+	for (j = i__; j <= i__2; ++j) {
+	    a_ref(i__, *n - k - l + j) = a_ref(i__, *n - k - l + j) - r___ref(
+		    i__, j);
 /* L50: */
 	}
 /* L60: */
@@ -248,10 +262,11 @@ static real c_b44 = -1.f;
 /* Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
-    for (i = k + 1; i <= i__1; ++i) {
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
-	for (j = i; j <= i__2; ++j) {
-	    a[i + (*n - k - l + j) * a_dim1] -= alpha[i] * r[i + j * r_dim1];
+	for (j = i__; j <= i__2; ++j) {
+	    a_ref(i__, *n - k - l + j) = a_ref(i__, *n - k - l + j) - alpha[
+		    i__] * r___ref(i__, j);
 /* L70: */
 	}
 /* L80: */
@@ -272,17 +287,18 @@ static real c_b44 = -1.f;
 /*     Compute B := V'*B*Q - D2*R */
 
     sgemm_("No transpose", "No transpose", p, n, n, &c_b17, &b[b_offset], ldb,
-	     &q[q_offset], ldq, &c_b18, &work[1], ldb);
+	     &q[q_offset], ldq, &c_b18, &work[1], ldb)
+	    ;
 
     sgemm_("Transpose", "No transpose", p, n, p, &c_b17, &v[v_offset], ldv, &
 	    work[1], ldb, &c_b18, &b[b_offset], ldb);
 
     i__1 = l;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = l;
-	for (j = i; j <= i__2; ++j) {
-	    b[i + (*n - l + j) * b_dim1] -= beta[k + i] * r[k + i + (k + j) * 
-		    r_dim1];
+	for (j = i__; j <= i__2; ++j) {
+	    b_ref(i__, *n - l + j) = b_ref(i__, *n - l + j) - beta[k + i__] * 
+		    r___ref(k + i__, k + j);
 /* L90: */
 	}
 /* L100: */
@@ -332,9 +348,43 @@ static real c_b44 = -1.f;
     resid = slansy_("1", "Upper", n, &work[1], ldq, &rwork[1]);
     result[5] = resid / (real) max(1,*n) / ulp;
 
+/*     Check sorting */
+
+    scopy_(n, &alpha[1], &c__1, &work[1], &c__1);
+/* Computing MIN */
+    i__2 = k + l;
+    i__1 = min(i__2,*m);
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
+	j = iwork[i__];
+	if (i__ != j) {
+	    temp = work[i__];
+	    work[i__] = work[j];
+	    work[j] = temp;
+	}
+/* L110: */
+    }
+
+    result[6] = 0.f;
+/* Computing MIN */
+    i__2 = k + l;
+    i__1 = min(i__2,*m) - 1;
+    for (i__ = k + 1; i__ <= i__1; ++i__) {
+	if (work[i__] < work[i__ + 1]) {
+	    result[6] = ulpinv;
+	}
+/* L120: */
+    }
+
     return 0;
 
 /*     End of SGSVTS */
 
 } /* sgsvts_ */
+
+#undef bf_ref
+#undef af_ref
+#undef r___ref
+#undef b_ref
+#undef a_ref
+
 

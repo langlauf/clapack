@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -42,10 +43,10 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
+    static integer info, ifst, ilst;
     static doublereal work[4], a[16]	/* was [4][4] */, b[16]	/* was [4][4] 
-	    */, c[16]	/* was [4][4] */;
-    static integer i, j, m;
+	    */, c__[16]	/* was [4][4] */;
+    static integer i__, j, m;
     static doublereal s[4], scale;
     static integer iwork[4];
     static doublereal wi[4];
@@ -68,15 +69,19 @@ static integer c__4 = 4;
     static doublereal sep[4];
 
     /* Fortran I/O blocks */
-    static cilist io___17 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___18 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___19 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___20 = { 0, 0, 0, fmt_9998, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+#define b_ref(a_1,a_2) b[(a_2)*4 + a_1 - 5]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       June 30, 1999   
 
 
     Purpose   
@@ -95,8 +100,7 @@ static integer c__4 = 4;
     NUNIT   (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     infoc_1.nout = *nunit;
@@ -106,59 +110,59 @@ static integer c__4 = 4;
 /*     Initialize A, B and SEL */
 
     for (j = 1; j <= 4; ++j) {
-	for (i = 1; i <= 4; ++i) {
-	    a[i + (j << 2) - 5] = 0.;
-	    b[i + (j << 2) - 5] = 0.;
+	for (i__ = 1; i__ <= 4; ++i__) {
+	    a_ref(i__, j) = 0.;
+	    b_ref(i__, j) = 0.;
 /* L10: */
 	}
 /* L20: */
     }
-    for (i = 1; i <= 4; ++i) {
-	a[i + (i << 2) - 5] = 1.;
-	sel[i - 1] = TRUE_;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	a_ref(i__, i__) = 1.;
+	sel[i__ - 1] = TRUE_;
 /* L30: */
     }
 
 /*     Test DTRSYL */
 
-    s_copy(srnamc_1.srnamt, "DTRSYL", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DTRSYL", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
-    dtrsyl_("X", "N", &c__1, &c__0, &c__0, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("X", "N", &c__1, &c__0, &c__0, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 2;
-    dtrsyl_("N", "X", &c__1, &c__0, &c__0, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "X", &c__1, &c__0, &c__0, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 3;
-    dtrsyl_("N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 4;
-    dtrsyl_("N", "N", &c__1, &c_n1, &c__0, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "N", &c__1, &c_n1, &c__0, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 5;
-    dtrsyl_("N", "N", &c__1, &c__0, &c_n1, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "N", &c__1, &c__0, &c_n1, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 7;
-    dtrsyl_("N", "N", &c__1, &c__2, &c__0, a, &c__1, b, &c__1, c, &c__2, &
+    dtrsyl_("N", "N", &c__1, &c__2, &c__0, a, &c__1, b, &c__1, c__, &c__2, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 9;
-    dtrsyl_("N", "N", &c__1, &c__0, &c__2, a, &c__1, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "N", &c__1, &c__0, &c__2, a, &c__1, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 11;
-    dtrsyl_("N", "N", &c__1, &c__2, &c__0, a, &c__2, b, &c__1, c, &c__1, &
+    dtrsyl_("N", "N", &c__1, &c__2, &c__0, a, &c__2, b, &c__1, c__, &c__1, &
 	    scale, &info);
     chkxer_("DTRSYL", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
@@ -166,87 +170,96 @@ static integer c__4 = 4;
 
 /*     Test DTREXC */
 
-    s_copy(srnamc_1.srnamt, "DTREXC", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DTREXC", (ftnlen)6, (ftnlen)6);
+    ifst = 1;
+    ilst = 1;
     infoc_1.infot = 1;
-    dtrexc_("X", &c__1, a, &c__1, b, &c__1, &c__1, &c__1, work, &info);
+    dtrexc_("X", &c__1, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 7;
-    dtrexc_("N", &c__0, a, &c__1, b, &c__1, &c__1, &c__1, work, &info);
+    dtrexc_("N", &c__0, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 4;
-    dtrexc_("N", &c__2, a, &c__1, b, &c__1, &c__1, &c__2, work, &info);
+    ilst = 2;
+    dtrexc_("N", &c__2, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 6;
-    dtrexc_("V", &c__2, a, &c__2, b, &c__1, &c__1, &c__2, work, &info);
+    dtrexc_("V", &c__2, a, &c__2, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 7;
-    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &c__0, &c__1, work, &info);
+    ifst = 0;
+    ilst = 1;
+    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 7;
-    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &c__2, &c__1, work, &info);
+    ifst = 2;
+    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 8;
-    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &c__1, &c__0, work, &info);
+    ifst = 1;
+    ilst = 0;
+    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 8;
-    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &c__1, &c__2, work, &info);
+    ilst = 2;
+    dtrexc_("V", &c__1, a, &c__1, b, &c__1, &ifst, &ilst, work, &info);
     chkxer_("DTREXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     nt += 8;
 
 /*     Test DTRSNA */
 
-    s_copy(srnamc_1.srnamt, "DTRSNA", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DTRSNA", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
-    dtrsna_("X", "A", sel, &c__0, a, &c__1, b, &c__1, c, &c__1, s, sep, &c__1,
-	     &m, work, &c__1, iwork, &info);
+    dtrsna_("X", "A", sel, &c__0, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
+	    c__1, &m, work, &c__1, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 2;
-    dtrsna_("B", "X", sel, &c__0, a, &c__1, b, &c__1, c, &c__1, s, sep, &c__1,
-	     &m, work, &c__1, iwork, &info);
+    dtrsna_("B", "X", sel, &c__0, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
+	    c__1, &m, work, &c__1, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 4;
-    dtrsna_("B", "A", sel, &c_n1, a, &c__1, b, &c__1, c, &c__1, s, sep, &c__1,
-	     &m, work, &c__1, iwork, &info);
+    dtrsna_("B", "A", sel, &c_n1, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
+	    c__1, &m, work, &c__1, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 6;
-    dtrsna_("V", "A", sel, &c__2, a, &c__1, b, &c__1, c, &c__1, s, sep, &c__2,
-	     &m, work, &c__2, iwork, &info);
+    dtrsna_("V", "A", sel, &c__2, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
+	    c__2, &m, work, &c__2, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 8;
-    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__1, c, &c__2, s, sep, &c__2,
-	     &m, work, &c__2, iwork, &info);
+    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__1, c__, &c__2, s, sep, &
+	    c__2, &m, work, &c__2, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 10;
-    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__2, c, &c__1, s, sep, &c__2,
-	     &m, work, &c__2, iwork, &info);
+    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__2, c__, &c__1, s, sep, &
+	    c__2, &m, work, &c__2, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 13;
-    dtrsna_("B", "A", sel, &c__1, a, &c__1, b, &c__1, c, &c__1, s, sep, &c__0,
-	     &m, work, &c__1, iwork, &info);
+    dtrsna_("B", "A", sel, &c__1, a, &c__1, b, &c__1, c__, &c__1, s, sep, &
+	    c__0, &m, work, &c__1, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 13;
-    dtrsna_("B", "S", sel, &c__2, a, &c__2, b, &c__2, c, &c__2, s, sep, &c__1,
-	     &m, work, &c__2, iwork, &info);
+    dtrsna_("B", "S", sel, &c__2, a, &c__2, b, &c__2, c__, &c__2, s, sep, &
+	    c__1, &m, work, &c__2, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     infoc_1.infot = 16;
-    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__2, c, &c__2, s, sep, &c__2,
-	     &m, work, &c__1, iwork, &info);
+    dtrsna_("B", "A", sel, &c__2, a, &c__2, b, &c__2, c__, &c__2, s, sep, &
+	    c__2, &m, work, &c__1, iwork, &info);
     chkxer_("DTRSNA", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 	    infoc_1.ok);
     nt += 9;
@@ -254,7 +267,7 @@ static integer c__4 = 4;
 /*     Test DTRSEN */
 
     sel[0] = FALSE_;
-    s_copy(srnamc_1.srnamt, "DTRSEN", 6L, 6L);
+    s_copy(srnamc_1.srnamt, "DTRSEN", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
     dtrsen_("X", "N", sel, &c__0, a, &c__1, b, &c__1, wr, wi, &m, s, sep, 
 	    work, &c__1, iwork, &c__1, &info);
@@ -310,15 +323,15 @@ static integer c__4 = 4;
 /*     Print a summary line. */
 
     if (infoc_1.ok) {
-	io___17.ciunit = infoc_1.nout;
-	s_wsfe(&io___17);
-	do_fio(&c__1, path, 3L);
+	io___19.ciunit = infoc_1.nout;
+	s_wsfe(&io___19);
+	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, (char *)&nt, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
-	io___18.ciunit = infoc_1.nout;
-	s_wsfe(&io___18);
-	do_fio(&c__1, path, 3L);
+	io___20.ciunit = infoc_1.nout;
+	s_wsfe(&io___20);
+	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
@@ -327,4 +340,8 @@ static integer c__4 = 4;
 /*     End of DERREC */
 
 } /* derrec_ */
+
+#undef b_ref
+#undef a_ref
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,9 +19,9 @@ static integer c__6 = 6;
 
 /* Subroutine */ int zchkhs_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, doublereal *thresh, integer *nounit, 
-	doublecomplex *a, integer *lda, doublecomplex *h, doublecomplex *t1, 
-	doublecomplex *t2, doublecomplex *u, integer *ldu, doublecomplex *z, 
-	doublecomplex *uz, doublecomplex *w1, doublecomplex *w3, 
+	doublecomplex *a, integer *lda, doublecomplex *h__, doublecomplex *t1,
+	 doublecomplex *t2, doublecomplex *u, integer *ldu, doublecomplex *
+	z__, doublecomplex *uz, doublecomplex *w1, doublecomplex *w3, 
 	doublecomplex *evectl, doublecomplex *evectr, doublecomplex *evecty, 
 	doublecomplex *evectx, doublecomplex *uu, doublecomplex *tau, 
 	doublecomplex *work, integer *nwork, doublereal *rwork, integer *
@@ -41,6 +42,10 @@ static integer c__6 = 6;
 	    " \002,a,\002 incorrectly \002,\002normalized.\002,/\002 Bits of "
 	    "error=\002,0p,g10.3,\002,\002,9x,\002N=\002,i6,\002, JTYPE=\002,"
 	    "i6,\002, ISEED=(\002,3(i5,\002,\002),i5,\002)\002)";
+    static char fmt_9997[] = "(\002 ZCHKHS: Selected \002,a,\002 Eigenvector"
+	    "s from \002,a,\002 do not match other eigenvectors \002,9x,\002N="
+	    "\002,i6,\002, JTYPE=\002,i6,\002, ISEED=(\002,3(i5,\002,\002),i5,"
+	    "\002)\002)";
 
     /* System generated locals */
     integer a_dim1, a_offset, evectl_dim1, evectl_offset, evectr_dim1, 
@@ -60,8 +65,8 @@ static integer c__6 = 6;
     static doublereal cond;
     static integer jcol, nmax;
     static doublereal unfl, ovfl, temp1, temp2;
-    static integer i, j, n;
-    static logical badnn;
+    static integer i__, j, k, n;
+    static logical badnn, match;
     static integer imode;
     static doublereal dumma[4];
     static integer iinfo;
@@ -84,7 +89,7 @@ static integer c__6 = 6;
     static doublereal rtulp;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), dlabad_(doublereal *, doublereal *);
-    static integer in;
+    static integer jj, in;
     extern doublereal dlamch_(char *);
     static doublecomplex cdumma[4];
     static integer idumma[1];
@@ -139,20 +144,38 @@ static integer c__6 = 6;
     static cilist io___47 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___49 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___50 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___51 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___52 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___53 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___54 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___55 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___56 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___54 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___55 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9998, 0 };
     static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___61 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___63 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___64 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define h___subscr(a_1,a_2) (a_2)*h_dim1 + a_1
+#define h___ref(a_1,a_2) h__[h___subscr(a_1,a_2)]
+#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
+#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+#define uu_subscr(a_1,a_2) (a_2)*uu_dim1 + a_1
+#define uu_ref(a_1,a_2) uu[uu_subscr(a_1,a_2)]
+#define evectl_subscr(a_1,a_2) (a_2)*evectl_dim1 + a_1
+#define evectl_ref(a_1,a_2) evectl[evectl_subscr(a_1,a_2)]
+#define evectr_subscr(a_1,a_2) (a_2)*evectr_dim1 + a_1
+#define evectr_ref(a_1,a_2) evectr[evectr_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -304,8 +327,7 @@ static integer c__6 = 6;
 
     NTYPES - INTEGER   
              The number of elements in DOTYPE.   If it is zero, ZCHKHS   
-             does nothing.  It must be at least zero.  If it is MAXTYP+1 
-  
+             does nothing.  It must be at least zero.  If it is MAXTYP+1   
              and NSIZES is 1, then an additional type, MAXTYP+1 is   
              defined, which is to use whatever matrix is in A.  This   
              is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
@@ -324,14 +346,12 @@ static integer c__6 = 6;
 
     ISEED  - INTEGER array, dimension (4)   
              On entry ISEED specifies the seed of the random number   
-             generator. The array elements should be between 0 and 4095; 
-  
+             generator. The array elements should be between 0 and 4095;   
              if not they will be reduced mod 4096.  Also, ISEED(4) must   
              be odd.  The random number generator uses a linear   
              congruential sequence limited to small integers, and so   
              should produce machine independent random numbers. The   
-             values of ISEED are changed on exit, and can be used in the 
-  
+             values of ISEED are changed on exit, and can be used in the   
              next call to ZCHKHS to continue the same random number   
              sequence.   
              Modified.   
@@ -373,8 +393,7 @@ static integer c__6 = 6;
              Modified.   
 
     T2     - COMPLEX*16 array, dimension (LDA,max(NN))   
-             The Schur matrix computed by ZHSEQR when Z is not computed. 
-  
+             The Schur matrix computed by ZHSEQR when Z is not computed.   
              This should be identical to T1.   
              Modified.   
 
@@ -441,12 +460,10 @@ static integer c__6 = 6;
              Modified.   
 
     NWORK  - INTEGER   
-             The number of entries in WORK.  NWORK >= 4*NN(j)*NN(j) + 2. 
-  
+             The number of entries in WORK.  NWORK >= 4*NN(j)*NN(j) + 2.   
 
     RWORK  - DOUBLE PRECISION array, dimension (max(NN))   
-             Workspace.  Could be equivalenced to IWORK, but not SELECT. 
-  
+             Workspace.  Could be equivalenced to IWORK, but not SELECT.   
              Modified.   
 
     IWORK  - INTEGER array, dimension (max(NN))   
@@ -480,8 +497,7 @@ static integer c__6 = 6;
                  eigenvalue or to decompose the problem.   
              Modified.   
 
-   -----------------------------------------------------------------------
-   
+   -----------------------------------------------------------------------   
 
        Some Local Variables and Parameters:   
        ---- ----- --------- --- ----------   
@@ -519,48 +535,47 @@ static integer c__6 = 6;
        KCONDS(j)       Selects whether CONDS is to be 1 or   
                        1/sqrt(ulp).  (0 means irrelevant.)   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     t2_dim1 = *lda;
-    t2_offset = t2_dim1 + 1;
+    t2_offset = 1 + t2_dim1 * 1;
     t2 -= t2_offset;
     t1_dim1 = *lda;
-    t1_offset = t1_dim1 + 1;
+    t1_offset = 1 + t1_dim1 * 1;
     t1 -= t1_offset;
     h_dim1 = *lda;
-    h_offset = h_dim1 + 1;
-    h -= h_offset;
+    h_offset = 1 + h_dim1 * 1;
+    h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     uu_dim1 = *ldu;
-    uu_offset = uu_dim1 + 1;
+    uu_offset = 1 + uu_dim1 * 1;
     uu -= uu_offset;
     evectx_dim1 = *ldu;
-    evectx_offset = evectx_dim1 + 1;
+    evectx_offset = 1 + evectx_dim1 * 1;
     evectx -= evectx_offset;
     evecty_dim1 = *ldu;
-    evecty_offset = evecty_dim1 + 1;
+    evecty_offset = 1 + evecty_dim1 * 1;
     evecty -= evecty_offset;
     evectr_dim1 = *ldu;
-    evectr_offset = evectr_dim1 + 1;
+    evectr_offset = 1 + evectr_dim1 * 1;
     evectr -= evectr_offset;
     evectl_dim1 = *ldu;
-    evectl_offset = evectl_dim1 + 1;
+    evectl_offset = 1 + evectl_dim1 * 1;
     evectl -= evectl_offset;
     uz_dim1 = *ldu;
-    uz_offset = uz_dim1 + 1;
+    uz_offset = 1 + uz_dim1 * 1;
     uz -= uz_offset;
     z_dim1 = *ldu;
-    z_offset = z_dim1 + 1;
-    z -= z_offset;
+    z_offset = 1 + z_dim1 * 1;
+    z__ -= z_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     --w1;
     --w3;
@@ -653,7 +668,7 @@ static integer c__6 = 6;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L190;
+		goto L250;
 	    }
 	    ++nmats;
 	    ntest = 0;
@@ -680,12 +695,9 @@ static integer c__6 = 6;
          =1  O(1)   1       clustered 1  zero   
          =2  large  large   clustered 2  identity   
          =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues
-)   
-         =5                 random log   hermitian, w/ eigenvalues
-   
-         =6                 random       general, w/ eigenvalues 
-  
+         =4                 arithmetic   diagonal, (w/ eigenvalues)   
+         =5                 random log   hermitian, w/ eigenvalues   
+         =6                 random       general, w/ eigenvalues   
          =7                              random diagonal   
          =8                              random hermitian   
          =9                              random general   
@@ -737,7 +749,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 /* L80: */
 		}
@@ -748,10 +760,10 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = jcol + jcol * a_dim1;
+		    i__4 = a_subscr(jcol, jcol);
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 		    if (jcol > 1) {
-			i__4 = jcol + (jcol - 1) * a_dim1;
+			i__4 = a_subscr(jcol, jcol - 1);
 			a[i__4].r = 1., a[i__4].i = 0.;
 		    }
 /* L90: */
@@ -839,7 +851,7 @@ L70:
 	    if (iinfo != 0) {
 		io___35.ciunit = *nounit;
 		s_wsfe(&io___35);
-		do_fio(&c__1, "Generator", 9L);
+		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -853,44 +865,44 @@ L100:
 
 /*           Call ZGEHRD to compute H and U, do tests. */
 
-	    zlacpy_(" ", &n, &n, &a[a_offset], lda, &h[h_offset], lda);
+	    zlacpy_(" ", &n, &n, &a[a_offset], lda, &h__[h_offset], lda);
 	    ntest = 1;
 
 	    ilo = 1;
 	    ihi = n;
 
 	    i__3 = *nwork - n;
-	    zgehrd_(&n, &ilo, &ihi, &h[h_offset], lda, &work[1], &work[n + 1],
-		     &i__3, &iinfo);
+	    zgehrd_(&n, &ilo, &ihi, &h__[h_offset], lda, &work[1], &work[n + 
+		    1], &i__3, &iinfo);
 
 	    if (iinfo != 0) {
 		result[1] = ulpinv;
 		io___38.ciunit = *nounit;
 		s_wsfe(&io___38);
-		do_fio(&c__1, "ZGEHRD", 6L);
+		do_fio(&c__1, "ZGEHRD", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L240;
 	    }
 
 	    i__3 = n - 1;
 	    for (j = 1; j <= i__3; ++j) {
-		i__4 = j + 1 + j * uu_dim1;
+		i__4 = uu_subscr(j + 1, j);
 		uu[i__4].r = 0., uu[i__4].i = 0.;
 		i__4 = n;
-		for (i = j + 2; i <= i__4; ++i) {
-		    i__5 = i + j * u_dim1;
-		    i__6 = i + j * h_dim1;
-		    u[i__5].r = h[i__6].r, u[i__5].i = h[i__6].i;
-		    i__5 = i + j * uu_dim1;
-		    i__6 = i + j * h_dim1;
-		    uu[i__5].r = h[i__6].r, uu[i__5].i = h[i__6].i;
-		    i__5 = i + j * h_dim1;
-		    h[i__5].r = 0., h[i__5].i = 0.;
+		for (i__ = j + 2; i__ <= i__4; ++i__) {
+		    i__5 = u_subscr(i__, j);
+		    i__6 = h___subscr(i__, j);
+		    u[i__5].r = h__[i__6].r, u[i__5].i = h__[i__6].i;
+		    i__5 = uu_subscr(i__, j);
+		    i__6 = h___subscr(i__, j);
+		    uu[i__5].r = h__[i__6].r, uu[i__5].i = h__[i__6].i;
+		    i__5 = h___subscr(i__, j);
+		    h__[i__5].r = 0., h__[i__5].i = 0.;
 /* L110: */
 		}
 /* L120: */
@@ -901,14 +913,14 @@ L100:
 		     &i__3, &iinfo);
 	    ntest = 2;
 
-	    zhst01_(&n, &ilo, &ihi, &a[a_offset], lda, &h[h_offset], lda, &u[
-		    u_offset], ldu, &work[1], nwork, &rwork[1], &result[1]);
+	    zhst01_(&n, &ilo, &ihi, &a[a_offset], lda, &h__[h_offset], lda, &
+		    u[u_offset], ldu, &work[1], nwork, &rwork[1], &result[1]);
 
 /*           Call ZHSEQR to compute T1, T2 and Z, do tests.   
 
              Eigenvalues only (W3) */
 
-	    zlacpy_(" ", &n, &n, &h[h_offset], lda, &t2[t2_offset], lda);
+	    zlacpy_(" ", &n, &n, &h__[h_offset], lda, &t2[t2_offset], lda);
 	    ntest = 3;
 	    result[3] = ulpinv;
 
@@ -917,7 +929,7 @@ L100:
 	    if (iinfo != 0) {
 		io___40.ciunit = *nounit;
 		s_wsfe(&io___40);
-		do_fio(&c__1, "ZHSEQR(E)", 9L);
+		do_fio(&c__1, "ZHSEQR(E)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -925,33 +937,32 @@ L100:
 		e_wsfe();
 		if (iinfo <= n + 2) {
 		    *info = abs(iinfo);
-		    goto L180;
+		    goto L240;
 		}
 	    }
 
 /*           Eigenvalues (W1) and Full Schur Form (T2) */
 
-	    zlacpy_(" ", &n, &n, &h[h_offset], lda, &t2[t2_offset], lda);
+	    zlacpy_(" ", &n, &n, &h__[h_offset], lda, &t2[t2_offset], lda);
 
 	    zhseqr_("S", "N", &n, &ilo, &ihi, &t2[t2_offset], lda, &w1[1], &
 		    uz[uz_offset], ldu, &work[1], nwork, &iinfo);
 	    if (iinfo != 0 && iinfo <= n + 2) {
 		io___41.ciunit = *nounit;
 		s_wsfe(&io___41);
-		do_fio(&c__1, "ZHSEQR(S)", 9L);
+		do_fio(&c__1, "ZHSEQR(S)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L240;
 	    }
 
-/*           Eigenvalues (W1), Schur Form (T1), and Schur Vectors 
-(UZ) */
+/*           Eigenvalues (W1), Schur Form (T1), and Schur Vectors (UZ) */
 
-	    zlacpy_(" ", &n, &n, &h[h_offset], lda, &t1[t1_offset], lda);
+	    zlacpy_(" ", &n, &n, &h__[h_offset], lda, &t1[t1_offset], lda);
 	    zlacpy_(" ", &n, &n, &u[u_offset], ldu, &uz[uz_offset], ldu);
 
 	    zhseqr_("S", "V", &n, &ilo, &ihi, &t1[t1_offset], lda, &w1[1], &
@@ -959,27 +970,28 @@ L100:
 	    if (iinfo != 0 && iinfo <= n + 2) {
 		io___42.ciunit = *nounit;
 		s_wsfe(&io___42);
-		do_fio(&c__1, "ZHSEQR(V)", 9L);
+		do_fio(&c__1, "ZHSEQR(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L240;
 	    }
 
 /*           Compute Z = U' UZ */
 
 	    zgemm_("C", "N", &n, &n, &n, &c_b2, &u[u_offset], ldu, &uz[
-		    uz_offset], ldu, &c_b1, &z[z_offset], ldu);
+		    uz_offset], ldu, &c_b1, &z__[z_offset], ldu);
 	    ntest = 8;
 
 /*           Do Tests 3: | H - Z T Z' | / ( |H| n ulp )   
                   and 4: | I - Z Z' | / ( n ulp ) */
 
-	    zhst01_(&n, &ilo, &ihi, &h[h_offset], lda, &t1[t1_offset], lda, &
-		    z[z_offset], ldu, &work[1], nwork, &rwork[1], &result[3]);
+	    zhst01_(&n, &ilo, &ihi, &h__[h_offset], lda, &t1[t1_offset], lda, 
+		    &z__[z_offset], ldu, &work[1], nwork, &rwork[1], &result[
+		    3]);
 
 /*           Do Tests 5: | A - UZ T (UZ)' | / ( |A| n ulp )   
                   and 6: | I - UZ (UZ)' | / ( n ulp ) */
@@ -1023,25 +1035,33 @@ L100:
 
 	    ntest = 9;
 	    result[9] = ulpinv;
+
+/*           Select every other eigenvector */
+
 	    i__3 = n;
 	    for (j = 1; j <= i__3; ++j) {
-		select[j] = TRUE_;
+		select[j] = FALSE_;
 /* L140: */
 	    }
-	    ztrevc_("Right", "Some", &select[1], &n, &t1[t1_offset], lda, 
+	    i__3 = n;
+	    for (j = 1; j <= i__3; j += 2) {
+		select[j] = TRUE_;
+/* L150: */
+	    }
+	    ztrevc_("Right", "All", &select[1], &n, &t1[t1_offset], lda, 
 		    cdumma, ldu, &evectr[evectr_offset], ldu, &n, &in, &work[
 		    1], &rwork[1], &iinfo);
 	    if (iinfo != 0) {
 		io___47.ciunit = *nounit;
 		s_wsfe(&io___47);
-		do_fio(&c__1, "ZTREVC(R)", 9L);
+		do_fio(&c__1, "ZTREVC(R,A)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L240;
 	    }
 
 /*           Test 9:  | TR - RW | / ( |T| |R| ulp ) */
@@ -1052,9 +1072,60 @@ L100:
 	    if (dumma[1] > *thresh) {
 		io___49.ciunit = *nounit;
 		s_wsfe(&io___49);
-		do_fio(&c__1, "Right", 5L);
-		do_fio(&c__1, "ZTREVC", 6L);
+		do_fio(&c__1, "Right", (ftnlen)5);
+		do_fio(&c__1, "ZTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(doublereal));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+/*           Compute selected right eigenvectors and confirm that   
+             they agree with previous right eigenvectors */
+
+	    ztrevc_("Right", "Some", &select[1], &n, &t1[t1_offset], lda, 
+		    cdumma, ldu, &evectl[evectl_offset], ldu, &n, &in, &work[
+		    1], &rwork[1], &iinfo);
+	    if (iinfo != 0) {
+		io___50.ciunit = *nounit;
+		s_wsfe(&io___50);
+		do_fio(&c__1, "ZTREVC(R,S)", (ftnlen)11);
+		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+		*info = abs(iinfo);
+		goto L240;
+	    }
+
+	    k = 1;
+	    match = TRUE_;
+	    i__3 = n;
+	    for (j = 1; j <= i__3; ++j) {
+		if (select[j]) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			i__5 = evectr_subscr(jj, j);
+			i__6 = evectl_subscr(jj, k);
+			if (evectr[i__5].r != evectl[i__6].r || evectr[i__5]
+				.i != evectl[i__6].i) {
+			    match = FALSE_;
+			    goto L180;
+			}
+/* L160: */
+		    }
+		    ++k;
+		}
+/* L170: */
+	    }
+L180:
+	    if (! match) {
+		io___54.ciunit = *nounit;
+		s_wsfe(&io___54);
+		do_fio(&c__1, "Right", (ftnlen)5);
+		do_fio(&c__1, "ZTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
@@ -1065,25 +1136,20 @@ L100:
 
 	    ntest = 10;
 	    result[10] = ulpinv;
-	    i__3 = n;
-	    for (j = 1; j <= i__3; ++j) {
-		select[j] = TRUE_;
-/* L150: */
-	    }
-	    ztrevc_("Left", "Some", &select[1], &n, &t1[t1_offset], lda, &
+	    ztrevc_("Left", "All", &select[1], &n, &t1[t1_offset], lda, &
 		    evectl[evectl_offset], ldu, cdumma, ldu, &n, &in, &work[1]
 		    , &rwork[1], &iinfo);
 	    if (iinfo != 0) {
-		io___50.ciunit = *nounit;
-		s_wsfe(&io___50);
-		do_fio(&c__1, "ZTREVC(L)", 9L);
+		io___55.ciunit = *nounit;
+		s_wsfe(&io___55);
+		do_fio(&c__1, "ZTREVC(L,A)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
 		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
 		e_wsfe();
 		*info = abs(iinfo);
-		goto L180;
+		goto L240;
 	    }
 
 /*           Test 10:  | LT - WL | / ( |T| |L| ulp ) */
@@ -1093,10 +1159,10 @@ L100:
 		    2]);
 	    result[10] = dumma[2];
 	    if (dumma[3] > *thresh) {
-		io___51.ciunit = *nounit;
-		s_wsfe(&io___51);
-		do_fio(&c__1, "Left", 4L);
-		do_fio(&c__1, "ZTREVC", 6L);
+		io___56.ciunit = *nounit;
+		s_wsfe(&io___56);
+		do_fio(&c__1, "Left", (ftnlen)4);
+		do_fio(&c__1, "ZTREVC", (ftnlen)6);
 		do_fio(&c__1, (char *)&dumma[3], (ftnlen)sizeof(doublereal));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1104,25 +1170,75 @@ L100:
 		e_wsfe();
 	    }
 
-/*           Call ZHSEIN for Right eigenvectors of H, do test 11 
-*/
+/*           Compute selected left eigenvectors and confirm that   
+             they agree with previous left eigenvectors */
+
+	    ztrevc_("Left", "Some", &select[1], &n, &t1[t1_offset], lda, &
+		    evectr[evectr_offset], ldu, cdumma, ldu, &n, &in, &work[1]
+		    , &rwork[1], &iinfo);
+	    if (iinfo != 0) {
+		io___57.ciunit = *nounit;
+		s_wsfe(&io___57);
+		do_fio(&c__1, "ZTREVC(L,S)", (ftnlen)11);
+		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+		*info = abs(iinfo);
+		goto L240;
+	    }
+
+	    k = 1;
+	    match = TRUE_;
+	    i__3 = n;
+	    for (j = 1; j <= i__3; ++j) {
+		if (select[j]) {
+		    i__4 = n;
+		    for (jj = 1; jj <= i__4; ++jj) {
+			i__5 = evectl_subscr(jj, j);
+			i__6 = evectr_subscr(jj, k);
+			if (evectl[i__5].r != evectr[i__6].r || evectl[i__5]
+				.i != evectr[i__6].i) {
+			    match = FALSE_;
+			    goto L210;
+			}
+/* L190: */
+		    }
+		    ++k;
+		}
+/* L200: */
+	    }
+L210:
+	    if (! match) {
+		io___58.ciunit = *nounit;
+		s_wsfe(&io___58);
+		do_fio(&c__1, "Left", (ftnlen)4);
+		do_fio(&c__1, "ZTREVC", (ftnlen)6);
+		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer));
+		e_wsfe();
+	    }
+
+/*           Call ZHSEIN for Right eigenvectors of H, do test 11 */
 
 	    ntest = 11;
 	    result[11] = ulpinv;
 	    i__3 = n;
 	    for (j = 1; j <= i__3; ++j) {
 		select[j] = TRUE_;
-/* L160: */
+/* L220: */
 	    }
 
-	    zhsein_("Right", "Qr", "Ninitv", &select[1], &n, &h[h_offset], 
+	    zhsein_("Right", "Qr", "Ninitv", &select[1], &n, &h__[h_offset], 
 		    lda, &w3[1], cdumma, ldu, &evectx[evectx_offset], ldu, &
 		    n1, &in, &work[1], &rwork[1], &iwork[1], &iwork[1], &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___52.ciunit = *nounit;
-		s_wsfe(&io___52);
-		do_fio(&c__1, "ZHSEIN(R)", 9L);
+		io___59.ciunit = *nounit;
+		s_wsfe(&io___59);
+		do_fio(&c__1, "ZHSEIN(R)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1130,7 +1246,7 @@ L100:
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L240;
 		}
 	    } else {
 
@@ -1138,17 +1254,17 @@ L100:
 
                           (from inverse iteration) */
 
-		zget22_("N", "N", "N", &n, &h[h_offset], lda, &evectx[
+		zget22_("N", "N", "N", &n, &h__[h_offset], lda, &evectx[
 			evectx_offset], ldu, &w3[1], &work[1], &rwork[1], 
 			dumma);
 		if (dumma[0] < ulpinv) {
 		    result[11] = dumma[0] * aninv;
 		}
 		if (dumma[1] > *thresh) {
-		    io___53.ciunit = *nounit;
-		    s_wsfe(&io___53);
-		    do_fio(&c__1, "Right", 5L);
-		    do_fio(&c__1, "ZHSEIN", 6L);
+		    io___60.ciunit = *nounit;
+		    s_wsfe(&io___60);
+		    do_fio(&c__1, "Right", (ftnlen)5);
+		    do_fio(&c__1, "ZHSEIN", (ftnlen)6);
 		    do_fio(&c__1, (char *)&dumma[1], (ftnlen)sizeof(
 			    doublereal));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1166,16 +1282,17 @@ L100:
 	    i__3 = n;
 	    for (j = 1; j <= i__3; ++j) {
 		select[j] = TRUE_;
-/* L170: */
+/* L230: */
 	    }
 
-	    zhsein_("Left", "Qr", "Ninitv", &select[1], &n, &h[h_offset], lda,
-		     &w3[1], &evecty[evecty_offset], ldu, cdumma, ldu, &n1, &
-		    in, &work[1], &rwork[1], &iwork[1], &iwork[1], &iinfo);
+	    zhsein_("Left", "Qr", "Ninitv", &select[1], &n, &h__[h_offset], 
+		    lda, &w3[1], &evecty[evecty_offset], ldu, cdumma, ldu, &
+		    n1, &in, &work[1], &rwork[1], &iwork[1], &iwork[1], &
+		    iinfo);
 	    if (iinfo != 0) {
-		io___54.ciunit = *nounit;
-		s_wsfe(&io___54);
-		do_fio(&c__1, "ZHSEIN(L)", 9L);
+		io___61.ciunit = *nounit;
+		s_wsfe(&io___61);
+		do_fio(&c__1, "ZHSEIN(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1183,7 +1300,7 @@ L100:
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L240;
 		}
 	    } else {
 
@@ -1191,17 +1308,17 @@ L100:
 
                           (from inverse iteration) */
 
-		zget22_("C", "N", "C", &n, &h[h_offset], lda, &evecty[
+		zget22_("C", "N", "C", &n, &h__[h_offset], lda, &evecty[
 			evecty_offset], ldu, &w3[1], &work[1], &rwork[1], &
 			dumma[2]);
 		if (dumma[2] < ulpinv) {
 		    result[12] = dumma[2] * aninv;
 		}
 		if (dumma[3] > *thresh) {
-		    io___55.ciunit = *nounit;
-		    s_wsfe(&io___55);
-		    do_fio(&c__1, "Left", 4L);
-		    do_fio(&c__1, "ZHSEIN", 6L);
+		    io___62.ciunit = *nounit;
+		    s_wsfe(&io___62);
+		    do_fio(&c__1, "Left", (ftnlen)4);
+		    do_fio(&c__1, "ZHSEIN", (ftnlen)6);
 		    do_fio(&c__1, (char *)&dumma[3], (ftnlen)sizeof(
 			    doublereal));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1212,8 +1329,7 @@ L100:
 		}
 	    }
 
-/*           Call ZUNMHR for Right eigenvectors of A, do test 13 
-*/
+/*           Call ZUNMHR for Right eigenvectors of A, do test 13 */
 
 	    ntest = 13;
 	    result[13] = ulpinv;
@@ -1222,9 +1338,9 @@ L100:
 		    , ldu, &tau[1], &evectx[evectx_offset], ldu, &work[1], 
 		    nwork, &iinfo);
 	    if (iinfo != 0) {
-		io___56.ciunit = *nounit;
-		s_wsfe(&io___56);
-		do_fio(&c__1, "ZUNMHR(L)", 9L);
+		io___63.ciunit = *nounit;
+		s_wsfe(&io___63);
+		do_fio(&c__1, "ZUNMHR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1232,7 +1348,7 @@ L100:
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L240;
 		}
 	    } else {
 
@@ -1257,9 +1373,9 @@ L100:
 		    , ldu, &tau[1], &evecty[evecty_offset], ldu, &work[1], 
 		    nwork, &iinfo);
 	    if (iinfo != 0) {
-		io___57.ciunit = *nounit;
-		s_wsfe(&io___57);
-		do_fio(&c__1, "ZUNMHR(L)", 9L);
+		io___64.ciunit = *nounit;
+		s_wsfe(&io___64);
+		do_fio(&c__1, "ZUNMHR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -1267,7 +1383,7 @@ L100:
 		e_wsfe();
 		*info = abs(iinfo);
 		if (iinfo < 0) {
-		    goto L180;
+		    goto L240;
 		}
 	    } else {
 
@@ -1285,16 +1401,16 @@ L100:
 
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
-L180:
+L240:
 
 	    ntestt += ntest;
 	    dlafts_("ZHS", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
 		     nounit, &nerrs);
 
-L190:
+L250:
 	    ;
 	}
-/* L200: */
+/* L260: */
     }
 
 /*     Summary */
@@ -1307,4 +1423,18 @@ L190:
 /*     End of ZCHKHS */
 
 } /* zchkhs_ */
+
+#undef evectr_ref
+#undef evectr_subscr
+#undef evectl_ref
+#undef evectl_subscr
+#undef uu_ref
+#undef uu_subscr
+#undef u_ref
+#undef u_subscr
+#undef h___ref
+#undef h___subscr
+#undef a_ref
+#undef a_subscr
+
 

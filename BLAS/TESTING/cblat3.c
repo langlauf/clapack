@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -40,7 +41,7 @@ static integer c__65 = 65;
 static integer c__7 = 7;
 static integer c__6 = 6;
 static integer c__2 = 2;
-static real c_b89 = 1.f;
+static real c_b87 = 1.f;
 static logical c_true = TRUE_;
 static logical c_false = FALSE_;
 static integer c__0 = 0;
@@ -89,9 +90,8 @@ static integer c_n1 = -1;
 	    "IN PROGRAM\002,/\002 ******* TESTS ABANDONED *******\002)";
 
     /* System generated locals */
-    integer i__1, i__2, i__3, i__4;
+    integer i__1, i__2, i__3, i__4, i__5;
     real r__1;
-    doublereal d__1;
     olist o__1;
     cllist cl__1;
 
@@ -132,9 +132,9 @@ static integer c_n1 = -1;
 	    integer *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, complex *, complex *, complex *, complex *, complex *, 
 	    complex *, complex *, complex *, complex *, real *, complex *);
-    static complex c[4225]	/* was [65][65] */;
+    static complex c__[4225]	/* was [65][65] */;
     static real g[65];
-    static integer i, j;
+    static integer i__, j;
     extern /* Subroutine */ int cchke_(integer *, char *, integer *);
     static integer n;
     static logical fatal;
@@ -205,69 +205,64 @@ static integer c_n1 = -1;
 
 
 
-/*  Test program for the COMPLEX          Level 3 Blas. */
+#define c___subscr(a_1,a_2) (a_2)*65 + a_1 - 66
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define ab_subscr(a_1,a_2) (a_2)*65 + a_1 - 66
+#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+#define snames_ref(a_0,a_1) &snames[(a_1)*6 + a_0 - 6]
 
-/*  The program must be driven by a short data file. The first 14 records 
-*/
-/*  of the file are read using list-directed input, the last 9 records */
-/*  are read using the format ( A6, L2 ). An annotated example of a data 
-*/
-/*  file can be obtained by deleting the first 3 characters from the */
-/*  following 23 lines: */
-/*  'CBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE */
-/*  6                 UNIT NUMBER OF SUMMARY FILE */
-/*  'CBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE */
-/*  -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0) */
-/*  F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD. */
-/*  F        LOGICAL FLAG, T TO STOP ON FAILURES. */
-/*  T        LOGICAL FLAG, T TO TEST ERROR EXITS. */
-/*  16.0     THRESHOLD VALUE OF TEST RATIO */
-/*  6                 NUMBER OF VALUES OF N */
-/*  0 1 2 3 5 9       VALUES OF N */
-/*  3                 NUMBER OF VALUES OF ALPHA */
-/*  (0.0,0.0) (1.0,0.0) (0.7,-0.9)       VALUES OF ALPHA */
-/*  3                 NUMBER OF VALUES OF BETA */
-/*  (0.0,0.0) (1.0,0.0) (1.3,-1.1)       VALUES OF BETA */
-/*  CGEMM  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CHEMM  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CSYMM  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CTRMM  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CTRSM  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CHERK  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CSYRK  T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CHER2K T PUT F FOR NO TEST. SAME COLUMNS. */
-/*  CSYR2K T PUT F FOR NO TEST. SAME COLUMNS. */
 
-/*  See: */
+/*  Test program for the COMPLEX          Level 3 Blas.   
 
-/*     Dongarra J. J., Du Croz J. J., Duff I. S. and Hammarling S. */
-/*     A Set of Level 3 Basic Linear Algebra Subprograms. */
+    The program must be driven by a short data file. The first 14 records   
+    of the file are read using list-directed input, the last 9 records   
+    are read using the format ( A6, L2 ). An annotated example of a data   
+    file can be obtained by deleting the first 3 characters from the   
+    following 23 lines:   
+    'CBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE   
+    6                 UNIT NUMBER OF SUMMARY FILE   
+    'CBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE   
+    -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)   
+    F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.   
+    F        LOGICAL FLAG, T TO STOP ON FAILURES.   
+    T        LOGICAL FLAG, T TO TEST ERROR EXITS.   
+    16.0     THRESHOLD VALUE OF TEST RATIO   
+    6                 NUMBER OF VALUES OF N   
+    0 1 2 3 5 9       VALUES OF N   
+    3                 NUMBER OF VALUES OF ALPHA   
+    (0.0,0.0) (1.0,0.0) (0.7,-0.9)       VALUES OF ALPHA   
+    3                 NUMBER OF VALUES OF BETA   
+    (0.0,0.0) (1.0,0.0) (1.3,-1.1)       VALUES OF BETA   
+    CGEMM  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CHEMM  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CSYMM  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CTRMM  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CTRSM  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CHERK  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CSYRK  T PUT F FOR NO TEST. SAME COLUMNS.   
+    CHER2K T PUT F FOR NO TEST. SAME COLUMNS.   
+    CSYR2K T PUT F FOR NO TEST. SAME COLUMNS.   
 
-/*     Technical Memorandum No.88 (Revision 1), Mathematics and */
-/*     Computer Science Division, Argonne National Laboratory, 9700 */
-/*     South Cass Avenue, Argonne, Illinois 60439, US. */
+    See:   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+       Dongarra J. J., Du Croz J. J., Duff I. S. and Hammarling S.   
+       A Set of Level 3 Basic Linear Algebra Subprograms.   
 
-/*     .. Parameters .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-/*     .. Executable Statements .. */
+       Technical Memorandum No.88 (Revision 1), Mathematics and   
+       Computer Science Division, Argonne National Laboratory, 9700   
+       South Cass Avenue, Argonne, Illinois 60439, US.   
 
-/*     Read name and unit number for summary output file and open file. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+
+       Read name and unit number for summary output file and open file. */
 
     s_rsle(&io___2);
-    do_lio(&c__9, &c__1, summry, 32L);
+    do_lio(&c__9, &c__1, summry, (ftnlen)32);
     e_rsle();
     s_rsle(&io___4);
     do_lio(&c__3, &c__1, (char *)&nout, (ftnlen)sizeof(integer));
@@ -277,18 +272,17 @@ static integer c_n1 = -1;
     o__1.ofnmlen = 32;
     o__1.ofnm = summry;
     o__1.orl = 0;
-    o__1.osta = "NEW";
+    o__1.osta = 0;
     o__1.oacc = 0;
     o__1.ofm = 0;
     o__1.oblnk = 0;
     f_open(&o__1);
     infoc_1.noutc = nout;
 
-/*     Read name and unit number for snapshot output file and open file. 
-*/
+/*     Read name and unit number for snapshot output file and open file. */
 
     s_rsle(&io___6);
-    do_lio(&c__9, &c__1, snaps, 32L);
+    do_lio(&c__9, &c__1, snaps, (ftnlen)32);
     e_rsle();
     s_rsle(&io___8);
     do_lio(&c__3, &c__1, (char *)&ntra, (ftnlen)sizeof(integer));
@@ -300,7 +294,7 @@ static integer c_n1 = -1;
 	o__1.ofnmlen = 32;
 	o__1.ofnm = snaps;
 	o__1.orl = 0;
-	o__1.osta = "NEW";
+	o__1.osta = 0;
 	o__1.oacc = 0;
 	o__1.ofm = 0;
 	o__1.oblnk = 0;
@@ -315,8 +309,7 @@ static integer c_n1 = -1;
     s_rsle(&io___13);
     do_lio(&c__8, &c__1, (char *)&sfatal, (ftnlen)sizeof(logical));
     e_rsle();
-/*     Read the flag that indicates whether error exits are to be tested. 
-*/
+/*     Read the flag that indicates whether error exits are to be tested. */
     s_rsle(&io___15);
     do_lio(&c__8, &c__1, (char *)&tsterr, (ftnlen)sizeof(logical));
     e_rsle();
@@ -325,29 +318,29 @@ static integer c_n1 = -1;
     do_lio(&c__4, &c__1, (char *)&thresh, (ftnlen)sizeof(real));
     e_rsle();
 
-/*     Read and check the parameter values for the tests. */
+/*     Read and check the parameter values for the tests.   
 
-/*     Values of N */
+       Values of N */
     s_rsle(&io___19);
     do_lio(&c__3, &c__1, (char *)&nidim, (ftnlen)sizeof(integer));
     e_rsle();
     if (nidim < 1 || nidim > 9) {
 	io___21.ciunit = nout;
 	s_wsfe(&io___21);
-	do_fio(&c__1, "N", 1L);
+	do_fio(&c__1, "N", (ftnlen)1);
 	do_fio(&c__1, (char *)&c__9, (ftnlen)sizeof(integer));
 	e_wsfe();
 	goto L220;
     }
     s_rsle(&io___22);
     i__1 = nidim;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__3, &c__1, (char *)&idim[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__3, &c__1, (char *)&idim[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_rsle();
     i__1 = nidim;
-    for (i = 1; i <= i__1; ++i) {
-	if (idim[i - 1] < 0 || idim[i - 1] > 65) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	if (idim[i__ - 1] < 0 || idim[i__ - 1] > 65) {
 	    io___25.ciunit = nout;
 	    s_wsfe(&io___25);
 	    do_fio(&c__1, (char *)&c__65, (ftnlen)sizeof(integer));
@@ -363,15 +356,15 @@ static integer c_n1 = -1;
     if (nalf < 1 || nalf > 7) {
 	io___28.ciunit = nout;
 	s_wsfe(&io___28);
-	do_fio(&c__1, "ALPHA", 5L);
+	do_fio(&c__1, "ALPHA", (ftnlen)5);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
 	goto L220;
     }
     s_rsle(&io___29);
     i__1 = nalf;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__6, &c__1, (char *)&alf[i - 1], (ftnlen)sizeof(complex));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__6, &c__1, (char *)&alf[i__ - 1], (ftnlen)sizeof(complex));
     }
     e_rsle();
 /*     Values of BETA */
@@ -381,15 +374,15 @@ static integer c_n1 = -1;
     if (nbet < 1 || nbet > 7) {
 	io___33.ciunit = nout;
 	s_wsfe(&io___33);
-	do_fio(&c__1, "BETA", 4L);
+	do_fio(&c__1, "BETA", (ftnlen)4);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
 	goto L220;
     }
     s_rsle(&io___34);
     i__1 = nbet;
-    for (i = 1; i <= i__1; ++i) {
-	do_lio(&c__6, &c__1, (char *)&bet[i - 1], (ftnlen)sizeof(complex));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_lio(&c__6, &c__1, (char *)&bet[i__ - 1], (ftnlen)sizeof(complex));
     }
     e_rsle();
 
@@ -401,22 +394,22 @@ static integer c_n1 = -1;
     io___37.ciunit = nout;
     s_wsfe(&io___37);
     i__1 = nidim;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__1, (char *)&idim[i - 1], (ftnlen)sizeof(integer));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__1, (char *)&idim[i__ - 1], (ftnlen)sizeof(integer));
     }
     e_wsfe();
     io___38.ciunit = nout;
     s_wsfe(&io___38);
     i__1 = nalf;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__2, (char *)&alf[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__2, (char *)&alf[i__ - 1], (ftnlen)sizeof(real));
     }
     e_wsfe();
     io___39.ciunit = nout;
     s_wsfe(&io___39);
     i__1 = nbet;
-    for (i = 1; i <= i__1; ++i) {
-	do_fio(&c__2, (char *)&bet[i - 1], (ftnlen)sizeof(real));
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	do_fio(&c__2, (char *)&bet[i__ - 1], (ftnlen)sizeof(real));
     }
     e_wsfe();
     if (! tsterr) {
@@ -438,11 +431,11 @@ static integer c_n1 = -1;
     s_wsle(&io___44);
     e_wsle();
 
-/*     Read names of subroutines and flags which indicate */
-/*     whether they are to be tested. */
+/*     Read names of subroutines and flags which indicate   
+       whether they are to be tested. */
 
-    for (i = 1; i <= 9; ++i) {
-	ltest[i - 1] = FALSE_;
+    for (i__ = 1; i__ <= 9; ++i__) {
+	ltest[i__ - 1] = FALSE_;
 /* L20: */
     }
 L30:
@@ -450,7 +443,7 @@ L30:
     if (i__1 != 0) {
 	goto L60;
     }
-    i__1 = do_fio(&c__1, snamet, 6L);
+    i__1 = do_fio(&c__1, snamet, (ftnlen)6);
     if (i__1 != 0) {
 	goto L60;
     }
@@ -462,19 +455,19 @@ L30:
     if (i__1 != 0) {
 	goto L60;
     }
-    for (i = 1; i <= 9; ++i) {
-	if (s_cmp(snamet, snames + (i - 1) * 6, 6L, 6L) == 0) {
+    for (i__ = 1; i__ <= 9; ++i__) {
+	if (s_cmp(snamet, snames_ref(0, i__), (ftnlen)6, (ftnlen)6) == 0) {
 	    goto L50;
 	}
 /* L40: */
     }
     io___49.ciunit = nout;
     s_wsfe(&io___49);
-    do_fio(&c__1, snamet, 6L);
+    do_fio(&c__1, snamet, (ftnlen)6);
     e_wsfe();
-    s_stop("", 0L);
+    s_stop("", (ftnlen)0);
 L50:
-    ltest[i - 1] = ltestt;
+    ltest[i__ - 1] = ltestt;
     goto L30;
 
 L60:
@@ -488,7 +481,7 @@ L60:
     eps = 1.f;
 L70:
     r__1 = eps + 1.f;
-    if (sdiff_(&r__1, &c_b89) == 0.f) {
+    if (sdiff_(&r__1, &c_b87) == 0.f) {
 	goto L80;
     }
     eps *= .5f;
@@ -506,111 +499,109 @@ L80:
     i__1 = n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = n;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * 65 - 66;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = ab_subscr(i__, j);
 /* Computing MAX */
-	    i__4 = i - j + 1;
-	    d__1 = (doublereal) max(i__4,0);
-	    ab[i__3].r = d__1, ab[i__3].i = 0.f;
+	    i__5 = i__ - j + 1;
+	    i__4 = max(i__5,0);
+	    ab[i__3].r = (real) i__4, ab[i__3].i = 0.f;
 /* L90: */
 	}
-	i__2 = j + 4224;
+	i__2 = ab_subscr(j, 66);
 	ab[i__2].r = (real) j, ab[i__2].i = 0.f;
-	i__2 = (j + 65) * 65 - 65;
+	i__2 = ab_subscr(1, j + 65);
 	ab[i__2].r = (real) j, ab[i__2].i = 0.f;
-	i__2 = j - 1;
-	c[i__2].r = 0.f, c[i__2].i = 0.f;
+	i__2 = c___subscr(j, 1);
+	c__[i__2].r = 0.f, c__[i__2].i = 0.f;
 /* L100: */
     }
     i__1 = n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j - 1;
-	d__1 = (doublereal) (j * ((j + 1) * j) / 2 - (j + 1) * j * (j - 1) / 
-		3);
-	cc[i__2].r = d__1, cc[i__2].i = 0.f;
+	i__3 = j * ((j + 1) * j) / 2 - (j + 1) * j * (j - 1) / 3;
+	cc[i__2].r = (real) i__3, cc[i__2].i = 0.f;
 /* L110: */
     }
-/*     CC holds the exact result. On exit from CMMCH CT holds */
-/*     the result computed by CMMCH. */
+/*     CC holds the exact result. On exit from CMMCH CT holds   
+       the result computed by CMMCH. */
     *(unsigned char *)transa = 'N';
     *(unsigned char *)transb = 'N';
-    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab[4225], &
-	    c__65, &c_b1, c, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, &
-	    nout, &c_true);
+    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab_ref(1, 66), &
+	    c__65, &c_b1, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, 
+	    &nout, &c_true);
     same = lce_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___64.ciunit = nout;
 	s_wsfe(&io___64);
-	do_fio(&c__1, transa, 1L);
-	do_fio(&c__1, transb, 1L);
+	do_fio(&c__1, transa, (ftnlen)1);
+	do_fio(&c__1, transb, (ftnlen)1);
 	do_fio(&c__1, (char *)&same, (ftnlen)sizeof(logical));
 	do_fio(&c__1, (char *)&err, (ftnlen)sizeof(real));
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
     *(unsigned char *)transb = 'C';
-    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab[4225], &
-	    c__65, &c_b1, c, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, &
-	    nout, &c_true);
+    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab_ref(1, 66), &
+	    c__65, &c_b1, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, 
+	    &nout, &c_true);
     same = lce_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___65.ciunit = nout;
 	s_wsfe(&io___65);
-	do_fio(&c__1, transa, 1L);
-	do_fio(&c__1, transb, 1L);
+	do_fio(&c__1, transa, (ftnlen)1);
+	do_fio(&c__1, transb, (ftnlen)1);
 	do_fio(&c__1, (char *)&same, (ftnlen)sizeof(logical));
 	do_fio(&c__1, (char *)&err, (ftnlen)sizeof(real));
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
     i__1 = n;
     for (j = 1; j <= i__1; ++j) {
-	i__2 = j + 4224;
-	d__1 = (doublereal) (n - j + 1);
-	ab[i__2].r = d__1, ab[i__2].i = 0.f;
-	i__2 = (j + 65) * 65 - 65;
-	d__1 = (doublereal) (n - j + 1);
-	ab[i__2].r = d__1, ab[i__2].i = 0.f;
+	i__2 = ab_subscr(j, 66);
+	i__3 = n - j + 1;
+	ab[i__2].r = (real) i__3, ab[i__2].i = 0.f;
+	i__2 = ab_subscr(1, j + 65);
+	i__3 = n - j + 1;
+	ab[i__2].r = (real) i__3, ab[i__2].i = 0.f;
 /* L120: */
     }
     i__1 = n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = n - j;
-	d__1 = (doublereal) (j * ((j + 1) * j) / 2 - (j + 1) * j * (j - 1) / 
-		3);
-	cc[i__2].r = d__1, cc[i__2].i = 0.f;
+	i__3 = j * ((j + 1) * j) / 2 - (j + 1) * j * (j - 1) / 3;
+	cc[i__2].r = (real) i__3, cc[i__2].i = 0.f;
 /* L130: */
     }
     *(unsigned char *)transa = 'C';
     *(unsigned char *)transb = 'N';
-    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab[4225], &
-	    c__65, &c_b1, c, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, &
-	    nout, &c_true);
+    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab_ref(1, 66), &
+	    c__65, &c_b1, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, 
+	    &nout, &c_true);
     same = lce_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___66.ciunit = nout;
 	s_wsfe(&io___66);
-	do_fio(&c__1, transa, 1L);
-	do_fio(&c__1, transb, 1L);
+	do_fio(&c__1, transa, (ftnlen)1);
+	do_fio(&c__1, transb, (ftnlen)1);
 	do_fio(&c__1, (char *)&same, (ftnlen)sizeof(logical));
 	do_fio(&c__1, (char *)&err, (ftnlen)sizeof(real));
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
     *(unsigned char *)transb = 'C';
-    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab[4225], &
-	    c__65, &c_b1, c, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, &
-	    nout, &c_true);
+    cmmch_(transa, transb, &n, &c__1, &n, &c_b2, ab, &c__65, &ab_ref(1, 66), &
+	    c__65, &c_b1, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal, 
+	    &nout, &c_true);
     same = lce_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___67.ciunit = nout;
 	s_wsfe(&io___67);
-	do_fio(&c__1, transa, 1L);
-	do_fio(&c__1, transb, 1L);
+	do_fio(&c__1, transa, (ftnlen)1);
+	do_fio(&c__1, transb, (ftnlen)1);
 	do_fio(&c__1, (char *)&same, (ftnlen)sizeof(logical));
 	do_fio(&c__1, (char *)&err, (ftnlen)sizeof(real));
 	e_wsfe();
-	s_stop("", 0L);
+	s_stop("", (ftnlen)0);
     }
 
 /*     Test each subroutine in turn. */
@@ -623,13 +614,14 @@ L80:
 /*           Subprogram is not to be tested. */
 	    io___70.ciunit = nout;
 	    s_wsfe(&io___70);
-	    do_fio(&c__1, snames + (isnum - 1) * 6, 6L);
+	    do_fio(&c__1, snames_ref(0, isnum), (ftnlen)6);
 	    e_wsfe();
 	} else {
-	    s_copy(srnamc_1.srnamt, snames + (isnum - 1) * 6, 6L, 6L);
+	    s_copy(srnamc_1.srnamt, snames_ref(0, isnum), (ftnlen)6, (ftnlen)
+		    6);
 /*           Test error exits. */
 	    if (tsterr) {
-		cchke_(&isnum, snames + (isnum - 1) * 6, &nout);
+		cchke_(&isnum, snames_ref(0, isnum), &nout);
 		io___71.ciunit = nout;
 		s_wsle(&io___71);
 		e_wsle();
@@ -651,36 +643,36 @@ L80:
 	    }
 /*           Test CGEMM, 01. */
 L140:
-	    cchk1_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
-		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
-		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c, cc, cs, ct,
-		     g);
+	    cchk1_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
+		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
+		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
+		    ct, g);
 	    goto L190;
 /*           Test CHEMM, 02, CSYMM, 03. */
 L150:
-	    cchk2_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
-		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
-		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c, cc, cs, ct,
-		     g);
+	    cchk2_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
+		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
+		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
+		    ct, g);
 	    goto L190;
 /*           Test CTRMM, 04, CTRSM, 05. */
 L160:
-	    cchk3_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
-		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &c__65, 
-		    ab, aa, as, &ab[4225], bb, bs, ct, g, c);
+	    cchk3_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
+		    &rewi, &fatal, &nidim, idim, &nalf, alf, &c__65, ab, aa, 
+		    as, &ab_ref(1, 66), bb, bs, ct, g, c__);
 	    goto L190;
 /*           Test CHERK, 06, CSYRK, 07. */
 L170:
-	    cchk4_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
-		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
-		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c, cc, cs, ct,
-		     g);
+	    cchk4_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
+		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
+		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
+		    ct, g);
 	    goto L190;
 /*           Test CHER2K, 08, CSYR2K, 09. */
 L180:
-	    cchk5_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
-		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
-		    bet, &c__65, ab, aa, as, bb, bs, c, cc, cs, ct, g, w);
+	    cchk5_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
+		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
+		    c__65, ab, aa, as, bb, bs, c__, cc, cs, ct, g, w);
 	    goto L190;
 
 L190:
@@ -717,7 +709,7 @@ L230:
     cl__1.cunit = nout;
     cl__1.csta = 0;
     f_clos(&cl__1);
-    s_stop("", 0L);
+    s_stop("", (ftnlen)0);
 
 
 /*     End of CBLAT3. */
@@ -725,11 +717,18 @@ L230:
     return 0;
 } /* MAIN__ */
 
+#undef snames_ref
+#undef ab_ref
+#undef ab_subscr
+#undef c___ref
+#undef c___subscr
+
+
 /* Subroutine */ int cchk1_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, complex *alf, integer *
 	nbet, complex *bet, integer *nmax, complex *a, complex *aa, complex *
-	as, complex *b, complex *bb, complex *bs, complex *c, complex *cc, 
+	as, complex *b, complex *bb, complex *bs, complex *c__, complex *cc, 
 	complex *cs, complex *ct, real *g)
 {
     /* Initialized data */
@@ -766,7 +765,7 @@ L230:
     static complex beta;
     static integer ldas, ldbs, ldcs;
     static logical same, null;
-    static integer i, k, m, n;
+    static integer i__, k, m, n;
     extern /* Subroutine */ int cmake_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, logical *, 
 	    complex *);
@@ -802,28 +801,17 @@ L230:
 
 
 
-/*  Tests CGEMM. */
+/*  Tests CGEMM.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -832,21 +820,20 @@ L230:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
-/*     .. Executable Statements .. */
 
     nargs = 13;
     nc = 0;
@@ -889,8 +876,7 @@ L230:
 			ma = m;
 			na = k;
 		    }
-/*                 Set LDA to 1 more than minimum value if
- room. */
+/*                 Set LDA to 1 more than minimum value if room. */
 		    lda = ma;
 		    if (lda < *nmax) {
 			++lda;
@@ -919,14 +905,12 @@ L230:
 			    mb = k;
 			    nb = n;
 			}
-/*                    Set LDB to 1 more than minimum v
-alue if room. */
+/*                    Set LDB to 1 more than minimum value if room. */
 			ldb = mb;
 			if (ldb < *nmax) {
 			    ++ldb;
 			}
-/*                    Skip tests if not enough room. 
-*/
+/*                    Skip tests if not enough room. */
 			if (ldb > *nmax) {
 			    goto L70;
 			}
@@ -947,17 +931,15 @@ alue if room. */
 				i__6 = ib;
 				beta.r = bet[i__6].r, beta.i = bet[i__6].i;
 
-/*                          Generate the matri
-x C. */
+/*                          Generate the matrix C. */
 
-				cmake_("GE", " ", " ", &m, &n, &c[c_offset], 
-					nmax, &cc[1], &ldc, &reset, &c_b1);
+				cmake_("GE", " ", " ", &m, &n, &c__[c_offset],
+					 nmax, &cc[1], &ldc, &reset, &c_b1);
 
 				++nc;
 
-/*                          Save every datum b
-efore calling the */
-/*                          subroutine. */
+/*                          Save every datum before calling the   
+                            subroutine. */
 
 				*(unsigned char *)tranas = *(unsigned char *)
 					transa;
@@ -968,18 +950,18 @@ efore calling the */
 				ks = k;
 				als.r = alpha.r, als.i = alpha.i;
 				i__6 = laa;
-				for (i = 1; i <= i__6; ++i) {
-				    i__7 = i;
-				    i__8 = i;
+				for (i__ = 1; i__ <= i__6; ++i__) {
+				    i__7 = i__;
+				    i__8 = i__;
 				    as[i__7].r = aa[i__8].r, as[i__7].i = aa[
 					    i__8].i;
 /* L10: */
 				}
 				ldas = lda;
 				i__6 = lbb;
-				for (i = 1; i <= i__6; ++i) {
-				    i__7 = i;
-				    i__8 = i;
+				for (i__ = 1; i__ <= i__6; ++i__) {
+				    i__7 = i__;
+				    i__8 = i__;
 				    bs[i__7].r = bb[i__8].r, bs[i__7].i = bb[
 					    i__8].i;
 /* L20: */
@@ -987,26 +969,25 @@ efore calling the */
 				ldbs = ldb;
 				bls.r = beta.r, bls.i = beta.i;
 				i__6 = lcc;
-				for (i = 1; i <= i__6; ++i) {
-				    i__7 = i;
-				    i__8 = i;
+				for (i__ = 1; i__ <= i__6; ++i__) {
+				    i__7 = i__;
+				    i__8 = i__;
 				    cs[i__7].r = cc[i__8].r, cs[i__7].i = cc[
 					    i__8].i;
 /* L30: */
 				}
 				ldcs = ldc;
 
-/*                          Call the subroutin
-e. */
+/*                          Call the subroutine. */
 
 				if (*trace) {
 				    io___124.ciunit = *ntra;
 				    s_wsfe(&io___124);
 				    do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, sname, 6L);
-				    do_fio(&c__1, transa, 1L);
-				    do_fio(&c__1, transb, 1L);
+				    do_fio(&c__1, sname, (ftnlen)6);
+				    do_fio(&c__1, transa, (ftnlen)1);
+				    do_fio(&c__1, transb, (ftnlen)1);
 				    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
@@ -1034,8 +1015,7 @@ e. */
 					aa[1], &lda, &bb[1], &ldb, &beta, &cc[
 					1], &ldc);
 
-/*                          Check if error-exi
-t was taken incorrectly. */
+/*                          Check if error-exit was taken incorrectly. */
 
 				if (! infoc_1.ok) {
 				    io___125.ciunit = *nout;
@@ -1045,8 +1025,7 @@ t was taken incorrectly. */
 				    goto L120;
 				}
 
-/*                          See what data chan
-ged inside subroutines. */
+/*                          See what data changed inside subroutines. */
 
 				isame[0] = *(unsigned char *)transa == *(
 					unsigned char *)tranas;
@@ -1071,18 +1050,17 @@ ged inside subroutines. */
 				}
 				isame[12] = ldcs == ldc;
 
-/*                          If data was incorr
-ectly changed, report */
-/*                          and return. */
+/*                          If data was incorrectly changed, report   
+                            and return. */
 
 				same = TRUE_;
 				i__6 = nargs;
-				for (i = 1; i <= i__6; ++i) {
-				    same = same && isame[i - 1];
-				    if (! isame[i - 1]) {
+				for (i__ = 1; i__ <= i__6; ++i__) {
+				    same = same && isame[i__ - 1];
+				    if (! isame[i__ - 1]) {
 					io___128.ciunit = *nout;
 					s_wsfe(&io___128);
-					do_fio(&c__1, (char *)&i, (ftnlen)
+					do_fio(&c__1, (char *)&i__, (ftnlen)
 						sizeof(integer));
 					e_wsfe();
 				    }
@@ -1095,18 +1073,16 @@ ectly changed, report */
 
 				if (! null) {
 
-/*                             Check the r
-esult. */
+/*                             Check the result. */
 
 				    cmmch_(transa, transb, &m, &n, &k, &alpha,
 					     &a[a_offset], nmax, &b[b_offset],
-					     nmax, &beta, &c[c_offset], nmax, 
-					    &ct[1], &g[1], &cc[1], &ldc, eps, 
-					    &err, fatal, nout, &c_true);
+					     nmax, &beta, &c__[c_offset], 
+					    nmax, &ct[1], &g[1], &cc[1], &ldc,
+					     eps, &err, fatal, nout, &c_true);
 				    errmax = dmax(errmax,err);
-/*                             If got real
-ly bad answer, report and */
-/*                             return. */
+/*                             If got really bad answer, report and   
+                               return. */
 				    if (*fatal) {
 					goto L120;
 				    }
@@ -1141,13 +1117,13 @@ L100:
     if (errmax < *thresh) {
 	io___130.ciunit = *nout;
 	s_wsfe(&io___130);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___131.ciunit = *nout;
 	s_wsfe(&io___131);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&errmax, (ftnlen)sizeof(real));
 	e_wsfe();
@@ -1157,14 +1133,14 @@ L100:
 L120:
     io___132.ciunit = *nout;
     s_wsfe(&io___132);
-    do_fio(&c__1, sname, 6L);
+    do_fio(&c__1, sname, (ftnlen)6);
     e_wsfe();
     io___133.ciunit = *nout;
     s_wsfe(&io___133);
     do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-    do_fio(&c__1, sname, 6L);
-    do_fio(&c__1, transa, 1L);
-    do_fio(&c__1, transb, 1L);
+    do_fio(&c__1, sname, (ftnlen)6);
+    do_fio(&c__1, transa, (ftnlen)1);
+    do_fio(&c__1, transb, (ftnlen)1);
     do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -1181,13 +1157,13 @@ L130:
 
 /*     End of CCHK1. */
 
-} /* cchk1_ */
+} /* cchk1_   
 
-/* Subroutine */ int cchk2_(char *sname, real *eps, real *thresh, integer *
+   Subroutine */ int cchk2_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, complex *alf, integer *
 	nbet, complex *bet, integer *nmax, complex *a, complex *aa, complex *
-	as, complex *b, complex *bb, complex *bs, complex *c, complex *cc, 
+	as, complex *b, complex *bb, complex *bs, complex *c__, complex *cc, 
 	complex *cs, complex *ct, real *g)
 {
     /* Initialized data */
@@ -1228,7 +1204,7 @@ L130:
     static char side[1];
     static logical conj, left, null;
     static char uplo[1];
-    static integer i, m, n;
+    static integer i__, m, n;
     extern /* Subroutine */ int cmake_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, logical *, 
 	    complex *);
@@ -1269,28 +1245,17 @@ L130:
 
 
 
-/*  Tests CHEMM and CSYMM. */
+/*  Tests CHEMM and CSYMM.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -1299,22 +1264,21 @@ L130:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
-/*     .. Executable Statements .. */
-    conj = s_cmp(sname + 1, "HE", 2L, 2L) == 0;
+    conj = s_cmp(sname + 1, "HE", (ftnlen)2, (ftnlen)2) == 0;
 
     nargs = 12;
     nc = 0;
@@ -1364,8 +1328,7 @@ L130:
 		} else {
 		    na = n;
 		}
-/*              Set LDA to 1 more than minimum value if room. 
-*/
+/*              Set LDA to 1 more than minimum value if room. */
 		lda = na;
 		if (lda < *nmax) {
 		    ++lda;
@@ -1379,8 +1342,7 @@ L130:
 		for (icu = 1; icu <= 2; ++icu) {
 		    *(unsigned char *)uplo = *(unsigned char *)&ichu[icu - 1];
 
-/*                 Generate the hermitian or symmetric mat
-rix A. */
+/*                 Generate the hermitian or symmetric matrix A. */
 
 		    cmake_(sname + 1, uplo, " ", &na, &na, &a[a_offset], nmax,
 			     &aa[1], &lda, &reset, &c_b1);
@@ -1397,14 +1359,13 @@ rix A. */
 
 /*                       Generate the matrix C. */
 
-			    cmake_("GE", " ", " ", &m, &n, &c[c_offset], nmax,
-				     &cc[1], &ldc, &reset, &c_b1);
+			    cmake_("GE", " ", " ", &m, &n, &c__[c_offset], 
+				    nmax, &cc[1], &ldc, &reset, &c_b1);
 
 			    ++nc;
 
-/*                       Save every datum before c
-alling the */
-/*                       subroutine. */
+/*                       Save every datum before calling the   
+                         subroutine. */
 
 			    *(unsigned char *)sides = *(unsigned char *)side;
 			    *(unsigned char *)uplos = *(unsigned char *)uplo;
@@ -1412,18 +1373,18 @@ alling the */
 			    ns = n;
 			    als.r = alpha.r, als.i = alpha.i;
 			    i__5 = laa;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				as[i__6].r = aa[i__7].r, as[i__6].i = aa[i__7]
 					.i;
 /* L10: */
 			    }
 			    ldas = lda;
 			    i__5 = lbb;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				bs[i__6].r = bb[i__7].r, bs[i__6].i = bb[i__7]
 					.i;
 /* L20: */
@@ -1431,9 +1392,9 @@ alling the */
 			    ldbs = ldb;
 			    bls.r = beta.r, bls.i = beta.i;
 			    i__5 = lcc;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				cs[i__6].r = cc[i__7].r, cs[i__6].i = cc[i__7]
 					.i;
 /* L30: */
@@ -1447,9 +1408,9 @@ alling the */
 				s_wsfe(&io___172);
 				do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					integer));
-				do_fio(&c__1, sname, 6L);
-				do_fio(&c__1, side, 1L);
-				do_fio(&c__1, uplo, 1L);
+				do_fio(&c__1, sname, (ftnlen)6);
+				do_fio(&c__1, side, (ftnlen)1);
+				do_fio(&c__1, uplo, (ftnlen)1);
 				do_fio(&c__1, (char *)&m, (ftnlen)sizeof(
 					integer));
 				do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
@@ -1481,8 +1442,7 @@ alling the */
 					ldc);
 			    }
 
-/*                       Check if error-exit was t
-aken incorrectly. */
+/*                       Check if error-exit was taken incorrectly. */
 
 			    if (! infoc_1.ok) {
 				io___173.ciunit = *nout;
@@ -1492,8 +1452,7 @@ aken incorrectly. */
 				goto L110;
 			    }
 
-/*                       See what data changed ins
-ide subroutines. */
+/*                       See what data changed inside subroutines. */
 
 			    isame[0] = *(unsigned char *)sides == *(unsigned 
 				    char *)side;
@@ -1515,19 +1474,18 @@ ide subroutines. */
 			    }
 			    isame[11] = ldcs == ldc;
 
-/*                       If data was incorrectly c
-hanged, report and */
-/*                       return. */
+/*                       If data was incorrectly changed, report and   
+                         return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
-			    for (i = 1; i <= i__5; ++i) {
-				same = same && isame[i - 1];
-				if (! isame[i - 1]) {
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				same = same && isame[i__ - 1];
+				if (! isame[i__ - 1]) {
 				    io___176.ciunit = *nout;
 				    s_wsfe(&io___176);
-				    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(
-					    integer));
+				    do_fio(&c__1, (char *)&i__, (ftnlen)
+					    sizeof(integer));
 				    e_wsfe();
 				}
 /* L40: */
@@ -1539,28 +1497,24 @@ hanged, report and */
 
 			    if (! null) {
 
-/*                          Check the result. 
-*/
+/*                          Check the result. */
 
 				if (left) {
 				    cmmch_("N", "N", &m, &n, &m, &alpha, &a[
 					    a_offset], nmax, &b[b_offset], 
-					    nmax, &beta, &c[c_offset], nmax, &
-					    ct[1], &g[1], &cc[1], &ldc, eps, &
-					    err, fatal, nout, &c_true)
-					    ;
+					    nmax, &beta, &c__[c_offset], nmax,
+					     &ct[1], &g[1], &cc[1], &ldc, eps,
+					     &err, fatal, nout, &c_true);
 				} else {
 				    cmmch_("N", "N", &m, &n, &n, &alpha, &b[
 					    b_offset], nmax, &a[a_offset], 
-					    nmax, &beta, &c[c_offset], nmax, &
-					    ct[1], &g[1], &cc[1], &ldc, eps, &
-					    err, fatal, nout, &c_true)
-					    ;
+					    nmax, &beta, &c__[c_offset], nmax,
+					     &ct[1], &g[1], &cc[1], &ldc, eps,
+					     &err, fatal, nout, &c_true);
 				}
 				errmax = dmax(errmax,err);
-/*                          If got really bad 
-answer, report and */
-/*                          return. */
+/*                          If got really bad answer, report and   
+                            return. */
 				if (*fatal) {
 				    goto L110;
 				}
@@ -1591,13 +1545,13 @@ L90:
     if (errmax < *thresh) {
 	io___178.ciunit = *nout;
 	s_wsfe(&io___178);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___179.ciunit = *nout;
 	s_wsfe(&io___179);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&errmax, (ftnlen)sizeof(real));
 	e_wsfe();
@@ -1607,14 +1561,14 @@ L90:
 L110:
     io___180.ciunit = *nout;
     s_wsfe(&io___180);
-    do_fio(&c__1, sname, 6L);
+    do_fio(&c__1, sname, (ftnlen)6);
     e_wsfe();
     io___181.ciunit = *nout;
     s_wsfe(&io___181);
     do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-    do_fio(&c__1, sname, 6L);
-    do_fio(&c__1, side, 1L);
-    do_fio(&c__1, uplo, 1L);
+    do_fio(&c__1, sname, (ftnlen)6);
+    do_fio(&c__1, side, (ftnlen)1);
+    do_fio(&c__1, uplo, (ftnlen)1);
     do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
     do_fio(&c__2, (char *)&alpha, (ftnlen)sizeof(real));
@@ -1630,13 +1584,13 @@ L120:
 
 /*     End of CCHK2. */
 
-} /* cchk2_ */
+} /* cchk2_   
 
-/* Subroutine */ int cchk3_(char *sname, real *eps, real *thresh, integer *
+   Subroutine */ int cchk3_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, complex *alf, integer *
 	nmax, complex *a, complex *aa, complex *as, complex *b, complex *bb, 
-	complex *bs, complex *ct, real *g, complex *c)
+	complex *bs, complex *ct, real *g, complex *c__)
 {
     /* Initialized data */
 
@@ -1678,7 +1632,7 @@ L120:
     static char side[1];
     static logical left, null;
     static char uplo[1];
-    static integer i, j, m, n;
+    static integer i__, j, m, n;
     extern /* Subroutine */ int cmake_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, logical *, 
 	    complex *);
@@ -1722,48 +1676,42 @@ L120:
 
 
 
-/*  Tests CTRMM and CTRSM. */
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  Tests CTRMM and CTRSM.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     --idim;
     --alf;
     c_dim1 = *nmax;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --g;
     --ct;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
-/*     .. Executable Statements .. */
 
     nargs = 11;
     nc = 0;
@@ -1773,9 +1721,9 @@ L120:
     i__1 = *nmax;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *nmax;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i + j * c_dim1;
-	    c[i__3].r = 0.f, c[i__3].i = 0.f;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = c___subscr(i__, j);
+	    c__[i__3].r = 0.f, c__[i__3].i = 0.f;
 /* L10: */
 	}
 /* L20: */
@@ -1808,8 +1756,7 @@ L120:
 		} else {
 		    na = n;
 		}
-/*              Set LDA to 1 more than minimum value if room. 
-*/
+/*              Set LDA to 1 more than minimum value if room. */
 		lda = na;
 		if (lda < *nmax) {
 		    ++lda;
@@ -1836,24 +1783,21 @@ L120:
 				i__4 = ia;
 				alpha.r = alf[i__4].r, alpha.i = alf[i__4].i;
 
-/*                          Generate the matri
-x A. */
+/*                          Generate the matrix A. */
 
 				cmake_("TR", uplo, diag, &na, &na, &a[
 					a_offset], nmax, &aa[1], &lda, &reset,
 					 &c_b1);
 
-/*                          Generate the matri
-x B. */
+/*                          Generate the matrix B. */
 
 				cmake_("GE", " ", " ", &m, &n, &b[b_offset], 
 					nmax, &bb[1], &ldb, &reset, &c_b1);
 
 				++nc;
 
-/*                          Save every datum b
-efore calling the */
-/*                          subroutine. */
+/*                          Save every datum before calling the   
+                            subroutine. */
 
 				*(unsigned char *)sides = *(unsigned char *)
 					side;
@@ -1867,38 +1811,38 @@ efore calling the */
 				ns = n;
 				als.r = alpha.r, als.i = alpha.i;
 				i__4 = laa;
-				for (i = 1; i <= i__4; ++i) {
-				    i__5 = i;
-				    i__6 = i;
+				for (i__ = 1; i__ <= i__4; ++i__) {
+				    i__5 = i__;
+				    i__6 = i__;
 				    as[i__5].r = aa[i__6].r, as[i__5].i = aa[
 					    i__6].i;
 /* L30: */
 				}
 				ldas = lda;
 				i__4 = lbb;
-				for (i = 1; i <= i__4; ++i) {
-				    i__5 = i;
-				    i__6 = i;
+				for (i__ = 1; i__ <= i__4; ++i__) {
+				    i__5 = i__;
+				    i__6 = i__;
 				    bs[i__5].r = bb[i__6].r, bs[i__5].i = bb[
 					    i__6].i;
 /* L40: */
 				}
 				ldbs = ldb;
 
-/*                          Call the subroutin
-e. */
+/*                          Call the subroutine. */
 
-				if (s_cmp(sname + 3, "MM", 2L, 2L) == 0) {
+				if (s_cmp(sname + 3, "MM", (ftnlen)2, (ftnlen)
+					2) == 0) {
 				    if (*trace) {
 					io___222.ciunit = *ntra;
 					s_wsfe(&io___222);
 					do_fio(&c__1, (char *)&nc, (ftnlen)
 						sizeof(integer));
-					do_fio(&c__1, sname, 6L);
-					do_fio(&c__1, side, 1L);
-					do_fio(&c__1, uplo, 1L);
-					do_fio(&c__1, transa, 1L);
-					do_fio(&c__1, diag, 1L);
+					do_fio(&c__1, sname, (ftnlen)6);
+					do_fio(&c__1, side, (ftnlen)1);
+					do_fio(&c__1, uplo, (ftnlen)1);
+					do_fio(&c__1, transa, (ftnlen)1);
+					do_fio(&c__1, diag, (ftnlen)1);
 					do_fio(&c__1, (char *)&m, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&n, (ftnlen)
@@ -1918,18 +1862,18 @@ e. */
 				    }
 				    ctrmm_(side, uplo, transa, diag, &m, &n, &
 					    alpha, &aa[1], &lda, &bb[1], &ldb);
-				} else if (s_cmp(sname + 3, "SM", 2L, 2L) == 
-					0) {
+				} else if (s_cmp(sname + 3, "SM", (ftnlen)2, (
+					ftnlen)2) == 0) {
 				    if (*trace) {
 					io___223.ciunit = *ntra;
 					s_wsfe(&io___223);
 					do_fio(&c__1, (char *)&nc, (ftnlen)
 						sizeof(integer));
-					do_fio(&c__1, sname, 6L);
-					do_fio(&c__1, side, 1L);
-					do_fio(&c__1, uplo, 1L);
-					do_fio(&c__1, transa, 1L);
-					do_fio(&c__1, diag, 1L);
+					do_fio(&c__1, sname, (ftnlen)6);
+					do_fio(&c__1, side, (ftnlen)1);
+					do_fio(&c__1, uplo, (ftnlen)1);
+					do_fio(&c__1, transa, (ftnlen)1);
+					do_fio(&c__1, diag, (ftnlen)1);
 					do_fio(&c__1, (char *)&m, (ftnlen)
 						sizeof(integer));
 					do_fio(&c__1, (char *)&n, (ftnlen)
@@ -1951,8 +1895,7 @@ e. */
 					    alpha, &aa[1], &lda, &bb[1], &ldb);
 				}
 
-/*                          Check if error-exi
-t was taken incorrectly. */
+/*                          Check if error-exit was taken incorrectly. */
 
 				if (! infoc_1.ok) {
 				    io___224.ciunit = *nout;
@@ -1962,8 +1905,7 @@ t was taken incorrectly. */
 				    goto L150;
 				}
 
-/*                          See what data chan
-ged inside subroutines. */
+/*                          See what data changed inside subroutines. */
 
 				isame[0] = *(unsigned char *)sides == *(
 					unsigned char *)side;
@@ -1987,18 +1929,17 @@ ged inside subroutines. */
 				}
 				isame[10] = ldbs == ldb;
 
-/*                          If data was incorr
-ectly changed, report and */
-/*                          return. */
+/*                          If data was incorrectly changed, report and   
+                            return. */
 
 				same = TRUE_;
 				i__4 = nargs;
-				for (i = 1; i <= i__4; ++i) {
-				    same = same && isame[i - 1];
-				    if (! isame[i - 1]) {
+				for (i__ = 1; i__ <= i__4; ++i__) {
+				    same = same && isame[i__ - 1];
+				    if (! isame[i__ - 1]) {
 					io___227.ciunit = *nout;
 					s_wsfe(&io___227);
-					do_fio(&c__1, (char *)&i, (ftnlen)
+					do_fio(&c__1, (char *)&i__, (ftnlen)
 						sizeof(integer));
 					e_wsfe();
 				    }
@@ -2010,46 +1951,44 @@ ectly changed, report and */
 				}
 
 				if (! null) {
-				    if (s_cmp(sname + 3, "MM", 2L, 2L) == 0) {
+				    if (s_cmp(sname + 3, "MM", (ftnlen)2, (
+					    ftnlen)2) == 0) {
 
-/*                                Chec
-k the result. */
+/*                                Check the result. */
 
 					if (left) {
 					    cmmch_(transa, "N", &m, &n, &m, &
 						    alpha, &a[a_offset], nmax,
 						     &b[b_offset], nmax, &
-						    c_b1, &c[c_offset], nmax, 
-						    &ct[1], &g[1], &bb[1], &
-						    ldb, eps, &err, fatal, 
-						    nout, &c_true);
+						    c_b1, &c__[c_offset], 
+						    nmax, &ct[1], &g[1], &bb[
+						    1], &ldb, eps, &err, 
+						    fatal, nout, &c_true);
 					} else {
 					    cmmch_("N", transa, &m, &n, &n, &
 						    alpha, &b[b_offset], nmax,
 						     &a[a_offset], nmax, &
-						    c_b1, &c[c_offset], nmax, 
-						    &ct[1], &g[1], &bb[1], &
-						    ldb, eps, &err, fatal, 
-						    nout, &c_true);
+						    c_b1, &c__[c_offset], 
+						    nmax, &ct[1], &g[1], &bb[
+						    1], &ldb, eps, &err, 
+						    fatal, nout, &c_true);
 					}
-				    } else if (s_cmp(sname + 3, "SM", 2L, 2L) 
-					    == 0) {
+				    } else if (s_cmp(sname + 3, "SM", (ftnlen)
+					    2, (ftnlen)2) == 0) {
 
-/*                                Comp
-ute approximation to original 
-*/
-/*                                matr
-ix. */
+/*                                Compute approximation to original   
+                                  matrix. */
 
 					i__4 = n;
 					for (j = 1; j <= i__4; ++j) {
 					    i__5 = m;
-					    for (i = 1; i <= i__5; ++i) {
-			  i__6 = i + j * c_dim1;
-			  i__7 = i + (j - 1) * ldb;
-			  c[i__6].r = bb[i__7].r, c[i__6].i = bb[i__7].i;
-			  i__6 = i + (j - 1) * ldb;
-			  i__7 = i + j * b_dim1;
+					    for (i__ = 1; i__ <= i__5; ++i__) 
+						    {
+			  i__6 = c___subscr(i__, j);
+			  i__7 = i__ + (j - 1) * ldb;
+			  c__[i__6].r = bb[i__7].r, c__[i__6].i = bb[i__7].i;
+			  i__6 = i__ + (j - 1) * ldb;
+			  i__7 = b_subscr(i__, j);
 			  q__1.r = alpha.r * b[i__7].r - alpha.i * b[i__7].i, 
 				  q__1.i = alpha.r * b[i__7].i + alpha.i * b[
 				  i__7].r;
@@ -2062,25 +2001,24 @@ ix. */
 					if (left) {
 					    cmmch_(transa, "N", &m, &n, &m, &
 						    c_b2, &a[a_offset], nmax, 
-						    &c[c_offset], nmax, &c_b1,
-						     &b[b_offset], nmax, &ct[
-						    1], &g[1], &bb[1], &ldb, 
-						    eps, &err, fatal, nout, &
-						    c_false);
+						    &c__[c_offset], nmax, &
+						    c_b1, &b[b_offset], nmax, 
+						    &ct[1], &g[1], &bb[1], &
+						    ldb, eps, &err, fatal, 
+						    nout, &c_false);
 					} else {
 					    cmmch_("N", transa, &m, &n, &n, &
-						    c_b2, &c[c_offset], nmax, 
-						    &a[a_offset], nmax, &c_b1,
-						     &b[b_offset], nmax, &ct[
-						    1], &g[1], &bb[1], &ldb, 
-						    eps, &err, fatal, nout, &
-						    c_false);
+						    c_b2, &c__[c_offset], 
+						    nmax, &a[a_offset], nmax, 
+						    &c_b1, &b[b_offset], nmax,
+						     &ct[1], &g[1], &bb[1], &
+						    ldb, eps, &err, fatal, 
+						    nout, &c_false);
 					}
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got real
-ly bad answer, report and */
-/*                             return. */
+/*                             If got really bad answer, report and   
+                               return. */
 				    if (*fatal) {
 					goto L150;
 				    }
@@ -2113,13 +2051,13 @@ L130:
     if (errmax < *thresh) {
 	io___229.ciunit = *nout;
 	s_wsfe(&io___229);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___230.ciunit = *nout;
 	s_wsfe(&io___230);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&errmax, (ftnlen)sizeof(real));
 	e_wsfe();
@@ -2129,16 +2067,16 @@ L130:
 L150:
     io___231.ciunit = *nout;
     s_wsfe(&io___231);
-    do_fio(&c__1, sname, 6L);
+    do_fio(&c__1, sname, (ftnlen)6);
     e_wsfe();
     io___232.ciunit = *nout;
     s_wsfe(&io___232);
     do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-    do_fio(&c__1, sname, 6L);
-    do_fio(&c__1, side, 1L);
-    do_fio(&c__1, uplo, 1L);
-    do_fio(&c__1, transa, 1L);
-    do_fio(&c__1, diag, 1L);
+    do_fio(&c__1, sname, (ftnlen)6);
+    do_fio(&c__1, side, (ftnlen)1);
+    do_fio(&c__1, uplo, (ftnlen)1);
+    do_fio(&c__1, transa, (ftnlen)1);
+    do_fio(&c__1, diag, (ftnlen)1);
     do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
     do_fio(&c__2, (char *)&alpha, (ftnlen)sizeof(real));
@@ -2154,11 +2092,17 @@ L160:
 
 } /* cchk3_ */
 
+#undef c___ref
+#undef c___subscr
+#undef b_ref
+#undef b_subscr
+
+
 /* Subroutine */ int cchk4_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, complex *alf, integer *
 	nbet, complex *bet, integer *nmax, complex *a, complex *aa, complex *
-	as, complex *b, complex *bb, complex *bs, complex *c, complex *cc, 
+	as, complex *b, complex *bb, complex *bs, complex *c__, complex *cc, 
 	complex *cs, complex *ct, real *g)
 {
     /* Initialized data */
@@ -2206,7 +2150,7 @@ L160:
     static real rals;
     static logical tran, null;
     static char uplo[1];
-    static integer i, j, k, n;
+    static integer i__, j, k, n;
     extern /* Subroutine */ int cmake_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, logical *, 
 	    complex *);
@@ -2252,28 +2196,23 @@ L160:
 
 
 
-/*  Tests CHERK and CSYRK. */
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  Tests CHERK and CSYRK.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -2282,22 +2221,21 @@ L160:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
-/*     .. Executable Statements .. */
-    conj = s_cmp(sname + 1, "HE", 2L, 2L) == 0;
+    conj = s_cmp(sname + 1, "HE", (ftnlen)2, (ftnlen)2) == 0;
 
     nargs = 10;
     nc = 0;
@@ -2335,8 +2273,7 @@ L160:
 		    ma = n;
 		    na = k;
 		}
-/*              Set LDA to 1 more than minimum value if room. 
-*/
+/*              Set LDA to 1 more than minimum value if room. */
 		lda = ma;
 		if (lda < *nmax) {
 		    ++lda;
@@ -2383,13 +2320,13 @@ L160:
 
 /*                       Generate the matrix C. */
 
-			    cmake_(sname + 1, uplo, " ", &n, &n, &c[c_offset],
-				     nmax, &cc[1], &ldc, &reset, &c_b1);
+			    cmake_(sname + 1, uplo, " ", &n, &n, &c__[
+				    c_offset], nmax, &cc[1], &ldc, &reset, &
+				    c_b1);
 
 			    ++nc;
 
-/*                       Save every datum before c
-alling the subroutine. */
+/*                       Save every datum before calling the subroutine. */
 
 			    *(unsigned char *)uplos = *(unsigned char *)uplo;
 			    *(unsigned char *)transs = *(unsigned char *)
@@ -2402,9 +2339,9 @@ alling the subroutine. */
 				als.r = alpha.r, als.i = alpha.i;
 			    }
 			    i__5 = laa;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				as[i__6].r = aa[i__7].r, as[i__6].i = aa[i__7]
 					.i;
 /* L10: */
@@ -2416,9 +2353,9 @@ alling the subroutine. */
 				bets.r = beta.r, bets.i = beta.i;
 			    }
 			    i__5 = lcc;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				cs[i__6].r = cc[i__7].r, cs[i__6].i = cc[i__7]
 					.i;
 /* L20: */
@@ -2433,9 +2370,9 @@ alling the subroutine. */
 				    s_wsfe(&io___274);
 				    do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, sname, 6L);
-				    do_fio(&c__1, uplo, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, sname, (ftnlen)6);
+				    do_fio(&c__1, uplo, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
@@ -2463,9 +2400,9 @@ alling the subroutine. */
 				    s_wsfe(&io___275);
 				    do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, sname, 6L);
-				    do_fio(&c__1, uplo, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, sname, (ftnlen)6);
+				    do_fio(&c__1, uplo, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
@@ -2489,8 +2426,7 @@ alling the subroutine. */
 					lda, &beta, &cc[1], &ldc);
 			    }
 
-/*                       Check if error-exit was t
-aken incorrectly. */
+/*                       Check if error-exit was taken incorrectly. */
 
 			    if (! infoc_1.ok) {
 				io___276.ciunit = *nout;
@@ -2500,8 +2436,7 @@ aken incorrectly. */
 				goto L120;
 			    }
 
-/*                       See what data changed ins
-ide subroutines. */
+/*                       See what data changed inside subroutines. */
 
 			    isame[0] = *(unsigned char *)uplos == *(unsigned 
 				    char *)uplo;
@@ -2531,19 +2466,18 @@ ide subroutines. */
 			    }
 			    isame[9] = ldcs == ldc;
 
-/*                       If data was incorrectly c
-hanged, report and */
-/*                       return. */
+/*                       If data was incorrectly changed, report and   
+                         return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
-			    for (i = 1; i <= i__5; ++i) {
-				same = same && isame[i - 1];
-				if (! isame[i - 1]) {
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				same = same && isame[i__ - 1];
+				if (! isame[i__ - 1]) {
 				    io___279.ciunit = *nout;
 				    s_wsfe(&io___279);
-				    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(
-					    integer));
+				    do_fio(&c__1, (char *)&i__, (ftnlen)
+					    sizeof(integer));
 				    e_wsfe();
 				}
 /* L30: */
@@ -2555,8 +2489,7 @@ hanged, report and */
 
 			    if (! null) {
 
-/*                          Check the result c
-olumn by column. */
+/*                          Check the result column by column. */
 
 				if (conj) {
 				    *(unsigned char *)transt = 'C';
@@ -2575,19 +2508,18 @@ olumn by column. */
 				    }
 				    if (tran) {
 					cmmch_(transt, "N", &lj, &c__1, &k, &
-						alpha, &a[jj * a_dim1 + 1], 
-						nmax, &a[j * a_dim1 + 1], 
-						nmax, &beta, &c[jj + j * 
-						c_dim1], nmax, &ct[1], &g[1], 
-						&cc[jc], &ldc, eps, &err, 
-						fatal, nout, &c_true);
+						alpha, &a_ref(1, jj), nmax, &
+						a_ref(1, j), nmax, &beta, &
+						c___ref(jj, j), nmax, &ct[1], 
+						&g[1], &cc[jc], &ldc, eps, &
+						err, fatal, nout, &c_true);
 				    } else {
 					cmmch_("N", transt, &lj, &c__1, &k, &
-						alpha, &a[jj + a_dim1], nmax, 
-						&a[j + a_dim1], nmax, &beta, &
-						c[jj + j * c_dim1], nmax, &ct[
-						1], &g[1], &cc[jc], &ldc, eps,
-						 &err, fatal, nout, &c_true);
+						alpha, &a_ref(jj, 1), nmax, &
+						a_ref(j, 1), nmax, &beta, &
+						c___ref(jj, j), nmax, &ct[1], 
+						&g[1], &cc[jc], &ldc, eps, &
+						err, fatal, nout, &c_true);
 				    }
 				    if (upper) {
 					jc += ldc;
@@ -2595,9 +2527,8 @@ olumn by column. */
 					jc = jc + ldc + 1;
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got real
-ly bad answer, report and */
-/*                             return. */
+/*                             If got really bad answer, report and   
+                               return. */
 				    if (*fatal) {
 					goto L110;
 				    }
@@ -2630,13 +2561,13 @@ L100:
     if (errmax < *thresh) {
 	io___286.ciunit = *nout;
 	s_wsfe(&io___286);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___287.ciunit = *nout;
 	s_wsfe(&io___287);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&errmax, (ftnlen)sizeof(real));
 	e_wsfe();
@@ -2654,15 +2585,15 @@ L110:
 L120:
     io___289.ciunit = *nout;
     s_wsfe(&io___289);
-    do_fio(&c__1, sname, 6L);
+    do_fio(&c__1, sname, (ftnlen)6);
     e_wsfe();
     if (conj) {
 	io___290.ciunit = *nout;
 	s_wsfe(&io___290);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-	do_fio(&c__1, sname, 6L);
-	do_fio(&c__1, uplo, 1L);
-	do_fio(&c__1, trans, 1L);
+	do_fio(&c__1, sname, (ftnlen)6);
+	do_fio(&c__1, uplo, (ftnlen)1);
+	do_fio(&c__1, trans, (ftnlen)1);
 	do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&ralpha, (ftnlen)sizeof(real));
@@ -2674,9 +2605,9 @@ L120:
 	io___291.ciunit = *nout;
 	s_wsfe(&io___291);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-	do_fio(&c__1, sname, 6L);
-	do_fio(&c__1, uplo, 1L);
-	do_fio(&c__1, trans, 1L);
+	do_fio(&c__1, sname, (ftnlen)6);
+	do_fio(&c__1, uplo, (ftnlen)1);
+	do_fio(&c__1, trans, (ftnlen)1);
 	do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
 	do_fio(&c__2, (char *)&alpha, (ftnlen)sizeof(real));
@@ -2694,11 +2625,17 @@ L130:
 
 } /* cchk4_ */
 
+#undef c___ref
+#undef c___subscr
+#undef a_ref
+#undef a_subscr
+
+
 /* Subroutine */ int cchk5_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, complex *alf, integer *
 	nbet, complex *bet, integer *nmax, complex *ab, complex *aa, complex *
-	as, complex *bb, complex *bs, complex *c, complex *cc, complex *cs, 
+	as, complex *bb, complex *bs, complex *c__, complex *cc, complex *cs, 
 	complex *ct, real *g, complex *w)
 {
     /* Initialized data */
@@ -2747,7 +2684,7 @@ L130:
     static complex bets;
     static logical tran, null;
     static char uplo[1];
-    static integer i, j, k, n;
+    static integer i__, j, k, n;
     extern /* Subroutine */ int cmake_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, logical *, 
 	    complex *);
@@ -2796,28 +2733,21 @@ L130:
 
 
 
-/*  Tests CHER2K and CSYR2K. */
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  Tests CHER2K and CSYR2K.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Functions .. */
-/*     .. External Subroutines .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Data statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -2827,8 +2757,8 @@ L130:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --bs;
     --bb;
     --as;
@@ -2836,8 +2766,7 @@ L130:
     --ab;
 
     /* Function Body */
-/*     .. Executable Statements .. */
-    conj = s_cmp(sname + 1, "HE", 2L, 2L) == 0;
+    conj = s_cmp(sname + 1, "HE", (ftnlen)2, (ftnlen)2) == 0;
 
     nargs = 12;
     nc = 0;
@@ -2875,8 +2804,7 @@ L130:
 		    ma = n;
 		    na = k;
 		}
-/*              Set LDA to 1 more than minimum value if room. 
-*/
+/*              Set LDA to 1 more than minimum value if room. */
 		lda = ma;
 		if (lda < *nmax) {
 		    ++lda;
@@ -2937,13 +2865,13 @@ L130:
 
 /*                       Generate the matrix C. */
 
-			    cmake_(sname + 1, uplo, " ", &n, &n, &c[c_offset],
-				     nmax, &cc[1], &ldc, &reset, &c_b1);
+			    cmake_(sname + 1, uplo, " ", &n, &n, &c__[
+				    c_offset], nmax, &cc[1], &ldc, &reset, &
+				    c_b1);
 
 			    ++nc;
 
-/*                       Save every datum before c
-alling the subroutine. */
+/*                       Save every datum before calling the subroutine. */
 
 			    *(unsigned char *)uplos = *(unsigned char *)uplo;
 			    *(unsigned char *)transs = *(unsigned char *)
@@ -2952,18 +2880,18 @@ alling the subroutine. */
 			    ks = k;
 			    als.r = alpha.r, als.i = alpha.i;
 			    i__5 = laa;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				as[i__6].r = aa[i__7].r, as[i__6].i = aa[i__7]
 					.i;
 /* L10: */
 			    }
 			    ldas = lda;
 			    i__5 = lbb;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				bs[i__6].r = bb[i__7].r, bs[i__6].i = bb[i__7]
 					.i;
 /* L20: */
@@ -2975,9 +2903,9 @@ alling the subroutine. */
 				bets.r = beta.r, bets.i = beta.i;
 			    }
 			    i__5 = lcc;
-			    for (i = 1; i <= i__5; ++i) {
-				i__6 = i;
-				i__7 = i;
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				i__6 = i__;
+				i__7 = i__;
 				cs[i__6].r = cc[i__7].r, cs[i__6].i = cc[i__7]
 					.i;
 /* L30: */
@@ -2992,9 +2920,9 @@ alling the subroutine. */
 				    s_wsfe(&io___334);
 				    do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, sname, 6L);
-				    do_fio(&c__1, uplo, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, sname, (ftnlen)6);
+				    do_fio(&c__1, uplo, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
@@ -3025,9 +2953,9 @@ alling the subroutine. */
 				    s_wsfe(&io___335);
 				    do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(
 					    integer));
-				    do_fio(&c__1, sname, 6L);
-				    do_fio(&c__1, uplo, 1L);
-				    do_fio(&c__1, trans, 1L);
+				    do_fio(&c__1, sname, (ftnlen)6);
+				    do_fio(&c__1, uplo, (ftnlen)1);
+				    do_fio(&c__1, trans, (ftnlen)1);
 				    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(
 					    integer));
 				    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(
@@ -3054,8 +2982,7 @@ alling the subroutine. */
 					ldc);
 			    }
 
-/*                       Check if error-exit was t
-aken incorrectly. */
+/*                       Check if error-exit was taken incorrectly. */
 
 			    if (! infoc_1.ok) {
 				io___336.ciunit = *nout;
@@ -3065,8 +2992,7 @@ aken incorrectly. */
 				goto L150;
 			    }
 
-/*                       See what data changed ins
-ide subroutines. */
+/*                       See what data changed inside subroutines. */
 
 			    isame[0] = *(unsigned char *)uplos == *(unsigned 
 				    char *)uplo;
@@ -3093,19 +3019,18 @@ ide subroutines. */
 			    }
 			    isame[11] = ldcs == ldc;
 
-/*                       If data was incorrectly c
-hanged, report and */
-/*                       return. */
+/*                       If data was incorrectly changed, report and   
+                         return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
-			    for (i = 1; i <= i__5; ++i) {
-				same = same && isame[i - 1];
-				if (! isame[i - 1]) {
+			    for (i__ = 1; i__ <= i__5; ++i__) {
+				same = same && isame[i__ - 1];
+				if (! isame[i__ - 1]) {
 				    io___339.ciunit = *nout;
 				    s_wsfe(&io___339);
-				    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(
-					    integer));
+				    do_fio(&c__1, (char *)&i__, (ftnlen)
+					    sizeof(integer));
 				    e_wsfe();
 				}
 /* L40: */
@@ -3117,8 +3042,7 @@ hanged, report and */
 
 			    if (! null) {
 
-/*                          Check the result c
-olumn by column. */
+/*                          Check the result column by column. */
 
 				if (conj) {
 				    *(unsigned char *)transt = 'C';
@@ -3138,10 +3062,10 @@ olumn by column. */
 				    }
 				    if (tran) {
 					i__6 = k;
-					for (i = 1; i <= i__6; ++i) {
-					    i__7 = i;
+					for (i__ = 1; i__ <= i__6; ++i__) {
+					    i__7 = i__;
 					    i__8 = (j - 1 << 1) * *nmax + k + 
-						    i;
+						    i__;
 					    q__1.r = alpha.r * ab[i__8].r - 
 						    alpha.i * ab[i__8].i, 
 						    q__1.i = alpha.r * ab[
@@ -3150,16 +3074,16 @@ olumn by column. */
 					    w[i__7].r = q__1.r, w[i__7].i = 
 						    q__1.i;
 					    if (conj) {
-			  i__7 = k + i;
+			  i__7 = k + i__;
 			  r_cnjg(&q__2, &alpha);
-			  i__8 = (j - 1 << 1) * *nmax + i;
+			  i__8 = (j - 1 << 1) * *nmax + i__;
 			  q__1.r = q__2.r * ab[i__8].r - q__2.i * ab[i__8].i, 
 				  q__1.i = q__2.r * ab[i__8].i + q__2.i * ab[
 				  i__8].r;
 			  w[i__7].r = q__1.r, w[i__7].i = q__1.i;
 					    } else {
-			  i__7 = k + i;
-			  i__8 = (j - 1 << 1) * *nmax + i;
+			  i__7 = k + i__;
+			  i__8 = (j - 1 << 1) * *nmax + i__;
 			  q__1.r = alpha.r * ab[i__8].r - alpha.i * ab[i__8]
 				  .i, q__1.i = alpha.r * ab[i__8].i + alpha.i 
 				  * ab[i__8].r;
@@ -3172,36 +3096,36 @@ olumn by column. */
 					i__8 = *nmax << 1;
 					cmmch_(transt, "N", &lj, &c__1, &i__6,
 						 &c_b2, &ab[jjab], &i__7, &w[
-						1], &i__8, &beta, &c[jj + j * 
-						c_dim1], nmax, &ct[1], &g[1], 
-						&cc[jc], &ldc, eps, &err, 
-						fatal, nout, &c_true);
+						1], &i__8, &beta, &c___ref(jj,
+						 j), nmax, &ct[1], &g[1], &cc[
+						jc], &ldc, eps, &err, fatal, 
+						nout, &c_true);
 				    } else {
 					i__6 = k;
-					for (i = 1; i <= i__6; ++i) {
+					for (i__ = 1; i__ <= i__6; ++i__) {
 					    if (conj) {
-			  i__7 = i;
-			  r_cnjg(&q__2, &ab[(k + i - 1) * *nmax + j]);
+			  i__7 = i__;
+			  r_cnjg(&q__2, &ab[(k + i__ - 1) * *nmax + j]);
 			  q__1.r = alpha.r * q__2.r - alpha.i * q__2.i, 
 				  q__1.i = alpha.r * q__2.i + alpha.i * 
 				  q__2.r;
 			  w[i__7].r = q__1.r, w[i__7].i = q__1.i;
-			  i__7 = k + i;
-			  i__8 = (i - 1) * *nmax + j;
+			  i__7 = k + i__;
+			  i__8 = (i__ - 1) * *nmax + j;
 			  q__2.r = alpha.r * ab[i__8].r - alpha.i * ab[i__8]
 				  .i, q__2.i = alpha.r * ab[i__8].i + alpha.i 
 				  * ab[i__8].r;
 			  r_cnjg(&q__1, &q__2);
 			  w[i__7].r = q__1.r, w[i__7].i = q__1.i;
 					    } else {
-			  i__7 = i;
-			  i__8 = (k + i - 1) * *nmax + j;
+			  i__7 = i__;
+			  i__8 = (k + i__ - 1) * *nmax + j;
 			  q__1.r = alpha.r * ab[i__8].r - alpha.i * ab[i__8]
 				  .i, q__1.i = alpha.r * ab[i__8].i + alpha.i 
 				  * ab[i__8].r;
 			  w[i__7].r = q__1.r, w[i__7].i = q__1.i;
-			  i__7 = k + i;
-			  i__8 = (i - 1) * *nmax + j;
+			  i__7 = k + i__;
+			  i__8 = (i__ - 1) * *nmax + j;
 			  q__1.r = alpha.r * ab[i__8].r - alpha.i * ab[i__8]
 				  .i, q__1.i = alpha.r * ab[i__8].i + alpha.i 
 				  * ab[i__8].r;
@@ -3213,10 +3137,11 @@ olumn by column. */
 					i__7 = *nmax << 1;
 					cmmch_("N", "N", &lj, &c__1, &i__6, &
 						c_b2, &ab[jj], nmax, &w[1], &
-						i__7, &beta, &c[jj + j * 
-						c_dim1], nmax, &ct[1], &g[1], 
-						&cc[jc], &ldc, eps, &err, 
-						fatal, nout, &c_true);
+						i__7, &beta, &c___ref(jj, j), 
+						nmax, &ct[1], &g[1], &cc[jc], 
+						&ldc, eps, &err, fatal, nout, 
+						&c_true)
+						;
 				    }
 				    if (upper) {
 					jc += ldc;
@@ -3227,9 +3152,8 @@ olumn by column. */
 					}
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got real
-ly bad answer, report and */
-/*                             return. */
+/*                             If got really bad answer, report and   
+                               return. */
 				    if (*fatal) {
 					goto L140;
 				    }
@@ -3262,13 +3186,13 @@ L130:
     if (errmax < *thresh) {
 	io___347.ciunit = *nout;
 	s_wsfe(&io___347);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	e_wsfe();
     } else {
 	io___348.ciunit = *nout;
 	s_wsfe(&io___348);
-	do_fio(&c__1, sname, 6L);
+	do_fio(&c__1, sname, (ftnlen)6);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&errmax, (ftnlen)sizeof(real));
 	e_wsfe();
@@ -3286,15 +3210,15 @@ L140:
 L150:
     io___350.ciunit = *nout;
     s_wsfe(&io___350);
-    do_fio(&c__1, sname, 6L);
+    do_fio(&c__1, sname, (ftnlen)6);
     e_wsfe();
     if (conj) {
 	io___351.ciunit = *nout;
 	s_wsfe(&io___351);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-	do_fio(&c__1, sname, 6L);
-	do_fio(&c__1, uplo, 1L);
-	do_fio(&c__1, trans, 1L);
+	do_fio(&c__1, sname, (ftnlen)6);
+	do_fio(&c__1, uplo, (ftnlen)1);
+	do_fio(&c__1, trans, (ftnlen)1);
 	do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
 	do_fio(&c__2, (char *)&alpha, (ftnlen)sizeof(real));
@@ -3307,9 +3231,9 @@ L150:
 	io___352.ciunit = *nout;
 	s_wsfe(&io___352);
 	do_fio(&c__1, (char *)&nc, (ftnlen)sizeof(integer));
-	do_fio(&c__1, sname, 6L);
-	do_fio(&c__1, uplo, 1L);
-	do_fio(&c__1, trans, 1L);
+	do_fio(&c__1, sname, (ftnlen)6);
+	do_fio(&c__1, uplo, (ftnlen)1);
+	do_fio(&c__1, trans, (ftnlen)1);
 	do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
 	do_fio(&c__2, (char *)&alpha, (ftnlen)sizeof(real));
@@ -3328,6 +3252,10 @@ L160:
 
 } /* cchk5_ */
 
+#undef c___ref
+#undef c___subscr
+
+
 /* Subroutine */ int cchke_(integer *isnum, char *srnamt, integer *nout)
 {
     /* Format strings */
@@ -3340,8 +3268,8 @@ L160:
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static complex beta, a[2]	/* was [2][1] */, b[2]	/* was [2][1] */, c[2]
-	    	/* was [2][1] */, alpha;
+    static complex beta, a[2]	/* was [2][1] */, b[2]	/* was [2][1] */, c__[
+	    2]	/* was [2][1] */, alpha;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *), chemm_(char *, 
@@ -3372,33 +3300,36 @@ L160:
 
 
 
-/*  Tests the error exits from the Level 3 Blas. */
-/*  Requires a special version of the error-handling routine XERBLA. */
-/*  ALPHA, RALPHA, BETA, RBETA, A, B and C should not need to be defined. 
-*/
+/*  Tests the error exits from the Level 3 Blas.   
+    Requires a special version of the error-handling routine XERBLA.   
+    A, B and C should not need to be defined.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
 
-/*     .. Scalar Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Local Scalars .. */
-/*     .. Local Arrays .. */
-/*     .. External Subroutines .. */
-/*     .. Common blocks .. */
-/*     .. Executable Statements .. */
-/*     OK is set to .FALSE. by the special version of XERBLA or by CHKXER 
-*/
-/*     if anything is wrong. */
+    3-19-92:  Initialize ALPHA, BETA, RALPHA, and RBETA  (eca)   
+    3-19-92:  Fix argument 12 in calls to CSYMM and CHEMM   
+              with INFOT = 9  (eca)   
+
+       OK is set to .FALSE. by the special version of XERBLA or by CHKXER   
+       if anything is wrong. */
     infoc_1.ok = TRUE_;
-/*     LERR is set to .TRUE. by the special version of XERBLA each time */
-/*     it is called, and is then tested and re-set by CHKXER. */
+/*     LERR is set to .TRUE. by the special version of XERBLA each time   
+       it is called, and is then tested and re-set by CHKXER. */
     infoc_1.lerr = FALSE_;
+
+/*     Initialize ALPHA, BETA, RALPHA, and RBETA. */
+
+    alpha.r = 1.f, alpha.i = -1.f;
+    beta.r = 2.f, beta.i = -2.f;
+    ralpha = 1.f;
+    rbeta = 2.f;
+
     switch (*isnum) {
 	case 1:  goto L10;
 	case 2:  goto L20;
@@ -3413,422 +3344,422 @@ L160:
 L10:
     infoc_1.infot = 1;
     cgemm_("/", "N", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 1;
     cgemm_("/", "C", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 1;
     cgemm_("/", "T", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
     cgemm_("N", "/", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
     cgemm_("C", "/", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
     cgemm_("T", "/", &c__0, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("N", "N", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("N", "C", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("N", "T", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("C", "N", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("C", "C", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("C", "T", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("T", "N", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("T", "C", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
     cgemm_("T", "T", &c_n1, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("N", "N", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("N", "C", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("N", "T", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("C", "N", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("C", "C", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("C", "T", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("T", "N", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("T", "C", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
     cgemm_("T", "T", &c__0, &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("N", "N", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("N", "C", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("N", "T", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("C", "N", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("C", "C", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("C", "T", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("T", "N", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("T", "C", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
     cgemm_("T", "T", &c__0, &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("N", "N", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__2);
+	    c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("N", "C", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__2);
+	    c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("N", "T", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__2);
+	    c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("C", "N", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__2, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("C", "C", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("C", "T", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("T", "N", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__2, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("T", "C", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
     cgemm_("T", "T", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("N", "N", &c__0, &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("C", "N", &c__0, &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("T", "N", &c__0, &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("N", "C", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("C", "C", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("T", "C", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("N", "T", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("C", "T", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
     cgemm_("T", "T", &c__0, &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("N", "N", &c__2, &c__0, &c__0, &alpha, a, &c__2, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("N", "C", &c__2, &c__0, &c__0, &alpha, a, &c__2, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("N", "T", &c__2, &c__0, &c__0, &alpha, a, &c__2, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("C", "N", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("C", "C", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("C", "T", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("T", "N", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("T", "C", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
     cgemm_("T", "T", &c__2, &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, 
-	    c, &c__1);
+	    c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
 L20:
     infoc_1.infot = 1;
-    chemm_("/", "U", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("/", "U", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    chemm_("L", "/", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("L", "/", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    chemm_("L", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("L", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    chemm_("R", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    chemm_("L", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("L", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    chemm_("R", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    chemm_("L", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("L", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    chemm_("R", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    chemm_("L", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("L", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    chemm_("R", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    chemm_("R", "U", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "U", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    chemm_("R", "L", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "L", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
-	    c__1);
+    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    chemm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
-	    c__1);
+    chemm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
-	    c__1);
+    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    chemm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    chemm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
+	    c__2);
+    chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
+    infoc_1.infot = 12;
+    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    chemm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
+    chemm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    chemm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    chemm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
-	    c__1);
-    chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
-    infoc_1.infot = 12;
-    chemm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    chemm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
 L30:
     infoc_1.infot = 1;
-    csymm_("/", "U", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("/", "U", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    csymm_("L", "/", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("L", "/", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csymm_("L", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("L", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csymm_("R", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "U", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csymm_("L", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("L", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csymm_("R", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "L", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csymm_("L", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("L", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csymm_("R", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "U", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csymm_("L", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("L", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csymm_("R", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "L", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csymm_("R", "U", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "U", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csymm_("R", "L", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "L", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
-	    c__1);
+    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csymm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
-	    c__1);
+    csymm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
-	    c__1);
+    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
+	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csymm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csymm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
+	    c__2);
+    chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
+    infoc_1.infot = 12;
+    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csymm_("L", "U", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
+    csymm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csymm_("R", "U", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csymm_("L", "L", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
-	    c__1);
-    chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
-    infoc_1.infot = 12;
-    csymm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c, &
+    csymm_("R", "L", &c__2, &c__0, &alpha, a, &c__1, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
@@ -4150,293 +4081,293 @@ L50:
     goto L100;
 L60:
     infoc_1.infot = 1;
-    cherk_("/", "N", &c__0, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("/", "N", &c__0, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    cherk_("U", "T", &c__0, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "T", &c__0, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cherk_("U", "N", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "N", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cherk_("U", "C", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "C", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cherk_("L", "N", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "N", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cherk_("L", "C", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "C", &c_n1, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cherk_("U", "N", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "N", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cherk_("U", "C", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "C", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cherk_("L", "N", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "N", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cherk_("L", "C", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "C", &c__0, &c_n1, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cherk_("U", "N", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__2);
+    cherk_("U", "N", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cherk_("U", "C", &c__0, &c__2, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "C", &c__0, &c__2, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cherk_("L", "N", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__2);
+    cherk_("L", "N", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cherk_("L", "C", &c__0, &c__2, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "C", &c__0, &c__2, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    cherk_("U", "N", &c__2, &c__0, &ralpha, a, &c__2, &rbeta, c, &c__1);
+    cherk_("U", "N", &c__2, &c__0, &ralpha, a, &c__2, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    cherk_("U", "C", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("U", "C", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    cherk_("L", "N", &c__2, &c__0, &ralpha, a, &c__2, &rbeta, c, &c__1);
+    cherk_("L", "N", &c__2, &c__0, &ralpha, a, &c__2, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    cherk_("L", "C", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c, &c__1);
+    cherk_("L", "C", &c__2, &c__0, &ralpha, a, &c__1, &rbeta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
 L70:
     infoc_1.infot = 1;
-    csyrk_("/", "N", &c__0, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("/", "N", &c__0, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    csyrk_("U", "C", &c__0, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "C", &c__0, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyrk_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyrk_("U", "T", &c_n1, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "T", &c_n1, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyrk_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyrk_("L", "T", &c_n1, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "T", &c_n1, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyrk_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyrk_("U", "T", &c__0, &c_n1, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "T", &c__0, &c_n1, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyrk_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyrk_("L", "T", &c__0, &c_n1, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "T", &c__0, &c_n1, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyrk_("U", "N", &c__2, &c__0, &alpha, a, &c__1, &beta, c, &c__2);
+    csyrk_("U", "N", &c__2, &c__0, &alpha, a, &c__1, &beta, c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyrk_("U", "T", &c__0, &c__2, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "T", &c__0, &c__2, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyrk_("L", "N", &c__2, &c__0, &alpha, a, &c__1, &beta, c, &c__2);
+    csyrk_("L", "N", &c__2, &c__0, &alpha, a, &c__1, &beta, c__, &c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyrk_("L", "T", &c__0, &c__2, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "T", &c__0, &c__2, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    csyrk_("U", "N", &c__2, &c__0, &alpha, a, &c__2, &beta, c, &c__1);
+    csyrk_("U", "N", &c__2, &c__0, &alpha, a, &c__2, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    csyrk_("U", "T", &c__2, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("U", "T", &c__2, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    csyrk_("L", "N", &c__2, &c__0, &alpha, a, &c__2, &beta, c, &c__1);
+    csyrk_("L", "N", &c__2, &c__0, &alpha, a, &c__2, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    csyrk_("L", "T", &c__2, &c__0, &alpha, a, &c__1, &beta, c, &c__1);
+    csyrk_("L", "T", &c__2, &c__0, &alpha, a, &c__1, &beta, c__, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
 L80:
     infoc_1.infot = 1;
-    cher2k_("/", "N", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("/", "N", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    cher2k_("U", "T", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "T", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cher2k_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cher2k_("U", "C", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "C", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cher2k_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    cher2k_("L", "C", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "C", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cher2k_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cher2k_("U", "C", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "C", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cher2k_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    cher2k_("L", "C", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "C", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cher2k_("U", "C", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "C", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    cher2k_("L", "C", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "C", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &rbeta, c, &
+    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &rbeta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    cher2k_("U", "C", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &rbeta, c, &
+    cher2k_("U", "C", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &rbeta, c, &
+    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &rbeta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    cher2k_("L", "C", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &rbeta, c, &
+    cher2k_("L", "C", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &rbeta, c, &
+    cher2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    cher2k_("U", "C", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("U", "C", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &rbeta, c, &
+    cher2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    cher2k_("L", "C", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c, &
+    cher2k_("L", "C", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &rbeta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L100;
 L90:
     infoc_1.infot = 1;
-    csyr2k_("/", "N", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("/", "N", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    csyr2k_("U", "C", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "C", &c__0, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyr2k_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyr2k_("U", "T", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "T", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyr2k_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "N", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    csyr2k_("L", "T", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "T", &c_n1, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyr2k_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyr2k_("U", "T", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "T", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyr2k_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "N", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    csyr2k_("L", "T", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "T", &c__0, &c_n1, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyr2k_("U", "T", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "T", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 7;
-    csyr2k_("L", "T", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "T", &c__0, &c__2, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
+    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csyr2k_("U", "T", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, c, &
+    csyr2k_("U", "T", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c, &
+    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__1, &beta, c__, &
 	    c__2);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 9;
-    csyr2k_("L", "T", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, c, &
+    csyr2k_("L", "T", &c__0, &c__2, &alpha, a, &c__2, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
+    csyr2k_("U", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csyr2k_("U", "T", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("U", "T", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c, &
+    csyr2k_("L", "N", &c__2, &c__0, &alpha, a, &c__2, b, &c__2, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 12;
-    csyr2k_("L", "T", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c, &
+    csyr2k_("L", "T", &c__2, &c__0, &alpha, a, &c__1, b, &c__1, &beta, c__, &
 	    c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
 
@@ -4444,12 +4375,12 @@ L100:
     if (infoc_1.ok) {
 	io___360.ciunit = *nout;
 	s_wsfe(&io___360);
-	do_fio(&c__1, srnamt, 6L);
+	do_fio(&c__1, srnamt, (ftnlen)6);
 	e_wsfe();
     } else {
 	io___361.ciunit = *nout;
 	s_wsfe(&io___361);
-	do_fio(&c__1, srnamt, 6L);
+	do_fio(&c__1, srnamt, (ftnlen)6);
 	e_wsfe();
     }
     return 0;
@@ -4457,15 +4388,15 @@ L100:
 
 /*     End of CCHKE. */
 
-} /* cchke_ */
+} /* cchke_   
 
-/* Subroutine */ int cmake_(char *type, char *uplo, char *diag, integer *m, 
+   Subroutine */ int cmake_(char *type__, char *uplo, char *diag, integer *m, 
 	integer *n, complex *a, integer *nmax, complex *aa, integer *lda, 
 	logical *reset, complex *transl)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
-    doublereal d__1;
+    real r__1;
     complex q__1, q__2;
 
     /* Builtin functions */
@@ -4476,44 +4407,41 @@ L100:
     extern /* Complex */ VOID cbeg_(complex *, logical *);
     static integer ibeg, iend;
     static logical unit;
-    static integer i, j;
+    static integer i__, j;
     static logical lower, upper;
     static integer jj;
     static logical gen, her, tri, sym;
 
 
-/*  Generates values for an M by N matrix A. */
-/*  Stores the values in the array AA in the data structure required */
-/*  by the routine, with unwanted elements set to rogue value. */
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
-/*  TYPE is 'GE', 'HE', 'SY' or 'TR'. */
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+/*  Generates values for an M by N matrix A.   
+    Stores the values in the array AA in the data structure required   
+    by the routine, with unwanted elements set to rogue value.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    TYPE is 'GE', 'HE', 'SY' or 'TR'.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. External Functions .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Executable Statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     a_dim1 = *nmax;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --aa;
 
     /* Function Body */
-    gen = s_cmp(type, "GE", 2L, 2L) == 0;
-    her = s_cmp(type, "HE", 2L, 2L) == 0;
-    sym = s_cmp(type, "SY", 2L, 2L) == 0;
-    tri = s_cmp(type, "TR", 2L, 2L) == 0;
+    gen = s_cmp(type__, "GE", (ftnlen)2, (ftnlen)2) == 0;
+    her = s_cmp(type__, "HE", (ftnlen)2, (ftnlen)2) == 0;
+    sym = s_cmp(type__, "SY", (ftnlen)2, (ftnlen)2) == 0;
+    tri = s_cmp(type__, "TR", (ftnlen)2, (ftnlen)2) == 0;
     upper = (her || sym || tri) && *(unsigned char *)uplo == 'U';
     lower = (her || sym || tri) && *(unsigned char *)uplo == 'L';
     unit = tri && *(unsigned char *)diag == 'U';
@@ -4523,28 +4451,28 @@ L100:
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
-	for (i = 1; i <= i__2; ++i) {
-	    if (gen || upper && i <= j || lower && i >= j) {
-		i__3 = i + j * a_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    if (gen || upper && i__ <= j || lower && i__ >= j) {
+		i__3 = a_subscr(i__, j);
 		cbeg_(&q__2, reset);
 		q__1.r = q__2.r + transl->r, q__1.i = q__2.i + transl->i;
 		a[i__3].r = q__1.r, a[i__3].i = q__1.i;
-		if (i != j) {
+		if (i__ != j) {
 /*                 Set some elements to zero */
 		    if (*n > 3 && j == *n / 2) {
-			i__3 = i + j * a_dim1;
+			i__3 = a_subscr(i__, j);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 		    if (her) {
-			i__3 = j + i * a_dim1;
-			r_cnjg(&q__1, &a[i + j * a_dim1]);
+			i__3 = a_subscr(j, i__);
+			r_cnjg(&q__1, &a_ref(i__, j));
 			a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 		    } else if (sym) {
-			i__3 = j + i * a_dim1;
-			i__4 = i + j * a_dim1;
+			i__3 = a_subscr(j, i__);
+			i__4 = a_subscr(i__, j);
 			a[i__3].r = a[i__4].r, a[i__3].i = a[i__4].i;
 		    } else if (tri) {
-			i__3 = j + i * a_dim1;
+			i__3 = a_subscr(j, i__);
 			a[i__3].r = 0.f, a[i__3].i = 0.f;
 		    }
 		}
@@ -4552,48 +4480,48 @@ L100:
 /* L10: */
 	}
 	if (her) {
-	    i__2 = j + j * a_dim1;
-	    i__3 = j + j * a_dim1;
-	    d__1 = a[i__3].r;
-	    q__1.r = d__1, q__1.i = 0.f;
+	    i__2 = a_subscr(j, j);
+	    i__3 = a_subscr(j, j);
+	    r__1 = a[i__3].r;
+	    q__1.r = r__1, q__1.i = 0.f;
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	}
 	if (tri) {
-	    i__2 = j + j * a_dim1;
-	    i__3 = j + j * a_dim1;
+	    i__2 = a_subscr(j, j);
+	    i__3 = a_subscr(j, j);
 	    q__1.r = a[i__3].r + 1.f, q__1.i = a[i__3].i + 0.f;
 	    a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	}
 	if (unit) {
-	    i__2 = j + j * a_dim1;
+	    i__2 = a_subscr(j, j);
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 	}
 /* L20: */
     }
 
-/*     Store elements in array AS in data structure required by routine. 
-*/
+/*     Store elements in array AS in data structure required by routine. */
 
-    if (s_cmp(type, "GE", 2L, 2L) == 0) {
+    if (s_cmp(type__, "GE", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + (j - 1) * *lda;
-		i__4 = i + j * a_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = i__ + (j - 1) * *lda;
+		i__4 = a_subscr(i__, j);
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L30: */
 	    }
 	    i__2 = *lda;
-	    for (i = *m + 1; i <= i__2; ++i) {
-		i__3 = i + (j - 1) * *lda;
+	    for (i__ = *m + 1; i__ <= i__2; ++i__) {
+		i__3 = i__ + (j - 1) * *lda;
 		aa[i__3].r = -1e10f, aa[i__3].i = 1e10f;
 /* L40: */
 	    }
 /* L50: */
 	}
-    } else if (s_cmp(type, "HE", 2L, 2L) == 0 || s_cmp(type, "SY", 2L, 2L) == 
-	    0 || s_cmp(type, "TR", 2L, 2L) == 0) {
+    } else if (s_cmp(type__, "HE", (ftnlen)2, (ftnlen)2) == 0 || s_cmp(type__,
+	     "SY", (ftnlen)2, (ftnlen)2) == 0 || s_cmp(type__, "TR", (ftnlen)
+	    2, (ftnlen)2) == 0) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    if (upper) {
@@ -4612,21 +4540,21 @@ L100:
 		iend = *n;
 	    }
 	    i__2 = ibeg - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + (j - 1) * *lda;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = i__ + (j - 1) * *lda;
 		aa[i__3].r = -1e10f, aa[i__3].i = 1e10f;
 /* L60: */
 	    }
 	    i__2 = iend;
-	    for (i = ibeg; i <= i__2; ++i) {
-		i__3 = i + (j - 1) * *lda;
-		i__4 = i + j * a_dim1;
+	    for (i__ = ibeg; i__ <= i__2; ++i__) {
+		i__3 = i__ + (j - 1) * *lda;
+		i__4 = a_subscr(i__, j);
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L70: */
 	    }
 	    i__2 = *lda;
-	    for (i = iend + 1; i <= i__2; ++i) {
-		i__3 = i + (j - 1) * *lda;
+	    for (i__ = iend + 1; i__ <= i__2; ++i__) {
+		i__3 = i__ + (j - 1) * *lda;
 		aa[i__3].r = -1e10f, aa[i__3].i = 1e10f;
 /* L80: */
 	    }
@@ -4634,8 +4562,8 @@ L100:
 		jj = j + (j - 1) * *lda;
 		i__2 = jj;
 		i__3 = jj;
-		d__1 = aa[i__3].r;
-		q__1.r = d__1, q__1.i = -1e10f;
+		r__1 = aa[i__3].r;
+		q__1.r = r__1, q__1.i = -1e10f;
 		aa[i__2].r = q__1.r, aa[i__2].i = q__1.i;
 	    }
 /* L90: */
@@ -4647,9 +4575,13 @@ L100:
 
 } /* cmake_ */
 
+#undef a_ref
+#undef a_subscr
+
+
 /* Subroutine */ int cmmch_(char *transa, char *transb, integer *m, integer *
 	n, integer *kk, complex *alpha, complex *a, integer *lda, complex *b, 
-	integer *ldb, complex *beta, complex *c, integer *ldc, complex *ct, 
+	integer *ldb, complex *beta, complex *c__, integer *ldc, complex *ct, 
 	real *g, complex *cc, integer *ldcc, real *eps, real *err, logical *
 	fatal, integer *nout, logical *mv)
 {
@@ -4677,7 +4609,7 @@ L100:
 
     /* Local variables */
     static real erri;
-    static integer i, j, k;
+    static integer i__, j, k;
     static logical trana, tranb, ctrana, ctranb;
 
     /* Fortran I/O blocks */
@@ -4688,38 +4620,40 @@ L100:
 
 
 
-/*  Checks the results of the computational tests. */
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
+#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+#define c___subscr(a_1,a_2) (a_2)*c_dim1 + a_1
+#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+#define cc_subscr(a_1,a_2) (a_2)*cc_dim1 + a_1
+#define cc_ref(a_1,a_2) cc[cc_subscr(a_1,a_2)]
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  Checks the results of the computational tests.   
 
-/*     .. Parameters .. */
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Statement Functions .. */
-/*     .. Statement Function definitions .. */
-/*     .. Executable Statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = c_dim1 + 1;
-    c -= c_offset;
+    c_offset = 1 + c_dim1 * 1;
+    c__ -= c_offset;
     --ct;
     --g;
     cc_dim1 = *ldcc;
-    cc_offset = cc_dim1 + 1;
+    cc_offset = 1 + cc_dim1 * 1;
     cc -= cc_offset;
 
     /* Function Body */
@@ -4730,41 +4664,41 @@ L100:
     ctrana = *(unsigned char *)transa == 'C';
     ctranb = *(unsigned char *)transb == 'C';
 
-/*     Compute expected result, one column at a time, in CT using data */
-/*     in A, B and C. */
-/*     Compute gauges in G. */
+/*     Compute expected result, one column at a time, in CT using data   
+       in A, B and C.   
+       Compute gauges in G. */
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 
 	i__2 = *m;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = i__;
 	    ct[i__3].r = 0.f, ct[i__3].i = 0.f;
-	    g[i] = 0.f;
+	    g[i__] = 0.f;
 /* L10: */
 	}
 	if (! trana && ! tranb) {
 	    i__2 = *kk;
 	    for (k = 1; k <= i__2; ++k) {
 		i__3 = *m;
-		for (i = 1; i <= i__3; ++i) {
-		    i__4 = i;
-		    i__5 = i;
-		    i__6 = i + k * a_dim1;
-		    i__7 = k + j * b_dim1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    i__4 = i__;
+		    i__5 = i__;
+		    i__6 = a_subscr(i__, k);
+		    i__7 = b_subscr(k, j);
 		    q__2.r = a[i__6].r * b[i__7].r - a[i__6].i * b[i__7].i, 
 			    q__2.i = a[i__6].r * b[i__7].i + a[i__6].i * b[
 			    i__7].r;
 		    q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i + 
 			    q__2.i;
 		    ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-		    i__4 = i + k * a_dim1;
-		    i__5 = k + j * b_dim1;
-		    g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = r_imag(&
-			    a[i + k * a_dim1]), dabs(r__2))) * ((r__3 = b[
-			    i__5].r, dabs(r__3)) + (r__4 = r_imag(&b[k + j * 
-			    b_dim1]), dabs(r__4)));
+		    i__4 = a_subscr(i__, k);
+		    i__5 = b_subscr(k, j);
+		    g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
+			    r_imag(&a_ref(i__, k)), dabs(r__2))) * ((r__3 = b[
+			    i__5].r, dabs(r__3)) + (r__4 = r_imag(&b_ref(k, j)
+			    ), dabs(r__4)));
 /* L20: */
 		}
 /* L30: */
@@ -4774,23 +4708,23 @@ L100:
 		i__2 = *kk;
 		for (k = 1; k <= i__2; ++k) {
 		    i__3 = *m;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i;
-			i__5 = i;
-			r_cnjg(&q__3, &a[k + i * a_dim1]);
-			i__6 = k + j * b_dim1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			i__5 = i__;
+			r_cnjg(&q__3, &a_ref(k, i__));
+			i__6 = b_subscr(k, j);
 			q__2.r = q__3.r * b[i__6].r - q__3.i * b[i__6].i, 
 				q__2.i = q__3.r * b[i__6].i + q__3.i * b[i__6]
 				.r;
 			q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i + 
 				q__2.i;
 			ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			i__4 = k + i * a_dim1;
-			i__5 = k + j * b_dim1;
-			g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				r_imag(&a[k + i * a_dim1]), dabs(r__2))) * ((
-				r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
-				r_imag(&b[k + j * b_dim1]), dabs(r__4)));
+			i__4 = a_subscr(k, i__);
+			i__5 = b_subscr(k, j);
+			g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
+				r_imag(&a_ref(k, i__)), dabs(r__2))) * ((r__3 
+				= b[i__5].r, dabs(r__3)) + (r__4 = r_imag(&
+				b_ref(k, j)), dabs(r__4)));
 /* L40: */
 		    }
 /* L50: */
@@ -4799,23 +4733,23 @@ L100:
 		i__2 = *kk;
 		for (k = 1; k <= i__2; ++k) {
 		    i__3 = *m;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i;
-			i__5 = i;
-			i__6 = k + i * a_dim1;
-			i__7 = k + j * b_dim1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			i__5 = i__;
+			i__6 = a_subscr(k, i__);
+			i__7 = b_subscr(k, j);
 			q__2.r = a[i__6].r * b[i__7].r - a[i__6].i * b[i__7]
 				.i, q__2.i = a[i__6].r * b[i__7].i + a[i__6]
 				.i * b[i__7].r;
 			q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i + 
 				q__2.i;
 			ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			i__4 = k + i * a_dim1;
-			i__5 = k + j * b_dim1;
-			g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				r_imag(&a[k + i * a_dim1]), dabs(r__2))) * ((
-				r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
-				r_imag(&b[k + j * b_dim1]), dabs(r__4)));
+			i__4 = a_subscr(k, i__);
+			i__5 = b_subscr(k, j);
+			g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
+				r_imag(&a_ref(k, i__)), dabs(r__2))) * ((r__3 
+				= b[i__5].r, dabs(r__3)) + (r__4 = r_imag(&
+				b_ref(k, j)), dabs(r__4)));
 /* L60: */
 		    }
 /* L70: */
@@ -4826,23 +4760,23 @@ L100:
 		i__2 = *kk;
 		for (k = 1; k <= i__2; ++k) {
 		    i__3 = *m;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i;
-			i__5 = i;
-			i__6 = i + k * a_dim1;
-			r_cnjg(&q__3, &b[j + k * b_dim1]);
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			i__5 = i__;
+			i__6 = a_subscr(i__, k);
+			r_cnjg(&q__3, &b_ref(j, k));
 			q__2.r = a[i__6].r * q__3.r - a[i__6].i * q__3.i, 
 				q__2.i = a[i__6].r * q__3.i + a[i__6].i * 
 				q__3.r;
 			q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i + 
 				q__2.i;
 			ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			i__4 = i + k * a_dim1;
-			i__5 = j + k * b_dim1;
-			g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				r_imag(&a[i + k * a_dim1]), dabs(r__2))) * ((
-				r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
-				r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			i__4 = a_subscr(i__, k);
+			i__5 = b_subscr(j, k);
+			g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
+				r_imag(&a_ref(i__, k)), dabs(r__2))) * ((r__3 
+				= b[i__5].r, dabs(r__3)) + (r__4 = r_imag(&
+				b_ref(j, k)), dabs(r__4)));
 /* L80: */
 		    }
 /* L90: */
@@ -4851,23 +4785,23 @@ L100:
 		i__2 = *kk;
 		for (k = 1; k <= i__2; ++k) {
 		    i__3 = *m;
-		    for (i = 1; i <= i__3; ++i) {
-			i__4 = i;
-			i__5 = i;
-			i__6 = i + k * a_dim1;
-			i__7 = j + k * b_dim1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			i__4 = i__;
+			i__5 = i__;
+			i__6 = a_subscr(i__, k);
+			i__7 = b_subscr(j, k);
 			q__2.r = a[i__6].r * b[i__7].r - a[i__6].i * b[i__7]
 				.i, q__2.i = a[i__6].r * b[i__7].i + a[i__6]
 				.i * b[i__7].r;
 			q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i + 
 				q__2.i;
 			ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			i__4 = i + k * a_dim1;
-			i__5 = j + k * b_dim1;
-			g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				r_imag(&a[i + k * a_dim1]), dabs(r__2))) * ((
-				r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
-				r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			i__4 = a_subscr(i__, k);
+			i__5 = b_subscr(j, k);
+			g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
+				r_imag(&a_ref(i__, k)), dabs(r__2))) * ((r__3 
+				= b[i__5].r, dabs(r__3)) + (r__4 = r_imag(&
+				b_ref(j, k)), dabs(r__4)));
 /* L100: */
 		    }
 /* L110: */
@@ -4879,23 +4813,23 @@ L100:
 		    i__2 = *kk;
 		    for (k = 1; k <= i__2; ++k) {
 			i__3 = *m;
-			for (i = 1; i <= i__3; ++i) {
-			    i__4 = i;
-			    i__5 = i;
-			    r_cnjg(&q__3, &a[k + i * a_dim1]);
-			    r_cnjg(&q__4, &b[j + k * b_dim1]);
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    i__5 = i__;
+			    r_cnjg(&q__3, &a_ref(k, i__));
+			    r_cnjg(&q__4, &b_ref(j, k));
 			    q__2.r = q__3.r * q__4.r - q__3.i * q__4.i, 
 				    q__2.i = q__3.r * q__4.i + q__3.i * 
 				    q__4.r;
 			    q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i 
 				    + q__2.i;
 			    ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			    i__4 = k + i * a_dim1;
-			    i__5 = j + k * b_dim1;
-			    g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				    r_imag(&a[k + i * a_dim1]), dabs(r__2))) *
-				     ((r__3 = b[i__5].r, dabs(r__3)) + (r__4 =
-				     r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			    i__4 = a_subscr(k, i__);
+			    i__5 = b_subscr(j, k);
+			    g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 
+				    = r_imag(&a_ref(k, i__)), dabs(r__2))) * (
+				    (r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
+				    r_imag(&b_ref(j, k)), dabs(r__4)));
 /* L120: */
 			}
 /* L130: */
@@ -4904,23 +4838,23 @@ L100:
 		    i__2 = *kk;
 		    for (k = 1; k <= i__2; ++k) {
 			i__3 = *m;
-			for (i = 1; i <= i__3; ++i) {
-			    i__4 = i;
-			    i__5 = i;
-			    r_cnjg(&q__3, &a[k + i * a_dim1]);
-			    i__6 = j + k * b_dim1;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    i__5 = i__;
+			    r_cnjg(&q__3, &a_ref(k, i__));
+			    i__6 = b_subscr(j, k);
 			    q__2.r = q__3.r * b[i__6].r - q__3.i * b[i__6].i, 
 				    q__2.i = q__3.r * b[i__6].i + q__3.i * b[
 				    i__6].r;
 			    q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i 
 				    + q__2.i;
 			    ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			    i__4 = k + i * a_dim1;
-			    i__5 = j + k * b_dim1;
-			    g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				    r_imag(&a[k + i * a_dim1]), dabs(r__2))) *
-				     ((r__3 = b[i__5].r, dabs(r__3)) + (r__4 =
-				     r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			    i__4 = a_subscr(k, i__);
+			    i__5 = b_subscr(j, k);
+			    g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 
+				    = r_imag(&a_ref(k, i__)), dabs(r__2))) * (
+				    (r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
+				    r_imag(&b_ref(j, k)), dabs(r__4)));
 /* L140: */
 			}
 /* L150: */
@@ -4931,23 +4865,23 @@ L100:
 		    i__2 = *kk;
 		    for (k = 1; k <= i__2; ++k) {
 			i__3 = *m;
-			for (i = 1; i <= i__3; ++i) {
-			    i__4 = i;
-			    i__5 = i;
-			    i__6 = k + i * a_dim1;
-			    r_cnjg(&q__3, &b[j + k * b_dim1]);
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    i__5 = i__;
+			    i__6 = a_subscr(k, i__);
+			    r_cnjg(&q__3, &b_ref(j, k));
 			    q__2.r = a[i__6].r * q__3.r - a[i__6].i * q__3.i, 
 				    q__2.i = a[i__6].r * q__3.i + a[i__6].i * 
 				    q__3.r;
 			    q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i 
 				    + q__2.i;
 			    ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			    i__4 = k + i * a_dim1;
-			    i__5 = j + k * b_dim1;
-			    g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				    r_imag(&a[k + i * a_dim1]), dabs(r__2))) *
-				     ((r__3 = b[i__5].r, dabs(r__3)) + (r__4 =
-				     r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			    i__4 = a_subscr(k, i__);
+			    i__5 = b_subscr(j, k);
+			    g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 
+				    = r_imag(&a_ref(k, i__)), dabs(r__2))) * (
+				    (r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
+				    r_imag(&b_ref(j, k)), dabs(r__4)));
 /* L160: */
 			}
 /* L170: */
@@ -4956,23 +4890,23 @@ L100:
 		    i__2 = *kk;
 		    for (k = 1; k <= i__2; ++k) {
 			i__3 = *m;
-			for (i = 1; i <= i__3; ++i) {
-			    i__4 = i;
-			    i__5 = i;
-			    i__6 = k + i * a_dim1;
-			    i__7 = j + k * b_dim1;
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    i__4 = i__;
+			    i__5 = i__;
+			    i__6 = a_subscr(k, i__);
+			    i__7 = b_subscr(j, k);
 			    q__2.r = a[i__6].r * b[i__7].r - a[i__6].i * b[
 				    i__7].i, q__2.i = a[i__6].r * b[i__7].i + 
 				    a[i__6].i * b[i__7].r;
 			    q__1.r = ct[i__5].r + q__2.r, q__1.i = ct[i__5].i 
 				    + q__2.i;
 			    ct[i__4].r = q__1.r, ct[i__4].i = q__1.i;
-			    i__4 = k + i * a_dim1;
-			    i__5 = j + k * b_dim1;
-			    g[i] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 = 
-				    r_imag(&a[k + i * a_dim1]), dabs(r__2))) *
-				     ((r__3 = b[i__5].r, dabs(r__3)) + (r__4 =
-				     r_imag(&b[j + k * b_dim1]), dabs(r__4)));
+			    i__4 = a_subscr(k, i__);
+			    i__5 = b_subscr(j, k);
+			    g[i__] += ((r__1 = a[i__4].r, dabs(r__1)) + (r__2 
+				    = r_imag(&a_ref(k, i__)), dabs(r__2))) * (
+				    (r__3 = b[i__5].r, dabs(r__3)) + (r__4 = 
+				    r_imag(&b_ref(j, k)), dabs(r__4)));
 /* L180: */
 			}
 /* L190: */
@@ -4981,22 +4915,22 @@ L100:
 	    }
 	}
 	i__2 = *m;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i;
-	    i__4 = i;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = i__;
+	    i__4 = i__;
 	    q__2.r = alpha->r * ct[i__4].r - alpha->i * ct[i__4].i, q__2.i = 
 		    alpha->r * ct[i__4].i + alpha->i * ct[i__4].r;
-	    i__5 = i + j * c_dim1;
-	    q__3.r = beta->r * c[i__5].r - beta->i * c[i__5].i, q__3.i = 
-		    beta->r * c[i__5].i + beta->i * c[i__5].r;
+	    i__5 = c___subscr(i__, j);
+	    q__3.r = beta->r * c__[i__5].r - beta->i * c__[i__5].i, q__3.i = 
+		    beta->r * c__[i__5].i + beta->i * c__[i__5].r;
 	    q__1.r = q__2.r + q__3.r, q__1.i = q__2.i + q__3.i;
 	    ct[i__3].r = q__1.r, ct[i__3].i = q__1.i;
-	    i__3 = i + j * c_dim1;
-	    g[i] = ((r__1 = alpha->r, dabs(r__1)) + (r__2 = r_imag(alpha), 
-		    dabs(r__2))) * g[i] + ((r__3 = beta->r, dabs(r__3)) + (
-		    r__4 = r_imag(beta), dabs(r__4))) * ((r__5 = c[i__3].r, 
-		    dabs(r__5)) + (r__6 = r_imag(&c[i + j * c_dim1]), dabs(
-		    r__6)));
+	    i__3 = c___subscr(i__, j);
+	    g[i__] = ((r__1 = alpha->r, dabs(r__1)) + (r__2 = r_imag(alpha), 
+		    dabs(r__2))) * g[i__] + ((r__3 = beta->r, dabs(r__3)) + (
+		    r__4 = r_imag(beta), dabs(r__4))) * ((r__5 = c__[i__3].r, 
+		    dabs(r__5)) + (r__6 = r_imag(&c___ref(i__, j)), dabs(r__6)
+		    ));
 /* L200: */
 	}
 
@@ -5004,16 +4938,16 @@ L100:
 
 	*err = 0.f;
 	i__2 = *m;
-	for (i = 1; i <= i__2; ++i) {
-	    i__3 = i;
-	    i__4 = i + j * cc_dim1;
+	for (i__ = 1; i__ <= i__2; ++i__) {
+	    i__3 = i__;
+	    i__4 = cc_subscr(i__, j);
 	    q__2.r = ct[i__3].r - cc[i__4].r, q__2.i = ct[i__3].i - cc[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 	    erri = ((r__1 = q__1.r, dabs(r__1)) + (r__2 = r_imag(&q__1), dabs(
 		    r__2))) / *eps;
-	    if (g[i] != 0.f) {
-		erri /= g[i];
+	    if (g[i__] != 0.f) {
+		erri /= g[i__];
 	    }
 	    *err = dmax(*err,erri);
 	    if (*err * sqrt(*eps) >= 1.f) {
@@ -5036,20 +4970,20 @@ L230:
     s_wsfe(&io___382);
     e_wsfe();
     i__1 = *m;
-    for (i = 1; i <= i__1; ++i) {
+    for (i__ = 1; i__ <= i__1; ++i__) {
 	if (*mv) {
 	    io___383.ciunit = *nout;
 	    s_wsfe(&io___383);
-	    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	    do_fio(&c__2, (char *)&ct[i], (ftnlen)sizeof(real));
-	    do_fio(&c__2, (char *)&cc[i + j * cc_dim1], (ftnlen)sizeof(real));
+	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	    do_fio(&c__2, (char *)&ct[i__], (ftnlen)sizeof(real));
+	    do_fio(&c__2, (char *)&cc_ref(i__, j), (ftnlen)sizeof(real));
 	    e_wsfe();
 	} else {
 	    io___384.ciunit = *nout;
 	    s_wsfe(&io___384);
-	    do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-	    do_fio(&c__2, (char *)&cc[i + j * cc_dim1], (ftnlen)sizeof(real));
-	    do_fio(&c__2, (char *)&ct[i], (ftnlen)sizeof(real));
+	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+	    do_fio(&c__2, (char *)&cc_ref(i__, j), (ftnlen)sizeof(real));
+	    do_fio(&c__2, (char *)&ct[i__], (ftnlen)sizeof(real));
 	    e_wsfe();
 	}
 /* L240: */
@@ -5069,6 +5003,16 @@ L250:
 
 } /* cmmch_ */
 
+#undef cc_ref
+#undef cc_subscr
+#undef c___ref
+#undef c___subscr
+#undef b_ref
+#undef b_subscr
+#undef a_ref
+#undef a_subscr
+
+
 logical lce_(complex *ri, complex *rj, integer *lr)
 {
     /* System generated locals */
@@ -5076,32 +5020,28 @@ logical lce_(complex *ri, complex *rj, integer *lr)
     logical ret_val;
 
     /* Local variables */
-    static integer i;
+    static integer i__;
 
 
-/*  Tests if two arrays are identical. */
+/*  Tests if two arrays are identical.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
 
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Executable Statements .. */
-    /* Parameter adjustments */
+       Parameter adjustments */
     --rj;
     --ri;
 
     /* Function Body */
     i__1 = *lr;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i;
-	i__3 = i;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = i__;
+	i__3 = i__;
 	if (ri[i__2].r != rj[i__3].r || ri[i__2].i != rj[i__3].i) {
 	    goto L20;
 	}
@@ -5118,8 +5058,8 @@ L30:
 
 } /* lce_ */
 
-logical lceres_(char *type, char *uplo, integer *m, integer *n, complex *aa, 
-	complex *as, integer *lda)
+logical lceres_(char *type__, char *uplo, integer *m, integer *n, complex *aa,
+	 complex *as, integer *lda)
 {
     /* System generated locals */
     integer aa_dim1, aa_offset, as_dim1, as_offset, i__1, i__2, i__3, i__4;
@@ -5129,43 +5069,45 @@ logical lceres_(char *type, char *uplo, integer *m, integer *n, complex *aa,
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer ibeg, iend, i, j;
+    static integer ibeg, iend, i__, j;
     static logical upper;
 
 
-/*  Tests if selected elements in two arrays are equal. */
+#define aa_subscr(a_1,a_2) (a_2)*aa_dim1 + a_1
+#define aa_ref(a_1,a_2) aa[aa_subscr(a_1,a_2)]
+#define as_subscr(a_1,a_2) (a_2)*as_dim1 + a_1
+#define as_ref(a_1,a_2) as[as_subscr(a_1,a_2)]
 
-/*  TYPE is 'GE' or 'HE' or 'SY'. */
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+/*  Tests if selected elements in two arrays are equal.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    TYPE is 'GE' or 'HE' or 'SY'.   
 
-/*     .. Scalar Arguments .. */
-/*     .. Array Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Executable Statements .. */
-    /* Parameter adjustments */
+    Auxiliary routine for test program for Level 3 Blas.   
+
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd.   
+
+       Parameter adjustments */
     as_dim1 = *lda;
-    as_offset = as_dim1 + 1;
+    as_offset = 1 + as_dim1 * 1;
     as -= as_offset;
     aa_dim1 = *lda;
-    aa_offset = aa_dim1 + 1;
+    aa_offset = 1 + aa_dim1 * 1;
     aa -= aa_offset;
 
     /* Function Body */
     upper = *(unsigned char *)uplo == 'U';
-    if (s_cmp(type, "GE", 2L, 2L) == 0) {
+    if (s_cmp(type__, "GE", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *lda;
-	    for (i = *m + 1; i <= i__2; ++i) {
-		i__3 = i + j * aa_dim1;
-		i__4 = i + j * as_dim1;
+	    for (i__ = *m + 1; i__ <= i__2; ++i__) {
+		i__3 = aa_subscr(i__, j);
+		i__4 = as_subscr(i__, j);
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
@@ -5173,8 +5115,8 @@ logical lceres_(char *type, char *uplo, integer *m, integer *n, complex *aa,
 	    }
 /* L20: */
 	}
-    } else if (s_cmp(type, "HE", 2L, 2L) == 0 || s_cmp(type, "SY", 2L, 2L) == 
-	    0) {
+    } else if (s_cmp(type__, "HE", (ftnlen)2, (ftnlen)2) == 0 || s_cmp(type__,
+	     "SY", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    if (upper) {
@@ -5185,18 +5127,18 @@ logical lceres_(char *type, char *uplo, integer *m, integer *n, complex *aa,
 		iend = *n;
 	    }
 	    i__2 = ibeg - 1;
-	    for (i = 1; i <= i__2; ++i) {
-		i__3 = i + j * aa_dim1;
-		i__4 = i + j * as_dim1;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = aa_subscr(i__, j);
+		i__4 = as_subscr(i__, j);
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
 /* L30: */
 	    }
 	    i__2 = *lda;
-	    for (i = iend + 1; i <= i__2; ++i) {
-		i__3 = i + j * aa_dim1;
-		i__4 = i + j * as_dim1;
+	    for (i__ = iend + 1; i__ <= i__2; ++i__) {
+		i__3 = aa_subscr(i__, j);
+		i__4 = as_subscr(i__, j);
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
@@ -5218,62 +5160,63 @@ L80:
 
 } /* lceres_ */
 
+#undef as_ref
+#undef as_subscr
+#undef aa_ref
+#undef aa_subscr
+
+
 /* Complex */ VOID cbeg_(complex * ret_val, logical *reset)
 {
     /* System generated locals */
-    doublereal d__1, d__2;
+    real r__1, r__2;
     complex q__1;
 
     /* Local variables */
-    static integer i, j, ic, mi, mj;
+    static integer i__, j, ic, mi, mj;
 
 
-/*  Generates complex numbers as pairs of random numbers uniformly */
-/*  distributed between -0.5 and 0.5. */
+/*  Generates complex numbers as pairs of random numbers uniformly   
+    distributed between -0.5 and 0.5.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-/*     .. Scalar Arguments .. */
-/*     .. Local Scalars .. */
-/*     .. Save statement .. */
-/*     .. Intrinsic Functions .. */
-/*     .. Executable Statements .. */
     if (*reset) {
 /*        Initialize local variables. */
 	mi = 891;
 	mj = 457;
-	i = 7;
+	i__ = 7;
 	j = 7;
 	ic = 0;
 	*reset = FALSE_;
     }
 
-/*     The sequence of values of I or J is bounded between 1 and 999. */
-/*     If initial I or J = 1,2,3,6,7 or 9, the period will be 50. */
-/*     If initial I or J = 4 or 8, the period will be 25. */
-/*     If initial I or J = 5, the period will be 10. */
-/*     IC is used to break up the period by skipping 1 value of I or J */
-/*     in 6. */
+/*     The sequence of values of I or J is bounded between 1 and 999.   
+       If initial I or J = 1,2,3,6,7 or 9, the period will be 50.   
+       If initial I or J = 4 or 8, the period will be 25.   
+       If initial I or J = 5, the period will be 10.   
+       IC is used to break up the period by skipping 1 value of I or J   
+       in 6. */
 
     ++ic;
 L10:
-    i *= mi;
+    i__ *= mi;
     j *= mj;
-    i -= i / 1000 * 1000;
+    i__ -= i__ / 1000 * 1000;
     j -= j / 1000 * 1000;
     if (ic >= 5) {
 	ic = 0;
 	goto L10;
     }
-    d__1 = (i - 500) / 1001.f;
-    d__2 = (j - 500) / 1001.f;
-    q__1.r = d__1, q__1.i = d__2;
+    r__1 = (i__ - 500) / 1001.f;
+    r__2 = (j - 500) / 1001.f;
+    q__1.r = r__1, q__1.i = r__2;
      ret_val->r = q__1.r,  ret_val->i = q__1.i;
     return ;
 
@@ -5287,24 +5230,22 @@ doublereal sdiff_(real *x, real *y)
     real ret_val;
 
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+/*  Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-/*     .. Scalar Arguments .. */
-/*     .. Executable Statements .. */
     ret_val = *x - *y;
     return ret_val;
 
 /*     End of SDIFF. */
 
-} /* sdiff_ */
+} /* sdiff_   
 
-/* Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
+   Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
 	logical *lerr, logical *ok)
 {
     /* Format strings */
@@ -5319,23 +5260,21 @@ doublereal sdiff_(real *x, real *y)
 
 
 
-/*  Tests whether XERBLA has detected an error when it should. */
+/*  Tests whether XERBLA has detected an error when it should.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-/*     .. Scalar Arguments .. */
-/*     .. Executable Statements .. */
     if (! (*lerr)) {
 	io___397.ciunit = *nout;
 	s_wsfe(&io___397);
 	do_fio(&c__1, (char *)&(*infot), (ftnlen)sizeof(integer));
-	do_fio(&c__1, srnamt, 6L);
+	do_fio(&c__1, srnamt, (ftnlen)6);
 	e_wsfe();
 	*ok = FALSE_;
     }
@@ -5345,9 +5284,9 @@ doublereal sdiff_(real *x, real *y)
 
 /*     End of CHKXER. */
 
-} /* chkxer_ */
+} /* chkxer_   
 
-/* Subroutine */ int xerbla_(char *srname, integer *info)
+   Subroutine */ int xerbla_(char *srname, integer *info)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 ******* XERBLA WAS CALLED WITH INFO ="
@@ -5368,27 +5307,23 @@ doublereal sdiff_(real *x, real *y)
 
 
 
-/*  This is a special version of XERBLA to be used only as part of */
-/*  the test program for testing error exits from the Level 3 BLAS */
-/*  routines. */
+/*  This is a special version of XERBLA to be used only as part of   
+    the test program for testing error exits from the Level 3 BLAS   
+    routines.   
 
-/*  XERBLA  is an error handler for the Level 3 BLAS routines. */
+    XERBLA  is an error handler for the Level 3 BLAS routines.   
 
-/*  It is called by the Level 3 BLAS routines if an input parameter is */
-/*  invalid. */
+    It is called by the Level 3 BLAS routines if an input parameter is   
+    invalid.   
 
-/*  Auxiliary routine for test program for Level 3 Blas. */
+    Auxiliary routine for test program for Level 3 Blas.   
 
-/*  -- Written on 8-February-1989. */
-/*     Jack Dongarra, Argonne National Laboratory. */
-/*     Iain Duff, AERE Harwell. */
-/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
-/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
+    -- Written on 8-February-1989.   
+       Jack Dongarra, Argonne National Laboratory.   
+       Iain Duff, AERE Harwell.   
+       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
+       Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-/*     .. Scalar Arguments .. */
-/*     .. Scalars in Common .. */
-/*     .. Common blocks .. */
-/*     .. Executable Statements .. */
     infoc_2.lerr = TRUE_;
     if (*info != infoc_2.infot) {
 	if (infoc_2.infot != 0) {
@@ -5405,11 +5340,11 @@ doublereal sdiff_(real *x, real *y)
 	}
 	infoc_2.ok = FALSE_;
     }
-    if (s_cmp(srname, srnamc_1.srnamt, 6L, 6L) != 0) {
+    if (s_cmp(srname, srnamc_1.srnamt, (ftnlen)6, (ftnlen)6) != 0) {
 	io___400.ciunit = infoc_2.nout;
 	s_wsfe(&io___400);
-	do_fio(&c__1, srname, 6L);
-	do_fio(&c__1, srnamc_1.srnamt, 6L);
+	do_fio(&c__1, srname, (ftnlen)6);
+	do_fio(&c__1, srnamc_1.srnamt, (ftnlen)6);
 	e_wsfe();
 	infoc_2.ok = FALSE_;
     }
@@ -5418,6 +5353,6 @@ doublereal sdiff_(real *x, real *y)
 
 /*     End of XERBLA */
 
-} /* xerbla_ */
+} /* xerbla_   
 
-/* Main program alias */ int cblat3_ () { MAIN__ (); return 0; }
+   Main program alias */ int cblat3_ () { MAIN__ (); return 0; }

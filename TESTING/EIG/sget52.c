@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -37,7 +38,10 @@ static real c_b15 = 1.f;
     static real errnrm, ulp;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define e_ref(a_1,a_2) e[(a_2)*e_dim1 + a_1]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -82,8 +86,7 @@ static real c_b15 = 1.f;
     of its elements is 1, where in this case, "absolute value"   
     of a complex value x is  |Re(x)| + |Im(x)| ; let us call this   
     maximum "absolute value" norm of a vector v  M(v).   
-    if a(j)=b(j)=0, then the eigenvector is set to be the jth coordinate 
-  
+    if a(j)=b(j)=0, then the eigenvector is set to be the jth coordinate   
     vector.  The normalization test is:   
 
             RESULT(2) =      max       | M(v(j)) - 1 | / ( n ulp )   
@@ -125,16 +128,14 @@ static real c_b15 = 1.f;
             generalized eigenvalues, then E(,j) contains the real part   
             of the eigenvector and E(,j+1) contains the imaginary part.   
             Note that whether E(,j) is a real eigenvector or part of a   
-            complex one is specified by whether ALPHAI(j) is zero or not. 
-  
+            complex one is specified by whether ALPHAI(j) is zero or not.   
 
     LDE     (input) INTEGER   
             The leading dimension of E.  It must be at least 1 and at   
             least N.   
 
     ALPHAR  (input) REAL array, dimension (N)   
-            The real parts of the values a(j) as described above, which, 
-  
+            The real parts of the values a(j) as described above, which,   
             along with b(j), define the generalized eigenvalues.   
             Complex eigenvalues always come in complex conjugate pairs   
             a(j)/b(j) and a(j+1)/b(j+1), which are stored in adjacent   
@@ -150,8 +151,7 @@ static real c_b15 = 1.f;
             always come in complex conjugate pairs a(j)/b(j) and   
             a(j+1)/b(j+1), which are stored in adjacent elements in   
             ALPHAR, ALPHAI, and BETA.  Thus, if the j-th and (j+1)-st   
-            eigenvalues form a pair, ALPHAI(j+1)/BETA(j+1) is assumed to 
-  
+            eigenvalues form a pair, ALPHAI(j+1)/BETA(j+1) is assumed to   
             be equal to  -ALPHAI(j)/BETA(j).  Also, nonzero values in   
             ALPHAI are assumed to always come in adjacent pairs.   
 
@@ -166,19 +166,18 @@ static real c_b15 = 1.f;
             B E is likely to overflow, then RESULT(1:2) is set to   
             10 / ulp.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     e_dim1 = *lde;
-    e_offset = e_dim1 + 1;
+    e_offset = 1 + e_dim1 * 1;
     e -= e_offset;
     --alphar;
     --alphai;
@@ -253,13 +252,11 @@ static real c_b15 = 1.f;
 		scale = 1.f / dmax(r__1,safmin);
 		acoef = scale * sbeta;
 		bcoefr = scale * salfr;
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[jvec * 
-			e_dim1 + 1], &c__1, &c_b12, &work[*n * (jvec - 1) + 1]
-			, &c__1);
-		r__1 = -(doublereal)bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
-			e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 1]
-			, &c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec)
+			, &c__1, &c_b12, &work[*n * (jvec - 1) + 1], &c__1);
+		r__1 = -bcoefr;
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
+			 &c__1, &c_b15, &work[*n * (jvec - 1) + 1], &c__1);
 	    } else {
 
 /*              Complex conjugate pair */
@@ -287,31 +284,26 @@ static real c_b15 = 1.f;
 		bcoefr = scale * salfr;
 		bcoefi = scale * salfi;
 		if (*left) {
-		    bcoefi = -(doublereal)bcoefi;
+		    bcoefi = -bcoefi;
 		}
 
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[jvec * 
-			e_dim1 + 1], &c__1, &c_b12, &work[*n * (jvec - 1) + 1]
-			, &c__1);
-		r__1 = -(doublereal)bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
-			e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 1]
-			, &c__1);
-		sgemv_(trans, n, n, &bcoefi, &b[b_offset], lda, &e[(jvec + 1) 
-			* e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 
-			1], &c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec)
+			, &c__1, &c_b12, &work[*n * (jvec - 1) + 1], &c__1);
+		r__1 = -bcoefr;
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
+			 &c__1, &c_b15, &work[*n * (jvec - 1) + 1], &c__1);
+		sgemv_(trans, n, n, &bcoefi, &b[b_offset], lda, &e_ref(1, 
+			jvec + 1), &c__1, &c_b15, &work[*n * (jvec - 1) + 1], 
+			&c__1);
 
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[(jvec + 1) *
-			 e_dim1 + 1], &c__1, &c_b12, &work[*n * jvec + 1], &
-			c__1);
-		r__1 = -(doublereal)bcoefi;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
-			e_dim1 + 1], &c__1, &c_b15, &work[*n * jvec + 1], &
-			c__1);
-		r__1 = -(doublereal)bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[(jvec + 1) * 
-			e_dim1 + 1], &c__1, &c_b15, &work[*n * jvec + 1], &
-			c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec 
+			+ 1), &c__1, &c_b12, &work[*n * jvec + 1], &c__1);
+		r__1 = -bcoefi;
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
+			 &c__1, &c_b15, &work[*n * jvec + 1], &c__1);
+		r__1 = -bcoefr;
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec 
+			+ 1), &c__1, &c_b15, &work[*n * jvec + 1], &c__1);
 	    }
 	}
 /* L10: */
@@ -319,8 +311,7 @@ static real c_b15 = 1.f;
 
 /* Computing 2nd power */
     i__1 = *n;
-    errnrm = slange_("One", n, n, &work[1], n, &work[i__1 * i__1 + 1]) / 
-	    enorm;
+    errnrm = slange_("One", n, n, &work[1], n, &work[i__1 * i__1 + 1]) / enorm;
 
 /*     Compute RESULT(1) */
 
@@ -340,8 +331,7 @@ static real c_b15 = 1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__2 = temp1, r__3 = (r__1 = e[j + jvec * e_dim1], dabs(
-			    r__1));
+		    r__2 = temp1, r__3 = (r__1 = e_ref(j, jvec), dabs(r__1));
 		    temp1 = dmax(r__2,r__3);
 /* L20: */
 		}
@@ -353,9 +343,8 @@ static real c_b15 = 1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = e[j + jvec * e_dim1], dabs(
-			    r__1)) + (r__2 = e[j + (jvec + 1) * e_dim1], dabs(
-			    r__2));
+		    r__3 = temp1, r__4 = (r__1 = e_ref(j, jvec), dabs(r__1)) 
+			    + (r__2 = e_ref(j, jvec + 1), dabs(r__2));
 		    temp1 = dmax(r__3,r__4);
 /* L30: */
 		}
@@ -376,4 +365,7 @@ static real c_b15 = 1.f;
 /*     End of SGET52 */
 
 } /* sget52_ */
+
+#undef e_ref
+
 

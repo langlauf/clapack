@@ -1,14 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int slaed8_(integer *icompq, integer *k, integer *n, integer 
-	*qsiz, real *d, real *q, integer *ldq, integer *indxq, real *rho, 
-	integer *cutpnt, real *z, real *dlamda, real *q2, integer *ldq2, real 
-	*w, integer *perm, integer *givptr, integer *givcol, real *givnum, 
-	integer *indxp, integer *indx, integer *info)
+	*qsiz, real *d__, real *q, integer *ldq, integer *indxq, real *rho, 
+	integer *cutpnt, real *z__, real *dlamda, real *q2, integer *ldq2, 
+	real *w, integer *perm, integer *givptr, integer *givcol, real *
+	givnum, integer *indxp, integer *indx, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab, 
-  
+/*  -- LAPACK routine (version 3.0) --   
+       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
        Courant Institute, NAG Ltd., and Rice University   
        September 30, 1994   
 
@@ -20,8 +20,7 @@
     sorted set.  Then it tries to deflate the size of the problem.   
     There are two ways in which deflation can occur:  when two or more   
     eigenvalues are close together or if there is a tiny element in the   
-    Z vector.  For each such occurrence the order of the related secular 
-  
+    Z vector.  For each such occurrence the order of the related secular   
     equation problem is reduced by one.   
 
     Arguments   
@@ -29,10 +28,8 @@
 
     ICOMPQ  (input) INTEGER   
             = 0:  Compute eigenvalues only.   
-            = 1:  Compute eigenvectors of original dense symmetric matrix 
-  
-                  also.  On entry, Q contains the orthogonal matrix used 
-  
+            = 1:  Compute eigenvectors of original dense symmetric matrix   
+                  also.  On entry, Q contains the orthogonal matrix used   
                   to reduce the original matrix to tridiagonal form.   
 
     K      (output) INTEGER   
@@ -44,8 +41,7 @@
 
     QSIZ   (input) INTEGER   
            The dimension of the orthogonal matrix used to reduce   
-           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1. 
-  
+           the full matrix to tridiagonal form.  QSIZ >= N if ICOMPQ = 1.   
 
     D      (input/output) REAL array, dimension (N)   
            On entry, the eigenvalues of the two submatrices to be   
@@ -54,8 +50,7 @@
 
     Q      (input/output) REAL array, dimension (LDQ,N)   
            If ICOMPQ = 0, Q is not referenced.  Otherwise,   
-           on entry, Q contains the eigenvectors of the partially solved 
-  
+           on entry, Q contains the eigenvectors of the partially solved   
            system which has been previously updated in matrix   
            multiplies with other partially solved eigensystems.   
            On exit, Q contains the trailing (N-K) updated eigenvectors   
@@ -71,8 +66,7 @@
            their values in order to be accurate.   
 
     RHO    (input/output) REAL   
-           On entry, the off-diagonal element associated with the rank-1 
-  
+           On entry, the off-diagonal element associated with the rank-1   
            cut which originally split the two submatrices which are now   
            being recombined.   
            On exit, RHO has been modified to the value required by   
@@ -103,8 +97,7 @@
            The leading dimension of the array Q2.  LDQ2 >= max(1,N).   
 
     W      (output) REAL array, dimension (N)   
-           The first k values of the final deflation-altered z-vector and 
-  
+           The first k values of the final deflation-altered z-vector and   
            will be passed to SLAED3.   
 
     PERM   (output) INTEGER array, dimension (N)   
@@ -116,8 +109,7 @@
            subproblem.   
 
     GIVCOL (output) INTEGER array, dimension (2, N)   
-           Each pair of numbers indicates a pair of columns to take place 
-  
+           Each pair of numbers indicates a pair of columns to take place   
            in a Givens rotation.   
 
     GIVNUM (output) REAL array, dimension (2, N)   
@@ -125,22 +117,26 @@
            corresponding Givens rotation.   
 
     INDXP  (workspace) INTEGER array, dimension (N)   
-           The permutation used to place deflated values of D at the end 
-  
+           The permutation used to place deflated values of D at the end   
            of the array.  INDXP(1:K) points to the nondeflated D-values   
            and INDXP(K+1:N) points to the deflated eigenvalues.   
 
     INDX   (workspace) INTEGER array, dimension (N)   
-           The permutation used to sort the contents of D into ascending 
-  
+           The permutation used to sort the contents of D into ascending   
            order.   
 
     INFO   (output) INTEGER   
             = 0:  successful exit.   
             < 0:  if INFO = -i, the i-th argument had an illegal value.   
 
-    ===================================================================== 
-  
+    Further Details   
+    ===============   
+
+    Based on contributions by   
+       Jeff Rutter, Computer Science Division, University of California   
+       at Berkeley, USA   
+
+    =====================================================================   
 
 
 
@@ -160,8 +156,8 @@
     static integer jlam, imax, jmax;
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static real c;
-    static integer i, j;
+    static real c__;
+    static integer i__, j;
     static real s, t;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
     static integer k2;
@@ -178,17 +174,21 @@
 	    real *, integer *, real *, integer *);
     static integer n1p1;
     static real eps, tau, tol;
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+#define q2_ref(a_1,a_2) q2[(a_2)*q2_dim1 + a_1]
+#define givcol_ref(a_1,a_2) givcol[(a_2)*2 + a_1]
+#define givnum_ref(a_1,a_2) givnum[(a_2)*2 + a_1]
 
 
-    --d;
+    --d__;
     q_dim1 = *ldq;
-    q_offset = q_dim1 + 1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --indxq;
-    --z;
+    --z__;
     --dlamda;
     q2_dim1 = *ldq2;
-    q2_offset = q2_dim1 + 1;
+    q2_offset = 1 + q2_dim1 * 1;
     q2 -= q2_offset;
     --w;
     --perm;
@@ -230,7 +230,7 @@
     n1p1 = n1 + 1;
 
     if (*rho < 0.f) {
-	sscal_(&n2, &c_b3, &z[n1p1], &c__1);
+	sscal_(&n2, &c_b3, &z__[n1p1], &c__1);
     }
 
 /*     Normalize z so that norm(z) = 1 */
@@ -241,44 +241,44 @@
 	indx[j] = j;
 /* L10: */
     }
-    sscal_(n, &t, &z[1], &c__1);
+    sscal_(n, &t, &z__[1], &c__1);
     *rho = (r__1 = *rho * 2.f, dabs(r__1));
 
 /*     Sort the eigenvalues into increasing order */
 
     i__1 = *n;
-    for (i = *cutpnt + 1; i <= i__1; ++i) {
-	indxq[i] += *cutpnt;
+    for (i__ = *cutpnt + 1; i__ <= i__1; ++i__) {
+	indxq[i__] += *cutpnt;
 /* L20: */
     }
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	dlamda[i] = d[indxq[i]];
-	w[i] = z[indxq[i]];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	dlamda[i__] = d__[indxq[i__]];
+	w[i__] = z__[indxq[i__]];
 /* L30: */
     }
-    i = 1;
+    i__ = 1;
     j = *cutpnt + 1;
     slamrg_(&n1, &n2, &dlamda[1], &c__1, &c__1, &indx[1]);
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	d[i] = dlamda[indx[i]];
-	z[i] = w[indx[i]];
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	d__[i__] = dlamda[indx[i__]];
+	z__[i__] = w[indx[i__]];
 /* L40: */
     }
 
 /*     Calculate the allowable deflation tolerence */
 
-    imax = isamax_(n, &z[1], &c__1);
-    jmax = isamax_(n, &d[1], &c__1);
+    imax = isamax_(n, &z__[1], &c__1);
+    jmax = isamax_(n, &d__[1], &c__1);
     eps = slamch_("Epsilon");
-    tol = eps * 8.f * (r__1 = d[jmax], dabs(r__1));
+    tol = eps * 8.f * (r__1 = d__[jmax], dabs(r__1));
 
 /*     If the rank-1 modifier is small enough, no more needs to be done   
        except to reorganize Q so that its columns correspond with the   
        elements in D. */
 
-    if (*rho * (r__1 = z[imax], dabs(r__1)) <= tol) {
+    if (*rho * (r__1 = z__[imax], dabs(r__1)) <= tol) {
 	*k = 0;
 	if (*icompq == 0) {
 	    i__1 = *n;
@@ -290,20 +290,17 @@
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 		perm[j] = indxq[indx[j]];
-		scopy_(qsiz, &q[perm[j] * q_dim1 + 1], &c__1, &q2[j * q2_dim1 
-			+ 1], &c__1);
+		scopy_(qsiz, &q_ref(1, perm[j]), &c__1, &q2_ref(1, j), &c__1);
 /* L60: */
 	    }
-	    slacpy_("A", qsiz, n, &q2[q2_dim1 + 1], ldq2, &q[q_dim1 + 1], ldq);
+	    slacpy_("A", qsiz, n, &q2_ref(1, 1), ldq2, &q_ref(1, 1), ldq);
 	}
 	return 0;
     }
 
-/*     If there are multiple eigenvalues then the problem deflates.  Here 
-  
+/*     If there are multiple eigenvalues then the problem deflates.  Here   
        the number of equal eigenvalues are found.  As each equal   
-       eigenvalue is found, an elementary reflector is computed to rotate 
-  
+       eigenvalue is found, an elementary reflector is computed to rotate   
        the corresponding eigensubspace so that the corresponding   
        components of Z are zero in this new basis. */
 
@@ -312,7 +309,7 @@
     k2 = *n + 1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	if (*rho * (r__1 = z[j], dabs(r__1)) <= tol) {
+	if (*rho * (r__1 = z__[j], dabs(r__1)) <= tol) {
 
 /*           Deflate due to small z component. */
 
@@ -332,7 +329,7 @@ L80:
     if (j > *n) {
 	goto L100;
     }
-    if (*rho * (r__1 = z[j], dabs(r__1)) <= tol) {
+    if (*rho * (r__1 = z__[j], dabs(r__1)) <= tol) {
 
 /*        Deflate due to small z component. */
 
@@ -342,57 +339,57 @@ L80:
 
 /*        Check if eigenvalues are close enough to allow deflation. */
 
-	s = z[jlam];
-	c = z[j];
+	s = z__[jlam];
+	c__ = z__[j];
 
 /*        Find sqrt(a**2+b**2) without overflow or   
           destructive underflow. */
 
-	tau = slapy2_(&c, &s);
-	t = d[j] - d[jlam];
-	c /= tau;
-	s = -(doublereal)s / tau;
-	if ((r__1 = t * c * s, dabs(r__1)) <= tol) {
+	tau = slapy2_(&c__, &s);
+	t = d__[j] - d__[jlam];
+	c__ /= tau;
+	s = -s / tau;
+	if ((r__1 = t * c__ * s, dabs(r__1)) <= tol) {
 
 /*           Deflation is possible. */
 
-	    z[j] = tau;
-	    z[jlam] = 0.f;
+	    z__[j] = tau;
+	    z__[jlam] = 0.f;
 
 /*           Record the appropriate Givens rotation */
 
 	    ++(*givptr);
-	    givcol[(*givptr << 1) + 1] = indxq[indx[jlam]];
-	    givcol[(*givptr << 1) + 2] = indxq[indx[j]];
-	    givnum[(*givptr << 1) + 1] = c;
-	    givnum[(*givptr << 1) + 2] = s;
+	    givcol_ref(1, *givptr) = indxq[indx[jlam]];
+	    givcol_ref(2, *givptr) = indxq[indx[j]];
+	    givnum_ref(1, *givptr) = c__;
+	    givnum_ref(2, *givptr) = s;
 	    if (*icompq == 1) {
-		srot_(qsiz, &q[indxq[indx[jlam]] * q_dim1 + 1], &c__1, &q[
-			indxq[indx[j]] * q_dim1 + 1], &c__1, &c, &s);
+		srot_(qsiz, &q_ref(1, indxq[indx[jlam]]), &c__1, &q_ref(1, 
+			indxq[indx[j]]), &c__1, &c__, &s);
 	    }
-	    t = d[jlam] * c * c + d[j] * s * s;
-	    d[j] = d[jlam] * s * s + d[j] * c * c;
-	    d[jlam] = t;
+	    t = d__[jlam] * c__ * c__ + d__[j] * s * s;
+	    d__[j] = d__[jlam] * s * s + d__[j] * c__ * c__;
+	    d__[jlam] = t;
 	    --k2;
-	    i = 1;
+	    i__ = 1;
 L90:
-	    if (k2 + i <= *n) {
-		if (d[jlam] < d[indxp[k2 + i]]) {
-		    indxp[k2 + i - 1] = indxp[k2 + i];
-		    indxp[k2 + i] = jlam;
-		    ++i;
+	    if (k2 + i__ <= *n) {
+		if (d__[jlam] < d__[indxp[k2 + i__]]) {
+		    indxp[k2 + i__ - 1] = indxp[k2 + i__];
+		    indxp[k2 + i__] = jlam;
+		    ++i__;
 		    goto L90;
 		} else {
-		    indxp[k2 + i - 1] = jlam;
+		    indxp[k2 + i__ - 1] = jlam;
 		}
 	    } else {
-		indxp[k2 + i - 1] = jlam;
+		indxp[k2 + i__ - 1] = jlam;
 	    }
 	    jlam = j;
 	} else {
 	    ++(*k);
-	    w[*k] = z[jlam];
-	    dlamda[*k] = d[jlam];
+	    w[*k] = z__[jlam];
+	    dlamda[*k] = d__[jlam];
 	    indxp[*k] = jlam;
 	    jlam = j;
 	}
@@ -403,23 +400,22 @@ L100:
 /*     Record the last eigenvalue. */
 
     ++(*k);
-    w[*k] = z[jlam];
-    dlamda[*k] = d[jlam];
+    w[*k] = z__[jlam];
+    dlamda[*k] = d__[jlam];
     indxp[*k] = jlam;
 
 L110:
 
 /*     Sort the eigenvalues and corresponding eigenvectors into DLAMDA   
        and Q2 respectively.  The eigenvalues/vectors which were not   
-       deflated go into the first K slots of DLAMDA and Q2 respectively, 
-  
+       deflated go into the first K slots of DLAMDA and Q2 respectively,   
        while those which were deflated go into the last N - K slots. */
 
     if (*icompq == 0) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    jp = indxp[j];
-	    dlamda[j] = d[jp];
+	    dlamda[j] = d__[jp];
 	    perm[j] = indxq[indx[jp]];
 /* L120: */
 	}
@@ -427,10 +423,9 @@ L110:
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    jp = indxp[j];
-	    dlamda[j] = d[jp];
+	    dlamda[j] = d__[jp];
 	    perm[j] = indxq[indx[jp]];
-	    scopy_(qsiz, &q[perm[j] * q_dim1 + 1], &c__1, &q2[j * q2_dim1 + 1]
-		    , &c__1);
+	    scopy_(qsiz, &q_ref(1, perm[j]), &c__1, &q2_ref(1, j), &c__1);
 /* L130: */
 	}
     }
@@ -441,13 +436,13 @@ L110:
     if (*k < *n) {
 	if (*icompq == 0) {
 	    i__1 = *n - *k;
-	    scopy_(&i__1, &dlamda[*k + 1], &c__1, &d[*k + 1], &c__1);
+	    scopy_(&i__1, &dlamda[*k + 1], &c__1, &d__[*k + 1], &c__1);
 	} else {
 	    i__1 = *n - *k;
-	    scopy_(&i__1, &dlamda[*k + 1], &c__1, &d[*k + 1], &c__1);
+	    scopy_(&i__1, &dlamda[*k + 1], &c__1, &d__[*k + 1], &c__1);
 	    i__1 = *n - *k;
-	    slacpy_("A", qsiz, &i__1, &q2[(*k + 1) * q2_dim1 + 1], ldq2, &q[(*
-		    k + 1) * q_dim1 + 1], ldq);
+	    slacpy_("A", qsiz, &i__1, &q2_ref(1, *k + 1), ldq2, &q_ref(1, *k 
+		    + 1), ldq);
 	}
     }
 
@@ -456,4 +451,10 @@ L110:
 /*     End of SLAED8 */
 
 } /* slaed8_ */
+
+#undef givnum_ref
+#undef givcol_ref
+#undef q2_ref
+#undef q_ref
+
 

@@ -9,6 +9,7 @@ VOID z_cos(r, z) doublecomplex *r, *z;
 void z_cos(doublecomplex *r, doublecomplex *z)
 #endif
 {
-r->r = cos(z->r) * cosh(z->i);
-r->i = - sin(z->r) * sinh(z->i);
-}
+	double zi = z->i, zr = z->r;
+	r->r =   cos(zr) * cosh(zi);
+	r->i = - sin(zr) * sinh(zi);
+	}

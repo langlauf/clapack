@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -28,7 +29,7 @@ doublereal dopaux_(char *subnam, integer *m, integer *n, integer *kl, integer
     static doublereal enb;
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -68,18 +69,17 @@ doublereal dopaux_(char *subnam, integer *m, integer *n, integer *kl, integer
     NB      (input) INTEGER   
             The block size.  If needed, NB >= 1.   
 
-    ===================================================================== 
-*/
+    ===================================================================== */
 
 
     ret_val = 0.;
     mults = 0.;
     adds = 0.;
     *(unsigned char *)c1 = *(unsigned char *)subnam;
-    s_copy(c2, subnam + 1, 2L, 2L);
-    s_copy(c3, subnam + 3, 3L, 3L);
-    if (*m <= 0 || ! (lsame_(c1, "S") || lsame_(c1, "D") || 
-	    lsame_(c1, "C") || lsame_(c1, "Z"))) {
+    s_copy(c2, subnam + 1, (ftnlen)2, (ftnlen)2);
+    s_copy(c3, subnam + 3, (ftnlen)3, (ftnlen)3);
+    if (*m <= 0 || ! (lsame_(c1, "S") || lsame_(c1, 
+	    "D") || lsame_(c1, "C") || lsame_(c1, "Z"))) {
 	return ret_val;
     }
     if (lsame_(c1, "S") || lsame_(c1, "D")) {
@@ -97,15 +97,16 @@ doublereal dopaux_(char *subnam, integer *m, integer *n, integer *kl, integer
 
 /*        xLAULM:  N  =>  M */
 
-	if (lsamen_(&c__3, c3, "ULM") || lsamen_(&c__3, c3, "UL2")) {
+	if (lsamen_(&c__3, c3, "ULM") || lsamen_(&c__3, 
+		c3, "UL2")) {
 	    mults = em * .33333333333333331 * (em * em - 1.);
 	    adds = em * (em * (em * .33333333333333331 - .5) + 
 		    .16666666666666666);
 
 /*        xLAUUM:  N  =>  M */
 
-	} else if (lsamen_(&c__3, c3, "UUM") || lsamen_(&c__3, c3, 
-		"UU2")) {
+	} else if (lsamen_(&c__3, c3, "UUM") || lsamen_(
+		&c__3, c3, "UU2")) {
 	    mults = em * (em * (em * .16666666666666666 + .5) + 
 		    .33333333333333331);
 	    adds = em * .16666666666666666 * (em * em - 1.);

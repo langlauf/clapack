@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -22,6 +23,9 @@ static integer c__1 = 1;
 	    saxpy_(integer *, real *, real *, integer *, real *, integer *);
     extern integer isamax_(integer *, real *, integer *);
     static integer kp1, nm1;
+
+
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
 /*     SGEFA FACTORS A REAL MATRIX BY GAUSSIAN ELIMINATION.   
@@ -75,7 +79,7 @@ static integer c__1 = 1;
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --ipvt;
 
@@ -92,12 +96,12 @@ static integer c__1 = 1;
 /*        FIND L = PIVOT INDEX */
 
 	i__2 = *n - k + 1;
-	l = isamax_(&i__2, &a[k + k * a_dim1], &c__1) + k - 1;
+	l = isamax_(&i__2, &a_ref(k, k), &c__1) + k - 1;
 	ipvt[k] = l;
 
 /*        ZERO PIVOT IMPLIES THIS COLUMN ALREADY TRIANGULARIZED */
 
-	if (a[l + k * a_dim1] == 0.f) {
+	if (a_ref(l, k) == 0.f) {
 	    goto L40;
 	}
 
@@ -106,31 +110,31 @@ static integer c__1 = 1;
 	if (l == k) {
 	    goto L10;
 	}
-	t = a[l + k * a_dim1];
-	a[l + k * a_dim1] = a[k + k * a_dim1];
-	a[k + k * a_dim1] = t;
+	t = a_ref(l, k);
+	a_ref(l, k) = a_ref(k, k);
+	a_ref(k, k) = t;
 L10:
 
 /*           COMPUTE MULTIPLIERS */
 
-	t = -1.f / a[k + k * a_dim1];
+	t = -1.f / a_ref(k, k);
 	i__2 = *n - k;
-	sscal_(&i__2, &t, &a[k + 1 + k * a_dim1], &c__1);
+	sscal_(&i__2, &t, &a_ref(k + 1, k), &c__1);
 
 /*           ROW ELIMINATION WITH COLUMN INDEXING */
 
 	i__2 = *n;
 	for (j = kp1; j <= i__2; ++j) {
-	    t = a[l + j * a_dim1];
+	    t = a_ref(l, j);
 	    if (l == k) {
 		goto L20;
 	    }
-	    a[l + j * a_dim1] = a[k + j * a_dim1];
-	    a[k + j * a_dim1] = t;
+	    a_ref(l, j) = a_ref(k, j);
+	    a_ref(k, j) = t;
 L20:
 	    i__3 = *n - k;
-	    saxpy_(&i__3, &t, &a[k + 1 + k * a_dim1], &c__1, &a[k + 1 + j * 
-		    a_dim1], &c__1);
+	    saxpy_(&i__3, &t, &a_ref(k + 1, k), &c__1, &a_ref(k + 1, j), &
+		    c__1);
 /* L30: */
 	}
 	goto L50;
@@ -142,13 +146,16 @@ L50:
     }
 L70:
     ipvt[*n] = *n;
-    if (a[*n + *n * a_dim1] == 0.f) {
+    if (a_ref(*n, *n) == 0.f) {
 	*info = *n;
     }
     return 0;
-} /* sgefa_   
+} /* sgefa_ */
 
-   Subroutine */ int spofa_(real *a, integer *lda, integer *n, integer *info)
+#undef a_ref
+
+
+/* Subroutine */ int spofa_(real *a, integer *lda, integer *n, integer *info)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
@@ -161,6 +168,9 @@ L70:
     static integer j, k;
     static real s, t;
     static integer jm1;
+
+
+#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
 /*     SPOFA FACTORS A REAL SYMMETRIC POSITIVE DEFINITE MATRIX.   
@@ -183,8 +193,7 @@ L70:
 
        ON RETURN   
 
-          A       AN UPPER TRIANGULAR MATRIX  R  SO THAT  A = TRANS(R)*R 
-  
+          A       AN UPPER TRIANGULAR MATRIX  R  SO THAT  A = TRANS(R)*R   
                   WHERE  TRANS(R)  IS THE TRANSPOSE.   
                   THE STRICT LOWER TRIANGLE IS UNALTERED.   
                   IF  INFO .NE. 0 , THE FACTORIZATION IS NOT COMPLETE.   
@@ -209,7 +218,7 @@ L70:
 
        Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
@@ -224,28 +233,31 @@ L70:
 	i__2 = jm1;
 	for (k = 1; k <= i__2; ++k) {
 	    i__3 = k - 1;
-	    t = a[k + j * a_dim1] - sdot_(&i__3, &a[k * a_dim1 + 1], &c__1, &
-		    a[j * a_dim1 + 1], &c__1);
-	    t /= a[k + k * a_dim1];
-	    a[k + j * a_dim1] = t;
+	    t = a_ref(k, j) - sdot_(&i__3, &a_ref(1, k), &c__1, &a_ref(1, j), 
+		    &c__1);
+	    t /= a_ref(k, k);
+	    a_ref(k, j) = t;
 	    s += t * t;
 /* L10: */
 	}
 L20:
-	s = a[j + j * a_dim1] - s;
+	s = a_ref(j, j) - s;
 /*     ......EXIT */
 	if (s <= 0.f) {
 	    goto L40;
 	}
-	a[j + j * a_dim1] = sqrt(s);
+	a_ref(j, j) = sqrt(s);
 /* L30: */
     }
     *info = 0;
 L40:
     return 0;
-} /* spofa_   
+} /* spofa_ */
 
-   Subroutine */ int sqrdc_(real *x, integer *ldx, integer *n, integer *p, 
+#undef a_ref
+
+
+/* Subroutine */ int sqrdc_(real *x, integer *ldx, integer *n, integer *p, 
 	real *qraux, integer *jpvt, real *work, integer *job)
 {
     /* System generated locals */
@@ -272,6 +284,9 @@ L40:
     static integer jj, jp, pl, pu;
     static real tt, maxnrm;
     static integer lp1, lup;
+
+
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
 
 
 /*     SQRDC USES HOUSEHOLDER TRANSFORMATIONS TO COMPUTE THE QR   
@@ -338,8 +353,7 @@ L40:
                   WITH ITS COLUMNS PERMUTED AS DESCRIBED BY JPVT.   
 
           QRAUX   REAL(P).   
-                  QRAUX CONTAINS FURTHER INFORMATION REQUIRED TO RECOVER 
-  
+                  QRAUX CONTAINS FURTHER INFORMATION REQUIRED TO RECOVER   
                   THE ORTHOGONAL PART OF THE DECOMPOSITION.   
 
           JPVT    JPVT(K) CONTAINS THE INDEX OF THE COLUMN OF THE   
@@ -360,7 +374,7 @@ L40:
 
        Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = x_dim1 + 1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
     --qraux;
     --jpvt;
@@ -388,7 +402,7 @@ L40:
 	    goto L10;
 	}
 	if (j != pl) {
-	    sswap_(n, &x[pl * x_dim1 + 1], &c__1, &x[j * x_dim1 + 1], &c__1);
+	    sswap_(n, &x_ref(1, pl), &c__1, &x_ref(1, j), &c__1);
 	}
 	jpvt[j] = jpvt[pl];
 	jpvt[pl] = j;
@@ -408,7 +422,7 @@ L10:
 	if (j == pu) {
 	    goto L30;
 	}
-	sswap_(n, &x[pu * x_dim1 + 1], &c__1, &x[j * x_dim1 + 1], &c__1);
+	sswap_(n, &x_ref(1, pu), &c__1, &x_ref(1, j), &c__1);
 	jp = jpvt[pu];
 	jpvt[pu] = jpvt[j];
 	jpvt[j] = jp;
@@ -427,7 +441,7 @@ L60:
     }
     i__1 = pu;
     for (j = pl; j <= i__1; ++j) {
-	qraux[j] = snrm2_(n, &x[j * x_dim1 + 1], &c__1);
+	qraux[j] = snrm2_(n, &x_ref(1, j), &c__1);
 	work[j] = qraux[j];
 /* L70: */
     }
@@ -461,7 +475,7 @@ L90:
 	if (maxj == l) {
 	    goto L110;
 	}
-	sswap_(n, &x[l * x_dim1 + 1], &c__1, &x[maxj * x_dim1 + 1], &c__1);
+	sswap_(n, &x_ref(1, l), &c__1, &x_ref(1, maxj), &c__1);
 	qraux[maxj] = qraux[l];
 	work[maxj] = work[l];
 	jp = jpvt[maxj];
@@ -477,17 +491,17 @@ L120:
 /*           COMPUTE THE HOUSEHOLDER TRANSFORMATION FOR COLUMN L. */
 
 	i__2 = *n - l + 1;
-	nrmxl = snrm2_(&i__2, &x[l + l * x_dim1], &c__1);
+	nrmxl = snrm2_(&i__2, &x_ref(l, l), &c__1);
 	if (nrmxl == 0.f) {
 	    goto L180;
 	}
-	if (x[l + l * x_dim1] != 0.f) {
-	    nrmxl = r_sign(&nrmxl, &x[l + l * x_dim1]);
+	if (x_ref(l, l) != 0.f) {
+	    nrmxl = r_sign(&nrmxl, &x_ref(l, l));
 	}
 	i__2 = *n - l + 1;
 	r__1 = 1.f / nrmxl;
-	sscal_(&i__2, &r__1, &x[l + l * x_dim1], &c__1);
-	x[l + l * x_dim1] += 1.f;
+	sscal_(&i__2, &r__1, &x_ref(l, l), &c__1);
+	x_ref(l, l) = x_ref(l, l) + 1.f;
 
 /*              APPLY THE TRANSFORMATION TO THE REMAINING COLUMNS,   
                 UPDATING THE NORMS. */
@@ -499,11 +513,10 @@ L120:
 	i__2 = *p;
 	for (j = lp1; j <= i__2; ++j) {
 	    i__3 = *n - l + 1;
-	    t = -(doublereal)sdot_(&i__3, &x[l + l * x_dim1], &c__1, &x[l + j 
-		    * x_dim1], &c__1) / x[l + l * x_dim1];
+	    t = -sdot_(&i__3, &x_ref(l, l), &c__1, &x_ref(l, j), &c__1) / 
+		    x_ref(l, l);
 	    i__3 = *n - l + 1;
-	    saxpy_(&i__3, &t, &x[l + l * x_dim1], &c__1, &x[l + j * x_dim1], &
-		    c__1);
+	    saxpy_(&i__3, &t, &x_ref(l, l), &c__1, &x_ref(l, j), &c__1);
 	    if (j < pl || j > pu) {
 		goto L150;
 	    }
@@ -511,7 +524,7 @@ L120:
 		goto L150;
 	    }
 /* Computing 2nd power */
-	    r__2 = (r__1 = x[l + j * x_dim1], dabs(r__1)) / qraux[j];
+	    r__2 = (r__1 = x_ref(l, j), dabs(r__1)) / qraux[j];
 	    tt = 1.f - r__2 * r__2;
 	    tt = dmax(tt,0.f);
 	    t = tt;
@@ -525,7 +538,7 @@ L120:
 	    goto L140;
 L130:
 	    i__3 = *n - l;
-	    qraux[j] = snrm2_(&i__3, &x[l + 1 + j * x_dim1], &c__1);
+	    qraux[j] = snrm2_(&i__3, &x_ref(l + 1, j), &c__1);
 	    work[j] = qraux[j];
 L140:
 L150:
@@ -536,18 +549,21 @@ L170:
 
 /*              SAVE THE TRANSFORMATION. */
 
-	qraux[l] = x[l + l * x_dim1];
-	x[l + l * x_dim1] = -(doublereal)nrmxl;
+	qraux[l] = x_ref(l, l);
+	x_ref(l, l) = -nrmxl;
 L180:
 L190:
 /* L200: */
 	;
     }
     return 0;
-} /* sqrdc_   
+} /* sqrdc_ */
 
-   Subroutine */ int sgtsl_(integer *n, real *c, real *d, real *e, real *b, 
-	integer *info)
+#undef x_ref
+
+
+/* Subroutine */ int sgtsl_(integer *n, real *c__, real *d__, real *e, real *
+	b, integer *info)
 {
     /* System generated locals */
     integer i__1;
@@ -607,17 +623,17 @@ L190:
        Parameter adjustments */
     --b;
     --e;
-    --d;
-    --c;
+    --d__;
+    --c__;
 
     /* Function Body */
     *info = 0;
-    c[1] = d[1];
+    c__[1] = d__[1];
     nm1 = *n - 1;
     if (nm1 < 1) {
 	goto L40;
     }
-    d[1] = e[1];
+    d__[1] = e[1];
     e[1] = 0.f;
     e[*n] = 0.f;
 
@@ -627,18 +643,18 @@ L190:
 
 /*              FIND THE LARGEST OF THE TWO ROWS */
 
-	if ((r__1 = c[kp1], dabs(r__1)) < (r__2 = c[k], dabs(r__2))) {
+	if ((r__1 = c__[kp1], dabs(r__1)) < (r__2 = c__[k], dabs(r__2))) {
 	    goto L10;
 	}
 
 /*                 INTERCHANGE ROW */
 
-	t = c[kp1];
-	c[kp1] = c[k];
-	c[k] = t;
-	t = d[kp1];
-	d[kp1] = d[k];
-	d[k] = t;
+	t = c__[kp1];
+	c__[kp1] = c__[k];
+	c__[k] = t;
+	t = d__[kp1];
+	d__[kp1] = d__[k];
+	d__[k] = t;
 	t = e[kp1];
 	e[kp1] = e[k];
 	e[k] = t;
@@ -649,22 +665,22 @@ L10:
 
 /*              ZERO ELEMENTS */
 
-	if (c[k] != 0.f) {
+	if (c__[k] != 0.f) {
 	    goto L20;
 	}
 	*info = k;
 /*     ............EXIT */
 	goto L100;
 L20:
-	t = -(doublereal)c[kp1] / c[k];
-	c[kp1] = d[kp1] + t * d[k];
-	d[kp1] = e[kp1] + t * e[k];
+	t = -c__[kp1] / c__[k];
+	c__[kp1] = d__[kp1] + t * d__[k];
+	d__[kp1] = e[kp1] + t * e[k];
 	e[kp1] = 0.f;
 	b[kp1] += t * b[k];
 /* L30: */
     }
 L40:
-    if (c[*n] != 0.f) {
+    if (c__[*n] != 0.f) {
 	goto L50;
     }
     *info = *n;
@@ -674,18 +690,18 @@ L50:
 /*           BACK SOLVE */
 
     nm2 = *n - 2;
-    b[*n] /= c[*n];
+    b[*n] /= c__[*n];
     if (*n == 1) {
 	goto L80;
     }
-    b[nm1] = (b[nm1] - d[nm1] * b[*n]) / c[nm1];
+    b[nm1] = (b[nm1] - d__[nm1] * b[*n]) / c__[nm1];
     if (nm2 < 1) {
 	goto L70;
     }
     i__1 = nm2;
     for (kb = 1; kb <= i__1; ++kb) {
 	k = nm2 - kb + 1;
-	b[k] = (b[k] - d[k] * b[k + 1] - e[k] * b[k + 2]) / c[k];
+	b[k] = (b[k] - d__[k] * b[k + 1] - e[k] * b[k + 2]) / c__[k];
 /* L60: */
     }
 L70:
@@ -696,7 +712,7 @@ L100:
     return 0;
 } /* sgtsl_   
 
-   Subroutine */ int sptsl_(integer *n, real *d, real *e, real *b)
+   Subroutine */ int sptsl_(integer *n, real *d__, real *e, real *b)
 {
     /* System generated locals */
     integer i__1;
@@ -745,13 +761,13 @@ L100:
        Parameter adjustments */
     --b;
     --e;
-    --d;
+    --d__;
 
     /* Function Body */
     if (*n != 1) {
 	goto L10;
     }
-    b[1] /= d[1];
+    b[1] /= d__[1];
     goto L70;
 L10:
     nm1 = *n - 1;
@@ -766,11 +782,11 @@ L10:
 
     i__1 = nm1d2;
     for (k = 1; k <= i__1; ++k) {
-	t1 = e[k] / d[k];
-	d[k + 1] -= t1 * e[k];
+	t1 = e[k] / d__[k];
+	d__[k + 1] -= t1 * e[k];
 	b[k + 1] -= t1 * b[k];
-	t2 = e[kbm1] / d[kbm1 + 1];
-	d[kbm1] -= t2 * e[kbm1];
+	t2 = e[kbm1] / d__[kbm1 + 1];
+	d__[kbm1] -= t2 * e[kbm1];
 	b[kbm1] -= t2 * b[kbm1 + 1];
 	--kbm1;
 /* L20: */
@@ -783,8 +799,8 @@ L30:
     if (*n % 2 != 0) {
 	goto L40;
     }
-    t1 = e[kp1] / d[kp1];
-    d[kp1 + 1] -= t1 * e[kp1];
+    t1 = e[kp1] / d__[kp1];
+    d__[kp1 + 1] -= t1 * e[kp1];
     b[kp1 + 1] -= t1 * b[kp1];
     ++kp1;
 L40:
@@ -792,7 +808,7 @@ L40:
 /*        BACK SOLVE STARTING AT THE CENTER, GOING TOWARDS THE TOP   
           AND BOTTOM */
 
-    b[kp1] /= d[kp1];
+    b[kp1] /= d__[kp1];
     if (*n == 2) {
 	goto L60;
     }
@@ -800,14 +816,14 @@ L40:
     ke = kp1 + nm1d2 - 1;
     i__1 = ke;
     for (kf = kp1; kf <= i__1; ++kf) {
-	b[k] = (b[k] - e[k] * b[k + 1]) / d[k];
-	b[kf + 1] = (b[kf + 1] - e[kf] * b[kf]) / d[kf + 1];
+	b[k] = (b[k] - e[k] * b[k + 1]) / d__[k];
+	b[kf + 1] = (b[kf + 1] - e[kf] * b[kf]) / d__[kf + 1];
 	--k;
 /* L50: */
     }
 L60:
     if (*n % 2 == 0) {
-	b[1] = (b[1] - e[1] * b[2]) / d[1];
+	b[1] = (b[1] - e[1] * b[2]) / d__[1];
     }
 L70:
     return 0;

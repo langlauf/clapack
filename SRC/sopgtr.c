@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sopgtr_(char *uplo, integer *n, real *ap, real *tau, 
 	real *q, integer *ldq, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -13,8 +14,7 @@
     =======   
 
     SOPGTR generates a real orthogonal matrix Q which is defined as the   
-    product of n-1 elementary reflectors H(i) of order n, as returned by 
-  
+    product of n-1 elementary reflectors H(i) of order n, as returned by   
     SSPTRD using packed storage:   
 
     if UPLO = 'U', Q = H(n-1) . . . H(2) H(1),   
@@ -53,19 +53,16 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* System generated locals */
     integer q_dim1, q_offset, i__1, i__2, i__3;
     /* Local variables */
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static integer iinfo;
     static logical upper;
@@ -75,14 +72,16 @@
 	    );
     static integer ij;
     extern /* Subroutine */ int xerbla_(char *, integer *);
+#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
 
+    --ap;
+    --tau;
+    q_dim1 = *ldq;
+    q_offset = 1 + q_dim1 * 1;
+    q -= q_offset;
+    --work;
 
-#define AP(I) ap[(I)-1]
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define Q(I,J) q[(I)-1 + ((J)-1)* ( *ldq)]
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -108,63 +107,59 @@
 
 /*        Q was determined by a call to SSPTRD with UPLO = 'U'   
 
-          Unpack the vectors which define the elementary reflectors an
-d   
-          set the last row and column of Q equal to those of the unit 
-  
+          Unpack the vectors which define the elementary reflectors and   
+          set the last row and column of Q equal to those of the unit   
           matrix */
 
 	ij = 2;
 	i__1 = *n - 1;
-	for (j = 1; j <= *n-1; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
-	    for (i = 1; i <= j-1; ++i) {
-		Q(i,j) = AP(ij);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		q_ref(i__, j) = ap[ij];
 		++ij;
 /* L10: */
 	    }
 	    ij += 2;
-	    Q(*n,j) = 0.f;
+	    q_ref(*n, j) = 0.f;
 /* L20: */
 	}
 	i__1 = *n - 1;
-	for (i = 1; i <= *n-1; ++i) {
-	    Q(i,*n) = 0.f;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    q_ref(i__, *n) = 0.f;
 /* L30: */
 	}
-	Q(*n,*n) = 1.f;
+	q_ref(*n, *n) = 1.f;
 
 /*        Generate Q(1:n-1,1:n-1) */
 
 	i__1 = *n - 1;
 	i__2 = *n - 1;
 	i__3 = *n - 1;
-	sorg2l_(&i__1, &i__2, &i__3, &Q(1,1), ldq, &TAU(1), &WORK(1), &
+	sorg2l_(&i__1, &i__2, &i__3, &q[q_offset], ldq, &tau[1], &work[1], &
 		iinfo);
 
     } else {
 
 /*        Q was determined by a call to SSPTRD with UPLO = 'L'.   
 
-          Unpack the vectors which define the elementary reflectors an
-d   
-          set the first row and column of Q equal to those of the unit
-   
+          Unpack the vectors which define the elementary reflectors and   
+          set the first row and column of Q equal to those of the unit   
           matrix */
 
-	Q(1,1) = 1.f;
+	q_ref(1, 1) = 1.f;
 	i__1 = *n;
-	for (i = 2; i <= *n; ++i) {
-	    Q(i,1) = 0.f;
+	for (i__ = 2; i__ <= i__1; ++i__) {
+	    q_ref(i__, 1) = 0.f;
 /* L40: */
 	}
 	ij = 3;
 	i__1 = *n;
-	for (j = 2; j <= *n; ++j) {
-	    Q(1,j) = 0.f;
+	for (j = 2; j <= i__1; ++j) {
+	    q_ref(1, j) = 0.f;
 	    i__2 = *n;
-	    for (i = j + 1; i <= *n; ++i) {
-		Q(i,j) = AP(ij);
+	    for (i__ = j + 1; i__ <= i__2; ++i__) {
+		q_ref(i__, j) = ap[ij];
 		++ij;
 /* L50: */
 	    }
@@ -178,8 +173,8 @@ d
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    sorg2r_(&i__1, &i__2, &i__3, &Q(2,2), ldq, &TAU(1), 
-		    &WORK(1), &iinfo);
+	    sorg2r_(&i__1, &i__2, &i__3, &q_ref(2, 2), ldq, &tau[1], &work[1],
+		     &iinfo);
 	}
     }
     return 0;
@@ -187,4 +182,7 @@ d
 /*     End of SOPGTR */
 
 } /* sopgtr_ */
+
+#undef q_ref
+
 

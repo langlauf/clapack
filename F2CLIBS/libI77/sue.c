@@ -9,11 +9,11 @@ c_sue(a) cilist *a;
 c_sue(cilist *a)
 #endif
 {
-	if(a->ciunit >= MXUNIT || a->ciunit < 0)
-		err(a->cierr,101,"startio");
 	f__external=f__sequential=1;
 	f__formatted=0;
 	f__curunit = &f__units[a->ciunit];
+	if(a->ciunit >= MXUNIT || a->ciunit < 0)
+		err(a->cierr,101,"startio");
 	f__elist=a;
 	if(f__curunit->ufd==NULL && fk_open(SEQ,UNF,a->ciunit))
 		err(a->cierr,114,"sue");
@@ -65,11 +65,15 @@ integer s_wsue(cilist *a)
 }
 integer e_wsue(Void)
 {	long loc;
-	(void) fwrite((char *)&f__reclen,sizeof(uiolen),1,f__cf);
+	fwrite((char *)&f__reclen,sizeof(uiolen),1,f__cf);
+#ifdef ALWAYS_FLUSH
+	if (fflush(f__cf))
+		err(f__elist->cierr, errno, "write end");
+#endif
 	loc=ftell(f__cf);
-	(void) fseek(f__cf,f__recloc,SEEK_SET);
-	(void) fwrite((char *)&f__reclen,sizeof(uiolen),1,f__cf);
-	(void) fseek(f__cf,loc,SEEK_SET);
+	fseek(f__cf,f__recloc,SEEK_SET);
+	fwrite((char *)&f__reclen,sizeof(uiolen),1,f__cf);
+	fseek(f__cf,loc,SEEK_SET);
 	return(0);
 }
 integer e_rsue(Void)

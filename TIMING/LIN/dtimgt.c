@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -45,12 +46,11 @@ static integer c__0 = 0;
     static integer ilda, info;
     static char path[3];
     static doublereal time;
-    static integer isub, nrhs, i, m, n;
+    static integer isub, nrhs, i__, m, n;
     static char cname[6];
-    static integer laval[1];
-    extern doublereal sopgb_(char *, integer *, integer *, integer *, integer 
+    extern doublereal dopgb_(char *, integer *, integer *, integer *, integer 
 	    *, integer *);
-    static integer itran;
+    static integer laval[1], itran;
     extern /* Subroutine */ int dgtsl_(integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, integer *);
     static char trans[1];
@@ -87,10 +87,15 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK timing routine (version 2.0) --   
+#define subnam_ref(a_0,a_1) &subnam[(a_1)*6 + a_0 - 6]
+#define reslts_ref(a_1,a_2,a_3,a_4) reslts[(((a_4)*reslts_dim3 + (a_3))*\
+reslts_dim2 + (a_2))*reslts_dim1 + a_1]
+
+
+/*  -- LAPACK timing routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+       June 30, 1999   
 
 
     Purpose   
@@ -105,8 +110,7 @@ static integer c__0 = 0;
             The input line that requested this routine.  The first six   
             characters contain either the name of a subroutine or a   
             generic path name.  The remaining characters may be used to   
-            specify the individual routines to be timed.  See ATIMIN for 
-  
+            specify the individual routines to be timed.  See ATIMIN for   
             a full description of the format of the input line.   
 
     NM      (input) INTEGER   
@@ -154,8 +158,7 @@ static integer c__0 = 0;
     NOUT    (input) INTEGER   
             The unit number for output.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mval;
@@ -167,16 +170,18 @@ static integer c__0 = 0;
     reslts_dim1 = *ldr1;
     reslts_dim2 = *ldr2;
     reslts_dim3 = *ldr3;
-    reslts_offset = reslts_dim1 * (reslts_dim2 * (reslts_dim3 + 1) + 1) + 1;
+    reslts_offset = 1 + reslts_dim1 * (1 + reslts_dim2 * (1 + reslts_dim3 * 1)
+	    );
     reslts -= reslts_offset;
 
     /* Function Body   
 
        Extract the timing request from the input line. */
 
-    s_copy(path, "Double precision", 1L, 16L);
-    s_copy(path + 1, "GT", 2L, 2L);
-    atimin_(path, line, &c__4, subnam, timsub, nout, &info, 3L, 80L, 6L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "GT", (ftnlen)2, (ftnlen)2);
+    atimin_(path, line, &c__4, subnam, timsub, nout, &info, (ftnlen)3, (
+	    ftnlen)80, (ftnlen)6);
     if (info != 0) {
 	goto L180;
     }
@@ -187,13 +192,13 @@ static integer c__0 = 0;
 	if (! timsub[isub - 1]) {
 	    goto L10;
 	}
-	s_copy(cname, subnam + (isub - 1) * 6, 6L, 6L);
-	atimck_(&c__2, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, 6L)
-		;
+	s_copy(cname, subnam_ref(0, isub), (ftnlen)6, (ftnlen)6);
+	atimck_(&c__2, cname, nm, &mval[1], nlda, &ldaval[1], nout, &info, (
+		ftnlen)6);
 	if (info > 0) {
 	    io___8.ciunit = *nout;
 	    s_wsfe(&io___8);
-	    do_fio(&c__1, cname, 6L);
+	    do_fio(&c__1, cname, (ftnlen)6);
 	    e_wsfe();
 	    timsub[isub - 1] = FALSE_;
 	}
@@ -243,9 +248,9 @@ L30:
 	    }
 
 	    time = (time - untime) / (doublereal) ic;
-	    ops = sopgb_("DGTTRF", &m, &m, &c__1, &c__1, &iwork[1]);
-	    reslts[(im + (reslts_dim3 + 1) * reslts_dim2) * reslts_dim1 + 1] =
-		     dmflop_(&ops, &time, &info);
+	    ops = dopgb_("DGTTRF", &m, &m, &c__1, &c__1, &iwork[1])
+		    ;
+	    reslts_ref(1, im, 1, 1) = dmflop_(&ops, &time, &info);
 
 	} else if (timsub[1]) {
 	    i__2 = n * 3;
@@ -271,15 +276,14 @@ L30:
 		for (ilda = 1; ilda <= i__2; ++ilda) {
 		    ldb = ldaval[ilda];
 		    i__3 = *nns;
-		    for (i = 1; i <= i__3; ++i) {
-			nrhs = nsval[i];
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			nrhs = nsval[i__];
 			dtimmg_(&c__0, &m, &nrhs, &b[1], &ldb, &c__0, &c__0);
 			ic = 0;
 			s1 = dsecnd_();
 L40:
 			dgttrs_(trans, &m, &nrhs, &a[1], &a[n], &a[n * 2], &a[
-				n * 3 - 2], &iwork[1], &b[1], &ldb, &info)
-				;
+				n * 3 - 2], &iwork[1], &b[1], &ldb, &info);
 			s2 = dsecnd_();
 			time = s2 - s1;
 			++ic;
@@ -289,8 +293,7 @@ L40:
 			    goto L40;
 			}
 
-/*                 Subtract the time used in DTIMMG. 
-*/
+/*                 Subtract the time used in DTIMMG. */
 
 			icl = 1;
 			s1 = dsecnd_();
@@ -305,16 +308,14 @@ L50:
 			}
 
 			time = (time - untime) / (doublereal) ic;
-			ops = sopgb_("DGTTRS", &m, &nrhs, &c__0, &c__0, &
+			ops = dopgb_("DGTTRS", &m, &nrhs, &c__0, &c__0, &
 				iwork[1]);
 			if (itran == 1) {
-			    reslts[i + (im + (ilda + (reslts_dim3 << 1)) * 
-				    reslts_dim2) * reslts_dim1] = dmflop_(&
-				    ops, &time, &info);
+			    reslts_ref(i__, im, ilda, 2) = dmflop_(&ops, &
+				    time, &info);
 			} else {
-			    reslts[i + (im + (ilda + reslts_dim3 * 5) * 
-				    reslts_dim2) * reslts_dim1] = dmflop_(&
-				    ops, &time, &info);
+			    reslts_ref(i__, im, ilda, 5) = dmflop_(&ops, &
+				    time, &info);
 			}
 /* L60: */
 		    }
@@ -329,8 +330,8 @@ L50:
 	    for (ilda = 1; ilda <= i__2; ++ilda) {
 		ldb = ldaval[ilda];
 		i__3 = *nns;
-		for (i = 1; i <= i__3; ++i) {
-		    nrhs = nsval[i];
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    nrhs = nsval[i__];
 		    i__4 = n * 3;
 		    dtimmg_(&c__12, &m, &m, &a[1], &i__4, &c__0, &c__0);
 		    dtimmg_(&c__0, &m, &nrhs, &b[1], &ldb, &c__0, &c__0);
@@ -365,9 +366,9 @@ L100:
 		    }
 
 		    time = (time - untime) / (doublereal) ic;
-		    ops = sopgb_("DGTSV ", &m, &nrhs, &c__0, &c__0, &iwork[1]);
-		    reslts[i + (im + (ilda + reslts_dim3 * 3) * reslts_dim2) *
-			     reslts_dim1] = dmflop_(&ops, &time, &info);
+		    ops = dopgb_("DGTSV ", &m, &nrhs, &c__0, &c__0, &iwork[1]);
+		    reslts_ref(i__, im, ilda, 3) = dmflop_(&ops, &time, &info)
+			    ;
 /* L110: */
 		}
 /* L120: */
@@ -408,9 +409,8 @@ L140:
 	    }
 
 	    time = (time - untime) / (doublereal) ic;
-	    ops = sopgb_("DGTSV ", &m, &c__1, &c__0, &c__0, &iwork[1]);
-	    reslts[(im + ((reslts_dim3 << 2) + 1) * reslts_dim2) * 
-		    reslts_dim1 + 1] = dmflop_(&ops, &time, &info);
+	    ops = dopgb_("DGTSV ", &m, &c__1, &c__0, &c__0, &iwork[1]);
+	    reslts_ref(1, im, 1, 4) = dmflop_(&ops, &time, &info);
 	}
 /* L150: */
     }
@@ -423,15 +423,15 @@ L140:
 	}
 	io___25.ciunit = *nout;
 	s_wsfe(&io___25);
-	do_fio(&c__1, subnam + (isub - 1) * 6, 6L);
+	do_fio(&c__1, subnam_ref(0, isub), (ftnlen)6);
 	e_wsfe();
 	if (*nlda > 1 && (timsub[1] || timsub[2])) {
 	    i__1 = *nlda;
-	    for (i = 1; i <= i__1; ++i) {
+	    for (i__ = 1; i__ <= i__1; ++i__) {
 		io___26.ciunit = *nout;
 		s_wsfe(&io___26);
-		do_fio(&c__1, (char *)&i, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ldaval[i], (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
+		do_fio(&c__1, (char *)&ldaval[i__], (ftnlen)sizeof(integer));
 		e_wsfe();
 /* L160: */
 	    }
@@ -441,30 +441,29 @@ L140:
 	e_wsle();
 	if (isub == 1) {
 	    dprtbl_(" ", "N", &c__1, laval, nm, &mval[1], &c__1, &reslts[
-		    reslts_offset], ldr1, ldr2, nout, 1L, 1L);
+		    reslts_offset], ldr1, ldr2, nout, (ftnlen)1, (ftnlen)1);
 	} else if (isub == 2) {
 	    io___29.ciunit = *nout;
 	    s_wsfe(&io___29);
-	    do_fio(&c__1, "N", 1L);
+	    do_fio(&c__1, "N", (ftnlen)1);
 	    e_wsfe();
-	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &reslts[(
-		    ((reslts_dim3 << 1) + 1) * reslts_dim2 + 1) * reslts_dim1 
-		    + 1], ldr1, ldr2, nout, 4L, 1L);
+	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &
+		    reslts_ref(1, 1, 1, 2), ldr1, ldr2, nout, (ftnlen)4, (
+		    ftnlen)1);
 	    io___30.ciunit = *nout;
 	    s_wsfe(&io___30);
-	    do_fio(&c__1, "T", 1L);
+	    do_fio(&c__1, "T", (ftnlen)1);
 	    e_wsfe();
-	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &reslts[(
-		    (reslts_dim3 * 5 + 1) * reslts_dim2 + 1) * reslts_dim1 + 
-		    1], ldr1, ldr2, nout, 4L, 1L);
+	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &
+		    reslts_ref(1, 1, 1, 5), ldr1, ldr2, nout, (ftnlen)4, (
+		    ftnlen)1);
 	} else if (isub == 3) {
-	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &reslts[(
-		    (reslts_dim3 * 3 + 1) * reslts_dim2 + 1) * reslts_dim1 + 
-		    1], ldr1, ldr2, nout, 4L, 1L);
+	    dprtbl_("NRHS", "N", nns, &nsval[1], nm, &mval[1], nlda, &
+		    reslts_ref(1, 1, 1, 3), ldr1, ldr2, nout, (ftnlen)4, (
+		    ftnlen)1);
 	} else if (isub == 4) {
-	    dprtbl_(" ", "N", &c__1, laval, nm, &mval[1], &c__1, &reslts[(((
-		    reslts_dim3 << 2) + 1) * reslts_dim2 + 1) * reslts_dim1 + 
-		    1], ldr1, ldr2, nout, 1L, 1L);
+	    dprtbl_(" ", "N", &c__1, laval, nm, &mval[1], &c__1, &reslts_ref(
+		    1, 1, 1, 4), ldr1, ldr2, nout, (ftnlen)1, (ftnlen)1);
 	}
 L170:
 	;
@@ -476,4 +475,8 @@ L180:
 /*     End of DTIMGT */
 
 } /* dtimgt_ */
+
+#undef reslts_ref
+#undef subnam_ref
+
 

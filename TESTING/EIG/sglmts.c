@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -12,7 +13,7 @@ static real c_b13 = -1.f;
 static real c_b15 = 1.f;
 
 /* Subroutine */ int sglmts_(integer *n, integer *m, integer *p, real *a, 
-	real *af, integer *lda, real *b, real *bf, integer *ldb, real *d, 
+	real *af, integer *lda, real *b, real *bf, integer *ldb, real *d__, 
 	real *df, real *x, real *u, real *work, integer *lwork, real *rwork, 
 	real *result)
 {
@@ -39,7 +40,7 @@ static real c_b15 = 1.f;
     static real eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        March 31, 1993   
@@ -103,25 +104,24 @@ static real c_b15 = 1.f;
               RESULT = -----------------------------------------   
                        (norm(A)+norm(B))*(norm(x)+norm(u))*EPS   
 
-    ==================================================================== 
-  
+    ====================================================================   
 
 
 
        Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = af_dim1 + 1;
+    af_offset = 1 + af_dim1 * 1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = bf_dim1 + 1;
+    bf_offset = 1 + bf_dim1 * 1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = b_dim1 + 1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
-    --d;
+    --d__;
     --df;
     --x;
     --u;
@@ -143,7 +143,7 @@ static real c_b15 = 1.f;
 
     slacpy_("Full", n, m, &a[a_offset], lda, &af[af_offset], lda);
     slacpy_("Full", n, p, &b[b_offset], ldb, &bf[bf_offset], ldb);
-    scopy_(n, &d[1], &c__1, &df[1], &c__1);
+    scopy_(n, &d__[1], &c__1, &df[1], &c__1);
 
 /*     Solve GLM problem */
 
@@ -156,7 +156,7 @@ static real c_b15 = 1.f;
          RESULT = -----------------------------------------   
                   (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
 
-    scopy_(n, &d[1], &c__1, &df[1], &c__1);
+    scopy_(n, &d__[1], &c__1, &df[1], &c__1);
     sgemv_("No transpose", n, m, &c_b13, &a[a_offset], lda, &x[1], &c__1, &
 	    c_b15, &df[1], &c__1);
 

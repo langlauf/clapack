@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zhptri_(char *uplo, integer *n, doublecomplex *ap, 
 	integer *ipiv, doublecomplex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -12,8 +13,7 @@
     Purpose   
     =======   
 
-    ZHPTRI computes the inverse of a complex Hermitian indefinite matrix 
-  
+    ZHPTRI computes the inverse of a complex Hermitian indefinite matrix   
     A in packed storage using the factorization A = U*D*U**H or   
     A = L*D*L**H computed by ZHPTRF.   
 
@@ -21,8 +21,7 @@
     =========   
 
     UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored 
-  
+            Specifies whether the details of the factorization are stored   
             as an upper or lower triangular matrix.   
             = 'U':  Upper triangular, form is A = U*D*U**H;   
             = 'L':  Lower triangular, form is A = L*D*L**H.   
@@ -35,10 +34,8 @@
             used to obtain the factor U or L as computed by ZHPTRF,   
             stored as a packed triangular matrix.   
 
-            On exit, if INFO = 0, the (Hermitian) inverse of the original 
-  
-            matrix, stored as a packed triangular matrix. The j-th column 
-  
+            On exit, if INFO = 0, the (Hermitian) inverse of the original   
+            matrix, stored as a packed triangular matrix. The j-th column   
             of inv(A) is stored in the array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = inv(A)(i,j) for 1<=i<=j;   
             if UPLO = 'L',   
@@ -53,19 +50,15 @@
     INFO    (output) INTEGER   
             = 0: successful exit   
             < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its 
-  
+            > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its   
                  inverse could not be computed.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input parameters.   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static doublecomplex c_b2 = {0.,0.};
     static integer c__1 = 1;
@@ -79,7 +72,7 @@
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
     static doublecomplex temp, akkp1;
-    static doublereal d;
+    static doublereal d__;
     static integer j, k;
     static doublereal t;
     extern logical lsame_(char *, char *);
@@ -100,12 +93,11 @@
     static doublereal akp1;
 
 
+    --work;
+    --ipiv;
+    --ap;
 
-#define WORK(I) work[(I)-1]
-#define IPIV(I) ipiv[(I)-1]
-#define AP(I) ap[(I)-1]
-
-
+    /* Function Body */
     *info = 0;
     upper = lsame_(uplo, "U");
     if (! upper && ! lsame_(uplo, "L")) {
@@ -134,7 +126,7 @@
 	kp = *n * (*n + 1) / 2;
 	for (*info = *n; *info >= 1; --(*info)) {
 	    i__1 = kp;
-	    if (IPIV(*info) > 0 && (AP(kp).r == 0. && AP(kp).i == 0.)) {
+	    if (ipiv[*info] > 0 && (ap[i__1].r == 0. && ap[i__1].i == 0.)) {
 		return 0;
 	    }
 	    kp -= *info;
@@ -148,7 +140,7 @@
 	i__1 = *n;
 	for (*info = 1; *info <= i__1; ++(*info)) {
 	    i__2 = kp;
-	    if (IPIV(*info) > 0 && (AP(kp).r == 0. && AP(kp).i == 0.)) {
+	    if (ipiv[*info] > 0 && (ap[i__2].r == 0. && ap[i__2].i == 0.)) {
 		return 0;
 	    }
 	    kp = kp + *n - *info + 1;
@@ -161,8 +153,7 @@
 
 /*        Compute inv(A) from the factorization A = U*D*U'.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	k = 1;
@@ -176,7 +167,7 @@ L30:
 	}
 
 	kcnext = kc + k;
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
@@ -184,25 +175,25 @@ L30:
 
 	    i__1 = kc + k - 1;
 	    i__2 = kc + k - 1;
-	    d__1 = 1. / AP(kc+k-1).r;
-	    AP(kc+k-1).r = d__1, AP(kc+k-1).i = 0.;
+	    d__1 = 1. / ap[i__2].r;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 
 /*           Compute column K of the inverse. */
 
 	    if (k > 1) {
 		i__1 = k - 1;
-		zcopy_(&i__1, &AP(kc), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(1), &WORK(1), &c__1, &c_b2, &
-			AP(kc), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[1], &work[1], &c__1, &c_b2, &
+			ap[kc], &c__1);
 		i__1 = kc + k - 1;
 		i__2 = kc + k - 1;
 		i__3 = k - 1;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kc), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kc], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kc+k-1).r - d__1, z__1.i = AP(kc+k-1).i;
-		AP(kc+k-1).r = z__1.r, AP(kc+k-1).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    }
 	    kstep = 1;
 	} else {
@@ -211,107 +202,106 @@ L30:
 
              Invert the diagonal block. */
 
-	    t = z_abs(&AP(kcnext + k - 1));
+	    t = z_abs(&ap[kcnext + k - 1]);
 	    i__1 = kc + k - 1;
-	    ak = AP(kc+k-1).r / t;
+	    ak = ap[i__1].r / t;
 	    i__1 = kcnext + k;
-	    akp1 = AP(kcnext+k).r / t;
+	    akp1 = ap[i__1].r / t;
 	    i__1 = kcnext + k - 1;
-	    z__1.r = AP(kcnext+k-1).r / t, z__1.i = AP(kcnext+k-1).i / t;
+	    z__1.r = ap[i__1].r / t, z__1.i = ap[i__1].i / t;
 	    akkp1.r = z__1.r, akkp1.i = z__1.i;
-	    d = t * (ak * akp1 - 1.);
+	    d__ = t * (ak * akp1 - 1.);
 	    i__1 = kc + k - 1;
-	    d__1 = akp1 / d;
-	    AP(kc+k-1).r = d__1, AP(kc+k-1).i = 0.;
+	    d__1 = akp1 / d__;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 	    i__1 = kcnext + k;
-	    d__1 = ak / d;
-	    AP(kcnext+k).r = d__1, AP(kcnext+k).i = 0.;
+	    d__1 = ak / d__;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 	    i__1 = kcnext + k - 1;
 	    z__2.r = -akkp1.r, z__2.i = -akkp1.i;
-	    z__1.r = z__2.r / d, z__1.i = z__2.i / d;
-	    AP(kcnext+k-1).r = z__1.r, AP(kcnext+k-1).i = z__1.i;
+	    z__1.r = z__2.r / d__, z__1.i = z__2.i / d__;
+	    ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 
 /*           Compute columns K and K+1 of the inverse. */
 
 	    if (k > 1) {
 		i__1 = k - 1;
-		zcopy_(&i__1, &AP(kc), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(1), &WORK(1), &c__1, &c_b2, &
-			AP(kc), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[1], &work[1], &c__1, &c_b2, &
+			ap[kc], &c__1);
 		i__1 = kc + k - 1;
 		i__2 = kc + k - 1;
 		i__3 = k - 1;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kc), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kc], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kc+k-1).r - d__1, z__1.i = AP(kc+k-1).i;
-		AP(kc+k-1).r = z__1.r, AP(kc+k-1).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 		i__1 = kcnext + k - 1;
 		i__2 = kcnext + k - 1;
 		i__3 = k - 1;
-		zdotc_(&z__2, &i__3, &AP(kc), &c__1, &AP(kcnext), &c__1);
-		z__1.r = AP(kcnext+k-1).r - z__2.r, z__1.i = AP(kcnext+k-1).i - z__2.i;
-		AP(kcnext+k-1).r = z__1.r, AP(kcnext+k-1).i = z__1.i;
+		zdotc_(&z__2, &i__3, &ap[kc], &c__1, &ap[kcnext], &c__1);
+		z__1.r = ap[i__2].r - z__2.r, z__1.i = ap[i__2].i - z__2.i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 		i__1 = k - 1;
-		zcopy_(&i__1, &AP(kcnext), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kcnext], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(1), &WORK(1), &c__1, &c_b2, &
-			AP(kcnext), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[1], &work[1], &c__1, &c_b2, &
+			ap[kcnext], &c__1);
 		i__1 = kcnext + k;
 		i__2 = kcnext + k;
 		i__3 = k - 1;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kcnext), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kcnext], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kcnext+k).r - d__1, z__1.i = AP(kcnext+k).i;
-		AP(kcnext+k).r = z__1.r, AP(kcnext+k).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    }
 	    kstep = 2;
 	    kcnext = kcnext + k + 1;
 	}
 
-	kp = (i__1 = IPIV(k), abs(i__1));
+	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the leading 
-  
+/*           Interchange rows and columns K and KP in the leading   
              submatrix A(1:k+1,1:k+1) */
 
 	    kpc = (kp - 1) * kp / 2 + 1;
 	    i__1 = kp - 1;
-	    zswap_(&i__1, &AP(kc), &c__1, &AP(kpc), &c__1);
+	    zswap_(&i__1, &ap[kc], &c__1, &ap[kpc], &c__1);
 	    kx = kpc + kp - 1;
 	    i__1 = k - 1;
-	    for (j = kp + 1; j <= k-1; ++j) {
+	    for (j = kp + 1; j <= i__1; ++j) {
 		kx = kx + j - 1;
-		d_cnjg(&z__1, &AP(kc + j - 1));
+		d_cnjg(&z__1, &ap[kc + j - 1]);
 		temp.r = z__1.r, temp.i = z__1.i;
 		i__2 = kc + j - 1;
-		d_cnjg(&z__1, &AP(kx));
-		AP(kc+j-1).r = z__1.r, AP(kc+j-1).i = z__1.i;
+		d_cnjg(&z__1, &ap[kx]);
+		ap[i__2].r = z__1.r, ap[i__2].i = z__1.i;
 		i__2 = kx;
-		AP(kx).r = temp.r, AP(kx).i = temp.i;
+		ap[i__2].r = temp.r, ap[i__2].i = temp.i;
 /* L40: */
 	    }
 	    i__1 = kc + kp - 1;
-	    d_cnjg(&z__1, &AP(kc + kp - 1));
-	    AP(kc+kp-1).r = z__1.r, AP(kc+kp-1).i = z__1.i;
+	    d_cnjg(&z__1, &ap[kc + kp - 1]);
+	    ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    i__1 = kc + k - 1;
-	    temp.r = AP(kc+k-1).r, temp.i = AP(kc+k-1).i;
+	    temp.r = ap[i__1].r, temp.i = ap[i__1].i;
 	    i__1 = kc + k - 1;
 	    i__2 = kpc + kp - 1;
-	    AP(kc+k-1).r = AP(kpc+kp-1).r, AP(kc+k-1).i = AP(kpc+kp-1).i;
+	    ap[i__1].r = ap[i__2].r, ap[i__1].i = ap[i__2].i;
 	    i__1 = kpc + kp - 1;
-	    AP(kpc+kp-1).r = temp.r, AP(kpc+kp-1).i = temp.i;
+	    ap[i__1].r = temp.r, ap[i__1].i = temp.i;
 	    if (kstep == 2) {
 		i__1 = kc + k + k - 1;
-		temp.r = AP(kc+k+k-1).r, temp.i = AP(kc+k+k-1).i;
+		temp.r = ap[i__1].r, temp.i = ap[i__1].i;
 		i__1 = kc + k + k - 1;
 		i__2 = kc + k + kp - 1;
-		AP(kc+k+k-1).r = AP(kc+k+kp-1).r, AP(kc+k+k-1).i = AP(kc+k+kp-1).i;
+		ap[i__1].r = ap[i__2].r, ap[i__1].i = ap[i__2].i;
 		i__1 = kc + k + kp - 1;
-		AP(kc+k+kp-1).r = temp.r, AP(kc+k+kp-1).i = temp.i;
+		ap[i__1].r = temp.r, ap[i__1].i = temp.i;
 	    }
 	}
 
@@ -325,8 +315,7 @@ L50:
 
 /*        Compute inv(A) from the factorization A = L*D*L'.   
 
-          K is the main loop index, increasing from 1 to N in steps of
-   
+          K is the main loop index, increasing from 1 to N in steps of   
           1 or 2, depending on the size of the diagonal blocks. */
 
 	npp = *n * (*n + 1) / 2;
@@ -341,7 +330,7 @@ L60:
 	}
 
 	kcnext = kc - (*n - k + 2);
-	if (IPIV(k) > 0) {
+	if (ipiv[k] > 0) {
 
 /*           1 x 1 diagonal block   
 
@@ -349,25 +338,25 @@ L60:
 
 	    i__1 = kc;
 	    i__2 = kc;
-	    d__1 = 1. / AP(kc).r;
-	    AP(kc).r = d__1, AP(kc).i = 0.;
+	    d__1 = 1. / ap[i__2].r;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 
 /*           Compute column K of the inverse. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		zcopy_(&i__1, &AP(kc + 1), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(kc + *n - k + 1), &WORK(1), &
-			c__1, &c_b2, &AP(kc + 1), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[kc + *n - k + 1], &work[1], &
+			c__1, &c_b2, &ap[kc + 1], &c__1);
 		i__1 = kc;
 		i__2 = kc;
 		i__3 = *n - k;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kc + 1), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kc + 1], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kc).r - d__1, z__1.i = AP(kc).i;
-		AP(kc).r = z__1.r, AP(kc).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    }
 	    kstep = 1;
 	} else {
@@ -376,111 +365,110 @@ L60:
 
              Invert the diagonal block. */
 
-	    t = z_abs(&AP(kcnext + 1));
+	    t = z_abs(&ap[kcnext + 1]);
 	    i__1 = kcnext;
-	    ak = AP(kcnext).r / t;
+	    ak = ap[i__1].r / t;
 	    i__1 = kc;
-	    akp1 = AP(kc).r / t;
+	    akp1 = ap[i__1].r / t;
 	    i__1 = kcnext + 1;
-	    z__1.r = AP(kcnext+1).r / t, z__1.i = AP(kcnext+1).i / t;
+	    z__1.r = ap[i__1].r / t, z__1.i = ap[i__1].i / t;
 	    akkp1.r = z__1.r, akkp1.i = z__1.i;
-	    d = t * (ak * akp1 - 1.);
+	    d__ = t * (ak * akp1 - 1.);
 	    i__1 = kcnext;
-	    d__1 = akp1 / d;
-	    AP(kcnext).r = d__1, AP(kcnext).i = 0.;
+	    d__1 = akp1 / d__;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 	    i__1 = kc;
-	    d__1 = ak / d;
-	    AP(kc).r = d__1, AP(kc).i = 0.;
+	    d__1 = ak / d__;
+	    ap[i__1].r = d__1, ap[i__1].i = 0.;
 	    i__1 = kcnext + 1;
 	    z__2.r = -akkp1.r, z__2.i = -akkp1.i;
-	    z__1.r = z__2.r / d, z__1.i = z__2.i / d;
-	    AP(kcnext+1).r = z__1.r, AP(kcnext+1).i = z__1.i;
+	    z__1.r = z__2.r / d__, z__1.i = z__2.i / d__;
+	    ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 
 /*           Compute columns K-1 and K of the inverse. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
-		zcopy_(&i__1, &AP(kc + 1), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(kc + (*n - k + 1)), &WORK(1), &
-			c__1, &c_b2, &AP(kc + 1), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[kc + (*n - k + 1)], &work[1], &
+			c__1, &c_b2, &ap[kc + 1], &c__1);
 		i__1 = kc;
 		i__2 = kc;
 		i__3 = *n - k;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kc + 1), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kc + 1], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kc).r - d__1, z__1.i = AP(kc).i;
-		AP(kc).r = z__1.r, AP(kc).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 		i__1 = kcnext + 1;
 		i__2 = kcnext + 1;
 		i__3 = *n - k;
-		zdotc_(&z__2, &i__3, &AP(kc + 1), &c__1, &AP(kcnext + 2), &
+		zdotc_(&z__2, &i__3, &ap[kc + 1], &c__1, &ap[kcnext + 2], &
 			c__1);
-		z__1.r = AP(kcnext+1).r - z__2.r, z__1.i = AP(kcnext+1).i - z__2.i;
-		AP(kcnext+1).r = z__1.r, AP(kcnext+1).i = z__1.i;
+		z__1.r = ap[i__2].r - z__2.r, z__1.i = ap[i__2].i - z__2.i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 		i__1 = *n - k;
-		zcopy_(&i__1, &AP(kcnext + 2), &c__1, &WORK(1), &c__1);
+		zcopy_(&i__1, &ap[kcnext + 2], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
 		z__1.r = -1., z__1.i = 0.;
-		zhpmv_(uplo, &i__1, &z__1, &AP(kc + (*n - k + 1)), &WORK(1), &
-			c__1, &c_b2, &AP(kcnext + 2), &c__1);
+		zhpmv_(uplo, &i__1, &z__1, &ap[kc + (*n - k + 1)], &work[1], &
+			c__1, &c_b2, &ap[kcnext + 2], &c__1);
 		i__1 = kcnext;
 		i__2 = kcnext;
 		i__3 = *n - k;
-		zdotc_(&z__2, &i__3, &WORK(1), &c__1, &AP(kcnext + 2), &c__1);
+		zdotc_(&z__2, &i__3, &work[1], &c__1, &ap[kcnext + 2], &c__1);
 		d__1 = z__2.r;
-		z__1.r = AP(kcnext).r - d__1, z__1.i = AP(kcnext).i;
-		AP(kcnext).r = z__1.r, AP(kcnext).i = z__1.i;
+		z__1.r = ap[i__2].r - d__1, z__1.i = ap[i__2].i;
+		ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    }
 	    kstep = 2;
 	    kcnext -= *n - k + 3;
 	}
 
-	kp = (i__1 = IPIV(k), abs(i__1));
+	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the trailing
-   
+/*           Interchange rows and columns K and KP in the trailing   
              submatrix A(k-1:n,k-1:n) */
 
 	    kpc = npp - (*n - kp + 1) * (*n - kp + 2) / 2 + 1;
 	    if (kp < *n) {
 		i__1 = *n - kp;
-		zswap_(&i__1, &AP(kc + kp - k + 1), &c__1, &AP(kpc + 1), &
+		zswap_(&i__1, &ap[kc + kp - k + 1], &c__1, &ap[kpc + 1], &
 			c__1);
 	    }
 	    kx = kc + kp - k;
 	    i__1 = kp - 1;
-	    for (j = k + 1; j <= kp-1; ++j) {
+	    for (j = k + 1; j <= i__1; ++j) {
 		kx = kx + *n - j + 1;
-		d_cnjg(&z__1, &AP(kc + j - k));
+		d_cnjg(&z__1, &ap[kc + j - k]);
 		temp.r = z__1.r, temp.i = z__1.i;
 		i__2 = kc + j - k;
-		d_cnjg(&z__1, &AP(kx));
-		AP(kc+j-k).r = z__1.r, AP(kc+j-k).i = z__1.i;
+		d_cnjg(&z__1, &ap[kx]);
+		ap[i__2].r = z__1.r, ap[i__2].i = z__1.i;
 		i__2 = kx;
-		AP(kx).r = temp.r, AP(kx).i = temp.i;
+		ap[i__2].r = temp.r, ap[i__2].i = temp.i;
 /* L70: */
 	    }
 	    i__1 = kc + kp - k;
-	    d_cnjg(&z__1, &AP(kc + kp - k));
-	    AP(kc+kp-k).r = z__1.r, AP(kc+kp-k).i = z__1.i;
+	    d_cnjg(&z__1, &ap[kc + kp - k]);
+	    ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
 	    i__1 = kc;
-	    temp.r = AP(kc).r, temp.i = AP(kc).i;
+	    temp.r = ap[i__1].r, temp.i = ap[i__1].i;
 	    i__1 = kc;
 	    i__2 = kpc;
-	    AP(kc).r = AP(kpc).r, AP(kc).i = AP(kpc).i;
+	    ap[i__1].r = ap[i__2].r, ap[i__1].i = ap[i__2].i;
 	    i__1 = kpc;
-	    AP(kpc).r = temp.r, AP(kpc).i = temp.i;
+	    ap[i__1].r = temp.r, ap[i__1].i = temp.i;
 	    if (kstep == 2) {
 		i__1 = kc - *n + k - 1;
-		temp.r = AP(kc-*n+k-1).r, temp.i = AP(kc-*n+k-1).i;
+		temp.r = ap[i__1].r, temp.i = ap[i__1].i;
 		i__1 = kc - *n + k - 1;
 		i__2 = kc - *n + kp - 1;
-		AP(kc-*n+k-1).r = AP(kc-*n+kp-1).r, AP(kc-*n+k-1).i = AP(kc-*n+kp-1).i;
+		ap[i__1].r = ap[i__2].r, ap[i__1].i = ap[i__2].i;
 		i__1 = kc - *n + kp - 1;
-		AP(kc-*n+kp-1).r = temp.r, AP(kc-*n+kp-1).i = temp.i;
+		ap[i__1].r = temp.r, ap[i__1].i = temp.i;
 	    }
 	}
 

@@ -1,9 +1,10 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zgeql2_(integer *m, integer *n, doublecomplex *a, 
 	integer *lda, doublecomplex *tau, doublecomplex *work, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -27,11 +28,9 @@
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the m by n matrix A.   
             On exit, if m >= n, the lower triangle of the subarray   
-            A(m-n+1:m,1:n) contains the n by n lower triangular matrix L; 
-  
+            A(m-n+1:m,1:n) contains the n by n lower triangular matrix L;   
             if m <= n, the elements on and below the (n-m)-th   
-            superdiagonal contain the m by n lower trapezoidal matrix L; 
-  
+            superdiagonal contain the m by n lower trapezoidal matrix L;   
             the remaining elements, with the array TAU, represent the   
             unitary matrix Q as a product of elementary reflectors   
             (see Further Details).   
@@ -40,8 +39,7 @@
             The leading dimension of the array A.  LDA >= max(1,M).   
 
     TAU     (output) COMPLEX*16 array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors (see Further 
-  
+            The scalar factors of the elementary reflectors (see Further   
             Details).   
 
     WORK    (workspace) COMPLEX*16 array, dimension (N)   
@@ -62,19 +60,15 @@
        H(i) = I - tau * v * v'   
 
     where tau is a complex scalar, and v is a complex vector with   
-    v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in 
-  
+    v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in   
     A(1:m-k+i-1,n-k+i), and tau in TAU(i).   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -84,20 +78,23 @@
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
-    static integer i, k;
+    static integer i__, k;
     static doublecomplex alpha;
     extern /* Subroutine */ int zlarf_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *), xerbla_(char *, integer *), zlarfg_(integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *);
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
     if (*m < 0) {
 	*info = -1;
@@ -114,27 +111,27 @@
 
     k = min(*m,*n);
 
-    for (i = k; i >= 1; --i) {
+    for (i__ = k; i__ >= 1; --i__) {
 
 /*        Generate elementary reflector H(i) to annihilate   
           A(1:m-k+i-1,n-k+i) */
 
-	i__1 = *m - k + i + (*n - k + i) * a_dim1;
-	alpha.r = A(*m-k+i,*n-k+i).r, alpha.i = A(*m-k+i,*n-k+i).i;
-	i__1 = *m - k + i;
-	zlarfg_(&i__1, &alpha, &A(1,*n-k+i), &c__1, &TAU(i));
+	i__1 = a_subscr(*m - k + i__, *n - k + i__);
+	alpha.r = a[i__1].r, alpha.i = a[i__1].i;
+	i__1 = *m - k + i__;
+	zlarfg_(&i__1, &alpha, &a_ref(1, *n - k + i__), &c__1, &tau[i__]);
 
 /*        Apply H(i)' to A(1:m-k+i,1:n-k+i-1) from the left */
 
-	i__1 = *m - k + i + (*n - k + i) * a_dim1;
-	A(*m-k+i,*n-k+i).r = 1., A(*m-k+i,*n-k+i).i = 0.;
-	i__1 = *m - k + i;
-	i__2 = *n - k + i - 1;
-	d_cnjg(&z__1, &TAU(i));
-	zlarf_("Left", &i__1, &i__2, &A(1,*n-k+i), &c__1, &
-		z__1, &A(1,1), lda, &WORK(1));
-	i__1 = *m - k + i + (*n - k + i) * a_dim1;
-	A(*m-k+i,*n-k+i).r = alpha.r, A(*m-k+i,*n-k+i).i = alpha.i;
+	i__1 = a_subscr(*m - k + i__, *n - k + i__);
+	a[i__1].r = 1., a[i__1].i = 0.;
+	i__1 = *m - k + i__;
+	i__2 = *n - k + i__ - 1;
+	d_cnjg(&z__1, &tau[i__]);
+	zlarf_("Left", &i__1, &i__2, &a_ref(1, *n - k + i__), &c__1, &z__1, &
+		a[a_offset], lda, &work[1]);
+	i__1 = a_subscr(*m - k + i__, *n - k + i__);
+	a[i__1].r = alpha.r, a[i__1].i = alpha.i;
 /* L10: */
     }
     return 0;
@@ -142,4 +139,8 @@
 /*     End of ZGEQL2 */
 
 } /* zgeql2_ */
+
+#undef a_ref
+#undef a_subscr
+
 

@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -33,7 +34,7 @@ static integer c__0 = 0;
 	doublereal *a, integer *lda, doublereal *u, integer *ldu, doublereal *
 	vt, integer *ldvt, doublereal *asav, doublereal *usav, doublereal *
 	vtsav, doublereal *s, doublereal *ssav, doublereal *e, doublereal *
-	work, integer *lwork, integer *nout, integer *info)
+	work, integer *lwork, integer *iwork, integer *nout, integer *info)
 {
     /* Initialized data */
 
@@ -62,10 +63,16 @@ static integer c__0 = 0;
 	    "(M,N) nonnegative values in\002,\002 decreasing order, else 1/ulp"
 	    "\002,/\002 5 = | U - Upartial | / ( M ulp )\002,/\002 6 = | VT -"
 	    " VTpartial | / ( N ulp )\002,/\002 7 = | S - Spartial | / ( min("
-	    "M,N) ulp |S| )\002,//)";
+	    "M,N) ulp |S| )\002,/\002 8 = | A - U diag(S) VT | / ( |A| max(M,"
+	    "N) ulp ) \002,/\002 9 = | I - U**T U | / ( M ulp ) \002,/\00210 "
+	    "= | I - VT VT**T | / ( N ulp ) \002,/\00211 = 0 if S contains mi"
+	    "n(M,N) nonnegative values in\002,\002 decreasing order, else 1/u"
+	    "lp\002,/\00212 = | U - Upartial | / ( M ulp )\002,/\00213 = | VT"
+	    " - VTpartial | / ( N ulp )\002,/\00214 = | S - Spartial | / ( mi"
+	    "n(M,N) ulp |S| )\002,//)";
     static char fmt_9997[] = "(\002 M=\002,i5,\002, N=\002,i5,\002, type "
 	    "\002,i1,\002, IWS=\002,i1,\002, seed=\002,4(i4,\002,\002),\002 t"
-	    "est(\002,i1,\002)=\002,g11.4)";
+	    "est(\002,i2,\002)=\002,g11.4)";
 
     /* System generated locals */
     integer a_dim1, a_offset, asav_dim1, asav_offset, u_dim1, u_offset, 
@@ -79,10 +86,10 @@ static integer c__0 = 0;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char path[3], jobu[1];
+    static char jobq[1], path[3], jobu[1];
     static integer mmax, nmax;
     static doublereal unfl, ovfl;
-    static integer ijvt, i, j, m, n;
+    static integer ijvt, i__, j, m, n;
     extern /* Subroutine */ int dbdt01_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, doublereal *)
@@ -99,7 +106,10 @@ static integer c__0 = 0;
     static integer jsize, jtype, ntest, iwtmp;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
-    extern /* Subroutine */ int dgesvd_(char *, char *, integer *, integer *, 
+    extern /* Subroutine */ int dgesdd_(char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    integer *), dgesvd_(char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), dlacpy_(char *, integer *, integer *, doublereal 
 	    *, integer *, doublereal *, integer *);
@@ -112,38 +122,39 @@ static integer c__0 = 0;
 	    doublereal *, doublereal *, integer *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, integer *);
     static integer minwrk;
-    static doublereal ulpinv, result[7];
+    static doublereal ulpinv, result[14];
     static integer lswork, mtypes;
     static doublereal dif, div;
-    static integer iju;
+    static integer ijq, iju;
     static doublereal ulp;
     static integer iws;
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, fmt_9996, 0 };
     static cilist io___30 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___38 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___39 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___40 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___38 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___42 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9997, 0 };
 
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       October 31, 1999   
 
 
     Purpose   
     =======   
 
-    DDRVBD checks the singular value decomposition (SVD) driver DGESVD.   
-    DGESVD factors A = U diag(S) VT, where U and VT are orthogonal   
-    and diag(S) is diagonal with the entries of the array S on its   
-    diagonal. The entries of S are the singular values, nonnegative and   
-    stored in decreasing order.  U and VT can be optionally not computed, 
-  
-    overwritten on A, or computed partially.   
+    DDRVBD checks the singular value decomposition (SVD) drivers   
+    DGESVD and SGESDD.   
+    Both DGESVD and SGESDD factor A = U diag(S) VT, where U and VT are   
+    orthogonal and diag(S) is diagonal with the entries of the array S   
+    on its diagonal. The entries of S are the singular values,   
+    nonnegative and stored in decreasing order.  U and VT can be   
+    optionally not computed, overwritten on A, or computed partially.   
 
     A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN.   
     U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N.   
@@ -151,29 +162,49 @@ static integer c__0 = 0;
     When DDRVBD is called, a number of matrix "sizes" (M's and N's)   
     and a number of matrix "types" are specified.  For each size (M,N)   
     and each type of matrix, and for the minimal workspace as well as   
-    workspace adequate to permit blocking, an  M x N  matrix "A" will be 
-  
-    generated and used to test the SVD routines.  For each matrix, A will 
-  
-    be factored as A = U diag(S) VT and the following 6 tests computed:   
+    workspace adequate to permit blocking, an  M x N  matrix "A" will be   
+    generated and used to test the SVD routines.  For each matrix, A will   
+    be factored as A = U diag(S) VT and the following 12 tests computed:   
 
-    (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+    Test for DGESVD:   
 
-    (2)   | I - U'U | / ( M ulp )   
+    (1)    | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
 
-    (3)   | I - VT VT' | / ( N ulp )   
+    (2)    | I - U'U | / ( M ulp )   
 
-    (4)   S contains MNMIN nonnegative values in decreasing order.   
-          (Return 0 if true, 1/ULP if false.)   
+    (3)    | I - VT VT' | / ( N ulp )   
 
-    (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
-          computed U.   
+    (4)    S contains MNMIN nonnegative values in decreasing order.   
+           (Return 0 if true, 1/ULP if false.)   
 
-    (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
-          computed VT.   
+    (5)    | U - Upartial | / ( M ulp ) where Upartial is a partially   
+           computed U.   
 
-    (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
-          vector of singular values from the partial SVD   
+    (6)    | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
+           computed VT.   
+
+    (7)    | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
+           vector of singular values from the partial SVD   
+
+    Test for DGESDD:   
+
+    (8)    | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+
+    (9)    | I - U'U | / ( M ulp )   
+
+    (10)   | I - VT VT' | / ( N ulp )   
+
+    (11)   S contains MNMIN nonnegative values in decreasing order.   
+           (Return 0 if true, 1/ULP if false.)   
+
+    (12)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
+           computed U.   
+
+    (13)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
+           computed VT.   
+
+    (14)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
+           vector of singular values from the partial SVD   
 
     The "sizes" are specified by the arrays MM(1:NSIZES) and   
     NN(1:NSIZES); the value of each element pair (MM(j),NN(j))   
@@ -220,12 +251,10 @@ static integer c__0 = 0;
             DOTYPE(NTYPES) will be ignored.   
 
     ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator.  The array 
-  
+            On entry, the seed of the random number generator.  The array   
             elements should be between 0 and 4095; if not they will be   
             reduced mod 4096.  Also, ISEED(4) must be odd.   
-            On exit, ISEED is changed and can be used in the next call to 
-  
+            On exit, ISEED is changed and can be used in the next call to   
             DDRVBD to continue the same random number sequence.   
 
     THRESH  (input) DOUBLE PRECISION   
@@ -250,8 +279,7 @@ static integer c__0 = 0;
     VT      (workspace) DOUBLE PRECISION array, dimension (LDVT,NMAX)   
 
     LDVT    (input) INTEGER   
-            The leading dimension of the array VT.  LDVT >= max(1,NMAX). 
-  
+            The leading dimension of the array VT.  LDVT >= max(1,NMAX).   
 
     ASAV    (workspace) DOUBLE PRECISION array, dimension (LDA,NMAX)   
 
@@ -275,6 +303,8 @@ static integer c__0 = 0;
             max(3*MN+MX,5*MN-4)+2*MN**2 for all pairs   
             pairs  (MN,MX)=( min(MM(j),NN(j), max(MM(j),NN(j)) )   
 
+    IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N)   
+
     NOUT    (input) INTEGER   
             The FORTRAN unit number for printing out error messages   
             (e.g., if a routine returns IINFO not equal to 0.)   
@@ -293,8 +323,7 @@ static integer c__0 = 0;
             If  DLATMS, or DGESVD returns an error code, the   
                 absolute value of it is returned.   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
        Parameter adjustments */
     --mm;
@@ -302,27 +331,28 @@ static integer c__0 = 0;
     --dotype;
     --iseed;
     asav_dim1 = *lda;
-    asav_offset = asav_dim1 + 1;
+    asav_offset = 1 + asav_dim1 * 1;
     asav -= asav_offset;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     usav_dim1 = *ldu;
-    usav_offset = usav_dim1 + 1;
+    usav_offset = 1 + usav_dim1 * 1;
     usav -= usav_offset;
     u_dim1 = *ldu;
-    u_offset = u_dim1 + 1;
+    u_offset = 1 + u_dim1 * 1;
     u -= u_offset;
     vtsav_dim1 = *ldvt;
-    vtsav_offset = vtsav_dim1 + 1;
+    vtsav_offset = 1 + vtsav_dim1 * 1;
     vtsav -= vtsav_offset;
     vt_dim1 = *ldvt;
-    vt_offset = vt_dim1 + 1;
+    vt_offset = 1 + vt_dim1 * 1;
     vt -= vt_offset;
     --s;
     --ssav;
     --e;
     --work;
+    --iwork;
 
     /* Function Body   
 
@@ -401,8 +431,8 @@ static integer c__0 = 0;
 
 /*     Initialize constants */
 
-    *(unsigned char *)path = 'D';
-    s_copy(path + 1, "BD", 2L, 2L);
+    s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
+    s_copy(path + 1, "BD", (ftnlen)2, (ftnlen)2);
     nfail = 0;
     ntest = 0;
     unfl = dlamch_("Safe minimum");
@@ -429,7 +459,7 @@ static integer c__0 = 0;
 	i__2 = mtypes;
 	for (jtype = 1; jtype <= i__2; ++jtype) {
 	    if (! dotype[jtype]) {
-		goto L110;
+		goto L140;
 	    }
 
 	    for (j = 1; j <= 4; ++j) {
@@ -447,15 +477,13 @@ static integer c__0 = 0;
 
 /*              Zero matrix */
 
-		dlaset_("Full", &m, &n, &c_b13, &c_b13, &a[a_offset], lda)
-			;
+		dlaset_("Full", &m, &n, &c_b13, &c_b13, &a[a_offset], lda);
 
 	    } else if (jtype == 2) {
 
 /*              Identity matrix */
 
-		dlaset_("Full", &m, &n, &c_b13, &c_b17, &a[a_offset], lda)
-			;
+		dlaset_("Full", &m, &n, &c_b13, &c_b17, &a[a_offset], lda);
 
 	    } else {
 
@@ -479,7 +507,7 @@ static integer c__0 = 0;
 		if (iinfo != 0) {
 		    io___25.ciunit = *nout;
 		    s_wsfe(&io___25);
-		    do_fio(&c__1, "Generator", 9L);
+		    do_fio(&c__1, "Generator", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -495,13 +523,20 @@ static integer c__0 = 0;
 L30:
 	    dlacpy_("F", &m, &n, &a[a_offset], lda, &asav[asav_offset], lda);
 
-/*           Do for minimal and adequate (for blocking) workspace 
-  
+/*           Do for minimal and adequate (for blocking) workspace */
+
+	    for (iws = 1; iws <= 4; ++iws) {
+
+		for (j = 1; j <= 14; ++j) {
+		    result[j - 1] = -1.;
+/* L40: */
+		}
+
+/*              Test DGESVD: Factorize A   
 
    Computing MAX */
-	    i__3 = min(m,n) * 3 + max(m,n), i__4 = min(m,n) * 5 - 4;
-	    iwtmp = max(i__3,i__4);
-	    for (iws = 1; iws <= 4; ++iws) {
+		i__3 = min(m,n) * 3 + max(m,n), i__4 = min(m,n) * 5;
+		iwtmp = max(i__3,i__4);
 		lswork = iwtmp + (iws - 1) * (*lwork - iwtmp) / 3;
 		lswork = min(lswork,*lwork);
 		lswork = max(lswork,1);
@@ -509,25 +544,18 @@ L30:
 		    lswork = *lwork;
 		}
 
-		for (j = 1; j <= 7; ++j) {
-		    result[j - 1] = -1.;
-/* L40: */
-		}
-
-/*              Factorize A */
-
 		if (iws > 1) {
 		    dlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
 			    , lda);
 		}
-		s_copy(srnamc_1.srnamt, "DGESVD", 6L, 6L);
+		s_copy(srnamc_1.srnamt, "DGESVD", (ftnlen)6, (ftnlen)6);
 		dgesvd_("A", "A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
 			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
 			1], &lswork, &iinfo);
 		if (iinfo != 0) {
 		    io___30.ciunit = *nout;
 		    s_wsfe(&io___30);
-		    do_fio(&c__1, "GESVD", 5L);
+		    do_fio(&c__1, "GESVD", (ftnlen)5);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -545,17 +573,19 @@ L30:
 		dbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
 			usav_offset], ldu, &ssav[1], &e[1], &vtsav[
 			vtsav_offset], ldvt, &work[1], result);
-		dort01_("Columns", &mnmin, &m, &usav[usav_offset], ldu, &work[
-			1], lwork, &result[1]);
-		dort01_("Rows", &mnmin, &n, &vtsav[vtsav_offset], ldvt, &work[
-			1], lwork, &result[2]);
+		if (m != 0 && n != 0) {
+		    dort01_("Columns", &m, &m, &usav[usav_offset], ldu, &work[
+			    1], lwork, &result[1]);
+		    dort01_("Rows", &n, &n, &vtsav[vtsav_offset], ldvt, &work[
+			    1], lwork, &result[2]);
+		}
 		result[3] = 0.;
 		i__3 = mnmin - 1;
-		for (i = 1; i <= i__3; ++i) {
-		    if (ssav[i] < ssav[i + 1]) {
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    if (ssav[i__] < ssav[i__ + 1]) {
 			result[3] = ulpinv;
 		    }
-		    if (ssav[i] < 0.) {
+		    if (ssav[i__] < 0.) {
 			result[3] = ulpinv;
 		    }
 /* L50: */
@@ -566,8 +596,7 @@ L30:
 		    }
 		}
 
-/*              Do partial SVDs, comparing to SSAV, USAV, and 
-VTSAV */
+/*              Do partial SVDs, comparing to SSAV, USAV, and VTSAV */
 
 		result[4] = 0.;
 		result[5] = 0.;
@@ -582,7 +611,8 @@ VTSAV */
 				ijvt];
 			dlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[
 				a_offset], lda);
-			s_copy(srnamc_1.srnamt, "DGESVD", 6L, 6L);
+			s_copy(srnamc_1.srnamt, "DGESVD", (ftnlen)6, (ftnlen)
+				6);
 			dgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1],
 				 &u[u_offset], ldu, &vt[vt_offset], ldvt, &
 				work[1], &lswork, &iinfo);
@@ -634,16 +664,16 @@ VTSAV */
 			d__1 = (doublereal) mnmin * ulp * s[1];
 			div = max(d__1,unfl);
 			i__3 = mnmin - 1;
-			for (i = 1; i <= i__3; ++i) {
-			    if (ssav[i] < ssav[i + 1]) {
+			for (i__ = 1; i__ <= i__3; ++i__) {
+			    if (ssav[i__] < ssav[i__ + 1]) {
 				dif = ulpinv;
 			    }
-			    if (ssav[i] < 0.) {
+			    if (ssav[i__] < 0.) {
 				dif = ulpinv;
 			    }
 /* Computing MAX */
-			    d__2 = dif, d__3 = (d__1 = ssav[i] - s[i], abs(
-				    d__1)) / div;
+			    d__2 = dif, d__3 = (d__1 = ssav[i__] - s[i__], 
+				    abs(d__1)) / div;
 			    dif = max(d__2,d__3);
 /* L60: */
 			}
@@ -654,20 +684,162 @@ L70:
 /* L80: */
 		}
 
+/*              Test DGESDD: Factorize A */
+
+		iwtmp = mnmin * 5 * mnmin + mnmin * 9 + max(m,n);
+		lswork = iwtmp + (iws - 1) * (*lwork - iwtmp) / 3;
+		lswork = min(lswork,*lwork);
+		lswork = max(lswork,1);
+		if (iws == 4) {
+		    lswork = *lwork;
+		}
+
+		dlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset], 
+			lda);
+		s_copy(srnamc_1.srnamt, "DGESDD", (ftnlen)6, (ftnlen)6);
+		dgesdd_("A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
+			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
+			1], &lswork, &iwork[1], &iinfo);
+		if (iinfo != 0) {
+		    io___38.ciunit = *nout;
+		    s_wsfe(&io___38);
+		    do_fio(&c__1, "GESDD", (ftnlen)5);
+		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&lswork, (ftnlen)sizeof(integer));
+		    do_fio(&c__4, (char *)&ioldsd[0], (ftnlen)sizeof(integer))
+			    ;
+		    e_wsfe();
+		    *info = abs(iinfo);
+		    return 0;
+		}
+
+/*              Do tests 8--11 */
+
+		dbdt01_(&m, &n, &c__0, &asav[asav_offset], lda, &usav[
+			usav_offset], ldu, &ssav[1], &e[1], &vtsav[
+			vtsav_offset], ldvt, &work[1], &result[7]);
+		if (m != 0 && n != 0) {
+		    dort01_("Columns", &m, &m, &usav[usav_offset], ldu, &work[
+			    1], lwork, &result[8]);
+		    dort01_("Rows", &n, &n, &vtsav[vtsav_offset], ldvt, &work[
+			    1], lwork, &result[9]);
+		}
+		result[10] = 0.;
+		i__3 = mnmin - 1;
+		for (i__ = 1; i__ <= i__3; ++i__) {
+		    if (ssav[i__] < ssav[i__ + 1]) {
+			result[10] = ulpinv;
+		    }
+		    if (ssav[i__] < 0.) {
+			result[10] = ulpinv;
+		    }
+/* L90: */
+		}
+		if (mnmin >= 1) {
+		    if (ssav[mnmin] < 0.) {
+			result[10] = ulpinv;
+		    }
+		}
+
+/*              Do partial SVDs, comparing to SSAV, USAV, and VTSAV */
+
+		result[11] = 0.;
+		result[12] = 0.;
+		result[13] = 0.;
+		for (ijq = 0; ijq <= 2; ++ijq) {
+		    *(unsigned char *)jobq = *(unsigned char *)&cjob[ijq];
+		    dlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
+			    , lda);
+		    s_copy(srnamc_1.srnamt, "DGESDD", (ftnlen)6, (ftnlen)6);
+		    dgesdd_(jobq, &m, &n, &a[a_offset], lda, &s[1], &u[
+			    u_offset], ldu, &vt[vt_offset], ldvt, &work[1], &
+			    lswork, &iwork[1], &iinfo);
+
+/*                 Compare U */
+
+		    dif = 0.;
+		    if (m > 0 && n > 0) {
+			if (ijq == 1) {
+			    if (m >= n) {
+				dort03_("C", &m, &mnmin, &m, &mnmin, &usav[
+					usav_offset], ldu, &a[a_offset], lda, 
+					&work[1], lwork, &dif, info);
+			    } else {
+				dort03_("C", &m, &mnmin, &m, &mnmin, &usav[
+					usav_offset], ldu, &u[u_offset], ldu, 
+					&work[1], lwork, &dif, info);
+			    }
+			} else if (ijq == 2) {
+			    dort03_("C", &m, &mnmin, &m, &mnmin, &usav[
+				    usav_offset], ldu, &u[u_offset], ldu, &
+				    work[1], lwork, &dif, info);
+			}
+		    }
+		    result[11] = max(result[11],dif);
+
+/*                 Compare VT */
+
+		    dif = 0.;
+		    if (m > 0 && n > 0) {
+			if (ijq == 1) {
+			    if (m >= n) {
+				dort03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+					vtsav_offset], ldvt, &vt[vt_offset], 
+					ldvt, &work[1], lwork, &dif, info);
+			    } else {
+				dort03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+					vtsav_offset], ldvt, &a[a_offset], 
+					lda, &work[1], lwork, &dif, info);
+			    }
+			} else if (ijq == 2) {
+			    dort03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
+				    vtsav_offset], ldvt, &vt[vt_offset], ldvt,
+				     &work[1], lwork, &dif, info);
+			}
+		    }
+		    result[12] = max(result[12],dif);
+
+/*                 Compare S */
+
+		    dif = 0.;
+/* Computing MAX */
+		    d__1 = (doublereal) mnmin * ulp * s[1];
+		    div = max(d__1,unfl);
+		    i__3 = mnmin - 1;
+		    for (i__ = 1; i__ <= i__3; ++i__) {
+			if (ssav[i__] < ssav[i__ + 1]) {
+			    dif = ulpinv;
+			}
+			if (ssav[i__] < 0.) {
+			    dif = ulpinv;
+			}
+/* Computing MAX */
+			d__2 = dif, d__3 = (d__1 = ssav[i__] - s[i__], abs(
+				d__1)) / div;
+			dif = max(d__2,d__3);
+/* L100: */
+		    }
+		    result[13] = max(result[13],dif);
+/* L110: */
+		}
+
 /*              End of Loop -- Check for RESULT(j) > THRESH */
 
-		for (j = 1; j <= 7; ++j) {
+		for (j = 1; j <= 14; ++j) {
 		    if (result[j - 1] >= *thresh) {
 			if (nfail == 0) {
-			    io___38.ciunit = *nout;
-			    s_wsfe(&io___38);
+			    io___41.ciunit = *nout;
+			    s_wsfe(&io___41);
 			    e_wsfe();
-			    io___39.ciunit = *nout;
-			    s_wsfe(&io___39);
+			    io___42.ciunit = *nout;
+			    s_wsfe(&io___42);
 			    e_wsfe();
 			}
-			io___40.ciunit = *nout;
-			s_wsfe(&io___40);
+			io___43.ciunit = *nout;
+			s_wsfe(&io___43);
 			do_fio(&c__1, (char *)&m, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
@@ -681,16 +853,16 @@ L70:
 			e_wsfe();
 			++nfail;
 		    }
-/* L90: */
+/* L120: */
 		}
-		ntest += 7;
+		ntest += 14;
 
-/* L100: */
+/* L130: */
 	    }
-L110:
+L140:
 	    ;
 	}
-/* L120: */
+/* L150: */
     }
 
 /*     Summary */

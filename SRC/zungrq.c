@@ -1,13 +1,14 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int zungrq_(integer *m, integer *n, integer *k, 
 	doublecomplex *a, integer *lda, doublecomplex *tau, doublecomplex *
 	work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 2.0) --   
+/*  -- LAPACK routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -31,14 +32,12 @@
             The number of columns of the matrix Q. N >= M.   
 
     K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the 
-  
+            The number of elementary reflectors whose product defines the   
             matrix Q. M >= K >= 0.   
 
     A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
             On entry, the (m-k+i)-th row must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as 
-  
+            defines the elementary reflector H(i), for i = 1,2,...,k, as   
             returned by ZGERQF in the last k rows of its array argument   
             A.   
             On exit, the M-by-N matrix Q.   
@@ -58,19 +57,21 @@
             For optimum performance LWORK >= M*NB, where NB is the   
             optimal blocksize.   
 
+            If LWORK = -1, then a workspace query is assumed; the routine   
+            only calculates the optimal size of the WORK array, returns   
+            this value as the first entry of the WORK array, and no error   
+            message related to LWORK is issued by XERBLA.   
+
     INFO    (output) INTEGER   
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument has an illegal value   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Test the input arguments   
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     static integer c_n1 = -1;
@@ -80,7 +81,7 @@
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     /* Local variables */
-    static integer i, j, l, nbmin, iinfo, ib, nb, ii, kk;
+    static integer i__, j, l, nbmin, iinfo, ib, nb, ii, kk;
     extern /* Subroutine */ int zungr2_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
@@ -96,16 +97,25 @@
     extern /* Subroutine */ int zlarft_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
+    static integer lwkopt;
+    static logical lquery;
     static integer iws;
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+    a_dim1 = *lda;
+    a_offset = 1 + a_dim1 * 1;
+    a -= a_offset;
+    --tau;
+    --work;
 
-#define TAU(I) tau[(I)-1]
-#define WORK(I) work[(I)-1]
-
-#define A(I,J) a[(I)-1 + ((J)-1)* ( *lda)]
-
+    /* Function Body */
     *info = 0;
+    nb = ilaenv_(&c__1, "ZUNGRQ", " ", m, n, k, &c_n1, (ftnlen)6, (ftnlen)1);
+    lwkopt = max(1,*m) * nb;
+    work[1].r = (doublereal) lwkopt, work[1].i = 0.;
+    lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
     } else if (*n < *m) {
@@ -114,54 +124,50 @@
 	*info = -3;
     } else if (*lda < max(1,*m)) {
 	*info = -5;
-    } else if (*lwork < max(1,*m)) {
+    } else if (*lwork < max(1,*m) && ! lquery) {
 	*info = -8;
     }
     if (*info != 0) {
 	i__1 = -(*info);
 	xerbla_("ZUNGRQ", &i__1);
 	return 0;
+    } else if (lquery) {
+	return 0;
     }
 
 /*     Quick return if possible */
 
     if (*m <= 0) {
-	WORK(1).r = 1., WORK(1).i = 0.;
+	work[1].r = 1., work[1].i = 0.;
 	return 0;
     }
 
-/*     Determine the block size. */
-
-    nb = ilaenv_(&c__1, "ZUNGRQ", " ", m, n, k, &c_n1, 6L, 1L);
     nbmin = 2;
     nx = 0;
     iws = *m;
     if (nb > 1 && nb < *k) {
 
-/*        Determine when to cross over from blocked to unblocked code.
-   
+/*        Determine when to cross over from blocked to unblocked code.   
 
    Computing MAX */
-	i__1 = 0, i__2 = ilaenv_(&c__3, "ZUNGRQ", " ", m, n, k, &c_n1, 6L, 1L)
-		;
+	i__1 = 0, i__2 = ilaenv_(&c__3, "ZUNGRQ", " ", m, n, k, &c_n1, (
+		ftnlen)6, (ftnlen)1);
 	nx = max(i__1,i__2);
 	if (nx < *k) {
 
-/*           Determine if workspace is large enough for blocked co
-de. */
+/*           Determine if workspace is large enough for blocked code. */
 
 	    ldwork = *m;
 	    iws = ldwork * nb;
 	    if (*lwork < iws) {
 
-/*              Not enough workspace to use optimal NB:  reduc
-e NB and   
+/*              Not enough workspace to use optimal NB:  reduce NB and   
                 determine the minimum value of NB. */
 
 		nb = *lwork / ldwork;
 /* Computing MAX */
 		i__1 = 2, i__2 = ilaenv_(&c__2, "ZUNGRQ", " ", m, n, k, &c_n1,
-			 6L, 1L);
+			 (ftnlen)6, (ftnlen)1);
 		nbmin = max(i__1,i__2);
 	    }
 	}
@@ -179,11 +185,11 @@ e NB and
 /*        Set A(1:m-kk,n-kk+1:n) to zero. */
 
 	i__1 = *n;
-	for (j = *n - kk + 1; j <= *n; ++j) {
+	for (j = *n - kk + 1; j <= i__1; ++j) {
 	    i__2 = *m - kk;
-	    for (i = 1; i <= *m-kk; ++i) {
-		i__3 = i + j * a_dim1;
-		A(i,j).r = 0., A(i,j).i = 0.;
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		i__3 = a_subscr(i__, j);
+		a[i__3].r = 0., a[i__3].i = 0.;
 /* L10: */
 	    }
 /* L20: */
@@ -197,7 +203,7 @@ e NB and
     i__1 = *m - kk;
     i__2 = *n - kk;
     i__3 = *k - kk;
-    zungr2_(&i__1, &i__2, &i__3, &A(1,1), lda, &TAU(1), &WORK(1), &iinfo)
+    zungr2_(&i__1, &i__2, &i__3, &a[a_offset], lda, &tau[1], &work[1], &iinfo)
 	    ;
 
     if (kk > 0) {
@@ -206,45 +212,44 @@ e NB and
 
 	i__1 = *k;
 	i__2 = nb;
-	for (i = *k - kk + 1; nb < 0 ? i >= *k : i <= *k; i += nb) {
+	for (i__ = *k - kk + 1; i__2 < 0 ? i__ >= i__1 : i__ <= i__1; i__ += 
+		i__2) {
 /* Computing MIN */
-	    i__3 = nb, i__4 = *k - i + 1;
+	    i__3 = nb, i__4 = *k - i__ + 1;
 	    ib = min(i__3,i__4);
-	    ii = *m - *k + i;
+	    ii = *m - *k + i__;
 	    if (ii > 1) {
 
-/*              Form the triangular factor of the block reflec
-tor   
+/*              Form the triangular factor of the block reflector   
                 H = H(i+ib-1) . . . H(i+1) H(i) */
 
-		i__3 = *n - *k + i + ib - 1;
-		zlarft_("Backward", "Rowwise", &i__3, &ib, &A(ii,1), 
-			lda, &TAU(i), &WORK(1), &ldwork);
+		i__3 = *n - *k + i__ + ib - 1;
+		zlarft_("Backward", "Rowwise", &i__3, &ib, &a_ref(ii, 1), lda,
+			 &tau[i__], &work[1], &ldwork);
 
-/*              Apply H' to A(1:m-k+i-1,1:n-k+i+ib-1) from the
- right */
+/*              Apply H' to A(1:m-k+i-1,1:n-k+i+ib-1) from the right */
 
 		i__3 = ii - 1;
-		i__4 = *n - *k + i + ib - 1;
+		i__4 = *n - *k + i__ + ib - 1;
 		zlarfb_("Right", "Conjugate transpose", "Backward", "Rowwise",
-			 &i__3, &i__4, &ib, &A(ii,1), lda, &WORK(1), &
-			ldwork, &A(1,1), lda, &WORK(ib + 1), &ldwork);
+			 &i__3, &i__4, &ib, &a_ref(ii, 1), lda, &work[1], &
+			ldwork, &a[a_offset], lda, &work[ib + 1], &ldwork);
 	    }
 
 /*           Apply H' to columns 1:n-k+i+ib-1 of current block */
 
-	    i__3 = *n - *k + i + ib - 1;
-	    zungr2_(&ib, &i__3, &ib, &A(ii,1), lda, &TAU(i), &WORK(1), 
+	    i__3 = *n - *k + i__ + ib - 1;
+	    zungr2_(&ib, &i__3, &ib, &a_ref(ii, 1), lda, &tau[i__], &work[1], 
 		    &iinfo);
 
 /*           Set columns n-k+i+ib:n of current block to zero */
 
 	    i__3 = *n;
-	    for (l = *n - *k + i + ib; l <= *n; ++l) {
+	    for (l = *n - *k + i__ + ib; l <= i__3; ++l) {
 		i__4 = ii + ib - 1;
-		for (j = ii; j <= ii+ib-1; ++j) {
-		    i__5 = j + l * a_dim1;
-		    A(j,l).r = 0., A(j,l).i = 0.;
+		for (j = ii; j <= i__4; ++j) {
+		    i__5 = a_subscr(j, l);
+		    a[i__5].r = 0., a[i__5].i = 0.;
 /* L30: */
 		}
 /* L40: */
@@ -253,10 +258,14 @@ tor
 	}
     }
 
-    WORK(1).r = (doublereal) iws, WORK(1).i = 0.;
+    work[1].r = (doublereal) iws, work[1].i = 0.;
     return 0;
 
 /*     End of ZUNGRQ */
 
 } /* zungrq_ */
+
+#undef a_ref
+#undef a_subscr
+
 

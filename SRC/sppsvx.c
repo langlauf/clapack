@@ -1,3 +1,4 @@
+#include "blaswrap.h"
 #include "f2c.h"
 
 /* Subroutine */ int sppsvx_(char *fact, char *uplo, integer *n, integer *
@@ -5,10 +6,10 @@
 	ldb, real *x, integer *ldx, real *rcond, real *ferr, real *berr, real 
 	*work, integer *iwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 2.0) --   
+/*  -- LAPACK driver routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+       June 30, 1999   
 
 
     Purpose   
@@ -39,13 +40,16 @@
        factor the matrix A (after equilibration if FACT = 'E') as   
           A = U**T* U,  if UPLO = 'U', or   
           A = L * L**T,  if UPLO = 'L',   
-       where U is an upper triangular matrix and L is a lower triangular 
-  
+       where U is an upper triangular matrix and L is a lower triangular   
        matrix.   
 
-    3. The factored form of A is used to estimate the condition number   
-       of the matrix A.  If the reciprocal of the condition number is   
-       less than machine precision, steps 4-6 are skipped.   
+    3. If the leading i-by-i principal minor is not positive definite,   
+       then the routine returns with INFO = i. Otherwise, the factored   
+       form of A is used to estimate the condition number of the matrix   
+       A.  If the reciprocal of the condition number is less than machine   
+       precision, INFO = N+1 is returned as a warning, but the routine   
+       still goes on to solve for X and compute error bounds as   
+       described below.   
 
     4. The system of equations is solved for X using the factored form   
        of A.   
@@ -62,19 +66,15 @@
     =========   
 
     FACT    (input) CHARACTER*1   
-            Specifies whether or not the factored form of the matrix A is 
-  
-            supplied on entry, and if not, whether the matrix A should be 
-  
+            Specifies whether or not the factored form of the matrix A is   
+            supplied on entry, and if not, whether the matrix A should be   
             equilibrated before it is factored.   
             = 'F':  On entry, AFP contains the factored form of A.   
                     If EQUED = 'Y', the matrix A has been equilibrated   
-                    with scaling factors given by S.  AP and AFP will not 
-  
+                    with scaling factors given by S.  AP and AFP will not   
                     be modified.   
             = 'N':  The matrix A will be copied to AFP and factored.   
-            = 'E':  The matrix A will be equilibrated if necessary, then 
-  
+            = 'E':  The matrix A will be equilibrated if necessary, then   
                     copied to AFP and factored.   
 
     UPLO    (input) CHARACTER*1   
@@ -90,19 +90,15 @@
             of the matrices B and X.  NRHS >= 0.   
 
     AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix 
-  
-            A, packed columnwise in a linear array, except if FACT = 'F' 
-  
-            and EQUED = 'Y', then A must contain the equilibrated matrix 
-  
+            On entry, the upper or lower triangle of the symmetric matrix   
+            A, packed columnwise in a linear array, except if FACT = 'F'   
+            and EQUED = 'Y', then A must contain the equilibrated matrix   
             diag(S)*A*diag(S).  The j-th column of A is stored in the   
             array AP as follows:   
             if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
             if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
             See below for further details.  A is not modified if   
-            FACT = 'F' or 'N', or if FACT = 'E' and EQUED = 'N' on exit. 
-  
+            FACT = 'F' or 'N', or if FACT = 'E' and EQUED = 'N' on exit.   
 
             On exit, if FACT = 'E' and EQUED = 'Y', A is overwritten by   
             diag(S)*A*diag(S).   
@@ -117,8 +113,7 @@
 
             If FACT = 'N', then AFP is an output argument and on exit   
             returns the triangular factor U or L from the Cholesky   
-            factorization A = U'*U or A = L*L' of the original matrix A. 
-  
+            factorization A = U'*U or A = L*L' of the original matrix A.   
 
             If FACT = 'E', then AFP is an output argument and on exit   
             returns the triangular factor U or L from the Cholesky   
@@ -129,11 +124,9 @@
     EQUED   (input or output) CHARACTER*1   
             Specifies the form of equilibration that was done.   
             = 'N':  No equilibration (always true if FACT = 'N').   
-            = 'Y':  Equilibration was done, i.e., A has been replaced by 
-  
+            = 'Y':  Equilibration was done, i.e., A has been replaced by   
                     diag(S) * A * diag(S).   
-            EQUED is an input argument if FACT = 'F'; otherwise, it is an 
-  
+            EQUED is an input argument if FACT = 'F'; otherwise, it is an   
             output argument.   
 
     S       (input or output) REAL array, dimension (N)   
@@ -151,33 +144,26 @@
             The leading dimension of the array B.  LDB >= max(1,N).   
 
     X       (output) REAL array, dimension (LDX,NRHS)   
-            If INFO = 0, the N-by-NRHS solution matrix X to the original 
-  
-            system of equations.  Note that if EQUED = 'Y', A and B are   
-            modified on exit, and the solution to the equilibrated system 
-  
-            is inv(diag(S))*X.   
+            If INFO = 0 or INFO = N+1, the N-by-NRHS solution matrix X to   
+            the original system of equations.  Note that if EQUED = 'Y',   
+            A and B are modified on exit, and the solution to the   
+            equilibrated system is inv(diag(S))*X.   
 
     LDX     (input) INTEGER   
             The leading dimension of the array X.  LDX >= max(1,N).   
 
     RCOND   (output) REAL   
-            The estimate of the reciprocal condition number of the matrix 
-  
+            The estimate of the reciprocal condition number of the matrix   
             A after equilibration (if done).  If RCOND is less than the   
             machine precision (in particular, if RCOND = 0), the matrix   
             is singular to working precision.  This condition is   
-            indicated by a return code of INFO > 0, and the solution and 
-  
-            error bounds are not computed.   
+            indicated by a return code of INFO > 0.   
 
     FERR    (output) REAL array, dimension (NRHS)   
             The estimated forward error bound for each solution vector   
             X(j) (the j-th column of the solution matrix X).   
-            If XTRUE is the true solution corresponding to X(j), FERR(j) 
-  
-            is an estimated upper bound for the magnitude of the largest 
-  
+            If XTRUE is the true solution corresponding to X(j), FERR(j)   
+            is an estimated upper bound for the magnitude of the largest   
             element in (X(j) - XTRUE) divided by the magnitude of the   
             largest element in X(j).  The estimate is as reliable as   
             the estimate for RCOND, and is almost always a slight   
@@ -196,16 +182,17 @@
             = 0:  successful exit   
             < 0:  if INFO = -i, the i-th argument had an illegal value   
             > 0:  if INFO = i, and i is   
-                  <= N: the leading minor of order i of A   
-                        is not positive definite, so the factorization   
-                        could not be completed, and the solution and   
-                        error bounds could not be computed.   
-                  = N+1: RCOND is less than machine precision.  The   
-                        factorization has been completed, but the matrix 
-  
-                        is singular to working precision, and the   
-                        solution and error bounds have not been computed. 
-  
+                  <= N:  the leading minor of order i of A is   
+                         not positive definite, so the factorization   
+                         could not be completed, and the solution has not   
+                         been computed. RCOND = 0 is returned.   
+                  = N+1: U is nonsingular, but RCOND is less than machine   
+                         precision, meaning that the matrix is singular   
+                         to working precision.  Nevertheless, the   
+                         solution and error bounds are computed because   
+                         there are a number of situations where the   
+                         computed solution can be more accurate than the   
+                         value of RCOND would suggest.   
 
     Further Details   
     ===============   
@@ -224,13 +211,10 @@
 
     AP = [ a11, a12, a22, a13, a23, a33, a14, a24, a34, a44 ]   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
-    
-   Parameter adjustments   
-       Function Body */
+       Parameter adjustments */
     /* Table of constant values */
     static integer c__1 = 1;
     
@@ -239,7 +223,7 @@
     real r__1, r__2;
     /* Local variables */
     static real amax, smin, smax;
-    static integer i, j;
+    static integer i__, j;
     extern logical lsame_(char *, char *);
     static real scond, anorm;
     static logical equil, rcequ;
@@ -264,20 +248,25 @@
 	    real *, real *, real *, integer *, integer *), spptrf_(
 	    char *, integer *, real *, integer *), spptrs_(char *, 
 	    integer *, integer *, real *, real *, integer *, integer *);
+#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
 
 
+    --ap;
+    --afp;
+    --s;
+    b_dim1 = *ldb;
+    b_offset = 1 + b_dim1 * 1;
+    b -= b_offset;
+    x_dim1 = *ldx;
+    x_offset = 1 + x_dim1 * 1;
+    x -= x_offset;
+    --ferr;
+    --berr;
+    --work;
+    --iwork;
 
-#define AP(I) ap[(I)-1]
-#define AFP(I) afp[(I)-1]
-#define S(I) s[(I)-1]
-#define FERR(I) ferr[(I)-1]
-#define BERR(I) berr[(I)-1]
-#define WORK(I) work[(I)-1]
-#define IWORK(I) iwork[(I)-1]
-
-#define B(I,J) b[(I)-1 + ((J)-1)* ( *ldb)]
-#define X(I,J) x[(I)-1 + ((J)-1)* ( *ldx)]
-
+    /* Function Body */
     *info = 0;
     nofact = lsame_(fact, "N");
     equil = lsame_(fact, "E");
@@ -294,25 +283,27 @@
 
     if (! nofact && ! equil && ! lsame_(fact, "F")) {
 	*info = -1;
-    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
+    } else if (! lsame_(uplo, "U") && ! lsame_(uplo, 
+	    "L")) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -3;
     } else if (*nrhs < 0) {
 	*info = -4;
-    } else if (lsame_(fact, "F") && ! (rcequ || lsame_(equed, "N"))) {
+    } else if (lsame_(fact, "F") && ! (rcequ || lsame_(
+	    equed, "N"))) {
 	*info = -7;
     } else {
 	if (rcequ) {
 	    smin = bignum;
 	    smax = 0.f;
 	    i__1 = *n;
-	    for (j = 1; j <= *n; ++j) {
+	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
-		r__1 = smin, r__2 = S(j);
+		r__1 = smin, r__2 = s[j];
 		smin = dmin(r__1,r__2);
 /* Computing MAX */
-		r__1 = smax, r__2 = S(j);
+		r__1 = smax, r__2 = s[j];
 		smax = dmax(r__1,r__2);
 /* L10: */
 	    }
@@ -341,15 +332,14 @@
 
     if (equil) {
 
-/*        Compute row and column scalings to equilibrate the matrix A.
- */
+/*        Compute row and column scalings to equilibrate the matrix A. */
 
-	sppequ_(uplo, n, &AP(1), &S(1), &scond, &amax, &infequ);
+	sppequ_(uplo, n, &ap[1], &s[1], &scond, &amax, &infequ);
 	if (infequ == 0) {
 
 /*           Equilibrate the matrix. */
 
-	    slaqsp_(uplo, n, &AP(1), &S(1), &scond, &amax, equed);
+	    slaqsp_(uplo, n, &ap[1], &s[1], &scond, &amax, equed);
 	    rcequ = lsame_(equed, "Y");
 	}
     }
@@ -358,10 +348,10 @@
 
     if (rcequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		B(i,j) = S(i) * B(i,j);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		b_ref(i__, j) = s[i__] * b_ref(i__, j);
 /* L20: */
 	    }
 /* L30: */
@@ -373,8 +363,8 @@
 /*        Compute the Cholesky factorization A = U'*U or A = L*L'. */
 
 	i__1 = *n * (*n + 1) / 2;
-	scopy_(&i__1, &AP(1), &c__1, &AFP(1), &c__1);
-	spptrf_(uplo, n, &AFP(1), info);
+	scopy_(&i__1, &ap[1], &c__1, &afp[1], &c__1);
+	spptrf_(uplo, n, &afp[1], info);
 
 /*        Return if INFO is non-zero. */
 
@@ -388,46 +378,45 @@
 
 /*     Compute the norm of the matrix A. */
 
-    anorm = slansp_("I", uplo, n, &AP(1), &WORK(1));
+    anorm = slansp_("I", uplo, n, &ap[1], &work[1]);
 
 /*     Compute the reciprocal of the condition number of A. */
 
-    sppcon_(uplo, n, &AFP(1), &anorm, rcond, &WORK(1), &IWORK(1), info);
+    sppcon_(uplo, n, &afp[1], &anorm, rcond, &work[1], &iwork[1], info);
 
-/*     Return if the matrix is singular to working precision. */
+/*     Set INFO = N+1 if the matrix is singular to working precision. */
 
     if (*rcond < slamch_("Epsilon")) {
 	*info = *n + 1;
-	return 0;
     }
 
 /*     Compute the solution matrix X. */
 
-    slacpy_("Full", n, nrhs, &B(1,1), ldb, &X(1,1), ldx);
-    spptrs_(uplo, n, nrhs, &AFP(1), &X(1,1), ldx, info);
+    slacpy_("Full", n, nrhs, &b[b_offset], ldb, &x[x_offset], ldx);
+    spptrs_(uplo, n, nrhs, &afp[1], &x[x_offset], ldx, info);
 
 /*     Use iterative refinement to improve the computed solution and   
        compute error bounds and backward error estimates for it. */
 
-    spprfs_(uplo, n, nrhs, &AP(1), &AFP(1), &B(1,1), ldb, &X(1,1), 
-	    ldx, &FERR(1), &BERR(1), &WORK(1), &IWORK(1), info);
+    spprfs_(uplo, n, nrhs, &ap[1], &afp[1], &b[b_offset], ldb, &x[x_offset], 
+	    ldx, &ferr[1], &berr[1], &work[1], &iwork[1], info);
 
 /*     Transform the solution matrix X to a solution of the original   
        system. */
 
     if (rcequ) {
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
+	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
-	    for (i = 1; i <= *n; ++i) {
-		X(i,j) = S(i) * X(i,j);
+	    for (i__ = 1; i__ <= i__2; ++i__) {
+		x_ref(i__, j) = s[i__] * x_ref(i__, j);
 /* L40: */
 	    }
 /* L50: */
 	}
 	i__1 = *nrhs;
-	for (j = 1; j <= *nrhs; ++j) {
-	    FERR(j) /= scond;
+	for (j = 1; j <= i__1; ++j) {
+	    ferr[j] /= scond;
 /* L60: */
 	}
     }
@@ -437,4 +426,8 @@
 /*     End of SPPSVX */
 
 } /* sppsvx_ */
+
+#undef x_ref
+#undef b_ref
+
 

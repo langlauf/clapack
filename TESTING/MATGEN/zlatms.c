@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -14,7 +15,7 @@ static logical c_true = TRUE_;
 static logical c_false = FALSE_;
 
 /* Subroutine */ int zlatms_(integer *m, integer *n, char *dist, integer *
-	iseed, char *sym, doublereal *d, integer *mode, doublereal *cond, 
+	iseed, char *sym, doublereal *d__, integer *mode, doublereal *cond, 
 	doublereal *dmax__, integer *kl, integer *ku, char *pack, 
 	doublecomplex *a, integer *lda, doublecomplex *work, integer *info)
 {
@@ -33,8 +34,8 @@ static logical c_false = FALSE_;
     static doublereal temp;
     static integer irow, isym;
     static logical zsym;
-    static doublecomplex c;
-    static integer i, j, k;
+    static doublecomplex c__;
+    static integer i__, j, k;
     static doublecomplex s;
     static doublereal alpha, angle;
     static integer ipack;
@@ -78,7 +79,11 @@ static logical c_false = FALSE_;
     static integer jch, llb, jkl, jku, uub;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
+#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        September 30, 1994   
@@ -113,20 +118,16 @@ static logical c_false = FALSE_;
                  bandwidth-1 matrix using Givens rotations, "chasing"   
                  out-of-band elements back, much as in QR; then convert   
                  the bandwidth-1 to a bandwidth-2 matrix, etc.  Note   
-                 that for reasonably small bandwidths (relative to M and 
-  
-                 N) this requires less storage, as a dense matrix is not 
-  
+                 that for reasonably small bandwidths (relative to M and   
+                 N) this requires less storage, as a dense matrix is not   
                  generated.  Also, for hermitian or symmetric matrices,   
                  only one triangle is generated.   
 
          Method A is chosen if the bandwidth is a large fraction of the   
              order of the matrix, and LDA is at least M (so a dense   
-             matrix can be stored.)  Method B is chosen if the bandwidth 
-  
+             matrix can be stored.)  Method B is chosen if the bandwidth   
              is small (< 1/2 N for hermitian or symmetric, < .3 N+M for   
-             non-symmetric), or LDA is less than M and not less than the 
-  
+             non-symmetric), or LDA is less than M and not less than the   
              bandwidth.   
 
          Pack the matrix if desired. Options specified by PACK are:   
@@ -143,8 +144,7 @@ static logical c_false = FALSE_;
                   upper triangular)   
             store the entire matrix in banded format   
          If Method B is chosen, and band format is specified, then the   
-            matrix will be generated in the band format, so no repacking 
-  
+            matrix will be generated in the band format, so no repacking   
             will be necessary.   
 
     Arguments   
@@ -159,8 +159,7 @@ static logical c_false = FALSE_;
              Not modified.   
 
     DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used 
-  
+             On entry, DIST specifies the type of distribution to be used   
              to generate the random eigen-/singular values.   
              'U' => UNIFORM( 0, 1 )  ( 'U' for uniform )   
              'S' => UNIFORM( -1, 1 ) ( 'S' for symmetric )   
@@ -202,8 +201,7 @@ static logical c_false = FALSE_;
              Modified if MODE is nonzero.   
 
     MODE   - INTEGER   
-             On entry this describes how the singular/eigenvalues are to 
-  
+             On entry this describes how the singular/eigenvalues are to   
              be specified:   
              MODE = 0 means use D as input   
              MODE = 1 sets D(1)=1 and D(2:N)=1.0/COND   
@@ -231,20 +229,16 @@ static logical c_false = FALSE_;
     DMAX   - DOUBLE PRECISION   
              If MODE is neither -6, 0 nor 6, the contents of D, as   
              computed according to MODE and COND, will be scaled by   
-             DMAX / max(abs(D(i))); thus, the maximum absolute eigen- or 
-  
-             singular value (which is to say the norm) will be abs(DMAX). 
-  
+             DMAX / max(abs(D(i))); thus, the maximum absolute eigen- or   
+             singular value (which is to say the norm) will be abs(DMAX).   
              Note that DMAX need not be positive: if DMAX is negative   
-             (or zero), D will be scaled by a negative number (or zero). 
-  
+             (or zero), D will be scaled by a negative number (or zero).   
              Not modified.   
 
     KL     - INTEGER   
              This specifies the lower bandwidth of the  matrix. For   
              example, KL=0 implies upper triangular, KL=1 implies upper   
-             Hessenberg, and KL being at least M-1 means that the matrix 
-  
+             Hessenberg, and KL being at least M-1 means that the matrix   
              has full lower bandwidth.  KL must equal KU if the matrix   
              is symmetric or hermitian.   
              Not modified.   
@@ -252,8 +246,7 @@ static logical c_false = FALSE_;
     KU     - INTEGER   
              This specifies the upper bandwidth of the  matrix. For   
              example, KU=0 implies lower triangular, KU=1 implies lower   
-             Hessenberg, and KU being at least N-1 means that the matrix 
-  
+             Hessenberg, and KU being at least N-1 means that the matrix   
              has full upper bandwidth.  KL must equal KU if the matrix   
              is symmetric or hermitian.   
              Not modified.   
@@ -266,11 +259,9 @@ static logical c_false = FALSE_;
              'L' => zero out all superdiagonal entries (if symmetric   
                     or hermitian)   
              'C' => store the upper triangle columnwise (only if the   
-                    matrix is symmetric, hermitian, or upper triangular) 
-  
+                    matrix is symmetric, hermitian, or upper triangular)   
              'R' => store the lower triangle columnwise (only if the   
-                    matrix is symmetric, hermitian, or lower triangular) 
-  
+                    matrix is symmetric, hermitian, or lower triangular)   
              'B' => store the lower triangle in band storage scheme   
                     (only if the matrix is symmetric, hermitian, or   
                     lower triangular)   
@@ -293,8 +284,7 @@ static logical c_false = FALSE_;
              Not modified.   
 
     A      - COMPLEX*16 array, dimension ( LDA, N )   
-             On exit A is the desired test matrix.  A is first generated 
-  
+             On exit A is the desired test matrix.  A is first generated   
              in full (unpacked) form, and then packed, if so specified   
              by PACK.  Thus, the first M elements of the first N   
              columns will always be modified.  If PACK specifies a   
@@ -328,25 +318,20 @@ static logical c_false = FALSE_;
               -7 => MODE not in range -6 to 6   
               -8 => COND less than 1.0, and MODE neither -6, 0 nor 6   
              -10 => KL negative   
-             -11 => KU negative, or SYM is not 'N' and KU is not equal to 
-  
+             -11 => KU negative, or SYM is not 'N' and KU is not equal to   
                     KL   
-             -12 => PACK illegal string, or PACK='U' or 'L', and SYM='N'; 
-  
+             -12 => PACK illegal string, or PACK='U' or 'L', and SYM='N';   
                     or PACK='C' or 'Q' and SYM='N' and KL is not zero;   
                     or PACK='R' or 'B' and SYM='N' and KU is not zero;   
-                    or PACK='U', 'L', 'C', 'R', 'B', or 'Q', and M is not 
-  
+                    or PACK='U', 'L', 'C', 'R', 'B', or 'Q', and M is not   
                     N.   
-             -14 => LDA is less than M, or PACK='Z' and LDA is less than 
-  
+             -14 => LDA is less than M, or PACK='Z' and LDA is less than   
                     MIN(KU,N-1) + MIN(KL,M-1) + 1.   
               1  => Error return from DLATM1   
               2  => Cannot scale to DMAX (max. sing. value is 0)   
               3  => Error return from ZLAGGE, CLAGHE or CLAGSY   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        1)      Decode and Test the input parameters.   
@@ -354,9 +339,9 @@ static logical c_false = FALSE_;
 
        Parameter adjustments */
     --iseed;
-    --d;
+    --d__;
     a_dim1 = *lda;
-    a_offset = a_dim1 + 1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --work;
 
@@ -511,8 +496,8 @@ static logical c_false = FALSE_;
 
 /*     Initialize random number generator */
 
-    for (i = 1; i <= 4; ++i) {
-	iseed[i] = (i__1 = iseed[i], abs(i__1)) % 4096;
+    for (i__ = 1; i__ <= 4; ++i__) {
+	iseed[i__] = (i__1 = iseed[i__], abs(i__1)) % 4096;
 /* L10: */
     }
 
@@ -524,7 +509,7 @@ static logical c_false = FALSE_;
 
                Compute D according to COND and MODE */
 
-    dlatm1_(mode, cond, &irsign, &idist, &iseed[1], &d[1], &mnmin, &iinfo);
+    dlatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], &mnmin, &iinfo);
     if (iinfo != 0) {
 	*info = 1;
 	return 0;
@@ -533,7 +518,7 @@ static logical c_false = FALSE_;
 /*     Choose Top-Down if D is (apparently) increasing,   
        Bottom-Up if D is (apparently) decreasing. */
 
-    if (abs(d[1]) <= (d__1 = d[mnmin], abs(d__1))) {
+    if (abs(d__[1]) <= (d__1 = d__[mnmin], abs(d__1))) {
 	topdwn = TRUE_;
     } else {
 	topdwn = FALSE_;
@@ -543,11 +528,11 @@ static logical c_false = FALSE_;
 
 /*        Scale by DMAX */
 
-	temp = abs(d[1]);
+	temp = abs(d__[1]);
 	i__1 = mnmin;
-	for (i = 2; i <= i__1; ++i) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 /* Computing MAX */
-	    d__2 = temp, d__3 = (d__1 = d[i], abs(d__1));
+	    d__2 = temp, d__3 = (d__1 = d__[i__], abs(d__1));
 	    temp = max(d__2,d__3);
 /* L20: */
 	}
@@ -559,7 +544,7 @@ static logical c_false = FALSE_;
 	    return 0;
 	}
 
-	dscal_(&mnmin, &alpha, &d[1], &c__1);
+	dscal_(&mnmin, &alpha, &d__[1], &c__1);
 
     }
 
@@ -600,9 +585,9 @@ static logical c_false = FALSE_;
     if (llb == 0 && uub == 0) {
 	i__1 = mnmin;
 	for (j = 1; j <= i__1; ++j) {
-	    i__2 = (1 - iskew) * j + ioffst + j * a_dim1;
+	    i__2 = a_subscr((1 - iskew) * j + ioffst, j);
 	    i__3 = j;
-	    z__1.r = d[i__3], z__1.i = 0.;
+	    z__1.r = d__[i__3], z__1.i = 0.;
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L30: */
 	}
@@ -628,9 +613,9 @@ static logical c_false = FALSE_;
 
 	    i__1 = mnmin;
 	    for (j = 1; j <= i__1; ++j) {
-		i__2 = (1 - iskew) * j + ioffst + j * a_dim1;
+		i__2 = a_subscr((1 - iskew) * j + ioffst, j);
 		i__3 = j;
-		z__1.r = d[i__3], z__1.i = 0.;
+		z__1.r = d__[i__3], z__1.i = 0.;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L40: */
 	    }
@@ -640,12 +625,10 @@ static logical c_false = FALSE_;
 		i__1 = uub;
 		for (jku = 1; jku <= i__1; ++jku) {
 
-/*                 Transform from bandwidth JKL, JKU-1 to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL, JKU-1 to JKL, JKU   
 
                    Last row actually rotated is M   
-                   Last column actually rotated is MIN( M+
-JKU, N )   
+                   Last column actually rotated is MIN( M+JKU, N )   
 
    Computing MIN */
 		    i__3 = *m + jku;
@@ -657,7 +640,7 @@ JKU, N )
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
@@ -670,9 +653,9 @@ JKU, N )
 			    i__3 = *n, i__4 = jr + jku;
 			    il = min(i__3,i__4) + 1 - icol;
 			    L__1 = jr > jkl;
-			    zlarot_(&c_true, &L__1, &c_false, &il, &c, &s, &a[
-				    jr - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &extra, &dummy);
+			    zlarot_(&c_true, &L__1, &c_false, &il, &c__, &s, &
+				    a_ref(jr - iskew * icol + ioffst, icol), &
+				    ilda, &extra, &dummy);
 			}
 
 /*                    Chase "EXTRA" back up */
@@ -683,15 +666,15 @@ JKU, N )
 			for (jch = jr - jkl; i__3 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__3) {
 			    if (ir < *m) {
-				zlartg_(&a[ir + 1 - iskew * (ic + 1) + ioffst 
-					+ (ic + 1) * a_dim1], &extra, &realc, 
-					&s, &dummy);
+				zlartg_(&a_ref(ir + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &extra, &realc, &s, &
+					dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__2.r = realc * dummy.r, z__2.i = realc * 
 					dummy.i;
 				d_cnjg(&z__1, &z__2);
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__3.r = -s.r, z__3.i = -s.i;
 				z__2.r = z__3.r * dummy.r - z__3.i * dummy.i, 
 					z__2.i = z__3.r * dummy.i + z__3.i * 
@@ -705,19 +688,19 @@ JKU, N )
 			    il = ir + 2 - irow;
 			    ctemp.r = 0., ctemp.i = 0.;
 			    iltemp = jch > jku;
-			    zlarot_(&c_false, &iltemp, &c_true, &il, &c, &s, &
-				    a[irow - iskew * ic + ioffst + ic * 
-				    a_dim1], &ilda, &ctemp, &extra);
+			    zlarot_(&c_false, &iltemp, &c_true, &il, &c__, &s,
+				     &a_ref(irow - iskew * ic + ioffst, ic), &
+				    ilda, &ctemp, &extra);
 			    if (iltemp) {
-				zlartg_(&a[irow + 1 - iskew * (ic + 1) + 
-					ioffst + (ic + 1) * a_dim1], &ctemp, &
-					realc, &s, &dummy);
+				zlartg_(&a_ref(irow + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &ctemp, &realc, &s, &
+					dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__2.r = realc * dummy.r, z__2.i = realc * 
 					dummy.i;
 				d_cnjg(&z__1, &z__2);
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__3.r = -s.r, z__3.i = -s.i;
 				z__2.r = z__3.r * dummy.r - z__3.i * dummy.i, 
 					z__2.i = z__3.r * dummy.i + z__3.i * 
@@ -731,10 +714,9 @@ JKU, N )
 				il = ic + 2 - icol;
 				extra.r = 0., extra.i = 0.;
 				L__1 = jch > jku + jkl;
-				zlarot_(&c_true, &L__1, &c_true, &il, &c, &s, 
-					&a[irow - iskew * icol + ioffst + 
-					icol * a_dim1], &ilda, &extra, &ctemp)
-					;
+				zlarot_(&c_true, &L__1, &c_true, &il, &c__, &
+					s, &a_ref(irow - iskew * icol + 
+					ioffst, icol), &ilda, &extra, &ctemp);
 				ic = icol;
 				ir = irow;
 			    }
@@ -749,8 +731,7 @@ JKU, N )
 		i__1 = llb;
 		for (jkl = 1; jkl <= i__1; ++jkl) {
 
-/*                 Transform from bandwidth JKL-1, JKU to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL-1, JKU to JKL, JKU   
 
    Computing MIN */
 		    i__3 = *n + jkl;
@@ -762,7 +743,7 @@ JKL, JKU
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
@@ -775,9 +756,9 @@ JKL, JKU
 			    i__3 = *m, i__4 = jc + jkl;
 			    il = min(i__3,i__4) + 1 - irow;
 			    L__1 = jc > jku;
-			    zlarot_(&c_false, &L__1, &c_false, &il, &c, &s, &
-				    a[irow - iskew * jc + ioffst + jc * 
-				    a_dim1], &ilda, &extra, &dummy);
+			    zlarot_(&c_false, &L__1, &c_false, &il, &c__, &s, 
+				    &a_ref(irow - iskew * jc + ioffst, jc), &
+				    ilda, &extra, &dummy);
 			}
 
 /*                    Chase "EXTRA" back up */
@@ -788,15 +769,15 @@ JKL, JKU
 			for (jch = jc - jku; i__3 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__3) {
 			    if (ic < *n) {
-				zlartg_(&a[ir + 1 - iskew * (ic + 1) + ioffst 
-					+ (ic + 1) * a_dim1], &extra, &realc, 
-					&s, &dummy);
+				zlartg_(&a_ref(ir + 1 - iskew * (ic + 1) + 
+					ioffst, ic + 1), &extra, &realc, &s, &
+					dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__2.r = realc * dummy.r, z__2.i = realc * 
 					dummy.i;
 				d_cnjg(&z__1, &z__2);
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__3.r = -s.r, z__3.i = -s.i;
 				z__2.r = z__3.r * dummy.r - z__3.i * dummy.i, 
 					z__2.i = z__3.r * dummy.i + z__3.i * 
@@ -810,19 +791,19 @@ JKL, JKU
 			    il = ic + 2 - icol;
 			    ctemp.r = 0., ctemp.i = 0.;
 			    iltemp = jch > jkl;
-			    zlarot_(&c_true, &iltemp, &c_true, &il, &c, &s, &
-				    a[ir - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &ctemp, &extra);
+			    zlarot_(&c_true, &iltemp, &c_true, &il, &c__, &s, 
+				    &a_ref(ir - iskew * icol + ioffst, icol), 
+				    &ilda, &ctemp, &extra);
 			    if (iltemp) {
-				zlartg_(&a[ir + 1 - iskew * (icol + 1) + 
-					ioffst + (icol + 1) * a_dim1], &ctemp,
-					 &realc, &s, &dummy);
+				zlartg_(&a_ref(ir + 1 - iskew * (icol + 1) + 
+					ioffst, icol + 1), &ctemp, &realc, &s,
+					 &dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__2.r = realc * dummy.r, z__2.i = realc * 
 					dummy.i;
 				d_cnjg(&z__1, &z__2);
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__3.r = -s.r, z__3.i = -s.i;
 				z__2.r = z__3.r * dummy.r - z__3.i * dummy.i, 
 					z__2.i = z__3.r * dummy.i + z__3.i * 
@@ -835,10 +816,9 @@ JKL, JKU
 				il = ir + 2 - irow;
 				extra.r = 0., extra.i = 0.;
 				L__1 = jch > jkl + jku;
-				zlarot_(&c_false, &L__1, &c_true, &il, &c, &s,
-					 &a[irow - iskew * icol + ioffst + 
-					icol * a_dim1], &ilda, &extra, &ctemp)
-					;
+				zlarot_(&c_false, &L__1, &c_true, &il, &c__, &
+					s, &a_ref(irow - iskew * icol + 
+					ioffst, icol), &ilda, &extra, &ctemp);
 				ic = icol;
 				ir = irow;
 			    }
@@ -857,12 +837,10 @@ JKL, JKU
 		i__1 = uub;
 		for (jku = 1; jku <= i__1; ++jku) {
 
-/*                 Transform from bandwidth JKL, JKU-1 to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL, JKU-1 to JKL, JKU   
 
                    First row actually rotated is M   
-                   First column actually rotated is MIN( M
-+JKU, N )   
+                   First column actually rotated is MIN( M+JKU, N )   
 
    Computing MIN */
 		    i__2 = *m, i__3 = *n + jkl;
@@ -877,7 +855,7 @@ JKL, JKU
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
@@ -890,9 +868,9 @@ JKL, JKU
 			    i__2 = *m, i__4 = jc + jkl + 1;
 			    il = min(i__2,i__4) + 1 - irow;
 			    L__1 = jc + jkl < *m;
-			    zlarot_(&c_false, &c_false, &L__1, &il, &c, &s, &
-				    a[irow - iskew * jc + ioffst + jc * 
-				    a_dim1], &ilda, &dummy, &extra);
+			    zlarot_(&c_false, &c_false, &L__1, &il, &c__, &s, 
+				    &a_ref(irow - iskew * jc + ioffst, jc), &
+				    ilda, &dummy, &extra);
 			}
 
 /*                    Chase "EXTRA" back down */
@@ -904,13 +882,13 @@ JKL, JKU
 				i__2; jch += i__4) {
 			    ilextr = ic > 0;
 			    if (ilextr) {
-				zlartg_(&a[jch - iskew * ic + ioffst + ic * 
-					a_dim1], &extra, &realc, &s, &dummy);
+				zlartg_(&a_ref(jch - iskew * ic + ioffst, ic),
+					 &extra, &realc, &s, &dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__1.r = realc * dummy.r, z__1.i = realc * 
 					dummy.i;
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__1.r = s.r * dummy.r - s.i * dummy.i, 
 					z__1.i = s.r * dummy.i + s.i * 
 					dummy.r;
@@ -923,18 +901,17 @@ JKL, JKU
 			    iltemp = jch + jku < *n;
 			    ctemp.r = 0., ctemp.i = 0.;
 			    i__5 = icol + 2 - ic;
-			    zlarot_(&c_true, &ilextr, &iltemp, &i__5, &c, &s, 
-				    &a[jch - iskew * ic + ioffst + ic * 
-				    a_dim1], &ilda, &extra, &ctemp);
+			    zlarot_(&c_true, &ilextr, &iltemp, &i__5, &c__, &
+				    s, &a_ref(jch - iskew * ic + ioffst, ic), 
+				    &ilda, &extra, &ctemp);
 			    if (iltemp) {
-				zlartg_(&a[jch - iskew * icol + ioffst + icol 
-					* a_dim1], &ctemp, &realc, &s, &dummy)
-					;
+				zlartg_(&a_ref(jch - iskew * icol + ioffst, 
+					icol), &ctemp, &realc, &s, &dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__1.r = realc * dummy.r, z__1.i = realc * 
 					dummy.i;
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__1.r = s.r * dummy.r - s.i * dummy.i, 
 					z__1.i = s.r * dummy.i + s.i * 
 					dummy.r;
@@ -944,10 +921,9 @@ JKL, JKU
 				il = min(i__5,i__6) + 2 - jch;
 				extra.r = 0., extra.i = 0.;
 				L__1 = jch + jkl + jku <= iendch;
-				zlarot_(&c_false, &c_true, &L__1, &il, &c, &s,
-					 &a[jch - iskew * icol + ioffst + 
-					icol * a_dim1], &ilda, &ctemp, &extra)
-					;
+				zlarot_(&c_false, &c_true, &L__1, &il, &c__, &
+					s, &a_ref(jch - iskew * icol + ioffst,
+					 icol), &ilda, &ctemp, &extra);
 				ic = icol;
 			    }
 /* L110: */
@@ -961,11 +937,9 @@ JKL, JKU
 		i__1 = llb;
 		for (jkl = 1; jkl <= i__1; ++jkl) {
 
-/*                 Transform from bandwidth JKL-1, JKU to 
-JKL, JKU   
+/*                 Transform from bandwidth JKL-1, JKU to JKL, JKU   
 
-                   First row actually rotated is MIN( N+JK
-L, M )   
+                   First row actually rotated is MIN( N+JKL, M )   
                    First column actually rotated is N   
 
    Computing MIN */
@@ -981,7 +955,7 @@ L, M )
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
@@ -994,9 +968,9 @@ L, M )
 			    i__3 = *n, i__2 = jr + jku + 1;
 			    il = min(i__3,i__2) + 1 - icol;
 			    L__1 = jr + jku < *n;
-			    zlarot_(&c_true, &c_false, &L__1, &il, &c, &s, &a[
-				    jr - iskew * icol + ioffst + icol * 
-				    a_dim1], &ilda, &dummy, &extra);
+			    zlarot_(&c_true, &c_false, &L__1, &il, &c__, &s, &
+				    a_ref(jr - iskew * icol + ioffst, icol), &
+				    ilda, &dummy, &extra);
 			}
 
 /*                    Chase "EXTRA" back down */
@@ -1008,13 +982,13 @@ L, M )
 				i__3; jch += i__2) {
 			    ilextr = ir > 0;
 			    if (ilextr) {
-				zlartg_(&a[ir - iskew * jch + ioffst + jch * 
-					a_dim1], &extra, &realc, &s, &dummy);
+				zlartg_(&a_ref(ir - iskew * jch + ioffst, jch)
+					, &extra, &realc, &s, &dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__1.r = realc * dummy.r, z__1.i = realc * 
 					dummy.i;
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__1.r = s.r * dummy.r - s.i * dummy.i, 
 					z__1.i = s.r * dummy.i + s.i * 
 					dummy.r;
@@ -1027,17 +1001,17 @@ L, M )
 			    iltemp = jch + jkl < *m;
 			    ctemp.r = 0., ctemp.i = 0.;
 			    i__5 = irow + 2 - ir;
-			    zlarot_(&c_false, &ilextr, &iltemp, &i__5, &c, &s,
-				     &a[ir - iskew * jch + ioffst + jch * 
-				    a_dim1], &ilda, &extra, &ctemp);
+			    zlarot_(&c_false, &ilextr, &iltemp, &i__5, &c__, &
+				    s, &a_ref(ir - iskew * jch + ioffst, jch),
+				     &ilda, &extra, &ctemp);
 			    if (iltemp) {
-				zlartg_(&a[irow - iskew * jch + ioffst + jch *
-					 a_dim1], &ctemp, &realc, &s, &dummy);
+				zlartg_(&a_ref(irow - iskew * jch + ioffst, 
+					jch), &ctemp, &realc, &s, &dummy);
 				zlarnd_(&z__1, &c__5, &iseed[1]);
 				dummy.r = z__1.r, dummy.i = z__1.i;
 				z__1.r = realc * dummy.r, z__1.i = realc * 
 					dummy.i;
-				c.r = z__1.r, c.i = z__1.i;
+				c__.r = z__1.r, c__.i = z__1.i;
 				z__1.r = s.r * dummy.r - s.i * dummy.i, 
 					z__1.i = s.r * dummy.i + s.i * 
 					dummy.r;
@@ -1047,9 +1021,9 @@ L, M )
 				il = min(i__5,i__6) + 2 - jch;
 				extra.r = 0., extra.i = 0.;
 				L__1 = jch + jkl + jku <= iendch;
-				zlarot_(&c_true, &c_true, &L__1, &il, &c, &s, 
-					&a[irow - iskew * jch + ioffst + jch *
-					 a_dim1], &ilda, &ctemp, &extra);
+				zlarot_(&c_true, &c_true, &L__1, &il, &c__, &
+					s, &a_ref(irow - iskew * jch + ioffst,
+					 jch), &ilda, &ctemp, &extra);
 				ir = irow;
 			    }
 /* L140: */
@@ -1082,9 +1056,9 @@ L, M )
 
 		i__1 = mnmin;
 		for (j = 1; j <= i__1; ++j) {
-		    i__4 = (1 - iskew) * j + ioffg + j * a_dim1;
+		    i__4 = a_subscr((1 - iskew) * j + ioffg, j);
 		    i__2 = j;
-		    z__1.r = d[i__2], z__1.i = 0.;
+		    z__1.r = d__[i__2], z__1.i = 0.;
 		    a[i__4].r = z__1.r, a[i__4].i = z__1.i;
 /* L170: */
 		}
@@ -1100,81 +1074,80 @@ L, M )
 			i__2 = jc + 1, i__3 = k + 2;
 			il = min(i__2,i__3);
 			extra.r = 0., extra.i = 0.;
-			i__2 = jc - iskew * (jc + 1) + ioffg + (jc + 1) * 
-				a_dim1;
+			i__2 = a_subscr(jc - iskew * (jc + 1) + ioffg, jc + 1)
+				;
 			ctemp.r = a[i__2].r, ctemp.i = a[i__2].i;
 			angle = dlarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663;
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
 			s.r = z__1.r, s.i = z__1.i;
 			if (zsym) {
-			    ct.r = c.r, ct.i = c.i;
+			    ct.r = c__.r, ct.i = c__.i;
 			    st.r = s.r, st.i = s.i;
 			} else {
 			    d_cnjg(&z__1, &ctemp);
 			    ctemp.r = z__1.r, ctemp.i = z__1.i;
-			    d_cnjg(&z__1, &c);
+			    d_cnjg(&z__1, &c__);
 			    ct.r = z__1.r, ct.i = z__1.i;
 			    d_cnjg(&z__1, &s);
 			    st.r = z__1.r, st.i = z__1.i;
 			}
 			L__1 = jc > k;
-			zlarot_(&c_false, &L__1, &c_true, &il, &c, &s, &a[
-				irow - iskew * jc + ioffg + jc * a_dim1], &
-				ilda, &extra, &ctemp);
+			zlarot_(&c_false, &L__1, &c_true, &il, &c__, &s, &
+				a_ref(irow - iskew * jc + ioffg, jc), &ilda, &
+				extra, &ctemp);
 /* Computing MIN */
 			i__3 = k, i__5 = *n - jc;
 			i__2 = min(i__3,i__5) + 1;
 			zlarot_(&c_true, &c_true, &c_false, &i__2, &ct, &st, &
-				a[(1 - iskew) * jc + ioffg + jc * a_dim1], &
-				ilda, &ctemp, &dummy);
+				a_ref((1 - iskew) * jc + ioffg, jc), &ilda, &
+				ctemp, &dummy);
 
-/*                    Chase EXTRA back up the matrix 
-*/
+/*                    Chase EXTRA back up the matrix */
 
 			icol = jc;
 			i__2 = -k;
 			for (jch = jc - k; i__2 < 0 ? jch >= 1 : jch <= 1; 
 				jch += i__2) {
-			    zlartg_(&a[jch + 1 - iskew * (icol + 1) + ioffg + 
-				    (icol + 1) * a_dim1], &extra, &realc, &s, 
-				    &dummy);
+			    zlartg_(&a_ref(jch + 1 - iskew * (icol + 1) + 
+				    ioffg, icol + 1), &extra, &realc, &s, &
+				    dummy);
 			    zlarnd_(&z__1, &c__5, &iseed[1]);
 			    dummy.r = z__1.r, dummy.i = z__1.i;
 			    z__2.r = realc * dummy.r, z__2.i = realc * 
 				    dummy.i;
 			    d_cnjg(&z__1, &z__2);
-			    c.r = z__1.r, c.i = z__1.i;
+			    c__.r = z__1.r, c__.i = z__1.i;
 			    z__3.r = -s.r, z__3.i = -s.i;
 			    z__2.r = z__3.r * dummy.r - z__3.i * dummy.i, 
 				    z__2.i = z__3.r * dummy.i + z__3.i * 
 				    dummy.r;
 			    d_cnjg(&z__1, &z__2);
 			    s.r = z__1.r, s.i = z__1.i;
-			    i__3 = jch - iskew * (jch + 1) + ioffg + (jch + 1)
-				     * a_dim1;
+			    i__3 = a_subscr(jch - iskew * (jch + 1) + ioffg, 
+				    jch + 1);
 			    ctemp.r = a[i__3].r, ctemp.i = a[i__3].i;
 			    if (zsym) {
-				ct.r = c.r, ct.i = c.i;
+				ct.r = c__.r, ct.i = c__.i;
 				st.r = s.r, st.i = s.i;
 			    } else {
 				d_cnjg(&z__1, &ctemp);
 				ctemp.r = z__1.r, ctemp.i = z__1.i;
-				d_cnjg(&z__1, &c);
+				d_cnjg(&z__1, &c__);
 				ct.r = z__1.r, ct.i = z__1.i;
 				d_cnjg(&z__1, &s);
 				st.r = z__1.r, st.i = z__1.i;
 			    }
 			    i__3 = k + 2;
-			    zlarot_(&c_true, &c_true, &c_true, &i__3, &c, &s, 
-				    &a[(1 - iskew) * jch + ioffg + jch * 
-				    a_dim1], &ilda, &ctemp, &extra);
+			    zlarot_(&c_true, &c_true, &c_true, &i__3, &c__, &
+				    s, &a_ref((1 - iskew) * jch + ioffg, jch),
+				     &ilda, &ctemp, &extra);
 /* Computing MAX */
 			    i__3 = 1, i__5 = jch - k;
 			    irow = max(i__3,i__5);
@@ -1184,8 +1157,8 @@ L, M )
 			    extra.r = 0., extra.i = 0.;
 			    L__1 = jch > k;
 			    zlarot_(&c_false, &L__1, &c_true, &il, &ct, &st, &
-				    a[irow - iskew * jch + ioffg + jch * 
-				    a_dim1], &ilda, &extra, &ctemp);
+				    a_ref(irow - iskew * jch + ioffg, jch), &
+				    ilda, &extra, &ctemp);
 			    icol = jch;
 /* L180: */
 			}
@@ -1194,10 +1167,8 @@ L, M )
 /* L200: */
 		}
 
-/*              If we need lower triangle, copy from upper. No
-te that   
-                the order of copying is chosen to work for 'q'
- -> 'b' */
+/*              If we need lower triangle, copy from upper. Note that   
+                the order of copying is chosen to work for 'q' -> 'b' */
 
 		if (ipack != ipackg && ipack != 3) {
 		    i__1 = *n;
@@ -1208,8 +1179,8 @@ te that
 			    i__2 = *n, i__3 = jc + uub;
 			    i__4 = min(i__2,i__3);
 			    for (jr = jc; jr <= i__4; ++jr) {
-				i__2 = jr + irow + jc * a_dim1;
-				i__3 = jc - iskew * jr + ioffg + jr * a_dim1;
+				i__2 = a_subscr(jr + irow, jc);
+				i__3 = a_subscr(jc - iskew * jr + ioffg, jr);
 				a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
 /* L210: */
 			    }
@@ -1218,9 +1189,9 @@ te that
 			    i__2 = *n, i__3 = jc + uub;
 			    i__4 = min(i__2,i__3);
 			    for (jr = jc; jr <= i__4; ++jr) {
-				i__2 = jr + irow + jc * a_dim1;
-				d_cnjg(&z__1, &a[jc - iskew * jr + ioffg + jr 
-					* a_dim1]);
+				i__2 = a_subscr(jr + irow, jc);
+				d_cnjg(&z__1, &a_ref(jc - iskew * jr + ioffg, 
+					jr));
 				a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L220: */
 			    }
@@ -1232,7 +1203,7 @@ te that
 			for (jc = *n - uub + 1; jc <= i__1; ++jc) {
 			    i__4 = uub + 1;
 			    for (jr = *n + 2 - jc; jr <= i__4; ++jr) {
-				i__2 = jr + jc * a_dim1;
+				i__2 = a_subscr(jr, jc);
 				a[i__2].r = 0., a[i__2].i = 0.;
 /* L240: */
 			    }
@@ -1260,9 +1231,9 @@ te that
 
 		i__1 = mnmin;
 		for (j = 1; j <= i__1; ++j) {
-		    i__4 = (1 - iskew) * j + ioffg + j * a_dim1;
+		    i__4 = a_subscr((1 - iskew) * j + ioffg, j);
 		    i__2 = j;
-		    z__1.r = d[i__2], z__1.i = 0.;
+		    z__1.r = d__[i__2], z__1.i = 0.;
 		    a[i__4].r = z__1.r, a[i__4].i = z__1.i;
 /* L260: */
 		}
@@ -1274,85 +1245,84 @@ te that
 			i__4 = *n + 1 - jc, i__2 = k + 2;
 			il = min(i__4,i__2);
 			extra.r = 0., extra.i = 0.;
-			i__4 = (1 - iskew) * jc + 1 + ioffg + jc * a_dim1;
+			i__4 = a_subscr((1 - iskew) * jc + 1 + ioffg, jc);
 			ctemp.r = a[i__4].r, ctemp.i = a[i__4].i;
 			angle = dlarnd_(&c__1, &iseed[1]) * 
 				6.2831853071795864769252867663;
 			d__1 = cos(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
-			c.r = z__1.r, c.i = z__1.i;
+			c__.r = z__1.r, c__.i = z__1.i;
 			d__1 = sin(angle);
 			zlarnd_(&z__2, &c__5, &iseed[1]);
 			z__1.r = d__1 * z__2.r, z__1.i = d__1 * z__2.i;
 			s.r = z__1.r, s.i = z__1.i;
 			if (zsym) {
-			    ct.r = c.r, ct.i = c.i;
+			    ct.r = c__.r, ct.i = c__.i;
 			    st.r = s.r, st.i = s.i;
 			} else {
 			    d_cnjg(&z__1, &ctemp);
 			    ctemp.r = z__1.r, ctemp.i = z__1.i;
-			    d_cnjg(&z__1, &c);
+			    d_cnjg(&z__1, &c__);
 			    ct.r = z__1.r, ct.i = z__1.i;
 			    d_cnjg(&z__1, &s);
 			    st.r = z__1.r, st.i = z__1.i;
 			}
 			L__1 = *n - jc > k;
-			zlarot_(&c_false, &c_true, &L__1, &il, &c, &s, &a[(1 
-				- iskew) * jc + ioffg + jc * a_dim1], &ilda, &
+			zlarot_(&c_false, &c_true, &L__1, &il, &c__, &s, &
+				a_ref((1 - iskew) * jc + ioffg, jc), &ilda, &
 				ctemp, &extra);
 /* Computing MAX */
 			i__4 = 1, i__2 = jc - k + 1;
 			icol = max(i__4,i__2);
 			i__4 = jc + 2 - icol;
 			zlarot_(&c_true, &c_false, &c_true, &i__4, &ct, &st, &
-				a[jc - iskew * icol + ioffg + icol * a_dim1], 
-				&ilda, &dummy, &ctemp);
+				a_ref(jc - iskew * icol + ioffg, icol), &ilda,
+				 &dummy, &ctemp);
 
-/*                    Chase EXTRA back down the matrix
- */
+/*                    Chase EXTRA back down the matrix */
 
 			icol = jc;
 			i__4 = *n - 1;
 			i__2 = k;
 			for (jch = jc + k; i__2 < 0 ? jch >= i__4 : jch <= 
 				i__4; jch += i__2) {
-			    zlartg_(&a[jch - iskew * icol + ioffg + icol * 
-				    a_dim1], &extra, &realc, &s, &dummy);
+			    zlartg_(&a_ref(jch - iskew * icol + ioffg, icol), 
+				    &extra, &realc, &s, &dummy);
 			    zlarnd_(&z__1, &c__5, &iseed[1]);
 			    dummy.r = z__1.r, dummy.i = z__1.i;
 			    z__1.r = realc * dummy.r, z__1.i = realc * 
 				    dummy.i;
-			    c.r = z__1.r, c.i = z__1.i;
+			    c__.r = z__1.r, c__.i = z__1.i;
 			    z__1.r = s.r * dummy.r - s.i * dummy.i, z__1.i = 
 				    s.r * dummy.i + s.i * dummy.r;
 			    s.r = z__1.r, s.i = z__1.i;
-			    i__3 = (1 - iskew) * jch + 1 + ioffg + jch * 
-				    a_dim1;
+			    i__3 = a_subscr((1 - iskew) * jch + 1 + ioffg, 
+				    jch);
 			    ctemp.r = a[i__3].r, ctemp.i = a[i__3].i;
 			    if (zsym) {
-				ct.r = c.r, ct.i = c.i;
+				ct.r = c__.r, ct.i = c__.i;
 				st.r = s.r, st.i = s.i;
 			    } else {
 				d_cnjg(&z__1, &ctemp);
 				ctemp.r = z__1.r, ctemp.i = z__1.i;
-				d_cnjg(&z__1, &c);
+				d_cnjg(&z__1, &c__);
 				ct.r = z__1.r, ct.i = z__1.i;
 				d_cnjg(&z__1, &s);
 				st.r = z__1.r, st.i = z__1.i;
 			    }
 			    i__3 = k + 2;
-			    zlarot_(&c_true, &c_true, &c_true, &i__3, &c, &s, 
-				    &a[jch - iskew * icol + ioffg + icol * 
-				    a_dim1], &ilda, &extra, &ctemp);
+			    zlarot_(&c_true, &c_true, &c_true, &i__3, &c__, &
+				    s, &a_ref(jch - iskew * icol + ioffg, 
+				    icol), &ilda, &extra, &ctemp);
 /* Computing MIN */
 			    i__3 = *n + 1 - jch, i__5 = k + 2;
 			    il = min(i__3,i__5);
 			    extra.r = 0., extra.i = 0.;
 			    L__1 = *n - jch > k;
 			    zlarot_(&c_false, &c_true, &L__1, &il, &ct, &st, &
-				    a[(1 - iskew) * jch + ioffg + jch * 
-				    a_dim1], &ilda, &ctemp, &extra);
+				    a_ref((1 - iskew) * jch + ioffg, jch), &
+				    ilda, &ctemp, &extra);
 			    icol = jch;
 /* L270: */
 			}
@@ -1361,10 +1331,8 @@ te that
 /* L290: */
 		}
 
-/*              If we need upper triangle, copy from lower. No
-te that   
-                the order of copying is chosen to work for 'b'
- -> 'q' */
+/*              If we need upper triangle, copy from lower. Note that   
+                the order of copying is chosen to work for 'b' -> 'q' */
 
 		if (ipack != ipackg && ipack != 4) {
 		    for (jc = *n; jc >= 1; --jc) {
@@ -1374,8 +1342,8 @@ te that
 			    i__2 = 1, i__4 = jc - uub;
 			    i__1 = max(i__2,i__4);
 			    for (jr = jc; jr >= i__1; --jr) {
-				i__2 = jr + irow + jc * a_dim1;
-				i__4 = jc - iskew * jr + ioffg + jr * a_dim1;
+				i__2 = a_subscr(jr + irow, jc);
+				i__4 = a_subscr(jc - iskew * jr + ioffg, jr);
 				a[i__2].r = a[i__4].r, a[i__2].i = a[i__4].i;
 /* L300: */
 			    }
@@ -1384,9 +1352,9 @@ te that
 			    i__2 = 1, i__4 = jc - uub;
 			    i__1 = max(i__2,i__4);
 			    for (jr = jc; jr >= i__1; --jr) {
-				i__2 = jr + irow + jc * a_dim1;
-				d_cnjg(&z__1, &a[jc - iskew * jr + ioffg + jr 
-					* a_dim1]);
+				i__2 = a_subscr(jr + irow, jc);
+				d_cnjg(&z__1, &a_ref(jc - iskew * jr + ioffg, 
+					jr));
 				a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L310: */
 			    }
@@ -1398,7 +1366,7 @@ te that
 			for (jc = 1; jc <= i__1; ++jc) {
 			    i__2 = uub + 1 - jc;
 			    for (jr = 1; jr <= i__2; ++jr) {
-				i__4 = jr + jc * a_dim1;
+				i__4 = a_subscr(jr, jc);
 				a[i__4].r = 0., a[i__4].i = 0.;
 /* L330: */
 			    }
@@ -1419,8 +1387,8 @@ te that
 		i__1 = *n;
 		for (jc = 1; jc <= i__1; ++jc) {
 		    irow = ioffst + (1 - iskew) * jc;
-		    i__2 = irow + jc * a_dim1;
-		    i__4 = irow + jc * a_dim1;
+		    i__2 = a_subscr(irow, jc);
+		    i__4 = a_subscr(irow, jc);
 		    d__1 = a[i__4].r;
 		    z__1.r = d__1, z__1.i = 0.;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -1443,19 +1411,19 @@ te that
 
 /*           Non-symmetric -- A = U D V */
 
-	    zlagge_(&mr, &nc, &llb, &uub, &d[1], &a[a_offset], lda, &iseed[1],
-		     &work[1], &iinfo);
+	    zlagge_(&mr, &nc, &llb, &uub, &d__[1], &a[a_offset], lda, &iseed[
+		    1], &work[1], &iinfo);
 	} else {
 
 /*           Symmetric -- A = U D U' or   
              Hermitian -- A = U D U* */
 
 	    if (zsym) {
-		zlagsy_(m, &llb, &d[1], &a[a_offset], lda, &iseed[1], &work[1]
-			, &iinfo);
+		zlagsy_(m, &llb, &d__[1], &a[a_offset], lda, &iseed[1], &work[
+			1], &iinfo);
 	    } else {
-		zlaghe_(m, &llb, &d[1], &a[a_offset], lda, &iseed[1], &work[1]
-			, &iinfo);
+		zlaghe_(m, &llb, &d__[1], &a[a_offset], lda, &iseed[1], &work[
+			1], &iinfo);
 	    }
 	}
 
@@ -1475,8 +1443,8 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *m;
-		for (i = j + 1; i <= i__2; ++i) {
-		    i__4 = i + j * a_dim1;
+		for (i__ = j + 1; i__ <= i__2; ++i__) {
+		    i__4 = a_subscr(i__, j);
 		    a[i__4].r = 0., a[i__4].i = 0.;
 /* L360: */
 		}
@@ -1490,8 +1458,8 @@ te that
 	    i__1 = *m;
 	    for (j = 2; j <= i__1; ++j) {
 		i__2 = j - 1;
-		for (i = 1; i <= i__2; ++i) {
-		    i__4 = i + j * a_dim1;
+		for (i__ = 1; i__ <= i__2; ++i__) {
+		    i__4 = a_subscr(i__, j);
 		    a[i__4].r = 0., a[i__4].i = 0.;
 /* L380: */
 		}
@@ -1507,14 +1475,14 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
-		for (i = 1; i <= i__2; ++i) {
+		for (i__ = 1; i__ <= i__2; ++i__) {
 		    ++irow;
 		    if (irow > *lda) {
 			irow = 1;
 			++icol;
 		    }
-		    i__4 = irow + icol * a_dim1;
-		    i__3 = i + j * a_dim1;
+		    i__4 = a_subscr(irow, icol);
+		    i__3 = a_subscr(i__, j);
 		    a[i__4].r = a[i__3].r, a[i__4].i = a[i__3].i;
 /* L400: */
 		}
@@ -1530,14 +1498,14 @@ te that
 	    i__1 = *m;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *m;
-		for (i = j; i <= i__2; ++i) {
+		for (i__ = j; i__ <= i__2; ++i__) {
 		    ++irow;
 		    if (irow > *lda) {
 			irow = 1;
 			++icol;
 		    }
-		    i__4 = irow + icol * a_dim1;
-		    i__3 = i + j * a_dim1;
+		    i__4 = a_subscr(irow, icol);
+		    i__3 = a_subscr(i__, j);
 		    a[i__4].r = a[i__3].r, a[i__4].i = a[i__3].i;
 /* L420: */
 		}
@@ -1546,12 +1514,9 @@ te that
 
 	} else if (ipack >= 5) {
 
-/*           'B' -- The lower triangle is packed as a band matrix.
-   
-             'Q' -- The upper triangle is packed as a band matrix.
-   
-             'Z' -- The whole matrix is packed as a band matrix. 
-*/
+/*           'B' -- The lower triangle is packed as a band matrix.   
+             'Q' -- The upper triangle is packed as a band matrix.   
+             'Z' -- The whole matrix is packed as a band matrix. */
 
 	    if (ipack == 5) {
 		uub = 0;
@@ -1564,9 +1529,9 @@ te that
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__2 = j + llb;
-		for (i = min(i__2,*m); i >= 1; --i) {
-		    i__2 = i - j + uub + 1 + j * a_dim1;
-		    i__4 = i + j * a_dim1;
+		for (i__ = min(i__2,*m); i__ >= 1; --i__) {
+		    i__2 = a_subscr(i__ - j + uub + 1, j);
+		    i__4 = a_subscr(i__, j);
 		    a[i__2].r = a[i__4].r, a[i__2].i = a[i__4].i;
 /* L440: */
 		}
@@ -1578,9 +1543,9 @@ te that
 /* Computing MIN */
 		i__4 = j + llb;
 		i__2 = min(i__4,*m);
-		for (i = j - uub; i <= i__2; ++i) {
-		    i__4 = i - j + uub + 1 + j * a_dim1;
-		    i__3 = i + j * a_dim1;
+		for (i__ = j - uub; i__ <= i__2; ++i__) {
+		    i__4 = a_subscr(i__ - j + uub + 1, j);
+		    i__3 = a_subscr(i__, j);
 		    a[i__4].r = a[i__3].r, a[i__4].i = a[i__3].i;
 /* L460: */
 		}
@@ -1598,7 +1563,7 @@ te that
 	    for (jc = icol; jc <= i__1; ++jc) {
 		i__2 = *lda;
 		for (jr = irow + 1; jr <= i__2; ++jr) {
-		    i__4 = jr + jc * a_dim1;
+		    i__4 = a_subscr(jr, jc);
 		    a[i__4].r = 0., a[i__4].i = 0.;
 /* L480: */
 		}
@@ -1611,8 +1576,7 @@ te that
 /*           Packed Band --   
                 1st row is now in A( UUB+2-j, j), zero above it   
                 m-th row is now in A( M+UUB-j,j), zero below it   
-                last non-zero diagonal is now in A( UUB+LLB+1,j ),
-   
+                last non-zero diagonal is now in A( UUB+LLB+1,j ),   
                    zero below it, too. */
 
 	    ir1 = uub + llb + 2;
@@ -1621,7 +1585,7 @@ te that
 	    for (jc = 1; jc <= i__1; ++jc) {
 		i__2 = uub + 1 - jc;
 		for (jr = 1; jr <= i__2; ++jr) {
-		    i__4 = jr + jc * a_dim1;
+		    i__4 = a_subscr(jr, jc);
 		    a[i__4].r = 0., a[i__4].i = 0.;
 /* L500: */
 		}
@@ -1631,7 +1595,7 @@ te that
 		i__2 = 1, i__4 = min(i__3,i__5);
 		i__6 = *lda;
 		for (jr = max(i__2,i__4); jr <= i__6; ++jr) {
-		    i__2 = jr + jc * a_dim1;
+		    i__2 = a_subscr(jr, jc);
 		    a[i__2].r = 0., a[i__2].i = 0.;
 /* L510: */
 		}
@@ -1645,4 +1609,8 @@ te that
 /*     End of ZLATMS */
 
 } /* zlatms_ */
+
+#undef a_ref
+#undef a_subscr
+
 

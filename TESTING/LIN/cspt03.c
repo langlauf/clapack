@@ -1,4 +1,5 @@
-/*  -- translated by f2c (version 19940927).
+#include "blaswrap.h"
+/*  -- translated by f2c (version 19990503).
    You must link the resulting object file with the libraries:
 	-lf2c -lm   (in that order)
 */
@@ -18,7 +19,7 @@ static integer c__1 = 1;
     complex q__1, q__2;
 
     /* Local variables */
-    static integer icol, jcol, kcol, nall, i, j, k;
+    static integer icol, jcol, kcol, nall, i__, j, k;
     static complex t;
     extern logical lsame_(char *, char *);
     static real anorm;
@@ -30,7 +31,11 @@ static integer c__1 = 1;
     static real ainvnm, eps;
 
 
-/*  -- LAPACK test routine (version 2.0) --   
+#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
+#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+
+
+/*  -- LAPACK test routine (version 3.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
        February 29, 1992   
@@ -67,8 +72,7 @@ static integer c__1 = 1;
     WORK    (workspace) COMPLEX array, dimension (LDWORK,N)   
 
     LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N). 
-  
+            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
 
     RWORK   (workspace) REAL array, dimension (N)   
 
@@ -79,8 +83,7 @@ static integer c__1 = 1;
     RESID   (output) REAL   
             norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
 
-    ===================================================================== 
-  
+    =====================================================================   
 
 
        Quick exit if N = 0.   
@@ -89,7 +92,7 @@ static integer c__1 = 1;
     --a;
     --ainv;
     work_dim1 = *ldw;
-    work_offset = work_dim1 + 1;
+    work_offset = 1 + work_dim1 * 1;
     work -= work_offset;
     --rwork;
 
@@ -118,19 +121,19 @@ static integer c__1 = 1;
 
     if (lsame_(uplo, "U")) {
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
-	    icol = (i - 1) * i / 2 + 1;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    icol = (i__ - 1) * i__ / 2 + 1;
 
 /*           Code when J <= I */
 
-	    i__2 = i;
+	    i__2 = i__;
 	    for (j = 1; j <= i__2; ++j) {
 		jcol = (j - 1) * j / 2 + 1;
 		cdotu_(&q__1, &j, &a[icol], &c__1, &ainv[jcol], &c__1);
 		t.r = q__1.r, t.i = q__1.i;
 		jcol = jcol + (j << 1) - 1;
 		kcol = icol - 1;
-		i__3 = i;
+		i__3 = i__;
 		for (k = j + 1; k <= i__3; ++k) {
 		    i__4 = kcol + k;
 		    i__5 = jcol;
@@ -142,9 +145,9 @@ static integer c__1 = 1;
 		    jcol += k;
 /* L10: */
 		}
-		kcol += i << 1;
+		kcol += i__ << 1;
 		i__3 = *n;
-		for (k = i + 1; k <= i__3; ++k) {
+		for (k = i__ + 1; k <= i__3; ++k) {
 		    i__4 = kcol;
 		    i__5 = jcol;
 		    q__2.r = a[i__4].r * ainv[i__5].r - a[i__4].i * ainv[i__5]
@@ -156,8 +159,8 @@ static integer c__1 = 1;
 		    jcol += k;
 /* L20: */
 		}
-		i__3 = i + j * work_dim1;
-		q__1.r = -(doublereal)t.r, q__1.i = -(doublereal)t.i;
+		i__3 = work_subscr(i__, j);
+		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L30: */
 	    }
@@ -165,14 +168,14 @@ static integer c__1 = 1;
 /*           Code when J > I */
 
 	    i__2 = *n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		jcol = (j - 1) * j / 2 + 1;
-		cdotu_(&q__1, &i, &a[icol], &c__1, &ainv[jcol], &c__1);
+		cdotu_(&q__1, &i__, &a[icol], &c__1, &ainv[jcol], &c__1);
 		t.r = q__1.r, t.i = q__1.i;
 		--jcol;
-		kcol = icol + (i << 1) - 1;
+		kcol = icol + (i__ << 1) - 1;
 		i__3 = j;
-		for (k = i + 1; k <= i__3; ++k) {
+		for (k = i__ + 1; k <= i__3; ++k) {
 		    i__4 = kcol;
 		    i__5 = jcol + k;
 		    q__2.r = a[i__4].r * ainv[i__5].r - a[i__4].i * ainv[i__5]
@@ -197,8 +200,8 @@ static integer c__1 = 1;
 		    jcol += k;
 /* L50: */
 		}
-		i__3 = i + j * work_dim1;
-		q__1.r = -(doublereal)t.r, q__1.i = -(doublereal)t.i;
+		i__3 = work_subscr(i__, j);
+		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L60: */
 	    }
@@ -210,18 +213,18 @@ static integer c__1 = 1;
 
 	nall = *n * (*n + 1) / 2;
 	i__1 = *n;
-	for (i = 1; i <= i__1; ++i) {
+	for (i__ = 1; i__ <= i__1; ++i__) {
 
 /*           Code when J <= I */
 
-	    icol = nall - (*n - i + 1) * (*n - i + 2) / 2 + 1;
-	    i__2 = i;
+	    icol = nall - (*n - i__ + 1) * (*n - i__ + 2) / 2 + 1;
+	    i__2 = i__;
 	    for (j = 1; j <= i__2; ++j) {
-		jcol = nall - (*n - j) * (*n - j + 1) / 2 - (*n - i);
-		i__3 = *n - i + 1;
+		jcol = nall - (*n - j) * (*n - j + 1) / 2 - (*n - i__);
+		i__3 = *n - i__ + 1;
 		cdotu_(&q__1, &i__3, &a[icol], &c__1, &ainv[jcol], &c__1);
 		t.r = q__1.r, t.i = q__1.i;
-		kcol = i;
+		kcol = i__;
 		jcol = j;
 		i__3 = j - 1;
 		for (k = 1; k <= i__3; ++k) {
@@ -237,7 +240,7 @@ static integer c__1 = 1;
 /* L80: */
 		}
 		jcol -= j;
-		i__3 = i - 1;
+		i__3 = i__ - 1;
 		for (k = j; k <= i__3; ++k) {
 		    i__4 = kcol;
 		    i__5 = jcol + k;
@@ -249,25 +252,25 @@ static integer c__1 = 1;
 		    kcol = kcol + *n - k;
 /* L90: */
 		}
-		i__3 = i + j * work_dim1;
-		q__1.r = -(doublereal)t.r, q__1.i = -(doublereal)t.i;
+		i__3 = work_subscr(i__, j);
+		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L100: */
 	    }
 
 /*           Code when J > I */
 
-	    icol = nall - (*n - i) * (*n - i + 1) / 2;
+	    icol = nall - (*n - i__) * (*n - i__ + 1) / 2;
 	    i__2 = *n;
-	    for (j = i + 1; j <= i__2; ++j) {
+	    for (j = i__ + 1; j <= i__2; ++j) {
 		jcol = nall - (*n - j + 1) * (*n - j + 2) / 2 + 1;
 		i__3 = *n - j + 1;
 		cdotu_(&q__1, &i__3, &a[icol - *n + j], &c__1, &ainv[jcol], &
 			c__1);
 		t.r = q__1.r, t.i = q__1.i;
-		kcol = i;
+		kcol = i__;
 		jcol = j;
-		i__3 = i - 1;
+		i__3 = i__ - 1;
 		for (k = 1; k <= i__3; ++k) {
 		    i__4 = kcol;
 		    i__5 = jcol;
@@ -280,9 +283,9 @@ static integer c__1 = 1;
 		    kcol = kcol + *n - k;
 /* L110: */
 		}
-		kcol -= i;
+		kcol -= i__;
 		i__3 = j - 1;
-		for (k = i; k <= i__3; ++k) {
+		for (k = i__; k <= i__3; ++k) {
 		    i__4 = kcol + k;
 		    i__5 = jcol;
 		    q__2.r = a[i__4].r * ainv[i__5].r - a[i__4].i * ainv[i__5]
@@ -293,8 +296,8 @@ static integer c__1 = 1;
 		    jcol = jcol + *n - k;
 /* L120: */
 		}
-		i__3 = i + j * work_dim1;
-		q__1.r = -(doublereal)t.r, q__1.i = -(doublereal)t.i;
+		i__3 = work_subscr(i__, j);
+		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L130: */
 	    }
@@ -305,9 +308,9 @@ static integer c__1 = 1;
 /*     Add the identity matrix to WORK . */
 
     i__1 = *n;
-    for (i = 1; i <= i__1; ++i) {
-	i__2 = i + i * work_dim1;
-	i__3 = i + i * work_dim1;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	i__2 = work_subscr(i__, i__);
+	i__3 = work_subscr(i__, i__);
 	q__1.r = work[i__3].r + 1.f, q__1.i = work[i__3].i;
 	work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L150: */
@@ -315,7 +318,8 @@ static integer c__1 = 1;
 
 /*     Compute norm(I - A*AINV) / (N * norm(A) * norm(AINV) * EPS) */
 
-    *resid = clange_("1", n, n, &work[work_offset], ldw, &rwork[1]);
+    *resid = clange_("1", n, n, &work[work_offset], ldw, &rwork[1])
+	    ;
 
     *resid = *resid * *rcond / eps / (real) (*n);
 
@@ -324,4 +328,8 @@ static integer c__1 = 1;
 /*     End of CSPT03 */
 
 } /* cspt03_ */
+
+#undef work_ref
+#undef work_subscr
+
 
