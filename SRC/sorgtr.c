@@ -1,99 +1,113 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c_n1 = -1;
 
 /* Subroutine */ int sorgtr_(char *uplo, integer *n, real *a, integer *lda, 
 	real *tau, real *work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    SORGTR generates a real orthogonal matrix Q which is defined as the   
-    product of n-1 elementary reflectors of order N, as returned by   
-    SSYTRD:   
-
-    if UPLO = 'U', Q = H(n-1) . . . H(2) H(1),   
-
-    if UPLO = 'L', Q = H(1) H(2) . . . H(n-1).   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U': Upper triangle of A contains elementary reflectors   
-                   from SSYTRD;   
-            = 'L': Lower triangle of A contains elementary reflectors   
-                   from SSYTRD.   
-
-    N       (input) INTEGER   
-            The order of the matrix Q. N >= 0.   
-
-    A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the vectors which define the elementary reflectors,   
-            as returned by SSYTRD.   
-            On exit, the N-by-N orthogonal matrix Q.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,N).   
-
-    TAU     (input) REAL array, dimension (N-1)   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by SSYTRD.   
-
-    WORK    (workspace/output) REAL array, dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
-
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK. LWORK >= max(1,N-1).   
-            For optimum performance LWORK >= (N-1)*NB, where NB is   
-            the optimal blocksize.   
-
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input arguments   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
+
     /* Local variables */
-    static integer i__, j;
+    integer i__, j, nb;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
-    static logical upper;
-    static integer nb;
+    integer iinfo;
+    logical upper;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
     extern /* Subroutine */ int sorgql_(integer *, integer *, integer *, real 
 	    *, integer *, real *, real *, integer *, integer *), sorgqr_(
 	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, integer *);
-    static logical lquery;
-    static integer lwkopt;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+, integer *, integer *);
+    logical lquery;
+    integer lwkopt;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SORGTR generates a real orthogonal matrix Q which is defined as the */
+/*  product of n-1 elementary reflectors of order N, as returned by */
+/*  SSYTRD: */
+
+/*  if UPLO = 'U', Q = H(n-1) . . . H(2) H(1), */
+
+/*  if UPLO = 'L', Q = H(1) H(2) . . . H(n-1). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U': Upper triangle of A contains elementary reflectors */
+/*                 from SSYTRD; */
+/*          = 'L': Lower triangle of A contains elementary reflectors */
+/*                 from SSYTRD. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix Q. N >= 0. */
+
+/*  A       (input/output) REAL array, dimension (LDA,N) */
+/*          On entry, the vectors which define the elementary reflectors, */
+/*          as returned by SSYTRD. */
+/*          On exit, the N-by-N orthogonal matrix Q. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= max(1,N). */
+
+/*  TAU     (input) REAL array, dimension (N-1) */
+/*          TAU(i) must contain the scalar factor of the elementary */
+/*          reflector H(i), as returned by SSYTRD. */
+
+/*  WORK    (workspace/output) REAL array, dimension (MAX(1,LWORK)) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
+
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. LWORK >= max(1,N-1). */
+/*          For optimum performance LWORK >= (N-1)*NB, where NB is */
+/*          the optimal blocksize. */
+
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -121,14 +135,12 @@
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    nb = ilaenv_(&c__1, "SORGQL", " ", &i__1, &i__2, &i__3, &c_n1, (
-		    ftnlen)6, (ftnlen)1);
+	    nb = ilaenv_(&c__1, "SORGQL", " ", &i__1, &i__2, &i__3, &c_n1);
 	} else {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    nb = ilaenv_(&c__1, "SORGQR", " ", &i__1, &i__2, &i__3, &c_n1, (
-		    ftnlen)6, (ftnlen)1);
+	    nb = ilaenv_(&c__1, "SORGQR", " ", &i__1, &i__2, &i__3, &c_n1);
 	}
 /* Computing MAX */
 	i__1 = 1, i__2 = *n - 1;
@@ -153,28 +165,28 @@
 
     if (upper) {
 
-/*        Q was determined by a call to SSYTRD with UPLO = 'U'   
+/*        Q was determined by a call to SSYTRD with UPLO = 'U' */
 
-          Shift the vectors which define the elementary reflectors one   
-          column to the left, and set the last row and column of Q to   
-          those of the unit matrix */
+/*        Shift the vectors which define the elementary reflectors one */
+/*        column to the left, and set the last row and column of Q to */
+/*        those of the unit matrix */
 
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		a_ref(i__, j) = a_ref(i__, j + 1);
+		a[i__ + j * a_dim1] = a[i__ + (j + 1) * a_dim1];
 /* L10: */
 	    }
-	    a_ref(*n, j) = 0.f;
+	    a[*n + j * a_dim1] = 0.f;
 /* L20: */
 	}
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    a_ref(i__, *n) = 0.f;
+	    a[i__ + *n * a_dim1] = 0.f;
 /* L30: */
 	}
-	a_ref(*n, *n) = 1.f;
+	a[*n + *n * a_dim1] = 1.f;
 
 /*        Generate Q(1:n-1,1:n-1) */
 
@@ -186,25 +198,25 @@
 
     } else {
 
-/*        Q was determined by a call to SSYTRD with UPLO = 'L'.   
+/*        Q was determined by a call to SSYTRD with UPLO = 'L'. */
 
-          Shift the vectors which define the elementary reflectors one   
-          column to the right, and set the first row and column of Q to   
-          those of the unit matrix */
+/*        Shift the vectors which define the elementary reflectors one */
+/*        column to the right, and set the first row and column of Q to */
+/*        those of the unit matrix */
 
 	for (j = *n; j >= 2; --j) {
-	    a_ref(1, j) = 0.f;
+	    a[j * a_dim1 + 1] = 0.f;
 	    i__1 = *n;
 	    for (i__ = j + 1; i__ <= i__1; ++i__) {
-		a_ref(i__, j) = a_ref(i__, j - 1);
+		a[i__ + j * a_dim1] = a[i__ + (j - 1) * a_dim1];
 /* L40: */
 	    }
 /* L50: */
 	}
-	a_ref(1, 1) = 1.f;
+	a[a_dim1 + 1] = 1.f;
 	i__1 = *n;
 	for (i__ = 2; i__ <= i__1; ++i__) {
-	    a_ref(i__, 1) = 0.f;
+	    a[i__ + a_dim1] = 0.f;
 /* L60: */
 	}
 	if (*n > 1) {
@@ -214,8 +226,8 @@
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 	    i__3 = *n - 1;
-	    sorgqr_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &work[1],
-		     lwork, &iinfo);
+	    sorgqr_(&i__1, &i__2, &i__3, &a[(a_dim1 << 1) + 2], lda, &tau[1], 
+		    &work[1], lwork, &iinfo);
 	}
     }
     work[1] = (real) lwkopt;
@@ -224,7 +236,3 @@
 /*     End of SORGTR */
 
 } /* sorgtr_ */
-
-#undef a_ref
-
-

@@ -1,81 +1,95 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static doublereal c_b8 = 1.;
+static integer c__1 = 1;
 
 /* Subroutine */ int zpptri_(char *uplo, integer *n, doublecomplex *ap, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    ZPPTRI computes the inverse of a complex Hermitian positive definite   
-    matrix A using the Cholesky factorization A = U**H*U or A = L*L**H   
-    computed by ZPPTRF.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangular factor is stored in AP;   
-            = 'L':  Lower triangular factor is stored in AP.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the triangular factor U or L from the Cholesky   
-            factorization A = U**H*U or A = L*L**H, packed columnwise as   
-            a linear array.  The j-th column of U or L is stored in the   
-            array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = L(i,j) for j<=i<=n.   
-
-            On exit, the upper or lower triangle of the (Hermitian)   
-            inverse of A, overwriting the input factor U or L.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
-                  zero, and the inverse could not be computed.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static doublereal c_b8 = 1.;
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2, i__3;
     doublereal d__1;
     doublecomplex z__1;
+
     /* Local variables */
+    integer j, jc, jj;
+    doublereal ajj;
+    integer jjn;
     extern /* Subroutine */ int zhpr_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *);
-    static integer j;
     extern logical lsame_(char *, char *);
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static logical upper;
+    logical upper;
     extern /* Subroutine */ int ztpmv_(char *, char *, char *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer jc, jj;
-    extern /* Subroutine */ int xerbla_(char *, integer *), zdscal_(
-	    integer *, doublereal *, doublecomplex *, integer *), ztptri_(
-	    char *, char *, integer *, doublecomplex *, integer *);
-    static doublereal ajj;
-    static integer jjn;
+	    doublecomplex *, doublecomplex *, integer *), xerbla_(char *, integer *), zdscal_(integer *, 
+	    doublereal *, doublecomplex *, integer *), ztptri_(char *, char *, 
+	     integer *, doublecomplex *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZPPTRI computes the inverse of a complex Hermitian positive definite */
+/*  matrix A using the Cholesky factorization A = U**H*U or A = L*L**H */
+/*  computed by ZPPTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangular factor is stored in AP; */
+/*          = 'L':  Lower triangular factor is stored in AP. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input/output) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          On entry, the triangular factor U or L from the Cholesky */
+/*          factorization A = U**H*U or A = L*L**H, packed columnwise as */
+/*          a linear array.  The j-th column of U or L is stored in the */
+/*          array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = L(i,j) for j<=i<=n. */
+
+/*          On exit, the upper or lower triangle of the (Hermitian) */
+/*          inverse of A, overwriting the input factor U or L. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, the (i,i) element of the factor U or L is */
+/*                zero, and the inverse could not be computed. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --ap;
 
     /* Function Body */
@@ -151,4 +165,3 @@
 /*     End of ZPPTRI */
 
 } /* zpptri_ */
-

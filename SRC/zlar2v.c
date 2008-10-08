@@ -1,79 +1,90 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zlar2v_(integer *n, doublecomplex *x, doublecomplex *y, 
 	doublecomplex *z__, integer *incx, doublereal *c__, doublecomplex *s, 
 	integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
-
-
-    Purpose   
-    =======   
-
-    ZLAR2V applies a vector of complex plane rotations with real cosines   
-    from both sides to a sequence of 2-by-2 complex Hermitian matrices,   
-    defined by the elements of the vectors x, y and z. For i = 1,2,...,n   
-
-       (       x(i)  z(i) ) :=   
-       ( conjg(z(i)) y(i) )   
-
-         (  c(i) conjg(s(i)) ) (       x(i)  z(i) ) ( c(i) -conjg(s(i)) )   
-         ( -s(i)       c(i)  ) ( conjg(z(i)) y(i) ) ( s(i)        c(i)  )   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of plane rotations to be applied.   
-
-    X       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX)   
-            The vector x; the elements of x are assumed to be real.   
-
-    Y       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX)   
-            The vector y; the elements of y are assumed to be real.   
-
-    Z       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX)   
-            The vector z.   
-
-    INCX    (input) INTEGER   
-            The increment between elements of X, Y and Z. INCX > 0.   
-
-    C       (input) DOUBLE PRECISION array, dimension (1+(N-1)*INCC)   
-            The cosines of the plane rotations.   
-
-    S       (input) COMPLEX*16 array, dimension (1+(N-1)*INCC)   
-            The sines of the plane rotations.   
-
-    INCC    (input) INTEGER   
-            The increment between elements of C and S. INCC > 0.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     doublereal d__1;
     doublecomplex z__1, z__2, z__3, z__4, z__5;
+
     /* Builtin functions */
     double d_imag(doublecomplex *);
     void d_cnjg(doublecomplex *, doublecomplex *);
-    /* Local variables */
-    static integer i__;
-    static doublecomplex t2, t3, t4;
-    static doublereal t5, t6;
-    static integer ic;
-    static doublereal ci;
-    static doublecomplex si;
-    static integer ix;
-    static doublereal xi, yi;
-    static doublecomplex zi;
-    static doublereal t1i, t1r, sii, zii, sir, zir;
 
+    /* Local variables */
+    integer i__;
+    doublecomplex t2, t3, t4;
+    doublereal t5, t6;
+    integer ic;
+    doublereal ci;
+    doublecomplex si;
+    integer ix;
+    doublereal xi, yi;
+    doublecomplex zi;
+    doublereal t1i, t1r, sii, zii, sir, zir;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLAR2V applies a vector of complex plane rotations with real cosines */
+/*  from both sides to a sequence of 2-by-2 complex Hermitian matrices, */
+/*  defined by the elements of the vectors x, y and z. For i = 1,2,...,n */
+
+/*     (       x(i)  z(i) ) := */
+/*     ( conjg(z(i)) y(i) ) */
+
+/*       (  c(i) conjg(s(i)) ) (       x(i)  z(i) ) ( c(i) -conjg(s(i)) ) */
+/*       ( -s(i)       c(i)  ) ( conjg(z(i)) y(i) ) ( s(i)        c(i)  ) */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of plane rotations to be applied. */
+
+/*  X       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX) */
+/*          The vector x; the elements of x are assumed to be real. */
+
+/*  Y       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX) */
+/*          The vector y; the elements of y are assumed to be real. */
+
+/*  Z       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX) */
+/*          The vector z. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between elements of X, Y and Z. INCX > 0. */
+
+/*  C       (input) DOUBLE PRECISION array, dimension (1+(N-1)*INCC) */
+/*          The cosines of the plane rotations. */
+
+/*  S       (input) COMPLEX*16 array, dimension (1+(N-1)*INCC) */
+/*          The sines of the plane rotations. */
+
+/*  INCC    (input) INTEGER */
+/*          The increment between elements of C and S. INCC > 0. */
+
+/*  ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --s;
     --c__;
     --z__;
@@ -135,4 +146,3 @@
 /*     End of ZLAR2V */
 
 } /* zlar2v_ */
-

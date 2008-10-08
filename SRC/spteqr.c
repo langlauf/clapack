@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,112 +18,125 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static real c__[1]	/* was [1][1] */;
-    static integer i__;
+    real c__[1]	/* was [1][1] */;
+    integer i__;
+    real vt[1]	/* was [1][1] */;
+    integer nru;
     extern logical lsame_(char *, char *);
-    static real vt[1]	/* was [1][1] */;
     extern /* Subroutine */ int xerbla_(char *, integer *), slaset_(
 	    char *, integer *, integer *, real *, real *, real *, integer *), sbdsqr_(char *, integer *, integer *, integer *, integer 
 	    *, real *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *, integer *);
-    static integer icompz;
+    integer icompz;
     extern /* Subroutine */ int spttrf_(integer *, real *, real *, integer *);
-    static integer nru;
 
 
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SPTEQR computes all eigenvalues and, optionally, eigenvectors of a */
+/*  symmetric positive definite tridiagonal matrix by first factoring the */
+/*  matrix using SPTTRF, and then calling SBDSQR to compute the singular */
+/*  values of the bidiagonal factor. */
 
-    Purpose   
-    =======   
+/*  This routine computes the eigenvalues of the positive definite */
+/*  tridiagonal matrix to high relative accuracy.  This means that if the */
+/*  eigenvalues range over many orders of magnitude in size, then the */
+/*  small eigenvalues and corresponding eigenvectors will be computed */
+/*  more accurately than, for example, with the standard QR method. */
 
-    SPTEQR computes all eigenvalues and, optionally, eigenvectors of a   
-    symmetric positive definite tridiagonal matrix by first factoring the   
-    matrix using SPTTRF, and then calling SBDSQR to compute the singular   
-    values of the bidiagonal factor.   
+/*  The eigenvectors of a full or band symmetric positive definite matrix */
+/*  can also be found if SSYTRD, SSPTRD, or SSBTRD has been used to */
+/*  reduce this matrix to tridiagonal form. (The reduction to tridiagonal */
+/*  form, however, may preclude the possibility of obtaining high */
+/*  relative accuracy in the small eigenvalues of the original matrix, if */
+/*  these eigenvalues range over many orders of magnitude.) */
 
-    This routine computes the eigenvalues of the positive definite   
-    tridiagonal matrix to high relative accuracy.  This means that if the   
-    eigenvalues range over many orders of magnitude in size, then the   
-    small eigenvalues and corresponding eigenvectors will be computed   
-    more accurately than, for example, with the standard QR method.   
+/*  Arguments */
+/*  ========= */
 
-    The eigenvectors of a full or band symmetric positive definite matrix   
-    can also be found if SSYTRD, SSPTRD, or SSBTRD has been used to   
-    reduce this matrix to tridiagonal form. (The reduction to tridiagonal   
-    form, however, may preclude the possibility of obtaining high   
-    relative accuracy in the small eigenvalues of the original matrix, if   
-    these eigenvalues range over many orders of magnitude.)   
+/*  COMPZ   (input) CHARACTER*1 */
+/*          = 'N':  Compute eigenvalues only. */
+/*          = 'V':  Compute eigenvectors of original symmetric */
+/*                  matrix also.  Array Z contains the orthogonal */
+/*                  matrix used to reduce the original matrix to */
+/*                  tridiagonal form. */
+/*          = 'I':  Compute eigenvectors of tridiagonal matrix also. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The order of the matrix.  N >= 0. */
 
-    COMPZ   (input) CHARACTER*1   
-            = 'N':  Compute eigenvalues only.   
-            = 'V':  Compute eigenvectors of original symmetric   
-                    matrix also.  Array Z contains the orthogonal   
-                    matrix used to reduce the original matrix to   
-                    tridiagonal form.   
-            = 'I':  Compute eigenvectors of tridiagonal matrix also.   
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, the n diagonal elements of the tridiagonal */
+/*          matrix. */
+/*          On normal exit, D contains the eigenvalues, in descending */
+/*          order. */
 
-    N       (input) INTEGER   
-            The order of the matrix.  N >= 0.   
+/*  E       (input/output) REAL array, dimension (N-1) */
+/*          On entry, the (n-1) subdiagonal elements of the tridiagonal */
+/*          matrix. */
+/*          On exit, E has been destroyed. */
 
-    D       (input/output) REAL array, dimension (N)   
-            On entry, the n diagonal elements of the tridiagonal   
-            matrix.   
-            On normal exit, D contains the eigenvalues, in descending   
-            order.   
+/*  Z       (input/output) REAL array, dimension (LDZ, N) */
+/*          On entry, if COMPZ = 'V', the orthogonal matrix used in the */
+/*          reduction to tridiagonal form. */
+/*          On exit, if COMPZ = 'V', the orthonormal eigenvectors of the */
+/*          original symmetric matrix; */
+/*          if COMPZ = 'I', the orthonormal eigenvectors of the */
+/*          tridiagonal matrix. */
+/*          If INFO > 0 on exit, Z contains the eigenvectors associated */
+/*          with only the stored eigenvalues. */
+/*          If  COMPZ = 'N', then Z is not referenced. */
 
-    E       (input/output) REAL array, dimension (N-1)   
-            On entry, the (n-1) subdiagonal elements of the tridiagonal   
-            matrix.   
-            On exit, E has been destroyed.   
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= 1, and if */
+/*          COMPZ = 'V' or 'I', LDZ >= max(1,N). */
 
-    Z       (input/output) REAL array, dimension (LDZ, N)   
-            On entry, if COMPZ = 'V', the orthogonal matrix used in the   
-            reduction to tridiagonal form.   
-            On exit, if COMPZ = 'V', the orthonormal eigenvectors of the   
-            original symmetric matrix;   
-            if COMPZ = 'I', the orthonormal eigenvectors of the   
-            tridiagonal matrix.   
-            If INFO > 0 on exit, Z contains the eigenvectors associated   
-            with only the stored eigenvalues.   
-            If  COMPZ = 'N', then Z is not referenced.   
+/*  WORK    (workspace) REAL array, dimension (4*N) */
 
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= 1, and if   
-            COMPZ = 'V' or 'I', LDZ >= max(1,N).   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit. */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+/*          > 0:  if INFO = i, and i is: */
+/*                <= N  the Cholesky factorization of the matrix could */
+/*                      not be performed because the i-th principal minor */
+/*                      was not positive definite. */
+/*                > N   the SVD algorithm failed to converge; */
+/*                      if INFO = N+i, i off-diagonal elements of the */
+/*                      bidiagonal factor did not converge to zero. */
 
-    WORK    (workspace) REAL array, dimension (4*N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit.   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  if INFO = i, and i is:   
-                  <= N  the Cholesky factorization of the matrix could   
-                        not be performed because the i-th principal minor   
-                        was not positive definite.   
-                  > N   the SVD algorithm failed to converge;   
-                        if INFO = N+i, i off-diagonal elements of the   
-                        bidiagonal factor did not converge to zero.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     --e;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --work;
 
@@ -165,7 +173,7 @@ static integer c__1 = 1;
 
     if (*n == 1) {
 	if (icompz > 0) {
-	    z___ref(1, 1) = 1.f;
+	    z__[z_dim1 + 1] = 1.f;
 	}
 	return 0;
     }
@@ -190,8 +198,8 @@ static integer c__1 = 1;
 /* L20: */
     }
 
-/*     Call SBDSQR to compute the singular values/vectors of the   
-       bidiagonal factor. */
+/*     Call SBDSQR to compute the singular values/vectors of the */
+/*     bidiagonal factor. */
 
     if (icompz > 0) {
 	nru = *n;
@@ -218,7 +226,3 @@ static integer c__1 = 1;
 /*     End of SPTEQR */
 
 } /* spteqr_ */
-
-#undef z___ref
-
-

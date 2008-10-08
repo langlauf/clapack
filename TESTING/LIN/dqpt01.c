@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,12 +16,12 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     doublereal ret_val;
 
     /* Local variables */
-    static integer info, i__, j;
-    static doublereal norma;
+    integer i__, j, info;
+    doublereal norma;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal rwork[1];
+    doublereal rwork[1];
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int xerbla_(char *, integer *), dormqr_(
@@ -35,75 +30,87 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 	    integer *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DQPT01 tests the QR-factorization with pivoting of a matrix A.  The */
+/*  array AF contains the (possibly partial) QR-factorization of A, where */
+/*  the upper triangle of AF(1:k,1:k) is a partial triangular factor, */
+/*  the entries below the diagonal in the first k columns are the */
+/*  Householder vectors, and the rest of AF contains a partially updated */
+/*  matrix. */
 
-    Purpose   
-    =======   
+/*  This function returns ||A*P - Q*R||/(||norm(A)||*eps*M) */
 
-    DQPT01 tests the QR-factorization with pivoting of a matrix A.  The   
-    array AF contains the (possibly partial) QR-factorization of A, where   
-    the upper triangle of AF(1:k,1:k) is a partial triangular factor,   
-    the entries below the diagonal in the first k columns are the   
-    Householder vectors, and the rest of AF contains a partially updated   
-    matrix.   
+/*  Arguments */
+/*  ========= */
 
-    This function returns ||A*P - Q*R||/(||norm(A)||*eps*M)   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and AF. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and AF. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and AF.   
+/*  K       (input) INTEGER */
+/*          The number of columns of AF that have been reduced */
+/*          to upper triangular form. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and AF.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          The original matrix A. */
 
-    K       (input) INTEGER   
-            The number of columns of AF that have been reduced   
-            to upper triangular form.   
+/*  AF      (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The (possibly partial) output of DGEQPF.  The upper triangle */
+/*          of AF(1:k,1:k) is a partial triangular factor, the entries */
+/*          below the diagonal in the first k columns are the Householder */
+/*          vectors, and the rest of AF contains a partially updated */
+/*          matrix. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA, N)   
-            The original matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
 
-    AF      (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The (possibly partial) output of DGEQPF.  The upper triangle   
-            of AF(1:k,1:k) is a partial triangular factor, the entries   
-            below the diagonal in the first k columns are the Householder   
-            vectors, and the rest of AF contains a partially updated   
-            matrix.   
+/*  TAU     (input) DOUBLE PRECISION array, dimension (K) */
+/*          Details of the Householder transformations as returned by */
+/*          DGEQPF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
+/*  JPVT    (input) INTEGER array, dimension (N) */
+/*          Pivot information as returned by DGEQPF. */
 
-    TAU     (input) DOUBLE PRECISION array, dimension (K)   
-            Details of the Householder transformations as returned by   
-            DGEQPF.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    JPVT    (input) INTEGER array, dimension (N)   
-            Pivot information as returned by DGEQPF.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= M*N+N. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= M*N+N.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --jpvt;
@@ -131,7 +138,7 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    work[(j - 1) * *m + i__] = af_ref(i__, j);
+	    work[(j - 1) * *m + i__] = af[i__ + j * af_dim1];
 /* L10: */
 	}
 	i__2 = *m;
@@ -143,7 +150,8 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
     }
     i__1 = *n;
     for (j = *k + 1; j <= i__1; ++j) {
-	dcopy_(m, &af_ref(1, j), &c__1, &work[(j - 1) * *m + 1], &c__1);
+	dcopy_(m, &af[j * af_dim1 + 1], &c__1, &work[(j - 1) * *m + 1], &c__1)
+		;
 /* L40: */
     }
 
@@ -156,8 +164,8 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 
 /*        Compare i-th column of QR and jpvt(i)-th column of A */
 
-	daxpy_(m, &c_b14, &a_ref(1, jpvt[j]), &c__1, &work[(j - 1) * *m + 1], 
-		&c__1);
+	daxpy_(m, &c_b14, &a[jpvt[j] * a_dim1 + 1], &c__1, &work[(j - 1) * *m 
+		+ 1], &c__1);
 /* L50: */
     }
 
@@ -172,8 +180,3 @@ doublereal dqpt01_(integer *m, integer *n, integer *k, doublereal *a,
 /*     End of DQPT01 */
 
 } /* dqpt01_ */
-
-#undef af_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,84 +16,90 @@ static real c_b9 = 0.f;
     /* Local variables */
     extern /* Subroutine */ int strsm_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
-	    ), xerbla_(char *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
+), xerbla_(char *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *), sormrq_(char *, char *, integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *);
+, real *, integer *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  Compute a minimum-norm solution */
+/*      min || A*X - B || */
+/*  using the RQ factorization */
+/*      A = R*Q */
+/*  computed by SGERQF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    Compute a minimum-norm solution   
-        min || A*X - B ||   
-    using the RQ factorization   
-        A = R*Q   
-    computed by SGERQF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= M >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= M >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          Details of the RQ factorization of the original matrix A as */
+/*          returned by SGERQF. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            Details of the RQ factorization of the original matrix A as   
-            returned by SGERQF.   
+/*  TAU     (input) REAL array, dimension (M) */
+/*          Details of the orthogonal matrix Q. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  B       (input/output) REAL array, dimension (LDB,NRHS) */
+/*          On entry, the right hand side vectors for the linear system. */
+/*          On exit, the solution vectors X.  Each solution vector */
+/*          is contained in rows 1:N of a column of B. */
 
-    TAU     (input) REAL array, dimension (M)   
-            Details of the orthogonal matrix Q.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= max(1,N). */
 
-    B       (input/output) REAL array, dimension (LDB,NRHS)   
-            On entry, the right hand side vectors for the linear system.   
-            On exit, the solution vectors X.  Each solution vector   
-            is contained in rows 1:N of a column of B.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= max(1,N).   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK must be at least NRHS, */
+/*          and should be at least NRHS*NB, where NB is the block size */
+/*          for this environment. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK must be at least NRHS,   
-            and should be at least NRHS*NB, where NB is the block size   
-            for this environment.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -131,8 +132,8 @@ static real c_b9 = 0.f;
 
 /*     Solve R*X = B(n-m+1:n,:) */
 
-    strsm_("Left", "Upper", "No transpose", "Non-unit", m, nrhs, &c_b7, &
-	    a_ref(1, *n - *m + 1), lda, &b_ref(*n - *m + 1, 1), ldb);
+    strsm_("Left", "Upper", "No transpose", "Non-unit", m, nrhs, &c_b7, &a[(*
+	    n - *m + 1) * a_dim1 + 1], lda, &b[*n - *m + 1 + b_dim1], ldb);
 
 /*     Set B(1:n-m,:) to zero */
 
@@ -149,8 +150,3 @@ static real c_b9 = 0.f;
 /*     End of SGERQS */
 
 } /* sgerqs_ */
-
-#undef b_ref
-#undef a_ref
-
-

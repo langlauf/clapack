@@ -1,18 +1,33 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int crotg_(complex *ca, complex *cb, real *c__, complex *s)
 {
     /* System generated locals */
     real r__1, r__2;
     complex q__1, q__2, q__3;
+
     /* Builtin functions */
     double c_abs(complex *), sqrt(doublereal);
     void r_cnjg(complex *, complex *);
+
     /* Local variables */
-    static real norm;
-    static complex alpha;
-    static real scale;
+    real norm;
+    complex alpha;
+    real scale;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CROTG determines a complex Givens rotation. */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
     if (c_abs(ca) != 0.f) {
 	goto L10;
     }
@@ -43,4 +58,3 @@ L10:
 L20:
     return 0;
 } /* crotg_ */
-

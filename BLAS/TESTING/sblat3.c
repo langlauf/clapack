@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -45,7 +40,7 @@ static integer c__0 = 0;
 static integer c_n1 = -1;
 static integer c__2 = 2;
 
-/* Main program */ MAIN__(void)
+/* Main program */ int MAIN__(void)
 {
     /* Initialized data */
 
@@ -102,56 +97,53 @@ static integer c__2 = 2;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer nalf, idim[9];
-    static logical same;
-    static integer nbet, ntra;
-    static logical rewi;
-    static integer nout;
+    real c__[4225]	/* was [65][65] */, g[65];
+    integer i__, j, n;
+    real w[130], aa[4225], ab[8450]	/* was [65][130] */, bb[4225], cc[
+	    4225], as[4225], bs[4225], cs[4225], ct[65], alf[7], bet[7];
+    extern logical lse_(real *, real *, integer *);
+    real eps, err;
+    integer nalf, idim[9];
+    logical same;
+    integer nbet, ntra;
+    logical rewi;
+    integer nout;
     extern /* Subroutine */ int schk1_(char *, real *, real *, integer *, 
 	    integer *, logical *, logical *, logical *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    real *, real *, real *, real *, real *, real *, real *, real *, 
-	    real *), schk2_(char *, real *, real *, integer *, 
+	    real *, ftnlen), schk2_(char *, real *, real *, integer *, 
 	    integer *, logical *, logical *, logical *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    real *, real *, real *, real *, real *, real *, real *, real *, 
-	    real *), schk3_(char *, real *, real *, integer *, 
+	    real *, ftnlen), schk3_(char *, real *, real *, integer *, 
 	    integer *, logical *, logical *, logical *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
-	    real *, real *, real *, real *, real *), schk4_(char *, 
+	    real *, real *, real *, real *, real *, ftnlen), schk4_(char *, 
 	    real *, real *, integer *, integer *, logical *, logical *, 
 	    logical *, integer *, integer *, integer *, real *, integer *, 
 	    real *, integer *, real *, real *, real *, real *, real *, real *,
-	     real *, real *, real *, real *, real *), schk5_(char *, 
+	     real *, real *, real *, real *, real *, ftnlen), schk5_(char *, 
 	    real *, real *, integer *, integer *, logical *, logical *, 
 	    logical *, integer *, integer *, integer *, real *, integer *, 
 	    real *, integer *, real *, real *, real *, real *, real *, real *,
-	     real *, real *, real *, real *, real *);
-    static real c__[4225]	/* was [65][65] */, g[65];
-    static integer i__, j, n;
-    static logical fatal;
-    static real w[130];
+	     real *, real *, real *, real *, real *, ftnlen);
+    logical fatal;
     extern doublereal sdiff_(real *, real *);
-    extern /* Subroutine */ int schke_(integer *, char *, integer *);
-    static logical trace;
-    static integer nidim;
+    extern /* Subroutine */ int schke_(integer *, char *, integer *, ftnlen);
+    logical trace;
+    integer nidim;
     extern /* Subroutine */ int smmch_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *, real *, real *, integer *, real *, 
-	    real *, logical *, integer *, logical *);
-    static char snaps[32];
-    static integer isnum;
-    static logical ltest[6];
-    static real aa[4225], ab[8450]	/* was [65][130] */, bb[4225], cc[
-	    4225], as[4225], bs[4225], cs[4225], ct[65];
-    static logical sfatal;
-    static char snamet[6], transa[1], transb[1];
-    static real thresh;
-    static logical ltestt, tsterr;
-    static char summry[32];
-    static real alf[7], bet[7];
-    extern logical lse_(real *, real *, integer *);
-    static real eps, err;
+	    real *, logical *, integer *, logical *, ftnlen, ftnlen);
+    char snaps[32];
+    integer isnum;
+    logical ltest[6], sfatal;
+    char snamet[6], transa[1], transb[1];
+    real thresh;
+    logical ltestt, tsterr;
+    char summry[32];
 
     /* Fortran I/O blocks */
     static cilist io___2 = { 0, 5, 0, 0, 0 };
@@ -197,56 +189,65 @@ static integer c__2 = 2;
 
 
 
-#define c___ref(a_1,a_2) c__[(a_2)*65 + a_1 - 66]
-#define ab_ref(a_1,a_2) ab[(a_2)*65 + a_1 - 66]
-#define snames_ref(a_0,a_1) &snames[(a_1)*6 + a_0 - 6]
+/*  Test program for the REAL             Level 3 Blas. */
 
+/*  The program must be driven by a short data file. The first 14 records */
+/*  of the file are read using list-directed input, the last 6 records */
+/*  are read using the format ( A6, L2 ). An annotated example of a data */
+/*  file can be obtained by deleting the first 3 characters from the */
+/*  following 20 lines: */
+/*  'sblat3.out'      NAME OF SUMMARY OUTPUT FILE */
+/*  6                 UNIT NUMBER OF SUMMARY FILE */
+/*  'SBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE */
+/*  -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0) */
+/*  F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD. */
+/*  F        LOGICAL FLAG, T TO STOP ON FAILURES. */
+/*  T        LOGICAL FLAG, T TO TEST ERROR EXITS. */
+/*  16.0     THRESHOLD VALUE OF TEST RATIO */
+/*  6                 NUMBER OF VALUES OF N */
+/*  0 1 2 3 5 9       VALUES OF N */
+/*  3                 NUMBER OF VALUES OF ALPHA */
+/*  0.0 1.0 0.7       VALUES OF ALPHA */
+/*  3                 NUMBER OF VALUES OF BETA */
+/*  0.0 1.0 1.3       VALUES OF BETA */
+/*  SGEMM  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  SSYMM  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  STRMM  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  STRSM  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  SSYRK  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  SSYR2K T PUT F FOR NO TEST. SAME COLUMNS. */
 
-/*  Test program for the REAL             Level 3 Blas.   
+/*  See: */
 
-    The program must be driven by a short data file. The first 14 records   
-    of the file are read using list-directed input, the last 6 records   
-    are read using the format ( A6, L2 ). An annotated example of a data   
-    file can be obtained by deleting the first 3 characters from the   
-    following 20 lines:   
-    'SBLAT3.SUMM'     NAME OF SUMMARY OUTPUT FILE   
-    6                 UNIT NUMBER OF SUMMARY FILE   
-    'SBLAT3.SNAP'     NAME OF SNAPSHOT OUTPUT FILE   
-    -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)   
-    F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.   
-    F        LOGICAL FLAG, T TO STOP ON FAILURES.   
-    T        LOGICAL FLAG, T TO TEST ERROR EXITS.   
-    16.0     THRESHOLD VALUE OF TEST RATIO   
-    6                 NUMBER OF VALUES OF N   
-    0 1 2 3 5 9       VALUES OF N   
-    3                 NUMBER OF VALUES OF ALPHA   
-    0.0 1.0 0.7       VALUES OF ALPHA   
-    3                 NUMBER OF VALUES OF BETA   
-    0.0 1.0 1.3       VALUES OF BETA   
-    SGEMM  T PUT F FOR NO TEST. SAME COLUMNS.   
-    SSYMM  T PUT F FOR NO TEST. SAME COLUMNS.   
-    STRMM  T PUT F FOR NO TEST. SAME COLUMNS.   
-    STRSM  T PUT F FOR NO TEST. SAME COLUMNS.   
-    SSYRK  T PUT F FOR NO TEST. SAME COLUMNS.   
-    SSYR2K T PUT F FOR NO TEST. SAME COLUMNS.   
+/*     Dongarra J. J., Du Croz J. J., Duff I. S. and Hammarling S. */
+/*     A Set of Level 3 Basic Linear Algebra Subprograms. */
 
-    See:   
+/*     Technical Memorandum No.88 (Revision 1), Mathematics and */
+/*     Computer Science Division, Argonne National Laboratory, 9700 */
+/*     South Cass Avenue, Argonne, Illinois 60439, US. */
 
-       Dongarra J. J., Du Croz J. J., Duff I. S. and Hammarling S.   
-       A Set of Level 3 Basic Linear Algebra Subprograms.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-       Technical Memorandum No.88 (Revision 1), Mathematics and   
-       Computer Science Division, Argonne National Laboratory, 9700   
-       South Cass Avenue, Argonne, Illinois 60439, US.   
+/*     10-9-00:  Change STATUS='NEW' to 'UNKNOWN' so that the testers */
+/*               can be run multiple times without deleting generated */
+/*               output files (susan) */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
+/*     .. Parameters .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
 
-
-       Read name and unit number for summary output file and open file. */
+/*     Read name and unit number for summary output file and open file. */
 
     s_rsle(&io___2);
     do_lio(&c__9, &c__1, summry, (ftnlen)32);
@@ -305,9 +306,9 @@ static integer c__2 = 2;
     do_lio(&c__4, &c__1, (char *)&thresh, (ftnlen)sizeof(real));
     e_rsle();
 
-/*     Read and check the parameter values for the tests.   
+/*     Read and check the parameter values for the tests. */
 
-       Values of N */
+/*     Values of N */
     s_rsle(&io___19);
     do_lio(&c__3, &c__1, (char *)&nidim, (ftnlen)sizeof(integer));
     e_rsle();
@@ -418,8 +419,8 @@ static integer c__2 = 2;
     s_wsle(&io___44);
     e_wsle();
 
-/*     Read names of subroutines and flags which indicate   
-       whether they are to be tested. */
+/*     Read names of subroutines and flags which indicate */
+/*     whether they are to be tested. */
 
     for (i__ = 1; i__ <= 6; ++i__) {
 	ltest[i__ - 1] = FALSE_;
@@ -443,7 +444,8 @@ L30:
 	goto L60;
     }
     for (i__ = 1; i__ <= 6; ++i__) {
-	if (s_cmp(snamet, snames_ref(0, i__), (ftnlen)6, (ftnlen)6) == 0) {
+	if (s_cmp(snamet, snames + (i__ - 1) * 6, (ftnlen)6, (ftnlen)6) == 0) 
+		{
 	    goto L50;
 	}
 /* L40: */
@@ -489,12 +491,12 @@ L80:
 	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
 	    i__3 = i__ - j + 1;
-	    ab_ref(i__, j) = (real) max(i__3,0);
+	    ab[i__ + j * 65 - 66] = (real) max(i__3,0);
 /* L90: */
 	}
-	ab_ref(j, 66) = (real) j;
-	ab_ref(1, j + 65) = (real) j;
-	c___ref(j, 1) = 0.f;
+	ab[j + 4224] = (real) j;
+	ab[(j + 65) * 65 - 65] = (real) j;
+	c__[j - 1] = 0.f;
 /* L100: */
     }
     i__1 = n;
@@ -503,13 +505,13 @@ L80:
 		;
 /* L110: */
     }
-/*     CC holds the exact result. On exit from SMMCH CT holds   
-       the result computed by SMMCH. */
+/*     CC holds the exact result. On exit from SMMCH CT holds */
+/*     the result computed by SMMCH. */
     *(unsigned char *)transa = 'N';
     *(unsigned char *)transb = 'N';
-    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab_ref(1, 66), 
-	    &c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &
-	    fatal, &nout, &c_true);
+    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab[4225], &
+	    c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal,
+	     &nout, &c_true, (ftnlen)1, (ftnlen)1);
     same = lse_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___64.ciunit = nout;
@@ -522,9 +524,9 @@ L80:
 	s_stop("", (ftnlen)0);
     }
     *(unsigned char *)transb = 'T';
-    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab_ref(1, 66), 
-	    &c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &
-	    fatal, &nout, &c_true);
+    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab[4225], &
+	    c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal,
+	     &nout, &c_true, (ftnlen)1, (ftnlen)1);
     same = lse_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___65.ciunit = nout;
@@ -538,8 +540,8 @@ L80:
     }
     i__1 = n;
     for (j = 1; j <= i__1; ++j) {
-	ab_ref(j, 66) = (real) (n - j + 1);
-	ab_ref(1, j + 65) = (real) (n - j + 1);
+	ab[j + 4224] = (real) (n - j + 1);
+	ab[(j + 65) * 65 - 65] = (real) (n - j + 1);
 /* L120: */
     }
     i__1 = n;
@@ -550,9 +552,9 @@ L80:
     }
     *(unsigned char *)transa = 'T';
     *(unsigned char *)transb = 'N';
-    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab_ref(1, 66), 
-	    &c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &
-	    fatal, &nout, &c_true);
+    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab[4225], &
+	    c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal,
+	     &nout, &c_true, (ftnlen)1, (ftnlen)1);
     same = lse_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___66.ciunit = nout;
@@ -565,9 +567,9 @@ L80:
 	s_stop("", (ftnlen)0);
     }
     *(unsigned char *)transb = 'T';
-    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab_ref(1, 66), 
-	    &c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &
-	    fatal, &nout, &c_true);
+    smmch_(transa, transb, &n, &c__1, &n, &c_b85, ab, &c__65, &ab[4225], &
+	    c__65, &c_b99, c__, &c__65, ct, g, cc, &c__65, &eps, &err, &fatal,
+	     &nout, &c_true, (ftnlen)1, (ftnlen)1);
     same = lse_(cc, ct, &n);
     if (! same || err != 0.f) {
 	io___67.ciunit = nout;
@@ -590,14 +592,14 @@ L80:
 /*           Subprogram is not to be tested. */
 	    io___70.ciunit = nout;
 	    s_wsfe(&io___70);
-	    do_fio(&c__1, snames_ref(0, isnum), (ftnlen)6);
+	    do_fio(&c__1, snames + (isnum - 1) * 6, (ftnlen)6);
 	    e_wsfe();
 	} else {
-	    s_copy(srnamc_1.srnamt, snames_ref(0, isnum), (ftnlen)6, (ftnlen)
-		    6);
+	    s_copy(srnamc_1.srnamt, snames + (isnum - 1) * 6, (ftnlen)6, (
+		    ftnlen)6);
 /*           Test error exits. */
 	    if (tsterr) {
-		schke_(&isnum, snames_ref(0, isnum), &nout);
+		schke_(&isnum, snames + (isnum - 1) * 6, &nout, (ftnlen)6);
 		io___71.ciunit = nout;
 		s_wsle(&io___71);
 		e_wsle();
@@ -616,36 +618,37 @@ L80:
 	    }
 /*           Test SGEMM, 01. */
 L140:
-	    schk1_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
-		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
-		    ct, g);
+	    schk1_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
+		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c__, cc, cs, 
+		    ct, g, (ftnlen)6);
 	    goto L190;
 /*           Test SSYMM, 02. */
 L150:
-	    schk2_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
-		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
-		    ct, g);
+	    schk2_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
+		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c__, cc, cs, 
+		    ct, g, (ftnlen)6);
 	    goto L190;
 /*           Test STRMM, 03, STRSM, 04. */
 L160:
-	    schk3_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &c__65, ab, aa, 
-		    as, &ab_ref(1, 66), bb, bs, ct, g, c__);
+	    schk3_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &c__65, 
+		    ab, aa, as, &ab[4225], bb, bs, ct, g, c__, (ftnlen)6);
 	    goto L190;
 /*           Test SSYRK, 05. */
 L170:
-	    schk4_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
-		    c__65, ab, aa, as, &ab_ref(1, 66), bb, bs, c__, cc, cs, 
-		    ct, g);
+	    schk4_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
+		    bet, &c__65, ab, aa, as, &ab[4225], bb, bs, c__, cc, cs, 
+		    ct, g, (ftnlen)6);
 	    goto L190;
 /*           Test SSYR2K, 06. */
 L180:
-	    schk5_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, bet, &
-		    c__65, ab, aa, as, bb, bs, c__, cc, cs, ct, g, w);
+	    schk5_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &nbet, 
+		    bet, &c__65, ab, aa, as, bb, bs, c__, cc, cs, ct, g, w, (
+		    ftnlen)6);
 	    goto L190;
 
 L190:
@@ -690,16 +693,12 @@ L230:
     return 0;
 } /* MAIN__ */
 
-#undef snames_ref
-#undef ab_ref
-#undef c___ref
-
-
 /* Subroutine */ int schk1_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, real *alf, integer *
 	nbet, real *bet, integer *nmax, real *a, real *aa, real *as, real *b, 
-	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g)
+	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g, 
+	ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -731,33 +730,31 @@ L230:
 	     f_rew(alist *);
 
     /* Local variables */
-    static real beta;
-    static integer ldas, ldbs, ldcs;
-    static logical same, null;
-    static integer i__, k, m, n;
-    static real alpha;
-    static logical isame[13];
+    integer i__, k, m, n, ia, ib, ma, mb, na, nb, nc, ik, im, in, ks, ms, ns, 
+	    ica, icb, laa, lbb, lda, lcc, ldb, ldc;
+    real als, bls;
+    extern logical lse_(real *, real *, integer *);
+    real err, beta;
+    integer ldas, ldbs, ldcs;
+    logical same, null;
+    real alpha;
+    logical isame[13];
     extern /* Subroutine */ int smake_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, logical *, real *
-	    );
-    static logical trana, tranb;
+	    , ftnlen, ftnlen, ftnlen);
+    logical trana, tranb;
     extern /* Subroutine */ int smmch_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *, real *, real *, integer *, real *, 
-	    real *, logical *, integer *, logical *), sgemm_(
+	    real *, logical *, integer *, logical *, ftnlen, ftnlen), sgemm_(
 	    char *, char *, integer *, integer *, integer *, real *, real *, 
 	    integer *, real *, integer *, real *, real *, integer *);
-    static integer nargs;
-    static logical reset;
-    static integer ia, ib, ma, mb, na, nb, nc, ik, im, in, ks, ms, ns;
-    static char tranas[1], tranbs[1], transa[1], transb[1];
-    static real errmax;
+    integer nargs;
+    logical reset;
+    char tranas[1], tranbs[1], transa[1], transb[1];
+    real errmax;
     extern logical lseres_(char *, char *, integer *, integer *, real *, real 
-	    *, integer *);
-    static integer ica, icb, laa, lbb, lda, lcc, ldb, ldc;
-    static real als, bls;
-    extern logical lse_(real *, real *, integer *);
-    static real err;
+	    *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___124 = { 0, 0, 0, fmt_9995, 0 };
@@ -770,17 +767,28 @@ L230:
 
 
 
-/*  Tests SGEMM.   
+/*  Tests SGEMM. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -789,20 +797,21 @@ L230:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
+/*     .. Executable Statements .. */
 
     nargs = 13;
     nc = 0;
@@ -859,7 +868,8 @@ L230:
 /*                 Generate the matrix A. */
 
 		    smake_("GE", " ", " ", &ma, &na, &a[a_offset], nmax, &aa[
-			    1], &lda, &reset, &c_b99);
+			    1], &lda, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (
+			    ftnlen)1);
 
 		    for (icb = 1; icb <= 3; ++icb) {
 			*(unsigned char *)transb = *(unsigned char *)&ich[icb 
@@ -888,7 +898,8 @@ L230:
 /*                    Generate the matrix B. */
 
 			smake_("GE", " ", " ", &mb, &nb, &b[b_offset], nmax, &
-				bb[1], &ldb, &reset, &c_b99);
+				bb[1], &ldb, &reset, &c_b99, (ftnlen)2, (
+				ftnlen)1, (ftnlen)1);
 
 			i__4 = *nalf;
 			for (ia = 1; ia <= i__4; ++ia) {
@@ -901,12 +912,13 @@ L230:
 /*                          Generate the matrix C. */
 
 				smake_("GE", " ", " ", &m, &n, &c__[c_offset],
-					 nmax, &cc[1], &ldc, &reset, &c_b99);
+					 nmax, &cc[1], &ldc, &reset, &c_b99, (
+					ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 				++nc;
 
-/*                          Save every datum before calling the   
-                            subroutine. */
+/*                          Save every datum before calling the */
+/*                          subroutine. */
 
 				*(unsigned char *)tranas = *(unsigned char *)
 					transa;
@@ -1002,12 +1014,13 @@ L230:
 				    isame[11] = lse_(&cs[1], &cc[1], &lcc);
 				} else {
 				    isame[11] = lseres_("GE", " ", &m, &n, &
-					    cs[1], &cc[1], &ldc);
+					    cs[1], &cc[1], &ldc, (ftnlen)2, (
+					    ftnlen)1);
 				}
 				isame[12] = ldcs == ldc;
 
-/*                          If data was incorrectly changed, report   
-                            and return. */
+/*                          If data was incorrectly changed, report */
+/*                          and return. */
 
 				same = TRUE_;
 				i__6 = nargs;
@@ -1035,10 +1048,11 @@ L230:
 					     &a[a_offset], nmax, &b[b_offset],
 					     nmax, &beta, &c__[c_offset], 
 					    nmax, &ct[1], &g[1], &cc[1], &ldc,
-					     eps, &err, fatal, nout, &c_true);
+					     eps, &err, fatal, nout, &c_true, 
+					    (ftnlen)1, (ftnlen)1);
 				    errmax = dmax(errmax,err);
-/*                             If got really bad answer, report and   
-                               return. */
+/*                             If got really bad answer, report and */
+/*                             return. */
 				    if (*fatal) {
 					goto L120;
 				    }
@@ -1113,13 +1127,14 @@ L130:
 
 /*     End of SCHK1. */
 
-} /* schk1_   
+} /* schk1_ */
 
-   Subroutine */ int schk2_(char *sname, real *eps, real *thresh, integer *
+/* Subroutine */ int schk2_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, real *alf, integer *
 	nbet, real *bet, integer *nmax, real *a, real *aa, real *as, real *b, 
-	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g)
+	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g, 
+	ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -1152,38 +1167,36 @@ L130:
 	     f_rew(alist *);
 
     /* Local variables */
-    static real beta;
-    static integer ldas, ldbs, ldcs;
-    static logical same;
-    static char side[1];
-    static logical left, null;
-    static char uplo[1];
-    static integer i__, m, n;
-    static real alpha;
-    static logical isame[13];
+    integer i__, m, n, ia, ib, na, nc, im, in, ms, ns, laa, lbb, lda, lcc, 
+	    ldb, ldc, ics;
+    real als, bls;
+    integer icu;
+    extern logical lse_(real *, real *, integer *);
+    real err, beta;
+    integer ldas, ldbs, ldcs;
+    logical same;
+    char side[1];
+    logical left, null;
+    char uplo[1];
+    real alpha;
+    logical isame[13];
     extern /* Subroutine */ int smake_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, logical *, real *
-	    );
-    static char sides[1];
+	    , ftnlen, ftnlen, ftnlen);
+    char sides[1];
     extern /* Subroutine */ int smmch_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *, real *, real *, integer *, real *, 
-	    real *, logical *, integer *, logical *);
-    static integer nargs;
-    static logical reset;
-    static char uplos[1];
+	    real *, logical *, integer *, logical *, ftnlen, ftnlen);
+    integer nargs;
+    logical reset;
+    char uplos[1];
     extern /* Subroutine */ int ssymm_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, integer *, real *, real *, 
 	    integer *);
-    static integer ia, ib, na, nc, im, in, ms, ns;
-    static real errmax;
+    real errmax;
     extern logical lseres_(char *, char *, integer *, integer *, real *, real 
-	    *, integer *);
-    static integer laa, lbb, lda, lcc, ldb, ldc, ics;
-    static real als, bls;
-    static integer icu;
-    extern logical lse_(real *, real *, integer *);
-    static real err;
+	    *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___171 = { 0, 0, 0, fmt_9995, 0 };
@@ -1196,17 +1209,28 @@ L130:
 
 
 
-/*  Tests SSYMM.   
+/*  Tests SSYMM. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -1215,20 +1239,21 @@ L130:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
+/*     .. Executable Statements .. */
 
     nargs = 12;
     nc = 0;
@@ -1268,7 +1293,7 @@ L130:
 /*           Generate the matrix B. */
 
 	    smake_("GE", " ", " ", &m, &n, &b[b_offset], nmax, &bb[1], &ldb, &
-		    reset, &c_b99);
+		    reset, &c_b99, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 	    for (ics = 1; ics <= 2; ++ics) {
 		*(unsigned char *)side = *(unsigned char *)&ichs[ics - 1];
@@ -1296,7 +1321,8 @@ L130:
 /*                 Generate the symmetric matrix A. */
 
 		    smake_("SY", uplo, " ", &na, &na, &a[a_offset], nmax, &aa[
-			    1], &lda, &reset, &c_b99);
+			    1], &lda, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (
+			    ftnlen)1);
 
 		    i__3 = *nalf;
 		    for (ia = 1; ia <= i__3; ++ia) {
@@ -1309,12 +1335,13 @@ L130:
 /*                       Generate the matrix C. */
 
 			    smake_("GE", " ", " ", &m, &n, &c__[c_offset], 
-				    nmax, &cc[1], &ldc, &reset, &c_b99);
+				    nmax, &cc[1], &ldc, &reset, &c_b99, (
+				    ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			    ++nc;
 
-/*                       Save every datum before calling the   
-                         subroutine. */
+/*                       Save every datum before calling the */
+/*                       subroutine. */
 
 			    *(unsigned char *)sides = *(unsigned char *)side;
 			    *(unsigned char *)uplos = *(unsigned char *)uplo;
@@ -1403,12 +1430,12 @@ L130:
 				isame[10] = lse_(&cs[1], &cc[1], &lcc);
 			    } else {
 				isame[10] = lseres_("GE", " ", &m, &n, &cs[1],
-					 &cc[1], &ldc);
+					 &cc[1], &ldc, (ftnlen)2, (ftnlen)1);
 			    }
 			    isame[11] = ldcs == ldc;
 
-/*                       If data was incorrectly changed, report and   
-                         return. */
+/*                       If data was incorrectly changed, report and */
+/*                       return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
@@ -1437,17 +1464,19 @@ L130:
 					    a_offset], nmax, &b[b_offset], 
 					    nmax, &beta, &c__[c_offset], nmax,
 					     &ct[1], &g[1], &cc[1], &ldc, eps,
-					     &err, fatal, nout, &c_true);
+					     &err, fatal, nout, &c_true, (
+					    ftnlen)1, (ftnlen)1);
 				} else {
 				    smmch_("N", "N", &m, &n, &n, &alpha, &b[
 					    b_offset], nmax, &a[a_offset], 
 					    nmax, &beta, &c__[c_offset], nmax,
 					     &ct[1], &g[1], &cc[1], &ldc, eps,
-					     &err, fatal, nout, &c_true);
+					     &err, fatal, nout, &c_true, (
+					    ftnlen)1, (ftnlen)1);
 				}
 				errmax = dmax(errmax,err);
-/*                          If got really bad answer, report and   
-                            return. */
+/*                          If got really bad answer, report and */
+/*                          return. */
 				if (*fatal) {
 				    goto L110;
 				}
@@ -1517,13 +1546,13 @@ L120:
 
 /*     End of SCHK2. */
 
-} /* schk2_   
+} /* schk2_ */
 
-   Subroutine */ int schk3_(char *sname, real *eps, real *thresh, integer *
+/* Subroutine */ int schk3_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, real *alf, integer *
 	nmax, real *a, real *aa, real *as, real *b, real *bb, real *bs, real *
-	ct, real *g, real *c__)
+	ct, real *g, real *c__, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -1558,42 +1587,41 @@ L120:
 	    integer *, char *, ftnlen), e_wsfe(void), f_rew(alist *);
 
     /* Local variables */
-    static char diag[1];
-    static integer ldas, ldbs;
-    static logical same;
-    static char side[1];
-    static logical left, null;
-    static char uplo[1];
-    static integer i__, j, m, n;
-    static real alpha;
-    static char diags[1];
-    static logical isame[13];
+    integer i__, j, m, n, ia, na, nc, im, in, ms, ns, laa, icd, lbb, lda, ldb,
+	     ics;
+    real als;
+    integer ict, icu;
+    extern logical lse_(real *, real *, integer *);
+    real err;
+    char diag[1];
+    integer ldas, ldbs;
+    logical same;
+    char side[1];
+    logical left, null;
+    char uplo[1];
+    real alpha;
+    char diags[1];
+    logical isame[13];
     extern /* Subroutine */ int smake_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, logical *, real *
-	    );
-    static char sides[1];
+	    , ftnlen, ftnlen, ftnlen);
+    char sides[1];
     extern /* Subroutine */ int smmch_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *, real *, real *, integer *, real *, 
-	    real *, logical *, integer *, logical *);
-    static integer nargs;
-    static logical reset;
-    static char uplos[1];
+	    real *, logical *, integer *, logical *, ftnlen, ftnlen);
+    integer nargs;
+    logical reset;
+    char uplos[1];
     extern /* Subroutine */ int strmm_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
-	    ), strsm_(char *, char *, char *, 
+), strsm_(char *, char *, char *, 
 	    char *, integer *, integer *, real *, real *, integer *, real *, 
 	    integer *);
-    static integer ia, na, nc, im, in, ms, ns;
-    static char tranas[1], transa[1];
-    static real errmax;
+    char tranas[1], transa[1];
+    real errmax;
     extern logical lseres_(char *, char *, integer *, integer *, real *, real 
-	    *, integer *);
-    static integer laa, icd, lbb, lda, ldb, ics;
-    static real als;
-    static integer ict, icu;
-    extern logical lse_(real *, real *, integer *);
-    static real err;
+	    *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___221 = { 0, 0, 0, fmt_9995, 0 };
@@ -1607,40 +1635,48 @@ L120:
 
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+/*  Tests STRMM and STRSM. */
 
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  Tests STRMM and STRSM.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     c_dim1 = *nmax;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --g;
     --ct;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
+/*     .. Executable Statements .. */
 
     nargs = 11;
     nc = 0;
@@ -1651,7 +1687,7 @@ L120:
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *nmax;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    c___ref(i__, j) = 0.f;
+	    c__[i__ + j * c_dim1] = 0.f;
 /* L10: */
 	}
 /* L20: */
@@ -1714,17 +1750,19 @@ L120:
 
 				smake_("TR", uplo, diag, &na, &na, &a[
 					a_offset], nmax, &aa[1], &lda, &reset,
-					 &c_b99);
+					 &c_b99, (ftnlen)2, (ftnlen)1, (
+					ftnlen)1);
 
 /*                          Generate the matrix B. */
 
 				smake_("GE", " ", " ", &m, &n, &b[b_offset], 
-					nmax, &bb[1], &ldb, &reset, &c_b99);
+					nmax, &bb[1], &ldb, &reset, &c_b99, (
+					ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 				++nc;
 
-/*                          Save every datum before calling the   
-                            subroutine. */
+/*                          Save every datum before calling the */
+/*                          subroutine. */
 
 				*(unsigned char *)sides = *(unsigned char *)
 					side;
@@ -1845,12 +1883,13 @@ L120:
 				    isame[9] = lse_(&bs[1], &bb[1], &lbb);
 				} else {
 				    isame[9] = lseres_("GE", " ", &m, &n, &bs[
-					    1], &bb[1], &ldb);
+					    1], &bb[1], &ldb, (ftnlen)2, (
+					    ftnlen)1);
 				}
 				isame[10] = ldbs == ldb;
 
-/*                          If data was incorrectly changed, report and   
-                            return. */
+/*                          If data was incorrectly changed, report and */
+/*                          return. */
 
 				same = TRUE_;
 				i__4 = nargs;
@@ -1883,7 +1922,8 @@ L120:
 						    c_b99, &c__[c_offset], 
 						    nmax, &ct[1], &g[1], &bb[
 						    1], &ldb, eps, &err, 
-						    fatal, nout, &c_true);
+						    fatal, nout, &c_true, (
+						    ftnlen)1, (ftnlen)1);
 					} else {
 					    smmch_("N", transa, &m, &n, &n, &
 						    alpha, &b[b_offset], nmax,
@@ -1891,21 +1931,23 @@ L120:
 						    c_b99, &c__[c_offset], 
 						    nmax, &ct[1], &g[1], &bb[
 						    1], &ldb, eps, &err, 
-						    fatal, nout, &c_true);
+						    fatal, nout, &c_true, (
+						    ftnlen)1, (ftnlen)1);
 					}
 				    } else if (s_cmp(sname + 3, "SM", (ftnlen)
 					    2, (ftnlen)2) == 0) {
 
-/*                                Compute approximation to original   
-                                  matrix. */
+/*                                Compute approximation to original */
+/*                                matrix. */
 
 					i__4 = n;
 					for (j = 1; j <= i__4; ++j) {
 					    i__5 = m;
 					    for (i__ = 1; i__ <= i__5; ++i__) 
 						    {
-			  c___ref(i__, j) = bb[i__ + (j - 1) * ldb];
-			  bb[i__ + (j - 1) * ldb] = alpha * b_ref(i__, j);
+			  c__[i__ + j * c_dim1] = bb[i__ + (j - 1) * ldb];
+			  bb[i__ + (j - 1) * ldb] = alpha * b[i__ + j * 
+				  b_dim1];
 /* L60: */
 					    }
 /* L70: */
@@ -1918,7 +1960,8 @@ L120:
 						    c_b99, &b[b_offset], nmax,
 						     &ct[1], &g[1], &bb[1], &
 						    ldb, eps, &err, fatal, 
-						    nout, &c_false);
+						    nout, &c_false, (ftnlen)1,
+						     (ftnlen)1);
 					} else {
 					    smmch_("N", transa, &m, &n, &n, &
 						    c_b85, &c__[c_offset], 
@@ -1926,12 +1969,13 @@ L120:
 						    &c_b99, &b[b_offset], 
 						    nmax, &ct[1], &g[1], &bb[
 						    1], &ldb, eps, &err, 
-						    fatal, nout, &c_false);
+						    fatal, nout, &c_false, (
+						    ftnlen)1, (ftnlen)1);
 					}
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got really bad answer, report and   
-                               return. */
+/*                             If got really bad answer, report and */
+/*                             return. */
 				    if (*fatal) {
 					goto L150;
 				    }
@@ -2005,15 +2049,12 @@ L160:
 
 } /* schk3_ */
 
-#undef c___ref
-#undef b_ref
-
-
 /* Subroutine */ int schk4_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, real *alf, integer *
 	nbet, real *bet, integer *nmax, real *a, real *aa, real *as, real *b, 
-	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g)
+	real *bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g, 
+	ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -2048,38 +2089,36 @@ L160:
 	     f_rew(alist *);
 
     /* Local variables */
-    static real beta;
-    static integer ldas, ldcs;
-    static logical same;
-    static real bets;
-    static logical tran, null;
-    static char uplo[1];
-    static integer i__, j, k, n;
-    static real alpha;
-    static logical isame[13];
+    integer i__, j, k, n, ia, ib, jc, ma, na, nc, ik, in, jj, lj, ks, ns, laa,
+	     lda, lcc, ldc;
+    real als;
+    integer ict, icu;
+    extern logical lse_(real *, real *, integer *);
+    real err, beta;
+    integer ldas, ldcs;
+    logical same;
+    real bets;
+    logical tran, null;
+    char uplo[1];
+    real alpha;
+    logical isame[13];
     extern /* Subroutine */ int smake_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, logical *, real *
-	    ), smmch_(char *, char *, integer *, 
+	    , ftnlen, ftnlen, ftnlen), smmch_(char *, char *, integer *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
 	    , real *, real *, integer *, real *, real *, real *, integer *, 
-	    real *, real *, logical *, integer *, logical *);
-    static integer nargs;
-    static logical reset;
-    static char trans[1];
-    static logical upper;
-    static char uplos[1];
+	    real *, real *, logical *, integer *, logical *, ftnlen, ftnlen);
+    integer nargs;
+    logical reset;
+    char trans[1];
+    logical upper;
+    char uplos[1];
     extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, real *, integer *);
-    static integer ia, ib, jc, ma, na, nc, ik, in, jj, lj, ks, ns;
-    static real errmax;
+    real errmax;
     extern logical lseres_(char *, char *, integer *, integer *, real *, real 
-	    *, integer *);
-    static char transs[1];
-    static integer laa, lda, lcc, ldc;
-    static real als;
-    static integer ict, icu;
-    extern logical lse_(real *, real *, integer *);
-    static real err;
+	    *, integer *, ftnlen, ftnlen);
+    char transs[1];
 
     /* Fortran I/O blocks */
     static cilist io___268 = { 0, 0, 0, fmt_9994, 0 };
@@ -2093,21 +2132,28 @@ L160:
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+/*  Tests SSYRK. */
 
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  Tests SSYRK.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -2116,20 +2162,21 @@ L160:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --bs;
     --bb;
     b_dim1 = *nmax;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
+/*     .. Executable Statements .. */
 
     nargs = 10;
     nc = 0;
@@ -2180,7 +2227,7 @@ L160:
 /*              Generate the matrix A. */
 
 		smake_("GE", " ", " ", &ma, &na, &a[a_offset], nmax, &aa[1], &
-			lda, &reset, &c_b99);
+			lda, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 		for (icu = 1; icu <= 2; ++icu) {
 		    *(unsigned char *)uplo = *(unsigned char *)&ichu[icu - 1];
@@ -2197,7 +2244,8 @@ L160:
 /*                       Generate the matrix C. */
 
 			    smake_("SY", uplo, " ", &n, &n, &c__[c_offset], 
-				    nmax, &cc[1], &ldc, &reset, &c_b99);
+				    nmax, &cc[1], &ldc, &reset, &c_b99, (
+				    ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			    ++nc;
 
@@ -2282,12 +2330,12 @@ L160:
 				isame[8] = lse_(&cs[1], &cc[1], &lcc);
 			    } else {
 				isame[8] = lseres_("SY", uplo, &n, &n, &cs[1],
-					 &cc[1], &ldc);
+					 &cc[1], &ldc, (ftnlen)2, (ftnlen)1);
 			    }
 			    isame[9] = ldcs == ldc;
 
-/*                       If data was incorrectly changed, report and   
-                         return. */
+/*                       If data was incorrectly changed, report and */
+/*                       return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
@@ -2323,18 +2371,21 @@ L160:
 				    }
 				    if (tran) {
 					smmch_("T", "N", &lj, &c__1, &k, &
-						alpha, &a_ref(1, jj), nmax, &
-						a_ref(1, j), nmax, &beta, &
-						c___ref(jj, j), nmax, &ct[1], 
-						&g[1], &cc[jc], &ldc, eps, &
-						err, fatal, nout, &c_true);
+						alpha, &a[jj * a_dim1 + 1], 
+						nmax, &a[j * a_dim1 + 1], 
+						nmax, &beta, &c__[jj + j * 
+						c_dim1], nmax, &ct[1], &g[1], 
+						&cc[jc], &ldc, eps, &err, 
+						fatal, nout, &c_true, (ftnlen)
+						1, (ftnlen)1);
 				    } else {
 					smmch_("N", "T", &lj, &c__1, &k, &
-						alpha, &a_ref(jj, 1), nmax, &
-						a_ref(j, 1), nmax, &beta, &
-						c___ref(jj, j), nmax, &ct[1], 
-						&g[1], &cc[jc], &ldc, eps, &
-						err, fatal, nout, &c_true);
+						alpha, &a[jj + a_dim1], nmax, 
+						&a[j + a_dim1], nmax, &beta, &
+						c__[jj + j * c_dim1], nmax, &
+						ct[1], &g[1], &cc[jc], &ldc, 
+						eps, &err, fatal, nout, &
+						c_true, (ftnlen)1, (ftnlen)1);
 				    }
 				    if (upper) {
 					jc += ldc;
@@ -2342,8 +2393,8 @@ L160:
 					jc = jc + ldc + 1;
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got really bad answer, report and   
-                               return. */
+/*                             If got really bad answer, report and */
+/*                             return. */
 				    if (*fatal) {
 					goto L110;
 				    }
@@ -2424,16 +2475,12 @@ L130:
 
 } /* schk4_ */
 
-#undef c___ref
-#undef a_ref
-
-
 /* Subroutine */ int schk5_(char *sname, real *eps, real *thresh, integer *
 	nout, integer *ntra, logical *trace, logical *rewi, logical *fatal, 
 	integer *nidim, integer *idim, integer *nalf, real *alf, integer *
 	nbet, real *bet, integer *nmax, real *ab, real *aa, real *as, real *
 	bb, real *bs, real *c__, real *cc, real *cs, real *ct, real *g, real *
-	w)
+	w, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -2467,41 +2514,39 @@ L130:
 	     f_rew(alist *);
 
     /* Local variables */
-    static integer jjab;
-    static real beta;
-    static integer ldas, ldbs, ldcs;
-    static logical same;
-    static real bets;
-    static logical tran, null;
-    static char uplo[1];
-    static integer i__, j, k, n;
-    static real alpha;
-    static logical isame[13];
+    integer i__, j, k, n, ia, ib, jc, ma, na, nc, ik, in, jj, lj, ks, ns, laa,
+	     lbb, lda, lcc, ldb, ldc;
+    real als;
+    integer ict, icu;
+    extern logical lse_(real *, real *, integer *);
+    real err;
+    integer jjab;
+    real beta;
+    integer ldas, ldbs, ldcs;
+    logical same;
+    real bets;
+    logical tran, null;
+    char uplo[1];
+    real alpha;
+    logical isame[13];
     extern /* Subroutine */ int smake_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, logical *, real *
-	    ), smmch_(char *, char *, integer *, 
+	    , ftnlen, ftnlen, ftnlen), smmch_(char *, char *, integer *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
 	    , real *, real *, integer *, real *, real *, real *, integer *, 
-	    real *, real *, logical *, integer *, logical *);
-    static integer nargs;
-    static logical reset;
-    static char trans[1];
-    static logical upper;
-    static char uplos[1];
-    static integer ia, ib, jc, ma, na, nc, ik, in, jj, lj;
+	    real *, real *, logical *, integer *, logical *, ftnlen, ftnlen);
+    integer nargs;
+    logical reset;
+    char trans[1];
+    logical upper;
+    char uplos[1];
     extern /* Subroutine */ int ssyr2k_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, integer *, real *, real *, 
 	    integer *);
-    static integer ks, ns;
-    static real errmax;
+    real errmax;
     extern logical lseres_(char *, char *, integer *, integer *, real *, real 
-	    *, integer *);
-    static char transs[1];
-    static integer laa, lbb, lda, lcc, ldb, ldc;
-    static real als;
-    static integer ict, icu;
-    extern logical lse_(real *, real *, integer *);
-    static real err;
+	    *, integer *, ftnlen, ftnlen);
+    char transs[1];
 
     /* Fortran I/O blocks */
     static cilist io___322 = { 0, 0, 0, fmt_9994, 0 };
@@ -2515,20 +2560,28 @@ L130:
 
 
 
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+/*  Tests SSYR2K. */
 
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  Tests SSYR2K.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --bet;
@@ -2538,7 +2591,7 @@ L130:
     --cs;
     --cc;
     c_dim1 = *nmax;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --bs;
     --bb;
@@ -2547,6 +2600,7 @@ L130:
     --ab;
 
     /* Function Body */
+/*     .. Executable Statements .. */
 
     nargs = 12;
     nc = 0;
@@ -2599,10 +2653,12 @@ L130:
 		if (tran) {
 		    i__3 = *nmax << 1;
 		    smake_("GE", " ", " ", &ma, &na, &ab[1], &i__3, &aa[1], &
-			    lda, &reset, &c_b99);
+			    lda, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (
+			    ftnlen)1);
 		} else {
 		    smake_("GE", " ", " ", &ma, &na, &ab[1], nmax, &aa[1], &
-			    lda, &reset, &c_b99);
+			    lda, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (
+			    ftnlen)1);
 		}
 
 /*              Generate the matrix B. */
@@ -2612,10 +2668,12 @@ L130:
 		if (tran) {
 		    i__3 = *nmax << 1;
 		    smake_("GE", " ", " ", &ma, &na, &ab[k + 1], &i__3, &bb[1]
-			    , &ldb, &reset, &c_b99);
+			    , &ldb, &reset, &c_b99, (ftnlen)2, (ftnlen)1, (
+			    ftnlen)1);
 		} else {
 		    smake_("GE", " ", " ", &ma, &na, &ab[k * *nmax + 1], nmax,
-			     &bb[1], &ldb, &reset, &c_b99);
+			     &bb[1], &ldb, &reset, &c_b99, (ftnlen)2, (ftnlen)
+			    1, (ftnlen)1);
 		}
 
 		for (icu = 1; icu <= 2; ++icu) {
@@ -2633,7 +2691,8 @@ L130:
 /*                       Generate the matrix C. */
 
 			    smake_("SY", uplo, " ", &n, &n, &c__[c_offset], 
-				    nmax, &cc[1], &ldc, &reset, &c_b99);
+				    nmax, &cc[1], &ldc, &reset, &c_b99, (
+				    ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			    ++nc;
 
@@ -2696,7 +2755,7 @@ L130:
 				al__1.aunit = *ntra;
 				f_rew(&al__1);
 			    }
-			    ssyr2k_(uplo, trans, &n, &k, &alpha, &aa[1], &lda,
+			    ssyr2k_(uplo, trans, &n, &k, &alpha, &aa[1], &lda, 
 				     &bb[1], &ldb, &beta, &cc[1], &ldc);
 
 /*                       Check if error-exit was taken incorrectly. */
@@ -2727,12 +2786,12 @@ L130:
 				isame[10] = lse_(&cs[1], &cc[1], &lcc);
 			    } else {
 				isame[10] = lseres_("SY", uplo, &n, &n, &cs[1]
-					, &cc[1], &ldc);
+					, &cc[1], &ldc, (ftnlen)2, (ftnlen)1);
 			    }
 			    isame[11] = ldcs == ldc;
 
-/*                       If data was incorrectly changed, report and   
-                         return. */
+/*                       If data was incorrectly changed, report and */
+/*                       return. */
 
 			    same = TRUE_;
 			    i__5 = nargs;
@@ -2781,10 +2840,11 @@ L130:
 					i__8 = *nmax << 1;
 					smmch_("T", "N", &lj, &c__1, &i__6, &
 						alpha, &ab[jjab], &i__7, &w[1]
-						, &i__8, &beta, &c___ref(jj, 
-						j), nmax, &ct[1], &g[1], &cc[
-						jc], &ldc, eps, &err, fatal, 
-						nout, &c_true);
+						, &i__8, &beta, &c__[jj + j * 
+						c_dim1], nmax, &ct[1], &g[1], 
+						&cc[jc], &ldc, eps, &err, 
+						fatal, nout, &c_true, (ftnlen)
+						1, (ftnlen)1);
 				    } else {
 					i__6 = k;
 					for (i__ = 1; i__ <= i__6; ++i__) {
@@ -2798,11 +2858,11 @@ L130:
 					i__7 = *nmax << 1;
 					smmch_("N", "N", &lj, &c__1, &i__6, &
 						alpha, &ab[jj], nmax, &w[1], &
-						i__7, &beta, &c___ref(jj, j), 
-						nmax, &ct[1], &g[1], &cc[jc], 
-						&ldc, eps, &err, fatal, nout, 
-						&c_true)
-						;
+						i__7, &beta, &c__[jj + j * 
+						c_dim1], nmax, &ct[1], &g[1], 
+						&cc[jc], &ldc, eps, &err, 
+						fatal, nout, &c_true, (ftnlen)
+						1, (ftnlen)1);
 				    }
 				    if (upper) {
 					jc += ldc;
@@ -2813,8 +2873,8 @@ L130:
 					}
 				    }
 				    errmax = dmax(errmax,err);
-/*                             If got really bad answer, report and   
-                               return. */
+/*                             If got really bad answer, report and */
+/*                             return. */
 				    if (*fatal) {
 					goto L140;
 				    }
@@ -2896,10 +2956,8 @@ L160:
 
 } /* schk5_ */
 
-#undef c___ref
-
-
-/* Subroutine */ int schke_(integer *isnum, char *srnamt, integer *nout)
+/* Subroutine */ int schke_(integer *isnum, char *srnamt, integer *nout, 
+	ftnlen srnamt_len)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 \002,a6,\002 PASSED THE TESTS OF ERROR-E"
@@ -2911,13 +2969,13 @@ L160:
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static real beta, a[2]	/* was [2][1] */, b[2]	/* was [2][1] */, c__[
-	    2]	/* was [2][1] */, alpha;
+    real a[2]	/* was [2][1] */, b[2]	/* was [2][1] */, c__[2]	/* 
+	    was [2][1] */, beta, alpha;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
-	    real *, integer *), strmm_(char *, char *, char *,
+	    real *, integer *), strmm_(char *, char *, char *, 
 	     char *, integer *, integer *, real *, real *, integer *, real *, 
-	    integer *), ssymm_(char *, char *,
+	    integer *), ssymm_(char *, char *, 
 	     integer *, integer *, real *, real *, integer *, real *, integer 
 	    *, real *, real *, integer *), strsm_(char *, 
 	    char *, char *, char *, integer *, integer *, real *, real *, 
@@ -2934,26 +2992,34 @@ L160:
 
 
 
-/*  Tests the error exits from the Level 3 Blas.   
-    Requires a special version of the error-handling routine XERBLA.   
-    A, B and C should not need to be defined.   
+/*  Tests the error exits from the Level 3 Blas. */
+/*  Requires a special version of the error-handling routine XERBLA. */
+/*  A, B and C should not need to be defined. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    3-19-92:  Initialize ALPHA and BETA  (eca)   
-    3-19-92:  Fix argument 12 in calls to SSYMM with INFOT = 9  (eca)   
+/*  3-19-92:  Initialize ALPHA and BETA  (eca) */
+/*  3-19-92:  Fix argument 12 in calls to SSYMM with INFOT = 9  (eca) */
 
-       OK is set to .FALSE. by the special version of XERBLA or by CHKXER   
-       if anything is wrong. */
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Parameters .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Subroutines .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
+/*     OK is set to .FALSE. by the special version of XERBLA or by CHKXER */
+/*     if anything is wrong. */
     infoc_1.ok = TRUE_;
-/*     LERR is set to .TRUE. by the special version of XERBLA each time   
-       it is called, and is then tested and re-set by CHKXER. */
+/*     LERR is set to .TRUE. by the special version of XERBLA each time */
+/*     it is called, and is then tested and re-set by CHKXER. */
     infoc_1.lerr = FALSE_;
 
 /*     Initialize ALPHA and BETA. */
@@ -3556,11 +3622,12 @@ L70:
 
 /*     End of SCHKE. */
 
-} /* schke_   
+} /* schke_ */
 
-   Subroutine */ int smake_(char *type__, char *uplo, char *diag, integer *m, 
+/* Subroutine */ int smake_(char *type__, char *uplo, char *diag, integer *m, 
 	integer *n, real *a, integer *nmax, real *aa, integer *lda, logical *
-	reset, real *transl)
+	reset, real *transl, ftnlen type_len, ftnlen uplo_len, ftnlen 
+	diag_len)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
@@ -3569,33 +3636,36 @@ L70:
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer ibeg, iend;
+    integer i__, j;
+    logical gen, tri, sym;
+    integer ibeg, iend;
     extern doublereal sbeg_(logical *);
-    static logical unit;
-    static integer i__, j;
-    static logical lower, upper, gen, tri, sym;
+    logical unit, lower, upper;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  Generates values for an M by N matrix A. */
+/*  Stores the values in the array AA in the data structure required */
+/*  by the routine, with unwanted elements set to rogue value. */
 
+/*  TYPE is 'GE', 'SY' or 'TR'. */
 
-/*  Generates values for an M by N matrix A.   
-    Stores the values in the array AA in the data structure required   
-    by the routine, with unwanted elements set to rogue value.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    TYPE is 'GE', 'SY' or 'TR'.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. External Functions .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --aa;
 
@@ -3614,26 +3684,26 @@ L70:
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    if (gen || upper && i__ <= j || lower && i__ >= j) {
-		a_ref(i__, j) = sbeg_(reset) + *transl;
+		a[i__ + j * a_dim1] = sbeg_(reset) + *transl;
 		if (i__ != j) {
 /*                 Set some elements to zero */
 		    if (*n > 3 && j == *n / 2) {
-			a_ref(i__, j) = 0.f;
+			a[i__ + j * a_dim1] = 0.f;
 		    }
 		    if (sym) {
-			a_ref(j, i__) = a_ref(i__, j);
+			a[j + i__ * a_dim1] = a[i__ + j * a_dim1];
 		    } else if (tri) {
-			a_ref(j, i__) = 0.f;
+			a[j + i__ * a_dim1] = 0.f;
 		    }
 		}
 	    }
 /* L10: */
 	}
 	if (tri) {
-	    a_ref(j, j) = a_ref(j, j) + 1.f;
+	    a[j + j * a_dim1] += 1.f;
 	}
 	if (unit) {
-	    a_ref(j, j) = 1.f;
+	    a[j + j * a_dim1] = 1.f;
 	}
 /* L20: */
     }
@@ -3645,7 +3715,7 @@ L70:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		aa[i__ + (j - 1) * *lda] = a_ref(i__, j);
+		aa[i__ + (j - 1) * *lda] = a[i__ + j * a_dim1];
 /* L30: */
 	    }
 	    i__2 = *lda;
@@ -3681,7 +3751,7 @@ L70:
 	    }
 	    i__2 = iend;
 	    for (i__ = ibeg; i__ <= i__2; ++i__) {
-		aa[i__ + (j - 1) * *lda] = a_ref(i__, j);
+		aa[i__ + (j - 1) * *lda] = a[i__ + j * a_dim1];
 /* L70: */
 	    }
 	    i__2 = *lda;
@@ -3698,14 +3768,11 @@ L70:
 
 } /* smake_ */
 
-#undef a_ref
-
-
 /* Subroutine */ int smmch_(char *transa, char *transb, integer *m, integer *
 	n, integer *kk, real *alpha, real *a, integer *lda, real *b, integer *
 	ldb, real *beta, real *c__, integer *ldc, real *ct, real *g, real *cc,
 	 integer *ldcc, real *eps, real *err, logical *fatal, integer *nout, 
-	logical *mv)
+	logical *mv, ftnlen transa_len, ftnlen transb_len)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 ******* FATAL ERROR - COMPUTED RESULT IS"
@@ -3725,9 +3792,9 @@ L70:
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static real erri;
-    static integer i__, j, k;
-    static logical trana, tranb;
+    integer i__, j, k;
+    real erri;
+    logical trana, tranb;
 
     /* Fortran I/O blocks */
     static cilist io___361 = { 0, 0, 0, fmt_9999, 0 };
@@ -3737,36 +3804,36 @@ L70:
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
-#define cc_ref(a_1,a_2) cc[(a_2)*cc_dim1 + a_1]
+/*  Checks the results of the computational tests. */
 
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-/*  Checks the results of the computational tests.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --ct;
     --g;
     cc_dim1 = *ldcc;
-    cc_offset = 1 + cc_dim1 * 1;
+    cc_offset = 1 + cc_dim1;
     cc -= cc_offset;
 
     /* Function Body */
@@ -3775,9 +3842,9 @@ L70:
     tranb = *(unsigned char *)transb == 'T' || *(unsigned char *)transb == 
 	    'C';
 
-/*     Compute expected result, one column at a time, in CT using data   
-       in A, B and C.   
-       Compute gauges in G. */
+/*     Compute expected result, one column at a time, in CT using data */
+/*     in A, B and C. */
+/*     Compute gauges in G. */
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
@@ -3793,9 +3860,9 @@ L70:
 	    for (k = 1; k <= i__2; ++k) {
 		i__3 = *m;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    ct[i__] += a_ref(i__, k) * b_ref(k, j);
-		    g[i__] += (r__1 = a_ref(i__, k), dabs(r__1)) * (r__2 = 
-			    b_ref(k, j), dabs(r__2));
+		    ct[i__] += a[i__ + k * a_dim1] * b[k + j * b_dim1];
+		    g[i__] += (r__1 = a[i__ + k * a_dim1], dabs(r__1)) * (
+			    r__2 = b[k + j * b_dim1], dabs(r__2));
 /* L20: */
 		}
 /* L30: */
@@ -3805,9 +3872,9 @@ L70:
 	    for (k = 1; k <= i__2; ++k) {
 		i__3 = *m;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    ct[i__] += a_ref(k, i__) * b_ref(k, j);
-		    g[i__] += (r__1 = a_ref(k, i__), dabs(r__1)) * (r__2 = 
-			    b_ref(k, j), dabs(r__2));
+		    ct[i__] += a[k + i__ * a_dim1] * b[k + j * b_dim1];
+		    g[i__] += (r__1 = a[k + i__ * a_dim1], dabs(r__1)) * (
+			    r__2 = b[k + j * b_dim1], dabs(r__2));
 /* L40: */
 		}
 /* L50: */
@@ -3817,9 +3884,9 @@ L70:
 	    for (k = 1; k <= i__2; ++k) {
 		i__3 = *m;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    ct[i__] += a_ref(i__, k) * b_ref(j, k);
-		    g[i__] += (r__1 = a_ref(i__, k), dabs(r__1)) * (r__2 = 
-			    b_ref(j, k), dabs(r__2));
+		    ct[i__] += a[i__ + k * a_dim1] * b[j + k * b_dim1];
+		    g[i__] += (r__1 = a[i__ + k * a_dim1], dabs(r__1)) * (
+			    r__2 = b[j + k * b_dim1], dabs(r__2));
 /* L60: */
 		}
 /* L70: */
@@ -3829,9 +3896,9 @@ L70:
 	    for (k = 1; k <= i__2; ++k) {
 		i__3 = *m;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    ct[i__] += a_ref(k, i__) * b_ref(j, k);
-		    g[i__] += (r__1 = a_ref(k, i__), dabs(r__1)) * (r__2 = 
-			    b_ref(j, k), dabs(r__2));
+		    ct[i__] += a[k + i__ * a_dim1] * b[j + k * b_dim1];
+		    g[i__] += (r__1 = a[k + i__ * a_dim1], dabs(r__1)) * (
+			    r__2 = b[j + k * b_dim1], dabs(r__2));
 /* L80: */
 		}
 /* L90: */
@@ -3839,9 +3906,9 @@ L70:
 	}
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    ct[i__] = *alpha * ct[i__] + *beta * c___ref(i__, j);
-	    g[i__] = dabs(*alpha) * g[i__] + dabs(*beta) * (r__1 = c___ref(
-		    i__, j), dabs(r__1));
+	    ct[i__] = *alpha * ct[i__] + *beta * c__[i__ + j * c_dim1];
+	    g[i__] = dabs(*alpha) * g[i__] + dabs(*beta) * (r__1 = c__[i__ + 
+		    j * c_dim1], dabs(r__1));
 /* L100: */
 	}
 
@@ -3850,7 +3917,8 @@ L70:
 	*err = 0.f;
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    erri = (r__1 = ct[i__] - cc_ref(i__, j), dabs(r__1)) / *eps;
+	    erri = (r__1 = ct[i__] - cc[i__ + j * cc_dim1], dabs(r__1)) / *
+		    eps;
 	    if (g[i__] != 0.f) {
 		erri /= g[i__];
 	    }
@@ -3881,13 +3949,15 @@ L130:
 	    s_wsfe(&io___362);
 	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&ct[i__], (ftnlen)sizeof(real));
-	    do_fio(&c__1, (char *)&cc_ref(i__, j), (ftnlen)sizeof(real));
+	    do_fio(&c__1, (char *)&cc[i__ + j * cc_dim1], (ftnlen)sizeof(real)
+		    );
 	    e_wsfe();
 	} else {
 	    io___363.ciunit = *nout;
 	    s_wsfe(&io___363);
 	    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
-	    do_fio(&c__1, (char *)&cc_ref(i__, j), (ftnlen)sizeof(real));
+	    do_fio(&c__1, (char *)&cc[i__ + j * cc_dim1], (ftnlen)sizeof(real)
+		    );
 	    do_fio(&c__1, (char *)&ct[i__], (ftnlen)sizeof(real));
 	    e_wsfe();
 	}
@@ -3908,12 +3978,6 @@ L150:
 
 } /* smmch_ */
 
-#undef cc_ref
-#undef c___ref
-#undef b_ref
-#undef a_ref
-
-
 logical lse_(real *ri, real *rj, integer *lr)
 {
     /* System generated locals */
@@ -3921,20 +3985,24 @@ logical lse_(real *ri, real *rj, integer *lr)
     logical ret_val;
 
     /* Local variables */
-    static integer i__;
+    integer i__;
 
 
-/*  Tests if two arrays are identical.   
+/*  Tests if two arrays are identical. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-       Parameter adjustments */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     --rj;
     --ri;
 
@@ -3958,7 +4026,7 @@ L30:
 } /* lse_ */
 
 logical lseres_(char *type__, char *uplo, integer *m, integer *n, real *aa, 
-	real *as, integer *lda)
+	real *as, integer *lda, ftnlen type_len, ftnlen uplo_len)
 {
     /* System generated locals */
     integer aa_dim1, aa_offset, as_dim1, as_offset, i__1, i__2;
@@ -3968,32 +4036,32 @@ logical lseres_(char *type__, char *uplo, integer *m, integer *n, real *aa,
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer ibeg, iend, i__, j;
-    static logical upper;
+    integer i__, j, ibeg, iend;
+    logical upper;
 
 
-#define aa_ref(a_1,a_2) aa[(a_2)*aa_dim1 + a_1]
-#define as_ref(a_1,a_2) as[(a_2)*as_dim1 + a_1]
+/*  Tests if selected elements in two arrays are equal. */
 
+/*  TYPE is 'GE' or 'SY'. */
 
-/*  Tests if selected elements in two arrays are equal.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    TYPE is 'GE' or 'SY'.   
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
-
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd.   
-
-       Parameter adjustments */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     as_dim1 = *lda;
-    as_offset = 1 + as_dim1 * 1;
+    as_offset = 1 + as_dim1;
     as -= as_offset;
     aa_dim1 = *lda;
-    aa_offset = 1 + aa_dim1 * 1;
+    aa_offset = 1 + aa_dim1;
     aa -= aa_offset;
 
     /* Function Body */
@@ -4003,7 +4071,7 @@ logical lseres_(char *type__, char *uplo, integer *m, integer *n, real *aa,
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *lda;
 	    for (i__ = *m + 1; i__ <= i__2; ++i__) {
-		if (aa_ref(i__, j) != as_ref(i__, j)) {
+		if (aa[i__ + j * aa_dim1] != as[i__ + j * as_dim1]) {
 		    goto L70;
 		}
 /* L10: */
@@ -4022,14 +4090,14 @@ logical lseres_(char *type__, char *uplo, integer *m, integer *n, real *aa,
 	    }
 	    i__2 = ibeg - 1;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		if (aa_ref(i__, j) != as_ref(i__, j)) {
+		if (aa[i__ + j * aa_dim1] != as[i__ + j * as_dim1]) {
 		    goto L70;
 		}
 /* L30: */
 	    }
 	    i__2 = *lda;
 	    for (i__ = iend + 1; i__ <= i__2; ++i__) {
-		if (aa_ref(i__, j) != as_ref(i__, j)) {
+		if (aa[i__ + j * aa_dim1] != as[i__ + j * as_dim1]) {
 		    goto L70;
 		}
 /* L40: */
@@ -4050,10 +4118,6 @@ L80:
 
 } /* lseres_ */
 
-#undef as_ref
-#undef aa_ref
-
-
 doublereal sbeg_(logical *reset)
 {
     /* System generated locals */
@@ -4063,16 +4127,20 @@ doublereal sbeg_(logical *reset)
     static integer i__, ic, mi;
 
 
-/*  Generates random numbers uniformly distributed between -0.5 and 0.5.   
+/*  Generates random numbers uniformly distributed between -0.5 and 0.5. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Save statement .. */
+/*     .. Executable Statements .. */
     if (*reset) {
 /*        Initialize local variables. */
 	mi = 891;
@@ -4081,11 +4149,11 @@ doublereal sbeg_(logical *reset)
 	*reset = FALSE_;
     }
 
-/*     The sequence of values of I is bounded between 1 and 999.   
-       If initial I = 1,2,3,6,7 or 9, the period will be 50.   
-       If initial I = 4 or 8, the period will be 25.   
-       If initial I = 5, the period will be 10.   
-       IC is used to break up the period by skipping 1 value of I in 6. */
+/*     The sequence of values of I is bounded between 1 and 999. */
+/*     If initial I = 1,2,3,6,7 or 9, the period will be 50. */
+/*     If initial I = 4 or 8, the period will be 25. */
+/*     If initial I = 5, the period will be 10. */
+/*     IC is used to break up the period by skipping 1 value of I in 6. */
 
     ++ic;
 L10:
@@ -4108,22 +4176,24 @@ doublereal sdiff_(real *x, real *y)
     real ret_val;
 
 
-/*  Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Executable Statements .. */
     ret_val = *x - *y;
     return ret_val;
 
 /*     End of SDIFF. */
 
-} /* sdiff_   
+} /* sdiff_ */
 
-   Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
+/* Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
 	logical *lerr, logical *ok)
 {
     /* Format strings */
@@ -4138,16 +4208,18 @@ doublereal sdiff_(real *x, real *y)
 
 
 
-/*  Tests whether XERBLA has detected an error when it should.   
+/*  Tests whether XERBLA has detected an error when it should. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Executable Statements .. */
     if (! (*lerr)) {
 	io___374.ciunit = *nout;
 	s_wsfe(&io___374);
@@ -4162,9 +4234,9 @@ doublereal sdiff_(real *x, real *y)
 
 /*     End of CHKXER. */
 
-} /* chkxer_   
+} /* chkxer_ */
 
-   Subroutine */ int xerbla_(char *srname, integer *info)
+/* Subroutine */ int xerbla_(char *srname, integer *info)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 ******* XERBLA WAS CALLED WITH INFO ="
@@ -4185,23 +4257,27 @@ doublereal sdiff_(real *x, real *y)
 
 
 
-/*  This is a special version of XERBLA to be used only as part of   
-    the test program for testing error exits from the Level 3 BLAS   
-    routines.   
+/*  This is a special version of XERBLA to be used only as part of */
+/*  the test program for testing error exits from the Level 3 BLAS */
+/*  routines. */
 
-    XERBLA  is an error handler for the Level 3 BLAS routines.   
+/*  XERBLA  is an error handler for the Level 3 BLAS routines. */
 
-    It is called by the Level 3 BLAS routines if an input parameter is   
-    invalid.   
+/*  It is called by the Level 3 BLAS routines if an input parameter is */
+/*  invalid. */
 
-    Auxiliary routine for test program for Level 3 Blas.   
+/*  Auxiliary routine for test program for Level 3 Blas. */
 
-    -- Written on 8-February-1989.   
-       Jack Dongarra, Argonne National Laboratory.   
-       Iain Duff, AERE Harwell.   
-       Jeremy Du Croz, Numerical Algorithms Group Ltd.   
-       Sven Hammarling, Numerical Algorithms Group Ltd. */
+/*  -- Written on 8-February-1989. */
+/*     Jack Dongarra, Argonne National Laboratory. */
+/*     Iain Duff, AERE Harwell. */
+/*     Jeremy Du Croz, Numerical Algorithms Group Ltd. */
+/*     Sven Hammarling, Numerical Algorithms Group Ltd. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
     infoc_2.lerr = TRUE_;
     if (*info != infoc_2.infot) {
 	if (infoc_2.infot != 0) {
@@ -4231,6 +4307,6 @@ doublereal sdiff_(real *x, real *y)
 
 /*     End of XERBLA */
 
-} /* xerbla_   
+} /* xerbla_ */
 
-   Main program alias */ int sblat3_ () { MAIN__ (); return 0; }
+/* Main program alias */ int sblat3_ () { MAIN__ (); return 0; }

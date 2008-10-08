@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -24,24 +19,25 @@ static integer c__1 = 1;
     complex q__1, q__2, q__3;
 
     /* Local variables */
+    integer j, jr;
+    real ulp;
     extern /* Subroutine */ int cher_(char *, integer *, real *, complex *, 
 	    integer *, complex *, integer *);
-    static integer jcol;
-    static real unfl;
-    static integer jrow;
+    integer jcol;
+    real unfl;
+    integer jrow;
     extern /* Subroutine */ int cher2_(char *, integer *, complex *, complex *
-	    , integer *, complex *, integer *, complex *, integer *);
-    static integer j;
-    extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
-	    integer *, complex *, complex *, integer *, complex *, integer *, 
-	    complex *, complex *, integer *);
+, integer *, complex *, integer *, complex *, integer *), 
+	    cgemm_(char *, char *, integer *, integer *, integer *, complex *, 
+	     complex *, integer *, complex *, integer *, complex *, complex *, 
+	     integer *);
     extern logical lsame_(char *, char *);
-    static integer iinfo;
-    static real anorm;
-    static char cuplo[1];
-    static complex vsave;
-    static logical lower;
-    static real wnorm;
+    integer iinfo;
+    real anorm;
+    char cuplo[1];
+    complex vsave;
+    logical lower;
+    real wnorm;
     extern /* Subroutine */ int cunm2l_(char *, char *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *), cunm2r_(char *, char *, 
@@ -49,169 +45,172 @@ static integer c__1 = 1;
 	    complex *, integer *, complex *, integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), clanhe_(char *, char *, integer *, 
-	    complex *, integer *, real *);
-    static integer jr;
-    extern doublereal slamch_(char *);
+	    complex *, integer *, real *), slamch_(char *);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *), claset_(char *, 
 	    integer *, integer *, complex *, complex *, complex *, integer *), clarfy_(char *, integer *, complex *, integer *, complex 
 	    *, complex *, integer *, complex *);
-    static real ulp;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
-#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
-#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CHET21 generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*     A = U S U* */
 
-    CHET21 generally checks a decomposition of the form   
+/*  where * means conjugate transpose, A is hermitian, U is unitary, and */
+/*  S is diagonal (if KBAND=0) or (real) symmetric tridiagonal (if */
+/*  KBAND=1). */
 
-       A = U S U*   
+/*  If ITYPE=1, then U is represented as a dense matrix; otherwise U is */
+/*  expressed as a product of Householder transformations, whose vectors */
+/*  are stored in the array "V" and whose scaling constants are in "TAU". */
+/*  We shall use the letter "V" to refer to the product of Householder */
+/*  transformations (which should be equal to U). */
 
-    where * means conjugate transpose, A is hermitian, U is unitary, and   
-    S is diagonal (if KBAND=0) or (real) symmetric tridiagonal (if   
-    KBAND=1).   
+/*  Specifically, if ITYPE=1, then: */
 
-    If ITYPE=1, then U is represented as a dense matrix; otherwise U is   
-    expressed as a product of Householder transformations, whose vectors   
-    are stored in the array "V" and whose scaling constants are in "TAU".   
-    We shall use the letter "V" to refer to the product of Householder   
-    transformations (which should be equal to U).   
+/*     RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and* */
+/*     RESULT(2) = | I - UU* | / ( n ulp ) */
 
-    Specifically, if ITYPE=1, then:   
+/*  If ITYPE=2, then: */
 
-       RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and*   
-       RESULT(2) = | I - UU* | / ( n ulp )   
+/*     RESULT(1) = | A - V S V* | / ( |A| n ulp ) */
 
-    If ITYPE=2, then:   
+/*  If ITYPE=3, then: */
 
-       RESULT(1) = | A - V S V* | / ( |A| n ulp )   
+/*     RESULT(1) = | I - UV* | / ( n ulp ) */
 
-    If ITYPE=3, then:   
+/*  For ITYPE > 1, the transformation U is expressed as a product */
+/*  V = H(1)...H(n-2),  where H(j) = I  -  tau(j) v(j) v(j)*  and each */
+/*  vector v(j) has its first j elements 0 and the remaining n-j elements */
+/*  stored in V(j+1:n,j). */
 
-       RESULT(1) = | I - UV* | / ( n ulp )   
+/*  Arguments */
+/*  ========= */
 
-    For ITYPE > 1, the transformation U is expressed as a product   
-    V = H(1)...H(n-2),  where H(j) = I  -  tau(j) v(j) v(j)*  and each   
-    vector v(j) has its first j elements 0 and the remaining n-j elements   
-    stored in V(j+1:n,j).   
+/*  ITYPE   (input) INTEGER */
+/*          Specifies the type of tests to be performed. */
+/*          1: U expressed as a dense unitary matrix: */
+/*             RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and* */
+/*             RESULT(2) = | I - UU* | / ( n ulp ) */
 
-    Arguments   
-    =========   
+/*          2: U expressed as a product V of Housholder transformations: */
+/*             RESULT(1) = | A - V S V* | / ( |A| n ulp ) */
 
-    ITYPE   (input) INTEGER   
-            Specifies the type of tests to be performed.   
-            1: U expressed as a dense unitary matrix:   
-               RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and*   
-               RESULT(2) = | I - UU* | / ( n ulp )   
+/*          3: U expressed both as a dense unitary matrix and */
+/*             as a product of Housholder transformations: */
+/*             RESULT(1) = | I - UV* | / ( n ulp ) */
 
-            2: U expressed as a product V of Housholder transformations:   
-               RESULT(1) = | A - V S V* | / ( |A| n ulp )   
+/*  UPLO    (input) CHARACTER */
+/*          If UPLO='U', the upper triangle of A and V will be used and */
+/*          the (strictly) lower triangle will not be referenced. */
+/*          If UPLO='L', the lower triangle of A and V will be used and */
+/*          the (strictly) upper triangle will not be referenced. */
 
-            3: U expressed both as a dense unitary matrix and   
-               as a product of Housholder transformations:   
-               RESULT(1) = | I - UV* | / ( n ulp )   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, CHET21 does nothing. */
+/*          It must be at least zero. */
 
-    UPLO    (input) CHARACTER   
-            If UPLO='U', the upper triangle of A and V will be used and   
-            the (strictly) lower triangle will not be referenced.   
-            If UPLO='L', the lower triangle of A and V will be used and   
-            the (strictly) upper triangle will not be referenced.   
+/*  KBAND   (input) INTEGER */
+/*          The bandwidth of the matrix.  It may only be zero or one. */
+/*          If zero, then S is diagonal, and E is not referenced.  If */
+/*          one, then S is symmetric tri-diagonal. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, CHET21 does nothing.   
-            It must be at least zero.   
+/*  A       (input) COMPLEX array, dimension (LDA, N) */
+/*          The original (unfactored) matrix.  It is assumed to be */
+/*          hermitian, and only the upper (UPLO='U') or only the lower */
+/*          (UPLO='L') will be referenced. */
 
-    KBAND   (input) INTEGER   
-            The bandwidth of the matrix.  It may only be zero or one.   
-            If zero, then S is diagonal, and E is not referenced.  If   
-            one, then S is symmetric tri-diagonal.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) COMPLEX array, dimension (LDA, N)   
-            The original (unfactored) matrix.  It is assumed to be   
-            hermitian, and only the upper (UPLO='U') or only the lower   
-            (UPLO='L') will be referenced.   
+/*  D       (input) REAL array, dimension (N) */
+/*          The diagonal of the (symmetric tri-) diagonal matrix. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The off-diagonal of the (symmetric tri-) diagonal matrix. */
+/*          E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and */
+/*          (3,2) element, etc. */
+/*          Not referenced if KBAND=0. */
 
-    D       (input) REAL array, dimension (N)   
-            The diagonal of the (symmetric tri-) diagonal matrix.   
+/*  U       (input) COMPLEX array, dimension (LDU, N) */
+/*          If ITYPE=1 or 3, this contains the unitary matrix in */
+/*          the decomposition, expressed as a dense matrix.  If ITYPE=2, */
+/*          then it is not referenced. */
 
-    E       (input) REAL array, dimension (N-1)   
-            The off-diagonal of the (symmetric tri-) diagonal matrix.   
-            E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and   
-            (3,2) element, etc.   
-            Not referenced if KBAND=0.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) COMPLEX array, dimension (LDU, N)   
-            If ITYPE=1 or 3, this contains the unitary matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
-            then it is not referenced.   
+/*  V       (input) COMPLEX array, dimension (LDV, N) */
+/*          If ITYPE=2 or 3, the columns of this array contain the */
+/*          Householder vectors used to describe the unitary matrix */
+/*          in the decomposition.  If UPLO='L', then the vectors are in */
+/*          the lower triangle, if UPLO='U', then in the upper */
+/*          triangle. */
+/*          *NOTE* If ITYPE=2 or 3, V is modified and restored.  The */
+/*          subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') */
+/*          is set to one, and later reset to its original value, during */
+/*          the course of the calculation. */
+/*          If ITYPE=1, then it is neither referenced nor modified. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    V       (input) COMPLEX array, dimension (LDV, N)   
-            If ITYPE=2 or 3, the columns of this array contain the   
-            Householder vectors used to describe the unitary matrix   
-            in the decomposition.  If UPLO='L', then the vectors are in   
-            the lower triangle, if UPLO='U', then in the upper   
-            triangle.   
-            *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
-            is set to one, and later reset to its original value, during   
-            the course of the calculation.   
-            If ITYPE=1, then it is neither referenced nor modified.   
+/*  TAU     (input) COMPLEX array, dimension (N) */
+/*          If ITYPE >= 2, then TAU(j) is the scalar factor of */
+/*          v(j) v(j)* in the Householder transformation H(j) of */
+/*          the product  U = H(1)...H(n-2) */
+/*          If ITYPE < 2, then TAU is not referenced. */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  WORK    (workspace) COMPLEX array, dimension (2*N**2) */
 
-    TAU     (input) COMPLEX array, dimension (N)   
-            If ITYPE >= 2, then TAU(j) is the scalar factor of   
-            v(j) v(j)* in the Householder transformation H(j) of   
-            the product  U = H(1)...H(n-2)   
-            If ITYPE < 2, then TAU is not referenced.   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    WORK    (workspace) COMPLEX array, dimension (2*N**2)   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The values computed by the two tests described above.  The */
+/*          values are currently limited to 1/ulp, to avoid overflow. */
+/*          RESULT(1) is always modified.  RESULT(2) is modified only */
+/*          if ITYPE=1. */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The values computed by the two tests described above.  The   
-            values are currently limited to 1/ulp, to avoid overflow.   
-            RESULT(1) is always modified.  RESULT(2) is modified only   
-            if ITYPE=1.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --tau;
     --work;
@@ -245,9 +244,9 @@ static integer c__1 = 1;
 	return 0;
     }
 
-/*     Do Test 1   
+/*     Do Test 1 */
 
-       Norm of A: */
+/*     Norm of A: */
 
     if (*itype == 3) {
 	anorm = 1.f;
@@ -269,7 +268,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    r__1 = -d__[j];
-	    cher_(cuplo, n, &r__1, &u_ref(1, j), &c__1, &work[1], n);
+	    cher_(cuplo, n, &r__1, &u[j * u_dim1 + 1], &c__1, &work[1], n);
 /* L10: */
 	}
 
@@ -279,8 +278,8 @@ static integer c__1 = 1;
 		i__2 = j;
 		q__2.r = e[i__2], q__2.i = 0.f;
 		q__1.r = -q__2.r, q__1.i = -q__2.i;
-		cher2_(cuplo, n, &q__1, &u_ref(1, j), &c__1, &u_ref(1, j - 1),
-			 &c__1, &work[1], n);
+		cher2_(cuplo, n, &q__1, &u[j * u_dim1 + 1], &c__1, &u[(j - 1) 
+			* u_dim1 + 1], &c__1, &work[1], n);
 /* L20: */
 	    }
 	}
@@ -313,7 +312,7 @@ static integer c__1 = 1;
 			q__3.r = -tau[i__3].r, q__3.i = -tau[i__3].i;
 			i__4 = j;
 			q__2.r = e[i__4] * q__3.r, q__2.i = e[i__4] * q__3.i;
-			i__5 = v_subscr(jr, j);
+			i__5 = jr + j * v_dim1;
 			q__1.r = q__2.r * v[i__5].r - q__2.i * v[i__5].i, 
 				q__1.i = q__2.r * v[i__5].i + q__2.i * v[i__5]
 				.r;
@@ -322,17 +321,16 @@ static integer c__1 = 1;
 		    }
 		}
 
-		i__1 = v_subscr(j + 1, j);
+		i__1 = j + 1 + j * v_dim1;
 		vsave.r = v[i__1].r, vsave.i = v[i__1].i;
-		i__1 = v_subscr(j + 1, j);
+		i__1 = j + 1 + j * v_dim1;
 		v[i__1].r = 1.f, v[i__1].i = 0.f;
 		i__1 = *n - j;
 /* Computing 2nd power */
 		i__2 = *n;
-		clarfy_("L", &i__1, &v_ref(j + 1, j), &c__1, &tau[j], &work[(*
-			n + 1) * j + 1], n, &work[i__2 * i__2 + 1])
-			;
-		i__1 = v_subscr(j + 1, j);
+		clarfy_("L", &i__1, &v[j + 1 + j * v_dim1], &c__1, &tau[j], &
+			work[(*n + 1) * j + 1], n, &work[i__2 * i__2 + 1]);
+		i__1 = j + 1 + j * v_dim1;
 		v[i__1].r = vsave.r, v[i__1].i = vsave.i;
 		i__1 = (*n + 1) * (j - 1) + 1;
 		i__2 = j;
@@ -357,7 +355,7 @@ static integer c__1 = 1;
 			q__3.r = -tau[i__4].r, q__3.i = -tau[i__4].i;
 			i__5 = j;
 			q__2.r = e[i__5] * q__3.r, q__2.i = e[i__5] * q__3.i;
-			i__6 = v_subscr(jr, j + 1);
+			i__6 = jr + (j + 1) * v_dim1;
 			q__1.r = q__2.r * v[i__6].r - q__2.i * v[i__6].i, 
 				q__1.i = q__2.r * v[i__6].i + q__2.i * v[i__6]
 				.r;
@@ -366,15 +364,15 @@ static integer c__1 = 1;
 		    }
 		}
 
-		i__2 = v_subscr(j, j + 1);
+		i__2 = j + (j + 1) * v_dim1;
 		vsave.r = v[i__2].r, vsave.i = v[i__2].i;
-		i__2 = v_subscr(j, j + 1);
+		i__2 = j + (j + 1) * v_dim1;
 		v[i__2].r = 1.f, v[i__2].i = 0.f;
 /* Computing 2nd power */
 		i__2 = *n;
-		clarfy_("U", &j, &v_ref(1, j + 1), &c__1, &tau[j], &work[1], 
-			n, &work[i__2 * i__2 + 1]);
-		i__2 = v_subscr(j, j + 1);
+		clarfy_("U", &j, &v[(j + 1) * v_dim1 + 1], &c__1, &tau[j], &
+			work[1], n, &work[i__2 * i__2 + 1]);
+		i__2 = j + (j + 1) * v_dim1;
 		v[i__2].r = vsave.r, v[i__2].i = vsave.i;
 		i__2 = (*n + 1) * j + 1;
 		i__3 = j + 1;
@@ -390,7 +388,7 @@ static integer c__1 = 1;
 		for (jrow = jcol; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = a_subscr(jrow, jcol);
+		    i__5 = jrow + jcol * a_dim1;
 		    q__1.r = work[i__4].r - a[i__5].r, q__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -401,7 +399,7 @@ static integer c__1 = 1;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = a_subscr(jrow, jcol);
+		    i__5 = jrow + jcol * a_dim1;
 		    q__1.r = work[i__4].r - a[i__5].r, q__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -425,15 +423,15 @@ static integer c__1 = 1;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    cunm2r_("R", "C", n, &i__1, &i__2, &v_ref(2, 1), ldv, &tau[1], &
+	    cunm2r_("R", "C", n, &i__1, &i__2, &v[v_dim1 + 2], ldv, &tau[1], &
 		    work[*n + 1], n, &work[i__3 * i__3 + 1], &iinfo);
 	} else {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
 /* Computing 2nd power */
 	    i__3 = *n;
-	    cunm2l_("R", "C", n, &i__1, &i__2, &v_ref(1, 2), ldv, &tau[1], &
-		    work[1], n, &work[i__3 * i__3 + 1], &iinfo);
+	    cunm2l_("R", "C", n, &i__1, &i__2, &v[(v_dim1 << 1) + 1], ldv, &
+		    tau[1], &work[1], n, &work[i__3 * i__3 + 1], &iinfo);
 	}
 	if (iinfo != 0) {
 	    result[1] = 10.f / ulp;
@@ -444,7 +442,7 @@ static integer c__1 = 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = (*n + 1) * (j - 1) + 1;
 	    i__3 = (*n + 1) * (j - 1) + 1;
-	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i + 0.f;
+	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i - 0.f;
 	    work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L100: */
 	}
@@ -466,19 +464,19 @@ static integer c__1 = 1;
 	}
     }
 
-/*     Do Test 2   
+/*     Do Test 2 */
 
-       Compute  UU* - I */
+/*     Compute  UU* - I */
 
     if (*itype == 1) {
-	cgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu,
+	cgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, 
 		 &c_b1, &work[1], n);
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = (*n + 1) * (j - 1) + 1;
 	    i__3 = (*n + 1) * (j - 1) + 1;
-	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i + 0.f;
+	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i - 0.f;
 	    work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L110: */
 	}
@@ -494,12 +492,3 @@ static integer c__1 = 1;
 /*     End of CHET21 */
 
 } /* chet21_ */
-
-#undef v_ref
-#undef v_subscr
-#undef u_ref
-#undef u_subscr
-#undef a_ref
-#undef a_subscr
-
-

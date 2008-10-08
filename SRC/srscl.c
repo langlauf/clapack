@@ -1,53 +1,68 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int srscl_(integer *n, real *sa, real *sx, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SRSCL multiplies an n-element real vector x by the real scalar 1/a.   
-    This is done without overflow or underflow as long as   
-    the final result x/a does not overflow or underflow.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of components of the vector x.   
-
-    SA      (input) REAL   
-            The scalar a which is used to divide each component of x.   
-            SA must be >= 0, or the subroutine will divide by zero.   
-
-    SX      (input/output) REAL array, dimension   
-                           (1+(N-1)*abs(INCX))   
-            The n-element vector x.   
-
-    INCX    (input) INTEGER   
-            The increment between successive values of the vector SX.   
-            > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n   
-
-   =====================================================================   
-
-
-       Quick return if possible   
-
-       Parameter adjustments */
-    static real cden;
-    static logical done;
-    static real cnum, cden1, cnum1;
+    real mul, cden;
+    logical done;
+    real cnum, cden1, cnum1;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
 	    slabad_(real *, real *);
     extern doublereal slamch_(char *);
-    static real bignum, smlnum, mul;
+    real bignum, smlnum;
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SRSCL multiplies an n-element real vector x by the real scalar 1/a. */
+/*  This is done without overflow or underflow as long as */
+/*  the final result x/a does not overflow or underflow. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of components of the vector x. */
+
+/*  SA      (input) REAL */
+/*          The scalar a which is used to divide each component of x. */
+/*          SA must be >= 0, or the subroutine will divide by zero. */
+
+/*  SX      (input/output) REAL array, dimension */
+/*                         (1+(N-1)*abs(INCX)) */
+/*          The n-element vector x. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive values of the vector SX. */
+/*          > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n */
+
+/* ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Quick return if possible */
+
+    /* Parameter adjustments */
     --sx;
 
     /* Function Body */
@@ -104,4 +119,3 @@ L10:
 /*     End of SRSCL */
 
 } /* srscl_ */
-

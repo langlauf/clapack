@@ -1,19 +1,36 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sscal_(integer *n, real *sa, real *sx, integer *incx)
 {
     /* System generated locals */
     integer i__1, i__2;
+
     /* Local variables */
-    static integer i__, m, nincx, mp1;
-/*     scales a vector by a constant.   
-       uses unrolled loops for increment equal to 1.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, mp1, nincx;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     scales a vector by a constant. */
+/*     uses unrolled loops for increment equal to 1. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --sx;
+
     /* Function Body */
     if (*n <= 0 || *incx <= 0) {
 	return 0;
@@ -21,7 +38,9 @@
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
@@ -30,8 +49,12 @@
 /* L10: */
     }
     return 0;
-/*        code for increment equal to 1   
-          clean-up loop */
+
+/*        code for increment equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 5;
     if (m == 0) {
@@ -58,4 +81,3 @@ L40:
     }
     return 0;
 } /* sscal_ */
-

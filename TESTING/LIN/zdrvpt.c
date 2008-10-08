@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -33,7 +28,7 @@ static doublecomplex c_b62 = {0.,0.};
 
 /* Subroutine */ int zdrvpt_(logical *dotype, integer *nn, integer *nval, 
 	integer *nrhs, doublereal *thresh, logical *tsterr, doublecomplex *a, 
-	doublereal *d__, doublecomplex *e, doublecomplex *b, doublecomplex *x,
+	doublereal *d__, doublecomplex *e, doublecomplex *b, doublecomplex *x, 
 	 doublecomplex *xact, doublecomplex *work, doublereal *rwork, integer 
 	*nout)
 {
@@ -51,38 +46,40 @@ static doublecomplex c_b62 = {0.,0.};
     integer i__1, i__2, i__3, i__4, i__5;
     doublereal d__1, d__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double z_abs(doublecomplex *);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char fact[1];
-    static doublereal cond;
-    static integer mode;
-    static doublereal dmax__;
-    static integer imat, info;
-    static char path[3], dist[1], type__[1];
-    static integer nrun, i__, j, k, n, ifact;
+    integer i__, j, k, n;
+    doublereal z__[3];
+    integer k1, ia, in, kl, ku, ix, nt, lda;
+    char fact[1];
+    doublereal cond;
+    integer mode;
+    doublereal dmax__;
+    integer imat, info;
+    char path[3], dist[1], type__[1];
+    integer nrun, ifact;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer nfail, iseed[4];
-    static doublereal z__[3];
+    integer nfail, iseed[4];
     extern doublereal dget06_(doublereal *, doublereal *);
-    static doublereal rcond;
-    static integer nimat;
-    static doublereal anorm;
-    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *,
+    doublereal rcond;
+    integer nimat;
+    doublereal anorm;
+    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublereal *, doublereal *
-	    ), dcopy_(integer *, doublereal *, integer *, doublereal *, 
+), dcopy_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer izero, nerrs, k1;
+    integer izero, nerrs;
     extern /* Subroutine */ int zptt01_(integer *, doublereal *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublecomplex *, 
 	    doublereal *);
-    static logical zerot;
+    logical zerot;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *), zptt02_(char *, integer *, integer *,
+	    doublecomplex *, integer *), zptt02_(char *, integer *, integer *, 
 	     doublereal *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *), zptt05_(
 	    integer *, integer *, doublereal *, doublecomplex *, 
@@ -91,23 +88,19 @@ static doublecomplex c_b62 = {0.,0.};
 	    doublereal *), zptsv_(integer *, integer *, doublereal *, 
 	    doublecomplex *, doublecomplex *, integer *, integer *), zlatb4_(
 	    char *, integer *, integer *, integer *, char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, char *);
-    static integer ia;
-    extern /* Subroutine */ int aladhd_(integer *, char *);
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku, ix, nt;
+	    integer *, doublereal *, integer *, doublereal *, char *), aladhd_(integer *, char *), alaerh_(char 
+	    *, char *, integer *, integer *, char *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *);
     extern integer idamax_(integer *, doublereal *, integer *);
-    static doublereal rcondc;
+    doublereal rcondc;
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
-	    doublecomplex *, integer *), alasvm_(char *, integer *, integer *,
+	    doublecomplex *, integer *), alasvm_(char *, integer *, integer *, 
 	     integer *, integer *), dlarnv_(integer *, integer *, 
 	    integer *, doublereal *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern doublereal zlanht_(char *, integer *, doublereal *, doublecomplex *
-	    );
+);
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
     extern doublereal dzasum_(integer *, doublecomplex *, integer *);
@@ -119,16 +112,15 @@ static doublecomplex c_b62 = {0.,0.};
 	    integer *, doublereal *, doublereal *, integer *, integer *, char 
 	    *, doublecomplex *, integer *, doublecomplex *, integer *), zlarnv_(integer *, integer *, integer *, 
 	    doublecomplex *);
-    static doublereal result[6];
+    doublereal result[6];
     extern /* Subroutine */ int zpttrf_(integer *, doublereal *, 
 	    doublecomplex *, integer *), zerrvx_(char *, integer *), 
 	    zpttrs_(char *, integer *, integer *, doublereal *, doublecomplex 
-	    *, doublecomplex *, integer *, integer *), zptsvx_(char *,
+	    *, doublecomplex *, integer *, integer *), zptsvx_(char *, 
 	     integer *, integer *, doublereal *, doublecomplex *, doublereal *
-	    , doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
+, doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublereal *, doublereal *, doublereal *, 
 	    doublecomplex *, doublereal *, integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___35 = { 0, 0, 0, fmt_9999, 0 };
@@ -136,66 +128,86 @@ static doublecomplex c_b62 = {0.,0.};
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZDRVPT tests ZPTSV and -SVX.   
+/*  ZDRVPT tests ZPTSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) COMPLEX*16 array, dimension (NMAX*2)   
+/*  A       (workspace) COMPLEX*16 array, dimension (NMAX*2) */
 
-    D       (workspace) DOUBLE PRECISION array, dimension (NMAX*2)   
+/*  D       (workspace) DOUBLE PRECISION array, dimension (NMAX*2) */
 
-    E       (workspace) COMPLEX*16 array, dimension (NMAX*2)   
+/*  E       (workspace) COMPLEX*16 array, dimension (NMAX*2) */
 
-    B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) COMPLEX*16 array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --rwork;
     --work;
     --xact;
@@ -208,6 +220,8 @@ static doublecomplex c_b62 = {0.,0.};
     --dotype;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "PT", (ftnlen)2, (ftnlen)2);
@@ -255,8 +269,8 @@ static doublecomplex c_b62 = {0.,0.};
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Type 1-6:  generate a symmetric tridiagonal matrix of   
-                known condition number in lower triangular band storage. */
+/*              Type 1-6:  generate a symmetric tridiagonal matrix of */
+/*              known condition number in lower triangular band storage. */
 
 		s_copy(srnamc_1.srnamt, "ZLATMS", (ftnlen)6, (ftnlen)6);
 		zlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
@@ -292,8 +306,8 @@ static doublecomplex c_b62 = {0.,0.};
 		}
 	    } else {
 
-/*              Type 7-12:  generate a diagonally dominant matrix with   
-                unknown condition number in the vectors D and E. */
+/*              Type 7-12:  generate a diagonally dominant matrix with */
+/*              unknown condition number in the vectors D and E. */
 
 		if (! zerot || ! dotype[7]) {
 
@@ -333,8 +347,8 @@ static doublecomplex c_b62 = {0.,0.};
 
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back the zeroed out   
-                   elements. */
+/*                 Reuse the last matrix by copying back the zeroed out */
+/*                 elements. */
 
 		    if (izero == 1) {
 			d__[1] = z__[1];
@@ -354,8 +368,8 @@ static doublecomplex c_b62 = {0.,0.};
 		    }
 		}
 
-/*              For types 8-10, set one row and column of the matrix to   
-                zero. */
+/*              For types 8-10, set one row and column of the matrix to */
+/*              zero. */
 
 		izero = 0;
 		if (imat == 8) {
@@ -405,7 +419,7 @@ static doublecomplex c_b62 = {0.,0.};
 
 /*           Set the right hand side. */
 
-	    zlaptm_("Lower", &n, nrhs, &c_b24, &d__[1], &e[1], &xact[1], &lda,
+	    zlaptm_("Lower", &n, nrhs, &c_b24, &d__[1], &e[1], &xact[1], &lda, 
 		     &c_b25, &b[1], &lda);
 
 	    for (ifact = 1; ifact <= 2; ++ifact) {
@@ -415,8 +429,8 @@ static doublecomplex c_b62 = {0.,0.};
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison with   
-                the value returned by ZPTSVX. */
+/*              Compute the condition number for comparison with */
+/*              the value returned by ZPTSVX. */
 
 		if (zerot) {
 		    if (ifact == 1) {
@@ -440,8 +454,8 @@ static doublecomplex c_b62 = {0.,0.};
 
 		    zpttrf_(&n, &d__[n + 1], &e[n + 1], &info);
 
-/*                 Use ZPTTRS to solve for one column at a time of   
-                   inv(A), computing the maximum column sum as we go. */
+/*                 Use ZPTTRS to solve for one column at a time of */
+/*                 inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.;
 		    i__3 = n;
@@ -498,8 +512,8 @@ static doublecomplex c_b62 = {0.,0.};
 		    nt = 0;
 		    if (izero == 0) {
 
-/*                    Check the factorization by computing the ratio   
-                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
+/*                    Check the factorization by computing the ratio */
+/*                       norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			zptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
 				work[1], result);
@@ -517,8 +531,8 @@ static doublecomplex c_b62 = {0.,0.};
 			nt = 3;
 		    }
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    i__3 = nt;
 		    for (k = 1; k <= i__3; ++k) {
@@ -565,12 +579,12 @@ static doublecomplex c_b62 = {0.,0.};
 
 		zlaset_("Full", &n, nrhs, &c_b62, &c_b62, &x[1], &lda);
 
-/*              Solve the system and compute the condition number and   
-                error bounds using ZPTSVX. */
+/*              Solve the system and compute the condition number and */
+/*              error bounds using ZPTSVX. */
 
 		s_copy(srnamc_1.srnamt, "ZPTSVX", (ftnlen)6, (ftnlen)6);
 		zptsvx_(fact, &n, nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1]
-			, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
+, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
 			*nrhs + 1], &work[1], &rwork[(*nrhs << 1) + 1], &info);
 
 /*              Check the error code from ZPTSVX. */
@@ -582,8 +596,8 @@ static doublecomplex c_b62 = {0.,0.};
 		if (izero == 0) {
 		    if (ifact == 2) {
 
-/*                    Check the factorization by computing the ratio   
-                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
+/*                    Check the factorization by computing the ratio */
+/*                       norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			k1 = 1;
 			zptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
@@ -606,7 +620,7 @@ static doublecomplex c_b62 = {0.,0.};
 /*                 Check error bounds from iterative refinement. */
 
 		    zptt05_(&n, nrhs, &d__[1], &e[1], &b[1], &lda, &x[1], &
-			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1],
+			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1], 
 			     &result[3]);
 		} else {
 		    k1 = 6;
@@ -616,8 +630,8 @@ static doublecomplex c_b62 = {0.,0.};
 
 		result[5] = dget06_(&rcond, &rcondc);
 
-/*              Print information about the tests that did not pass   
-                the threshold. */
+/*              Print information about the tests that did not pass */
+/*              the threshold. */
 
 		for (k = k1; k <= 6; ++k) {
 		    if (result[k - 1] >= *thresh) {
@@ -657,4 +671,3 @@ L110:
 /*     End of ZDRVPT */
 
 } /* zdrvpt_ */
-

@@ -1,37 +1,44 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 logical lsame_(char *ca, char *cb)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    LSAME returns .TRUE. if CA is the same letter as CB regardless of   
-    case.   
-
-    Arguments   
-    =========   
-
-    CA      (input) CHARACTER*1   
-    CB      (input) CHARACTER*1   
-            CA and CB specify the single characters to be compared.   
-
-   ===================================================================== 
-  
-
-
-       Test if the characters are equal */
     /* System generated locals */
     logical ret_val;
-    /* Local variables */
-    static integer inta, intb, zcode;
 
+    /* Local variables */
+    integer inta, intb, zcode;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  LSAME returns .TRUE. if CA is the same letter as CB regardless of */
+/*  case. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  CA      (input) CHARACTER*1 */
+
+/*  CB      (input) CHARACTER*1 */
+/*          CA and CB specify the single characters to be compared. */
+
+/* ===================================================================== */
+
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+
+/*     Test if the characters are equal */
 
     ret_val = *(unsigned char *)ca == *(unsigned char *)cb;
     if (ret_val) {
@@ -42,19 +49,18 @@ logical lsame_(char *ca, char *cb)
 
     zcode = 'Z';
 
-/*     Use 'Z' rather than 'A' so that ASCII can be detected on Prime   
-       machines, on which ICHAR returns a value with bit 8 set.   
-       ICHAR('A') on Prime machines returns 193 which is the same as   
-       ICHAR('A') on an EBCDIC machine. */
+/*     Use 'Z' rather than 'A' so that ASCII can be detected on Prime */
+/*     machines, on which ICHAR returns a value with bit 8 set. */
+/*     ICHAR('A') on Prime machines returns 193 which is the same as */
+/*     ICHAR('A') on an EBCDIC machine. */
 
     inta = *(unsigned char *)ca;
     intb = *(unsigned char *)cb;
 
     if (zcode == 90 || zcode == 122) {
 
-/*        ASCII is assumed - ZCODE is the ASCII code of either lower o
-r   
-          upper case 'Z'. */
+/*        ASCII is assumed - ZCODE is the ASCII code of either lower or */
+/*        upper case 'Z'. */
 
 	if (inta >= 97 && inta <= 122) {
 	    inta += -32;
@@ -65,9 +71,8 @@ r
 
     } else if (zcode == 233 || zcode == 169) {
 
-/*        EBCDIC is assumed - ZCODE is the EBCDIC code of either lower
- or   
-          upper case 'Z'. */
+/*        EBCDIC is assumed - ZCODE is the EBCDIC code of either lower or */
+/*        upper case 'Z'. */
 
 	if (inta >= 129 && inta <= 137 || inta >= 145 && inta <= 153 || inta 
 		>= 162 && inta <= 169) {
@@ -80,9 +85,8 @@ r
 
     } else if (zcode == 218 || zcode == 250) {
 
-/*        ASCII is assumed, on Prime machines - ZCODE is the ASCII cod
-e   
-          plus 128 of either lower or upper case 'Z'. */
+/*        ASCII is assumed, on Prime machines - ZCODE is the ASCII code */
+/*        plus 128 of either lower or upper case 'Z'. */
 
 	if (inta >= 225 && inta <= 250) {
 	    inta += -32;
@@ -93,10 +97,9 @@ e
     }
     ret_val = inta == intb;
 
-/*     RETURN   
+/*     RETURN */
 
-       End of LSAME */
+/*     End of LSAME */
 
     return ret_val;
 } /* lsame_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -49,46 +44,43 @@ static integer c__3 = 3;
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static doublereal cond;
-    static integer jcol, nmax;
-    static doublereal unfl, ovfl;
-    static char uplo[1];
-    static integer i__, j, m, n;
-    static logical badnn;
-    static integer imode;
+    integer i__, j, m, n, ka, kb, ij, il, iu;
+    doublereal vl, vu;
+    integer ka9, kb9;
+    doublereal ulp, cond;
+    integer jcol, nmax;
+    doublereal unfl, ovfl;
+    char uplo[1];
+    logical badnn;
+    integer imode;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dsgt01_(integer *, char *, integer *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
+	    *, doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, doublereal *, doublereal *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int dsbgv_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    static doublereal aninv, anorm;
-    static integer itemp, nmats;
+    doublereal aninv, anorm;
+    integer itemp, nmats;
     extern /* Subroutine */ int dspgv_(integer *, char *, char *, integer *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *, 
 	     doublereal *, integer *);
-    static integer jsize, nerrs, itype, jtype, ntest;
+    integer jsize, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int dsygv_(integer *, char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, integer *);
-    static integer iseed2[4];
+    integer iseed2[4];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer ka, kb, ij, il;
-    extern doublereal dlamch_(char *);
-    static integer iu;
-    static doublereal vl;
-    extern doublereal dlarnd_(integer *, integer *);
+    extern doublereal dlamch_(char *), dlarnd_(integer *, integer *);
     extern /* Subroutine */ int dsbgvd_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, integer *, integer *);
-    static doublereal vu;
-    static integer idumma[1];
+    integer idumma[1];
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int dlafts_(char *, integer *, integer *, integer 
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *), dlaset_(char *, integer *, integer *, 
@@ -99,16 +91,16 @@ static integer c__3 = 3;
 	    *, doublereal *, integer *, doublereal *, char *, integer *, 
 	    integer *, integer *, doublereal *, doublereal *, char *, 
 	    doublereal *, integer *, integer *, integer *);
-    static doublereal abstol;
+    doublereal abstol;
     extern /* Subroutine */ int dlasum_(char *, integer *, integer *, integer 
 	    *), dlatms_(integer *, integer *, char *, integer *, char 
-	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
+	    *, doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *, char *, doublereal *, integer *, doublereal *, 
 	    integer *), dspgvd_(integer *, char *, 
 	    char *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *);
-    static integer ibuplo, ibtype;
+    integer ibuplo, ibtype;
     extern /* Subroutine */ int dsbgvx_(char *, char *, char *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
@@ -118,20 +110,18 @@ static integer c__3 = 3;
 	    char *, integer *, doublereal *, integer *, doublereal *, integer 
 	    *, doublereal *, doublereal *, integer *, integer *, integer *, 
 	    integer *);
-    static integer ka9, kb9;
-    static doublereal rtunfl, rtovfl, ulpinv;
+    doublereal rtunfl, rtovfl, ulpinv;
     extern /* Subroutine */ int dspgvx_(integer *, char *, char *, char *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *, 
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *);
-    static integer mtypes, ntestt;
+    integer mtypes, ntestt;
     extern /* Subroutine */ int dsygvx_(integer *, char *, char *, char *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, integer *);
-    static doublereal ulp;
 
     /* Fortran I/O blocks */
     static cilist io___36 = { 0, 0, 0, fmt_9999, 0 };
@@ -153,355 +143,365 @@ static integer c__3 = 3;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
-#define bb_ref(a_1,a_2) bb[(a_2)*bb_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/* ****************************************************************** */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*     modified August 1997, a new parameter LIWORK is added */
+/*     in the calling sequence. */
 
-   ******************************************************************   
+/*     test routine DDGT01 is also modified */
 
-       modified August 1997, a new parameter LIWORK is added   
-       in the calling sequence.   
+/* ****************************************************************** */
 
-       test routine DDGT01 is also modified   
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-   ******************************************************************   
+/*  Purpose */
+/*  ======= */
 
+/*       DDRVSG checks the real symmetric generalized eigenproblem */
+/*       drivers. */
 
-    Purpose   
-    =======   
+/*               DSYGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem. */
 
-         DDRVSG checks the real symmetric generalized eigenproblem   
-         drivers.   
+/*               DSYGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem using a divide and conquer algorithm. */
 
-                 DSYGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem.   
+/*               DSYGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem. */
 
-                 DSYGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem using a divide and conquer algorithm.   
+/*               DSPGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem in packed storage. */
 
-                 DSYGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem.   
+/*               DSPGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem in packed storage using a divide and */
+/*               conquer algorithm. */
 
-                 DSPGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem in packed storage.   
+/*               DSPGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite generalized */
+/*               eigenproblem in packed storage. */
 
-                 DSPGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem in packed storage using a divide and   
-                 conquer algorithm.   
+/*               DSBGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite banded */
+/*               generalized eigenproblem. */
 
-                 DSPGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite generalized   
-                 eigenproblem in packed storage.   
+/*               DSBGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite banded */
+/*               generalized eigenproblem using a divide and conquer */
+/*               algorithm. */
 
-                 DSBGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite banded   
-                 generalized eigenproblem.   
+/*               DSBGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric-definite banded */
+/*               generalized eigenproblem. */
 
-                 DSBGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite banded   
-                 generalized eigenproblem using a divide and conquer   
-                 algorithm.   
+/*       When DDRVSG is called, a number of matrix "sizes" ("n's") and a */
+/*       number of matrix "types" are specified.  For each size ("n") */
+/*       and each type of matrix, one matrix A of the given type will be */
+/*       generated; a random well-conditioned matrix B is also generated */
+/*       and the pair (A,B) is used to test the drivers. */
 
-                 DSBGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric-definite banded   
-                 generalized eigenproblem.   
+/*       For each pair (A,B), the following tests are performed: */
 
-         When DDRVSG is called, a number of matrix "sizes" ("n's") and a   
-         number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix A of the given type will be   
-         generated; a random well-conditioned matrix B is also generated   
-         and the pair (A,B) is used to test the drivers.   
+/*       (1) DSYGV with ITYPE = 1 and UPLO ='U': */
 
-         For each pair (A,B), the following tests are performed:   
+/*               | A Z - B Z D | / ( |A| |Z| n ulp ) */
 
-         (1) DSYGV with ITYPE = 1 and UPLO ='U':   
-
-                 | A Z - B Z D | / ( |A| |Z| n ulp )   
-
-         (2) as (1) but calling DSPGV   
-         (3) as (1) but calling DSBGV   
-         (4) as (1) but with UPLO = 'L'   
-         (5) as (4) but calling DSPGV   
-         (6) as (4) but calling DSBGV   
-
-         (7) DSYGV with ITYPE = 2 and UPLO ='U':   
-
-                 | A B Z - Z D | / ( |A| |Z| n ulp )   
-
-         (8) as (7) but calling DSPGV   
-         (9) as (7) but with UPLO = 'L'   
-         (10) as (9) but calling DSPGV   
-
-         (11) DSYGV with ITYPE = 3 and UPLO ='U':   
-
-                 | B A Z - Z D | / ( |A| |Z| n ulp )   
-
-         (12) as (11) but calling DSPGV   
-         (13) as (11) but with UPLO = 'L'   
-         (14) as (13) but calling DSPGV   
-
-         DSYGVD, DSPGVD and DSBGVD performed the same 14 tests.   
-
-         DSYGVX, DSPGVX and DSBGVX performed the above 14 tests with   
-         the parameter RANGE = 'A', 'N' and 'I', respectively.   
-
-         The "sizes" are specified by an array NN(1:NSIZES); the value   
-         of each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-         This type is used for the matrix A which has half-bandwidth KA.   
-         B is generated as a well-conditioned positive definite matrix   
-         with half-bandwidth KB (<= KA).   
-         Currently, the list of possible types for A is:   
-
-         (1)  The zero matrix.   
-         (2)  The identity matrix.   
-
-         (3)  A diagonal matrix with evenly spaced entries   
-              1, ..., ULP  and random signs.   
-              (ULP = (first number larger than 1) - 1 )   
-         (4)  A diagonal matrix with geometrically spaced entries   
-              1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries   
-              1, ULP, ..., ULP and random signs.   
-
-         (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-         (8)  A matrix of the form  U* D U, where U is orthogonal and   
-              D has evenly spaced entries 1, ..., ULP with random signs   
-              on the diagonal.   
-
-         (9)  A matrix of the form  U* D U, where U is orthogonal and   
-              D has geometrically spaced entries 1, ..., ULP with random   
-              signs on the diagonal.   
-
-         (10) A matrix of the form  U* D U, where U is orthogonal and   
-              D has "clustered" entries 1, ULP,..., ULP with random   
-              signs on the diagonal.   
-
-         (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-         (13) symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-         (15) Same as (13), but multiplied by SQRT( underflow threshold)   
-
-         (16) Same as (8), but with KA = 1 and KB = 1   
-         (17) Same as (8), but with KA = 2 and KB = 1   
-         (18) Same as (8), but with KA = 2 and KB = 2   
-         (19) Same as (8), but with KA = 3 and KB = 1   
-         (20) Same as (8), but with KA = 3 and KB = 2   
-         (21) Same as (8), but with KA = 3 and KB = 3   
-
-    Arguments   
-    =========   
-
-    NSIZES  INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            DDRVSG does nothing.  It must be at least zero.   
-            Not modified.   
-
-    NN      INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-            Not modified.   
-
-    NTYPES  INTEGER   
-            The number of elements in DOTYPE.   If it is zero, DDRVSG   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-            Not modified.   
-
-    DOTYPE  LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-            Not modified.   
-
-    ISEED   INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to DDRVSG to continue the same random number   
-            sequence.   
-            Modified.   
-
-    THRESH  DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-            Not modified.   
-
-    NOUNIT  INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-            Not modified.   
-
-    A       DOUBLE PRECISION array, dimension (LDA , max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDA     INTEGER   
-            The leading dimension of A and AB.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    B       DOUBLE PRECISION array, dimension (LDB , max(NN))   
-            Used to hold the symmetric positive definite matrix for   
-            the generailzed problem.   
-            On exit, B contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDB     INTEGER   
-            The leading dimension of B and BB.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    D       DOUBLE PRECISION array, dimension (max(NN))   
-            The eigenvalues of A. On exit, the eigenvalues in D   
-            correspond with the matrix in A.   
-            Modified.   
-
-    Z       DOUBLE PRECISION array, dimension (LDZ, max(NN))   
-            The matrix of eigenvectors.   
-            Modified.   
-
-    LDZ     INTEGER   
-            The leading dimension of Z.  It must be at least 1 and   
-            at least max( NN ).   
-            Not modified.   
-
-    AB      DOUBLE PRECISION array, dimension (LDA, max(NN))   
-            Workspace.   
-            Modified.   
-
-    BB      DOUBLE PRECISION array, dimension (LDB, max(NN))   
-            Workspace.   
-            Modified.   
-
-    AP      DOUBLE PRECISION array, dimension (max(NN)**2)   
-            Workspace.   
-            Modified.   
-
-    BP      DOUBLE PRECISION array, dimension (max(NN)**2)   
-            Workspace.   
-            Modified.   
-
-    WORK    DOUBLE PRECISION array, dimension (NWORK)   
-            Workspace.   
-            Modified.   
-
-    NWORK   INTEGER   
-            The number of entries in WORK.  This must be at least   
-            1+5*N+2*N*lg(N)+3*N**2 where N = max( NN(j) ) and   
-            lg( N ) = smallest integer k such that 2**k >= N.   
-            Not modified.   
-
-    IWORK   INTEGER array, dimension (LIWORK)   
-            Workspace.   
-            Modified.   
-
-    LIWORK  INTEGER   
-            The number of entries in WORK.  This must be at least 6*N.   
-            Not modified.   
-
-    RESULT  DOUBLE PRECISION array, dimension (70)   
-            The values computed by the 70 tests described above.   
-            Modified.   
-
-    INFO    INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDZ < 1 or LDZ < NMAX.   
-            -21: NWORK too small.   
-            -23: LIWORK too small.   
-            If  DLATMR, SLATMS, DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD,   
-                DSBGVD, DSYGVX, DSPGVX or SSBGVX returns an error code,   
-                the absolute value of it is returned.   
-            Modified.   
-
-   ----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests that have been run   
-                         on this matrix.   
-         NTESTT          The total number of tests for this call.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far (computed by DLAFTS).   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*       (2) as (1) but calling DSPGV */
+/*       (3) as (1) but calling DSBGV */
+/*       (4) as (1) but with UPLO = 'L' */
+/*       (5) as (4) but calling DSPGV */
+/*       (6) as (4) but calling DSBGV */
+
+/*       (7) DSYGV with ITYPE = 2 and UPLO ='U': */
+
+/*               | A B Z - Z D | / ( |A| |Z| n ulp ) */
+
+/*       (8) as (7) but calling DSPGV */
+/*       (9) as (7) but with UPLO = 'L' */
+/*       (10) as (9) but calling DSPGV */
+
+/*       (11) DSYGV with ITYPE = 3 and UPLO ='U': */
+
+/*               | B A Z - Z D | / ( |A| |Z| n ulp ) */
+
+/*       (12) as (11) but calling DSPGV */
+/*       (13) as (11) but with UPLO = 'L' */
+/*       (14) as (13) but calling DSPGV */
+
+/*       DSYGVD, DSPGVD and DSBGVD performed the same 14 tests. */
+
+/*       DSYGVX, DSPGVX and DSBGVX performed the above 14 tests with */
+/*       the parameter RANGE = 'A', 'N' and 'I', respectively. */
+
+/*       The "sizes" are specified by an array NN(1:NSIZES); the value */
+/*       of each element NN(j) specifies one size. */
+/*       The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*       This type is used for the matrix A which has half-bandwidth KA. */
+/*       B is generated as a well-conditioned positive definite matrix */
+/*       with half-bandwidth KB (<= KA). */
+/*       Currently, the list of possible types for A is: */
+
+/*       (1)  The zero matrix. */
+/*       (2)  The identity matrix. */
+
+/*       (3)  A diagonal matrix with evenly spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*            (ULP = (first number larger than 1) - 1 ) */
+/*       (4)  A diagonal matrix with geometrically spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*       (5)  A diagonal matrix with "clustered" entries */
+/*            1, ULP, ..., ULP and random signs. */
+
+/*       (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*       (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*       (8)  A matrix of the form  U* D U, where U is orthogonal and */
+/*            D has evenly spaced entries 1, ..., ULP with random signs */
+/*            on the diagonal. */
+
+/*       (9)  A matrix of the form  U* D U, where U is orthogonal and */
+/*            D has geometrically spaced entries 1, ..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (10) A matrix of the form  U* D U, where U is orthogonal and */
+/*            D has "clustered" entries 1, ULP,..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*       (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*       (13) symmetric matrix with random entries chosen from (-1,1). */
+/*       (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*       (15) Same as (13), but multiplied by SQRT( underflow threshold) */
+
+/*       (16) Same as (8), but with KA = 1 and KB = 1 */
+/*       (17) Same as (8), but with KA = 2 and KB = 1 */
+/*       (18) Same as (8), but with KA = 2 and KB = 2 */
+/*       (19) Same as (8), but with KA = 3 and KB = 1 */
+/*       (20) Same as (8), but with KA = 3 and KB = 2 */
+/*       (21) Same as (8), but with KA = 3 and KB = 3 */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          DDRVSG does nothing.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NN      INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+/*          Not modified. */
+
+/*  NTYPES  INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, DDRVSG */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+/*          Not modified. */
+
+/*  DOTYPE  LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+/*          Not modified. */
+
+/*  ISEED   INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to DDRVSG to continue the same random number */
+/*          sequence. */
+/*          Modified. */
+
+/*  THRESH  DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NOUNIT  INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+/*          Not modified. */
+
+/*  A       DOUBLE PRECISION array, dimension (LDA , max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDA     INTEGER */
+/*          The leading dimension of A and AB.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  B       DOUBLE PRECISION array, dimension (LDB , max(NN)) */
+/*          Used to hold the symmetric positive definite matrix for */
+/*          the generailzed problem. */
+/*          On exit, B contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDB     INTEGER */
+/*          The leading dimension of B and BB.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  D       DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The eigenvalues of A. On exit, the eigenvalues in D */
+/*          correspond with the matrix in A. */
+/*          Modified. */
+
+/*  Z       DOUBLE PRECISION array, dimension (LDZ, max(NN)) */
+/*          The matrix of eigenvectors. */
+/*          Modified. */
+
+/*  LDZ     INTEGER */
+/*          The leading dimension of Z.  It must be at least 1 and */
+/*          at least max( NN ). */
+/*          Not modified. */
+
+/*  AB      DOUBLE PRECISION array, dimension (LDA, max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  BB      DOUBLE PRECISION array, dimension (LDB, max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  AP      DOUBLE PRECISION array, dimension (max(NN)**2) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  BP      DOUBLE PRECISION array, dimension (max(NN)**2) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  WORK    DOUBLE PRECISION array, dimension (NWORK) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  NWORK   INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          1+5*N+2*N*lg(N)+3*N**2 where N = max( NN(j) ) and */
+/*          lg( N ) = smallest integer k such that 2**k >= N. */
+/*          Not modified. */
+
+/*  IWORK   INTEGER array, dimension (LIWORK) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LIWORK  INTEGER */
+/*          The number of entries in WORK.  This must be at least 6*N. */
+/*          Not modified. */
+
+/*  RESULT  DOUBLE PRECISION array, dimension (70) */
+/*          The values computed by the 70 tests described above. */
+/*          Modified. */
+
+/*  INFO    INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -16: LDZ < 1 or LDZ < NMAX. */
+/*          -21: NWORK too small. */
+/*          -23: LIWORK too small. */
+/*          If  DLATMR, SLATMS, DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD, */
+/*              DSBGVD, DSYGVX, DSPGVX or SSBGVX returns an error code, */
+/*              the absolute value of it is returned. */
+/*          Modified. */
+
+/* ---------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests that have been run */
+/*                       on this matrix. */
+/*       NTESTT          The total number of tests for this call. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far (computed by DLAFTS). */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ab_dim1 = *lda;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bb_dim1 = *ldb;
-    bb_offset = 1 + bb_dim1 * 1;
+    bb_offset = 1 + bb_dim1;
     bb -= bb_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --d__;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --ap;
     --bp;
@@ -509,9 +509,11 @@ static integer c__3 = 3;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       1)      Check for errors */
+/*     1)      Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -613,20 +615,20 @@ static integer c__3 = 3;
 /* L30: */
 	    }
 
-/*           2)      Compute "A"   
+/*           2)      Compute "A" */
 
-                     Control parameters:   
+/*                   Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, w/ eigenvalues   
-             =5         random log   hermitian, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random hermitian   
-             =9                      banded, w/ eigenvalues */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, w/ eigenvalues */
+/*           =5         random log   hermitian, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random hermitian */
+/*           =9                      banded, w/ eigenvalues */
 
 	    if (mtypes > 21) {
 		goto L90;
@@ -679,7 +681,7 @@ L70:
 		dlaset_("Full", lda, &n, &c_b18, &c_b18, &a[a_offset], lda);
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 /* L80: */
 		}
 
@@ -695,9 +697,9 @@ L70:
 
 	    } else if (itype == 5) {
 
-/*              symmetric, eigenvalues specified   
+/*              symmetric, eigenvalues specified */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 0, i__4 = n - 1;
 		ka = max(i__3,i__4);
 		kb = ka;
@@ -719,9 +721,9 @@ L70:
 
 	    } else if (itype == 8) {
 
-/*              symmetric, random eigenvalues   
+/*              symmetric, random eigenvalues */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 0, i__4 = n - 1;
 		ka = max(i__3,i__4);
 		kb = ka;
@@ -733,35 +735,35 @@ L70:
 
 	    } else if (itype == 9) {
 
-/*              symmetric banded, eigenvalues specified   
+/*              symmetric banded, eigenvalues specified */
 
-                The following values are used for the half-bandwidths:   
+/*              The following values are used for the half-bandwidths: */
 
-                  ka = 1   kb = 1   
-                  ka = 2   kb = 1   
-                  ka = 2   kb = 2   
-                  ka = 3   kb = 1   
-                  ka = 3   kb = 2   
-                  ka = 3   kb = 3 */
+/*                ka = 1   kb = 1 */
+/*                ka = 2   kb = 1 */
+/*                ka = 2   kb = 2 */
+/*                ka = 3   kb = 1 */
+/*                ka = 3   kb = 2 */
+/*                ka = 3   kb = 3 */
 
 		++kb9;
 		if (kb9 > ka9) {
 		    ++ka9;
 		    kb9 = 1;
 		}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 		i__5 = n - 1;
 		i__3 = 0, i__4 = min(i__5,ka9);
 		ka = max(i__3,i__4);
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 		i__5 = n - 1;
 		i__3 = 0, i__4 = min(i__5,kb9);
 		kb = max(i__3,i__4);
 		dlatms_(&n, &n, "S", &iseed[1], "S", &work[1], &imode, &cond, 
 			&anorm, &ka, &ka, "N", &a[a_offset], lda, &work[n + 1]
-			, &iinfo);
+, &iinfo);
 
 	    } else {
 
@@ -797,13 +799,13 @@ L90:
 		}
 	    }
 
-/*           3) Call DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD, SSBGVD,   
-                DSYGVX, DSPGVX, and DSBGVX, do tests.   
+/*           3) Call DSYGV, DSPGV, DSBGV, SSYGVD, SSPGVD, SSBGVD, */
+/*              DSYGVX, DSPGVX, and DSBGVX, do tests. */
 
-             loop over the three generalized problems   
-                   IBTYPE = 1: A*x = (lambda)*B*x   
-                   IBTYPE = 2: A*B*x = (lambda)*x   
-                   IBTYPE = 3: B*A*x = (lambda)*x */
+/*           loop over the three generalized problems */
+/*                 IBTYPE = 1: A*x = (lambda)*B*x */
+/*                 IBTYPE = 2: A*B*x = (lambda)*x */
+/*                 IBTYPE = 3: B*A*x = (lambda)*x */
 
 	    for (ibtype = 1; ibtype <= 3; ++ibtype) {
 
@@ -817,8 +819,8 @@ L90:
 			*(unsigned char *)uplo = 'L';
 		    }
 
-/*                 Generate random well-conditioned positive definite   
-                   matrix B, of bandwidth not greater than that of A. */
+/*                 Generate random well-conditioned positive definite */
+/*                 matrix B, of bandwidth not greater than that of A. */
 
 		    dlatms_(&n, &n, "U", &iseed[1], "P", &work[1], &c__5, &
 			    c_b82, &c_b35, &kb, &kb, uplo, &b[b_offset], ldb, 
@@ -922,7 +924,7 @@ L90:
 
 		    dsygvx_(&ibtype, "V", "A", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___49.ciunit = *nounit;
@@ -963,16 +965,16 @@ L90:
 		    dlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
 			    ldb);
 
-/*                 since we do not know the exact eigenvalues of this   
-                   eigenpair, we just set VL and VU as constants.   
-                   It is quite possible that there are no eigenvalues   
-                   in this interval. */
+/*                 since we do not know the exact eigenvalues of this */
+/*                 eigenpair, we just set VL and VU as constants. */
+/*                 It is quite possible that there are no eigenvalues */
+/*                 in this interval. */
 
 		    vl = 0.;
 		    vu = anorm;
 		    dsygvx_(&ibtype, "V", "V", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___50.ciunit = *nounit;
@@ -1015,7 +1017,7 @@ L90:
 
 		    dsygvx_(&ibtype, "V", "I", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___51.ciunit = *nounit;
@@ -1063,8 +1065,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L110: */
 			    }
@@ -1076,8 +1078,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L130: */
 			    }
@@ -1131,8 +1133,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L150: */
 			    }
@@ -1144,8 +1146,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L170: */
 			    }
@@ -1200,8 +1202,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L190: */
 			    }
@@ -1213,8 +1215,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L210: */
 			    }
@@ -1225,7 +1227,7 @@ L100:
 		    dspgvx_(&ibtype, "V", "A", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
-			    , info);
+, info);
 		    if (iinfo != 0) {
 			io___55.ciunit = *nounit;
 			s_wsfe(&io___55);
@@ -1268,8 +1270,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L230: */
 			    }
@@ -1281,8 +1283,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L250: */
 			    }
@@ -1295,7 +1297,7 @@ L100:
 		    dspgvx_(&ibtype, "V", "V", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
-			    , info);
+, info);
 		    if (iinfo != 0) {
 			io___56.ciunit = *nounit;
 			s_wsfe(&io___56);
@@ -1338,8 +1340,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L270: */
 			    }
@@ -1351,8 +1353,8 @@ L100:
 			for (j = 1; j <= i__3; ++j) {
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
-				ap[ij] = a_ref(i__, j);
-				bp[ij] = b_ref(i__, j);
+				ap[ij] = a[i__ + j * a_dim1];
+				bp[ij] = b[i__ + j * b_dim1];
 				++ij;
 /* L290: */
 			    }
@@ -1363,7 +1365,7 @@ L100:
 		    dspgvx_(&ibtype, "V", "I", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &iwork[n + 1], &iwork[1]
-			    , info);
+, info);
 		    if (iinfo != 0) {
 			io___57.ciunit = *nounit;
 			s_wsfe(&io___57);
@@ -1414,8 +1416,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
-					    j);
+				    ab[ka + 1 + i__ - j + j * ab_dim1] = a[
+					    i__ + j * a_dim1];
 /* L320: */
 				}
 /* Computing MAX */
@@ -1423,8 +1425,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
-					    j);
+				    bb[kb + 1 + i__ - j + j * bb_dim1] = b[
+					    i__ + j * b_dim1];
 /* L330: */
 				}
 /* L340: */
@@ -1436,14 +1438,16 @@ L310:
 				i__7 = n, i__4 = j + ka;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+				    ab[i__ + 1 - j + j * ab_dim1] = a[i__ + j 
+					    * a_dim1];
 /* L350: */
 				}
 /* Computing MIN */
 				i__7 = n, i__4 = j + kb;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+				    bb[i__ + 1 - j + j * bb_dim1] = b[i__ + j 
+					    * b_dim1];
 /* L360: */
 				}
 /* L370: */
@@ -1500,8 +1504,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
-					    j);
+				    ab[ka + 1 + i__ - j + j * ab_dim1] = a[
+					    i__ + j * a_dim1];
 /* L380: */
 				}
 /* Computing MAX */
@@ -1509,8 +1513,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
-					    j);
+				    bb[kb + 1 + i__ - j + j * bb_dim1] = b[
+					    i__ + j * b_dim1];
 /* L390: */
 				}
 /* L400: */
@@ -1522,14 +1526,16 @@ L310:
 				i__4 = n, i__5 = j + ka;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+				    ab[i__ + 1 - j + j * ab_dim1] = a[i__ + j 
+					    * a_dim1];
 /* L410: */
 				}
 /* Computing MIN */
 				i__4 = n, i__5 = j + kb;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+				    bb[i__ + 1 - j + j * bb_dim1] = b[i__ + j 
+					    * b_dim1];
 /* L420: */
 				}
 /* L430: */
@@ -1587,8 +1593,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
-					    j);
+				    ab[ka + 1 + i__ - j + j * ab_dim1] = a[
+					    i__ + j * a_dim1];
 /* L440: */
 				}
 /* Computing MAX */
@@ -1596,8 +1602,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
-					    j);
+				    bb[kb + 1 + i__ - j + j * bb_dim1] = b[
+					    i__ + j * b_dim1];
 /* L450: */
 				}
 /* L460: */
@@ -1609,14 +1615,16 @@ L310:
 				i__5 = n, i__7 = j + ka;
 				i__4 = min(i__5,i__7);
 				for (i__ = j; i__ <= i__4; ++i__) {
-				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+				    ab[i__ + 1 - j + j * ab_dim1] = a[i__ + j 
+					    * a_dim1];
 /* L470: */
 				}
 /* Computing MIN */
 				i__5 = n, i__7 = j + kb;
 				i__4 = min(i__5,i__7);
 				for (i__ = j; i__ <= i__4; ++i__) {
-				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+				    bb[i__ + 1 - j + j * bb_dim1] = b[i__ + j 
+					    * b_dim1];
 /* L480: */
 				}
 /* L490: */
@@ -1675,8 +1683,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
-					    j);
+				    ab[ka + 1 + i__ - j + j * ab_dim1] = a[
+					    i__ + j * a_dim1];
 /* L500: */
 				}
 /* Computing MAX */
@@ -1684,8 +1692,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
-					    j);
+				    bb[kb + 1 + i__ - j + j * bb_dim1] = b[
+					    i__ + j * b_dim1];
 /* L510: */
 				}
 /* L520: */
@@ -1697,14 +1705,16 @@ L310:
 				i__7 = n, i__4 = j + ka;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+				    ab[i__ + 1 - j + j * ab_dim1] = a[i__ + j 
+					    * a_dim1];
 /* L530: */
 				}
 /* Computing MIN */
 				i__7 = n, i__4 = j + kb;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+				    bb[i__ + 1 - j + j * bb_dim1] = b[i__ + j 
+					    * b_dim1];
 /* L540: */
 				}
 /* L550: */
@@ -1764,8 +1774,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    ab_ref(ka + 1 + i__ - j, j) = a_ref(i__, 
-					    j);
+				    ab[ka + 1 + i__ - j + j * ab_dim1] = a[
+					    i__ + j * a_dim1];
 /* L560: */
 				}
 /* Computing MAX */
@@ -1773,8 +1783,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    bb_ref(kb + 1 + i__ - j, j) = b_ref(i__, 
-					    j);
+				    bb[kb + 1 + i__ - j + j * bb_dim1] = b[
+					    i__ + j * b_dim1];
 /* L570: */
 				}
 /* L580: */
@@ -1786,14 +1796,16 @@ L310:
 				i__4 = n, i__5 = j + ka;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    ab_ref(i__ + 1 - j, j) = a_ref(i__, j);
+				    ab[i__ + 1 - j + j * ab_dim1] = a[i__ + j 
+					    * a_dim1];
 /* L590: */
 				}
 /* Computing MIN */
 				i__4 = n, i__5 = j + kb;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    bb_ref(i__ + 1 - j, j) = b_ref(i__, j);
+				    bb[i__ + 1 - j + j * bb_dim1] = b[i__ + j 
+					    * b_dim1];
 /* L600: */
 				}
 /* L610: */
@@ -1850,7 +1862,7 @@ L620:
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
 	    ntestt += ntest;
-	    dlafts_("DSG", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
+	    dlafts_("DSG", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh, 
 		     nounit, &nerrs);
 L640:
 	    ;
@@ -1867,10 +1879,3 @@ L640:
 /*     End of DDRVSG */
 
 } /* ddrvsg_ */
-
-#undef bb_ref
-#undef ab_ref
-#undef b_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sstech_(integer *n, real *a, real *b, real *eig, real *
 	tol, real *work, integer *info)
@@ -14,71 +9,85 @@
     real r__1, r__2, r__3;
 
     /* Local variables */
-    static real emin;
-    static integer isub, bpnt, numl, numu, tpnt, i__, j, count;
-    static real lower, upper, tuppr, mx;
+    integer i__, j;
+    real mx, eps, emin;
+    integer isub, bpnt, numl, numu, tpnt, count;
+    real lower, upper, tuppr;
     extern doublereal slamch_(char *);
-    static real unflep;
+    real unflep;
     extern /* Subroutine */ int sstect_(integer *, real *, real *, real *, 
 	    integer *);
-    static real eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-       Let T be the tridiagonal matrix with diagonal entries A(1) ,...,   
-       A(N) and offdiagonal entries B(1) ,..., B(N-1)).  SSTECH checks to   
-       see if EIG(1) ,..., EIG(N) are indeed accurate eigenvalues of T.   
-       It does this by expanding each EIG(I) into an interval   
-       [SVD(I) - EPS, SVD(I) + EPS], merging overlapping intervals if   
-       any, and using Sturm sequences to count and verify whether each   
-       resulting interval has the correct number of eigenvalues (using   
-       SSTECT).  Here EPS = TOL*MACHEPS*MAXEIG, where MACHEPS is the   
-       machine precision and MAXEIG is the absolute value of the largest   
-       eigenvalue. If each interval contains the correct number of   
-       eigenvalues, INFO = 0 is returned, otherwise INFO is the index of   
-       the first eigenvalue in the first bad interval.   
+/*     Let T be the tridiagonal matrix with diagonal entries A(1) ,..., */
+/*     A(N) and offdiagonal entries B(1) ,..., B(N-1)).  SSTECH checks to */
+/*     see if EIG(1) ,..., EIG(N) are indeed accurate eigenvalues of T. */
+/*     It does this by expanding each EIG(I) into an interval */
+/*     [SVD(I) - EPS, SVD(I) + EPS], merging overlapping intervals if */
+/*     any, and using Sturm sequences to count and verify whether each */
+/*     resulting interval has the correct number of eigenvalues (using */
+/*     SSTECT).  Here EPS = TOL*MACHEPS*MAXEIG, where MACHEPS is the */
+/*     machine precision and MAXEIG is the absolute value of the largest */
+/*     eigenvalue. If each interval contains the correct number of */
+/*     eigenvalues, INFO = 0 is returned, otherwise INFO is the index of */
+/*     the first eigenvalue in the first bad interval. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The dimension of the tridiagonal matrix T.   
+/*  N       (input) INTEGER */
+/*          The dimension of the tridiagonal matrix T. */
 
-    A       (input) REAL array, dimension (N)   
-            The diagonal entries of the tridiagonal matrix T.   
+/*  A       (input) REAL array, dimension (N) */
+/*          The diagonal entries of the tridiagonal matrix T. */
 
-    B       (input) REAL array, dimension (N-1)   
-            The offdiagonal entries of the tridiagonal matrix T.   
+/*  B       (input) REAL array, dimension (N-1) */
+/*          The offdiagonal entries of the tridiagonal matrix T. */
 
-    EIG     (input) REAL array, dimension (N)   
-            The purported eigenvalues to be checked.   
+/*  EIG     (input) REAL array, dimension (N) */
+/*          The purported eigenvalues to be checked. */
 
-    TOL     (input) REAL   
-            Error tolerance for checking, a multiple of the   
-            machine precision.   
+/*  TOL     (input) REAL */
+/*          Error tolerance for checking, a multiple of the */
+/*          machine precision. */
 
-    WORK    (workspace) REAL array, dimension (N)   
+/*  WORK    (workspace) REAL array, dimension (N) */
 
-    INFO    (output) INTEGER   
-            0  if the eigenvalues are all correct (to within   
-               1 +- TOL*MACHEPS*MAXEIG)   
-            >0 if the interval containing the INFO-th eigenvalue   
-               contains the incorrect number of eigenvalues.   
+/*  INFO    (output) INTEGER */
+/*          0  if the eigenvalues are all correct (to within */
+/*             1 +- TOL*MACHEPS*MAXEIG) */
+/*          >0 if the interval containing the INFO-th eigenvalue */
+/*             contains the incorrect number of eigenvalues. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check input parameters   
+/*     Check input parameters */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --work;
     --eig;
     --b;
@@ -144,8 +153,8 @@
 /* L40: */
     }
 
-/*     TPNT points to singular value at right endpoint of interval   
-       BPNT points to singular value at left  endpoint of interval */
+/*     TPNT points to singular value at right endpoint of interval */
+/*     BPNT points to singular value at left  endpoint of interval */
 
     tpnt = 1;
     bpnt = 1;
@@ -197,4 +206,3 @@ L80:
 /*     End of SSTECH */
 
 } /* sstech_ */
-

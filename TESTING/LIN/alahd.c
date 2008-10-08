@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -244,297 +239,253 @@ static integer c__8 = 8;
     /* System generated locals */
     address a__1[2];
     integer i__1[2];
+    cilist ci__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static logical sord, corz;
-    extern logical lsame_(char *, char *);
-    static char c1[1], c3[1], p2[2];
-    extern logical lsamen_(integer *, char *, char *);
-    static char subnam[6], sym[9];
+    char c1[1], c3[1], p2[2], sym[9];
+    logical sord, corz;
+    extern logical lsame_(char *, char *), lsamen_(integer *, 
+	    char *, char *);
+    char subnam[6];
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___7 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___8 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___9 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___10 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___11 = { 0, 0, 0, fmt_9961, 0 };
-    static cilist io___12 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___13 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___14 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___15 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___16 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___17 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___18 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___19 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___20 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___21 = { 0, 0, 0, fmt_9978, 0 };
-    static cilist io___22 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___23 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___24 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___25 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___26 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___27 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___28 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___29 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___30 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___31 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___32 = { 0, 0, 0, fmt_9977, 0 };
-    static cilist io___33 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___34 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___35 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___36 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___37 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___38 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___39 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___40 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___41 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___43 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___44 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___45 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___46 = { 0, 0, 0, fmt_9975, 0 };
-    static cilist io___47 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___48 = { 0, 0, 0, fmt_9954, 0 };
-    static cilist io___49 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___7 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___8 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___9 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___10 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___11 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___12 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___13 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___14 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___15 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___16 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___17 = { 0, 0, 0, fmt_9978, 0 };
+    static cilist io___18 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___19 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___20 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___21 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___22 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___23 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___24 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___25 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___26 = { 0, 0, 0, fmt_9977, 0 };
+    static cilist io___27 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___28 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___29 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___30 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___31 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___32 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___33 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___35 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___36 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___37 = { 0, 0, 0, fmt_9975, 0 };
+    static cilist io___38 = { 0, 0, 0, fmt_9954, 0 };
+    static cilist io___39 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___40 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___41 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___42 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___44 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___45 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___46 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___47 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___48 = { 0, 0, 0, fmt_9973, 0 };
+    static cilist io___49 = { 0, 0, 0, fmt_9954, 0 };
     static cilist io___50 = { 0, 0, 0, fmt_9960, 0 };
     static cilist io___51 = { 0, 0, 0, fmt_9959, 0 };
     static cilist io___52 = { 0, 0, 0, fmt_9958, 0 };
     static cilist io___53 = { 0, 0, 0, fmt_9957, 0 };
     static cilist io___54 = { 0, 0, 0, fmt_9956, 0 };
     static cilist io___55 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___56 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___57 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___58 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___59 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___60 = { 0, 0, 0, fmt_9973, 0 };
-    static cilist io___61 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___62 = { 0, 0, 0, fmt_9954, 0 };
-    static cilist io___63 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___64 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___65 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___66 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___67 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___68 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___69 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___70 = { 0, 0, 0, fmt_9993, 0 };
-    static cilist io___71 = { 0, 0, 0, fmt_9993, 0 };
-    static cilist io___72 = { 0, 0, 0, fmt_9976, 0 };
-    static cilist io___73 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___74 = { 0, 0, 0, fmt_9952, 0 };
-    static cilist io___75 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___76 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___77 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___78 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___79 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___80 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___81 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___82 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___83 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___84 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___85 = { 0, 0, 0, fmt_9972, 0 };
-    static cilist io___86 = { 0, 0, 0, fmt_9971, 0 };
-    static cilist io___87 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___88 = { 0, 0, 0, fmt_9953, 0 };
-    static cilist io___89 = { 0, 0, 0, fmt_9961, 0 };
-    static cilist io___90 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___91 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___92 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___93 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___94 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___95 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___96 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___97 = { 0, 0, 0, fmt_9992, 0 };
-    static cilist io___98 = { 0, 0, 0, fmt_9991, 0 };
-    static cilist io___99 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___100 = { 0, 0, 0, fmt_9972, 0 };
-    static cilist io___101 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___102 = { 0, 0, 0, fmt_9953, 0 };
-    static cilist io___103 = { 0, 0, 0, fmt_9961, 0 };
-    static cilist io___104 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___105 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___106 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___107 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___56 = { 0, 0, 0, fmt_9993, 0 };
+    static cilist io___57 = { 0, 0, 0, fmt_9993, 0 };
+    static cilist io___58 = { 0, 0, 0, fmt_9976, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9952, 0 };
+    static cilist io___60 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___61 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___63 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___64 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___65 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___66 = { 0, 0, 0, fmt_9992, 0 };
+    static cilist io___67 = { 0, 0, 0, fmt_9991, 0 };
+    static cilist io___68 = { 0, 0, 0, fmt_9972, 0 };
+    static cilist io___69 = { 0, 0, 0, fmt_9971, 0 };
+    static cilist io___70 = { 0, 0, 0, fmt_9953, 0 };
+    static cilist io___71 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___72 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___73 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___74 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___75 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___76 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___77 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___78 = { 0, 0, 0, fmt_9992, 0 };
+    static cilist io___79 = { 0, 0, 0, fmt_9991, 0 };
+    static cilist io___80 = { 0, 0, 0, fmt_9972, 0 };
+    static cilist io___81 = { 0, 0, 0, fmt_9953, 0 };
+    static cilist io___82 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___83 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___84 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___85 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___86 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___87 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9990, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9989, 0 };
+    static cilist io___92 = { 0, 0, 0, fmt_9966, 0 };
+    static cilist io___93 = { 0, 0, 0, fmt_9965, 0 };
+    static cilist io___94 = { 0, 0, 0, fmt_9961, 0 };
+    static cilist io___95 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___96 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___97 = { 0, 0, 0, fmt_9958, 0 };
+    static cilist io___98 = { 0, 0, 0, fmt_9957, 0 };
+    static cilist io___99 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___100 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___101 = { 0, 0, 0, fmt_9951, 0 };
+    static cilist io___102 = { 0, 0, 0, fmt_9988, 0 };
+    static cilist io___103 = { 0, 0, 0, fmt_9964, 0 };
+    static cilist io___104 = { 0, 0, 0, fmt_9963, 0 };
+    static cilist io___105 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___106 = { 0, 0, 0, fmt_9959, 0 };
+    static cilist io___107 = { 0, 0, 0, fmt_9958, 0 };
     static cilist io___108 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___109 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___110 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___111 = { 0, 0, 0, fmt_9990, 0 };
-    static cilist io___113 = { 0, 0, 0, fmt_9989, 0 };
-    static cilist io___114 = { 0, 0, 0, fmt_9966, 0 };
-    static cilist io___115 = { 0, 0, 0, fmt_9965, 0 };
-    static cilist io___116 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___117 = { 0, 0, 0, fmt_9961, 0 };
-    static cilist io___118 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___119 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___120 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___121 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___122 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___123 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___124 = { 0, 0, 0, fmt_9951, 0 };
-    static cilist io___125 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___126 = { 0, 0, 0, fmt_9988, 0 };
-    static cilist io___127 = { 0, 0, 0, fmt_9964, 0 };
-    static cilist io___128 = { 0, 0, 0, fmt_9963, 0 };
-    static cilist io___129 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___130 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___131 = { 0, 0, 0, fmt_9959, 0 };
-    static cilist io___132 = { 0, 0, 0, fmt_9958, 0 };
-    static cilist io___133 = { 0, 0, 0, fmt_9957, 0 };
-    static cilist io___134 = { 0, 0, 0, fmt_9956, 0 };
-    static cilist io___135 = { 0, 0, 0, fmt_9955, 0 };
-    static cilist io___136 = { 0, 0, 0, fmt_9951, 0 };
-    static cilist io___137 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___138 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___139 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
+    static cilist io___109 = { 0, 0, 0, fmt_9956, 0 };
+    static cilist io___110 = { 0, 0, 0, fmt_9955, 0 };
+    static cilist io___111 = { 0, 0, 0, fmt_9951, 0 };
+    static cilist io___112 = { 0, 0, 0, fmt_9987, 0 };
+    static cilist io___113 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___114 = { 0, 0, 0, fmt_9950, 0 };
+    static cilist io___115 = { 0, 0, 0, fmt_9946, 0 };
+    static cilist io___116 = { 0, 0, 0, fmt_9944, 0 };
+    static cilist io___117 = { 0, 0, 0, fmt_9943, 0 };
+    static cilist io___118 = { 0, 0, 0, fmt_9942, 0 };
+    static cilist io___119 = { 0, 0, 0, fmt_9941, 0 };
+    static cilist io___120 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___121 = { 0, 0, 0, fmt_9987, 0 };
+    static cilist io___122 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___123 = { 0, 0, 0, fmt_9949, 0 };
+    static cilist io___124 = { 0, 0, 0, fmt_9945, 0 };
+    static cilist io___125 = { 0, 0, 0, fmt_9944, 0 };
+    static cilist io___126 = { 0, 0, 0, fmt_9943, 0 };
+    static cilist io___127 = { 0, 0, 0, fmt_9942, 0 };
+    static cilist io___128 = { 0, 0, 0, fmt_9941, 0 };
+    static cilist io___129 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___130 = { 0, 0, 0, fmt_9987, 0 };
+    static cilist io___131 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___132 = { 0, 0, 0, fmt_9948, 0 };
+    static cilist io___133 = { 0, 0, 0, fmt_9946, 0 };
+    static cilist io___134 = { 0, 0, 0, fmt_9944, 0 };
+    static cilist io___135 = { 0, 0, 0, fmt_9943, 0 };
+    static cilist io___136 = { 0, 0, 0, fmt_9942, 0 };
+    static cilist io___137 = { 0, 0, 0, fmt_9941, 0 };
+    static cilist io___138 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___139 = { 0, 0, 0, fmt_9987, 0 };
     static cilist io___140 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___141 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___142 = { 0, 0, 0, fmt_9950, 0 };
-    static cilist io___143 = { 0, 0, 0, fmt_9946, 0 };
-    static cilist io___144 = { 0, 0, 0, fmt_9944, 0 };
-    static cilist io___145 = { 0, 0, 0, fmt_9943, 0 };
-    static cilist io___146 = { 0, 0, 0, fmt_9942, 0 };
-    static cilist io___147 = { 0, 0, 0, fmt_9941, 0 };
-    static cilist io___148 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___149 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___150 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___151 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___152 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___153 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___154 = { 0, 0, 0, fmt_9949, 0 };
-    static cilist io___155 = { 0, 0, 0, fmt_9945, 0 };
-    static cilist io___156 = { 0, 0, 0, fmt_9944, 0 };
-    static cilist io___157 = { 0, 0, 0, fmt_9943, 0 };
-    static cilist io___158 = { 0, 0, 0, fmt_9942, 0 };
-    static cilist io___159 = { 0, 0, 0, fmt_9941, 0 };
-    static cilist io___160 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___161 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___162 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___163 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___164 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___165 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___166 = { 0, 0, 0, fmt_9948, 0 };
-    static cilist io___167 = { 0, 0, 0, fmt_9946, 0 };
-    static cilist io___168 = { 0, 0, 0, fmt_9944, 0 };
-    static cilist io___169 = { 0, 0, 0, fmt_9943, 0 };
-    static cilist io___170 = { 0, 0, 0, fmt_9942, 0 };
-    static cilist io___171 = { 0, 0, 0, fmt_9941, 0 };
-    static cilist io___172 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___173 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___174 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___175 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___176 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___177 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___178 = { 0, 0, 0, fmt_9947, 0 };
-    static cilist io___179 = { 0, 0, 0, fmt_9945, 0 };
-    static cilist io___180 = { 0, 0, 0, fmt_9944, 0 };
-    static cilist io___181 = { 0, 0, 0, fmt_9943, 0 };
-    static cilist io___182 = { 0, 0, 0, fmt_9942, 0 };
-    static cilist io___183 = { 0, 0, 0, fmt_9941, 0 };
-    static cilist io___184 = { 0, 0, 0, fmt_9960, 0 };
-    static cilist io___185 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___186 = { 0, 0, 0, fmt_9986, 0 };
-    static cilist io___187 = { 0, 0, 0, fmt_9969, 0 };
-    static cilist io___188 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___189 = { 0, 0, 0, fmt_9940, 0 };
-    static cilist io___190 = { 0, 0, 0, fmt_9939, 0 };
-    static cilist io___191 = { 0, 0, 0, fmt_9938, 0 };
-    static cilist io___192 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___193 = { 0, 0, 0, fmt_9985, 0 };
-    static cilist io___194 = { 0, 0, 0, fmt_9968, 0 };
-    static cilist io___195 = { 0, 0, 0, fmt_9929, 0 };
-    static cilist io___196 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___197 = { 0, 0, 0, fmt_9940, 0 };
-    static cilist io___198 = { 0, 0, 0, fmt_9937, 0 };
-    static cilist io___199 = { 0, 0, 0, fmt_9938, 0 };
-    static cilist io___200 = { 0, 0, 0, fmt_9940, 0 };
-    static cilist io___201 = { 0, 0, 0, fmt_9937, 0 };
-    static cilist io___202 = { 0, 0, 0, fmt_9938, 0 };
-    static cilist io___203 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___204 = { 0, 0, 0, fmt_9984, 0 };
-    static cilist io___205 = { 0, 0, 0, fmt_9967, 0 };
-    static cilist io___206 = { 0, 0, 0, fmt_9921, 0 };
-    static cilist io___207 = { 0, 0, 0, fmt_9935, 0 };
-    static cilist io___208 = { 0, 0, 0, fmt_9931, 0 };
-    static cilist io___209 = { 0, 0, 0, fmt_9933, 0 };
-    static cilist io___210 = { 0, 0, 0, fmt_9935, 0 };
-    static cilist io___211 = { 0, 0, 0, fmt_9934, 0 };
-    static cilist io___212 = { 0, 0, 0, fmt_9932, 0 };
-    static cilist io___213 = { 0, 0, 0, fmt_9920, 0 };
-    static cilist io___214 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___215 = { 0, 0, 0, fmt_9983, 0 };
-    static cilist io___216 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___217 = { 0, 0, 0, fmt_9979, 0 };
-    static cilist io___218 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
-    static cilist io___219 = { 0, 0, 0, fmt_9962, 0 };
-    static cilist io___220 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___221 = { 0, 0, 0, fmt_9982, 0 };
-    static cilist io___222 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___223 = { 0, 0, 0, fmt_9974, 0 };
-    static cilist io___224 = { 0, 0, 0, "( ' Test ratio:' )", 0 };
-    static cilist io___225 = { 0, 0, 0, fmt_9954, 0 };
-    static cilist io___226 = { 0, 0, 0, "( ' Messages:' )", 0 };
-    static cilist io___227 = { 0, 0, 0, fmt_9981, 0 };
-    static cilist io___228 = { 0, 0, 0, "( ' Matrix types:' )", 0 };
-    static cilist io___229 = { 0, 0, 0, fmt_9970, 0 };
-    static cilist io___230 = { 0, 0, 0, "( ' Test ratios:' )", 0 };
-    static cilist io___231 = { 0, 0, 0, fmt_9980, 0 };
+    static cilist io___141 = { 0, 0, 0, fmt_9947, 0 };
+    static cilist io___142 = { 0, 0, 0, fmt_9945, 0 };
+    static cilist io___143 = { 0, 0, 0, fmt_9944, 0 };
+    static cilist io___144 = { 0, 0, 0, fmt_9943, 0 };
+    static cilist io___145 = { 0, 0, 0, fmt_9942, 0 };
+    static cilist io___146 = { 0, 0, 0, fmt_9941, 0 };
+    static cilist io___147 = { 0, 0, 0, fmt_9960, 0 };
+    static cilist io___148 = { 0, 0, 0, fmt_9986, 0 };
+    static cilist io___149 = { 0, 0, 0, fmt_9969, 0 };
+    static cilist io___150 = { 0, 0, 0, fmt_9940, 0 };
+    static cilist io___151 = { 0, 0, 0, fmt_9939, 0 };
+    static cilist io___152 = { 0, 0, 0, fmt_9938, 0 };
+    static cilist io___153 = { 0, 0, 0, fmt_9985, 0 };
+    static cilist io___154 = { 0, 0, 0, fmt_9968, 0 };
+    static cilist io___155 = { 0, 0, 0, fmt_9929, 0 };
+    static cilist io___156 = { 0, 0, 0, fmt_9940, 0 };
+    static cilist io___157 = { 0, 0, 0, fmt_9937, 0 };
+    static cilist io___158 = { 0, 0, 0, fmt_9938, 0 };
+    static cilist io___159 = { 0, 0, 0, fmt_9940, 0 };
+    static cilist io___160 = { 0, 0, 0, fmt_9937, 0 };
+    static cilist io___161 = { 0, 0, 0, fmt_9938, 0 };
+    static cilist io___162 = { 0, 0, 0, fmt_9984, 0 };
+    static cilist io___163 = { 0, 0, 0, fmt_9967, 0 };
+    static cilist io___164 = { 0, 0, 0, fmt_9921, 0 };
+    static cilist io___165 = { 0, 0, 0, fmt_9935, 0 };
+    static cilist io___166 = { 0, 0, 0, fmt_9931, 0 };
+    static cilist io___167 = { 0, 0, 0, fmt_9933, 0 };
+    static cilist io___168 = { 0, 0, 0, fmt_9935, 0 };
+    static cilist io___169 = { 0, 0, 0, fmt_9934, 0 };
+    static cilist io___170 = { 0, 0, 0, fmt_9932, 0 };
+    static cilist io___171 = { 0, 0, 0, fmt_9920, 0 };
+    static cilist io___172 = { 0, 0, 0, fmt_9983, 0 };
+    static cilist io___173 = { 0, 0, 0, fmt_9979, 0 };
+    static cilist io___174 = { 0, 0, 0, fmt_9962, 0 };
+    static cilist io___175 = { 0, 0, 0, fmt_9982, 0 };
+    static cilist io___176 = { 0, 0, 0, fmt_9974, 0 };
+    static cilist io___177 = { 0, 0, 0, fmt_9954, 0 };
+    static cilist io___178 = { 0, 0, 0, fmt_9981, 0 };
+    static cilist io___179 = { 0, 0, 0, fmt_9970, 0 };
+    static cilist io___180 = { 0, 0, 0, fmt_9980, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1998   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ALAHD prints header information for the different test paths.   
+/*  ALAHD prints header information for the different test paths. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    IOUNIT  (input) INTEGER   
-            The unit number to which the header information should be   
-            printed.   
+/*  IOUNIT  (input) INTEGER */
+/*          The unit number to which the header information should be */
+/*          printed. */
 
-    PATH    (input) CHARACTER*3   
-            The name of the path for which the header information is to   
-            be printed.  Current paths are   
-               _GE:  General matrices   
-               _GB:  General band   
-               _GT:  General Tridiagonal   
-               _PO:  Symmetric or Hermitian positive definite   
-               _PP:  Symmetric or Hermitian positive definite packed   
-               _PB:  Symmetric or Hermitian positive definite band   
-               _PT:  Symmetric or Hermitian positive definite tridiagonal   
-               _SY:  Symmetric indefinite   
-               _SP:  Symmetric indefinite packed   
-               _HE:  (complex) Hermitian indefinite   
-               _HP:  (complex) Hermitian indefinite packed   
-               _TR:  Triangular   
-               _TP:  Triangular packed   
-               _TB:  Triangular band   
-               _QR:  QR (general matrices)   
-               _LQ:  LQ (general matrices)   
-               _QL:  QL (general matrices)   
-               _RQ:  RQ (general matrices)   
-               _QP:  QR with column pivoting   
-               _TZ:  Trapezoidal   
-               _LS:  Least Squares driver routines   
-               _LU:  LU variants   
-               _CH:  Cholesky variants   
-               _QS:  QR variants   
-            The first character must be one of S, D, C, or Z (C or Z only   
-            if complex).   
+/*  PATH    (input) CHARACTER*3 */
+/*          The name of the path for which the header information is to */
+/*          be printed.  Current paths are */
+/*             _GE:  General matrices */
+/*             _GB:  General band */
+/*             _GT:  General Tridiagonal */
+/*             _PO:  Symmetric or Hermitian positive definite */
+/*             _PP:  Symmetric or Hermitian positive definite packed */
+/*             _PB:  Symmetric or Hermitian positive definite band */
+/*             _PT:  Symmetric or Hermitian positive definite tridiagonal */
+/*             _SY:  Symmetric indefinite */
+/*             _SP:  Symmetric indefinite packed */
+/*             _HE:  (complex) Hermitian indefinite */
+/*             _HP:  (complex) Hermitian indefinite packed */
+/*             _TR:  Triangular */
+/*             _TP:  Triangular packed */
+/*             _TB:  Triangular band */
+/*             _QR:  QR (general matrices) */
+/*             _LQ:  LQ (general matrices) */
+/*             _QL:  QL (general matrices) */
+/*             _RQ:  RQ (general matrices) */
+/*             _QP:  QR with column pivoting */
+/*             _TZ:  Trapezoidal */
+/*             _LS:  Least Squares driver routines */
+/*             _LU:  LU variants */
+/*             _CH:  Cholesky variants */
+/*             _QS:  QR variants */
+/*          The first character must be one of S, D, C, or Z (C or Z only */
+/*          if complex). */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (*iounit <= 0) {
 	return 0;
@@ -556,151 +507,167 @@ static integer c__8 = 8;
 	s_wsfe(&io___6);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
+	e_wsfe();
 	io___7.ciunit = *iounit;
 	s_wsfe(&io___7);
 	e_wsfe();
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
+	e_wsfe();
 	io___8.ciunit = *iounit;
 	s_wsfe(&io___8);
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___9.ciunit = *iounit;
 	s_wsfe(&io___9);
+	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___10.ciunit = *iounit;
 	s_wsfe(&io___10);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___11.ciunit = *iounit;
 	s_wsfe(&io___11);
-	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___12.ciunit = *iounit;
 	s_wsfe(&io___12);
-	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___13.ciunit = *iounit;
 	s_wsfe(&io___13);
-	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___14.ciunit = *iounit;
 	s_wsfe(&io___14);
-	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___15.ciunit = *iounit;
 	s_wsfe(&io___15);
-	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___16.ciunit = *iounit;
-	s_wsfe(&io___16);
-	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___17.ciunit = *iounit;
-	s_wsfe(&io___17);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___18.ciunit = *iounit;
-	s_wsfe(&io___18);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "GB")) {
 
 /*        GB: General band */
 
+	io___16.ciunit = *iounit;
+	s_wsfe(&io___16);
+	do_fio(&c__1, path, (ftnlen)3);
+	e_wsfe();
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
+	e_wsfe();
+	io___17.ciunit = *iounit;
+	s_wsfe(&io___17);
+	e_wsfe();
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
+	e_wsfe();
+	io___18.ciunit = *iounit;
+	s_wsfe(&io___18);
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	e_wsfe();
 	io___19.ciunit = *iounit;
 	s_wsfe(&io___19);
-	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___20.ciunit = *iounit;
 	s_wsfe(&io___20);
+	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___21.ciunit = *iounit;
 	s_wsfe(&io___21);
+	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___22.ciunit = *iounit;
 	s_wsfe(&io___22);
+	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___23.ciunit = *iounit;
 	s_wsfe(&io___23);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___24.ciunit = *iounit;
 	s_wsfe(&io___24);
-	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___25.ciunit = *iounit;
-	s_wsfe(&io___25);
-	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___26.ciunit = *iounit;
-	s_wsfe(&io___26);
-	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___27.ciunit = *iounit;
-	s_wsfe(&io___27);
-	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___28.ciunit = *iounit;
-	s_wsfe(&io___28);
-	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___29.ciunit = *iounit;
-	s_wsfe(&io___29);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___30.ciunit = *iounit;
-	s_wsfe(&io___30);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "GT")) {
 
 /*        GT: General tridiagonal */
 
+	io___25.ciunit = *iounit;
+	s_wsfe(&io___25);
+	do_fio(&c__1, path, (ftnlen)3);
+	e_wsfe();
+	io___26.ciunit = *iounit;
+	s_wsfe(&io___26);
+	e_wsfe();
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
+	e_wsfe();
+	io___27.ciunit = *iounit;
+	s_wsfe(&io___27);
+	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___28.ciunit = *iounit;
+	s_wsfe(&io___28);
+	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___29.ciunit = *iounit;
+	s_wsfe(&io___29);
+	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
+	e_wsfe();
+	io___30.ciunit = *iounit;
+	s_wsfe(&io___30);
+	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
+	e_wsfe();
 	io___31.ciunit = *iounit;
 	s_wsfe(&io___31);
-	do_fio(&c__1, path, (ftnlen)3);
+	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___32.ciunit = *iounit;
 	s_wsfe(&io___32);
+	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
 	io___33.ciunit = *iounit;
 	s_wsfe(&io___33);
-	e_wsfe();
-	io___34.ciunit = *iounit;
-	s_wsfe(&io___34);
-	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___35.ciunit = *iounit;
-	s_wsfe(&io___35);
-	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___36.ciunit = *iounit;
-	s_wsfe(&io___36);
-	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___37.ciunit = *iounit;
-	s_wsfe(&io___37);
-	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___38.ciunit = *iounit;
-	s_wsfe(&io___38);
-	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___39.ciunit = *iounit;
-	s_wsfe(&io___39);
-	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
-	e_wsfe();
-	io___40.ciunit = *iounit;
-	s_wsfe(&io___40);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___41.ciunit = *iounit;
-	s_wsfe(&io___41);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "PO") || lsamen_(&
 	    c__2, p2, "PP")) {
 
-/*        PO: Positive definite full   
-          PP: Positive definite packed */
+/*        PO: Positive definite full */
+/*        PP: Positive definite packed */
 
 	if (sord) {
 	    s_copy(sym, "Symmetric", (ftnlen)9, (ftnlen)9);
@@ -708,62 +675,68 @@ static integer c__8 = 8;
 	    s_copy(sym, "Hermitian", (ftnlen)9, (ftnlen)9);
 	}
 	if (lsame_(c3, "O")) {
-	    io___43.ciunit = *iounit;
-	    s_wsfe(&io___43);
+	    io___35.ciunit = *iounit;
+	    s_wsfe(&io___35);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	} else {
-	    io___44.ciunit = *iounit;
-	    s_wsfe(&io___44);
+	    io___36.ciunit = *iounit;
+	    s_wsfe(&io___36);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, sym, (ftnlen)9);
 	    e_wsfe();
 	}
-	io___45.ciunit = *iounit;
-	s_wsfe(&io___45);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___46.ciunit = *iounit;
-	s_wsfe(&io___46);
+	io___37.ciunit = *iounit;
+	s_wsfe(&io___37);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___47.ciunit = *iounit;
-	s_wsfe(&io___47);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___48.ciunit = *iounit;
-	s_wsfe(&io___48);
+	io___38.ciunit = *iounit;
+	s_wsfe(&io___38);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___49.ciunit = *iounit;
-	s_wsfe(&io___49);
+	io___39.ciunit = *iounit;
+	s_wsfe(&io___39);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___50.ciunit = *iounit;
-	s_wsfe(&io___50);
+	io___40.ciunit = *iounit;
+	s_wsfe(&io___40);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___51.ciunit = *iounit;
-	s_wsfe(&io___51);
+	io___41.ciunit = *iounit;
+	s_wsfe(&io___41);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___52.ciunit = *iounit;
-	s_wsfe(&io___52);
+	io___42.ciunit = *iounit;
+	s_wsfe(&io___42);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___53.ciunit = *iounit;
-	s_wsfe(&io___53);
+	io___43.ciunit = *iounit;
+	s_wsfe(&io___43);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___54.ciunit = *iounit;
-	s_wsfe(&io___54);
+	io___44.ciunit = *iounit;
+	s_wsfe(&io___44);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___55.ciunit = *iounit;
-	s_wsfe(&io___55);
+	io___45.ciunit = *iounit;
+	s_wsfe(&io___45);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___56.ciunit = *iounit;
-	s_wsfe(&io___56);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "PB")) {
@@ -771,58 +744,64 @@ static integer c__8 = 8;
 /*        PB: Positive definite band */
 
 	if (sord) {
-	    io___57.ciunit = *iounit;
-	    s_wsfe(&io___57);
+	    io___46.ciunit = *iounit;
+	    s_wsfe(&io___46);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
-	    io___58.ciunit = *iounit;
-	    s_wsfe(&io___58);
+	    io___47.ciunit = *iounit;
+	    s_wsfe(&io___47);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
-	io___59.ciunit = *iounit;
-	s_wsfe(&io___59);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___60.ciunit = *iounit;
-	s_wsfe(&io___60);
+	io___48.ciunit = *iounit;
+	s_wsfe(&io___48);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___61.ciunit = *iounit;
-	s_wsfe(&io___61);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___62.ciunit = *iounit;
-	s_wsfe(&io___62);
+	io___49.ciunit = *iounit;
+	s_wsfe(&io___49);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___63.ciunit = *iounit;
-	s_wsfe(&io___63);
+	io___50.ciunit = *iounit;
+	s_wsfe(&io___50);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___64.ciunit = *iounit;
-	s_wsfe(&io___64);
+	io___51.ciunit = *iounit;
+	s_wsfe(&io___51);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___65.ciunit = *iounit;
-	s_wsfe(&io___65);
+	io___52.ciunit = *iounit;
+	s_wsfe(&io___52);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___66.ciunit = *iounit;
-	s_wsfe(&io___66);
+	io___53.ciunit = *iounit;
+	s_wsfe(&io___53);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___67.ciunit = *iounit;
-	s_wsfe(&io___67);
+	io___54.ciunit = *iounit;
+	s_wsfe(&io___54);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___68.ciunit = *iounit;
-	s_wsfe(&io___68);
+	io___55.ciunit = *iounit;
+	s_wsfe(&io___55);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___69.ciunit = *iounit;
-	s_wsfe(&io___69);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "PT")) {
@@ -830,199 +809,215 @@ static integer c__8 = 8;
 /*        PT: Positive definite tridiagonal */
 
 	if (sord) {
-	    io___70.ciunit = *iounit;
-	    s_wsfe(&io___70);
+	    io___56.ciunit = *iounit;
+	    s_wsfe(&io___56);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
-	    io___71.ciunit = *iounit;
-	    s_wsfe(&io___71);
+	    io___57.ciunit = *iounit;
+	    s_wsfe(&io___57);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
-	io___72.ciunit = *iounit;
-	s_wsfe(&io___72);
+	io___58.ciunit = *iounit;
+	s_wsfe(&io___58);
 	e_wsfe();
-	io___73.ciunit = *iounit;
-	s_wsfe(&io___73);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___74.ciunit = *iounit;
-	s_wsfe(&io___74);
+	io___59.ciunit = *iounit;
+	s_wsfe(&io___59);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___75.ciunit = *iounit;
-	s_wsfe(&io___75);
+	io___60.ciunit = *iounit;
+	s_wsfe(&io___60);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___76.ciunit = *iounit;
-	s_wsfe(&io___76);
+	io___61.ciunit = *iounit;
+	s_wsfe(&io___61);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___77.ciunit = *iounit;
-	s_wsfe(&io___77);
+	io___62.ciunit = *iounit;
+	s_wsfe(&io___62);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___78.ciunit = *iounit;
-	s_wsfe(&io___78);
+	io___63.ciunit = *iounit;
+	s_wsfe(&io___63);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___79.ciunit = *iounit;
-	s_wsfe(&io___79);
+	io___64.ciunit = *iounit;
+	s_wsfe(&io___64);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___80.ciunit = *iounit;
-	s_wsfe(&io___80);
+	io___65.ciunit = *iounit;
+	s_wsfe(&io___65);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___81.ciunit = *iounit;
-	s_wsfe(&io___81);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "SY") || lsamen_(&
 	    c__2, p2, "SP")) {
 
-/*        SY: Symmetric indefinite full   
-          SP: Symmetric indefinite packed */
+/*        SY: Symmetric indefinite full */
+/*        SP: Symmetric indefinite packed */
 
 	if (lsame_(c3, "Y")) {
-	    io___82.ciunit = *iounit;
-	    s_wsfe(&io___82);
+	    io___66.ciunit = *iounit;
+	    s_wsfe(&io___66);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	} else {
-	    io___83.ciunit = *iounit;
-	    s_wsfe(&io___83);
+	    io___67.ciunit = *iounit;
+	    s_wsfe(&io___67);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Symmetric", (ftnlen)9);
 	    e_wsfe();
 	}
-	io___84.ciunit = *iounit;
-	s_wsfe(&io___84);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 	if (sord) {
-	    io___85.ciunit = *iounit;
-	    s_wsfe(&io___85);
+	    io___68.ciunit = *iounit;
+	    s_wsfe(&io___68);
 	    e_wsfe();
 	} else {
-	    io___86.ciunit = *iounit;
-	    s_wsfe(&io___86);
+	    io___69.ciunit = *iounit;
+	    s_wsfe(&io___69);
 	    e_wsfe();
 	}
-	io___87.ciunit = *iounit;
-	s_wsfe(&io___87);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___88.ciunit = *iounit;
-	s_wsfe(&io___88);
+	io___70.ciunit = *iounit;
+	s_wsfe(&io___70);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___89.ciunit = *iounit;
-	s_wsfe(&io___89);
+	io___71.ciunit = *iounit;
+	s_wsfe(&io___71);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___90.ciunit = *iounit;
-	s_wsfe(&io___90);
+	io___72.ciunit = *iounit;
+	s_wsfe(&io___72);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___91.ciunit = *iounit;
-	s_wsfe(&io___91);
+	io___73.ciunit = *iounit;
+	s_wsfe(&io___73);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___92.ciunit = *iounit;
-	s_wsfe(&io___92);
+	io___74.ciunit = *iounit;
+	s_wsfe(&io___74);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___93.ciunit = *iounit;
-	s_wsfe(&io___93);
+	io___75.ciunit = *iounit;
+	s_wsfe(&io___75);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___94.ciunit = *iounit;
-	s_wsfe(&io___94);
+	io___76.ciunit = *iounit;
+	s_wsfe(&io___76);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___95.ciunit = *iounit;
-	s_wsfe(&io___95);
+	io___77.ciunit = *iounit;
+	s_wsfe(&io___77);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___96.ciunit = *iounit;
-	s_wsfe(&io___96);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "HE") || lsamen_(&
 	    c__2, p2, "HP")) {
 
-/*        HE: Hermitian indefinite full   
-          HP: Hermitian indefinite packed */
+/*        HE: Hermitian indefinite full */
+/*        HP: Hermitian indefinite packed */
 
 	if (lsame_(c3, "E")) {
-	    io___97.ciunit = *iounit;
-	    s_wsfe(&io___97);
+	    io___78.ciunit = *iounit;
+	    s_wsfe(&io___78);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	} else {
-	    io___98.ciunit = *iounit;
-	    s_wsfe(&io___98);
+	    io___79.ciunit = *iounit;
+	    s_wsfe(&io___79);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    do_fio(&c__1, "Hermitian", (ftnlen)9);
 	    e_wsfe();
 	}
-	io___99.ciunit = *iounit;
-	s_wsfe(&io___99);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___100.ciunit = *iounit;
-	s_wsfe(&io___100);
+	io___80.ciunit = *iounit;
+	s_wsfe(&io___80);
 	e_wsfe();
-	io___101.ciunit = *iounit;
-	s_wsfe(&io___101);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___102.ciunit = *iounit;
-	s_wsfe(&io___102);
+	io___81.ciunit = *iounit;
+	s_wsfe(&io___81);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___103.ciunit = *iounit;
-	s_wsfe(&io___103);
+	io___82.ciunit = *iounit;
+	s_wsfe(&io___82);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___104.ciunit = *iounit;
-	s_wsfe(&io___104);
+	io___83.ciunit = *iounit;
+	s_wsfe(&io___83);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___105.ciunit = *iounit;
-	s_wsfe(&io___105);
+	io___84.ciunit = *iounit;
+	s_wsfe(&io___84);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___106.ciunit = *iounit;
-	s_wsfe(&io___106);
+	io___85.ciunit = *iounit;
+	s_wsfe(&io___85);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___107.ciunit = *iounit;
-	s_wsfe(&io___107);
+	io___86.ciunit = *iounit;
+	s_wsfe(&io___86);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___108.ciunit = *iounit;
-	s_wsfe(&io___108);
+	io___87.ciunit = *iounit;
+	s_wsfe(&io___87);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___109.ciunit = *iounit;
-	s_wsfe(&io___109);
+	io___88.ciunit = *iounit;
+	s_wsfe(&io___88);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___110.ciunit = *iounit;
-	s_wsfe(&io___110);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "TR") || lsamen_(&
 	    c__2, p2, "TP")) {
 
-/*        TR: Triangular full   
-          TP: Triangular packed */
+/*        TR: Triangular full */
+/*        TP: Triangular packed */
 
 	if (lsame_(c3, "R")) {
-	    io___111.ciunit = *iounit;
-	    s_wsfe(&io___111);
+	    io___89.ciunit = *iounit;
+	    s_wsfe(&io___89);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 /* Writing concatenation */
@@ -1030,8 +1025,8 @@ static integer c__8 = 8;
 	    i__1[1] = 5, a__1[1] = "LATRS";
 	    s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
 	} else {
-	    io___113.ciunit = *iounit;
-	    s_wsfe(&io___113);
+	    io___91.ciunit = *iounit;
+	    s_wsfe(&io___91);
 	    do_fio(&c__1, path, (ftnlen)3);
 	    e_wsfe();
 /* Writing concatenation */
@@ -1039,588 +1034,645 @@ static integer c__8 = 8;
 	    i__1[1] = 5, a__1[1] = "LATPS";
 	    s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
 	}
-	io___114.ciunit = *iounit;
-	s_wsfe(&io___114);
+	io___92.ciunit = *iounit;
+	s_wsfe(&io___92);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___115.ciunit = *iounit;
-	s_wsfe(&io___115);
+	io___93.ciunit = *iounit;
+	s_wsfe(&io___93);
 	do_fio(&c__1, subnam, (ftnlen)6);
 	e_wsfe();
-	io___116.ciunit = *iounit;
-	s_wsfe(&io___116);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___117.ciunit = *iounit;
-	s_wsfe(&io___117);
+	io___94.ciunit = *iounit;
+	s_wsfe(&io___94);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___118.ciunit = *iounit;
-	s_wsfe(&io___118);
+	io___95.ciunit = *iounit;
+	s_wsfe(&io___95);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___119.ciunit = *iounit;
-	s_wsfe(&io___119);
+	io___96.ciunit = *iounit;
+	s_wsfe(&io___96);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___120.ciunit = *iounit;
-	s_wsfe(&io___120);
+	io___97.ciunit = *iounit;
+	s_wsfe(&io___97);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___121.ciunit = *iounit;
-	s_wsfe(&io___121);
+	io___98.ciunit = *iounit;
+	s_wsfe(&io___98);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___122.ciunit = *iounit;
-	s_wsfe(&io___122);
+	io___99.ciunit = *iounit;
+	s_wsfe(&io___99);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___123.ciunit = *iounit;
-	s_wsfe(&io___123);
+	io___100.ciunit = *iounit;
+	s_wsfe(&io___100);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___124.ciunit = *iounit;
-	s_wsfe(&io___124);
+	io___101.ciunit = *iounit;
+	s_wsfe(&io___101);
 	do_fio(&c__1, subnam, (ftnlen)6);
 	do_fio(&c__1, (char *)&c__8, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___125.ciunit = *iounit;
-	s_wsfe(&io___125);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "TB")) {
 
 /*        TB: Triangular band */
 
-	io___126.ciunit = *iounit;
-	s_wsfe(&io___126);
+	io___102.ciunit = *iounit;
+	s_wsfe(&io___102);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
 /* Writing concatenation */
 	i__1[0] = 1, a__1[0] = path;
 	i__1[1] = 5, a__1[1] = "LATBS";
 	s_cat(subnam, a__1, i__1, &c__2, (ftnlen)6);
-	io___127.ciunit = *iounit;
-	s_wsfe(&io___127);
+	io___103.ciunit = *iounit;
+	s_wsfe(&io___103);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___128.ciunit = *iounit;
-	s_wsfe(&io___128);
+	io___104.ciunit = *iounit;
+	s_wsfe(&io___104);
 	do_fio(&c__1, subnam, (ftnlen)6);
 	e_wsfe();
-	io___129.ciunit = *iounit;
-	s_wsfe(&io___129);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___130.ciunit = *iounit;
-	s_wsfe(&io___130);
+	io___105.ciunit = *iounit;
+	s_wsfe(&io___105);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___131.ciunit = *iounit;
-	s_wsfe(&io___131);
+	io___106.ciunit = *iounit;
+	s_wsfe(&io___106);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___132.ciunit = *iounit;
-	s_wsfe(&io___132);
+	io___107.ciunit = *iounit;
+	s_wsfe(&io___107);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___133.ciunit = *iounit;
-	s_wsfe(&io___133);
+	io___108.ciunit = *iounit;
+	s_wsfe(&io___108);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___134.ciunit = *iounit;
-	s_wsfe(&io___134);
+	io___109.ciunit = *iounit;
+	s_wsfe(&io___109);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___135.ciunit = *iounit;
-	s_wsfe(&io___135);
+	io___110.ciunit = *iounit;
+	s_wsfe(&io___110);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___136.ciunit = *iounit;
-	s_wsfe(&io___136);
+	io___111.ciunit = *iounit;
+	s_wsfe(&io___111);
 	do_fio(&c__1, subnam, (ftnlen)6);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___137.ciunit = *iounit;
-	s_wsfe(&io___137);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "QR")) {
 
 /*        QR decomposition of rectangular matrices */
 
-	io___138.ciunit = *iounit;
-	s_wsfe(&io___138);
+	io___112.ciunit = *iounit;
+	s_wsfe(&io___112);
 	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, "QR", (ftnlen)2);
 	e_wsfe();
-	io___139.ciunit = *iounit;
-	s_wsfe(&io___139);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___140.ciunit = *iounit;
-	s_wsfe(&io___140);
+	io___113.ciunit = *iounit;
+	s_wsfe(&io___113);
 	e_wsfe();
-	io___141.ciunit = *iounit;
-	s_wsfe(&io___141);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___142.ciunit = *iounit;
-	s_wsfe(&io___142);
+	io___114.ciunit = *iounit;
+	s_wsfe(&io___114);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___143.ciunit = *iounit;
-	s_wsfe(&io___143);
+	io___115.ciunit = *iounit;
+	s_wsfe(&io___115);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___144.ciunit = *iounit;
-	s_wsfe(&io___144);
+	io___116.ciunit = *iounit;
+	s_wsfe(&io___116);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___145.ciunit = *iounit;
-	s_wsfe(&io___145);
+	io___117.ciunit = *iounit;
+	s_wsfe(&io___117);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___146.ciunit = *iounit;
-	s_wsfe(&io___146);
+	io___118.ciunit = *iounit;
+	s_wsfe(&io___118);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___147.ciunit = *iounit;
-	s_wsfe(&io___147);
+	io___119.ciunit = *iounit;
+	s_wsfe(&io___119);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___148.ciunit = *iounit;
-	s_wsfe(&io___148);
+	io___120.ciunit = *iounit;
+	s_wsfe(&io___120);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___149.ciunit = *iounit;
-	s_wsfe(&io___149);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "LQ")) {
 
 /*        LQ decomposition of rectangular matrices */
 
-	io___150.ciunit = *iounit;
-	s_wsfe(&io___150);
+	io___121.ciunit = *iounit;
+	s_wsfe(&io___121);
 	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, "LQ", (ftnlen)2);
 	e_wsfe();
-	io___151.ciunit = *iounit;
-	s_wsfe(&io___151);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___152.ciunit = *iounit;
-	s_wsfe(&io___152);
+	io___122.ciunit = *iounit;
+	s_wsfe(&io___122);
 	e_wsfe();
-	io___153.ciunit = *iounit;
-	s_wsfe(&io___153);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___154.ciunit = *iounit;
-	s_wsfe(&io___154);
+	io___123.ciunit = *iounit;
+	s_wsfe(&io___123);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___155.ciunit = *iounit;
-	s_wsfe(&io___155);
+	io___124.ciunit = *iounit;
+	s_wsfe(&io___124);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___156.ciunit = *iounit;
-	s_wsfe(&io___156);
+	io___125.ciunit = *iounit;
+	s_wsfe(&io___125);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___157.ciunit = *iounit;
-	s_wsfe(&io___157);
+	io___126.ciunit = *iounit;
+	s_wsfe(&io___126);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___158.ciunit = *iounit;
-	s_wsfe(&io___158);
+	io___127.ciunit = *iounit;
+	s_wsfe(&io___127);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___159.ciunit = *iounit;
-	s_wsfe(&io___159);
+	io___128.ciunit = *iounit;
+	s_wsfe(&io___128);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___160.ciunit = *iounit;
-	s_wsfe(&io___160);
+	io___129.ciunit = *iounit;
+	s_wsfe(&io___129);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___161.ciunit = *iounit;
-	s_wsfe(&io___161);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "QL")) {
 
 /*        QL decomposition of rectangular matrices */
 
-	io___162.ciunit = *iounit;
-	s_wsfe(&io___162);
+	io___130.ciunit = *iounit;
+	s_wsfe(&io___130);
 	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, "QL", (ftnlen)2);
 	e_wsfe();
-	io___163.ciunit = *iounit;
-	s_wsfe(&io___163);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___164.ciunit = *iounit;
-	s_wsfe(&io___164);
+	io___131.ciunit = *iounit;
+	s_wsfe(&io___131);
 	e_wsfe();
-	io___165.ciunit = *iounit;
-	s_wsfe(&io___165);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___166.ciunit = *iounit;
-	s_wsfe(&io___166);
+	io___132.ciunit = *iounit;
+	s_wsfe(&io___132);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___167.ciunit = *iounit;
-	s_wsfe(&io___167);
+	io___133.ciunit = *iounit;
+	s_wsfe(&io___133);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___168.ciunit = *iounit;
-	s_wsfe(&io___168);
+	io___134.ciunit = *iounit;
+	s_wsfe(&io___134);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___169.ciunit = *iounit;
-	s_wsfe(&io___169);
+	io___135.ciunit = *iounit;
+	s_wsfe(&io___135);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___170.ciunit = *iounit;
-	s_wsfe(&io___170);
+	io___136.ciunit = *iounit;
+	s_wsfe(&io___136);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___171.ciunit = *iounit;
-	s_wsfe(&io___171);
+	io___137.ciunit = *iounit;
+	s_wsfe(&io___137);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "M", (ftnlen)1);
 	e_wsfe();
-	io___172.ciunit = *iounit;
-	s_wsfe(&io___172);
+	io___138.ciunit = *iounit;
+	s_wsfe(&io___138);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___173.ciunit = *iounit;
-	s_wsfe(&io___173);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "RQ")) {
 
 /*        RQ decomposition of rectangular matrices */
 
-	io___174.ciunit = *iounit;
-	s_wsfe(&io___174);
+	io___139.ciunit = *iounit;
+	s_wsfe(&io___139);
 	do_fio(&c__1, path, (ftnlen)3);
 	do_fio(&c__1, "RQ", (ftnlen)2);
 	e_wsfe();
-	io___175.ciunit = *iounit;
-	s_wsfe(&io___175);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___176.ciunit = *iounit;
-	s_wsfe(&io___176);
+	io___140.ciunit = *iounit;
+	s_wsfe(&io___140);
 	e_wsfe();
-	io___177.ciunit = *iounit;
-	s_wsfe(&io___177);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___178.ciunit = *iounit;
-	s_wsfe(&io___178);
+	io___141.ciunit = *iounit;
+	s_wsfe(&io___141);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___179.ciunit = *iounit;
-	s_wsfe(&io___179);
+	io___142.ciunit = *iounit;
+	s_wsfe(&io___142);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___180.ciunit = *iounit;
-	s_wsfe(&io___180);
+	io___143.ciunit = *iounit;
+	s_wsfe(&io___143);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___181.ciunit = *iounit;
-	s_wsfe(&io___181);
+	io___144.ciunit = *iounit;
+	s_wsfe(&io___144);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___182.ciunit = *iounit;
-	s_wsfe(&io___182);
+	io___145.ciunit = *iounit;
+	s_wsfe(&io___145);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___183.ciunit = *iounit;
-	s_wsfe(&io___183);
+	io___146.ciunit = *iounit;
+	s_wsfe(&io___146);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	do_fio(&c__1, "N", (ftnlen)1);
 	e_wsfe();
-	io___184.ciunit = *iounit;
-	s_wsfe(&io___184);
+	io___147.ciunit = *iounit;
+	s_wsfe(&io___147);
 	do_fio(&c__1, (char *)&c__7, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___185.ciunit = *iounit;
-	s_wsfe(&io___185);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "QP")) {
 
 /*        QR decomposition with column pivoting */
 
-	io___186.ciunit = *iounit;
-	s_wsfe(&io___186);
+	io___148.ciunit = *iounit;
+	s_wsfe(&io___148);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___187.ciunit = *iounit;
-	s_wsfe(&io___187);
+	io___149.ciunit = *iounit;
+	s_wsfe(&io___149);
 	e_wsfe();
-	io___188.ciunit = *iounit;
-	s_wsfe(&io___188);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___189.ciunit = *iounit;
-	s_wsfe(&io___189);
+	io___150.ciunit = *iounit;
+	s_wsfe(&io___150);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___190.ciunit = *iounit;
-	s_wsfe(&io___190);
+	io___151.ciunit = *iounit;
+	s_wsfe(&io___151);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___191.ciunit = *iounit;
-	s_wsfe(&io___191);
+	io___152.ciunit = *iounit;
+	s_wsfe(&io___152);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___192.ciunit = *iounit;
-	s_wsfe(&io___192);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "TZ")) {
 
 /*        TZ:  Trapezoidal */
 
-	io___193.ciunit = *iounit;
-	s_wsfe(&io___193);
+	io___153.ciunit = *iounit;
+	s_wsfe(&io___153);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___194.ciunit = *iounit;
-	s_wsfe(&io___194);
+	io___154.ciunit = *iounit;
+	s_wsfe(&io___154);
 	e_wsfe();
-	io___195.ciunit = *iounit;
-	s_wsfe(&io___195);
+	io___155.ciunit = *iounit;
+	s_wsfe(&io___155);
 	do_fio(&c__1, c1, (ftnlen)1);
 	do_fio(&c__1, c1, (ftnlen)1);
 	e_wsfe();
-	io___196.ciunit = *iounit;
-	s_wsfe(&io___196);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___197.ciunit = *iounit;
-	s_wsfe(&io___197);
+	io___156.ciunit = *iounit;
+	s_wsfe(&io___156);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___198.ciunit = *iounit;
-	s_wsfe(&io___198);
+	io___157.ciunit = *iounit;
+	s_wsfe(&io___157);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___199.ciunit = *iounit;
-	s_wsfe(&io___199);
+	io___158.ciunit = *iounit;
+	s_wsfe(&io___158);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___200.ciunit = *iounit;
-	s_wsfe(&io___200);
+	io___159.ciunit = *iounit;
+	s_wsfe(&io___159);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___201.ciunit = *iounit;
-	s_wsfe(&io___201);
+	io___160.ciunit = *iounit;
+	s_wsfe(&io___160);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___202.ciunit = *iounit;
-	s_wsfe(&io___202);
+	io___161.ciunit = *iounit;
+	s_wsfe(&io___161);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___203.ciunit = *iounit;
-	s_wsfe(&io___203);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "LS")) {
 
-/*        LS:  Least Squares driver routines for   
-               LS, LSD, LSS, LSX and LSY. */
+/*        LS:  Least Squares driver routines for */
+/*             LS, LSD, LSS, LSX and LSY. */
 
-	io___204.ciunit = *iounit;
-	s_wsfe(&io___204);
+	io___162.ciunit = *iounit;
+	s_wsfe(&io___162);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___205.ciunit = *iounit;
-	s_wsfe(&io___205);
+	io___163.ciunit = *iounit;
+	s_wsfe(&io___163);
 	e_wsfe();
-	io___206.ciunit = *iounit;
-	s_wsfe(&io___206);
+	io___164.ciunit = *iounit;
+	s_wsfe(&io___164);
 	do_fio(&c__1, c1, (ftnlen)1);
 	do_fio(&c__1, c1, (ftnlen)1);
 	do_fio(&c__1, c1, (ftnlen)1);
 	do_fio(&c__1, c1, (ftnlen)1);
 	do_fio(&c__1, c1, (ftnlen)1);
 	e_wsfe();
-	io___207.ciunit = *iounit;
-	s_wsfe(&io___207);
+	io___165.ciunit = *iounit;
+	s_wsfe(&io___165);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___208.ciunit = *iounit;
-	s_wsfe(&io___208);
+	io___166.ciunit = *iounit;
+	s_wsfe(&io___166);
 	do_fio(&c__1, (char *)&c__2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___209.ciunit = *iounit;
-	s_wsfe(&io___209);
+	io___167.ciunit = *iounit;
+	s_wsfe(&io___167);
 	do_fio(&c__1, (char *)&c__3, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___210.ciunit = *iounit;
-	s_wsfe(&io___210);
+	io___168.ciunit = *iounit;
+	s_wsfe(&io___168);
 	do_fio(&c__1, (char *)&c__4, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___211.ciunit = *iounit;
-	s_wsfe(&io___211);
+	io___169.ciunit = *iounit;
+	s_wsfe(&io___169);
 	do_fio(&c__1, (char *)&c__5, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___212.ciunit = *iounit;
-	s_wsfe(&io___212);
+	io___170.ciunit = *iounit;
+	s_wsfe(&io___170);
 	do_fio(&c__1, (char *)&c__6, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___213.ciunit = *iounit;
-	s_wsfe(&io___213);
+	io___171.ciunit = *iounit;
+	s_wsfe(&io___171);
 	e_wsfe();
-	io___214.ciunit = *iounit;
-	s_wsfe(&io___214);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "LU")) {
 
 /*        LU factorization variants */
 
-	io___215.ciunit = *iounit;
-	s_wsfe(&io___215);
+	io___172.ciunit = *iounit;
+	s_wsfe(&io___172);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___216.ciunit = *iounit;
-	s_wsfe(&io___216);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___217.ciunit = *iounit;
-	s_wsfe(&io___217);
+	io___173.ciunit = *iounit;
+	s_wsfe(&io___173);
 	e_wsfe();
-	io___218.ciunit = *iounit;
-	s_wsfe(&io___218);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratio:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___219.ciunit = *iounit;
-	s_wsfe(&io___219);
+	io___174.ciunit = *iounit;
+	s_wsfe(&io___174);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___220.ciunit = *iounit;
-	s_wsfe(&io___220);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "CH")) {
 
 /*        Cholesky factorization variants */
 
-	io___221.ciunit = *iounit;
-	s_wsfe(&io___221);
+	io___175.ciunit = *iounit;
+	s_wsfe(&io___175);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___222.ciunit = *iounit;
-	s_wsfe(&io___222);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___223.ciunit = *iounit;
-	s_wsfe(&io___223);
+	io___176.ciunit = *iounit;
+	s_wsfe(&io___176);
 	e_wsfe();
-	io___224.ciunit = *iounit;
-	s_wsfe(&io___224);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratio:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___225.ciunit = *iounit;
-	s_wsfe(&io___225);
+	io___177.ciunit = *iounit;
+	s_wsfe(&io___177);
 	do_fio(&c__1, (char *)&c__1, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___226.ciunit = *iounit;
-	s_wsfe(&io___226);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Messages:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else if (lsamen_(&c__2, p2, "QS")) {
 
 /*        QR factorization variants */
 
-	io___227.ciunit = *iounit;
-	s_wsfe(&io___227);
+	io___178.ciunit = *iounit;
+	s_wsfe(&io___178);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
-	io___228.ciunit = *iounit;
-	s_wsfe(&io___228);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Matrix types:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
-	io___229.ciunit = *iounit;
-	s_wsfe(&io___229);
+	io___179.ciunit = *iounit;
+	s_wsfe(&io___179);
 	e_wsfe();
-	io___230.ciunit = *iounit;
-	s_wsfe(&io___230);
+	ci__1.cierr = 0;
+	ci__1.ciunit = *iounit;
+	ci__1.cifmt = "( ' Test ratios:' )";
+	s_wsfe(&ci__1);
 	e_wsfe();
 
     } else {
 
 /*        Print error message if no header is available. */
 
-	io___231.ciunit = *iounit;
-	s_wsfe(&io___231);
+	io___180.ciunit = *iounit;
+	s_wsfe(&io___180);
 	do_fio(&c__1, path, (ftnlen)3);
 	e_wsfe();
     }
 
-/*     First line of header   
+/*     First line of header */
 
 
-       GE matrix types   
+/*     GE matrix types */
 
 
-       GB matrix types   
+/*     GB matrix types */
 
 
-       GT matrix types   
+/*     GT matrix types */
 
 
-       PT matrix types   
+/*     PT matrix types */
 
 
-       PO, PP matrix types   
+/*     PO, PP matrix types */
 
 
-       CH matrix types   
+/*     CH matrix types */
 
 
-       PB matrix types   
+/*     PB matrix types */
 
 
-       SSY, SSP, CHE, CHP matrix types   
+/*     SSY, SSP, CHE, CHP matrix types */
 
 
-       CSY, CSP matrix types   
+/*     CSY, CSP matrix types */
 
 
-       QR matrix types   
+/*     QR matrix types */
 
 
-       QP matrix types   
+/*     QP matrix types */
 
 
-       TZ matrix types   
+/*     TZ matrix types */
 
 
-       LS matrix types   
+/*     LS matrix types */
 
 
-       TR, TP matrix types   
+/*     TR, TP matrix types */
 
 
-       TB matrix types   
+/*     TB matrix types */
 
 
-       Test ratios   
+/*     Test ratios */
 
-   L9936:   
-   L9930: */
+/* L9936: */
+/* L9930: */
 
     return 0;
 
 /*     End of ALAHD */
 
 } /* alahd_ */
-

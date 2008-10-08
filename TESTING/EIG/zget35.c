@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -30,32 +25,33 @@ static doublecomplex c_b43 = {1.,0.};
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer imla, imlb, imlc, info;
-    static doublecomplex csav[100]	/* was [10][10] */;
-    static integer isgn;
-    static doublecomplex atmp[100]	/* was [10][10] */, btmp[100]	/* 
-	    was [10][10] */, ctmp[100]	/* was [10][10] */;
-    static doublereal tnrm;
-    static doublecomplex rmul;
-    static doublereal xnrm;
-    static doublecomplex a[100]	/* was [10][10] */, b[100]	/* was [10][
+    doublecomplex a[100]	/* was [10][10] */, b[100]	/* was [10][
 	    10] */, c__[100]	/* was [10][10] */;
-    static integer i__, j, m, n, imlad;
-    static doublereal scale;
-    static char trana[1], tranb[1];
+    integer i__, j, m, n;
+    doublereal vm1[3], vm2[3], dum[1], eps, res, res1;
+    integer imla, imlb, imlc, info;
+    doublecomplex csav[100]	/* was [10][10] */;
+    integer isgn;
+    doublecomplex atmp[100]	/* was [10][10] */, btmp[100]	/* was [10][
+	    10] */, ctmp[100]	/* was [10][10] */;
+    doublereal tnrm;
+    doublecomplex rmul;
+    doublereal xnrm;
+    integer imlad;
+    doublereal scale;
+    char trana[1], tranb[1];
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
-    static integer itrana, itranb;
+    integer itrana, itranb;
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal bignum, smlnum, vm1[3], vm2[3];
+    doublereal bignum, smlnum;
     extern /* Subroutine */ int ztrsyl_(char *, char *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, doublereal *, integer *);
-    static doublereal dum[1], eps, res, res1;
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 0, 0, 0, 0 };
@@ -65,67 +61,65 @@ static doublecomplex c_b43 = {1.,0.};
 
 
 
-#define csav_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define csav_ref(a_1,a_2) csav[csav_subscr(a_1,a_2)]
-#define atmp_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define atmp_ref(a_1,a_2) atmp[atmp_subscr(a_1,a_2)]
-#define btmp_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define btmp_ref(a_1,a_2) btmp[btmp_subscr(a_1,a_2)]
-#define ctmp_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define ctmp_ref(a_1,a_2) ctmp[ctmp_subscr(a_1,a_2)]
-#define a_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define c___subscr(a_1,a_2) (a_2)*10 + a_1 - 11
-#define c___ref(a_1,a_2) c__[c___subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGET35 tests ZTRSYL, a routine for solving the Sylvester matrix */
+/*  equation */
 
-    Purpose   
-    =======   
+/*     op(A)*X + ISGN*X*op(B) = scale*C, */
 
-    ZGET35 tests ZTRSYL, a routine for solving the Sylvester matrix   
-    equation   
+/*  A and B are assumed to be in Schur canonical form, op() represents an */
+/*  optional transpose, and ISGN can be -1 or +1.  Scale is an output */
+/*  less than or equal to 1, chosen to avoid overflow in X. */
 
-       op(A)*X + ISGN*X*op(B) = scale*C,   
+/*  The test code verifies that the following residual is order 1: */
 
-    A and B are assumed to be in Schur canonical form, op() represents an   
-    optional transpose, and ISGN can be -1 or +1.  Scale is an output   
-    less than or equal to 1, chosen to avoid overflow in X.   
+/*     norm(op(A)*X + ISGN*X*op(B) - scale*C) / */
+/*         (EPS*max(norm(A),norm(B))*norm(X)) */
 
-    The test code verifies that the following residual is order 1:   
+/*  Arguments */
+/*  ========== */
 
-       norm(op(A)*X + ISGN*X*op(B) - scale*C) /   
-           (EPS*max(norm(A),norm(B))*norm(X))   
+/*  RMAX    (output) DOUBLE PRECISION */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) DOUBLE PRECISION   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER */
+/*          Number of examples where INFO is nonzero. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER   
-            Number of examples where INFO is nonzero.   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number. */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = dlamch_("P");
     smlnum = dlamch_("S") / eps;
@@ -163,8 +157,8 @@ L10:
 	s_rsle(&io___10);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&atmp_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&atmp[i__ + j * 10 - 11], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L20: */
@@ -175,8 +169,8 @@ L10:
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&btmp_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&btmp[i__ + j * 10 - 11], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L30: */
@@ -187,8 +181,8 @@ L10:
 	s_rsle(&io___15);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&ctmp_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&ctmp[i__ + j * 10 - 11], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L40: */
@@ -217,8 +211,8 @@ L10:
 				for (i__ = 1; i__ <= i__1; ++i__) {
 				    i__2 = m;
 				    for (j = 1; j <= i__2; ++j) {
-					i__3 = a_subscr(i__, j);
-					i__4 = atmp_subscr(i__, j);
+					i__3 = i__ + j * 10 - 11;
+					i__4 = i__ + j * 10 - 11;
 					i__5 = imla - 1;
 					z__1.r = vm1[i__5] * atmp[i__4].r, 
 						z__1.i = vm1[i__5] * atmp[
@@ -226,20 +220,20 @@ L10:
 					a[i__3].r = z__1.r, a[i__3].i = 
 						z__1.i;
 /* Computing MAX */
-					d__1 = tnrm, d__2 = z_abs(&a_ref(i__, 
-						j));
+					d__1 = tnrm, d__2 = z_abs(&a[i__ + j *
+						 10 - 11]);
 					tnrm = max(d__1,d__2);
 /* L50: */
 				    }
-				    i__2 = a_subscr(i__, i__);
-				    i__3 = a_subscr(i__, i__);
+				    i__2 = i__ + i__ * 10 - 11;
+				    i__3 = i__ + i__ * 10 - 11;
 				    i__4 = imlad - 1;
 				    z__1.r = vm2[i__4] * a[i__3].r, z__1.i = 
 					    vm2[i__4] * a[i__3].i;
 				    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* Computing MAX */
-				    d__1 = tnrm, d__2 = z_abs(&a_ref(i__, i__)
-					    );
+				    d__1 = tnrm, d__2 = z_abs(&a[i__ + i__ * 
+					    10 - 11]);
 				    tnrm = max(d__1,d__2);
 /* L60: */
 				}
@@ -247,8 +241,8 @@ L10:
 				for (i__ = 1; i__ <= i__1; ++i__) {
 				    i__2 = n;
 				    for (j = 1; j <= i__2; ++j) {
-					i__3 = b_subscr(i__, j);
-					i__4 = btmp_subscr(i__, j);
+					i__3 = i__ + j * 10 - 11;
+					i__4 = i__ + j * 10 - 11;
 					i__5 = imlb - 1;
 					z__1.r = vm1[i__5] * btmp[i__4].r, 
 						z__1.i = vm1[i__5] * btmp[
@@ -256,8 +250,8 @@ L10:
 					b[i__3].r = z__1.r, b[i__3].i = 
 						z__1.i;
 /* Computing MAX */
-					d__1 = tnrm, d__2 = z_abs(&b_ref(i__, 
-						j));
+					d__1 = tnrm, d__2 = z_abs(&b[i__ + j *
+						 10 - 11]);
 					tnrm = max(d__1,d__2);
 /* L70: */
 				    }
@@ -270,16 +264,16 @@ L10:
 				for (i__ = 1; i__ <= i__1; ++i__) {
 				    i__2 = n;
 				    for (j = 1; j <= i__2; ++j) {
-					i__3 = c___subscr(i__, j);
-					i__4 = ctmp_subscr(i__, j);
+					i__3 = i__ + j * 10 - 11;
+					i__4 = i__ + j * 10 - 11;
 					i__5 = imlc - 1;
 					z__1.r = vm1[i__5] * ctmp[i__4].r, 
 						z__1.i = vm1[i__5] * ctmp[
 						i__4].i;
 					c__[i__3].r = z__1.r, c__[i__3].i = 
 						z__1.i;
-					i__3 = csav_subscr(i__, j);
-					i__4 = c___subscr(i__, j);
+					i__3 = i__ + j * 10 - 11;
+					i__4 = i__ + j * 10 - 11;
 					csav[i__3].r = c__[i__4].r, csav[i__3]
 						.i = c__[i__4].i;
 /* L90: */
@@ -288,7 +282,7 @@ L10:
 				}
 				++(*knt);
 				ztrsyl_(trana, tranb, &isgn, &m, &n, a, &
-					c__10, b, &c__10, c__, &c__10, &scale,
+					c__10, b, &c__10, c__, &c__10, &scale, 
 					 &info);
 				if (info != 0) {
 				    ++(*ninfo);
@@ -344,20 +338,3 @@ L10:
 /*     End of ZGET35 */
 
 } /* zget35_ */
-
-#undef c___ref
-#undef c___subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-#undef ctmp_ref
-#undef ctmp_subscr
-#undef btmp_ref
-#undef btmp_subscr
-#undef atmp_ref
-#undef atmp_subscr
-#undef csav_ref
-#undef csav_subscr
-
-

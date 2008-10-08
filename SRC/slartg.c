@@ -1,78 +1,98 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slartg_(real *f, real *g, real *cs, real *sn, real *r__)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SLARTG generate a plane rotation so that   
-
-       [  CS  SN  ]  .  [ F ]  =  [ R ]   where CS**2 + SN**2 = 1.   
-       [ -SN  CS  ]     [ G ]     [ 0 ]   
-
-    This is a slower, more accurate version of the BLAS1 routine SROTG,   
-    with the following other differences:   
-       F and G are unchanged on return.   
-       If G=0, then CS=1 and SN=0.   
-       If F=0 and (G .ne. 0), then CS=0 and SN=1 without doing any   
-          floating point operations (saves work in SBDSQR when   
-          there are zeros on the diagonal).   
-
-    If F exceeds G in magnitude, CS will be positive.   
-
-    Arguments   
-    =========   
-
-    F       (input) REAL   
-            The first component of vector to be rotated.   
-
-    G       (input) REAL   
-            The second component of vector to be rotated.   
-
-    CS      (output) REAL   
-            The cosine of the rotation.   
-
-    SN      (output) REAL   
-            The sine of the rotation.   
-
-    R       (output) REAL   
-            The nonzero component of the rotated vector.   
-
-    ===================================================================== */
-    /* Initialized data */
-    static logical first = TRUE_;
     /* System generated locals */
     integer i__1;
     real r__1, r__2;
+
     /* Builtin functions */
     double log(doublereal), pow_ri(real *, integer *), sqrt(doublereal);
+
     /* Local variables */
-    static integer i__;
-    static real scale;
-    static integer count;
-    static real f1, g1, safmn2, safmx2;
+    integer i__;
+    real f1, g1, eps, scale;
+    integer count;
+    real safmn2, safmx2;
     extern doublereal slamch_(char *);
-    static real safmin, eps;
+    real safmin;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
-    if (first) {
-	first = FALSE_;
-	safmin = slamch_("S");
-	eps = slamch_("E");
-	r__1 = slamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 
-		2.f);
-	safmn2 = pow_ri(&r__1, &i__1);
-	safmx2 = 1.f / safmn2;
-    }
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLARTG generate a plane rotation so that */
+
+/*     [  CS  SN  ]  .  [ F ]  =  [ R ]   where CS**2 + SN**2 = 1. */
+/*     [ -SN  CS  ]     [ G ]     [ 0 ] */
+
+/*  This is a slower, more accurate version of the BLAS1 routine SROTG, */
+/*  with the following other differences: */
+/*     F and G are unchanged on return. */
+/*     If G=0, then CS=1 and SN=0. */
+/*     If F=0 and (G .ne. 0), then CS=0 and SN=1 without doing any */
+/*        floating point operations (saves work in SBDSQR when */
+/*        there are zeros on the diagonal). */
+
+/*  If F exceeds G in magnitude, CS will be positive. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  F       (input) REAL */
+/*          The first component of vector to be rotated. */
+
+/*  G       (input) REAL */
+/*          The second component of vector to be rotated. */
+
+/*  CS      (output) REAL */
+/*          The cosine of the rotation. */
+
+/*  SN      (output) REAL */
+/*          The sine of the rotation. */
+
+/*  R       (output) REAL */
+/*          The nonzero component of the rotated vector. */
+
+/*  This version has a few statements commented out for thread safety */
+/*  (machine parameters are computed on each entry). 10 feb 03, SJH. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     LOGICAL            FIRST */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     SAVE               FIRST, SAFMX2, SAFMIN, SAFMN2 */
+/*     .. */
+/*     .. Data statements .. */
+/*     DATA               FIRST / .TRUE. / */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     IF( FIRST ) THEN */
+    safmin = slamch_("S");
+    eps = slamch_("E");
+    r__1 = slamch_("B");
+    i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 2.f);
+    safmn2 = pow_ri(&r__1, &i__1);
+    safmx2 = 1.f / safmn2;
+/*        FIRST = .FALSE. */
+/*     END IF */
     if (*g == 0.f) {
 	*cs = 1.f;
 	*sn = 0.f;
@@ -155,4 +175,3 @@ L30:
 /*     End of SLARTG */
 
 } /* slartg_ */
-

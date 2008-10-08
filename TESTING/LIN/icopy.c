@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int icopy_(integer *n, integer *sx, integer *incx, integer *
 	sy, integer *incy)
@@ -13,43 +8,51 @@
     integer i__1;
 
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
+    integer i__, m, ix, iy, mp1;
 
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ICOPY copies an integer vector x to an integer vector y.   
-    Uses unrolled loops for increments equal to 1.   
+/*  ICOPY copies an integer vector x to an integer vector y. */
+/*  Uses unrolled loops for increments equal to 1. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The length of the vectors SX and SY.   
+/*  N       (input) INTEGER */
+/*          The length of the vectors SX and SY. */
 
-    SX      (input) INTEGER array, dimension (1+(N-1)*abs(INCX))   
-            The vector X.   
+/*  SX      (input) INTEGER array, dimension (1+(N-1)*abs(INCX)) */
+/*          The vector X. */
 
-    INCX    (input) INTEGER   
-            The spacing between consecutive elements of SX.   
+/*  INCX    (input) INTEGER */
+/*          The spacing between consecutive elements of SX. */
 
-    SY      (output) INTEGER array, dimension (1+(N-1)*abs(INCY))   
-            The vector Y.   
+/*  SY      (output) INTEGER array, dimension (1+(N-1)*abs(INCY)) */
+/*          The vector Y. */
 
-    INCY    (input) INTEGER   
-            The spacing between consecutive elements of SY.   
+/*  INCY    (input) INTEGER */
+/*          The spacing between consecutive elements of SY. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --sy;
     --sx;
 
@@ -80,9 +83,9 @@
     }
     return 0;
 
-/*     Code for both increments equal to 1   
+/*     Code for both increments equal to 1 */
 
-       Clean-up loop */
+/*     Clean-up loop */
 
 L20:
     m = *n % 7;
@@ -115,4 +118,3 @@ L40:
 /*     End of ICOPY */
 
 } /* icopy_ */
-

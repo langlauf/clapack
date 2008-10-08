@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zlaipd_(integer *n, doublecomplex *a, integer *inda, 
 	integer *vinda)
@@ -15,57 +10,66 @@
     doublecomplex z__1;
 
     /* Local variables */
-    static integer i__, ia;
+    integer i__, ia, ixa;
     extern doublereal dlamch_(char *);
-    static doublereal bignum;
-    static integer ixa;
+    doublereal bignum;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZLAIPD sets the imaginary part of the diagonal elements of a complex   
-    matrix A to a large value.  This is used to test LAPACK routines for   
-    complex Hermitian matrices, which are not supposed to access or use   
-    the imaginary parts of the diagonals.   
+/*  ZLAIPD sets the imaginary part of the diagonal elements of a complex */
+/*  matrix A to a large value.  This is used to test LAPACK routines for */
+/*  complex Hermitian matrices, which are not supposed to access or use */
+/*  the imaginary parts of the diagonals. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N      (input) INTEGER   
-           The number of diagonal elements of A.   
+/*  N      (input) INTEGER */
+/*         The number of diagonal elements of A. */
 
-    A      (input/output) COMPLEX*16 array, dimension   
-                          (1+(N-1)*INDA+(N-2)*VINDA)   
-           On entry, the complex (Hermitian) matrix A.   
-           On exit, the imaginary parts of the diagonal elements are set   
-           to BIGNUM = EPS / SAFMIN, where EPS is the machine epsilon and   
-           SAFMIN is the safe minimum.   
+/*  A      (input/output) COMPLEX*16 array, dimension */
+/*                        (1+(N-1)*INDA+(N-2)*VINDA) */
+/*         On entry, the complex (Hermitian) matrix A. */
+/*         On exit, the imaginary parts of the diagonal elements are set */
+/*         to BIGNUM = EPS / SAFMIN, where EPS is the machine epsilon and */
+/*         SAFMIN is the safe minimum. */
 
-    INDA   (input) INTEGER   
-           The increment between A(1) and the next diagonal element of A.   
-           Typical values are   
-           = LDA+1:  square matrices with leading dimension LDA   
-           = 2:  packed upper triangular matrix, starting at A(1,1)   
-           = N:  packed lower triangular matrix, starting at A(1,1)   
+/*  INDA   (input) INTEGER */
+/*         The increment between A(1) and the next diagonal element of A. */
+/*         Typical values are */
+/*         = LDA+1:  square matrices with leading dimension LDA */
+/*         = 2:  packed upper triangular matrix, starting at A(1,1) */
+/*         = N:  packed lower triangular matrix, starting at A(1,1) */
 
-    VINDA  (input) INTEGER   
-           The change in the diagonal increment between columns of A.   
-           Typical values are   
-           = 0:  no change, the row and column increments in A are fixed   
-           = 1:  packed upper triangular matrix   
-           = -1:  packed lower triangular matrix   
+/*  VINDA  (input) INTEGER */
+/*         The change in the diagonal increment between columns of A. */
+/*         Typical values are */
+/*         = 0:  no change, the row and column increments in A are fixed */
+/*         = 1:  packed upper triangular matrix */
+/*         = -1:  packed lower triangular matrix */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --a;
 
     /* Function Body */
@@ -85,4 +89,3 @@
     }
     return 0;
 } /* zlaipd_ */
-

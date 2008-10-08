@@ -1,77 +1,92 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int clapll_(integer *n, complex *x, integer *incx, complex *
 	y, integer *incy, real *ssmin)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    Given two column vectors X and Y, let   
-
-                         A = ( X Y ).   
-
-    The subroutine first computes the QR factorization of A = Q*R,   
-    and then computes the SVD of the 2-by-2 upper triangular matrix R.   
-    The smaller singular value of R is returned in SSMIN, which is used   
-    as the measurement of the linear dependency of the vectors X and Y.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The length of the vectors X and Y.   
-
-    X       (input/output) COMPLEX array, dimension (1+(N-1)*INCX)   
-            On entry, X contains the N-vector X.   
-            On exit, X is overwritten.   
-
-    INCX    (input) INTEGER   
-            The increment between successive elements of X. INCX > 0.   
-
-    Y       (input/output) COMPLEX array, dimension (1+(N-1)*INCY)   
-            On entry, Y contains the N-vector Y.   
-            On exit, Y is overwritten.   
-
-    INCY    (input) INTEGER   
-            The increment between successive elements of Y. INCY > 0.   
-
-    SSMIN   (output) REAL   
-            The smallest singular value of the N-by-2 matrix A = ( X Y ).   
-
-    =====================================================================   
-
-
-       Quick return if possible   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1, r__2, r__3;
     complex q__1, q__2, q__3, q__4;
+
     /* Builtin functions */
     void r_cnjg(complex *, complex *);
     double c_abs(complex *);
+
     /* Local variables */
+    complex c__, a11, a12, a22, tau;
     extern /* Subroutine */ int slas2_(real *, real *, real *, real *, real *)
 	    ;
-    static complex c__;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern /* Subroutine */ int caxpy_(integer *, complex *, complex *, 
 	    integer *, complex *, integer *);
-    static real ssmax;
-    static complex a11, a12, a22;
+    real ssmax;
     extern /* Subroutine */ int clarfg_(integer *, complex *, complex *, 
 	    integer *, complex *);
-    static complex tau;
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  Given two column vectors X and Y, let */
+
+/*                       A = ( X Y ). */
+
+/*  The subroutine first computes the QR factorization of A = Q*R, */
+/*  and then computes the SVD of the 2-by-2 upper triangular matrix R. */
+/*  The smaller singular value of R is returned in SSMIN, which is used */
+/*  as the measurement of the linear dependency of the vectors X and Y. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The length of the vectors X and Y. */
+
+/*  X       (input/output) COMPLEX array, dimension (1+(N-1)*INCX) */
+/*          On entry, X contains the N-vector X. */
+/*          On exit, X is overwritten. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive elements of X. INCX > 0. */
+
+/*  Y       (input/output) COMPLEX array, dimension (1+(N-1)*INCY) */
+/*          On entry, Y contains the N-vector Y. */
+/*          On exit, Y is overwritten. */
+
+/*  INCY    (input) INTEGER */
+/*          The increment between successive elements of Y. INCY > 0. */
+
+/*  SSMIN   (output) REAL */
+/*          The smallest singular value of the N-by-2 matrix A = ( X Y ). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Quick return if possible */
+
+    /* Parameter adjustments */
     --y;
     --x;
 
@@ -114,4 +129,3 @@
 /*     End of CLAPLL */
 
 } /* clapll_ */
-

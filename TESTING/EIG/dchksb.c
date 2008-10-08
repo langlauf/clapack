@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -68,24 +63,24 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static doublereal cond;
-    static integer jcol, kmax, nmax;
-    static doublereal unfl, ovfl, temp1;
-    static integer i__, j, k, n;
-    static logical badnn;
-    static integer imode;
+    integer i__, j, k, n, jc, jr;
+    doublereal ulp, cond;
+    integer jcol, kmax, nmax;
+    doublereal unfl, ovfl, temp1;
+    logical badnn;
+    integer imode;
     extern /* Subroutine */ int dsbt21_(char *, integer *, integer *, integer 
 	    *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *);
-    static integer iinfo;
-    static doublereal aninv, anorm;
-    static integer nmats, jsize, nerrs, itype, jtype, ntest, jc;
-    static logical badnnb;
+    integer iinfo;
+    doublereal aninv, anorm;
+    integer nmats, jsize, nerrs, itype, jtype, ntest;
+    logical badnnb;
     extern doublereal dlamch_(char *);
-    static integer jr, idumma[1];
+    integer idumma[1];
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int dlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    xerbla_(char *, integer *), dsbtrd_(char *, char *, 
@@ -100,10 +95,9 @@ static integer c__4 = 4;
 	    integer *, char *, doublereal *, integer *, doublereal *, integer 
 	    *), dlasum_(char *, integer *, integer *, 
 	    integer *);
-    static integer jwidth;
-    static doublereal rtunfl, rtovfl, ulpinv;
-    static integer mtypes, ntestt;
-    static doublereal ulp;
+    integer jwidth;
+    doublereal rtunfl, rtovfl, ulpinv;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___36 = { 0, 0, 0, fmt_9999, 0 };
@@ -118,227 +112,242 @@ static integer c__4 = 4;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DCHKSB tests the reduction of a symmetric band matrix to tridiagonal */
+/*  form, used with the symmetric eigenvalue problem. */
 
-    Purpose   
-    =======   
+/*  DSBTRD factors a symmetric band matrix A as  U S U' , where ' means */
+/*  transpose, S is symmetric tridiagonal, and U is orthogonal. */
+/*  DSBTRD can use either just the lower or just the upper triangle */
+/*  of A; DCHKSB checks both cases. */
 
-    DCHKSB tests the reduction of a symmetric band matrix to tridiagonal   
-    form, used with the symmetric eigenvalue problem.   
+/*  When DCHKSB is called, a number of matrix "sizes" ("n's"), a number */
+/*  of bandwidths ("k's"), and a number of matrix "types" are */
+/*  specified.  For each size ("n"), each bandwidth ("k") less than or */
+/*  equal to "n", and each type of matrix, one matrix will be generated */
+/*  and used to test the symmetric banded reduction routine.  For each */
+/*  matrix, a number of tests will be performed: */
 
-    DSBTRD factors a symmetric band matrix A as  U S U' , where ' means   
-    transpose, S is symmetric tridiagonal, and U is orthogonal.   
-    DSBTRD can use either just the lower or just the upper triangle   
-    of A; DCHKSB checks both cases.   
+/*  (1)     | A - V S V' | / ( |A| n ulp )  computed by DSBTRD with */
+/*                                          UPLO='U' */
 
-    When DCHKSB is called, a number of matrix "sizes" ("n's"), a number   
-    of bandwidths ("k's"), and a number of matrix "types" are   
-    specified.  For each size ("n"), each bandwidth ("k") less than or   
-    equal to "n", and each type of matrix, one matrix will be generated   
-    and used to test the symmetric banded reduction routine.  For each   
-    matrix, a number of tests will be performed:   
+/*  (2)     | I - UU' | / ( n ulp ) */
 
-    (1)     | A - V S V' | / ( |A| n ulp )  computed by DSBTRD with   
-                                            UPLO='U'   
+/*  (3)     | A - V S V' | / ( |A| n ulp )  computed by DSBTRD with */
+/*                                          UPLO='L' */
 
-    (2)     | I - UU' | / ( n ulp )   
+/*  (4)     | I - UU' | / ( n ulp ) */
 
-    (3)     | A - V S V' | / ( |A| n ulp )  computed by DSBTRD with   
-                                            UPLO='L'   
+/*  The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*  each element NN(j) specifies one size. */
+/*  The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*  if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*  Currently, the list of possible types is: */
 
-    (4)     | I - UU' | / ( n ulp )   
+/*  (1)  The zero matrix. */
+/*  (2)  The identity matrix. */
 
-    The "sizes" are specified by an array NN(1:NSIZES); the value of   
-    each element NN(j) specifies one size.   
-    The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-    if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-    Currently, the list of possible types is:   
+/*  (3)  A diagonal matrix with evenly spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*       (ULP = (first number larger than 1) - 1 ) */
+/*  (4)  A diagonal matrix with geometrically spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*  (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*       and random signs. */
 
-    (1)  The zero matrix.   
-    (2)  The identity matrix.   
+/*  (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*  (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
 
-    (3)  A diagonal matrix with evenly spaced entries   
-         1, ..., ULP  and random signs.   
-         (ULP = (first number larger than 1) - 1 )   
-    (4)  A diagonal matrix with geometrically spaced entries   
-         1, ..., ULP  and random signs.   
-    (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-         and random signs.   
+/*  (8)  A matrix of the form  U' D U, where U is orthogonal and */
+/*       D has evenly spaced entries 1, ..., ULP with random signs */
+/*       on the diagonal. */
 
-    (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-    (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
+/*  (9)  A matrix of the form  U' D U, where U is orthogonal and */
+/*       D has geometrically spaced entries 1, ..., ULP with random */
+/*       signs on the diagonal. */
 
-    (8)  A matrix of the form  U' D U, where U is orthogonal and   
-         D has evenly spaced entries 1, ..., ULP with random signs   
-         on the diagonal.   
+/*  (10) A matrix of the form  U' D U, where U is orthogonal and */
+/*       D has "clustered" entries 1, ULP,..., ULP with random */
+/*       signs on the diagonal. */
 
-    (9)  A matrix of the form  U' D U, where U is orthogonal and   
-         D has geometrically spaced entries 1, ..., ULP with random   
-         signs on the diagonal.   
+/*  (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*  (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
 
-    (10) A matrix of the form  U' D U, where U is orthogonal and   
-         D has "clustered" entries 1, ULP,..., ULP with random   
-         signs on the diagonal.   
+/*  (13) Symmetric matrix with random entries chosen from (-1,1). */
+/*  (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*  (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
 
-    (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-    (12) Same as (8), but multiplied by SQRT( underflow threshold )   
+/*  Arguments */
+/*  ========= */
 
-    (13) Symmetric matrix with random entries chosen from (-1,1).   
-    (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-    (15) Same as (13), but multiplied by SQRT( underflow threshold )   
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          DCHKSB does nothing.  It must be at least zero. */
 
-    Arguments   
-    =========   
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
 
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            DCHKSB does nothing.  It must be at least zero.   
+/*  NWDTHS  (input) INTEGER */
+/*          The number of bandwidths to use.  If it is zero, */
+/*          DCHKSB does nothing.  It must be at least zero. */
 
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
+/*  KK      (input) INTEGER array, dimension (NWDTHS) */
+/*          An array containing the bandwidths to be used for the band */
+/*          matrices.  The values must be at least zero. */
 
-    NWDTHS  (input) INTEGER   
-            The number of bandwidths to use.  If it is zero,   
-            DCHKSB does nothing.  It must be at least zero.   
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, DCHKSB */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
 
-    KK      (input) INTEGER array, dimension (NWDTHS)   
-            An array containing the bandwidths to be used for the band   
-            matrices.  The values must be at least zero.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
 
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, DCHKSB   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to DCHKSB to continue the same random number */
+/*          sequence. */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to DCHKSB to continue the same random number   
-            sequence.   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
 
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  A       (input/workspace) DOUBLE PRECISION array, dimension */
+/*                            (LDA, max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 2 (not 1!) */
+/*          and at least max( KK )+1. */
 
-    A       (input/workspace) DOUBLE PRECISION array, dimension   
-                              (LDA, max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.   
+/*  SD      (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*          Used to hold the diagonal of the tridiagonal matrix computed */
+/*          by DSBTRD. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 2 (not 1!)   
-            and at least max( KK )+1.   
+/*  SE      (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*          Used to hold the off-diagonal of the tridiagonal matrix */
+/*          computed by DSBTRD. */
 
-    SD      (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-            Used to hold the diagonal of the tridiagonal matrix computed   
-            by DSBTRD.   
+/*  U       (workspace) DOUBLE PRECISION array, dimension (LDU, max(NN)) */
+/*          Used to hold the orthogonal matrix computed by DSBTRD. */
 
-    SE      (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-            Used to hold the off-diagonal of the tridiagonal matrix   
-            computed by DSBTRD.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  It must be at least 1 */
+/*          and at least max( NN ). */
 
-    U       (workspace) DOUBLE PRECISION array, dimension (LDU, max(NN))   
-            Used to hold the orthogonal matrix computed by DSBTRD.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  It must be at least 1   
-            and at least max( NN ).   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          max( LDA+1, max(NN)+1 )*max(NN). */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (4) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            max( LDA+1, max(NN)+1 )*max(NN).   
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (4)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
+/* ----------------------------------------------------------------------- */
 
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far. */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
 
-   -----------------------------------------------------------------------   
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
 
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far.   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
+/*  ===================================================================== */
 
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --kk;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -431,8 +440,8 @@ static integer c__4 = 4;
 	    if (k > n) {
 		goto L180;
 	    }
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	    i__5 = n - 1;
 	    i__3 = 0, i__4 = min(i__5,k);
 	    k = max(i__3,i__4);
@@ -456,22 +465,22 @@ static integer c__4 = 4;
 /* L30: */
 		}
 
-/*              Compute "A".   
-                Store as "Upper"; later, we will copy to other format.   
+/*              Compute "A". */
+/*              Store as "Upper"; later, we will copy to other format. */
 
-                Control parameters:   
+/*              Control parameters: */
 
-                    KMAGN  KMODE        KTYPE   
-                =1  O(1)   clustered 1  zero   
-                =2  large  clustered 2  identity   
-                =3  small  exponential  (none)   
-                =4         arithmetic   diagonal, (w/ eigenvalues)   
-                =5         random log   symmetric, w/ eigenvalues   
-                =6         random       (none)   
-                =7                      random diagonal   
-                =8                      random symmetric   
-                =9                      positive definite   
-                =10                     diagonally dominant tridiagonal */
+/*                  KMAGN  KMODE        KTYPE */
+/*              =1  O(1)   clustered 1  zero */
+/*              =2  large  clustered 2  identity */
+/*              =3  small  exponential  (none) */
+/*              =4         arithmetic   diagonal, (w/ eigenvalues) */
+/*              =5         random log   symmetric, w/ eigenvalues */
+/*              =6         random       (none) */
+/*              =7                      random diagonal */
+/*              =8                      random symmetric */
+/*              =9                      positive definite */
+/*              =10                     diagonally dominant tridiagonal */
 
 		if (mtypes > 15) {
 		    goto L100;
@@ -510,9 +519,9 @@ L70:
 		    cond = ulpinv * aninv / 10.;
 		}
 
-/*              Special Matrices -- Identity & Jordan block   
+/*              Special Matrices -- Identity & Jordan block */
 
-                   Zero */
+/*                 Zero */
 
 		if (itype == 1) {
 		    iinfo = 0;
@@ -523,7 +532,7 @@ L70:
 
 		    i__4 = n;
 		    for (jcol = 1; jcol <= i__4; ++jcol) {
-			a_ref(k + 1, jcol) = anorm;
+			a[k + 1 + jcol * a_dim1] = anorm;
 /* L80: */
 		    }
 
@@ -532,8 +541,8 @@ L70:
 /*                 Diagonal Matrix, [Eigen]values Specified */
 
 		    dlatms_(&n, &n, "S", &iseed[1], "S", &work[1], &imode, &
-			    cond, &anorm, &c__0, &c__0, "Q", &a_ref(k + 1, 1),
-			     lda, &work[n + 1], &iinfo);
+			    cond, &anorm, &c__0, &c__0, "Q", &a[k + 1 + 
+			    a_dim1], lda, &work[n + 1], &iinfo);
 
 		} else if (itype == 5) {
 
@@ -550,8 +559,8 @@ L70:
 		    dlatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &
 			    c_b32, &c_b32, "T", "N", &work[n + 1], &c__1, &
 			    c_b32, &work[(n << 1) + 1], &c__1, &c_b32, "N", 
-			    idumma, &c__0, &c__0, &c_b18, &anorm, "Q", &a_ref(
-			    k + 1, 1), lda, idumma, &iinfo);
+			    idumma, &c__0, &c__0, &c_b18, &anorm, "Q", &a[k + 
+			    1 + a_dim1], lda, idumma, &iinfo);
 
 		} else if (itype == 8) {
 
@@ -560,7 +569,7 @@ L70:
 		    dlatmr_(&n, &n, "S", &iseed[1], "S", &work[1], &c__6, &
 			    c_b32, &c_b32, "T", "N", &work[n + 1], &c__1, &
 			    c_b32, &work[(n << 1) + 1], &c__1, &c_b32, "N", 
-			    idumma, &k, &k, &c_b18, &anorm, "Q", &a[a_offset],
+			    idumma, &k, &k, &c_b18, &anorm, "Q", &a[a_offset], 
 			     lda, idumma, &iinfo);
 
 		} else if (itype == 9) {
@@ -579,16 +588,17 @@ L70:
 			k = max(1,k);
 		    }
 		    dlatms_(&n, &n, "S", &iseed[1], "P", &work[1], &imode, &
-			    cond, &anorm, &c__1, &c__1, "Q", &a_ref(k, 1), 
+			    cond, &anorm, &c__1, &c__1, "Q", &a[k + a_dim1], 
 			    lda, &work[n + 1], &iinfo);
 		    i__4 = n;
 		    for (i__ = 2; i__ <= i__4; ++i__) {
-			temp1 = (d__1 = a_ref(k, i__), abs(d__1)) / sqrt((
-				d__2 = a_ref(k + 1, i__ - 1) * a_ref(k + 1, 
-				i__), abs(d__2)));
+			temp1 = (d__1 = a[k + i__ * a_dim1], abs(d__1)) / 
+				sqrt((d__2 = a[k + 1 + (i__ - 1) * a_dim1] * 
+				a[k + 1 + i__ * a_dim1], abs(d__2)));
 			if (temp1 > .5) {
-			    a_ref(k, i__) = sqrt((d__1 = a_ref(k + 1, i__ - 1)
-				     * a_ref(k + 1, i__), abs(d__1))) * .5;
+			    a[k + i__ * a_dim1] = sqrt((d__1 = a[k + 1 + (i__ 
+				    - 1) * a_dim1] * a[k + 1 + i__ * a_dim1], 
+				    abs(d__1))) * .5;
 			}
 /* L90: */
 		    }
@@ -647,8 +657,8 @@ L100:
 		dsbt21_("Upper", &n, &k, &c__1, &a[a_offset], lda, &sd[1], &
 			se[1], &u[u_offset], ldu, &work[1], &result[1]);
 
-/*              Convert A from Upper-Triangle-Only storage to   
-                Lower-Triangle-Only storage. */
+/*              Convert A from Upper-Triangle-Only storage to */
+/*              Lower-Triangle-Only storage. */
 
 		i__4 = n;
 		for (jc = 1; jc <= i__4; ++jc) {
@@ -656,7 +666,8 @@ L100:
 		    i__6 = k, i__7 = n - jc;
 		    i__5 = min(i__6,i__7);
 		    for (jr = 0; jr <= i__5; ++jr) {
-			a_ref(jr + 1, jc) = a_ref(k + 1 - jr, jc + jr);
+			a[jr + 1 + jc * a_dim1] = a[k + 1 - jr + (jc + jr) * 
+				a_dim1];
 /* L110: */
 		    }
 /* L120: */
@@ -667,7 +678,7 @@ L100:
 		    i__5 = k, i__6 = n - jc;
 		    i__7 = k;
 		    for (jr = min(i__5,i__6) + 1; jr <= i__7; ++jr) {
-			a_ref(jr + 1, jc) = 0.;
+			a[jr + 1 + jc * a_dim1] = 0.;
 /* L130: */
 		    }
 /* L140: */
@@ -718,8 +729,8 @@ L150:
 		for (jr = 1; jr <= i__4; ++jr) {
 		    if (result[jr] >= *thresh) {
 
-/*                    If this is the first test to fail,   
-                      print a header to the data file. */
+/*                    If this is the first test to fail, */
+/*                    print a header to the data file. */
 
 			if (nerrs == 0) {
 			    io___41.ciunit = *nounit;
@@ -784,7 +795,3 @@ L180:
 /*     End of DCHKSB */
 
 } /* dchksb_ */
-
-#undef a_ref
-
-

@@ -1,76 +1,25 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int zlacon_(integer *n, doublecomplex *v, doublecomplex *x, 
 	doublereal *est, integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    ZLACON estimates the 1-norm of a square, complex matrix A.   
-    Reverse communication is used for evaluating matrix-vector products.   
-
-    Arguments   
-    =========   
-
-    N      (input) INTEGER   
-           The order of the matrix.  N >= 1.   
-
-    V      (workspace) COMPLEX*16 array, dimension (N)   
-           On the final return, V = A*W,  where  EST = norm(V)/norm(W)   
-           (W is not returned).   
-
-    X      (input/output) COMPLEX*16 array, dimension (N)   
-           On an intermediate return, X should be overwritten by   
-                 A * X,   if KASE=1,   
-                 A' * X,  if KASE=2,   
-           where A' is the conjugate transpose of A, and ZLACON must be   
-           re-called with all the other parameters unchanged.   
-
-    EST    (output) DOUBLE PRECISION   
-           An estimate (a lower bound) for norm(A).   
-
-    KASE   (input/output) INTEGER   
-           On the initial call to ZLACON, KASE should be 0.   
-           On an intermediate return, KASE will be 1 or 2, indicating   
-           whether X should be overwritten by A * X  or A' * X.   
-           On the final return from ZLACON, KASE will again be 0.   
-
-    Further Details   
-    ======= =======   
-
-    Contributed by Nick Higham, University of Manchester.   
-    Originally named CONEST, dated March 16, 1988.   
-
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
-    a real or complex matrix, with applications to condition estimation",   
-    ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
-
-    Last modified:  April, 1999   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2, i__3;
     doublereal d__1, d__2;
     doublecomplex z__1;
+
     /* Builtin functions */
     double z_abs(doublecomplex *), d_imag(doublecomplex *);
+
     /* Local variables */
-    static integer iter;
+    static integer i__, j, iter;
     static doublereal temp;
-    static integer jump, i__, j;
+    static integer jump;
     static doublereal absxi;
     static integer jlast;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
@@ -81,6 +30,78 @@
     static doublereal safmin, altsgn, estold;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLACON estimates the 1-norm of a square, complex matrix A. */
+/*  Reverse communication is used for evaluating matrix-vector products. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N      (input) INTEGER */
+/*         The order of the matrix.  N >= 1. */
+
+/*  V      (workspace) COMPLEX*16 array, dimension (N) */
+/*         On the final return, V = A*W,  where  EST = norm(V)/norm(W) */
+/*         (W is not returned). */
+
+/*  X      (input/output) COMPLEX*16 array, dimension (N) */
+/*         On an intermediate return, X should be overwritten by */
+/*               A * X,   if KASE=1, */
+/*               A' * X,  if KASE=2, */
+/*         where A' is the conjugate transpose of A, and ZLACON must be */
+/*         re-called with all the other parameters unchanged. */
+
+/*  EST    (input/output) DOUBLE PRECISION */
+/*         On entry with KASE = 1 or 2 and JUMP = 3, EST should be */
+/*         unchanged from the previous call to ZLACON. */
+/*         On exit, EST is an estimate (a lower bound) for norm(A). */
+
+/*  KASE   (input/output) INTEGER */
+/*         On the initial call to ZLACON, KASE should be 0. */
+/*         On an intermediate return, KASE will be 1 or 2, indicating */
+/*         whether X should be overwritten by A * X  or A' * X. */
+/*         On the final return from ZLACON, KASE will again be 0. */
+
+/*  Further Details */
+/*  ======= ======= */
+
+/*  Contributed by Nick Higham, University of Manchester. */
+/*  Originally named CONEST, dated March 16, 1988. */
+
+/*  Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of */
+/*  a real or complex matrix, with applications to condition estimation", */
+/*  ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988. */
+
+/*  Last modified:  April, 1999 */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --x;
     --v;
 
@@ -108,8 +129,8 @@
 	case 5:  goto L120;
     }
 
-/*     ................ ENTRY   (JUMP = 1)   
-       FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 1) */
+/*     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
 
 L20:
     if (*n == 1) {
@@ -140,8 +161,8 @@ L20:
     jump = 2;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 2)   
-       FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY ZTRANS(A)*X. */
+/*     ................ ENTRY   (JUMP = 2) */
+/*     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY CTRANS(A)*X. */
 
 L40:
     j = izmax1_(n, &x[1], &c__1);
@@ -162,8 +183,8 @@ L50:
     jump = 3;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 3)   
-       X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 3) */
+/*     X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
     zcopy_(n, &x[1], &c__1, &v[1], &c__1);
@@ -195,8 +216,8 @@ L70:
     jump = 4;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 4)   
-       X HAS BEEN OVERWRITTEN BY ZTRANS(A)*X. */
+/*     ................ ENTRY   (JUMP = 4) */
+/*     X HAS BEEN OVERWRITTEN BY CTRANS(A)*X. */
 
 L90:
     jlast = j;
@@ -223,8 +244,8 @@ L100:
     jump = 5;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 5)   
-       X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 5) */
+/*     X HAS BEEN OVERWRITTEN BY A*X. */
 
 L120:
     temp = dzsum1_(n, &x[1], &c__1) / (doublereal) (*n * 3) * 2.;
@@ -240,4 +261,3 @@ L130:
 /*     End of ZLACON */
 
 } /* zlacon_ */
-

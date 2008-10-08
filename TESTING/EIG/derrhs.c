@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -44,23 +39,23 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublereal a[9]	/* was [3][3] */, c__[9]	/* was [3][3] 
-	    */;
-    static integer i__, j, m;
-    static doublereal s[3], w[28];
-    static char c2[2];
+    doublereal a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    integer i__, j, m;
+    doublereal s[3], w[28];
+    char c2[2];
+    doublereal wi[3];
+    integer nt;
+    doublereal vl[9]	/* was [3][3] */, vr[9]	/* was [3][3] */, wr[3];
+    integer ihi, ilo;
+    logical sel[3];
+    doublereal tau[3];
+    integer info;
     extern /* Subroutine */ int dgebak_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *), dgebal_(char *, integer *, doublereal 
 	    *, integer *, integer *, integer *, doublereal *, integer *), dgehrd_(integer *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, integer *);
-    static integer ifaill[3];
-    static doublereal wi[3];
-    static integer nt;
-    static doublereal vl[9]	/* was [3][3] */;
-    static integer ifailr[3];
-    static doublereal vr[9]	/* was [3][3] */, wr[3];
+    integer ifaill[3], ifailr[3];
     extern /* Subroutine */ int dhsein_(char *, char *, char *, logical *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
@@ -76,9 +71,6 @@ static integer c__4 = 4;
 	    integer *, integer *, integer *, doublereal *, integer *), dormhr_(char *, char *, integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *);
-    static integer ihi, ilo;
-    static logical sel[3];
-    static doublereal tau[3];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -87,32 +79,47 @@ static integer c__4 = 4;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*3 + a_1 - 4]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRHS tests the error exits for DGEBAK, SGEBAL, SGEHRD, DORGHR, */
+/*  DORMHR, DHSEQR, SHSEIN, and DTREVC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRHS tests the error exits for DGEBAK, SGEBAL, SGEHRD, DORGHR,   
-    DORMHR, DHSEQR, SHSEIN, and DTREVC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -124,7 +131,7 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + j * 3 - 4] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	wi[j - 1] = (doublereal) j;
@@ -504,7 +511,3 @@ static integer c__4 = 4;
 /*     End of DERRHS */
 
 } /* derrhs_ */
-
-#undef a_ref
-
-

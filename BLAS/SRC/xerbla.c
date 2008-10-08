@@ -1,12 +1,13 @@
 #include "blaswrap.h"
+#include "stdio.h"
 #include "f2c.h"
 
 /* Subroutine */ int xerbla_(char *srname, integer *info)
 {
-/*  -- LAPACK auxiliary routine (preliminary version) --   
+/*  -- LAPACK auxiliary routine (version 2.0) --   
        Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
        Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+       September 30, 1994   
 
 
     Purpose   
@@ -27,29 +28,14 @@
 
     INFO    (input) INTEGER   
             The position of the invalid parameter in the parameter list   
-            of the calling routine. */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
-    /* Format strings */
-    static char fmt_9999[] = "(\002 ** On entry to \002,a6,\002 parameter nu"
-	    "mber \002,i2,\002 had \002,\002an illegal value\002)";
-    /* Builtin functions */
-    integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
-    /* Subroutine */ int s_stop(char *, ftnlen);
-    /* Fortran I/O blocks */
-    static cilist io___1 = { 0, 6, 0, fmt_9999, 0 };
 
+            of the calling routine.   
 
+   ===================================================================== 
+*/
 
-
-    s_wsfe(&io___1);
-    do_fio(&c__1, srname, (ftnlen)6);
-    do_fio(&c__1, (char *)&(*info), (ftnlen)sizeof(integer));
-    e_wsfe();
-
-    s_stop("", (ftnlen)0);
-
+    printf("** On entry to %6s, parameter number %2i had an illegal value\n",
+		srname, *info);
 
 /*     End of XERBLA */
 

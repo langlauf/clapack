@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -41,21 +36,20 @@ static integer c__20 = 20;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[2];
-    static real rmax, vmax;
-    static complex e[400]	/* was [20][20] */;
-    static integer i__, j, n;
-    static real scale[20], x;
-    static integer ninfo;
+    complex e[400]	/* was [20][20] */;
+    integer i__, j, n;
+    real x;
+    integer ihi;
+    complex ein[400]	/* was [20][20] */;
+    integer ilo;
+    real eps;
+    integer knt, info, lmax[2];
+    real rmax, vmax, scale[20];
+    integer ninfo;
     extern /* Subroutine */ int cgebak_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, complex *, integer *, integer *);
     extern doublereal slamch_(char *);
-    static real safmin;
-    static integer ihi;
-    static complex ein[400]	/* was [20][20] */;
-    static integer ilo;
-    static real eps;
-    static integer knt;
+    real safmin;
 
     /* Fortran I/O blocks */
     static cilist io___7 = { 0, 0, 0, 0, 0 };
@@ -71,36 +65,48 @@ static integer c__20 = 20;
 
 
 
-#define e_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
-#define ein_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define ein_ref(a_1,a_2) ein[ein_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CCHKBK tests CGEBAK, a routine for backward transformation of */
+/*  the computed right or left eigenvectors if the orginal matrix */
+/*  was preprocessed by balance subroutine CGEBAL. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CCHKBK tests CGEBAK, a routine for backward transformation of   
-    the computed right or left eigenvectors if the orginal matrix   
-    was preprocessed by balance subroutine CGEBAL.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/* ====================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-   ====================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -135,8 +141,8 @@ L10:
 	s_rsle(&io___14);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&e_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&e[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L20: */
@@ -148,8 +154,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&ein_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&ein[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L30: */
@@ -168,19 +174,19 @@ L10:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = e_subscr(i__, j);
-	    i__4 = ein_subscr(i__, j);
+	    i__3 = i__ + j * 20 - 21;
+	    i__4 = i__ + j * 20 - 21;
 	    q__2.r = e[i__3].r - ein[i__4].r, q__2.i = e[i__3].i - ein[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 	    x = ((r__1 = q__1.r, dabs(r__1)) + (r__2 = r_imag(&q__1), dabs(
 		    r__2))) / eps;
-	    i__3 = e_subscr(i__, j);
-	    if ((r__1 = e[i__3].r, dabs(r__1)) + (r__2 = r_imag(&e_ref(i__, j)
-		    ), dabs(r__2)) > safmin) {
-		i__4 = e_subscr(i__, j);
-		x /= (r__3 = e[i__4].r, dabs(r__3)) + (r__4 = r_imag(&e_ref(
-			i__, j)), dabs(r__4));
+	    i__3 = i__ + j * 20 - 21;
+	    if ((r__1 = e[i__3].r, dabs(r__1)) + (r__2 = r_imag(&e[i__ + j * 
+		    20 - 21]), dabs(r__2)) > safmin) {
+		i__4 = i__ + j * 20 - 21;
+		x /= (r__3 = e[i__4].r, dabs(r__3)) + (r__4 = r_imag(&e[i__ + 
+			j * 20 - 21]), dabs(r__4));
 	    }
 	    vmax = dmax(vmax,x);
 /* L40: */
@@ -227,10 +233,3 @@ L60:
 /*     End of CCHKBK */
 
 } /* cchkbk_ */
-
-#undef ein_ref
-#undef ein_subscr
-#undef e_ref
-#undef e_subscr
-
-

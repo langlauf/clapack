@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,144 +21,154 @@ static integer c__1 = 1;
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer kbeg, jcol;
-    static doublereal xabs;
-    static integer irow, j;
+    integer j, kbeg, jcol;
+    doublereal xabs;
+    integer irow;
     extern logical lsame_(char *, char *);
-    static doublecomplex csign;
+    doublecomplex csign;
     extern /* Subroutine */ int zgerc_(integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zscal_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *);
-    static integer ixfrm;
+    integer ixfrm;
     extern /* Subroutine */ int zgemv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *);
-    static integer itype, nxfrm;
-    static doublereal xnorm;
+    integer itype, nxfrm;
+    doublereal xnorm;
     extern doublereal dznrm2_(integer *, doublecomplex *, integer *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static doublereal factor;
+    doublereal factor;
     extern /* Subroutine */ int zlacgv_(integer *, doublecomplex *, integer *)
 	    ;
     extern /* Double Complex */ VOID zlarnd_(doublecomplex *, integer *, 
 	    integer *);
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static doublecomplex xnorms;
+    doublecomplex xnorms;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*     ZLAROR pre- or post-multiplies an M by N matrix A by a random */
+/*     unitary matrix U, overwriting A. A may optionally be */
+/*     initialized to the identity matrix before multiplying by U. */
+/*     U is generated using the method of G.W. Stewart */
+/*     ( SIAM J. Numer. Anal. 17, 1980, pp. 403-409 ). */
+/*     (BLAS-2 version) */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-       ZLAROR pre- or post-multiplies an M by N matrix A by a random   
-       unitary matrix U, overwriting A. A may optionally be   
-       initialized to the identity matrix before multiplying by U.   
-       U is generated using the method of G.W. Stewart   
-       ( SIAM J. Numer. Anal. 17, 1980, pp. 403-409 ).   
-       (BLAS-2 version)   
+/*  SIDE   - CHARACTER*1 */
+/*           SIDE specifies whether A is multiplied on the left or right */
+/*           by U. */
+/*       SIDE = 'L'   Multiply A on the left (premultiply) by U */
+/*       SIDE = 'R'   Multiply A on the right (postmultiply) by U* */
+/*       SIDE = 'C'   Multiply A on the left by U and the right by U* */
+/*       SIDE = 'T'   Multiply A on the left by U and the right by U' */
+/*           Not modified. */
 
-    Arguments   
-    =========   
+/*  INIT   - CHARACTER*1 */
+/*           INIT specifies whether or not A should be initialized to */
+/*           the identity matrix. */
+/*              INIT = 'I'   Initialize A to (a section of) the */
+/*                           identity matrix before applying U. */
+/*              INIT = 'N'   No initialization.  Apply U to the */
+/*                           input matrix A. */
 
-    SIDE   - CHARACTER*1   
-             SIDE specifies whether A is multiplied on the left or right   
-             by U.   
-         SIDE = 'L'   Multiply A on the left (premultiply) by U   
-         SIDE = 'R'   Multiply A on the right (postmultiply) by U*   
-         SIDE = 'C'   Multiply A on the left by U and the right by U*   
-         SIDE = 'T'   Multiply A on the left by U and the right by U'   
-             Not modified.   
+/*           INIT = 'I' may be used to generate square (i.e., unitary) */
+/*           or rectangular orthogonal matrices (orthogonality being */
+/*           in the sense of ZDOTC): */
 
-    INIT   - CHARACTER*1   
-             INIT specifies whether or not A should be initialized to   
-             the identity matrix.   
-                INIT = 'I'   Initialize A to (a section of) the   
-                             identity matrix before applying U.   
-                INIT = 'N'   No initialization.  Apply U to the   
-                             input matrix A.   
+/*           For square matrices, M=N, and SIDE many be either 'L' or */
+/*           'R'; the rows will be orthogonal to each other, as will the */
+/*           columns. */
+/*           For rectangular matrices where M < N, SIDE = 'R' will */
+/*           produce a dense matrix whose rows will be orthogonal and */
+/*           whose columns will not, while SIDE = 'L' will produce a */
+/*           matrix whose rows will be orthogonal, and whose first M */
+/*           columns will be orthogonal, the remaining columns being */
+/*           zero. */
+/*           For matrices where M > N, just use the previous */
+/*           explaination, interchanging 'L' and 'R' and "rows" and */
+/*           "columns". */
 
-             INIT = 'I' may be used to generate square (i.e., unitary)   
-             or rectangular orthogonal matrices (orthogonality being   
-             in the sense of ZDOTC):   
+/*           Not modified. */
 
-             For square matrices, M=N, and SIDE many be either 'L' or   
-             'R'; the rows will be orthogonal to each other, as will the   
-             columns.   
-             For rectangular matrices where M < N, SIDE = 'R' will   
-             produce a dense matrix whose rows will be orthogonal and   
-             whose columns will not, while SIDE = 'L' will produce a   
-             matrix whose rows will be orthogonal, and whose first M   
-             columns will be orthogonal, the remaining columns being   
-             zero.   
-             For matrices where M > N, just use the previous   
-             explaination, interchanging 'L' and 'R' and "rows" and   
-             "columns".   
+/*  M      - INTEGER */
+/*           Number of rows of A. Not modified. */
 
-             Not modified.   
+/*  N      - INTEGER */
+/*           Number of columns of A. Not modified. */
 
-    M      - INTEGER   
-             Number of rows of A. Not modified.   
+/*  A      - COMPLEX*16 array, dimension ( LDA, N ) */
+/*           Input and output array. Overwritten by U A ( if SIDE = 'L' ) */
+/*           or by A U ( if SIDE = 'R' ) */
+/*           or by U A U* ( if SIDE = 'C') */
+/*           or by U A U' ( if SIDE = 'T') on exit. */
 
-    N      - INTEGER   
-             Number of columns of A. Not modified.   
+/*  LDA    - INTEGER */
+/*           Leading dimension of A. Must be at least MAX ( 1, M ). */
+/*           Not modified. */
 
-    A      - COMPLEX*16 array, dimension ( LDA, N )   
-             Input and output array. Overwritten by U A ( if SIDE = 'L' )   
-             or by A U ( if SIDE = 'R' )   
-             or by U A U* ( if SIDE = 'C')   
-             or by U A U' ( if SIDE = 'T') on exit.   
+/*  ISEED  - INTEGER array, dimension ( 4 ) */
+/*           On entry ISEED specifies the seed of the random number */
+/*           generator. The array elements should be between 0 and 4095; */
+/*           if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*           be odd.  The random number generator uses a linear */
+/*           congruential sequence limited to small integers, and so */
+/*           should produce machine independent random numbers. The */
+/*           values of ISEED are changed on exit, and can be used in the */
+/*           next call to ZLAROR to continue the same random number */
+/*           sequence. */
+/*           Modified. */
 
-    LDA    - INTEGER   
-             Leading dimension of A. Must be at least MAX ( 1, M ).   
-             Not modified.   
+/*  X      - COMPLEX*16 array, dimension ( 3*MAX( M, N ) ) */
+/*           Workspace. Of length: */
+/*               2*M + N if SIDE = 'L', */
+/*               2*N + M if SIDE = 'R', */
+/*               3*N     if SIDE = 'C' or 'T'. */
+/*           Modified. */
 
-    ISEED  - INTEGER array, dimension ( 4 )   
-             On entry ISEED specifies the seed of the random number   
-             generator. The array elements should be between 0 and 4095;   
-             if not they will be reduced mod 4096.  Also, ISEED(4) must   
-             be odd.  The random number generator uses a linear   
-             congruential sequence limited to small integers, and so   
-             should produce machine independent random numbers. The   
-             values of ISEED are changed on exit, and can be used in the   
-             next call to ZLAROR to continue the same random number   
-             sequence.   
-             Modified.   
+/*  INFO   - INTEGER */
+/*           An error flag.  It is set to: */
+/*            0  if no error. */
+/*            1  if ZLARND returned a bad random number (installation */
+/*               problem) */
+/*           -1  if SIDE is not L, R, C, or T. */
+/*           -3  if M is negative. */
+/*           -4  if N is negative or if SIDE is C or T and N is not equal */
+/*               to M. */
+/*           -6  if LDA is less than M. */
 
-    X      - COMPLEX*16 array, dimension ( 3*MAX( M, N ) )   
-             Workspace. Of length:   
-                 2*M + N if SIDE = 'L',   
-                 2*N + M if SIDE = 'R',   
-                 3*N     if SIDE = 'C' or 'T'.   
-             Modified.   
+/*  ===================================================================== */
 
-    INFO   - INTEGER   
-             An error flag.  It is set to:   
-              0  if no error.   
-              1  if ZLARND returned a bad random number (installation   
-                 problem)   
-             -1  if SIDE is not L, R, C, or T.   
-             -3  if M is negative.   
-             -4  if N is negative or if SIDE is C or T and N is not equal   
-                 to M.   
-             -6  if LDA is less than M.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --x;
@@ -214,12 +219,12 @@ static integer c__1 = 1;
 	zlaset_("Full", m, n, &c_b1, &c_b2, &a[a_offset], lda);
     }
 
-/*     If no rotation possible, still multiply by   
-       a random complex number from the circle |x| = 1   
+/*     If no rotation possible, still multiply by */
+/*     a random complex number from the circle |x| = 1 */
 
-        2)      Compute Rotation by computing Householder   
-                Transformations H(2), H(3), ..., H(n).  Note that the   
-                order in which they are computed is irrelevant. */
+/*      2)      Compute Rotation by computing Householder */
+/*              Transformations H(2), H(3), ..., H(n).  Note that the */
+/*              order in which they are computed is irrelevant. */
 
     i__1 = nxfrm;
     for (j = 1; j <= i__1; ++j) {
@@ -278,12 +283,12 @@ static integer c__1 = 1;
 
 /*           Apply H(k) on the left of A */
 
-	    zgemv_("C", &ixfrm, n, &c_b2, &a_ref(kbeg, 1), lda, &x[kbeg], &
+	    zgemv_("C", &ixfrm, n, &c_b2, &a[kbeg + a_dim1], lda, &x[kbeg], &
 		    c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
 	    z__2.r = factor, z__2.i = 0.;
 	    z__1.r = -z__2.r, z__1.i = -z__2.i;
 	    zgerc_(&ixfrm, n, &z__1, &x[kbeg], &c__1, &x[(nxfrm << 1) + 1], &
-		    c__1, &a_ref(kbeg, 1), lda);
+		    c__1, &a[kbeg + a_dim1], lda);
 
 	}
 
@@ -295,12 +300,12 @@ static integer c__1 = 1;
 		zlacgv_(&ixfrm, &x[kbeg], &c__1);
 	    }
 
-	    zgemv_("N", m, &ixfrm, &c_b2, &a_ref(1, kbeg), lda, &x[kbeg], &
-		    c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
+	    zgemv_("N", m, &ixfrm, &c_b2, &a[kbeg * a_dim1 + 1], lda, &x[kbeg]
+, &c__1, &c_b1, &x[(nxfrm << 1) + 1], &c__1);
 	    z__2.r = factor, z__2.i = 0.;
 	    z__1.r = -z__2.r, z__1.i = -z__2.i;
 	    zgerc_(m, &ixfrm, &z__1, &x[(nxfrm << 1) + 1], &c__1, &x[kbeg], &
-		    c__1, &a_ref(1, kbeg), lda);
+		    c__1, &a[kbeg * a_dim1 + 1], lda);
 
 	}
 /* L30: */
@@ -324,7 +329,7 @@ static integer c__1 = 1;
 	i__1 = *m;
 	for (irow = 1; irow <= i__1; ++irow) {
 	    d_cnjg(&z__1, &x[nxfrm + irow]);
-	    zscal_(n, &z__1, &a_ref(irow, 1), lda);
+	    zscal_(n, &z__1, &a[irow + a_dim1], lda);
 /* L40: */
 	}
     }
@@ -332,7 +337,7 @@ static integer c__1 = 1;
     if (itype == 2 || itype == 3) {
 	i__1 = *n;
 	for (jcol = 1; jcol <= i__1; ++jcol) {
-	    zscal_(m, &x[nxfrm + jcol], &a_ref(1, jcol), &c__1);
+	    zscal_(m, &x[nxfrm + jcol], &a[jcol * a_dim1 + 1], &c__1);
 /* L50: */
 	}
     }
@@ -341,7 +346,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (jcol = 1; jcol <= i__1; ++jcol) {
 	    d_cnjg(&z__1, &x[nxfrm + jcol]);
-	    zscal_(m, &z__1, &a_ref(1, jcol), &c__1);
+	    zscal_(m, &z__1, &a[jcol * a_dim1 + 1], &c__1);
 /* L60: */
 	}
     }
@@ -350,8 +355,3 @@ static integer c__1 = 1;
 /*     End of ZLAROR */
 
 } /* zlaror_ */
-
-#undef a_ref
-#undef a_subscr
-
-

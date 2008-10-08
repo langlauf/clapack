@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -30,18 +25,19 @@ static doublereal c_b17 = 1.;
     integer a_dim1, a_offset, af_dim1, af_offset, q_dim1, q_offset, r_dim1, 
 	    r_offset, i__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
+    doublereal eps;
+    integer info;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static doublereal resid, anorm;
-    static integer minmn;
+    doublereal resid, anorm;
+    integer minmn;
     extern /* Subroutine */ int dsyrk_(char *, char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
@@ -55,84 +51,97 @@ static doublereal c_b17 = 1.;
     extern /* Subroutine */ int dorgqr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *);
-    static doublereal eps;
 
 
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DQRT01 tests DGEQRF, which computes the QR factorization of an m-by-n */
+/*  matrix A, and partially tests DORGQR which forms the m-by-m */
+/*  orthogonal matrix Q. */
 
-    Purpose   
-    =======   
+/*  DQRT01 compares R with Q'*A, and checks that Q is orthogonal. */
 
-    DQRT01 tests DGEQRF, which computes the QR factorization of an m-by-n   
-    matrix A, and partially tests DORGQR which forms the m-by-m   
-    orthogonal matrix Q.   
+/*  Arguments */
+/*  ========= */
 
-    DQRT01 compares R with Q'*A, and checks that Q is orthogonal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  AF      (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          Details of the QR factorization of A, as returned by DGEQRF. */
+/*          See DGEQRF for further details. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  Q       (output) DOUBLE PRECISION array, dimension (LDA,M) */
+/*          The m-by-m orthogonal matrix Q. */
 
-    AF      (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the QR factorization of A, as returned by DGEQRF.   
-            See DGEQRF for further details.   
+/*  R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N)) */
 
-    Q       (output) DOUBLE PRECISION array, dimension (LDA,M)   
-            The m-by-m orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N))   
+/*  TAU     (output) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by DGEQRF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by DGEQRF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( R - Q'*A ) / ( M * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( M * EPS ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( R - Q'*A ) / ( M * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -156,7 +165,7 @@ static doublereal c_b17 = 1.;
 
     dlaset_("Full", m, m, &c_b6, &c_b6, &q[q_offset], lda);
     i__1 = *m - 1;
-    dlacpy_("Lower", &i__1, n, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
+    dlacpy_("Lower", &i__1, n, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda);
 
 /*     Generate the m-by-m matrix Q */
 
@@ -200,8 +209,3 @@ static doublereal c_b17 = 1.;
 /*     End of DQRT01 */
 
 } /* dqrt01_ */
-
-#undef af_ref
-#undef q_ref
-
-

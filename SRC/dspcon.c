@@ -1,86 +1,105 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int dspcon_(char *uplo, integer *n, doublereal *ap, integer *
 	ipiv, doublereal *anorm, doublereal *rcond, doublereal *work, integer 
 	*iwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    DSPCON estimates the reciprocal of the condition number (in the   
-    1-norm) of a real symmetric packed matrix A using the factorization   
-    A = U*D*U**T or A = L*D*L**T computed by DSPTRF.   
-
-    An estimate is obtained for norm(inv(A)), and the reciprocal of the   
-    condition number is computed as RCOND = 1 / (ANORM * norm(inv(A))).   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored   
-            as an upper or lower triangular matrix.   
-            = 'U':  Upper triangular, form is A = U*D*U**T;   
-            = 'L':  Lower triangular, form is A = L*D*L**T.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            The block diagonal matrix D and the multipliers used to   
-            obtain the factor U or L as computed by DSPTRF, stored as a   
-            packed triangular matrix.   
-
-    IPIV    (input) INTEGER array, dimension (N)   
-            Details of the interchanges and the block structure of D   
-            as determined by DSPTRF.   
-
-    ANORM   (input) DOUBLE PRECISION   
-            The 1-norm of the original matrix A.   
-
-    RCOND   (output) DOUBLE PRECISION   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is an   
-            estimate of the 1-norm of inv(A) computed in this routine.   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (2*N)   
-
-    IWORK    (workspace) INTEGER array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1;
+
     /* Local variables */
-    static integer kase, i__;
+    integer i__, ip, kase;
     extern logical lsame_(char *, char *);
-    static logical upper;
-    static integer ip;
-    extern /* Subroutine */ int dlacon_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *, integer *), xerbla_(char *, integer *);
-    static doublereal ainvnm;
+    integer isave[3];
+    logical upper;
+    extern /* Subroutine */ int dlacn2_(integer *, doublereal *, doublereal *, 
+	     integer *, doublereal *, integer *, integer *), xerbla_(char *, 
+	    integer *);
+    doublereal ainvnm;
     extern /* Subroutine */ int dsptrs_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     Modified to call DLACN2 in place of DLACON, 5 Feb 03, SJH. */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DSPCON estimates the reciprocal of the condition number (in the */
+/*  1-norm) of a real symmetric packed matrix A using the factorization */
+/*  A = U*D*U**T or A = L*D*L**T computed by DSPTRF. */
+
+/*  An estimate is obtained for norm(inv(A)), and the reciprocal of the */
+/*  condition number is computed as RCOND = 1 / (ANORM * norm(inv(A))). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the details of the factorization are stored */
+/*          as an upper or lower triangular matrix. */
+/*          = 'U':  Upper triangular, form is A = U*D*U**T; */
+/*          = 'L':  Lower triangular, form is A = L*D*L**T. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2) */
+/*          The block diagonal matrix D and the multipliers used to */
+/*          obtain the factor U or L as computed by DSPTRF, stored as a */
+/*          packed triangular matrix. */
+
+/*  IPIV    (input) INTEGER array, dimension (N) */
+/*          Details of the interchanges and the block structure of D */
+/*          as determined by DSPTRF. */
+
+/*  ANORM   (input) DOUBLE PRECISION */
+/*          The 1-norm of the original matrix A. */
+
+/*  RCOND   (output) DOUBLE PRECISION */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is an */
+/*          estimate of the 1-norm of inv(A) computed in this routine. */
+
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (2*N) */
+
+/*  IWORK    (workspace) INTEGER array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --iwork;
     --work;
     --ipiv;
@@ -145,7 +164,7 @@
 
     kase = 0;
 L30:
-    dlacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
+    dlacn2_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase, isave);
     if (kase != 0) {
 
 /*        Multiply by inv(L*D*L') or inv(U*D*U'). */
@@ -165,4 +184,3 @@ L30:
 /*     End of DSPCON */
 
 } /* dspcon_ */
-

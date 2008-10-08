@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -42,28 +37,28 @@ static integer c__1 = 1;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublereal a[16]	/* was [4][4] */, d__[4], e[4];
-    static integer i__, j;
-    static doublereal q[16]	/* was [4][4] */, u[16]	/* was [4][4] */, v[
-	    16]	/* was [4][4] */, w[4];
-    static char c2[2];
+    doublereal a[16]	/* was [4][4] */, d__[4], e[4];
+    integer i__, j;
+    doublereal q[16]	/* was [4][4] */, u[16]	/* was [4][4] */, v[16]	/* 
+	    was [4][4] */, w[4];
+    char c2[2];
+    integer iq[16]	/* was [4][4] */, iw[4], nt;
+    doublereal tp[4], tq[4];
+    integer info;
     extern /* Subroutine */ int dgebd2_(integer *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *, 
 	     doublereal *, integer *), dbdsdc_(char *, char *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *), dgebrd_(integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, integer *, integer *);
-    static integer iq[16]	/* was [4][4] */, iw[4], nt;
-    static doublereal tp[4], tq[4];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int dbdsqr_(char *, integer *, integer *, integer 
-	    *, integer *, doublereal *, doublereal *, doublereal *, integer *,
+	    *, integer *, doublereal *, doublereal *, doublereal *, integer *, 
 	     doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *), dorgbr_(char *, integer *, integer *, integer 
-	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
+	    *, doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *), chkxer_(char *, integer *, integer *, 
 	    logical *, logical *), dormbr_(char *, char *, char *, 
 	    integer *, integer *, integer *, doublereal *, integer *, 
@@ -77,32 +72,47 @@ static integer c__1 = 1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRBD tests the error exits for DGEBRD, DORGBR, DORMBR, DBDSQR and */
+/*  DBDSDC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRBD tests the error exits for DGEBRD, DORGBR, DORMBR, DBDSQR and   
-    DBDSDC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -114,7 +124,7 @@ static integer c__1 = 1;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 /* L20: */
@@ -213,67 +223,67 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "DORMBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dormbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dormbr_("Q", "/", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "/", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dormbr_("Q", "L", "/", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "L", "/", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dormbr_("Q", "L", "T", &c_n1, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "L", "T", &c_n1, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dormbr_("Q", "L", "T", &c__0, &c_n1, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "L", "T", &c__0, &c_n1, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dormbr_("Q", "L", "T", &c__0, &c__0, &c_n1, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "L", "T", &c__0, &c__0, &c_n1, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dormbr_("Q", "L", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w,
+	dormbr_("Q", "L", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dormbr_("Q", "R", "T", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "R", "T", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dormbr_("P", "L", "T", &c__2, &c__0, &c__2, a, &c__1, tq, u, &c__2, w,
+	dormbr_("P", "L", "T", &c__2, &c__0, &c__2, a, &c__1, tq, u, &c__2, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dormbr_("P", "R", "T", &c__0, &c__2, &c__2, a, &c__1, tq, u, &c__1, w,
+	dormbr_("P", "R", "T", &c__0, &c__2, &c__2, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dormbr_("Q", "R", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "R", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dormbr_("Q", "L", "T", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w,
+	dormbr_("Q", "L", "T", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dormbr_("Q", "R", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w,
+	dormbr_("Q", "R", "T", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w, 
 		 &c__1, &info);
 	chkxer_("DORMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -376,7 +386,3 @@ static integer c__1 = 1;
 /*     End of DERRBD */
 
 } /* derrbd_ */
-
-#undef a_ref
-
-

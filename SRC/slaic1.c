@@ -1,96 +1,110 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static real c_b5 = 1.f;
 
 /* Subroutine */ int slaic1_(integer *job, integer *j, real *x, real *sest, 
 	real *w, real *gamma, real *sestpr, real *s, real *c__)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    SLAIC1 applies one step of incremental condition estimation in   
-    its simplest version:   
-
-    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j   
-    lower triangular matrix L, such that   
-             twonorm(L*x) = sest   
-    Then SLAIC1 computes sestpr, s, c such that   
-    the vector   
-                    [ s*x ]   
-             xhat = [  c  ]   
-    is an approximate singular vector of   
-                    [ L     0  ]   
-             Lhat = [ w' gamma ]   
-    in the sense that   
-             twonorm(Lhat*xhat) = sestpr.   
-
-    Depending on JOB, an estimate for the largest or smallest singular   
-    value is computed.   
-
-    Note that [s c]' and sestpr**2 is an eigenpair of the system   
-
-        diag(sest*sest, 0) + [alpha  gamma] * [ alpha ]   
-                                              [ gamma ]   
-
-    where  alpha =  x'*w.   
-
-    Arguments   
-    =========   
-
-    JOB     (input) INTEGER   
-            = 1: an estimate for the largest singular value is computed.   
-            = 2: an estimate for the smallest singular value is computed.   
-
-    J       (input) INTEGER   
-            Length of X and W   
-
-    X       (input) REAL array, dimension (J)   
-            The j-vector x.   
-
-    SEST    (input) REAL   
-            Estimated singular value of j by j matrix L   
-
-    W       (input) REAL array, dimension (J)   
-            The j-vector w.   
-
-    GAMMA   (input) REAL   
-            The diagonal element gamma.   
-
-    SESTPR  (output) REAL   
-            Estimated singular value of (j+1) by (j+1) matrix Lhat.   
-
-    S       (output) REAL   
-            Sine needed in forming xhat.   
-
-    C       (output) REAL   
-            Cosine needed in forming xhat.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static real c_b5 = 1.f;
-    
     /* System generated locals */
     real r__1, r__2, r__3, r__4;
+
     /* Builtin functions */
     double sqrt(doublereal), r_sign(real *, real *);
+
     /* Local variables */
-    static real sine;
+    real b, t, s1, s2, eps, tmp, sine;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static real test, zeta1, zeta2, b, t, alpha, norma, s1, s2, absgam, 
-	    absalp;
+    real test, zeta1, zeta2, alpha, norma, absgam, absalp;
     extern doublereal slamch_(char *);
-    static real cosine, absest, eps, tmp;
+    real cosine, absest;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLAIC1 applies one step of incremental condition estimation in */
+/*  its simplest version: */
+
+/*  Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j */
+/*  lower triangular matrix L, such that */
+/*           twonorm(L*x) = sest */
+/*  Then SLAIC1 computes sestpr, s, c such that */
+/*  the vector */
+/*                  [ s*x ] */
+/*           xhat = [  c  ] */
+/*  is an approximate singular vector of */
+/*                  [ L     0  ] */
+/*           Lhat = [ w' gamma ] */
+/*  in the sense that */
+/*           twonorm(Lhat*xhat) = sestpr. */
+
+/*  Depending on JOB, an estimate for the largest or smallest singular */
+/*  value is computed. */
+
+/*  Note that [s c]' and sestpr**2 is an eigenpair of the system */
+
+/*      diag(sest*sest, 0) + [alpha  gamma] * [ alpha ] */
+/*                                            [ gamma ] */
+
+/*  where  alpha =  x'*w. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOB     (input) INTEGER */
+/*          = 1: an estimate for the largest singular value is computed. */
+/*          = 2: an estimate for the smallest singular value is computed. */
+
+/*  J       (input) INTEGER */
+/*          Length of X and W */
+
+/*  X       (input) REAL array, dimension (J) */
+/*          The j-vector x. */
+
+/*  SEST    (input) REAL */
+/*          Estimated singular value of j by j matrix L */
+
+/*  W       (input) REAL array, dimension (J) */
+/*          The j-vector w. */
+
+/*  GAMMA   (input) REAL */
+/*          The diagonal element gamma. */
+
+/*  SESTPR  (output) REAL */
+/*          Estimated singular value of (j+1) by (j+1) matrix Lhat. */
+
+/*  S       (output) REAL */
+/*          Sine needed in forming xhat. */
+
+/*  C       (output) REAL */
+/*          Cosine needed in forming xhat. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --w;
     --x;
 
@@ -104,9 +118,9 @@
 
     if (*job == 1) {
 
-/*        Estimating largest singular value   
+/*        Estimating largest singular value */
 
-          special cases */
+/*        special cases */
 
 	if (*sest == 0.f) {
 	    s1 = dmax(absgam,absalp);
@@ -187,9 +201,9 @@
 
     } else if (*job == 2) {
 
-/*        Estimating smallest singular value   
+/*        Estimating smallest singular value */
 
-          special cases */
+/*        special cases */
 
 	if (*sest == 0.f) {
 	    *sestpr = 0.f;
@@ -296,4 +310,3 @@
 /*     End of SLAIC1 */
 
 } /* slaic1_ */
-

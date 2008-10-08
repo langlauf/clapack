@@ -1,114 +1,139 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int ctrcon_(char *norm, char *uplo, char *diag, integer *n, 
 	complex *a, integer *lda, real *rcond, complex *work, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    CTRCON estimates the reciprocal of the condition number of a   
-    triangular matrix A, in either the 1-norm or the infinity-norm.   
-
-    The norm of A is computed and an estimate is obtained for   
-    norm(inv(A)), then the reciprocal of the condition number is   
-    computed as   
-       RCOND = 1 / ( norm(A) * norm(inv(A)) ).   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies whether the 1-norm condition number or the   
-            infinity-norm condition number is required:   
-            = '1' or 'O':  1-norm;   
-            = 'I':         Infinity-norm.   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  A is upper triangular;   
-            = 'L':  A is lower triangular.   
-
-    DIAG    (input) CHARACTER*1   
-            = 'N':  A is non-unit triangular;   
-            = 'U':  A is unit triangular.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The triangular matrix A.  If UPLO = 'U', the leading N-by-N   
-            upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of   
-            A is not referenced.  If UPLO = 'L', the leading N-by-N lower   
-            triangular part of the array A contains the lower triangular   
-            matrix, and the strictly upper triangular part of A is not   
-            referenced.  If DIAG = 'U', the diagonal elements of A are   
-            also not referenced and are assumed to be 1.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    RCOND   (output) REAL   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(norm(A) * norm(inv(A))).   
-
-    WORK    (workspace) COMPLEX array, dimension (2*N)   
-
-    RWORK   (workspace) REAL array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1;
     real r__1, r__2;
+
     /* Builtin functions */
     double r_imag(complex *);
+
     /* Local variables */
-    static integer kase, kase1;
-    static real scale;
+    integer ix, kase, kase1;
+    real scale;
     extern logical lsame_(char *, char *);
-    static real anorm;
-    static logical upper;
-    static real xnorm;
-    extern /* Subroutine */ int clacon_(integer *, complex *, complex *, real 
-	    *, integer *);
-    static integer ix;
+    integer isave[3];
+    real anorm;
+    logical upper;
+    extern /* Subroutine */ int clacn2_(integer *, complex *, complex *, real 
+	    *, integer *, integer *);
+    real xnorm;
     extern integer icamax_(integer *, complex *, integer *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern doublereal clantr_(char *, char *, char *, integer *, integer *, 
 	    complex *, integer *, real *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int clatrs_(char *, char *, char *, char *, 
 	    integer *, complex *, integer *, complex *, real *, real *, 
 	    integer *), csrscl_(integer *, 
 	    real *, complex *, integer *);
-    static logical onenrm;
-    static char normin[1];
-    static real smlnum;
-    static logical nounit;
+    logical onenrm;
+    char normin[1];
+    real smlnum;
+    logical nounit;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     Modified to call CLACN2 in place of CLACON, 10 Feb 03, SJH. */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CTRCON estimates the reciprocal of the condition number of a */
+/*  triangular matrix A, in either the 1-norm or the infinity-norm. */
+
+/*  The norm of A is computed and an estimate is obtained for */
+/*  norm(inv(A)), then the reciprocal of the condition number is */
+/*  computed as */
+/*     RCOND = 1 / ( norm(A) * norm(inv(A)) ). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NORM    (input) CHARACTER*1 */
+/*          Specifies whether the 1-norm condition number or the */
+/*          infinity-norm condition number is required: */
+/*          = '1' or 'O':  1-norm; */
+/*          = 'I':         Infinity-norm. */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  A is upper triangular; */
+/*          = 'L':  A is lower triangular. */
+
+/*  DIAG    (input) CHARACTER*1 */
+/*          = 'N':  A is non-unit triangular; */
+/*          = 'U':  A is unit triangular. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The triangular matrix A.  If UPLO = 'U', the leading N-by-N */
+/*          upper triangular part of the array A contains the upper */
+/*          triangular matrix, and the strictly lower triangular part of */
+/*          A is not referenced.  If UPLO = 'L', the leading N-by-N lower */
+/*          triangular part of the array A contains the lower triangular */
+/*          matrix, and the strictly upper triangular part of A is not */
+/*          referenced.  If DIAG = 'U', the diagonal elements of A are */
+/*          also not referenced and are assumed to be 1. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
+
+/*  RCOND   (output) REAL */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(norm(A) * norm(inv(A))). */
+
+/*  WORK    (workspace) COMPLEX array, dimension (2*N) */
+
+/*  RWORK   (workspace) REAL array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --work;
     --rwork;
@@ -165,7 +190,7 @@
 	}
 	kase = 0;
 L10:
-	clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
+	clacn2_(n, &work[*n + 1], &work[1], &ainvnm, &kase, isave);
 	if (kase != 0) {
 	    if (kase == kase1) {
 
@@ -210,4 +235,3 @@ L20:
 /*     End of CTRCON */
 
 } /* ctrcon_ */
-

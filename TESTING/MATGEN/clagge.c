@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -13,7 +8,7 @@ static complex c_b2 = {1.f,0.f};
 static integer c__3 = 3;
 static integer c__1 = 1;
 
-/* Subroutine */ int clagge_(integer *m, integer *n, integer *kl, integer *ku,
+/* Subroutine */ int clagge_(integer *m, integer *n, integer *kl, integer *ku, 
 	 real *d__, complex *a, integer *lda, integer *iseed, complex *work, 
 	integer *info)
 {
@@ -27,86 +22,96 @@ static integer c__1 = 1;
     void c_div(complex *, complex *, complex *);
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
+    complex wa, wb;
+    real wn;
+    complex tau;
     extern /* Subroutine */ int cgerc_(integer *, integer *, complex *, 
 	    complex *, integer *, complex *, integer *, complex *, integer *),
 	     cscal_(integer *, complex *, complex *, integer *), cgemv_(char *
-	    , integer *, integer *, complex *, complex *, integer *, complex *
-	    , integer *, complex *, complex *, integer *);
+, integer *, integer *, complex *, complex *, integer *, complex *
+, integer *, complex *, complex *, integer *);
     extern doublereal scnrm2_(integer *, complex *, integer *);
-    static complex wa, wb;
-    extern /* Subroutine */ int clacgv_(integer *, complex *, integer *);
-    static real wn;
-    extern /* Subroutine */ int xerbla_(char *, integer *), clarnv_(
-	    integer *, integer *, integer *, complex *);
-    static complex tau;
+    extern /* Subroutine */ int clacgv_(integer *, complex *, integer *), 
+	    xerbla_(char *, integer *), clarnv_(integer *, integer *, 
+	    integer *, complex *);
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CLAGGE generates a complex general m by n matrix A, by pre- and post- */
+/*  multiplying a real diagonal matrix D with random unitary matrices: */
+/*  A = U*D*V. The lower and upper bandwidths may then be reduced to */
+/*  kl and ku by additional unitary transformations. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CLAGGE generates a complex general m by n matrix A, by pre- and post-   
-    multiplying a real diagonal matrix D with random unitary matrices:   
-    A = U*D*V. The lower and upper bandwidths may then be reduced to   
-    kl and ku by additional unitary transformations.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  KL      (input) INTEGER */
+/*          The number of nonzero subdiagonals within the band of A. */
+/*          0 <= KL <= M-1. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  KU      (input) INTEGER */
+/*          The number of nonzero superdiagonals within the band of A. */
+/*          0 <= KU <= N-1. */
 
-    KL      (input) INTEGER   
-            The number of nonzero subdiagonals within the band of A.   
-            0 <= KL <= M-1.   
+/*  D       (input) REAL array, dimension (min(M,N)) */
+/*          The diagonal elements of the diagonal matrix D. */
 
-    KU      (input) INTEGER   
-            The number of nonzero superdiagonals within the band of A.   
-            0 <= KU <= N-1.   
+/*  A       (output) COMPLEX array, dimension (LDA,N) */
+/*          The generated m by n matrix A. */
 
-    D       (input) REAL array, dimension (min(M,N))   
-            The diagonal elements of the diagonal matrix D.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (output) COMPLEX array, dimension (LDA,N)   
-            The generated m by n matrix A.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  WORK    (workspace) COMPLEX array, dimension (M+N) */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    WORK    (workspace) COMPLEX array, dimension (M+N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --work;
@@ -136,7 +141,7 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(i__, j);
+	    i__3 = i__ + j * a_dim1;
 	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 /* L10: */
 	}
@@ -144,7 +149,7 @@ static integer c__1 = 1;
     }
     i__1 = min(*m,*n);
     for (i__ = 1; i__ <= i__1; ++i__) {
-	i__2 = a_subscr(i__, i__);
+	i__2 = i__ + i__ * a_dim1;
 	i__3 = i__;
 	a[i__2].r = d__[i__3], a[i__2].i = 0.f;
 /* L30: */
@@ -182,13 +187,14 @@ static integer c__1 = 1;
 
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
-	    cgemv_("Conjugate transpose", &i__1, &i__2, &c_b2, &a_ref(i__, 
-		    i__), lda, &work[1], &c__1, &c_b1, &work[*m + 1], &c__1);
+	    cgemv_("Conjugate transpose", &i__1, &i__2, &c_b2, &a[i__ + i__ * 
+		    a_dim1], lda, &work[1], &c__1, &c_b1, &work[*m + 1], &
+		    c__1);
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
 	    q__1.r = -tau.r, q__1.i = -tau.i;
-	    cgerc_(&i__1, &i__2, &q__1, &work[1], &c__1, &work[*m + 1], &c__1,
-		     &a_ref(i__, i__), lda);
+	    cgerc_(&i__1, &i__2, &q__1, &work[1], &c__1, &work[*m + 1], &c__1, 
+		     &a[i__ + i__ * a_dim1], lda);
 	}
 	if (i__ < *n) {
 
@@ -219,51 +225,51 @@ static integer c__1 = 1;
 
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
-	    cgemv_("No transpose", &i__1, &i__2, &c_b2, &a_ref(i__, i__), lda,
-		     &work[1], &c__1, &c_b1, &work[*n + 1], &c__1)
-		    ;
+	    cgemv_("No transpose", &i__1, &i__2, &c_b2, &a[i__ + i__ * a_dim1]
+, lda, &work[1], &c__1, &c_b1, &work[*n + 1], &c__1);
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
 	    q__1.r = -tau.r, q__1.i = -tau.i;
-	    cgerc_(&i__1, &i__2, &q__1, &work[*n + 1], &c__1, &work[1], &c__1,
-		     &a_ref(i__, i__), lda);
+	    cgerc_(&i__1, &i__2, &q__1, &work[*n + 1], &c__1, &work[1], &c__1, 
+		     &a[i__ + i__ * a_dim1], lda);
 	}
 /* L40: */
     }
 
-/*     Reduce number of subdiagonals to KL and number of superdiagonals   
-       to KU   
+/*     Reduce number of subdiagonals to KL and number of superdiagonals */
+/*     to KU */
 
-   Computing MAX */
+/* Computing MAX */
     i__2 = *m - 1 - *kl, i__3 = *n - 1 - *ku;
     i__1 = max(i__2,i__3);
     for (i__ = 1; i__ <= i__1; ++i__) {
 	if (*kl <= *ku) {
 
-/*           annihilate subdiagonal elements first (necessary if KL = 0)   
+/*           annihilate subdiagonal elements first (necessary if KL = 0) */
 
-   Computing MIN */
+/* Computing MIN */
 	    i__2 = *m - 1 - *kl;
 	    if (i__ <= min(i__2,*n)) {
 
 /*              generate reflection to annihilate A(kl+i+1:m,i) */
 
 		i__2 = *m - *kl - i__ + 1;
-		wn = scnrm2_(&i__2, &a_ref(*kl + i__, i__), &c__1);
-		r__1 = wn / c_abs(&a_ref(*kl + i__, i__));
-		i__2 = a_subscr(*kl + i__, i__);
+		wn = scnrm2_(&i__2, &a[*kl + i__ + i__ * a_dim1], &c__1);
+		r__1 = wn / c_abs(&a[*kl + i__ + i__ * a_dim1]);
+		i__2 = *kl + i__ + i__ * a_dim1;
 		q__1.r = r__1 * a[i__2].r, q__1.i = r__1 * a[i__2].i;
 		wa.r = q__1.r, wa.i = q__1.i;
 		if (wn == 0.f) {
 		    tau.r = 0.f, tau.i = 0.f;
 		} else {
-		    i__2 = a_subscr(*kl + i__, i__);
+		    i__2 = *kl + i__ + i__ * a_dim1;
 		    q__1.r = a[i__2].r + wa.r, q__1.i = a[i__2].i + wa.i;
 		    wb.r = q__1.r, wb.i = q__1.i;
 		    i__2 = *m - *kl - i__;
 		    c_div(&q__1, &c_b2, &wb);
-		    cscal_(&i__2, &q__1, &a_ref(*kl + i__ + 1, i__), &c__1);
-		    i__2 = a_subscr(*kl + i__, i__);
+		    cscal_(&i__2, &q__1, &a[*kl + i__ + 1 + i__ * a_dim1], &
+			    c__1);
+		    i__2 = *kl + i__ + i__ * a_dim1;
 		    a[i__2].r = 1.f, a[i__2].i = 0.f;
 		    c_div(&q__1, &wb, &wa);
 		    r__1 = q__1.r;
@@ -274,15 +280,16 @@ static integer c__1 = 1;
 
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(*kl 
-			+ i__, i__ + 1), lda, &a_ref(*kl + i__, i__), &c__1, &
-			c_b1, &work[1], &c__1);
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a[*kl + 
+			i__ + (i__ + 1) * a_dim1], lda, &a[*kl + i__ + i__ * 
+			a_dim1], &c__1, &c_b1, &work[1], &c__1);
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
 		q__1.r = -tau.r, q__1.i = -tau.i;
-		cgerc_(&i__2, &i__3, &q__1, &a_ref(*kl + i__, i__), &c__1, &
-			work[1], &c__1, &a_ref(*kl + i__, i__ + 1), lda);
-		i__2 = a_subscr(*kl + i__, i__);
+		cgerc_(&i__2, &i__3, &q__1, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &work[1], &c__1, &a[*kl + i__ + (i__ + 1) * 
+			a_dim1], lda);
+		i__2 = *kl + i__ + i__ * a_dim1;
 		q__1.r = -wa.r, q__1.i = -wa.i;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	    }
@@ -294,21 +301,22 @@ static integer c__1 = 1;
 /*              generate reflection to annihilate A(i,ku+i+1:n) */
 
 		i__2 = *n - *ku - i__ + 1;
-		wn = scnrm2_(&i__2, &a_ref(i__, *ku + i__), lda);
-		r__1 = wn / c_abs(&a_ref(i__, *ku + i__));
-		i__2 = a_subscr(i__, *ku + i__);
+		wn = scnrm2_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
+		r__1 = wn / c_abs(&a[i__ + (*ku + i__) * a_dim1]);
+		i__2 = i__ + (*ku + i__) * a_dim1;
 		q__1.r = r__1 * a[i__2].r, q__1.i = r__1 * a[i__2].i;
 		wa.r = q__1.r, wa.i = q__1.i;
 		if (wn == 0.f) {
 		    tau.r = 0.f, tau.i = 0.f;
 		} else {
-		    i__2 = a_subscr(i__, *ku + i__);
+		    i__2 = i__ + (*ku + i__) * a_dim1;
 		    q__1.r = a[i__2].r + wa.r, q__1.i = a[i__2].i + wa.i;
 		    wb.r = q__1.r, wb.i = q__1.i;
 		    i__2 = *n - *ku - i__;
 		    c_div(&q__1, &c_b2, &wb);
-		    cscal_(&i__2, &q__1, &a_ref(i__, *ku + i__ + 1), lda);
-		    i__2 = a_subscr(i__, *ku + i__);
+		    cscal_(&i__2, &q__1, &a[i__ + (*ku + i__ + 1) * a_dim1], 
+			    lda);
+		    i__2 = i__ + (*ku + i__) * a_dim1;
 		    a[i__2].r = 1.f, a[i__2].i = 0.f;
 		    c_div(&q__1, &wb, &wa);
 		    r__1 = q__1.r;
@@ -318,48 +326,50 @@ static integer c__1 = 1;
 /*              apply reflection to A(i+1:m,ku+i:n) from the right */
 
 		i__2 = *n - *ku - i__ + 1;
-		clacgv_(&i__2, &a_ref(i__, *ku + i__), lda);
+		clacgv_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(i__ + 1, *
-			ku + i__), lda, &a_ref(i__, *ku + i__), lda, &c_b1, &
-			work[1], &c__1);
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a[i__ + 1 + (*ku 
+			+ i__) * a_dim1], lda, &a[i__ + (*ku + i__) * a_dim1], 
+			 lda, &c_b1, &work[1], &c__1);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
 		q__1.r = -tau.r, q__1.i = -tau.i;
-		cgerc_(&i__2, &i__3, &q__1, &work[1], &c__1, &a_ref(i__, *ku 
-			+ i__), lda, &a_ref(i__ + 1, *ku + i__), lda);
-		i__2 = a_subscr(i__, *ku + i__);
+		cgerc_(&i__2, &i__3, &q__1, &work[1], &c__1, &a[i__ + (*ku + 
+			i__) * a_dim1], lda, &a[i__ + 1 + (*ku + i__) * 
+			a_dim1], lda);
+		i__2 = i__ + (*ku + i__) * a_dim1;
 		q__1.r = -wa.r, q__1.i = -wa.i;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	    }
 	} else {
 
-/*           annihilate superdiagonal elements first (necessary if   
-             KU = 0)   
+/*           annihilate superdiagonal elements first (necessary if */
+/*           KU = 0) */
 
-   Computing MIN */
+/* Computing MIN */
 	    i__2 = *n - 1 - *ku;
 	    if (i__ <= min(i__2,*m)) {
 
 /*              generate reflection to annihilate A(i,ku+i+1:n) */
 
 		i__2 = *n - *ku - i__ + 1;
-		wn = scnrm2_(&i__2, &a_ref(i__, *ku + i__), lda);
-		r__1 = wn / c_abs(&a_ref(i__, *ku + i__));
-		i__2 = a_subscr(i__, *ku + i__);
+		wn = scnrm2_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
+		r__1 = wn / c_abs(&a[i__ + (*ku + i__) * a_dim1]);
+		i__2 = i__ + (*ku + i__) * a_dim1;
 		q__1.r = r__1 * a[i__2].r, q__1.i = r__1 * a[i__2].i;
 		wa.r = q__1.r, wa.i = q__1.i;
 		if (wn == 0.f) {
 		    tau.r = 0.f, tau.i = 0.f;
 		} else {
-		    i__2 = a_subscr(i__, *ku + i__);
+		    i__2 = i__ + (*ku + i__) * a_dim1;
 		    q__1.r = a[i__2].r + wa.r, q__1.i = a[i__2].i + wa.i;
 		    wb.r = q__1.r, wb.i = q__1.i;
 		    i__2 = *n - *ku - i__;
 		    c_div(&q__1, &c_b2, &wb);
-		    cscal_(&i__2, &q__1, &a_ref(i__, *ku + i__ + 1), lda);
-		    i__2 = a_subscr(i__, *ku + i__);
+		    cscal_(&i__2, &q__1, &a[i__ + (*ku + i__ + 1) * a_dim1], 
+			    lda);
+		    i__2 = i__ + (*ku + i__) * a_dim1;
 		    a[i__2].r = 1.f, a[i__2].i = 0.f;
 		    c_div(&q__1, &wb, &wa);
 		    r__1 = q__1.r;
@@ -369,18 +379,19 @@ static integer c__1 = 1;
 /*              apply reflection to A(i+1:m,ku+i:n) from the right */
 
 		i__2 = *n - *ku - i__ + 1;
-		clacgv_(&i__2, &a_ref(i__, *ku + i__), lda);
+		clacgv_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
-		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a_ref(i__ + 1, *
-			ku + i__), lda, &a_ref(i__, *ku + i__), lda, &c_b1, &
-			work[1], &c__1);
+		cgemv_("No transpose", &i__2, &i__3, &c_b2, &a[i__ + 1 + (*ku 
+			+ i__) * a_dim1], lda, &a[i__ + (*ku + i__) * a_dim1], 
+			 lda, &c_b1, &work[1], &c__1);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
 		q__1.r = -tau.r, q__1.i = -tau.i;
-		cgerc_(&i__2, &i__3, &q__1, &work[1], &c__1, &a_ref(i__, *ku 
-			+ i__), lda, &a_ref(i__ + 1, *ku + i__), lda);
-		i__2 = a_subscr(i__, *ku + i__);
+		cgerc_(&i__2, &i__3, &q__1, &work[1], &c__1, &a[i__ + (*ku + 
+			i__) * a_dim1], lda, &a[i__ + 1 + (*ku + i__) * 
+			a_dim1], lda);
+		i__2 = i__ + (*ku + i__) * a_dim1;
 		q__1.r = -wa.r, q__1.i = -wa.i;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	    }
@@ -392,21 +403,22 @@ static integer c__1 = 1;
 /*              generate reflection to annihilate A(kl+i+1:m,i) */
 
 		i__2 = *m - *kl - i__ + 1;
-		wn = scnrm2_(&i__2, &a_ref(*kl + i__, i__), &c__1);
-		r__1 = wn / c_abs(&a_ref(*kl + i__, i__));
-		i__2 = a_subscr(*kl + i__, i__);
+		wn = scnrm2_(&i__2, &a[*kl + i__ + i__ * a_dim1], &c__1);
+		r__1 = wn / c_abs(&a[*kl + i__ + i__ * a_dim1]);
+		i__2 = *kl + i__ + i__ * a_dim1;
 		q__1.r = r__1 * a[i__2].r, q__1.i = r__1 * a[i__2].i;
 		wa.r = q__1.r, wa.i = q__1.i;
 		if (wn == 0.f) {
 		    tau.r = 0.f, tau.i = 0.f;
 		} else {
-		    i__2 = a_subscr(*kl + i__, i__);
+		    i__2 = *kl + i__ + i__ * a_dim1;
 		    q__1.r = a[i__2].r + wa.r, q__1.i = a[i__2].i + wa.i;
 		    wb.r = q__1.r, wb.i = q__1.i;
 		    i__2 = *m - *kl - i__;
 		    c_div(&q__1, &c_b2, &wb);
-		    cscal_(&i__2, &q__1, &a_ref(*kl + i__ + 1, i__), &c__1);
-		    i__2 = a_subscr(*kl + i__, i__);
+		    cscal_(&i__2, &q__1, &a[*kl + i__ + 1 + i__ * a_dim1], &
+			    c__1);
+		    i__2 = *kl + i__ + i__ * a_dim1;
 		    a[i__2].r = 1.f, a[i__2].i = 0.f;
 		    c_div(&q__1, &wb, &wa);
 		    r__1 = q__1.r;
@@ -417,15 +429,16 @@ static integer c__1 = 1;
 
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
-		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(*kl 
-			+ i__, i__ + 1), lda, &a_ref(*kl + i__, i__), &c__1, &
-			c_b1, &work[1], &c__1);
+		cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a[*kl + 
+			i__ + (i__ + 1) * a_dim1], lda, &a[*kl + i__ + i__ * 
+			a_dim1], &c__1, &c_b1, &work[1], &c__1);
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
 		q__1.r = -tau.r, q__1.i = -tau.i;
-		cgerc_(&i__2, &i__3, &q__1, &a_ref(*kl + i__, i__), &c__1, &
-			work[1], &c__1, &a_ref(*kl + i__, i__ + 1), lda);
-		i__2 = a_subscr(*kl + i__, i__);
+		cgerc_(&i__2, &i__3, &q__1, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &work[1], &c__1, &a[*kl + i__ + (i__ + 1) * 
+			a_dim1], lda);
+		i__2 = *kl + i__ + i__ * a_dim1;
 		q__1.r = -wa.r, q__1.i = -wa.i;
 		a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	    }
@@ -433,14 +446,14 @@ static integer c__1 = 1;
 
 	i__2 = *m;
 	for (j = *kl + i__ + 1; j <= i__2; ++j) {
-	    i__3 = a_subscr(j, i__);
+	    i__3 = j + i__ * a_dim1;
 	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 /* L50: */
 	}
 
 	i__2 = *n;
 	for (j = *ku + i__ + 1; j <= i__2; ++j) {
-	    i__3 = a_subscr(i__, j);
+	    i__3 = i__ + j * a_dim1;
 	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 /* L60: */
 	}
@@ -451,8 +464,3 @@ static integer c__1 = 1;
 /*     End of CLAGGE */
 
 } /* clagge_ */
-
-#undef a_ref
-#undef a_subscr
-
-

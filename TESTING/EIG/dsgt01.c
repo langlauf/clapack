@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,10 +17,11 @@ static doublereal c_b12 = -1.;
     integer a_dim1, a_offset, b_dim1, b_offset, z_dim1, z_offset, i__1;
 
     /* Local variables */
-    static integer i__;
+    integer i__;
+    doublereal ulp;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int dsymm_(char *, char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
@@ -33,100 +29,108 @@ static doublereal c_b12 = -1.;
 	    integer *, doublereal *, integer *, doublereal *), 
 	    dlansy_(char *, char *, integer *, doublereal *, integer *, 
 	    doublereal *);
-    static doublereal ulp;
 
 
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     modified August 1997, a new parameter M is added to the calling */
+/*     sequence. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-       modified August 1997, a new parameter M is added to the calling   
-       sequence.   
+/*  Purpose */
+/*  ======= */
 
+/*  DDGT01 checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*     A Z   =  B Z D or */
+/*     A B Z =  Z D or */
+/*     B A Z =  Z D */
 
-    DDGT01 checks a decomposition of the form   
+/*  where A is a symmetric matrix, B is */
+/*  symmetric positive definite, Z is orthogonal, and D is diagonal. */
 
-       A Z   =  B Z D or   
-       A B Z =  Z D or   
-       B A Z =  Z D   
+/*  One of the following test ratios is computed: */
 
-    where A is a symmetric matrix, B is   
-    symmetric positive definite, Z is orthogonal, and D is diagonal.   
+/*  ITYPE = 1:  RESULT(1) = | A Z - B Z D | / ( |A| |Z| n ulp ) */
 
-    One of the following test ratios is computed:   
+/*  ITYPE = 2:  RESULT(1) = | A B Z - Z D | / ( |A| |Z| n ulp ) */
 
-    ITYPE = 1:  RESULT(1) = | A Z - B Z D | / ( |A| |Z| n ulp )   
+/*  ITYPE = 3:  RESULT(1) = | B A Z - Z D | / ( |A| |Z| n ulp ) */
 
-    ITYPE = 2:  RESULT(1) = | A B Z - Z D | / ( |A| |Z| n ulp )   
+/*  Arguments */
+/*  ========= */
 
-    ITYPE = 3:  RESULT(1) = | B A Z - Z D | / ( |A| |Z| n ulp )   
+/*  ITYPE   (input) INTEGER */
+/*          The form of the symmetric generalized eigenproblem. */
+/*          = 1:  A*z = (lambda)*B*z */
+/*          = 2:  A*B*z = (lambda)*z */
+/*          = 3:  B*A*z = (lambda)*z */
 
-    Arguments   
-    =========   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          symmetric matrices A and B is stored. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    ITYPE   (input) INTEGER   
-            The form of the symmetric generalized eigenproblem.   
-            = 1:  A*z = (lambda)*B*z   
-            = 2:  A*B*z = (lambda)*z   
-            = 3:  B*A*z = (lambda)*z   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            symmetric matrices A and B is stored.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  M       (input) INTEGER */
+/*          The number of eigenvalues found.  0 <= M <= N. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          The original symmetric matrix A. */
 
-    M       (input) INTEGER   
-            The number of eigenvalues found.  0 <= M <= N.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA, N)   
-            The original symmetric matrix A.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB, N) */
+/*          The original symmetric positive definite matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB, N)   
-            The original symmetric positive definite matrix B.   
+/*  Z       (input) DOUBLE PRECISION array, dimension (LDZ, M) */
+/*          The computed eigenvectors of the generalized eigenproblem. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= max(1,N). */
 
-    Z       (input) DOUBLE PRECISION array, dimension (LDZ, M)   
-            The computed eigenvectors of the generalized eigenproblem.   
+/*  D       (input) DOUBLE PRECISION array, dimension (M) */
+/*          The computed eigenvalues of the generalized eigenproblem. */
 
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= max(1,N).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (N*N) */
 
-    D       (input) DOUBLE PRECISION array, dimension (M)   
-            The computed eigenvalues of the generalized eigenproblem.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (1) */
+/*          The test ratio as described above. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (N*N)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (1)   
-            The test ratio as described above.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --d__;
     --work;
@@ -155,7 +159,7 @@ static doublereal c_b12 = -1.;
 		ldz, &c_b7, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    dscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    dscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L10: */
 	}
 	dsymm_("Left", uplo, n, m, &c_b6, &b[b_offset], ldb, &z__[z_offset], 
@@ -172,7 +176,7 @@ static doublereal c_b12 = -1.;
 		ldz, &c_b7, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    dscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    dscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L20: */
 	}
 	dsymm_("Left", uplo, n, m, &c_b6, &a[a_offset], lda, &work[1], n, &
@@ -188,7 +192,7 @@ static doublereal c_b12 = -1.;
 		ldz, &c_b7, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    dscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    dscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L30: */
 	}
 	dsymm_("Left", uplo, n, m, &c_b6, &b[b_offset], ldb, &work[1], n, &
@@ -202,7 +206,3 @@ static doublereal c_b12 = -1.;
 /*     End of DDGT01 */
 
 } /* dsgt01_ */
-
-#undef z___ref
-
-

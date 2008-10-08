@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -63,32 +58,31 @@ static integer c__8 = 8;
     integer i__1, i__2, i__3, i__4, i__5, i__6[3], i__7[4];
     char ch__1[3], ch__2[4];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen), s_cat(char *,
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen), s_cat(char *,
 	     char **, integer *, integer *, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer ldab;
-    static char diag[1];
-    static integer imat, info;
-    static char path[3];
-    static integer irhs, nrhs;
-    static char norm[1], uplo[1];
-    static integer nrun, i__, j, k;
+    integer i__, j, k, n, kd, ik, in, nk, lda, ldab;
+    char diag[1];
+    integer imat, info;
+    char path[3];
+    integer irhs, nrhs;
+    char norm[1], uplo[1];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer idiag, n;
-    static doublereal scale;
-    static integer nfail, iseed[4];
+    integer idiag;
+    doublereal scale;
     extern /* Subroutine */ int dget04_(integer *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *, doublereal *, doublereal *), 
-	    dtbt02_(char *, char *, char *, integer *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *), 
-	    dtbt03_(char *, char *, char *, integer *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *);
+	    integer *, doublereal *, integer *, doublereal *, doublereal *);
+    integer nfail, iseed[4];
+    extern /* Subroutine */ int dtbt02_(char *, char *, char *, integer *, 
+	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    integer *, doublereal *, integer *, doublereal *, doublereal *), dtbt03_(char *, char *, char *, integer *
+, integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
+	     integer *, doublereal *, doublereal *);
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dtbt05_(char *, char *, char *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
@@ -96,23 +90,23 @@ static integer c__8 = 8;
 	    doublereal *, doublereal *, doublereal *),
 	     dtbt06_(doublereal *, doublereal *, char *, char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal rcond;
-    static integer nimat;
-    static doublereal anorm;
-    static integer itran;
+    doublereal rcond;
+    integer nimat;
+    doublereal anorm;
+    integer itran;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), dtbsv_(char *, char *, char *, integer *
-	    , integer *, doublereal *, integer *, doublereal *, integer *);
-    static char trans[1];
-    static integer iuplo, nerrs;
-    static char xtype[1];
-    static integer nimat2, kd, ik, in, nk;
+, integer *, doublereal *, integer *, doublereal *, integer *);
+    char trans[1];
+    integer iuplo, nerrs;
+    char xtype[1];
+    integer nimat2;
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
     extern doublereal dlantb_(char *, char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *);
-    static doublereal rcondc;
+    doublereal rcondc;
     extern /* Subroutine */ int dlatbs_(char *, char *, char *, char *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *), dlattb_(integer *, char *, char *, char *, integer *, 
@@ -124,23 +118,22 @@ static integer c__8 = 8;
 	    *, char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, integer *, integer *);
-    static doublereal rcondi;
+    doublereal rcondi;
     extern /* Subroutine */ int dlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    alasum_(char *, integer *, integer *, integer *, integer *);
-    static doublereal rcondo;
+    doublereal rcondo;
     extern doublereal dlantr_(char *, char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dtbrfs_(char *, char *, char *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, integer *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern /* Subroutine */ int derrtr_(char *, integer *), dtbtrs_(
 	    char *, char *, char *, integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *);
-    static doublereal result[8];
-    static integer lda;
+    doublereal result[8];
 
     /* Fortran I/O blocks */
     static cilist io___39 = { 0, 0, 0, fmt_9999, 0 };
@@ -150,74 +143,94 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 3, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKTB tests DTBTRS, -RFS, and -CON, and DLATBS.   
+/*  DCHKTB tests DTBTRS, -RFS, and -CON, and DLATBS. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The leading dimension of the work arrays.   
-            NMAX >= the maximum value of N in NVAL.   
+/*  NMAX    (input) INTEGER */
+/*          The leading dimension of the work arrays. */
+/*          NMAX >= the maximum value of N in NVAL. */
 
-    AB      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AB      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AINV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AINV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (NMAX*max(3,NSMAX))   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (NMAX*max(3,NSMAX)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension   
-                        (max(NMAX,2*NSMAX))   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension */
+/*                      (max(NMAX,2*NSMAX)) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -230,9 +243,11 @@ static integer c__8 = 8;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "TB", (ftnlen)2, (ftnlen)2);
@@ -272,8 +287,8 @@ static integer c__8 = 8;
 	i__2 = nk;
 	for (ik = 1; ik <= i__2; ++ik) {
 
-/*           Do for KD = 0, N, (3N-1)/4, and (N+1)/4. This order makes   
-             it easier to skip redundant values for small values of N. */
+/*           Do for KD = 0, N, (3N-1)/4, and (N+1)/4. This order makes */
+/*           it easier to skip redundant values for small values of N. */
 
 	    if (ik == 1) {
 		kd = 0;
@@ -305,7 +320,7 @@ static integer c__8 = 8;
 /*                 Call DLATTB to generate a triangular test matrix. */
 
 		    s_copy(srnamc_1.srnamt, "DLATTB", (ftnlen)6, (ftnlen)6);
-		    dlattb_(&imat, uplo, "No transpose", diag, iseed, &n, &kd,
+		    dlattb_(&imat, uplo, "No transpose", diag, iseed, &n, &kd, 
 			     &ab[1], &ldab, &x[1], &work[1], &info);
 
 /*                 Set IDIAG = 1 for non-unit matrices, 2 for unit. */
@@ -316,15 +331,15 @@ static integer c__8 = 8;
 			idiag = 2;
 		    }
 
-/*                 Form the inverse of A so we can get a good estimate   
-                   of RCONDC = 1/(norm(A) * norm(inv(A))). */
+/*                 Form the inverse of A so we can get a good estimate */
+/*                 of RCONDC = 1/(norm(A) * norm(inv(A))). */
 
 		    dlaset_("Full", &n, &n, &c_b14, &c_b15, &ainv[1], &lda);
 		    if (lsame_(uplo, "U")) {
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
 			    dtbsv_(uplo, "No transpose", diag, &j, &kd, &ab[1]
-				    , &ldab, &ainv[(j - 1) * lda + 1], &c__1);
+, &ldab, &ainv[(j - 1) * lda + 1], &c__1);
 /* L20: */
 			}
 		    } else {
@@ -381,8 +396,8 @@ static integer c__8 = 8;
 				rcondc = rcondi;
 			    }
 
-/* +    TEST 1   
-                      Solve and compute residual for op(A)*x = b. */
+/* +    TEST 1 */
+/*                    Solve and compute residual for op(A)*x = b. */
 
 			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
 				    ftnlen)6);
@@ -395,7 +410,7 @@ static integer c__8 = 8;
 
 			    s_copy(srnamc_1.srnamt, "DTBTRS", (ftnlen)6, (
 				    ftnlen)6);
-			    dtbtrs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1],
+			    dtbtrs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &x[1], &lda, &info);
 
 /*                    Check error code from DTBTRS. */
@@ -407,30 +422,30 @@ static integer c__8 = 8;
 				i__6[2] = 1, a__1[2] = diag;
 				s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)3);
 				alaerh_(path, "DTBTRS", &info, &c__0, ch__1, &
-					n, &n, &kd, &kd, &nrhs, &imat, &nfail,
+					n, &n, &kd, &kd, &nrhs, &imat, &nfail, 
 					 &nerrs, nout);
 			    }
 
-			    dtbt02_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1],
+			    dtbt02_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &x[1], &lda, &b[1], &lda, &work[1]
-				    , result)
+, result)
 				    ;
 
-/* +    TEST 2   
-                      Check solution from generated exact solution. */
+/* +    TEST 2 */
+/*                    Check solution from generated exact solution. */
 
 			    dget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[1]);
 
-/* +    TESTS 3, 4, and 5   
-                      Use iterative refinement to improve the solution   
-                      and compute error bounds. */
+/* +    TESTS 3, 4, and 5 */
+/*                    Use iterative refinement to improve the solution */
+/*                    and compute error bounds. */
 
 			    s_copy(srnamc_1.srnamt, "DTBRFS", (ftnlen)6, (
 				    ftnlen)6);
-			    dtbrfs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1],
+			    dtbrfs_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &b[1], &lda, &x[1], &lda, &rwork[
-				    1], &rwork[nrhs + 1], &work[1], &iwork[1],
+				    1], &rwork[nrhs + 1], &work[1], &iwork[1], 
 				     &info);
 
 /*                    Check error code from DTBRFS. */
@@ -442,19 +457,19 @@ static integer c__8 = 8;
 				i__6[2] = 1, a__1[2] = diag;
 				s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)3);
 				alaerh_(path, "DTBRFS", &info, &c__0, ch__1, &
-					n, &n, &kd, &kd, &nrhs, &imat, &nfail,
+					n, &n, &kd, &kd, &nrhs, &imat, &nfail, 
 					 &nerrs, nout);
 			    }
 
 			    dget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[2]);
-			    dtbt05_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1],
+			    dtbt05_(uplo, trans, diag, &n, &kd, &nrhs, &ab[1], 
 				     &ldab, &b[1], &lda, &x[1], &lda, &xact[1]
-				    , &lda, &rwork[1], &rwork[nrhs + 1], &
+, &lda, &rwork[1], &rwork[nrhs + 1], &
 				    result[3]);
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = 1; k <= 5; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -489,8 +504,8 @@ static integer c__8 = 8;
 /* L60: */
 		    }
 
-/* +    TEST 6   
-                      Get an estimate of RCOND = 1/CNDNUM. */
+/* +    TEST 6 */
+/*                    Get an estimate of RCOND = 1/CNDNUM. */
 
 		    for (itran = 1; itran <= 2; ++itran) {
 			if (itran == 1) {
@@ -514,15 +529,15 @@ static integer c__8 = 8;
 			    i__6[2] = 1, a__1[2] = diag;
 			    s_cat(ch__1, a__1, i__6, &c__3, (ftnlen)3);
 			    alaerh_(path, "DTBCON", &info, &c__0, ch__1, &n, &
-				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs,
+				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs, 
 				     nout);
 			}
 
 			dtbt06_(&rcond, &rcondc, uplo, diag, &n, &kd, &ab[1], 
 				&ldab, &rwork[1], &result[5]);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			if (result[5] >= *thresh) {
 			    if (nfail == 0 && nerrs == 0) {
@@ -587,8 +602,8 @@ L90:
 			dlattb_(&imat, uplo, trans, diag, iseed, &n, &kd, &ab[
 				1], &ldab, &x[1], &work[1], &info);
 
-/* +    TEST 7   
-                      Solve the system op(A)*x = b */
+/* +    TEST 7 */
+/*                    Solve the system op(A)*x = b */
 
 			s_copy(srnamc_1.srnamt, "DLATBS", (ftnlen)6, (ftnlen)
 				6);
@@ -606,7 +621,7 @@ L90:
 			    i__7[3] = 1, a__2[3] = "N";
 			    s_cat(ch__2, a__2, i__7, &c__4, (ftnlen)4);
 			    alaerh_(path, "DLATBS", &info, &c__0, ch__2, &n, &
-				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs,
+				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs, 
 				     nout);
 			}
 
@@ -614,8 +629,8 @@ L90:
 				ldab, &scale, &rwork[1], &c_b15, &b[1], &lda, 
 				&x[1], &lda, &work[1], &result[6]);
 
-/* +    TEST 8   
-                      Solve op(A)*x = b again with NORMIN = 'Y'. */
+/* +    TEST 8 */
+/*                    Solve op(A)*x = b again with NORMIN = 'Y'. */
 
 			dcopy_(&n, &x[1], &c__1, &b[1], &c__1);
 			dlatbs_(uplo, trans, diag, "Y", &n, &kd, &ab[1], &
@@ -631,7 +646,7 @@ L90:
 			    i__7[3] = 1, a__2[3] = "Y";
 			    s_cat(ch__2, a__2, i__7, &c__4, (ftnlen)4);
 			    alaerh_(path, "DLATBS", &info, &c__0, ch__2, &n, &
-				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs,
+				    n, &kd, &kd, &c_n1, &imat, &nfail, &nerrs, 
 				     nout);
 			}
 
@@ -639,8 +654,8 @@ L90:
 				ldab, &scale, &rwork[1], &c_b15, &b[1], &lda, 
 				&x[1], &lda, &work[1], &result[7]);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			if (result[6] >= *thresh) {
 			    if (nfail == 0 && nerrs == 0) {
@@ -712,4 +727,3 @@ L120:
 /*     End of DCHKTB */
 
 } /* dchktb_ */
-

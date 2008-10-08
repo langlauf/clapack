@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -18,83 +13,85 @@ static real c_b3 = 0.f;
 	    e_offset, z_dim1, z_offset, i__1, i__2, i__3;
 
     /* Local variables */
-    static integer i__, j, l, ik, jk, mn;
+    integer i__, j, l, ik, jk, mn, mn2;
     extern /* Subroutine */ int slaset_(char *, integer *, integer *, real *, 
 	    real *, real *, integer *);
-    static integer mn2;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define d___ref(a_1,a_2) d__[(a_2)*d_dim1 + a_1]
-#define e_ref(a_1,a_2) e[(a_2)*e_dim1 + a_1]
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  Form the 2*M*N by 2*M*N matrix */
 
-    Purpose   
-    =======   
+/*         Z = [ kron(In, A)  -kron(B', Im) ] */
+/*             [ kron(In, D)  -kron(E', Im) ], */
 
-    Form the 2*M*N by 2*M*N matrix   
+/*  where In is the identity matrix of size n and X' is the transpose */
+/*  of X. kron(X, Y) is the Kronecker product between the matrices X */
+/*  and Y. */
 
-           Z = [ kron(In, A)  -kron(B', Im) ]   
-               [ kron(In, D)  -kron(E', Im) ],   
+/*  Arguments */
+/*  ========= */
 
-    where In is the identity matrix of size n and X' is the transpose   
-    of X. kron(X, Y) is the Kronecker product between the matrices X   
-    and Y.   
+/*  M       (input) INTEGER */
+/*          Size of matrix, must be >= 1. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          Size of matrix, must be >= 1. */
 
-    M       (input) INTEGER   
-            Size of matrix, must be >= 1.   
+/*  A       (input) REAL, dimension ( LDA, M ) */
+/*          The matrix A in the output matrix Z. */
 
-    N       (input) INTEGER   
-            Size of matrix, must be >= 1.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, B, D, and E. ( LDA >= M+N ) */
 
-    A       (input) REAL, dimension ( LDA, M )   
-            The matrix A in the output matrix Z.   
+/*  B       (input) REAL, dimension ( LDA, N ) */
+/*  D       (input) REAL, dimension ( LDA, M ) */
+/*  E       (input) REAL, dimension ( LDA, N ) */
+/*          The matrices used in forming the output matrix Z. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A, B, D, and E. ( LDA >= M+N )   
+/*  Z       (output) REAL, dimension ( LDZ, 2*M*N ) */
+/*          The resultant Kronecker M*N*2 by M*N*2 matrix (see above.) */
 
-    B       (input) REAL, dimension ( LDA, N )   
-    D       (input) REAL, dimension ( LDA, M )   
-    E       (input) REAL, dimension ( LDA, N )   
-            The matrices used in forming the output matrix Z.   
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of Z. ( LDZ >= 2*M*N ) */
 
-    Z       (output) REAL, dimension ( LDZ, 2*M*N )   
-            The resultant Kronecker M*N*2 by M*N*2 matrix (see above.)   
+/*  ==================================================================== */
 
-    LDZ     (input) INTEGER   
-            The leading dimension of Z. ( LDZ >= 2*M*N )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    ====================================================================   
+/*     Initialize Z */
 
-
-       Initialize Z   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     e_dim1 = *lda;
-    e_offset = 1 + e_dim1 * 1;
+    e_offset = 1 + e_dim1;
     e -= e_offset;
     d_dim1 = *lda;
-    d_offset = 1 + d_dim1 * 1;
+    d_offset = 1 + d_dim1;
     d__ -= d_offset;
     b_dim1 = *lda;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
 
     /* Function Body */
@@ -112,7 +109,8 @@ static real c_b3 = 0.f;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    i__3 = *m;
 	    for (j = 1; j <= i__3; ++j) {
-		z___ref(ik + i__ - 1, ik + j - 1) = a_ref(i__, j);
+		z__[ik + i__ - 1 + (ik + j - 1) * z_dim1] = a[i__ + j * 
+			a_dim1];
 /* L10: */
 	    }
 /* L20: */
@@ -124,7 +122,8 @@ static real c_b3 = 0.f;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    i__3 = *m;
 	    for (j = 1; j <= i__3; ++j) {
-		z___ref(ik + mn + i__ - 1, ik + j - 1) = d___ref(i__, j);
+		z__[ik + mn + i__ - 1 + (ik + j - 1) * z_dim1] = d__[i__ + j *
+			 d_dim1];
 /* L30: */
 	    }
 /* L40: */
@@ -146,7 +145,8 @@ static real c_b3 = 0.f;
 
 	    i__3 = *m;
 	    for (i__ = 1; i__ <= i__3; ++i__) {
-		z___ref(ik + i__ - 1, jk + i__ - 1) = -b_ref(j, l);
+		z__[ik + i__ - 1 + (jk + i__ - 1) * z_dim1] = -b[j + l * 
+			b_dim1];
 /* L60: */
 	    }
 
@@ -154,7 +154,8 @@ static real c_b3 = 0.f;
 
 	    i__3 = *m;
 	    for (i__ = 1; i__ <= i__3; ++i__) {
-		z___ref(ik + mn + i__ - 1, jk + i__ - 1) = -e_ref(j, l);
+		z__[ik + mn + i__ - 1 + (jk + i__ - 1) * z_dim1] = -e[j + l * 
+			e_dim1];
 /* L70: */
 	    }
 
@@ -171,11 +172,3 @@ static real c_b3 = 0.f;
 /*     End of SLAKF2 */
 
 } /* slakf2_ */
-
-#undef z___ref
-#undef e_ref
-#undef d___ref
-#undef b_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -27,21 +22,21 @@ static integer c__0 = 0;
     doublereal d__1;
 
     /* Local variables */
-    static integer info;
-    static doublereal temp;
-    static integer j;
+    integer j, mn;
+    doublereal eps;
+    integer info;
+    doublereal temp;
     extern doublereal dasum_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int zlarf_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *), zgemm_(char *, char *, 
-	    integer *, integer *, integer *, doublecomplex *, doublecomplex *,
+	    integer *, integer *, integer *, doublecomplex *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *);
-    static doublereal dummy[1];
+    doublereal dummy[1];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dznrm2_(integer *, doublecomplex *, integer *), dlamch_(
 	    char *);
-    static integer mn;
     extern /* Subroutine */ int dlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *);
@@ -50,99 +45,110 @@ static integer c__0 = 0;
 	    integer *), xerbla_(char *, integer *);
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
-	    doublecomplex *, integer *), zlascl_(char *, integer *, integer *,
+	    doublecomplex *, integer *), zlascl_(char *, integer *, integer *, 
 	     doublereal *, doublereal *, integer *, integer *, doublecomplex *
-	    , integer *, integer *), zlaset_(char *, integer *, 
+, integer *, integer *), zlaset_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    integer *), zlaror_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, integer *, doublecomplex *, integer *);
-    static doublereal smlnum;
+    doublereal smlnum;
     extern /* Subroutine */ int zlarnv_(integer *, integer *, integer *, 
 	    doublecomplex *);
-    static doublereal eps;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZQRT15 generates a matrix with full or deficient rank and of various */
+/*  norms. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZQRT15 generates a matrix with full or deficient rank and of various   
-    norms.   
+/*  SCALE   (input) INTEGER */
+/*          SCALE = 1: normally scaled matrix */
+/*          SCALE = 2: matrix scaled up */
+/*          SCALE = 3: matrix scaled down */
 
-    Arguments   
-    =========   
+/*  RKSEL   (input) INTEGER */
+/*          RKSEL = 1: full rank matrix */
+/*          RKSEL = 2: rank-deficient matrix */
 
-    SCALE   (input) INTEGER   
-            SCALE = 1: normally scaled matrix   
-            SCALE = 2: matrix scaled up   
-            SCALE = 3: matrix scaled down   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    RKSEL   (input) INTEGER   
-            RKSEL = 1: full rank matrix   
-            RKSEL = 2: rank-deficient matrix   
+/*  N       (input) INTEGER */
+/*          The number of columns of A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B. */
 
-    N       (input) INTEGER   
-            The number of columns of A.   
+/*  A       (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (output) COMPLEX*16 array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  B       (output) COMPLEX*16 array, dimension (LDB, NRHS) */
+/*          A matrix that is in the range space of matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. */
 
-    B       (output) COMPLEX*16 array, dimension (LDB, NRHS)   
-            A matrix that is in the range space of matrix A.   
+/*  S       (output) DOUBLE PRECISION array, dimension MIN(M,N) */
+/*          Singular values of A. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.   
+/*  RANK    (output) INTEGER */
+/*          number of nonzero singular values of A. */
 
-    S       (output) DOUBLE PRECISION array, dimension MIN(M,N)   
-            Singular values of A.   
+/*  NORMA   (output) DOUBLE PRECISION */
+/*          one-norm norm of A. */
 
-    RANK    (output) INTEGER   
-            number of nonzero singular values of A.   
+/*  NORMB   (output) DOUBLE PRECISION */
+/*          one-norm norm of B. */
 
-    NORMA   (output) DOUBLE PRECISION   
-            one-norm norm of A.   
+/*  ISEED   (input/output) integer array, dimension (4) */
+/*          seed for random number generator. */
 
-    NORMB   (output) DOUBLE PRECISION   
-            one-norm norm of B.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    ISEED   (input/output) integer array, dimension (4)   
-            seed for random number generator.   
+/*  LWORK   (input) INTEGER */
+/*          length of work space required. */
+/*          LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            length of work space required.   
-            LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --s;
     --iseed;
@@ -207,36 +213,37 @@ L20:
 	zlarf_("Left", m, rank, &work[1], &c__1, &c_b22, &a[a_offset], lda, &
 		work[*m + 1]);
 
-/*        workspace used: m+mn   
+/*        workspace used: m+mn */
 
-          Generate consistent rhs in the range space of A */
+/*        Generate consistent rhs in the range space of A */
 
 	i__1 = *rank * *nrhs;
 	zlarnv_(&c__2, &iseed[1], &i__1, &work[1]);
 	zgemm_("No transpose", "No transpose", m, nrhs, rank, &c_b2, &a[
 		a_offset], lda, &work[1], rank, &c_b1, &b[b_offset], ldb);
 
-/*        work space used: <= mn *nrhs   
+/*        work space used: <= mn *nrhs */
 
-          generate (unscaled) matrix A */
+/*        generate (unscaled) matrix A */
 
 	i__1 = *rank;
 	for (j = 1; j <= i__1; ++j) {
-	    zdscal_(m, &s[j], &a_ref(1, j), &c__1);
+	    zdscal_(m, &s[j], &a[j * a_dim1 + 1], &c__1);
 /* L40: */
 	}
 	if (*rank < *n) {
 	    i__1 = *n - *rank;
-	    zlaset_("Full", m, &i__1, &c_b1, &c_b1, &a_ref(1, *rank + 1), lda);
+	    zlaset_("Full", m, &i__1, &c_b1, &c_b1, &a[(*rank + 1) * a_dim1 + 
+		    1], lda);
 	}
 	zlaror_("Right", "No initialization", m, n, &a[a_offset], lda, &iseed[
 		1], &work[1], &info);
 
     } else {
 
-/*        work space used 2*n+m   
+/*        work space used 2*n+m */
 
-          Generate null matrix and rhs */
+/*        Generate null matrix and rhs */
 
 	i__1 = mn;
 	for (j = 1; j <= i__1; ++j) {
@@ -289,8 +296,3 @@ L20:
 /*     End of ZQRT15 */
 
 } /* zqrt15_ */
-
-#undef a_ref
-#undef a_subscr
-
-

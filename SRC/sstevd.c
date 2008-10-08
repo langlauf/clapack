@@ -1,136 +1,152 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int sstevd_(char *jobz, integer *n, real *d__, real *e, real 
 	*z__, integer *ldz, real *work, integer *lwork, integer *iwork, 
 	integer *liwork, integer *info)
 {
-/*  -- LAPACK driver routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    SSTEVD computes all eigenvalues and, optionally, eigenvectors of a   
-    real symmetric tridiagonal matrix. If eigenvectors are desired, it   
-    uses a divide and conquer algorithm.   
-
-    The divide and conquer algorithm makes very mild assumptions about   
-    floating point arithmetic. It will work on machines with a guard   
-    digit in add/subtract, or on those binary machines without guard   
-    digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or   
-    Cray-2. It could conceivably fail on hexadecimal or decimal machines   
-    without guard digits, but we know of none.   
-
-    Arguments   
-    =========   
-
-    JOBZ    (input) CHARACTER*1   
-            = 'N':  Compute eigenvalues only;   
-            = 'V':  Compute eigenvalues and eigenvectors.   
-
-    N       (input) INTEGER   
-            The order of the matrix.  N >= 0.   
-
-    D       (input/output) REAL array, dimension (N)   
-            On entry, the n diagonal elements of the tridiagonal matrix   
-            A.   
-            On exit, if INFO = 0, the eigenvalues in ascending order.   
-
-    E       (input/output) REAL array, dimension (N)   
-            On entry, the (n-1) subdiagonal elements of the tridiagonal   
-            matrix A, stored in elements 1 to N-1 of E; E(N) need not   
-            be set, but is used by the routine.   
-            On exit, the contents of E are destroyed.   
-
-    Z       (output) REAL array, dimension (LDZ, N)   
-            If JOBZ = 'V', then if INFO = 0, Z contains the orthonormal   
-            eigenvectors of the matrix A, with the i-th column of Z   
-            holding the eigenvector associated with D(i).   
-            If JOBZ = 'N', then Z is not referenced.   
-
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= 1, and if   
-            JOBZ = 'V', LDZ >= max(1,N).   
-
-    WORK    (workspace/output) REAL array,   
-                                           dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
-
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
-            If JOBZ  = 'N' or N <= 1 then LWORK must be at least 1.   
-            If JOBZ  = 'V' and N > 1 then LWORK must be at least   
-                           ( 1 + 4*N + N**2 ).   
-
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
-
-    IWORK   (workspace/output) INTEGER array, dimension (LIWORK)   
-            On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK.   
-
-    LIWORK  (input) INTEGER   
-            The dimension of the array IWORK.   
-            If JOBZ  = 'N' or N <= 1 then LIWORK must be at least 1.   
-            If JOBZ  = 'V' and N > 1 then LIWORK must be at least 3+5*N.   
-
-            If LIWORK = -1, then a workspace query is assumed; the   
-            routine only calculates the optimal size of the IWORK array,   
-            returns this value as the first entry of the IWORK array, and   
-            no error message related to LIWORK is issued by XERBLA.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the algorithm failed to converge; i   
-                  off-diagonal elements of E did not converge to zero.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer z_dim1, z_offset, i__1;
     real r__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static real rmin, rmax, tnrm, sigma;
+    real eps, rmin, rmax, tnrm, sigma;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static integer lwmin;
-    static logical wantz;
-    static integer iscale;
+    integer lwmin;
+    logical wantz;
+    integer iscale;
     extern doublereal slamch_(char *);
-    static real safmin;
+    real safmin;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real bignum;
+    real bignum;
     extern /* Subroutine */ int sstedc_(char *, integer *, real *, real *, 
 	    real *, integer *, real *, integer *, integer *, integer *, 
 	    integer *);
-    static integer liwmin;
+    integer liwmin;
     extern doublereal slanst_(char *, integer *, real *, real *);
     extern /* Subroutine */ int ssterf_(integer *, real *, real *, integer *);
-    static real smlnum;
-    static logical lquery;
-    static real eps;
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+    real smlnum;
+    logical lquery;
 
 
+/*  -- LAPACK driver routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SSTEVD computes all eigenvalues and, optionally, eigenvectors of a */
+/*  real symmetric tridiagonal matrix. If eigenvectors are desired, it */
+/*  uses a divide and conquer algorithm. */
+
+/*  The divide and conquer algorithm makes very mild assumptions about */
+/*  floating point arithmetic. It will work on machines with a guard */
+/*  digit in add/subtract, or on those binary machines without guard */
+/*  digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or */
+/*  Cray-2. It could conceivably fail on hexadecimal or decimal machines */
+/*  without guard digits, but we know of none. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOBZ    (input) CHARACTER*1 */
+/*          = 'N':  Compute eigenvalues only; */
+/*          = 'V':  Compute eigenvalues and eigenvectors. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix.  N >= 0. */
+
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, the n diagonal elements of the tridiagonal matrix */
+/*          A. */
+/*          On exit, if INFO = 0, the eigenvalues in ascending order. */
+
+/*  E       (input/output) REAL array, dimension (N-1) */
+/*          On entry, the (n-1) subdiagonal elements of the tridiagonal */
+/*          matrix A, stored in elements 1 to N-1 of E. */
+/*          On exit, the contents of E are destroyed. */
+
+/*  Z       (output) REAL array, dimension (LDZ, N) */
+/*          If JOBZ = 'V', then if INFO = 0, Z contains the orthonormal */
+/*          eigenvectors of the matrix A, with the i-th column of Z */
+/*          holding the eigenvector associated with D(i). */
+/*          If JOBZ = 'N', then Z is not referenced. */
+
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= 1, and if */
+/*          JOBZ = 'V', LDZ >= max(1,N). */
+
+/*  WORK    (workspace/output) REAL array, */
+/*                                         dimension (LWORK) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
+
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
+/*          If JOBZ  = 'N' or N <= 1 then LWORK must be at least 1. */
+/*          If JOBZ  = 'V' and N > 1 then LWORK must be at least */
+/*                         ( 1 + 4*N + N**2 ). */
+
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal sizes of the WORK and IWORK */
+/*          arrays, returns these values as the first entries of the WORK */
+/*          and IWORK arrays, and no error message related to LWORK or */
+/*          LIWORK is issued by XERBLA. */
+
+/*  IWORK   (workspace/output) INTEGER array, dimension (MAX(1,LIWORK)) */
+/*          On exit, if INFO = 0, IWORK(1) returns the optimal LIWORK. */
+
+/*  LIWORK  (input) INTEGER */
+/*          The dimension of the array IWORK. */
+/*          If JOBZ  = 'N' or N <= 1 then LIWORK must be at least 1. */
+/*          If JOBZ  = 'V' and N > 1 then LIWORK must be at least 3+5*N. */
+
+/*          If LIWORK = -1, then a workspace query is assumed; the */
+/*          routine only calculates the optimal sizes of the WORK and */
+/*          IWORK arrays, returns these values as the first entries of */
+/*          the WORK and IWORK arrays, and no error message related to */
+/*          LWORK or LIWORK is issued by XERBLA. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, the algorithm failed to converge; i */
+/*                off-diagonal elements of E did not converge to zero. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --d__;
     --e;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --work;
     --iwork;
@@ -155,15 +171,17 @@
 	*info = -2;
     } else if (*ldz < 1 || wantz && *ldz < *n) {
 	*info = -6;
-    } else if (*lwork < lwmin && ! lquery) {
-	*info = -8;
-    } else if (*liwork < liwmin && ! lquery) {
-	*info = -10;
     }
 
     if (*info == 0) {
 	work[1] = (real) lwmin;
 	iwork[1] = liwmin;
+
+	if (*lwork < lwmin && ! lquery) {
+	    *info = -8;
+	} else if (*liwork < liwmin && ! lquery) {
+	    *info = -10;
+	}
     }
 
     if (*info != 0) {
@@ -182,7 +200,7 @@
 
     if (*n == 1) {
 	if (wantz) {
-	    z___ref(1, 1) = 1.f;
+	    z__[z_dim1 + 1] = 1.f;
 	}
 	return 0;
     }
@@ -213,8 +231,8 @@
 	sscal_(&i__1, &sigma, &e[1], &c__1);
     }
 
-/*     For eigenvalues only, call SSTERF.  For eigenvalues and   
-       eigenvectors, call SSTEDC. */
+/*     For eigenvalues only, call SSTERF.  For eigenvalues and */
+/*     eigenvectors, call SSTEDC. */
 
     if (! wantz) {
 	ssterf_(n, &d__[1], &e[1], info);
@@ -238,7 +256,3 @@
 /*     End of SSTEVD */
 
 } /* sstevd_ */
-
-#undef z___ref
-
-

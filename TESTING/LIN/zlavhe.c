@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,7 +18,9 @@ static integer c__1 = 1;
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer j, k;
+    integer j, k;
+    doublecomplex t1, t2, d11, d12, d21, d22;
+    integer kp;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zscal_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *), zgemv_(char *, integer *, integer *, 
@@ -32,134 +29,139 @@ static integer c__1 = 1;
 	    zgeru_(integer *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *)
 	    , zswap_(integer *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *);
-    static doublecomplex t1, t2, d11, d12, d21, d22;
-    static integer kp;
-    extern /* Subroutine */ int xerbla_(char *, integer *), zlacgv_(
-	    integer *, doublecomplex *, integer *);
-    static logical nounit;
+	    integer *), xerbla_(char *, integer *), zlacgv_(integer *, 
+	     doublecomplex *, integer *);
+    logical nounit;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*     ZLAVHE  performs one of the matrix-vector operations */
+/*        x := A*x  or  x := A^H*x, */
+/*     where x is an N element vector and  A is one of the factors */
+/*     from the symmetric factorization computed by ZHETRF. */
+/*     ZHETRF produces a factorization of the form */
+/*          U * D * U^H     or     L * D * L^H, */
+/*     where U (or L) is a product of permutation and unit upper (lower) */
+/*     triangular matrices, U^H (or L^H) is the conjugate transpose of */
+/*     U (or L), and D is Hermitian and block diagonal with 1 x 1 and */
+/*     2 x 2 diagonal blocks.  The multipliers for the transformations */
+/*     and the upper or lower triangular parts of the diagonal blocks */
+/*     are stored in the leading upper or lower triangle of the 2-D */
+/*     array A. */
 
-    Purpose   
-    =======   
+/*     If TRANS = 'N' or 'n', ZLAVHE multiplies either by U or U * D */
+/*     (or L or L * D). */
+/*     If TRANS = 'C' or 'c', ZLAVHE multiplies either by U^H or D * U^H */
+/*     (or L^H or D * L^H ). */
 
-       ZLAVHE  performs one of the matrix-vector operations   
-          x := A*x  or  x := A^H*x,   
-       where x is an N element vector and  A is one of the factors   
-       from the symmetric factorization computed by ZHETRF.   
-       ZHETRF produces a factorization of the form   
-            U * D * U^H     or     L * D * L^H,   
-       where U (or L) is a product of permutation and unit upper (lower)   
-       triangular matrices, U^H (or L^H) is the conjugate transpose of   
-       U (or L), and D is Hermitian and block diagonal with 1 x 1 and   
-       2 x 2 diagonal blocks.  The multipliers for the transformations   
-       and the upper or lower triangular parts of the diagonal blocks   
-       are stored in the leading upper or lower triangle of the 2-D   
-       array A.   
+/*  Arguments */
+/*  ========== */
 
-       If TRANS = 'N' or 'n', ZLAVHE multiplies either by U or U * D   
-       (or L or L * D).   
-       If TRANS = 'C' or 'c', ZLAVHE multiplies either by U^H or D * U^H   
-       (or L^H or D * L^H ).   
+/*  UPLO   - CHARACTER*1 */
+/*           On entry, UPLO specifies whether the triangular matrix */
+/*           stored in A is upper or lower triangular. */
+/*              UPLO = 'U' or 'u'   The matrix is upper triangular. */
+/*              UPLO = 'L' or 'l'   The matrix is lower triangular. */
+/*           Unchanged on exit. */
 
-    Arguments   
-    ==========   
+/*  TRANS  - CHARACTER*1 */
+/*           On entry, TRANS specifies the operation to be performed as */
+/*           follows: */
+/*              TRANS = 'N' or 'n'   x := A*x. */
+/*              TRANS = 'C' or 'c'   x := A^H*x. */
+/*           Unchanged on exit. */
 
-    UPLO   - CHARACTER*1   
-             On entry, UPLO specifies whether the triangular matrix   
-             stored in A is upper or lower triangular.   
-                UPLO = 'U' or 'u'   The matrix is upper triangular.   
-                UPLO = 'L' or 'l'   The matrix is lower triangular.   
-             Unchanged on exit.   
+/*  DIAG   - CHARACTER*1 */
+/*           On entry, DIAG specifies whether the diagonal blocks are */
+/*           assumed to be unit matrices: */
+/*              DIAG = 'U' or 'u'   Diagonal blocks are unit matrices. */
+/*              DIAG = 'N' or 'n'   Diagonal blocks are non-unit. */
+/*           Unchanged on exit. */
 
-    TRANS  - CHARACTER*1   
-             On entry, TRANS specifies the operation to be performed as   
-             follows:   
-                TRANS = 'N' or 'n'   x := A*x.   
-                TRANS = 'C' or 'c'   x := A^H*x.   
-             Unchanged on exit.   
+/*  N      - INTEGER */
+/*           On entry, N specifies the order of the matrix A. */
+/*           N must be at least zero. */
+/*           Unchanged on exit. */
 
-    DIAG   - CHARACTER*1   
-             On entry, DIAG specifies whether the diagonal blocks are   
-             assumed to be unit matrices:   
-                DIAG = 'U' or 'u'   Diagonal blocks are unit matrices.   
-                DIAG = 'N' or 'n'   Diagonal blocks are non-unit.   
-             Unchanged on exit.   
+/*  NRHS   - INTEGER */
+/*           On entry, NRHS specifies the number of right hand sides, */
+/*           i.e., the number of vectors x to be multiplied by A. */
+/*           NRHS must be at least zero. */
+/*           Unchanged on exit. */
 
-    N      - INTEGER   
-             On entry, N specifies the order of the matrix A.   
-             N must be at least zero.   
-             Unchanged on exit.   
+/*  A      - COMPLEX*16 array, dimension( LDA, N ) */
+/*           On entry, A contains a block diagonal matrix and the */
+/*           multipliers of the transformations used to obtain it, */
+/*           stored as a 2-D triangular matrix. */
+/*           Unchanged on exit. */
 
-    NRHS   - INTEGER   
-             On entry, NRHS specifies the number of right hand sides,   
-             i.e., the number of vectors x to be multiplied by A.   
-             NRHS must be at least zero.   
-             Unchanged on exit.   
+/*  LDA    - INTEGER */
+/*           On entry, LDA specifies the first dimension of A as declared */
+/*           in the calling ( sub ) program. LDA must be at least */
+/*           max( 1, N ). */
+/*           Unchanged on exit. */
 
-    A      - COMPLEX*16 array, dimension( LDA, N )   
-             On entry, A contains a block diagonal matrix and the   
-             multipliers of the transformations used to obtain it,   
-             stored as a 2-D triangular matrix.   
-             Unchanged on exit.   
+/*  IPIV   - INTEGER array, dimension( N ) */
+/*           On entry, IPIV contains the vector of pivot indices as */
+/*           determined by ZSYTRF or ZHETRF. */
+/*           If IPIV( K ) = K, no interchange was done. */
+/*           If IPIV( K ) <> K but IPIV( K ) > 0, then row K was inter- */
+/*           changed with row IPIV( K ) and a 1 x 1 pivot block was used. */
+/*           If IPIV( K ) < 0 and UPLO = 'U', then row K-1 was exchanged */
+/*           with row | IPIV( K ) | and a 2 x 2 pivot block was used. */
+/*           If IPIV( K ) < 0 and UPLO = 'L', then row K+1 was exchanged */
+/*           with row | IPIV( K ) | and a 2 x 2 pivot block was used. */
 
-    LDA    - INTEGER   
-             On entry, LDA specifies the first dimension of A as declared   
-             in the calling ( sub ) program. LDA must be at least   
-             max( 1, N ).   
-             Unchanged on exit.   
+/*  B      - COMPLEX*16 array, dimension( LDB, NRHS ) */
+/*           On entry, B contains NRHS vectors of length N. */
+/*           On exit, B is overwritten with the product A * B. */
 
-    IPIV   - INTEGER array, dimension( N )   
-             On entry, IPIV contains the vector of pivot indices as   
-             determined by ZSYTRF or ZHETRF.   
-             If IPIV( K ) = K, no interchange was done.   
-             If IPIV( K ) <> K but IPIV( K ) > 0, then row K was inter-   
-             changed with row IPIV( K ) and a 1 x 1 pivot block was used.   
-             If IPIV( K ) < 0 and UPLO = 'U', then row K-1 was exchanged   
-             with row | IPIV( K ) | and a 2 x 2 pivot block was used.   
-             If IPIV( K ) < 0 and UPLO = 'L', then row K+1 was exchanged   
-             with row | IPIV( K ) | and a 2 x 2 pivot block was used.   
+/*  LDB    - INTEGER */
+/*           On entry, LDB contains the leading dimension of B as */
+/*           declared in the calling program.  LDB must be at least */
+/*           max( 1, N ). */
+/*           Unchanged on exit. */
 
-    B      - COMPLEX*16 array, dimension( LDB, NRHS )   
-             On entry, B contains NRHS vectors of length N.   
-             On exit, B is overwritten with the product A * B.   
+/*  INFO   - INTEGER */
+/*           INFO is the error flag. */
+/*           On exit, a value of 0 indicates a successful exit. */
+/*           A negative value, say -K, indicates that the K-th argument */
+/*           has an illegal value. */
 
-    LDB    - INTEGER   
-             On entry, LDB contains the leading dimension of B as   
-             declared in the calling program.  LDB must be at least   
-             max( 1, N ).   
-             Unchanged on exit.   
+/*  ===================================================================== */
 
-    INFO   - INTEGER   
-             INFO is the error flag.   
-             On exit, a value of 0 indicates a successful exit.   
-             A negative value, say -K, indicates that the K-th argument   
-             has an illegal value.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ipiv;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -192,15 +194,15 @@ static integer c__1 = 1;
     }
 
     nounit = lsame_(diag, "N");
-/* ------------------------------------------   
+/* ------------------------------------------ */
 
-       Compute  B := A * B  (No transpose)   
+/*     Compute  B := A * B  (No transpose) */
 
-   ------------------------------------------ */
+/* ------------------------------------------ */
     if (lsame_(trans, "N")) {
 
-/*        Compute  B := U*B   
-          where U = P(m)*inv(U(m))* ... *P(1)*inv(U(1)) */
+/*        Compute  B := U*B */
+/*        where U = P(m)*inv(U(m))* ... *P(1)*inv(U(1)) */
 
 	if (lsame_(uplo, "U")) {
 
@@ -213,12 +215,12 @@ L10:
 	    }
 	    if (ipiv[k] > 0) {
 
-/*              1 x 1 pivot block   
+/*              1 x 1 pivot block */
 
-                Multiply by the diagonal element if forming U * D. */
+/*              Multiply by the diagonal element if forming U * D. */
 
 		if (nounit) {
-		    zscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
+		    zscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
 		}
 
 /*              Multiply by  P(K) * inv(U(K))  if K > 1. */
@@ -228,46 +230,47 @@ L10:
 /*                 Apply the transformation. */
 
 		    i__1 = k - 1;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(1, k), &c__1, &b_ref(k, 
-			    1), ldb, &b_ref(1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[k * a_dim1 + 1], &c__1, &b[
+			    k + b_dim1], ldb, &b[b_dim1 + 1], ldb);
 
 /*                 Interchange if P(K) != I. */
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 		}
 		++k;
 	    } else {
 
-/*              2 x 2 pivot block   
+/*              2 x 2 pivot block */
 
-                Multiply by the diagonal block if forming U * D. */
+/*              Multiply by the diagonal block if forming U * D. */
 
 		if (nounit) {
-		    i__1 = a_subscr(k, k);
+		    i__1 = k + k * a_dim1;
 		    d11.r = a[i__1].r, d11.i = a[i__1].i;
-		    i__1 = a_subscr(k + 1, k + 1);
+		    i__1 = k + 1 + (k + 1) * a_dim1;
 		    d22.r = a[i__1].r, d22.i = a[i__1].i;
-		    i__1 = a_subscr(k, k + 1);
+		    i__1 = k + (k + 1) * a_dim1;
 		    d12.r = a[i__1].r, d12.i = a[i__1].i;
 		    d_cnjg(&z__1, &d12);
 		    d21.r = z__1.r, d21.i = z__1.i;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			t1.r = b[i__2].r, t1.i = b[i__2].i;
-			i__2 = b_subscr(k + 1, j);
+			i__2 = k + 1 + j * b_dim1;
 			t2.r = b[i__2].r, t2.i = b[i__2].i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			z__2.r = d11.r * t1.r - d11.i * t1.i, z__2.i = d11.r *
 				 t1.i + d11.i * t1.r;
 			z__3.r = d12.r * t2.r - d12.i * t2.i, z__3.i = d12.r *
 				 t2.i + d12.i * t2.r;
 			z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 			b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-			i__2 = b_subscr(k + 1, j);
+			i__2 = k + 1 + j * b_dim1;
 			z__2.r = d21.r * t1.r - d21.i * t1.i, z__2.i = d21.r *
 				 t1.i + d21.i * t1.r;
 			z__3.r = d22.r * t2.r - d22.i * t2.i, z__3.i = d22.r *
@@ -285,17 +288,19 @@ L10:
 /*                 Apply the transformations. */
 
 		    i__1 = k - 1;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(1, k), &c__1, &b_ref(k, 
-			    1), ldb, &b_ref(1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[k * a_dim1 + 1], &c__1, &b[
+			    k + b_dim1], ldb, &b[b_dim1 + 1], ldb);
 		    i__1 = k - 1;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(1, k + 1), &c__1, &
-			    b_ref(k + 1, 1), ldb, &b_ref(1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[(k + 1) * a_dim1 + 1], &
+			    c__1, &b[k + 1 + b_dim1], ldb, &b[b_dim1 + 1], 
+			    ldb);
 
 /*                 Interchange if P(K) != I. */
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 		}
 		k += 2;
@@ -303,8 +308,8 @@ L10:
 	    goto L10;
 L30:
 
-/*        Compute  B := L*B   
-          where L = P(1)*inv(L(1))* ... *P(m)*inv(L(m)) . */
+/*        Compute  B := L*B */
+/*        where L = P(1)*inv(L(1))* ... *P(m)*inv(L(m)) . */
 
 	    ;
 	} else {
@@ -317,17 +322,17 @@ L40:
 		goto L60;
 	    }
 
-/*           Test the pivot index.  If greater than zero, a 1 x 1   
-             pivot was used, otherwise a 2 x 2 pivot was used. */
+/*           Test the pivot index.  If greater than zero, a 1 x 1 */
+/*           pivot was used, otherwise a 2 x 2 pivot was used. */
 
 	    if (ipiv[k] > 0) {
 
-/*              1 x 1 pivot block:   
+/*              1 x 1 pivot block: */
 
-                Multiply by the diagonal element if forming L * D. */
+/*              Multiply by the diagonal element if forming L * D. */
 
 		if (nounit) {
-		    zscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
+		    zscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
 		}
 
 /*              Multiply by  P(K) * inv(L(K))  if K < N. */
@@ -338,47 +343,48 @@ L40:
 /*                 Apply the transformation. */
 
 		    i__1 = *n - k;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(k + 1, k), &c__1, &
-			    b_ref(k, 1), ldb, &b_ref(k + 1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[k + 1 + k * a_dim1], &c__1, 
+			    &b[k + b_dim1], ldb, &b[k + 1 + b_dim1], ldb);
 
-/*                 Interchange if a permutation was applied at the   
-                   K-th step of the factorization. */
+/*                 Interchange if a permutation was applied at the */
+/*                 K-th step of the factorization. */
 
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 		}
 		--k;
 
 	    } else {
 
-/*              2 x 2 pivot block:   
+/*              2 x 2 pivot block: */
 
-                Multiply by the diagonal block if forming L * D. */
+/*              Multiply by the diagonal block if forming L * D. */
 
 		if (nounit) {
-		    i__1 = a_subscr(k - 1, k - 1);
+		    i__1 = k - 1 + (k - 1) * a_dim1;
 		    d11.r = a[i__1].r, d11.i = a[i__1].i;
-		    i__1 = a_subscr(k, k);
+		    i__1 = k + k * a_dim1;
 		    d22.r = a[i__1].r, d22.i = a[i__1].i;
-		    i__1 = a_subscr(k, k - 1);
+		    i__1 = k + (k - 1) * a_dim1;
 		    d21.r = a[i__1].r, d21.i = a[i__1].i;
 		    d_cnjg(&z__1, &d21);
 		    d12.r = z__1.r, d12.i = z__1.i;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			i__2 = b_subscr(k - 1, j);
+			i__2 = k - 1 + j * b_dim1;
 			t1.r = b[i__2].r, t1.i = b[i__2].i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			t2.r = b[i__2].r, t2.i = b[i__2].i;
-			i__2 = b_subscr(k - 1, j);
+			i__2 = k - 1 + j * b_dim1;
 			z__2.r = d11.r * t1.r - d11.i * t1.i, z__2.i = d11.r *
 				 t1.i + d11.i * t1.r;
 			z__3.r = d12.r * t2.r - d12.i * t2.i, z__3.i = d12.r *
 				 t2.i + d12.i * t2.r;
 			z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 			b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			z__2.r = d21.r * t1.r - d21.i * t1.i, z__2.i = d21.r *
 				 t1.i + d21.i * t1.r;
 			z__3.r = d22.r * t2.r - d22.i * t2.i, z__3.i = d22.r *
@@ -396,18 +402,20 @@ L40:
 /*                 Apply the transformation. */
 
 		    i__1 = *n - k;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(k + 1, k), &c__1, &
-			    b_ref(k, 1), ldb, &b_ref(k + 1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[k + 1 + k * a_dim1], &c__1, 
+			    &b[k + b_dim1], ldb, &b[k + 1 + b_dim1], ldb);
 		    i__1 = *n - k;
-		    zgeru_(&i__1, nrhs, &c_b1, &a_ref(k + 1, k - 1), &c__1, &
-			    b_ref(k - 1, 1), ldb, &b_ref(k + 1, 1), ldb);
+		    zgeru_(&i__1, nrhs, &c_b1, &a[k + 1 + (k - 1) * a_dim1], &
+			    c__1, &b[k - 1 + b_dim1], ldb, &b[k + 1 + b_dim1], 
+			     ldb);
 
-/*                 Interchange if a permutation was applied at the   
-                   K-th step of the factorization. */
+/*                 Interchange if a permutation was applied at the */
+/*                 K-th step of the factorization. */
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 		}
 		k += -2;
@@ -416,16 +424,16 @@ L40:
 L60:
 	    ;
 	}
-/* --------------------------------------------------   
+/* -------------------------------------------------- */
 
-       Compute  B := A^H * B  (conjugate transpose)   
+/*     Compute  B := A^H * B  (conjugate transpose) */
 
-   -------------------------------------------------- */
+/* -------------------------------------------------- */
     } else {
 
-/*        Form  B := U^H*B   
-          where U  = P(m)*inv(U(m))* ... *P(1)*inv(U(1))   
-          and   U^H = inv(U^H(1))*P(1)* ... *inv(U^H(m))*P(m) */
+/*        Form  B := U^H*B */
+/*        where U  = P(m)*inv(U(m))* ... *P(1)*inv(U(1)) */
+/*        and   U^H = inv(U^H(1))*P(1)* ... *inv(U^H(m))*P(m) */
 
 	if (lsame_(uplo, "U")) {
 
@@ -446,21 +454,23 @@ L70:
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 
-/*                 Apply the transformation   
-                      y = y - B' conjg(x),   
-                   where x is a column of A and y is a row of B. */
+/*                 Apply the transformation */
+/*                    y = y - B' conjg(x), */
+/*                 where x is a column of A and y is a row of B. */
 
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		    i__1 = k - 1;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb,
-			     &a_ref(1, k), &c__1, &c_b1, &b_ref(k, 1), ldb);
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb, 
+			     &a[k * a_dim1 + 1], &c__1, &c_b1, &b[k + b_dim1], 
+			     ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		}
 		if (nounit) {
-		    zscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
+		    zscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
 		}
 		--k;
 
@@ -473,54 +483,55 @@ L70:
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k - 1) {
-			zswap_(nrhs, &b_ref(k - 1, 1), ldb, &b_ref(kp, 1), 
-				ldb);
+			zswap_(nrhs, &b[k - 1 + b_dim1], ldb, &b[kp + b_dim1], 
+				 ldb);
 		    }
 
-/*                 Apply the transformations   
-                      y = y - B' conjg(x),   
-                   where x is a block column of A and y is a block   
-                   row of B. */
+/*                 Apply the transformations */
+/*                    y = y - B' conjg(x), */
+/*                 where x is a block column of A and y is a block */
+/*                 row of B. */
 
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		    i__1 = k - 2;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb,
-			     &a_ref(1, k), &c__1, &c_b1, &b_ref(k, 1), ldb);
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
-
-		    zlacgv_(nrhs, &b_ref(k - 1, 1), ldb);
-		    i__1 = k - 2;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb,
-			     &a_ref(1, k - 1), &c__1, &c_b1, &b_ref(k - 1, 1),
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb, 
+			     &a[k * a_dim1 + 1], &c__1, &c_b1, &b[k + b_dim1], 
 			     ldb);
-		    zlacgv_(nrhs, &b_ref(k - 1, 1), ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
+
+		    zlacgv_(nrhs, &b[k - 1 + b_dim1], ldb);
+		    i__1 = k - 2;
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[b_offset], ldb, 
+			     &a[(k - 1) * a_dim1 + 1], &c__1, &c_b1, &b[k - 1 
+			    + b_dim1], ldb);
+		    zlacgv_(nrhs, &b[k - 1 + b_dim1], ldb);
 		}
 
 /*              Multiply by the diagonal block if non-unit. */
 
 		if (nounit) {
-		    i__1 = a_subscr(k - 1, k - 1);
+		    i__1 = k - 1 + (k - 1) * a_dim1;
 		    d11.r = a[i__1].r, d11.i = a[i__1].i;
-		    i__1 = a_subscr(k, k);
+		    i__1 = k + k * a_dim1;
 		    d22.r = a[i__1].r, d22.i = a[i__1].i;
-		    i__1 = a_subscr(k - 1, k);
+		    i__1 = k - 1 + k * a_dim1;
 		    d12.r = a[i__1].r, d12.i = a[i__1].i;
 		    d_cnjg(&z__1, &d12);
 		    d21.r = z__1.r, d21.i = z__1.i;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			i__2 = b_subscr(k - 1, j);
+			i__2 = k - 1 + j * b_dim1;
 			t1.r = b[i__2].r, t1.i = b[i__2].i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			t2.r = b[i__2].r, t2.i = b[i__2].i;
-			i__2 = b_subscr(k - 1, j);
+			i__2 = k - 1 + j * b_dim1;
 			z__2.r = d11.r * t1.r - d11.i * t1.i, z__2.i = d11.r *
 				 t1.i + d11.i * t1.r;
 			z__3.r = d12.r * t2.r - d12.i * t2.i, z__3.i = d12.r *
 				 t2.i + d12.i * t2.r;
 			z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 			b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			z__2.r = d21.r * t1.r - d21.i * t1.i, z__2.i = d21.r *
 				 t1.i + d21.i * t1.r;
 			z__3.r = d22.r * t2.r - d22.i * t2.i, z__3.i = d22.r *
@@ -535,9 +546,9 @@ L70:
 	    goto L70;
 L90:
 
-/*        Form  B := L^H*B   
-          where L  = P(1)*inv(L(1))* ... *P(m)*inv(L(m))   
-          and   L^H = inv(L^H(m))*P(m)* ... *inv(L^H(1))*P(1) */
+/*        Form  B := L^H*B */
+/*        where L  = P(1)*inv(L(1))* ... *P(m)*inv(L(m)) */
+/*        and   L^H = inv(L^H(m))*P(m)* ... *inv(L^H(1))*P(1) */
 
 	    ;
 	} else {
@@ -559,20 +570,21 @@ L100:
 
 		    kp = ipiv[k];
 		    if (kp != k) {
-			zswap_(nrhs, &b_ref(k, 1), ldb, &b_ref(kp, 1), ldb);
+			zswap_(nrhs, &b[k + b_dim1], ldb, &b[kp + b_dim1], 
+				ldb);
 		    }
 
 /*                 Apply the transformation */
 
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		    i__1 = *n - k;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b_ref(k + 1, 1), 
-			    ldb, &a_ref(k + 1, k), &c__1, &c_b1, &b_ref(k, 1),
-			     ldb);
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[k + 1 + b_dim1]
+, ldb, &a[k + 1 + k * a_dim1], &c__1, &c_b1, &b[k 
+			    + b_dim1], ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		}
 		if (nounit) {
-		    zscal_(nrhs, &a_ref(k, k), &b_ref(k, 1), ldb);
+		    zscal_(nrhs, &a[k + k * a_dim1], &b[k + b_dim1], ldb);
 		}
 		++k;
 
@@ -585,52 +597,52 @@ L100:
 
 		    kp = (i__1 = ipiv[k], abs(i__1));
 		    if (kp != k + 1) {
-			zswap_(nrhs, &b_ref(k + 1, 1), ldb, &b_ref(kp, 1), 
-				ldb);
+			zswap_(nrhs, &b[k + 1 + b_dim1], ldb, &b[kp + b_dim1], 
+				 ldb);
 		    }
 
 /*                 Apply the transformation */
 
-		    zlacgv_(nrhs, &b_ref(k + 1, 1), ldb);
+		    zlacgv_(nrhs, &b[k + 1 + b_dim1], ldb);
 		    i__1 = *n - k - 1;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b_ref(k + 2, 1), 
-			    ldb, &a_ref(k + 2, k + 1), &c__1, &c_b1, &b_ref(k 
-			    + 1, 1), ldb);
-		    zlacgv_(nrhs, &b_ref(k + 1, 1), ldb);
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[k + 2 + b_dim1]
+, ldb, &a[k + 2 + (k + 1) * a_dim1], &c__1, &c_b1, 
+			     &b[k + 1 + b_dim1], ldb);
+		    zlacgv_(nrhs, &b[k + 1 + b_dim1], ldb);
 
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		    i__1 = *n - k - 1;
-		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b_ref(k + 2, 1), 
-			    ldb, &a_ref(k + 2, k), &c__1, &c_b1, &b_ref(k, 1),
-			     ldb);
-		    zlacgv_(nrhs, &b_ref(k, 1), ldb);
+		    zgemv_("Conjugate", &i__1, nrhs, &c_b1, &b[k + 2 + b_dim1]
+, ldb, &a[k + 2 + k * a_dim1], &c__1, &c_b1, &b[k 
+			    + b_dim1], ldb);
+		    zlacgv_(nrhs, &b[k + b_dim1], ldb);
 		}
 
 /*              Multiply by the diagonal block if non-unit. */
 
 		if (nounit) {
-		    i__1 = a_subscr(k, k);
+		    i__1 = k + k * a_dim1;
 		    d11.r = a[i__1].r, d11.i = a[i__1].i;
-		    i__1 = a_subscr(k + 1, k + 1);
+		    i__1 = k + 1 + (k + 1) * a_dim1;
 		    d22.r = a[i__1].r, d22.i = a[i__1].i;
-		    i__1 = a_subscr(k + 1, k);
+		    i__1 = k + 1 + k * a_dim1;
 		    d21.r = a[i__1].r, d21.i = a[i__1].i;
 		    d_cnjg(&z__1, &d21);
 		    d12.r = z__1.r, d12.i = z__1.i;
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			t1.r = b[i__2].r, t1.i = b[i__2].i;
-			i__2 = b_subscr(k + 1, j);
+			i__2 = k + 1 + j * b_dim1;
 			t2.r = b[i__2].r, t2.i = b[i__2].i;
-			i__2 = b_subscr(k, j);
+			i__2 = k + j * b_dim1;
 			z__2.r = d11.r * t1.r - d11.i * t1.i, z__2.i = d11.r *
 				 t1.i + d11.i * t1.r;
 			z__3.r = d12.r * t2.r - d12.i * t2.i, z__3.i = d12.r *
 				 t2.i + d12.i * t2.r;
 			z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
 			b[i__2].r = z__1.r, b[i__2].i = z__1.i;
-			i__2 = b_subscr(k + 1, j);
+			i__2 = k + 1 + j * b_dim1;
 			z__2.r = d21.r * t1.r - d21.i * t1.i, z__2.i = d21.r *
 				 t1.i + d21.i * t1.r;
 			z__3.r = d22.r * t2.r - d22.i * t2.i, z__3.i = d22.r *
@@ -653,10 +665,3 @@ L120:
 /*     End of ZLAVHE */
 
 } /* zlavhe_ */
-
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

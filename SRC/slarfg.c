@@ -1,78 +1,94 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slarfg_(integer *n, real *alpha, real *x, integer *incx, 
 	real *tau)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SLARFG generates a real elementary reflector H of order n, such   
-    that   
-
-          H * ( alpha ) = ( beta ),   H' * H = I.   
-              (   x   )   (   0  )   
-
-    where alpha and beta are scalars, and x is an (n-1)-element real   
-    vector. H is represented in the form   
-
-          H = I - tau * ( 1 ) * ( 1 v' ) ,   
-                        ( v )   
-
-    where tau is a real scalar and v is a real (n-1)-element   
-    vector.   
-
-    If the elements of x are all zero, then tau = 0 and H is taken to be   
-    the unit matrix.   
-
-    Otherwise  1 <= tau <= 2.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the elementary reflector.   
-
-    ALPHA   (input/output) REAL   
-            On entry, the value alpha.   
-            On exit, it is overwritten with the value beta.   
-
-    X       (input/output) REAL array, dimension   
-                           (1+(N-2)*abs(INCX))   
-            On entry, the vector x.   
-            On exit, it is overwritten with the vector v.   
-
-    INCX    (input) INTEGER   
-            The increment between elements of X. INCX > 0.   
-
-    TAU     (output) REAL   
-            The value tau.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1;
+
     /* Builtin functions */
     double r_sign(real *, real *);
-    /* Local variables */
-    static real beta;
-    extern doublereal snrm2_(integer *, real *, integer *);
-    static integer j;
-    extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static real xnorm;
-    extern doublereal slapy2_(real *, real *), slamch_(char *);
-    static real safmin, rsafmn;
-    static integer knt;
 
+    /* Local variables */
+    integer j, knt;
+    real beta;
+    extern doublereal snrm2_(integer *, real *, integer *);
+    extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
+    real xnorm;
+    extern doublereal slapy2_(real *, real *), slamch_(char *);
+    real safmin, rsafmn;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLARFG generates a real elementary reflector H of order n, such */
+/*  that */
+
+/*        H * ( alpha ) = ( beta ),   H' * H = I. */
+/*            (   x   )   (   0  ) */
+
+/*  where alpha and beta are scalars, and x is an (n-1)-element real */
+/*  vector. H is represented in the form */
+
+/*        H = I - tau * ( 1 ) * ( 1 v' ) , */
+/*                      ( v ) */
+
+/*  where tau is a real scalar and v is a real (n-1)-element */
+/*  vector. */
+
+/*  If the elements of x are all zero, then tau = 0 and H is taken to be */
+/*  the unit matrix. */
+
+/*  Otherwise  1 <= tau <= 2. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The order of the elementary reflector. */
+
+/*  ALPHA   (input/output) REAL */
+/*          On entry, the value alpha. */
+/*          On exit, it is overwritten with the value beta. */
+
+/*  X       (input/output) REAL array, dimension */
+/*                         (1+(N-2)*abs(INCX)) */
+/*          On entry, the vector x. */
+/*          On exit, it is overwritten with the vector v. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between elements of X. INCX > 0. */
+
+/*  TAU     (output) REAL */
+/*          The value tau. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --x;
 
     /* Function Body */
@@ -145,4 +161,3 @@ L10:
 /*     End of SLARFG */
 
 } /* slarfg_ */
-

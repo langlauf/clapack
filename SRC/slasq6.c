@@ -1,12 +1,7 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int slasq6_(integer *i0, integer *n0, real *z__, integer *pp,
+/* Subroutine */ int slasq6_(integer *i0, integer *n0, real *z__, integer *pp, 
 	 real *dmin__, real *dmin1, real *dmin2, real *dn, real *dnm1, real *
 	dnm2)
 {
@@ -15,63 +10,75 @@
     real r__1, r__2;
 
     /* Local variables */
-    static real emin, temp, d__;
-    static integer j4;
+    real d__;
+    integer j4, j4p2;
+    real emin, temp;
     extern doublereal slamch_(char *);
-    static real safmin;
-    static integer j4p2;
+    real safmin;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SLASQ6 computes one dqd (shift equal to zero) transform in   
-    ping-pong form, with protection against underflow and overflow.   
+/*  SLASQ6 computes one dqd (shift equal to zero) transform in */
+/*  ping-pong form, with protection against underflow and overflow. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    I0    (input) INTEGER   
-          First index.   
+/*  I0    (input) INTEGER */
+/*        First index. */
 
-    N0    (input) INTEGER   
-          Last index.   
+/*  N0    (input) INTEGER */
+/*        Last index. */
 
-    Z     (input) REAL array, dimension ( 4*N )   
-          Z holds the qd array. EMIN is stored in Z(4*N0) to avoid   
-          an extra argument.   
+/*  Z     (input) REAL array, dimension ( 4*N ) */
+/*        Z holds the qd array. EMIN is stored in Z(4*N0) to avoid */
+/*        an extra argument. */
 
-    PP    (input) INTEGER   
-          PP=0 for ping, PP=1 for pong.   
+/*  PP    (input) INTEGER */
+/*        PP=0 for ping, PP=1 for pong. */
 
-    DMIN  (output) REAL   
-          Minimum value of d.   
+/*  DMIN  (output) REAL */
+/*        Minimum value of d. */
 
-    DMIN1 (output) REAL   
-          Minimum value of d, excluding D( N0 ).   
+/*  DMIN1 (output) REAL */
+/*        Minimum value of d, excluding D( N0 ). */
 
-    DMIN2 (output) REAL   
-          Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
+/*  DMIN2 (output) REAL */
+/*        Minimum value of d, excluding D( N0 ) and D( N0-1 ). */
 
-    DN    (output) REAL   
-          d(N0), the last value of d.   
+/*  DN    (output) REAL */
+/*        d(N0), the last value of d. */
 
-    DNM1  (output) REAL   
-          d(N0-1).   
+/*  DNM1  (output) REAL */
+/*        d(N0-1). */
 
-    DNM2  (output) REAL   
-          d(N0-2).   
+/*  DNM2  (output) REAL */
+/*        d(N0-2). */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameter .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Function .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
@@ -185,4 +192,3 @@
 /*     End of SLASQ6 */
 
 } /* slasq6_ */
-

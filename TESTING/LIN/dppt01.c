@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -18,74 +13,87 @@ static doublereal c_b14 = 1.;
     integer i__1;
 
     /* Local variables */
+    integer i__, k;
+    doublereal t;
+    integer kc;
+    doublereal eps;
+    integer npp;
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     extern /* Subroutine */ int dspr_(char *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *);
-    static integer i__, k;
-    static doublereal t;
-    extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
+	    doublereal *, integer *, doublereal *), dscal_(integer *, 
+	    doublereal *, doublereal *, integer *);
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int dtpmv_(char *, char *, char *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer kc;
     extern doublereal dlamch_(char *), dlansp_(char *, char *, 
 	    integer *, doublereal *, doublereal *);
-    static doublereal eps;
-    static integer npp;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DPPT01 reconstructs a symmetric positive definite packed matrix A   
-    from its L*L' or U'*U factorization and computes the residual   
-       norm( L*L' - A ) / ( N * norm(A) * EPS ) or   
-       norm( U'*U - A ) / ( N * norm(A) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  DPPT01 reconstructs a symmetric positive definite packed matrix A */
+/*  from its L*L' or U'*U factorization and computes the residual */
+/*     norm( L*L' - A ) / ( N * norm(A) * EPS ) or */
+/*     norm( U'*U - A ) / ( N * norm(A) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          symmetric matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    A       (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            The original symmetric matrix A, stored as a packed   
-            triangular matrix.   
+/*  A       (input) DOUBLE PRECISION array, dimension (N*(N+1)/2) */
+/*          The original symmetric matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    AFAC    (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            On entry, the factor L or U from the L*L' or U'*U   
-            factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the   
-            difference L*L' - A (or U'*U - A).   
+/*  AFAC    (input/output) DOUBLE PRECISION array, dimension (N*(N+1)/2) */
+/*          On entry, the factor L or U from the L*L' or U'*U */
+/*          factorization of A, stored as a packed triangular matrix. */
+/*          Overwritten with the reconstructed matrix, and then with the */
+/*          difference L*L' - A (or U'*U - A). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    RESID   (output) DOUBLE PRECISION   
-            If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
-            If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS ) */
+/*          If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS ) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick exit if N = 0   
+/*     Quick exit if N = 0 */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --afac;
     --a;
@@ -133,8 +141,8 @@ static doublereal c_b14 = 1.;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of   
-             columns K+1 through N. */
+/*           Add a multiple of column K of the factor L to each of */
+/*           columns K+1 through N. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
@@ -173,4 +181,3 @@ static doublereal c_b14 = 1.;
 /*     End of DPPT01 */
 
 } /* dppt01_ */
-

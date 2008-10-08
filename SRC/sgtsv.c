@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sgtsv_(integer *n, integer *nrhs, real *dl, real *d__, 
 	real *du, real *b, integer *ldb, integer *info)
@@ -14,86 +9,95 @@
     real r__1, r__2;
 
     /* Local variables */
-    static real fact, temp;
-    static integer i__, j;
+    integer i__, j;
+    real fact, temp;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SGTSV  solves the equation */
 
-    Purpose   
-    =======   
+/*     A*X = B, */
 
-    SGTSV  solves the equation   
+/*  where A is an n by n tridiagonal matrix, by Gaussian elimination with */
+/*  partial pivoting. */
 
-       A*X = B,   
+/*  Note that the equation  A'*X = B  may be solved by interchanging the */
+/*  order of the arguments DU and DL. */
 
-    where A is an n by n tridiagonal matrix, by Gaussian elimination with   
-    partial pivoting.   
+/*  Arguments */
+/*  ========= */
 
-    Note that the equation  A'*X = B  may be solved by interchanging the   
-    order of the arguments DU and DL.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrix B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  DL      (input/output) REAL array, dimension (N-1) */
+/*          On entry, DL must contain the (n-1) sub-diagonal elements of */
+/*          A. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrix B.  NRHS >= 0.   
+/*          On exit, DL is overwritten by the (n-2) elements of the */
+/*          second super-diagonal of the upper triangular matrix U from */
+/*          the LU factorization of A, in DL(1), ..., DL(n-2). */
 
-    DL      (input/output) REAL array, dimension (N-1)   
-            On entry, DL must contain the (n-1) sub-diagonal elements of   
-            A.   
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, D must contain the diagonal elements of A. */
 
-            On exit, DL is overwritten by the (n-2) elements of the   
-            second super-diagonal of the upper triangular matrix U from   
-            the LU factorization of A, in DL(1), ..., DL(n-2).   
+/*          On exit, D is overwritten by the n diagonal elements of U. */
 
-    D       (input/output) REAL array, dimension (N)   
-            On entry, D must contain the diagonal elements of A.   
+/*  DU      (input/output) REAL array, dimension (N-1) */
+/*          On entry, DU must contain the (n-1) super-diagonal elements */
+/*          of A. */
 
-            On exit, D is overwritten by the n diagonal elements of U.   
+/*          On exit, DU is overwritten by the (n-1) elements of the first */
+/*          super-diagonal of U. */
 
-    DU      (input/output) REAL array, dimension (N-1)   
-            On entry, DU must contain the (n-1) super-diagonal elements   
-            of A.   
+/*  B       (input/output) REAL array, dimension (LDB,NRHS) */
+/*          On entry, the N by NRHS matrix of right hand side matrix B. */
+/*          On exit, if INFO = 0, the N by NRHS solution matrix X. */
 
-            On exit, DU is overwritten by the (n-1) elements of the first   
-            super-diagonal of U.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input/output) REAL array, dimension (LDB,NRHS)   
-            On entry, the N by NRHS matrix of right hand side matrix B.   
-            On exit, if INFO = 0, the N by NRHS solution matrix X.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
+/*          > 0: if INFO = i, U(i,i) is exactly zero, and the solution */
+/*               has not been computed.  The factorization has not been */
+/*               completed unless i = N. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, U(i,i) is exactly zero, and the solution   
-                 has not been computed.  The factorization has not been   
-                 completed unless i = N.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --dl;
     --d__;
     --du;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -126,8 +130,7 @@
 		if (d__[i__] != 0.f) {
 		    fact = dl[i__] / d__[i__];
 		    d__[i__ + 1] -= fact * du[i__];
-		    b_ref(i__ + 1, 1) = b_ref(i__ + 1, 1) - fact * b_ref(i__, 
-			    1);
+		    b[i__ + 1 + b_dim1] -= fact * b[i__ + b_dim1];
 		} else {
 		    *info = i__;
 		    return 0;
@@ -144,9 +147,9 @@
 		dl[i__] = du[i__ + 1];
 		du[i__ + 1] = -fact * dl[i__];
 		du[i__] = temp;
-		temp = b_ref(i__, 1);
-		b_ref(i__, 1) = b_ref(i__ + 1, 1);
-		b_ref(i__ + 1, 1) = temp - fact * b_ref(i__ + 1, 1);
+		temp = b[i__ + b_dim1];
+		b[i__ + b_dim1] = b[i__ + 1 + b_dim1];
+		b[i__ + 1 + b_dim1] = temp - fact * b[i__ + 1 + b_dim1];
 	    }
 /* L10: */
 	}
@@ -157,8 +160,7 @@
 		if (d__[i__] != 0.f) {
 		    fact = dl[i__] / d__[i__];
 		    d__[i__ + 1] -= fact * du[i__];
-		    b_ref(i__ + 1, 1) = b_ref(i__ + 1, 1) - fact * b_ref(i__, 
-			    1);
+		    b[i__ + 1 + b_dim1] -= fact * b[i__ + b_dim1];
 		} else {
 		    *info = i__;
 		    return 0;
@@ -169,9 +171,9 @@
 		temp = d__[i__ + 1];
 		d__[i__ + 1] = du[i__] - fact * temp;
 		du[i__] = temp;
-		temp = b_ref(i__, 1);
-		b_ref(i__, 1) = b_ref(i__ + 1, 1);
-		b_ref(i__ + 1, 1) = temp - fact * b_ref(i__ + 1, 1);
+		temp = b[i__ + b_dim1];
+		b[i__ + b_dim1] = b[i__ + 1 + b_dim1];
+		b[i__ + 1 + b_dim1] = temp - fact * b[i__ + 1 + b_dim1];
 	    }
 	}
 	if (d__[*n] == 0.f) {
@@ -191,8 +193,7 @@
 		    d__[i__ + 1] -= fact * du[i__];
 		    i__2 = *nrhs;
 		    for (j = 1; j <= i__2; ++j) {
-			b_ref(i__ + 1, j) = b_ref(i__ + 1, j) - fact * b_ref(
-				i__, j);
+			b[i__ + 1 + j * b_dim1] -= fact * b[i__ + j * b_dim1];
 /* L20: */
 		    }
 		} else {
@@ -213,9 +214,10 @@
 		du[i__] = temp;
 		i__2 = *nrhs;
 		for (j = 1; j <= i__2; ++j) {
-		    temp = b_ref(i__, j);
-		    b_ref(i__, j) = b_ref(i__ + 1, j);
-		    b_ref(i__ + 1, j) = temp - fact * b_ref(i__ + 1, j);
+		    temp = b[i__ + j * b_dim1];
+		    b[i__ + j * b_dim1] = b[i__ + 1 + j * b_dim1];
+		    b[i__ + 1 + j * b_dim1] = temp - fact * b[i__ + 1 + j * 
+			    b_dim1];
 /* L30: */
 		}
 	    }
@@ -230,8 +232,7 @@
 		    d__[i__ + 1] -= fact * du[i__];
 		    i__1 = *nrhs;
 		    for (j = 1; j <= i__1; ++j) {
-			b_ref(i__ + 1, j) = b_ref(i__ + 1, j) - fact * b_ref(
-				i__, j);
+			b[i__ + 1 + j * b_dim1] -= fact * b[i__ + j * b_dim1];
 /* L50: */
 		    }
 		} else {
@@ -246,9 +247,10 @@
 		du[i__] = temp;
 		i__1 = *nrhs;
 		for (j = 1; j <= i__1; ++j) {
-		    temp = b_ref(i__, j);
-		    b_ref(i__, j) = b_ref(i__ + 1, j);
-		    b_ref(i__ + 1, j) = temp - fact * b_ref(i__ + 1, j);
+		    temp = b[i__ + j * b_dim1];
+		    b[i__ + j * b_dim1] = b[i__ + 1 + j * b_dim1];
+		    b[i__ + 1 + j * b_dim1] = temp - fact * b[i__ + 1 + j * 
+			    b_dim1];
 /* L60: */
 		}
 	    }
@@ -264,14 +266,15 @@
     if (*nrhs <= 2) {
 	j = 1;
 L70:
-	b_ref(*n, j) = b_ref(*n, j) / d__[*n];
+	b[*n + j * b_dim1] /= d__[*n];
 	if (*n > 1) {
-	    b_ref(*n - 1, j) = (b_ref(*n - 1, j) - du[*n - 1] * b_ref(*n, j)) 
-		    / d__[*n - 1];
+	    b[*n - 1 + j * b_dim1] = (b[*n - 1 + j * b_dim1] - du[*n - 1] * b[
+		    *n + j * b_dim1]) / d__[*n - 1];
 	}
 	for (i__ = *n - 2; i__ >= 1; --i__) {
-	    b_ref(i__, j) = (b_ref(i__, j) - du[i__] * b_ref(i__ + 1, j) - dl[
-		    i__] * b_ref(i__ + 2, j)) / d__[i__];
+	    b[i__ + j * b_dim1] = (b[i__ + j * b_dim1] - du[i__] * b[i__ + 1 
+		    + j * b_dim1] - dl[i__] * b[i__ + 2 + j * b_dim1]) / d__[
+		    i__];
 /* L80: */
 	}
 	if (j < *nrhs) {
@@ -281,14 +284,15 @@ L70:
     } else {
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    b_ref(*n, j) = b_ref(*n, j) / d__[*n];
+	    b[*n + j * b_dim1] /= d__[*n];
 	    if (*n > 1) {
-		b_ref(*n - 1, j) = (b_ref(*n - 1, j) - du[*n - 1] * b_ref(*n, 
-			j)) / d__[*n - 1];
+		b[*n - 1 + j * b_dim1] = (b[*n - 1 + j * b_dim1] - du[*n - 1] 
+			* b[*n + j * b_dim1]) / d__[*n - 1];
 	    }
 	    for (i__ = *n - 2; i__ >= 1; --i__) {
-		b_ref(i__, j) = (b_ref(i__, j) - du[i__] * b_ref(i__ + 1, j) 
-			- dl[i__] * b_ref(i__ + 2, j)) / d__[i__];
+		b[i__ + j * b_dim1] = (b[i__ + j * b_dim1] - du[i__] * b[i__ 
+			+ 1 + j * b_dim1] - dl[i__] * b[i__ + 2 + j * b_dim1])
+			 / d__[i__];
 /* L90: */
 	    }
 /* L100: */
@@ -300,7 +304,3 @@ L70:
 /*     End of SGTSV */
 
 } /* sgtsv_ */
-
-#undef b_ref
-
-

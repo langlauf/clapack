@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int ssvdct_(integer *n, real *s, real *e, real *shift, 
 	integer *num)
@@ -17,60 +12,71 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static real unfl, ovfl, ssun;
-    static integer i__;
-    static real u, m1, m2, mx;
+    integer i__;
+    real u, m1, m2, mx, tmp, tom, sun, sov, unfl, ovfl, ssun;
     extern doublereal slamch_(char *);
-    static real sshift, tmp, tom, sun, sov;
+    real sshift;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SSVDCT counts the number NUM of eigenvalues of a 2*N by 2*N   
-    tridiagonal matrix T which are less than or equal to SHIFT.  T is   
-    formed by putting zeros on the diagonal and making the off-diagonals   
-    equal to S(1), E(1), S(2), E(2), ... , E(N-1), S(N).  If SHIFT is   
-    positive, NUM is equal to N plus the number of singular values of a   
-    bidiagonal matrix B less than or equal to SHIFT.  Here B has diagonal   
-    entries S(1), ..., S(N) and superdiagonal entries E(1), ... E(N-1).   
-    If SHIFT is negative, NUM is equal to the number of singular values   
-    of B greater than or equal to -SHIFT.   
+/*  SSVDCT counts the number NUM of eigenvalues of a 2*N by 2*N */
+/*  tridiagonal matrix T which are less than or equal to SHIFT.  T is */
+/*  formed by putting zeros on the diagonal and making the off-diagonals */
+/*  equal to S(1), E(1), S(2), E(2), ... , E(N-1), S(N).  If SHIFT is */
+/*  positive, NUM is equal to N plus the number of singular values of a */
+/*  bidiagonal matrix B less than or equal to SHIFT.  Here B has diagonal */
+/*  entries S(1), ..., S(N) and superdiagonal entries E(1), ... E(N-1). */
+/*  If SHIFT is negative, NUM is equal to the number of singular values */
+/*  of B greater than or equal to -SHIFT. */
 
-    See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal   
-    Matrix", Report CS41, Computer Science Dept., Stanford University,   
-    July 21, 1966   
+/*  See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal */
+/*  Matrix", Report CS41, Computer Science Dept., Stanford University, */
+/*  July 21, 1966 */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The dimension of the bidiagonal matrix B.   
+/*  N       (input) INTEGER */
+/*          The dimension of the bidiagonal matrix B. */
 
-    S       (input) REAL array, dimension (N)   
-            The diagonal entries of the bidiagonal matrix B.   
+/*  S       (input) REAL array, dimension (N) */
+/*          The diagonal entries of the bidiagonal matrix B. */
 
-    E       (input) REAL array of dimension (N-1)   
-            The superdiagonal entries of the bidiagonal matrix B.   
+/*  E       (input) REAL array of dimension (N-1) */
+/*          The superdiagonal entries of the bidiagonal matrix B. */
 
-    SHIFT   (input) REAL   
-            The shift, used as described under Purpose.   
+/*  SHIFT   (input) REAL */
+/*          The shift, used as described under Purpose. */
 
-    NUM     (output) INTEGER   
-            The number of eigenvalues of T less than or equal to SHIFT.   
+/*  NUM     (output) INTEGER */
+/*          The number of eigenvalues of T less than or equal to SHIFT. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Get machine constants   
+/*     Get machine constants */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --e;
     --s;
 
@@ -174,4 +180,3 @@
 /*     End of SSVDCT */
 
 } /* ssvdct_ */
-

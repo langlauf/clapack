@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -31,18 +26,19 @@ static real c_b25 = 1.f;
     integer a_dim1, a_offset, af_dim1, af_offset, q_dim1, q_offset, r_dim1, 
 	    r_offset, i__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
+    real eps;
+    integer info;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *), cherk_(char *, 
 	    char *, integer *, integer *, real *, complex *, integer *, real *
-	    , complex *, integer *);
-    static real resid, anorm;
-    static integer minmn;
+, complex *, integer *);
+    real resid, anorm;
+    integer minmn;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *);
     extern /* Subroutine */ int cgeqrf_(integer *, integer *, complex *, 
@@ -50,90 +46,101 @@ static real c_b25 = 1.f;
 	    char *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *), claset_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, integer *);
-    extern doublereal clansy_(char *, char *, integer *, complex *, integer *,
+    extern doublereal clansy_(char *, char *, integer *, complex *, integer *, 
 	     real *);
     extern /* Subroutine */ int cungqr_(integer *, integer *, integer *, 
 	    complex *, integer *, complex *, complex *, integer *, integer *);
-    static real eps;
 
 
-#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
-#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CQRT01 tests CGEQRF, which computes the QR factorization of an m-by-n */
+/*  matrix A, and partially tests CUNGQR which forms the m-by-m */
+/*  orthogonal matrix Q. */
 
-    Purpose   
-    =======   
+/*  CQRT01 compares R with Q'*A, and checks that Q is orthogonal. */
 
-    CQRT01 tests CGEQRF, which computes the QR factorization of an m-by-n   
-    matrix A, and partially tests CUNGQR which forms the m-by-m   
-    orthogonal matrix Q.   
+/*  Arguments */
+/*  ========= */
 
-    CQRT01 compares R with Q'*A, and checks that Q is orthogonal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  AF      (output) COMPLEX array, dimension (LDA,N) */
+/*          Details of the QR factorization of A, as returned by CGEQRF. */
+/*          See CGEQRF for further details. */
 
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  Q       (output) COMPLEX array, dimension (LDA,M) */
+/*          The m-by-m orthogonal matrix Q. */
 
-    AF      (output) COMPLEX array, dimension (LDA,N)   
-            Details of the QR factorization of A, as returned by CGEQRF.   
-            See CGEQRF for further details.   
+/*  R       (workspace) COMPLEX array, dimension (LDA,max(M,N)) */
 
-    Q       (output) COMPLEX array, dimension (LDA,M)   
-            The m-by-m orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    R       (workspace) COMPLEX array, dimension (LDA,max(M,N))   
+/*  TAU     (output) COMPLEX array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by CGEQRF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  WORK    (workspace) COMPLEX array, dimension (LWORK) */
 
-    TAU     (output) COMPLEX array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by CGEQRF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) COMPLEX array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( R - Q'*A ) / ( M * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( M * EPS ) */
 
-    RWORK   (workspace) REAL array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( R - Q'*A ) / ( M * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -157,7 +164,7 @@ static real c_b25 = 1.f;
 
     claset_("Full", m, m, &c_b1, &c_b1, &q[q_offset], lda);
     i__1 = *m - 1;
-    clacpy_("Lower", &i__1, n, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
+    clacpy_("Lower", &i__1, n, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda);
 
 /*     Generate the m-by-m matrix Q */
 
@@ -201,10 +208,3 @@ static real c_b25 = 1.f;
 /*     End of CQRT01 */
 
 } /* cqrt01_ */
-
-#undef af_ref
-#undef af_subscr
-#undef q_ref
-#undef q_subscr
-
-

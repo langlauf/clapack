@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,136 +16,140 @@ static integer c__1 = 1;
     doublereal d__1, d__2, d__3;
 
     /* Local variables */
-    static doublereal diff, axbi;
-    static integer imax;
-    static doublereal unfl, ovfl;
-    static integer i__, j, k;
+    integer i__, j, k, nz;
+    doublereal eps, tmp, diff, axbi;
+    integer imax;
+    doublereal unfl, ovfl;
     extern logical lsame_(char *, char *);
-    static doublereal xnorm;
+    doublereal xnorm;
     extern doublereal dlamch_(char *);
     extern integer idamax_(integer *, doublereal *, integer *);
-    static integer nz;
-    static doublereal errbnd;
-    static logical notran;
-    static doublereal eps, tmp;
+    doublereal errbnd;
+    logical notran;
 
 
-#define xact_ref(a_1,a_2) xact[(a_2)*xact_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
-#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DGBT05 tests the error bounds from iterative refinement for the */
+/*  computed solution to a system of equations op(A)*X = B, where A is a */
+/*  general band matrix of order n with kl subdiagonals and ku */
+/*  superdiagonals and op(A) = A or A**T, depending on TRANS. */
 
-    Purpose   
-    =======   
+/*  RESLTS(1) = test of the error bound */
+/*            = norm(X - XACT) / ( norm(X) * FERR ) */
 
-    DGBT05 tests the error bounds from iterative refinement for the   
-    computed solution to a system of equations op(A)*X = B, where A is a   
-    general band matrix of order n with kl subdiagonals and ku   
-    superdiagonals and op(A) = A or A**T, depending on TRANS.   
+/*  A large value is returned if this ratio is not less than one. */
 
-    RESLTS(1) = test of the error bound   
-              = norm(X - XACT) / ( norm(X) * FERR )   
+/*  RESLTS(2) = residual from the iterative refinement routine */
+/*            = the maximum of BERR / ( NZ*EPS + (*) ), where */
+/*              (*) = NZ*UNFL / (min_i (abs(op(A))*abs(X) +abs(b))_i ) */
+/*              and NZ = max. number of nonzeros in any row of A, plus 1 */
 
-    A large value is returned if this ratio is not less than one.   
+/*  Arguments */
+/*  ========= */
 
-    RESLTS(2) = residual from the iterative refinement routine   
-              = the maximum of BERR / ( NZ*EPS + (*) ), where   
-                (*) = NZ*UNFL / (min_i (abs(op(A))*abs(X) +abs(b))_i )   
-                and NZ = max. number of nonzeros in any row of A, plus 1   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Specifies the form of the system of equations. */
+/*          = 'N':  A * X = B     (No transpose) */
+/*          = 'T':  A**T * X = B  (Transpose) */
+/*          = 'C':  A**H * X = B  (Conjugate transpose = Transpose) */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of rows of the matrices X, B, and XACT, and the */
+/*          order of the matrix A.  N >= 0. */
 
-    TRANS   (input) CHARACTER*1   
-            Specifies the form of the system of equations.   
-            = 'N':  A * X = B     (No transpose)   
-            = 'T':  A**T * X = B  (Transpose)   
-            = 'C':  A**H * X = B  (Conjugate transpose = Transpose)   
+/*  KL      (input) INTEGER */
+/*          The number of subdiagonals within the band of A.  KL >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows of the matrices X, B, and XACT, and the   
-            order of the matrix A.  N >= 0.   
+/*  KU      (input) INTEGER */
+/*          The number of superdiagonals within the band of A.  KU >= 0. */
 
-    KL      (input) INTEGER   
-            The number of subdiagonals within the band of A.  KL >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of the matrices X, B, and XACT. */
+/*          NRHS >= 0. */
 
-    KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0.   
+/*  AB      (input) DOUBLE PRECISION array, dimension (LDAB,N) */
+/*          The original band matrix A, stored in rows 1 to KL+KU+1. */
+/*          The j-th column of A is stored in the j-th column of the */
+/*          array AB as follows: */
+/*          AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(n,j+kl). */
 
-    NRHS    (input) INTEGER   
-            The number of columns of the matrices X, B, and XACT.   
-            NRHS >= 0.   
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= KL+KU+1. */
 
-    AB      (input) DOUBLE PRECISION array, dimension (LDAB,N)   
-            The original band matrix A, stored in rows 1 to KL+KU+1.   
-            The j-th column of A is stored in the j-th column of the   
-            array AB as follows:   
-            AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(n,j+kl).   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,NRHS) */
+/*          The right hand side vectors for the system of linear */
+/*          equations. */
 
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= KL+KU+1.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            The right hand side vectors for the system of linear   
-            equations.   
+/*  X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS) */
+/*          The computed solution vectors.  Each vector is stored as a */
+/*          column of the matrix X. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  LDX >= max(1,N). */
 
-    X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS)   
-            The computed solution vectors.  Each vector is stored as a   
-            column of the matrix X.   
+/*  XACT    (input) DOUBLE PRECISION array, dimension (LDX,NRHS) */
+/*          The exact solution vectors.  Each vector is stored as a */
+/*          column of the matrix XACT. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  LDX >= max(1,N).   
+/*  LDXACT  (input) INTEGER */
+/*          The leading dimension of the array XACT.  LDXACT >= max(1,N). */
 
-    XACT    (input) DOUBLE PRECISION array, dimension (LDX,NRHS)   
-            The exact solution vectors.  Each vector is stored as a   
-            column of the matrix XACT.   
+/*  FERR    (input) DOUBLE PRECISION array, dimension (NRHS) */
+/*          The estimated forward error bounds for each solution vector */
+/*          X.  If XTRUE is the true solution, FERR bounds the magnitude */
+/*          of the largest entry in (X - XTRUE) divided by the magnitude */
+/*          of the largest entry in X. */
 
-    LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
+/*  BERR    (input) DOUBLE PRECISION array, dimension (NRHS) */
+/*          The componentwise relative backward error of each solution */
+/*          vector (i.e., the smallest relative change in any entry of A */
+/*          or B that makes X an exact solution). */
 
-    FERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
-            The estimated forward error bounds for each solution vector   
-            X.  If XTRUE is the true solution, FERR bounds the magnitude   
-            of the largest entry in (X - XTRUE) divided by the magnitude   
-            of the largest entry in X.   
+/*  RESLTS  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The maximum over the NRHS solution vectors of the ratios: */
+/*          RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR ) */
+/*          RESLTS(2) = BERR / ( NZ*EPS + (*) ) */
 
-    BERR    (input) DOUBLE PRECISION array, dimension (NRHS)   
-            The componentwise relative backward error of each solution   
-            vector (i.e., the smallest relative change in any entry of A   
-            or B that makes X an exact solution).   
+/*  ===================================================================== */
 
-    RESLTS  (output) DOUBLE PRECISION array, dimension (2)   
-            The maximum over the NRHS solution vectors of the ratios:   
-            RESLTS(1) = norm(X - XACT) / ( norm(X) * FERR )   
-            RESLTS(2) = BERR / ( NZ*EPS + (*) )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0 or NRHS = 0. */
 
-
-       Quick exit if N = 0 or NRHS = 0.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = 1 + xact_dim1 * 1;
+    xact_offset = 1 + xact_dim1;
     xact -= xact_offset;
     --ferr;
     --berr;
@@ -171,23 +170,23 @@ static integer c__1 = 1;
     i__1 = *kl + *ku + 2, i__2 = *n + 1;
     nz = min(i__1,i__2);
 
-/*     Test 1:  Compute the maximum of   
-          norm(X - XACT) / ( norm(X) * FERR )   
-       over all the vectors X and XACT using the infinity-norm. */
+/*     Test 1:  Compute the maximum of */
+/*        norm(X - XACT) / ( norm(X) * FERR ) */
+/*     over all the vectors X and XACT using the infinity-norm. */
 
     errbnd = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	imax = idamax_(n, &x_ref(1, j), &c__1);
+	imax = idamax_(n, &x[j * x_dim1 + 1], &c__1);
 /* Computing MAX */
-	d__2 = (d__1 = x_ref(imax, j), abs(d__1));
+	d__2 = (d__1 = x[imax + j * x_dim1], abs(d__1));
 	xnorm = max(d__2,unfl);
 	diff = 0.;
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = diff, d__3 = (d__1 = x_ref(i__, j) - xact_ref(i__, j), abs(
-		    d__1));
+	    d__2 = diff, d__3 = (d__1 = x[i__ + j * x_dim1] - xact[i__ + j * 
+		    xact_dim1], abs(d__1));
 	    diff = max(d__2,d__3);
 /* L10: */
 	}
@@ -214,14 +213,14 @@ L30:
     }
     reslts[1] = errbnd;
 
-/*     Test 2:  Compute the maximum of BERR / ( NZ*EPS + (*) ), where   
-       (*) = NZ*UNFL / (min_i (abs(op(A))*abs(X) +abs(b))_i ) */
+/*     Test 2:  Compute the maximum of BERR / ( NZ*EPS + (*) ), where */
+/*     (*) = NZ*UNFL / (min_i (abs(op(A))*abs(X) +abs(b))_i ) */
 
     i__1 = *nrhs;
     for (k = 1; k <= i__1; ++k) {
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    tmp = (d__1 = b_ref(i__, k), abs(d__1));
+	    tmp = (d__1 = b[i__ + k * b_dim1], abs(d__1));
 	    if (notran) {
 /* Computing MAX */
 		i__3 = i__ - *kl;
@@ -229,8 +228,8 @@ L30:
 		i__5 = i__ + *ku;
 		i__4 = min(i__5,*n);
 		for (j = max(i__3,1); j <= i__4; ++j) {
-		    tmp += (d__1 = ab_ref(*ku + 1 + i__ - j, j), abs(d__1)) * 
-			    (d__2 = x_ref(j, k), abs(d__2));
+		    tmp += (d__1 = ab[*ku + 1 + i__ - j + j * ab_dim1], abs(
+			    d__1)) * (d__2 = x[j + k * x_dim1], abs(d__2));
 /* L40: */
 		}
 	    } else {
@@ -240,8 +239,8 @@ L30:
 		i__5 = i__ + *kl;
 		i__3 = min(i__5,*n);
 		for (j = max(i__4,1); j <= i__3; ++j) {
-		    tmp += (d__1 = ab_ref(*ku + 1 + j - i__, i__), abs(d__1)) 
-			    * (d__2 = x_ref(j, k), abs(d__2));
+		    tmp += (d__1 = ab[*ku + 1 + j - i__ + i__ * ab_dim1], abs(
+			    d__1)) * (d__2 = x[j + k * x_dim1], abs(d__2));
 /* L50: */
 		}
 	    }
@@ -268,10 +267,3 @@ L30:
 /*     End of DGBT05 */
 
 } /* dgbt05_ */
-
-#undef ab_ref
-#undef x_ref
-#undef b_ref
-#undef xact_ref
-
-

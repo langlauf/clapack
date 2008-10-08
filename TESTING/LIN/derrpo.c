@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,23 +30,22 @@ static integer c_n1 = -1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal w[12], x[4], rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4];
+    doublereal a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal w[12], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4], af[16]	/* was [4][4] */;
+    integer iw[4], info;
+    doublereal anrm, rcond;
     extern /* Subroutine */ int dpbtf2_(char *, integer *, integer *, 
 	    doublereal *, integer *, integer *), dpotf2_(char *, 
-	    integer *, doublereal *, integer *, integer *);
-    static doublereal af[16]	/* was [4][4] */;
-    static integer iw[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
-	     dpbcon_(char *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, integer *);
+	    integer *, doublereal *, integer *, integer *), alaesm_(
+	    char *, logical *, integer *), dpbcon_(char *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
+	    doublereal *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int dpbequ_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *), dpbrfs_(char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -61,11 +55,11 @@ static integer c_n1 = -1;
 	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
 	    integer *), chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dppcon_(char *, integer *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, integer *, integer *), dpoequ_(integer *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, integer *), dpoequ_(integer *, doublereal *, integer *, doublereal *, 
 	     doublereal *, doublereal *, integer *), dpbtrs_(char *, integer *
-	    , integer *, integer *, doublereal *, integer *, doublereal *, 
+, integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *), dporfs_(char *, integer *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
+	    *, doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, integer *), dpotrf_(char *, 
 	    integer *, doublereal *, integer *, integer *), dpotri_(
@@ -73,7 +67,7 @@ static integer c_n1 = -1;
 	    dppequ_(char *, integer *, doublereal *, doublereal *, doublereal 
 	    *, doublereal *, integer *), dpprfs_(char *, integer *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *, integer *), dpptrf_(char *, integer *, 
 	    doublereal *, integer *), dpptri_(char *, integer *, 
 	    doublereal *, integer *), dpotrs_(char *, integer *, 
@@ -86,33 +80,47 @@ static integer c_n1 = -1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRPO tests the error exits for the DOUBLE PRECISION routines */
+/*  for symmetric positive definite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRPO tests the error exits for the DOUBLE PRECISION routines   
-    for symmetric positive definite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -124,8 +132,8 @@ static integer c_n1 = -1;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
-	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
+	    af[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -140,10 +148,10 @@ static integer c_n1 = -1;
 
     if (lsamen_(&c__2, c2, "PO")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite matrix. */
 
-          DPOTRF */
+/*        DPOTRF */
 
 	s_copy(srnamc_1.srnamt, "DPOTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -284,10 +292,10 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite packed matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite packed matrix. */
 
-          DPPTRF */
+/*        DPPTRF */
 
 	s_copy(srnamc_1.srnamt, "DPPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -386,10 +394,10 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite band matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite band matrix. */
 
-          DPBTRF */
+/*        DPBTRF */
 
 	s_copy(srnamc_1.srnamt, "DPBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -551,8 +559,3 @@ static integer c_n1 = -1;
 /*     End of DERRPO */
 
 } /* derrpo_ */
-
-#undef af_ref
-#undef a_ref
-
-

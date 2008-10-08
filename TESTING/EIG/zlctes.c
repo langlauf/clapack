@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,37 +15,45 @@ logical zlctes_(doublecomplex *z__, doublecomplex *d__)
     double d_imag(doublecomplex *), d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal zmax;
+    doublereal zmax;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZLCTES returns .TRUE. if the eigenvalue Z/D is to be selected   
-    (specifically, in this subroutine, if the real part of the   
-    eigenvalue is negative), and otherwise it returns .FALSE..   
+/*  ZLCTES returns .TRUE. if the eigenvalue Z/D is to be selected */
+/*  (specifically, in this subroutine, if the real part of the */
+/*  eigenvalue is negative), and otherwise it returns .FALSE.. */
 
-    It is used by the test routine ZDRGES to test whether the driver   
-    routine ZGGES succesfully sorts eigenvalues.   
+/*  It is used by the test routine ZDRGES to test whether the driver */
+/*  routine ZGGES succesfully sorts eigenvalues. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    Z       (input) COMPLEX*16   
-            The numerator part of a complex eigenvalue Z/D.   
+/*  Z       (input) COMPLEX*16 */
+/*          The numerator part of a complex eigenvalue Z/D. */
 
-    D       (input) COMPLEX*16   
-            The denominator part of a complex eigenvalue Z/D.   
+/*  D       (input) COMPLEX*16 */
+/*          The denominator part of a complex eigenvalue Z/D. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
 
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (d__->r == 0. && d__->i == 0.) {
 	ret_val = z__->r < 0.;
@@ -78,4 +81,3 @@ logical zlctes_(doublecomplex *z__, doublecomplex *d__)
 /*     End of ZLCTES */
 
 } /* zlctes_ */
-

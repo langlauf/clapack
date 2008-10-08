@@ -31,11 +31,15 @@ include ../../make.inc
 #       make single
 #       make single complex
 #       make single double complex complex16
-#  Alternatively, the command
+#  Note that these commands are not safe for parallel builds.
+#
+#  Alternatively, the commands
+#       make all
+#  or
 #       make
 #  without any arguments creates a library of all four precisions.
-#  The library is called
-#       blas.a
+#  The name of the library is held in BLASLIB, which is set in the
+#  top-level make.inc
 #
 #  To remove the object files after the library is created, enter
 #       make clean
@@ -47,29 +51,30 @@ include ../../make.inc
 #  Edward Anderson, University of Tennessee
 #  March 26, 1990
 #  Susan Ostrouchov, Last updated September 30, 1994
+#  ejr, May 2006.
 #
 #######################################################################
 
-all: single double complex complex16
+all: $(BLASLIB)
  
 #---------------------------------------------------------
 #  Comment out the next 6 definitions if you already have
 #  the Level 1 BLAS.
 #---------------------------------------------------------
 SBLAS1 = isamax.o sasum.o saxpy.o scopy.o sdot.o snrm2.o \
-	srot.o srotg.o sscal.o sswap.o
+	srot.o srotg.o sscal.o sswap.o sdsdot.o srotmg.o srotm.o
 $(SBLAS1): $(FRC)
 
-CBLAS1 = scasum.o scnrm2.o icamax.o caxpy.o ccopy.o \
-	cdotc.o cdotu.o csscal.o crotg.o cscal.o cswap.o
+CBLAS1 = scabs1.o scasum.o scnrm2.o icamax.o caxpy.o ccopy.o \
+	cdotc.o cdotu.o csscal.o crotg.o cscal.o cswap.o csrot.o
 $(CBLAS1): $(FRC)
 
 DBLAS1 = idamax.o dasum.o daxpy.o dcopy.o ddot.o dnrm2.o \
-	drot.o drotg.o dscal.o dswap.o
+	drot.o drotg.o dscal.o dswap.o drotmg.o drotm.o
 $(DBLAS1): $(FRC)
 
 ZBLAS1 = dcabs1.o dzasum.o dznrm2.o izamax.o zaxpy.o zcopy.o \
-	zdotc.o zdotu.o zdscal.o zrotg.o zscal.o zswap.o
+	zdotc.o zdotu.o zdscal.o zrotg.o zscal.o zswap.o zdrot.o
 $(ZBLAS1): $(FRC)
 
 CB1AUX = isamax.o sasum.o saxpy.o scopy.o snrm2.o sscal.o
@@ -128,6 +133,13 @@ ZBLAS3 = zgemm.o zsymm.o zsyrk.o zsyr2k.o ztrmm.o ztrsm.o \
 	zhemm.o zherk.o zher2k.o
 $(ZBLAS3): $(FRC)
 
+ALLOBJ=$(SBLAS1) $(SBLAS2) $(SBLAS3) $(DBLAS1) $(DBLAS2) $(DBLAS3)	\
+	$(CBLAS1) $(CB1AUX) $(CBLAS2) $(CBLAS3) $(ZBLAS1) $(ZB1AUX)	\
+	$(ZBLAS2) $(ZBLAS3) $(ALLBLAS)
+
+$(BLASLIB): $(ALLOBJ)
+	$(ARCH) $(ARCHFLAGS) $@ $(ALLOBJ)
+	$(RANLIB) $@
 
 single: $(SBLAS1) $(ALLBLAS) $(SBLAS2) $(SBLAS3)
 	$(ARCH) $(ARCHFLAGS) $(BLASLIB) $(SBLAS1) $(ALLBLAS) \
@@ -156,5 +168,5 @@ clean:
 	rm -f *.o
 
 .c.o: 
-	$(CC) $(CFLAGS) -c $*.c
-
+	$(CC) $(CFLAGS) -c $< -o $@
+ 

@@ -1,14 +1,9 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
-static complex c_b6 = {-1.f,0.f};
+static complex c_b6 = {-1.f,-0.f};
 static integer c__1 = 1;
 static complex c_b9 = {0.f,0.f};
 
@@ -23,100 +18,110 @@ static complex c_b9 = {0.f,0.f};
     complex q__1;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
+    real eps;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
-	    , complex *, integer *, complex *, integer *, complex *, complex *
-	    , integer *);
-    static real bnorm;
+, complex *, integer *, complex *, integer *, complex *, complex *
+, integer *);
+    real bnorm;
     extern doublereal slamch_(char *);
     extern integer isamax_(integer *, real *, integer *);
     extern doublereal scasum_(integer *, complex *, integer *);
-    static real eps;
 
 
-#define vt_subscr(a_1,a_2) (a_2)*vt_dim1 + a_1
-#define vt_ref(a_1,a_2) vt[vt_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CBDT03 reconstructs a bidiagonal matrix B from its SVD: */
+/*     S = U' * B * V */
+/*  where U and V are orthogonal matrices and S is diagonal. */
 
-    Purpose   
-    =======   
+/*  The test ratio to test the singular value decomposition is */
+/*     RESID = norm( B - U * S * VT ) / ( n * norm(B) * EPS ) */
+/*  where VT = V' and EPS is the machine precision. */
 
-    CBDT03 reconstructs a bidiagonal matrix B from its SVD:   
-       S = U' * B * V   
-    where U and V are orthogonal matrices and S is diagonal.   
+/*  Arguments */
+/*  ========= */
 
-    The test ratio to test the singular value decomposition is   
-       RESID = norm( B - U * S * VT ) / ( n * norm(B) * EPS )   
-    where VT = V' and EPS is the machine precision.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix B is upper or lower bidiagonal. */
+/*          = 'U':  Upper bidiagonal */
+/*          = 'L':  Lower bidiagonal */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The order of the matrix B. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix B is upper or lower bidiagonal.   
-            = 'U':  Upper bidiagonal   
-            = 'L':  Lower bidiagonal   
+/*  KD      (input) INTEGER */
+/*          The bandwidth of the bidiagonal matrix B.  If KD = 1, the */
+/*          matrix B is bidiagonal, and if KD = 0, B is diagonal and E is */
+/*          not referenced.  If KD is greater than 1, it is assumed to be */
+/*          1, and if KD is less than 0, it is assumed to be 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix B.   
+/*  D       (input) REAL array, dimension (N) */
+/*          The n diagonal elements of the bidiagonal matrix B. */
 
-    KD      (input) INTEGER   
-            The bandwidth of the bidiagonal matrix B.  If KD = 1, the   
-            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is   
-            not referenced.  If KD is greater than 1, it is assumed to be   
-            1, and if KD is less than 0, it is assumed to be 0.   
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The (n-1) superdiagonal elements of the bidiagonal matrix B */
+/*          if UPLO = 'U', or the (n-1) subdiagonal elements of B if */
+/*          UPLO = 'L'. */
 
-    D       (input) REAL array, dimension (N)   
-            The n diagonal elements of the bidiagonal matrix B.   
+/*  U       (input) COMPLEX array, dimension (LDU,N) */
+/*          The n by n orthogonal matrix U in the reduction B = U'*A*P. */
 
-    E       (input) REAL array, dimension (N-1)   
-            The (n-1) superdiagonal elements of the bidiagonal matrix B   
-            if UPLO = 'U', or the (n-1) subdiagonal elements of B if   
-            UPLO = 'L'.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,N) */
 
-    U       (input) COMPLEX array, dimension (LDU,N)   
-            The n by n orthogonal matrix U in the reduction B = U'*A*P.   
+/*  S       (input) REAL array, dimension (N) */
+/*          The singular values from the SVD of B, sorted in decreasing */
+/*          order. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,N)   
+/*  VT      (input) COMPLEX array, dimension (LDVT,N) */
+/*          The n by n orthogonal matrix V' in the reduction */
+/*          B = U * S * V'. */
 
-    S       (input) REAL array, dimension (N)   
-            The singular values from the SVD of B, sorted in decreasing   
-            order.   
+/*  LDVT    (input) INTEGER */
+/*          The leading dimension of the array VT. */
 
-    VT      (input) COMPLEX array, dimension (LDVT,N)   
-            The n by n orthogonal matrix V' in the reduction   
-            B = U * S * V'.   
+/*  WORK    (workspace) COMPLEX array, dimension (2*N) */
 
-    LDVT    (input) INTEGER   
-            The leading dimension of the array VT.   
+/*  RESID   (output) REAL */
+/*          The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS ) */
 
-    WORK    (workspace) COMPLEX array, dimension (2*N)   
+/* ====================================================================== */
 
-    RESID   (output) REAL   
-            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-   ======================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --s;
     vt_dim1 = *ldvt;
-    vt_offset = 1 + vt_dim1 * 1;
+    vt_offset = 1 + vt_dim1;
     vt -= vt_offset;
     --work;
 
@@ -143,7 +148,7 @@ static complex c_b9 = {0.f,0.f};
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *n + i__;
 		    i__4 = i__;
-		    i__5 = vt_subscr(i__, j);
+		    i__5 = i__ + j * vt_dim1;
 		    q__1.r = s[i__4] * vt[i__5].r, q__1.i = s[i__4] * vt[i__5]
 			    .i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -186,7 +191,7 @@ static complex c_b9 = {0.f,0.f};
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *n + i__;
 		    i__4 = i__;
-		    i__5 = vt_subscr(i__, j);
+		    i__5 = i__ + j * vt_dim1;
 		    q__1.r = s[i__4] * vt[i__5].r, q__1.i = s[i__4] * vt[i__5]
 			    .i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -230,7 +235,7 @@ static complex c_b9 = {0.f,0.f};
 	    for (i__ = 1; i__ <= i__2; ++i__) {
 		i__3 = *n + i__;
 		i__4 = i__;
-		i__5 = vt_subscr(i__, j);
+		i__5 = i__ + j * vt_dim1;
 		q__1.r = s[i__4] * vt[i__5].r, q__1.i = s[i__4] * vt[i__5].i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L50: */
@@ -280,8 +285,3 @@ static complex c_b9 = {0.f,0.f};
 /*     End of CBDT03 */
 
 } /* cbdt03_ */
-
-#undef vt_ref
-#undef vt_subscr
-
-

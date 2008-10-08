@@ -1,20 +1,36 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static doublereal c_b4 = 1.;
 
 /* Subroutine */ int drotg_(doublereal *da, doublereal *db, doublereal *c__, 
 	doublereal *s)
 {
-    /* Table of constant values */
-    static doublereal c_b4 = 1.;
-    
     /* System generated locals */
     doublereal d__1, d__2;
+
     /* Builtin functions */
     double sqrt(doublereal), d_sign(doublereal *, doublereal *);
+
     /* Local variables */
-    static doublereal r__, scale, z__, roe;
-/*     construct givens plane rotation.   
-       jack dongarra, linpack, 3/11/78. */
+    doublereal r__, z__, roe, scale;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     construct givens plane rotation. */
+/*     jack dongarra, linpack, 3/11/78. */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
     roe = *db;
     if (abs(*da) > abs(*db)) {
 	roe = *da;
@@ -49,5 +65,3 @@ L20:
     *db = z__;
     return 0;
 } /* drotg_ */
-
-

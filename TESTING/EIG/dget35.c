@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -36,81 +31,89 @@ static doublereal c_b35 = 1.;
     double sqrt(doublereal), sin(doublereal);
 
     /* Local variables */
-    static integer info;
-    static doublereal cnrm;
-    static integer isgn;
-    static doublereal rmul, tnrm, xnrm, a[36]	/* was [6][6] */, b[36]	/* 
-	    was [6][6] */, c__[36]	/* was [6][6] */;
-    static integer i__, j, m, n;
-    static doublereal scale;
+    doublereal a[36]	/* was [6][6] */, b[36]	/* was [6][6] */, c__[36]	
+	    /* was [6][6] */;
+    integer i__, j, m, n;
+    doublereal cc[36]	/* was [6][6] */, vm1[3], vm2[3];
+    integer ima, imb;
+    doublereal dum[1], eps, res, res1;
+    integer info;
+    doublereal cnrm;
+    integer isgn;
+    doublereal rmul, tnrm, xnrm, scale;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static char trana[1], tranb[1];
-    static integer imlda1, imlda2, imldb1;
-    static doublereal cc[36]	/* was [6][6] */;
+    char trana[1], tranb[1];
+    integer imlda1, imlda2, imldb1;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static integer imloff, itrana, itranb;
-    static doublereal bignum, smlnum;
+    integer imloff, itrana, itranb;
+    doublereal bignum, smlnum;
     extern /* Subroutine */ int dtrsyl_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal vm1[3], vm2[3];
-    static integer ima, imb;
-    static doublereal dum[1], eps, res, res1;
 
 
-#define ival_ref(a_1,a_2,a_3) ival[((a_3)*6 + (a_2))*6 + a_1 - 43]
-#define a_ref(a_1,a_2) a[(a_2)*6 + a_1 - 7]
-#define b_ref(a_1,a_2) b[(a_2)*6 + a_1 - 7]
-#define c___ref(a_1,a_2) c__[(a_2)*6 + a_1 - 7]
-#define cc_ref(a_1,a_2) cc[(a_2)*6 + a_1 - 7]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET35 tests DTRSYL, a routine for solving the Sylvester matrix */
+/*  equation */
 
-    Purpose   
-    =======   
+/*     op(A)*X + ISGN*X*op(B) = scale*C, */
 
-    DGET35 tests DTRSYL, a routine for solving the Sylvester matrix   
-    equation   
+/*  A and B are assumed to be in Schur canonical form, op() represents an */
+/*  optional transpose, and ISGN can be -1 or +1.  Scale is an output */
+/*  less than or equal to 1, chosen to avoid overflow in X. */
 
-       op(A)*X + ISGN*X*op(B) = scale*C,   
+/*  The test code verifies that the following residual is order 1: */
 
-    A and B are assumed to be in Schur canonical form, op() represents an   
-    optional transpose, and ISGN can be -1 or +1.  Scale is an output   
-    less than or equal to 1, chosen to avoid overflow in X.   
+/*     norm(op(A)*X + ISGN*X*op(B) - scale*C) / */
+/*         (EPS*max(norm(A),norm(B))*norm(X)) */
 
-    The test code verifies that the following residual is order 1:   
+/*  Arguments */
+/*  ========== */
 
-       norm(op(A)*X + ISGN*X*op(B) - scale*C) /   
-           (EPS*max(norm(A),norm(B))*norm(X))   
+/*  RMAX    (output) DOUBLE PRECISION */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) DOUBLE PRECISION   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER */
+/*          Number of examples where INFO is nonzero. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER   
-            Number of examples where INFO is nonzero.   
+/*  ===================================================================== */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = dlamch_("P");
     smlnum = dlamch_("S") * 4. / eps;
@@ -161,16 +164,17 @@ static doublereal c_b35 = 1.;
 					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = m;
 					    for (j = 1; j <= i__2; ++j) {
-			  a_ref(i__, j) = (doublereal) ival_ref(i__, j, ima);
+			  a[i__ + j * 6 - 7] = (doublereal) ival[i__ + (j + 
+				  ima * 6) * 6 - 43];
 			  if ((i__3 = i__ - j, abs(i__3)) <= 1) {
-			      a_ref(i__, j) = a_ref(i__, j) * vm1[imlda1 - 1];
-			      a_ref(i__, j) = a_ref(i__, j) * vm2[imlda2 - 1];
+			      a[i__ + j * 6 - 7] *= vm1[imlda1 - 1];
+			      a[i__ + j * 6 - 7] *= vm2[imlda2 - 1];
 			  } else {
-			      a_ref(i__, j) = a_ref(i__, j) * vm1[imloff - 1];
+			      a[i__ + j * 6 - 7] *= vm1[imloff - 1];
 			  }
 /* Computing MAX */
-			  d__2 = tnrm, d__3 = (d__1 = a_ref(i__, j), abs(d__1)
-				  );
+			  d__2 = tnrm, d__3 = (d__1 = a[i__ + j * 6 - 7], abs(
+				  d__1));
 			  tnrm = max(d__2,d__3);
 /* L10: */
 					    }
@@ -180,15 +184,16 @@ static doublereal c_b35 = 1.;
 					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = n;
 					    for (j = 1; j <= i__2; ++j) {
-			  b_ref(i__, j) = (doublereal) ival_ref(i__, j, imb);
+			  b[i__ + j * 6 - 7] = (doublereal) ival[i__ + (j + 
+				  imb * 6) * 6 - 43];
 			  if ((i__3 = i__ - j, abs(i__3)) <= 1) {
-			      b_ref(i__, j) = b_ref(i__, j) * vm1[imldb1 - 1];
+			      b[i__ + j * 6 - 7] *= vm1[imldb1 - 1];
 			  } else {
-			      b_ref(i__, j) = b_ref(i__, j) * vm1[imloff - 1];
+			      b[i__ + j * 6 - 7] *= vm1[imloff - 1];
 			  }
 /* Computing MAX */
-			  d__2 = tnrm, d__3 = (d__1 = b_ref(i__, j), abs(d__1)
-				  );
+			  d__2 = tnrm, d__3 = (d__1 = b[i__ + j * 6 - 7], abs(
+				  d__1));
 			  tnrm = max(d__2,d__3);
 /* L30: */
 					    }
@@ -199,11 +204,11 @@ static doublereal c_b35 = 1.;
 					for (i__ = 1; i__ <= i__1; ++i__) {
 					    i__2 = n;
 					    for (j = 1; j <= i__2; ++j) {
-			  c___ref(i__, j) = sin((doublereal) (i__ * j));
+			  c__[i__ + j * 6 - 7] = sin((doublereal) (i__ * j));
 /* Computing MAX */
-			  d__1 = cnrm, d__2 = c___ref(i__, j);
+			  d__1 = cnrm, d__2 = c__[i__ + j * 6 - 7];
 			  cnrm = max(d__1,d__2);
-			  cc_ref(i__, j) = c___ref(i__, j);
+			  cc[i__ + j * 6 - 7] = c__[i__ + j * 6 - 7];
 /* L50: */
 					    }
 /* L60: */
@@ -231,7 +236,7 @@ static doublereal c_b35 = 1.;
 					dgemm_("N", tranb, &m, &n, &n, &d__1, 
 						c__, &c__6, b, &c__6, &c_b35, 
 						cc, &c__6);
-					res1 = dlange_("M", &m, &n, cc, &c__6,
+					res1 = dlange_("M", &m, &n, cc, &c__6, 
 						 dum);
 /* Computing MAX */
 					d__1 = smlnum, d__2 = smlnum * xnrm, 
@@ -266,11 +271,3 @@ static doublereal c_b35 = 1.;
 /*     End of DGET35 */
 
 } /* dget35_ */
-
-#undef cc_ref
-#undef c___ref
-#undef b_ref
-#undef a_ref
-#undef ival_ref
-
-

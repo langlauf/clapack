@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,8 +23,10 @@ static integer c__1 = 1;
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer i__, j;
-    static doublecomplex alpha;
+    integer i__, j, ii, jj;
+    doublecomplex wa, wb;
+    doublereal wn;
+    doublecomplex tau, alpha;
     extern /* Subroutine */ int zgerc_(integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zscal_(integer *, doublecomplex *, 
@@ -44,74 +41,80 @@ static integer c__1 = 1;
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *);
     extern doublereal dznrm2_(integer *, doublecomplex *, integer *);
-    static integer ii, jj;
-    static doublecomplex wa, wb;
-    static doublereal wn;
     extern /* Subroutine */ int xerbla_(char *, integer *), zlacgv_(
 	    integer *, doublecomplex *, integer *), zlarnv_(integer *, 
 	    integer *, integer *, doublecomplex *);
-    static doublecomplex tau;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZLAGSY generates a complex symmetric matrix A, by pre- and post- */
+/*  multiplying a real diagonal matrix D with a random unitary matrix: */
+/*  A = U*D*U**T. The semi-bandwidth may then be reduced to k by */
+/*  additional unitary transformations. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZLAGSY generates a complex symmetric matrix A, by pre- and post-   
-    multiplying a real diagonal matrix D with a random unitary matrix:   
-    A = U*D*U**T. The semi-bandwidth may then be reduced to k by   
-    additional unitary transformations.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  K       (input) INTEGER */
+/*          The number of nonzero subdiagonals within the band of A. */
+/*          0 <= K <= N-1. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal elements of the diagonal matrix D. */
 
-    K       (input) INTEGER   
-            The number of nonzero subdiagonals within the band of A.   
-            0 <= K <= N-1.   
+/*  A       (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          The generated n by n symmetric matrix A (the full matrix is */
+/*          stored). */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal elements of the diagonal matrix D.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= N. */
 
-    A       (output) COMPLEX*16 array, dimension (LDA,N)   
-            The generated n by n symmetric matrix A (the full matrix is   
-            stored).   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= N.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (2*N) */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (2*N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --work;
@@ -137,7 +140,7 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = j + 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(i__, j);
+	    i__3 = i__ + j * a_dim1;
 	    a[i__3].r = 0., a[i__3].i = 0.;
 /* L10: */
 	}
@@ -145,7 +148,7 @@ static integer c__1 = 1;
     }
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	i__2 = a_subscr(i__, i__);
+	i__2 = i__ + i__ * a_dim1;
 	i__3 = i__;
 	a[i__2].r = d__[i__3], a[i__2].i = 0.;
 /* L30: */
@@ -178,22 +181,22 @@ static integer c__1 = 1;
 	    tau.r = d__1, tau.i = 0.;
 	}
 
-/*        apply random reflection to A(i:n,i:n) from the left   
-          and the right   
+/*        apply random reflection to A(i:n,i:n) from the left */
+/*        and the right */
 
-          compute  y := tau * A * conjg(u) */
+/*        compute  y := tau * A * conjg(u) */
 
 	i__1 = *n - i__ + 1;
 	zlacgv_(&i__1, &work[1], &c__1);
 	i__1 = *n - i__ + 1;
-	zsymv_("Lower", &i__1, &tau, &a_ref(i__, i__), lda, &work[1], &c__1, &
-		c_b1, &work[*n + 1], &c__1);
+	zsymv_("Lower", &i__1, &tau, &a[i__ + i__ * a_dim1], lda, &work[1], &
+		c__1, &c_b1, &work[*n + 1], &c__1);
 	i__1 = *n - i__ + 1;
 	zlacgv_(&i__1, &work[1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( u, y ) * u */
 
-	z__3.r = -.5, z__3.i = 0.;
+	z__3.r = -.5, z__3.i = -0.;
 	z__2.r = z__3.r * tau.r - z__3.i * tau.i, z__2.i = z__3.r * tau.i + 
 		z__3.i * tau.r;
 	i__1 = *n - i__ + 1;
@@ -204,17 +207,17 @@ static integer c__1 = 1;
 	i__1 = *n - i__ + 1;
 	zaxpy_(&i__1, &alpha, &work[1], &c__1, &work[*n + 1], &c__1);
 
-/*        apply the transformation as a rank-2 update to A(i:n,i:n)   
+/*        apply the transformation as a rank-2 update to A(i:n,i:n) */
 
-          CALL ZSYR2( 'Lower', N-I+1, -ONE, WORK, 1, WORK( N+1 ), 1,   
-          $               A( I, I ), LDA ) */
+/*        CALL ZSYR2( 'Lower', N-I+1, -ONE, WORK, 1, WORK( N+1 ), 1, */
+/*        $               A( I, I ), LDA ) */
 
 	i__1 = *n;
 	for (jj = i__; jj <= i__1; ++jj) {
 	    i__2 = *n;
 	    for (ii = jj; ii <= i__2; ++ii) {
-		i__3 = a_subscr(ii, jj);
-		i__4 = a_subscr(ii, jj);
+		i__3 = ii + jj * a_dim1;
+		i__4 = ii + jj * a_dim1;
 		i__5 = ii - i__ + 1;
 		i__6 = *n + jj - i__ + 1;
 		z__3.r = work[i__5].r * work[i__6].r - work[i__5].i * work[
@@ -243,21 +246,21 @@ static integer c__1 = 1;
 /*        generate reflection to annihilate A(k+i+1:n,i) */
 
 	i__2 = *n - *k - i__ + 1;
-	wn = dznrm2_(&i__2, &a_ref(*k + i__, i__), &c__1);
-	d__1 = wn / z_abs(&a_ref(*k + i__, i__));
-	i__2 = a_subscr(*k + i__, i__);
+	wn = dznrm2_(&i__2, &a[*k + i__ + i__ * a_dim1], &c__1);
+	d__1 = wn / z_abs(&a[*k + i__ + i__ * a_dim1]);
+	i__2 = *k + i__ + i__ * a_dim1;
 	z__1.r = d__1 * a[i__2].r, z__1.i = d__1 * a[i__2].i;
 	wa.r = z__1.r, wa.i = z__1.i;
 	if (wn == 0.) {
 	    tau.r = 0., tau.i = 0.;
 	} else {
-	    i__2 = a_subscr(*k + i__, i__);
+	    i__2 = *k + i__ + i__ * a_dim1;
 	    z__1.r = a[i__2].r + wa.r, z__1.i = a[i__2].i + wa.i;
 	    wb.r = z__1.r, wb.i = z__1.i;
 	    i__2 = *n - *k - i__;
 	    z_div(&z__1, &c_b2, &wb);
-	    zscal_(&i__2, &z__1, &a_ref(*k + i__ + 1, i__), &c__1);
-	    i__2 = a_subscr(*k + i__, i__);
+	    zscal_(&i__2, &z__1, &a[*k + i__ + 1 + i__ * a_dim1], &c__1);
+	    i__2 = *k + i__ + i__ * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 	    z_div(&z__1, &wb, &wa);
 	    d__1 = z__1.r;
@@ -268,59 +271,61 @@ static integer c__1 = 1;
 
 	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
-	zgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(*k + i__, 
-		i__ + 1), lda, &a_ref(*k + i__, i__), &c__1, &c_b1, &work[1], 
-		&c__1);
+	zgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a[*k + i__ + (i__ 
+		+ 1) * a_dim1], lda, &a[*k + i__ + i__ * a_dim1], &c__1, &
+		c_b1, &work[1], &c__1);
 	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
 	z__1.r = -tau.r, z__1.i = -tau.i;
-	zgerc_(&i__2, &i__3, &z__1, &a_ref(*k + i__, i__), &c__1, &work[1], &
-		c__1, &a_ref(*k + i__, i__ + 1), lda);
+	zgerc_(&i__2, &i__3, &z__1, &a[*k + i__ + i__ * a_dim1], &c__1, &work[
+		1], &c__1, &a[*k + i__ + (i__ + 1) * a_dim1], lda);
 
-/*        apply reflection to A(k+i:n,k+i:n) from the left and the right   
+/*        apply reflection to A(k+i:n,k+i:n) from the left and the right */
 
-          compute  y := tau * A * conjg(u) */
+/*        compute  y := tau * A * conjg(u) */
 
 	i__2 = *n - *k - i__ + 1;
-	zlacgv_(&i__2, &a_ref(*k + i__, i__), &c__1);
+	zlacgv_(&i__2, &a[*k + i__ + i__ * a_dim1], &c__1);
 	i__2 = *n - *k - i__ + 1;
-	zsymv_("Lower", &i__2, &tau, &a_ref(*k + i__, *k + i__), lda, &a_ref(*
-		k + i__, i__), &c__1, &c_b1, &work[1], &c__1);
+	zsymv_("Lower", &i__2, &tau, &a[*k + i__ + (*k + i__) * a_dim1], lda, 
+		&a[*k + i__ + i__ * a_dim1], &c__1, &c_b1, &work[1], &c__1);
 	i__2 = *n - *k - i__ + 1;
-	zlacgv_(&i__2, &a_ref(*k + i__, i__), &c__1);
+	zlacgv_(&i__2, &a[*k + i__ + i__ * a_dim1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( u, y ) * u */
 
-	z__3.r = -.5, z__3.i = 0.;
+	z__3.r = -.5, z__3.i = -0.;
 	z__2.r = z__3.r * tau.r - z__3.i * tau.i, z__2.i = z__3.r * tau.i + 
 		z__3.i * tau.r;
 	i__2 = *n - *k - i__ + 1;
-	zdotc_(&z__4, &i__2, &a_ref(*k + i__, i__), &c__1, &work[1], &c__1);
+	zdotc_(&z__4, &i__2, &a[*k + i__ + i__ * a_dim1], &c__1, &work[1], &
+		c__1);
 	z__1.r = z__2.r * z__4.r - z__2.i * z__4.i, z__1.i = z__2.r * z__4.i 
 		+ z__2.i * z__4.r;
 	alpha.r = z__1.r, alpha.i = z__1.i;
 	i__2 = *n - *k - i__ + 1;
-	zaxpy_(&i__2, &alpha, &a_ref(*k + i__, i__), &c__1, &work[1], &c__1);
+	zaxpy_(&i__2, &alpha, &a[*k + i__ + i__ * a_dim1], &c__1, &work[1], &
+		c__1);
 
-/*        apply symmetric rank-2 update to A(k+i:n,k+i:n)   
+/*        apply symmetric rank-2 update to A(k+i:n,k+i:n) */
 
-          CALL ZSYR2( 'Lower', N-K-I+1, -ONE, A( K+I, I ), 1, WORK, 1,   
-          $               A( K+I, K+I ), LDA ) */
+/*        CALL ZSYR2( 'Lower', N-K-I+1, -ONE, A( K+I, I ), 1, WORK, 1, */
+/*        $               A( K+I, K+I ), LDA ) */
 
 	i__2 = *n;
 	for (jj = *k + i__; jj <= i__2; ++jj) {
 	    i__3 = *n;
 	    for (ii = jj; ii <= i__3; ++ii) {
-		i__4 = a_subscr(ii, jj);
-		i__5 = a_subscr(ii, jj);
-		i__6 = a_subscr(ii, i__);
+		i__4 = ii + jj * a_dim1;
+		i__5 = ii + jj * a_dim1;
+		i__6 = ii + i__ * a_dim1;
 		i__7 = jj - *k - i__ + 1;
 		z__3.r = a[i__6].r * work[i__7].r - a[i__6].i * work[i__7].i, 
 			z__3.i = a[i__6].r * work[i__7].i + a[i__6].i * work[
 			i__7].r;
 		z__2.r = a[i__5].r - z__3.r, z__2.i = a[i__5].i - z__3.i;
 		i__8 = ii - *k - i__ + 1;
-		i__9 = a_subscr(jj, i__);
+		i__9 = jj + i__ * a_dim1;
 		z__4.r = work[i__8].r * a[i__9].r - work[i__8].i * a[i__9].i, 
 			z__4.i = work[i__8].r * a[i__9].i + work[i__8].i * a[
 			i__9].r;
@@ -331,12 +336,12 @@ static integer c__1 = 1;
 /* L80: */
 	}
 
-	i__2 = a_subscr(*k + i__, i__);
+	i__2 = *k + i__ + i__ * a_dim1;
 	z__1.r = -wa.r, z__1.i = -wa.i;
 	a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 	i__2 = *n;
 	for (j = *k + i__ + 1; j <= i__2; ++j) {
-	    i__3 = a_subscr(j, i__);
+	    i__3 = j + i__ * a_dim1;
 	    a[i__3].r = 0., a[i__3].i = 0.;
 /* L90: */
 	}
@@ -349,8 +354,8 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = j + 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(j, i__);
-	    i__4 = a_subscr(i__, j);
+	    i__3 = j + i__ * a_dim1;
+	    i__4 = i__ + j * a_dim1;
 	    a[i__3].r = a[i__4].r, a[i__3].i = a[i__4].i;
 /* L110: */
 	}
@@ -361,8 +366,3 @@ static integer c__1 = 1;
 /*     End of ZLAGSY */
 
 } /* zlagsy_ */
-
-#undef a_ref
-#undef a_subscr
-
-

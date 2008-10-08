@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -38,21 +33,21 @@ static integer c__20 = 20;
 	    char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[2];
-    static doublereal rmax, vmax, e[400]	/* was [20][20] */;
-    static integer i__, j, n;
-    static doublereal scale[20], x;
-    static integer ninfo;
+    doublereal e[400]	/* was [20][20] */;
+    integer i__, j, n;
+    doublereal x;
+    integer ihi;
+    doublereal ein[400]	/* was [20][20] */;
+    integer ilo;
+    doublereal eps;
+    integer knt, info, lmax[2];
+    doublereal rmax, vmax, scale[20];
+    integer ninfo;
     extern /* Subroutine */ int dgebak_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *);
     extern doublereal dlamch_(char *);
-    static doublereal safmin;
-    static integer ihi;
-    static doublereal ein[400]	/* was [20][20] */;
-    static integer ilo;
-    static doublereal eps;
-    static integer knt;
+    doublereal safmin;
 
     /* Fortran I/O blocks */
     static cilist io___7 = { 0, 0, 0, 0, 0 };
@@ -68,34 +63,44 @@ static integer c__20 = 20;
 
 
 
-#define e_ref(a_1,a_2) e[(a_2)*20 + a_1 - 21]
-#define ein_ref(a_1,a_2) ein[(a_2)*20 + a_1 - 21]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DCHKBK tests DGEBAK, a routine for backward transformation of */
+/*  the computed right or left eigenvectors if the orginal matrix */
+/*  was preprocessed by balance subroutine DGEBAL. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DCHKBK tests DGEBAK, a routine for backward transformation of   
-    the computed right or left eigenvectors if the orginal matrix   
-    was preprocessed by balance subroutine DGEBAL.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/* ====================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-   ====================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -131,8 +136,8 @@ L10:
 	s_rsle(&io___14);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&e_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&e[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L20: */
@@ -144,8 +149,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&ein_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&ein[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L30: */
@@ -164,9 +169,10 @@ L10:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    x = (d__1 = e_ref(i__, j) - ein_ref(i__, j), abs(d__1)) / eps;
-	    if ((d__1 = e_ref(i__, j), abs(d__1)) > safmin) {
-		x /= (d__2 = e_ref(i__, j), abs(d__2));
+	    x = (d__1 = e[i__ + j * 20 - 21] - ein[i__ + j * 20 - 21], abs(
+		    d__1)) / eps;
+	    if ((d__1 = e[i__ + j * 20 - 21], abs(d__1)) > safmin) {
+		x /= (d__2 = e[i__ + j * 20 - 21], abs(d__2));
 	    }
 	    vmax = max(vmax,x);
 /* L40: */
@@ -213,8 +219,3 @@ L60:
 /*     End of DCHKBK */
 
 } /* dchkbk_ */
-
-#undef ein_ref
-#undef e_ref
-
-

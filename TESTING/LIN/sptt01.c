@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sptt01_(integer *n, real *d__, real *e, real *df, real *
 	ef, real *work, real *resid)
@@ -14,57 +9,68 @@
     real r__1, r__2, r__3, r__4, r__5;
 
     /* Local variables */
-    static integer i__;
-    static real anorm, de;
+    integer i__;
+    real de, eps, anorm;
     extern doublereal slamch_(char *);
-    static real eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SPTT01 reconstructs a tridiagonal matrix A from its L*D*L'   
-    factorization and computes the residual   
-       norm(L*D*L' - A) / ( n * norm(A) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  SPTT01 reconstructs a tridiagonal matrix A from its L*D*L' */
+/*  factorization and computes the residual */
+/*     norm(L*D*L' - A) / ( n * norm(A) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGTER   
-            The order of the matrix A.   
+/*  N       (input) INTEGTER */
+/*          The order of the matrix A. */
 
-    D       (input) REAL array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix A.   
+/*  D       (input) REAL array, dimension (N) */
+/*          The n diagonal elements of the tridiagonal matrix A. */
 
-    E       (input) REAL array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the tridiagonal matrix A.   
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The (n-1) subdiagonal elements of the tridiagonal matrix A. */
 
-    DF      (input) REAL array, dimension (N)   
-            The n diagonal elements of the factor L from the L*D*L'   
-            factorization of A.   
+/*  DF      (input) REAL array, dimension (N) */
+/*          The n diagonal elements of the factor L from the L*D*L' */
+/*          factorization of A. */
 
-    EF      (input) REAL array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the factor L from the   
-            L*D*L' factorization of A.   
+/*  EF      (input) REAL array, dimension (N-1) */
+/*          The (n-1) subdiagonal elements of the factor L from the */
+/*          L*D*L' factorization of A. */
 
-    WORK    (workspace) REAL array, dimension (2*N)   
+/*  WORK    (workspace) REAL array, dimension (2*N) */
 
-    RESID   (output) REAL   
-            norm(L*D*L' - A) / (n * norm(A) * EPS)   
+/*  RESID   (output) REAL */
+/*          norm(L*D*L' - A) / (n * norm(A) * EPS) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick return if possible   
+/*     Quick return if possible */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --work;
     --ef;
     --df;
@@ -135,4 +141,3 @@
 /*     End of SPTT01 */
 
 } /* sptt01_ */
-

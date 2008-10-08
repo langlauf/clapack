@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,97 +16,106 @@ static real c_b7 = 1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static integer j;
-    static real anorm, bnorm;
+    integer j;
+    real eps, anorm, bnorm;
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int ssbmv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *);
-    static real xnorm;
+    real xnorm;
     extern doublereal slamch_(char *), slansb_(char *, char *, 
 	    integer *, integer *, real *, integer *, real *);
-    static real eps;
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SPBT02 computes the residual for a solution of a symmetric banded */
+/*  system of equations  A*x = b: */
+/*     RESID = norm( B - A*X ) / ( norm(A) * norm(X) * EPS) */
+/*  where EPS is the machine precision. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SPBT02 computes the residual for a solution of a symmetric banded   
-    system of equations  A*x = b:   
-       RESID = norm( B - A*X ) / ( norm(A) * norm(X) * EPS)   
-    where EPS is the machine precision.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          symmetric matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  KD      (input) INTEGER */
+/*          The number of super-diagonals of the matrix A if UPLO = 'U', */
+/*          or the number of sub-diagonals if UPLO = 'L'.  KD >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The original symmetric band matrix A.  If UPLO = 'U', the */
+/*          upper triangular part of A is stored as a band matrix; if */
+/*          UPLO = 'L', the lower triangular part of A is stored.  The */
+/*          columns of the appropriate triangle are stored in the columns */
+/*          of A and the diagonals of the triangle are stored in the rows */
+/*          of A.  See SPBTRF for further details. */
 
-    KD      (input) INTEGER   
-            The number of super-diagonals of the matrix A if UPLO = 'U',   
-            or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
+/*  LDA     (input) INTEGER. */
+/*          The leading dimension of the array A.  LDA >= max(1,KD+1). */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The original symmetric band matrix A.  If UPLO = 'U', the   
-            upper triangular part of A is stored as a band matrix; if   
-            UPLO = 'L', the lower triangular part of A is stored.  The   
-            columns of the appropriate triangle are stored in the columns   
-            of A and the diagonals of the triangle are stored in the rows   
-            of A.  See SPBTRF for further details.   
+/*  X       (input) REAL array, dimension (LDX,NRHS) */
+/*          The computed solution vectors for the system of linear */
+/*          equations. */
 
-    LDA     (input) INTEGER.   
-            The leading dimension of the array A.  LDA >= max(1,KD+1).   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.   LDX >= max(1,N). */
 
-    X       (input) REAL array, dimension (LDX,NRHS)   
-            The computed solution vectors for the system of linear   
-            equations.   
+/*  B       (input/output) REAL array, dimension (LDB,NRHS) */
+/*          On entry, the right hand side vectors for the system of */
+/*          linear equations. */
+/*          On exit, B is overwritten with the difference B - A*X. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.   LDX >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input/output) REAL array, dimension (LDB,NRHS)   
-            On entry, the right hand side vectors for the system of   
-            linear equations.   
-            On exit, B is overwritten with the difference B - A*X.   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  RESID   (output) REAL */
+/*          The maximum over the number of right hand sides of */
+/*          norm(B - A*X) / ( norm(A) * norm(X) * EPS ). */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  ===================================================================== */
 
-    RESID   (output) REAL   
-            The maximum over the number of right hand sides of   
-            norm(B - A*X) / ( norm(A) * norm(X) * EPS ).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0 or NRHS = 0. */
 
-
-       Quick exit if N = 0 or NRHS = 0.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --rwork;
 
@@ -134,19 +138,19 @@ static real c_b7 = 1.f;
 
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	ssbmv_(uplo, n, kd, &c_b5, &a[a_offset], lda, &x_ref(1, j), &c__1, &
-		c_b7, &b_ref(1, j), &c__1);
+	ssbmv_(uplo, n, kd, &c_b5, &a[a_offset], lda, &x[j * x_dim1 + 1], &
+		c__1, &c_b7, &b[j * b_dim1 + 1], &c__1);
 /* L10: */
     }
 
-/*     Compute the maximum over the number of right hand sides of   
-            norm( B - A*X ) / ( norm(A) * norm(X) * EPS ) */
+/*     Compute the maximum over the number of right hand sides of */
+/*          norm( B - A*X ) / ( norm(A) * norm(X) * EPS ) */
 
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = sasum_(n, &b_ref(1, j), &c__1);
-	xnorm = sasum_(n, &x_ref(1, j), &c__1);
+	bnorm = sasum_(n, &b[j * b_dim1 + 1], &c__1);
+	xnorm = sasum_(n, &x[j * x_dim1 + 1], &c__1);
 	if (xnorm <= 0.f) {
 	    *resid = 1.f / eps;
 	} else {
@@ -162,8 +166,3 @@ static real c_b7 = 1.f;
 /*     End of SPBT02 */
 
 } /* spbt02_ */
-
-#undef x_ref
-#undef b_ref
-
-

@@ -1,62 +1,80 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slasrt_(char *id, integer *n, real *d__, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    Sort the numbers in D in increasing order (if ID = 'I') or   
-    in decreasing order (if ID = 'D' ).   
-
-    Use Quick Sort, reverting to Insertion sort on arrays of   
-    size <= 20. Dimension of STACK limits N to about 2**32.   
-
-    Arguments   
-    =========   
-
-    ID      (input) CHARACTER*1   
-            = 'I': sort D in increasing order;   
-            = 'D': sort D in decreasing order.   
-
-    N       (input) INTEGER   
-            The length of the array D.   
-
-    D       (input/output) REAL array, dimension (N)   
-            On entry, the array to be sorted.   
-            On exit, D has been sorted into increasing order   
-            (D(1) <= ... <= D(N) ) or into decreasing order   
-            (D(1) >= ... >= D(N) ), depending on ID.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input paramters.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
-    /* Local variables */
-    static integer endd, i__, j;
-    extern logical lsame_(char *, char *);
-    static integer stack[64]	/* was [2][32] */;
-    static real dmnmx, d1, d2, d3;
-    static integer start;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer stkpnt, dir;
-    static real tmp;
-#define stack_ref(a_1,a_2) stack[(a_2)*2 + a_1 - 3]
 
+    /* Local variables */
+    integer i__, j;
+    real d1, d2, d3;
+    integer dir;
+    real tmp;
+    integer endd;
+    extern logical lsame_(char *, char *);
+    integer stack[64]	/* was [2][32] */;
+    real dmnmx;
+    integer start;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    integer stkpnt;
+
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  Sort the numbers in D in increasing order (if ID = 'I') or */
+/*  in decreasing order (if ID = 'D' ). */
+
+/*  Use Quick Sort, reverting to Insertion sort on arrays of */
+/*  size <= 20. Dimension of STACK limits N to about 2**32. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  ID      (input) CHARACTER*1 */
+/*          = 'I': sort D in increasing order; */
+/*          = 'D': sort D in decreasing order. */
+
+/*  N       (input) INTEGER */
+/*          The length of the array D. */
+
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, the array to be sorted. */
+/*          On exit, D has been sorted into increasing order */
+/*          (D(1) <= ... <= D(N) ) or into decreasing order */
+/*          (D(1) >= ... >= D(N) ), depending on ID. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input paramters. */
+
+    /* Parameter adjustments */
     --d__;
 
     /* Function Body */
@@ -85,11 +103,11 @@
     }
 
     stkpnt = 1;
-    stack_ref(1, 1) = 1;
-    stack_ref(2, 1) = *n;
+    stack[0] = 1;
+    stack[1] = *n;
 L10:
-    start = stack_ref(1, stkpnt);
-    endd = stack_ref(2, stkpnt);
+    start = stack[(stkpnt << 1) - 2];
+    endd = stack[(stkpnt << 1) - 1];
     --stkpnt;
     if (endd - start <= 20 && endd - start > 0) {
 
@@ -141,9 +159,9 @@ L50:
 
     } else if (endd - start > 20) {
 
-/*        Partition D( START:ENDD ) and stack parts, largest one first   
+/*        Partition D( START:ENDD ) and stack parts, largest one first */
 
-          Choose partition entry as median of 3 */
+/*        Choose partition entry as median of 3 */
 
 	d1 = d__[start];
 	d2 = d__[endd];
@@ -192,18 +210,18 @@ L80:
 	    }
 	    if (j - start > endd - j - 1) {
 		++stkpnt;
-		stack_ref(1, stkpnt) = start;
-		stack_ref(2, stkpnt) = j;
+		stack[(stkpnt << 1) - 2] = start;
+		stack[(stkpnt << 1) - 1] = j;
 		++stkpnt;
-		stack_ref(1, stkpnt) = j + 1;
-		stack_ref(2, stkpnt) = endd;
+		stack[(stkpnt << 1) - 2] = j + 1;
+		stack[(stkpnt << 1) - 1] = endd;
 	    } else {
 		++stkpnt;
-		stack_ref(1, stkpnt) = j + 1;
-		stack_ref(2, stkpnt) = endd;
+		stack[(stkpnt << 1) - 2] = j + 1;
+		stack[(stkpnt << 1) - 1] = endd;
 		++stkpnt;
-		stack_ref(1, stkpnt) = start;
-		stack_ref(2, stkpnt) = j;
+		stack[(stkpnt << 1) - 2] = start;
+		stack[(stkpnt << 1) - 1] = j;
 	    }
 	} else {
 
@@ -230,18 +248,18 @@ L110:
 	    }
 	    if (j - start > endd - j - 1) {
 		++stkpnt;
-		stack_ref(1, stkpnt) = start;
-		stack_ref(2, stkpnt) = j;
+		stack[(stkpnt << 1) - 2] = start;
+		stack[(stkpnt << 1) - 1] = j;
 		++stkpnt;
-		stack_ref(1, stkpnt) = j + 1;
-		stack_ref(2, stkpnt) = endd;
+		stack[(stkpnt << 1) - 2] = j + 1;
+		stack[(stkpnt << 1) - 1] = endd;
 	    } else {
 		++stkpnt;
-		stack_ref(1, stkpnt) = j + 1;
-		stack_ref(2, stkpnt) = endd;
+		stack[(stkpnt << 1) - 2] = j + 1;
+		stack[(stkpnt << 1) - 1] = endd;
 		++stkpnt;
-		stack_ref(1, stkpnt) = start;
-		stack_ref(2, stkpnt) = j;
+		stack[(stkpnt << 1) - 2] = start;
+		stack[(stkpnt << 1) - 1] = j;
 	    }
 	}
     }
@@ -253,7 +271,3 @@ L110:
 /*     End of SLASRT */
 
 } /* slasrt_ */
-
-#undef stack_ref
-
-

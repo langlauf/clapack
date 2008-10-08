@@ -1,11 +1,5 @@
-#include "blaswrap.h"
-
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -28,7 +22,7 @@ static integer c__3 = 3;
 
 /* Subroutine */ int sdrvst_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *nounit, real *
-	a, integer *lda, real *d1, real *d2, real *d3, real *d4, real *eveigs,
+	a, integer *lda, real *d1, real *d2, real *d3, real *d4, real *eveigs, 
 	 real *wa1, real *wa2, real *wa3, real *u, integer *ldu, real *v, 
 	real *tau, real *z__, real *work, integer *lwork, integer *iwork, 
 	integer *liwork, real *result, integer *info)
@@ -59,54 +53,53 @@ static integer c__3 = 3;
 	     char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static real cond;
-    static integer jcol, ihbw, indx, nmax;
-    static real unfl, ovfl;
-    static char uplo[1];
-    static integer irow;
-    static real temp1, temp2, temp3;
-    static integer i__, j, idiag, m, n;
-    static logical badnn;
+    integer i__, j, m, n, j1, j2, m2, m3, kd, il, iu;
+    real vl, vu;
+    integer lgn;
+    real ulp, cond;
+    integer jcol, ihbw, indx, nmax;
+    real unfl, ovfl;
+    char uplo[1];
+    integer irow;
+    real temp1, temp2, temp3;
+    integer idiag;
+    logical badnn;
     extern doublereal ssxt1_(integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *);
-    static integer imode, lwedc, iinfo;
-    static real aninv, anorm;
-    static integer itemp, nmats;
+    integer imode, lwedc, iinfo;
+    real aninv, anorm;
+    integer itemp, nmats;
     extern /* Subroutine */ int ssbev_(char *, char *, integer *, integer *, 
 	    real *, integer *, real *, real *, integer *, real *, integer *);
-    static integer jsize, iuplo, itype, j1, j2, jtype, m2, m3, nerrs, ntest;
+    integer jsize, iuplo, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int sspev_(char *, char *, integer *, real *, 
 	    real *, real *, integer *, real *, integer *), 
-	    sstev_(char *, integer *, real *, real *, real *, integer *, real 
-	    *, integer *), sstt21_(integer *, integer *, real *, real 
-	    *, real *, real *, real *, integer *, real *, real *), sstt22_(
-	    integer *, integer *, integer *, real *, real *, real *, real *, 
-	    real *, integer *, real *, integer *, real *), ssyev_(char *, 
-	    char *, integer *, real *, integer *, real *, real *, integer *, 
-	    integer *), ssyt21_(integer *, char *, integer *, 
+	    sstt21_(integer *, integer *, real *, real *, real *, real *, 
+	    real *, integer *, real *, real *), sstt22_(integer *, integer *, 
+	    integer *, real *, real *, real *, real *, real *, integer *, 
+	    real *, integer *, real *), sstev_(char *, integer *, real *, 
+	    real *, real *, integer *, real *, integer *), ssyt21_(
+	    integer *, char *, integer *, integer *, real *, integer *, real *
+, real *, real *, integer *, real *, integer *, real *, real *, 
+	    real *), ssyt22_(integer *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, real *, integer *, 
-	    real *, integer *, real *, real *, real *);
-    static integer iseed2[4], iseed3[4];
-    extern /* Subroutine */ int ssyt22_(integer *, char *, integer *, integer 
-	    *, integer *, real *, integer *, real *, real *, real *, integer *
-	    , real *, integer *, real *, real *, real *);
-    static integer kd, il;
+	    real *, integer *, real *, real *, real *), ssyev_(char *, 
+	     char *, integer *, real *, integer *, real *, real *, integer *, 
+	    integer *);
+    integer iseed2[4], iseed3[4];
     extern /* Subroutine */ int slabad_(real *, real *);
-    static integer iu;
-    static real vl;
-    static integer liwedc;
+    integer liwedc;
     extern doublereal slamch_(char *);
-    static real vu;
-    static integer idumma[1];
+    integer idumma[1];
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern doublereal slarnd_(integer *, integer *);
-    static real abstol;
+    real abstol;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *), ssbevd_(char *, char *, integer *, integer 
 	    *, real *, integer *, real *, real *, integer *, real *, integer *
-	    , integer *, integer *, integer *), slacpy_(char *
-	    , integer *, integer *, real *, integer *, real *, integer *), slafts_(char *, integer *, integer *, integer *, integer 
+, integer *, integer *, integer *), slacpy_(char *
+, integer *, integer *, real *, integer *, real *, integer *), slafts_(char *, integer *, integer *, integer *, integer 
 	    *, real *, integer *, real *, integer *, integer *), 
 	    slaset_(char *, integer *, integer *, real *, real *, real *, 
 	    integer *), slatmr_(integer *, integer *, char *, integer 
@@ -116,33 +109,33 @@ static integer c__3 = 3;
 	    integer *, integer *, integer *), slatms_(integer *, integer *, char *, integer *, 
 	    char *, real *, integer *, real *, real *, integer *, integer *, 
 	    char *, real *, integer *, real *, integer *), sspevd_(char *, char *, integer *, real *, real *, real *
-	    , integer *, real *, integer *, integer *, integer *, integer *), sstevd_(char *, integer *, real *, real *, real *
-	    , integer *, real *, integer *, integer *, integer *, integer *);
-    static real rtovfl, rtunfl;
-    static integer mtypes, ntestt;
-    static real ulpinv;
+, integer *, real *, integer *, integer *, integer *, integer *), sstevd_(char *, integer *, real *, real *, real *
+, integer *, real *, integer *, integer *, integer *, integer *);
+    real rtunfl, rtovfl, ulpinv;
     extern /* Subroutine */ int ssbevx_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *, integer *)
-	    , sspevx_(char *, char *, char *, integer *, real *, real *, real 
-	    *, integer *, integer *, real *, integer *, real *, real *, 
-	    integer *, real *, integer *, integer *, integer *), sstevr_(char *, char *, integer *, real *, real *
-	    , real *, real *, integer *, integer *, real *, integer *, real *,
-	     real *, integer *, integer *, real *, integer *, integer *, 
-	    integer *, integer *), ssyevd_(char *, char *, 
+, real *, integer *, integer *, integer *)
+	    ;
+    integer mtypes, ntestt;
+    extern /* Subroutine */ int sstevr_(char *, char *, integer *, real *, 
+	    real *, real *, real *, integer *, integer *, real *, integer *, 
+	    real *, real *, integer *, integer *, real *, integer *, integer *
+, integer *, integer *), ssyevd_(char *, char *, 
 	    integer *, real *, integer *, real *, real *, integer *, integer *
-	    , integer *, integer *), ssyevr_(char *, char *, 
-	    char *, integer *, real *, integer *, real *, real *, integer *, 
-	    integer *, real *, integer *, real *, real *, integer *, integer *
-	    , real *, integer *, integer *, integer *, integer *), sstevx_(char *, char *, integer *, real *, real *
-	    , real *, real *, integer *, integer *, real *, integer *, real *,
-	     real *, integer *, real *, integer *, integer *, integer *), ssyevx_(char *, char *, char *, integer *, real *
-	    , integer *, real *, real *, integer *, integer *, real *, 
+, integer *, integer *), sspevx_(char *, char *, 
+	    char *, integer *, real *, real *, real *, integer *, integer *, 
+	    real *, integer *, real *, real *, integer *, real *, integer *, 
+	    integer *, integer *), ssyevr_(char *, 
+	    char *, char *, integer *, real *, integer *, real *, real *, 
+	    integer *, integer *, real *, integer *, real *, real *, integer *
+, integer *, real *, integer *, integer *, integer *, integer *), sstevx_(char *, char *, integer *, real *
+, real *, real *, real *, integer *, integer *, real *, integer *, 
+	     real *, real *, integer *, real *, integer *, integer *, integer 
+	    *), ssyevx_(char *, char *, char *, integer *, 
+	    real *, integer *, real *, real *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *, integer *, integer *
-	    , integer *, integer *);
-    static integer lgn;
-    static real ulp;
+, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
@@ -201,428 +194,443 @@ static integer c__3 = 3;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
-#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       April 4, 2000   
+/*  Purpose */
+/*  ======= */
 
+/*       SDRVST  checks the symmetric eigenvalue problem drivers. */
 
-    Purpose   
-    =======   
+/*               SSTEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric tridiagonal matrix. */
 
-         SDRVST  checks the symmetric eigenvalue problem drivers.   
+/*               SSTEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric tridiagonal matrix. */
 
-                 SSTEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric tridiagonal matrix.   
+/*               SSTEVR computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric tridiagonal matrix */
+/*               using the Relatively Robust Representation where it can. */
 
-                 SSTEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric tridiagonal matrix.   
+/*               SSYEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix. */
 
-                 SSTEVR computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric tridiagonal matrix   
-                 using the Relatively Robust Representation where it can.   
+/*               SSYEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix. */
 
-                 SSYEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix.   
-
-                 SSYEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix.   
-
-                 SSYEVR computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix   
-                 using the Relatively Robust Representation where it can.   
-
-                 SSPEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix in packed   
-                 storage.   
-
-                 SSPEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix in packed   
-                 storage.   
-
-                 SSBEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric band matrix.   
-
-                 SSBEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric band matrix.   
-
-                 SSYEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix using   
-                 a divide and conquer algorithm.   
-
-                 SSPEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric matrix in packed   
-                 storage, using a divide and conquer algorithm.   
-
-                 SSBEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a real symmetric band matrix,   
-                 using a divide and conquer algorithm.   
-
-         When SDRVST is called, a number of matrix "sizes" ("n's") and a   
-         number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix will be generated and used   
-         to test the appropriate drivers.  For each matrix and each   
-         driver routine called, the following tests will be performed:   
-
-         (1)     | A - Z D Z' | / ( |A| n ulp )   
-
-         (2)     | I - Z Z' | / ( n ulp )   
-
-         (3)     | D1 - D2 | / ( |D1| ulp )   
-
-         where Z is the matrix of eigenvectors returned when the   
-         eigenvector option is given and D1 and D2 are the eigenvalues   
-         returned with and without the eigenvector option.   
-
-         The "sizes" are specified by an array NN(1:NSIZES); the value of   
-         each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-         Currently, the list of possible types is:   
-
-         (1)  The zero matrix.   
-         (2)  The identity matrix.   
-
-         (3)  A diagonal matrix with evenly spaced eigenvalues   
-              1, ..., ULP  and random signs.   
-              (ULP = (first number larger than 1) - 1 )   
-         (4)  A diagonal matrix with geometrically spaced eigenvalues   
-              1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" eigenvalues   
-              1, ULP, ..., ULP and random signs.   
-
-         (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-         (8)  A matrix of the form  U' D U, where U is orthogonal and   
-              D has evenly spaced entries 1, ..., ULP with random signs   
-              on the diagonal.   
-
-         (9)  A matrix of the form  U' D U, where U is orthogonal and   
-              D has geometrically spaced entries 1, ..., ULP with random   
-              signs on the diagonal.   
-
-         (10) A matrix of the form  U' D U, where U is orthogonal and   
-              D has "clustered" entries 1, ULP,..., ULP with random   
-              signs on the diagonal.   
-
-         (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-         (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
-         (16) A band matrix with half bandwidth randomly chosen between   
-              0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
-              with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
-         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
-
-    Arguments   
-    =========   
-
-    NSIZES  INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            SDRVST does nothing.  It must be at least zero.   
-            Not modified.   
-
-    NN      INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-            Not modified.   
-
-    NTYPES  INTEGER   
-            The number of elements in DOTYPE.   If it is zero, SDRVST   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-            Not modified.   
-
-    DOTYPE  LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-            Not modified.   
-
-    ISEED   INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to SDRVST to continue the same random number   
-            sequence.   
-            Modified.   
-
-    THRESH  REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-            Not modified.   
-
-    NOUNIT  INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-            Not modified.   
-
-    A       REAL array, dimension (LDA , max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDA     INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    D1      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by SSTEQR simlutaneously   
-            with Z.  On exit, the eigenvalues in D1 correspond with the   
-            matrix in A.   
-            Modified.   
-
-    D2      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by SSTEQR if Z is not   
-            computed.  On exit, the eigenvalues in D2 correspond with   
-            the matrix in A.   
-            Modified.   
-
-    D3      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by SSTERF.  On exit, the   
-            eigenvalues in D3 correspond with the matrix in A.   
-            Modified.   
-
-    D4      REAL array, dimension   
-
-    EVEIGS  REAL array, dimension (max(NN))   
-            The eigenvalues as computed by SSTEV('N', ... )   
-            (I reserve the right to change this to the output of   
-            whichever algorithm computes the most accurate eigenvalues).   
-
-    WA1     REAL array, dimension   
-
-    WA2     REAL array, dimension   
-
-    WA3     REAL array, dimension   
-
-    U       REAL array, dimension (LDU, max(NN))   
-            The orthogonal matrix computed by SSYTRD + SORGTR.   
-            Modified.   
-
-    LDU     INTEGER   
-            The leading dimension of U, Z, and V.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    V       REAL array, dimension (LDU, max(NN))   
-            The Housholder vectors computed by SSYTRD in reducing A to   
-            tridiagonal form.   
-            Modified.   
-
-    TAU     REAL array, dimension (max(NN))   
-            The Householder factors computed by SSYTRD in reducing A   
-            to tridiagonal form.   
-            Modified.   
-
-    Z       REAL array, dimension (LDU, max(NN))   
-            The orthogonal matrix of eigenvectors computed by SSTEQR,   
-            SPTEQR, and SSTEIN.   
-            Modified.   
-
-    WORK    REAL array, dimension (LWORK)   
-            Workspace.   
-            Modified.   
-
-    LWORK   INTEGER   
-            The number of entries in WORK.  This must be at least   
-            1 + 4 * Nmax + 2 * Nmax * lg Nmax + 4 * Nmax**2   
-            where Nmax = max( NN(j), 2 ) and lg = log base 2.   
-            Not modified.   
-
-    IWORK   INTEGER array,   
-               dimension (6 + 6*Nmax + 5 * Nmax * lg Nmax )   
-            where Nmax = max( NN(j), 2 ) and lg = log base 2.   
-            Workspace.   
-            Modified.   
-
-    RESULT  REAL array, dimension (105)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-            Modified.   
-
-    INFO    INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDU < 1 or LDU < NMAX.   
-            -21: LWORK too small.   
-            If  SLATMR, SLATMS, SSYTRD, SORGTR, SSTEQR, SSTERF,   
-                or SORMTR returns an error code, the   
-                absolute value of it is returned.   
-            Modified.   
-
-   -----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far (computed by SLAFTS).   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-       The tests performed are:                 Routine tested   
-      1= | A - U S U' | / ( |A| n ulp )         SSTEV('V', ... )   
-      2= | I - U U' | / ( n ulp )               SSTEV('V', ... )   
-      3= |D(with Z) - D(w/o Z)| / (|D| ulp)     SSTEV('N', ... )   
-      4= | A - U S U' | / ( |A| n ulp )         SSTEVX('V','A', ... )   
-      5= | I - U U' | / ( n ulp )               SSTEVX('V','A', ... )   
-      6= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVX('N','A', ... )   
-      7= | A - U S U' | / ( |A| n ulp )         SSTEVR('V','A', ... )   
-      8= | I - U U' | / ( n ulp )               SSTEVR('V','A', ... )   
-      9= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVR('N','A', ... )   
-      10= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','I', ... )   
-      11= | I - U U' | / ( n ulp )              SSTEVX('V','I', ... )   
-      12= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','I', ... )   
-      13= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','V', ... )   
-      14= | I - U U' | / ( n ulp )              SSTEVX('V','V', ... )   
-      15= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','V', ... )   
-      16= | A - U S U' | / ( |A| n ulp )        SSTEVD('V', ... )   
-      17= | I - U U' | / ( n ulp )              SSTEVD('V', ... )   
-      18= |D(with Z) - EVEIGS| / (|D| ulp)      SSTEVD('N', ... )   
-      19= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','I', ... )   
-      20= | I - U U' | / ( n ulp )              SSTEVR('V','I', ... )   
-      21= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','I', ... )   
-      22= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','V', ... )   
-      23= | I - U U' | / ( n ulp )              SSTEVR('V','V', ... )   
-      24= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','V', ... )   
-
-      25= | A - U S U' | / ( |A| n ulp )        SSYEV('L','V', ... )   
-      26= | I - U U' | / ( n ulp )              SSYEV('L','V', ... )   
-      27= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEV('L','N', ... )   
-      28= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','A', ... )   
-      29= | I - U U' | / ( n ulp )              SSYEVX('L','V','A', ... )   
-      30= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','A', ... )   
-      31= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','I', ... )   
-      32= | I - U U' | / ( n ulp )              SSYEVX('L','V','I', ... )   
-      33= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','I', ... )   
-      34= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','V', ... )   
-      35= | I - U U' | / ( n ulp )              SSYEVX('L','V','V', ... )   
-      36= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','V', ... )   
-      37= | A - U S U' | / ( |A| n ulp )        SSPEV('L','V', ... )   
-      38= | I - U U' | / ( n ulp )              SSPEV('L','V', ... )   
-      39= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEV('L','N', ... )   
-      40= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','A', ... )   
-      41= | I - U U' | / ( n ulp )              SSPEVX('L','V','A', ... )   
-      42= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','A', ... )   
-      43= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','I', ... )   
-      44= | I - U U' | / ( n ulp )              SSPEVX('L','V','I', ... )   
-      45= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','I', ... )   
-      46= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','V', ... )   
-      47= | I - U U' | / ( n ulp )              SSPEVX('L','V','V', ... )   
-      48= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','V', ... )   
-      49= | A - U S U' | / ( |A| n ulp )        SSBEV('L','V', ... )   
-      50= | I - U U' | / ( n ulp )              SSBEV('L','V', ... )   
-      51= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEV('L','N', ... )   
-      52= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','A', ... )   
-      53= | I - U U' | / ( n ulp )              SSBEVX('L','V','A', ... )   
-      54= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','A', ... )   
-      55= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','I', ... )   
-      56= | I - U U' | / ( n ulp )              SSBEVX('L','V','I', ... )   
-      57= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','I', ... )   
-      58= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','V', ... )   
-      59= | I - U U' | / ( n ulp )              SSBEVX('L','V','V', ... )   
-      60= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','V', ... )   
-      61= | A - U S U' | / ( |A| n ulp )        SSYEVD('L','V', ... )   
-      62= | I - U U' | / ( n ulp )              SSYEVD('L','V', ... )   
-      63= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVD('L','N', ... )   
-      64= | A - U S U' | / ( |A| n ulp )        SSPEVD('L','V', ... )   
-      65= | I - U U' | / ( n ulp )              SSPEVD('L','V', ... )   
-      66= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVD('L','N', ... )   
-      67= | A - U S U' | / ( |A| n ulp )        SSBEVD('L','V', ... )   
-      68= | I - U U' | / ( n ulp )              SSBEVD('L','V', ... )   
-      69= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVD('L','N', ... )   
-      70= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','A', ... )   
-      71= | I - U U' | / ( n ulp )              SSYEVR('L','V','A', ... )   
-      72= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','A', ... )   
-      73= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','I', ... )   
-      74= | I - U U' | / ( n ulp )              SSYEVR('L','V','I', ... )   
-      75= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','I', ... )   
-      76= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','V', ... )   
-      77= | I - U U' | / ( n ulp )              SSYEVR('L','V','V', ... )   
-      78= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','V', ... )   
-
-      Tests 25 through 78 are repeated (as tests 79 through 132)   
-      with UPLO='U'   
-
-      To be added in 1999   
-
-      79= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','A', ... )   
-      80= | I - U U' | / ( n ulp )              SSPEVR('L','V','A', ... )   
-      81= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','A', ... )   
-      82= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','I', ... )   
-      83= | I - U U' | / ( n ulp )              SSPEVR('L','V','I', ... )   
-      84= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','I', ... )   
-      85= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','V', ... )   
-      86= | I - U U' | / ( n ulp )              SSPEVR('L','V','V', ... )   
-      87= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','V', ... )   
-      88= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','A', ... )   
-      89= | I - U U' | / ( n ulp )              SSBEVR('L','V','A', ... )   
-      90= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','A', ... )   
-      91= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','I', ... )   
-      92= | I - U U' | / ( n ulp )              SSBEVR('L','V','I', ... )   
-      93= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','I', ... )   
-      94= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','V', ... )   
-      95= | I - U U' | / ( n ulp )              SSBEVR('L','V','V', ... )   
-      96= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','V', ... )   
-
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*               SSYEVR computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix */
+/*               using the Relatively Robust Representation where it can. */
+
+/*               SSPEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix in packed */
+/*               storage. */
+
+/*               SSPEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix in packed */
+/*               storage. */
+
+/*               SSBEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric band matrix. */
+
+/*               SSBEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric band matrix. */
+
+/*               SSYEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix using */
+/*               a divide and conquer algorithm. */
+
+/*               SSPEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric matrix in packed */
+/*               storage, using a divide and conquer algorithm. */
+
+/*               SSBEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a real symmetric band matrix, */
+/*               using a divide and conquer algorithm. */
+
+/*       When SDRVST is called, a number of matrix "sizes" ("n's") and a */
+/*       number of matrix "types" are specified.  For each size ("n") */
+/*       and each type of matrix, one matrix will be generated and used */
+/*       to test the appropriate drivers.  For each matrix and each */
+/*       driver routine called, the following tests will be performed: */
+
+/*       (1)     | A - Z D Z' | / ( |A| n ulp ) */
+
+/*       (2)     | I - Z Z' | / ( n ulp ) */
+
+/*       (3)     | D1 - D2 | / ( |D1| ulp ) */
+
+/*       where Z is the matrix of eigenvectors returned when the */
+/*       eigenvector option is given and D1 and D2 are the eigenvalues */
+/*       returned with and without the eigenvector option. */
+
+/*       The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*       each element NN(j) specifies one size. */
+/*       The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*       Currently, the list of possible types is: */
+
+/*       (1)  The zero matrix. */
+/*       (2)  The identity matrix. */
+
+/*       (3)  A diagonal matrix with evenly spaced eigenvalues */
+/*            1, ..., ULP  and random signs. */
+/*            (ULP = (first number larger than 1) - 1 ) */
+/*       (4)  A diagonal matrix with geometrically spaced eigenvalues */
+/*            1, ..., ULP  and random signs. */
+/*       (5)  A diagonal matrix with "clustered" eigenvalues */
+/*            1, ULP, ..., ULP and random signs. */
+
+/*       (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*       (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*       (8)  A matrix of the form  U' D U, where U is orthogonal and */
+/*            D has evenly spaced entries 1, ..., ULP with random signs */
+/*            on the diagonal. */
+
+/*       (9)  A matrix of the form  U' D U, where U is orthogonal and */
+/*            D has geometrically spaced entries 1, ..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (10) A matrix of the form  U' D U, where U is orthogonal and */
+/*            D has "clustered" entries 1, ULP,..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*       (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*       (13) Symmetric matrix with random entries chosen from (-1,1). */
+/*       (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*       (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
+/*       (16) A band matrix with half bandwidth randomly chosen between */
+/*            0 and N-1, with evenly spaced eigenvalues 1, ..., ULP */
+/*            with random signs. */
+/*       (17) Same as (16), but multiplied by SQRT( overflow threshold ) */
+/*       (18) Same as (16), but multiplied by SQRT( underflow threshold ) */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          SDRVST does nothing.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NN      INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+/*          Not modified. */
+
+/*  NTYPES  INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, SDRVST */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+/*          Not modified. */
+
+/*  DOTYPE  LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+/*          Not modified. */
+
+/*  ISEED   INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to SDRVST to continue the same random number */
+/*          sequence. */
+/*          Modified. */
+
+/*  THRESH  REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NOUNIT  INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+/*          Not modified. */
+
+/*  A       REAL array, dimension (LDA , max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDA     INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  D1      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by SSTEQR simlutaneously */
+/*          with Z.  On exit, the eigenvalues in D1 correspond with the */
+/*          matrix in A. */
+/*          Modified. */
+
+/*  D2      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by SSTEQR if Z is not */
+/*          computed.  On exit, the eigenvalues in D2 correspond with */
+/*          the matrix in A. */
+/*          Modified. */
+
+/*  D3      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by SSTERF.  On exit, the */
+/*          eigenvalues in D3 correspond with the matrix in A. */
+/*          Modified. */
+
+/*  D4      REAL array, dimension */
+
+/*  EVEIGS  REAL array, dimension (max(NN)) */
+/*          The eigenvalues as computed by SSTEV('N', ... ) */
+/*          (I reserve the right to change this to the output of */
+/*          whichever algorithm computes the most accurate eigenvalues). */
+
+/*  WA1     REAL array, dimension */
+
+/*  WA2     REAL array, dimension */
+
+/*  WA3     REAL array, dimension */
+
+/*  U       REAL array, dimension (LDU, max(NN)) */
+/*          The orthogonal matrix computed by SSYTRD + SORGTR. */
+/*          Modified. */
+
+/*  LDU     INTEGER */
+/*          The leading dimension of U, Z, and V.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  V       REAL array, dimension (LDU, max(NN)) */
+/*          The Housholder vectors computed by SSYTRD in reducing A to */
+/*          tridiagonal form. */
+/*          Modified. */
+
+/*  TAU     REAL array, dimension (max(NN)) */
+/*          The Householder factors computed by SSYTRD in reducing A */
+/*          to tridiagonal form. */
+/*          Modified. */
+
+/*  Z       REAL array, dimension (LDU, max(NN)) */
+/*          The orthogonal matrix of eigenvectors computed by SSTEQR, */
+/*          SPTEQR, and SSTEIN. */
+/*          Modified. */
+
+/*  WORK    REAL array, dimension (LWORK) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LWORK   INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          1 + 4 * Nmax + 2 * Nmax * lg Nmax + 4 * Nmax**2 */
+/*          where Nmax = max( NN(j), 2 ) and lg = log base 2. */
+/*          Not modified. */
+
+/*  IWORK   INTEGER array, */
+/*             dimension (6 + 6*Nmax + 5 * Nmax * lg Nmax ) */
+/*          where Nmax = max( NN(j), 2 ) and lg = log base 2. */
+/*          Workspace. */
+/*          Modified. */
+
+/*  RESULT  REAL array, dimension (105) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+/*          Modified. */
+
+/*  INFO    INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -16: LDU < 1 or LDU < NMAX. */
+/*          -21: LWORK too small. */
+/*          If  SLATMR, SLATMS, SSYTRD, SORGTR, SSTEQR, SSTERF, */
+/*              or SORMTR returns an error code, the */
+/*              absolute value of it is returned. */
+/*          Modified. */
+
+/* ----------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far (computed by SLAFTS). */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*     The tests performed are:                 Routine tested */
+/*    1= | A - U S U' | / ( |A| n ulp )         SSTEV('V', ... ) */
+/*    2= | I - U U' | / ( n ulp )               SSTEV('V', ... ) */
+/*    3= |D(with Z) - D(w/o Z)| / (|D| ulp)     SSTEV('N', ... ) */
+/*    4= | A - U S U' | / ( |A| n ulp )         SSTEVX('V','A', ... ) */
+/*    5= | I - U U' | / ( n ulp )               SSTEVX('V','A', ... ) */
+/*    6= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVX('N','A', ... ) */
+/*    7= | A - U S U' | / ( |A| n ulp )         SSTEVR('V','A', ... ) */
+/*    8= | I - U U' | / ( n ulp )               SSTEVR('V','A', ... ) */
+/*    9= |D(with Z) - EVEIGS| / (|D| ulp)       SSTEVR('N','A', ... ) */
+/*    10= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','I', ... ) */
+/*    11= | I - U U' | / ( n ulp )              SSTEVX('V','I', ... ) */
+/*    12= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','I', ... ) */
+/*    13= | A - U S U' | / ( |A| n ulp )        SSTEVX('V','V', ... ) */
+/*    14= | I - U U' | / ( n ulp )              SSTEVX('V','V', ... ) */
+/*    15= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVX('N','V', ... ) */
+/*    16= | A - U S U' | / ( |A| n ulp )        SSTEVD('V', ... ) */
+/*    17= | I - U U' | / ( n ulp )              SSTEVD('V', ... ) */
+/*    18= |D(with Z) - EVEIGS| / (|D| ulp)      SSTEVD('N', ... ) */
+/*    19= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','I', ... ) */
+/*    20= | I - U U' | / ( n ulp )              SSTEVR('V','I', ... ) */
+/*    21= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','I', ... ) */
+/*    22= | A - U S U' | / ( |A| n ulp )        SSTEVR('V','V', ... ) */
+/*    23= | I - U U' | / ( n ulp )              SSTEVR('V','V', ... ) */
+/*    24= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSTEVR('N','V', ... ) */
+
+/*    25= | A - U S U' | / ( |A| n ulp )        SSYEV('L','V', ... ) */
+/*    26= | I - U U' | / ( n ulp )              SSYEV('L','V', ... ) */
+/*    27= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEV('L','N', ... ) */
+/*    28= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','A', ... ) */
+/*    29= | I - U U' | / ( n ulp )              SSYEVX('L','V','A', ... ) */
+/*    30= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','A', ... ) */
+/*    31= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','I', ... ) */
+/*    32= | I - U U' | / ( n ulp )              SSYEVX('L','V','I', ... ) */
+/*    33= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','I', ... ) */
+/*    34= | A - U S U' | / ( |A| n ulp )        SSYEVX('L','V','V', ... ) */
+/*    35= | I - U U' | / ( n ulp )              SSYEVX('L','V','V', ... ) */
+/*    36= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVX('L','N','V', ... ) */
+/*    37= | A - U S U' | / ( |A| n ulp )        SSPEV('L','V', ... ) */
+/*    38= | I - U U' | / ( n ulp )              SSPEV('L','V', ... ) */
+/*    39= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEV('L','N', ... ) */
+/*    40= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','A', ... ) */
+/*    41= | I - U U' | / ( n ulp )              SSPEVX('L','V','A', ... ) */
+/*    42= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','A', ... ) */
+/*    43= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','I', ... ) */
+/*    44= | I - U U' | / ( n ulp )              SSPEVX('L','V','I', ... ) */
+/*    45= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','I', ... ) */
+/*    46= | A - U S U' | / ( |A| n ulp )        SSPEVX('L','V','V', ... ) */
+/*    47= | I - U U' | / ( n ulp )              SSPEVX('L','V','V', ... ) */
+/*    48= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVX('L','N','V', ... ) */
+/*    49= | A - U S U' | / ( |A| n ulp )        SSBEV('L','V', ... ) */
+/*    50= | I - U U' | / ( n ulp )              SSBEV('L','V', ... ) */
+/*    51= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEV('L','N', ... ) */
+/*    52= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','A', ... ) */
+/*    53= | I - U U' | / ( n ulp )              SSBEVX('L','V','A', ... ) */
+/*    54= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','A', ... ) */
+/*    55= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','I', ... ) */
+/*    56= | I - U U' | / ( n ulp )              SSBEVX('L','V','I', ... ) */
+/*    57= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','I', ... ) */
+/*    58= | A - U S U' | / ( |A| n ulp )        SSBEVX('L','V','V', ... ) */
+/*    59= | I - U U' | / ( n ulp )              SSBEVX('L','V','V', ... ) */
+/*    60= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVX('L','N','V', ... ) */
+/*    61= | A - U S U' | / ( |A| n ulp )        SSYEVD('L','V', ... ) */
+/*    62= | I - U U' | / ( n ulp )              SSYEVD('L','V', ... ) */
+/*    63= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVD('L','N', ... ) */
+/*    64= | A - U S U' | / ( |A| n ulp )        SSPEVD('L','V', ... ) */
+/*    65= | I - U U' | / ( n ulp )              SSPEVD('L','V', ... ) */
+/*    66= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVD('L','N', ... ) */
+/*    67= | A - U S U' | / ( |A| n ulp )        SSBEVD('L','V', ... ) */
+/*    68= | I - U U' | / ( n ulp )              SSBEVD('L','V', ... ) */
+/*    69= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVD('L','N', ... ) */
+/*    70= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','A', ... ) */
+/*    71= | I - U U' | / ( n ulp )              SSYEVR('L','V','A', ... ) */
+/*    72= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','A', ... ) */
+/*    73= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','I', ... ) */
+/*    74= | I - U U' | / ( n ulp )              SSYEVR('L','V','I', ... ) */
+/*    75= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','I', ... ) */
+/*    76= | A - U S U' | / ( |A| n ulp )        SSYEVR('L','V','V', ... ) */
+/*    77= | I - U U' | / ( n ulp )              SSYEVR('L','V','V', ... ) */
+/*    78= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSYEVR('L','N','V', ... ) */
+
+/*    Tests 25 through 78 are repeated (as tests 79 through 132) */
+/*    with UPLO='U' */
+
+/*    To be added in 1999 */
+
+/*    79= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','A', ... ) */
+/*    80= | I - U U' | / ( n ulp )              SSPEVR('L','V','A', ... ) */
+/*    81= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','A', ... ) */
+/*    82= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','I', ... ) */
+/*    83= | I - U U' | / ( n ulp )              SSPEVR('L','V','I', ... ) */
+/*    84= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','I', ... ) */
+/*    85= | A - U S U' | / ( |A| n ulp )        SSPEVR('L','V','V', ... ) */
+/*    86= | I - U U' | / ( n ulp )              SSPEVR('L','V','V', ... ) */
+/*    87= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSPEVR('L','N','V', ... ) */
+/*    88= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','A', ... ) */
+/*    89= | I - U U' | / ( n ulp )              SSBEVR('L','V','A', ... ) */
+/*    90= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','A', ... ) */
+/*    91= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','I', ... ) */
+/*    92= | I - U U' | / ( n ulp )              SSBEVR('L','V','I', ... ) */
+/*    93= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','I', ... ) */
+/*    94= | A - U S U' | / ( |A| n ulp )        SSBEVR('L','V','V', ... ) */
+/*    95= | I - U U' | / ( n ulp )              SSBEVR('L','V','V', ... ) */
+/*    96= |D(with Z) - D(w/o Z)| / (|D| ulp)    SSBEVR('L','N','V', ... ) */
+
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d1;
     --d2;
@@ -633,22 +641,24 @@ static integer c__3 = 3;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --tau;
     --work;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Keep ftrnchek happy */
+/*     Keep ftrnchek happy */
 
     vl = 0.f;
     vu = 0.f;
@@ -768,20 +778,20 @@ static integer c__3 = 3;
 /* L30: */
 	    }
 
-/*           2)      Compute "A"   
+/*           2)      Compute "A" */
 
-                     Control parameters:   
+/*                   Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, (w/ eigenvalues)   
-             =5         random log   symmetric, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random symmetric   
-             =9                      band symmetric, w/ eigenvalues */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, (w/ eigenvalues) */
+/*           =5         random log   symmetric, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random symmetric */
+/*           =9                      band symmetric, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -816,9 +826,9 @@ L70:
 	    iinfo = 0;
 	    cond = ulpinv;
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                     Zero */
+/*                   Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -829,7 +839,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 /* L80: */
 		}
 
@@ -895,7 +905,7 @@ L70:
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
 			i__ = j - idiag;
-			a_ref(i__, j) = u_ref(irow, j);
+			a[i__ + j * a_dim1] = u[irow + j * u_dim1];
 /* L90: */
 		    }
 /* L100: */
@@ -939,16 +949,16 @@ L110:
 		ntest = 1;
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L120: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L130: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
-		sstev_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1],
+		sstev_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
 		    io___48.ciunit = *nounit;
@@ -975,12 +985,12 @@ L110:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L140: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L150: */
 		}
 		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z__[
@@ -989,11 +999,11 @@ L110:
 		ntest = 3;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L160: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEV", (ftnlen)6, (ftnlen)5);
-		sstev_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1],
+		sstev_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
 		    io___49.ciunit = *nounit;
@@ -1039,12 +1049,12 @@ L180:
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
 		    eveigs[i__] = d3[i__];
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L190: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L200: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1083,12 +1093,12 @@ L180:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L210: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L220: */
 		}
 		sstt21_(&n, &c__0, &d3[1], &d4[1], &wa1[1], &d2[1], &z__[
@@ -1097,7 +1107,7 @@ L180:
 		ntest = 6;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L230: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1149,12 +1159,12 @@ L250:
 		ntest = 7;
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L260: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L270: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1193,12 +1203,12 @@ L250:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L280: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L290: */
 		}
 		sstt21_(&n, &c__0, &d3[1], &d4[1], &wa1[1], &d2[1], &z__[
@@ -1207,7 +1217,7 @@ L250:
 		ntest = 9;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L300: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1261,12 +1271,12 @@ L320:
 		ntest = 10;
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L330: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L340: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1298,12 +1308,12 @@ L320:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L350: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L360: */
 		}
 		i__3 = max(1,m2);
@@ -1314,7 +1324,7 @@ L320:
 		ntest = 12;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L370: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1387,12 +1397,12 @@ L380:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L390: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L400: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1431,12 +1441,12 @@ L380:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L410: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L420: */
 		}
 		i__3 = max(1,m2);
@@ -1446,7 +1456,7 @@ L380:
 		ntest = 15;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L430: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVX", (ftnlen)6, (ftnlen)6);
@@ -1487,17 +1497,17 @@ L440:
 		ntest = 16;
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L450: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L460: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
 		sstevd_("V", &n, &d1[1], &d2[1], &z__[z_offset], ldu, &work[1]
-			, &lwedc, &iwork[1], &liwedc, &iinfo);
+, &lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___64.ciunit = *nounit;
 		    s_wsfe(&io___64);
@@ -1523,12 +1533,12 @@ L440:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L470: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L480: */
 		}
 		sstt21_(&n, &c__0, &d3[1], &d4[1], &d1[1], &d2[1], &z__[
@@ -1537,12 +1547,12 @@ L440:
 		ntest = 18;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L490: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVD", (ftnlen)6, (ftnlen)6);
 		sstevd_("N", &n, &d3[1], &d4[1], &z__[z_offset], ldu, &work[1]
-			, &lwedc, &iwork[1], &liwedc, &iinfo);
+, &lwedc, &iwork[1], &liwedc, &iinfo);
 		if (iinfo != 0) {
 		    io___65.ciunit = *nounit;
 		    s_wsfe(&io___65);
@@ -1588,12 +1598,12 @@ L510:
 		ntest = 19;
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L520: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L530: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1626,12 +1636,12 @@ L510:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L540: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L550: */
 		}
 		i__3 = max(1,m2);
@@ -1642,7 +1652,7 @@ L510:
 		ntest = 21;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L560: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1716,12 +1726,12 @@ L570:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d1[i__] = a_ref(i__, i__);
+		    d1[i__] = a[i__ + i__ * a_dim1];
 /* L580: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d2[i__] = a_ref(i__ + 1, i__);
+		    d2[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L590: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1761,12 +1771,12 @@ L570:
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d3[i__] = a_ref(i__, i__);
+		    d3[i__] = a[i__ + i__ * a_dim1];
 /* L600: */
 		}
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L610: */
 		}
 		i__3 = max(1,m2);
@@ -1776,7 +1786,7 @@ L570:
 		ntest = 24;
 		i__3 = n - 1;
 		for (i__ = 1; i__ <= i__3; ++i__) {
-		    d4[i__] = a_ref(i__ + 1, i__);
+		    d4[i__] = a[i__ + 1 + i__ * a_dim1];
 /* L620: */
 		}
 		s_copy(srnamc_1.srnamt, "SSTEVR", (ftnlen)6, (ftnlen)6);
@@ -1827,8 +1837,8 @@ L630:
 		ntest = 24;
 	    }
 
-/*           Perform remaining tests storing upper or lower triangular   
-             part of matrix. */
+/*           Perform remaining tests storing upper or lower triangular */
+/*           part of matrix. */
 
 	    for (iuplo = 0; iuplo <= 1; ++iuplo) {
 		if (iuplo == 0) {
@@ -1875,7 +1885,7 @@ L630:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -2003,7 +2013,7 @@ L660:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		ntest += 2;
 		s_copy(srnamc_1.srnamt, "SSYEVX", (ftnlen)6, (ftnlen)6);
@@ -2235,8 +2245,8 @@ L700:
 
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2244,7 +2254,7 @@ L700:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L710: */
 			}
@@ -2256,7 +2266,7 @@ L700:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L730: */
 			}
@@ -2298,7 +2308,7 @@ L700:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2306,7 +2316,7 @@ L700:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L750: */
 			}
@@ -2318,7 +2328,7 @@ L700:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L770: */
 			}
@@ -2373,8 +2383,8 @@ L700:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array WORK with the upper or lower triangular part   
-                of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular part */
+/*              of the matrix in packed form. */
 
 L800:
 		if (iuplo == 1) {
@@ -2383,7 +2393,7 @@ L800:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L810: */
 			}
@@ -2395,7 +2405,7 @@ L800:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L830: */
 			}
@@ -2444,7 +2454,7 @@ L800:
 		s_copy(srnamc_1.srnamt, "SSPEVX", (ftnlen)6, (ftnlen)6);
 		sspevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
-			, &iwork[1], &iwork[n * 5 + 1], &iinfo);
+, &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___83.ciunit = *nounit;
 		    s_wsfe(&io___83);
@@ -2475,7 +2485,7 @@ L800:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2485,7 +2495,7 @@ L800:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L850: */
 			}
@@ -2497,7 +2507,7 @@ L800:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L870: */
 			}
@@ -2560,7 +2570,7 @@ L900:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L910: */
 			}
@@ -2572,7 +2582,7 @@ L900:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L930: */
 			}
@@ -2626,7 +2636,7 @@ L900:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L950: */
 			}
@@ -2638,7 +2648,7 @@ L900:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L970: */
 			}
@@ -2703,7 +2713,7 @@ L990:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1000: */
 			}
@@ -2715,7 +2725,7 @@ L990:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1020: */
 			}
@@ -2769,7 +2779,7 @@ L990:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1040: */
 			}
@@ -2781,7 +2791,7 @@ L990:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1060: */
 			}
@@ -2853,8 +2863,8 @@ L1080:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2863,7 +2873,8 @@ L1080:
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1090: */
 			}
 /* L1100: */
@@ -2875,7 +2886,7 @@ L1080:
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__7; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1110: */
 			}
 /* L1120: */
@@ -2916,7 +2927,7 @@ L1080:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2925,7 +2936,8 @@ L1080:
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1130: */
 			}
 /* L1140: */
@@ -2937,7 +2949,7 @@ L1080:
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1150: */
 			}
 /* L1160: */
@@ -2991,8 +3003,8 @@ L1080:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L1180:
 		if (iuplo == 1) {
@@ -3002,7 +3014,8 @@ L1180:
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1190: */
 			}
 /* L1200: */
@@ -3014,7 +3027,7 @@ L1180:
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1210: */
 			}
 /* L1220: */
@@ -3057,7 +3070,7 @@ L1180:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa2[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -3068,7 +3081,8 @@ L1180:
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1230: */
 			}
 /* L1240: */
@@ -3080,7 +3094,7 @@ L1180:
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__7; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1250: */
 			}
 /* L1260: */
@@ -3145,7 +3159,8 @@ L1280:
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1290: */
 			}
 /* L1300: */
@@ -3157,7 +3172,7 @@ L1280:
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1310: */
 			}
 /* L1320: */
@@ -3210,7 +3225,8 @@ L1280:
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1330: */
 			}
 /* L1340: */
@@ -3222,7 +3238,7 @@ L1280:
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1350: */
 			}
 /* L1360: */
@@ -3284,7 +3300,8 @@ L1370:
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1380: */
 			}
 /* L1390: */
@@ -3296,7 +3313,7 @@ L1370:
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__7; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1400: */
 			}
 /* L1410: */
@@ -3349,7 +3366,8 @@ L1370:
 			i__7 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__7,i__4); i__ <= i__5; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1420: */
 			}
 /* L1430: */
@@ -3361,7 +3379,7 @@ L1370:
 			i__7 = n, i__4 = j + kd;
 			i__5 = min(i__7,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1440: */
 			}
 /* L1450: */
@@ -3459,7 +3477,7 @@ L1460:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -3516,8 +3534,8 @@ L1480:
 
 		slacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -3525,7 +3543,7 @@ L1480:
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1490: */
 			}
@@ -3537,7 +3555,7 @@ L1480:
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1510: */
 			}
@@ -3580,7 +3598,7 @@ L1480:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -3589,7 +3607,7 @@ L1480:
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
 
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1530: */
 			}
@@ -3601,7 +3619,7 @@ L1480:
 		    for (j = 1; j <= i__3; ++j) {
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    work[indx] = a_ref(i__, j);
+			    work[indx] = a[i__ + j * a_dim1];
 			    ++indx;
 /* L1550: */
 			}
@@ -3670,8 +3688,8 @@ L1580:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -3680,7 +3698,8 @@ L1580:
 			i__5 = 1, i__7 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__7); i__ <= i__4; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1590: */
 			}
 /* L1600: */
@@ -3692,7 +3711,7 @@ L1580:
 			i__5 = n, i__7 = j + kd;
 			i__4 = min(i__5,i__7);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1610: */
 			}
 /* L1620: */
@@ -3734,7 +3753,7 @@ L1580:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -3743,7 +3762,8 @@ L1580:
 			i__4 = 1, i__5 = j - kd;
 			i__7 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__7; ++i__) {
-			    v_ref(kd + 1 + i__ - j, j) = a_ref(i__, j);
+			    v[kd + 1 + i__ - j + j * v_dim1] = a[i__ + j * 
+				    a_dim1];
 /* L1630: */
 			}
 /* L1640: */
@@ -3755,7 +3775,7 @@ L1580:
 			i__4 = n, i__5 = j + kd;
 			i__7 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__7; ++i__) {
-			    v_ref(i__ + 1 - j, j) = a_ref(i__, j);
+			    v[i__ + 1 - j + j * v_dim1] = a[i__ + j * a_dim1];
 /* L1650: */
 			}
 /* L1660: */
@@ -3853,7 +3873,7 @@ L1680:
 
 		ssyt21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &result[ntest]);
+, &work[1], &result[ntest]);
 
 		ntest += 2;
 		s_copy(srnamc_1.srnamt, "SSYEVR", (ftnlen)6, (ftnlen)6);
@@ -4098,7 +4118,7 @@ L1710:
 
 	    ntestt += ntest;
 
-	    slafts_("SST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
+	    slafts_("SST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh, 
 		     nounit, &nerrs);
 
 L1730:
@@ -4117,9 +4137,3 @@ L1730:
 /*     End of SDRVST */
 
 } /* sdrvst_ */
-
-#undef v_ref
-#undef u_ref
-#undef a_ref
-
-

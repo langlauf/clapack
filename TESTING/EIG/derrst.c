@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -33,16 +28,14 @@ static doublereal c_b221 = 1.;
 static integer c__23 = 23;
 static integer c__28 = 28;
 static integer c__12 = 12;
-static integer c__22 = 22;
 static integer c__19 = 19;
 static integer c__11 = 11;
-static integer c__27 = 27;
 static integer c__4 = 4;
 static integer c__20 = 20;
 static integer c__5 = 5;
+static integer c__27 = 27;
 static integer c__16 = 16;
 static integer c__8 = 8;
-static integer c__7 = 7;
 static integer c__25 = 25;
 static integer c__18 = 18;
 
@@ -63,33 +56,32 @@ static integer c__18 = 18;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublereal a[9]	/* was [3][3] */, c__[9]	/* was [3][3] 
-	    */, d__[3], e[3];
-    static integer i__, j, m, n;
-    static doublereal q[9]	/* was [3][3] */, r__[3], w[60], x[3], z__[9]	
-	    /* was [3][3] */;
+    doublereal a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */, d__[
+	    3], e[3];
+    integer i__, j, m, n;
+    doublereal q[9]	/* was [3][3] */, r__[3], w[60], x[3], z__[9]	/* 
+	    was [3][3] */;
+    char c2[2];
+    integer i1[3], i2[3], i3[3], iw[36], nt;
+    doublereal tau[3];
+    integer info;
     extern /* Subroutine */ int dsbev_(char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *), dspev_(char *, char *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
-	    doublereal *, integer *);
-    static char c2[2];
-    extern /* Subroutine */ int dstev_(char *, integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    static integer i1[3], i2[3], i3[3];
-    extern /* Subroutine */ int dsyev_(char *, char *, integer *, doublereal *
-	    , integer *, doublereal *, doublereal *, integer *, integer *);
-    static integer iw[36], nt;
-    extern /* Subroutine */ int dstedc_(char *, integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    integer *, integer *, integer *), dsbevd_(char *, char *, 
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, integer *), dstev_(char *, integer *
+, doublereal *, doublereal *, doublereal *, integer *, doublereal 
+	    *, integer *), dsyev_(char *, char *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    integer *), dstedc_(char *, integer *, doublereal 
+	    *, doublereal *, doublereal *, integer *, doublereal *, integer *, 
+	     integer *, integer *, integer *), dsbevd_(char *, char *, 
+	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int dsbtrd_(char *, char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *, doublereal *, integer *), chkxer_(
 	    char *, integer *, integer *, logical *, logical *), 
 	    dspevd_(char *, char *, integer *, doublereal *, doublereal *, 
@@ -98,7 +90,7 @@ static integer c__18 = 18;
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, integer *), dsterf_(integer *, doublereal *, 
-	    doublereal *, integer *), dstevd_(char *, integer *, doublereal *,
+	    doublereal *, integer *), dstevd_(char *, integer *, doublereal *, 
 	     doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *, integer *, integer *), dsbevx_(char *, char *, 
 	    char *, integer *, integer *, doublereal *, integer *, doublereal 
@@ -115,29 +107,29 @@ static integer c__18 = 18;
 	    doublereal *, integer *, doublereal *, integer *), 
 	    dorgtr_(char *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, integer *), dsptrd_(char *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *, 
 	     integer *), dsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *), dopmtr_(char *, char *, char *, integer *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
 	     integer *), dormtr_(char *, char *, char 
 	    *, integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), dstevr_(char *, char *, integer *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *, 
 	     integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, doublereal *, integer *, integer *, integer 
 	    *, integer *);
-    static integer nsplit;
+    integer nsplit;
     extern /* Subroutine */ int dspevx_(char *, char *, char *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, integer *, integer *, integer *), dsytrd_(char *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *, 
 	     integer *), dsyevr_(char *, char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, doublereal *, integer *, integer *, integer 
 	    *, integer *), dstevx_(char *, char *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *, 
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *), dsyevx_(char *, char *, char *, 
@@ -145,7 +137,6 @@ static integer c__18 = 18;
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *);
-    static doublereal tau[3];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -154,35 +145,50 @@ static integer c__18 = 18;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*3 + a_1 - 4]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRST tests the error exits for DSYTRD, DORGTR, DORMTR, DSPTRD, */
+/*  DOPGTR, DOPMTR, DSTEQR, SSTERF, SSTEBZ, SSTEIN, DPTEQR, DSBTRD, */
+/*  DSYEV, SSYEVX, SSYEVD, DSBEV, SSBEVX, SSBEVD, */
+/*  DSPEV, SSPEVX, SSPEVD, DSTEV, SSTEVX, SSTEVD, and SSTEDC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRST tests the error exits for DSYTRD, DORGTR, DORMTR, DSPTRD,   
-    DOPGTR, DOPMTR, DSTEQR, SSTERF, SSTEBZ, SSTEIN, DPTEQR, DSBTRD,   
-    DSYEV, SSYEVX, SSYEVD, DSBEV, SSBEVX, SSBEVD,   
-    DSPEV, SSPEVX, SSPEVD, DSTEV, SSTEVX, SSTEVD, and SSTEDC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    =====================================================================   
-
-       NMAX has to be at least 3 or LIW may be too small */
+/*     NMAX has to be at least 3 or LIW may be too small */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -194,7 +200,7 @@ static integer c__18 = 18;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + j * 3 - 4] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 /* L20: */
@@ -395,42 +401,42 @@ static integer c__18 = 18;
 
 	s_copy(srnamc_1.srnamt, "DSTEBZ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dstebz_("/", "E", &c__0, &c_b220, &c_b221, &c__1, &c__0, &c_b220, d__,
+	dstebz_("/", "E", &c__0, &c_b220, &c_b221, &c__1, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dstebz_("A", "/", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	dstebz_("A", "/", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dstebz_("A", "E", &c_n1, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	dstebz_("A", "E", &c_n1, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dstebz_("V", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	dstebz_("V", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dstebz_("I", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	dstebz_("I", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__2, &c__1, &c_b220, d__,
+	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__2, &c__1, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__0, &c_b220, d__,
+	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__2, &c_b220, d__,
+	dstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__2, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("DSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -507,11 +513,11 @@ static integer c__18 = 18;
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__12, iw, &c__12, &info);
+	dstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__0, iw, &c__12, &info);
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__22, iw, &c__28, &info);
+	dstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__0, iw, &c__28, &info);
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
@@ -519,11 +525,11 @@ static integer c__18 = 18;
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__19, iw, &c__11, &info);
+	dstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__19, iw, &c__0, &info);
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__23, iw, &c__27, &info);
+	dstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__23, iw, &c__0, &info);
 	chkxer_("DSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 9;
@@ -931,7 +937,7 @@ static integer c__18 = 18;
 		infoc_1.ok);
 	infoc_1.infot = 17;
 	dsyevx_("V", "A", "U", &c__1, a, &c__1, &c_b220, &c_b220, &c__0, &
-		c__0, &c_b220, &m, x, z__, &c__1, w, &c__7, iw, i3, &info);
+		c__0, &c_b220, &m, x, z__, &c__1, w, &c__0, iw, i3, &info);
 	chkxer_("DSYEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 12;
@@ -1101,27 +1107,27 @@ static integer c__18 = 18;
 
 	s_copy(srnamc_1.srnamt, "DSBEVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dsbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	dsbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dsbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	dsbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dsbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	dsbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dsbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	dsbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	dsbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__4, iw,
+	dsbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__4, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1131,12 +1137,12 @@ static integer c__18 = 18;
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dsbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, iw,
+	dsbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dsbevd_("N", "U", &c__2, &c__0, a, &c__1, x, z__, &c__1, w, &c__3, iw,
+	dsbevd_("N", "U", &c__2, &c__0, a, &c__1, x, z__, &c__1, w, &c__3, iw, 
 		 &c__1, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1146,7 +1152,7 @@ static integer c__18 = 18;
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	dsbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	dsbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__0, &info);
 	chkxer_("DSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1289,7 +1295,3 @@ static integer c__18 = 18;
 /*     End of DERRST */
 
 } /* derrst_ */
-
-#undef a_ref
-
-

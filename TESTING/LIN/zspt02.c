@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,93 +16,100 @@ static integer c__1 = 1;
     doublecomplex z__1;
 
     /* Local variables */
-    static integer j;
-    static doublereal anorm, bnorm, xnorm;
+    integer j;
+    doublereal eps, anorm, bnorm, xnorm;
     extern /* Subroutine */ int zspmv_(char *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *);
     extern doublereal dlamch_(char *), dzasum_(integer *, 
 	    doublecomplex *, integer *), zlansp_(char *, char *, integer *, 
 	    doublecomplex *, doublereal *);
-    static doublereal eps;
 
 
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZSPT02 computes the residual in the solution of a complex symmetric */
+/*  system of linear equations  A*x = b  when packed storage is used for */
+/*  the coefficient matrix.  The ratio computed is */
 
-    Purpose   
-    =======   
+/*     RESID = norm( B - A*X ) / ( norm(A) * norm(X) * EPS). */
 
-    ZSPT02 computes the residual in the solution of a complex symmetric   
-    system of linear equations  A*x = b  when packed storage is used for   
-    the coefficient matrix.  The ratio computed is   
+/*  where EPS is the machine precision. */
 
-       RESID = norm( B - A*X ) / ( norm(A) * norm(X) * EPS).   
+/*  Arguments */
+/*  ========= */
 
-    where EPS is the machine precision.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          complex symmetric matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            complex symmetric matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B, the matrix of right hand sides. */
+/*          NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The original complex symmetric matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B, the matrix of right hand sides.   
-            NRHS >= 0.   
+/*  X       (input) COMPLEX*16 array, dimension (LDX,NRHS) */
+/*          The computed solution vectors for the system of linear */
+/*          equations. */
 
-    A       (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The original complex symmetric matrix A, stored as a packed   
-            triangular matrix.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.   LDX >= max(1,N). */
 
-    X       (input) COMPLEX*16 array, dimension (LDX,NRHS)   
-            The computed solution vectors for the system of linear   
-            equations.   
+/*  B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS) */
+/*          On entry, the right hand side vectors for the system of */
+/*          linear equations. */
+/*          On exit, B is overwritten with the difference B - A*X. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.   LDX >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS)   
-            On entry, the right hand side vectors for the system of   
-            linear equations.   
-            On exit, B is overwritten with the difference B - A*X.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          The maximum over the number of right hand sides of */
+/*          norm(B - A*X) / ( norm(A) * norm(X) * EPS ). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            The maximum over the number of right hand sides of   
-            norm(B - A*X) / ( norm(A) * norm(X) * EPS ).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0 or NRHS = 0 */
 
-
-       Quick exit if N = 0 or NRHS = 0   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --a;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --rwork;
 
@@ -130,20 +132,20 @@ static integer c__1 = 1;
 
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	z__1.r = -1., z__1.i = 0.;
-	zspmv_(uplo, n, &z__1, &a[1], &x_ref(1, j), &c__1, &c_b1, &b_ref(1, j)
-		, &c__1);
+	z__1.r = -1., z__1.i = -0.;
+	zspmv_(uplo, n, &z__1, &a[1], &x[j * x_dim1 + 1], &c__1, &c_b1, &b[j *
+		 b_dim1 + 1], &c__1);
 /* L10: */
     }
 
-/*     Compute the maximum over the number of right hand sides of   
-          norm( B - A*X ) / ( norm(A) * norm(X) * EPS ) . */
+/*     Compute the maximum over the number of right hand sides of */
+/*        norm( B - A*X ) / ( norm(A) * norm(X) * EPS ) . */
 
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = dzasum_(n, &b_ref(1, j), &c__1);
-	xnorm = dzasum_(n, &x_ref(1, j), &c__1);
+	bnorm = dzasum_(n, &b[j * b_dim1 + 1], &c__1);
+	xnorm = dzasum_(n, &x[j * x_dim1 + 1], &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -159,10 +161,3 @@ static integer c__1 = 1;
 /*     End of ZSPT02 */
 
 } /* zspt02_ */
-
-#undef x_ref
-#undef x_subscr
-#undef b_ref
-#undef b_subscr
-
-

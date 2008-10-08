@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -37,17 +32,16 @@ static real c_b152 = -1.f;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static real w[12], x[4], rcond;
-    static char c2[2];
-    static real r1[4], r2[4], af[16]	/* was [4][4] */;
-    static integer ip[4];
+    real a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    real w[12], x[4];
+    char c2[2];
+    real r1[4], r2[4], af[16]	/* was [4][4] */;
+    integer ip[4], iw[4], info;
+    real anrm, rcond;
     extern /* Subroutine */ int ssytf2_(char *, integer *, real *, integer *, 
-	    integer *, integer *);
-    static integer iw[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    integer *, integer *), alaesm_(char *, logical *, integer 
+	    *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), sspcon_(char *, integer *, real *, integer 
@@ -59,11 +53,11 @@ static real c_b152 = -1.f;
 	    ssptrf_(char *, integer *, real *, integer *, integer *), 
 	    ssptri_(char *, integer *, real *, integer *, real *, integer *), ssyrfs_(char *, integer *, integer *, real *, integer *, 
 	    real *, integer *, integer *, real *, integer *, real *, integer *
-	    , real *, real *, real *, integer *, integer *), ssytrf_(
+, real *, real *, real *, integer *, integer *), ssytrf_(
 	    char *, integer *, real *, integer *, integer *, real *, integer *
-	    , integer *), ssytri_(char *, integer *, real *, integer *
-	    , integer *, real *, integer *), ssptrs_(char *, integer *
-	    , integer *, real *, integer *, real *, integer *, integer *), ssytrs_(char *, integer *, integer *, real *, integer *, 
+, integer *), ssytri_(char *, integer *, real *, integer *
+, integer *, real *, integer *), ssptrs_(char *, integer *
+, integer *, real *, integer *, real *, integer *, integer *), ssytrs_(char *, integer *, integer *, real *, integer *, 
 	    integer *, real *, integer *, integer *);
 
     /* Fortran I/O blocks */
@@ -71,33 +65,47 @@ static real c_b152 = -1.f;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRSY tests the error exits for the REAL routines */
+/*  for symmetric indefinite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRSY tests the error exits for the REAL routines   
-    for symmetric indefinite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -109,8 +117,8 @@ static real c_b152 = -1.f;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1.f / (real) (i__ + j);
-	    af_ref(i__, j) = 1.f / (real) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1.f / (real) (i__ + j);
+	    af[i__ + (j << 2) - 5] = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -128,10 +136,10 @@ static real c_b152 = -1.f;
 
     if (lsamen_(&c__2, c2, "SY")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman   
-          factorization of a symmetric indefinite matrix.   
+/*        Test error exits of the routines that use the Bunch-Kaufman */
+/*        factorization of a symmetric indefinite matrix. */
 
-          SSYTRF */
+/*        SSYTRF */
 
 	s_copy(srnamc_1.srnamt, "SSYTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -264,10 +272,10 @@ static real c_b152 = -1.f;
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman   
-          factorization of a symmetric indefinite packed matrix.   
+/*        Test error exits of the routines that use the Bunch-Kaufman */
+/*        factorization of a symmetric indefinite packed matrix. */
 
-          SSPTRF */
+/*        SSPTRF */
 
 	s_copy(srnamc_1.srnamt, "SSPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -366,8 +374,3 @@ static real c_b152 = -1.f;
 /*     End of SERRSY */
 
 } /* serrsy_ */
-
-#undef af_ref
-#undef a_ref
-
-

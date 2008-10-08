@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -42,39 +37,37 @@ static integer c__4 = 4;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real anrm;
-    static complex a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static real r__[4], ccond;
-    static complex w[8], x[4];
-    static real rcond;
-    static char c2[2];
-    static real r1[4], r2[4];
+    complex a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    real r__[4];
+    complex w[8], x[4];
+    char c2[2];
+    real r1[4], r2[4];
+    complex af[16]	/* was [4][4] */;
+    integer ip[4], info;
+    real anrm, ccond, rcond;
     extern /* Subroutine */ int cgbtf2_(integer *, integer *, integer *, 
 	    integer *, complex *, integer *, integer *, integer *), cgetf2_(
-	    integer *, integer *, complex *, integer *, integer *, integer *);
-    static complex af[16]	/* was [4][4] */;
-    static integer ip[4];
-    extern /* Subroutine */ int cgbcon_(char *, integer *, integer *, integer 
-	    *, complex *, integer *, integer *, real *, real *, complex *, 
-	    real *, integer *), cgecon_(char *, integer *, complex *, 
-	    integer *, real *, real *, complex *, real *, integer *), 
-	    alaesm_(char *, logical *, integer *), cgbequ_(integer *, 
-	    integer *, integer *, integer *, complex *, integer *, real *, 
-	    real *, real *, real *, real *, integer *), cgbrfs_(char *, 
-	    integer *, integer *, integer *, integer *, complex *, integer *, 
-	    complex *, integer *, integer *, complex *, integer *, complex *, 
-	    integer *, real *, real *, complex *, real *, integer *), 
-	    cgbtrf_(integer *, integer *, integer *, integer *, complex *, 
-	    integer *, integer *, integer *), cgeequ_(integer *, integer *, 
-	    complex *, integer *, real *, real *, real *, real *, real *, 
-	    integer *), cgerfs_(char *, integer *, integer *, complex *, 
+	    integer *, integer *, complex *, integer *, integer *, integer *),
+	     cgbcon_(char *, integer *, integer *, integer *, complex *, 
+	    integer *, integer *, real *, real *, complex *, real *, integer *
+), cgecon_(char *, integer *, complex *, integer *, real *
+, real *, complex *, real *, integer *), alaesm_(char *, 
+	    logical *, integer *), cgbequ_(integer *, integer *, 
+	    integer *, integer *, complex *, integer *, real *, real *, real *
+, real *, real *, integer *), cgbrfs_(char *, integer *, integer *
+, integer *, integer *, complex *, integer *, complex *, integer *
+, integer *, complex *, integer *, complex *, integer *, real *, 
+	    real *, complex *, real *, integer *), cgbtrf_(integer *, 
+	    integer *, integer *, integer *, complex *, integer *, integer *, 
+	    integer *), cgeequ_(integer *, integer *, complex *, integer *, 
+	    real *, real *, real *, real *, real *, integer *), cgerfs_(char *
+, integer *, integer *, complex *, integer *, complex *, integer *
+, integer *, complex *, integer *, complex *, integer *, real *, 
+	    real *, complex *, real *, integer *), cgetrf_(integer *, 
+	    integer *, complex *, integer *, integer *, integer *), cgetri_(
 	    integer *, complex *, integer *, integer *, complex *, integer *, 
-	    complex *, integer *, real *, real *, complex *, real *, integer *
-	    ), cgetrf_(integer *, integer *, complex *, integer *, 
-	    integer *, integer *), cgetri_(integer *, complex *, integer *, 
-	    integer *, complex *, integer *, integer *);
+	    integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int cgbtrs_(char *, integer *, integer *, integer 
 	    *, integer *, complex *, integer *, integer *, complex *, integer 
@@ -88,35 +81,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRGE tests the error exits for the COMPLEX routines */
+/*  for general matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRGE tests the error exits for the COMPLEX routines   
-    for general matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -128,12 +133,12 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
@@ -153,8 +158,8 @@ static integer c__4 = 4;
     }
     infoc_1.ok = TRUE_;
 
-/*     Test error exits of the routines that use the LU decomposition   
-       of a general matrix. */
+/*     Test error exits of the routines that use the LU decomposition */
+/*     of a general matrix. */
 
     if (lsamen_(&c__2, c2, "GE")) {
 
@@ -304,8 +309,8 @@ static integer c__4 = 4;
 	chkxer_("CGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the LU decomposition   
-       of a general band matrix. */
+/*     Test error exits of the routines that use the LU decomposition */
+/*     of a general band matrix. */
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
@@ -449,27 +454,27 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CGBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	cgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	cgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	cgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r__,
+	cgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r__,
+	cgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("CGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -513,10 +518,3 @@ static integer c__4 = 4;
 /*     End of CERRGE */
 
 } /* cerrge_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

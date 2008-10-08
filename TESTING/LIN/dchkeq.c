@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -34,23 +29,24 @@ static integer c__1 = 1;
     integer i__1, i__2, i__3, i__4, i__5, i__6, i__7, i__8;
     doublereal d__1, d__2, d__3;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double pow_di(doublereal *, integer *);
     integer pow_ii(integer *, integer *), s_wsle(cilist *), e_wsle(void), 
 	    s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static char path[3];
-    static doublereal norm, rpow[11], a[25]	/* was [5][5] */, c__[5];
-    static integer i__, j, m, n;
-    static doublereal r__[5], ccond, rcond, rcmin, rcmax, ratio, ab[65]	/* 
-	    was [13][5] */, ap[15];
-    static integer kl;
+    doublereal a[25]	/* was [5][5] */, c__[5];
+    integer i__, j, m, n;
+    doublereal r__[5], ab[65]	/* was [13][5] */, ap[15];
+    integer kl;
+    logical ok;
+    integer ku;
+    doublereal eps, pow[11];
+    integer info;
+    char path[3];
+    doublereal norm, rpow[11], ccond, rcond, rcmin, rcmax, ratio;
     extern doublereal dlamch_(char *);
-    static logical ok;
-    static integer ku;
     extern /* Subroutine */ int dgbequ_(integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, integer *), dgeequ_(
@@ -59,10 +55,10 @@ static integer c__1 = 1;
 	    , dpbequ_(char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    dpoequ_(integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *), dppequ_(char *, integer *,
+	    doublereal *, doublereal *, integer *), dppequ_(char *, integer *, 
 	     doublereal *, doublereal *, doublereal *, doublereal *, integer *
-	    );
-    static doublereal reslts[5], eps, pow[11];
+);
+    doublereal reslts[5];
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, 0, 0 };
@@ -75,32 +71,42 @@ static integer c__1 = 1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*5 + a_1 - 6]
-#define ab_ref(a_1,a_2) ab[(a_2)*13 + a_1 - 14]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DCHKEQ tests DGEEQU, DGBEQU, DPOEQU, DPPEQU and DPBEQU */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DCHKEQ tests DGEEQU, DGBEQU, DPOEQU, DPPEQU and DPBEQU   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          Threshold for testing routines. Should be between 2 and 10. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            Threshold for testing routines. Should be between 2 and 10.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "EQ", (ftnlen)2, (ftnlen)2);
@@ -126,9 +132,10 @@ static integer c__1 = 1;
 		for (i__ = 1; i__ <= 5; ++i__) {
 		    if (i__ <= m && j <= n) {
 			i__1 = i__ + j;
-			a_ref(i__, j) = pow[i__ + j] * pow_ii(&c_n1, &i__1);
+			a[i__ + j * 5 - 6] = pow[i__ + j] * pow_ii(&c_n1, &
+				i__1);
 		    } else {
-			a_ref(i__, j) = 0.;
+			a[i__ + j * 5 - 6] = 0.;
 		    }
 /* L30: */
 		}
@@ -180,7 +187,7 @@ static integer c__1 = 1;
 /*     Test with zero rows and columns */
 
     for (j = 1; j <= 5; ++j) {
-	a_ref(4, j) = 0.;
+	a[j * 5 - 2] = 0.;
 /* L90: */
     }
     dgeequ_(&c__5, &c__5, a, &c__5, r__, c__, &rcond, &ccond, &norm, &info);
@@ -189,11 +196,11 @@ static integer c__1 = 1;
     }
 
     for (j = 1; j <= 5; ++j) {
-	a_ref(4, j) = 1.;
+	a[j * 5 - 2] = 1.;
 /* L100: */
     }
     for (i__ = 1; i__ <= 5; ++i__) {
-	a_ref(i__, 4) = 0.;
+	a[i__ + 14] = 0.;
 /* L110: */
     }
     dgeequ_(&c__5, &c__5, a, &c__5, r__, c__, &rcond, &ccond, &norm, &info);
@@ -217,7 +224,7 @@ static integer c__1 = 1;
 
 		    for (j = 1; j <= 5; ++j) {
 			for (i__ = 1; i__ <= 13; ++i__) {
-			    ab_ref(i__, j) = 0.;
+			    ab[i__ + j * 13 - 14] = 0.;
 /* L120: */
 			}
 /* L130: */
@@ -233,8 +240,8 @@ static integer c__1 = 1;
 			    if (i__ <= min(i__5,i__6) && i__ >= max(i__7,i__8)
 				     && j <= n) {
 				i__5 = i__ + j;
-				ab_ref(ku + 1 + i__ - j, j) = pow[i__ + j] * 
-					pow_ii(&c_n1, &i__5);
+				ab[ku + 1 + i__ - j + j * 13 - 14] = pow[i__ 
+					+ j] * pow_ii(&c_n1, &i__5);
 			    }
 /* L140: */
 			}
@@ -352,9 +359,9 @@ static integer c__1 = 1;
 	    for (j = 1; j <= 5; ++j) {
 		if (i__ <= n && j == i__) {
 		    i__1 = i__ + j;
-		    a_ref(i__, j) = pow[i__ + j] * pow_ii(&c_n1, &i__1);
+		    a[i__ + j * 5 - 6] = pow[i__ + j] * pow_ii(&c_n1, &i__1);
 		} else {
-		    a_ref(i__, j) = 0.;
+		    a[i__ + j * 5 - 6] = 0.;
 		}
 /* L260: */
 	    }
@@ -387,7 +394,7 @@ static integer c__1 = 1;
 	}
 /* L290: */
     }
-    a_ref(4, 4) = -1.;
+    a[18] = -1.;
     dpoequ_(&c__5, a, &c__5, r__, &rcond, &norm, &info);
     if (info != 4) {
 	reslts[2] = 1.;
@@ -498,14 +505,14 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    ab_ref(i__, j) = 0.;
+		    ab[i__ + j * 13 - 14] = 0.;
 /* L370: */
 		}
 /* L380: */
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		ab_ref(kl + 1, j) = pow[j * 2];
+		ab[kl + 1 + j * 13 - 14] = pow[j * 2];
 /* L390: */
 	    }
 
@@ -536,7 +543,7 @@ static integer c__1 = 1;
 	    if (n != 0) {
 /* Computing MAX */
 		i__2 = n - 1;
-		ab_ref(kl + 1, max(i__2,1)) = -1.;
+		ab[kl + 1 + max(i__2,1) * 13 - 14] = -1.;
 		dpbequ_("U", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -549,14 +556,14 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    ab_ref(i__, j) = 0.;
+		    ab[i__ + j * 13 - 14] = 0.;
 /* L410: */
 		}
 /* L420: */
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		ab_ref(1, j) = pow[j * 2];
+		ab[j * 13 - 13] = pow[j * 2];
 /* L430: */
 	    }
 
@@ -587,7 +594,7 @@ static integer c__1 = 1;
 	    if (n != 0) {
 /* Computing MAX */
 		i__2 = n - 1;
-		ab_ref(1, max(i__2,1)) = -1.;
+		ab[max(i__2,1) * 13 - 13] = -1.;
 		dpbequ_("L", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -652,8 +659,3 @@ static integer c__1 = 1;
 /*     End of DCHKEQ */
 
 } /* dchkeq_ */
-
-#undef ab_ref
-#undef a_ref
-
-

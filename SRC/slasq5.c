@@ -1,73 +1,86 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int slasq5_(integer *i0, integer *n0, real *z__, integer *pp,
+/* Subroutine */ int slasq5_(integer *i0, integer *n0, real *z__, integer *pp, 
 	 real *tau, real *dmin__, real *dmin1, real *dmin2, real *dn, real *
 	dnm1, real *dnm2, logical *ieee)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       May 17, 2000   
-
-
-    Purpose   
-    =======   
-
-    SLASQ5 computes one dqds transform in ping-pong form, one   
-    version for IEEE machines another for non IEEE machines.   
-
-    Arguments   
-    =========   
-
-    I0    (input) INTEGER   
-          First index.   
-
-    N0    (input) INTEGER   
-          Last index.   
-
-    Z     (input) REAL array, dimension ( 4*N )   
-          Z holds the qd array. EMIN is stored in Z(4*N0) to avoid   
-          an extra argument.   
-
-    PP    (input) INTEGER   
-          PP=0 for ping, PP=1 for pong.   
-
-    TAU   (input) REAL   
-          This is the shift.   
-
-    DMIN  (output) REAL   
-          Minimum value of d.   
-
-    DMIN1 (output) REAL   
-          Minimum value of d, excluding D( N0 ).   
-
-    DMIN2 (output) REAL   
-          Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
-
-    DN    (output) REAL   
-          d(N0), the last value of d.   
-
-    DNM1  (output) REAL   
-          d(N0-1).   
-
-    DNM2  (output) REAL   
-          d(N0-2).   
-
-    IEEE  (input) LOGICAL   
-          Flag for IEEE or non IEEE arithmetic.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1, r__2;
-    /* Local variables */
-    static real emin, temp, d__;
-    static integer j4, j4p2;
 
+    /* Local variables */
+    real d__;
+    integer j4, j4p2;
+    real emin, temp;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLASQ5 computes one dqds transform in ping-pong form, one */
+/*  version for IEEE machines another for non IEEE machines. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  I0    (input) INTEGER */
+/*        First index. */
+
+/*  N0    (input) INTEGER */
+/*        Last index. */
+
+/*  Z     (input) REAL array, dimension ( 4*N ) */
+/*        Z holds the qd array. EMIN is stored in Z(4*N0) to avoid */
+/*        an extra argument. */
+
+/*  PP    (input) INTEGER */
+/*        PP=0 for ping, PP=1 for pong. */
+
+/*  TAU   (input) REAL */
+/*        This is the shift. */
+
+/*  DMIN  (output) REAL */
+/*        Minimum value of d. */
+
+/*  DMIN1 (output) REAL */
+/*        Minimum value of d, excluding D( N0 ). */
+
+/*  DMIN2 (output) REAL */
+/*        Minimum value of d, excluding D( N0 ) and D( N0-1 ). */
+
+/*  DN    (output) REAL */
+/*        d(N0), the last value of d. */
+
+/*  DNM1  (output) REAL */
+/*        d(N0-1). */
+
+/*  DNM2  (output) REAL */
+/*        d(N0-2). */
+
+/*  IEEE  (input) LOGICAL */
+/*        Flag for IEEE or non IEEE arithmetic. */
+
+/*  ===================================================================== */
+
+/*     .. Parameter .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
@@ -206,4 +219,3 @@
 /*     End of SLASQ5 */
 
 } /* slasq5_ */
-

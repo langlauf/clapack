@@ -1,70 +1,13 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlasq3_(integer *i0, integer *n0, doublereal *z__, 
-	integer *pp, doublereal *dmin__, doublereal *sigma, doublereal *desig,
+	integer *pp, doublereal *dmin__, doublereal *sigma, doublereal *desig, 
 	 doublereal *qmax, integer *nfail, integer *iter, integer *ndiv, 
 	logical *ieee)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       May 17, 2000   
-
-
-    Purpose   
-    =======   
-
-    DLASQ3 checks for deflation, computes a shift (TAU) and calls dqds.   
-    In case of failure it changes shifts, and tries again until output   
-    is positive.   
-
-    Arguments   
-    =========   
-
-    I0     (input) INTEGER   
-           First index.   
-
-    N0     (input) INTEGER   
-           Last index.   
-
-    Z      (input) DOUBLE PRECISION array, dimension ( 4*N )   
-           Z holds the qd array.   
-
-    PP     (input) INTEGER   
-           PP=0 for ping, PP=1 for pong.   
-
-    DMIN   (output) DOUBLE PRECISION   
-           Minimum value of d.   
-
-    SIGMA  (output) DOUBLE PRECISION   
-           Sum of shifts used in current segment.   
-
-    DESIG  (input/output) DOUBLE PRECISION   
-           Lower order part of SIGMA   
-
-    QMAX   (input) DOUBLE PRECISION   
-           Maximum value of q.   
-
-    NFAIL  (output) INTEGER   
-           Number of times shift was too big.   
-
-    ITER   (output) INTEGER   
-           Number of iterations.   
-
-    NDIV   (output) INTEGER   
-           Number of divisions.   
-
-    TTYPE  (output) INTEGER   
-           Shift type.   
-
-    IEEE   (input) LOGICAL   
-           Flag for IEEE or non IEEE arithmetic (passed to DLASQ5).   
-
-    =====================================================================   
-
-       Parameter adjustments */
     /* Initialized data */
+
     static integer ttype = 0;
     static doublereal dmin1 = 0.;
     static doublereal dmin2 = 0.;
@@ -72,14 +15,20 @@
     static doublereal dn1 = 0.;
     static doublereal dn2 = 0.;
     static doublereal tau = 0.;
+
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static doublereal temp, s, t;
-    static integer j4;
+    doublereal s, t;
+    integer j4, nn;
+    doublereal eps, tol;
+    integer n0in, ipn4;
+    doublereal tol2, temp;
     extern /* Subroutine */ int dlasq4_(integer *, integer *, doublereal *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *)
@@ -90,14 +39,88 @@
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
     extern doublereal dlamch_(char *);
-    static integer nn;
-    static doublereal safmin, eps, tol;
-    static integer n0in, ipn4;
-    static doublereal tol2;
+    doublereal safmin;
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLASQ3 checks for deflation, computes a shift (TAU) and calls dqds. */
+/*  In case of failure it changes shifts, and tries again until output */
+/*  is positive. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  I0     (input) INTEGER */
+/*         First index. */
+
+/*  N0     (input) INTEGER */
+/*         Last index. */
+
+/*  Z      (input) DOUBLE PRECISION array, dimension ( 4*N ) */
+/*         Z holds the qd array. */
+
+/*  PP     (input) INTEGER */
+/*         PP=0 for ping, PP=1 for pong. */
+
+/*  DMIN   (output) DOUBLE PRECISION */
+/*         Minimum value of d. */
+
+/*  SIGMA  (output) DOUBLE PRECISION */
+/*         Sum of shifts used in current segment. */
+
+/*  DESIG  (input/output) DOUBLE PRECISION */
+/*         Lower order part of SIGMA */
+
+/*  QMAX   (input) DOUBLE PRECISION */
+/*         Maximum value of q. */
+
+/*  NFAIL  (output) INTEGER */
+/*         Number of times shift was too big. */
+
+/*  ITER   (output) INTEGER */
+/*         Number of iterations. */
+
+/*  NDIV   (output) INTEGER */
+/*         Number of divisions. */
+
+/*  TTYPE  (output) INTEGER */
+/*         Shift type. */
+
+/*  IEEE   (input) LOGICAL */
+/*         Flag for IEEE or non IEEE arithmetic (passed to DLASQ5). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Function .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Data statement .. */
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     n0in = *n0;
     eps = dlamch_("Precision");
@@ -210,20 +233,18 @@ L50:
 	    d__1 = *qmax, d__2 = z__[(*i0 << 2) + *pp - 3], d__1 = max(d__1,
 		    d__2), d__2 = z__[(*i0 << 2) + *pp + 1];
 	    *qmax = max(d__1,d__2);
-	    *dmin__ = 0.;
+	    *dmin__ = -0.;
 	}
     }
 
-/* L70:   
-
-   Computing MIN */
+/* Computing MIN */
     d__1 = z__[(*n0 << 2) + *pp - 1], d__2 = z__[(*n0 << 2) + *pp - 9], d__1 =
 	     min(d__1,d__2), d__2 = dmin2 + z__[(*n0 << 2) - *pp];
     if (*dmin__ < 0. || safmin * *qmax < min(d__1,d__2)) {
 
 /*        Choose a shift. */
 
-	dlasq4_(i0, n0, &z__[1], pp, &n0in, dmin__, &dmin1, &dmin2, &dn, &dn1,
+	dlasq4_(i0, n0, &z__[1], pp, &n0in, dmin__, &dmin1, &dmin2, &dn, &dn1, 
 		 &dn2, &tau, &ttype);
 
 /*        Call dqds until DMIN > 0. */
@@ -314,4 +335,3 @@ L100:
 /*     End of DLASQ3 */
 
 } /* dlasq3_ */
-

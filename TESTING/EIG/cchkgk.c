@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -46,19 +41,24 @@ static integer c__50 = 50;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[4];
-    static real rmax, vmax;
-    static complex work[2500]	/* was [50][50] */, a[2500]	/* was [50][
-	    50] */, b[2500]	/* was [50][50] */, e[2500]	/* was [50][
-	    50] */, f[2500]	/* was [50][50] */;
-    static integer i__, j, m, n;
+    complex a[2500]	/* was [50][50] */, b[2500]	/* was [50][50] */, e[
+	    2500]	/* was [50][50] */, f[2500]	/* was [50][50] */;
+    integer i__, j, m, n;
+    complex af[2500]	/* was [50][50] */, bf[2500]	/* was [50][50] */, 
+	    vl[2500]	/* was [50][50] */, vr[2500]	/* was [50][50] */;
+    integer ihi, ilo;
+    real eps;
+    complex vlf[2500]	/* was [50][50] */;
+    integer knt;
+    complex vrf[2500]	/* was [50][50] */;
+    integer info, lmax[4];
+    real rmax, vmax;
+    complex work[2500]	/* was [50][50] */;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *);
-    static integer ninfo;
-    static real anorm, bnorm, rwork[300];
-    static complex af[2500]	/* was [50][50] */, bf[2500]	/* was [50][
-	    50] */;
+    integer ninfo;
+    real anorm, bnorm, rwork[300];
     extern /* Subroutine */ int cggbak_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, complex *, integer *, 
 	    integer *), cggbal_(char *, integer *, complex *, 
@@ -66,18 +66,11 @@ static integer c__50 = 50;
 	    real *, real *, integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
-    static complex vl[2500]	/* was [50][50] */;
-    static real lscale[50];
+    real lscale[50];
     extern doublereal slamch_(char *);
-    static complex vr[2500]	/* was [50][50] */;
-    static real rscale[50];
+    real rscale[50];
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *);
-    static integer ihi, ilo;
-    static real eps;
-    static complex vlf[2500]	/* was [50][50] */;
-    static integer knt;
-    static complex vrf[2500]	/* was [50][50] */;
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 0, 0, 0, 0 };
@@ -96,43 +89,47 @@ static integer c__50 = 50;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define e_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
-#define f_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define f_ref(a_1,a_2) f[f_subscr(a_1,a_2)]
-#define vl_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define vl_ref(a_1,a_2) vl[vl_subscr(a_1,a_2)]
-#define vr_subscr(a_1,a_2) (a_2)*50 + a_1 - 51
-#define vr_ref(a_1,a_2) vr[vr_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CCHKGK tests CGGBAK, a routine for backward balancing  of */
+/*  a matrix pair (A, B). */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CCHKGK tests CGGBAK, a routine for backward balancing  of   
-    a matrix pair (A, B).   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -160,8 +157,8 @@ L10:
 	s_rsle(&io___10);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&a[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L20: */
@@ -173,8 +170,8 @@ L10:
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&b[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L30: */
@@ -186,8 +183,8 @@ L10:
 	s_rsle(&io___15);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&vl_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&vl[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L40: */
@@ -199,8 +196,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&vr_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&vr[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L50: */
@@ -236,10 +233,10 @@ L10:
 	lmax[2] = knt;
     }
 
-/*     Test of CGGBAK   
+/*     Test of CGGBAK */
 
-       Check tilde(VL)'*A*tilde(VR) - VL'*tilde(A)*VR   
-       where tilde(A) denotes the transformed matrix. */
+/*     Check tilde(VL)'*A*tilde(VR) - VL'*tilde(A)*VR */
+/*     where tilde(A) denotes the transformed matrix. */
 
     cgemm_("N", "N", &n, &m, &n, &c_b2, af, &c__50, vr, &c__50, &c_b1, work, &
 	    c__50);
@@ -256,8 +253,8 @@ L10:
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    i__3 = e_subscr(i__, j);
-	    i__4 = f_subscr(i__, j);
+	    i__3 = i__ + j * 50 - 51;
+	    i__4 = i__ + j * 50 - 51;
 	    q__2.r = e[i__3].r - f[i__4].r, q__2.i = e[i__3].i - f[i__4].i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 /* Computing MAX */
@@ -291,8 +288,8 @@ L10:
     for (j = 1; j <= i__1; ++j) {
 	i__2 = m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    i__3 = e_subscr(i__, j);
-	    i__4 = f_subscr(i__, j);
+	    i__3 = i__ + j * 50 - 51;
+	    i__4 = i__ + j * 50 - 51;
 	    q__2.r = e[i__3].r - f[i__4].r, q__2.i = e[i__3].i - f[i__4].i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
 /* Computing MAX */
@@ -351,18 +348,3 @@ L100:
 /*     End of CCHKGK */
 
 } /* cchkgk_ */
-
-#undef vr_ref
-#undef vr_subscr
-#undef vl_ref
-#undef vl_subscr
-#undef f_ref
-#undef f_subscr
-#undef e_ref
-#undef e_subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

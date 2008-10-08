@@ -1,86 +1,97 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static complex c_b1 = {1.f,0.f};
+static integer c__2 = 2;
 
 /* Subroutine */ int claesy_(complex *a, complex *b, complex *c__, complex *
 	rt1, complex *rt2, complex *evscal, complex *cs1, complex *sn1)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CLAESY computes the eigendecomposition of a 2-by-2 symmetric matrix   
-       ( ( A, B );( B, C ) )   
-    provided the norm of the matrix of eigenvectors is larger than   
-    some threshold value.   
-
-    RT1 is the eigenvalue of larger absolute value, and RT2 of   
-    smaller absolute value.  If the eigenvectors are computed, then   
-    on return ( CS1, SN1 ) is the unit eigenvector for RT1, hence   
-
-    [  CS1     SN1   ] . [ A  B ] . [ CS1    -SN1   ] = [ RT1  0  ]   
-    [ -SN1     CS1   ]   [ B  C ]   [ SN1     CS1   ]   [  0  RT2 ]   
-
-    Arguments   
-    =========   
-
-    A       (input) COMPLEX   
-            The ( 1, 1 ) element of input matrix.   
-
-    B       (input) COMPLEX   
-            The ( 1, 2 ) element of input matrix.  The ( 2, 1 ) element   
-            is also given by B, since the 2-by-2 matrix is symmetric.   
-
-    C       (input) COMPLEX   
-            The ( 2, 2 ) element of input matrix.   
-
-    RT1     (output) COMPLEX   
-            The eigenvalue of larger modulus.   
-
-    RT2     (output) COMPLEX   
-            The eigenvalue of smaller modulus.   
-
-    EVSCAL  (output) COMPLEX   
-            The complex value by which the eigenvector matrix was scaled   
-            to make it orthonormal.  If EVSCAL is zero, the eigenvectors   
-            were not computed.  This means one of two things:  the 2-by-2   
-            matrix could not be diagonalized, or the norm of the matrix   
-            of eigenvectors before scaling was larger than the threshold   
-            value THRESH (set below).   
-
-    CS1     (output) COMPLEX   
-    SN1     (output) COMPLEX   
-            If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector   
-            for RT1.   
-
-   =====================================================================   
-
-
-
-       Special case:  The matrix is actually diagonal.   
-       To avoid divide by zero later, we treat this case separately. */
-    /* Table of constant values */
-    static complex c_b1 = {1.f,0.f};
-    static integer c__2 = 2;
-    
     /* System generated locals */
     real r__1, r__2;
     complex q__1, q__2, q__3, q__4, q__5, q__6, q__7;
+
     /* Builtin functions */
     double c_abs(complex *);
     void pow_ci(complex *, complex *, integer *), c_sqrt(complex *, complex *)
 	    , c_div(complex *, complex *, complex *);
+
     /* Local variables */
-    static real babs, tabs;
-    static complex s, t;
-    static real z__, evnorm;
-    static complex tmp;
+    complex s, t;
+    real z__;
+    complex tmp;
+    real babs, tabs, evnorm;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLAESY computes the eigendecomposition of a 2-by-2 symmetric matrix */
+/*     ( ( A, B );( B, C ) ) */
+/*  provided the norm of the matrix of eigenvectors is larger than */
+/*  some threshold value. */
+
+/*  RT1 is the eigenvalue of larger absolute value, and RT2 of */
+/*  smaller absolute value.  If the eigenvectors are computed, then */
+/*  on return ( CS1, SN1 ) is the unit eigenvector for RT1, hence */
+
+/*  [  CS1     SN1   ] . [ A  B ] . [ CS1    -SN1   ] = [ RT1  0  ] */
+/*  [ -SN1     CS1   ]   [ B  C ]   [ SN1     CS1   ]   [  0  RT2 ] */
+
+/*  Arguments */
+/*  ========= */
+
+/*  A       (input) COMPLEX */
+/*          The ( 1, 1 ) element of input matrix. */
+
+/*  B       (input) COMPLEX */
+/*          The ( 1, 2 ) element of input matrix.  The ( 2, 1 ) element */
+/*          is also given by B, since the 2-by-2 matrix is symmetric. */
+
+/*  C       (input) COMPLEX */
+/*          The ( 2, 2 ) element of input matrix. */
+
+/*  RT1     (output) COMPLEX */
+/*          The eigenvalue of larger modulus. */
+
+/*  RT2     (output) COMPLEX */
+/*          The eigenvalue of smaller modulus. */
+
+/*  EVSCAL  (output) COMPLEX */
+/*          The complex value by which the eigenvector matrix was scaled */
+/*          to make it orthonormal.  If EVSCAL is zero, the eigenvectors */
+/*          were not computed.  This means one of two things:  the 2-by-2 */
+/*          matrix could not be diagonalized, or the norm of the matrix */
+/*          of eigenvectors before scaling was larger than the threshold */
+/*          value THRESH (set below). */
+
+/*  CS1     (output) COMPLEX */
+/*  SN1     (output) COMPLEX */
+/*          If EVSCAL .NE. 0,  ( CS1, SN1 ) is the unit right eigenvector */
+/*          for RT1. */
+
+/* ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+
+/*     Special case:  The matrix is actually diagonal. */
+/*     To avoid divide by zero later, we treat this case separately. */
 
     if (c_abs(b) == 0.f) {
 	rt1->r = a->r, rt1->i = a->i;
@@ -97,10 +108,10 @@
 	}
     } else {
 
-/*        Compute the eigenvalues and eigenvectors.   
-          The characteristic equation is   
-             lambda **2 - (A+C) lambda + (A*C - B*B)   
-          and we solve it using the quadratic formula. */
+/*        Compute the eigenvalues and eigenvectors. */
+/*        The characteristic equation is */
+/*           lambda **2 - (A+C) lambda + (A*C - B*B) */
+/*        and we solve it using the quadratic formula. */
 
 	q__2.r = a->r + c__->r, q__2.i = a->i + c__->i;
 	q__1.r = q__2.r * .5f, q__1.i = q__2.i * .5f;
@@ -125,8 +136,8 @@
 	    t.r = q__1.r, t.i = q__1.i;
 	}
 
-/*        Compute the two eigenvalues.  RT1 and RT2 are exchanged   
-          if necessary so that RT1 will have the greater magnitude. */
+/*        Compute the two eigenvalues.  RT1 and RT2 are exchanged */
+/*        if necessary so that RT1 will have the greater magnitude. */
 
 	q__1.r = s.r + t.r, q__1.i = s.i + t.i;
 	rt1->r = q__1.r, rt1->i = q__1.i;
@@ -138,10 +149,10 @@
 	    rt2->r = tmp.r, rt2->i = tmp.i;
 	}
 
-/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then   
-          scale the components of this eigenvector so that the matrix   
-          of eigenvectors X satisfies  X * X' = I .  (No scaling is   
-          done if the norm of the eigenvalue matrix is less than THRESH.) */
+/*        Choose CS1 = 1 and SN1 to satisfy the first equation, then */
+/*        scale the components of this eigenvector so that the matrix */
+/*        of eigenvectors X satisfies  X * X' = I .  (No scaling is */
+/*        done if the norm of the eigenvalue matrix is less than THRESH.) */
 
 	q__2.r = rt1->r - a->r, q__2.i = rt1->i - a->i;
 	c_div(&q__1, &q__2, b);
@@ -181,4 +192,3 @@
 /*     End of CLAESY */
 
 } /* claesy_ */
-

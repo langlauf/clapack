@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,117 +17,128 @@ static real c_b13 = -1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static integer jcol;
-    static real unfl;
-    static integer jrow, jdiag;
+    real ulp;
+    integer jcol;
+    real unfl;
+    integer jrow, jdiag;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm, wnorm;
+    real anorm, wnorm;
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *);
-    static real ulp;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  Purpose */
+/*  ======= */
 
+/*       SGET51  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*               A = U B V' */
 
-         SGET51  generally checks a decomposition of the form   
+/*       where ' means transpose and U and V are orthogonal. */
 
-                 A = U B V'   
+/*       Specifically, if ITYPE=1 */
 
-         where ' means transpose and U and V are orthogonal.   
+/*               RESULT = | A - U B V' | / ( |A| n ulp ) */
 
-         Specifically, if ITYPE=1   
+/*       If ITYPE=2, then: */
 
-                 RESULT = | A - U B V' | / ( |A| n ulp )   
+/*               RESULT = | A - B | / ( |A| n ulp ) */
 
-         If ITYPE=2, then:   
+/*       If ITYPE=3, then: */
 
-                 RESULT = | A - B | / ( |A| n ulp )   
+/*               RESULT = | I - UU' | / ( n ulp ) */
 
-         If ITYPE=3, then:   
+/*  Arguments */
+/*  ========= */
 
-                 RESULT = | I - UU' | / ( n ulp )   
+/*  ITYPE   (input) INTEGER */
+/*          Specifies the type of tests to be performed. */
+/*          =1: RESULT = | A - U B V' | / ( |A| n ulp ) */
+/*          =2: RESULT = | A - B | / ( |A| n ulp ) */
+/*          =3: RESULT = | I - UU' | / ( n ulp ) */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, SGET51 does nothing. */
+/*          It must be at least zero. */
 
-    ITYPE   (input) INTEGER   
-            Specifies the type of tests to be performed.   
-            =1: RESULT = | A - U B V' | / ( |A| n ulp )   
-            =2: RESULT = | A - B | / ( |A| n ulp )   
-            =3: RESULT = | I - UU' | / ( n ulp )   
+/*  A       (input) REAL array, dimension (LDA, N) */
+/*          The original (unfactored) matrix. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SGET51 does nothing.   
-            It must be at least zero.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) REAL array, dimension (LDA, N)   
-            The original (unfactored) matrix.   
+/*  B       (input) REAL array, dimension (LDB, N) */
+/*          The factored matrix. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) REAL array, dimension (LDB, N)   
-            The factored matrix.   
+/*  U       (input) REAL array, dimension (LDU, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) REAL array, dimension (LDU, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  V       (input) REAL array, dimension (LDV, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    V       (input) REAL array, dimension (LDV, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  WORK    (workspace) REAL array, dimension (2*N**2) */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  RESULT  (output) REAL */
+/*          The values computed by the test specified by ITYPE.  The */
+/*          value is currently limited to 1/ulp, to avoid overflow. */
+/*          Errors are flagged by RESULT=10/ulp. */
 
-    WORK    (workspace) REAL array, dimension (2*N**2)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL   
-            The values computed by the test specified by ITYPE.  The   
-            value is currently limited to 1/ulp, to avoid overflow.   
-            Errors are flagged by RESULT=10/ulp.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
 
@@ -156,9 +162,9 @@ static real c_b13 = -1.f;
 
     if (*itype <= 2) {
 
-/*        Tests scaled by the norm(A)   
+/*        Tests scaled by the norm(A) */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = slange_("1", n, n, &a[a_offset], lda, &work[1]);
 	anorm = dmax(r__1,unfl);
 
@@ -187,16 +193,16 @@ static real c_b13 = -1.f;
 	    for (jcol = 1; jcol <= i__1; ++jcol) {
 		i__2 = *n;
 		for (jrow = 1; jrow <= i__2; ++jrow) {
-		    work[jrow + *n * (jcol - 1)] -= a_ref(jrow, jcol);
+		    work[jrow + *n * (jcol - 1)] -= a[jrow + jcol * a_dim1];
 /* L10: */
 		}
 /* L20: */
 	    }
 	}
 
-/*        Compute norm(W)/ ( ulp*norm(A) )   
+/*        Compute norm(W)/ ( ulp*norm(A) ) */
 
-   Computing 2nd power */
+/* Computing 2nd power */
 	i__1 = *n;
 	wnorm = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]);
 
@@ -216,11 +222,11 @@ static real c_b13 = -1.f;
 
     } else {
 
-/*        Tests not scaled by norm(A)   
+/*        Tests not scaled by norm(A) */
 
-          ITYPE=3: Compute  UU' - I */
+/*        ITYPE=3: Compute  UU' - I */
 
-	sgemm_("N", "C", n, n, n, &c_b9, &u[u_offset], ldu, &u[u_offset], ldu,
+	sgemm_("N", "C", n, n, n, &c_b9, &u[u_offset], ldu, &u[u_offset], ldu, 
 		 &c_b10, &work[1], n);
 
 	i__1 = *n;
@@ -229,8 +235,8 @@ static real c_b13 = -1.f;
 /* L30: */
 	}
 
-/* Computing MIN   
-   Computing 2nd power */
+/* Computing MIN */
+/* Computing 2nd power */
 	i__1 = *n;
 	r__1 = slange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]), r__2 = (real) (*n);
 	*result = dmin(r__1,r__2) / (*n * ulp);
@@ -241,7 +247,3 @@ static real c_b13 = -1.f;
 /*     End of SGET51 */
 
 } /* sget51_ */
-
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,20 +30,18 @@ static integer c_n1 = -1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal a[4]	/* was [2][2] */, b[2], scale, w[2], x[2], 
-	    rcond;
-    static char c2[2];
-    static doublereal r1[2], r2[2];
+    doublereal a[4]	/* was [2][2] */, b[2], w[2], x[2];
+    char c2[2];
+    doublereal r1[2], r2[2];
+    integer iw[2], info;
+    doublereal scale, rcond;
     extern /* Subroutine */ int dtrti2_(char *, char *, integer *, doublereal 
-	    *, integer *, integer *);
-    static integer iw[2];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
-	     dlatbs_(char *, char *, char *, char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
-	     integer *), dtbcon_(char *, char 
-	    *, char *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *);
+	    *, integer *, integer *), alaesm_(char *, logical 
+	    *, integer *), dlatbs_(char *, char *, char *, char *, 
+	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, doublereal *, integer *), dtbcon_(char *, char *, char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
+	    integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dtbrfs_(char *, char *, char *, integer *, 
@@ -57,15 +50,15 @@ static integer c_n1 = -1;
 	    doublereal *, integer *, integer *), 
 	    dlatps_(char *, char *, char *, char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, integer *), dtpcon_(char *, char *, char *, integer *
-	    , doublereal *, doublereal *, doublereal *, integer *, integer *), dlatrs_(char *, char *, char *, char *, 
+, doublereal *, doublereal *, doublereal *, integer *, integer *), dlatrs_(char *, char *, char *, char *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *), dtrcon_(
 	    char *, char *, char *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *), dtbtrs_(char *, char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *), dtprfs_(char *, char *, char *
-	    , integer *, integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+, integer *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *, integer *), dtrrfs_(char *, 
 	    char *, char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -82,49 +75,62 @@ static integer c_n1 = -1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRTR tests the error exits for the DOUBLE PRECISION triangular */
+/*  routines. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRTR tests the error exits for the DOUBLE PRECISION triangular   
-    routines.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
     s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
-    a_ref(1, 1) = 1.;
-    a_ref(1, 2) = 2.;
-    a_ref(2, 2) = 3.;
-    a_ref(2, 1) = 4.;
+    a[0] = 1.;
+    a[2] = 2.;
+    a[3] = 3.;
+    a[1] = 4.;
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "TR")) {
 
-/*        Test error exits for the general triangular routines.   
+/*        Test error exits for the general triangular routines. */
 
-          DTRTRI */
+/*        DTRTRI */
 
 	s_copy(srnamc_1.srnamt, "DTRTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -200,42 +206,42 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "DTRRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dtrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	dtrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dtrrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	dtrrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dtrrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	dtrrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dtrrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	dtrrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dtrrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1,
+	dtrrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1,
+	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1,
+	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1,
+	dtrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("DTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -294,9 +300,9 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "TP")) {
 
-/*        Test error exits for the packed triangular routines.   
+/*        Test error exits for the packed triangular routines. */
 
-          DTPTRI */
+/*        DTPTRI */
 
 	s_copy(srnamc_1.srnamt, "DTPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -344,37 +350,37 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "DTPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	dtprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	dtprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	dtprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	dtprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	dtprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	dtprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	dtprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	dtprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	dtprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w,
+	dtprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	dtprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w,
+	dtprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	dtprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w,
+	dtprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("DTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -425,9 +431,9 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
-/*        Test error exits for the banded triangular routines.   
+/*        Test error exits for the banded triangular routines. */
 
-          DTBTRS */
+/*        DTBTRS */
 
 	s_copy(srnamc_1.srnamt, "DTBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -589,7 +595,3 @@ static integer c_n1 = -1;
 /*     End of DERRTR */
 
 } /* derrtr_ */
-
-#undef a_ref
-
-

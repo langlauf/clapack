@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,7 +14,7 @@ static integer c__0 = 0;
 	doublecomplex *a, integer *lda, doublecomplex *u, integer *ldu, 
 	doublecomplex *vt, integer *ldvt, doublecomplex *asav, doublecomplex *
 	usav, doublecomplex *vtsav, doublereal *s, doublereal *ssav, 
-	doublereal *e, doublecomplex *work, integer *lwork, doublereal *rwork,
+	doublereal *e, doublecomplex *work, integer *lwork, doublereal *rwork, 
 	 integer *iwork, integer *nounit, integer *info)
 {
     /* Initialized data */
@@ -72,20 +67,24 @@ static integer c__0 = 0;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char jobq[1], jobu[1];
-    static integer mmax, nmax;
-    static doublereal unfl, ovfl;
-    static integer ijvt, i__, j, m, n;
-    static logical badmm, badnn;
-    static integer nfail, iinfo;
+    integer i__, j, m, n;
+    doublereal dif, div;
+    integer ijq, iju;
+    doublereal ulp;
+    char jobq[1], jobu[1];
+    integer mmax, nmax;
+    doublereal unfl, ovfl;
+    integer ijvt;
+    logical badmm, badnn;
+    integer nfail, iinfo;
     extern /* Subroutine */ int zbdt01_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublereal *);
-    static doublereal anorm;
-    static integer mnmin, mnmax;
-    static char jobvt[1];
-    static integer iwspc, jsize, nerrs, jtype, ntest, iwtmp;
+    doublereal anorm;
+    integer mnmin, mnmax;
+    char jobvt[1];
+    integer iwspc, jsize, nerrs, jtype, ntest, iwtmp;
     extern /* Subroutine */ int zunt01_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *), zunt03_(char *, integer *, 
@@ -94,30 +93,27 @@ static integer c__0 = 0;
 	    doublereal *, doublereal *, integer *);
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int zgesdd_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublereal *, integer *, integer *), alasvm_(char *, 
 	    integer *, integer *, integer *, integer *), zgesvd_(char 
 	    *, char *, integer *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, integer *);
-    static integer ntestf;
+    integer ntestf;
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *);
-    static integer minwrk;
+    integer minwrk;
     extern /* Subroutine */ int zlatms_(integer *, integer *, char *, integer 
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    static doublereal ulpinv, result[14];
-    static integer lswork, mtypes, ntestt;
-    static doublereal dif, div;
-    static integer ijq, iju;
-    static doublereal ulp;
+    doublereal ulpinv, result[14];
+    integer lswork, mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___27 = { 0, 0, 0, fmt_9996, 0 };
@@ -129,248 +125,264 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZDRVBD checks the singular value decomposition (SVD) driver ZGESVD   
-    and ZGESDD.   
-    ZGESVD and CGESDD factors A = U diag(S) VT, where U and VT are   
-    unitary and diag(S) is diagonal with the entries of the array S on   
-    its diagonal. The entries of S are the singular values, nonnegative   
-    and stored in decreasing order.  U and VT can be optionally not   
-    computed, overwritten on A, or computed partially.   
+/*  ZDRVBD checks the singular value decomposition (SVD) driver ZGESVD */
+/*  and ZGESDD. */
+/*  ZGESVD and CGESDD factors A = U diag(S) VT, where U and VT are */
+/*  unitary and diag(S) is diagonal with the entries of the array S on */
+/*  its diagonal. The entries of S are the singular values, nonnegative */
+/*  and stored in decreasing order.  U and VT can be optionally not */
+/*  computed, overwritten on A, or computed partially. */
 
-    A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN.   
-    U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N.   
+/*  A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN. */
+/*  U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N. */
 
-    When ZDRVBD is called, a number of matrix "sizes" (M's and N's)   
-    and a number of matrix "types" are specified.  For each size (M,N)   
-    and each type of matrix, and for the minimal workspace as well as   
-    workspace adequate to permit blocking, an  M x N  matrix "A" will be   
-    generated and used to test the SVD routines.  For each matrix, A will   
-    be factored as A = U diag(S) VT and the following 12 tests computed:   
+/*  When ZDRVBD is called, a number of matrix "sizes" (M's and N's) */
+/*  and a number of matrix "types" are specified.  For each size (M,N) */
+/*  and each type of matrix, and for the minimal workspace as well as */
+/*  workspace adequate to permit blocking, an  M x N  matrix "A" will be */
+/*  generated and used to test the SVD routines.  For each matrix, A will */
+/*  be factored as A = U diag(S) VT and the following 12 tests computed: */
 
-    Test for ZGESVD:   
+/*  Test for ZGESVD: */
 
-    (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+/*  (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
 
-    (2)   | I - U'U | / ( M ulp )   
+/*  (2)   | I - U'U | / ( M ulp ) */
 
-    (3)   | I - VT VT' | / ( N ulp )   
+/*  (3)   | I - VT VT' | / ( N ulp ) */
 
-    (4)   S contains MNMIN nonnegative values in decreasing order.   
-          (Return 0 if true, 1/ULP if false.)   
+/*  (4)   S contains MNMIN nonnegative values in decreasing order. */
+/*        (Return 0 if true, 1/ULP if false.) */
 
-    (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
-          computed U.   
+/*  (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially */
+/*        computed U. */
 
-    (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
-          computed VT.   
+/*  (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially */
+/*        computed VT. */
 
-    (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
-          vector of singular values from the partial SVD   
+/*  (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the */
+/*        vector of singular values from the partial SVD */
 
-    Test for ZGESDD:   
+/*  Test for ZGESDD: */
 
-    (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+/*  (1)   | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
 
-    (2)   | I - U'U | / ( M ulp )   
+/*  (2)   | I - U'U | / ( M ulp ) */
 
-    (3)   | I - VT VT' | / ( N ulp )   
+/*  (3)   | I - VT VT' | / ( N ulp ) */
 
-    (4)   S contains MNMIN nonnegative values in decreasing order.   
-          (Return 0 if true, 1/ULP if false.)   
+/*  (4)   S contains MNMIN nonnegative values in decreasing order. */
+/*        (Return 0 if true, 1/ULP if false.) */
 
-    (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
-          computed U.   
+/*  (5)   | U - Upartial | / ( M ulp ) where Upartial is a partially */
+/*        computed U. */
 
-    (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
-          computed VT.   
+/*  (6)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially */
+/*        computed VT. */
 
-    (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
-          vector of singular values from the partial SVD   
+/*  (7)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the */
+/*        vector of singular values from the partial SVD */
 
-    The "sizes" are specified by the arrays MM(1:NSIZES) and   
-    NN(1:NSIZES); the value of each element pair (MM(j),NN(j))   
-    specifies one size.  The "types" are specified by a logical array   
-    DOTYPE( 1:NTYPES ); if DOTYPE(j) is .TRUE., then matrix type "j"   
-    will be generated.   
-    Currently, the list of possible types is:   
+/*  The "sizes" are specified by the arrays MM(1:NSIZES) and */
+/*  NN(1:NSIZES); the value of each element pair (MM(j),NN(j)) */
+/*  specifies one size.  The "types" are specified by a logical array */
+/*  DOTYPE( 1:NTYPES ); if DOTYPE(j) is .TRUE., then matrix type "j" */
+/*  will be generated. */
+/*  Currently, the list of possible types is: */
 
-    (1)  The zero matrix.   
-    (2)  The identity matrix.   
-    (3)  A matrix of the form  U D V, where U and V are unitary and   
-         D has evenly spaced entries 1, ..., ULP with random signs   
-         on the diagonal.   
-    (4)  Same as (3), but multiplied by the underflow-threshold / ULP.   
-    (5)  Same as (3), but multiplied by the overflow-threshold * ULP.   
+/*  (1)  The zero matrix. */
+/*  (2)  The identity matrix. */
+/*  (3)  A matrix of the form  U D V, where U and V are unitary and */
+/*       D has evenly spaced entries 1, ..., ULP with random signs */
+/*       on the diagonal. */
+/*  (4)  Same as (3), but multiplied by the underflow-threshold / ULP. */
+/*  (5)  Same as (3), but multiplied by the overflow-threshold * ULP. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            ZDRVBD does nothing.  It must be at least zero.   
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          ZDRVBD does nothing.  It must be at least zero. */
 
-    MM      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the matrix "heights" to be used.  For   
-            each j=1,...,NSIZES, if MM(j) is zero, then MM(j) and NN(j)   
-            will be ignored.  The MM(j) values must be at least zero.   
+/*  MM      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the matrix "heights" to be used.  For */
+/*          each j=1,...,NSIZES, if MM(j) is zero, then MM(j) and NN(j) */
+/*          will be ignored.  The MM(j) values must be at least zero. */
 
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the matrix "widths" to be used.  For   
-            each j=1,...,NSIZES, if NN(j) is zero, then MM(j) and NN(j)   
-            will be ignored.  The NN(j) values must be at least zero.   
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the matrix "widths" to be used.  For */
+/*          each j=1,...,NSIZES, if NN(j) is zero, then MM(j) and NN(j) */
+/*          will be ignored.  The NN(j) values must be at least zero. */
 
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, ZDRVBD   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrices are in A and B.   
-            This is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, ZDRVBD */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrices are in A and B. */
+/*          This is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size (m,n), a matrix   
-            of type j will be generated.  If NTYPES is smaller than the   
-            maximum number of types defined (PARAMETER MAXTYP), then   
-            types NTYPES+1 through MAXTYP will not be generated.  If   
-            NTYPES is larger than MAXTYP, DOTYPE(MAXTYP+1) through   
-            DOTYPE(NTYPES) will be ignored.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size (m,n), a matrix */
+/*          of type j will be generated.  If NTYPES is smaller than the */
+/*          maximum number of types defined (PARAMETER MAXTYP), then */
+/*          types NTYPES+1 through MAXTYP will not be generated.  If */
+/*          NTYPES is larger than MAXTYP, DOTYPE(MAXTYP+1) through */
+/*          DOTYPE(NTYPES) will be ignored. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to ZDRVBD to continue the same random number   
-            sequence.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to ZDRVBD to continue the same random number */
+/*          sequence. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
 
-    A       (output) COMPLEX*16 array, dimension (LDA,max(NN))   
-            Used to hold the matrix whose singular values are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
+/*  A       (output) COMPLEX*16 array, dimension (LDA,max(NN)) */
+/*          Used to hold the matrix whose singular values are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( MM ).   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( MM ). */
 
-    U       (output) COMPLEX*16 array, dimension (LDU,max(MM))   
-            Used to hold the computed matrix of right singular vectors.   
-            On exit, U contains the last such vectors actually computed.   
+/*  U       (output) COMPLEX*16 array, dimension (LDU,max(MM)) */
+/*          Used to hold the computed matrix of right singular vectors. */
+/*          On exit, U contains the last such vectors actually computed. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  It must be at   
-            least 1 and at least max( MM ).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  It must be at */
+/*          least 1 and at least max( MM ). */
 
-    VT      (output) COMPLEX*16 array, dimension (LDVT,max(NN))   
-            Used to hold the computed matrix of left singular vectors.   
-            On exit, VT contains the last such vectors actually computed.   
+/*  VT      (output) COMPLEX*16 array, dimension (LDVT,max(NN)) */
+/*          Used to hold the computed matrix of left singular vectors. */
+/*          On exit, VT contains the last such vectors actually computed. */
 
-    LDVT    (input) INTEGER   
-            The leading dimension of VT.  It must be at   
-            least 1 and at least max( NN ).   
+/*  LDVT    (input) INTEGER */
+/*          The leading dimension of VT.  It must be at */
+/*          least 1 and at least max( NN ). */
 
-    ASAV    (output) COMPLEX*16 array, dimension (LDA,max(NN))   
-            Used to hold a different copy of the matrix whose singular   
-            values are to be computed.  On exit, A contains the last   
-            matrix actually used.   
+/*  ASAV    (output) COMPLEX*16 array, dimension (LDA,max(NN)) */
+/*          Used to hold a different copy of the matrix whose singular */
+/*          values are to be computed.  On exit, A contains the last */
+/*          matrix actually used. */
 
-    USAV    (output) COMPLEX*16 array, dimension (LDU,max(MM))   
-            Used to hold a different copy of the computed matrix of   
-            right singular vectors. On exit, USAV contains the last such   
-            vectors actually computed.   
+/*  USAV    (output) COMPLEX*16 array, dimension (LDU,max(MM)) */
+/*          Used to hold a different copy of the computed matrix of */
+/*          right singular vectors. On exit, USAV contains the last such */
+/*          vectors actually computed. */
 
-    VTSAV   (output) COMPLEX*16 array, dimension (LDVT,max(NN))   
-            Used to hold a different copy of the computed matrix of   
-            left singular vectors. On exit, VTSAV contains the last such   
-            vectors actually computed.   
+/*  VTSAV   (output) COMPLEX*16 array, dimension (LDVT,max(NN)) */
+/*          Used to hold a different copy of the computed matrix of */
+/*          left singular vectors. On exit, VTSAV contains the last such */
+/*          vectors actually computed. */
 
-    S       (output) DOUBLE PRECISION array, dimension (max(min(MM,NN)))   
-            Contains the computed singular values.   
+/*  S       (output) DOUBLE PRECISION array, dimension (max(min(MM,NN))) */
+/*          Contains the computed singular values. */
 
-    SSAV    (output) DOUBLE PRECISION array, dimension (max(min(MM,NN)))   
-            Contains another copy of the computed singular values.   
+/*  SSAV    (output) DOUBLE PRECISION array, dimension (max(min(MM,NN))) */
+/*          Contains another copy of the computed singular values. */
 
-    E       (output) DOUBLE PRECISION array, dimension (max(min(MM,NN)))   
-            Workspace for ZGESVD.   
+/*  E       (output) DOUBLE PRECISION array, dimension (max(min(MM,NN))) */
+/*          Workspace for ZGESVD. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            MAX(3*MIN(M,N)+MAX(M,N)**2,5*MIN(M,N),3*MAX(M,N)) for all   
-            pairs  (M,N)=(MM(j),NN(j))   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          MAX(3*MIN(M,N)+MAX(M,N)**2,5*MIN(M,N),3*MAX(M,N)) for all */
+/*          pairs  (M,N)=(MM(j),NN(j)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array,   
-                        dimension ( 5*max(max(MM,NN)) )   
+/*  RWORK   (workspace) DOUBLE PRECISION array, */
+/*                      dimension ( 5*max(max(MM,NN)) ) */
 
-    IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N)   
+/*  IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N) */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (7)   
-            The values computed by the 7 tests described above.   
-            The values are currently limited to 1/ULP, to avoid   
-            overflow.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (7) */
+/*          The values computed by the 7 tests described above. */
+/*          The values are currently limited to 1/ULP, to avoid */
+/*          overflow. */
 
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some MM(j) < 0   
-             -3: Some NN(j) < 0   
-             -4: NTYPES < 0   
-             -7: THRESH < 0   
-            -10: LDA < 1 or LDA < MMAX, where MMAX is max( MM(j) ).   
-            -12: LDU < 1 or LDU < MMAX.   
-            -14: LDVT < 1 or LDVT < NMAX, where NMAX is max( NN(j) ).   
-            -21: LWORK too small.   
-            If  ZLATMS, or ZGESVD returns an error code, the   
-                absolute value of it is returned.   
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some MM(j) < 0 */
+/*           -3: Some NN(j) < 0 */
+/*           -4: NTYPES < 0 */
+/*           -7: THRESH < 0 */
+/*          -10: LDA < 1 or LDA < MMAX, where MMAX is max( MM(j) ). */
+/*          -12: LDU < 1 or LDU < MMAX. */
+/*          -14: LDVT < 1 or LDVT < NMAX, where NMAX is max( NN(j) ). */
+/*          -21: LWORK too small. */
+/*          If  ZLATMS, or ZGESVD returns an error code, the */
+/*              absolute value of it is returned. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --mm;
     --nn;
     --dotype;
     --iseed;
     asav_dim1 = *lda;
-    asav_offset = 1 + asav_dim1 * 1;
+    asav_offset = 1 + asav_dim1;
     asav -= asav_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     usav_dim1 = *ldu;
-    usav_offset = 1 + usav_dim1 * 1;
+    usav_offset = 1 + usav_dim1;
     usav -= usav_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     vtsav_dim1 = *ldvt;
-    vtsav_offset = 1 + vtsav_dim1 * 1;
+    vtsav_offset = 1 + vtsav_dim1;
     vtsav -= vtsav_offset;
     vt_dim1 = *ldvt;
-    vt_offset = 1 + vt_dim1 * 1;
+    vt_offset = 1 + vt_dim1;
     vt -= vt_offset;
     --s;
     --ssav;
@@ -379,9 +391,11 @@ static integer c__0 = 0;
     --rwork;
     --iwork;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     *info = 0;
 
@@ -410,14 +424,14 @@ static integer c__0 = 0;
 	if (nn[j] < 0) {
 	    badnn = TRUE_;
 	}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	i__4 = mm[j], i__5 = nn[j];
 	i__2 = mnmax, i__3 = min(i__4,i__5);
 	mnmax = max(i__2,i__3);
-/* Computing MAX   
-   Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MAX */
+/* Computing MIN */
 	i__6 = mm[j], i__7 = nn[j];
 /* Computing MAX */
 	i__9 = mm[j], i__10 = nn[j];
@@ -546,7 +560,7 @@ static integer c__0 = 0;
 		i__3 = m - 1;
 		i__4 = n - 1;
 		zlatms_(&m, &n, "U", &iseed[1], "N", &s[1], &c__4, &d__1, &
-			anorm, &i__3, &i__4, "N", &a[a_offset], lda, &work[1],
+			anorm, &i__3, &i__4, "N", &a[a_offset], lda, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
 		    io___27.ciunit = *nounit;
@@ -590,7 +604,7 @@ L50:
 
 		if (iwspc > 1) {
 		    zlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
-			    , lda);
+, lda);
 		}
 		zgesvd_("A", "A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
 			usav_offset], ldu, &vtsav[vtsav_offset], ldvt, &work[
@@ -654,7 +668,7 @@ L50:
 				ijvt];
 			zlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[
 				a_offset], lda);
-			zgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1],
+			zgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1], 
 				 &u[u_offset], ldu, &vt[vt_offset], ldvt, &
 				work[1], &lswork, &rwork[1], &iinfo);
 
@@ -688,7 +702,7 @@ L50:
 			    if (ijvt == 1) {
 				zunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
 					vtsav_offset], ldvt, &a[a_offset], 
-					lda, &work[1], lwork, &rwork[1], &dif,
+					lda, &work[1], lwork, &rwork[1], &dif, 
 					 &iinfo);
 			    } else if (ijvt == 2) {
 				zunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
@@ -801,7 +815,7 @@ L90:
 		for (ijq = 0; ijq <= 2; ++ijq) {
 		    *(unsigned char *)jobq = *(unsigned char *)&cjob[ijq];
 		    zlacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
-			    , lda);
+, lda);
 		    zgesdd_(jobq, &m, &n, &a[a_offset], lda, &s[1], &u[
 			    u_offset], ldu, &vt[vt_offset], ldvt, &work[1], &
 			    lswork, &rwork[1], &iwork[1], &iinfo);
@@ -843,12 +857,12 @@ L90:
 			    } else {
 				zunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
 					vtsav_offset], ldvt, &a[a_offset], 
-					lda, &work[1], lwork, &rwork[1], &dif,
+					lda, &work[1], lwork, &rwork[1], &dif, 
 					 &iinfo);
 			    }
 			} else if (ijq == 2) {
 			    zunt03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
-				    vtsav_offset], ldvt, &vt[vt_offset], ldvt,
+				    vtsav_offset], ldvt, &vt[vt_offset], ldvt, 
 				     &work[1], lwork, &rwork[1], &dif, &iinfo);
 			}
 		    }
@@ -950,4 +964,3 @@ L170:
 /*     End of ZDRVBD */
 
 } /* zdrvbd_ */
-

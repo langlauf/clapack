@@ -1,101 +1,127 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int zgecon_(char *norm, integer *n, doublecomplex *a, 
 	integer *lda, doublereal *anorm, doublereal *rcond, doublecomplex *
 	work, doublereal *rwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    ZGECON estimates the reciprocal of the condition number of a general   
-    complex matrix A, in either the 1-norm or the infinity-norm, using   
-    the LU factorization computed by ZGETRF.   
-
-    An estimate is obtained for norm(inv(A)), and the reciprocal of the   
-    condition number is computed as   
-       RCOND = 1 / ( norm(A) * norm(inv(A)) ).   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies whether the 1-norm condition number or the   
-            infinity-norm condition number is required:   
-            = '1' or 'O':  1-norm;   
-            = 'I':         Infinity-norm.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The factors L and U from the factorization A = P*L*U   
-            as computed by ZGETRF.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    ANORM   (input) DOUBLE PRECISION   
-            If NORM = '1' or 'O', the 1-norm of the original matrix A.   
-            If NORM = 'I', the infinity-norm of the original matrix A.   
-
-    RCOND   (output) DOUBLE PRECISION   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(norm(A) * norm(inv(A))).   
-
-    WORK    (workspace) COMPLEX*16 array, dimension (2*N)   
-
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (2*N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1;
     doublereal d__1, d__2;
+
     /* Builtin functions */
     double d_imag(doublecomplex *);
+
     /* Local variables */
-    static integer kase, kase1;
-    static doublereal scale;
+    doublereal sl;
+    integer ix;
+    doublereal su;
+    integer kase, kase1;
+    doublereal scale;
     extern logical lsame_(char *, char *);
+    integer isave[3];
+    extern /* Subroutine */ int zlacn2_(integer *, doublecomplex *, 
+	    doublecomplex *, doublereal *, integer *, integer *);
     extern doublereal dlamch_(char *);
-    static doublereal sl;
-    static integer ix;
-    static doublereal su;
-    extern /* Subroutine */ int xerbla_(char *, integer *), zlacon_(
-	    integer *, doublecomplex *, doublecomplex *, doublereal *, 
-	    integer *);
-    static doublereal ainvnm;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    doublereal ainvnm;
     extern integer izamax_(integer *, doublecomplex *, integer *);
-    static logical onenrm;
+    logical onenrm;
     extern /* Subroutine */ int zdrscl_(integer *, doublereal *, 
 	    doublecomplex *, integer *);
-    static char normin[1];
-    static doublereal smlnum;
+    char normin[1];
+    doublereal smlnum;
     extern /* Subroutine */ int zlatrs_(char *, char *, char *, char *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     Modified to call ZLACN2 in place of ZLACON, 10 Feb 03, SJH. */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZGECON estimates the reciprocal of the condition number of a general */
+/*  complex matrix A, in either the 1-norm or the infinity-norm, using */
+/*  the LU factorization computed by ZGETRF. */
+
+/*  An estimate is obtained for norm(inv(A)), and the reciprocal of the */
+/*  condition number is computed as */
+/*     RCOND = 1 / ( norm(A) * norm(inv(A)) ). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NORM    (input) CHARACTER*1 */
+/*          Specifies whether the 1-norm condition number or the */
+/*          infinity-norm condition number is required: */
+/*          = '1' or 'O':  1-norm; */
+/*          = 'I':         Infinity-norm. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The factors L and U from the factorization A = P*L*U */
+/*          as computed by ZGETRF. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
+
+/*  ANORM   (input) DOUBLE PRECISION */
+/*          If NORM = '1' or 'O', the 1-norm of the original matrix A. */
+/*          If NORM = 'I', the infinity-norm of the original matrix A. */
+
+/*  RCOND   (output) DOUBLE PRECISION */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(norm(A) * norm(inv(A))). */
+
+/*  WORK    (workspace) COMPLEX*16 array, dimension (2*N) */
+
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (2*N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --work;
     --rwork;
@@ -141,7 +167,7 @@
     }
     kase = 0;
 L10:
-    zlacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
+    zlacn2_(n, &work[*n + 1], &work[1], &ainvnm, &kase, isave);
     if (kase != 0) {
 	if (kase == kase1) {
 
@@ -195,4 +221,3 @@ L20:
 /*     End of ZGECON */
 
 } /* zgecon_ */
-

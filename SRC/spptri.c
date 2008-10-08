@@ -1,77 +1,90 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static real c_b8 = 1.f;
+static integer c__1 = 1;
 
 /* Subroutine */ int spptri_(char *uplo, integer *n, real *ap, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    SPPTRI computes the inverse of a real symmetric positive definite   
-    matrix A using the Cholesky factorization A = U**T*U or A = L*L**T   
-    computed by SPPTRF.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangular factor is stored in AP;   
-            = 'L':  Lower triangular factor is stored in AP.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the triangular factor U or L from the Cholesky   
-            factorization A = U**T*U or A = L*L**T, packed columnwise as   
-            a linear array.  The j-th column of U or L is stored in the   
-            array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = L(i,j) for j<=i<=n.   
-
-            On exit, the upper or lower triangle of the (symmetric)   
-            inverse of A, overwriting the input factor U or L.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
-                  zero, and the inverse could not be computed.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static real c_b8 = 1.f;
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2;
+
     /* Local variables */
+    integer j, jc, jj;
+    real ajj;
+    integer jjn;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
     extern /* Subroutine */ int sspr_(char *, integer *, real *, real *, 
 	    integer *, real *);
-    static integer j;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static logical upper;
+    logical upper;
     extern /* Subroutine */ int stpmv_(char *, char *, char *, integer *, 
-	    real *, real *, integer *);
-    static integer jc, jj;
-    extern /* Subroutine */ int xerbla_(char *, integer *), stptri_(
-	    char *, char *, integer *, real *, integer *);
-    static real ajj;
-    static integer jjn;
+	    real *, real *, integer *), xerbla_(char *
+, integer *), stptri_(char *, char *, integer *, real *, 
+	    integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SPPTRI computes the inverse of a real symmetric positive definite */
+/*  matrix A using the Cholesky factorization A = U**T*U or A = L*L**T */
+/*  computed by SPPTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangular factor is stored in AP; */
+/*          = 'L':  Lower triangular factor is stored in AP. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input/output) REAL array, dimension (N*(N+1)/2) */
+/*          On entry, the triangular factor U or L from the Cholesky */
+/*          factorization A = U**T*U or A = L*L**T, packed columnwise as */
+/*          a linear array.  The j-th column of U or L is stored in the */
+/*          array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = U(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = L(i,j) for j<=i<=n. */
+
+/*          On exit, the upper or lower triangle of the (symmetric) */
+/*          inverse of A, overwriting the input factor U or L. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, the (i,i) element of the factor U or L is */
+/*                zero, and the inverse could not be computed. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --ap;
 
     /* Function Body */
@@ -144,4 +157,3 @@
 /*     End of SPPTRI */
 
 } /* spptri_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -37,16 +32,16 @@ static doublereal c_b152 = -1.;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal w[12], x[4], rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4], af[16]	/* was [4][4] */;
+    doublereal a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal w[12], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4], af[16]	/* was [4][4] */;
+    integer ip[4], iw[4], info;
+    doublereal anrm, rcond;
     extern /* Subroutine */ int dsytf2_(char *, integer *, doublereal *, 
-	    integer *, integer *, integer *);
-    static integer ip[4], iw[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    integer *, integer *, integer *), alaesm_(char *, logical 
+	    *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dspcon_(char *, integer *, doublereal *, 
@@ -54,9 +49,9 @@ static doublereal c_b152 = -1.;
 	    integer *), dsycon_(char *, integer *, doublereal *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *, integer *), dsprfs_(char *, integer *, integer 
-	    *, doublereal *, doublereal *, integer *, doublereal *, integer *,
+	    *, doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	     doublereal *, integer *, doublereal *, doublereal *, doublereal *
-	    , integer *, integer *), dsptrf_(char *, integer *, 
+, integer *, integer *), dsptrf_(char *, integer *, 
 	    doublereal *, integer *, integer *), dsptri_(char *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *), dsyrfs_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, doublereal *, 
@@ -74,33 +69,47 @@ static doublereal c_b152 = -1.;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRSY tests the error exits for the DOUBLE PRECISION routines */
+/*  for symmetric indefinite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRSY tests the error exits for the DOUBLE PRECISION routines   
-    for symmetric indefinite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -112,8 +121,8 @@ static doublereal c_b152 = -1.;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
-	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
+	    af[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -131,10 +140,10 @@ static doublereal c_b152 = -1.;
 
     if (lsamen_(&c__2, c2, "SY")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman   
-          factorization of a symmetric indefinite matrix.   
+/*        Test error exits of the routines that use the Bunch-Kaufman */
+/*        factorization of a symmetric indefinite matrix. */
 
-          DSYTRF */
+/*        DSYTRF */
 
 	s_copy(srnamc_1.srnamt, "DSYTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -267,10 +276,10 @@ static doublereal c_b152 = -1.;
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
-/*        Test error exits of the routines that use the Bunch-Kaufman   
-          factorization of a symmetric indefinite packed matrix.   
+/*        Test error exits of the routines that use the Bunch-Kaufman */
+/*        factorization of a symmetric indefinite packed matrix. */
 
-          DSPTRF */
+/*        DSPTRF */
 
 	s_copy(srnamc_1.srnamt, "DSPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -369,8 +378,3 @@ static doublereal c_b152 = -1.;
 /*     End of DERRSY */
 
 } /* derrsy_ */
-
-#undef af_ref
-#undef a_ref
-
-

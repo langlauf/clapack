@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -41,41 +36,39 @@ static integer c__4 = 4;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm;
-    static doublecomplex a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal r__[4];
-    static doublecomplex w[8], x[4];
-    static doublereal rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4];
-    static doublecomplex af[16]	/* was [4][4] */;
-    static integer ip[4];
+    doublecomplex a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal r__[4];
+    doublecomplex w[8], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4];
+    doublecomplex af[16]	/* was [4][4] */;
+    integer ip[4], info;
+    doublereal anrm, rcond;
     extern /* Subroutine */ int zsytf2_(char *, integer *, doublecomplex *, 
 	    integer *, integer *, integer *), alaesm_(char *, logical 
 	    *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
-	    *, logical *), zspcon_(char *, integer *, doublecomplex *,
+	    *, logical *), zspcon_(char *, integer *, doublecomplex *, 
 	     integer *, doublereal *, doublereal *, doublecomplex *, integer *
-	    ), zsycon_(char *, integer *, doublecomplex *, integer *, 
+), zsycon_(char *, integer *, doublecomplex *, integer *, 
 	    integer *, doublereal *, doublereal *, doublecomplex *, integer *), zsprfs_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
-	    doublecomplex *, doublereal *, integer *), zsptrf_(char *,
+	    doublecomplex *, doublereal *, integer *), zsptrf_(char *, 
 	     integer *, doublecomplex *, integer *, integer *), 
 	    zsptri_(char *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zsyrfs_(char *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
-	    , doublereal *, doublereal *, doublecomplex *, doublereal *, 
+, doublereal *, doublereal *, doublecomplex *, doublereal *, 
 	    integer *), zsytrf_(char *, integer *, doublecomplex *, 
 	    integer *, integer *, doublecomplex *, integer *, integer *), zsytri_(char *, integer *, doublecomplex *, integer *, 
 	    integer *, doublecomplex *, integer *), zsptrs_(char *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     integer *, integer *), zsytrs_(char *, integer *, 
-	    integer *, doublecomplex *, integer *, integer *, doublecomplex *,
+	    integer *, doublecomplex *, integer *, integer *, doublecomplex *, 
 	     integer *, integer *);
 
     /* Fortran I/O blocks */
@@ -83,35 +76,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRSY tests the error exits for the COMPLEX*16 routines */
+/*  for symmetric indefinite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRSY tests the error exits for the COMPLEX*16 routines   
-    for symmetric indefinite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -123,12 +128,12 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
@@ -149,8 +154,8 @@ static integer c__4 = 4;
     anrm = 1.;
     infoc_1.ok = TRUE_;
 
-/*     Test error exits of the routines that use the diagonal pivoting   
-       factorization of a symmetric indefinite matrix. */
+/*     Test error exits of the routines that use the diagonal pivoting */
+/*     factorization of a symmetric indefinite matrix. */
 
     if (lsamen_(&c__2, c2, "SY")) {
 
@@ -286,8 +291,8 @@ static integer c__4 = 4;
 	chkxer_("ZSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the diagonal pivoting   
-       factorization of a symmetric indefinite packed matrix. */
+/*     Test error exits of the routines that use the diagonal pivoting */
+/*     factorization of a symmetric indefinite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
@@ -391,10 +396,3 @@ static integer c__4 = 4;
 /*     End of ZERRSY */
 
 } /* zerrsy_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

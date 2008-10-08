@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -38,42 +33,37 @@ static integer c__4 = 4;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal ccond, w[12], x[4], rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4];
+    doublereal a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal w[12], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4], af[16]	/* was [4][4] */;
+    integer ip[4], iw[4], info;
+    doublereal anrm, ccond, rcond;
     extern /* Subroutine */ int dgbtf2_(integer *, integer *, integer *, 
 	    integer *, doublereal *, integer *, integer *, integer *), 
 	    dgetf2_(integer *, integer *, doublereal *, integer *, integer *, 
-	    integer *);
-    static doublereal af[16]	/* was [4][4] */;
-    static integer ip[4];
-    extern /* Subroutine */ int dgbcon_(char *, integer *, integer *, integer 
-	    *, doublereal *, integer *, integer *, doublereal *, doublereal *,
-	     doublereal *, integer *, integer *), dgecon_(char *, 
+	    integer *), dgbcon_(char *, integer *, integer *, integer *, 
+	    doublereal *, integer *, integer *, doublereal *, doublereal *, 
+	    doublereal *, integer *, integer *), dgecon_(char *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *, integer *);
-    static integer iw[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
-	     dgbequ_(integer *, integer *, integer *, integer *, doublereal *,
-	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
-	    , doublereal *, integer *), dgbrfs_(char *, integer *, integer *, 
+	    doublereal *, integer *, integer *), alaesm_(char *, 
+	    logical *, integer *), dgbequ_(integer *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
-	    integer *), dgbtrf_(integer *, integer *, integer *, 
-	    integer *, doublereal *, integer *, integer *, integer *), 
-	    dgeequ_(integer *, integer *, doublereal *, integer *, doublereal 
-	    *, doublereal *, doublereal *, doublereal *, doublereal *, 
-	    integer *), dgerfs_(char *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *, integer *), dgetrf_(integer *, 
-	    integer *, doublereal *, integer *, integer *, integer *), 
-	    dgetri_(integer *, doublereal *, integer *, integer *, doublereal 
-	    *, integer *, integer *);
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *)
+	    , dgbrfs_(char *, integer *, integer *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, doublereal *, integer *, integer *), 
+	    dgbtrf_(integer *, integer *, integer *, integer *, doublereal *, 
+	    integer *, integer *, integer *), dgeequ_(integer *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
+	     doublereal *, doublereal *, integer *), dgerfs_(char *, integer *
+, integer *, doublereal *, integer *, doublereal *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, integer *, 
+	    doublereal *, doublereal *, doublereal *, integer *, integer *), dgetrf_(integer *, integer *, doublereal *, integer *, 
+	    integer *, integer *), dgetri_(integer *, doublereal *, integer *, 
+	     integer *, doublereal *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dgbtrs_(char *, integer *, integer *, 
@@ -87,33 +77,47 @@ static integer c__4 = 4;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DERRGE tests the error exits for the DOUBLE PRECISION routines */
+/*  for general matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERRGE tests the error exits for the DOUBLE PRECISION routines   
-    for general matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -125,8 +129,8 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1. / (doublereal) (i__ + j);
-	    af_ref(i__, j) = 1. / (doublereal) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
+	    af[i__ + (j << 2) - 5] = 1. / (doublereal) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.;
@@ -142,10 +146,10 @@ static integer c__4 = 4;
 
     if (lsamen_(&c__2, c2, "GE")) {
 
-/*        Test error exits of the routines that use the LU decomposition   
-          of a general matrix.   
+/*        Test error exits of the routines that use the LU decomposition */
+/*        of a general matrix. */
 
-          DGETRF */
+/*        DGETRF */
 
 	s_copy(srnamc_1.srnamt, "DGETRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -286,10 +290,10 @@ static integer c__4 = 4;
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
-/*        Test error exits of the routines that use the LU decomposition   
-          of a general band matrix.   
+/*        Test error exits of the routines that use the LU decomposition */
+/*        of a general band matrix. */
 
-          DGBTRF */
+/*        DGBTRF */
 
 	s_copy(srnamc_1.srnamt, "DGBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -493,8 +497,3 @@ static integer c__4 = 4;
 /*     End of DERRGE */
 
 } /* derrge_ */
-
-#undef af_ref
-#undef a_ref
-
-

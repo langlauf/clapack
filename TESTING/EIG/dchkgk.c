@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -44,17 +39,22 @@ static doublereal c_b55 = 0.;
 	    char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[4];
-    static doublereal rmax, vmax, work[2500]	/* was [50][50] */, a[2500]	
-	    /* was [50][50] */, b[2500]	/* was [50][50] */, e[2500]	/* 
-	    was [50][50] */, f[2500]	/* was [50][50] */;
-    static integer i__, j, m, n;
+    doublereal a[2500]	/* was [50][50] */, b[2500]	/* was [50][50] */, e[
+	    2500]	/* was [50][50] */, f[2500]	/* was [50][50] */;
+    integer i__, j, m, n;
+    doublereal af[2500]	/* was [50][50] */, bf[2500]	/* was [50][50] */, 
+	    vl[2500]	/* was [50][50] */, vr[2500]	/* was [50][50] */;
+    integer ihi, ilo;
+    doublereal eps, vlf[2500]	/* was [50][50] */;
+    integer knt;
+    doublereal vrf[2500]	/* was [50][50] */;
+    integer info, lmax[4];
+    doublereal rmax, vmax, work[2500]	/* was [50][50] */;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer ninfo;
-    static doublereal anorm, bnorm, af[2500]	/* was [50][50] */, bf[2500]	
-	    /* was [50][50] */;
+    integer ninfo;
+    doublereal anorm, bnorm;
     extern /* Subroutine */ int dggbak_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *), dggbal_(char *, integer *, 
@@ -62,14 +62,9 @@ static doublereal c_b55 = 0.;
 	    integer *, doublereal *, doublereal *, doublereal *, integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal vl[2500]	/* was [50][50] */, lscale[50], vr[2500]	
-	    /* was [50][50] */, rscale[50];
+    doublereal lscale[50], rscale[50];
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer ihi, ilo;
-    static doublereal eps, vlf[2500]	/* was [50][50] */;
-    static integer knt;
-    static doublereal vrf[2500]	/* was [50][50] */;
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 0, 0, 0, 0 };
@@ -88,39 +83,45 @@ static doublereal c_b55 = 0.;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*50 + a_1 - 51]
-#define b_ref(a_1,a_2) b[(a_2)*50 + a_1 - 51]
-#define e_ref(a_1,a_2) e[(a_2)*50 + a_1 - 51]
-#define f_ref(a_1,a_2) f[(a_2)*50 + a_1 - 51]
-#define vl_ref(a_1,a_2) vl[(a_2)*50 + a_1 - 51]
-#define vr_ref(a_1,a_2) vr[(a_2)*50 + a_1 - 51]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DCHKGK tests DGGBAK, a routine for backward balancing  of */
+/*  a matrix pair (A, B). */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DCHKGK tests DGGBAK, a routine for backward balancing  of   
-    a matrix pair (A, B).   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Initialization */
+/*     Initialization */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -148,8 +149,8 @@ L10:
 	s_rsle(&io___10);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&a[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L20: */
@@ -161,8 +162,8 @@ L10:
 	s_rsle(&io___13);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&b[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L30: */
@@ -174,8 +175,8 @@ L10:
 	s_rsle(&io___15);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&vl_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&vl[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L40: */
@@ -187,8 +188,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = m;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&vr_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&vr[i__ + j * 50 - 51], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L50: */
@@ -224,19 +225,19 @@ L10:
 	lmax[2] = knt;
     }
 
-/*     Test of DGGBAK   
+/*     Test of DGGBAK */
 
-       Check tilde(VL)'*A*tilde(VR) - VL'*tilde(A)*VR   
-       where tilde(A) denotes the transformed matrix. */
+/*     Check tilde(VL)'*A*tilde(VR) - VL'*tilde(A)*VR */
+/*     where tilde(A) denotes the transformed matrix. */
 
-    dgemm_("N", "N", &n, &m, &n, &c_b52, af, &c__50, vr, &c__50, &c_b55, work,
+    dgemm_("N", "N", &n, &m, &n, &c_b52, af, &c__50, vr, &c__50, &c_b55, work, 
 	     &c__50);
     dgemm_("T", "N", &m, &m, &n, &c_b52, vl, &c__50, work, &c__50, &c_b55, e, 
 	    &c__50);
 
-    dgemm_("N", "N", &n, &m, &n, &c_b52, a, &c__50, vrf, &c__50, &c_b55, work,
+    dgemm_("N", "N", &n, &m, &n, &c_b52, a, &c__50, vrf, &c__50, &c_b55, work, 
 	     &c__50);
-    dgemm_("T", "N", &m, &m, &n, &c_b52, vlf, &c__50, work, &c__50, &c_b55, f,
+    dgemm_("T", "N", &m, &m, &n, &c_b52, vlf, &c__50, work, &c__50, &c_b55, f, 
 	     &c__50);
 
     vmax = 0.;
@@ -245,8 +246,8 @@ L10:
 	i__2 = m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = vmax, d__3 = (d__1 = e_ref(i__, j) - f_ref(i__, j), abs(
-		    d__1));
+	    d__2 = vmax, d__3 = (d__1 = e[i__ + j * 50 - 51] - f[i__ + j * 50 
+		    - 51], abs(d__1));
 	    vmax = max(d__2,d__3);
 /* L60: */
 	}
@@ -260,14 +261,14 @@ L10:
 
 /*     Check tilde(VL)'*B*tilde(VR) - VL'*tilde(B)*VR */
 
-    dgemm_("N", "N", &n, &m, &n, &c_b52, bf, &c__50, vr, &c__50, &c_b55, work,
+    dgemm_("N", "N", &n, &m, &n, &c_b52, bf, &c__50, vr, &c__50, &c_b55, work, 
 	     &c__50);
     dgemm_("T", "N", &m, &m, &n, &c_b52, vl, &c__50, work, &c__50, &c_b55, e, 
 	    &c__50);
 
-    dgemm_("N", "N", &n, &m, &n, &c_b52, b, &c__50, vrf, &c__50, &c_b55, work,
+    dgemm_("N", "N", &n, &m, &n, &c_b52, b, &c__50, vrf, &c__50, &c_b55, work, 
 	     &c__50);
-    dgemm_("T", "N", &m, &m, &n, &c_b52, vlf, &c__50, work, &c__50, &c_b55, f,
+    dgemm_("T", "N", &m, &m, &n, &c_b52, vlf, &c__50, work, &c__50, &c_b55, f, 
 	     &c__50);
 
     vmax = 0.;
@@ -276,8 +277,8 @@ L10:
 	i__2 = m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    d__2 = vmax, d__3 = (d__1 = e_ref(i__, j) - f_ref(i__, j), abs(
-		    d__1));
+	    d__2 = vmax, d__3 = (d__1 = e[i__ + j * 50 - 51] - f[i__ + j * 50 
+		    - 51], abs(d__1));
 	    vmax = max(d__2,d__3);
 /* L80: */
 	}
@@ -331,12 +332,3 @@ L100:
 /*     End of DCHKGK */
 
 } /* dchkgk_ */
-
-#undef vr_ref
-#undef vl_ref
-#undef f_ref
-#undef e_ref
-#undef b_ref
-#undef a_ref
-
-

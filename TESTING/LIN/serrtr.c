@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,42 +30,42 @@ static integer c_n1 = -1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real a[4]	/* was [2][2] */, b[2], scale, w[2], x[2], rcond;
-    static char c2[2];
-    static real r1[2], r2[2];
+    real a[4]	/* was [2][2] */, b[2], w[2], x[2];
+    char c2[2];
+    real r1[2], r2[2];
+    integer iw[2], info;
+    real scale, rcond;
     extern /* Subroutine */ int strti2_(char *, char *, integer *, real *, 
-	    integer *, integer *);
-    static integer iw[2];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    integer *, integer *), alaesm_(char *, logical *, 
+	    integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), slatbs_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *), stbcon_(char *, char *
-	    , char *, integer *, integer *, real *, integer *, real *, real *,
+, char *, integer *, integer *, real *, integer *, real *, real *, 
 	     integer *, integer *), stbrfs_(char *, 
 	    char *, char *, integer *, integer *, integer *, real *, integer *
-	    , real *, integer *, real *, integer *, real *, real *, real *, 
+, real *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *, integer *), slatps_(char *, 
-	    char *, char *, char *, integer *, real *, real *, real *, real *,
+	    char *, char *, char *, integer *, real *, real *, real *, real *, 
 	     integer *), stpcon_(char *, char 
 	    *, char *, integer *, real *, real *, real *, integer *, integer *
-	    ), slatrs_(char *, char *, char *, char *,
+), slatrs_(char *, char *, char *, char *, 
 	     integer *, real *, integer *, real *, real *, real *, integer *), strcon_(char *, char *, char *, 
 	    integer *, real *, integer *, real *, real *, integer *, integer *
-	    ), stbtrs_(char *, char *, char *, 
+), stbtrs_(char *, char *, char *, 
 	    integer *, integer *, integer *, real *, integer *, real *, 
 	    integer *, integer *), stprfs_(char *, 
 	    char *, char *, integer *, integer *, real *, real *, integer *, 
 	    real *, integer *, real *, real *, real *, integer *, integer *), strrfs_(char *, char *, char *, integer *
-	    , integer *, real *, integer *, real *, integer *, real *, 
+, integer *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *, real *, real *, integer *, integer *), stptri_(char *, char *, integer *, real *, 
 	    integer *), strtri_(char *, char *, integer *, 
 	    real *, integer *, integer *), stptrs_(char *, 
 	    char *, char *, integer *, integer *, real *, real *, integer *, 
 	    integer *), strtrs_(char *, char *, char *
-	    , integer *, integer *, real *, integer *, real *, integer *, 
+, integer *, integer *, real *, integer *, real *, integer *, 
 	    integer *);
 
     /* Fortran I/O blocks */
@@ -78,49 +73,62 @@ static integer c_n1 = -1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRTR tests the error exits for the REAL triangular */
+/*  routines. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRTR tests the error exits for the REAL triangular   
-    routines.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
     s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
-    a_ref(1, 1) = 1.f;
-    a_ref(1, 2) = 2.f;
-    a_ref(2, 2) = 3.f;
-    a_ref(2, 1) = 4.f;
+    a[0] = 1.f;
+    a[2] = 2.f;
+    a[3] = 3.f;
+    a[1] = 4.f;
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "TR")) {
 
-/*        Test error exits for the general triangular routines.   
+/*        Test error exits for the general triangular routines. */
 
-          STRTRI */
+/*        STRTRI */
 
 	s_copy(srnamc_1.srnamt, "STRTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -196,42 +204,42 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "STRRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	strrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	strrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	strrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	strrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	strrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	strrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	strrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	strrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	strrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1,
+	strrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1,
+	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1,
+	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1,
+	strrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1, 
 		 r2, w, iw, &info);
 	chkxer_("STRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -290,9 +298,9 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "TP")) {
 
-/*        Test error exits for the packed triangular routines.   
+/*        Test error exits for the packed triangular routines. */
 
-          STPTRI */
+/*        STPTRI */
 
 	s_copy(srnamc_1.srnamt, "STPTRI", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -340,37 +348,37 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "STPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	stprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	stprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	stprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	stprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	stprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	stprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	stprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	stprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	stprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w,
+	stprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	stprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w,
+	stprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	stprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w,
+	stprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w, 
 		 iw, &info);
 	chkxer_("STPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -421,9 +429,9 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
-/*        Test error exits for the banded triangular routines.   
+/*        Test error exits for the banded triangular routines. */
 
-          STBTRS */
+/*        STBTRS */
 
 	s_copy(srnamc_1.srnamt, "STBTRS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -585,7 +593,3 @@ static integer c_n1 = -1;
 /*     End of SERRTR */
 
 } /* serrtr_ */
-
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,74 +21,89 @@ static integer c__2 = 2;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static doublereal badc1, badc2, large, small;
-    static char c2[2];
+    char c2[2];
+    integer mat;
+    static doublereal eps, badc1, badc2, large, small;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
     extern logical lsamen_(integer *, char *, char *);
-    static integer mat;
-    static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLATB4 sets parameters for the matrix generator based on the type of   
-    matrix to be generated.   
+/*  DLATB4 sets parameters for the matrix generator based on the type of */
+/*  matrix to be generated. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name. */
 
-    IMAT    (input) INTEGER   
-            An integer key describing which matrix to generate for this   
-            path.   
+/*  IMAT    (input) INTEGER */
+/*          An integer key describing which matrix to generate for this */
+/*          path. */
 
-    M       (input) INTEGER   
-            The number of rows in the matrix to be generated.   
+/*  M       (input) INTEGER */
+/*          The number of rows in the matrix to be generated. */
 
-    N       (input) INTEGER   
-            The number of columns in the matrix to be generated.   
+/*  N       (input) INTEGER */
+/*          The number of columns in the matrix to be generated. */
 
-    TYPE    (output) CHARACTER*1   
-            The type of the matrix to be generated:   
-            = 'S':  symmetric matrix   
-            = 'P':  symmetric positive (semi)definite matrix   
-            = 'N':  nonsymmetric matrix   
+/*  TYPE    (output) CHARACTER*1 */
+/*          The type of the matrix to be generated: */
+/*          = 'S':  symmetric matrix */
+/*          = 'P':  symmetric positive (semi)definite matrix */
+/*          = 'N':  nonsymmetric matrix */
 
-    KL      (output) INTEGER   
-            The lower band width of the matrix to be generated.   
+/*  KL      (output) INTEGER */
+/*          The lower band width of the matrix to be generated. */
 
-    KU      (output) INTEGER   
-            The upper band width of the matrix to be generated.   
+/*  KU      (output) INTEGER */
+/*          The upper band width of the matrix to be generated. */
 
-    ANORM   (output) DOUBLE PRECISION   
-            The desired norm of the matrix to be generated.  The diagonal   
-            matrix of singular values or eigenvalues is scaled by this   
-            value.   
+/*  ANORM   (output) DOUBLE PRECISION */
+/*          The desired norm of the matrix to be generated.  The diagonal */
+/*          matrix of singular values or eigenvalues is scaled by this */
+/*          value. */
 
-    MODE    (output) INTEGER   
-            A key indicating how to choose the vector of eigenvalues.   
+/*  MODE    (output) INTEGER */
+/*          A key indicating how to choose the vector of eigenvalues. */
 
-    CNDNUM  (output) DOUBLE PRECISION   
-            The desired condition number.   
+/*  CNDNUM  (output) DOUBLE PRECISION */
+/*          The desired condition number. */
 
-    DIST    (output) CHARACTER*1   
-            The type of distribution to be used by the random number   
-            generator.   
+/*  DIST    (output) CHARACTER*1 */
+/*          The type of distribution to be used by the random number */
+/*          generator. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Data statements .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Set some constants for use in the subroutine. */
+/*     Set some constants for use in the subroutine. */
 
     if (first) {
 	first = FALSE_;
@@ -103,8 +113,8 @@ static integer c__2 = 2;
 	small = dlamch_("Safe minimum");
 	large = 1. / small;
 
-/*        If it looks like we're on a Cray, take the square root of   
-          SMALL and LARGE to avoid overflow and underflow problems. */
+/*        If it looks like we're on a Cray, take the square root of */
+/*        SMALL and LARGE to avoid overflow and underflow problems. */
 
 	dlabad_(&small, &large);
 	small = small / eps * .25;
@@ -121,10 +131,10 @@ static integer c__2 = 2;
     if (lsamen_(&c__2, c2, "QR") || lsamen_(&c__2, c2, 
 	    "LQ") || lsamen_(&c__2, c2, "QL") || lsamen_(&c__2, c2, "RQ")) {
 
-/*        xQR, xLQ, xQL, xRQ:  Set parameters to generate a general   
-                               M x N matrix.   
+/*        xQR, xLQ, xQL, xRQ:  Set parameters to generate a general */
+/*                             M x N matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -172,9 +182,9 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "GE")) {
 
-/*        xGE:  Set parameters to generate a general M x N matrix.   
+/*        xGE:  Set parameters to generate a general M x N matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -222,9 +232,9 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
-/*        xGB:  Set parameters to generate a general banded matrix.   
+/*        xGB:  Set parameters to generate a general banded matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -248,9 +258,9 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "GT")) {
 
-/*        xGT:  Set parameters to generate a general tridiagonal matrix.   
+/*        xGT:  Set parameters to generate a general tridiagonal matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -284,10 +294,10 @@ static integer c__2 = 2;
     } else if (lsamen_(&c__2, c2, "PO") || lsamen_(&
 	    c__2, c2, "PP") || lsamen_(&c__2, c2, "SY") || lsamen_(&c__2, c2, "SP")) {
 
-/*        xPO, xPP, xSY, xSP: Set parameters to generate a   
-          symmetric matrix.   
+/*        xPO, xPP, xSY, xSP: Set parameters to generate a */
+/*        symmetric matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = *(unsigned char *)c2;
 
@@ -322,9 +332,9 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
-/*        xPB:  Set parameters to generate a symmetric band matrix.   
+/*        xPB:  Set parameters to generate a symmetric band matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'P';
 
@@ -348,8 +358,8 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        xPT:  Set parameters to generate a symmetric positive definite   
-          tridiagonal matrix. */
+/*        xPT:  Set parameters to generate a symmetric positive definite */
+/*        tridiagonal matrix. */
 
 	*(unsigned char *)type__ = 'P';
 	if (*imat == 1) {
@@ -380,9 +390,9 @@ static integer c__2 = 2;
     } else if (lsamen_(&c__2, c2, "TR") || lsamen_(&
 	    c__2, c2, "TP")) {
 
-/*        xTR, xTP:  Set parameters to generate a triangular matrix   
+/*        xTR, xTP:  Set parameters to generate a triangular matrix */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -426,9 +436,9 @@ static integer c__2 = 2;
 
     } else if (lsamen_(&c__2, c2, "TB")) {
 
-/*        xTB:  Set parameters to generate a triangular band matrix.   
+/*        xTB:  Set parameters to generate a triangular band matrix. */
 
-          Set TYPE, the type of matrix to be generated. */
+/*        Set TYPE, the type of matrix to be generated. */
 
 	*(unsigned char *)type__ = 'N';
 
@@ -459,4 +469,3 @@ static integer c__2 = 2;
 /*     End of DLATB4 */
 
 } /* dlatb4_ */
-

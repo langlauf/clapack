@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -55,31 +50,31 @@ static integer c__5 = 5;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, sdim;
-    static doublecomplex a[16]	/* was [4][4] */;
-    static logical b[4];
-    static integer i__, j;
-    static doublereal s[4];
-    static doublecomplex u[16]	/* was [4][4] */, w[16], x[4];
-    static doublereal abnrm;
+    doublecomplex a[16]	/* was [4][4] */;
+    logical b[4];
+    integer i__, j;
+    doublereal s[4];
+    doublecomplex u[16]	/* was [4][4] */, w[16], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4];
+    integer iw[16], nt;
+    doublecomplex vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] 
+	    */;
+    doublereal rw[20];
+    doublecomplex vt[16]	/* was [4][4] */;
+    integer ihi, ilo, info, sdim;
+    doublereal abnrm;
     extern /* Subroutine */ int zgees_(char *, char *, L_fp, integer *, 
 	    doublecomplex *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, logical *, integer *), zgeev_(char *
-	    , char *, integer *, doublecomplex *, integer *, doublecomplex *, 
+, char *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, integer *);
-    static char c2[2];
-    static doublereal r1[4], r2[4];
-    static integer iw[16], nt;
-    static doublecomplex vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] 
-	    */;
-    static doublereal rw[20];
-    static doublecomplex vt[16]	/* was [4][4] */;
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int zgesdd_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublereal *, integer *, integer *), chkxer_(char *, 
 	    integer *, integer *, logical *, logical *), zgesvd_(char 
 	    *, char *, integer *, integer *, doublecomplex *, integer *, 
@@ -91,10 +86,9 @@ static integer c__5 = 5;
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, doublereal *, logical *, integer *), zgeevx_(char *, char *, char *, char *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, integer *,
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *, 
 	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
-	    , doublecomplex *, integer *, doublereal *, integer *);
-    static integer ihi, ilo;
+, doublecomplex *, integer *, doublereal *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -107,43 +101,57 @@ static integer c__5 = 5;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 22, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRED tests the error exits for the eigenvalue driver routines for */
+/*  DOUBLE PRECISION matrices: */
 
-    Purpose   
-    =======   
+/*  PATH  driver   description */
+/*  ----  ------   ----------- */
+/*  ZEV   ZGEEV    find eigenvalues/eigenvectors for nonsymmetric A */
+/*  ZES   ZGEES    find eigenvalues/Schur form for nonsymmetric A */
+/*  ZVX   ZGEEVX   ZGEEV + balancing and condition estimation */
+/*  ZSX   ZGEESX   ZGEES + balancing and condition estimation */
+/*  ZBD   ZGESVD   compute SVD of an M-by-N matrix A */
+/*        ZGESDD   compute SVD of an M-by-N matrix A(by divide and */
+/*                 conquer) */
 
-    ZERRED tests the error exits for the eigenvalue driver routines for   
-    DOUBLE PRECISION matrices:   
+/*  Arguments */
+/*  ========= */
 
-    PATH  driver   description   
-    ----  ------   -----------   
-    ZEV   ZGEEV    find eigenvalues/eigenvectors for nonsymmetric A   
-    ZES   ZGEES    find eigenvalues/Schur form for nonsymmetric A   
-    ZVX   ZGEEVX   ZGEEV + balancing and condition estimation   
-    ZSX   ZGEESX   ZGEES + balancing and condition estimation   
-    ZBD   ZGESVD   compute SVD of an M-by-N matrix A   
-          ZGESDD   compute SVD of an M-by-N matrix A(by divide and   
-                   conquer)   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -155,14 +163,14 @@ static integer c__5 = 5;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    a[i__1].r = 0., a[i__1].i = 0.;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	i__1 = a_subscr(i__, i__);
+	i__1 = i__ + (i__ << 2) - 5;
 	a[i__1].r = 1., a[i__1].i = 0.;
 /* L30: */
     }
@@ -409,32 +417,32 @@ static integer c__5 = 5;
 
 	s_copy(srnamc_1.srnamt, "ZGESDD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	zgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	zgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	zgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	zgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5,
+	zgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	zgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	zgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("ZGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -473,8 +481,3 @@ static integer c__5 = 5;
 /*     End of ZERRED */
 
 } /* zerred_ */
-
-#undef a_ref
-#undef a_subscr
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -29,16 +24,17 @@ static real c_b16 = 1.f;
     integer a_dim1, a_offset, af_dim1, af_offset, q_dim1, q_offset, r_dim1, 
 	    r_offset, i__1, i__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real resid;
+    real eps;
+    integer info;
+    real resid;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
@@ -50,95 +46,106 @@ static real c_b16 = 1.f;
 	    real *);
     extern /* Subroutine */ int sorgrq_(integer *, integer *, integer *, real 
 	    *, integer *, real *, real *, integer *, integer *);
-    static real eps;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define r___ref(a_1,a_2) r__[(a_2)*r_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SRQT02 tests SORGRQ, which generates an m-by-n matrix Q with */
+/*  orthonornmal rows that is defined as the product of k elementary */
+/*  reflectors. */
 
-    Purpose   
-    =======   
+/*  Given the RQ factorization of an m-by-n matrix A, SRQT02 generates */
+/*  the orthogonal matrix Q defined by the factorization of the last k */
+/*  rows of A; it compares R(m-k+1:m,n-m+1:n) with */
+/*  A(m-k+1:m,1:n)*Q(n-m+1:n,1:n)', and checks that the rows of Q are */
+/*  orthonormal. */
 
-    SRQT02 tests SORGRQ, which generates an m-by-n matrix Q with   
-    orthonornmal rows that is defined as the product of k elementary   
-    reflectors.   
+/*  Arguments */
+/*  ========= */
 
-    Given the RQ factorization of an m-by-n matrix A, SRQT02 generates   
-    the orthogonal matrix Q defined by the factorization of the last k   
-    rows of A; it compares R(m-k+1:m,n-m+1:n) with   
-    A(m-k+1:m,1:n)*Q(n-m+1:n,1:n)', and checks that the rows of Q are   
-    orthonormal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix Q to be generated.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix Q to be generated. */
+/*          N >= M >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0.   
+/*  K       (input) INTEGER */
+/*          The number of elementary reflectors whose product defines the */
+/*          matrix Q. M >= K >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix Q to be generated.   
-            N >= M >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The m-by-n matrix A which was factorized by SRQT01. */
 
-    K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the   
-            matrix Q. M >= K >= 0.   
+/*  AF      (input) REAL array, dimension (LDA,N) */
+/*          Details of the RQ factorization of A, as returned by SGERQF. */
+/*          See SGERQF for further details. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The m-by-n matrix A which was factorized by SRQT01.   
+/*  Q       (workspace) REAL array, dimension (LDA,N) */
 
-    AF      (input) REAL array, dimension (LDA,N)   
-            Details of the RQ factorization of A, as returned by SGERQF.   
-            See SGERQF for further details.   
+/*  R       (workspace) REAL array, dimension (LDA,M) */
 
-    Q       (workspace) REAL array, dimension (LDA,N)   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and L. LDA >= N. */
 
-    R       (workspace) REAL array, dimension (LDA,M)   
+/*  TAU     (input) REAL array, dimension (M) */
+/*          The scalar factors of the elementary reflectors corresponding */
+/*          to the RQ factorization in AF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= N.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    TAU     (input) REAL array, dimension (M)   
-            The scalar factors of the elementary reflectors corresponding   
-            to the RQ factorization in AF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q*Q' ) / ( N * EPS ) */
 
-    RWORK   (workspace) REAL array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -159,14 +166,14 @@ static real c_b16 = 1.f;
     slaset_("Full", m, n, &c_b4, &c_b4, &q[q_offset], lda);
     if (*k < *n) {
 	i__1 = *n - *k;
-	slacpy_("Full", k, &i__1, &af_ref(*m - *k + 1, 1), lda, &q_ref(*m - *
-		k + 1, 1), lda);
+	slacpy_("Full", k, &i__1, &af[*m - *k + 1 + af_dim1], lda, &q[*m - *k 
+		+ 1 + q_dim1], lda);
     }
     if (*k > 1) {
 	i__1 = *k - 1;
 	i__2 = *k - 1;
-	slacpy_("Lower", &i__1, &i__2, &af_ref(*m - *k + 2, *n - *k + 1), lda,
-		 &q_ref(*m - *k + 2, *n - *k + 1), lda);
+	slacpy_("Lower", &i__1, &i__2, &af[*m - *k + 2 + (*n - *k + 1) * 
+		af_dim1], lda, &q[*m - *k + 2 + (*n - *k + 1) * q_dim1], lda);
     }
 
 /*     Generate the last n rows of the matrix Q */
@@ -177,22 +184,22 @@ static real c_b16 = 1.f;
 
 /*     Copy R(m-k+1:m,n-m+1:n) */
 
-    slaset_("Full", k, m, &c_b10, &c_b10, &r___ref(*m - *k + 1, *n - *m + 1), 
-	    lda);
-    slacpy_("Upper", k, k, &af_ref(*m - *k + 1, *n - *k + 1), lda, &r___ref(*
-	    m - *k + 1, *n - *k + 1), lda);
+    slaset_("Full", k, m, &c_b10, &c_b10, &r__[*m - *k + 1 + (*n - *m + 1) * 
+	    r_dim1], lda);
+    slacpy_("Upper", k, k, &af[*m - *k + 1 + (*n - *k + 1) * af_dim1], lda, &
+	    r__[*m - *k + 1 + (*n - *k + 1) * r_dim1], lda);
 
 /*     Compute R(m-k+1:m,n-m+1:n) - A(m-k+1:m,1:n) * Q(n-m+1:n,1:n)' */
 
-    sgemm_("No transpose", "Transpose", k, m, n, &c_b15, &a_ref(*m - *k + 1, 
-	    1), lda, &q[q_offset], lda, &c_b16, &r___ref(*m - *k + 1, *n - *m 
-	    + 1), lda);
+    sgemm_("No transpose", "Transpose", k, m, n, &c_b15, &a[*m - *k + 1 + 
+	    a_dim1], lda, &q[q_offset], lda, &c_b16, &r__[*m - *k + 1 + (*n - 
+	    *m + 1) * r_dim1], lda);
 
 /*     Compute norm( R - A*Q' ) / ( N * norm(A) * EPS ) . */
 
-    anorm = slange_("1", k, n, &a_ref(*m - *k + 1, 1), lda, &rwork[1]);
-    resid = slange_("1", k, m, &r___ref(*m - *k + 1, *n - *m + 1), lda, &
-	    rwork[1]);
+    anorm = slange_("1", k, n, &a[*m - *k + 1 + a_dim1], lda, &rwork[1]);
+    resid = slange_("1", k, m, &r__[*m - *k + 1 + (*n - *m + 1) * r_dim1], 
+	    lda, &rwork[1]);
     if (anorm > 0.f) {
 	result[1] = resid / (real) max(1,*n) / anorm / eps;
     } else {
@@ -216,10 +223,3 @@ static real c_b16 = 1.f;
 /*     End of SRQT02 */
 
 } /* srqt02_ */
-
-#undef af_ref
-#undef r___ref
-#undef q_ref
-#undef a_ref
-
-

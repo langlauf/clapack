@@ -2,6 +2,14 @@
                             CLAPACK README FILE
                             ===================
 
+============================================================================================
+          Version 3.1.1.1 (threadsafe)
+    Release date: October 2008
+ F2C translation of LAPACK 3.1.1
+To get revisions info about LAPACK 3.1.0 and 3.1.1, 
+read LAPACK-revisions3.1.0.info and LAPACK-revisions3.1.1.info
+============================================================================================
+
 This README file describes how and how to install the ANSI C translation of the
 LAPACK library, called CLAPACK.  CLAPACK must be compiled with an ANSI Standard
 C compiler.  If the C compiler on your machine is an old-style C compiler, you
@@ -13,10 +21,8 @@ IMPORTANT NOTE:
  sgesv.c and have it work unless you properly install and link to the
  f2c and BLAS routines as described below.  If your linker complains about
  missing functions, you have probably accidentally neglected this step.
-   Also, you will need the files "f2c.h" (included with the f2c libraries)
- and "blaswrap.h" in order to compile these routines. 
-   Note also that you *CANNOT* directly link to a BLAS library optimized
- for your platform without using a wrapper library, as described below.
+   Also, you will need the file "f2c.h" (included with the f2c libraries)
+in order to compile these routines. 
  The default BLAS routines included with CLAPACK in the BLAS/SRC
  subdirectory may also be used these will most likely be
  slower than a BLAS library optimized for your machine. If you do
@@ -30,7 +36,7 @@ IMPORTANT NOTE:
 For a fast default installation, you will need to
   - Untar clapack.tar and modify the make.inc file   (see step 1 below)
   - Make the f2c libraries                           (see step 2 below)
-  - Make the BLAS library or wrapper                 (see step 2 below)
+  - Make the BLAS library                            (see step 2 below)
   - Make the main library, test it, and time it by simply typing
       make
 
@@ -43,17 +49,12 @@ the FORTRAN version (INSTALL/lawn81.*) useful.
 
 (1) 'tar xvf clapack.tar' to build the following directory structure:
     CLAPACK/README.install     this file
-    CLAPACK/README.maintain    description of how to CLAPACK is built and
-                               maintained
-    CLAPACK/BLAS/       C source for BLAS and for BLAS wrappers
+    CLAPACK/BLAS/       C source for BLAS
     CLAPACK/F2CLIBS/    f2c I/O functions (libI77) and math functions (libF77)
     CLAPACK/INSTALL/    Testing functions and pre-tested make.inc files
                         for various platforms.
     CLAPACK/SRC/        C source of LAPACK routines
     CLAPACK/TESTING/    driver routines to test correctness
-    CLAPACK/TIMING/     driver routines to measure performance
-    CLAPACK/Translate/  software for translation and subsequent clean up,
-                        including CompletePolish as described below.
     CLAPACK/make.inc	compiler, compile flags and library definitions, 
 			included in all Makefiles.
 		        NOTE: It's better to use gcc compiler on some older
@@ -122,18 +123,39 @@ WARNING: 1) If your system lacks onexit() and you are not using an ANSI C
        optimized for your particular machine. This may be done by modifying
        the line
           BLASLIB      = ../../blas$(PLAT).a
-       in CLAPACK/make.inc to point to the optimized BLAS and to an
-       appropriate "wrapper" library.  If you are using a version of the
-       BLAS which provides the standard CBLAS interface (e.g. ATLAS),
+       in CLAPACK/make.inc to point to the optimized BLAS.
+
+Link with BLAS which provides the standard CBLAS interface 
+==========================================================
+       If you are using a version of the BLAS which provides the standard 
+       CBLAS interface (e.g. ATLAS), you need to add the appropriate "wrapper" library.
        you can make the wrapper library libcblaswr.a by typing 
        "make cblaswrap" from the main directory.  For this setup
        (ATLAS with the CBLAS wrapper), the BLASLIB line might look like
-           BLASLIB     = ../../libcblaswr.a -lcblas -latlas
-       A sample Fortran calling interface (libfblaswr.a) for systems with
-       Sun-style Fortran calling conventions is also provided; however, 
-       this interface will need modifications to work on other 
-       architectures which have different Fortran calling convensions.  
-       See the README in the BLAS/WRAP subdirectory for further information.}
+Example:
+Modification to make.inc
+CC        = gcc
+BLASLIB     = ../../libcblaswr.a -lcblas -latlas
+Creation of libcblaswr.a : make cblaswrap
+
+Link with BLAS which Fortran calling interface
+===============================================
+Two possibilities:
+	- add -DNO_BLAS_WRAP to the CC variable to when compiling and no need of a "wrapper" library
+Example:
+CC        = gcc -DNO_BLAS_WRAP 
+BLASLIB = -lgoto -lpthread
+	
+ 	- add the sample Fortran calling interface (libfblaswr.a) for systems with
+       Sun-style Fortran calling conventions is also provided; however,
+       this interface will need modifications to work on other
+       architectures which have different Fortran calling convensions.
+       See the README in the BLAS/WRAP subdirectory for further information. 
+Example:
+CC        = gcc
+BLASLIB = ../../libfblaswr.a -lgoto -lpthread
+Creation of libfblaswr.a : make fblaswrap
+}
 
 (5) Build the archive containing lapack source code by doing:
       cd CLAPACK/SRC; make
@@ -146,22 +168,6 @@ WARNING: 1) If your system lacks onexit() and you are not using an ANSI C
 
     Inspect the output files *.out to confirm that no errors occurred.
 
-(7) Build the archive containing the eigensystem routines, compile
-    eigenroutine TIMING code, and the linear system TIMING code
-    by doing:
-      cd CLAPACK/TIMING; make
-
-(8) Run the LAPACK timing tests by doing:
-      cd CLAPACK/TIMING; make
-      xlintims < sblasa.in > sblasa.out
-      xlintims < sblasb.in > sblasb.out
-      xlintims < sblasc.in > sblasc.out
-
-      repeat timing of blas for c, d, and z
-
-NOTE:  If your particular system does not have enough memory to complete
-       the above compilations you can do the following steps instead:
-
 I.   Compile the matrix generation software, the eigenroutine TESTING code,
      the linear system TESTING code, and run the LAPACK tests separately
      by doing:
@@ -169,17 +175,10 @@ I.   Compile the matrix generation software, the eigenroutine TESTING code,
 	cd CLAPACK/TESTING/EIG; make
 	cd CLAPACK/TESTING/LIN; make
 	cd CLAPACK/TESTING; make
-II.  Build the archive containing the eigensystem routines, compile
-     eigenroutine TIMING code, and the linear system TIMING code
-     separately by doing:
-	cd CLAPACK/TIMING/EIG/EIGSRC; make
-	cd CLAPACK/TIMING/EIG; make
-	cd CLAPACK/TIMING/LIN; make
-	continue with step (8)
-III. After the executable files and libraries have been created for each
+II. After the executable files and libraries have been created for each
      of the compiles, the object files should be removed by doing:
 	make clean
-IV.  Each 'make' may be accomplished just for one or a subset of the 
+III.  Each 'make' may be accomplished just for one or a subset of the 
      precisions desired.  For example:
 	make single
 	make single complex
@@ -207,3 +206,10 @@ Sept 27 1993
  {University of California at Berkeley}
              {July 19, 2000}
 
+{Revised by Julie Langou}
+ {University of Tennessee}
+             {February 2008}
+
+{Revised by Julie Langou}
+{University of Tennessee}
+			 {October 2008}

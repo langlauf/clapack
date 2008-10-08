@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -30,18 +25,19 @@ static doublereal c_b21 = 1.;
     integer a_dim1, a_offset, af_dim1, af_offset, q_dim1, q_offset, r_dim1, 
 	    r_offset, i__1, i__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
+    doublereal eps;
+    integer info;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static doublereal resid, anorm;
-    static integer minmn;
+    doublereal resid, anorm;
+    integer minmn;
     extern /* Subroutine */ int dsyrk_(char *, char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
@@ -55,85 +51,97 @@ static doublereal c_b21 = 1.;
     extern /* Subroutine */ int dorgrq_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *);
-    static doublereal eps;
 
 
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define r___ref(a_1,a_2) r__[(a_2)*r_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DRQT01 tests DGERQF, which computes the RQ factorization of an m-by-n */
+/*  matrix A, and partially tests DORGRQ which forms the n-by-n */
+/*  orthogonal matrix Q. */
 
-    Purpose   
-    =======   
+/*  DRQT01 compares R with A*Q', and checks that Q is orthogonal. */
 
-    DRQT01 tests DGERQF, which computes the RQ factorization of an m-by-n   
-    matrix A, and partially tests DORGRQ which forms the n-by-n   
-    orthogonal matrix Q.   
+/*  Arguments */
+/*  ========= */
 
-    DRQT01 compares R with A*Q', and checks that Q is orthogonal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  AF      (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          Details of the RQ factorization of A, as returned by DGERQF. */
+/*          See DGERQF for further details. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  Q       (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The n-by-n orthogonal matrix Q. */
 
-    AF      (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the RQ factorization of A, as returned by DGERQF.   
-            See DGERQF for further details.   
+/*  R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N)) */
 
-    Q       (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            The n-by-n orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and L. */
+/*          LDA >= max(M,N). */
 
-    R       (workspace) DOUBLE PRECISION array, dimension (LDA,max(M,N))   
+/*  TAU     (output) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by DGERQF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L.   
-            LDA >= max(M,N).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by DGERQF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,N)) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q*Q' ) / ( N * EPS ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,N))   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( R - A*Q' ) / ( N * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q*Q' ) / ( N * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -159,21 +167,21 @@ static doublereal c_b21 = 1.;
     if (*m <= *n) {
 	if (*m > 0 && *m < *n) {
 	    i__1 = *n - *m;
-	    dlacpy_("Full", m, &i__1, &af[af_offset], lda, &q_ref(*n - *m + 1,
-		     1), lda);
+	    dlacpy_("Full", m, &i__1, &af[af_offset], lda, &q[*n - *m + 1 + 
+		    q_dim1], lda);
 	}
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &af_ref(2, *n - *m + 1), lda, &
-		    q_ref(*n - *m + 2, *n - *m + 1), lda);
+	    dlacpy_("Lower", &i__1, &i__2, &af[(*n - *m + 1) * af_dim1 + 2], 
+		    lda, &q[*n - *m + 2 + (*n - *m + 1) * q_dim1], lda);
 	}
     } else {
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &af_ref(*m - *n + 2, 1), lda, &
-		    q_ref(2, 1), lda);
+	    dlacpy_("Lower", &i__1, &i__2, &af[*m - *n + 2 + af_dim1], lda, &
+		    q[q_dim1 + 2], lda);
 	}
     }
 
@@ -187,8 +195,8 @@ static doublereal c_b21 = 1.;
     dlaset_("Full", m, n, &c_b13, &c_b13, &r__[r_offset], lda);
     if (*m <= *n) {
 	if (*m > 0) {
-	    dlacpy_("Upper", m, m, &af_ref(1, *n - *m + 1), lda, &r___ref(1, *
-		    n - *m + 1), lda);
+	    dlacpy_("Upper", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &
+		    r__[(*n - *m + 1) * r_dim1 + 1], lda);
 	}
     } else {
 	if (*m > *n && *n > 0) {
@@ -197,8 +205,8 @@ static doublereal c_b21 = 1.;
 		    lda);
 	}
 	if (*n > 0) {
-	    dlacpy_("Upper", n, n, &af_ref(*m - *n + 1, 1), lda, &r___ref(*m 
-		    - *n + 1, 1), lda);
+	    dlacpy_("Upper", n, n, &af[*m - *n + 1 + af_dim1], lda, &r__[*m - 
+		    *n + 1 + r_dim1], lda);
 	}
     }
 
@@ -234,9 +242,3 @@ static doublereal c_b21 = 1.;
 /*     End of DRQT01 */
 
 } /* drqt01_ */
-
-#undef af_ref
-#undef r___ref
-#undef q_ref
-
-

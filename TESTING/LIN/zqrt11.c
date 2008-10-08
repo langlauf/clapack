@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,7 +16,7 @@ doublereal zqrt11_(integer *m, integer *k, doublecomplex *a, integer *lda,
     doublecomplex z__1;
 
     /* Local variables */
-    static integer info, j;
+    integer j, info;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int zunm2r_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
@@ -30,62 +25,78 @@ doublereal zqrt11_(integer *m, integer *k, doublecomplex *a, integer *lda,
 	    integer *, doublereal *);
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static doublereal rdummy[1];
+    doublereal rdummy[1];
 
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZQRT11 computes the test ratio   
+/*  ZQRT11 computes the test ratio */
 
-          || Q'*Q - I || / (eps * m)   
+/*        || Q'*Q - I || / (eps * m) */
 
-    where the orthogonal matrix Q is represented as a product of   
-    elementary transformations.  Each transformation has the form   
+/*  where the orthogonal matrix Q is represented as a product of */
+/*  elementary transformations.  Each transformation has the form */
 
-       H(k) = I - tau(k) v(k) v(k)'   
+/*     H(k) = I - tau(k) v(k) v(k)' */
 
-    where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form   
-    [ 0 ... 0 1 x(k) ]', where x(k) is a vector of length m-k stored   
-    in A(k+1:m,k).   
+/*  where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form */
+/*  [ 0 ... 0 1 x(k) ]', where x(k) is a vector of length m-k stored */
+/*  in A(k+1:m,k). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    K       (input) INTEGER   
-            The number of columns of A whose subdiagonal entries   
-            contain information about orthogonal transformations.   
+/*  K       (input) INTEGER */
+/*          The number of columns of A whose subdiagonal entries */
+/*          contain information about orthogonal transformations. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,K)   
-            The (possibly partial) output of a QR reduction routine.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,K) */
+/*          The (possibly partial) output of a QR reduction routine. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    TAU     (input) COMPLEX*16 array, dimension (K)   
-            The scaling factors tau for the elementary transformations as   
-            computed by the QR factorization routine.   
+/*  TAU     (input) COMPLEX*16 array, dimension (K) */
+/*          The scaling factors tau for the elementary transformations as */
+/*          computed by the QR factorization routine. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= M*M + M.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= M*M + M. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -116,7 +127,7 @@ doublereal zqrt11_(integer *m, integer *k, doublecomplex *a, integer *lda,
 /*     Form Q'*Q */
 
     zunm2r_("Left", "Conjugate transpose", m, m, k, &a[a_offset], lda, &tau[1]
-	    , &work[1], m, &work[*m * *m + 1], &info);
+, &work[1], m, &work[*m * *m + 1], &info);
 
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
@@ -135,4 +146,3 @@ doublereal zqrt11_(integer *m, integer *k, doublecomplex *a, integer *lda,
 /*     End of ZQRT11 */
 
 } /* zqrt11_ */
-

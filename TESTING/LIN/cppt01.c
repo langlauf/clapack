@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,75 +18,85 @@ static real c_b19 = 1.f;
     double r_imag(complex *);
 
     /* Local variables */
+    integer i__, k, kc;
+    complex tc;
+    real tr, eps;
     extern /* Subroutine */ int chpr_(char *, integer *, real *, complex *, 
-	    integer *, complex *);
-    static integer i__, k;
-    extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
-	    integer *);
+	    integer *, complex *), cscal_(integer *, complex *, 
+	    complex *, integer *);
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern logical lsame_(char *, char *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int ctpmv_(char *, char *, char *, integer *, 
 	    complex *, complex *, integer *);
-    static integer kc;
-    static complex tc;
-    extern doublereal clanhp_(char *, char *, integer *, complex *, real *);
-    static real tr;
-    extern doublereal slamch_(char *);
-    static real eps;
+    extern doublereal clanhp_(char *, char *, integer *, complex *, real *), slamch_(char *);
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CPPT01 reconstructs a Hermitian positive definite packed matrix A   
-    from its L*L' or U'*U factorization and computes the residual   
-       norm( L*L' - A ) / ( N * norm(A) * EPS ) or   
-       norm( U'*U - A ) / ( N * norm(A) * EPS ),   
-    where EPS is the machine epsilon, L' is the conjugate transpose of   
-    L, and U' is the conjugate transpose of U.   
+/*  CPPT01 reconstructs a Hermitian positive definite packed matrix A */
+/*  from its L*L' or U'*U factorization and computes the residual */
+/*     norm( L*L' - A ) / ( N * norm(A) * EPS ) or */
+/*     norm( U'*U - A ) / ( N * norm(A) * EPS ), */
+/*  where EPS is the machine epsilon, L' is the conjugate transpose of */
+/*  L, and U' is the conjugate transpose of U. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            Hermitian matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          Hermitian matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    A       (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The original Hermitian matrix A, stored as a packed   
-            triangular matrix.   
+/*  A       (input) COMPLEX array, dimension (N*(N+1)/2) */
+/*          The original Hermitian matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    AFAC    (input/output) COMPLEX array, dimension (N*(N+1)/2)   
-            On entry, the factor L or U from the L*L' or U'*U   
-            factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the   
-            difference L*L' - A (or U'*U - A).   
+/*  AFAC    (input/output) COMPLEX array, dimension (N*(N+1)/2) */
+/*          On entry, the factor L or U from the L*L' or U'*U */
+/*          factorization of A, stored as a packed triangular matrix. */
+/*          Overwritten with the reconstructed matrix, and then with the */
+/*          difference L*L' - A (or U'*U - A). */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    RESID   (output) REAL   
-            If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
-            If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
+/*  RESID   (output) REAL */
+/*          If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS ) */
+/*          If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS ) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick exit if N = 0   
+/*     Quick exit if N = 0 */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --afac;
     --a;
@@ -111,8 +116,8 @@ static real c_b19 = 1.f;
 	return 0;
     }
 
-/*     Check the imaginary parts of the diagonal elements and return with   
-       an error code if any are nonzero. */
+/*     Check the imaginary parts of the diagonal elements and return with */
+/*     an error code if any are nonzero. */
 
     kc = 1;
     if (lsame_(uplo, "U")) {
@@ -192,8 +197,8 @@ static real c_b19 = 1.f;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of   
-             columns K+1 through N. */
+/*           Add a multiple of column K of the factor L to each of */
+/*           columns K+1 through N. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
@@ -249,4 +254,3 @@ static real c_b19 = 1.f;
 /*     End of CPPT01 */
 
 } /* cppt01_ */
-

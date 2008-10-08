@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -33,7 +28,7 @@ static real c_b44 = 0.f;
 static complex c_b65 = {0.f,0.f};
 
 /* Subroutine */ int cdrvgt_(logical *dotype, integer *nn, integer *nval, 
-	integer *nrhs, real *thresh, logical *tsterr, complex *a, complex *af,
+	integer *nrhs, real *thresh, logical *tsterr, complex *a, complex *af, 
 	 complex *b, complex *x, complex *xact, complex *work, real *rwork, 
 	integer *iwork, integer *nout)
 {
@@ -55,81 +50,79 @@ static complex c_b65 = {0.f,0.f};
     real r__1, r__2;
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static real cond;
-    static integer mode, koff, imat, info;
-    static char path[3], dist[1], type__[1];
-    static integer nrun, i__, j, k, m, n, ifact;
+    integer i__, j, k, m, n;
+    real z__[3];
+    integer k1, in, kl, ku, ix, nt, lda;
+    char fact[1];
+    real cond;
+    integer mode, koff, imat, info;
+    char path[3], dist[1], type__[1];
+    integer nrun, ifact;
     extern /* Subroutine */ int cget04_(integer *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *);
-    static integer nfail, iseed[4];
-    static real z__[3];
+    integer nfail, iseed[4];
     extern /* Subroutine */ int cgtt01_(integer *, complex *, complex *, 
 	    complex *, complex *, complex *, complex *, complex *, integer *, 
 	    complex *, integer *, real *, real *), cgtt02_(char *, integer *, 
 	    integer *, complex *, complex *, complex *, complex *, integer *, 
 	    complex *, integer *, real *, real *);
-    static real rcond;
+    real rcond;
     extern /* Subroutine */ int cgtt05_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, complex *, integer *, complex *, integer 
 	    *, complex *, integer *, real *, real *, real *);
-    static integer nimat;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static integer itran;
+    real anorm;
+    integer itran;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *), cgtsv_(integer *, integer *, complex *, 
 	    complex *, complex *, complex *, integer *, integer *);
-    static char trans[1];
-    static integer izero, nerrs, k1;
-    static logical zerot;
+    char trans[1];
+    integer izero, nerrs;
+    logical zerot;
     extern /* Subroutine */ int clatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    ), aladhd_(integer *, char *);
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku, ix, nt;
-    extern /* Subroutine */ int clagtm_(char *, integer *, integer *, real *, 
-	    complex *, complex *, complex *, complex *, integer *, real *, 
-	    complex *, integer *);
-    static real rcondc;
+), aladhd_(integer *, char *), 
+	    alaerh_(char *, char *, integer *, integer *, char *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *), clagtm_(char *, 
+	    integer *, integer *, real *, complex *, complex *, complex *, 
+	    complex *, integer *, real *, complex *, integer *);
+    real rcondc;
     extern doublereal clangt_(char *, integer *, complex *, complex *, 
 	    complex *);
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
 	    *), clacpy_(char *, integer *, integer *, complex *, integer *, 
 	    complex *, integer *), claset_(char *, integer *, integer 
 	    *, complex *, complex *, complex *, integer *);
-    static real rcondi;
+    real rcondi;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static real rcondo, anormi;
+    real rcondo, anormi;
     extern /* Subroutine */ int clarnv_(integer *, integer *, integer *, 
 	    complex *), clatms_(integer *, integer *, char *, integer *, char 
 	    *, real *, integer *, real *, real *, integer *, integer *, char *
-	    , complex *, integer *, complex *, integer *);
-    static real ainvnm;
+, complex *, integer *, complex *, integer *);
+    real ainvnm;
     extern /* Subroutine */ int cgttrf_(integer *, complex *, complex *, 
 	    complex *, complex *, integer *, integer *);
-    static logical trfcon;
-    static real anormo;
+    logical trfcon;
+    real anormo;
     extern doublereal scasum_(integer *, complex *, integer *);
     extern /* Subroutine */ int cgttrs_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, complex *, integer *, complex *, integer 
 	    *, integer *), cerrvx_(char *, integer *);
-    static real result[6];
+    real result[6];
     extern /* Subroutine */ int cgtsvx_(char *, char *, integer *, integer *, 
 	    complex *, complex *, complex *, complex *, complex *, complex *, 
 	    complex *, integer *, complex *, integer *, complex *, integer *, 
 	    real *, real *, real *, complex *, real *, integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
@@ -138,62 +131,82 @@ static complex c_b65 = {0.f,0.f};
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CDRVGT tests CGTSV and -SVX.   
+/*  CDRVGT tests CGTSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) COMPLEX array, dimension (NMAX*4)   
+/*  A       (workspace) COMPLEX array, dimension (NMAX*4) */
 
-    AF      (workspace) COMPLEX array, dimension (NMAX*4)   
+/*  AF      (workspace) COMPLEX array, dimension (NMAX*4) */
 
-    B       (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  B       (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    X       (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  X       (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    WORK    (workspace) COMPLEX array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS) */
 
-    IWORK   (workspace) INTEGER array, dimension (2*NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (2*NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -206,6 +219,8 @@ static complex c_b65 = {0.f,0.f};
     --dotype;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "GT", (ftnlen)2, (ftnlen)2);
@@ -256,9 +271,9 @@ static complex c_b65 = {0.f,0.f};
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Types 1-6:  generate matrices of known condition number.   
+/*              Types 1-6:  generate matrices of known condition number. */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
 		s_copy(srnamc_1.srnamt, "CLATMS", (ftnlen)6, (ftnlen)6);
@@ -284,8 +299,8 @@ static complex c_b65 = {0.f,0.f};
 		ccopy_(&n, &af[2], &c__3, &a[m + 1], &c__1);
 	    } else {
 
-/*              Types 7-12:  generate tridiagonal matrices with   
-                unknown condition numbers. */
+/*              Types 7-12:  generate tridiagonal matrices with */
+/*              unknown condition numbers. */
 
 		if (! zerot || ! dotype[7]) {
 
@@ -299,8 +314,8 @@ static complex c_b65 = {0.f,0.f};
 		    }
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back the zeroed out   
-                   elements. */
+/*                 Reuse the last matrix by copying back the zeroed out */
+/*                 elements. */
 
 		    if (izero == 1) {
 			i__3 = n;
@@ -373,8 +388,8 @@ static complex c_b65 = {0.f,0.f};
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison with   
-                the value returned by CGTSVX. */
+/*              Compute the condition number for comparison with */
+/*              the value returned by CGTSVX. */
 
 		if (zerot) {
 		    if (ifact == 1) {
@@ -397,8 +412,8 @@ static complex c_b65 = {0.f,0.f};
 		    cgttrf_(&n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + (
 			    m << 1) + 1], &iwork[1], &info);
 
-/*                 Use CGTTRS to solve for one column at a time of   
-                   inv(A), computing the maximum column sum as we go. */
+/*                 Use CGTTRS to solve for one column at a time of */
+/*                 inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
@@ -411,7 +426,7 @@ static complex c_b65 = {0.f,0.f};
 			}
 			i__4 = i__;
 			x[i__4].r = 1.f, x[i__4].i = 0.f;
-			cgttrs_("No transpose", &n, &c__1, &af[1], &af[m + 1],
+			cgttrs_("No transpose", &n, &c__1, &af[1], &af[m + 1], 
 				 &af[n + m + 1], &af[n + (m << 1) + 1], &
 				iwork[1], &x[1], &lda, &info);
 /* Computing MAX */
@@ -428,8 +443,8 @@ static complex c_b65 = {0.f,0.f};
 			rcondo = 1.f / anormo / ainvnm;
 		    }
 
-/*                 Use CGTTRS to solve for one column at a time of   
-                   inv(A'), computing the maximum column sum as we go. */
+/*                 Use CGTTRS to solve for one column at a time of */
+/*                 inv(A'), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
@@ -443,7 +458,7 @@ static complex c_b65 = {0.f,0.f};
 			i__4 = i__;
 			x[i__4].r = 1.f, x[i__4].i = 0.f;
 			cgttrs_("Conjugate transpose", &n, &c__1, &af[1], &af[
-				m + 1], &af[n + m + 1], &af[n + (m << 1) + 1],
+				m + 1], &af[n + m + 1], &af[n + (m << 1) + 1], 
 				 &iwork[1], &x[1], &lda, &info);
 /* Computing MAX */
 			r__1 = ainvnm, r__2 = scasum_(&n, &x[1], &c__1);
@@ -486,10 +501,10 @@ static complex c_b65 = {0.f,0.f};
 
 		    if (ifact == 2 && itran == 1) {
 
-/*                    --- Test CGTSV  ---   
+/*                    --- Test CGTSV  --- */
 
-                      Solve the system using Gaussian elimination with   
-                      partial pivoting. */
+/*                    Solve the system using Gaussian elimination with */
+/*                    partial pivoting. */
 
 			i__3 = n + (m << 1);
 			ccopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
@@ -525,8 +540,8 @@ static complex c_b65 = {0.f,0.f};
 			    nt = 3;
 			}
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			i__3 = nt;
 			for (k = 2; k <= i__3; ++k) {
@@ -568,8 +583,8 @@ static complex c_b65 = {0.f,0.f};
 		    }
 		    claset_("Full", &n, nrhs, &c_b65, &c_b65, &x[1], &lda);
 
-/*                 Solve the system and compute the condition number and   
-                   error bounds using CGTSVX. */
+/*                 Solve the system and compute the condition number and */
+/*                 error bounds using CGTSVX. */
 
 		    s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)6, (ftnlen)6);
 		    cgtsvx_(fact, trans, &n, nrhs, &a[1], &a[m + 1], &a[n + m 
@@ -592,8 +607,8 @@ static complex c_b65 = {0.f,0.f};
 
 		    if (ifact >= 2) {
 
-/*                    Reconstruct matrix from factors and compute   
-                      residual. */
+/*                    Reconstruct matrix from factors and compute */
+/*                    residual. */
 
 			cgtt01_(&n, &a[1], &a[m + 1], &a[n + m + 1], &af[1], &
 				af[m + 1], &af[n + m + 1], &af[n + (m << 1) + 
@@ -627,8 +642,8 @@ static complex c_b65 = {0.f,0.f};
 			nt = 5;
 		    }
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    i__3 = nt;
 		    for (k = k1; k <= i__3; ++k) {
@@ -697,4 +712,3 @@ L130:
 /*     End of CDRVGT */
 
 } /* cdrvgt_ */
-

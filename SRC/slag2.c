@@ -1,115 +1,126 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slag2_(real *a, integer *lda, real *b, integer *ldb, 
 	real *safmin, real *scale1, real *scale2, real *wr1, real *wr2, real *
 	wi)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    SLAG2 computes the eigenvalues of a 2 x 2 generalized eigenvalue   
-    problem  A - w B, with scaling as necessary to avoid over-/underflow.   
-
-    The scaling factor "s" results in a modified eigenvalue equation   
-
-        s A - w B   
-
-    where  s  is a non-negative scaling factor chosen so that  w,  w B,   
-    and  s A  do not overflow and, if possible, do not underflow, either.   
-
-    Arguments   
-    =========   
-
-    A       (input) REAL array, dimension (LDA, 2)   
-            On entry, the 2 x 2 matrix A.  It is assumed that its 1-norm   
-            is less than 1/SAFMIN.  Entries less than   
-            sqrt(SAFMIN)*norm(A) are subject to being treated as zero.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= 2.   
-
-    B       (input) REAL array, dimension (LDB, 2)   
-            On entry, the 2 x 2 upper triangular matrix B.  It is   
-            assumed that the one-norm of B is less than 1/SAFMIN.  The   
-            diagonals should be at least sqrt(SAFMIN) times the largest   
-            element of B (in absolute value); if a diagonal is smaller   
-            than that, then  +/- sqrt(SAFMIN) will be used instead of   
-            that diagonal.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= 2.   
-
-    SAFMIN  (input) REAL   
-            The smallest positive number s.t. 1/SAFMIN does not   
-            overflow.  (This should always be SLAMCH('S') -- it is an   
-            argument in order to avoid having to call SLAMCH frequently.)   
-
-    SCALE1  (output) REAL   
-            A scaling factor used to avoid over-/underflow in the   
-            eigenvalue equation which defines the first eigenvalue.  If   
-            the eigenvalues are complex, then the eigenvalues are   
-            ( WR1  +/-  WI i ) / SCALE1  (which may lie outside the   
-            exponent range of the machine), SCALE1=SCALE2, and SCALE1   
-            will always be positive.  If the eigenvalues are real, then   
-            the first (real) eigenvalue is  WR1 / SCALE1 , but this may   
-            overflow or underflow, and in fact, SCALE1 may be zero or   
-            less than the underflow threshhold if the exact eigenvalue   
-            is sufficiently large.   
-
-    SCALE2  (output) REAL   
-            A scaling factor used to avoid over-/underflow in the   
-            eigenvalue equation which defines the second eigenvalue.  If   
-            the eigenvalues are complex, then SCALE2=SCALE1.  If the   
-            eigenvalues are real, then the second (real) eigenvalue is   
-            WR2 / SCALE2 , but this may overflow or underflow, and in   
-            fact, SCALE2 may be zero or less than the underflow   
-            threshhold if the exact eigenvalue is sufficiently large.   
-
-    WR1     (output) REAL   
-            If the eigenvalue is real, then WR1 is SCALE1 times the   
-            eigenvalue closest to the (2,2) element of A B**(-1).  If the   
-            eigenvalue is complex, then WR1=WR2 is SCALE1 times the real   
-            part of the eigenvalues.   
-
-    WR2     (output) REAL   
-            If the eigenvalue is real, then WR2 is SCALE2 times the   
-            other eigenvalue.  If the eigenvalue is complex, then   
-            WR1=WR2 is SCALE1 times the real part of the eigenvalues.   
-
-    WI      (output) REAL   
-            If the eigenvalue is real, then WI is zero.  If the   
-            eigenvalue is complex, then WI is SCALE1 times the imaginary   
-            part of the eigenvalues.  WI will always be non-negative.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset;
     real r__1, r__2, r__3, r__4, r__5, r__6;
+
     /* Builtin functions */
     double sqrt(doublereal), r_sign(real *, real *);
-    /* Local variables */
-    static real diff, bmin, wbig, wabs, wdet, r__, binv11, binv22, discr, 
-	    anorm, bnorm, bsize, shift, c1, c2, c3, c4, c5, rtmin, rtmax, 
-	    wsize, s1, s2, a11, a12, a21, a22, b11, b12, b22, ascale, bscale, 
-	    pp, qq, ss, wscale, safmax, wsmall, as11, as12, as22, sum, abi22;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
 
+    /* Local variables */
+    real r__, c1, c2, c3, c4, c5, s1, s2, a11, a12, a21, a22, b11, b12, b22, 
+	    pp, qq, ss, as11, as12, as22, sum, abi22, diff, bmin, wbig, wabs, 
+	    wdet, binv11, binv22, discr, anorm, bnorm, bsize, shift, rtmin, 
+	    rtmax, wsize, ascale, bscale, wscale, safmax, wsmall;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLAG2 computes the eigenvalues of a 2 x 2 generalized eigenvalue */
+/*  problem  A - w B, with scaling as necessary to avoid over-/underflow. */
+
+/*  The scaling factor "s" results in a modified eigenvalue equation */
+
+/*      s A - w B */
+
+/*  where  s  is a non-negative scaling factor chosen so that  w,  w B, */
+/*  and  s A  do not overflow and, if possible, do not underflow, either. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  A       (input) REAL array, dimension (LDA, 2) */
+/*          On entry, the 2 x 2 matrix A.  It is assumed that its 1-norm */
+/*          is less than 1/SAFMIN.  Entries less than */
+/*          sqrt(SAFMIN)*norm(A) are subject to being treated as zero. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= 2. */
+
+/*  B       (input) REAL array, dimension (LDB, 2) */
+/*          On entry, the 2 x 2 upper triangular matrix B.  It is */
+/*          assumed that the one-norm of B is less than 1/SAFMIN.  The */
+/*          diagonals should be at least sqrt(SAFMIN) times the largest */
+/*          element of B (in absolute value); if a diagonal is smaller */
+/*          than that, then  +/- sqrt(SAFMIN) will be used instead of */
+/*          that diagonal. */
+
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= 2. */
+
+/*  SAFMIN  (input) REAL */
+/*          The smallest positive number s.t. 1/SAFMIN does not */
+/*          overflow.  (This should always be SLAMCH('S') -- it is an */
+/*          argument in order to avoid having to call SLAMCH frequently.) */
+
+/*  SCALE1  (output) REAL */
+/*          A scaling factor used to avoid over-/underflow in the */
+/*          eigenvalue equation which defines the first eigenvalue.  If */
+/*          the eigenvalues are complex, then the eigenvalues are */
+/*          ( WR1  +/-  WI i ) / SCALE1  (which may lie outside the */
+/*          exponent range of the machine), SCALE1=SCALE2, and SCALE1 */
+/*          will always be positive.  If the eigenvalues are real, then */
+/*          the first (real) eigenvalue is  WR1 / SCALE1 , but this may */
+/*          overflow or underflow, and in fact, SCALE1 may be zero or */
+/*          less than the underflow threshhold if the exact eigenvalue */
+/*          is sufficiently large. */
+
+/*  SCALE2  (output) REAL */
+/*          A scaling factor used to avoid over-/underflow in the */
+/*          eigenvalue equation which defines the second eigenvalue.  If */
+/*          the eigenvalues are complex, then SCALE2=SCALE1.  If the */
+/*          eigenvalues are real, then the second (real) eigenvalue is */
+/*          WR2 / SCALE2 , but this may overflow or underflow, and in */
+/*          fact, SCALE2 may be zero or less than the underflow */
+/*          threshhold if the exact eigenvalue is sufficiently large. */
+
+/*  WR1     (output) REAL */
+/*          If the eigenvalue is real, then WR1 is SCALE1 times the */
+/*          eigenvalue closest to the (2,2) element of A B**(-1).  If the */
+/*          eigenvalue is complex, then WR1=WR2 is SCALE1 times the real */
+/*          part of the eigenvalues. */
+
+/*  WR2     (output) REAL */
+/*          If the eigenvalue is real, then WR2 is SCALE2 times the */
+/*          other eigenvalue.  If the eigenvalue is complex, then */
+/*          WR1=WR2 is SCALE1 times the real part of the eigenvalues. */
+
+/*  WI      (output) REAL */
+/*          If the eigenvalue is real, then WI is zero.  If the */
+/*          eigenvalue is complex, then WI is SCALE1 times the imaginary */
+/*          part of the eigenvalues.  WI will always be non-negative. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -117,24 +128,24 @@
     rtmax = 1.f / rtmin;
     safmax = 1.f / *safmin;
 
-/*     Scale A   
+/*     Scale A */
 
-   Computing MAX */
-    r__5 = (r__1 = a_ref(1, 1), dabs(r__1)) + (r__2 = a_ref(2, 1), dabs(r__2))
-	    , r__6 = (r__3 = a_ref(1, 2), dabs(r__3)) + (r__4 = a_ref(2, 2), 
-	    dabs(r__4)), r__5 = max(r__5,r__6);
+/* Computing MAX */
+    r__5 = (r__1 = a[a_dim1 + 1], dabs(r__1)) + (r__2 = a[a_dim1 + 2], dabs(
+	    r__2)), r__6 = (r__3 = a[(a_dim1 << 1) + 1], dabs(r__3)) + (r__4 =
+	     a[(a_dim1 << 1) + 2], dabs(r__4)), r__5 = max(r__5,r__6);
     anorm = dmax(r__5,*safmin);
     ascale = 1.f / anorm;
-    a11 = ascale * a_ref(1, 1);
-    a21 = ascale * a_ref(2, 1);
-    a12 = ascale * a_ref(1, 2);
-    a22 = ascale * a_ref(2, 2);
+    a11 = ascale * a[a_dim1 + 1];
+    a21 = ascale * a[a_dim1 + 2];
+    a12 = ascale * a[(a_dim1 << 1) + 1];
+    a22 = ascale * a[(a_dim1 << 1) + 2];
 
 /*     Perturb B if necessary to insure non-singularity */
 
-    b11 = b_ref(1, 1);
-    b12 = b_ref(1, 2);
-    b22 = b_ref(2, 2);
+    b11 = b[b_dim1 + 1];
+    b12 = b[(b_dim1 << 1) + 1];
+    b22 = b[(b_dim1 << 1) + 2];
 /* Computing MAX */
     r__1 = dabs(b11), r__2 = dabs(b12), r__1 = max(r__1,r__2), r__2 = dabs(
 	    b22), r__1 = max(r__1,r__2);
@@ -146,9 +157,9 @@
 	b22 = r_sign(&bmin, &b22);
     }
 
-/*     Scale B   
+/*     Scale B */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = dabs(b11), r__2 = dabs(b12) + dabs(b22), r__1 = max(r__1,r__2);
     bnorm = dmax(r__1,*safmin);
 /* Computing MAX */
@@ -159,9 +170,9 @@
     b12 *= bscale;
     b22 *= bscale;
 
-/*     Compute larger eigenvalue by method described by C. van Loan   
+/*     Compute larger eigenvalue by method described by C. van Loan */
 
-       ( AS is A shifted by -SHIFT*B ) */
+/*     ( AS is A shifted by -SHIFT*B ) */
 
     binv11 = 1.f / b11;
     binv22 = 1.f / b22;
@@ -204,11 +215,11 @@
 	}
     }
 
-/*     Note: the test of R in the following IF is to cover the case when   
-             DISCR is small and negative and is flushed to zero during   
-             the calculation of R.  On machines which have a consistent   
-             flush-to-zero threshhold and handle numbers above that   
-             threshhold correctly, it would not be necessary. */
+/*     Note: the test of R in the following IF is to cover the case when */
+/*           DISCR is small and negative and is flushed to zero during */
+/*           the calculation of R.  On machines which have a consistent */
+/*           flush-to-zero threshhold and handle numbers above that */
+/*           threshhold correctly, it would not be necessary. */
 
     if (discr >= 0.f || r__ == 0.f) {
 	sum = pp + r_sign(&r__, &pp);
@@ -225,8 +236,8 @@
 	    wsmall = wdet / wbig;
 	}
 
-/*        Choose (real) eigenvalue closest to 2,2 element of A*B**(-1)   
-          for WR1. */
+/*        Choose (real) eigenvalue closest to 2,2 element of A*B**(-1) */
+/*        for WR1. */
 
 	if (pp > abi22) {
 	    *wr1 = dmin(wbig,wsmall);
@@ -245,17 +256,17 @@
 	*wi = r__;
     }
 
-/*     Further scaling to avoid underflow and overflow in computing   
-       SCALE1 and overflow in computing w*B.   
+/*     Further scaling to avoid underflow and overflow in computing */
+/*     SCALE1 and overflow in computing w*B. */
 
-       This scale factor (WSCALE) is bounded from above using C1 and C2,   
-       and from below using C3 and C4.   
-          C1 implements the condition  s A  must never overflow.   
-          C2 implements the condition  w B  must never overflow.   
-          C3, with C2,   
-             implement the condition that s A - w B must never overflow.   
-          C4 implements the condition  s    should not underflow.   
-          C5 implements the condition  max(s,|w|) should be at least 2. */
+/*     This scale factor (WSCALE) is bounded from above using C1 and C2, */
+/*     and from below using C3 and C4. */
+/*        C1 implements the condition  s A  must never overflow. */
+/*        C2 implements the condition  w B  must never overflow. */
+/*        C3, with C2, */
+/*           implement the condition that s A - w B must never overflow. */
+/*        C4 implements the condition  s    should not underflow. */
+/*        C5 implements the condition  max(s,|w|) should be at least 2. */
 
     c1 = bsize * (*safmin * dmax(1.f,ascale));
     c2 = *safmin * dmax(1.f,bnorm);
@@ -278,8 +289,8 @@
 /*     Scale first eigenvalue */
 
     wabs = dabs(*wr1) + dabs(*wi);
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
     r__3 = c4, r__4 = dmax(wabs,c5) * .5f;
     r__1 = max(*safmin,c1), r__2 = (wabs * c2 + c3) * 1.0000100000000001f, 
 	    r__1 = max(r__1,r__2), r__2 = dmin(r__3,r__4);
@@ -305,9 +316,9 @@
 /*     Scale second eigenvalue (if real) */
 
     if (*wi == 0.f) {
-/* Computing MAX   
-   Computing MIN   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MIN */
+/* Computing MAX */
 	r__5 = dabs(*wr2);
 	r__3 = c4, r__4 = dmax(r__5,c5) * .5f;
 	r__1 = max(*safmin,c1), r__2 = (dabs(*wr2) * c2 + c3) * 
@@ -331,8 +342,3 @@
 
     return 0;
 } /* slag2_ */
-
-#undef b_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,32 +23,30 @@ static integer c__0 = 0;
 	    e_rsle(void);
 
     /* Local variables */
-    static integer ifnd, icmp, iscl, info, lcmp[3], kmin;
-    static doublereal wiin[20], vmax, tnrm, wrin[20], work[1200], vmul, stmp[
-	    20];
-    static integer i__, j, m, n;
-    static doublereal s[20], t[400]	/* was [20][20] */, v;
+    integer i__, j, m, n;
+    doublereal s[20], t[400]	/* was [20][20] */, v, le[400]	/* was [20][
+	    20] */, re[400]	/* was [20][20] */, wi[20], wr[20], val[3], 
+	    dum[1], eps, sep[20], sin__[20], tol, tmp[400]	/* was [20][
+	    20] */;
+    integer ifnd, icmp, iscl, info, lcmp[3], kmin;
+    doublereal wiin[20], vmax, tnrm, wrin[20], work[1200], vmul, stmp[20];
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal sepin[20];
+    doublereal sepin[20];
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal vimin, tolin, vrmin;
-    static integer iwork[40];
-    static doublereal witmp[20], wrtmp[20];
+    doublereal vimin, tolin, vrmin;
+    integer iwork[40];
+    doublereal witmp[20], wrtmp[20];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static doublereal le[400]	/* was [20][20] */, re[400]	/* was [20][
-	    20] */;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dgehrd_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    integer *);
-    static doublereal wi[20], wr[20];
-    extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *);
-    static logical select[20];
-    static doublereal bignum;
+	    integer *), dlacpy_(char *, integer *, integer *, doublereal *, 
+	    integer *, doublereal *, integer *);
+    logical select[20];
+    doublereal bignum;
     extern /* Subroutine */ int dhseqr_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), dtrevc_(char *, char *, logical *, integer *, 
@@ -62,8 +55,7 @@ static integer c__0 = 0;
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *, integer *);
-    static doublereal septmp[20], smlnum, val[3], dum[1], eps, sep[20], sin__[
-	    20], tol, tmp[400]	/* was [20][20] */;
+    doublereal septmp[20], smlnum;
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, 0, 0 };
@@ -72,60 +64,70 @@ static integer c__0 = 0;
 
 
 
-#define t_ref(a_1,a_2) t[(a_2)*20 + a_1 - 21]
-#define le_ref(a_1,a_2) le[(a_2)*20 + a_1 - 21]
-#define re_ref(a_1,a_2) re[(a_2)*20 + a_1 - 21]
-#define tmp_ref(a_1,a_2) tmp[(a_2)*20 + a_1 - 21]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET37 tests DTRSNA, a routine for estimating condition numbers of */
+/*  eigenvalues and/or right eigenvectors of a matrix. */
 
-    Purpose   
-    =======   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    DGET37 tests DTRSNA, a routine for estimating condition numbers of   
-    eigenvalues and/or right eigenvectors of a matrix.   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) DOUBLE PRECISION array, dimension (3) */
+/*          Value of the largest test ratio. */
+/*          RMAX(1) = largest ratio comparing different calls to DTRSNA */
+/*          RMAX(2) = largest error in reciprocal condition */
+/*                    numbers taking their conditioning into account */
+/*          RMAX(3) = largest error in reciprocal condition */
+/*                    numbers not taking their conditioning into */
+/*                    account (may be larger than RMAX(2)) */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER array, dimension (3) */
+/*          LMAX(i) is example number where largest test ratio */
+/*          RMAX(i) is achieved. Also: */
+/*          If DGEHRD returns INFO nonzero on example i, LMAX(1)=i */
+/*          If DHSEQR returns INFO nonzero on example i, LMAX(2)=i */
+/*          If DTRSNA returns INFO nonzero on example i, LMAX(3)=i */
 
-    RMAX    (output) DOUBLE PRECISION array, dimension (3)   
-            Value of the largest test ratio.   
-            RMAX(1) = largest ratio comparing different calls to DTRSNA   
-            RMAX(2) = largest error in reciprocal condition   
-                      numbers taking their conditioning into account   
-            RMAX(3) = largest error in reciprocal condition   
-                      numbers not taking their conditioning into   
-                      account (may be larger than RMAX(2))   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = No. of times DGEHRD returned INFO nonzero */
+/*          NINFO(2) = No. of times DHSEQR returned INFO nonzero */
+/*          NINFO(3) = No. of times DTRSNA returned INFO nonzero */
 
-    LMAX    (output) INTEGER array, dimension (3)   
-            LMAX(i) is example number where largest test ratio   
-            RMAX(i) is achieved. Also:   
-            If DGEHRD returns INFO nonzero on example i, LMAX(1)=i   
-            If DHSEQR returns INFO nonzero on example i, LMAX(2)=i   
-            If DTRSNA returns INFO nonzero on example i, LMAX(3)=i   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = No. of times DGEHRD returned INFO nonzero   
-            NINFO(2) = No. of times DHSEQR returned INFO nonzero   
-            NINFO(3) = No. of times DTRSNA returned INFO nonzero   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
     --lmax;
     --rmax;
@@ -154,9 +156,9 @@ static integer c__0 = 0;
     val[1] = 1.;
     val[2] = sqrt(bignum);
 
-/*     Read input data until N=0.  Assume input eigenvalues are sorted   
-       lexicographically (increasing by real part, then decreasing by   
-       imaginary part) */
+/*     Read input data until N=0.  Assume input eigenvalues are sorted */
+/*     lexicographically (increasing by real part, then decreasing by */
+/*     imaginary part) */
 
 L10:
     io___5.ciunit = *nin;
@@ -172,8 +174,8 @@ L10:
 	s_rsle(&io___8);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&tmp[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L20: */
@@ -206,7 +208,7 @@ L10:
 	vmul = val[iscl - 1];
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    dscal_(&n, &vmul, &t_ref(1, i__), &c__1);
+	    dscal_(&n, &vmul, &t[i__ * 20 - 20], &c__1);
 /* L40: */
 	}
 	if (tnrm == 0.) {
@@ -226,7 +228,7 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = n;
 	    for (i__ = j + 2; i__ <= i__2; ++i__) {
-		t_ref(i__, j) = 0.;
+		t[i__ + j * 20 - 21] = 0.;
 /* L50: */
 	    }
 /* L60: */
@@ -257,8 +259,8 @@ L10:
 	    goto L240;
 	}
 
-/*        Sort eigenvalues and condition numbers lexicographically   
-          to compare with inputs */
+/*        Sort eigenvalues and condition numbers lexicographically */
+/*        to compare with inputs */
 
 	dcopy_(&n, wr, &c__1, wrtmp, &c__1);
 	dcopy_(&n, wi, &c__1, witmp, &c__1);
@@ -293,10 +295,10 @@ L10:
 /* L80: */
 	}
 
-/*        Compare condition numbers for eigenvalues   
-          taking their condition numbers into account   
+/*        Compare condition numbers for eigenvalues */
+/*        taking their condition numbers into account */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = (doublereal) n * 2. * eps * tnrm;
 	v = max(d__1,smlnum);
 	if (tnrm == 0.) {
@@ -340,8 +342,8 @@ L10:
 /* L90: */
 	}
 
-/*        Compare condition numbers for eigenvectors   
-          taking their condition numbers into account */
+/*        Compare condition numbers for eigenvectors */
+/*        taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -382,8 +384,8 @@ L10:
 /* L100: */
 	}
 
-/*        Compare condition numbers for eigenvalues   
-          without taking their condition numbers into account */
+/*        Compare condition numbers for eigenvalues */
+/*        without taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -410,8 +412,8 @@ L10:
 /* L110: */
 	}
 
-/*        Compare condition numbers for eigenvectors   
-          without taking their condition numbers into account */
+/*        Compare condition numbers for eigenvectors */
+/*        without taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -573,11 +575,11 @@ L10:
 		    ifnd = 1;
 		    lcmp[1] = i__;
 		    lcmp[2] = i__ + 1;
-		    dcopy_(&n, &re_ref(1, i__), &c__1, &re_ref(1, 2), &c__1);
-		    dcopy_(&n, &re_ref(1, i__ + 1), &c__1, &re_ref(1, 3), &
+		    dcopy_(&n, &re[i__ * 20 - 20], &c__1, &re[20], &c__1);
+		    dcopy_(&n, &re[(i__ + 1) * 20 - 20], &c__1, &re[40], &
 			    c__1);
-		    dcopy_(&n, &le_ref(1, i__), &c__1, &le_ref(1, 2), &c__1);
-		    dcopy_(&n, &le_ref(1, i__ + 1), &c__1, &le_ref(1, 3), &
+		    dcopy_(&n, &le[i__ * 20 - 20], &c__1, &le[20], &c__1);
+		    dcopy_(&n, &le[(i__ + 1) * 20 - 20], &c__1, &le[40], &
 			    c__1);
 		}
 /* L190: */
@@ -598,8 +600,8 @@ L10:
 		} else {
 		    lcmp[2] = i__;
 		    ifnd = 1;
-		    dcopy_(&n, &re_ref(1, i__), &c__1, &re_ref(1, 3), &c__1);
-		    dcopy_(&n, &le_ref(1, i__), &c__1, &le_ref(1, 3), &c__1);
+		    dcopy_(&n, &re[i__ * 20 - 20], &c__1, &re[40], &c__1);
+		    dcopy_(&n, &le[i__ * 20 - 20], &c__1, &le[40], &c__1);
 		}
 /* L200: */
 	    }
@@ -692,10 +694,3 @@ L240:
 /*     End of DGET37 */
 
 } /* dget37_ */
-
-#undef tmp_ref
-#undef re_ref
-#undef le_ref
-#undef t_ref
-
-

@@ -1,116 +1,132 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int sspev_(char *jobz, char *uplo, integer *n, real *ap, 
 	real *w, real *z__, integer *ldz, real *work, integer *info)
 {
-/*  -- LAPACK driver routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    SSPEV computes all the eigenvalues and, optionally, eigenvectors of a   
-    real symmetric matrix A in packed storage.   
-
-    Arguments   
-    =========   
-
-    JOBZ    (input) CHARACTER*1   
-            = 'N':  Compute eigenvalues only;   
-            = 'V':  Compute eigenvalues and eigenvectors.   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangle of A is stored;   
-            = 'L':  Lower triangle of A is stored.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input/output) REAL array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the symmetric matrix   
-            A, packed columnwise in a linear array.  The j-th column of A   
-            is stored in the array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n.   
-
-            On exit, AP is overwritten by values generated during the   
-            reduction to tridiagonal form.  If UPLO = 'U', the diagonal   
-            and first superdiagonal of the tridiagonal matrix T overwrite   
-            the corresponding elements of A, and if UPLO = 'L', the   
-            diagonal and first subdiagonal of T overwrite the   
-            corresponding elements of A.   
-
-    W       (output) REAL array, dimension (N)   
-            If INFO = 0, the eigenvalues in ascending order.   
-
-    Z       (output) REAL array, dimension (LDZ, N)   
-            If JOBZ = 'V', then if INFO = 0, Z contains the orthonormal   
-            eigenvectors of the matrix A, with the i-th column of Z   
-            holding the eigenvector associated with W(i).   
-            If JOBZ = 'N', then Z is not referenced.   
-
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= 1, and if   
-            JOBZ = 'V', LDZ >= max(1,N).   
-
-    WORK    (workspace) REAL array, dimension (3*N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit.   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  if INFO = i, the algorithm failed to converge; i   
-                  off-diagonal elements of an intermediate tridiagonal   
-                  form did not converge to zero.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer z_dim1, z_offset, i__1;
     real r__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static integer inde;
-    static real anrm;
-    static integer imax;
-    static real rmin, rmax, sigma;
+    real eps;
+    integer inde;
+    real anrm;
+    integer imax;
+    real rmin, rmax, sigma;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static logical wantz;
-    static integer iscale;
+    logical wantz;
+    integer iscale;
     extern doublereal slamch_(char *);
-    static real safmin;
+    real safmin;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real bignum;
-    static integer indtau, indwrk;
+    real bignum;
+    integer indtau, indwrk;
     extern doublereal slansp_(char *, char *, integer *, real *, real *);
     extern /* Subroutine */ int ssterf_(integer *, real *, real *, integer *);
-    static real smlnum;
+    real smlnum;
     extern /* Subroutine */ int sopgtr_(char *, integer *, real *, real *, 
 	    real *, integer *, real *, integer *), ssptrd_(char *, 
 	    integer *, real *, real *, real *, real *, integer *), 
 	    ssteqr_(char *, integer *, real *, real *, real *, integer *, 
 	    real *, integer *);
-    static real eps;
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
 
 
+/*  -- LAPACK driver routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SSPEV computes all the eigenvalues and, optionally, eigenvectors of a */
+/*  real symmetric matrix A in packed storage. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOBZ    (input) CHARACTER*1 */
+/*          = 'N':  Compute eigenvalues only; */
+/*          = 'V':  Compute eigenvalues and eigenvectors. */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored; */
+/*          = 'L':  Lower triangle of A is stored. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input/output) REAL array, dimension (N*(N+1)/2) */
+/*          On entry, the upper or lower triangle of the symmetric matrix */
+/*          A, packed columnwise in a linear array.  The j-th column of A */
+/*          is stored in the array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2*n-j)/2) = A(i,j) for j<=i<=n. */
+
+/*          On exit, AP is overwritten by values generated during the */
+/*          reduction to tridiagonal form.  If UPLO = 'U', the diagonal */
+/*          and first superdiagonal of the tridiagonal matrix T overwrite */
+/*          the corresponding elements of A, and if UPLO = 'L', the */
+/*          diagonal and first subdiagonal of T overwrite the */
+/*          corresponding elements of A. */
+
+/*  W       (output) REAL array, dimension (N) */
+/*          If INFO = 0, the eigenvalues in ascending order. */
+
+/*  Z       (output) REAL array, dimension (LDZ, N) */
+/*          If JOBZ = 'V', then if INFO = 0, Z contains the orthonormal */
+/*          eigenvectors of the matrix A, with the i-th column of Z */
+/*          holding the eigenvector associated with W(i). */
+/*          If JOBZ = 'N', then Z is not referenced. */
+
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= 1, and if */
+/*          JOBZ = 'V', LDZ >= max(1,N). */
+
+/*  WORK    (workspace) REAL array, dimension (3*N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit. */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+/*          > 0:  if INFO = i, the algorithm failed to converge; i */
+/*                off-diagonal elements of an intermediate tridiagonal */
+/*                form did not converge to zero. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --ap;
     --w;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --work;
 
@@ -144,7 +160,7 @@
     if (*n == 1) {
 	w[1] = ap[1];
 	if (wantz) {
-	    z___ref(1, 1) = 1.f;
+	    z__[z_dim1 + 1] = 1.f;
 	}
 	return 0;
     }
@@ -180,8 +196,8 @@
     indtau = inde + *n;
     ssptrd_(uplo, n, &ap[1], &w[1], &work[inde], &work[indtau], &iinfo);
 
-/*     For eigenvalues only, call SSTERF.  For eigenvectors, first call   
-       SOPGTR to generate the orthogonal matrix, then call SSTEQR. */
+/*     For eigenvalues only, call SSTERF.  For eigenvectors, first call */
+/*     SOPGTR to generate the orthogonal matrix, then call SSTEQR. */
 
     if (! wantz) {
 	ssterf_(n, &w[1], &work[inde], info);
@@ -210,7 +226,3 @@
 /*     End of SSPEV */
 
 } /* sspev_ */
-
-#undef z___ref
-
-

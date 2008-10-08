@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -40,34 +35,36 @@ static integer c__3 = 3;
     /* System generated locals */
     integer i__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, ifst, ilst;
-    static doublecomplex work[24], a[16]	/* was [4][4] */, b[16]	/* 
-	    was [4][4] */, c__[16]	/* was [4][4] */;
-    static integer i__, j, m;
-    static doublereal s[4], scale;
-    static doublecomplex x[4];
-    static integer nt;
-    static doublereal rw[24];
+    doublecomplex a[16]	/* was [4][4] */, b[16]	/* was [4][4] */, c__[16]	
+	    /* was [4][4] */;
+    integer i__, j, m;
+    doublereal s[4];
+    doublecomplex x[4];
+    integer nt;
+    doublereal rw[24];
+    logical sel[4];
+    doublereal sep[4];
+    integer info, ifst, ilst;
+    doublecomplex work[24];
+    doublereal scale;
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
-	    *, logical *), ztrexc_(char *, integer *, doublecomplex *,
+	    *, logical *), ztrexc_(char *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, integer *, integer *, 
 	    integer *), ztrsna_(char *, char *, logical *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
+	    doublecomplex *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *, doublecomplex *, integer *, doublereal *, integer *), ztrsen_(char *, char *, logical *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, integer *), ztrsyl_(
 	    char *, char *, integer *, integer *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublereal *, integer *);
-    static logical sel[4];
-    static doublereal sep[4];
 
     /* Fortran I/O blocks */
     static cilist io___18 = { 0, 0, 0, fmt_9999, 0 };
@@ -75,36 +72,44 @@ static integer c__3 = 3;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERREC tests the error exits for the routines for eigen- condition */
+/*  estimation for DOUBLE PRECISION matrices: */
+/*     ZTRSYL, CTREXC, CTRSNA and CTRSEN. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERREC tests the error exits for the routines for eigen- condition   
-    estimation for DOUBLE PRECISION matrices:   
-       ZTRSYL, CTREXC, CTRSNA and CTRSEN.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     infoc_1.ok = TRUE_;
@@ -114,16 +119,16 @@ static integer c__3 = 3;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    a[i__1].r = 0., a[i__1].i = 0.;
-	    i__1 = b_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    b[i__1].r = 0., b[i__1].i = 0.;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	i__1 = a_subscr(i__, i__);
+	i__1 = i__ + (i__ << 2) - 5;
 	a[i__1].r = 1., a[i__1].i = 0.;
 	sel[i__ - 1] = TRUE_;
 /* L30: */
@@ -336,10 +341,3 @@ static integer c__3 = 3;
 /*     End of ZERREC */
 
 } /* zerrec_ */
-
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

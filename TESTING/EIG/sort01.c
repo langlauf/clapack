@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,91 +16,102 @@ static integer c__1 = 1;
     real r__1, r__2;
 
     /* Local variables */
+    integer i__, j, k;
+    real eps, tmp;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static integer i__, j, k;
     extern logical lsame_(char *, char *);
-    static integer mnmin;
+    integer mnmin;
     extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, real *, integer *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int slaset_(char *, integer *, integer *, real *, 
 	    real *, real *, integer *);
-    static integer ldwork;
+    integer ldwork;
     extern doublereal slansy_(char *, char *, integer *, real *, integer *, 
 	    real *);
-    static char transu[1];
-    static real eps, tmp;
+    char transu[1];
 
 
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SORT01 checks that the matrix U is orthogonal by computing the ratio */
 
-    Purpose   
-    =======   
+/*     RESID = norm( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R', */
+/*  or */
+/*     RESID = norm( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    SORT01 checks that the matrix U is orthogonal by computing the ratio   
+/*  Alternatively, if there isn't sufficient workspace to form */
+/*  I - U*U' or I - U'*U, the ratio is computed as */
 
-       RESID = norm( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R',   
-    or   
-       RESID = norm( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*     RESID = abs( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R', */
+/*  or */
+/*     RESID = abs( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    Alternatively, if there isn't sufficient workspace to form   
-    I - U*U' or I - U'*U, the ratio is computed as   
+/*  where EPS is the machine precision.  ROWCOL is used only if m = n; */
+/*  if m > n, ROWCOL is assumed to be 'C', and if m < n, ROWCOL is */
+/*  assumed to be 'R'. */
 
-       RESID = abs( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R',   
-    or   
-       RESID = abs( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*  Arguments */
+/*  ========= */
 
-    where EPS is the machine precision.  ROWCOL is used only if m = n;   
-    if m > n, ROWCOL is assumed to be 'C', and if m < n, ROWCOL is   
-    assumed to be 'R'.   
+/*  ROWCOL  (input) CHARACTER */
+/*          Specifies whether the rows or columns of U should be checked */
+/*          for orthogonality.  Used only if M = N. */
+/*          = 'R':  Check for orthogonal rows of U */
+/*          = 'C':  Check for orthogonal columns of U */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix U. */
 
-    ROWCOL  (input) CHARACTER   
-            Specifies whether the rows or columns of U should be checked   
-            for orthogonality.  Used only if M = N.   
-            = 'R':  Check for orthogonal rows of U   
-            = 'C':  Check for orthogonal columns of U   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix U. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix U.   
+/*  U       (input) REAL array, dimension (LDU,N) */
+/*          The orthogonal matrix U.  U is checked for orthogonal columns */
+/*          if m > n or if m = n and ROWCOL = 'C'.  U is checked for */
+/*          orthogonal rows if m < n or if m = n and ROWCOL = 'R'. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix U.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,M). */
 
-    U       (input) REAL array, dimension (LDU,N)   
-            The orthogonal matrix U.  U is checked for orthogonal columns   
-            if m > n or if m = n and ROWCOL = 'C'.  U is checked for   
-            orthogonal rows if m < n or if m = n and ROWCOL = 'R'.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,M).   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  For best performance, LWORK */
+/*          should be at least N*(N+1) if ROWCOL = 'C' or M*(M+1) if */
+/*          ROWCOL = 'R', but the test will be done even if LWORK is 0. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  RESID   (output) REAL */
+/*          RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or */
+/*          RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  For best performance, LWORK   
-            should be at least N*(N+1) if ROWCOL = 'C' or M*(M+1) if   
-            ROWCOL = 'R', but the test will be done even if LWORK is 0.   
+/*  ===================================================================== */
 
-    RESID   (output) REAL   
-            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or   
-            RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
 
@@ -159,7 +165,8 @@ static integer c__1 = 1;
 		} else {
 		    tmp = 1.f;
 		}
-		tmp -= sdot_(m, &u_ref(1, i__), &c__1, &u_ref(1, j), &c__1);
+		tmp -= sdot_(m, &u[i__ * u_dim1 + 1], &c__1, &u[j * u_dim1 + 
+			1], &c__1);
 /* Computing MAX */
 		r__1 = *resid, r__2 = dabs(tmp);
 		*resid = dmax(r__1,r__2);
@@ -181,7 +188,7 @@ static integer c__1 = 1;
 		} else {
 		    tmp = 1.f;
 		}
-		tmp -= sdot_(n, &u_ref(j, 1), ldu, &u_ref(i__, 1), ldu);
+		tmp -= sdot_(n, &u[j + u_dim1], ldu, &u[i__ + u_dim1], ldu);
 /* Computing MAX */
 		r__1 = *resid, r__2 = dabs(tmp);
 		*resid = dmax(r__1,r__2);
@@ -196,7 +203,3 @@ static integer c__1 = 1;
 /*     End of SORT01 */
 
 } /* sort01_ */
-
-#undef u_ref
-
-

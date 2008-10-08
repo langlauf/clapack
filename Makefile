@@ -1,33 +1,31 @@
 #
-#  Top Level Makefile for LAPACK
-#  Version 3.0
-#  June 30, 1999
+#  Top Level Makefile for CLAPACK
+#  Version 3.1.1 threadsafe version
+#  October 2008
 #
 
 include make.inc
 
-#all: install lib testing blas_testing timing blas_timing
-all: f2clib install lib testing blas_testing timing blas_timing
+#all: lapack_install lib lapack_testing blas_testing 
+all: f2clib lapack_install lib lapack_testing blas_testing 
 
 #lib: lapacklib tmglib
-lib: f2clib lapacklib tmglib
+#lib: f2clib lapacklib tmglib
+lib: blaslib lapacklib tmglib
 
-clean: cleanlib cleantesting cleantiming
+clean: cleanlib cleantesting 
 
-install:
+lapack_install:
 	( cd INSTALL; $(MAKE); ./testlsame; ./testslamch; \
-	  ./testdlamch; ./testsecond; ./testdsecnd; \
-	  cp lsame.c ../BLAS/SRC/; cp lsame.c ../SRC; \
-	  cp slamch.c ../SRC/; cp dlamch.c ../SRC/; \
-	  cp second.c ../SRC/; cp dsecnd.c ../SRC/ )
+	  ./testdlamch; ./testsecond; ./testdsecnd )
 
 blaslib:
 	( cd BLAS/SRC; $(MAKE) )
 
-cblaswrap:
+cblaswrap: blaswrap_copy
 	( cd BLAS/WRAP; $(MAKE) libcblaswr.a; cp libcblaswr.a ../.. )
 
-fblaswrap:
+fblaswrap: blaswrap_copy
 	( cd BLAS/WRAP; $(MAKE) libfblaswr.a; cp libfblaswr.a ../.. )
 
 lapacklib:
@@ -37,10 +35,9 @@ tmglib:
 	( cd TESTING/MATGEN; $(MAKE) )
 
 f2clib:
-	( cd F2CLIBS/libF77; $(MAKE) )
-	( cd F2CLIBS/libI77; $(MAKE) )
+	( cd F2CLIBS/libf2c; $(MAKE) )
 
-testing:
+lapack_testing:
 	( cd TESTING ; $(MAKE) )
 
 blas_testing:
@@ -62,54 +59,28 @@ blas_testing:
 	           ./xblat3c < cblat3.in ; \
 	           ./xblat3z < zblat3.in )
 
-timing:
-	( cd TIMING; $(MAKE) )
-
-blas_timing:
-	( cd TIMING/LIN; $(MAKE) )
-	( cd TIMING; ./xlintims < sblasa.in > sblasa.out ; \
-	             ./xlintims < sblasb.in > sblasb.out ; \
-	             ./xlintims < sblasc.in > sblasc.out )
-	( cd TIMING; ./xlintimd < dblasa.in > dblasa.out ; \
-	             ./xlintimd < dblasb.in > dblasb.out ; \
-	             ./xlintimd < dblasc.in > dblasc.out )
-	( cd TIMING; ./xlintimc < cblasa.in > cblasa.out ; \
-	             ./xlintimc < cblasb.in > cblasb.out ; \
-	             ./xlintimc < cblasc.in > cblasc.out )
-	( cd TIMING; ./xlintimz < zblasa.in > zblasa.out ; \
-	             ./xlintimz < zblasb.in > zblasb.out ; \
-	             ./xlintimz < zblasc.in > zblasc.out )
-
 cleanlib:
 	( cd INSTALL; $(MAKE) clean )
 	( cd BLAS/SRC; $(MAKE) clean )
-	( cd BLAS/WRAP; $(MAKE) clean )
 	( cd SRC; $(MAKE) clean )
 	( cd TESTING/MATGEN; $(MAKE) clean )
-	( cd F2CLIBS/libF77; $(MAKE) clean )
-	( cd F2CLIBS/libI77; $(MAKE) clean )
+	( cd F2CLIBS/libf2c; $(MAKE) clean )
 
 cleantesting:
+	( cd BLAS/TESTING ; rm -f *.o)
 	( cd TESTING/LIN; $(MAKE) clean )
 	( cd TESTING/EIG; $(MAKE) clean )
 	( cd TESTING; rm -f xlin* xeig* )
 
-cleantiming:
-	( cd TIMING/LIN; $(MAKE) clean )
-	( cd TIMING/LIN/LINSRC; $(MAKE) clean )
-	( cd TIMING/EIG; $(MAKE) clean )
-	( cd TIMING/EIG/EIGSRC; $(MAKE) clean )
-	( cd TIMING; rm -f xlin* xeig* )
+cleanall: clean
+	rm -f *.a BLAS/WRAP/*.a F2CLIBS/*.a INSTALL/test* BLAS/x* BLAS/*.out
 
 blaswrap_copy:
-	cp INSTALL/blaswrap.h SRC
-	cp INSTALL/blaswrap.h BLAS/SRC
-	cp INSTALL/blaswrap.h BLAS/TESTING
-	cp INSTALL/blaswrap.h BLAS/WRAP
-	cp INSTALL/blaswrap.h TESTING/LIN
-	cp INSTALL/blaswrap.h TESTING/EIG
-	cp INSTALL/blaswrap.h TESTING/MATGEN
-	cp INSTALL/blaswrap.h TIMING/EIG
-	cp INSTALL/blaswrap.h TIMING/EIG/EIGSRC
-	cp INSTALL/blaswrap.h TIMING/LIN
-	cp INSTALL/blaswrap.h TIMING/LIN/LINSRC
+	cp BLAS/WRAP/blaswrap.h SRC
+	cp BLAS/WRAP/blaswrap.h BLAS/SRC
+	cp BLAS/WRAP/blaswrap.h BLAS/TESTING
+	cp BLAS/WRAP/blaswrap.h INSTALL
+	cp BLAS/WRAP/blaswrap.h TESTING/LIN
+	cp BLAS/WRAP/blaswrap.h TESTING/EIG
+	cp BLAS/WRAP/blaswrap.h TESTING/MATGEN
+

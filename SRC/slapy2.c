@@ -1,36 +1,47 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal slapy2_(real *x, real *y)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    SLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary   
-    overflow.   
-
-    Arguments   
-    =========   
-
-    X       (input) REAL   
-    Y       (input) REAL   
-            X and Y specify the values x and y.   
-
-    ===================================================================== */
     /* System generated locals */
     real ret_val, r__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static real xabs, yabs, w, z__;
+    real w, z__, xabs, yabs;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary */
+/*  overflow. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  X       (input) REAL */
+/*  Y       (input) REAL */
+/*          X and Y specify the values x and y. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     xabs = dabs(*x);
     yabs = dabs(*y);
@@ -48,4 +59,3 @@ doublereal slapy2_(real *x, real *y)
 /*     End of SLAPY2 */
 
 } /* slapy2_ */
-

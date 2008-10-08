@@ -1,76 +1,89 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlasd5_(integer *i__, doublereal *d__, doublereal *z__, 
 	doublereal *delta, doublereal *rho, doublereal *dsigma, doublereal *
 	work)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
-       Courant Institute, NAG Ltd., and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    This subroutine computes the square root of the I-th eigenvalue   
-    of a positive symmetric rank-one modification of a 2-by-2 diagonal   
-    matrix   
-
-               diag( D ) * diag( D ) +  RHO *  Z * transpose(Z) .   
-
-    The diagonal entries in the array D are assumed to satisfy   
-
-               0 <= D(i) < D(j)  for  i < j .   
-
-    We also assume RHO > 0 and that the Euclidean norm of the vector   
-    Z is one.   
-
-    Arguments   
-    =========   
-
-    I      (input) INTEGER   
-           The index of the eigenvalue to be computed.  I = 1 or I = 2.   
-
-    D      (input) DOUBLE PRECISION array, dimension ( 2 )   
-           The original eigenvalues.  We assume 0 <= D(1) < D(2).   
-
-    Z      (input) DOUBLE PRECISION array, dimension ( 2 )   
-           The components of the updating vector.   
-
-    DELTA  (output) DOUBLE PRECISION array, dimension ( 2 )   
-           Contains (D(j) - lambda_I) in its  j-th component.   
-           The vector DELTA contains the information necessary   
-           to construct the eigenvectors.   
-
-    RHO    (input) DOUBLE PRECISION   
-           The scalar in the symmetric updating formula.   
-
-    DSIGMA (output) DOUBLE PRECISION   
-           The computed lambda_I, the I-th updated eigenvalue.   
-
-    WORK   (workspace) DOUBLE PRECISION array, dimension ( 2 )   
-           WORK contains (D(j) + sigma_I) in its  j-th component.   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Ren-Cang Li, Computer Science Division, University of California   
-       at Berkeley, USA   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     doublereal d__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
-    /* Local variables */
-    static doublereal b, c__, w, delsq, del, tau;
 
+    /* Local variables */
+    doublereal b, c__, w, del, tau, delsq;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  This subroutine computes the square root of the I-th eigenvalue */
+/*  of a positive symmetric rank-one modification of a 2-by-2 diagonal */
+/*  matrix */
+
+/*             diag( D ) * diag( D ) +  RHO *  Z * transpose(Z) . */
+
+/*  The diagonal entries in the array D are assumed to satisfy */
+
+/*             0 <= D(i) < D(j)  for  i < j . */
+
+/*  We also assume RHO > 0 and that the Euclidean norm of the vector */
+/*  Z is one. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  I      (input) INTEGER */
+/*         The index of the eigenvalue to be computed.  I = 1 or I = 2. */
+
+/*  D      (input) DOUBLE PRECISION array, dimension ( 2 ) */
+/*         The original eigenvalues.  We assume 0 <= D(1) < D(2). */
+
+/*  Z      (input) DOUBLE PRECISION array, dimension ( 2 ) */
+/*         The components of the updating vector. */
+
+/*  DELTA  (output) DOUBLE PRECISION array, dimension ( 2 ) */
+/*         Contains (D(j) - sigma_I) in its  j-th component. */
+/*         The vector DELTA contains the information necessary */
+/*         to construct the eigenvectors. */
+
+/*  RHO    (input) DOUBLE PRECISION */
+/*         The scalar in the symmetric updating formula. */
+
+/*  DSIGMA (output) DOUBLE PRECISION */
+/*         The computed sigma_I, the I-th updated eigenvalue. */
+
+/*  WORK   (workspace) DOUBLE PRECISION array, dimension ( 2 ) */
+/*         WORK contains (D(j) + sigma_I) in its  j-th component. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*     Ren-Cang Li, Computer Science Division, University of California */
+/*     at Berkeley, USA */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --work;
     --delta;
     --z__;
@@ -86,9 +99,9 @@
 	    b = delsq + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
 	    c__ = *rho * z__[1] * z__[1] * delsq;
 
-/*           B > ZERO, always   
+/*           B > ZERO, always */
 
-             The following TAU is DSIGMA * DSIGMA - D( 1 ) * D( 1 ) */
+/*           The following TAU is DSIGMA * DSIGMA - D( 1 ) * D( 1 ) */
 
 	    tau = c__ * 2. / (b + sqrt((d__1 = b * b - c__ * 4., abs(d__1))));
 
@@ -100,8 +113,8 @@
 	    delta[2] = del - tau;
 	    work[1] = d__[1] * 2. + tau;
 	    work[2] = d__[1] + tau + d__[2];
-/*           DELTA( 1 ) = -Z( 1 ) / TAU   
-             DELTA( 2 ) = Z( 2 ) / ( DEL-TAU ) */
+/*           DELTA( 1 ) = -Z( 1 ) / TAU */
+/*           DELTA( 2 ) = Z( 2 ) / ( DEL-TAU ) */
 	} else {
 	    b = -delsq + *rho * (z__[1] * z__[1] + z__[2] * z__[2]);
 	    c__ = *rho * z__[2] * z__[2] * delsq;
@@ -122,12 +135,12 @@
 	    delta[2] = -tau;
 	    work[1] = d__[1] + tau + d__[2];
 	    work[2] = d__[2] * 2. + tau;
-/*           DELTA( 1 ) = -Z( 1 ) / ( DEL+TAU )   
-             DELTA( 2 ) = -Z( 2 ) / TAU */
+/*           DELTA( 1 ) = -Z( 1 ) / ( DEL+TAU ) */
+/*           DELTA( 2 ) = -Z( 2 ) / TAU */
 	}
-/*        TEMP = SQRT( DELTA( 1 )*DELTA( 1 )+DELTA( 2 )*DELTA( 2 ) )   
-          DELTA( 1 ) = DELTA( 1 ) / TEMP   
-          DELTA( 2 ) = DELTA( 2 ) / TEMP */
+/*        TEMP = SQRT( DELTA( 1 )*DELTA( 1 )+DELTA( 2 )*DELTA( 2 ) ) */
+/*        DELTA( 1 ) = DELTA( 1 ) / TEMP */
+/*        DELTA( 2 ) = DELTA( 2 ) / TEMP */
     } else {
 
 /*        Now I=2 */
@@ -151,15 +164,14 @@
 	delta[2] = -tau;
 	work[1] = d__[1] + tau + d__[2];
 	work[2] = d__[2] * 2. + tau;
-/*        DELTA( 1 ) = -Z( 1 ) / ( DEL+TAU )   
-          DELTA( 2 ) = -Z( 2 ) / TAU   
-          TEMP = SQRT( DELTA( 1 )*DELTA( 1 )+DELTA( 2 )*DELTA( 2 ) )   
-          DELTA( 1 ) = DELTA( 1 ) / TEMP   
-          DELTA( 2 ) = DELTA( 2 ) / TEMP */
+/*        DELTA( 1 ) = -Z( 1 ) / ( DEL+TAU ) */
+/*        DELTA( 2 ) = -Z( 2 ) / TAU */
+/*        TEMP = SQRT( DELTA( 1 )*DELTA( 1 )+DELTA( 2 )*DELTA( 2 ) ) */
+/*        DELTA( 1 ) = DELTA( 1 ) / TEMP */
+/*        DELTA( 2 ) = DELTA( 2 ) / TEMP */
     }
     return 0;
 
 /*     End of DLASD5 */
 
 } /* dlasd5_ */
-

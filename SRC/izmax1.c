@@ -1,51 +1,66 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 integer izmax1_(integer *n, doublecomplex *cx, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    IZMAX1 finds the index of the element whose real part has maximum   
-    absolute value.   
-
-    Based on IZAMAX from Level 1 BLAS.   
-    The change is to use the 'genuine' absolute value.   
-
-    Contributed by Nick Higham for use with ZLACON.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of elements in the vector CX.   
-
-    CX      (input) COMPLEX*16 array, dimension (N)   
-            The vector whose elements will be summed.   
-
-    INCX    (input) INTEGER   
-            The spacing between successive values of CX.  INCX >= 1.   
-
-   =====================================================================   
-
-
-       NEXT LINE IS THE ONLY MODIFICATION.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer ret_val, i__1;
+
     /* Builtin functions */
     double z_abs(doublecomplex *);
-    /* Local variables */
-    static doublereal smax;
-    static integer i__, ix;
 
+    /* Local variables */
+    integer i__, ix;
+    doublereal smax;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  IZMAX1 finds the index of the element whose real part has maximum */
+/*  absolute value. */
+
+/*  Based on IZAMAX from Level 1 BLAS. */
+/*  The change is to use the 'genuine' absolute value. */
+
+/*  Contributed by Nick Higham for use with ZLACON. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of elements in the vector CX. */
+
+/*  CX      (input) COMPLEX*16 array, dimension (N) */
+/*          The vector whose elements will be summed. */
+
+/*  INCX    (input) INTEGER */
+/*          The spacing between successive values of CX.  INCX >= 1. */
+
+/* ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+
+/*     NEXT LINE IS THE ONLY MODIFICATION. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --cx;
 
     /* Function Body */
@@ -98,4 +113,3 @@ L40:
 /*     End of IZMAX1 */
 
 } /* izmax1_ */
-

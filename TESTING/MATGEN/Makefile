@@ -2,7 +2,7 @@ include ../../make.inc
 
 #######################################################################
 #  This is the makefile to create a library of the test matrix
-#  generators used in LAPACK.  The files are organized as follows:
+#  generators used in CLAPACK.  The files are organized as follows:
 #
 #     SCATGEN  -- Auxiliary routines called from both REAL and COMPLEX
 #     DZATGEN  -- Auxiliary routines called from both DOUBLE PRECISION
@@ -53,7 +53,15 @@ ZMATGEN = zlatms.o zlatme.o zlatmr.o \
    zlagge.o zlaghe.o zlagsy.o zlakf2.o zlarge.o zlaror.o zlarot.o \
    zlatm1.o zlarnd.o zlatm2.o zlatm3.o zlatm5.o zlatm6.o
 
-all: single complex double complex16
+all:	../../$(TMGLIB)
+
+ALLOBJ=$(SMATGEN) $(CMATGEN) $(SCATGEN) $(DMATGEN) $(ZMATGEN)	\
+	$(DZATGEN)
+
+../../$(TMGLIB): $(SMATGEN) $(CMATGEN) $(SCATGEN) $(DMATGEN)	\
+		$(ZMATGEN) $(DZATGEN)
+	$(ARCH) $(ARCHFLAGS) $@ $(ALLOBJ)
+	$(RANLIB) $@
 
 single: $(SMATGEN) $(SCATGEN)
 	$(ARCH) $(ARCHFLAGS) ../../$(TMGLIB) $(SMATGEN) $(SCATGEN)
@@ -84,5 +92,8 @@ FRC:
 clean: ; \
         rm -f *.o
 
-.c.o: ; $(CC) -c $(CFLAGS) $<
+.c.o: ; $(CC) $(CFLAGS) -c $< -o $@
+
+slaran.o: slaran.c ; $(CC) $(NOOPT) -c $< -o $@
+dlaran.o: dlaran.c ; $(CC) $(NOOPT) -c $< -o $@
 

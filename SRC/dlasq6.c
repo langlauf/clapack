@@ -1,13 +1,8 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlasq6_(integer *i0, integer *n0, doublereal *z__, 
-	integer *pp, doublereal *dmin__, doublereal *dmin1, doublereal *dmin2,
+	integer *pp, doublereal *dmin__, doublereal *dmin1, doublereal *dmin2, 
 	 doublereal *dn, doublereal *dnm1, doublereal *dnm2)
 {
     /* System generated locals */
@@ -15,63 +10,75 @@
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal emin, temp, d__;
-    static integer j4;
+    doublereal d__;
+    integer j4, j4p2;
+    doublereal emin, temp;
     extern doublereal dlamch_(char *);
-    static doublereal safmin;
-    static integer j4p2;
+    doublereal safmin;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLASQ6 computes one dqd (shift equal to zero) transform in   
-    ping-pong form, with protection against underflow and overflow.   
+/*  DLASQ6 computes one dqd (shift equal to zero) transform in */
+/*  ping-pong form, with protection against underflow and overflow. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    I0    (input) INTEGER   
-          First index.   
+/*  I0    (input) INTEGER */
+/*        First index. */
 
-    N0    (input) INTEGER   
-          Last index.   
+/*  N0    (input) INTEGER */
+/*        Last index. */
 
-    Z     (input) DOUBLE PRECISION array, dimension ( 4*N )   
-          Z holds the qd array. EMIN is stored in Z(4*N0) to avoid   
-          an extra argument.   
+/*  Z     (input) DOUBLE PRECISION array, dimension ( 4*N ) */
+/*        Z holds the qd array. EMIN is stored in Z(4*N0) to avoid */
+/*        an extra argument. */
 
-    PP    (input) INTEGER   
-          PP=0 for ping, PP=1 for pong.   
+/*  PP    (input) INTEGER */
+/*        PP=0 for ping, PP=1 for pong. */
 
-    DMIN  (output) DOUBLE PRECISION   
-          Minimum value of d.   
+/*  DMIN  (output) DOUBLE PRECISION */
+/*        Minimum value of d. */
 
-    DMIN1 (output) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ).   
+/*  DMIN1 (output) DOUBLE PRECISION */
+/*        Minimum value of d, excluding D( N0 ). */
 
-    DMIN2 (output) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
+/*  DMIN2 (output) DOUBLE PRECISION */
+/*        Minimum value of d, excluding D( N0 ) and D( N0-1 ). */
 
-    DN    (output) DOUBLE PRECISION   
-          d(N0), the last value of d.   
+/*  DN    (output) DOUBLE PRECISION */
+/*        d(N0), the last value of d. */
 
-    DNM1  (output) DOUBLE PRECISION   
-          d(N0-1).   
+/*  DNM1  (output) DOUBLE PRECISION */
+/*        d(N0-1). */
 
-    DNM2  (output) DOUBLE PRECISION   
-          d(N0-2).   
+/*  DNM2  (output) DOUBLE PRECISION */
+/*        d(N0-2). */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameter .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Function .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
@@ -185,4 +192,3 @@
 /*     End of DLASQ6 */
 
 } /* dlasq6_ */
-

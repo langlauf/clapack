@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,80 +16,90 @@ static integer c__1 = 1;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j;
+    integer j;
+    doublereal eps;
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal anorm, bnorm, xnorm;
+    doublereal anorm, bnorm, xnorm;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int dlaptm_(integer *, integer *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
 	     doublereal *, integer *);
     extern doublereal dlanst_(char *, integer *, doublereal *, doublereal *);
-    static doublereal eps;
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DPTT02 computes the residual for the solution to a symmetric */
+/*  tridiagonal system of equations: */
+/*     RESID = norm(B - A*X) / (norm(A) * norm(X) * EPS), */
+/*  where EPS is the machine epsilon. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DPTT02 computes the residual for the solution to a symmetric   
-    tridiagonal system of equations:   
-       RESID = norm(B - A*X) / (norm(A) * norm(X) * EPS),   
-    where EPS is the machine epsilon.   
+/*  N       (input) INTEGTER */
+/*          The order of the matrix A. */
 
-    Arguments   
-    =========   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrices B and X.  NRHS >= 0. */
 
-    N       (input) INTEGTER   
-            The order of the matrix A.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The n diagonal elements of the tridiagonal matrix A. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrices B and X.  NRHS >= 0.   
+/*  E       (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The (n-1) subdiagonal elements of the tridiagonal matrix A. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix A.   
+/*  X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS) */
+/*          The n by nrhs matrix of solution vectors X. */
 
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the tridiagonal matrix A.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  LDX >= max(1,N). */
 
-    X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS)   
-            The n by nrhs matrix of solution vectors X.   
+/*  B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS) */
+/*          On entry, the n by nrhs matrix of right hand side vectors B. */
+/*          On exit, B is overwritten with the difference B - A*X. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  LDX >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            On entry, the n by nrhs matrix of right hand side vectors B.   
-            On exit, B is overwritten with the difference B - A*X.   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          norm(B - A*X) / (norm(A) * norm(X) * EPS) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            norm(B - A*X) / (norm(A) * norm(X) * EPS)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     --e;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -120,14 +125,14 @@ static integer c__1 = 1;
     dlaptm_(n, nrhs, &c_b4, &d__[1], &e[1], &x[x_offset], ldx, &c_b5, &b[
 	    b_offset], ldb);
 
-/*     Compute the maximum over the number of right hand sides of   
-          norm(B - A*X) / ( norm(A) * norm(X) * EPS ). */
+/*     Compute the maximum over the number of right hand sides of */
+/*        norm(B - A*X) / ( norm(A) * norm(X) * EPS ). */
 
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	bnorm = dasum_(n, &b_ref(1, j), &c__1);
-	xnorm = dasum_(n, &x_ref(1, j), &c__1);
+	bnorm = dasum_(n, &b[j * b_dim1 + 1], &c__1);
+	xnorm = dasum_(n, &x[j * x_dim1 + 1], &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -143,8 +148,3 @@ static integer c__1 = 1;
 /*     End of DPTT02 */
 
 } /* dptt02_ */
-
-#undef x_ref
-#undef b_ref
-
-

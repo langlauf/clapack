@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -24,69 +19,81 @@ static integer c__0 = 0;
     double r_sign(real *, real *);
 
     /* Local variables */
-    static integer info, j;
-    static real dummy[1];
+    integer j, info;
+    real dummy[1];
     extern /* Subroutine */ int slabad_(real *, real *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
     extern /* Subroutine */ int clascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, complex *, integer *, integer *);
     extern doublereal slamch_(char *);
-    static real bignum;
+    real bignum;
     extern /* Subroutine */ int clarnv_(integer *, integer *, integer *, 
 	    complex *);
     extern doublereal scasum_(integer *, complex *, integer *);
-    static real smlnum;
+    real smlnum;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CQRT13 generates a full-rank matrix that may be scaled to have large */
+/*  or small norm. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CQRT13 generates a full-rank matrix that may be scaled to have large   
-    or small norm.   
+/*  SCALE   (input) INTEGER */
+/*          SCALE = 1: normally scaled matrix */
+/*          SCALE = 2: matrix scaled up */
+/*          SCALE = 3: matrix scaled down */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    SCALE   (input) INTEGER   
-            SCALE = 1: normally scaled matrix   
-            SCALE = 2: matrix scaled up   
-            SCALE = 3: matrix scaled down   
+/*  N       (input) INTEGER */
+/*          The number of columns of A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  A       (output) COMPLEX array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (output) COMPLEX array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  NORMA   (output) REAL */
+/*          The one-norm of A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  ISEED   (input/output) integer array, dimension (4) */
+/*          Seed for random number generator */
 
-    NORMA   (output) REAL   
-            The one-norm of A.   
+/*  ===================================================================== */
 
-    ISEED   (input/output) integer array, dimension (4)   
-            Seed for random number generator   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
 
@@ -99,12 +106,12 @@ static integer c__0 = 0;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	clarnv_(&c__2, &iseed[1], m, &a_ref(1, j));
+	clarnv_(&c__2, &iseed[1], m, &a[j * a_dim1 + 1]);
 	if (j <= *m) {
-	    i__2 = a_subscr(j, j);
-	    i__3 = a_subscr(j, j);
-	    r__2 = scasum_(m, &a_ref(1, j), &c__1);
-	    i__4 = a_subscr(j, j);
+	    i__2 = j + j * a_dim1;
+	    i__3 = j + j * a_dim1;
+	    r__2 = scasum_(m, &a[j * a_dim1 + 1], &c__1);
+	    i__4 = j + j * a_dim1;
 	    r__3 = a[i__4].r;
 	    r__1 = r_sign(&r__2, &r__3);
 	    q__2.r = r__1, q__2.i = 0.f;
@@ -145,8 +152,3 @@ static integer c__0 = 0;
 /*     End of CQRT13 */
 
 } /* cqrt13_ */
-
-#undef a_ref
-#undef a_subscr
-
-

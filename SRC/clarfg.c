@@ -1,88 +1,104 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static complex c_b5 = {1.f,0.f};
 
 /* Subroutine */ int clarfg_(integer *n, complex *alpha, complex *x, integer *
 	incx, complex *tau)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CLARFG generates a complex elementary reflector H of order n, such   
-    that   
-
-          H' * ( alpha ) = ( beta ),   H' * H = I.   
-               (   x   )   (   0  )   
-
-    where alpha and beta are scalars, with beta real, and x is an   
-    (n-1)-element complex vector. H is represented in the form   
-
-          H = I - tau * ( 1 ) * ( 1 v' ) ,   
-                        ( v )   
-
-    where tau is a complex scalar and v is a complex (n-1)-element   
-    vector. Note that H is not hermitian.   
-
-    If the elements of x are all zero and alpha is real, then tau = 0   
-    and H is taken to be the unit matrix.   
-
-    Otherwise  1 <= real(tau) <= 2  and  abs(tau-1) <= 1 .   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the elementary reflector.   
-
-    ALPHA   (input/output) COMPLEX   
-            On entry, the value alpha.   
-            On exit, it is overwritten with the value beta.   
-
-    X       (input/output) COMPLEX array, dimension   
-                           (1+(N-2)*abs(INCX))   
-            On entry, the vector x.   
-            On exit, it is overwritten with the vector v.   
-
-    INCX    (input) INTEGER   
-            The increment between elements of X. INCX > 0.   
-
-    TAU     (output) COMPLEX   
-            The value tau.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static complex c_b5 = {1.f,0.f};
-    
     /* System generated locals */
     integer i__1;
     real r__1, r__2;
     complex q__1, q__2;
+
     /* Builtin functions */
     double r_imag(complex *), r_sign(real *, real *);
+
     /* Local variables */
-    static real beta;
-    static integer j;
+    integer j, knt;
+    real beta;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
-    static real alphi, alphr, xnorm;
+    real alphi, alphr, xnorm;
     extern doublereal scnrm2_(integer *, complex *, integer *), slapy3_(real *
-	    , real *, real *);
+, real *, real *);
     extern /* Complex */ VOID cladiv_(complex *, complex *, complex *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
 	    *);
-    static real safmin, rsafmn;
-    static integer knt;
+    real safmin, rsafmn;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLARFG generates a complex elementary reflector H of order n, such */
+/*  that */
+
+/*        H' * ( alpha ) = ( beta ),   H' * H = I. */
+/*             (   x   )   (   0  ) */
+
+/*  where alpha and beta are scalars, with beta real, and x is an */
+/*  (n-1)-element complex vector. H is represented in the form */
+
+/*        H = I - tau * ( 1 ) * ( 1 v' ) , */
+/*                      ( v ) */
+
+/*  where tau is a complex scalar and v is a complex (n-1)-element */
+/*  vector. Note that H is not hermitian. */
+
+/*  If the elements of x are all zero and alpha is real, then tau = 0 */
+/*  and H is taken to be the unit matrix. */
+
+/*  Otherwise  1 <= real(tau) <= 2  and  abs(tau-1) <= 1 . */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The order of the elementary reflector. */
+
+/*  ALPHA   (input/output) COMPLEX */
+/*          On entry, the value alpha. */
+/*          On exit, it is overwritten with the value beta. */
+
+/*  X       (input/output) COMPLEX array, dimension */
+/*                         (1+(N-2)*abs(INCX)) */
+/*          On entry, the vector x. */
+/*          On exit, it is overwritten with the vector v. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between elements of X. INCX > 0. */
+
+/*  TAU     (output) COMPLEX */
+/*          The value tau. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --x;
 
     /* Function Body */
@@ -172,4 +188,3 @@ L10:
 /*     End of CLARFG */
 
 } /* clarfg_ */
-

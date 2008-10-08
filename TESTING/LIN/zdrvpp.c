@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -59,75 +54,74 @@ static doublecomplex c_b63 = {0.,0.};
     integer i__1, i__2, i__3, i__4, i__5[2];
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static integer ioff, mode;
-    static doublereal amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1], uplo[1], type__[1];
-    static integer nrun, i__, k, n, ifact, nfail, iseed[4], nfact;
+    integer i__, k, n, k1, in, kl, ku, nt, lda, npp;
+    char fact[1];
+    integer ioff, mode;
+    doublereal amax;
+    char path[3];
+    integer imat, info;
+    char dist[1], uplo[1], type__[1];
+    integer nrun, ifact, nfail, iseed[4], nfact;
     extern doublereal dget06_(doublereal *, doublereal *);
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static doublereal roldc, rcond, scond;
-    static integer nimat;
-    static doublereal anorm;
-    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *,
+    char equed[1];
+    doublereal roldc, rcond, scond;
+    integer nimat;
+    doublereal anorm;
+    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublereal *, doublereal *
-	    );
-    static logical equil;
-    static integer iuplo, izero, nerrs, k1;
+);
+    logical equil;
+    integer iuplo, izero, nerrs;
     extern /* Subroutine */ int zppt01_(char *, integer *, doublecomplex *, 
 	    doublecomplex *, doublereal *, doublereal *), zppt02_(
 	    char *, integer *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, doublereal *);
-    static logical zerot;
+    logical zerot;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *), zppt05_(char *, integer *, integer *,
+	    doublecomplex *, integer *), zppt05_(char *, integer *, integer *, 
 	     doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     doublereal *);
-    static char xtype[1];
+    char xtype[1];
     extern /* Subroutine */ int zppsv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, integer *), 
 	    zlatb4_(char *, integer *, integer *, integer *, char *, integer *
-	    , integer *, doublereal *, integer *, doublereal *, char *), aladhd_(integer *, char *);
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer ku, nt;
-    static doublereal rcondc;
-    static logical nofact;
-    static char packit[1];
-    static integer iequed;
+, integer *, doublereal *, integer *, doublereal *, char *), aladhd_(integer *, char *), 
+	    alaerh_(char *, char *, integer *, integer *, char *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *);
+    logical prefac;
+    doublereal rcondc;
+    logical nofact;
+    char packit[1];
+    integer iequed;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static doublereal cndnum;
-    extern /* Subroutine */ int zlaipd_(integer *, doublecomplex *, integer *,
+    doublereal cndnum;
+    extern /* Subroutine */ int zlaipd_(integer *, doublecomplex *, integer *, 
 	     integer *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern doublereal zlanhp_(char *, char *, integer *, doublecomplex *, 
 	    doublereal *);
     extern /* Subroutine */ int zlaqhp_(char *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, doublereal *, char *),
-	     zlacpy_(char *, integer *, integer *, doublecomplex *, integer *,
+	     zlacpy_(char *, integer *, integer *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *), zlarhs_(char *, char *, 
 	    char *, char *, integer *, integer *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *), zlatms_(integer *, integer *, char *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, char *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *);
-    static doublereal result[6];
+    doublereal result[6];
     extern /* Subroutine */ int zppequ_(char *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    zpptrf_(char *, integer *, doublecomplex *, integer *), 
@@ -137,7 +131,6 @@ static doublecomplex c_b63 = {0.,0.};
 	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublereal *, doublereal *, doublereal *, 
 	    doublecomplex *, doublereal *, integer *);
-    static integer lda, npp;
 
     /* Fortran I/O blocks */
     static cilist io___49 = { 0, 0, 0, fmt_9999, 0 };
@@ -146,74 +139,94 @@ static doublecomplex c_b63 = {0.,0.};
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZDRVPP tests the driver routines ZPPSV and -SVX.   
+/*  ZDRVPP tests the driver routines ZPPSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2)   
+/*  A       (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2) */
 
-    AFAC    (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2)   
+/*  AFAC    (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2) */
 
-    ASAV    (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2)   
+/*  ASAV    (workspace) COMPLEX*16 array, dimension (NMAX*(NMAX+1)/2) */
 
-    B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension (NMAX)   
+/*  S       (workspace) DOUBLE PRECISION array, dimension (NMAX) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) COMPLEX*16 array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --rwork;
     --work;
     --s;
@@ -227,9 +240,11 @@ static doublecomplex c_b63 = {0.,0.};
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "PP", (ftnlen)2, (ftnlen)2);
@@ -284,8 +299,8 @@ static doublecomplex c_b63 = {0.,0.};
 		*(unsigned char *)packit = *(unsigned char *)&packs[iuplo - 1]
 			;
 
-/*              Set up parameters with ZLATB4 and generate a test matrix   
-                with ZLATMS. */
+/*              Set up parameters with ZLATB4 and generate a test matrix */
+/*              with ZLATMS. */
 
 		zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
@@ -299,13 +314,13 @@ static doublecomplex c_b63 = {0.,0.};
 /*              Check error code from ZLATMS. */
 
 		if (info != 0) {
-		    alaerh_(path, "ZLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "ZLATMS", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		    goto L120;
 		}
 
-/*              For types 3-5, zero one row and column of the matrix to   
-                test that INFO is returned correctly. */
+/*              For types 3-5, zero one row and column of the matrix to */
+/*              test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 3) {
@@ -393,16 +408,16 @@ static doublecomplex c_b63 = {0.,0.};
 			} else if (! lsame_(fact, "N")) 
 				{
 
-/*                       Compute the condition number for comparison with   
-                         the value returned by ZPPSVX (FACT = 'N' reuses   
-                         the condition number from the previous iteration   
-                            with FACT = 'F'). */
+/*                       Compute the condition number for comparison with */
+/*                       the value returned by ZPPSVX (FACT = 'N' reuses */
+/*                       the condition number from the previous iteration */
+/*                          with FACT = 'F'). */
 
 			    zcopy_(&npp, &asav[1], &c__1, &afac[1], &c__1);
 			    if (equil || iequed > 1) {
 
-/*                          Compute row and column scale factors to   
-                            equilibrate the matrix A. */
+/*                          Compute row and column scale factors to */
+/*                          equilibrate the matrix A. */
 
 				zppequ_(uplo, &n, &afac[1], &s[1], &scond, &
 					amax, &info);
@@ -413,13 +428,13 @@ static doublecomplex c_b63 = {0.,0.};
 
 /*                             Equilibrate the matrix. */
 
-				    zlaqhp_(uplo, &n, &afac[1], &s[1], &scond,
+				    zlaqhp_(uplo, &n, &afac[1], &s[1], &scond, 
 					     &amax, equed);
 				}
 			    }
 
-/*                       Save the condition number of the   
-                         non-equilibrated system for use in ZGET04. */
+/*                       Save the condition number of the */
+/*                       non-equilibrated system for use in ZGET04. */
 
 			    if (equil) {
 				roldc = rcondc;
@@ -428,7 +443,7 @@ static doublecomplex c_b63 = {0.,0.};
 /*                       Compute the 1-norm of A. */
 
 			    anorm = zlanhp_("1", uplo, &n, &afac[1], &rwork[1]
-				    );
+);
 
 /*                       Factor the matrix A. */
 
@@ -465,10 +480,10 @@ static doublecomplex c_b63 = {0.,0.};
 
 			if (nofact) {
 
-/*                       --- Test ZPPSV  ---   
+/*                       --- Test ZPPSV  --- */
 
-                         Compute the L*L' or U'*U factorization of the   
-                         matrix and solve the system. */
+/*                       Compute the L*L' or U'*U factorization of the */
+/*                       matrix and solve the system. */
 
 			    zcopy_(&npp, &a[1], &c__1, &afac[1], &c__1);
 			    zlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
@@ -490,8 +505,8 @@ static doublecomplex c_b63 = {0.,0.};
 				goto L70;
 			    }
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    zppt01_(uplo, &n, &a[1], &afac[1], &rwork[1], 
 				    result);
@@ -509,8 +524,8 @@ static doublecomplex c_b63 = {0.,0.};
 				    rcondc, &result[2]);
 			    nt = 3;
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    i__4 = nt;
 			    for (k = 1; k <= i__4; ++k) {
@@ -549,15 +564,15 @@ L70:
 			zlaset_("Full", &n, nrhs, &c_b63, &c_b63, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if FACT='F' and   
-                         EQUED='Y'. */
+/*                       Equilibrate the matrix if FACT='F' and */
+/*                       EQUED='Y'. */
 
 			    zlaqhp_(uplo, &n, &a[1], &s[1], &scond, &amax, 
 				    equed);
 			}
 
-/*                    Solve the system and compute the condition number   
-                      and error bounds using ZPPSVX. */
+/*                    Solve the system and compute the condition number */
+/*                    and error bounds using ZPPSVX. */
 
 			s_copy(srnamc_1.srnamt, "ZPPSVX", (ftnlen)6, (ftnlen)
 				6);
@@ -582,8 +597,8 @@ L70:
 			if (info == 0) {
 			    if (! prefac) {
 
-/*                          Reconstruct matrix from factors and compute   
-                            residual. */
+/*                          Reconstruct matrix from factors and compute */
+/*                          residual. */
 
 				zppt01_(uplo, &n, &a[1], &afac[1], &rwork[(*
 					nrhs << 1) + 1], result);
@@ -595,7 +610,7 @@ L70:
 /*                       Compute residual of the computed solution. */
 
 			    zlacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
-				    , &lda);
+, &lda);
 			    zppt02_(uplo, &n, nrhs, &asav[1], &x[1], &lda, &
 				    work[1], &lda, &rwork[(*nrhs << 1) + 1], &
 				    result[1]);
@@ -603,15 +618,15 @@ L70:
 /*                       Check solution from generated exact solution. */
 
 			    if (nofact || prefac && lsame_(equed, "N")) {
-				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 			    } else {
-				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds from iterative   
-                         refinement. */
+/*                       Check the error bounds from iterative */
+/*                       refinement. */
 
 			    zppt05_(uplo, &n, nrhs, &asav[1], &b[1], &lda, &x[
 				    1], &lda, &xact[1], &lda, &rwork[1], &
@@ -620,13 +635,13 @@ L70:
 			    k1 = 6;
 			}
 
-/*                    Compare RCOND from ZPPSVX with the computed value   
-                      in RCONDC. */
+/*                    Compare RCOND from ZPPSVX with the computed value */
+/*                    in RCONDC. */
 
 			result[5] = dget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			for (k = k1; k <= 6; ++k) {
 			    if (result[k - 1] >= *thresh) {
@@ -694,4 +709,3 @@ L130:
 /*     End of ZDRVPP */
 
 } /* zdrvpp_ */
-

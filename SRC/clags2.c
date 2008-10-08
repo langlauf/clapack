@@ -1,111 +1,128 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int clags2_(logical *upper, real *a1, complex *a2, real *a3, 
 	real *b1, complex *b2, real *b3, real *csu, complex *snu, real *csv, 
 	complex *snv, real *csq, complex *snq)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CLAGS2 computes 2-by-2 unitary matrices U, V and Q, such   
-    that if ( UPPER ) then   
-
-              U'*A*Q = U'*( A1 A2 )*Q = ( x  0  )   
-                          ( 0  A3 )     ( x  x  )   
-    and   
-              V'*B*Q = V'*( B1 B2 )*Q = ( x  0  )   
-                          ( 0  B3 )     ( x  x  )   
-
-    or if ( .NOT.UPPER ) then   
-
-              U'*A*Q = U'*( A1 0  )*Q = ( x  x  )   
-                          ( A2 A3 )     ( 0  x  )   
-    and   
-              V'*B*Q = V'*( B1 0  )*Q = ( x  x  )   
-                          ( B2 B3 )     ( 0  x  )   
-    where   
-
-      U = (     CSU      SNU ), V = (     CSV     SNV ),   
-          ( -CONJG(SNU)  CSU )      ( -CONJG(SNV) CSV )   
-
-      Q = (     CSQ      SNQ )   
-          ( -CONJG(SNQ)  CSQ )   
-
-    Z' denotes the conjugate transpose of Z.   
-
-    The rows of the transformed A and B are parallel. Moreover, if the   
-    input 2-by-2 matrix A is not zero, then the transformed (1,1) entry   
-    of A is not zero. If the input matrices A and B are both not zero,   
-    then the transformed (2,2) element of B is not zero, except when the   
-    first rows of input A and B are parallel and the second rows are   
-    zero.   
-
-    Arguments   
-    =========   
-
-    UPPER   (input) LOGICAL   
-            = .TRUE.: the input matrices A and B are upper triangular.   
-            = .FALSE.: the input matrices A and B are lower triangular.   
-
-    A1      (input) REAL   
-    A2      (input) COMPLEX   
-    A3      (input) REAL   
-            On entry, A1, A2 and A3 are elements of the input 2-by-2   
-            upper (lower) triangular matrix A.   
-
-    B1      (input) REAL   
-    B2      (input) COMPLEX   
-    B3      (input) REAL   
-            On entry, B1, B2 and B3 are elements of the input 2-by-2   
-            upper (lower) triangular matrix B.   
-
-    CSU     (output) REAL   
-    SNU     (output) COMPLEX   
-            The desired unitary matrix U.   
-
-    CSV     (output) REAL   
-    SNV     (output) COMPLEX   
-            The desired unitary matrix V.   
-
-    CSQ     (output) REAL   
-    SNQ     (output) COMPLEX   
-            The desired unitary matrix Q.   
-
-    ===================================================================== */
     /* System generated locals */
     real r__1, r__2, r__3, r__4, r__5, r__6, r__7, r__8;
     complex q__1, q__2, q__3, q__4, q__5;
+
     /* Builtin functions */
     double c_abs(complex *), r_imag(complex *);
     void r_cnjg(complex *, complex *);
+
     /* Local variables */
-    static real aua11, aua12, aua21, aua22, avb11, avb12, avb21, avb22, ua11r,
-	     ua22r, vb11r, vb22r, a;
-    static complex b, c__;
-    static real d__;
-    static complex r__, d1;
-    static real s1, s2, fb, fc;
+    real a;
+    complex b, c__;
+    real d__;
+    complex r__, d1;
+    real s1, s2, fb, fc;
+    complex ua11, ua12, ua21, ua22, vb11, vb12, vb21, vb22;
+    real csl, csr, snl, snr, aua11, aua12, aua21, aua22, avb11, avb12, avb21, 
+	    avb22, ua11r, ua22r, vb11r, vb22r;
     extern /* Subroutine */ int slasv2_(real *, real *, real *, real *, real *
-	    , real *, real *, real *, real *), clartg_(complex *, complex *, 
+, real *, real *, real *, real *), clartg_(complex *, complex *, 
 	    real *, complex *, complex *);
-    static complex ua11, ua12, ua21, ua22, vb11, vb12, vb21, vb22;
-    static real csl, csr, snl, snr;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLAGS2 computes 2-by-2 unitary matrices U, V and Q, such */
+/*  that if ( UPPER ) then */
+
+/*            U'*A*Q = U'*( A1 A2 )*Q = ( x  0  ) */
+/*                        ( 0  A3 )     ( x  x  ) */
+/*  and */
+/*            V'*B*Q = V'*( B1 B2 )*Q = ( x  0  ) */
+/*                        ( 0  B3 )     ( x  x  ) */
+
+/*  or if ( .NOT.UPPER ) then */
+
+/*            U'*A*Q = U'*( A1 0  )*Q = ( x  x  ) */
+/*                        ( A2 A3 )     ( 0  x  ) */
+/*  and */
+/*            V'*B*Q = V'*( B1 0  )*Q = ( x  x  ) */
+/*                        ( B2 B3 )     ( 0  x  ) */
+/*  where */
+
+/*    U = (     CSU      SNU ), V = (     CSV     SNV ), */
+/*        ( -CONJG(SNU)  CSU )      ( -CONJG(SNV) CSV ) */
+
+/*    Q = (     CSQ      SNQ ) */
+/*        ( -CONJG(SNQ)  CSQ ) */
+
+/*  Z' denotes the conjugate transpose of Z. */
+
+/*  The rows of the transformed A and B are parallel. Moreover, if the */
+/*  input 2-by-2 matrix A is not zero, then the transformed (1,1) entry */
+/*  of A is not zero. If the input matrices A and B are both not zero, */
+/*  then the transformed (2,2) element of B is not zero, except when the */
+/*  first rows of input A and B are parallel and the second rows are */
+/*  zero. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPPER   (input) LOGICAL */
+/*          = .TRUE.: the input matrices A and B are upper triangular. */
+/*          = .FALSE.: the input matrices A and B are lower triangular. */
+
+/*  A1      (input) REAL */
+/*  A2      (input) COMPLEX */
+/*  A3      (input) REAL */
+/*          On entry, A1, A2 and A3 are elements of the input 2-by-2 */
+/*          upper (lower) triangular matrix A. */
+
+/*  B1      (input) REAL */
+/*  B2      (input) COMPLEX */
+/*  B3      (input) REAL */
+/*          On entry, B1, B2 and B3 are elements of the input 2-by-2 */
+/*          upper (lower) triangular matrix B. */
+
+/*  CSU     (output) REAL */
+/*  SNU     (output) COMPLEX */
+/*          The desired unitary matrix U. */
+
+/*  CSV     (output) REAL */
+/*  SNV     (output) COMPLEX */
+/*          The desired unitary matrix V. */
+
+/*  CSQ     (output) REAL */
+/*  SNQ     (output) COMPLEX */
+/*          The desired unitary matrix Q. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (*upper) {
 
-/*        Input matrices A and B are upper triangular matrices   
+/*        Input matrices A and B are upper triangular matrices */
 
-          Form matrix C = A*adj(B) = ( a b )   
-                                     ( 0 d ) */
+/*        Form matrix C = A*adj(B) = ( a b ) */
+/*                                   ( 0 d ) */
 
 	a = *a1 * *b3;
 	d__ = *a3 * *b1;
@@ -115,8 +132,8 @@
 	b.r = q__1.r, b.i = q__1.i;
 	fb = c_abs(&b);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
-          diagonal matrix diag(1,D1). */
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary */
+/*        diagonal matrix diag(1,D1). */
 
 	d1.r = 1.f, d1.i = 0.f;
 	if (fb != 0.f) {
@@ -124,17 +141,17 @@
 	    d1.r = q__1.r, d1.i = q__1.i;
 	}
 
-/*        The SVD of real 2 by 2 triangular C   
+/*        The SVD of real 2 by 2 triangular C */
 
-           ( CSL -SNL )*( A B )*(  CSR  SNR ) = ( R 0 )   
-           ( SNL  CSL ) ( 0 D ) ( -SNR  CSR )   ( 0 T ) */
+/*         ( CSL -SNL )*( A B )*(  CSR  SNR ) = ( R 0 ) */
+/*         ( SNL  CSL ) ( 0 D ) ( -SNR  CSR )   ( 0 T ) */
 
 	slasv2_(&a, &fb, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (dabs(csl) >= dabs(snl) || dabs(csr) >= dabs(snr)) {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
-             and (1,2) element of |U|'*|A| and |V|'*|B|. */
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B, */
+/*           and (1,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    ua11r = csl * *a1;
 	    q__2.r = csl * a2->r, q__2.i = csl * a2->i;
@@ -195,8 +212,8 @@
 
 	} else {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
-             and (2,2) element of |U|'*|A| and |V|'*|B|. */
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B, */
+/*           and (2,2) element of |U|'*|A| and |V|'*|B|. */
 
 	    r_cnjg(&q__4, &d1);
 	    q__3.r = -q__4.r, q__3.i = -q__4.i;
@@ -274,10 +291,10 @@
 
     } else {
 
-/*        Input matrices A and B are lower triangular matrices   
+/*        Input matrices A and B are lower triangular matrices */
 
-          Form matrix C = A*adj(B) = ( a 0 )   
-                                     ( c d ) */
+/*        Form matrix C = A*adj(B) = ( a 0 ) */
+/*                                   ( c d ) */
 
 	a = *a1 * *b3;
 	d__ = *a3 * *b1;
@@ -287,8 +304,8 @@
 	c__.r = q__1.r, c__.i = q__1.i;
 	fc = c_abs(&c__);
 
-/*        Transform complex 2-by-2 matrix C to real matrix by unitary   
-          diagonal matrix diag(d1,1). */
+/*        Transform complex 2-by-2 matrix C to real matrix by unitary */
+/*        diagonal matrix diag(d1,1). */
 
 	d1.r = 1.f, d1.i = 0.f;
 	if (fc != 0.f) {
@@ -296,17 +313,17 @@
 	    d1.r = q__1.r, d1.i = q__1.i;
 	}
 
-/*        The SVD of real 2 by 2 triangular C   
+/*        The SVD of real 2 by 2 triangular C */
 
-           ( CSL -SNL )*( A 0 )*(  CSR  SNR ) = ( R 0 )   
-           ( SNL  CSL ) ( C D ) ( -SNR  CSR )   ( 0 T ) */
+/*         ( CSL -SNL )*( A 0 )*(  CSR  SNR ) = ( R 0 ) */
+/*         ( SNL  CSL ) ( C D ) ( -SNR  CSR )   ( 0 T ) */
 
 	slasv2_(&a, &fc, &d__, &s1, &s2, &snr, &csr, &snl, &csl);
 
 	if (dabs(csr) >= dabs(snr) || dabs(csl) >= dabs(snl)) {
 
-/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B,   
-             and (2,1) element of |U|'*|A| and |V|'*|B|. */
+/*           Compute the (2,1) and (2,2) elements of U'*A and V'*B, */
+/*           and (2,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    q__4.r = -d1.r, q__4.i = -d1.i;
 	    q__3.r = snr * q__4.r, q__3.i = snr * q__4.i;
@@ -363,8 +380,8 @@
 
 	} else {
 
-/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B,   
-             and (1,1) element of |U|'*|A| and |V|'*|B|. */
+/*           Compute the (1,1) and (1,2) elements of U'*A and V'*B, */
+/*           and (1,1) element of |U|'*|A| and |V|'*|B|. */
 
 	    r__1 = csr * *a1;
 	    r_cnjg(&q__4, &d1);
@@ -434,4 +451,3 @@
 /*     End of CLAGS2 */
 
 } /* clags2_ */
-

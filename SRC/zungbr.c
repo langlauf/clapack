@@ -1,130 +1,143 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c_n1 = -1;
 
 /* Subroutine */ int zungbr_(char *vect, integer *m, integer *n, integer *k, 
 	doublecomplex *a, integer *lda, doublecomplex *tau, doublecomplex *
 	work, integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    ZUNGBR generates one of the complex unitary matrices Q or P**H   
-    determined by ZGEBRD when reducing a complex matrix A to bidiagonal   
-    form: A = Q * B * P**H.  Q and P**H are defined as products of   
-    elementary reflectors H(i) or G(i) respectively.   
-
-    If VECT = 'Q', A is assumed to have been an M-by-K matrix, and Q   
-    is of order M:   
-    if m >= k, Q = H(1) H(2) . . . H(k) and ZUNGBR returns the first n   
-    columns of Q, where m >= n >= k;   
-    if m < k, Q = H(1) H(2) . . . H(m-1) and ZUNGBR returns Q as an   
-    M-by-M matrix.   
-
-    If VECT = 'P', A is assumed to have been a K-by-N matrix, and P**H   
-    is of order N:   
-    if k < n, P**H = G(k) . . . G(2) G(1) and ZUNGBR returns the first m   
-    rows of P**H, where n >= m >= k;   
-    if k >= n, P**H = G(n-1) . . . G(2) G(1) and ZUNGBR returns P**H as   
-    an N-by-N matrix.   
-
-    Arguments   
-    =========   
-
-    VECT    (input) CHARACTER*1   
-            Specifies whether the matrix Q or the matrix P**H is   
-            required, as defined in the transformation applied by ZGEBRD:   
-            = 'Q':  generate Q;   
-            = 'P':  generate P**H.   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix Q or P**H to be returned.   
-            M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix Q or P**H to be returned.   
-            N >= 0.   
-            If VECT = 'Q', M >= N >= min(M,K);   
-            if VECT = 'P', N >= M >= min(N,K).   
-
-    K       (input) INTEGER   
-            If VECT = 'Q', the number of columns in the original M-by-K   
-            matrix reduced by ZGEBRD.   
-            If VECT = 'P', the number of rows in the original K-by-N   
-            matrix reduced by ZGEBRD.   
-            K >= 0.   
-
-    A       (input/output) COMPLEX*16 array, dimension (LDA,N)   
-            On entry, the vectors which define the elementary reflectors,   
-            as returned by ZGEBRD.   
-            On exit, the M-by-N matrix Q or P**H.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= M.   
-
-    TAU     (input) COMPLEX*16 array, dimension   
-                                  (min(M,K)) if VECT = 'Q'   
-                                  (min(N,K)) if VECT = 'P'   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i) or G(i), which determines Q or P**H, as   
-            returned by ZGEBRD in its array argument TAUQ or TAUP.   
-
-    WORK    (workspace/output) COMPLEX*16 array, dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
-
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK. LWORK >= max(1,min(M,N)).   
-            For optimum performance LWORK >= min(M,N)*NB, where NB   
-            is the optimal blocksize.   
-
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input arguments   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
+
     /* Local variables */
-    static integer i__, j;
+    integer i__, j, nb, mn;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
-    static logical wantq;
-    static integer nb, mn;
+    integer iinfo;
+    logical wantq;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-    static integer lwkopt;
-    static logical lquery;
+	    integer *, integer *);
+    integer lwkopt;
+    logical lquery;
     extern /* Subroutine */ int zunglq_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *), zungqr_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *);
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZUNGBR generates one of the complex unitary matrices Q or P**H */
+/*  determined by ZGEBRD when reducing a complex matrix A to bidiagonal */
+/*  form: A = Q * B * P**H.  Q and P**H are defined as products of */
+/*  elementary reflectors H(i) or G(i) respectively. */
+
+/*  If VECT = 'Q', A is assumed to have been an M-by-K matrix, and Q */
+/*  is of order M: */
+/*  if m >= k, Q = H(1) H(2) . . . H(k) and ZUNGBR returns the first n */
+/*  columns of Q, where m >= n >= k; */
+/*  if m < k, Q = H(1) H(2) . . . H(m-1) and ZUNGBR returns Q as an */
+/*  M-by-M matrix. */
+
+/*  If VECT = 'P', A is assumed to have been a K-by-N matrix, and P**H */
+/*  is of order N: */
+/*  if k < n, P**H = G(k) . . . G(2) G(1) and ZUNGBR returns the first m */
+/*  rows of P**H, where n >= m >= k; */
+/*  if k >= n, P**H = G(n-1) . . . G(2) G(1) and ZUNGBR returns P**H as */
+/*  an N-by-N matrix. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  VECT    (input) CHARACTER*1 */
+/*          Specifies whether the matrix Q or the matrix P**H is */
+/*          required, as defined in the transformation applied by ZGEBRD: */
+/*          = 'Q':  generate Q; */
+/*          = 'P':  generate P**H. */
+
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix Q or P**H to be returned. */
+/*          M >= 0. */
+
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix Q or P**H to be returned. */
+/*          N >= 0. */
+/*          If VECT = 'Q', M >= N >= min(M,K); */
+/*          if VECT = 'P', N >= M >= min(N,K). */
+
+/*  K       (input) INTEGER */
+/*          If VECT = 'Q', the number of columns in the original M-by-K */
+/*          matrix reduced by ZGEBRD. */
+/*          If VECT = 'P', the number of rows in the original K-by-N */
+/*          matrix reduced by ZGEBRD. */
+/*          K >= 0. */
+
+/*  A       (input/output) COMPLEX*16 array, dimension (LDA,N) */
+/*          On entry, the vectors which define the elementary reflectors, */
+/*          as returned by ZGEBRD. */
+/*          On exit, the M-by-N matrix Q or P**H. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= M. */
+
+/*  TAU     (input) COMPLEX*16 array, dimension */
+/*                                (min(M,K)) if VECT = 'Q' */
+/*                                (min(N,K)) if VECT = 'P' */
+/*          TAU(i) must contain the scalar factor of the elementary */
+/*          reflector H(i) or G(i), which determines Q or P**H, as */
+/*          returned by ZGEBRD in its array argument TAUQ or TAUP. */
+
+/*  WORK    (workspace/output) COMPLEX*16 array, dimension (MAX(1,LWORK)) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
+
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. LWORK >= max(1,min(M,N)). */
+/*          For optimum performance LWORK >= min(M,N)*NB, where NB */
+/*          is the optimal blocksize. */
+
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -151,11 +164,9 @@
 
     if (*info == 0) {
 	if (wantq) {
-	    nb = ilaenv_(&c__1, "ZUNGQR", " ", m, n, k, &c_n1, (ftnlen)6, (
-		    ftnlen)1);
+	    nb = ilaenv_(&c__1, "ZUNGQR", " ", m, n, k, &c_n1);
 	} else {
-	    nb = ilaenv_(&c__1, "ZUNGLQ", " ", m, n, k, &c_n1, (ftnlen)6, (
-		    ftnlen)1);
+	    nb = ilaenv_(&c__1, "ZUNGLQ", " ", m, n, k, &c_n1);
 	}
 	lwkopt = max(1,mn) * nb;
 	work[1].r = (doublereal) lwkopt, work[1].i = 0.;
@@ -178,8 +189,8 @@
 
     if (wantq) {
 
-/*        Form Q, determined by a call to ZGEBRD to reduce an m-by-k   
-          matrix */
+/*        Form Q, determined by a call to ZGEBRD to reduce an m-by-k */
+/*        matrix */
 
 	if (*m >= *k) {
 
@@ -190,29 +201,29 @@
 
 	} else {
 
-/*           If m < k, assume m = n   
+/*           If m < k, assume m = n */
 
-             Shift the vectors which define the elementary reflectors one   
-             column to the right, and set the first row and column of Q   
-             to those of the unit matrix */
+/*           Shift the vectors which define the elementary reflectors one */
+/*           column to the right, and set the first row and column of Q */
+/*           to those of the unit matrix */
 
 	    for (j = *m; j >= 2; --j) {
-		i__1 = a_subscr(1, j);
+		i__1 = j * a_dim1 + 1;
 		a[i__1].r = 0., a[i__1].i = 0.;
 		i__1 = *m;
 		for (i__ = j + 1; i__ <= i__1; ++i__) {
-		    i__2 = a_subscr(i__, j);
-		    i__3 = a_subscr(i__, j - 1);
+		    i__2 = i__ + j * a_dim1;
+		    i__3 = i__ + (j - 1) * a_dim1;
 		    a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
 /* L10: */
 		}
 /* L20: */
 	    }
-	    i__1 = a_subscr(1, 1);
+	    i__1 = a_dim1 + 1;
 	    a[i__1].r = 1., a[i__1].i = 0.;
 	    i__1 = *m;
 	    for (i__ = 2; i__ <= i__1; ++i__) {
-		i__2 = a_subscr(i__, 1);
+		i__2 = i__ + a_dim1;
 		a[i__2].r = 0., a[i__2].i = 0.;
 /* L30: */
 	    }
@@ -223,14 +234,14 @@
 		i__1 = *m - 1;
 		i__2 = *m - 1;
 		i__3 = *m - 1;
-		zungqr_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &
-			work[1], lwork, &iinfo);
+		zungqr_(&i__1, &i__2, &i__3, &a[(a_dim1 << 1) + 2], lda, &tau[
+			1], &work[1], lwork, &iinfo);
 	    }
 	}
     } else {
 
-/*        Form P', determined by a call to ZGEBRD to reduce a k-by-n   
-          matrix */
+/*        Form P', determined by a call to ZGEBRD to reduce a k-by-n */
+/*        matrix */
 
 	if (*k < *n) {
 
@@ -241,29 +252,29 @@
 
 	} else {
 
-/*           If k >= n, assume m = n   
+/*           If k >= n, assume m = n */
 
-             Shift the vectors which define the elementary reflectors one   
-             row downward, and set the first row and column of P' to   
-             those of the unit matrix */
+/*           Shift the vectors which define the elementary reflectors one */
+/*           row downward, and set the first row and column of P' to */
+/*           those of the unit matrix */
 
-	    i__1 = a_subscr(1, 1);
+	    i__1 = a_dim1 + 1;
 	    a[i__1].r = 1., a[i__1].i = 0.;
 	    i__1 = *n;
 	    for (i__ = 2; i__ <= i__1; ++i__) {
-		i__2 = a_subscr(i__, 1);
+		i__2 = i__ + a_dim1;
 		a[i__2].r = 0., a[i__2].i = 0.;
 /* L40: */
 	    }
 	    i__1 = *n;
 	    for (j = 2; j <= i__1; ++j) {
 		for (i__ = j - 1; i__ >= 2; --i__) {
-		    i__2 = a_subscr(i__, j);
-		    i__3 = a_subscr(i__ - 1, j);
+		    i__2 = i__ + j * a_dim1;
+		    i__3 = i__ - 1 + j * a_dim1;
 		    a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
 /* L50: */
 		}
-		i__2 = a_subscr(1, j);
+		i__2 = j * a_dim1 + 1;
 		a[i__2].r = 0., a[i__2].i = 0.;
 /* L60: */
 	    }
@@ -274,8 +285,8 @@
 		i__1 = *n - 1;
 		i__2 = *n - 1;
 		i__3 = *n - 1;
-		zunglq_(&i__1, &i__2, &i__3, &a_ref(2, 2), lda, &tau[1], &
-			work[1], lwork, &iinfo);
+		zunglq_(&i__1, &i__2, &i__3, &a[(a_dim1 << 1) + 2], lda, &tau[
+			1], &work[1], lwork, &iinfo);
 	    }
 	}
     }
@@ -285,8 +296,3 @@
 /*     End of ZUNGBR */
 
 } /* zungbr_ */
-
-#undef a_ref
-#undef a_subscr
-
-

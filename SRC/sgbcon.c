@@ -1,113 +1,135 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int sgbcon_(char *norm, integer *n, integer *kl, integer *ku,
+/* Table of constant values */
+
+static integer c__1 = 1;
+
+/* Subroutine */ int sgbcon_(char *norm, integer *n, integer *kl, integer *ku, 
 	 real *ab, integer *ldab, integer *ipiv, real *anorm, real *rcond, 
 	real *work, integer *iwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SGBCON estimates the reciprocal of the condition number of a real   
-    general band matrix A, in either the 1-norm or the infinity-norm,   
-    using the LU factorization computed by SGBTRF.   
-
-    An estimate is obtained for norm(inv(A)), and the reciprocal of the   
-    condition number is computed as   
-       RCOND = 1 / ( norm(A) * norm(inv(A)) ).   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies whether the 1-norm condition number or the   
-            infinity-norm condition number is required:   
-            = '1' or 'O':  1-norm;   
-            = 'I':         Infinity-norm.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    KL      (input) INTEGER   
-            The number of subdiagonals within the band of A.  KL >= 0.   
-
-    KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0.   
-
-    AB      (input) REAL array, dimension (LDAB,N)   
-            Details of the LU factorization of the band matrix A, as   
-            computed by SGBTRF.  U is stored as an upper triangular band   
-            matrix with KL+KU superdiagonals in rows 1 to KL+KU+1, and   
-            the multipliers used during the factorization are stored in   
-            rows KL+KU+2 to 2*KL+KU+1.   
-
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= 2*KL+KU+1.   
-
-    IPIV    (input) INTEGER array, dimension (N)   
-            The pivot indices; for 1 <= i <= N, row i of the matrix was   
-            interchanged with row IPIV(i).   
-
-    ANORM   (input) REAL   
-            If NORM = '1' or 'O', the 1-norm of the original matrix A.   
-            If NORM = 'I', the infinity-norm of the original matrix A.   
-
-    RCOND   (output) REAL   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(norm(A) * norm(inv(A))).   
-
-    WORK    (workspace) REAL array, dimension (3*N)   
-
-    IWORK   (workspace) INTEGER array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1, i__2, i__3;
     real r__1;
+
     /* Local variables */
-    static integer kase;
+    integer j;
+    real t;
+    integer kd, lm, jp, ix, kase;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static integer kase1, j;
-    static real t, scale;
+    integer kase1;
+    real scale;
     extern logical lsame_(char *, char *);
-    static logical lnoti;
+    integer isave[3];
+    logical lnoti;
     extern /* Subroutine */ int srscl_(integer *, real *, real *, integer *), 
-	    saxpy_(integer *, real *, real *, integer *, real *, integer *);
-    static integer kd, lm, jp, ix;
+	    saxpy_(integer *, real *, real *, integer *, real *, integer *), 
+	    slacn2_(integer *, real *, real *, integer *, real *, integer *, 
+	    integer *);
     extern doublereal slamch_(char *);
-    extern /* Subroutine */ int xerbla_(char *, integer *), slacon_(
-	    integer *, real *, real *, integer *, real *, integer *);
+    extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int slatbs_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *);
-    static logical onenrm;
-    static char normin[1];
-    static real smlnum;
-#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+    logical onenrm;
+    char normin[1];
+    real smlnum;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     Modified to call SLACN2 in place of SLACON, 7 Feb 03, SJH. */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SGBCON estimates the reciprocal of the condition number of a real */
+/*  general band matrix A, in either the 1-norm or the infinity-norm, */
+/*  using the LU factorization computed by SGBTRF. */
+
+/*  An estimate is obtained for norm(inv(A)), and the reciprocal of the */
+/*  condition number is computed as */
+/*     RCOND = 1 / ( norm(A) * norm(inv(A)) ). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NORM    (input) CHARACTER*1 */
+/*          Specifies whether the 1-norm condition number or the */
+/*          infinity-norm condition number is required: */
+/*          = '1' or 'O':  1-norm; */
+/*          = 'I':         Infinity-norm. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  KL      (input) INTEGER */
+/*          The number of subdiagonals within the band of A.  KL >= 0. */
+
+/*  KU      (input) INTEGER */
+/*          The number of superdiagonals within the band of A.  KU >= 0. */
+
+/*  AB      (input) REAL array, dimension (LDAB,N) */
+/*          Details of the LU factorization of the band matrix A, as */
+/*          computed by SGBTRF.  U is stored as an upper triangular band */
+/*          matrix with KL+KU superdiagonals in rows 1 to KL+KU+1, and */
+/*          the multipliers used during the factorization are stored in */
+/*          rows KL+KU+2 to 2*KL+KU+1. */
+
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= 2*KL+KU+1. */
+
+/*  IPIV    (input) INTEGER array, dimension (N) */
+/*          The pivot indices; for 1 <= i <= N, row i of the matrix was */
+/*          interchanged with row IPIV(i). */
+
+/*  ANORM   (input) REAL */
+/*          If NORM = '1' or 'O', the 1-norm of the original matrix A. */
+/*          If NORM = 'I', the infinity-norm of the original matrix A. */
+
+/*  RCOND   (output) REAL */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(norm(A) * norm(inv(A))). */
+
+/*  WORK    (workspace) REAL array, dimension (3*N) */
+
+/*  IWORK   (workspace) INTEGER array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     --ipiv;
     --work;
@@ -160,7 +182,7 @@
     lnoti = *kl > 0;
     kase = 0;
 L10:
-    slacon_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase);
+    slacn2_(n, &work[*n + 1], &work[1], &iwork[1], &ainvnm, &kase, isave);
     if (kase != 0) {
 	if (kase == kase1) {
 
@@ -179,8 +201,8 @@ L10:
 			work[j] = t;
 		    }
 		    r__1 = -t;
-		    saxpy_(&lm, &r__1, &ab_ref(kd + 1, j), &c__1, &work[j + 1]
-			    , &c__1);
+		    saxpy_(&lm, &r__1, &ab[kd + 1 + j * ab_dim1], &c__1, &
+			    work[j + 1], &c__1);
 /* L20: */
 		}
 	    }
@@ -207,8 +229,8 @@ L10:
 /* Computing MIN */
 		    i__1 = *kl, i__2 = *n - j;
 		    lm = min(i__1,i__2);
-		    work[j] -= sdot_(&lm, &ab_ref(kd + 1, j), &c__1, &work[j 
-			    + 1], &c__1);
+		    work[j] -= sdot_(&lm, &ab[kd + 1 + j * ab_dim1], &c__1, &
+			    work[j + 1], &c__1);
 		    jp = ipiv[j];
 		    if (jp != j) {
 			t = work[jp];
@@ -246,7 +268,3 @@ L40:
 /*     End of SGBCON */
 
 } /* sgbcon_ */
-
-#undef ab_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -14,7 +9,7 @@ static integer c__1 = 1;
 
 /* Subroutine */ int zhpt21_(integer *itype, char *uplo, integer *n, integer *
 	kband, doublecomplex *ap, doublereal *d__, doublereal *e, 
-	doublecomplex *u, integer *ldu, doublecomplex *vp, doublecomplex *tau,
+	doublecomplex *u, integer *ldu, doublecomplex *vp, doublecomplex *tau, 
 	 doublecomplex *work, doublereal *rwork, doublereal *result)
 {
     /* System generated locals */
@@ -23,215 +18,220 @@ static integer c__1 = 1;
     doublecomplex z__1, z__2, z__3;
 
     /* Local variables */
-    static doublereal unfl;
-    static doublecomplex temp;
+    integer j, jp, jr, jp1, lap;
+    doublereal ulp, unfl;
+    doublecomplex temp;
     extern /* Subroutine */ int zhpr_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *), zhpr2_(char 
 	    *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *);
-    static integer j;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
-    static doublereal anorm;
+    integer iinfo;
+    doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static char cuplo[1];
-    static doublecomplex vsave;
+    char cuplo[1];
+    doublecomplex vsave;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static logical lower;
-    static doublereal wnorm;
+    logical lower;
+    doublereal wnorm;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zhpmv_(char *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *), zaxpy_(
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    extern doublereal dlamch_(char *);
-    static integer jp, jr;
-    extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
-	    integer *, doublereal *), zlanhp_(char *, char *, integer 
-	    *, doublecomplex *, doublereal *);
+    extern doublereal dlamch_(char *), zlange_(char *, integer *, 
+	    integer *, doublecomplex *, integer *, doublereal *), 
+	    zlanhp_(char *, char *, integer *, doublecomplex *, doublereal *);
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer jp1;
-    extern /* Subroutine */ int zupmtr_(char *, char *, char *, integer *, 
-	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *);
-    static integer lap;
-    static doublereal ulp;
+	    doublecomplex *, doublecomplex *, integer *), zupmtr_(
+	    char *, char *, char *, integer *, integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
+	    integer *);
 
 
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZHPT21  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*          A = U S U* */
 
-    ZHPT21  generally checks a decomposition of the form   
+/*  where * means conjugate transpose, A is hermitian, U is */
+/*  unitary, and S is diagonal (if KBAND=0) or (real) symmetric */
+/*  tridiagonal (if KBAND=1).  If ITYPE=1, then U is represented as */
+/*  a dense matrix, otherwise the U is expressed as a product of */
+/*  Householder transformations, whose vectors are stored in the */
+/*  array "V" and whose scaling constants are in "TAU"; we shall */
+/*  use the letter "V" to refer to the product of Householder */
+/*  transformations (which should be equal to U). */
 
-            A = U S U*   
+/*  Specifically, if ITYPE=1, then: */
 
-    where * means conjugate transpose, A is hermitian, U is   
-    unitary, and S is diagonal (if KBAND=0) or (real) symmetric   
-    tridiagonal (if KBAND=1).  If ITYPE=1, then U is represented as   
-    a dense matrix, otherwise the U is expressed as a product of   
-    Householder transformations, whose vectors are stored in the   
-    array "V" and whose scaling constants are in "TAU"; we shall   
-    use the letter "V" to refer to the product of Householder   
-    transformations (which should be equal to U).   
+/*          RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and* */
+/*          RESULT(2) = | I - UU* | / ( n ulp ) */
 
-    Specifically, if ITYPE=1, then:   
+/*  If ITYPE=2, then: */
 
-            RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and*   
-            RESULT(2) = | I - UU* | / ( n ulp )   
+/*          RESULT(1) = | A - V S V* | / ( |A| n ulp ) */
 
-    If ITYPE=2, then:   
+/*  If ITYPE=3, then: */
 
-            RESULT(1) = | A - V S V* | / ( |A| n ulp )   
+/*          RESULT(1) = | I - UV* | / ( n ulp ) */
 
-    If ITYPE=3, then:   
+/*  Packed storage means that, for example, if UPLO='U', then the columns */
+/*  of the upper triangle of A are stored one after another, so that */
+/*  A(1,j+1) immediately follows A(j,j) in the array AP.  Similarly, if */
+/*  UPLO='L', then the columns of the lower triangle of A are stored one */
+/*  after another in AP, so that A(j+1,j+1) immediately follows A(n,j) */
+/*  in the array AP.  This means that A(i,j) is stored in: */
 
-            RESULT(1) = | I - UV* | / ( n ulp )   
+/*     AP( i + j*(j-1)/2 )                 if UPLO='U' */
 
-    Packed storage means that, for example, if UPLO='U', then the columns   
-    of the upper triangle of A are stored one after another, so that   
-    A(1,j+1) immediately follows A(j,j) in the array AP.  Similarly, if   
-    UPLO='L', then the columns of the lower triangle of A are stored one   
-    after another in AP, so that A(j+1,j+1) immediately follows A(n,j)   
-    in the array AP.  This means that A(i,j) is stored in:   
+/*     AP( i + (2*n-j)*(j-1)/2 )           if UPLO='L' */
 
-       AP( i + j*(j-1)/2 )                 if UPLO='U'   
+/*  The array VP bears the same relation to the matrix V that A does to */
+/*  AP. */
 
-       AP( i + (2*n-j)*(j-1)/2 )           if UPLO='L'   
+/*  For ITYPE > 1, the transformation U is expressed as a product */
+/*  of Householder transformations: */
 
-    The array VP bears the same relation to the matrix V that A does to   
-    AP.   
+/*     If UPLO='U', then  V = H(n-1)...H(1),  where */
 
-    For ITYPE > 1, the transformation U is expressed as a product   
-    of Householder transformations:   
+/*         H(j) = I  -  tau(j) v(j) v(j)* */
 
-       If UPLO='U', then  V = H(n-1)...H(1),  where   
+/*     and the first j-1 elements of v(j) are stored in V(1:j-1,j+1), */
+/*     (i.e., VP( j*(j+1)/2 + 1 : j*(j+1)/2 + j-1 ) ), */
+/*     the j-th element is 1, and the last n-j elements are 0. */
 
-           H(j) = I  -  tau(j) v(j) v(j)*   
+/*     If UPLO='L', then  V = H(1)...H(n-1),  where */
 
-       and the first j-1 elements of v(j) are stored in V(1:j-1,j+1),   
-       (i.e., VP( j*(j+1)/2 + 1 : j*(j+1)/2 + j-1 ) ),   
-       the j-th element is 1, and the last n-j elements are 0.   
+/*         H(j) = I  -  tau(j) v(j) v(j)* */
 
-       If UPLO='L', then  V = H(1)...H(n-1),  where   
+/*     and the first j elements of v(j) are 0, the (j+1)-st is 1, and the */
+/*     (j+2)-nd through n-th elements are stored in V(j+2:n,j) (i.e., */
+/*     in VP( (2*n-j)*(j-1)/2 + j+2 : (2*n-j)*(j-1)/2 + n ) .) */
 
-           H(j) = I  -  tau(j) v(j) v(j)*   
+/*  Arguments */
+/*  ========= */
 
-       and the first j elements of v(j) are 0, the (j+1)-st is 1, and the   
-       (j+2)-nd through n-th elements are stored in V(j+2:n,j) (i.e.,   
-       in VP( (2*n-j)*(j-1)/2 + j+2 : (2*n-j)*(j-1)/2 + n ) .)   
+/*  ITYPE   (input) INTEGER */
+/*          Specifies the type of tests to be performed. */
+/*          1: U expressed as a dense unitary matrix: */
+/*             RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and* */
+/*             RESULT(2) = | I - UU* | / ( n ulp ) */
 
-    Arguments   
-    =========   
+/*          2: U expressed as a product V of Housholder transformations: */
+/*             RESULT(1) = | A - V S V* | / ( |A| n ulp ) */
 
-    ITYPE   (input) INTEGER   
-            Specifies the type of tests to be performed.   
-            1: U expressed as a dense unitary matrix:   
-               RESULT(1) = | A - U S U* | / ( |A| n ulp )   *and*   
-               RESULT(2) = | I - UU* | / ( n ulp )   
+/*          3: U expressed both as a dense unitary matrix and */
+/*             as a product of Housholder transformations: */
+/*             RESULT(1) = | I - UV* | / ( n ulp ) */
 
-            2: U expressed as a product V of Housholder transformations:   
-               RESULT(1) = | A - V S V* | / ( |A| n ulp )   
+/*  UPLO    (input) CHARACTER */
+/*          If UPLO='U', the upper triangle of A and V will be used and */
+/*          the (strictly) lower triangle will not be referenced. */
+/*          If UPLO='L', the lower triangle of A and V will be used and */
+/*          the (strictly) upper triangle will not be referenced. */
 
-            3: U expressed both as a dense unitary matrix and   
-               as a product of Housholder transformations:   
-               RESULT(1) = | I - UV* | / ( n ulp )   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, ZHPT21 does nothing. */
+/*          It must be at least zero. */
 
-    UPLO    (input) CHARACTER   
-            If UPLO='U', the upper triangle of A and V will be used and   
-            the (strictly) lower triangle will not be referenced.   
-            If UPLO='L', the lower triangle of A and V will be used and   
-            the (strictly) upper triangle will not be referenced.   
+/*  KBAND   (input) INTEGER */
+/*          The bandwidth of the matrix.  It may only be zero or one. */
+/*          If zero, then S is diagonal, and E is not referenced.  If */
+/*          one, then S is symmetric tri-diagonal. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZHPT21 does nothing.   
-            It must be at least zero.   
+/*  AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The original (unfactored) matrix.  It is assumed to be */
+/*          hermitian, and contains the columns of just the upper */
+/*          triangle (UPLO='U') or only the lower triangle (UPLO='L'), */
+/*          packed one after another. */
 
-    KBAND   (input) INTEGER   
-            The bandwidth of the matrix.  It may only be zero or one.   
-            If zero, then S is diagonal, and E is not referenced.  If   
-            one, then S is symmetric tri-diagonal.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal of the (symmetric tri-) diagonal matrix. */
 
-    AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The original (unfactored) matrix.  It is assumed to be   
-            hermitian, and contains the columns of just the upper   
-            triangle (UPLO='U') or only the lower triangle (UPLO='L'),   
-            packed one after another.   
+/*  E       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The off-diagonal of the (symmetric tri-) diagonal matrix. */
+/*          E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and */
+/*          (3,2) element, etc. */
+/*          Not referenced if KBAND=0. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal of the (symmetric tri-) diagonal matrix.   
+/*  U       (input) COMPLEX*16 array, dimension (LDU, N) */
+/*          If ITYPE=1 or 3, this contains the unitary matrix in */
+/*          the decomposition, expressed as a dense matrix.  If ITYPE=2, */
+/*          then it is not referenced. */
 
-    E       (input) DOUBLE PRECISION array, dimension (N)   
-            The off-diagonal of the (symmetric tri-) diagonal matrix.   
-            E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and   
-            (3,2) element, etc.   
-            Not referenced if KBAND=0.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) COMPLEX*16 array, dimension (LDU, N)   
-            If ITYPE=1 or 3, this contains the unitary matrix in   
-            the decomposition, expressed as a dense matrix.  If ITYPE=2,   
-            then it is not referenced.   
+/*  VP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2) */
+/*          If ITYPE=2 or 3, the columns of this array contain the */
+/*          Householder vectors used to describe the unitary matrix */
+/*          in the decomposition, as described in purpose. */
+/*          *NOTE* If ITYPE=2 or 3, V is modified and restored.  The */
+/*          subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U') */
+/*          is set to one, and later reset to its original value, during */
+/*          the course of the calculation. */
+/*          If ITYPE=1, then it is neither referenced nor modified. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  TAU     (input) COMPLEX*16 array, dimension (N) */
+/*          If ITYPE >= 2, then TAU(j) is the scalar factor of */
+/*          v(j) v(j)* in the Householder transformation H(j) of */
+/*          the product  U = H(1)...H(n-2) */
+/*          If ITYPE < 2, then TAU is not referenced. */
 
-    VP      (input) DOUBLE PRECISION array, dimension (N*(N+1)/2)   
-            If ITYPE=2 or 3, the columns of this array contain the   
-            Householder vectors used to describe the unitary matrix   
-            in the decomposition, as described in purpose.   
-            *NOTE* If ITYPE=2 or 3, V is modified and restored.  The   
-            subdiagonal (if UPLO='L') or the superdiagonal (if UPLO='U')   
-            is set to one, and later reset to its original value, during   
-            the course of the calculation.   
-            If ITYPE=1, then it is neither referenced nor modified.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (N**2) */
+/*          Workspace. */
 
-    TAU     (input) COMPLEX*16 array, dimension (N)   
-            If ITYPE >= 2, then TAU(j) is the scalar factor of   
-            v(j) v(j)* in the Householder transformation H(j) of   
-            the product  U = H(1)...H(n-2)   
-            If ITYPE < 2, then TAU is not referenced.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
+/*          Workspace. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (N**2)   
-            Workspace.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The values computed by the two tests described above.  The */
+/*          values are currently limited to 1/ulp, to avoid overflow. */
+/*          RESULT(1) is always modified.  RESULT(2) is modified only */
+/*          if ITYPE=1. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
-            Workspace.   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The values computed by the two tests described above.  The   
-            values are currently limited to 1/ulp, to avoid overflow.   
-            RESULT(1) is always modified.  RESULT(2) is modified only   
-            if ITYPE=1.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Constants */
 
-
-       Constants   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ap;
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --vp;
     --tau;
@@ -268,9 +268,9 @@ static integer c__1 = 1;
 	return 0;
     }
 
-/*     Do Test 1   
+/*     Do Test 1 */
 
-       Norm of A: */
+/*     Norm of A: */
 
     if (*itype == 3) {
 	anorm = 1.;
@@ -293,7 +293,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    d__1 = -d__[j];
-	    zhpr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
+	    zhpr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1]);
 /* L10: */
 	}
 
@@ -303,8 +303,8 @@ static integer c__1 = 1;
 		i__2 = j;
 		z__2.r = e[i__2], z__2.i = 0.;
 		z__1.r = -z__2.r, z__1.i = -z__2.i;
-		zhpr2_(cuplo, n, &z__1, &u_ref(1, j), &c__1, &u_ref(1, j - 1),
-			 &c__1, &work[1]);
+		zhpr2_(cuplo, n, &z__1, &u[j * u_dim1 + 1], &c__1, &u[(j - 1) 
+			* u_dim1 + 1], &c__1, &work[1]);
 /* L20: */
 	    }
 	}
@@ -429,7 +429,7 @@ static integer c__1 = 1;
 		    i__2 = j;
 		    z__1.r = -tau[i__2].r, z__1.i = -tau[i__2].i;
 		    zhpr2_("U", &j, &z__1, &vp[jp1 + 1], &c__1, &work[lap + 1]
-			    , &c__1, &work[1]);
+, &c__1, &work[1]);
 		    i__2 = jp1 + j;
 		    vp[i__2].r = vsave.r, vp[i__2].i = vsave.i;
 		}
@@ -473,7 +473,7 @@ static integer c__1 = 1;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = (*n + 1) * (j - 1) + 1;
 	    i__3 = (*n + 1) * (j - 1) + 1;
-	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i + 0.;
+	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i - 0.;
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L80: */
 	}
@@ -495,19 +495,19 @@ static integer c__1 = 1;
 	}
     }
 
-/*     Do Test 2   
+/*     Do Test 2 */
 
-       Compute  UU* - I */
+/*     Compute  UU* - I */
 
     if (*itype == 1) {
-	zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu,
+	zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, 
 		 &c_b1, &work[1], n);
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = (*n + 1) * (j - 1) + 1;
 	    i__3 = (*n + 1) * (j - 1) + 1;
-	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i + 0.;
+	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i - 0.;
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L90: */
 	}
@@ -523,8 +523,3 @@ static integer c__1 = 1;
 /*     End of ZHPT21 */
 
 } /* zhpt21_ */
-
-#undef u_ref
-#undef u_subscr
-
-

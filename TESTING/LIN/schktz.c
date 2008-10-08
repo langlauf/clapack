@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -44,28 +39,29 @@ static integer c__1 = 1;
     integer i__1, i__2, i__3, i__4;
     real r__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer mode, info;
-    static char path[3];
-    static integer nrun, i__;
+    integer i__, k, m, n, im, in, lda;
+    real eps;
+    integer mode, info;
+    char path[3];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, m, n, nfail, iseed[4], imode, mnmin, nerrs;
-    extern doublereal sqrt12_(integer *, integer *, real *, integer *, real *,
+    integer nfail, iseed[4], imode, mnmin, nerrs;
+    extern doublereal sqrt12_(integer *, integer *, real *, integer *, real *, 
 	     real *, integer *);
-    static integer lwork;
-    extern doublereal srzt01_(integer *, integer *, real *, real *, integer *,
-	     real *, real *, integer *), srzt02_(integer *, integer *, real *,
+    integer lwork;
+    extern doublereal srzt01_(integer *, integer *, real *, real *, integer *, 
+	     real *, real *, integer *), srzt02_(integer *, integer *, real *, 
 	     integer *, real *, real *, integer *), stzt01_(integer *, 
 	    integer *, real *, real *, integer *, real *, real *, integer *), 
 	    stzt02_(integer *, integer *, real *, integer *, real *, real *, 
 	    integer *);
     extern /* Subroutine */ int sgeqr2_(integer *, integer *, real *, integer 
 	    *, real *, real *, integer *);
-    static integer im, in;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int alasum_(char *, integer *, integer *, integer 
 	    *, integer *), slaord_(char *, integer *, real *, integer 
@@ -75,81 +71,99 @@ static integer c__1 = 1;
 	    integer *, char *, integer *, char *, real *, integer *, real *, 
 	    real *, integer *, integer *, char *, real *, integer *, real *, 
 	    integer *);
-    static real result[6];
+    real result[6];
     extern /* Subroutine */ int serrtz_(char *, integer *), stzrqf_(
 	    integer *, integer *, real *, integer *, real *, integer *), 
 	    stzrzf_(integer *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *);
-    static integer lda;
-    static real eps;
 
     /* Fortran I/O blocks */
     static cilist io___21 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SCHKTZ tests STZRQF and STZRZF.   
+/*  SCHKTZ tests STZRQF and STZRZF. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) REAL array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the   
-            maximum value of N in NVAL.   
+/*  A       (workspace) REAL array, dimension (MMAX*NMAX) */
+/*          where MMAX is the maximum value of M in MVAL and NMAX is the */
+/*          maximum value of N in NVAL. */
 
-    COPYA   (workspace) REAL array, dimension (MMAX*NMAX)   
+/*  COPYA   (workspace) REAL array, dimension (MMAX*NMAX) */
 
-    S       (workspace) REAL array, dimension   
-                        (min(MMAX,NMAX))   
+/*  S       (workspace) REAL array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    COPYS   (workspace) REAL array, dimension   
-                        (min(MMAX,NMAX))   
+/*  COPYS   (workspace) REAL array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    TAU     (workspace) REAL array, dimension (MMAX)   
+/*  TAU     (workspace) REAL array, dimension (MMAX) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (MMAX*NMAX + 4*NMAX + MMAX)   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (MMAX*NMAX + 4*NMAX + MMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --work;
     --tau;
     --copys;
@@ -160,9 +174,11 @@ static integer c__1 = 1;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "TZ", (ftnlen)2, (ftnlen)2);
@@ -198,7 +214,8 @@ static integer c__1 = 1;
 	    n = nval[in];
 	    mnmin = min(m,n);
 /* Computing MAX */
-	    i__3 = 1, i__4 = n * n + (m << 2) + n;
+	    i__3 = 1, i__4 = n * n + (m << 2) + n, i__3 = max(i__3,i__4), 
+		    i__4 = m * n + (mnmin << 1) + (n << 2);
 	    lwork = max(i__3,i__4);
 
 	    if (m <= n) {
@@ -207,17 +224,17 @@ static integer c__1 = 1;
 			goto L50;
 		    }
 
-/*                 Do for each type of singular value distribution.   
-                      0:  zero matrix   
-                      1:  one small singular value   
-                      2:  exponential distribution */
+/*                 Do for each type of singular value distribution. */
+/*                    0:  zero matrix */
+/*                    1:  one small singular value */
+/*                    2:  exponential distribution */
 
 		    mode = imode - 1;
 
-/*                 Test STZRQF   
+/*                 Test STZRQF */
 
-                   Generate test matrix of size m by n using   
-                   singular value distribution indicated by `mode'. */
+/*                 Generate test matrix of size m by n using */
+/*                 singular value distribution indicated by `mode'. */
 
 		    if (mode == 0) {
 			slaset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
@@ -243,8 +260,8 @@ static integer c__1 = 1;
 
 		    slacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
 
-/*                 Call STZRQF to reduce the upper trapezoidal matrix to   
-                   upper triangular form. */
+/*                 Call STZRQF to reduce the upper trapezoidal matrix to */
+/*                 upper triangular form. */
 
 		    s_copy(srnamc_1.srnamt, "STZRQF", (ftnlen)6, (ftnlen)6);
 		    stzrqf_(&m, &n, &a[1], &lda, &tau[1], &info);
@@ -262,12 +279,12 @@ static integer c__1 = 1;
 /*                 Compute norm(Q'*Q - I). */
 
 		    result[2] = stzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
-			    , &lwork);
+, &lwork);
 
-/*                 Test STZRZF   
+/*                 Test STZRZF */
 
-                   Generate test matrix of size m by n using   
-                   singular value distribution indicated by `mode'. */
+/*                 Generate test matrix of size m by n using */
+/*                 singular value distribution indicated by `mode'. */
 
 		    if (mode == 0) {
 			slaset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
@@ -293,8 +310,8 @@ static integer c__1 = 1;
 
 		    slacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
 
-/*                 Call STZRZF to reduce the upper trapezoidal matrix to   
-                   upper triangular form. */
+/*                 Call STZRZF to reduce the upper trapezoidal matrix to */
+/*                 upper triangular form. */
 
 		    s_copy(srnamc_1.srnamt, "STZRZF", (ftnlen)6, (ftnlen)6);
 		    stzrzf_(&m, &n, &a[1], &lda, &tau[1], &work[1], &lwork, &
@@ -313,10 +330,10 @@ static integer c__1 = 1;
 /*                 Compute norm(Q'*Q - I). */
 
 		    result[5] = srzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
-			    , &lwork);
+, &lwork);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    for (k = 1; k <= 6; ++k) {
 			if (result[k - 1] >= *thresh) {
@@ -359,4 +376,3 @@ L50:
 
     return 0;
 } /* schktz_ */
-

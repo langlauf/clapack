@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,120 +17,130 @@ static complex c_b2 = {1.f,0.f};
     complex q__1;
 
     /* Local variables */
-    static integer jcol;
-    static real unfl;
-    static integer jrow, jdiag;
+    real ulp;
+    integer jcol;
+    real unfl;
+    integer jrow, jdiag;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *);
-    static real anorm, wnorm;
+    real anorm, wnorm;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *);
-    static real ulp;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*       CGET51  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*               A = U B V* */
 
-         CGET51  generally checks a decomposition of the form   
+/*       where * means conjugate transpose and U and V are unitary. */
 
-                 A = U B V*   
+/*       Specifically, if ITYPE=1 */
 
-         where * means conjugate transpose and U and V are unitary.   
+/*               RESULT = | A - U B V* | / ( |A| n ulp ) */
 
-         Specifically, if ITYPE=1   
+/*       If ITYPE=2, then: */
 
-                 RESULT = | A - U B V* | / ( |A| n ulp )   
+/*               RESULT = | A - B | / ( |A| n ulp ) */
 
-         If ITYPE=2, then:   
+/*       If ITYPE=3, then: */
 
-                 RESULT = | A - B | / ( |A| n ulp )   
+/*               RESULT = | I - UU* | / ( n ulp ) */
 
-         If ITYPE=3, then:   
+/*  Arguments */
+/*  ========= */
 
-                 RESULT = | I - UU* | / ( n ulp )   
+/*  ITYPE   (input) INTEGER */
+/*          Specifies the type of tests to be performed. */
+/*          =1: RESULT = | A - U B V* | / ( |A| n ulp ) */
+/*          =2: RESULT = | A - B | / ( |A| n ulp ) */
+/*          =3: RESULT = | I - UU* | / ( n ulp ) */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, CGET51 does nothing. */
+/*          It must be at least zero. */
 
-    ITYPE   (input) INTEGER   
-            Specifies the type of tests to be performed.   
-            =1: RESULT = | A - U B V* | / ( |A| n ulp )   
-            =2: RESULT = | A - B | / ( |A| n ulp )   
-            =3: RESULT = | I - UU* | / ( n ulp )   
+/*  A       (input) COMPLEX array, dimension (LDA, N) */
+/*          The original (unfactored) matrix. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, CGET51 does nothing.   
-            It must be at least zero.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) COMPLEX array, dimension (LDA, N)   
-            The original (unfactored) matrix.   
+/*  B       (input) COMPLEX array, dimension (LDB, N) */
+/*          The factored matrix. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) COMPLEX array, dimension (LDB, N)   
-            The factored matrix.   
+/*  U       (input) COMPLEX array, dimension (LDU, N) */
+/*          The unitary matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) COMPLEX array, dimension (LDU, N)   
-            The unitary matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  V       (input) COMPLEX array, dimension (LDV, N) */
+/*          The unitary matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    V       (input) COMPLEX array, dimension (LDV, N)   
-            The unitary matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  WORK    (workspace) COMPLEX array, dimension (2*N**2) */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    WORK    (workspace) COMPLEX array, dimension (2*N**2)   
+/*  RESULT  (output) REAL */
+/*          The values computed by the test specified by ITYPE.  The */
+/*          value is currently limited to 1/ulp, to avoid overflow. */
+/*          Errors are flagged by RESULT=10/ulp. */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL   
-            The values computed by the test specified by ITYPE.  The   
-            value is currently limited to 1/ulp, to avoid overflow.   
-            Errors are flagged by RESULT=10/ulp.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
     --rwork;
@@ -160,9 +165,9 @@ static complex c_b2 = {1.f,0.f};
 
     if (*itype <= 2) {
 
-/*        Tests scaled by the norm(A)   
+/*        Tests scaled by the norm(A) */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = clange_("1", n, n, &a[a_offset], lda, &rwork[1]);
 	anorm = dmax(r__1,unfl);
 
@@ -176,7 +181,7 @@ static complex c_b2 = {1.f,0.f};
 	    cgemm_("N", "N", n, n, n, &c_b2, &u[u_offset], ldu, &b[b_offset], 
 		    ldb, &c_b1, &work[i__1 * i__1 + 1], n);
 
-	    q__1.r = -1.f, q__1.i = 0.f;
+	    q__1.r = -1.f, q__1.i = -0.f;
 /* Computing 2nd power */
 	    i__1 = *n;
 	    cgemm_("N", "C", n, n, n, &q__1, &work[i__1 * i__1 + 1], n, &v[
@@ -194,7 +199,7 @@ static complex c_b2 = {1.f,0.f};
 		for (jrow = 1; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = a_subscr(jrow, jcol);
+		    i__5 = jrow + jcol * a_dim1;
 		    q__1.r = work[i__4].r - a[i__5].r, q__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = q__1.r, work[i__3].i = q__1.i;
@@ -224,18 +229,18 @@ static complex c_b2 = {1.f,0.f};
 
     } else {
 
-/*        Tests not scaled by norm(A)   
+/*        Tests not scaled by norm(A) */
 
-          ITYPE=3: Compute  UU' - I */
+/*        ITYPE=3: Compute  UU' - I */
 
-	cgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu,
+	cgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, 
 		 &c_b1, &work[1], n);
 
 	i__1 = *n;
 	for (jdiag = 1; jdiag <= i__1; ++jdiag) {
 	    i__2 = (*n + 1) * (jdiag - 1) + 1;
 	    i__3 = (*n + 1) * (jdiag - 1) + 1;
-	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i + 0.f;
+	    q__1.r = work[i__3].r - 1.f, q__1.i = work[i__3].i - 0.f;
 	    work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L30: */
 	}
@@ -251,8 +256,3 @@ static complex c_b2 = {1.f,0.f};
 /*     End of CGET51 */
 
 } /* cget51_ */
-
-#undef a_ref
-#undef a_subscr
-
-

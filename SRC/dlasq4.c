@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlasq4_(integer *i0, integer *n0, doublereal *z__, 
 	integer *pp, integer *n0in, doublereal *dmin__, doublereal *dmin1, 
@@ -23,75 +18,89 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal s, a2, b1, b2;
-    static integer i4, nn, np;
-    static doublereal gam, gap1, gap2;
+    doublereal s, a2, b1, b2;
+    integer i4, nn, np;
+    doublereal gam, gap1, gap2;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLASQ4 computes an approximation TAU to the smallest eigenvalue   
-    using values of d from the previous transform.   
+/*  DLASQ4 computes an approximation TAU to the smallest eigenvalue */
+/*  using values of d from the previous transform. */
 
-    I0    (input) INTEGER   
-          First index.   
+/*  I0    (input) INTEGER */
+/*        First index. */
 
-    N0    (input) INTEGER   
-          Last index.   
+/*  N0    (input) INTEGER */
+/*        Last index. */
 
-    Z     (input) DOUBLE PRECISION array, dimension ( 4*N )   
-          Z holds the qd array.   
+/*  Z     (input) DOUBLE PRECISION array, dimension ( 4*N ) */
+/*        Z holds the qd array. */
 
-    PP    (input) INTEGER   
-          PP=0 for ping, PP=1 for pong.   
+/*  PP    (input) INTEGER */
+/*        PP=0 for ping, PP=1 for pong. */
 
-    NOIN  (input) INTEGER   
-          The value of N0 at start of EIGTEST.   
+/*  N0IN  (input) INTEGER */
+/*        The value of N0 at start of EIGTEST. */
 
-    DMIN  (input) DOUBLE PRECISION   
-          Minimum value of d.   
+/*  DMIN  (input) DOUBLE PRECISION */
+/*        Minimum value of d. */
 
-    DMIN1 (input) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ).   
+/*  DMIN1 (input) DOUBLE PRECISION */
+/*        Minimum value of d, excluding D( N0 ). */
 
-    DMIN2 (input) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
+/*  DMIN2 (input) DOUBLE PRECISION */
+/*        Minimum value of d, excluding D( N0 ) and D( N0-1 ). */
 
-    DN    (input) DOUBLE PRECISION   
-          d(N)   
+/*  DN    (input) DOUBLE PRECISION */
+/*        d(N) */
 
-    DN1   (input) DOUBLE PRECISION   
-          d(N-1)   
+/*  DN1   (input) DOUBLE PRECISION */
+/*        d(N-1) */
 
-    DN2   (input) DOUBLE PRECISION   
-          d(N-2)   
+/*  DN2   (input) DOUBLE PRECISION */
+/*        d(N-2) */
 
-    TAU   (output) DOUBLE PRECISION   
-          This is the shift.   
+/*  TAU   (output) DOUBLE PRECISION */
+/*        This is the shift. */
 
-    TTYPE (output) INTEGER   
-          Shift type.   
+/*  TTYPE (output) INTEGER */
+/*        Shift type. */
 
-    Further Details   
-    ===============   
-    CNST1 = 9/16   
+/*  Further Details */
+/*  =============== */
+/*  CNST1 = 9/16 */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Data statement .. */
+    /* Parameter adjustments */
     --z__;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       A negative DMIN forces the shift to take that absolute value   
-       TTYPE records the type of shift. */
+/*     A negative DMIN forces the shift to take that absolute value */
+/*     TTYPE records the type of shift. */
 
     if (*dmin__ <= 0.) {
 	*tau = -(*dmin__);
@@ -317,9 +326,9 @@ L60:
 
     } else if (*n0in == *n0 + 2) {
 
-/*        Two eigenvalues deflated. Use DMIN2, DN2 for DMIN and DN.   
+/*        Two eigenvalues deflated. Use DMIN2, DN2 for DMIN and DN. */
 
-          Cases 10 and 11. */
+/*        Cases 10 and 11. */
 
 	if (*dmin2 == *dn2 && z__[nn - 5] * 2. < z__[nn - 7]) {
 	    *ttype = -10;
@@ -378,4 +387,3 @@ L80:
 /*     End of DLASQ4 */
 
 } /* dlasq4_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -31,14 +26,11 @@ static integer c__3 = 3;
 static integer c__4 = 4;
 static integer c__23 = 23;
 static integer c__28 = 28;
-static integer c__16 = 16;
 static integer c__12 = 12;
-static integer c__22 = 22;
-static integer c__11 = 11;
-static integer c__27 = 27;
 static integer c__25 = 25;
 static integer c__8 = 8;
 static integer c__18 = 18;
+static integer c__11 = 11;
 static doublereal c_b458 = 0.;
 static doublereal c_b472 = 1.;
 
@@ -60,28 +52,26 @@ static doublereal c_b472 = 1.;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] 
-	    */;
-    static doublereal d__[3], e[3];
-    static integer i__, j, m, n;
-    static doublecomplex q[9]	/* was [3][3] */;
-    static doublereal r__[60];
-    static doublecomplex w[60];
-    static doublereal x[3];
-    static doublecomplex z__[9]	/* was [3][3] */;
+    doublecomplex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    doublereal d__[3], e[3];
+    integer i__, j, m, n;
+    doublecomplex q[9]	/* was [3][3] */;
+    doublereal r__[60];
+    doublecomplex w[60];
+    doublereal x[3];
+    doublecomplex z__[9]	/* was [3][3] */;
+    char c2[2];
+    integer i1[3], i2[3], i3[3], iw[36], nt;
+    doublereal rw[60];
+    doublecomplex tau[3];
+    integer info;
     extern /* Subroutine */ int zhbev_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, doublereal *, integer *), zheev_(char *, char *, integer *, doublecomplex *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
-	     integer *);
-    static char c2[2];
-    static integer i1[3], i2[3], i3[3];
-    extern /* Subroutine */ int zhpev_(char *, char *, integer *, 
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
+	     integer *), zhpev_(char *, char *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, integer *);
-    static integer iw[36], nt;
-    static doublereal rw[60];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int zhbevd_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
@@ -94,7 +84,7 @@ static doublereal c_b472 = 1.;
 	    doublereal *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *), zhbtrd_(char *, char *, integer *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     doublecomplex *, integer *, doublecomplex *, integer *), zhetrd_(char *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *), zhpevd_(char *, char *, integer *, 
@@ -107,21 +97,21 @@ static doublereal c_b472 = 1.;
 	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *), zhbevx_(char *, 
 	    char *, char *, integer *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
+	    doublecomplex *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
-	    , integer *, doublecomplex *, doublereal *, integer *, integer *, 
+, integer *, doublecomplex *, doublereal *, integer *, integer *, 
 	    integer *), zheevx_(char *, char *, char *
-	    , integer *, doublecomplex *, integer *, doublereal *, doublereal 
+, integer *, doublecomplex *, integer *, doublereal *, doublereal 
 	    *, integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, integer *, integer *, integer *), zhptrd_(char *, integer *, doublecomplex *, doublereal *,
+	    doublereal *, integer *, integer *, integer *), zhptrd_(char *, integer *, doublecomplex *, doublereal *, 
 	     doublereal *, doublecomplex *, integer *), zstein_(
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    integer *, integer *, integer *), zhpevx_(char *, char *, char *, 
-	    integer *, doublecomplex *, doublereal *, doublereal *, integer *,
+	    integer *, doublecomplex *, doublereal *, doublereal *, integer *, 
 	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
-	    , integer *, doublecomplex *, doublereal *, integer *, integer *, 
+, integer *, doublecomplex *, doublereal *, integer *, integer *, 
 	    integer *), zpteqr_(char *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, integer *, 
 	    doublereal *, integer *), zsteqr_(char *, integer *, 
@@ -137,7 +127,6 @@ static doublereal c_b472 = 1.;
 	    char *, char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *);
-    static doublecomplex tau[3];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -146,35 +135,49 @@ static doublereal c_b472 = 1.;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRST tests the error exits for ZHETRD, ZUNGTR, CUNMTR, ZHPTRD, */
+/*  ZUNGTR, ZUPMTR, ZSTEQR, CSTEIN, ZPTEQR, ZHBTRD, */
+/*  ZHEEV, CHEEVX, CHEEVD, ZHBEV, CHBEVX, CHBEVD, */
+/*  ZHPEV, CHPEVX, CHPEVD, and ZSTEDC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRST tests the error exits for ZHETRD, ZUNGTR, CUNMTR, ZHPTRD,   
-    ZUNGTR, ZUPMTR, ZSTEQR, CSTEIN, ZPTEQR, ZHBTRD,   
-    ZHEEV, CHEEVX, CHEEVD, ZHBEV, CHBEVX, CHBEVD,   
-    ZHPEV, CHPEVX, CHPEVD, and ZSTEDC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -186,7 +189,7 @@ static doublereal c_b472 = 1.;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + j * 3 - 4;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    a[i__1].r = d__1, a[i__1].i = 0.;
 /* L10: */
@@ -452,7 +455,7 @@ static doublereal c_b472 = 1.;
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__3, rw, &c__23, iw, &
+	zstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__0, rw, &c__23, iw, &
 		c__28, &info);
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -462,12 +465,12 @@ static doublereal c_b472 = 1.;
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	zstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__16, iw, &
+	zstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__1, iw, &
 		c__12, &info);
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	zstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__22, iw, &
+	zstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__1, iw, &
 		c__28, &info);
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -478,12 +481,12 @@ static doublereal c_b472 = 1.;
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	zstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__23, iw, &
-		c__11, &info);
+		c__0, &info);
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	zstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__23, iw, &
-		c__27, &info);
+		c__0, &info);
 	chkxer_("ZSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 11;
@@ -925,77 +928,77 @@ static doublereal c_b472 = 1.;
 
 	s_copy(srnamc_1.srnamt, "ZHBEVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zhbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zhbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zhbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zhbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zhbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__2, rw,
+	zhbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__2, rw, 
 		 &c__2, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__1, w, &c__8, rw,
+	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__1, w, &c__8, rw, 
 		 &c__25, iw, &c__12, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, rw,
+	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__1, rw,
+	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__1, rw, 
 		 &c__2, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__25, iw, &c__12, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__0, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw,
+	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw, 
 		 &c__2, iw, &c__12, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	zhbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__0, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	zhbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__2, iw, &c__0, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw,
+	zhbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw, 
 		 &c__25, iw, &c__2, &info);
 	chkxer_("ZHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1121,8 +1124,3 @@ static doublereal c_b472 = 1.;
 /*     End of ZERRST */
 
 } /* zerrst_ */
-
-#undef a_ref
-#undef a_subscr
-
-

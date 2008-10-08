@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -27,46 +22,62 @@ logical cslect_(complex *z__)
     double c_abs(complex *);
 
     /* Local variables */
-    static real rmin;
-    static integer i__;
-    static real x;
+    integer i__;
+    real x, rmin;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     February 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CSLECT returns .TRUE. if the eigenvalue Z is to be selected,   
-    otherwise it returns .FALSE.   
-    It is used by CCHK41 to test if CGEES succesfully sorts eigenvalues,   
-    and by CCHK43 to test if CGEESX succesfully sorts eigenvalues.   
+/*  CSLECT returns .TRUE. if the eigenvalue Z is to be selected, */
+/*  otherwise it returns .FALSE. */
+/*  It is used by CCHK41 to test if CGEES succesfully sorts eigenvalues, */
+/*  and by CCHK43 to test if CGEESX succesfully sorts eigenvalues. */
 
-    The common block /SSLCT/ controls how eigenvalues are selected.   
-    If SELOPT = 0, then CSLECT return .TRUE. when real(Z) is less than   
-    zero, and .FALSE. otherwise.   
-    If SELOPT is at least 1, CSLECT returns SELVAL(SELOPT) and adds 1   
-    to SELOPT, cycling back to 1 at SELMAX.   
+/*  The common block /SSLCT/ controls how eigenvalues are selected. */
+/*  If SELOPT = 0, then CSLECT return .TRUE. when real(Z) is less than */
+/*  zero, and .FALSE. otherwise. */
+/*  If SELOPT is at least 1, CSLECT returns SELVAL(SELOPT) and adds 1 */
+/*  to SELOPT, cycling back to 1 at SELMAX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    Z       (input) COMPLEX   
-            The eigenvalue Z.   
+/*  Z       (input) COMPLEX */
+/*          The eigenvalue Z. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (sslct_1.selopt == 0) {
 	ret_val = z__->r < 0.f;
     } else {
-	rmin = 0.f;
+	q__2.r = sslct_1.selwr[0], q__2.i = sslct_1.selwi[0];
+	q__1.r = z__->r - q__2.r, q__1.i = z__->i - q__2.i;
+	rmin = c_abs(&q__1);
+	ret_val = sslct_1.selval[0];
 	i__1 = sslct_1.seldim;
-	for (i__ = 1; i__ <= i__1; ++i__) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 	    i__2 = i__ - 1;
 	    i__3 = i__ - 1;
 	    q__2.r = sslct_1.selwr[i__2], q__2.i = sslct_1.selwi[i__3];
@@ -84,4 +95,3 @@ logical cslect_(complex *z__)
 /*     End of CSLECT */
 
 } /* cslect_ */
-

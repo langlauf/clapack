@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,78 +21,84 @@ static doublereal c_b9 = 1.;
 	    doublereal *, integer *, doublereal *, integer *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  Solve the least squares problem */
+/*      min || A*X - B || */
+/*  using the QL factorization */
+/*      A = Q*L */
+/*  computed by DGEQLF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    Solve the least squares problem   
-        min || A*X - B ||   
-    using the QL factorization   
-        A = Q*L   
-    computed by DGEQLF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  M >= N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  M >= N >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          Details of the QL factorization of the original matrix A as */
+/*          returned by DGEQLF. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the QL factorization of the original matrix A as   
-            returned by DGEQLF.   
+/*  TAU     (input) DOUBLE PRECISION array, dimension (N) */
+/*          Details of the orthogonal matrix Q. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS) */
+/*          On entry, the m-by-nrhs right hand side matrix B. */
+/*          On exit, the n-by-nrhs solution matrix X, stored in rows */
+/*          m-n+1:m. */
 
-    TAU     (input) DOUBLE PRECISION array, dimension (N)   
-            Details of the orthogonal matrix Q.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= M. */
 
-    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            On entry, the m-by-nrhs right hand side matrix B.   
-            On exit, the n-by-nrhs solution matrix X, stored in rows   
-            m-n+1:m.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= M.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK must be at least NRHS, */
+/*          and should be at least NRHS*NB, where NB is the block size */
+/*          for this environment. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK must be at least NRHS,   
-            and should be at least NRHS*NB, where NB is the block size   
-            for this environment.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments. */
 
-
-       Test the input arguments.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -135,16 +136,11 @@ static doublereal c_b9 = 1.;
 
 /*     Solve L*X = B(m-n+1:m,:) */
 
-    dtrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b9, &
-	    a_ref(*m - *n + 1, 1), lda, &b_ref(*m - *n + 1, 1), ldb);
+    dtrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b9, &a[*m 
+	    - *n + 1 + a_dim1], lda, &b[*m - *n + 1 + b_dim1], ldb);
 
     return 0;
 
 /*     End of DGEQLS */
 
 } /* dgeqls_ */
-
-#undef b_ref
-#undef a_ref
-
-

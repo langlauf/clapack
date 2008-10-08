@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -40,62 +35,70 @@ static integer c__2 = 2;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static complex a[4]	/* was [2][2] */, b[2];
-    static integer i__, j;
-    static complex w[2], x[2];
+    complex a[4]	/* was [2][2] */, b[2];
+    integer i__, j;
+    complex w[2], x[2], af[4]	/* was [2][2] */;
+    integer info;
     extern /* Subroutine */ int cgeql2_(integer *, integer *, complex *, 
 	    integer *, complex *, complex *, integer *), cung2l_(integer *, 
 	    integer *, integer *, complex *, integer *, complex *, complex *, 
 	    integer *), cunm2l_(char *, char *, integer *, integer *, integer 
 	    *, complex *, integer *, complex *, complex *, integer *, complex 
-	    *, integer *);
-    static complex af[4]	/* was [2][2] */;
-    extern /* Subroutine */ int cgeqlf_(integer *, integer *, complex *, 
-	    integer *, complex *, complex *, integer *, integer *), alaesm_(
-	    char *, logical *, integer *), cgeqls_(integer *, integer 
-	    *, integer *, complex *, integer *, complex *, complex *, integer 
-	    *, complex *, integer *, integer *), chkxer_(char *, integer *, 
-	    integer *, logical *, logical *), cungql_(integer *, 
-	    integer *, integer *, complex *, integer *, complex *, complex *, 
-	    integer *, integer *), cunmql_(char *, char *, integer *, integer 
-	    *, integer *, complex *, integer *, complex *, complex *, integer 
-	    *, complex *, integer *, integer *);
+	    *, integer *), cgeqlf_(integer *, integer *, 
+	    complex *, integer *, complex *, complex *, integer *, integer *),
+	     alaesm_(char *, logical *, integer *), cgeqls_(integer *, 
+	     integer *, integer *, complex *, integer *, complex *, complex *, 
+	     integer *, complex *, integer *, integer *), chkxer_(char *, 
+	    integer *, integer *, logical *, logical *), cungql_(
+	    integer *, integer *, integer *, complex *, integer *, complex *, 
+	    complex *, integer *, integer *), cunmql_(char *, char *, integer 
+	    *, integer *, integer *, complex *, integer *, complex *, complex 
+	    *, integer *, complex *, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRQL tests the error exits for the COMPLEX routines */
+/*  that use the QL decomposition of a general matrix. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRQL tests the error exits for the COMPLEX routines   
-    that use the QL decomposition of a general matrix.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -106,12 +109,12 @@ static integer c__2 = 2;
 
     for (j = 1; j <= 2; ++j) {
 	for (i__ = 1; i__ <= 2; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 1) - 3;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 1) - 3;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
@@ -128,9 +131,9 @@ static integer c__2 = 2;
     }
     infoc_1.ok = TRUE_;
 
-/*     Error exits for QL factorization   
+/*     Error exits for QL factorization */
 
-       CGEQLF */
+/*     CGEQLF */
 
     s_copy(srnamc_1.srnamt, "CGEQLF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
@@ -375,10 +378,3 @@ static integer c__2 = 2;
 /*     End of CERRQL */
 
 } /* cerrql_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

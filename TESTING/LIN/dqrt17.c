@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,15 +21,16 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
     doublereal ret_val;
 
     /* Local variables */
-    static integer iscl, info;
+    doublereal err;
+    integer iscl, info;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
     extern logical lsame_(char *, char *);
-    static doublereal norma, normb;
-    static integer ncols;
-    static doublereal normx, rwork[1];
-    static integer nrows;
+    doublereal norma, normb;
+    integer ncols;
+    doublereal normx, rwork[1];
+    integer nrows;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dlascl_(char *, integer *, integer *, 
@@ -42,98 +38,114 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 	    integer *, integer *), dlacpy_(char *, integer *, integer 
 	    *, doublereal *, integer *, doublereal *, integer *), 
 	    xerbla_(char *, integer *);
-    static doublereal bignum, smlnum, normrs, err;
+    doublereal bignum, smlnum, normrs;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DQRT17 computes the ratio   
+/*  DQRT17 computes the ratio */
 
-       || R'*op(A) ||/(||A||*alpha*max(M,N,NRHS)*eps)   
+/*     || R'*op(A) ||/(||A||*alpha*max(M,N,NRHS)*eps) */
 
-    where R = op(A)*X - B, op(A) is A or A', and   
+/*  where R = op(A)*X - B, op(A) is A or A', and */
 
-       alpha = ||B|| if IRESID = 1 (zero-residual problem)   
-       alpha = ||R|| if IRESID = 2 (otherwise).   
+/*     alpha = ||B|| if IRESID = 1 (zero-residual problem) */
+/*     alpha = ||R|| if IRESID = 2 (otherwise). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    TRANS   (input) CHARACTER*1   
-            Specifies whether or not the transpose of A is used.   
-            = 'N':  No transpose, op(A) = A.   
-            = 'T':  Transpose, op(A) = A'.   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Specifies whether or not the transpose of A is used. */
+/*          = 'N':  No transpose, op(A) = A. */
+/*          = 'T':  Transpose, op(A) = A'. */
 
-    IRESID  (input) INTEGER   
-            IRESID = 1 indicates zero-residual problem.   
-            IRESID = 2 indicates non-zero residual.   
+/*  IRESID  (input) INTEGER */
+/*          IRESID = 1 indicates zero-residual problem. */
+/*          IRESID = 2 indicates non-zero residual. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
-            If TRANS = 'N', the number of rows of the matrix B.   
-            If TRANS = 'T', the number of rows of the matrix X.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
+/*          If TRANS = 'N', the number of rows of the matrix B. */
+/*          If TRANS = 'T', the number of rows of the matrix X. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix  A.   
-            If TRANS = 'N', the number of rows of the matrix X.   
-            If TRANS = 'T', the number of rows of the matrix B.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix  A. */
+/*          If TRANS = 'N', the number of rows of the matrix X. */
+/*          If TRANS = 'T', the number of rows of the matrix B. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of the matrices X and B.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of the matrices X and B. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= M.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= M. */
 
-    X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS)   
-            If TRANS = 'N', the n-by-nrhs matrix X.   
-            If TRANS = 'T', the m-by-nrhs matrix X.   
+/*  X       (input) DOUBLE PRECISION array, dimension (LDX,NRHS) */
+/*          If TRANS = 'N', the n-by-nrhs matrix X. */
+/*          If TRANS = 'T', the m-by-nrhs matrix X. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.   
-            If TRANS = 'N', LDX >= N.   
-            If TRANS = 'T', LDX >= M.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X. */
+/*          If TRANS = 'N', LDX >= N. */
+/*          If TRANS = 'T', LDX >= M. */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            If TRANS = 'N', the m-by-nrhs matrix B.   
-            If TRANS = 'T', the n-by-nrhs matrix B.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,NRHS) */
+/*          If TRANS = 'N', the m-by-nrhs matrix B. */
+/*          If TRANS = 'T', the n-by-nrhs matrix B. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.   
-            If TRANS = 'N', LDB >= M.   
-            If TRANS = 'T', LDB >= N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. */
+/*          If TRANS = 'N', LDB >= M. */
+/*          If TRANS = 'T', LDB >= N. */
 
-    C       (workspace) DOUBLE PRECISION array, dimension (LDB,NRHS)   
+/*  C       (workspace) DOUBLE PRECISION array, dimension (LDB,NRHS) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= NRHS*(M+N).   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= NRHS*(M+N). */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     c_dim1 = *ldb;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -214,4 +226,3 @@ doublereal dqrt17_(char *trans, integer *iresid, integer *m, integer *n,
 /*     End of DQRT17 */
 
 } /* dqrt17_ */
-

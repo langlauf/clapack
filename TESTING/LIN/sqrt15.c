@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -18,7 +13,7 @@ static integer c__0 = 0;
 
 /* Subroutine */ int sqrt15_(integer *scale, integer *rksel, integer *m, 
 	integer *n, integer *nrhs, real *a, integer *lda, real *b, integer *
-	ldb, real *s, integer *rank, real *norma, real *normb, integer *iseed,
+	ldb, real *s, integer *rank, real *norma, real *normb, integer *iseed, 
 	 real *work, integer *lwork)
 {
     /* System generated locals */
@@ -26,109 +21,122 @@ static integer c__0 = 0;
     real r__1;
 
     /* Local variables */
-    static integer info;
-    static real temp;
+    integer j, mn;
+    real eps;
+    integer info;
+    real temp;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer j;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
 	    slarf_(char *, integer *, integer *, real *, integer *, real *, 
 	    real *, integer *, real *), sgemm_(char *, char *, 
 	    integer *, integer *, integer *, real *, real *, integer *, real *
-	    , integer *, real *, real *, integer *);
+, integer *, real *, real *, integer *);
     extern doublereal sasum_(integer *, real *, integer *);
-    static real dummy[1];
-    static integer mn;
+    real dummy[1];
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real bignum;
+    real bignum;
     extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, integer *);
     extern doublereal slarnd_(integer *, integer *);
     extern /* Subroutine */ int slaord_(char *, integer *, real *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *), slaror_(char *, char *, integer *, 
 	    integer *, real *, integer *, integer *, real *, integer *), slarnv_(integer *, integer *, integer *, real *);
-    static real smlnum, eps;
+    real smlnum;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SQRT15 generates a matrix with full or deficient rank and of various */
+/*  norms. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SQRT15 generates a matrix with full or deficient rank and of various   
-    norms.   
+/*  SCALE   (input) INTEGER */
+/*          SCALE = 1: normally scaled matrix */
+/*          SCALE = 2: matrix scaled up */
+/*          SCALE = 3: matrix scaled down */
 
-    Arguments   
-    =========   
+/*  RKSEL   (input) INTEGER */
+/*          RKSEL = 1: full rank matrix */
+/*          RKSEL = 2: rank-deficient matrix */
 
-    SCALE   (input) INTEGER   
-            SCALE = 1: normally scaled matrix   
-            SCALE = 2: matrix scaled up   
-            SCALE = 3: matrix scaled down   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    RKSEL   (input) INTEGER   
-            RKSEL = 1: full rank matrix   
-            RKSEL = 2: rank-deficient matrix   
+/*  N       (input) INTEGER */
+/*          The number of columns of A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B. */
 
-    N       (input) INTEGER   
-            The number of columns of A.   
+/*  A       (output) REAL array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (output) REAL array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  B       (output) REAL array, dimension (LDB, NRHS) */
+/*          A matrix that is in the range space of matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. */
 
-    B       (output) REAL array, dimension (LDB, NRHS)   
-            A matrix that is in the range space of matrix A.   
+/*  S       (output) REAL array, dimension MIN(M,N) */
+/*          Singular values of A. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.   
+/*  RANK    (output) INTEGER */
+/*          number of nonzero singular values of A. */
 
-    S       (output) REAL array, dimension MIN(M,N)   
-            Singular values of A.   
+/*  NORMA   (output) REAL */
+/*          one-norm of A. */
 
-    RANK    (output) INTEGER   
-            number of nonzero singular values of A.   
+/*  NORMB   (output) REAL */
+/*          one-norm of B. */
 
-    NORMA   (output) REAL   
-            one-norm of A.   
+/*  ISEED   (input/output) integer array, dimension (4) */
+/*          seed for random number generator. */
 
-    NORMB   (output) REAL   
-            one-norm of B.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    ISEED   (input/output) integer array, dimension (4)   
-            seed for random number generator.   
+/*  LWORK   (input) INTEGER */
+/*          length of work space required. */
+/*          LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M) */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            length of work space required.   
-            LWORK >= MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --s;
     --iseed;
@@ -193,37 +201,37 @@ L20:
 	slarf_("Left", m, rank, &work[1], &c__1, &c_b22, &a[a_offset], lda, &
 		work[*m + 1]);
 
-/*        workspace used: m+mn   
+/*        workspace used: m+mn */
 
-          Generate consistent rhs in the range space of A */
+/*        Generate consistent rhs in the range space of A */
 
 	i__1 = *rank * *nrhs;
 	slarnv_(&c__2, &iseed[1], &i__1, &work[1]);
 	sgemm_("No transpose", "No transpose", m, nrhs, rank, &c_b19, &a[
 		a_offset], lda, &work[1], rank, &c_b18, &b[b_offset], ldb);
 
-/*        work space used: <= mn *nrhs   
+/*        work space used: <= mn *nrhs */
 
-          generate (unscaled) matrix A */
+/*        generate (unscaled) matrix A */
 
 	i__1 = *rank;
 	for (j = 1; j <= i__1; ++j) {
-	    sscal_(m, &s[j], &a_ref(1, j), &c__1);
+	    sscal_(m, &s[j], &a[j * a_dim1 + 1], &c__1);
 /* L40: */
 	}
 	if (*rank < *n) {
 	    i__1 = *n - *rank;
-	    slaset_("Full", m, &i__1, &c_b18, &c_b18, &a_ref(1, *rank + 1), 
-		    lda);
+	    slaset_("Full", m, &i__1, &c_b18, &c_b18, &a[(*rank + 1) * a_dim1 
+		    + 1], lda);
 	}
 	slaror_("Right", "No initialization", m, n, &a[a_offset], lda, &iseed[
 		1], &work[1], &info);
 
     } else {
 
-/*        work space used 2*n+m   
+/*        work space used 2*n+m */
 
-          Generate null matrix and rhs */
+/*        Generate null matrix and rhs */
 
 	i__1 = mn;
 	for (j = 1; j <= i__1; ++j) {
@@ -277,7 +285,3 @@ L20:
 /*     End of SQRT15 */
 
 } /* sqrt15_ */
-
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -57,61 +52,59 @@ static integer c__2 = 2;
     integer i__1, i__2, i__3, i__4, i__5[2];
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static integer ioff, mode;
-    static real amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1], uplo[1], type__[1];
-    static integer nrun, i__, k, n, ifact, nfail, iseed[4], nfact;
+    integer i__, k, n, k1, in, kl, ku, nt, lda, npp;
+    char fact[1];
+    integer ioff, mode;
+    real amax;
+    char path[3];
+    integer imat, info;
+    char dist[1], uplo[1], type__[1];
+    integer nrun, ifact, nfail, iseed[4], nfact;
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static real roldc, rcond, scond;
+    char equed[1];
+    real roldc, rcond, scond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *);
-    static integer nimat;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static logical equil;
+    real anorm;
+    logical equil;
     extern /* Subroutine */ int sppt01_(char *, integer *, real *, real *, 
 	    real *, real *);
-    static integer iuplo, izero, nerrs, k1;
-    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
-	    integer *), sppt02_(char *, integer *, integer *, real *, real *, 
-	    integer *, real *, integer *, real *, real *), sppt05_(
+    integer iuplo, izero, nerrs;
+    extern /* Subroutine */ int sppt02_(char *, integer *, integer *, real *, 
+	    real *, integer *, real *, integer *, real *, real *), 
+	    scopy_(integer *, real *, integer *, real *, integer *), sppt05_(
 	    char *, integer *, integer *, real *, real *, integer *, real *, 
 	    integer *, real *, integer *, real *, real *, real *);
-    static logical zerot;
-    static char xtype[1];
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int sppsv_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *), slatb4_(char *, integer *, 
 	    integer *, integer *, char *, integer *, integer *, real *, 
 	    integer *, real *, char *), aladhd_(
-	    integer *, char *);
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer ku, nt;
-    static real rcondc;
-    static logical nofact;
-    static char packit[1];
-    static integer iequed;
+	    integer *, char *), alaerh_(char *, char *, integer *, 
+	    integer *, char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *);
+    logical prefac;
+    real rcondc;
+    logical nofact;
+    char packit[1];
+    integer iequed;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static real cndnum, ainvnm;
+    real cndnum, ainvnm;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), slarhs_(char *, char *, 
 	    char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , integer *, integer *), slaset_(
+, integer *, integer *), slaset_(
 	    char *, integer *, integer *, real *, real *, real *, integer *);
     extern doublereal slansp_(char *, char *, integer *, real *, real *);
     extern /* Subroutine */ int slaqsp_(char *, integer *, real *, real *, 
@@ -120,13 +113,12 @@ static integer c__2 = 2;
 	    real *, integer *, integer *, char *, real *, integer *, real *, 
 	    integer *), sppequ_(char *, integer *, 
 	    real *, real *, real *, real *, integer *);
-    static real result[6];
+    real result[6];
     extern /* Subroutine */ int spptrf_(char *, integer *, real *, integer *), spptri_(char *, integer *, real *, integer *), 
 	    serrvx_(char *, integer *), sppsvx_(char *, char *, 
 	    integer *, integer *, real *, real *, char *, real *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
 	    integer *, integer *);
-    static integer lda, npp;
 
     /* Fortran I/O blocks */
     static cilist io___49 = { 0, 0, 0, fmt_9999, 0 };
@@ -135,79 +127,99 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SDRVPP tests the driver routines SPPSV and -SVX.   
+/*  SDRVPP tests the driver routines SPPSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) REAL array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  A       (workspace) REAL array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    AFAC    (workspace) REAL array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  AFAC    (workspace) REAL array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    ASAV    (workspace) REAL array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  ASAV    (workspace) REAL array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    B       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  B       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    X       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  X       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    S       (workspace) REAL array, dimension (NMAX)   
+/*  S       (workspace) REAL array, dimension (NMAX) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -222,9 +234,11 @@ static integer c__2 = 2;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PP", (ftnlen)2, (ftnlen)2);
@@ -279,8 +293,8 @@ static integer c__2 = 2;
 		*(unsigned char *)packit = *(unsigned char *)&packs[iuplo - 1]
 			;
 
-/*              Set up parameters with SLATB4 and generate a test matrix   
-                with SLATMS. */
+/*              Set up parameters with SLATB4 and generate a test matrix */
+/*              with SLATMS. */
 
 		slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
@@ -294,13 +308,13 @@ static integer c__2 = 2;
 /*              Check error code from SLATMS. */
 
 		if (info != 0) {
-		    alaerh_(path, "SLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "SLATMS", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		    goto L120;
 		}
 
-/*              For types 3-5, zero one row and column of the matrix to   
-                test that INFO is returned correctly. */
+/*              For types 3-5, zero one row and column of the matrix to */
+/*              test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 3) {
@@ -376,16 +390,16 @@ static integer c__2 = 2;
 			} else if (! lsame_(fact, "N")) 
 				{
 
-/*                       Compute the condition number for comparison with   
-                         the value returned by SPPSVX (FACT = 'N' reuses   
-                         the condition number from the previous iteration   
-                         with FACT = 'F'). */
+/*                       Compute the condition number for comparison with */
+/*                       the value returned by SPPSVX (FACT = 'N' reuses */
+/*                       the condition number from the previous iteration */
+/*                       with FACT = 'F'). */
 
 			    scopy_(&npp, &asav[1], &c__1, &afac[1], &c__1);
 			    if (equil || iequed > 1) {
 
-/*                          Compute row and column scale factors to   
-                            equilibrate the matrix A. */
+/*                          Compute row and column scale factors to */
+/*                          equilibrate the matrix A. */
 
 				sppequ_(uplo, &n, &afac[1], &s[1], &scond, &
 					amax, &info);
@@ -396,13 +410,13 @@ static integer c__2 = 2;
 
 /*                             Equilibrate the matrix. */
 
-				    slaqsp_(uplo, &n, &afac[1], &s[1], &scond,
+				    slaqsp_(uplo, &n, &afac[1], &s[1], &scond, 
 					     &amax, equed);
 				}
 			    }
 
-/*                       Save the condition number of the   
-                         non-equilibrated system for use in SGET04. */
+/*                       Save the condition number of the */
+/*                       non-equilibrated system for use in SGET04. */
 
 			    if (equil) {
 				roldc = rcondc;
@@ -411,7 +425,7 @@ static integer c__2 = 2;
 /*                       Compute the 1-norm of A. */
 
 			    anorm = slansp_("1", uplo, &n, &afac[1], &rwork[1]
-				    );
+);
 
 /*                       Factor the matrix A. */
 
@@ -448,10 +462,10 @@ static integer c__2 = 2;
 
 			if (nofact) {
 
-/*                       --- Test SPPSV  ---   
+/*                       --- Test SPPSV  --- */
 
-                         Compute the L*L' or U'*U factorization of the   
-                         matrix and solve the system. */
+/*                       Compute the L*L' or U'*U factorization of the */
+/*                       matrix and solve the system. */
 
 			    scopy_(&npp, &a[1], &c__1, &afac[1], &c__1);
 			    slacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
@@ -473,8 +487,8 @@ static integer c__2 = 2;
 				goto L70;
 			    }
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    sppt01_(uplo, &n, &a[1], &afac[1], &rwork[1], 
 				    result);
@@ -492,8 +506,8 @@ static integer c__2 = 2;
 				    rcondc, &result[2]);
 			    nt = 3;
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    i__4 = nt;
 			    for (k = 1; k <= i__4; ++k) {
@@ -532,15 +546,15 @@ L70:
 			slaset_("Full", &n, nrhs, &c_b60, &c_b60, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if FACT='F' and   
-                         EQUED='Y'. */
+/*                       Equilibrate the matrix if FACT='F' and */
+/*                       EQUED='Y'. */
 
 			    slaqsp_(uplo, &n, &a[1], &s[1], &scond, &amax, 
 				    equed);
 			}
 
-/*                    Solve the system and compute the condition number   
-                      and error bounds using SPPSVX. */
+/*                    Solve the system and compute the condition number */
+/*                    and error bounds using SPPSVX. */
 
 			s_copy(srnamc_1.srnamt, "SPPSVX", (ftnlen)6, (ftnlen)
 				6);
@@ -565,8 +579,8 @@ L70:
 			if (info == 0) {
 			    if (! prefac) {
 
-/*                          Reconstruct matrix from factors and compute   
-                            residual. */
+/*                          Reconstruct matrix from factors and compute */
+/*                          residual. */
 
 				sppt01_(uplo, &n, &a[1], &afac[1], &rwork[(*
 					nrhs << 1) + 1], result);
@@ -578,7 +592,7 @@ L70:
 /*                       Compute residual of the computed solution. */
 
 			    slacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
-				    , &lda);
+, &lda);
 			    sppt02_(uplo, &n, nrhs, &asav[1], &x[1], &lda, &
 				    work[1], &lda, &rwork[(*nrhs << 1) + 1], &
 				    result[1]);
@@ -586,15 +600,15 @@ L70:
 /*                       Check solution from generated exact solution. */
 
 			    if (nofact || prefac && lsame_(equed, "N")) {
-				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 			    } else {
-				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds from iterative   
-                         refinement. */
+/*                       Check the error bounds from iterative */
+/*                       refinement. */
 
 			    sppt05_(uplo, &n, nrhs, &asav[1], &b[1], &lda, &x[
 				    1], &lda, &xact[1], &lda, &rwork[1], &
@@ -603,13 +617,13 @@ L70:
 			    k1 = 6;
 			}
 
-/*                    Compare RCOND from SPPSVX with the computed value   
-                      in RCONDC. */
+/*                    Compare RCOND from SPPSVX with the computed value */
+/*                    in RCONDC. */
 
 			result[5] = sget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			for (k = k1; k <= 6; ++k) {
 			    if (result[k - 1] >= *thresh) {
@@ -677,4 +691,3 @@ L130:
 /*     End of SDRVPP */
 
 } /* sdrvpp_ */
-

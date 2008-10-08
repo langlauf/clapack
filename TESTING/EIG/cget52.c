@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -27,129 +22,144 @@ static integer c__1 = 1;
     void r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static integer jvec;
-    static real temp1;
-    static integer j;
-    static complex betai;
-    static real scale, abmax;
+    integer j;
+    real ulp;
+    integer jvec;
+    real temp1;
+    complex betai;
+    real scale, abmax;
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
-	    , complex *, integer *, complex *, integer *, complex *, complex *
-	    , integer *);
-    static real anorm, bnorm, enorm;
-    static char trans[1];
-    static complex acoeff, bcoeff;
+, complex *, integer *, complex *, integer *, complex *, complex *
+, integer *);
+    real anorm, bnorm, enorm;
+    char trans[1];
+    complex acoeff, bcoeff;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
-    static complex alphai;
+    complex alphai;
     extern doublereal slamch_(char *);
-    static real alfmax, safmin;
-    static char normab[1];
-    static real safmax, betmax, enrmer, errnrm, ulp;
+    real alfmax, safmin;
+    char normab[1];
+    real safmax, betmax, enrmer, errnrm;
 
 
-#define e_subscr(a_1,a_2) (a_2)*e_dim1 + a_1
-#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CGET52  does an eigenvector check for the generalized eigenvalue */
+/*  problem. */
 
-    Purpose   
-    =======   
+/*  The basic test for right eigenvectors is: */
 
-    CGET52  does an eigenvector check for the generalized eigenvalue   
-    problem.   
+/*                            | b(i) A E(i) -  a(i) B E(i) | */
+/*          RESULT(1) = max   ------------------------------- */
+/*                       i    n ulp max( |b(i) A|, |a(i) B| ) */
 
-    The basic test for right eigenvectors is:   
+/*  using the 1-norm.  Here, a(i)/b(i) = w is the i-th generalized */
+/*  eigenvalue of A - w B, or, equivalently, b(i)/a(i) = m is the i-th */
+/*  generalized eigenvalue of m A - B. */
 
-                              | b(i) A E(i) -  a(i) B E(i) |   
-            RESULT(1) = max   -------------------------------   
-                         i    n ulp max( |b(i) A|, |a(i) B| )   
+/*                          H   H  _      _ */
+/*  For left eigenvectors, A , B , a, and b  are used. */
 
-    using the 1-norm.  Here, a(i)/b(i) = w is the i-th generalized   
-    eigenvalue of A - w B, or, equivalently, b(i)/a(i) = m is the i-th   
-    generalized eigenvalue of m A - B.   
+/*  CGET52 also tests the normalization of E.  Each eigenvector is */
+/*  supposed to be normalized so that the maximum "absolute value" */
+/*  of its elements is 1, where in this case, "absolute value" */
+/*  of a complex value x is  |Re(x)| + |Im(x)| ; let us call this */
+/*  maximum "absolute value" norm of a vector v  M(v). */
+/*  if a(i)=b(i)=0, then the eigenvector is set to be the jth coordinate */
+/*  vector. The normalization test is: */
 
-                            H   H  _      _   
-    For left eigenvectors, A , B , a, and b  are used.   
+/*          RESULT(2) =      max       | M(v(i)) - 1 | / ( n ulp ) */
+/*                     eigenvectors v(i) */
 
-    CGET52 also tests the normalization of E.  Each eigenvector is   
-    supposed to be normalized so that the maximum "absolute value"   
-    of its elements is 1, where in this case, "absolute value"   
-    of a complex value x is  |Re(x)| + |Im(x)| ; let us call this   
-    maximum "absolute value" norm of a vector v  M(v).   
-    if a(i)=b(i)=0, then the eigenvector is set to be the jth coordinate   
-    vector. The normalization test is:   
+/*  Arguments */
+/*  ========= */
 
-            RESULT(2) =      max       | M(v(i)) - 1 | / ( n ulp )   
-                       eigenvectors v(i)   
+/*  LEFT    (input) LOGICAL */
+/*          =.TRUE.:  The eigenvectors in the columns of E are assumed */
+/*                    to be *left* eigenvectors. */
+/*          =.FALSE.: The eigenvectors in the columns of E are assumed */
+/*                    to be *right* eigenvectors. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrices.  If it is zero, CGET52 does */
+/*          nothing.  It must be at least zero. */
 
-    LEFT    (input) LOGICAL   
-            =.TRUE.:  The eigenvectors in the columns of E are assumed   
-                      to be *left* eigenvectors.   
-            =.FALSE.: The eigenvectors in the columns of E are assumed   
-                      to be *right* eigenvectors.   
+/*  A       (input) COMPLEX array, dimension (LDA, N) */
+/*          The matrix A. */
 
-    N       (input) INTEGER   
-            The size of the matrices.  If it is zero, CGET52 does   
-            nothing.  It must be at least zero.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) COMPLEX array, dimension (LDA, N)   
-            The matrix A.   
+/*  B       (input) COMPLEX array, dimension (LDB, N) */
+/*          The matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) COMPLEX array, dimension (LDB, N)   
-            The matrix B.   
+/*  E       (input) COMPLEX array, dimension (LDE, N) */
+/*          The matrix of eigenvectors.  It must be O( 1 ). */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDE     (input) INTEGER */
+/*          The leading dimension of E.  It must be at least 1 and at */
+/*          least N. */
 
-    E       (input) COMPLEX array, dimension (LDE, N)   
-            The matrix of eigenvectors.  It must be O( 1 ).   
+/*  ALPHA   (input) COMPLEX array, dimension (N) */
+/*          The values a(i) as described above, which, along with b(i), */
+/*          define the generalized eigenvalues. */
 
-    LDE     (input) INTEGER   
-            The leading dimension of E.  It must be at least 1 and at   
-            least N.   
+/*  BETA    (input) COMPLEX array, dimension (N) */
+/*          The values b(i) as described above, which, along with a(i), */
+/*          define the generalized eigenvalues. */
 
-    ALPHA   (input) COMPLEX array, dimension (N)   
-            The values a(i) as described above, which, along with b(i),   
-            define the generalized eigenvalues.   
+/*  WORK    (workspace) COMPLEX array, dimension (N**2) */
 
-    BETA    (input) COMPLEX array, dimension (N)   
-            The values b(i) as described above, which, along with a(i),   
-            define the generalized eigenvalues.   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    WORK    (workspace) COMPLEX array, dimension (N**2)   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The values computed by the test described above.  If A E or */
+/*          B E is likely to overflow, then RESULT(1:2) is set to */
+/*          10 / ulp. */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The values computed by the test described above.  If A E or   
-            B E is likely to overflow, then RESULT(1:2) is set to   
-            10 / ulp.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     e_dim1 = *lde;
-    e_offset = 1 + e_dim1 * 1;
+    e_offset = 1 + e_dim1;
     e -= e_offset;
     --alpha;
     --beta;
@@ -176,9 +186,9 @@ static integer c__1 = 1;
 	*(unsigned char *)normab = 'O';
     }
 
-/*     Norm of A, B, and E:   
+/*     Norm of A, B, and E: */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = clange_(normab, n, n, &a[a_offset], lda, &rwork[1]);
     anorm = dmax(r__1,safmin);
 /* Computing MAX */
@@ -190,8 +200,8 @@ static integer c__1 = 1;
     alfmax = safmax / dmax(1.f,bnorm);
     betmax = safmax / dmax(1.f,anorm);
 
-/*     Compute error matrix.   
-       Column i = ( b(i) A - a(i) B ) E(i) / max( |a(i) B| |b(i) A| ) */
+/*     Compute error matrix. */
+/*     Column i = ( b(i) A - a(i) B ) E(i) / max( |a(i) B| |b(i) A| ) */
 
     i__1 = *n;
     for (jvec = 1; jvec <= i__1; ++jvec) {
@@ -228,11 +238,11 @@ static integer c__1 = 1;
 	    r_cnjg(&q__1, &bcoeff);
 	    bcoeff.r = q__1.r, bcoeff.i = q__1.i;
 	}
-	cgemv_(trans, n, n, &acoeff, &a[a_offset], lda, &e_ref(1, jvec), &
-		c__1, &c_b1, &work[*n * (jvec - 1) + 1], &c__1);
+	cgemv_(trans, n, n, &acoeff, &a[a_offset], lda, &e[jvec * e_dim1 + 1], 
+		 &c__1, &c_b1, &work[*n * (jvec - 1) + 1], &c__1);
 	q__1.r = -bcoeff.r, q__1.i = -bcoeff.i;
-	cgemv_(trans, n, n, &q__1, &b[b_offset], lda, &e_ref(1, jvec), &c__1, 
-		&c_b2, &work[*n * (jvec - 1) + 1], &c__1);
+	cgemv_(trans, n, n, &q__1, &b[b_offset], lda, &e[jvec * e_dim1 + 1], &
+		c__1, &c_b2, &work[*n * (jvec - 1) + 1], &c__1);
 /* L10: */
     }
 
@@ -251,9 +261,9 @@ static integer c__1 = 1;
 	i__2 = *n;
 	for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-	    i__3 = e_subscr(j, jvec);
+	    i__3 = j + jvec * e_dim1;
 	    r__3 = temp1, r__4 = (r__1 = e[i__3].r, dabs(r__1)) + (r__2 = 
-		    r_imag(&e_ref(j, jvec)), dabs(r__2));
+		    r_imag(&e[j + jvec * e_dim1]), dabs(r__2));
 	    temp1 = dmax(r__3,r__4);
 /* L20: */
 	}
@@ -272,8 +282,3 @@ static integer c__1 = 1;
 /*     End of CGET52 */
 
 } /* cget52_ */
-
-#undef e_ref
-#undef e_subscr
-
-

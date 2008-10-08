@@ -1,89 +1,105 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sdisna_(char *job, integer *m, integer *n, real *d__, 
 	real *sep, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SDISNA computes the reciprocal condition numbers for the eigenvectors   
-    of a real symmetric or complex Hermitian matrix or for the left or   
-    right singular vectors of a general m-by-n matrix. The reciprocal   
-    condition number is the 'gap' between the corresponding eigenvalue or   
-    singular value and the nearest other one.   
-
-    The bound on the error, measured by angle in radians, in the I-th   
-    computed vector is given by   
-
-           SLAMCH( 'E' ) * ( ANORM / SEP( I ) )   
-
-    where ANORM = 2-norm(A) = max( abs( D(j) ) ).  SEP(I) is not allowed   
-    to be smaller than SLAMCH( 'E' )*ANORM in order to limit the size of   
-    the error bound.   
-
-    SDISNA may also be used to compute error bounds for eigenvectors of   
-    the generalized symmetric definite eigenproblem.   
-
-    Arguments   
-    =========   
-
-    JOB     (input) CHARACTER*1   
-            Specifies for which problem the reciprocal condition numbers   
-            should be computed:   
-            = 'E':  the eigenvectors of a symmetric/Hermitian matrix;   
-            = 'L':  the left singular vectors of a general matrix;   
-            = 'R':  the right singular vectors of a general matrix.   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix. M >= 0.   
-
-    N       (input) INTEGER   
-            If JOB = 'L' or 'R', the number of columns of the matrix,   
-            in which case N >= 0. Ignored if JOB = 'E'.   
-
-    D       (input) REAL array, dimension (M) if JOB = 'E'   
-                                dimension (min(M,N)) if JOB = 'L' or 'R'   
-            The eigenvalues (if JOB = 'E') or singular values (if JOB =   
-            'L' or 'R') of the matrix, in either increasing or decreasing   
-            order. If singular values, they must be non-negative.   
-
-    SEP     (output) REAL array, dimension (M) if JOB = 'E'   
-                                 dimension (min(M,N)) if JOB = 'L' or 'R'   
-            The reciprocal condition numbers of the vectors.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit.   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-
-    =====================================================================   
-
-
-       Test the input arguments   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     real r__1, r__2, r__3;
-    /* Local variables */
-    static logical decr, left, incr, sing;
-    static integer i__, k;
-    static logical eigen;
-    extern logical lsame_(char *, char *);
-    static real anorm;
-    static logical right;
-    static real oldgap;
-    extern doublereal slamch_(char *);
-    static real safmin;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real newgap, thresh, eps;
 
+    /* Local variables */
+    integer i__, k;
+    real eps;
+    logical decr, left, incr, sing, eigen;
+    extern logical lsame_(char *, char *);
+    real anorm;
+    logical right;
+    real oldgap;
+    extern doublereal slamch_(char *);
+    real safmin;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    real newgap, thresh;
+
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SDISNA computes the reciprocal condition numbers for the eigenvectors */
+/*  of a real symmetric or complex Hermitian matrix or for the left or */
+/*  right singular vectors of a general m-by-n matrix. The reciprocal */
+/*  condition number is the 'gap' between the corresponding eigenvalue or */
+/*  singular value and the nearest other one. */
+
+/*  The bound on the error, measured by angle in radians, in the I-th */
+/*  computed vector is given by */
+
+/*         SLAMCH( 'E' ) * ( ANORM / SEP( I ) ) */
+
+/*  where ANORM = 2-norm(A) = max( abs( D(j) ) ).  SEP(I) is not allowed */
+/*  to be smaller than SLAMCH( 'E' )*ANORM in order to limit the size of */
+/*  the error bound. */
+
+/*  SDISNA may also be used to compute error bounds for eigenvectors of */
+/*  the generalized symmetric definite eigenproblem. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOB     (input) CHARACTER*1 */
+/*          Specifies for which problem the reciprocal condition numbers */
+/*          should be computed: */
+/*          = 'E':  the eigenvectors of a symmetric/Hermitian matrix; */
+/*          = 'L':  the left singular vectors of a general matrix; */
+/*          = 'R':  the right singular vectors of a general matrix. */
+
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix. M >= 0. */
+
+/*  N       (input) INTEGER */
+/*          If JOB = 'L' or 'R', the number of columns of the matrix, */
+/*          in which case N >= 0. Ignored if JOB = 'E'. */
+
+/*  D       (input) REAL array, dimension (M) if JOB = 'E' */
+/*                              dimension (min(M,N)) if JOB = 'L' or 'R' */
+/*          The eigenvalues (if JOB = 'E') or singular values (if JOB = */
+/*          'L' or 'R') of the matrix, in either increasing or decreasing */
+/*          order. If singular values, they must be non-negative. */
+
+/*  SEP     (output) REAL array, dimension (M) if JOB = 'E' */
+/*                               dimension (min(M,N)) if JOB = 'L' or 'R' */
+/*          The reciprocal condition numbers of the vectors. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit. */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments */
+
+    /* Parameter adjustments */
     --sep;
     --d__;
 
@@ -170,8 +186,8 @@
 	}
     }
 
-/*     Ensure that reciprocal condition numbers are not less than   
-       threshold, in order to limit the size of the error bound */
+/*     Ensure that reciprocal condition numbers are not less than */
+/*     threshold, in order to limit the size of the error bound */
 
     eps = slamch_("E");
     safmin = slamch_("S");
@@ -198,4 +214,3 @@
 /*     End of SDISNA */
 
 } /* sdisna_ */
-

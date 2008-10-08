@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,59 +30,68 @@ static integer c__2 = 2;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real a[4]	/* was [2][2] */, b[2];
-    static integer i__, j;
-    static real w[2], x[2];
+    real a[4]	/* was [2][2] */, b[2];
+    integer i__, j;
+    real w[2], x[2], af[4]	/* was [2][2] */;
+    integer info;
     extern /* Subroutine */ int sgelq2_(integer *, integer *, real *, integer 
-	    *, real *, real *, integer *);
-    static real af[4]	/* was [2][2] */;
-    extern /* Subroutine */ int sorgl2_(integer *, integer *, integer *, real 
-	    *, integer *, real *, real *, integer *), sorml2_(char *, char *, 
-	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, real *, integer *), alaesm_(char *, 
-	    logical *, integer *), sgelqf_(integer *, integer *, real 
-	    *, integer *, real *, real *, integer *, integer *), chkxer_(char 
-	    *, integer *, integer *, logical *, logical *), sgelqs_(
-	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, real *, integer *, integer *), sorglq_(integer *, 
-	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , integer *), sormlq_(char *, char *, integer *, integer *, 
-	    integer *, real *, integer *, real *, real *, integer *, real *, 
-	    integer *, integer *);
+	    *, real *, real *, integer *), sorgl2_(integer *, integer *, 
+	    integer *, real *, integer *, real *, real *, integer *), sorml2_(
+	    char *, char *, integer *, integer *, integer *, real *, integer *
+, real *, real *, integer *, real *, integer *), 
+	    alaesm_(char *, logical *, integer *), sgelqf_(integer *, 
+	    integer *, real *, integer *, real *, real *, integer *, integer *
+), chkxer_(char *, integer *, integer *, logical *, logical *), sgelqs_(integer *, integer *, integer *, real *, integer 
+	    *, real *, real *, integer *, real *, integer *, integer *), 
+	    sorglq_(integer *, integer *, integer *, real *, integer *, real *
+, real *, integer *, integer *), sormlq_(char *, char *, integer *
+, integer *, integer *, real *, integer *, real *, real *, 
+	    integer *, real *, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
-#define af_ref(a_1,a_2) af[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRLQ tests the error exits for the REAL routines */
+/*  that use the LQ decomposition of a general matrix. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRLQ tests the error exits for the REAL routines   
-    that use the LQ decomposition of a general matrix.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -98,8 +102,8 @@ static integer c__2 = 2;
 
     for (j = 1; j <= 2; ++j) {
 	for (i__ = 1; i__ <= 2; ++i__) {
-	    a_ref(i__, j) = 1.f / (real) (i__ + j);
-	    af_ref(i__, j) = 1.f / (real) (i__ + j);
+	    a[i__ + (j << 1) - 3] = 1.f / (real) (i__ + j);
+	    af[i__ + (j << 1) - 3] = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -109,9 +113,9 @@ static integer c__2 = 2;
     }
     infoc_1.ok = TRUE_;
 
-/*     Error exits for LQ factorization   
+/*     Error exits for LQ factorization */
 
-       SGELQF */
+/*     SGELQF */
 
     s_copy(srnamc_1.srnamt, "SGELQF", (ftnlen)6, (ftnlen)6);
     infoc_1.infot = 1;
@@ -356,8 +360,3 @@ static integer c__2 = 2;
 /*     End of SERRLQ */
 
 } /* serrlq_ */
-
-#undef af_ref
-#undef a_ref
-
-

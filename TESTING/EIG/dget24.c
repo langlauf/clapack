@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -51,36 +46,37 @@ static doublereal c_b44 = -1.;
     double d_sign(doublereal *, doublereal *), sqrt(doublereal);
 
     /* Local variables */
-    static integer sdim, kmin, itmp, ipnt[20], rsub;
-    static char sort[1];
-    static integer sdim1, i__, j;
-    static doublereal v;
+    integer i__, j;
+    doublereal v, eps, tol, tmp, ulp;
+    integer sdim, kmin, itmp, ipnt[20], rsub;
+    char sort[1];
+    integer sdim1;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int dort01_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal vimin, tolin, vrmin;
-    static integer isort;
-    static doublereal wnorm, rcnde1, rcndv1;
+    doublereal vimin, tolin, vrmin;
+    integer isort;
+    doublereal wnorm, rcnde1, rcndv1;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal rconde;
+    doublereal rconde;
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
     extern logical dslect_(doublereal *, doublereal *);
     extern /* Subroutine */ int dgeesx_(char *, char *, L_fp, char *, integer 
-	    *, doublereal *, integer *, integer *, doublereal *, doublereal *,
+	    *, doublereal *, integer *, integer *, doublereal *, doublereal *, 
 	     doublereal *, integer *, doublereal *, doublereal *, doublereal *
-	    , integer *, integer *, integer *, logical *, integer *), xerbla_(char *, integer *);
-    static integer knteig;
-    static doublereal rcondv;
-    static integer liwork;
-    static doublereal smlnum, ulpinv, eps, tol, tmp, ulp;
+, integer *, integer *, integer *, logical *, integer *), xerbla_(char *, integer *);
+    integer knteig;
+    doublereal rcondv;
+    integer liwork;
+    doublereal smlnum, ulpinv;
 
     /* Fortran I/O blocks */
     static cilist io___13 = { 0, 0, 0, fmt_9998, 0 };
@@ -103,234 +99,250 @@ static doublereal c_b44 = -1.;
 
 
 
-#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
-#define ht_ref(a_1,a_2) ht[(a_2)*ht_dim1 + a_1]
-#define vs_ref(a_1,a_2) vs[(a_2)*vs_dim1 + a_1]
-#define vs1_ref(a_1,a_2) vs1[(a_2)*vs1_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*     DGET24 checks the nonsymmetric eigenvalue (Schur form) problem */
+/*     expert driver DGEESX. */
 
-    Purpose   
-    =======   
+/*     If COMP = .FALSE., the first 13 of the following tests will be */
+/*     be performed on the input matrix A, and also tests 14 and 15 */
+/*     if LWORK is sufficiently large. */
+/*     If COMP = .TRUE., all 17 test will be performed. */
 
-       DGET24 checks the nonsymmetric eigenvalue (Schur form) problem   
-       expert driver DGEESX.   
+/*     (1)     0 if T is in Schur form, 1/ulp otherwise */
+/*            (no sorting of eigenvalues) */
 
-       If COMP = .FALSE., the first 13 of the following tests will be   
-       be performed on the input matrix A, and also tests 14 and 15   
-       if LWORK is sufficiently large.   
-       If COMP = .TRUE., all 17 test will be performed.   
+/*     (2)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (1)     0 if T is in Schur form, 1/ulp otherwise   
-              (no sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (no sorting of eigenvalues). */
 
-       (2)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (no sorting of eigenvalues).   
+/*     (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues).   
+/*     (5)     0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (6)     0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (5)     0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (7)     0 if T is in Schur form, 1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (6)     0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (8)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (7)     0 if T is in Schur form, 1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (with sorting of eigenvalues). */
 
-       (8)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (with sorting of eigenvalues).   
+/*     (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare WR, WI with and */
+/*             without reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
+/*     (11)    0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare T with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               If workspace sufficient, also compare WR, WI with and   
-               without reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (12)    0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare VS with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (11)    0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare T with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (13)    if sorting worked and SDIM is the number of */
+/*             eigenvalues which were SELECTed */
+/*             If workspace sufficient, also compare SDIM with and */
+/*             without reciprocal condition numbers */
 
-       (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare VS with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (14)    if RCONDE the same no matter if VS and/or RCONDV computed */
 
-       (13)    if sorting worked and SDIM is the number of   
-               eigenvalues which were SELECTed   
-               If workspace sufficient, also compare SDIM with and   
-               without reciprocal condition numbers   
+/*     (15)    if RCONDV the same no matter if VS and/or RCONDE computed */
 
-       (14)    if RCONDE the same no matter if VS and/or RCONDV computed   
+/*     (16)  |RCONDE - RCDEIN| / cond(RCONDE) */
 
-       (15)    if RCONDV the same no matter if VS and/or RCONDE computed   
+/*        RCONDE is the reciprocal average eigenvalue condition number */
+/*        computed by DGEESX and RCDEIN (the precomputed true value) */
+/*        is supplied as input.  cond(RCONDE) is the condition number */
+/*        of RCONDE, and takes errors in computing RCONDE into account, */
+/*        so that the resulting quantity should be O(ULP). cond(RCONDE) */
+/*        is essentially given by norm(A)/RCONDV. */
 
-       (16)  |RCONDE - RCDEIN| / cond(RCONDE)   
+/*     (17)  |RCONDV - RCDVIN| / cond(RCONDV) */
 
-          RCONDE is the reciprocal average eigenvalue condition number   
-          computed by DGEESX and RCDEIN (the precomputed true value)   
-          is supplied as input.  cond(RCONDE) is the condition number   
-          of RCONDE, and takes errors in computing RCONDE into account,   
-          so that the resulting quantity should be O(ULP). cond(RCONDE)   
-          is essentially given by norm(A)/RCONDV.   
+/*        RCONDV is the reciprocal right invariant subspace condition */
+/*        number computed by DGEESX and RCDVIN (the precomputed true */
+/*        value) is supplied as input. cond(RCONDV) is the condition */
+/*        number of RCONDV, and takes errors in computing RCONDV into */
+/*        account, so that the resulting quantity should be O(ULP). */
+/*        cond(RCONDV) is essentially given by norm(A)/RCONDE. */
 
-       (17)  |RCONDV - RCDVIN| / cond(RCONDV)   
+/*  Arguments */
+/*  ========= */
 
-          RCONDV is the reciprocal right invariant subspace condition   
-          number computed by DGEESX and RCDVIN (the precomputed true   
-          value) is supplied as input. cond(RCONDV) is the condition   
-          number of RCONDV, and takes errors in computing RCONDV into   
-          account, so that the resulting quantity should be O(ULP).   
-          cond(RCONDV) is essentially given by norm(A)/RCONDE.   
+/*  COMP    (input) LOGICAL */
+/*          COMP describes which input tests to perform: */
+/*            = .FALSE. if the computed condition numbers are not to */
+/*                      be tested against RCDVIN and RCDEIN */
+/*            = .TRUE.  if they are to be compared */
 
-    Arguments   
-    =========   
+/*  JTYPE   (input) INTEGER */
+/*          Type of input matrix. Used to label output if error occurs. */
 
-    COMP    (input) LOGICAL   
-            COMP describes which input tests to perform:   
-              = .FALSE. if the computed condition numbers are not to   
-                        be tested against RCDVIN and RCDEIN   
-              = .TRUE.  if they are to be compared   
+/*  ISEED   (input) INTEGER array, dimension (4) */
+/*          If COMP = .FALSE., the random number generator seed */
+/*          used to produce matrix. */
+/*          If COMP = .TRUE., ISEED(1) = the number of the example. */
+/*          Used to label output if error occurs. */
 
-    JTYPE   (input) INTEGER   
-            Type of input matrix. Used to label output if error occurs.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    ISEED   (input) INTEGER array, dimension (4)   
-            If COMP = .FALSE., the random number generator seed   
-            used to produce matrix.   
-            If COMP = .TRUE., ISEED(1) = the number of the example.   
-            Used to label output if error occurs.   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns INFO not equal to 0.) */
 
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  N       (input) INTEGER */
+/*          The dimension of A. N must be at least 0. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns INFO not equal to 0.)   
+/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed. */
 
-    N       (input) INTEGER   
-            The dimension of A. N must be at least 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, and H. LDA must be at */
+/*          least 1 and at least N. */
 
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA, N)   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.   
+/*  H       (workspace) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          Another copy of the test matrix A, modified by DGEESX. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A, and H. LDA must be at   
-            least 1 and at least N.   
+/*  HT      (workspace) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          Yet another copy of the test matrix A, modified by DGEESX. */
 
-    H       (workspace) DOUBLE PRECISION array, dimension (LDA, N)   
-            Another copy of the test matrix A, modified by DGEESX.   
+/*  WR      (workspace) DOUBLE PRECISION array, dimension (N) */
+/*  WI      (workspace) DOUBLE PRECISION array, dimension (N) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          On exit, WR + WI*i are the eigenvalues of the matrix in A. */
 
-    HT      (workspace) DOUBLE PRECISION array, dimension (LDA, N)   
-            Yet another copy of the test matrix A, modified by DGEESX.   
+/*  WRT     (workspace) DOUBLE PRECISION array, dimension (N) */
+/*  WIT     (workspace) DOUBLE PRECISION array, dimension (N) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but those computed when DGEESX only computes a partial */
+/*          eigendecomposition, i.e. not Schur vectors */
 
-    WR      (workspace) DOUBLE PRECISION array, dimension (N)   
-    WI      (workspace) DOUBLE PRECISION array, dimension (N)   
-            The real and imaginary parts of the eigenvalues of A.   
-            On exit, WR + WI*i are the eigenvalues of the matrix in A.   
+/*  WRTMP   (workspace) DOUBLE PRECISION array, dimension (N) */
+/*  WITMP   (workspace) DOUBLE PRECISION array, dimension (N) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but sorted by increasing real part. */
 
-    WRT     (workspace) DOUBLE PRECISION array, dimension (N)   
-    WIT     (workspace) DOUBLE PRECISION array, dimension (N)   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but those computed when DGEESX only computes a partial   
-            eigendecomposition, i.e. not Schur vectors   
+/*  VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, N) */
+/*          VS holds the computed Schur vectors. */
 
-    WRTMP   (workspace) DOUBLE PRECISION array, dimension (N)   
-    WITMP   (workspace) DOUBLE PRECISION array, dimension (N)   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but sorted by increasing real part.   
+/*  LDVS    (input) INTEGER */
+/*          Leading dimension of VS. Must be at least max(1, N). */
 
-    VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, N)   
-            VS holds the computed Schur vectors.   
+/*  VS1     (workspace) DOUBLE PRECISION array, dimension (LDVS, N) */
+/*          VS1 holds another copy of the computed Schur vectors. */
 
-    LDVS    (input) INTEGER   
-            Leading dimension of VS. Must be at least max(1, N).   
+/*  RCDEIN  (input) DOUBLE PRECISION */
+/*          When COMP = .TRUE. RCDEIN holds the precomputed reciprocal */
+/*          condition number for the average of selected eigenvalues. */
 
-    VS1     (workspace) DOUBLE PRECISION array, dimension (LDVS, N)   
-            VS1 holds another copy of the computed Schur vectors.   
+/*  RCDVIN  (input) DOUBLE PRECISION */
+/*          When COMP = .TRUE. RCDVIN holds the precomputed reciprocal */
+/*          condition number for the selected right invariant subspace. */
 
-    RCDEIN  (input) DOUBLE PRECISION   
-            When COMP = .TRUE. RCDEIN holds the precomputed reciprocal   
-            condition number for the average of selected eigenvalues.   
+/*  NSLCT   (input) INTEGER */
+/*          When COMP = .TRUE. the number of selected eigenvalues */
+/*          corresponding to the precomputed values RCDEIN and RCDVIN. */
 
-    RCDVIN  (input) DOUBLE PRECISION   
-            When COMP = .TRUE. RCDVIN holds the precomputed reciprocal   
-            condition number for the selected right invariant subspace.   
+/*  ISLCT   (input) INTEGER array, dimension (NSLCT) */
+/*          When COMP = .TRUE. ISLCT selects the eigenvalues of the */
+/*          input matrix corresponding to the precomputed values RCDEIN */
+/*          and RCDVIN. For I=1, ... ,NSLCT, if ISLCT(I) = J, then the */
+/*          eigenvalue with the J-th largest real part is selected. */
+/*          Not referenced if COMP = .FALSE. */
 
-    NSLCT   (input) INTEGER   
-            When COMP = .TRUE. the number of selected eigenvalues   
-            corresponding to the precomputed values RCDEIN and RCDVIN.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (17) */
+/*          The values computed by the 17 tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
 
-    ISLCT   (input) INTEGER array, dimension (NSLCT)   
-            When COMP = .TRUE. ISLCT selects the eigenvalues of the   
-            input matrix corresponding to the precomputed values RCDEIN   
-            and RCDVIN. For I=1, ... ,NSLCT, if ISLCT(I) = J, then the   
-            eigenvalue with the J-th largest real part is selected.   
-            Not referenced if COMP = .FALSE.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (17)   
-            The values computed by the 17 tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK to be passed to DGEESX. This */
+/*          must be at least 3*N, and N+N**2 if tests 14--16 are to */
+/*          be performed. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  IWORK   (workspace) INTEGER array, dimension (N*N) */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK to be passed to DGEESX. This   
-            must be at least 3*N, and N+N**2 if tests 14--16 are to   
-            be performed.   
+/*  BWORK   (workspace) LOGICAL array, dimension (N) */
 
-    IWORK   (workspace) INTEGER array, dimension (N*N)   
+/*  INFO    (output) INTEGER */
+/*          If 0,  successful exit. */
+/*          If <0, input parameter -INFO had an incorrect value. */
+/*          If >0, DGEESX returned an error code, the absolute */
+/*                 value of which is returned. */
 
-    BWORK   (workspace) LOGICAL array, dimension (N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            If 0,  successful exit.   
-            If <0, input parameter -INFO had an incorrect value.   
-            If >0, DGEESX returned an error code, the absolute   
-                   value of which is returned.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Check for errors */
 
-
-       Check for errors   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = 1 + ht_dim1 * 1;
+    ht_offset = 1 + ht_dim1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --wr;
     --wi;
@@ -339,10 +351,10 @@ static doublereal c_b44 = -1.;
     --wrtmp;
     --witmp;
     vs1_dim1 = *ldvs;
-    vs1_offset = 1 + vs1_dim1 * 1;
+    vs1_offset = 1 + vs1_dim1;
     vs1 -= vs1_offset;
     vs_dim1 = *ldvs;
-    vs_offset = 1 + vs_dim1 * 1;
+    vs_offset = 1 + vs_dim1;
     vs -= vs_offset;
     --islct;
     --result;
@@ -443,7 +455,7 @@ static doublereal c_b44 = -1.;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = j + 2; i__ <= i__2; ++i__) {
-		if (h___ref(i__, j) != 0.) {
+		if (h__[i__ + j * h_dim1] != 0.) {
 		    result[rsub + 1] = ulpinv;
 		}
 /* L20: */
@@ -452,34 +464,35 @@ static doublereal c_b44 = -1.;
 	}
 	i__1 = *n - 2;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0. && h___ref(i__ + 2, i__ + 1) != 
-		    0.) {
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0. && h__[i__ + 2 + (i__ + 1) *
+		     h_dim1] != 0.) {
 		result[rsub + 1] = ulpinv;
 	    }
 /* L40: */
 	}
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0.) {
-		if (h___ref(i__, i__) != h___ref(i__ + 1, i__ + 1) || h___ref(
-			i__, i__ + 1) == 0. || d_sign(&c_b35, &h___ref(i__ + 
-			1, i__)) == d_sign(&c_b35, &h___ref(i__, i__ + 1))) {
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0.) {
+		if (h__[i__ + i__ * h_dim1] != h__[i__ + 1 + (i__ + 1) * 
+			h_dim1] || h__[i__ + (i__ + 1) * h_dim1] == 0. || 
+			d_sign(&c_b35, &h__[i__ + 1 + i__ * h_dim1]) == 
+			d_sign(&c_b35, &h__[i__ + (i__ + 1) * h_dim1])) {
 		    result[rsub + 1] = ulpinv;
 		}
 	    }
 /* L50: */
 	}
 
-/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * ULP)   
+/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * ULP) */
 
-          Copy A to VS1, used as workspace */
+/*        Copy A to VS1, used as workspace */
 
 	dlacpy_(" ", n, n, &a[a_offset], lda, &vs1[vs1_offset], ldvs);
 
 /*        Compute Q*H and store in HT. */
 
 	dgemm_("No transpose", "No transpose", n, n, n, &c_b35, &vs[vs_offset]
-		, ldvs, &h__[h_offset], lda, &c_b41, &ht[ht_offset], lda);
+, ldvs, &h__[h_offset], lda, &c_b41, &ht[ht_offset], lda);
 
 /*        Compute A - Q*H*Q' */
 
@@ -515,39 +528,40 @@ static doublereal c_b44 = -1.;
 	result[rsub + 4] = 0.;
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__, i__) != wr[i__]) {
+	    if (h__[i__ + i__ * h_dim1] != wr[i__]) {
 		result[rsub + 4] = ulpinv;
 	    }
 /* L60: */
 	}
 	if (*n > 1) {
-	    if (h___ref(2, 1) == 0. && wi[1] != 0.) {
+	    if (h__[h_dim1 + 2] == 0. && wi[1] != 0.) {
 		result[rsub + 4] = ulpinv;
 	    }
-	    if (h___ref(*n, *n - 1) == 0. && wi[*n] != 0.) {
+	    if (h__[*n + (*n - 1) * h_dim1] == 0. && wi[*n] != 0.) {
 		result[rsub + 4] = ulpinv;
 	    }
 	}
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0.) {
-		tmp = sqrt((d__1 = h___ref(i__ + 1, i__), abs(d__1))) * sqrt((
-			d__2 = h___ref(i__, i__ + 1), abs(d__2)));
-/* Computing MAX   
-   Computing MAX */
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0.) {
+		tmp = sqrt((d__1 = h__[i__ + 1 + i__ * h_dim1], abs(d__1))) * 
+			sqrt((d__2 = h__[i__ + (i__ + 1) * h_dim1], abs(d__2))
+			);
+/* Computing MAX */
+/* Computing MAX */
 		d__4 = ulp * tmp;
 		d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__] - tmp, abs(
 			d__1)) / max(d__4,smlnum);
 		result[rsub + 4] = max(d__2,d__3);
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 		d__4 = ulp * tmp;
 		d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__ + 1] + tmp, 
 			abs(d__1)) / max(d__4,smlnum);
 		result[rsub + 4] = max(d__2,d__3);
 	    } else if (i__ > 1) {
-		if (h___ref(i__ + 1, i__) == 0. && h___ref(i__, i__ - 1) == 
-			0. && wi[i__] != 0.) {
+		if (h__[i__ + 1 + i__ * h_dim1] == 0. && h__[i__ + (i__ - 1) *
+			 h_dim1] == 0. && wi[i__] != 0.) {
 		    result[rsub + 4] = ulpinv;
 		}
 	    }
@@ -589,7 +603,7 @@ static doublereal c_b44 = -1.;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[rsub + 5] = ulpinv;
 		}
 /* L80: */
@@ -624,7 +638,7 @@ static doublereal c_b44 = -1.;
 		    d__2 = -wi[i__];
 		    if ((dslect_(&wr[i__ + 1], &wi[i__ + 1]) || dslect_(&wr[
 			    i__ + 1], &d__1)) && ! (dslect_(&wr[i__], &wi[i__]
-			    ) || dslect_(&wr[i__], &d__2)) && iinfo != *n + 2)
+) || dslect_(&wr[i__], &d__2)) && iinfo != *n + 2)
 			     {
 			result[13] = ulpinv;
 		    }
@@ -639,8 +653,8 @@ static doublereal c_b44 = -1.;
 /* L120: */
     }
 
-/*     If there is enough workspace, perform tests (14) and (15)   
-       as well as (10) through (13) */
+/*     If there is enough workspace, perform tests (14) and (15) */
+/*     as well as (10) through (13) */
 
     if (*lwork >= *n + *n * *n / 2) {
 
@@ -650,7 +664,7 @@ static doublereal c_b44 = -1.;
 	result[14] = 0.;
 	result[15] = 0.;
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("V", sort, (L_fp)dslect_, "B", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("V", sort, (L_fp)dslect_, "B", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rconde, &rcondv, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -687,10 +701,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L130: */
@@ -704,7 +718,7 @@ static doublereal c_b44 = -1.;
 /*        Compute both RCONDE and RCONDV without VS, and compare */
 
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("N", sort, (L_fp)dslect_, "B", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("N", sort, (L_fp)dslect_, "B", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -750,10 +764,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L150: */
@@ -767,7 +781,7 @@ static doublereal c_b44 = -1.;
 /*        Compute RCONDE with VS, and compare */
 
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("V", sort, (L_fp)dslect_, "E", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("V", sort, (L_fp)dslect_, "E", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -809,10 +823,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L170: */
@@ -826,7 +840,7 @@ static doublereal c_b44 = -1.;
 /*        Compute RCONDE without VS, and compare */
 
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("N", sort, (L_fp)dslect_, "E", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("N", sort, (L_fp)dslect_, "E", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -868,10 +882,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L190: */
@@ -885,7 +899,7 @@ static doublereal c_b44 = -1.;
 /*        Compute RCONDV with VS, and compare */
 
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("V", sort, (L_fp)dslect_, "V", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("V", sort, (L_fp)dslect_, "V", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -927,10 +941,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L210: */
@@ -944,7 +958,7 @@ static doublereal c_b44 = -1.;
 /*        Compute RCONDV without VS, and compare */
 
 	dlacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	dgeesx_("N", sort, (L_fp)dslect_, "V", n, &ht[ht_offset], lda, &sdim1,
+	dgeesx_("N", sort, (L_fp)dslect_, "V", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -986,10 +1000,10 @@ static doublereal c_b44 = -1.;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L230: */
@@ -1004,14 +1018,14 @@ static doublereal c_b44 = -1.;
 
 L250:
 
-/*     If there are precomputed reciprocal condition numbers, compare   
-       computed values with them. */
+/*     If there are precomputed reciprocal condition numbers, compare */
+/*     computed values with them. */
 
     if (*comp) {
 
-/*        First set up SELOPT, SELDIM, SELVAL, SELWR, and SELWI so that   
-          the logical function DSLECT selects the eigenvalues specified   
-          by NSLCT and ISLCT. */
+/*        First set up SELOPT, SELDIM, SELVAL, SELWR, and SELWI so that */
+/*        the logical function DSLECT selects the eigenvalues specified */
+/*        by NSLCT and ISLCT. */
 
 	sslct_1.seldim = *n;
 	sslct_1.selopt = 1;
@@ -1073,8 +1087,8 @@ L250:
 	    goto L300;
 	}
 
-/*        Compare condition number for average of selected eigenvalues   
-          taking its condition number into account */
+/*        Compare condition number for average of selected eigenvalues */
+/*        taking its condition number into account */
 
 	anorm = dlange_("1", n, n, &a[a_offset], lda, &work[1]);
 /* Computing MAX */
@@ -1111,8 +1125,8 @@ L250:
 	    result[16] = 1.;
 	}
 
-/*        Compare condition numbers for right invariant subspace   
-          taking its condition number into account */
+/*        Compare condition numbers for right invariant subspace */
+/*        taking its condition number into account */
 
 	if (v > rcondv * rconde) {
 	    tol = rcondv;
@@ -1153,10 +1167,3 @@ L300:
 /*     End of DGET24 */
 
 } /* dget24_ */
-
-#undef vs1_ref
-#undef vs_ref
-#undef ht_ref
-#undef h___ref
-
-

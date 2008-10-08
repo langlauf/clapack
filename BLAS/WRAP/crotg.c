@@ -10,9 +10,9 @@
     double c_abs(complex *), sqrt(doublereal);
     void r_cnjg(complex *, complex *);
     /* Local variables */
-    static real norm;
-    static complex alpha;
-    static real scale;
+    real norm;
+    complex alpha;
+    real scale;
     if (c_abs(ca) != 0.f) {
 	goto L10;
     }

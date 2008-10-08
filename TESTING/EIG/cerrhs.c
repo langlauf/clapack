@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -48,22 +43,24 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static complex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
-    static integer i__, j, m;
-    static real s[3];
-    static complex w[9], x[3];
-    static char c2[2];
+    complex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    integer i__, j, m;
+    real s[3];
+    complex w[9], x[3];
+    char c2[2];
+    integer nt;
+    complex vl[9]	/* was [3][3] */, vr[9]	/* was [3][3] */;
+    real rw[3];
+    integer ihi, ilo;
+    logical sel[3];
+    complex tau[3];
+    integer info;
     extern /* Subroutine */ int cgebak_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, complex *, integer *, integer *), cgebal_(char *, integer *, complex *, integer *, 
 	    integer *, integer *, real *, integer *), cgehrd_(integer 
 	    *, integer *, integer *, complex *, integer *, complex *, complex 
 	    *, integer *, integer *);
-    static integer ifaill[3], nt;
-    static complex vl[9]	/* was [3][3] */;
-    static integer ifailr[3];
-    static complex vr[9]	/* was [3][3] */;
-    static real rw[3];
+    integer ifaill[3], ifailr[3];
     extern /* Subroutine */ int chsein_(char *, char *, char *, logical *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, integer *, integer *, complex *, real *, 
@@ -79,9 +76,6 @@ static integer c__4 = 4;
 	    *, integer *, integer *, integer *, complex *, real *, integer *), cunmhr_(char *, char *, integer *, integer *, 
 	    integer *, integer *, complex *, integer *, complex *, complex *, 
 	    integer *, complex *, integer *, integer *);
-    static integer ihi, ilo;
-    static logical sel[3];
-    static complex tau[3];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -90,33 +84,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRHS tests the error exits for CGEBAK, CGEBAL, CGEHRD, CUNGHR, */
+/*  CUNMHR, CHSEQR, CHSEIN, and CTREVC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRHS tests the error exits for CGEBAK, CGEBAL, CGEHRD, CUNGHR,   
-    CUNMHR, CHSEQR, CHSEIN, and CTREVC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -128,7 +136,7 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + j * 3 - 4;
 	    r__1 = 1.f / (real) (i__ + j);
 	    a[i__1].r = r__1, a[i__1].i = 0.f;
 /* L10: */
@@ -509,8 +517,3 @@ static integer c__4 = 4;
 /*     End of CERRHS */
 
 } /* cerrhs_ */
-
-#undef a_ref
-#undef a_subscr
-
-

@@ -1,69 +1,12 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int slasq3_(integer *i0, integer *n0, real *z__, integer *pp,
+/* Subroutine */ int slasq3_(integer *i0, integer *n0, real *z__, integer *pp, 
 	 real *dmin__, real *sigma, real *desig, real *qmax, integer *nfail, 
 	integer *iter, integer *ndiv, logical *ieee)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       May 17, 2000   
-
-
-    Purpose   
-    =======   
-
-    SLASQ3 checks for deflation, computes a shift (TAU) and calls dqds.   
-    In case of failure it changes shifts, and tries again until output   
-    is positive.   
-
-    Arguments   
-    =========   
-
-    I0     (input) INTEGER   
-           First index.   
-
-    N0     (input) INTEGER   
-           Last index.   
-
-    Z      (input) REAL array, dimension ( 4*N )   
-           Z holds the qd array.   
-
-    PP     (input) INTEGER   
-           PP=0 for ping, PP=1 for pong.   
-
-    DMIN   (output) REAL   
-           Minimum value of d.   
-
-    SIGMA  (output) REAL   
-           Sum of shifts used in current segment.   
-
-    DESIG  (input/output) REAL   
-           Lower order part of SIGMA   
-
-    QMAX   (input) REAL   
-           Maximum value of q.   
-
-    NFAIL  (output) INTEGER   
-           Number of times shift was too big.   
-
-    ITER   (output) INTEGER   
-           Number of iterations.   
-
-    NDIV   (output) INTEGER   
-           Number of divisions.   
-
-    TTYPE  (output) INTEGER   
-           Shift type.   
-
-    IEEE   (input) LOGICAL   
-           Flag for IEEE or non IEEE arithmetic (passed to SLASQ5).   
-
-    =====================================================================   
-
-       Parameter adjustments */
     /* Initialized data */
+
     static integer ttype = 0;
     static real dmin1 = 0.f;
     static real dmin2 = 0.f;
@@ -71,29 +14,109 @@
     static real dn1 = 0.f;
     static real dn2 = 0.f;
     static real tau = 0.f;
+
     /* System generated locals */
     integer i__1;
     real r__1, r__2;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static real temp, s, t;
-    static integer j4;
+    real s, t;
+    integer j4, nn;
+    real eps, tol;
+    integer n0in, ipn4;
+    real tol2, temp;
     extern /* Subroutine */ int slasq4_(integer *, integer *, real *, integer 
 	    *, integer *, real *, real *, real *, real *, real *, real *, 
 	    real *, integer *), slasq5_(integer *, integer *, real *, integer 
 	    *, real *, real *, real *, real *, real *, real *, real *, 
 	    logical *), slasq6_(integer *, integer *, real *, integer *, real 
 	    *, real *, real *, real *, real *, real *);
-    static integer nn;
     extern doublereal slamch_(char *);
-    static real safmin, eps, tol;
-    static integer n0in, ipn4;
-    static real tol2;
+    real safmin;
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLASQ3 checks for deflation, computes a shift (TAU) and calls dqds. */
+/*  In case of failure it changes shifts, and tries again until output */
+/*  is positive. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  I0     (input) INTEGER */
+/*         First index. */
+
+/*  N0     (input) INTEGER */
+/*         Last index. */
+
+/*  Z      (input) REAL array, dimension ( 4*N ) */
+/*         Z holds the qd array. */
+
+/*  PP     (input) INTEGER */
+/*         PP=0 for ping, PP=1 for pong. */
+
+/*  DMIN   (output) REAL */
+/*         Minimum value of d. */
+
+/*  SIGMA  (output) REAL */
+/*         Sum of shifts used in current segment. */
+
+/*  DESIG  (input/output) REAL */
+/*         Lower order part of SIGMA */
+
+/*  QMAX   (input) REAL */
+/*         Maximum value of q. */
+
+/*  NFAIL  (output) INTEGER */
+/*         Number of times shift was too big. */
+
+/*  ITER   (output) INTEGER */
+/*         Number of iterations. */
+
+/*  NDIV   (output) INTEGER */
+/*         Number of divisions. */
+
+/*  TTYPE  (output) INTEGER */
+/*         Shift type. */
+
+/*  IEEE   (input) LOGICAL */
+/*         Flag for IEEE or non IEEE arithmetic (passed to SLASQ5). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Function .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Data statement .. */
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     n0in = *n0;
     eps = slamch_("Precision");
@@ -206,20 +229,18 @@ L50:
 	    r__1 = *qmax, r__2 = z__[(*i0 << 2) + *pp - 3], r__1 = max(r__1,
 		    r__2), r__2 = z__[(*i0 << 2) + *pp + 1];
 	    *qmax = dmax(r__1,r__2);
-	    *dmin__ = 0.f;
+	    *dmin__ = -0.f;
 	}
     }
 
-/* L70:   
-
-   Computing MIN */
+/* Computing MIN */
     r__1 = z__[(*n0 << 2) + *pp - 1], r__2 = z__[(*n0 << 2) + *pp - 9], r__1 =
 	     min(r__1,r__2), r__2 = dmin2 + z__[(*n0 << 2) - *pp];
     if (*dmin__ < 0.f || safmin * *qmax < dmin(r__1,r__2)) {
 
 /*        Choose a shift. */
 
-	slasq4_(i0, n0, &z__[1], pp, &n0in, dmin__, &dmin1, &dmin2, &dn, &dn1,
+	slasq4_(i0, n0, &z__[1], pp, &n0in, dmin__, &dmin1, &dmin2, &dn, &dn1, 
 		 &dn2, &tau, &ttype);
 
 /*        Call dqds until DMIN > 0. */
@@ -310,4 +331,3 @@ L100:
 /*     End of SLASQ3 */
 
 } /* slasq3_ */
-

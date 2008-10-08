@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -21,34 +16,44 @@ logical zlctsx_(doublecomplex *alpha, doublecomplex *beta)
     logical ret_val;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    This function is used to determine what eigenvalues will be   
-    selected.  If this is part of the test driver ZDRGSX, do not   
-    change the code UNLESS you are testing input examples and not   
-    using the built-in examples.   
+/*  This function is used to determine what eigenvalues will be */
+/*  selected.  If this is part of the test driver ZDRGSX, do not */
+/*  change the code UNLESS you are testing input examples and not */
+/*  using the built-in examples. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    ALPHA   (input) COMPLEX*16   
-    BETA    (input) COMPLEX*16   
-            parameters to decide whether the pair (ALPHA, BETA) is   
-            selected.   
+/*  ALPHA   (input) COMPLEX*16 */
+/*  BETA    (input) COMPLEX*16 */
+/*          parameters to decide whether the pair (ALPHA, BETA) is */
+/*          selected. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       DOUBLE PRECISION               ZERO   
-       PARAMETER          ( ZERO = 0.0E+0 )   
-       COMPLEX*16            CZERO   
-       PARAMETER          ( CZERO = ( 0.0E+0, 0.0E+0 ) ) */
+/*     .. Parameters .. */
+/*     DOUBLE PRECISION               ZERO */
+/*     PARAMETER          ( ZERO = 0.0E+0 ) */
+/*     COMPLEX*16            CZERO */
+/*     PARAMETER          ( CZERO = ( 0.0E+0, 0.0E+0 ) ) */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (mn_1.fs) {
 	++mn_1.i__;
@@ -74,15 +79,14 @@ logical zlctsx_(doublecomplex *alpha, doublecomplex *beta)
 	}
     }
 
-/*      IF( BETA.EQ.CZERO ) THEN   
-           ZLCTSX = ( DBLE( ALPHA ).GT.ZERO )   
-        ELSE   
-           ZLCTSX = ( DBLE( ALPHA/BETA ).GT.ZERO )   
-        END IF */
+/*      IF( BETA.EQ.CZERO ) THEN */
+/*         ZLCTSX = ( DBLE( ALPHA ).GT.ZERO ) */
+/*      ELSE */
+/*         ZLCTSX = ( DBLE( ALPHA/BETA ).GT.ZERO ) */
+/*      END IF */
 
     return ret_val;
 
 /*     End of ZLCTSX */
 
 } /* zlctsx_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,116 +18,126 @@ static integer c__1 = 1;
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal s;
+    integer i__, j;
+    doublereal s;
+    integer irc, lmx;
+    doublereal ulp, res1, res2;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dort01_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *);
     extern doublereal dlamch_(char *);
     extern integer idamax_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer irc, lmx;
-    static doublereal ulp, res1, res2;
 
 
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
-#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DORT03 compares two orthogonal matrices U and V to see if their */
+/*  corresponding rows or columns span the same spaces.  The rows are */
+/*  checked if RC = 'R', and the columns are checked if RC = 'C'. */
 
-    Purpose   
-    =======   
+/*  RESULT is the maximum of */
 
-    DORT03 compares two orthogonal matrices U and V to see if their   
-    corresponding rows or columns span the same spaces.  The rows are   
-    checked if RC = 'R', and the columns are checked if RC = 'C'.   
+/*     | V*V' - I | / ( MV ulp ), if RC = 'R', or */
 
-    RESULT is the maximum of   
+/*     | V'*V - I | / ( MV ulp ), if RC = 'C', */
 
-       | V*V' - I | / ( MV ulp ), if RC = 'R', or   
+/*  and the maximum over rows (or columns) 1 to K of */
 
-       | V'*V - I | / ( MV ulp ), if RC = 'C',   
+/*     | U(i) - S*V(i) |/ ( N ulp ) */
 
-    and the maximum over rows (or columns) 1 to K of   
+/*  where S is +-1 (chosen to minimize the expression), U(i) is the i-th */
+/*  row (column) of U, and V(i) is the i-th row (column) of V. */
 
-       | U(i) - S*V(i) |/ ( N ulp )   
+/*  Arguments */
+/*  ========== */
 
-    where S is +-1 (chosen to minimize the expression), U(i) is the i-th   
-    row (column) of U, and V(i) is the i-th row (column) of V.   
+/*  RC      (input) CHARACTER*1 */
+/*          If RC = 'R' the rows of U and V are to be compared. */
+/*          If RC = 'C' the columns of U and V are to be compared. */
 
-    Arguments   
-    ==========   
+/*  MU      (input) INTEGER */
+/*          The number of rows of U if RC = 'R', and the number of */
+/*          columns if RC = 'C'.  If MU = 0 DORT03 does nothing. */
+/*          MU must be at least zero. */
 
-    RC      (input) CHARACTER*1   
-            If RC = 'R' the rows of U and V are to be compared.   
-            If RC = 'C' the columns of U and V are to be compared.   
+/*  MV      (input) INTEGER */
+/*          The number of rows of V if RC = 'R', and the number of */
+/*          columns if RC = 'C'.  If MV = 0 DORT03 does nothing. */
+/*          MV must be at least zero. */
 
-    MU      (input) INTEGER   
-            The number of rows of U if RC = 'R', and the number of   
-            columns if RC = 'C'.  If MU = 0 DORT03 does nothing.   
-            MU must be at least zero.   
+/*  N       (input) INTEGER */
+/*          If RC = 'R', the number of columns in the matrices U and V, */
+/*          and if RC = 'C', the number of rows in U and V.  If N = 0 */
+/*          DORT03 does nothing.  N must be at least zero. */
 
-    MV      (input) INTEGER   
-            The number of rows of V if RC = 'R', and the number of   
-            columns if RC = 'C'.  If MV = 0 DORT03 does nothing.   
-            MV must be at least zero.   
+/*  K       (input) INTEGER */
+/*          The number of rows or columns of U and V to compare. */
+/*          0 <= K <= max(MU,MV). */
 
-    N       (input) INTEGER   
-            If RC = 'R', the number of columns in the matrices U and V,   
-            and if RC = 'C', the number of rows in U and V.  If N = 0   
-            DORT03 does nothing.  N must be at least zero.   
+/*  U       (input) DOUBLE PRECISION array, dimension (LDU,N) */
+/*          The first matrix to compare.  If RC = 'R', U is MU by N, and */
+/*          if RC = 'C', U is N by MU. */
 
-    K       (input) INTEGER   
-            The number of rows or columns of U and V to compare.   
-            0 <= K <= max(MU,MV).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  If RC = 'R', LDU >= max(1,MU), */
+/*          and if RC = 'C', LDU >= max(1,N). */
 
-    U       (input) DOUBLE PRECISION array, dimension (LDU,N)   
-            The first matrix to compare.  If RC = 'R', U is MU by N, and   
-            if RC = 'C', U is N by MU.   
+/*  V       (input) DOUBLE PRECISION array, dimension (LDV,N) */
+/*          The second matrix to compare.  If RC = 'R', V is MV by N, and */
+/*          if RC = 'C', V is N by MV. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  If RC = 'R', LDU >= max(1,MU),   
-            and if RC = 'C', LDU >= max(1,N).   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  If RC = 'R', LDV >= max(1,MV), */
+/*          and if RC = 'C', LDV >= max(1,N). */
 
-    V       (input) DOUBLE PRECISION array, dimension (LDV,N)   
-            The second matrix to compare.  If RC = 'R', V is MV by N, and   
-            if RC = 'C', V is N by MV.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  If RC = 'R', LDV >= max(1,MV),   
-            and if RC = 'C', LDV >= max(1,N).   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  For best performance, LWORK */
+/*          should be at least N*N if RC = 'C' or M*M if RC = 'R', but */
+/*          the tests will be done even if LWORK is 0. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RESULT  (output) DOUBLE PRECISION */
+/*          The value computed by the test described above.  RESULT is */
+/*          limited to 1/ulp to avoid overflow. */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  For best performance, LWORK   
-            should be at least N*N if RC = 'C' or M*M if RC = 'R', but   
-            the tests will be done even if LWORK is 0.   
+/*  INFO    (output) INTEGER */
+/*          0  indicates a successful exit */
+/*          -k indicates the k-th parameter had an illegal value */
 
-    RESULT  (output) DOUBLE PRECISION   
-            The value computed by the test described above.  RESULT is   
-            limited to 1/ulp to avoid overflow.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            0  indicates a successful exit   
-            -k indicates the k-th parameter had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Check inputs */
 
-
-       Check inputs   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
 
@@ -186,14 +191,14 @@ static integer c__1 = 1;
 	res1 = 0.;
 	i__1 = *k;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    lmx = idamax_(n, &u_ref(i__, 1), ldu);
-	    s = d_sign(&c_b7, &u_ref(i__, lmx)) * d_sign(&c_b7, &v_ref(i__, 
-		    lmx));
+	    lmx = idamax_(n, &u[i__ + u_dim1], ldu);
+	    s = d_sign(&c_b7, &u[i__ + lmx * u_dim1]) * d_sign(&c_b7, &v[i__ 
+		    + lmx * v_dim1]);
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		d__2 = res1, d__3 = (d__1 = u_ref(i__, j) - s * v_ref(i__, j),
-			 abs(d__1));
+		d__2 = res1, d__3 = (d__1 = u[i__ + j * u_dim1] - s * v[i__ + 
+			j * v_dim1], abs(d__1));
 		res1 = max(d__2,d__3);
 /* L10: */
 	    }
@@ -212,14 +217,14 @@ static integer c__1 = 1;
 	res1 = 0.;
 	i__1 = *k;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    lmx = idamax_(n, &u_ref(1, i__), &c__1);
-	    s = d_sign(&c_b7, &u_ref(lmx, i__)) * d_sign(&c_b7, &v_ref(lmx, 
-		    i__));
+	    lmx = idamax_(n, &u[i__ * u_dim1 + 1], &c__1);
+	    s = d_sign(&c_b7, &u[lmx + i__ * u_dim1]) * d_sign(&c_b7, &v[lmx 
+		    + i__ * v_dim1]);
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		d__2 = res1, d__3 = (d__1 = u_ref(j, i__) - s * v_ref(j, i__),
-			 abs(d__1));
+		d__2 = res1, d__3 = (d__1 = u[j + i__ * u_dim1] - s * v[j + 
+			i__ * v_dim1], abs(d__1));
 		res1 = max(d__2,d__3);
 /* L30: */
 	    }
@@ -240,8 +245,3 @@ static integer c__1 = 1;
 /*     End of DORT03 */
 
 } /* dort03_ */
-
-#undef v_ref
-#undef u_ref
-
-

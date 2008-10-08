@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int ssvdch_(integer *n, real *s, real *e, real *svd, real *
 	tol, integer *info)
@@ -16,71 +11,85 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer bpnt;
-    static real unfl, ovfl;
-    static integer numl, numu, tpnt, count;
-    static real lower, upper, tuppr;
+    real eps;
+    integer bpnt;
+    real unfl, ovfl;
+    integer numl, numu, tpnt, count;
+    real lower, upper, tuppr;
     extern doublereal slamch_(char *);
-    static real unflep;
+    real unflep;
     extern /* Subroutine */ int ssvdct_(integer *, real *, real *, real *, 
 	    integer *);
-    static real eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SSVDCH checks to see if SVD(1) ,..., SVD(N) are accurate singular   
-    values of the bidiagonal matrix B with diagonal entries   
-    S(1) ,..., S(N) and superdiagonal entries E(1) ,..., E(N-1)).   
-    It does this by expanding each SVD(I) into an interval   
-    [SVD(I) * (1-EPS) , SVD(I) * (1+EPS)], merging overlapping intervals   
-    if any, and using Sturm sequences to count and verify whether each   
-    resulting interval has the correct number of singular values (using   
-    SSVDCT). Here EPS=TOL*MAX(N/10,1)*MACHEP, where MACHEP is the   
-    machine precision. The routine assumes the singular values are sorted   
-    with SVD(1) the largest and SVD(N) smallest.  If each interval   
-    contains the correct number of singular values, INFO = 0 is returned,   
-    otherwise INFO is the index of the first singular value in the first   
-    bad interval.   
+/*  SSVDCH checks to see if SVD(1) ,..., SVD(N) are accurate singular */
+/*  values of the bidiagonal matrix B with diagonal entries */
+/*  S(1) ,..., S(N) and superdiagonal entries E(1) ,..., E(N-1)). */
+/*  It does this by expanding each SVD(I) into an interval */
+/*  [SVD(I) * (1-EPS) , SVD(I) * (1+EPS)], merging overlapping intervals */
+/*  if any, and using Sturm sequences to count and verify whether each */
+/*  resulting interval has the correct number of singular values (using */
+/*  SSVDCT). Here EPS=TOL*MAX(N/10,1)*MACHEP, where MACHEP is the */
+/*  machine precision. The routine assumes the singular values are sorted */
+/*  with SVD(1) the largest and SVD(N) smallest.  If each interval */
+/*  contains the correct number of singular values, INFO = 0 is returned, */
+/*  otherwise INFO is the index of the first singular value in the first */
+/*  bad interval. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    N       (input) INTEGER   
-            The dimension of the bidiagonal matrix B.   
+/*  N       (input) INTEGER */
+/*          The dimension of the bidiagonal matrix B. */
 
-    S       (input) REAL array, dimension (N)   
-            The diagonal entries of the bidiagonal matrix B.   
+/*  S       (input) REAL array, dimension (N) */
+/*          The diagonal entries of the bidiagonal matrix B. */
 
-    E       (input) REAL array, dimension (N-1)   
-            The superdiagonal entries of the bidiagonal matrix B.   
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The superdiagonal entries of the bidiagonal matrix B. */
 
-    SVD     (input) REAL array, dimension (N)   
-            The computed singular values to be checked.   
+/*  SVD     (input) REAL array, dimension (N) */
+/*          The computed singular values to be checked. */
 
-    TOL     (input) REAL   
-            Error tolerance for checking, a multiplier of the   
-            machine precision.   
+/*  TOL     (input) REAL */
+/*          Error tolerance for checking, a multiplier of the */
+/*          machine precision. */
 
-    INFO    (output) INTEGER   
-            =0 if the singular values are all correct (to within   
-               1 +- TOL*MACHEPS)   
-            >0 if the interval containing the INFO-th singular value   
-               contains the incorrect number of singular values.   
+/*  INFO    (output) INTEGER */
+/*          =0 if the singular values are all correct (to within */
+/*             1 +- TOL*MACHEPS) */
+/*          >0 if the interval containing the INFO-th singular value */
+/*             contains the incorrect number of singular values. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Get machine constants   
+/*     Get machine constants */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --svd;
     --e;
     --s;
@@ -94,20 +103,20 @@
     ovfl = slamch_("Overflow");
     eps = slamch_("Epsilon") * slamch_("Base");
 
-/*     UNFLEP is chosen so that when an eigenvalue is multiplied by the   
-       scale factor sqrt(OVFL)*sqrt(sqrt(UNFL))/MX in SSVDCT, it exceeds   
-       sqrt(UNFL), which is the lower limit for SSVDCT. */
+/*     UNFLEP is chosen so that when an eigenvalue is multiplied by the */
+/*     scale factor sqrt(OVFL)*sqrt(sqrt(UNFL))/MX in SSVDCT, it exceeds */
+/*     sqrt(UNFL), which is the lower limit for SSVDCT. */
 
     unflep = sqrt(sqrt(unfl)) / sqrt(ovfl) * svd[1] + unfl / eps;
 
-/*     The value of EPS works best when TOL .GE. 10.   
+/*     The value of EPS works best when TOL .GE. 10. */
 
-   Computing MAX */
+/* Computing MAX */
     i__1 = *n / 10;
     eps = *tol * max(i__1,1) * eps;
 
-/*     TPNT points to singular value at right endpoint of interval   
-       BPNT points to singular value at left  endpoint of interval */
+/*     TPNT points to singular value at right endpoint of interval */
+/*     BPNT points to singular value at left  endpoint of interval */
 
     tpnt = 1;
     bpnt = 1;
@@ -168,4 +177,3 @@ L40:
 /*     End of SSVDCH */
 
 } /* ssvdch_ */
-

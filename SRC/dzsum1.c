@@ -1,50 +1,61 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal dzsum1_(integer *n, doublecomplex *cx, integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    DZSUM1 takes the sum of the absolute values of a complex   
-    vector and returns a double precision result.   
-
-    Based on DZASUM from the Level 1 BLAS.   
-    The change is to use the 'genuine' absolute value.   
-
-    Contributed by Nick Higham for use with ZLACON.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of elements in the vector CX.   
-
-    CX      (input) COMPLEX*16 array, dimension (N)   
-            The vector whose elements will be summed.   
-
-    INCX    (input) INTEGER   
-            The spacing between successive values of CX.  INCX > 0.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
     doublereal ret_val;
+
     /* Builtin functions */
     double z_abs(doublecomplex *);
-    /* Local variables */
-    static integer i__, nincx;
-    static doublereal stemp;
 
+    /* Local variables */
+    integer i__, nincx;
+    doublereal stemp;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DZSUM1 takes the sum of the absolute values of a complex */
+/*  vector and returns a double precision result. */
+
+/*  Based on DZASUM from the Level 1 BLAS. */
+/*  The change is to use the 'genuine' absolute value. */
+
+/*  Contributed by Nick Higham for use with ZLACON. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of elements in the vector CX. */
+
+/*  CX      (input) COMPLEX*16 array, dimension (N) */
+/*          The vector whose elements will be summed. */
+
+/*  INCX    (input) INTEGER */
+/*          The spacing between successive values of CX.  INCX > 0. */
+
+/*  ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --cx;
 
     /* Function Body */
@@ -89,4 +100,3 @@ L20:
 /*     End of DZSUM1 */
 
 } /* dzsum1_ */
-

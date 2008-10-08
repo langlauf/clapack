@@ -1,78 +1,94 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 doublereal slanst_(char *norm, integer *n, real *d__, real *e)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
-
-
-    Purpose   
-    =======   
-
-    SLANST  returns the value of the one norm,  or the Frobenius norm, or   
-    the  infinity norm,  or the  element of  largest absolute value  of a   
-    real symmetric tridiagonal matrix A.   
-
-    Description   
-    ===========   
-
-    SLANST returns the value   
-
-       SLANST = ( max(abs(A(i,j))), NORM = 'M' or 'm'   
-                (   
-                ( norm1(A),         NORM = '1', 'O' or 'o'   
-                (   
-                ( normI(A),         NORM = 'I' or 'i'   
-                (   
-                ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
-
-    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
-    squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies the value to be returned in SLANST as described   
-            above.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.  When N = 0, SLANST is   
-            set to zero.   
-
-    D       (input) REAL array, dimension (N)   
-            The diagonal elements of A.   
-
-    E       (input) REAL array, dimension (N-1)   
-            The (n-1) sub-diagonal or super-diagonal elements of A.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1;
     real ret_val, r__1, r__2, r__3, r__4, r__5;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static integer i__;
-    static real scale;
+    integer i__;
+    real sum, scale;
     extern logical lsame_(char *, char *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int slassq_(integer *, real *, integer *, real *, 
 	    real *);
-    static real sum;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLANST  returns the value of the one norm,  or the Frobenius norm, or */
+/*  the  infinity norm,  or the  element of  largest absolute value  of a */
+/*  real symmetric tridiagonal matrix A. */
+
+/*  Description */
+/*  =========== */
+
+/*  SLANST returns the value */
+
+/*     SLANST = ( max(abs(A(i,j))), NORM = 'M' or 'm' */
+/*              ( */
+/*              ( norm1(A),         NORM = '1', 'O' or 'o' */
+/*              ( */
+/*              ( normI(A),         NORM = 'I' or 'i' */
+/*              ( */
+/*              ( normF(A),         NORM = 'F', 'f', 'E' or 'e' */
+
+/*  where  norm1  denotes the  one norm of a matrix (maximum column sum), */
+/*  normI  denotes the  infinity norm  of a matrix  (maximum row sum) and */
+/*  normF  denotes the  Frobenius norm of a matrix (square root of sum of */
+/*  squares).  Note that  max(abs(A(i,j)))  is not a consistent matrix norm. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NORM    (input) CHARACTER*1 */
+/*          Specifies the value to be returned in SLANST as described */
+/*          above. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0.  When N = 0, SLANST is */
+/*          set to zero. */
+
+/*  D       (input) REAL array, dimension (N) */
+/*          The diagonal elements of A. */
+
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The (n-1) sub-diagonal or super-diagonal elements of A. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --e;
     --d__;
 
@@ -136,4 +152,3 @@ doublereal slanst_(char *norm, integer *n, real *d__, real *e)
 /*     End of SLANST */
 
 } /* slanst_ */
-

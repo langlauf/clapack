@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,101 +15,109 @@ static integer c__1 = 1;
 	    bf_offset;
 
     /* Local variables */
-    static integer info;
+    integer info;
     extern /* Subroutine */ int sget02_(char *, integer *, integer *, integer 
 	    *, real *, integer *, real *, integer *, real *, integer *, real *
-	    , real *), scopy_(integer *, real *, integer *, real *, 
+, real *), scopy_(integer *, real *, integer *, real *, 
 	    integer *), sgglse_(integer *, integer *, integer *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
 	    integer *, integer *), slacpy_(char *, integer *, integer *, real 
 	    *, integer *, real *, integer *);
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SLSETS tests SGGLSE - a subroutine for solving linear equality   
-    constrained least square problem (LSE).   
+/*  SLSETS tests SGGLSE - a subroutine for solving linear equality */
+/*  constrained least square problem (LSE). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    P       (input) INTEGER   
-            The number of rows of the matrix B.  P >= 0.   
+/*  P       (input) INTEGER */
+/*          The number of rows of the matrix B.  P >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B.  N >= 0. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    AF      (workspace) REAL array, dimension (LDA,N)   
+/*  AF      (workspace) REAL array, dimension (LDA,N) */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    B       (input) REAL array, dimension (LDB,N)   
-            The P-by-N matrix A.   
+/*  B       (input) REAL array, dimension (LDB,N) */
+/*          The P-by-N matrix A. */
 
-    BF      (workspace) REAL array, dimension (LDB,N)   
+/*  BF      (workspace) REAL array, dimension (LDB,N) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B, BF, V and S.   
-            LDB >= max(P,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B, BF, V and S. */
+/*          LDB >= max(P,N). */
 
-    C       (input) REAL array, dimension( M )   
-            the vector C in the LSE problem.   
+/*  C       (input) REAL array, dimension( M ) */
+/*          the vector C in the LSE problem. */
 
-    CF      (workspace) REAL array, dimension( M )   
+/*  CF      (workspace) REAL array, dimension( M ) */
 
-    D       (input) REAL array, dimension( P )   
-            the vector D in the LSE problem.   
+/*  D       (input) REAL array, dimension( P ) */
+/*          the vector D in the LSE problem. */
 
-    DF      (workspace) REAL array, dimension( P )   
+/*  DF      (workspace) REAL array, dimension( P ) */
 
-    X       (output) REAL array, dimension( N )   
-            solution vector X in the LSE problem.   
+/*  X       (output) REAL array, dimension( N ) */
+/*          solution vector X in the LSE problem. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    RWORK   (workspace) REAL array, dimension (M)   
+/*  RWORK   (workspace) REAL array, dimension (M) */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The test ratios:   
-              RESULT(1) = norm( A*x - c )/ norm(A)*norm(X)*EPS   
-              RESULT(2) = norm( B*x - d )/ norm(B)*norm(X)*EPS   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The test ratios: */
+/*            RESULT(1) = norm( A*x - c )/ norm(A)*norm(X)*EPS */
+/*            RESULT(2) = norm( B*x - d )/ norm(B)*norm(X)*EPS */
 
-    ====================================================================   
+/*  ==================================================================== */
 
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Copy the matrices A and B to the arrays AF and BF,   
-       and the vectors C and D to the arrays CF and DF,   
+/*     Copy the matrices A and B to the arrays AF and BF, */
+/*     and the vectors C and D to the arrays CF and DF, */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --c__;
     --cf;
@@ -133,12 +136,12 @@ static integer c__1 = 1;
 
 /*     Solve LSE problem */
 
-    sgglse_(m, n, p, &af[af_offset], lda, &bf[bf_offset], ldb, &cf[1], &df[1],
+    sgglse_(m, n, p, &af[af_offset], lda, &bf[bf_offset], ldb, &cf[1], &df[1], 
 	     &x[1], &work[1], lwork, &info);
 
-/*     Test the residual for the solution of LSE   
+/*     Test the residual for the solution of LSE */
 
-       Compute RESULT(1) = norm( A*x - c ) / norm(A)*norm(X)*EPS */
+/*     Compute RESULT(1) = norm( A*x - c ) / norm(A)*norm(X)*EPS */
 
     scopy_(m, &c__[1], &c__1, &cf[1], &c__1);
     scopy_(p, &d__[1], &c__1, &df[1], &c__1);
@@ -155,4 +158,3 @@ static integer c__1 = 1;
 /*     End of SLSETS */
 
 } /* slsets_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,120 +18,129 @@ static integer c_n1 = -1;
     real r__1, r__2;
     doublereal d__1, d__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal), r_sign(real *, real *), pow_dd(doublereal *, 
 	    doublereal *);
 
     /* Local variables */
-    static real sfac;
-    static integer ioff, mode, lenj;
-    static char path[3], dist[1];
-    static real unfl, rexp;
-    static char type__[1];
-    static real texp, star1, plus1, plus2;
-    static integer i__, j;
-    static real bscal;
+    integer i__, j, kl, ku, iy;
+    real ulp, sfac;
+    integer ioff, mode, lenj;
+    char path[3], dist[1];
+    real unfl, rexp;
+    char type__[1];
+    real texp, star1, plus1, plus2, bscal;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static real tscal, anorm, bnorm, tleft;
-    static logical upper;
+    real tscal, anorm, bnorm, tleft;
+    logical upper;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *), sswap_(integer *, real *, integer *, real *, integer *
-	    );
-    static real tnorm;
+);
+    real tnorm;
     extern /* Subroutine */ int slatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    ), slabad_(real *, real *);
-    static integer kl, ku, iy;
+), slabad_(real *, real *);
     extern doublereal slamch_(char *);
-    static char packit[1];
-    static real bignum;
+    char packit[1];
+    real bignum;
     extern integer isamax_(integer *, real *, integer *);
     extern doublereal slarnd_(integer *, integer *);
-    static real cndnum;
-    static integer jcount;
+    real cndnum;
+    integer jcount;
     extern /* Subroutine */ int slatms_(integer *, integer *, char *, integer 
 	    *, char *, real *, integer *, real *, real *, integer *, integer *
-	    , char *, real *, integer *, real *, integer *), slarnv_(integer *, integer *, integer *, real *);
-    static real smlnum, ulp;
+, char *, real *, integer *, real *, integer *), slarnv_(integer *, integer *, integer *, real *);
+    real smlnum;
 
 
-#define ab_ref(a_1,a_2) ab[(a_2)*ab_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SLATTB generates a triangular test matrix in 2-dimensional storage. */
+/*  IMAT and UPLO uniquely specify the properties of the test matrix, */
+/*  which is returned in the array A. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SLATTB generates a triangular test matrix in 2-dimensional storage.   
-    IMAT and UPLO uniquely specify the properties of the test matrix,   
-    which is returned in the array A.   
+/*  IMAT    (input) INTEGER */
+/*          An integer key describing which matrix to generate for this */
+/*          path. */
 
-    Arguments   
-    =========   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix A will be upper or lower */
+/*          triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    IMAT    (input) INTEGER   
-            An integer key describing which matrix to generate for this   
-            path.   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Specifies whether the matrix or its transpose will be used. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose */
+/*          = 'C':  Conjugate transpose (= transpose) */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A will be upper or lower   
-            triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  DIAG    (output) CHARACTER*1 */
+/*          Specifies whether or not the matrix A is unit triangular. */
+/*          = 'N':  Non-unit triangular */
+/*          = 'U':  Unit triangular */
 
-    TRANS   (input) CHARACTER*1   
-            Specifies whether the matrix or its transpose will be used.   
-            = 'N':  No transpose   
-            = 'T':  Transpose   
-            = 'C':  Conjugate transpose (= transpose)   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          The seed vector for the random number generator (used in */
+/*          SLATMS).  Modified on exit. */
 
-    DIAG    (output) CHARACTER*1   
-            Specifies whether or not the matrix A is unit triangular.   
-            = 'N':  Non-unit triangular   
-            = 'U':  Unit triangular   
+/*  N       (input) INTEGER */
+/*          The order of the matrix to be generated. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            The seed vector for the random number generator (used in   
-            SLATMS).  Modified on exit.   
+/*  KD      (input) INTEGER */
+/*          The number of superdiagonals or subdiagonals of the banded */
+/*          triangular matrix A.  KD >= 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix to be generated.   
+/*  AB      (output) REAL array, dimension (LDAB,N) */
+/*          The upper or lower triangular banded matrix A, stored in the */
+/*          first KD+1 rows of AB.  Let j be a column of A, 1<=j<=n. */
+/*          If UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j. */
+/*          If UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). */
 
-    KD      (input) INTEGER   
-            The number of superdiagonals or subdiagonals of the banded   
-            triangular matrix A.  KD >= 0.   
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= KD+1. */
 
-    AB      (output) REAL array, dimension (LDAB,N)   
-            The upper or lower triangular banded matrix A, stored in the   
-            first KD+1 rows of AB.  Let j be a column of A, 1<=j<=n.   
-            If UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j.   
-            If UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
+/*  B       (workspace) REAL array, dimension (N) */
 
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= KD+1.   
+/*  WORK    (workspace) REAL array, dimension (2*N) */
 
-    B       (workspace) REAL array, dimension (N)   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0: if INFO = -k, the k-th argument had an illegal value */
 
-    WORK    (workspace) REAL array, dimension (2*N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0: if INFO = -k, the k-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     --b;
     --work;
@@ -188,12 +192,12 @@ static integer c_n1 = -1;
 
     if (*imat <= 5) {
 	slatms_(n, n, dist, &iseed[1], type__, &b[1], &mode, &cndnum, &anorm, 
-		&kl, &ku, packit, &ab_ref(ioff, 1), ldab, &work[1], info);
+		&kl, &ku, packit, &ab[ioff + ab_dim1], ldab, &work[1], info);
 
-/*     IMAT > 5:  Unit triangular matrix   
-       The diagonal is deliberately set to something other than 1.   
+/*     IMAT > 5:  Unit triangular matrix */
+/*     The diagonal is deliberately set to something other than 1. */
 
-       IMAT = 6:  Matrix is the identity */
+/*     IMAT = 6:  Matrix is the identity */
 
     } else if (*imat == 6) {
 	if (upper) {
@@ -203,31 +207,31 @@ static integer c_n1 = -1;
 		i__2 = 1, i__3 = *kd + 2 - j;
 		i__4 = *kd;
 		for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L10: */
 		}
-		ab_ref(*kd + 1, j) = (real) j;
+		ab[*kd + 1 + j * ab_dim1] = (real) j;
 /* L20: */
 	    }
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		ab_ref(1, j) = (real) j;
+		ab[j * ab_dim1 + 1] = (real) j;
 /* Computing MIN */
 		i__2 = *kd + 1, i__3 = *n - j + 1;
 		i__4 = min(i__2,i__3);
 		for (i__ = 2; i__ <= i__4; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L30: */
 		}
 /* L40: */
 	    }
 	}
 
-/*     IMAT > 6:  Non-trivial unit triangular matrix   
+/*     IMAT > 6:  Non-trivial unit triangular matrix */
 
-       A unit triangular matrix T with condition CNDNUM is formed.   
-       In this version, T only has bandwidth 2, the rest of it is zero. */
+/*     A unit triangular matrix T with condition CNDNUM is formed. */
+/*     In this version, T only has bandwidth 2, the rest of it is zero. */
 
     } else if (*imat <= 9) {
 	tnorm = sqrt(cndnum);
@@ -241,10 +245,10 @@ static integer c_n1 = -1;
 		i__4 = 1, i__2 = *kd + 2 - j;
 		i__3 = *kd;
 		for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L50: */
 		}
-		ab_ref(*kd + 1, j) = (real) j;
+		ab[*kd + 1 + j * ab_dim1] = (real) j;
 /* L60: */
 	    }
 	} else {
@@ -254,56 +258,56 @@ static integer c_n1 = -1;
 		i__4 = *kd + 1, i__2 = *n - j + 1;
 		i__3 = min(i__4,i__2);
 		for (i__ = 2; i__ <= i__3; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L70: */
 		}
-		ab_ref(1, j) = (real) j;
+		ab[j * ab_dim1 + 1] = (real) j;
 /* L80: */
 	    }
 	}
 
-/*        Special case:  T is tridiagonal.  Set every other offdiagonal   
-          so that the matrix has norm TNORM+1. */
+/*        Special case:  T is tridiagonal.  Set every other offdiagonal */
+/*        so that the matrix has norm TNORM+1. */
 
 	if (*kd == 1) {
 	    if (upper) {
 		r__1 = slarnd_(&c__2, &iseed[1]);
-		ab_ref(1, 2) = r_sign(&tnorm, &r__1);
+		ab[(ab_dim1 << 1) + 1] = r_sign(&tnorm, &r__1);
 		lenj = (*n - 3) / 2;
 		slarnv_(&c__2, &iseed[1], &lenj, &work[1]);
 		i__1 = lenj;
 		for (j = 1; j <= i__1; ++j) {
-		    ab_ref(1, j + 1 << 1) = tnorm * work[j];
+		    ab[(j + 1 << 1) * ab_dim1 + 1] = tnorm * work[j];
 /* L90: */
 		}
 	    } else {
 		r__1 = slarnd_(&c__2, &iseed[1]);
-		ab_ref(2, 1) = r_sign(&tnorm, &r__1);
+		ab[ab_dim1 + 2] = r_sign(&tnorm, &r__1);
 		lenj = (*n - 3) / 2;
 		slarnv_(&c__2, &iseed[1], &lenj, &work[1]);
 		i__1 = lenj;
 		for (j = 1; j <= i__1; ++j) {
-		    ab_ref(2, (j << 1) + 1) = tnorm * work[j];
+		    ab[((j << 1) + 1) * ab_dim1 + 2] = tnorm * work[j];
 /* L100: */
 		}
 	    }
 	} else if (*kd > 1) {
 
-/*           Form a unit triangular matrix T with condition CNDNUM.  T is   
-             given by   
-                     | 1   +   *                      |   
-                     |     1   +                      |   
-                 T = |         1   +   *              |   
-                     |             1   +              |   
-                     |                 1   +   *      |   
-                     |                     1   +      |   
-                     |                          . . . |   
-          Each element marked with a '*' is formed by taking the product   
-          of the adjacent elements marked with '+'.  The '*'s can be   
-          chosen freely, and the '+'s are chosen so that the inverse of   
-          T will have elements of the same magnitude as T.   
+/*           Form a unit triangular matrix T with condition CNDNUM.  T is */
+/*           given by */
+/*                   | 1   +   *                      | */
+/*                   |     1   +                      | */
+/*               T = |         1   +   *              | */
+/*                   |             1   +              | */
+/*                   |                 1   +   *      | */
+/*                   |                     1   +      | */
+/*                   |                          . . . | */
+/*        Each element marked with a '*' is formed by taking the product */
+/*        of the adjacent elements marked with '+'.  The '*'s can be */
+/*        chosen freely, and the '+'s are chosen so that the inverse of */
+/*        T will have elements of the same magnitude as T. */
 
-          The two offdiagonals of T are stored in WORK. */
+/*        The two offdiagonals of T are stored in WORK. */
 
 	    r__1 = slarnd_(&c__2, &iseed[1]);
 	    star1 = r_sign(&tnorm, &r__1);
@@ -320,8 +324,8 @@ static integer c_n1 = -1;
 		    work[*n + j + 1] = 0.f;
 		    plus1 = star1 / plus2;
 
-/*                 Generate a new *-value with norm between sqrt(TNORM)   
-                   and TNORM. */
+/*                 Generate a new *-value with norm between sqrt(TNORM) */
+/*                 and TNORM. */
 
 		    rexp = slarnd_(&c__2, &iseed[1]);
 		    if (rexp < 0.f) {
@@ -341,27 +345,28 @@ static integer c_n1 = -1;
 
 	    if (upper) {
 		i__1 = *n - 1;
-		scopy_(&i__1, &work[1], &c__1, &ab_ref(*kd, 2), ldab);
+		scopy_(&i__1, &work[1], &c__1, &ab[*kd + (ab_dim1 << 1)], 
+			ldab);
 		i__1 = *n - 2;
-		scopy_(&i__1, &work[*n + 1], &c__1, &ab_ref(*kd - 1, 3), ldab)
-			;
+		scopy_(&i__1, &work[*n + 1], &c__1, &ab[*kd - 1 + ab_dim1 * 3]
+, ldab);
 	    } else {
 		i__1 = *n - 1;
-		scopy_(&i__1, &work[1], &c__1, &ab_ref(2, 1), ldab);
+		scopy_(&i__1, &work[1], &c__1, &ab[ab_dim1 + 2], ldab);
 		i__1 = *n - 2;
-		scopy_(&i__1, &work[*n + 1], &c__1, &ab_ref(3, 1), ldab);
+		scopy_(&i__1, &work[*n + 1], &c__1, &ab[ab_dim1 + 3], ldab);
 	    }
 	}
 
-/*     IMAT > 9:  Pathological test cases.  These triangular matrices   
-       are badly scaled or badly conditioned, so when used in solving a   
-       triangular system they may cause overflow in the solution vector. */
+/*     IMAT > 9:  Pathological test cases.  These triangular matrices */
+/*     are badly scaled or badly conditioned, so when used in solving a */
+/*     triangular system they may cause overflow in the solution vector. */
 
     } else if (*imat == 10) {
 
-/*        Type 10:  Generate a triangular matrix with elements between   
-          -1 and 1. Give the diagonal norm 2 to make it well-conditioned.   
-          Make the right hand side large so that it requires scaling. */
+/*        Type 10:  Generate a triangular matrix with elements between */
+/*        -1 and 1. Give the diagonal norm 2 to make it well-conditioned. */
+/*        Make the right hand side large so that it requires scaling. */
 
 	if (upper) {
 	    i__1 = *n;
@@ -369,8 +374,10 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__3 = j, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 2 - lenj, j));
-		ab_ref(*kd + 1, j) = r_sign(&c_b36, &ab_ref(*kd + 1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 2 - lenj + j * 
+			ab_dim1]);
+		ab[*kd + 1 + j * ab_dim1] = r_sign(&c_b36, &ab[*kd + 1 + j * 
+			ab_dim1]);
 /* L120: */
 	    }
 	} else {
@@ -380,9 +387,9 @@ static integer c_n1 = -1;
 		i__3 = *n - j + 1, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
 		if (lenj > 0) {
-		    slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(1, j));
+		    slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 1]);
 		}
-		ab_ref(1, j) = r_sign(&c_b36, &ab_ref(1, j));
+		ab[j * ab_dim1 + 1] = r_sign(&c_b36, &ab[j * ab_dim1 + 1]);
 /* L130: */
 	    }
 	}
@@ -397,9 +404,9 @@ static integer c_n1 = -1;
 
     } else if (*imat == 11) {
 
-/*        Type 11:  Make the first diagonal element in the solve small to   
-          cause immediate overflow when dividing by T(j,j).   
-          In type 11, the offdiagonal elements are small (CNORM(j) < 1). */
+/*        Type 11:  Make the first diagonal element in the solve small to */
+/*        cause immediate overflow when dividing by T(j,j). */
+/*        In type 11, the offdiagonal elements are small (CNORM(j) < 1). */
 
 	slarnv_(&c__2, &iseed[1], n, &b[1]);
 	tscal = 1.f / (real) (*kd + 1);
@@ -409,35 +416,38 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__3 = j, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 2 - lenj, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 2 - lenj + j * 
+			ab_dim1]);
 		i__3 = lenj - 1;
-		sscal_(&i__3, &tscal, &ab_ref(*kd + 2 - lenj, j), &c__1);
-		ab_ref(*kd + 1, j) = r_sign(&c_b47, &ab_ref(*kd + 1, j));
+		sscal_(&i__3, &tscal, &ab[*kd + 2 - lenj + j * ab_dim1], &
+			c__1);
+		ab[*kd + 1 + j * ab_dim1] = r_sign(&c_b47, &ab[*kd + 1 + j * 
+			ab_dim1]);
 /* L140: */
 	    }
-	    ab_ref(*kd + 1, *n) = smlnum * ab_ref(*kd + 1, *n);
+	    ab[*kd + 1 + *n * ab_dim1] = smlnum * ab[*kd + 1 + *n * ab_dim1];
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__3 = *n - j + 1, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 1]);
 		if (lenj > 1) {
 		    i__3 = lenj - 1;
-		    sscal_(&i__3, &tscal, &ab_ref(2, j), &c__1);
+		    sscal_(&i__3, &tscal, &ab[j * ab_dim1 + 2], &c__1);
 		}
-		ab_ref(1, j) = r_sign(&c_b47, &ab_ref(1, j));
+		ab[j * ab_dim1 + 1] = r_sign(&c_b47, &ab[j * ab_dim1 + 1]);
 /* L150: */
 	    }
-	    ab_ref(1, 1) = smlnum * ab_ref(1, 1);
+	    ab[ab_dim1 + 1] = smlnum * ab[ab_dim1 + 1];
 	}
 
     } else if (*imat == 12) {
 
-/*        Type 12:  Make the first diagonal element in the solve small to   
-          cause immediate overflow when dividing by T(j,j).   
-          In type 12, the offdiagonal elements are O(1) (CNORM(j) > 1). */
+/*        Type 12:  Make the first diagonal element in the solve small to */
+/*        cause immediate overflow when dividing by T(j,j). */
+/*        In type 12, the offdiagonal elements are O(1) (CNORM(j) > 1). */
 
 	slarnv_(&c__2, &iseed[1], n, &b[1]);
 	if (upper) {
@@ -446,29 +456,31 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__3 = j, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 2 - lenj, j));
-		ab_ref(*kd + 1, j) = r_sign(&c_b47, &ab_ref(*kd + 1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 2 - lenj + j * 
+			ab_dim1]);
+		ab[*kd + 1 + j * ab_dim1] = r_sign(&c_b47, &ab[*kd + 1 + j * 
+			ab_dim1]);
 /* L160: */
 	    }
-	    ab_ref(*kd + 1, *n) = smlnum * ab_ref(*kd + 1, *n);
+	    ab[*kd + 1 + *n * ab_dim1] = smlnum * ab[*kd + 1 + *n * ab_dim1];
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
 /* Computing MIN */
 		i__3 = *n - j + 1, i__4 = *kd + 1;
 		lenj = min(i__3,i__4);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(1, j));
-		ab_ref(1, j) = r_sign(&c_b47, &ab_ref(1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 1]);
+		ab[j * ab_dim1 + 1] = r_sign(&c_b47, &ab[j * ab_dim1 + 1]);
 /* L170: */
 	    }
-	    ab_ref(1, 1) = smlnum * ab_ref(1, 1);
+	    ab[ab_dim1 + 1] = smlnum * ab[ab_dim1 + 1];
 	}
 
     } else if (*imat == 13) {
 
-/*        Type 13:  T is diagonal with small numbers on the diagonal to   
-          make the growth factor underflow, but a small right hand side   
-          chosen so that the solution does not overflow. */
+/*        Type 13:  T is diagonal with small numbers on the diagonal to */
+/*        make the growth factor underflow, but a small right hand side */
+/*        chosen so that the solution does not overflow. */
 
 	if (upper) {
 	    jcount = 1;
@@ -477,13 +489,13 @@ static integer c_n1 = -1;
 		i__1 = 1, i__3 = *kd + 1 - (j - 1);
 		i__4 = *kd;
 		for (i__ = max(i__1,i__3); i__ <= i__4; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L180: */
 		}
 		if (jcount <= 2) {
-		    ab_ref(*kd + 1, j) = smlnum;
+		    ab[*kd + 1 + j * ab_dim1] = smlnum;
 		} else {
-		    ab_ref(*kd + 1, j) = 1.f;
+		    ab[*kd + 1 + j * ab_dim1] = 1.f;
 		}
 		++jcount;
 		if (jcount > 4) {
@@ -499,13 +511,13 @@ static integer c_n1 = -1;
 		i__3 = *n - j + 1, i__2 = *kd + 1;
 		i__1 = min(i__3,i__2);
 		for (i__ = 2; i__ <= i__1; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L200: */
 		}
 		if (jcount <= 2) {
-		    ab_ref(1, j) = smlnum;
+		    ab[j * ab_dim1 + 1] = smlnum;
 		} else {
-		    ab_ref(1, j) = 1.f;
+		    ab[j * ab_dim1 + 1] = 1.f;
 		}
 		++jcount;
 		if (jcount > 4) {
@@ -536,9 +548,9 @@ static integer c_n1 = -1;
 
     } else if (*imat == 14) {
 
-/*        Type 14:  Make the diagonal elements small to cause gradual   
-          overflow when dividing by T(j,j).  To control the amount of   
-          scaling needed, the matrix is bidiagonal. */
+/*        Type 14:  Make the diagonal elements small to cause gradual */
+/*        overflow when dividing by T(j,j).  To control the amount of */
+/*        scaling needed, the matrix is bidiagonal. */
 
 	texp = 1.f / (real) (*kd + 1);
 	d__1 = (doublereal) smlnum;
@@ -552,13 +564,13 @@ static integer c_n1 = -1;
 		i__1 = 1, i__3 = *kd + 2 - j;
 		i__2 = *kd;
 		for (i__ = max(i__1,i__3); i__ <= i__2; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L240: */
 		}
 		if (j > 1 && *kd > 0) {
-		    ab_ref(*kd, j) = -1.f;
+		    ab[*kd + j * ab_dim1] = -1.f;
 		}
-		ab_ref(*kd + 1, j) = tscal;
+		ab[*kd + 1 + j * ab_dim1] = tscal;
 /* L250: */
 	    }
 	    b[*n] = 1.f;
@@ -569,13 +581,13 @@ static integer c_n1 = -1;
 		i__1 = *n - j + 1, i__3 = *kd + 1;
 		i__2 = min(i__1,i__3);
 		for (i__ = 3; i__ <= i__2; ++i__) {
-		    ab_ref(i__, j) = 0.f;
+		    ab[i__ + j * ab_dim1] = 0.f;
 /* L260: */
 		}
 		if (j < *n && *kd > 0) {
-		    ab_ref(2, j) = -1.f;
+		    ab[j * ab_dim1 + 2] = -1.f;
 		}
-		ab_ref(1, j) = tscal;
+		ab[j * ab_dim1 + 1] = tscal;
 /* L270: */
 	    }
 	    b[1] = 1.f;
@@ -592,11 +604,13 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__2 = j, i__1 = *kd + 1;
 		lenj = min(i__2,i__1);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 2 - lenj, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 2 - lenj + j * 
+			ab_dim1]);
 		if (j != iy) {
-		    ab_ref(*kd + 1, j) = r_sign(&c_b36, &ab_ref(*kd + 1, j));
+		    ab[*kd + 1 + j * ab_dim1] = r_sign(&c_b36, &ab[*kd + 1 + 
+			    j * ab_dim1]);
 		} else {
-		    ab_ref(*kd + 1, j) = 0.f;
+		    ab[*kd + 1 + j * ab_dim1] = 0.f;
 		}
 /* L280: */
 	    }
@@ -606,11 +620,12 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__2 = *n - j + 1, i__1 = *kd + 1;
 		lenj = min(i__2,i__1);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 1]);
 		if (j != iy) {
-		    ab_ref(1, j) = r_sign(&c_b36, &ab_ref(1, j));
+		    ab[j * ab_dim1 + 1] = r_sign(&c_b36, &ab[j * ab_dim1 + 1])
+			    ;
 		} else {
-		    ab_ref(1, j) = 0.f;
+		    ab[j * ab_dim1 + 1] = 0.f;
 		}
 /* L290: */
 	    }
@@ -620,10 +635,10 @@ static integer c_n1 = -1;
 
     } else if (*imat == 16) {
 
-/*        Type 16:  Make the offdiagonal elements large to cause overflow   
-          when adding a column of T.  In the non-transposed case, the   
-          matrix is constructed to cause overflow when adding a column in   
-          every other step. */
+/*        Type 16:  Make the offdiagonal elements large to cause overflow */
+/*        when adding a column of T.  In the non-transposed case, the */
+/*        matrix is constructed to cause overflow when adding a column in */
+/*        every other step. */
 
 	tscal = unfl / ulp;
 	tscal = (1.f - ulp) / tscal;
@@ -631,7 +646,7 @@ static integer c_n1 = -1;
 	for (j = 1; j <= i__4; ++j) {
 	    i__2 = *kd + 1;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		ab_ref(i__, j) = 0.f;
+		ab[i__ + j * ab_dim1] = 0.f;
 /* L300: */
 	    }
 /* L310: */
@@ -645,15 +660,16 @@ static integer c_n1 = -1;
 		    i__1 = 1, i__3 = j - *kd + 1;
 		    i__2 = max(i__1,i__3);
 		    for (i__ = j; i__ >= i__2; i__ += -2) {
-			ab_ref(j - i__ + 1, i__) = -tscal / (real) (*kd + 2);
-			ab_ref(*kd + 1, i__) = 1.f;
+			ab[j - i__ + 1 + i__ * ab_dim1] = -tscal / (real) (*
+				kd + 2);
+			ab[*kd + 1 + i__ * ab_dim1] = 1.f;
 			b[i__] = texp * (1.f - ulp);
 /* Computing MAX */
 			i__1 = 1, i__3 = j - *kd + 1;
 			if (i__ > max(i__1,i__3)) {
-			    ab_ref(j - i__ + 2, i__ - 1) = -(tscal / (real) (*
-				    kd + 2)) / (real) (*kd + 3);
-			    ab_ref(*kd + 1, i__ - 1) = 1.f;
+			    ab[j - i__ + 2 + (i__ - 1) * ab_dim1] = -(tscal / 
+				    (real) (*kd + 2)) / (real) (*kd + 3);
+			    ab[*kd + 1 + (i__ - 1) * ab_dim1] = 1.f;
 			    b[i__ - 1] = texp * (real) ((*kd + 1) * (*kd + 1) 
 				    + *kd);
 			}
@@ -678,16 +694,17 @@ static integer c_n1 = -1;
 		    i__3 = *n, i__5 = j + *kd - 1;
 		    i__1 = min(i__3,i__5);
 		    for (i__ = j; i__ <= i__1; i__ += 2) {
-			ab_ref(lenj - (i__ - j), j) = -tscal / (real) (*kd + 
-				2);
-			ab_ref(1, j) = 1.f;
+			ab[lenj - (i__ - j) + j * ab_dim1] = -tscal / (real) (
+				*kd + 2);
+			ab[j * ab_dim1 + 1] = 1.f;
 			b[j] = texp * (1.f - ulp);
 /* Computing MIN */
 			i__3 = *n, i__5 = j + *kd - 1;
 			if (i__ < min(i__3,i__5)) {
-			    ab_ref(lenj - (i__ - j + 1), i__ + 1) = -(tscal / 
-				    (real) (*kd + 2)) / (real) (*kd + 3);
-			    ab_ref(1, i__ + 1) = 1.f;
+			    ab[lenj - (i__ - j + 1) + (i__ + 1) * ab_dim1] = 
+				    -(tscal / (real) (*kd + 2)) / (real) (*kd 
+				    + 3);
+			    ab[(i__ + 1) * ab_dim1 + 1] = 1.f;
 			    b[i__ + 1] = texp * (real) ((*kd + 1) * (*kd + 1) 
 				    + *kd);
 			}
@@ -704,7 +721,7 @@ static integer c_n1 = -1;
 	} else {
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		ab_ref(1, j) = 1.f;
+		ab[j * ab_dim1 + 1] = 1.f;
 		b[j] = (real) j;
 /* L360: */
 	    }
@@ -712,9 +729,9 @@ static integer c_n1 = -1;
 
     } else if (*imat == 17) {
 
-/*        Type 17:  Generate a unit triangular matrix with elements   
-          between -1 and 1, and make the right hand side large so that it   
-          requires scaling. */
+/*        Type 17:  Generate a unit triangular matrix with elements */
+/*        between -1 and 1, and make the right hand side large so that it */
+/*        requires scaling. */
 
 	if (upper) {
 	    i__2 = *n;
@@ -722,8 +739,9 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__4 = j - 1;
 		lenj = min(i__4,*kd);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 1 - lenj, j));
-		ab_ref(*kd + 1, j) = (real) j;
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 1 - lenj + j * 
+			ab_dim1]);
+		ab[*kd + 1 + j * ab_dim1] = (real) j;
 /* L370: */
 	    }
 	} else {
@@ -733,9 +751,9 @@ static integer c_n1 = -1;
 		i__4 = *n - j;
 		lenj = min(i__4,*kd);
 		if (lenj > 0) {
-		    slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(2, j));
+		    slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 2]);
 		}
-		ab_ref(1, j) = (real) j;
+		ab[j * ab_dim1 + 1] = (real) j;
 /* L380: */
 	    }
 	}
@@ -750,11 +768,11 @@ static integer c_n1 = -1;
 
     } else if (*imat == 18) {
 
-/*        Type 18:  Generate a triangular matrix with elements between   
-          BIGNUM/KD and BIGNUM so that at least one of the column   
-          norms will exceed BIGNUM.   
+/*        Type 18:  Generate a triangular matrix with elements between */
+/*        BIGNUM/KD and BIGNUM so that at least one of the column */
+/*        norms will exceed BIGNUM. */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = 1.f, r__2 = (real) (*kd);
 	tleft = bignum / dmax(r__1,r__2);
 	tscal = bignum * ((real) (*kd) / (real) (*kd + 1));
@@ -764,11 +782,12 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__4 = j, i__1 = *kd + 1;
 		lenj = min(i__4,i__1);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(*kd + 2 - lenj, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[*kd + 2 - lenj + j * 
+			ab_dim1]);
 		i__4 = *kd + 1;
 		for (i__ = *kd + 2 - lenj; i__ <= i__4; ++i__) {
-		    ab_ref(i__, j) = r_sign(&tleft, &ab_ref(i__, j)) + tscal *
-			     ab_ref(i__, j);
+		    ab[i__ + j * ab_dim1] = r_sign(&tleft, &ab[i__ + j * 
+			    ab_dim1]) + tscal * ab[i__ + j * ab_dim1];
 /* L390: */
 		}
 /* L400: */
@@ -779,11 +798,11 @@ static integer c_n1 = -1;
 /* Computing MIN */
 		i__4 = *n - j + 1, i__1 = *kd + 1;
 		lenj = min(i__4,i__1);
-		slarnv_(&c__2, &iseed[1], &lenj, &ab_ref(1, j));
+		slarnv_(&c__2, &iseed[1], &lenj, &ab[j * ab_dim1 + 1]);
 		i__4 = lenj;
 		for (i__ = 1; i__ <= i__4; ++i__) {
-		    ab_ref(i__, j) = r_sign(&tleft, &ab_ref(i__, j)) + tscal *
-			     ab_ref(i__, j);
+		    ab[i__ + j * ab_dim1] = r_sign(&tleft, &ab[i__ + j * 
+			    ab_dim1]) + tscal * ab[i__ + j * ab_dim1];
 /* L410: */
 		}
 /* L420: */
@@ -803,8 +822,8 @@ static integer c_n1 = -1;
 		i__4 = *n - (j << 1) + 1, i__1 = *kd + 1;
 		lenj = min(i__4,i__1);
 		i__4 = *ldab - 1;
-		sswap_(&lenj, &ab_ref(*kd + 1, j), &i__4, &ab_ref(*kd + 2 - 
-			lenj, *n - j + 1), &c_n1);
+		sswap_(&lenj, &ab[*kd + 1 + j * ab_dim1], &i__4, &ab[*kd + 2 
+			- lenj + (*n - j + 1) * ab_dim1], &c_n1);
 /* L430: */
 	    }
 	} else {
@@ -814,8 +833,8 @@ static integer c_n1 = -1;
 		i__4 = *n - (j << 1) + 1, i__1 = *kd + 1;
 		lenj = min(i__4,i__1);
 		i__4 = -(*ldab) + 1;
-		sswap_(&lenj, &ab_ref(1, j), &c__1, &ab_ref(lenj, *n - j + 2 
-			- lenj), &i__4);
+		sswap_(&lenj, &ab[j * ab_dim1 + 1], &c__1, &ab[lenj + (*n - j 
+			+ 2 - lenj) * ab_dim1], &i__4);
 /* L440: */
 	    }
 	}
@@ -826,7 +845,3 @@ static integer c_n1 = -1;
 /*     End of SLATTB */
 
 } /* slattb_ */
-
-#undef ab_ref
-
-

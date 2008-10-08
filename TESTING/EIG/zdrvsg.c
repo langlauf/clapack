@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -53,47 +48,44 @@ static integer c__3 = 3;
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static doublereal cond;
-    static integer jcol, nmax;
-    static doublereal unfl, ovfl;
-    static char uplo[1];
-    static integer i__, j, m, n;
-    static logical badnn;
-    static integer imode;
+    integer i__, j, m, n, ka, kb, ij, il, iu;
+    doublereal vl, vu;
+    integer ka9, kb9;
+    doublereal ulp, cond;
+    integer jcol, nmax;
+    doublereal unfl, ovfl;
+    char uplo[1];
+    logical badnn;
+    integer imode;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
-    static doublereal aninv, anorm;
-    static integer itemp;
+    integer iinfo;
+    doublereal aninv, anorm;
+    integer itemp;
     extern /* Subroutine */ int zhbgv_(char *, char *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublereal *, doublecomplex *, integer *, doublecomplex *, 
 	    doublereal *, integer *);
-    static integer nmats, jsize;
+    integer nmats, jsize;
     extern /* Subroutine */ int zhegv_(integer *, char *, char *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, integer *), zsgt01_(integer *, char *, integer *, integer *,
+	    doublereal *, doublecomplex *, integer *, doublereal *, integer *), zsgt01_(integer *, char *, integer *, integer *, 
 	     doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    doublereal *, doublereal *);
-    static integer nerrs, itype, jtype, ntest;
+    integer nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int zhpgv_(integer *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, doublereal *, integer *);
-    static integer iseed2[4];
+    integer iseed2[4];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer ka, kb, ij, il;
-    extern doublereal dlamch_(char *);
-    static integer iu;
-    static doublereal vl;
-    extern doublereal dlarnd_(integer *, integer *);
-    static doublereal vu;
-    static integer idumma[1];
+    extern doublereal dlamch_(char *), dlarnd_(integer *, integer *);
+    integer idumma[1];
     extern /* Subroutine */ int dlafts_(char *, integer *, integer *, integer 
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static doublereal abstol;
+    doublereal abstol;
     extern /* Subroutine */ int dlasum_(char *, integer *, integer *, integer 
 	    *), zhbgvd_(char *, char *, integer *, integer *, integer 
 	    *, doublecomplex *, integer *, doublecomplex *, integer *, 
@@ -101,29 +93,32 @@ static integer c__3 = 3;
 	    integer *, doublereal *, integer *, integer *, integer *, integer 
 	    *), zhegvd_(integer *, char *, char *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, integer *,
+	    doublereal *, doublecomplex *, integer *, doublereal *, integer *, 
 	     integer *, integer *, integer *);
-    static integer ibuplo, ibtype;
+    integer ibuplo, ibtype;
     extern /* Subroutine */ int zhpgvd_(integer *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, integer *, 
 	    integer *, integer *, integer *), zlacpy_(char *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
-	     integer *);
-    static integer ka9, kb9;
-    extern /* Subroutine */ int zhbgvx_(char *, char *, char *, integer *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
-	     integer *, doublecomplex *, integer *, doublereal *, doublereal *
-	    , integer *, integer *, doublereal *, integer *, doublereal *, 
-	    doublecomplex *, integer *, doublecomplex *, doublereal *, 
-	    integer *, integer *, integer *), zlaset_(
-	    char *, integer *, integer *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, integer *);
-    static doublereal rtunfl, rtovfl;
-    static integer mtypes, ntestt;
-    static doublereal ulpinv;
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
+	     integer *), zlaset_(char *, integer *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, integer *), zhbgvx_(char *, char *, char *, integer *, integer *, 
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
+	     doublecomplex *, integer *, doublereal *, doublereal *, integer *
+, integer *, doublereal *, integer *, doublereal *, doublecomplex 
+	    *, integer *, doublecomplex *, doublereal *, integer *, integer *, 
+	     integer *), zlatmr_(integer *, integer *, 
+	     char *, integer *, char *, doublecomplex *, integer *, 
+	    doublereal *, doublecomplex *, char *, char *, doublecomplex *, 
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
+	     char *, integer *, integer *, integer *, doublereal *, 
+	    doublereal *, char *, doublecomplex *, integer *, integer *, 
+	    integer *);
+    doublereal rtunfl, rtovfl;
+    integer mtypes, ntestt;
+    doublereal ulpinv;
     extern /* Subroutine */ int zhegvx_(integer *, char *, char *, char *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
@@ -131,16 +126,10 @@ static integer c__3 = 3;
 	    char *, char *, integer *, doublecomplex *, doublecomplex *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublecomplex *, integer *, 
-	    doublecomplex *, doublereal *, integer *, integer *, integer *), zlatmr_(integer *, integer *, char *, 
-	    integer *, char *, doublecomplex *, integer *, doublereal *, 
-	    doublecomplex *, char *, char *, doublecomplex *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, char *, 
-	    integer *, integer *, integer *, doublereal *, doublereal *, char 
-	    *, doublecomplex *, integer *, integer *, integer *), zlatms_(integer *, 
-	    integer *, char *, integer *, char *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *, char *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal ulp;
+	    doublecomplex *, doublereal *, integer *, integer *, integer *), zlatms_(integer *, integer *, char *, 
+	    integer *, char *, doublereal *, integer *, doublereal *, 
+	    doublereal *, integer *, integer *, char *, doublecomplex *, 
+	    integer *, doublecomplex *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___36 = { 0, 0, 0, fmt_9999, 0 };
@@ -162,371 +151,377 @@ static integer c__3 = 3;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
-#define bb_subscr(a_1,a_2) (a_2)*bb_dim1 + a_1
-#define bb_ref(a_1,a_2) bb[bb_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/* ********************************************************************* */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*     modified August 1997, a new parameter LRWORK and LIWORK are */
+/*     added in the calling sequence. */
 
-   *********************************************************************   
+/*     test routine CDGT01 is also modified */
 
-       modified August 1997, a new parameter LRWORK and LIWORK are   
-       added in the calling sequence.   
+/* ********************************************************************* */
 
-       test routine CDGT01 is also modified   
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-   *********************************************************************   
+/*  Purpose */
+/*  ======= */
 
+/*       ZDRVSG checks the complex Hermitian generalized eigenproblem */
+/*       drivers. */
 
-    Purpose   
-    =======   
+/*               ZHEGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem. */
 
-         ZDRVSG checks the complex Hermitian generalized eigenproblem   
-         drivers.   
+/*               ZHEGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem using a divide and conquer algorithm. */
 
-                 ZHEGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem.   
+/*               ZHEGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem. */
 
-                 ZHEGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem using a divide and conquer algorithm.   
+/*               ZHPGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem in packed storage. */
 
-                 ZHEGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem.   
+/*               ZHPGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem in packed storage using a divide and */
+/*               conquer algorithm. */
 
-                 ZHPGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem in packed storage.   
+/*               ZHPGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite generalized */
+/*               eigenproblem in packed storage. */
 
-                 ZHPGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem in packed storage using a divide and   
-                 conquer algorithm.   
+/*               ZHBGV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite banded */
+/*               generalized eigenproblem. */
 
-                 ZHPGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite generalized   
-                 eigenproblem in packed storage.   
+/*               ZHBGVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite banded */
+/*               generalized eigenproblem using a divide and conquer */
+/*               algorithm. */
 
-                 ZHBGV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite banded   
-                 generalized eigenproblem.   
+/*               ZHBGVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian-definite banded */
+/*               generalized eigenproblem. */
 
-                 ZHBGVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite banded   
-                 generalized eigenproblem using a divide and conquer   
-                 algorithm.   
+/*       When ZDRVSG is called, a number of matrix "sizes" ("n's") and a */
+/*       number of matrix "types" are specified.  For each size ("n") */
+/*       and each type of matrix, one matrix A of the given type will be */
+/*       generated; a random well-conditioned matrix B is also generated */
+/*       and the pair (A,B) is used to test the drivers. */
 
-                 ZHBGVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian-definite banded   
-                 generalized eigenproblem.   
+/*       For each pair (A,B), the following tests are performed: */
 
-         When ZDRVSG is called, a number of matrix "sizes" ("n's") and a   
-         number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix A of the given type will be   
-         generated; a random well-conditioned matrix B is also generated   
-         and the pair (A,B) is used to test the drivers.   
+/*       (1) ZHEGV with ITYPE = 1 and UPLO ='U': */
 
-         For each pair (A,B), the following tests are performed:   
+/*               | A Z - B Z D | / ( |A| |Z| n ulp ) */
 
-         (1) ZHEGV with ITYPE = 1 and UPLO ='U':   
-
-                 | A Z - B Z D | / ( |A| |Z| n ulp )   
-
-         (2) as (1) but calling ZHPGV   
-         (3) as (1) but calling ZHBGV   
-         (4) as (1) but with UPLO = 'L'   
-         (5) as (4) but calling ZHPGV   
-         (6) as (4) but calling ZHBGV   
-
-         (7) ZHEGV with ITYPE = 2 and UPLO ='U':   
-
-                 | A B Z - Z D | / ( |A| |Z| n ulp )   
-
-         (8) as (7) but calling ZHPGV   
-         (9) as (7) but with UPLO = 'L'   
-         (10) as (9) but calling ZHPGV   
-
-         (11) ZHEGV with ITYPE = 3 and UPLO ='U':   
-
-                 | B A Z - Z D | / ( |A| |Z| n ulp )   
-
-         (12) as (11) but calling ZHPGV   
-         (13) as (11) but with UPLO = 'L'   
-         (14) as (13) but calling ZHPGV   
-
-         ZHEGVD, ZHPGVD and ZHBGVD performed the same 14 tests.   
-
-         ZHEGVX, ZHPGVX and ZHBGVX performed the above 14 tests with   
-         the parameter RANGE = 'A', 'N' and 'I', respectively.   
-
-         The "sizes" are specified by an array NN(1:NSIZES); the value of   
-         each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-         This type is used for the matrix A which has half-bandwidth KA.   
-         B is generated as a well-conditioned positive definite matrix   
-         with half-bandwidth KB (<= KA).   
-         Currently, the list of possible types for A is:   
-
-         (1)  The zero matrix.   
-         (2)  The identity matrix.   
-
-         (3)  A diagonal matrix with evenly spaced entries   
-              1, ..., ULP  and random signs.   
-              (ULP = (first number larger than 1) - 1 )   
-         (4)  A diagonal matrix with geometrically spaced entries   
-              1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-              and random signs.   
-
-         (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-         (8)  A matrix of the form  U* D U, where U is unitary and   
-              D has evenly spaced entries 1, ..., ULP with random signs   
-              on the diagonal.   
-
-         (9)  A matrix of the form  U* D U, where U is unitary and   
-              D has geometrically spaced entries 1, ..., ULP with random   
-              signs on the diagonal.   
-
-         (10) A matrix of the form  U* D U, where U is unitary and   
-              D has "clustered" entries 1, ULP,..., ULP with random   
-              signs on the diagonal.   
-
-         (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-         (13) Hermitian matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
-
-         (16) Same as (8), but with KA = 1 and KB = 1   
-         (17) Same as (8), but with KA = 2 and KB = 1   
-         (18) Same as (8), but with KA = 2 and KB = 2   
-         (19) Same as (8), but with KA = 3 and KB = 1   
-         (20) Same as (8), but with KA = 3 and KB = 2   
-         (21) Same as (8), but with KA = 3 and KB = 3   
-
-    Arguments   
-    =========   
-
-    NSIZES  INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            ZDRVSG does nothing.  It must be at least zero.   
-            Not modified.   
-
-    NN      INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-            Not modified.   
-
-    NTYPES  INTEGER   
-            The number of elements in DOTYPE.   If it is zero, ZDRVSG   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-            Not modified.   
-
-    DOTYPE  LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-            Not modified.   
-
-    ISEED   INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to ZDRVSG to continue the same random number   
-            sequence.   
-            Modified.   
-
-    THRESH  DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-            Not modified.   
-
-    NOUNIT  INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-            Not modified.   
-
-    A       COMPLEX*16 array, dimension (LDA , max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDA     INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    B       COMPLEX*16 array, dimension (LDB , max(NN))   
-            Used to hold the Hermitian positive definite matrix for   
-            the generailzed problem.   
-            On exit, B contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDB     INTEGER   
-            The leading dimension of B.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    D       DOUBLE PRECISION array, dimension (max(NN))   
-            The eigenvalues of A. On exit, the eigenvalues in D   
-            correspond with the matrix in A.   
-            Modified.   
-
-    Z       COMPLEX*16 array, dimension (LDZ, max(NN))   
-            The matrix of eigenvectors.   
-            Modified.   
-
-    LDZ     INTEGER   
-            The leading dimension of ZZ.  It must be at least 1 and   
-            at least max( NN ).   
-            Not modified.   
-
-    AB      COMPLEX*16 array, dimension (LDA, max(NN))   
-            Workspace.   
-            Modified.   
-
-    BB      COMPLEX*16 array, dimension (LDB, max(NN))   
-            Workspace.   
-            Modified.   
-
-    AP      COMPLEX*16 array, dimension (max(NN)**2)   
-            Workspace.   
-            Modified.   
-
-    BP      COMPLEX*16 array, dimension (max(NN)**2)   
-            Workspace.   
-            Modified.   
-
-    WORK    COMPLEX*16 array, dimension (NWORK)   
-            Workspace.   
-            Modified.   
-
-    NWORK   INTEGER   
-            The number of entries in WORK.  This must be at least   
-            2*N + N**2  where  N = max( NN(j), 2 ).   
-            Not modified.   
-
-    RWORK   DOUBLE PRECISION array, dimension (LRWORK)   
-            Workspace.   
-            Modified.   
-
-    LRWORK  INTEGER   
-            The number of entries in RWORK.  This must be at least   
-            max( 7*N, 1 + 4*N + 2*N*lg(N) + 3*N**2 ) where   
-            N = max( NN(j) ) and lg( N ) = smallest integer k such   
-            that 2**k >= N .   
-            Not modified.   
-
-    IWORK   INTEGER array, dimension (LIWORK))   
-            Workspace.   
-            Modified.   
-
-    LIWORK  INTEGER   
-            The number of entries in IWORK.  This must be at least   
-            2 + 5*max( NN(j) ).   
-            Not modified.   
-
-    RESULT  DOUBLE PRECISION array, dimension (70)   
-            The values computed by the 70 tests described above.   
-            Modified.   
-
-    INFO    INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDZ < 1 or LDZ < NMAX.   
-            -21: NWORK too small.   
-            -23: LRWORK too small.   
-            -25: LIWORK too small.   
-            If  ZLATMR, CLATMS, ZHEGV, ZHPGV, ZHBGV, CHEGVD, CHPGVD,   
-                ZHPGVD, ZHEGVX, CHPGVX, ZHBGVX returns an error code,   
-                the absolute value of it is returned.   
-            Modified.   
-
-   -----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests that have been run   
-                         on this matrix.   
-         NTESTT          The total number of tests for this call.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far (computed by DLAFTS).   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*       (2) as (1) but calling ZHPGV */
+/*       (3) as (1) but calling ZHBGV */
+/*       (4) as (1) but with UPLO = 'L' */
+/*       (5) as (4) but calling ZHPGV */
+/*       (6) as (4) but calling ZHBGV */
+
+/*       (7) ZHEGV with ITYPE = 2 and UPLO ='U': */
+
+/*               | A B Z - Z D | / ( |A| |Z| n ulp ) */
+
+/*       (8) as (7) but calling ZHPGV */
+/*       (9) as (7) but with UPLO = 'L' */
+/*       (10) as (9) but calling ZHPGV */
+
+/*       (11) ZHEGV with ITYPE = 3 and UPLO ='U': */
+
+/*               | B A Z - Z D | / ( |A| |Z| n ulp ) */
+
+/*       (12) as (11) but calling ZHPGV */
+/*       (13) as (11) but with UPLO = 'L' */
+/*       (14) as (13) but calling ZHPGV */
+
+/*       ZHEGVD, ZHPGVD and ZHBGVD performed the same 14 tests. */
+
+/*       ZHEGVX, ZHPGVX and ZHBGVX performed the above 14 tests with */
+/*       the parameter RANGE = 'A', 'N' and 'I', respectively. */
+
+/*       The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*       each element NN(j) specifies one size. */
+/*       The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*       This type is used for the matrix A which has half-bandwidth KA. */
+/*       B is generated as a well-conditioned positive definite matrix */
+/*       with half-bandwidth KB (<= KA). */
+/*       Currently, the list of possible types for A is: */
+
+/*       (1)  The zero matrix. */
+/*       (2)  The identity matrix. */
+
+/*       (3)  A diagonal matrix with evenly spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*            (ULP = (first number larger than 1) - 1 ) */
+/*       (4)  A diagonal matrix with geometrically spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*       (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*            and random signs. */
+
+/*       (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*       (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*       (8)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has evenly spaced entries 1, ..., ULP with random signs */
+/*            on the diagonal. */
+
+/*       (9)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has geometrically spaced entries 1, ..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (10) A matrix of the form  U* D U, where U is unitary and */
+/*            D has "clustered" entries 1, ULP,..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*       (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*       (13) Hermitian matrix with random entries chosen from (-1,1). */
+/*       (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*       (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
+
+/*       (16) Same as (8), but with KA = 1 and KB = 1 */
+/*       (17) Same as (8), but with KA = 2 and KB = 1 */
+/*       (18) Same as (8), but with KA = 2 and KB = 2 */
+/*       (19) Same as (8), but with KA = 3 and KB = 1 */
+/*       (20) Same as (8), but with KA = 3 and KB = 2 */
+/*       (21) Same as (8), but with KA = 3 and KB = 3 */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          ZDRVSG does nothing.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NN      INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+/*          Not modified. */
+
+/*  NTYPES  INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, ZDRVSG */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+/*          Not modified. */
+
+/*  DOTYPE  LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+/*          Not modified. */
+
+/*  ISEED   INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to ZDRVSG to continue the same random number */
+/*          sequence. */
+/*          Modified. */
+
+/*  THRESH  DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NOUNIT  INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+/*          Not modified. */
+
+/*  A       COMPLEX*16 array, dimension (LDA , max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDA     INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  B       COMPLEX*16 array, dimension (LDB , max(NN)) */
+/*          Used to hold the Hermitian positive definite matrix for */
+/*          the generailzed problem. */
+/*          On exit, B contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDB     INTEGER */
+/*          The leading dimension of B.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  D       DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The eigenvalues of A. On exit, the eigenvalues in D */
+/*          correspond with the matrix in A. */
+/*          Modified. */
+
+/*  Z       COMPLEX*16 array, dimension (LDZ, max(NN)) */
+/*          The matrix of eigenvectors. */
+/*          Modified. */
+
+/*  LDZ     INTEGER */
+/*          The leading dimension of ZZ.  It must be at least 1 and */
+/*          at least max( NN ). */
+/*          Not modified. */
+
+/*  AB      COMPLEX*16 array, dimension (LDA, max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  BB      COMPLEX*16 array, dimension (LDB, max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  AP      COMPLEX*16 array, dimension (max(NN)**2) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  BP      COMPLEX*16 array, dimension (max(NN)**2) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  WORK    COMPLEX*16 array, dimension (NWORK) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  NWORK   INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          2*N + N**2  where  N = max( NN(j), 2 ). */
+/*          Not modified. */
+
+/*  RWORK   DOUBLE PRECISION array, dimension (LRWORK) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LRWORK  INTEGER */
+/*          The number of entries in RWORK.  This must be at least */
+/*          max( 7*N, 1 + 4*N + 2*N*lg(N) + 3*N**2 ) where */
+/*          N = max( NN(j) ) and lg( N ) = smallest integer k such */
+/*          that 2**k >= N . */
+/*          Not modified. */
+
+/*  IWORK   INTEGER array, dimension (LIWORK)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LIWORK  INTEGER */
+/*          The number of entries in IWORK.  This must be at least */
+/*          2 + 5*max( NN(j) ). */
+/*          Not modified. */
+
+/*  RESULT  DOUBLE PRECISION array, dimension (70) */
+/*          The values computed by the 70 tests described above. */
+/*          Modified. */
+
+/*  INFO    INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -16: LDZ < 1 or LDZ < NMAX. */
+/*          -21: NWORK too small. */
+/*          -23: LRWORK too small. */
+/*          -25: LIWORK too small. */
+/*          If  ZLATMR, CLATMS, ZHEGV, ZHPGV, ZHBGV, CHEGVD, CHPGVD, */
+/*              ZHPGVD, ZHEGVX, CHPGVX, ZHBGVX returns an error code, */
+/*              the absolute value of it is returned. */
+/*          Modified. */
+
+/* ----------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests that have been run */
+/*                       on this matrix. */
+/*       NTESTT          The total number of tests for this call. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far (computed by DLAFTS). */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ab_dim1 = *lda;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bb_dim1 = *ldb;
-    bb_offset = 1 + bb_dim1 * 1;
+    bb_offset = 1 + bb_dim1;
     bb -= bb_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --d__;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --ap;
     --bp;
@@ -535,9 +530,11 @@ static integer c__3 = 3;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       1)      Check for errors */
+/*     1)      Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -645,20 +642,20 @@ static integer c__3 = 3;
 /* L30: */
 	    }
 
-/*           2)      Compute "A"   
+/*           2)      Compute "A" */
 
-                     Control parameters:   
+/*                   Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, w/ eigenvalues   
-             =5         random log   hermitian, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random hermitian   
-             =9                      banded, w/ eigenvalues */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, w/ eigenvalues */
+/*           =5         random log   hermitian, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random hermitian */
+/*           =9                      banded, w/ eigenvalues */
 
 	    if (mtypes > 21) {
 		goto L90;
@@ -711,7 +708,7 @@ L70:
 		zlaset_("Full", lda, &n, &c_b1, &c_b1, &a[a_offset], lda);
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = a_subscr(jcol, jcol);
+		    i__4 = jcol + jcol * a_dim1;
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 /* L80: */
 		}
@@ -722,19 +719,19 @@ L70:
 
 		ka = 0;
 		kb = 0;
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &c__0, &c__0, "N", &a[a_offset], lda, &work[
 			1], &iinfo);
 
 	    } else if (itype == 5) {
 
-/*              Hermitian, eigenvalues specified   
+/*              Hermitian, eigenvalues specified */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 0, i__4 = n - 1;
 		ka = max(i__3,i__4);
 		kb = ka;
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &n, &n, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -752,9 +749,9 @@ L70:
 
 	    } else if (itype == 8) {
 
-/*              Hermitian, random eigenvalues   
+/*              Hermitian, random eigenvalues */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 0, i__4 = n - 1;
 		ka = max(i__3,i__4);
 		kb = ka;
@@ -766,33 +763,33 @@ L70:
 
 	    } else if (itype == 9) {
 
-/*              Hermitian banded, eigenvalues specified   
+/*              Hermitian banded, eigenvalues specified */
 
-                The following values are used for the half-bandwidths:   
+/*              The following values are used for the half-bandwidths: */
 
-                  ka = 1   kb = 1   
-                  ka = 2   kb = 1   
-                  ka = 2   kb = 2   
-                  ka = 3   kb = 1   
-                  ka = 3   kb = 2   
-                  ka = 3   kb = 3 */
+/*                ka = 1   kb = 1 */
+/*                ka = 2   kb = 1 */
+/*                ka = 2   kb = 2 */
+/*                ka = 3   kb = 1 */
+/*                ka = 3   kb = 2 */
+/*                ka = 3   kb = 3 */
 
 		++kb9;
 		if (kb9 > ka9) {
 		    ++ka9;
 		    kb9 = 1;
 		}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 		i__5 = n - 1;
 		i__3 = 0, i__4 = min(i__5,ka9);
 		ka = max(i__3,i__4);
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 		i__5 = n - 1;
 		i__3 = 0, i__4 = min(i__5,kb9);
 		kb = max(i__3,i__4);
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &ka, &ka, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -830,13 +827,13 @@ L90:
 		}
 	    }
 
-/*           3) Call ZHEGV, ZHPGV, ZHBGV, CHEGVD, CHPGVD, CHBGVD,   
-                ZHEGVX, ZHPGVX and ZHBGVX, do tests.   
+/*           3) Call ZHEGV, ZHPGV, ZHBGV, CHEGVD, CHPGVD, CHBGVD, */
+/*              ZHEGVX, ZHPGVX and ZHBGVX, do tests. */
 
-             loop over the three generalized problems   
-                   IBTYPE = 1: A*x = (lambda)*B*x   
-                   IBTYPE = 2: A*B*x = (lambda)*x   
-                   IBTYPE = 3: B*A*x = (lambda)*x */
+/*           loop over the three generalized problems */
+/*                 IBTYPE = 1: A*x = (lambda)*B*x */
+/*                 IBTYPE = 2: A*B*x = (lambda)*x */
+/*                 IBTYPE = 3: B*A*x = (lambda)*x */
 
 	    for (ibtype = 1; ibtype <= 3; ++ibtype) {
 
@@ -850,8 +847,8 @@ L90:
 			*(unsigned char *)uplo = 'L';
 		    }
 
-/*                 Generate random well-conditioned positive definite   
-                   matrix B, of bandwidth not greater than that of A. */
+/*                 Generate random well-conditioned positive definite */
+/*                 matrix B, of bandwidth not greater than that of A. */
 
 		    zlatms_(&n, &n, "U", &iseed[1], "P", &rwork[1], &c__5, &
 			    c_b78, &c_b33, &kb, &kb, uplo, &b[b_offset], ldb, 
@@ -956,7 +953,7 @@ L90:
 
 		    zhegvx_(&ibtype, "V", "A", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &rwork[1], &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___49.ciunit = *nounit;
@@ -997,16 +994,16 @@ L90:
 		    zlacpy_(uplo, &n, &n, &b[b_offset], ldb, &bb[bb_offset], 
 			    ldb);
 
-/*                 since we do not know the exact eigenvalues of this   
-                   eigenpair, we just set VL and VU as constants.   
-                   It is quite possible that there are no eigenvalues   
-                   in this interval. */
+/*                 since we do not know the exact eigenvalues of this */
+/*                 eigenpair, we just set VL and VU as constants. */
+/*                 It is quite possible that there are no eigenvalues */
+/*                 in this interval. */
 
 		    vl = 0.;
 		    vu = anorm;
 		    zhegvx_(&ibtype, "V", "V", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &rwork[1], &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___50.ciunit = *nounit;
@@ -1049,7 +1046,7 @@ L90:
 
 		    zhegvx_(&ibtype, "V", "I", uplo, &n, &ab[ab_offset], lda, 
 			    &bb[bb_offset], ldb, &vl, &vu, &il, &iu, &abstol, 
-			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork,
+			    &m, &d__[1], &z__[z_offset], ldz, &work[1], nwork, 
 			     &rwork[1], &iwork[n + 1], &iwork[1], &iinfo);
 		    if (iinfo != 0) {
 			io___51.ciunit = *nounit;
@@ -1098,11 +1095,11 @@ L100:
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1117,11 +1114,11 @@ L100:
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1178,11 +1175,11 @@ L100:
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1197,11 +1194,11 @@ L100:
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1259,11 +1256,11 @@ L100:
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1278,11 +1275,11 @@ L100:
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1295,7 +1292,7 @@ L100:
 		    zhpgvx_(&ibtype, "V", "A", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &rwork[1], &iwork[n + 1]
-			    , &iwork[1], info);
+, &iwork[1], info);
 		    if (iinfo != 0) {
 			io___55.ciunit = *nounit;
 			s_wsfe(&io___55);
@@ -1339,11 +1336,11 @@ L100:
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1358,11 +1355,11 @@ L100:
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1377,7 +1374,7 @@ L100:
 		    zhpgvx_(&ibtype, "V", "V", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &rwork[1], &iwork[n + 1]
-			    , &iwork[1], info);
+, &iwork[1], info);
 		    if (iinfo != 0) {
 			io___56.ciunit = *nounit;
 			s_wsfe(&io___56);
@@ -1421,11 +1418,11 @@ L100:
 			    i__4 = j;
 			    for (i__ = 1; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1440,11 +1437,11 @@ L100:
 			    i__4 = n;
 			    for (i__ = j; i__ <= i__4; ++i__) {
 				i__5 = ij;
-				i__7 = a_subscr(i__, j);
+				i__7 = i__ + j * a_dim1;
 				ap[i__5].r = a[i__7].r, ap[i__5].i = a[i__7]
 					.i;
 				i__5 = ij;
-				i__7 = b_subscr(i__, j);
+				i__7 = i__ + j * b_dim1;
 				bp[i__5].r = b[i__7].r, bp[i__5].i = b[i__7]
 					.i;
 				++ij;
@@ -1457,7 +1454,7 @@ L100:
 		    zhpgvx_(&ibtype, "V", "I", uplo, &n, &ap[1], &bp[1], &vl, 
 			    &vu, &il, &iu, &abstol, &m, &d__[1], &z__[
 			    z_offset], ldz, &work[1], &rwork[1], &iwork[n + 1]
-			    , &iwork[1], info);
+, &iwork[1], info);
 		    if (iinfo != 0) {
 			io___57.ciunit = *nounit;
 			s_wsfe(&io___57);
@@ -1508,8 +1505,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    i__4 = ab_subscr(ka + 1 + i__ - j, j);
-				    i__5 = a_subscr(i__, j);
+				    i__4 = ka + 1 + i__ - j + j * ab_dim1;
+				    i__5 = i__ + j * a_dim1;
 				    ab[i__4].r = a[i__5].r, ab[i__4].i = a[
 					    i__5].i;
 /* L320: */
@@ -1519,8 +1516,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    i__7 = bb_subscr(kb + 1 + i__ - j, j);
-				    i__4 = b_subscr(i__, j);
+				    i__7 = kb + 1 + i__ - j + j * bb_dim1;
+				    i__4 = i__ + j * b_dim1;
 				    bb[i__7].r = b[i__4].r, bb[i__7].i = b[
 					    i__4].i;
 /* L330: */
@@ -1534,8 +1531,8 @@ L310:
 				i__7 = n, i__4 = j + ka;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    i__7 = ab_subscr(i__ + 1 - j, j);
-				    i__4 = a_subscr(i__, j);
+				    i__7 = i__ + 1 - j + j * ab_dim1;
+				    i__4 = i__ + j * a_dim1;
 				    ab[i__7].r = a[i__4].r, ab[i__7].i = a[
 					    i__4].i;
 /* L350: */
@@ -1544,8 +1541,8 @@ L310:
 				i__7 = n, i__4 = j + kb;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    i__7 = bb_subscr(i__ + 1 - j, j);
-				    i__4 = b_subscr(i__, j);
+				    i__7 = i__ + 1 - j + j * bb_dim1;
+				    i__4 = i__ + j * b_dim1;
 				    bb[i__7].r = b[i__4].r, bb[i__7].i = b[
 					    i__4].i;
 /* L360: */
@@ -1604,8 +1601,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    i__5 = ab_subscr(ka + 1 + i__ - j, j);
-				    i__7 = a_subscr(i__, j);
+				    i__5 = ka + 1 + i__ - j + j * ab_dim1;
+				    i__7 = i__ + j * a_dim1;
 				    ab[i__5].r = a[i__7].r, ab[i__5].i = a[
 					    i__7].i;
 /* L380: */
@@ -1615,8 +1612,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    i__4 = bb_subscr(kb + 1 + i__ - j, j);
-				    i__5 = b_subscr(i__, j);
+				    i__4 = kb + 1 + i__ - j + j * bb_dim1;
+				    i__5 = i__ + j * b_dim1;
 				    bb[i__4].r = b[i__5].r, bb[i__4].i = b[
 					    i__5].i;
 /* L390: */
@@ -1630,8 +1627,8 @@ L310:
 				i__4 = n, i__5 = j + ka;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    i__4 = ab_subscr(i__ + 1 - j, j);
-				    i__5 = a_subscr(i__, j);
+				    i__4 = i__ + 1 - j + j * ab_dim1;
+				    i__5 = i__ + j * a_dim1;
 				    ab[i__4].r = a[i__5].r, ab[i__4].i = a[
 					    i__5].i;
 /* L410: */
@@ -1640,8 +1637,8 @@ L310:
 				i__4 = n, i__5 = j + kb;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    i__4 = bb_subscr(i__ + 1 - j, j);
-				    i__5 = b_subscr(i__, j);
+				    i__4 = i__ + 1 - j + j * bb_dim1;
+				    i__5 = i__ + j * b_dim1;
 				    bb[i__4].r = b[i__5].r, bb[i__4].i = b[
 					    i__5].i;
 /* L420: */
@@ -1701,8 +1698,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    i__7 = ab_subscr(ka + 1 + i__ - j, j);
-				    i__4 = a_subscr(i__, j);
+				    i__7 = ka + 1 + i__ - j + j * ab_dim1;
+				    i__4 = i__ + j * a_dim1;
 				    ab[i__7].r = a[i__4].r, ab[i__7].i = a[
 					    i__4].i;
 /* L440: */
@@ -1712,8 +1709,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    i__5 = bb_subscr(kb + 1 + i__ - j, j);
-				    i__7 = b_subscr(i__, j);
+				    i__5 = kb + 1 + i__ - j + j * bb_dim1;
+				    i__7 = i__ + j * b_dim1;
 				    bb[i__5].r = b[i__7].r, bb[i__5].i = b[
 					    i__7].i;
 /* L450: */
@@ -1727,8 +1724,8 @@ L310:
 				i__5 = n, i__7 = j + ka;
 				i__4 = min(i__5,i__7);
 				for (i__ = j; i__ <= i__4; ++i__) {
-				    i__5 = ab_subscr(i__ + 1 - j, j);
-				    i__7 = a_subscr(i__, j);
+				    i__5 = i__ + 1 - j + j * ab_dim1;
+				    i__7 = i__ + j * a_dim1;
 				    ab[i__5].r = a[i__7].r, ab[i__5].i = a[
 					    i__7].i;
 /* L470: */
@@ -1737,8 +1734,8 @@ L310:
 				i__5 = n, i__7 = j + kb;
 				i__4 = min(i__5,i__7);
 				for (i__ = j; i__ <= i__4; ++i__) {
-				    i__5 = bb_subscr(i__ + 1 - j, j);
-				    i__7 = b_subscr(i__, j);
+				    i__5 = i__ + 1 - j + j * bb_dim1;
+				    i__7 = i__ + j * b_dim1;
 				    bb[i__5].r = b[i__7].r, bb[i__5].i = b[
 					    i__7].i;
 /* L480: */
@@ -1798,8 +1795,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    i__4 = ab_subscr(ka + 1 + i__ - j, j);
-				    i__5 = a_subscr(i__, j);
+				    i__4 = ka + 1 + i__ - j + j * ab_dim1;
+				    i__5 = i__ + j * a_dim1;
 				    ab[i__4].r = a[i__5].r, ab[i__4].i = a[
 					    i__5].i;
 /* L500: */
@@ -1809,8 +1806,8 @@ L310:
 				i__5 = j;
 				for (i__ = max(i__7,i__4); i__ <= i__5; ++i__)
 					 {
-				    i__7 = bb_subscr(kb + 1 + i__ - j, j);
-				    i__4 = b_subscr(i__, j);
+				    i__7 = kb + 1 + i__ - j + j * bb_dim1;
+				    i__4 = i__ + j * b_dim1;
 				    bb[i__7].r = b[i__4].r, bb[i__7].i = b[
 					    i__4].i;
 /* L510: */
@@ -1824,8 +1821,8 @@ L310:
 				i__7 = n, i__4 = j + ka;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    i__7 = ab_subscr(i__ + 1 - j, j);
-				    i__4 = a_subscr(i__, j);
+				    i__7 = i__ + 1 - j + j * ab_dim1;
+				    i__4 = i__ + j * a_dim1;
 				    ab[i__7].r = a[i__4].r, ab[i__7].i = a[
 					    i__4].i;
 /* L530: */
@@ -1834,8 +1831,8 @@ L310:
 				i__7 = n, i__4 = j + kb;
 				i__5 = min(i__7,i__4);
 				for (i__ = j; i__ <= i__5; ++i__) {
-				    i__7 = bb_subscr(i__ + 1 - j, j);
-				    i__4 = b_subscr(i__, j);
+				    i__7 = i__ + 1 - j + j * bb_dim1;
+				    i__4 = i__ + j * b_dim1;
 				    bb[i__7].r = b[i__4].r, bb[i__7].i = b[
 					    i__4].i;
 /* L540: */
@@ -1897,8 +1894,8 @@ L310:
 				i__4 = j;
 				for (i__ = max(i__5,i__7); i__ <= i__4; ++i__)
 					 {
-				    i__5 = ab_subscr(ka + 1 + i__ - j, j);
-				    i__7 = a_subscr(i__, j);
+				    i__5 = ka + 1 + i__ - j + j * ab_dim1;
+				    i__7 = i__ + j * a_dim1;
 				    ab[i__5].r = a[i__7].r, ab[i__5].i = a[
 					    i__7].i;
 /* L560: */
@@ -1908,8 +1905,8 @@ L310:
 				i__7 = j;
 				for (i__ = max(i__4,i__5); i__ <= i__7; ++i__)
 					 {
-				    i__4 = bb_subscr(kb + 1 + i__ - j, j);
-				    i__5 = b_subscr(i__, j);
+				    i__4 = kb + 1 + i__ - j + j * bb_dim1;
+				    i__5 = i__ + j * b_dim1;
 				    bb[i__4].r = b[i__5].r, bb[i__4].i = b[
 					    i__5].i;
 /* L570: */
@@ -1923,8 +1920,8 @@ L310:
 				i__4 = n, i__5 = j + ka;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    i__4 = ab_subscr(i__ + 1 - j, j);
-				    i__5 = a_subscr(i__, j);
+				    i__4 = i__ + 1 - j + j * ab_dim1;
+				    i__5 = i__ + j * a_dim1;
 				    ab[i__4].r = a[i__5].r, ab[i__4].i = a[
 					    i__5].i;
 /* L590: */
@@ -1933,8 +1930,8 @@ L310:
 				i__4 = n, i__5 = j + kb;
 				i__7 = min(i__4,i__5);
 				for (i__ = j; i__ <= i__7; ++i__) {
-				    i__4 = bb_subscr(i__ + 1 - j, j);
-				    i__5 = b_subscr(i__, j);
+				    i__4 = i__ + 1 - j + j * bb_dim1;
+				    i__5 = i__ + j * b_dim1;
 				    bb[i__4].r = b[i__5].r, bb[i__4].i = b[
 					    i__5].i;
 /* L600: */
@@ -1993,7 +1990,7 @@ L620:
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
 	    ntestt += ntest;
-	    dlafts_("ZSG", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
+	    dlafts_("ZSG", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh, 
 		     nounit, &nerrs);
 L640:
 	    ;
@@ -2011,14 +2008,3 @@ L640:
 /*     End of ZDRVSG */
 
 } /* zdrvsg_ */
-
-#undef bb_ref
-#undef bb_subscr
-#undef ab_ref
-#undef ab_subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

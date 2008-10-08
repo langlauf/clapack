@@ -1,104 +1,118 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static complex c_b1 = {1.f,0.f};
+static integer c__1 = 1;
 
 /* Subroutine */ int chpgst_(integer *itype, char *uplo, integer *n, complex *
 	ap, complex *bp, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CHPGST reduces a complex Hermitian-definite generalized   
-    eigenproblem to standard form, using packed storage.   
-
-    If ITYPE = 1, the problem is A*x = lambda*B*x,   
-    and A is overwritten by inv(U**H)*A*inv(U) or inv(L)*A*inv(L**H)   
-
-    If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or   
-    B*A*x = lambda*x, and A is overwritten by U*A*U**H or L**H*A*L.   
-
-    B must have been previously factorized as U**H*U or L*L**H by CPPTRF.   
-
-    Arguments   
-    =========   
-
-    ITYPE   (input) INTEGER   
-            = 1: compute inv(U**H)*A*inv(U) or inv(L)*A*inv(L**H);   
-            = 2 or 3: compute U*A*U**H or L**H*A*L.   
-
-    UPLO    (input) CHARACTER   
-            = 'U':  Upper triangle of A is stored and B is factored as   
-                    U**H*U;   
-            = 'L':  Lower triangle of A is stored and B is factored as   
-                    L*L**H.   
-
-    N       (input) INTEGER   
-            The order of the matrices A and B.  N >= 0.   
-
-    AP      (input/output) COMPLEX array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix   
-            A, packed columnwise in a linear array.  The j-th column of A   
-            is stored in the array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-
-            On exit, if INFO = 0, the transformed matrix, stored in the   
-            same format as A.   
-
-    BP      (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The triangular factor from the Cholesky factorization of B,   
-            stored in the same format as A, as returned by CPPTRF.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static complex c_b1 = {1.f,0.f};
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     real r__1, r__2;
     complex q__1, q__2, q__3;
+
     /* Local variables */
+    integer j, k, j1, k1, jj, kk;
+    complex ct;
+    real ajj;
+    integer j1j1;
+    real akk;
+    integer k1k1;
+    real bjj, bkk;
     extern /* Subroutine */ int chpr2_(char *, integer *, complex *, complex *
-	    , integer *, complex *, integer *, complex *);
-    static integer j, k;
+, integer *, complex *, integer *, complex *);
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int chpmv_(char *, integer *, complex *, complex *
-	    , complex *, integer *, complex *, complex *, integer *), 
+, complex *, integer *, complex *, complex *, integer *), 
 	    caxpy_(integer *, complex *, complex *, integer *, complex *, 
 	    integer *), ctpmv_(char *, char *, char *, integer *, complex *, 
 	    complex *, integer *);
-    static logical upper;
-    static integer j1, k1;
+    logical upper;
     extern /* Subroutine */ int ctpsv_(char *, char *, char *, integer *, 
-	    complex *, complex *, integer *);
-    static integer jj, kk;
-    static complex ct;
-    extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
-	    *), xerbla_(char *, integer *);
-    static real ajj;
-    static integer j1j1;
-    static real akk;
-    static integer k1k1;
-    static real bjj, bkk;
+	    complex *, complex *, integer *), csscal_(
+	    integer *, real *, complex *, integer *), xerbla_(char *, integer 
+	    *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CHPGST reduces a complex Hermitian-definite generalized */
+/*  eigenproblem to standard form, using packed storage. */
+
+/*  If ITYPE = 1, the problem is A*x = lambda*B*x, */
+/*  and A is overwritten by inv(U**H)*A*inv(U) or inv(L)*A*inv(L**H) */
+
+/*  If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or */
+/*  B*A*x = lambda*x, and A is overwritten by U*A*U**H or L**H*A*L. */
+
+/*  B must have been previously factorized as U**H*U or L*L**H by CPPTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  ITYPE   (input) INTEGER */
+/*          = 1: compute inv(U**H)*A*inv(U) or inv(L)*A*inv(L**H); */
+/*          = 2 or 3: compute U*A*U**H or L**H*A*L. */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored and B is factored as */
+/*                  U**H*U; */
+/*          = 'L':  Lower triangle of A is stored and B is factored as */
+/*                  L*L**H. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrices A and B.  N >= 0. */
+
+/*  AP      (input/output) COMPLEX array, dimension (N*(N+1)/2) */
+/*          On entry, the upper or lower triangle of the Hermitian matrix */
+/*          A, packed columnwise in a linear array.  The j-th column of A */
+/*          is stored in the array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n. */
+
+/*          On exit, if INFO = 0, the transformed matrix, stored in the */
+/*          same format as A. */
+
+/*  BP      (input) COMPLEX array, dimension (N*(N+1)/2) */
+/*          The triangular factor from the Cholesky factorization of B, */
+/*          stored in the same format as A, as returned by CPPTRF. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --bp;
     --ap;
 
@@ -121,9 +135,9 @@
     if (*itype == 1) {
 	if (upper) {
 
-/*           Compute inv(U')*A*inv(U)   
+/*           Compute inv(U')*A*inv(U) */
 
-             J1 and JJ are the indices of A(1,j) and A(j,j) */
+/*           J1 and JJ are the indices of A(1,j) and A(j,j) */
 
 	    jj = 0;
 	    i__1 = *n;
@@ -142,7 +156,7 @@
 		ctpsv_(uplo, "Conjugate transpose", "Non-unit", &j, &bp[1], &
 			ap[j1], &c__1);
 		i__2 = j - 1;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__2, &q__1, &ap[1], &bp[j1], &c__1, &c_b1, &ap[
 			j1], &c__1);
 		i__2 = j - 1;
@@ -159,9 +173,9 @@
 	    }
 	} else {
 
-/*           Compute inv(L)*A*inv(L')   
+/*           Compute inv(L)*A*inv(L') */
 
-             KK and K1K1 are the indices of A(k,k) and A(k+1,k+1) */
+/*           KK and K1K1 are the indices of A(k,k) and A(k+1,k+1) */
 
 	    kk = 1;
 	    i__1 = *n;
@@ -189,14 +203,14 @@
 		    caxpy_(&i__2, &ct, &bp[kk + 1], &c__1, &ap[kk + 1], &c__1)
 			    ;
 		    i__2 = *n - k;
-		    q__1.r = -1.f, q__1.i = 0.f;
+		    q__1.r = -1.f, q__1.i = -0.f;
 		    chpr2_(uplo, &i__2, &q__1, &ap[kk + 1], &c__1, &bp[kk + 1]
-			    , &c__1, &ap[k1k1]);
+, &c__1, &ap[k1k1]);
 		    i__2 = *n - k;
 		    caxpy_(&i__2, &ct, &bp[kk + 1], &c__1, &ap[kk + 1], &c__1)
 			    ;
 		    i__2 = *n - k;
-		    ctpsv_(uplo, "No transpose", "Non-unit", &i__2, &bp[k1k1],
+		    ctpsv_(uplo, "No transpose", "Non-unit", &i__2, &bp[k1k1], 
 			     &ap[kk + 1], &c__1);
 		}
 		kk = k1k1;
@@ -206,9 +220,9 @@
     } else {
 	if (upper) {
 
-/*           Compute U*A*U'   
+/*           Compute U*A*U' */
 
-             K1 and KK are the indices of A(1,k) and A(k,k) */
+/*           K1 and KK are the indices of A(1,k) and A(k,k) */
 
 	    kk = 0;
 	    i__1 = *n;
@@ -245,9 +259,9 @@
 	    }
 	} else {
 
-/*           Compute L'*A*L   
+/*           Compute L'*A*L */
 
-             JJ and J1J1 are the indices of A(j,j) and A(j+1,j+1) */
+/*           JJ and J1J1 are the indices of A(j,j) and A(j+1,j+1) */
 
 	    jj = 1;
 	    i__1 = *n;
@@ -273,7 +287,7 @@
 			c_b1, &ap[jj + 1], &c__1);
 		i__2 = *n - j + 1;
 		ctpmv_(uplo, "Conjugate transpose", "Non-unit", &i__2, &bp[jj]
-			, &ap[jj], &c__1);
+, &ap[jj], &c__1);
 		jj = j1j1;
 /* L40: */
 	    }
@@ -284,4 +298,3 @@
 /*     End of CHPGST */
 
 } /* chpgst_ */
-

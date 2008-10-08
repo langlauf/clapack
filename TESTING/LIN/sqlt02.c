@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -29,16 +24,17 @@ static real c_b16 = 1.f;
     integer a_dim1, a_offset, af_dim1, af_offset, l_dim1, l_offset, q_dim1, 
 	    q_offset, i__1, i__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real resid;
+    real eps;
+    integer info;
+    real resid;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
@@ -47,98 +43,109 @@ static real c_b16 = 1.f;
 	    integer *, real *, integer *), slaset_(char *, integer *, 
 	    integer *, real *, real *, real *, integer *), sorgql_(
 	    integer *, integer *, integer *, real *, integer *, real *, real *
-	    , integer *, integer *);
+, integer *, integer *);
     extern doublereal slansy_(char *, char *, integer *, real *, integer *, 
 	    real *);
-    static real eps;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define l_ref(a_1,a_2) l[(a_2)*l_dim1 + a_1]
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SQLT02 tests SORGQL, which generates an m-by-n matrix Q with */
+/*  orthonornmal columns that is defined as the product of k elementary */
+/*  reflectors. */
 
-    Purpose   
-    =======   
+/*  Given the QL factorization of an m-by-n matrix A, SQLT02 generates */
+/*  the orthogonal matrix Q defined by the factorization of the last k */
+/*  columns of A; it compares L(m-n+1:m,n-k+1:n) with */
+/*  Q(1:m,m-n+1:m)'*A(1:m,n-k+1:n), and checks that the columns of Q are */
+/*  orthonormal. */
 
-    SQLT02 tests SORGQL, which generates an m-by-n matrix Q with   
-    orthonornmal columns that is defined as the product of k elementary   
-    reflectors.   
+/*  Arguments */
+/*  ========= */
 
-    Given the QL factorization of an m-by-n matrix A, SQLT02 generates   
-    the orthogonal matrix Q defined by the factorization of the last k   
-    columns of A; it compares L(m-n+1:m,n-k+1:n) with   
-    Q(1:m,m-n+1:m)'*A(1:m,n-k+1:n), and checks that the columns of Q are   
-    orthonormal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix Q to be generated.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix Q to be generated. */
+/*          M >= N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix Q to be generated.  M >= 0.   
+/*  K       (input) INTEGER */
+/*          The number of elementary reflectors whose product defines the */
+/*          matrix Q. N >= K >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix Q to be generated.   
-            M >= N >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The m-by-n matrix A which was factorized by SQLT01. */
 
-    K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the   
-            matrix Q. N >= K >= 0.   
+/*  AF      (input) REAL array, dimension (LDA,N) */
+/*          Details of the QL factorization of A, as returned by SGEQLF. */
+/*          See SGEQLF for further details. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The m-by-n matrix A which was factorized by SQLT01.   
+/*  Q       (workspace) REAL array, dimension (LDA,N) */
 
-    AF      (input) REAL array, dimension (LDA,N)   
-            Details of the QL factorization of A, as returned by SGEQLF.   
-            See SGEQLF for further details.   
+/*  L       (workspace) REAL array, dimension (LDA,N) */
 
-    Q       (workspace) REAL array, dimension (LDA,N)   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and L. LDA >= M. */
 
-    L       (workspace) REAL array, dimension (LDA,N)   
+/*  TAU     (input) REAL array, dimension (N) */
+/*          The scalar factors of the elementary reflectors corresponding */
+/*          to the QL factorization in AF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and L. LDA >= M.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    TAU     (input) REAL array, dimension (N)   
-            The scalar factors of the elementary reflectors corresponding   
-            to the QL factorization in AF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( M * EPS ) */
 
-    RWORK   (workspace) REAL array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = 1 + l_dim1 * 1;
+    l_offset = 1 + l_dim1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -159,14 +166,14 @@ static real c_b16 = 1.f;
     slaset_("Full", m, n, &c_b4, &c_b4, &q[q_offset], lda);
     if (*k < *m) {
 	i__1 = *m - *k;
-	slacpy_("Full", &i__1, k, &af_ref(1, *n - *k + 1), lda, &q_ref(1, *n 
-		- *k + 1), lda);
+	slacpy_("Full", &i__1, k, &af[(*n - *k + 1) * af_dim1 + 1], lda, &q[(*
+		n - *k + 1) * q_dim1 + 1], lda);
     }
     if (*k > 1) {
 	i__1 = *k - 1;
 	i__2 = *k - 1;
-	slacpy_("Upper", &i__1, &i__2, &af_ref(*m - *k + 1, *n - *k + 2), lda,
-		 &q_ref(*m - *k + 1, *n - *k + 2), lda);
+	slacpy_("Upper", &i__1, &i__2, &af[*m - *k + 1 + (*n - *k + 2) * 
+		af_dim1], lda, &q[*m - *k + 1 + (*n - *k + 2) * q_dim1], lda);
     }
 
 /*     Generate the last n columns of the matrix Q */
@@ -177,22 +184,22 @@ static real c_b16 = 1.f;
 
 /*     Copy L(m-n+1:m,n-k+1:n) */
 
-    slaset_("Full", n, k, &c_b10, &c_b10, &l_ref(*m - *n + 1, *n - *k + 1), 
-	    lda);
-    slacpy_("Lower", k, k, &af_ref(*m - *k + 1, *n - *k + 1), lda, &l_ref(*m 
-	    - *k + 1, *n - *k + 1), lda);
+    slaset_("Full", n, k, &c_b10, &c_b10, &l[*m - *n + 1 + (*n - *k + 1) * 
+	    l_dim1], lda);
+    slacpy_("Lower", k, k, &af[*m - *k + 1 + (*n - *k + 1) * af_dim1], lda, &
+	    l[*m - *k + 1 + (*n - *k + 1) * l_dim1], lda);
 
 /*     Compute L(m-n+1:m,n-k+1:n) - Q(1:m,m-n+1:m)' * A(1:m,n-k+1:n) */
 
     sgemm_("Transpose", "No transpose", n, k, m, &c_b15, &q[q_offset], lda, &
-	    a_ref(1, *n - *k + 1), lda, &c_b16, &l_ref(*m - *n + 1, *n - *k + 
-	    1), lda);
+	    a[(*n - *k + 1) * a_dim1 + 1], lda, &c_b16, &l[*m - *n + 1 + (*n 
+	    - *k + 1) * l_dim1], lda);
 
 /*     Compute norm( L - Q'*A ) / ( M * norm(A) * EPS ) . */
 
-    anorm = slange_("1", m, k, &a_ref(1, *n - *k + 1), lda, &rwork[1]);
-    resid = slange_("1", n, k, &l_ref(*m - *n + 1, *n - *k + 1), lda, &rwork[
-	    1]);
+    anorm = slange_("1", m, k, &a[(*n - *k + 1) * a_dim1 + 1], lda, &rwork[1]);
+    resid = slange_("1", n, k, &l[*m - *n + 1 + (*n - *k + 1) * l_dim1], lda, 
+	    &rwork[1]);
     if (anorm > 0.f) {
 	result[1] = resid / (real) max(1,*m) / anorm / eps;
     } else {
@@ -216,10 +223,3 @@ static real c_b16 = 1.f;
 /*     End of SQLT02 */
 
 } /* sqlt02_ */
-
-#undef af_ref
-#undef q_ref
-#undef l_ref
-#undef a_ref
-
-

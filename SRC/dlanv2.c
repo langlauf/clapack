@@ -1,77 +1,88 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static doublereal c_b4 = 1.;
 
 /* Subroutine */ int dlanv2_(doublereal *a, doublereal *b, doublereal *c__, 
-	doublereal *d__, doublereal *rt1r, doublereal *rt1i, doublereal *rt2r,
+	doublereal *d__, doublereal *rt1r, doublereal *rt1i, doublereal *rt2r, 
 	 doublereal *rt2i, doublereal *cs, doublereal *sn)
 {
-/*  -- LAPACK driver routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric   
-    matrix in standard form:   
-
-         [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ]   
-         [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ]   
-
-    where either   
-    1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or   
-    2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex   
-    conjugate eigenvalues.   
-
-    Arguments   
-    =========   
-
-    A       (input/output) DOUBLE PRECISION   
-    B       (input/output) DOUBLE PRECISION   
-    C       (input/output) DOUBLE PRECISION   
-    D       (input/output) DOUBLE PRECISION   
-            On entry, the elements of the input matrix.   
-            On exit, they are overwritten by the elements of the   
-            standardised Schur form.   
-
-    RT1R    (output) DOUBLE PRECISION   
-    RT1I    (output) DOUBLE PRECISION   
-    RT2R    (output) DOUBLE PRECISION   
-    RT2I    (output) DOUBLE PRECISION   
-            The real and imaginary parts of the eigenvalues. If the   
-            eigenvalues are a complex conjugate pair, RT1I > 0.   
-
-    CS      (output) DOUBLE PRECISION   
-    SN      (output) DOUBLE PRECISION   
-            Parameters of the rotation matrix.   
-
-    Further Details   
-    ===============   
-
-    Modified by V. Sima, Research Institute for Informatics, Bucharest,   
-    Romania, to reduce the risk of cancellation errors,   
-    when computing real eigenvalues, and to ensure, if possible, that   
-    abs(RT1R) >= abs(RT2R).   
-
-    ===================================================================== */
-    /* Table of constant values */
-    static doublereal c_b4 = 1.;
-    
     /* System generated locals */
     doublereal d__1, d__2;
+
     /* Builtin functions */
     double d_sign(doublereal *, doublereal *), sqrt(doublereal);
+
     /* Local variables */
-    static doublereal temp, p, scale, bcmax, z__, bcmis, sigma;
-    extern doublereal dlapy2_(doublereal *, doublereal *);
-    static doublereal aa, bb, cc, dd;
-    extern doublereal dlamch_(char *);
-    static doublereal cs1, sn1, sab, sac, eps, tau;
+    doublereal p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, temp, 
+	    scale, bcmax, bcmis, sigma;
+    extern doublereal dlapy2_(doublereal *, doublereal *), dlamch_(char *);
 
 
+/*  -- LAPACK driver routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric */
+/*  matrix in standard form: */
+
+/*       [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ] */
+/*       [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ] */
+
+/*  where either */
+/*  1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or */
+/*  2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex */
+/*  conjugate eigenvalues. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  A       (input/output) DOUBLE PRECISION */
+/*  B       (input/output) DOUBLE PRECISION */
+/*  C       (input/output) DOUBLE PRECISION */
+/*  D       (input/output) DOUBLE PRECISION */
+/*          On entry, the elements of the input matrix. */
+/*          On exit, they are overwritten by the elements of the */
+/*          standardised Schur form. */
+
+/*  RT1R    (output) DOUBLE PRECISION */
+/*  RT1I    (output) DOUBLE PRECISION */
+/*  RT2R    (output) DOUBLE PRECISION */
+/*  RT2I    (output) DOUBLE PRECISION */
+/*          The real and imaginary parts of the eigenvalues. If the */
+/*          eigenvalues are a complex conjugate pair, RT1I > 0. */
+
+/*  CS      (output) DOUBLE PRECISION */
+/*  SN      (output) DOUBLE PRECISION */
+/*          Parameters of the rotation matrix. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Modified by V. Sima, Research Institute for Informatics, Bucharest, */
+/*  Romania, to reduce the risk of cancellation errors, */
+/*  when computing real eigenvalues, and to ensure, if possible, that */
+/*  abs(RT1R) >= abs(RT2R). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     eps = dlamch_("P");
     if (*c__ == 0.) {
@@ -110,8 +121,8 @@
 	scale = max(d__1,bcmax);
 	z__ = p / scale * p + bcmax / scale * bcmis;
 
-/*        If Z is of the order of the machine accuracy, postpone the   
-          decision on the nature of eigenvalues */
+/*        If Z is of the order of the machine accuracy, postpone the */
+/*        decision on the nature of eigenvalues */
 
 	if (z__ >= eps * 4.) {
 
@@ -131,24 +142,24 @@
 	    *c__ = 0.;
 	} else {
 
-/*           Complex eigenvalues, or real (almost) equal eigenvalues.   
-             Make diagonal elements equal. */
+/*           Complex eigenvalues, or real (almost) equal eigenvalues. */
+/*           Make diagonal elements equal. */
 
 	    sigma = *b + *c__;
 	    tau = dlapy2_(&sigma, &temp);
 	    *cs = sqrt((abs(sigma) / tau + 1.) * .5);
 	    *sn = -(p / (tau * *cs)) * d_sign(&c_b4, &sigma);
 
-/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ]   
-                     [ CC  DD ]   [ C  D ] [ SN  CS ] */
+/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ] */
+/*                   [ CC  DD ]   [ C  D ] [ SN  CS ] */
 
 	    aa = *a * *cs + *b * *sn;
 	    bb = -(*a) * *sn + *b * *cs;
 	    cc = *c__ * *cs + *d__ * *sn;
 	    dd = -(*c__) * *sn + *d__ * *cs;
 
-/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ]   
-                     [ C  D ]   [-SN  CS ] [ CC  DD ] */
+/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ] */
+/*                   [ C  D ]   [-SN  CS ] [ CC  DD ] */
 
 	    *a = aa * *cs + cc * *sn;
 	    *b = bb * *cs + dd * *sn;
@@ -210,4 +221,3 @@ L10:
 /*     End of DLANV2 */
 
 } /* dlanv2_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -22,7 +17,7 @@ static integer c__9 = 9;
 static integer c__5 = 5;
 static real c_b43 = 1.f;
 
-/* Main program */ MAIN__(void)
+/* Main program */ int MAIN__(void)
 {
     /* Initialized data */
 
@@ -39,28 +34,35 @@ static real c_b43 = 1.f;
     /* Subroutine */ int s_stop(char *, ftnlen);
 
     /* Local variables */
-    extern /* Subroutine */ int check1_(real *), check2_(real *);
-    static integer ic;
-    extern /* Subroutine */ int header_(void);
+    integer ic;
+    extern /* Subroutine */ int check1_(real *), check2_(real *), header_(
+	    void);
 
     /* Fortran I/O blocks */
     static cilist io___2 = { 0, 6, 0, fmt_99999, 0 };
     static cilist io___4 = { 0, 6, 0, fmt_99998, 0 };
 
 
-/*     Test program for the COMPLEX    Level 1 BLAS.   
-       Based upon the original BLAS test routine together with:   
-       F06GAF Example Program Text */
+/*     Test program for the COMPLEX    Level 1 BLAS. */
+/*     Based upon the original BLAS test routine together with: */
+/*     F06GAF Example Program Text */
+/*     .. Parameters .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. External Subroutines .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
     s_wsfe(&io___2);
     e_wsfe();
     for (ic = 1; ic <= 10; ++ic) {
 	combla_1.icase = ic;
 	header_();
 
-/*        Initialize PASS, INCX, INCY, and MODE for a new case.   
-          The value 9999 for INCX, INCY or MODE will appear in the   
-          detailed  output, if any, for cases that do not involve   
-          these parameters. */
+/*        Initialize PASS, INCX, INCY, and MODE for a new case. */
+/*        The value 9999 for INCX, INCY or MODE will appear in the */
+/*        detailed  output, if any, for cases that do not involve */
+/*        these parameters. */
 
 	combla_1.pass = TRUE_;
 	combla_1.incx = 9999;
@@ -81,9 +83,9 @@ static real c_b43 = 1.f;
     s_stop("", (ftnlen)0);
 
     return 0;
-} /* MAIN__   
+} /* MAIN__ */
 
-   Subroutine */ int header_(void)
+/* Subroutine */ int header_(void)
 {
     /* Initialized data */
 
@@ -101,55 +103,55 @@ static real c_b43 = 1.f;
     static cilist io___6 = { 0, 6, 0, fmt_99999, 0 };
 
 
-
-#define l_ref(a_0,a_1) &l[(a_1)*6 + a_0 - 6]
-
+/*     .. Parameters .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Arrays .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
     s_wsfe(&io___6);
     do_fio(&c__1, (char *)&combla_1.icase, (ftnlen)sizeof(integer));
-    do_fio(&c__1, l_ref(0, combla_1.icase), (ftnlen)6);
+    do_fio(&c__1, l + (0 + (0 + (combla_1.icase - 1) * 6)), (ftnlen)6);
     e_wsfe();
     return 0;
 
 } /* header_ */
 
-#undef l_ref
-
-
 /* Subroutine */ int check1_(real *sfac)
 {
     /* Initialized data */
 
-    static real strue2[5] = { 0.f,.5f,.6f,.7f,.7f };
-    static real strue4[5] = { 0.f,.7f,1.f,1.3f,1.7f };
+    static real strue2[5] = { 0.f,.5f,.6f,.7f,.8f };
+    static real strue4[5] = { 0.f,.7f,1.f,1.3f,1.6f };
     static complex ctrue5[80]	/* was [8][5][2] */ = { {.1f,.1f},{1.f,2.f},{
 	    1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{-.16f,
 	    -.37f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f}
 	    ,{3.f,4.f},{-.17f,-.19f},{.13f,-.39f},{5.f,6.f},{5.f,6.f},{5.f,
 	    6.f},{5.f,6.f},{5.f,6.f},{5.f,6.f},{.11f,-.03f},{-.17f,.46f},{
 	    -.17f,-.19f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{
-	    .19f,-.17f},{.32f,.09f},{.23f,-.24f},{.18f,.01f},{2.f,3.f},{2.f,
-	    3.f},{2.f,3.f},{2.f,3.f},{.1f,.1f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{
-	    4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{-.16f,-.37f},{6.f,7.f},{
-	    6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{-.17f,
+	    .19f,-.17f},{.2f,-.35f},{.35f,.2f},{.14f,.08f},{2.f,3.f},{2.f,3.f}
+	    ,{2.f,3.f},{2.f,3.f},{.1f,.1f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,
+	    5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{-.16f,-.37f},{6.f,7.f},{6.f,
+	    7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{-.17f,
 	    -.19f},{8.f,9.f},{.13f,-.39f},{2.f,5.f},{2.f,5.f},{2.f,5.f},{2.f,
 	    5.f},{2.f,5.f},{.11f,-.03f},{3.f,6.f},{-.17f,.46f},{4.f,7.f},{
 	    -.17f,-.19f},{7.f,2.f},{7.f,2.f},{7.f,2.f},{.19f,-.17f},{5.f,8.f},
-	    {.32f,.09f},{6.f,9.f},{.23f,-.24f},{8.f,3.f},{.18f,.01f},{9.f,4.f}
-	     };
+	    {.2f,-.35f},{6.f,9.f},{.35f,.2f},{8.f,3.f},{.14f,.08f},{9.f,4.f} }
+	    ;
     static complex ctrue6[80]	/* was [8][5][2] */ = { {.1f,.1f},{1.f,2.f},{
 	    1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{1.f,2.f},{.09f,
 	    -.12f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f}
 	    ,{3.f,4.f},{.03f,-.09f},{.15f,-.03f},{5.f,6.f},{5.f,6.f},{5.f,6.f}
 	    ,{5.f,6.f},{5.f,6.f},{5.f,6.f},{.03f,.03f},{-.18f,.03f},{.03f,
 	    -.09f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{.09f,
-	    .03f},{.03f,.12f},{.12f,.03f},{.03f,.06f},{2.f,3.f},{2.f,3.f},{
-	    2.f,3.f},{2.f,3.f},{.1f,.1f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,
-	    5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{.09f,-.12f},{6.f,7.f},{6.f,
-	    7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{.03f,
-	    -.09f},{8.f,9.f},{.15f,-.03f},{2.f,5.f},{2.f,5.f},{2.f,5.f},{2.f,
-	    5.f},{2.f,5.f},{.03f,.03f},{3.f,6.f},{-.18f,.03f},{4.f,7.f},{.03f,
-	    -.09f},{7.f,2.f},{7.f,2.f},{7.f,2.f},{.09f,.03f},{5.f,8.f},{.03f,
-	    .12f},{6.f,9.f},{.12f,.03f},{8.f,3.f},{.03f,.06f},{9.f,4.f} };
+	    .03f},{.15f,0.f},{0.f,.15f},{0.f,.06f},{2.f,3.f},{2.f,3.f},{2.f,
+	    3.f},{2.f,3.f},{.1f,.1f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{
+	    4.f,5.f},{4.f,5.f},{4.f,5.f},{.09f,-.12f},{6.f,7.f},{6.f,7.f},{
+	    6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{.03f,-.09f},{
+	    8.f,9.f},{.15f,-.03f},{2.f,5.f},{2.f,5.f},{2.f,5.f},{2.f,5.f},{
+	    2.f,5.f},{.03f,.03f},{3.f,6.f},{-.18f,.03f},{4.f,7.f},{.03f,-.09f}
+	    ,{7.f,2.f},{7.f,2.f},{7.f,2.f},{.09f,.03f},{5.f,8.f},{.15f,0.f},{
+	    6.f,9.f},{0.f,.15f},{8.f,3.f},{0.f,.06f},{9.f,4.f} };
     static integer itrue3[5] = { 0,1,2,2,2 };
     static real sa = .3f;
     static complex ca = {.4f,-.7f};
@@ -158,14 +160,14 @@ static real c_b43 = 1.f;
 	    -.4f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},{3.f,4.f},
 	    {3.f,4.f},{.1f,-.3f},{.5f,-.1f},{5.f,6.f},{5.f,6.f},{5.f,6.f},{
 	    5.f,6.f},{5.f,6.f},{5.f,6.f},{.1f,.1f},{-.6f,.1f},{.1f,-.3f},{7.f,
-	    8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{.3f,.1f},{.1f,.4f},{
-	    .4f,.1f},{.1f,.2f},{2.f,3.f},{2.f,3.f},{2.f,3.f},{2.f,3.f},{.1f,
+	    8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{7.f,8.f},{.3f,.1f},{.5f,0.f},{
+	    0.f,.5f},{0.f,.2f},{2.f,3.f},{2.f,3.f},{2.f,3.f},{2.f,3.f},{.1f,
 	    .1f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{4.f,5.f},{
 	    4.f,5.f},{.3f,-.4f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,7.f},{6.f,
 	    7.f},{6.f,7.f},{6.f,7.f},{.1f,-.3f},{8.f,9.f},{.5f,-.1f},{2.f,5.f}
 	    ,{2.f,5.f},{2.f,5.f},{2.f,5.f},{2.f,5.f},{.1f,.1f},{3.f,6.f},{
 	    -.6f,.1f},{4.f,7.f},{.1f,-.3f},{7.f,2.f},{7.f,2.f},{7.f,2.f},{.3f,
-	    .1f},{5.f,8.f},{.1f,.4f},{6.f,9.f},{.4f,.1f},{8.f,3.f},{.1f,.2f},{
+	    .1f},{5.f,8.f},{.5f,0.f},{6.f,9.f},{0.f,.5f},{8.f,3.f},{0.f,.2f},{
 	    9.f,4.f} };
 
     /* System generated locals */
@@ -179,59 +181,68 @@ static real c_b43 = 1.f;
     /* Subroutine */ int s_stop(char *, ftnlen);
 
     /* Local variables */
-    static integer i__;
+    integer i__;
+    complex cx[8];
+    integer np1, len;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *), ctest_(integer *, complex *, complex *, complex *, 
 	    real *);
-    static complex mwpcs[5], mwpct[5];
+    complex mwpcs[5], mwpct[5];
     extern doublereal scnrm2_(integer *, complex *, integer *);
     extern /* Subroutine */ int itest1_(integer *, integer *), stest1_(real *,
 	     real *, real *, real *);
-    static complex cx[8];
     extern integer icamax_(integer *, complex *, integer *);
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
 	    *);
     extern doublereal scasum_(integer *, complex *, integer *);
-    static integer np1, len;
 
     /* Fortran I/O blocks */
     static cilist io___19 = { 0, 6, 0, 0, 0 };
 
 
-
-#define ctrue5_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
-#define ctrue5_ref(a_1,a_2,a_3) ctrue5[ctrue5_subscr(a_1,a_2,a_3)]
-#define ctrue6_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
-#define ctrue6_ref(a_1,a_2,a_3) ctrue6[ctrue6_subscr(a_1,a_2,a_3)]
-#define cv_subscr(a_1,a_2,a_3) ((a_3)*5 + (a_2))*8 + a_1 - 49
-#define cv_ref(a_1,a_2,a_3) cv[cv_subscr(a_1,a_2,a_3)]
-
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
     for (combla_1.incx = 1; combla_1.incx <= 2; ++combla_1.incx) {
 	for (np1 = 1; np1 <= 5; ++np1) {
 	    combla_1.n = np1 - 1;
 	    len = max(combla_1.n,1) << 1;
+/*           .. Set vector arguments .. */
 	    i__1 = len;
 	    for (i__ = 1; i__ <= i__1; ++i__) {
 		i__2 = i__ - 1;
-		i__3 = cv_subscr(i__, np1, combla_1.incx);
+		i__3 = i__ + (np1 + combla_1.incx * 5 << 3) - 49;
 		cx[i__2].r = cv[i__3].r, cx[i__2].i = cv[i__3].i;
 /* L20: */
 	    }
 	    if (combla_1.icase == 6) {
+/*              .. SCNRM2 .. */
 		r__1 = scnrm2_(&combla_1.n, cx, &combla_1.incx);
 		stest1_(&r__1, &strue2[np1 - 1], &strue2[np1 - 1], sfac);
 	    } else if (combla_1.icase == 7) {
+/*              .. SCASUM .. */
 		r__1 = scasum_(&combla_1.n, cx, &combla_1.incx);
 		stest1_(&r__1, &strue4[np1 - 1], &strue4[np1 - 1], sfac);
 	    } else if (combla_1.icase == 8) {
+/*              .. CSCAL .. */
 		cscal_(&combla_1.n, &ca, cx, &combla_1.incx);
-		ctest_(&len, cx, &ctrue5_ref(1, np1, combla_1.incx), &
-			ctrue5_ref(1, np1, combla_1.incx), sfac);
+		ctest_(&len, cx, &ctrue5[(np1 + combla_1.incx * 5 << 3) - 48],
+			 &ctrue5[(np1 + combla_1.incx * 5 << 3) - 48], sfac);
 	    } else if (combla_1.icase == 9) {
+/*              .. CSSCAL .. */
 		csscal_(&combla_1.n, &sa, cx, &combla_1.incx);
-		ctest_(&len, cx, &ctrue6_ref(1, np1, combla_1.incx), &
-			ctrue6_ref(1, np1, combla_1.incx), sfac);
+		ctest_(&len, cx, &ctrue6[(np1 + combla_1.incx * 5 << 3) - 48],
+			 &ctrue6[(np1 + combla_1.incx * 5 << 3) - 48], sfac);
 	    } else if (combla_1.icase == 10) {
+/*              .. ICAMAX .. */
 		i__1 = icamax_(&combla_1.n, cx, &combla_1.incx);
 		itest1_(&i__1, &itrue3[np1 - 1]);
 	    } else {
@@ -249,8 +260,8 @@ static real c_b43 = 1.f;
 
     combla_1.incx = 1;
     if (combla_1.icase == 8) {
-/*        CSCAL   
-          Add a test for alpha equal to zero. */
+/*        CSCAL */
+/*        Add a test for alpha equal to zero. */
 	ca.r = 0.f, ca.i = 0.f;
 	for (i__ = 1; i__ <= 5; ++i__) {
 	    i__1 = i__ - 1;
@@ -262,8 +273,8 @@ static real c_b43 = 1.f;
 	cscal_(&c__5, &ca, cx, &combla_1.incx);
 	ctest_(&c__5, cx, mwpct, mwpcs, sfac);
     } else if (combla_1.icase == 9) {
-/*        CSSCAL   
-          Add a test for alpha equal to zero. */
+/*        CSSCAL */
+/*        Add a test for alpha equal to zero. */
 	sa = 0.f;
 	for (i__ = 1; i__ <= 5; ++i__) {
 	    i__1 = i__ - 1;
@@ -305,14 +316,6 @@ static real c_b43 = 1.f;
     }
     return 0;
 } /* check1_ */
-
-#undef cv_ref
-#undef cv_subscr
-#undef ctrue6_ref
-#undef ctrue6_subscr
-#undef ctrue5_ref
-#undef ctrue5_subscr
-
 
 /* Subroutine */ int check2_(real *sfac)
 {
@@ -413,8 +416,11 @@ static real c_b43 = 1.f;
     /* Subroutine */ int s_stop(char *, ftnlen);
 
     /* Local variables */
-    static complex cdot[1];
-    static integer lenx, leny, i__;
+    integer i__, ki, kn;
+    complex cx[7], cy[7];
+    integer mx, my;
+    complex cdot[1];
+    integer lenx, leny;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
@@ -424,32 +430,25 @@ static real c_b43 = 1.f;
     extern /* Subroutine */ int cswap_(integer *, complex *, integer *, 
 	    complex *, integer *), ctest_(integer *, complex *, complex *, 
 	    complex *, real *);
-    static integer ksize;
+    integer ksize;
     extern /* Subroutine */ int caxpy_(integer *, complex *, complex *, 
 	    integer *, complex *, integer *);
-    static integer ki, kn;
-    static complex cx[7], cy[7];
-    static integer mx, my;
 
     /* Fortran I/O blocks */
     static cilist io___48 = { 0, 6, 0, 0, 0 };
 
 
-
-#define ct10x_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
-#define ct10x_ref(a_1,a_2,a_3) ct10x[ct10x_subscr(a_1,a_2,a_3)]
-#define ct10y_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
-#define ct10y_ref(a_1,a_2,a_3) ct10y[ct10y_subscr(a_1,a_2,a_3)]
-#define lens_ref(a_1,a_2) lens[(a_2)*4 + a_1 - 5]
-#define csize2_subscr(a_1,a_2) (a_2)*7 + a_1 - 8
-#define csize2_ref(a_1,a_2) csize2[csize2_subscr(a_1,a_2)]
-#define ct6_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define ct6_ref(a_1,a_2) ct6[ct6_subscr(a_1,a_2)]
-#define ct7_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define ct7_ref(a_1,a_2) ct7[ct7_subscr(a_1,a_2)]
-#define ct8_subscr(a_1,a_2,a_3) ((a_3)*4 + (a_2))*7 + a_1 - 36
-#define ct8_ref(a_1,a_2,a_3) ct8[ct8_subscr(a_1,a_2,a_3)]
-
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
     for (ki = 1; ki <= 4; ++ki) {
 	combla_1.incx = incxs[ki - 1];
 	combla_1.incy = incys[ki - 1];
@@ -459,8 +458,9 @@ static real c_b43 = 1.f;
 	for (kn = 1; kn <= 4; ++kn) {
 	    combla_1.n = ns[kn - 1];
 	    ksize = min(2,kn);
-	    lenx = lens_ref(kn, mx);
-	    leny = lens_ref(kn, my);
+	    lenx = lens[kn + (mx << 2) - 5];
+	    leny = lens[kn + (my << 2) - 5];
+/*           .. initialize all argument arrays .. */
 	    for (i__ = 1; i__ <= 7; ++i__) {
 		i__1 = i__ - 1;
 		i__2 = i__ - 1;
@@ -471,27 +471,37 @@ static real c_b43 = 1.f;
 /* L20: */
 	    }
 	    if (combla_1.icase == 1) {
+/*              .. CDOTC .. */
 		cdotc_(&q__1, &combla_1.n, cx, &combla_1.incx, cy, &
 			combla_1.incy);
 		cdot[0].r = q__1.r, cdot[0].i = q__1.i;
-		ctest_(&c__1, cdot, &ct6_ref(kn, ki), &csize1[kn - 1], sfac);
+		ctest_(&c__1, cdot, &ct6[kn + (ki << 2) - 5], &csize1[kn - 1],
+			 sfac);
 	    } else if (combla_1.icase == 2) {
+/*              .. CDOTU .. */
 		cdotu_(&q__1, &combla_1.n, cx, &combla_1.incx, cy, &
 			combla_1.incy);
 		cdot[0].r = q__1.r, cdot[0].i = q__1.i;
-		ctest_(&c__1, cdot, &ct7_ref(kn, ki), &csize1[kn - 1], sfac);
+		ctest_(&c__1, cdot, &ct7[kn + (ki << 2) - 5], &csize1[kn - 1],
+			 sfac);
 	    } else if (combla_1.icase == 3) {
+/*              .. CAXPY .. */
 		caxpy_(&combla_1.n, &ca, cx, &combla_1.incx, cy, &
 			combla_1.incy);
-		ctest_(&leny, cy, &ct8_ref(1, kn, ki), &csize2_ref(1, ksize), 
-			sfac);
+		ctest_(&leny, cy, &ct8[(kn + (ki << 2)) * 7 - 35], &csize2[
+			ksize * 7 - 7], sfac);
 	    } else if (combla_1.icase == 4) {
+/*              .. CCOPY .. */
 		ccopy_(&combla_1.n, cx, &combla_1.incx, cy, &combla_1.incy);
-		ctest_(&leny, cy, &ct10y_ref(1, kn, ki), csize3, &c_b43);
+		ctest_(&leny, cy, &ct10y[(kn + (ki << 2)) * 7 - 35], csize3, &
+			c_b43);
 	    } else if (combla_1.icase == 5) {
+/*              .. CSWAP .. */
 		cswap_(&combla_1.n, cx, &combla_1.incx, cy, &combla_1.incy);
-		ctest_(&lenx, cx, &ct10x_ref(1, kn, ki), csize3, &c_b43);
-		ctest_(&leny, cy, &ct10y_ref(1, kn, ki), csize3, &c_b43);
+		ctest_(&lenx, cx, &ct10x[(kn + (ki << 2)) * 7 - 35], csize3, &
+			c_b43);
+		ctest_(&leny, cy, &ct10y[(kn + (ki << 2)) * 7 - 35], csize3, &
+			c_b43);
 	    } else {
 		s_wsle(&io___48);
 		do_lio(&c__9, &c__1, " Shouldn't be here in CHECK2", (ftnlen)
@@ -506,21 +516,6 @@ static real c_b43 = 1.f;
     }
     return 0;
 } /* check2_ */
-
-#undef ct8_ref
-#undef ct8_subscr
-#undef ct7_ref
-#undef ct7_subscr
-#undef ct6_ref
-#undef ct6_subscr
-#undef csize2_ref
-#undef csize2_subscr
-#undef lens_ref
-#undef ct10y_ref
-#undef ct10y_subscr
-#undef ct10x_ref
-#undef ct10x_subscr
-
 
 /* Subroutine */ int stest_(integer *len, real *scomp, real *strue, real *
 	ssize, real *sfac)
@@ -541,9 +536,9 @@ static real c_b43 = 1.f;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer i__;
+    integer i__;
+    real sd;
     extern doublereal sdiff_(real *, real *);
-    static real sd;
 
     /* Fortran I/O blocks */
     static cilist io___51 = { 0, 6, 0, fmt_99999, 0 };
@@ -551,16 +546,25 @@ static real c_b43 = 1.f;
     static cilist io___53 = { 0, 6, 0, fmt_99997, 0 };
 
 
-/*     ********************************* STEST **************************   
+/*     ********************************* STEST ************************** */
 
-       THIS SUBR COMPARES ARRAYS  SCOMP() AND STRUE() OF LENGTH LEN TO   
-       SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE   
-       NEGLIGIBLE.   
+/*     THIS SUBR COMPARES ARRAYS  SCOMP() AND STRUE() OF LENGTH LEN TO */
+/*     SEE IF THE TERM BY TERM DIFFERENCES, MULTIPLIED BY SFAC, ARE */
+/*     NEGLIGIBLE. */
 
-       C. L. LAWSON, JPL, 1974 DEC 10   
+/*     C. L. LAWSON, JPL, 1974 DEC 10 */
 
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. External Functions .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ssize;
     --strue;
     --scomp;
@@ -605,25 +609,30 @@ L40:
     }
     return 0;
 
-} /* stest_   
+} /* stest_ */
 
-   Subroutine */ int stest1_(real *scomp1, real *strue1, real *ssize, real *
+/* Subroutine */ int stest1_(real *scomp1, real *strue1, real *ssize, real *
 	sfac)
 {
-    static real scomp[1], strue[1];
+    real scomp[1], strue[1];
     extern /* Subroutine */ int stest_(integer *, real *, real *, real *, 
 	    real *);
 
-/*     ************************* STEST1 *****************************   
+/*     ************************* STEST1 ***************************** */
 
-       THIS IS AN INTERFACE SUBROUTINE TO ACCOMODATE THE FORTRAN   
-       REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE   
-       ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT.   
+/*     THIS IS AN INTERFACE SUBROUTINE TO ACCOMODATE THE FORTRAN */
+/*     REQUIREMENT THAT WHEN A DUMMY ARGUMENT IS AN ARRAY, THE */
+/*     ACTUAL ARGUMENT MUST ALSO BE AN ARRAY OR AN ARRAY ELEMENT. */
 
-       C.L. LAWSON, JPL, 1978 DEC 6   
+/*     C.L. LAWSON, JPL, 1978 DEC 6 */
 
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Arrays .. */
+/*     .. External Subroutines .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ssize;
 
     /* Function Body */
@@ -639,14 +648,16 @@ doublereal sdiff_(real *sa, real *sb)
     /* System generated locals */
     real ret_val;
 
-/*     ********************************* SDIFF **************************   
-       COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15 */
+/*     ********************************* SDIFF ************************** */
+/*     COMPUTES DIFFERENCE OF TWO NUMBERS.  C. L. LAWSON, JPL 1974 FEB 15 */
 
+/*     .. Scalar Arguments .. */
+/*     .. Executable Statements .. */
     ret_val = *sa - *sb;
     return ret_val;
-} /* sdiff_   
+} /* sdiff_ */
 
-   Subroutine */ int ctest_(integer *len, complex *ccomp, complex *ctrue, 
+/* Subroutine */ int ctest_(integer *len, complex *ccomp, complex *ctrue, 
 	complex *csize, real *sfac)
 {
     /* System generated locals */
@@ -656,16 +667,23 @@ doublereal sdiff_(real *sa, real *sb)
     double r_imag(complex *);
 
     /* Local variables */
-    static integer i__;
-    static real scomp[20], ssize[20], strue[20];
+    integer i__;
+    real scomp[20], ssize[20], strue[20];
     extern /* Subroutine */ int stest_(integer *, real *, real *, real *, 
 	    real *);
 
-/*     **************************** CTEST *****************************   
+/*     **************************** CTEST ***************************** */
 
-       C.L. LAWSON, JPL, 1978 DEC 6   
+/*     C.L. LAWSON, JPL, 1978 DEC 6 */
 
-       Parameter adjustments */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     --csize;
     --ctrue;
     --ccomp;
@@ -688,9 +706,9 @@ doublereal sdiff_(real *sa, real *sb)
     i__1 = *len << 1;
     stest_(&i__1, scomp, strue, ssize, sfac);
     return 0;
-} /* ctest_   
+} /* ctest_ */
 
-   Subroutine */ int itest1_(integer *icomp, integer *itrue)
+/* Subroutine */ int itest1_(integer *icomp, integer *itrue)
 {
     /* Format strings */
     static char fmt_99999[] = "(\002                                       F"
@@ -704,7 +722,7 @@ doublereal sdiff_(real *sa, real *sb)
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer id;
+    integer id;
 
     /* Fortran I/O blocks */
     static cilist io___60 = { 0, 6, 0, fmt_99999, 0 };
@@ -712,12 +730,18 @@ doublereal sdiff_(real *sa, real *sb)
     static cilist io___63 = { 0, 6, 0, fmt_99997, 0 };
 
 
-/*     ********************************* ITEST1 *************************   
+/*     ********************************* ITEST1 ************************* */
 
-       THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR   
-       EQUALITY.   
-       C. L. LAWSON, JPL, 1974 DEC 10 */
+/*     THIS SUBROUTINE COMPARES THE VARIABLES ICOMP AND ITRUE FOR */
+/*     EQUALITY. */
+/*     C. L. LAWSON, JPL, 1974 DEC 10 */
 
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
     if (*icomp == *itrue) {
 	goto L40;
     }
@@ -748,6 +772,6 @@ L20:
 L40:
     return 0;
 
-} /* itest1_   
+} /* itest1_ */
 
-   Main program alias */ int cblat1_ () { MAIN__ (); return 0; }
+/* Main program alias */ int cblat1_ () { MAIN__ (); return 0; }

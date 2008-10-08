@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -90,55 +85,55 @@ static integer c__11 = 11;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer inde;
-    static doublereal cond;
-    static integer nmax;
-    static doublereal unfl, ovfl, temp1, temp2, temp3, temp4;
-    extern doublereal dsxt1_(integer *, doublereal *, integer *, doublereal *,
+    integer i__, j, m, n, m2, m3, jc, il, jr, iu;
+    doublereal vl, vu;
+    integer nap, lgn;
+    doublereal ulp;
+    integer inde;
+    doublereal cond;
+    integer nmax;
+    doublereal unfl, ovfl, temp1, temp2, temp3, temp4;
+    extern doublereal dsxt1_(integer *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, doublereal *, doublereal *);
-    static integer i__, j, m, n;
-    static logical badnn;
-    static integer imode, lwedc;
-    static doublereal dumma[1];
-    static integer iinfo;
-    static doublereal aninv, anorm;
+    logical badnn;
+    integer imode, lwedc;
+    doublereal dumma[1];
+    integer iinfo;
+    doublereal aninv, anorm;
     extern /* Subroutine */ int zhet21_(integer *, char *, integer *, integer 
 	    *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublereal *);
-    static integer itemp;
+    integer itemp;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer nmats, jsize, itype, jtype, nerrs, m2, m3, ntest;
+    integer nmats, jsize;
     extern /* Subroutine */ int zhpt21_(integer *, char *, integer *, integer 
 	    *, doublecomplex *, doublereal *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublereal *, doublereal *), zcopy_(integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *), zstt21_(
-	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
-	    doublereal *, doublereal *), zstt22_(integer *, integer *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *);
-    static integer iseed2[4], log2ui;
+    integer nerrs, itype, jtype, ntest;
+    extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
+	    doublecomplex *, integer *), zstt21_(integer *, integer *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *, 
+	    doublecomplex *, integer *, doublecomplex *, doublereal *, 
+	    doublereal *), zstt22_(integer *, integer *, integer *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *, 
+	    doublereal *, doublereal *);
+    integer iseed2[4], log2ui;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer jc, il;
-    extern doublereal dlamch_(char *);
-    static integer jr, iu;
-    static doublereal vl;
-    extern doublereal dlarnd_(integer *, integer *);
-    static integer liwedc, nblock;
-    extern /* Subroutine */ int dstech_(integer *, doublereal *, doublereal *,
+    extern doublereal dlamch_(char *), dlarnd_(integer *, integer *);
+    integer liwedc, nblock;
+    extern /* Subroutine */ int dstech_(integer *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal vu;
-    static integer idumma[1];
+    integer idumma[1];
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-    static integer lrwedc;
-    static doublereal abstol;
+	    integer *, integer *);
+    integer lrwedc;
+    doublereal abstol;
     extern /* Subroutine */ int dlasum_(char *, integer *, integer *, integer 
 	    *), dsterf_(integer *, doublereal *, doublereal *, 
 	    integer *), dstebz_(char *, char *, integer *, doublereal *, 
@@ -148,64 +143,65 @@ static integer c__11 = 11;
 	    zstedc_(char *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, integer *, integer *, integer *, integer *);
-    static integer indrwk;
+    integer indrwk;
     extern /* Subroutine */ int zhetrd_(char *, integer *, doublecomplex *, 
 	    integer *, doublereal *, doublereal *, doublecomplex *, 
 	    doublecomplex *, integer *, integer *), zlacpy_(char *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     integer *), zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static integer nsplit, mtypes, ntestt;
-    static doublereal rtovfl, rtunfl, ulpinv;
+    logical tryrac;
+    integer nsplit;
+    doublereal rtunfl, rtovfl, ulpinv;
+    integer mtypes, ntestt;
     extern /* Subroutine */ int zhptrd_(char *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, doublecomplex *, integer *), 
 	    zlatmr_(integer *, integer *, char *, integer *, char *, 
-	    doublecomplex *, integer *, doublereal *, doublecomplex *, char *,
+	    doublecomplex *, integer *, doublereal *, doublecomplex *, char *, 
 	     char *, doublecomplex *, integer *, doublereal *, doublecomplex *
-	    , integer *, doublereal *, char *, integer *, integer *, integer *
-	    , doublereal *, doublereal *, char *, doublecomplex *, integer *, 
+, integer *, doublereal *, char *, integer *, integer *, integer *
+, doublereal *, doublereal *, char *, doublecomplex *, integer *, 
 	    integer *, integer *), zlatms_(integer *, integer *, char *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, char *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *), zpteqr_(char *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, integer *, 
-	    doublereal *, integer *), zstegr_(char *, char *, integer 
+	    doublereal *, integer *), zstemr_(char *, char *, integer 
 	    *, doublereal *, doublereal *, doublereal *, doublereal *, 
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    doublecomplex *, integer *, integer *, doublereal *, integer *, 
-	    integer *, integer *, integer *), zstein_(integer 
-	    *, doublereal *, doublereal *, integer *, doublereal *, integer *,
-	     integer *, doublecomplex *, integer *, doublereal *, integer *, 
-	    integer *, integer *), zsteqr_(char *, integer *, doublereal *, 
-	    doublereal *, doublecomplex *, integer *, doublereal *, integer *), zungtr_(char *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *, integer *), 
-	    zupgtr_(char *, integer *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static integer nap, lgn;
-    static doublereal ulp;
+	    integer *, integer *, integer *, doublereal *, doublecomplex *, 
+	    integer *, integer *, integer *, logical *, doublereal *, integer 
+	    *, integer *, integer *, integer *), zstein_(
+	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
+	    integer *, integer *, doublecomplex *, integer *, doublereal *, 
+	    integer *, integer *, integer *), zsteqr_(char *, integer *, 
+	    doublereal *, doublereal *, doublecomplex *, integer *, 
+	    doublereal *, integer *), zungtr_(char *, integer *, 
+	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
+	    integer *, integer *), zupgtr_(char *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    doublecomplex *, integer *);
 
     /* Fortran I/O blocks */
-    static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___43 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___44 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___45 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___47 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___46 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___48 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___49 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___50 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___51 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___52 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___53 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___54 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___58 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___66 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___59 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___67 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___70 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___72 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___68 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___71 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___73 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___74 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___77 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___75 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___78 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___79 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___80 = { 0, 0, 0, fmt_9999, 0 };
@@ -216,437 +212,450 @@ static integer c__11 = 11;
     static cilist io___85 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___86 = { 0, 0, 0, fmt_9999, 0 };
     static cilist io___87 = { 0, 0, 0, fmt_9999, 0 };
-    static cilist io___88 = { 0, 0, 0, fmt_9998, 0 };
-    static cilist io___89 = { 0, 0, 0, fmt_9997, 0 };
-    static cilist io___90 = { 0, 0, 0, fmt_9996, 0 };
-    static cilist io___91 = { 0, 0, 0, fmt_9995, 0 };
-    static cilist io___92 = { 0, 0, 0, fmt_9994, 0 };
-    static cilist io___93 = { 0, 0, 0, fmt_9987, 0 };
-    static cilist io___94 = { 0, 0, 0, fmt_9989, 0 };
-    static cilist io___95 = { 0, 0, 0, fmt_9988, 0 };
+    static cilist io___88 = { 0, 0, 0, fmt_9999, 0 };
+    static cilist io___89 = { 0, 0, 0, fmt_9998, 0 };
+    static cilist io___90 = { 0, 0, 0, fmt_9997, 0 };
+    static cilist io___91 = { 0, 0, 0, fmt_9996, 0 };
+    static cilist io___92 = { 0, 0, 0, fmt_9995, 0 };
+    static cilist io___93 = { 0, 0, 0, fmt_9994, 0 };
+    static cilist io___94 = { 0, 0, 0, fmt_9987, 0 };
+    static cilist io___95 = { 0, 0, 0, fmt_9989, 0 };
+    static cilist io___96 = { 0, 0, 0, fmt_9988, 0 };
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZCHKST  checks the Hermitian eigenvalue problem routines. */
 
-    Purpose   
-    =======   
+/*     ZHETRD factors A as  U S U* , where * means conjugate transpose, */
+/*     S is real symmetric tridiagonal, and U is unitary. */
+/*     ZHETRD can use either just the lower or just the upper triangle */
+/*     of A; ZCHKST checks both cases. */
+/*     U is represented as a product of Householder */
+/*     transformations, whose vectors are stored in the first */
+/*     n-1 columns of V, and whose scale factors are in TAU. */
 
-    ZCHKST  checks the Hermitian eigenvalue problem routines.   
+/*     ZHPTRD does the same as ZHETRD, except that A and V are stored */
+/*     in "packed" format. */
 
-       ZHETRD factors A as  U S U* , where * means conjugate transpose,   
-       S is real symmetric tridiagonal, and U is unitary.   
-       ZHETRD can use either just the lower or just the upper triangle   
-       of A; ZCHKST checks both cases.   
-       U is represented as a product of Householder   
-       transformations, whose vectors are stored in the first   
-       n-1 columns of V, and whose scale factors are in TAU.   
+/*     ZUNGTR constructs the matrix U from the contents of V and TAU. */
 
-       ZHPTRD does the same as ZHETRD, except that A and V are stored   
-       in "packed" format.   
+/*     ZUPGTR constructs the matrix U from the contents of VP and TAU. */
 
-       ZUNGTR constructs the matrix U from the contents of V and TAU.   
+/*     ZSTEQR factors S as  Z D1 Z* , where Z is the unitary */
+/*     matrix of eigenvectors and D1 is a diagonal matrix with */
+/*     the eigenvalues on the diagonal.  D2 is the matrix of */
+/*     eigenvalues computed when Z is not computed. */
 
-       ZUPGTR constructs the matrix U from the contents of VP and TAU.   
+/*     DSTERF computes D3, the matrix of eigenvalues, by the */
+/*     PWK method, which does not yield eigenvectors. */
 
-       ZSTEQR factors S as  Z D1 Z* , where Z is the unitary   
-       matrix of eigenvectors and D1 is a diagonal matrix with   
-       the eigenvalues on the diagonal.  D2 is the matrix of   
-       eigenvalues computed when Z is not computed.   
+/*     ZPTEQR factors S as  Z4 D4 Z4* , for a */
+/*     Hermitian positive definite tridiagonal matrix. */
+/*     D5 is the matrix of eigenvalues computed when Z is not */
+/*     computed. */
 
-       DSTERF computes D3, the matrix of eigenvalues, by the   
-       PWK method, which does not yield eigenvectors.   
+/*     DSTEBZ computes selected eigenvalues.  WA1, WA2, and */
+/*     WA3 will denote eigenvalues computed to high */
+/*     absolute accuracy, with different range options. */
+/*     WR will denote eigenvalues computed to high relative */
+/*     accuracy. */
 
-       ZPTEQR factors S as  Z4 D4 Z4* , for a   
-       Hermitian positive definite tridiagonal matrix.   
-       D5 is the matrix of eigenvalues computed when Z is not   
-       computed.   
+/*     ZSTEIN computes Y, the eigenvectors of S, given the */
+/*     eigenvalues. */
 
-       DSTEBZ computes selected eigenvalues.  WA1, WA2, and   
-       WA3 will denote eigenvalues computed to high   
-       absolute accuracy, with different range options.   
-       WR will denote eigenvalues computed to high relative   
-       accuracy.   
+/*     ZSTEDC factors S as Z D1 Z* , where Z is the unitary */
+/*     matrix of eigenvectors and D1 is a diagonal matrix with */
+/*     the eigenvalues on the diagonal ('I' option). It may also */
+/*     update an input unitary matrix, usually the output */
+/*     from ZHETRD/ZUNGTR or ZHPTRD/ZUPGTR ('V' option). It may */
+/*     also just compute eigenvalues ('N' option). */
 
-       ZSTEIN computes Y, the eigenvectors of S, given the   
-       eigenvalues.   
+/*     ZSTEMR factors S as Z D1 Z* , where Z is the unitary */
+/*     matrix of eigenvectors and D1 is a diagonal matrix with */
+/*     the eigenvalues on the diagonal ('I' option).  ZSTEMR */
+/*     uses the Relatively Robust Representation whenever possible. */
 
-       ZSTEDC factors S as Z D1 Z* , where Z is the unitary   
-       matrix of eigenvectors and D1 is a diagonal matrix with   
-       the eigenvalues on the diagonal ('I' option). It may also   
-       update an input unitary matrix, usually the output   
-       from ZHETRD/ZUNGTR or ZHPTRD/ZUPGTR ('V' option). It may   
-       also just compute eigenvalues ('N' option).   
+/*  When ZCHKST is called, a number of matrix "sizes" ("n's") and a */
+/*  number of matrix "types" are specified.  For each size ("n") */
+/*  and each type of matrix, one matrix will be generated and used */
+/*  to test the Hermitian eigenroutines.  For each matrix, a number */
+/*  of tests will be performed: */
 
-       ZSTEGR factors S as Z D1 Z* , where Z is the unitary   
-       matrix of eigenvectors and D1 is a diagonal matrix with   
-       the eigenvalues on the diagonal ('I' option).  ZSTEGR   
-       uses the Relatively Robust Representation whenever possible.   
+/*  (1)     | A - V S V* | / ( |A| n ulp ) ZHETRD( UPLO='U', ... ) */
 
-    When ZCHKST is called, a number of matrix "sizes" ("n's") and a   
-    number of matrix "types" are specified.  For each size ("n")   
-    and each type of matrix, one matrix will be generated and used   
-    to test the Hermitian eigenroutines.  For each matrix, a number   
-    of tests will be performed:   
+/*  (2)     | I - UV* | / ( n ulp )        ZUNGTR( UPLO='U', ... ) */
 
-    (1)     | A - V S V* | / ( |A| n ulp ) ZHETRD( UPLO='U', ... )   
+/*  (3)     | A - V S V* | / ( |A| n ulp ) ZHETRD( UPLO='L', ... ) */
 
-    (2)     | I - UV* | / ( n ulp )        ZUNGTR( UPLO='U', ... )   
+/*  (4)     | I - UV* | / ( n ulp )        ZUNGTR( UPLO='L', ... ) */
 
-    (3)     | A - V S V* | / ( |A| n ulp ) ZHETRD( UPLO='L', ... )   
+/*  (5-8)   Same as 1-4, but for ZHPTRD and ZUPGTR. */
 
-    (4)     | I - UV* | / ( n ulp )        ZUNGTR( UPLO='L', ... )   
+/*  (9)     | S - Z D Z* | / ( |S| n ulp ) ZSTEQR('V',...) */
 
-    (5-8)   Same as 1-4, but for ZHPTRD and ZUPGTR.   
+/*  (10)    | I - ZZ* | / ( n ulp )        ZSTEQR('V',...) */
 
-    (9)     | S - Z D Z* | / ( |S| n ulp ) ZSTEQR('V',...)   
+/*  (11)    | D1 - D2 | / ( |D1| ulp )        ZSTEQR('N',...) */
 
-    (10)    | I - ZZ* | / ( n ulp )        ZSTEQR('V',...)   
+/*  (12)    | D1 - D3 | / ( |D1| ulp )        DSTERF */
 
-    (11)    | D1 - D2 | / ( |D1| ulp )        ZSTEQR('N',...)   
+/*  (13)    0 if the true eigenvalues (computed by sturm count) */
+/*          of S are within THRESH of */
+/*          those in D1.  2*THRESH if they are not.  (Tested using */
+/*          DSTECH) */
 
-    (12)    | D1 - D3 | / ( |D1| ulp )        DSTERF   
+/*  For S positive definite, */
 
-    (13)    0 if the true eigenvalues (computed by sturm count)   
-            of S are within THRESH of   
-            those in D1.  2*THRESH if they are not.  (Tested using   
-            DSTECH)   
+/*  (14)    | S - Z4 D4 Z4* | / ( |S| n ulp ) ZPTEQR('V',...) */
 
-    For S positive definite,   
+/*  (15)    | I - Z4 Z4* | / ( n ulp )        ZPTEQR('V',...) */
 
-    (14)    | S - Z4 D4 Z4* | / ( |S| n ulp ) ZPTEQR('V',...)   
+/*  (16)    | D4 - D5 | / ( 100 |D4| ulp )       ZPTEQR('N',...) */
 
-    (15)    | I - Z4 Z4* | / ( n ulp )        ZPTEQR('V',...)   
+/*  When S is also diagonally dominant by the factor gamma < 1, */
 
-    (16)    | D4 - D5 | / ( 100 |D4| ulp )       ZPTEQR('N',...)   
+/*  (17)    max | D4(i) - WR(i) | / ( |D4(i)| omega ) , */
+/*           i */
+/*          omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4 */
+/*                                               DSTEBZ( 'A', 'E', ...) */
 
-    When S is also diagonally dominant by the factor gamma < 1,   
+/*  (18)    | WA1 - D3 | / ( |D3| ulp )          DSTEBZ( 'A', 'E', ...) */
 
-    (17)    max | D4(i) - WR(i) | / ( |D4(i)| omega ) ,   
-             i   
-            omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
-                                                 DSTEBZ( 'A', 'E', ...)   
+/*  (19)    ( max { min | WA2(i)-WA3(j) | } + */
+/*             i     j */
+/*            max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp ) */
+/*             i     j */
+/*                                               DSTEBZ( 'I', 'E', ...) */
 
-    (18)    | WA1 - D3 | / ( |D3| ulp )          DSTEBZ( 'A', 'E', ...)   
+/*  (20)    | S - Y WA1 Y* | / ( |S| n ulp )  DSTEBZ, ZSTEIN */
 
-    (19)    ( max { min | WA2(i)-WA3(j) | } +   
-               i     j   
-              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
-               i     j   
-                                                 DSTEBZ( 'I', 'E', ...)   
+/*  (21)    | I - Y Y* | / ( n ulp )          DSTEBZ, ZSTEIN */
 
-    (20)    | S - Y WA1 Y* | / ( |S| n ulp )  DSTEBZ, ZSTEIN   
+/*  (22)    | S - Z D Z* | / ( |S| n ulp )    ZSTEDC('I') */
 
-    (21)    | I - Y Y* | / ( n ulp )          DSTEBZ, ZSTEIN   
+/*  (23)    | I - ZZ* | / ( n ulp )           ZSTEDC('I') */
 
-    (22)    | S - Z D Z* | / ( |S| n ulp )    ZSTEDC('I')   
+/*  (24)    | S - Z D Z* | / ( |S| n ulp )    ZSTEDC('V') */
 
-    (23)    | I - ZZ* | / ( n ulp )           ZSTEDC('I')   
+/*  (25)    | I - ZZ* | / ( n ulp )           ZSTEDC('V') */
 
-    (24)    | S - Z D Z* | / ( |S| n ulp )    ZSTEDC('V')   
+/*  (26)    | D1 - D2 | / ( |D1| ulp )           ZSTEDC('V') and */
+/*                                               ZSTEDC('N') */
 
-    (25)    | I - ZZ* | / ( n ulp )           ZSTEDC('V')   
+/*  Test 27 is disabled at the moment because ZSTEMR does not */
+/*  guarantee high relatvie accuracy. */
 
-    (26)    | D1 - D2 | / ( |D1| ulp )           ZSTEDC('V') and   
-                                                 ZSTEDC('N')   
+/*  (27)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) , */
+/*           i */
+/*          omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4 */
+/*                                               ZSTEMR('V', 'A') */
 
-    Test 27 is disabled at the moment because ZSTEGR does not   
-    guarantee high relatvie accuracy.   
+/*  (28)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) , */
+/*           i */
+/*          omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4 */
+/*                                               ZSTEMR('V', 'I') */
 
-    (27)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) ,   
-             i   
-            omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
-                                                 ZSTEGR('V', 'A')   
+/*  Tests 29 through 34 are disable at present because ZSTEMR */
+/*  does not handle partial specturm requests. */
 
-    (28)    max | D6(i) - WR(i) | / ( |D6(i)| omega ) ,   
-             i   
-            omega = 2 (2n-1) ULP (1 + 8 gamma**2) / (1 - gamma)**4   
-                                                 ZSTEGR('V', 'I')   
+/*  (29)    | S - Z D Z* | / ( |S| n ulp )    ZSTEMR('V', 'I') */
 
-    Tests 29 through 34 are disable at present because @9pre)STEGR   
-    does not handle partial specturm requests.   
+/*  (30)    | I - ZZ* | / ( n ulp )           ZSTEMR('V', 'I') */
 
-    (29)    | S - Z D Z* | / ( |S| n ulp )    ZSTEGR('V', 'I')   
+/*  (31)    ( max { min | WA2(i)-WA3(j) | } + */
+/*             i     j */
+/*            max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp ) */
+/*             i     j */
+/*          ZSTEMR('N', 'I') vs. CSTEMR('V', 'I') */
 
-    (30)    | I - ZZ* | / ( n ulp )           ZSTEGR('V', 'I')   
+/*  (32)    | S - Z D Z* | / ( |S| n ulp )    ZSTEMR('V', 'V') */
 
-    (31)    ( max { min | WA2(i)-WA3(j) | } +   
-               i     j   
-              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
-               i     j   
-            ZSTEGR('N', 'I') vs. CSTEGR('V', 'I')   
+/*  (33)    | I - ZZ* | / ( n ulp )           ZSTEMR('V', 'V') */
 
-    (32)    | S - Z D Z* | / ( |S| n ulp )    ZSTEGR('V', 'V')   
-
-    (33)    | I - ZZ* | / ( n ulp )           ZSTEGR('V', 'V')   
-
-    (34)    ( max { min | WA2(i)-WA3(j) | } +   
-               i     j   
-              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
-               i     j   
-            ZSTEGR('N', 'V') vs. CSTEGR('V', 'V')   
-
-    (35)    | S - Z D Z* | / ( |S| n ulp )    ZSTEGR('V', 'A')   
-
-    (36)    | I - ZZ* | / ( n ulp )           ZSTEGR('V', 'A')   
-
-    (37)    ( max { min | WA2(i)-WA3(j) | } +   
-               i     j   
-              max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp )   
-               i     j   
-            ZSTEGR('N', 'A') vs. CSTEGR('V', 'A')   
-
-    The "sizes" are specified by an array NN(1:NSIZES); the value of   
-    each element NN(j) specifies one size.   
-    The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-    if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-    Currently, the list of possible types is:   
-
-    (1)  The zero matrix.   
-    (2)  The identity matrix.   
-
-    (3)  A diagonal matrix with evenly spaced entries   
-         1, ..., ULP  and random signs.   
-         (ULP = (first number larger than 1) - 1 )   
-    (4)  A diagonal matrix with geometrically spaced entries   
-         1, ..., ULP  and random signs.   
-    (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-         and random signs.   
-
-    (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-    (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-    (8)  A matrix of the form  U* D U, where U is unitary and   
-         D has evenly spaced entries 1, ..., ULP with random signs   
-         on the diagonal.   
-
-    (9)  A matrix of the form  U* D U, where U is unitary and   
-         D has geometrically spaced entries 1, ..., ULP with random   
-         signs on the diagonal.   
-
-    (10) A matrix of the form  U* D U, where U is unitary and   
-         D has "clustered" entries 1, ULP,..., ULP with random   
-         signs on the diagonal.   
-
-    (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-    (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-    (13) Hermitian matrix with random entries chosen from (-1,1).   
-    (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-    (15) Same as (13), but multiplied by SQRT( underflow threshold )   
-    (16) Same as (8), but diagonal elements are all positive.   
-    (17) Same as (9), but diagonal elements are all positive.   
-    (18) Same as (10), but diagonal elements are all positive.   
-    (19) Same as (16), but multiplied by SQRT( overflow threshold )   
-    (20) Same as (16), but multiplied by SQRT( underflow threshold )   
-    (21) A diagonally dominant tridiagonal matrix with geometrically   
-         spaced diagonal entries 1, ..., ULP.   
-
-    Arguments   
-    =========   
-
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            ZCHKST does nothing.  It must be at least zero.   
-
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, ZCHKST   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to ZCHKST to continue the same random number   
-            sequence.   
-
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-
-    A       (input/workspace/output) COMPLEX*16 array of   
-                                    dimension ( LDA , max(NN) )   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( NN ).   
-
-    AP      (workspace) COMPLEX*16 array of   
-                        dimension( max(NN)*max(NN+1)/2 )   
-            The matrix A stored in packed format.   
-
-    SD      (workspace/output) DOUBLE PRECISION array of   
-                               dimension( max(NN) )   
-            The diagonal of the tridiagonal matrix computed by ZHETRD.   
-            On exit, SD and SE contain the tridiagonal form of the   
-            matrix in A.   
-
-    SE      (workspace/output) DOUBLE PRECISION array of   
-                               dimension( max(NN) )   
-            The off-diagonal of the tridiagonal matrix computed by   
-            ZHETRD.  On exit, SD and SE contain the tridiagonal form of   
-            the matrix in A.   
-
-    D1      (workspace/output) DOUBLE PRECISION array of   
-                               dimension( max(NN) )   
-            The eigenvalues of A, as computed by ZSTEQR simlutaneously   
-            with Z.  On exit, the eigenvalues in D1 correspond with the   
-            matrix in A.   
-
-    D2      (workspace/output) DOUBLE PRECISION array of   
-                               dimension( max(NN) )   
-            The eigenvalues of A, as computed by ZSTEQR if Z is not   
-            computed.  On exit, the eigenvalues in D2 correspond with   
-            the matrix in A.   
-
-    D3      (workspace/output) DOUBLE PRECISION array of   
-                               dimension( max(NN) )   
-            The eigenvalues of A, as computed by DSTERF.  On exit, the   
-            eigenvalues in D3 correspond with the matrix in A.   
-
-    U       (workspace/output) COMPLEX*16 array of   
-                               dimension( LDU, max(NN) ).   
-            The unitary matrix computed by ZHETRD + ZUNGTR.   
-
-    LDU     (input) INTEGER   
-            The leading dimension of U, Z, and V.  It must be at least 1   
-            and at least max( NN ).   
-
-    V       (workspace/output) COMPLEX*16 array of   
-                               dimension( LDU, max(NN) ).   
-            The Housholder vectors computed by ZHETRD in reducing A to   
-            tridiagonal form.  The vectors computed with UPLO='U' are   
-            in the upper triangle, and the vectors computed with UPLO='L'   
-            are in the lower triangle.  (As described in ZHETRD, the   
-            sub- and superdiagonal are not set to 1, although the   
-            true Householder vector has a 1 in that position.  The   
-            routines that use V, such as ZUNGTR, set those entries to   
-            1 before using them, and then restore them later.)   
-
-    VP      (workspace) COMPLEX*16 array of   
-                        dimension( max(NN)*max(NN+1)/2 )   
-            The matrix V stored in packed format.   
-
-    TAU     (workspace/output) COMPLEX*16 array of   
-                               dimension( max(NN) )   
-            The Householder factors computed by ZHETRD in reducing A   
-            to tridiagonal form.   
-
-    Z       (workspace/output) COMPLEX*16 array of   
-                               dimension( LDU, max(NN) ).   
-            The unitary matrix of eigenvectors computed by ZSTEQR,   
-            ZPTEQR, and ZSTEIN.   
-
-    WORK    (workspace/output) COMPLEX*16 array of   
-                        dimension( LWORK )   
-
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            1 + 4 * Nmax + 2 * Nmax * lg Nmax + 3 * Nmax**2   
-            where Nmax = max( NN(j), 2 ) and lg = log base 2.   
-
-    IWORK   (workspace/output) INTEGER array,   
-               dimension (6 + 6*Nmax + 5 * Nmax * lg Nmax )   
-            where Nmax = max( NN(j), 2 ) and lg = log base 2.   
-            Workspace.   
-
-    RWORK   (workspace/output) DOUBLE PRECISION array of   
-                        dimension( ??? )   
-
-    RESULT  (output) DOUBLE PRECISION array, dimension (26)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -23: LDU < 1 or LDU < NMAX.   
-            -29: LWORK too small.   
-            If  ZLATMR, CLATMS, ZHETRD, ZUNGTR, ZSTEQR, DSTERF,   
-                or ZUNMC2 returns an error code, the   
-                absolute value of it is returned.   
-
-   -----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NBLOCK          Blocksize as returned by ENVIR.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far.   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*  (34)    ( max { min | WA2(i)-WA3(j) | } + */
+/*             i     j */
+/*            max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp ) */
+/*             i     j */
+/*          ZSTEMR('N', 'V') vs. CSTEMR('V', 'V') */
+
+/*  (35)    | S - Z D Z* | / ( |S| n ulp )    ZSTEMR('V', 'A') */
+
+/*  (36)    | I - ZZ* | / ( n ulp )           ZSTEMR('V', 'A') */
+
+/*  (37)    ( max { min | WA2(i)-WA3(j) | } + */
+/*             i     j */
+/*            max { min | WA3(i)-WA2(j) | } ) / ( |D3| ulp ) */
+/*             i     j */
+/*          ZSTEMR('N', 'A') vs. CSTEMR('V', 'A') */
+
+/*  The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*  each element NN(j) specifies one size. */
+/*  The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*  if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*  Currently, the list of possible types is: */
+
+/*  (1)  The zero matrix. */
+/*  (2)  The identity matrix. */
+
+/*  (3)  A diagonal matrix with evenly spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*       (ULP = (first number larger than 1) - 1 ) */
+/*  (4)  A diagonal matrix with geometrically spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*  (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*       and random signs. */
+
+/*  (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*  (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*  (8)  A matrix of the form  U* D U, where U is unitary and */
+/*       D has evenly spaced entries 1, ..., ULP with random signs */
+/*       on the diagonal. */
+
+/*  (9)  A matrix of the form  U* D U, where U is unitary and */
+/*       D has geometrically spaced entries 1, ..., ULP with random */
+/*       signs on the diagonal. */
+
+/*  (10) A matrix of the form  U* D U, where U is unitary and */
+/*       D has "clustered" entries 1, ULP,..., ULP with random */
+/*       signs on the diagonal. */
+
+/*  (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*  (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*  (13) Hermitian matrix with random entries chosen from (-1,1). */
+/*  (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*  (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
+/*  (16) Same as (8), but diagonal elements are all positive. */
+/*  (17) Same as (9), but diagonal elements are all positive. */
+/*  (18) Same as (10), but diagonal elements are all positive. */
+/*  (19) Same as (16), but multiplied by SQRT( overflow threshold ) */
+/*  (20) Same as (16), but multiplied by SQRT( underflow threshold ) */
+/*  (21) A diagonally dominant tridiagonal matrix with geometrically */
+/*       spaced diagonal entries 1, ..., ULP. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          ZCHKST does nothing.  It must be at least zero. */
+
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, ZCHKST */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to ZCHKST to continue the same random number */
+/*          sequence. */
+
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+
+/*  A       (input/workspace/output) COMPLEX*16 array of */
+/*                                  dimension ( LDA , max(NN) ) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( NN ). */
+
+/*  AP      (workspace) COMPLEX*16 array of */
+/*                      dimension( max(NN)*max(NN+1)/2 ) */
+/*          The matrix A stored in packed format. */
+
+/*  SD      (workspace/output) DOUBLE PRECISION array of */
+/*                             dimension( max(NN) ) */
+/*          The diagonal of the tridiagonal matrix computed by ZHETRD. */
+/*          On exit, SD and SE contain the tridiagonal form of the */
+/*          matrix in A. */
+
+/*  SE      (workspace/output) DOUBLE PRECISION array of */
+/*                             dimension( max(NN) ) */
+/*          The off-diagonal of the tridiagonal matrix computed by */
+/*          ZHETRD.  On exit, SD and SE contain the tridiagonal form of */
+/*          the matrix in A. */
+
+/*  D1      (workspace/output) DOUBLE PRECISION array of */
+/*                             dimension( max(NN) ) */
+/*          The eigenvalues of A, as computed by ZSTEQR simlutaneously */
+/*          with Z.  On exit, the eigenvalues in D1 correspond with the */
+/*          matrix in A. */
+
+/*  D2      (workspace/output) DOUBLE PRECISION array of */
+/*                             dimension( max(NN) ) */
+/*          The eigenvalues of A, as computed by ZSTEQR if Z is not */
+/*          computed.  On exit, the eigenvalues in D2 correspond with */
+/*          the matrix in A. */
+
+/*  D3      (workspace/output) DOUBLE PRECISION array of */
+/*                             dimension( max(NN) ) */
+/*          The eigenvalues of A, as computed by DSTERF.  On exit, the */
+/*          eigenvalues in D3 correspond with the matrix in A. */
+
+/*  U       (workspace/output) COMPLEX*16 array of */
+/*                             dimension( LDU, max(NN) ). */
+/*          The unitary matrix computed by ZHETRD + ZUNGTR. */
+
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U, Z, and V.  It must be at least 1 */
+/*          and at least max( NN ). */
+
+/*  V       (workspace/output) COMPLEX*16 array of */
+/*                             dimension( LDU, max(NN) ). */
+/*          The Housholder vectors computed by ZHETRD in reducing A to */
+/*          tridiagonal form.  The vectors computed with UPLO='U' are */
+/*          in the upper triangle, and the vectors computed with UPLO='L' */
+/*          are in the lower triangle.  (As described in ZHETRD, the */
+/*          sub- and superdiagonal are not set to 1, although the */
+/*          true Householder vector has a 1 in that position.  The */
+/*          routines that use V, such as ZUNGTR, set those entries to */
+/*          1 before using them, and then restore them later.) */
+
+/*  VP      (workspace) COMPLEX*16 array of */
+/*                      dimension( max(NN)*max(NN+1)/2 ) */
+/*          The matrix V stored in packed format. */
+
+/*  TAU     (workspace/output) COMPLEX*16 array of */
+/*                             dimension( max(NN) ) */
+/*          The Householder factors computed by ZHETRD in reducing A */
+/*          to tridiagonal form. */
+
+/*  Z       (workspace/output) COMPLEX*16 array of */
+/*                             dimension( LDU, max(NN) ). */
+/*          The unitary matrix of eigenvectors computed by ZSTEQR, */
+/*          ZPTEQR, and ZSTEIN. */
+
+/*  WORK    (workspace/output) COMPLEX*16 array of */
+/*                      dimension( LWORK ) */
+
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          1 + 4 * Nmax + 2 * Nmax * lg Nmax + 3 * Nmax**2 */
+/*          where Nmax = max( NN(j), 2 ) and lg = log base 2. */
+
+/*  IWORK   (workspace/output) INTEGER array, */
+/*             dimension (6 + 6*Nmax + 5 * Nmax * lg Nmax ) */
+/*          where Nmax = max( NN(j), 2 ) and lg = log base 2. */
+/*          Workspace. */
+
+/*  RWORK   (workspace/output) DOUBLE PRECISION array of */
+/*                      dimension( ??? ) */
+
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (26) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -23: LDU < 1 or LDU < NMAX. */
+/*          -29: LWORK too small. */
+/*          If  ZLATMR, CLATMS, ZHETRD, ZUNGTR, ZSTEQR, DSTERF, */
+/*              or ZUNMC2 returns an error code, the */
+/*              absolute value of it is returned. */
+
+/* ----------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NBLOCK          Blocksize as returned by ENVIR. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far. */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ap;
     --sd;
@@ -661,13 +670,13 @@ static integer c__11 = 11;
     --wa3;
     --wr;
     z_dim1 = *ldu;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --vp;
     --tau;
@@ -676,9 +685,11 @@ static integer c__11 = 11;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Keep ftnchek happy */
+/*     Keep ftnchek happy */
     idumma[0] = 1;
 
 /*     Check for errors */
@@ -689,6 +700,7 @@ static integer c__11 = 11;
 /*     Important constants */
 
     badnn = FALSE_;
+    tryrac = TRUE_;
     nmax = 1;
     i__1 = *nsizes;
     for (j = 1; j <= i__1; ++j) {
@@ -701,8 +713,7 @@ static integer c__11 = 11;
 /* L10: */
     }
 
-    nblock = ilaenv_(&c__1, "ZHETRD", "L", &nmax, &c_n1, &c_n1, &c_n1, (
-	    ftnlen)6, (ftnlen)1);
+    nblock = ilaenv_(&c__1, "ZHETRD", "L", &nmax, &c_n1, &c_n1, &c_n1);
 /* Computing MIN */
     i__1 = nmax, i__2 = max(1,nblock);
     nblock = min(i__1,i__2);
@@ -804,21 +815,21 @@ static integer c__11 = 11;
 /* L30: */
 	    }
 
-/*           Compute "A"   
+/*           Compute "A" */
 
-             Control parameters:   
+/*           Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, (w/ eigenvalues)   
-             =5         random log   Hermitian, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random Hermitian   
-             =9                      positive definite   
-             =10                     diagonally dominant tridiagonal */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, (w/ eigenvalues) */
+/*           =5         random log   Hermitian, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random Hermitian */
+/*           =9                      positive definite */
+/*           =10                     diagonally dominant tridiagonal */
 
 	    if (mtypes > 21) {
 		goto L100;
@@ -857,9 +868,9 @@ L70:
 		cond = ulpinv * aninv / 10.;
 	    }
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                Zero */
+/*              Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -870,7 +881,7 @@ L70:
 
 		i__3 = n;
 		for (jc = 1; jc <= i__3; ++jc) {
-		    i__4 = a_subscr(jc, jc);
+		    i__4 = jc + jc * a_dim1;
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 /* L80: */
 		}
@@ -879,7 +890,7 @@ L70:
 
 /*              Diagonal Matrix, [Eigen]values Specified */
 
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &c__0, &c__0, "N", &a[a_offset], lda, &work[
 			1], &iinfo);
 
@@ -888,7 +899,7 @@ L70:
 
 /*              Hermitian, eigenvalues specified */
 
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &n, &n, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -916,7 +927,7 @@ L70:
 
 /*              Positive definite, eigenvalues specified. */
 
-		zlatms_(&n, &n, "S", &iseed[1], "P", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "P", &rwork[1], &imode, &cond, 
 			 &anorm, &n, &n, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -924,26 +935,26 @@ L70:
 
 /*              Positive definite tridiagonal, eigenvalues specified. */
 
-		zlatms_(&n, &n, "S", &iseed[1], "P", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "P", &rwork[1], &imode, &cond, 
 			 &anorm, &c__1, &c__1, "N", &a[a_offset], lda, &work[
 			1], &iinfo);
 		i__3 = n;
 		for (i__ = 2; i__ <= i__3; ++i__) {
-		    temp1 = z_abs(&a_ref(i__ - 1, i__));
-		    i__4 = a_subscr(i__ - 1, i__ - 1);
-		    i__5 = a_subscr(i__, i__);
+		    temp1 = z_abs(&a[i__ - 1 + i__ * a_dim1]);
+		    i__4 = i__ - 1 + (i__ - 1) * a_dim1;
+		    i__5 = i__ + i__ * a_dim1;
 		    z__1.r = a[i__4].r * a[i__5].r - a[i__4].i * a[i__5].i, 
 			    z__1.i = a[i__4].r * a[i__5].i + a[i__4].i * a[
 			    i__5].r;
 		    temp2 = sqrt(z_abs(&z__1));
 		    if (temp1 > temp2 * .5) {
-			i__4 = a_subscr(i__ - 1, i__);
-			i__5 = a_subscr(i__ - 1, i__);
+			i__4 = i__ - 1 + i__ * a_dim1;
+			i__5 = i__ - 1 + i__ * a_dim1;
 			d__1 = temp2 * .5 / (unfl + temp1);
 			z__1.r = d__1 * a[i__5].r, z__1.i = d__1 * a[i__5].i;
 			a[i__4].r = z__1.r, a[i__4].i = z__1.i;
-			i__4 = a_subscr(i__, i__ - 1);
-			d_cnjg(&z__1, &a_ref(i__ - 1, i__));
+			i__4 = i__ + (i__ - 1) * a_dim1;
+			d_cnjg(&z__1, &a[i__ - 1 + i__ * a_dim1]);
 			a[i__4].r = z__1.r, a[i__4].i = z__1.i;
 		    }
 /* L90: */
@@ -955,8 +966,8 @@ L70:
 	    }
 
 	    if (iinfo != 0) {
-		io___41.ciunit = *nounit;
-		s_wsfe(&io___41);
+		io___42.ciunit = *nounit;
+		s_wsfe(&io___42);
 		do_fio(&c__1, "Generator", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -969,8 +980,8 @@ L70:
 
 L100:
 
-/*           Call ZHETRD and ZUNGTR to compute S and U from   
-             upper triangle. */
+/*           Call ZHETRD and ZUNGTR to compute S and U from */
+/*           upper triangle. */
 
 	    zlacpy_("U", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
@@ -979,8 +990,8 @@ L100:
 		    work[1], lwork, &iinfo);
 
 	    if (iinfo != 0) {
-		io___42.ciunit = *nounit;
-		s_wsfe(&io___42);
+		io___43.ciunit = *nounit;
+		s_wsfe(&io___43);
 		do_fio(&c__1, "ZHETRD(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1002,8 +1013,8 @@ L100:
 	    zungtr_("U", &n, &u[u_offset], ldu, &tau[1], &work[1], lwork, &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___43.ciunit = *nounit;
-		s_wsfe(&io___43);
+		io___44.ciunit = *nounit;
+		s_wsfe(&io___44);
 		do_fio(&c__1, "ZUNGTR(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1028,8 +1039,8 @@ L100:
 		    1], &u[u_offset], ldu, &v[v_offset], ldu, &tau[1], &work[
 		    1], &rwork[1], &result[2]);
 
-/*           Call ZHETRD and ZUNGTR to compute S and U from   
-             lower triangle, do tests. */
+/*           Call ZHETRD and ZUNGTR to compute S and U from */
+/*           lower triangle, do tests. */
 
 	    zlacpy_("L", &n, &n, &a[a_offset], lda, &v[v_offset], ldu);
 
@@ -1038,8 +1049,8 @@ L100:
 		    work[1], lwork, &iinfo);
 
 	    if (iinfo != 0) {
-		io___44.ciunit = *nounit;
-		s_wsfe(&io___44);
+		io___45.ciunit = *nounit;
+		s_wsfe(&io___45);
 		do_fio(&c__1, "ZHETRD(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1061,8 +1072,8 @@ L100:
 	    zungtr_("L", &n, &u[u_offset], ldu, &tau[1], &work[1], lwork, &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___45.ciunit = *nounit;
-		s_wsfe(&io___45);
+		io___46.ciunit = *nounit;
+		s_wsfe(&io___46);
 		do_fio(&c__1, "ZUNGTR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1094,7 +1105,7 @@ L100:
 		for (jr = 1; jr <= i__4; ++jr) {
 		    ++i__;
 		    i__5 = i__;
-		    i__6 = a_subscr(jr, jc);
+		    i__6 = jr + jc * a_dim1;
 		    ap[i__5].r = a[i__6].r, ap[i__5].i = a[i__6].i;
 /* L110: */
 		}
@@ -1109,8 +1120,8 @@ L100:
 	    zhptrd_("U", &n, &vp[1], &sd[1], &se[1], &tau[1], &iinfo);
 
 	    if (iinfo != 0) {
-		io___47.ciunit = *nounit;
-		s_wsfe(&io___47);
+		io___48.ciunit = *nounit;
+		s_wsfe(&io___48);
 		do_fio(&c__1, "ZHPTRD(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1130,8 +1141,8 @@ L100:
 	    zupgtr_("U", &n, &vp[1], &tau[1], &u[u_offset], ldu, &work[1], &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___48.ciunit = *nounit;
-		s_wsfe(&io___48);
+		io___49.ciunit = *nounit;
+		s_wsfe(&io___49);
 		do_fio(&c__1, "ZUPGTR(U)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1165,7 +1176,7 @@ L100:
 		for (jr = jc; jr <= i__4; ++jr) {
 		    ++i__;
 		    i__5 = i__;
-		    i__6 = a_subscr(jr, jc);
+		    i__6 = jr + jc * a_dim1;
 		    ap[i__5].r = a[i__6].r, ap[i__5].i = a[i__6].i;
 /* L130: */
 		}
@@ -1180,8 +1191,8 @@ L100:
 	    zhptrd_("L", &n, &vp[1], &sd[1], &se[1], &tau[1], &iinfo);
 
 	    if (iinfo != 0) {
-		io___49.ciunit = *nounit;
-		s_wsfe(&io___49);
+		io___50.ciunit = *nounit;
+		s_wsfe(&io___50);
 		do_fio(&c__1, "ZHPTRD(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1201,8 +1212,8 @@ L100:
 	    zupgtr_("L", &n, &vp[1], &tau[1], &u[u_offset], ldu, &work[1], &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___50.ciunit = *nounit;
-		s_wsfe(&io___50);
+		io___51.ciunit = *nounit;
+		s_wsfe(&io___51);
 		do_fio(&c__1, "ZUPGTR(L)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1225,9 +1236,9 @@ L100:
 		    u_offset], ldu, &vp[1], &tau[1], &work[1], &rwork[1], &
 		    result[8]);
 
-/*           Call ZSTEQR to compute D1, D2, and Z, do tests.   
+/*           Call ZSTEQR to compute D1, D2, and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 	    dcopy_(&n, &sd[1], &c__1, &d1[1], &c__1);
 	    if (n > 0) {
@@ -1240,8 +1251,8 @@ L100:
 	    zsteqr_("V", &n, &d1[1], &rwork[1], &z__[z_offset], ldu, &rwork[n 
 		    + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___51.ciunit = *nounit;
-		s_wsfe(&io___51);
+		io___52.ciunit = *nounit;
+		s_wsfe(&io___52);
 		do_fio(&c__1, "ZSTEQR(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1269,8 +1280,8 @@ L100:
 	    zsteqr_("N", &n, &d2[1], &rwork[1], &work[1], ldu, &rwork[n + 1], 
 		    &iinfo);
 	    if (iinfo != 0) {
-		io___52.ciunit = *nounit;
-		s_wsfe(&io___52);
+		io___53.ciunit = *nounit;
+		s_wsfe(&io___53);
 		do_fio(&c__1, "ZSTEQR(N)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1297,8 +1308,8 @@ L100:
 	    ntest = 12;
 	    dsterf_(&n, &d3[1], &rwork[1], &iinfo);
 	    if (iinfo != 0) {
-		io___53.ciunit = *nounit;
-		s_wsfe(&io___53);
+		io___54.ciunit = *nounit;
+		s_wsfe(&io___54);
 		do_fio(&c__1, "DSTERF", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1352,8 +1363,8 @@ L100:
 	    d__1 = unfl, d__2 = ulp * max(temp3,temp4);
 	    result[12] = temp4 / max(d__1,d__2);
 
-/*           Do Test 13 -- Sturm Sequence Test of Eigenvalues   
-                           Go up by factors of two until it succeeds */
+/*           Do Test 13 -- Sturm Sequence Test of Eigenvalues */
+/*                         Go up by factors of two until it succeeds */
 
 	    ntest = 13;
 	    temp1 = *thresh * (.5 - ulp);
@@ -1372,8 +1383,8 @@ L100:
 L170:
 	    result[13] = temp1;
 
-/*           For positive definite matrices ( JTYPE.GT.15 ) call ZPTEQR   
-             and do tests 14, 15, and 16 . */
+/*           For positive definite matrices ( JTYPE.GT.15 ) call ZPTEQR */
+/*           and do tests 14, 15, and 16 . */
 
 	    if (jtype > 15) {
 
@@ -1390,8 +1401,8 @@ L170:
 		zpteqr_("V", &n, &d4[1], &rwork[1], &z__[z_offset], ldu, &
 			rwork[n + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___57.ciunit = *nounit;
-		    s_wsfe(&io___57);
+		    io___58.ciunit = *nounit;
+		    s_wsfe(&io___58);
 		    do_fio(&c__1, "ZPTEQR(V)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1425,8 +1436,8 @@ L170:
 		zpteqr_("N", &n, &d5[1], &rwork[1], &z__[z_offset], ldu, &
 			rwork[n + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___58.ciunit = *nounit;
-		    s_wsfe(&io___58);
+		    io___59.ciunit = *nounit;
+		    s_wsfe(&io___59);
 		    do_fio(&c__1, "ZPTEQR(N)", (ftnlen)9);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1468,10 +1479,10 @@ L170:
 		result[16] = 0.;
 	    }
 
-/*           Call DSTEBZ with different options and do tests 17-18.   
+/*           Call DSTEBZ with different options and do tests 17-18. */
 
-                If S is positive definite and diagonally dominant,   
-                ask for all eigenvalues with high relative accuracy. */
+/*              If S is positive definite and diagonally dominant, */
+/*              ask for all eigenvalues with high relative accuracy. */
 
 	    vl = 0.;
 	    vu = 0.;
@@ -1484,8 +1495,8 @@ L170:
 			se[1], &m, &nsplit, &wr[1], &iwork[1], &iwork[n + 1], 
 			&rwork[1], &iwork[(n << 1) + 1], &iinfo);
 		if (iinfo != 0) {
-		    io___66.ciunit = *nounit;
-		    s_wsfe(&io___66);
+		    io___67.ciunit = *nounit;
+		    s_wsfe(&io___67);
 		    do_fio(&c__1, "DSTEBZ(A,rel)", (ftnlen)13);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1525,12 +1536,12 @@ L170:
 
 	    ntest = 18;
 	    abstol = unfl + unfl;
-	    dstebz_("A", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
+	    dstebz_("A", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1], 
 		     &m, &nsplit, &wa1[1], &iwork[1], &iwork[n + 1], &rwork[1]
-		    , &iwork[(n << 1) + 1], &iinfo);
+, &iwork[(n << 1) + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___67.ciunit = *nounit;
-		s_wsfe(&io___67);
+		io___68.ciunit = *nounit;
+		s_wsfe(&io___68);
 		do_fio(&c__1, "DSTEBZ(A)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1566,8 +1577,8 @@ L170:
 	    d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 	    result[18] = temp2 / max(d__1,d__2);
 
-/*           Choose random values for IL and IU, and ask for the   
-             IL-th through IU-th eigenvalues. */
+/*           Choose random values for IL and IU, and ask for the */
+/*           IL-th through IU-th eigenvalues. */
 
 	    ntest = 19;
 	    if (n <= 1) {
@@ -1583,12 +1594,12 @@ L170:
 		}
 	    }
 
-	    dstebz_("I", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
+	    dstebz_("I", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1], 
 		     &m2, &nsplit, &wa2[1], &iwork[1], &iwork[n + 1], &rwork[
 		    1], &iwork[(n << 1) + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___70.ciunit = *nounit;
-		s_wsfe(&io___70);
+		io___71.ciunit = *nounit;
+		s_wsfe(&io___71);
 		do_fio(&c__1, "DSTEBZ(I)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1604,8 +1615,8 @@ L170:
 		}
 	    }
 
-/*           Determine the values VL and VU of the IL-th and IU-th   
-             eigenvalues and ask for all eigenvalues in this range. */
+/*           Determine the values VL and VU of the IL-th and IU-th */
+/*           eigenvalues and ask for all eigenvalues in this range. */
 
 	    if (n > 0) {
 		if (il != 1) {
@@ -1635,12 +1646,12 @@ L170:
 		vu = 1.;
 	    }
 
-	    dstebz_("V", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
+	    dstebz_("V", "E", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1], 
 		     &m3, &nsplit, &wa3[1], &iwork[1], &iwork[n + 1], &rwork[
 		    1], &iwork[(n << 1) + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___72.ciunit = *nounit;
-		s_wsfe(&io___72);
+		io___73.ciunit = *nounit;
+		s_wsfe(&io___73);
 		do_fio(&c__1, "DSTEBZ(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1679,17 +1690,17 @@ L170:
 	    d__1 = unfl, d__2 = temp3 * ulp;
 	    result[19] = (temp1 + temp2) / max(d__1,d__2);
 
-/*           Call ZSTEIN to compute eigenvectors corresponding to   
-             eigenvalues in WA1.  (First call DSTEBZ again, to make sure   
-             it returns these eigenvalues in the correct order.) */
+/*           Call ZSTEIN to compute eigenvectors corresponding to */
+/*           eigenvalues in WA1.  (First call DSTEBZ again, to make sure */
+/*           it returns these eigenvalues in the correct order.) */
 
 	    ntest = 21;
-	    dstebz_("A", "B", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1],
+	    dstebz_("A", "B", &n, &vl, &vu, &il, &iu, &abstol, &sd[1], &se[1], 
 		     &m, &nsplit, &wa1[1], &iwork[1], &iwork[n + 1], &rwork[1]
-		    , &iwork[(n << 1) + 1], &iinfo);
+, &iwork[(n << 1) + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___73.ciunit = *nounit;
-		s_wsfe(&io___73);
+		io___74.ciunit = *nounit;
+		s_wsfe(&io___74);
 		do_fio(&c__1, "DSTEBZ(A,B)", (ftnlen)11);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1706,12 +1717,12 @@ L170:
 		}
 	    }
 
-	    zstein_(&n, &sd[1], &se[1], &m, &wa1[1], &iwork[1], &iwork[n + 1],
+	    zstein_(&n, &sd[1], &se[1], &m, &wa1[1], &iwork[1], &iwork[n + 1], 
 		     &z__[z_offset], ldu, &rwork[1], &iwork[(n << 1) + 1], &
 		    iwork[n * 3 + 1], &iinfo);
 	    if (iinfo != 0) {
-		io___74.ciunit = *nounit;
-		s_wsfe(&io___74);
+		io___75.ciunit = *nounit;
+		s_wsfe(&io___75);
 		do_fio(&c__1, "ZSTEIN", (ftnlen)6);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1730,12 +1741,12 @@ L170:
 
 /*           Do tests 20 and 21 */
 
-	    zstt21_(&n, &c__0, &sd[1], &se[1], &wa1[1], dumma, &z__[z_offset],
+	    zstt21_(&n, &c__0, &sd[1], &se[1], &wa1[1], dumma, &z__[z_offset], 
 		     ldu, &work[1], &rwork[1], &result[20]);
 
-/*           Call ZSTEDC(I) to compute D1 and Z, do tests.   
+/*           Call ZSTEDC(I) to compute D1 and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 	    inde = 1;
 	    indrwk = inde + n;
@@ -1751,8 +1762,8 @@ L170:
 		    1], &lwedc, &rwork[indrwk], &lrwedc, &iwork[1], &liwedc, &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___77.ciunit = *nounit;
-		s_wsfe(&io___77);
+		io___78.ciunit = *nounit;
+		s_wsfe(&io___78);
 		do_fio(&c__1, "ZSTEDC(I)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1773,9 +1784,9 @@ L170:
 	    zstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[z_offset], 
 		    ldu, &work[1], &rwork[1], &result[22]);
 
-/*           Call ZSTEDC(V) to compute D1 and Z, do tests.   
+/*           Call ZSTEDC(V) to compute D1 and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 	    dcopy_(&n, &sd[1], &c__1, &d1[1], &c__1);
 	    if (n > 0) {
@@ -1789,8 +1800,8 @@ L170:
 		    1], &lwedc, &rwork[indrwk], &lrwedc, &iwork[1], &liwedc, &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___78.ciunit = *nounit;
-		s_wsfe(&io___78);
+		io___79.ciunit = *nounit;
+		s_wsfe(&io___79);
 		do_fio(&c__1, "ZSTEDC(V)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1811,9 +1822,9 @@ L170:
 	    zstt21_(&n, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[z_offset], 
 		    ldu, &work[1], &rwork[1], &result[24]);
 
-/*           Call ZSTEDC(N) to compute D2, do tests.   
+/*           Call ZSTEDC(N) to compute D2, do tests. */
 
-             Compute D2 */
+/*           Compute D2 */
 
 	    dcopy_(&n, &sd[1], &c__1, &d2[1], &c__1);
 	    if (n > 0) {
@@ -1827,8 +1838,8 @@ L170:
 		    1], &lwedc, &rwork[indrwk], &lrwedc, &iwork[1], &liwedc, &
 		    iinfo);
 	    if (iinfo != 0) {
-		io___79.ciunit = *nounit;
-		s_wsfe(&io___79);
+		io___80.ciunit = *nounit;
+		s_wsfe(&io___80);
 		do_fio(&c__1, "ZSTEDC(N)", (ftnlen)9);
 		do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1865,17 +1876,16 @@ L170:
 	    d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 	    result[26] = temp2 / max(d__1,d__2);
 
-/*           Only test ZSTEGR if IEEE compliant */
+/*           Only test ZSTEMR if IEEE compliant */
 
-	    if (ilaenv_(&c__10, "ZSTEGR", "VA", &c__1, &c__0, &c__0, &c__0, (
-		    ftnlen)6, (ftnlen)2) == 1 && ilaenv_(&c__11, "ZSTEGR", 
-		    "VA", &c__1, &c__0, &c__0, &c__0, (ftnlen)6, (ftnlen)2) ==
+	    if (ilaenv_(&c__10, "ZSTEMR", "VA", &c__1, &c__0, &c__0, &c__0) == 1 && ilaenv_(&c__11, "ZSTEMR", 
+		    "VA", &c__1, &c__0, &c__0, &c__0) ==
 		     1) {
 
-/*           Call ZSTEGR, do test 27 (relative eigenvalue accuracy)   
+/*           Call ZSTEMR, do test 27 (relative eigenvalue accuracy) */
 
-                If S is positive definite and diagonally dominant,   
-                ask for all eigenvalues with high relative accuracy. */
+/*              If S is positive definite and diagonally dominant, */
+/*              ask for all eigenvalues with high relative accuracy. */
 
 		vl = 0.;
 		vu = 0.;
@@ -1885,14 +1895,14 @@ L170:
 		    ntest = 27;
 		    abstol = unfl + unfl;
 		    i__3 = *lwork - (n << 1);
-		    zstegr_("V", "A", &n, &sd[1], &se[1], &vl, &vu, &il, &iu, 
-			    &abstol, &m, &wr[1], &z__[z_offset], ldu, &iwork[
-			    1], &rwork[1], lrwork, &iwork[(n << 1) + 1], &
+		    zstemr_("V", "A", &n, &sd[1], &se[1], &vl, &vu, &il, &iu, 
+			    &m, &wr[1], &z__[z_offset], ldu, &n, &iwork[1], &
+			    tryrac, &rwork[1], lrwork, &iwork[(n << 1) + 1], &
 			    i__3, &iinfo);
 		    if (iinfo != 0) {
-			io___80.ciunit = *nounit;
-			s_wsfe(&io___80);
-			do_fio(&c__1, "ZSTEGR(V,A,rel)", (ftnlen)15);
+			io___81.ciunit = *nounit;
+			s_wsfe(&io___81);
+			do_fio(&c__1, "ZSTEMR(V,A,rel)", (ftnlen)15);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -1939,15 +1949,15 @@ L170:
 			ntest = 28;
 			abstol = unfl + unfl;
 			i__3 = *lwork - (n << 1);
-			zstegr_("V", "I", &n, &sd[1], &se[1], &vl, &vu, &il, &
-				iu, &abstol, &m, &wr[1], &z__[z_offset], ldu, 
-				&iwork[1], &rwork[1], lrwork, &iwork[(n << 1) 
-				+ 1], &i__3, &iinfo);
+			zstemr_("V", "I", &n, &sd[1], &se[1], &vl, &vu, &il, &
+				iu, &m, &wr[1], &z__[z_offset], ldu, &n, &
+				iwork[1], &tryrac, &rwork[1], lrwork, &iwork[(
+				n << 1) + 1], &i__3, &iinfo);
 
 			if (iinfo != 0) {
-			    io___81.ciunit = *nounit;
-			    s_wsfe(&io___81);
-			    do_fio(&c__1, "ZSTEGR(V,I,rel)", (ftnlen)15);
+			    io___82.ciunit = *nounit;
+			    s_wsfe(&io___82);
+			    do_fio(&c__1, "ZSTEMR(V,I,rel)", (ftnlen)15);
 			    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer))
@@ -1991,9 +2001,9 @@ L170:
 		    result[28] = 0.;
 		}
 
-/*           Call ZSTEGR(V,I) to compute D1 and Z, do tests.   
+/*           Call ZSTEMR(V,I) to compute D1 and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 		dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		if (n > 0) {
@@ -2013,14 +2023,14 @@ L170:
 		    }
 		    i__3 = *lrwork - n;
 		    i__4 = *liwork - (n << 1);
-		    zstegr_("V", "I", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
-			    iu, &abstol, &m, &d1[1], &z__[z_offset], ldu, &
-			    iwork[1], &rwork[n + 1], &i__3, &iwork[(n << 1) + 
-			    1], &i__4, &iinfo);
+		    zstemr_("V", "I", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
+			    iu, &m, &d1[1], &z__[z_offset], ldu, &n, &iwork[1]
+, &tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) 
+			    + 1], &i__4, &iinfo);
 		    if (iinfo != 0) {
-			io___82.ciunit = *nounit;
-			s_wsfe(&io___82);
-			do_fio(&c__1, "ZSTEGR(V,I)", (ftnlen)11);
+			io___83.ciunit = *nounit;
+			s_wsfe(&io___83);
+			do_fio(&c__1, "ZSTEMR(V,I)", (ftnlen)11);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -2038,12 +2048,12 @@ L170:
 			}
 		    }
 
-/*           Do Tests 29 and 30   
+/*           Do Tests 29 and 30 */
 
 
-             Call ZSTEGR to compute D2, do tests.   
+/*           Call ZSTEMR to compute D2, do tests. */
 
-             Compute D2 */
+/*           Compute D2 */
 
 		    dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		    if (n > 0) {
@@ -2054,14 +2064,14 @@ L170:
 		    ntest = 31;
 		    i__3 = *lrwork - n;
 		    i__4 = *liwork - (n << 1);
-		    zstegr_("N", "I", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
-			    iu, &abstol, &m, &d2[1], &z__[z_offset], ldu, &
-			    iwork[1], &rwork[n + 1], &i__3, &iwork[(n << 1) + 
-			    1], &i__4, &iinfo);
+		    zstemr_("N", "I", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
+			    iu, &m, &d2[1], &z__[z_offset], ldu, &n, &iwork[1]
+, &tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) 
+			    + 1], &i__4, &iinfo);
 		    if (iinfo != 0) {
-			io___83.ciunit = *nounit;
-			s_wsfe(&io___83);
-			do_fio(&c__1, "ZSTEGR(N,I)", (ftnlen)11);
+			io___84.ciunit = *nounit;
+			s_wsfe(&io___84);
+			do_fio(&c__1, "ZSTEMR(N,I)", (ftnlen)11);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -2103,9 +2113,9 @@ L170:
 		    result[31] = temp2 / max(d__1,d__2);
 
 
-/*           Call ZSTEGR(V,V) to compute D1 and Z, do tests.   
+/*           Call ZSTEMR(V,V) to compute D1 and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 		    dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		    if (n > 0) {
@@ -2148,14 +2158,14 @@ L170:
 
 		    i__3 = *lrwork - n;
 		    i__4 = *liwork - (n << 1);
-		    zstegr_("V", "V", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
-			    iu, &abstol, &m, &d1[1], &z__[z_offset], ldu, &
-			    iwork[1], &rwork[n + 1], &i__3, &iwork[(n << 1) + 
-			    1], &i__4, &iinfo);
+		    zstemr_("V", "V", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
+			    iu, &m, &d1[1], &z__[z_offset], ldu, &m, &iwork[1]
+, &tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) 
+			    + 1], &i__4, &iinfo);
 		    if (iinfo != 0) {
-			io___84.ciunit = *nounit;
-			s_wsfe(&io___84);
-			do_fio(&c__1, "ZSTEGR(V,V)", (ftnlen)11);
+			io___85.ciunit = *nounit;
+			s_wsfe(&io___85);
+			do_fio(&c__1, "ZSTEMR(V,V)", (ftnlen)11);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -2179,9 +2189,9 @@ L170:
 			    z__[z_offset], ldu, &work[1], &m, &rwork[1], &
 			    result[32]);
 
-/*           Call ZSTEGR to compute D2, do tests.   
+/*           Call ZSTEMR to compute D2, do tests. */
 
-             Compute D2 */
+/*           Compute D2 */
 
 		    dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		    if (n > 0) {
@@ -2192,14 +2202,14 @@ L170:
 		    ntest = 34;
 		    i__3 = *lrwork - n;
 		    i__4 = *liwork - (n << 1);
-		    zstegr_("N", "V", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
-			    iu, &abstol, &m, &d2[1], &z__[z_offset], ldu, &
-			    iwork[1], &rwork[n + 1], &i__3, &iwork[(n << 1) + 
-			    1], &i__4, &iinfo);
+		    zstemr_("N", "V", &n, &d5[1], &rwork[1], &vl, &vu, &il, &
+			    iu, &m, &d2[1], &z__[z_offset], ldu, &n, &iwork[1]
+, &tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) 
+			    + 1], &i__4, &iinfo);
 		    if (iinfo != 0) {
-			io___85.ciunit = *nounit;
-			s_wsfe(&io___85);
-			do_fio(&c__1, "ZSTEGR(N,V)", (ftnlen)11);
+			io___86.ciunit = *nounit;
+			s_wsfe(&io___86);
+			do_fio(&c__1, "ZSTEMR(N,V)", (ftnlen)11);
 			do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer))
 				;
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
@@ -2249,9 +2259,9 @@ L170:
 		}
 
 
-/*           Call ZSTEGR(V,A) to compute D1 and Z, do tests.   
+/*           Call ZSTEMR(V,A) to compute D1 and Z, do tests. */
 
-             Compute D1 and Z */
+/*           Compute D1 and Z */
 
 		dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		if (n > 0) {
@@ -2263,14 +2273,14 @@ L170:
 
 		i__3 = *lrwork - n;
 		i__4 = *liwork - (n << 1);
-		zstegr_("V", "A", &n, &d5[1], &rwork[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &d1[1], &z__[z_offset], ldu, &iwork[1], &
-			rwork[n + 1], &i__3, &iwork[(n << 1) + 1], &i__4, &
-			iinfo);
+		zstemr_("V", "A", &n, &d5[1], &rwork[1], &vl, &vu, &il, &iu, &
+			m, &d1[1], &z__[z_offset], ldu, &n, &iwork[1], &
+			tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) + 1], &
+			i__4, &iinfo);
 		if (iinfo != 0) {
-		    io___86.ciunit = *nounit;
-		    s_wsfe(&io___86);
-		    do_fio(&c__1, "ZSTEGR(V,A)", (ftnlen)11);
+		    io___87.ciunit = *nounit;
+		    s_wsfe(&io___87);
+		    do_fio(&c__1, "ZSTEMR(V,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2291,9 +2301,9 @@ L170:
 		zstt22_(&n, &m, &c__0, &sd[1], &se[1], &d1[1], dumma, &z__[
 			z_offset], ldu, &work[1], &m, &rwork[1], &result[35]);
 
-/*           Call ZSTEGR to compute D2, do tests.   
+/*           Call ZSTEMR to compute D2, do tests. */
 
-             Compute D2 */
+/*           Compute D2 */
 
 		dcopy_(&n, &sd[1], &c__1, &d5[1], &c__1);
 		if (n > 0) {
@@ -2304,14 +2314,14 @@ L170:
 		ntest = 37;
 		i__3 = *lrwork - n;
 		i__4 = *liwork - (n << 1);
-		zstegr_("N", "A", &n, &d5[1], &rwork[1], &vl, &vu, &il, &iu, &
-			abstol, &m, &d2[1], &z__[z_offset], ldu, &iwork[1], &
-			rwork[n + 1], &i__3, &iwork[(n << 1) + 1], &i__4, &
-			iinfo);
+		zstemr_("N", "A", &n, &d5[1], &rwork[1], &vl, &vu, &il, &iu, &
+			m, &d2[1], &z__[z_offset], ldu, &n, &iwork[1], &
+			tryrac, &rwork[n + 1], &i__3, &iwork[(n << 1) + 1], &
+			i__4, &iinfo);
 		if (iinfo != 0) {
-		    io___87.ciunit = *nounit;
-		    s_wsfe(&io___87);
-		    do_fio(&c__1, "ZSTEGR(N,A)", (ftnlen)11);
+		    io___88.ciunit = *nounit;
+		    s_wsfe(&io___88);
+		    do_fio(&c__1, "ZSTEMR(N,A)", (ftnlen)11);
 		    do_fio(&c__1, (char *)&iinfo, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer));
@@ -2352,47 +2362,47 @@ L270:
 L280:
 	    ntestt += ntest;
 
-/*           End of Loop -- Check for RESULT(j) > THRESH   
+/*           End of Loop -- Check for RESULT(j) > THRESH */
 
 
-             Print out tests which fail. */
+/*           Print out tests which fail. */
 
 	    i__3 = ntest;
 	    for (jr = 1; jr <= i__3; ++jr) {
 		if (result[jr] >= *thresh) {
 
-/*                 If this is the first test to fail,   
-                   print a header to the data file. */
+/*                 If this is the first test to fail, */
+/*                 print a header to the data file. */
 
 		    if (nerrs == 0) {
-			io___88.ciunit = *nounit;
-			s_wsfe(&io___88);
-			do_fio(&c__1, "ZST", (ftnlen)3);
-			e_wsfe();
 			io___89.ciunit = *nounit;
 			s_wsfe(&io___89);
+			do_fio(&c__1, "ZST", (ftnlen)3);
 			e_wsfe();
 			io___90.ciunit = *nounit;
 			s_wsfe(&io___90);
 			e_wsfe();
 			io___91.ciunit = *nounit;
 			s_wsfe(&io___91);
-			do_fio(&c__1, "Hermitian", (ftnlen)9);
 			e_wsfe();
 			io___92.ciunit = *nounit;
 			s_wsfe(&io___92);
+			do_fio(&c__1, "Hermitian", (ftnlen)9);
+			e_wsfe();
+			io___93.ciunit = *nounit;
+			s_wsfe(&io___93);
 			e_wsfe();
 
 /*                    Tests performed */
 
-			io___93.ciunit = *nounit;
-			s_wsfe(&io___93);
+			io___94.ciunit = *nounit;
+			s_wsfe(&io___94);
 			e_wsfe();
 		    }
 		    ++nerrs;
 		    if (result[jr] < 1e4) {
-			io___94.ciunit = *nounit;
-			s_wsfe(&io___94);
+			io___95.ciunit = *nounit;
+			s_wsfe(&io___95);
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
 				;
@@ -2403,8 +2413,8 @@ L280:
 				doublereal));
 			e_wsfe();
 		    } else {
-			io___95.ciunit = *nounit;
-			s_wsfe(&io___95);
+			io___96.ciunit = *nounit;
+			s_wsfe(&io___96);
 			do_fio(&c__1, (char *)&n, (ftnlen)sizeof(integer));
 			do_fio(&c__1, (char *)&jtype, (ftnlen)sizeof(integer))
 				;
@@ -2432,16 +2442,11 @@ L300:
 
 
 
-/* L9993:   
-   L9992:   
-   L9991:   
-   L9990:   
+/* L9993: */
+/* L9992: */
+/* L9991: */
+/* L9990: */
 
-       End of ZCHKST */
+/*     End of ZCHKST */
 
 } /* zchkst_ */
-
-#undef a_ref
-#undef a_subscr
-
-

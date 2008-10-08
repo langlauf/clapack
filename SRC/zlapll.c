@@ -1,77 +1,92 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zlapll_(integer *n, doublecomplex *x, integer *incx, 
 	doublecomplex *y, integer *incy, doublereal *ssmin)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    Given two column vectors X and Y, let   
-
-                         A = ( X Y ).   
-
-    The subroutine first computes the QR factorization of A = Q*R,   
-    and then computes the SVD of the 2-by-2 upper triangular matrix R.   
-    The smaller singular value of R is returned in SSMIN, which is used   
-    as the measurement of the linear dependency of the vectors X and Y.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The length of the vectors X and Y.   
-
-    X       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX)   
-            On entry, X contains the N-vector X.   
-            On exit, X is overwritten.   
-
-    INCX    (input) INTEGER   
-            The increment between successive elements of X. INCX > 0.   
-
-    Y       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCY)   
-            On entry, Y contains the N-vector Y.   
-            On exit, Y is overwritten.   
-
-    INCY    (input) INTEGER   
-            The increment between successive elements of Y. INCY > 0.   
-
-    SSMIN   (output) DOUBLE PRECISION   
-            The smallest singular value of the N-by-2 matrix A = ( X Y ).   
-
-    =====================================================================   
-
-
-       Quick return if possible   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2, d__3;
     doublecomplex z__1, z__2, z__3, z__4;
+
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
     double z_abs(doublecomplex *);
+
     /* Local variables */
+    doublecomplex c__, a11, a12, a22, tau;
     extern /* Subroutine */ int dlas2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
-    static doublecomplex c__;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal ssmax;
+    doublereal ssmax;
     extern /* Subroutine */ int zaxpy_(integer *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublecomplex a11, a12, a22;
-    extern /* Subroutine */ int zlarfg_(integer *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *);
-    static doublecomplex tau;
+	    doublecomplex *, integer *, doublecomplex *, integer *), zlarfg_(
+	    integer *, doublecomplex *, doublecomplex *, integer *, 
+	    doublecomplex *);
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  Given two column vectors X and Y, let */
+
+/*                       A = ( X Y ). */
+
+/*  The subroutine first computes the QR factorization of A = Q*R, */
+/*  and then computes the SVD of the 2-by-2 upper triangular matrix R. */
+/*  The smaller singular value of R is returned in SSMIN, which is used */
+/*  as the measurement of the linear dependency of the vectors X and Y. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The length of the vectors X and Y. */
+
+/*  X       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCX) */
+/*          On entry, X contains the N-vector X. */
+/*          On exit, X is overwritten. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive elements of X. INCX > 0. */
+
+/*  Y       (input/output) COMPLEX*16 array, dimension (1+(N-1)*INCY) */
+/*          On entry, Y contains the N-vector Y. */
+/*          On exit, Y is overwritten. */
+
+/*  INCY    (input) INTEGER */
+/*          The increment between successive elements of Y. INCY > 0. */
+
+/*  SSMIN   (output) DOUBLE PRECISION */
+/*          The smallest singular value of the N-by-2 matrix A = ( X Y ). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Quick return if possible */
+
+    /* Parameter adjustments */
     --y;
     --x;
 
@@ -114,4 +129,3 @@
 /*     End of ZLAPLL */
 
 } /* zlapll_ */
-

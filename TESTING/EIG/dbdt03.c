@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,99 +16,110 @@ static doublereal c_b8 = 0.;
     doublereal d__1, d__2, d__3, d__4;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
+    doublereal eps;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal bnorm;
+    doublereal bnorm;
     extern doublereal dlamch_(char *);
     extern integer idamax_(integer *, doublereal *, integer *);
-    static doublereal eps;
 
 
-#define vt_ref(a_1,a_2) vt[(a_2)*vt_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DBDT03 reconstructs a bidiagonal matrix B from its SVD: */
+/*     S = U' * B * V */
+/*  where U and V are orthogonal matrices and S is diagonal. */
 
-    Purpose   
-    =======   
+/*  The test ratio to test the singular value decomposition is */
+/*     RESID = norm( B - U * S * VT ) / ( n * norm(B) * EPS ) */
+/*  where VT = V' and EPS is the machine precision. */
 
-    DBDT03 reconstructs a bidiagonal matrix B from its SVD:   
-       S = U' * B * V   
-    where U and V are orthogonal matrices and S is diagonal.   
+/*  Arguments */
+/*  ========= */
 
-    The test ratio to test the singular value decomposition is   
-       RESID = norm( B - U * S * VT ) / ( n * norm(B) * EPS )   
-    where VT = V' and EPS is the machine precision.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix B is upper or lower bidiagonal. */
+/*          = 'U':  Upper bidiagonal */
+/*          = 'L':  Lower bidiagonal */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The order of the matrix B. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix B is upper or lower bidiagonal.   
-            = 'U':  Upper bidiagonal   
-            = 'L':  Lower bidiagonal   
+/*  KD      (input) INTEGER */
+/*          The bandwidth of the bidiagonal matrix B.  If KD = 1, the */
+/*          matrix B is bidiagonal, and if KD = 0, B is diagonal and E is */
+/*          not referenced.  If KD is greater than 1, it is assumed to be */
+/*          1, and if KD is less than 0, it is assumed to be 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix B.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The n diagonal elements of the bidiagonal matrix B. */
 
-    KD      (input) INTEGER   
-            The bandwidth of the bidiagonal matrix B.  If KD = 1, the   
-            matrix B is bidiagonal, and if KD = 0, B is diagonal and E is   
-            not referenced.  If KD is greater than 1, it is assumed to be   
-            1, and if KD is less than 0, it is assumed to be 0.   
+/*  E       (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The (n-1) superdiagonal elements of the bidiagonal matrix B */
+/*          if UPLO = 'U', or the (n-1) subdiagonal elements of B if */
+/*          UPLO = 'L'. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the bidiagonal matrix B.   
+/*  U       (input) DOUBLE PRECISION array, dimension (LDU,N) */
+/*          The n by n orthogonal matrix U in the reduction B = U'*A*P. */
 
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) superdiagonal elements of the bidiagonal matrix B   
-            if UPLO = 'U', or the (n-1) subdiagonal elements of B if   
-            UPLO = 'L'.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,N) */
 
-    U       (input) DOUBLE PRECISION array, dimension (LDU,N)   
-            The n by n orthogonal matrix U in the reduction B = U'*A*P.   
+/*  S       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The singular values from the SVD of B, sorted in decreasing */
+/*          order. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,N)   
+/*  VT      (input) DOUBLE PRECISION array, dimension (LDVT,N) */
+/*          The n by n orthogonal matrix V' in the reduction */
+/*          B = U * S * V'. */
 
-    S       (input) DOUBLE PRECISION array, dimension (N)   
-            The singular values from the SVD of B, sorted in decreasing   
-            order.   
+/*  LDVT    (input) INTEGER */
+/*          The leading dimension of the array VT. */
 
-    VT      (input) DOUBLE PRECISION array, dimension (LDVT,N)   
-            The n by n orthogonal matrix V' in the reduction   
-            B = U * S * V'.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (2*N) */
 
-    LDVT    (input) INTEGER   
-            The leading dimension of the array VT.   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS ) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (2*N)   
+/* ====================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            The test ratio:  norm(B - U * S * V') / ( n * norm(A) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-   ======================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --s;
     vt_dim1 = *ldvt;
-    vt_offset = 1 + vt_dim1 * 1;
+    vt_offset = 1 + vt_dim1;
     vt -= vt_offset;
     --work;
 
@@ -138,7 +144,7 @@ static doublereal c_b8 = 0.;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*n + i__] = s[i__] * vt_ref(i__, j);
+		    work[*n + i__] = s[i__] * vt[i__ + j * vt_dim1];
 /* L10: */
 		}
 		dgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
@@ -168,7 +174,7 @@ static doublereal c_b8 = 0.;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*n + i__] = s[i__] * vt_ref(i__, j);
+		    work[*n + i__] = s[i__] * vt[i__ + j * vt_dim1];
 /* L30: */
 		}
 		dgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*
@@ -199,7 +205,7 @@ static doublereal c_b8 = 0.;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		work[*n + i__] = s[i__] * vt_ref(i__, j);
+		work[*n + i__] = s[i__] * vt[i__ + j * vt_dim1];
 /* L50: */
 	    }
 	    dgemv_("No transpose", n, n, &c_b6, &u[u_offset], ldu, &work[*n + 
@@ -243,7 +249,3 @@ static doublereal c_b8 = 0.;
 /*     End of DBDT03 */
 
 } /* dbdt03_ */
-
-#undef vt_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,9 +16,10 @@ static doublecomplex c_b12 = {-1.,0.};
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j;
+    integer j;
+    doublereal eps;
     extern logical lsame_(char *, char *);
-    static doublereal anorm, bnorm, xnorm;
+    doublereal anorm, bnorm, xnorm;
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zaxpy_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), ztrmv_(
@@ -32,108 +28,115 @@ static doublecomplex c_b12 = {-1.,0.};
     extern doublereal dlamch_(char *), dzasum_(integer *, 
 	    doublecomplex *, integer *), zlantr_(char *, char *, char *, 
 	    integer *, integer *, doublecomplex *, integer *, doublereal *);
-    static doublereal eps;
 
 
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZTRT02 computes the residual for the computed solution to a */
+/*  triangular system of linear equations  A*x = b,  A**T *x = b, */
+/*  or A**H *x = b.  Here A is a triangular matrix, A**T is the transpose */
+/*  of A, A**H is the conjugate transpose of A, and x and b are N by NRHS */
+/*  matrices.  The test ratio is the maximum over the number of right */
+/*  hand sides of */
+/*     norm(b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ), */
+/*  where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZTRT02 computes the residual for the computed solution to a   
-    triangular system of linear equations  A*x = b,  A**T *x = b,   
-    or A**H *x = b.  Here A is a triangular matrix, A**T is the transpose   
-    of A, A**H is the conjugate transpose of A, and x and b are N by NRHS   
-    matrices.  The test ratio is the maximum over the number of right   
-    hand sides of   
-       norm(b - op(A)*x) / ( norm(op(A)) * norm(x) * EPS ),   
-    where op(A) denotes A, A**T, or A**H, and EPS is the machine epsilon.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix A is upper or lower triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    =========   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Specifies the operation applied to A. */
+/*          = 'N':  A *x = b     (No transpose) */
+/*          = 'T':  A**T *x = b  (Transpose) */
+/*          = 'C':  A**H *x = b  (Conjugate transpose) */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  DIAG    (input) CHARACTER*1 */
+/*          Specifies whether or not the matrix A is unit triangular. */
+/*          = 'N':  Non-unit triangular */
+/*          = 'U':  Unit triangular */
 
-    TRANS   (input) CHARACTER*1   
-            Specifies the operation applied to A.   
-            = 'N':  A *x = b     (No transpose)   
-            = 'T':  A**T *x = b  (Transpose)   
-            = 'C':  A**H *x = b  (Conjugate transpose)   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    DIAG    (input) CHARACTER*1   
-            Specifies whether or not the matrix A is unit triangular.   
-            = 'N':  Non-unit triangular   
-            = 'U':  Unit triangular   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrices X and B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The triangular matrix A.  If UPLO = 'U', the leading n by n */
+/*          upper triangular part of the array A contains the upper */
+/*          triangular matrix, and the strictly lower triangular part of */
+/*          A is not referenced.  If UPLO = 'L', the leading n by n lower */
+/*          triangular part of the array A contains the lower triangular */
+/*          matrix, and the strictly upper triangular part of A is not */
+/*          referenced.  If DIAG = 'U', the diagonal elements of A are */
+/*          also not referenced and are assumed to be 1. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrices X and B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The triangular matrix A.  If UPLO = 'U', the leading n by n   
-            upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of   
-            A is not referenced.  If UPLO = 'L', the leading n by n lower   
-            triangular part of the array A contains the lower triangular   
-            matrix, and the strictly upper triangular part of A is not   
-            referenced.  If DIAG = 'U', the diagonal elements of A are   
-            also not referenced and are assumed to be 1.   
+/*  X       (input) COMPLEX*16 array, dimension (LDX,NRHS) */
+/*          The computed solution vectors for the system of linear */
+/*          equations. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  LDX >= max(1,N). */
 
-    X       (input) COMPLEX*16 array, dimension (LDX,NRHS)   
-            The computed solution vectors for the system of linear   
-            equations.   
+/*  B       (input) COMPLEX*16 array, dimension (LDB,NRHS) */
+/*          The right hand side vectors for the system of linear */
+/*          equations. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  LDX >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input) COMPLEX*16 array, dimension (LDB,NRHS)   
-            The right hand side vectors for the system of linear   
-            equations.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (N) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (N)   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          The maximum over the number of right hand sides of */
+/*          norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            The maximum over the number of right hand sides of   
-            norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0 or NRHS = 0 */
 
-
-       Quick exit if N = 0 or NRHS = 0   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
     --rwork;
@@ -160,17 +163,17 @@ static doublecomplex c_b12 = {-1.,0.};
 	return 0;
     }
 
-/*     Compute the maximum over the number of right hand sides of   
-          norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ) */
+/*     Compute the maximum over the number of right hand sides of */
+/*        norm(op(A)*x - b) / ( norm(op(A)) * norm(x) * EPS ) */
 
     *resid = 0.;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	zcopy_(n, &x_ref(1, j), &c__1, &work[1], &c__1);
+	zcopy_(n, &x[j * x_dim1 + 1], &c__1, &work[1], &c__1);
 	ztrmv_(uplo, trans, diag, n, &a[a_offset], lda, &work[1], &c__1);
-	zaxpy_(n, &c_b12, &b_ref(1, j), &c__1, &work[1], &c__1);
+	zaxpy_(n, &c_b12, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
 	bnorm = dzasum_(n, &work[1], &c__1);
-	xnorm = dzasum_(n, &x_ref(1, j), &c__1);
+	xnorm = dzasum_(n, &x[j * x_dim1 + 1], &c__1);
 	if (xnorm <= 0.) {
 	    *resid = 1. / eps;
 	} else {
@@ -186,10 +189,3 @@ static doublecomplex c_b12 = {-1.,0.};
 /*     End of ZTRT02 */
 
 } /* ztrt02_ */
-
-#undef x_ref
-#undef x_subscr
-#undef b_ref
-#undef b_subscr
-
-

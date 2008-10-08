@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zaxpy_(integer *n, doublecomplex *za, doublecomplex *zx, 
 	integer *incx, doublecomplex *zy, integer *incy)
@@ -7,16 +7,31 @@
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     doublecomplex z__1, z__2;
+
     /* Local variables */
-    static integer i__;
+    integer i__, ix, iy;
     extern doublereal dcabs1_(doublecomplex *);
-    static integer ix, iy;
-/*     constant times a vector plus a vector.   
-       jack dongarra, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     constant times a vector plus a vector. */
+/*     jack dongarra, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --zy;
     --zx;
+
     /* Function Body */
     if (*n <= 0) {
 	return 0;
@@ -27,8 +42,10 @@
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -51,7 +68,9 @@
 /* L10: */
     }
     return 0;
+
 /*        code for both increments equal to 1 */
+
 L20:
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -66,4 +85,3 @@ L20:
     }
     return 0;
 } /* zaxpy_ */
-

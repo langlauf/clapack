@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -24,50 +19,66 @@ logical dslect_(doublereal *zr, doublereal *zi)
     logical ret_val;
 
     /* Local variables */
-    static doublereal rmin;
-    static integer i__;
-    static doublereal x;
+    integer i__;
+    doublereal x, rmin;
     extern doublereal dlapy2_(doublereal *, doublereal *);
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     February 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DSLECT returns .TRUE. if the eigenvalue ZR+sqrt(-1)*ZI is to be   
-    selected, and otherwise it returns .FALSE.   
-    It is used by DCHK41 to test if DGEES succesfully sorts eigenvalues,   
-    and by DCHK43 to test if DGEESX succesfully sorts eigenvalues.   
+/*  DSLECT returns .TRUE. if the eigenvalue ZR+sqrt(-1)*ZI is to be */
+/*  selected, and otherwise it returns .FALSE. */
+/*  It is used by DCHK41 to test if DGEES succesfully sorts eigenvalues, */
+/*  and by DCHK43 to test if DGEESX succesfully sorts eigenvalues. */
 
-    The common block /SSLCT/ controls how eigenvalues are selected.   
-    If SELOPT = 0, then DSLECT return .TRUE. when ZR is less than zero,   
-    and .FALSE. otherwise.   
-    If SELOPT is at least 1, DSLECT returns SELVAL(SELOPT) and adds 1   
-    to SELOPT, cycling back to 1 at SELMAX.   
+/*  The common block /SSLCT/ controls how eigenvalues are selected. */
+/*  If SELOPT = 0, then DSLECT return .TRUE. when ZR is less than zero, */
+/*  and .FALSE. otherwise. */
+/*  If SELOPT is at least 1, DSLECT returns SELVAL(SELOPT) and adds 1 */
+/*  to SELOPT, cycling back to 1 at SELMAX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    ZR      (input) DOUBLE PRECISION   
-            The real part of a complex eigenvalue ZR + i*ZI.   
+/*  ZR      (input) DOUBLE PRECISION */
+/*          The real part of a complex eigenvalue ZR + i*ZI. */
 
-    ZI      (input) DOUBLE PRECISION   
-            The imaginary part of a complex eigenvalue ZR + i*ZI.   
+/*  ZI      (input) DOUBLE PRECISION */
+/*          The imaginary part of a complex eigenvalue ZR + i*ZI. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (sslct_1.selopt == 0) {
 	ret_val = *zr < 0.;
     } else {
-	rmin = 0.;
+	d__1 = *zr - sslct_1.selwr[0];
+	d__2 = *zi - sslct_1.selwi[0];
+	rmin = dlapy2_(&d__1, &d__2);
+	ret_val = sslct_1.selval[0];
 	i__1 = sslct_1.seldim;
-	for (i__ = 1; i__ <= i__1; ++i__) {
+	for (i__ = 2; i__ <= i__1; ++i__) {
 	    d__1 = *zr - sslct_1.selwr[i__ - 1];
 	    d__2 = *zi - sslct_1.selwi[i__ - 1];
 	    x = dlapy2_(&d__1, &d__2);
@@ -83,4 +94,3 @@ logical dslect_(doublereal *zr, doublereal *zi)
 /*     End of DSLECT */
 
 } /* dslect_ */
-

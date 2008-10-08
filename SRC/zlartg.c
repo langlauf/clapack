@@ -1,92 +1,117 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zlartg_(doublecomplex *f, doublecomplex *g, doublereal *
 	cs, doublecomplex *sn, doublecomplex *r__)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    ZLARTG generates a plane rotation so that   
-
-       [  CS  SN  ]     [ F ]     [ R ]   
-       [  __      ]  .  [   ]  =  [   ]   where CS**2 + |SN|**2 = 1.   
-       [ -SN  CS  ]     [ G ]     [ 0 ]   
-
-    This is a faster version of the BLAS1 routine ZROTG, except for   
-    the following differences:   
-       F and G are unchanged on return.   
-       If G=0, then CS=1 and SN=0.   
-       If F=0, then CS=0 and SN is chosen so that R is real.   
-
-    Arguments   
-    =========   
-
-    F       (input) COMPLEX*16   
-            The first component of vector to be rotated.   
-
-    G       (input) COMPLEX*16   
-            The second component of vector to be rotated.   
-
-    CS      (output) DOUBLE PRECISION   
-            The cosine of the rotation.   
-
-    SN      (output) COMPLEX*16   
-            The sine of the rotation.   
-
-    R       (output) COMPLEX*16   
-            The nonzero component of the rotated vector.   
-
-    Further Details   
-    ======= =======   
-
-    3-5-96 - Modified with a new algorithm by W. Kahan and J. Demmel   
-
-    ===================================================================== */
-    /* Initialized data */
-    static logical first = TRUE_;
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8, d__9, d__10;
     doublecomplex z__1, z__2, z__3;
+
     /* Builtin functions */
     double log(doublereal), pow_di(doublereal *, integer *), d_imag(
 	    doublecomplex *), sqrt(doublereal);
     void d_cnjg(doublecomplex *, doublecomplex *);
+
     /* Local variables */
-    static doublereal d__;
-    static integer i__;
-    static doublereal scale;
-    static integer count;
-    static doublereal f2, g2, safmn2;
+    doublereal d__;
+    integer i__;
+    doublereal f2, g2;
+    doublecomplex ff;
+    doublereal di, dr;
+    doublecomplex fs, gs;
+    doublereal f2s, g2s, eps, scale;
+    integer count;
+    doublereal safmn2;
     extern doublereal dlapy2_(doublereal *, doublereal *);
-    static doublereal safmx2;
-    static doublecomplex ff;
-    static doublereal di, dr;
+    doublereal safmx2;
     extern doublereal dlamch_(char *);
-    static doublecomplex fs, gs;
-    static doublereal safmin, f2s, g2s, eps;
+    doublereal safmin;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
-    if (first) {
-	first = FALSE_;
-	safmin = dlamch_("S");
-	eps = dlamch_("E");
-	d__1 = dlamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(dlamch_("B")) / 
-		2.);
-	safmn2 = pow_di(&d__1, &i__1);
-	safmx2 = 1. / safmn2;
-    }
-/* Computing MAX   
-   Computing MAX */
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLARTG generates a plane rotation so that */
+
+/*     [  CS  SN  ]     [ F ]     [ R ] */
+/*     [  __      ]  .  [   ]  =  [   ]   where CS**2 + |SN|**2 = 1. */
+/*     [ -SN  CS  ]     [ G ]     [ 0 ] */
+
+/*  This is a faster version of the BLAS1 routine ZROTG, except for */
+/*  the following differences: */
+/*     F and G are unchanged on return. */
+/*     If G=0, then CS=1 and SN=0. */
+/*     If F=0, then CS=0 and SN is chosen so that R is real. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  F       (input) COMPLEX*16 */
+/*          The first component of vector to be rotated. */
+
+/*  G       (input) COMPLEX*16 */
+/*          The second component of vector to be rotated. */
+
+/*  CS      (output) DOUBLE PRECISION */
+/*          The cosine of the rotation. */
+
+/*  SN      (output) COMPLEX*16 */
+/*          The sine of the rotation. */
+
+/*  R       (output) COMPLEX*16 */
+/*          The nonzero component of the rotated vector. */
+
+/*  Further Details */
+/*  ======= ======= */
+
+/*  3-5-96 - Modified with a new algorithm by W. Kahan and J. Demmel */
+
+/*  This version has a few statements commented out for thread safety */
+/*  (machine parameters are computed on each entry). 10 feb 03, SJH. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     LOGICAL            FIRST */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     SAVE               FIRST, SAFMX2, SAFMIN, SAFMN2 */
+/*     .. */
+/*     .. Data statements .. */
+/*     DATA               FIRST / .TRUE. / */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     IF( FIRST ) THEN */
+    safmin = dlamch_("S");
+    eps = dlamch_("E");
+    d__1 = dlamch_("B");
+    i__1 = (integer) (log(safmin / eps) / log(dlamch_("B")) / 2.);
+    safmn2 = pow_di(&d__1, &i__1);
+    safmx2 = 1. / safmn2;
+/*        FIRST = .FALSE. */
+/*     END IF */
+/* Computing MAX */
+/* Computing MAX */
     d__7 = (d__1 = f->r, abs(d__1)), d__8 = (d__2 = d_imag(f), abs(d__2));
 /* Computing MAX */
     d__9 = (d__3 = g->r, abs(d__3)), d__10 = (d__4 = d_imag(g), abs(d__4));
@@ -157,20 +182,20 @@ L20:
 	d__1 = fs.r;
 	d__2 = d_imag(&fs);
 	f2s = dlapy2_(&d__1, &d__2);
-/*        G2 and G2S are accurate   
-          G2 is at least SAFMIN, and G2S is at least SAFMN2 */
+/*        G2 and G2S are accurate */
+/*        G2 is at least SAFMIN, and G2S is at least SAFMN2 */
 	g2s = sqrt(g2);
-/*        Error in CS from underflow in F2S is at most   
-          UNFL / SAFMN2 .lt. sqrt(UNFL*EPS) .lt. EPS   
-          If MAX(G2,ONE)=G2, then F2 .lt. G2*SAFMIN,   
-          and so CS .lt. sqrt(SAFMIN)   
-          If MAX(G2,ONE)=ONE, then F2 .lt. SAFMIN   
-          and so CS .lt. sqrt(SAFMIN)/SAFMN2 = sqrt(EPS)   
-          Therefore, CS = F2S/G2S / sqrt( 1 + (F2S/G2S)**2 ) = F2S/G2S */
+/*        Error in CS from underflow in F2S is at most */
+/*        UNFL / SAFMN2 .lt. sqrt(UNFL*EPS) .lt. EPS */
+/*        If MAX(G2,ONE)=G2, then F2 .lt. G2*SAFMIN, */
+/*        and so CS .lt. sqrt(SAFMIN) */
+/*        If MAX(G2,ONE)=ONE, then F2 .lt. SAFMIN */
+/*        and so CS .lt. sqrt(SAFMIN)/SAFMN2 = sqrt(EPS) */
+/*        Therefore, CS = F2S/G2S / sqrt( 1 + (F2S/G2S)**2 ) = F2S/G2S */
 	*cs = f2s / g2s;
-/*        Make sure abs(FF) = 1   
-          Do complex/real division explicitly with 2 real divisions   
-   Computing MAX */
+/*        Make sure abs(FF) = 1 */
+/*        Do complex/real division explicitly with 2 real divisions */
+/* Computing MAX */
 	d__3 = (d__1 = f->r, abs(d__1)), d__4 = (d__2 = d_imag(f), abs(d__2));
 	if (max(d__3,d__4) > 1.) {
 	    d__1 = f->r;
@@ -202,9 +227,9 @@ L20:
 	r__->r = z__1.r, r__->i = z__1.i;
     } else {
 
-/*        This is the most common case.   
-          Neither F2 nor F2/G2 are less than SAFMIN   
-          F2S cannot overflow, and it is accurate */
+/*        This is the most common case. */
+/*        Neither F2 nor F2/G2 are less than SAFMIN */
+/*        F2S cannot overflow, and it is accurate */
 
 	f2s = sqrt(g2 / f2 + 1.);
 /*        Do the F2S(real)*FS(complex) multiply with two real multiplies */
@@ -246,4 +271,3 @@ L20:
 /*     End of ZLARTG */
 
 } /* zlartg_ */
-

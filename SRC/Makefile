@@ -1,7 +1,7 @@
 include ../make.inc
 
 #######################################################################
-#  This is the makefile to create a library for LAPACK.
+#  This is the makefile to create a library for CLAPACK.
 #  The files are organized as follows:
 #       ALLAUX -- Auxiliary routines called from all precisions
 #       SCLAUX -- Auxiliary routines called from both REAL and COMPLEX
@@ -37,40 +37,43 @@ include ../make.inc
 #  installation guide, LAPACK Working Note 41, for instructions.
 #
 #######################################################################
-
-OBJDIR = $(PLATFORM)
  
-ALLAUX = ilaenv.o ieeeck.o lsame.o lsamen.o xerbla.o
+ALLAUX = ilaenv.o ieeeck.o lsamen.o xerbla.o iparmq.o	\
+    ../INSTALL/ilaver.o ../INSTALL/lsame.o
 
 SCLAUX = \
    sbdsdc.o \
    sbdsqr.o sdisna.o slabad.o slacpy.o sladiv.o slae2.o  slaebz.o \
    slaed0.o slaed1.o slaed2.o slaed3.o slaed4.o slaed5.o slaed6.o \
    slaed7.o slaed8.o slaed9.o slaeda.o slaev2.o slagtf.o \
-   slagts.o slamch.o slamrg.o slanst.o \
+   slagts.o slamrg.o slanst.o \
    slapy2.o slapy3.o slarnv.o \
-   slarrb.o slarre.o slarrf.o \
+   slarra.o slarrb.o slarrc.o slarrd.o slarre.o slarrf.o slarrj.o \
+   slarrk.o slarrr.o slaneg.o \
    slartg.o slaruv.o slas2.o  slascl.o \
    slasd0.o slasd1.o slasd2.o slasd3.o slasd4.o slasd5.o slasd6.o \
-   slasd7.o slasd8.o slasd9.o slasda.o slasdq.o slasdt.o \
-   slaset.o slasq1.o slasq2.o slasq3.o slasq4.o slasq5.o slasq6.o \
+   slasd7.o slasd8.o slasda.o slasdq.o slasdt.o \
+   slaset.o slasq1.o slasq2.o slasq3.o slazq3.o slasq4.o slazq4.o slasq5.o slasq6.o \
    slasr.o  slasrt.o slassq.o slasv2.o spttrf.o sstebz.o sstedc.o \
-   ssteqr.o ssterf.o second.o
+   ssteqr.o ssterf.o slaisnan.o sisnan.o \
+   ../INSTALL/slamch.o ../INSTALL/second.o
 
 DZLAUX = \
    dbdsdc.o \
    dbdsqr.o ddisna.o dlabad.o dlacpy.o dladiv.o dlae2.o  dlaebz.o \
    dlaed0.o dlaed1.o dlaed2.o dlaed3.o dlaed4.o dlaed5.o dlaed6.o \
    dlaed7.o dlaed8.o dlaed9.o dlaeda.o dlaev2.o dlagtf.o \
-   dlagts.o dlamch.o dlamrg.o dlanst.o \
+   dlagts.o dlamrg.o dlanst.o \
    dlapy2.o dlapy3.o dlarnv.o \
-   dlarrb.o dlarre.o dlarrf.o \
+   dlarra.o dlarrb.o dlarrc.o dlarrd.o dlarre.o dlarrf.o dlarrj.o \
+   dlarrk.o dlarrr.o dlaneg.o \
    dlartg.o dlaruv.o dlas2.o  dlascl.o \
    dlasd0.o dlasd1.o dlasd2.o dlasd3.o dlasd4.o dlasd5.o dlasd6.o \
-   dlasd7.o dlasd8.o dlasd9.o dlasda.o dlasdq.o dlasdt.o \
-   dlaset.o dlasq1.o dlasq2.o dlasq3.o dlasq4.o dlasq5.o dlasq6.o \
+   dlasd7.o dlasd8.o dlasda.o dlasdq.o dlasdt.o \
+   dlaset.o dlasq1.o dlasq2.o dlasq3.o dlazq3.o dlasq4.o dlazq4.o dlasq5.o dlasq6.o \
    dlasr.o  dlasrt.o dlassq.o dlasv2.o dpttrf.o dstebz.o dstedc.o \
-   dsteqr.o dsterf.o dsecnd.o
+   dsteqr.o dsterf.o dlaisnan.o disnan.o \
+   ../INSTALL/dlamch.o ../INSTALL/dsecnd.o
 
 SLASRC = \
    sgbbrd.o sgbcon.o sgbequ.o sgbrfs.o sgbsv.o  \
@@ -85,13 +88,14 @@ SLASRC = \
    sggglm.o sgghrd.o sgglse.o sggqrf.o \
    sggrqf.o sggsvd.o sggsvp.o sgtcon.o sgtrfs.o sgtsv.o  \
    sgtsvx.o sgttrf.o sgttrs.o sgtts2.o shgeqz.o \
-   shsein.o shseqr.o slabrd.o slacon.o \
+   shsein.o shseqr.o slabrd.o slacon.o slacn2.o \
    slaein.o slaexc.o slag2.o  slags2.o slagtm.o slagv2.o slahqr.o \
-   slahrd.o slaic1.o slaln2.o slals0.o slalsa.o slalsd.o \
+   slahrd.o slahr2.o slaic1.o slaln2.o slals0.o slalsa.o slalsd.o \
    slangb.o slange.o slangt.o slanhs.o slansb.o slansp.o \
    slansy.o slantb.o slantp.o slantr.o slanv2.o \
    slapll.o slapmt.o \
    slaqgb.o slaqge.o slaqp2.o slaqps.o slaqsb.o slaqsp.o slaqsy.o \
+   slaqr0.o slaqr1.o slaqr2.o slaqr3.o slaqr4.o slaqr5.o \
    slaqtr.o slar1v.o slar2v.o \
    slarf.o  slarfb.o slarfg.o slarft.o slarfx.o slargv.o \
    slarrv.o slartv.o \
@@ -118,7 +122,7 @@ SLASRC = \
    stgsja.o stgsna.o stgsy2.o stgsyl.o stpcon.o stprfs.o stptri.o \
    stptrs.o \
    strcon.o strevc.o strexc.o strrfs.o strsen.o strsna.o strsyl.o \
-   strti2.o strtri.o strtrs.o stzrqf.o stzrzf.o
+   strti2.o strtri.o strtrs.o stzrqf.o stzrzf.o sstemr.o
 
 CLASRC = \
    cbdsqr.o cgbbrd.o cgbcon.o cgbequ.o cgbrfs.o cgbsv.o  cgbsvx.o \
@@ -141,15 +145,16 @@ CLASRC = \
    chpevx.o chpgst.o chpgv.o  chpgvd.o chpgvx.o chprfs.o chpsv.o  \
    chpsvx.o \
    chptrd.o chptrf.o chptri.o chptrs.o chsein.o chseqr.o clabrd.o \
-   clacgv.o clacon.o clacp2.o clacpy.o clacrm.o clacrt.o cladiv.o \
+   clacgv.o clacon.o clacn2.o clacp2.o clacpy.o clacrm.o clacrt.o cladiv.o \
    claed0.o claed7.o claed8.o \
    claein.o claesy.o claev2.o clags2.o clagtm.o \
    clahef.o clahqr.o \
-   clahrd.o claic1.o clals0.o clalsa.o clalsd.o clangb.o clange.o clangt.o \
+   clahrd.o clahr2.o claic1.o clals0.o clalsa.o clalsd.o clangb.o clange.o clangt.o \
    clanhb.o clanhe.o \
    clanhp.o clanhs.o clanht.o clansb.o clansp.o clansy.o clantb.o \
    clantp.o clantr.o clapll.o clapmt.o clarcm.o claqgb.o claqge.o \
    claqhb.o claqhe.o claqhp.o claqp2.o claqps.o claqsb.o \
+   claqr0.o claqr1.o claqr2.o claqr3.o claqr4.o claqr5.o \
    claqsp.o claqsy.o clar1v.o clar2v.o clarf.o  clarfb.o clarfg.o clarft.o \
    clarfx.o clargv.o clarnv.o clarrv.o clartg.o clartv.o \
    clarz.o  clarzb.o clarzt.o clascl.o claset.o clasr.o  classq.o \
@@ -160,7 +165,7 @@ CLASRC = \
    cppequ.o cpprfs.o cppsv.o  cppsvx.o cpptrf.o cpptri.o cpptrs.o \
    cptcon.o cpteqr.o cptrfs.o cptsv.o  cptsvx.o cpttrf.o cpttrs.o cptts2.o \
    crot.o   cspcon.o cspmv.o  cspr.o   csprfs.o cspsv.o  \
-   cspsvx.o csptrf.o csptri.o csptrs.o csrot.o  csrscl.o cstedc.o \
+   cspsvx.o csptrf.o csptri.o csptrs.o csrscl.o cstedc.o \
    cstegr.o cstein.o csteqr.o csycon.o csymv.o  \
    csyr.o   csyrfs.o csysv.o  csysvx.o csytf2.o csytrf.o csytri.o \
    csytrs.o ctbcon.o ctbrfs.o ctbtrs.o ctgevc.o ctgex2.o \
@@ -171,7 +176,7 @@ CLASRC = \
    cungbr.o cunghr.o cungl2.o cunglq.o cungql.o cungqr.o cungr2.o \
    cungrq.o cungtr.o cunm2l.o cunm2r.o cunmbr.o cunmhr.o cunml2.o \
    cunmlq.o cunmql.o cunmqr.o cunmr2.o cunmr3.o cunmrq.o cunmrz.o \
-   cunmtr.o cupgtr.o cupmtr.o icmax1.o scsum1.o
+   cunmtr.o cupgtr.o cupmtr.o icmax1.o scsum1.o cstemr.o
 
 DLASRC = \
    dgbbrd.o dgbcon.o dgbequ.o dgbrfs.o dgbsv.o  \
@@ -186,13 +191,14 @@ DLASRC = \
    dggglm.o dgghrd.o dgglse.o dggqrf.o \
    dggrqf.o dggsvd.o dggsvp.o dgtcon.o dgtrfs.o dgtsv.o  \
    dgtsvx.o dgttrf.o dgttrs.o dgtts2.o dhgeqz.o \
-   dhsein.o dhseqr.o dlabrd.o dlacon.o \
+   dhsein.o dhseqr.o dlabrd.o dlacon.o dlacn2.o \
    dlaein.o dlaexc.o dlag2.o  dlags2.o dlagtm.o dlagv2.o dlahqr.o \
-   dlahrd.o dlaic1.o dlaln2.o dlals0.o dlalsa.o dlalsd.o \
+   dlahrd.o dlahr2.o dlaic1.o dlaln2.o dlals0.o dlalsa.o dlalsd.o \
    dlangb.o dlange.o dlangt.o dlanhs.o dlansb.o dlansp.o \
    dlansy.o dlantb.o dlantp.o dlantr.o dlanv2.o \
    dlapll.o dlapmt.o \
    dlaqgb.o dlaqge.o dlaqp2.o dlaqps.o dlaqsb.o dlaqsp.o dlaqsy.o \
+   dlaqr0.o dlaqr1.o dlaqr2.o dlaqr3.o dlaqr4.o dlaqr5.o \
    dlaqtr.o dlar1v.o dlar2v.o \
    dlarf.o  dlarfb.o dlarfg.o dlarft.o dlarfx.o dlargv.o \
    dlarrv.o dlartv.o \
@@ -220,7 +226,8 @@ DLASRC = \
    dtgsja.o dtgsna.o dtgsy2.o dtgsyl.o dtpcon.o dtprfs.o dtptri.o \
    dtptrs.o \
    dtrcon.o dtrevc.o dtrexc.o dtrrfs.o dtrsen.o dtrsna.o dtrsyl.o \
-   dtrti2.o dtrtri.o dtrtrs.o dtzrqf.o dtzrzf.o
+   dtrti2.o dtrtri.o dtrtrs.o dtzrqf.o dtzrzf.o dstemr.o \
+   dsgesv.o dlag2s.o slag2d.o
 
 ZLASRC = \
    zbdsqr.o zgbbrd.o zgbcon.o zgbequ.o zgbrfs.o zgbsv.o  zgbsvx.o \
@@ -243,16 +250,17 @@ ZLASRC = \
    zhpevx.o zhpgst.o zhpgv.o  zhpgvd.o zhpgvx.o zhprfs.o zhpsv.o  \
    zhpsvx.o \
    zhptrd.o zhptrf.o zhptri.o zhptrs.o zhsein.o zhseqr.o zlabrd.o \
-   zlacgv.o zlacon.o zlacp2.o zlacpy.o zlacrm.o zlacrt.o zladiv.o \
+   zlacgv.o zlacon.o zlacn2.o zlacp2.o zlacpy.o zlacrm.o zlacrt.o zladiv.o \
    zlaed0.o zlaed7.o zlaed8.o \
    zlaein.o zlaesy.o zlaev2.o zlags2.o zlagtm.o \
    zlahef.o zlahqr.o \
-   zlahrd.o zlaic1.o zlals0.o zlalsa.o zlalsd.o zlangb.o zlange.o \
+   zlahrd.o zlahr2.o zlaic1.o zlals0.o zlalsa.o zlalsd.o zlangb.o zlange.o \
    zlangt.o zlanhb.o \
    zlanhe.o \
    zlanhp.o zlanhs.o zlanht.o zlansb.o zlansp.o zlansy.o zlantb.o \
    zlantp.o zlantr.o zlapll.o zlapmt.o zlaqgb.o zlaqge.o \
    zlaqhb.o zlaqhe.o zlaqhp.o zlaqp2.o zlaqps.o zlaqsb.o \
+   zlaqr0.o zlaqr1.o zlaqr2.o zlaqr3.o zlaqr4.o zlaqr5.o \
    zlaqsp.o zlaqsy.o zlar1v.o zlar2v.o zlarcm.o zlarf.o  zlarfb.o \
    zlarfg.o zlarft.o \
    zlarfx.o zlargv.o zlarnv.o zlarrv.o zlartg.o zlartv.o \
@@ -265,7 +273,7 @@ ZLASRC = \
    zppequ.o zpprfs.o zppsv.o  zppsvx.o zpptrf.o zpptri.o zpptrs.o \
    zptcon.o zpteqr.o zptrfs.o zptsv.o  zptsvx.o zpttrf.o zpttrs.o zptts2.o \
    zrot.o   zspcon.o zspmv.o  zspr.o   zsprfs.o zspsv.o  \
-   zspsvx.o zsptrf.o zsptri.o zsptrs.o zdrot.o  zdrscl.o zstedc.o \
+   zspsvx.o zsptrf.o zsptri.o zsptrs.o zdrscl.o zstedc.o \
    zstegr.o zstein.o zsteqr.o zsycon.o zsymv.o  \
    zsyr.o   zsyrfs.o zsysv.o  zsysvx.o zsytf2.o zsytrf.o zsytri.o \
    zsytrs.o ztbcon.o ztbrfs.o ztbtrs.o ztgevc.o ztgex2.o \
@@ -277,9 +285,17 @@ ZLASRC = \
    zungrq.o zungtr.o zunm2l.o zunm2r.o zunmbr.o zunmhr.o zunml2.o \
    zunmlq.o zunmql.o zunmqr.o zunmr2.o zunmr3.o zunmrq.o zunmrz.o \
    zunmtr.o zupgtr.o \
-   zupmtr.o izmax1.o dzsum1.o
+   zupmtr.o izmax1.o dzsum1.o zstemr.o \
+   zcgesv.o zlag2c.o clag2z.o
 
-all: single complex double complex16
+all: ../$(LAPACKLIB)
+
+ALLOBJ=$(SLASRC) $(DLASRC) $(CLASRC) $(ZLASRC) $(SCLAUX) $(DZLAUX)	\
+	$(ALLAUX)
+
+../$(LAPACKLIB): $(ALLOBJ)
+	$(ARCH) $(ARCHFLAGS) $@ $(ALLOBJ)
+	$(RANLIB) $@
 
 single: $(SLASRC) $(ALLAUX) $(SCLAUX) 
 	$(ARCH) $(ARCHFLAGS) ../$(LAPACKLIB) $(SLASRC) $(ALLAUX) \
@@ -315,11 +331,9 @@ FRC:
 clean:
 	rm -f *.o
 
-slamch.o: slamch.c
-	$(CC) -c $(NOOPT) $<
-
-dlamch.o: dlamch.c
-	$(CC) -c $(NOOPT) $<
-
 .c.o: 
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -o $@
+
+slaruv.o: slaruv.c ; $(CC) $(NOOPT) -c $< -o $@
+dlaruv.o: dlaruv.c ; $(CC) $(NOOPT) -c $< -o $@
+

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,20 +17,18 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     doublereal ret_val;
 
     /* Local variables */
-    static integer iscl, info;
-    static doublereal anrm;
-    extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i__, j;
-    extern doublereal dasum_(integer *, doublereal *, integer *);
+    integer i__, j, mn, iscl, info;
+    doublereal anrm;
+    extern doublereal dnrm2_(integer *, doublereal *, integer *), dasum_(
+	    integer *, doublereal *, integer *);
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
-	    integer *, doublereal *, integer *), dgebd2_(integer *, integer *,
+	    integer *, doublereal *, integer *), dgebd2_(integer *, integer *, 
 	     doublereal *, integer *, doublereal *, doublereal *, doublereal *
-	    , doublereal *, doublereal *, integer *);
-    static doublereal dummy[1];
+, doublereal *, doublereal *, integer *);
+    doublereal dummy[1];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static integer mn;
     extern /* Subroutine */ int dlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), dlaset_(char *, integer *, integer 
@@ -44,56 +37,69 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 	    integer *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal bignum, smlnum, nrmsvl;
+    doublereal bignum, smlnum, nrmsvl;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DQRT12 computes the singular values `svlues' of the upper trapezoid */
+/*  of A(1:M,1:N) and returns the ratio */
 
-    Purpose   
-    =======   
+/*       || s - svlues||/(||svlues||*eps*max(M,N)) */
 
-    DQRT12 computes the singular values `svlues' of the upper trapezoid   
-    of A(1:M,1:N) and returns the ratio   
+/*  Arguments */
+/*  ========= */
 
-         || s - svlues||/(||svlues||*eps*max(M,N))   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The M-by-N matrix A. Only the upper trapezoid is referenced. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced.   
+/*  S       (input) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The singular values of the matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    S       (input) DOUBLE PRECISION array, dimension (min(M,N))   
-            The singular values of the matrix A.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK. LWORK >= max(M*N + 4*min(M,N) + */
+/*          max(M,N), M*N+2*MIN( M, N )+4*N). */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK. LWORK >= M*N + 4*min(M,N) +   
-            max(M,N).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --s;
     --work;
@@ -103,7 +109,10 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 
 /*     Test that enough workspace is supplied */
 
-    if (*lwork < *m * *n + (min(*m,*n) << 2) + max(*m,*n)) {
+/* Computing MAX */
+    i__1 = *m * *n + (min(*m,*n) << 2) + max(*m,*n), i__2 = *m * *n + (min(*m,
+	    *n) << 1) + (*n << 2);
+    if (*lwork < max(i__1,i__2)) {
 	xerbla_("DQRT12", &c__7);
 	return ret_val;
     }
@@ -124,7 +133,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    work[(j - 1) * *m + i__] = a_ref(i__, j);
+	    work[(j - 1) * *m + i__] = a[i__ + j * a_dim1];
 /* L10: */
 	}
 /* L20: */
@@ -159,7 +168,7 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 /*        Compute SVD of work */
 
 	dgebd2_(m, n, &work[1], m, &work[*m * *n + 1], &work[*m * *n + mn + 1]
-		, &work[*m * *n + (mn << 1) + 1], &work[*m * *n + mn * 3 + 1],
+, &work[*m * *n + (mn << 1) + 1], &work[*m * *n + mn * 3 + 1], 
 		 &work[*m * *n + (mn << 2) + 1], &info);
 	dbdsqr_("Upper", &mn, &c__0, &c__0, &c__0, &work[*m * *n + 1], &work[*
 		m * *n + mn + 1], dummy, &mn, dummy, &c__1, dummy, &mn, &work[
@@ -198,7 +207,3 @@ doublereal dqrt12_(integer *m, integer *n, doublereal *a, integer *lda,
 /*     End of DQRT12 */
 
 } /* dqrt12_ */
-
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -30,51 +25,44 @@ static integer c_n1 = -1;
 
 /* Subroutine */ int cerrtr_(char *path, integer *nunit)
 {
-    /* System generated locals */
-    integer i__1;
-
     /* Builtin functions */
     integer s_wsle(cilist *), e_wsle(void);
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static complex a[4]	/* was [2][2] */, b[2];
-    static real scale;
-    static complex w[2], x[2];
-    static real rcond;
-    static char c2[2];
-    static real r1[2], r2[2];
+    complex a[4]	/* was [2][2] */, b[2], w[2], x[2];
+    char c2[2];
+    real r1[2], r2[2], rw[2];
+    integer info;
+    real scale, rcond;
     extern /* Subroutine */ int ctrti2_(char *, char *, integer *, complex *, 
 	    integer *, integer *), alaesm_(char *, logical *, 
 	    integer *), clatbs_(char *, char *, char *, char *, 
 	    integer *, integer *, complex *, integer *, complex *, real *, 
-	    real *, integer *);
-    static real rw[2];
-    extern /* Subroutine */ int ctbcon_(char *, char *, char *, integer *, 
-	    integer *, complex *, integer *, real *, complex *, real *, 
-	    integer *);
+	    real *, integer *), ctbcon_(char *
+, char *, char *, integer *, integer *, complex *, integer *, 
+	    real *, complex *, real *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int ctbrfs_(char *, char *, char *, integer *, 
 	    integer *, integer *, complex *, integer *, complex *, integer *, 
 	    complex *, integer *, real *, real *, complex *, real *, integer *
-	    ), chkxer_(char *, integer *, integer *, 
+), chkxer_(char *, integer *, integer *, 
 	    logical *, logical *), clatps_(char *, char *, char *, 
 	    char *, integer *, complex *, complex *, real *, real *, integer *
-	    ), ctpcon_(char *, char *, char *,
+), ctpcon_(char *, char *, char *, 
 	     integer *, complex *, real *, complex *, real *, integer *), clatrs_(char *, char *, char *, char *, 
 	    integer *, complex *, integer *, complex *, real *, real *, 
 	    integer *), ctrcon_(char *, char *
-	    , char *, integer *, complex *, integer *, real *, complex *, 
+, char *, integer *, complex *, integer *, real *, complex *, 
 	    real *, integer *), ctbtrs_(char *, char *
-	    , char *, integer *, integer *, integer *, complex *, integer *, 
+, char *, integer *, integer *, integer *, complex *, integer *, 
 	    complex *, integer *, integer *), ctprfs_(
 	    char *, char *, char *, integer *, integer *, complex *, complex *
-	    , integer *, complex *, integer *, real *, real *, complex *, 
+, integer *, complex *, integer *, real *, real *, complex *, 
 	    real *, integer *), ctrrfs_(char *, char *
-	    , char *, integer *, integer *, complex *, integer *, complex *, 
+, char *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *, complex *, real *
-	    , integer *), ctptri_(char *, char *, 
+, integer *), ctptri_(char *, char *, 
 	    integer *, complex *, integer *), ctrtri_(char *, 
 	    char *, integer *, complex *, integer *, integer *), ctptrs_(char *, char *, char *, integer *, integer *, 
 	    complex *, complex *, integer *, integer *), ctrtrs_(char *, char *, char *, integer *, integer *, 
@@ -85,46 +73,54 @@ static integer c_n1 = -1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRTR tests the error exits for the COMPLEX triangular routines. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRTR tests the error exits for the COMPLEX triangular routines.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
     s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
-    i__1 = a_subscr(1, 1);
-    a[i__1].r = 1.f, a[i__1].i = 0.f;
-    i__1 = a_subscr(1, 2);
-    a[i__1].r = 2.f, a[i__1].i = 0.f;
-    i__1 = a_subscr(2, 2);
-    a[i__1].r = 3.f, a[i__1].i = 0.f;
-    i__1 = a_subscr(2, 1);
-    a[i__1].r = 4.f, a[i__1].i = 0.f;
+    a[0].r = 1.f, a[0].i = 0.f;
+    a[2].r = 2.f, a[2].i = 0.f;
+    a[3].r = 3.f, a[3].i = 0.f;
+    a[1].r = 4.f, a[1].i = 0.f;
     infoc_1.ok = TRUE_;
 
 /*     Test error exits for the general triangular routines. */
@@ -201,42 +197,42 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "CTRRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	ctrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	ctrrfs_("/", "N", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	ctrrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	ctrrfs_("U", "/", "N", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	ctrrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	ctrrfs_("U", "N", "/", &c__0, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	ctrrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1,
+	ctrrfs_("U", "N", "N", &c_n1, &c__0, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	ctrrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1,
+	ctrrfs_("U", "N", "N", &c__0, &c_n1, a, &c__1, b, &c__1, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1,
+	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__1, b, &c__2, x, &c__2, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1,
+	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__1, x, &c__2, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1,
+	ctrrfs_("U", "N", "N", &c__2, &c__1, a, &c__2, b, &c__2, x, &c__1, r1, 
 		 r2, w, rw, &info);
 	chkxer_("CTRRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -345,37 +341,37 @@ static integer c_n1 = -1;
 
 	s_copy(srnamc_1.srnamt, "CTPRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	ctprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	ctprfs_("/", "N", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	ctprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	ctprfs_("U", "/", "N", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	ctprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	ctprfs_("U", "N", "/", &c__0, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	ctprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w,
+	ctprfs_("U", "N", "N", &c_n1, &c__0, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	ctprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w,
+	ctprfs_("U", "N", "N", &c__0, &c_n1, a, b, &c__1, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	ctprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w,
+	ctprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__1, x, &c__2, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	ctprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w,
+	ctprfs_("U", "N", "N", &c__2, &c__1, a, b, &c__2, x, &c__1, r1, r2, w, 
 		 rw, &info);
 	chkxer_("CTPRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -590,8 +586,3 @@ static integer c_n1 = -1;
 /*     End of CERRTR */
 
 } /* cerrtr_ */
-
-#undef a_ref
-#undef a_subscr
-
-

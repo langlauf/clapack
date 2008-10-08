@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,89 +14,98 @@ static integer c__2 = 2;
 	    4,1,2,4,8,9,4,2,1,4,9,1,2,2,1,9,4,1,2,4,9 };
 
     /* System generated locals */
-    real r__1, r__2, r__3, r__4, r__5, r__6, r__7, r__8;
+    real r__1, r__2;
 
     /* Builtin functions */
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer info, isgn;
-    static real tnrm, xnrm, b[4]	/* was [2][2] */, scale, x[4]	/* 
-	    was [2][2] */;
-    static integer n1, n2;
-    static real xnorm;
-    static integer ib;
+    real b[4]	/* was [2][2] */, x[4]	/* was [2][2] */;
+    integer n1, n2, ib;
+    real tl[4]	/* was [2][2] */, tr[4]	/* was [2][2] */;
+    integer ib1, ib2, ib3;
+    real den, val[3], eps;
+    integer itl;
+    real res, sgn;
+    integer itr;
+    real tmp;
+    integer info, isgn;
+    real tnrm, xnrm, scale, xnorm;
     extern /* Subroutine */ int slasy2_(logical *, logical *, integer *, 
 	    integer *, integer *, real *, integer *, real *, integer *, real *
-	    , integer *, real *, real *, integer *, real *, integer *), 
+, integer *, real *, real *, integer *, real *, integer *), 
 	    slabad_(real *, real *);
-    static real tl[4]	/* was [2][2] */, tr[4]	/* was [2][2] */;
     extern doublereal slamch_(char *);
-    static real bignum;
-    static integer itranl, itlscl;
-    static logical ltranl;
-    static integer ib1, ib2, ib3, itranr, itrscl;
-    static logical ltranr;
-    static real smlnum, den, val[3], eps;
-    static integer itl;
-    static real res, sgn;
-    static integer itr;
-    static real tmp;
+    real bignum;
+    integer itranl, itlscl;
+    logical ltranl;
+    integer itranr, itrscl;
+    logical ltranr;
+    real smlnum;
 
 
-#define b_ref(a_1,a_2) b[(a_2)*2 + a_1 - 3]
-#define x_ref(a_1,a_2) x[(a_2)*2 + a_1 - 3]
-#define itval_ref(a_1,a_2,a_3) itval[((a_3)*2 + (a_2))*2 + a_1 - 7]
-#define tl_ref(a_1,a_2) tl[(a_2)*2 + a_1 - 3]
-#define tr_ref(a_1,a_2) tr[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET32 tests SLASY2, a routine for solving */
 
-    Purpose   
-    =======   
+/*          op(TL)*X + ISGN*X*op(TR) = SCALE*B */
 
-    SGET32 tests SLASY2, a routine for solving   
+/*  where TL is N1 by N1, TR is N2 by N2, and N1,N2 =1 or 2 only. */
+/*  X and B are N1 by N2, op() is an optional transpose, an */
+/*  ISGN = 1 or -1. SCALE is chosen less than or equal to 1 to */
+/*  avoid overflow in X. */
 
-            op(TL)*X + ISGN*X*op(TR) = SCALE*B   
+/*  The test condition is that the scaled residual */
 
-    where TL is N1 by N1, TR is N2 by N2, and N1,N2 =1 or 2 only.   
-    X and B are N1 by N2, op() is an optional transpose, an   
-    ISGN = 1 or -1. SCALE is chosen less than or equal to 1 to   
-    avoid overflow in X.   
+/*  norm( op(TL)*X + ISGN*X*op(TR) = SCALE*B ) */
+/*       / ( max( ulp*norm(TL), ulp*norm(TR)) * norm(X), SMLNUM ) */
 
-    The test condition is that the scaled residual   
+/*  should be on the order of 1. Here, ulp is the machine precision. */
+/*  Also, it is verified that SCALE is less than or equal to 1, and */
+/*  that XNORM = infinity-norm(X). */
 
-    norm( op(TL)*X + ISGN*X*op(TR) = SCALE*B )   
-         / ( max( ulp*norm(TL), ulp*norm(TR)) * norm(X), SMLNUM )   
+/*  Arguments */
+/*  ========== */
 
-    should be on the order of 1. Here, ulp is the machine precision.   
-    Also, it is verified that SCALE is less than or equal to 1, and   
-    that XNORM = infinity-norm(X).   
+/*  RMAX    (output) REAL */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) REAL   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER */
+/*          Number of examples returned with INFO.NE.0. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER   
-            Number of examples returned with INFO.NE.0.   
+/*  ===================================================================== */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = slamch_("P");
     smlnum = slamch_("S") / eps;
@@ -133,9 +137,9 @@ static integer c__2 = 2;
 		for (itl = 1; itl <= 3; ++itl) {
 		    for (itr = 1; itr <= 3; ++itr) {
 			for (ib = 1; ib <= 3; ++ib) {
-			    tl_ref(1, 1) = val[itl - 1];
-			    tr_ref(1, 1) = val[itr - 1];
-			    b_ref(1, 1) = val[ib - 1];
+			    tl[0] = val[itl - 1];
+			    tr[0] = val[itr - 1];
+			    b[0] = val[ib - 1];
 			    ++(*knt);
 			    slasy2_(&ltranl, &ltranr, &isgn, &n1, &n2, tl, &
 				    c__2, tr, &c__2, b, &c__2, &scale, x, &
@@ -143,28 +147,24 @@ static integer c__2 = 2;
 			    if (info != 0) {
 				++(*ninfo);
 			    }
-			    res = (r__1 = (tl_ref(1, 1) + sgn * tr_ref(1, 1)) 
-				    * x_ref(1, 1) - scale * b_ref(1, 1), dabs(
-				    r__1));
+			    res = (r__1 = (tl[0] + sgn * tr[0]) * x[0] - 
+				    scale * b[0], dabs(r__1));
 			    if (info == 0) {
 /* Computing MAX */
-				r__4 = eps * (((r__1 = tr_ref(1, 1), dabs(
-					r__1)) + (r__2 = tl_ref(1, 1), dabs(
-					r__2))) * (r__3 = x_ref(1, 1), dabs(
-					r__3)));
-				den = dmax(r__4,smlnum);
+				r__1 = eps * ((dabs(tr[0]) + dabs(tl[0])) * 
+					dabs(x[0]));
+				den = dmax(r__1,smlnum);
 			    } else {
 /* Computing MAX */
-				r__2 = (r__1 = x_ref(1, 1), dabs(r__1));
-				den = smlnum * dmax(r__2,1.f);
+				r__1 = dabs(x[0]);
+				den = smlnum * dmax(r__1,1.f);
 			    }
 			    res /= den;
 			    if (scale > 1.f) {
 				res += 1.f / eps;
 			    }
-			    res += (r__2 = xnorm - (r__1 = x_ref(1, 1), dabs(
-				    r__1)), dabs(r__2)) / dmax(smlnum,xnorm) /
-				     eps;
+			    res += (r__1 = xnorm - dabs(x[0]), dabs(r__1)) / 
+				    dmax(smlnum,xnorm) / eps;
 			    if (info != 0 && info != 1) {
 				res += 1.f / eps;
 			    }
@@ -186,48 +186,41 @@ static integer c__2 = 2;
 			for (itr = 1; itr <= 3; ++itr) {
 			    for (ib1 = 1; ib1 <= 3; ++ib1) {
 				for (ib2 = 1; ib2 <= 3; ++ib2) {
-				    b_ref(1, 1) = val[ib1 - 1];
-				    b_ref(2, 1) = val[ib2 - 1] * -4.f;
-				    tl_ref(1, 1) = itval_ref(1, 1, itl) * val[
-					    itlscl - 1];
-				    tl_ref(2, 1) = itval_ref(2, 1, itl) * val[
-					    itlscl - 1];
-				    tl_ref(1, 2) = itval_ref(1, 2, itl) * val[
-					    itlscl - 1];
-				    tl_ref(2, 2) = itval_ref(2, 2, itl) * val[
-					    itlscl - 1];
-				    tr_ref(1, 1) = val[itr - 1];
+				    b[0] = val[ib1 - 1];
+				    b[1] = val[ib2 - 1] * -4.f;
+				    tl[0] = itval[((itl << 1) + 1 << 1) - 6] *
+					     val[itlscl - 1];
+				    tl[1] = itval[((itl << 1) + 1 << 1) - 5] *
+					     val[itlscl - 1];
+				    tl[2] = itval[((itl << 1) + 2 << 1) - 6] *
+					     val[itlscl - 1];
+				    tl[3] = itval[((itl << 1) + 2 << 1) - 5] *
+					     val[itlscl - 1];
+				    tr[0] = val[itr - 1];
 				    ++(*knt);
-				    slasy2_(&ltranl, &ltranr, &isgn, &n1, &n2,
+				    slasy2_(&ltranl, &ltranr, &isgn, &n1, &n2, 
 					     tl, &c__2, tr, &c__2, b, &c__2, &
 					    scale, x, &c__2, &xnorm, &info);
 				    if (info != 0) {
 					++(*ninfo);
 				    }
 				    if (ltranl) {
-					tmp = tl_ref(1, 2);
-					tl_ref(1, 2) = tl_ref(2, 1);
-					tl_ref(2, 1) = tmp;
+					tmp = tl[2];
+					tl[2] = tl[1];
+					tl[1] = tmp;
 				    }
-				    res = (r__1 = (tl_ref(1, 1) + sgn * 
-					    tr_ref(1, 1)) * x_ref(1, 1) + 
-					    tl_ref(1, 2) * x_ref(2, 1) - 
-					    scale * b_ref(1, 1), dabs(r__1));
-				    res += (r__1 = (tl_ref(2, 2) + sgn * 
-					    tr_ref(1, 1)) * x_ref(2, 1) + 
-					    tl_ref(2, 1) * x_ref(1, 1) - 
-					    scale * b_ref(2, 1), dabs(r__1));
-				    tnrm = (r__1 = tr_ref(1, 1), dabs(r__1)) 
-					    + (r__2 = tl_ref(1, 1), dabs(r__2)
-					    ) + (r__3 = tl_ref(1, 2), dabs(
-					    r__3)) + (r__4 = tl_ref(2, 1), 
-					    dabs(r__4)) + (r__5 = tl_ref(2, 2)
-					    , dabs(r__5));
+				    res = (r__1 = (tl[0] + sgn * tr[0]) * x[0]
+					     + tl[2] * x[1] - scale * b[0], 
+					    dabs(r__1));
+				    res += (r__1 = (tl[3] + sgn * tr[0]) * x[
+					    1] + tl[1] * x[0] - scale * b[1], 
+					    dabs(r__1));
+				    tnrm = dabs(tr[0]) + dabs(tl[0]) + dabs(
+					    tl[2]) + dabs(tl[1]) + dabs(tl[3])
+					    ;
 /* Computing MAX */
-				    r__3 = (r__1 = x_ref(1, 1), dabs(r__1)), 
-					    r__4 = (r__2 = x_ref(2, 1), dabs(
-					    r__2));
-				    xnrm = dmax(r__3,r__4);
+				    r__1 = dabs(x[0]), r__2 = dabs(x[1]);
+				    xnrm = dmax(r__1,r__2);
 /* Computing MAX */
 				    r__1 = smlnum, r__2 = smlnum * xnrm, r__1 
 					    = max(r__1,r__2), r__2 = tnrm * 
@@ -261,45 +254,39 @@ static integer c__2 = 2;
 			for (itl = 1; itl <= 3; ++itl) {
 			    for (ib1 = 1; ib1 <= 3; ++ib1) {
 				for (ib2 = 1; ib2 <= 3; ++ib2) {
-				    b_ref(1, 1) = val[ib1 - 1];
-				    b_ref(1, 2) = val[ib2 - 1] * -2.f;
-				    tr_ref(1, 1) = itval_ref(1, 1, itr) * val[
-					    itrscl - 1];
-				    tr_ref(2, 1) = itval_ref(2, 1, itr) * val[
-					    itrscl - 1];
-				    tr_ref(1, 2) = itval_ref(1, 2, itr) * val[
-					    itrscl - 1];
-				    tr_ref(2, 2) = itval_ref(2, 2, itr) * val[
-					    itrscl - 1];
-				    tl_ref(1, 1) = val[itl - 1];
+				    b[0] = val[ib1 - 1];
+				    b[2] = val[ib2 - 1] * -2.f;
+				    tr[0] = itval[((itr << 1) + 1 << 1) - 6] *
+					     val[itrscl - 1];
+				    tr[1] = itval[((itr << 1) + 1 << 1) - 5] *
+					     val[itrscl - 1];
+				    tr[2] = itval[((itr << 1) + 2 << 1) - 6] *
+					     val[itrscl - 1];
+				    tr[3] = itval[((itr << 1) + 2 << 1) - 5] *
+					     val[itrscl - 1];
+				    tl[0] = val[itl - 1];
 				    ++(*knt);
-				    slasy2_(&ltranl, &ltranr, &isgn, &n1, &n2,
+				    slasy2_(&ltranl, &ltranr, &isgn, &n1, &n2, 
 					     tl, &c__2, tr, &c__2, b, &c__2, &
 					    scale, x, &c__2, &xnorm, &info);
 				    if (info != 0) {
 					++(*ninfo);
 				    }
 				    if (ltranr) {
-					tmp = tr_ref(1, 2);
-					tr_ref(1, 2) = tr_ref(2, 1);
-					tr_ref(2, 1) = tmp;
+					tmp = tr[2];
+					tr[2] = tr[1];
+					tr[1] = tmp;
 				    }
-				    tnrm = (r__1 = tl_ref(1, 1), dabs(r__1)) 
-					    + (r__2 = tr_ref(1, 1), dabs(r__2)
-					    ) + (r__3 = tr_ref(1, 2), dabs(
-					    r__3)) + (r__4 = tr_ref(2, 2), 
-					    dabs(r__4)) + (r__5 = tr_ref(2, 1)
-					    , dabs(r__5));
-				    xnrm = (r__1 = x_ref(1, 1), dabs(r__1)) + 
-					    (r__2 = x_ref(1, 2), dabs(r__2));
-				    res = (r__1 = (tl_ref(1, 1) + sgn * 
-					    tr_ref(1, 1)) * x_ref(1, 1) + sgn 
-					    * tr_ref(2, 1) * x_ref(1, 2) - 
-					    scale * b_ref(1, 1), dabs(r__1));
-				    res += (r__1 = (tl_ref(1, 1) + sgn * 
-					    tr_ref(2, 2)) * x_ref(1, 2) + sgn 
-					    * tr_ref(1, 2) * x_ref(1, 1) - 
-					    scale * b_ref(1, 2), dabs(r__1));
+				    tnrm = dabs(tl[0]) + dabs(tr[0]) + dabs(
+					    tr[2]) + dabs(tr[3]) + dabs(tr[1])
+					    ;
+				    xnrm = dabs(x[0]) + dabs(x[2]);
+				    res = (r__1 = (tl[0] + sgn * tr[0]) * x[0]
+					     + sgn * tr[1] * x[2] - scale * b[
+					    0], dabs(r__1));
+				    res += (r__1 = (tl[0] + sgn * tr[3]) * x[
+					    2] + sgn * tr[2] * x[0] - scale * 
+					    b[2], dabs(r__1));
 /* Computing MAX */
 				    r__1 = smlnum, r__2 = smlnum * xnrm, r__1 
 					    = max(r__1,r__2), r__2 = tnrm * 
@@ -335,97 +322,77 @@ static integer c__2 = 2;
 				for (ib1 = 1; ib1 <= 3; ++ib1) {
 				    for (ib2 = 1; ib2 <= 3; ++ib2) {
 					for (ib3 = 1; ib3 <= 3; ++ib3) {
-					    b_ref(1, 1) = val[ib1 - 1];
-					    b_ref(2, 1) = val[ib2 - 1] * -4.f;
-					    b_ref(1, 2) = val[ib3 - 1] * -2.f;
+					    b[0] = val[ib1 - 1];
+					    b[1] = val[ib2 - 1] * -4.f;
+					    b[2] = val[ib3 - 1] * -2.f;
 /* Computing MIN */
 					    r__1 = val[ib1 - 1], r__2 = val[
 						    ib2 - 1], r__1 = min(r__1,
 						    r__2), r__2 = val[ib3 - 1]
 						    ;
-					    b_ref(2, 2) = dmin(r__1,r__2) * 
-						    8.f;
-					    tr_ref(1, 1) = itval_ref(1, 1, 
-						    itr) * val[itrscl - 1];
-					    tr_ref(2, 1) = itval_ref(2, 1, 
-						    itr) * val[itrscl - 1];
-					    tr_ref(1, 2) = itval_ref(1, 2, 
-						    itr) * val[itrscl - 1];
-					    tr_ref(2, 2) = itval_ref(2, 2, 
-						    itr) * val[itrscl - 1];
-					    tl_ref(1, 1) = itval_ref(1, 1, 
-						    itl) * val[itlscl - 1];
-					    tl_ref(2, 1) = itval_ref(2, 1, 
-						    itl) * val[itlscl - 1];
-					    tl_ref(1, 2) = itval_ref(1, 2, 
-						    itl) * val[itlscl - 1];
-					    tl_ref(2, 2) = itval_ref(2, 2, 
-						    itl) * val[itlscl - 1];
+					    b[3] = dmin(r__1,r__2) * 8.f;
+					    tr[0] = itval[((itr << 1) + 1 << 
+						    1) - 6] * val[itrscl - 1];
+					    tr[1] = itval[((itr << 1) + 1 << 
+						    1) - 5] * val[itrscl - 1];
+					    tr[2] = itval[((itr << 1) + 2 << 
+						    1) - 6] * val[itrscl - 1];
+					    tr[3] = itval[((itr << 1) + 2 << 
+						    1) - 5] * val[itrscl - 1];
+					    tl[0] = itval[((itl << 1) + 1 << 
+						    1) - 6] * val[itlscl - 1];
+					    tl[1] = itval[((itl << 1) + 1 << 
+						    1) - 5] * val[itlscl - 1];
+					    tl[2] = itval[((itl << 1) + 2 << 
+						    1) - 6] * val[itlscl - 1];
+					    tl[3] = itval[((itl << 1) + 2 << 
+						    1) - 5] * val[itlscl - 1];
 					    ++(*knt);
 					    slasy2_(&ltranl, &ltranr, &isgn, &
 						    n1, &n2, tl, &c__2, tr, &
-						    c__2, b, &c__2, &scale, x,
+						    c__2, b, &c__2, &scale, x, 
 						     &c__2, &xnorm, &info);
 					    if (info != 0) {
 			  ++(*ninfo);
 					    }
 					    if (ltranr) {
-			  tmp = tr_ref(1, 2);
-			  tr_ref(1, 2) = tr_ref(2, 1);
-			  tr_ref(2, 1) = tmp;
+			  tmp = tr[2];
+			  tr[2] = tr[1];
+			  tr[1] = tmp;
 					    }
 					    if (ltranl) {
-			  tmp = tl_ref(1, 2);
-			  tl_ref(1, 2) = tl_ref(2, 1);
-			  tl_ref(2, 1) = tmp;
+			  tmp = tl[2];
+			  tl[2] = tl[1];
+			  tl[1] = tmp;
 					    }
-					    tnrm = (r__1 = tr_ref(1, 1), dabs(
-						    r__1)) + (r__2 = tr_ref(2,
-						     1), dabs(r__2)) + (r__3 =
-						     tr_ref(1, 2), dabs(r__3))
-						     + (r__4 = tr_ref(2, 2), 
-						    dabs(r__4)) + (r__5 = 
-						    tl_ref(1, 1), dabs(r__5)) 
-						    + (r__6 = tl_ref(2, 1), 
-						    dabs(r__6)) + (r__7 = 
-						    tl_ref(1, 2), dabs(r__7)) 
-						    + (r__8 = tl_ref(2, 2), 
-						    dabs(r__8));
+					    tnrm = dabs(tr[0]) + dabs(tr[1]) 
+						    + dabs(tr[2]) + dabs(tr[3]
+						    ) + dabs(tl[0]) + dabs(tl[
+						    1]) + dabs(tl[2]) + dabs(
+						    tl[3]);
 /* Computing MAX */
-					    r__5 = (r__1 = x_ref(1, 1), dabs(
-						    r__1)) + (r__2 = x_ref(1, 
-						    2), dabs(r__2)), r__6 = (
-						    r__3 = x_ref(2, 1), dabs(
-						    r__3)) + (r__4 = x_ref(2, 
-						    2), dabs(r__4));
-					    xnrm = dmax(r__5,r__6);
-					    res = (r__1 = (tl_ref(1, 1) + sgn 
-						    * tr_ref(1, 1)) * x_ref(1,
-						     1) + sgn * tr_ref(2, 1) *
-						     x_ref(1, 2) + tl_ref(1, 
-						    2) * x_ref(2, 1) - scale *
-						     b_ref(1, 1), dabs(r__1));
-					    res += (r__1 = tl_ref(1, 1) * 
-						    x_ref(1, 2) + sgn * 
-						    tr_ref(1, 2) * x_ref(1, 1)
-						     + sgn * tr_ref(2, 2) * 
-						    x_ref(1, 2) + tl_ref(1, 2)
-						     * x_ref(2, 2) - scale * 
-						    b_ref(1, 2), dabs(r__1));
-					    res += (r__1 = tl_ref(2, 1) * 
-						    x_ref(1, 1) + sgn * 
-						    tr_ref(1, 1) * x_ref(2, 1)
-						     + sgn * tr_ref(2, 1) * 
-						    x_ref(2, 2) + tl_ref(2, 2)
-						     * x_ref(2, 1) - scale * 
-						    b_ref(2, 1), dabs(r__1));
-					    res += (r__1 = (tl_ref(2, 2) + 
-						    sgn * tr_ref(2, 2)) * 
-						    x_ref(2, 2) + sgn * 
-						    tr_ref(1, 2) * x_ref(2, 1)
-						     + tl_ref(2, 1) * x_ref(1,
-						     2) - scale * b_ref(2, 2),
-						     dabs(r__1));
+					    r__1 = dabs(x[0]) + dabs(x[2]), 
+						    r__2 = dabs(x[1]) + dabs(
+						    x[3]);
+					    xnrm = dmax(r__1,r__2);
+					    res = (r__1 = (tl[0] + sgn * tr[0]
+						    ) * x[0] + sgn * tr[1] * 
+						    x[2] + tl[2] * x[1] - 
+						    scale * b[0], dabs(r__1));
+					    res += (r__1 = tl[0] * x[2] + sgn 
+						    * tr[2] * x[0] + sgn * tr[
+						    3] * x[2] + tl[2] * x[3] 
+						    - scale * b[2], dabs(r__1)
+						    );
+					    res += (r__1 = tl[1] * x[0] + sgn 
+						    * tr[0] * x[1] + sgn * tr[
+						    1] * x[3] + tl[3] * x[1] 
+						    - scale * b[1], dabs(r__1)
+						    );
+					    res += (r__1 = (tl[3] + sgn * tr[
+						    3]) * x[3] + sgn * tr[2] *
+						     x[1] + tl[1] * x[2] - 
+						    scale * b[3], dabs(r__1));
 /* Computing MAX */
 					    r__1 = smlnum, r__2 = smlnum * 
 						    xnrm, r__1 = max(r__1,
@@ -469,11 +436,3 @@ static integer c__2 = 2;
 /*     End of SGET32 */
 
 } /* sget32_ */
-
-#undef tr_ref
-#undef tl_ref
-#undef itval_ref
-#undef x_ref
-#undef b_ref
-
-

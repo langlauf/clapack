@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,7 +14,7 @@ static doublecomplex c_b1 = {1.,0.};
 
     /* Local variables */
     extern /* Subroutine */ int ztrsm_(char *, char *, char *, char *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *), 
 	    xerbla_(char *, integer *), zunmql_(char *, char *, 
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
@@ -27,80 +22,84 @@ static doublecomplex c_b1 = {1.,0.};
 	    integer *, integer *);
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  Solve the least squares problem */
+/*      min || A*X - B || */
+/*  using the QL factorization */
+/*      A = Q*L */
+/*  computed by ZGEQLF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    Solve the least squares problem   
-        min || A*X - B ||   
-    using the QL factorization   
-        A = Q*L   
-    computed by ZGEQLF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  M >= N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  M >= N >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          Details of the QL factorization of the original matrix A as */
+/*          returned by ZGEQLF. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the QL factorization of the original matrix A as   
-            returned by ZGEQLF.   
+/*  TAU     (input) COMPLEX*16 array, dimension (N) */
+/*          Details of the orthogonal matrix Q. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS) */
+/*          On entry, the m-by-nrhs right hand side matrix B. */
+/*          On exit, the n-by-nrhs solution matrix X, stored in rows */
+/*          m-n+1:m. */
 
-    TAU     (input) COMPLEX*16 array, dimension (N)   
-            Details of the orthogonal matrix Q.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= M. */
 
-    B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS)   
-            On entry, the m-by-nrhs right hand side matrix B.   
-            On exit, the n-by-nrhs solution matrix X, stored in rows   
-            m-n+1:m.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= M.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK must be at least NRHS, */
+/*          and should be at least NRHS*NB, where NB is the block size */
+/*          for this environment. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK must be at least NRHS,   
-            and should be at least NRHS*NB, where NB is the block size   
-            for this environment.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments. */
 
-
-       Test the input arguments.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -138,18 +137,11 @@ static doublecomplex c_b1 = {1.,0.};
 
 /*     Solve L*X = B(m-n+1:m,:) */
 
-    ztrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b1, &
-	    a_ref(*m - *n + 1, 1), lda, &b_ref(*m - *n + 1, 1), ldb);
+    ztrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b1, &a[*m 
+	    - *n + 1 + a_dim1], lda, &b[*m - *n + 1 + b_dim1], ldb);
 
     return 0;
 
 /*     End of ZGEQLS */
 
 } /* zgeqls_ */
-
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

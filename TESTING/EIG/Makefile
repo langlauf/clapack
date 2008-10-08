@@ -1,7 +1,7 @@
 include ../../make.inc
 
 ########################################################################
-#  This is the makefile for the eigenvalue test program from LAPACK.
+#  This is the makefile for the eigenvalue test program from CLAPACK.
 #  The test files are organized as follows:
 #
 #     AEIGTST -- Auxiliary test routines used in all precisions
@@ -127,24 +127,24 @@ double: ../xeigtstd
 complex16: ../xeigtstz
 
 ../xeigtsts: $(SEIGTST) $(SCIGTST) $(AEIGTST) ; \
-          $(LOADER) $(LOADOPTS) -o $@ \
+          $(CC) $(LOADOPTS)   -o $@ \
           $(SEIGTST) $(SCIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
 
 ../xeigtstc: $(CEIGTST) $(SCIGTST) $(AEIGTST) ; \
-          $(LOADER) $(LOADOPTS) -o $@ \
+          $(CC) $(LOADOPTS)   -o $@ \
           $(CEIGTST) $(SCIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
 
 ../xeigtstd: $(DEIGTST) $(DZIGTST) $(AEIGTST) ; \
-          $(LOADER) $(LOADOPTS) -o $@ \
+          $(CC) $(LOADOPTS)   -o $@ \
           $(DEIGTST) $(DZIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
 
 ../xeigtstz: $(ZEIGTST) $(DZIGTST) $(AEIGTST) ; \
-          $(LOADER) $(LOADOPTS) -o $@ \
+          $(CC) $(LOADOPTS)   -o $@ \
           $(ZEIGTST) $(DZIGTST) $(AEIGTST) ../../$(TMGLIB) \
-	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc
+	  ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm
 
 $(AEIGTST): $(FRC)
 $(SCIGTST): $(FRC)
@@ -161,13 +161,13 @@ clean:
 	rm -f *.o
 
 schkee.o: schkee.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 dchkee.o: dchkee.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 cchkee.o: cchkee.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 zchkee.o: zchkee.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 
-.c.o : ; $(CC) $(CFLAGS) -c $<
+.c.o : ; $(CC) $(CFLAGS)  -c $< -o $@
 

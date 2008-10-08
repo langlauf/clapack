@@ -44,20 +44,20 @@ complex: ../xblat1c
 complex16: ../xblat1z
 
 ../xblat1s: $(SBLAT1)
-	$(LOADER) $(LOADOPTS) $(SBLAT1) \
-        $(BLASLIB) $(F2CLIB) -lm -lc -o ../xblat1s
+	${CC} $(LOADOPTS)   $(SBLAT1) \
+        $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1s
 
 ../xblat1c: $(CBLAT1) 
-	$(LOADER) $(LOADOPTS) $(CBLAT1) \
-        $(BLASLIB) $(F2CLIB) -lm -lc -o ../xblat1c
+	${CC} $(LOADOPTS)   $(CBLAT1) \
+        $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1c
  
 ../xblat1d: $(DBLAT1) 
-	$(LOADER) $(LOADOPTS) $(DBLAT1) \
-        $(BLASLIB) $(F2CLIB) -lm -lc -o ../xblat1d
+	${CC} $(LOADOPTS)   $(DBLAT1) \
+        $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1d
  
 ../xblat1z: $(ZBLAT1) 
-	$(LOADER) $(LOADOPTS) $(ZBLAT1) \
-        $(BLASLIB) $(F2CLIB) -lm -lc -o ../xblat1z
+	${CC} $(LOADOPTS)   $(ZBLAT1) \
+        $(BLASLIB) $(F2CLIB) -lm  -o ../xblat1z
  
 $(SBLAT1): $(FRC)
 $(CBLAT1): $(FRC)
@@ -71,4 +71,4 @@ clean:
 	rm -f *.o
  
 .c.o: 
-	$(CC) $(CFLAGS) -c $*.c
+	${CC} $(CFLAGS) -c  $<

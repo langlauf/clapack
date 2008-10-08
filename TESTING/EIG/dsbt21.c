@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -12,7 +7,7 @@ static integer c__1 = 1;
 static doublereal c_b22 = 1.;
 static doublereal c_b23 = 0.;
 
-/* Subroutine */ int dsbt21_(char *uplo, integer *n, integer *ka, integer *ks,
+/* Subroutine */ int dsbt21_(char *uplo, integer *n, integer *ka, integer *ks, 
 	 doublereal *a, integer *lda, doublereal *d__, doublereal *e, 
 	doublereal *u, integer *ldu, doublereal *work, doublereal *result)
 {
@@ -21,125 +16,130 @@ static doublereal c_b23 = 0.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal unfl;
+    integer j, jc, jr, lw, ika;
+    doublereal ulp, unfl;
     extern /* Subroutine */ int dspr_(char *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *), dspr2_(char *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *);
-    static integer j;
-    extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
-	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, integer *);
+	    integer *, doublereal *), dgemm_(char *, char *, integer *
+, integer *, integer *, doublereal *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *, integer *);
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
-    static char cuplo[1];
-    static logical lower;
-    static doublereal wnorm;
-    static integer jc;
+    doublereal anorm;
+    char cuplo[1];
+    logical lower;
+    doublereal wnorm;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *);
-    static integer jr, lw;
-    extern doublereal dlansb_(char *, char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *), dlansp_(
-	    char *, char *, integer *, doublereal *, doublereal *);
-    static integer ika;
-    static doublereal ulp;
+	    integer *, doublereal *, integer *, doublereal *), 
+	    dlansb_(char *, char *, integer *, integer *, doublereal *, 
+	    integer *, doublereal *), dlansp_(char *, char *, 
+	    integer *, doublereal *, doublereal *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DSBT21  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*          A = U S U' */
 
-    DSBT21  generally checks a decomposition of the form   
+/*  where ' means transpose, A is symmetric banded, U is */
+/*  orthogonal, and S is diagonal (if KS=0) or symmetric */
+/*  tridiagonal (if KS=1). */
 
-            A = U S U'   
+/*  Specifically: */
 
-    where ' means transpose, A is symmetric banded, U is   
-    orthogonal, and S is diagonal (if KS=0) or symmetric   
-    tridiagonal (if KS=1).   
+/*          RESULT(1) = | A - U S U' | / ( |A| n ulp ) *and* */
+/*          RESULT(2) = | I - UU' | / ( n ulp ) */
 
-    Specifically:   
+/*  Arguments */
+/*  ========= */
 
-            RESULT(1) = | A - U S U' | / ( |A| n ulp ) *and*   
-            RESULT(2) = | I - UU' | / ( n ulp )   
+/*  UPLO    (input) CHARACTER */
+/*          If UPLO='U', the upper triangle of A and V will be used and */
+/*          the (strictly) lower triangle will not be referenced. */
+/*          If UPLO='L', the lower triangle of A and V will be used and */
+/*          the (strictly) upper triangle will not be referenced. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, DSBT21 does nothing. */
+/*          It must be at least zero. */
 
-    UPLO    (input) CHARACTER   
-            If UPLO='U', the upper triangle of A and V will be used and   
-            the (strictly) lower triangle will not be referenced.   
-            If UPLO='L', the lower triangle of A and V will be used and   
-            the (strictly) upper triangle will not be referenced.   
+/*  KA      (input) INTEGER */
+/*          The bandwidth of the matrix A.  It must be at least zero.  If */
+/*          it is larger than N-1, then max( 0, N-1 ) will be used. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, DSBT21 does nothing.   
-            It must be at least zero.   
+/*  KS      (input) INTEGER */
+/*          The bandwidth of the matrix S.  It may only be zero or one. */
+/*          If zero, then S is diagonal, and E is not referenced.  If */
+/*          one, then S is symmetric tri-diagonal. */
 
-    KA      (input) INTEGER   
-            The bandwidth of the matrix A.  It must be at least zero.  If   
-            it is larger than N-1, then max( 0, N-1 ) will be used.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA, N) */
+/*          The original (unfactored) matrix.  It is assumed to be */
+/*          symmetric, and only the upper (UPLO='U') or only the lower */
+/*          (UPLO='L') will be referenced. */
 
-    KS      (input) INTEGER   
-            The bandwidth of the matrix S.  It may only be zero or one.   
-            If zero, then S is diagonal, and E is not referenced.  If   
-            one, then S is symmetric tri-diagonal.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least min( KA, N-1 ). */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA, N)   
-            The original (unfactored) matrix.  It is assumed to be   
-            symmetric, and only the upper (UPLO='U') or only the lower   
-            (UPLO='L') will be referenced.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal of the (symmetric tri-) diagonal matrix S. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least min( KA, N-1 ).   
+/*  E       (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The off-diagonal of the (symmetric tri-) diagonal matrix S. */
+/*          E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and */
+/*          (3,2) element, etc. */
+/*          Not referenced if KS=0. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal of the (symmetric tri-) diagonal matrix S.   
+/*  U       (input) DOUBLE PRECISION array, dimension (LDU, N) */
+/*          The orthogonal matrix in the decomposition, expressed as a */
+/*          dense matrix (i.e., not as a product of Householder */
+/*          transformations, Givens transformations, etc.) */
 
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The off-diagonal of the (symmetric tri-) diagonal matrix S.   
-            E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and   
-            (3,2) element, etc.   
-            Not referenced if KS=0.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) DOUBLE PRECISION array, dimension (LDU, N)   
-            The orthogonal matrix in the decomposition, expressed as a   
-            dense matrix (i.e., not as a product of Householder   
-            transformations, Givens transformations, etc.)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (N**2+N) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The values computed by the two tests described above.  The */
+/*          values are currently limited to 1/ulp, to avoid overflow. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (N**2+N)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The values computed by the two tests described above.  The   
-            values are currently limited to 1/ulp, to avoid overflow.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Constants */
 
-
-       Constants   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
     --result;
@@ -151,8 +151,8 @@ static doublereal c_b23 = 0.;
 	return 0;
     }
 
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
     i__3 = *n - 1;
     i__1 = 0, i__2 = min(i__3,*ka);
     ika = max(i__1,i__2);
@@ -169,19 +169,19 @@ static doublereal c_b23 = 0.;
     unfl = dlamch_("Safe minimum");
     ulp = dlamch_("Epsilon") * dlamch_("Base");
 
-/*     Some Error Checks   
+/*     Some Error Checks */
 
-       Do Test 1   
+/*     Do Test 1 */
 
-       Norm of A:   
+/*     Norm of A: */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = dlansb_("1", cuplo, n, &ika, &a[a_offset], lda, &work[1]);
     anorm = max(d__1,unfl);
 
-/*     Compute error matrix:    Error = A - U S U'   
+/*     Compute error matrix:    Error = A - U S U' */
 
-       Copy A from SB to SP storage format. */
+/*     Copy A from SB to SP storage format. */
 
     j = 0;
     i__1 = *n;
@@ -192,7 +192,7 @@ static doublereal c_b23 = 0.;
 	    i__2 = min(i__3,i__4);
 	    for (jr = 1; jr <= i__2; ++jr) {
 		++j;
-		work[j] = a_ref(jr, jc);
+		work[j] = a[jr + jc * a_dim1];
 /* L10: */
 	    }
 	    i__2 = *n + 1 - jc;
@@ -212,7 +212,7 @@ static doublereal c_b23 = 0.;
 	    i__2 = ika, i__3 = jc - 1;
 	    for (jr = min(i__2,i__3); jr >= 0; --jr) {
 		++j;
-		work[j] = a_ref(ika + 1 - jr, jc);
+		work[j] = a[ika + 1 - jr + jc * a_dim1];
 /* L40: */
 	    }
 	}
@@ -222,7 +222,8 @@ static doublereal c_b23 = 0.;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	d__1 = -d__[j];
-	dspr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
+	dspr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1])
+		;
 /* L60: */
     }
 
@@ -230,8 +231,8 @@ static doublereal c_b23 = 0.;
 	i__1 = *n - 1;
 	for (j = 1; j <= i__1; ++j) {
 	    d__1 = -e[j];
-	    dspr2_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
-		    c__1, &work[1]);
+	    dspr2_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
+		    u_dim1 + 1], &c__1, &work[1]);
 /* L70: */
 	}
     }
@@ -251,9 +252,9 @@ static doublereal c_b23 = 0.;
 	}
     }
 
-/*     Do Test 2   
+/*     Do Test 2 */
 
-       Compute  UU' - I */
+/*     Compute  UU' - I */
 
     dgemm_("N", "C", n, n, n, &c_b22, &u[u_offset], ldu, &u[u_offset], ldu, &
 	    c_b23, &work[1], n);
@@ -264,8 +265,8 @@ static doublereal c_b23 = 0.;
 /* L80: */
     }
 
-/* Computing MIN   
-   Computing 2nd power */
+/* Computing MIN */
+/* Computing 2nd power */
     i__1 = *n;
     d__1 = dlange_("1", n, n, &work[1], n, &work[i__1 * i__1 + 1]),
 	     d__2 = (doublereal) (*n);
@@ -276,8 +277,3 @@ static doublereal c_b23 = 0.;
 /*     End of DSBT21 */
 
 } /* dsbt21_ */
-
-#undef u_ref
-#undef a_ref
-
-

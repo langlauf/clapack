@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -41,22 +36,21 @@ static integer c__20 = 20;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[2];
-    static doublereal rmax, vmax;
-    static doublecomplex e[400]	/* was [20][20] */;
-    static integer i__, j, n;
-    static doublereal scale[20], x;
-    static integer ninfo;
+    doublecomplex e[400]	/* was [20][20] */;
+    integer i__, j, n;
+    doublereal x;
+    integer ihi;
+    doublecomplex ein[400]	/* was [20][20] */;
+    integer ilo;
+    doublereal eps;
+    integer knt, info, lmax[2];
+    doublereal rmax, vmax, scale[20];
+    integer ninfo;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int zgebak_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublecomplex *, integer *, 
 	    integer *);
-    static doublereal safmin;
-    static integer ihi;
-    static doublecomplex ein[400]	/* was [20][20] */;
-    static integer ilo;
-    static doublereal eps;
-    static integer knt;
+    doublereal safmin;
 
     /* Fortran I/O blocks */
     static cilist io___7 = { 0, 0, 0, 0, 0 };
@@ -72,36 +66,48 @@ static integer c__20 = 20;
 
 
 
-#define e_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
-#define ein_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define ein_ref(a_1,a_2) ein[ein_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZCHKBK tests ZGEBAK, a routine for backward transformation of */
+/*  the computed right or left eigenvectors if the orginal matrix */
+/*  was preprocessed by balance subroutine ZGEBAL. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZCHKBK tests ZGEBAK, a routine for backward transformation of   
-    the computed right or left eigenvectors if the orginal matrix   
-    was preprocessed by balance subroutine ZGEBAL.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/* ====================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-   ====================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -137,8 +143,8 @@ L10:
 	s_rsle(&io___14);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&e_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&e[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L20: */
@@ -150,8 +156,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&ein_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&ein[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L30: */
@@ -170,19 +176,19 @@ L10:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    i__3 = e_subscr(i__, j);
-	    i__4 = ein_subscr(i__, j);
+	    i__3 = i__ + j * 20 - 21;
+	    i__4 = i__ + j * 20 - 21;
 	    z__2.r = e[i__3].r - ein[i__4].r, z__2.i = e[i__3].i - ein[i__4]
 		    .i;
 	    z__1.r = z__2.r, z__1.i = z__2.i;
 	    x = ((d__1 = z__1.r, abs(d__1)) + (d__2 = d_imag(&z__1), abs(d__2)
 		    )) / eps;
-	    i__3 = e_subscr(i__, j);
-	    if ((d__1 = e[i__3].r, abs(d__1)) + (d__2 = d_imag(&e_ref(i__, j))
-		    , abs(d__2)) > safmin) {
-		i__4 = e_subscr(i__, j);
-		x /= (d__3 = e[i__4].r, abs(d__3)) + (d__4 = d_imag(&e_ref(
-			i__, j)), abs(d__4));
+	    i__3 = i__ + j * 20 - 21;
+	    if ((d__1 = e[i__3].r, abs(d__1)) + (d__2 = d_imag(&e[i__ + j * 
+		    20 - 21]), abs(d__2)) > safmin) {
+		i__4 = i__ + j * 20 - 21;
+		x /= (d__3 = e[i__4].r, abs(d__3)) + (d__4 = d_imag(&e[i__ + 
+			j * 20 - 21]), abs(d__4));
 	    }
 	    vmax = max(vmax,x);
 /* L40: */
@@ -229,10 +235,3 @@ L60:
 /*     End of ZCHKBK */
 
 } /* zchkbk_ */
-
-#undef ein_ref
-#undef ein_subscr
-#undef e_ref
-#undef e_subscr
-
-

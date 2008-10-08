@@ -1,106 +1,121 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int zlaic1_(integer *job, integer *j, doublecomplex *x, 
 	doublereal *sest, doublecomplex *w, doublecomplex *gamma, doublereal *
 	sestpr, doublecomplex *s, doublecomplex *c__)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    ZLAIC1 applies one step of incremental condition estimation in   
-    its simplest version:   
-
-    Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j   
-    lower triangular matrix L, such that   
-             twonorm(L*x) = sest   
-    Then ZLAIC1 computes sestpr, s, c such that   
-    the vector   
-                    [ s*x ]   
-             xhat = [  c  ]   
-    is an approximate singular vector of   
-                    [ L     0  ]   
-             Lhat = [ w' gamma ]   
-    in the sense that   
-             twonorm(Lhat*xhat) = sestpr.   
-
-    Depending on JOB, an estimate for the largest or smallest singular   
-    value is computed.   
-
-    Note that [s c]' and sestpr**2 is an eigenpair of the system   
-
-        diag(sest*sest, 0) + [alpha  gamma] * [ conjg(alpha) ]   
-                                              [ conjg(gamma) ]   
-
-    where  alpha =  conjg(x)'*w.   
-
-    Arguments   
-    =========   
-
-    JOB     (input) INTEGER   
-            = 1: an estimate for the largest singular value is computed.   
-            = 2: an estimate for the smallest singular value is computed.   
-
-    J       (input) INTEGER   
-            Length of X and W   
-
-    X       (input) COMPLEX*16 array, dimension (J)   
-            The j-vector x.   
-
-    SEST    (input) DOUBLE PRECISION   
-            Estimated singular value of j by j matrix L   
-
-    W       (input) COMPLEX*16 array, dimension (J)   
-            The j-vector w.   
-
-    GAMMA   (input) COMPLEX*16   
-            The diagonal element gamma.   
-
-    SESTPR  (output) DOUBLE PRECISION   
-            Estimated singular value of (j+1) by (j+1) matrix Lhat.   
-
-    S       (output) COMPLEX*16   
-            Sine needed in forming xhat.   
-
-    C       (output) COMPLEX*16   
-            Cosine needed in forming xhat.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     doublereal d__1, d__2;
     doublecomplex z__1, z__2, z__3, z__4, z__5, z__6;
+
     /* Builtin functions */
     double z_abs(doublecomplex *);
     void d_cnjg(doublecomplex *, doublecomplex *), z_sqrt(doublecomplex *, 
 	    doublecomplex *);
     double sqrt(doublereal);
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
+
     /* Local variables */
-    static doublecomplex sine;
-    static doublereal test, zeta1, zeta2, b, t;
-    static doublecomplex alpha;
-    static doublereal norma;
+    doublereal b, t, s1, s2, scl, eps, tmp;
+    doublecomplex sine;
+    doublereal test, zeta1, zeta2;
+    doublecomplex alpha;
+    doublereal norma;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal s1, s2;
     extern doublereal dlamch_(char *);
-    static doublereal absgam, absalp;
-    static doublecomplex cosine;
-    static doublereal absest, scl, eps, tmp;
+    doublereal absgam, absalp;
+    doublecomplex cosine;
+    doublereal absest;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLAIC1 applies one step of incremental condition estimation in */
+/*  its simplest version: */
+
+/*  Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j */
+/*  lower triangular matrix L, such that */
+/*           twonorm(L*x) = sest */
+/*  Then ZLAIC1 computes sestpr, s, c such that */
+/*  the vector */
+/*                  [ s*x ] */
+/*           xhat = [  c  ] */
+/*  is an approximate singular vector of */
+/*                  [ L     0  ] */
+/*           Lhat = [ w' gamma ] */
+/*  in the sense that */
+/*           twonorm(Lhat*xhat) = sestpr. */
+
+/*  Depending on JOB, an estimate for the largest or smallest singular */
+/*  value is computed. */
+
+/*  Note that [s c]' and sestpr**2 is an eigenpair of the system */
+
+/*      diag(sest*sest, 0) + [alpha  gamma] * [ conjg(alpha) ] */
+/*                                            [ conjg(gamma) ] */
+
+/*  where  alpha =  conjg(x)'*w. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOB     (input) INTEGER */
+/*          = 1: an estimate for the largest singular value is computed. */
+/*          = 2: an estimate for the smallest singular value is computed. */
+
+/*  J       (input) INTEGER */
+/*          Length of X and W */
+
+/*  X       (input) COMPLEX*16 array, dimension (J) */
+/*          The j-vector x. */
+
+/*  SEST    (input) DOUBLE PRECISION */
+/*          Estimated singular value of j by j matrix L */
+
+/*  W       (input) COMPLEX*16 array, dimension (J) */
+/*          The j-vector w. */
+
+/*  GAMMA   (input) COMPLEX*16 */
+/*          The diagonal element gamma. */
+
+/*  SESTPR  (output) DOUBLE PRECISION */
+/*          Estimated singular value of (j+1) by (j+1) matrix Lhat. */
+
+/*  S       (output) COMPLEX*16 */
+/*          Sine needed in forming xhat. */
+
+/*  C       (output) COMPLEX*16 */
+/*          Cosine needed in forming xhat. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --w;
     --x;
 
@@ -115,9 +130,9 @@
 
     if (*job == 1) {
 
-/*        Estimating largest singular value   
+/*        Estimating largest singular value */
 
-          special cases */
+/*        special cases */
 
 	if (*sest == 0.) {
 	    s1 = max(absgam,absalp);
@@ -245,9 +260,9 @@
 
     } else if (*job == 2) {
 
-/*        Estimating smallest singular value   
+/*        Estimating smallest singular value */
 
-          special cases */
+/*        special cases */
 
 	if (*sest == 0.) {
 	    *sestpr = 0.;
@@ -422,4 +437,3 @@
 /*     End of ZLAIC1 */
 
 } /* zlaic1_ */
-

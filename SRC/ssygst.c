@@ -1,115 +1,126 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c_n1 = -1;
+static real c_b14 = 1.f;
+static real c_b16 = -.5f;
+static real c_b19 = -1.f;
+static real c_b52 = .5f;
 
 /* Subroutine */ int ssygst_(integer *itype, char *uplo, integer *n, real *a, 
 	integer *lda, real *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SSYGST reduces a real symmetric-definite generalized eigenproblem   
-    to standard form.   
-
-    If ITYPE = 1, the problem is A*x = lambda*B*x,   
-    and A is overwritten by inv(U**T)*A*inv(U) or inv(L)*A*inv(L**T)   
-
-    If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or   
-    B*A*x = lambda*x, and A is overwritten by U*A*U**T or L**T*A*L.   
-
-    B must have been previously factorized as U**T*U or L*L**T by SPOTRF.   
-
-    Arguments   
-    =========   
-
-    ITYPE   (input) INTEGER   
-            = 1: compute inv(U**T)*A*inv(U) or inv(L)*A*inv(L**T);   
-            = 2 or 3: compute U*A*U**T or L**T*A*L.   
-
-    UPLO    (input) CHARACTER   
-            = 'U':  Upper triangle of A is stored and B is factored as   
-                    U**T*U;   
-            = 'L':  Lower triangle of A is stored and B is factored as   
-                    L*L**T.   
-
-    N       (input) INTEGER   
-            The order of the matrices A and B.  N >= 0.   
-
-    A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the symmetric matrix A.  If UPLO = 'U', the leading   
-            N-by-N upper triangular part of A contains the upper   
-            triangular part of the matrix A, and the strictly lower   
-            triangular part of A is not referenced.  If UPLO = 'L', the   
-            leading N-by-N lower triangular part of A contains the lower   
-            triangular part of the matrix A, and the strictly upper   
-            triangular part of A is not referenced.   
-
-            On exit, if INFO = 0, the transformed matrix, stored in the   
-            same format as A.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    B       (input) REAL array, dimension (LDB,N)   
-            The triangular factor from the Cholesky factorization of B,   
-            as returned by SPOTRF.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    static real c_b14 = 1.f;
-    static real c_b16 = -.5f;
-    static real c_b19 = -1.f;
-    static real c_b52 = .5f;
-    
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
+
     /* Local variables */
-    static integer k;
+    integer k, kb, nb;
     extern logical lsame_(char *, char *);
-    static logical upper;
+    logical upper;
     extern /* Subroutine */ int strmm_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
-	    ), ssymm_(char *, char *, integer 
+), ssymm_(char *, char *, integer 
 	    *, integer *, real *, real *, integer *, real *, integer *, real *
-	    , real *, integer *), strsm_(char *, char *, char 
+, real *, integer *), strsm_(char *, char *, char 
 	    *, char *, integer *, integer *, real *, real *, integer *, real *
-	    , integer *);
-    static integer kb, nb;
-    extern /* Subroutine */ int ssygs2_(integer *, char *, integer *, real *, 
-	    integer *, real *, integer *, integer *), ssyr2k_(char *, 
-	    char *, integer *, integer *, real *, real *, integer *, real *, 
-	    integer *, real *, real *, integer *), xerbla_(
-	    char *, integer *);
+, integer *), ssygs2_(integer *, 
+	    char *, integer *, real *, integer *, real *, integer *, integer *
+), ssyr2k_(char *, char *, integer *, integer *, real *, 
+	    real *, integer *, real *, integer *, real *, real *, integer *), xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+	    integer *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SSYGST reduces a real symmetric-definite generalized eigenproblem */
+/*  to standard form. */
+
+/*  If ITYPE = 1, the problem is A*x = lambda*B*x, */
+/*  and A is overwritten by inv(U**T)*A*inv(U) or inv(L)*A*inv(L**T) */
+
+/*  If ITYPE = 2 or 3, the problem is A*B*x = lambda*x or */
+/*  B*A*x = lambda*x, and A is overwritten by U*A*U**T or L**T*A*L. */
+
+/*  B must have been previously factorized as U**T*U or L*L**T by SPOTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  ITYPE   (input) INTEGER */
+/*          = 1: compute inv(U**T)*A*inv(U) or inv(L)*A*inv(L**T); */
+/*          = 2 or 3: compute U*A*U**T or L**T*A*L. */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored and B is factored as */
+/*                  U**T*U; */
+/*          = 'L':  Lower triangle of A is stored and B is factored as */
+/*                  L*L**T. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrices A and B.  N >= 0. */
+
+/*  A       (input/output) REAL array, dimension (LDA,N) */
+/*          On entry, the symmetric matrix A.  If UPLO = 'U', the leading */
+/*          N-by-N upper triangular part of A contains the upper */
+/*          triangular part of the matrix A, and the strictly lower */
+/*          triangular part of A is not referenced.  If UPLO = 'L', the */
+/*          leading N-by-N lower triangular part of A contains the lower */
+/*          triangular part of the matrix A, and the strictly upper */
+/*          triangular part of A is not referenced. */
+
+/*          On exit, if INFO = 0, the transformed matrix, stored in the */
+/*          same format as A. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
+
+/*  B       (input) REAL array, dimension (LDB,N) */
+/*          The triangular factor from the Cholesky factorization of B, */
+/*          as returned by SPOTRF. */
+
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -140,8 +151,7 @@
 
 /*     Determine the block size for this environment. */
 
-    nb = ilaenv_(&c__1, "SSYGST", uplo, n, &c_n1, &c_n1, &c_n1, (ftnlen)6, (
-	    ftnlen)1);
+    nb = ilaenv_(&c__1, "SSYGST", uplo, n, &c_n1, &c_n1, &c_n1);
 
     if (nb <= 1 || nb >= *n) {
 
@@ -166,29 +176,30 @@
 
 /*                 Update the upper triangle of A(k:n,k:n) */
 
-		    ssygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
-			     ldb, info);
+		    ssygs2_(itype, uplo, &kb, &a[k + k * a_dim1], lda, &b[k + 
+			    k * b_dim1], ldb, info);
 		    if (k + kb <= *n) {
 			i__3 = *n - k - kb + 1;
 			strsm_("Left", uplo, "Transpose", "Non-unit", &kb, &
-				i__3, &c_b14, &b_ref(k, k), ldb, &a_ref(k, k 
-				+ kb), lda);
+				i__3, &c_b14, &b[k + k * b_dim1], ldb, &a[k + 
+				(k + kb) * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssymm_("Left", uplo, &kb, &i__3, &c_b16, &a_ref(k, k),
-				 lda, &b_ref(k, k + kb), ldb, &c_b14, &a_ref(
-				k, k + kb), lda);
+			ssymm_("Left", uplo, &kb, &i__3, &c_b16, &a[k + k * 
+				a_dim1], lda, &b[k + (k + kb) * b_dim1], ldb, 
+				&c_b14, &a[k + (k + kb) * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssyr2k_(uplo, "Transpose", &i__3, &kb, &c_b19, &a_ref(
-				k, k + kb), lda, &b_ref(k, k + kb), ldb, &
-				c_b14, &a_ref(k + kb, k + kb), lda);
+			ssyr2k_(uplo, "Transpose", &i__3, &kb, &c_b19, &a[k + 
+				(k + kb) * a_dim1], lda, &b[k + (k + kb) * 
+				b_dim1], ldb, &c_b14, &a[k + kb + (k + kb) * 
+				a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssymm_("Left", uplo, &kb, &i__3, &c_b16, &a_ref(k, k),
-				 lda, &b_ref(k, k + kb), ldb, &c_b14, &a_ref(
-				k, k + kb), lda);
+			ssymm_("Left", uplo, &kb, &i__3, &c_b16, &a[k + k * 
+				a_dim1], lda, &b[k + (k + kb) * b_dim1], ldb, 
+				&c_b14, &a[k + (k + kb) * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			strsm_("Right", uplo, "No transpose", "Non-unit", &kb,
-				 &i__3, &c_b14, &b_ref(k + kb, k + kb), ldb, &
-				a_ref(k, k + kb), lda);
+			strsm_("Right", uplo, "No transpose", "Non-unit", &kb, 
+				 &i__3, &c_b14, &b[k + kb + (k + kb) * b_dim1]
+, ldb, &a[k + (k + kb) * a_dim1], lda);
 		    }
 /* L10: */
 		}
@@ -205,29 +216,30 @@
 
 /*                 Update the lower triangle of A(k:n,k:n) */
 
-		    ssygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
-			     ldb, info);
+		    ssygs2_(itype, uplo, &kb, &a[k + k * a_dim1], lda, &b[k + 
+			    k * b_dim1], ldb, info);
 		    if (k + kb <= *n) {
 			i__3 = *n - k - kb + 1;
 			strsm_("Right", uplo, "Transpose", "Non-unit", &i__3, 
-				&kb, &c_b14, &b_ref(k, k), ldb, &a_ref(k + kb,
-				 k), lda);
+				&kb, &c_b14, &b[k + k * b_dim1], ldb, &a[k + 
+				kb + k * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssymm_("Right", uplo, &i__3, &kb, &c_b16, &a_ref(k, k)
-				, lda, &b_ref(k + kb, k), ldb, &c_b14, &a_ref(
-				k + kb, k), lda);
+			ssymm_("Right", uplo, &i__3, &kb, &c_b16, &a[k + k * 
+				a_dim1], lda, &b[k + kb + k * b_dim1], ldb, &
+				c_b14, &a[k + kb + k * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssyr2k_(uplo, "No transpose", &i__3, &kb, &c_b19, &
-				a_ref(k + kb, k), lda, &b_ref(k + kb, k), ldb,
-				 &c_b14, &a_ref(k + kb, k + kb), lda);
+			ssyr2k_(uplo, "No transpose", &i__3, &kb, &c_b19, &a[
+				k + kb + k * a_dim1], lda, &b[k + kb + k * 
+				b_dim1], ldb, &c_b14, &a[k + kb + (k + kb) * 
+				a_dim1], lda);
 			i__3 = *n - k - kb + 1;
-			ssymm_("Right", uplo, &i__3, &kb, &c_b16, &a_ref(k, k)
-				, lda, &b_ref(k + kb, k), ldb, &c_b14, &a_ref(
-				k + kb, k), lda);
+			ssymm_("Right", uplo, &i__3, &kb, &c_b16, &a[k + k * 
+				a_dim1], lda, &b[k + kb + k * b_dim1], ldb, &
+				c_b14, &a[k + kb + k * a_dim1], lda);
 			i__3 = *n - k - kb + 1;
 			strsm_("Left", uplo, "No transpose", "Non-unit", &
-				i__3, &kb, &c_b14, &b_ref(k + kb, k + kb), 
-				ldb, &a_ref(k + kb, k), lda);
+				i__3, &kb, &c_b14, &b[k + kb + (k + kb) * 
+				b_dim1], ldb, &a[k + kb + k * a_dim1], lda);
 		    }
 /* L20: */
 		}
@@ -248,22 +260,27 @@
 
 		    i__3 = k - 1;
 		    strmm_("Left", uplo, "No transpose", "Non-unit", &i__3, &
-			    kb, &c_b14, &b[b_offset], ldb, &a_ref(1, k), lda);
+			    kb, &c_b14, &b[b_offset], ldb, &a[k * a_dim1 + 1], 
+			     lda)
+			    ;
 		    i__3 = k - 1;
-		    ssymm_("Right", uplo, &i__3, &kb, &c_b52, &a_ref(k, k), 
-			    lda, &b_ref(1, k), ldb, &c_b14, &a_ref(1, k), lda);
+		    ssymm_("Right", uplo, &i__3, &kb, &c_b52, &a[k + k * 
+			    a_dim1], lda, &b[k * b_dim1 + 1], ldb, &c_b14, &a[
+			    k * a_dim1 + 1], lda);
 		    i__3 = k - 1;
-		    ssyr2k_(uplo, "No transpose", &i__3, &kb, &c_b14, &a_ref(
-			    1, k), lda, &b_ref(1, k), ldb, &c_b14, &a[
-			    a_offset], lda);
+		    ssyr2k_(uplo, "No transpose", &i__3, &kb, &c_b14, &a[k * 
+			    a_dim1 + 1], lda, &b[k * b_dim1 + 1], ldb, &c_b14, 
+			     &a[a_offset], lda);
 		    i__3 = k - 1;
-		    ssymm_("Right", uplo, &i__3, &kb, &c_b52, &a_ref(k, k), 
-			    lda, &b_ref(1, k), ldb, &c_b14, &a_ref(1, k), lda);
+		    ssymm_("Right", uplo, &i__3, &kb, &c_b52, &a[k + k * 
+			    a_dim1], lda, &b[k * b_dim1 + 1], ldb, &c_b14, &a[
+			    k * a_dim1 + 1], lda);
 		    i__3 = k - 1;
-		    strmm_("Right", uplo, "Transpose", "Non-unit", &i__3, &kb,
-			     &c_b14, &b_ref(k, k), ldb, &a_ref(1, k), lda);
-		    ssygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
-			     ldb, info);
+		    strmm_("Right", uplo, "Transpose", "Non-unit", &i__3, &kb, 
+			     &c_b14, &b[k + k * b_dim1], ldb, &a[k * a_dim1 + 
+			    1], lda);
+		    ssygs2_(itype, uplo, &kb, &a[k + k * a_dim1], lda, &b[k + 
+			    k * b_dim1], ldb, info);
 /* L30: */
 		}
 	    } else {
@@ -281,23 +298,26 @@
 
 		    i__3 = k - 1;
 		    strmm_("Right", uplo, "No transpose", "Non-unit", &kb, &
-			    i__3, &c_b14, &b[b_offset], ldb, &a_ref(k, 1), 
+			    i__3, &c_b14, &b[b_offset], ldb, &a[k + a_dim1], 
 			    lda);
 		    i__3 = k - 1;
-		    ssymm_("Left", uplo, &kb, &i__3, &c_b52, &a_ref(k, k), 
-			    lda, &b_ref(k, 1), ldb, &c_b14, &a_ref(k, 1), lda);
+		    ssymm_("Left", uplo, &kb, &i__3, &c_b52, &a[k + k * 
+			    a_dim1], lda, &b[k + b_dim1], ldb, &c_b14, &a[k + 
+			    a_dim1], lda);
 		    i__3 = k - 1;
-		    ssyr2k_(uplo, "Transpose", &i__3, &kb, &c_b14, &a_ref(k, 
-			    1), lda, &b_ref(k, 1), ldb, &c_b14, &a[a_offset], 
-			    lda);
+		    ssyr2k_(uplo, "Transpose", &i__3, &kb, &c_b14, &a[k + 
+			    a_dim1], lda, &b[k + b_dim1], ldb, &c_b14, &a[
+			    a_offset], lda);
 		    i__3 = k - 1;
-		    ssymm_("Left", uplo, &kb, &i__3, &c_b52, &a_ref(k, k), 
-			    lda, &b_ref(k, 1), ldb, &c_b14, &a_ref(k, 1), lda);
+		    ssymm_("Left", uplo, &kb, &i__3, &c_b52, &a[k + k * 
+			    a_dim1], lda, &b[k + b_dim1], ldb, &c_b14, &a[k + 
+			    a_dim1], lda);
 		    i__3 = k - 1;
 		    strmm_("Left", uplo, "Transpose", "Non-unit", &kb, &i__3, 
-			    &c_b14, &b_ref(k, k), ldb, &a_ref(k, 1), lda);
-		    ssygs2_(itype, uplo, &kb, &a_ref(k, k), lda, &b_ref(k, k),
-			     ldb, info);
+			    &c_b14, &b[k + k * b_dim1], ldb, &a[k + a_dim1], 
+			    lda);
+		    ssygs2_(itype, uplo, &kb, &a[k + k * a_dim1], lda, &b[k + 
+			    k * b_dim1], ldb, info);
 /* L40: */
 		}
 	    }
@@ -308,8 +328,3 @@
 /*     End of SSYGST */
 
 } /* ssygst_ */
-
-#undef b_ref
-#undef a_ref
-
-

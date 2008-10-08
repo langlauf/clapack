@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -38,32 +33,31 @@ static integer c__1 = 1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal b[2], c__[2], d__[2], e[2], f[2], w[2], x[2], rcond, 
-	    anorm;
-    static char c2[2];
-    static doublereal r1[2], r2[2], cf[2], df[2], ef[2];
-    static integer ip[2], iw[2];
+    doublereal b[2], c__[2], d__[2], e[2], f[2], w[2], x[2];
+    char c2[2];
+    doublereal r1[2], r2[2], cf[2], df[2], ef[2];
+    integer ip[2], iw[2], info;
+    doublereal rcond, anorm;
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
 	     dgtcon_(char *, integer *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     doublereal *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dptcon_(integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *)
 	    , dgtrfs_(char *, integer *, integer *, doublereal *, doublereal *
-	    , doublereal *, doublereal *, doublereal *, doublereal *, 
+, doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
-	    integer *), dgttrf_(integer *, doublereal *, doublereal *,
+	    integer *), dgttrf_(integer *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, integer *, integer *), dptrfs_(
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), dpttrf_(
-	    integer *, doublereal *, doublereal *, integer *), dgttrs_(char *,
+	    integer *, doublereal *, doublereal *, integer *), dgttrs_(char *, 
 	     integer *, integer *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, integer *), dpttrs_(integer *, integer *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, integer *, integer *), dpttrs_(integer *, integer *, doublereal *, doublereal *, 
 	     doublereal *, integer *, integer *);
 
     /* Fortran I/O blocks */
@@ -71,29 +65,45 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DERRGT tests the error exits for the DOUBLE PRECISION tridiagonal   
-    routines.   
+/*  DERRGT tests the error exits for the DOUBLE PRECISION tridiagonal */
+/*  routines. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -113,9 +123,9 @@ static integer c__1 = 1;
 
     if (lsamen_(&c__2, c2, "GT")) {
 
-/*        Test error exits for the general tridiagonal routines.   
+/*        Test error exits for the general tridiagonal routines. */
 
-          DGTTRF */
+/*        DGTTRF */
 
 	s_copy(srnamc_1.srnamt, "DGTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -191,10 +201,10 @@ static integer c__1 = 1;
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        Test error exits for the positive definite tridiagonal   
-          routines.   
+/*        Test error exits for the positive definite tridiagonal */
+/*        routines. */
 
-          DPTTRF */
+/*        DPTTRF */
 
 	s_copy(srnamc_1.srnamt, "DPTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -265,4 +275,3 @@ static integer c__1 = 1;
 /*     End of DERRGT */
 
 } /* derrgt_ */
-

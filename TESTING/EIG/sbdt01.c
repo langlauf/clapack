@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,8 +17,8 @@ static real c_b9 = 1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static integer i__, j;
-    static real anorm;
+    integer i__, j;
+    real eps, anorm;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *);
     extern doublereal sasum_(integer *, real *, integer *);
@@ -31,96 +26,105 @@ static real c_b9 = 1.f;
 	    integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real eps;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define pt_ref(a_1,a_2) pt[(a_2)*pt_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SBDT01 reconstructs a general matrix A from its bidiagonal form */
+/*     A = Q * B * P' */
+/*  where Q (m by min(m,n)) and P' (min(m,n) by n) are orthogonal */
+/*  matrices and B is bidiagonal. */
 
-    Purpose   
-    =======   
+/*  The test ratio to test the reduction is */
+/*     RESID = norm( A - Q * B * PT ) / ( n * norm(A) * EPS ) */
+/*  where PT = P' and EPS is the machine precision. */
 
-    SBDT01 reconstructs a general matrix A from its bidiagonal form   
-       A = Q * B * P'   
-    where Q (m by min(m,n)) and P' (min(m,n) by n) are orthogonal   
-    matrices and B is bidiagonal.   
+/*  Arguments */
+/*  ========= */
 
-    The test ratio to test the reduction is   
-       RESID = norm( A - Q * B * PT ) / ( n * norm(A) * EPS )   
-    where PT = P' and EPS is the machine precision.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and Q. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and P'. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and Q.   
+/*  KD      (input) INTEGER */
+/*          If KD = 0, B is diagonal and the array E is not referenced. */
+/*          If KD = 1, the reduction was performed by xGEBRD; B is upper */
+/*          bidiagonal if M >= N, and lower bidiagonal if M < N. */
+/*          If KD = -1, the reduction was performed by xGBBRD; B is */
+/*          always upper bidiagonal. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and P'.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The m by n matrix A. */
 
-    KD      (input) INTEGER   
-            If KD = 0, B is diagonal and the array E is not referenced.   
-            If KD = 1, the reduction was performed by xGEBRD; B is upper   
-            bidiagonal if M >= N, and lower bidiagonal if M < N.   
-            If KD = -1, the reduction was performed by xGBBRD; B is   
-            always upper bidiagonal.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The m by n matrix A.   
+/*  Q       (input) REAL array, dimension (LDQ,N) */
+/*          The m by min(m,n) orthogonal matrix Q in the reduction */
+/*          A = Q * B * P'. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of the array Q.  LDQ >= max(1,M). */
 
-    Q       (input) REAL array, dimension (LDQ,N)   
-            The m by min(m,n) orthogonal matrix Q in the reduction   
-            A = Q * B * P'.   
+/*  D       (input) REAL array, dimension (min(M,N)) */
+/*          The diagonal elements of the bidiagonal matrix B. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of the array Q.  LDQ >= max(1,M).   
+/*  E       (input) REAL array, dimension (min(M,N)-1) */
+/*          The superdiagonal elements of the bidiagonal matrix B if */
+/*          m >= n, or the subdiagonal elements of B if m < n. */
 
-    D       (input) REAL array, dimension (min(M,N))   
-            The diagonal elements of the bidiagonal matrix B.   
+/*  PT      (input) REAL array, dimension (LDPT,N) */
+/*          The min(m,n) by n orthogonal matrix P' in the reduction */
+/*          A = Q * B * P'. */
 
-    E       (input) REAL array, dimension (min(M,N)-1)   
-            The superdiagonal elements of the bidiagonal matrix B if   
-            m >= n, or the subdiagonal elements of B if m < n.   
+/*  LDPT    (input) INTEGER */
+/*          The leading dimension of the array PT. */
+/*          LDPT >= max(1,min(M,N)). */
 
-    PT      (input) REAL array, dimension (LDPT,N)   
-            The min(m,n) by n orthogonal matrix P' in the reduction   
-            A = Q * B * P'.   
+/*  WORK    (workspace) REAL array, dimension (M+N) */
 
-    LDPT    (input) INTEGER   
-            The leading dimension of the array PT.   
-            LDPT >= max(1,min(M,N)).   
+/*  RESID   (output) REAL */
+/*          The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS ) */
 
-    WORK    (workspace) REAL array, dimension (M+N)   
+/*  ===================================================================== */
 
-    RESID   (output) REAL   
-            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --d__;
     --e;
     pt_dim1 = *ldpt;
-    pt_offset = 1 + pt_dim1 * 1;
+    pt_offset = 1 + pt_dim1;
     pt -= pt_offset;
     --work;
 
@@ -143,14 +147,14 @@ static real c_b9 = 1.f;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *n - 1;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*m + i__] = d__[i__] * pt_ref(i__, j) + e[i__] * 
-			    pt_ref(i__ + 1, j);
+		    work[*m + i__] = d__[i__] * pt[i__ + j * pt_dim1] + e[i__]
+			     * pt[i__ + 1 + j * pt_dim1];
 /* L10: */
 		}
-		work[*m + *n] = d__[*n] * pt_ref(*n, j);
+		work[*m + *n] = d__[*n] * pt[*n + j * pt_dim1];
 		sgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
@@ -164,14 +168,14 @@ static real c_b9 = 1.f;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *m - 1;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*m + i__] = d__[i__] * pt_ref(i__, j) + e[i__] * 
-			    pt_ref(i__ + 1, j);
+		    work[*m + i__] = d__[i__] * pt[i__ + j * pt_dim1] + e[i__]
+			     * pt[i__ + 1 + j * pt_dim1];
 /* L30: */
 		}
-		work[*m + *m] = d__[*m] * pt_ref(*m, j);
+		work[*m + *m] = d__[*m] * pt[*m + j * pt_dim1];
 		sgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
 			m + 1], &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
@@ -185,12 +189,12 @@ static real c_b9 = 1.f;
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
-		work[*m + 1] = d__[1] * pt_ref(1, j);
+		scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+		work[*m + 1] = d__[1] * pt[j * pt_dim1 + 1];
 		i__2 = *m;
 		for (i__ = 2; i__ <= i__2; ++i__) {
-		    work[*m + i__] = e[i__ - 1] * pt_ref(i__ - 1, j) + d__[
-			    i__] * pt_ref(i__, j);
+		    work[*m + i__] = e[i__ - 1] * pt[i__ - 1 + j * pt_dim1] + 
+			    d__[i__] * pt[i__ + j * pt_dim1];
 /* L50: */
 		}
 		sgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
@@ -208,10 +212,10 @@ static real c_b9 = 1.f;
 	if (*m >= *n) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *n;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*m + i__] = d__[i__] * pt_ref(i__, j);
+		    work[*m + i__] = d__[i__] * pt[i__ + j * pt_dim1];
 /* L70: */
 		}
 		sgemv_("No transpose", m, n, &c_b7, &q[q_offset], ldq, &work[*
@@ -224,10 +228,10 @@ static real c_b9 = 1.f;
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *m;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    work[*m + i__] = d__[i__] * pt_ref(i__, j);
+		    work[*m + i__] = d__[i__] * pt[i__ + j * pt_dim1];
 /* L90: */
 		}
 		sgemv_("No transpose", m, m, &c_b7, &q[q_offset], ldq, &work[*
@@ -270,8 +274,3 @@ static real c_b9 = 1.f;
 /*     End of SBDT01 */
 
 } /* sbdt01_ */
-
-#undef pt_ref
-#undef a_ref
-
-

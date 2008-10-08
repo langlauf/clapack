@@ -1,107 +1,125 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int cgbequ_(integer *m, integer *n, integer *kl, integer *ku,
+/* Subroutine */ int cgbequ_(integer *m, integer *n, integer *kl, integer *ku, 
 	 complex *ab, integer *ldab, real *r__, real *c__, real *rowcnd, real 
 	*colcnd, real *amax, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1992   
-
-
-    Purpose   
-    =======   
-
-    CGBEQU computes row and column scalings intended to equilibrate an   
-    M-by-N band matrix A and reduce its condition number.  R returns the   
-    row scale factors and C the column scale factors, chosen to try to   
-    make the largest element in each row and column of the matrix B with   
-    elements B(i,j)=R(i)*A(i,j)*C(j) have absolute value 1.   
-
-    R(i) and C(j) are restricted to be between SMLNUM = smallest safe   
-    number and BIGNUM = largest safe number.  Use of these scaling   
-    factors is not guaranteed to reduce the condition number of A but   
-    works well in practice.   
-
-    Arguments   
-    =========   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
-
-    KL      (input) INTEGER   
-            The number of subdiagonals within the band of A.  KL >= 0.   
-
-    KU      (input) INTEGER   
-            The number of superdiagonals within the band of A.  KU >= 0.   
-
-    AB      (input) COMPLEX array, dimension (LDAB,N)   
-            The band matrix A, stored in rows 1 to KL+KU+1.  The j-th   
-            column of A is stored in the j-th column of the array AB as   
-            follows:   
-            AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl).   
-
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= KL+KU+1.   
-
-    R       (output) REAL array, dimension (M)   
-            If INFO = 0, or INFO > M, R contains the row scale factors   
-            for A.   
-
-    C       (output) REAL array, dimension (N)   
-            If INFO = 0, C contains the column scale factors for A.   
-
-    ROWCND  (output) REAL   
-            If INFO = 0 or INFO > M, ROWCND contains the ratio of the   
-            smallest R(i) to the largest R(i).  If ROWCND >= 0.1 and   
-            AMAX is neither too large nor too small, it is not worth   
-            scaling by R.   
-
-    COLCND  (output) REAL   
-            If INFO = 0, COLCND contains the ratio of the smallest   
-            C(i) to the largest C(i).  If COLCND >= 0.1, it is not   
-            worth scaling by C.   
-
-    AMAX    (output) REAL   
-            Absolute value of largest matrix element.  If AMAX is very   
-            close to overflow or very close to underflow, the matrix   
-            should be scaled.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, and i is   
-                  <= M:  the i-th row of A is exactly zero   
-                  >  M:  the (i-M)-th column of A is exactly zero   
-
-    =====================================================================   
-
-
-       Test the input parameters   
-
-       Parameter adjustments */
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1, i__2, i__3, i__4;
     real r__1, r__2, r__3, r__4;
+
     /* Builtin functions */
     double r_imag(complex *);
+
     /* Local variables */
-    static integer i__, j;
-    static real rcmin, rcmax;
-    static integer kd;
+    integer i__, j, kd;
+    real rcmin, rcmax;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real bignum, smlnum;
-#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+    real bignum, smlnum;
 
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CGBEQU computes row and column scalings intended to equilibrate an */
+/*  M-by-N band matrix A and reduce its condition number.  R returns the */
+/*  row scale factors and C the column scale factors, chosen to try to */
+/*  make the largest element in each row and column of the matrix B with */
+/*  elements B(i,j)=R(i)*A(i,j)*C(j) have absolute value 1. */
+
+/*  R(i) and C(j) are restricted to be between SMLNUM = smallest safe */
+/*  number and BIGNUM = largest safe number.  Use of these scaling */
+/*  factors is not guaranteed to reduce the condition number of A but */
+/*  works well in practice. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
+
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
+
+/*  KL      (input) INTEGER */
+/*          The number of subdiagonals within the band of A.  KL >= 0. */
+
+/*  KU      (input) INTEGER */
+/*          The number of superdiagonals within the band of A.  KU >= 0. */
+
+/*  AB      (input) COMPLEX array, dimension (LDAB,N) */
+/*          The band matrix A, stored in rows 1 to KL+KU+1.  The j-th */
+/*          column of A is stored in the j-th column of the array AB as */
+/*          follows: */
+/*          AB(ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl). */
+
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= KL+KU+1. */
+
+/*  R       (output) REAL array, dimension (M) */
+/*          If INFO = 0, or INFO > M, R contains the row scale factors */
+/*          for A. */
+
+/*  C       (output) REAL array, dimension (N) */
+/*          If INFO = 0, C contains the column scale factors for A. */
+
+/*  ROWCND  (output) REAL */
+/*          If INFO = 0 or INFO > M, ROWCND contains the ratio of the */
+/*          smallest R(i) to the largest R(i).  If ROWCND >= 0.1 and */
+/*          AMAX is neither too large nor too small, it is not worth */
+/*          scaling by R. */
+
+/*  COLCND  (output) REAL */
+/*          If INFO = 0, COLCND contains the ratio of the smallest */
+/*          C(i) to the largest C(i).  If COLCND >= 0.1, it is not */
+/*          worth scaling by C. */
+
+/*  AMAX    (output) REAL */
+/*          Absolute value of largest matrix element.  If AMAX is very */
+/*          close to overflow or very close to underflow, the matrix */
+/*          should be scaled. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, and i is */
+/*                <= M:  the i-th row of A is exactly zero */
+/*                >  M:  the (i-M)-th column of A is exactly zero */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters */
+
+    /* Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     --r__;
     --c__;
@@ -159,9 +177,9 @@
 	i__3 = min(i__4,*m);
 	for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
 /* Computing MAX */
-	    i__2 = ab_subscr(kd + i__ - j, j);
+	    i__2 = kd + i__ - j + j * ab_dim1;
 	    r__3 = r__[i__], r__4 = (r__1 = ab[i__2].r, dabs(r__1)) + (r__2 = 
-		    r_imag(&ab_ref(kd + i__ - j, j)), dabs(r__2));
+		    r_imag(&ab[kd + i__ - j + j * ab_dim1]), dabs(r__2));
 	    r__[i__] = dmax(r__3,r__4);
 /* L20: */
 	}
@@ -202,8 +220,8 @@
 
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-/* Computing MIN   
-   Computing MAX */
+/* Computing MIN */
+/* Computing MAX */
 	    r__2 = r__[i__];
 	    r__1 = dmax(r__2,smlnum);
 	    r__[i__] = 1.f / dmin(r__1,bignum);
@@ -223,8 +241,8 @@
 /* L70: */
     }
 
-/*     Find the maximum element in each column,   
-       assuming the row scaling computed above. */
+/*     Find the maximum element in each column, */
+/*     assuming the row scaling computed above. */
 
     kd = *ku + 1;
     i__1 = *n;
@@ -236,9 +254,10 @@
 	i__2 = min(i__4,*m);
 	for (i__ = max(i__3,1); i__ <= i__2; ++i__) {
 /* Computing MAX */
-	    i__3 = ab_subscr(kd + i__ - j, j);
+	    i__3 = kd + i__ - j + j * ab_dim1;
 	    r__3 = c__[j], r__4 = ((r__1 = ab[i__3].r, dabs(r__1)) + (r__2 = 
-		    r_imag(&ab_ref(kd + i__ - j, j)), dabs(r__2))) * r__[i__];
+		    r_imag(&ab[kd + i__ - j + j * ab_dim1]), dabs(r__2))) * 
+		    r__[i__];
 	    c__[j] = dmax(r__3,r__4);
 /* L80: */
 	}
@@ -278,8 +297,8 @@
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-/* Computing MIN   
-   Computing MAX */
+/* Computing MIN */
+/* Computing MAX */
 	    r__2 = c__[j];
 	    r__1 = dmax(r__2,smlnum);
 	    c__[j] = 1.f / dmin(r__1,bignum);
@@ -296,8 +315,3 @@
 /*     End of CGBEQU */
 
 } /* cgbequ_ */
-
-#undef ab_ref
-#undef ab_subscr
-
-

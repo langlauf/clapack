@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,7 +15,7 @@ static doublecomplex c_b2 = {1.,0.};
 
     /* Local variables */
     extern /* Subroutine */ int ztrsm_(char *, char *, char *, char *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *), 
 	    xerbla_(char *, integer *), zlaset_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
@@ -29,77 +24,83 @@ static doublecomplex c_b2 = {1.,0.};
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *);
 
 
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  Compute a minimum-norm solution */
+/*      min || A*X - B || */
+/*  using the LQ factorization */
+/*      A = L*Q */
+/*  computed by ZGELQF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    Compute a minimum-norm solution   
-        min || A*X - B ||   
-    using the LQ factorization   
-        A = L*Q   
-    computed by ZGELQF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= M >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= M >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          Details of the LQ factorization of the original matrix A as */
+/*          returned by ZGELQF. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the LQ factorization of the original matrix A as   
-            returned by ZGELQF.   
+/*  TAU     (input) COMPLEX*16 array, dimension (M) */
+/*          Details of the orthogonal matrix Q. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS) */
+/*          On entry, the m-by-nrhs right hand side matrix B. */
+/*          On exit, the n-by-nrhs solution matrix X. */
 
-    TAU     (input) COMPLEX*16 array, dimension (M)   
-            Details of the orthogonal matrix Q.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= N. */
 
-    B       (input/output) COMPLEX*16 array, dimension (LDB,NRHS)   
-            On entry, the m-by-nrhs right hand side matrix B.   
-            On exit, the n-by-nrhs solution matrix X.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= N.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK must be at least NRHS, */
+/*          and should be at least NRHS*NB, where NB is the block size */
+/*          for this environment. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK must be at least NRHS,   
-            and should be at least NRHS*NB, where NB is the block size   
-            for this environment.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -139,7 +140,7 @@ static doublecomplex c_b2 = {1.,0.};
 
     if (*m < *n) {
 	i__1 = *n - *m;
-	zlaset_("Full", &i__1, nrhs, &c_b1, &c_b1, &b_ref(*m + 1, 1), ldb);
+	zlaset_("Full", &i__1, nrhs, &c_b1, &c_b1, &b[*m + 1 + b_dim1], ldb);
     }
 
 /*     B := Q' * B */
@@ -152,8 +153,3 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGELQS */
 
 } /* zgelqs_ */
-
-#undef b_ref
-#undef b_subscr
-
-

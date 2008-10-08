@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,77 +18,91 @@ static integer c__0 = 0;
     double sqrt(doublereal);
 
     /* Local variables */
+    integer i__;
+    real eps;
     extern /* Subroutine */ int slas2_(real *, real *, real *, real *, real *)
 	    ;
-    static integer i__;
-    static real scale;
-    static integer iinfo;
-    static real sigmn, sigmx;
+    real scale;
+    integer iinfo;
+    real sigmn, sigmx;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *), slasq2_(integer *, real *, integer *);
     extern doublereal slamch_(char *);
-    static real safmin;
+    real safmin;
     extern /* Subroutine */ int xerbla_(char *, integer *), slascl_(
 	    char *, integer *, integer *, real *, real *, integer *, integer *
-	    , real *, integer *, integer *), slasrt_(char *, integer *
-	    , real *, integer *);
-    static real eps;
+, real *, integer *, integer *), slasrt_(char *, integer *
+, real *, integer *);
 
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SLASQ1 computes the singular values of a real N-by-N bidiagonal   
-    matrix with diagonal D and off-diagonal E. The singular values   
-    are computed to high relative accuracy, in the absence of   
-    denormalization, underflow and overflow. The algorithm was first   
-    presented in   
+/*  SLASQ1 computes the singular values of a real N-by-N bidiagonal */
+/*  matrix with diagonal D and off-diagonal E. The singular values */
+/*  are computed to high relative accuracy, in the absence of */
+/*  denormalization, underflow and overflow. The algorithm was first */
+/*  presented in */
 
-    "Accurate singular values and differential qd algorithms" by K. V.   
-    Fernando and B. N. Parlett, Numer. Math., Vol-67, No. 2, pp. 191-230,   
-    1994,   
+/*  "Accurate singular values and differential qd algorithms" by K. V. */
+/*  Fernando and B. N. Parlett, Numer. Math., Vol-67, No. 2, pp. 191-230, */
+/*  1994, */
 
-    and the present implementation is described in "An implementation of   
-    the dqds Algorithm (Positive Case)", LAPACK Working Note.   
+/*  and the present implementation is described in "An implementation of */
+/*  the dqds Algorithm (Positive Case)", LAPACK Working Note. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N     (input) INTEGER   
-          The number of rows and columns in the matrix. N >= 0.   
+/*  N     (input) INTEGER */
+/*        The number of rows and columns in the matrix. N >= 0. */
 
-    D     (input/output) REAL array, dimension (N)   
-          On entry, D contains the diagonal elements of the   
-          bidiagonal matrix whose SVD is desired. On normal exit,   
-          D contains the singular values in decreasing order.   
+/*  D     (input/output) REAL array, dimension (N) */
+/*        On entry, D contains the diagonal elements of the */
+/*        bidiagonal matrix whose SVD is desired. On normal exit, */
+/*        D contains the singular values in decreasing order. */
 
-    E     (input/output) REAL array, dimension (N)   
-          On entry, elements E(1:N-1) contain the off-diagonal elements   
-          of the bidiagonal matrix whose SVD is desired.   
-          On exit, E is overwritten.   
+/*  E     (input/output) REAL array, dimension (N) */
+/*        On entry, elements E(1:N-1) contain the off-diagonal elements */
+/*        of the bidiagonal matrix whose SVD is desired. */
+/*        On exit, E is overwritten. */
 
-    WORK  (workspace) REAL array, dimension (4*N)   
+/*  WORK  (workspace) REAL array, dimension (4*N) */
 
-    INFO  (output) INTEGER   
-          = 0: successful exit   
-          < 0: if INFO = -i, the i-th argument had an illegal value   
-          > 0: the algorithm failed   
-               = 1, a split was marked by a positive value in E   
-               = 2, current block of Z not diagonalized after 30*N   
-                    iterations (in inner while loop)   
-               = 3, termination criterion of outer while loop not met   
-                    (program created more than N unreduced blocks)   
+/*  INFO  (output) INTEGER */
+/*        = 0: successful exit */
+/*        < 0: if INFO = -i, the i-th argument had an illegal value */
+/*        > 0: the algorithm failed */
+/*             = 1, a split was marked by a positive value in E */
+/*             = 2, current block of Z not diagonalized after 30*N */
+/*                  iterations (in inner while loop) */
+/*             = 3, termination criterion of outer while loop not met */
+/*                  (program created more than N unreduced blocks) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --work;
     --e;
     --d__;
@@ -145,8 +154,8 @@ static integer c__0 = 0;
 /* L20: */
     }
 
-/*     Copy D and E into WORK (in the Z format) and scale (squaring the   
-       input data makes scaling by a power of the radix pointless). */
+/*     Copy D and E into WORK (in the Z format) and scale (squaring the */
+/*     input data makes scaling by a power of the radix pointless). */
 
     eps = slamch_("Precision");
     safmin = slamch_("Safe minimum");
@@ -187,4 +196,3 @@ static integer c__0 = 0;
 /*     End of SLASQ1 */
 
 } /* slasq1_ */
-

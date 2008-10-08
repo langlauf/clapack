@@ -1,100 +1,115 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zlascl_(char *type__, integer *kl, integer *ku, 
 	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 
 	doublecomplex *a, integer *lda, integer *info)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
-
-
-    Purpose   
-    =======   
-
-    ZLASCL multiplies the M by N complex matrix A by the real scalar   
-    CTO/CFROM.  This is done without over/underflow as long as the final   
-    result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that   
-    A may be full, upper triangular, lower triangular, upper Hessenberg,   
-    or banded.   
-
-    Arguments   
-    =========   
-
-    TYPE    (input) CHARACTER*1   
-            TYPE indices the storage type of the input matrix.   
-            = 'G':  A is a full matrix.   
-            = 'L':  A is a lower triangular matrix.   
-            = 'U':  A is an upper triangular matrix.   
-            = 'H':  A is an upper Hessenberg matrix.   
-            = 'B':  A is a symmetric band matrix with lower bandwidth KL   
-                    and upper bandwidth KU and with the only the lower   
-                    half stored.   
-            = 'Q':  A is a symmetric band matrix with lower bandwidth KL   
-                    and upper bandwidth KU and with the only the upper   
-                    half stored.   
-            = 'Z':  A is a band matrix with lower bandwidth KL and upper   
-                    bandwidth KU.   
-
-    KL      (input) INTEGER   
-            The lower bandwidth of A.  Referenced only if TYPE = 'B',   
-            'Q' or 'Z'.   
-
-    KU      (input) INTEGER   
-            The upper bandwidth of A.  Referenced only if TYPE = 'B',   
-            'Q' or 'Z'.   
-
-    CFROM   (input) DOUBLE PRECISION   
-    CTO     (input) DOUBLE PRECISION   
-            The matrix A is multiplied by CTO/CFROM. A(I,J) is computed   
-            without over/underflow if the final result CTO*A(I,J)/CFROM   
-            can be represented without over/underflow.  CFROM must be   
-            nonzero.   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
-
-    A       (input/output) COMPLEX*16 array, dimension (LDA,M)   
-            The matrix to be multiplied by CTO/CFROM.  See TYPE for the   
-            storage type.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
-
-    INFO    (output) INTEGER   
-            0  - successful exit   
-            <0 - if INFO = -i, the i-th argument had an illegal value.   
-
-    =====================================================================   
-
-
-       Test the input arguments   
-
-       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     doublecomplex z__1;
-    /* Local variables */
-    static logical done;
-    static doublereal ctoc;
-    static integer i__, j;
-    extern logical lsame_(char *, char *);
-    static integer itype, k1, k2, k3, k4;
-    static doublereal cfrom1;
-    extern doublereal dlamch_(char *);
-    static doublereal cfromc;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
-    static doublereal bignum, smlnum, mul, cto1;
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
 
+    /* Local variables */
+    integer i__, j, k1, k2, k3, k4;
+    doublereal mul, cto1;
+    logical done;
+    doublereal ctoc;
+    extern logical lsame_(char *, char *);
+    integer itype;
+    doublereal cfrom1;
+    extern doublereal dlamch_(char *);
+    doublereal cfromc;
+    extern /* Subroutine */ int xerbla_(char *, integer *);
+    doublereal bignum, smlnum;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLASCL multiplies the M by N complex matrix A by the real scalar */
+/*  CTO/CFROM.  This is done without over/underflow as long as the final */
+/*  result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that */
+/*  A may be full, upper triangular, lower triangular, upper Hessenberg, */
+/*  or banded. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  TYPE    (input) CHARACTER*1 */
+/*          TYPE indices the storage type of the input matrix. */
+/*          = 'G':  A is a full matrix. */
+/*          = 'L':  A is a lower triangular matrix. */
+/*          = 'U':  A is an upper triangular matrix. */
+/*          = 'H':  A is an upper Hessenberg matrix. */
+/*          = 'B':  A is a symmetric band matrix with lower bandwidth KL */
+/*                  and upper bandwidth KU and with the only the lower */
+/*                  half stored. */
+/*          = 'Q':  A is a symmetric band matrix with lower bandwidth KL */
+/*                  and upper bandwidth KU and with the only the upper */
+/*                  half stored. */
+/*          = 'Z':  A is a band matrix with lower bandwidth KL and upper */
+/*                  bandwidth KU. */
+
+/*  KL      (input) INTEGER */
+/*          The lower bandwidth of A.  Referenced only if TYPE = 'B', */
+/*          'Q' or 'Z'. */
+
+/*  KU      (input) INTEGER */
+/*          The upper bandwidth of A.  Referenced only if TYPE = 'B', */
+/*          'Q' or 'Z'. */
+
+/*  CFROM   (input) DOUBLE PRECISION */
+/*  CTO     (input) DOUBLE PRECISION */
+/*          The matrix A is multiplied by CTO/CFROM. A(I,J) is computed */
+/*          without over/underflow if the final result CTO*A(I,J)/CFROM */
+/*          can be represented without over/underflow.  CFROM must be */
+/*          nonzero. */
+
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
+
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
+
+/*  A       (input/output) COMPLEX*16 array, dimension (LDA,N) */
+/*          The matrix to be multiplied by CTO/CFROM.  See TYPE for the */
+/*          storage type. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
+
+/*  INFO    (output) INTEGER */
+/*          0  - successful exit */
+/*          <0 - if INFO = -i, the i-th argument had an illegal value. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
@@ -190,8 +205,8 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L20: */
@@ -207,8 +222,8 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *m;
 	    for (i__ = j; i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L40: */
@@ -224,8 +239,8 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = min(j,*m);
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L60: */
@@ -243,8 +258,8 @@ L10:
 	    i__3 = j + 1;
 	    i__2 = min(i__3,*m);
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L80: */
@@ -264,8 +279,8 @@ L10:
 	    i__3 = k3, i__4 = k4 - j;
 	    i__2 = min(i__3,i__4);
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L100: */
@@ -285,8 +300,8 @@ L10:
 	    i__2 = k1 - j;
 	    i__3 = k3;
 	    for (i__ = max(i__2,1); i__ <= i__3; ++i__) {
-		i__2 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__2 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L120: */
@@ -310,8 +325,8 @@ L10:
 	    i__4 = k3, i__5 = k4 - j;
 	    i__2 = min(i__4,i__5);
 	    for (i__ = max(i__3,k2); i__ <= i__2; ++i__) {
-		i__3 = a_subscr(i__, j);
-		i__4 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
+		i__4 = i__ + j * a_dim1;
 		z__1.r = mul * a[i__4].r, z__1.i = mul * a[i__4].i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 /* L140: */
@@ -330,8 +345,3 @@ L10:
 /*     End of ZLASCL */
 
 } /* zlascl_ */
-
-#undef a_ref
-#undef a_subscr
-
-

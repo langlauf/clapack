@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -58,23 +53,24 @@ static doublereal c_b46 = 1.;
     integer i__1, i__2, i__3, i__4, i__5, i__6, i__7[2];
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer ldab;
-    static char fact[1];
-    static integer ioff, mode, koff;
-    static doublereal amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1], uplo[1], type__[1];
-    static integer nrun, i__, k, n, ifact;
+    integer i__, k, n, i1, i2, k1, kd, nb, in, kl, iw, ku, nt, lda, ikd, nkd, 
+	    ldab;
+    char fact[1];
+    integer ioff, mode, koff;
+    doublereal amax;
+    char path[3];
+    integer imat, info;
+    char dist[1], uplo[1], type__[1];
+    integer nrun, ifact;
     extern /* Subroutine */ int dget04_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
-    static integer nfail, iseed[4], nfact;
+    integer nfail, iseed[4], nfact;
     extern doublereal dget06_(doublereal *, doublereal *);
     extern /* Subroutine */ int dpbt01_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -84,43 +80,41 @@ static doublereal c_b46 = 1.;
 	    dpbt05_(char *, integer *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *);
-    static integer kdval[4];
+    integer kdval[4];
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static integer nbmin;
-    static doublereal rcond, roldc, scond;
-    static integer nimat;
-    static doublereal anorm;
+    char equed[1];
+    integer nbmin;
+    doublereal rcond, roldc, scond;
+    integer nimat;
+    doublereal anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static logical equil;
+    logical equil;
     extern /* Subroutine */ int dpbsv_(char *, integer *, integer *, integer *
-	    , doublereal *, integer *, doublereal *, integer *, integer *), dswap_(integer *, doublereal *, integer *, doublereal *, 
+, doublereal *, integer *, doublereal *, integer *, integer *), dswap_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer iuplo, izero, i1, i2, k1, nerrs;
-    static logical zerot;
-    static char xtype[1];
+    integer iuplo, izero, nerrs;
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int dlatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, char *), aladhd_(integer *, 
 	    char *);
-    static integer kd, nb, in, kl;
     extern doublereal dlange_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *);
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer iw, ku, nt;
+    logical prefac;
     extern doublereal dlansb_(char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dlaqsb_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     char *);
-    static doublereal rcondc;
-    static logical nofact;
-    static char packit[1];
-    static integer iequed;
+    doublereal rcondc;
+    logical nofact;
+    char packit[1];
+    integer iequed;
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    dlarhs_(char *, char *, char *, char *, integer *, integer *, 
@@ -129,24 +123,23 @@ static doublereal c_b46 = 1.;
 	    integer *), dlaset_(char *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *), dpbequ_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *), alasvm_(char *, integer *, integer *, 
 	    integer *, integer *);
-    static doublereal cndnum;
+    doublereal cndnum;
     extern /* Subroutine */ int dlatms_(integer *, integer *, char *, integer 
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublereal *, integer *, doublereal 
 	    *, integer *), dpbtrf_(char *, integer *, 
 	    integer *, doublereal *, integer *, integer *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern /* Subroutine */ int dpbtrs_(char *, integer *, integer *, integer 
 	    *, doublereal *, integer *, doublereal *, integer *, integer *), xlaenv_(integer *, integer *), dpbsvx_(char *, char *, 
 	    integer *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, char *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, integer *, integer *), derrvx_(char *, integer *);
-    static doublereal result[6];
-    static integer lda, ikd, nkd;
+    doublereal result[6];
 
     /* Fortran I/O blocks */
     static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
@@ -155,76 +148,96 @@ static doublereal c_b46 = 1.;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DDRVPB tests the driver routines DPBSV and -SVX.   
+/*  DDRVPB tests the driver routines DPBSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    ASAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  ASAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension (NMAX)   
+/*  S       (workspace) DOUBLE PRECISION array, dimension (NMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -239,9 +252,11 @@ static doublereal c_b46 = 1.;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PB", (ftnlen)2, (ftnlen)2);
@@ -276,9 +291,9 @@ static doublereal c_b46 = 1.;
 	lda = max(n,1);
 	*(unsigned char *)xtype = 'N';
 
-/*        Set limits on the number of loop iterations.   
+/*        Set limits on the number of loop iterations. */
 
-   Computing MAX */
+/* Computing MAX */
 	i__2 = 1, i__3 = min(n,4);
 	nkd = max(i__2,i__3);
 	nimat = 8;
@@ -293,9 +308,9 @@ static doublereal c_b46 = 1.;
 	i__2 = nkd;
 	for (ikd = 1; ikd <= i__2; ++ikd) {
 
-/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This order   
-             makes it easier to skip redundant values for small values   
-             of N. */
+/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This order */
+/*           makes it easier to skip redundant values for small values */
+/*           of N. */
 
 	    kd = kdval[ikd - 1];
 	    ldab = kd + 1;
@@ -333,15 +348,15 @@ static doublereal c_b46 = 1.;
 
 		    if (! zerot || ! dotype[1]) {
 
-/*                    Set up parameters with DLATB4 and generate a test   
-                      matrix with DLATMS. */
+/*                    Set up parameters with DLATB4 and generate a test */
+/*                    matrix with DLATMS. */
 
-			dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm,
+			dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, 
 				 &mode, &cndnum, dist);
 
 			s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)
 				6);
-			dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode,
+			dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, 
 				 &cndnum, &anorm, &kd, &kd, packit, &a[koff], 
 				&ldab, &work[1], &info);
 
@@ -355,8 +370,8 @@ static doublereal c_b46 = 1.;
 			}
 		    } else if (izero > 0) {
 
-/*                    Use the same matrix for types 3 and 4 as for type   
-                      2 by copying back the zeroed out column, */
+/*                    Use the same matrix for types 3 and 4 as for type */
+/*                    2 by copying back the zeroed out column, */
 
 			iw = (lda << 1) + 1;
 			if (iuplo == 1) {
@@ -385,8 +400,8 @@ static doublereal c_b46 = 1.;
 			}
 		    }
 
-/*                 For types 2-4, zero one row and column of the matrix   
-                   to test that INFO is returned correctly. */
+/*                 For types 2-4, zero one row and column of the matrix */
+/*                 to test that INFO is returned correctly. */
 
 		    izero = 0;
 		    if (zerot) {
@@ -472,18 +487,18 @@ static doublereal c_b46 = 1.;
 
 			    } else if (! lsame_(fact, "N")) {
 
-/*                          Compute the condition number for comparison   
-                            with the value returned by DPBSVX (FACT =   
-                            'N' reuses the condition number from the   
-                            previous iteration with FACT = 'F'). */
+/*                          Compute the condition number for comparison */
+/*                          with the value returned by DPBSVX (FACT = */
+/*                          'N' reuses the condition number from the */
+/*                          previous iteration with FACT = 'F'). */
 
 				i__5 = kd + 1;
 				dlacpy_("Full", &i__5, &n, &asav[1], &ldab, &
 					afac[1], &ldab);
 				if (equil || iequed > 1) {
 
-/*                             Compute row and column scale factors to   
-                               equilibrate the matrix A. */
+/*                             Compute row and column scale factors to */
+/*                             equilibrate the matrix A. */
 
 				    dpbequ_(uplo, &n, &kd, &afac[1], &ldab, &
 					    s[1], &scond, &amax, &info);
@@ -500,8 +515,8 @@ static doublereal c_b46 = 1.;
 				    }
 				}
 
-/*                          Save the condition number of the   
-                            non-equilibrated system for use in DGET04. */
+/*                          Save the condition number of the */
+/*                          non-equilibrated system for use in DGET04. */
 
 				if (equil) {
 				    roldc = rcondc;
@@ -518,7 +533,7 @@ static doublereal c_b46 = 1.;
 
 /*                          Form the inverse of A. */
 
-				dlaset_("Full", &n, &n, &c_b45, &c_b46, &a[1],
+				dlaset_("Full", &n, &n, &c_b45, &c_b46, &a[1], 
 					 &lda);
 				s_copy(srnamc_1.srnamt, "DPBTRS", (ftnlen)6, (
 					ftnlen)6);
@@ -539,16 +554,16 @@ static doublereal c_b46 = 1.;
 /*                       Restore the matrix A. */
 
 			    i__5 = kd + 1;
-			    dlacpy_("Full", &i__5, &n, &asav[1], &ldab, &a[1],
+			    dlacpy_("Full", &i__5, &n, &asav[1], &ldab, &a[1], 
 				     &ldab);
 
-/*                       Form an exact solution and set the right hand   
-                         side. */
+/*                       Form an exact solution and set the right hand */
+/*                       side. */
 
 			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
 				    ftnlen)6);
 			    dlarhs_(path, xtype, uplo, " ", &n, &n, &kd, &kd, 
-				    nrhs, &a[1], &ldab, &xact[1], &lda, &b[1],
+				    nrhs, &a[1], &ldab, &xact[1], &lda, &b[1], 
 				     &lda, iseed, &info);
 			    *(unsigned char *)xtype = 'C';
 			    dlacpy_("Full", &n, nrhs, &b[1], &lda, &bsav[1], &
@@ -556,10 +571,10 @@ static doublereal c_b46 = 1.;
 
 			    if (nofact) {
 
-/*                          --- Test DPBSV  ---   
+/*                          --- Test DPBSV  --- */
 
-                            Compute the L*L' or U'*U factorization of the   
-                            matrix and solve the system. */
+/*                          Compute the L*L' or U'*U factorization of the */
+/*                          matrix and solve the system. */
 
 				i__5 = kd + 1;
 				dlacpy_("Full", &i__5, &n, &a[1], &ldab, &
@@ -583,10 +598,10 @@ static doublereal c_b46 = 1.;
 				    goto L40;
 				}
 
-/*                          Reconstruct matrix from factors and compute   
-                            residual. */
+/*                          Reconstruct matrix from factors and compute */
+/*                          residual. */
 
-				dpbt01_(uplo, &n, &kd, &a[1], &ldab, &afac[1],
+				dpbt01_(uplo, &n, &kd, &a[1], &ldab, &afac[1], 
 					 &ldab, &rwork[1], result);
 
 /*                          Compute residual of the computed solution. */
@@ -599,12 +614,12 @@ static doublereal c_b46 = 1.;
 
 /*                          Check solution from generated exact solution. */
 
-				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 				nt = 3;
 
-/*                          Print information about the tests that did   
-                            not pass the threshold. */
+/*                          Print information about the tests that did */
+/*                          not pass the threshold. */
 
 				i__5 = nt;
 				for (k = 1; k <= i__5; ++k) {
@@ -647,20 +662,20 @@ L40:
 				    lda);
 			    if (iequed > 1 && n > 0) {
 
-/*                          Equilibrate the matrix if FACT='F' and   
-                            EQUED='Y' */
+/*                          Equilibrate the matrix if FACT='F' and */
+/*                          EQUED='Y' */
 
 				dlaqsb_(uplo, &n, &kd, &a[1], &ldab, &s[1], &
 					scond, &amax, equed);
 			    }
 
-/*                       Solve the system and compute the condition   
-                         number and error bounds using DPBSVX. */
+/*                       Solve the system and compute the condition */
+/*                       number and error bounds using DPBSVX. */
 
 			    s_copy(srnamc_1.srnamt, "DPBSVX", (ftnlen)6, (
 				    ftnlen)6);
 			    dpbsvx_(fact, uplo, &n, &kd, nrhs, &a[1], &ldab, &
-				    afac[1], &ldab, equed, &s[1], &b[1], &lda,
+				    afac[1], &ldab, equed, &s[1], &b[1], &lda, 
 				     &x[1], &lda, &rcond, &rwork[1], &rwork[*
 				    nrhs + 1], &work[1], &iwork[1], &info);
 
@@ -672,7 +687,7 @@ L40:
 				i__7[1] = 1, a__1[1] = uplo;
 				s_cat(ch__1, a__1, i__7, &c__2, (ftnlen)2);
 				alaerh_(path, "DPBSVX", &info, &izero, ch__1, 
-					&n, &n, &kd, &kd, nrhs, &imat, &nfail,
+					&n, &n, &kd, &kd, nrhs, &imat, &nfail, 
 					 &nerrs, nout);
 				goto L60;
 			    }
@@ -680,8 +695,8 @@ L40:
 			    if (info == 0) {
 				if (! prefac) {
 
-/*                             Reconstruct matrix from factors and   
-                               compute residual. */
+/*                             Reconstruct matrix from factors and */
+/*                             compute residual. */
 
 				    dpbt01_(uplo, &n, &kd, &a[1], &ldab, &
 					    afac[1], &ldab, &rwork[(*nrhs << 
@@ -709,8 +724,8 @@ L40:
 					    lda, &roldc, &result[2]);
 				}
 
-/*                          Check the error bounds from iterative   
-                            refinement. */
+/*                          Check the error bounds from iterative */
+/*                          refinement. */
 
 				dpbt05_(uplo, &n, &kd, nrhs, &asav[1], &ldab, 
 					&b[1], &lda, &x[1], &lda, &xact[1], &
@@ -720,13 +735,13 @@ L40:
 				k1 = 6;
 			    }
 
-/*                       Compare RCOND from DPBSVX with the computed   
-                         value in RCONDC. */
+/*                       Compare RCOND from DPBSVX with the computed */
+/*                       value in RCONDC. */
 
 			    result[5] = dget06_(&rcond, &rcondc);
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = k1; k <= 6; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -798,4 +813,3 @@ L80:
 /*     End of DDRVPB */
 
 } /* ddrvpb_ */
-

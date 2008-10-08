@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -44,23 +39,25 @@ static integer c__1 = 1;
     integer i__1, i__2, i__3, i__4;
     doublereal d__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer mode, info;
-    static char path[3];
-    static integer ilow, nrun, i__;
+    integer i__, k, m, n, im, in, lda;
+    doublereal eps;
+    integer mode, info;
+    char path[3];
+    integer ilow, nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, m, n, ihigh, nfail, iseed[4], imode;
+    integer ihigh, nfail, iseed[4], imode;
     extern doublereal dqpt01_(integer *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *), dqrt11_(integer *, integer *, doublereal *, integer *,
+	    integer *), dqrt11_(integer *, integer *, doublereal *, integer *, 
 	     doublereal *, doublereal *, integer *), dqrt12_(integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *);
-    static integer mnmin, istep, nerrs, lwork, im, in;
+    integer mnmin, istep, nerrs, lwork;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int dlaord_(char *, integer *, doublereal *, 
 	    integer *), dgeqpf_(integer *, integer *, doublereal *, 
@@ -69,82 +66,100 @@ static integer c__1 = 1;
 	    doublereal *, integer *), dlaset_(char *, integer *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *), alasum_(char *, integer *, integer *, integer *, integer 
 	    *), dlatms_(integer *, integer *, char *, integer *, char 
-	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
+	    *, doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *, char *, doublereal *, integer *, doublereal *, 
 	    integer *), derrqp_(char *, integer *);
-    static doublereal result[3];
-    static integer lda;
-    static doublereal eps;
+    doublereal result[3];
 
     /* Fortran I/O blocks */
     static cilist io___24 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKQP tests DGEQPF.   
+/*  DCHKQP tests DGEQPF. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the   
-            maximum value of N in NVAL.   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
+/*          where MMAX is the maximum value of M in MVAL and NMAX is the */
+/*          maximum value of N in NVAL. */
 
-    COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
+/*  COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  S       (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    COPYS   (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  COPYS   (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    TAU     (workspace) DOUBLE PRECISION array, dimension (MMAX)   
+/*  TAU     (workspace) DOUBLE PRECISION array, dimension (MMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (MMAX*NMAX + 4*NMAX + MMAX)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (MMAX*NMAX + 4*NMAX + MMAX) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --work;
     --tau;
@@ -156,9 +171,11 @@ static integer c__1 = 1;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "QP", (ftnlen)2, (ftnlen)2);
@@ -194,7 +211,8 @@ static integer c__1 = 1;
 	    n = nval[in];
 	    mnmin = min(m,n);
 /* Computing MAX */
-	    i__3 = 1, i__4 = m * max(m,n) + (mnmin << 2) + max(m,n);
+	    i__3 = 1, i__4 = m * max(m,n) + (mnmin << 2) + max(m,n), i__3 = 
+		    max(i__3,i__4), i__4 = m * n + (mnmin << 1) + (n << 2);
 	    lwork = max(i__3,i__4);
 
 	    for (imode = 1; imode <= 6; ++imode) {
@@ -202,21 +220,21 @@ static integer c__1 = 1;
 		    goto L60;
 		}
 
-/*              Do for each type of matrix   
-                   1:  zero matrix   
-                   2:  one small singular value   
-                   3:  geometric distribution of singular values   
-                   4:  first n/2 columns fixed   
-                   5:  last n/2 columns fixed   
-                   6:  every second column fixed */
+/*              Do for each type of matrix */
+/*                 1:  zero matrix */
+/*                 2:  one small singular value */
+/*                 3:  geometric distribution of singular values */
+/*                 4:  first n/2 columns fixed */
+/*                 5:  last n/2 columns fixed */
+/*                 6:  every second column fixed */
 
 		mode = imode;
 		if (imode > 3) {
 		    mode = 1;
 		}
 
-/*              Generate test matrix of size m by n using   
-                singular value distribution indicated by `mode'. */
+/*              Generate test matrix of size m by n using */
+/*              singular value distribution indicated by `mode'. */
 
 		i__3 = n;
 		for (i__ = 1; i__ <= i__3; ++i__) {
@@ -287,10 +305,10 @@ static integer c__1 = 1;
 /*              Compute Q'*Q */
 
 		result[2] = dqrt11_(&m, &mnmin, &a[1], &lda, &tau[1], &work[1]
-			, &lwork);
+, &lwork);
 
-/*              Print information about the tests that did not pass   
-                the threshold. */
+/*              Print information about the tests that did not pass */
+/*              the threshold. */
 
 		for (k = 1; k <= 3; ++k) {
 		    if (result[k - 1] >= *thresh) {
@@ -329,4 +347,3 @@ L60:
 
     return 0;
 } /* dchkqp_ */
-

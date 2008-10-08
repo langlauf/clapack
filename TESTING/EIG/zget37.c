@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -30,53 +25,52 @@ static integer c__0 = 0;
     double d_imag(doublecomplex *);
 
     /* Local variables */
-    static integer icmp;
-    static doublecomplex cdum[1];
-    static integer iscl, info, lcmp[3], kmin;
-    static doublereal wiin[20], vmin, vmax, tnrm;
-    static integer isrt;
-    static doublereal wrin[20], vmul, stmp[20];
-    static doublecomplex work[1200], wtmp[20];
-    static doublereal wsrt[20];
-    static integer i__, j, m, n;
-    static doublereal s[20];
-    static doublecomplex t[400]	/* was [20][20] */;
-    static doublereal v;
-    static doublecomplex w[20];
+    integer i__, j, m, n;
+    doublereal s[20];
+    doublecomplex t[400]	/* was [20][20] */;
+    doublereal v;
+    doublecomplex w[20], le[400]	/* was [20][20] */, re[400]	/* 
+	    was [20][20] */;
+    doublereal val[3], dum[1], eps, sep[20], sin__[20], tol;
+    doublecomplex tmp[400]	/* was [20][20] */;
+    integer icmp;
+    doublecomplex cdum[1];
+    integer iscl, info, lcmp[3], kmin;
+    doublereal wiin[20], vmin, vmax, tnrm;
+    integer isrt;
+    doublereal wrin[20], vmul, stmp[20];
+    doublecomplex work[1200], wtmp[20];
+    doublereal wsrt[20];
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
-    static doublereal vcmin, sepin[20];
+    doublereal vcmin, sepin[20];
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal tolin, rwork[40];
+    doublereal tolin, rwork[40];
     extern /* Subroutine */ int zcopy_(integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), dlabad_(doublereal *, doublereal *);
-    static doublecomplex le[400]	/* was [20][20] */, re[400]	/* 
-	    was [20][20] */;
     extern doublereal dlamch_(char *);
-    static logical select[20];
+    logical select[20];
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
 	    doublecomplex *, integer *), zgehrd_(integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
-	    doublecomplex *, integer *, integer *), zlacpy_(char *, integer *,
+	    doublecomplex *, integer *, integer *), zlacpy_(char *, integer *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
-	    );
-    static doublereal septmp[20], smlnum;
+);
+    doublereal septmp[20], smlnum;
     extern /* Subroutine */ int zhseqr_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *), ztrevc_(char *, char *, logical *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, integer *, integer *, doublecomplex *,
-	     doublereal *, integer *), ztrsna_(char *, char *,
+	    doublecomplex *, integer *, integer *, integer *, doublecomplex *, 
+	     doublereal *, integer *), ztrsna_(char *, char *, 
 	     logical *, integer *, doublecomplex *, integer *, doublecomplex *
-	    , integer *, doublecomplex *, integer *, doublereal *, doublereal 
-	    *, integer *, integer *, doublecomplex *, integer *, doublereal *,
+, integer *, doublecomplex *, integer *, doublereal *, doublereal 
+	    *, integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	     integer *);
-    static doublereal val[3], dum[1], eps, sep[20], sin__[20], tol;
-    static doublecomplex tmp[400]	/* was [20][20] */;
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, 0, 0 };
@@ -85,64 +79,70 @@ static integer c__0 = 0;
 
 
 
-#define t_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
-#define le_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define le_ref(a_1,a_2) le[le_subscr(a_1,a_2)]
-#define re_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define re_ref(a_1,a_2) re[re_subscr(a_1,a_2)]
-#define tmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define tmp_ref(a_1,a_2) tmp[tmp_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGET37 tests ZTRSNA, a routine for estimating condition numbers of */
+/*  eigenvalues and/or right eigenvectors of a matrix. */
 
-    Purpose   
-    =======   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    ZGET37 tests ZTRSNA, a routine for estimating condition numbers of   
-    eigenvalues and/or right eigenvectors of a matrix.   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) DOUBLE PRECISION array, dimension (3) */
+/*          Value of the largest test ratio. */
+/*          RMAX(1) = largest ratio comparing different calls to ZTRSNA */
+/*          RMAX(2) = largest error in reciprocal condition */
+/*                    numbers taking their conditioning into account */
+/*          RMAX(3) = largest error in reciprocal condition */
+/*                    numbers not taking their conditioning into */
+/*                    account (may be larger than RMAX(2)) */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER array, dimension (3) */
+/*          LMAX(i) is example number where largest test ratio */
+/*          RMAX(i) is achieved. Also: */
+/*          If ZGEHRD returns INFO nonzero on example i, LMAX(1)=i */
+/*          If ZHSEQR returns INFO nonzero on example i, LMAX(2)=i */
+/*          If ZTRSNA returns INFO nonzero on example i, LMAX(3)=i */
 
-    RMAX    (output) DOUBLE PRECISION array, dimension (3)   
-            Value of the largest test ratio.   
-            RMAX(1) = largest ratio comparing different calls to ZTRSNA   
-            RMAX(2) = largest error in reciprocal condition   
-                      numbers taking their conditioning into account   
-            RMAX(3) = largest error in reciprocal condition   
-                      numbers not taking their conditioning into   
-                      account (may be larger than RMAX(2))   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = No. of times ZGEHRD returned INFO nonzero */
+/*          NINFO(2) = No. of times ZHSEQR returned INFO nonzero */
+/*          NINFO(3) = No. of times ZTRSNA returned INFO nonzero */
 
-    LMAX    (output) INTEGER array, dimension (3)   
-            LMAX(i) is example number where largest test ratio   
-            RMAX(i) is achieved. Also:   
-            If ZGEHRD returns INFO nonzero on example i, LMAX(1)=i   
-            If ZHSEQR returns INFO nonzero on example i, LMAX(2)=i   
-            If ZTRSNA returns INFO nonzero on example i, LMAX(3)=i   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = No. of times ZGEHRD returned INFO nonzero   
-            NINFO(2) = No. of times ZHSEQR returned INFO nonzero   
-            NINFO(3) = No. of times ZTRSNA returned INFO nonzero   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
     --lmax;
     --rmax;
@@ -170,9 +170,9 @@ static integer c__0 = 0;
     val[1] = 1.;
     val[2] = sqrt(bignum);
 
-/*     Read input data until N=0.  Assume input eigenvalues are sorted   
-       lexicographically (increasing by real part if ISRT = 0,   
-       increasing by imaginary part if ISRT = 1) */
+/*     Read input data until N=0.  Assume input eigenvalues are sorted */
+/*     lexicographically (increasing by real part if ISRT = 0, */
+/*     increasing by imaginary part if ISRT = 1) */
 
 L10:
     io___5.ciunit = *nin;
@@ -189,8 +189,8 @@ L10:
 	s_rsle(&io___9);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&tmp[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L20: */
@@ -220,7 +220,7 @@ L10:
 	vmul = val[iscl - 1];
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    zdscal_(&n, &vmul, &t_ref(1, i__), &c__1);
+	    zdscal_(&n, &vmul, &t[i__ * 20 - 20], &c__1);
 /* L40: */
 	}
 	if (tnrm == 0.) {
@@ -240,7 +240,7 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = n;
 	    for (i__ = j + 2; i__ <= i__2; ++i__) {
-		i__3 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
 		t[i__3].r = 0., t[i__3].i = 0.;
 /* L50: */
 	    }
@@ -277,8 +277,8 @@ L10:
 	    goto L260;
 	}
 
-/*        Sort eigenvalues and condition numbers lexicographically   
-          to compare with inputs */
+/*        Sort eigenvalues and condition numbers lexicographically */
+/*        to compare with inputs */
 
 	zcopy_(&n, w, &c__1, wtmp, &c__1);
 	if (isrt == 0) {
@@ -335,10 +335,10 @@ L10:
 /* L110: */
 	}
 
-/*        Compare condition numbers for eigenvalues   
-          taking their condition numbers into account   
+/*        Compare condition numbers for eigenvalues */
+/*        taking their condition numbers into account */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = (doublereal) n * 2. * eps * tnrm;
 	v = max(d__1,smlnum);
 	if (tnrm == 0.) {
@@ -382,8 +382,8 @@ L10:
 /* L120: */
 	}
 
-/*        Compare condition numbers for eigenvectors   
-          taking their condition numbers into account */
+/*        Compare condition numbers for eigenvectors */
+/*        taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -424,8 +424,8 @@ L10:
 /* L130: */
 	}
 
-/*        Compare condition numbers for eigenvalues   
-          without taking their condition numbers into account */
+/*        Compare condition numbers for eigenvalues */
+/*        without taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -452,8 +452,8 @@ L10:
 /* L140: */
 	}
 
-/*        Compare condition numbers for eigenvectors   
-          without taking their condition numbers into account */
+/*        Compare condition numbers for eigenvectors */
+/*        without taking their condition numbers into account */
 
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -485,7 +485,7 @@ L10:
 	dum[0] = -1.;
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
-	ztrsna_("E", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("E", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -508,7 +508,7 @@ L10:
 
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
-	ztrsna_("V", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("V", "A", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -536,7 +536,7 @@ L10:
 	}
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
-	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -559,7 +559,7 @@ L10:
 
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
-	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -582,7 +582,7 @@ L10:
 
 	dcopy_(&n, dum, &c__0, stmp, &c__1);
 	dcopy_(&n, dum, &c__0, septmp, &c__1);
-	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -619,22 +619,22 @@ L10:
 	    icmp = 1;
 	    lcmp[0] = 2;
 	    select[1] = TRUE_;
-	    zcopy_(&n, &re_ref(1, 2), &c__1, &re_ref(1, 1), &c__1);
-	    zcopy_(&n, &le_ref(1, 2), &c__1, &le_ref(1, 1), &c__1);
+	    zcopy_(&n, &re[20], &c__1, re, &c__1);
+	    zcopy_(&n, &le[20], &c__1, le, &c__1);
 	}
 	if (n > 3) {
 	    icmp = 2;
 	    lcmp[1] = n - 1;
 	    select[n - 2] = TRUE_;
-	    zcopy_(&n, &re_ref(1, n - 1), &c__1, &re_ref(1, 2), &c__1);
-	    zcopy_(&n, &le_ref(1, n - 1), &c__1, &le_ref(1, 2), &c__1);
+	    zcopy_(&n, &re[(n - 1) * 20 - 20], &c__1, &re[20], &c__1);
+	    zcopy_(&n, &le[(n - 1) * 20 - 20], &c__1, &le[20], &c__1);
 	}
 
 /*        Compute all selected condition numbers */
 
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
-	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("B", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -658,7 +658,7 @@ L10:
 
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
-	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("E", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -682,7 +682,7 @@ L10:
 
 	dcopy_(&icmp, dum, &c__0, stmp, &c__1);
 	dcopy_(&icmp, dum, &c__0, septmp, &c__1);
-	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp,
+	ztrsna_("V", "S", select, &n, t, &c__20, le, &c__20, re, &c__20, stmp, 
 		 septmp, &n, &m, work, &n, rwork, &info)
 		;
 	if (info != 0) {
@@ -715,14 +715,3 @@ L260:
 /*     End of ZGET37 */
 
 } /* zget37_ */
-
-#undef tmp_ref
-#undef tmp_subscr
-#undef re_ref
-#undef re_subscr
-#undef le_ref
-#undef le_subscr
-#undef t_ref
-#undef t_subscr
-
-

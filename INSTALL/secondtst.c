@@ -1,16 +1,12 @@
-/* secondtst.f -- translated by f2c (version 19940927).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
 static integer c__1 = 1;
 static integer c__100 = 100;
 
-/* Main program */ MAIN__(void)
+/* Main program */ int MAIN__(void)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 Time for 1,000,000 SAXPY ops  = \002,g10"
@@ -33,12 +29,11 @@ static integer c__100 = 100;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer i, j;
-    static real alpha, x[100], y[100];
+    integer i__, j;
+    real x[100], y[100], t1, t2, avg, alpha;
     extern /* Subroutine */ int mysub_(integer *, real *, real *);
-    static real t1, t2;
     extern doublereal second_(void);
-    static real tnosec, avg;
+    real tnosec;
 
     /* Fortran I/O blocks */
     static cilist io___8 = { 0, 6, 0, fmt_9999, 0 };
@@ -50,10 +45,9 @@ static integer c__100 = 100;
 
 
 
-/*  -- LAPACK test routine (version 3.0) -- */
-/*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
-/*     Courant Institute, Argonne National Lab, and Rice University */
-/*     September 30, 1994 */
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
 /*     .. Parameters .. */
 /*     .. */
@@ -70,9 +64,9 @@ static integer c__100 = 100;
 
 /*     Initialize X and Y */
 
-    for (i = 1; i <= 100; ++i) {
-	x[i - 1] = 1.f / (real) i;
-	y[i - 1] = (real) (100 - i) / 100.f;
+    for (i__ = 1; i__ <= 100; ++i__) {
+	x[i__ - 1] = 1.f / (real) i__;
+	y[i__ - 1] = (real) (100 - i__) / 100.f;
 /* L10: */
     }
     alpha = .315f;
@@ -81,11 +75,11 @@ static integer c__100 = 100;
 
     t1 = second_();
     for (j = 1; j <= 5000; ++j) {
-	for (i = 1; i <= 100; ++i) {
-	    y[i - 1] += alpha * x[i - 1];
+	for (i__ = 1; i__ <= 100; ++i__) {
+	    y[i__ - 1] += alpha * x[i__ - 1];
 /* L20: */
 	}
-	alpha = -(doublereal)alpha;
+	alpha = -alpha;
 /* L30: */
     }
     t2 = second_();
@@ -108,11 +102,11 @@ static integer c__100 = 100;
 
     t1 = second_();
     for (j = 1; j <= 5000; ++j) {
-	for (i = 1; i <= 100; ++i) {
-	    y[i - 1] += alpha * x[i - 1];
+	for (i__ = 1; i__ <= 100; ++i__) {
+	    y[i__ - 1] += alpha * x[i__ - 1];
 /* L40: */
 	}
-	alpha = -(doublereal)alpha;
+	alpha = -alpha;
 	t2 = second_();
 /* L50: */
     }

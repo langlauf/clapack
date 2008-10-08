@@ -1,70 +1,83 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slaed5_(integer *i__, real *d__, real *z__, real *delta, 
 	real *rho, real *dlam)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
-       Courant Institute, NAG Ltd., and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    This subroutine computes the I-th eigenvalue of a symmetric rank-one   
-    modification of a 2-by-2 diagonal matrix   
-
-               diag( D )  +  RHO *  Z * transpose(Z) .   
-
-    The diagonal elements in the array D are assumed to satisfy   
-
-               D(i) < D(j)  for  i < j .   
-
-    We also assume RHO > 0 and that the Euclidean norm of the vector   
-    Z is one.   
-
-    Arguments   
-    =========   
-
-    I      (input) INTEGER   
-           The index of the eigenvalue to be computed.  I = 1 or I = 2.   
-
-    D      (input) REAL array, dimension (2)   
-           The original eigenvalues.  We assume D(1) < D(2).   
-
-    Z      (input) REAL array, dimension (2)   
-           The components of the updating vector.   
-
-    DELTA  (output) REAL array, dimension (2)   
-           The vector DELTA contains the information necessary   
-           to construct the eigenvectors.   
-
-    RHO    (input) REAL   
-           The scalar in the symmetric updating formula.   
-
-    DLAM   (output) REAL   
-           The computed lambda_I, the I-th updated eigenvalue.   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Ren-Cang Li, Computer Science Division, University of California   
-       at Berkeley, USA   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     real r__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
-    /* Local variables */
-    static real temp, b, c__, w, del, tau;
 
+    /* Local variables */
+    real b, c__, w, del, tau, temp;
+
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  This subroutine computes the I-th eigenvalue of a symmetric rank-one */
+/*  modification of a 2-by-2 diagonal matrix */
+
+/*             diag( D )  +  RHO *  Z * transpose(Z) . */
+
+/*  The diagonal elements in the array D are assumed to satisfy */
+
+/*             D(i) < D(j)  for  i < j . */
+
+/*  We also assume RHO > 0 and that the Euclidean norm of the vector */
+/*  Z is one. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  I      (input) INTEGER */
+/*         The index of the eigenvalue to be computed.  I = 1 or I = 2. */
+
+/*  D      (input) REAL array, dimension (2) */
+/*         The original eigenvalues.  We assume D(1) < D(2). */
+
+/*  Z      (input) REAL array, dimension (2) */
+/*         The components of the updating vector. */
+
+/*  DELTA  (output) REAL array, dimension (2) */
+/*         The vector DELTA contains the information necessary */
+/*         to construct the eigenvectors. */
+
+/*  RHO    (input) REAL */
+/*         The scalar in the symmetric updating formula. */
+
+/*  DLAM   (output) REAL */
+/*         The computed lambda_I, the I-th updated eigenvalue. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*     Ren-Cang Li, Computer Science Division, University of California */
+/*     at Berkeley, USA */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --delta;
     --z__;
     --d__;
@@ -122,4 +135,3 @@
 /*     End OF SLAED5 */
 
 } /* slaed5_ */
-

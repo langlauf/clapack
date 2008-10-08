@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,15 +23,17 @@ static integer c__200 = 200;
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static integer ifst, ilst;
-    static doublereal work[200];
-    static integer info1, info2, ifst1, ifst2, ilst1, ilst2, i__, j, n;
-    static doublereal q[100]	/* was [10][10] */;
+    integer i__, j, n;
+    doublereal q[100]	/* was [10][10] */, t1[100]	/* was [10][10] */, 
+	    t2[100]	/* was [10][10] */;
+    integer loc;
+    doublereal eps, res, tmp[100]	/* was [10][10] */;
+    integer ifst, ilst;
+    doublereal work[200];
+    integer info1, info2, ifst1, ifst2, ilst1, ilst2;
     extern /* Subroutine */ int dhst01_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal t1[100]	/* was [10][10] */, t2[100]	/* was [10][
-	    10] */;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
@@ -44,10 +41,9 @@ static integer c__200 = 200;
 	    doublereal *, integer *), dtrexc_(char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *, doublereal *, integer *);
-    static integer ifstsv;
-    static doublereal result[2];
-    static integer ilstsv, loc;
-    static doublereal eps, res, tmp[100]	/* was [10][10] */;
+    integer ifstsv;
+    doublereal result[2];
+    integer ilstsv;
 
     /* Fortran I/O blocks */
     static cilist io___2 = { 0, 0, 0, 0, 0 };
@@ -55,58 +51,68 @@ static integer c__200 = 200;
 
 
 
-#define q_ref(a_1,a_2) q[(a_2)*10 + a_1 - 11]
-#define t1_ref(a_1,a_2) t1[(a_2)*10 + a_1 - 11]
-#define t2_ref(a_1,a_2) t2[(a_2)*10 + a_1 - 11]
-#define tmp_ref(a_1,a_2) tmp[(a_2)*10 + a_1 - 11]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET36 tests DTREXC, a routine for moving blocks (either 1 by 1 or */
+/*  2 by 2) on the diagonal of a matrix in real Schur form.  Thus, DLAEXC */
+/*  computes an orthogonal matrix Q such that */
 
-    Purpose   
-    =======   
+/*     Q' * T1 * Q  = T2 */
 
-    DGET36 tests DTREXC, a routine for moving blocks (either 1 by 1 or   
-    2 by 2) on the diagonal of a matrix in real Schur form.  Thus, DLAEXC   
-    computes an orthogonal matrix Q such that   
+/*  and where one of the diagonal blocks of T1 (the one at row IFST) has */
+/*  been moved to position ILST. */
 
-       Q' * T1 * Q  = T2   
+/*  The test code verifies that the residual Q'*T1*Q-T2 is small, that T2 */
+/*  is in Schur form, and that the final position of the IFST block is */
+/*  ILST (within +-1). */
 
-    and where one of the diagonal blocks of T1 (the one at row IFST) has   
-    been moved to position ILST.   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    The test code verifies that the residual Q'*T1*Q-T2 is small, that T2   
-    is in Schur form, and that the final position of the IFST block is   
-    ILST (within +-1).   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) DOUBLE PRECISION */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) DOUBLE PRECISION   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(J) is the number of examples where INFO=J. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(J) is the number of examples where INFO=J.   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number. */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
 
     /* Function Body */
@@ -137,8 +143,8 @@ L10:
 	s_rsle(&io___7);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&tmp[i__ + j * 10 - 11], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L20: */
@@ -161,10 +167,10 @@ L10:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    if (i__ == j && q_ref(i__, j) != 1.) {
+	    if (i__ == j && q[i__ + j * 10 - 11] != 1.) {
 		res += 1. / eps;
 	    }
-	    if (i__ != j && q_ref(i__, j) != 0.) {
+	    if (i__ != j && q[i__ + j * 10 - 11] != 0.) {
 		res += 1. / eps;
 	    }
 /* L30: */
@@ -183,7 +189,7 @@ L10:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    if (t1_ref(i__, j) != t2_ref(i__, j)) {
+	    if (t1[i__ + j * 10 - 11] != t2[i__ + j * 10 - 11]) {
 		res += 1. / eps;
 	    }
 /* L50: */
@@ -223,21 +229,22 @@ L10:
 
     loc = 1;
 L70:
-    if (t2_ref(loc + 1, loc) != 0.) {
+    if (t2[loc + 1 + loc * 10 - 11] != 0.) {
 
 /*        2 by 2 block */
 
-	if (t2_ref(loc, loc + 1) == 0. || t2_ref(loc, loc) != t2_ref(loc + 1, 
-		loc + 1) || d_sign(&c_b22, &t2_ref(loc, loc + 1)) == d_sign(&
-		c_b22, &t2_ref(loc + 1, loc))) {
+	if (t2[loc + (loc + 1) * 10 - 11] == 0. || t2[loc + loc * 10 - 11] != 
+		t2[loc + 1 + (loc + 1) * 10 - 11] || d_sign(&c_b22, &t2[loc + 
+		(loc + 1) * 10 - 11]) == d_sign(&c_b22, &t2[loc + 1 + loc * 
+		10 - 11])) {
 	    res += 1. / eps;
 	}
 	i__1 = n;
 	for (i__ = loc + 2; i__ <= i__1; ++i__) {
-	    if (t2_ref(i__, loc) != 0.) {
+	    if (t2[i__ + loc * 10 - 11] != 0.) {
 		res += 1. / res;
 	    }
-	    if (t2_ref(i__, loc + 1) != 0.) {
+	    if (t2[i__ + (loc + 1) * 10 - 11] != 0.) {
 		res += 1. / res;
 	    }
 /* L80: */
@@ -249,7 +256,7 @@ L70:
 
 	i__1 = n;
 	for (i__ = loc + 1; i__ <= i__1; ++i__) {
-	    if (t2_ref(i__, loc) != 0.) {
+	    if (t2[i__ + loc * 10 - 11] != 0.) {
 		res += 1. / res;
 	    }
 /* L90: */
@@ -268,10 +275,3 @@ L70:
 /*     End of DGET36 */
 
 } /* dget36_ */
-
-#undef tmp_ref
-#undef t2_ref
-#undef t1_ref
-#undef q_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -16,7 +11,7 @@ static integer c__1 = 1;
 /* Subroutine */ int dgsvts_(integer *m, integer *p, integer *n, doublereal *
 	a, doublereal *af, integer *lda, doublereal *b, doublereal *bf, 
 	integer *ldb, doublereal *u, integer *ldu, doublereal *v, integer *
-	ldv, doublereal *q, integer *ldq, doublereal *alpha, doublereal *beta,
+	ldv, doublereal *q, integer *ldq, doublereal *alpha, doublereal *beta, 
 	 doublereal *r__, integer *ldr, integer *iwork, doublereal *work, 
 	integer *lwork, doublereal *rwork, doublereal *result)
 {
@@ -27,13 +22,14 @@ static integer c__1 = 1;
     doublereal d__1;
 
     /* Local variables */
-    static integer info;
-    static doublereal unfl, temp;
-    static integer i__, j, k, l;
+    integer i__, j, k, l;
+    doublereal ulp;
+    integer info;
+    doublereal unfl, temp;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static doublereal resid, anorm, bnorm;
+    doublereal resid, anorm, bnorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), dsyrk_(char *, char *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
@@ -45,147 +41,154 @@ static integer c__1 = 1;
 	    dlaset_(char *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *), dggsvd_(char *, char *, char *, 
 	    integer *, integer *, integer *, integer *, integer *, doublereal 
-	    *, integer *, doublereal *, integer *, doublereal *, doublereal *,
+	    *, integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	     doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *);
     extern doublereal dlansy_(char *, char *, integer *, doublereal *, 
 	    integer *, doublereal *);
-    static doublereal ulpinv, ulp;
+    doublereal ulpinv;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define r___ref(a_1,a_2) r__[(a_2)*r_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
-#define bf_ref(a_1,a_2) bf[(a_2)*bf_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DGSVTS tests DGGSVD, which computes the GSVD of an M-by-N matrix A */
+/*  and a P-by-N matrix B: */
+/*               U'*A*Q = D1*R and V'*B*Q = D2*R. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DGSVTS tests DGGSVD, which computes the GSVD of an M-by-N matrix A   
-    and a P-by-N matrix B:   
-                 U'*A*Q = D1*R and V'*B*Q = D2*R.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  P       (input) INTEGER */
+/*          The number of rows of the matrix B.  P >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B.  N >= 0. */
 
-    P       (input) INTEGER   
-            The number of rows of the matrix B.  P >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,M) */
+/*          The M-by-N matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.  N >= 0.   
+/*  AF      (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          Details of the GSVD of A and B, as returned by DGGSVD, */
+/*          see DGGSVD for further details. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
-            The M-by-N matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
+/*          LDA >= max( 1,M ). */
 
-    AF      (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the GSVD of A and B, as returned by DGGSVD,   
-            see DGGSVD for further details.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,P) */
+/*          On entry, the P-by-N matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
-            LDA >= max( 1,M ).   
+/*  BF      (output) DOUBLE PRECISION array, dimension (LDB,N) */
+/*          Details of the GSVD of A and B, as returned by DGGSVD, */
+/*          see DGGSVD for further details. */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,P)   
-            On entry, the P-by-N matrix B.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B and BF. */
+/*          LDB >= max(1,P). */
 
-    BF      (output) DOUBLE PRECISION array, dimension (LDB,N)   
-            Details of the GSVD of A and B, as returned by DGGSVD,   
-            see DGGSVD for further details.   
+/*  U       (output) DOUBLE PRECISION array, dimension(LDU,M) */
+/*          The M by M orthogonal matrix U. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B and BF.   
-            LDB >= max(1,P).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U. LDU >= max(1,M). */
 
-    U       (output) DOUBLE PRECISION array, dimension(LDU,M)   
-            The M by M orthogonal matrix U.   
+/*  V       (output) DOUBLE PRECISION array, dimension(LDV,M) */
+/*          The P by P orthogonal matrix V. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U. LDU >= max(1,M).   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of the array V. LDV >= max(1,P). */
 
-    V       (output) DOUBLE PRECISION array, dimension(LDV,M)   
-            The P by P orthogonal matrix V.   
+/*  Q       (output) DOUBLE PRECISION array, dimension(LDQ,N) */
+/*          The N by N orthogonal matrix Q. */
 
-    LDV     (input) INTEGER   
-            The leading dimension of the array V. LDV >= max(1,P).   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of the array Q. LDQ >= max(1,N). */
 
-    Q       (output) DOUBLE PRECISION array, dimension(LDQ,N)   
-            The N by N orthogonal matrix Q.   
+/*  ALPHA   (output) DOUBLE PRECISION array, dimension (N) */
+/*  BETA    (output) DOUBLE PRECISION array, dimension (N) */
+/*          The generalized singular value pairs of A and B, the */
+/*          ``diagonal'' matrices D1 and D2 are constructed from */
+/*          ALPHA and BETA, see subroutine DGGSVD for details. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of the array Q. LDQ >= max(1,N).   
+/*  R       (output) DOUBLE PRECISION array, dimension(LDQ,N) */
+/*          The upper triangular matrix R. */
 
-    ALPHA   (output) DOUBLE PRECISION array, dimension (N)   
-    BETA    (output) DOUBLE PRECISION array, dimension (N)   
-            The generalized singular value pairs of A and B, the   
-            ``diagonal'' matrices D1 and D2 are constructed from   
-            ALPHA and BETA, see subroutine DGGSVD for details.   
+/*  LDR     (input) INTEGER */
+/*          The leading dimension of the array R. LDR >= max(1,N). */
 
-    R       (output) DOUBLE PRECISION array, dimension(LDQ,N)   
-            The upper triangular matrix R.   
+/*  IWORK   (workspace) INTEGER array, dimension (N) */
 
-    LDR     (input) INTEGER   
-            The leading dimension of the array R. LDR >= max(1,N).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    IWORK   (workspace) INTEGER array, dimension (N)   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK, */
+/*          LWORK >= max(M,P,N)*max(M,P,N). */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,P,N)) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK,   
-            LWORK >= max(M,P,N)*max(M,P,N).   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (6) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( U'*A*Q - D1*R ) / ( MAX(M,N)*norm(A)*ULP) */
+/*          RESULT(2) = norm( V'*B*Q - D2*R ) / ( MAX(P,N)*norm(B)*ULP) */
+/*          RESULT(3) = norm( I - U'*U ) / ( M*ULP ) */
+/*          RESULT(4) = norm( I - V'*V ) / ( P*ULP ) */
+/*          RESULT(5) = norm( I - Q'*Q ) / ( N*ULP ) */
+/*          RESULT(6) = 0        if ALPHA is in decreasing order; */
+/*                    = ULPINV   otherwise. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,P,N))   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (6)   
-            The test ratios:   
-            RESULT(1) = norm( U'*A*Q - D1*R ) / ( MAX(M,N)*norm(A)*ULP)   
-            RESULT(2) = norm( V'*B*Q - D2*R ) / ( MAX(P,N)*norm(B)*ULP)   
-            RESULT(3) = norm( I - U'*U ) / ( M*ULP )   
-            RESULT(4) = norm( I - V'*V ) / ( P*ULP )   
-            RESULT(5) = norm( I - Q'*Q ) / ( N*ULP )   
-            RESULT(6) = 0        if ALPHA is in decreasing order;   
-                      = ULPINV   otherwise.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --alpha;
     --beta;
     r_dim1 = *ldr;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     --iwork;
     --work;
@@ -215,15 +218,15 @@ static integer c__1 = 1;
 	    bf_offset], ldb, &alpha[1], &beta[1], &u[u_offset], ldu, &v[
 	    v_offset], ldv, &q[q_offset], ldq, &work[1], &iwork[1], &info);
 
-/*     Copy R   
+/*     Copy R */
 
-   Computing MIN */
+/* Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    r___ref(i__, j) = af_ref(i__, *n - k - l + j);
+	    r__[i__ + j * r_dim1] = af[i__ + (*n - k - l + j) * af_dim1];
 /* L10: */
 	}
 /* L20: */
@@ -234,7 +237,8 @@ static integer c__1 = 1;
 	for (i__ = *m + 1; i__ <= i__1; ++i__) {
 	    i__2 = k + l;
 	    for (j = i__; j <= i__2; ++j) {
-		r___ref(i__, j) = bf_ref(i__ - k, *n - k - l + j);
+		r__[i__ + j * r_dim1] = bf[i__ - k + (*n - k - l + j) * 
+			bf_dim1];
 /* L30: */
 	    }
 /* L40: */
@@ -243,7 +247,7 @@ static integer c__1 = 1;
 
 /*     Compute A:= U'*A*Q - D1*R */
 
-    dgemm_("No transpose", "No transpose", m, n, n, &c_b17, &a[a_offset], lda,
+    dgemm_("No transpose", "No transpose", m, n, n, &c_b17, &a[a_offset], lda, 
 	     &q[q_offset], ldq, &c_b18, &work[1], lda)
 	    ;
 
@@ -254,8 +258,7 @@ static integer c__1 = 1;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    a_ref(i__, *n - k - l + j) = a_ref(i__, *n - k - l + j) - r___ref(
-		    i__, j);
+	    a[i__ + (*n - k - l + j) * a_dim1] -= r__[i__ + j * r_dim1];
 /* L50: */
 	}
 /* L60: */
@@ -267,8 +270,8 @@ static integer c__1 = 1;
     for (i__ = k + 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    a_ref(i__, *n - k - l + j) = a_ref(i__, *n - k - l + j) - alpha[
-		    i__] * r___ref(i__, j);
+	    a[i__ + (*n - k - l + j) * a_dim1] -= alpha[i__] * r__[i__ + j * 
+		    r_dim1];
 /* L70: */
 	}
 /* L80: */
@@ -288,7 +291,7 @@ static integer c__1 = 1;
 
 /*     Compute B := V'*B*Q - D2*R */
 
-    dgemm_("No transpose", "No transpose", p, n, n, &c_b17, &b[b_offset], ldb,
+    dgemm_("No transpose", "No transpose", p, n, n, &c_b17, &b[b_offset], ldb, 
 	     &q[q_offset], ldq, &c_b18, &work[1], ldb)
 	    ;
 
@@ -299,8 +302,8 @@ static integer c__1 = 1;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = l;
 	for (j = i__; j <= i__2; ++j) {
-	    b_ref(i__, *n - l + j) = b_ref(i__, *n - l + j) - beta[k + i__] * 
-		    r___ref(k + i__, k + j);
+	    b[i__ + (*n - l + j) * b_dim1] -= beta[k + i__] * r__[k + i__ + (
+		    k + j) * r_dim1];
 /* L90: */
 	}
 /* L100: */
@@ -382,11 +385,3 @@ static integer c__1 = 1;
 /*     End of DGSVTS */
 
 } /* dgsvts_ */
-
-#undef bf_ref
-#undef af_ref
-#undef r___ref
-#undef b_ref
-#undef a_ref
-
-

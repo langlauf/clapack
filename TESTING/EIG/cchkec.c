@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -33,28 +28,28 @@ static integer c__3 = 3;
     static char fmt_9995[] = "(/1x,\002All tests for \002,a3,\002 routines p"
 	    "assed the threshold (\002,i6,\002 tests run)\002)";
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static char path[3];
+    logical ok;
+    real eps;
+    char path[3];
     extern /* Subroutine */ int cget35_(real *, integer *, integer *, integer 
 	    *, integer *), cget36_(real *, integer *, integer *, integer *, 
 	    integer *), cget37_(real *, integer *, integer *, integer *, 
 	    integer *), cget38_(real *, integer *, integer *, integer *, 
 	    integer *);
-    static real sfmin;
-    static logical ok;
+    real sfmin;
     extern /* Subroutine */ int cerrec_(char *, integer *);
     extern doublereal slamch_(char *);
-    static integer ktrexc, ltrexc, ktrsna, ntrexc, ltrsna[3], ntrsna[3], 
-	    ktrsen;
-    static real rtrexc;
-    static integer ltrsen[3], ntrsen[3];
-    static real rtrsna[3], rtrsen[3];
-    static integer ntests, ktrsyl, ltrsyl, ntrsyl;
-    static real rtrsyl, eps;
+    integer ktrexc, ltrexc, ktrsna, ntrexc, ltrsna[3], ntrsna[3], ktrsen;
+    real rtrexc;
+    integer ltrsen[3], ntrsen[3];
+    real rtrsna[3], rtrsen[3];
+    integer ntests, ktrsyl, ltrsyl, ntrsyl;
+    real rtrsyl;
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, fmt_9994, 0 };
@@ -68,42 +63,52 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CCHKEC tests eigen- condition estimation routines   
-           CTRSYL, CTREXC, CTRSNA, CTRSEN   
+/*  CCHKEC tests eigen- condition estimation routines */
+/*         CTRSYL, CTREXC, CTRSNA, CTRSEN */
 
-    In all cases, the routine runs through a fixed set of numerical   
-    examples, subjects them to various tests, and compares the test   
-    results to a threshold THRESH. In addition, CTRSNA and CTRSEN are   
-    tested by reading in precomputed examples from a file (on input unit   
-    NIN).  Output is written to output unit NOUT.   
+/*  In all cases, the routine runs through a fixed set of numerical */
+/*  examples, subjects them to various tests, and compares the test */
+/*  results to a threshold THRESH. In addition, CTRSNA and CTRSEN are */
+/*  tested by reading in precomputed examples from a file (on input unit */
+/*  NIN).  Output is written to output unit NOUT. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    THRESH  (input) REAL   
-            Threshold for residual tests.  A computed test ratio passes   
-            the threshold if it is less than THRESH.   
+/*  THRESH  (input) REAL */
+/*          Threshold for residual tests.  A computed test ratio passes */
+/*          the threshold if it is less than THRESH. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input. */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "EC", (ftnlen)2, (ftnlen)2);
@@ -193,4 +198,3 @@ static integer c__3 = 3;
 /*     End of CCHKEC */
 
 } /* cchkec_ */
-

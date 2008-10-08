@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,11 +16,11 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
     real ret_val;
 
     /* Local variables */
-    static integer i__, j;
-    static real norma;
+    integer i__, j;
+    real norma;
     extern /* Subroutine */ int caxpy_(integer *, complex *, complex *, 
 	    integer *, complex *, integer *);
-    static real rwork[1];
+    real rwork[1];
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *);
     extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
@@ -35,62 +30,72 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
 	    *);
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CTZT01 returns */
+/*       || A - R*Q || / ( M * eps * ||A|| ) */
+/*  for an upper trapezoidal A that was factored with CTZRQF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CTZT01 returns   
-         || A - R*Q || / ( M * eps * ||A|| )   
-    for an upper trapezoidal A that was factored with CTZRQF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and AF. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and AF. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and AF.   
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The original upper trapezoidal M by N matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and AF.   
+/*  AF      (input) COMPLEX array, dimension (LDA,N) */
+/*          The output of CTZRQF for input matrix A. */
+/*          The lower triangle is not referenced. */
 
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The original upper trapezoidal M by N matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
 
-    AF      (input) COMPLEX array, dimension (LDA,N)   
-            The output of CTZRQF for input matrix A.   
-            The lower triangle is not referenced.   
+/*  TAU     (input) COMPLEX array, dimension (M) */
+/*          Details of the  Householder transformations as returned by */
+/*          CTZRQF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
+/*  WORK    (workspace) COMPLEX array, dimension (LWORK) */
 
-    TAU     (input) COMPLEX array, dimension (M)   
-            Details of the  Householder transformations as returned by   
-            CTZRQF.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= m*n + m. */
 
-    WORK    (workspace) COMPLEX array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= m*n + m.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -119,7 +124,7 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    i__3 = (j - 1) * *m + i__;
-	    i__4 = af_subscr(i__, j);
+	    i__4 = i__ + j * af_dim1;
 	    work[i__3].r = af[i__4].r, work[i__3].i = af[i__4].i;
 /* L10: */
 	}
@@ -131,9 +136,9 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
     i__1 = *m;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = *n - *m + 1;
-	clatzm_("Right", &i__, &i__2, &af_ref(i__, *m + 1), lda, &tau[i__], &
-		work[(i__ - 1) * *m + 1], &work[*m * *m + 1], m, &work[*m * *
-		n + 1]);
+	clatzm_("Right", &i__, &i__2, &af[i__ + (*m + 1) * af_dim1], lda, &
+		tau[i__], &work[(i__ - 1) * *m + 1], &work[*m * *m + 1], m, &
+		work[*m * *n + 1]);
 /* L30: */
     }
 
@@ -141,8 +146,8 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
 
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	caxpy_(m, &c_b15, &a_ref(1, i__), &c__1, &work[(i__ - 1) * *m + 1], &
-		c__1);
+	caxpy_(m, &c_b15, &a[i__ * a_dim1 + 1], &c__1, &work[(i__ - 1) * *m + 
+		1], &c__1);
 /* L40: */
     }
 
@@ -158,10 +163,3 @@ doublereal ctzt01_(integer *m, integer *n, complex *a, complex *af, integer *
 /*     End of CTZT01 */
 
 } /* ctzt01_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

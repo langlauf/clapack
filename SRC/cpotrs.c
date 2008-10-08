@@ -1,79 +1,95 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static complex c_b1 = {1.f,0.f};
 
 /* Subroutine */ int cpotrs_(char *uplo, integer *n, integer *nrhs, complex *
 	a, integer *lda, complex *b, integer *ldb, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CPOTRS solves a system of linear equations A*X = B with a Hermitian   
-    positive definite matrix A using the Cholesky factorization   
-    A = U**H*U or A = L*L**H computed by CPOTRF.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangle of A is stored;   
-            = 'L':  Lower triangle of A is stored.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrix B.  NRHS >= 0.   
-
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The triangular factor U or L from the Cholesky factorization   
-            A = U**H*U or A = L*L**H, as computed by CPOTRF.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    B       (input/output) COMPLEX array, dimension (LDB,NRHS)   
-            On entry, the right hand side matrix B.   
-            On exit, the solution matrix X.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static complex c_b1 = {1.f,0.f};
-    
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1;
+
     /* Local variables */
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int ctrsm_(char *, char *, char *, char *, 
 	    integer *, integer *, complex *, complex *, integer *, complex *, 
 	    integer *);
-    static logical upper;
+    logical upper;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CPOTRS solves a system of linear equations A*X = B with a Hermitian */
+/*  positive definite matrix A using the Cholesky factorization */
+/*  A = U**H*U or A = L*L**H computed by CPOTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored; */
+/*          = 'L':  Lower triangle of A is stored. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrix B.  NRHS >= 0. */
+
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The triangular factor U or L from the Cholesky factorization */
+/*          A = U**H*U or A = L*L**H, as computed by CPOTRF. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
+
+/*  B       (input/output) COMPLEX array, dimension (LDB,NRHS) */
+/*          On entry, the right hand side matrix B. */
+/*          On exit, the solution matrix X. */
+
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -104,9 +120,9 @@
 
     if (upper) {
 
-/*        Solve A*X = B where A = U'*U.   
+/*        Solve A*X = B where A = U'*U. */
 
-          Solve U'*X = B, overwriting B with X. */
+/*        Solve U'*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Upper", "Conjugate transpose", "Non-unit", n, nrhs, &
 		c_b1, &a[a_offset], lda, &b[b_offset], ldb);
@@ -117,9 +133,9 @@
 		a[a_offset], lda, &b[b_offset], ldb);
     } else {
 
-/*        Solve A*X = B where A = L*L'.   
+/*        Solve A*X = B where A = L*L'. */
 
-          Solve L*X = B, overwriting B with X. */
+/*        Solve L*X = B, overwriting B with X. */
 
 	ctrsm_("Left", "Lower", "No transpose", "Non-unit", n, nrhs, &c_b1, &
 		a[a_offset], lda, &b[b_offset], ldb);
@@ -135,4 +151,3 @@
 /*     End of CPOTRS */
 
 } /* cpotrs_ */
-

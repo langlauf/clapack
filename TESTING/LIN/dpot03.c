@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,95 +15,105 @@ static doublereal c_b12 = 0.;
 	    i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
+    doublereal eps;
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int dsymm_(char *, char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern doublereal dlansy_(char *, char *, integer *, doublereal *, 
 	    integer *, doublereal *);
-    static doublereal eps;
 
 
-#define ainv_ref(a_1,a_2) ainv[(a_2)*ainv_dim1 + a_1]
-#define work_ref(a_1,a_2) work[(a_2)*work_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DPOT03 computes the residual for a symmetric matrix times its */
+/*  inverse: */
+/*     norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========== */
 
-    DPOT03 computes the residual for a symmetric matrix times its   
-    inverse:   
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          symmetric matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    ==========   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The original symmetric matrix A. */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N) */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The original symmetric matrix A.   
+/*  AINV    (input/output) DOUBLE PRECISION array, dimension (LDAINV,N) */
+/*          On entry, the inverse of the matrix A, stored as a symmetric */
+/*          matrix in the same format as A. */
+/*          In this version, AINV is expanded into a full matrix and */
+/*          multiplied by A, so the opposing triangle of AINV will be */
+/*          changed; i.e., if the upper triangular part of AINV is */
+/*          stored, the lower triangular part will be used as work space. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N)   
+/*  LDAINV  (input) INTEGER */
+/*          The leading dimension of the array AINV.  LDAINV >= max(1,N). */
 
-    AINV    (input/output) DOUBLE PRECISION array, dimension (LDAINV,N)   
-            On entry, the inverse of the matrix A, stored as a symmetric   
-            matrix in the same format as A.   
-            In this version, AINV is expanded into a full matrix and   
-            multiplied by A, so the opposing triangle of AINV will be   
-            changed; i.e., if the upper triangular part of AINV is   
-            stored, the lower triangular part will be used as work space.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LDWORK,N) */
 
-    LDAINV  (input) INTEGER   
-            The leading dimension of the array AINV.  LDAINV >= max(1,N).   
+/*  LDWORK  (input) INTEGER */
+/*          The leading dimension of the array WORK.  LDWORK >= max(1,N). */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LDWORK,N)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
+/*  RCOND   (output) DOUBLE PRECISION */
+/*          The reciprocal of the condition number of A, computed as */
+/*          ( 1/norm(A) ) / norm(AINV). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS ) */
 
-    RCOND   (output) DOUBLE PRECISION   
-            The reciprocal of the condition number of A, computed as   
-            ( 1/norm(A) ) / norm(AINV).   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0. */
 
-
-       Quick exit if N = 0.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     ainv_dim1 = *ldainv;
-    ainv_offset = 1 + ainv_dim1 * 1;
+    ainv_offset = 1 + ainv_dim1;
     ainv -= ainv_offset;
     work_dim1 = *ldwork;
-    work_offset = 1 + work_dim1 * 1;
+    work_offset = 1 + work_dim1;
     work -= work_offset;
     --rwork;
 
@@ -131,15 +136,15 @@ static doublereal c_b12 = 0.;
     }
     *rcond = 1. / anorm / ainvnm;
 
-/*     Expand AINV into a full matrix and call DSYMM to multiply   
-       AINV on the left by A. */
+/*     Expand AINV into a full matrix and call DSYMM to multiply */
+/*     AINV on the left by A. */
 
     if (lsame_(uplo, "U")) {
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j - 1;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		ainv_ref(j, i__) = ainv_ref(i__, j);
+		ainv[j + i__ * ainv_dim1] = ainv[i__ + j * ainv_dim1];
 /* L10: */
 	    }
 /* L20: */
@@ -149,7 +154,7 @@ static doublereal c_b12 = 0.;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = j + 1; i__ <= i__2; ++i__) {
-		ainv_ref(j, i__) = ainv_ref(i__, j);
+		ainv[j + i__ * ainv_dim1] = ainv[i__ + j * ainv_dim1];
 /* L30: */
 	    }
 /* L40: */
@@ -162,7 +167,7 @@ static doublereal c_b12 = 0.;
 
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	work_ref(i__, i__) = work_ref(i__, i__) + 1.;
+	work[i__ + i__ * work_dim1] += 1.;
 /* L50: */
     }
 
@@ -177,8 +182,3 @@ static doublereal c_b12 = 0.;
 /*     End of DPOT03 */
 
 } /* dpot03_ */
-
-#undef work_ref
-#undef ainv_ref
-
-

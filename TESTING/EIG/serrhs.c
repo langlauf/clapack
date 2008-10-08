@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -44,20 +39,21 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static real a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
-    static integer i__, j, m;
-    static real s[3], w[28];
-    static char c2[2];
+    real a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    integer i__, j, m;
+    real s[3], w[28];
+    char c2[2];
+    real wi[3];
+    integer nt;
+    real vl[9]	/* was [3][3] */, vr[9]	/* was [3][3] */, wr[3];
+    integer ihi, ilo;
+    logical sel[3];
+    real tau[3];
+    integer info;
     extern /* Subroutine */ int sgebak_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, integer *), sgebal_(char *, integer *, real *, integer *, 
 	    integer *, integer *, real *, integer *);
-    static integer ifaill[3];
-    static real wi[3];
-    static integer nt;
-    static real vl[9]	/* was [3][3] */;
-    static integer ifailr[3];
-    static real vr[9]	/* was [3][3] */, wr[3];
+    integer ifaill[3], ifailr[3];
     extern /* Subroutine */ int sgehrd_(integer *, integer *, integer *, real 
 	    *, integer *, real *, real *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
@@ -67,16 +63,13 @@ static integer c__4 = 4;
 	    real *, integer *, integer *, integer *, real *, integer *, 
 	    integer *, integer *), sorghr_(integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , integer *), shseqr_(char *, char *, integer *, integer *, 
+, integer *), shseqr_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, real *, integer *, 
 	    real *, integer *, integer *), strevc_(char *, 
 	    char *, logical *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *, integer *, real *, integer *), sormhr_(char *, char *, integer *, integer *, 
+, real *, integer *, integer *, integer *, real *, integer *), sormhr_(char *, char *, integer *, integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *);
-    static integer ihi, ilo;
-    static logical sel[3];
-    static real tau[3];
+, real *, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -85,32 +78,47 @@ static integer c__4 = 4;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*3 + a_1 - 4]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRHS tests the error exits for SGEBAK, SGEBAL, SGEHRD, SORGHR, */
+/*  SORMHR, SHSEQR, SHSEIN, and STREVC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRHS tests the error exits for SGEBAK, SGEBAL, SGEHRD, SORGHR,   
-    SORMHR, SHSEQR, SHSEIN, and STREVC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -122,7 +130,7 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    a_ref(i__, j) = 1.f / (real) (i__ + j);
+	    a[i__ + j * 3 - 4] = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	wi[j - 1] = (real) j;
@@ -502,7 +510,3 @@ static integer c__4 = 4;
 /*     End of SERRHS */
 
 } /* serrhs_ */
-
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,71 +17,77 @@ static integer c__2 = 2;
     double sqrt(doublereal), z_abs(doublecomplex *);
 
     /* Local variables */
-    static doublereal beta;
-    static doublecomplex a, b, c__;
-    static integer i__, j;
-    static doublecomplex r__;
-    static doublereal alpha;
-    static integer n5;
-    static doublereal alpha3;
+    doublecomplex a, b, c__;
+    integer i__, j;
+    doublecomplex r__;
+    integer n5;
+    doublereal beta, alpha, alpha3;
     extern /* Double Complex */ VOID zlarnd_(doublecomplex *, integer *, 
 	    integer *);
 
 
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZLATSY generates a special test matrix for the complex symmetric */
+/*  (indefinite) factorization.  The pivot blocks of the generated matrix */
+/*  will be in the following order: */
+/*     2x2 pivot block, non diagonalizable */
+/*     1x1 pivot block */
+/*     2x2 pivot block, diagonalizable */
+/*     (cycle repeats) */
+/*  A row interchange is required for each non-diagonalizable 2x2 block. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZLATSY generates a special test matrix for the complex symmetric   
-    (indefinite) factorization.  The pivot blocks of the generated matrix   
-    will be in the following order:   
-       2x2 pivot block, non diagonalizable   
-       1x1 pivot block   
-       2x2 pivot block, diagonalizable   
-       (cycle repeats)   
-    A row interchange is required for each non-diagonalizable 2x2 block.   
+/*  UPLO    (input) CHARACTER */
+/*          Specifies whether the generated matrix is to be upper or */
+/*          lower triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The dimension of the matrix to be generated. */
 
-    UPLO    (input) CHARACTER   
-            Specifies whether the generated matrix is to be upper or   
-            lower triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  X       (output) COMPLEX*16 array, dimension (LDX,N) */
+/*          The generated matrix, consisting of 3x3 and 2x2 diagonal */
+/*          blocks which result in the pivot sequence given above. */
+/*          The matrix outside of these diagonal blocks is zero. */
 
-    N       (input) INTEGER   
-            The dimension of the matrix to be generated.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X. */
 
-    X       (output) COMPLEX*16 array, dimension (LDX,N)   
-            The generated matrix, consisting of 3x3 and 2x2 diagonal   
-            blocks which result in the pivot sequence given above.   
-            The matrix outside of these diagonal blocks is zero.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed for the random number generator.  The last */
+/*          of the four integers must be odd.  (modified on exit) */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.   
+/*  ===================================================================== */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed for the random number generator.  The last   
-            of the four integers must be odd.  (modified on exit)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Initialize constants */
 
-
-       Initialize constants   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     --iseed;
 
@@ -105,7 +106,7 @@ static integer c__2 = 2;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = j;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = x_subscr(i__, j);
+		i__3 = i__ + j * x_dim1;
 		x[i__3].r = 0., x[i__3].i = 0.;
 /* L10: */
 	    }
@@ -129,32 +130,32 @@ static integer c__2 = 2;
 	    c__.r = z__1.r, c__.i = z__1.i;
 	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
 	    r__.r = z__1.r, r__.i = z__1.i;
-	    i__2 = x_subscr(i__, i__);
+	    i__2 = i__ + i__ * x_dim1;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
-	    i__2 = x_subscr(i__ - 2, i__);
+	    i__2 = i__ - 2 + i__ * x_dim1;
 	    x[i__2].r = b.r, x[i__2].i = b.i;
-	    i__2 = x_subscr(i__ - 2, i__ - 1);
+	    i__2 = i__ - 2 + (i__ - 1) * x_dim1;
 	    x[i__2].r = r__.r, x[i__2].i = r__.i;
-	    i__2 = x_subscr(i__ - 2, i__ - 2);
+	    i__2 = i__ - 2 + (i__ - 2) * x_dim1;
 	    x[i__2].r = c__.r, x[i__2].i = c__.i;
-	    i__2 = x_subscr(i__ - 1, i__ - 1);
+	    i__2 = i__ - 1 + (i__ - 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    i__2 = x_subscr(i__ - 3, i__ - 3);
+	    i__2 = i__ - 3 + (i__ - 3) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    i__2 = x_subscr(i__ - 4, i__ - 4);
+	    i__2 = i__ - 4 + (i__ - 4) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    if (z_abs(&x_ref(i__ - 3, i__ - 3)) > z_abs(&x_ref(i__ - 4, i__ - 
-		    4))) {
-		i__2 = x_subscr(i__ - 4, i__ - 3);
-		i__3 = x_subscr(i__ - 3, i__ - 3);
+	    if (z_abs(&x[i__ - 3 + (i__ - 3) * x_dim1]) > z_abs(&x[i__ - 4 + (
+		    i__ - 4) * x_dim1])) {
+		i__2 = i__ - 4 + (i__ - 3) * x_dim1;
+		i__3 = i__ - 3 + (i__ - 3) * x_dim1;
 		z__1.r = x[i__3].r * 2., z__1.i = x[i__3].i * 2.;
 		x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    } else {
-		i__2 = x_subscr(i__ - 4, i__ - 3);
-		i__3 = x_subscr(i__ - 4, i__ - 4);
+		i__2 = i__ - 4 + (i__ - 3) * x_dim1;
+		i__3 = i__ - 4 + (i__ - 4) * x_dim1;
 		z__1.r = x[i__3].r * 2., z__1.i = x[i__3].i * 2.;
 		x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    }
@@ -178,40 +179,41 @@ static integer c__2 = 2;
 	    c__.r = z__1.r, c__.i = z__1.i;
 	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
 	    r__.r = z__1.r, r__.i = z__1.i;
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
-	    i__1 = x_subscr(i__ - 2, i__);
+	    i__1 = i__ - 2 + i__ * x_dim1;
 	    x[i__1].r = b.r, x[i__1].i = b.i;
-	    i__1 = x_subscr(i__ - 2, i__ - 1);
+	    i__1 = i__ - 2 + (i__ - 1) * x_dim1;
 	    x[i__1].r = r__.r, x[i__1].i = r__.i;
-	    i__1 = x_subscr(i__ - 2, i__ - 2);
+	    i__1 = i__ - 2 + (i__ - 2) * x_dim1;
 	    x[i__1].r = c__.r, x[i__1].i = c__.i;
-	    i__1 = x_subscr(i__ - 1, i__ - 1);
+	    i__1 = i__ - 1 + (i__ - 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    i__ += -3;
 	}
 	if (i__ > 1) {
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
-	    i__1 = x_subscr(i__ - 1, i__ - 1);
+	    i__1 = i__ - 1 + (i__ - 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
-	    if (z_abs(&x_ref(i__, i__)) > z_abs(&x_ref(i__ - 1, i__ - 1))) {
-		i__1 = x_subscr(i__ - 1, i__);
-		i__2 = x_subscr(i__, i__);
+	    if (z_abs(&x[i__ + i__ * x_dim1]) > z_abs(&x[i__ - 1 + (i__ - 1) *
+		     x_dim1])) {
+		i__1 = i__ - 1 + i__ * x_dim1;
+		i__2 = i__ + i__ * x_dim1;
 		z__1.r = x[i__2].r * 2., z__1.i = x[i__2].i * 2.;
 		x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    } else {
-		i__1 = x_subscr(i__ - 1, i__);
-		i__2 = x_subscr(i__ - 1, i__ - 1);
+		i__1 = i__ - 1 + i__ * x_dim1;
+		i__2 = i__ - 1 + (i__ - 1) * x_dim1;
 		z__1.r = x[i__2].r * 2., z__1.i = x[i__2].i * 2.;
 		x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    }
 	    i__ += -2;
 	} else if (i__ == 1) {
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    --i__;
@@ -227,7 +229,7 @@ static integer c__2 = 2;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = j; i__ <= i__2; ++i__) {
-		i__3 = x_subscr(i__, j);
+		i__3 = i__ + j * x_dim1;
 		x[i__3].r = 0., x[i__3].i = 0.;
 /* L40: */
 	    }
@@ -251,32 +253,32 @@ static integer c__2 = 2;
 	    c__.r = z__1.r, c__.i = z__1.i;
 	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
 	    r__.r = z__1.r, r__.i = z__1.i;
-	    i__2 = x_subscr(i__, i__);
+	    i__2 = i__ + i__ * x_dim1;
 	    x[i__2].r = a.r, x[i__2].i = a.i;
-	    i__2 = x_subscr(i__ + 2, i__);
+	    i__2 = i__ + 2 + i__ * x_dim1;
 	    x[i__2].r = b.r, x[i__2].i = b.i;
-	    i__2 = x_subscr(i__ + 2, i__ + 1);
+	    i__2 = i__ + 2 + (i__ + 1) * x_dim1;
 	    x[i__2].r = r__.r, x[i__2].i = r__.i;
-	    i__2 = x_subscr(i__ + 2, i__ + 2);
+	    i__2 = i__ + 2 + (i__ + 2) * x_dim1;
 	    x[i__2].r = c__.r, x[i__2].i = c__.i;
-	    i__2 = x_subscr(i__ + 1, i__ + 1);
+	    i__2 = i__ + 1 + (i__ + 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    i__2 = x_subscr(i__ + 3, i__ + 3);
+	    i__2 = i__ + 3 + (i__ + 3) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    i__2 = x_subscr(i__ + 4, i__ + 4);
+	    i__2 = i__ + 4 + (i__ + 4) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__2].r = z__1.r, x[i__2].i = z__1.i;
-	    if (z_abs(&x_ref(i__ + 3, i__ + 3)) > z_abs(&x_ref(i__ + 4, i__ + 
-		    4))) {
-		i__2 = x_subscr(i__ + 4, i__ + 3);
-		i__3 = x_subscr(i__ + 3, i__ + 3);
+	    if (z_abs(&x[i__ + 3 + (i__ + 3) * x_dim1]) > z_abs(&x[i__ + 4 + (
+		    i__ + 4) * x_dim1])) {
+		i__2 = i__ + 4 + (i__ + 3) * x_dim1;
+		i__3 = i__ + 3 + (i__ + 3) * x_dim1;
 		z__1.r = x[i__3].r * 2., z__1.i = x[i__3].i * 2.;
 		x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    } else {
-		i__2 = x_subscr(i__ + 4, i__ + 3);
-		i__3 = x_subscr(i__ + 4, i__ + 4);
+		i__2 = i__ + 4 + (i__ + 3) * x_dim1;
+		i__3 = i__ + 4 + (i__ + 4) * x_dim1;
 		z__1.r = x[i__3].r * 2., z__1.i = x[i__3].i * 2.;
 		x[i__2].r = z__1.r, x[i__2].i = z__1.i;
 	    }
@@ -300,40 +302,41 @@ static integer c__2 = 2;
 	    c__.r = z__1.r, c__.i = z__1.i;
 	    z__1.r = c__.r / beta, z__1.i = c__.i / beta;
 	    r__.r = z__1.r, r__.i = z__1.i;
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    x[i__1].r = a.r, x[i__1].i = a.i;
-	    i__1 = x_subscr(i__ + 2, i__);
+	    i__1 = i__ + 2 + i__ * x_dim1;
 	    x[i__1].r = b.r, x[i__1].i = b.i;
-	    i__1 = x_subscr(i__ + 2, i__ + 1);
+	    i__1 = i__ + 2 + (i__ + 1) * x_dim1;
 	    x[i__1].r = r__.r, x[i__1].i = r__.i;
-	    i__1 = x_subscr(i__ + 2, i__ + 2);
+	    i__1 = i__ + 2 + (i__ + 2) * x_dim1;
 	    x[i__1].r = c__.r, x[i__1].i = c__.i;
-	    i__1 = x_subscr(i__ + 1, i__ + 1);
+	    i__1 = i__ + 1 + (i__ + 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    i__ += 3;
 	}
 	if (i__ < *n) {
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
-	    i__1 = x_subscr(i__ + 1, i__ + 1);
+	    i__1 = i__ + 1 + (i__ + 1) * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
-	    if (z_abs(&x_ref(i__, i__)) > z_abs(&x_ref(i__ + 1, i__ + 1))) {
-		i__1 = x_subscr(i__ + 1, i__);
-		i__2 = x_subscr(i__, i__);
+	    if (z_abs(&x[i__ + i__ * x_dim1]) > z_abs(&x[i__ + 1 + (i__ + 1) *
+		     x_dim1])) {
+		i__1 = i__ + 1 + i__ * x_dim1;
+		i__2 = i__ + i__ * x_dim1;
 		z__1.r = x[i__2].r * 2., z__1.i = x[i__2].i * 2.;
 		x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    } else {
-		i__1 = x_subscr(i__ + 1, i__);
-		i__2 = x_subscr(i__ + 1, i__ + 1);
+		i__1 = i__ + 1 + i__ * x_dim1;
+		i__2 = i__ + 1 + (i__ + 1) * x_dim1;
 		z__1.r = x[i__2].r * 2., z__1.i = x[i__2].i * 2.;
 		x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    }
 	    i__ += 2;
 	} else if (i__ == *n) {
-	    i__1 = x_subscr(i__, i__);
+	    i__1 = i__ + i__ * x_dim1;
 	    zlarnd_(&z__1, &c__2, &iseed[1]);
 	    x[i__1].r = z__1.r, x[i__1].i = z__1.i;
 	    ++i__;
@@ -345,8 +348,3 @@ static integer c__2 = 2;
 /*     End of ZLATSY */
 
 } /* zlatsy_ */
-
-#undef x_ref
-#undef x_subscr
-
-

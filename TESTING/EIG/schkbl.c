@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -40,20 +35,19 @@ static integer c__20 = 20;
 	    char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[3];
-    static real meps, temp, rmax, vmax, a[400]	/* was [20][20] */;
-    static integer i__, j, n;
-    static real scale[20];
-    static integer ihiin, ninfo, iloin;
-    static real anorm, sfmin, dummy[1];
+    real a[400]	/* was [20][20] */;
+    integer i__, j, n;
+    real ain[400]	/* was [20][20] */;
+    integer ihi, ilo, knt, info, lmax[3];
+    real meps, temp, rmax, vmax, scale[20];
+    integer ihiin, ninfo, iloin;
+    real anorm, sfmin, dummy[1];
     extern /* Subroutine */ int sgebal_(char *, integer *, real *, integer *, 
 	    integer *, integer *, real *, integer *);
     extern doublereal slamch_(char *);
-    static real scalin[20];
-    extern doublereal slange_(char *, integer *, integer *, real *, integer *,
+    real scalin[20];
+    extern doublereal slange_(char *, integer *, integer *, real *, integer *, 
 	     real *);
-    static real ain[400]	/* was [20][20] */;
-    static integer ihi, ilo, knt;
 
     /* Fortran I/O blocks */
     static cilist io___8 = { 0, 0, 0, 0, 0 };
@@ -71,33 +65,43 @@ static integer c__20 = 20;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*20 + a_1 - 21]
-#define ain_ref(a_1,a_2) ain[(a_2)*20 + a_1 - 21]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SCHKBL tests SGEBAL, a routine for balancing a general real */
+/*  matrix and isolating some of its eigenvalues. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SCHKBL tests SGEBAL, a routine for balancing a general real   
-    matrix and isolating some of its eigenvalues.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/* ====================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-   ====================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -124,8 +128,8 @@ L10:
 	s_rsle(&io___11);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(real))
-		    ;
+	    do_lio(&c__4, &c__1, (char *)&a[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(real));
 	}
 	e_rsle();
 /* L20: */
@@ -142,8 +146,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&ain_ref(i__, j), (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&ain[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(real));
 	}
 	e_rsle();
 /* L30: */
@@ -176,12 +180,12 @@ L10:
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-	    r__1 = a_ref(i__, j), r__2 = ain_ref(i__, j);
+	    r__1 = a[i__ + j * 20 - 21], r__2 = ain[i__ + j * 20 - 21];
 	    temp = dmax(r__1,r__2);
 	    temp = dmax(temp,sfmin);
 /* Computing MAX */
-	    r__2 = vmax, r__3 = (r__1 = a_ref(i__, j) - ain_ref(i__, j), dabs(
-		    r__1)) / temp;
+	    r__2 = vmax, r__3 = (r__1 = a[i__ + j * 20 - 21] - ain[i__ + j * 
+		    20 - 21], dabs(r__1)) / temp;
 	    vmax = dmax(r__2,r__3);
 /* L40: */
 	}
@@ -245,8 +249,3 @@ L70:
 /*     End of SCHKBL */
 
 } /* schkbl_ */
-
-#undef ain_ref
-#undef a_ref
-
-

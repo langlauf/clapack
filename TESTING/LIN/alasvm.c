@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -30,38 +25,40 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ALASVM prints a summary of results from one of the -DRV- routines.   
+/*  ALASVM prints a summary of results from one of the -DRV- routines. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    TYPE    (input) CHARACTER*3   
-            The LAPACK path name.   
+/*  TYPE    (input) CHARACTER*3 */
+/*          The LAPACK path name. */
 
-    NOUT  (input) INTEGER   
-            The unit number on which results are to be printed.   
-            NOUT >= 0.   
+/*  NOUT  (input) INTEGER */
+/*          The unit number on which results are to be printed. */
+/*          NOUT >= 0. */
 
-    NFAIL   (input) INTEGER   
-            The number of tests which did not pass the threshold ratio.   
+/*  NFAIL   (input) INTEGER */
+/*          The number of tests which did not pass the threshold ratio. */
 
-    NRUN    (input) INTEGER   
-            The total number of tests.   
+/*  NRUN    (input) INTEGER */
+/*          The total number of tests. */
 
-    NERRS   (input) INTEGER   
-            The number of error messages recorded.   
+/*  NERRS   (input) INTEGER */
+/*          The number of error messages recorded. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Executable Statements .. */
 
     if (*nfail > 0) {
 	io___1.ciunit = *nout;
@@ -89,4 +86,3 @@ static integer c__1 = 1;
 /*     End of ALASVM */
 
 } /* alasvm_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -46,26 +41,25 @@ static integer c__1 = 1;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex a[16]	/* was [4][4] */;
-    static doublereal d__[4], e[4];
-    static integer i__, j;
-    static doublecomplex u[16]	/* was [4][4] */, v[16]	/* was [4][4] */, w[4]
-	    ;
-    static char c2[2];
-    static integer nt;
-    static doublecomplex tp[4], tq[4];
-    static doublereal rw[16];
-    extern /* Subroutine */ int zgebrd_(integer *, integer *, doublecomplex *,
+    doublecomplex a[16]	/* was [4][4] */;
+    doublereal d__[4], e[4];
+    integer i__, j;
+    doublecomplex u[16]	/* was [4][4] */, v[16]	/* was [4][4] */, w[4];
+    char c2[2];
+    integer nt;
+    doublecomplex tp[4], tq[4];
+    doublereal rw[16];
+    integer info;
+    extern /* Subroutine */ int zgebrd_(integer *, integer *, doublecomplex *, 
 	     integer *, doublereal *, doublereal *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), zbdsqr_(char *, integer *, integer *, 
-	    integer *, integer *, doublereal *, doublereal *, doublecomplex *,
+	    integer *, integer *, doublereal *, doublereal *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
-	    , doublereal *, integer *), zungbr_(char *, integer *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+, doublereal *, integer *), zungbr_(char *, integer *, 
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     doublecomplex *, integer *, integer *), zunmbr_(char *, 
 	    char *, char *, integer *, integer *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -78,32 +72,46 @@ static integer c__1 = 1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 22, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRBD tests the error exits for ZGEBRD, ZUNGBR, ZUNMBR, and ZBDSQR. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRBD tests the error exits for ZGEBRD, ZUNGBR, ZUNMBR, and ZBDSQR.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -115,7 +123,7 @@ static integer c__1 = 1;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    a[i__1].r = d__1, a[i__1].i = 0.;
 /* L10: */
@@ -199,68 +207,68 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "ZUNMBR", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("/", "L", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zunmbr_("Q", "/", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "/", "T", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zunmbr_("Q", "L", "/", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "L", "/", &c__0, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zunmbr_("Q", "L", "C", &c_n1, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "L", "C", &c_n1, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	zunmbr_("Q", "L", "C", &c__0, &c_n1, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "L", "C", &c__0, &c_n1, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zunmbr_("Q", "L", "C", &c__0, &c__0, &c_n1, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "L", "C", &c__0, &c__0, &c_n1, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmbr_("Q", "L", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w,
+	zunmbr_("Q", "L", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmbr_("Q", "R", "C", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "R", "C", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmbr_("P", "L", "C", &c__2, &c__0, &c__2, a, &c__1, tq, u, &c__2, w,
+	zunmbr_("P", "L", "C", &c__2, &c__0, &c__2, a, &c__1, tq, u, &c__2, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	zunmbr_("P", "R", "C", &c__0, &c__2, &c__2, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("P", "R", "C", &c__0, &c__2, &c__2, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zunmbr_("Q", "R", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__1, w,
+	zunmbr_("Q", "R", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__1, w, 
 		 &c__1, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zunmbr_("Q", "L", "C", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w,
-		 &c__1, &info);
+	zunmbr_("Q", "L", "C", &c__0, &c__2, &c__0, a, &c__1, tq, u, &c__1, w, 
+		 &c__0, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zunmbr_("Q", "R", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w,
-		 &c__1, &info);
+	zunmbr_("Q", "R", "C", &c__2, &c__0, &c__0, a, &c__1, tq, u, &c__2, w, 
+		 &c__0, &info);
 	chkxer_("ZUNMBR", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 13;
@@ -332,8 +340,3 @@ static integer c__1 = 1;
 /*     End of ZERRBD */
 
 } /* zerrbd_ */
-
-#undef a_ref
-#undef a_subscr
-
-

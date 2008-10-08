@@ -1,107 +1,132 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int cpbcon_(char *uplo, integer *n, integer *kd, complex *ab,
+/* Table of constant values */
+
+static integer c__1 = 1;
+
+/* Subroutine */ int cpbcon_(char *uplo, integer *n, integer *kd, complex *ab, 
 	 integer *ldab, real *anorm, real *rcond, complex *work, real *rwork, 
 	integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CPBCON estimates the reciprocal of the condition number (in the   
-    1-norm) of a complex Hermitian positive definite band matrix using   
-    the Cholesky factorization A = U**H*U or A = L*L**H computed by   
-    CPBTRF.   
-
-    An estimate is obtained for norm(inv(A)), and the reciprocal of the   
-    condition number is computed as RCOND = 1 / (ANORM * norm(inv(A))).   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangular factor stored in AB;   
-            = 'L':  Lower triangular factor stored in AB.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    KD      (input) INTEGER   
-            The number of superdiagonals of the matrix A if UPLO = 'U',   
-            or the number of sub-diagonals if UPLO = 'L'.  KD >= 0.   
-
-    AB      (input) COMPLEX array, dimension (LDAB,N)   
-            The triangular factor U or L from the Cholesky factorization   
-            A = U**H*U or A = L*L**H of the band matrix A, stored in the   
-            first KD+1 rows of the array.  The j-th column of U or L is   
-            stored in the j-th column of the array AB as follows:   
-            if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j;   
-            if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd).   
-
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= KD+1.   
-
-    ANORM   (input) REAL   
-            The 1-norm (or infinity-norm) of the Hermitian band matrix A.   
-
-    RCOND   (output) REAL   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is an   
-            estimate of the 1-norm of inv(A) computed in this routine.   
-
-    WORK    (workspace) COMPLEX array, dimension (2*N)   
-
-    RWORK   (workspace) REAL array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1;
     real r__1, r__2;
+
     /* Builtin functions */
     double r_imag(complex *);
+
     /* Local variables */
-    static integer kase;
-    static real scale;
+    integer ix, kase;
+    real scale;
     extern logical lsame_(char *, char *);
-    static logical upper;
-    extern /* Subroutine */ int clacon_(integer *, complex *, complex *, real 
-	    *, integer *);
-    static integer ix;
+    integer isave[3];
+    logical upper;
+    extern /* Subroutine */ int clacn2_(integer *, complex *, complex *, real 
+	    *, integer *, integer *);
     extern integer icamax_(integer *, complex *, integer *);
-    static real scalel;
+    real scalel;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int clatbs_(char *, char *, char *, char *, 
 	    integer *, integer *, complex *, integer *, complex *, real *, 
 	    real *, integer *);
-    static real scaleu;
+    real scaleu;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int csrscl_(integer *, real *, complex *, integer 
 	    *);
-    static char normin[1];
-    static real smlnum;
+    char normin[1];
+    real smlnum;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     Modified to call CLACN2 in place of CLACON, 10 Feb 03, SJH. */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CPBCON estimates the reciprocal of the condition number (in the */
+/*  1-norm) of a complex Hermitian positive definite band matrix using */
+/*  the Cholesky factorization A = U**H*U or A = L*L**H computed by */
+/*  CPBTRF. */
+
+/*  An estimate is obtained for norm(inv(A)), and the reciprocal of the */
+/*  condition number is computed as RCOND = 1 / (ANORM * norm(inv(A))). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangular factor stored in AB; */
+/*          = 'L':  Lower triangular factor stored in AB. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  KD      (input) INTEGER */
+/*          The number of superdiagonals of the matrix A if UPLO = 'U', */
+/*          or the number of sub-diagonals if UPLO = 'L'.  KD >= 0. */
+
+/*  AB      (input) COMPLEX array, dimension (LDAB,N) */
+/*          The triangular factor U or L from the Cholesky factorization */
+/*          A = U**H*U or A = L*L**H of the band matrix A, stored in the */
+/*          first KD+1 rows of the array.  The j-th column of U or L is */
+/*          stored in the j-th column of the array AB as follows: */
+/*          if UPLO ='U', AB(kd+1+i-j,j) = U(i,j) for max(1,j-kd)<=i<=j; */
+/*          if UPLO ='L', AB(1+i-j,j)    = L(i,j) for j<=i<=min(n,j+kd). */
+
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= KD+1. */
+
+/*  ANORM   (input) REAL */
+/*          The 1-norm (or infinity-norm) of the Hermitian band matrix A. */
+
+/*  RCOND   (output) REAL */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is an */
+/*          estimate of the 1-norm of inv(A) computed in this routine. */
+
+/*  WORK    (workspace) COMPLEX array, dimension (2*N) */
+
+/*  RWORK   (workspace) REAL array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     --work;
     --rwork;
@@ -143,13 +168,13 @@
     kase = 0;
     *(unsigned char *)normin = 'N';
 L10:
-    clacon_(n, &work[*n + 1], &work[1], &ainvnm, &kase);
+    clacn2_(n, &work[*n + 1], &work[1], &ainvnm, &kase, isave);
     if (kase != 0) {
 	if (upper) {
 
 /*           Multiply by inv(U'). */
 
-	    clatbs_("Upper", "Conjugate transpose", "Non-unit", normin, n, kd,
+	    clatbs_("Upper", "Conjugate transpose", "Non-unit", normin, n, kd, 
 		     &ab[ab_offset], ldab, &work[1], &scalel, &rwork[1], info);
 	    *(unsigned char *)normin = 'Y';
 
@@ -167,7 +192,7 @@ L10:
 
 /*           Multiply by inv(L'). */
 
-	    clatbs_("Lower", "Conjugate transpose", "Non-unit", normin, n, kd,
+	    clatbs_("Lower", "Conjugate transpose", "Non-unit", normin, n, kd, 
 		     &ab[ab_offset], ldab, &work[1], &scaleu, &rwork[1], info);
 	}
 
@@ -199,4 +224,3 @@ L20:
 /*     End of CPBCON */
 
 } /* cpbcon_ */
-

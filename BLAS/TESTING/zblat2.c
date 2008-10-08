@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -46,7 +41,7 @@ static integer c_n1 = -1;
 static integer c__0 = 0;
 static logical c_false = FALSE_;
 
-/* Main program */ MAIN__(void)
+/* Main program */ int MAIN__(void)
 {
     /* Initialized data */
 
@@ -110,80 +105,77 @@ static logical c_false = FALSE_;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer nalf, idim[9];
-    static logical same;
-    static integer ninc, nbet, ntra;
-    static logical rewi;
-    static integer nout;
+    doublecomplex a[4225]	/* was [65][65] */;
+    doublereal g[65];
+    integer i__, j, n;
+    doublecomplex x[65], y[65], z__[130], aa[4225];
+    integer kb[7];
+    doublecomplex as[4225], xs[130], ys[130], yt[65], xx[130], yy[130], alf[7]
+	    ;
+    integer inc[7], nkb;
+    doublecomplex bet[7];
+    doublereal eps, err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    integer nalf, idim[9];
+    logical same;
+    integer ninc, nbet, ntra;
+    logical rewi;
+    integer nout;
     extern /* Subroutine */ int zchk1_(char *, doublereal *, doublereal *, 
 	    integer *, integer *, logical *, logical *, logical *, integer *, 
 	    integer *, integer *, integer *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
-	    , doublecomplex *, doublecomplex *, doublecomplex *, doublereal *), zchk2_(char *, doublereal *, doublereal *, integer *, 
+	    , doublecomplex *, doublecomplex *, doublecomplex *, doublereal *,
+	     ftnlen), zchk2_(char *, doublereal *, doublereal *, integer *, 
 	    integer *, logical *, logical *, logical *, integer *, integer *, 
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, integer *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublecomplex *, doublecomplex *, doublereal *), zchk3_(char *, doublereal *, doublereal *, integer *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
+	    ftnlen), zchk3_(char *, doublereal *, doublereal *, integer *, 
 	    integer *, logical *, logical *, logical *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, doublecomplex *, doublereal *,
-	     doublecomplex *), zchk4_(char *, doublereal *, 
+	     doublecomplex *, ftnlen), zchk4_(char *, doublereal *, 
 	    doublereal *, integer *, integer *, logical *, logical *, logical 
 	    *, integer *, integer *, integer *, doublecomplex *, integer *, 
 	    integer *, integer *, integer *, doublecomplex *, doublecomplex *,
 	     doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex 
 	    *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublereal *, doublecomplex *), zchk5_(
+	    doublecomplex *, doublereal *, doublecomplex *, ftnlen), zchk5_(
 	    char *, doublereal *, doublereal *, integer *, integer *, logical 
 	    *, logical *, logical *, integer *, integer *, integer *, 
 	    doublecomplex *, integer *, integer *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
-	    doublecomplex *), zchk6_(char *, doublereal *, doublereal 
+	    doublecomplex *, ftnlen), zchk6_(char *, doublereal *, doublereal 
 	    *, integer *, integer *, logical *, logical *, logical *, integer 
 	    *, integer *, integer *, doublecomplex *, integer *, integer *, 
 	    integer *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
 	    , doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, doublereal *, doublecomplex *);
-    static doublecomplex a[4225]	/* was [65][65] */;
-    static doublereal g[65];
-    static integer i__, j;
+	    doublecomplex *, doublereal *, doublecomplex *, ftnlen);
     extern doublereal ddiff_(doublereal *, doublereal *);
-    static integer n;
-    static logical fatal;
-    static doublecomplex x[65], y[65], z__[130];
-    static logical trace;
-    static integer nidim;
-    extern /* Subroutine */ int zchke_(integer *, char *, integer *);
-    static char snaps[32], trans[1];
+    logical fatal, trace;
+    integer nidim;
+    extern /* Subroutine */ int zchke_(integer *, char *, integer *, ftnlen);
+    char snaps[32], trans[1];
     extern /* Subroutine */ int zmvch_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
-	    doublereal *, logical *, integer *, logical *);
-    static integer isnum;
-    static logical ltest[17];
-    static doublecomplex aa[4225];
-    static integer kb[7];
-    static doublecomplex as[4225];
-    static logical sfatal;
-    static doublecomplex xs[130], ys[130], yt[65], xx[130], yy[130];
-    static char snamet[6];
-    static doublereal thresh;
-    static logical ltestt, tsterr;
-    static char summry[32];
-    static doublecomplex alf[7];
-    static integer inc[7], nkb;
-    static doublecomplex bet[7];
-    static doublereal eps, err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublereal *, logical *, integer *, logical *, ftnlen);
+    integer isnum;
+    logical ltest[17], sfatal;
+    char snamet[6];
+    doublereal thresh;
+    logical ltestt, tsterr;
+    char summry[32];
 
     /* Fortran I/O blocks */
     static cilist io___2 = { 0, 5, 0, 0, 0 };
@@ -237,77 +229,86 @@ static logical c_false = FALSE_;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*65 + a_1 - 66
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define snames_ref(a_0,a_1) &snames[(a_1)*6 + a_0 - 6]
+/*  Test program for the COMPLEX*16       Level 2 Blas. */
+
+/*  The program must be driven by a short data file. The first 18 records */
+/*  of the file are read using list-directed input, the last 17 records */
+/*  are read using the format ( A6, L2 ). An annotated example of a data */
+/*  file can be obtained by deleting the first 3 characters from the */
+/*  following 35 lines: */
+/*  'zblat2.out'      NAME OF SUMMARY OUTPUT FILE */
+/*  6                 UNIT NUMBER OF SUMMARY FILE */
+/*  'CBLA2T.SNAP'     NAME OF SNAPSHOT OUTPUT FILE */
+/*  -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0) */
+/*  F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD. */
+/*  F        LOGICAL FLAG, T TO STOP ON FAILURES. */
+/*  T        LOGICAL FLAG, T TO TEST ERROR EXITS. */
+/*  16.0     THRESHOLD VALUE OF TEST RATIO */
+/*  6                 NUMBER OF VALUES OF N */
+/*  0 1 2 3 5 9       VALUES OF N */
+/*  4                 NUMBER OF VALUES OF K */
+/*  0 1 2 4           VALUES OF K */
+/*  4                 NUMBER OF VALUES OF INCX AND INCY */
+/*  1 2 -1 -2         VALUES OF INCX AND INCY */
+/*  3                 NUMBER OF VALUES OF ALPHA */
+/*  (0.0,0.0) (1.0,0.0) (0.7,-0.9)       VALUES OF ALPHA */
+/*  3                 NUMBER OF VALUES OF BETA */
+/*  (0.0,0.0) (1.0,0.0) (1.3,-1.1)       VALUES OF BETA */
+/*  ZGEMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZGBMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHEMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHBMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHPMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTRMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTBMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTPMV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTRSV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTBSV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZTPSV  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZGERC  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZGERU  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHER   T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHPR   T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHER2  T PUT F FOR NO TEST. SAME COLUMNS. */
+/*  ZHPR2  T PUT F FOR NO TEST. SAME COLUMNS. */
+
+/*     See: */
+
+/*        Dongarra J. J., Du Croz J. J., Hammarling S.  and Hanson R. J.. */
+/*        An  extended  set of Fortran  Basic Linear Algebra Subprograms. */
+
+/*        Technical  Memoranda  Nos. 41 (revision 3) and 81,  Mathematics */
+/*        and  Computer Science  Division,  Argonne  National Laboratory, */
+/*        9700 South Cass Avenue, Argonne, Illinois 60439, US. */
+
+/*        Or */
+
+/*        NAG  Technical Reports TR3/87 and TR4/87,  Numerical Algorithms */
+/*        Group  Ltd.,  NAG  Central  Office,  256  Banbury  Road, Oxford */
+/*        OX2 7DE, UK,  and  Numerical Algorithms Group Inc.,  1101  31st */
+/*        Street,  Suite 100,  Downers Grove,  Illinois 60515-1263,  USA. */
 
 
-/*  Test program for the COMPLEX*16       Level 2 Blas.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    The program must be driven by a short data file. The first 18 records   
-    of the file are read using list-directed input, the last 17 records   
-    are read using the format ( A6, L2 ). An annotated example of a data   
-    file can be obtained by deleting the first 3 characters from the   
-    following 35 lines:   
-    'ZBLAT2.SUMM'     NAME OF SUMMARY OUTPUT FILE   
-    6                 UNIT NUMBER OF SUMMARY FILE   
-    'CBLA2T.SNAP'     NAME OF SNAPSHOT OUTPUT FILE   
-    -1                UNIT NUMBER OF SNAPSHOT FILE (NOT USED IF .LT. 0)   
-    F        LOGICAL FLAG, T TO REWIND SNAPSHOT FILE AFTER EACH RECORD.   
-    F        LOGICAL FLAG, T TO STOP ON FAILURES.   
-    T        LOGICAL FLAG, T TO TEST ERROR EXITS.   
-    16.0     THRESHOLD VALUE OF TEST RATIO   
-    6                 NUMBER OF VALUES OF N   
-    0 1 2 3 5 9       VALUES OF N   
-    4                 NUMBER OF VALUES OF K   
-    0 1 2 4           VALUES OF K   
-    4                 NUMBER OF VALUES OF INCX AND INCY   
-    1 2 -1 -2         VALUES OF INCX AND INCY   
-    3                 NUMBER OF VALUES OF ALPHA   
-    (0.0,0.0) (1.0,0.0) (0.7,-0.9)       VALUES OF ALPHA   
-    3                 NUMBER OF VALUES OF BETA   
-    (0.0,0.0) (1.0,0.0) (1.3,-1.1)       VALUES OF BETA   
-    ZGEMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZGBMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHEMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHBMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHPMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTRMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTBMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTPMV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTRSV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTBSV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZTPSV  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZGERC  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZGERU  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHER   T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHPR   T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHER2  T PUT F FOR NO TEST. SAME COLUMNS.   
-    ZHPR2  T PUT F FOR NO TEST. SAME COLUMNS.   
+/*     10-9-00:  Change STATUS='NEW' to 'UNKNOWN' so that the testers */
+/*               can be run multiple times without deleting generated */
+/*               output files (susan) */
 
-       See:   
+/*     .. Parameters .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+/*     .. Executable Statements .. */
 
-          Dongarra J. J., Du Croz J. J., Hammarling S.  and Hanson R. J..   
-          An  extended  set of Fortran  Basic Linear Algebra Subprograms.   
-
-          Technical  Memoranda  Nos. 41 (revision 3) and 81,  Mathematics   
-          and  Computer Science  Division,  Argonne  National Laboratory,   
-          9700 South Cass Avenue, Argonne, Illinois 60439, US.   
-
-          Or   
-
-          NAG  Technical Reports TR3/87 and TR4/87,  Numerical Algorithms   
-          Group  Ltd.,  NAG  Central  Office,  256  Banbury  Road, Oxford   
-          OX2 7DE, UK,  and  Numerical Algorithms Group Inc.,  1101  31st   
-          Street,  Suite 100,  Downers Grove,  Illinois 60515-1263,  USA.   
-
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-
-       Read name and unit number for summary output file and open file. */
+/*     Read name and unit number for summary output file and open file. */
 
     s_rsle(&io___2);
     do_lio(&c__9, &c__1, summry, (ftnlen)32);
@@ -320,7 +321,7 @@ static logical c_false = FALSE_;
     o__1.ofnmlen = 32;
     o__1.ofnm = summry;
     o__1.orl = 0;
-    o__1.osta = "NEW";
+    o__1.osta = "UNKNOWN";
     o__1.oacc = 0;
     o__1.ofm = 0;
     o__1.oblnk = 0;
@@ -342,7 +343,7 @@ static logical c_false = FALSE_;
 	o__1.ofnmlen = 32;
 	o__1.ofnm = snaps;
 	o__1.orl = 0;
-	o__1.osta = "NEW";
+	o__1.osta = "UNKNOWN";
 	o__1.oacc = 0;
 	o__1.ofm = 0;
 	o__1.oblnk = 0;
@@ -366,9 +367,9 @@ static logical c_false = FALSE_;
     do_lio(&c__5, &c__1, (char *)&thresh, (ftnlen)sizeof(doublereal));
     e_rsle();
 
-/*     Read and check the parameter values for the tests.   
+/*     Read and check the parameter values for the tests. */
 
-       Values of N */
+/*     Values of N */
     s_rsle(&io___19);
     do_lio(&c__3, &c__1, (char *)&nidim, (ftnlen)sizeof(integer));
     e_rsle();
@@ -552,8 +553,8 @@ static logical c_false = FALSE_;
     s_wsle(&io___58);
     e_wsle();
 
-/*     Read names of subroutines and flags which indicate   
-       whether they are to be tested. */
+/*     Read names of subroutines and flags which indicate */
+/*     whether they are to be tested. */
 
     for (i__ = 1; i__ <= 17; ++i__) {
 	ltest[i__ - 1] = FALSE_;
@@ -577,7 +578,8 @@ L50:
 	goto L80;
     }
     for (i__ = 1; i__ <= 17; ++i__) {
-	if (s_cmp(snamet, snames_ref(0, i__), (ftnlen)6, (ftnlen)6) == 0) {
+	if (s_cmp(snamet, snames + (i__ - 1) * 6, (ftnlen)6, (ftnlen)6) == 0) 
+		{
 	    goto L70;
 	}
 /* L60: */
@@ -621,7 +623,7 @@ L100:
     for (j = 1; j <= i__1; ++j) {
 	i__2 = n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(i__, j);
+	    i__3 = i__ + j * 65 - 66;
 /* Computing MAX */
 	    i__5 = i__ - j + 1;
 	    i__4 = max(i__5,0);
@@ -641,11 +643,11 @@ L100:
 	yy[i__2].r = (doublereal) i__3, yy[i__2].i = 0.;
 /* L130: */
     }
-/*     YY holds the exact result. On exit from ZMVCH YT holds   
-       the result computed by ZMVCH. */
+/*     YY holds the exact result. On exit from ZMVCH YT holds */
+/*     the result computed by ZMVCH. */
     *(unsigned char *)trans = 'N';
     zmvch_(trans, &n, &n, &c_b2, a, &c__65, x, &c__1, &c_b1, y, &c__1, yt, g, 
-	    yy, &eps, &err, &fatal, &nout, &c_true);
+	    yy, &eps, &err, &fatal, &nout, &c_true, (ftnlen)1);
     same = lze_(yy, yt, &n);
     if (! same || err != 0.) {
 	io___78.ciunit = nout;
@@ -658,7 +660,7 @@ L100:
     }
     *(unsigned char *)trans = 'T';
     zmvch_(trans, &n, &n, &c_b2, a, &c__65, x, &c_n1, &c_b1, y, &c_n1, yt, g, 
-	    yy, &eps, &err, &fatal, &nout, &c_true);
+	    yy, &eps, &err, &fatal, &nout, &c_true, (ftnlen)1);
     same = lze_(yy, yt, &n);
     if (! same || err != 0.) {
 	io___79.ciunit = nout;
@@ -680,14 +682,14 @@ L100:
 /*           Subprogram is not to be tested. */
 	    io___82.ciunit = nout;
 	    s_wsfe(&io___82);
-	    do_fio(&c__1, snames_ref(0, isnum), (ftnlen)6);
+	    do_fio(&c__1, snames + (isnum - 1) * 6, (ftnlen)6);
 	    e_wsfe();
 	} else {
-	    s_copy(srnamc_1.srnamt, snames_ref(0, isnum), (ftnlen)6, (ftnlen)
-		    6);
+	    s_copy(srnamc_1.srnamt, snames + (isnum - 1) * 6, (ftnlen)6, (
+		    ftnlen)6);
 /*           Test error exits. */
 	    if (tsterr) {
-		zchke_(&isnum, snames_ref(0, isnum), &nout);
+		zchke_(&isnum, snames + (isnum - 1) * 6, &nout, (ftnlen)6);
 		io___83.ciunit = nout;
 		s_wsle(&io___83);
 		e_wsle();
@@ -717,42 +719,46 @@ L100:
 	    }
 /*           Test ZGEMV, 01, and ZGBMV, 02. */
 L140:
-	    zchk1_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nkb, kb, &nalf, alf, &nbet, 
-		    bet, &ninc, inc, &c__65, &c__2, a, aa, as, x, xx, xs, y, 
-		    yy, ys, yt, g);
+	    zchk1_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nkb, kb, &nalf, alf, 
+		    &nbet, bet, &ninc, inc, &c__65, &c__2, a, aa, as, x, xx, 
+		    xs, y, yy, ys, yt, g, (ftnlen)6);
 	    goto L200;
 /*           Test ZHEMV, 03, ZHBMV, 04, and ZHPMV, 05. */
 L150:
-	    zchk2_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nkb, kb, &nalf, alf, &nbet, 
-		    bet, &ninc, inc, &c__65, &c__2, a, aa, as, x, xx, xs, y, 
-		    yy, ys, yt, g);
+	    zchk2_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nkb, kb, &nalf, alf, 
+		    &nbet, bet, &ninc, inc, &c__65, &c__2, a, aa, as, x, xx, 
+		    xs, y, yy, ys, yt, g, (ftnlen)6);
 	    goto L200;
-/*           Test ZTRMV, 06, ZTBMV, 07, ZTPMV, 08,   
-             ZTRSV, 09, ZTBSV, 10, and ZTPSV, 11. */
+/*           Test ZTRMV, 06, ZTBMV, 07, ZTPMV, 08, */
+/*           ZTRSV, 09, ZTBSV, 10, and ZTPSV, 11. */
 L160:
-	    zchk3_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nkb, kb, &ninc, inc, &c__65,
-		     &c__2, a, aa, as, y, yy, ys, yt, g, z__);
+	    zchk3_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nkb, kb, &ninc, inc, 
+		    &c__65, &c__2, a, aa, as, y, yy, ys, yt, g, z__, (ftnlen)
+		    6);
 	    goto L200;
 /*           Test ZGERC, 12, ZGERU, 13. */
 L170:
-	    zchk4_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, inc, &
-		    c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, g, z__);
+	    zchk4_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, 
+		    inc, &c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, 
+		    g, z__, (ftnlen)6);
 	    goto L200;
 /*           Test ZHER, 14, and ZHPR, 15. */
 L180:
-	    zchk5_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, inc, &
-		    c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, g, z__);
+	    zchk5_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, 
+		    inc, &c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, 
+		    g, z__, (ftnlen)6);
 	    goto L200;
 /*           Test ZHER2, 16, and ZHPR2, 17. */
 L190:
-	    zchk6_(snames_ref(0, isnum), &eps, &thresh, &nout, &ntra, &trace, 
-		    &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, inc, &
-		    c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, g, z__);
+	    zchk6_(snames + (isnum - 1) * 6, &eps, &thresh, &nout, &ntra, &
+		    trace, &rewi, &fatal, &nidim, idim, &nalf, alf, &ninc, 
+		    inc, &c__65, &c__2, a, aa, as, x, xx, xs, y, yy, ys, yt, 
+		    g, z__, (ftnlen)6);
 
 L200:
 	    if (fatal && sfatal) {
@@ -796,11 +802,6 @@ L240:
     return 0;
 } /* MAIN__ */
 
-#undef snames_ref
-#undef a_ref
-#undef a_subscr
-
-
 /* Subroutine */ int zchk1_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nkb, integer *kb, 
@@ -809,7 +810,7 @@ L240:
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *y, 
 	doublecomplex *yy, doublecomplex *ys, doublecomplex *yt, doublereal *
-	g)
+	g, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -846,25 +847,32 @@ L240:
 	     f_rew(alist *);
 
     /* Local variables */
-    static doublecomplex beta;
-    static integer ldas;
-    static logical same;
-    static integer incx, incy;
-    static logical full, tran, null;
-    static integer i__, m, n;
-    static doublecomplex alpha;
-    static logical isame[13];
+    integer i__, m, n, ia, ib, ic, nc, nd, im, in, kl, ml, nk, nl, ku, ix, iy,
+	     ms, lx, ly, ns, laa, lda;
+    doublecomplex als, bls;
+    doublereal err;
+    integer iku, kls;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    integer kus;
+    doublecomplex beta;
+    integer ldas;
+    logical same;
+    integer incx, incy;
+    logical full, tran, null;
+    doublecomplex alpha;
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
-    static logical reset;
-    static integer incxs, incys;
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
+    logical reset;
+    integer incxs, incys;
     extern /* Subroutine */ int zgbmv_(char *, integer *, integer *, integer *
-	    , integer *, doublecomplex *, doublecomplex *, integer *, 
+, integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static char trans[1];
+    char trans[1];
     extern /* Subroutine */ int zgemv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), 
@@ -872,21 +880,13 @@ L240:
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    doublereal *, doublecomplex *, doublereal *, doublereal *, 
-	    logical *, integer *, logical *);
-    static integer ia, ib, ic;
-    static logical banded;
-    static integer nc, nd, im, in, kl, ml, nk, nl, ku, ix, iy, ms, lx, ly, ns;
-    static doublereal errmax;
-    static doublecomplex transl;
+	    logical *, integer *, logical *, ftnlen);
+    logical banded;
+    doublereal errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static char transs[1];
-    static integer laa, lda;
-    static doublecomplex als, bls;
-    static doublereal err;
-    static integer iku, kls;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
-    static integer kus;
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
+    char transs[1];
 
     /* Fortran I/O blocks */
     static cilist io___139 = { 0, 0, 0, fmt_9994, 0 };
@@ -901,15 +901,26 @@ L240:
 
 
 
-/*  Tests ZGEMV and ZGBMV.   
+/*  Tests ZGEMV and ZGBMV. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --kb;
     --alf;
@@ -922,7 +933,7 @@ L240:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ys;
     --yy;
@@ -930,6 +941,7 @@ L240:
     --xx;
 
     /* Function Body */
+/*     .. Executable Statements .. */
     full = *(unsigned char *)&sname[2] == 'E';
     banded = *(unsigned char *)&sname[2] == 'B';
 /*     Define the number of arguments. */
@@ -996,7 +1008,8 @@ L240:
 
 		transl.r = 0., transl.i = 0.;
 		zmake_(sname + 1, " ", " ", &m, &n, &a[a_offset], nmax, &aa[1]
-			, &lda, &kl, &ku, &reset, &transl);
+			, &lda, &kl, &ku, &reset, &transl, (ftnlen)2, (ftnlen)
+			1, (ftnlen)1);
 
 		for (ic = 1; ic <= 3; ++ic) {
 		    *(unsigned char *)trans = *(unsigned char *)&ich[ic - 1];
@@ -1022,7 +1035,8 @@ L240:
 			i__4 = abs(incx);
 			i__5 = nl - 1;
 			zmake_("GE", " ", " ", &c__1, &nl, &x[1], &c__1, &xx[
-				1], &i__4, &c__0, &i__5, &reset, &transl);
+				1], &i__4, &c__0, &i__5, &reset, &transl, (
+				ftnlen)2, (ftnlen)1, (ftnlen)1);
 			if (nl > 1) {
 			    i__4 = nl / 2;
 			    x[i__4].r = 0., x[i__4].i = 0.;
@@ -1053,12 +1067,13 @@ L240:
 				    i__8 = ml - 1;
 				    zmake_("GE", " ", " ", &c__1, &ml, &y[1], 
 					    &c__1, &yy[1], &i__7, &c__0, &
-					    i__8, &reset, &transl);
+					    i__8, &reset, &transl, (ftnlen)2, 
+					    (ftnlen)1, (ftnlen)1);
 
 				    ++nc;
 
-/*                             Save every datum before calling the   
-                               subroutine. */
+/*                             Save every datum before calling the */
+/*                             subroutine. */
 
 				    *(unsigned char *)transs = *(unsigned 
 					    char *)trans;
@@ -1204,7 +1219,8 @@ L240:
 					    i__7 = abs(incy);
 					    isame[9] = lzeres_("GE", " ", &
 						    c__1, &ml, &ys[1], &yy[1],
-						     &i__7);
+						     &i__7, (ftnlen)2, (
+						    ftnlen)1);
 					}
 					isame[10] = incys == incy;
 				    } else if (banded) {
@@ -1225,13 +1241,14 @@ L240:
 					    i__7 = abs(incy);
 					    isame[11] = lzeres_("GE", " ", &
 						    c__1, &ml, &ys[1], &yy[1],
-						     &i__7);
+						     &i__7, (ftnlen)2, (
+						    ftnlen)1);
 					}
 					isame[12] = incys == incy;
 				    }
 
-/*                             If data was incorrectly changed, report   
-                               and return. */
+/*                             If data was incorrectly changed, report */
+/*                             and return. */
 
 				    same = TRUE_;
 				    i__7 = nargs;
@@ -1259,16 +1276,17 @@ L240:
 						a_offset], nmax, &x[1], &incx,
 						 &beta, &y[1], &incy, &yt[1], 
 						&g[1], &yy[1], eps, &err, 
-						fatal, nout, &c_true);
+						fatal, nout, &c_true, (ftnlen)
+						1);
 					errmax = max(errmax,err);
-/*                                If got really bad answer, report and   
-                                  return. */
+/*                                If got really bad answer, report and */
+/*                                return. */
 					if (*fatal) {
 					    goto L130;
 					}
 				    } else {
-/*                                Avoid repeating tests with M.le.0 or   
-                                  N.le.0. */
+/*                                Avoid repeating tests with M.le.0 or */
+/*                                N.le.0. */
 					goto L110;
 				    }
 
@@ -1359,9 +1377,9 @@ L140:
 
 /*     End of ZCHK1. */
 
-} /* zchk1_   
+} /* zchk1_ */
 
-   Subroutine */ int zchk2_(char *sname, doublereal *eps, doublereal *thresh, 
+/* Subroutine */ int zchk2_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nkb, integer *kb, 
 	integer *nalf, doublecomplex *alf, integer *nbet, doublecomplex *bet, 
@@ -1369,7 +1387,7 @@ L140:
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *y, 
 	doublecomplex *yy, doublecomplex *ys, doublecomplex *yt, doublereal *
-	g)
+	g, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -1410,21 +1428,26 @@ L140:
 	     f_rew(alist *);
 
     /* Local variables */
-    static doublecomplex beta;
-    static integer ldas;
-    static logical same;
-    static integer incx, incy;
-    static logical full, null;
-    static char uplo[1];
-    static integer i__, k, n;
-    static doublecomplex alpha;
-    static logical isame[13];
+    integer i__, k, n, ia, ib, ic, nc, ik, in, nk, ks, ix, iy, ns, lx, ly, 
+	    laa, lda;
+    doublecomplex als, bls;
+    doublereal err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    doublecomplex beta;
+    integer ldas;
+    logical same;
+    integer incx, incy;
+    logical full, null;
+    char uplo[1];
+    doublecomplex alpha;
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
-    static logical reset;
-    static integer incxs, incys;
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
+    logical reset;
+    integer incxs, incys;
     extern /* Subroutine */ int zhbmv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), 
@@ -1432,26 +1455,18 @@ L140:
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    doublereal *, doublecomplex *, doublereal *, doublereal *, 
-	    logical *, integer *, logical *), zhemv_(char *, integer *
-	    , doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
+	    logical *, integer *, logical *, ftnlen), zhemv_(char *, integer *
+, doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *);
-    static char uplos[1];
+    char uplos[1];
     extern /* Subroutine */ int zhpmv_(char *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *);
-    static integer ia, ib, ic;
-    static logical banded;
-    static integer nc, ik, in;
-    static logical packed;
-    static integer nk, ks, ix, iy, ns, lx, ly;
-    static doublereal errmax;
-    static doublecomplex transl;
+    logical banded, packed;
+    doublereal errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer laa, lda;
-    static doublecomplex als, bls;
-    static doublereal err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___189 = { 0, 0, 0, fmt_9993, 0 };
@@ -1468,15 +1483,26 @@ L140:
 
 
 
-/*  Tests ZHEMV, ZHBMV and ZHPMV.   
+/*  Tests ZHEMV, ZHBMV and ZHPMV. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --kb;
     --alf;
@@ -1489,7 +1515,7 @@ L140:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ys;
     --yy;
@@ -1497,6 +1523,7 @@ L140:
     --xx;
 
     /* Function Body */
+/*     .. Executable Statements .. */
     full = *(unsigned char *)&sname[2] == 'E';
     banded = *(unsigned char *)&sname[2] == 'B';
     packed = *(unsigned char *)&sname[2] == 'P';
@@ -1556,7 +1583,8 @@ L140:
 
 		transl.r = 0., transl.i = 0.;
 		zmake_(sname + 1, uplo, " ", &n, &n, &a[a_offset], nmax, &aa[
-			1], &lda, &k, &k, &reset, &transl);
+			1], &lda, &k, &k, &reset, &transl, (ftnlen)2, (ftnlen)
+			1, (ftnlen)1);
 
 		i__3 = *ninc;
 		for (ix = 1; ix <= i__3; ++ix) {
@@ -1569,7 +1597,8 @@ L140:
 		    i__4 = abs(incx);
 		    i__5 = n - 1;
 		    zmake_("GE", " ", " ", &c__1, &n, &x[1], &c__1, &xx[1], &
-			    i__4, &c__0, &i__5, &reset, &transl);
+			    i__4, &c__0, &i__5, &reset, &transl, (ftnlen)2, (
+			    ftnlen)1, (ftnlen)1);
 		    if (n > 1) {
 			i__4 = n / 2;
 			x[i__4].r = 0., x[i__4].i = 0.;
@@ -1599,12 +1628,13 @@ L140:
 				i__8 = n - 1;
 				zmake_("GE", " ", " ", &c__1, &n, &y[1], &
 					c__1, &yy[1], &i__7, &c__0, &i__8, &
-					reset, &transl);
+					reset, &transl, (ftnlen)2, (ftnlen)1, 
+					(ftnlen)1);
 
 				++nc;
 
-/*                          Save every datum before calling the   
-                            subroutine. */
+/*                          Save every datum before calling the */
+/*                          subroutine. */
 
 				*(unsigned char *)uplos = *(unsigned char *)
 					uplo;
@@ -1701,7 +1731,7 @@ L140:
 					al__1.aunit = *ntra;
 					f_rew(&al__1);
 				    }
-				    zhbmv_(uplo, &n, &k, &alpha, &aa[1], &lda,
+				    zhbmv_(uplo, &n, &k, &alpha, &aa[1], &lda, 
 					     &xx[1], &incx, &beta, &yy[1], &
 					    incy);
 				} else if (packed) {
@@ -1762,7 +1792,8 @@ L140:
 				    } else {
 					i__7 = abs(incy);
 					isame[8] = lzeres_("GE", " ", &c__1, &
-						n, &ys[1], &yy[1], &i__7);
+						n, &ys[1], &yy[1], &i__7, (
+						ftnlen)2, (ftnlen)1);
 				    }
 				    isame[9] = incys == incy;
 				} else if (banded) {
@@ -1780,7 +1811,8 @@ L140:
 				    } else {
 					i__7 = abs(incy);
 					isame[9] = lzeres_("GE", " ", &c__1, &
-						n, &ys[1], &yy[1], &i__7);
+						n, &ys[1], &yy[1], &i__7, (
+						ftnlen)2, (ftnlen)1);
 				    }
 				    isame[10] = incys == incy;
 				} else if (packed) {
@@ -1796,13 +1828,14 @@ L140:
 				    } else {
 					i__7 = abs(incy);
 					isame[7] = lzeres_("GE", " ", &c__1, &
-						n, &ys[1], &yy[1], &i__7);
+						n, &ys[1], &yy[1], &i__7, (
+						ftnlen)2, (ftnlen)1);
 				    }
 				    isame[8] = incys == incy;
 				}
 
-/*                          If data was incorrectly changed, report and   
-                            return. */
+/*                          If data was incorrectly changed, report and */
+/*                          return. */
 
 				same = TRUE_;
 				i__7 = nargs;
@@ -1829,10 +1862,11 @@ L140:
 				    zmvch_("N", &n, &n, &alpha, &a[a_offset], 
 					    nmax, &x[1], &incx, &beta, &y[1], 
 					    &incy, &yt[1], &g[1], &yy[1], eps,
-					     &err, fatal, nout, &c_true);
+					     &err, fatal, nout, &c_true, (
+					    ftnlen)1);
 				    errmax = max(errmax,err);
-/*                             If got really bad answer, report and   
-                               return. */
+/*                             If got really bad answer, report and */
+/*                             return. */
 				    if (*fatal) {
 					goto L120;
 				    }
@@ -1934,15 +1968,15 @@ L130:
 
 /*     End of ZCHK2. */
 
-} /* zchk2_   
+} /* zchk2_ */
 
-   Subroutine */ int zchk3_(char *sname, doublereal *eps, doublereal *thresh, 
+/* Subroutine */ int zchk3_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nkb, integer *kb, 
 	integer *ninc, integer *inc, integer *nmax, integer *incmax, 
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *xt, 
-	doublereal *g, doublecomplex *z__)
+	doublereal *g, doublecomplex *z__, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -1981,48 +2015,45 @@ L130:
 	    integer *, char *, ftnlen), e_wsfe(void), f_rew(alist *);
 
     /* Local variables */
-    static char diag[1];
-    static integer ldas;
-    static logical same;
-    static integer incx;
-    static logical full, null;
-    static char uplo[1];
-    static integer i__, k, n;
-    static char diags[1];
-    static logical isame[13];
+    integer i__, k, n, nc, ik, in, nk, ks, ix, ns, lx, laa, icd, lda, ict, 
+	    icu;
+    doublereal err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    char diag[1];
+    integer ldas;
+    logical same;
+    integer incx;
+    logical full, null;
+    char uplo[1], diags[1];
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
-    static logical reset;
-    static integer incxs;
-    static char trans[1];
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
+    logical reset;
+    integer incxs;
+    char trans[1];
     extern /* Subroutine */ int zmvch_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
-	    doublereal *, logical *, integer *, logical *);
-    static char uplos[1];
+	    doublereal *, logical *, integer *, logical *, ftnlen);
+    char uplos[1];
     extern /* Subroutine */ int ztbmv_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *), ztbsv_(char *, char *, char *, integer *
-	    , integer *, doublecomplex *, integer *, doublecomplex *, integer 
+, integer *, doublecomplex *, integer *, doublecomplex *, integer 
 	    *), ztpmv_(char *, char *, char *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), ztrmv_(char *, char *, char *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), ztpsv_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *), ztrsv_(char *, char *, char *, integer *, doublecomplex *
-	    , integer *, doublecomplex *, integer *);
-    static logical banded;
-    static integer nc, ik, in;
-    static logical packed;
-    static integer nk, ks, ix, ns, lx;
-    static doublereal errmax;
-    static doublecomplex transl;
+, integer *, doublecomplex *, integer *);
+    logical banded, packed;
+    doublereal errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static char transs[1];
-    static integer laa, icd, lda, ict, icu;
-    static doublereal err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
+    char transs[1];
 
     /* Fortran I/O blocks */
     static cilist io___239 = { 0, 0, 0, fmt_9993, 0 };
@@ -2042,15 +2073,26 @@ L130:
 
 
 
-/*  Tests ZTRMV, ZTBMV, ZTPMV, ZTRSV, ZTBSV and ZTPSV.   
+/*  Tests ZTRMV, ZTBMV, ZTPMV, ZTRSV, ZTBSV and ZTPSV. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --kb;
     --inc;
@@ -2061,12 +2103,13 @@ L130:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --xs;
     --xx;
 
     /* Function Body */
+/*     .. Executable Statements .. */
     full = *(unsigned char *)&sname[2] == 'R';
     banded = *(unsigned char *)&sname[2] == 'B';
     packed = *(unsigned char *)&sname[2] == 'P';
@@ -2141,7 +2184,8 @@ L130:
 
 			transl.r = 0., transl.i = 0.;
 			zmake_(sname + 1, uplo, diag, &n, &n, &a[a_offset], 
-				nmax, &aa[1], &lda, &k, &k, &reset, &transl);
+				nmax, &aa[1], &lda, &k, &k, &reset, &transl, (
+				ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			i__3 = *ninc;
 			for (ix = 1; ix <= i__3; ++ix) {
@@ -2155,7 +2199,7 @@ L130:
 			    i__5 = n - 1;
 			    zmake_("GE", " ", " ", &c__1, &n, &x[1], &c__1, &
 				    xx[1], &i__4, &c__0, &i__5, &reset, &
-				    transl);
+				    transl, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 			    if (n > 1) {
 				i__4 = n / 2;
 				x[i__4].r = 0., x[i__4].i = 0.;
@@ -2379,7 +2423,8 @@ L130:
 				} else {
 				    i__4 = abs(incx);
 				    isame[6] = lzeres_("GE", " ", &c__1, &n, &
-					    xs[1], &xx[1], &i__4);
+					    xs[1], &xx[1], &i__4, (ftnlen)2, (
+					    ftnlen)1);
 				}
 				isame[7] = incxs == incx;
 			    } else if (banded) {
@@ -2391,7 +2436,8 @@ L130:
 				} else {
 				    i__4 = abs(incx);
 				    isame[7] = lzeres_("GE", " ", &c__1, &n, &
-					    xs[1], &xx[1], &i__4);
+					    xs[1], &xx[1], &i__4, (ftnlen)2, (
+					    ftnlen)1);
 				}
 				isame[8] = incxs == incx;
 			    } else if (packed) {
@@ -2401,13 +2447,14 @@ L130:
 				} else {
 				    i__4 = abs(incx);
 				    isame[5] = lzeres_("GE", " ", &c__1, &n, &
-					    xs[1], &xx[1], &i__4);
+					    xs[1], &xx[1], &i__4, (ftnlen)2, (
+					    ftnlen)1);
 				}
 				isame[6] = incxs == incx;
 			    }
 
-/*                       If data was incorrectly changed, report and   
-                         return. */
+/*                       If data was incorrectly changed, report and */
+/*                       return. */
 
 			    same = TRUE_;
 			    i__4 = nargs;
@@ -2436,7 +2483,8 @@ L130:
 				    zmvch_(trans, &n, &n, &c_b2, &a[a_offset],
 					     nmax, &x[1], &incx, &c_b1, &z__[
 					    1], &incx, &xt[1], &g[1], &xx[1], 
-					    eps, &err, fatal, nout, &c_true);
+					    eps, &err, fatal, nout, &c_true, (
+					    ftnlen)1);
 				} else if (s_cmp(sname + 3, "SV", (ftnlen)2, (
 					ftnlen)2) == 0) {
 
@@ -2457,7 +2505,8 @@ L130:
 				    zmvch_(trans, &n, &n, &c_b2, &a[a_offset],
 					     nmax, &z__[1], &incx, &c_b1, &x[
 					    1], &incx, &xt[1], &g[1], &xx[1], 
-					    eps, &err, fatal, nout, &c_false);
+					    eps, &err, fatal, nout, &c_false, 
+					    (ftnlen)1);
 				}
 				errmax = max(errmax,err);
 /*                          If got really bad answer, report and return. */
@@ -2556,16 +2605,16 @@ L130:
 
 /*     End of ZCHK3. */
 
-} /* zchk3_   
+} /* zchk3_ */
 
-   Subroutine */ int zchk4_(char *sname, doublereal *eps, doublereal *thresh, 
+/* Subroutine */ int zchk4_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nalf, doublecomplex *
 	alf, integer *ninc, integer *inc, integer *nmax, integer *incmax, 
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *y, 
 	doublecomplex *yy, doublecomplex *ys, doublecomplex *yt, doublereal *
-	g, doublecomplex *z__)
+	g, doublecomplex *z__, ftnlen sname_len)
 {
     /* Format strings */
     static char fmt_9994[] = "(1x,i6,\002: \002,a6,\002(\002,2(i3,\002,"
@@ -2597,38 +2646,39 @@ L130:
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer ldas;
-    static logical same, conj;
-    static integer incx, incy;
-    static logical null;
-    static integer i__, j, m, n;
-    static doublecomplex alpha, w[1];
-    static logical isame[13];
+    integer i__, j, m, n;
+    doublecomplex w[1];
+    integer ia, nc, nd, im, in, ms, ix, iy, ns, lx, ly, laa, lda;
+    doublecomplex als;
+    doublereal err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    integer ldas;
+    logical same, conj;
+    integer incx, incy;
+    logical null;
+    doublecomplex alpha;
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
     extern /* Subroutine */ int zgerc_(integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    static logical reset;
-    static integer incxs, incys;
+    logical reset;
+    integer incxs, incys;
     extern /* Subroutine */ int zmvch_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
-	    doublereal *, logical *, integer *, logical *), zgeru_(
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    doublereal *, logical *, integer *, logical *, ftnlen), zgeru_(
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, doublecomplex *, integer *);
-    static integer ia, nc, nd, im, in, ms, ix, iy, ns, lx, ly;
-    static doublereal errmax;
-    static doublecomplex transl;
+    doublereal errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer laa, lda;
-    static doublecomplex als;
-    static doublereal err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___285 = { 0, 0, 0, fmt_9994, 0 };
@@ -2642,19 +2692,26 @@ L130:
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  Tests ZGERC and ZGERU. */
 
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-/*  Tests ZGERC and ZGERU.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --inc;
@@ -2666,7 +2723,7 @@ L130:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ys;
     --yy;
@@ -2722,7 +2779,8 @@ L130:
 		i__3 = abs(incx);
 		i__4 = m - 1;
 		zmake_("GE", " ", " ", &c__1, &m, &x[1], &c__1, &xx[1], &i__3,
-			 &c__0, &i__4, &reset, &transl);
+			 &c__0, &i__4, &reset, &transl, (ftnlen)2, (ftnlen)1, 
+			(ftnlen)1);
 		if (m > 1) {
 		    i__3 = m / 2;
 		    x[i__3].r = 0., x[i__3].i = 0.;
@@ -2741,7 +2799,8 @@ L130:
 		    i__4 = abs(incy);
 		    i__5 = n - 1;
 		    zmake_("GE", " ", " ", &c__1, &n, &y[1], &c__1, &yy[1], &
-			    i__4, &c__0, &i__5, &reset, &transl);
+			    i__4, &c__0, &i__5, &reset, &transl, (ftnlen)2, (
+			    ftnlen)1, (ftnlen)1);
 		    if (n > 1) {
 			i__4 = n / 2;
 			y[i__4].r = 0., y[i__4].i = 0.;
@@ -2761,7 +2820,7 @@ L130:
 			i__6 = n - 1;
 			zmake_(sname + 1, " ", " ", &m, &n, &a[a_offset], 
 				nmax, &aa[1], &lda, &i__5, &i__6, &reset, &
-				transl);
+				transl, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			++nc;
 
@@ -2858,7 +2917,7 @@ L130:
 			    isame[7] = lze_(&as[1], &aa[1], &laa);
 			} else {
 			    isame[7] = lzeres_("GE", " ", &m, &n, &as[1], &aa[
-				    1], &lda);
+				    1], &lda, (ftnlen)2, (ftnlen)1);
 			}
 			isame[8] = ldas == lda;
 
@@ -2919,9 +2978,10 @@ L130:
 				    w[0].r = z__1.r, w[0].i = z__1.i;
 				}
 				zmvch_("N", &m, &c__1, &alpha, &z__[1], nmax, 
-					w, &c__1, &c_b2, &a_ref(1, j), &c__1, 
-					&yt[1], &g[1], &aa[(j - 1) * lda + 1],
-					 eps, &err, fatal, nout, &c_true);
+					w, &c__1, &c_b2, &a[j * a_dim1 + 1], &
+					c__1, &yt[1], &g[1], &aa[(j - 1) * 
+					lda + 1], eps, &err, fatal, nout, &
+					c_true, (ftnlen)1);
 				errmax = max(errmax,err);
 /*                          If got really bad answer, report and return. */
 				if (*fatal) {
@@ -2999,10 +3059,6 @@ L150:
 
 } /* zchk4_ */
 
-#undef a_ref
-#undef a_subscr
-
-
 /* Subroutine */ int zchk5_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nalf, doublecomplex *
@@ -3010,7 +3066,7 @@ L150:
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *y, 
 	doublecomplex *yy, doublecomplex *ys, doublecomplex *yt, doublereal *
-	g, doublecomplex *z__)
+	g, doublecomplex *z__, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -3048,43 +3104,43 @@ L150:
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer ldas;
-    static logical same;
-    static doublereal rals;
-    static integer incx;
-    static logical full;
+    integer i__, j, n;
+    doublecomplex w[1];
+    integer ia, ja, ic, nc, jj, lj, in, ix, ns, lx, laa, lda;
+    doublereal err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    integer ldas;
+    logical same;
+    doublereal rals;
+    integer incx;
+    logical full;
     extern /* Subroutine */ int zher_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static logical null;
-    static char uplo[1];
+    logical null;
+    char uplo[1];
     extern /* Subroutine */ int zhpr_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *);
-    static integer i__, j, n;
-    static doublecomplex alpha, w[1];
-    static logical isame[13];
+    doublecomplex alpha;
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
-    static logical reset;
-    static integer incxs;
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
+    logical reset;
+    integer incxs;
     extern /* Subroutine */ int zmvch_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
-	    doublereal *, logical *, integer *, logical *);
-    static logical upper;
-    static char uplos[1];
-    static integer ia, ja, ic, nc, jj, lj, in;
-    static logical packed;
-    static integer ix, ns, lx;
-    static doublereal ralpha, errmax;
-    static doublecomplex transl;
+	    doublereal *, logical *, integer *, logical *, ftnlen);
+    logical upper;
+    char uplos[1];
+    logical packed;
+    doublereal ralpha, errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer laa, lda;
-    static doublereal err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___326 = { 0, 0, 0, fmt_9993, 0 };
@@ -3100,19 +3156,26 @@ L150:
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  Tests ZHER and ZHPR. */
 
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-/*  Tests ZHER and ZHPR.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --inc;
@@ -3124,7 +3187,7 @@ L150:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ys;
     --yy;
@@ -3132,6 +3195,7 @@ L150:
     --xx;
 
     /* Function Body */
+/*     .. Executable Statements .. */
     full = *(unsigned char *)&sname[2] == 'E';
     packed = *(unsigned char *)&sname[2] == 'P';
 /*     Define the number of arguments. */
@@ -3178,7 +3242,8 @@ L150:
 		i__3 = abs(incx);
 		i__4 = n - 1;
 		zmake_("GE", " ", " ", &c__1, &n, &x[1], &c__1, &xx[1], &i__3,
-			 &c__0, &i__4, &reset, &transl);
+			 &c__0, &i__4, &reset, &transl, (ftnlen)2, (ftnlen)1, 
+			(ftnlen)1);
 		if (n > 1) {
 		    i__3 = n / 2;
 		    x[i__3].r = 0., x[i__3].i = 0.;
@@ -3200,7 +3265,8 @@ L150:
 		    i__4 = n - 1;
 		    i__5 = n - 1;
 		    zmake_(sname + 1, uplo, " ", &n, &n, &a[a_offset], nmax, &
-			    aa[1], &lda, &i__4, &i__5, &reset, &transl);
+			    aa[1], &lda, &i__4, &i__5, &reset, &transl, (
+			    ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 		    ++nc;
 
@@ -3298,7 +3364,7 @@ L150:
 			isame[5] = lze_(&as[1], &aa[1], &laa);
 		    } else {
 			isame[5] = lzeres_(sname + 1, uplo, &n, &n, &as[1], &
-				aa[1], &lda);
+				aa[1], &lda, (ftnlen)2, (ftnlen)1);
 		    }
 		    if (! packed) {
 			isame[6] = ldas == lda;
@@ -3360,9 +3426,9 @@ L150:
 				lj = n - j + 1;
 			    }
 			    zmvch_("N", &lj, &c__1, &alpha, &z__[jj], &lj, w, 
-				    &c__1, &c_b2, &a_ref(jj, j), &c__1, &yt[1]
-				    , &g[1], &aa[ja], eps, &err, fatal, nout, 
-				    &c_true);
+				    &c__1, &c_b2, &a[jj + j * a_dim1], &c__1, 
+				    &yt[1], &g[1], &aa[ja], eps, &err, fatal, 
+				    nout, &c_true, (ftnlen)1);
 			    if (full) {
 				if (upper) {
 				    ja += lda;
@@ -3459,10 +3525,6 @@ L130:
 
 } /* zchk5_ */
 
-#undef a_ref
-#undef a_subscr
-
-
 /* Subroutine */ int zchk6_(char *sname, doublereal *eps, doublereal *thresh, 
 	integer *nout, integer *ntra, logical *trace, logical *rewi, logical *
 	fatal, integer *nidim, integer *idim, integer *nalf, doublecomplex *
@@ -3470,7 +3532,7 @@ L130:
 	doublecomplex *a, doublecomplex *aa, doublecomplex *as, doublecomplex 
 	*x, doublecomplex *xx, doublecomplex *xs, doublecomplex *y, 
 	doublecomplex *yy, doublecomplex *ys, doublecomplex *yt, doublereal *
-	g, doublecomplex *z__)
+	g, doublecomplex *z__, ftnlen sname_len)
 {
     /* Initialized data */
 
@@ -3509,43 +3571,43 @@ L130:
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer ldas;
-    static logical same;
-    static integer incx, incy;
-    static logical full, null;
-    static char uplo[1];
+    integer i__, j, n;
+    doublecomplex w[2];
+    integer ia, ja, ic, nc, jj, lj, in, ix, iy, ns, lx, ly, laa, lda;
+    doublecomplex als;
+    doublereal err;
+    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+    integer ldas;
+    logical same;
+    integer incx, incy;
+    logical full, null;
+    char uplo[1];
     extern /* Subroutine */ int zher2_(char *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zhpr2_(char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *);
-    static integer i__, j, n;
-    static doublecomplex alpha, w[2];
-    static logical isame[13];
+    doublecomplex alpha;
+    logical isame[13];
     extern /* Subroutine */ int zmake_(char *, char *, char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
-	     integer *, integer *, logical *, doublecomplex *);
-    static integer nargs;
-    static logical reset;
-    static integer incxs, incys;
+	     integer *, integer *, logical *, doublecomplex *, ftnlen, ftnlen,
+	     ftnlen);
+    integer nargs;
+    logical reset;
+    integer incxs, incys;
     extern /* Subroutine */ int zmvch_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, doublereal *, 
-	    doublereal *, logical *, integer *, logical *);
-    static logical upper;
-    static char uplos[1];
-    static integer ia, ja, ic, nc, jj, lj, in;
-    static logical packed;
-    static integer ix, iy, ns, lx, ly;
-    static doublereal errmax;
-    static doublecomplex transl;
+	    doublereal *, logical *, integer *, logical *, ftnlen);
+    logical upper;
+    char uplos[1];
+    logical packed;
+    doublereal errmax;
+    doublecomplex transl;
     extern logical lzeres_(char *, char *, integer *, integer *, 
-	    doublecomplex *, doublecomplex *, integer *);
-    static integer laa, lda;
-    static doublecomplex als;
-    static doublereal err;
-    extern logical lze_(doublecomplex *, doublecomplex *, integer *);
+	    doublecomplex *, doublecomplex *, integer *, ftnlen, ftnlen);
 
     /* Fortran I/O blocks */
     static cilist io___375 = { 0, 0, 0, fmt_9993, 0 };
@@ -3561,26 +3623,31 @@ L130:
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
-#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+/*  Tests ZHER2 and ZHPR2. */
 
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-/*  Tests ZHER2 and ZHPR2.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Functions .. */
+/*     .. External Subroutines .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --idim;
     --alf;
     --inc;
     z_dim1 = *nmax;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --g;
     --yt;
@@ -3589,7 +3656,7 @@ L130:
     --as;
     --aa;
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --ys;
     --yy;
@@ -3597,6 +3664,7 @@ L130:
     --xx;
 
     /* Function Body */
+/*     .. Executable Statements .. */
     full = *(unsigned char *)&sname[2] == 'E';
     packed = *(unsigned char *)&sname[2] == 'P';
 /*     Define the number of arguments. */
@@ -3643,7 +3711,8 @@ L130:
 		i__3 = abs(incx);
 		i__4 = n - 1;
 		zmake_("GE", " ", " ", &c__1, &n, &x[1], &c__1, &xx[1], &i__3,
-			 &c__0, &i__4, &reset, &transl);
+			 &c__0, &i__4, &reset, &transl, (ftnlen)2, (ftnlen)1, 
+			(ftnlen)1);
 		if (n > 1) {
 		    i__3 = n / 2;
 		    x[i__3].r = 0., x[i__3].i = 0.;
@@ -3662,7 +3731,8 @@ L130:
 		    i__4 = abs(incy);
 		    i__5 = n - 1;
 		    zmake_("GE", " ", " ", &c__1, &n, &y[1], &c__1, &yy[1], &
-			    i__4, &c__0, &i__5, &reset, &transl);
+			    i__4, &c__0, &i__5, &reset, &transl, (ftnlen)2, (
+			    ftnlen)1, (ftnlen)1);
 		    if (n > 1) {
 			i__4 = n / 2;
 			y[i__4].r = 0., y[i__4].i = 0.;
@@ -3683,7 +3753,7 @@ L130:
 			i__6 = n - 1;
 			zmake_(sname + 1, uplo, " ", &n, &n, &a[a_offset], 
 				nmax, &aa[1], &lda, &i__5, &i__6, &reset, &
-				transl);
+				transl, (ftnlen)2, (ftnlen)1, (ftnlen)1);
 
 			++nc;
 
@@ -3797,7 +3867,7 @@ L130:
 			    isame[7] = lze_(&as[1], &aa[1], &laa);
 			} else {
 			    isame[7] = lzeres_(sname + 1, uplo, &n, &n, &as[1]
-				    , &aa[1], &lda);
+				    , &aa[1], &lda, (ftnlen)2, (ftnlen)1);
 			}
 			if (! packed) {
 			    isame[8] = ldas == lda;
@@ -3830,7 +3900,7 @@ L130:
 			    if (incx > 0) {
 				i__5 = n;
 				for (i__ = 1; i__ <= i__5; ++i__) {
-				    i__6 = z___subscr(i__, 1);
+				    i__6 = i__ + z_dim1;
 				    i__7 = i__;
 				    z__[i__6].r = x[i__7].r, z__[i__6].i = x[
 					    i__7].i;
@@ -3839,7 +3909,7 @@ L130:
 			    } else {
 				i__5 = n;
 				for (i__ = 1; i__ <= i__5; ++i__) {
-				    i__6 = z___subscr(i__, 1);
+				    i__6 = i__ + z_dim1;
 				    i__7 = n - i__ + 1;
 				    z__[i__6].r = x[i__7].r, z__[i__6].i = x[
 					    i__7].i;
@@ -3849,7 +3919,7 @@ L130:
 			    if (incy > 0) {
 				i__5 = n;
 				for (i__ = 1; i__ <= i__5; ++i__) {
-				    i__6 = z___subscr(i__, 2);
+				    i__6 = i__ + (z_dim1 << 1);
 				    i__7 = i__;
 				    z__[i__6].r = y[i__7].r, z__[i__6].i = y[
 					    i__7].i;
@@ -3858,7 +3928,7 @@ L130:
 			    } else {
 				i__5 = n;
 				for (i__ = 1; i__ <= i__5; ++i__) {
-				    i__6 = z___subscr(i__, 2);
+				    i__6 = i__ + (z_dim1 << 1);
 				    i__7 = n - i__ + 1;
 				    z__[i__6].r = y[i__7].r, z__[i__6].i = y[
 					    i__7].i;
@@ -3868,13 +3938,13 @@ L130:
 			    ja = 1;
 			    i__5 = n;
 			    for (j = 1; j <= i__5; ++j) {
-				d_cnjg(&z__2, &z___ref(j, 2));
+				d_cnjg(&z__2, &z__[j + (z_dim1 << 1)]);
 				z__1.r = alpha.r * z__2.r - alpha.i * z__2.i, 
 					z__1.i = alpha.r * z__2.i + alpha.i * 
 					z__2.r;
 				w[0].r = z__1.r, w[0].i = z__1.i;
 				d_cnjg(&z__2, &alpha);
-				d_cnjg(&z__3, &z___ref(j, 1));
+				d_cnjg(&z__3, &z__[j + z_dim1]);
 				z__1.r = z__2.r * z__3.r - z__2.i * z__3.i, 
 					z__1.i = z__2.r * z__3.i + z__2.i * 
 					z__3.r;
@@ -3886,11 +3956,11 @@ L130:
 				    jj = j;
 				    lj = n - j + 1;
 				}
-				zmvch_("N", &lj, &c__2, &c_b2, &z___ref(jj, 1)
-					, nmax, w, &c__1, &c_b2, &a_ref(jj, j)
-					, &c__1, &yt[1], &g[1], &aa[ja], eps, 
-					&err, fatal, nout, &c_true)
-					;
+				zmvch_("N", &lj, &c__2, &c_b2, &z__[jj + 
+					z_dim1], nmax, w, &c__1, &c_b2, &a[jj 
+					+ j * a_dim1], &c__1, &yt[1], &g[1], &
+					aa[ja], eps, &err, fatal, nout, &
+					c_true, (ftnlen)1);
 				if (full) {
 				    if (upper) {
 					ja += lda;
@@ -3992,13 +4062,8 @@ L170:
 
 } /* zchk6_ */
 
-#undef z___ref
-#undef z___subscr
-#undef a_ref
-#undef a_subscr
-
-
-/* Subroutine */ int zchke_(integer *isnum, char *srnamt, integer *nout)
+/* Subroutine */ int zchke_(integer *isnum, char *srnamt, integer *nout, 
+	ftnlen srnamt_len)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 \002,a6,\002 PASSED THE TESTS OF ERROR-E"
@@ -4010,22 +4075,20 @@ L170:
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static doublecomplex beta;
+    doublecomplex a[1]	/* was [1][1] */, x[1], y[1], beta;
     extern /* Subroutine */ int zher_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
-	    zhpr_(char *, integer *, doublereal *, doublecomplex *, integer *,
+	    zhpr_(char *, integer *, doublereal *, doublecomplex *, integer *, 
 	     doublecomplex *), zher2_(char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *);
-    static doublecomplex a[1]	/* was [1][1] */;
-    extern /* Subroutine */ int zhpr2_(char *, integer *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, 
-	    doublecomplex *);
-    static doublecomplex alpha, x[1], y[1];
+	    integer *, doublecomplex *, integer *), zhpr2_(char *, 
+	    integer *, doublecomplex *, doublecomplex *, integer *, 
+	    doublecomplex *, integer *, doublecomplex *);
+    doublecomplex alpha;
     extern /* Subroutine */ int zgerc_(integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), zgbmv_(char *, integer *, integer *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zhbmv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
@@ -4038,7 +4101,7 @@ L170:
 	    integer *), zgeru_(integer *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *), ztbmv_(char *, char *, char *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     integer *), zhpmv_(char *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *), ztbsv_(char 
@@ -4047,10 +4110,10 @@ L170:
 	    char *, char *, char *, integer *, doublecomplex *, doublecomplex 
 	    *, integer *), ztrmv_(char *, char *, 
 	    char *, integer *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *), ztpsv_(char *, char *, char *,
+	    integer *), ztpsv_(char *, char *, char *, 
 	     integer *, doublecomplex *, doublecomplex *, integer *), ztrsv_(char *, char *, char *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal ralpha;
+    doublereal ralpha;
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *);
 
@@ -4060,21 +4123,28 @@ L170:
 
 
 
-/*  Tests the error exits from the Level 2 Blas.   
-    Requires a special version of the error-handling routine XERBLA.   
-    ALPHA, RALPHA, BETA, A, X and Y should not need to be defined.   
+/*  Tests the error exits from the Level 2 Blas. */
+/*  Requires a special version of the error-handling routine XERBLA. */
+/*  ALPHA, RALPHA, BETA, A, X and Y should not need to be defined. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-       OK is set to .FALSE. by the special version of XERBLA or by CHKXER   
-       if anything is wrong. */
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Local Scalars .. */
+/*     .. Local Arrays .. */
+/*     .. External Subroutines .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
+/*     OK is set to .FALSE. by the special version of XERBLA or by CHKXER */
+/*     if anything is wrong. */
     infoc_1.ok = TRUE_;
-/*     LERR is set to .TRUE. by the special version of XERBLA each time   
-       it is called, and is then tested and re-set by CHKXER. */
+/*     LERR is set to .TRUE. by the special version of XERBLA each time */
+/*     it is called, and is then tested and re-set by CHKXER. */
     infoc_1.lerr = FALSE_;
     switch (*isnum) {
 	case 1:  goto L10;
@@ -4117,35 +4187,35 @@ L10:
     goto L180;
 L20:
     infoc_1.infot = 1;
-    zgbmv_("/", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("/", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 2;
-    zgbmv_("N", &c_n1, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c_n1, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 3;
-    zgbmv_("N", &c__0, &c_n1, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c__0, &c_n1, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 4;
-    zgbmv_("N", &c__0, &c__0, &c_n1, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c__0, &c__0, &c_n1, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 5;
-    zgbmv_("N", &c__2, &c__0, &c__0, &c_n1, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c__2, &c__0, &c__0, &c_n1, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 8;
-    zgbmv_("N", &c__0, &c__0, &c__1, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c__0, &c__0, &c__1, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 10;
-    zgbmv_("N", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__0, &beta,
+    zgbmv_("N", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__0, &beta, 
 	     y, &c__1);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     infoc_1.infot = 13;
-    zgbmv_("N", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta,
+    zgbmv_("N", &c__0, &c__0, &c__0, &c__0, &alpha, a, &c__1, x, &c__1, &beta, 
 	     y, &c__0);
     chkxer_(srnamt, &infoc_1.infot, nout, &infoc_1.lerr, &infoc_1.ok);
     goto L180;
@@ -4442,12 +4512,12 @@ L180:
 
 /*     End of ZCHKE. */
 
-} /* zchke_   
+} /* zchke_ */
 
-   Subroutine */ int zmake_(char *type__, char *uplo, char *diag, integer *m, 
+/* Subroutine */ int zmake_(char *type__, char *uplo, char *diag, integer *m, 
 	integer *n, doublecomplex *a, integer *nmax, doublecomplex *aa, 
 	integer *lda, integer *kl, integer *ku, logical *reset, doublecomplex 
-	*transl)
+	*transl, ftnlen type_len, ftnlen uplo_len, ftnlen diag_len)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4;
@@ -4459,37 +4529,36 @@ L180:
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer ibeg, iend, ioff;
+    integer i__, j, i1, i2, i3, jj, kk;
+    logical gen, tri, sym;
+    integer ibeg, iend, ioff;
     extern /* Double Complex */ VOID zbeg_(doublecomplex *, logical *);
-    static logical unit;
-    static integer i__, j;
-    static logical lower;
-    static integer i1, i2, i3;
-    static logical upper;
-    static integer jj, kk;
-    static logical gen, tri, sym;
+    logical unit, lower, upper;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  Generates values for an M by N matrix A within the bandwidth */
+/*  defined by KL and KU. */
+/*  Stores the values in the array AA in the data structure required */
+/*  by the routine, with unwanted elements set to rogue value. */
 
+/*  TYPE is 'GE', 'GB', 'HE', 'HB', 'HP', 'TR', 'TB' OR 'TP'. */
 
-/*  Generates values for an M by N matrix A within the bandwidth   
-    defined by KL and KU.   
-    Stores the values in the array AA in the data structure required   
-    by the routine, with unwanted elements set to rogue value.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    TYPE is 'GE', 'GB', 'HE', 'HB', 'HP', 'TR', 'TB' OR 'TP'.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. External Functions .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --aa;
 
@@ -4510,21 +4579,21 @@ L180:
 	    if (gen || upper && i__ <= j || lower && i__ >= j) {
 		if (i__ <= j && j - i__ <= *ku || i__ >= j && i__ - j <= *kl) 
 			{
-		    i__3 = a_subscr(i__, j);
+		    i__3 = i__ + j * a_dim1;
 		    zbeg_(&z__2, reset);
 		    z__1.r = z__2.r + transl->r, z__1.i = z__2.i + transl->i;
 		    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 		} else {
-		    i__3 = a_subscr(i__, j);
+		    i__3 = i__ + j * a_dim1;
 		    a[i__3].r = 0., a[i__3].i = 0.;
 		}
 		if (i__ != j) {
 		    if (sym) {
-			i__3 = a_subscr(j, i__);
-			d_cnjg(&z__1, &a_ref(i__, j));
+			i__3 = j + i__ * a_dim1;
+			d_cnjg(&z__1, &a[i__ + j * a_dim1]);
 			a[i__3].r = z__1.r, a[i__3].i = z__1.i;
 		    } else if (tri) {
-			i__3 = a_subscr(j, i__);
+			i__3 = j + i__ * a_dim1;
 			a[i__3].r = 0., a[i__3].i = 0.;
 		    }
 		}
@@ -4532,20 +4601,20 @@ L180:
 /* L10: */
 	}
 	if (sym) {
-	    i__2 = a_subscr(j, j);
-	    i__3 = a_subscr(j, j);
+	    i__2 = j + j * a_dim1;
+	    i__3 = j + j * a_dim1;
 	    d__1 = a[i__3].r;
 	    z__1.r = d__1, z__1.i = 0.;
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 	}
 	if (tri) {
-	    i__2 = a_subscr(j, j);
-	    i__3 = a_subscr(j, j);
+	    i__2 = j + j * a_dim1;
+	    i__3 = j + j * a_dim1;
 	    z__1.r = a[i__3].r + 1., z__1.i = a[i__3].i + 0.;
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 	}
 	if (unit) {
-	    i__2 = a_subscr(j, j);
+	    i__2 = j + j * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 	}
 /* L20: */
@@ -4559,7 +4628,7 @@ L180:
 	    i__2 = *m;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
 		i__3 = i__ + (j - 1) * *lda;
-		i__4 = a_subscr(i__, j);
+		i__4 = i__ + j * a_dim1;
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L30: */
 	    }
@@ -4585,7 +4654,7 @@ L180:
 	    i__2 = min(i__3,i__4);
 	    for (i2 = i1; i2 <= i__2; ++i2) {
 		i__3 = i2 + (j - 1) * *lda;
-		i__4 = a_subscr(i2 + j - *ku - 1, j);
+		i__4 = i2 + j - *ku - 1 + j * a_dim1;
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L70: */
 	    }
@@ -4625,7 +4694,7 @@ L180:
 	    i__2 = iend;
 	    for (i__ = ibeg; i__ <= i__2; ++i__) {
 		i__3 = i__ + (j - 1) * *lda;
-		i__4 = a_subscr(i__, j);
+		i__4 = i__ + j * a_dim1;
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L110: */
 	    }
@@ -4679,7 +4748,7 @@ L180:
 	    i__2 = iend;
 	    for (i__ = ibeg; i__ <= i__2; ++i__) {
 		i__3 = i__ + (j - 1) * *lda;
-		i__4 = a_subscr(i__ + j - kk, j);
+		i__4 = i__ + j - kk + j * a_dim1;
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 /* L150: */
 	    }
@@ -4715,7 +4784,7 @@ L180:
 	    for (i__ = ibeg; i__ <= i__2; ++i__) {
 		++ioff;
 		i__3 = ioff;
-		i__4 = a_subscr(i__, j);
+		i__4 = i__ + j * a_dim1;
 		aa[i__3].r = a[i__4].r, aa[i__3].i = a[i__4].i;
 		if (i__ == j) {
 		    if (unit) {
@@ -4741,15 +4810,12 @@ L180:
 
 } /* zmake_ */
 
-#undef a_ref
-#undef a_subscr
-
-
 /* Subroutine */ int zmvch_(char *trans, integer *m, integer *n, 
 	doublecomplex *alpha, doublecomplex *a, integer *nmax, doublecomplex *
 	x, integer *incx, doublecomplex *beta, doublecomplex *y, integer *
 	incy, doublecomplex *yt, doublereal *g, doublecomplex *yy, doublereal 
-	*eps, doublereal *err, logical *fatal, integer *nout, logical *mv)
+	*eps, doublereal *err, logical *fatal, integer *nout, logical *mv, 
+	ftnlen trans_len)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 ******* FATAL ERROR - COMPUTED RESULT IS"
@@ -4771,11 +4837,10 @@ L180:
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static doublereal erri;
-    static logical tran;
-    static integer i__, j;
-    static logical ctran;
-    static integer incxl, incyl, ml, nl, iy, jx, kx, ky;
+    integer i__, j, ml, nl, iy, jx, kx, ky;
+    doublereal erri;
+    logical tran, ctran;
+    integer incxl, incyl;
 
     /* Fortran I/O blocks */
     static cilist io___430 = { 0, 0, 0, fmt_9999, 0 };
@@ -4784,21 +4849,25 @@ L180:
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  Checks the results of the computational tests. */
 
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-/*  Checks the results of the computational tests.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Statement Functions .. */
+/*     .. Statement Function definitions .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     a_dim1 = *nmax;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --x;
     --y;
@@ -4831,8 +4900,8 @@ L180:
 	incyl = 1;
     }
 
-/*     Compute expected result in YT using data in A, X and Y.   
-       Compute gauges in G. */
+/*     Compute expected result in YT using data in A, X and Y. */
+/*     Compute gauges in G. */
 
     iy = ky;
     i__1 = ml;
@@ -4846,18 +4915,18 @@ L180:
 	    for (j = 1; j <= i__2; ++j) {
 		i__3 = iy;
 		i__4 = iy;
-		i__5 = a_subscr(j, i__);
+		i__5 = j + i__ * a_dim1;
 		i__6 = jx;
 		z__2.r = a[i__5].r * x[i__6].r - a[i__5].i * x[i__6].i, 
 			z__2.i = a[i__5].r * x[i__6].i + a[i__5].i * x[i__6]
 			.r;
 		z__1.r = yt[i__4].r + z__2.r, z__1.i = yt[i__4].i + z__2.i;
 		yt[i__3].r = z__1.r, yt[i__3].i = z__1.i;
-		i__3 = a_subscr(j, i__);
+		i__3 = j + i__ * a_dim1;
 		i__4 = jx;
-		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&
-			a_ref(j, i__)), abs(d__2))) * ((d__3 = x[i__4].r, abs(
-			d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
+		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&a[j 
+			+ i__ * a_dim1]), abs(d__2))) * ((d__3 = x[i__4].r, 
+			abs(d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
 		jx += incxl;
 /* L10: */
 	    }
@@ -4866,17 +4935,17 @@ L180:
 	    for (j = 1; j <= i__2; ++j) {
 		i__3 = iy;
 		i__4 = iy;
-		d_cnjg(&z__3, &a_ref(j, i__));
+		d_cnjg(&z__3, &a[j + i__ * a_dim1]);
 		i__5 = jx;
 		z__2.r = z__3.r * x[i__5].r - z__3.i * x[i__5].i, z__2.i = 
 			z__3.r * x[i__5].i + z__3.i * x[i__5].r;
 		z__1.r = yt[i__4].r + z__2.r, z__1.i = yt[i__4].i + z__2.i;
 		yt[i__3].r = z__1.r, yt[i__3].i = z__1.i;
-		i__3 = a_subscr(j, i__);
+		i__3 = j + i__ * a_dim1;
 		i__4 = jx;
-		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&
-			a_ref(j, i__)), abs(d__2))) * ((d__3 = x[i__4].r, abs(
-			d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
+		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&a[j 
+			+ i__ * a_dim1]), abs(d__2))) * ((d__3 = x[i__4].r, 
+			abs(d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
 		jx += incxl;
 /* L20: */
 	    }
@@ -4885,18 +4954,18 @@ L180:
 	    for (j = 1; j <= i__2; ++j) {
 		i__3 = iy;
 		i__4 = iy;
-		i__5 = a_subscr(i__, j);
+		i__5 = i__ + j * a_dim1;
 		i__6 = jx;
 		z__2.r = a[i__5].r * x[i__6].r - a[i__5].i * x[i__6].i, 
 			z__2.i = a[i__5].r * x[i__6].i + a[i__5].i * x[i__6]
 			.r;
 		z__1.r = yt[i__4].r + z__2.r, z__1.i = yt[i__4].i + z__2.i;
 		yt[i__3].r = z__1.r, yt[i__3].i = z__1.i;
-		i__3 = a_subscr(i__, j);
+		i__3 = i__ + j * a_dim1;
 		i__4 = jx;
-		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&
-			a_ref(i__, j)), abs(d__2))) * ((d__3 = x[i__4].r, abs(
-			d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
+		g[iy] += ((d__1 = a[i__3].r, abs(d__1)) + (d__2 = d_imag(&a[
+			i__ + j * a_dim1]), abs(d__2))) * ((d__3 = x[i__4].r, 
+			abs(d__3)) + (d__4 = d_imag(&x[jx]), abs(d__4)));
 		jx += incxl;
 /* L30: */
 	    }
@@ -4977,10 +5046,6 @@ L80:
 
 } /* zmvch_ */
 
-#undef a_ref
-#undef a_subscr
-
-
 logical lze_(doublecomplex *ri, doublecomplex *rj, integer *lr)
 {
     /* System generated locals */
@@ -4988,18 +5053,22 @@ logical lze_(doublecomplex *ri, doublecomplex *rj, integer *lr)
     logical ret_val;
 
     /* Local variables */
-    static integer i__;
+    integer i__;
 
 
-/*  Tests if two arrays are identical.   
+/*  Tests if two arrays are identical. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-       Parameter adjustments */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     --rj;
     --ri;
 
@@ -5025,7 +5094,8 @@ L30:
 } /* lze_ */
 
 logical lzeres_(char *type__, char *uplo, integer *m, integer *n, 
-	doublecomplex *aa, doublecomplex *as, integer *lda)
+	doublecomplex *aa, doublecomplex *as, integer *lda, ftnlen type_len, 
+	ftnlen uplo_len)
 {
     /* System generated locals */
     integer aa_dim1, aa_offset, as_dim1, as_offset, i__1, i__2, i__3, i__4;
@@ -5035,32 +5105,30 @@ logical lzeres_(char *type__, char *uplo, integer *m, integer *n,
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer ibeg, iend, i__, j;
-    static logical upper;
+    integer i__, j, ibeg, iend;
+    logical upper;
 
 
-#define aa_subscr(a_1,a_2) (a_2)*aa_dim1 + a_1
-#define aa_ref(a_1,a_2) aa[aa_subscr(a_1,a_2)]
-#define as_subscr(a_1,a_2) (a_2)*as_dim1 + a_1
-#define as_ref(a_1,a_2) as[as_subscr(a_1,a_2)]
+/*  Tests if selected elements in two arrays are equal. */
 
+/*  TYPE is 'GE', 'HE' or 'HP'. */
 
-/*  Tests if selected elements in two arrays are equal.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    TYPE is 'GE', 'HE' or 'HP'.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
-
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
-
-       Parameter adjustments */
+/*     .. Scalar Arguments .. */
+/*     .. Array Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Executable Statements .. */
+    /* Parameter adjustments */
     as_dim1 = *lda;
-    as_offset = 1 + as_dim1 * 1;
+    as_offset = 1 + as_dim1;
     as -= as_offset;
     aa_dim1 = *lda;
-    aa_offset = 1 + aa_dim1 * 1;
+    aa_offset = 1 + aa_dim1;
     aa -= aa_offset;
 
     /* Function Body */
@@ -5070,8 +5138,8 @@ logical lzeres_(char *type__, char *uplo, integer *m, integer *n,
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *lda;
 	    for (i__ = *m + 1; i__ <= i__2; ++i__) {
-		i__3 = aa_subscr(i__, j);
-		i__4 = as_subscr(i__, j);
+		i__3 = i__ + j * aa_dim1;
+		i__4 = i__ + j * as_dim1;
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
@@ -5091,8 +5159,8 @@ logical lzeres_(char *type__, char *uplo, integer *m, integer *n,
 	    }
 	    i__2 = ibeg - 1;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		i__3 = aa_subscr(i__, j);
-		i__4 = as_subscr(i__, j);
+		i__3 = i__ + j * aa_dim1;
+		i__4 = i__ + j * as_dim1;
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
@@ -5100,8 +5168,8 @@ logical lzeres_(char *type__, char *uplo, integer *m, integer *n,
 	    }
 	    i__2 = *lda;
 	    for (i__ = iend + 1; i__ <= i__2; ++i__) {
-		i__3 = aa_subscr(i__, j);
-		i__4 = as_subscr(i__, j);
+		i__3 = i__ + j * aa_dim1;
+		i__4 = i__ + j * as_dim1;
 		if (aa[i__3].r != as[i__4].r || aa[i__3].i != as[i__4].i) {
 		    goto L70;
 		}
@@ -5123,12 +5191,6 @@ L80:
 
 } /* lzeres_ */
 
-#undef as_ref
-#undef as_subscr
-#undef aa_ref
-#undef aa_subscr
-
-
 /* Double Complex */ VOID zbeg_(doublecomplex * ret_val, logical *reset)
 {
     /* System generated locals */
@@ -5139,15 +5201,20 @@ L80:
     static integer i__, j, ic, mi, mj;
 
 
-/*  Generates complex numbers as pairs of random numbers uniformly   
-    distributed between -0.5 and 0.5.   
+/*  Generates complex numbers as pairs of random numbers uniformly */
+/*  distributed between -0.5 and 0.5. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office. */
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Local Scalars .. */
+/*     .. Save statement .. */
+/*     .. Intrinsic Functions .. */
+/*     .. Executable Statements .. */
     if (*reset) {
 /*        Initialize local variables. */
 	mi = 891;
@@ -5158,12 +5225,12 @@ L80:
 	*reset = FALSE_;
     }
 
-/*     The sequence of values of I or J is bounded between 1 and 999.   
-       If initial I or J = 1,2,3,6,7 or 9, the period will be 50.   
-       If initial I or J = 4 or 8, the period will be 25.   
-       If initial I or J = 5, the period will be 10.   
-       IC is used to break up the period by skipping 1 value of I or J   
-       in 6. */
+/*     The sequence of values of I or J is bounded between 1 and 999. */
+/*     If initial I or J = 1,2,3,6,7 or 9, the period will be 50. */
+/*     If initial I or J = 4 or 8, the period will be 25. */
+/*     If initial I or J = 5, the period will be 10. */
+/*     IC is used to break up the period by skipping 1 value of I or J */
+/*     in 6. */
 
     ++ic;
 L10:
@@ -5191,19 +5258,21 @@ doublereal ddiff_(doublereal *x, doublereal *y)
     doublereal ret_val;
 
 
-/*  Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs. */
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Executable Statements .. */
     ret_val = *x - *y;
     return ret_val;
 
 /*     End of DDIFF. */
 
-} /* ddiff_   
+} /* ddiff_ */
 
-   Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
+/* Subroutine */ int chkxer_(char *srnamt, integer *infot, integer *nout, 
 	logical *lerr, logical *ok)
 {
     /* Format strings */
@@ -5218,14 +5287,16 @@ doublereal ddiff_(doublereal *x, doublereal *y)
 
 
 
-/*  Tests whether XERBLA has detected an error when it should.   
+/*  Tests whether XERBLA has detected an error when it should. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office. */
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Executable Statements .. */
     if (! (*lerr)) {
 	io___444.ciunit = *nout;
 	s_wsfe(&io___444);
@@ -5240,9 +5311,9 @@ doublereal ddiff_(doublereal *x, doublereal *y)
 
 /*     End of CHKXER. */
 
-} /* chkxer_   
+} /* chkxer_ */
 
-   Subroutine */ int xerbla_(char *srname, integer *info)
+/* Subroutine */ int xerbla_(char *srname, integer *info)
 {
     /* Format strings */
     static char fmt_9999[] = "(\002 ******* XERBLA WAS CALLED WITH INFO ="
@@ -5263,21 +5334,25 @@ doublereal ddiff_(doublereal *x, doublereal *y)
 
 
 
-/*  This is a special version of XERBLA to be used only as part of   
-    the test program for testing error exits from the Level 2 BLAS   
-    routines.   
+/*  This is a special version of XERBLA to be used only as part of */
+/*  the test program for testing error exits from the Level 2 BLAS */
+/*  routines. */
 
-    XERBLA  is an error handler for the Level 2 BLAS routines.   
+/*  XERBLA  is an error handler for the Level 2 BLAS routines. */
 
-    It is called by the Level 2 BLAS routines if an input parameter is   
-    invalid.   
+/*  It is called by the Level 2 BLAS routines if an input parameter is */
+/*  invalid. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office. */
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
+/*     .. Scalar Arguments .. */
+/*     .. Scalars in Common .. */
+/*     .. Common blocks .. */
+/*     .. Executable Statements .. */
     infoc_2.lerr = TRUE_;
     if (*info != infoc_2.infot) {
 	if (infoc_2.infot != 0) {
@@ -5307,6 +5382,6 @@ doublereal ddiff_(doublereal *x, doublereal *y)
 
 /*     End of XERBLA */
 
-} /* xerbla_   
+} /* xerbla_ */
 
-   Main program alias */ int zblat2_ () { MAIN__ (); return 0; }
+/* Main program alias */ int zblat2_ () { MAIN__ (); return 0; }

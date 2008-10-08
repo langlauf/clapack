@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dgbmv_(char *trans, integer *m, integer *n, integer *kl, 
 	integer *ku, doublereal *alpha, doublereal *a, integer *lda, 
@@ -8,111 +8,155 @@
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5, i__6;
+
     /* Local variables */
-    static integer info;
-    static doublereal temp;
-    static integer lenx, leny, i__, j, k;
+    integer i__, j, k, ix, iy, jx, jy, kx, ky, kup1, info;
+    doublereal temp;
+    integer lenx, leny;
     extern logical lsame_(char *, char *);
-    static integer ix, iy, jx, jy, kx, ky;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer kup1;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-/*  Purpose   
-    =======   
-    DGBMV  performs one of the matrix-vector operations   
-       y := alpha*A*x + beta*y,   or   y := alpha*A'*x + beta*y,   
-    where alpha and beta are scalars, x and y are vectors and A is an   
-    m by n band matrix, with kl sub-diagonals and ku super-diagonals.   
-    Parameters   
-    ==========   
-    TRANS  - CHARACTER*1.   
-             On entry, TRANS specifies the operation to be performed as   
-             follows:   
-                TRANS = 'N' or 'n'   y := alpha*A*x + beta*y.   
-                TRANS = 'T' or 't'   y := alpha*A'*x + beta*y.   
-                TRANS = 'C' or 'c'   y := alpha*A'*x + beta*y.   
-             Unchanged on exit.   
-    M      - INTEGER.   
-             On entry, M specifies the number of rows of the matrix A.   
-             M must be at least zero.   
-             Unchanged on exit.   
-    N      - INTEGER.   
-             On entry, N specifies the number of columns of the matrix A.   
-             N must be at least zero.   
-             Unchanged on exit.   
-    KL     - INTEGER.   
-             On entry, KL specifies the number of sub-diagonals of the   
-             matrix A. KL must satisfy  0 .le. KL.   
-             Unchanged on exit.   
-    KU     - INTEGER.   
-             On entry, KU specifies the number of super-diagonals of the   
-             matrix A. KU must satisfy  0 .le. KU.   
-             Unchanged on exit.   
-    ALPHA  - DOUBLE PRECISION.   
-             On entry, ALPHA specifies the scalar alpha.   
-             Unchanged on exit.   
-    A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).   
-             Before entry, the leading ( kl + ku + 1 ) by n part of the   
-             array A must contain the matrix of coefficients, supplied   
-             column by column, with the leading diagonal of the matrix in   
-             row ( ku + 1 ) of the array, the first super-diagonal   
-             starting at position 2 in row ku, the first sub-diagonal   
-             starting at position 1 in row ( ku + 2 ), and so on.   
-             Elements in the array A that do not correspond to elements   
-             in the band matrix (such as the top left ku by ku triangle)   
-             are not referenced.   
-             The following program segment will transfer a band matrix   
-             from conventional full matrix storage to band storage:   
-                   DO 20, J = 1, N   
-                      K = KU + 1 - J   
-                      DO 10, I = MAX( 1, J - KU ), MIN( M, J + KL )   
-                         A( K + I, J ) = matrix( I, J )   
-                10    CONTINUE   
-                20 CONTINUE   
-             Unchanged on exit.   
-    LDA    - INTEGER.   
-             On entry, LDA specifies the first dimension of A as declared   
-             in the calling (sub) program. LDA must be at least   
-             ( kl + ku + 1 ).   
-             Unchanged on exit.   
-    X      - DOUBLE PRECISION array of DIMENSION at least   
-             ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'   
-             and at least   
-             ( 1 + ( m - 1 )*abs( INCX ) ) otherwise.   
-             Before entry, the incremented array X must contain the   
-             vector x.   
-             Unchanged on exit.   
-    INCX   - INTEGER.   
-             On entry, INCX specifies the increment for the elements of   
-             X. INCX must not be zero.   
-             Unchanged on exit.   
-    BETA   - DOUBLE PRECISION.   
-             On entry, BETA specifies the scalar beta. When BETA is   
-             supplied as zero then Y need not be set on input.   
-             Unchanged on exit.   
-    Y      - DOUBLE PRECISION array of DIMENSION at least   
-             ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n'   
-             and at least   
-             ( 1 + ( n - 1 )*abs( INCY ) ) otherwise.   
-             Before entry, the incremented array Y must contain the   
-             vector y. On exit, Y is overwritten by the updated vector y.   
-    INCY   - INTEGER.   
-             On entry, INCY specifies the increment for the elements of   
-             Y. INCY must not be zero.   
-             Unchanged on exit.   
-    Level 2 Blas routine.   
-    -- Written on 22-October-1986.   
-       Jack Dongarra, Argonne National Lab.   
-       Jeremy Du Croz, Nag Central Office.   
-       Sven Hammarling, Nag Central Office.   
-       Richard Hanson, Sandia National Labs.   
-       Test the input parameters.   
-       Parameter adjustments */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DGBMV  performs one of the matrix-vector operations */
+
+/*     y := alpha*A*x + beta*y,   or   y := alpha*A'*x + beta*y, */
+
+/*  where alpha and beta are scalars, x and y are vectors and A is an */
+/*  m by n band matrix, with kl sub-diagonals and ku super-diagonals. */
+
+/*  Arguments */
+/*  ========== */
+
+/*  TRANS  - CHARACTER*1. */
+/*           On entry, TRANS specifies the operation to be performed as */
+/*           follows: */
+
+/*              TRANS = 'N' or 'n'   y := alpha*A*x + beta*y. */
+
+/*              TRANS = 'T' or 't'   y := alpha*A'*x + beta*y. */
+
+/*              TRANS = 'C' or 'c'   y := alpha*A'*x + beta*y. */
+
+/*           Unchanged on exit. */
+
+/*  M      - INTEGER. */
+/*           On entry, M specifies the number of rows of the matrix A. */
+/*           M must be at least zero. */
+/*           Unchanged on exit. */
+
+/*  N      - INTEGER. */
+/*           On entry, N specifies the number of columns of the matrix A. */
+/*           N must be at least zero. */
+/*           Unchanged on exit. */
+
+/*  KL     - INTEGER. */
+/*           On entry, KL specifies the number of sub-diagonals of the */
+/*           matrix A. KL must satisfy  0 .le. KL. */
+/*           Unchanged on exit. */
+
+/*  KU     - INTEGER. */
+/*           On entry, KU specifies the number of super-diagonals of the */
+/*           matrix A. KU must satisfy  0 .le. KU. */
+/*           Unchanged on exit. */
+
+/*  ALPHA  - DOUBLE PRECISION. */
+/*           On entry, ALPHA specifies the scalar alpha. */
+/*           Unchanged on exit. */
+
+/*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ). */
+/*           Before entry, the leading ( kl + ku + 1 ) by n part of the */
+/*           array A must contain the matrix of coefficients, supplied */
+/*           column by column, with the leading diagonal of the matrix in */
+/*           row ( ku + 1 ) of the array, the first super-diagonal */
+/*           starting at position 2 in row ku, the first sub-diagonal */
+/*           starting at position 1 in row ( ku + 2 ), and so on. */
+/*           Elements in the array A that do not correspond to elements */
+/*           in the band matrix (such as the top left ku by ku triangle) */
+/*           are not referenced. */
+/*           The following program segment will transfer a band matrix */
+/*           from conventional full matrix storage to band storage: */
+
+/*                 DO 20, J = 1, N */
+/*                    K = KU + 1 - J */
+/*                    DO 10, I = MAX( 1, J - KU ), MIN( M, J + KL ) */
+/*                       A( K + I, J ) = matrix( I, J ) */
+/*              10    CONTINUE */
+/*              20 CONTINUE */
+
+/*           Unchanged on exit. */
+
+/*  LDA    - INTEGER. */
+/*           On entry, LDA specifies the first dimension of A as declared */
+/*           in the calling (sub) program. LDA must be at least */
+/*           ( kl + ku + 1 ). */
+/*           Unchanged on exit. */
+
+/*  X      - DOUBLE PRECISION array of DIMENSION at least */
+/*           ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n' */
+/*           and at least */
+/*           ( 1 + ( m - 1 )*abs( INCX ) ) otherwise. */
+/*           Before entry, the incremented array X must contain the */
+/*           vector x. */
+/*           Unchanged on exit. */
+
+/*  INCX   - INTEGER. */
+/*           On entry, INCX specifies the increment for the elements of */
+/*           X. INCX must not be zero. */
+/*           Unchanged on exit. */
+
+/*  BETA   - DOUBLE PRECISION. */
+/*           On entry, BETA specifies the scalar beta. When BETA is */
+/*           supplied as zero then Y need not be set on input. */
+/*           Unchanged on exit. */
+
+/*  Y      - DOUBLE PRECISION array of DIMENSION at least */
+/*           ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n' */
+/*           and at least */
+/*           ( 1 + ( n - 1 )*abs( INCY ) ) otherwise. */
+/*           Before entry, the incremented array Y must contain the */
+/*           vector y. On exit, Y is overwritten by the updated vector y. */
+
+/*  INCY   - INTEGER. */
+/*           On entry, INCY specifies the increment for the elements of */
+/*           Y. INCY must not be zero. */
+/*           Unchanged on exit. */
+
+
+/*  Level 2 Blas routine. */
+
+/*  -- Written on 22-October-1986. */
+/*     Jack Dongarra, Argonne National Lab. */
+/*     Jeremy Du Croz, Nag Central Office. */
+/*     Sven Hammarling, Nag Central Office. */
+/*     Richard Hanson, Sandia National Labs. */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --x;
     --y;
+
     /* Function Body */
     info = 0;
     if (! lsame_(trans, "N") && ! lsame_(trans, "T") && ! lsame_(trans, "C")
@@ -137,12 +181,16 @@
 	xerbla_("DGBMV ", &info);
 	return 0;
     }
+
 /*     Quick return if possible. */
+
     if (*m == 0 || *n == 0 || *alpha == 0. && *beta == 1.) {
 	return 0;
     }
-/*     Set  LENX  and  LENY, the lengths of the vectors x and y, and set   
-       up the start points in  X  and  Y. */
+
+/*     Set  LENX  and  LENY, the lengths of the vectors x and y, and set */
+/*     up the start points in  X  and  Y. */
+
     if (lsame_(trans, "N")) {
 	lenx = *n;
 	leny = *m;
@@ -160,9 +208,12 @@
     } else {
 	ky = 1 - (leny - 1) * *incy;
     }
-/*     Start the operations. In this version the elements of A are   
-       accessed sequentially with one pass through the band part of A.   
-       First form  y := beta*y. */
+
+/*     Start the operations. In this version the elements of A are */
+/*     accessed sequentially with one pass through the band part of A. */
+
+/*     First form  y := beta*y. */
+
     if (*beta != 1.) {
 	if (*incy == 1) {
 	    if (*beta == 0.) {
@@ -202,7 +253,9 @@
     }
     kup1 = *ku + 1;
     if (lsame_(trans, "N")) {
+
 /*        Form  y := alpha*A*x + y. */
+
 	jx = kx;
 	if (*incy == 1) {
 	    i__1 = *n;
@@ -216,7 +269,7 @@
 		    i__5 = *m, i__6 = j + *kl;
 		    i__4 = min(i__5,i__6);
 		    for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
-			y[i__] += temp * a_ref(k + i__, j);
+			y[i__] += temp * a[k + i__ + j * a_dim1];
 /* L50: */
 		    }
 		}
@@ -236,7 +289,7 @@
 		    i__5 = *m, i__6 = j + *kl;
 		    i__3 = min(i__5,i__6);
 		    for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
-			y[iy] += temp * a_ref(k + i__, j);
+			y[iy] += temp * a[k + i__ + j * a_dim1];
 			iy += *incy;
 /* L70: */
 		    }
@@ -249,7 +302,9 @@
 	    }
 	}
     } else {
+
 /*        Form  y := alpha*A'*x + y. */
+
 	jy = ky;
 	if (*incx == 1) {
 	    i__1 = *n;
@@ -262,7 +317,7 @@
 		i__5 = *m, i__6 = j + *kl;
 		i__2 = min(i__5,i__6);
 		for (i__ = max(i__3,i__4); i__ <= i__2; ++i__) {
-		    temp += a_ref(k + i__, j) * x[i__];
+		    temp += a[k + i__ + j * a_dim1] * x[i__];
 /* L90: */
 		}
 		y[jy] += *alpha * temp;
@@ -281,7 +336,7 @@
 		i__5 = *m, i__6 = j + *kl;
 		i__4 = min(i__5,i__6);
 		for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
-		    temp += a_ref(k + i__, j) * x[ix];
+		    temp += a[k + i__ + j * a_dim1] * x[ix];
 		    ix += *incx;
 /* L110: */
 		}
@@ -294,8 +349,9 @@
 	    }
 	}
     }
-    return 0;
-/*     End of DGBMV . */
-} /* dgbmv_ */
-#undef a_ref
 
+    return 0;
+
+/*     End of DGBMV . */
+
+} /* dgbmv_ */

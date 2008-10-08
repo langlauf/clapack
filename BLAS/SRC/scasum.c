@@ -1,23 +1,41 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal scasum_(integer *n, complex *cx, integer *incx)
 {
     /* System generated locals */
     integer i__1, i__2, i__3;
     real ret_val, r__1, r__2;
+
     /* Builtin functions */
     double r_imag(complex *);
+
     /* Local variables */
-    static integer i__, nincx;
-    static real stemp;
-/*     takes the sum of the absolute values of a complex vector and   
-       returns a single precision result.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, nincx;
+    real stemp;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     takes the sum of the absolute values of a complex vector and */
+/*     returns a single precision result. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --cx;
+
     /* Function Body */
     ret_val = 0.f;
     stemp = 0.f;
@@ -27,7 +45,9 @@ doublereal scasum_(integer *n, complex *cx, integer *incx)
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
@@ -39,7 +59,9 @@ doublereal scasum_(integer *n, complex *cx, integer *incx)
     }
     ret_val = stemp;
     return ret_val;
+
 /*        code for increment equal to 1 */
+
 L20:
     i__2 = *n;
     for (i__ = 1; i__ <= i__2; ++i__) {
@@ -51,4 +73,3 @@ L20:
     ret_val = stemp;
     return ret_val;
 } /* scasum_ */
-

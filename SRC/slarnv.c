@@ -1,64 +1,81 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slarnv_(integer *idist, integer *iseed, integer *n, real 
 	*x)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SLARNV returns a vector of n random real numbers from a uniform or   
-    normal distribution.   
-
-    Arguments   
-    =========   
-
-    IDIST   (input) INTEGER   
-            Specifies the distribution of the random numbers:   
-            = 1:  uniform (0,1)   
-            = 2:  uniform (-1,1)   
-            = 3:  normal (0,1)   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
-
-    N       (input) INTEGER   
-            The number of random numbers to be generated.   
-
-    X       (output) REAL array, dimension (N)   
-            The generated random numbers.   
-
-    Further Details   
-    ===============   
-
-    This routine calls the auxiliary routine SLARUV to generate random   
-    real numbers from a uniform (0,1) distribution, in batches of up to   
-    128 using vectorisable code. The Box-Muller method is used to   
-    transform numbers from a uniform to a normal distribution.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3;
+
     /* Builtin functions */
     double log(doublereal), sqrt(doublereal), cos(doublereal);
+
     /* Local variables */
-    static integer i__;
-    static real u[128];
-    static integer il, iv, il2;
+    integer i__;
+    real u[128];
+    integer il, iv, il2;
     extern /* Subroutine */ int slaruv_(integer *, integer *, real *);
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLARNV returns a vector of n random real numbers from a uniform or */
+/*  normal distribution. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  IDIST   (input) INTEGER */
+/*          Specifies the distribution of the random numbers: */
+/*          = 1:  uniform (0,1) */
+/*          = 2:  uniform (-1,1) */
+/*          = 3:  normal (0,1) */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
+
+/*  N       (input) INTEGER */
+/*          The number of random numbers to be generated. */
+
+/*  X       (output) REAL array, dimension (N) */
+/*          The generated random numbers. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  This routine calls the auxiliary routine SLARUV to generate random */
+/*  real numbers from a uniform (0,1) distribution, in batches of up to */
+/*  128 using vectorisable code. The Box-Muller method is used to */
+/*  transform numbers from a uniform to a normal distribution. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --x;
     --iseed;
 
@@ -74,8 +91,8 @@
 	    il2 = il;
 	}
 
-/*        Call SLARUV to generate IL2 numbers from a uniform (0,1)   
-          distribution (IL2 <= LV) */
+/*        Call SLARUV to generate IL2 numbers from a uniform (0,1) */
+/*        distribution (IL2 <= LV) */
 
 	slaruv_(&iseed[1], &il2, u);
 
@@ -115,4 +132,3 @@
 /*     End of SLARNV */
 
 } /* slarnv_ */
-

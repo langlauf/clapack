@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,100 +16,114 @@ static real c_b11 = -1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static real unfl, ovfl;
+    real eps, unfl, ovfl;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int sort01_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *, real *);
-    static real wnorm;
+    real wnorm;
     extern /* Subroutine */ int slabad_(real *, real *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *);
-    static integer ldwork;
-    static real smlnum, eps;
+    integer ldwork;
+    real smlnum;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SHST01 tests the reduction of a general matrix A to upper Hessenberg   
-    form:  A = Q*H*Q'.  Two test ratios are computed;   
+/*  SHST01 tests the reduction of a general matrix A to upper Hessenberg */
+/*  form:  A = Q*H*Q'.  Two test ratios are computed; */
 
-    RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
-    RESULT(2) = norm( I - Q'*Q ) / ( N * EPS )   
+/*  RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS ) */
+/*  RESULT(2) = norm( I - Q'*Q ) / ( N * EPS ) */
 
-    The matrix Q is assumed to be given explicitly as it would be   
-    following SGEHRD + SORGHR.   
+/*  The matrix Q is assumed to be given explicitly as it would be */
+/*  following SGEHRD + SORGHR. */
 
-    In this version, ILO and IHI are not used and are assumed to be 1 and   
-    N, respectively.   
+/*  In this version, ILO and IHI are not used and are assumed to be 1 and */
+/*  N, respectively. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    ILO     (input) INTEGER   
-    IHI     (input) INTEGER   
-            A is assumed to be upper triangular in rows and columns   
-            1:ILO-1 and IHI+1:N, so Q differs from the identity only in   
-            rows and columns ILO+1:IHI.   
+/*  ILO     (input) INTEGER */
+/*  IHI     (input) INTEGER */
+/*          A is assumed to be upper triangular in rows and columns */
+/*          1:ILO-1 and IHI+1:N, so Q differs from the identity only in */
+/*          rows and columns ILO+1:IHI. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The original n by n matrix A.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The original n by n matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    H       (input) REAL array, dimension (LDH,N)   
-            The upper Hessenberg matrix H from the reduction A = Q*H*Q'   
-            as computed by SGEHRD.  H is assumed to be zero below the   
-            first subdiagonal.   
+/*  H       (input) REAL array, dimension (LDH,N) */
+/*          The upper Hessenberg matrix H from the reduction A = Q*H*Q' */
+/*          as computed by SGEHRD.  H is assumed to be zero below the */
+/*          first subdiagonal. */
 
-    LDH     (input) INTEGER   
-            The leading dimension of the array H.  LDH >= max(1,N).   
+/*  LDH     (input) INTEGER */
+/*          The leading dimension of the array H.  LDH >= max(1,N). */
 
-    Q       (input) REAL array, dimension (LDQ,N)   
-            The orthogonal matrix Q from the reduction A = Q*H*Q' as   
-            computed by SGEHRD + SORGHR.   
+/*  Q       (input) REAL array, dimension (LDQ,N) */
+/*          The orthogonal matrix Q from the reduction A = Q*H*Q' as */
+/*          computed by SGEHRD + SORGHR. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of the array Q.  LDQ >= max(1,N).   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of the array Q.  LDQ >= max(1,N). */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= 2*N*N.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= 2*N*N. */
 
-    RESULT  (output) REAL array, dimension (2)   
-            RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( N * EPS )   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          RESULT(1) = norm( A - Q*H*Q' ) / ( norm(A) * N * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( N * EPS ) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick return if possible   
+/*     Quick return if possible */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --work;
     --result;
@@ -132,9 +141,9 @@ static real c_b11 = -1.f;
     slabad_(&unfl, &ovfl);
     smlnum = unfl * *n / eps;
 
-/*     Test 1:  Compute norm( A - Q*H*Q' ) / ( norm(A) * N * EPS )   
+/*     Test 1:  Compute norm( A - Q*H*Q' ) / ( norm(A) * N * EPS ) */
 
-       Copy A to WORK */
+/*     Copy A to WORK */
 
     ldwork = max(1,*n);
     slacpy_(" ", n, n, &a[a_offset], lda, &work[1], &ldwork);
@@ -154,9 +163,9 @@ static real c_b11 = -1.f;
     anorm = dmax(r__1,unfl);
     wnorm = slange_("1", n, n, &work[1], &ldwork, &work[ldwork * *n + 1]);
 
-/*     Note that RESULT(1) cannot overflow and is bounded by 1/(N*EPS)   
+/*     Note that RESULT(1) cannot overflow and is bounded by 1/(N*EPS) */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = smlnum, r__2 = anorm * eps;
     result[1] = dmin(wnorm,anorm) / dmax(r__1,r__2) / *n;
 
@@ -169,4 +178,3 @@ static real c_b11 = -1.f;
 /*     End of SHST01 */
 
 } /* shst01_ */
-

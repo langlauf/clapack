@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,120 +21,130 @@ static doublecomplex c_b2 = {1.,0.};
     void d_cnjg(doublecomplex *, doublecomplex *);
 
     /* Local variables */
-    static integer joff, jcol, jvec;
-    static doublereal unfl;
-    static integer jrow;
-    static doublereal temp1;
-    static integer j;
+    integer j;
+    doublereal ulp;
+    integer joff, jcol, jvec;
+    doublereal unfl;
+    integer jrow;
+    doublereal temp1;
     extern logical lsame_(char *, char *);
-    static char norma[1];
-    static doublereal anorm;
+    char norma[1];
+    doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static char norme[1];
-    static doublereal enorm;
-    static doublecomplex wtemp;
+    char norme[1];
+    doublereal enorm;
+    doublecomplex wtemp;
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *);
-    static doublereal enrmin, enrmax;
+    doublereal enrmin, enrmax;
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static integer itrnse;
-    static doublereal errnrm;
-    static integer itrnsw;
-    static doublereal ulp;
+    integer itrnse;
+    doublereal errnrm;
+    integer itrnsw;
 
 
-#define e_subscr(a_1,a_2) (a_2)*e_dim1 + a_1
-#define e_ref(a_1,a_2) e[e_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGET22 does an eigenvector check. */
 
-    Purpose   
-    =======   
+/*  The basic test is: */
 
-    ZGET22 does an eigenvector check.   
+/*     RESULT(1) = | A E  -  E W | / ( |A| |E| ulp ) */
 
-    The basic test is:   
+/*  using the 1-norm.  It also tests the normalization of E: */
 
-       RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
+/*     RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp ) */
+/*                  j */
 
-    using the 1-norm.  It also tests the normalization of E:   
+/*  where E(j) is the j-th eigenvector, and m-norm is the max-norm of a */
+/*  vector.  The max-norm of a complex n-vector x in this case is the */
+/*  maximum of |re(x(i)| + |im(x(i)| over i = 1, ..., n. */
 
-       RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
-                    j   
+/*  Arguments */
+/*  ========== */
 
-    where E(j) is the j-th eigenvector, and m-norm is the max-norm of a   
-    vector.  The max-norm of a complex n-vector x in this case is the   
-    maximum of |re(x(i)| + |im(x(i)| over i = 1, ..., n.   
+/*  TRANSA  (input) CHARACTER*1 */
+/*          Specifies whether or not A is transposed. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose */
+/*          = 'C':  Conjugate transpose */
 
-    Arguments   
-    ==========   
+/*  TRANSE  (input) CHARACTER*1 */
+/*          Specifies whether or not E is transposed. */
+/*          = 'N':  No transpose, eigenvectors are in columns of E */
+/*          = 'T':  Transpose, eigenvectors are in rows of E */
+/*          = 'C':  Conjugate transpose, eigenvectors are in rows of E */
 
-    TRANSA  (input) CHARACTER*1   
-            Specifies whether or not A is transposed.   
-            = 'N':  No transpose   
-            = 'T':  Transpose   
-            = 'C':  Conjugate transpose   
+/*  TRANSW  (input) CHARACTER*1 */
+/*          Specifies whether or not W is transposed. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose, same as TRANSW = 'N' */
+/*          = 'C':  Conjugate transpose, use -WI(j) instead of WI(j) */
 
-    TRANSE  (input) CHARACTER*1   
-            Specifies whether or not E is transposed.   
-            = 'N':  No transpose, eigenvectors are in columns of E   
-            = 'T':  Transpose, eigenvectors are in rows of E   
-            = 'C':  Conjugate transpose, eigenvectors are in rows of E   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    TRANSW  (input) CHARACTER*1   
-            Specifies whether or not W is transposed.   
-            = 'N':  No transpose   
-            = 'T':  Transpose, same as TRANSW = 'N'   
-            = 'C':  Conjugate transpose, use -WI(j) instead of WI(j)   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The matrix whose eigenvectors are in E. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The matrix whose eigenvectors are in E.   
+/*  E       (input) COMPLEX*16 array, dimension (LDE,N) */
+/*          The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors */
+/*          are stored in the columns of E, if TRANSE = 'T' or 'C', the */
+/*          eigenvectors are stored in the rows of E. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDE     (input) INTEGER */
+/*          The leading dimension of the array E.  LDE >= max(1,N). */
 
-    E       (input) COMPLEX*16 array, dimension (LDE,N)   
-            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors   
-            are stored in the columns of E, if TRANSE = 'T' or 'C', the   
-            eigenvectors are stored in the rows of E.   
+/*  W       (input) COMPLEX*16 array, dimension (N) */
+/*          The eigenvalues of A. */
 
-    LDE     (input) INTEGER   
-            The leading dimension of the array E.  LDE >= max(1,N).   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (N*N) */
 
-    W       (input) COMPLEX*16 array, dimension (N)   
-            The eigenvalues of A.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (N*N)   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          RESULT(1) = | A E  -  E W | / ( |A| |E| ulp ) */
+/*          RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp ) */
+/*                       j */
+/*  ===================================================================== */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
-            RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
-                         j   
-    =====================================================================   
+/*     Initialize RESULT (in case N=0) */
 
-
-       Initialize RESULT (in case N=0)   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     e_dim1 = *lde;
-    e_offset = 1 + e_dim1 * 1;
+    e_offset = 1 + e_dim1;
     e -= e_offset;
     --w;
     --work;
@@ -188,9 +193,9 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		i__3 = e_subscr(j, jvec);
+		i__3 = j + jvec * e_dim1;
 		d__3 = temp1, d__4 = (d__1 = e[i__3].r, abs(d__1)) + (d__2 = 
-			d_imag(&e_ref(j, jvec)), abs(d__2));
+			d_imag(&e[j + jvec * e_dim1]), abs(d__2));
 		temp1 = max(d__3,d__4);
 /* L10: */
 	    }
@@ -210,9 +215,9 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jvec = 1; jvec <= i__2; ++jvec) {
 /* Computing MAX */
-		i__3 = e_subscr(jvec, j);
+		i__3 = jvec + j * e_dim1;
 		d__3 = rwork[jvec], d__4 = (d__1 = e[i__3].r, abs(d__1)) + (
-			d__2 = d_imag(&e_ref(jvec, j)), abs(d__2));
+			d__2 = d_imag(&e[jvec + j * e_dim1]), abs(d__2));
 		rwork[jvec] = max(d__3,d__4);
 /* L40: */
 	    }
@@ -231,21 +236,21 @@ static doublecomplex c_b2 = {1.,0.};
 	}
     }
 
-/*     Norm of A:   
+/*     Norm of A: */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = zlange_(norma, n, n, &a[a_offset], lda, &rwork[1]);
     anorm = max(d__1,unfl);
 
-/*     Norm of E:   
+/*     Norm of E: */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = zlange_(norme, n, n, &e[e_offset], lde, &rwork[1]);
     enorm = max(d__1,ulp);
 
-/*     Norm of error:   
+/*     Norm of error: */
 
-       Error =  AE - EW */
+/*     Error =  AE - EW */
 
     zlaset_("Full", n, n, &c_b1, &c_b1, &work[1], n);
 
@@ -264,7 +269,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		i__4 = e_subscr(jrow, jcol);
+		i__4 = jrow + jcol * e_dim1;
 		z__1.r = e[i__4].r * wtemp.r - e[i__4].i * wtemp.i, z__1.i = 
 			e[i__4].r * wtemp.i + e[i__4].i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -274,7 +279,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		i__4 = e_subscr(jcol, jrow);
+		i__4 = jcol + jrow * e_dim1;
 		z__1.r = e[i__4].r * wtemp.r - e[i__4].i * wtemp.i, z__1.i = 
 			e[i__4].r * wtemp.i + e[i__4].i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -284,7 +289,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    i__2 = *n;
 	    for (jrow = 1; jrow <= i__2; ++jrow) {
 		i__3 = joff + jrow;
-		d_cnjg(&z__2, &e_ref(jcol, jrow));
+		d_cnjg(&z__2, &e[jcol + jrow * e_dim1]);
 		z__1.r = z__2.r * wtemp.r - z__2.i * wtemp.i, z__1.i = z__2.r 
 			* wtemp.i + z__2.i * wtemp.r;
 		work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -295,7 +300,7 @@ static doublecomplex c_b2 = {1.,0.};
 /* L100: */
     }
 
-    z__1.r = -1., z__1.i = 0.;
+    z__1.r = -1., z__1.i = -0.;
     zgemm_(transa, transe, n, n, n, &c_b2, &a[a_offset], lda, &e[e_offset], 
 	    lde, &z__1, &work[1], n);
 
@@ -315,9 +320,9 @@ static doublecomplex c_b2 = {1.,0.};
 	}
     }
 
-/*     Compute RESULT(2) : the normalization error in E.   
+/*     Compute RESULT(2) : the normalization error in E. */
 
-   Computing MAX */
+/* Computing MAX */
     d__3 = (d__1 = enrmax - 1., abs(d__1)), d__4 = (d__2 = enrmin - 1., abs(
 	    d__2));
     result[2] = max(d__3,d__4) / ((doublereal) (*n) * ulp);
@@ -327,8 +332,3 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGET22 */
 
 } /* zget22_ */
-
-#undef e_ref
-#undef e_subscr
-
-

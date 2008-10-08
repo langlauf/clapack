@@ -1,107 +1,128 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int dlaqp2_(integer *m, integer *n, integer *offset, 
 	doublereal *a, integer *lda, integer *jpvt, doublereal *tau, 
 	doublereal *vn1, doublereal *vn2, doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    DLAQP2 computes a QR factorization with column pivoting of   
-    the block A(OFFSET+1:M,1:N).   
-    The block A(1:OFFSET,1:N) is accordingly pivoted, but not factorized.   
-
-    Arguments   
-    =========   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A. M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A. N >= 0.   
-
-    OFFSET  (input) INTEGER   
-            The number of rows of the matrix A that must be pivoted   
-            but no factorized. OFFSET >= 0.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the M-by-N matrix A.   
-            On exit, the upper triangle of block A(OFFSET+1:M,1:N) is   
-            the triangular factor obtained; the elements in block   
-            A(OFFSET+1:M,1:N) below the diagonal, together with the   
-            array TAU, represent the orthogonal matrix Q as a product of   
-            elementary reflectors. Block A(1:OFFSET,1:N) has been   
-            accordingly pivoted, but no factorized.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,M).   
-
-    JPVT    (input/output) INTEGER array, dimension (N)   
-            On entry, if JPVT(i) .ne. 0, the i-th column of A is permuted   
-            to the front of A*P (a leading column); if JPVT(i) = 0,   
-            the i-th column of A is a free column.   
-            On exit, if JPVT(i) = k, then the i-th column of A*P   
-            was the k-th column of A.   
-
-    TAU     (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors.   
-
-    VN1     (input/output) DOUBLE PRECISION array, dimension (N)   
-            The vector with the partial column norms.   
-
-    VN2     (input/output) DOUBLE PRECISION array, dimension (N)   
-            The vector with the exact column norms.   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (N)   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-      G. Quintana-Orti, Depto. de Informatica, Universidad Jaime I, Spain   
-      X. Sun, Computer Science Dept., Duke University, USA   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
     doublereal d__1, d__2;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static doublereal temp;
+    integer i__, j, mn;
+    doublereal aii;
+    integer pvt;
+    doublereal temp;
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static doublereal temp2;
-    static integer i__, j;
+    doublereal temp2, tol3z;
     extern /* Subroutine */ int dlarf_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *);
-    static integer offpi, itemp;
+    integer offpi, itemp;
     extern /* Subroutine */ int dswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer mn;
-    extern /* Subroutine */ int dlarfg_(integer *, doublereal *, doublereal *,
+    extern doublereal dlamch_(char *);
+    extern /* Subroutine */ int dlarfg_(integer *, doublereal *, doublereal *, 
 	     integer *, doublereal *);
     extern integer idamax_(integer *, doublereal *, integer *);
-    static doublereal aii;
-    static integer pvt;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLAQP2 computes a QR factorization with column pivoting of */
+/*  the block A(OFFSET+1:M,1:N). */
+/*  The block A(1:OFFSET,1:N) is accordingly pivoted, but not factorized. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. M >= 0. */
+
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. N >= 0. */
+
+/*  OFFSET  (input) INTEGER */
+/*          The number of rows of the matrix A that must be pivoted */
+/*          but no factorized. OFFSET >= 0. */
+
+/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          On entry, the M-by-N matrix A. */
+/*          On exit, the upper triangle of block A(OFFSET+1:M,1:N) is */
+/*          the triangular factor obtained; the elements in block */
+/*          A(OFFSET+1:M,1:N) below the diagonal, together with the */
+/*          array TAU, represent the orthogonal matrix Q as a product of */
+/*          elementary reflectors. Block A(1:OFFSET,1:N) has been */
+/*          accordingly pivoted, but no factorized. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= max(1,M). */
+
+/*  JPVT    (input/output) INTEGER array, dimension (N) */
+/*          On entry, if JPVT(i) .ne. 0, the i-th column of A is permuted */
+/*          to the front of A*P (a leading column); if JPVT(i) = 0, */
+/*          the i-th column of A is a free column. */
+/*          On exit, if JPVT(i) = k, then the i-th column of A*P */
+/*          was the k-th column of A. */
+
+/*  TAU     (output) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors. */
+
+/*  VN1     (input/output) DOUBLE PRECISION array, dimension (N) */
+/*          The vector with the partial column norms. */
+
+/*  VN2     (input/output) DOUBLE PRECISION array, dimension (N) */
+/*          The vector with the exact column norms. */
+
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (N) */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*    G. Quintana-Orti, Depto. de Informatica, Universidad Jaime I, Spain */
+/*    X. Sun, Computer Science Dept., Duke University, USA */
+
+/*  Partial column norm updating strategy modified by */
+/*    Z. Drmac and Z. Bujanovic, Dept. of Mathematics, */
+/*    University of Zagreb, Croatia. */
+/*    June 2006. */
+/*  For more details see LAPACK Working Note 176. */
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --jpvt;
     --tau;
@@ -109,10 +130,11 @@
     --vn2;
     --work;
 
-    /* Function Body   
-   Computing MIN */
+    /* Function Body */
+/* Computing MIN */
     i__1 = *m - *offset;
     mn = min(i__1,*n);
+    tol3z = sqrt(dlamch_("Epsilon"));
 
 /*     Compute factorization. */
 
@@ -127,7 +149,8 @@
 	pvt = i__ - 1 + idamax_(&i__2, &vn1[i__], &c__1);
 
 	if (pvt != i__) {
-	    dswap_(m, &a_ref(1, pvt), &c__1, &a_ref(1, i__), &c__1);
+	    dswap_(m, &a[pvt * a_dim1 + 1], &c__1, &a[i__ * a_dim1 + 1], &
+		    c__1);
 	    itemp = jpvt[pvt];
 	    jpvt[pvt] = jpvt[i__];
 	    jpvt[i__] = itemp;
@@ -139,24 +162,24 @@
 
 	if (offpi < *m) {
 	    i__2 = *m - offpi + 1;
-	    dlarfg_(&i__2, &a_ref(offpi, i__), &a_ref(offpi + 1, i__), &c__1, 
-		    &tau[i__]);
+	    dlarfg_(&i__2, &a[offpi + i__ * a_dim1], &a[offpi + 1 + i__ * 
+		    a_dim1], &c__1, &tau[i__]);
 	} else {
-	    dlarfg_(&c__1, &a_ref(*m, i__), &a_ref(*m, i__), &c__1, &tau[i__])
-		    ;
+	    dlarfg_(&c__1, &a[*m + i__ * a_dim1], &a[*m + i__ * a_dim1], &
+		    c__1, &tau[i__]);
 	}
 
 	if (i__ < *n) {
 
 /*           Apply H(i)' to A(offset+i:m,i+1:n) from the left. */
 
-	    aii = a_ref(offpi, i__);
-	    a_ref(offpi, i__) = 1.;
+	    aii = a[offpi + i__ * a_dim1];
+	    a[offpi + i__ * a_dim1] = 1.;
 	    i__2 = *m - offpi + 1;
 	    i__3 = *n - i__;
-	    dlarf_("Left", &i__2, &i__3, &a_ref(offpi, i__), &c__1, &tau[i__],
-		     &a_ref(offpi, i__ + 1), lda, &work[1]);
-	    a_ref(offpi, i__) = aii;
+	    dlarf_("Left", &i__2, &i__3, &a[offpi + i__ * a_dim1], &c__1, &
+		    tau[i__], &a[offpi + (i__ + 1) * a_dim1], lda, &work[1]);
+	    a[offpi + i__ * a_dim1] = aii;
 	}
 
 /*        Update partial column norms. */
@@ -164,17 +187,22 @@
 	i__2 = *n;
 	for (j = i__ + 1; j <= i__2; ++j) {
 	    if (vn1[j] != 0.) {
+
+/*              NOTE: The following 4 lines follow from the analysis in */
+/*              Lapack Working Note 176. */
+
 /* Computing 2nd power */
-		d__2 = (d__1 = a_ref(offpi, j), abs(d__1)) / vn1[j];
+		d__2 = (d__1 = a[offpi + j * a_dim1], abs(d__1)) / vn1[j];
 		temp = 1. - d__2 * d__2;
 		temp = max(temp,0.);
 /* Computing 2nd power */
 		d__1 = vn1[j] / vn2[j];
-		temp2 = temp * .05 * (d__1 * d__1) + 1.;
-		if (temp2 == 1.) {
+		temp2 = temp * (d__1 * d__1);
+		if (temp2 <= tol3z) {
 		    if (offpi < *m) {
 			i__3 = *m - offpi;
-			vn1[j] = dnrm2_(&i__3, &a_ref(offpi + 1, j), &c__1);
+			vn1[j] = dnrm2_(&i__3, &a[offpi + 1 + j * a_dim1], &
+				c__1);
 			vn2[j] = vn1[j];
 		    } else {
 			vn1[j] = 0.;
@@ -195,7 +223,3 @@
 /*     End of DLAQP2 */
 
 } /* dlaqp2_ */
-
-#undef a_ref
-
-

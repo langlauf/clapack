@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -35,24 +30,25 @@ static integer c__1 = 1;
     real r__1, r__2, r__3;
     complex q__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double pow_ri(real *, integer *);
     integer pow_ii(integer *, integer *), s_wsle(cilist *), e_wsle(void), 
 	    s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static char path[3];
-    static real norm, rpow[11];
-    static complex a[25]	/* was [5][5] */;
-    static real c__[5];
-    static integer i__, j, m, n;
-    static real r__[5], ccond, rcond, rcmin, rcmax, ratio;
-    static complex ab[65]	/* was [13][5] */, ap[15];
-    static integer kl;
-    static logical ok;
-    static integer ku;
+    complex a[25]	/* was [5][5] */;
+    real c__[5];
+    integer i__, j, m, n;
+    real r__[5];
+    complex ab[65]	/* was [13][5] */, ap[15];
+    integer kl;
+    logical ok;
+    integer ku;
+    real eps, pow[11];
+    integer info;
+    char path[3];
+    real norm, rpow[11], ccond, rcond, rcmin, rcmax, ratio;
     extern /* Subroutine */ int cgbequ_(integer *, integer *, integer *, 
 	    integer *, complex *, integer *, real *, real *, real *, real *, 
 	    real *, integer *);
@@ -60,10 +56,10 @@ static integer c__1 = 1;
     extern /* Subroutine */ int cgeequ_(integer *, integer *, complex *, 
 	    integer *, real *, real *, real *, real *, real *, integer *), 
 	    cpbequ_(char *, integer *, integer *, complex *, integer *, real *
-	    , real *, real *, integer *), cpoequ_(integer *, complex *
-	    , integer *, real *, real *, real *, integer *), cppequ_(char *, 
+, real *, real *, integer *), cpoequ_(integer *, complex *
+, integer *, real *, real *, real *, integer *), cppequ_(char *, 
 	    integer *, complex *, real *, real *, real *, integer *);
-    static real reslts[5], eps, pow[11];
+    real reslts[5];
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, 0, 0 };
@@ -76,34 +72,42 @@ static integer c__1 = 1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*5 + a_1 - 6
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define ab_subscr(a_1,a_2) (a_2)*13 + a_1 - 14
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CCHKEQ tests CGEEQU, CGBEQU, CPOEQU, CPPEQU and CPBEQU */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CCHKEQ tests CGEEQU, CGBEQU, CPOEQU, CPPEQU and CPBEQU   
+/*  THRESH  (input) REAL */
+/*          Threshold for testing routines. Should be between 2 and 10. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    THRESH  (input) REAL   
-            Threshold for testing routines. Should be between 2 and 10.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "EQ", (ftnlen)2, (ftnlen)2);
@@ -128,12 +132,12 @@ static integer c__1 = 1;
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 5; ++i__) {
 		    if (i__ <= m && j <= n) {
-			i__1 = a_subscr(i__, j);
+			i__1 = i__ + j * 5 - 6;
 			i__2 = i__ + j;
 			r__1 = pow[i__ + j] * pow_ii(&c_n1, &i__2);
 			a[i__1].r = r__1, a[i__1].i = 0.f;
 		    } else {
-			i__1 = a_subscr(i__, j);
+			i__1 = i__ + j * 5 - 6;
 			a[i__1].r = 0.f, a[i__1].i = 0.f;
 		    }
 /* L30: */
@@ -186,7 +190,7 @@ static integer c__1 = 1;
 /*     Test with zero rows and columns */
 
     for (j = 1; j <= 5; ++j) {
-	i__1 = a_subscr(4, j);
+	i__1 = j * 5 - 2;
 	a[i__1].r = 0.f, a[i__1].i = 0.f;
 /* L90: */
     }
@@ -196,12 +200,12 @@ static integer c__1 = 1;
     }
 
     for (j = 1; j <= 5; ++j) {
-	i__1 = a_subscr(4, j);
+	i__1 = j * 5 - 2;
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 /* L100: */
     }
     for (i__ = 1; i__ <= 5; ++i__) {
-	i__1 = a_subscr(i__, 4);
+	i__1 = i__ + 14;
 	a[i__1].r = 0.f, a[i__1].i = 0.f;
 /* L110: */
     }
@@ -226,7 +230,7 @@ static integer c__1 = 1;
 
 		    for (j = 1; j <= 5; ++j) {
 			for (i__ = 1; i__ <= 13; ++i__) {
-			    i__3 = ab_subscr(i__, j);
+			    i__3 = i__ + j * 13 - 14;
 			    ab[i__3].r = 0.f, ab[i__3].i = 0.f;
 /* L120: */
 			}
@@ -242,7 +246,7 @@ static integer c__1 = 1;
 			    i__7 = 1, i__8 = j - ku;
 			    if (i__ <= min(i__5,i__6) && i__ >= max(i__7,i__8)
 				     && j <= n) {
-				i__5 = ab_subscr(ku + 1 + i__ - j, j);
+				i__5 = ku + 1 + i__ - j + j * 13 - 14;
 				i__6 = i__ + j;
 				r__1 = pow[i__ + j] * pow_ii(&c_n1, &i__6);
 				ab[i__5].r = r__1, ab[i__5].i = 0.f;
@@ -362,12 +366,12 @@ static integer c__1 = 1;
 	for (i__ = 1; i__ <= 5; ++i__) {
 	    for (j = 1; j <= 5; ++j) {
 		if (i__ <= n && j == i__) {
-		    i__1 = a_subscr(i__, j);
+		    i__1 = i__ + j * 5 - 6;
 		    i__2 = i__ + j;
 		    r__1 = pow[i__ + j] * pow_ii(&c_n1, &i__2);
 		    a[i__1].r = r__1, a[i__1].i = 0.f;
 		} else {
-		    i__1 = a_subscr(i__, j);
+		    i__1 = i__ + j * 5 - 6;
 		    a[i__1].r = 0.f, a[i__1].i = 0.f;
 		}
 /* L260: */
@@ -401,9 +405,8 @@ static integer c__1 = 1;
 	}
 /* L290: */
     }
-    i__1 = a_subscr(4, 4);
-    q__1.r = -1.f, q__1.i = 0.f;
-    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
+    q__1.r = -1.f, q__1.i = -0.f;
+    a[18].r = q__1.r, a[18].i = q__1.i;
     cpoequ_(&c__5, a, &c__5, r__, &rcond, &norm, &info);
     if (info != 4) {
 	reslts[2] = 1.f;
@@ -502,7 +505,7 @@ static integer c__1 = 1;
     }
     i__ = 13;
     i__1 = i__ - 1;
-    q__1.r = -1.f, q__1.i = 0.f;
+    q__1.r = -1.f, q__1.i = -0.f;
     ap[i__1].r = q__1.r, ap[i__1].i = q__1.i;
     cppequ_("L", &c__5, ap, r__, &rcond, &norm, &info);
     if (info != 4) {
@@ -522,7 +525,7 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    i__2 = ab_subscr(i__, j);
+		    i__2 = i__ + j * 13 - 14;
 		    ab[i__2].r = 0.f, ab[i__2].i = 0.f;
 /* L370: */
 		}
@@ -530,7 +533,7 @@ static integer c__1 = 1;
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ab_subscr(kl + 1, j);
+		i__3 = kl + 1 + j * 13 - 14;
 		i__4 = j << 1;
 		ab[i__3].r = pow[i__4], ab[i__3].i = 0.f;
 /* L390: */
@@ -562,10 +565,10 @@ static integer c__1 = 1;
 	    }
 	    if (n != 0) {
 /* Computing MAX */
-		i__2 = n - 1;
-		i__3 = ab_subscr(kl + 1, max(i__2,1));
-		q__1.r = -1.f, q__1.i = 0.f;
-		ab[i__3].r = q__1.r, ab[i__3].i = q__1.i;
+		i__3 = n - 1;
+		i__2 = kl + 1 + max(i__3,1) * 13 - 14;
+		q__1.r = -1.f, q__1.i = -0.f;
+		ab[i__2].r = q__1.r, ab[i__2].i = q__1.i;
 		cpbequ_("U", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -578,7 +581,7 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    i__2 = ab_subscr(i__, j);
+		    i__2 = i__ + j * 13 - 14;
 		    ab[i__2].r = 0.f, ab[i__2].i = 0.f;
 /* L410: */
 		}
@@ -586,7 +589,7 @@ static integer c__1 = 1;
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ab_subscr(1, j);
+		i__3 = j * 13 - 13;
 		i__4 = j << 1;
 		ab[i__3].r = pow[i__4], ab[i__3].i = 0.f;
 /* L430: */
@@ -618,10 +621,10 @@ static integer c__1 = 1;
 	    }
 	    if (n != 0) {
 /* Computing MAX */
-		i__2 = n - 1;
-		i__3 = ab_subscr(1, max(i__2,1));
-		q__1.r = -1.f, q__1.i = 0.f;
-		ab[i__3].r = q__1.r, ab[i__3].i = q__1.i;
+		i__3 = n - 1;
+		i__2 = max(i__3,1) * 13 - 13;
+		q__1.r = -1.f, q__1.i = -0.f;
+		ab[i__2].r = q__1.r, ab[i__2].i = q__1.i;
 		cpbequ_("L", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -686,10 +689,3 @@ static integer c__1 = 1;
 /*     End of CCHKEQ */
 
 } /* cchkeq_ */
-
-#undef ab_ref
-#undef ab_subscr
-#undef a_ref
-#undef a_subscr
-
-

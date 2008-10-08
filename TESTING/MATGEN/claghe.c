@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,89 +21,99 @@ static integer c__1 = 1;
     void c_div(complex *, complex *, complex *), r_cnjg(complex *, complex *);
 
     /* Local variables */
+    integer i__, j;
+    complex wa, wb;
+    real wn;
+    complex tau;
     extern /* Subroutine */ int cher2_(char *, integer *, complex *, complex *
-	    , integer *, complex *, integer *, complex *, integer *);
-    static integer i__, j;
-    extern /* Subroutine */ int cgerc_(integer *, integer *, complex *, 
-	    complex *, integer *, complex *, integer *, complex *, integer *);
-    static complex alpha;
+, integer *, complex *, integer *, complex *, integer *), 
+	    cgerc_(integer *, integer *, complex *, complex *, integer *, 
+	    complex *, integer *, complex *, integer *);
+    complex alpha;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
-	    , complex *, integer *, complex *, integer *, complex *, complex *
-	    , integer *), chemv_(char *, integer *, complex *, 
+, complex *, integer *, complex *, integer *, complex *, complex *
+, integer *), chemv_(char *, integer *, complex *, 
 	    complex *, integer *, complex *, integer *, complex *, complex *, 
 	    integer *), caxpy_(integer *, complex *, complex *, 
 	    integer *, complex *, integer *);
     extern doublereal scnrm2_(integer *, complex *, integer *);
-    static complex wa, wb;
-    static real wn;
     extern /* Subroutine */ int xerbla_(char *, integer *), clarnv_(
 	    integer *, integer *, integer *, complex *);
-    static complex tau;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CLAGHE generates a complex hermitian matrix A, by pre- and post- */
+/*  multiplying a real diagonal matrix D with a random unitary matrix: */
+/*  A = U*D*U'. The semi-bandwidth may then be reduced to k by additional */
+/*  unitary transformations. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CLAGHE generates a complex hermitian matrix A, by pre- and post-   
-    multiplying a real diagonal matrix D with a random unitary matrix:   
-    A = U*D*U'. The semi-bandwidth may then be reduced to k by additional   
-    unitary transformations.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  K       (input) INTEGER */
+/*          The number of nonzero subdiagonals within the band of A. */
+/*          0 <= K <= N-1. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  D       (input) REAL array, dimension (N) */
+/*          The diagonal elements of the diagonal matrix D. */
 
-    K       (input) INTEGER   
-            The number of nonzero subdiagonals within the band of A.   
-            0 <= K <= N-1.   
+/*  A       (output) COMPLEX array, dimension (LDA,N) */
+/*          The generated n by n hermitian matrix A (the full matrix is */
+/*          stored). */
 
-    D       (input) REAL array, dimension (N)   
-            The diagonal elements of the diagonal matrix D.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= N. */
 
-    A       (output) COMPLEX array, dimension (LDA,N)   
-            The generated n by n hermitian matrix A (the full matrix is   
-            stored).   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= N.   
+/*  WORK    (workspace) COMPLEX array, dimension (2*N) */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    WORK    (workspace) COMPLEX array, dimension (2*N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --work;
@@ -134,7 +139,7 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = j + 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(i__, j);
+	    i__3 = i__ + j * a_dim1;
 	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 /* L10: */
 	}
@@ -142,7 +147,7 @@ static integer c__1 = 1;
     }
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	i__2 = a_subscr(i__, i__);
+	i__2 = i__ + i__ * a_dim1;
 	i__3 = i__;
 	a[i__2].r = d__[i__3], a[i__2].i = 0.f;
 /* L30: */
@@ -175,18 +180,18 @@ static integer c__1 = 1;
 	    tau.r = r__1, tau.i = 0.f;
 	}
 
-/*        apply random reflection to A(i:n,i:n) from the left   
-          and the right   
+/*        apply random reflection to A(i:n,i:n) from the left */
+/*        and the right */
 
-          compute  y := tau * A * u */
+/*        compute  y := tau * A * u */
 
 	i__1 = *n - i__ + 1;
-	chemv_("Lower", &i__1, &tau, &a_ref(i__, i__), lda, &work[1], &c__1, &
-		c_b1, &work[*n + 1], &c__1);
+	chemv_("Lower", &i__1, &tau, &a[i__ + i__ * a_dim1], lda, &work[1], &
+		c__1, &c_b1, &work[*n + 1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( y, u ) * u */
 
-	q__3.r = -.5f, q__3.i = 0.f;
+	q__3.r = -.5f, q__3.i = -0.f;
 	q__2.r = q__3.r * tau.r - q__3.i * tau.i, q__2.i = q__3.r * tau.i + 
 		q__3.i * tau.r;
 	i__1 = *n - i__ + 1;
@@ -200,9 +205,9 @@ static integer c__1 = 1;
 /*        apply the transformation as a rank-2 update to A(i:n,i:n) */
 
 	i__1 = *n - i__ + 1;
-	q__1.r = -1.f, q__1.i = 0.f;
+	q__1.r = -1.f, q__1.i = -0.f;
 	cher2_("Lower", &i__1, &q__1, &work[1], &c__1, &work[*n + 1], &c__1, &
-		a_ref(i__, i__), lda);
+		a[i__ + i__ * a_dim1], lda);
 /* L40: */
     }
 
@@ -214,21 +219,21 @@ static integer c__1 = 1;
 /*        generate reflection to annihilate A(k+i+1:n,i) */
 
 	i__2 = *n - *k - i__ + 1;
-	wn = scnrm2_(&i__2, &a_ref(*k + i__, i__), &c__1);
-	r__1 = wn / c_abs(&a_ref(*k + i__, i__));
-	i__2 = a_subscr(*k + i__, i__);
+	wn = scnrm2_(&i__2, &a[*k + i__ + i__ * a_dim1], &c__1);
+	r__1 = wn / c_abs(&a[*k + i__ + i__ * a_dim1]);
+	i__2 = *k + i__ + i__ * a_dim1;
 	q__1.r = r__1 * a[i__2].r, q__1.i = r__1 * a[i__2].i;
 	wa.r = q__1.r, wa.i = q__1.i;
 	if (wn == 0.f) {
 	    tau.r = 0.f, tau.i = 0.f;
 	} else {
-	    i__2 = a_subscr(*k + i__, i__);
+	    i__2 = *k + i__ + i__ * a_dim1;
 	    q__1.r = a[i__2].r + wa.r, q__1.i = a[i__2].i + wa.i;
 	    wb.r = q__1.r, wb.i = q__1.i;
 	    i__2 = *n - *k - i__;
 	    c_div(&q__1, &c_b2, &wb);
-	    cscal_(&i__2, &q__1, &a_ref(*k + i__ + 1, i__), &c__1);
-	    i__2 = a_subscr(*k + i__, i__);
+	    cscal_(&i__2, &q__1, &a[*k + i__ + 1 + i__ * a_dim1], &c__1);
+	    i__2 = *k + i__ + i__ * a_dim1;
 	    a[i__2].r = 1.f, a[i__2].i = 0.f;
 	    c_div(&q__1, &wb, &wa);
 	    r__1 = q__1.r;
@@ -239,49 +244,51 @@ static integer c__1 = 1;
 
 	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
-	cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a_ref(*k + i__, 
-		i__ + 1), lda, &a_ref(*k + i__, i__), &c__1, &c_b1, &work[1], 
-		&c__1);
+	cgemv_("Conjugate transpose", &i__2, &i__3, &c_b2, &a[*k + i__ + (i__ 
+		+ 1) * a_dim1], lda, &a[*k + i__ + i__ * a_dim1], &c__1, &
+		c_b1, &work[1], &c__1);
 	i__2 = *n - *k - i__ + 1;
 	i__3 = *k - 1;
 	q__1.r = -tau.r, q__1.i = -tau.i;
-	cgerc_(&i__2, &i__3, &q__1, &a_ref(*k + i__, i__), &c__1, &work[1], &
-		c__1, &a_ref(*k + i__, i__ + 1), lda);
+	cgerc_(&i__2, &i__3, &q__1, &a[*k + i__ + i__ * a_dim1], &c__1, &work[
+		1], &c__1, &a[*k + i__ + (i__ + 1) * a_dim1], lda);
 
-/*        apply reflection to A(k+i:n,k+i:n) from the left and the right   
+/*        apply reflection to A(k+i:n,k+i:n) from the left and the right */
 
-          compute  y := tau * A * u */
+/*        compute  y := tau * A * u */
 
 	i__2 = *n - *k - i__ + 1;
-	chemv_("Lower", &i__2, &tau, &a_ref(*k + i__, *k + i__), lda, &a_ref(*
-		k + i__, i__), &c__1, &c_b1, &work[1], &c__1);
+	chemv_("Lower", &i__2, &tau, &a[*k + i__ + (*k + i__) * a_dim1], lda, 
+		&a[*k + i__ + i__ * a_dim1], &c__1, &c_b1, &work[1], &c__1);
 
 /*        compute  v := y - 1/2 * tau * ( y, u ) * u */
 
-	q__3.r = -.5f, q__3.i = 0.f;
+	q__3.r = -.5f, q__3.i = -0.f;
 	q__2.r = q__3.r * tau.r - q__3.i * tau.i, q__2.i = q__3.r * tau.i + 
 		q__3.i * tau.r;
 	i__2 = *n - *k - i__ + 1;
-	cdotc_(&q__4, &i__2, &work[1], &c__1, &a_ref(*k + i__, i__), &c__1);
+	cdotc_(&q__4, &i__2, &work[1], &c__1, &a[*k + i__ + i__ * a_dim1], &
+		c__1);
 	q__1.r = q__2.r * q__4.r - q__2.i * q__4.i, q__1.i = q__2.r * q__4.i 
 		+ q__2.i * q__4.r;
 	alpha.r = q__1.r, alpha.i = q__1.i;
 	i__2 = *n - *k - i__ + 1;
-	caxpy_(&i__2, &alpha, &a_ref(*k + i__, i__), &c__1, &work[1], &c__1);
+	caxpy_(&i__2, &alpha, &a[*k + i__ + i__ * a_dim1], &c__1, &work[1], &
+		c__1);
 
 /*        apply hermitian rank-2 update to A(k+i:n,k+i:n) */
 
 	i__2 = *n - *k - i__ + 1;
-	q__1.r = -1.f, q__1.i = 0.f;
-	cher2_("Lower", &i__2, &q__1, &a_ref(*k + i__, i__), &c__1, &work[1], 
-		&c__1, &a_ref(*k + i__, *k + i__), lda);
+	q__1.r = -1.f, q__1.i = -0.f;
+	cher2_("Lower", &i__2, &q__1, &a[*k + i__ + i__ * a_dim1], &c__1, &
+		work[1], &c__1, &a[*k + i__ + (*k + i__) * a_dim1], lda);
 
-	i__2 = a_subscr(*k + i__, i__);
+	i__2 = *k + i__ + i__ * a_dim1;
 	q__1.r = -wa.r, q__1.i = -wa.i;
 	a[i__2].r = q__1.r, a[i__2].i = q__1.i;
 	i__2 = *n;
 	for (j = *k + i__ + 1; j <= i__2; ++j) {
-	    i__3 = a_subscr(j, i__);
+	    i__3 = j + i__ * a_dim1;
 	    a[i__3].r = 0.f, a[i__3].i = 0.f;
 /* L50: */
 	}
@@ -294,8 +301,8 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = j + 1; i__ <= i__2; ++i__) {
-	    i__3 = a_subscr(j, i__);
-	    r_cnjg(&q__1, &a_ref(i__, j));
+	    i__3 = j + i__ * a_dim1;
+	    r_cnjg(&q__1, &a[i__ + j * a_dim1]);
 	    a[i__3].r = q__1.r, a[i__3].i = q__1.i;
 /* L70: */
 	}
@@ -306,8 +313,3 @@ static integer c__1 = 1;
 /*     End of CLAGHE */
 
 } /* claghe_ */
-
-#undef a_ref
-#undef a_subscr
-
-

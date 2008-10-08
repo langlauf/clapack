@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -36,102 +31,114 @@ static real c_b59 = -1.f;
     double sqrt(doublereal), cos(doublereal), sin(doublereal);
 
     /* Local variables */
-    static integer ndim, info;
-    static real dumm;
+    real b[10], d__[20];
+    integer i__, j, k, n;
+    real t[100]	/* was [10][10] */, w, x[20], y[20], vm1[5], vm2[5], vm3[5], 
+	    vm4[5], vm5[3], dum[1], eps;
+    integer ivm1, ivm2, ivm3, ivm4, ivm5, ndim, info;
+    real dumm;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static real norm, work[10], b[10], d__[20];
-    static integer i__, j, k, n;
-    static real t[100]	/* was [10][10] */, scale, w, x[20], y[20], domin, 
-	    resid;
+    real norm, work[10], scale, domin, resid;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *);
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real xnorm;
+    real xnorm;
     extern /* Subroutine */ int slabad_(real *, real *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real bignum;
+    real bignum;
     extern integer isamax_(integer *, real *, integer *);
-    static real normtb;
+    real normtb;
     extern /* Subroutine */ int slaqtr_(logical *, logical *, integer *, real 
 	    *, integer *, real *, real *, real *, real *, real *, integer *);
-    static real smlnum, vm1[5], vm2[5], vm3[5], vm4[5], vm5[3], dum[1], eps;
-    static integer ivm1, ivm2, ivm3, ivm4, ivm5;
+    real smlnum;
 
 
-#define ival_ref(a_1,a_2,a_3) ival[((a_3)*5 + (a_2))*5 + a_1 - 31]
-#define t_ref(a_1,a_2) t[(a_2)*10 + a_1 - 11]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET39 tests SLAQTR, a routine for solving the real or */
+/*  special complex quasi upper triangular system */
 
-    Purpose   
-    =======   
+/*       op(T)*p = scale*c, */
+/*  or */
+/*       op(T + iB)*(p+iq) = scale*(c+id), */
 
-    SGET39 tests SLAQTR, a routine for solving the real or   
-    special complex quasi upper triangular system   
+/*  in real arithmetic. T is upper quasi-triangular. */
+/*  If it is complex, then the first diagonal block of T must be */
+/*  1 by 1, B has the special structure */
 
-         op(T)*p = scale*c,   
-    or   
-         op(T + iB)*(p+iq) = scale*(c+id),   
+/*                 B = [ b(1) b(2) ... b(n) ] */
+/*                     [       w            ] */
+/*                     [           w        ] */
+/*                     [              .     ] */
+/*                     [                 w  ] */
 
-    in real arithmetic. T is upper quasi-triangular.   
-    If it is complex, then the first diagonal block of T must be   
-    1 by 1, B has the special structure   
+/*  op(A) = A or A', where A' denotes the conjugate transpose of */
+/*  the matrix A. */
 
-                   B = [ b(1) b(2) ... b(n) ]   
-                       [       w            ]   
-                       [           w        ]   
-                       [              .     ]   
-                       [                 w  ]   
+/*  On input, X = [ c ].  On output, X = [ p ]. */
+/*                [ d ]                  [ q ] */
 
-    op(A) = A or A', where A' denotes the conjugate transpose of   
-    the matrix A.   
+/*  Scale is an output less than or equal to 1, chosen to avoid */
+/*  overflow in X. */
+/*  This subroutine is specially designed for the condition number */
+/*  estimation in the eigenproblem routine STRSNA. */
 
-    On input, X = [ c ].  On output, X = [ p ].   
-                  [ d ]                  [ q ]   
+/*  The test code verifies that the following residual is order 1: */
 
-    Scale is an output less than or equal to 1, chosen to avoid   
-    overflow in X.   
-    This subroutine is specially designed for the condition number   
-    estimation in the eigenproblem routine STRSNA.   
+/*       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| */
+/*     ----------------------------------------- */
+/*         max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*             (||T||+||B||)*smlnum/ulp, */
+/*             smlnum) */
 
-    The test code verifies that the following residual is order 1:   
+/*  (The (||T||+||B||)*smlnum/ulp term accounts for possible */
+/*   (gradual or nongradual) underflow in x1 and x2.) */
 
-         ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)||   
-       -----------------------------------------   
-           max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-               (||T||+||B||)*smlnum/ulp,   
-               smlnum)   
+/*  Arguments */
+/*  ========== */
 
-    (The (||T||+||B||)*smlnum/ulp term accounts for possible   
-     (gradual or nongradual) underflow in x1 and x2.)   
+/*  RMAX    (output) REAL */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) REAL   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER */
+/*          Number of examples where INFO is nonzero. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER   
-            Number of examples where INFO is nonzero.   
+/*  ===================================================================== */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Data statements .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = slamch_("P");
     smlnum = slamch_("S");
@@ -189,11 +196,11 @@ static real c_b59 = -1.f;
 			    for (i__ = 1; i__ <= i__1; ++i__) {
 				i__2 = n;
 				for (j = 1; j <= i__2; ++j) {
-				    t_ref(i__, j) = (real) ival_ref(i__, j, 
-					    ndim) * vm1[ivm1 - 1];
+				    t[i__ + j * 10 - 11] = (real) ival[i__ + (
+					    j + ndim * 5) * 5 - 31] * vm1[
+					    ivm1 - 1];
 				    if (i__ >= j) {
-					t_ref(i__, j) = t_ref(i__, j) * vm5[
-						ivm5 - 1];
+					t[i__ + j * 10 - 11] *= vm5[ivm5 - 1];
 				    }
 /* L10: */
 				}
@@ -228,8 +235,8 @@ static real c_b59 = -1.f;
 				++(*ninfo);
 			    }
 
-/*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
+/*                       || T*x - scale*d || / */
+/*                         max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
 			    scopy_(&n, d__, &c__1, y, &c__1);
 			    r__1 = -scale;
@@ -255,8 +262,8 @@ static real c_b59 = -1.f;
 				++(*ninfo);
 			    }
 
-/*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
+/*                       || T*x - scale*d || / */
+/*                         max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
 			    scopy_(&n, d__, &c__1, y, &c__1);
 			    r__1 = -scale;
@@ -283,9 +290,9 @@ static real c_b59 = -1.f;
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-                                    smlnum/ulp * (||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| / */
+/*                          max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*                                  smlnum/ulp * (||T||+||B||), smlnum ) */
 
 
 			    i__1 = n << 1;
@@ -335,9 +342,9 @@ static real c_b59 = -1.f;
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-                                    smlnum/ulp * (||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| / */
+/*                          max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*                                  smlnum/ulp * (||T||+||B||), smlnum ) */
 
 			    i__1 = n << 1;
 			    scopy_(&i__1, d__, &c__1, y, &c__1);
@@ -393,8 +400,3 @@ static real c_b59 = -1.f;
 /*     End of SGET39 */
 
 } /* sget39_ */
-
-#undef t_ref
-#undef ival_ref
-
-

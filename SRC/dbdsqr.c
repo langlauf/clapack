@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,194 +23,210 @@ static doublereal c_b72 = -1.;
 	    doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal abse;
-    static integer idir;
-    static doublereal abss;
-    static integer oldm;
-    static doublereal cosl;
-    static integer isub, iter;
-    static doublereal unfl, sinl, cosr, smin, smax, sinr;
+    doublereal f, g, h__;
+    integer i__, j, m;
+    doublereal r__, cs;
+    integer ll;
+    doublereal sn, mu;
+    integer nm1, nm12, nm13, lll;
+    doublereal eps, sll, tol, abse;
+    integer idir;
+    doublereal abss;
+    integer oldm;
+    doublereal cosl;
+    integer isub, iter;
+    doublereal unfl, sinl, cosr, smin, smax, sinr;
     extern /* Subroutine */ int drot_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *), dlas2_(
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *);
-    static doublereal f, g, h__;
-    static integer i__, j, m;
-    static doublereal r__;
-    extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
+	    doublereal *), dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical lsame_(char *, char *);
-    static doublereal oldcs;
+    doublereal oldcs;
     extern /* Subroutine */ int dlasr_(char *, char *, char *, integer *, 
 	    integer *, doublereal *, doublereal *, doublereal *, integer *);
-    static integer oldll;
-    static doublereal shift, sigmn, oldsn;
+    integer oldll;
+    doublereal shift, sigmn, oldsn;
     extern /* Subroutine */ int dswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static integer maxit;
-    static doublereal sminl, sigmx;
-    static logical lower;
-    extern /* Subroutine */ int dlasq1_(integer *, doublereal *, doublereal *,
+    integer maxit;
+    doublereal sminl, sigmx;
+    logical lower;
+    extern /* Subroutine */ int dlasq1_(integer *, doublereal *, doublereal *, 
 	     doublereal *, integer *), dlasv2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
-    static doublereal cs;
-    static integer ll;
     extern doublereal dlamch_(char *);
-    static doublereal sn, mu;
     extern /* Subroutine */ int dlartg_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *), xerbla_(char *, 
 	    integer *);
-    static doublereal sminoa, thresh;
-    static logical rotate;
-    static doublereal sminlo;
-    static integer nm1;
-    static doublereal tolmul;
-    static integer nm12, nm13, lll;
-    static doublereal eps, sll, tol;
+    doublereal sminoa, thresh;
+    logical rotate;
+    doublereal tolmul;
 
 
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
-#define vt_ref(a_1,a_2) vt[(a_2)*vt_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DBDSQR computes the singular values and, optionally, the right and/or */
+/*  left singular vectors from the singular value decomposition (SVD) of */
+/*  a real N-by-N (upper or lower) bidiagonal matrix B using the implicit */
+/*  zero-shift QR algorithm.  The SVD of B has the form */
 
-    Purpose   
-    =======   
+/*     B = Q * S * P**T */
 
-    DBDSQR computes the singular value decomposition (SVD) of a real   
-    N-by-N (upper or lower) bidiagonal matrix B:  B = Q * S * P' (P'   
-    denotes the transpose of P), where S is a diagonal matrix with   
-    non-negative diagonal elements (the singular values of B), and Q   
-    and P are orthogonal matrices.   
+/*  where S is the diagonal matrix of singular values, Q is an orthogonal */
+/*  matrix of left singular vectors, and P is an orthogonal matrix of */
+/*  right singular vectors.  If left singular vectors are requested, this */
+/*  subroutine actually returns U*Q instead of Q, and, if right singular */
+/*  vectors are requested, this subroutine returns P**T*VT instead of */
+/*  P**T, for given real input matrices U and VT.  When U and VT are the */
+/*  orthogonal matrices that reduce a general matrix A to bidiagonal */
+/*  form:  A = U*B*VT, as computed by DGEBRD, then */
 
-    The routine computes S, and optionally computes U * Q, P' * VT,   
-    or Q' * C, for given real input matrices U, VT, and C.   
+/*     A = (U*Q) * S * (P**T*VT) */
 
-    See "Computing  Small Singular Values of Bidiagonal Matrices With   
-    Guaranteed High Relative Accuracy," by J. Demmel and W. Kahan,   
-    LAPACK Working Note #3 (or SIAM J. Sci. Statist. Comput. vol. 11,   
-    no. 5, pp. 873-912, Sept 1990) and   
-    "Accurate singular values and differential qd algorithms," by   
-    B. Parlett and V. Fernando, Technical Report CPAM-554, Mathematics   
-    Department, University of California at Berkeley, July 1992   
-    for a detailed description of the algorithm.   
+/*  is the SVD of A.  Optionally, the subroutine may also compute Q**T*C */
+/*  for a given real input matrix C. */
 
-    Arguments   
-    =========   
+/*  See "Computing  Small Singular Values of Bidiagonal Matrices With */
+/*  Guaranteed High Relative Accuracy," by J. Demmel and W. Kahan, */
+/*  LAPACK Working Note #3 (or SIAM J. Sci. Statist. Comput. vol. 11, */
+/*  no. 5, pp. 873-912, Sept 1990) and */
+/*  "Accurate singular values and differential qd algorithms," by */
+/*  B. Parlett and V. Fernando, Technical Report CPAM-554, Mathematics */
+/*  Department, University of California at Berkeley, July 1992 */
+/*  for a detailed description of the algorithm. */
 
-    UPLO    (input) CHARACTER*1   
-            = 'U':  B is upper bidiagonal;   
-            = 'L':  B is lower bidiagonal.   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The order of the matrix B.  N >= 0.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  B is upper bidiagonal; */
+/*          = 'L':  B is lower bidiagonal. */
 
-    NCVT    (input) INTEGER   
-            The number of columns of the matrix VT. NCVT >= 0.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix B.  N >= 0. */
 
-    NRU     (input) INTEGER   
-            The number of rows of the matrix U. NRU >= 0.   
+/*  NCVT    (input) INTEGER */
+/*          The number of columns of the matrix VT. NCVT >= 0. */
 
-    NCC     (input) INTEGER   
-            The number of columns of the matrix C. NCC >= 0.   
+/*  NRU     (input) INTEGER */
+/*          The number of rows of the matrix U. NRU >= 0. */
 
-    D       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, the n diagonal elements of the bidiagonal matrix B.   
-            On exit, if INFO=0, the singular values of B in decreasing   
-            order.   
+/*  NCC     (input) INTEGER */
+/*          The number of columns of the matrix C. NCC >= 0. */
 
-    E       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, the elements of E contain the   
-            offdiagonal elements of the bidiagonal matrix whose SVD   
-            is desired. On normal exit (INFO = 0), E is destroyed.   
-            If the algorithm does not converge (INFO > 0), D and E   
-            will contain the diagonal and superdiagonal elements of a   
-            bidiagonal matrix orthogonally equivalent to the one given   
-            as input. E(N) is used for workspace.   
+/*  D       (input/output) DOUBLE PRECISION array, dimension (N) */
+/*          On entry, the n diagonal elements of the bidiagonal matrix B. */
+/*          On exit, if INFO=0, the singular values of B in decreasing */
+/*          order. */
 
-    VT      (input/output) DOUBLE PRECISION array, dimension (LDVT, NCVT)   
-            On entry, an N-by-NCVT matrix VT.   
-            On exit, VT is overwritten by P' * VT.   
-            VT is not referenced if NCVT = 0.   
+/*  E       (input/output) DOUBLE PRECISION array, dimension (N-1) */
+/*          On entry, the N-1 offdiagonal elements of the bidiagonal */
+/*          matrix B. */
+/*          On exit, if INFO = 0, E is destroyed; if INFO > 0, D and E */
+/*          will contain the diagonal and superdiagonal elements of a */
+/*          bidiagonal matrix orthogonally equivalent to the one given */
+/*          as input. */
 
-    LDVT    (input) INTEGER   
-            The leading dimension of the array VT.   
-            LDVT >= max(1,N) if NCVT > 0; LDVT >= 1 if NCVT = 0.   
+/*  VT      (input/output) DOUBLE PRECISION array, dimension (LDVT, NCVT) */
+/*          On entry, an N-by-NCVT matrix VT. */
+/*          On exit, VT is overwritten by P**T * VT. */
+/*          Not referenced if NCVT = 0. */
 
-    U       (input/output) DOUBLE PRECISION array, dimension (LDU, N)   
-            On entry, an NRU-by-N matrix U.   
-            On exit, U is overwritten by U * Q.   
-            U is not referenced if NRU = 0.   
+/*  LDVT    (input) INTEGER */
+/*          The leading dimension of the array VT. */
+/*          LDVT >= max(1,N) if NCVT > 0; LDVT >= 1 if NCVT = 0. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,NRU).   
+/*  U       (input/output) DOUBLE PRECISION array, dimension (LDU, N) */
+/*          On entry, an NRU-by-N matrix U. */
+/*          On exit, U is overwritten by U * Q. */
+/*          Not referenced if NRU = 0. */
 
-    C       (input/output) DOUBLE PRECISION array, dimension (LDC, NCC)   
-            On entry, an N-by-NCC matrix C.   
-            On exit, C is overwritten by Q' * C.   
-            C is not referenced if NCC = 0.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,NRU). */
 
-    LDC     (input) INTEGER   
-            The leading dimension of the array C.   
-            LDC >= max(1,N) if NCC > 0; LDC >=1 if NCC = 0.   
+/*  C       (input/output) DOUBLE PRECISION array, dimension (LDC, NCC) */
+/*          On entry, an N-by-NCC matrix C. */
+/*          On exit, C is overwritten by Q**T * C. */
+/*          Not referenced if NCC = 0. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (4*N)   
+/*  LDC     (input) INTEGER */
+/*          The leading dimension of the array C. */
+/*          LDC >= max(1,N) if NCC > 0; LDC >=1 if NCC = 0. */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  If INFO = -i, the i-th argument had an illegal value   
-            > 0:  the algorithm did not converge; D and E contain the   
-                  elements of a bidiagonal matrix which is orthogonally   
-                  similar to the input matrix B;  if INFO = i, i   
-                  elements of E have not converged to zero.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (2*N) */
+/*          if NCVT = NRU = NCC = 0, (max(1, 4*N)) otherwise */
 
-    Internal Parameters   
-    ===================   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  If INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  the algorithm did not converge; D and E contain the */
+/*                elements of a bidiagonal matrix which is orthogonally */
+/*                similar to the input matrix B;  if INFO = i, i */
+/*                elements of E have not converged to zero. */
 
-    TOLMUL  DOUBLE PRECISION, default = max(10,min(100,EPS**(-1/8)))   
-            TOLMUL controls the convergence criterion of the QR loop.   
-            If it is positive, TOLMUL*EPS is the desired relative   
-               precision in the computed singular values.   
-            If it is negative, abs(TOLMUL*EPS*sigma_max) is the   
-               desired absolute accuracy in the computed singular   
-               values (corresponds to relative accuracy   
-               abs(TOLMUL*EPS) in the largest singular value.   
-            abs(TOLMUL) should be between 1 and 1/EPS, and preferably   
-               between 10 (for fast convergence) and .1/EPS   
-               (for there to be some accuracy in the results).   
-            Default is to lose at either one eighth or 2 of the   
-               available decimal digits in each computed singular value   
-               (whichever is smaller).   
+/*  Internal Parameters */
+/*  =================== */
 
-    MAXITR  INTEGER, default = 6   
-            MAXITR controls the maximum number of passes of the   
-            algorithm through its inner loop. The algorithms stops   
-            (and so fails to converge) if the number of passes   
-            through the inner loop exceeds MAXITR*N**2.   
+/*  TOLMUL  DOUBLE PRECISION, default = max(10,min(100,EPS**(-1/8))) */
+/*          TOLMUL controls the convergence criterion of the QR loop. */
+/*          If it is positive, TOLMUL*EPS is the desired relative */
+/*             precision in the computed singular values. */
+/*          If it is negative, abs(TOLMUL*EPS*sigma_max) is the */
+/*             desired absolute accuracy in the computed singular */
+/*             values (corresponds to relative accuracy */
+/*             abs(TOLMUL*EPS) in the largest singular value. */
+/*          abs(TOLMUL) should be between 1 and 1/EPS, and preferably */
+/*             between 10 (for fast convergence) and .1/EPS */
+/*             (for there to be some accuracy in the results). */
+/*          Default is to lose at either one eighth or 2 of the */
+/*             available decimal digits in each computed singular value */
+/*             (whichever is smaller). */
 
-    =====================================================================   
+/*  MAXITR  INTEGER, default = 6 */
+/*          MAXITR controls the maximum number of passes of the */
+/*          algorithm through its inner loop. The algorithms stops */
+/*          (and so fails to converge) if the number of passes */
+/*          through the inner loop exceeds MAXITR*N**2. */
 
+/*  ===================================================================== */
 
-       Test the input parameters.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --d__;
     --e;
     vt_dim1 = *ldvt;
-    vt_offset = 1 + vt_dim1 * 1;
+    vt_offset = 1 + vt_dim1;
     vt -= vt_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --work;
 
@@ -272,8 +283,8 @@ static doublereal c_b72 = -1.;
     eps = dlamch_("Epsilon");
     unfl = dlamch_("Safe minimum");
 
-/*     If matrix lower bidiagonal, rotate to be upper bidiagonal   
-       by applying Givens rotations on the left */
+/*     If matrix lower bidiagonal, rotate to be upper bidiagonal */
+/*     by applying Givens rotations on the left */
 
     if (lower) {
 	i__1 = *n - 1;
@@ -294,17 +305,17 @@ static doublereal c_b72 = -1.;
 		    ldu);
 	}
 	if (*ncc > 0) {
-	    dlasr_("L", "V", "F", n, ncc, &work[1], &work[*n], &c__[c_offset],
+	    dlasr_("L", "V", "F", n, ncc, &work[1], &work[*n], &c__[c_offset], 
 		     ldc);
 	}
     }
 
-/*     Compute singular values to relative accuracy TOL   
-       (By setting TOL to be negative, algorithm will compute   
-       singular values to absolute accuracy ABS(TOL)*norm(input matrix))   
+/*     Compute singular values to relative accuracy TOL */
+/*     (By setting TOL to be negative, algorithm will compute */
+/*     singular values to absolute accuracy ABS(TOL)*norm(input matrix)) */
 
-   Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
     d__3 = 100., d__4 = pow_dd(&eps, &c_b15);
     d__1 = 10., d__2 = min(d__3,d__4);
     tolmul = max(d__1,d__2);
@@ -354,16 +365,16 @@ L50:
 	thresh = max(d__1,d__2);
     } else {
 
-/*        Absolute accuracy desired   
+/*        Absolute accuracy desired */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = abs(tol) * smax, d__2 = *n * 6 * *n * unfl;
 	thresh = max(d__1,d__2);
     }
 
-/*     Prepare for main iteration loop for the singular values   
-       (MAXIT is the maximum number of passes through the inner   
-       loop permitted before nonconvergence signalled.) */
+/*     Prepare for main iteration loop for the singular values */
+/*     (MAXIT is the maximum number of passes through the inner */
+/*     loop permitted before nonconvergence signalled.) */
 
     maxit = *n * 6 * *n;
     iter = 0;
@@ -434,7 +445,7 @@ L90:
 
 /*        2 by 2 block, handle separately */
 
-	dlasv2_(&d__[m - 1], &e[m - 1], &d__[m], &sigmn, &sigmx, &sinr, &cosr,
+	dlasv2_(&d__[m - 1], &e[m - 1], &d__[m], &sigmn, &sigmx, &sinr, &cosr, 
 		 &sinl, &cosl);
 	d__[m - 1] = sigmx;
 	e[m - 1] = 0.;
@@ -443,23 +454,23 @@ L90:
 /*        Compute singular vectors, if desired */
 
 	if (*ncvt > 0) {
-	    drot_(ncvt, &vt_ref(m - 1, 1), ldvt, &vt_ref(m, 1), ldvt, &cosr, &
-		    sinr);
+	    drot_(ncvt, &vt[m - 1 + vt_dim1], ldvt, &vt[m + vt_dim1], ldvt, &
+		    cosr, &sinr);
 	}
 	if (*nru > 0) {
-	    drot_(nru, &u_ref(1, m - 1), &c__1, &u_ref(1, m), &c__1, &cosl, &
-		    sinl);
+	    drot_(nru, &u[(m - 1) * u_dim1 + 1], &c__1, &u[m * u_dim1 + 1], &
+		    c__1, &cosl, &sinl);
 	}
 	if (*ncc > 0) {
-	    drot_(ncc, &c___ref(m - 1, 1), ldc, &c___ref(m, 1), ldc, &cosl, &
-		    sinl);
+	    drot_(ncc, &c__[m - 1 + c_dim1], ldc, &c__[m + c_dim1], ldc, &
+		    cosl, &sinl);
 	}
 	m += -2;
 	goto L60;
     }
 
-/*     If working on new submatrix, choose shift direction   
-       (from larger end diagonal element towards smaller) */
+/*     If working on new submatrix, choose shift direction */
+/*     (from larger end diagonal element towards smaller) */
 
     if (ll > oldm || m < oldll) {
 	if ((d__1 = d__[ll], abs(d__1)) >= (d__2 = d__[m], abs(d__2))) {
@@ -479,8 +490,8 @@ L90:
 
     if (idir == 1) {
 
-/*        Run convergence test in forward direction   
-          First apply standard test to bottom of matrix */
+/*        Run convergence test in forward direction */
+/*        First apply standard test to bottom of matrix */
 
 	if ((d__2 = e[m - 1], abs(d__2)) <= abs(tol) * (d__1 = d__[m], abs(
 		d__1)) || tol < 0. && (d__3 = e[m - 1], abs(d__3)) <= thresh) 
@@ -491,8 +502,8 @@ L90:
 
 	if (tol >= 0.) {
 
-/*           If relative accuracy desired,   
-             apply convergence criterion forward */
+/*           If relative accuracy desired, */
+/*           apply convergence criterion forward */
 
 	    mu = (d__1 = d__[ll], abs(d__1));
 	    sminl = mu;
@@ -502,7 +513,6 @@ L90:
 		    e[lll] = 0.;
 		    goto L60;
 		}
-		sminlo = sminl;
 		mu = (d__2 = d__[lll + 1], abs(d__2)) * (mu / (mu + (d__1 = e[
 			lll], abs(d__1))));
 		sminl = min(sminl,mu);
@@ -512,8 +522,8 @@ L90:
 
     } else {
 
-/*        Run convergence test in backward direction   
-          First apply standard test to top of matrix */
+/*        Run convergence test in backward direction */
+/*        First apply standard test to top of matrix */
 
 	if ((d__2 = e[ll], abs(d__2)) <= abs(tol) * (d__1 = d__[ll], abs(d__1)
 		) || tol < 0. && (d__3 = e[ll], abs(d__3)) <= thresh) {
@@ -523,8 +533,8 @@ L90:
 
 	if (tol >= 0.) {
 
-/*           If relative accuracy desired,   
-             apply convergence criterion backward */
+/*           If relative accuracy desired, */
+/*           apply convergence criterion backward */
 
 	    mu = (d__1 = d__[m], abs(d__1));
 	    sminl = mu;
@@ -534,7 +544,6 @@ L90:
 		    e[lll] = 0.;
 		    goto L60;
 		}
-		sminlo = sminl;
 		mu = (d__2 = d__[lll], abs(d__2)) * (mu / (mu + (d__1 = e[lll]
 			, abs(d__1))));
 		sminl = min(sminl,mu);
@@ -545,10 +554,10 @@ L90:
     oldll = ll;
     oldm = m;
 
-/*     Compute shift.  First, test if shifting would ruin relative   
-       accuracy, and if so set the shift to zero.   
+/*     Compute shift.  First, test if shifting would ruin relative */
+/*     accuracy, and if so set the shift to zero. */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = eps, d__2 = tol * .01;
     if (tol >= 0. && *n * tol * (sminl / smax) <= max(d__1,d__2)) {
 
@@ -587,8 +596,8 @@ L90:
     if (shift == 0.) {
 	if (idir == 1) {
 
-/*           Chase bulge from top to bottom   
-             Save cosines and sines for later singular vector updates */
+/*           Chase bulge from top to bottom */
+/*           Save cosines and sines for later singular vector updates */
 
 	    cs = 1.;
 	    oldcs = 1.;
@@ -616,18 +625,18 @@ L90:
 
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("L", "V", "F", &i__1, ncvt, &work[1], &work[*n], &
-			vt_ref(ll, 1), ldvt);
+		dlasr_("L", "V", "F", &i__1, ncvt, &work[1], &work[*n], &vt[
+			ll + vt_dim1], ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("R", "V", "F", nru, &i__1, &work[nm12 + 1], &work[nm13 
-			+ 1], &u_ref(1, ll), ldu);
+			+ 1], &u[ll * u_dim1 + 1], ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("L", "V", "F", &i__1, ncc, &work[nm12 + 1], &work[nm13 
-			+ 1], &c___ref(ll, 1), ldc);
+			+ 1], &c__[ll + c_dim1], ldc);
 	    }
 
 /*           Test convergence */
@@ -638,8 +647,8 @@ L90:
 
 	} else {
 
-/*           Chase bulge from bottom to top   
-             Save cosines and sines for later singular vector updates */
+/*           Chase bulge from bottom to top */
+/*           Save cosines and sines for later singular vector updates */
 
 	    cs = 1.;
 	    oldcs = 1.;
@@ -668,17 +677,17 @@ L90:
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("L", "V", "B", &i__1, ncvt, &work[nm12 + 1], &work[
-			nm13 + 1], &vt_ref(ll, 1), ldvt);
+			nm13 + 1], &vt[ll + vt_dim1], ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("R", "V", "B", nru, &i__1, &work[1], &work[*n], &u_ref(
-			1, ll), ldu);
+		dlasr_("R", "V", "B", nru, &i__1, &work[1], &work[*n], &u[ll *
+			 u_dim1 + 1], ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("L", "V", "B", &i__1, ncc, &work[1], &work[*n], &
-			c___ref(ll, 1), ldc);
+		dlasr_("L", "V", "B", &i__1, ncc, &work[1], &work[*n], &c__[
+			ll + c_dim1], ldc);
 	    }
 
 /*           Test convergence */
@@ -693,8 +702,8 @@ L90:
 
 	if (idir == 1) {
 
-/*           Chase bulge from top to bottom   
-             Save cosines and sines for later singular vector updates */
+/*           Chase bulge from top to bottom */
+/*           Save cosines and sines for later singular vector updates */
 
 	    f = ((d__1 = d__[ll], abs(d__1)) - shift) * (d_sign(&c_b49, &d__[
 		    ll]) + shift / d__[ll]);
@@ -729,18 +738,18 @@ L90:
 
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("L", "V", "F", &i__1, ncvt, &work[1], &work[*n], &
-			vt_ref(ll, 1), ldvt);
+		dlasr_("L", "V", "F", &i__1, ncvt, &work[1], &work[*n], &vt[
+			ll + vt_dim1], ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("R", "V", "F", nru, &i__1, &work[nm12 + 1], &work[nm13 
-			+ 1], &u_ref(1, ll), ldu);
+			+ 1], &u[ll * u_dim1 + 1], ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("L", "V", "F", &i__1, ncc, &work[nm12 + 1], &work[nm13 
-			+ 1], &c___ref(ll, 1), ldc);
+			+ 1], &c__[ll + c_dim1], ldc);
 	    }
 
 /*           Test convergence */
@@ -751,8 +760,8 @@ L90:
 
 	} else {
 
-/*           Chase bulge from bottom to top   
-             Save cosines and sines for later singular vector updates */
+/*           Chase bulge from bottom to top */
+/*           Save cosines and sines for later singular vector updates */
 
 	    f = ((d__1 = d__[m], abs(d__1)) - shift) * (d_sign(&c_b49, &d__[m]
 		    ) + shift / d__[m]);
@@ -794,17 +803,17 @@ L90:
 	    if (*ncvt > 0) {
 		i__1 = m - ll + 1;
 		dlasr_("L", "V", "B", &i__1, ncvt, &work[nm12 + 1], &work[
-			nm13 + 1], &vt_ref(ll, 1), ldvt);
+			nm13 + 1], &vt[ll + vt_dim1], ldvt);
 	    }
 	    if (*nru > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("R", "V", "B", nru, &i__1, &work[1], &work[*n], &u_ref(
-			1, ll), ldu);
+		dlasr_("R", "V", "B", nru, &i__1, &work[1], &work[*n], &u[ll *
+			 u_dim1 + 1], ldu);
 	    }
 	    if (*ncc > 0) {
 		i__1 = m - ll + 1;
-		dlasr_("L", "V", "B", &i__1, ncc, &work[1], &work[*n], &
-			c___ref(ll, 1), ldc);
+		dlasr_("L", "V", "B", &i__1, ncc, &work[1], &work[*n], &c__[
+			ll + c_dim1], ldc);
 	    }
 	}
     }
@@ -824,14 +833,14 @@ L160:
 /*           Change sign of singular vectors, if desired */
 
 	    if (*ncvt > 0) {
-		dscal_(ncvt, &c_b72, &vt_ref(i__, 1), ldvt);
+		dscal_(ncvt, &c_b72, &vt[i__ + vt_dim1], ldvt);
 	    }
 	}
 /* L170: */
     }
 
-/*     Sort the singular values into decreasing order (insertion sort on   
-       singular values, but only one transposition per singular vector) */
+/*     Sort the singular values into decreasing order (insertion sort on */
+/*     singular values, but only one transposition per singular vector) */
 
     i__1 = *n - 1;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -855,16 +864,16 @@ L160:
 	    d__[isub] = d__[*n + 1 - i__];
 	    d__[*n + 1 - i__] = smin;
 	    if (*ncvt > 0) {
-		dswap_(ncvt, &vt_ref(isub, 1), ldvt, &vt_ref(*n + 1 - i__, 1),
-			 ldvt);
+		dswap_(ncvt, &vt[isub + vt_dim1], ldvt, &vt[*n + 1 - i__ + 
+			vt_dim1], ldvt);
 	    }
 	    if (*nru > 0) {
-		dswap_(nru, &u_ref(1, isub), &c__1, &u_ref(1, *n + 1 - i__), &
-			c__1);
+		dswap_(nru, &u[isub * u_dim1 + 1], &c__1, &u[(*n + 1 - i__) * 
+			u_dim1 + 1], &c__1);
 	    }
 	    if (*ncc > 0) {
-		dswap_(ncc, &c___ref(isub, 1), ldc, &c___ref(*n + 1 - i__, 1),
-			 ldc);
+		dswap_(ncc, &c__[isub + c_dim1], ldc, &c__[*n + 1 - i__ + 
+			c_dim1], ldc);
 	    }
 	}
 /* L190: */
@@ -888,9 +897,3 @@ L220:
 /*     End of DBDSQR */
 
 } /* dbdsqr_ */
-
-#undef vt_ref
-#undef u_ref
-#undef c___ref
-
-

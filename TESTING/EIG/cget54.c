@@ -1,17 +1,12 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
 static complex c_b1 = {0.f,0.f};
 static complex c_b2 = {1.f,0.f};
 
-/* Subroutine */ int cget54_(integer *n, complex *a, integer *lda, complex *b,
+/* Subroutine */ int cget54_(integer *n, complex *a, integer *lda, complex *b, 
 	 integer *ldb, complex *s, integer *lds, complex *t, integer *ldt, 
 	complex *u, integer *ldu, complex *v, integer *ldv, complex *work, 
 	real *result)
@@ -23,115 +18,131 @@ static complex c_b2 = {1.f,0.f};
     complex q__1;
 
     /* Local variables */
-    static real unfl;
+    real dum[1], ulp, unfl;
     extern /* Subroutine */ int cgemm_(char *, char *, integer *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *);
-    static real wnorm;
+    real wnorm;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *);
-    static real abnorm, dum[1], ulp;
+    real abnorm;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CGET54 checks a generalized decomposition of the form   
+/*  CGET54 checks a generalized decomposition of the form */
 
-             A = U*S*V'  and B = U*T* V'   
+/*           A = U*S*V'  and B = U*T* V' */
 
-    where ' means conjugate transpose and U and V are unitary.   
+/*  where ' means conjugate transpose and U and V are unitary. */
 
-    Specifically,   
+/*  Specifically, */
 
-      RESULT = ||( A - U*S*V', B - U*T*V' )|| / (||( A, B )||*n*ulp )   
+/*    RESULT = ||( A - U*S*V', B - U*T*V' )|| / (||( A, B )||*n*ulp ) */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SGET54 does nothing.   
-            It must be at least zero.   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, SGET54 does nothing. */
+/*          It must be at least zero. */
 
-    A       (input) COMPLEX array, dimension (LDA, N)   
-            The original (unfactored) matrix A.   
+/*  A       (input) COMPLEX array, dimension (LDA, N) */
+/*          The original (unfactored) matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) COMPLEX array, dimension (LDB, N)   
-            The original (unfactored) matrix B.   
+/*  B       (input) COMPLEX array, dimension (LDB, N) */
+/*          The original (unfactored) matrix B. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    S       (input) COMPLEX array, dimension (LDS, N)   
-            The factored matrix S.   
+/*  S       (input) COMPLEX array, dimension (LDS, N) */
+/*          The factored matrix S. */
 
-    LDS     (input) INTEGER   
-            The leading dimension of S.  It must be at least 1   
-            and at least N.   
+/*  LDS     (input) INTEGER */
+/*          The leading dimension of S.  It must be at least 1 */
+/*          and at least N. */
 
-    T       (input) COMPLEX array, dimension (LDT, N)   
-            The factored matrix T.   
+/*  T       (input) COMPLEX array, dimension (LDT, N) */
+/*          The factored matrix T. */
 
-    LDT     (input) INTEGER   
-            The leading dimension of T.  It must be at least 1   
-            and at least N.   
+/*  LDT     (input) INTEGER */
+/*          The leading dimension of T.  It must be at least 1 */
+/*          and at least N. */
 
-    U       (input) COMPLEX array, dimension (LDU, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
+/*  U       (input) COMPLEX array, dimension (LDU, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    V       (input) COMPLEX array, dimension (LDV, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
+/*  V       (input) COMPLEX array, dimension (LDV, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    WORK    (workspace) COMPLEX array, dimension (3*N**2)   
+/*  WORK    (workspace) COMPLEX array, dimension (3*N**2) */
 
-    RESULT  (output) REAL   
-            The value RESULT, It is currently limited to 1/ulp, to   
-            avoid overflow. Errors are flagged by RESULT=10/ulp.   
+/*  RESULT  (output) REAL */
+/*          The value RESULT, It is currently limited to 1/ulp, to */
+/*          avoid overflow. Errors are flagged by RESULT=10/ulp. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     s_dim1 = *lds;
-    s_offset = 1 + s_dim1 * 1;
+    s_offset = 1 + s_dim1;
     s -= s_offset;
     t_dim1 = *ldt;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
 
@@ -162,8 +173,8 @@ static complex c_b2 = {1.f,0.f};
     cgemm_("N", "N", n, n, n, &c_b2, &u[u_offset], ldu, &s[s_offset], lds, &
 	    c_b1, &work[*n * *n + 1], n);
 
-    q__1.r = -1.f, q__1.i = 0.f;
-    cgemm_("N", "C", n, n, n, &q__1, &work[*n * *n + 1], n, &v[v_offset], ldv,
+    q__1.r = -1.f, q__1.i = -0.f;
+    cgemm_("N", "C", n, n, n, &q__1, &work[*n * *n + 1], n, &v[v_offset], ldv, 
 	     &c_b2, &work[1], n);
 
 /*     Compute W2 = B - U*T*V', and put in the workarray W(N*N+1:2*N*N) */
@@ -172,7 +183,7 @@ static complex c_b2 = {1.f,0.f};
     cgemm_("N", "N", n, n, n, &c_b2, &u[u_offset], ldu, &t[t_offset], ldt, &
 	    c_b1, &work[(*n << 1) * *n + 1], n);
 
-    q__1.r = -1.f, q__1.i = 0.f;
+    q__1.r = -1.f, q__1.i = -0.f;
     cgemm_("N", "C", n, n, n, &q__1, &work[(*n << 1) * *n + 1], n, &v[
 	    v_offset], ldv, &c_b2, &work[*n * *n + 1], n);
 
@@ -200,4 +211,3 @@ static complex c_b2 = {1.f,0.f};
 /*     End of CGET54 */
 
 } /* cget54_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,47 +23,45 @@ static integer c__400 = 400;
 	    e_rsle(void);
 
     /* Local variables */
-    static integer ndim, iscl, info, kmin, itmp, ipnt[20];
-    static doublereal vmax, qsav[400]	/* was [20][20] */, tsav[400]	/* 
-	    was [20][20] */, tnrm, qtmp[400]	/* was [20][20] */, work[1200]
-	    , stmp, vmul, ttmp[400]	/* was [20][20] */, tsav1[400]	/* 
+    integer i__, j, m, n;
+    doublereal q[400]	/* was [20][20] */, s, t[400]	/* was [20][20] */, v,
+	     wi[20], wr[20], val[3], eps, sep, sin__, tol, tmp[400]	/* 
 	    was [20][20] */;
-    static integer i__, j, m, n;
-    static doublereal q[400]	/* was [20][20] */, s, t[400]	/* was [20][
-	    20] */, v;
+    integer ndim, iscl, info, kmin, itmp, ipnt[20];
+    doublereal vmax, qsav[400]	/* was [20][20] */, tsav[400]	/* was [20][
+	    20] */, tnrm, qtmp[400]	/* was [20][20] */, work[1200], stmp, 
+	    vmul, ttmp[400]	/* was [20][20] */, tsav1[400]	/* was [20][
+	    20] */;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *), dhst01_(integer *, integer *, integer *, doublereal *,
+	    integer *), dhst01_(integer *, integer *, integer *, doublereal *, 
 	     integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *);
-    static doublereal sepin;
+    doublereal sepin;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal vimin, tolin, vrmin;
-    static integer iwork[400];
-    static doublereal witmp[20], wrtmp[20];
+    doublereal vimin, tolin, vrmin;
+    integer iwork[400];
+    doublereal witmp[20], wrtmp[20];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dgehrd_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *);
-    static doublereal wi[20];
-    static integer iselec[20];
-    static doublereal wr[20];
+    integer iselec[20];
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static logical select[20];
-    static doublereal bignum;
+    logical select[20];
+    doublereal bignum;
     extern /* Subroutine */ int dorghr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *), dhseqr_(char *, char *, integer *, integer *, integer 
 	    *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), dtrsen_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     integer *, integer *, integer *, integer *);
-    static doublereal septmp, smlnum, result[2], val[3], eps, sep, sin__, tol,
-	     tmp[400]	/* was [20][20] */;
+    doublereal septmp, smlnum, result[2];
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, 0, 0 };
@@ -78,63 +71,71 @@ static integer c__400 = 400;
 
 
 
-#define qsav_ref(a_1,a_2) qsav[(a_2)*20 + a_1 - 21]
-#define qtmp_ref(a_1,a_2) qtmp[(a_2)*20 + a_1 - 21]
-#define ttmp_ref(a_1,a_2) ttmp[(a_2)*20 + a_1 - 21]
-#define q_ref(a_1,a_2) q[(a_2)*20 + a_1 - 21]
-#define t_ref(a_1,a_2) t[(a_2)*20 + a_1 - 21]
-#define tmp_ref(a_1,a_2) tmp[(a_2)*20 + a_1 - 21]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET38 tests DTRSEN, a routine for estimating condition numbers of a */
+/*  cluster of eigenvalues and/or its associated right invariant subspace */
 
-    Purpose   
-    =======   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    DGET38 tests DTRSEN, a routine for estimating condition numbers of a   
-    cluster of eigenvalues and/or its associated right invariant subspace   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) DOUBLE PRECISION array, dimension (3) */
+/*          Values of the largest test ratios. */
+/*          RMAX(1) = largest residuals from DHST01 or comparing */
+/*                    different calls to DTRSEN */
+/*          RMAX(2) = largest error in reciprocal condition */
+/*                    numbers taking their conditioning into account */
+/*          RMAX(3) = largest error in reciprocal condition */
+/*                    numbers not taking their conditioning into */
+/*                    account (may be larger than RMAX(2)) */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER array, dimension (3) */
+/*          LMAX(i) is example number where largest test ratio */
+/*          RMAX(i) is achieved. Also: */
+/*          If DGEHRD returns INFO nonzero on example i, LMAX(1)=i */
+/*          If DHSEQR returns INFO nonzero on example i, LMAX(2)=i */
+/*          If DTRSEN returns INFO nonzero on example i, LMAX(3)=i */
 
-    RMAX    (output) DOUBLE PRECISION array, dimension (3)   
-            Values of the largest test ratios.   
-            RMAX(1) = largest residuals from DHST01 or comparing   
-                      different calls to DTRSEN   
-            RMAX(2) = largest error in reciprocal condition   
-                      numbers taking their conditioning into account   
-            RMAX(3) = largest error in reciprocal condition   
-                      numbers not taking their conditioning into   
-                      account (may be larger than RMAX(2))   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = No. of times DGEHRD returned INFO nonzero */
+/*          NINFO(2) = No. of times DHSEQR returned INFO nonzero */
+/*          NINFO(3) = No. of times DTRSEN returned INFO nonzero */
 
-    LMAX    (output) INTEGER array, dimension (3)   
-            LMAX(i) is example number where largest test ratio   
-            RMAX(i) is achieved. Also:   
-            If DGEHRD returns INFO nonzero on example i, LMAX(1)=i   
-            If DHSEQR returns INFO nonzero on example i, LMAX(2)=i   
-            If DTRSEN returns INFO nonzero on example i, LMAX(3)=i   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = No. of times DGEHRD returned INFO nonzero   
-            NINFO(2) = No. of times DHSEQR returned INFO nonzero   
-            NINFO(3) = No. of times DTRSEN returned INFO nonzero   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number. */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
     --lmax;
     --rmax;
@@ -163,9 +164,9 @@ static integer c__400 = 400;
     val[1] = 1.;
     val[2] = sqrt(sqrt(bignum));
 
-/*     Read input data until N=0.  Assume input eigenvalues are sorted   
-       lexicographically (increasing by real part, then decreasing by   
-       imaginary part) */
+/*     Read input data until N=0.  Assume input eigenvalues are sorted */
+/*     lexicographically (increasing by real part, then decreasing by */
+/*     imaginary part) */
 
 L10:
     io___5.ciunit = *nin;
@@ -190,8 +191,8 @@ L10:
 	s_rsle(&io___11);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__5, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    doublereal));
+	    do_lio(&c__5, &c__1, (char *)&tmp[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublereal));
 	}
 	e_rsle();
 /* L20: */
@@ -212,7 +213,7 @@ L10:
 	vmul = val[iscl - 1];
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    dscal_(&n, &vmul, &t_ref(1, i__), &c__1);
+	    dscal_(&n, &vmul, &t[i__ * 20 - 20], &c__1);
 /* L30: */
 	}
 	if (tnrm == 0.) {
@@ -311,10 +312,10 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          taking its condition number into account   
+/*        Compare condition number for eigenvalue cluster */
+/*        taking its condition number into account */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = (doublereal) n * 2. * eps * tnrm;
 	v = max(d__1,smlnum);
 	if (tnrm == 0.) {
@@ -354,8 +355,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        taking its condition number into account */
 
 	if (v > septmp * stmp) {
 	    tol = septmp;
@@ -391,8 +392,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          without taking its condition number into account */
+/*        Compare condition number for eigenvalue cluster */
+/*        without taking its condition number into account */
 
 	if (sin__ <= (doublereal) (n << 1) * eps && stmp <= (doublereal) (n <<
 		 1) * eps) {
@@ -415,8 +416,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          without taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        without taking its condition number into account */
 
 	if (sepin <= v && septmp <= v) {
 	    vmax = 1.;
@@ -438,8 +439,8 @@ L10:
 	    }
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Update Q */
 
 	vmax = 0.;
 	dlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -464,10 +465,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
-		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != q[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
 /* L80: */
@@ -475,8 +476,8 @@ L10:
 /* L90: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Update Q */
 
 	dlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	dlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -500,10 +501,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
-		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != q[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
 /* L100: */
@@ -511,8 +512,8 @@ L10:
 /* L110: */
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Do not update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Do not update Q */
 
 	dlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	dlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -536,10 +537,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
-		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != qsav[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
 /* L120: */
@@ -547,8 +548,8 @@ L10:
 /* L130: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Do not update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Do not update Q */
 
 	dlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	dlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -572,10 +573,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
-		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != qsav[i__ + j * 20 - 21]) {
 		    vmax = 1. / eps;
 		}
 /* L140: */
@@ -596,12 +597,3 @@ L160:
 /*     End of DGET38 */
 
 } /* dget38_ */
-
-#undef tmp_ref
-#undef t_ref
-#undef q_ref
-#undef ttmp_ref
-#undef qtmp_ref
-#undef qsav_ref
-
-

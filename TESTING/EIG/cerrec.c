@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -40,19 +35,23 @@ static integer c__3 = 3;
     /* System generated locals */
     integer i__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, ifst, ilst;
-    static complex work[24], a[16]	/* was [4][4] */, b[16]	/* was [4][4] 
-	    */, c__[16]	/* was [4][4] */;
-    static integer i__, j, m;
-    static real s[4], scale;
-    static complex x[4];
-    static integer nt;
-    static real rw[24];
+    complex a[16]	/* was [4][4] */, b[16]	/* was [4][4] */, c__[16]	
+	    /* was [4][4] */;
+    integer i__, j, m;
+    real s[4];
+    complex x[4];
+    integer nt;
+    real rw[24];
+    logical sel[4];
+    real sep[4];
+    integer info, ifst, ilst;
+    complex work[24];
+    real scale;
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), ctrexc_(char *, integer *, complex *, 
 	    integer *, complex *, integer *, integer *, integer *, integer *), ctrsna_(char *, char *, logical *, integer *, complex *, 
@@ -63,8 +62,6 @@ static integer c__3 = 3;
 	    integer *, real *, real *, complex *, integer *, integer *), ctrsyl_(char *, char *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, complex *, 
 	    integer *, real *, integer *);
-    static logical sel[4];
-    static real sep[4];
 
     /* Fortran I/O blocks */
     static cilist io___18 = { 0, 0, 0, fmt_9999, 0 };
@@ -72,36 +69,44 @@ static integer c__3 = 3;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  CERREC tests the error exits for the routines for eigen- condition */
+/*  estimation for REAL matrices: */
+/*     CTRSYL, CTREXC, CTRSNA and CTRSEN. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERREC tests the error exits for the routines for eigen- condition   
-    estimation for REAL matrices:   
-       CTRSYL, CTREXC, CTRSNA and CTRSEN.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     infoc_1.ok = TRUE_;
@@ -111,16 +116,16 @@ static integer c__3 = 3;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    a[i__1].r = 0.f, a[i__1].i = 0.f;
-	    i__1 = b_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    b[i__1].r = 0.f, b[i__1].i = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	i__1 = a_subscr(i__, i__);
+	i__1 = i__ + (i__ << 2) - 5;
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 	sel[i__ - 1] = TRUE_;
 /* L30: */
@@ -333,10 +338,3 @@ static integer c__3 = 3;
 /*     End of CERREC */
 
 } /* cerrec_ */
-
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

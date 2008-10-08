@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,87 +17,97 @@ doublereal zqrt12_(integer *m, integer *n, doublecomplex *a, integer *lda,
     doublereal ret_val;
 
     /* Local variables */
-    static integer iscl, info;
-    static doublereal anrm;
-    extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i__, j;
-    extern doublereal dasum_(integer *, doublereal *, integer *);
+    integer i__, j, mn, iscl, info;
+    doublereal anrm;
+    extern doublereal dnrm2_(integer *, doublereal *, integer *), dasum_(
+	    integer *, doublereal *, integer *);
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static doublereal dummy[1];
-    extern /* Subroutine */ int zgebd2_(integer *, integer *, doublecomplex *,
+    doublereal dummy[1];
+    extern /* Subroutine */ int zgebd2_(integer *, integer *, doublecomplex *, 
 	     integer *, doublereal *, doublereal *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *), dlabad_(doublereal *
-	    , doublereal *);
+, doublereal *);
     extern doublereal dlamch_(char *);
-    static integer mn;
     extern /* Subroutine */ int dlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), xerbla_(char *, integer *),
 	     dbdsqr_(char *, integer *, integer *, integer *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, integer *, doublereal *, integer *);
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int zlascl_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *, doublecomplex *,
+	    doublereal *, doublereal *, integer *, integer *, doublecomplex *, 
 	     integer *, integer *), zlaset_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static doublereal smlnum, nrmsvl;
+    doublereal smlnum, nrmsvl;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZQRT12 computes the singular values `svlues' of the upper trapezoid */
+/*  of A(1:M,1:N) and returns the ratio */
 
-    Purpose   
-    =======   
+/*       || s - svlues||/(||svlues||*eps*max(M,N)) */
 
-    ZQRT12 computes the singular values `svlues' of the upper trapezoid   
-    of A(1:M,1:N) and returns the ratio   
+/*  Arguments */
+/*  ========= */
 
-         || s - svlues||/(||svlues||*eps*max(M,N))   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The M-by-N matrix A. Only the upper trapezoid is referenced. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced.   
+/*  S       (input) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The singular values of the matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    S       (input) DOUBLE PRECISION array, dimension (min(M,N))   
-            The singular values of the matrix A.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK. LWORK >= M*N + 2*min(M,N) + */
+/*          max(M,N). */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (2*min(M,N)) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK. LWORK >= M*N + 2*min(M,N) +   
-            max(M,N).   
+/*  ===================================================================== */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (2*min(M,N))   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --s;
     --work;
@@ -135,7 +140,7 @@ doublereal zqrt12_(integer *m, integer *n, doublecomplex *a, integer *lda,
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    i__3 = (j - 1) * *m + i__;
-	    i__4 = a_subscr(i__, j);
+	    i__4 = i__ + j * a_dim1;
 	    work[i__3].r = a[i__4].r, work[i__3].i = a[i__4].i;
 /* L10: */
 	}
@@ -211,8 +216,3 @@ doublereal zqrt12_(integer *m, integer *n, doublecomplex *a, integer *lda,
 /*     End of ZQRT12 */
 
 } /* zqrt12_ */
-
-#undef a_ref
-#undef a_subscr
-
-

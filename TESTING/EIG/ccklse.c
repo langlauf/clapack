@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -30,27 +25,25 @@ static integer c__0 = 0;
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5, i__6, i__7;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsle(cilist *), e_wsle(void), s_wsfe(cilist *), do_fio(integer *
 	    , char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer imat;
-    static char path[3], type__[1];
-    static integer nrun, i__, m, n, p, modea, modeb, nfail;
-    static char dista[1], distb[1];
-    static integer iinfo;
-    static real anorm, bnorm;
-    static integer lwork;
+    integer i__, m, n, p, ik, nt, lda, ldb, kla, klb, kua, kub, imat;
+    char path[3], type__[1];
+    integer nrun, modea, modeb, nfail;
+    char dista[1], distb[1];
+    integer iinfo;
+    real anorm, bnorm;
+    integer lwork;
     extern /* Subroutine */ int slatb9_(char *, integer *, integer *, integer 
 	    *, integer *, char *, integer *, integer *, integer *, integer *, 
 	    real *, real *, integer *, integer *, real *, real *, char *, 
 	    char *), alahdg_(integer *, char *
-	    );
-    static integer ik;
-    static real cndnma, cndnmb;
-    static integer nt;
+);
+    real cndnma, cndnmb;
     extern /* Subroutine */ int alareq_(char *, integer *, logical *, integer 
 	    *, integer *, integer *), clarhs_(char *, char *, char *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
@@ -59,14 +52,13 @@ static integer c__0 = 0;
 	    char *, integer *, integer *, integer *, integer *), 
 	    clatms_(integer *, integer *, char *, integer *, char *, real *, 
 	    integer *, real *, real *, integer *, integer *, char *, complex *
-	    , integer *, complex *, integer *), 
+, integer *, complex *, integer *), 
 	    clsets_(integer *, integer *, integer *, complex *, complex *, 
 	    integer *, complex *, complex *, integer *, complex *, complex *, 
 	    complex *, complex *, complex *, complex *, integer *, real *, 
 	    real *);
-    static logical dotype[8], firstt;
-    static real result[7];
-    static integer lda, ldb, kla, klb, kua, kub;
+    logical dotype[8], firstt;
+    real result[7];
 
     /* Fortran I/O blocks */
     static cilist io___13 = { 0, 0, 0, 0, 0 };
@@ -77,88 +69,102 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CCKLSE tests CGGLSE - a subroutine for solving linear equality   
-    constrained least square problem (LSE).   
+/*  CCKLSE tests CGGLSE - a subroutine for solving linear equality */
+/*  constrained least square problem (LSE). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    NN      (input) INTEGER   
-            The number of values of (M,P,N) contained in the vectors   
-            (MVAL, PVAL, NVAL).   
+/*  NN      (input) INTEGER */
+/*          The number of values of (M,P,N) contained in the vectors */
+/*          (MVAL, PVAL, NVAL). */
 
-    MVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix row(column) dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix row(column) dimension M. */
 
-    PVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix row(column) dimension P.   
+/*  PVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix row(column) dimension P. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column(row) dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column(row) dimension N. */
 
-    NMATS   (input) INTEGER   
-            The number of matrix types to be tested for each combination   
-            of matrix dimensions.  If NMATS >= NTYPES (the maximum   
-            number of matrix types), then all the different types are   
-            generated for testing.  If NMATS < NTYPES, another input line   
-            is read to get the numbers of the matrix types to be used.   
+/*  NMATS   (input) INTEGER */
+/*          The number of matrix types to be tested for each combination */
+/*          of matrix dimensions.  If NMATS >= NTYPES (the maximum */
+/*          number of matrix types), then all the different types are */
+/*          generated for testing.  If NMATS < NTYPES, another input line */
+/*          is read to get the numbers of the matrix types to be used. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator.  The array   
-            elements should be between 0 and 4095, otherwise they will be   
-            reduced mod 4096, and ISEED(4) must be odd.   
-            On exit, the next seed in the random number sequence after   
-            all the test matrices have been generated.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator.  The array */
+/*          elements should be between 0 and 4095, otherwise they will be */
+/*          reduced mod 4096, and ISEED(4) must be odd. */
+/*          On exit, the next seed in the random number sequence after */
+/*          all the test matrices have been generated. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning   
-            the work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for M or N, used in dimensioning */
+/*          the work arrays. */
 
-    A       (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  A       (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    AF      (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  AF      (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    B       (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  B       (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    BF      (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  BF      (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    X       (workspace) COMPLEX array, dimension (5*NMAX)   
+/*  X       (workspace) COMPLEX array, dimension (5*NMAX) */
 
-    WORK    (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  WORK    (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    RWORK   (workspace) REAL array, dimension (NMAX)   
+/*  RWORK   (workspace) REAL array, dimension (NMAX) */
 
-    NIN     (input) INTEGER   
-            The unit number for input.   
+/*  NIN     (input) INTEGER */
+/*          The unit number for input. */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    INFO    (output) INTEGER   
-            = 0 :  successful exit   
-            > 0 :  If CLATMS returns an error code, the absolute value   
-                   of it is returned.   
+/*  INFO    (output) INTEGER */
+/*          = 0 :  successful exit */
+/*          > 0 :  If CLATMS returns an error code, the absolute value */
+/*                 of it is returned. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed.   
+/*     Initialize constants and the random number seed. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --work;
     --x;
@@ -226,8 +232,8 @@ static integer c__0 = 0;
 		goto L30;
 	    }
 
-/*           Set up parameters with SLATB9 and generate test   
-             matrices A and B with CLATMS. */
+/*           Set up parameters with SLATB9 and generate test */
+/*           matrices A and B with CLATMS. */
 
 	    slatb9_(path, &imat, &m, &p, &n, type__, &kla, &kua, &klb, &kub, &
 		    anorm, &bnorm, &modea, &modeb, &cndnma, &cndnmb, dista, 
@@ -257,9 +263,9 @@ static integer c__0 = 0;
 		goto L30;
 	    }
 
-/*           Generate the right-hand sides C and D for the LSE.   
+/*           Generate the right-hand sides C and D for the LSE. */
 
-   Computing MAX */
+/* Computing MAX */
 	    i__3 = m - 1;
 	    i__2 = max(i__3,0);
 /* Computing MAX */
@@ -267,7 +273,7 @@ static integer c__0 = 0;
 	    i__4 = max(i__5,0);
 	    i__6 = max(n,1);
 	    i__7 = max(m,1);
-	    clarhs_("CGE", "New solution", "Upper", "N", &m, &n, &i__2, &i__4,
+	    clarhs_("CGE", "New solution", "Upper", "N", &m, &n, &i__2, &i__4, 
 		     &c__1, &a[1], &lda, &x[(*nmax << 2) + 1], &i__6, &x[1], &
 		    i__7, &iseed[1], &iinfo);
 
@@ -287,11 +293,11 @@ static integer c__0 = 0;
 
 	    clsets_(&m, &p, &n, &a[1], &af[1], &lda, &b[1], &bf[1], &ldb, &x[
 		    1], &x[*nmax + 1], &x[(*nmax << 1) + 1], &x[*nmax * 3 + 1]
-		    , &x[(*nmax << 2) + 1], &work[1], &lwork, &rwork[1], 
+, &x[(*nmax << 2) + 1], &work[1], &lwork, &rwork[1], 
 		    result);
 
-/*           Print information about the tests that did not   
-             pass the threshold. */
+/*           Print information about the tests that did not */
+/*           pass the threshold. */
 
 	    i__2 = nt;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
@@ -332,4 +338,3 @@ L40:
 /*     End of CCKLSE */
 
 } /* ccklse_ */
-

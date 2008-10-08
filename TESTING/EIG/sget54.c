@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,116 +17,131 @@ static real c_b15 = -1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static real unfl;
+    real dum[1], ulp, unfl;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real wnorm;
+    real wnorm;
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real abnorm;
+    real abnorm;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *);
-    static real dum[1], ulp;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SGET54 checks a generalized decomposition of the form   
+/*  SGET54 checks a generalized decomposition of the form */
 
-             A = U*S*V'  and B = U*T* V'   
+/*           A = U*S*V'  and B = U*T* V' */
 
-    where ' means transpose and U and V are orthogonal.   
+/*  where ' means transpose and U and V are orthogonal. */
 
-    Specifically,   
+/*  Specifically, */
 
-     RESULT = ||( A - U*S*V', B - U*T*V' )|| / (||( A, B )||*n*ulp )   
+/*   RESULT = ||( A - U*S*V', B - U*T*V' )|| / (||( A, B )||*n*ulp ) */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, SGET54 does nothing.   
-            It must be at least zero.   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, SGET54 does nothing. */
+/*          It must be at least zero. */
 
-    A       (input) REAL array, dimension (LDA, N)   
-            The original (unfactored) matrix A.   
+/*  A       (input) REAL array, dimension (LDA, N) */
+/*          The original (unfactored) matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) REAL array, dimension (LDB, N)   
-            The original (unfactored) matrix B.   
+/*  B       (input) REAL array, dimension (LDB, N) */
+/*          The original (unfactored) matrix B. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    S       (input) REAL array, dimension (LDS, N)   
-            The factored matrix S.   
+/*  S       (input) REAL array, dimension (LDS, N) */
+/*          The factored matrix S. */
 
-    LDS     (input) INTEGER   
-            The leading dimension of S.  It must be at least 1   
-            and at least N.   
+/*  LDS     (input) INTEGER */
+/*          The leading dimension of S.  It must be at least 1 */
+/*          and at least N. */
 
-    T       (input) REAL array, dimension (LDT, N)   
-            The factored matrix T.   
+/*  T       (input) REAL array, dimension (LDT, N) */
+/*          The factored matrix T. */
 
-    LDT     (input) INTEGER   
-            The leading dimension of T.  It must be at least 1   
-            and at least N.   
+/*  LDT     (input) INTEGER */
+/*          The leading dimension of T.  It must be at least 1 */
+/*          and at least N. */
 
-    U       (input) REAL array, dimension (LDU, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
+/*  U       (input) REAL array, dimension (LDU, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    V       (input) REAL array, dimension (LDV, N)   
-            The orthogonal matrix on the left-hand side in the   
-            decomposition.   
+/*  V       (input) REAL array, dimension (LDV, N) */
+/*          The orthogonal matrix on the left-hand side in the */
+/*          decomposition. */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    WORK    (workspace) REAL array, dimension (3*N**2)   
+/*  WORK    (workspace) REAL array, dimension (3*N**2) */
 
-    RESULT  (output) REAL   
-            The value RESULT, It is currently limited to 1/ulp, to   
-            avoid overflow. Errors are flagged by RESULT=10/ulp.   
+/*  RESULT  (output) REAL */
+/*          The value RESULT, It is currently limited to 1/ulp, to */
+/*          avoid overflow. Errors are flagged by RESULT=10/ulp. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     s_dim1 = *lds;
-    s_offset = 1 + s_dim1 * 1;
+    s_offset = 1 + s_dim1;
     s -= s_offset;
     t_dim1 = *ldt;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
 
@@ -198,4 +208,3 @@ static real c_b15 = -1.f;
 /*     End of SGET54 */
 
 } /* sget54_ */
-

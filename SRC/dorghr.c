@@ -1,94 +1,109 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c_n1 = -1;
 
 /* Subroutine */ int dorghr_(integer *n, integer *ilo, integer *ihi, 
 	doublereal *a, integer *lda, doublereal *tau, doublereal *work, 
 	integer *lwork, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    DORGHR generates a real orthogonal matrix Q which is defined as the   
-    product of IHI-ILO elementary reflectors of order N, as returned by   
-    DGEHRD:   
-
-    Q = H(ilo) H(ilo+1) . . . H(ihi-1).   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix Q. N >= 0.   
-
-    ILO     (input) INTEGER   
-    IHI     (input) INTEGER   
-            ILO and IHI must have the same values as in the previous call   
-            of DGEHRD. Q is equal to the unit matrix except in the   
-            submatrix Q(ilo+1:ihi,ilo+1:ihi).   
-            1 <= ILO <= IHI <= N, if N > 0; ILO=1 and IHI=0, if N=0.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the vectors which define the elementary reflectors,   
-            as returned by DGEHRD.   
-            On exit, the N-by-N orthogonal matrix Q.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,N).   
-
-    TAU     (input) DOUBLE PRECISION array, dimension (N-1)   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by DGEHRD.   
-
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
-
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK. LWORK >= IHI-ILO.   
-            For optimum performance LWORK >= (IHI-ILO)*NB, where NB is   
-            the optimal blocksize.   
-
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    =====================================================================   
-
-
-       Test the input arguments   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
+
     /* Local variables */
-    static integer i__, j, iinfo, nb, nh;
+    integer i__, j, nb, nh, iinfo;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
     extern /* Subroutine */ int dorgqr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *);
-    static integer lwkopt;
-    static logical lquery;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+    integer lwkopt;
+    logical lquery;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DORGHR generates a real orthogonal matrix Q which is defined as the */
+/*  product of IHI-ILO elementary reflectors of order N, as returned by */
+/*  DGEHRD: */
+
+/*  Q = H(ilo) H(ilo+1) . . . H(ihi-1). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix Q. N >= 0. */
+
+/*  ILO     (input) INTEGER */
+/*  IHI     (input) INTEGER */
+/*          ILO and IHI must have the same values as in the previous call */
+/*          of DGEHRD. Q is equal to the unit matrix except in the */
+/*          submatrix Q(ilo+1:ihi,ilo+1:ihi). */
+/*          1 <= ILO <= IHI <= N, if N > 0; ILO=1 and IHI=0, if N=0. */
+
+/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          On entry, the vectors which define the elementary reflectors, */
+/*          as returned by DGEHRD. */
+/*          On exit, the N-by-N orthogonal matrix Q. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= max(1,N). */
+
+/*  TAU     (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          TAU(i) must contain the scalar factor of the elementary */
+/*          reflector H(i), as returned by DGEHRD. */
+
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
+
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. LWORK >= IHI-ILO. */
+/*          For optimum performance LWORK >= (IHI-ILO)*NB, where NB is */
+/*          the optimal blocksize. */
+
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -110,8 +125,7 @@
     }
 
     if (*info == 0) {
-	nb = ilaenv_(&c__1, "DORGQR", " ", &nh, &nh, &nh, &c_n1, (ftnlen)6, (
-		ftnlen)1);
+	nb = ilaenv_(&c__1, "DORGQR", " ", &nh, &nh, &nh, &c_n1);
 	lwkopt = max(1,nh) * nb;
 	work[1] = (doublereal) lwkopt;
     }
@@ -131,25 +145,25 @@
 	return 0;
     }
 
-/*     Shift the vectors which define the elementary reflectors one   
-       column to the right, and set the first ilo and the last n-ihi   
-       rows and columns to those of the unit matrix */
+/*     Shift the vectors which define the elementary reflectors one */
+/*     column to the right, and set the first ilo and the last n-ihi */
+/*     rows and columns to those of the unit matrix */
 
     i__1 = *ilo + 1;
     for (j = *ihi; j >= i__1; --j) {
 	i__2 = j - 1;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = 0.;
+	    a[i__ + j * a_dim1] = 0.;
 /* L10: */
 	}
 	i__2 = *ihi;
 	for (i__ = j + 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = a_ref(i__, j - 1);
+	    a[i__ + j * a_dim1] = a[i__ + (j - 1) * a_dim1];
 /* L20: */
 	}
 	i__2 = *n;
 	for (i__ = *ihi + 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = 0.;
+	    a[i__ + j * a_dim1] = 0.;
 /* L30: */
 	}
 /* L40: */
@@ -158,20 +172,20 @@
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = 0.;
+	    a[i__ + j * a_dim1] = 0.;
 /* L50: */
 	}
-	a_ref(j, j) = 1.;
+	a[j + j * a_dim1] = 1.;
 /* L60: */
     }
     i__1 = *n;
     for (j = *ihi + 1; j <= i__1; ++j) {
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = 0.;
+	    a[i__ + j * a_dim1] = 0.;
 /* L70: */
 	}
-	a_ref(j, j) = 1.;
+	a[j + j * a_dim1] = 1.;
 /* L80: */
     }
 
@@ -179,8 +193,8 @@
 
 /*        Generate Q(ilo+1:ihi,ilo+1:ihi) */
 
-	dorgqr_(&nh, &nh, &nh, &a_ref(*ilo + 1, *ilo + 1), lda, &tau[*ilo], &
-		work[1], lwork, &iinfo);
+	dorgqr_(&nh, &nh, &nh, &a[*ilo + 1 + (*ilo + 1) * a_dim1], lda, &tau[*
+		ilo], &work[1], lwork, &iinfo);
     }
     work[1] = (doublereal) lwkopt;
     return 0;
@@ -188,7 +202,3 @@
 /*     End of DORGHR */
 
 } /* dorghr_ */
-
-#undef a_ref
-
-

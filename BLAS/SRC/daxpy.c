@@ -1,20 +1,37 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int daxpy_(integer *n, doublereal *da, doublereal *dx, 
 	integer *incx, doublereal *dy, integer *incy)
 {
     /* System generated locals */
     integer i__1;
+
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
-/*     constant times a vector plus a vector.   
-       uses unrolled loops for increments equal to one.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, ix, iy, mp1;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     constant times a vector plus a vector. */
+/*     uses unrolled loops for increments equal to one. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --dy;
     --dx;
+
     /* Function Body */
     if (*n <= 0) {
 	return 0;
@@ -25,8 +42,10 @@
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -43,8 +62,12 @@
 /* L10: */
     }
     return 0;
-/*        code for both increments equal to 1   
-          clean-up loop */
+
+/*        code for both increments equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 4;
     if (m == 0) {
@@ -70,4 +93,3 @@ L40:
     }
     return 0;
 } /* daxpy_ */
-

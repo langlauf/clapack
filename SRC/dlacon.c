@@ -1,77 +1,26 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static doublereal c_b11 = 1.;
 
 /* Subroutine */ int dlacon_(integer *n, doublereal *v, doublereal *x, 
 	integer *isgn, doublereal *est, integer *kase)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
-
-
-    Purpose   
-    =======   
-
-    DLACON estimates the 1-norm of a square, real matrix A.   
-    Reverse communication is used for evaluating matrix-vector products.   
-
-    Arguments   
-    =========   
-
-    N      (input) INTEGER   
-           The order of the matrix.  N >= 1.   
-
-    V      (workspace) DOUBLE PRECISION array, dimension (N)   
-           On the final return, V = A*W,  where  EST = norm(V)/norm(W)   
-           (W is not returned).   
-
-    X      (input/output) DOUBLE PRECISION array, dimension (N)   
-           On an intermediate return, X should be overwritten by   
-                 A * X,   if KASE=1,   
-                 A' * X,  if KASE=2,   
-           and DLACON must be re-called with all the other parameters   
-           unchanged.   
-
-    ISGN   (workspace) INTEGER array, dimension (N)   
-
-    EST    (output) DOUBLE PRECISION   
-           An estimate (a lower bound) for norm(A).   
-
-    KASE   (input/output) INTEGER   
-           On the initial call to DLACON, KASE should be 0.   
-           On an intermediate return, KASE will be 1 or 2, indicating   
-           whether X should be overwritten by A * X  or A' * X.   
-           On the final return from DLACON, KASE will again be 0.   
-
-    Further Details   
-    ======= =======   
-
-    Contributed by Nick Higham, University of Manchester.   
-    Originally named SONEST, dated March 16, 1988.   
-
-    Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of   
-    a real or complex matrix, with applications to condition estimation",   
-    ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static doublereal c_b11 = 1.;
-    
     /* System generated locals */
     integer i__1;
     doublereal d__1;
+
     /* Builtin functions */
     double d_sign(doublereal *, doublereal *);
     integer i_dnnt(doublereal *);
+
     /* Local variables */
-    static integer iter;
+    static integer i__, j, iter;
     static doublereal temp;
-    static integer jump, i__, j;
+    static integer jump;
     extern doublereal dasum_(integer *, doublereal *, integer *);
     static integer jlast;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
@@ -80,6 +29,78 @@
     static doublereal altsgn, estold;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLACON estimates the 1-norm of a square, real matrix A. */
+/*  Reverse communication is used for evaluating matrix-vector products. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N      (input) INTEGER */
+/*         The order of the matrix.  N >= 1. */
+
+/*  V      (workspace) DOUBLE PRECISION array, dimension (N) */
+/*         On the final return, V = A*W,  where  EST = norm(V)/norm(W) */
+/*         (W is not returned). */
+
+/*  X      (input/output) DOUBLE PRECISION array, dimension (N) */
+/*         On an intermediate return, X should be overwritten by */
+/*               A * X,   if KASE=1, */
+/*               A' * X,  if KASE=2, */
+/*         and DLACON must be re-called with all the other parameters */
+/*         unchanged. */
+
+/*  ISGN   (workspace) INTEGER array, dimension (N) */
+
+/*  EST    (input/output) DOUBLE PRECISION */
+/*         On entry with KASE = 1 or 2 and JUMP = 3, EST should be */
+/*         unchanged from the previous call to DLACON. */
+/*         On exit, EST is an estimate (a lower bound) for norm(A). */
+
+/*  KASE   (input/output) INTEGER */
+/*         On the initial call to DLACON, KASE should be 0. */
+/*         On an intermediate return, KASE will be 1 or 2, indicating */
+/*         whether X should be overwritten by A * X  or A' * X. */
+/*         On the final return from DLACON, KASE will again be 0. */
+
+/*  Further Details */
+/*  ======= ======= */
+
+/*  Contributed by Nick Higham, University of Manchester. */
+/*  Originally named SONEST, dated March 16, 1988. */
+
+/*  Reference: N.J. Higham, "FORTRAN codes for estimating the one-norm of */
+/*  a real or complex matrix, with applications to condition estimation", */
+/*  ACM Trans. Math. Soft., vol. 14, no. 4, pp. 381-396, December 1988. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --isgn;
     --x;
     --v;
@@ -104,8 +125,8 @@
 	case 5:  goto L140;
     }
 
-/*     ................ ENTRY   (JUMP = 1)   
-       FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 1) */
+/*     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X. */
 
 L20:
     if (*n == 1) {
@@ -126,8 +147,8 @@ L20:
     jump = 2;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 2)   
-       FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
+/*     ................ ENTRY   (JUMP = 2) */
+/*     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
 
 L40:
     j = idamax_(n, &x[1], &c__1);
@@ -146,8 +167,8 @@ L50:
     jump = 3;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 3)   
-       X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 3) */
+/*     X HAS BEEN OVERWRITTEN BY A*X. */
 
 L70:
     dcopy_(n, &x[1], &c__1, &v[1], &c__1);
@@ -180,8 +201,8 @@ L90:
     jump = 4;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 4)   
-       X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X. */
+/*     ................ ENTRY   (JUMP = 4) */
+/*     X HAS BEEN OVERWRITTEN BY TRANSPOSE(A)*X. */
 
 L110:
     jlast = j;
@@ -206,8 +227,8 @@ L120:
     jump = 5;
     return 0;
 
-/*     ................ ENTRY   (JUMP = 5)   
-       X HAS BEEN OVERWRITTEN BY A*X. */
+/*     ................ ENTRY   (JUMP = 5) */
+/*     X HAS BEEN OVERWRITTEN BY A*X. */
 
 L140:
     temp = dasum_(n, &x[1], &c__1) / (doublereal) (*n * 3) * 2.;
@@ -223,4 +244,3 @@ L150:
 /*     End of DLACON */
 
 } /* dlacon_ */
-

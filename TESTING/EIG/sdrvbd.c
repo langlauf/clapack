@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -80,52 +75,53 @@ static integer c__0 = 0;
 	    i__9, i__10, i__11, i__12, i__13, i__14;
     real r__1, r__2, r__3;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char jobq[1], path[3], jobu[1];
-    static integer mmax, nmax;
-    static real unfl, ovfl;
-    static integer ijvt, i__, j, m, n;
-    static logical badmm, badnn;
-    static integer nfail;
+    integer i__, j, m, n;
+    real dif, div;
+    integer ijq, iju;
+    real ulp;
+    integer iws;
+    char jobq[1], path[3], jobu[1];
+    integer mmax, nmax;
+    real unfl, ovfl;
+    integer ijvt;
+    logical badmm, badnn;
+    integer nfail;
     extern /* Subroutine */ int sbdt01_(integer *, integer *, integer *, real 
 	    *, integer *, real *, integer *, real *, real *, real *, integer *
-	    , real *, real *);
-    static integer iinfo;
-    static real anorm;
-    static integer mnmin, mnmax;
-    static char jobvt[1];
-    static integer jsize;
+, real *, real *);
+    integer iinfo;
+    real anorm;
+    integer mnmin, mnmax;
+    char jobvt[1];
+    integer jsize;
     extern /* Subroutine */ int sort01_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *, real *), sort03_(char *, 
 	    integer *, integer *, integer *, integer *, real *, integer *, 
 	    real *, integer *, real *, integer *, real *, integer *);
-    static integer jtype, ntest, iwtmp;
+    integer jtype, ntest, iwtmp;
     extern /* Subroutine */ int slabad_(real *, real *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int sgesdd_(char *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, integer *, integer *), xerbla_(char *, integer 
 	    *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *), sgesvd_(char *, char *, integer *, integer 
 	    *, real *, integer *, real *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *), slacpy_(char *, 
+, real *, integer *, integer *), slacpy_(char *, 
 	    integer *, integer *, real *, integer *, real *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *), slatms_(integer *, integer *, char *, 
 	    integer *, char *, real *, integer *, real *, real *, integer *, 
 	    integer *, char *, real *, integer *, real *, integer *);
-    static integer minwrk;
-    static real ulpinv, result[14];
-    static integer lswork, mtypes;
-    static real dif, div;
-    static integer ijq, iju;
-    static real ulp;
-    static integer iws;
+    integer minwrk;
+    real ulpinv, result[14];
+    integer lswork, mtypes;
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, fmt_9996, 0 };
@@ -137,214 +133,234 @@ static integer c__0 = 0;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SDRVBD checks the singular value decomposition (SVD) drivers   
-    SGESVD and SGESDD.   
-    Both SGESVD and SGESDD factor A = U diag(S) VT, where U and VT are   
-    orthogonal and diag(S) is diagonal with the entries of the array S   
-    on its diagonal. The entries of S are the singular values,   
-    nonnegative and stored in decreasing order.  U and VT can be   
-    optionally not computed, overwritten on A, or computed partially.   
+/*  SDRVBD checks the singular value decomposition (SVD) drivers */
+/*  SGESVD and SGESDD. */
+/*  Both SGESVD and SGESDD factor A = U diag(S) VT, where U and VT are */
+/*  orthogonal and diag(S) is diagonal with the entries of the array S */
+/*  on its diagonal. The entries of S are the singular values, */
+/*  nonnegative and stored in decreasing order.  U and VT can be */
+/*  optionally not computed, overwritten on A, or computed partially. */
 
-    A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN.   
-    U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N.   
+/*  A is M by N. Let MNMIN = min( M, N ). S has dimension MNMIN. */
+/*  U can be M by M or M by MNMIN. VT can be N by N or MNMIN by N. */
 
-    When SDRVBD is called, a number of matrix "sizes" (M's and N's)   
-    and a number of matrix "types" are specified.  For each size (M,N)   
-    and each type of matrix, and for the minimal workspace as well as   
-    workspace adequate to permit blocking, an  M x N  matrix "A" will be   
-    generated and used to test the SVD routines.  For each matrix, A will   
-    be factored as A = U diag(S) VT and the following 12 tests computed:   
+/*  When SDRVBD is called, a number of matrix "sizes" (M's and N's) */
+/*  and a number of matrix "types" are specified.  For each size (M,N) */
+/*  and each type of matrix, and for the minimal workspace as well as */
+/*  workspace adequate to permit blocking, an  M x N  matrix "A" will be */
+/*  generated and used to test the SVD routines.  For each matrix, A will */
+/*  be factored as A = U diag(S) VT and the following 12 tests computed: */
 
-    Test for SGESVD:   
+/*  Test for SGESVD: */
 
-    (1)    | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+/*  (1)    | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
 
-    (2)    | I - U'U | / ( M ulp )   
+/*  (2)    | I - U'U | / ( M ulp ) */
 
-    (3)    | I - VT VT' | / ( N ulp )   
+/*  (3)    | I - VT VT' | / ( N ulp ) */
 
-    (4)    S contains MNMIN nonnegative values in decreasing order.   
-           (Return 0 if true, 1/ULP if false.)   
+/*  (4)    S contains MNMIN nonnegative values in decreasing order. */
+/*         (Return 0 if true, 1/ULP if false.) */
 
-    (5)    | U - Upartial | / ( M ulp ) where Upartial is a partially   
-           computed U.   
+/*  (5)    | U - Upartial | / ( M ulp ) where Upartial is a partially */
+/*         computed U. */
 
-    (6)    | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
-           computed VT.   
+/*  (6)    | VT - VTpartial | / ( N ulp ) where VTpartial is a partially */
+/*         computed VT. */
 
-    (7)    | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
-           vector of singular values from the partial SVD   
+/*  (7)    | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the */
+/*         vector of singular values from the partial SVD */
 
-    Test for SGESDD:   
+/*  Test for SGESDD: */
 
-    (8)    | A - U diag(S) VT | / ( |A| max(M,N) ulp )   
+/*  (8)    | A - U diag(S) VT | / ( |A| max(M,N) ulp ) */
 
-    (9)    | I - U'U | / ( M ulp )   
+/*  (9)    | I - U'U | / ( M ulp ) */
 
-    (10)   | I - VT VT' | / ( N ulp )   
+/*  (10)   | I - VT VT' | / ( N ulp ) */
 
-    (11)   S contains MNMIN nonnegative values in decreasing order.   
-           (Return 0 if true, 1/ULP if false.)   
+/*  (11)   S contains MNMIN nonnegative values in decreasing order. */
+/*         (Return 0 if true, 1/ULP if false.) */
 
-    (12)   | U - Upartial | / ( M ulp ) where Upartial is a partially   
-           computed U.   
+/*  (12)   | U - Upartial | / ( M ulp ) where Upartial is a partially */
+/*         computed U. */
 
-    (13)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially   
-           computed VT.   
+/*  (13)   | VT - VTpartial | / ( N ulp ) where VTpartial is a partially */
+/*         computed VT. */
 
-    (14)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the   
-           vector of singular values from the partial SVD   
+/*  (14)   | S - Spartial | / ( MNMIN ulp |S| ) where Spartial is the */
+/*         vector of singular values from the partial SVD */
 
-    The "sizes" are specified by the arrays MM(1:NSIZES) and   
-    NN(1:NSIZES); the value of each element pair (MM(j),NN(j))   
-    specifies one size.  The "types" are specified by a logical array   
-    DOTYPE( 1:NTYPES ); if DOTYPE(j) is .TRUE., then matrix type "j"   
-    will be generated.   
-    Currently, the list of possible types is:   
+/*  The "sizes" are specified by the arrays MM(1:NSIZES) and */
+/*  NN(1:NSIZES); the value of each element pair (MM(j),NN(j)) */
+/*  specifies one size.  The "types" are specified by a logical array */
+/*  DOTYPE( 1:NTYPES ); if DOTYPE(j) is .TRUE., then matrix type "j" */
+/*  will be generated. */
+/*  Currently, the list of possible types is: */
 
-    (1)  The zero matrix.   
-    (2)  The identity matrix.   
-    (3)  A matrix of the form  U D V, where U and V are orthogonal and   
-         D has evenly spaced entries 1, ..., ULP with random signs   
-         on the diagonal.   
-    (4)  Same as (3), but multiplied by the underflow-threshold / ULP.   
-    (5)  Same as (3), but multiplied by the overflow-threshold * ULP.   
+/*  (1)  The zero matrix. */
+/*  (2)  The identity matrix. */
+/*  (3)  A matrix of the form  U D V, where U and V are orthogonal and */
+/*       D has evenly spaced entries 1, ..., ULP with random signs */
+/*       on the diagonal. */
+/*  (4)  Same as (3), but multiplied by the underflow-threshold / ULP. */
+/*  (5)  Same as (3), but multiplied by the overflow-threshold * ULP. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    NSIZES  (input) INTEGER   
-            The number of matrix sizes (M,N) contained in the vectors   
-            MM and NN.   
+/*  NSIZES  (input) INTEGER */
+/*          The number of matrix sizes (M,N) contained in the vectors */
+/*          MM and NN. */
 
-    MM      (input) INTEGER array, dimension (NSIZES)   
-            The values of the matrix row dimension M.   
+/*  MM      (input) INTEGER array, dimension (NSIZES) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            The values of the matrix column dimension N.   
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          The values of the matrix column dimension N. */
 
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, SDRVBD   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrices are in A and B.   
-            This is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, SDRVBD */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrices are in A and B. */
+/*          This is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size (m,n), a matrix   
-            of type j will be generated.  If NTYPES is smaller than the   
-            maximum number of types defined (PARAMETER MAXTYP), then   
-            types NTYPES+1 through MAXTYP will not be generated.  If   
-            NTYPES is larger than MAXTYP, DOTYPE(MAXTYP+1) through   
-            DOTYPE(NTYPES) will be ignored.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size (m,n), a matrix */
+/*          of type j will be generated.  If NTYPES is smaller than the */
+/*          maximum number of types defined (PARAMETER MAXTYP), then */
+/*          types NTYPES+1 through MAXTYP will not be generated.  If */
+/*          NTYPES is larger than MAXTYP, DOTYPE(MAXTYP+1) through */
+/*          DOTYPE(NTYPES) will be ignored. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator.  The array   
-            elements should be between 0 and 4095; if not they will be   
-            reduced mod 4096.  Also, ISEED(4) must be odd.   
-            On exit, ISEED is changed and can be used in the next call to   
-            SDRVBD to continue the same random number sequence.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator.  The array */
+/*          elements should be between 0 and 4095; if not they will be */
+/*          reduced mod 4096.  Also, ISEED(4) must be odd. */
+/*          On exit, ISEED is changed and can be used in the next call to */
+/*          SDRVBD to continue the same random number sequence. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  The test   
-            ratios are scaled to be O(1), so THRESH should be a small   
-            multiple of 1, e.g., 10 or 100.  To have every test ratio   
-            printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  The test */
+/*          ratios are scaled to be O(1), so THRESH should be a small */
+/*          multiple of 1, e.g., 10 or 100.  To have every test ratio */
+/*          printed, use THRESH = 0. */
 
-    A       (workspace) REAL array, dimension (LDA,NMAX)   
-            where NMAX is the maximum value of N in NN.   
+/*  A       (workspace) REAL array, dimension (LDA,NMAX) */
+/*          where NMAX is the maximum value of N in NN. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,MMAX),   
-            where MMAX is the maximum value of M in MM.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,MMAX), */
+/*          where MMAX is the maximum value of M in MM. */
 
-    U       (workspace) REAL array, dimension (LDU,MMAX)   
+/*  U       (workspace) REAL array, dimension (LDU,MMAX) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,MMAX).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,MMAX). */
 
-    VT      (workspace) REAL array, dimension (LDVT,NMAX)   
+/*  VT      (workspace) REAL array, dimension (LDVT,NMAX) */
 
-    LDVT    (input) INTEGER   
-            The leading dimension of the array VT.  LDVT >= max(1,NMAX).   
+/*  LDVT    (input) INTEGER */
+/*          The leading dimension of the array VT.  LDVT >= max(1,NMAX). */
 
-    ASAV    (workspace) REAL array, dimension (LDA,NMAX)   
+/*  ASAV    (workspace) REAL array, dimension (LDA,NMAX) */
 
-    USAV    (workspace) REAL array, dimension (LDU,MMAX)   
+/*  USAV    (workspace) REAL array, dimension (LDU,MMAX) */
 
-    VTSAV   (workspace) REAL array, dimension (LDVT,NMAX)   
+/*  VTSAV   (workspace) REAL array, dimension (LDVT,NMAX) */
 
-    S       (workspace) REAL array, dimension   
-                        (max(min(MM,NN)))   
+/*  S       (workspace) REAL array, dimension */
+/*                      (max(min(MM,NN))) */
 
-    SSAV    (workspace) REAL array, dimension   
-                        (max(min(MM,NN)))   
+/*  SSAV    (workspace) REAL array, dimension */
+/*                      (max(min(MM,NN))) */
 
-    E       (workspace) REAL array, dimension   
-                        (max(min(MM,NN)))   
+/*  E       (workspace) REAL array, dimension */
+/*                      (max(min(MM,NN))) */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            max(3*MN+MX,5*MN-4)+2*MN**2 for all pairs   
-            pairs  (MN,MX)=( min(MM(j),NN(j), max(MM(j),NN(j)) )   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          max(3*MN+MX,5*MN-4)+2*MN**2 for all pairs */
+/*          pairs  (MN,MX)=( min(MM(j),NN(j), max(MM(j),NN(j)) ) */
 
-    IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N)   
+/*  IWORK   (workspace) INTEGER array, dimension at least 8*min(M,N) */
 
-    NOUT    (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
+/*  NOUT    (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
 
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some MM(j) < 0   
-             -3: Some NN(j) < 0   
-             -4: NTYPES < 0   
-             -7: THRESH < 0   
-            -10: LDA < 1 or LDA < MMAX, where MMAX is max( MM(j) ).   
-            -12: LDU < 1 or LDU < MMAX.   
-            -14: LDVT < 1 or LDVT < NMAX, where NMAX is max( NN(j) ).   
-            -21: LWORK too small.   
-            If  SLATMS, or SGESVD returns an error code, the   
-                absolute value of it is returned.   
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some MM(j) < 0 */
+/*           -3: Some NN(j) < 0 */
+/*           -4: NTYPES < 0 */
+/*           -7: THRESH < 0 */
+/*          -10: LDA < 1 or LDA < MMAX, where MMAX is max( MM(j) ). */
+/*          -12: LDU < 1 or LDU < MMAX. */
+/*          -14: LDVT < 1 or LDVT < NMAX, where NMAX is max( NN(j) ). */
+/*          -21: LWORK too small. */
+/*          If  SLATMS, or SGESVD returns an error code, the */
+/*              absolute value of it is returned. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --mm;
     --nn;
     --dotype;
     --iseed;
     asav_dim1 = *lda;
-    asav_offset = 1 + asav_dim1 * 1;
+    asav_offset = 1 + asav_dim1;
     asav -= asav_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     usav_dim1 = *ldu;
-    usav_offset = 1 + usav_dim1 * 1;
+    usav_offset = 1 + usav_dim1;
     usav -= usav_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     vtsav_dim1 = *ldvt;
-    vtsav_offset = 1 + vtsav_dim1 * 1;
+    vtsav_offset = 1 + vtsav_dim1;
     vtsav -= vtsav_offset;
     vt_dim1 = *ldvt;
-    vt_offset = 1 + vt_dim1 * 1;
+    vt_offset = 1 + vt_dim1;
     vt -= vt_offset;
     --s;
     --ssav;
@@ -352,9 +368,11 @@ static integer c__0 = 0;
     --work;
     --iwork;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     *info = 0;
     badmm = FALSE_;
@@ -377,14 +395,14 @@ static integer c__0 = 0;
 	if (nn[j] < 0) {
 	    badnn = TRUE_;
 	}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	i__4 = mm[j], i__5 = nn[j];
 	i__2 = mnmax, i__3 = min(i__4,i__5);
 	mnmax = max(i__2,i__3);
-/* Computing MAX   
-   Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MAX */
+/* Computing MIN */
 	i__6 = mm[j], i__7 = nn[j];
 /* Computing MAX */
 	i__8 = mm[j], i__9 = nn[j];
@@ -500,7 +518,7 @@ static integer c__0 = 0;
 		i__3 = m - 1;
 		i__4 = n - 1;
 		slatms_(&m, &n, "U", &iseed[1], "N", &s[1], &c__4, &r__1, &
-			anorm, &i__3, &i__4, "N", &a[a_offset], lda, &work[1],
+			anorm, &i__3, &i__4, "N", &a[a_offset], lda, &work[1], 
 			 &iinfo);
 		if (iinfo != 0) {
 		    io___25.ciunit = *nout;
@@ -530,9 +548,9 @@ L30:
 /* L40: */
 		}
 
-/*              Test SGESVD: Factorize A   
+/*              Test SGESVD: Factorize A */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = min(m,n) * 3 + max(m,n), i__4 = min(m,n) * 5;
 		iwtmp = max(i__3,i__4);
 		lswork = iwtmp + (iws - 1) * (*lwork - iwtmp) / 3;
@@ -544,7 +562,7 @@ L30:
 
 		if (iws > 1) {
 		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
-			    , lda);
+, lda);
 		}
 		s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)6);
 		sgesvd_("A", "A", &m, &n, &a[a_offset], lda, &ssav[1], &usav[
@@ -611,7 +629,7 @@ L30:
 				a_offset], lda);
 			s_copy(srnamc_1.srnamt, "SGESVD", (ftnlen)6, (ftnlen)
 				6);
-			sgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1],
+			sgesvd_(jobu, jobvt, &m, &n, &a[a_offset], lda, &s[1], 
 				 &u[u_offset], ldu, &vt[vt_offset], ldvt, &
 				work[1], &lswork, &iinfo);
 
@@ -750,7 +768,7 @@ L70:
 		for (ijq = 0; ijq <= 2; ++ijq) {
 		    *(unsigned char *)jobq = *(unsigned char *)&cjob[ijq];
 		    slacpy_("F", &m, &n, &asav[asav_offset], lda, &a[a_offset]
-			    , lda);
+, lda);
 		    s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
 		    sgesdd_(jobq, &m, &n, &a[a_offset], lda, &s[1], &u[
 			    u_offset], ldu, &vt[vt_offset], ldvt, &work[1], &
@@ -794,7 +812,7 @@ L70:
 			    }
 			} else if (ijq == 2) {
 			    sort03_("R", &n, &mnmin, &n, &mnmin, &vtsav[
-				    vtsav_offset], ldvt, &vt[vt_offset], ldvt,
+				    vtsav_offset], ldvt, &vt[vt_offset], ldvt, 
 				     &work[1], lwork, &dif, info);
 			}
 		    }
@@ -873,4 +891,3 @@ L140:
 /*     End of SDRVBD */
 
 } /* sdrvbd_ */
-

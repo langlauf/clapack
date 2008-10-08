@@ -1,9 +1,5 @@
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "string.h"
 
 /* Table of constant values */
 
@@ -18,16 +14,16 @@ static integer c__0 = 0;
 static real c_b227 = 0.f;
 static real c_b228 = 1.f;
 
-/* Main program */ MAIN__(void)
+/* Main program */ int MAIN__(void)
 {
     /* Builtin functions */
     integer s_wsle(cilist *), do_lio(integer *, integer *, char *, ftnlen), 
 	    e_wsle(void);
 
     /* Local variables */
-    static integer ieeeok;
+    integer ieeeok;
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 6, 0, 0, 0 };
@@ -51,11 +47,15 @@ static real c_b228 = 1.f;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999 */
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_wsle(&io___1);
     do_lio(&c__9, &c__1, "We are about to check whether infinity arithmetic", 
@@ -70,8 +70,7 @@ static real c_b228 = 1.f;
 	    ftnlen)48);
     e_wsle();
 
-    ieeeok = ilaenv_(&c__10, "ILAENV", "N", &c__1, &c__2, &c__3, &c__4, (
-	    ftnlen)6, (ftnlen)1);
+    ieeeok = ilaenv_(&c__10, "ILAENV", "N", &c__1, &c__2, &c__3, &c__4);
     s_wsle(&io___5);
     e_wsle();
 
@@ -110,8 +109,7 @@ static real c_b228 = 1.f;
     do_lio(&c__9, &c__1, "ILAENV = 0 for ISPEC = 11 in LAPACK/SRC/ilaenv.f", (
 	    ftnlen)48);
     e_wsle();
-    ieeeok = ilaenv_(&c__11, "ILAENV", "N", &c__1, &c__2, &c__3, &c__4, (
-	    ftnlen)6, (ftnlen)1);
+    ieeeok = ilaenv_(&c__11, "ILAENV", "N", &c__1, &c__2, &c__3, &c__4);
 
     s_wsle(&io___14);
     e_wsle();
@@ -143,123 +141,131 @@ static real c_b228 = 1.f;
 } /* MAIN__ */
 
 integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1, 
-	integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen 
-	opts_len)
+	integer *n2, integer *n3, integer *n4)
 {
     /* System generated locals */
     integer ret_val;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer i__;
-    static logical cname, sname;
-    static integer nbmin;
-    static char c1[1], c2[2], c3[3], c4[2];
-    static integer ic, nb;
+    integer i__;
+    char c1[1], c2[2], c3[3], c4[2];
+    integer ic, nb, iz, nx;
+    logical cname, sname;
+    integer nbmin;
     extern integer ieeeck_(integer *, real *, real *);
-    static integer iz, nx;
-    static char subnam[6];
+    char subnam[6];
+    ftnlen name_len;
+    name_len = strlen (name__);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ILAENV is called from the LAPACK routines to choose problem-dependent   
-    parameters for the local environment.  See ISPEC for a description of   
-    the parameters.   
+/*  ILAENV is called from the LAPACK routines to choose problem-dependent */
+/*  parameters for the local environment.  See ISPEC for a description of */
+/*  the parameters. */
 
-    This version provides a set of parameters which should give good,   
-    but not optimal, performance on many of the currently available   
-    computers.  Users are encouraged to modify this subroutine to set   
-    the tuning parameters for their particular machine using the option   
-    and problem size information in the arguments.   
+/*  This version provides a set of parameters which should give good, */
+/*  but not optimal, performance on many of the currently available */
+/*  computers.  Users are encouraged to modify this subroutine to set */
+/*  the tuning parameters for their particular machine using the option */
+/*  and problem size information in the arguments. */
 
-    This routine will not function correctly if it is converted to all   
-    lower case.  Converting it to all upper case is allowed.   
+/*  This routine will not function correctly if it is converted to all */
+/*  lower case.  Converting it to all upper case is allowed. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    ISPEC   (input) INTEGER   
-            Specifies the parameter to be returned as the value of   
-            ILAENV.   
-            = 1: the optimal blocksize; if this value is 1, an unblocked   
-                 algorithm will give the best performance.   
-            = 2: the minimum block size for which the block routine   
-                 should be used; if the usable block size is less than   
-                 this value, an unblocked routine should be used.   
-            = 3: the crossover point (in a block routine, for N less   
-                 than this value, an unblocked routine should be used)   
-            = 4: the number of shifts, used in the nonsymmetric   
-                 eigenvalue routines   
-            = 5: the minimum column dimension for blocking to be used;   
-                 rectangular blocks must have dimension at least k by m,   
-                 where k is given by ILAENV(2,...) and m by ILAENV(5,...)   
-            = 6: the crossover point for the SVD (when reducing an m by n   
-                 matrix to bidiagonal form, if max(m,n)/min(m,n) exceeds   
-                 this value, a QR factorization is used first to reduce   
-                 the matrix to a triangular form.)   
-            = 7: the number of processors   
-            = 8: the crossover point for the multishift QR and QZ methods   
-                 for nonsymmetric eigenvalue problems.   
-            = 9: maximum size of the subproblems at the bottom of the   
-                 computation tree in the divide-and-conquer algorithm   
-                 (used by xGELSD and xGESDD)   
-            =10: ieee NaN arithmetic can be trusted not to trap   
-            =11: infinity arithmetic can be trusted not to trap   
+/*  ISPEC   (input) INTEGER */
+/*          Specifies the parameter to be returned as the value of */
+/*          ILAENV. */
+/*          = 1: the optimal blocksize; if this value is 1, an unblocked */
+/*               algorithm will give the best performance. */
+/*          = 2: the minimum block size for which the block routine */
+/*               should be used; if the usable block size is less than */
+/*               this value, an unblocked routine should be used. */
+/*          = 3: the crossover point (in a block routine, for N less */
+/*               than this value, an unblocked routine should be used) */
+/*          = 4: the number of shifts, used in the nonsymmetric */
+/*               eigenvalue routines */
+/*          = 5: the minimum column dimension for blocking to be used; */
+/*               rectangular blocks must have dimension at least k by m, */
+/*               where k is given by ILAENV(2,...) and m by ILAENV(5,...) */
+/*          = 6: the crossover point for the SVD (when reducing an m by n */
+/*               matrix to bidiagonal form, if max(m,n)/min(m,n) exceeds */
+/*               this value, a QR factorization is used first to reduce */
+/*               the matrix to a triangular form.) */
+/*          = 7: the number of processors */
+/*          = 8: the crossover point for the multishift QR and QZ methods */
+/*               for nonsymmetric eigenvalue problems. */
+/*          = 9: maximum size of the subproblems at the bottom of the */
+/*               computation tree in the divide-and-conquer algorithm */
+/*               (used by xGELSD and xGESDD) */
+/*          =10: ieee NaN arithmetic can be trusted not to trap */
+/*          =11: infinity arithmetic can be trusted not to trap */
 
-    NAME    (input) CHARACTER*(*)   
-            The name of the calling subroutine, in either upper case or   
-            lower case.   
+/*  NAME    (input) CHARACTER*(*) */
+/*          The name of the calling subroutine, in either upper case or */
+/*          lower case. */
 
-    OPTS    (input) CHARACTER*(*)   
-            The character options to the subroutine NAME, concatenated   
-            into a single character string.  For example, UPLO = 'U',   
-            TRANS = 'T', and DIAG = 'N' for a triangular routine would   
-            be specified as OPTS = 'UTN'.   
+/*  OPTS    (input) CHARACTER*(*) */
+/*          The character options to the subroutine NAME, concatenated */
+/*          into a single character string.  For example, UPLO = 'U', */
+/*          TRANS = 'T', and DIAG = 'N' for a triangular routine would */
+/*          be specified as OPTS = 'UTN'. */
 
-    N1      (input) INTEGER   
-    N2      (input) INTEGER   
-    N3      (input) INTEGER   
-    N4      (input) INTEGER   
-            Problem dimensions for the subroutine NAME; these may not all   
-            be required.   
+/*  N1      (input) INTEGER */
+/*  N2      (input) INTEGER */
+/*  N3      (input) INTEGER */
+/*  N4      (input) INTEGER */
+/*          Problem dimensions for the subroutine NAME; these may not all */
+/*          be required. */
 
-   (ILAENV) (output) INTEGER   
-            >= 0: the value of the parameter specified by ISPEC   
-            < 0:  if ILAENV = -k, the k-th argument had an illegal value.   
+/* (ILAENV) (output) INTEGER */
+/*          >= 0: the value of the parameter specified by ISPEC */
+/*          < 0:  if ILAENV = -k, the k-th argument had an illegal value. */
 
-    Further Details   
-    ===============   
+/*  Further Details */
+/*  =============== */
 
-    The following conventions have been used when calling ILAENV from the   
-    LAPACK routines:   
-    1)  OPTS is a concatenation of all of the character options to   
-        subroutine NAME, in the same order that they appear in the   
-        argument list for NAME, even if they are not used in determining   
-        the value of the parameter specified by ISPEC.   
-    2)  The problem dimensions N1, N2, N3, N4 are specified in the order   
-        that they appear in the argument list for NAME.  N1 is used   
-        first, N2 second, and so on, and unused problem dimensions are   
-        passed a value of -1.   
-    3)  The parameter value returned by ILAENV is checked for validity in   
-        the calling subroutine.  For example, ILAENV is used to retrieve   
-        the optimal blocksize for STRTRI as follows:   
+/*  The following conventions have been used when calling ILAENV from the */
+/*  LAPACK routines: */
+/*  1)  OPTS is a concatenation of all of the character options to */
+/*      subroutine NAME, in the same order that they appear in the */
+/*      argument list for NAME, even if they are not used in determining */
+/*      the value of the parameter specified by ISPEC. */
+/*  2)  The problem dimensions N1, N2, N3, N4 are specified in the order */
+/*      that they appear in the argument list for NAME.  N1 is used */
+/*      first, N2 second, and so on, and unused problem dimensions are */
+/*      passed a value of -1. */
+/*  3)  The parameter value returned by ILAENV is checked for validity in */
+/*      the calling subroutine.  For example, ILAENV is used to retrieve */
+/*      the optimal blocksize for STRTRI as follows: */
 
-        NB = ILAENV( 1, 'STRTRI', UPLO // DIAG, N, -1, -1, -1 )   
-        IF( NB.LE.1 ) NB = MAX( 1, N )   
+/*      NB = ILAENV( 1, 'STRTRI', UPLO // DIAG, N, -1, -1, -1 ) */
+/*      IF( NB.LE.1 ) NB = MAX( 1, N ) */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     switch (*ispec) {
 	case 1:  goto L100;
@@ -354,11 +360,11 @@ L100:
 
 L110:
 
-/*     ISPEC = 1:  block size   
+/*     ISPEC = 1:  block size */
 
-       In these examples, separate code is provided for setting NB for   
-       real and complex.  We assume that NB will take the same value in   
-       single or double precision. */
+/*     In these examples, separate code is provided for setting NB for */
+/*     real and complex.  We assume that NB will take the same value in */
+/*     single or double precision. */
 
     nb = 1;
 
@@ -712,9 +718,9 @@ L800:
 
 L900:
 
-/*     ISPEC = 9:  maximum size of the subproblems at the bottom of the   
-                   computation tree in the divide-and-conquer algorithm   
-                   (used by xGELSD and xGESDD) */
+/*     ISPEC = 9:  maximum size of the subproblems at the bottom of the */
+/*                 computation tree in the divide-and-conquer algorithm */
+/*                 (used by xGELSD and xGESDD) */
 
     ret_val = 25;
     return ret_val;
@@ -749,45 +755,48 @@ integer ieeeck_(integer *ispec, real *zero, real *one)
     integer ret_val;
 
     /* Local variables */
-    static real neginf, posinf, negzro, newzro, nan1, nan2, nan3, nan4, nan5, 
-	    nan6;
+    real nan1, nan2, nan3, nan4, nan5, nan6, neginf, posinf, negzro, newzro;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    IEEECK is called from the ILAENV to verify that Inifinity and   
-    possibly NaN arithmetic is safe (i.e. will not trap).   
+/*  IEEECK is called from the ILAENV to verify that Inifinity and */
+/*  possibly NaN arithmetic is safe (i.e. will not trap). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    ISPEC   (input) INTEGER   
-            Specifies whether to test just for inifinity arithmetic   
-            or whether to test for infinity and NaN arithmetic.   
-            = 0: Verify infinity arithmetic only.   
-            = 1: Verify infinity and NaN arithmetic.   
+/*  ISPEC   (input) INTEGER */
+/*          Specifies whether to test just for inifinity arithmetic */
+/*          or whether to test for infinity and NaN arithmetic. */
+/*          = 0: Verify infinity arithmetic only. */
+/*          = 1: Verify infinity and NaN arithmetic. */
 
-    ZERO    (input) REAL   
-            Must contain the value 0.0   
-            This is passed to prevent the compiler from optimizing   
-            away this code.   
+/*  ZERO    (input) REAL */
+/*          Must contain the value 0.0 */
+/*          This is passed to prevent the compiler from optimizing */
+/*          away this code. */
 
-    ONE     (input) REAL   
-            Must contain the value 1.0   
-            This is passed to prevent the compiler from optimizing   
-            away this code.   
+/*  ONE     (input) REAL */
+/*          Must contain the value 1.0 */
+/*          This is passed to prevent the compiler from optimizing */
+/*          away this code. */
 
-    RETURN VALUE:  INTEGER   
-            = 0:  Arithmetic failed to produce the correct answers   
-            = 1:  Arithmetic produced the correct answers */
+/*  RETURN VALUE:  INTEGER */
+/*          = 0:  Arithmetic failed to produce the correct answers */
+/*          = 1:  Arithmetic produced the correct answers */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Executable Statements .. */
     ret_val = 1;
     posinf = *one / *zero;
     if (posinf <= *one) {
@@ -866,6 +875,6 @@ integer ieeeck_(integer *ispec, real *zero, real *one)
 	return ret_val;
     }
     return ret_val;
-} /* ieeeck_   
+} /* ieeeck_ */
 
-   Main program alias */ int main_ () { MAIN__ (); return 0; }
+/* Main program alias */ int main_ () { MAIN__ (); return 0; }

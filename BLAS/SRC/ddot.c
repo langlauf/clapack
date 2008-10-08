@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy, 
 	integer *incy)
@@ -7,17 +7,33 @@ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy,
     /* System generated locals */
     integer i__1;
     doublereal ret_val;
+
     /* Local variables */
-    static integer i__, m;
-    static doublereal dtemp;
-    static integer ix, iy, mp1;
-/*     forms the dot product of two vectors.   
-       uses unrolled loops for increments equal to one.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, ix, iy, mp1;
+    doublereal dtemp;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     forms the dot product of two vectors. */
+/*     uses unrolled loops for increments equal to one. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --dy;
     --dx;
+
     /* Function Body */
     ret_val = 0.;
     dtemp = 0.;
@@ -27,8 +43,10 @@ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy,
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -46,8 +64,12 @@ doublereal ddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy,
     }
     ret_val = dtemp;
     return ret_val;
-/*        code for both increments equal to 1   
-          clean-up loop */
+
+/*        code for both increments equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 5;
     if (m == 0) {
@@ -74,4 +96,3 @@ L60:
     ret_val = dtemp;
     return ret_val;
 } /* ddot_ */
-

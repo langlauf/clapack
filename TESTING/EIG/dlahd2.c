@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -220,11 +215,11 @@ static integer c__2 = 2;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static logical sord, corz;
-    static integer j;
-    extern logical lsame_(char *, char *);
-    static char c2[2];
-    extern logical lsamen_(integer *, char *, char *);
+    integer j;
+    char c2[2];
+    logical sord, corz;
+    extern logical lsame_(char *, char *), lsamen_(integer *, 
+	    char *, char *);
 
     /* Fortran I/O blocks */
     static cilist io___3 = { 0, 0, 0, fmt_9999, 0 };
@@ -280,39 +275,45 @@ static integer c__2 = 2;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 2.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK auxiliary test routine (version 2.0) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLAHD2 prints header information for the different test paths.   
+/*  DLAHD2 prints header information for the different test paths. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    IOUNIT  (input) INTEGER.   
-            On entry, IOUNIT specifies the unit number to which the   
-            header information should be printed.   
+/*  IOUNIT  (input) INTEGER. */
+/*          On entry, IOUNIT specifies the unit number to which the */
+/*          header information should be printed. */
 
-    PATH    (input) CHARACTER*3.   
-            On entry, PATH contains the name of the path for which the   
-            header information is to be printed.  Current paths are   
+/*  PATH    (input) CHARACTER*3. */
+/*          On entry, PATH contains the name of the path for which the */
+/*          header information is to be printed.  Current paths are */
 
-               DHS, ZHS:  Non-symmetric eigenproblem.   
-               DST, ZST:  Symmetric eigenproblem.   
-               DSG, ZSG:  Symmetric Generalized eigenproblem.   
-               DBD, ZBD:  Singular Value Decomposition (SVD)   
-               DBB, ZBB:  General Banded reduction to bidiagonal form   
+/*             DHS, ZHS:  Non-symmetric eigenproblem. */
+/*             DST, ZST:  Symmetric eigenproblem. */
+/*             DSG, ZSG:  Symmetric Generalized eigenproblem. */
+/*             DBD, ZBD:  Singular Value Decomposition (SVD) */
+/*             DBB, ZBB:  General Banded reduction to bidiagonal form */
 
-            These paths also are supplied in double precision (replace   
-            leading S by D and leading C by Z in path names).   
+/*          These paths also are supplied in double precision (replace */
+/*          leading S by D and leading C by Z in path names). */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (*iounit <= 0) {
 	return 0;
@@ -644,23 +645,22 @@ static integer c__2 = 2;
 
 
 
-/*     Symmetric/Hermitian eigenproblem   
+/*     Symmetric/Hermitian eigenproblem */
 
 
 
-       Symmetric/Hermitian Generalized eigenproblem   
+/*     Symmetric/Hermitian Generalized eigenproblem */
 
 
 
-       Singular Value Decomposition   
+/*     Singular Value Decomposition */
 
 
 
-       Band reduction to bidiagonal form   
+/*     Band reduction to bidiagonal form */
 
 
 
-       End of DLAHD2 */
+/*     End of DLAHD2 */
 
 } /* dlahd2_ */
-

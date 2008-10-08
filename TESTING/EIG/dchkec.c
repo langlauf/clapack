@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -46,12 +41,14 @@ static integer c__3 = 3;
     static char fmt_9990[] = "(/1x,\002All tests for \002,a3,\002 routines p"
 	    "assed the thresh\002,\002old (\002,i6,\002 tests run)\002)";
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static char path[3];
+    logical ok;
+    doublereal eps;
+    char path[3];
     extern /* Subroutine */ int dget31_(doublereal *, integer *, integer *, 
 	    integer *), dget32_(doublereal *, integer *, integer *, integer *)
 	    , dget33_(doublereal *, integer *, integer *, integer *), dget34_(
@@ -61,26 +58,25 @@ static integer c__3 = 3;
 	    dget37_(doublereal *, integer *, integer *, integer *, integer *),
 	     dget38_(doublereal *, integer *, integer *, integer *, integer *)
 	    , dget39_(doublereal *, integer *, integer *, integer *);
-    static doublereal sfmin;
-    static integer klaln2, llaln2, nlaln2[2];
-    static doublereal rlaln2;
-    static integer klanv2, llanv2, nlanv2;
-    static doublereal rlanv2;
-    static integer klasy2, llasy2, nlasy2;
-    static doublereal rlasy2;
+    doublereal sfmin;
+    integer klaln2, llaln2, nlaln2[2];
+    doublereal rlaln2;
+    integer klanv2, llanv2, nlanv2;
+    doublereal rlanv2;
+    integer klasy2, llasy2, nlasy2;
+    doublereal rlasy2;
     extern doublereal dlamch_(char *);
-    static logical ok;
     extern /* Subroutine */ int derrec_(char *, integer *);
-    static integer klaexc, llaexc, nlaexc[2];
-    static doublereal rlaexc;
-    static integer klaqtr, llaqtr, ktrexc, ltrexc, ktrsna, nlaqtr, ltrsna[3];
-    static doublereal rlaqtr;
-    static integer ktrsen;
-    static doublereal rtrexc;
-    static integer ltrsen[3], ntrexc[3], ntrsen[3], ntrsna[3];
-    static doublereal rtrsna[3], rtrsen[3];
-    static integer ntests, ktrsyl, ltrsyl, ntrsyl;
-    static doublereal rtrsyl, eps;
+    integer klaexc, llaexc, nlaexc[2];
+    doublereal rlaexc;
+    integer klaqtr, llaqtr, ktrexc, ltrexc, ktrsna, nlaqtr, ltrsna[3];
+    doublereal rlaqtr;
+    integer ktrsen;
+    doublereal rtrexc;
+    integer ltrsen[3], ntrexc[3], ntrsen[3], ntrsna[3];
+    doublereal rtrsna[3], rtrsen[3];
+    integer ntests, ktrsyl, ltrsyl, ntrsyl;
+    doublereal rtrsyl;
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, fmt_9989, 0 };
@@ -99,43 +95,53 @@ static integer c__3 = 3;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKEC tests eigen- condition estimation routines   
-           DLALN2, DLASY2, DLANV2, DLAQTR, DLAEXC,   
-           DTRSYL, DTREXC, DTRSNA, DTRSEN   
+/*  DCHKEC tests eigen- condition estimation routines */
+/*         DLALN2, DLASY2, DLANV2, DLAQTR, DLAEXC, */
+/*         DTRSYL, DTREXC, DTRSNA, DTRSEN */
 
-    In all cases, the routine runs through a fixed set of numerical   
-    examples, subjects them to various tests, and compares the test   
-    results to a threshold THRESH. In addition, DTREXC, DTRSNA and DTRSEN   
-    are tested by reading in precomputed examples from a file (on input   
-    unit NIN).  Output is written to output unit NOUT.   
+/*  In all cases, the routine runs through a fixed set of numerical */
+/*  examples, subjects them to various tests, and compares the test */
+/*  results to a threshold THRESH. In addition, DTREXC, DTRSNA and DTRSEN */
+/*  are tested by reading in precomputed examples from a file (on input */
+/*  unit NIN).  Output is written to output unit NOUT. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    THRESH  (input) DOUBLE PRECISION   
-            Threshold for residual tests.  A computed test ratio passes   
-            the threshold if it is less than THRESH.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          Threshold for residual tests.  A computed test ratio passes */
+/*          the threshold if it is less than THRESH. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input. */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "EC", (ftnlen)2, (ftnlen)2);
@@ -289,4 +295,3 @@ static integer c__3 = 3;
 /*     End of DCHKEC */
 
 } /* dchkec_ */
-

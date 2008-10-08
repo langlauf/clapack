@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -30,265 +25,274 @@ static integer c__5 = 5;
     void r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static logical bads;
-    static integer isim;
-    static real temp;
-    static integer i__, j;
+    integer i__, j, ic, jc, ir, jcr;
+    complex tau;
+    logical bads;
+    integer isim;
+    real temp;
     extern /* Subroutine */ int cgerc_(integer *, integer *, complex *, 
 	    complex *, integer *, complex *, integer *, complex *, integer *);
-    static complex alpha;
+    complex alpha;
     extern /* Subroutine */ int cscal_(integer *, complex *, complex *, 
 	    integer *);
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int cgemv_(char *, integer *, integer *, complex *
-	    , complex *, integer *, complex *, integer *, complex *, complex *
-	    , integer *);
-    static integer iinfo;
-    static real tempa[1];
-    static integer icols, idist;
+, complex *, integer *, complex *, integer *, complex *, complex *
+, integer *);
+    integer iinfo;
+    real tempa[1];
+    integer icols, idist;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *);
-    static integer irows;
+    integer irows;
     extern /* Subroutine */ int clatm1_(integer *, real *, integer *, integer 
-	    *, integer *, complex *, integer *, integer *), slatm1_(integer *,
+	    *, integer *, complex *, integer *, integer *), slatm1_(integer *, 
 	     real *, integer *, integer *, integer *, real *, integer *, 
 	    integer *);
-    static integer ic, jc;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
-    static integer ir;
     extern /* Subroutine */ int clarge_(integer *, complex *, integer *, 
 	    integer *, complex *, integer *), clarfg_(integer *, complex *, 
 	    complex *, integer *, complex *), clacgv_(integer *, complex *, 
 	    integer *);
     extern /* Complex */ VOID clarnd_(complex *, integer *, integer *);
-    static real ralpha;
+    real ralpha;
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
 	    *), claset_(char *, integer *, integer *, complex *, complex *, 
 	    complex *, integer *), xerbla_(char *, integer *),
 	     clarnv_(integer *, integer *, integer *, complex *);
-    static integer irsign, iupper;
-    static complex xnorms;
-    static integer jcr;
-    static complex tau;
+    integer irsign, iupper;
+    complex xnorms;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*     CLATME generates random non-symmetric square matrices with */
+/*     specified eigenvalues for testing LAPACK programs. */
 
-    Purpose   
-    =======   
+/*     CLATME operates by applying the following sequence of */
+/*     operations: */
 
-       CLATME generates random non-symmetric square matrices with   
-       specified eigenvalues for testing LAPACK programs.   
+/*     1. Set the diagonal to D, where D may be input or */
+/*          computed according to MODE, COND, DMAX, and RSIGN */
+/*          as described below. */
 
-       CLATME operates by applying the following sequence of   
-       operations:   
+/*     2. If UPPER='T', the upper triangle of A is set to random values */
+/*          out of distribution DIST. */
 
-       1. Set the diagonal to D, where D may be input or   
-            computed according to MODE, COND, DMAX, and RSIGN   
-            as described below.   
+/*     3. If SIM='T', A is multiplied on the left by a random matrix */
+/*          X, whose singular values are specified by DS, MODES, and */
+/*          CONDS, and on the right by X inverse. */
 
-       2. If UPPER='T', the upper triangle of A is set to random values   
-            out of distribution DIST.   
+/*     4. If KL < N-1, the lower bandwidth is reduced to KL using */
+/*          Householder transformations.  If KU < N-1, the upper */
+/*          bandwidth is reduced to KU. */
 
-       3. If SIM='T', A is multiplied on the left by a random matrix   
-            X, whose singular values are specified by DS, MODES, and   
-            CONDS, and on the right by X inverse.   
+/*     5. If ANORM is not negative, the matrix is scaled to have */
+/*          maximum-element-norm ANORM. */
 
-       4. If KL < N-1, the lower bandwidth is reduced to KL using   
-            Householder transformations.  If KU < N-1, the upper   
-            bandwidth is reduced to KU.   
+/*     (Note: since the matrix cannot be reduced beyond Hessenberg form, */
+/*      no packing options are available.) */
 
-       5. If ANORM is not negative, the matrix is scaled to have   
-            maximum-element-norm ANORM.   
+/*  Arguments */
+/*  ========= */
 
-       (Note: since the matrix cannot be reduced beyond Hessenberg form,   
-        no packing options are available.)   
+/*  N      - INTEGER */
+/*           The number of columns (or rows) of A. Not modified. */
 
-    Arguments   
-    =========   
+/*  DIST   - CHARACTER*1 */
+/*           On entry, DIST specifies the type of distribution to be used */
+/*           to generate the random eigen-/singular values, and on the */
+/*           upper triangle (see UPPER). */
+/*           'U' => UNIFORM( 0, 1 )  ( 'U' for uniform ) */
+/*           'S' => UNIFORM( -1, 1 ) ( 'S' for symmetric ) */
+/*           'N' => NORMAL( 0, 1 )   ( 'N' for normal ) */
+/*           'D' => uniform on the complex disc |z| < 1. */
+/*           Not modified. */
 
-    N      - INTEGER   
-             The number of columns (or rows) of A. Not modified.   
+/*  ISEED  - INTEGER array, dimension ( 4 ) */
+/*           On entry ISEED specifies the seed of the random number */
+/*           generator. They should lie between 0 and 4095 inclusive, */
+/*           and ISEED(4) should be odd. The random number generator */
+/*           uses a linear congruential sequence limited to small */
+/*           integers, and so should produce machine independent */
+/*           random numbers. The values of ISEED are changed on */
+/*           exit, and can be used in the next call to CLATME */
+/*           to continue the same random number sequence. */
+/*           Changed on exit. */
 
-    DIST   - CHARACTER*1   
-             On entry, DIST specifies the type of distribution to be used   
-             to generate the random eigen-/singular values, and on the   
-             upper triangle (see UPPER).   
-             'U' => UNIFORM( 0, 1 )  ( 'U' for uniform )   
-             'S' => UNIFORM( -1, 1 ) ( 'S' for symmetric )   
-             'N' => NORMAL( 0, 1 )   ( 'N' for normal )   
-             'D' => uniform on the complex disc |z| < 1.   
-             Not modified.   
+/*  D      - COMPLEX array, dimension ( N ) */
+/*           This array is used to specify the eigenvalues of A.  If */
+/*           MODE=0, then D is assumed to contain the eigenvalues */
+/*           otherwise they will be computed according to MODE, COND, */
+/*           DMAX, and RSIGN and placed in D. */
+/*           Modified if MODE is nonzero. */
 
-    ISEED  - INTEGER array, dimension ( 4 )   
-             On entry ISEED specifies the seed of the random number   
-             generator. They should lie between 0 and 4095 inclusive,   
-             and ISEED(4) should be odd. The random number generator   
-             uses a linear congruential sequence limited to small   
-             integers, and so should produce machine independent   
-             random numbers. The values of ISEED are changed on   
-             exit, and can be used in the next call to CLATME   
-             to continue the same random number sequence.   
-             Changed on exit.   
+/*  MODE   - INTEGER */
+/*           On entry this describes how the eigenvalues are to */
+/*           be specified: */
+/*           MODE = 0 means use D as input */
+/*           MODE = 1 sets D(1)=1 and D(2:N)=1.0/COND */
+/*           MODE = 2 sets D(1:N-1)=1 and D(N)=1.0/COND */
+/*           MODE = 3 sets D(I)=COND**(-(I-1)/(N-1)) */
+/*           MODE = 4 sets D(i)=1 - (i-1)/(N-1)*(1 - 1/COND) */
+/*           MODE = 5 sets D to random numbers in the range */
+/*                    ( 1/COND , 1 ) such that their logarithms */
+/*                    are uniformly distributed. */
+/*           MODE = 6 set D to random numbers from same distribution */
+/*                    as the rest of the matrix. */
+/*           MODE < 0 has the same meaning as ABS(MODE), except that */
+/*              the order of the elements of D is reversed. */
+/*           Thus if MODE is between 1 and 4, D has entries ranging */
+/*              from 1 to 1/COND, if between -1 and -4, D has entries */
+/*              ranging from 1/COND to 1, */
+/*           Not modified. */
 
-    D      - COMPLEX array, dimension ( N )   
-             This array is used to specify the eigenvalues of A.  If   
-             MODE=0, then D is assumed to contain the eigenvalues   
-             otherwise they will be computed according to MODE, COND,   
-             DMAX, and RSIGN and placed in D.   
-             Modified if MODE is nonzero.   
+/*  COND   - REAL */
+/*           On entry, this is used as described under MODE above. */
+/*           If used, it must be >= 1. Not modified. */
 
-    MODE   - INTEGER   
-             On entry this describes how the eigenvalues are to   
-             be specified:   
-             MODE = 0 means use D as input   
-             MODE = 1 sets D(1)=1 and D(2:N)=1.0/COND   
-             MODE = 2 sets D(1:N-1)=1 and D(N)=1.0/COND   
-             MODE = 3 sets D(I)=COND**(-(I-1)/(N-1))   
-             MODE = 4 sets D(i)=1 - (i-1)/(N-1)*(1 - 1/COND)   
-             MODE = 5 sets D to random numbers in the range   
-                      ( 1/COND , 1 ) such that their logarithms   
-                      are uniformly distributed.   
-             MODE = 6 set D to random numbers from same distribution   
-                      as the rest of the matrix.   
-             MODE < 0 has the same meaning as ABS(MODE), except that   
-                the order of the elements of D is reversed.   
-             Thus if MODE is between 1 and 4, D has entries ranging   
-                from 1 to 1/COND, if between -1 and -4, D has entries   
-                ranging from 1/COND to 1,   
-             Not modified.   
+/*  DMAX   - COMPLEX */
+/*           If MODE is neither -6, 0 nor 6, the contents of D, as */
+/*           computed according to MODE and COND, will be scaled by */
+/*           DMAX / max(abs(D(i))).  Note that DMAX need not be */
+/*           positive or real: if DMAX is negative or complex (or zero), */
+/*           D will be scaled by a negative or complex number (or zero). */
+/*           If RSIGN='F' then the largest (absolute) eigenvalue will be */
+/*           equal to DMAX. */
+/*           Not modified. */
 
-    COND   - REAL   
-             On entry, this is used as described under MODE above.   
-             If used, it must be >= 1. Not modified.   
+/*  EI     - CHARACTER*1 (ignored) */
+/*           Not modified. */
 
-    DMAX   - COMPLEX   
-             If MODE is neither -6, 0 nor 6, the contents of D, as   
-             computed according to MODE and COND, will be scaled by   
-             DMAX / max(abs(D(i))).  Note that DMAX need not be   
-             positive or real: if DMAX is negative or complex (or zero),   
-             D will be scaled by a negative or complex number (or zero).   
-             If RSIGN='F' then the largest (absolute) eigenvalue will be   
-             equal to DMAX.   
-             Not modified.   
+/*  RSIGN  - CHARACTER*1 */
+/*           If MODE is not 0, 6, or -6, and RSIGN='T', then the */
+/*           elements of D, as computed according to MODE and COND, will */
+/*           be multiplied by a random complex number from the unit */
+/*           circle |z| = 1.  If RSIGN='F', they will not be.  RSIGN may */
+/*           only have the values 'T' or 'F'. */
+/*           Not modified. */
 
-    EI     - CHARACTER*1 (ignored)   
-             Not modified.   
+/*  UPPER  - CHARACTER*1 */
+/*           If UPPER='T', then the elements of A above the diagonal */
+/*           will be set to random numbers out of DIST.  If UPPER='F', */
+/*           they will not.  UPPER may only have the values 'T' or 'F'. */
+/*           Not modified. */
 
-    RSIGN  - CHARACTER*1   
-             If MODE is not 0, 6, or -6, and RSIGN='T', then the   
-             elements of D, as computed according to MODE and COND, will   
-             be multiplied by a random complex number from the unit   
-             circle |z| = 1.  If RSIGN='F', they will not be.  RSIGN may   
-             only have the values 'T' or 'F'.   
-             Not modified.   
+/*  SIM    - CHARACTER*1 */
+/*           If SIM='T', then A will be operated on by a "similarity */
+/*           transform", i.e., multiplied on the left by a matrix X and */
+/*           on the right by X inverse.  X = U S V, where U and V are */
+/*           random unitary matrices and S is a (diagonal) matrix of */
+/*           singular values specified by DS, MODES, and CONDS.  If */
+/*           SIM='F', then A will not be transformed. */
+/*           Not modified. */
 
-    UPPER  - CHARACTER*1   
-             If UPPER='T', then the elements of A above the diagonal   
-             will be set to random numbers out of DIST.  If UPPER='F',   
-             they will not.  UPPER may only have the values 'T' or 'F'.   
-             Not modified.   
+/*  DS     - REAL array, dimension ( N ) */
+/*           This array is used to specify the singular values of X, */
+/*           in the same way that D specifies the eigenvalues of A. */
+/*           If MODE=0, the DS contains the singular values, which */
+/*           may not be zero. */
+/*           Modified if MODE is nonzero. */
 
-    SIM    - CHARACTER*1   
-             If SIM='T', then A will be operated on by a "similarity   
-             transform", i.e., multiplied on the left by a matrix X and   
-             on the right by X inverse.  X = U S V, where U and V are   
-             random unitary matrices and S is a (diagonal) matrix of   
-             singular values specified by DS, MODES, and CONDS.  If   
-             SIM='F', then A will not be transformed.   
-             Not modified.   
+/*  MODES  - INTEGER */
+/*  CONDS  - REAL */
+/*           Similar to MODE and COND, but for specifying the diagonal */
+/*           of S.  MODES=-6 and +6 are not allowed (since they would */
+/*           result in randomly ill-conditioned eigenvalues.) */
 
-    DS     - REAL array, dimension ( N )   
-             This array is used to specify the singular values of X,   
-             in the same way that D specifies the eigenvalues of A.   
-             If MODE=0, the DS contains the singular values, which   
-             may not be zero.   
-             Modified if MODE is nonzero.   
+/*  KL     - INTEGER */
+/*           This specifies the lower bandwidth of the  matrix.  KL=1 */
+/*           specifies upper Hessenberg form.  If KL is at least N-1, */
+/*           then A will have full lower bandwidth. */
+/*           Not modified. */
 
-    MODES  - INTEGER   
-    CONDS  - REAL   
-             Similar to MODE and COND, but for specifying the diagonal   
-             of S.  MODES=-6 and +6 are not allowed (since they would   
-             result in randomly ill-conditioned eigenvalues.)   
+/*  KU     - INTEGER */
+/*           This specifies the upper bandwidth of the  matrix.  KU=1 */
+/*           specifies lower Hessenberg form.  If KU is at least N-1, */
+/*           then A will have full upper bandwidth; if KU and KL */
+/*           are both at least N-1, then A will be dense.  Only one of */
+/*           KU and KL may be less than N-1. */
+/*           Not modified. */
 
-    KL     - INTEGER   
-             This specifies the lower bandwidth of the  matrix.  KL=1   
-             specifies upper Hessenberg form.  If KL is at least N-1,   
-             then A will have full lower bandwidth.   
-             Not modified.   
+/*  ANORM  - REAL */
+/*           If ANORM is not negative, then A will be scaled by a non- */
+/*           negative real number to make the maximum-element-norm of A */
+/*           to be ANORM. */
+/*           Not modified. */
 
-    KU     - INTEGER   
-             This specifies the upper bandwidth of the  matrix.  KU=1   
-             specifies lower Hessenberg form.  If KU is at least N-1,   
-             then A will have full upper bandwidth; if KU and KL   
-             are both at least N-1, then A will be dense.  Only one of   
-             KU and KL may be less than N-1.   
-             Not modified.   
+/*  A      - COMPLEX array, dimension ( LDA, N ) */
+/*           On exit A is the desired test matrix. */
+/*           Modified. */
 
-    ANORM  - REAL   
-             If ANORM is not negative, then A will be scaled by a non-   
-             negative real number to make the maximum-element-norm of A   
-             to be ANORM.   
-             Not modified.   
+/*  LDA    - INTEGER */
+/*           LDA specifies the first dimension of A as declared in the */
+/*           calling program.  LDA must be at least M. */
+/*           Not modified. */
 
-    A      - COMPLEX array, dimension ( LDA, N )   
-             On exit A is the desired test matrix.   
-             Modified.   
+/*  WORK   - COMPLEX array, dimension ( 3*N ) */
+/*           Workspace. */
+/*           Modified. */
 
-    LDA    - INTEGER   
-             LDA specifies the first dimension of A as declared in the   
-             calling program.  LDA must be at least M.   
-             Not modified.   
+/*  INFO   - INTEGER */
+/*           Error code.  On exit, INFO will be set to one of the */
+/*           following values: */
+/*             0 => normal return */
+/*            -1 => N negative */
+/*            -2 => DIST illegal string */
+/*            -5 => MODE not in range -6 to 6 */
+/*            -6 => COND less than 1.0, and MODE neither -6, 0 nor 6 */
+/*            -9 => RSIGN is not 'T' or 'F' */
+/*           -10 => UPPER is not 'T' or 'F' */
+/*           -11 => SIM   is not 'T' or 'F' */
+/*           -12 => MODES=0 and DS has a zero singular value. */
+/*           -13 => MODES is not in the range -5 to 5. */
+/*           -14 => MODES is nonzero and CONDS is less than 1. */
+/*           -15 => KL is less than 1. */
+/*           -16 => KU is less than 1, or KL and KU are both less than */
+/*                  N-1. */
+/*           -19 => LDA is less than M. */
+/*            1  => Error return from CLATM1 (computing D) */
+/*            2  => Cannot scale to DMAX (max. eigenvalue is 0) */
+/*            3  => Error return from SLATM1 (computing DS) */
+/*            4  => Error return from CLARGE */
+/*            5  => Zero singular value from SLATM1. */
 
-    WORK   - COMPLEX array, dimension ( 3*N )   
-             Workspace.   
-             Modified.   
+/*  ===================================================================== */
 
-    INFO   - INTEGER   
-             Error code.  On exit, INFO will be set to one of the   
-             following values:   
-               0 => normal return   
-              -1 => N negative   
-              -2 => DIST illegal string   
-              -5 => MODE not in range -6 to 6   
-              -6 => COND less than 1.0, and MODE neither -6, 0 nor 6   
-              -9 => RSIGN is not 'T' or 'F'   
-             -10 => UPPER is not 'T' or 'F'   
-             -11 => SIM   is not 'T' or 'F'   
-             -12 => MODES=0 and DS has a zero singular value.   
-             -13 => MODES is not in the range -5 to 5.   
-             -14 => MODES is nonzero and CONDS is less than 1.   
-             -15 => KL is less than 1.   
-             -16 => KU is less than 1, or KL and KU are both less than   
-                    N-1.   
-             -19 => LDA is less than M.   
-              1  => Error return from CLATM1 (computing D)   
-              2  => Cannot scale to DMAX (max. eigenvalue is 0)   
-              3  => Error return from SLATM1 (computing DS)   
-              4  => Error return from CLARGE   
-              5  => Zero singular value from SLATM1.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     1)      Decode and Test the input parameters. */
+/*             Initialize flags & seed. */
 
-
-       1)      Decode and Test the input parameters.   
-               Initialize flags & seed.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     --d__;
     --ds;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --work;
 
@@ -405,9 +409,9 @@ static integer c__5 = 5;
 	++iseed[4];
     }
 
-/*     2)      Set up diagonal of A   
+/*     2)      Set up diagonal of A */
 
-               Compute D according to COND and MODE */
+/*             Compute D according to COND and MODE */
 
     clatm1_(mode, cond, &irsign, &idist, &iseed[1], &d__[1], n, &iinfo);
     if (iinfo != 0) {
@@ -449,22 +453,22 @@ static integer c__5 = 5;
 	i__1 = *n;
 	for (jc = 2; jc <= i__1; ++jc) {
 	    i__2 = jc - 1;
-	    clarnv_(&idist, &iseed[1], &i__2, &a_ref(1, jc));
+	    clarnv_(&idist, &iseed[1], &i__2, &a[jc * a_dim1 + 1]);
 /* L40: */
 	}
     }
 
-/*     4)      If SIM='T', apply similarity transformation.   
+/*     4)      If SIM='T', apply similarity transformation. */
 
-                                  -1   
-               Transform is  X A X  , where X = U S V, thus   
+/*                                -1 */
+/*             Transform is  X A X  , where X = U S V, thus */
 
-               it is  U S V A V' (1/S) U' */
+/*             it is  U S V A V' (1/S) U' */
 
     if (isim != 0) {
 
-/*        Compute S (singular values of the eigenvector matrix)   
-          according to CONDS and MODES */
+/*        Compute S (singular values of the eigenvector matrix) */
+/*        according to CONDS and MODES */
 
 	slatm1_(modes, conds, &c__0, &c__0, &iseed[1], &ds[1], n, &iinfo);
 	if (iinfo != 0) {
@@ -484,10 +488,10 @@ static integer c__5 = 5;
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
-	    csscal_(n, &ds[j], &a_ref(j, 1), lda);
+	    csscal_(n, &ds[j], &a[j + a_dim1], lda);
 	    if (ds[j] != 0.f) {
 		r__1 = 1.f / ds[j];
-		csscal_(n, &r__1, &a_ref(1, j), &c__1);
+		csscal_(n, &r__1, &a[j * a_dim1 + 1], &c__1);
 	    } else {
 		*info = 5;
 		return 0;
@@ -516,7 +520,7 @@ static integer c__5 = 5;
 	    irows = *n + 1 - jcr;
 	    icols = *n + *kl - jcr;
 
-	    ccopy_(&irows, &a_ref(jcr, ic), &c__1, &work[1], &c__1);
+	    ccopy_(&irows, &a[jcr + ic * a_dim1], &c__1, &work[1], &c__1);
 	    xnorms.r = work[1].r, xnorms.i = work[1].i;
 	    clarfg_(&irows, &xnorms, &work[2], &c__1, &tau);
 	    r_cnjg(&q__1, &tau);
@@ -525,30 +529,29 @@ static integer c__5 = 5;
 	    clarnd_(&q__1, &c__5, &iseed[1]);
 	    alpha.r = q__1.r, alpha.i = q__1.i;
 
-	    cgemv_("C", &irows, &icols, &c_b2, &a_ref(jcr, ic + 1), lda, &
-		    work[1], &c__1, &c_b1, &work[irows + 1], &c__1)
-		    ;
+	    cgemv_("C", &irows, &icols, &c_b2, &a[jcr + (ic + 1) * a_dim1], 
+		    lda, &work[1], &c__1, &c_b1, &work[irows + 1], &c__1);
 	    q__1.r = -tau.r, q__1.i = -tau.i;
 	    cgerc_(&irows, &icols, &q__1, &work[1], &c__1, &work[irows + 1], &
-		    c__1, &a_ref(jcr, ic + 1), lda);
+		    c__1, &a[jcr + (ic + 1) * a_dim1], lda);
 
-	    cgemv_("N", n, &irows, &c_b2, &a_ref(1, jcr), lda, &work[1], &
-		    c__1, &c_b1, &work[irows + 1], &c__1);
+	    cgemv_("N", n, &irows, &c_b2, &a[jcr * a_dim1 + 1], lda, &work[1], 
+		     &c__1, &c_b1, &work[irows + 1], &c__1);
 	    r_cnjg(&q__2, &tau);
 	    q__1.r = -q__2.r, q__1.i = -q__2.i;
-	    cgerc_(n, &irows, &q__1, &work[irows + 1], &c__1, &work[1], &c__1,
-		     &a_ref(1, jcr), lda);
+	    cgerc_(n, &irows, &q__1, &work[irows + 1], &c__1, &work[1], &c__1, 
+		     &a[jcr * a_dim1 + 1], lda);
 
-	    i__2 = a_subscr(jcr, ic);
+	    i__2 = jcr + ic * a_dim1;
 	    a[i__2].r = xnorms.r, a[i__2].i = xnorms.i;
 	    i__2 = irows - 1;
-	    claset_("Full", &i__2, &c__1, &c_b1, &c_b1, &a_ref(jcr + 1, ic), 
-		    lda);
+	    claset_("Full", &i__2, &c__1, &c_b1, &c_b1, &a[jcr + 1 + ic * 
+		    a_dim1], lda);
 
 	    i__2 = icols + 1;
-	    cscal_(&i__2, &alpha, &a_ref(jcr, ic), lda);
+	    cscal_(&i__2, &alpha, &a[jcr + ic * a_dim1], lda);
 	    r_cnjg(&q__1, &alpha);
-	    cscal_(n, &q__1, &a_ref(1, jcr), &c__1);
+	    cscal_(n, &q__1, &a[jcr * a_dim1 + 1], &c__1);
 /* L60: */
 	}
     } else if (*ku < *n - 1) {
@@ -561,7 +564,7 @@ static integer c__5 = 5;
 	    irows = *n + *ku - jcr;
 	    icols = *n + 1 - jcr;
 
-	    ccopy_(&icols, &a_ref(ir, jcr), lda, &work[1], &c__1);
+	    ccopy_(&icols, &a[ir + jcr * a_dim1], lda, &work[1], &c__1);
 	    xnorms.r = work[1].r, xnorms.i = work[1].i;
 	    clarfg_(&icols, &xnorms, &work[2], &c__1, &tau);
 	    r_cnjg(&q__1, &tau);
@@ -572,30 +575,29 @@ static integer c__5 = 5;
 	    clarnd_(&q__1, &c__5, &iseed[1]);
 	    alpha.r = q__1.r, alpha.i = q__1.i;
 
-	    cgemv_("N", &irows, &icols, &c_b2, &a_ref(ir + 1, jcr), lda, &
-		    work[1], &c__1, &c_b1, &work[icols + 1], &c__1)
-		    ;
+	    cgemv_("N", &irows, &icols, &c_b2, &a[ir + 1 + jcr * a_dim1], lda, 
+		     &work[1], &c__1, &c_b1, &work[icols + 1], &c__1);
 	    q__1.r = -tau.r, q__1.i = -tau.i;
 	    cgerc_(&irows, &icols, &q__1, &work[icols + 1], &c__1, &work[1], &
-		    c__1, &a_ref(ir + 1, jcr), lda);
+		    c__1, &a[ir + 1 + jcr * a_dim1], lda);
 
-	    cgemv_("C", &icols, n, &c_b2, &a_ref(jcr, 1), lda, &work[1], &
+	    cgemv_("C", &icols, n, &c_b2, &a[jcr + a_dim1], lda, &work[1], &
 		    c__1, &c_b1, &work[icols + 1], &c__1);
 	    r_cnjg(&q__2, &tau);
 	    q__1.r = -q__2.r, q__1.i = -q__2.i;
-	    cgerc_(&icols, n, &q__1, &work[1], &c__1, &work[icols + 1], &c__1,
-		     &a_ref(jcr, 1), lda);
+	    cgerc_(&icols, n, &q__1, &work[1], &c__1, &work[icols + 1], &c__1, 
+		     &a[jcr + a_dim1], lda);
 
-	    i__2 = a_subscr(ir, jcr);
+	    i__2 = ir + jcr * a_dim1;
 	    a[i__2].r = xnorms.r, a[i__2].i = xnorms.i;
 	    i__2 = icols - 1;
-	    claset_("Full", &c__1, &i__2, &c_b1, &c_b1, &a_ref(ir, jcr + 1), 
-		    lda);
+	    claset_("Full", &c__1, &i__2, &c_b1, &c_b1, &a[ir + (jcr + 1) * 
+		    a_dim1], lda);
 
 	    i__2 = irows + 1;
-	    cscal_(&i__2, &alpha, &a_ref(ir, jcr), &c__1);
+	    cscal_(&i__2, &alpha, &a[ir + jcr * a_dim1], &c__1);
 	    r_cnjg(&q__1, &alpha);
-	    cscal_(n, &q__1, &a_ref(jcr, 1), lda);
+	    cscal_(n, &q__1, &a[jcr + a_dim1], lda);
 /* L70: */
 	}
     }
@@ -608,7 +610,7 @@ static integer c__5 = 5;
 	    ralpha = *anorm / temp;
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		csscal_(n, &ralpha, &a_ref(1, j), &c__1);
+		csscal_(n, &ralpha, &a[j * a_dim1 + 1], &c__1);
 /* L80: */
 	    }
 	}
@@ -619,8 +621,3 @@ static integer c__5 = 5;
 /*     End of CLATME */
 
 } /* clatme_ */
-
-#undef a_ref
-#undef a_subscr
-
-

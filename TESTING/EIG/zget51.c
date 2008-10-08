@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,122 +18,132 @@ static doublecomplex c_b2 = {1.,0.};
     doublecomplex z__1;
 
     /* Local variables */
-    static integer jcol;
-    static doublereal unfl;
-    static integer jrow, jdiag;
-    static doublereal anorm;
+    doublereal ulp;
+    integer jcol;
+    doublereal unfl;
+    integer jrow, jdiag;
+    doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static doublereal wnorm;
+    doublereal wnorm;
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *);
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal ulp;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*       ZGET51  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*               A = U B V* */
 
-         ZGET51  generally checks a decomposition of the form   
+/*       where * means conjugate transpose and U and V are unitary. */
 
-                 A = U B V*   
+/*       Specifically, if ITYPE=1 */
 
-         where * means conjugate transpose and U and V are unitary.   
+/*               RESULT = | A - U B V* | / ( |A| n ulp ) */
 
-         Specifically, if ITYPE=1   
+/*       If ITYPE=2, then: */
 
-                 RESULT = | A - U B V* | / ( |A| n ulp )   
+/*               RESULT = | A - B | / ( |A| n ulp ) */
 
-         If ITYPE=2, then:   
+/*       If ITYPE=3, then: */
 
-                 RESULT = | A - B | / ( |A| n ulp )   
+/*               RESULT = | I - UU* | / ( n ulp ) */
 
-         If ITYPE=3, then:   
+/*  Arguments */
+/*  ========= */
 
-                 RESULT = | I - UU* | / ( n ulp )   
+/*  ITYPE   (input) INTEGER */
+/*          Specifies the type of tests to be performed. */
+/*          =1: RESULT = | A - U B V* | / ( |A| n ulp ) */
+/*          =2: RESULT = | A - B | / ( |A| n ulp ) */
+/*          =3: RESULT = | I - UU* | / ( n ulp ) */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, ZGET51 does nothing. */
+/*          It must be at least zero. */
 
-    ITYPE   (input) INTEGER   
-            Specifies the type of tests to be performed.   
-            =1: RESULT = | A - U B V* | / ( |A| n ulp )   
-            =2: RESULT = | A - B | / ( |A| n ulp )   
-            =3: RESULT = | I - UU* | / ( n ulp )   
+/*  A       (input) COMPLEX*16 array, dimension (LDA, N) */
+/*          The original (unfactored) matrix. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZGET51 does nothing.   
-            It must be at least zero.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA, N)   
-            The original (unfactored) matrix.   
+/*  B       (input) COMPLEX*16 array, dimension (LDB, N) */
+/*          The factored matrix. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) COMPLEX*16 array, dimension (LDB, N)   
-            The factored matrix.   
+/*  U       (input) COMPLEX*16 array, dimension (LDU, N) */
+/*          The unitary matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) COMPLEX*16 array, dimension (LDU, N)   
-            The unitary matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  V       (input) COMPLEX*16 array, dimension (LDV, N) */
+/*          The unitary matrix on the left-hand side in the */
+/*          decomposition. */
+/*          Not referenced if ITYPE=2 */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of V.  LDV must be at least N and */
+/*          at least 1. */
 
-    V       (input) COMPLEX*16 array, dimension (LDV, N)   
-            The unitary matrix on the left-hand side in the   
-            decomposition.   
-            Not referenced if ITYPE=2   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (2*N**2) */
 
-    LDV     (input) INTEGER   
-            The leading dimension of V.  LDV must be at least N and   
-            at least 1.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (2*N**2)   
+/*  RESULT  (output) DOUBLE PRECISION */
+/*          The values computed by the test specified by ITYPE.  The */
+/*          value is currently limited to 1/ulp, to avoid overflow. */
+/*          Errors are flagged by RESULT=10/ulp. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION   
-            The values computed by the test specified by ITYPE.  The   
-            value is currently limited to 1/ulp, to avoid overflow.   
-            Errors are flagged by RESULT=10/ulp.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     --work;
     --rwork;
@@ -163,9 +168,9 @@ static doublecomplex c_b2 = {1.,0.};
 
     if (*itype <= 2) {
 
-/*        Tests scaled by the norm(A)   
+/*        Tests scaled by the norm(A) */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = zlange_("1", n, n, &a[a_offset], lda, &rwork[1]);
 	anorm = max(d__1,unfl);
 
@@ -179,7 +184,7 @@ static doublecomplex c_b2 = {1.,0.};
 	    zgemm_("N", "N", n, n, n, &c_b2, &u[u_offset], ldu, &b[b_offset], 
 		    ldb, &c_b1, &work[i__1 * i__1 + 1], n);
 
-	    z__1.r = -1., z__1.i = 0.;
+	    z__1.r = -1., z__1.i = -0.;
 /* Computing 2nd power */
 	    i__1 = *n;
 	    zgemm_("N", "C", n, n, n, &z__1, &work[i__1 * i__1 + 1], n, &v[
@@ -197,7 +202,7 @@ static doublecomplex c_b2 = {1.,0.};
 		for (jrow = 1; jrow <= i__2; ++jrow) {
 		    i__3 = jrow + *n * (jcol - 1);
 		    i__4 = jrow + *n * (jcol - 1);
-		    i__5 = a_subscr(jrow, jcol);
+		    i__5 = jrow + jcol * a_dim1;
 		    z__1.r = work[i__4].r - a[i__5].r, z__1.i = work[i__4].i 
 			    - a[i__5].i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -227,18 +232,18 @@ static doublecomplex c_b2 = {1.,0.};
 
     } else {
 
-/*        Tests not scaled by norm(A)   
+/*        Tests not scaled by norm(A) */
 
-          ITYPE=3: Compute  UU' - I */
+/*        ITYPE=3: Compute  UU' - I */
 
-	zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu,
+	zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, 
 		 &c_b1, &work[1], n);
 
 	i__1 = *n;
 	for (jdiag = 1; jdiag <= i__1; ++jdiag) {
 	    i__2 = (*n + 1) * (jdiag - 1) + 1;
 	    i__3 = (*n + 1) * (jdiag - 1) + 1;
-	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i + 0.;
+	    z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i - 0.;
 	    work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L30: */
 	}
@@ -254,8 +259,3 @@ static doublecomplex c_b2 = {1.,0.};
 /*     End of ZGET51 */
 
 } /* zget51_ */
-
-#undef a_ref
-#undef a_subscr
-
-

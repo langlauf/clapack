@@ -1,20 +1,37 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 integer isamax_(integer *n, real *sx, integer *incx)
 {
     /* System generated locals */
     integer ret_val, i__1;
     real r__1;
+
     /* Local variables */
-    static real smax;
-    static integer i__, ix;
-/*     finds the index of element having max. absolute value.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, ix;
+    real smax;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     finds the index of element having max. absolute value. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --sx;
+
     /* Function Body */
     ret_val = 0;
     if (*n < 1 || *incx <= 0) {
@@ -27,7 +44,9 @@ integer isamax_(integer *n, real *sx, integer *incx)
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     ix = 1;
     smax = dabs(sx[1]);
     ix += *incx;
@@ -43,7 +62,9 @@ L5:
 /* L10: */
     }
     return ret_val;
+
 /*        code for increment equal to 1 */
+
 L20:
     smax = dabs(sx[1]);
     i__1 = *n;
@@ -58,4 +79,3 @@ L30:
     }
     return ret_val;
 } /* isamax_ */
-

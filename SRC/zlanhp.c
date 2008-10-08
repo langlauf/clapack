@@ -1,93 +1,108 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 doublereal zlanhp_(char *norm, char *uplo, integer *n, doublecomplex *ap, 
 	doublereal *work)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    ZLANHP  returns the value of the one norm,  or the Frobenius norm, or   
-    the  infinity norm,  or the  element of  largest absolute value  of a   
-    complex hermitian matrix A,  supplied in packed form.   
-
-    Description   
-    ===========   
-
-    ZLANHP returns the value   
-
-       ZLANHP = ( max(abs(A(i,j))), NORM = 'M' or 'm'   
-                (   
-                ( norm1(A),         NORM = '1', 'O' or 'o'   
-                (   
-                ( normI(A),         NORM = 'I' or 'i'   
-                (   
-                ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
-
-    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
-    squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies the value to be returned in ZLANHP as described   
-            above.   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            hermitian matrix A is supplied.   
-            = 'U':  Upper triangular part of A is supplied   
-            = 'L':  Lower triangular part of A is supplied   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.  When N = 0, ZLANHP is   
-            set to zero.   
-
-    AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangle of the hermitian matrix A, packed   
-            columnwise in a linear array.  The j-th column of A is stored   
-            in the array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-            Note that the  imaginary parts of the diagonal elements need   
-            not be set and are assumed to be zero.   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK),   
-            where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise,   
-            WORK is not referenced.   
-
-   =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2;
     doublereal ret_val, d__1, d__2, d__3;
+
     /* Builtin functions */
     double z_abs(doublecomplex *), sqrt(doublereal);
+
     /* Local variables */
-    static doublereal absa;
-    static integer i__, j, k;
-    static doublereal scale;
+    integer i__, j, k;
+    doublereal sum, absa, scale;
     extern logical lsame_(char *, char *);
-    static doublereal value;
-    extern /* Subroutine */ int zlassq_(integer *, doublecomplex *, integer *,
+    doublereal value;
+    extern /* Subroutine */ int zlassq_(integer *, doublecomplex *, integer *, 
 	     doublereal *, doublereal *);
-    static doublereal sum;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZLANHP  returns the value of the one norm,  or the Frobenius norm, or */
+/*  the  infinity norm,  or the  element of  largest absolute value  of a */
+/*  complex hermitian matrix A,  supplied in packed form. */
+
+/*  Description */
+/*  =========== */
+
+/*  ZLANHP returns the value */
+
+/*     ZLANHP = ( max(abs(A(i,j))), NORM = 'M' or 'm' */
+/*              ( */
+/*              ( norm1(A),         NORM = '1', 'O' or 'o' */
+/*              ( */
+/*              ( normI(A),         NORM = 'I' or 'i' */
+/*              ( */
+/*              ( normF(A),         NORM = 'F', 'f', 'E' or 'e' */
+
+/*  where  norm1  denotes the  one norm of a matrix (maximum column sum), */
+/*  normI  denotes the  infinity norm  of a matrix  (maximum row sum) and */
+/*  normF  denotes the  Frobenius norm of a matrix (square root of sum of */
+/*  squares).  Note that  max(abs(A(i,j)))  is not a consistent matrix norm. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NORM    (input) CHARACTER*1 */
+/*          Specifies the value to be returned in ZLANHP as described */
+/*          above. */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          hermitian matrix A is supplied. */
+/*          = 'U':  Upper triangular part of A is supplied */
+/*          = 'L':  Lower triangular part of A is supplied */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0.  When N = 0, ZLANHP is */
+/*          set to zero. */
+
+/*  AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The upper or lower triangle of the hermitian matrix A, packed */
+/*          columnwise in a linear array.  The j-th column of A is stored */
+/*          in the array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n. */
+/*          Note that the  imaginary parts of the diagonal elements need */
+/*          not be set and are assumed to be zero. */
+
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (MAX(1,LWORK)), */
+/*          where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise, */
+/*          WORK is not referenced. */
+
+/* ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --work;
     --ap;
 
@@ -248,4 +263,3 @@ doublereal zlanhp_(char *norm, char *uplo, integer *n, doublecomplex *ap,
 /*     End of ZLANHP */
 
 } /* zlanhp_ */
-

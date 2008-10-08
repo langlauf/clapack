@@ -1,63 +1,70 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int clacrt_(integer *n, complex *cx, integer *incx, complex *
 	cy, integer *incy, complex *c__, complex *s)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    CLACRT performs the operation   
-
-       (  c  s )( x )  ==> ( x )   
-       ( -s  c )( y )      ( y )   
-
-    where c and s are complex and the vectors x and y are complex.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of elements in the vectors CX and CY.   
-
-    CX      (input/output) COMPLEX array, dimension (N)   
-            On input, the vector x.   
-            On output, CX is overwritten with c*x + s*y.   
-
-    INCX    (input) INTEGER   
-            The increment between successive values of CX.  INCX <> 0.   
-
-    CY      (input/output) COMPLEX array, dimension (N)   
-            On input, the vector y.   
-            On output, CY is overwritten with -s*x + c*y.   
-
-    INCY    (input) INTEGER   
-            The increment between successive values of CY.  INCY <> 0.   
-
-    C       (input) COMPLEX   
-    S       (input) COMPLEX   
-            C and S define the matrix   
-               [  C   S  ].   
-               [ -S   C  ]   
-
-   =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     complex q__1, q__2, q__3;
-    /* Local variables */
-    static integer i__;
-    static complex ctemp;
-    static integer ix, iy;
 
+    /* Local variables */
+    integer i__, ix, iy;
+    complex ctemp;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLACRT performs the operation */
+
+/*     (  c  s )( x )  ==> ( x ) */
+/*     ( -s  c )( y )      ( y ) */
+
+/*  where c and s are complex and the vectors x and y are complex. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of elements in the vectors CX and CY. */
+
+/*  CX      (input/output) COMPLEX array, dimension (N) */
+/*          On input, the vector x. */
+/*          On output, CX is overwritten with c*x + s*y. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive values of CX.  INCX <> 0. */
+
+/*  CY      (input/output) COMPLEX array, dimension (N) */
+/*          On input, the vector y. */
+/*          On output, CY is overwritten with -s*x + c*y. */
+
+/*  INCY    (input) INTEGER */
+/*          The increment between successive values of CY.  INCY <> 0. */
+
+/*  C       (input) COMPLEX */
+/*  S       (input) COMPLEX */
+/*          C and S define the matrix */
+/*             [  C   S  ]. */
+/*             [ -S   C  ] */
+
+/* ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --cy;
     --cx;
 
@@ -134,4 +141,3 @@ L20:
     }
     return 0;
 } /* clacrt_ */
-

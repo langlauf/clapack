@@ -1,55 +1,70 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zdrscl_(integer *n, doublereal *sa, doublecomplex *sx, 
 	integer *incx)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    ZDRSCL multiplies an n-element complex vector x by the real scalar   
-    1/a.  This is done without overflow or underflow as long as   
-    the final result x/a does not overflow or underflow.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of components of the vector x.   
-
-    SA      (input) DOUBLE PRECISION   
-            The scalar a which is used to divide each component of x.   
-            SA must be >= 0, or the subroutine will divide by zero.   
-
-    SX      (input/output) COMPLEX*16 array, dimension   
-                           (1+(N-1)*abs(INCX))   
-            The n-element vector x.   
-
-    INCX    (input) INTEGER   
-            The increment between successive values of the vector SX.   
-            > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n   
-
-   =====================================================================   
-
-
-       Quick return if possible   
-
-       Parameter adjustments */
-    static doublereal cden;
-    static logical done;
-    static doublereal cnum, cden1, cnum1;
+    doublereal mul, cden;
+    logical done;
+    doublereal cnum, cden1, cnum1;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
 	    doublecomplex *, integer *);
-    static doublereal bignum, smlnum, mul;
+    doublereal bignum, smlnum;
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZDRSCL multiplies an n-element complex vector x by the real scalar */
+/*  1/a.  This is done without overflow or underflow as long as */
+/*  the final result x/a does not overflow or underflow. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of components of the vector x. */
+
+/*  SA      (input) DOUBLE PRECISION */
+/*          The scalar a which is used to divide each component of x. */
+/*          SA must be >= 0, or the subroutine will divide by zero. */
+
+/*  SX      (input/output) COMPLEX*16 array, dimension */
+/*                         (1+(N-1)*abs(INCX)) */
+/*          The n-element vector x. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive values of the vector SX. */
+/*          > 0:  SX(1) = X(1) and SX(1+(i-1)*INCX) = x(i),     1< i<= n */
+
+/* ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Quick return if possible */
+
+    /* Parameter adjustments */
     --sx;
 
     /* Function Body */
@@ -106,4 +121,3 @@ L10:
 /*     End of ZDRSCL */
 
 } /* zdrscl_ */
-

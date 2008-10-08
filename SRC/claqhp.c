@@ -1,88 +1,100 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int claqhp_(char *uplo, integer *n, complex *ap, real *s, 
 	real *scond, real *amax, char *equed)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CLAQHP equilibrates a Hermitian matrix A using the scaling factors   
-    in the vector S.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            Hermitian matrix A is stored.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input/output) COMPLEX array, dimension (N*(N+1)/2)   
-            On entry, the upper or lower triangle of the Hermitian matrix   
-            A, packed columnwise in a linear array.  The j-th column of A   
-            is stored in the array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n.   
-
-            On exit, the equilibrated matrix:  diag(S) * A * diag(S), in   
-            the same storage format as A.   
-
-    S       (input) REAL array, dimension (N)   
-            The scale factors for A.   
-
-    SCOND   (input) REAL   
-            Ratio of the smallest S(i) to the largest S(i).   
-
-    AMAX    (input) REAL   
-            Absolute value of largest matrix entry.   
-
-    EQUED   (output) CHARACTER*1   
-            Specifies whether or not equilibration was done.   
-            = 'N':  No equilibration.   
-            = 'Y':  Equilibration was done, i.e., A has been replaced by   
-                    diag(S) * A * diag(S).   
-
-    Internal Parameters   
-    ===================   
-
-    THRESH is a threshold value used to decide if scaling should be done   
-    based on the ratio of the scaling factors.  If SCOND < THRESH,   
-    scaling is done.   
-
-    LARGE and SMALL are threshold values used to decide if scaling should   
-    be done based on the absolute size of the largest matrix element.   
-    If AMAX > LARGE or AMAX < SMALL, scaling is done.   
-
-    =====================================================================   
-
-
-       Quick return if possible   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     real r__1;
     complex q__1;
+
     /* Local variables */
-    static integer i__, j;
-    static real large;
+    integer i__, j, jc;
+    real cj, large;
     extern logical lsame_(char *, char *);
-    static real small;
-    static integer jc;
-    static real cj;
+    real small;
     extern doublereal slamch_(char *);
 
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLAQHP equilibrates a Hermitian matrix A using the scaling factors */
+/*  in the vector S. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          Hermitian matrix A is stored. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input/output) COMPLEX array, dimension (N*(N+1)/2) */
+/*          On entry, the upper or lower triangle of the Hermitian matrix */
+/*          A, packed columnwise in a linear array.  The j-th column of A */
+/*          is stored in the array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', AP(i + (j-1)*(2n-j)/2) = A(i,j) for j<=i<=n. */
+
+/*          On exit, the equilibrated matrix:  diag(S) * A * diag(S), in */
+/*          the same storage format as A. */
+
+/*  S       (input) REAL array, dimension (N) */
+/*          The scale factors for A. */
+
+/*  SCOND   (input) REAL */
+/*          Ratio of the smallest S(i) to the largest S(i). */
+
+/*  AMAX    (input) REAL */
+/*          Absolute value of largest matrix entry. */
+
+/*  EQUED   (output) CHARACTER*1 */
+/*          Specifies whether or not equilibration was done. */
+/*          = 'N':  No equilibration. */
+/*          = 'Y':  Equilibration was done, i.e., A has been replaced by */
+/*                  diag(S) * A * diag(S). */
+
+/*  Internal Parameters */
+/*  =================== */
+
+/*  THRESH is a threshold value used to decide if scaling should be done */
+/*  based on the ratio of the scaling factors.  If SCOND < THRESH, */
+/*  scaling is done. */
+
+/*  LARGE and SMALL are threshold values used to decide if scaling should */
+/*  be done based on the absolute size of the largest matrix element. */
+/*  If AMAX > LARGE or AMAX < SMALL, scaling is done. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Quick return if possible */
+
+    /* Parameter adjustments */
     --s;
     --ap;
 
@@ -163,4 +175,3 @@
 /*     End of CLAQHP */
 
 } /* claqhp_ */
-

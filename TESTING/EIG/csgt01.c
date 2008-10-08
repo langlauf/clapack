@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,113 +16,121 @@ static integer c__1 = 1;
     complex q__1;
 
     /* Local variables */
-    static integer i__;
+    integer i__;
+    real ulp;
     extern /* Subroutine */ int chemm_(char *, char *, integer *, integer *, 
 	    complex *, complex *, integer *, complex *, integer *, complex *, 
 	    complex *, integer *);
-    static real anorm;
+    real anorm;
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), clanhe_(char *, char *, integer *, 
 	    complex *, integer *, real *), slamch_(char *);
     extern /* Subroutine */ int csscal_(integer *, real *, complex *, integer 
 	    *);
-    static real ulp;
 
 
-#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
-#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     modified August 1997, a new parameter M is added to the calling */
+/*     sequence. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-       modified August 1997, a new parameter M is added to the calling   
-       sequence.   
+/*  Purpose */
+/*  ======= */
 
+/*  CSGT01 checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*     A Z   =  B Z D or */
+/*     A B Z =  Z D or */
+/*     B A Z =  Z D */
 
-    CSGT01 checks a decomposition of the form   
+/*  where A is a Hermitian matrix, B is Hermitian positive definite, */
+/*  Z is unitary, and D is diagonal. */
 
-       A Z   =  B Z D or   
-       A B Z =  Z D or   
-       B A Z =  Z D   
+/*  One of the following test ratios is computed: */
 
-    where A is a Hermitian matrix, B is Hermitian positive definite,   
-    Z is unitary, and D is diagonal.   
+/*  ITYPE = 1:  RESULT(1) = | A Z - B Z D | / ( |A| |Z| n ulp ) */
 
-    One of the following test ratios is computed:   
+/*  ITYPE = 2:  RESULT(1) = | A B Z - Z D | / ( |A| |Z| n ulp ) */
 
-    ITYPE = 1:  RESULT(1) = | A Z - B Z D | / ( |A| |Z| n ulp )   
+/*  ITYPE = 3:  RESULT(1) = | B A Z - Z D | / ( |A| |Z| n ulp ) */
 
-    ITYPE = 2:  RESULT(1) = | A B Z - Z D | / ( |A| |Z| n ulp )   
+/*  Arguments */
+/*  ========= */
 
-    ITYPE = 3:  RESULT(1) = | B A Z - Z D | / ( |A| |Z| n ulp )   
+/*  ITYPE   (input) INTEGER */
+/*          The form of the Hermitian generalized eigenproblem. */
+/*          = 1:  A*z = (lambda)*B*z */
+/*          = 2:  A*B*z = (lambda)*z */
+/*          = 3:  B*A*z = (lambda)*z */
 
-    Arguments   
-    =========   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          Hermitian matrices A and B is stored. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    ITYPE   (input) INTEGER   
-            The form of the Hermitian generalized eigenproblem.   
-            = 1:  A*z = (lambda)*B*z   
-            = 2:  A*B*z = (lambda)*z   
-            = 3:  B*A*z = (lambda)*z   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            Hermitian matrices A and B is stored.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  M       (input) INTEGER */
+/*          The number of eigenvalues found.  M >= 0. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  A       (input) COMPLEX array, dimension (LDA, N) */
+/*          The original Hermitian matrix A. */
 
-    M       (input) INTEGER   
-            The number of eigenvalues found.  M >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    A       (input) COMPLEX array, dimension (LDA, N)   
-            The original Hermitian matrix A.   
+/*  B       (input) COMPLEX array, dimension (LDB, N) */
+/*          The original Hermitian positive definite matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,N). */
 
-    B       (input) COMPLEX array, dimension (LDB, N)   
-            The original Hermitian positive definite matrix B.   
+/*  Z       (input) COMPLEX array, dimension (LDZ, M) */
+/*          The computed eigenvectors of the generalized eigenproblem. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,N).   
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDZ >= max(1,N). */
 
-    Z       (input) COMPLEX array, dimension (LDZ, M)   
-            The computed eigenvectors of the generalized eigenproblem.   
+/*  D       (input) REAL array, dimension (M) */
+/*          The computed eigenvalues of the generalized eigenproblem. */
 
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= max(1,N).   
+/*  WORK    (workspace) COMPLEX array, dimension (N*N) */
 
-    D       (input) REAL array, dimension (M)   
-            The computed eigenvalues of the generalized eigenproblem.   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    WORK    (workspace) COMPLEX array, dimension (N*N)   
+/*  RESULT  (output) REAL array, dimension (1) */
+/*          The test ratio as described above. */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (1)   
-            The test ratio as described above.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --d__;
     --work;
@@ -157,10 +160,10 @@ static integer c__1 = 1;
 		ldz, &c_b1, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    csscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    csscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L10: */
 	}
-	q__1.r = -1.f, q__1.i = 0.f;
+	q__1.r = -1.f, q__1.i = -0.f;
 	chemm_("Left", uplo, n, m, &c_b2, &b[b_offset], ldb, &z__[z_offset], 
 		ldz, &q__1, &work[1], n);
 
@@ -175,10 +178,10 @@ static integer c__1 = 1;
 		ldz, &c_b1, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    csscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    csscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L20: */
 	}
-	q__1.r = -1.f, q__1.i = 0.f;
+	q__1.r = -1.f, q__1.i = -0.f;
 	chemm_("Left", uplo, n, m, &c_b2, &a[a_offset], lda, &work[1], n, &
 		q__1, &z__[z_offset], ldz);
 
@@ -192,10 +195,10 @@ static integer c__1 = 1;
 		ldz, &c_b1, &work[1], n);
 	i__1 = *m;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    csscal_(n, &d__[i__], &z___ref(1, i__), &c__1);
+	    csscal_(n, &d__[i__], &z__[i__ * z_dim1 + 1], &c__1);
 /* L30: */
 	}
-	q__1.r = -1.f, q__1.i = 0.f;
+	q__1.r = -1.f, q__1.i = -0.f;
 	chemm_("Left", uplo, n, m, &c_b2, &b[b_offset], ldb, &work[1], n, &
 		q__1, &z__[z_offset], ldz);
 
@@ -207,8 +210,3 @@ static integer c__1 = 1;
 /*     End of CSGT01 */
 
 } /* csgt01_ */
-
-#undef z___ref
-#undef z___subscr
-
-

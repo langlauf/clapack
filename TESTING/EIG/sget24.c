@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -49,39 +44,38 @@ static real c_b44 = -1.f;
     double r_sign(real *, real *), sqrt(doublereal);
 
     /* Local variables */
-    static integer sdim, kmin, itmp, ipnt[20], rsub;
-    static char sort[1];
-    static integer sdim1, i__, j;
-    static real v;
-    static integer iinfo;
+    integer i__, j;
+    real v, eps, tol, tmp, ulp;
+    integer sdim, kmin, itmp, ipnt[20], rsub;
+    char sort[1];
+    integer sdim1, iinfo;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm, vimin, tolin;
+    real anorm, vimin, tolin;
     extern /* Subroutine */ int sort01_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *, real *);
-    static real vrmin;
-    static integer isort;
-    static real wnorm;
+    real vrmin;
+    integer isort;
+    real wnorm;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real rcnde1, rcndv1;
-    extern doublereal slamch_(char *);
-    static real rconde;
-    extern doublereal slange_(char *, integer *, integer *, real *, integer *,
-	     real *);
+    real rcnde1, rcndv1;
+    extern doublereal slamch_(char *), slange_(char *, integer *, 
+	    integer *, real *, integer *, real *);
+    real rconde;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer knteig;
-    static real rcondv;
+    integer knteig;
+    real rcondv;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *);
     extern logical sslect_(real *, real *);
     extern /* Subroutine */ int sgeesx_(char *, char *, L_fp, char *, integer 
 	    *, real *, integer *, integer *, real *, real *, real *, integer *
-	    , real *, real *, real *, integer *, integer *, integer *, 
+, real *, real *, real *, integer *, integer *, integer *, 
 	    logical *, integer *);
-    static integer liwork;
-    static real smlnum, ulpinv, eps, tol, tmp, ulp;
+    integer liwork;
+    real smlnum, ulpinv;
 
     /* Fortran I/O blocks */
     static cilist io___13 = { 0, 0, 0, fmt_9998, 0 };
@@ -104,234 +98,250 @@ static real c_b44 = -1.f;
 
 
 
-#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
-#define ht_ref(a_1,a_2) ht[(a_2)*ht_dim1 + a_1]
-#define vs_ref(a_1,a_2) vs[(a_2)*vs_dim1 + a_1]
-#define vs1_ref(a_1,a_2) vs1[(a_2)*vs1_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*     SGET24 checks the nonsymmetric eigenvalue (Schur form) problem */
+/*     expert driver SGEESX. */
 
-    Purpose   
-    =======   
+/*     If COMP = .FALSE., the first 13 of the following tests will be */
+/*     be performed on the input matrix A, and also tests 14 and 15 */
+/*     if LWORK is sufficiently large. */
+/*     If COMP = .TRUE., all 17 test will be performed. */
 
-       SGET24 checks the nonsymmetric eigenvalue (Schur form) problem   
-       expert driver SGEESX.   
+/*     (1)     0 if T is in Schur form, 1/ulp otherwise */
+/*            (no sorting of eigenvalues) */
 
-       If COMP = .FALSE., the first 13 of the following tests will be   
-       be performed on the input matrix A, and also tests 14 and 15   
-       if LWORK is sufficiently large.   
-       If COMP = .TRUE., all 17 test will be performed.   
+/*     (2)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (1)     0 if T is in Schur form, 1/ulp otherwise   
-              (no sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (no sorting of eigenvalues). */
 
-       (2)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (no sorting of eigenvalues).   
+/*     (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues).   
+/*     (5)     0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (6)     0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (5)     0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (7)     0 if T is in Schur form, 1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (6)     0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (8)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (7)     0 if T is in Schur form, 1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (with sorting of eigenvalues). */
 
-       (8)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (with sorting of eigenvalues).   
+/*     (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare WR, WI with and */
+/*             without reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
+/*     (11)    0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare T with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               If workspace sufficient, also compare WR, WI with and   
-               without reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (12)    0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare VS with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
 
-       (11)    0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare T with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (13)    if sorting worked and SDIM is the number of */
+/*             eigenvalues which were SELECTed */
+/*             If workspace sufficient, also compare SDIM with and */
+/*             without reciprocal condition numbers */
 
-       (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare VS with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
+/*     (14)    if RCONDE the same no matter if VS and/or RCONDV computed */
 
-       (13)    if sorting worked and SDIM is the number of   
-               eigenvalues which were SELECTed   
-               If workspace sufficient, also compare SDIM with and   
-               without reciprocal condition numbers   
+/*     (15)    if RCONDV the same no matter if VS and/or RCONDE computed */
 
-       (14)    if RCONDE the same no matter if VS and/or RCONDV computed   
+/*     (16)  |RCONDE - RCDEIN| / cond(RCONDE) */
 
-       (15)    if RCONDV the same no matter if VS and/or RCONDE computed   
+/*        RCONDE is the reciprocal average eigenvalue condition number */
+/*        computed by SGEESX and RCDEIN (the precomputed true value) */
+/*        is supplied as input.  cond(RCONDE) is the condition number */
+/*        of RCONDE, and takes errors in computing RCONDE into account, */
+/*        so that the resulting quantity should be O(ULP). cond(RCONDE) */
+/*        is essentially given by norm(A)/RCONDV. */
 
-       (16)  |RCONDE - RCDEIN| / cond(RCONDE)   
+/*     (17)  |RCONDV - RCDVIN| / cond(RCONDV) */
 
-          RCONDE is the reciprocal average eigenvalue condition number   
-          computed by SGEESX and RCDEIN (the precomputed true value)   
-          is supplied as input.  cond(RCONDE) is the condition number   
-          of RCONDE, and takes errors in computing RCONDE into account,   
-          so that the resulting quantity should be O(ULP). cond(RCONDE)   
-          is essentially given by norm(A)/RCONDV.   
+/*        RCONDV is the reciprocal right invariant subspace condition */
+/*        number computed by SGEESX and RCDVIN (the precomputed true */
+/*        value) is supplied as input. cond(RCONDV) is the condition */
+/*        number of RCONDV, and takes errors in computing RCONDV into */
+/*        account, so that the resulting quantity should be O(ULP). */
+/*        cond(RCONDV) is essentially given by norm(A)/RCONDE. */
 
-       (17)  |RCONDV - RCDVIN| / cond(RCONDV)   
+/*  Arguments */
+/*  ========= */
 
-          RCONDV is the reciprocal right invariant subspace condition   
-          number computed by SGEESX and RCDVIN (the precomputed true   
-          value) is supplied as input. cond(RCONDV) is the condition   
-          number of RCONDV, and takes errors in computing RCONDV into   
-          account, so that the resulting quantity should be O(ULP).   
-          cond(RCONDV) is essentially given by norm(A)/RCONDE.   
+/*  COMP    (input) LOGICAL */
+/*          COMP describes which input tests to perform: */
+/*            = .FALSE. if the computed condition numbers are not to */
+/*                      be tested against RCDVIN and RCDEIN */
+/*            = .TRUE.  if they are to be compared */
 
-    Arguments   
-    =========   
+/*  JTYPE   (input) INTEGER */
+/*          Type of input matrix. Used to label output if error occurs. */
 
-    COMP    (input) LOGICAL   
-            COMP describes which input tests to perform:   
-              = .FALSE. if the computed condition numbers are not to   
-                        be tested against RCDVIN and RCDEIN   
-              = .TRUE.  if they are to be compared   
+/*  ISEED   (input) INTEGER array, dimension (4) */
+/*          If COMP = .FALSE., the random number generator seed */
+/*          used to produce matrix. */
+/*          If COMP = .TRUE., ISEED(1) = the number of the example. */
+/*          Used to label output if error occurs. */
 
-    JTYPE   (input) INTEGER   
-            Type of input matrix. Used to label output if error occurs.   
+/*  THRESH  (input) REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    ISEED   (input) INTEGER array, dimension (4)   
-            If COMP = .FALSE., the random number generator seed   
-            used to produce matrix.   
-            If COMP = .TRUE., ISEED(1) = the number of the example.   
-            Used to label output if error occurs.   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns INFO not equal to 0.) */
 
-    THRESH  (input) REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  N       (input) INTEGER */
+/*          The dimension of A. N must be at least 0. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns INFO not equal to 0.)   
+/*  A       (input/output) REAL array, dimension (LDA, N) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed. */
 
-    N       (input) INTEGER   
-            The dimension of A. N must be at least 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, and H. LDA must be at */
+/*          least 1 and at least N. */
 
-    A       (input/output) REAL array, dimension (LDA, N)   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.   
+/*  H       (workspace) REAL array, dimension (LDA, N) */
+/*          Another copy of the test matrix A, modified by SGEESX. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A, and H. LDA must be at   
-            least 1 and at least N.   
+/*  HT      (workspace) REAL array, dimension (LDA, N) */
+/*          Yet another copy of the test matrix A, modified by SGEESX. */
 
-    H       (workspace) REAL array, dimension (LDA, N)   
-            Another copy of the test matrix A, modified by SGEESX.   
+/*  WR      (workspace) REAL array, dimension (N) */
+/*  WI      (workspace) REAL array, dimension (N) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          On exit, WR + WI*i are the eigenvalues of the matrix in A. */
 
-    HT      (workspace) REAL array, dimension (LDA, N)   
-            Yet another copy of the test matrix A, modified by SGEESX.   
+/*  WRT     (workspace) REAL array, dimension (N) */
+/*  WIT     (workspace) REAL array, dimension (N) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but those computed when SGEESX only computes a partial */
+/*          eigendecomposition, i.e. not Schur vectors */
 
-    WR      (workspace) REAL array, dimension (N)   
-    WI      (workspace) REAL array, dimension (N)   
-            The real and imaginary parts of the eigenvalues of A.   
-            On exit, WR + WI*i are the eigenvalues of the matrix in A.   
+/*  WRTMP   (workspace) REAL array, dimension (N) */
+/*  WITMP   (workspace) REAL array, dimension (N) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but sorted by increasing real part. */
 
-    WRT     (workspace) REAL array, dimension (N)   
-    WIT     (workspace) REAL array, dimension (N)   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but those computed when SGEESX only computes a partial   
-            eigendecomposition, i.e. not Schur vectors   
+/*  VS      (workspace) REAL array, dimension (LDVS, N) */
+/*          VS holds the computed Schur vectors. */
 
-    WRTMP   (workspace) REAL array, dimension (N)   
-    WITMP   (workspace) REAL array, dimension (N)   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but sorted by increasing real part.   
+/*  LDVS    (input) INTEGER */
+/*          Leading dimension of VS. Must be at least max(1, N). */
 
-    VS      (workspace) REAL array, dimension (LDVS, N)   
-            VS holds the computed Schur vectors.   
+/*  VS1     (workspace) REAL array, dimension (LDVS, N) */
+/*          VS1 holds another copy of the computed Schur vectors. */
 
-    LDVS    (input) INTEGER   
-            Leading dimension of VS. Must be at least max(1, N).   
+/*  RCDEIN  (input) REAL */
+/*          When COMP = .TRUE. RCDEIN holds the precomputed reciprocal */
+/*          condition number for the average of selected eigenvalues. */
 
-    VS1     (workspace) REAL array, dimension (LDVS, N)   
-            VS1 holds another copy of the computed Schur vectors.   
+/*  RCDVIN  (input) REAL */
+/*          When COMP = .TRUE. RCDVIN holds the precomputed reciprocal */
+/*          condition number for the selected right invariant subspace. */
 
-    RCDEIN  (input) REAL   
-            When COMP = .TRUE. RCDEIN holds the precomputed reciprocal   
-            condition number for the average of selected eigenvalues.   
+/*  NSLCT   (input) INTEGER */
+/*          When COMP = .TRUE. the number of selected eigenvalues */
+/*          corresponding to the precomputed values RCDEIN and RCDVIN. */
 
-    RCDVIN  (input) REAL   
-            When COMP = .TRUE. RCDVIN holds the precomputed reciprocal   
-            condition number for the selected right invariant subspace.   
+/*  ISLCT   (input) INTEGER array, dimension (NSLCT) */
+/*          When COMP = .TRUE. ISLCT selects the eigenvalues of the */
+/*          input matrix corresponding to the precomputed values RCDEIN */
+/*          and RCDVIN. For I=1, ... ,NSLCT, if ISLCT(I) = J, then the */
+/*          eigenvalue with the J-th largest real part is selected. */
+/*          Not referenced if COMP = .FALSE. */
 
-    NSLCT   (input) INTEGER   
-            When COMP = .TRUE. the number of selected eigenvalues   
-            corresponding to the precomputed values RCDEIN and RCDVIN.   
+/*  RESULT  (output) REAL array, dimension (17) */
+/*          The values computed by the 17 tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
 
-    ISLCT   (input) INTEGER array, dimension (NSLCT)   
-            When COMP = .TRUE. ISLCT selects the eigenvalues of the   
-            input matrix corresponding to the precomputed values RCDEIN   
-            and RCDVIN. For I=1, ... ,NSLCT, if ISLCT(I) = J, then the   
-            eigenvalue with the J-th largest real part is selected.   
-            Not referenced if COMP = .FALSE.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    RESULT  (output) REAL array, dimension (17)   
-            The values computed by the 17 tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK to be passed to SGEESX. This */
+/*          must be at least 3*N, and N+N**2 if tests 14--16 are to */
+/*          be performed. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  IWORK   (workspace) INTEGER array, dimension (N*N) */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK to be passed to SGEESX. This   
-            must be at least 3*N, and N+N**2 if tests 14--16 are to   
-            be performed.   
+/*  BWORK   (workspace) LOGICAL array, dimension (N) */
 
-    IWORK   (workspace) INTEGER array, dimension (N*N)   
+/*  INFO    (output) INTEGER */
+/*          If 0,  successful exit. */
+/*          If <0, input parameter -INFO had an incorrect value. */
+/*          If >0, SGEESX returned an error code, the absolute */
+/*                 value of which is returned. */
 
-    BWORK   (workspace) LOGICAL array, dimension (N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            If 0,  successful exit.   
-            If <0, input parameter -INFO had an incorrect value.   
-            If >0, SGEESX returned an error code, the absolute   
-                   value of which is returned.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Check for errors */
 
-
-       Check for errors   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = 1 + ht_dim1 * 1;
+    ht_offset = 1 + ht_dim1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --wr;
     --wi;
@@ -340,10 +350,10 @@ static real c_b44 = -1.f;
     --wrtmp;
     --witmp;
     vs1_dim1 = *ldvs;
-    vs1_offset = 1 + vs1_dim1 * 1;
+    vs1_offset = 1 + vs1_dim1;
     vs1 -= vs1_offset;
     vs_dim1 = *ldvs;
-    vs_offset = 1 + vs_dim1 * 1;
+    vs_offset = 1 + vs_dim1;
     vs -= vs_offset;
     --islct;
     --result;
@@ -444,7 +454,7 @@ static real c_b44 = -1.f;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = j + 2; i__ <= i__2; ++i__) {
-		if (h___ref(i__, j) != 0.f) {
+		if (h__[i__ + j * h_dim1] != 0.f) {
 		    result[rsub + 1] = ulpinv;
 		}
 /* L20: */
@@ -453,34 +463,35 @@ static real c_b44 = -1.f;
 	}
 	i__1 = *n - 2;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0.f && h___ref(i__ + 2, i__ + 1) != 
-		    0.f) {
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0.f && h__[i__ + 2 + (i__ + 1) 
+		    * h_dim1] != 0.f) {
 		result[rsub + 1] = ulpinv;
 	    }
 /* L40: */
 	}
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0.f) {
-		if (h___ref(i__, i__) != h___ref(i__ + 1, i__ + 1) || h___ref(
-			i__, i__ + 1) == 0.f || r_sign(&c_b35, &h___ref(i__ + 
-			1, i__)) == r_sign(&c_b35, &h___ref(i__, i__ + 1))) {
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0.f) {
+		if (h__[i__ + i__ * h_dim1] != h__[i__ + 1 + (i__ + 1) * 
+			h_dim1] || h__[i__ + (i__ + 1) * h_dim1] == 0.f || 
+			r_sign(&c_b35, &h__[i__ + 1 + i__ * h_dim1]) == 
+			r_sign(&c_b35, &h__[i__ + (i__ + 1) * h_dim1])) {
 		    result[rsub + 1] = ulpinv;
 		}
 	    }
 /* L50: */
 	}
 
-/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * ULP)   
+/*        Test (2) or (8): Compute norm(A - Q*H*Q') / (norm(A) * N * ULP) */
 
-          Copy A to VS1, used as workspace */
+/*        Copy A to VS1, used as workspace */
 
 	slacpy_(" ", n, n, &a[a_offset], lda, &vs1[vs1_offset], ldvs);
 
 /*        Compute Q*H and store in HT. */
 
 	sgemm_("No transpose", "No transpose", n, n, n, &c_b35, &vs[vs_offset]
-		, ldvs, &h__[h_offset], lda, &c_b41, &ht[ht_offset], lda);
+, ldvs, &h__[h_offset], lda, &c_b41, &ht[ht_offset], lda);
 
 /*        Compute A - Q*H*Q' */
 
@@ -516,39 +527,40 @@ static real c_b44 = -1.f;
 	result[rsub + 4] = 0.f;
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__, i__) != wr[i__]) {
+	    if (h__[i__ + i__ * h_dim1] != wr[i__]) {
 		result[rsub + 4] = ulpinv;
 	    }
 /* L60: */
 	}
 	if (*n > 1) {
-	    if (h___ref(2, 1) == 0.f && wi[1] != 0.f) {
+	    if (h__[h_dim1 + 2] == 0.f && wi[1] != 0.f) {
 		result[rsub + 4] = ulpinv;
 	    }
-	    if (h___ref(*n, *n - 1) == 0.f && wi[*n] != 0.f) {
+	    if (h__[*n + (*n - 1) * h_dim1] == 0.f && wi[*n] != 0.f) {
 		result[rsub + 4] = ulpinv;
 	    }
 	}
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    if (h___ref(i__ + 1, i__) != 0.f) {
-		tmp = sqrt((r__1 = h___ref(i__ + 1, i__), dabs(r__1))) * sqrt(
-			(r__2 = h___ref(i__, i__ + 1), dabs(r__2)));
-/* Computing MAX   
-   Computing MAX */
+	    if (h__[i__ + 1 + i__ * h_dim1] != 0.f) {
+		tmp = sqrt((r__1 = h__[i__ + 1 + i__ * h_dim1], dabs(r__1))) *
+			 sqrt((r__2 = h__[i__ + (i__ + 1) * h_dim1], dabs(
+			r__2)));
+/* Computing MAX */
+/* Computing MAX */
 		r__4 = ulp * tmp;
 		r__2 = result[rsub + 4], r__3 = (r__1 = wi[i__] - tmp, dabs(
 			r__1)) / dmax(r__4,smlnum);
 		result[rsub + 4] = dmax(r__2,r__3);
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 		r__4 = ulp * tmp;
 		r__2 = result[rsub + 4], r__3 = (r__1 = wi[i__ + 1] + tmp, 
 			dabs(r__1)) / dmax(r__4,smlnum);
 		result[rsub + 4] = dmax(r__2,r__3);
 	    } else if (i__ > 1) {
-		if (h___ref(i__ + 1, i__) == 0.f && h___ref(i__, i__ - 1) == 
-			0.f && wi[i__] != 0.f) {
+		if (h__[i__ + 1 + i__ * h_dim1] == 0.f && h__[i__ + (i__ - 1) 
+			* h_dim1] == 0.f && wi[i__] != 0.f) {
 		    result[rsub + 4] = ulpinv;
 		}
 	    }
@@ -590,7 +602,7 @@ static real c_b44 = -1.f;
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[rsub + 5] = ulpinv;
 		}
 /* L80: */
@@ -625,7 +637,7 @@ static real c_b44 = -1.f;
 		    r__2 = -wi[i__];
 		    if ((sslect_(&wr[i__ + 1], &wi[i__ + 1]) || sslect_(&wr[
 			    i__ + 1], &r__1)) && ! (sslect_(&wr[i__], &wi[i__]
-			    ) || sslect_(&wr[i__], &r__2)) && iinfo != *n + 2)
+) || sslect_(&wr[i__], &r__2)) && iinfo != *n + 2)
 			     {
 			result[13] = ulpinv;
 		    }
@@ -640,8 +652,8 @@ static real c_b44 = -1.f;
 /* L120: */
     }
 
-/*     If there is enough workspace, perform tests (14) and (15)   
-       as well as (10) through (13) */
+/*     If there is enough workspace, perform tests (14) and (15) */
+/*     as well as (10) through (13) */
 
     if (*lwork >= *n + *n * *n / 2) {
 
@@ -651,7 +663,7 @@ static real c_b44 = -1.f;
 	result[14] = 0.f;
 	result[15] = 0.f;
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("V", sort, (L_fp)sslect_, "B", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("V", sort, (L_fp)sslect_, "B", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rconde, &rcondv, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -688,10 +700,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L130: */
@@ -705,7 +717,7 @@ static real c_b44 = -1.f;
 /*        Compute both RCONDE and RCONDV without VS, and compare */
 
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("N", sort, (L_fp)sslect_, "B", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("N", sort, (L_fp)sslect_, "B", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -751,10 +763,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L150: */
@@ -768,7 +780,7 @@ static real c_b44 = -1.f;
 /*        Compute RCONDE with VS, and compare */
 
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("V", sort, (L_fp)sslect_, "E", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("V", sort, (L_fp)sslect_, "E", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -810,10 +822,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L170: */
@@ -827,7 +839,7 @@ static real c_b44 = -1.f;
 /*        Compute RCONDE without VS, and compare */
 
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("N", sort, (L_fp)sslect_, "E", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("N", sort, (L_fp)sslect_, "E", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -869,10 +881,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L190: */
@@ -886,7 +898,7 @@ static real c_b44 = -1.f;
 /*        Compute RCONDV with VS, and compare */
 
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("V", sort, (L_fp)sslect_, "V", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("V", sort, (L_fp)sslect_, "V", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -928,10 +940,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L210: */
@@ -945,7 +957,7 @@ static real c_b44 = -1.f;
 /*        Compute RCONDV without VS, and compare */
 
 	slacpy_("F", n, n, &a[a_offset], lda, &ht[ht_offset], lda);
-	sgeesx_("N", sort, (L_fp)sslect_, "V", n, &ht[ht_offset], lda, &sdim1,
+	sgeesx_("N", sort, (L_fp)sslect_, "V", n, &ht[ht_offset], lda, &sdim1, 
 		 &wrt[1], &wit[1], &vs1[vs1_offset], ldvs, &rcnde1, &rcndv1, &
 		work[1], lwork, &iwork[1], &liwork, &bwork[1], &iinfo);
 	if (iinfo != 0 && iinfo != *n + 2) {
@@ -987,10 +999,10 @@ static real c_b44 = -1.f;
 	    }
 	    i__2 = *n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (h___ref(i__, j) != ht_ref(i__, j)) {
+		if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]) {
 		    result[11] = ulpinv;
 		}
-		if (vs_ref(i__, j) != vs1_ref(i__, j)) {
+		if (vs[i__ + j * vs_dim1] != vs1[i__ + j * vs1_dim1]) {
 		    result[12] = ulpinv;
 		}
 /* L230: */
@@ -1005,14 +1017,14 @@ static real c_b44 = -1.f;
 
 L250:
 
-/*     If there are precomputed reciprocal condition numbers, compare   
-       computed values with them. */
+/*     If there are precomputed reciprocal condition numbers, compare */
+/*     computed values with them. */
 
     if (*comp) {
 
-/*        First set up SELOPT, SELDIM, SELVAL, SELWR, and SELWI so that   
-          the logical function SSLECT selects the eigenvalues specified   
-          by NSLCT and ISLCT. */
+/*        First set up SELOPT, SELDIM, SELVAL, SELWR, and SELWI so that */
+/*        the logical function SSLECT selects the eigenvalues specified */
+/*        by NSLCT and ISLCT. */
 
 	sslct_1.seldim = *n;
 	sslct_1.selopt = 1;
@@ -1074,8 +1086,8 @@ L250:
 	    goto L300;
 	}
 
-/*        Compare condition number for average of selected eigenvalues   
-          taking its condition number into account */
+/*        Compare condition number for average of selected eigenvalues */
+/*        taking its condition number into account */
 
 	anorm = slange_("1", n, n, &a[a_offset], lda, &work[1]);
 /* Computing MAX */
@@ -1112,8 +1124,8 @@ L250:
 	    result[16] = 1.f;
 	}
 
-/*        Compare condition numbers for right invariant subspace   
-          taking its condition number into account */
+/*        Compare condition numbers for right invariant subspace */
+/*        taking its condition number into account */
 
 	if (v > rcondv * rconde) {
 	    tol = rcondv;
@@ -1154,10 +1166,3 @@ L300:
 /*     End of SGET24 */
 
 } /* sget24_ */
-
-#undef vs1_ref
-#undef vs_ref
-#undef ht_ref
-#undef h___ref
-
-

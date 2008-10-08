@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zrotg_(doublecomplex *ca, doublecomplex *cb, doublereal *
 	c__, doublecomplex *s)
@@ -7,15 +7,30 @@
     /* System generated locals */
     doublereal d__1, d__2;
     doublecomplex z__1, z__2, z__3, z__4;
+
     /* Builtin functions */
     double z_abs(doublecomplex *);
     void z_div(doublecomplex *, doublecomplex *, doublecomplex *);
     double sqrt(doublereal);
     void d_cnjg(doublecomplex *, doublecomplex *);
+
     /* Local variables */
-    static doublereal norm;
-    static doublecomplex alpha;
-    static doublereal scale;
+    doublereal norm;
+    doublecomplex alpha;
+    doublereal scale;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     determines a double complex Givens rotation. */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
     if (z_abs(ca) != 0.) {
 	goto L10;
     }
@@ -48,4 +63,3 @@ L10:
 L20:
     return 0;
 } /* zrotg_ */
-

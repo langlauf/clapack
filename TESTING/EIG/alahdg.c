@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -82,13 +77,13 @@ static integer c__8 = 8;
     static char fmt_9944[] = "(3x,i2,\002: norm( I - Q'*Q )   / ( N * EPS "
 	    ")\002)";
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char c2[3];
-    static integer itype;
+    char c2[3];
+    integer itype;
     extern logical lsamen_(integer *, char *, char *);
 
     /* Fortran I/O blocks */
@@ -158,35 +153,41 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ALAHDG prints header information for the different test paths.   
+/*  ALAHDG prints header information for the different test paths. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    IOUNIT  (input) INTEGER   
-            The unit number to which the header information should be   
-            printed.   
+/*  IOUNIT  (input) INTEGER */
+/*          The unit number to which the header information should be */
+/*          printed. */
 
-    PATH    (input) CHARACTER*3   
-            The name of the path for which the header information is to   
-            be printed.  Current paths are   
-               GQR:  GQR (general matrices)   
-               GRQ:  GRQ (general matrices)   
-               LSE:  LSE Problem   
-               GLM:  GLM Problem   
-               GSV:  Generalized Singular Value Decomposition   
+/*  PATH    (input) CHARACTER*3 */
+/*          The name of the path for which the header information is to */
+/*          be printed.  Current paths are */
+/*             GQR:  GQR (general matrices) */
+/*             GRQ:  GRQ (general matrices) */
+/*             LSE:  LSE Problem */
+/*             GLM:  GLM Problem */
+/*             GSV:  Generalized Singular Value Decomposition */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (*iounit <= 0) {
 	return 0;
@@ -500,23 +501,22 @@ static integer c__8 = 8;
 
 
 
-/*     GQR test ratio   
+/*     GQR test ratio */
 
 
-       GRQ test ratio   
+/*     GRQ test ratio */
 
 
-       LSE test ratio   
+/*     LSE test ratio */
 
 
-       GLM test ratio   
+/*     GLM test ratio */
 
 
-       GSVD test ratio */
+/*     GSVD test ratio */
 
     return 0;
 
 /*     End of ALAHDG */
 
 } /* alahdg_ */
-

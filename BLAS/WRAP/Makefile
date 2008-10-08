@@ -4,6 +4,8 @@ include ../../make.inc
 #  This is the makefile to create a wrapper for the CBLAS.
 #######################################################################
 
+all: libfblaswr.a libcblaswr.a
+
 libcblaswr.a: cblaswr.o crotg.o zrotg.o
 	$(ARCH) $(ARCHFLAGS) libcblaswr.a cblaswr.o crotg.o zrotg.o
 

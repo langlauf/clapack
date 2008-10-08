@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -13,7 +8,7 @@ static doublecomplex c_b2 = {0.,0.};
 static integer c__2 = 2;
 static integer c__1 = 1;
 
-/* Subroutine */ int zlarhs_(char *path, char *xtype, char *uplo, char *trans,
+/* Subroutine */ int zlarhs_(char *path, char *xtype, char *uplo, char *trans, 
 	 integer *m, integer *n, integer *kl, integer *ku, integer *nrhs, 
 	doublecomplex *a, integer *lda, doublecomplex *x, integer *ldx, 
 	doublecomplex *b, integer *ldb, integer *iseed, integer *info)
@@ -21,14 +16,16 @@ static integer c__1 = 1;
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, x_dim1, x_offset, i__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static logical band;
-    static char diag[1];
-    static logical tran;
-    static integer j;
+    integer j;
+    char c1[1], c2[2];
+    integer mb, nx;
+    logical gen, tri, qrs, sym, band;
+    char diag[1];
+    logical tran;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -36,11 +33,9 @@ static integer c__1 = 1;
 	    integer *), zhemm_(char *, char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
-	    integer *);
-    static char c1[1], c2[2];
-    extern /* Subroutine */ int zgbmv_(char *, integer *, integer *, integer *
-	    , integer *, doublecomplex *, doublecomplex *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
+	    integer *), zgbmv_(char *, integer *, integer *, 
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
+	     doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zhbmv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), 
@@ -52,167 +47,173 @@ static integer c__1 = 1;
 	    char *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), ztrmm_(char *, char *, char *, char *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *), 
 	    zspmv_(char *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zsymm_(char *, char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), ztpmv_(char *, char *, char *, integer *, doublecomplex *
-	    , doublecomplex *, integer *);
-    static integer mb, nx;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
+, doublecomplex *, integer *), xerbla_(
+	    char *, integer *);
     extern logical lsamen_(integer *, char *, char *);
-    static logical notran;
+    logical notran;
     extern /* Subroutine */ int zlacpy_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
 	    zlarnv_(integer *, integer *, integer *, doublecomplex *);
-    static logical gen, tri, qrs, sym;
 
 
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZLARHS chooses a set of NRHS random solution vectors and sets */
+/*  up the right hand sides for the linear system */
+/*     op( A ) * X = B, */
+/*  where op( A ) may be A, A**T (transpose of A), or A**H (conjugate */
+/*  transpose of A). */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZLARHS chooses a set of NRHS random solution vectors and sets   
-    up the right hand sides for the linear system   
-       op( A ) * X = B,   
-    where op( A ) may be A, A**T (transpose of A), or A**H (conjugate   
-    transpose of A).   
+/*  PATH    (input) CHARACTER*3 */
+/*          The type of the complex matrix A.  PATH may be given in any */
+/*          combination of upper and lower case.  Valid paths include */
+/*             xGE:  General m x n matrix */
+/*             xGB:  General banded matrix */
+/*             xPO:  Hermitian positive definite, 2-D storage */
+/*             xPP:  Hermitian positive definite packed */
+/*             xPB:  Hermitian positive definite banded */
+/*             xHE:  Hermitian indefinite, 2-D storage */
+/*             xHP:  Hermitian indefinite packed */
+/*             xHB:  Hermitian indefinite banded */
+/*             xSY:  Symmetric indefinite, 2-D storage */
+/*             xSP:  Symmetric indefinite packed */
+/*             xSB:  Symmetric indefinite banded */
+/*             xTR:  Triangular */
+/*             xTP:  Triangular packed */
+/*             xTB:  Triangular banded */
+/*             xQR:  General m x n matrix */
+/*             xLQ:  General m x n matrix */
+/*             xQL:  General m x n matrix */
+/*             xRQ:  General m x n matrix */
+/*          where the leading character indicates the precision. */
 
-    Arguments   
-    =========   
+/*  XTYPE   (input) CHARACTER*1 */
+/*          Specifies how the exact solution X will be determined: */
+/*          = 'N':  New solution; generate a random X. */
+/*          = 'C':  Computed; use value of X on entry. */
 
-    PATH    (input) CHARACTER*3   
-            The type of the complex matrix A.  PATH may be given in any   
-            combination of upper and lower case.  Valid paths include   
-               xGE:  General m x n matrix   
-               xGB:  General banded matrix   
-               xPO:  Hermitian positive definite, 2-D storage   
-               xPP:  Hermitian positive definite packed   
-               xPB:  Hermitian positive definite banded   
-               xHE:  Hermitian indefinite, 2-D storage   
-               xHP:  Hermitian indefinite packed   
-               xHB:  Hermitian indefinite banded   
-               xSY:  Symmetric indefinite, 2-D storage   
-               xSP:  Symmetric indefinite packed   
-               xSB:  Symmetric indefinite banded   
-               xTR:  Triangular   
-               xTP:  Triangular packed   
-               xTB:  Triangular banded   
-               xQR:  General m x n matrix   
-               xLQ:  General m x n matrix   
-               xQL:  General m x n matrix   
-               xRQ:  General m x n matrix   
-            where the leading character indicates the precision.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Used only if A is symmetric or triangular; specifies whether */
+/*          the upper or lower triangular part of the matrix A is stored. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    XTYPE   (input) CHARACTER*1   
-            Specifies how the exact solution X will be determined:   
-            = 'N':  New solution; generate a random X.   
-            = 'C':  Computed; use value of X on entry.   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Used only if A is nonsymmetric; specifies the operation */
+/*          applied to the matrix A. */
+/*          = 'N':  B := A    * X */
+/*          = 'T':  B := A**T * X */
+/*          = 'C':  B := A**H * X */
 
-    UPLO    (input) CHARACTER*1   
-            Used only if A is symmetric or triangular; specifies whether   
-            the upper or lower triangular part of the matrix A is stored.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    TRANS   (input) CHARACTER*1   
-            Used only if A is nonsymmetric; specifies the operation   
-            applied to the matrix A.   
-            = 'N':  B := A    * X   
-            = 'T':  B := A**T * X   
-            = 'C':  B := A**H * X   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  KL      (input) INTEGER */
+/*          Used only if A is a band matrix; specifies the number of */
+/*          subdiagonals of A if A is a general band matrix or if A is */
+/*          symmetric or triangular and UPLO = 'L'; specifies the number */
+/*          of superdiagonals of A if A is symmetric or triangular and */
+/*          UPLO = 'U'.  0 <= KL <= M-1. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  KU      (input) INTEGER */
+/*          Used only if A is a general band matrix or if A is */
+/*          triangular. */
 
-    KL      (input) INTEGER   
-            Used only if A is a band matrix; specifies the number of   
-            subdiagonals of A if A is a general band matrix or if A is   
-            symmetric or triangular and UPLO = 'L'; specifies the number   
-            of superdiagonals of A if A is symmetric or triangular and   
-            UPLO = 'U'.  0 <= KL <= M-1.   
+/*          If PATH = xGB, specifies the number of superdiagonals of A, */
+/*          and 0 <= KU <= N-1. */
 
-    KU      (input) INTEGER   
-            Used only if A is a general band matrix or if A is   
-            triangular.   
+/*          If PATH = xTR, xTP, or xTB, specifies whether or not the */
+/*          matrix has unit diagonal: */
+/*          = 1:  matrix has non-unit diagonal (default) */
+/*          = 2:  matrix has unit diagonal */
 
-            If PATH = xGB, specifies the number of superdiagonals of A,   
-            and 0 <= KU <= N-1.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors in the system A*X = B. */
 
-            If PATH = xTR, xTP, or xTB, specifies whether or not the   
-            matrix has unit diagonal:   
-            = 1:  matrix has non-unit diagonal (default)   
-            = 2:  matrix has unit diagonal   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The test matrix whose type is given by PATH. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors in the system A*X = B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
+/*          If PATH = xGB, LDA >= KL+KU+1. */
+/*          If PATH = xPB, xSB, xHB, or xTB, LDA >= KL+1. */
+/*          Otherwise, LDA >= max(1,M). */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The test matrix whose type is given by PATH.   
+/*  X       (input or output) COMPLEX*16  array, dimension (LDX,NRHS) */
+/*          On entry, if XTYPE = 'C' (for 'Computed'), then X contains */
+/*          the exact solution to the system of linear equations. */
+/*          On exit, if XTYPE = 'N' (for 'New'), then X is initialized */
+/*          with random values. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
-            If PATH = xGB, LDA >= KL+KU+1.   
-            If PATH = xPB, xSB, xHB, or xTB, LDA >= KL+1.   
-            Otherwise, LDA >= max(1,M).   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  If TRANS = 'N', */
+/*          LDX >= max(1,N); if TRANS = 'T', LDX >= max(1,M). */
 
-    X       (input or output) COMPLEX*16  array, dimension (LDX,NRHS)   
-            On entry, if XTYPE = 'C' (for 'Computed'), then X contains   
-            the exact solution to the system of linear equations.   
-            On exit, if XTYPE = 'N' (for 'New'), then X is initialized   
-            with random values.   
+/*  B       (output) COMPLEX*16  array, dimension (LDB,NRHS) */
+/*          The right hand side vector(s) for the system of equations, */
+/*          computed from B = op(A) * X, where op(A) is determined by */
+/*          TRANS. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  If TRANS = 'N',   
-            LDX >= max(1,N); if TRANS = 'T', LDX >= max(1,M).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  If TRANS = 'N', */
+/*          LDB >= max(1,M); if TRANS = 'T', LDB >= max(1,N). */
 
-    B       (output) COMPLEX*16  array, dimension (LDB,NRHS)   
-            The right hand side vector(s) for the system of equations,   
-            computed from B = op(A) * X, where op(A) is determined by   
-            TRANS.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          The seed vector for the random number generator (used in */
+/*          ZLATMS).  Modified on exit. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  If TRANS = 'N',   
-            LDB >= max(1,M); if TRANS = 'T', LDB >= max(1,N).   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            The seed vector for the random number generator (used in   
-            ZLATMS).  Modified on exit.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --iseed;
 
@@ -275,13 +276,13 @@ static integer c__1 = 1;
     if (! lsame_(xtype, "C")) {
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zlarnv_(&c__2, &iseed[1], n, &x_ref(1, j));
+	    zlarnv_(&c__2, &iseed[1], n, &x[j * x_dim1 + 1]);
 /* L10: */
 	}
     }
 
-/*     Multiply X by op( A ) using an appropriate   
-       matrix multiply routine. */
+/*     Multiply X by op( A ) using an appropriate */
+/*     matrix multiply routine. */
 
     if (lsamen_(&c__2, c2, "GE") || lsamen_(&c__2, c2, 
 	    "QR") || lsamen_(&c__2, c2, "LQ") || lsamen_(&c__2, c2, "QL") || 
@@ -313,8 +314,8 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zgbmv_(trans, m, n, kl, ku, &c_b1, &a[a_offset], lda, &x_ref(1, j)
-		    , &c__1, &c_b2, &b_ref(1, j), &c__1);
+	    zgbmv_(trans, m, n, kl, ku, &c_b1, &a[a_offset], lda, &x[j * 
+		    x_dim1 + 1], &c__1, &c_b2, &b[j * b_dim1 + 1], &c__1);
 /* L20: */
 	}
 
@@ -325,8 +326,8 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zhbmv_(uplo, n, kl, &c_b1, &a[a_offset], lda, &x_ref(1, j), &c__1,
-		     &c_b2, &b_ref(1, j), &c__1);
+	    zhbmv_(uplo, n, kl, &c_b1, &a[a_offset], lda, &x[j * x_dim1 + 1], 
+		    &c__1, &c_b2, &b[j * b_dim1 + 1], &c__1);
 /* L30: */
 	}
 
@@ -336,8 +337,8 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zsbmv_(uplo, n, kl, &c_b1, &a[a_offset], lda, &x_ref(1, j), &c__1,
-		     &c_b2, &b_ref(1, j), &c__1);
+	    zsbmv_(uplo, n, kl, &c_b1, &a[a_offset], lda, &x[j * x_dim1 + 1], 
+		    &c__1, &c_b2, &b[j * b_dim1 + 1], &c__1);
 /* L40: */
 	}
 
@@ -348,8 +349,8 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zhpmv_(uplo, n, &c_b1, &a[a_offset], &x_ref(1, j), &c__1, &c_b2, &
-		    b_ref(1, j), &c__1);
+	    zhpmv_(uplo, n, &c_b1, &a[a_offset], &x[j * x_dim1 + 1], &c__1, &
+		    c_b2, &b[j * b_dim1 + 1], &c__1);
 /* L50: */
 	}
 
@@ -359,16 +360,16 @@ static integer c__1 = 1;
 
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    zspmv_(uplo, n, &c_b1, &a[a_offset], &x_ref(1, j), &c__1, &c_b2, &
-		    b_ref(1, j), &c__1);
+	    zspmv_(uplo, n, &c_b1, &a[a_offset], &x[j * x_dim1 + 1], &c__1, &
+		    c_b2, &b[j * b_dim1 + 1], &c__1);
 /* L60: */
 	}
 
     } else if (lsamen_(&c__2, c2, "TR")) {
 
-/*        Triangular matrix.  Note that for triangular matrices,   
-             KU = 1 => non-unit triangular   
-             KU = 2 => unit triangular */
+/*        Triangular matrix.  Note that for triangular matrices, */
+/*           KU = 1 => non-unit triangular */
+/*           KU = 2 => unit triangular */
 
 	zlacpy_("Full", n, nrhs, &x[x_offset], ldx, &b[b_offset], ldb);
 	if (*ku == 2) {
@@ -391,7 +392,8 @@ static integer c__1 = 1;
 	}
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    ztpmv_(uplo, trans, diag, n, &a[a_offset], &b_ref(1, j), &c__1);
+	    ztpmv_(uplo, trans, diag, n, &a[a_offset], &b[j * b_dim1 + 1], &
+		    c__1);
 /* L70: */
 	}
 
@@ -407,8 +409,8 @@ static integer c__1 = 1;
 	}
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
-	    ztbmv_(uplo, trans, diag, n, kl, &a[a_offset], lda, &b_ref(1, j), 
-		    &c__1);
+	    ztbmv_(uplo, trans, diag, n, kl, &a[a_offset], lda, &b[j * b_dim1 
+		    + 1], &c__1);
 /* L80: */
 	}
 
@@ -426,10 +428,3 @@ static integer c__1 = 1;
 /*     End of ZLARHS */
 
 } /* zlarhs_ */
-
-#undef x_ref
-#undef x_subscr
-#undef b_ref
-#undef b_subscr
-
-

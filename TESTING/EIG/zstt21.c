@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,111 +18,120 @@ static integer c__1 = 1;
     doublecomplex z__1, z__2;
 
     /* Local variables */
-    static doublereal unfl;
+    integer j;
+    doublereal ulp, unfl;
     extern /* Subroutine */ int zher_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal temp1, temp2;
+    doublereal temp1, temp2;
     extern /* Subroutine */ int zher2_(char *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    static integer j;
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static doublereal wnorm;
+    doublereal wnorm;
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *), 
 	    zlanhe_(char *, char *, integer *, doublecomplex *, integer *, 
 	    doublereal *);
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static doublereal ulp;
 
 
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZSTT21  checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*     A = U S U* */
 
-    ZSTT21  checks a decomposition of the form   
+/*  where * means conjugate transpose, A is real symmetric tridiagonal, */
+/*  U is unitary, and S is real and diagonal (if KBAND=0) or symmetric */
+/*  tridiagonal (if KBAND=1).  Two tests are performed: */
 
-       A = U S U*   
+/*     RESULT(1) = | A - U S U* | / ( |A| n ulp ) */
 
-    where * means conjugate transpose, A is real symmetric tridiagonal,   
-    U is unitary, and S is real and diagonal (if KBAND=0) or symmetric   
-    tridiagonal (if KBAND=1).  Two tests are performed:   
+/*     RESULT(2) = | I - UU* | / ( n ulp ) */
 
-       RESULT(1) = | A - U S U* | / ( |A| n ulp )   
+/*  Arguments */
+/*  ========= */
 
-       RESULT(2) = | I - UU* | / ( n ulp )   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, ZSTT21 does nothing. */
+/*          It must be at least zero. */
 
-    Arguments   
-    =========   
+/*  KBAND   (input) INTEGER */
+/*          The bandwidth of the matrix S.  It may only be zero or one. */
+/*          If zero, then S is diagonal, and SE is not referenced.  If */
+/*          one, then S is symmetric tri-diagonal. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZSTT21 does nothing.   
-            It must be at least zero.   
+/*  AD      (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal of the original (unfactored) matrix A.  A is */
+/*          assumed to be real symmetric tridiagonal. */
 
-    KBAND   (input) INTEGER   
-            The bandwidth of the matrix S.  It may only be zero or one.   
-            If zero, then S is diagonal, and SE is not referenced.  If   
-            one, then S is symmetric tri-diagonal.   
+/*  AE      (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The off-diagonal of the original (unfactored) matrix A.  A */
+/*          is assumed to be symmetric tridiagonal.  AE(1) is the (1,2) */
+/*          and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc. */
 
-    AD      (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal of the original (unfactored) matrix A.  A is   
-            assumed to be real symmetric tridiagonal.   
+/*  SD      (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal of the real (symmetric tri-) diagonal matrix S. */
 
-    AE      (input) DOUBLE PRECISION array, dimension (N-1)   
-            The off-diagonal of the original (unfactored) matrix A.  A   
-            is assumed to be symmetric tridiagonal.  AE(1) is the (1,2)   
-            and (2,1) element, AE(2) is the (2,3) and (3,2) element, etc.   
+/*  SE      (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The off-diagonal of the (symmetric tri-) diagonal matrix S. */
+/*          Not referenced if KBSND=0.  If KBAND=1, then AE(1) is the */
+/*          (1,2) and (2,1) element, SE(2) is the (2,3) and (3,2) */
+/*          element, etc. */
 
-    SD      (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal of the real (symmetric tri-) diagonal matrix S.   
+/*  U       (input) COMPLEX*16 array, dimension (LDU, N) */
+/*          The unitary matrix in the decomposition. */
 
-    SE      (input) DOUBLE PRECISION array, dimension (N-1)   
-            The off-diagonal of the (symmetric tri-) diagonal matrix S.   
-            Not referenced if KBSND=0.  If KBAND=1, then AE(1) is the   
-            (1,2) and (2,1) element, SE(2) is the (2,3) and (3,2)   
-            element, etc.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N. */
 
-    U       (input) COMPLEX*16 array, dimension (LDU, N)   
-            The unitary matrix in the decomposition.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (N**2) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (N**2)   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The values computed by the two tests described above.  The */
+/*          values are currently limited to 1/ulp, to avoid overflow. */
+/*          RESULT(1) is always modified. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The values computed by the two tests described above.  The   
-            values are currently limited to 1/ulp, to avoid overflow.   
-            RESULT(1) is always modified.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     1)      Constants */
 
-
-       1)      Constants   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ad;
     --ae;
     --sd;
     --se;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
     --rwork;
@@ -143,9 +147,9 @@ static integer c__1 = 1;
     unfl = dlamch_("Safe minimum");
     ulp = dlamch_("Precision");
 
-/*     Do Test 1   
+/*     Do Test 1 */
 
-       Copy A & Compute its 1-Norm: */
+/*     Copy A & Compute its 1-Norm: */
 
     zlaset_("Full", n, n, &c_b1, &c_b1, &work[1], n);
 
@@ -183,7 +187,7 @@ static integer c__1 = 1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	d__1 = -sd[j];
-	zher_("L", n, &d__1, &u_ref(1, j), &c__1, &work[1], n);
+	zher_("L", n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1], n);
 /* L20: */
     }
 
@@ -193,8 +197,8 @@ static integer c__1 = 1;
 	    i__2 = j;
 	    z__2.r = se[i__2], z__2.i = 0.;
 	    z__1.r = -z__2.r, z__1.i = -z__2.i;
-	    zher2_("L", n, &z__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
-		    c__1, &work[1], n);
+	    zher2_("L", n, &z__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
+		    u_dim1 + 1], &c__1, &work[1], n);
 /* L30: */
 	}
     }
@@ -216,9 +220,9 @@ static integer c__1 = 1;
 	}
     }
 
-/*     Do Test 2   
+/*     Do Test 2 */
 
-       Compute  UU* - I */
+/*     Compute  UU* - I */
 
     zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, &
 	    c_b1, &work[1], n);
@@ -227,14 +231,14 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = (*n + 1) * (j - 1) + 1;
 	i__3 = (*n + 1) * (j - 1) + 1;
-	z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i + 0.;
+	z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i - 0.;
 	work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L40: */
     }
 
 /* Computing MIN */
     d__1 = (doublereal) (*n), d__2 = zlange_("1", n, n, &work[1], n, &rwork[1]
-	    );
+);
     result[2] = min(d__1,d__2) / (*n * ulp);
 
     return 0;
@@ -242,8 +246,3 @@ static integer c__1 = 1;
 /*     End of ZSTT21 */
 
 } /* zstt21_ */
-
-#undef u_ref
-#undef u_subscr
-
-

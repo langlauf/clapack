@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int ztpt06_(doublereal *rcond, doublereal *rcondc, char *
 	uplo, char *diag, integer *n, doublecomplex *ap, doublereal *rwork, 
@@ -14,73 +9,84 @@
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal rmin, rmax, anorm;
+    doublereal eps, rmin, rmax, anorm;
     extern doublereal dlamch_(char *);
-    static doublereal bignum;
+    doublereal bignum;
     extern doublereal zlantp_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublereal *);
-    static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZTPT06 computes a test ratio comparing RCOND (the reciprocal   
-    condition number of the triangular matrix A) and RCONDC, the estimate   
-    computed by ZTPCON.  Information about the triangular matrix is used   
-    if one estimate is zero and the other is non-zero to decide if   
-    underflow in the estimate is justified.   
+/*  ZTPT06 computes a test ratio comparing RCOND (the reciprocal */
+/*  condition number of the triangular matrix A) and RCONDC, the estimate */
+/*  computed by ZTPCON.  Information about the triangular matrix is used */
+/*  if one estimate is zero and the other is non-zero to decide if */
+/*  underflow in the estimate is justified. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    RCOND   (input) DOUBLE PRECISION   
-            The estimate of the reciprocal condition number obtained by   
-            forming the explicit inverse of the matrix A and computing   
-            RCOND = 1/( norm(A) * norm(inv(A)) ).   
+/*  RCOND   (input) DOUBLE PRECISION */
+/*          The estimate of the reciprocal condition number obtained by */
+/*          forming the explicit inverse of the matrix A and computing */
+/*          RCOND = 1/( norm(A) * norm(inv(A)) ). */
 
-    RCONDC  (input) DOUBLE PRECISION   
-            The estimate of the reciprocal condition number computed by   
-            ZTPCON.   
+/*  RCONDC  (input) DOUBLE PRECISION */
+/*          The estimate of the reciprocal condition number computed by */
+/*          ZTPCON. */
 
-    UPLO    (input) CHARACTER   
-            Specifies whether the matrix A is upper or lower triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER */
+/*          Specifies whether the matrix A is upper or lower triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    DIAG    (input) CHARACTER   
-            Specifies whether or not the matrix A is unit triangular.   
-            = 'N':  Non-unit triangular   
-            = 'U':  Unit triangular   
+/*  DIAG    (input) CHARACTER */
+/*          Specifies whether or not the matrix A is unit triangular. */
+/*          = 'N':  Non-unit triangular */
+/*          = 'U':  Unit triangular */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in   
-            a linear array.  The j-th column of A is stored in the array   
-            AP as follows:   
-            if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L',   
-               AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n.   
+/*  AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The upper or lower triangular matrix A, packed columnwise in */
+/*          a linear array.  The j-th column of A is stored in the array */
+/*          AP as follows: */
+/*          if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', */
+/*             AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    RAT     (output) DOUBLE PRECISION   
-            The test ratio.  If both RCOND and RCONDC are nonzero,   
-               RAT = MAX( RCOND, RCONDC )/MIN( RCOND, RCONDC ) - 1.   
-            If RAT = 0, the two estimates are exactly the same.   
+/*  RAT     (output) DOUBLE PRECISION */
+/*          The test ratio.  If both RCOND and RCONDC are nonzero, */
+/*             RAT = MAX( RCOND, RCONDC )/MIN( RCOND, RCONDC ) - 1. */
+/*          If RAT = 0, the two estimates are exactly the same. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --ap;
 
@@ -111,11 +117,11 @@
 
     } else {
 
-/*        One estimate is zero, the other is non-zero.  If the matrix is   
-          ill-conditioned, return the nonzero estimate multiplied by   
-          1/EPS; if the matrix is badly scaled, return the nonzero   
-          estimate multiplied by BIGNUM/TMAX, where TMAX is the maximum   
-          element in absolute value in A. */
+/*        One estimate is zero, the other is non-zero.  If the matrix is */
+/*        ill-conditioned, return the nonzero estimate multiplied by */
+/*        1/EPS; if the matrix is badly scaled, return the nonzero */
+/*        estimate multiplied by BIGNUM/TMAX, where TMAX is the maximum */
+/*        element in absolute value in A. */
 
 	bignum = 1. / dlamch_("Safe minimum");
 	anorm = zlantp_("M", uplo, diag, n, &ap[1], &rwork[1]);
@@ -130,4 +136,3 @@
 /*     End of ZTPT06 */
 
 } /* ztpt06_ */
-

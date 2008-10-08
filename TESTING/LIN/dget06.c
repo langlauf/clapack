@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal dget06_(doublereal *rcond, doublereal *rcondc)
 {
@@ -12,34 +7,44 @@ doublereal dget06_(doublereal *rcond, doublereal *rcondc)
     doublereal ret_val;
 
     /* Local variables */
+    doublereal rat, eps;
     extern doublereal dlamch_(char *);
-    static doublereal rat, eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DGET06 computes a test ratio to compare two values for RCOND.   
+/*  DGET06 computes a test ratio to compare two values for RCOND. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    RCOND   (input) DOUBLE PRECISION   
-            The estimate of the reciprocal of the condition number of A,   
-            as computed by DGECON.   
+/*  RCOND   (input) DOUBLE PRECISION */
+/*          The estimate of the reciprocal of the condition number of A, */
+/*          as computed by DGECON. */
 
-    RCONDC  (input) DOUBLE PRECISION   
-            The reciprocal of the condition number of A, computed as   
-            ( 1/norm(A) ) / norm(inv(A)).   
+/*  RCONDC  (input) DOUBLE PRECISION */
+/*          The reciprocal of the condition number of A, computed as */
+/*          ( 1/norm(A) ) / norm(inv(A)). */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     eps = dlamch_("Epsilon");
     if (*rcond > 0.) {
@@ -61,4 +66,3 @@ doublereal dget06_(doublereal *rcond, doublereal *rcondc)
 /*     End of DGET06 */
 
 } /* dget06_ */
-

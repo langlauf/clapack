@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -112,35 +107,35 @@ static integer c__0 = 0;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer iadd, ierr, nmax, i__, j, n;
-    static logical badnn;
-    static doublereal rmagn[4];
-    static doublecomplex ctemp;
-    extern /* Subroutine */ int zget52_(logical *, integer *, doublecomplex *,
+    integer i__, j, n, n1, jc, nb, in, jr;
+    doublereal ulp;
+    integer iadd, ierr, nmax;
+    logical badnn;
+    doublereal rmagn[4];
+    doublecomplex ctemp;
+    extern /* Subroutine */ int zget52_(logical *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
-	    , doublecomplex *, doublecomplex *, doublecomplex *, doublereal *,
+, doublecomplex *, doublecomplex *, doublecomplex *, doublereal *, 
 	     doublereal *);
-    static integer nmats, jsize;
+    integer nmats, jsize;
     extern /* Subroutine */ int zggev_(char *, char *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, integer *);
-    static integer nerrs, jtype, n1;
+    integer nerrs, jtype;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *), zlatm4_(
 	    integer *, integer *, integer *, integer *, logical *, doublereal 
 	    *, doublereal *, doublereal *, integer *, integer *, 
 	    doublecomplex *, integer *);
-    static integer jc, nb, in;
     extern doublereal dlamch_(char *);
-    static integer jr;
     extern /* Subroutine */ int zunm2r_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
-    static doublereal safmin, safmax;
-    static integer ioldsd[4];
+    doublereal safmin, safmax;
+    integer ioldsd[4];
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *), xerbla_(char *, integer *), 
 	    zlarfg_(integer *, doublecomplex *, doublecomplex *, integer *, 
@@ -151,10 +146,9 @@ static integer c__0 = 0;
 	    doublecomplex *, integer *, doublecomplex *, integer *), 
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *);
-    static integer minwrk, maxwrk;
-    static doublereal ulpinv;
-    static integer mtypes, ntestt;
-    static doublereal ulp;
+    integer minwrk, maxwrk;
+    doublereal ulpinv;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___40 = { 0, 0, 0, fmt_9999, 0 };
@@ -174,317 +168,321 @@ static integer c__0 = 0;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
-#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
-#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
-#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
-#define qe_subscr(a_1,a_2) (a_2)*qe_dim1 + a_1
-#define qe_ref(a_1,a_2) qe[qe_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     February 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZDRGEV checks the nonsymmetric generalized eigenvalue problem driver */
+/*  routine ZGGEV. */
 
-    Purpose   
-    =======   
+/*  ZGGEV computes for a pair of n-by-n nonsymmetric matrices (A,B) the */
+/*  generalized eigenvalues and, optionally, the left and right */
+/*  eigenvectors. */
 
-    ZDRGEV checks the nonsymmetric generalized eigenvalue problem driver   
-    routine ZGGEV.   
+/*  A generalized eigenvalue for a pair of matrices (A,B) is a scalar w */
+/*  or a ratio  alpha/beta = w, such that A - w*B is singular.  It is */
+/*  usually represented as the pair (alpha,beta), as there is reasonalbe */
+/*  interpretation for beta=0, and even for both being zero. */
 
-    ZGGEV computes for a pair of n-by-n nonsymmetric matrices (A,B) the   
-    generalized eigenvalues and, optionally, the left and right   
-    eigenvectors.   
+/*  A right generalized eigenvector corresponding to a generalized */
+/*  eigenvalue  w  for a pair of matrices (A,B) is a vector r  such that */
+/*  (A - wB) * r = 0.  A left generalized eigenvector is a vector l such */
+/*  that l**H * (A - wB) = 0, where l**H is the conjugate-transpose of l. */
 
-    A generalized eigenvalue for a pair of matrices (A,B) is a scalar w   
-    or a ratio  alpha/beta = w, such that A - w*B is singular.  It is   
-    usually represented as the pair (alpha,beta), as there is reasonalbe   
-    interpretation for beta=0, and even for both being zero.   
+/*  When ZDRGEV is called, a number of matrix "sizes" ("n's") and a */
+/*  number of matrix "types" are specified.  For each size ("n") */
+/*  and each type of matrix, a pair of matrices (A, B) will be generated */
+/*  and used for testing.  For each matrix pair, the following tests */
+/*  will be performed and compared with the threshhold THRESH. */
 
-    A right generalized eigenvector corresponding to a generalized   
-    eigenvalue  w  for a pair of matrices (A,B) is a vector r  such that   
-    (A - wB) * r = 0.  A left generalized eigenvector is a vector l such   
-    that l**H * (A - wB) = 0, where l**H is the conjugate-transpose of l.   
+/*  Results from ZGGEV: */
 
-    When ZDRGEV is called, a number of matrix "sizes" ("n's") and a   
-    number of matrix "types" are specified.  For each size ("n")   
-    and each type of matrix, a pair of matrices (A, B) will be generated   
-    and used for testing.  For each matrix pair, the following tests   
-    will be performed and compared with the threshhold THRESH.   
+/*  (1)  max over all left eigenvalue/-vector pairs (alpha/beta,l) of */
 
-    Results from ZGGEV:   
+/*       | VL**H * (beta A - alpha B) |/( ulp max(|beta A|, |alpha B|) ) */
 
-    (1)  max over all left eigenvalue/-vector pairs (alpha/beta,l) of   
+/*       where VL**H is the conjugate-transpose of VL. */
 
-         | VL**H * (beta A - alpha B) |/( ulp max(|beta A|, |alpha B|) )   
+/*  (2)  | |VL(i)| - 1 | / ulp and whether largest component real */
 
-         where VL**H is the conjugate-transpose of VL.   
+/*       VL(i) denotes the i-th column of VL. */
 
-    (2)  | |VL(i)| - 1 | / ulp and whether largest component real   
+/*  (3)  max over all left eigenvalue/-vector pairs (alpha/beta,r) of */
 
-         VL(i) denotes the i-th column of VL.   
+/*       | (beta A - alpha B) * VR | / ( ulp max(|beta A|, |alpha B|) ) */
 
-    (3)  max over all left eigenvalue/-vector pairs (alpha/beta,r) of   
+/*  (4)  | |VR(i)| - 1 | / ulp and whether largest component real */
 
-         | (beta A - alpha B) * VR | / ( ulp max(|beta A|, |alpha B|) )   
+/*       VR(i) denotes the i-th column of VR. */
 
-    (4)  | |VR(i)| - 1 | / ulp and whether largest component real   
+/*  (5)  W(full) = W(partial) */
+/*       W(full) denotes the eigenvalues computed when both l and r */
+/*       are also computed, and W(partial) denotes the eigenvalues */
+/*       computed when only W, only W and r, or only W and l are */
+/*       computed. */
 
-         VR(i) denotes the i-th column of VR.   
+/*  (6)  VL(full) = VL(partial) */
+/*       VL(full) denotes the left eigenvectors computed when both l */
+/*       and r are computed, and VL(partial) denotes the result */
+/*       when only l is computed. */
 
-    (5)  W(full) = W(partial)   
-         W(full) denotes the eigenvalues computed when both l and r   
-         are also computed, and W(partial) denotes the eigenvalues   
-         computed when only W, only W and r, or only W and l are   
-         computed.   
+/*  (7)  VR(full) = VR(partial) */
+/*       VR(full) denotes the right eigenvectors computed when both l */
+/*       and r are also computed, and VR(partial) denotes the result */
+/*       when only l is computed. */
 
-    (6)  VL(full) = VL(partial)   
-         VL(full) denotes the left eigenvectors computed when both l   
-         and r are computed, and VL(partial) denotes the result   
-         when only l is computed.   
 
-    (7)  VR(full) = VR(partial)   
-         VR(full) denotes the right eigenvectors computed when both l   
-         and r are also computed, and VR(partial) denotes the result   
-         when only l is computed.   
+/*  Test Matrices */
+/*  ---- -------- */
 
+/*  The sizes of the test matrices are specified by an array */
+/*  NN(1:NSIZES); the value of each element NN(j) specifies one size. */
+/*  The "types" are specified by a logical array DOTYPE( 1:NTYPES ); if */
+/*  DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*  Currently, the list of possible types is: */
 
-    Test Matrices   
-    ---- --------   
+/*  (1)  ( 0, 0 )         (a pair of zero matrices) */
 
-    The sizes of the test matrices are specified by an array   
-    NN(1:NSIZES); the value of each element NN(j) specifies one size.   
-    The "types" are specified by a logical array DOTYPE( 1:NTYPES ); if   
-    DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-    Currently, the list of possible types is:   
+/*  (2)  ( I, 0 )         (an identity and a zero matrix) */
 
-    (1)  ( 0, 0 )         (a pair of zero matrices)   
+/*  (3)  ( 0, I )         (an identity and a zero matrix) */
 
-    (2)  ( I, 0 )         (an identity and a zero matrix)   
+/*  (4)  ( I, I )         (a pair of identity matrices) */
 
-    (3)  ( 0, I )         (an identity and a zero matrix)   
+/*          t   t */
+/*  (5)  ( J , J  )       (a pair of transposed Jordan blocks) */
 
-    (4)  ( I, I )         (a pair of identity matrices)   
+/*                                      t                ( I   0  ) */
+/*  (6)  ( X, Y )         where  X = ( J   0  )  and Y = (      t ) */
+/*                                   ( 0   I  )          ( 0   J  ) */
+/*                        and I is a k x k identity and J a (k+1)x(k+1) */
+/*                        Jordan block; k=(N-1)/2 */
 
-            t   t   
-    (5)  ( J , J  )       (a pair of transposed Jordan blocks)   
+/*  (7)  ( D, I )         where D is diag( 0, 1,..., N-1 ) (a diagonal */
+/*                        matrix with those diagonal entries.) */
+/*  (8)  ( I, D ) */
+
+/*  (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big */
 
-                                        t                ( I   0  )   
-    (6)  ( X, Y )         where  X = ( J   0  )  and Y = (      t )   
-                                     ( 0   I  )          ( 0   J  )   
-                          and I is a k x k identity and J a (k+1)x(k+1)   
-                          Jordan block; k=(N-1)/2   
+/*  (10) ( small*D, big*I ) */
+
+/*  (11) ( big*I, small*D ) */
 
-    (7)  ( D, I )         where D is diag( 0, 1,..., N-1 ) (a diagonal   
-                          matrix with those diagonal entries.)   
-    (8)  ( I, D )   
-
-    (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big   
+/*  (12) ( small*I, big*D ) */
+
+/*  (13) ( big*D, big*I ) */
+
+/*  (14) ( small*D, small*I ) */
+
+/*  (15) ( D1, D2 )        where D1 is diag( 0, 0, 1, ..., N-3, 0 ) and */
+/*                         D2 is diag( 0, N-3, N-4,..., 1, 0, 0 ) */
+/*            t   t */
+/*  (16) Q ( J , J ) Z     where Q and Z are random orthogonal matrices. */
+
+/*  (17) Q ( T1, T2 ) Z    where T1 and T2 are upper triangular matrices */
+/*                         with random O(1) entries above the diagonal */
+/*                         and diagonal entries diag(T1) = */
+/*                         ( 0, 0, 1, ..., N-3, 0 ) and diag(T2) = */
+/*                         ( 0, N-3, N-4,..., 1, 0, 0 ) */
+
+/*  (18) Q ( T1, T2 ) Z    diag(T1) = ( 0, 0, 1, 1, s, ..., s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1,..., 1, 0 ) */
+/*                         s = machine precision. */
+
+/*  (19) Q ( T1, T2 ) Z    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0 ) */
+
+/*                                                         N-5 */
+/*  (20) Q ( T1, T2 ) Z    diag(T1)=( 0, 0, 1, 1, a, ..., a   =s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 ) */
+
+/*  (21) Q ( T1, T2 ) Z    diag(T1)=( 0, 0, 1, r1, r2, ..., r(N-4), 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 ) */
+/*                         where r1,..., r(N-4) are random. */
 
-    (10) ( small*D, big*I )   
-
-    (11) ( big*I, small*D )   
+/*  (22) Q ( big*T1, small*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
 
-    (12) ( small*I, big*D )   
-
-    (13) ( big*D, big*I )   
-
-    (14) ( small*D, small*I )   
-
-    (15) ( D1, D2 )        where D1 is diag( 0, 0, 1, ..., N-3, 0 ) and   
-                           D2 is diag( 0, N-3, N-4,..., 1, 0, 0 )   
-              t   t   
-    (16) Q ( J , J ) Z     where Q and Z are random orthogonal matrices.   
-
-    (17) Q ( T1, T2 ) Z    where T1 and T2 are upper triangular matrices   
-                           with random O(1) entries above the diagonal   
-                           and diagonal entries diag(T1) =   
-                           ( 0, 0, 1, ..., N-3, 0 ) and diag(T2) =   
-                           ( 0, N-3, N-4,..., 1, 0, 0 )   
-
-    (18) Q ( T1, T2 ) Z    diag(T1) = ( 0, 0, 1, 1, s, ..., s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1,..., 1, 0 )   
-                           s = machine precision.   
-
-    (19) Q ( T1, T2 ) Z    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0 )   
-
-                                                           N-5   
-    (20) Q ( T1, T2 ) Z    diag(T1)=( 0, 0, 1, 1, a, ..., a   =s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 )   
-
-    (21) Q ( T1, T2 ) Z    diag(T1)=( 0, 0, 1, r1, r2, ..., r(N-4), 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 )   
-                           where r1,..., r(N-4) are random.   
+/*  (23) Q ( small*T1, big*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
 
-    (22) Q ( big*T1, small*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
+/*  (24) Q ( small*T1, small*T2 ) Z  diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
 
-    (23) Q ( small*T1, big*T2 ) Z    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
+/*  (25) Q ( big*T1, big*T2 ) Z      diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
 
-    (24) Q ( small*T1, small*T2 ) Z  diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
-
-    (25) Q ( big*T1, big*T2 ) Z      diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
+/*  (26) Q ( T1, T2 ) Z     where T1 and T2 are random upper-triangular */
+/*                          matrices. */
+
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          ZDRGES does nothing.  NSIZES >= 0. */
+
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  NN >= 0. */
 
-    (26) Q ( T1, T2 ) Z     where T1 and T2 are random upper-triangular   
-                            matrices.   
-
-
-    Arguments   
-    =========   
-
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            ZDRGES does nothing.  NSIZES >= 0.   
-
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  NN >= 0.   
-
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, ZDRGEV   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated. If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096. Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to ZDRGES to continue the same random number   
-            sequence.   
-
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error is   
-            scaled to be O(1), so THRESH should be a reasonably small   
-            multiple of 1, e.g., 10 or 100.  In particular, it should   
-            not depend on the precision (single vs. double) or the size   
-            of the matrix.  It must be at least zero.   
-
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IERR not equal to 0.)   
-
-    A       (input/workspace) COMPLEX*16 array, dimension(LDA, max(NN))   
-            Used to hold the original A matrix.  Used as input only   
-            if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and   
-            DOTYPE(MAXTYP+1)=.TRUE.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A, B, S, and T.   
-            It must be at least 1 and at least max( NN ).   
-
-    B       (input/workspace) COMPLEX*16 array, dimension(LDA, max(NN))   
-            Used to hold the original B matrix.  Used as input only   
-            if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and   
-            DOTYPE(MAXTYP+1)=.TRUE.   
-
-    S       (workspace) COMPLEX*16 array, dimension (LDA, max(NN))   
-            The Schur form matrix computed from A by ZGGEV.  On exit, S   
-            contains the Schur form matrix corresponding to the matrix   
-            in A.   
-
-    T       (workspace) COMPLEX*16 array, dimension (LDA, max(NN))   
-            The upper triangular matrix computed from B by ZGGEV.   
-
-    Q      (workspace) COMPLEX*16 array, dimension (LDQ, max(NN))   
-            The (left) eigenvectors matrix computed by ZGGEV.   
-
-    LDQ     (input) INTEGER   
-            The leading dimension of Q and Z. It must   
-            be at least 1 and at least max( NN ).   
-
-    Z       (workspace) COMPLEX*16 array, dimension( LDQ, max(NN) )   
-            The (right) orthogonal matrix computed by ZGGEV.   
-
-    QE      (workspace) COMPLEX*16 array, dimension( LDQ, max(NN) )   
-            QE holds the computed right or left eigenvectors.   
-
-    LDQE    (input) INTEGER   
-            The leading dimension of QE. LDQE >= max(1,max(NN)).   
-
-    ALPHA   (workspace) COMPLEX*16 array, dimension (max(NN))   
-    BETA    (workspace) COMPLEX*16 array, dimension (max(NN))   
-            The generalized eigenvalues of (A,B) computed by ZGGEV.   
-            ( ALPHAR(k)+ALPHAI(k)*i ) / BETA(k) is the k-th   
-            generalized eigenvalue of A and B.   
-
-    ALPHA1  (workspace) COMPLEX*16 array, dimension (max(NN))   
-    BETA1   (workspace) COMPLEX*16 array, dimension (max(NN))   
-            Like ALPHAR, ALPHAI, BETA, these arrays contain the   
-            eigenvalues of A and B, but those computed when ZGGEV only   
-            computes a partial eigendecomposition, i.e. not the   
-            eigenvalues and left and right eigenvectors.   
-
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
-
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  LWORK >= N*(N+1)   
-
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (8*N)   
-            Real workspace.   
-
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  A routine returned an error code.  INFO is the   
-                  absolute value of the INFO value returned.   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, ZDRGEV */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated. If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096. Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to ZDRGES to continue the same random number */
+/*          sequence. */
+
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error is */
+/*          scaled to be O(1), so THRESH should be a reasonably small */
+/*          multiple of 1, e.g., 10 or 100.  In particular, it should */
+/*          not depend on the precision (single vs. double) or the size */
+/*          of the matrix.  It must be at least zero. */
+
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IERR not equal to 0.) */
+
+/*  A       (input/workspace) COMPLEX*16 array, dimension(LDA, max(NN)) */
+/*          Used to hold the original A matrix.  Used as input only */
+/*          if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and */
+/*          DOTYPE(MAXTYP+1)=.TRUE. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, B, S, and T. */
+/*          It must be at least 1 and at least max( NN ). */
+
+/*  B       (input/workspace) COMPLEX*16 array, dimension(LDA, max(NN)) */
+/*          Used to hold the original B matrix.  Used as input only */
+/*          if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and */
+/*          DOTYPE(MAXTYP+1)=.TRUE. */
+
+/*  S       (workspace) COMPLEX*16 array, dimension (LDA, max(NN)) */
+/*          The Schur form matrix computed from A by ZGGEV.  On exit, S */
+/*          contains the Schur form matrix corresponding to the matrix */
+/*          in A. */
+
+/*  T       (workspace) COMPLEX*16 array, dimension (LDA, max(NN)) */
+/*          The upper triangular matrix computed from B by ZGGEV. */
+
+/*  Q      (workspace) COMPLEX*16 array, dimension (LDQ, max(NN)) */
+/*          The (left) eigenvectors matrix computed by ZGGEV. */
+
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of Q and Z. It must */
+/*          be at least 1 and at least max( NN ). */
+
+/*  Z       (workspace) COMPLEX*16 array, dimension( LDQ, max(NN) ) */
+/*          The (right) orthogonal matrix computed by ZGGEV. */
+
+/*  QE      (workspace) COMPLEX*16 array, dimension( LDQ, max(NN) ) */
+/*          QE holds the computed right or left eigenvectors. */
+
+/*  LDQE    (input) INTEGER */
+/*          The leading dimension of QE. LDQE >= max(1,max(NN)). */
+
+/*  ALPHA   (workspace) COMPLEX*16 array, dimension (max(NN)) */
+/*  BETA    (workspace) COMPLEX*16 array, dimension (max(NN)) */
+/*          The generalized eigenvalues of (A,B) computed by ZGGEV. */
+/*          ( ALPHAR(k)+ALPHAI(k)*i ) / BETA(k) is the k-th */
+/*          generalized eigenvalue of A and B. */
+
+/*  ALPHA1  (workspace) COMPLEX*16 array, dimension (max(NN)) */
+/*  BETA1   (workspace) COMPLEX*16 array, dimension (max(NN)) */
+/*          Like ALPHAR, ALPHAI, BETA, these arrays contain the */
+/*          eigenvalues of A and B, but those computed when ZGGEV only */
+/*          computes a partial eigendecomposition, i.e. not the */
+/*          eigenvalues and left and right eigenvectors. */
+
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
+
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  LWORK >= N*(N+1) */
+
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (8*N) */
+/*          Real workspace. */
+
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid overflow. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+/*          > 0:  A routine returned an error code.  INFO is the */
+/*                absolute value of the INFO value returned. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     t_dim1 = *lda;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     s_dim1 = *lda;
-    s_offset = 1 + s_dim1 * 1;
+    s_offset = 1 + s_dim1;
     s -= s_offset;
     b_dim1 = *lda;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     z_dim1 = *ldq;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     qe_dim1 = *ldqe;
-    qe_offset = 1 + qe_dim1 * 1;
+    qe_offset = 1 + qe_dim1;
     qe -= qe_offset;
     --alpha;
     --beta;
@@ -494,9 +492,11 @@ static integer c__0 = 0;
     --rwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     *info = 0;
 
@@ -529,23 +529,21 @@ static integer c__0 = 0;
 	*info = -17;
     }
 
-/*     Compute workspace   
-        (Note: Comments in the code beginning "Workspace:" describe the   
-         minimal amount of workspace needed at that point in the code,   
-         as well as the preferred amount for good performance.   
-         NB refers to the optimal block size for the immediately   
-         following subroutine, as returned by ILAENV. */
+/*     Compute workspace */
+/*      (Note: Comments in the code beginning "Workspace:" describe the */
+/*       minimal amount of workspace needed at that point in the code, */
+/*       as well as the preferred amount for good performance. */
+/*       NB refers to the optimal block size for the immediately */
+/*       following subroutine, as returned by ILAENV. */
 
     minwrk = 1;
     if (*info == 0 && *lwork >= 1) {
 	minwrk = nmax * (nmax + 1);
 /* Computing MAX */
 	i__1 = 1, i__2 = ilaenv_(&c__1, "ZGEQRF", " ", &nmax, &nmax, &c_n1, &
-		c_n1, (ftnlen)6, (ftnlen)1), i__1 = max(i__1,i__2), i__2 = 
-		ilaenv_(&c__1, "ZUNMQR", "LC", &nmax, &nmax, &nmax, &c_n1, (
-		ftnlen)6, (ftnlen)2), i__1 = max(i__1,i__2), i__2 = ilaenv_(&
-		c__1, "ZUNGQR", " ", &nmax, &nmax, &nmax, &c_n1, (ftnlen)6, (
-		ftnlen)1);
+		c_n1), i__1 = max(i__1,i__2), i__2 = 
+		ilaenv_(&c__1, "ZUNMQR", "LC", &nmax, &nmax, &nmax, &c_n1), i__1 = max(i__1,i__2), i__2 = ilaenv_(&
+		c__1, "ZUNGQR", " ", &nmax, &nmax, &nmax, &c_n1);
 	nb = max(i__1,i__2);
 /* Computing MAX */
 	i__1 = nmax << 1, i__2 = nmax * (nb + 1), i__1 = max(i__1,i__2), i__2 
@@ -615,26 +613,26 @@ static integer c__0 = 0;
 /* L20: */
 	    }
 
-/*           Generate test matrices A and B   
+/*           Generate test matrices A and B */
 
-             Description of control parameters:   
+/*           Description of control parameters: */
 
-             KZLASS: =1 means w/o rotation, =2 means w/ rotation,   
-                     =3 means random.   
-             KATYPE: the "type" to be passed to ZLATM4 for computing A.   
-             KAZERO: the pattern of zeros on the diagonal for A:   
-                     =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0 ),   
-                     =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 ),   
-                     =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string of   
-                     non-zero entries.)   
-             KAMAGN: the magnitude of the matrix: =0: zero, =1: O(1),   
-                     =2: large, =3: small.   
-             LASIGN: .TRUE. if the diagonal elements of A are to be   
-                     multiplied by a random magnitude 1 number.   
-             KBTYPE, KBZERO, KBMAGN, LBSIGN: the same, but for B.   
-             KTRIAN: =0: don't fill in the upper triangle, =1: do.   
-             KZ1, KZ2, KADD: used to implement KAZERO and KBZERO.   
-             RMAGN: used to implement KAMAGN and KBMAGN. */
+/*           KZLASS: =1 means w/o rotation, =2 means w/ rotation, */
+/*                   =3 means random. */
+/*           KATYPE: the "type" to be passed to ZLATM4 for computing A. */
+/*           KAZERO: the pattern of zeros on the diagonal for A: */
+/*                   =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0 ), */
+/*                   =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 ), */
+/*                   =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string of */
+/*                   non-zero entries.) */
+/*           KAMAGN: the magnitude of the matrix: =0: zero, =1: O(1), */
+/*                   =2: large, =3: small. */
+/*           LASIGN: .TRUE. if the diagonal elements of A are to be */
+/*                   multiplied by a random magnitude 1 number. */
+/*           KBTYPE, KBZERO, KBMAGN, LBSIGN: the same, but for B. */
+/*           KTRIAN: =0: don't fill in the upper triangle, =1: do. */
+/*           KZ1, KZ2, KADD: used to implement KAZERO and KBZERO. */
+/*           RMAGN: used to implement KAMAGN and KBMAGN. */
 
 	    if (mtypes > 26) {
 		goto L100;
@@ -660,7 +658,7 @@ static integer c__0 = 0;
 			a_offset], lda);
 		iadd = kadd[kazero[jtype - 1] - 1];
 		if (iadd > 0 && iadd <= n) {
-		    i__3 = a_subscr(iadd, iadd);
+		    i__3 = iadd + iadd * a_dim1;
 		    i__4 = kamagn[jtype - 1];
 		    a[i__3].r = rmagn[i__4], a[i__3].i = 0.;
 		}
@@ -683,55 +681,55 @@ static integer c__0 = 0;
 			b_offset], lda);
 		iadd = kadd[kbzero[jtype - 1] - 1];
 		if (iadd != 0 && iadd <= n) {
-		    i__3 = b_subscr(iadd, iadd);
+		    i__3 = iadd + iadd * b_dim1;
 		    i__4 = kbmagn[jtype - 1];
 		    b[i__3].r = rmagn[i__4], b[i__3].i = 0.;
 		}
 
 		if (kclass[jtype - 1] == 2 && n > 0) {
 
-/*                 Include rotations   
+/*                 Include rotations */
 
-                   Generate Q, Z as Householder transformations times   
-                   a diagonal matrix. */
+/*                 Generate Q, Z as Householder transformations times */
+/*                 a diagonal matrix. */
 
 		    i__3 = n - 1;
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = jc; jr <= i__4; ++jr) {
-			    i__5 = q_subscr(jr, jc);
+			    i__5 = jr + jc * q_dim1;
 			    zlarnd_(&z__1, &c__3, &iseed[1]);
 			    q[i__5].r = z__1.r, q[i__5].i = z__1.i;
-			    i__5 = z___subscr(jr, jc);
+			    i__5 = jr + jc * z_dim1;
 			    zlarnd_(&z__1, &c__3, &iseed[1]);
 			    z__[i__5].r = z__1.r, z__[i__5].i = z__1.i;
 /* L30: */
 			}
 			i__4 = n + 1 - jc;
-			zlarfg_(&i__4, &q_ref(jc, jc), &q_ref(jc + 1, jc), &
-				c__1, &work[jc]);
+			zlarfg_(&i__4, &q[jc + jc * q_dim1], &q[jc + 1 + jc * 
+				q_dim1], &c__1, &work[jc]);
 			i__4 = (n << 1) + jc;
-			i__5 = q_subscr(jc, jc);
+			i__5 = jc + jc * q_dim1;
 			d__2 = q[i__5].r;
 			d__1 = d_sign(&c_b28, &d__2);
 			work[i__4].r = d__1, work[i__4].i = 0.;
-			i__4 = q_subscr(jc, jc);
+			i__4 = jc + jc * q_dim1;
 			q[i__4].r = 1., q[i__4].i = 0.;
 			i__4 = n + 1 - jc;
-			zlarfg_(&i__4, &z___ref(jc, jc), &z___ref(jc + 1, jc),
-				 &c__1, &work[n + jc]);
+			zlarfg_(&i__4, &z__[jc + jc * z_dim1], &z__[jc + 1 + 
+				jc * z_dim1], &c__1, &work[n + jc]);
 			i__4 = n * 3 + jc;
-			i__5 = z___subscr(jc, jc);
+			i__5 = jc + jc * z_dim1;
 			d__2 = z__[i__5].r;
 			d__1 = d_sign(&c_b28, &d__2);
 			work[i__4].r = d__1, work[i__4].i = 0.;
-			i__4 = z___subscr(jc, jc);
+			i__4 = jc + jc * z_dim1;
 			z__[i__4].r = 1., z__[i__4].i = 0.;
 /* L40: */
 		    }
 		    zlarnd_(&z__1, &c__3, &iseed[1]);
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
-		    i__3 = q_subscr(n, n);
+		    i__3 = n + n * q_dim1;
 		    q[i__3].r = 1., q[i__3].i = 0.;
 		    i__3 = n;
 		    work[i__3].r = 0., work[i__3].i = 0.;
@@ -741,7 +739,7 @@ static integer c__0 = 0;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
 		    zlarnd_(&z__1, &c__3, &iseed[1]);
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
-		    i__3 = z___subscr(n, n);
+		    i__3 = n + n * z_dim1;
 		    z__[i__3].r = 1., z__[i__3].i = 0.;
 		    i__3 = n << 1;
 		    work[i__3].r = 0., work[i__3].i = 0.;
@@ -756,24 +754,24 @@ static integer c__0 = 0;
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = 1; jr <= i__4; ++jr) {
-			    i__5 = a_subscr(jr, jc);
+			    i__5 = jr + jc * a_dim1;
 			    i__6 = (n << 1) + jr;
 			    d_cnjg(&z__3, &work[n * 3 + jc]);
 			    z__2.r = work[i__6].r * z__3.r - work[i__6].i * 
 				    z__3.i, z__2.i = work[i__6].r * z__3.i + 
 				    work[i__6].i * z__3.r;
-			    i__7 = a_subscr(jr, jc);
+			    i__7 = jr + jc * a_dim1;
 			    z__1.r = z__2.r * a[i__7].r - z__2.i * a[i__7].i, 
 				    z__1.i = z__2.r * a[i__7].i + z__2.i * a[
 				    i__7].r;
 			    a[i__5].r = z__1.r, a[i__5].i = z__1.i;
-			    i__5 = b_subscr(jr, jc);
+			    i__5 = jr + jc * b_dim1;
 			    i__6 = (n << 1) + jr;
 			    d_cnjg(&z__3, &work[n * 3 + jc]);
 			    z__2.r = work[i__6].r * z__3.r - work[i__6].i * 
 				    z__3.i, z__2.i = work[i__6].r * z__3.i + 
 				    work[i__6].i * z__3.r;
-			    i__7 = b_subscr(jr, jc);
+			    i__7 = jr + jc * b_dim1;
 			    z__1.r = z__2.r * b[i__7].r - z__2.i * b[i__7].i, 
 				    z__1.i = z__2.r * b[i__7].i + z__2.i * b[
 				    i__7].r;
@@ -817,13 +815,13 @@ static integer c__0 = 0;
 		for (jc = 1; jc <= i__3; ++jc) {
 		    i__4 = n;
 		    for (jr = 1; jr <= i__4; ++jr) {
-			i__5 = a_subscr(jr, jc);
+			i__5 = jr + jc * a_dim1;
 			i__6 = kamagn[jtype - 1];
 			zlarnd_(&z__2, &c__4, &iseed[1]);
 			z__1.r = rmagn[i__6] * z__2.r, z__1.i = rmagn[i__6] * 
 				z__2.i;
 			a[i__5].r = z__1.r, a[i__5].i = z__1.i;
-			i__5 = b_subscr(jr, jc);
+			i__5 = jr + jc * b_dim1;
 			i__6 = kbmagn[jtype - 1];
 			zlarnd_(&z__2, &c__4, &iseed[1]);
 			z__1.r = rmagn[i__6] * z__2.r, z__1.i = rmagn[i__6] * 
@@ -947,14 +945,14 @@ L100:
 /* L120: */
 	    }
 
-/*           Do test (6): Compute eigenvalues and left eigenvectors,   
-             and test them */
+/*           Do test (6): Compute eigenvalues and left eigenvectors, */
+/*           and test them */
 
 	    zlacpy_(" ", &n, &n, &a[a_offset], lda, &s[s_offset], lda);
 	    zlacpy_(" ", &n, &n, &b[b_offset], lda, &t[t_offset], lda);
 	    zggev_("V", "N", &n, &s[s_offset], lda, &t[t_offset], lda, &
 		    alpha1[1], &beta1[1], &qe[qe_offset], ldqe, &z__[z_offset]
-		    , ldq, &work[1], lwork, &rwork[1], &ierr);
+, ldq, &work[1], lwork, &rwork[1], &ierr);
 	    if (ierr != 0 && ierr != n + 1) {
 		result[1] = ulpinv;
 		io___46.ciunit = *nounit;
@@ -987,8 +985,8 @@ L100:
 	    for (j = 1; j <= i__3; ++j) {
 		i__4 = n;
 		for (jc = 1; jc <= i__4; ++jc) {
-		    i__5 = q_subscr(j, jc);
-		    i__6 = qe_subscr(j, jc);
+		    i__5 = j + jc * q_dim1;
+		    i__6 = j + jc * qe_dim1;
 		    if (q[i__5].r != qe[i__6].r || q[i__5].i != qe[i__6].i) {
 			result[6] = ulpinv;
 		    }
@@ -997,8 +995,8 @@ L100:
 /* L150: */
 	    }
 
-/*           Do test (7): Compute eigenvalues and right eigenvectors,   
-             and test them */
+/*           Do test (7): Compute eigenvalues and right eigenvectors, */
+/*           and test them */
 
 	    zlacpy_(" ", &n, &n, &a[a_offset], lda, &s[s_offset], lda);
 	    zlacpy_(" ", &n, &n, &b[b_offset], lda, &t[t_offset], lda);
@@ -1037,8 +1035,8 @@ L100:
 	    for (j = 1; j <= i__3; ++j) {
 		i__4 = n;
 		for (jc = 1; jc <= i__4; ++jc) {
-		    i__5 = z___subscr(j, jc);
-		    i__6 = qe_subscr(j, jc);
+		    i__5 = j + jc * z_dim1;
+		    i__6 = j + jc * qe_dim1;
 		    if (z__[i__5].r != qe[i__6].r || z__[i__5].i != qe[i__6]
 			    .i) {
 			result[7] = ulpinv;
@@ -1056,11 +1054,11 @@ L190:
 
 /*           Print out tests which fail. */
 
-	    for (jr = 1; jr <= 9; ++jr) {
+	    for (jr = 1; jr <= 7; ++jr) {
 		if (result[jr] >= *thresh) {
 
-/*                 If this is the first test to fail,   
-                   print a header to the data file. */
+/*                 If this is the first test to fail, */
+/*                 print a header to the data file. */
 
 		    if (nerrs == 0) {
 			io___48.ciunit = *nounit;
@@ -1141,16 +1139,3 @@ L210:
 /*     End of ZDRGEV */
 
 } /* zdrgev_ */
-
-#undef qe_ref
-#undef qe_subscr
-#undef z___ref
-#undef z___subscr
-#undef q_ref
-#undef q_subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,7 +18,7 @@ static integer c_n1 = -1;
 	integer *nrhs, integer *iseed, real *thresh, integer *nounit, complex 
 	*a, integer *lda, complex *ab, integer *ldab, real *bd, real *be, 
 	complex *q, integer *ldq, complex *p, integer *ldp, complex *c__, 
-	integer *ldc, complex *cc, complex *work, integer *lwork, real *rwork,
+	integer *ldc, complex *cc, complex *work, integer *lwork, real *rwork, 
 	 real *result, integer *info)
 {
     /* Initialized data */
@@ -50,51 +45,48 @@ static integer c_n1 = -1;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static real cond;
-    static integer jcol, kmax, mmax, nmax;
-    static real unfl, ovfl;
-    static integer i__, j, k, m, n;
+    integer i__, j, k, m, n, kl, jr, ku;
+    real ulp, cond;
+    integer jcol, kmax, mmax, nmax;
+    real unfl, ovfl;
     extern /* Subroutine */ int cbdt01_(integer *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, 
-	    complex *, integer *, complex *, real *, real *);
-    static logical badmm, badnn;
-    extern /* Subroutine */ int cbdt02_(integer *, integer *, complex *, 
-	    integer *, complex *, integer *, complex *, integer *, complex *, 
-	    real *, real *);
-    static integer imode, iinfo;
+	    complex *, integer *, complex *, real *, real *), cbdt02_(integer 
+	    *, integer *, complex *, integer *, complex *, integer *, complex 
+	    *, integer *, complex *, real *, real *);
+    logical badmm, badnn;
+    integer imode, iinfo;
     extern /* Subroutine */ int cunt01_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, real *, real *);
-    static real anorm;
-    static integer mnmin, mnmax, nmats, jsize, nerrs, itype, jtype, ntest;
+    real anorm;
+    integer mnmin, mnmax, nmats, jsize, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int slahd2_(integer *, char *), cgbbrd_(
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    complex *, integer *, real *, real *, complex *, integer *, 
 	    complex *, integer *, complex *, integer *, complex *, real *, 
 	    integer *);
-    static logical badnnb;
-    static integer kl, jr, ku;
+    logical badnnb;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *);
-    static integer idumma[1];
+    integer idumma[1];
     extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int xerbla_(char *, integer *), clatmr_(
 	    integer *, integer *, char *, integer *, char *, complex *, 
 	    integer *, real *, complex *, char *, char *, complex *, integer *
-	    , real *, complex *, integer *, real *, char *, integer *, 
+, real *, complex *, integer *, real *, char *, integer *, 
 	    integer *, integer *, real *, real *, char *, complex *, integer *
-	    , integer *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
+, integer *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
 	    real *, integer *, real *, real *, integer *, integer *, char *, 
 	    complex *, integer *, complex *, integer *);
-    static real amninv;
-    static integer jwidth;
+    real amninv;
+    integer jwidth;
     extern /* Subroutine */ int slasum_(char *, integer *, integer *, integer 
 	    *);
-    static real rtunfl, rtovfl, ulpinv;
-    static integer mtypes, ntestt;
-    static real ulp;
+    real rtunfl, rtovfl, ulpinv;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
@@ -103,278 +95,290 @@ static integer c_n1 = -1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (new routine for release 2.0) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (new routine for release 2.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  CCHKBB tests the reduction of a general complex rectangular band */
+/*  matrix to real bidiagonal form. */
 
-    Purpose   
-    =======   
+/*  CGBBRD factors a general band matrix A as  Q B P* , where * means */
+/*  conjugate transpose, B is upper bidiagonal, and Q and P are unitary; */
+/*  CGBBRD can also overwrite a given matrix C with Q* C . */
 
-    CCHKBB tests the reduction of a general complex rectangular band   
-    matrix to real bidiagonal form.   
+/*  For each pair of matrix dimensions (M,N) and each selected matrix */
+/*  type, an M by N matrix A and an M by NRHS matrix C are generated. */
+/*  The problem dimensions are as follows */
+/*     A:          M x N */
+/*     Q:          M x M */
+/*     P:          N x N */
+/*     B:          min(M,N) x min(M,N) */
+/*     C:          M x NRHS */
 
-    CGBBRD factors a general band matrix A as  Q B P* , where * means   
-    conjugate transpose, B is upper bidiagonal, and Q and P are unitary;   
-    CGBBRD can also overwrite a given matrix C with Q* C .   
+/*  For each generated matrix, 4 tests are performed: */
 
-    For each pair of matrix dimensions (M,N) and each selected matrix   
-    type, an M by N matrix A and an M by NRHS matrix C are generated.   
-    The problem dimensions are as follows   
-       A:          M x N   
-       Q:          M x M   
-       P:          N x N   
-       B:          min(M,N) x min(M,N)   
-       C:          M x NRHS   
+/*  (1)   | A - Q B PT | / ( |A| max(M,N) ulp ), PT = P' */
 
-    For each generated matrix, 4 tests are performed:   
+/*  (2)   | I - Q' Q | / ( M ulp ) */
 
-    (1)   | A - Q B PT | / ( |A| max(M,N) ulp ), PT = P'   
+/*  (3)   | I - PT PT' | / ( N ulp ) */
 
-    (2)   | I - Q' Q | / ( M ulp )   
+/*  (4)   | Y - Q' C | / ( |Y| max(M,NRHS) ulp ), where Y = Q' C. */
 
-    (3)   | I - PT PT' | / ( N ulp )   
+/*  The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*  if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*  Currently, the list of possible types is: */
 
-    (4)   | Y - Q' C | / ( |Y| max(M,NRHS) ulp ), where Y = Q' C.   
+/*  The possible matrix types are */
 
-    The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-    if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-    Currently, the list of possible types is:   
+/*  (1)  The zero matrix. */
+/*  (2)  The identity matrix. */
 
-    The possible matrix types are   
+/*  (3)  A diagonal matrix with evenly spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*       (ULP = (first number larger than 1) - 1 ) */
+/*  (4)  A diagonal matrix with geometrically spaced entries */
+/*       1, ..., ULP  and random signs. */
+/*  (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*       and random signs. */
 
-    (1)  The zero matrix.   
-    (2)  The identity matrix.   
+/*  (6)  Same as (3), but multiplied by SQRT( overflow threshold ) */
+/*  (7)  Same as (3), but multiplied by SQRT( underflow threshold ) */
 
-    (3)  A diagonal matrix with evenly spaced entries   
-         1, ..., ULP  and random signs.   
-         (ULP = (first number larger than 1) - 1 )   
-    (4)  A diagonal matrix with geometrically spaced entries   
-         1, ..., ULP  and random signs.   
-    (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-         and random signs.   
+/*  (8)  A matrix of the form  U D V, where U and V are orthogonal and */
+/*       D has evenly spaced entries 1, ..., ULP with random signs */
+/*       on the diagonal. */
 
-    (6)  Same as (3), but multiplied by SQRT( overflow threshold )   
-    (7)  Same as (3), but multiplied by SQRT( underflow threshold )   
+/*  (9)  A matrix of the form  U D V, where U and V are orthogonal and */
+/*       D has geometrically spaced entries 1, ..., ULP with random */
+/*       signs on the diagonal. */
 
-    (8)  A matrix of the form  U D V, where U and V are orthogonal and   
-         D has evenly spaced entries 1, ..., ULP with random signs   
-         on the diagonal.   
+/*  (10) A matrix of the form  U D V, where U and V are orthogonal and */
+/*       D has "clustered" entries 1, ULP,..., ULP with random */
+/*       signs on the diagonal. */
 
-    (9)  A matrix of the form  U D V, where U and V are orthogonal and   
-         D has geometrically spaced entries 1, ..., ULP with random   
-         signs on the diagonal.   
+/*  (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*  (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
 
-    (10) A matrix of the form  U D V, where U and V are orthogonal and   
-         D has "clustered" entries 1, ULP,..., ULP with random   
-         signs on the diagonal.   
+/*  (13) Rectangular matrix with random entries chosen from (-1,1). */
+/*  (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*  (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
 
-    (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-    (12) Same as (8), but multiplied by SQRT( underflow threshold )   
+/*  Arguments */
+/*  ========= */
 
-    (13) Rectangular matrix with random entries chosen from (-1,1).   
-    (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-    (15) Same as (13), but multiplied by SQRT( underflow threshold )   
+/*  NSIZES  (input) INTEGER */
+/*          The number of values of M and N contained in the vectors */
+/*          MVAL and NVAL.  The matrix sizes are used in pairs (M,N). */
+/*          If NSIZES is zero, CCHKBB does nothing.  NSIZES must be at */
+/*          least zero. */
 
-    Arguments   
-    =========   
+/*  MVAL    (input) INTEGER array, dimension (NSIZES) */
+/*          The values of the matrix row dimension M. */
 
-    NSIZES  (input) INTEGER   
-            The number of values of M and N contained in the vectors   
-            MVAL and NVAL.  The matrix sizes are used in pairs (M,N).   
-            If NSIZES is zero, CCHKBB does nothing.  NSIZES must be at   
-            least zero.   
+/*  NVAL    (input) INTEGER array, dimension (NSIZES) */
+/*          The values of the matrix column dimension N. */
 
-    MVAL    (input) INTEGER array, dimension (NSIZES)   
-            The values of the matrix row dimension M.   
+/*  NWDTHS  (input) INTEGER */
+/*          The number of bandwidths to use.  If it is zero, */
+/*          CCHKBB does nothing.  It must be at least zero. */
 
-    NVAL    (input) INTEGER array, dimension (NSIZES)   
-            The values of the matrix column dimension N.   
+/*  KK      (input) INTEGER array, dimension (NWDTHS) */
+/*          An array containing the bandwidths to be used for the band */
+/*          matrices.  The values must be at least zero. */
 
-    NWDTHS  (input) INTEGER   
-            The number of bandwidths to use.  If it is zero,   
-            CCHKBB does nothing.  It must be at least zero.   
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, CCHKBB */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
 
-    KK      (input) INTEGER array, dimension (NWDTHS)   
-            An array containing the bandwidths to be used for the band   
-            matrices.  The values must be at least zero.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
 
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, CCHKBB   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns in the "right-hand side" matrix C. */
+/*          If NRHS = 0, then the operations on the right-hand side will */
+/*          not be tested. NRHS must be at least 0. */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to CCHKBB to continue the same random number */
+/*          sequence. */
 
-    NRHS    (input) INTEGER   
-            The number of columns in the "right-hand side" matrix C.   
-            If NRHS = 0, then the operations on the right-hand side will   
-            not be tested. NRHS must be at least 0.   
+/*  THRESH  (input) REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to CCHKBB to continue the same random number   
-            sequence.   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
 
-    THRESH  (input) REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  A       (input/workspace) REAL array, dimension */
+/*                            (LDA, max(NN)) */
+/*          Used to hold the matrix A. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least max( NN ). */
 
-    A       (input/workspace) REAL array, dimension   
-                              (LDA, max(NN))   
-            Used to hold the matrix A.   
+/*  AB      (workspace) REAL array, dimension (LDAB, max(NN)) */
+/*          Used to hold A in band storage format. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least max( NN ).   
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of AB.  It must be at least 2 (not 1!) */
+/*          and at least max( KK )+1. */
 
-    AB      (workspace) REAL array, dimension (LDAB, max(NN))   
-            Used to hold A in band storage format.   
+/*  BD      (workspace) REAL array, dimension (max(NN)) */
+/*          Used to hold the diagonal of the bidiagonal matrix computed */
+/*          by CGBBRD. */
 
-    LDAB    (input) INTEGER   
-            The leading dimension of AB.  It must be at least 2 (not 1!)   
-            and at least max( KK )+1.   
+/*  BE      (workspace) REAL array, dimension (max(NN)) */
+/*          Used to hold the off-diagonal of the bidiagonal matrix */
+/*          computed by CGBBRD. */
 
-    BD      (workspace) REAL array, dimension (max(NN))   
-            Used to hold the diagonal of the bidiagonal matrix computed   
-            by CGBBRD.   
+/*  Q       (workspace) COMPLEX array, dimension (LDQ, max(NN)) */
+/*          Used to hold the unitary matrix Q computed by CGBBRD. */
 
-    BE      (workspace) REAL array, dimension (max(NN))   
-            Used to hold the off-diagonal of the bidiagonal matrix   
-            computed by CGBBRD.   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of Q.  It must be at least 1 */
+/*          and at least max( NN ). */
 
-    Q       (workspace) COMPLEX array, dimension (LDQ, max(NN))   
-            Used to hold the unitary matrix Q computed by CGBBRD.   
+/*  P       (workspace) COMPLEX array, dimension (LDP, max(NN)) */
+/*          Used to hold the unitary matrix P computed by CGBBRD. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of Q.  It must be at least 1   
-            and at least max( NN ).   
+/*  LDP     (input) INTEGER */
+/*          The leading dimension of P.  It must be at least 1 */
+/*          and at least max( NN ). */
 
-    P       (workspace) COMPLEX array, dimension (LDP, max(NN))   
-            Used to hold the unitary matrix P computed by CGBBRD.   
+/*  C       (workspace) COMPLEX array, dimension (LDC, max(NN)) */
+/*          Used to hold the matrix C updated by CGBBRD. */
 
-    LDP     (input) INTEGER   
-            The leading dimension of P.  It must be at least 1   
-            and at least max( NN ).   
+/*  LDC     (input) INTEGER */
+/*          The leading dimension of U.  It must be at least 1 */
+/*          and at least max( NN ). */
 
-    C       (workspace) COMPLEX array, dimension (LDC, max(NN))   
-            Used to hold the matrix C updated by CGBBRD.   
+/*  CC      (workspace) COMPLEX array, dimension (LDC, max(NN)) */
+/*          Used to hold a copy of the matrix C. */
 
-    LDC     (input) INTEGER   
-            The leading dimension of U.  It must be at least 1   
-            and at least max( NN ).   
+/*  WORK    (workspace) COMPLEX array, dimension (LWORK) */
 
-    CC      (workspace) COMPLEX array, dimension (LDC, max(NN))   
-            Used to hold a copy of the matrix C.   
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          max( LDA+1, max(NN)+1 )*max(NN). */
 
-    WORK    (workspace) COMPLEX array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (max(NN)) */
 
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            max( LDA+1, max(NN)+1 )*max(NN).   
+/*  RESULT  (output) REAL array, dimension (4) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
 
-    RWORK   (workspace) REAL array, dimension (max(NN))   
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
 
-    RESULT  (output) REAL array, dimension (4)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
+/* ----------------------------------------------------------------------- */
 
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far. */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
 
-   -----------------------------------------------------------------------   
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
 
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far.   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
+/*  ===================================================================== */
 
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --mval;
     --nval;
     --kk;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
     --bd;
     --be;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     p_dim1 = *ldp;
-    p_offset = 1 + p_dim1 * 1;
+    p_offset = 1 + p_dim1;
     p -= p_offset;
     cc_dim1 = *ldc;
-    cc_offset = 1 + cc_dim1 * 1;
+    cc_offset = 1 + cc_dim1;
     cc -= cc_offset;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --work;
     --rwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -400,8 +404,8 @@ static integer c_n1 = -1;
 	if (nval[j] < 0) {
 	    badnn = TRUE_;
 	}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	i__4 = mval[j], i__5 = nval[j];
 	i__2 = mnmax, i__3 = min(i__4,i__5);
 	mnmax = max(i__2,i__3);
@@ -492,13 +496,13 @@ static integer c_n1 = -1;
 	    if (k >= m && k >= n) {
 		goto L150;
 	    }
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	    i__5 = m - 1;
 	    i__3 = 0, i__4 = min(i__5,k);
 	    kl = max(i__3,i__4);
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	    i__5 = n - 1;
 	    i__3 = 0, i__4 = min(i__5,k);
 	    ku = max(i__3,i__4);
@@ -522,20 +526,20 @@ static integer c_n1 = -1;
 /* L30: */
 		}
 
-/*              Compute "A".   
+/*              Compute "A". */
 
-                Control parameters:   
+/*              Control parameters: */
 
-                    KMAGN  KMODE        KTYPE   
-                =1  O(1)   clustered 1  zero   
-                =2  large  clustered 2  identity   
-                =3  small  exponential  (none)   
-                =4         arithmetic   diagonal, (w/ singular values)   
-                =5         random log   (none)   
-                =6         random       nonhermitian, w/ singular values   
-                =7                      (none)   
-                =8                      (none)   
-                =9                      random nonhermitian */
+/*                  KMAGN  KMODE        KTYPE */
+/*              =1  O(1)   clustered 1  zero */
+/*              =2  large  clustered 2  identity */
+/*              =3  small  exponential  (none) */
+/*              =4         arithmetic   diagonal, (w/ singular values) */
+/*              =5         random log   (none) */
+/*              =6         random       nonhermitian, w/ singular values */
+/*              =7                      (none) */
+/*              =8                      (none) */
+/*              =9                      random nonhermitian */
 
 		if (mtypes > 15) {
 		    goto L90;
@@ -571,9 +575,9 @@ L70:
 		iinfo = 0;
 		cond = ulpinv;
 
-/*              Special Matrices -- Identity & Jordan block   
+/*              Special Matrices -- Identity & Jordan block */
 
-                   Zero */
+/*                 Zero */
 
 		if (itype == 1) {
 		    iinfo = 0;
@@ -584,7 +588,7 @@ L70:
 
 		    i__4 = n;
 		    for (jcol = 1; jcol <= i__4; ++jcol) {
-			i__5 = a_subscr(jcol, jcol);
+			i__5 = jcol + jcol * a_dim1;
 			a[i__5].r = anorm, a[i__5].i = 0.f;
 /* L80: */
 		    }
@@ -654,8 +658,8 @@ L90:
 		    i__8 = m, i__9 = j + kl;
 		    i__7 = min(i__8,i__9);
 		    for (i__ = max(i__5,i__6); i__ <= i__7; ++i__) {
-			i__5 = ab_subscr(ku + 1 + i__ - j, j);
-			i__6 = a_subscr(i__, j);
+			i__5 = ku + 1 + i__ - j + j * ab_dim1;
+			i__6 = i__ + j * a_dim1;
 			ab[i__5].r = a[i__6].r, ab[i__5].i = a[i__6].i;
 /* L100: */
 		    }
@@ -664,7 +668,7 @@ L90:
 
 /*              Copy C */
 
-		clacpy_("Full", &m, nrhs, &c__[c_offset], ldc, &cc[cc_offset],
+		clacpy_("Full", &m, nrhs, &c__[c_offset], ldc, &cc[cc_offset], 
 			 ldc);
 
 /*              Call CGBBRD to compute B, Q and P, and to update C. */
@@ -692,15 +696,15 @@ L90:
 		    }
 		}
 
-/*              Test 1:  Check the decomposition A := Q * B * P'   
-                     2:  Check the orthogonality of Q   
-                     3:  Check the orthogonality of P   
-                     4:  Check the computation of Q' * C */
+/*              Test 1:  Check the decomposition A := Q * B * P' */
+/*                   2:  Check the orthogonality of Q */
+/*                   3:  Check the orthogonality of P */
+/*                   4:  Check the computation of Q' * C */
 
 		cbdt01_(&m, &n, &c_n1, &a[a_offset], lda, &q[q_offset], ldq, &
-			bd[1], &be[1], &p[p_offset], ldp, &work[1], &rwork[1],
+			bd[1], &be[1], &p[p_offset], ldp, &work[1], &rwork[1], 
 			 &result[1]);
-		cunt01_("Columns", &m, &m, &q[q_offset], ldq, &work[1], lwork,
+		cunt01_("Columns", &m, &m, &q[q_offset], ldq, &work[1], lwork, 
 			 &rwork[1], &result[2]);
 		cunt01_("Rows", &n, &n, &p[p_offset], ldp, &work[1], lwork, &
 			rwork[1], &result[3]);
@@ -719,7 +723,7 @@ L120:
 		for (jr = 1; jr <= i__4; ++jr) {
 		    if (result[jr] >= *thresh) {
 			if (nerrs == 0) {
-			    slahd2_(nounit, "ZBB");
+			    slahd2_(nounit, "CBB");
 			}
 			++nerrs;
 			io___45.ciunit = *nounit;
@@ -750,17 +754,10 @@ L150:
 
 /*     Summary */
 
-    slasum_("ZBB", nounit, &nerrs, &ntestt);
+    slasum_("CBB", nounit, &nerrs, &ntestt);
     return 0;
 
 
 /*     End of CCHKBB */
 
 } /* cchkbb_ */
-
-#undef ab_ref
-#undef ab_subscr
-#undef a_ref
-#undef a_subscr
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -61,75 +56,74 @@ static integer c__7 = 7;
     doublereal d__1, d__2;
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static integer ioff, mode;
-    static doublereal amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1];
-    static doublereal rdum[1];
-    static char type__[1];
-    static integer nrun, i__, k, n, ifact, nfail, iseed[4], nfact;
+    integer i__, k, n, k1, nb, in, kl, ku, nt, lda;
+    char fact[1];
+    integer ioff, mode;
+    doublereal amax;
+    char path[3];
+    integer imat, info;
+    char dist[1];
+    doublereal rdum[1];
+    char type__[1];
+    integer nrun, ifact, nfail, iseed[4], nfact;
     extern doublereal dget06_(doublereal *, doublereal *);
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static integer nbmin;
-    static doublereal rcond, roldc;
-    static integer nimat;
-    static doublereal roldi;
-    extern /* Subroutine */ int zget01_(integer *, integer *, doublecomplex *,
+    char equed[1];
+    integer nbmin;
+    doublereal rcond, roldc;
+    integer nimat;
+    doublereal roldi;
+    extern /* Subroutine */ int zget01_(integer *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, integer *, doublereal *, 
 	    doublereal *), zget02_(char *, integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *);
-    static doublereal anorm;
-    static integer itran;
-    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *,
+    doublereal anorm;
+    integer itran;
+    extern /* Subroutine */ int zget04_(integer *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, doublereal *, doublereal *
-	    );
-    static logical equil;
-    static doublereal roldo;
+);
+    logical equil;
+    doublereal roldo;
     extern /* Subroutine */ int zget07_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublereal *);
-    static char trans[1];
-    static integer izero, nerrs, k1, lwork;
+    char trans[1];
+    integer izero, nerrs, lwork;
     extern /* Subroutine */ int zgesv_(integer *, integer *, doublecomplex *, 
 	    integer *, integer *, doublecomplex *, integer *, integer *);
-    static logical zerot;
-    static char xtype[1];
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int zlatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, char *), aladhd_(integer *, 
 	    char *);
-    static integer nb, in, kl;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer ku, nt;
-    static doublereal colcnd, rcondc;
-    static logical nofact;
-    static integer iequed;
-    static doublereal rcondi;
+    logical prefac;
+    doublereal colcnd, rcondc;
+    logical nofact;
+    integer iequed;
+    doublereal rcondi;
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static doublereal cndnum, anormi, rcondo, ainvnm;
-    extern /* Subroutine */ int zlaqge_(integer *, integer *, doublecomplex *,
+    doublereal cndnum, anormi, rcondo, ainvnm;
+    extern /* Subroutine */ int zlaqge_(integer *, integer *, doublecomplex *, 
 	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
-	    , doublereal *, char *);
-    static logical trfcon;
-    static doublereal anormo, rowcnd;
+, doublereal *, char *);
+    logical trfcon;
+    doublereal anormo, rowcnd;
     extern /* Subroutine */ int xlaenv_(integer *, integer *), zgeequ_(
 	    integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *)
@@ -139,7 +133,7 @@ static integer c__7 = 7;
 	    zgetri_(integer *, doublecomplex *, integer *, integer *, 
 	    doublecomplex *, integer *, integer *), zlarhs_(char *, char *, 
 	    char *, char *, integer *, integer *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublecomplex *, integer *,
+	    integer *, doublecomplex *, integer *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
     extern doublereal zlantr_(char *, char *, char *, integer *, integer *, 
@@ -148,15 +142,14 @@ static integer c__7 = 7;
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *);
-    static doublereal result[7];
+    doublereal result[7];
     extern /* Subroutine */ int zgesvx_(char *, char *, integer *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, integer *,
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *, 
 	     char *, doublereal *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublereal *, doublecomplex *, doublereal *, integer *);
-    static doublereal rpvgrw;
+    doublereal rpvgrw;
     extern /* Subroutine */ int zerrvx_(char *, integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___55 = { 0, 0, 0, fmt_9999, 0 };
@@ -171,76 +164,96 @@ static integer c__7 = 7;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZDRVGE tests the driver routines ZGESV and -SVX.   
+/*  ZDRVGE tests the driver routines ZGESV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) COMPLEX*16 array, dimension (NMAX*NMAX)   
+/*  A       (workspace) COMPLEX*16 array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) COMPLEX*16 array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) COMPLEX*16 array, dimension (NMAX*NMAX) */
 
-    ASAV    (workspace) COMPLEX*16 array, dimension (NMAX*NMAX)   
+/*  ASAV    (workspace) COMPLEX*16 array, dimension (NMAX*NMAX) */
 
-    B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  B       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  X       (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) COMPLEX*16 array, dimension (NMAX*NRHS) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension (2*NMAX)   
+/*  S       (workspace) DOUBLE PRECISION array, dimension (2*NMAX) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) COMPLEX*16 array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (2*NRHS+NMAX)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (2*NRHS+NMAX) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -255,9 +268,11 @@ static integer c__7 = 7;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "GE", (ftnlen)2, (ftnlen)2);
@@ -311,8 +326,8 @@ static integer c__7 = 7;
 		goto L80;
 	    }
 
-/*           Set up parameters with ZLATB4 and generate a test matrix   
-             with ZLATMS. */
+/*           Set up parameters with ZLATB4 and generate a test matrix */
+/*           with ZLATMS. */
 
 	    zlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
 		    cndnum, dist);
@@ -331,8 +346,8 @@ static integer c__7 = 7;
 		goto L80;
 	    }
 
-/*           For types 5-7, zero one or more columns of the matrix to   
-             test that INFO is returned correctly. */
+/*           For types 5-7, zero one or more columns of the matrix to */
+/*           test that INFO is returned correctly. */
 
 	    if (zerot) {
 		if (imat == 5) {
@@ -389,17 +404,17 @@ static integer c__7 = 7;
 
 		    } else if (! nofact) {
 
-/*                    Compute the condition number for comparison with   
-                      the value returned by ZGESVX (FACT = 'N' reuses   
-                      the condition number from the previous iteration   
-                      with FACT = 'F'). */
+/*                    Compute the condition number for comparison with */
+/*                    the value returned by ZGESVX (FACT = 'N' reuses */
+/*                    the condition number from the previous iteration */
+/*                    with FACT = 'F'). */
 
 			zlacpy_("Full", &n, &n, &asav[1], &lda, &afac[1], &
 				lda);
 			if (equil || iequed > 1) {
 
-/*                       Compute row and column scale factors to   
-                         equilibrate the matrix A. */
+/*                       Compute row and column scale factors to */
+/*                       equilibrate the matrix A. */
 
 			    zgeequ_(&n, &n, &afac[1], &lda, &s[1], &s[n + 1], 
 				    &rowcnd, &colcnd, &amax, &info);
@@ -423,8 +438,8 @@ static integer c__7 = 7;
 			    }
 			}
 
-/*                    Save the condition number of the non-equilibrated   
-                      system for use in ZGET04. */
+/*                    Save the condition number of the non-equilibrated */
+/*                    system for use in ZGET04. */
 
 			if (equil) {
 			    roldo = rcondo;
@@ -496,10 +511,10 @@ static integer c__7 = 7;
 
 			if (nofact && itran == 1) {
 
-/*                       --- Test ZGESV  ---   
+/*                       --- Test ZGESV  --- */
 
-                         Compute the LU factorization of the matrix and   
-                         solve the system. */
+/*                       Compute the LU factorization of the matrix and */
+/*                       solve the system. */
 
 			    zlacpy_("Full", &n, &n, &a[1], &lda, &afac[1], &
 				    lda);
@@ -508,7 +523,7 @@ static integer c__7 = 7;
 
 			    s_copy(srnamc_1.srnamt, "ZGESV ", (ftnlen)6, (
 				    ftnlen)6);
-			    zgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1],
+			    zgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1], 
 				     &lda, &info);
 
 /*                       Check error code from ZGESV . */
@@ -519,8 +534,8 @@ static integer c__7 = 7;
 					nfail, &nerrs, nout);
 			    }
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    zget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
 				    iwork[1], &rwork[1], result);
@@ -537,13 +552,13 @@ static integer c__7 = 7;
 
 /*                          Check solution from generated exact solution. */
 
-				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 				nt = 3;
 			    }
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    i__4 = nt;
 			    for (k = 1; k <= i__4; ++k) {
@@ -579,15 +594,15 @@ static integer c__7 = 7;
 			zlaset_("Full", &n, nrhs, &c_b20, &c_b20, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if FACT = 'F' and   
-                         EQUED = 'R', 'C', or 'B'. */
+/*                       Equilibrate the matrix if FACT = 'F' and */
+/*                       EQUED = 'R', 'C', or 'B'. */
 
 			    zlaqge_(&n, &n, &a[1], &lda, &s[1], &s[n + 1], &
 				    rowcnd, &colcnd, &amax, equed);
 			}
 
-/*                    Solve the system and compute the condition number   
-                      and error bounds using ZGESVX. */
+/*                    Solve the system and compute the condition number */
+/*                    and error bounds using ZGESVX. */
 
 			s_copy(srnamc_1.srnamt, "ZGESVX", (ftnlen)6, (ftnlen)
 				6);
@@ -609,8 +624,8 @@ static integer c__7 = 7;
 				    nerrs, nout);
 			}
 
-/*                    Compare RWORK(2*NRHS+1) from ZGESVX with the   
-                      computed reciprocal pivot growth factor RPVGRW */
+/*                    Compare RWORK(2*NRHS+1) from ZGESVX with the */
+/*                    computed reciprocal pivot growth factor RPVGRW */
 
 			if (info != 0) {
 			    rpvgrw = zlantr_("M", "U", "N", &info, &info, &
@@ -638,8 +653,8 @@ static integer c__7 = 7;
 
 			if (! prefac) {
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    zget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
 				    iwork[1], &rwork[(*nrhs << 1) + 1], 
@@ -655,15 +670,15 @@ static integer c__7 = 7;
 /*                       Compute residual of the computed solution. */
 
 			    zlacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
-				    , &lda);
+, &lda);
 			    zget02_(trans, &n, &n, nrhs, &asav[1], &lda, &x[1]
-				    , &lda, &work[1], &lda, &rwork[(*nrhs << 
+, &lda, &work[1], &lda, &rwork[(*nrhs << 
 				    1) + 1], &result[1]);
 
 /*                       Check solution from generated exact solution. */
 
 			    if (nofact || prefac && lsame_(equed, "N")) {
-				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 			    } else {
 				if (itran == 1) {
@@ -671,12 +686,12 @@ static integer c__7 = 7;
 				} else {
 				    roldc = roldi;
 				}
-				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				zget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds from iterative   
-                         refinement. */
+/*                       Check the error bounds from iterative */
+/*                       refinement. */
 
 			    zget07_(trans, &n, nrhs, &asav[1], &lda, &b[1], &
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
@@ -685,13 +700,13 @@ static integer c__7 = 7;
 			    trfcon = TRUE_;
 			}
 
-/*                    Compare RCOND from ZGESVX with the computed value   
-                      in RCONDC. */
+/*                    Compare RCOND from ZGESVX with the computed value */
+/*                    in RCONDC. */
 
 			result[5] = dget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			if (! trfcon) {
 			    for (k = k1; k <= 7; ++k) {
@@ -879,4 +894,3 @@ L80:
 /*     End of ZDRVGE */
 
 } /* zdrvge_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,8 +16,8 @@ doublereal srzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
     real ret_val;
 
     /* Local variables */
-    static integer info, i__, j;
-    static real norma, rwork[1];
+    integer i__, j, info;
+    real norma, rwork[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
@@ -33,60 +28,72 @@ doublereal srzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 	    integer *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SRZT01 returns */
+/*       || A - R*Q || / ( M * eps * ||A|| ) */
+/*  for an upper trapezoidal A that was factored with STZRZF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SRZT01 returns   
-         || A - R*Q || / ( M * eps * ||A|| )   
-    for an upper trapezoidal A that was factored with STZRZF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and AF. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and AF. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and AF.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The original upper trapezoidal M by N matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and AF.   
+/*  AF      (input) REAL array, dimension (LDA,N) */
+/*          The output of STZRZF for input matrix A. */
+/*          The lower triangle is not referenced. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The original upper trapezoidal M by N matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
 
-    AF      (input) REAL array, dimension (LDA,N)   
-            The output of STZRZF for input matrix A.   
-            The lower triangle is not referenced.   
+/*  TAU     (input) REAL array, dimension (M) */
+/*          Details of the Householder transformations as returned by */
+/*          STZRZF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    TAU     (input) REAL array, dimension (M)   
-            Details of the Householder transformations as returned by   
-            STZRZF.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= m*n + m*nb. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= m*n + m*nb.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -114,7 +121,7 @@ doublereal srzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
     for (j = 1; j <= i__1; ++j) {
 	i__2 = j;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    work[(j - 1) * *m + i__] = af_ref(i__, j);
+	    work[(j - 1) * *m + i__] = af[i__ + j * af_dim1];
 /* L10: */
 	}
 /* L20: */
@@ -131,8 +138,8 @@ doublereal srzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	saxpy_(m, &c_b13, &a_ref(1, i__), &c__1, &work[(i__ - 1) * *m + 1], &
-		c__1);
+	saxpy_(m, &c_b13, &a[i__ * a_dim1 + 1], &c__1, &work[(i__ - 1) * *m + 
+		1], &c__1);
 /* L30: */
     }
 
@@ -148,8 +155,3 @@ doublereal srzt01_(integer *m, integer *n, real *a, real *af, integer *lda,
 /*     End of SRZT01 */
 
 } /* srzt01_ */
-
-#undef af_ref
-#undef a_ref
-
-

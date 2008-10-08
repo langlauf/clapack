@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,72 +15,81 @@ static doublereal c_b7 = -1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal unfl;
-    static integer j;
+    integer j;
+    doublereal eps, unfl;
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal wnorm;
+    doublereal wnorm;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal eps;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET10 compares two matrices A and B and computes the ratio */
+/*  RESULT = norm( A - B ) / ( norm(A) * M * EPS ) */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DGET10 compares two matrices A and B and computes the ratio   
-    RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and B. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and B.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The m by n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The m by n matrix A.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,N) */
+/*          The m by n matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,M). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
-            The m by n matrix B.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,M).   
+/*  RESULT  (output) DOUBLE PRECISION */
+/*          RESULT = norm( A - B ) / ( norm(A) * M * EPS ) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION   
-            RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -101,8 +105,8 @@ static doublereal c_b7 = -1.;
     wnorm = 0.;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
-	daxpy_(m, &c_b7, &b_ref(1, j), &c__1, &work[1], &c__1);
+	dcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+	daxpy_(m, &c_b7, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
 /* Computing MAX */
 	d__1 = wnorm, d__2 = dasum_(n, &work[1], &c__1);
 	wnorm = max(d__1,d__2);
@@ -132,8 +136,3 @@ static doublereal c_b7 = -1.;
 /*     End of DGET10 */
 
 } /* dget10_ */
-
-#undef b_ref
-#undef a_ref
-
-

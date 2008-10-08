@@ -1,19 +1,35 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static real c_b4 = 1.f;
 
 /* Subroutine */ int srotg_(real *sa, real *sb, real *c__, real *s)
 {
-    /* Table of constant values */
-    static real c_b4 = 1.f;
-    
     /* System generated locals */
     real r__1, r__2;
+
     /* Builtin functions */
     double sqrt(doublereal), r_sign(real *, real *);
+
     /* Local variables */
-    static real r__, scale, z__, roe;
-/*     construct givens plane rotation.   
-       jack dongarra, linpack, 3/11/78. */
+    real r__, z__, roe, scale;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     construct givens plane rotation. */
+/*     jack dongarra, linpack, 3/11/78. */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
     roe = *sb;
     if (dabs(*sa) > dabs(*sb)) {
 	roe = *sa;
@@ -48,5 +64,3 @@ L20:
     *sb = z__;
     return 0;
 } /* srotg_ */
-
-

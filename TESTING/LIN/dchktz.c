@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -44,30 +39,31 @@ static integer c__1 = 1;
     integer i__1, i__2, i__3, i__4;
     doublereal d__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer mode, info;
-    static char path[3];
-    static integer nrun, i__;
+    integer i__, k, m, n, im, in, lda;
+    doublereal eps;
+    integer mode, info;
+    char path[3];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, m, n, nfail, iseed[4], imode;
+    integer nfail, iseed[4], imode;
     extern doublereal dqrt12_(integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static integer mnmin;
+    integer mnmin;
     extern doublereal drzt01_(integer *, integer *, doublereal *, doublereal *
-	    , integer *, doublereal *, doublereal *, integer *), drzt02_(
+, integer *, doublereal *, doublereal *, integer *), drzt02_(
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *), dtzt01_(integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *), dtzt02_(integer *, integer *, doublereal *, integer *
-	    , doublereal *, doublereal *, integer *);
-    static integer nerrs, lwork;
+, doublereal *, doublereal *, integer *);
+    integer nerrs, lwork;
     extern /* Subroutine */ int dgeqr2_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer im, in;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int dlaord_(char *, integer *, doublereal *, 
 	    integer *), dlacpy_(char *, integer *, integer *, 
@@ -79,79 +75,97 @@ static integer c__1 = 1;
 	    doublereal *, doublereal *, integer *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, integer *), derrtz_(char *, integer *), dtzrqf_(integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *);
-    static doublereal result[6];
+    doublereal result[6];
     extern /* Subroutine */ int dtzrzf_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, integer *);
-    static integer lda;
-    static doublereal eps;
 
     /* Fortran I/O blocks */
     static cilist io___21 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKTZ tests DTZRQF and STZRZF.   
+/*  DCHKTZ tests DTZRQF and STZRZF. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the   
-            maximum value of N in NVAL.   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
+/*          where MMAX is the maximum value of M in MVAL and NMAX is the */
+/*          maximum value of N in NVAL. */
 
-    COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
+/*  COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  S       (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    COPYS   (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  COPYS   (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    TAU     (workspace) DOUBLE PRECISION array, dimension (MMAX)   
+/*  TAU     (workspace) DOUBLE PRECISION array, dimension (MMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (MMAX*NMAX + 4*NMAX + MMAX)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (MMAX*NMAX + 4*NMAX + MMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --work;
     --tau;
     --copys;
@@ -162,9 +176,11 @@ static integer c__1 = 1;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "TZ", (ftnlen)2, (ftnlen)2);
@@ -200,7 +216,8 @@ static integer c__1 = 1;
 	    n = nval[in];
 	    mnmin = min(m,n);
 /* Computing MAX */
-	    i__3 = 1, i__4 = n * n + (m << 2) + n;
+	    i__3 = 1, i__4 = n * n + (m << 2) + n, i__3 = max(i__3,i__4), 
+		    i__4 = m * n + (mnmin << 1) + (n << 2);
 	    lwork = max(i__3,i__4);
 
 	    if (m <= n) {
@@ -209,17 +226,17 @@ static integer c__1 = 1;
 			goto L50;
 		    }
 
-/*                 Do for each type of singular value distribution.   
-                      0:  zero matrix   
-                      1:  one small singular value   
-                      2:  exponential distribution */
+/*                 Do for each type of singular value distribution. */
+/*                    0:  zero matrix */
+/*                    1:  one small singular value */
+/*                    2:  exponential distribution */
 
 		    mode = imode - 1;
 
-/*                 Test DTZRQF   
+/*                 Test DTZRQF */
 
-                   Generate test matrix of size m by n using   
-                   singular value distribution indicated by `mode'. */
+/*                 Generate test matrix of size m by n using */
+/*                 singular value distribution indicated by `mode'. */
 
 		    if (mode == 0) {
 			dlaset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
@@ -245,8 +262,8 @@ static integer c__1 = 1;
 
 		    dlacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
 
-/*                 Call DTZRQF to reduce the upper trapezoidal matrix to   
-                   upper triangular form. */
+/*                 Call DTZRQF to reduce the upper trapezoidal matrix to */
+/*                 upper triangular form. */
 
 		    s_copy(srnamc_1.srnamt, "DTZRQF", (ftnlen)6, (ftnlen)6);
 		    dtzrqf_(&m, &n, &a[1], &lda, &tau[1], &info);
@@ -264,12 +281,12 @@ static integer c__1 = 1;
 /*                 Compute norm(Q'*Q - I). */
 
 		    result[2] = dtzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
-			    , &lwork);
+, &lwork);
 
-/*                 Test DTZRZF   
+/*                 Test DTZRZF */
 
-                   Generate test matrix of size m by n using   
-                   singular value distribution indicated by `mode'. */
+/*                 Generate test matrix of size m by n using */
+/*                 singular value distribution indicated by `mode'. */
 
 		    if (mode == 0) {
 			dlaset_("Full", &m, &n, &c_b10, &c_b10, &a[1], &lda);
@@ -295,8 +312,8 @@ static integer c__1 = 1;
 
 		    dlacpy_("All", &m, &n, &a[1], &lda, &copya[1], &lda);
 
-/*                 Call DTZRZF to reduce the upper trapezoidal matrix to   
-                   upper triangular form. */
+/*                 Call DTZRZF to reduce the upper trapezoidal matrix to */
+/*                 upper triangular form. */
 
 		    s_copy(srnamc_1.srnamt, "DTZRZF", (ftnlen)6, (ftnlen)6);
 		    dtzrzf_(&m, &n, &a[1], &lda, &tau[1], &work[1], &lwork, &
@@ -315,10 +332,10 @@ static integer c__1 = 1;
 /*                 Compute norm(Q'*Q - I). */
 
 		    result[5] = drzt02_(&m, &n, &a[1], &lda, &tau[1], &work[1]
-			    , &lwork);
+, &lwork);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    for (k = 1; k <= 6; ++k) {
 			if (result[k - 1] >= *thresh) {
@@ -361,4 +378,3 @@ L50:
 
     return 0;
 } /* dchktz_ */
-

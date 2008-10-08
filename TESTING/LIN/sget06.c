@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal sget06_(real *rcond, real *rcondc)
 {
@@ -12,34 +7,44 @@ doublereal sget06_(real *rcond, real *rcondc)
     real ret_val;
 
     /* Local variables */
+    real rat, eps;
     extern doublereal slamch_(char *);
-    static real rat, eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SGET06 computes a test ratio to compare two values for RCOND.   
+/*  SGET06 computes a test ratio to compare two values for RCOND. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    RCOND   (input) REAL   
-            The estimate of the reciprocal of the condition number of A,   
-            as computed by SGECON.   
+/*  RCOND   (input) REAL */
+/*          The estimate of the reciprocal of the condition number of A, */
+/*          as computed by SGECON. */
 
-    RCONDC  (input) REAL   
-            The reciprocal of the condition number of A, computed as   
-            ( 1/norm(A) ) / norm(inv(A)).   
+/*  RCONDC  (input) REAL */
+/*          The reciprocal of the condition number of A, computed as */
+/*          ( 1/norm(A) ) / norm(inv(A)). */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     eps = slamch_("Epsilon");
     if (*rcond > 0.f) {
@@ -61,4 +66,3 @@ doublereal sget06_(real *rcond, real *rcondc)
 /*     End of SGET06 */
 
 } /* sget06_ */
-

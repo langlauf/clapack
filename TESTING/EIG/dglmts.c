@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -24,16 +19,17 @@ static doublereal c_b15 = 1.;
     doublereal d__1;
 
     /* Local variables */
-    static integer info;
-    static doublereal unfl;
+    doublereal eps;
+    integer info;
+    doublereal unfl;
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal anorm, bnorm;
+    doublereal anorm, bnorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal dnorm, xnorm, ynorm;
+    doublereal dnorm, xnorm, ynorm;
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dggglm_(integer *, integer *, integer *, 
@@ -41,89 +37,102 @@ static doublereal c_b15 = 1.;
 	    doublereal *, doublereal *, doublereal *, integer *, integer *), 
 	    dlacpy_(char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DGLMTS tests DGGGLM - a subroutine for solving the generalized   
-    linear model problem.   
+/*  DGLMTS tests DGGGLM - a subroutine for solving the generalized */
+/*  linear model problem. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The number of rows of the matrices A and B.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of rows of the matrices A and B.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of columns of the matrix A.  M >= 0.   
+/*  M       (input) INTEGER */
+/*          The number of columns of the matrix A.  M >= 0. */
 
-    P       (input) INTEGER   
-            The number of columns of the matrix B.  P >= 0.   
+/*  P       (input) INTEGER */
+/*          The number of columns of the matrix B.  P >= 0. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
-            The N-by-M matrix A.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,M) */
+/*          The N-by-M matrix A. */
 
-    AF      (workspace) DOUBLE PRECISION array, dimension (LDA,M)   
+/*  AF      (workspace) DOUBLE PRECISION array, dimension (LDA,M) */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF. LDA >= max(M,N).   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF. LDA >= max(M,N). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,P)   
-            The N-by-P matrix A.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,P) */
+/*          The N-by-P matrix A. */
 
-    BF      (workspace) DOUBLE PRECISION array, dimension (LDB,P)   
+/*  BF      (workspace) DOUBLE PRECISION array, dimension (LDB,P) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B, BF. LDB >= max(P,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B, BF. LDB >= max(P,N). */
 
-    D       (input) DOUBLE PRECISION array, dimension( N )   
-            On input, the left hand side of the GLM.   
+/*  D       (input) DOUBLE PRECISION array, dimension( N ) */
+/*          On input, the left hand side of the GLM. */
 
-    DF      (workspace) DOUBLE PRECISION array, dimension( N )   
+/*  DF      (workspace) DOUBLE PRECISION array, dimension( N ) */
 
-    X       (output) DOUBLE PRECISION array, dimension( M )   
-            solution vector X in the GLM problem.   
+/*  X       (output) DOUBLE PRECISION array, dimension( M ) */
+/*          solution vector X in the GLM problem. */
 
-    U       (output) DOUBLE PRECISION array, dimension( P )   
-            solution vector U in the GLM problem.   
+/*  U       (output) DOUBLE PRECISION array, dimension( P ) */
+/*          solution vector U in the GLM problem. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    RESULT   (output) DOUBLE PRECISION   
-            The test ratio:   
-                             norm( d - A*x - B*u )   
-              RESULT = -----------------------------------------   
-                       (norm(A)+norm(B))*(norm(x)+norm(u))*EPS   
+/*  RESULT   (output) DOUBLE PRECISION */
+/*          The test ratio: */
+/*                           norm( d - A*x - B*u ) */
+/*            RESULT = ----------------------------------------- */
+/*                     (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
 
-    ====================================================================   
+/*  ==================================================================== */
 
+/*     .. */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
 
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --d__;
     --df;
@@ -142,8 +151,8 @@ static doublereal c_b15 = 1.;
     d__1 = dlange_("1", n, p, &b[b_offset], ldb, &rwork[1]);
     bnorm = max(d__1,unfl);
 
-/*     Copy the matrices A and B to the arrays AF and BF,   
-       and the vector D the array DF. */
+/*     Copy the matrices A and B to the arrays AF and BF, */
+/*     and the vector D the array DF. */
 
     dlacpy_("Full", n, m, &a[a_offset], lda, &af[af_offset], lda);
     dlacpy_("Full", n, p, &b[b_offset], ldb, &bf[bf_offset], ldb);
@@ -154,11 +163,11 @@ static doublereal c_b15 = 1.;
     dggglm_(n, m, p, &af[af_offset], lda, &bf[bf_offset], ldb, &df[1], &x[1], 
 	    &u[1], &work[1], lwork, &info);
 
-/*     Test the residual for the solution of LSE   
+/*     Test the residual for the solution of LSE */
 
-                         norm( d - A*x - B*u )   
-         RESULT = -----------------------------------------   
-                  (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
+/*                       norm( d - A*x - B*u ) */
+/*       RESULT = ----------------------------------------- */
+/*                (norm(A)+norm(B))*(norm(x)+norm(u))*EPS */
 
     dcopy_(n, &d__[1], &c__1, &df[1], &c__1);
     dgemv_("No transpose", n, m, &c_b13, &a[a_offset], lda, &x[1], &c__1, &
@@ -182,4 +191,3 @@ static doublereal c_b15 = 1.;
 /*     End of DGLMTS */
 
 } /* dglmts_ */
-

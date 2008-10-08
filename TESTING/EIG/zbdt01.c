@@ -1,15 +1,10 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
 static integer c__1 = 1;
-static doublecomplex c_b7 = {-1.,0.};
+static doublecomplex c_b7 = {-1.,-0.};
 static doublecomplex c_b10 = {1.,0.};
 
 /* Subroutine */ int zbdt01_(integer *m, integer *n, integer *kd, 
@@ -24,8 +19,8 @@ static doublecomplex c_b10 = {1.,0.};
     doublecomplex z__1, z__2, z__3;
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal anorm;
+    integer i__, j;
+    doublereal eps, anorm;
     extern /* Subroutine */ int zgemv_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *), 
@@ -34,100 +29,107 @@ static doublecomplex c_b10 = {1.,0.};
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *), 
 	    dzasum_(integer *, doublecomplex *, integer *);
-    static doublereal eps;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define pt_subscr(a_1,a_2) (a_2)*pt_dim1 + a_1
-#define pt_ref(a_1,a_2) pt[pt_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZBDT01 reconstructs a general matrix A from its bidiagonal form */
+/*     A = Q * B * P' */
+/*  where Q (m by min(m,n)) and P' (min(m,n) by n) are unitary */
+/*  matrices and B is bidiagonal. */
 
-    Purpose   
-    =======   
+/*  The test ratio to test the reduction is */
+/*     RESID = norm( A - Q * B * PT ) / ( n * norm(A) * EPS ) */
+/*  where PT = P' and EPS is the machine precision. */
 
-    ZBDT01 reconstructs a general matrix A from its bidiagonal form   
-       A = Q * B * P'   
-    where Q (m by min(m,n)) and P' (min(m,n) by n) are unitary   
-    matrices and B is bidiagonal.   
+/*  Arguments */
+/*  ========= */
 
-    The test ratio to test the reduction is   
-       RESID = norm( A - Q * B * PT ) / ( n * norm(A) * EPS )   
-    where PT = P' and EPS is the machine precision.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and Q. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and P'. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and Q.   
+/*  KD      (input) INTEGER */
+/*          If KD = 0, B is diagonal and the array E is not referenced. */
+/*          If KD = 1, the reduction was performed by xGEBRD; B is upper */
+/*          bidiagonal if M >= N, and lower bidiagonal if M < N. */
+/*          If KD = -1, the reduction was performed by xGBBRD; B is */
+/*          always upper bidiagonal. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and P'.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The m by n matrix A. */
 
-    KD      (input) INTEGER   
-            If KD = 0, B is diagonal and the array E is not referenced.   
-            If KD = 1, the reduction was performed by xGEBRD; B is upper   
-            bidiagonal if M >= N, and lower bidiagonal if M < N.   
-            If KD = -1, the reduction was performed by xGBBRD; B is   
-            always upper bidiagonal.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The m by n matrix A.   
+/*  Q       (input) COMPLEX*16 array, dimension (LDQ,N) */
+/*          The m by min(m,n) unitary matrix Q in the reduction */
+/*          A = Q * B * P'. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of the array Q.  LDQ >= max(1,M). */
 
-    Q       (input) COMPLEX*16 array, dimension (LDQ,N)   
-            The m by min(m,n) unitary matrix Q in the reduction   
-            A = Q * B * P'.   
+/*  D       (input) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The diagonal elements of the bidiagonal matrix B. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of the array Q.  LDQ >= max(1,M).   
+/*  E       (input) DOUBLE PRECISION array, dimension (min(M,N)-1) */
+/*          The superdiagonal elements of the bidiagonal matrix B if */
+/*          m >= n, or the subdiagonal elements of B if m < n. */
 
-    D       (input) DOUBLE PRECISION array, dimension (min(M,N))   
-            The diagonal elements of the bidiagonal matrix B.   
+/*  PT      (input) COMPLEX*16 array, dimension (LDPT,N) */
+/*          The min(m,n) by n unitary matrix P' in the reduction */
+/*          A = Q * B * P'. */
 
-    E       (input) DOUBLE PRECISION array, dimension (min(M,N)-1)   
-            The superdiagonal elements of the bidiagonal matrix B if   
-            m >= n, or the subdiagonal elements of B if m < n.   
+/*  LDPT    (input) INTEGER */
+/*          The leading dimension of the array PT. */
+/*          LDPT >= max(1,min(M,N)). */
 
-    PT      (input) COMPLEX*16 array, dimension (LDPT,N)   
-            The min(m,n) by n unitary matrix P' in the reduction   
-            A = Q * B * P'.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (M+N) */
 
-    LDPT    (input) INTEGER   
-            The leading dimension of the array PT.   
-            LDPT >= max(1,min(M,N)).   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (M+N)   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            The test ratio:  norm(A - Q * B * P') / ( n * norm(A) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --d__;
     --e;
     pt_dim1 = *ldpt;
-    pt_offset = 1 + pt_dim1 * 1;
+    pt_offset = 1 + pt_dim1;
     pt -= pt_offset;
     --work;
     --rwork;
@@ -151,16 +153,16 @@ static doublecomplex c_b10 = {1.,0.};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		zcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *n - 1;
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *m + i__;
 		    i__4 = i__;
-		    i__5 = pt_subscr(i__, j);
+		    i__5 = i__ + j * pt_dim1;
 		    z__2.r = d__[i__4] * pt[i__5].r, z__2.i = d__[i__4] * pt[
 			    i__5].i;
 		    i__6 = i__;
-		    i__7 = pt_subscr(i__ + 1, j);
+		    i__7 = i__ + 1 + j * pt_dim1;
 		    z__3.r = e[i__6] * pt[i__7].r, z__3.i = e[i__6] * pt[i__7]
 			    .i;
 		    z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
@@ -169,7 +171,7 @@ static doublecomplex c_b10 = {1.,0.};
 		}
 		i__2 = *m + *n;
 		i__3 = *n;
-		i__4 = pt_subscr(*n, j);
+		i__4 = *n + j * pt_dim1;
 		z__1.r = d__[i__3] * pt[i__4].r, z__1.i = d__[i__3] * pt[i__4]
 			.i;
 		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
@@ -186,16 +188,16 @@ static doublecomplex c_b10 = {1.,0.};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		zcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *m - 1;
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *m + i__;
 		    i__4 = i__;
-		    i__5 = pt_subscr(i__, j);
+		    i__5 = i__ + j * pt_dim1;
 		    z__2.r = d__[i__4] * pt[i__5].r, z__2.i = d__[i__4] * pt[
 			    i__5].i;
 		    i__6 = i__;
-		    i__7 = pt_subscr(i__ + 1, j);
+		    i__7 = i__ + 1 + j * pt_dim1;
 		    z__3.r = e[i__6] * pt[i__7].r, z__3.i = e[i__6] * pt[i__7]
 			    .i;
 		    z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
@@ -204,7 +206,7 @@ static doublecomplex c_b10 = {1.,0.};
 		}
 		i__2 = *m + *m;
 		i__3 = *m;
-		i__4 = pt_subscr(*m, j);
+		i__4 = *m + j * pt_dim1;
 		z__1.r = d__[i__3] * pt[i__4].r, z__1.i = d__[i__3] * pt[i__4]
 			.i;
 		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
@@ -221,20 +223,20 @@ static doublecomplex c_b10 = {1.,0.};
 
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		zcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *m + 1;
-		i__3 = pt_subscr(1, j);
+		i__3 = j * pt_dim1 + 1;
 		z__1.r = d__[1] * pt[i__3].r, z__1.i = d__[1] * pt[i__3].i;
 		work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 		i__2 = *m;
 		for (i__ = 2; i__ <= i__2; ++i__) {
 		    i__3 = *m + i__;
 		    i__4 = i__ - 1;
-		    i__5 = pt_subscr(i__ - 1, j);
+		    i__5 = i__ - 1 + j * pt_dim1;
 		    z__2.r = e[i__4] * pt[i__5].r, z__2.i = e[i__4] * pt[i__5]
 			    .i;
 		    i__6 = i__;
-		    i__7 = pt_subscr(i__, j);
+		    i__7 = i__ + j * pt_dim1;
 		    z__3.r = d__[i__6] * pt[i__7].r, z__3.i = d__[i__6] * pt[
 			    i__7].i;
 		    z__1.r = z__2.r + z__3.r, z__1.i = z__2.i + z__3.i;
@@ -256,12 +258,12 @@ static doublecomplex c_b10 = {1.,0.};
 	if (*m >= *n) {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		zcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *n;
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *m + i__;
 		    i__4 = i__;
-		    i__5 = pt_subscr(i__, j);
+		    i__5 = i__ + j * pt_dim1;
 		    z__1.r = d__[i__4] * pt[i__5].r, z__1.i = d__[i__4] * pt[
 			    i__5].i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -277,12 +279,12 @@ static doublecomplex c_b10 = {1.,0.};
 	} else {
 	    i__1 = *n;
 	    for (j = 1; j <= i__1; ++j) {
-		zcopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
+		zcopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
 		i__2 = *m;
 		for (i__ = 1; i__ <= i__2; ++i__) {
 		    i__3 = *m + i__;
 		    i__4 = i__;
-		    i__5 = pt_subscr(i__, j);
+		    i__5 = i__ + j * pt_dim1;
 		    z__1.r = d__[i__4] * pt[i__5].r, z__1.i = d__[i__4] * pt[
 			    i__5].i;
 		    work[i__3].r = z__1.r, work[i__3].i = z__1.i;
@@ -328,10 +330,3 @@ static doublecomplex c_b10 = {1.,0.};
 /*     End of ZBDT01 */
 
 } /* zbdt01_ */
-
-#undef pt_ref
-#undef pt_subscr
-#undef a_ref
-#undef a_subscr
-
-

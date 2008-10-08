@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -116,37 +111,36 @@ static logical c_false = FALSE_;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer iadd, nmax;
-    static real temp1, temp2;
-    static integer j, n;
-    static logical badnn;
-    static real dumma[4];
-    static integer iinfo;
-    static real rmagn[4];
+    integer j, n, i1, n1, jc, in, jr;
+    real ulp;
+    integer iadd, nmax;
+    real temp1, temp2;
+    logical badnn;
+    real dumma[4];
+    integer iinfo;
+    real rmagn[4];
     extern /* Subroutine */ int sget51_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, integer *, real *, integer *, real *
-	    , real *), sget52_(logical *, integer *, real *, integer *, real *
-	    , integer *, real *, integer *, real *, real *, real *, real *, 
+, real *), sget52_(logical *, integer *, real *, integer *, real *
+, integer *, real *, integer *, real *, real *, real *, real *, 
 	    real *);
-    static real anorm, bnorm;
-    static integer nmats, jsize, nerrs, i1, jtype, ntest, n1;
+    real anorm, bnorm;
+    integer nmats, jsize, nerrs, jtype, ntest;
     extern /* Subroutine */ int sgeqr2_(integer *, integer *, real *, integer 
 	    *, real *, real *, integer *), slatm4_(integer *, integer *, 
 	    integer *, integer *, integer *, real *, real *, real *, integer *
-	    , integer *, real *, integer *);
-    static integer jc;
-    extern /* Subroutine */ int sorm2r_(char *, char *, integer *, integer *, 
-	    integer *, real *, integer *, real *, real *, integer *, real *, 
-	    integer *), slabad_(real *, real *);
-    static integer in, jr;
+, integer *, real *, integer *), sorm2r_(char *, char *, integer *
+, integer *, integer *, real *, integer *, real *, real *, 
+	    integer *, real *, integer *), slabad_(real *, 
+	    real *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real safmin;
-    static integer ioldsd[4];
-    static real safmax;
+    real safmin;
+    integer ioldsd[4];
+    real safmax;
     extern /* Subroutine */ int sgghrd_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *);
+, real *, integer *, integer *);
     extern doublereal slarnd_(integer *, integer *);
     extern /* Subroutine */ int slarfg_(integer *, real *, real *, integer *, 
 	    real *), xerbla_(char *, integer *), shgeqz_(char *, char 
@@ -157,11 +151,10 @@ static logical c_false = FALSE_;
 	    real *, real *, real *, integer *), slasum_(char *, 
 	    integer *, integer *, integer *), stgevc_(char *, char *, 
 	    logical *, integer *, real *, integer *, real *, integer *, real *
-	    , integer *, real *, integer *, integer *, integer *, real *, 
+, integer *, real *, integer *, integer *, integer *, real *, 
 	    integer *);
-    static real ulpinv;
-    static integer lwkopt, mtypes, ntestt;
-    static real ulp;
+    real ulpinv;
+    integer lwkopt, mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___40 = { 0, 0, 0, fmt_9999, 0 };
@@ -192,411 +185,419 @@ static logical c_false = FALSE_;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define u_ref(a_1,a_2) u[(a_2)*u_dim1 + a_1]
-#define v_ref(a_1,a_2) v[(a_2)*v_dim1 + a_1]
-#define evectl_ref(a_1,a_2) evectl[(a_2)*evectl_dim1 + a_1]
-#define evectr_ref(a_1,a_2) evectr[(a_2)*evectr_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SCHKGG  checks the nonsymmetric generalized eigenvalue problem */
+/*  routines. */
+/*                                 T          T        T */
+/*  SGGHRD factors A and B as U H V  and U T V , where   means */
+/*  transpose, H is hessenberg, T is triangular and U and V are */
+/*  orthogonal. */
+/*                                  T          T */
+/*  SHGEQZ factors H and T as  Q S Z  and Q P Z , where P is upper */
+/*  triangular, S is in generalized Schur form (block upper triangular, */
+/*  with 1x1 and 2x2 blocks on the diagonal, the 2x2 blocks */
+/*  corresponding to complex conjugate pairs of generalized */
+/*  eigenvalues), and Q and Z are orthogonal.  It also computes the */
+/*  generalized eigenvalues (alpha(1),beta(1)),...,(alpha(n),beta(n)), */
+/*  where alpha(j)=S(j,j) and beta(j)=P(j,j) -- thus, */
+/*  w(j) = alpha(j)/beta(j) is a root of the generalized eigenvalue */
+/*  problem */
 
-    Purpose   
-    =======   
+/*      det( A - w(j) B ) = 0 */
 
-    SCHKGG  checks the nonsymmetric generalized eigenvalue problem   
-    routines.   
-                                   T          T        T   
-    SGGHRD factors A and B as U H V  and U T V , where   means   
-    transpose, H is hessenberg, T is triangular and U and V are   
-    orthogonal.   
-                                    T          T   
-    SHGEQZ factors H and T as  Q S Z  and Q P Z , where P is upper   
-    triangular, S is in generalized Schur form (block upper triangular,   
-    with 1x1 and 2x2 blocks on the diagonal, the 2x2 blocks   
-    corresponding to complex conjugate pairs of generalized   
-    eigenvalues), and Q and Z are orthogonal.  It also computes the   
-    generalized eigenvalues (alpha(1),beta(1)),...,(alpha(n),beta(n)),   
-    where alpha(j)=S(j,j) and beta(j)=P(j,j) -- thus,   
-    w(j) = alpha(j)/beta(j) is a root of the generalized eigenvalue   
-    problem   
+/*  and m(j) = beta(j)/alpha(j) is a root of the essentially equivalent */
+/*  problem */
 
-        det( A - w(j) B ) = 0   
+/*      det( m(j) A - B ) = 0 */
 
-    and m(j) = beta(j)/alpha(j) is a root of the essentially equivalent   
-    problem   
+/*  STGEVC computes the matrix L of left eigenvectors and the matrix R */
+/*  of right eigenvectors for the matrix pair ( S, P ).  In the */
+/*  description below,  l and r are left and right eigenvectors */
+/*  corresponding to the generalized eigenvalues (alpha,beta). */
 
-        det( m(j) A - B ) = 0   
+/*  When SCHKGG is called, a number of matrix "sizes" ("n's") and a */
+/*  number of matrix "types" are specified.  For each size ("n") */
+/*  and each type of matrix, one matrix will be generated and used */
+/*  to test the nonsymmetric eigenroutines.  For each matrix, 15 */
+/*  tests will be performed.  The first twelve "test ratios" should be */
+/*  small -- O(1).  They will be compared with the threshhold THRESH: */
 
-    STGEVC computes the matrix L of left eigenvectors and the matrix R   
-    of right eigenvectors for the matrix pair ( S, P ).  In the   
-    description below,  l and r are left and right eigenvectors   
-    corresponding to the generalized eigenvalues (alpha,beta).   
+/*                   T */
+/*  (1)   | A - U H V  | / ( |A| n ulp ) */
 
-    When SCHKGG is called, a number of matrix "sizes" ("n's") and a   
-    number of matrix "types" are specified.  For each size ("n")   
-    and each type of matrix, one matrix will be generated and used   
-    to test the nonsymmetric eigenroutines.  For each matrix, 15   
-    tests will be performed.  The first twelve "test ratios" should be   
-    small -- O(1).  They will be compared with the threshhold THRESH:   
+/*                   T */
+/*  (2)   | B - U T V  | / ( |B| n ulp ) */
 
-                     T   
-    (1)   | A - U H V  | / ( |A| n ulp )   
+/*                T */
+/*  (3)   | I - UU  | / ( n ulp ) */
 
-                     T   
-    (2)   | B - U T V  | / ( |B| n ulp )   
+/*                T */
+/*  (4)   | I - VV  | / ( n ulp ) */
 
-                  T   
-    (3)   | I - UU  | / ( n ulp )   
+/*                   T */
+/*  (5)   | H - Q S Z  | / ( |H| n ulp ) */
 
-                  T   
-    (4)   | I - VV  | / ( n ulp )   
+/*                   T */
+/*  (6)   | T - Q P Z  | / ( |T| n ulp ) */
 
-                     T   
-    (5)   | H - Q S Z  | / ( |H| n ulp )   
+/*                T */
+/*  (7)   | I - QQ  | / ( n ulp ) */
 
-                     T   
-    (6)   | T - Q P Z  | / ( |T| n ulp )   
+/*                T */
+/*  (8)   | I - ZZ  | / ( n ulp ) */
 
-                  T   
-    (7)   | I - QQ  | / ( n ulp )   
+/*  (9)   max over all left eigenvalue/-vector pairs (beta/alpha,l) of */
 
-                  T   
-    (8)   | I - ZZ  | / ( n ulp )   
+/*     | l**H * (beta S - alpha P) | / ( ulp max( |beta S|, |alpha P| ) ) */
 
-    (9)   max over all left eigenvalue/-vector pairs (beta/alpha,l) of   
+/*  (10)  max over all left eigenvalue/-vector pairs (beta/alpha,l') of */
+/*                            T */
+/*    | l'**H * (beta H - alpha T) | / ( ulp max( |beta H|, |alpha T| ) ) */
 
-       | l**H * (beta S - alpha P) | / ( ulp max( |beta S|, |alpha P| ) )   
+/*        where the eigenvectors l' are the result of passing Q to */
+/*        STGEVC and back transforming (HOWMNY='B'). */
 
-    (10)  max over all left eigenvalue/-vector pairs (beta/alpha,l') of   
-                              T   
-      | l'**H * (beta H - alpha T) | / ( ulp max( |beta H|, |alpha T| ) )   
+/*  (11)  max over all right eigenvalue/-vector pairs (beta/alpha,r) of */
 
-          where the eigenvectors l' are the result of passing Q to   
-          STGEVC and back transforming (HOWMNY='B').   
+/*        | (beta S - alpha T) r | / ( ulp max( |beta S|, |alpha T| ) ) */
 
-    (11)  max over all right eigenvalue/-vector pairs (beta/alpha,r) of   
+/*  (12)  max over all right eigenvalue/-vector pairs (beta/alpha,r') of */
 
-          | (beta S - alpha T) r | / ( ulp max( |beta S|, |alpha T| ) )   
+/*        | (beta H - alpha T) r' | / ( ulp max( |beta H|, |alpha T| ) ) */
 
-    (12)  max over all right eigenvalue/-vector pairs (beta/alpha,r') of   
+/*        where the eigenvectors r' are the result of passing Z to */
+/*        STGEVC and back transforming (HOWMNY='B'). */
 
-          | (beta H - alpha T) r' | / ( ulp max( |beta H|, |alpha T| ) )   
+/*  The last three test ratios will usually be small, but there is no */
+/*  mathematical requirement that they be so.  They are therefore */
+/*  compared with THRESH only if TSTDIF is .TRUE. */
 
-          where the eigenvectors r' are the result of passing Z to   
-          STGEVC and back transforming (HOWMNY='B').   
+/*  (13)  | S(Q,Z computed) - S(Q,Z not computed) | / ( |S| ulp ) */
 
-    The last three test ratios will usually be small, but there is no   
-    mathematical requirement that they be so.  They are therefore   
-    compared with THRESH only if TSTDIF is .TRUE.   
+/*  (14)  | P(Q,Z computed) - P(Q,Z not computed) | / ( |P| ulp ) */
 
-    (13)  | S(Q,Z computed) - S(Q,Z not computed) | / ( |S| ulp )   
+/*  (15)  max( |alpha(Q,Z computed) - alpha(Q,Z not computed)|/|S| , */
+/*             |beta(Q,Z computed) - beta(Q,Z not computed)|/|P| ) / ulp */
 
-    (14)  | P(Q,Z computed) - P(Q,Z not computed) | / ( |P| ulp )   
+/*  In addition, the normalization of L and R are checked, and compared */
+/*  with the threshhold THRSHN. */
 
-    (15)  max( |alpha(Q,Z computed) - alpha(Q,Z not computed)|/|S| ,   
-               |beta(Q,Z computed) - beta(Q,Z not computed)|/|P| ) / ulp   
+/*  Test Matrices */
+/*  ---- -------- */
 
-    In addition, the normalization of L and R are checked, and compared   
-    with the threshhold THRSHN.   
+/*  The sizes of the test matrices are specified by an array */
+/*  NN(1:NSIZES); the value of each element NN(j) specifies one size. */
+/*  The "types" are specified by a logical array DOTYPE( 1:NTYPES ); if */
+/*  DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*  Currently, the list of possible types is: */
 
-    Test Matrices   
-    ---- --------   
+/*  (1)  ( 0, 0 )         (a pair of zero matrices) */
 
-    The sizes of the test matrices are specified by an array   
-    NN(1:NSIZES); the value of each element NN(j) specifies one size.   
-    The "types" are specified by a logical array DOTYPE( 1:NTYPES ); if   
-    DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-    Currently, the list of possible types is:   
+/*  (2)  ( I, 0 )         (an identity and a zero matrix) */
 
-    (1)  ( 0, 0 )         (a pair of zero matrices)   
+/*  (3)  ( 0, I )         (an identity and a zero matrix) */
 
-    (2)  ( I, 0 )         (an identity and a zero matrix)   
+/*  (4)  ( I, I )         (a pair of identity matrices) */
 
-    (3)  ( 0, I )         (an identity and a zero matrix)   
+/*          t   t */
+/*  (5)  ( J , J  )       (a pair of transposed Jordan blocks) */
 
-    (4)  ( I, I )         (a pair of identity matrices)   
+/*                                      t                ( I   0  ) */
+/*  (6)  ( X, Y )         where  X = ( J   0  )  and Y = (      t ) */
+/*                                   ( 0   I  )          ( 0   J  ) */
+/*                        and I is a k x k identity and J a (k+1)x(k+1) */
+/*                        Jordan block; k=(N-1)/2 */
 
-            t   t   
-    (5)  ( J , J  )       (a pair of transposed Jordan blocks)   
+/*  (7)  ( D, I )         where D is diag( 0, 1,..., N-1 ) (a diagonal */
+/*                        matrix with those diagonal entries.) */
+/*  (8)  ( I, D ) */
 
-                                        t                ( I   0  )   
-    (6)  ( X, Y )         where  X = ( J   0  )  and Y = (      t )   
-                                     ( 0   I  )          ( 0   J  )   
-                          and I is a k x k identity and J a (k+1)x(k+1)   
-                          Jordan block; k=(N-1)/2   
+/*  (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big */
 
-    (7)  ( D, I )         where D is diag( 0, 1,..., N-1 ) (a diagonal   
-                          matrix with those diagonal entries.)   
-    (8)  ( I, D )   
+/*  (10) ( small*D, big*I ) */
 
-    (9)  ( big*D, small*I ) where "big" is near overflow and small=1/big   
+/*  (11) ( big*I, small*D ) */
 
-    (10) ( small*D, big*I )   
+/*  (12) ( small*I, big*D ) */
+
+/*  (13) ( big*D, big*I ) */
 
-    (11) ( big*I, small*D )   
-
-    (12) ( small*I, big*D )   
-
-    (13) ( big*D, big*I )   
-
-    (14) ( small*D, small*I )   
-
-    (15) ( D1, D2 )        where D1 is diag( 0, 0, 1, ..., N-3, 0 ) and   
-                           D2 is diag( 0, N-3, N-4,..., 1, 0, 0 )   
-              t   t   
-    (16) U ( J , J ) V     where U and V are random orthogonal matrices.   
-
-    (17) U ( T1, T2 ) V    where T1 and T2 are upper triangular matrices   
-                           with random O(1) entries above the diagonal   
-                           and diagonal entries diag(T1) =   
-                           ( 0, 0, 1, ..., N-3, 0 ) and diag(T2) =   
-                           ( 0, N-3, N-4,..., 1, 0, 0 )   
-
-    (18) U ( T1, T2 ) V    diag(T1) = ( 0, 0, 1, 1, s, ..., s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1,..., 1, 0 )   
-                           s = machine precision.   
-
-    (19) U ( T1, T2 ) V    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0 )   
-
-                                                           N-5   
-    (20) U ( T1, T2 ) V    diag(T1)=( 0, 0, 1, 1, a, ..., a   =s, 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 )   
-
-    (21) U ( T1, T2 ) V    diag(T1)=( 0, 0, 1, r1, r2, ..., r(N-4), 0 )   
-                           diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 )   
-                           where r1,..., r(N-4) are random.   
-
-    (22) U ( big*T1, small*T2 ) V    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
-
-    (23) U ( small*T1, big*T2 ) V    diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
-
-    (24) U ( small*T1, small*T2 ) V  diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
-
-    (25) U ( big*T1, big*T2 ) V      diag(T1) = ( 0, 0, 1, ..., N-3, 0 )   
-                                     diag(T2) = ( 0, 1, ..., 1, 0, 0 )   
-
-    (26) U ( T1, T2 ) V     where T1 and T2 are random upper-triangular   
-                            matrices.   
-
-    Arguments   
-    =========   
-
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            SCHKGG does nothing.  It must be at least zero.   
-
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, SCHKGG   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to SCHKGG to continue the same random number   
-            sequence.   
-
-    THRESH  (input) REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error is   
-            scaled to be O(1), so THRESH should be a reasonably small   
-            multiple of 1, e.g., 10 or 100.  In particular, it should   
-            not depend on the precision (single vs. double) or the size   
-            of the matrix.  It must be at least zero.   
-
-    TSTDIF  (input) LOGICAL   
-            Specifies whether test ratios 13-15 will be computed and   
-            compared with THRESH.   
-            = .FALSE.: Only test ratios 1-12 will be computed and tested.   
-                       Ratios 13-15 will be set to zero.   
-            = .TRUE.:  All the test ratios 1-15 will be computed and   
-                       tested.   
-
-    THRSHN  (input) REAL   
-            Threshhold for reporting eigenvector normalization error.   
-            If the normalization of any eigenvector differs from 1 by   
-            more than THRSHN*ulp, then a special error message will be   
-            printed.  (This is handled separately from the other tests,   
-            since only a compiler or programming error should cause an   
-            error message, at least if THRSHN is at least 5--10.)   
-
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-
-    A       (input/workspace) REAL array, dimension   
-                              (LDA, max(NN))   
-            Used to hold the original A matrix.  Used as input only   
-            if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and   
-            DOTYPE(MAXTYP+1)=.TRUE.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A, B, H, T, S1, P1, S2, and P2.   
-            It must be at least 1 and at least max( NN ).   
-
-    B       (input/workspace) REAL array, dimension   
-                              (LDA, max(NN))   
-            Used to hold the original B matrix.  Used as input only   
-            if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and   
-            DOTYPE(MAXTYP+1)=.TRUE.   
-
-    H       (workspace) REAL array, dimension (LDA, max(NN))   
-            The upper Hessenberg matrix computed from A by SGGHRD.   
-
-    T       (workspace) REAL array, dimension (LDA, max(NN))   
-            The upper triangular matrix computed from B by SGGHRD.   
-
-    S1      (workspace) REAL array, dimension (LDA, max(NN))   
-            The Schur (block upper triangular) matrix computed from H by   
-            SHGEQZ when Q and Z are also computed.   
-
-    S2      (workspace) REAL array, dimension (LDA, max(NN))   
-            The Schur (block upper triangular) matrix computed from H by   
-            SHGEQZ when Q and Z are not computed.   
-
-    P1      (workspace) REAL array, dimension (LDA, max(NN))   
-            The upper triangular matrix computed from T by SHGEQZ   
-            when Q and Z are also computed.   
-
-    P2      (workspace) REAL array, dimension (LDA, max(NN))   
-            The upper triangular matrix computed from T by SHGEQZ   
-            when Q and Z are not computed.   
-
-    U       (workspace) REAL array, dimension (LDU, max(NN))   
-            The (left) orthogonal matrix computed by SGGHRD.   
-
-    LDU     (input) INTEGER   
-            The leading dimension of U, V, Q, Z, EVECTL, and EVECTR.  It   
-            must be at least 1 and at least max( NN ).   
-
-    V       (workspace) REAL array, dimension (LDU, max(NN))   
-            The (right) orthogonal matrix computed by SGGHRD.   
-
-    Q       (workspace) REAL array, dimension (LDU, max(NN))   
-            The (left) orthogonal matrix computed by SHGEQZ.   
-
-    Z       (workspace) REAL array, dimension (LDU, max(NN))   
-            The (left) orthogonal matrix computed by SHGEQZ.   
-
-    ALPHR1  (workspace) REAL array, dimension (max(NN))   
-    ALPHI1  (workspace) REAL array, dimension (max(NN))   
-    BETA1   (workspace) REAL array, dimension (max(NN))   
-
-            The generalized eigenvalues of (A,B) computed by SHGEQZ   
-            when Q, Z, and the full Schur matrices are computed.   
-            On exit, ( ALPHR1(k)+ALPHI1(k)*i ) / BETA1(k) is the k-th   
-            generalized eigenvalue of the matrices in A and B.   
-
-    ALPHR3  (workspace) REAL array, dimension (max(NN))   
-    ALPHI3  (workspace) REAL array, dimension (max(NN))   
-    BETA3   (workspace) REAL array, dimension (max(NN))   
-
-    EVECTL  (workspace) REAL array, dimension (LDU, max(NN))   
-            The (block lower triangular) left eigenvector matrix for   
-            the matrices in S1 and P1.  (See STGEVC for the format.)   
-
-    EVECTR  (workspace) REAL array, dimension (LDU, max(NN))   
-            The (block upper triangular) right eigenvector matrix for   
-            the matrices in S1 and P1.  (See STGEVC for the format.)   
-
-    WORK    (workspace) REAL array, dimension (LWORK)   
-
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            max( 2 * N**2, 6*N, 1 ), for all N=NN(j).   
-
-    LLWORK  (workspace) LOGICAL array, dimension (max(NN))   
-
-    RESULT  (output) REAL array, dimension (15)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  A routine returned an error code.  INFO is the   
-                  absolute value of the INFO value returned.   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*  (14) ( small*D, small*I ) */
+
+/*  (15) ( D1, D2 )        where D1 is diag( 0, 0, 1, ..., N-3, 0 ) and */
+/*                         D2 is diag( 0, N-3, N-4,..., 1, 0, 0 ) */
+/*            t   t */
+/*  (16) U ( J , J ) V     where U and V are random orthogonal matrices. */
+
+/*  (17) U ( T1, T2 ) V    where T1 and T2 are upper triangular matrices */
+/*                         with random O(1) entries above the diagonal */
+/*                         and diagonal entries diag(T1) = */
+/*                         ( 0, 0, 1, ..., N-3, 0 ) and diag(T2) = */
+/*                         ( 0, N-3, N-4,..., 1, 0, 0 ) */
+
+/*  (18) U ( T1, T2 ) V    diag(T1) = ( 0, 0, 1, 1, s, ..., s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1,..., 1, 0 ) */
+/*                         s = machine precision. */
+
+/*  (19) U ( T1, T2 ) V    diag(T1)=( 0,0,1,1, 1-d, ..., 1-(N-5)*d=s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0 ) */
+
+/*                                                         N-5 */
+/*  (20) U ( T1, T2 ) V    diag(T1)=( 0, 0, 1, 1, a, ..., a   =s, 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 ) */
+
+/*  (21) U ( T1, T2 ) V    diag(T1)=( 0, 0, 1, r1, r2, ..., r(N-4), 0 ) */
+/*                         diag(T2) = ( 0, 1, 0, 1, ..., 1, 0, 0 ) */
+/*                         where r1,..., r(N-4) are random. */
+
+/*  (22) U ( big*T1, small*T2 ) V    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
+
+/*  (23) U ( small*T1, big*T2 ) V    diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
+
+/*  (24) U ( small*T1, small*T2 ) V  diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
+
+/*  (25) U ( big*T1, big*T2 ) V      diag(T1) = ( 0, 0, 1, ..., N-3, 0 ) */
+/*                                   diag(T2) = ( 0, 1, ..., 1, 0, 0 ) */
+
+/*  (26) U ( T1, T2 ) V     where T1 and T2 are random upper-triangular */
+/*                          matrices. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          SCHKGG does nothing.  It must be at least zero. */
+
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, SCHKGG */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to SCHKGG to continue the same random number */
+/*          sequence. */
+
+/*  THRESH  (input) REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error is */
+/*          scaled to be O(1), so THRESH should be a reasonably small */
+/*          multiple of 1, e.g., 10 or 100.  In particular, it should */
+/*          not depend on the precision (single vs. double) or the size */
+/*          of the matrix.  It must be at least zero. */
+
+/*  TSTDIF  (input) LOGICAL */
+/*          Specifies whether test ratios 13-15 will be computed and */
+/*          compared with THRESH. */
+/*          = .FALSE.: Only test ratios 1-12 will be computed and tested. */
+/*                     Ratios 13-15 will be set to zero. */
+/*          = .TRUE.:  All the test ratios 1-15 will be computed and */
+/*                     tested. */
+
+/*  THRSHN  (input) REAL */
+/*          Threshhold for reporting eigenvector normalization error. */
+/*          If the normalization of any eigenvector differs from 1 by */
+/*          more than THRSHN*ulp, then a special error message will be */
+/*          printed.  (This is handled separately from the other tests, */
+/*          since only a compiler or programming error should cause an */
+/*          error message, at least if THRSHN is at least 5--10.) */
+
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+
+/*  A       (input/workspace) REAL array, dimension */
+/*                            (LDA, max(NN)) */
+/*          Used to hold the original A matrix.  Used as input only */
+/*          if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and */
+/*          DOTYPE(MAXTYP+1)=.TRUE. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, B, H, T, S1, P1, S2, and P2. */
+/*          It must be at least 1 and at least max( NN ). */
+
+/*  B       (input/workspace) REAL array, dimension */
+/*                            (LDA, max(NN)) */
+/*          Used to hold the original B matrix.  Used as input only */
+/*          if NTYPES=MAXTYP+1, DOTYPE(1:MAXTYP)=.FALSE., and */
+/*          DOTYPE(MAXTYP+1)=.TRUE. */
+
+/*  H       (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The upper Hessenberg matrix computed from A by SGGHRD. */
+
+/*  T       (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The upper triangular matrix computed from B by SGGHRD. */
+
+/*  S1      (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The Schur (block upper triangular) matrix computed from H by */
+/*          SHGEQZ when Q and Z are also computed. */
+
+/*  S2      (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The Schur (block upper triangular) matrix computed from H by */
+/*          SHGEQZ when Q and Z are not computed. */
+
+/*  P1      (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The upper triangular matrix computed from T by SHGEQZ */
+/*          when Q and Z are also computed. */
+
+/*  P2      (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          The upper triangular matrix computed from T by SHGEQZ */
+/*          when Q and Z are not computed. */
+
+/*  U       (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (left) orthogonal matrix computed by SGGHRD. */
+
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U, V, Q, Z, EVECTL, and EVECTR.  It */
+/*          must be at least 1 and at least max( NN ). */
+
+/*  V       (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (right) orthogonal matrix computed by SGGHRD. */
+
+/*  Q       (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (left) orthogonal matrix computed by SHGEQZ. */
+
+/*  Z       (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (left) orthogonal matrix computed by SHGEQZ. */
+
+/*  ALPHR1  (workspace) REAL array, dimension (max(NN)) */
+/*  ALPHI1  (workspace) REAL array, dimension (max(NN)) */
+/*  BETA1   (workspace) REAL array, dimension (max(NN)) */
+
+/*          The generalized eigenvalues of (A,B) computed by SHGEQZ */
+/*          when Q, Z, and the full Schur matrices are computed. */
+/*          On exit, ( ALPHR1(k)+ALPHI1(k)*i ) / BETA1(k) is the k-th */
+/*          generalized eigenvalue of the matrices in A and B. */
+
+/*  ALPHR3  (workspace) REAL array, dimension (max(NN)) */
+/*  ALPHI3  (workspace) REAL array, dimension (max(NN)) */
+/*  BETA3   (workspace) REAL array, dimension (max(NN)) */
+
+/*  EVECTL  (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (block lower triangular) left eigenvector matrix for */
+/*          the matrices in S1 and P1.  (See STGEVC for the format.) */
+
+/*  EVECTR  (workspace) REAL array, dimension (LDU, max(NN)) */
+/*          The (block upper triangular) right eigenvector matrix for */
+/*          the matrices in S1 and P1.  (See STGEVC for the format.) */
+
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
+
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          max( 2 * N**2, 6*N, 1 ), for all N=NN(j). */
+
+/*  LLWORK  (workspace) LOGICAL array, dimension (max(NN)) */
+
+/*  RESULT  (output) REAL array, dimension (15) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  A routine returned an error code.  INFO is the */
+/*                absolute value of the INFO value returned. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     p2_dim1 = *lda;
-    p2_offset = 1 + p2_dim1 * 1;
+    p2_offset = 1 + p2_dim1;
     p2 -= p2_offset;
     p1_dim1 = *lda;
-    p1_offset = 1 + p1_dim1 * 1;
+    p1_offset = 1 + p1_dim1;
     p1 -= p1_offset;
     s2_dim1 = *lda;
-    s2_offset = 1 + s2_dim1 * 1;
+    s2_offset = 1 + s2_dim1;
     s2 -= s2_offset;
     s1_dim1 = *lda;
-    s1_offset = 1 + s1_dim1 * 1;
+    s1_offset = 1 + s1_dim1;
     s1 -= s1_offset;
     t_dim1 = *lda;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     b_dim1 = *lda;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     evectr_dim1 = *ldu;
-    evectr_offset = 1 + evectr_dim1 * 1;
+    evectr_offset = 1 + evectr_dim1;
     evectr -= evectr_offset;
     evectl_dim1 = *ldu;
-    evectl_offset = 1 + evectl_dim1 * 1;
+    evectl_offset = 1 + evectl_dim1;
     evectl -= evectl_offset;
     z_dim1 = *ldu;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     q_dim1 = *ldu;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     v_dim1 = *ldu;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --alphr1;
     --alphi1;
@@ -608,9 +609,11 @@ static logical c_false = FALSE_;
     --llwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     *info = 0;
 
@@ -627,10 +630,10 @@ static logical c_false = FALSE_;
 /* L10: */
     }
 
-/*     Maximum blocksize and shift -- we assume that blocksize and number   
-       of shifts are monotone increasing functions of N.   
+/*     Maximum blocksize and shift -- we assume that blocksize and number */
+/*     of shifts are monotone increasing functions of N. */
 
-   Computing MAX */
+/* Computing MAX */
     i__1 = nmax * 6, i__2 = (nmax << 1) * nmax, i__1 = max(i__1,i__2);
     lwkopt = max(i__1,1);
 
@@ -717,28 +720,28 @@ static logical c_false = FALSE_;
 /* L30: */
 	    }
 
-/*           Compute A and B   
+/*           Compute A and B */
 
-             Description of control parameters:   
+/*           Description of control parameters: */
 
-             KCLASS: =1 means w/o rotation, =2 means w/ rotation,   
-                     =3 means random.   
-             KATYPE: the "type" to be passed to SLATM4 for computing A.   
-             KAZERO: the pattern of zeros on the diagonal for A:   
-                     =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0 ),   
-                     =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 ),   
-                     =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string of   
-                     non-zero entries.)   
-             KAMAGN: the magnitude of the matrix: =0: zero, =1: O(1),   
-                     =2: large, =3: small.   
-             IASIGN: 1 if the diagonal elements of A are to be   
-                     multiplied by a random magnitude 1 number, =2 if   
-                     randomly chosen diagonal blocks are to be rotated   
-                     to form 2x2 blocks.   
-             KBTYPE, KBZERO, KBMAGN, IBSIGN: the same, but for B.   
-             KTRIAN: =0: don't fill in the upper triangle, =1: do.   
-             KZ1, KZ2, KADD: used to implement KAZERO and KBZERO.   
-             RMAGN: used to implement KAMAGN and KBMAGN. */
+/*           KCLASS: =1 means w/o rotation, =2 means w/ rotation, */
+/*                   =3 means random. */
+/*           KATYPE: the "type" to be passed to SLATM4 for computing A. */
+/*           KAZERO: the pattern of zeros on the diagonal for A: */
+/*                   =1: ( xxx ), =2: (0, xxx ) =3: ( 0, 0, xxx, 0 ), */
+/*                   =4: ( 0, xxx, 0, 0 ), =5: ( 0, 0, 1, xxx, 0 ), */
+/*                   =6: ( 0, 1, 0, xxx, 0 ).  (xxx means a string of */
+/*                   non-zero entries.) */
+/*           KAMAGN: the magnitude of the matrix: =0: zero, =1: O(1), */
+/*                   =2: large, =3: small. */
+/*           IASIGN: 1 if the diagonal elements of A are to be */
+/*                   multiplied by a random magnitude 1 number, =2 if */
+/*                   randomly chosen diagonal blocks are to be rotated */
+/*                   to form 2x2 blocks. */
+/*           KBTYPE, KBZERO, KBMAGN, IBSIGN: the same, but for B. */
+/*           KTRIAN: =0: don't fill in the upper triangle, =1: do. */
+/*           KZ1, KZ2, KADD: used to implement KAZERO and KBZERO. */
+/*           RMAGN: used to implement KAMAGN and KBMAGN. */
 
 	    if (mtypes > 26) {
 		goto L110;
@@ -764,7 +767,7 @@ static logical c_false = FALSE_;
 			a_offset], lda);
 		iadd = kadd[kazero[jtype - 1] - 1];
 		if (iadd > 0 && iadd <= n) {
-		    a_ref(iadd, iadd) = rmagn[kamagn[jtype - 1]];
+		    a[iadd + iadd * a_dim1] = rmagn[kamagn[jtype - 1]];
 		}
 
 /*              Generate B (w/o rotation) */
@@ -785,41 +788,43 @@ static logical c_false = FALSE_;
 			b_offset], lda);
 		iadd = kadd[kbzero[jtype - 1] - 1];
 		if (iadd != 0 && iadd <= n) {
-		    b_ref(iadd, iadd) = rmagn[kbmagn[jtype - 1]];
+		    b[iadd + iadd * b_dim1] = rmagn[kbmagn[jtype - 1]];
 		}
 
 		if (kclass[jtype - 1] == 2 && n > 0) {
 
-/*                 Include rotations   
+/*                 Include rotations */
 
-                   Generate U, V as Householder transformations times   
-                   a diagonal matrix. */
+/*                 Generate U, V as Householder transformations times */
+/*                 a diagonal matrix. */
 
 		    i__3 = n - 1;
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = jc; jr <= i__4; ++jr) {
-			    u_ref(jr, jc) = slarnd_(&c__3, &iseed[1]);
-			    v_ref(jr, jc) = slarnd_(&c__3, &iseed[1]);
+			    u[jr + jc * u_dim1] = slarnd_(&c__3, &iseed[1]);
+			    v[jr + jc * v_dim1] = slarnd_(&c__3, &iseed[1]);
 /* L40: */
 			}
 			i__4 = n + 1 - jc;
-			slarfg_(&i__4, &u_ref(jc, jc), &u_ref(jc + 1, jc), &
-				c__1, &work[jc]);
-			work[(n << 1) + jc] = r_sign(&c_b19, &u_ref(jc, jc));
-			u_ref(jc, jc) = 1.f;
+			slarfg_(&i__4, &u[jc + jc * u_dim1], &u[jc + 1 + jc * 
+				u_dim1], &c__1, &work[jc]);
+			work[(n << 1) + jc] = r_sign(&c_b19, &u[jc + jc * 
+				u_dim1]);
+			u[jc + jc * u_dim1] = 1.f;
 			i__4 = n + 1 - jc;
-			slarfg_(&i__4, &v_ref(jc, jc), &v_ref(jc + 1, jc), &
-				c__1, &work[n + jc]);
-			work[n * 3 + jc] = r_sign(&c_b19, &v_ref(jc, jc));
-			v_ref(jc, jc) = 1.f;
+			slarfg_(&i__4, &v[jc + jc * v_dim1], &v[jc + 1 + jc * 
+				v_dim1], &c__1, &work[n + jc]);
+			work[n * 3 + jc] = r_sign(&c_b19, &v[jc + jc * v_dim1]
+				);
+			v[jc + jc * v_dim1] = 1.f;
 /* L50: */
 		    }
-		    u_ref(n, n) = 1.f;
+		    u[n + n * u_dim1] = 1.f;
 		    work[n] = 0.f;
 		    r__1 = slarnd_(&c__2, &iseed[1]);
 		    work[n * 3] = r_sign(&c_b19, &r__1);
-		    v_ref(n, n) = 1.f;
+		    v[n + n * v_dim1] = 1.f;
 		    work[n * 2] = 0.f;
 		    r__1 = slarnd_(&c__2, &iseed[1]);
 		    work[n * 4] = r_sign(&c_b19, &r__1);
@@ -830,10 +835,10 @@ static logical c_false = FALSE_;
 		    for (jc = 1; jc <= i__3; ++jc) {
 			i__4 = n;
 			for (jr = 1; jr <= i__4; ++jr) {
-			    a_ref(jr, jc) = work[(n << 1) + jr] * work[n * 3 
-				    + jc] * a_ref(jr, jc);
-			    b_ref(jr, jc) = work[(n << 1) + jr] * work[n * 3 
-				    + jc] * b_ref(jr, jc);
+			    a[jr + jc * a_dim1] = work[(n << 1) + jr] * work[
+				    n * 3 + jc] * a[jr + jc * a_dim1];
+			    b[jr + jc * b_dim1] = work[(n << 1) + jr] * work[
+				    n * 3 + jc] * b[jr + jc * b_dim1];
 /* L60: */
 			}
 /* L70: */
@@ -875,10 +880,10 @@ static logical c_false = FALSE_;
 		for (jc = 1; jc <= i__3; ++jc) {
 		    i__4 = n;
 		    for (jr = 1; jr <= i__4; ++jr) {
-			a_ref(jr, jc) = rmagn[kamagn[jtype - 1]] * slarnd_(&
-				c__2, &iseed[1]);
-			b_ref(jr, jc) = rmagn[kbmagn[jtype - 1]] * slarnd_(&
-				c__2, &iseed[1]);
+			a[jr + jc * a_dim1] = rmagn[kamagn[jtype - 1]] * 
+				slarnd_(&c__2, &iseed[1]);
+			b[jr + jc * b_dim1] = rmagn[kbmagn[jtype - 1]] * 
+				slarnd_(&c__2, &iseed[1]);
 /* L80: */
 		    }
 /* L90: */
@@ -959,7 +964,7 @@ L110:
 	    }
 
 	    sgghrd_("V", "I", &n, &c__1, &n, &h__[h_offset], lda, &t[t_offset]
-		    , lda, &u[u_offset], ldu, &v[v_offset], ldu, &iinfo);
+, lda, &u[u_offset], ldu, &v[v_offset], ldu, &iinfo);
 	    if (iinfo != 0) {
 		io___44.ciunit = *nounit;
 		s_wsfe(&io___44);
@@ -985,11 +990,11 @@ L110:
 	    sget51_(&c__3, &n, &b[b_offset], lda, &t[t_offset], lda, &v[
 		    v_offset], ldu, &v[v_offset], ldu, &work[1], &result[4]);
 
-/*           Call SHGEQZ to compute S1, P1, S2, P2, Q, and Z, do tests.   
+/*           Call SHGEQZ to compute S1, P1, S2, P2, Q, and Z, do tests. */
 
-             Compute T1 and UZ   
+/*           Compute T1 and UZ */
 
-             Eigenvalues only */
+/*           Eigenvalues only */
 
 	    slacpy_(" ", &n, &n, &h__[h_offset], lda, &s2[s2_offset], lda);
 	    slacpy_(" ", &n, &n, &t[t_offset], lda, &p2[p2_offset], lda);
@@ -1073,16 +1078,16 @@ L110:
 		    z_offset], ldu, &z__[z_offset], ldu, &work[1], &result[8])
 		    ;
 
-/*           Compute the Left and Right Eigenvectors of (S1,P1)   
+/*           Compute the Left and Right Eigenvectors of (S1,P1) */
 
-             9: Compute the left eigenvector Matrix without   
-                back transforming: */
+/*           9: Compute the left eigenvector Matrix without */
+/*              back transforming: */
 
 	    ntest = 9;
 	    result[9] = ulpinv;
 
-/*           To test "SELECT" option, compute half of the eigenvectors   
-             in one call, and half in another */
+/*           To test "SELECT" option, compute half of the eigenvectors */
+/*           in one call, and half in another */
 
 	    i1 = n / 2;
 	    i__3 = i1;
@@ -1125,8 +1130,8 @@ L110:
 	    }
 
 	    stgevc_("L", "S", &llwork[1], &n, &s1[s1_offset], lda, &p1[
-		    p1_offset], lda, &evectl_ref(1, i1 + 1), ldu, dumma, ldu, 
-		    &n, &in, &work[1], &iinfo);
+		    p1_offset], lda, &evectl[(i1 + 1) * evectl_dim1 + 1], ldu, 
+		     dumma, ldu, &n, &in, &work[1], &iinfo);
 	    if (iinfo != 0) {
 		io___51.ciunit = *nounit;
 		s_wsfe(&io___51);
@@ -1156,8 +1161,8 @@ L110:
 		e_wsfe();
 	    }
 
-/*           10: Compute the left eigenvector Matrix with   
-                 back transforming: */
+/*           10: Compute the left eigenvector Matrix with */
+/*               back transforming: */
 
 	    ntest = 10;
 	    result[10] = ulpinv;
@@ -1195,14 +1200,14 @@ L110:
 		e_wsfe();
 	    }
 
-/*           11: Compute the right eigenvector Matrix without   
-                 back transforming: */
+/*           11: Compute the right eigenvector Matrix without */
+/*               back transforming: */
 
 	    ntest = 11;
 	    result[11] = ulpinv;
 
-/*           To test "SELECT" option, compute half of the eigenvectors   
-             in one call, and half in another */
+/*           To test "SELECT" option, compute half of the eigenvectors */
+/*           in one call, and half in another */
 
 	    i1 = n / 2;
 	    i__3 = i1;
@@ -1245,8 +1250,8 @@ L110:
 	    }
 
 	    stgevc_("R", "S", &llwork[1], &n, &s1[s1_offset], lda, &p1[
-		    p1_offset], lda, dumma, ldu, &evectr_ref(1, i1 + 1), ldu, 
-		    &n, &in, &work[1], &iinfo);
+		    p1_offset], lda, dumma, ldu, &evectr[(i1 + 1) * 
+		    evectr_dim1 + 1], ldu, &n, &in, &work[1], &iinfo);
 	    if (iinfo != 0) {
 		io___56.ciunit = *nounit;
 		s_wsfe(&io___56);
@@ -1276,8 +1281,8 @@ L110:
 		e_wsfe();
 	    }
 
-/*           12: Compute the right eigenvector Matrix with   
-                 back transforming: */
+/*           12: Compute the right eigenvector Matrix with */
+/*               back transforming: */
 
 	    ntest = 12;
 	    result[12] = ulpinv;
@@ -1373,8 +1378,8 @@ L210:
 	    for (jr = 1; jr <= i__3; ++jr) {
 		if (result[jr] >= *thresh) {
 
-/*                 If this is the first test to fail,   
-                   print a header to the data file. */
+/*                 If this is the first test to fail, */
+/*                 print a header to the data file. */
 
 		    if (nerrs == 0) {
 			io___62.ciunit = *nounit;
@@ -1459,12 +1464,3 @@ L230:
 /*     End of SCHKGG */
 
 } /* schkgg_ */
-
-#undef evectr_ref
-#undef evectl_ref
-#undef v_ref
-#undef u_ref
-#undef b_ref
-#undef a_ref
-
-

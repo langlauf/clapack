@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -40,16 +35,15 @@ static integer c_n1 = -1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm;
-    static doublecomplex a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal r__[4];
-    static doublecomplex w[8], x[4];
-    static doublereal rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4];
-    static doublecomplex af[16]	/* was [4][4] */;
+    doublecomplex a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal r__[4];
+    doublecomplex w[8], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4];
+    doublecomplex af[16]	/* was [4][4] */;
+    integer info;
+    doublereal anrm, rcond;
     extern /* Subroutine */ int zpbtf2_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, integer *), zpotf2_(char *, 
 	    integer *, doublecomplex *, integer *, integer *), 
@@ -58,23 +52,23 @@ static integer c_n1 = -1;
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), zpbcon_(char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
-	    doublecomplex *, doublereal *, integer *), zpbequ_(char *,
+	    doublecomplex *, doublereal *, integer *), zpbequ_(char *, 
 	     integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *), zpbrfs_(char *, 
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
-	    doublecomplex *, doublereal *, integer *), zpbtrf_(char *,
+	    doublecomplex *, doublereal *, integer *), zpbtrf_(char *, 
 	     integer *, integer *, doublecomplex *, integer *, integer *), zpocon_(char *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, doublereal *, 
 	    integer *), zppcon_(char *, integer *, doublecomplex *, 
 	    doublereal *, doublereal *, doublecomplex *, doublereal *, 
-	    integer *), zpoequ_(integer *, doublecomplex *, integer *,
+	    integer *), zpoequ_(integer *, doublecomplex *, integer *, 
 	     doublereal *, doublereal *, doublereal *, integer *), zpbtrs_(
 	    char *, integer *, integer *, integer *, doublecomplex *, integer 
-	    *, doublecomplex *, integer *, integer *), zporfs_(char *,
+	    *, doublecomplex *, integer *, integer *), zporfs_(char *, 
 	     integer *, integer *, doublecomplex *, integer *, doublecomplex *
-	    , integer *, doublecomplex *, integer *, doublecomplex *, integer 
+, integer *, doublecomplex *, integer *, doublecomplex *, integer 
 	    *, doublereal *, doublereal *, doublecomplex *, doublereal *, 
 	    integer *), zpotrf_(char *, integer *, doublecomplex *, 
 	    integer *, integer *), zpotri_(char *, integer *, 
@@ -82,11 +76,11 @@ static integer c_n1 = -1;
 	    integer *, doublecomplex *, doublereal *, doublereal *, 
 	    doublereal *, integer *), zpprfs_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     doublecomplex *, doublereal *, integer *), zpptrf_(char *
-	    , integer *, doublecomplex *, integer *), zpptri_(char *, 
+, integer *, doublecomplex *, integer *), zpptri_(char *, 
 	    integer *, doublecomplex *, integer *), zpotrs_(char *, 
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     integer *, integer *), zpptrs_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, integer *);
 
@@ -95,35 +89,47 @@ static integer c_n1 = -1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRPO tests the error exits for the COMPLEX*16 routines */
+/*  for Hermitian positive definite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRPO tests the error exits for the COMPLEX*16 routines   
-    for Hermitian positive definite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -135,12 +141,12 @@ static integer c_n1 = -1;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
@@ -160,8 +166,8 @@ static integer c_n1 = -1;
     anrm = 1.;
     infoc_1.ok = TRUE_;
 
-/*     Test error exits of the routines that use the Cholesky   
-       decomposition of a Hermitian positive definite matrix. */
+/*     Test error exits of the routines that use the Cholesky */
+/*     decomposition of a Hermitian positive definite matrix. */
 
     if (lsamen_(&c__2, c2, "PO")) {
 
@@ -313,8 +319,8 @@ static integer c_n1 = -1;
 	chkxer_("ZPOEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the Cholesky   
-       decomposition of a Hermitian positive definite packed matrix. */
+/*     Test error exits of the routines that use the Cholesky */
+/*     decomposition of a Hermitian positive definite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
@@ -420,8 +426,8 @@ static integer c_n1 = -1;
 	chkxer_("ZPPEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the Cholesky   
-       decomposition of a Hermitian positive definite band matrix. */
+/*     Test error exits of the routines that use the Cholesky */
+/*     decomposition of a Hermitian positive definite band matrix. */
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
@@ -592,10 +598,3 @@ static integer c_n1 = -1;
 /*     End of ZERRPO */
 
 } /* zerrpo_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

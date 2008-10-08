@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,73 +14,81 @@ static real c_b7 = -1.f;
     real r__1, r__2;
 
     /* Local variables */
-    static real unfl;
-    static integer j;
-    static real anorm;
+    integer j;
+    real eps, unfl, anorm;
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real wnorm;
+    real wnorm;
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real eps;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET10 compares two matrices A and B and computes the ratio */
+/*  RESULT = norm( A - B ) / ( norm(A) * M * EPS ) */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SGET10 compares two matrices A and B and computes the ratio   
-    RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and B. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and B.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The m by n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The m by n matrix A.   
+/*  B       (input) REAL array, dimension (LDB,N) */
+/*          The m by n matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,M). */
 
-    B       (input) REAL array, dimension (LDB,N)   
-            The m by n matrix B.   
+/*  WORK    (workspace) REAL array, dimension (M) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,M).   
+/*  RESULT  (output) REAL */
+/*          RESULT = norm( A - B ) / ( norm(A) * M * EPS ) */
 
-    WORK    (workspace) REAL array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL   
-            RESULT = norm( A - B ) / ( norm(A) * M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -101,8 +104,8 @@ static real c_b7 = -1.f;
     wnorm = 0.f;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	scopy_(m, &a_ref(1, j), &c__1, &work[1], &c__1);
-	saxpy_(m, &c_b7, &b_ref(1, j), &c__1, &work[1], &c__1);
+	scopy_(m, &a[j * a_dim1 + 1], &c__1, &work[1], &c__1);
+	saxpy_(m, &c_b7, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
 /* Computing MAX */
 	r__1 = wnorm, r__2 = sasum_(n, &work[1], &c__1);
 	wnorm = dmax(r__1,r__2);
@@ -132,8 +135,3 @@ static real c_b7 = -1.f;
 /*     End of SGET10 */
 
 } /* sget10_ */
-
-#undef b_ref
-#undef a_ref
-
-

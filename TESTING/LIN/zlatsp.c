@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,64 +17,73 @@ static integer c__2 = 2;
     double sqrt(doublereal), z_abs(doublecomplex *);
 
     /* Local variables */
-    static doublereal beta;
-    static doublecomplex a, b, c__;
-    static integer j;
-    static doublecomplex r__;
-    static doublereal alpha;
-    static integer n5;
-    static doublereal alpha3;
-    static integer jj;
+    doublecomplex a, b, c__;
+    integer j;
+    doublecomplex r__;
+    integer n5, jj;
+    doublereal beta, alpha, alpha3;
     extern /* Double Complex */ VOID zlarnd_(doublecomplex *, integer *, 
 	    integer *);
 
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZLATSP generates a special test matrix for the complex symmetric   
-    (indefinite) factorization for packed matrices.  The pivot blocks of   
-    the generated matrix will be in the following order:   
-       2x2 pivot block, non diagonalizable   
-       1x1 pivot block   
-       2x2 pivot block, diagonalizable   
-       (cycle repeats)   
-    A row interchange is required for each non-diagonalizable 2x2 block.   
+/*  ZLATSP generates a special test matrix for the complex symmetric */
+/*  (indefinite) factorization for packed matrices.  The pivot blocks of */
+/*  the generated matrix will be in the following order: */
+/*     2x2 pivot block, non diagonalizable */
+/*     1x1 pivot block */
+/*     2x2 pivot block, diagonalizable */
+/*     (cycle repeats) */
+/*  A row interchange is required for each non-diagonalizable 2x2 block. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    UPLO    (input) CHARACTER   
-            Specifies whether the generated matrix is to be upper or   
-            lower triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER */
+/*          Specifies whether the generated matrix is to be upper or */
+/*          lower triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    N       (input) INTEGER   
-            The dimension of the matrix to be generated.   
+/*  N       (input) INTEGER */
+/*          The dimension of the matrix to be generated. */
 
-    X       (output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The generated matrix in packed storage format.  The matrix   
-            consists of 3x3 and 2x2 diagonal blocks which result in the   
-            pivot sequence given above.  The matrix outside these   
-            diagonal blocks is zero.   
+/*  X       (output) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The generated matrix in packed storage format.  The matrix */
+/*          consists of 3x3 and 2x2 diagonal blocks which result in the */
+/*          pivot sequence given above.  The matrix outside these */
+/*          diagonal blocks is zero. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed for the random number generator.  The last   
-            of the four integers must be odd.  (modified on exit)   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed for the random number generator.  The last */
+/*          of the four integers must be odd.  (modified on exit) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants   
+/*     Initialize constants */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     --x;
 
@@ -340,4 +344,3 @@ static integer c__2 = 2;
 /*     End of ZLATSP */
 
 } /* zlatsp_ */
-

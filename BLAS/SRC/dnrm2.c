@@ -1,28 +1,47 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 {
-/*        The following loop is equivalent to this call to the LAPACK   
-          auxiliary routine:   
-          CALL DLASSQ( N, X, INCX, SCALE, SSQ ) */
     /* System generated locals */
     integer i__1, i__2;
     doublereal ret_val, d__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static doublereal norm, scale, absxi;
-    static integer ix;
-    static doublereal ssq;
-/*  DNRM2 returns the euclidean norm of a vector via the function   
-    name, so that   
-       DNRM2 := sqrt( x'*x )   
-    -- This version written on 25-October-1982.   
-       Modified on 14-October-1993 to inline the call to DLASSQ.   
-       Sven Hammarling, Nag Ltd.   
-       Parameter adjustments */
+    integer ix;
+    doublereal ssq, norm, scale, absxi;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DNRM2 returns the euclidean norm of a vector via the function */
+/*  name, so that */
+
+/*     DNRM2 := sqrt( x'*x ) */
+
+
+/*  -- This version written on 25-October-1982. */
+/*     Modified on 14-October-1993 to inline the call to DLASSQ. */
+/*     Sven Hammarling, Nag Ltd. */
+
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --x;
+
     /* Function Body */
     if (*n < 1 || *incx < 1) {
 	norm = 0.;
@@ -31,7 +50,9 @@ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
     } else {
 	scale = 0.;
 	ssq = 1.;
-
+/*        The following loop is equivalent to this call to the LAPACK */
+/*        auxiliary routine: */
+/*        CALL DLASSQ( N, X, INCX, SCALE, SSQ ) */
 
 	i__1 = (*n - 1) * *incx + 1;
 	i__2 = *incx;
@@ -60,4 +81,3 @@ doublereal dnrm2_(integer *n, doublereal *x, integer *incx)
 /*     End of DNRM2. */
 
 } /* dnrm2_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -28,46 +23,44 @@ static integer c__400 = 400;
 	    e_rsle(void);
 
     /* Local variables */
-    static integer ndim, iscl, info, kmin, itmp, ipnt[20];
-    static real vmax, qsav[400]	/* was [20][20] */, tsav[400]	/* was [20][
+    integer i__, j, m, n;
+    real q[400]	/* was [20][20] */, s, t[400]	/* was [20][20] */, v, wi[20],
+	     wr[20], val[3], eps, sep, sin__, tol, tmp[400]	/* was [20][
+	    20] */;
+    integer ndim, iscl, info, kmin, itmp, ipnt[20];
+    real vmax, qsav[400]	/* was [20][20] */, tsav[400]	/* was [20][
 	    20] */, tnrm, qtmp[400]	/* was [20][20] */, work[1200], stmp, 
 	    vmul, ttmp[400]	/* was [20][20] */, tsav1[400]	/* was [20][
 	    20] */;
-    static integer i__, j, m, n;
-    static real q[400]	/* was [20][20] */, s, t[400]	/* was [20][20] */, v;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static real sepin, vimin;
+    real sepin, vimin;
     extern /* Subroutine */ int shst01_(integer *, integer *, integer *, real 
 	    *, integer *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *);
-    static real tolin, vrmin;
-    static integer iwork[400];
+    real tolin, vrmin;
+    integer iwork[400];
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real witmp[20], wrtmp[20];
+    real witmp[20], wrtmp[20];
     extern /* Subroutine */ int slabad_(real *, real *);
-    static real wi[20];
-    static integer iselec[20];
-    extern doublereal slamch_(char *);
-    static real wr[20];
-    extern doublereal slange_(char *, integer *, integer *, real *, integer *,
-	     real *);
+    integer iselec[20];
+    extern doublereal slamch_(char *), slange_(char *, integer *, 
+	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int sgehrd_(integer *, integer *, integer *, real 
 	    *, integer *, real *, real *, integer *, integer *);
-    static logical select[20];
-    static real bignum;
+    logical select[20];
+    real bignum;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), sorghr_(integer *, integer 
 	    *, integer *, real *, integer *, real *, real *, integer *, 
 	    integer *), shseqr_(char *, char *, integer *, integer *, integer 
 	    *, real *, integer *, real *, real *, real *, integer *, real *, 
 	    integer *, integer *);
-    static real septmp, smlnum, result[2];
+    real septmp, smlnum, result[2];
     extern /* Subroutine */ int strsen_(char *, char *, logical *, integer *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *, 
 	    real *, real *, real *, integer *, integer *, integer *, integer *
-	    );
-    static real val[3], eps, sep, sin__, tol, tmp[400]	/* was [20][20] */;
+);
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, 0, 0 };
@@ -77,63 +70,71 @@ static integer c__400 = 400;
 
 
 
-#define qsav_ref(a_1,a_2) qsav[(a_2)*20 + a_1 - 21]
-#define qtmp_ref(a_1,a_2) qtmp[(a_2)*20 + a_1 - 21]
-#define ttmp_ref(a_1,a_2) ttmp[(a_2)*20 + a_1 - 21]
-#define q_ref(a_1,a_2) q[(a_2)*20 + a_1 - 21]
-#define t_ref(a_1,a_2) t[(a_2)*20 + a_1 - 21]
-#define tmp_ref(a_1,a_2) tmp[(a_2)*20 + a_1 - 21]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET38 tests STRSEN, a routine for estimating condition numbers of a */
+/*  cluster of eigenvalues and/or its associated right invariant subspace */
 
-    Purpose   
-    =======   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    SGET38 tests STRSEN, a routine for estimating condition numbers of a   
-    cluster of eigenvalues and/or its associated right invariant subspace   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) REAL array, dimension (3) */
+/*          Values of the largest test ratios. */
+/*          RMAX(1) = largest residuals from SHST01 or comparing */
+/*                    different calls to STRSEN */
+/*          RMAX(2) = largest error in reciprocal condition */
+/*                    numbers taking their conditioning into account */
+/*          RMAX(3) = largest error in reciprocal condition */
+/*                    numbers not taking their conditioning into */
+/*                    account (may be larger than RMAX(2)) */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER array, dimension (3) */
+/*          LMAX(i) is example number where largest test ratio */
+/*          RMAX(i) is achieved. Also: */
+/*          If SGEHRD returns INFO nonzero on example i, LMAX(1)=i */
+/*          If SHSEQR returns INFO nonzero on example i, LMAX(2)=i */
+/*          If STRSEN returns INFO nonzero on example i, LMAX(3)=i */
 
-    RMAX    (output) REAL array, dimension (3)   
-            Values of the largest test ratios.   
-            RMAX(1) = largest residuals from SHST01 or comparing   
-                      different calls to STRSEN   
-            RMAX(2) = largest error in reciprocal condition   
-                      numbers taking their conditioning into account   
-            RMAX(3) = largest error in reciprocal condition   
-                      numbers not taking their conditioning into   
-                      account (may be larger than RMAX(2))   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = No. of times SGEHRD returned INFO nonzero */
+/*          NINFO(2) = No. of times SHSEQR returned INFO nonzero */
+/*          NINFO(3) = No. of times STRSEN returned INFO nonzero */
 
-    LMAX    (output) INTEGER array, dimension (3)   
-            LMAX(i) is example number where largest test ratio   
-            RMAX(i) is achieved. Also:   
-            If SGEHRD returns INFO nonzero on example i, LMAX(1)=i   
-            If SHSEQR returns INFO nonzero on example i, LMAX(2)=i   
-            If STRSEN returns INFO nonzero on example i, LMAX(3)=i   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = No. of times SGEHRD returned INFO nonzero   
-            NINFO(2) = No. of times SHSEQR returned INFO nonzero   
-            NINFO(3) = No. of times STRSEN returned INFO nonzero   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number. */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
     --lmax;
     --rmax;
@@ -162,9 +163,9 @@ static integer c__400 = 400;
     val[1] = 1.f;
     val[2] = sqrt(sqrt(bignum));
 
-/*     Read input data until N=0.  Assume input eigenvalues are sorted   
-       lexicographically (increasing by real part, then decreasing by   
-       imaginary part) */
+/*     Read input data until N=0.  Assume input eigenvalues are sorted */
+/*     lexicographically (increasing by real part, then decreasing by */
+/*     imaginary part) */
 
 L10:
     io___5.ciunit = *nin;
@@ -189,8 +190,8 @@ L10:
 	s_rsle(&io___11);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    real));
+	    do_lio(&c__4, &c__1, (char *)&tmp[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(real));
 	}
 	e_rsle();
 /* L20: */
@@ -211,7 +212,7 @@ L10:
 	vmul = val[iscl - 1];
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    sscal_(&n, &vmul, &t_ref(1, i__), &c__1);
+	    sscal_(&n, &vmul, &t[i__ * 20 - 20], &c__1);
 /* L30: */
 	}
 	if (tnrm == 0.f) {
@@ -310,10 +311,10 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          taking its condition number into account   
+/*        Compare condition number for eigenvalue cluster */
+/*        taking its condition number into account */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = (real) n * 2.f * eps * tnrm;
 	v = dmax(r__1,smlnum);
 	if (tnrm == 0.f) {
@@ -353,8 +354,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        taking its condition number into account */
 
 	if (v > septmp * stmp) {
 	    tol = septmp;
@@ -390,8 +391,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          without taking its condition number into account */
+/*        Compare condition number for eigenvalue cluster */
+/*        without taking its condition number into account */
 
 	if (sin__ <= (real) (n << 1) * eps && stmp <= (real) (n << 1) * eps) {
 	    vmax = 1.f;
@@ -413,8 +414,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          without taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        without taking its condition number into account */
 
 	if (sepin <= v && septmp <= v) {
 	    vmax = 1.f;
@@ -436,8 +437,8 @@ L10:
 	    }
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Update Q */
 
 	vmax = 0.f;
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -462,10 +463,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != q[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
 /* L80: */
@@ -473,8 +474,8 @@ L10:
 /* L90: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Update Q */
 
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	slacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -498,10 +499,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp_ref(i__, j) != q_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != q[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
 /* L100: */
@@ -509,8 +510,8 @@ L10:
 /* L110: */
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Do not update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Do not update Q */
 
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	slacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -534,10 +535,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != qsav[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
 /* L120: */
@@ -545,8 +546,8 @@ L10:
 /* L130: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Do not update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Do not update Q */
 
 	slacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	slacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -570,10 +571,10 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		if (ttmp_ref(i__, j) != t_ref(i__, j)) {
+		if (ttmp[i__ + j * 20 - 21] != t[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
-		if (qtmp_ref(i__, j) != qsav_ref(i__, j)) {
+		if (qtmp[i__ + j * 20 - 21] != qsav[i__ + j * 20 - 21]) {
 		    vmax = 1.f / eps;
 		}
 /* L140: */
@@ -594,12 +595,3 @@ L160:
 /*     End of SGET38 */
 
 } /* sget38_ */
-
-#undef tmp_ref
-#undef t_ref
-#undef q_ref
-#undef ttmp_ref
-#undef qtmp_ref
-#undef qsav_ref
-
-

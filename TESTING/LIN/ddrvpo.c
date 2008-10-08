@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -57,28 +52,29 @@ static doublereal c_b50 = 0.;
     integer i__1, i__2, i__3, i__4, i__5[2];
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static integer ioff, mode;
-    static doublereal amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1], uplo[1], type__[1];
-    static integer nrun, i__, k, n, ifact;
+    integer i__, k, n, k1, nb, in, kl, ku, nt, lda;
+    char fact[1];
+    integer ioff, mode;
+    doublereal amax;
+    char path[3];
+    integer imat, info;
+    char dist[1], uplo[1], type__[1];
+    integer nrun, ifact;
     extern /* Subroutine */ int dget04_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
-    static integer nfail, iseed[4], nfact;
+    integer nfail, iseed[4], nfact;
     extern doublereal dget06_(doublereal *, doublereal *);
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static integer nbmin;
-    static doublereal rcond, roldc, scond;
-    static integer nimat;
+    char equed[1];
+    integer nbmin;
+    doublereal rcond, roldc, scond;
+    integer nimat;
     extern /* Subroutine */ int dpot01_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *), dpot02_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
@@ -86,26 +82,23 @@ static doublereal c_b50 = 0.;
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, doublereal *);
-    static doublereal anorm;
-    static logical equil;
-    static integer iuplo, izero, nerrs, k1;
+    doublereal anorm;
+    logical equil;
+    integer iuplo, izero, nerrs;
     extern /* Subroutine */ int dposv_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *);
-    static logical zerot;
-    static char xtype[1];
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int dlatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, char *), aladhd_(integer *, 
-	    char *);
-    static integer nb, in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
+	    char *), alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer ku, nt;
-    static doublereal rcondc;
-    static logical nofact;
-    static integer iequed;
+    logical prefac;
+    doublereal rcondc;
+    logical nofact;
+    integer iequed;
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    dlarhs_(char *, char *, char *, char *, integer *, integer *, 
@@ -115,12 +108,12 @@ static doublereal c_b50 = 0.;
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *), alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static doublereal cndnum;
+    doublereal cndnum;
     extern /* Subroutine */ int dlatms_(integer *, integer *, char *, integer 
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublereal *, integer *, doublereal 
 	    *, integer *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern doublereal dlansy_(char *, char *, integer *, doublereal *, 
 	    integer *, doublereal *);
     extern /* Subroutine */ int dlaqsy_(char *, integer *, doublereal *, 
@@ -128,13 +121,12 @@ static doublereal c_b50 = 0.;
 	    doublereal *, doublereal *, doublereal *, integer *), dpotrf_(
 	    char *, integer *, doublereal *, integer *, integer *), 
 	    dpotri_(char *, integer *, doublereal *, integer *, integer *), xlaenv_(integer *, integer *), derrvx_(char *, integer *);
-    static doublereal result[6];
+    doublereal result[6];
     extern /* Subroutine */ int dposvx_(char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, char *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *, 
 	     integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___48 = { 0, 0, 0, fmt_9999, 0 };
@@ -143,76 +135,96 @@ static doublereal c_b50 = 0.;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DDRVPO tests the driver routines DPOSV and -SVX.   
+/*  DDRVPO tests the driver routines DPOSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    ASAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  ASAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension (NMAX)   
+/*  S       (workspace) DOUBLE PRECISION array, dimension (NMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX+2*NRHS) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -227,9 +239,11 @@ static doublereal c_b50 = 0.;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PO", (ftnlen)2, (ftnlen)2);
@@ -288,27 +302,27 @@ static doublereal c_b50 = 0.;
 	    for (iuplo = 1; iuplo <= 2; ++iuplo) {
 		*(unsigned char *)uplo = *(unsigned char *)&uplos[iuplo - 1];
 
-/*              Set up parameters with DLATB4 and generate a test matrix   
-                with DLATMS. */
+/*              Set up parameters with DLATB4 and generate a test matrix */
+/*              with DLATMS. */
 
 		dlatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
 		s_copy(srnamc_1.srnamt, "DLATMS", (ftnlen)6, (ftnlen)6);
 		dlatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
-			cndnum, &anorm, &kl, &ku, uplo, &a[1], &lda, &work[1],
+			cndnum, &anorm, &kl, &ku, uplo, &a[1], &lda, &work[1], 
 			 &info);
 
 /*              Check error code from DLATMS. */
 
 		if (info != 0) {
-		    alaerh_(path, "DLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "DLATMS", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		    goto L110;
 		}
 
-/*              For types 3-5, zero one row and column of the matrix to   
-                test that INFO is returned correctly. */
+/*              For types 3-5, zero one row and column of the matrix to */
+/*              test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 3) {
@@ -384,17 +398,17 @@ static doublereal c_b50 = 0.;
 			} else if (! lsame_(fact, "N")) 
 				{
 
-/*                       Compute the condition number for comparison with   
-                         the value returned by DPOSVX (FACT = 'N' reuses   
-                         the condition number from the previous iteration   
-                         with FACT = 'F'). */
+/*                       Compute the condition number for comparison with */
+/*                       the value returned by DPOSVX (FACT = 'N' reuses */
+/*                       the condition number from the previous iteration */
+/*                       with FACT = 'F'). */
 
 			    dlacpy_(uplo, &n, &n, &asav[1], &lda, &afac[1], &
 				    lda);
 			    if (equil || iequed > 1) {
 
-/*                          Compute row and column scale factors to   
-                            equilibrate the matrix A. */
+/*                          Compute row and column scale factors to */
+/*                          equilibrate the matrix A. */
 
 				dpoequ_(&n, &afac[1], &lda, &s[1], &scond, &
 					amax, &info);
@@ -410,8 +424,8 @@ static doublereal c_b50 = 0.;
 				}
 			    }
 
-/*                       Save the condition number of the   
-                         non-equilibrated system for use in DGET04. */
+/*                       Save the condition number of the */
+/*                       non-equilibrated system for use in DGET04. */
 
 			    if (equil) {
 				roldc = rcondc;
@@ -458,10 +472,10 @@ static doublereal c_b50 = 0.;
 
 			if (nofact) {
 
-/*                       --- Test DPOSV  ---   
+/*                       --- Test DPOSV  --- */
 
-                         Compute the L*L' or U'*U factorization of the   
-                         matrix and solve the system. */
+/*                       Compute the L*L' or U'*U factorization of the */
+/*                       matrix and solve the system. */
 
 			    dlacpy_(uplo, &n, &n, &a[1], &lda, &afac[1], &lda);
 			    dlacpy_("Full", &n, nrhs, &b[1], &lda, &x[1], &
@@ -483,8 +497,8 @@ static doublereal c_b50 = 0.;
 				goto L70;
 			    }
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    dpot01_(uplo, &n, &a[1], &lda, &afac[1], &lda, &
 				    rwork[1], result);
@@ -502,8 +516,8 @@ static doublereal c_b50 = 0.;
 				    rcondc, &result[2]);
 			    nt = 3;
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    i__4 = nt;
 			    for (k = 1; k <= i__4; ++k) {
@@ -542,21 +556,21 @@ L70:
 			dlaset_("Full", &n, nrhs, &c_b50, &c_b50, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if FACT='F' and   
-                         EQUED='Y'. */
+/*                       Equilibrate the matrix if FACT='F' and */
+/*                       EQUED='Y'. */
 
 			    dlaqsy_(uplo, &n, &a[1], &lda, &s[1], &scond, &
 				    amax, equed);
 			}
 
-/*                    Solve the system and compute the condition number   
-                      and error bounds using DPOSVX. */
+/*                    Solve the system and compute the condition number */
+/*                    and error bounds using DPOSVX. */
 
 			s_copy(srnamc_1.srnamt, "DPOSVX", (ftnlen)6, (ftnlen)
 				6);
 			dposvx_(fact, uplo, &n, nrhs, &a[1], &lda, &afac[1], &
 				lda, equed, &s[1], &b[1], &lda, &x[1], &lda, &
-				rcond, &rwork[1], &rwork[*nrhs + 1], &work[1],
+				rcond, &rwork[1], &rwork[*nrhs + 1], &work[1], 
 				 &iwork[1], &info);
 
 /*                    Check the error code from DPOSVX. */
@@ -575,10 +589,10 @@ L70:
 			if (info == 0) {
 			    if (! prefac) {
 
-/*                          Reconstruct matrix from factors and compute   
-                            residual. */
+/*                          Reconstruct matrix from factors and compute */
+/*                          residual. */
 
-				dpot01_(uplo, &n, &a[1], &lda, &afac[1], &lda,
+				dpot01_(uplo, &n, &a[1], &lda, &afac[1], &lda, 
 					 &rwork[(*nrhs << 1) + 1], result);
 				k1 = 1;
 			    } else {
@@ -588,7 +602,7 @@ L70:
 /*                       Compute residual of the computed solution. */
 
 			    dlacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
-				    , &lda);
+, &lda);
 			    dpot02_(uplo, &n, nrhs, &asav[1], &lda, &x[1], &
 				    lda, &work[1], &lda, &rwork[(*nrhs << 1) 
 				    + 1], &result[1]);
@@ -596,15 +610,15 @@ L70:
 /*                       Check solution from generated exact solution. */
 
 			    if (nofact || prefac && lsame_(equed, "N")) {
-				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 			    } else {
-				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				dget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds from iterative   
-                         refinement. */
+/*                       Check the error bounds from iterative */
+/*                       refinement. */
 
 			    dpot05_(uplo, &n, nrhs, &asav[1], &lda, &b[1], &
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
@@ -613,13 +627,13 @@ L70:
 			    k1 = 6;
 			}
 
-/*                    Compare RCOND from DPOSVX with the computed value   
-                      in RCONDC. */
+/*                    Compare RCOND from DPOSVX with the computed value */
+/*                    in RCONDC. */
 
 			result[5] = dget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			for (k = k1; k <= 6; ++k) {
 			    if (result[k - 1] >= *thresh) {
@@ -686,4 +700,3 @@ L120:
 /*     End of DDRVPO */
 
 } /* ddrvpo_ */
-

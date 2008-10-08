@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,78 +14,91 @@ static integer c__1 = 1;
     doublecomplex z__1;
 
     /* Local variables */
-    static integer j;
+    integer j, jc;
+    doublereal eps;
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
-    static logical unitd;
+    doublereal anorm;
+    logical unitd;
     extern /* Subroutine */ int ztpmv_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *);
-    static integer jc;
     extern doublereal dlamch_(char *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern doublereal zlantp_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublereal *);
-    static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZTPT01 computes the residual for a triangular matrix A times its   
-    inverse when A is stored in packed format:   
-       RESID = norm(A*AINV - I) / ( N * norm(A) * norm(AINV) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  ZTPT01 computes the residual for a triangular matrix A times its */
+/*  inverse when A is stored in packed format: */
+/*     RESID = norm(A*AINV - I) / ( N * norm(A) * norm(AINV) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A is upper or lower triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix A is upper or lower triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    DIAG    (input) CHARACTER*1   
-            Specifies whether or not the matrix A is unit triangular.   
-            = 'N':  Non-unit triangular   
-            = 'U':  Unit triangular   
+/*  DIAG    (input) CHARACTER*1 */
+/*          Specifies whether or not the matrix A is unit triangular. */
+/*          = 'N':  Non-unit triangular */
+/*          = 'U':  Unit triangular */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The original upper or lower triangular matrix A, packed   
-            columnwise in a linear array.  The j-th column of A is stored   
-            in the array AP as follows:   
-            if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L',   
-               AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n.   
+/*  AP      (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The original upper or lower triangular matrix A, packed */
+/*          columnwise in a linear array.  The j-th column of A is stored */
+/*          in the array AP as follows: */
+/*          if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', */
+/*             AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n. */
 
-    AINVP   (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the (triangular) inverse of the matrix A, packed   
-            columnwise in a linear array as in AP.   
-            On exit, the contents of AINVP are destroyed.   
+/*  AINVP   (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          On entry, the (triangular) inverse of the matrix A, packed */
+/*          columnwise in a linear array as in AP. */
+/*          On exit, the contents of AINVP are destroyed. */
 
-    RCOND   (output) DOUBLE PRECISION   
-            The reciprocal condition number of A, computed as   
-            1/(norm(A) * norm(AINV)).   
+/*  RCOND   (output) DOUBLE PRECISION */
+/*          The reciprocal condition number of A, computed as */
+/*          1/(norm(A) * norm(AINV)). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    RESID   (output) DOUBLE PRECISION   
-            norm(A*AINV - I) / ( N * norm(A) * norm(AINV) * EPS )   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          norm(A*AINV - I) / ( N * norm(A) * norm(AINV) * EPS ) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick exit if N = 0.   
+/*     Quick exit if N = 0. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --ainvp;
     --ap;
@@ -177,4 +185,3 @@ static integer c__1 = 1;
 /*     End of ZTPT01 */
 
 } /* ztpt01_ */
-

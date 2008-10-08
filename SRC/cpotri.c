@@ -1,65 +1,77 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
-/* Subroutine */ int cpotri_(char *uplo, integer *n, complex *a, integer *lda,
+/* Subroutine */ int cpotri_(char *uplo, integer *n, complex *a, integer *lda, 
 	 integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
-
-
-    Purpose   
-    =======   
-
-    CPOTRI computes the inverse of a complex Hermitian positive definite   
-    matrix A using the Cholesky factorization A = U**H*U or A = L*L**H   
-    computed by CPOTRF.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangle of A is stored;   
-            = 'L':  Lower triangle of A is stored.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    A       (input/output) COMPLEX array, dimension (LDA,N)   
-            On entry, the triangular factor U or L from the Cholesky   
-            factorization A = U**H*U or A = L*L**H, as computed by   
-            CPOTRF.   
-            On exit, the upper or lower triangle of the (Hermitian)   
-            inverse of A, overwriting the input factor U or L.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the (i,i) element of the factor U or L is   
-                  zero, and the inverse could not be computed.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer a_dim1, a_offset, i__1;
+
     /* Local variables */
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int xerbla_(char *, integer *), clauum_(
 	    char *, integer *, complex *, integer *, integer *), 
 	    ctrtri_(char *, char *, integer *, complex *, integer *, integer *
-	    );
+);
 
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CPOTRI computes the inverse of a complex Hermitian positive definite */
+/*  matrix A using the Cholesky factorization A = U**H*U or A = L*L**H */
+/*  computed by CPOTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored; */
+/*          = 'L':  Lower triangle of A is stored. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  A       (input/output) COMPLEX array, dimension (LDA,N) */
+/*          On entry, the triangular factor U or L from the Cholesky */
+/*          factorization A = U**H*U or A = L*L**H, as computed by */
+/*          CPOTRF. */
+/*          On exit, the upper or lower triangle of the (Hermitian) */
+/*          inverse of A, overwriting the input factor U or L. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, the (i,i) element of the factor U or L is */
+/*                zero, and the inverse could not be computed. */
+
+/*  ===================================================================== */
+
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
@@ -99,4 +111,3 @@
 /*     End of CPOTRI */
 
 } /* cpotri_ */
-

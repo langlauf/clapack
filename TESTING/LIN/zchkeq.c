@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -35,38 +30,38 @@ static integer c__1 = 1;
     doublereal d__1, d__2, d__3;
     doublecomplex z__1;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double pow_di(doublereal *, integer *);
     integer pow_ii(integer *, integer *), s_wsle(cilist *), e_wsle(void), 
 	    s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static char path[3];
-    static doublereal norm, rpow[11];
-    static doublecomplex a[25]	/* was [5][5] */;
-    static doublereal c__[5];
-    static integer i__, j, m, n;
-    static doublereal r__[5], ccond, rcond, rcmin, rcmax, ratio;
-    static doublecomplex ab[65]	/* was [13][5] */, ap[15];
-    static integer kl;
+    doublecomplex a[25]	/* was [5][5] */;
+    doublereal c__[5];
+    integer i__, j, m, n;
+    doublereal r__[5];
+    doublecomplex ab[65]	/* was [13][5] */, ap[15];
+    integer kl;
+    logical ok;
+    integer ku;
+    doublereal eps, pow[11];
+    integer info;
+    char path[3];
+    doublereal norm, rpow[11], ccond, rcond, rcmin, rcmax, ratio;
     extern doublereal dlamch_(char *);
-    static logical ok;
-    static integer ku;
     extern /* Subroutine */ int zgbequ_(integer *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, doublereal *, integer *), zgeequ_(
 	    integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *)
 	    , zpbequ_(char *, integer *, integer *, doublecomplex *, integer *
-	    , doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal reslts[5];
-    extern /* Subroutine */ int zpoequ_(integer *, doublecomplex *, integer *,
+, doublereal *, doublereal *, doublereal *, integer *);
+    doublereal reslts[5];
+    extern /* Subroutine */ int zpoequ_(integer *, doublecomplex *, integer *, 
 	     doublereal *, doublereal *, doublereal *, integer *), zppequ_(
 	    char *, integer *, doublecomplex *, doublereal *, doublereal *, 
 	    doublereal *, integer *);
-    static doublereal eps, pow[11];
 
     /* Fortran I/O blocks */
     static cilist io___25 = { 0, 0, 0, 0, 0 };
@@ -79,34 +74,42 @@ static integer c__1 = 1;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*5 + a_1 - 6
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define ab_subscr(a_1,a_2) (a_2)*13 + a_1 - 14
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZCHKEQ tests ZGEEQU, ZGBEQU, ZPOEQU, ZPPEQU and ZPBEQU */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZCHKEQ tests ZGEEQU, ZGBEQU, ZPOEQU, ZPPEQU and ZPBEQU   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          Threshold for testing routines. Should be between 2 and 10. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            Threshold for testing routines. Should be between 2 and 10.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Zomplex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "EQ", (ftnlen)2, (ftnlen)2);
@@ -131,12 +134,12 @@ static integer c__1 = 1;
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 5; ++i__) {
 		    if (i__ <= m && j <= n) {
-			i__1 = a_subscr(i__, j);
+			i__1 = i__ + j * 5 - 6;
 			i__2 = i__ + j;
 			d__1 = pow[i__ + j] * pow_ii(&c_n1, &i__2);
 			a[i__1].r = d__1, a[i__1].i = 0.;
 		    } else {
-			i__1 = a_subscr(i__, j);
+			i__1 = i__ + j * 5 - 6;
 			a[i__1].r = 0., a[i__1].i = 0.;
 		    }
 /* L30: */
@@ -189,7 +192,7 @@ static integer c__1 = 1;
 /*     Test with zero rows and columns */
 
     for (j = 1; j <= 5; ++j) {
-	i__1 = a_subscr(4, j);
+	i__1 = j * 5 - 2;
 	a[i__1].r = 0., a[i__1].i = 0.;
 /* L90: */
     }
@@ -199,12 +202,12 @@ static integer c__1 = 1;
     }
 
     for (j = 1; j <= 5; ++j) {
-	i__1 = a_subscr(4, j);
+	i__1 = j * 5 - 2;
 	a[i__1].r = 1., a[i__1].i = 0.;
 /* L100: */
     }
     for (i__ = 1; i__ <= 5; ++i__) {
-	i__1 = a_subscr(i__, 4);
+	i__1 = i__ + 14;
 	a[i__1].r = 0., a[i__1].i = 0.;
 /* L110: */
     }
@@ -229,7 +232,7 @@ static integer c__1 = 1;
 
 		    for (j = 1; j <= 5; ++j) {
 			for (i__ = 1; i__ <= 13; ++i__) {
-			    i__3 = ab_subscr(i__, j);
+			    i__3 = i__ + j * 13 - 14;
 			    ab[i__3].r = 0., ab[i__3].i = 0.;
 /* L120: */
 			}
@@ -245,7 +248,7 @@ static integer c__1 = 1;
 			    i__7 = 1, i__8 = j - ku;
 			    if (i__ <= min(i__5,i__6) && i__ >= max(i__7,i__8)
 				     && j <= n) {
-				i__5 = ab_subscr(ku + 1 + i__ - j, j);
+				i__5 = ku + 1 + i__ - j + j * 13 - 14;
 				i__6 = i__ + j;
 				d__1 = pow[i__ + j] * pow_ii(&c_n1, &i__6);
 				ab[i__5].r = d__1, ab[i__5].i = 0.;
@@ -365,12 +368,12 @@ static integer c__1 = 1;
 	for (i__ = 1; i__ <= 5; ++i__) {
 	    for (j = 1; j <= 5; ++j) {
 		if (i__ <= n && j == i__) {
-		    i__1 = a_subscr(i__, j);
+		    i__1 = i__ + j * 5 - 6;
 		    i__2 = i__ + j;
 		    d__1 = pow[i__ + j] * pow_ii(&c_n1, &i__2);
 		    a[i__1].r = d__1, a[i__1].i = 0.;
 		} else {
-		    i__1 = a_subscr(i__, j);
+		    i__1 = i__ + j * 5 - 6;
 		    a[i__1].r = 0., a[i__1].i = 0.;
 		}
 /* L260: */
@@ -404,9 +407,8 @@ static integer c__1 = 1;
 	}
 /* L290: */
     }
-    i__1 = a_subscr(4, 4);
-    z__1.r = -1., z__1.i = 0.;
-    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
+    z__1.r = -1., z__1.i = -0.;
+    a[18].r = z__1.r, a[18].i = z__1.i;
     zpoequ_(&c__5, a, &c__5, r__, &rcond, &norm, &info);
     if (info != 4) {
 	reslts[2] = 1.;
@@ -505,7 +507,7 @@ static integer c__1 = 1;
     }
     i__ = 13;
     i__1 = i__ - 1;
-    z__1.r = -1., z__1.i = 0.;
+    z__1.r = -1., z__1.i = -0.;
     ap[i__1].r = z__1.r, ap[i__1].i = z__1.i;
     zppequ_("L", &c__5, ap, r__, &rcond, &norm, &info);
     if (info != 4) {
@@ -525,7 +527,7 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    i__2 = ab_subscr(i__, j);
+		    i__2 = i__ + j * 13 - 14;
 		    ab[i__2].r = 0., ab[i__2].i = 0.;
 /* L370: */
 		}
@@ -533,7 +535,7 @@ static integer c__1 = 1;
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ab_subscr(kl + 1, j);
+		i__3 = kl + 1 + j * 13 - 14;
 		i__4 = j << 1;
 		ab[i__3].r = pow[i__4], ab[i__3].i = 0.;
 /* L390: */
@@ -565,10 +567,10 @@ static integer c__1 = 1;
 	    }
 	    if (n != 0) {
 /* Computing MAX */
-		i__2 = n - 1;
-		i__3 = ab_subscr(kl + 1, max(i__2,1));
-		z__1.r = -1., z__1.i = 0.;
-		ab[i__3].r = z__1.r, ab[i__3].i = z__1.i;
+		i__3 = n - 1;
+		i__2 = kl + 1 + max(i__3,1) * 13 - 14;
+		z__1.r = -1., z__1.i = -0.;
+		ab[i__2].r = z__1.r, ab[i__2].i = z__1.i;
 		zpbequ_("U", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -581,7 +583,7 @@ static integer c__1 = 1;
 
 	    for (j = 1; j <= 5; ++j) {
 		for (i__ = 1; i__ <= 13; ++i__) {
-		    i__2 = ab_subscr(i__, j);
+		    i__2 = i__ + j * 13 - 14;
 		    ab[i__2].r = 0., ab[i__2].i = 0.;
 /* L410: */
 		}
@@ -589,7 +591,7 @@ static integer c__1 = 1;
 	    }
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ab_subscr(1, j);
+		i__3 = j * 13 - 13;
 		i__4 = j << 1;
 		ab[i__3].r = pow[i__4], ab[i__3].i = 0.;
 /* L430: */
@@ -621,10 +623,10 @@ static integer c__1 = 1;
 	    }
 	    if (n != 0) {
 /* Computing MAX */
-		i__2 = n - 1;
-		i__3 = ab_subscr(1, max(i__2,1));
-		z__1.r = -1., z__1.i = 0.;
-		ab[i__3].r = z__1.r, ab[i__3].i = z__1.i;
+		i__3 = n - 1;
+		i__2 = max(i__3,1) * 13 - 13;
+		z__1.r = -1., z__1.i = -0.;
+		ab[i__2].r = z__1.r, ab[i__2].i = z__1.i;
 		zpbequ_("L", &n, &kl, ab, &c__13, r__, &rcond, &norm, &info);
 /* Computing MAX */
 		i__2 = n - 1;
@@ -689,10 +691,3 @@ static integer c__1 = 1;
 /*     End of ZCHKEQ */
 
 } /* zchkeq_ */
-
-#undef ab_ref
-#undef ab_subscr
-#undef a_ref
-#undef a_subscr
-
-

@@ -1,22 +1,38 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal sasum_(integer *n, real *sx, integer *incx)
 {
     /* System generated locals */
     integer i__1, i__2;
     real ret_val, r__1, r__2, r__3, r__4, r__5, r__6;
+
     /* Local variables */
-    static integer i__, m, nincx;
-    static real stemp;
-    static integer mp1;
-/*     takes the sum of the absolute values.   
-       uses unrolled loops for increment equal to one.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, mp1, nincx;
+    real stemp;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     takes the sum of the absolute values. */
+/*     uses unrolled loops for increment equal to one. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --sx;
+
     /* Function Body */
     ret_val = 0.f;
     stemp = 0.f;
@@ -26,7 +42,9 @@ doublereal sasum_(integer *n, real *sx, integer *incx)
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
@@ -36,8 +54,12 @@ doublereal sasum_(integer *n, real *sx, integer *incx)
     }
     ret_val = stemp;
     return ret_val;
-/*        code for increment equal to 1   
-          clean-up loop */
+
+/*        code for increment equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 6;
     if (m == 0) {
@@ -65,4 +87,3 @@ L60:
     ret_val = stemp;
     return ret_val;
 } /* sasum_ */
-

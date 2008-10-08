@@ -1,62 +1,72 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int crot_(integer *n, complex *cx, integer *incx, complex *
 	cy, integer *incy, real *c__, complex *s)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    CROT   applies a plane rotation, where the cos (C) is real and the   
-    sin (S) is complex, and the vectors CX and CY are complex.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of elements in the vectors CX and CY.   
-
-    CX      (input/output) COMPLEX array, dimension (N)   
-            On input, the vector X.   
-            On output, CX is overwritten with C*X + S*Y.   
-
-    INCX    (input) INTEGER   
-            The increment between successive values of CY.  INCX <> 0.   
-
-    CY      (input/output) COMPLEX array, dimension (N)   
-            On input, the vector Y.   
-            On output, CY is overwritten with -CONJG(S)*X + C*Y.   
-
-    INCY    (input) INTEGER   
-            The increment between successive values of CY.  INCX <> 0.   
-
-    C       (input) REAL   
-    S       (input) COMPLEX   
-            C and S define a rotation   
-               [  C          S  ]   
-               [ -conjg(S)   C  ]   
-            where C*C + S*CONJG(S) = 1.0.   
-
-   =====================================================================   
-
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     complex q__1, q__2, q__3, q__4;
+
     /* Builtin functions */
     void r_cnjg(complex *, complex *);
-    /* Local variables */
-    static integer i__;
-    static complex stemp;
-    static integer ix, iy;
 
+    /* Local variables */
+    integer i__, ix, iy;
+    complex stemp;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CROT   applies a plane rotation, where the cos (C) is real and the */
+/*  sin (S) is complex, and the vectors CX and CY are complex. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of elements in the vectors CX and CY. */
+
+/*  CX      (input/output) COMPLEX array, dimension (N) */
+/*          On input, the vector X. */
+/*          On output, CX is overwritten with C*X + S*Y. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between successive values of CY.  INCX <> 0. */
+
+/*  CY      (input/output) COMPLEX array, dimension (N) */
+/*          On input, the vector Y. */
+/*          On output, CY is overwritten with -CONJG(S)*X + C*Y. */
+
+/*  INCY    (input) INTEGER */
+/*          The increment between successive values of CY.  INCX <> 0. */
+
+/*  C       (input) REAL */
+/*  S       (input) COMPLEX */
+/*          C and S define a rotation */
+/*             [  C          S  ] */
+/*             [ -conjg(S)   C  ] */
+/*          where C*C + S*CONJG(S) = 1.0. */
+
+/* ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     --cy;
     --cx;
 
@@ -131,4 +141,3 @@ L20:
     }
     return 0;
 } /* crot_ */
-

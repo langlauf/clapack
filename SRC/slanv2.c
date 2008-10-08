@@ -1,74 +1,87 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static real c_b4 = 1.f;
 
 /* Subroutine */ int slanv2_(real *a, real *b, real *c__, real *d__, real *
 	rt1r, real *rt1i, real *rt2r, real *rt2i, real *cs, real *sn)
 {
-/*  -- LAPACK driver routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    SLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric   
-    matrix in standard form:   
-
-         [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ]   
-         [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ]   
-
-    where either   
-    1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or   
-    2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex   
-    conjugate eigenvalues.   
-
-    Arguments   
-    =========   
-
-    A       (input/output) REAL   
-    B       (input/output) REAL   
-    C       (input/output) REAL   
-    D       (input/output) REAL   
-            On entry, the elements of the input matrix.   
-            On exit, they are overwritten by the elements of the   
-            standardised Schur form.   
-
-    RT1R    (output) REAL   
-    RT1I    (output) REAL   
-    RT2R    (output) REAL   
-    RT2I    (output) REAL   
-            The real and imaginary parts of the eigenvalues. If the   
-            eigenvalues are a complex conjugate pair, RT1I > 0.   
-
-    CS      (output) REAL   
-    SN      (output) REAL   
-            Parameters of the rotation matrix.   
-
-    Further Details   
-    ===============   
-
-    Modified by V. Sima, Research Institute for Informatics, Bucharest,   
-    Romania, to reduce the risk of cancellation errors,   
-    when computing real eigenvalues, and to ensure, if possible, that   
-    abs(RT1R) >= abs(RT2R).   
-
-    ===================================================================== */
-    /* Table of constant values */
-    static real c_b4 = 1.f;
-    
     /* System generated locals */
     real r__1, r__2;
+
     /* Builtin functions */
     double r_sign(real *, real *), sqrt(doublereal);
+
     /* Local variables */
-    static real temp, p, scale, bcmax, z__, bcmis, sigma, aa, bb, cc, dd;
+    real p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, temp, scale, 
+	    bcmax, bcmis, sigma;
     extern doublereal slapy2_(real *, real *), slamch_(char *);
-    static real cs1, sn1, sab, sac, eps, tau;
 
 
+/*  -- LAPACK driver routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLANV2 computes the Schur factorization of a real 2-by-2 nonsymmetric */
+/*  matrix in standard form: */
+
+/*       [ A  B ] = [ CS -SN ] [ AA  BB ] [ CS  SN ] */
+/*       [ C  D ]   [ SN  CS ] [ CC  DD ] [-SN  CS ] */
+
+/*  where either */
+/*  1) CC = 0 so that AA and DD are real eigenvalues of the matrix, or */
+/*  2) AA = DD and BB*CC < 0, so that AA + or - sqrt(BB*CC) are complex */
+/*  conjugate eigenvalues. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  A       (input/output) REAL */
+/*  B       (input/output) REAL */
+/*  C       (input/output) REAL */
+/*  D       (input/output) REAL */
+/*          On entry, the elements of the input matrix. */
+/*          On exit, they are overwritten by the elements of the */
+/*          standardised Schur form. */
+
+/*  RT1R    (output) REAL */
+/*  RT1I    (output) REAL */
+/*  RT2R    (output) REAL */
+/*  RT2I    (output) REAL */
+/*          The real and imaginary parts of the eigenvalues. If the */
+/*          eigenvalues are a complex conjugate pair, RT1I > 0. */
+
+/*  CS      (output) REAL */
+/*  SN      (output) REAL */
+/*          Parameters of the rotation matrix. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Modified by V. Sima, Research Institute for Informatics, Bucharest, */
+/*  Romania, to reduce the risk of cancellation errors, */
+/*  when computing real eigenvalues, and to ensure, if possible, that */
+/*  abs(RT1R) >= abs(RT2R). */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     eps = slamch_("P");
     if (*c__ == 0.f) {
@@ -107,8 +120,8 @@
 	scale = dmax(r__1,bcmax);
 	z__ = p / scale * p + bcmax / scale * bcmis;
 
-/*        If Z is of the order of the machine accuracy, postpone the   
-          decision on the nature of eigenvalues */
+/*        If Z is of the order of the machine accuracy, postpone the */
+/*        decision on the nature of eigenvalues */
 
 	if (z__ >= eps * 4.f) {
 
@@ -128,24 +141,24 @@
 	    *c__ = 0.f;
 	} else {
 
-/*           Complex eigenvalues, or real (almost) equal eigenvalues.   
-             Make diagonal elements equal. */
+/*           Complex eigenvalues, or real (almost) equal eigenvalues. */
+/*           Make diagonal elements equal. */
 
 	    sigma = *b + *c__;
 	    tau = slapy2_(&sigma, &temp);
 	    *cs = sqrt((dabs(sigma) / tau + 1.f) * .5f);
 	    *sn = -(p / (tau * *cs)) * r_sign(&c_b4, &sigma);
 
-/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ]   
-                     [ CC  DD ]   [ C  D ] [ SN  CS ] */
+/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ] */
+/*                   [ CC  DD ]   [ C  D ] [ SN  CS ] */
 
 	    aa = *a * *cs + *b * *sn;
 	    bb = -(*a) * *sn + *b * *cs;
 	    cc = *c__ * *cs + *d__ * *sn;
 	    dd = -(*c__) * *sn + *d__ * *cs;
 
-/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ]   
-                     [ C  D ]   [-SN  CS ] [ CC  DD ] */
+/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ] */
+/*                   [ C  D ]   [-SN  CS ] [ CC  DD ] */
 
 	    *a = aa * *cs + cc * *sn;
 	    *b = bb * *cs + dd * *sn;
@@ -207,4 +220,3 @@ L10:
 /*     End of SLANV2 */
 
 } /* slanv2_ */
-

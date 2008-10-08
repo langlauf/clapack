@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -32,25 +27,26 @@ static doublereal c_b29 = 1.;
     integer a_dim1, a_offset, af_dim1, af_offset, l_dim1, l_offset, q_dim1, 
 	    q_offset, i__1, i__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal resid, anorm;
-    static integer minmn;
+    doublereal eps;
+    integer info;
+    doublereal resid, anorm;
+    integer minmn;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zherk_(char *, char *, integer *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
 	     doublecomplex *, integer *);
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *);
-    extern /* Subroutine */ int zgeqlf_(integer *, integer *, doublecomplex *,
+    extern /* Subroutine */ int zgeqlf_(integer *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, doublecomplex *, integer *, integer *
-	    ), zlacpy_(char *, integer *, integer *, doublecomplex *, integer 
-	    *, doublecomplex *, integer *), zlaset_(char *, integer *,
+), zlacpy_(char *, integer *, integer *, doublecomplex *, integer 
+	    *, doublecomplex *, integer *), zlaset_(char *, integer *, 
 	     integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    integer *);
     extern doublereal zlansy_(char *, char *, integer *, doublecomplex *, 
@@ -58,88 +54,97 @@ static doublereal c_b29 = 1.;
     extern /* Subroutine */ int zungql_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *);
-    static doublereal eps;
 
 
-#define l_subscr(a_1,a_2) (a_2)*l_dim1 + a_1
-#define l_ref(a_1,a_2) l[l_subscr(a_1,a_2)]
-#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
-#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZQLT01 tests ZGEQLF, which computes the QL factorization of an m-by-n */
+/*  matrix A, and partially tests ZUNGQL which forms the m-by-m */
+/*  orthogonal matrix Q. */
 
-    Purpose   
-    =======   
+/*  ZQLT01 compares L with Q'*A, and checks that Q is orthogonal. */
 
-    ZQLT01 tests ZGEQLF, which computes the QL factorization of an m-by-n   
-    matrix A, and partially tests ZUNGQL which forms the m-by-m   
-    orthogonal matrix Q.   
+/*  Arguments */
+/*  ========= */
 
-    ZQLT01 compares L with Q'*A, and checks that Q is orthogonal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  AF      (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          Details of the QL factorization of A, as returned by ZGEQLF. */
+/*          See ZGEQLF for further details. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  Q       (output) COMPLEX*16 array, dimension (LDA,M) */
+/*          The m-by-m orthogonal matrix Q. */
 
-    AF      (output) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the QL factorization of A, as returned by ZGEQLF.   
-            See ZGEQLF for further details.   
+/*  L       (workspace) COMPLEX*16 array, dimension (LDA,max(M,N)) */
 
-    Q       (output) COMPLEX*16 array, dimension (LDA,M)   
-            The m-by-m orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    L       (workspace) COMPLEX*16 array, dimension (LDA,max(M,N))   
+/*  TAU     (output) COMPLEX*16 array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by ZGEQLF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    TAU     (output) COMPLEX*16 array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by ZGEQLF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( M * EPS ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = 1 + l_dim1 * 1;
+    l_offset = 1 + l_dim1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -165,21 +170,21 @@ static doublereal c_b29 = 1.;
     if (*m >= *n) {
 	if (*n < *m && *n > 0) {
 	    i__1 = *m - *n;
-	    zlacpy_("Full", &i__1, n, &af[af_offset], lda, &q_ref(1, *m - *n 
-		    + 1), lda);
+	    zlacpy_("Full", &i__1, n, &af[af_offset], lda, &q[(*m - *n + 1) * 
+		    q_dim1 + 1], lda);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    zlacpy_("Upper", &i__1, &i__2, &af_ref(*m - *n + 1, 2), lda, &
-		    q_ref(*m - *n + 1, *m - *n + 2), lda);
+	    zlacpy_("Upper", &i__1, &i__2, &af[*m - *n + 1 + (af_dim1 << 1)], 
+		    lda, &q[*m - *n + 1 + (*m - *n + 2) * q_dim1], lda);
 	}
     } else {
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    zlacpy_("Upper", &i__1, &i__2, &af_ref(1, *n - *m + 2), lda, &
-		    q_ref(1, 2), lda);
+	    zlacpy_("Upper", &i__1, &i__2, &af[(*n - *m + 2) * af_dim1 + 1], 
+		    lda, &q[(q_dim1 << 1) + 1], lda);
 	}
     }
 
@@ -193,8 +198,8 @@ static doublereal c_b29 = 1.;
     zlaset_("Full", m, n, &c_b12, &c_b12, &l[l_offset], lda);
     if (*m >= *n) {
 	if (*n > 0) {
-	    zlacpy_("Lower", n, n, &af_ref(*m - *n + 1, 1), lda, &l_ref(*m - *
-		    n + 1, 1), lda);
+	    zlacpy_("Lower", n, n, &af[*m - *n + 1 + af_dim1], lda, &l[*m - *
+		    n + 1 + l_dim1], lda);
 	}
     } else {
 	if (*n > *m && *m > 0) {
@@ -202,8 +207,8 @@ static doublereal c_b29 = 1.;
 	    zlacpy_("Full", m, &i__1, &af[af_offset], lda, &l[l_offset], lda);
 	}
 	if (*m > 0) {
-	    zlacpy_("Lower", m, m, &af_ref(1, *n - *m + 1), lda, &l_ref(1, *n 
-		    - *m + 1), lda);
+	    zlacpy_("Lower", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &l[(
+		    *n - *m + 1) * l_dim1 + 1], lda);
 	}
     }
 
@@ -239,12 +244,3 @@ static doublereal c_b29 = 1.;
 /*     End of ZQLT01 */
 
 } /* zqlt01_ */
-
-#undef af_ref
-#undef af_subscr
-#undef q_ref
-#undef q_subscr
-#undef l_ref
-#undef l_subscr
-
-

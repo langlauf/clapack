@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -27,99 +22,113 @@ static integer c__1 = 1;
     double d_imag(doublecomplex *);
 
     /* Local variables */
-    static integer i__, j, k;
+    integer i__, j, k;
+    doublereal eps;
+    doublecomplex tmp;
     extern logical lsame_(char *, char *);
-    static integer mnmin;
+    integer mnmin;
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
     extern /* Subroutine */ int zherk_(char *, char *, integer *, integer *, 
 	    doublereal *, doublecomplex *, integer *, doublereal *, 
 	    doublecomplex *, integer *);
     extern doublereal dlamch_(char *);
-    static integer ldwork;
+    integer ldwork;
     extern /* Subroutine */ int zlaset_(char *, integer *, integer *, 
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
-    static char transu[1];
+    char transu[1];
     extern doublereal zlansy_(char *, char *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal eps;
-    static doublecomplex tmp;
 
 
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZUNT01 checks that the matrix U is unitary by computing the ratio */
 
-    Purpose   
-    =======   
+/*     RESID = norm( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R', */
+/*  or */
+/*     RESID = norm( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    ZUNT01 checks that the matrix U is unitary by computing the ratio   
+/*  Alternatively, if there isn't sufficient workspace to form */
+/*  I - U*U' or I - U'*U, the ratio is computed as */
 
-       RESID = norm( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R',   
-    or   
-       RESID = norm( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*     RESID = abs( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R', */
+/*  or */
+/*     RESID = abs( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    Alternatively, if there isn't sufficient workspace to form   
-    I - U*U' or I - U'*U, the ratio is computed as   
+/*  where EPS is the machine precision.  ROWCOL is used only if m = n; */
+/*  if m > n, ROWCOL is assumed to be 'C', and if m < n, ROWCOL is */
+/*  assumed to be 'R'. */
 
-       RESID = abs( I - U*U' ) / ( n * EPS ), if ROWCOL = 'R',   
-    or   
-       RESID = abs( I - U'*U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*  Arguments */
+/*  ========= */
 
-    where EPS is the machine precision.  ROWCOL is used only if m = n;   
-    if m > n, ROWCOL is assumed to be 'C', and if m < n, ROWCOL is   
-    assumed to be 'R'.   
+/*  ROWCOL  (input) CHARACTER */
+/*          Specifies whether the rows or columns of U should be checked */
+/*          for orthogonality.  Used only if M = N. */
+/*          = 'R':  Check for orthogonal rows of U */
+/*          = 'C':  Check for orthogonal columns of U */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix U. */
 
-    ROWCOL  (input) CHARACTER   
-            Specifies whether the rows or columns of U should be checked   
-            for orthogonality.  Used only if M = N.   
-            = 'R':  Check for orthogonal rows of U   
-            = 'C':  Check for orthogonal columns of U   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix U. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix U.   
+/*  U       (input) COMPLEX*16 array, dimension (LDU,N) */
+/*          The unitary matrix U.  U is checked for orthogonal columns */
+/*          if m > n or if m = n and ROWCOL = 'C'.  U is checked for */
+/*          orthogonal rows if m < n or if m = n and ROWCOL = 'R'. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix U.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,M). */
 
-    U       (input) COMPLEX*16 array, dimension (LDU,N)   
-            The unitary matrix U.  U is checked for orthogonal columns   
-            if m > n or if m = n and ROWCOL = 'C'.  U is checked for   
-            orthogonal rows if m < n or if m = n and ROWCOL = 'R'.   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,M).   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  For best performance, LWORK */
+/*          should be at least N*N if ROWCOL = 'C' or M*M if */
+/*          ROWCOL = 'R', but the test will be done even if LWORK is 0. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          Used only if LWORK is large enough to use the Level 3 BLAS */
+/*          code. */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  For best performance, LWORK   
-            should be at least N*N if ROWCOL = 'C' or M*M if   
-            ROWCOL = 'R', but the test will be done even if LWORK is 0.   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or */
+/*          RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (min(M,N))   
-            Used only if LWORK is large enough to use the Level 3 BLAS   
-            code.   
+/*  ===================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            RESID = norm( I - U * U' ) / ( n * EPS ), if ROWCOL = 'R', or   
-            RESID = norm( I - U' * U ) / ( m * EPS ), if ROWCOL = 'C'.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
     --rwork;
@@ -153,7 +162,7 @@ static integer c__1 = 1;
 /*        Compute I - U*U' or I - U'*U. */
 
 	zlaset_("Upper", &mnmin, &mnmin, &c_b7, &c_b8, &work[1], &ldwork);
-	zherk_("Upper", transu, &mnmin, &k, &c_b10, &u[u_offset], ldu, &c_b11,
+	zherk_("Upper", transu, &mnmin, &k, &c_b10, &u[u_offset], ldu, &c_b11, 
 		 &work[1], &ldwork);
 
 /*        Compute norm( I - U*U' ) / ( K * EPS ) . */
@@ -173,7 +182,8 @@ static integer c__1 = 1;
 		} else {
 		    tmp.r = 1., tmp.i = 0.;
 		}
-		zdotc_(&z__2, m, &u_ref(1, i__), &c__1, &u_ref(1, j), &c__1);
+		zdotc_(&z__2, m, &u[i__ * u_dim1 + 1], &c__1, &u[j * u_dim1 + 
+			1], &c__1);
 		z__1.r = tmp.r - z__2.r, z__1.i = tmp.i - z__2.i;
 		tmp.r = z__1.r, tmp.i = z__1.i;
 /* Computing MAX */
@@ -198,7 +208,7 @@ static integer c__1 = 1;
 		} else {
 		    tmp.r = 1., tmp.i = 0.;
 		}
-		zdotc_(&z__2, n, &u_ref(j, 1), ldu, &u_ref(i__, 1), ldu);
+		zdotc_(&z__2, n, &u[j + u_dim1], ldu, &u[i__ + u_dim1], ldu);
 		z__1.r = tmp.r - z__2.r, z__1.i = tmp.i - z__2.i;
 		tmp.r = z__1.r, tmp.i = z__1.i;
 /* Computing MAX */
@@ -216,8 +226,3 @@ static integer c__1 = 1;
 /*     End of ZUNT01 */
 
 } /* zunt01_ */
-
-#undef u_ref
-#undef u_subscr
-
-

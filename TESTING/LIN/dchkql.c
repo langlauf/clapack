@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -49,151 +44,164 @@ static integer c__3 = 3;
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer mode, imat, info;
-    static char path[3];
-    static integer kval[4];
-    static char dist[1], type__[1];
-    static integer nrun, i__;
-    extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, m, n;
-    extern /* Subroutine */ int dget02_(char *, integer *, integer *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
-	     integer *, doublereal *, doublereal *);
-    static integer nfail, iseed[4];
+    integer i__, k, m, n, nb, ik, im, in, kl, nk, ku, nt, nx, lda, inb, mode, 
+	    imat, info;
+    char path[3];
+    integer kval[4];
+    char dist[1], type__[1];
+    integer nrun;
+    extern /* Subroutine */ int alahd_(integer *, char *), dget02_(
+	    char *, integer *, integer *, integer *, doublereal *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *);
+    integer nfail, iseed[4];
     extern /* Subroutine */ int dqlt01_(integer *, integer *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
+	    doublereal *, doublereal *, doublereal *, integer *, doublereal *, 
 	     doublereal *, integer *, doublereal *, doublereal *), dqlt02_(
 	    integer *, integer *, integer *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *, doublereal *, doublereal *), dqlt03_(integer *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
-    static doublereal anorm;
-    static integer minmn, nerrs, lwork;
+    doublereal anorm;
+    integer minmn, nerrs, lwork;
     extern /* Subroutine */ int dlatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, char *);
-    static integer nb, ik, im, in, kl, nk;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku, nt, nx;
-    extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), 
-	    dlarhs_(char *, char *, char *, char *, integer *, integer *, 
-	    integer *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *, integer *, 
+	    doublereal *, char *), alaerh_(char *, 
+	    char *, integer *, integer *, char *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *), dlacpy_(char *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *, integer *), dlarhs_(char *, char *, char *, char *, integer *, 
+	    integer *, integer *, integer *, integer *, doublereal *, integer 
+	    *, doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *), dgeqls_(integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *), 
 	    alasum_(char *, integer *, integer *, integer *, integer *);
-    static doublereal cndnum;
+    doublereal cndnum;
     extern /* Subroutine */ int dlatms_(integer *, integer *, char *, integer 
 	    *, char *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, integer *, char *, doublereal *, integer *, doublereal 
 	    *, integer *), derrql_(char *, integer *), xlaenv_(integer *, integer *);
-    static doublereal result[7];
-    static integer lda, inb;
+    doublereal result[7];
 
     /* Fortran I/O blocks */
     static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKQL tests DGEQLF, DORGQL and DORMQL.   
+/*  DCHKQL tests DGEQLF, DORGQL and DORMQL. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NNB     (input) INTEGER   
-            The number of values of NB and NX contained in the   
-            vectors NBVAL and NXVAL.  The blocking parameters are used   
-            in pairs (NB,NX).   
+/*  NNB     (input) INTEGER */
+/*          The number of values of NB and NX contained in the */
+/*          vectors NBVAL and NXVAL.  The blocking parameters are used */
+/*          in pairs (NB,NX). */
 
-    NBVAL   (input) INTEGER array, dimension (NNB)   
-            The values of the blocksize NB.   
+/*  NBVAL   (input) INTEGER array, dimension (NNB) */
+/*          The values of the blocksize NB. */
 
-    NXVAL   (input) INTEGER array, dimension (NNB)   
-            The values of the crossover point NX.   
+/*  NXVAL   (input) INTEGER array, dimension (NNB) */
+/*          The values of the crossover point NX. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning   
-            the work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for M or N, used in dimensioning */
+/*          the work arrays. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AF      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AF      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AQ      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AQ      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AL      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AL      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AC      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AC      (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NRHS) */
 
-    TAU     (workspace) DOUBLE PRECISION array, dimension (NMAX)   
+/*  TAU     (workspace) DOUBLE PRECISION array, dimension (NMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (NMAX) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -212,9 +220,11 @@ static integer c__3 = 3;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "QL", (ftnlen)2, (ftnlen)2);
@@ -257,8 +267,8 @@ static integer c__3 = 3;
 		    goto L50;
 		}
 
-/*              Set up parameters with DLATB4 and generate a test matrix   
-                with DLATMS. */
+/*              Set up parameters with DLATB4 and generate a test matrix */
+/*              with DLATMS. */
 
 		dlatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
@@ -276,9 +286,9 @@ static integer c__3 = 3;
 		    goto L50;
 		}
 
-/*              Set some values for K: the first value must be MINMN,   
-                corresponding to the call of DQLT01; other values are   
-                used in the calls of DQLT02, and must not exceed MINMN. */
+/*              Set some values for K: the first value must be MINMN, */
+/*              corresponding to the call of DQLT01; other values are */
+/*              used in the calls of DQLT02, and must not exceed MINMN. */
 
 		kval[0] = minmn;
 		kval[1] = 0;
@@ -314,14 +324,14 @@ static integer c__3 = 3;
 /*                       Test DGEQLF */
 
 			    dqlt01_(&m, &n, &a[1], &af[1], &aq[1], &al[1], &
-				    lda, &tau[1], &work[1], &lwork, &rwork[1],
+				    lda, &tau[1], &work[1], &lwork, &rwork[1], 
 				     result);
 			} else if (m >= n) {
 
-/*                       Test DORGQL, using factorization   
-                         returned by DQLT01 */
+/*                       Test DORGQL, using factorization */
+/*                       returned by DQLT01 */
 
-			    dqlt02_(&m, &n, &k, &a[1], &af[1], &aq[1], &al[1],
+			    dqlt02_(&m, &n, &k, &a[1], &af[1], &aq[1], &al[1], 
 				     &lda, &tau[1], &work[1], &lwork, &rwork[
 				    1], result);
 			} else {
@@ -330,22 +340,22 @@ static integer c__3 = 3;
 			}
 			if (m >= k) {
 
-/*                       Test DORMQL, using factorization returned   
-                         by DQLT01 */
+/*                       Test DORMQL, using factorization returned */
+/*                       by DQLT01 */
 
 			    dqlt03_(&m, &n, &k, &af[1], &ac[1], &al[1], &aq[1]
-				    , &lda, &tau[1], &work[1], &lwork, &rwork[
+, &lda, &tau[1], &work[1], &lwork, &rwork[
 				    1], &result[2]);
 			    nt += 4;
 
-/*                       If M>=N and K=N, call DGEQLS to solve a system   
-                         with NRHS right hand sides and compute the   
-                         residual. */
+/*                       If M>=N and K=N, call DGEQLS to solve a system */
+/*                       with NRHS right hand sides and compute the */
+/*                       residual. */
 
 			    if (k == n && inb == 1) {
 
-/*                          Generate a solution and set the right   
-                            hand side. */
+/*                          Generate a solution and set the right */
+/*                          hand side. */
 
 				s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
 					ftnlen)6);
@@ -370,7 +380,7 @@ static integer c__3 = 3;
 				}
 
 				dget02_("No transpose", &m, &n, nrhs, &a[1], &
-					lda, &x[m - n + 1], &lda, &b[1], &lda,
+					lda, &x[m - n + 1], &lda, &b[1], &lda, 
 					 &rwork[1], &result[6]);
 				++nt;
 			    } else {
@@ -383,8 +393,8 @@ static integer c__3 = 3;
 			    result[5] = 0.;
 			}
 
-/*                    Print information about the tests that did not   
-                      pass the threshold. */
+/*                    Print information about the tests that did not */
+/*                    pass the threshold. */
 
 			i__5 = nt;
 			for (i__ = 1; i__ <= i__5; ++i__) {
@@ -437,4 +447,3 @@ L50:
 /*     End of DCHKQL */
 
 } /* dchkql_ */
-

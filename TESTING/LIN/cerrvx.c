@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -49,42 +44,40 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static complex a[16]	/* was [4][4] */, b[4];
-    static real c__[4];
-    static integer i__, j;
-    static real r__[4];
-    static complex w[8], x[4];
+    complex a[16]	/* was [4][4] */, b[4];
+    real c__[4];
+    integer i__, j;
+    real r__[4];
+    complex w[8], x[4];
+    char c2[2];
+    real r1[4], r2[4];
+    complex af[16]	/* was [4][4] */;
+    char eq[1];
+    real rf[4];
+    integer ip[4];
+    real rw[4];
+    integer info;
     extern /* Subroutine */ int cgbsv_(integer *, integer *, integer *, 
 	    integer *, complex *, integer *, integer *, complex *, integer *, 
 	    integer *);
-    static real rcond;
+    real rcond;
     extern /* Subroutine */ int cgesv_(integer *, integer *, complex *, 
 	    integer *, integer *, complex *, integer *, integer *), chesv_(
 	    char *, integer *, integer *, complex *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, integer *), 
 	    cpbsv_(char *, integer *, integer *, integer *, complex *, 
 	    integer *, complex *, integer *, integer *), chpsv_(char *
-	    , integer *, integer *, complex *, integer *, complex *, integer *
-	    , integer *);
-    static char c2[2];
-    extern /* Subroutine */ int cgtsv_(integer *, integer *, complex *, 
+, integer *, integer *, complex *, integer *, complex *, integer *
+, integer *), cgtsv_(integer *, integer *, complex *, 
 	    complex *, complex *, complex *, integer *, integer *), cposv_(
 	    char *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, integer *), cppsv_(char *, integer *, integer *
-	    , complex *, complex *, integer *, integer *), cspsv_(
+, complex *, complex *, integer *, integer *), cspsv_(
 	    char *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, integer *), cptsv_(integer *, integer *, real *
-	    , complex *, complex *, integer *, integer *);
-    static real r1[4], r2[4];
-    extern /* Subroutine */ int csysv_(char *, integer *, integer *, complex *
-	    , integer *, integer *, complex *, integer *, complex *, integer *
-	    , integer *);
-    static complex af[16]	/* was [4][4] */;
-    static char eq[1];
-    static real rf[4];
-    static integer ip[4];
-    static real rw[4];
+, complex *, complex *, integer *, integer *), csysv_(char *, 
+	    integer *, integer *, complex *, integer *, integer *, complex *, 
+	    integer *, complex *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), cgbsvx_(char *, char *, integer *, integer 
@@ -94,24 +87,24 @@ static integer c__4 = 4;
 	    integer *), cgesvx_(char *, char *, 
 	    integer *, integer *, complex *, integer *, complex *, integer *, 
 	    integer *, char *, real *, real *, complex *, integer *, complex *
-	    , integer *, real *, real *, real *, complex *, real *, integer *), chesvx_(char *, char *, integer *, 
+, integer *, real *, real *, real *, complex *, real *, integer *), chesvx_(char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, real *
-	    , complex *, integer *, real *, integer *), 
+, complex *, integer *, real *, integer *), 
 	    cpbsvx_(char *, char *, integer *, integer *, integer *, complex *
-	    , integer *, complex *, integer *, char *, real *, complex *, 
+, integer *, complex *, integer *, char *, real *, complex *, 
 	    integer *, complex *, integer *, real *, real *, real *, complex *
-	    , real *, integer *), chpsvx_(char *, 
+, real *, integer *), chpsvx_(char *, 
 	    char *, integer *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, complex *, integer *, real *, real *, real *
-	    , complex *, real *, integer *), cgtsvx_(char *, 
+, complex *, real *, integer *), cgtsvx_(char *, 
 	    char *, integer *, integer *, complex *, complex *, complex *, 
 	    complex *, complex *, complex *, complex *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *, real *, complex *
-	    , real *, integer *), cposvx_(char *, char *, 
+, real *, integer *), cposvx_(char *, char *, 
 	    integer *, integer *, complex *, integer *, complex *, integer *, 
 	    char *, real *, complex *, integer *, complex *, integer *, real *
-	    , real *, real *, complex *, real *, integer *), cppsvx_(char *, char *, integer *, integer *, complex *, 
+, real *, real *, complex *, real *, integer *), cppsvx_(char *, char *, integer *, integer *, complex *, 
 	    complex *, char *, real *, complex *, integer *, complex *, 
 	    integer *, real *, real *, real *, complex *, real *, integer *), cspsvx_(char *, char *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
@@ -122,7 +115,7 @@ static integer c__4 = 4;
 	    integer *), csysvx_(char *, char *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *, real *, complex *
-	    , integer *, real *, integer *);
+, integer *, real *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -131,35 +124,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRVX tests the error exits for the COMPLEX driver routines */
+/*  for solving linear systems of equations. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRVX tests the error exits for the COMPLEX driver routines   
-    for solving linear systems of equations.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -171,12 +176,12 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
@@ -196,6 +201,7 @@ static integer c__4 = 4;
 	ip[j - 1] = j;
 /* L20: */
     }
+    *(unsigned char *)eq = ' ';
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "GE")) {
@@ -224,60 +230,60 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CGESVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("/", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgesvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("N", "/", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgesvx_("N", "N", &c_n1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c_n1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgesvx_("N", "N", &c__0, &c_n1, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c__0, &c_n1, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cgesvx_("N", "N", &c__2, &c__1, a, &c__1, af, &c__2, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c__2, &c__1, a, &c__1, af, &c__2, ip, eq, r__, c__, 
 		 b, &c__2, x, &c__2, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__2, x, &c__2, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	*(unsigned char *)eq = '/';
-	cgesvx_("F", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("F", "N", &c__0, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
 	*(unsigned char *)eq = 'R';
-	cgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	*(unsigned char *)eq = 'C';
-	cgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__,
+	cgesvx_("F", "N", &c__1, &c__0, a, &c__1, af, &c__1, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
-	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__, 
 		 b, &c__1, x, &c__2, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__,
+	cgesvx_("N", "N", &c__2, &c__1, a, &c__2, af, &c__2, ip, eq, r__, c__, 
 		 b, &c__2, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGESVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -316,82 +322,82 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CGBSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("/", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgbsvx_("N", "/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "/", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgbsvx_("N", "N", &c_n1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c_n1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgbsvx_("N", "N", &c__1, &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c__1, &c_n1, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cgbsvx_("N", "N", &c__1, &c__0, &c_n1, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c__1, &c__0, &c_n1, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cgbsvx_("N", "N", &c__0, &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c__0, &c__0, &c__0, &c_n1, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__2, af, &c__4, ip,
+	cgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__2, af, &c__4, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	cgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__3, af, &c__3, ip,
+	cgbsvx_("N", "N", &c__1, &c__1, &c__1, &c__0, a, &c__3, af, &c__3, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	*(unsigned char *)eq = '/';
-	cgbsvx_("F", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("F", "N", &c__0, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
 	*(unsigned char *)eq = 'R';
-	cgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	*(unsigned char *)eq = 'C';
-	cgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("F", "N", &c__1, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	cgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__1, x, &c__2, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
-	cgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip,
+	cgbsvx_("N", "N", &c__2, &c__0, &c__0, &c__0, a, &c__1, af, &c__1, ip, 
 		 eq, r__, c__, b, &c__2, x, &c__1, &rcond, r1, r2, w, rw, &
 		info);
 	chkxer_("CGBSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -403,18 +409,15 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CGTSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgtsv_(&c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
-		c__1, &info);
+	cgtsv_(&c_n1, &c__0, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("CGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgtsv_(&c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
-		c__1, &info);
+	cgtsv_(&c__0, &c_n1, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("CGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	cgtsv_(&c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 3), b, &
-		c__1, &info);
+	cgtsv_(&c__2, &c__0, a, &a[4], &a[8], b, &c__1, &info);
 	chkxer_("CGTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -422,39 +425,33 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CGTSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgtsvx_("/", "N", &c__0, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("/", "N", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgtsvx_("N", "/", &c__0, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("N", "/", &c__0, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgtsvx_("N", "N", &c_n1, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("N", "N", &c_n1, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cgtsvx_("N", "N", &c__0, &c_n1, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("N", "N", &c__0, &c_n1, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
-	cgtsvx_("N", "N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__1, x, &c__2, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("N", "N", &c__2, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__1, x, &c__2, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	cgtsvx_("N", "N", &c__2, &c__0, &a_ref(1, 1), &a_ref(1, 2), &a_ref(1, 
-		3), &af_ref(1, 1), &af_ref(1, 2), &af_ref(1, 3), &af_ref(1, 4)
-		, ip, b, &c__2, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cgtsvx_("N", "N", &c__2, &c__0, a, &a[4], &a[8], af, &af[4], &af[8], &
+		af[12], ip, b, &c__2, x, &c__1, &rcond, r1, r2, w, rw, &info);
 	chkxer_("CGTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -711,15 +708,15 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CPTSV ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cptsv_(&c_n1, &c__0, r__, &a_ref(1, 1), b, &c__1, &info);
+	cptsv_(&c_n1, &c__0, r__, a, b, &c__1, &info);
 	chkxer_("CPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cptsv_(&c__0, &c_n1, r__, &a_ref(1, 1), b, &c__1, &info);
+	cptsv_(&c__0, &c_n1, r__, a, b, &c__1, &info);
 	chkxer_("CPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	cptsv_(&c__2, &c__0, r__, &a_ref(1, 1), b, &c__1, &info);
+	cptsv_(&c__2, &c__0, r__, a, b, &c__1, &info);
 	chkxer_("CPTSV ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -727,28 +724,28 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CPTSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cptsvx_("/", &c__0, &c__0, r__, &a_ref(1, 1), rf, &af_ref(1, 1), b, &
-		c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cptsvx_("/", &c__0, &c__0, r__, a, rf, af, b, &c__1, x, &c__1, &rcond, 
+		 r1, r2, w, rw, &info);
 	chkxer_("CPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cptsvx_("N", &c_n1, &c__0, r__, &a_ref(1, 1), rf, &af_ref(1, 1), b, &
-		c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cptsvx_("N", &c_n1, &c__0, r__, a, rf, af, b, &c__1, x, &c__1, &rcond, 
+		 r1, r2, w, rw, &info);
 	chkxer_("CPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cptsvx_("N", &c__0, &c_n1, r__, &a_ref(1, 1), rf, &af_ref(1, 1), b, &
-		c__1, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cptsvx_("N", &c__0, &c_n1, r__, a, rf, af, b, &c__1, x, &c__1, &rcond, 
+		 r1, r2, w, rw, &info);
 	chkxer_("CPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	cptsvx_("N", &c__2, &c__0, r__, &a_ref(1, 1), rf, &af_ref(1, 1), b, &
-		c__1, x, &c__2, &rcond, r1, r2, w, rw, &info);
+	cptsvx_("N", &c__2, &c__0, r__, a, rf, af, b, &c__1, x, &c__2, &rcond, 
+		 r1, r2, w, rw, &info);
 	chkxer_("CPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	cptsvx_("N", &c__2, &c__0, r__, &a_ref(1, 1), rf, &af_ref(1, 1), b, &
-		c__2, x, &c__1, &rcond, r1, r2, w, rw, &info);
+	cptsvx_("N", &c__2, &c__0, r__, a, rf, af, b, &c__2, x, &c__1, &rcond, 
+		 r1, r2, w, rw, &info);
 	chkxer_("CPTSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
@@ -853,32 +850,32 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CHPSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	chpsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	chpsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	chpsvx_("N", "/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	chpsvx_("N", "/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	chpsvx_("N", "U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	chpsvx_("N", "U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	chpsvx_("N", "U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	chpsvx_("N", "U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	chpsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__1, x, &c__2, &rcond,
+	chpsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__1, x, &c__2, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	chpsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__2, x, &c__1, &rcond,
+	chpsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__2, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CHPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -980,32 +977,32 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "CSPSVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	cspsvx_("/", "U", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cspsvx_("N", "/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	cspsvx_("N", "/", &c__0, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cspsvx_("N", "U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	cspsvx_("N", "U", &c_n1, &c__0, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	cspsvx_("N", "U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, &rcond,
+	cspsvx_("N", "U", &c__0, &c_n1, a, af, ip, b, &c__1, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	cspsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__1, x, &c__2, &rcond,
+	cspsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__1, x, &c__2, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	cspsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__2, x, &c__1, &rcond,
+	cspsvx_("N", "U", &c__2, &c__0, a, af, ip, b, &c__2, x, &c__1, &rcond, 
 		 r1, r2, w, rw, &info);
 	chkxer_("CSPSVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1031,10 +1028,3 @@ static integer c__4 = 4;
 /*     End of CERRVX */
 
 } /* cerrvx_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

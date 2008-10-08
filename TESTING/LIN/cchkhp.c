@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -50,73 +45,70 @@ static integer c__8 = 8;
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer ioff, mode, imat, info;
-    static char path[3], dist[1];
-    static integer irhs, nrhs;
-    static char uplo[1], type__[1];
-    static integer nrun, i__, j, k;
-    extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer n;
-    extern /* Subroutine */ int cget04_(integer *, integer *, complex *, 
-	    integer *, complex *, integer *, real *, real *);
-    static integer nfail, iseed[4];
+    integer i__, j, k, n, i1, i2, in, kl, ku, nt, lda, npp, ioff, mode, imat, 
+	    info;
+    char path[3], dist[1];
+    integer irhs, nrhs;
+    char uplo[1], type__[1];
+    integer nrun;
+    extern /* Subroutine */ int alahd_(integer *, char *), cget04_(
+	    integer *, integer *, complex *, integer *, complex *, integer *, 
+	    real *, real *);
+    integer nfail, iseed[4];
     extern /* Subroutine */ int chpt01_(char *, integer *, complex *, complex 
 	    *, integer *, complex *, integer *, real *, real *);
     extern logical lsame_(char *, char *);
-    static real rcond;
-    static integer nimat;
+    real rcond;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
     extern /* Subroutine */ int cppt02_(char *, integer *, integer *, complex 
 	    *, complex *, integer *, complex *, integer *, real *, real *), cppt03_(char *, integer *, complex *, complex *, complex 
 	    *, integer *, real *, real *, real *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int ccopy_(integer *, complex *, integer *, 
 	    complex *, integer *), cppt05_(char *, integer *, integer *, 
 	    complex *, complex *, integer *, complex *, integer *, complex *, 
 	    integer *, real *, real *, real *);
-    static integer iuplo, izero, i1, i2, nerrs;
-    static logical zerot;
-    static char xtype[1];
+    integer iuplo, izero, nerrs;
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int clatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    );
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *), claipd_(integer *, complex *, integer *, integer *);
-    static integer ku, nt;
+), alaerh_(char *, char *, integer *, 
+	    integer *, char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *), claipd_(integer *, complex *, integer *, integer 
+	    *);
     extern doublereal clanhp_(char *, char *, integer *, complex *, real *);
-    static real rcondc;
+    real rcondc;
     extern /* Subroutine */ int chpcon_(char *, integer *, complex *, integer 
 	    *, real *, real *, complex *, integer *);
-    static char packit[1];
+    char packit[1];
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *), clarhs_(char *, char 
 	    *, char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, complex *, 
 	    integer *, integer *, integer *), 
 	    alasum_(char *, integer *, integer *, integer *, integer *);
-    static real cndnum;
+    real cndnum;
     extern /* Subroutine */ int chprfs_(char *, integer *, integer *, complex 
 	    *, complex *, integer *, complex *, integer *, complex *, integer 
 	    *, real *, real *, complex *, real *, integer *), chptrf_(
 	    char *, integer *, complex *, integer *, integer *), 
 	    clatms_(integer *, integer *, char *, integer *, char *, real *, 
 	    integer *, real *, real *, integer *, integer *, char *, complex *
-	    , integer *, complex *, integer *), 
+, integer *, complex *, integer *), 
 	    chptri_(char *, integer *, complex *, integer *, complex *, 
 	    integer *);
-    static logical trfcon;
+    logical trfcon;
     extern /* Subroutine */ int chptrs_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, integer *), cerrsy_(
 	    char *, integer *);
-    static real result[8];
-    static integer lda, npp;
+    real result[8];
 
     /* Fortran I/O blocks */
     static cilist io___38 = { 0, 0, 0, fmt_9999, 0 };
@@ -125,79 +117,99 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CCHKHP tests CHPTRF, -TRI, -TRS, -RFS, and -CON   
+/*  CCHKHP tests CHPTRF, -TRI, -TRS, -RFS, and -CON */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) COMPLEX array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  A       (workspace) COMPLEX array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    AFAC    (workspace) COMPLEX array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  AFAC    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    AINV    (workspace) COMPLEX array, dimension   
-                        (NMAX*(NMAX+1)/2)   
+/*  AINV    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*(NMAX+1)/2) */
 
-    B       (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) COMPLEX array, dimension   
-                        (NMAX*max(2,NSMAX))   
+/*  WORK    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*max(2,NSMAX)) */
 
-    RWORK   (workspace) REAL array,   
-                                   dimension (NMAX+2*NSMAX)   
+/*  RWORK   (workspace) REAL array, */
+/*                                 dimension (NMAX+2*NSMAX) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -211,9 +223,11 @@ static integer c__8 = 8;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "HP", (ftnlen)2, (ftnlen)2);
@@ -271,8 +285,8 @@ static integer c__8 = 8;
 		    *(unsigned char *)packit = 'R';
 		}
 
-/*              Set up parameters with CLATB4 and generate a test matrix   
-                with CLATMS. */
+/*              Set up parameters with CLATB4 and generate a test matrix */
+/*              with CLATMS. */
 
 		clatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
@@ -285,13 +299,13 @@ static integer c__8 = 8;
 /*              Check error code from CLATMS. */
 
 		if (info != 0) {
-		    alaerh_(path, "CLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "CLATMS", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		    goto L150;
 		}
 
-/*              For types 3-6, zero one or more rows and columns of   
-                the matrix to test that INFO is returned correctly. */
+/*              For types 3-6, zero one or more rows and columns of */
+/*              the matrix to test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 3) {
@@ -394,8 +408,8 @@ static integer c__8 = 8;
 		s_copy(srnamc_1.srnamt, "CHPTRF", (ftnlen)6, (ftnlen)6);
 		chptrf_(uplo, &n, &afac[1], &iwork[1], &info);
 
-/*              Adjust the expected value of INFO to account for   
-                pivoting. */
+/*              Adjust the expected value of INFO to account for */
+/*              pivoting. */
 
 		k = izero;
 		if (k > 0) {
@@ -423,15 +437,15 @@ L100:
 		    trfcon = FALSE_;
 		}
 
-/* +    TEST 1   
-                Reconstruct matrix from factors and compute residual. */
+/* +    TEST 1 */
+/*              Reconstruct matrix from factors and compute residual. */
 
 		chpt01_(uplo, &n, &a[1], &afac[1], &iwork[1], &ainv[1], &lda, 
 			&rwork[1], result);
 		nt = 1;
 
-/* +    TEST 2   
-                Form the inverse and compute the residual. */
+/* +    TEST 2 */
+/*              Form the inverse and compute the residual. */
 
 		if (! trfcon) {
 		    ccopy_(&npp, &afac[1], &c__1, &ainv[1], &c__1);
@@ -451,8 +465,8 @@ L100:
 		    nt = 2;
 		}
 
-/*              Print information about the tests that did not pass   
-                the threshold. */
+/*              Print information about the tests that did not pass */
+/*              the threshold. */
 
 		i__3 = nt;
 		for (k = 1; k <= i__3; ++k) {
@@ -486,8 +500,8 @@ L100:
 		for (irhs = 1; irhs <= i__3; ++irhs) {
 		    nrhs = nsval[irhs];
 
-/* +    TEST 3   
-                Solve and compute residual for  A * X = B. */
+/* +    TEST 3 */
+/*              Solve and compute residual for  A * X = B. */
 
 		    s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (ftnlen)6);
 		    clarhs_(path, xtype, uplo, " ", &n, &n, &kl, &ku, &nrhs, &
@@ -497,7 +511,7 @@ L100:
 		    clacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
 
 		    s_copy(srnamc_1.srnamt, "CHPTRS", (ftnlen)6, (ftnlen)6);
-		    chptrs_(uplo, &n, &nrhs, &afac[1], &iwork[1], &x[1], &lda,
+		    chptrs_(uplo, &n, &nrhs, &afac[1], &iwork[1], &x[1], &lda, 
 			     &info);
 
 /*              Check error code from CHPTRS. */
@@ -512,18 +526,18 @@ L100:
 		    cppt02_(uplo, &n, &nrhs, &a[1], &x[1], &lda, &work[1], &
 			    lda, &rwork[1], &result[2]);
 
-/* +    TEST 4   
-                Check solution from generated exact solution. */
+/* +    TEST 4 */
+/*              Check solution from generated exact solution. */
 
 		    cget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
 			    result[3]);
 
-/* +    TESTS 5, 6, and 7   
-                Use iterative refinement to improve the solution. */
+/* +    TESTS 5, 6, and 7 */
+/*              Use iterative refinement to improve the solution. */
 
 		    s_copy(srnamc_1.srnamt, "CHPRFS", (ftnlen)6, (ftnlen)6);
 		    chprfs_(uplo, &n, &nrhs, &a[1], &afac[1], &iwork[1], &b[1]
-			    , &lda, &x[1], &lda, &rwork[1], &rwork[nrhs + 1], 
+, &lda, &x[1], &lda, &rwork[1], &rwork[nrhs + 1], 
 			    &work[1], &rwork[(nrhs << 1) + 1], &info);
 
 /*              Check error code from CHPRFS. */
@@ -540,8 +554,8 @@ L100:
 			    &xact[1], &lda, &rwork[1], &rwork[nrhs + 1], &
 			    result[5]);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    for (k = 3; k <= 7; ++k) {
 			if (result[k - 1] >= *thresh) {
@@ -570,8 +584,8 @@ L100:
 /* L130: */
 		}
 
-/* +    TEST 8   
-                Get an estimate of RCOND = 1/CNDNUM. */
+/* +    TEST 8 */
+/*              Get an estimate of RCOND = 1/CNDNUM. */
 
 L140:
 		anorm = clanhp_("1", uplo, &n, &a[1], &rwork[1]);
@@ -582,7 +596,7 @@ L140:
 /*              Check error code from CHPCON. */
 
 		if (info != 0) {
-		    alaerh_(path, "CHPCON", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "CHPCON", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		}
 
@@ -623,4 +637,3 @@ L160:
 /*     End of CCHKHP */
 
 } /* cchkhp_ */
-

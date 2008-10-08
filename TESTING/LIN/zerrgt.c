@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -39,73 +34,89 @@ static integer c__1 = 1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex b[2];
-    static doublereal d__[2];
-    static doublecomplex e[2];
-    static integer i__;
-    static doublecomplex w[2], x[2];
-    static doublereal rcond, anorm;
-    static char c2[2];
-    static doublereal r1[2], r2[2], df[2];
-    static doublecomplex ef[2], dl[2];
-    static integer ip[2];
-    static doublecomplex du[2];
+    doublecomplex b[2];
+    doublereal d__[2];
+    doublecomplex e[2];
+    integer i__;
+    doublecomplex w[2], x[2];
+    char c2[2];
+    doublereal r1[2], r2[2], df[2];
+    doublecomplex ef[2], dl[2];
+    integer ip[2];
+    doublecomplex du[2];
+    doublereal rw[2];
+    doublecomplex du2[2], dlf[2], duf[2];
+    integer info;
+    doublereal rcond, anorm;
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
-    static doublereal rw[2];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
-	    *, logical *), zgtcon_(char *, integer *, doublecomplex *,
+	    *, logical *), zgtcon_(char *, integer *, doublecomplex *, 
 	     doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
-	    doublereal *, doublereal *, doublecomplex *, integer *);
-    static doublecomplex du2[2];
-    extern /* Subroutine */ int zptcon_(integer *, doublereal *, 
-	    doublecomplex *, doublereal *, doublereal *, doublereal *, 
-	    integer *), zgtrfs_(char *, integer *, integer *, doublecomplex *,
-	     doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex 
-	    *, doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
-	     doublecomplex *, doublereal *, integer *), zgttrf_(
-	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, integer *, integer *), zptrfs_(char *, integer *,
-	     integer *, doublereal *, doublecomplex *, doublereal *, 
+	    doublereal *, doublereal *, doublecomplex *, integer *), 
+	    zptcon_(integer *, doublereal *, doublecomplex *, doublereal *, 
+	    doublereal *, doublereal *, integer *), zgtrfs_(char *, integer *, 
+	     integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, doublecomplex *
+, integer *, doublecomplex *, integer *, doublecomplex *, integer 
+	    *, doublereal *, doublereal *, doublecomplex *, doublereal *, 
+	    integer *), zgttrf_(integer *, doublecomplex *, 
+	    doublecomplex *, doublecomplex *, doublecomplex *, integer *, 
+	    integer *), zptrfs_(char *, integer *, integer *, doublereal *, 
+	    doublecomplex *, doublereal *, doublecomplex *, doublecomplex *, 
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
+	     doublecomplex *, doublereal *, integer *), zpttrf_(
+	    integer *, doublereal *, doublecomplex *, integer *), zgttrs_(
+	    char *, integer *, integer *, doublecomplex *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
-	    integer *, doublereal *, doublereal *, doublecomplex *, 
-	    doublereal *, integer *), zpttrf_(integer *, doublereal *,
-	     doublecomplex *, integer *), zgttrs_(char *, integer *, integer *
-	    , doublecomplex *, doublecomplex *, doublecomplex *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, integer *), zpttrs_(char *, integer *, integer *, doublereal *, 
-	    doublecomplex *, doublecomplex *, integer *, integer *);
-    static doublecomplex dlf[2], duf[2];
+	    integer *, integer *), zpttrs_(char *, integer *, integer 
+	    *, doublereal *, doublecomplex *, doublecomplex *, integer *, 
+	    integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZERRGT tests the error exits for the COMPLEX*16 tridiagonal   
-    routines.   
+/*  ZERRGT tests the error exits for the COMPLEX*16 tridiagonal */
+/*  routines. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -127,9 +138,9 @@ static integer c__1 = 1;
 
     if (lsamen_(&c__2, c2, "GT")) {
 
-/*        Test error exits for the general tridiagonal routines.   
+/*        Test error exits for the general tridiagonal routines. */
 
-          ZGTTRF */
+/*        ZGTTRF */
 
 	s_copy(srnamc_1.srnamt, "ZGTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -161,27 +172,27 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "ZGTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	zgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("ZGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zgtrfs_("N", &c_n1, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	zgtrfs_("N", &c_n1, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("ZGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zgtrfs_("N", &c__0, &c_n1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	zgtrfs_("N", &c__0, &c_n1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("ZGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	zgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	zgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__2, r1, r2, w, rw, &info);
 	chkxer_("ZGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	zgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__2,
+	zgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__2, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("ZGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -205,10 +216,10 @@ static integer c__1 = 1;
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        Test error exits for the positive definite tridiagonal   
-          routines.   
+/*        Test error exits for the positive definite tridiagonal */
+/*        routines. */
 
-          ZPTTRF */
+/*        ZPTTRF */
 
 	s_copy(srnamc_1.srnamt, "ZPTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -240,27 +251,27 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "ZPTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	zptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("ZPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zptrfs_("U", &c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	zptrfs_("U", &c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("ZPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zptrfs_("U", &c__0, &c_n1, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	zptrfs_("U", &c__0, &c_n1, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("ZPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	zptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__1, x, &c__2, r1, r2,
+	zptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__1, x, &c__2, r1, r2, 
 		 w, rw, &info);
 	chkxer_("ZPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	zptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__2, x, &c__1, r1, r2,
+	zptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__2, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("ZPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -288,4 +299,3 @@ static integer c__1 = 1;
 /*     End of ZERRGT */
 
 } /* zerrgt_ */
-

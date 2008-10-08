@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -12,7 +7,7 @@ static integer c__1 = 1;
 static real c_b12 = 0.f;
 static real c_b15 = 1.f;
 
-/* Subroutine */ int sget52_(logical *left, integer *n, real *a, integer *lda,
+/* Subroutine */ int sget52_(logical *left, integer *n, real *a, integer *lda, 
 	 real *b, integer *ldb, real *e, integer *lde, real *alphar, real *
 	alphai, real *beta, real *work, real *result)
 {
@@ -21,163 +16,174 @@ static real c_b15 = 1.f;
     real r__1, r__2, r__3, r__4;
 
     /* Local variables */
-    static integer jvec;
-    static real temp1;
-    static integer j;
-    static real acoef, scale, abmax, salfi, sbeta, salfr, anorm, bnorm, enorm;
+    integer j;
+    real ulp;
+    integer jvec;
+    real temp1, acoef, scale, abmax, salfi, sbeta, salfr, anorm, bnorm, enorm;
     extern /* Subroutine */ int sgemv_(char *, integer *, integer *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, integer *);
-    static char trans[1];
-    static real bcoefi, bcoefr, alfmax;
+    char trans[1];
+    real bcoefi, bcoefr, alfmax;
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real safmin;
-    static char normab[1];
-    static real safmax, betmax, enrmer;
-    static logical ilcplx;
-    static real errnrm, ulp;
+    real safmin;
+    char normab[1];
+    real safmax, betmax, enrmer;
+    logical ilcplx;
+    real errnrm;
 
 
-#define e_ref(a_1,a_2) e[(a_2)*e_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET52  does an eigenvector check for the generalized eigenvalue */
+/*  problem. */
 
-    Purpose   
-    =======   
+/*  The basic test for right eigenvectors is: */
 
-    SGET52  does an eigenvector check for the generalized eigenvalue   
-    problem.   
+/*                            | b(j) A E(j) -  a(j) B E(j) | */
+/*          RESULT(1) = max   ------------------------------- */
+/*                       j    n ulp max( |b(j) A|, |a(j) B| ) */
 
-    The basic test for right eigenvectors is:   
+/*  using the 1-norm.  Here, a(j)/b(j) = w is the j-th generalized */
+/*  eigenvalue of A - w B, or, equivalently, b(j)/a(j) = m is the j-th */
+/*  generalized eigenvalue of m A - B. */
 
-                              | b(j) A E(j) -  a(j) B E(j) |   
-            RESULT(1) = max   -------------------------------   
-                         j    n ulp max( |b(j) A|, |a(j) B| )   
+/*  For real eigenvalues, the test is straightforward.  For complex */
+/*  eigenvalues, E(j) and a(j) are complex, represented by */
+/*  Er(j) + i*Ei(j) and ar(j) + i*ai(j), resp., so the test for that */
+/*  eigenvector becomes */
 
-    using the 1-norm.  Here, a(j)/b(j) = w is the j-th generalized   
-    eigenvalue of A - w B, or, equivalently, b(j)/a(j) = m is the j-th   
-    generalized eigenvalue of m A - B.   
+/*                  max( |Wr|, |Wi| ) */
+/*      -------------------------------------------- */
+/*      n ulp max( |b(j) A|, (|ar(j)|+|ai(j)|) |B| ) */
 
-    For real eigenvalues, the test is straightforward.  For complex   
-    eigenvalues, E(j) and a(j) are complex, represented by   
-    Er(j) + i*Ei(j) and ar(j) + i*ai(j), resp., so the test for that   
-    eigenvector becomes   
+/*  where */
 
-                    max( |Wr|, |Wi| )   
-        --------------------------------------------   
-        n ulp max( |b(j) A|, (|ar(j)|+|ai(j)|) |B| )   
+/*      Wr = b(j) A Er(j) - ar(j) B Er(j) + ai(j) B Ei(j) */
 
-    where   
+/*      Wi = b(j) A Ei(j) - ai(j) B Er(j) - ar(j) B Ei(j) */
 
-        Wr = b(j) A Er(j) - ar(j) B Er(j) + ai(j) B Ei(j)   
+/*                          T   T  _ */
+/*  For left eigenvectors, A , B , a, and b  are used. */
 
-        Wi = b(j) A Ei(j) - ai(j) B Er(j) - ar(j) B Ei(j)   
+/*  SGET52 also tests the normalization of E.  Each eigenvector is */
+/*  supposed to be normalized so that the maximum "absolute value" */
+/*  of its elements is 1, where in this case, "absolute value" */
+/*  of a complex value x is  |Re(x)| + |Im(x)| ; let us call this */
+/*  maximum "absolute value" norm of a vector v  M(v). */
+/*  if a(j)=b(j)=0, then the eigenvector is set to be the jth coordinate */
+/*  vector.  The normalization test is: */
 
-                            T   T  _   
-    For left eigenvectors, A , B , a, and b  are used.   
+/*          RESULT(2) =      max       | M(v(j)) - 1 | / ( n ulp ) */
+/*                     eigenvectors v(j) */
 
-    SGET52 also tests the normalization of E.  Each eigenvector is   
-    supposed to be normalized so that the maximum "absolute value"   
-    of its elements is 1, where in this case, "absolute value"   
-    of a complex value x is  |Re(x)| + |Im(x)| ; let us call this   
-    maximum "absolute value" norm of a vector v  M(v).   
-    if a(j)=b(j)=0, then the eigenvector is set to be the jth coordinate   
-    vector.  The normalization test is:   
+/*  Arguments */
+/*  ========= */
 
-            RESULT(2) =      max       | M(v(j)) - 1 | / ( n ulp )   
-                       eigenvectors v(j)   
+/*  LEFT    (input) LOGICAL */
+/*          =.TRUE.:  The eigenvectors in the columns of E are assumed */
+/*                    to be *left* eigenvectors. */
+/*          =.FALSE.: The eigenvectors in the columns of E are assumed */
+/*                    to be *right* eigenvectors. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrices.  If it is zero, SGET52 does */
+/*          nothing.  It must be at least zero. */
 
-    LEFT    (input) LOGICAL   
-            =.TRUE.:  The eigenvectors in the columns of E are assumed   
-                      to be *left* eigenvectors.   
-            =.FALSE.: The eigenvectors in the columns of E are assumed   
-                      to be *right* eigenvectors.   
+/*  A       (input) REAL array, dimension (LDA, N) */
+/*          The matrix A. */
 
-    N       (input) INTEGER   
-            The size of the matrices.  If it is zero, SGET52 does   
-            nothing.  It must be at least zero.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least N. */
 
-    A       (input) REAL array, dimension (LDA, N)   
-            The matrix A.   
+/*  B       (input) REAL array, dimension (LDB, N) */
+/*          The matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least N.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 1 */
+/*          and at least N. */
 
-    B       (input) REAL array, dimension (LDB, N)   
-            The matrix B.   
+/*  E       (input) REAL array, dimension (LDE, N) */
+/*          The matrix of eigenvectors.  It must be O( 1 ).  Complex */
+/*          eigenvalues and eigenvectors always come in pairs, the */
+/*          eigenvalue and its conjugate being stored in adjacent */
+/*          elements of ALPHAR, ALPHAI, and BETA.  Thus, if a(j)/b(j) */
+/*          and a(j+1)/b(j+1) are a complex conjugate pair of */
+/*          generalized eigenvalues, then E(,j) contains the real part */
+/*          of the eigenvector and E(,j+1) contains the imaginary part. */
+/*          Note that whether E(,j) is a real eigenvector or part of a */
+/*          complex one is specified by whether ALPHAI(j) is zero or not. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 1   
-            and at least N.   
+/*  LDE     (input) INTEGER */
+/*          The leading dimension of E.  It must be at least 1 and at */
+/*          least N. */
 
-    E       (input) REAL array, dimension (LDE, N)   
-            The matrix of eigenvectors.  It must be O( 1 ).  Complex   
-            eigenvalues and eigenvectors always come in pairs, the   
-            eigenvalue and its conjugate being stored in adjacent   
-            elements of ALPHAR, ALPHAI, and BETA.  Thus, if a(j)/b(j)   
-            and a(j+1)/b(j+1) are a complex conjugate pair of   
-            generalized eigenvalues, then E(,j) contains the real part   
-            of the eigenvector and E(,j+1) contains the imaginary part.   
-            Note that whether E(,j) is a real eigenvector or part of a   
-            complex one is specified by whether ALPHAI(j) is zero or not.   
+/*  ALPHAR  (input) REAL array, dimension (N) */
+/*          The real parts of the values a(j) as described above, which, */
+/*          along with b(j), define the generalized eigenvalues. */
+/*          Complex eigenvalues always come in complex conjugate pairs */
+/*          a(j)/b(j) and a(j+1)/b(j+1), which are stored in adjacent */
+/*          elements in ALPHAR, ALPHAI, and BETA.  Thus, if the j-th */
+/*          and (j+1)-st eigenvalues form a pair, ALPHAR(j+1)/BETA(j+1) */
+/*          is assumed to be equal to ALPHAR(j)/BETA(j). */
 
-    LDE     (input) INTEGER   
-            The leading dimension of E.  It must be at least 1 and at   
-            least N.   
+/*  ALPHAI  (input) REAL array, dimension (N) */
+/*          The imaginary parts of the values a(j) as described above, */
+/*          which, along with b(j), define the generalized eigenvalues. */
+/*          If ALPHAI(j)=0, then the eigenvalue is real, otherwise it */
+/*          is part of a complex conjugate pair.  Complex eigenvalues */
+/*          always come in complex conjugate pairs a(j)/b(j) and */
+/*          a(j+1)/b(j+1), which are stored in adjacent elements in */
+/*          ALPHAR, ALPHAI, and BETA.  Thus, if the j-th and (j+1)-st */
+/*          eigenvalues form a pair, ALPHAI(j+1)/BETA(j+1) is assumed to */
+/*          be equal to  -ALPHAI(j)/BETA(j).  Also, nonzero values in */
+/*          ALPHAI are assumed to always come in adjacent pairs. */
 
-    ALPHAR  (input) REAL array, dimension (N)   
-            The real parts of the values a(j) as described above, which,   
-            along with b(j), define the generalized eigenvalues.   
-            Complex eigenvalues always come in complex conjugate pairs   
-            a(j)/b(j) and a(j+1)/b(j+1), which are stored in adjacent   
-            elements in ALPHAR, ALPHAI, and BETA.  Thus, if the j-th   
-            and (j+1)-st eigenvalues form a pair, ALPHAR(j+1)/BETA(j+1)   
-            is assumed to be equal to ALPHAR(j)/BETA(j).   
+/*  BETA    (input) REAL array, dimension (N) */
+/*          The values b(j) as described above, which, along with a(j), */
+/*          define the generalized eigenvalues. */
 
-    ALPHAI  (input) REAL array, dimension (N)   
-            The imaginary parts of the values a(j) as described above,   
-            which, along with b(j), define the generalized eigenvalues.   
-            If ALPHAI(j)=0, then the eigenvalue is real, otherwise it   
-            is part of a complex conjugate pair.  Complex eigenvalues   
-            always come in complex conjugate pairs a(j)/b(j) and   
-            a(j+1)/b(j+1), which are stored in adjacent elements in   
-            ALPHAR, ALPHAI, and BETA.  Thus, if the j-th and (j+1)-st   
-            eigenvalues form a pair, ALPHAI(j+1)/BETA(j+1) is assumed to   
-            be equal to  -ALPHAI(j)/BETA(j).  Also, nonzero values in   
-            ALPHAI are assumed to always come in adjacent pairs.   
+/*  WORK    (workspace) REAL array, dimension (N**2+N) */
 
-    BETA    (input) REAL array, dimension (N)   
-            The values b(j) as described above, which, along with a(j),   
-            define the generalized eigenvalues.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The values computed by the test described above.  If A E or */
+/*          B E is likely to overflow, then RESULT(1:2) is set to */
+/*          10 / ulp. */
 
-    WORK    (workspace) REAL array, dimension (N**2+N)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The values computed by the test described above.  If A E or   
-            B E is likely to overflow, then RESULT(1:2) is set to   
-            10 / ulp.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     e_dim1 = *lde;
-    e_offset = 1 + e_dim1 * 1;
+    e_offset = 1 + e_dim1;
     e -= e_offset;
     --alphar;
     --alphai;
@@ -204,9 +210,9 @@ static real c_b15 = 1.f;
 	*(unsigned char *)normab = 'O';
     }
 
-/*     Norm of A, B, and E:   
+/*     Norm of A, B, and E: */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = slange_(normab, n, n, &a[a_offset], lda, &work[1]);
     anorm = dmax(r__1,safmin);
 /* Computing MAX */
@@ -218,8 +224,8 @@ static real c_b15 = 1.f;
     alfmax = safmax / dmax(1.f,bnorm);
     betmax = safmax / dmax(1.f,anorm);
 
-/*     Compute error matrix.   
-       Column i = ( b(i) A - a(i) B ) E(i) / max( |a(i) B| |b(i) A| ) */
+/*     Compute error matrix. */
+/*     Column i = ( b(i) A - a(i) B ) E(i) / max( |a(i) B| |b(i) A| ) */
 
     ilcplx = FALSE_;
     i__1 = *n;
@@ -235,9 +241,9 @@ static real c_b15 = 1.f;
 	    sbeta = beta[jvec];
 	    if (salfi == 0.f) {
 
-/*              Real eigenvalue and -vector   
+/*              Real eigenvalue and -vector */
 
-   Computing MAX */
+/* Computing MAX */
 		r__1 = dabs(salfr), r__2 = dabs(sbeta);
 		abmax = dmax(r__1,r__2);
 		if (dabs(salfr) > alfmax || dabs(sbeta) > betmax || abmax < 
@@ -252,11 +258,13 @@ static real c_b15 = 1.f;
 		scale = 1.f / dmax(r__1,safmin);
 		acoef = scale * sbeta;
 		bcoefr = scale * salfr;
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec)
-			, &c__1, &c_b12, &work[*n * (jvec - 1) + 1], &c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[jvec * 
+			e_dim1 + 1], &c__1, &c_b12, &work[*n * (jvec - 1) + 1]
+, &c__1);
 		r__1 = -bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
-			 &c__1, &c_b15, &work[*n * (jvec - 1) + 1], &c__1);
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
+			e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 1]
+, &c__1);
 	    } else {
 
 /*              Complex conjugate pair */
@@ -287,23 +295,28 @@ static real c_b15 = 1.f;
 		    bcoefi = -bcoefi;
 		}
 
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec)
-			, &c__1, &c_b12, &work[*n * (jvec - 1) + 1], &c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[jvec * 
+			e_dim1 + 1], &c__1, &c_b12, &work[*n * (jvec - 1) + 1]
+, &c__1);
 		r__1 = -bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
-			 &c__1, &c_b15, &work[*n * (jvec - 1) + 1], &c__1);
-		sgemv_(trans, n, n, &bcoefi, &b[b_offset], lda, &e_ref(1, 
-			jvec + 1), &c__1, &c_b15, &work[*n * (jvec - 1) + 1], 
-			&c__1);
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
+			e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 1]
+, &c__1);
+		sgemv_(trans, n, n, &bcoefi, &b[b_offset], lda, &e[(jvec + 1) 
+			* e_dim1 + 1], &c__1, &c_b15, &work[*n * (jvec - 1) + 
+			1], &c__1);
 
-		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e_ref(1, jvec 
-			+ 1), &c__1, &c_b12, &work[*n * jvec + 1], &c__1);
+		sgemv_(trans, n, n, &acoef, &a[a_offset], lda, &e[(jvec + 1) *
+			 e_dim1 + 1], &c__1, &c_b12, &work[*n * jvec + 1], &
+			c__1);
 		r__1 = -bcoefi;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec),
-			 &c__1, &c_b15, &work[*n * jvec + 1], &c__1);
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[jvec * 
+			e_dim1 + 1], &c__1, &c_b15, &work[*n * jvec + 1], &
+			c__1);
 		r__1 = -bcoefr;
-		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e_ref(1, jvec 
-			+ 1), &c__1, &c_b15, &work[*n * jvec + 1], &c__1);
+		sgemv_(trans, n, n, &r__1, &b[b_offset], lda, &e[(jvec + 1) * 
+			e_dim1 + 1], &c__1, &c_b15, &work[*n * jvec + 1], &
+			c__1);
 	    }
 	}
 /* L10: */
@@ -331,7 +344,8 @@ static real c_b15 = 1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__2 = temp1, r__3 = (r__1 = e_ref(j, jvec), dabs(r__1));
+		    r__2 = temp1, r__3 = (r__1 = e[j + jvec * e_dim1], dabs(
+			    r__1));
 		    temp1 = dmax(r__2,r__3);
 /* L20: */
 		}
@@ -343,8 +357,9 @@ static real c_b15 = 1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = e_ref(j, jvec), dabs(r__1)) 
-			    + (r__2 = e_ref(j, jvec + 1), dabs(r__2));
+		    r__3 = temp1, r__4 = (r__1 = e[j + jvec * e_dim1], dabs(
+			    r__1)) + (r__2 = e[j + (jvec + 1) * e_dim1], dabs(
+			    r__2));
 		    temp1 = dmax(r__3,r__4);
 /* L30: */
 		}
@@ -365,7 +380,3 @@ static real c_b15 = 1.f;
 /*     End of SGET52 */
 
 } /* sget52_ */
-
-#undef e_ref
-
-

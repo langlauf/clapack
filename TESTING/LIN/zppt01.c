@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,76 +18,87 @@ static doublereal c_b19 = 1.;
     double d_imag(doublecomplex *);
 
     /* Local variables */
+    integer i__, k, kc;
+    doublecomplex tc;
+    doublereal tr, eps;
     extern /* Subroutine */ int zhpr_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *);
-    static integer i__, k;
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int zscal_(integer *, doublecomplex *, 
 	    doublecomplex *, integer *);
     extern /* Double Complex */ VOID zdotc_(doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *);
     extern /* Subroutine */ int ztpmv_(char *, char *, char *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *);
-    static integer kc;
-    static doublecomplex tc;
-    extern doublereal dlamch_(char *);
-    static doublereal tr;
-    extern doublereal zlanhp_(char *, char *, integer *, doublecomplex *, 
-	    doublereal *);
-    static doublereal eps;
+    extern doublereal dlamch_(char *), zlanhp_(char *, char *, 
+	    integer *, doublecomplex *, doublereal *);
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZPPT01 reconstructs a Hermitian positive definite packed matrix A   
-    from its L*L' or U'*U factorization and computes the residual   
-       norm( L*L' - A ) / ( N * norm(A) * EPS ) or   
-       norm( U'*U - A ) / ( N * norm(A) * EPS ),   
-    where EPS is the machine epsilon, L' is the conjugate transpose of   
-    L, and U' is the conjugate transpose of U.   
+/*  ZPPT01 reconstructs a Hermitian positive definite packed matrix A */
+/*  from its L*L' or U'*U factorization and computes the residual */
+/*     norm( L*L' - A ) / ( N * norm(A) * EPS ) or */
+/*     norm( U'*U - A ) / ( N * norm(A) * EPS ), */
+/*  where EPS is the machine epsilon, L' is the conjugate transpose of */
+/*  L, and U' is the conjugate transpose of U. */
 
-    Arguments   
-    ==========   
+/*  Arguments */
+/*  ========== */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            Hermitian matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          Hermitian matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    A       (input) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            The original Hermitian matrix A, stored as a packed   
-            triangular matrix.   
+/*  A       (input) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          The original Hermitian matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    AFAC    (input/output) COMPLEX*16 array, dimension (N*(N+1)/2)   
-            On entry, the factor L or U from the L*L' or U'*U   
-            factorization of A, stored as a packed triangular matrix.   
-            Overwritten with the reconstructed matrix, and then with the   
-            difference L*L' - A (or U'*U - A).   
+/*  AFAC    (input/output) COMPLEX*16 array, dimension (N*(N+1)/2) */
+/*          On entry, the factor L or U from the L*L' or U'*U */
+/*          factorization of A, stored as a packed triangular matrix. */
+/*          Overwritten with the reconstructed matrix, and then with the */
+/*          difference L*L' - A (or U'*U - A). */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    RESID   (output) DOUBLE PRECISION   
-            If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS )   
-            If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS )   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          If UPLO = 'L', norm(L*L' - A) / ( N * norm(A) * EPS ) */
+/*          If UPLO = 'U', norm(U'*U - A) / ( N * norm(A) * EPS ) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick exit if N = 0   
+/*     Quick exit if N = 0 */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --rwork;
     --afac;
     --a;
@@ -112,8 +118,8 @@ static doublereal c_b19 = 1.;
 	return 0;
     }
 
-/*     Check the imaginary parts of the diagonal elements and return with   
-       an error code if any are nonzero. */
+/*     Check the imaginary parts of the diagonal elements and return with */
+/*     an error code if any are nonzero. */
 
     kc = 1;
     if (lsame_(uplo, "U")) {
@@ -193,8 +199,8 @@ static doublereal c_b19 = 1.;
 	kc = *n * (*n + 1) / 2;
 	for (k = *n; k >= 1; --k) {
 
-/*           Add a multiple of column K of the factor L to each of   
-             columns K+1 through N. */
+/*           Add a multiple of column K of the factor L to each of */
+/*           columns K+1 through N. */
 
 	    if (k < *n) {
 		i__1 = *n - k;
@@ -250,4 +256,3 @@ static doublereal c_b19 = 1.;
 /*     End of ZPPT01 */
 
 } /* zppt01_ */
-

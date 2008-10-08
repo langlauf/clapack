@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,10 +21,9 @@ static integer c__3 = 3;
 	    doublereal), z_abs(doublecomplex *);
 
     /* Local variables */
-    static integer kbeg, isdb, kend, isde, klen, i__, k;
-    static doublereal alpha;
-    static doublecomplex ctemp;
-    static integer jc, jd, jr;
+    integer i__, k, jc, jd, jr, kbeg, isdb, kend, isde, klen;
+    doublereal alpha;
+    doublecomplex ctemp;
     extern doublereal dlaran_(integer *);
     extern /* Double Complex */ VOID zlarnd_(doublecomplex *, integer *, 
 	    integer *);
@@ -37,117 +31,127 @@ static integer c__3 = 3;
 	    doublecomplex *, doublecomplex *, doublecomplex *, integer *);
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZLATM4 generates basic square matrices, which may later be */
+/*  multiplied by others in order to produce test matrices.  It is */
+/*  intended mainly to be used to test the generalized eigenvalue */
+/*  routines. */
 
-    Purpose   
-    =======   
+/*  It first generates the diagonal and (possibly) subdiagonal, */
+/*  according to the value of ITYPE, NZ1, NZ2, RSIGN, AMAGN, and RCOND. */
+/*  It then fills in the upper triangle with random numbers, if TRIANG is */
+/*  non-zero. */
 
-    ZLATM4 generates basic square matrices, which may later be   
-    multiplied by others in order to produce test matrices.  It is   
-    intended mainly to be used to test the generalized eigenvalue   
-    routines.   
+/*  Arguments */
+/*  ========= */
 
-    It first generates the diagonal and (possibly) subdiagonal,   
-    according to the value of ITYPE, NZ1, NZ2, RSIGN, AMAGN, and RCOND.   
-    It then fills in the upper triangle with random numbers, if TRIANG is   
-    non-zero.   
+/*  ITYPE   (input) INTEGER */
+/*          The "type" of matrix on the diagonal and sub-diagonal. */
+/*          If ITYPE < 0, then type abs(ITYPE) is generated and then */
+/*             swapped end for end (A(I,J) := A'(N-J,N-I).)  See also */
+/*             the description of AMAGN and RSIGN. */
 
-    Arguments   
-    =========   
+/*          Special types: */
+/*          = 0:  the zero matrix. */
+/*          = 1:  the identity. */
+/*          = 2:  a transposed Jordan block. */
+/*          = 3:  If N is odd, then a k+1 x k+1 transposed Jordan block */
+/*                followed by a k x k identity block, where k=(N-1)/2. */
+/*                If N is even, then k=(N-2)/2, and a zero diagonal entry */
+/*                is tacked onto the end. */
 
-    ITYPE   (input) INTEGER   
-            The "type" of matrix on the diagonal and sub-diagonal.   
-            If ITYPE < 0, then type abs(ITYPE) is generated and then   
-               swapped end for end (A(I,J) := A'(N-J,N-I).)  See also   
-               the description of AMAGN and RSIGN.   
+/*          Diagonal types.  The diagonal consists of NZ1 zeros, then */
+/*             k=N-NZ1-NZ2 nonzeros.  The subdiagonal is zero.  ITYPE */
+/*             specifies the nonzero diagonal entries as follows: */
+/*          = 4:  1, ..., k */
+/*          = 5:  1, RCOND, ..., RCOND */
+/*          = 6:  1, ..., 1, RCOND */
+/*          = 7:  1, a, a^2, ..., a^(k-1)=RCOND */
+/*          = 8:  1, 1-d, 1-2*d, ..., 1-(k-1)*d=RCOND */
+/*          = 9:  random numbers chosen from (RCOND,1) */
+/*          = 10: random numbers with distribution IDIST (see ZLARND.) */
 
-            Special types:   
-            = 0:  the zero matrix.   
-            = 1:  the identity.   
-            = 2:  a transposed Jordan block.   
-            = 3:  If N is odd, then a k+1 x k+1 transposed Jordan block   
-                  followed by a k x k identity block, where k=(N-1)/2.   
-                  If N is even, then k=(N-2)/2, and a zero diagonal entry   
-                  is tacked onto the end.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix. */
 
-            Diagonal types.  The diagonal consists of NZ1 zeros, then   
-               k=N-NZ1-NZ2 nonzeros.  The subdiagonal is zero.  ITYPE   
-               specifies the nonzero diagonal entries as follows:   
-            = 4:  1, ..., k   
-            = 5:  1, RCOND, ..., RCOND   
-            = 6:  1, ..., 1, RCOND   
-            = 7:  1, a, a^2, ..., a^(k-1)=RCOND   
-            = 8:  1, 1-d, 1-2*d, ..., 1-(k-1)*d=RCOND   
-            = 9:  random numbers chosen from (RCOND,1)   
-            = 10: random numbers with distribution IDIST (see ZLARND.)   
+/*  NZ1     (input) INTEGER */
+/*          If abs(ITYPE) > 3, then the first NZ1 diagonal entries will */
+/*          be zero. */
 
-    N       (input) INTEGER   
-            The order of the matrix.   
+/*  NZ2     (input) INTEGER */
+/*          If abs(ITYPE) > 3, then the last NZ2 diagonal entries will */
+/*          be zero. */
 
-    NZ1     (input) INTEGER   
-            If abs(ITYPE) > 3, then the first NZ1 diagonal entries will   
-            be zero.   
+/*  RSIGN   (input) LOGICAL */
+/*          = .TRUE.:  The diagonal and subdiagonal entries will be */
+/*                     multiplied by random numbers of magnitude 1. */
+/*          = .FALSE.: The diagonal and subdiagonal entries will be */
+/*                     left as they are (usually non-negative real.) */
 
-    NZ2     (input) INTEGER   
-            If abs(ITYPE) > 3, then the last NZ2 diagonal entries will   
-            be zero.   
+/*  AMAGN   (input) DOUBLE PRECISION */
+/*          The diagonal and subdiagonal entries will be multiplied by */
+/*          AMAGN. */
 
-    RSIGN   (input) LOGICAL   
-            = .TRUE.:  The diagonal and subdiagonal entries will be   
-                       multiplied by random numbers of magnitude 1.   
-            = .FALSE.: The diagonal and subdiagonal entries will be   
-                       left as they are (usually non-negative real.)   
+/*  RCOND   (input) DOUBLE PRECISION */
+/*          If abs(ITYPE) > 4, then the smallest diagonal entry will be */
+/*          RCOND.  RCOND must be between 0 and 1. */
 
-    AMAGN   (input) DOUBLE PRECISION   
-            The diagonal and subdiagonal entries will be multiplied by   
-            AMAGN.   
+/*  TRIANG  (input) DOUBLE PRECISION */
+/*          The entries above the diagonal will be random numbers with */
+/*          magnitude bounded by TRIANG (i.e., random numbers multiplied */
+/*          by TRIANG.) */
 
-    RCOND   (input) DOUBLE PRECISION   
-            If abs(ITYPE) > 4, then the smallest diagonal entry will be   
-            RCOND.  RCOND must be between 0 and 1.   
+/*  IDIST   (input) INTEGER */
+/*          On entry, DIST specifies the type of distribution to be used */
+/*          to generate a random matrix . */
+/*          = 1: real and imaginary parts each UNIFORM( 0, 1 ) */
+/*          = 2: real and imaginary parts each UNIFORM( -1, 1 ) */
+/*          = 3: real and imaginary parts each NORMAL( 0, 1 ) */
+/*          = 4: complex number uniform in DISK( 0, 1 ) */
 
-    TRIANG  (input) DOUBLE PRECISION   
-            The entries above the diagonal will be random numbers with   
-            magnitude bounded by TRIANG (i.e., random numbers multiplied   
-            by TRIANG.)   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator.  The values of ISEED are changed on exit, and can */
+/*          be used in the next call to ZLATM4 to continue the same */
+/*          random number sequence. */
+/*          Note: ISEED(4) should be odd, for the random number generator */
+/*          used at present. */
 
-    IDIST   (input) INTEGER   
-            On entry, DIST specifies the type of distribution to be used   
-            to generate a random matrix .   
-            = 1: real and imaginary parts each UNIFORM( 0, 1 )   
-            = 2: real and imaginary parts each UNIFORM( -1, 1 )   
-            = 3: real and imaginary parts each NORMAL( 0, 1 )   
-            = 4: complex number uniform in DISK( 0, 1 )   
+/*  A       (output) COMPLEX*16 array, dimension (LDA, N) */
+/*          Array to be computed. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator.  The values of ISEED are changed on exit, and can   
-            be used in the next call to ZLATM4 to continue the same   
-            random number sequence.   
-            Note: ISEED(4) should be odd, for the random number generator   
-            used at present.   
+/*  LDA     (input) INTEGER */
+/*          Leading dimension of A.  Must be at least 1 and at least N. */
 
-    A       (output) COMPLEX*16 array, dimension (LDA, N)   
-            Array to be computed.   
+/*  ===================================================================== */
 
-    LDA     (input) INTEGER   
-            Leading dimension of A.  Must be at least 1 and at least N.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
 
     /* Function Body */
@@ -162,18 +166,18 @@ static integer c__3 = 3;
 	++iseed[4];
     }
 
-/*     Compute diagonal and subdiagonal according to ITYPE, NZ1, NZ2,   
-       and RCOND */
+/*     Compute diagonal and subdiagonal according to ITYPE, NZ1, NZ2, */
+/*     and RCOND */
 
     if (*itype != 0) {
 	if (abs(*itype) >= 4) {
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	    i__3 = *n, i__4 = *nz1 + 1;
 	    i__1 = 1, i__2 = min(i__3,i__4);
 	    kbeg = max(i__1,i__2);
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	    i__3 = *n, i__4 = *n - *nz2;
 	    i__1 = kbeg, i__2 = min(i__3,i__4);
 	    kend = max(i__1,i__2);
@@ -203,7 +207,7 @@ static integer c__3 = 3;
 L10:
 	i__1 = *n;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 /* L20: */
 	}
@@ -214,7 +218,7 @@ L10:
 L30:
 	i__1 = *n - 1;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd + 1, jd);
+	    i__2 = jd + 1 + jd * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 /* L40: */
 	}
@@ -222,14 +226,14 @@ L30:
 	isde = *n - 1;
 	goto L220;
 
-/*        abs(ITYPE) = 3: Transposed Jordan block, followed by the   
-                          identity. */
+/*        abs(ITYPE) = 3: Transposed Jordan block, followed by the */
+/*                        identity. */
 
 L50:
 	k = (*n - 1) / 2;
 	i__1 = k;
 	for (jd = 1; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd + 1, jd);
+	    i__2 = jd + 1 + jd * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 /* L60: */
 	}
@@ -237,7 +241,7 @@ L50:
 	isde = k;
 	i__1 = (k << 1) + 1;
 	for (jd = k + 2; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 /* L70: */
 	}
@@ -248,7 +252,7 @@ L50:
 L80:
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    i__3 = jd - *nz1;
 	    z__1.r = (doublereal) i__3, z__1.i = 0.;
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -261,12 +265,12 @@ L80:
 L100:
 	i__1 = kend;
 	for (jd = kbeg + 1; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    z__1.r = *rcond, z__1.i = 0.;
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L110: */
 	}
-	i__1 = a_subscr(kbeg, kbeg);
+	i__1 = kbeg + kbeg * a_dim1;
 	a[i__1].r = 1., a[i__1].i = 0.;
 	goto L220;
 
@@ -275,11 +279,11 @@ L100:
 L120:
 	i__1 = kend - 1;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    a[i__2].r = 1., a[i__2].i = 0.;
 /* L130: */
 	}
-	i__1 = a_subscr(kend, kend);
+	i__1 = kend + kend * a_dim1;
 	z__1.r = *rcond, z__1.i = 0.;
 	a[i__1].r = z__1.r, a[i__1].i = z__1.i;
 	goto L220;
@@ -287,14 +291,14 @@ L120:
 /*        abs(ITYPE) = 7: Exponentially distributed D values: */
 
 L140:
-	i__1 = a_subscr(kbeg, kbeg);
+	i__1 = kbeg + kbeg * a_dim1;
 	a[i__1].r = 1., a[i__1].i = 0.;
 	if (klen > 1) {
 	    d__1 = 1. / (doublereal) (klen - 1);
 	    alpha = pow_dd(rcond, &d__1);
 	    i__1 = klen;
 	    for (i__ = 2; i__ <= i__1; ++i__) {
-		i__2 = a_subscr(*nz1 + i__, *nz1 + i__);
+		i__2 = *nz1 + i__ + (*nz1 + i__) * a_dim1;
 		d__2 = (doublereal) (i__ - 1);
 		d__1 = pow_dd(&alpha, &d__2);
 		z__1.r = d__1, z__1.i = 0.;
@@ -307,13 +311,13 @@ L140:
 /*        abs(ITYPE) = 8: Arithmetically distributed D values: */
 
 L160:
-	i__1 = a_subscr(kbeg, kbeg);
+	i__1 = kbeg + kbeg * a_dim1;
 	a[i__1].r = 1., a[i__1].i = 0.;
 	if (klen > 1) {
 	    alpha = (1. - *rcond) / (doublereal) (klen - 1);
 	    i__1 = klen;
 	    for (i__ = 2; i__ <= i__1; ++i__) {
-		i__2 = a_subscr(*nz1 + i__, *nz1 + i__);
+		i__2 = *nz1 + i__ + (*nz1 + i__) * a_dim1;
 		d__1 = (doublereal) (klen - i__) * alpha + *rcond;
 		z__1.r = d__1, z__1.i = 0.;
 		a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -328,7 +332,7 @@ L180:
 	alpha = log(*rcond);
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    d__1 = exp(alpha * dlaran_(&iseed[1]));
 	    a[i__2].r = d__1, a[i__2].i = 0.;
 /* L190: */
@@ -340,7 +344,7 @@ L180:
 L200:
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
 	    zlarnd_(&z__1, idist, &iseed[1]);
 	    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
 /* L210: */
@@ -352,36 +356,36 @@ L220:
 
 	i__1 = kend;
 	for (jd = kbeg; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd, jd);
-	    i__3 = a_subscr(jd, jd);
+	    i__2 = jd + jd * a_dim1;
+	    i__3 = jd + jd * a_dim1;
 	    d__1 = *amagn * a[i__3].r;
 	    a[i__2].r = d__1, a[i__2].i = 0.;
 /* L230: */
 	}
 	i__1 = isde;
 	for (jd = isdb; jd <= i__1; ++jd) {
-	    i__2 = a_subscr(jd + 1, jd);
-	    i__3 = a_subscr(jd + 1, jd);
+	    i__2 = jd + 1 + jd * a_dim1;
+	    i__3 = jd + 1 + jd * a_dim1;
 	    d__1 = *amagn * a[i__3].r;
 	    a[i__2].r = d__1, a[i__2].i = 0.;
 /* L240: */
 	}
 
-/*        If RSIGN = .TRUE., assign random signs to diagonal and   
-          subdiagonal */
+/*        If RSIGN = .TRUE., assign random signs to diagonal and */
+/*        subdiagonal */
 
 	if (*rsign) {
 	    i__1 = kend;
 	    for (jd = kbeg; jd <= i__1; ++jd) {
-		i__2 = a_subscr(jd, jd);
+		i__2 = jd + jd * a_dim1;
 		if (a[i__2].r != 0.) {
 		    zlarnd_(&z__1, &c__3, &iseed[1]);
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
 		    d__1 = z_abs(&ctemp);
 		    z__1.r = ctemp.r / d__1, z__1.i = ctemp.i / d__1;
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
-		    i__2 = a_subscr(jd, jd);
-		    i__3 = a_subscr(jd, jd);
+		    i__2 = jd + jd * a_dim1;
+		    i__3 = jd + jd * a_dim1;
 		    d__1 = a[i__3].r;
 		    z__1.r = d__1 * ctemp.r, z__1.i = d__1 * ctemp.i;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -390,15 +394,15 @@ L220:
 	    }
 	    i__1 = isde;
 	    for (jd = isdb; jd <= i__1; ++jd) {
-		i__2 = a_subscr(jd + 1, jd);
+		i__2 = jd + 1 + jd * a_dim1;
 		if (a[i__2].r != 0.) {
 		    zlarnd_(&z__1, &c__3, &iseed[1]);
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
 		    d__1 = z_abs(&ctemp);
 		    z__1.r = ctemp.r / d__1, z__1.i = ctemp.i / d__1;
 		    ctemp.r = z__1.r, ctemp.i = z__1.i;
-		    i__2 = a_subscr(jd + 1, jd);
-		    i__3 = a_subscr(jd + 1, jd);
+		    i__2 = jd + 1 + jd * a_dim1;
+		    i__3 = jd + 1 + jd * a_dim1;
 		    d__1 = a[i__3].r;
 		    z__1.r = d__1 * ctemp.r, z__1.i = d__1 * ctemp.i;
 		    a[i__2].r = z__1.r, a[i__2].i = z__1.i;
@@ -412,23 +416,23 @@ L220:
 	if (*itype < 0) {
 	    i__1 = (kbeg + kend - 1) / 2;
 	    for (jd = kbeg; jd <= i__1; ++jd) {
-		i__2 = a_subscr(jd, jd);
+		i__2 = jd + jd * a_dim1;
 		ctemp.r = a[i__2].r, ctemp.i = a[i__2].i;
-		i__2 = a_subscr(jd, jd);
-		i__3 = a_subscr(kbeg + kend - jd, kbeg + kend - jd);
+		i__2 = jd + jd * a_dim1;
+		i__3 = kbeg + kend - jd + (kbeg + kend - jd) * a_dim1;
 		a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
-		i__2 = a_subscr(kbeg + kend - jd, kbeg + kend - jd);
+		i__2 = kbeg + kend - jd + (kbeg + kend - jd) * a_dim1;
 		a[i__2].r = ctemp.r, a[i__2].i = ctemp.i;
 /* L270: */
 	    }
 	    i__1 = (*n - 1) / 2;
 	    for (jd = 1; jd <= i__1; ++jd) {
-		i__2 = a_subscr(jd + 1, jd);
+		i__2 = jd + 1 + jd * a_dim1;
 		ctemp.r = a[i__2].r, ctemp.i = a[i__2].i;
-		i__2 = a_subscr(jd + 1, jd);
-		i__3 = a_subscr(*n + 1 - jd, *n - jd);
+		i__2 = jd + 1 + jd * a_dim1;
+		i__3 = *n + 1 - jd + (*n - jd) * a_dim1;
 		a[i__2].r = a[i__3].r, a[i__2].i = a[i__3].i;
-		i__2 = a_subscr(*n + 1 - jd, *n - jd);
+		i__2 = *n + 1 - jd + (*n - jd) * a_dim1;
 		a[i__2].r = ctemp.r, a[i__2].i = ctemp.i;
 /* L280: */
 	    }
@@ -443,7 +447,7 @@ L220:
 	for (jc = 2; jc <= i__1; ++jc) {
 	    i__2 = jc - 1;
 	    for (jr = 1; jr <= i__2; ++jr) {
-		i__3 = a_subscr(jr, jc);
+		i__3 = jr + jc * a_dim1;
 		zlarnd_(&z__2, idist, &iseed[1]);
 		z__1.r = *triang * z__2.r, z__1.i = *triang * z__2.i;
 		a[i__3].r = z__1.r, a[i__3].i = z__1.i;
@@ -458,8 +462,3 @@ L220:
 /*     End of ZLATM4 */
 
 } /* zlatm4_ */
-
-#undef a_ref
-#undef a_subscr
-
-

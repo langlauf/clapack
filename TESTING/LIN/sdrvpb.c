@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -57,84 +52,82 @@ static real c_b46 = 1.f;
     integer i__1, i__2, i__3, i__4, i__5, i__6, i__7[2];
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static integer ldab;
-    static char fact[1];
-    static integer ioff, mode, koff;
-    static real amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1], uplo[1], type__[1];
-    static integer nrun, i__, k, n, ifact, nfail, iseed[4], nfact, kdval[4];
+    integer i__, k, n, i1, i2, k1, kd, nb, in, kl, iw, ku, nt, lda, ikd, nkd, 
+	    ldab;
+    char fact[1];
+    integer ioff, mode, koff;
+    real amax;
+    char path[3];
+    integer imat, info;
+    char dist[1], uplo[1], type__[1];
+    integer nrun, ifact, nfail, iseed[4], nfact, kdval[4];
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static integer nbmin;
-    static real rcond, roldc, scond;
-    static integer nimat;
+    char equed[1];
+    integer nbmin;
+    real rcond, roldc, scond;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *), spbt01_(char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int spbt02_(char *, integer *, integer *, integer 
 	    *, real *, integer *, real *, integer *, real *, integer *, real *
-	    , real *), spbt05_(char *, integer *, integer *, integer *
-	    , real *, integer *, real *, integer *, real *, integer *, real *,
+, real *), spbt05_(char *, integer *, integer *, integer *
+, real *, integer *, real *, integer *, real *, integer *, real *, 
 	     integer *, real *, real *, real *);
-    static logical equil;
-    static integer iuplo, izero, i1, i2, k1, nerrs;
+    logical equil;
+    integer iuplo, izero, nerrs;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *), spbsv_(char *, integer *, integer *, integer *, real *
-	    , integer *, real *, integer *, integer *), sswap_(
+, integer *, real *, integer *, integer *), sswap_(
 	    integer *, real *, integer *, real *, integer *);
-    static logical zerot;
-    static char xtype[1];
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int slatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    ), aladhd_(integer *, char *);
-    static integer kd, nb, in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static logical prefac;
-    static integer iw, ku, nt;
-    static real rcondc;
-    extern doublereal slange_(char *, integer *, integer *, real *, integer *,
+), aladhd_(integer *, char *), 
+	    alaerh_(char *, char *, integer *, integer *, char *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *);
+    logical prefac;
+    real rcondc;
+    extern doublereal slange_(char *, integer *, integer *, real *, integer *, 
 	     real *);
-    static logical nofact;
-    static char packit[1];
-    static integer iequed;
+    logical nofact;
+    char packit[1];
+    integer iequed;
     extern doublereal slansb_(char *, char *, integer *, integer *, real *, 
 	    integer *, real *);
-    static real cndnum;
+    real cndnum;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *), slaqsb_(char *, integer *, integer *, real 
 	    *, integer *, real *, real *, real *, char *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), slarhs_(char *, char *, 
 	    char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , integer *, integer *), slaset_(
+, integer *, integer *), slaset_(
 	    char *, integer *, integer *, real *, real *, real *, integer *), spbequ_(char *, integer *, integer *, real *, integer *, 
 	    real *, real *, real *, integer *), spbtrf_(char *, 
 	    integer *, integer *, real *, integer *, integer *), 
 	    xlaenv_(integer *, integer *), slatms_(integer *, integer *, char 
 	    *, integer *, char *, real *, integer *, real *, real *, integer *
-	    , integer *, char *, real *, integer *, real *, integer *), spbtrs_(char *, integer *, integer *, integer *,
+, integer *, char *, real *, integer *, real *, integer *), spbtrs_(char *, integer *, integer *, integer *, 
 	     real *, integer *, real *, integer *, integer *);
-    static real result[6];
+    real result[6];
     extern /* Subroutine */ int spbsvx_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, char *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, real *, 
 	    real *, integer *, integer *), serrvx_(
 	    char *, integer *);
-    static integer lda, ikd, nkd;
 
     /* Fortran I/O blocks */
     static cilist io___57 = { 0, 0, 0, fmt_9999, 0 };
@@ -143,76 +136,96 @@ static real c_b46 = 1.f;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SDRVPB tests the driver routines SPBSV and -SVX.   
+/*  SDRVPB tests the driver routines SPBSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  A       (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    ASAV    (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  ASAV    (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    B       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  B       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    X       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  X       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    S       (workspace) REAL array, dimension (NMAX)   
+/*  S       (workspace) REAL array, dimension (NMAX) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS)   
+/*  RWORK   (workspace) REAL array, dimension (NMAX+2*NRHS) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -227,9 +240,11 @@ static real c_b46 = 1.f;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PB", (ftnlen)2, (ftnlen)2);
@@ -264,9 +279,9 @@ static real c_b46 = 1.f;
 	lda = max(n,1);
 	*(unsigned char *)xtype = 'N';
 
-/*        Set limits on the number of loop iterations.   
+/*        Set limits on the number of loop iterations. */
 
-   Computing MAX */
+/* Computing MAX */
 	i__2 = 1, i__3 = min(n,4);
 	nkd = max(i__2,i__3);
 	nimat = 8;
@@ -281,9 +296,9 @@ static real c_b46 = 1.f;
 	i__2 = nkd;
 	for (ikd = 1; ikd <= i__2; ++ikd) {
 
-/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This order   
-             makes it easier to skip redundant values for small values   
-             of N. */
+/*           Do for KD = 0, (5*N+1)/4, (3N-1)/4, and (N+1)/4. This order */
+/*           makes it easier to skip redundant values for small values */
+/*           of N. */
 
 	    kd = kdval[ikd - 1];
 	    ldab = kd + 1;
@@ -321,15 +336,15 @@ static real c_b46 = 1.f;
 
 		    if (! zerot || ! dotype[1]) {
 
-/*                    Set up parameters with SLATB4 and generate a test   
-                      matrix with SLATMS. */
+/*                    Set up parameters with SLATB4 and generate a test */
+/*                    matrix with SLATMS. */
 
-			slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm,
+			slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, 
 				 &mode, &cndnum, dist);
 
 			s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)
 				6);
-			slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode,
+			slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, 
 				 &cndnum, &anorm, &kd, &kd, packit, &a[koff], 
 				&ldab, &work[1], &info);
 
@@ -343,8 +358,8 @@ static real c_b46 = 1.f;
 			}
 		    } else if (izero > 0) {
 
-/*                    Use the same matrix for types 3 and 4 as for type   
-                      2 by copying back the zeroed out column, */
+/*                    Use the same matrix for types 3 and 4 as for type */
+/*                    2 by copying back the zeroed out column, */
 
 			iw = (lda << 1) + 1;
 			if (iuplo == 1) {
@@ -373,8 +388,8 @@ static real c_b46 = 1.f;
 			}
 		    }
 
-/*                 For types 2-4, zero one row and column of the matrix   
-                   to test that INFO is returned correctly. */
+/*                 For types 2-4, zero one row and column of the matrix */
+/*                 to test that INFO is returned correctly. */
 
 		    izero = 0;
 		    if (zerot) {
@@ -460,18 +475,18 @@ static real c_b46 = 1.f;
 
 			    } else if (! lsame_(fact, "N")) {
 
-/*                          Compute the condition number for comparison   
-                            with the value returned by SPBSVX (FACT =   
-                            'N' reuses the condition number from the   
-                            previous iteration with FACT = 'F'). */
+/*                          Compute the condition number for comparison */
+/*                          with the value returned by SPBSVX (FACT = */
+/*                          'N' reuses the condition number from the */
+/*                          previous iteration with FACT = 'F'). */
 
 				i__5 = kd + 1;
 				slacpy_("Full", &i__5, &n, &asav[1], &ldab, &
 					afac[1], &ldab);
 				if (equil || iequed > 1) {
 
-/*                             Compute row and column scale factors to   
-                               equilibrate the matrix A. */
+/*                             Compute row and column scale factors to */
+/*                             equilibrate the matrix A. */
 
 				    spbequ_(uplo, &n, &kd, &afac[1], &ldab, &
 					    s[1], &scond, &amax, &info);
@@ -488,8 +503,8 @@ static real c_b46 = 1.f;
 				    }
 				}
 
-/*                          Save the condition number of the   
-                            non-equilibrated system for use in SGET04. */
+/*                          Save the condition number of the */
+/*                          non-equilibrated system for use in SGET04. */
 
 				if (equil) {
 				    roldc = rcondc;
@@ -506,7 +521,7 @@ static real c_b46 = 1.f;
 
 /*                          Form the inverse of A. */
 
-				slaset_("Full", &n, &n, &c_b45, &c_b46, &a[1],
+				slaset_("Full", &n, &n, &c_b45, &c_b46, &a[1], 
 					 &lda);
 				s_copy(srnamc_1.srnamt, "SPBTRS", (ftnlen)6, (
 					ftnlen)6);
@@ -527,16 +542,16 @@ static real c_b46 = 1.f;
 /*                       Restore the matrix A. */
 
 			    i__5 = kd + 1;
-			    slacpy_("Full", &i__5, &n, &asav[1], &ldab, &a[1],
+			    slacpy_("Full", &i__5, &n, &asav[1], &ldab, &a[1], 
 				     &ldab);
 
-/*                       Form an exact solution and set the right hand   
-                         side. */
+/*                       Form an exact solution and set the right hand */
+/*                       side. */
 
 			    s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (
 				    ftnlen)6);
 			    slarhs_(path, xtype, uplo, " ", &n, &n, &kd, &kd, 
-				    nrhs, &a[1], &ldab, &xact[1], &lda, &b[1],
+				    nrhs, &a[1], &ldab, &xact[1], &lda, &b[1], 
 				     &lda, iseed, &info);
 			    *(unsigned char *)xtype = 'C';
 			    slacpy_("Full", &n, nrhs, &b[1], &lda, &bsav[1], &
@@ -544,10 +559,10 @@ static real c_b46 = 1.f;
 
 			    if (nofact) {
 
-/*                          --- Test SPBSV  ---   
+/*                          --- Test SPBSV  --- */
 
-                            Compute the L*L' or U'*U factorization of the   
-                            matrix and solve the system. */
+/*                          Compute the L*L' or U'*U factorization of the */
+/*                          matrix and solve the system. */
 
 				i__5 = kd + 1;
 				slacpy_("Full", &i__5, &n, &a[1], &ldab, &
@@ -571,10 +586,10 @@ static real c_b46 = 1.f;
 				    goto L40;
 				}
 
-/*                          Reconstruct matrix from factors and compute   
-                            residual. */
+/*                          Reconstruct matrix from factors and compute */
+/*                          residual. */
 
-				spbt01_(uplo, &n, &kd, &a[1], &ldab, &afac[1],
+				spbt01_(uplo, &n, &kd, &a[1], &ldab, &afac[1], 
 					 &ldab, &rwork[1], result);
 
 /*                          Compute residual of the computed solution. */
@@ -587,12 +602,12 @@ static real c_b46 = 1.f;
 
 /*                          Check solution from generated exact solution. */
 
-				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				sget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 				nt = 3;
 
-/*                          Print information about the tests that did   
-                            not pass the threshold. */
+/*                          Print information about the tests that did */
+/*                          not pass the threshold. */
 
 				i__5 = nt;
 				for (k = 1; k <= i__5; ++k) {
@@ -635,20 +650,20 @@ L40:
 				    lda);
 			    if (iequed > 1 && n > 0) {
 
-/*                          Equilibrate the matrix if FACT='F' and   
-                            EQUED='Y' */
+/*                          Equilibrate the matrix if FACT='F' and */
+/*                          EQUED='Y' */
 
 				slaqsb_(uplo, &n, &kd, &a[1], &ldab, &s[1], &
 					scond, &amax, equed);
 			    }
 
-/*                       Solve the system and compute the condition   
-                         number and error bounds using SPBSVX. */
+/*                       Solve the system and compute the condition */
+/*                       number and error bounds using SPBSVX. */
 
 			    s_copy(srnamc_1.srnamt, "SPBSVX", (ftnlen)6, (
 				    ftnlen)6);
 			    spbsvx_(fact, uplo, &n, &kd, nrhs, &a[1], &ldab, &
-				    afac[1], &ldab, equed, &s[1], &b[1], &lda,
+				    afac[1], &ldab, equed, &s[1], &b[1], &lda, 
 				     &x[1], &lda, &rcond, &rwork[1], &rwork[*
 				    nrhs + 1], &work[1], &iwork[1], &info);
 
@@ -660,7 +675,7 @@ L40:
 				i__7[1] = 1, a__1[1] = uplo;
 				s_cat(ch__1, a__1, i__7, &c__2, (ftnlen)2);
 				alaerh_(path, "SPBSVX", &info, &izero, ch__1, 
-					&n, &n, &kd, &kd, nrhs, &imat, &nfail,
+					&n, &n, &kd, &kd, nrhs, &imat, &nfail, 
 					 &nerrs, nout);
 				goto L60;
 			    }
@@ -668,8 +683,8 @@ L40:
 			    if (info == 0) {
 				if (! prefac) {
 
-/*                             Reconstruct matrix from factors and   
-                               compute residual. */
+/*                             Reconstruct matrix from factors and */
+/*                             compute residual. */
 
 				    spbt01_(uplo, &n, &kd, &a[1], &ldab, &
 					    afac[1], &ldab, &rwork[(*nrhs << 
@@ -697,8 +712,8 @@ L40:
 					    lda, &roldc, &result[2]);
 				}
 
-/*                          Check the error bounds from iterative   
-                            refinement. */
+/*                          Check the error bounds from iterative */
+/*                          refinement. */
 
 				spbt05_(uplo, &n, &kd, nrhs, &asav[1], &ldab, 
 					&b[1], &lda, &x[1], &lda, &xact[1], &
@@ -708,13 +723,13 @@ L40:
 				k1 = 6;
 			    }
 
-/*                       Compare RCOND from SPBSVX with the computed   
-                         value in RCONDC. */
+/*                       Compare RCOND from SPBSVX with the computed */
+/*                       value in RCONDC. */
 
 			    result[5] = sget06_(&rcond, &rcondc);
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = k1; k <= 6; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -786,4 +801,3 @@ L80:
 /*     End of SDRVPB */
 
 } /* sdrvpb_ */
-

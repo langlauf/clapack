@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -29,17 +24,18 @@ static real c_b21 = 1.f;
     integer a_dim1, a_offset, af_dim1, af_offset, l_dim1, l_offset, q_dim1, 
 	    q_offset, i__1, i__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real resid;
+    real eps;
+    integer info;
+    real resid;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static real anorm;
-    static integer minmn;
+    real anorm;
+    integer minmn;
     extern /* Subroutine */ int ssyrk_(char *, char *, integer *, integer *, 
 	    real *, real *, integer *, real *, real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
@@ -52,85 +48,97 @@ static real c_b21 = 1.f;
 	    *, integer *, real *, real *, integer *, integer *);
     extern doublereal slansy_(char *, char *, integer *, real *, integer *, 
 	    real *);
-    static real eps;
 
 
-#define l_ref(a_1,a_2) l[(a_2)*l_dim1 + a_1]
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SQLT01 tests SGEQLF, which computes the QL factorization of an m-by-n */
+/*  matrix A, and partially tests SORGQL which forms the m-by-m */
+/*  orthogonal matrix Q. */
 
-    Purpose   
-    =======   
+/*  SQLT01 compares L with Q'*A, and checks that Q is orthogonal. */
 
-    SQLT01 tests SGEQLF, which computes the QL factorization of an m-by-n   
-    matrix A, and partially tests SORGQL which forms the m-by-m   
-    orthogonal matrix Q.   
+/*  Arguments */
+/*  ========= */
 
-    SQLT01 compares L with Q'*A, and checks that Q is orthogonal.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The m-by-n matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  AF      (output) REAL array, dimension (LDA,N) */
+/*          Details of the QL factorization of A, as returned by SGEQLF. */
+/*          See SGEQLF for further details. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The m-by-n matrix A.   
+/*  Q       (output) REAL array, dimension (LDA,M) */
+/*          The m-by-m orthogonal matrix Q. */
 
-    AF      (output) REAL array, dimension (LDA,N)   
-            Details of the QL factorization of A, as returned by SGEQLF.   
-            See SGEQLF for further details.   
+/*  L       (workspace) REAL array, dimension (LDA,max(M,N)) */
 
-    Q       (output) REAL array, dimension (LDA,M)   
-            The m-by-m orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    L       (workspace) REAL array, dimension (LDA,max(M,N))   
+/*  TAU     (output) REAL array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by SGEQLF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    TAU     (output) REAL array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by SGEQLF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (M) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS ) */
+/*          RESULT(2) = norm( I - Q'*Q ) / ( M * EPS ) */
 
-    RWORK   (workspace) REAL array, dimension (M)   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            The test ratios:   
-            RESULT(1) = norm( L - Q'*A ) / ( M * norm(A) * EPS )   
-            RESULT(2) = norm( I - Q'*Q ) / ( M * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     l_dim1 = *lda;
-    l_offset = 1 + l_dim1 * 1;
+    l_offset = 1 + l_dim1;
     l -= l_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -156,21 +164,21 @@ static real c_b21 = 1.f;
     if (*m >= *n) {
 	if (*n < *m && *n > 0) {
 	    i__1 = *m - *n;
-	    slacpy_("Full", &i__1, n, &af[af_offset], lda, &q_ref(1, *m - *n 
-		    + 1), lda);
+	    slacpy_("Full", &i__1, n, &af[af_offset], lda, &q[(*m - *n + 1) * 
+		    q_dim1 + 1], lda);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    slacpy_("Upper", &i__1, &i__2, &af_ref(*m - *n + 1, 2), lda, &
-		    q_ref(*m - *n + 1, *m - *n + 2), lda);
+	    slacpy_("Upper", &i__1, &i__2, &af[*m - *n + 1 + (af_dim1 << 1)], 
+		    lda, &q[*m - *n + 1 + (*m - *n + 2) * q_dim1], lda);
 	}
     } else {
 	if (*m > 1) {
 	    i__1 = *m - 1;
 	    i__2 = *m - 1;
-	    slacpy_("Upper", &i__1, &i__2, &af_ref(1, *n - *m + 2), lda, &
-		    q_ref(1, 2), lda);
+	    slacpy_("Upper", &i__1, &i__2, &af[(*n - *m + 2) * af_dim1 + 1], 
+		    lda, &q[(q_dim1 << 1) + 1], lda);
 	}
     }
 
@@ -184,8 +192,8 @@ static real c_b21 = 1.f;
     slaset_("Full", m, n, &c_b13, &c_b13, &l[l_offset], lda);
     if (*m >= *n) {
 	if (*n > 0) {
-	    slacpy_("Lower", n, n, &af_ref(*m - *n + 1, 1), lda, &l_ref(*m - *
-		    n + 1, 1), lda);
+	    slacpy_("Lower", n, n, &af[*m - *n + 1 + af_dim1], lda, &l[*m - *
+		    n + 1 + l_dim1], lda);
 	}
     } else {
 	if (*n > *m && *m > 0) {
@@ -193,8 +201,8 @@ static real c_b21 = 1.f;
 	    slacpy_("Full", m, &i__1, &af[af_offset], lda, &l[l_offset], lda);
 	}
 	if (*m > 0) {
-	    slacpy_("Lower", m, m, &af_ref(1, *n - *m + 1), lda, &l_ref(1, *n 
-		    - *m + 1), lda);
+	    slacpy_("Lower", m, m, &af[(*n - *m + 1) * af_dim1 + 1], lda, &l[(
+		    *n - *m + 1) * l_dim1 + 1], lda);
 	}
     }
 
@@ -230,9 +238,3 @@ static real c_b21 = 1.f;
 /*     End of SQLT01 */
 
 } /* sqlt01_ */
-
-#undef af_ref
-#undef q_ref
-#undef l_ref
-
-

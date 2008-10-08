@@ -1,54 +1,10 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slaruv_(integer *iseed, integer *n, real *x)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    SLARUV returns a vector of n random real numbers from a uniform (0,1)   
-    distribution (n <= 128).   
-
-    This is an auxiliary routine called by SLARNV and CLARNV.   
-
-    Arguments   
-    =========   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
-
-    N       (input) INTEGER   
-            The number of random numbers to be generated. N <= 128.   
-
-    X       (output) REAL array, dimension (N)   
-            The generated random numbers.   
-
-    Further Details   
-    ===============   
-
-    This routine uses a multiplicative congruential method with modulus   
-    2**48 and multiplier 33952834046453 (see G.S.Fishman,   
-    'Multiplicative congruential random number generators with modulus   
-    2**b: an exhaustive analysis for b = 32 and a partial analysis for   
-    b = 48', Math. Comp. 189, pp 331-344, 1990).   
-
-    48-bit integers are stored in 4 integer array elements with 12 bits   
-    per element. Hence the routine is portable across machines with   
-    integers of 32 bits or more.   
-
-    =====================================================================   
-
-       Parameter adjustments */
     /* Initialized data */
+
     static integer mm[512]	/* was [128][4] */ = { 494,2637,255,2008,1253,
 	    3344,4084,1739,3143,3468,688,1657,1238,3166,1292,3422,1270,2016,
 	    154,2862,697,1706,491,931,1444,444,3577,3944,2184,1661,3482,657,
@@ -88,16 +44,77 @@
 	    249,3917,2481,3941,2217,2749,3041,1877,345,2861,1809,3141,2825,
 	    157,2881,3637,1465,2829,2161,3365,361,2685,3745,2325,3609,3821,
 	    3537,517,3017,2141,1537 };
+
     /* System generated locals */
     integer i__1;
-    /* Local variables */
-    static integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
-#define mm_ref(a_1,a_2) mm[(a_2)*128 + a_1 - 129]
 
+    /* Local variables */
+    integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLARUV returns a vector of n random real numbers from a uniform (0,1) */
+/*  distribution (n <= 128). */
+
+/*  This is an auxiliary routine called by SLARNV and CLARNV. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
+
+/*  N       (input) INTEGER */
+/*          The number of random numbers to be generated. N <= 128. */
+
+/*  X       (output) REAL array, dimension (N) */
+/*          The generated random numbers. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  This routine uses a multiplicative congruential method with modulus */
+/*  2**48 and multiplier 33952834046453 (see G.S.Fishman, */
+/*  'Multiplicative congruential random number generators with modulus */
+/*  2**b: an exhaustive analysis for b = 32 and a partial analysis for */
+/*  b = 48', Math. Comp. 189, pp 331-344, 1990). */
+
+/*  48-bit integers are stored in 4 integer array elements with 12 bits */
+/*  per element. Hence the routine is portable across machines with */
+/*  integers of 32 bits or more. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iseed;
     --x;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     i1 = iseed[1];
     i2 = iseed[2];
@@ -107,20 +124,22 @@
     i__1 = min(*n,128);
     for (i__ = 1; i__ <= i__1; ++i__) {
 
+L20:
+
 /*        Multiply the seed by i-th power of the multiplier modulo 2**48 */
 
-	it4 = i4 * mm_ref(i__, 4);
+	it4 = i4 * mm[i__ + 383];
 	it3 = it4 / 4096;
 	it4 -= it3 << 12;
-	it3 = it3 + i3 * mm_ref(i__, 4) + i4 * mm_ref(i__, 3);
+	it3 = it3 + i3 * mm[i__ + 383] + i4 * mm[i__ + 255];
 	it2 = it3 / 4096;
 	it3 -= it2 << 12;
-	it2 = it2 + i2 * mm_ref(i__, 4) + i3 * mm_ref(i__, 3) + i4 * mm_ref(
-		i__, 2);
+	it2 = it2 + i2 * mm[i__ + 383] + i3 * mm[i__ + 255] + i4 * mm[i__ + 
+		127];
 	it1 = it2 / 4096;
 	it2 -= it1 << 12;
-	it1 = it1 + i1 * mm_ref(i__, 4) + i2 * mm_ref(i__, 3) + i3 * mm_ref(
-		i__, 2) + i4 * mm_ref(i__, 1);
+	it1 = it1 + i1 * mm[i__ + 383] + i2 * mm[i__ + 255] + i3 * mm[i__ + 
+		127] + i4 * mm[i__ - 1];
 	it1 %= 4096;
 
 /*        Convert 48-bit integer to a real number in the interval (0,1) */
@@ -128,6 +147,24 @@
 	x[i__] = ((real) it1 + ((real) it2 + ((real) it3 + (real) it4 * 
 		2.44140625e-4f) * 2.44140625e-4f) * 2.44140625e-4f) * 
 		2.44140625e-4f;
+
+	if (x[i__] == 1.f) {
+/*           If a real number has n bits of precision, and the first */
+/*           n bits of the 48-bit integer above happen to be all 1 (which */
+/*           will occur about once every 2**n calls), then X( I ) will */
+/*           be rounded to exactly 1.0. In IEEE single precision arithmetic, */
+/*           this will happen relatively often since n = 24. */
+/*           Since X( I ) is not supposed to return exactly 0.0 or 1.0, */
+/*           the statistically correct thing to do in this situation is */
+/*           simply to iterate again. */
+/*           N.B. the case X( I ) = 0.0 should not be possible. */
+	    i1 += 2;
+	    i2 += 2;
+	    i3 += 2;
+	    i4 += 2;
+	    goto L20;
+	}
+
 /* L10: */
     }
 
@@ -142,7 +179,3 @@
 /*     End of SLARUV */
 
 } /* slaruv_ */
-
-#undef mm_ref
-
-

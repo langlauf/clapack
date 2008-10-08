@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -55,33 +50,30 @@ static integer c__5 = 5;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, sdim;
-    static complex a[16]	/* was [4][4] */;
-    static logical b[4];
-    static integer i__, j;
-    static real s[4];
-    static complex u[16]	/* was [4][4] */;
+    complex a[16]	/* was [4][4] */;
+    logical b[4];
+    integer i__, j;
+    real s[4];
+    complex u[16]	/* was [4][4] */, w[16], x[4];
+    char c2[2];
+    real r1[4], r2[4];
+    integer iw[16], nt;
+    complex vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] */;
+    real rw[20];
+    complex vt[16]	/* was [4][4] */;
+    integer ihi, ilo, info, sdim;
     extern /* Subroutine */ int cgees_(char *, char *, L_fp, integer *, 
 	    complex *, integer *, integer *, complex *, complex *, integer *, 
-	    complex *, integer *, real *, logical *, integer *);
-    static complex w[16], x[4];
-    extern /* Subroutine */ int cgeev_(char *, char *, integer *, complex *, 
-	    integer *, complex *, complex *, integer *, complex *, integer *, 
-	    complex *, integer *, real *, integer *);
-    static real abnrm;
-    static char c2[2];
-    static real r1[4], r2[4];
+	    complex *, integer *, real *, logical *, integer *), cgeev_(char *, char *, integer *, complex *, integer *, 
+	    complex *, complex *, integer *, complex *, integer *, complex *, 
+	    integer *, real *, integer *);
+    real abnrm;
     extern /* Subroutine */ int cgesdd_(char *, integer *, integer *, complex 
 	    *, integer *, real *, complex *, integer *, complex *, integer *, 
-	    complex *, integer *, real *, integer *, integer *);
-    static integer iw[16], nt;
-    static complex vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] 
-	    */;
-    static real rw[20];
-    static complex vt[16]	/* was [4][4] */;
-    extern /* Subroutine */ int cgesvd_(char *, char *, integer *, integer *, 
-	    complex *, integer *, real *, complex *, integer *, complex *, 
-	    integer *, complex *, integer *, real *, integer *);
+	    complex *, integer *, real *, integer *, integer *), 
+	    cgesvd_(char *, char *, integer *, integer *, complex *, integer *
+, real *, complex *, integer *, complex *, integer *, complex *, 
+	    integer *, real *, integer *);
     extern logical cslect_();
     extern /* Subroutine */ int cgeesx_(char *, char *, L_fp, char *, integer 
 	    *, complex *, integer *, integer *, complex *, complex *, integer 
@@ -91,9 +83,8 @@ static integer c__5 = 5;
     extern /* Subroutine */ int cgeevx_(char *, char *, char *, char *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, integer *, integer *, real *, real *, real *
-	    , real *, complex *, integer *, real *, integer *), chkxer_(char *, integer *, integer *, logical *,
+, real *, complex *, integer *, real *, integer *), chkxer_(char *, integer *, integer *, logical *, 
 	     logical *);
-    static integer ihi, ilo;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -106,43 +97,57 @@ static integer c__5 = 5;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 22, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRED tests the error exits for the eigenvalue driver routines for */
+/*  REAL matrices: */
 
-    Purpose   
-    =======   
+/*  PATH  driver   description */
+/*  ----  ------   ----------- */
+/*  CEV   CGEEV    find eigenvalues/eigenvectors for nonsymmetric A */
+/*  CES   CGEES    find eigenvalues/Schur form for nonsymmetric A */
+/*  CVX   CGEEVX   CGEEV + balancing and condition estimation */
+/*  CSX   CGEESX   CGEES + balancing and condition estimation */
+/*  CBD   CGESVD   compute SVD of an M-by-N matrix A */
+/*        CGESDD   compute SVD of an M-by-N matrix A(by divide and */
+/*                 conquer) */
 
-    CERRED tests the error exits for the eigenvalue driver routines for   
-    REAL matrices:   
+/*  Arguments */
+/*  ========= */
 
-    PATH  driver   description   
-    ----  ------   -----------   
-    CEV   CGEEV    find eigenvalues/eigenvectors for nonsymmetric A   
-    CES   CGEES    find eigenvalues/Schur form for nonsymmetric A   
-    CVX   CGEEVX   CGEEV + balancing and condition estimation   
-    CSX   CGEESX   CGEES + balancing and condition estimation   
-    CBD   CGESVD   compute SVD of an M-by-N matrix A   
-          CGESDD   compute SVD of an M-by-N matrix A(by divide and   
-                   conquer)   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -154,14 +159,14 @@ static integer c__5 = 5;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    a[i__1].r = 0.f, a[i__1].i = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	i__1 = a_subscr(i__, i__);
+	i__1 = i__ + (i__ << 2) - 5;
 	a[i__1].r = 1.f, a[i__1].i = 0.f;
 /* L30: */
     }
@@ -408,32 +413,32 @@ static integer c__5 = 5;
 
 	s_copy(srnamc_1.srnamt, "CGESDD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	cgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	cgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	cgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	cgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	cgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5,
+	cgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	cgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	cgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 rw, iw, &info);
 	chkxer_("CGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -472,8 +477,3 @@ static integer c__5 = 5;
 /*     End of CERRED */
 
 } /* cerred_ */
-
-#undef a_ref
-#undef a_subscr
-
-

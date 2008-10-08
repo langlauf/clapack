@@ -1,80 +1,30 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static complex c_b2 = {0.f,0.f};
+static integer c__1 = 1;
 
 /* Subroutine */ int chptri_(char *uplo, integer *n, complex *ap, integer *
 	ipiv, complex *work, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    CHPTRI computes the inverse of a complex Hermitian indefinite matrix   
-    A in packed storage using the factorization A = U*D*U**H or   
-    A = L*D*L**H computed by CHPTRF.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the details of the factorization are stored   
-            as an upper or lower triangular matrix.   
-            = 'U':  Upper triangular, form is A = U*D*U**H;   
-            = 'L':  Lower triangular, form is A = L*D*L**H.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    AP      (input/output) COMPLEX array, dimension (N*(N+1)/2)   
-            On entry, the block diagonal matrix D and the multipliers   
-            used to obtain the factor U or L as computed by CHPTRF,   
-            stored as a packed triangular matrix.   
-
-            On exit, if INFO = 0, the (Hermitian) inverse of the original   
-            matrix, stored as a packed triangular matrix. The j-th column   
-            of inv(A) is stored in the array AP as follows:   
-            if UPLO = 'U', AP(i + (j-1)*j/2) = inv(A)(i,j) for 1<=i<=j;   
-            if UPLO = 'L',   
-               AP(i + (j-1)*(2n-j)/2) = inv(A)(i,j) for j<=i<=n.   
-
-    IPIV    (input) INTEGER array, dimension (N)   
-            Details of the interchanges and the block structure of D   
-            as determined by CHPTRF.   
-
-    WORK    (workspace) COMPLEX array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its   
-                 inverse could not be computed.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static complex c_b2 = {0.f,0.f};
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1, i__2, i__3;
     real r__1;
     complex q__1, q__2;
+
     /* Builtin functions */
     double c_abs(complex *);
     void r_cnjg(complex *, complex *);
+
     /* Local variables */
-    static complex temp, akkp1;
-    static real d__;
-    static integer j, k;
-    static real t;
+    real d__;
+    integer j, k;
+    real t, ak;
+    integer kc, kp, kx, kpc, npp;
+    real akp1;
+    complex temp, akkp1;
     extern /* Complex */ VOID cdotc_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern logical lsame_(char *, char *);
@@ -82,15 +32,81 @@
 	    complex *, integer *), chpmv_(char *, integer *, complex *, 
 	    complex *, complex *, integer *, complex *, complex *, integer *), cswap_(integer *, complex *, integer *, complex *, 
 	    integer *);
-    static integer kstep;
-    static logical upper;
-    static real ak;
-    static integer kc, kp, kx;
+    integer kstep;
+    logical upper;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer kcnext, kpc, npp;
-    static real akp1;
+    integer kcnext;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CHPTRI computes the inverse of a complex Hermitian indefinite matrix */
+/*  A in packed storage using the factorization A = U*D*U**H or */
+/*  A = L*D*L**H computed by CHPTRF. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the details of the factorization are stored */
+/*          as an upper or lower triangular matrix. */
+/*          = 'U':  Upper triangular, form is A = U*D*U**H; */
+/*          = 'L':  Lower triangular, form is A = L*D*L**H. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  AP      (input/output) COMPLEX array, dimension (N*(N+1)/2) */
+/*          On entry, the block diagonal matrix D and the multipliers */
+/*          used to obtain the factor U or L as computed by CHPTRF, */
+/*          stored as a packed triangular matrix. */
+
+/*          On exit, if INFO = 0, the (Hermitian) inverse of the original */
+/*          matrix, stored as a packed triangular matrix. The j-th column */
+/*          of inv(A) is stored in the array AP as follows: */
+/*          if UPLO = 'U', AP(i + (j-1)*j/2) = inv(A)(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', */
+/*             AP(i + (j-1)*(2n-j)/2) = inv(A)(i,j) for j<=i<=n. */
+
+/*  IPIV    (input) INTEGER array, dimension (N) */
+/*          Details of the interchanges and the block structure of D */
+/*          as determined by CHPTRF. */
+
+/*  WORK    (workspace) COMPLEX array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
+/*          > 0: if INFO = i, D(i,i) = 0; the matrix is singular and its */
+/*               inverse could not be computed. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --work;
     --ipiv;
     --ap;
@@ -149,10 +165,10 @@
 
     if (upper) {
 
-/*        Compute inv(A) from the factorization A = U*D*U'.   
+/*        Compute inv(A) from the factorization A = U*D*U'. */
 
-          K is the main loop index, increasing from 1 to N in steps of   
-          1 or 2, depending on the size of the diagonal blocks. */
+/*        K is the main loop index, increasing from 1 to N in steps of */
+/*        1 or 2, depending on the size of the diagonal blocks. */
 
 	k = 1;
 	kc = 1;
@@ -167,9 +183,9 @@ L30:
 	kcnext = kc + k;
 	if (ipiv[k] > 0) {
 
-/*           1 x 1 diagonal block   
+/*           1 x 1 diagonal block */
 
-             Invert the diagonal block. */
+/*           Invert the diagonal block. */
 
 	    i__1 = kc + k - 1;
 	    i__2 = kc + k - 1;
@@ -182,7 +198,7 @@ L30:
 		i__1 = k - 1;
 		ccopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[1], &work[1], &c__1, &c_b2, &
 			ap[kc], &c__1);
 		i__1 = kc + k - 1;
@@ -196,9 +212,9 @@ L30:
 	    kstep = 1;
 	} else {
 
-/*           2 x 2 diagonal block   
+/*           2 x 2 diagonal block */
 
-             Invert the diagonal block. */
+/*           Invert the diagonal block. */
 
 	    t = c_abs(&ap[kcnext + k - 1]);
 	    i__1 = kc + k - 1;
@@ -226,7 +242,7 @@ L30:
 		i__1 = k - 1;
 		ccopy_(&i__1, &ap[kc], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[1], &work[1], &c__1, &c_b2, &
 			ap[kc], &c__1);
 		i__1 = kc + k - 1;
@@ -245,7 +261,7 @@ L30:
 		i__1 = k - 1;
 		ccopy_(&i__1, &ap[kcnext], &c__1, &work[1], &c__1);
 		i__1 = k - 1;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[1], &work[1], &c__1, &c_b2, &
 			ap[kcnext], &c__1);
 		i__1 = kcnext + k;
@@ -263,8 +279,8 @@ L30:
 	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the leading   
-             submatrix A(1:k+1,1:k+1) */
+/*           Interchange rows and columns K and KP in the leading */
+/*           submatrix A(1:k+1,1:k+1) */
 
 	    kpc = (kp - 1) * kp / 2 + 1;
 	    i__1 = kp - 1;
@@ -311,10 +327,10 @@ L50:
 	;
     } else {
 
-/*        Compute inv(A) from the factorization A = L*D*L'.   
+/*        Compute inv(A) from the factorization A = L*D*L'. */
 
-          K is the main loop index, increasing from 1 to N in steps of   
-          1 or 2, depending on the size of the diagonal blocks. */
+/*        K is the main loop index, increasing from 1 to N in steps of */
+/*        1 or 2, depending on the size of the diagonal blocks. */
 
 	npp = *n * (*n + 1) / 2;
 	k = *n;
@@ -330,9 +346,9 @@ L60:
 	kcnext = kc - (*n - k + 2);
 	if (ipiv[k] > 0) {
 
-/*           1 x 1 diagonal block   
+/*           1 x 1 diagonal block */
 
-             Invert the diagonal block. */
+/*           Invert the diagonal block. */
 
 	    i__1 = kc;
 	    i__2 = kc;
@@ -345,7 +361,7 @@ L60:
 		i__1 = *n - k;
 		ccopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[kc + *n - k + 1], &work[1], &
 			c__1, &c_b2, &ap[kc + 1], &c__1);
 		i__1 = kc;
@@ -359,9 +375,9 @@ L60:
 	    kstep = 1;
 	} else {
 
-/*           2 x 2 diagonal block   
+/*           2 x 2 diagonal block */
 
-             Invert the diagonal block. */
+/*           Invert the diagonal block. */
 
 	    t = c_abs(&ap[kcnext + 1]);
 	    i__1 = kcnext;
@@ -389,7 +405,7 @@ L60:
 		i__1 = *n - k;
 		ccopy_(&i__1, &ap[kc + 1], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[kc + (*n - k + 1)], &work[1], &
 			c__1, &c_b2, &ap[kc + 1], &c__1);
 		i__1 = kc;
@@ -409,7 +425,7 @@ L60:
 		i__1 = *n - k;
 		ccopy_(&i__1, &ap[kcnext + 2], &c__1, &work[1], &c__1);
 		i__1 = *n - k;
-		q__1.r = -1.f, q__1.i = 0.f;
+		q__1.r = -1.f, q__1.i = -0.f;
 		chpmv_(uplo, &i__1, &q__1, &ap[kc + (*n - k + 1)], &work[1], &
 			c__1, &c_b2, &ap[kcnext + 2], &c__1);
 		i__1 = kcnext;
@@ -427,8 +443,8 @@ L60:
 	kp = (i__1 = ipiv[k], abs(i__1));
 	if (kp != k) {
 
-/*           Interchange rows and columns K and KP in the trailing   
-             submatrix A(k-1:n,k-1:n) */
+/*           Interchange rows and columns K and KP in the trailing */
+/*           submatrix A(k-1:n,k-1:n) */
 
 	    kpc = npp - (*n - kp + 1) * (*n - kp + 2) / 2 + 1;
 	    if (kp < *n) {
@@ -482,4 +498,3 @@ L80:
 /*     End of CHPTRI */
 
 } /* chptri_ */
-

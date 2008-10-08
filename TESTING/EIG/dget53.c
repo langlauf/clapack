@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dget53_(doublereal *a, integer *lda, doublereal *b, 
 	integer *ldb, doublereal *scale, doublereal *wr, doublereal *wi, 
@@ -18,95 +13,103 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static doublereal deti, absw, detr, temp, anorm, bnorm, cnorm, s1;
+    doublereal s1, ci11, ci12, ci22, cr11, cr12, cr21, cr22, ulp, wis, wrs, 
+	    deti, absw, detr, temp, anorm, bnorm, cnorm;
     extern doublereal dlamch_(char *);
-    static doublereal cscale, scales, safmin, sigmin, ci11, ci12, ci22, cr11, 
-	    cr12, cr21, cr22, ulp, wis, wrs;
+    doublereal cscale, scales, safmin, sigmin;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET53  checks the generalized eigenvalues computed by DLAG2. */
 
-    Purpose   
-    =======   
+/*  The basic test for an eigenvalue is: */
 
-    DGET53  checks the generalized eigenvalues computed by DLAG2.   
+/*                               | det( s A - w B ) | */
+/*      RESULT =  --------------------------------------------------- */
+/*                ulp max( s norm(A), |w| norm(B) )*norm( s A - w B ) */
 
-    The basic test for an eigenvalue is:   
+/*  Two "safety checks" are performed: */
 
-                                 | det( s A - w B ) |   
-        RESULT =  ---------------------------------------------------   
-                  ulp max( s norm(A), |w| norm(B) )*norm( s A - w B )   
+/*  (1)  ulp*max( s*norm(A), |w|*norm(B) )  must be at least */
+/*       safe_minimum.  This insures that the test performed is */
+/*       not essentially  det(0*A + 0*B)=0. */
 
-    Two "safety checks" are performed:   
+/*  (2)  s*norm(A) + |w|*norm(B) must be less than 1/safe_minimum. */
+/*       This insures that  s*A - w*B  will not overflow. */
 
-    (1)  ulp*max( s*norm(A), |w|*norm(B) )  must be at least   
-         safe_minimum.  This insures that the test performed is   
-         not essentially  det(0*A + 0*B)=0.   
+/*  If these tests are not passed, then  s  and  w  are scaled and */
+/*  tested anyway, if this is possible. */
 
-    (2)  s*norm(A) + |w|*norm(B) must be less than 1/safe_minimum.   
-         This insures that  s*A - w*B  will not overflow.   
+/*  Arguments */
+/*  ========= */
 
-    If these tests are not passed, then  s  and  w  are scaled and   
-    tested anyway, if this is possible.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA, 2) */
+/*          The 2x2 matrix A. */
 
-    Arguments   
-    =========   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 2. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA, 2)   
-            The 2x2 matrix A.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB, N) */
+/*          The 2x2 upper-triangular matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 2.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of B.  It must be at least 2. */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB, N)   
-            The 2x2 upper-triangular matrix B.   
+/*  SCALE   (input) DOUBLE PRECISION */
+/*          The "scale factor" s in the formula  s A - w B .  It is */
+/*          assumed to be non-negative. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least 2.   
+/*  WR      (input) DOUBLE PRECISION */
+/*          The real part of the eigenvalue  w  in the formula */
+/*          s A - w B . */
 
-    SCALE   (input) DOUBLE PRECISION   
-            The "scale factor" s in the formula  s A - w B .  It is   
-            assumed to be non-negative.   
+/*  WI      (input) DOUBLE PRECISION */
+/*          The imaginary part of the eigenvalue  w  in the formula */
+/*          s A - w B . */
 
-    WR      (input) DOUBLE PRECISION   
-            The real part of the eigenvalue  w  in the formula   
-            s A - w B .   
+/*  RESULT  (output) DOUBLE PRECISION */
+/*          If INFO is 2 or less, the value computed by the test */
+/*             described above. */
+/*          If INFO=3, this will just be 1/ulp. */
 
-    WI      (input) DOUBLE PRECISION   
-            The imaginary part of the eigenvalue  w  in the formula   
-            s A - w B .   
+/*  INFO    (output) INTEGER */
+/*          =0:  The input data pass the "safety checks". */
+/*          =1:  s*norm(A) + |w|*norm(B) > 1/safe_minimum. */
+/*          =2:  ulp*max( s*norm(A), |w|*norm(B) ) < safe_minimum */
+/*          =3:  same as INFO=2, but  s  and  w  could not be scaled so */
+/*               as to compute the test. */
 
-    RESULT  (output) DOUBLE PRECISION   
-            If INFO is 2 or less, the value computed by the test   
-               described above.   
-            If INFO=3, this will just be 1/ulp.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            =0:  The input data pass the "safety checks".   
-            =1:  s*norm(A) + |w|*norm(B) > 1/safe_minimum.   
-            =2:  ulp*max( s*norm(A), |w|*norm(B) ) < safe_minimum   
-            =3:  same as INFO=2, but  s  and  w  could not be scaled so   
-                 as to compute the test.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Initialize */
 
-
-       Initialize   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -122,13 +125,14 @@
     ulp = dlamch_("Epsilon") * dlamch_("Base");
     absw = abs(wrs) + abs(wis);
 /* Computing MAX */
-    d__5 = (d__1 = a_ref(1, 1), abs(d__1)) + (d__2 = a_ref(2, 1), abs(d__2)), 
-	    d__6 = (d__3 = a_ref(1, 2), abs(d__3)) + (d__4 = a_ref(2, 2), abs(
-	    d__4)), d__5 = max(d__5,d__6);
+    d__5 = (d__1 = a[a_dim1 + 1], abs(d__1)) + (d__2 = a[a_dim1 + 2], abs(
+	    d__2)), d__6 = (d__3 = a[(a_dim1 << 1) + 1], abs(d__3)) + (d__4 = 
+	    a[(a_dim1 << 1) + 2], abs(d__4)), d__5 = max(d__5,d__6);
     anorm = max(d__5,safmin);
 /* Computing MAX */
-    d__4 = (d__3 = b_ref(1, 1), abs(d__3)), d__5 = (d__1 = b_ref(1, 2), abs(
-	    d__1)) + (d__2 = b_ref(2, 2), abs(d__2)), d__4 = max(d__4,d__5);
+    d__4 = (d__3 = b[b_dim1 + 1], abs(d__3)), d__5 = (d__1 = b[(b_dim1 << 1) 
+	    + 1], abs(d__1)) + (d__2 = b[(b_dim1 << 1) + 2], abs(d__2)), d__4 
+	    = max(d__4,d__5);
     bnorm = max(d__4,safmin);
 
 /*     Check for possible overflow. */
@@ -145,8 +149,8 @@
 	wis *= temp;
 	absw = abs(wrs) + abs(wis);
     }
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
     d__3 = scales * anorm, d__4 = absw * bnorm;
     d__1 = ulp * max(d__3,d__4), d__2 = safmin * max(scales,absw);
     s1 = max(d__1,d__2);
@@ -161,17 +165,17 @@
 	    return 0;
 	}
 
-/*        Scale up to avoid underflow   
+/*        Scale up to avoid underflow */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = scales * anorm + absw * bnorm;
 	temp = 1. / max(d__1,safmin);
 	scales *= temp;
 	wrs *= temp;
 	wis *= temp;
 	absw = abs(wrs) + abs(wis);
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 	d__3 = scales * anorm, d__4 = absw * bnorm;
 	d__1 = ulp * max(d__3,d__4), d__2 = safmin * max(scales,absw);
 	s1 = max(d__1,d__2);
@@ -184,21 +188,21 @@
 
 /*     Compute C = s A - w B */
 
-    cr11 = scales * a_ref(1, 1) - wrs * b_ref(1, 1);
-    ci11 = -wis * b_ref(1, 1);
-    cr21 = scales * a_ref(2, 1);
-    cr12 = scales * a_ref(1, 2) - wrs * b_ref(1, 2);
-    ci12 = -wis * b_ref(1, 2);
-    cr22 = scales * a_ref(2, 2) - wrs * b_ref(2, 2);
-    ci22 = -wis * b_ref(2, 2);
+    cr11 = scales * a[a_dim1 + 1] - wrs * b[b_dim1 + 1];
+    ci11 = -wis * b[b_dim1 + 1];
+    cr21 = scales * a[a_dim1 + 2];
+    cr12 = scales * a[(a_dim1 << 1) + 1] - wrs * b[(b_dim1 << 1) + 1];
+    ci12 = -wis * b[(b_dim1 << 1) + 1];
+    cr22 = scales * a[(a_dim1 << 1) + 2] - wrs * b[(b_dim1 << 1) + 2];
+    ci22 = -wis * b[(b_dim1 << 1) + 2];
 
-/*     Compute the smallest singular value of s A - w B:   
+/*     Compute the smallest singular value of s A - w B: */
 
-                   |det( s A - w B )|   
-       sigma_min = ------------------   
-                   norm( s A - w B )   
+/*                 |det( s A - w B )| */
+/*     sigma_min = ------------------ */
+/*                 norm( s A - w B ) */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = abs(cr11) + abs(ci11) + abs(cr21), d__2 = abs(cr12) + abs(ci12) + 
 	    abs(cr22) + abs(ci22), d__1 = max(d__1,d__2);
     cnorm = max(d__1,safmin);
@@ -214,8 +218,3 @@
 /*     End of DGET53 */
 
 } /* dget53_ */
-
-#undef b_ref
-#undef a_ref
-
-

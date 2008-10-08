@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -56,100 +51,93 @@ static integer c__3 = 3;
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static doublereal cond;
-    static integer jcol, ihbw, indx, nmax;
-    static doublereal unfl, ovfl;
-    static char uplo[1];
-    static integer irow;
-    static doublereal temp1, temp2, temp3;
-    extern doublereal dsxt1_(integer *, doublereal *, integer *, doublereal *,
+    integer i__, j, m, n, j1, j2, m2, m3, kd, il, iu;
+    doublereal vl, vu;
+    integer lgn;
+    doublereal ulp, cond;
+    integer jcol, ihbw, indx, nmax;
+    doublereal unfl, ovfl;
+    char uplo[1];
+    integer irow;
+    doublereal temp1, temp2, temp3;
+    extern doublereal dsxt1_(integer *, doublereal *, integer *, doublereal *, 
 	     integer *, doublereal *, doublereal *, doublereal *);
-    static integer i__, j, idiag, m, n;
-    static logical badnn;
-    static integer imode, lwedc, iinfo;
-    static doublereal aninv, anorm;
+    integer idiag;
+    logical badnn;
+    integer imode, lwedc, iinfo;
+    doublereal aninv, anorm;
     extern /* Subroutine */ int zhet21_(integer *, char *, integer *, integer 
 	    *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublereal *);
-    static integer itemp;
+    integer itemp;
     extern /* Subroutine */ int zhbev_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, doublereal *, integer *), zhet22_(integer *, char *, integer *, integer *, integer 
 	    *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, doublereal *, doublereal *), zheev_(char *, char *, integer *, doublecomplex *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
 	     integer *);
-    static integer nmats, jsize, iuplo, nerrs, itype, j1, j2, jtype, m2, m3, 
-	    ntest;
+    integer nmats, jsize, iuplo, nerrs, itype, jtype, ntest;
     extern /* Subroutine */ int zhpev_(char *, char *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, integer *);
-    static integer iseed2[4], iseed3[4];
+    integer iseed2[4], iseed3[4];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer kd, il;
-    extern doublereal dlamch_(char *);
-    static integer iu;
-    static doublereal vl;
-    extern doublereal dlarnd_(integer *, integer *);
-    static integer liwedc;
-    static doublereal vu;
-    static integer idumma[1];
+    extern doublereal dlamch_(char *), dlarnd_(integer *, integer *);
+    integer liwedc, idumma[1];
     extern /* Subroutine */ int dlafts_(char *, integer *, integer *, integer 
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static integer lrwedc;
+    integer lrwedc;
     extern /* Subroutine */ int zhbevd_(char *, char *, integer *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, doublereal *, integer *, 
 	    integer *, integer *, integer *), alasvm_(char *, 
 	    integer *, integer *, integer *, integer *);
-    static doublereal abstol;
+    doublereal abstol;
     extern /* Subroutine */ int zheevd_(char *, char *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublecomplex *, 
 	    integer *, doublereal *, integer *, integer *, integer *, integer 
 	    *);
-    static integer indwrk;
+    integer indwrk;
     extern /* Subroutine */ int zhpevd_(char *, char *, integer *, 
 	    doublecomplex *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
 	    integer *, integer *), zlacpy_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, integer *), zheevr_(char *, char *, char *, integer *, 
-	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
+	    doublecomplex *, integer *, doublereal *, doublereal *, integer *, 
 	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
-	    , integer *, integer *, doublecomplex *, integer *, doublereal *, 
+, integer *, integer *, doublecomplex *, integer *, doublereal *, 
 	    integer *, integer *, integer *, integer *), zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *), zhbevx_(
 	    char *, char *, char *, integer *, integer *, doublecomplex *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *, doublereal *, 
-	    integer *, integer *, integer *);
-    static doublereal rtovfl;
-    static integer mtypes, ntestt;
-    static doublereal rtunfl, ulpinv;
-    extern /* Subroutine */ int zheevx_(char *, char *, char *, integer *, 
-	    doublecomplex *, integer *, doublereal *, doublereal *, integer *,
-	     integer *, doublereal *, integer *, doublereal *, doublecomplex *
-	    , integer *, doublecomplex *, integer *, doublereal *, integer *, 
-	    integer *, integer *), zhpevx_(char *, 
-	    char *, char *, integer *, doublecomplex *, doublereal *, 
-	    doublereal *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublecomplex *, integer *, doublecomplex *, 
-	    doublereal *, integer *, integer *, integer *), zlatmr_(integer *, integer *, char *, integer *, char *, 
-	    doublecomplex *, integer *, doublereal *, doublecomplex *, char *,
-	     char *, doublecomplex *, integer *, doublereal *, doublecomplex *
-	    , integer *, doublereal *, char *, integer *, integer *, integer *
-	    , doublereal *, doublereal *, char *, doublecomplex *, integer *, 
-	    integer *, integer *), zlatms_(integer *, integer *, char *, integer *, char *, 
-	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    integer *, char *, doublecomplex *, integer *, doublecomplex *, 
+	    integer *, integer *, integer *), zheevx_(
+	    char *, char *, char *, integer *, doublecomplex *, integer *, 
+	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
+	    integer *, doublereal *, doublecomplex *, integer *, 
+	    doublecomplex *, integer *, doublereal *, integer *, integer *, 
 	    integer *);
-    static integer lgn;
-    static doublereal ulp;
+    doublereal rtunfl, rtovfl, ulpinv;
+    integer mtypes, ntestt;
+    extern /* Subroutine */ int zhpevx_(char *, char *, char *, integer *, 
+	    doublecomplex *, doublereal *, doublereal *, integer *, integer *, 
+	     doublereal *, integer *, doublereal *, doublecomplex *, integer *
+, doublecomplex *, doublereal *, integer *, integer *, integer *), zlatmr_(integer *, integer *, char *, 
+	    integer *, char *, doublecomplex *, integer *, doublereal *, 
+	    doublecomplex *, char *, char *, doublecomplex *, integer *, 
+	    doublereal *, doublecomplex *, integer *, doublereal *, char *, 
+	    integer *, integer *, integer *, doublereal *, doublereal *, char 
+	    *, doublecomplex *, integer *, integer *, integer *), zlatms_(integer *, 
+	    integer *, char *, integer *, char *, doublereal *, integer *, 
+	    doublereal *, doublereal *, integer *, integer *, char *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
@@ -192,316 +180,324 @@ static integer c__3 = 3;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
-#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
-#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 3, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*       ZDRVST  checks the Hermitian eigenvalue problem drivers. */
 
-    Purpose   
-    =======   
+/*               ZHEEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix, */
+/*               using a divide-and-conquer algorithm. */
+
+/*               ZHEEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix. */
 
-         ZDRVST  checks the Hermitian eigenvalue problem drivers.   
+/*               ZHEEVR computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix */
+/*               using the Relatively Robust Representation where it can. */
 
-                 ZHEEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix,   
-                 using a divide-and-conquer algorithm.   
-
-                 ZHEEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
-
-                 ZHEEVR computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix   
-                 using the Relatively Robust Representation where it can.   
-
-                 ZHPEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage, using a divide-and-conquer algorithm.   
-
-                 ZHPEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
-
-                 ZHBEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix,   
-                 using a divide-and-conquer algorithm.   
-
-                 ZHBEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
-
-                 ZHEEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
-
-                 ZHPEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
-
-                 ZHBEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
-
-         When ZDRVST is called, a number of matrix "sizes" ("n's") and a   
-         number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix will be generated and used   
-         to test the appropriate drivers.  For each matrix and each   
-         driver routine called, the following tests will be performed:   
-
-         (1)     | A - Z D Z' | / ( |A| n ulp )   
-
-         (2)     | I - Z Z' | / ( n ulp )   
-
-         (3)     | D1 - D2 | / ( |D1| ulp )   
-
-         where Z is the matrix of eigenvectors returned when the   
-         eigenvector option is given and D1 and D2 are the eigenvalues   
-         returned with and without the eigenvector option.   
-
-         The "sizes" are specified by an array NN(1:NSIZES); the value of   
-         each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-         Currently, the list of possible types is:   
-
-         (1)  The zero matrix.   
-         (2)  The identity matrix.   
-
-         (3)  A diagonal matrix with evenly spaced entries   
-              1, ..., ULP  and random signs.   
-              (ULP = (first number larger than 1) - 1 )   
-         (4)  A diagonal matrix with geometrically spaced entries   
-              1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-              and random signs.   
-
-         (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-         (8)  A matrix of the form  U* D U, where U is unitary and   
-              D has evenly spaced entries 1, ..., ULP with random signs   
-              on the diagonal.   
-
-         (9)  A matrix of the form  U* D U, where U is unitary and   
-              D has geometrically spaced entries 1, ..., ULP with random   
-              signs on the diagonal.   
-
-         (10) A matrix of the form  U* D U, where U is unitary and   
-              D has "clustered" entries 1, ULP,..., ULP with random   
-              signs on the diagonal.   
-
-         (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-         (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
-         (16) A band matrix with half bandwidth randomly chosen between   
-              0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
-              with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
-         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
-
-    Arguments   
-    =========   
-
-    NSIZES  INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            ZDRVST does nothing.  It must be at least zero.   
-            Not modified.   
-
-    NN      INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-            Not modified.   
-
-    NTYPES  INTEGER   
-            The number of elements in DOTYPE.   If it is zero, ZDRVST   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-            Not modified.   
-
-    DOTYPE  LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-            Not modified.   
-
-    ISEED   INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to ZDRVST to continue the same random number   
-            sequence.   
-            Modified.   
-
-    THRESH  DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-            Not modified.   
-
-    NOUNIT  INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-            Not modified.   
-
-    A       COMPLEX*16 array, dimension (LDA , max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDA     INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    D1      DOUBLE PRECISION array, dimension (max(NN))   
-            The eigenvalues of A, as computed by ZSTEQR simlutaneously   
-            with Z.  On exit, the eigenvalues in D1 correspond with the   
-            matrix in A.   
-            Modified.   
-
-    D2      DOUBLE PRECISION array, dimension (max(NN))   
-            The eigenvalues of A, as computed by ZSTEQR if Z is not   
-            computed.  On exit, the eigenvalues in D2 correspond with   
-            the matrix in A.   
-            Modified.   
-
-    D3      DOUBLE PRECISION array, dimension (max(NN))   
-            The eigenvalues of A, as computed by DSTERF.  On exit, the   
-            eigenvalues in D3 correspond with the matrix in A.   
-            Modified.   
-
-    WA1     DOUBLE PRECISION array, dimension   
-
-    WA2     DOUBLE PRECISION array, dimension   
-
-    WA3     DOUBLE PRECISION array, dimension   
-
-    U       COMPLEX*16 array, dimension (LDU, max(NN))   
-            The unitary matrix computed by ZHETRD + ZUNGC3.   
-            Modified.   
-
-    LDU     INTEGER   
-            The leading dimension of U, Z, and V.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    V       COMPLEX*16 array, dimension (LDU, max(NN))   
-            The Housholder vectors computed by ZHETRD in reducing A to   
-            tridiagonal form.   
-            Modified.   
-
-    TAU     COMPLEX*16 array, dimension (max(NN))   
-            The Householder factors computed by ZHETRD in reducing A   
-            to tridiagonal form.   
-            Modified.   
-
-    Z       COMPLEX*16 array, dimension (LDU, max(NN))   
-            The unitary matrix of eigenvectors computed by ZHEEVD,   
-            ZHEEVX, ZHPEVD, CHPEVX, ZHBEVD, and CHBEVX.   
-            Modified.   
-
-    WORK  - COMPLEX*16 array of dimension ( LWORK )   
-             Workspace.   
-             Modified.   
-
-    LWORK - INTEGER   
-             The number of entries in WORK.  This must be at least   
-             2*max( NN(j), 2 )**2.   
-             Not modified.   
-
-    RWORK   DOUBLE PRECISION array, dimension (3*max(NN))   
-             Workspace.   
-             Modified.   
-
-    LRWORK - INTEGER   
-             The number of entries in RWORK.   
-
-    IWORK   INTEGER array, dimension (6*max(NN))   
-            Workspace.   
-            Modified.   
-
-    LIWORK - INTEGER   
-             The number of entries in IWORK.   
-
-    RESULT  DOUBLE PRECISION array, dimension (??)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-            Modified.   
-
-    INFO    INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDU < 1 or LDU < NMAX.   
-            -21: LWORK too small.   
-            If  DLATMR, SLATMS, ZHETRD, DORGC3, ZSTEQR, DSTERF,   
-                or DORMC2 returns an error code, the   
-                absolute value of it is returned.   
-            Modified.   
-
-   -----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far (computed by DLAFTS).   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
+/*               ZHPEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage, using a divide-and-conquer algorithm. */
+
+/*               ZHPEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage. */
+
+/*               ZHBEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix, */
+/*               using a divide-and-conquer algorithm. */
+
+/*               ZHBEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix. */
+
+/*               ZHEEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix. */
+
+/*               ZHPEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage. */
+
+/*               ZHBEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix. */
+
+/*       When ZDRVST is called, a number of matrix "sizes" ("n's") and a */
+/*       number of matrix "types" are specified.  For each size ("n") */
+/*       and each type of matrix, one matrix will be generated and used */
+/*       to test the appropriate drivers.  For each matrix and each */
+/*       driver routine called, the following tests will be performed: */
+
+/*       (1)     | A - Z D Z' | / ( |A| n ulp ) */
+
+/*       (2)     | I - Z Z' | / ( n ulp ) */
+
+/*       (3)     | D1 - D2 | / ( |D1| ulp ) */
+
+/*       where Z is the matrix of eigenvectors returned when the */
+/*       eigenvector option is given and D1 and D2 are the eigenvalues */
+/*       returned with and without the eigenvector option. */
+
+/*       The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*       each element NN(j) specifies one size. */
+/*       The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*       Currently, the list of possible types is: */
+
+/*       (1)  The zero matrix. */
+/*       (2)  The identity matrix. */
+
+/*       (3)  A diagonal matrix with evenly spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*            (ULP = (first number larger than 1) - 1 ) */
+/*       (4)  A diagonal matrix with geometrically spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*       (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*            and random signs. */
+
+/*       (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*       (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*       (8)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has evenly spaced entries 1, ..., ULP with random signs */
+/*            on the diagonal. */
+
+/*       (9)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has geometrically spaced entries 1, ..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (10) A matrix of the form  U* D U, where U is unitary and */
+/*            D has "clustered" entries 1, ULP,..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*       (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*       (13) Symmetric matrix with random entries chosen from (-1,1). */
+/*       (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*       (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
+/*       (16) A band matrix with half bandwidth randomly chosen between */
+/*            0 and N-1, with evenly spaced eigenvalues 1, ..., ULP */
+/*            with random signs. */
+/*       (17) Same as (16), but multiplied by SQRT( overflow threshold ) */
+/*       (18) Same as (16), but multiplied by SQRT( underflow threshold ) */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          ZDRVST does nothing.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NN      INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+/*          Not modified. */
+
+/*  NTYPES  INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, ZDRVST */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+/*          Not modified. */
+
+/*  DOTYPE  LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+/*          Not modified. */
+
+/*  ISEED   INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to ZDRVST to continue the same random number */
+/*          sequence. */
+/*          Modified. */
+
+/*  THRESH  DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NOUNIT  INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+/*          Not modified. */
+
+/*  A       COMPLEX*16 array, dimension (LDA , max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDA     INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  D1      DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by ZSTEQR simlutaneously */
+/*          with Z.  On exit, the eigenvalues in D1 correspond with the */
+/*          matrix in A. */
+/*          Modified. */
+
+/*  D2      DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by ZSTEQR if Z is not */
+/*          computed.  On exit, the eigenvalues in D2 correspond with */
+/*          the matrix in A. */
+/*          Modified. */
+
+/*  D3      DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by DSTERF.  On exit, the */
+/*          eigenvalues in D3 correspond with the matrix in A. */
+/*          Modified. */
+
+/*  WA1     DOUBLE PRECISION array, dimension */
+
+/*  WA2     DOUBLE PRECISION array, dimension */
+
+/*  WA3     DOUBLE PRECISION array, dimension */
+
+/*  U       COMPLEX*16 array, dimension (LDU, max(NN)) */
+/*          The unitary matrix computed by ZHETRD + ZUNGC3. */
+/*          Modified. */
+
+/*  LDU     INTEGER */
+/*          The leading dimension of U, Z, and V.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  V       COMPLEX*16 array, dimension (LDU, max(NN)) */
+/*          The Housholder vectors computed by ZHETRD in reducing A to */
+/*          tridiagonal form. */
+/*          Modified. */
+
+/*  TAU     COMPLEX*16 array, dimension (max(NN)) */
+/*          The Householder factors computed by ZHETRD in reducing A */
+/*          to tridiagonal form. */
+/*          Modified. */
+
+/*  Z       COMPLEX*16 array, dimension (LDU, max(NN)) */
+/*          The unitary matrix of eigenvectors computed by ZHEEVD, */
+/*          ZHEEVX, ZHPEVD, CHPEVX, ZHBEVD, and CHBEVX. */
+/*          Modified. */
+
+/*  WORK  - COMPLEX*16 array of dimension ( LWORK ) */
+/*           Workspace. */
+/*           Modified. */
+
+/*  LWORK - INTEGER */
+/*           The number of entries in WORK.  This must be at least */
+/*           2*max( NN(j), 2 )**2. */
+/*           Not modified. */
+
+/*  RWORK   DOUBLE PRECISION array, dimension (3*max(NN)) */
+/*           Workspace. */
+/*           Modified. */
+
+/*  LRWORK - INTEGER */
+/*           The number of entries in RWORK. */
+
+/*  IWORK   INTEGER array, dimension (6*max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LIWORK - INTEGER */
+/*           The number of entries in IWORK. */
+
+/*  RESULT  DOUBLE PRECISION array, dimension (??) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+/*          Modified. */
+
+/*  INFO    INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -16: LDU < 1 or LDU < NMAX. */
+/*          -21: LWORK too small. */
+/*          If  DLATMR, SLATMS, ZHETRD, DORGC3, ZSTEQR, DSTERF, */
+/*              or DORMC2 returns an error code, the */
+/*              absolute value of it is returned. */
+/*          Modified. */
+
+/* ----------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far (computed by DLAFTS). */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*  ===================================================================== */
+
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d1;
     --d2;
@@ -510,13 +506,13 @@ static integer c__3 = 3;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --tau;
     --work;
@@ -524,9 +520,11 @@ static integer c__3 = 3;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       1)      Check for errors */
+/*     1)      Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -641,20 +639,20 @@ static integer c__3 = 3;
 /* L30: */
 	    }
 
-/*           2)      Compute "A"   
+/*           2)      Compute "A" */
 
-                     Control parameters:   
+/*                   Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, (w/ eigenvalues)   
-             =5         random log   Hermitian, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random Hermitian   
-             =9                      band Hermitian, w/ eigenvalues */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, (w/ eigenvalues) */
+/*           =5         random log   Hermitian, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random Hermitian */
+/*           =9                      band Hermitian, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -689,9 +687,9 @@ L70:
 	    iinfo = 0;
 	    cond = ulpinv;
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                     Zero */
+/*                   Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -702,7 +700,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = a_subscr(jcol, jcol);
+		    i__4 = jcol + jcol * a_dim1;
 		    a[i__4].r = anorm, a[i__4].i = 0.;
 /* L80: */
 		}
@@ -711,7 +709,7 @@ L70:
 
 /*              Diagonal Matrix, [Eigen]values Specified */
 
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &c__0, &c__0, "N", &a[a_offset], lda, &work[
 			1], &iinfo);
 
@@ -719,7 +717,7 @@ L70:
 
 /*              Hermitian, eigenvalues specified */
 
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &n, &n, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -748,7 +746,7 @@ L70:
 /*              Hermitian banded, eigenvalues specified */
 
 		ihbw = (integer) ((n - 1) * dlarnd_(&c__1, iseed3));
-		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		zlatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &ihbw, &ihbw, "Z", &u[u_offset], ldu, &work[
 			1], &iinfo);
 
@@ -767,8 +765,8 @@ L70:
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
 			i__ = j - idiag;
-			i__5 = a_subscr(i__, j);
-			i__6 = u_subscr(irow, j);
+			i__5 = i__ + j * a_dim1;
+			i__6 = irow + j * u_dim1;
 			a[i__5].r = u[i__6].r, a[i__5].i = u[i__6].i;
 /* L90: */
 		    }
@@ -807,8 +805,8 @@ L110:
 		}
 	    }
 
-/*           Perform tests storing upper or lower triangular   
-             part of matrix. */
+/*           Perform tests storing upper or lower triangular */
+/*           part of matrix. */
 
 	    for (iuplo = 0; iuplo <= 1; ++iuplo) {
 		if (iuplo == 0) {
@@ -854,7 +852,7 @@ L110:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -979,7 +977,7 @@ L130:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		zheevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
@@ -1216,8 +1214,8 @@ L170:
 
 		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -1226,7 +1224,7 @@ L170:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1241,7 +1239,7 @@ L170:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1286,7 +1284,7 @@ L170:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -1295,7 +1293,7 @@ L170:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1310,7 +1308,7 @@ L170:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1368,8 +1366,8 @@ L170:
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array WORK with the upper or lower triangular part   
-                of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular part */
+/*              of the matrix in packed form. */
 
 L270:
 		if (iuplo == 1) {
@@ -1379,7 +1377,7 @@ L270:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1394,7 +1392,7 @@ L270:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1442,7 +1440,7 @@ L270:
 
 		zhpevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
-			, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___69.ciunit = *nounit;
 		    s_wsfe(&io___69);
@@ -1473,7 +1471,7 @@ L270:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -1484,7 +1482,7 @@ L270:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1499,7 +1497,7 @@ L270:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1565,7 +1563,7 @@ L370:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1580,7 +1578,7 @@ L370:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1635,7 +1633,7 @@ L370:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1650,7 +1648,7 @@ L370:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1714,7 +1712,7 @@ L460:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1729,7 +1727,7 @@ L460:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1784,7 +1782,7 @@ L460:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1799,7 +1797,7 @@ L460:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1873,8 +1871,8 @@ L550:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1883,8 +1881,8 @@ L550:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L560: */
 			}
@@ -1897,8 +1895,8 @@ L550:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L580: */
 			}
@@ -1941,7 +1939,7 @@ L550:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1950,8 +1948,8 @@ L550:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L600: */
 			}
@@ -1964,8 +1962,8 @@ L550:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L620: */
 			}
@@ -2021,8 +2019,8 @@ L550:
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L650:
 		if (iuplo == 1) {
@@ -2032,8 +2030,8 @@ L650:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L660: */
 			}
@@ -2046,8 +2044,8 @@ L650:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L680: */
 			}
@@ -2091,7 +2089,7 @@ L650:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2102,8 +2100,8 @@ L650:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L700: */
 			}
@@ -2116,8 +2114,8 @@ L650:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L720: */
 			}
@@ -2173,8 +2171,8 @@ L650:
 		d__1 = unfl, d__2 = ulp * max(temp1,temp2);
 		result[ntest] = temp2 / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L750:
 		++ntest;
@@ -2185,8 +2183,8 @@ L750:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L760: */
 			}
@@ -2199,8 +2197,8 @@ L750:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L780: */
 			}
@@ -2254,8 +2252,8 @@ L750:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L800: */
 			}
@@ -2268,8 +2266,8 @@ L750:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L820: */
 			}
@@ -2322,8 +2320,8 @@ L750:
 		d__1 = unfl, d__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / max(d__1,d__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L840:
 		++ntest;
@@ -2334,8 +2332,8 @@ L840:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L850: */
 			}
@@ -2348,8 +2346,8 @@ L840:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L870: */
 			}
@@ -2402,8 +2400,8 @@ L840:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L890: */
 			}
@@ -2416,8 +2414,8 @@ L840:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L910: */
 			}
@@ -2514,7 +2512,7 @@ L930:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -2568,10 +2566,10 @@ L950:
 
 		zlacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Call ZHPEV   
+/*              Call ZHPEV */
 
-                Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2580,7 +2578,7 @@ L950:
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2595,7 +2593,7 @@ L950:
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2640,7 +2638,7 @@ L950:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2649,7 +2647,7 @@ L950:
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2664,7 +2662,7 @@ L950:
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2736,8 +2734,8 @@ L1050:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2746,8 +2744,8 @@ L1050:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L1060: */
 			}
@@ -2760,8 +2758,8 @@ L1050:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L1080: */
 			}
@@ -2803,7 +2801,7 @@ L1050:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2812,8 +2810,8 @@ L1050:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L1100: */
 			}
@@ -2826,8 +2824,8 @@ L1050:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L1120: */
 			}
@@ -2923,7 +2921,7 @@ L1140:
 
 		zhet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		i__3 = *liwork - (n << 1);
@@ -3158,8 +3156,8 @@ L1180:
 
 
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L1190:
 
@@ -3170,7 +3168,7 @@ L1190:
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
 	    ntestt += ntest;
-	    dlafts_("ZST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
+	    dlafts_("ZST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh, 
 		     nounit, &nerrs);
 
 L1210:
@@ -3189,12 +3187,3 @@ L1210:
 /*     End of ZDRVST */
 
 } /* zdrvst_ */
-
-#undef v_ref
-#undef v_subscr
-#undef u_ref
-#undef u_subscr
-#undef a_ref
-#undef a_subscr
-
-

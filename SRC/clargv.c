@@ -1,111 +1,137 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int clargv_(integer *n, complex *x, integer *incx, complex *
 	y, integer *incy, real *c__, integer *incc)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    CLARGV generates a vector of complex plane rotations with real   
-    cosines, determined by elements of the complex vectors x and y.   
-    For i = 1,2,...,n   
-
-       (        c(i)   s(i) ) ( x(i) ) = ( r(i) )   
-       ( -conjg(s(i))  c(i) ) ( y(i) ) = (   0  )   
-
-       where c(i)**2 + ABS(s(i))**2 = 1   
-
-    The following conventions are used (these are the same as in CLARTG,   
-    but differ from the BLAS1 routine CROTG):   
-       If y(i)=0, then c(i)=1 and s(i)=0.   
-       If x(i)=0, then c(i)=0 and s(i) is chosen so that r(i) is real.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The number of plane rotations to be generated.   
-
-    X       (input/output) COMPLEX array, dimension (1+(N-1)*INCX)   
-            On entry, the vector x.   
-            On exit, x(i) is overwritten by r(i), for i = 1,...,n.   
-
-    INCX    (input) INTEGER   
-            The increment between elements of X. INCX > 0.   
-
-    Y       (input/output) COMPLEX array, dimension (1+(N-1)*INCY)   
-            On entry, the vector y.   
-            On exit, the sines of the plane rotations.   
-
-    INCY    (input) INTEGER   
-            The increment between elements of Y. INCY > 0.   
-
-    C       (output) REAL array, dimension (1+(N-1)*INCC)   
-            The cosines of the plane rotations.   
-
-    INCC    (input) INTEGER   
-            The increment between elements of C. INCC > 0.   
-
-    Further Details   
-    ======= =======   
-
-    6-6-96 - Modified with a new algorithm by W. Kahan and J. Demmel   
-
-    =====================================================================   
-
-       Parameter adjustments */
-    /* Initialized data */
-    static logical first = TRUE_;
     /* System generated locals */
     integer i__1, i__2;
     real r__1, r__2, r__3, r__4, r__5, r__6, r__7, r__8, r__9, r__10;
     complex q__1, q__2, q__3;
+
     /* Builtin functions */
     double log(doublereal), pow_ri(real *, integer *), r_imag(complex *), 
 	    sqrt(doublereal);
     void r_cnjg(complex *, complex *);
-    /* Local variables */
-    static real d__;
-    static complex f, g;
-    static integer i__, j;
-    static complex r__;
-    static real scale;
-    static integer count;
-    static real f2, g2, safmn2, safmx2;
-    extern doublereal slapy2_(real *, real *);
-    static integer ic;
-    static real di;
-    static complex ff;
-    static real cs, dr;
-    static complex fs, gs;
-    static integer ix, iy;
-    static complex sn;
-    extern doublereal slamch_(char *);
-    static real safmin, f2s, g2s, eps;
 
+    /* Local variables */
+    real d__;
+    complex f, g;
+    integer i__, j;
+    complex r__;
+    real f2, g2;
+    integer ic;
+    real di;
+    complex ff;
+    real cs, dr;
+    complex fs, gs;
+    integer ix, iy;
+    complex sn;
+    real f2s, g2s, eps, scale;
+    integer count;
+    real safmn2, safmx2;
+    extern doublereal slapy2_(real *, real *), slamch_(char *);
+    real safmin;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  CLARGV generates a vector of complex plane rotations with real */
+/*  cosines, determined by elements of the complex vectors x and y. */
+/*  For i = 1,2,...,n */
+
+/*     (        c(i)   s(i) ) ( x(i) ) = ( r(i) ) */
+/*     ( -conjg(s(i))  c(i) ) ( y(i) ) = (   0  ) */
+
+/*     where c(i)**2 + ABS(s(i))**2 = 1 */
+
+/*  The following conventions are used (these are the same as in CLARTG, */
+/*  but differ from the BLAS1 routine CROTG): */
+/*     If y(i)=0, then c(i)=1 and s(i)=0. */
+/*     If x(i)=0, then c(i)=0 and s(i) is chosen so that r(i) is real. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The number of plane rotations to be generated. */
+
+/*  X       (input/output) COMPLEX array, dimension (1+(N-1)*INCX) */
+/*          On entry, the vector x. */
+/*          On exit, x(i) is overwritten by r(i), for i = 1,...,n. */
+
+/*  INCX    (input) INTEGER */
+/*          The increment between elements of X. INCX > 0. */
+
+/*  Y       (input/output) COMPLEX array, dimension (1+(N-1)*INCY) */
+/*          On entry, the vector y. */
+/*          On exit, the sines of the plane rotations. */
+
+/*  INCY    (input) INTEGER */
+/*          The increment between elements of Y. INCY > 0. */
+
+/*  C       (output) REAL array, dimension (1+(N-1)*INCC) */
+/*          The cosines of the plane rotations. */
+
+/*  INCC    (input) INTEGER */
+/*          The increment between elements of C. INCC > 0. */
+
+/*  Further Details */
+/*  ======= ======= */
+
+/*  6-6-96 - Modified with a new algorithm by W. Kahan and J. Demmel */
+
+/*  This version has a few statements commented out for thread safety */
+/*  (machine parameters are computed on each entry). 10 feb 03, SJH. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     LOGICAL            FIRST */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     SAVE               FIRST, SAFMX2, SAFMIN, SAFMN2 */
+/*     .. */
+/*     .. Data statements .. */
+/*     DATA               FIRST / .TRUE. / */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     IF( FIRST ) THEN */
+/*        FIRST = .FALSE. */
+    /* Parameter adjustments */
     --c__;
     --y;
     --x;
 
     /* Function Body */
-
-    if (first) {
-	first = FALSE_;
-	safmin = slamch_("S");
-	eps = slamch_("E");
-	r__1 = slamch_("B");
-	i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 
-		2.f);
-	safmn2 = pow_ri(&r__1, &i__1);
-	safmx2 = 1.f / safmn2;
-    }
+    safmin = slamch_("S");
+    eps = slamch_("E");
+    r__1 = slamch_("B");
+    i__1 = (integer) (log(safmin / eps) / log(slamch_("B")) / 2.f);
+    safmn2 = pow_ri(&r__1, &i__1);
+    safmx2 = 1.f / safmn2;
+/*     END IF */
     ix = 1;
     iy = 1;
     ic = 1;
@@ -116,10 +142,10 @@
 	i__2 = iy;
 	g.r = y[i__2].r, g.i = y[i__2].i;
 
-/*        Use identical algorithm as in CLARTG   
+/*        Use identical algorithm as in CLARTG */
 
-   Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 	r__7 = (r__1 = f.r, dabs(r__1)), r__8 = (r__2 = r_imag(&f), dabs(r__2)
 		);
 /* Computing MAX */
@@ -179,8 +205,8 @@ L20:
 		r__3 = r_imag(&g);
 		r__1 = slapy2_(&r__2, &r__3);
 		r__.r = r__1, r__.i = 0.f;
-/*              Do complex/real division explicitly with two real   
-                divisions */
+/*              Do complex/real division explicitly with two real */
+/*              divisions */
 		r__1 = gs.r;
 		r__2 = r_imag(&gs);
 		d__ = slapy2_(&r__1, &r__2);
@@ -193,20 +219,20 @@ L20:
 	    r__1 = fs.r;
 	    r__2 = r_imag(&fs);
 	    f2s = slapy2_(&r__1, &r__2);
-/*           G2 and G2S are accurate   
-             G2 is at least SAFMIN, and G2S is at least SAFMN2 */
+/*           G2 and G2S are accurate */
+/*           G2 is at least SAFMIN, and G2S is at least SAFMN2 */
 	    g2s = sqrt(g2);
-/*           Error in CS from underflow in F2S is at most   
-             UNFL / SAFMN2 .lt. sqrt(UNFL*EPS) .lt. EPS   
-             If MAX(G2,ONE)=G2, then F2 .lt. G2*SAFMIN,   
-             and so CS .lt. sqrt(SAFMIN)   
-             If MAX(G2,ONE)=ONE, then F2 .lt. SAFMIN   
-             and so CS .lt. sqrt(SAFMIN)/SAFMN2 = sqrt(EPS)   
-             Therefore, CS = F2S/G2S / sqrt( 1 + (F2S/G2S)**2 ) = F2S/G2S */
+/*           Error in CS from underflow in F2S is at most */
+/*           UNFL / SAFMN2 .lt. sqrt(UNFL*EPS) .lt. EPS */
+/*           If MAX(G2,ONE)=G2, then F2 .lt. G2*SAFMIN, */
+/*           and so CS .lt. sqrt(SAFMIN) */
+/*           If MAX(G2,ONE)=ONE, then F2 .lt. SAFMIN */
+/*           and so CS .lt. sqrt(SAFMIN)/SAFMN2 = sqrt(EPS) */
+/*           Therefore, CS = F2S/G2S / sqrt( 1 + (F2S/G2S)**2 ) = F2S/G2S */
 	    cs = f2s / g2s;
-/*           Make sure abs(FF) = 1   
-             Do complex/real division explicitly with 2 real divisions   
-   Computing MAX */
+/*           Make sure abs(FF) = 1 */
+/*           Do complex/real division explicitly with 2 real divisions */
+/* Computing MAX */
 	    r__3 = (r__1 = f.r, dabs(r__1)), r__4 = (r__2 = r_imag(&f), dabs(
 		    r__2));
 	    if (dmax(r__3,r__4) > 1.f) {
@@ -239,13 +265,13 @@ L20:
 	    r__.r = q__1.r, r__.i = q__1.i;
 	} else {
 
-/*           This is the most common case.   
-             Neither F2 nor F2/G2 are less than SAFMIN   
-             F2S cannot overflow, and it is accurate */
+/*           This is the most common case. */
+/*           Neither F2 nor F2/G2 are less than SAFMIN */
+/*           F2S cannot overflow, and it is accurate */
 
 	    f2s = sqrt(g2 / f2 + 1.f);
-/*           Do the F2S(real)*FS(complex) multiply with two real   
-             multiplies */
+/*           Do the F2S(real)*FS(complex) multiply with two real */
+/*           multiplies */
 	    r__1 = f2s * fs.r;
 	    r__2 = f2s * r_imag(&fs);
 	    q__1.r = r__1, q__1.i = r__2;
@@ -295,4 +321,3 @@ L50:
 /*     End of CLARGV */
 
 } /* clargv_ */
-

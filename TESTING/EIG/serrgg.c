@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -48,30 +43,33 @@ static integer c__20 = 20;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, sdim;
-    static real anrm, bnrm, tola, tolb;
-    static integer ifst, ilst;
-    static real a[9]	/* was [3][3] */, b[9]	/* was [3][3] */;
-    static integer i__, j, m;
-    static real q[9]	/* was [3][3] */, u[9]	/* was [3][3] */, v[9]	/* 
-	    was [3][3] */, scale, w[18], z__[9]	/* was [3][3] */;
+    real a[9]	/* was [3][3] */, b[9]	/* was [3][3] */;
+    integer i__, j, m;
+    real q[9]	/* was [3][3] */, u[9]	/* was [3][3] */, v[9]	/* was [3][3] 
+	    */, w[18], z__[9]	/* was [3][3] */;
+    char c2[2];
+    real r1[3], r2[3], r3[3];
+    logical bw[3];
+    real ls[3];
+    integer iw[3], nt;
+    real rs[3], dif, rce[2];
+    logical sel[3];
+    real tau[3], rcv[2];
+    integer info, sdim;
+    real anrm, bnrm, tola, tolb;
+    integer ifst, ilst;
+    real scale;
     extern /* Subroutine */ int sgges_(char *, char *, char *, L_fp, integer *
-	    , real *, integer *, real *, integer *, integer *, real *, real *,
+, real *, integer *, real *, integer *, integer *, real *, real *, 
 	     real *, real *, integer *, real *, integer *, real *, integer *, 
 	    logical *, integer *), sggev_(char *, 
 	    char *, integer *, real *, integer *, real *, integer *, real *, 
 	    real *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, integer *);
-    static char c2[2];
-    static real r1[3], r2[3], r3[3];
-    static logical bw[3];
-    static real ls[3];
-    static integer iw[3], nt;
-    static real rs[3];
-    static integer ncycle;
+    integer ncycle;
     extern /* Subroutine */ int sgghrd_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *);
+, real *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int sggglm_(integer *, integer *, integer *, real 
 	    *, integer *, real *, integer *, real *, real *, real *, real *, 
@@ -80,11 +78,11 @@ static integer c__20 = 20;
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    real *, real *, integer *, integer *), sggqrf_(integer *, integer 
 	    *, integer *, real *, integer *, real *, real *, integer *, real *
-	    , real *, integer *, integer *), sggrqf_(integer *, integer *, 
+, real *, integer *, integer *), sggrqf_(integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, integer *, real *, 
 	    real *, integer *, integer *), stgevc_(char *, char *, logical *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *, integer *, real *, integer *);
+, real *, integer *, integer *, integer *, real *, integer *);
     extern logical slctes_();
     extern /* Subroutine */ int sggsvd_(char *, char *, char *, integer *, 
 	    integer *, integer *, integer *, integer *, real *, integer *, 
@@ -96,17 +94,17 @@ static integer c__20 = 20;
 	    integer *, real *, integer *, integer *, real *, real *, real *, 
 	    real *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *, integer *, integer *, logical *, integer *), shgeqz_(char *, char *, char *, integer *
-	    , integer *, integer *, real *, integer *, real *, integer *, 
+, integer *, integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *, real *, integer *, real *, integer *, 
 	    real *, integer *, integer *), stgsja_(
 	    char *, char *, char *, integer *, integer *, integer *, integer *
-	    , integer *, real *, integer *, real *, integer *, real *, real *,
+, integer *, real *, integer *, real *, integer *, real *, real *, 
 	     real *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *, integer *, integer *), 
 	    sggevx_(char *, char *, char *, char *, integer *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
 	    integer *, real *, integer *, integer *, integer *, real *, real *
-	    , real *, real *, real *, real *, real *, integer *, integer *, 
+, real *, real *, real *, real *, real *, integer *, integer *, 
 	    logical *, integer *), stgsen_(
 	    integer *, logical *, logical *, logical *, integer *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
@@ -115,20 +113,17 @@ static integer c__20 = 20;
 	    *, char *, logical *, integer *, real *, integer *, real *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, integer *, integer *);
-    static integer dummyk, dummyl;
+    integer dummyk, dummyl;
     extern /* Subroutine */ int sggsvp_(char *, char *, char *, integer *, 
 	    integer *, integer *, real *, integer *, real *, integer *, real *
-	    , real *, integer *, integer *, real *, integer *, real *, 
+, real *, integer *, integer *, real *, integer *, real *, 
 	    integer *, real *, integer *, integer *, real *, real *, integer *
-	    );
+);
     extern logical slctsx_();
     extern /* Subroutine */ int stgsyl_(char *, integer *, integer *, integer 
 	    *, real *, integer *, real *, integer *, real *, integer *, real *
-	    , integer *, real *, integer *, real *, integer *, real *, real *,
+, integer *, real *, integer *, real *, integer *, real *, real *, 
 	     real *, integer *, integer *, integer *);
-    static real dif, rce[2];
-    static logical sel[3];
-    static real tau[3], rcv[2];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -137,34 +132,46 @@ static integer c__20 = 20;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*3 + a_1 - 4]
-#define b_ref(a_1,a_2) b[(a_2)*3 + a_1 - 4]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRGG tests the error exits for SGGES, SGGESX, SGGEV, SGGEVX, */
+/*  SGGGLM, SGGHRD, SGGLSE, SGGQRF, SGGRQF, SGGSVD, SGGSVP, SHGEQZ, */
+/*  STGEVC, STGEXC, STGSEN, STGSJA, STGSNA, and STGSYL. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRGG tests the error exits for SGGES, SGGESX, SGGEV, SGGEVX,   
-    SGGGLM, SGGHRD, SGGLSE, SGGQRF, SGGRQF, SGGSVD, SGGSVP, SHGEQZ,   
-    STGEVC, STGEXC, STGSEN, STGSJA, STGSNA, and STGSYL.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -177,15 +184,15 @@ static integer c__20 = 20;
     for (j = 1; j <= 3; ++j) {
 	sel[j - 1] = TRUE_;
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    a_ref(i__, j) = 0.f;
-	    b_ref(i__, j) = 0.f;
+	    a[i__ + j * 3 - 4] = 0.f;
+	    b[i__ + j * 3 - 4] = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 3; ++i__) {
-	a_ref(i__, i__) = 1.f;
-	b_ref(i__, i__) = 1.f;
+	a[i__ + i__ * 3 - 4] = 1.f;
+	b[i__ + i__ * 3 - 4] = 1.f;
 /* L30: */
     }
     infoc_1.ok = TRUE_;
@@ -393,32 +400,32 @@ static integer c__20 = 20;
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	sggsvd_("N", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
-		c__0, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
+	sggsvd_("N", "N", "N", &c__2, &c__1, &c__1, &dummyk, &dummyl, a, &
+		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
 		info);
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
-	sggsvd_("N", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
-		c__1, b, &c__0, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
+	sggsvd_("N", "N", "N", &c__1, &c__1, &c__2, &dummyk, &dummyl, a, &
+		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
 		info);
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	sggsvd_("U", "N", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
-		c__1, b, &c__1, r1, r2, u, &c__0, v, &c__1, q, &c__1, w, iw, &
+	sggsvd_("U", "N", "N", &c__2, &c__2, &c__2, &dummyk, &dummyl, a, &
+		c__2, b, &c__2, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
 		info);
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
-	sggsvd_("N", "V", "N", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
-		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__0, q, &c__1, w, iw, &
+	sggsvd_("N", "V", "N", &c__1, &c__1, &c__2, &dummyk, &dummyl, a, &
+		c__1, b, &c__2, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
 		info);
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 20;
-	sggsvd_("N", "N", "Q", &c__0, &c__0, &c__0, &dummyk, &dummyl, a, &
-		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__0, w, iw, &
+	sggsvd_("N", "N", "Q", &c__1, &c__2, &c__1, &dummyk, &dummyl, a, &
+		c__1, b, &c__1, r1, r2, u, &c__1, v, &c__1, q, &c__1, w, iw, &
 		info);
 	chkxer_("SGGSVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -428,68 +435,68 @@ static integer c__20 = 20;
 
 	s_copy(srnamc_1.srnamt, "SGGSVP", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	sggsvp_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
+	sggsvp_("/", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	sggsvp_("N", "/", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
+	sggsvp_("N", "/", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	sggsvp_("N", "N", "/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
+	sggsvp_("N", "N", "/", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	sggsvp_("N", "N", "N", &c_n1, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
+	sggsvp_("N", "N", "N", &c_n1, &c__0, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	sggsvp_("N", "N", "N", &c__0, &c_n1, &c__0, a, &c__1, b, &c__1, &tola,
+	sggsvp_("N", "N", "N", &c__0, &c_n1, &c__0, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	sggsvp_("N", "N", "N", &c__0, &c__0, &c_n1, a, &c__1, b, &c__1, &tola,
+	sggsvp_("N", "N", "N", &c__0, &c__0, &c_n1, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	sggsvp_("N", "N", "N", &c__0, &c__0, &c__0, a, &c__0, b, &c__1, &tola,
+	sggsvp_("N", "N", "N", &c__2, &c__1, &c__1, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	sggsvp_("N", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__0, &tola,
+	sggsvp_("N", "N", "N", &c__1, &c__2, &c__1, a, &c__1, b, &c__1, &tola, 
 		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
-	sggsvp_("U", "N", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
-		 &tolb, &dummyk, &dummyl, u, &c__0, v, &c__1, q, &c__1, iw, 
+	sggsvp_("U", "N", "N", &c__2, &c__2, &c__2, a, &c__2, b, &c__2, &tola, 
+		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
-	sggsvp_("N", "V", "N", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
-		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__0, q, &c__1, iw, 
+	sggsvp_("N", "V", "N", &c__1, &c__2, &c__1, a, &c__1, b, &c__2, &tola, 
+		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 20;
-	sggsvp_("N", "N", "Q", &c__0, &c__0, &c__0, a, &c__1, b, &c__1, &tola,
-		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__0, iw, 
+	sggsvp_("N", "N", "Q", &c__1, &c__1, &c__2, a, &c__1, b, &c__1, &tola, 
+		 &tolb, &dummyk, &dummyl, u, &c__1, v, &c__1, q, &c__1, iw, 
 		tau, w, &info);
 	chkxer_("SGGSVP", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -609,7 +616,7 @@ static integer c__20 = 20;
 	chkxer_("SGGGLM", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
-	sggglm_(&c__1, &c__1, &c__1, a, &c__1, b, &c__1, r1, r2, r3, w, &c__1,
+	sggglm_(&c__1, &c__1, &c__1, a, &c__1, b, &c__1, r1, r2, r3, w, &c__1, 
 		 &info);
 	chkxer_("SGGGLM", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -658,7 +665,7 @@ static integer c__20 = 20;
 	chkxer_("SGGLSE", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
-	sgglse_(&c__1, &c__1, &c__1, a, &c__1, b, &c__1, r1, r2, r3, w, &c__1,
+	sgglse_(&c__1, &c__1, &c__1, a, &c__1, b, &c__1, r1, r2, r3, w, &c__1, 
 		 &info);
 	chkxer_("SGGLSE", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -748,57 +755,57 @@ static integer c__20 = 20;
 
 	s_copy(srnamc_1.srnamt, "SGGES ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	sgges_("/", "N", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim,
+	sgges_("/", "N", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	sgges_("N", "/", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim,
+	sgges_("N", "/", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	sgges_("N", "V", "/", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim,
+	sgges_("N", "V", "/", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	sgges_("N", "V", "S", (L_fp)slctes_, &c_n1, a, &c__1, b, &c__1, &sdim,
+	sgges_("N", "V", "S", (L_fp)slctes_, &c_n1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__0, b, &c__1, &sdim,
+	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__0, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__0, &sdim,
+	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__0, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim,
+	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__0, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim,
+	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__2, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 17;
-	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim,
+	sgges_("N", "V", "S", (L_fp)slctes_, &c__1, a, &c__1, b, &c__1, &sdim, 
 		 r1, r2, r3, q, &c__1, u, &c__0, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 17;
-	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim,
+	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim, 
 		 r1, r2, r3, q, &c__2, u, &c__1, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 19;
-	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim,
+	sgges_("V", "V", "S", (L_fp)slctes_, &c__2, a, &c__2, b, &c__2, &sdim, 
 		 r1, r2, r3, q, &c__2, u, &c__2, w, &c__1, bw, &info);
 	chkxer_("SGGES ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -809,84 +816,84 @@ static integer c__20 = 20;
 	s_copy(srnamc_1.srnamt, "SGGESX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggesx_("/", "N", "S", (L_fp)slctsx_, "N", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	sggesx_("N", "/", "S", (L_fp)slctsx_, "N", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	sggesx_("V", "V", "/", (L_fp)slctsx_, "N", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "/", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c_n1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__1, a, &c__0, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__1, a, &c__1, b, &c__0, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__0, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__0, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__2, a, &c__2, b, &c__2, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__1, a, &c__1, b, &c__1, 
-		&sdim, r1, r2, r3, q, &c__1, u, &c__0, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__1, u, &c__0, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 18;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__2, a, &c__2, b, &c__2, 
-		&sdim, r1, r2, r3, q, &c__2, u, &c__1, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__2, u, &c__1, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 22;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "B", &c__2, a, &c__2, b, &c__2, 
-		&sdim, r1, r2, r3, q, &c__2, u, &c__2, rce, rcv, w, &c__1, iw,
+		&sdim, r1, r2, r3, q, &c__2, u, &c__2, rce, rcv, w, &c__1, iw, 
 		 &c__1, bw, &info)
 		;
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
@@ -894,7 +901,7 @@ static integer c__20 = 20;
 	infoc_1.infot = 24;
 	sggesx_("V", "V", "S", (L_fp)slctsx_, "V", &c__1, a, &c__1, b, &c__1, 
 		&sdim, r1, r2, r3, q, &c__1, u, &c__1, rce, rcv, w, &c__32, 
-		iw, &c_n1, bw, &info);
+		iw, &c__0, bw, &info);
 	chkxer_("SGGESX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 13;
@@ -959,73 +966,73 @@ static integer c__20 = 20;
 	s_copy(srnamc_1.srnamt, "SGGEVX", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	sggevx_("/", "N", "N", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
 	sggevx_("N", "/", "N", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
 	sggevx_("N", "N", "/", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
 	sggevx_("N", "N", "N", "/", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	sggevx_("N", "N", "N", "N", &c_n1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	sggevx_("N", "N", "N", "N", &c__1, a, &c__0, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
 	sggevx_("N", "N", "N", "N", &c__1, a, &c__1, b, &c__0, r1, r2, r3, q, 
-		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	sggevx_("N", "N", "N", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__0, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__0, u, &c__1, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	sggevx_("N", "V", "N", "N", &c__2, a, &c__2, b, &c__2, r1, r2, r3, q, 
-		&c__1, u, &c__2, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__2, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	sggevx_("N", "N", "N", "N", &c__1, a, &c__1, b, &c__1, r1, r2, r3, q, 
-		&c__1, u, &c__0, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__1, u, &c__0, &c__1, &c__1, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	sggevx_("N", "N", "V", "N", &c__2, a, &c__2, b, &c__2, r1, r2, r3, q, 
-		&c__2, u, &c__1, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__2, u, &c__1, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 26;
 	sggevx_("N", "N", "V", "N", &c__2, a, &c__2, b, &c__2, r1, r2, r3, q, 
-		&c__2, u, &c__2, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv,
+		&c__2, u, &c__2, &c__1, &c__2, ls, rs, &anrm, &bnrm, rce, rcv, 
 		 w, &c__1, iw, bw, &info);
 	chkxer_("SGGEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1071,7 +1078,7 @@ static integer c__20 = 20;
 		infoc_1.ok);
 	infoc_1.infot = 15;
 	stgexc_(&c_true, &c_true, &c__1, a, &c__1, b, &c__1, q, &c__1, z__, &
-		c__1, &ifst, &ilst, w, &c__1, &info);
+		c__1, &ifst, &ilst, w, &c__0, &info);
 	chkxer_("STGEXC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 8;
@@ -1081,55 +1088,55 @@ static integer c__20 = 20;
 	s_copy(srnamc_1.srnamt, "STGSEN", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
 	stgsen_(&c_n1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c_n1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c__1, a, &c__0, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__0, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 14;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__0, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__0, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 16;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__0, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__0, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 22;
 	stgsen_(&c__0, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 22;
 	stgsen_(&c__1, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 22;
 	stgsen_(&c__2, &c_true, &c_true, sel, &c__1, a, &c__1, b, &c__1, r1, 
-		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1,
+		r2, r3, q, &c__1, z__, &c__1, &m, &tola, &tolb, rcv, w, &c__1, 
 		 iw, &c__1, &info);
 	chkxer_("STGSEN", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1290,8 +1297,3 @@ static integer c__20 = 20;
 /*     End of SERRGG */
 
 } /* serrgg_ */
-
-#undef b_ref
-#undef a_ref
-
-

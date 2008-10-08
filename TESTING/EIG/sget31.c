@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,98 +14,112 @@ static integer c__2 = 2;
 
     /* System generated locals */
     real r__1, r__2, r__3, r__4, r__5, r__6, r__7, r__8, r__9, r__10, r__11, 
-	    r__12, r__13, r__14, r__15, r__16, r__17;
+	    r__12, r__13;
 
     /* Builtin functions */
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer info;
-    static real unfl, smin, a[4]	/* was [2][2] */, b[4]	/* was [2][2] 
-	    */, scale, x[4]	/* was [2][2] */;
-    static integer ismin;
-    static real d1, d2, vsmin[4], xnorm;
+    real a[4]	/* was [2][2] */, b[4]	/* was [2][2] */, x[4]	/* was [2][2] 
+	    */, d1, d2, ca;
+    integer ia, ib, na;
+    real wi;
+    integer nw;
+    real wr;
+    integer id1, id2, ica;
+    real den, vab[3], vca[5], vdd[4], eps;
+    integer iwi;
+    real res, tmp;
+    integer iwr;
+    real vwi[4], vwr[4];
+    integer info;
+    real unfl, smin, scale;
+    integer ismin;
+    real vsmin[4], xnorm;
     extern /* Subroutine */ int slaln2_(logical *, integer *, integer *, real 
 	    *, real *, real *, integer *, real *, real *, real *, integer *, 
-	    real *, real *, real *, integer *, real *, real *, integer *);
-    static real ca;
-    static integer ia, ib, na;
-    extern /* Subroutine */ int slabad_(real *, real *);
-    static real wi;
-    static integer nw;
+	    real *, real *, real *, integer *, real *, real *, integer *), 
+	    slabad_(real *, real *);
     extern doublereal slamch_(char *);
-    static real wr, bignum;
-    static integer id1, id2, itrans;
-    static real smlnum;
-    static integer ica;
-    static real den, vab[3], vca[5], vdd[4], eps;
-    static integer iwi;
-    static real res, tmp;
-    static integer iwr;
-    static real vwi[4], vwr[4];
+    real bignum;
+    integer itrans;
+    real smlnum;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
-#define b_ref(a_1,a_2) b[(a_2)*2 + a_1 - 3]
-#define x_ref(a_1,a_2) x[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET31 tests SLALN2, a routine for solving */
 
-    Purpose   
-    =======   
+/*     (ca A - w D)X = sB */
 
-    SGET31 tests SLALN2, a routine for solving   
+/*  where A is an NA by NA matrix (NA=1 or 2 only), w is a real (NW=1) or */
+/*  complex (NW=2) constant, ca is a real constant, D is an NA by NA real */
+/*  diagonal matrix, and B is an NA by NW matrix (when NW=2 the second */
+/*  column of B contains the imaginary part of the solution).  The code */
+/*  returns X and s, where s is a scale factor, less than or equal to 1, */
+/*  which is chosen to avoid overflow in X. */
 
-       (ca A - w D)X = sB   
+/*  If any singular values of ca A-w D are less than another input */
+/*  parameter SMIN, they are perturbed up to SMIN. */
 
-    where A is an NA by NA matrix (NA=1 or 2 only), w is a real (NW=1) or   
-    complex (NW=2) constant, ca is a real constant, D is an NA by NA real   
-    diagonal matrix, and B is an NA by NW matrix (when NW=2 the second   
-    column of B contains the imaginary part of the solution).  The code   
-    returns X and s, where s is a scale factor, less than or equal to 1,   
-    which is chosen to avoid overflow in X.   
+/*  The test condition is that the scaled residual */
 
-    If any singular values of ca A-w D are less than another input   
-    parameter SMIN, they are perturbed up to SMIN.   
+/*      norm( (ca A-w D)*X - s*B ) / */
+/*            ( max( ulp*norm(ca A-w D), SMIN )*norm(X) ) */
 
-    The test condition is that the scaled residual   
+/*  should be on the order of 1.  Here, ulp is the machine precision. */
+/*  Also, it is verified that SCALE is less than or equal to 1, and that */
+/*  XNORM = infinity-norm(X). */
 
-        norm( (ca A-w D)*X - s*B ) /   
-              ( max( ulp*norm(ca A-w D), SMIN )*norm(X) )   
+/*  Arguments */
+/*  ========== */
 
-    should be on the order of 1.  Here, ulp is the machine precision.   
-    Also, it is verified that SCALE is less than or equal to 1, and that   
-    XNORM = infinity-norm(X).   
+/*  RMAX    (output) REAL */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) REAL   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = number of examples with INFO less than 0 */
+/*          NINFO(2) = number of examples with INFO greater than 0 */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = number of examples with INFO less than 0   
-            NINFO(2) = number of examples with INFO greater than 0   
+/*  ===================================================================== */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --ninfo;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = slamch_("P");
     unfl = slamch_("U");
@@ -166,18 +175,18 @@ static integer c__2 = 2;
 			na = 1;
 			nw = 1;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a_ref(1, 1) = vab[ia - 1];
+			    a[0] = vab[ia - 1];
 			    for (ib = 1; ib <= 3; ++ib) {
-				b_ref(1, 1) = vab[ib - 1];
+				b[0] = vab[ib - 1];
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1.f && d2 == 1.f && ca == 1.f) {
-					wr = vwr[iwr - 1] * a_ref(1, 1);
+					wr = vwr[iwr - 1] * a[0];
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    wi = 0.f;
 				    slaln2_(&ltrans[itrans], &na, &nw, &smin, 
-					    &ca, a, &c__2, &d1, &d2, b, &c__2,
+					    &ca, a, &c__2, &d1, &d2, b, &c__2, 
 					     &wr, &wi, x, &c__2, &scale, &
 					    xnorm, &info);
 				    if (info < 0) {
@@ -186,35 +195,29 @@ static integer c__2 = 2;
 				    if (info > 0) {
 					++ninfo[2];
 				    }
-				    res = (r__1 = (ca * a_ref(1, 1) - wr * d1)
-					     * x_ref(1, 1) - scale * b_ref(1, 
-					    1), dabs(r__1));
+				    res = (r__1 = (ca * a[0] - wr * d1) * x[0]
+					     - scale * b[0], dabs(r__1));
 				    if (info == 0) {
 /* Computing MAX */
-					r__2 = eps * (r__1 = (ca * a_ref(1, 1)
-						 - wr * d1) * x_ref(1, 1), 
-						dabs(r__1));
+					r__2 = eps * (r__1 = (ca * a[0] - wr *
+						 d1) * x[0], dabs(r__1));
 					den = dmax(r__2,smlnum);
 				    } else {
 /* Computing MAX */
-					r__2 = smin * (r__1 = x_ref(1, 1), 
-						dabs(r__1));
-					den = dmax(r__2,smlnum);
+					r__1 = smin * dabs(x[0]);
+					den = dmax(r__1,smlnum);
 				    }
 				    res /= den;
-				    if ((r__1 = x_ref(1, 1), dabs(r__1)) < 
-					    unfl && (r__3 = b_ref(1, 1), dabs(
-					    r__3)) <= smlnum * (r__2 = ca * 
-					    a_ref(1, 1) - wr * d1, dabs(r__2))
-					    ) {
+				    if (dabs(x[0]) < unfl && dabs(b[0]) <= 
+					    smlnum * (r__1 = ca * a[0] - wr * 
+					    d1, dabs(r__1))) {
 					res = 0.f;
 				    }
 				    if (scale > 1.f) {
 					res += 1.f / eps;
 				    }
-				    res += (r__2 = xnorm - (r__1 = x_ref(1, 1)
-					    , dabs(r__1)), dabs(r__2)) / dmax(
-					    smlnum,xnorm) / eps;
+				    res += (r__1 = xnorm - dabs(x[0]), dabs(
+					    r__1)) / dmax(smlnum,xnorm) / eps;
 				    if (info != 0 && info != 1) {
 					res += 1.f / eps;
 				    }
@@ -233,26 +236,26 @@ static integer c__2 = 2;
 			na = 1;
 			nw = 2;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a_ref(1, 1) = vab[ia - 1];
+			    a[0] = vab[ia - 1];
 			    for (ib = 1; ib <= 3; ++ib) {
-				b_ref(1, 1) = vab[ib - 1];
-				b_ref(1, 2) = vab[ib - 1] * -.5f;
+				b[0] = vab[ib - 1];
+				b[2] = vab[ib - 1] * -.5f;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1.f && d2 == 1.f && ca == 1.f) {
-					wr = vwr[iwr - 1] * a_ref(1, 1);
+					wr = vwr[iwr - 1] * a[0];
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    for (iwi = 1; iwi <= 4; ++iwi) {
 					if (d1 == 1.f && d2 == 1.f && ca == 
 						1.f) {
-					    wi = vwi[iwi - 1] * a_ref(1, 1);
+					    wi = vwi[iwi - 1] * a[0];
 					} else {
 					    wi = vwi[iwi - 1];
 					}
 					slaln2_(&ltrans[itrans], &na, &nw, &
-						smin, &ca, a, &c__2, &d1, &d2,
-						 b, &c__2, &wr, &wi, x, &c__2,
+						smin, &ca, a, &c__2, &d1, &d2, 
+						 b, &c__2, &wr, &wi, x, &c__2, 
 						 &scale, &xnorm, &info);
 					if (info < 0) {
 					    ++ninfo[1];
@@ -260,50 +263,41 @@ static integer c__2 = 2;
 					if (info > 0) {
 					    ++ninfo[2];
 					}
-					res = (r__1 = (ca * a_ref(1, 1) - wr *
-						 d1) * x_ref(1, 1) + wi * d1 *
-						 x_ref(1, 2) - scale * b_ref(
-						1, 1), dabs(r__1));
-					res += (r__1 = -wi * d1 * x_ref(1, 1) 
-						+ (ca * a_ref(1, 1) - wr * d1)
-						 * x_ref(1, 2) - scale * 
-						b_ref(1, 2), dabs(r__1));
+					res = (r__1 = (ca * a[0] - wr * d1) * 
+						x[0] + wi * d1 * x[2] - scale 
+						* b[0], dabs(r__1));
+					res += (r__1 = -wi * d1 * x[0] + (ca *
+						 a[0] - wr * d1) * x[2] - 
+						scale * b[2], dabs(r__1));
 					if (info == 0) {
-/* Computing MAX   
-   Computing MAX */
-					    r__6 = (r__3 = ca * a_ref(1, 1) - 
-						    wr * d1, dabs(r__3)), 
-						    r__7 = (r__4 = d1 * wi, 
-						    dabs(r__4));
-					    r__5 = eps * (dmax(r__6,r__7) * ((
-						    r__1 = x_ref(1, 1), dabs(
-						    r__1)) + (r__2 = x_ref(1, 
-						    2), dabs(r__2))));
-					    den = dmax(r__5,smlnum);
+/* Computing MAX */
+/* Computing MAX */
+					    r__4 = (r__1 = ca * a[0] - wr * 
+						    d1, dabs(r__1)), r__5 = (
+						    r__2 = d1 * wi, dabs(r__2)
+						    );
+					    r__3 = eps * (dmax(r__4,r__5) * (
+						    dabs(x[0]) + dabs(x[2])));
+					    den = dmax(r__3,smlnum);
 					} else {
 /* Computing MAX */
-					    r__3 = smin * ((r__1 = x_ref(1, 1)
-						    , dabs(r__1)) + (r__2 = 
-						    x_ref(1, 2), dabs(r__2)));
-					    den = dmax(r__3,smlnum);
+					    r__1 = smin * (dabs(x[0]) + dabs(
+						    x[2]));
+					    den = dmax(r__1,smlnum);
 					}
 					res /= den;
-					if ((r__1 = x_ref(1, 1), dabs(r__1)) <
-						 unfl && (r__2 = x_ref(1, 2), 
-						dabs(r__2)) < unfl && (r__4 = 
-						b_ref(1, 1), dabs(r__4)) <= 
-						smlnum * (r__3 = ca * a_ref(1,
-						 1) - wr * d1, dabs(r__3))) {
+					if (dabs(x[0]) < unfl && dabs(x[2]) < 
+						unfl && dabs(b[0]) <= smlnum *
+						 (r__1 = ca * a[0] - wr * d1, 
+						dabs(r__1))) {
 					    res = 0.f;
 					}
 					if (scale > 1.f) {
 					    res += 1.f / eps;
 					}
-					res += (r__3 = xnorm - (r__1 = x_ref(
-						1, 1), dabs(r__1)) - (r__2 = 
-						x_ref(1, 2), dabs(r__2)), 
-						dabs(r__3)) / dmax(smlnum,
-						xnorm) / eps;
+					res += (r__1 = xnorm - dabs(x[0]) - 
+						dabs(x[2]), dabs(r__1)) / 
+						dmax(smlnum,xnorm) / eps;
 					if (info != 0 && info != 1) {
 					    res += 1.f / eps;
 					}
@@ -324,22 +318,22 @@ static integer c__2 = 2;
 			na = 2;
 			nw = 1;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a_ref(1, 1) = vab[ia - 1];
-			    a_ref(1, 2) = vab[ia - 1] * -3.f;
-			    a_ref(2, 1) = vab[ia - 1] * -7.f;
-			    a_ref(2, 2) = vab[ia - 1] * 21.f;
+			    a[0] = vab[ia - 1];
+			    a[2] = vab[ia - 1] * -3.f;
+			    a[1] = vab[ia - 1] * -7.f;
+			    a[3] = vab[ia - 1] * 21.f;
 			    for (ib = 1; ib <= 3; ++ib) {
-				b_ref(1, 1) = vab[ib - 1];
-				b_ref(2, 1) = vab[ib - 1] * -2.f;
+				b[0] = vab[ib - 1];
+				b[1] = vab[ib - 1] * -2.f;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1.f && d2 == 1.f && ca == 1.f) {
-					wr = vwr[iwr - 1] * a_ref(1, 1);
+					wr = vwr[iwr - 1] * a[0];
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    wi = 0.f;
 				    slaln2_(&ltrans[itrans], &na, &nw, &smin, 
-					    &ca, a, &c__2, &d1, &d2, b, &c__2,
+					    &ca, a, &c__2, &d1, &d2, b, &c__2, 
 					     &wr, &wi, x, &c__2, &scale, &
 					    xnorm, &info);
 				    if (info < 0) {
@@ -349,79 +343,66 @@ static integer c__2 = 2;
 					++ninfo[2];
 				    }
 				    if (itrans == 1) {
-					tmp = a_ref(1, 2);
-					a_ref(1, 2) = a_ref(2, 1);
-					a_ref(2, 1) = tmp;
+					tmp = a[2];
+					a[2] = a[1];
+					a[1] = tmp;
 				    }
-				    res = (r__1 = (ca * a_ref(1, 1) - wr * d1)
-					     * x_ref(1, 1) + ca * a_ref(1, 2) 
-					    * x_ref(2, 1) - scale * b_ref(1, 
-					    1), dabs(r__1));
-				    res += (r__1 = ca * a_ref(2, 1) * x_ref(1,
-					     1) + (ca * a_ref(2, 2) - wr * d2)
-					     * x_ref(2, 1) - scale * b_ref(2, 
-					    1), dabs(r__1));
+				    res = (r__1 = (ca * a[0] - wr * d1) * x[0]
+					     + ca * a[2] * x[1] - scale * b[0]
+					    , dabs(r__1));
+				    res += (r__1 = ca * a[1] * x[0] + (ca * a[
+					    3] - wr * d2) * x[1] - scale * b[
+					    1], dabs(r__1));
 				    if (info == 0) {
-/* Computing MAX   
-   Computing MAX */
-					r__8 = (r__1 = ca * a_ref(1, 1) - wr *
-						 d1, dabs(r__1)) + (r__2 = ca 
-						* a_ref(1, 2), dabs(r__2)), 
-						r__9 = (r__3 = ca * a_ref(2, 
-						1), dabs(r__3)) + (r__4 = ca *
-						 a_ref(2, 2) - wr * d2, dabs(
-						r__4));
 /* Computing MAX */
-					r__10 = (r__5 = x_ref(1, 1), dabs(
-						r__5)), r__11 = (r__6 = x_ref(
-						2, 1), dabs(r__6));
-					r__7 = eps * (dmax(r__8,r__9) * dmax(
-						r__10,r__11));
-					den = dmax(r__7,smlnum);
+/* Computing MAX */
+					r__6 = (r__1 = ca * a[0] - wr * d1, 
+						dabs(r__1)) + (r__2 = ca * a[
+						2], dabs(r__2)), r__7 = (r__3 
+						= ca * a[1], dabs(r__3)) + (
+						r__4 = ca * a[3] - wr * d2, 
+						dabs(r__4));
+/* Computing MAX */
+					r__8 = dabs(x[0]), r__9 = dabs(x[1]);
+					r__5 = eps * (dmax(r__6,r__7) * dmax(
+						r__8,r__9));
+					den = dmax(r__5,smlnum);
 				    } else {
-/* Computing MAX   
-   Computing MAX   
-   Computing MAX */
-					r__10 = (r__1 = ca * a_ref(1, 1) - wr 
-						* d1, dabs(r__1)) + (r__2 = 
-						ca * a_ref(1, 2), dabs(r__2)),
-						 r__11 = (r__3 = ca * a_ref(2,
-						 1), dabs(r__3)) + (r__4 = ca 
-						* a_ref(2, 2) - wr * d2, dabs(
-						r__4));
-					r__8 = smin / eps, r__9 = dmax(r__10,
-						r__11);
 /* Computing MAX */
-					r__12 = (r__5 = x_ref(1, 1), dabs(
-						r__5)), r__13 = (r__6 = x_ref(
-						2, 1), dabs(r__6));
-					r__7 = eps * (dmax(r__8,r__9) * dmax(
-						r__12,r__13));
-					den = dmax(r__7,smlnum);
+/* Computing MAX */
+/* Computing MAX */
+					r__8 = (r__1 = ca * a[0] - wr * d1, 
+						dabs(r__1)) + (r__2 = ca * a[
+						2], dabs(r__2)), r__9 = (r__3 
+						= ca * a[1], dabs(r__3)) + (
+						r__4 = ca * a[3] - wr * d2, 
+						dabs(r__4));
+					r__6 = smin / eps, r__7 = dmax(r__8,
+						r__9);
+/* Computing MAX */
+					r__10 = dabs(x[0]), r__11 = dabs(x[1])
+						;
+					r__5 = eps * (dmax(r__6,r__7) * dmax(
+						r__10,r__11));
+					den = dmax(r__5,smlnum);
 				    }
 				    res /= den;
-				    if ((r__1 = x_ref(1, 1), dabs(r__1)) < 
-					    unfl && (r__2 = x_ref(2, 1), dabs(
-					    r__2)) < unfl && (r__3 = b_ref(1, 
-					    1), dabs(r__3)) + (r__4 = b_ref(2,
-					     1), dabs(r__4)) <= smlnum * ((
-					    r__5 = ca * a_ref(1, 1) - wr * d1,
-					     dabs(r__5)) + (r__6 = ca * a_ref(
-					    1, 2), dabs(r__6)) + (r__7 = ca * 
-					    a_ref(2, 1), dabs(r__7)) + (r__8 =
-					     ca * a_ref(2, 2) - wr * d2, dabs(
-					    r__8)))) {
+				    if (dabs(x[0]) < unfl && dabs(x[1]) < 
+					    unfl && dabs(b[0]) + dabs(b[1]) <=
+					     smlnum * ((r__1 = ca * a[0] - wr 
+					    * d1, dabs(r__1)) + (r__2 = ca * 
+					    a[2], dabs(r__2)) + (r__3 = ca * 
+					    a[1], dabs(r__3)) + (r__4 = ca * 
+					    a[3] - wr * d2, dabs(r__4)))) {
 					res = 0.f;
 				    }
 				    if (scale > 1.f) {
 					res += 1.f / eps;
 				    }
 /* Computing MAX */
-				    r__4 = (r__1 = x_ref(1, 1), dabs(r__1)), 
-					    r__5 = (r__2 = x_ref(2, 1), dabs(
-					    r__2));
-				    res += (r__3 = xnorm - dmax(r__4,r__5), 
-					    dabs(r__3)) / dmax(smlnum,xnorm) /
+				    r__2 = dabs(x[0]), r__3 = dabs(x[1]);
+				    res += (r__1 = xnorm - dmax(r__2,r__3), 
+					    dabs(r__1)) / dmax(smlnum,xnorm) /
 					     eps;
 				    if (info != 0 && info != 1) {
 					res += 1.f / eps;
@@ -441,31 +422,31 @@ static integer c__2 = 2;
 			na = 2;
 			nw = 2;
 			for (ia = 1; ia <= 3; ++ia) {
-			    a_ref(1, 1) = vab[ia - 1] * 2.f;
-			    a_ref(1, 2) = vab[ia - 1] * -3.f;
-			    a_ref(2, 1) = vab[ia - 1] * -7.f;
-			    a_ref(2, 2) = vab[ia - 1] * 21.f;
+			    a[0] = vab[ia - 1] * 2.f;
+			    a[2] = vab[ia - 1] * -3.f;
+			    a[1] = vab[ia - 1] * -7.f;
+			    a[3] = vab[ia - 1] * 21.f;
 			    for (ib = 1; ib <= 3; ++ib) {
-				b_ref(1, 1) = vab[ib - 1];
-				b_ref(2, 1) = vab[ib - 1] * -2.f;
-				b_ref(1, 2) = vab[ib - 1] * 4.f;
-				b_ref(2, 2) = vab[ib - 1] * -7.f;
+				b[0] = vab[ib - 1];
+				b[1] = vab[ib - 1] * -2.f;
+				b[2] = vab[ib - 1] * 4.f;
+				b[3] = vab[ib - 1] * -7.f;
 				for (iwr = 1; iwr <= 4; ++iwr) {
 				    if (d1 == 1.f && d2 == 1.f && ca == 1.f) {
-					wr = vwr[iwr - 1] * a_ref(1, 1);
+					wr = vwr[iwr - 1] * a[0];
 				    } else {
 					wr = vwr[iwr - 1];
 				    }
 				    for (iwi = 1; iwi <= 4; ++iwi) {
 					if (d1 == 1.f && d2 == 1.f && ca == 
 						1.f) {
-					    wi = vwi[iwi - 1] * a_ref(1, 1);
+					    wi = vwi[iwi - 1] * a[0];
 					} else {
 					    wi = vwi[iwi - 1];
 					}
 					slaln2_(&ltrans[itrans], &na, &nw, &
-						smin, &ca, a, &c__2, &d1, &d2,
-						 b, &c__2, &wr, &wi, x, &c__2,
+						smin, &ca, a, &c__2, &d1, &d2, 
+						 b, &c__2, &wr, &wi, x, &c__2, 
 						 &scale, &xnorm, &info);
 					if (info < 0) {
 					    ++ninfo[1];
@@ -474,112 +455,91 @@ static integer c__2 = 2;
 					    ++ninfo[2];
 					}
 					if (itrans == 1) {
-					    tmp = a_ref(1, 2);
-					    a_ref(1, 2) = a_ref(2, 1);
-					    a_ref(2, 1) = tmp;
+					    tmp = a[2];
+					    a[2] = a[1];
+					    a[1] = tmp;
 					}
-					res = (r__1 = (ca * a_ref(1, 1) - wr *
-						 d1) * x_ref(1, 1) + ca * 
-						a_ref(1, 2) * x_ref(2, 1) + 
-						wi * d1 * x_ref(1, 2) - scale 
-						* b_ref(1, 1), dabs(r__1));
-					res += (r__1 = (ca * a_ref(1, 1) - wr 
-						* d1) * x_ref(1, 2) + ca * 
-						a_ref(1, 2) * x_ref(2, 2) - 
-						wi * d1 * x_ref(1, 1) - scale 
-						* b_ref(1, 2), dabs(r__1));
-					res += (r__1 = ca * a_ref(2, 1) * 
-						x_ref(1, 1) + (ca * a_ref(2, 
-						2) - wr * d2) * x_ref(2, 1) + 
-						wi * d2 * x_ref(2, 2) - scale 
-						* b_ref(2, 1), dabs(r__1));
-					res += (r__1 = ca * a_ref(2, 1) * 
-						x_ref(1, 2) + (ca * a_ref(2, 
-						2) - wr * d2) * x_ref(2, 2) - 
-						wi * d2 * x_ref(2, 1) - scale 
-						* b_ref(2, 2), dabs(r__1));
+					res = (r__1 = (ca * a[0] - wr * d1) * 
+						x[0] + ca * a[2] * x[1] + wi *
+						 d1 * x[2] - scale * b[0], 
+						dabs(r__1));
+					res += (r__1 = (ca * a[0] - wr * d1) *
+						 x[2] + ca * a[2] * x[3] - wi 
+						* d1 * x[0] - scale * b[2], 
+						dabs(r__1));
+					res += (r__1 = ca * a[1] * x[0] + (ca 
+						* a[3] - wr * d2) * x[1] + wi 
+						* d2 * x[3] - scale * b[1], 
+						dabs(r__1));
+					res += (r__1 = ca * a[1] * x[2] + (ca 
+						* a[3] - wr * d2) * x[3] - wi 
+						* d2 * x[1] - scale * b[3], 
+						dabs(r__1));
 					if (info == 0) {
-/* Computing MAX   
-   Computing MAX */
-					    r__12 = (r__1 = ca * a_ref(1, 1) 
-						    - wr * d1, dabs(r__1)) + (
-						    r__2 = ca * a_ref(1, 2), 
-						    dabs(r__2)) + (r__3 = wi *
-						     d1, dabs(r__3)), r__13 = 
-						    (r__4 = ca * a_ref(2, 1), 
-						    dabs(r__4)) + (r__5 = ca *
-						     a_ref(2, 2) - wr * d2, 
-						    dabs(r__5)) + (r__6 = wi *
-						     d2, dabs(r__6));
 /* Computing MAX */
-					    r__14 = (r__7 = x_ref(1, 1), dabs(
-						    r__7)) + (r__8 = x_ref(2, 
-						    1), dabs(r__8)), r__15 = (
-						    r__9 = x_ref(1, 2), dabs(
-						    r__9)) + (r__10 = x_ref(2,
-						     2), dabs(r__10));
-					    r__11 = eps * (dmax(r__12,r__13) *
-						     dmax(r__14,r__15));
-					    den = dmax(r__11,smlnum);
+/* Computing MAX */
+					    r__8 = (r__1 = ca * a[0] - wr * 
+						    d1, dabs(r__1)) + (r__2 = 
+						    ca * a[2], dabs(r__2)) + (
+						    r__3 = wi * d1, dabs(r__3)
+						    ), r__9 = (r__4 = ca * a[
+						    1], dabs(r__4)) + (r__5 = 
+						    ca * a[3] - wr * d2, dabs(
+						    r__5)) + (r__6 = wi * d2, 
+						    dabs(r__6));
+/* Computing MAX */
+					    r__10 = dabs(x[0]) + dabs(x[1]), 
+						    r__11 = dabs(x[2]) + dabs(
+						    x[3]);
+					    r__7 = eps * (dmax(r__8,r__9) * 
+						    dmax(r__10,r__11));
+					    den = dmax(r__7,smlnum);
 					} else {
-/* Computing MAX   
-   Computing MAX   
-   Computing MAX */
-					    r__14 = (r__1 = ca * a_ref(1, 1) 
-						    - wr * d1, dabs(r__1)) + (
-						    r__2 = ca * a_ref(1, 2), 
-						    dabs(r__2)) + (r__3 = wi *
-						     d1, dabs(r__3)), r__15 = 
-						    (r__4 = ca * a_ref(2, 1), 
-						    dabs(r__4)) + (r__5 = ca *
-						     a_ref(2, 2) - wr * d2, 
-						    dabs(r__5)) + (r__6 = wi *
-						     d2, dabs(r__6));
-					    r__12 = smin / eps, r__13 = dmax(
-						    r__14,r__15);
 /* Computing MAX */
-					    r__16 = (r__7 = x_ref(1, 1), dabs(
-						    r__7)) + (r__8 = x_ref(2, 
-						    1), dabs(r__8)), r__17 = (
-						    r__9 = x_ref(1, 2), dabs(
-						    r__9)) + (r__10 = x_ref(2,
-						     2), dabs(r__10));
-					    r__11 = eps * (dmax(r__12,r__13) *
-						     dmax(r__16,r__17));
-					    den = dmax(r__11,smlnum);
+/* Computing MAX */
+/* Computing MAX */
+					    r__10 = (r__1 = ca * a[0] - wr * 
+						    d1, dabs(r__1)) + (r__2 = 
+						    ca * a[2], dabs(r__2)) + (
+						    r__3 = wi * d1, dabs(r__3)
+						    ), r__11 = (r__4 = ca * a[
+						    1], dabs(r__4)) + (r__5 = 
+						    ca * a[3] - wr * d2, dabs(
+						    r__5)) + (r__6 = wi * d2, 
+						    dabs(r__6));
+					    r__8 = smin / eps, r__9 = dmax(
+						    r__10,r__11);
+/* Computing MAX */
+					    r__12 = dabs(x[0]) + dabs(x[1]), 
+						    r__13 = dabs(x[2]) + dabs(
+						    x[3]);
+					    r__7 = eps * (dmax(r__8,r__9) * 
+						    dmax(r__12,r__13));
+					    den = dmax(r__7,smlnum);
 					}
 					res /= den;
-					if ((r__1 = x_ref(1, 1), dabs(r__1)) <
-						 unfl && (r__2 = x_ref(2, 1), 
-						dabs(r__2)) < unfl && (r__3 = 
-						x_ref(1, 2), dabs(r__3)) < 
-						unfl && (r__4 = x_ref(2, 2), 
-						dabs(r__4)) < unfl && (r__5 = 
-						b_ref(1, 1), dabs(r__5)) + (
-						r__6 = b_ref(2, 1), dabs(r__6)
-						) <= smlnum * ((r__7 = ca * 
-						a_ref(1, 1) - wr * d1, dabs(
-						r__7)) + (r__8 = ca * a_ref(1,
-						 2), dabs(r__8)) + (r__9 = ca 
-						* a_ref(2, 1), dabs(r__9)) + (
-						r__10 = ca * a_ref(2, 2) - wr 
-						* d2, dabs(r__10)) + (r__11 = 
-						wi * d2, dabs(r__11)) + (
-						r__12 = wi * d1, dabs(r__12)))
-						) {
+					if (dabs(x[0]) < unfl && dabs(x[1]) < 
+						unfl && dabs(x[2]) < unfl && 
+						dabs(x[3]) < unfl && dabs(b[0]
+						) + dabs(b[1]) <= smlnum * ((
+						r__1 = ca * a[0] - wr * d1, 
+						dabs(r__1)) + (r__2 = ca * a[
+						2], dabs(r__2)) + (r__3 = ca *
+						 a[1], dabs(r__3)) + (r__4 = 
+						ca * a[3] - wr * d2, dabs(
+						r__4)) + (r__5 = wi * d2, 
+						dabs(r__5)) + (r__6 = wi * d1,
+						 dabs(r__6)))) {
 					    res = 0.f;
 					}
 					if (scale > 1.f) {
 					    res += 1.f / eps;
 					}
 /* Computing MAX */
-					r__6 = (r__1 = x_ref(1, 1), dabs(r__1)
-						) + (r__2 = x_ref(1, 2), dabs(
-						r__2)), r__7 = (r__3 = x_ref(
-						2, 1), dabs(r__3)) + (r__4 = 
-						x_ref(2, 2), dabs(r__4));
-					res += (r__5 = xnorm - dmax(r__6,r__7)
-						, dabs(r__5)) / dmax(smlnum,
+					r__2 = dabs(x[0]) + dabs(x[2]), r__3 =
+						 dabs(x[1]) + dabs(x[3]);
+					res += (r__1 = xnorm - dmax(r__2,r__3)
+						, dabs(r__1)) / dmax(smlnum,
 						xnorm) / eps;
 					if (info != 0 && info != 1) {
 					    res += 1.f / eps;
@@ -613,9 +573,3 @@ static integer c__2 = 2;
 /*     End of SGET31 */
 
 } /* sget31_ */
-
-#undef x_ref
-#undef b_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zptt01_(integer *n, doublereal *d__, doublecomplex *e, 
 	doublereal *df, doublecomplex *ef, doublecomplex *work, doublereal *
@@ -20,58 +15,69 @@
     double z_abs(doublecomplex *);
 
     /* Local variables */
-    static integer i__;
-    static doublereal anorm;
-    static doublecomplex de;
+    integer i__;
+    doublecomplex de;
+    doublereal eps, anorm;
     extern doublereal dlamch_(char *);
-    static doublereal eps;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ZPTT01 reconstructs a tridiagonal matrix A from its L*D*L'   
-    factorization and computes the residual   
-       norm(L*D*L' - A) / ( n * norm(A) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  ZPTT01 reconstructs a tridiagonal matrix A from its L*D*L' */
+/*  factorization and computes the residual */
+/*     norm(L*D*L' - A) / ( n * norm(A) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGTER   
-            The order of the matrix A.   
+/*  N       (input) INTEGTER */
+/*          The order of the matrix A. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix A.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The n diagonal elements of the tridiagonal matrix A. */
 
-    E       (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the tridiagonal matrix A.   
+/*  E       (input) COMPLEX*16 array, dimension (N-1) */
+/*          The (n-1) subdiagonal elements of the tridiagonal matrix A. */
 
-    DF      (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the factor L from the L*D*L'   
-            factorization of A.   
+/*  DF      (input) DOUBLE PRECISION array, dimension (N) */
+/*          The n diagonal elements of the factor L from the L*D*L' */
+/*          factorization of A. */
 
-    EF      (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the factor L from the   
-            L*D*L' factorization of A.   
+/*  EF      (input) COMPLEX*16 array, dimension (N-1) */
+/*          The (n-1) subdiagonal elements of the factor L from the */
+/*          L*D*L' factorization of A. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (2*N)   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (2*N) */
 
-    RESID   (output) DOUBLE PRECISION   
-            norm(L*D*L' - A) / (n * norm(A) * EPS)   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          norm(L*D*L' - A) / (n * norm(A) * EPS) */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Quick return if possible   
+/*     Quick return if possible */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --work;
     --ef;
     --df;
@@ -154,4 +160,3 @@
 /*     End of ZPTT01 */
 
 } /* zptt01_ */
-

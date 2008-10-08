@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,84 +17,94 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
     real ret_val;
 
     /* Local variables */
-    static integer iscl, info;
-    static real anrm;
+    integer i__, j, mn, iscl, info;
+    real anrm;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i__, j;
     extern /* Subroutine */ int cgebd2_(integer *, integer *, complex *, 
 	    integer *, real *, real *, complex *, complex *, complex *, 
 	    integer *);
     extern doublereal sasum_(integer *, real *, integer *);
-    static real dummy[1];
+    real dummy[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *), slabad_(real *, real *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
-    static integer mn;
     extern /* Subroutine */ int clascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, complex *, integer *, integer *);
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, integer *), xerbla_(char *, 
 	    integer *);
-    static real bignum;
+    real bignum;
     extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, integer *), sbdsqr_(char *, integer *, integer *, integer *, integer 
 	    *, real *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *, integer *);
-    static real smlnum, nrmsvl;
+    real smlnum, nrmsvl;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CQRT12 computes the singular values `svlues' of the upper trapezoid */
+/*  of A(1:M,1:N) and returns the ratio */
 
-    Purpose   
-    =======   
+/*       || s - svlues||/(||svlues||*eps*max(M,N)) */
 
-    CQRT12 computes the singular values `svlues' of the upper trapezoid   
-    of A(1:M,1:N) and returns the ratio   
+/*  Arguments */
+/*  ========= */
 
-         || s - svlues||/(||svlues||*eps*max(M,N))   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The M-by-N matrix A. Only the upper trapezoid is referenced. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced.   
+/*  S       (input) REAL array, dimension (min(M,N)) */
+/*          The singular values of the matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  WORK    (workspace) COMPLEX array, dimension (LWORK) */
 
-    S       (input) REAL array, dimension (min(M,N))   
-            The singular values of the matrix A.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK. LWORK >= M*N + 2*min(M,N) + */
+/*          max(M,N). */
 
-    WORK    (workspace) COMPLEX array, dimension (LWORK)   
+/*  RWORK   (workspace) REAL array, dimension (4*min(M,N)) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK. LWORK >= M*N + 2*min(M,N) +   
-            max(M,N).   
+/*  ===================================================================== */
 
-    RWORK   (workspace) REAL array, dimension (4*min(M,N))   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --s;
     --work;
@@ -132,7 +137,7 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    i__3 = (j - 1) * *m + i__;
-	    i__4 = a_subscr(i__, j);
+	    i__4 = i__ + j * a_dim1;
 	    work[i__3].r = a[i__4].r, work[i__3].i = a[i__4].i;
 /* L10: */
 	}
@@ -208,8 +213,3 @@ doublereal cqrt12_(integer *m, integer *n, complex *a, integer *lda, real *s,
 /*     End of CQRT12 */
 
 } /* cqrt12_ */
-
-#undef a_ref
-#undef a_subscr
-
-

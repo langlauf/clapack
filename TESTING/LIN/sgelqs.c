@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,82 +16,89 @@ static real c_b9 = 0.f;
     /* Local variables */
     extern /* Subroutine */ int strsm_(char *, char *, char *, char *, 
 	    integer *, integer *, real *, real *, integer *, real *, integer *
-	    ), xerbla_(char *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
+), xerbla_(char *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *), sormlq_(char *, char *, integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *);
+, real *, integer *, integer *);
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  Compute a minimum-norm solution */
+/*      min || A*X - B || */
+/*  using the LQ factorization */
+/*      A = L*Q */
+/*  computed by SGELQF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    Compute a minimum-norm solution   
-        min || A*X - B ||   
-    using the LQ factorization   
-        A = L*Q   
-    computed by SGELQF.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= M >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of B.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= M >= 0.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          Details of the LQ factorization of the original matrix A as */
+/*          returned by SGELQF. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of B.  NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            Details of the LQ factorization of the original matrix A as   
-            returned by SGELQF.   
+/*  TAU     (input) REAL array, dimension (M) */
+/*          Details of the orthogonal matrix Q. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  B       (input/output) REAL array, dimension (LDB,NRHS) */
+/*          On entry, the m-by-nrhs right hand side matrix B. */
+/*          On exit, the n-by-nrhs solution matrix X. */
 
-    TAU     (input) REAL array, dimension (M)   
-            Details of the orthogonal matrix Q.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= N. */
 
-    B       (input/output) REAL array, dimension (LDB,NRHS)   
-            On entry, the m-by-nrhs right hand side matrix B.   
-            On exit, the n-by-nrhs solution matrix X.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= N.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK must be at least NRHS, */
+/*          and should be at least NRHS*NB, where NB is the block size */
+/*          for this environment. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK must be at least NRHS,   
-            and should be at least NRHS*NB, where NB is the block size   
-            for this environment.   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --work;
 
@@ -136,7 +138,7 @@ static real c_b9 = 0.f;
 
     if (*m < *n) {
 	i__1 = *n - *m;
-	slaset_("Full", &i__1, nrhs, &c_b9, &c_b9, &b_ref(*m + 1, 1), ldb);
+	slaset_("Full", &i__1, nrhs, &c_b9, &c_b9, &b[*m + 1 + b_dim1], ldb);
     }
 
 /*     B := Q' * B */
@@ -149,7 +151,3 @@ static real c_b9 = 0.f;
 /*     End of SGELQS */
 
 } /* sgelqs_ */
-
-#undef b_ref
-
-

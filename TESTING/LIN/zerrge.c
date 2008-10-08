@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -42,22 +37,19 @@ static integer c__4 = 4;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static doublereal anrm;
-    static doublecomplex a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static doublereal r__[4], ccond;
-    static doublecomplex w[8], x[4];
-    static doublereal rcond;
-    static char c2[2];
-    static doublereal r1[4], r2[4];
+    doublecomplex a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    doublereal r__[4];
+    doublecomplex w[8], x[4];
+    char c2[2];
+    doublereal r1[4], r2[4];
+    doublecomplex af[16]	/* was [4][4] */;
+    integer ip[4], info;
+    doublereal anrm, ccond, rcond;
     extern /* Subroutine */ int zgbtf2_(integer *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, integer *, integer *), 
 	    zgetf2_(integer *, integer *, doublecomplex *, integer *, integer 
-	    *, integer *);
-    static doublecomplex af[16]	/* was [4][4] */;
-    static integer ip[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    *, integer *), alaesm_(char *, logical *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int zgbcon_(char *, integer *, integer *, integer 
 	    *, doublecomplex *, integer *, integer *, doublereal *, 
@@ -65,7 +57,7 @@ static integer c__4 = 4;
 	    chkxer_(char *, integer *, integer *, logical *, logical *), zgecon_(char *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, doublereal *, 
 	    integer *), zgbequ_(integer *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, doublereal *, doublereal *,
+	    integer *, doublecomplex *, integer *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, doublereal *, integer *), zgbrfs_(
 	    char *, integer *, integer *, integer *, integer *, doublecomplex 
 	    *, integer *, doublecomplex *, integer *, integer *, 
@@ -76,16 +68,16 @@ static integer c__4 = 4;
 	    zgeequ_(integer *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *, integer *), zgerfs_(char *, integer *, integer *, 
-	    doublecomplex *, integer *, doublecomplex *, integer *, integer *,
+	    doublecomplex *, integer *, doublecomplex *, integer *, integer *, 
 	     doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *, doublecomplex *, doublereal *, 
-	    integer *), zgetrf_(integer *, integer *, doublecomplex *,
+	    integer *), zgetrf_(integer *, integer *, doublecomplex *, 
 	     integer *, integer *, integer *), zgetri_(integer *, 
-	    doublecomplex *, integer *, integer *, doublecomplex *, integer *,
+	    doublecomplex *, integer *, integer *, doublecomplex *, integer *, 
 	     integer *), zgbtrs_(char *, integer *, integer *, integer *, 
-	    integer *, doublecomplex *, integer *, integer *, doublecomplex *,
+	    integer *, doublecomplex *, integer *, integer *, doublecomplex *, 
 	     integer *, integer *), zgetrs_(char *, integer *, 
-	    integer *, doublecomplex *, integer *, integer *, doublecomplex *,
+	    integer *, doublecomplex *, integer *, integer *, doublecomplex *, 
 	     integer *, integer *);
 
     /* Fortran I/O blocks */
@@ -93,35 +85,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRGE tests the error exits for the COMPLEX*16 routines */
+/*  for general matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRGE tests the error exits for the COMPLEX*16 routines   
-    for general matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -133,12 +137,12 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
 	    a[i__1].r = z__1.r, a[i__1].i = z__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    d__2 = -1. / (doublereal) (i__ + j);
 	    z__1.r = d__1, z__1.i = d__2;
@@ -158,8 +162,8 @@ static integer c__4 = 4;
     }
     infoc_1.ok = TRUE_;
 
-/*     Test error exits of the routines that use the LU decomposition   
-       of a general matrix. */
+/*     Test error exits of the routines that use the LU decomposition */
+/*     of a general matrix. */
 
     if (lsamen_(&c__2, c2, "GE")) {
 
@@ -309,8 +313,8 @@ static integer c__4 = 4;
 	chkxer_("ZGEEQU", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the LU decomposition   
-       of a general band matrix. */
+/*     Test error exits of the routines that use the LU decomposition */
+/*     of a general band matrix. */
 
     } else if (lsamen_(&c__2, c2, "GB")) {
 
@@ -454,27 +458,27 @@ static integer c__4 = 4;
 
 	s_copy(srnamc_1.srnamt, "ZGBCON", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	zgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	zgbcon_("/", &c__0, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("ZGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	zgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	zgbcon_("1", &c_n1, &c__0, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("ZGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	zgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__,
+	zgbcon_("1", &c__1, &c_n1, &c__0, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("ZGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	zgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r__,
+	zgbcon_("1", &c__1, &c__0, &c_n1, a, &c__1, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("ZGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	zgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r__,
+	zgbcon_("1", &c__2, &c__1, &c__1, a, &c__3, ip, &anrm, &rcond, w, r__, 
 		 &info);
 	chkxer_("ZGBCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -518,10 +522,3 @@ static integer c__4 = 4;
 /*     End of ZERRGE */
 
 } /* zerrge_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

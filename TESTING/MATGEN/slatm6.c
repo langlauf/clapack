@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -29,10 +24,10 @@ static integer c__60 = 60;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer info;
-    static real work[100];
-    static integer i__, j;
-    static real z__[144]	/* was [12][12] */;
+    integer i__, j;
+    real z__[144]	/* was [12][12] */;
+    integer info;
+    real work[100];
     extern /* Subroutine */ int slakf2_(integer *, integer *, real *, integer 
 	    *, real *, real *, real *, real *, integer *), sgesvd_(char *, 
 	    char *, integer *, integer *, real *, integer *, real *, real *, 
@@ -40,125 +35,133 @@ static integer c__60 = 60;
 	    integer *, real *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
-#define y_ref(a_1,a_2) y[(a_2)*y_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SLATM6 generates test matrices for the generalized eigenvalue */
+/*  problem, their corresponding right and left eigenvector matrices, */
+/*  and also reciprocal condition numbers for all eigenvalues and */
+/*  the reciprocal condition numbers of eigenvectors corresponding to */
+/*  the 1th and 5th eigenvalues. */
 
-    Purpose   
-    =======   
+/*  Test Matrices */
+/*  ============= */
 
-    SLATM6 generates test matrices for the generalized eigenvalue   
-    problem, their corresponding right and left eigenvector matrices,   
-    and also reciprocal condition numbers for all eigenvalues and   
-    the reciprocal condition numbers of eigenvectors corresponding to   
-    the 1th and 5th eigenvalues.   
+/*  Two kinds of test matrix pairs */
 
-    Test Matrices   
-    =============   
+/*        (A, B) = inverse(YH) * (Da, Db) * inverse(X) */
 
-    Two kinds of test matrix pairs   
+/*  are used in the tests: */
 
-          (A, B) = inverse(YH) * (Da, Db) * inverse(X)   
+/*  Type 1: */
+/*     Da = 1+a   0    0    0    0    Db = 1   0   0   0   0 */
+/*           0   2+a   0    0    0         0   1   0   0   0 */
+/*           0    0   3+a   0    0         0   0   1   0   0 */
+/*           0    0    0   4+a   0         0   0   0   1   0 */
+/*           0    0    0    0   5+a ,      0   0   0   0   1 , and */
 
-    are used in the tests:   
+/*  Type 2: */
+/*     Da =  1   -1    0    0    0    Db = 1   0   0   0   0 */
+/*           1    1    0    0    0         0   1   0   0   0 */
+/*           0    0    1    0    0         0   0   1   0   0 */
+/*           0    0    0   1+a  1+b        0   0   0   1   0 */
+/*           0    0    0  -1-b  1+a ,      0   0   0   0   1 . */
 
-    Type 1:   
-       Da = 1+a   0    0    0    0    Db = 1   0   0   0   0   
-             0   2+a   0    0    0         0   1   0   0   0   
-             0    0   3+a   0    0         0   0   1   0   0   
-             0    0    0   4+a   0         0   0   0   1   0   
-             0    0    0    0   5+a ,      0   0   0   0   1 , and   
+/*  In both cases the same inverse(YH) and inverse(X) are used to compute */
+/*  (A, B), giving the exact eigenvectors to (A,B) as (YH, X): */
 
-    Type 2:   
-       Da =  1   -1    0    0    0    Db = 1   0   0   0   0   
-             1    1    0    0    0         0   1   0   0   0   
-             0    0    1    0    0         0   0   1   0   0   
-             0    0    0   1+a  1+b        0   0   0   1   0   
-             0    0    0  -1-b  1+a ,      0   0   0   0   1 .   
+/*  YH:  =  1    0   -y    y   -y    X =  1   0  -x  -x   x */
+/*          0    1   -y    y   -y         0   1   x  -x  -x */
+/*          0    0    1    0    0         0   0   1   0   0 */
+/*          0    0    0    1    0         0   0   0   1   0 */
+/*          0    0    0    0    1,        0   0   0   0   1 , */
 
-    In both cases the same inverse(YH) and inverse(X) are used to compute   
-    (A, B), giving the exact eigenvectors to (A,B) as (YH, X):   
+/* where a, b, x and y will have all values independently of each other. */
 
-    YH:  =  1    0   -y    y   -y    X =  1   0  -x  -x   x   
-            0    1   -y    y   -y         0   1   x  -x  -x   
-            0    0    1    0    0         0   0   1   0   0   
-            0    0    0    1    0         0   0   0   1   0   
-            0    0    0    0    1,        0   0   0   0   1 ,   
+/*  Arguments */
+/*  ========= */
 
-   where a, b, x and y will have all values independently of each other.   
+/*  TYPE    (input) INTEGER */
+/*          Specifies the problem type (see futher details). */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          Size of the matrices A and B. */
 
-    TYPE    (input) INTEGER   
-            Specifies the problem type (see futher details).   
+/*  A       (output) REAL array, dimension (LDA, N). */
+/*          On exit A N-by-N is initialized according to TYPE. */
 
-    N       (input) INTEGER   
-            Size of the matrices A and B.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A and of B. */
 
-    A       (output) REAL array, dimension (LDA, N).   
-            On exit A N-by-N is initialized according to TYPE.   
+/*  B       (output) REAL array, dimension (LDA, N). */
+/*          On exit B N-by-N is initialized according to TYPE. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A and of B.   
+/*  X       (output) REAL array, dimension (LDX, N). */
+/*          On exit X is the N-by-N matrix of right eigenvectors. */
 
-    B       (output) REAL array, dimension (LDA, N).   
-            On exit B N-by-N is initialized according to TYPE.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of X. */
 
-    X       (output) REAL array, dimension (LDX, N).   
-            On exit X is the N-by-N matrix of right eigenvectors.   
+/*  Y       (output) REAL array, dimension (LDY, N). */
+/*          On exit Y is the N-by-N matrix of left eigenvectors. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of X.   
+/*  LDY     (input) INTEGER */
+/*          The leading dimension of Y. */
 
-    Y       (output) REAL array, dimension (LDY, N).   
-            On exit Y is the N-by-N matrix of left eigenvectors.   
+/*  ALPHA   (input) REAL */
+/*  BETA    (input) REAL */
+/*          Weighting constants for matrix A. */
 
-    LDY     (input) INTEGER   
-            The leading dimension of Y.   
+/*  WX      (input) REAL */
+/*          Constant for right eigenvector matrix. */
 
-    ALPHA   (input) REAL   
-    BETA    (input) REAL   
-            Weighting constants for matrix A.   
+/*  WY      (input) REAL */
+/*          Constant for left eigenvector matrix. */
 
-    WX      (input) REAL   
-            Constant for right eigenvector matrix.   
+/*  S       (output) REAL array, dimension (N) */
+/*          S(i) is the reciprocal condition number for eigenvalue i. */
 
-    WY      (input) REAL   
-            Constant for left eigenvector matrix.   
+/*  DIF     (output) REAL array, dimension (N) */
+/*          DIF(i) is the reciprocal condition number for eigenvector i. */
 
-    S       (output) REAL array, dimension (N)   
-            S(i) is the reciprocal condition number for eigenvalue i.   
+/*  ===================================================================== */
 
-    DIF     (output) REAL array, dimension (N)   
-            DIF(i) is the reciprocal condition number for eigenvector i.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Generate test problem ... */
+/*     (Da, Db) ... */
 
-
-       Generate test problem ...   
-       (Da, Db) ...   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     b_dim1 = *lda;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     y_dim1 = *ldy;
-    y_offset = 1 + y_dim1 * 1;
+    y_offset = 1 + y_dim1;
     y -= y_offset;
     --s;
     --dif;
@@ -170,11 +173,11 @@ static integer c__60 = 60;
 	for (j = 1; j <= i__2; ++j) {
 
 	    if (i__ == j) {
-		a_ref(i__, i__) = (real) i__ + *alpha;
-		b_ref(i__, i__) = 1.f;
+		a[i__ + i__ * a_dim1] = (real) i__ + *alpha;
+		b[i__ + i__ * b_dim1] = 1.f;
 	    } else {
-		a_ref(i__, j) = 0.f;
-		b_ref(i__, j) = 0.f;
+		a[i__ + j * a_dim1] = 0.f;
+		b[i__ + j * b_dim1] = 0.f;
 	    }
 
 /* L10: */
@@ -185,77 +188,81 @@ static integer c__60 = 60;
 /*     Form X and Y */
 
     slacpy_("F", n, n, &b[b_offset], lda, &y[y_offset], ldy);
-    y_ref(3, 1) = -(*wy);
-    y_ref(4, 1) = *wy;
-    y_ref(5, 1) = -(*wy);
-    y_ref(3, 2) = -(*wy);
-    y_ref(4, 2) = *wy;
-    y_ref(5, 2) = -(*wy);
+    y[y_dim1 + 3] = -(*wy);
+    y[y_dim1 + 4] = *wy;
+    y[y_dim1 + 5] = -(*wy);
+    y[(y_dim1 << 1) + 3] = -(*wy);
+    y[(y_dim1 << 1) + 4] = *wy;
+    y[(y_dim1 << 1) + 5] = -(*wy);
 
     slacpy_("F", n, n, &b[b_offset], lda, &x[x_offset], ldx);
-    x_ref(1, 3) = -(*wx);
-    x_ref(1, 4) = -(*wx);
-    x_ref(1, 5) = *wx;
-    x_ref(2, 3) = *wx;
-    x_ref(2, 4) = -(*wx);
-    x_ref(2, 5) = -(*wx);
+    x[x_dim1 * 3 + 1] = -(*wx);
+    x[(x_dim1 << 2) + 1] = -(*wx);
+    x[x_dim1 * 5 + 1] = *wx;
+    x[x_dim1 * 3 + 2] = *wx;
+    x[(x_dim1 << 2) + 2] = -(*wx);
+    x[x_dim1 * 5 + 2] = -(*wx);
 
 /*     Form (A, B) */
 
-    b_ref(1, 3) = *wx + *wy;
-    b_ref(2, 3) = -(*wx) + *wy;
-    b_ref(1, 4) = *wx - *wy;
-    b_ref(2, 4) = *wx - *wy;
-    b_ref(1, 5) = -(*wx) + *wy;
-    b_ref(2, 5) = *wx + *wy;
+    b[b_dim1 * 3 + 1] = *wx + *wy;
+    b[b_dim1 * 3 + 2] = -(*wx) + *wy;
+    b[(b_dim1 << 2) + 1] = *wx - *wy;
+    b[(b_dim1 << 2) + 2] = *wx - *wy;
+    b[b_dim1 * 5 + 1] = -(*wx) + *wy;
+    b[b_dim1 * 5 + 2] = *wx + *wy;
     if (*type__ == 1) {
-	a_ref(1, 3) = *wx * a_ref(1, 1) + *wy * a_ref(3, 3);
-	a_ref(2, 3) = -(*wx) * a_ref(2, 2) + *wy * a_ref(3, 3);
-	a_ref(1, 4) = *wx * a_ref(1, 1) - *wy * a_ref(4, 4);
-	a_ref(2, 4) = *wx * a_ref(2, 2) - *wy * a_ref(4, 4);
-	a_ref(1, 5) = -(*wx) * a_ref(1, 1) + *wy * a_ref(5, 5);
-	a_ref(2, 5) = *wx * a_ref(2, 2) + *wy * a_ref(5, 5);
+	a[a_dim1 * 3 + 1] = *wx * a[a_dim1 + 1] + *wy * a[a_dim1 * 3 + 3];
+	a[a_dim1 * 3 + 2] = -(*wx) * a[(a_dim1 << 1) + 2] + *wy * a[a_dim1 * 
+		3 + 3];
+	a[(a_dim1 << 2) + 1] = *wx * a[a_dim1 + 1] - *wy * a[(a_dim1 << 2) + 
+		4];
+	a[(a_dim1 << 2) + 2] = *wx * a[(a_dim1 << 1) + 2] - *wy * a[(a_dim1 <<
+		 2) + 4];
+	a[a_dim1 * 5 + 1] = -(*wx) * a[a_dim1 + 1] + *wy * a[a_dim1 * 5 + 5];
+	a[a_dim1 * 5 + 2] = *wx * a[(a_dim1 << 1) + 2] + *wy * a[a_dim1 * 5 + 
+		5];
     } else if (*type__ == 2) {
-	a_ref(1, 3) = *wx * 2.f + *wy;
-	a_ref(2, 3) = *wy;
-	a_ref(1, 4) = -(*wy) * (*alpha + 2.f + *beta);
-	a_ref(2, 4) = *wx * 2.f - *wy * (*alpha + 2.f + *beta);
-	a_ref(1, 5) = *wx * -2.f + *wy * (*alpha - *beta);
-	a_ref(2, 5) = *wy * (*alpha - *beta);
-	a_ref(1, 1) = 1.f;
-	a_ref(1, 2) = -1.f;
-	a_ref(2, 1) = 1.f;
-	a_ref(2, 2) = a_ref(1, 1);
-	a_ref(3, 3) = 1.f;
-	a_ref(4, 4) = *alpha + 1.f;
-	a_ref(4, 5) = *beta + 1.f;
-	a_ref(5, 4) = -a_ref(4, 5);
-	a_ref(5, 5) = a_ref(4, 4);
+	a[a_dim1 * 3 + 1] = *wx * 2.f + *wy;
+	a[a_dim1 * 3 + 2] = *wy;
+	a[(a_dim1 << 2) + 1] = -(*wy) * (*alpha + 2.f + *beta);
+	a[(a_dim1 << 2) + 2] = *wx * 2.f - *wy * (*alpha + 2.f + *beta);
+	a[a_dim1 * 5 + 1] = *wx * -2.f + *wy * (*alpha - *beta);
+	a[a_dim1 * 5 + 2] = *wy * (*alpha - *beta);
+	a[a_dim1 + 1] = 1.f;
+	a[(a_dim1 << 1) + 1] = -1.f;
+	a[a_dim1 + 2] = 1.f;
+	a[(a_dim1 << 1) + 2] = a[a_dim1 + 1];
+	a[a_dim1 * 3 + 3] = 1.f;
+	a[(a_dim1 << 2) + 4] = *alpha + 1.f;
+	a[a_dim1 * 5 + 4] = *beta + 1.f;
+	a[(a_dim1 << 2) + 5] = -a[a_dim1 * 5 + 4];
+	a[a_dim1 * 5 + 5] = a[(a_dim1 << 2) + 4];
     }
 
 /*     Compute condition numbers */
 
     if (*type__ == 1) {
 
-	s[1] = 1.f / sqrt((*wy * 3.f * *wy + 1.f) / (a_ref(1, 1) * a_ref(1, 1)
-		 + 1.f));
-	s[2] = 1.f / sqrt((*wy * 3.f * *wy + 1.f) / (a_ref(2, 2) * a_ref(2, 2)
-		 + 1.f));
-	s[3] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a_ref(3, 3) * a_ref(3, 3)
-		 + 1.f));
-	s[4] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a_ref(4, 4) * a_ref(4, 4)
-		 + 1.f));
-	s[5] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a_ref(5, 5) * a_ref(5, 5)
-		 + 1.f));
+	s[1] = 1.f / sqrt((*wy * 3.f * *wy + 1.f) / (a[a_dim1 + 1] * a[a_dim1 
+		+ 1] + 1.f));
+	s[2] = 1.f / sqrt((*wy * 3.f * *wy + 1.f) / (a[(a_dim1 << 1) + 2] * a[
+		(a_dim1 << 1) + 2] + 1.f));
+	s[3] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a[a_dim1 * 3 + 3] * a[
+		a_dim1 * 3 + 3] + 1.f));
+	s[4] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a[(a_dim1 << 2) + 4] * a[
+		(a_dim1 << 2) + 4] + 1.f));
+	s[5] = 1.f / sqrt((*wx * 2.f * *wx + 1.f) / (a[a_dim1 * 5 + 5] * a[
+		a_dim1 * 5 + 5] + 1.f));
 
-	slakf2_(&c__1, &c__4, &a[a_offset], lda, &a_ref(2, 2), &b[b_offset], &
-		b_ref(2, 2), z__, &c__12);
+	slakf2_(&c__1, &c__4, &a[a_offset], lda, &a[(a_dim1 << 1) + 2], &b[
+		b_offset], &b[(b_dim1 << 1) + 2], z__, &c__12);
 	sgesvd_("N", "N", &c__8, &c__8, z__, &c__12, work, &work[8], &c__1, &
 		work[9], &c__1, &work[10], &c__40, &info);
 	dif[1] = work[7];
 
-	slakf2_(&c__4, &c__1, &a[a_offset], lda, &a_ref(5, 5), &b[b_offset], &
-		b_ref(5, 5), z__, &c__12);
+	slakf2_(&c__4, &c__1, &a[a_offset], lda, &a[a_dim1 * 5 + 5], &b[
+		b_offset], &b[b_dim1 * 5 + 5], z__, &c__12);
 	sgesvd_("N", "N", &c__8, &c__8, z__, &c__12, work, &work[8], &c__1, &
 		work[9], &c__1, &work[10], &c__40, &info);
 	dif[5] = work[7];
@@ -269,15 +276,15 @@ static integer c__60 = 60;
 		+ 1.f) + 1.f + (*beta + 1.f) * (*beta + 1.f)));
 	s[5] = s[4];
 
-	slakf2_(&c__2, &c__3, &a[a_offset], lda, &a_ref(3, 3), &b[b_offset], &
-		b_ref(3, 3), z__, &c__12);
-	sgesvd_("N", "N", &c__12, &c__12, z__, &c__12, work, &work[12], &c__1,
+	slakf2_(&c__2, &c__3, &a[a_offset], lda, &a[a_dim1 * 3 + 3], &b[
+		b_offset], &b[b_dim1 * 3 + 3], z__, &c__12);
+	sgesvd_("N", "N", &c__12, &c__12, z__, &c__12, work, &work[12], &c__1, 
 		 &work[13], &c__1, &work[14], &c__60, &info);
 	dif[1] = work[11];
 
-	slakf2_(&c__3, &c__2, &a[a_offset], lda, &a_ref(4, 4), &b[b_offset], &
-		b_ref(4, 4), z__, &c__12);
-	sgesvd_("N", "N", &c__12, &c__12, z__, &c__12, work, &work[12], &c__1,
+	slakf2_(&c__3, &c__2, &a[a_offset], lda, &a[(a_dim1 << 2) + 4], &b[
+		b_offset], &b[(b_dim1 << 2) + 4], z__, &c__12);
+	sgesvd_("N", "N", &c__12, &c__12, z__, &c__12, work, &work[12], &c__1, 
 		 &work[13], &c__1, &work[14], &c__60, &info);
 	dif[5] = work[11];
 
@@ -288,10 +295,3 @@ static integer c__60 = 60;
 /*     End of SLATM6 */
 
 } /* slatm6_ */
-
-#undef y_ref
-#undef x_ref
-#undef b_ref
-#undef a_ref
-
-

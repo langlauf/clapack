@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -18,7 +13,7 @@ static integer c__1 = 1;
 	doublecomplex *a, doublecomplex *af, integer *lda, doublecomplex *b, 
 	doublecomplex *bf, integer *ldb, doublecomplex *u, integer *ldu, 
 	doublecomplex *v, integer *ldv, doublecomplex *q, integer *ldq, 
-	doublereal *alpha, doublereal *beta, doublecomplex *r__, integer *ldr,
+	doublereal *alpha, doublereal *beta, doublecomplex *r__, integer *ldr, 
 	 integer *iwork, doublecomplex *work, integer *lwork, doublereal *
 	rwork, doublereal *result)
 {
@@ -30,16 +25,16 @@ static integer c__1 = 1;
     doublecomplex z__1, z__2;
 
     /* Local variables */
-    static integer info;
-    static doublereal unfl, temp;
-    static integer i__, j, k, l;
-    static doublereal resid, anorm, bnorm;
+    integer i__, j, k, l;
+    doublereal ulp;
+    integer info;
+    doublereal unfl, temp, resid, anorm, bnorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), zgemm_(char *, char *, integer *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
+	    integer *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	     doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zherk_(char *, char *, integer *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
 	     doublecomplex *, integer *);
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *), 
@@ -50,151 +45,153 @@ static integer c__1 = 1;
 	    zlaset_(char *, integer *, integer *, doublecomplex *, 
 	    doublecomplex *, doublecomplex *, integer *), zggsvd_(
 	    char *, char *, char *, integer *, integer *, integer *, integer *
-	    , integer *, doublecomplex *, integer *, doublecomplex *, integer 
+, integer *, doublecomplex *, integer *, doublecomplex *, integer 
 	    *, doublereal *, doublereal *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublereal *, integer *, integer *);
-    static doublereal ulpinv, ulp;
+    doublereal ulpinv;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*b_dim1 + a_1
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define r___subscr(a_1,a_2) (a_2)*r_dim1 + a_1
-#define r___ref(a_1,a_2) r__[r___subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
-#define bf_subscr(a_1,a_2) (a_2)*bf_dim1 + a_1
-#define bf_ref(a_1,a_2) bf[bf_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGSVTS tests ZGGSVD, which computes the GSVD of an M-by-N matrix A */
+/*  and a P-by-N matrix B: */
+/*               U'*A*Q = D1*R and V'*B*Q = D2*R. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZGSVTS tests ZGGSVD, which computes the GSVD of an M-by-N matrix A   
-    and a P-by-N matrix B:   
-                 U'*A*Q = D1*R and V'*B*Q = D2*R.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  P       (input) INTEGER */
+/*          The number of rows of the matrix B.  P >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B.  N >= 0. */
 
-    P       (input) INTEGER   
-            The number of rows of the matrix B.  P >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,M) */
+/*          The M-by-N matrix A. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.  N >= 0.   
+/*  AF      (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          Details of the GSVD of A and B, as returned by ZGGSVD, */
+/*          see ZGGSVD for further details. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,M)   
-            The M-by-N matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
+/*          LDA >= max( 1,M ). */
 
-    AF      (output) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the GSVD of A and B, as returned by ZGGSVD,   
-            see ZGGSVD for further details.   
+/*  B       (input) COMPLEX*16 array, dimension (LDB,P) */
+/*          On entry, the P-by-N matrix B. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
-            LDA >= max( 1,M ).   
+/*  BF      (output) COMPLEX*16 array, dimension (LDB,N) */
+/*          Details of the GSVD of A and B, as returned by ZGGSVD, */
+/*          see ZGGSVD for further details. */
 
-    B       (input) COMPLEX*16 array, dimension (LDB,P)   
-            On entry, the P-by-N matrix B.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B and BF. */
+/*          LDB >= max(1,P). */
 
-    BF      (output) COMPLEX*16 array, dimension (LDB,N)   
-            Details of the GSVD of A and B, as returned by ZGGSVD,   
-            see ZGGSVD for further details.   
+/*  U       (output) COMPLEX*16 array, dimension(LDU,M) */
+/*          The M by M unitary matrix U. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B and BF.   
-            LDB >= max(1,P).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U. LDU >= max(1,M). */
 
-    U       (output) COMPLEX*16 array, dimension(LDU,M)   
-            The M by M unitary matrix U.   
+/*  V       (output) COMPLEX*16 array, dimension(LDV,M) */
+/*          The P by P unitary matrix V. */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U. LDU >= max(1,M).   
+/*  LDV     (input) INTEGER */
+/*          The leading dimension of the array V. LDV >= max(1,P). */
 
-    V       (output) COMPLEX*16 array, dimension(LDV,M)   
-            The P by P unitary matrix V.   
+/*  Q       (output) COMPLEX*16 array, dimension(LDQ,N) */
+/*          The N by N unitary matrix Q. */
 
-    LDV     (input) INTEGER   
-            The leading dimension of the array V. LDV >= max(1,P).   
+/*  LDQ     (input) INTEGER */
+/*          The leading dimension of the array Q. LDQ >= max(1,N). */
 
-    Q       (output) COMPLEX*16 array, dimension(LDQ,N)   
-            The N by N unitary matrix Q.   
+/*  ALPHA   (output) DOUBLE PRECISION array, dimension (N) */
+/*  BETA    (output) DOUBLE PRECISION array, dimension (N) */
+/*          The generalized singular value pairs of A and B, the */
+/*          ``diagonal'' matrices D1 and D2 are constructed from */
+/*          ALPHA and BETA, see subroutine ZGGSVD for details. */
 
-    LDQ     (input) INTEGER   
-            The leading dimension of the array Q. LDQ >= max(1,N).   
+/*  R       (output) COMPLEX*16 array, dimension(LDQ,N) */
+/*          The upper triangular matrix R. */
 
-    ALPHA   (output) DOUBLE PRECISION array, dimension (N)   
-    BETA    (output) DOUBLE PRECISION array, dimension (N)   
-            The generalized singular value pairs of A and B, the   
-            ``diagonal'' matrices D1 and D2 are constructed from   
-            ALPHA and BETA, see subroutine ZGGSVD for details.   
+/*  LDR     (input) INTEGER */
+/*          The leading dimension of the array R. LDR >= max(1,N). */
 
-    R       (output) COMPLEX*16 array, dimension(LDQ,N)   
-            The upper triangular matrix R.   
+/*  IWORK   (workspace) INTEGER array, dimension (N) */
 
-    LDR     (input) INTEGER   
-            The leading dimension of the array R. LDR >= max(1,N).   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    IWORK   (workspace) INTEGER array, dimension (N)   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK, */
+/*          LWORK >= max(M,P,N)*max(M,P,N). */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,P,N)) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK,   
-            LWORK >= max(M,P,N)*max(M,P,N).   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (5) */
+/*          The test ratios: */
+/*          RESULT(1) = norm( U'*A*Q - D1*R ) / ( MAX(M,N)*norm(A)*ULP) */
+/*          RESULT(2) = norm( V'*B*Q - D2*R ) / ( MAX(P,N)*norm(B)*ULP) */
+/*          RESULT(3) = norm( I - U'*U ) / ( M*ULP ) */
+/*          RESULT(4) = norm( I - V'*V ) / ( P*ULP ) */
+/*          RESULT(5) = norm( I - Q'*Q ) / ( N*ULP ) */
+/*          RESULT(6) = 0        if ALPHA is in decreasing order; */
+/*                    = ULPINV   otherwise. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(M,P,N))   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (5)   
-            The test ratios:   
-            RESULT(1) = norm( U'*A*Q - D1*R ) / ( MAX(M,N)*norm(A)*ULP)   
-            RESULT(2) = norm( V'*B*Q - D2*R ) / ( MAX(P,N)*norm(B)*ULP)   
-            RESULT(3) = norm( I - U'*U ) / ( M*ULP )   
-            RESULT(4) = norm( I - V'*V ) / ( P*ULP )   
-            RESULT(5) = norm( I - Q'*Q ) / ( N*ULP )   
-            RESULT(6) = 0        if ALPHA is in decreasing order;   
-                      = ULPINV   otherwise.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --alpha;
     --beta;
     r_dim1 = *ldr;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     --iwork;
     --work;
@@ -222,19 +219,19 @@ static integer c__1 = 1;
 
     zggsvd_("U", "V", "Q", m, n, p, &k, &l, &af[af_offset], lda, &bf[
 	    bf_offset], ldb, &alpha[1], &beta[1], &u[u_offset], ldu, &v[
-	    v_offset], ldv, &q[q_offset], ldq, &work[1], &rwork[1], &iwork[1],
+	    v_offset], ldv, &q[q_offset], ldq, &work[1], &rwork[1], &iwork[1], 
 	     &info);
 
-/*     Copy R   
+/*     Copy R */
 
-   Computing MIN */
+/* Computing MIN */
     i__2 = k + l;
     i__1 = min(i__2,*m);
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    i__3 = r___subscr(i__, j);
-	    i__4 = af_subscr(i__, *n - k - l + j);
+	    i__3 = i__ + j * r_dim1;
+	    i__4 = i__ + (*n - k - l + j) * af_dim1;
 	    r__[i__3].r = af[i__4].r, r__[i__3].i = af[i__4].i;
 /* L10: */
 	}
@@ -246,8 +243,8 @@ static integer c__1 = 1;
 	for (i__ = *m + 1; i__ <= i__1; ++i__) {
 	    i__2 = k + l;
 	    for (j = i__; j <= i__2; ++j) {
-		i__3 = r___subscr(i__, j);
-		i__4 = bf_subscr(i__ - k, *n - k - l + j);
+		i__3 = i__ + j * r_dim1;
+		i__4 = i__ - k + (*n - k - l + j) * bf_dim1;
 		r__[i__3].r = bf[i__4].r, r__[i__3].i = bf[i__4].i;
 /* L30: */
 	    }
@@ -261,15 +258,15 @@ static integer c__1 = 1;
 	    &q[q_offset], ldq, &c_b1, &work[1], lda);
 
     zgemm_("Conjugate transpose", "No transpose", m, n, m, &c_b2, &u[u_offset]
-	    , ldu, &work[1], lda, &c_b1, &a[a_offset], lda);
+, ldu, &work[1], lda, &c_b1, &a[a_offset], lda);
 
     i__1 = k;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    i__3 = a_subscr(i__, *n - k - l + j);
-	    i__4 = a_subscr(i__, *n - k - l + j);
-	    i__5 = r___subscr(i__, j);
+	    i__3 = i__ + (*n - k - l + j) * a_dim1;
+	    i__4 = i__ + (*n - k - l + j) * a_dim1;
+	    i__5 = i__ + j * r_dim1;
 	    z__1.r = a[i__4].r - r__[i__5].r, z__1.i = a[i__4].i - r__[i__5]
 		    .i;
 	    a[i__3].r = z__1.r, a[i__3].i = z__1.i;
@@ -284,10 +281,10 @@ static integer c__1 = 1;
     for (i__ = k + 1; i__ <= i__1; ++i__) {
 	i__2 = k + l;
 	for (j = i__; j <= i__2; ++j) {
-	    i__3 = a_subscr(i__, *n - k - l + j);
-	    i__4 = a_subscr(i__, *n - k - l + j);
+	    i__3 = i__ + (*n - k - l + j) * a_dim1;
+	    i__4 = i__ + (*n - k - l + j) * a_dim1;
 	    i__5 = i__;
-	    i__6 = r___subscr(i__, j);
+	    i__6 = i__ + j * r_dim1;
 	    z__2.r = alpha[i__5] * r__[i__6].r, z__2.i = alpha[i__5] * r__[
 		    i__6].i;
 	    z__1.r = a[i__4].r - z__2.r, z__1.i = a[i__4].i - z__2.i;
@@ -314,16 +311,16 @@ static integer c__1 = 1;
 	    &q[q_offset], ldq, &c_b1, &work[1], ldb);
 
     zgemm_("Conjugate transpose", "No transpose", p, n, p, &c_b2, &v[v_offset]
-	    , ldv, &work[1], ldb, &c_b1, &b[b_offset], ldb);
+, ldv, &work[1], ldb, &c_b1, &b[b_offset], ldb);
 
     i__1 = l;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = l;
 	for (j = i__; j <= i__2; ++j) {
-	    i__3 = b_subscr(i__, *n - l + j);
-	    i__4 = b_subscr(i__, *n - l + j);
+	    i__3 = i__ + (*n - l + j) * b_dim1;
+	    i__4 = i__ + (*n - l + j) * b_dim1;
 	    i__5 = k + i__;
-	    i__6 = r___subscr(k + i__, k + j);
+	    i__6 = k + i__ + (k + j) * r_dim1;
 	    z__2.r = beta[i__5] * r__[i__6].r, z__2.i = beta[i__5] * r__[i__6]
 		    .i;
 	    z__1.r = b[i__4].r - z__2.r, z__1.i = b[i__4].i - z__2.i;
@@ -409,16 +406,3 @@ static integer c__1 = 1;
 /*     End of ZGSVTS */
 
 } /* zgsvts_ */
-
-#undef bf_ref
-#undef bf_subscr
-#undef af_ref
-#undef af_subscr
-#undef r___ref
-#undef r___subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

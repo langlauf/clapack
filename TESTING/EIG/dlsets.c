@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,102 +16,110 @@ static integer c__1 = 1;
 	    bf_offset;
 
     /* Local variables */
-    static integer info;
+    integer info;
     extern /* Subroutine */ int dget02_(char *, integer *, integer *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
-	     integer *, doublereal *, doublereal *), dcopy_(integer *,
+	    *, doublereal *, integer *, doublereal *, integer *, doublereal *, 
+	     integer *, doublereal *, doublereal *), dcopy_(integer *, 
 	     doublereal *, integer *, doublereal *, integer *), dgglse_(
 	    integer *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     doublereal *, integer *, integer *), dlacpy_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *);
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       March 31, 1993   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLSETS tests DGGLSE - a subroutine for solving linear equality   
-    constrained least square problem (LSE).   
+/*  DLSETS tests DGGLSE - a subroutine for solving linear equality */
+/*  constrained least square problem (LSE). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    P       (input) INTEGER   
-            The number of rows of the matrix B.  P >= 0.   
+/*  P       (input) INTEGER */
+/*          The number of rows of the matrix B.  P >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and B.  N >= 0.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and B.  N >= 0. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    AF      (workspace) DOUBLE PRECISION array, dimension (LDA,N)   
+/*  AF      (workspace) DOUBLE PRECISION array, dimension (LDA,N) */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, Q and R.   
-            LDA >= max(M,N).   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, Q and R. */
+/*          LDA >= max(M,N). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
-            The P-by-N matrix A.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,N) */
+/*          The P-by-N matrix A. */
 
-    BF      (workspace) DOUBLE PRECISION array, dimension (LDB,N)   
+/*  BF      (workspace) DOUBLE PRECISION array, dimension (LDB,N) */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B, BF, V and S.   
-            LDB >= max(P,N).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B, BF, V and S. */
+/*          LDB >= max(P,N). */
 
-    C       (input) DOUBLE PRECISION array, dimension( M )   
-            the vector C in the LSE problem.   
+/*  C       (input) DOUBLE PRECISION array, dimension( M ) */
+/*          the vector C in the LSE problem. */
 
-    CF      (workspace) DOUBLE PRECISION array, dimension( M )   
+/*  CF      (workspace) DOUBLE PRECISION array, dimension( M ) */
 
-    D       (input) DOUBLE PRECISION array, dimension( P )   
-            the vector D in the LSE problem.   
+/*  D       (input) DOUBLE PRECISION array, dimension( P ) */
+/*          the vector D in the LSE problem. */
 
-    DF      (workspace) DOUBLE PRECISION array, dimension( P )   
+/*  DF      (workspace) DOUBLE PRECISION array, dimension( P ) */
 
-    X       (output) DOUBLE PRECISION array, dimension( N )   
-            solution vector X in the LSE problem.   
+/*  X       (output) DOUBLE PRECISION array, dimension( N ) */
+/*          solution vector X in the LSE problem. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (M)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The test ratios:   
-              RESULT(1) = norm( A*x - c )/ norm(A)*norm(X)*EPS   
-              RESULT(2) = norm( B*x - d )/ norm(B)*norm(X)*EPS   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The test ratios: */
+/*            RESULT(1) = norm( A*x - c )/ norm(A)*norm(X)*EPS */
+/*            RESULT(2) = norm( B*x - d )/ norm(B)*norm(X)*EPS */
 
-    ====================================================================   
+/*  ==================================================================== */
 
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Copy the matrices A and B to the arrays AF and BF,   
-       and the vectors C and D to the arrays CF and DF,   
+/*     Copy the matrices A and B to the arrays AF and BF, */
+/*     and the vectors C and D to the arrays CF and DF, */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --c__;
     --cf;
@@ -135,12 +138,12 @@ static integer c__1 = 1;
 
 /*     Solve LSE problem */
 
-    dgglse_(m, n, p, &af[af_offset], lda, &bf[bf_offset], ldb, &cf[1], &df[1],
+    dgglse_(m, n, p, &af[af_offset], lda, &bf[bf_offset], ldb, &cf[1], &df[1], 
 	     &x[1], &work[1], lwork, &info);
 
-/*     Test the residual for the solution of LSE   
+/*     Test the residual for the solution of LSE */
 
-       Compute RESULT(1) = norm( A*x - c ) / norm(A)*norm(X)*EPS */
+/*     Compute RESULT(1) = norm( A*x - c ) / norm(A)*norm(X)*EPS */
 
     dcopy_(m, &c__[1], &c__1, &cf[1], &c__1);
     dcopy_(p, &d__[1], &c__1, &df[1], &c__1);
@@ -157,4 +160,3 @@ static integer c__1 = 1;
 /*     End of DLSETS */
 
 } /* dlsets_ */
-

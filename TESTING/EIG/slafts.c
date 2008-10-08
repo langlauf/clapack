@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -36,7 +31,7 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer k;
+    integer k;
     extern /* Subroutine */ int slahd2_(integer *, char *);
 
     /* Fortran I/O blocks */
@@ -47,72 +42,80 @@ static integer c__4 = 4;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-       SLAFTS tests the result vector against the threshold value to   
-       see which tests for this matrix type failed to pass the threshold.   
-       Output is to the file given by unit IOUNIT.   
+/*     SLAFTS tests the result vector against the threshold value to */
+/*     see which tests for this matrix type failed to pass the threshold. */
+/*     Output is to the file given by unit IOUNIT. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    TYPE   - CHARACTER*3   
-             On entry, TYPE specifies the matrix type to be used in the   
-             printed messages.   
-             Not modified.   
+/*  TYPE   - CHARACTER*3 */
+/*           On entry, TYPE specifies the matrix type to be used in the */
+/*           printed messages. */
+/*           Not modified. */
 
-    N      - INTEGER   
-             On entry, N specifies the order of the test matrix.   
-             Not modified.   
+/*  N      - INTEGER */
+/*           On entry, N specifies the order of the test matrix. */
+/*           Not modified. */
 
-    IMAT   - INTEGER   
-             On entry, IMAT specifies the type of the test matrix.   
-             A listing of the different types is printed by SLAHD2   
-             to the output file if a test fails to pass the threshold.   
-             Not modified.   
+/*  IMAT   - INTEGER */
+/*           On entry, IMAT specifies the type of the test matrix. */
+/*           A listing of the different types is printed by SLAHD2 */
+/*           to the output file if a test fails to pass the threshold. */
+/*           Not modified. */
 
-    NTESTS - INTEGER   
-             On entry, NTESTS is the number of tests performed on the   
-             subroutines in the path given by TYPE.   
-             Not modified.   
+/*  NTESTS - INTEGER */
+/*           On entry, NTESTS is the number of tests performed on the */
+/*           subroutines in the path given by TYPE. */
+/*           Not modified. */
 
-    RESULT - REAL               array of dimension( NTESTS )   
-             On entry, RESULT contains the test ratios from the tests   
-             performed in the calling program.   
-             Not modified.   
+/*  RESULT - REAL               array of dimension( NTESTS ) */
+/*           On entry, RESULT contains the test ratios from the tests */
+/*           performed in the calling program. */
+/*           Not modified. */
 
-    ISEED  - INTEGER            array of dimension( 4 )   
-             Contains the random seed that generated the matrix used   
-             for the tests whose ratios are in RESULT.   
-             Not modified.   
+/*  ISEED  - INTEGER            array of dimension( 4 ) */
+/*           Contains the random seed that generated the matrix used */
+/*           for the tests whose ratios are in RESULT. */
+/*           Not modified. */
 
-    THRESH - REAL   
-             On entry, THRESH specifies the acceptable threshold of the   
-             test ratios.  If RESULT( K ) > THRESH, then the K-th test   
-             did not pass the threshold and a message will be printed.   
-             Not modified.   
+/*  THRESH - REAL */
+/*           On entry, THRESH specifies the acceptable threshold of the */
+/*           test ratios.  If RESULT( K ) > THRESH, then the K-th test */
+/*           did not pass the threshold and a message will be printed. */
+/*           Not modified. */
 
-    IOUNIT - INTEGER   
-             On entry, IOUNIT specifies the unit number of the file   
-             to which the messages are printed.   
-             Not modified.   
+/*  IOUNIT - INTEGER */
+/*           On entry, IOUNIT specifies the unit number of the file */
+/*           to which the messages are printed. */
+/*           Not modified. */
 
-    IE     - INTEGER   
-             On entry, IE contains the number of tests which have   
-             failed to pass the threshold so far.   
-             Updated on exit if any of the ratios in RESULT also fail.   
+/*  IE     - INTEGER */
+/*           On entry, IE contains the number of tests which have */
+/*           failed to pass the threshold so far. */
+/*           Updated on exit if any of the ratios in RESULT also fail. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --iseed;
     --result;
 
@@ -125,18 +128,18 @@ static integer c__4 = 4;
 	for (k = 1; k <= i__1; ++k) {
 	    if (result[k] >= *thresh) {
 
-/*           If this is the first test to fail, call SLAHD2   
-             to print a header to the data file. */
+/*           If this is the first test to fail, call SLAHD2 */
+/*           to print a header to the data file. */
 
 		if (*ie == 0) {
 		    slahd2_(iounit, type__);
 		}
 		++(*ie);
-/* **            WRITE( IOUNIT, 15 )' Matrix of order', N,   
-   **     $               ',  type ', IMAT,   
-   **     $               ',  test ', K,   
-   **     $               ',  ratio = ', RESULT( K )   
-   **   15       FORMAT( A16, I5, 2( A8, I2 ), A11, G13.6 ) */
+/* **            WRITE( IOUNIT, 15 )' Matrix of order', N, */
+/* **     $               ',  type ', IMAT, */
+/* **     $               ',  test ', K, */
+/* **     $               ',  ratio = ', RESULT( K ) */
+/* **   15       FORMAT( A16, I5, 2( A8, I2 ), A11, G13.6 ) */
 		if (result[k] < 1e4f) {
 		    io___2.ciunit = *iounit;
 		    s_wsfe(&io___2);
@@ -167,17 +170,17 @@ static integer c__4 = 4;
 	for (k = 1; k <= i__1; ++k) {
 	    if (result[k] >= *thresh) {
 
-/*              If this is the first test to fail, call SLAHD2   
-                to print a header to the data file. */
+/*              If this is the first test to fail, call SLAHD2 */
+/*              to print a header to the data file. */
 
 		if (*ie == 0) {
 		    slahd2_(iounit, type__);
 		}
 		++(*ie);
-/* **              WRITE( IOUNIT, FMT = 9997 )' Matrix of size', M, ' x',   
-   **     $             N, ', type ', IMAT, ',  test ', K, ',  ratio = ',   
-   **     $             RESULT( K )   
-   ** 9997           FORMAT( A10, I5, A2, I5, A7, I2, A8, I2, A11, G13.6 ) */
+/* **              WRITE( IOUNIT, FMT = 9997 )' Matrix of size', M, ' x', */
+/* **     $             N, ', type ', IMAT, ',  test ', K, ',  ratio = ', */
+/* **     $             RESULT( K ) */
+/* ** 9997           FORMAT( A10, I5, A2, I5, A7, I2, A8, I2, A11, G13.6 ) */
 		if (result[k] < 1e4f) {
 		    io___4.ciunit = *iounit;
 		    s_wsfe(&io___4);
@@ -209,4 +212,3 @@ static integer c__4 = 4;
 /*     End of SLAFTS */
 
 } /* slafts_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -13,7 +8,7 @@ static integer c__1 = 1;
 static real c_b11 = 1.f;
 static real c_b13 = 0.f;
 
-/* Subroutine */ int slagge_(integer *m, integer *n, integer *kl, integer *ku,
+/* Subroutine */ int slagge_(integer *m, integer *n, integer *kl, integer *ku, 
 	 real *d__, real *a, integer *lda, integer *iseed, real *work, 
 	integer *info)
 {
@@ -25,83 +20,93 @@ static real c_b13 = 0.f;
     double r_sign(real *, real *);
 
     /* Local variables */
+    integer i__, j;
+    real wa, wb, wn, tau;
     extern /* Subroutine */ int sger_(integer *, integer *, real *, real *, 
 	    integer *, real *, integer *, real *, integer *);
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i__, j;
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
 	    sgemv_(char *, integer *, integer *, real *, real *, integer *, 
-	    real *, integer *, real *, real *, integer *);
-    static real wa, wb, wn;
-    extern /* Subroutine */ int xerbla_(char *, integer *), slarnv_(
-	    integer *, integer *, integer *, real *);
-    static real tau;
+	    real *, integer *, real *, real *, integer *), xerbla_(
+	    char *, integer *), slarnv_(integer *, integer *, integer 
+	    *, real *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK auxiliary test routine (version 3.1) */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0)   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SLAGGE generates a real general m by n matrix A, by pre- and post- */
+/*  multiplying a real diagonal matrix D with random orthogonal matrices: */
+/*  A = U*D*V. The lower and upper bandwidths may then be reduced to */
+/*  kl and ku by additional orthogonal transformations. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SLAGGE generates a real general m by n matrix A, by pre- and post-   
-    multiplying a real diagonal matrix D with random orthogonal matrices:   
-    A = U*D*V. The lower and upper bandwidths may then be reduced to   
-    kl and ku by additional orthogonal transformations.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A.  M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A.  N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
+/*  KL      (input) INTEGER */
+/*          The number of nonzero subdiagonals within the band of A. */
+/*          0 <= KL <= M-1. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
+/*  KU      (input) INTEGER */
+/*          The number of nonzero superdiagonals within the band of A. */
+/*          0 <= KU <= N-1. */
 
-    KL      (input) INTEGER   
-            The number of nonzero subdiagonals within the band of A.   
-            0 <= KL <= M-1.   
+/*  D       (input) REAL array, dimension (min(M,N)) */
+/*          The diagonal elements of the diagonal matrix D. */
 
-    KU      (input) INTEGER   
-            The number of nonzero superdiagonals within the band of A.   
-            0 <= KU <= N-1.   
+/*  A       (output) REAL array, dimension (LDA,N) */
+/*          The generated m by n matrix A. */
 
-    D       (input) REAL array, dimension (min(M,N))   
-            The diagonal elements of the diagonal matrix D.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= M. */
 
-    A       (output) REAL array, dimension (LDA,N)   
-            The generated m by n matrix A.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= M.   
+/*  WORK    (workspace) REAL array, dimension (M+N) */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    WORK    (workspace) REAL array, dimension (M+N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --work;
@@ -131,14 +136,14 @@ static real c_b13 = 0.f;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = *m;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    a_ref(i__, j) = 0.f;
+	    a[i__ + j * a_dim1] = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     i__1 = min(*m,*n);
     for (i__ = 1; i__ <= i__1; ++i__) {
-	a_ref(i__, i__) = d__[i__];
+	a[i__ + i__ * a_dim1] = d__[i__];
 /* L30: */
     }
 
@@ -169,13 +174,13 @@ static real c_b13 = 0.f;
 
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
-	    sgemv_("Transpose", &i__1, &i__2, &c_b11, &a_ref(i__, i__), lda, &
-		    work[1], &c__1, &c_b13, &work[*m + 1], &c__1);
+	    sgemv_("Transpose", &i__1, &i__2, &c_b11, &a[i__ + i__ * a_dim1], 
+		    lda, &work[1], &c__1, &c_b13, &work[*m + 1], &c__1);
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
 	    r__1 = -tau;
 	    sger_(&i__1, &i__2, &r__1, &work[1], &c__1, &work[*m + 1], &c__1, 
-		    &a_ref(i__, i__), lda);
+		    &a[i__ + i__ * a_dim1], lda);
 	}
 	if (i__ < *n) {
 
@@ -201,45 +206,47 @@ static real c_b13 = 0.f;
 
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
-	    sgemv_("No transpose", &i__1, &i__2, &c_b11, &a_ref(i__, i__), 
-		    lda, &work[1], &c__1, &c_b13, &work[*n + 1], &c__1);
+	    sgemv_("No transpose", &i__1, &i__2, &c_b11, &a[i__ + i__ * 
+		    a_dim1], lda, &work[1], &c__1, &c_b13, &work[*n + 1], &
+		    c__1);
 	    i__1 = *m - i__ + 1;
 	    i__2 = *n - i__ + 1;
 	    r__1 = -tau;
 	    sger_(&i__1, &i__2, &r__1, &work[*n + 1], &c__1, &work[1], &c__1, 
-		    &a_ref(i__, i__), lda);
+		    &a[i__ + i__ * a_dim1], lda);
 	}
 /* L40: */
     }
 
-/*     Reduce number of subdiagonals to KL and number of superdiagonals   
-       to KU   
+/*     Reduce number of subdiagonals to KL and number of superdiagonals */
+/*     to KU */
 
-   Computing MAX */
+/* Computing MAX */
     i__2 = *m - 1 - *kl, i__3 = *n - 1 - *ku;
     i__1 = max(i__2,i__3);
     for (i__ = 1; i__ <= i__1; ++i__) {
 	if (*kl <= *ku) {
 
-/*           annihilate subdiagonal elements first (necessary if KL = 0)   
+/*           annihilate subdiagonal elements first (necessary if KL = 0) */
 
-   Computing MIN */
+/* Computing MIN */
 	    i__2 = *m - 1 - *kl;
 	    if (i__ <= min(i__2,*n)) {
 
 /*              generate reflection to annihilate A(kl+i+1:m,i) */
 
 		i__2 = *m - *kl - i__ + 1;
-		wn = snrm2_(&i__2, &a_ref(*kl + i__, i__), &c__1);
-		wa = r_sign(&wn, &a_ref(*kl + i__, i__));
+		wn = snrm2_(&i__2, &a[*kl + i__ + i__ * a_dim1], &c__1);
+		wa = r_sign(&wn, &a[*kl + i__ + i__ * a_dim1]);
 		if (wn == 0.f) {
 		    tau = 0.f;
 		} else {
-		    wb = a_ref(*kl + i__, i__) + wa;
+		    wb = a[*kl + i__ + i__ * a_dim1] + wa;
 		    i__2 = *m - *kl - i__;
 		    r__1 = 1.f / wb;
-		    sscal_(&i__2, &r__1, &a_ref(*kl + i__ + 1, i__), &c__1);
-		    a_ref(*kl + i__, i__) = 1.f;
+		    sscal_(&i__2, &r__1, &a[*kl + i__ + 1 + i__ * a_dim1], &
+			    c__1);
+		    a[*kl + i__ + i__ * a_dim1] = 1.f;
 		    tau = wb / wa;
 		}
 
@@ -247,15 +254,16 @@ static real c_b13 = 0.f;
 
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
-		sgemv_("Transpose", &i__2, &i__3, &c_b11, &a_ref(*kl + i__, 
-			i__ + 1), lda, &a_ref(*kl + i__, i__), &c__1, &c_b13, 
-			&work[1], &c__1);
+		sgemv_("Transpose", &i__2, &i__3, &c_b11, &a[*kl + i__ + (i__ 
+			+ 1) * a_dim1], lda, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &c_b13, &work[1], &c__1);
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
 		r__1 = -tau;
-		sger_(&i__2, &i__3, &r__1, &a_ref(*kl + i__, i__), &c__1, &
-			work[1], &c__1, &a_ref(*kl + i__, i__ + 1), lda);
-		a_ref(*kl + i__, i__) = -wa;
+		sger_(&i__2, &i__3, &r__1, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &work[1], &c__1, &a[*kl + i__ + (i__ + 1) * 
+			a_dim1], lda);
+		a[*kl + i__ + i__ * a_dim1] = -wa;
 	    }
 
 /* Computing MIN */
@@ -265,16 +273,17 @@ static real c_b13 = 0.f;
 /*              generate reflection to annihilate A(i,ku+i+1:n) */
 
 		i__2 = *n - *ku - i__ + 1;
-		wn = snrm2_(&i__2, &a_ref(i__, *ku + i__), lda);
-		wa = r_sign(&wn, &a_ref(i__, *ku + i__));
+		wn = snrm2_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
+		wa = r_sign(&wn, &a[i__ + (*ku + i__) * a_dim1]);
 		if (wn == 0.f) {
 		    tau = 0.f;
 		} else {
-		    wb = a_ref(i__, *ku + i__) + wa;
+		    wb = a[i__ + (*ku + i__) * a_dim1] + wa;
 		    i__2 = *n - *ku - i__;
 		    r__1 = 1.f / wb;
-		    sscal_(&i__2, &r__1, &a_ref(i__, *ku + i__ + 1), lda);
-		    a_ref(i__, *ku + i__) = 1.f;
+		    sscal_(&i__2, &r__1, &a[i__ + (*ku + i__ + 1) * a_dim1], 
+			    lda);
+		    a[i__ + (*ku + i__) * a_dim1] = 1.f;
 		    tau = wb / wa;
 		}
 
@@ -282,38 +291,40 @@ static real c_b13 = 0.f;
 
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
-		sgemv_("No transpose", &i__2, &i__3, &c_b11, &a_ref(i__ + 1, *
-			ku + i__), lda, &a_ref(i__, *ku + i__), lda, &c_b13, &
-			work[1], &c__1);
+		sgemv_("No transpose", &i__2, &i__3, &c_b11, &a[i__ + 1 + (*
+			ku + i__) * a_dim1], lda, &a[i__ + (*ku + i__) * 
+			a_dim1], lda, &c_b13, &work[1], &c__1);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
 		r__1 = -tau;
-		sger_(&i__2, &i__3, &r__1, &work[1], &c__1, &a_ref(i__, *ku + 
-			i__), lda, &a_ref(i__ + 1, *ku + i__), lda);
-		a_ref(i__, *ku + i__) = -wa;
+		sger_(&i__2, &i__3, &r__1, &work[1], &c__1, &a[i__ + (*ku + 
+			i__) * a_dim1], lda, &a[i__ + 1 + (*ku + i__) * 
+			a_dim1], lda);
+		a[i__ + (*ku + i__) * a_dim1] = -wa;
 	    }
 	} else {
 
-/*           annihilate superdiagonal elements first (necessary if   
-             KU = 0)   
+/*           annihilate superdiagonal elements first (necessary if */
+/*           KU = 0) */
 
-   Computing MIN */
+/* Computing MIN */
 	    i__2 = *n - 1 - *ku;
 	    if (i__ <= min(i__2,*m)) {
 
 /*              generate reflection to annihilate A(i,ku+i+1:n) */
 
 		i__2 = *n - *ku - i__ + 1;
-		wn = snrm2_(&i__2, &a_ref(i__, *ku + i__), lda);
-		wa = r_sign(&wn, &a_ref(i__, *ku + i__));
+		wn = snrm2_(&i__2, &a[i__ + (*ku + i__) * a_dim1], lda);
+		wa = r_sign(&wn, &a[i__ + (*ku + i__) * a_dim1]);
 		if (wn == 0.f) {
 		    tau = 0.f;
 		} else {
-		    wb = a_ref(i__, *ku + i__) + wa;
+		    wb = a[i__ + (*ku + i__) * a_dim1] + wa;
 		    i__2 = *n - *ku - i__;
 		    r__1 = 1.f / wb;
-		    sscal_(&i__2, &r__1, &a_ref(i__, *ku + i__ + 1), lda);
-		    a_ref(i__, *ku + i__) = 1.f;
+		    sscal_(&i__2, &r__1, &a[i__ + (*ku + i__ + 1) * a_dim1], 
+			    lda);
+		    a[i__ + (*ku + i__) * a_dim1] = 1.f;
 		    tau = wb / wa;
 		}
 
@@ -321,15 +332,16 @@ static real c_b13 = 0.f;
 
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
-		sgemv_("No transpose", &i__2, &i__3, &c_b11, &a_ref(i__ + 1, *
-			ku + i__), lda, &a_ref(i__, *ku + i__), lda, &c_b13, &
-			work[1], &c__1);
+		sgemv_("No transpose", &i__2, &i__3, &c_b11, &a[i__ + 1 + (*
+			ku + i__) * a_dim1], lda, &a[i__ + (*ku + i__) * 
+			a_dim1], lda, &c_b13, &work[1], &c__1);
 		i__2 = *m - i__;
 		i__3 = *n - *ku - i__ + 1;
 		r__1 = -tau;
-		sger_(&i__2, &i__3, &r__1, &work[1], &c__1, &a_ref(i__, *ku + 
-			i__), lda, &a_ref(i__ + 1, *ku + i__), lda);
-		a_ref(i__, *ku + i__) = -wa;
+		sger_(&i__2, &i__3, &r__1, &work[1], &c__1, &a[i__ + (*ku + 
+			i__) * a_dim1], lda, &a[i__ + 1 + (*ku + i__) * 
+			a_dim1], lda);
+		a[i__ + (*ku + i__) * a_dim1] = -wa;
 	    }
 
 /* Computing MIN */
@@ -339,16 +351,17 @@ static real c_b13 = 0.f;
 /*              generate reflection to annihilate A(kl+i+1:m,i) */
 
 		i__2 = *m - *kl - i__ + 1;
-		wn = snrm2_(&i__2, &a_ref(*kl + i__, i__), &c__1);
-		wa = r_sign(&wn, &a_ref(*kl + i__, i__));
+		wn = snrm2_(&i__2, &a[*kl + i__ + i__ * a_dim1], &c__1);
+		wa = r_sign(&wn, &a[*kl + i__ + i__ * a_dim1]);
 		if (wn == 0.f) {
 		    tau = 0.f;
 		} else {
-		    wb = a_ref(*kl + i__, i__) + wa;
+		    wb = a[*kl + i__ + i__ * a_dim1] + wa;
 		    i__2 = *m - *kl - i__;
 		    r__1 = 1.f / wb;
-		    sscal_(&i__2, &r__1, &a_ref(*kl + i__ + 1, i__), &c__1);
-		    a_ref(*kl + i__, i__) = 1.f;
+		    sscal_(&i__2, &r__1, &a[*kl + i__ + 1 + i__ * a_dim1], &
+			    c__1);
+		    a[*kl + i__ + i__ * a_dim1] = 1.f;
 		    tau = wb / wa;
 		}
 
@@ -356,27 +369,28 @@ static real c_b13 = 0.f;
 
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
-		sgemv_("Transpose", &i__2, &i__3, &c_b11, &a_ref(*kl + i__, 
-			i__ + 1), lda, &a_ref(*kl + i__, i__), &c__1, &c_b13, 
-			&work[1], &c__1);
+		sgemv_("Transpose", &i__2, &i__3, &c_b11, &a[*kl + i__ + (i__ 
+			+ 1) * a_dim1], lda, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &c_b13, &work[1], &c__1);
 		i__2 = *m - *kl - i__ + 1;
 		i__3 = *n - i__;
 		r__1 = -tau;
-		sger_(&i__2, &i__3, &r__1, &a_ref(*kl + i__, i__), &c__1, &
-			work[1], &c__1, &a_ref(*kl + i__, i__ + 1), lda);
-		a_ref(*kl + i__, i__) = -wa;
+		sger_(&i__2, &i__3, &r__1, &a[*kl + i__ + i__ * a_dim1], &
+			c__1, &work[1], &c__1, &a[*kl + i__ + (i__ + 1) * 
+			a_dim1], lda);
+		a[*kl + i__ + i__ * a_dim1] = -wa;
 	    }
 	}
 
 	i__2 = *m;
 	for (j = *kl + i__ + 1; j <= i__2; ++j) {
-	    a_ref(j, i__) = 0.f;
+	    a[j + i__ * a_dim1] = 0.f;
 /* L50: */
 	}
 
 	i__2 = *n;
 	for (j = *ku + i__ + 1; j <= i__2; ++j) {
-	    a_ref(i__, j) = 0.f;
+	    a[i__ + j * a_dim1] = 0.f;
 /* L60: */
 	}
 /* L70: */
@@ -386,7 +400,3 @@ static real c_b13 = 0.f;
 /*     End of SLAGGE */
 
 } /* slagge_ */
-
-#undef a_ref
-
-

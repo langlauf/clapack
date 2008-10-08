@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -54,69 +49,65 @@ static integer c__8 = 8;
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer ioff, mode, imat, info;
-    static char path[3], dist[1];
-    static integer irhs, nrhs;
-    static char uplo[1], type__[1];
-    static integer nrun, i__;
+    integer i__, k, n, nb, in, kl, ku, lda, inb, ioff, mode, imat, info;
+    char path[3], dist[1];
+    integer irhs, nrhs;
+    char uplo[1], type__[1];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, n, nfail, iseed[4];
-    static real rcond;
+    integer nfail, iseed[4];
+    real rcond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *);
-    static integer nimat;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
+    real anorm;
     extern /* Subroutine */ int spot01_(char *, integer *, real *, integer *, 
 	    real *, integer *, real *, real *), spot02_(char *, 
 	    integer *, integer *, real *, integer *, real *, integer *, real *
-	    , integer *, real *, real *);
-    static integer iuplo, izero, nerrs;
+, integer *, real *, real *);
+    integer iuplo, izero, nerrs;
     extern /* Subroutine */ int spot03_(char *, integer *, real *, integer *, 
 	    real *, integer *, real *, integer *, real *, real *, real *), spot05_(char *, integer *, integer *, real *, integer *, 
 	    real *, integer *, real *, integer *, real *, integer *, real *, 
 	    real *, real *);
-    static logical zerot;
-    static char xtype[1];
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int slatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    );
-    static integer nb, in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku;
-    static real rcondc;
+), alaerh_(char *, char *, integer *, 
+	    integer *, char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *);
+    real rcondc;
     extern /* Subroutine */ int alasum_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static real cndnum;
+    real cndnum;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), slarhs_(char *, char *, 
 	    char *, char *, integer *, integer *, integer *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , integer *, integer *), xlaenv_(
+, integer *, integer *), xlaenv_(
 	    integer *, integer *), spocon_(char *, integer *, real *, integer 
 	    *, real *, real *, real *, integer *, integer *), slatms_(
 	    integer *, integer *, char *, integer *, char *, real *, integer *
-	    , real *, real *, integer *, integer *, char *, real *, integer *,
+, real *, real *, integer *, integer *, char *, real *, integer *, 
 	     real *, integer *);
     extern doublereal slansy_(char *, char *, integer *, real *, integer *, 
 	    real *);
     extern /* Subroutine */ int serrpo_(char *, integer *), sporfs_(
 	    char *, integer *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, real *, integer *, real *, real *, real *, 
+, real *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *, integer *), spotrf_(char *, integer *, real *, 
 	    integer *, integer *);
-    static real result[8];
+    real result[8];
     extern /* Subroutine */ int spotri_(char *, integer *, real *, integer *, 
 	    integer *), spotrs_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *, integer *);
-    static integer lda, inb;
 
     /* Fortran I/O blocks */
     static cilist io___33 = { 0, 0, 0, fmt_9999, 0 };
@@ -125,82 +116,102 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 7, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SCHKPO tests SPOTRF, -TRI, -TRS, -RFS, and -CON   
+/*  SCHKPO tests SPOTRF, -TRI, -TRS, -RFS, and -CON */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NNB     (input) INTEGER   
-            The number of values of NB contained in the vector NBVAL.   
+/*  NNB     (input) INTEGER */
+/*          The number of values of NB contained in the vector NBVAL. */
 
-    NBVAL   (input) INTEGER array, dimension (NBVAL)   
-            The values of the blocksize NB.   
+/*  NBVAL   (input) INTEGER array, dimension (NBVAL) */
+/*          The values of the blocksize NB. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  A       (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    AINV    (workspace) REAL array, dimension (NMAX*NMAX)   
+/*  AINV    (workspace) REAL array, dimension (NMAX*NMAX) */
 
-    B       (workspace) REAL array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) REAL array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) REAL array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) REAL array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) REAL array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) REAL array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NSMAX))   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (NMAX*max(3,NSMAX)) */
 
-    RWORK   (workspace) REAL array, dimension   
-                        (max(NMAX,2*NSMAX))   
+/*  RWORK   (workspace) REAL array, dimension */
+/*                      (max(NMAX,2*NSMAX)) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -215,9 +226,11 @@ static integer c__8 = 8;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PO", (ftnlen)2, (ftnlen)2);
@@ -271,27 +284,27 @@ static integer c__8 = 8;
 	    for (iuplo = 1; iuplo <= 2; ++iuplo) {
 		*(unsigned char *)uplo = *(unsigned char *)&uplos[iuplo - 1];
 
-/*              Set up parameters with SLATB4 and generate a test matrix   
-                with SLATMS. */
+/*              Set up parameters with SLATB4 and generate a test matrix */
+/*              with SLATMS. */
 
 		slatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
 
 		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
 		slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &
-			cndnum, &anorm, &kl, &ku, uplo, &a[1], &lda, &work[1],
+			cndnum, &anorm, &kl, &ku, uplo, &a[1], &lda, &work[1], 
 			 &info);
 
 /*              Check error code from SLATMS. */
 
 		if (info != 0) {
-		    alaerh_(path, "SLATMS", &info, &c__0, uplo, &n, &n, &c_n1,
+		    alaerh_(path, "SLATMS", &info, &c__0, uplo, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		    goto L100;
 		}
 
-/*              For types 3-5, zero one row and column of the matrix to   
-                test that INFO is returned correctly. */
+/*              For types 3-5, zero one row and column of the matrix to */
+/*              test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 3) {
@@ -364,15 +377,15 @@ static integer c__8 = 8;
 			goto L90;
 		    }
 
-/* +    TEST 1   
-                   Reconstruct matrix from factors and compute residual. */
+/* +    TEST 1 */
+/*                 Reconstruct matrix from factors and compute residual. */
 
 		    slacpy_(uplo, &n, &n, &afac[1], &lda, &ainv[1], &lda);
 		    spot01_(uplo, &n, &a[1], &lda, &ainv[1], &lda, &rwork[1], 
 			    result);
 
-/* +    TEST 2   
-                   Form the inverse and compute the residual. */
+/* +    TEST 2 */
+/*                 Form the inverse and compute the residual. */
 
 		    slacpy_(uplo, &n, &n, &afac[1], &lda, &ainv[1], &lda);
 		    s_copy(srnamc_1.srnamt, "SPOTRI", (ftnlen)6, (ftnlen)6);
@@ -389,8 +402,8 @@ static integer c__8 = 8;
 		    spot03_(uplo, &n, &a[1], &lda, &ainv[1], &lda, &work[1], &
 			    lda, &rwork[1], &rcondc, &result[1]);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    for (k = 1; k <= 2; ++k) {
 			if (result[k - 1] >= *thresh) {
@@ -417,8 +430,8 @@ static integer c__8 = 8;
 		    }
 		    nrun += 2;
 
-/*                 Skip the rest of the tests unless this is the first   
-                   blocksize. */
+/*                 Skip the rest of the tests unless this is the first */
+/*                 blocksize. */
 
 		    if (inb != 1) {
 			goto L90;
@@ -428,8 +441,8 @@ static integer c__8 = 8;
 		    for (irhs = 1; irhs <= i__4; ++irhs) {
 			nrhs = nsval[irhs];
 
-/* +    TEST 3   
-                   Solve and compute residual for A * X = B . */
+/* +    TEST 3 */
+/*                 Solve and compute residual for A * X = B . */
 
 			s_copy(srnamc_1.srnamt, "SLARHS", (ftnlen)6, (ftnlen)
 				6);
@@ -456,14 +469,14 @@ static integer c__8 = 8;
 			spot02_(uplo, &n, &nrhs, &a[1], &lda, &x[1], &lda, &
 				work[1], &lda, &rwork[1], &result[2]);
 
-/* +    TEST 4   
-                   Check solution from generated exact solution. */
+/* +    TEST 4 */
+/*                 Check solution from generated exact solution. */
 
 			sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				rcondc, &result[3]);
 
-/* +    TESTS 5, 6, and 7   
-                   Use iterative refinement to improve the solution. */
+/* +    TESTS 5, 6, and 7 */
+/*                 Use iterative refinement to improve the solution. */
 
 			s_copy(srnamc_1.srnamt, "SPORFS", (ftnlen)6, (ftnlen)
 				6);
@@ -485,8 +498,8 @@ static integer c__8 = 8;
 				1], &lda, &xact[1], &lda, &rwork[1], &rwork[
 				nrhs + 1], &result[5]);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			for (k = 3; k <= 7; ++k) {
 			    if (result[k - 1] >= *thresh) {
@@ -515,13 +528,13 @@ static integer c__8 = 8;
 /* L80: */
 		    }
 
-/* +    TEST 8   
-                   Get an estimate of RCOND = 1/CNDNUM. */
+/* +    TEST 8 */
+/*                 Get an estimate of RCOND = 1/CNDNUM. */
 
 		    anorm = slansy_("1", uplo, &n, &a[1], &lda, &rwork[1]);
 		    s_copy(srnamc_1.srnamt, "SPOCON", (ftnlen)6, (ftnlen)6);
 		    spocon_(uplo, &n, &afac[1], &lda, &anorm, &rcond, &work[1]
-			    , &iwork[1], &info);
+, &iwork[1], &info);
 
 /*                 Check error code from SPOCON. */
 
@@ -572,4 +585,3 @@ L110:
 /*     End of SCHKPO */
 
 } /* schkpo_ */
-

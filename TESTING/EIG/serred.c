@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -54,41 +49,40 @@ static integer c__5 = 5;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, sdim;
-    static real a[16]	/* was [4][4] */;
-    static logical b[4];
-    static integer i__, j;
-    static real s[4], u[16]	/* was [4][4] */, w[16], abnrm;
+    real a[16]	/* was [4][4] */;
+    logical b[4];
+    integer i__, j;
+    real s[4], u[16]	/* was [4][4] */, w[16];
+    char c2[2];
+    real r1[4], r2[4];
+    integer iw[8];
+    real wi[4];
+    integer nt;
+    real vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] */, wr[4], vt[
+	    16]	/* was [4][4] */;
+    integer ihi, ilo, info, sdim;
+    real abnrm;
     extern /* Subroutine */ int sgees_(char *, char *, L_fp, integer *, real *
-	    , integer *, integer *, real *, real *, real *, integer *, real *,
+, integer *, integer *, real *, real *, real *, integer *, real *, 
 	     integer *, logical *, integer *), sgeev_(char *, 
 	    char *, integer *, real *, integer *, real *, real *, real *, 
-	    integer *, real *, integer *, real *, integer *, integer *);
-    static char c2[2];
-    static real r1[4], r2[4];
-    static integer iw[8];
-    static real wi[4];
-    static integer nt;
-    static real vl[16]	/* was [4][4] */, vr[16]	/* was [4][4] */, wr[
-	    4], vt[16]	/* was [4][4] */;
-    extern /* Subroutine */ int sgesdd_(char *, integer *, integer *, real *, 
+	    integer *, real *, integer *, real *, integer *, integer *), sgesdd_(char *, integer *, integer *, real *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), sgesvd_(char *, char *, integer *, integer 
 	    *, real *, integer *, real *, real *, integer *, real *, integer *
-	    , real *, integer *, integer *);
+, real *, integer *, integer *);
     extern logical sslect_();
     extern /* Subroutine */ int sgeesx_(char *, char *, L_fp, char *, integer 
 	    *, real *, integer *, integer *, real *, real *, real *, integer *
-	    , real *, real *, real *, integer *, integer *, integer *, 
+, real *, real *, real *, integer *, integer *, integer *, 
 	    logical *, integer *), sgeevx_(char *, 
 	    char *, char *, char *, integer *, real *, integer *, real *, 
 	    real *, real *, integer *, real *, integer *, integer *, integer *
-	    , real *, real *, real *, real *, real *, integer *, integer *, 
+, real *, real *, real *, real *, real *, integer *, integer *, 
 	    integer *);
-    static integer ihi, ilo;
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -97,42 +91,57 @@ static integer c__5 = 5;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 22, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRED tests the error exits for the eigenvalue driver routines for */
+/*  REAL matrices: */
 
-    Purpose   
-    =======   
+/*  PATH  driver   description */
+/*  ----  ------   ----------- */
+/*  SEV   SGEEV    find eigenvalues/eigenvectors for nonsymmetric A */
+/*  SES   SGEES    find eigenvalues/Schur form for nonsymmetric A */
+/*  SVX   SGEEVX   SGEEV + balancing and condition estimation */
+/*  SSX   SGEESX   SGEES + balancing and condition estimation */
+/*  SBD   SGESVD   compute SVD of an M-by-N matrix A */
+/*        SGESDD   compute SVD of an M-by-N matrix A (by divide and */
+/*                 conquer) */
 
-    SERRED tests the error exits for the eigenvalue driver routines for   
-    REAL matrices:   
+/*  Arguments */
+/*  ========= */
 
-    PATH  driver   description   
-    ----  ------   -----------   
-    SEV   SGEEV    find eigenvalues/eigenvectors for nonsymmetric A   
-    SES   SGEES    find eigenvalues/Schur form for nonsymmetric A   
-    SVX   SGEEVX   SGEEV + balancing and condition estimation   
-    SSX   SGEESX   SGEES + balancing and condition estimation   
-    SBD   SGESVD   compute SVD of an M-by-N matrix A   
-          SGESDD   compute SVD of an M-by-N matrix A (by divide and   
-                   conquer)   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -144,13 +153,13 @@ static integer c__5 = 5;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 0.f;
+	    a[i__ + (j << 2) - 5] = 0.f;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	a_ref(i__, i__) = 1.f;
+	a[i__ + (i__ << 2) - 5] = 1.f;
 /* L30: */
     }
     infoc_1.ok = TRUE_;
@@ -390,32 +399,32 @@ static integer c__5 = 5;
 
 	s_copy(srnamc_1.srnamt, "SGESDD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	sgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	sgesdd_("X", &c__0, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	sgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	sgesdd_("N", &c_n1, &c__0, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	sgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1,
+	sgesdd_("N", &c__0, &c_n1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__1, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	sgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	sgesdd_("N", &c__2, &c__1, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	sgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5,
+	sgesdd_("A", &c__2, &c__1, a, &c__2, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	sgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5,
+	sgesdd_("A", &c__1, &c__2, a, &c__1, s, u, &c__1, vt, &c__1, w, &c__5, 
 		 iw, &info);
 	chkxer_("SGESDD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -444,7 +453,3 @@ static integer c__5 = 5;
 /*     End of SERRED */
 
 } /* serred_ */
-
-#undef a_ref
-
-

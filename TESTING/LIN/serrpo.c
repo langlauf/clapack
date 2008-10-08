@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,19 +30,17 @@ static integer c_n1 = -1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real anrm, a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static real w[12], x[4], rcond;
-    static char c2[2];
-    static real r1[4], r2[4];
+    real a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    real w[12], x[4];
+    char c2[2];
+    real r1[4], r2[4], af[16]	/* was [4][4] */;
+    integer iw[4], info;
+    real anrm, rcond;
     extern /* Subroutine */ int spbtf2_(char *, integer *, integer *, real *, 
-	    integer *, integer *);
-    static real af[16]	/* was [4][4] */;
-    extern /* Subroutine */ int spotf2_(char *, integer *, real *, integer *, 
-	    integer *);
-    static integer iw[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    integer *, integer *), spotf2_(char *, integer *, real *, 
+	    integer *, integer *), alaesm_(char *, logical *, integer 
+	    *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), spbcon_(char *, integer *, integer *, real 
@@ -62,9 +55,9 @@ static integer c_n1 = -1;
 	    real *, real *, integer *, integer *), spoequ_(integer *, 
 	    real *, integer *, real *, real *, real *, integer *), spbtrs_(
 	    char *, integer *, integer *, integer *, real *, integer *, real *
-	    , integer *, integer *), sporfs_(char *, integer *, 
+, integer *, integer *), sporfs_(char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, integer *
-	    , real *, integer *, real *, real *, real *, integer *, integer *), spotrf_(char *, integer *, real *, integer *, integer *), spotri_(char *, integer *, real *, integer *, integer *), sppequ_(char *, integer *, real *, real *, real *, real 
+, real *, integer *, real *, real *, real *, integer *, integer *), spotrf_(char *, integer *, real *, integer *, integer *), spotri_(char *, integer *, real *, integer *, integer *), sppequ_(char *, integer *, real *, real *, real *, real 
 	    *, integer *), spprfs_(char *, integer *, integer *, real 
 	    *, real *, real *, integer *, real *, integer *, real *, real *, 
 	    real *, integer *, integer *), spptrf_(char *, integer *, 
@@ -78,33 +71,47 @@ static integer c_n1 = -1;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define af_ref(a_1,a_2) af[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRPO tests the error exits for the REAL routines */
+/*  for symmetric positive definite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRPO tests the error exits for the REAL routines   
-    for symmetric positive definite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -116,8 +123,8 @@ static integer c_n1 = -1;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 1.f / (real) (i__ + j);
-	    af_ref(i__, j) = 1.f / (real) (i__ + j);
+	    a[i__ + (j << 2) - 5] = 1.f / (real) (i__ + j);
+	    af[i__ + (j << 2) - 5] = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 	b[j - 1] = 0.f;
@@ -132,10 +139,10 @@ static integer c_n1 = -1;
 
     if (lsamen_(&c__2, c2, "PO")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite matrix. */
 
-          SPOTRF */
+/*        SPOTRF */
 
 	s_copy(srnamc_1.srnamt, "SPOTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -276,10 +283,10 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "PP")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite packed matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite packed matrix. */
 
-          SPPTRF */
+/*        SPPTRF */
 
 	s_copy(srnamc_1.srnamt, "SPPTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -378,10 +385,10 @@ static integer c_n1 = -1;
 
     } else if (lsamen_(&c__2, c2, "PB")) {
 
-/*        Test error exits of the routines that use the Cholesky   
-          decomposition of a symmetric positive definite band matrix.   
+/*        Test error exits of the routines that use the Cholesky */
+/*        decomposition of a symmetric positive definite band matrix. */
 
-          SPBTRF */
+/*        SPBTRF */
 
 	s_copy(srnamc_1.srnamt, "SPBTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -543,8 +550,3 @@ static integer c_n1 = -1;
 /*     End of SERRPO */
 
 } /* serrpo_ */
-
-#undef af_ref
-#undef a_ref
-
-

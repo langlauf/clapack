@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -48,46 +43,44 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] 
-	    */;
-    static integer i__, j, m;
-    static doublereal s[3];
-    static doublecomplex w[9], x[3];
-    static char c2[2];
-    static integer ifaill[3], nt;
-    static doublecomplex vl[9]	/* was [3][3] */;
+    doublecomplex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    integer i__, j, m;
+    doublereal s[3];
+    doublecomplex w[9], x[3];
+    char c2[2];
+    integer nt;
+    doublecomplex vl[9]	/* was [3][3] */, vr[9]	/* was [3][3] */;
+    doublereal rw[3];
+    integer ihi, ilo;
+    logical sel[3];
+    doublecomplex tau[3];
+    integer info, ifaill[3];
     extern /* Subroutine */ int zgebak_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublecomplex *, integer *, 
+	    integer *), zgebal_(char *, integer *, 
+	    doublecomplex *, integer *, integer *, integer *, doublereal *, 
 	    integer *);
-    static integer ifailr[3];
-    extern /* Subroutine */ int zgebal_(char *, integer *, doublecomplex *, 
-	    integer *, integer *, integer *, doublereal *, integer *);
-    static doublecomplex vr[9]	/* was [3][3] */;
-    static doublereal rw[3];
+    integer ifailr[3];
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int zgehrd_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *), chkxer_(char *, integer *, integer *, 
 	    logical *, logical *), zhsein_(char *, char *, char *, 
-	    logical *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    logical *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     doublecomplex *, integer *, doublecomplex *, integer *, integer *
-	    , integer *, doublecomplex *, doublereal *, integer *, integer *, 
+, integer *, doublecomplex *, doublereal *, integer *, integer *, 
 	    integer *), zhseqr_(char *, char *, 
 	    integer *, integer *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, doublecomplex *, integer *, doublecomplex *, 
 	    integer *, integer *), ztrevc_(char *, char *, 
-	    logical *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    logical *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     integer *, doublecomplex *, integer *, integer *, integer *, 
 	    doublecomplex *, doublereal *, integer *), 
 	    zunghr_(integer *, integer *, integer *, doublecomplex *, integer 
 	    *, doublecomplex *, doublecomplex *, integer *, integer *), 
 	    zunmhr_(char *, char *, integer *, integer *, integer *, integer *
-	    , doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
+, doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *, integer *, integer *);
-    static integer ihi, ilo;
-    static logical sel[3];
-    static doublecomplex tau[3];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -96,33 +89,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRHS tests the error exits for ZGEBAK, CGEBAL, CGEHRD, ZUNGHR, */
+/*  ZUNMHR, ZHSEQR, CHSEIN, and ZTREVC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRHS tests the error exits for ZGEBAK, CGEBAL, CGEHRD, ZUNGHR,   
-    ZUNMHR, ZHSEQR, CHSEIN, and ZTREVC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -134,7 +141,7 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + j * 3 - 4;
 	    d__1 = 1. / (doublereal) (i__ + j);
 	    a[i__1].r = d__1, a[i__1].i = 0.;
 /* L10: */
@@ -515,8 +522,3 @@ static integer c__4 = 4;
 /*     End of ZERRHS */
 
 } /* zerrhs_ */
-
-#undef a_ref
-#undef a_subscr
-
-

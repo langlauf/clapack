@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -38,20 +33,22 @@ static integer c__4 = 4;
     static char fmt_9998[] = "(\002 *** \002,a3,\002 routines failed the tes"
 	    "ts of the error ex\002,\002its ***\002)";
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info, ifst, ilst;
-    static doublereal work[4], a[16]	/* was [4][4] */, b[16]	/* was [4][4] 
-	    */, c__[16]	/* was [4][4] */;
-    static integer i__, j, m;
-    static doublereal s[4], scale;
-    static integer iwork[4];
-    static doublereal wi[4];
-    static integer nt;
-    static doublereal wr[4];
+    doublereal a[16]	/* was [4][4] */, b[16]	/* was [4][4] */, c__[16]	
+	    /* was [4][4] */;
+    integer i__, j, m;
+    doublereal s[4], wi[4];
+    integer nt;
+    doublereal wr[4];
+    logical sel[4];
+    doublereal sep[4];
+    integer info, ifst, ilst;
+    doublereal work[4], scale;
+    integer iwork[4];
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), dtrexc_(char *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *, integer *, 
@@ -59,14 +56,12 @@ static integer c__4 = 4;
 	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, doublereal *, integer *, integer *, integer *), dtrsen_(char *, char *, logical *, integer *, doublereal 
-	    *, integer *, doublereal *, integer *, doublereal *, doublereal *,
+	    *, integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *, doublereal *, doublereal *, doublereal *, integer *, 
 	    integer *, integer *, integer *), dtrsyl_(char *, 
 	    char *, integer *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static logical sel[4];
-    static doublereal sep[4];
 
     /* Fortran I/O blocks */
     static cilist io___19 = { 0, 0, 0, fmt_9999, 0 };
@@ -74,34 +69,44 @@ static integer c__4 = 4;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*4 + a_1 - 5]
-#define b_ref(a_1,a_2) b[(a_2)*4 + a_1 - 5]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DERREC tests the error exits for the routines for eigen- condition */
+/*  estimation for DOUBLE PRECISION matrices: */
+/*     DTRSYL, STREXC, STRSNA and STRSEN. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DERREC tests the error exits for the routines for eigen- condition   
-    estimation for DOUBLE PRECISION matrices:   
-       DTRSYL, STREXC, STRSNA and STRSEN.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     infoc_1.ok = TRUE_;
@@ -111,14 +116,14 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    a_ref(i__, j) = 0.;
-	    b_ref(i__, j) = 0.;
+	    a[i__ + (j << 2) - 5] = 0.;
+	    b[i__ + (j << 2) - 5] = 0.;
 /* L10: */
 	}
 /* L20: */
     }
     for (i__ = 1; i__ <= 4; ++i__) {
-	a_ref(i__, i__) = 1.;
+	a[i__ + (i__ << 2) - 5] = 1.;
 	sel[i__ - 1] = TRUE_;
 /* L30: */
     }
@@ -340,8 +345,3 @@ static integer c__4 = 4;
 /*     End of DERREC */
 
 } /* derrec_ */
-
-#undef b_ref
-#undef a_ref
-
-

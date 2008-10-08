@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slasdt_(integer *n, integer *lvl, integer *nd, integer *
 	inode, integer *ndiml, integer *ndimr, integer *msub)
@@ -16,62 +11,72 @@
     double log(doublereal);
 
     /* Local variables */
-    static integer maxn;
-    static real temp;
-    static integer nlvl, llst, i__, ncrnt, il, ir;
+    integer i__, il, ir, maxn;
+    real temp;
+    integer nlvl, llst, ncrnt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SLASDT creates a tree of subproblems for bidiagonal divide and   
-    conquer.   
+/*  SLASDT creates a tree of subproblems for bidiagonal divide and */
+/*  conquer. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-     N      (input) INTEGER   
-            On entry, the number of diagonal elements of the   
-            bidiagonal matrix.   
+/*   N      (input) INTEGER */
+/*          On entry, the number of diagonal elements of the */
+/*          bidiagonal matrix. */
 
-     LVL    (output) INTEGER   
-            On exit, the number of levels on the computation tree.   
+/*   LVL    (output) INTEGER */
+/*          On exit, the number of levels on the computation tree. */
 
-     ND     (output) INTEGER   
-            On exit, the number of nodes on the tree.   
+/*   ND     (output) INTEGER */
+/*          On exit, the number of nodes on the tree. */
 
-     INODE  (output) INTEGER array, dimension ( N )   
-            On exit, centers of subproblems.   
+/*   INODE  (output) INTEGER array, dimension ( N ) */
+/*          On exit, centers of subproblems. */
 
-     NDIML  (output) INTEGER array, dimension ( N )   
-            On exit, row dimensions of left children.   
+/*   NDIML  (output) INTEGER array, dimension ( N ) */
+/*          On exit, row dimensions of left children. */
 
-     NDIMR  (output) INTEGER array, dimension ( N )   
-            On exit, row dimensions of right children.   
+/*   NDIMR  (output) INTEGER array, dimension ( N ) */
+/*          On exit, row dimensions of right children. */
 
-     MSUB   (input) INTEGER.   
-            On entry, the maximum row dimension each subproblem at the   
-            bottom of the tree can be of.   
+/*   MSUB   (input) INTEGER. */
+/*          On entry, the maximum row dimension each subproblem at the */
+/*          bottom of the tree can be of. */
 
-    Further Details   
-    ===============   
+/*  Further Details */
+/*  =============== */
 
-    Based on contributions by   
-       Ming Gu and Huan Ren, Computer Science Division, University of   
-       California at Berkeley, USA   
+/*  Based on contributions by */
+/*     Ming Gu and Huan Ren, Computer Science Division, University of */
+/*     California at Berkeley, USA */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Find the number of levels on the tree.   
+/*     Find the number of levels on the tree. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ndimr;
     --ndiml;
     --inode;
@@ -91,8 +96,8 @@
     i__1 = *lvl - 1;
     for (nlvl = 1; nlvl <= i__1; ++nlvl) {
 
-/*        Constructing the tree at (NLVL+1)-st level. The number of   
-          nodes created on this level is LLST * 2. */
+/*        Constructing the tree at (NLVL+1)-st level. The number of */
+/*        nodes created on this level is LLST * 2. */
 
 	i__2 = llst - 1;
 	for (i__ = 0; i__ <= i__2; ++i__) {
@@ -117,4 +122,3 @@
 /*     End of SLASDT */
 
 } /* slasdt_ */
-

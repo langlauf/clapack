@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -17,7 +12,7 @@ static doublereal c_b82 = 0.;
 
 /* Subroutine */ int dgelsd_(integer *m, integer *n, integer *nrhs, 
 	doublereal *a, integer *lda, doublereal *b, integer *ldb, doublereal *
-	s, doublereal *rcond, integer *rank, doublereal *work, integer *lwork,
+	s, doublereal *rcond, integer *rank, doublereal *work, integer *lwork, 
 	 integer *iwork, integer *info)
 {
     /* System generated locals */
@@ -27,19 +22,17 @@ static doublereal c_b82 = 0.;
     double log(doublereal);
 
     /* Local variables */
-    static doublereal anrm, bnrm;
-    static integer itau, nlvl, iascl, ibscl;
-    static doublereal sfmin;
-    static integer minmn, maxmn, itaup, itauq, mnthr, nwork;
-    extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
-    static integer ie, il;
-    extern /* Subroutine */ int dgebrd_(integer *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, integer *, integer *);
-    extern doublereal dlamch_(char *);
-    static integer mm;
-    extern doublereal dlange_(char *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *);
+    integer ie, il, mm;
+    doublereal eps, anrm, bnrm;
+    integer itau, nlvl, iascl, ibscl;
+    doublereal sfmin;
+    integer minmn, maxmn, itaup, itauq, mnthr, nwork;
+    extern /* Subroutine */ int dlabad_(doublereal *, doublereal *), dgebrd_(
+	    integer *, integer *, doublereal *, integer *, doublereal *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *, integer *, 
+	     integer *);
+    extern doublereal dlamch_(char *), dlange_(char *, integer *, 
+	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dgelqf_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, integer *), 
 	    dlalsd_(char *, integer *, integer *, integer *, doublereal *, 
@@ -53,164 +46,173 @@ static doublereal c_b82 = 0.;
 	    doublereal *, doublereal *, integer *), xerbla_(char *, 
 	    integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-    static doublereal bignum;
+	    integer *, integer *);
+    doublereal bignum;
     extern /* Subroutine */ int dormbr_(char *, char *, char *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *);
-    static integer wlalsd;
+    integer wlalsd;
     extern /* Subroutine */ int dormlq_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *);
-    static integer ldwork;
+    integer ldwork;
     extern /* Subroutine */ int dormqr_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *, integer *);
-    static integer minwrk, maxwrk;
-    static doublereal smlnum;
-    static logical lquery;
-    static integer smlsiz;
-    static doublereal eps;
+    integer minwrk, maxwrk;
+    doublereal smlnum;
+    logical lquery;
+    integer smlsiz;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+/*  -- LAPACK driver routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK driver routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  DGELSD computes the minimum-norm solution to a real linear least */
+/*  squares problem: */
+/*      minimize 2-norm(| b - A*x |) */
+/*  using the singular value decomposition (SVD) of A. A is an M-by-N */
+/*  matrix which may be rank-deficient. */
 
-    Purpose   
-    =======   
+/*  Several right hand side vectors b and solution vectors x can be */
+/*  handled in a single call; they are stored as the columns of the */
+/*  M-by-NRHS right hand side matrix B and the N-by-NRHS solution */
+/*  matrix X. */
 
-    DGELSD computes the minimum-norm solution to a real linear least   
-    squares problem:   
-        minimize 2-norm(| b - A*x |)   
-    using the singular value decomposition (SVD) of A. A is an M-by-N   
-    matrix which may be rank-deficient.   
+/*  The problem is solved in three steps: */
+/*  (1) Reduce the coefficient matrix A to bidiagonal form with */
+/*      Householder transformations, reducing the original problem */
+/*      into a "bidiagonal least squares problem" (BLS) */
+/*  (2) Solve the BLS using a divide and conquer approach. */
+/*  (3) Apply back all the Householder tranformations to solve */
+/*      the original least squares problem. */
 
-    Several right hand side vectors b and solution vectors x can be   
-    handled in a single call; they are stored as the columns of the   
-    M-by-NRHS right hand side matrix B and the N-by-NRHS solution   
-    matrix X.   
+/*  The effective rank of A is determined by treating as zero those */
+/*  singular values which are less than RCOND times the largest singular */
+/*  value. */
 
-    The problem is solved in three steps:   
-    (1) Reduce the coefficient matrix A to bidiagonal form with   
-        Householder transformations, reducing the original problem   
-        into a "bidiagonal least squares problem" (BLS)   
-    (2) Solve the BLS using a divide and conquer approach.   
-    (3) Apply back all the Householder tranformations to solve   
-        the original least squares problem.   
+/*  The divide and conquer algorithm makes very mild assumptions about */
+/*  floating point arithmetic. It will work on machines with a guard */
+/*  digit in add/subtract, or on those binary machines without guard */
+/*  digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or */
+/*  Cray-2. It could conceivably fail on hexadecimal or decimal machines */
+/*  without guard digits, but we know of none. */
 
-    The effective rank of A is determined by treating as zero those   
-    singular values which are less than RCOND times the largest singular   
-    value.   
+/*  Arguments */
+/*  ========= */
 
-    The divide and conquer algorithm makes very mild assumptions about   
-    floating point arithmetic. It will work on machines with a guard   
-    digit in add/subtract, or on those binary machines without guard   
-    digits which subtract like the Cray X-MP, Cray Y-MP, Cray C-90, or   
-    Cray-2. It could conceivably fail on hexadecimal or decimal machines   
-    without guard digits, but we know of none.   
+/*  M       (input) INTEGER */
+/*          The number of rows of A. M >= 0. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of A. N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of A. M >= 0.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrices B and X. NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of A. N >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          On entry, the M-by-N matrix A. */
+/*          On exit, A has been destroyed. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrices B and X. NRHS >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,M). */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the M-by-N matrix A.   
-            On exit, A has been destroyed.   
+/*  B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS) */
+/*          On entry, the M-by-NRHS right hand side matrix B. */
+/*          On exit, B is overwritten by the N-by-NRHS solution */
+/*          matrix X.  If m >= n and RANK = n, the residual */
+/*          sum-of-squares for the solution in the i-th column is given */
+/*          by the sum of squares of elements n+1:m in that column. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= max(1,max(M,N)). */
 
-    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)   
-            On entry, the M-by-NRHS right hand side matrix B.   
-            On exit, B is overwritten by the N-by-NRHS solution   
-            matrix X.  If m >= n and RANK = n, the residual   
-            sum-of-squares for the solution in the i-th column is given   
-            by the sum of squares of elements n+1:m in that column.   
+/*  S       (output) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The singular values of A in decreasing order. */
+/*          The condition number of A in the 2-norm = S(1)/S(min(m,n)). */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= max(1,max(M,N)).   
+/*  RCOND   (input) DOUBLE PRECISION */
+/*          RCOND is used to determine the effective rank of A. */
+/*          Singular values S(i) <= RCOND*S(1) are treated as zero. */
+/*          If RCOND < 0, machine precision is used instead. */
 
-    S       (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The singular values of A in decreasing order.   
-            The condition number of A in the 2-norm = S(1)/S(min(m,n)).   
+/*  RANK    (output) INTEGER */
+/*          The effective rank of A, i.e., the number of singular values */
+/*          which are greater than RCOND*S(1). */
 
-    RCOND   (input) DOUBLE PRECISION   
-            RCOND is used to determine the effective rank of A.   
-            Singular values S(i) <= RCOND*S(1) are treated as zero.   
-            If RCOND < 0, machine precision is used instead.   
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
 
-    RANK    (output) INTEGER   
-            The effective rank of A, i.e., the number of singular values   
-            which are greater than RCOND*S(1).   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. LWORK must be at least 1. */
+/*          The exact minimum amount of workspace needed depends on M, */
+/*          N and NRHS. As long as LWORK is at least */
+/*              12*N + 2*N*SMLSIZ + 8*N*NLVL + N*NRHS + (SMLSIZ+1)**2, */
+/*          if M is greater than or equal to N or */
+/*              12*M + 2*M*SMLSIZ + 8*M*NLVL + M*NRHS + (SMLSIZ+1)**2, */
+/*          if M is less than N, the code will execute correctly. */
+/*          SMLSIZ is returned by ILAENV and is equal to the maximum */
+/*          size of the subproblems at the bottom of the computation */
+/*          tree (usually about 25), and */
+/*             NLVL = MAX( 0, INT( LOG_2( MIN( M,N )/(SMLSIZ+1) ) ) + 1 ) */
+/*          For good performance, LWORK should generally be larger. */
 
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK. LWORK must be at least 1.   
-            The exact minimum amount of workspace needed depends on M,   
-            N and NRHS. As long as LWORK is at least   
-                12*N + 2*N*SMLSIZ + 8*N*NLVL + N*NRHS + (SMLSIZ+1)**2,   
-            if M is greater than or equal to N or   
-                12*M + 2*M*SMLSIZ + 8*M*NLVL + M*NRHS + (SMLSIZ+1)**2,   
-            if M is less than N, the code will execute correctly.   
-            SMLSIZ is returned by ILAENV and is equal to the maximum   
-            size of the subproblems at the bottom of the computation   
-            tree (usually about 25), and   
-               NLVL = MAX( 0, INT( LOG_2( MIN( M,N )/(SMLSIZ+1) ) ) + 1 )   
-            For good performance, LWORK should generally be larger.   
+/*  IWORK   (workspace) INTEGER array, dimension (MAX(1,LIWORK)) */
+/*          LIWORK >= 3 * MINMN * NLVL + 11 * MINMN, */
+/*          where MINMN = MIN( M,N ). */
 
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+/*          > 0:  the algorithm for computing the SVD failed to converge; */
+/*                if INFO = i, i off-diagonal elements of an intermediate */
+/*                bidiagonal form did not converge to zero. */
 
-    IWORK   (workspace) INTEGER array, dimension (LIWORK)   
-            LIWORK >= 3 * MINMN * NLVL + 11 * MINMN,   
-            where MINMN = MIN( M,N ).   
+/*  Further Details */
+/*  =============== */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-            > 0:  the algorithm for computing the SVD failed to converge;   
-                  if INFO = i, i off-diagonal elements of an intermediate   
-                  bidiagonal form did not converge to zero.   
+/*  Based on contributions by */
+/*     Ming Gu and Ren-Cang Li, Computer Science Division, University of */
+/*       California at Berkeley, USA */
+/*     Osni Marques, LBNL/NERSC, USA */
 
-    Further Details   
-    ===============   
+/*  ===================================================================== */
 
-    Based on contributions by   
-       Ming Gu and Ren-Cang Li, Computer Science Division, University of   
-         California at Berkeley, USA   
-       Osni Marques, LBNL/NERSC, USA   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments. */
 
-
-       Test the input arguments.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --s;
     --work;
@@ -220,8 +222,7 @@ static doublereal c_b82 = 0.;
     *info = 0;
     minmn = min(*m,*n);
     maxmn = max(*m,*n);
-    mnthr = ilaenv_(&c__6, "DGELSD", " ", m, n, nrhs, &c_n1, (ftnlen)6, (
-	    ftnlen)1);
+    mnthr = ilaenv_(&c__6, "DGELSD", " ", m, n, nrhs, &c_n1);
     lquery = *lwork == -1;
     if (*m < 0) {
 	*info = -1;
@@ -235,15 +236,14 @@ static doublereal c_b82 = 0.;
 	*info = -7;
     }
 
-    smlsiz = ilaenv_(&c__9, "DGELSD", " ", &c__0, &c__0, &c__0, &c__0, (
-	    ftnlen)6, (ftnlen)1);
+    smlsiz = ilaenv_(&c__9, "DGELSD", " ", &c__0, &c__0, &c__0, &c__0);
 
-/*     Compute workspace.   
-       (Note: Comments in the code beginning "Workspace:" describe the   
-       minimal amount of workspace needed at that point in the code,   
-       as well as the preferred amount for good performance.   
-       NB refers to the optimal block size for the immediately   
-       following subroutine, as returned by ILAENV.) */
+/*     Compute workspace. */
+/*     (Note: Comments in the code beginning "Workspace:" describe the */
+/*     minimal amount of workspace needed at that point in the code, */
+/*     as well as the preferred amount for good performance. */
+/*     NB refers to the optimal block size for the immediately */
+/*     following subroutine, as returned by ILAENV.) */
 
     minwrk = 1;
     minmn = max(1,minmn);
@@ -262,28 +262,28 @@ static doublereal c_b82 = 0.;
 	    mm = *n;
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n + *n * ilaenv_(&c__1, "DGEQRF", " ", m, 
-		    n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
+		    n, &c_n1, &c_n1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n + *nrhs * ilaenv_(&c__1, "DORMQR", "LT", 
-		    m, nrhs, n, &c_n1, (ftnlen)6, (ftnlen)2);
+		    m, nrhs, n, &c_n1);
 	    maxwrk = max(i__1,i__2);
 	}
 	if (*m >= *n) {
 
-/*           Path 1 - overdetermined or exactly determined.   
+/*           Path 1 - overdetermined or exactly determined. */
 
-   Computing MAX */
+/* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n * 3 + (mm + *n) * ilaenv_(&c__1, "DGEBRD"
-		    , " ", &mm, n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
+, " ", &mm, n, &c_n1, &c_n1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
 	    i__1 = maxwrk, i__2 = *n * 3 + *nrhs * ilaenv_(&c__1, "DORMBR", 
-		    "QLT", &mm, nrhs, n, &c_n1, (ftnlen)6, (ftnlen)3);
+		    "QLT", &mm, nrhs, n, &c_n1);
 	    maxwrk = max(i__1,i__2);
 /* Computing MAX */
-	    i__1 = maxwrk, i__2 = *n * 3 + (*n - 1) * ilaenv_(&c__1, "DORMBR",
-		     "PLN", n, nrhs, n, &c_n1, (ftnlen)6, (ftnlen)3);
+	    i__1 = maxwrk, i__2 = *n * 3 + (*n - 1) * ilaenv_(&c__1, "DORMBR", 
+		     "PLN", n, nrhs, n, &c_n1);
 	    maxwrk = max(i__1,i__2);
 /* Computing 2nd power */
 	    i__1 = smlsiz + 1;
@@ -304,25 +304,22 @@ static doublereal c_b82 = 0.;
 		    nrhs + i__1 * i__1;
 	    if (*n >= mnthr) {
 
-/*              Path 2a - underdetermined, with many more columns   
-                than rows. */
+/*              Path 2a - underdetermined, with many more columns */
+/*              than rows. */
 
 		maxwrk = *m + *m * ilaenv_(&c__1, "DGELQF", " ", m, n, &c_n1, 
-			&c_n1, (ftnlen)6, (ftnlen)1);
+			&c_n1);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * *m + (*m << 2) + (*m << 1) * 
-			ilaenv_(&c__1, "DGEBRD", " ", m, m, &c_n1, &c_n1, (
-			ftnlen)6, (ftnlen)1);
+			ilaenv_(&c__1, "DGEBRD", " ", m, m, &c_n1, &c_n1);
 		maxwrk = max(i__1,i__2);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * *m + (*m << 2) + *nrhs * ilaenv_(&
-			c__1, "DORMBR", "QLT", m, nrhs, m, &c_n1, (ftnlen)6, (
-			ftnlen)3);
+			c__1, "DORMBR", "QLT", m, nrhs, m, &c_n1);
 		maxwrk = max(i__1,i__2);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * *m + (*m << 2) + (*m - 1) * 
-			ilaenv_(&c__1, "DORMBR", "PLN", m, nrhs, m, &c_n1, (
-			ftnlen)6, (ftnlen)3);
+			ilaenv_(&c__1, "DORMBR", "PLN", m, nrhs, m, &c_n1);
 		maxwrk = max(i__1,i__2);
 		if (*nrhs > 1) {
 /* Computing MAX */
@@ -335,7 +332,7 @@ static doublereal c_b82 = 0.;
 		}
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m + *nrhs * ilaenv_(&c__1, "DORMLQ", 
-			"LT", n, nrhs, m, &c_n1, (ftnlen)6, (ftnlen)2);
+			"LT", n, nrhs, m, &c_n1);
 		maxwrk = max(i__1,i__2);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * *m + (*m << 2) + wlalsd;
@@ -344,15 +341,15 @@ static doublereal c_b82 = 0.;
 
 /*              Path 2 - remaining underdetermined cases. */
 
-		maxwrk = *m * 3 + (*n + *m) * ilaenv_(&c__1, "DGEBRD", " ", m,
-			 n, &c_n1, &c_n1, (ftnlen)6, (ftnlen)1);
+		maxwrk = *m * 3 + (*n + *m) * ilaenv_(&c__1, "DGEBRD", " ", m, 
+			 n, &c_n1, &c_n1);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * 3 + *nrhs * ilaenv_(&c__1, "DORMBR"
-			, "QLT", m, nrhs, n, &c_n1, (ftnlen)6, (ftnlen)3);
+, "QLT", m, nrhs, n, &c_n1);
 		maxwrk = max(i__1,i__2);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * 3 + *m * ilaenv_(&c__1, "DORMBR", 
-			"PLN", n, nrhs, m, &c_n1, (ftnlen)6, (ftnlen)3);
+			"PLN", n, nrhs, m, &c_n1);
 		maxwrk = max(i__1,i__2);
 /* Computing MAX */
 		i__1 = maxwrk, i__2 = *m * 3 + wlalsd;
@@ -430,14 +427,14 @@ static doublereal c_b82 = 0.;
 
 /*        Scale matrix norm up to SMLNUM. */
 
-	dlascl_("G", &c__0, &c__0, &bnrm, &smlnum, m, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &bnrm, &smlnum, m, nrhs, &b[b_offset], ldb, 
 		 info);
 	ibscl = 1;
     } else if (bnrm > bignum) {
 
 /*        Scale matrix norm down to BIGNUM. */
 
-	dlascl_("G", &c__0, &c__0, &bnrm, &bignum, m, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &bnrm, &bignum, m, nrhs, &b[b_offset], ldb, 
 		 info);
 	ibscl = 2;
     }
@@ -446,7 +443,7 @@ static doublereal c_b82 = 0.;
 
     if (*m < *n) {
 	i__1 = *n - *m;
-	dlaset_("F", &i__1, nrhs, &c_b82, &c_b82, &b_ref(*m + 1, 1), ldb);
+	dlaset_("F", &i__1, nrhs, &c_b82, &c_b82, &b[*m + 1 + b_dim1], ldb);
     }
 
 /*     Overdetermined case. */
@@ -464,15 +461,15 @@ static doublereal c_b82 = 0.;
 	    itau = 1;
 	    nwork = itau + *n;
 
-/*           Compute A=Q*R.   
-             (Workspace: need 2*N, prefer N+N*NB) */
+/*           Compute A=Q*R. */
+/*           (Workspace: need 2*N, prefer N+N*NB) */
 
 	    i__1 = *lwork - nwork + 1;
-	    dgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[nwork], &i__1,
+	    dgeqrf_(m, n, &a[a_offset], lda, &work[itau], &work[nwork], &i__1, 
 		     info);
 
-/*           Multiply B by transpose(Q).   
-             (Workspace: need N+NRHS, prefer N+NRHS*NB) */
+/*           Multiply B by transpose(Q). */
+/*           (Workspace: need N+NRHS, prefer N+NRHS*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dormqr_("L", "T", m, nrhs, n, &a[a_offset], lda, &work[itau], &b[
@@ -483,7 +480,8 @@ static doublereal c_b82 = 0.;
 	    if (*n > 1) {
 		i__1 = *n - 1;
 		i__2 = *n - 1;
-		dlaset_("L", &i__1, &i__2, &c_b82, &c_b82, &a_ref(2, 1), lda);
+		dlaset_("L", &i__1, &i__2, &c_b82, &c_b82, &a[a_dim1 + 2], 
+			lda);
 	    }
 	}
 
@@ -492,15 +490,15 @@ static doublereal c_b82 = 0.;
 	itaup = itauq + *n;
 	nwork = itaup + *n;
 
-/*        Bidiagonalize R in A.   
-          (Workspace: need 3*N+MM, prefer 3*N+(MM+N)*NB) */
+/*        Bidiagonalize R in A. */
+/*        (Workspace: need 3*N+MM, prefer 3*N+(MM+N)*NB) */
 
 	i__1 = *lwork - nwork + 1;
 	dgebrd_(&mm, n, &a[a_offset], lda, &s[1], &work[ie], &work[itauq], &
 		work[itaup], &work[nwork], &i__1, info);
 
-/*        Multiply B by transpose of left bidiagonalizing vectors of R.   
-          (Workspace: need 3*N+NRHS, prefer 3*N+NRHS*NB) */
+/*        Multiply B by transpose of left bidiagonalizing vectors of R. */
+/*        (Workspace: need 3*N+NRHS, prefer 3*N+NRHS*NB) */
 
 	i__1 = *lwork - nwork + 1;
 	dormbr_("Q", "L", "T", &mm, nrhs, n, &a[a_offset], lda, &work[itauq], 
@@ -523,30 +521,31 @@ static doublereal c_b82 = 0.;
     } else /* if(complicated condition) */ {
 /* Computing MAX */
 	i__1 = *m, i__2 = (*m << 1) - 4, i__1 = max(i__1,i__2), i__1 = max(
-		i__1,*nrhs), i__2 = *n - *m * 3;
-	if (*n >= mnthr && *lwork >= (*m << 2) + *m * *m + max(i__1,i__2)) {
+		i__1,*nrhs), i__2 = *n - *m * 3, i__1 = max(i__1,i__2);
+	if (*n >= mnthr && *lwork >= (*m << 2) + *m * *m + max(i__1,wlalsd)) {
 
-/*        Path 2a - underdetermined, with many more columns than rows   
-          and sufficient workspace for an efficient algorithm. */
+/*        Path 2a - underdetermined, with many more columns than rows */
+/*        and sufficient workspace for an efficient algorithm. */
 
 	    ldwork = *m;
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 	    i__3 = *m, i__4 = (*m << 1) - 4, i__3 = max(i__3,i__4), i__3 = 
 		    max(i__3,*nrhs), i__4 = *n - *m * 3;
 	    i__1 = (*m << 2) + *m * *lda + max(i__3,i__4), i__2 = *m * *lda + 
-		    *m + *m * *nrhs;
+		    *m + *m * *nrhs, i__1 = max(i__1,i__2), i__2 = (*m << 2) 
+		    + *m * *lda + wlalsd;
 	    if (*lwork >= max(i__1,i__2)) {
 		ldwork = *lda;
 	    }
 	    itau = 1;
 	    nwork = *m + 1;
 
-/*        Compute A=L*Q.   
-          (Workspace: need 2*M, prefer M+M*NB) */
+/*        Compute A=L*Q. */
+/*        (Workspace: need 2*M, prefer M+M*NB) */
 
 	    i__1 = *lwork - nwork + 1;
-	    dgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[nwork], &i__1,
+	    dgelqf_(m, n, &a[a_offset], lda, &work[itau], &work[nwork], &i__1, 
 		     info);
 	    il = nwork;
 
@@ -562,15 +561,15 @@ static doublereal c_b82 = 0.;
 	    itaup = itauq + *m;
 	    nwork = itaup + *m;
 
-/*        Bidiagonalize L in WORK(IL).   
-          (Workspace: need M*M+5*M, prefer M*M+4*M+2*M*NB) */
+/*        Bidiagonalize L in WORK(IL). */
+/*        (Workspace: need M*M+5*M, prefer M*M+4*M+2*M*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dgebrd_(m, m, &work[il], &ldwork, &s[1], &work[ie], &work[itauq], 
 		    &work[itaup], &work[nwork], &i__1, info);
 
-/*        Multiply B by transpose of left bidiagonalizing vectors of L.   
-          (Workspace: need M*M+4*M+NRHS, prefer M*M+4*M+NRHS*NB) */
+/*        Multiply B by transpose of left bidiagonalizing vectors of L. */
+/*        (Workspace: need M*M+4*M+NRHS, prefer M*M+4*M+NRHS*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dormbr_("Q", "L", "T", m, nrhs, m, &work[il], &ldwork, &work[
@@ -593,11 +592,12 @@ static doublereal c_b82 = 0.;
 /*        Zero out below first M rows of B. */
 
 	    i__1 = *n - *m;
-	    dlaset_("F", &i__1, nrhs, &c_b82, &c_b82, &b_ref(*m + 1, 1), ldb);
+	    dlaset_("F", &i__1, nrhs, &c_b82, &c_b82, &b[*m + 1 + b_dim1], 
+		    ldb);
 	    nwork = itau + *m;
 
-/*        Multiply transpose(Q) by B.   
-          (Workspace: need M+NRHS, prefer M+NRHS*NB) */
+/*        Multiply transpose(Q) by B. */
+/*        (Workspace: need M+NRHS, prefer M+NRHS*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dormlq_("L", "T", n, nrhs, m, &a[a_offset], lda, &work[itau], &b[
@@ -612,19 +612,19 @@ static doublereal c_b82 = 0.;
 	    itaup = itauq + *m;
 	    nwork = itaup + *m;
 
-/*        Bidiagonalize A.   
-          (Workspace: need 3*M+N, prefer 3*M+(M+N)*NB) */
+/*        Bidiagonalize A. */
+/*        (Workspace: need 3*M+N, prefer 3*M+(M+N)*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dgebrd_(m, n, &a[a_offset], lda, &s[1], &work[ie], &work[itauq], &
 		    work[itaup], &work[nwork], &i__1, info);
 
-/*        Multiply B by transpose of left bidiagonalizing vectors.   
-          (Workspace: need 3*M+NRHS, prefer 3*M+NRHS*NB) */
+/*        Multiply B by transpose of left bidiagonalizing vectors. */
+/*        (Workspace: need 3*M+NRHS, prefer 3*M+NRHS*NB) */
 
 	    i__1 = *lwork - nwork + 1;
 	    dormbr_("Q", "L", "T", m, nrhs, n, &a[a_offset], lda, &work[itauq]
-		    , &b[b_offset], ldb, &work[nwork], &i__1, info);
+, &b[b_offset], ldb, &work[nwork], &i__1, info);
 
 /*        Solve the bidiagonal least squares problem. */
 
@@ -638,7 +638,7 @@ static doublereal c_b82 = 0.;
 
 	    i__1 = *lwork - nwork + 1;
 	    dormbr_("P", "L", "N", n, nrhs, m, &a[a_offset], lda, &work[itaup]
-		    , &b[b_offset], ldb, &work[nwork], &i__1, info);
+, &b[b_offset], ldb, &work[nwork], &i__1, info);
 
 	}
     }
@@ -646,21 +646,21 @@ static doublereal c_b82 = 0.;
 /*     Undo scaling. */
 
     if (iascl == 1) {
-	dlascl_("G", &c__0, &c__0, &anrm, &smlnum, n, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &anrm, &smlnum, n, nrhs, &b[b_offset], ldb, 
 		 info);
 	dlascl_("G", &c__0, &c__0, &smlnum, &anrm, &minmn, &c__1, &s[1], &
 		minmn, info);
     } else if (iascl == 2) {
-	dlascl_("G", &c__0, &c__0, &anrm, &bignum, n, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &anrm, &bignum, n, nrhs, &b[b_offset], ldb, 
 		 info);
 	dlascl_("G", &c__0, &c__0, &bignum, &anrm, &minmn, &c__1, &s[1], &
 		minmn, info);
     }
     if (ibscl == 1) {
-	dlascl_("G", &c__0, &c__0, &smlnum, &bnrm, n, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &smlnum, &bnrm, n, nrhs, &b[b_offset], ldb, 
 		 info);
     } else if (ibscl == 2) {
-	dlascl_("G", &c__0, &c__0, &bignum, &bnrm, n, nrhs, &b[b_offset], ldb,
+	dlascl_("G", &c__0, &c__0, &bignum, &bnrm, n, nrhs, &b[b_offset], ldb, 
 		 info);
     }
 
@@ -671,8 +671,3 @@ L10:
 /*     End of DGELSD */
 
 } /* dgelsd_ */
-
-#undef b_ref
-#undef a_ref
-
-

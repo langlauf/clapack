@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -34,7 +29,7 @@ static integer c__7 = 7;
 /* Subroutine */ int cdrvge_(logical *dotype, integer *nn, integer *nval, 
 	integer *nrhs, real *thresh, logical *tsterr, integer *nmax, complex *
 	a, complex *afac, complex *asav, complex *b, complex *bsav, complex *
-	x, complex *xact, real *s, complex *work, real *rwork, integer *iwork,
+	x, complex *xact, real *s, complex *work, real *rwork, integer *iwork, 
 	 integer *nout)
 {
     /* Initialized data */
@@ -60,72 +55,71 @@ static integer c__7 = 7;
     real r__1, r__2;
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static char fact[1];
-    static integer ioff, mode;
-    static real amax;
-    static char path[3];
-    static integer imat, info;
-    static char dist[1];
-    static real rdum[1];
-    static char type__[1];
-    static integer nrun, i__, k, n;
+    integer i__, k, n, k1, nb, in, kl, ku, nt, lda;
+    char fact[1];
+    integer ioff, mode;
+    real amax;
+    char path[3];
+    integer imat, info;
+    char dist[1];
+    real rdum[1];
+    char type__[1];
+    integer nrun;
     extern /* Subroutine */ int cget01_(integer *, integer *, complex *, 
 	    integer *, complex *, integer *, integer *, real *, real *), 
 	    cget02_(char *, integer *, integer *, integer *, complex *, 
 	    integer *, complex *, integer *, complex *, integer *, real *, 
 	    real *);
-    static integer ifact;
+    integer ifact;
     extern /* Subroutine */ int cget04_(integer *, integer *, complex *, 
 	    integer *, complex *, integer *, real *, real *);
-    static integer nfail, iseed[4], nfact;
+    integer nfail, iseed[4], nfact;
     extern /* Subroutine */ int cget07_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, complex *, integer *, complex 
 	    *, integer *, real *, real *, real *);
     extern logical lsame_(char *, char *);
-    static char equed[1];
-    static integer nbmin;
-    static real rcond, roldc;
+    char equed[1];
+    integer nbmin;
+    real rcond, roldc;
     extern /* Subroutine */ int cgesv_(integer *, integer *, complex *, 
 	    integer *, integer *, complex *, integer *, integer *);
-    static integer nimat;
-    static real roldi;
+    integer nimat;
+    real roldi;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static integer itran;
-    static logical equil;
-    static real roldo;
-    static char trans[1];
-    static integer izero, nerrs, k1, lwork;
-    static logical zerot;
-    static char xtype[1];
+    real anorm;
+    integer itran;
+    logical equil;
+    real roldo;
+    char trans[1];
+    integer izero, nerrs, lwork;
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int clatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    ), aladhd_(integer *, char *);
-    static integer nb, in, kl;
+), aladhd_(integer *, char *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *), claqge_(integer *, integer *, complex *, integer *, real 
 	    *, real *, real *, real *, real *, char *);
-    static logical prefac;
-    static integer ku, nt;
-    static real colcnd;
+    logical prefac;
+    real colcnd;
     extern doublereal slamch_(char *);
-    static real rcondc;
+    real rcondc;
     extern /* Subroutine */ int cgeequ_(integer *, integer *, complex *, 
 	    integer *, real *, real *, real *, real *, real *, integer *);
-    static logical nofact;
-    static integer iequed;
+    logical nofact;
+    integer iequed;
     extern /* Subroutine */ int cgetrf_(integer *, integer *, complex *, 
 	    integer *, integer *, integer *);
-    static real rcondi;
+    real rcondi;
     extern /* Subroutine */ int cgetri_(integer *, complex *, integer *, 
 	    integer *, complex *, integer *, integer *), clacpy_(char *, 
 	    integer *, integer *, complex *, integer *, complex *, integer *), clarhs_(char *, char *, char *, char *, integer *, 
@@ -133,20 +127,19 @@ static integer c__7 = 7;
 	    complex *, integer *, complex *, integer *, integer *, integer *);
     extern doublereal clantr_(char *, char *, char *, integer *, integer *, 
 	    complex *, integer *, real *);
-    static real cndnum, anormi, rcondo, ainvnm;
+    real cndnum, anormi, rcondo, ainvnm;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *), claset_(char *, integer *, integer *, 
 	    complex *, complex *, complex *, integer *);
-    static logical trfcon;
-    static real anormo, rowcnd;
+    logical trfcon;
+    real anormo, rowcnd;
     extern /* Subroutine */ int cgesvx_(char *, char *, integer *, integer *, 
 	    complex *, integer *, complex *, integer *, integer *, char *, 
 	    real *, real *, complex *, integer *, complex *, integer *, real *
-	    , real *, real *, complex *, real *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
+, real *, real *, complex *, real *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
 	    real *, integer *, real *, real *, integer *, integer *, char *, 
 	    complex *, integer *, complex *, integer *), xlaenv_(integer *, integer *), cerrvx_(char *, integer *);
-    static real result[7], rpvgrw;
-    static integer lda;
+    real result[7], rpvgrw;
 
     /* Fortran I/O blocks */
     static cilist io___55 = { 0, 0, 0, fmt_9999, 0 };
@@ -161,76 +154,96 @@ static integer c__7 = 7;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CDRVGE tests the driver routines CGESV and -SVX.   
+/*  CDRVGE tests the driver routines CGESV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for N, used in dimensioning the   
-            work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for N, used in dimensioning the */
+/*          work arrays. */
 
-    A       (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  A       (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    ASAV    (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  ASAV    (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    B       (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  B       (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    BSAV    (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  BSAV    (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    X       (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  X       (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) COMPLEX array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) COMPLEX array, dimension (NMAX*NRHS) */
 
-    S       (workspace) REAL array, dimension (2*NMAX)   
+/*  S       (workspace) REAL array, dimension (2*NMAX) */
 
-    WORK    (workspace) COMPLEX array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) REAL array, dimension (2*NRHS+NMAX)   
+/*  RWORK   (workspace) REAL array, dimension (2*NRHS+NMAX) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -245,9 +258,11 @@ static integer c__7 = 7;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "GE", (ftnlen)2, (ftnlen)2);
@@ -301,8 +316,8 @@ static integer c__7 = 7;
 		goto L80;
 	    }
 
-/*           Set up parameters with CLATB4 and generate a test matrix   
-             with CLATMS. */
+/*           Set up parameters with CLATB4 and generate a test matrix */
+/*           with CLATMS. */
 
 	    clatb4_(path, &imat, &n, &n, type__, &kl, &ku, &anorm, &mode, &
 		    cndnum, dist);
@@ -321,8 +336,8 @@ static integer c__7 = 7;
 		goto L80;
 	    }
 
-/*           For types 5-7, zero one or more columns of the matrix to   
-             test that INFO is returned correctly. */
+/*           For types 5-7, zero one or more columns of the matrix to */
+/*           test that INFO is returned correctly. */
 
 	    if (zerot) {
 		if (imat == 5) {
@@ -379,17 +394,17 @@ static integer c__7 = 7;
 
 		    } else if (! nofact) {
 
-/*                    Compute the condition number for comparison with   
-                      the value returned by CGESVX (FACT = 'N' reuses   
-                      the condition number from the previous iteration   
-                      with FACT = 'F'). */
+/*                    Compute the condition number for comparison with */
+/*                    the value returned by CGESVX (FACT = 'N' reuses */
+/*                    the condition number from the previous iteration */
+/*                    with FACT = 'F'). */
 
 			clacpy_("Full", &n, &n, &asav[1], &lda, &afac[1], &
 				lda);
 			if (equil || iequed > 1) {
 
-/*                       Compute row and column scale factors to   
-                         equilibrate the matrix A. */
+/*                       Compute row and column scale factors to */
+/*                       equilibrate the matrix A. */
 
 			    cgeequ_(&n, &n, &afac[1], &lda, &s[1], &s[n + 1], 
 				    &rowcnd, &colcnd, &amax, &info);
@@ -413,8 +428,8 @@ static integer c__7 = 7;
 			    }
 			}
 
-/*                    Save the condition number of the non-equilibrated   
-                      system for use in CGET04. */
+/*                    Save the condition number of the non-equilibrated */
+/*                    system for use in CGET04. */
 
 			if (equil) {
 			    roldo = rcondo;
@@ -486,10 +501,10 @@ static integer c__7 = 7;
 
 			if (nofact && itran == 1) {
 
-/*                       --- Test CGESV  ---   
+/*                       --- Test CGESV  --- */
 
-                         Compute the LU factorization of the matrix and   
-                         solve the system. */
+/*                       Compute the LU factorization of the matrix and */
+/*                       solve the system. */
 
 			    clacpy_("Full", &n, &n, &a[1], &lda, &afac[1], &
 				    lda);
@@ -498,7 +513,7 @@ static integer c__7 = 7;
 
 			    s_copy(srnamc_1.srnamt, "CGESV ", (ftnlen)6, (
 				    ftnlen)6);
-			    cgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1],
+			    cgesv_(&n, nrhs, &afac[1], &lda, &iwork[1], &x[1], 
 				     &lda, &info);
 
 /*                       Check error code from CGESV . */
@@ -509,8 +524,8 @@ static integer c__7 = 7;
 					nfail, &nerrs, nout);
 			    }
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    cget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
 				    iwork[1], &rwork[1], result);
@@ -527,13 +542,13 @@ static integer c__7 = 7;
 
 /*                          Check solution from generated exact solution. */
 
-				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 				nt = 3;
 			    }
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    i__4 = nt;
 			    for (k = 1; k <= i__4; ++k) {
@@ -569,15 +584,15 @@ static integer c__7 = 7;
 			claset_("Full", &n, nrhs, &c_b20, &c_b20, &x[1], &lda);
 			if (iequed > 1 && n > 0) {
 
-/*                       Equilibrate the matrix if FACT = 'F' and   
-                         EQUED = 'R', 'C', or 'B'. */
+/*                       Equilibrate the matrix if FACT = 'F' and */
+/*                       EQUED = 'R', 'C', or 'B'. */
 
 			    claqge_(&n, &n, &a[1], &lda, &s[1], &s[n + 1], &
 				    rowcnd, &colcnd, &amax, equed);
 			}
 
-/*                    Solve the system and compute the condition number   
-                      and error bounds using CGESVX. */
+/*                    Solve the system and compute the condition number */
+/*                    and error bounds using CGESVX. */
 
 			s_copy(srnamc_1.srnamt, "CGESVX", (ftnlen)6, (ftnlen)
 				6);
@@ -599,8 +614,8 @@ static integer c__7 = 7;
 				    nerrs, nout);
 			}
 
-/*                    Compare RWORK(2*NRHS+1) from CGESVX with the   
-                      computed reciprocal pivot growth factor RPVGRW */
+/*                    Compare RWORK(2*NRHS+1) from CGESVX with the */
+/*                    computed reciprocal pivot growth factor RPVGRW */
 
 			if (info != 0) {
 			    rpvgrw = clantr_("M", "U", "N", &info, &info, &
@@ -629,8 +644,8 @@ static integer c__7 = 7;
 
 			if (! prefac) {
 
-/*                       Reconstruct matrix from factors and compute   
-                         residual. */
+/*                       Reconstruct matrix from factors and compute */
+/*                       residual. */
 
 			    cget01_(&n, &n, &a[1], &lda, &afac[1], &lda, &
 				    iwork[1], &rwork[(*nrhs << 1) + 1], 
@@ -646,15 +661,15 @@ static integer c__7 = 7;
 /*                       Compute residual of the computed solution. */
 
 			    clacpy_("Full", &n, nrhs, &bsav[1], &lda, &work[1]
-				    , &lda);
+, &lda);
 			    cget02_(trans, &n, &n, nrhs, &asav[1], &lda, &x[1]
-				    , &lda, &work[1], &lda, &rwork[(*nrhs << 
+, &lda, &work[1], &lda, &rwork[(*nrhs << 
 				    1) + 1], &result[1]);
 
 /*                       Check solution from generated exact solution. */
 
 			    if (nofact || prefac && lsame_(equed, "N")) {
-				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &rcondc, &result[2]);
 			    } else {
 				if (itran == 1) {
@@ -662,12 +677,12 @@ static integer c__7 = 7;
 				} else {
 				    roldc = roldi;
 				}
-				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda,
+				cget04_(&n, nrhs, &x[1], &lda, &xact[1], &lda, 
 					 &roldc, &result[2]);
 			    }
 
-/*                       Check the error bounds from iterative   
-                         refinement. */
+/*                       Check the error bounds from iterative */
+/*                       refinement. */
 
 			    cget07_(trans, &n, nrhs, &asav[1], &lda, &b[1], &
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
@@ -676,13 +691,13 @@ static integer c__7 = 7;
 			    trfcon = TRUE_;
 			}
 
-/*                    Compare RCOND from CGESVX with the computed value   
-                      in RCONDC. */
+/*                    Compare RCOND from CGESVX with the computed value */
+/*                    in RCONDC. */
 
 			result[5] = sget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			if (! trfcon) {
 			    for (k = k1; k <= 7; ++k) {
@@ -870,4 +885,3 @@ L80:
 /*     End of CDRVGE */
 
 } /* cdrvge_ */
-

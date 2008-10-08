@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -27,13 +22,14 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     void r_cnjg(complex *, complex *);
 
     /* Local variables */
-    static integer info;
-    static real anrm;
-    static logical tpsd;
-    static real xnrm;
-    static integer i__, j;
+    integer i__, j;
+    real err;
+    integer info;
+    real anrm;
+    logical tpsd;
+    real xnrm;
     extern logical lsame_(char *, char *);
-    static real rwork[1];
+    real rwork[1];
     extern /* Subroutine */ int cgelq2_(integer *, integer *, complex *, 
 	    integer *, complex *, complex *, integer *), cgeqr2_(integer *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *);
@@ -45,76 +41,87 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
     extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *), xerbla_(char *, 
 	    integer *);
-    static integer ldwork;
-    static real err;
+    integer ldwork;
 
 
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CQRT14 checks whether X is in the row space of A or A'.  It does so */
+/*  by scaling both X and A such that their norms are in the range */
+/*  [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X] */
+/*  (if TRANS = 'C') or an LQ factorization of [A',X]' (if TRANS = 'N'), */
+/*  and returning the norm of the trailing triangle, scaled by */
+/*  MAX(M,N,NRHS)*eps. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CQRT14 checks whether X is in the row space of A or A'.  It does so   
-    by scaling both X and A such that their norms are in the range   
-    [sqrt(eps), 1/sqrt(eps)], then computing a QR factorization of [A,X]   
-    (if TRANS = 'C') or an LQ factorization of [A',X]' (if TRANS = 'N'),   
-    and returning the norm of the trailing triangle, scaled by   
-    MAX(M,N,NRHS)*eps.   
+/*  TRANS   (input) CHARACTER*1 */
+/*          = 'N':  No transpose, check for X in the row space of A */
+/*          = 'C':  Conjugate transpose, check for X in row space of A'. */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    TRANS   (input) CHARACTER*1   
-            = 'N':  No transpose, check for X in the row space of A   
-            = 'C':  Conjugate transpose, check for X in row space of A'.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of X. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
+/*  A       (input) COMPLEX array, dimension (LDA,N) */
+/*          The M-by-N matrix A. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of X.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (input) COMPLEX array, dimension (LDA,N)   
-            The M-by-N matrix A.   
+/*  X       (input) COMPLEX array, dimension (LDX,NRHS) */
+/*          If TRANS = 'N', the N-by-NRHS matrix X. */
+/*          IF TRANS = 'C', the M-by-NRHS matrix X. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X. */
 
-    X       (input) COMPLEX array, dimension (LDX,NRHS)   
-            If TRANS = 'N', the N-by-NRHS matrix X.   
-            IF TRANS = 'C', the M-by-NRHS matrix X.   
+/*  WORK    (workspace) COMPLEX array dimension (LWORK) */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.   
+/*  LWORK   (input) INTEGER */
+/*          length of workspace array required */
+/*          If TRANS = 'N', LWORK >= (M+NRHS)*(N+2); */
+/*          if TRANS = 'C', LWORK >= (N+NRHS)*(M+2). */
 
-    WORK    (workspace) COMPLEX array dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            length of workspace array required   
-            If TRANS = 'N', LWORK >= (M+NRHS)*(N+2);   
-            if TRANS = 'C', LWORK >= (N+NRHS)*(M+2).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     --work;
 
@@ -173,11 +180,11 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	i__1 = *n + *nrhs;
 /* Computing MIN */
 	i__2 = *m, i__3 = *n + *nrhs;
-	cgeqr2_(m, &i__1, &work[1], &ldwork, &work[ldwork * (*n + *nrhs) + 1],
-		 &work[ldwork * (*n + *nrhs) + min(i__2,i__3) + 1], &info);
+	cgeqr2_(m, &i__1, &work[1], &ldwork, &work[ldwork * (*n + *nrhs) + 1], 
+		 &work[ldwork * (*n + *nrhs) + min(i__2, i__3)+ 1], &info);
 
-/*        Compute largest entry in upper triangle of   
-          work(n+1:m,n+1:n+nrhs) */
+/*        Compute largest entry in upper triangle of */
+/*        work(n+1:m,n+1:n+nrhs) */
 
 	err = 0.f;
 	i__1 = *n + *nrhs;
@@ -201,7 +208,7 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	    i__2 = *nrhs;
 	    for (j = 1; j <= i__2; ++j) {
 		i__3 = *m + j + (i__ - 1) * ldwork;
-		r_cnjg(&q__1, &x_ref(i__, j));
+		r_cnjg(&q__1, &x[i__ + j * x_dim1]);
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L30: */
 	    }
@@ -220,8 +227,8 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 	cgelq2_(&ldwork, n, &work[1], &ldwork, &work[ldwork * *n + 1], &work[
 		ldwork * (*n + 1) + 1], &info);
 
-/*        Compute largest entry in lower triangle in   
-          work(m+1:m+nrhs,m+1:n) */
+/*        Compute largest entry in lower triangle in */
+/*        work(m+1:m+nrhs,m+1:n) */
 
 	err = 0.f;
 	i__1 = *n;
@@ -247,8 +254,3 @@ doublereal cqrt14_(char *trans, integer *m, integer *n, integer *nrhs,
 /*     End of CQRT14 */
 
 } /* cqrt14_ */
-
-#undef x_ref
-#undef x_subscr
-
-

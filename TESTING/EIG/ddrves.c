@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -95,52 +90,54 @@ static integer c__2 = 2;
 	    vs_offset, i__1, i__2, i__3, i__4;
     doublereal d__1, d__2, d__3, d__4;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
-    static doublereal cond;
-    static integer jcol;
-    static char path[3];
-    static integer sdim, nmax;
-    static doublereal unfl, ovfl;
-    static integer rsub;
-    static char sort[1];
-    static integer i__, j, n;
-    static logical badnn;
+    integer i__, j, n;
+    doublereal res[2];
+    integer iwk;
+    doublereal tmp, ulp, cond;
+    integer jcol;
+    char path[3];
+    integer sdim, nmax;
+    doublereal unfl, ovfl;
+    integer rsub;
+    char sort[1];
+    logical badnn;
     extern /* Subroutine */ int dgees_(char *, char *, L_fp, integer *, 
 	    doublereal *, integer *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, logical *, 
 	    integer *);
-    static integer nfail, imode;
+    integer nfail, imode;
     extern /* Subroutine */ int dhst01_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static integer iinfo;
-    static doublereal conds, anorm;
-    static integer jsize, nerrs, itype, jtype, ntest, lwork, isort;
-    static doublereal rtulp;
+    integer iinfo;
+    doublereal conds, anorm;
+    integer jsize, nerrs, itype, jtype, ntest, lwork, isort;
+    doublereal rtulp;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
-    static char adumma[1*1];
+    char adumma[1*1];
     extern /* Subroutine */ int dlatme_(integer *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, char *, char 
 	    *, char *, char *, doublereal *, integer *, doublereal *, integer 
-	    *, integer *, doublereal *, doublereal *, integer *, doublereal *,
+	    *, integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	     integer *);
-    static integer idumma[1], ioldsd[4];
+    integer idumma[1], ioldsd[4];
     extern logical dslect_(doublereal *, doublereal *);
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer knteig;
+    integer knteig;
     extern /* Subroutine */ int dlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *), 
 	    dlatmr_(integer *, integer *, char *, integer *, char *, 
 	    doublereal *, integer *, doublereal *, doublereal *, char *, char 
-	    *, doublereal *, integer *, doublereal *, doublereal *, integer *,
+	    *, doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	     doublereal *, char *, integer *, integer *, integer *, 
 	    doublereal *, doublereal *, char *, doublereal *, integer *, 
 	    integer *, integer *), dlasum_(char *, integer *, integer *, integer *),
@@ -148,14 +145,11 @@ static integer c__2 = 2;
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, char *, doublereal *, integer *, doublereal *, integer 
 	    *), xerbla_(char *, integer *);
-    static integer ntestf;
-    static doublereal ulpinv;
-    static integer nnwork;
-    static doublereal rtulpi;
-    static integer mtypes, ntestt;
-    static doublereal res[2];
-    static integer iwk;
-    static doublereal tmp, ulp;
+    integer ntestf;
+    doublereal ulpinv;
+    integer nnwork;
+    doublereal rtulpi;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___32 = { 0, 0, 0, fmt_9992, 0 };
@@ -171,306 +165,323 @@ static integer c__2 = 2;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define h___ref(a_1,a_2) h__[(a_2)*h_dim1 + a_1]
-#define ht_ref(a_1,a_2) ht[(a_2)*ht_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*     DDRVES checks the nonsymmetric eigenvalue (Schur form) problem */
+/*     driver DGEES. */
 
-    Purpose   
-    =======   
+/*     When DDRVES is called, a number of matrix "sizes" ("n's") and a */
+/*     number of matrix "types" are specified.  For each size ("n") */
+/*     and each type of matrix, one matrix will be generated and used */
+/*     to test the nonsymmetric eigenroutines.  For each matrix, 13 */
+/*     tests will be performed: */
 
-       DDRVES checks the nonsymmetric eigenvalue (Schur form) problem   
-       driver DGEES.   
+/*     (1)     0 if T is in Schur form, 1/ulp otherwise */
+/*            (no sorting of eigenvalues) */
 
-       When DDRVES is called, a number of matrix "sizes" ("n's") and a   
-       number of matrix "types" are specified.  For each size ("n")   
-       and each type of matrix, one matrix will be generated and used   
-       to test the nonsymmetric eigenroutines.  For each matrix, 13   
-       tests will be performed:   
+/*     (2)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (1)     0 if T is in Schur form, 1/ulp otherwise   
-              (no sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (no sorting of eigenvalues). */
 
-       (2)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (no sorting of eigenvalues).   
+/*     (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues).   
+/*     (5)     0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (6)     0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
 
-       (5)     0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (7)     0 if T is in Schur form, 1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (6)     0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
+/*     (8)     | A - VS T VS' | / ( n |A| ulp ) */
 
-       (7)     0 if T is in Schur form, 1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (with sorting of eigenvalues). */
 
-       (8)     | A - VS T VS' | / ( n |A| ulp )   
+/*     (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). */
 
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (with sorting of eigenvalues).   
+/*     (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
+/*     (11)    0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*     (12)    0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
 
-       (11)    0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*     (13)    if sorting worked and SDIM is the number of */
+/*             eigenvalues which were SELECTed */
 
-       (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               (with sorting of eigenvalues)   
+/*     The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*     each element NN(j) specifies one size. */
+/*     The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*     if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*     Currently, the list of possible types is: */
 
-       (13)    if sorting worked and SDIM is the number of   
-               eigenvalues which were SELECTed   
+/*     (1)  The zero matrix. */
+/*     (2)  The identity matrix. */
+/*     (3)  A (transposed) Jordan block, with 1's on the diagonal. */
 
-       The "sizes" are specified by an array NN(1:NSIZES); the value of   
-       each element NN(j) specifies one size.   
-       The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-       Currently, the list of possible types is:   
+/*     (4)  A diagonal matrix with evenly spaced entries */
+/*          1, ..., ULP  and random signs. */
+/*          (ULP = (first number larger than 1) - 1 ) */
+/*     (5)  A diagonal matrix with geometrically spaced entries */
+/*          1, ..., ULP  and random signs. */
+/*     (6)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*          and random signs. */
 
-       (1)  The zero matrix.   
-       (2)  The identity matrix.   
-       (3)  A (transposed) Jordan block, with 1's on the diagonal.   
+/*     (7)  Same as (4), but multiplied by a constant near */
+/*          the overflow threshold */
+/*     (8)  Same as (4), but multiplied by a constant near */
+/*          the underflow threshold */
 
-       (4)  A diagonal matrix with evenly spaced entries   
-            1, ..., ULP  and random signs.   
-            (ULP = (first number larger than 1) - 1 )   
-       (5)  A diagonal matrix with geometrically spaced entries   
-            1, ..., ULP  and random signs.   
-       (6)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-            and random signs.   
+/*     (9)  A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has evenly spaced entries 1, ..., ULP with random signs */
+/*          on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
 
-       (7)  Same as (4), but multiplied by a constant near   
-            the overflow threshold   
-       (8)  Same as (4), but multiplied by a constant near   
-            the underflow threshold   
+/*     (10) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has geometrically spaced entries 1, ..., ULP with random */
+/*          signs on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
 
-       (9)  A matrix of the form  U' T U, where U is orthogonal and   
-            T has evenly spaced entries 1, ..., ULP with random signs   
-            on the diagonal and random O(1) entries in the upper   
-            triangle.   
+/*     (11) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has "clustered" entries 1, ULP,..., ULP with random */
+/*          signs on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
 
-       (10) A matrix of the form  U' T U, where U is orthogonal and   
-            T has geometrically spaced entries 1, ..., ULP with random   
-            signs on the diagonal and random O(1) entries in the upper   
-            triangle.   
+/*     (12) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has real or complex conjugate paired eigenvalues randomly */
+/*          chosen from ( ULP, 1 ) and random O(1) entries in the upper */
+/*          triangle. */
 
-       (11) A matrix of the form  U' T U, where U is orthogonal and   
-            T has "clustered" entries 1, ULP,..., ULP with random   
-            signs on the diagonal and random O(1) entries in the upper   
-            triangle.   
+/*     (13) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has evenly spaced entries 1, ..., ULP */
+/*          with random signs on the diagonal and random O(1) entries */
+/*          in the upper triangle. */
 
-       (12) A matrix of the form  U' T U, where U is orthogonal and   
-            T has real or complex conjugate paired eigenvalues randomly   
-            chosen from ( ULP, 1 ) and random O(1) entries in the upper   
-            triangle.   
+/*     (14) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has geometrically spaced entries */
+/*          1, ..., ULP with random signs on the diagonal and random */
+/*          O(1) entries in the upper triangle. */
 
-       (13) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has evenly spaced entries 1, ..., ULP   
-            with random signs on the diagonal and random O(1) entries   
-            in the upper triangle.   
+/*     (15) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has "clustered" entries 1, ULP,..., ULP */
+/*          with random signs on the diagonal and random O(1) entries */
+/*          in the upper triangle. */
 
-       (14) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has geometrically spaced entries   
-            1, ..., ULP with random signs on the diagonal and random   
-            O(1) entries in the upper triangle.   
+/*     (16) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has real or complex conjugate paired */
+/*          eigenvalues randomly chosen from ( ULP, 1 ) and random */
+/*          O(1) entries in the upper triangle. */
 
-       (15) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has "clustered" entries 1, ULP,..., ULP   
-            with random signs on the diagonal and random O(1) entries   
-            in the upper triangle.   
+/*     (17) Same as (16), but multiplied by a constant */
+/*          near the overflow threshold */
+/*     (18) Same as (16), but multiplied by a constant */
+/*          near the underflow threshold */
 
-       (16) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has real or complex conjugate paired   
-            eigenvalues randomly chosen from ( ULP, 1 ) and random   
-            O(1) entries in the upper triangle.   
+/*     (19) Nonsymmetric matrix with random entries chosen from (-1,1). */
+/*          If N is at least 4, all entries in first two rows and last */
+/*          row, and first column and last two columns are zero. */
+/*     (20) Same as (19), but multiplied by a constant */
+/*          near the overflow threshold */
+/*     (21) Same as (19), but multiplied by a constant */
+/*          near the underflow threshold */
 
-       (17) Same as (16), but multiplied by a constant   
-            near the overflow threshold   
-       (18) Same as (16), but multiplied by a constant   
-            near the underflow threshold   
+/*  Arguments */
+/*  ========= */
 
-       (19) Nonsymmetric matrix with random entries chosen from (-1,1).   
-            If N is at least 4, all entries in first two rows and last   
-            row, and first column and last two columns are zero.   
-       (20) Same as (19), but multiplied by a constant   
-            near the overflow threshold   
-       (21) Same as (19), but multiplied by a constant   
-            near the underflow threshold   
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          DDRVES does nothing.  It must be at least zero. */
 
-    Arguments   
-    =========   
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
 
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            DDRVES does nothing.  It must be at least zero.   
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, DDRVES */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
 
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
 
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE.   If it is zero, DDRVES   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to DDRVES to continue the same random number */
+/*          sequence. */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to DDRVES to continue the same random number   
-            sequence.   
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns INFO not equal to 0.) */
 
-    THRESH  (input) DOUBLE PRECISION   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually used. */
 
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns INFO not equal to 0.)   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, and H. LDA must be at */
+/*          least 1 and at least max(NN). */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used.   
+/*  H       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) */
+/*          Another copy of the test matrix A, modified by DGEES. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A, and H. LDA must be at   
-            least 1 and at least max(NN).   
+/*  HT      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN)) */
+/*          Yet another copy of the test matrix A, modified by DGEES. */
 
-    H       (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
-            Another copy of the test matrix A, modified by DGEES.   
+/*  WR      (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*  WI      (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          On exit, WR + WI*i are the eigenvalues of the matrix in A. */
 
-    HT      (workspace) DOUBLE PRECISION array, dimension (LDA, max(NN))   
-            Yet another copy of the test matrix A, modified by DGEES.   
+/*  WRT     (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*  WIT     (workspace) DOUBLE PRECISION array, dimension (max(NN)) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but those computed when DGEES only computes a partial */
+/*          eigendecomposition, i.e. not Schur vectors */
 
-    WR      (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-    WI      (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-            The real and imaginary parts of the eigenvalues of A.   
-            On exit, WR + WI*i are the eigenvalues of the matrix in A.   
+/*  VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, max(NN)) */
+/*          VS holds the computed Schur vectors. */
 
-    WRT     (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-    WIT     (workspace) DOUBLE PRECISION array, dimension (max(NN))   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but those computed when DGEES only computes a partial   
-            eigendecomposition, i.e. not Schur vectors   
+/*  LDVS    (input) INTEGER */
+/*          Leading dimension of VS. Must be at least max(1,max(NN)). */
 
-    VS      (workspace) DOUBLE PRECISION array, dimension (LDVS, max(NN))   
-            VS holds the computed Schur vectors.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (13) */
+/*          The values computed by the 13 tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid overflow. */
 
-    LDVS    (input) INTEGER   
-            Leading dimension of VS. Must be at least max(1,max(NN)).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (NWORK) */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (13)   
-            The values computed by the 13 tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow.   
+/*  NWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          5*NN(j)+2*NN(j)**2 for all j. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (NWORK)   
+/*  IWORK   (workspace) INTEGER array, dimension (max(NN)) */
 
-    NWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            5*NN(j)+2*NN(j)**2 for all j.   
+/*  INFO    (output) INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -6: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -17: LDVS < 1 or LDVS < NMAX, where NMAX is max( NN(j) ). */
+/*          -20: NWORK too small. */
+/*          If  DLATMR, SLATMS, SLATME or DGEES returns an error code, */
+/*              the absolute value of it is returned. */
 
-    IWORK   (workspace) INTEGER array, dimension (max(NN))   
+/* ----------------------------------------------------------------------- */
 
-    INFO    (output) INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -6: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -17: LDVS < 1 or LDVS < NMAX, where NMAX is max( NN(j) ).   
-            -20: NWORK too small.   
-            If  DLATMR, SLATMS, SLATME or DGEES returns an error code,   
-                the absolute value of it is returned.   
+/*     Some Local Variables and Parameters: */
+/*     ---- ----- --------- --- ---------- */
 
-   -----------------------------------------------------------------------   
+/*     ZERO, ONE       Real 0 and 1. */
+/*     MAXTYP          The number of types defined. */
+/*     NMAX            Largest value in NN. */
+/*     NERRS           The number of tests which have exceeded THRESH */
+/*     COND, CONDS, */
+/*     IMODE           Values to be passed to the matrix generators. */
+/*     ANORM           Norm of A; passed to matrix generators. */
 
-       Some Local Variables and Parameters:   
-       ---- ----- --------- --- ----------   
+/*     OVFL, UNFL      Overflow and underflow thresholds. */
+/*     ULP, ULPINV     Finest relative precision and its inverse. */
+/*     RTULP, RTULPI   Square roots of the previous 4 values. */
 
-       ZERO, ONE       Real 0 and 1.   
-       MAXTYP          The number of types defined.   
-       NMAX            Largest value in NN.   
-       NERRS           The number of tests which have exceeded THRESH   
-       COND, CONDS,   
-       IMODE           Values to be passed to the matrix generators.   
-       ANORM           Norm of A; passed to matrix generators.   
+/*             The following four arrays decode JTYPE: */
+/*     KTYPE(j)        The general type (1-10) for type "j". */
+/*     KMODE(j)        The MODE value to be passed to the matrix */
+/*                     generator for type "j". */
+/*     KMAGN(j)        The order of magnitude ( O(1), */
+/*                     O(overflow^(1/2) ), O(underflow^(1/2) ) */
+/*     KCONDS(j)       Selectw whether CONDS is to be 1 or */
+/*                     1/sqrt(ulp).  (0 means irrelevant.) */
 
-       OVFL, UNFL      Overflow and underflow thresholds.   
-       ULP, ULPINV     Finest relative precision and its inverse.   
-       RTULP, RTULPI   Square roots of the previous 4 values.   
+/*  ===================================================================== */
 
-               The following four arrays decode JTYPE:   
-       KTYPE(j)        The general type (1-10) for type "j".   
-       KMODE(j)        The MODE value to be passed to the matrix   
-                       generator for type "j".   
-       KMAGN(j)        The order of magnitude ( O(1),   
-                       O(overflow^(1/2) ), O(underflow^(1/2) )   
-       KCONDS(j)       Selectw whether CONDS is to be 1 or   
-                       1/sqrt(ulp).  (0 means irrelevant.)   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = 1 + ht_dim1 * 1;
+    ht_offset = 1 + ht_dim1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --wr;
     --wi;
     --wrt;
     --wit;
     vs_dim1 = *ldvs;
-    vs_offset = 1 + vs_dim1 * 1;
+    vs_offset = 1 + vs_dim1;
     vs -= vs_offset;
     --result;
     --work;
@@ -478,6 +489,8 @@ static integer c__2 = 2;
     --bwork;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "ES", (ftnlen)2, (ftnlen)2);
@@ -575,21 +588,21 @@ static integer c__2 = 2;
 /* L20: */
 	    }
 
-/*           Compute "A"   
+/*           Compute "A" */
 
-             Control parameters:   
+/*           Control parameters: */
 
-             KMAGN  KCONDS  KMODE        KTYPE   
-         =1  O(1)   1       clustered 1  zero   
-         =2  large  large   clustered 2  identity   
-         =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues)   
-         =5                 random log   symmetric, w/ eigenvalues   
-         =6                 random       general, w/ eigenvalues   
-         =7                              random diagonal   
-         =8                              random symmetric   
-         =9                              random general   
-         =10                             random triangular */
+/*           KMAGN  KCONDS  KMODE        KTYPE */
+/*       =1  O(1)   1       clustered 1  zero */
+/*       =2  large  large   clustered 2  identity */
+/*       =3  small          exponential  Jordan */
+/*       =4                 arithmetic   diagonal, (w/ eigenvalues) */
+/*       =5                 random log   symmetric, w/ eigenvalues */
+/*       =6                 random       general, w/ eigenvalues */
+/*       =7                              random diagonal */
+/*       =8                              random symmetric */
+/*       =9                              random general */
+/*       =10                             random triangular */
 
 	    if (mtypes > 21) {
 		goto L90;
@@ -624,9 +637,9 @@ L60:
 	    iinfo = 0;
 	    cond = ulpinv;
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                Zero */
+/*              Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -637,7 +650,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 /* L70: */
 		}
 
@@ -647,9 +660,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 		    if (jcol > 1) {
-			a_ref(jcol, jcol - 1) = 1.;
+			a[jcol + (jcol - 1) * a_dim1] = 1.;
 		    }
 /* L80: */
 		}
@@ -685,7 +698,7 @@ L60:
 		*(unsigned char *)&adumma[0] = ' ';
 		dlatme_(&n, "S", &iseed[1], &work[1], &imode, &cond, &c_b31, 
 			adumma, "T", "T", "T", &work[n + 1], &c__4, &conds, &
-			n, &n, &anorm, &a[a_offset], lda, &work[(n << 1) + 1],
+			n, &n, &anorm, &a[a_offset], lda, &work[(n << 1) + 1], 
 			 &iinfo);
 
 	    } else if (itype == 7) {
@@ -721,13 +734,13 @@ L60:
 		    dlaset_("Full", &c__2, &n, &c_b17, &c_b17, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a_ref(3, 1)
-			    , lda);
+		    dlaset_("Full", &i__3, &c__1, &c_b17, &c_b17, &a[a_dim1 + 
+			    3], lda);
 		    i__3 = n - 3;
-		    dlaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a_ref(3, n 
-			    - 1), lda);
-		    dlaset_("Full", &c__1, &n, &c_b17, &c_b17, &a_ref(n, 1), 
-			    lda);
+		    dlaset_("Full", &i__3, &c__2, &c_b17, &c_b17, &a[(n - 1) *
+			     a_dim1 + 3], lda);
+		    dlaset_("Full", &c__1, &n, &c_b17, &c_b17, &a[n + a_dim1], 
+			     lda);
 		}
 
 	    } else if (itype == 10) {
@@ -821,7 +834,7 @@ L90:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = j + 2; i__ <= i__4; ++i__) {
-			    if (h___ref(i__, j) != 0.) {
+			    if (h__[i__ + j * h_dim1] != 0.) {
 				result[rsub + 1] = ulpinv;
 			    }
 /* L110: */
@@ -830,28 +843,29 @@ L90:
 		    }
 		    i__3 = n - 2;
 		    for (i__ = 1; i__ <= i__3; ++i__) {
-			if (h___ref(i__ + 1, i__) != 0. && h___ref(i__ + 2, 
-				i__ + 1) != 0.) {
+			if (h__[i__ + 1 + i__ * h_dim1] != 0. && h__[i__ + 2 
+				+ (i__ + 1) * h_dim1] != 0.) {
 			    result[rsub + 1] = ulpinv;
 			}
 /* L130: */
 		    }
 		    i__3 = n - 1;
 		    for (i__ = 1; i__ <= i__3; ++i__) {
-			if (h___ref(i__ + 1, i__) != 0.) {
-			    if (h___ref(i__, i__) != h___ref(i__ + 1, i__ + 1)
-				     || h___ref(i__, i__ + 1) == 0. || d_sign(
-				    &c_b31, &h___ref(i__ + 1, i__)) == d_sign(
-				    &c_b31, &h___ref(i__, i__ + 1))) {
+			if (h__[i__ + 1 + i__ * h_dim1] != 0.) {
+			    if (h__[i__ + i__ * h_dim1] != h__[i__ + 1 + (i__ 
+				    + 1) * h_dim1] || h__[i__ + (i__ + 1) * 
+				    h_dim1] == 0. || d_sign(&c_b31, &h__[i__ 
+				    + 1 + i__ * h_dim1]) == d_sign(&c_b31, &
+				    h__[i__ + (i__ + 1) * h_dim1])) {
 				result[rsub + 1] = ulpinv;
 			    }
 			}
 /* L140: */
 		    }
 
-/*                 Do Tests (2) and (3) or Tests (8) and (9)   
+/*                 Do Tests (2) and (3) or Tests (8) and (9) */
 
-   Computing MAX */
+/* Computing MAX */
 		    i__3 = 1, i__4 = (n << 1) * n;
 		    lwork = max(i__3,i__4);
 		    dhst01_(&n, &c__1, &n, &a[a_offset], lda, &h__[h_offset], 
@@ -864,40 +878,41 @@ L90:
 		    result[rsub + 4] = 0.;
 		    i__3 = n;
 		    for (i__ = 1; i__ <= i__3; ++i__) {
-			if (h___ref(i__, i__) != wr[i__]) {
+			if (h__[i__ + i__ * h_dim1] != wr[i__]) {
 			    result[rsub + 4] = ulpinv;
 			}
 /* L150: */
 		    }
 		    if (n > 1) {
-			if (h___ref(2, 1) == 0. && wi[1] != 0.) {
+			if (h__[h_dim1 + 2] == 0. && wi[1] != 0.) {
 			    result[rsub + 4] = ulpinv;
 			}
-			if (h___ref(n, n - 1) == 0. && wi[n] != 0.) {
+			if (h__[n + (n - 1) * h_dim1] == 0. && wi[n] != 0.) {
 			    result[rsub + 4] = ulpinv;
 			}
 		    }
 		    i__3 = n - 1;
 		    for (i__ = 1; i__ <= i__3; ++i__) {
-			if (h___ref(i__ + 1, i__) != 0.) {
-			    tmp = sqrt((d__1 = h___ref(i__ + 1, i__), abs(
-				    d__1))) * sqrt((d__2 = h___ref(i__, i__ + 
-				    1), abs(d__2)));
-/* Computing MAX   
-   Computing MAX */
+			if (h__[i__ + 1 + i__ * h_dim1] != 0.) {
+			    tmp = sqrt((d__1 = h__[i__ + 1 + i__ * h_dim1], 
+				    abs(d__1))) * sqrt((d__2 = h__[i__ + (i__ 
+				    + 1) * h_dim1], abs(d__2)));
+/* Computing MAX */
+/* Computing MAX */
 			    d__4 = ulp * tmp;
 			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__] - 
 				    tmp, abs(d__1)) / max(d__4,unfl);
 			    result[rsub + 4] = max(d__2,d__3);
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 			    d__4 = ulp * tmp;
 			    d__2 = result[rsub + 4], d__3 = (d__1 = wi[i__ + 
 				    1] + tmp, abs(d__1)) / max(d__4,unfl);
 			    result[rsub + 4] = max(d__2,d__3);
 			} else if (i__ > 1) {
-			    if (h___ref(i__ + 1, i__) == 0. && h___ref(i__, 
-				    i__ - 1) == 0. && wi[i__] != 0.) {
+			    if (h__[i__ + 1 + i__ * h_dim1] == 0. && h__[i__ 
+				    + (i__ - 1) * h_dim1] == 0. && wi[i__] != 
+				    0.) {
 				result[rsub + 4] = ulpinv;
 			    }
 			}
@@ -933,7 +948,8 @@ L90:
 		    for (j = 1; j <= i__3; ++j) {
 			i__4 = n;
 			for (i__ = 1; i__ <= i__4; ++i__) {
-			    if (h___ref(i__, j) != ht_ref(i__, j)) {
+			    if (h__[i__ + j * h_dim1] != ht[i__ + j * ht_dim1]
+				    ) {
 				result[rsub + 5] = ulpinv;
 			    }
 /* L170: */
@@ -1069,9 +1085,3 @@ L260:
 /*     End of DDRVES */
 
 } /* ddrves_ */
-
-#undef ht_ref
-#undef h___ref
-#undef a_ref
-
-

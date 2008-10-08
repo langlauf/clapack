@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -36,105 +31,117 @@ static doublereal c_b59 = -1.;
     double sqrt(doublereal), cos(doublereal), sin(doublereal);
 
     /* Local variables */
-    static integer ndim;
+    doublereal b[10], d__[20];
+    integer i__, j, k, n;
+    doublereal t[100]	/* was [10][10] */, w, x[20], y[20], vm1[5], vm2[5], 
+	    vm3[5], vm4[5], vm5[3], dum[1], eps;
+    integer ivm1, ivm2, ivm3, ivm4, ivm5, ndim;
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer info;
-    static doublereal dumm, norm, work[10], b[10], d__[20];
-    static integer i__, j, k, n;
-    static doublereal t[100]	/* was [10][10] */, scale, w, x[20], y[20];
+    integer info;
+    doublereal dumm, norm, work[10], scale;
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
-    static doublereal domin, resid;
+    doublereal domin, resid;
     extern doublereal dasum_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    static doublereal xnorm;
+    doublereal xnorm;
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern integer idamax_(integer *, doublereal *, integer *);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int dlaqtr_(logical *, logical *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
+	    doublereal *, integer *, doublereal *, doublereal *, doublereal *, 
 	     doublereal *, doublereal *, integer *);
-    static doublereal normtb, smlnum, vm1[5], vm2[5], vm3[5], vm4[5], vm5[3], 
-	    dum[1], eps;
-    static integer ivm1, ivm2, ivm3, ivm4, ivm5;
+    doublereal normtb, smlnum;
 
 
-#define ival_ref(a_1,a_2,a_3) ival[((a_3)*5 + (a_2))*5 + a_1 - 31]
-#define t_ref(a_1,a_2) t[(a_2)*10 + a_1 - 11]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DGET39 tests DLAQTR, a routine for solving the real or */
+/*  special complex quasi upper triangular system */
 
-    Purpose   
-    =======   
+/*       op(T)*p = scale*c, */
+/*  or */
+/*       op(T + iB)*(p+iq) = scale*(c+id), */
 
-    DGET39 tests DLAQTR, a routine for solving the real or   
-    special complex quasi upper triangular system   
+/*  in real arithmetic. T is upper quasi-triangular. */
+/*  If it is complex, then the first diagonal block of T must be */
+/*  1 by 1, B has the special structure */
 
-         op(T)*p = scale*c,   
-    or   
-         op(T + iB)*(p+iq) = scale*(c+id),   
+/*                 B = [ b(1) b(2) ... b(n) ] */
+/*                     [       w            ] */
+/*                     [           w        ] */
+/*                     [              .     ] */
+/*                     [                 w  ] */
 
-    in real arithmetic. T is upper quasi-triangular.   
-    If it is complex, then the first diagonal block of T must be   
-    1 by 1, B has the special structure   
+/*  op(A) = A or A', where A' denotes the conjugate transpose of */
+/*  the matrix A. */
 
-                   B = [ b(1) b(2) ... b(n) ]   
-                       [       w            ]   
-                       [           w        ]   
-                       [              .     ]   
-                       [                 w  ]   
+/*  On input, X = [ c ].  On output, X = [ p ]. */
+/*                [ d ]                  [ q ] */
 
-    op(A) = A or A', where A' denotes the conjugate transpose of   
-    the matrix A.   
+/*  Scale is an output less than or equal to 1, chosen to avoid */
+/*  overflow in X. */
+/*  This subroutine is specially designed for the condition number */
+/*  estimation in the eigenproblem routine DTRSNA. */
 
-    On input, X = [ c ].  On output, X = [ p ].   
-                  [ d ]                  [ q ]   
+/*  The test code verifies that the following residual is order 1: */
 
-    Scale is an output less than or equal to 1, chosen to avoid   
-    overflow in X.   
-    This subroutine is specially designed for the condition number   
-    estimation in the eigenproblem routine DTRSNA.   
+/*       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| */
+/*     ----------------------------------------- */
+/*         max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*             (||T||+||B||)*smlnum/ulp, */
+/*             smlnum) */
 
-    The test code verifies that the following residual is order 1:   
+/*  (The (||T||+||B||)*smlnum/ulp term accounts for possible */
+/*   (gradual or nongradual) underflow in x1 and x2.) */
 
-         ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)||   
-       -----------------------------------------   
-           max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-               (||T||+||B||)*smlnum/ulp,   
-               smlnum)   
+/*  Arguments */
+/*  ========== */
 
-    (The (||T||+||B||)*smlnum/ulp term accounts for possible   
-     (gradual or nongradual) underflow in x1 and x2.)   
+/*  RMAX    (output) DOUBLE PRECISION */
+/*          Value of the largest test ratio. */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER */
+/*          Example number where largest test ratio achieved. */
 
-    RMAX    (output) DOUBLE PRECISION   
-            Value of the largest test ratio.   
+/*  NINFO   (output) INTEGER */
+/*          Number of examples where INFO is nonzero. */
 
-    LMAX    (output) INTEGER   
-            Example number where largest test ratio achieved.   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER   
-            Number of examples where INFO is nonzero.   
+/*  ===================================================================== */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Data statements .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Get machine parameters */
+/*     Get machine parameters */
 
     eps = dlamch_("P");
     smlnum = dlamch_("S");
@@ -192,11 +199,11 @@ static doublereal c_b59 = -1.;
 			    for (i__ = 1; i__ <= i__1; ++i__) {
 				i__2 = n;
 				for (j = 1; j <= i__2; ++j) {
-				    t_ref(i__, j) = (doublereal) ival_ref(i__,
-					     j, ndim) * vm1[ivm1 - 1];
+				    t[i__ + j * 10 - 11] = (doublereal) ival[
+					    i__ + (j + ndim * 5) * 5 - 31] * 
+					    vm1[ivm1 - 1];
 				    if (i__ >= j) {
-					t_ref(i__, j) = t_ref(i__, j) * vm5[
-						ivm5 - 1];
+					t[i__ + j * 10 - 11] *= vm5[ivm5 - 1];
 				    }
 /* L10: */
 				}
@@ -232,8 +239,8 @@ static doublereal c_b59 = -1.;
 				++(*ninfo);
 			    }
 
-/*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
+/*                       || T*x - scale*d || / */
+/*                         max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
 			    dcopy_(&n, d__, &c__1, y, &c__1);
 			    d__1 = -scale;
@@ -259,8 +266,8 @@ static doublereal c_b59 = -1.;
 				++(*ninfo);
 			    }
 
-/*                       || T*x - scale*d || /   
-                           max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
+/*                       || T*x - scale*d || / */
+/*                         max(ulp*||T||*||x||,smlnum/ulp*||T||,smlnum) */
 
 			    dcopy_(&n, d__, &c__1, y, &c__1);
 			    d__1 = -scale;
@@ -287,9 +294,9 @@ static doublereal c_b59 = -1.;
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-                                    smlnum/ulp * (||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| / */
+/*                          max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*                                  smlnum/ulp * (||T||+||B||), smlnum ) */
 
 
 			    i__1 = n << 1;
@@ -339,9 +346,9 @@ static doublereal c_b59 = -1.;
 				++(*ninfo);
 			    }
 
-/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| /   
-                            max(ulp*(||T||+||B||)*(||x1||+||x2||),   
-                                    smlnum/ulp * (||T||+||B||), smlnum ) */
+/*                       ||(T+i*B)*(x1+i*x2) - scale*(d1+i*d2)|| / */
+/*                          max(ulp*(||T||+||B||)*(||x1||+||x2||), */
+/*                                  smlnum/ulp * (||T||+||B||), smlnum ) */
 
 			    i__1 = n << 1;
 			    dcopy_(&i__1, d__, &c__1, y, &c__1);
@@ -397,8 +404,3 @@ static doublereal c_b59 = -1.;
 /*     End of DGET39 */
 
 } /* dget39_ */
-
-#undef t_ref
-#undef ival_ref
-
-

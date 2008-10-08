@@ -1,133 +1,143 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static doublecomplex c_b1 = {1.,0.};
+static integer c__1 = 1;
+static integer c_n1 = -1;
+static doublereal c_b21 = -1.;
+static doublereal c_b22 = 1.;
+static integer c__33 = 33;
 
 /* Subroutine */ int zpbtrf_(char *uplo, integer *n, integer *kd, 
 	doublecomplex *ab, integer *ldab, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    ZPBTRF computes the Cholesky factorization of a complex Hermitian   
-    positive definite band matrix A.   
-
-    The factorization has the form   
-       A = U**H * U,  if UPLO = 'U', or   
-       A = L  * L**H,  if UPLO = 'L',   
-    where U is an upper triangular matrix and L is lower triangular.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            = 'U':  Upper triangle of A is stored;   
-            = 'L':  Lower triangle of A is stored.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    KD      (input) INTEGER   
-            The number of superdiagonals of the matrix A if UPLO = 'U',   
-            or the number of subdiagonals if UPLO = 'L'.  KD >= 0.   
-
-    AB      (input/output) COMPLEX*16 array, dimension (LDAB,N)   
-            On entry, the upper or lower triangle of the Hermitian band   
-            matrix A, stored in the first KD+1 rows of the array.  The   
-            j-th column of A is stored in the j-th column of the array AB   
-            as follows:   
-            if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j;   
-            if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd).   
-
-            On exit, if INFO = 0, the triangular factor U or L from the   
-            Cholesky factorization A = U**H*U or A = L*L**H of the band   
-            matrix A, in the same storage format as A.   
-
-    LDAB    (input) INTEGER   
-            The leading dimension of the array AB.  LDAB >= KD+1.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  if INFO = i, the leading minor of order i is not   
-                  positive definite, and the factorization could not be   
-                  completed.   
-
-    Further Details   
-    ===============   
-
-    The band storage scheme is illustrated by the following example, when   
-    N = 6, KD = 2, and UPLO = 'U':   
-
-    On entry:                       On exit:   
-
-        *    *   a13  a24  a35  a46      *    *   u13  u24  u35  u46   
-        *   a12  a23  a34  a45  a56      *   u12  u23  u34  u45  u56   
-       a11  a22  a33  a44  a55  a66     u11  u22  u33  u44  u55  u66   
-
-    Similarly, if UPLO = 'L' the format of A is as follows:   
-
-    On entry:                       On exit:   
-
-       a11  a22  a33  a44  a55  a66     l11  l22  l33  l44  l55  l66   
-       a21  a32  a43  a54  a65   *      l21  l32  l43  l54  l65   *   
-       a31  a42  a53  a64   *    *      l31  l42  l53  l64   *    *   
-
-    Array elements marked * are not used by the routine.   
-
-    Contributed by   
-    Peter Mayes and Giuseppe Radicati, IBM ECSEC, Rome, March 23, 1989   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static doublecomplex c_b1 = {1.,0.};
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    static doublereal c_b21 = -1.;
-    static doublereal c_b22 = 1.;
-    static integer c__33 = 33;
-    
     /* System generated locals */
     integer ab_dim1, ab_offset, i__1, i__2, i__3, i__4, i__5, i__6;
     doublecomplex z__1;
+
     /* Local variables */
-    static doublecomplex work[1056]	/* was [33][32] */;
-    static integer i__, j;
+    integer i__, j, i2, i3, ib, nb, ii, jj;
+    doublecomplex work[1056]	/* was [33][32] */;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zherk_(char *, char *, integer *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
-	     doublecomplex *, integer *);
-    static integer i2, i3;
-    extern /* Subroutine */ int ztrsm_(char *, char *, char *, char *, 
-	    integer *, integer *, doublecomplex *, doublecomplex *, integer *,
-	     doublecomplex *, integer *), 
-	    zpbtf2_(char *, integer *, integer *, doublecomplex *, integer *, 
-	    integer *);
-    static integer ib, nb, ii, jj;
-    extern /* Subroutine */ int zpotf2_(char *, integer *, doublecomplex *, 
-	    integer *, integer *), xerbla_(char *, integer *);
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
+	     doublecomplex *, integer *), ztrsm_(char *, char 
+	    *, char *, char *, integer *, integer *, doublecomplex *, 
+	    doublecomplex *, integer *, doublecomplex *, integer *), zpbtf2_(char *, integer *, integer *, 
+	    doublecomplex *, integer *, integer *), zpotf2_(char *, 
+	    integer *, doublecomplex *, integer *, integer *), 
+	    xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
-#define work_subscr(a_1,a_2) (a_2)*33 + a_1 - 34
-#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
-#define ab_subscr(a_1,a_2) (a_2)*ab_dim1 + a_1
-#define ab_ref(a_1,a_2) ab[ab_subscr(a_1,a_2)]
+	    integer *, integer *);
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZPBTRF computes the Cholesky factorization of a complex Hermitian */
+/*  positive definite band matrix A. */
+
+/*  The factorization has the form */
+/*     A = U**H * U,  if UPLO = 'U', or */
+/*     A = L  * L**H,  if UPLO = 'L', */
+/*  where U is an upper triangular matrix and L is lower triangular. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  UPLO    (input) CHARACTER*1 */
+/*          = 'U':  Upper triangle of A is stored; */
+/*          = 'L':  Lower triangle of A is stored. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  KD      (input) INTEGER */
+/*          The number of superdiagonals of the matrix A if UPLO = 'U', */
+/*          or the number of subdiagonals if UPLO = 'L'.  KD >= 0. */
+
+/*  AB      (input/output) COMPLEX*16 array, dimension (LDAB,N) */
+/*          On entry, the upper or lower triangle of the Hermitian band */
+/*          matrix A, stored in the first KD+1 rows of the array.  The */
+/*          j-th column of A is stored in the j-th column of the array AB */
+/*          as follows: */
+/*          if UPLO = 'U', AB(kd+1+i-j,j) = A(i,j) for max(1,j-kd)<=i<=j; */
+/*          if UPLO = 'L', AB(1+i-j,j)    = A(i,j) for j<=i<=min(n,j+kd). */
+
+/*          On exit, if INFO = 0, the triangular factor U or L from the */
+/*          Cholesky factorization A = U**H*U or A = L*L**H of the band */
+/*          matrix A, in the same storage format as A. */
+
+/*  LDAB    (input) INTEGER */
+/*          The leading dimension of the array AB.  LDAB >= KD+1. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+/*          > 0:  if INFO = i, the leading minor of order i is not */
+/*                positive definite, and the factorization could not be */
+/*                completed. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  The band storage scheme is illustrated by the following example, when */
+/*  N = 6, KD = 2, and UPLO = 'U': */
+
+/*  On entry:                       On exit: */
+
+/*      *    *   a13  a24  a35  a46      *    *   u13  u24  u35  u46 */
+/*      *   a12  a23  a34  a45  a56      *   u12  u23  u34  u45  u56 */
+/*     a11  a22  a33  a44  a55  a66     u11  u22  u33  u44  u55  u66 */
+
+/*  Similarly, if UPLO = 'L' the format of A is as follows: */
+
+/*  On entry:                       On exit: */
+
+/*     a11  a22  a33  a44  a55  a66     l11  l22  l33  l44  l55  l66 */
+/*     a21  a32  a43  a54  a65   *      l21  l32  l43  l54  l65   * */
+/*     a31  a42  a53  a64   *    *      l31  l42  l53  l64   *    * */
+
+/*  Array elements marked * are not used by the routine. */
+
+/*  Contributed by */
+/*  Peter Mayes and Giuseppe Radicati, IBM ECSEC, Rome, March 23, 1989 */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     ab_dim1 = *ldab;
-    ab_offset = 1 + ab_dim1 * 1;
+    ab_offset = 1 + ab_dim1;
     ab -= ab_offset;
 
     /* Function Body */
@@ -155,11 +165,10 @@
 
 /*     Determine the block size for this environment */
 
-    nb = ilaenv_(&c__1, "ZPBTRF", uplo, n, kd, &c_n1, &c_n1, (ftnlen)6, (
-	    ftnlen)1);
+    nb = ilaenv_(&c__1, "ZPBTRF", uplo, n, kd, &c_n1, &c_n1);
 
-/*     The block size must not exceed the semi-bandwidth KD, and must not   
-       exceed the limit set by the size of the local array WORK. */
+/*     The block size must not exceed the semi-bandwidth KD, and must not */
+/*     exceed the limit set by the size of the local array WORK. */
 
     nb = min(nb,32);
 
@@ -174,17 +183,17 @@
 
 	if (lsame_(uplo, "U")) {
 
-/*           Compute the Cholesky factorization of a Hermitian band   
-             matrix, given the upper triangle of the matrix in band   
-             storage.   
+/*           Compute the Cholesky factorization of a Hermitian band */
+/*           matrix, given the upper triangle of the matrix in band */
+/*           storage. */
 
-             Zero the upper triangle of the work array. */
+/*           Zero the upper triangle of the work array. */
 
 	    i__1 = nb;
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j - 1;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-		    i__3 = work_subscr(i__, j);
+		    i__3 = i__ + j * 33 - 34;
 		    work[i__3].r = 0., work[i__3].i = 0.;
 /* L10: */
 		}
@@ -203,28 +212,28 @@
 /*              Factorize the diagonal block */
 
 		i__3 = *ldab - 1;
-		zpotf2_(uplo, &ib, &ab_ref(*kd + 1, i__), &i__3, &ii);
+		zpotf2_(uplo, &ib, &ab[*kd + 1 + i__ * ab_dim1], &i__3, &ii);
 		if (ii != 0) {
 		    *info = i__ + ii - 1;
 		    goto L150;
 		}
 		if (i__ + ib <= *n) {
 
-/*                 Update the relevant part of the trailing submatrix.   
-                   If A11 denotes the diagonal block which has just been   
-                   factorized, then we need to update the remaining   
-                   blocks in the diagram:   
+/*                 Update the relevant part of the trailing submatrix. */
+/*                 If A11 denotes the diagonal block which has just been */
+/*                 factorized, then we need to update the remaining */
+/*                 blocks in the diagram: */
 
-                      A11   A12   A13   
-                            A22   A23   
-                                  A33   
+/*                    A11   A12   A13 */
+/*                          A22   A23 */
+/*                                A33 */
 
-                   The numbers of rows and columns in the partitioning   
-                   are IB, I2, I3 respectively. The blocks A12, A22 and   
-                   A23 are empty if IB = KD. The upper triangle of A13   
-                   lies outside the band.   
+/*                 The numbers of rows and columns in the partitioning */
+/*                 are IB, I2, I3 respectively. The blocks A12, A22 and */
+/*                 A23 are empty if IB = KD. The upper triangle of A13 */
+/*                 lies outside the band. */
 
-   Computing MIN */
+/* Computing MIN */
 		    i__3 = *kd - ib, i__4 = *n - i__ - ib + 1;
 		    i2 = min(i__3,i__4);
 /* Computing MIN */
@@ -238,17 +247,18 @@
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
 			ztrsm_("Left", "Upper", "Conjugate transpose", "Non-"
-				"unit", &ib, &i2, &c_b1, &ab_ref(*kd + 1, i__),
-				 &i__3, &ab_ref(*kd + 1 - ib, i__ + ib), &
-				i__4);
+				"unit", &ib, &i2, &c_b1, &ab[*kd + 1 + i__ * 
+				ab_dim1], &i__3, &ab[*kd + 1 - ib + (i__ + ib)
+				 * ab_dim1], &i__4);
 
 /*                    Update A22 */
 
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
 			zherk_("Upper", "Conjugate transpose", &i2, &ib, &
-				c_b21, &ab_ref(*kd + 1 - ib, i__ + ib), &i__3,
-				 &c_b22, &ab_ref(*kd + 1, i__ + ib), &i__4);
+				c_b21, &ab[*kd + 1 - ib + (i__ + ib) * 
+				ab_dim1], &i__3, &c_b22, &ab[*kd + 1 + (i__ + 
+				ib) * ab_dim1], &i__4);
 		    }
 
 		    if (i3 > 0) {
@@ -259,9 +269,9 @@
 			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = ib;
 			    for (ii = jj; ii <= i__4; ++ii) {
-				i__5 = work_subscr(ii, jj);
-				i__6 = ab_subscr(ii - jj + 1, jj + i__ + *kd 
-					- 1);
+				i__5 = ii + jj * 33 - 34;
+				i__6 = ii - jj + 1 + (jj + i__ + *kd - 1) * 
+					ab_dim1;
 				work[i__5].r = ab[i__6].r, work[i__5].i = ab[
 					i__6].i;
 /* L30: */
@@ -273,27 +283,28 @@
 
 			i__3 = *ldab - 1;
 			ztrsm_("Left", "Upper", "Conjugate transpose", "Non-"
-				"unit", &ib, &i3, &c_b1, &ab_ref(*kd + 1, i__),
-				 &i__3, work, &c__33);
+				"unit", &ib, &i3, &c_b1, &ab[*kd + 1 + i__ * 
+				ab_dim1], &i__3, work, &c__33);
 
 /*                    Update A23 */
 
 			if (i2 > 0) {
-			    z__1.r = -1., z__1.i = 0.;
+			    z__1.r = -1., z__1.i = -0.;
 			    i__3 = *ldab - 1;
 			    i__4 = *ldab - 1;
-			    zgemm_("Conjugate transpose", "No transpose", &i2,
-				     &i3, &ib, &z__1, &ab_ref(*kd + 1 - ib, 
-				    i__ + ib), &i__3, work, &c__33, &c_b1, &
-				    ab_ref(ib + 1, i__ + *kd), &i__4);
+			    zgemm_("Conjugate transpose", "No transpose", &i2, 
+				     &i3, &ib, &z__1, &ab[*kd + 1 - ib + (i__ 
+				    + ib) * ab_dim1], &i__3, work, &c__33, &
+				    c_b1, &ab[ib + 1 + (i__ + *kd) * ab_dim1], 
+				     &i__4);
 			}
 
 /*                    Update A33 */
 
 			i__3 = *ldab - 1;
 			zherk_("Upper", "Conjugate transpose", &i3, &ib, &
-				c_b21, work, &c__33, &c_b22, &ab_ref(*kd + 1, 
-				i__ + *kd), &i__3);
+				c_b21, work, &c__33, &c_b22, &ab[*kd + 1 + (
+				i__ + *kd) * ab_dim1], &i__3);
 
 /*                    Copy the lower triangle of A13 back into place. */
 
@@ -301,9 +312,9 @@
 			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = ib;
 			    for (ii = jj; ii <= i__4; ++ii) {
-				i__5 = ab_subscr(ii - jj + 1, jj + i__ + *kd 
-					- 1);
-				i__6 = work_subscr(ii, jj);
+				i__5 = ii - jj + 1 + (jj + i__ + *kd - 1) * 
+					ab_dim1;
+				i__6 = ii + jj * 33 - 34;
 				ab[i__5].r = work[i__6].r, ab[i__5].i = work[
 					i__6].i;
 /* L50: */
@@ -316,17 +327,17 @@
 	    }
 	} else {
 
-/*           Compute the Cholesky factorization of a Hermitian band   
-             matrix, given the lower triangle of the matrix in band   
-             storage.   
+/*           Compute the Cholesky factorization of a Hermitian band */
+/*           matrix, given the lower triangle of the matrix in band */
+/*           storage. */
 
-             Zero the lower triangle of the work array. */
+/*           Zero the lower triangle of the work array. */
 
 	    i__2 = nb;
 	    for (j = 1; j <= i__2; ++j) {
 		i__1 = nb;
 		for (i__ = j + 1; i__ <= i__1; ++i__) {
-		    i__3 = work_subscr(i__, j);
+		    i__3 = i__ + j * 33 - 34;
 		    work[i__3].r = 0., work[i__3].i = 0.;
 /* L80: */
 		}
@@ -345,28 +356,28 @@
 /*              Factorize the diagonal block */
 
 		i__3 = *ldab - 1;
-		zpotf2_(uplo, &ib, &ab_ref(1, i__), &i__3, &ii);
+		zpotf2_(uplo, &ib, &ab[i__ * ab_dim1 + 1], &i__3, &ii);
 		if (ii != 0) {
 		    *info = i__ + ii - 1;
 		    goto L150;
 		}
 		if (i__ + ib <= *n) {
 
-/*                 Update the relevant part of the trailing submatrix.   
-                   If A11 denotes the diagonal block which has just been   
-                   factorized, then we need to update the remaining   
-                   blocks in the diagram:   
+/*                 Update the relevant part of the trailing submatrix. */
+/*                 If A11 denotes the diagonal block which has just been */
+/*                 factorized, then we need to update the remaining */
+/*                 blocks in the diagram: */
 
-                      A11   
-                      A21   A22   
-                      A31   A32   A33   
+/*                    A11 */
+/*                    A21   A22 */
+/*                    A31   A32   A33 */
 
-                   The numbers of rows and columns in the partitioning   
-                   are IB, I2, I3 respectively. The blocks A21, A22 and   
-                   A32 are empty if IB = KD. The lower triangle of A31   
-                   lies outside the band.   
+/*                 The numbers of rows and columns in the partitioning */
+/*                 are IB, I2, I3 respectively. The blocks A21, A22 and */
+/*                 A32 are empty if IB = KD. The lower triangle of A31 */
+/*                 lies outside the band. */
 
-   Computing MIN */
+/* Computing MIN */
 		    i__3 = *kd - ib, i__4 = *n - i__ - ib + 1;
 		    i2 = min(i__3,i__4);
 /* Computing MIN */
@@ -380,16 +391,16 @@
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
 			ztrsm_("Right", "Lower", "Conjugate transpose", "Non"
-				"-unit", &i2, &ib, &c_b1, &ab_ref(1, i__), &
-				i__3, &ab_ref(ib + 1, i__), &i__4);
+				"-unit", &i2, &ib, &c_b1, &ab[i__ * ab_dim1 + 
+				1], &i__3, &ab[ib + 1 + i__ * ab_dim1], &i__4);
 
 /*                    Update A22 */
 
 			i__3 = *ldab - 1;
 			i__4 = *ldab - 1;
-			zherk_("Lower", "No transpose", &i2, &ib, &c_b21, &
-				ab_ref(ib + 1, i__), &i__3, &c_b22, &ab_ref(1,
-				 i__ + ib), &i__4);
+			zherk_("Lower", "No transpose", &i2, &ib, &c_b21, &ab[
+				ib + 1 + i__ * ab_dim1], &i__3, &c_b22, &ab[(
+				i__ + ib) * ab_dim1 + 1], &i__4);
 		    }
 
 		    if (i3 > 0) {
@@ -400,9 +411,9 @@
 			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = min(jj,i3);
 			    for (ii = 1; ii <= i__4; ++ii) {
-				i__5 = work_subscr(ii, jj);
-				i__6 = ab_subscr(*kd + 1 - jj + ii, jj + i__ 
-					- 1);
+				i__5 = ii + jj * 33 - 34;
+				i__6 = *kd + 1 - jj + ii + (jj + i__ - 1) * 
+					ab_dim1;
 				work[i__5].r = ab[i__6].r, work[i__5].i = ab[
 					i__6].i;
 /* L100: */
@@ -414,27 +425,27 @@
 
 			i__3 = *ldab - 1;
 			ztrsm_("Right", "Lower", "Conjugate transpose", "Non"
-				"-unit", &i3, &ib, &c_b1, &ab_ref(1, i__), &
-				i__3, work, &c__33);
+				"-unit", &i3, &ib, &c_b1, &ab[i__ * ab_dim1 + 
+				1], &i__3, work, &c__33);
 
 /*                    Update A32 */
 
 			if (i2 > 0) {
-			    z__1.r = -1., z__1.i = 0.;
+			    z__1.r = -1., z__1.i = -0.;
 			    i__3 = *ldab - 1;
 			    i__4 = *ldab - 1;
-			    zgemm_("No transpose", "Conjugate transpose", &i3,
-				     &i2, &ib, &z__1, work, &c__33, &ab_ref(
-				    ib + 1, i__), &i__3, &c_b1, &ab_ref(*kd + 
-				    1 - ib, i__ + ib), &i__4);
+			    zgemm_("No transpose", "Conjugate transpose", &i3, 
+				     &i2, &ib, &z__1, work, &c__33, &ab[ib + 
+				    1 + i__ * ab_dim1], &i__3, &c_b1, &ab[*kd 
+				    + 1 - ib + (i__ + ib) * ab_dim1], &i__4);
 			}
 
 /*                    Update A33 */
 
 			i__3 = *ldab - 1;
 			zherk_("Lower", "No transpose", &i3, &ib, &c_b21, 
-				work, &c__33, &c_b22, &ab_ref(1, i__ + *kd), &
-				i__3);
+				work, &c__33, &c_b22, &ab[(i__ + *kd) * 
+				ab_dim1 + 1], &i__3);
 
 /*                    Copy the upper triangle of A31 back into place. */
 
@@ -442,9 +453,9 @@
 			for (jj = 1; jj <= i__3; ++jj) {
 			    i__4 = min(jj,i3);
 			    for (ii = 1; ii <= i__4; ++ii) {
-				i__5 = ab_subscr(*kd + 1 - jj + ii, jj + i__ 
-					- 1);
-				i__6 = work_subscr(ii, jj);
+				i__5 = *kd + 1 - jj + ii + (jj + i__ - 1) * 
+					ab_dim1;
+				i__6 = ii + jj * 33 - 34;
 				ab[i__5].r = work[i__6].r, ab[i__5].i = work[
 					i__6].i;
 /* L120: */
@@ -465,10 +476,3 @@ L150:
 /*     End of ZPBTRF */
 
 } /* zpbtrf_ */
-
-#undef ab_ref
-#undef ab_subscr
-#undef work_ref
-#undef work_subscr
-
-

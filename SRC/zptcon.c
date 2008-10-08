@@ -1,84 +1,101 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
 
 /* Subroutine */ int zptcon_(integer *n, doublereal *d__, doublecomplex *e, 
 	doublereal *anorm, doublereal *rcond, doublereal *rwork, integer *
 	info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    ZPTCON computes the reciprocal of the condition number (in the   
-    1-norm) of a complex Hermitian positive definite tridiagonal matrix   
-    using the factorization A = L*D*L**H or A = U**H*D*U computed by   
-    ZPTTRF.   
-
-    Norm(inv(A)) is computed by a direct method, and the reciprocal of   
-    the condition number is computed as   
-                     RCOND = 1 / (ANORM * norm(inv(A))).   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the diagonal matrix D from the   
-            factorization of A, as computed by ZPTTRF.   
-
-    E       (input) COMPLEX*16 array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the unit bidiagonal factor   
-            U or L from the factorization of A, as computed by ZPTTRF.   
-
-    ANORM   (input) DOUBLE PRECISION   
-            The 1-norm of the original matrix A.   
-
-    RCOND   (output) DOUBLE PRECISION   
-            The reciprocal of the condition number of the matrix A,   
-            computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is the   
-            1-norm of inv(A) computed in this routine.   
-
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-
-    Further Details   
-    ===============   
-
-    The method used is described in Nicholas J. Higham, "Efficient   
-    Algorithms for Computing the Condition Number of a Tridiagonal   
-    Matrix", SIAM J. Sci. Stat. Comput., Vol. 7, No. 1, January 1986.   
-
-    =====================================================================   
-
-
-       Test the input arguments.   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    
     /* System generated locals */
     integer i__1;
     doublereal d__1;
+
     /* Builtin functions */
     double z_abs(doublecomplex *);
+
     /* Local variables */
-    static integer i__, ix;
+    integer i__, ix;
     extern integer idamax_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZPTCON computes the reciprocal of the condition number (in the */
+/*  1-norm) of a complex Hermitian positive definite tridiagonal matrix */
+/*  using the factorization A = L*D*L**H or A = U**H*D*U computed by */
+/*  ZPTTRF. */
+
+/*  Norm(inv(A)) is computed by a direct method, and the reciprocal of */
+/*  the condition number is computed as */
+/*                   RCOND = 1 / (ANORM * norm(inv(A))). */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The n diagonal elements of the diagonal matrix D from the */
+/*          factorization of A, as computed by ZPTTRF. */
+
+/*  E       (input) COMPLEX*16 array, dimension (N-1) */
+/*          The (n-1) off-diagonal elements of the unit bidiagonal factor */
+/*          U or L from the factorization of A, as computed by ZPTTRF. */
+
+/*  ANORM   (input) DOUBLE PRECISION */
+/*          The 1-norm of the original matrix A. */
+
+/*  RCOND   (output) DOUBLE PRECISION */
+/*          The reciprocal of the condition number of the matrix A, */
+/*          computed as RCOND = 1/(ANORM * AINVNM), where AINVNM is the */
+/*          1-norm of inv(A) computed in this routine. */
+
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
+
+/*  Further Details */
+/*  =============== */
+
+/*  The method used is described in Nicholas J. Higham, "Efficient */
+/*  Algorithms for Computing the Condition Number of a Tridiagonal */
+/*  Matrix", SIAM J. Sci. Stat. Comput., Vol. 7, No. 1, January 1986. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input arguments. */
+
+    /* Parameter adjustments */
     --rwork;
     --e;
     --d__;
@@ -116,14 +133,14 @@
 /* L10: */
     }
 
-/*     Solve M(A) * x = e, where M(A) = (m(i,j)) is given by   
+/*     Solve M(A) * x = e, where M(A) = (m(i,j)) is given by */
 
-          m(i,j) =  abs(A(i,j)), i = j,   
-          m(i,j) = -abs(A(i,j)), i .ne. j,   
+/*        m(i,j) =  abs(A(i,j)), i = j, */
+/*        m(i,j) = -abs(A(i,j)), i .ne. j, */
 
-       and e = [ 1, 1, ..., 1 ]'.  Note M(A) = M(L)*D*M(L)'.   
+/*     and e = [ 1, 1, ..., 1 ]'.  Note M(A) = M(L)*D*M(L)'. */
 
-       Solve M(L) * x = e. */
+/*     Solve M(L) * x = e. */
 
     rwork[1] = 1.;
     i__1 = *n;
@@ -156,4 +173,3 @@
 /*     End of ZPTCON */
 
 } /* zptcon_ */
-

@@ -1,125 +1,145 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlaed4_(integer *n, integer *i__, doublereal *d__, 
-	doublereal *z__, doublereal *delta, doublereal *rho, doublereal *dlam,
+	doublereal *z__, doublereal *delta, doublereal *rho, doublereal *dlam, 
 	 integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Oak Ridge National Lab, Argonne National Lab,   
-       Courant Institute, NAG Ltd., and Rice University   
-       December 23, 1999   
-
-
-    Purpose   
-    =======   
-
-    This subroutine computes the I-th updated eigenvalue of a symmetric   
-    rank-one modification to a diagonal matrix whose elements are   
-    given in the array d, and that   
-
-               D(i) < D(j)  for  i < j   
-
-    and that RHO > 0.  This is arranged by the calling routine, and is   
-    no loss in generality.  The rank-one modified system is thus   
-
-               diag( D )  +  RHO *  Z * Z_transpose.   
-
-    where we assume the Euclidean norm of Z is 1.   
-
-    The method consists of approximating the rational functions in the   
-    secular equation by simpler interpolating rational functions.   
-
-    Arguments   
-    =========   
-
-    N      (input) INTEGER   
-           The length of all arrays.   
-
-    I      (input) INTEGER   
-           The index of the eigenvalue to be computed.  1 <= I <= N.   
-
-    D      (input) DOUBLE PRECISION array, dimension (N)   
-           The original eigenvalues.  It is assumed that they are in   
-           order, D(I) < D(J)  for I < J.   
-
-    Z      (input) DOUBLE PRECISION array, dimension (N)   
-           The components of the updating vector.   
-
-    DELTA  (output) DOUBLE PRECISION array, dimension (N)   
-           If N .ne. 1, DELTA contains (D(j) - lambda_I) in its  j-th   
-           component.  If N = 1, then DELTA(1) = 1.  The vector DELTA   
-           contains the information necessary to construct the   
-           eigenvectors.   
-
-    RHO    (input) DOUBLE PRECISION   
-           The scalar in the symmetric updating formula.   
-
-    DLAM   (output) DOUBLE PRECISION   
-           The computed lambda_I, the I-th updated eigenvalue.   
-
-    INFO   (output) INTEGER   
-           = 0:  successful exit   
-           > 0:  if INFO = 1, the updating process failed.   
-
-    Internal Parameters   
-    ===================   
-
-    Logical variable ORGATI (origin-at-i?) is used for distinguishing   
-    whether D(i) or D(i+1) is treated as the origin.   
-
-              ORGATI = .true.    origin at i   
-              ORGATI = .false.   origin at i+1   
-
-     Logical variable SWTCH3 (switch-for-3-poles?) is for noting   
-     if we are working with THREE poles!   
-
-     MAXIT is the maximum number of iterations allowed for each   
-     eigenvalue.   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Ren-Cang Li, Computer Science Division, University of California   
-       at Berkeley, USA   
-
-    =====================================================================   
-
-
-       Since this routine is called in an inner loop, we do no argument   
-       checking.   
-
-       Quick return for N=1 and 2.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
     doublereal d__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
-    /* Local variables */
-    static doublereal dphi, dpsi;
-    static integer iter;
-    static doublereal temp, prew, temp1, a, b, c__;
-    static integer j;
-    static doublereal w, dltlb, dltub, midpt;
-    static integer niter;
-    static logical swtch;
-    extern /* Subroutine */ int dlaed5_(integer *, doublereal *, doublereal *,
-	     doublereal *, doublereal *, doublereal *), dlaed6_(integer *, 
-	    logical *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, integer *);
-    static logical swtch3;
-    static integer ii;
-    extern doublereal dlamch_(char *);
-    static doublereal dw, zz[3];
-    static logical orgati;
-    static doublereal erretm, rhoinv;
-    static integer ip1;
-    static doublereal del, eta, phi, eps, tau, psi;
-    static integer iim1, iip1;
 
+    /* Local variables */
+    doublereal a, b, c__;
+    integer j;
+    doublereal w;
+    integer ii;
+    doublereal dw, zz[3];
+    integer ip1;
+    doublereal del, eta, phi, eps, tau, psi;
+    integer iim1, iip1;
+    doublereal dphi, dpsi;
+    integer iter;
+    doublereal temp, prew, temp1, dltlb, dltub, midpt;
+    integer niter;
+    logical swtch;
+    extern /* Subroutine */ int dlaed5_(integer *, doublereal *, doublereal *, 
+	     doublereal *, doublereal *, doublereal *), dlaed6_(integer *, 
+	    logical *, doublereal *, doublereal *, doublereal *, doublereal *, 
+	     doublereal *, integer *);
+    logical swtch3;
+    extern doublereal dlamch_(char *);
+    logical orgati;
+    doublereal erretm, rhoinv;
+
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  This subroutine computes the I-th updated eigenvalue of a symmetric */
+/*  rank-one modification to a diagonal matrix whose elements are */
+/*  given in the array d, and that */
+
+/*             D(i) < D(j)  for  i < j */
+
+/*  and that RHO > 0.  This is arranged by the calling routine, and is */
+/*  no loss in generality.  The rank-one modified system is thus */
+
+/*             diag( D )  +  RHO *  Z * Z_transpose. */
+
+/*  where we assume the Euclidean norm of Z is 1. */
+
+/*  The method consists of approximating the rational functions in the */
+/*  secular equation by simpler interpolating rational functions. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N      (input) INTEGER */
+/*         The length of all arrays. */
+
+/*  I      (input) INTEGER */
+/*         The index of the eigenvalue to be computed.  1 <= I <= N. */
+
+/*  D      (input) DOUBLE PRECISION array, dimension (N) */
+/*         The original eigenvalues.  It is assumed that they are in */
+/*         order, D(I) < D(J)  for I < J. */
+
+/*  Z      (input) DOUBLE PRECISION array, dimension (N) */
+/*         The components of the updating vector. */
+
+/*  DELTA  (output) DOUBLE PRECISION array, dimension (N) */
+/*         If N .GT. 2, DELTA contains (D(j) - lambda_I) in its  j-th */
+/*         component.  If N = 1, then DELTA(1) = 1. If N = 2, see DLAED5 */
+/*         for detail. The vector DELTA contains the information necessary */
+/*         to construct the eigenvectors by DLAED3 and DLAED9. */
+
+/*  RHO    (input) DOUBLE PRECISION */
+/*         The scalar in the symmetric updating formula. */
+
+/*  DLAM   (output) DOUBLE PRECISION */
+/*         The computed lambda_I, the I-th updated eigenvalue. */
+
+/*  INFO   (output) INTEGER */
+/*         = 0:  successful exit */
+/*         > 0:  if INFO = 1, the updating process failed. */
+
+/*  Internal Parameters */
+/*  =================== */
+
+/*  Logical variable ORGATI (origin-at-i?) is used for distinguishing */
+/*  whether D(i) or D(i+1) is treated as the origin. */
+
+/*            ORGATI = .true.    origin at i */
+/*            ORGATI = .false.   origin at i+1 */
+
+/*   Logical variable SWTCH3 (switch-for-3-poles?) is for noting */
+/*   if we are working with THREE poles! */
+
+/*   MAXIT is the maximum number of iterations allowed for each */
+/*   eigenvalue. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*     Ren-Cang Li, Computer Science Division, University of California */
+/*     at Berkeley, USA */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Since this routine is called in an inner loop, we do no argument */
+/*     checking. */
+
+/*     Quick return for N=1 and 2. */
+
+    /* Parameter adjustments */
     --delta;
     --z__;
     --d__;
@@ -157,8 +177,8 @@
 
 	midpt = *rho / 2.;
 
-/*        If ||Z||_2 is not one, then TEMP should be set to   
-          RHO * ||Z||_2^2 / TWO */
+/*        If ||Z||_2 is not one, then TEMP should be set to */
+/*        RHO * ||Z||_2^2 / TWO */
 
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
@@ -194,8 +214,8 @@
 		}
 	    }
 
-/*           It can be proved that   
-                 D(N)+RHO/2 <= LAMBDA(N) < D(N)+TAU <= D(N)+RHO */
+/*           It can be proved that */
+/*               D(N)+RHO/2 <= LAMBDA(N) < D(N)+TAU <= D(N)+RHO */
 
 	    dltlb = midpt;
 	    dltub = *rho;
@@ -209,8 +229,8 @@
 		tau = (a + sqrt(a * a + b * 4. * c__)) / (c__ * 2.);
 	    }
 
-/*           It can be proved that   
-                 D(N) < D(N)+TAU < LAMBDA(N) < D(N)+RHO/2 */
+/*           It can be proved that */
+/*               D(N) < D(N)+TAU < LAMBDA(N) < D(N)+RHO/2 */
 
 	    dltlb = 0.;
 	    dltub = midpt;
@@ -271,8 +291,8 @@
 	    c__ = abs(c__);
 	}
 	if (c__ == 0.) {
-/*          ETA = B/A   
-             ETA = RHO - TAU */
+/*          ETA = B/A */
+/*           ETA = RHO - TAU */
 	    eta = dltub - tau;
 	} else if (a >= 0.) {
 	    eta = (a + sqrt((d__1 = a * a - b * 4. * c__, abs(d__1)))) / (c__ 
@@ -282,11 +302,11 @@
 		    );
 	}
 
-/*        Note, eta should be positive if w is negative, and   
-          eta should be negative otherwise. However,   
-          if for some reason caused by roundoff, eta*w > 0,   
-          we simply use one Newton step instead. This way   
-          will guarantee eta*w < 0. */
+/*        Note, eta should be positive if w is negative, and */
+/*        eta should be negative otherwise. However, */
+/*        if for some reason caused by roundoff, eta*w > 0, */
+/*        we simply use one Newton step instead. This way */
+/*        will guarantee eta*w < 0. */
 
 	if (w * eta > 0.) {
 	    eta = -w / (dpsi + dphi);
@@ -365,11 +385,11 @@
 			d__1))));
 	    }
 
-/*           Note, eta should be positive if w is negative, and   
-             eta should be negative otherwise. However,   
-             if for some reason caused by roundoff, eta*w > 0,   
-             we simply use one Newton step instead. This way   
-             will guarantee eta*w < 0. */
+/*           Note, eta should be positive if w is negative, and */
+/*           eta should be negative otherwise. However, */
+/*           if for some reason caused by roundoff, eta*w > 0, */
+/*           we simply use one Newton step instead. This way */
+/*           will guarantee eta*w < 0. */
 
 	    if (w * eta > 0.) {
 		eta = -w / (dpsi + dphi);
@@ -461,9 +481,9 @@
 
 	if (w > 0.) {
 
-/*           d(i)< the ith eigenvalue < (d(i)+d(i+1))/2   
+/*           d(i)< the ith eigenvalue < (d(i)+d(i+1))/2 */
 
-             We choose d(i) as origin. */
+/*           We choose d(i) as origin. */
 
 	    orgati = TRUE_;
 	    a = c__ * del + z__[*i__] * z__[*i__] + z__[ip1] * z__[ip1];
@@ -479,9 +499,9 @@
 	    dltub = midpt;
 	} else {
 
-/*           (d(i)+d(i+1))/2 <= the ith eigenvalue < d(i+1)   
+/*           (d(i)+d(i+1))/2 <= the ith eigenvalue < d(i+1) */
 
-             We choose d(i+1) as origin. */
+/*           We choose d(i+1) as origin. */
 
 	    orgati = FALSE_;
 	    a = c__ * del - z__[*i__] * z__[*i__] - z__[ip1] * z__[ip1];
@@ -548,8 +568,8 @@
 
 	w = rhoinv + phi + psi;
 
-/*        W is the value of the secular function with   
-          its ii-th element removed. */
+/*        W is the value of the secular function with */
+/*        its ii-th element removed. */
 
 	swtch3 = FALSE_;
 	if (orgati) {
@@ -652,11 +672,11 @@
 	    }
 	}
 
-/*        Note, eta should be positive if w is negative, and   
-          eta should be negative otherwise. However,   
-          if for some reason caused by roundoff, eta*w > 0,   
-          we simply use one Newton step instead. This way   
-          will guarantee eta*w < 0. */
+/*        Note, eta should be positive if w is negative, and */
+/*        eta should be negative otherwise. However, */
+/*        if for some reason caused by roundoff, eta*w > 0, */
+/*        we simply use one Newton step instead. This way */
+/*        will guarantee eta*w < 0. */
 
 	if (w * eta >= 0.) {
 	    eta = -w / dw;
@@ -672,7 +692,6 @@
 
 	prew = w;
 
-/* L170: */
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    delta[j] -= eta;
@@ -835,11 +854,11 @@
 		}
 	    }
 
-/*           Note, eta should be positive if w is negative, and   
-             eta should be negative otherwise. However,   
-             if for some reason caused by roundoff, eta*w > 0,   
-             we simply use one Newton step instead. This way   
-             will guarantee eta*w < 0. */
+/*           Note, eta should be positive if w is negative, and */
+/*           eta should be negative otherwise. However, */
+/*           if for some reason caused by roundoff, eta*w > 0, */
+/*           we simply use one Newton step instead. This way */
+/*           will guarantee eta*w < 0. */
 
 	    if (w * eta >= 0.) {
 		eta = -w / dw;
@@ -921,4 +940,3 @@ L250:
 /*     End of DLAED4 */
 
 } /* dlaed4_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -21,37 +16,45 @@ logical dlctsx_(doublereal *ar, doublereal *ai, doublereal *beta)
     logical ret_val;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    This function is used to determine what eigenvalues will be   
-    selected.  If this is part of the test driver DDRGSX, do not   
-    change the code UNLESS you are testing input examples and not   
-    using the built-in examples.   
+/*  This function is used to determine what eigenvalues will be */
+/*  selected.  If this is part of the test driver DDRGSX, do not */
+/*  change the code UNLESS you are testing input examples and not */
+/*  using the built-in examples. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    AR      (input) DOUBLE PRECISION   
-            The numerator of the real part of a complex eigenvalue   
-            (AR/BETA) + i*(AI/BETA).   
+/*  AR      (input) DOUBLE PRECISION */
+/*          The numerator of the real part of a complex eigenvalue */
+/*          (AR/BETA) + i*(AI/BETA). */
 
-    AI      (input) DOUBLE PRECISION   
-            The numerator of the imaginary part of a complex eigenvalue   
-            (AR/BETA) + i*(AI).   
+/*  AI      (input) DOUBLE PRECISION */
+/*          The numerator of the imaginary part of a complex eigenvalue */
+/*          (AR/BETA) + i*(AI). */
 
-    BETA    (input) DOUBLE PRECISION   
-            The denominator part of a complex eigenvalue   
-            (AR/BETA) + i*(AI/BETA).   
+/*  BETA    (input) DOUBLE PRECISION */
+/*          The denominator part of a complex eigenvalue */
+/*          (AR/BETA) + i*(AI/BETA). */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Save statement .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (mn_1.fs) {
 	++mn_1.i__;
@@ -77,15 +80,14 @@ logical dlctsx_(doublereal *ar, doublereal *ai, doublereal *beta)
 	}
     }
 
-/*       IF( AR/BETA.GT.0.0 )THEN   
-            DLCTSX = .TRUE.   
-         ELSE   
-            DLCTSX = .FALSE.   
-         END IF */
+/*       IF( AR/BETA.GT.0.0 )THEN */
+/*          DLCTSX = .TRUE. */
+/*       ELSE */
+/*          DLCTSX = .FALSE. */
+/*       END IF */
 
     return ret_val;
 
 /*     End of DLCTSX */
 
 } /* dlctsx_ */
-

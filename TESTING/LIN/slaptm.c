@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slaptm_(integer *n, integer *nrhs, real *alpha, real *
 	d__, real *e, real *x, integer *ldx, real *beta, real *b, integer *
@@ -14,79 +9,83 @@
     integer b_dim1, b_offset, x_dim1, x_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
+    integer i__, j;
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define x_ref(a_1,a_2) x[(a_2)*x_dim1 + a_1]
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SLAPTM multiplies an N by NRHS matrix X by a symmetric tridiagonal */
+/*  matrix A and stores the result in a matrix B.  The operation has the */
+/*  form */
 
-    Purpose   
-    =======   
+/*     B := alpha * A * X + beta * B */
 
-    SLAPTM multiplies an N by NRHS matrix X by a symmetric tridiagonal   
-    matrix A and stores the result in a matrix B.  The operation has the   
-    form   
+/*  where alpha may be either 1. or -1. and beta may be 0., 1., or -1. */
 
-       B := alpha * A * X + beta * B   
+/*  Arguments */
+/*  ========= */
 
-    where alpha may be either 1. or -1. and beta may be 0., 1., or -1.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand sides, i.e., the number of columns */
+/*          of the matrices X and B. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  ALPHA   (input) REAL */
+/*          The scalar alpha.  ALPHA must be 1. or -1.; otherwise, */
+/*          it is assumed to be 0. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand sides, i.e., the number of columns   
-            of the matrices X and B.   
+/*  D       (input) REAL array, dimension (N) */
+/*          The n diagonal elements of the tridiagonal matrix A. */
 
-    ALPHA   (input) REAL   
-            The scalar alpha.  ALPHA must be 1. or -1.; otherwise,   
-            it is assumed to be 0.   
+/*  E       (input) REAL array, dimension (N-1) */
+/*          The (n-1) subdiagonal or superdiagonal elements of A. */
 
-    D       (input) REAL array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix A.   
+/*  X       (input) REAL array, dimension (LDX,NRHS) */
+/*          The N by NRHS matrix X. */
 
-    E       (input) REAL array, dimension (N-1)   
-            The (n-1) subdiagonal or superdiagonal elements of A.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  LDX >= max(N,1). */
 
-    X       (input) REAL array, dimension (LDX,NRHS)   
-            The N by NRHS matrix X.   
+/*  BETA    (input) REAL */
+/*          The scalar beta.  BETA must be 0., 1., or -1.; otherwise, */
+/*          it is assumed to be 1. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  LDX >= max(N,1).   
+/*  B       (input/output) REAL array, dimension (LDB,NRHS) */
+/*          On entry, the N by NRHS matrix B. */
+/*          On exit, B is overwritten by the matrix expression */
+/*          B := alpha * A * X + beta * B. */
 
-    BETA    (input) REAL   
-            The scalar beta.  BETA must be 0., 1., or -1.; otherwise,   
-            it is assumed to be 1.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(N,1). */
 
-    B       (input/output) REAL array, dimension (LDB,NRHS)   
-            On entry, the N by NRHS matrix B.   
-            On exit, B is overwritten by the matrix expression   
-            B := alpha * A * X + beta * B.   
+/*  ===================================================================== */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(N,1).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     --e;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
 
     /* Function Body */
@@ -101,7 +100,7 @@
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		b_ref(i__, j) = 0.f;
+		b[i__ + j * b_dim1] = 0.f;
 /* L10: */
 	    }
 /* L20: */
@@ -111,7 +110,7 @@
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = *n;
 	    for (i__ = 1; i__ <= i__2; ++i__) {
-		b_ref(i__, j) = -b_ref(i__, j);
+		b[i__ + j * b_dim1] = -b[i__ + j * b_dim1];
 /* L30: */
 	    }
 /* L40: */
@@ -125,17 +124,17 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    if (*n == 1) {
-		b_ref(1, j) = b_ref(1, j) + d__[1] * x_ref(1, j);
+		b[j * b_dim1 + 1] += d__[1] * x[j * x_dim1 + 1];
 	    } else {
-		b_ref(1, j) = b_ref(1, j) + d__[1] * x_ref(1, j) + e[1] * 
-			x_ref(2, j);
-		b_ref(*n, j) = b_ref(*n, j) + e[*n - 1] * x_ref(*n - 1, j) + 
-			d__[*n] * x_ref(*n, j);
+		b[j * b_dim1 + 1] = b[j * b_dim1 + 1] + d__[1] * x[j * x_dim1 
+			+ 1] + e[1] * x[j * x_dim1 + 2];
+		b[*n + j * b_dim1] = b[*n + j * b_dim1] + e[*n - 1] * x[*n - 
+			1 + j * x_dim1] + d__[*n] * x[*n + j * x_dim1];
 		i__2 = *n - 1;
 		for (i__ = 2; i__ <= i__2; ++i__) {
-		    b_ref(i__, j) = b_ref(i__, j) + e[i__ - 1] * x_ref(i__ - 
-			    1, j) + d__[i__] * x_ref(i__, j) + e[i__] * x_ref(
-			    i__ + 1, j);
+		    b[i__ + j * b_dim1] = b[i__ + j * b_dim1] + e[i__ - 1] * 
+			    x[i__ - 1 + j * x_dim1] + d__[i__] * x[i__ + j * 
+			    x_dim1] + e[i__] * x[i__ + 1 + j * x_dim1];
 /* L50: */
 		}
 	    }
@@ -148,17 +147,17 @@
 	i__1 = *nrhs;
 	for (j = 1; j <= i__1; ++j) {
 	    if (*n == 1) {
-		b_ref(1, j) = b_ref(1, j) - d__[1] * x_ref(1, j);
+		b[j * b_dim1 + 1] -= d__[1] * x[j * x_dim1 + 1];
 	    } else {
-		b_ref(1, j) = b_ref(1, j) - d__[1] * x_ref(1, j) - e[1] * 
-			x_ref(2, j);
-		b_ref(*n, j) = b_ref(*n, j) - e[*n - 1] * x_ref(*n - 1, j) - 
-			d__[*n] * x_ref(*n, j);
+		b[j * b_dim1 + 1] = b[j * b_dim1 + 1] - d__[1] * x[j * x_dim1 
+			+ 1] - e[1] * x[j * x_dim1 + 2];
+		b[*n + j * b_dim1] = b[*n + j * b_dim1] - e[*n - 1] * x[*n - 
+			1 + j * x_dim1] - d__[*n] * x[*n + j * x_dim1];
 		i__2 = *n - 1;
 		for (i__ = 2; i__ <= i__2; ++i__) {
-		    b_ref(i__, j) = b_ref(i__, j) - e[i__ - 1] * x_ref(i__ - 
-			    1, j) - d__[i__] * x_ref(i__, j) - e[i__] * x_ref(
-			    i__ + 1, j);
+		    b[i__ + j * b_dim1] = b[i__ + j * b_dim1] - e[i__ - 1] * 
+			    x[i__ - 1 + j * x_dim1] - d__[i__] * x[i__ + j * 
+			    x_dim1] - e[i__] * x[i__ + 1 + j * x_dim1];
 /* L70: */
 		}
 	    }
@@ -170,8 +169,3 @@
 /*     End of SLAPTM */
 
 } /* slaptm_ */
-
-#undef x_ref
-#undef b_ref
-
-

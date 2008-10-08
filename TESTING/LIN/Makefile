@@ -2,7 +2,7 @@ include ../../make.inc
 
 #######################################################################
 #  This makefile creates the test programs for the linear equation
-#  routines in LAPACK.  The test files are grouped as follows:
+#  routines in CLAPACK.  The test files are grouped as follows:
 #
 #       ALINTST -- Auxiliary test routines
 #       SLINTST -- Single precision real test routines
@@ -166,32 +166,51 @@ ZLINTST = zchkaa.o \
    ztrt02.o ztrt03.o ztrt05.o ztrt06.o \
    ztzt01.o ztzt02.o dget06.o
 
-all:  single double complex complex16
+DSLINTST = dchkab.o \
+	ddrvab.o derrab.o dget08.o          \
+	alaerh.o alahd.o  aladhd.o alareq.o \
+	chkxer.o dlarhs.o dlatb4.o xerbla.o \
+	dget02.o
+
+ZCLINTST = zchkab.o \
+	zdrvab.o zerrab.o zget08.o          \
+	alaerh.o alahd.o  aladhd.o alareq.o \
+	chkxer.o zget02.o zlarhs.o zlatb4.o \
+	zsbmv.o  xerbla.o
+
+all:  single double complex complex16 proto-double proto-complex16
 
 single: ../xlintsts
 double: ../xlintstd
 complex: ../xlintstc
-complex16: ../xlintstz
+complex16: ../xlintstz 
+
+proto-double: ../xlintstds
+proto-complex16: ../xlintstzc 
 
 ../xlintsts : $(ALINTST) $(SLINTST) $(SCLNTST)
-	$(LOADER) $(LOADOPTS)  $(ALINTST) $(SCLNTST) $(SLINTST) \
-        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc \
-	-o $@
+	$(CC) $(LOADOPTS)    $(ALINTST) $(SCLNTST) $(SLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
 
 ../xlintstc : $(ALINTST) $(CLINTST) $(SCLNTST)
-	$(LOADER) $(LOADOPTS)  $(ALINTST) $(SCLNTST) $(CLINTST) \
-        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc \
-	-o $@
+	$(CC) $(LOADOPTS)    $(ALINTST) $(SCLNTST) $(CLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
  
 ../xlintstd : $(ALINTST) $(DLINTST) $(DZLNTST)
-	$(LOADER) $(LOADOPTS)  $(ALINTST) $(DZLNTST) $(DLINTST) \
-        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc \
-	-o $@
+	$(CC) $(LOADOPTS)    $(ALINTST) $(DZLNTST) $(DLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
  
 ../xlintstz : $(ALINTST) $(ZLINTST) $(DZLNTST)
-	$(LOADER) $(LOADOPTS)  $(ALINTST) $(DZLNTST) $(ZLINTST) \
-        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm -lc \
-	-o $@
+	$(CC) $(LOADOPTS)    $(ALINTST) $(DZLNTST) $(ZLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
+ 
+../xlintstds : $(DSLINTST)
+	$(CC) $(LOADOPTS)    $(DSLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
+ 
+../xlintstzc : $(ZCLINTST)
+	$(CC) $(LOADOPTS)    $(ZCLINTST) \
+        ../../$(TMGLIB) ../../$(LAPACKLIB) $(BLASLIB) $(F2CLIB) -lm  -o $@
  
 $(ALINTST): $(FRC)
 $(SCLNTST): $(FRC)
@@ -208,14 +227,13 @@ clean:
 	rm -f *.o
 
 schkaa.o: schkaa.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 dchkaa.o: dchkaa.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 cchkaa.o: cchkaa.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
 zchkaa.o: zchkaa.c
-	$(CC) $(DRVCFLAGS) -c $<
+	$(CC) $(DRVCFLAGS)  -c $< -o $@
  
-.c.o:
-	$(CC) $(CFLAGS) -c $*.c
-
+.c.o: 
+	$(CC) $(CFLAGS) -c $< -o $@

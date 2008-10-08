@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int zsbmv_(char *uplo, integer *n, integer *k, doublecomplex 
 	*alpha, doublecomplex *a, integer *lda, doublecomplex *x, integer *
@@ -15,142 +10,151 @@
     doublecomplex z__1, z__2, z__3, z__4;
 
     /* Local variables */
-    static integer info;
-    static doublecomplex temp1, temp2;
-    static integer i__, j, l;
+    integer i__, j, l, ix, iy, jx, jy, kx, ky, info;
+    doublecomplex temp1, temp2;
     extern logical lsame_(char *, char *);
-    static integer kplus1, ix, iy, jx, jy, kx, ky;
+    integer kplus1;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  ZSBMV  performs the matrix-vector  operation */
 
-    Purpose   
-    =======   
+/*     y := alpha*A*x + beta*y, */
 
-    ZSBMV  performs the matrix-vector  operation   
+/*  where alpha and beta are scalars, x and y are n element vectors and */
+/*  A is an n by n symmetric band matrix, with k super-diagonals. */
 
-       y := alpha*A*x + beta*y,   
+/*  Arguments */
+/*  ========== */
 
-    where alpha and beta are scalars, x and y are n element vectors and   
-    A is an n by n symmetric band matrix, with k super-diagonals.   
+/*  UPLO   - CHARACTER*1 */
+/*           On entry, UPLO specifies whether the upper or lower */
+/*           triangular part of the band matrix A is being supplied as */
+/*           follows: */
 
-    Arguments   
-    ==========   
+/*              UPLO = 'U' or 'u'   The upper triangular part of A is */
+/*                                  being supplied. */
 
-    UPLO   - CHARACTER*1   
-             On entry, UPLO specifies whether the upper or lower   
-             triangular part of the band matrix A is being supplied as   
-             follows:   
+/*              UPLO = 'L' or 'l'   The lower triangular part of A is */
+/*                                  being supplied. */
 
-                UPLO = 'U' or 'u'   The upper triangular part of A is   
-                                    being supplied.   
+/*           Unchanged on exit. */
 
-                UPLO = 'L' or 'l'   The lower triangular part of A is   
-                                    being supplied.   
+/*  N      - INTEGER */
+/*           On entry, N specifies the order of the matrix A. */
+/*           N must be at least zero. */
+/*           Unchanged on exit. */
 
-             Unchanged on exit.   
+/*  K      - INTEGER */
+/*           On entry, K specifies the number of super-diagonals of the */
+/*           matrix A. K must satisfy  0 .le. K. */
+/*           Unchanged on exit. */
 
-    N      - INTEGER   
-             On entry, N specifies the order of the matrix A.   
-             N must be at least zero.   
-             Unchanged on exit.   
+/*  ALPHA  - COMPLEX*16 */
+/*           On entry, ALPHA specifies the scalar alpha. */
+/*           Unchanged on exit. */
 
-    K      - INTEGER   
-             On entry, K specifies the number of super-diagonals of the   
-             matrix A. K must satisfy  0 .le. K.   
-             Unchanged on exit.   
+/*  A      - COMPLEX*16 array, dimension( LDA, N ) */
+/*           Before entry with UPLO = 'U' or 'u', the leading ( k + 1 ) */
+/*           by n part of the array A must contain the upper triangular */
+/*           band part of the symmetric matrix, supplied column by */
+/*           column, with the leading diagonal of the matrix in row */
+/*           ( k + 1 ) of the array, the first super-diagonal starting at */
+/*           position 2 in row k, and so on. The top left k by k triangle */
+/*           of the array A is not referenced. */
+/*           The following program segment will transfer the upper */
+/*           triangular part of a symmetric band matrix from conventional */
+/*           full matrix storage to band storage: */
 
-    ALPHA  - COMPLEX*16   
-             On entry, ALPHA specifies the scalar alpha.   
-             Unchanged on exit.   
+/*                 DO 20, J = 1, N */
+/*                    M = K + 1 - J */
+/*                    DO 10, I = MAX( 1, J - K ), J */
+/*                       A( M + I, J ) = matrix( I, J ) */
+/*              10    CONTINUE */
+/*              20 CONTINUE */
 
-    A      - COMPLEX*16 array, dimension( LDA, N )   
-             Before entry with UPLO = 'U' or 'u', the leading ( k + 1 )   
-             by n part of the array A must contain the upper triangular   
-             band part of the symmetric matrix, supplied column by   
-             column, with the leading diagonal of the matrix in row   
-             ( k + 1 ) of the array, the first super-diagonal starting at   
-             position 2 in row k, and so on. The top left k by k triangle   
-             of the array A is not referenced.   
-             The following program segment will transfer the upper   
-             triangular part of a symmetric band matrix from conventional   
-             full matrix storage to band storage:   
+/*           Before entry with UPLO = 'L' or 'l', the leading ( k + 1 ) */
+/*           by n part of the array A must contain the lower triangular */
+/*           band part of the symmetric matrix, supplied column by */
+/*           column, with the leading diagonal of the matrix in row 1 of */
+/*           the array, the first sub-diagonal starting at position 1 in */
+/*           row 2, and so on. The bottom right k by k triangle of the */
+/*           array A is not referenced. */
+/*           The following program segment will transfer the lower */
+/*           triangular part of a symmetric band matrix from conventional */
+/*           full matrix storage to band storage: */
 
-                   DO 20, J = 1, N   
-                      M = K + 1 - J   
-                      DO 10, I = MAX( 1, J - K ), J   
-                         A( M + I, J ) = matrix( I, J )   
-                10    CONTINUE   
-                20 CONTINUE   
+/*                 DO 20, J = 1, N */
+/*                    M = 1 - J */
+/*                    DO 10, I = J, MIN( N, J + K ) */
+/*                       A( M + I, J ) = matrix( I, J ) */
+/*              10    CONTINUE */
+/*              20 CONTINUE */
 
-             Before entry with UPLO = 'L' or 'l', the leading ( k + 1 )   
-             by n part of the array A must contain the lower triangular   
-             band part of the symmetric matrix, supplied column by   
-             column, with the leading diagonal of the matrix in row 1 of   
-             the array, the first sub-diagonal starting at position 1 in   
-             row 2, and so on. The bottom right k by k triangle of the   
-             array A is not referenced.   
-             The following program segment will transfer the lower   
-             triangular part of a symmetric band matrix from conventional   
-             full matrix storage to band storage:   
+/*           Unchanged on exit. */
 
-                   DO 20, J = 1, N   
-                      M = 1 - J   
-                      DO 10, I = J, MIN( N, J + K )   
-                         A( M + I, J ) = matrix( I, J )   
-                10    CONTINUE   
-                20 CONTINUE   
+/*  LDA    - INTEGER */
+/*           On entry, LDA specifies the first dimension of A as declared */
+/*           in the calling (sub) program. LDA must be at least */
+/*           ( k + 1 ). */
+/*           Unchanged on exit. */
 
-             Unchanged on exit.   
+/*  X      - COMPLEX*16 array, dimension at least */
+/*           ( 1 + ( N - 1 )*abs( INCX ) ). */
+/*           Before entry, the incremented array X must contain the */
+/*           vector x. */
+/*           Unchanged on exit. */
 
-    LDA    - INTEGER   
-             On entry, LDA specifies the first dimension of A as declared   
-             in the calling (sub) program. LDA must be at least   
-             ( k + 1 ).   
-             Unchanged on exit.   
+/*  INCX   - INTEGER */
+/*           On entry, INCX specifies the increment for the elements of */
+/*           X. INCX must not be zero. */
+/*           Unchanged on exit. */
 
-    X      - COMPLEX*16 array, dimension at least   
-             ( 1 + ( N - 1 )*abs( INCX ) ).   
-             Before entry, the incremented array X must contain the   
-             vector x.   
-             Unchanged on exit.   
+/*  BETA   - COMPLEX*16 */
+/*           On entry, BETA specifies the scalar beta. */
+/*           Unchanged on exit. */
 
-    INCX   - INTEGER   
-             On entry, INCX specifies the increment for the elements of   
-             X. INCX must not be zero.   
-             Unchanged on exit.   
+/*  Y      - COMPLEX*16 array, dimension at least */
+/*           ( 1 + ( N - 1 )*abs( INCY ) ). */
+/*           Before entry, the incremented array Y must contain the */
+/*           vector y. On exit, Y is overwritten by the updated vector y. */
 
-    BETA   - COMPLEX*16   
-             On entry, BETA specifies the scalar beta.   
-             Unchanged on exit.   
+/*  INCY   - INTEGER */
+/*           On entry, INCY specifies the increment for the elements of */
+/*           Y. INCY must not be zero. */
+/*           Unchanged on exit. */
 
-    Y      - COMPLEX*16 array, dimension at least   
-             ( 1 + ( N - 1 )*abs( INCY ) ).   
-             Before entry, the incremented array Y must contain the   
-             vector y. On exit, Y is overwritten by the updated vector y.   
+/*  ===================================================================== */
 
-    INCY   - INTEGER   
-             On entry, INCY specifies the increment for the elements of   
-             Y. INCY must not be zero.   
-             Unchanged on exit.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --x;
     --y;
@@ -195,10 +199,10 @@
 	ky = 1 - (*n - 1) * *incy;
     }
 
-/*     Start the operations. In this version the elements of the array A   
-       are accessed sequentially with one pass through A.   
+/*     Start the operations. In this version the elements of the array A */
+/*     are accessed sequentially with one pass through A. */
 
-       First form  y := beta*y. */
+/*     First form  y := beta*y. */
 
     if (beta->r != 1. || beta->i != 0.) {
 	if (*incy == 1) {
@@ -269,13 +273,13 @@
 		for (i__ = max(i__2,i__3); i__ <= i__4; ++i__) {
 		    i__2 = i__;
 		    i__3 = i__;
-		    i__5 = a_subscr(l + i__, j);
+		    i__5 = l + i__ + j * a_dim1;
 		    z__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    z__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    z__1.r = y[i__3].r + z__2.r, z__1.i = y[i__3].i + z__2.i;
 		    y[i__2].r = z__1.r, y[i__2].i = z__1.i;
-		    i__2 = a_subscr(l + i__, j);
+		    i__2 = l + i__ + j * a_dim1;
 		    i__3 = i__;
 		    z__2.r = a[i__2].r * x[i__3].r - a[i__2].i * x[i__3].i, 
 			    z__2.i = a[i__2].r * x[i__3].i + a[i__2].i * x[
@@ -286,7 +290,7 @@
 		}
 		i__4 = j;
 		i__2 = j;
-		i__3 = a_subscr(kplus1, j);
+		i__3 = kplus1 + j * a_dim1;
 		z__3.r = temp1.r * a[i__3].r - temp1.i * a[i__3].i, z__3.i = 
 			temp1.r * a[i__3].i + temp1.i * a[i__3].r;
 		z__2.r = y[i__2].r + z__3.r, z__2.i = y[i__2].i + z__3.i;
@@ -315,13 +319,13 @@
 		for (i__ = max(i__4,i__2); i__ <= i__3; ++i__) {
 		    i__4 = iy;
 		    i__2 = iy;
-		    i__5 = a_subscr(l + i__, j);
+		    i__5 = l + i__ + j * a_dim1;
 		    z__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    z__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    z__1.r = y[i__2].r + z__2.r, z__1.i = y[i__2].i + z__2.i;
 		    y[i__4].r = z__1.r, y[i__4].i = z__1.i;
-		    i__4 = a_subscr(l + i__, j);
+		    i__4 = l + i__ + j * a_dim1;
 		    i__2 = ix;
 		    z__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    z__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
@@ -334,7 +338,7 @@
 		}
 		i__3 = jy;
 		i__4 = jy;
-		i__2 = a_subscr(kplus1, j);
+		i__2 = kplus1 + j * a_dim1;
 		z__3.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, z__3.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		z__2.r = y[i__4].r + z__3.r, z__2.i = y[i__4].i + z__3.i;
@@ -365,7 +369,7 @@
 		temp2.r = 0., temp2.i = 0.;
 		i__3 = j;
 		i__4 = j;
-		i__2 = a_subscr(1, j);
+		i__2 = j * a_dim1 + 1;
 		z__2.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, z__2.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		z__1.r = y[i__4].r + z__2.r, z__1.i = y[i__4].i + z__2.i;
@@ -377,13 +381,13 @@
 		for (i__ = j + 1; i__ <= i__3; ++i__) {
 		    i__4 = i__;
 		    i__2 = i__;
-		    i__5 = a_subscr(l + i__, j);
+		    i__5 = l + i__ + j * a_dim1;
 		    z__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    z__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    z__1.r = y[i__2].r + z__2.r, z__1.i = y[i__2].i + z__2.i;
 		    y[i__4].r = z__1.r, y[i__4].i = z__1.i;
-		    i__4 = a_subscr(l + i__, j);
+		    i__4 = l + i__ + j * a_dim1;
 		    i__2 = i__;
 		    z__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    z__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
@@ -412,7 +416,7 @@
 		temp2.r = 0., temp2.i = 0.;
 		i__3 = jy;
 		i__4 = jy;
-		i__2 = a_subscr(1, j);
+		i__2 = j * a_dim1 + 1;
 		z__2.r = temp1.r * a[i__2].r - temp1.i * a[i__2].i, z__2.i = 
 			temp1.r * a[i__2].i + temp1.i * a[i__2].r;
 		z__1.r = y[i__4].r + z__2.r, z__1.i = y[i__4].i + z__2.i;
@@ -428,13 +432,13 @@
 		    iy += *incy;
 		    i__4 = iy;
 		    i__2 = iy;
-		    i__5 = a_subscr(l + i__, j);
+		    i__5 = l + i__ + j * a_dim1;
 		    z__2.r = temp1.r * a[i__5].r - temp1.i * a[i__5].i, 
 			    z__2.i = temp1.r * a[i__5].i + temp1.i * a[i__5]
 			    .r;
 		    z__1.r = y[i__2].r + z__2.r, z__1.i = y[i__2].i + z__2.i;
 		    y[i__4].r = z__1.r, y[i__4].i = z__1.i;
-		    i__4 = a_subscr(l + i__, j);
+		    i__4 = l + i__ + j * a_dim1;
 		    i__2 = ix;
 		    z__2.r = a[i__4].r * x[i__2].r - a[i__4].i * x[i__2].i, 
 			    z__2.i = a[i__4].r * x[i__2].i + a[i__4].i * x[
@@ -461,8 +465,3 @@
 /*     End of ZSBMV */
 
 } /* zsbmv_ */
-
-#undef a_ref
-#undef a_subscr
-
-

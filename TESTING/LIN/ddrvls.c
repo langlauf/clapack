@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -28,11 +23,11 @@ static integer c__9 = 9;
 static integer c__25 = 25;
 static integer c__1 = 1;
 static integer c__3 = 3;
-static doublereal c_b24 = 1.;
-static doublereal c_b25 = 0.;
+static doublereal c_b28 = 1.;
+static doublereal c_b29 = 0.;
 static integer c__0 = 0;
 static integer c_n1 = -1;
-static doublereal c_b92 = -1.;
+static doublereal c_b96 = -1.;
 
 /* Subroutine */ int ddrvls_(logical *dotype, integer *nm, integer *mval, 
 	integer *nn, integer *nval, integer *nns, integer *nsval, integer *
@@ -57,58 +52,58 @@ static doublereal c_b92 = -1.;
     integer i__1, i__2, i__3, i__4, i__5, i__6;
     doublereal d__1, d__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal), log(doublereal);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static char path[3];
-    static integer rank, nrhs, nlvl, nrun, i__, j, k;
-    extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer m, n;
-    extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
-    static integer nfail, iseed[4];
+    integer i__, j, k, m, n, nb, im, in, lda, ldb, inb;
+    doublereal eps;
+    integer ins, info;
+    char path[3];
+    integer rank, nrhs, nlvl, nrun;
+    extern /* Subroutine */ int alahd_(integer *, char *), dscal_(
+	    integer *, doublereal *, doublereal *, integer *);
+    integer nfail, iseed[4];
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static integer crank;
+    integer crank;
     extern /* Subroutine */ int dgels_(char *, integer *, integer *, integer *
-	    , doublereal *, integer *, doublereal *, integer *, doublereal *, 
+, doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *);
-    static integer irank;
-    static doublereal rcond;
+    integer irank;
+    doublereal rcond;
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static integer itran, mnmin, ncols;
-    static doublereal norma, normb;
+    integer itran, mnmin, ncols;
+    doublereal norma, normb;
     extern doublereal dqrt12_(integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *), dqrt14_(char *, integer *,
+	    doublereal *, doublereal *, integer *), dqrt14_(char *, integer *, 
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *), dqrt17_(char *, 
 	    integer *, integer *, integer *, integer *, doublereal *, integer 
-	    *, doublereal *, integer *, doublereal *, integer *, doublereal *,
+	    *, doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	     doublereal *, integer *);
     extern /* Subroutine */ int daxpy_(integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *);
-    static char trans[1];
-    static integer nerrs, itype;
+    char trans[1];
+    integer nerrs, itype;
     extern /* Subroutine */ int dqrt13_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static integer lwork;
+    integer lwork;
     extern /* Subroutine */ int dqrt15_(integer *, integer *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *, integer *), dqrt16_(char *, integer *, 
 	    integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
-    static integer nrows, lwlsy, nb, im, in;
+    integer nrows, lwlsy;
     extern doublereal dlamch_(char *);
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static integer iscale;
+    integer iscale;
     extern /* Subroutine */ int dgelsd_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
@@ -122,14 +117,11 @@ static doublereal c_b92 = -1.;
 	    integer *, doublereal *, integer *, doublereal *, integer *), 
 	    dgelsy_(integer *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, integer *, integer *), dlarnv_(integer *, integer *,
+	    doublereal *, integer *, integer *), dlarnv_(integer *, integer *, 
 	     integer *, doublereal *), derrls_(char *, integer *), 
 	    xlaenv_(integer *, integer *);
-    static integer ldwork;
-    static doublereal result[18];
-    static integer lda, ldb, inb;
-    static doublereal eps;
-    static integer ins;
+    integer ldwork;
+    doublereal result[18];
 
     /* Fortran I/O blocks */
     static cilist io___35 = { 0, 0, 0, fmt_9999, 0 };
@@ -138,106 +130,126 @@ static doublereal c_b92 = -1.;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       January 3, 2000   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DDRVLS tests the least squares driver routines DGELS, DGELSS, DGELSX,   
-    DGELSY and DGELSD.   
+/*  DDRVLS tests the least squares driver routines DGELS, DGELSS, DGELSX, */
+/*  DGELSY and DGELSD. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
-            The matrix of type j is generated as follows:   
-            j=1: A = U*D*V where U and V are random orthogonal matrices   
-                 and D has random entries (> 0.1) taken from a uniform   
-                 distribution (0,1). A is full rank.   
-            j=2: The same of 1, but A is scaled up.   
-            j=3: The same of 1, but A is scaled down.   
-            j=4: A = U*D*V where U and V are random orthogonal matrices   
-                 and D has 3*min(M,N)/4 random entries (> 0.1) taken   
-                 from a uniform distribution (0,1) and the remaining   
-                 entries set to 0. A is rank-deficient.   
-            j=5: The same of 4, but A is scaled up.   
-            j=6: The same of 5, but A is scaled down.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
+/*          The matrix of type j is generated as follows: */
+/*          j=1: A = U*D*V where U and V are random orthogonal matrices */
+/*               and D has random entries (> 0.1) taken from a uniform */
+/*               distribution (0,1). A is full rank. */
+/*          j=2: The same of 1, but A is scaled up. */
+/*          j=3: The same of 1, but A is scaled down. */
+/*          j=4: A = U*D*V where U and V are random orthogonal matrices */
+/*               and D has 3*min(M,N)/4 random entries (> 0.1) taken */
+/*               from a uniform distribution (0,1) and the remaining */
+/*               entries set to 0. A is rank-deficient. */
+/*          j=5: The same of 4, but A is scaled up. */
+/*          j=6: The same of 5, but A is scaled down. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    NNB     (input) INTEGER   
-            The number of values of NB and NX contained in the   
-            vectors NBVAL and NXVAL.  The blocking parameters are used   
-            in pairs (NB,NX).   
+/*  NNB     (input) INTEGER */
+/*          The number of values of NB and NX contained in the */
+/*          vectors NBVAL and NXVAL.  The blocking parameters are used */
+/*          in pairs (NB,NX). */
 
-    NBVAL   (input) INTEGER array, dimension (NNB)   
-            The values of the blocksize NB.   
+/*  NBVAL   (input) INTEGER array, dimension (NNB) */
+/*          The values of the blocksize NB. */
 
-    NXVAL   (input) INTEGER array, dimension (NNB)   
-            The values of the crossover point NX.   
+/*  NXVAL   (input) INTEGER array, dimension (NNB) */
+/*          The values of the crossover point NX. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
-            where MMAX is the maximum value of M in MVAL and NMAX is the   
-            maximum value of N in NVAL.   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
+/*          where MMAX is the maximum value of M in MVAL and NMAX is the */
+/*          maximum value of N in NVAL. */
 
-    COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX)   
+/*  COPYA   (workspace) DOUBLE PRECISION array, dimension (MMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX)   
-            where MMAX is the maximum value of M in MVAL and NSMAX is the   
-            maximum value of NRHS in NSVAL.   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX) */
+/*          where MMAX is the maximum value of M in MVAL and NSMAX is the */
+/*          maximum value of NRHS in NSVAL. */
 
-    COPYB   (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX)   
+/*  COPYB   (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX) */
 
-    C       (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX)   
+/*  C       (workspace) DOUBLE PRECISION array, dimension (MMAX*NSMAX) */
 
-    S       (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  S       (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    COPYS   (workspace) DOUBLE PRECISION array, dimension   
-                        (min(MMAX,NMAX))   
+/*  COPYS   (workspace) DOUBLE PRECISION array, dimension */
+/*                      (min(MMAX,NMAX)) */
 
-    WORK    (workspace) DOUBLE PRECISION array,   
-                        dimension (MMAX*NMAX + 4*NMAX + MMAX).   
+/*  WORK    (workspace) DOUBLE PRECISION array, */
+/*                      dimension (MMAX*NMAX + 4*NMAX + MMAX). */
 
-    IWORK   (workspace) INTEGER array, dimension (15*NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (15*NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --work;
     --copys;
@@ -254,9 +266,11 @@ static doublereal c_b92 = -1.;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "LS", (ftnlen)2, (ftnlen)2);
@@ -275,6 +289,8 @@ static doublereal c_b92 = -1.;
 
 /*     Test the error exits */
 
+    xlaenv_(&c__2, &c__2);
+    xlaenv_(&c__9, &c__25);
     if (*tsterr) {
 	derrls_(path, nout);
     }
@@ -304,8 +320,8 @@ static doublereal c_b92 = -1.;
 	    i__3 = *nns;
 	    for (ins = 1; ins <= i__3; ++ins) {
 		nrhs = nsval[ins];
-/* Computing MAX   
-   Computing MAX */
+/* Computing MAX */
+/* Computing MAX */
 		d__1 = 1., d__2 = (doublereal) mnmin;
 		i__4 = (integer) (log(max(d__1,d__2) / 26.) / log(2.)) + 1;
 		nlvl = max(i__4,0);
@@ -326,9 +342,9 @@ static doublereal c_b92 = -1.;
 
 			if (irank == 1) {
 
-/*                       Test DGELS   
+/*                       Test DGELS */
 
-                         Generate a matrix of scaling type ISCALE */
+/*                       Generate a matrix of scaling type ISCALE */
 
 			    dqrt13_(&iscale, &m, &n, &copya[1], &lda, &norma, 
 				    iseed);
@@ -361,8 +377,8 @@ static doublereal c_b92 = -1.;
 					dscal_(&i__5, &d__1, &work[1], &c__1);
 				    }
 				    dgemm_(trans, "No transpose", &nrows, &
-					    nrhs, &ncols, &c_b24, &copya[1], &
-					    lda, &work[1], &ldwork, &c_b25, &
+					    nrhs, &ncols, &c_b28, &copya[1], &
+					    lda, &work[1], &ldwork, &c_b29, &
 					    b[1], &ldb)
 					    ;
 				    dlacpy_("Full", &nrows, &nrhs, &b[1], &
@@ -417,8 +433,8 @@ static doublereal c_b92 = -1.;
 						&ldb, &work[1], &lwork);
 				    }
 
-/*                             Print information about the tests that   
-                               did not pass the threshold. */
+/*                             Print information about the tests that */
+/*                             did not pass the threshold. */
 
 				    for (k = 1; k <= 2; ++k) {
 					if (result[k - 1] >= *thresh) {
@@ -455,16 +471,16 @@ static doublereal c_b92 = -1.;
 			    }
 			}
 
-/*                    Generate a matrix of scaling type ISCALE and rank   
-                      type IRANK. */
+/*                    Generate a matrix of scaling type ISCALE and rank */
+/*                    type IRANK. */
 
 			dqrt15_(&iscale, &irank, &m, &n, &nrhs, &copya[1], &
 				lda, &copyb[1], &ldb, &copys[1], &rank, &
 				norma, &normb, iseed, &work[1], &lwork);
 
-/*                    workspace used: MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M)   
+/*                    workspace used: MAX(M+MIN(M,N),NRHS*MIN(M,N),2*N+M) */
 
-                      Initialize vector IWORK. */
+/*                    Initialize vector IWORK. */
 
 			i__4 = n;
 			for (j = 1; j <= i__4; ++j) {
@@ -473,11 +489,11 @@ static doublereal c_b92 = -1.;
 			}
 			ldwork = max(1,m);
 
-/*                    Test DGELSX   
+/*                    Test DGELSX */
 
-                      DGELSX:  Compute the minimum-norm solution X   
-                      to min( norm( A * X - B ) ) using a complete   
-                      orthogonal factorization. */
+/*                    DGELSX:  Compute the minimum-norm solution X */
+/*                    to min( norm( A * X - B ) ) using a complete */
+/*                    orthogonal factorization. */
 
 			dlacpy_("Full", &m, &n, &copya[1], &lda, &a[1], &lda);
 			dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], &
@@ -488,21 +504,21 @@ static doublereal c_b92 = -1.;
 			dgelsx_(&m, &n, &nrhs, &a[1], &lda, &b[1], &ldb, &
 				iwork[1], &rcond, &crank, &work[1], &info);
 			if (info != 0) {
-			    alaerh_(path, "DGELSX", &info, &c__0, " ", &m, &n,
+			    alaerh_(path, "DGELSX", &info, &c__0, " ", &m, &n, 
 				     &nrhs, &c_n1, &nb, &itype, &nfail, &
 				    nerrs, nout);
 			}
 
-/*                    workspace used: MAX( MNMIN+3*N, 2*MNMIN+NRHS )   
+/*                    workspace used: MAX( MNMIN+3*N, 2*MNMIN+NRHS ) */
 
-                      Test 3:  Compute relative error in svd   
-                               workspace: M*N + 4*MIN(M,N) + MAX(M,N) */
+/*                    Test 3:  Compute relative error in svd */
+/*                             workspace: M*N + 4*MIN(M,N) + MAX(M,N) */
 
 			result[2] = dqrt12_(&crank, &crank, &a[1], &lda, &
 				copys[1], &work[1], &lwork);
 
-/*                    Test 4:  Compute error in solution   
-                               workspace:  M*NRHS + M */
+/*                    Test 4:  Compute error in solution */
+/*                             workspace:  M*NRHS + M */
 
 			dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &work[1], 
 				&ldwork);
@@ -510,29 +526,29 @@ static doublereal c_b92 = -1.;
 				lda, &b[1], &ldb, &work[1], &ldwork, &work[m *
 				 nrhs + 1], &result[3]);
 
-/*                    Test 5:  Check norm of r'*A   
-                               workspace: NRHS*(M+N) */
+/*                    Test 5:  Check norm of r'*A */
+/*                             workspace: NRHS*(M+N) */
 
 			result[4] = 0.;
 			if (m > crank) {
-			    result[4] = dqrt17_("No transpose", &c__1, &m, &n,
+			    result[4] = dqrt17_("No transpose", &c__1, &m, &n, 
 				     &nrhs, &copya[1], &lda, &b[1], &ldb, &
 				    copyb[1], &ldb, &c__[1], &work[1], &lwork);
 			}
 
-/*                    Test 6:  Check if x is in the rowspace of A   
-                               workspace: (M+NRHS)*(N+2) */
+/*                    Test 6:  Check if x is in the rowspace of A */
+/*                             workspace: (M+NRHS)*(N+2) */
 
 			result[5] = 0.;
 
 			if (n > crank) {
-			    result[5] = dqrt14_("No transpose", &m, &n, &nrhs,
+			    result[5] = dqrt14_("No transpose", &m, &n, &nrhs, 
 				     &copya[1], &lda, &b[1], &ldb, &work[1], &
 				    lwork);
 			}
 
-/*                    Print information about the tests that did not   
-                      pass the threshold. */
+/*                    Print information about the tests that did not */
+/*                    pass the threshold. */
 
 			for (k = 3; k <= 6; ++k) {
 			    if (result[k - 1] >= *thresh) {
@@ -570,14 +586,14 @@ static doublereal c_b92 = -1.;
 			    xlaenv_(&c__1, &nb);
 			    xlaenv_(&c__3, &nxval[inb]);
 
-/*                       Test DGELSY   
+/*                       Test DGELSY */
 
-                         DGELSY:  Compute the minimum-norm solution X   
-                         to min( norm( A * X - B ) )   
-                         using the rank-revealing orthogonal   
-                         factorization.   
+/*                       DGELSY:  Compute the minimum-norm solution X */
+/*                       to min( norm( A * X - B ) ) */
+/*                       using the rank-revealing orthogonal */
+/*                       factorization. */
 
-                         Initialize vector IWORK. */
+/*                       Initialize vector IWORK. */
 
 			    i__5 = n;
 			    for (j = 1; j <= i__5; ++j) {
@@ -585,9 +601,9 @@ static doublereal c_b92 = -1.;
 /* L70: */
 			    }
 
-/*                       Set LWLSY to the adequate value.   
+/*                       Set LWLSY to the adequate value. */
 
-   Computing MAX */
+/* Computing MAX */
 			    i__5 = 1, i__6 = mnmin + (n << 1) + nb * (n + 1), 
 				    i__5 = max(i__5,i__6), i__6 = (mnmin << 1)
 				     + nb * nrhs;
@@ -595,7 +611,7 @@ static doublereal c_b92 = -1.;
 
 			    dlacpy_("Full", &m, &n, &copya[1], &lda, &a[1], &
 				    lda);
-			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1],
+			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
 
 			    s_copy(srnamc_1.srnamt, "DGELSY", (ftnlen)6, (
@@ -604,19 +620,19 @@ static doublereal c_b92 = -1.;
 				    iwork[1], &rcond, &crank, &work[1], &
 				    lwlsy, &info);
 			    if (info != 0) {
-				alaerh_(path, "DGELSY", &info, &c__0, " ", &m,
+				alaerh_(path, "DGELSY", &info, &c__0, " ", &m, 
 					 &n, &nrhs, &c_n1, &nb, &itype, &
 					nfail, &nerrs, nout);
 			    }
 
-/*                       Test 7:  Compute relative error in svd   
-                                  workspace: M*N + 4*MIN(M,N) + MAX(M,N) */
+/*                       Test 7:  Compute relative error in svd */
+/*                                workspace: M*N + 4*MIN(M,N) + MAX(M,N) */
 
 			    result[6] = dqrt12_(&crank, &crank, &a[1], &lda, &
 				    copys[1], &work[1], &lwork);
 
-/*                       Test 8:  Compute error in solution   
-                                  workspace:  M*NRHS + M */
+/*                       Test 8:  Compute error in solution */
+/*                                workspace:  M*NRHS + M */
 
 			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &work[
 				    1], &ldwork);
@@ -624,19 +640,19 @@ static doublereal c_b92 = -1.;
 				    &lda, &b[1], &ldb, &work[1], &ldwork, &
 				    work[m * nrhs + 1], &result[7]);
 
-/*                       Test 9:  Check norm of r'*A   
-                                  workspace: NRHS*(M+N) */
+/*                       Test 9:  Check norm of r'*A */
+/*                                workspace: NRHS*(M+N) */
 
 			    result[8] = 0.;
 			    if (m > crank) {
-				result[8] = dqrt17_("No transpose", &c__1, &m,
+				result[8] = dqrt17_("No transpose", &c__1, &m, 
 					 &n, &nrhs, &copya[1], &lda, &b[1], &
 					ldb, &copyb[1], &ldb, &c__[1], &work[
 					1], &lwork);
 			    }
 
-/*                       Test 10:  Check if x is in the rowspace of A   
-                                  workspace: (M+NRHS)*(N+2) */
+/*                       Test 10:  Check if x is in the rowspace of A */
+/*                                workspace: (M+NRHS)*(N+2) */
 
 			    result[9] = 0.;
 
@@ -646,15 +662,15 @@ static doublereal c_b92 = -1.;
 					work[1], &lwork);
 			    }
 
-/*                       Test DGELSS   
+/*                       Test DGELSS */
 
-                         DGELSS:  Compute the minimum-norm solution X   
-                         to min( norm( A * X - B ) )   
-                         using the SVD. */
+/*                       DGELSS:  Compute the minimum-norm solution X */
+/*                       to min( norm( A * X - B ) ) */
+/*                       using the SVD. */
 
 			    dlacpy_("Full", &m, &n, &copya[1], &lda, &a[1], &
 				    lda);
-			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1],
+			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
 			    s_copy(srnamc_1.srnamt, "DGELSS", (ftnlen)6, (
 				    ftnlen)6);
@@ -662,19 +678,19 @@ static doublereal c_b92 = -1.;
 				    s[1], &rcond, &crank, &work[1], &lwork, &
 				    info);
 			    if (info != 0) {
-				alaerh_(path, "DGELSS", &info, &c__0, " ", &m,
+				alaerh_(path, "DGELSS", &info, &c__0, " ", &m, 
 					 &n, &nrhs, &c_n1, &nb, &itype, &
 					nfail, &nerrs, nout);
 			    }
 
-/*                       workspace used: 3*min(m,n) +   
-                                         max(2*min(m,n),nrhs,max(m,n))   
+/*                       workspace used: 3*min(m,n) + */
+/*                                       max(2*min(m,n),nrhs,max(m,n)) */
 
-                         Test 11:  Compute relative error in svd */
+/*                       Test 11:  Compute relative error in svd */
 
 			    if (rank > 0) {
-				daxpy_(&mnmin, &c_b92, &copys[1], &c__1, &s[1]
-					, &c__1);
+				daxpy_(&mnmin, &c_b96, &copys[1], &c__1, &s[1]
+, &c__1);
 				result[10] = dasum_(&mnmin, &s[1], &c__1) / 
 					dasum_(&mnmin, &copys[1], &c__1) / (
 					eps * (doublereal) mnmin);
@@ -709,13 +725,13 @@ static doublereal c_b92 = -1.;
 					work[1], &lwork);
 			    }
 
-/*                       Test DGELSD   
+/*                       Test DGELSD */
 
-                         DGELSD:  Compute the minimum-norm solution X   
-                         to min( norm( A * X - B ) ) using a   
-                         divide and conquer SVD.   
+/*                       DGELSD:  Compute the minimum-norm solution X */
+/*                       to min( norm( A * X - B ) ) using a */
+/*                       divide and conquer SVD. */
 
-                         Initialize vector IWORK. */
+/*                       Initialize vector IWORK. */
 
 			    i__5 = n;
 			    for (j = 1; j <= i__5; ++j) {
@@ -725,7 +741,7 @@ static doublereal c_b92 = -1.;
 
 			    dlacpy_("Full", &m, &n, &copya[1], &lda, &a[1], &
 				    lda);
-			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1],
+			    dlacpy_("Full", &m, &nrhs, &copyb[1], &ldb, &b[1], 
 				     &ldb);
 
 			    s_copy(srnamc_1.srnamt, "DGELSD", (ftnlen)6, (
@@ -734,7 +750,7 @@ static doublereal c_b92 = -1.;
 				    s[1], &rcond, &crank, &work[1], &lwork, &
 				    iwork[1], &info);
 			    if (info != 0) {
-				alaerh_(path, "DGELSD", &info, &c__0, " ", &m,
+				alaerh_(path, "DGELSD", &info, &c__0, " ", &m, 
 					 &n, &nrhs, &c_n1, &nb, &itype, &
 					nfail, &nerrs, nout);
 			    }
@@ -742,8 +758,8 @@ static doublereal c_b92 = -1.;
 /*                       Test 15:  Compute relative error in svd */
 
 			    if (rank > 0) {
-				daxpy_(&mnmin, &c_b92, &copys[1], &c__1, &s[1]
-					, &c__1);
+				daxpy_(&mnmin, &c_b96, &copys[1], &c__1, &s[1]
+, &c__1);
 				result[14] = dasum_(&mnmin, &s[1], &c__1) / 
 					dasum_(&mnmin, &copys[1], &c__1) / (
 					eps * (doublereal) mnmin);
@@ -778,8 +794,8 @@ static doublereal c_b92 = -1.;
 					work[1], &lwork);
 			    }
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = 7; k <= 18; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -832,4 +848,3 @@ L110:
 /*     End of DDRVLS */
 
 } /* ddrvls_ */
-

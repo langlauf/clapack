@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -55,89 +50,85 @@ static integer c__3 = 3;
     /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static real cond;
-    static integer jcol, ihbw, indx, nmax;
-    static real unfl, ovfl;
-    static char uplo[1];
-    static integer irow;
-    static real temp1, temp2, temp3;
-    static integer i__, j, idiag, m, n;
-    static logical badnn;
+    integer i__, j, m, n, j1, j2, m2, m3, kd, il, iu;
+    real vl, vu;
+    integer lgn;
+    real ulp, cond;
+    integer jcol, ihbw, indx, nmax;
+    real unfl, ovfl;
+    char uplo[1];
+    integer irow;
+    real temp1, temp2, temp3;
+    integer idiag;
+    logical badnn;
     extern doublereal ssxt1_(integer *, real *, integer *, real *, integer *, 
 	    real *, real *, real *);
-    extern /* Subroutine */ int chbev_(char *, char *, integer *, integer *, 
-	    complex *, integer *, real *, complex *, integer *, complex *, 
-	    real *, integer *), chet21_(integer *, char *, 
+    extern /* Subroutine */ int chet21_(integer *, char *, integer *, integer 
+	    *, complex *, integer *, real *, real *, complex *, integer *, 
+	    complex *, integer *, complex *, complex *, real *, real *), chbev_(char *, char *, integer *, integer *, complex *, 
+	    integer *, real *, complex *, integer *, complex *, real *, 
+	    integer *), chet22_(integer *, char *, integer *, 
 	    integer *, integer *, complex *, integer *, real *, real *, 
 	    complex *, integer *, complex *, integer *, complex *, complex *, 
 	    real *, real *), cheev_(char *, char *, integer *, 
 	    complex *, integer *, real *, complex *, integer *, real *, 
-	    integer *), chet22_(integer *, char *, integer *, 
-	    integer *, integer *, complex *, integer *, real *, real *, 
-	    complex *, integer *, complex *, integer *, complex *, complex *, 
-	    real *, real *);
-    static integer imode, lwedc, iinfo;
+	    integer *);
+    integer imode, lwedc, iinfo;
     extern /* Subroutine */ int chpev_(char *, char *, integer *, complex *, 
 	    real *, complex *, integer *, complex *, real *, integer *);
-    static real aninv, anorm;
-    static integer itemp, nmats, jsize, iuplo, nerrs, itype, j1, j2, jtype, 
-	    m2, m3, ntest, iseed2[4], iseed3[4], kd, il;
+    real aninv, anorm;
+    integer itemp, nmats, jsize, iuplo, nerrs, itype, jtype, ntest, iseed2[4],
+	     iseed3[4];
     extern /* Subroutine */ int slabad_(real *, real *), chbevd_(char *, char 
 	    *, integer *, integer *, complex *, integer *, real *, complex *, 
 	    integer *, complex *, integer *, real *, integer *, integer *, 
-	    integer *, integer *);
-    static integer iu;
-    extern /* Subroutine */ int cheevd_(char *, char *, integer *, complex *, 
-	    integer *, real *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *);
-    static real vl;
-    static integer liwedc;
+	    integer *, integer *), cheevd_(char *, char *, 
+	    integer *, complex *, integer *, real *, complex *, integer *, 
+	    real *, integer *, integer *, integer *, integer *);
+    integer liwedc;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int chpevd_(char *, char *, integer *, complex *, 
 	    real *, complex *, integer *, complex *, integer *, real *, 
-	    integer *, integer *, integer *, integer *);
-    static real vu;
-    static integer idumma[1];
+	    integer *, integer *, integer *, integer *), 
+	    clacpy_(char *, integer *, integer *, complex *, integer *, 
+	    complex *, integer *);
+    integer idumma[1];
     extern /* Subroutine */ int cheevr_(char *, char *, char *, integer *, 
 	    complex *, integer *, real *, real *, integer *, integer *, real *
-	    , integer *, real *, complex *, integer *, integer *, complex *, 
+, integer *, real *, complex *, integer *, integer *, complex *, 
 	    integer *, real *, integer *, integer *, integer *, integer *);
-    static integer ioldsd[4];
+    integer ioldsd[4];
     extern /* Subroutine */ int chbevx_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, real *, complex *
-	    , integer *, complex *, real *, integer *, integer *, integer *);
-    static integer lrwedc;
-    extern /* Subroutine */ int clacpy_(char *, integer *, integer *, complex 
-	    *, integer *, complex *, integer *), cheevx_(char *, char 
+, integer *, complex *, real *, integer *, integer *, integer *);
+    integer lrwedc;
+    extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
+	    *, complex *, complex *, integer *), cheevx_(char *, char 
 	    *, char *, integer *, complex *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, real *, complex *, 
 	    integer *, complex *, integer *, real *, integer *, integer *, 
 	    integer *);
     extern doublereal slarnd_(integer *, integer *);
-    static real abstol;
+    real abstol;
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
-	    *, integer *), claset_(char *, integer *, integer *, 
-	    complex *, complex *, complex *, integer *), clatmr_(
-	    integer *, integer *, char *, integer *, char *, complex *, 
-	    integer *, real *, complex *, char *, char *, complex *, integer *
-	    , real *, complex *, integer *, real *, char *, integer *, 
-	    integer *, integer *, real *, real *, char *, complex *, integer *
-	    , integer *, integer *), clatms_(integer *, integer *, char *, integer *, char *, 
-	    real *, integer *, real *, real *, integer *, integer *, char *, 
-	    complex *, integer *, complex *, integer *), xerbla_(char *, integer *), slafts_(char *, 
-	    integer *, integer *, integer *, integer *, real *, integer *, 
-	    real *, integer *, integer *);
-    static integer indwrk;
+	    *, integer *), clatmr_(integer *, integer *, char *, 
+	    integer *, char *, complex *, integer *, real *, complex *, char *
+, char *, complex *, integer *, real *, complex *, integer *, 
+	    real *, char *, integer *, integer *, integer *, real *, real *, 
+	    char *, complex *, integer *, integer *, integer *), clatms_(integer *, 
+	    integer *, char *, integer *, char *, real *, integer *, real *, 
+	    real *, integer *, integer *, char *, complex *, integer *, 
+	    complex *, integer *), xerbla_(char *, 
+	    integer *), slafts_(char *, integer *, integer *, integer 
+	    *, integer *, real *, integer *, real *, integer *, integer *);
+    integer indwrk;
     extern /* Subroutine */ int chpevx_(char *, char *, char *, integer *, 
 	    complex *, real *, real *, integer *, integer *, real *, integer *
-	    , real *, complex *, integer *, complex *, real *, integer *, 
+, real *, complex *, integer *, complex *, real *, integer *, 
 	    integer *, integer *);
-    static real rtovfl;
-    static integer mtypes, ntestt;
-    static real rtunfl, ulpinv;
-    static integer lgn;
-    static real ulp;
+    real rtunfl, rtovfl, ulpinv;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___42 = { 0, 0, 0, fmt_9999, 0 };
@@ -180,316 +171,324 @@ static integer c__3 = 3;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
-#define v_subscr(a_1,a_2) (a_2)*v_dim1 + a_1
-#define v_ref(a_1,a_2) v[v_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 3, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*       CDRVST  checks the Hermitian eigenvalue problem drivers. */
 
-    Purpose   
-    =======   
+/*               CHEEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix, */
+/*               using a divide-and-conquer algorithm. */
+
+/*               CHEEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix. */
 
-         CDRVST  checks the Hermitian eigenvalue problem drivers.   
+/*               CHEEVR computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix */
+/*               using the Relatively Robust Representation where it can. */
 
-                 CHEEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix,   
-                 using a divide-and-conquer algorithm.   
-
-                 CHEEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
-
-                 CHEEVR computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix   
-                 using the Relatively Robust Representation where it can.   
-
-                 CHPEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage, using a divide-and-conquer algorithm.   
-
-                 CHPEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
-
-                 CHBEVD computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix,   
-                 using a divide-and-conquer algorithm.   
-
-                 CHBEVX computes selected eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
-
-                 CHEEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix.   
-
-                 CHPEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian matrix in packed   
-                 storage.   
-
-                 CHBEV computes all eigenvalues and, optionally,   
-                 eigenvectors of a complex Hermitian band matrix.   
-
-         When CDRVST is called, a number of matrix "sizes" ("n's") and a   
-         number of matrix "types" are specified.  For each size ("n")   
-         and each type of matrix, one matrix will be generated and used   
-         to test the appropriate drivers.  For each matrix and each   
-         driver routine called, the following tests will be performed:   
-
-         (1)     | A - Z D Z' | / ( |A| n ulp )   
-
-         (2)     | I - Z Z' | / ( n ulp )   
-
-         (3)     | D1 - D2 | / ( |D1| ulp )   
-
-         where Z is the matrix of eigenvectors returned when the   
-         eigenvector option is given and D1 and D2 are the eigenvalues   
-         returned with and without the eigenvector option.   
-
-         The "sizes" are specified by an array NN(1:NSIZES); the value of   
-         each element NN(j) specifies one size.   
-         The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-         if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-         Currently, the list of possible types is:   
-
-         (1)  The zero matrix.   
-         (2)  The identity matrix.   
-
-         (3)  A diagonal matrix with evenly spaced entries   
-              1, ..., ULP  and random signs.   
-              (ULP = (first number larger than 1) - 1 )   
-         (4)  A diagonal matrix with geometrically spaced entries   
-              1, ..., ULP  and random signs.   
-         (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-              and random signs.   
-
-         (6)  Same as (4), but multiplied by SQRT( overflow threshold )   
-         (7)  Same as (4), but multiplied by SQRT( underflow threshold )   
-
-         (8)  A matrix of the form  U* D U, where U is unitary and   
-              D has evenly spaced entries 1, ..., ULP with random signs   
-              on the diagonal.   
-
-         (9)  A matrix of the form  U* D U, where U is unitary and   
-              D has geometrically spaced entries 1, ..., ULP with random   
-              signs on the diagonal.   
-
-         (10) A matrix of the form  U* D U, where U is unitary and   
-              D has "clustered" entries 1, ULP,..., ULP with random   
-              signs on the diagonal.   
-
-         (11) Same as (8), but multiplied by SQRT( overflow threshold )   
-         (12) Same as (8), but multiplied by SQRT( underflow threshold )   
-
-         (13) Symmetric matrix with random entries chosen from (-1,1).   
-         (14) Same as (13), but multiplied by SQRT( overflow threshold )   
-         (15) Same as (13), but multiplied by SQRT( underflow threshold )   
-         (16) A band matrix with half bandwidth randomly chosen between   
-              0 and N-1, with evenly spaced eigenvalues 1, ..., ULP   
-              with random signs.   
-         (17) Same as (16), but multiplied by SQRT( overflow threshold )   
-         (18) Same as (16), but multiplied by SQRT( underflow threshold )   
-
-    Arguments   
-    =========   
-
-    NSIZES  INTEGER   
-            The number of sizes of matrices to use.  If it is zero,   
-            CDRVST does nothing.  It must be at least zero.   
-            Not modified.   
-
-    NN      INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-            Not modified.   
-
-    NTYPES  INTEGER   
-            The number of elements in DOTYPE.   If it is zero, CDRVST   
-            does nothing.  It must be at least zero.  If it is MAXTYP+1   
-            and NSIZES is 1, then an additional type, MAXTYP+1 is   
-            defined, which is to use whatever matrix is in A.  This   
-            is only useful if DOTYPE(1:MAXTYP) is .FALSE. and   
-            DOTYPE(MAXTYP+1) is .TRUE. .   
-            Not modified.   
-
-    DOTYPE  LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-            Not modified.   
-
-    ISEED   INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to CDRVST to continue the same random number   
-            sequence.   
-            Modified.   
-
-    THRESH  REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-            Not modified.   
-
-    NOUNIT  INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns IINFO not equal to 0.)   
-            Not modified.   
-
-    A       COMPLEX array, dimension (LDA , max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually   
-            used.   
-            Modified.   
-
-    LDA     INTEGER   
-            The leading dimension of A.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    D1      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by CSTEQR simlutaneously   
-            with Z.  On exit, the eigenvalues in D1 correspond with the   
-            matrix in A.   
-            Modified.   
-
-    D2      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by CSTEQR if Z is not   
-            computed.  On exit, the eigenvalues in D2 correspond with   
-            the matrix in A.   
-            Modified.   
-
-    D3      REAL array, dimension (max(NN))   
-            The eigenvalues of A, as computed by SSTERF.  On exit, the   
-            eigenvalues in D3 correspond with the matrix in A.   
-            Modified.   
-
-    WA1     REAL array, dimension   
-
-    WA2     REAL array, dimension   
-
-    WA3     REAL array, dimension   
-
-    U       COMPLEX array, dimension (LDU, max(NN))   
-            The unitary matrix computed by CHETRD + CUNGC3.   
-            Modified.   
-
-    LDU     INTEGER   
-            The leading dimension of U, Z, and V.  It must be at   
-            least 1 and at least max( NN ).   
-            Not modified.   
-
-    V       COMPLEX array, dimension (LDU, max(NN))   
-            The Housholder vectors computed by CHETRD in reducing A to   
-            tridiagonal form.   
-            Modified.   
-
-    TAU     COMPLEX array, dimension (max(NN))   
-            The Householder factors computed by CHETRD in reducing A   
-            to tridiagonal form.   
-            Modified.   
-
-    Z       COMPLEX array, dimension (LDU, max(NN))   
-            The unitary matrix of eigenvectors computed by CHEEVD,   
-            CHEEVX, CHPEVD, CHPEVX, CHBEVD, and CHBEVX.   
-            Modified.   
-
-    WORK  - COMPLEX array of dimension ( LWORK )   
-             Workspace.   
-             Modified.   
-
-    LWORK - INTEGER   
-             The number of entries in WORK.  This must be at least   
-             2*max( NN(j), 2 )**2.   
-             Not modified.   
-
-    RWORK   REAL array, dimension (3*max(NN))   
-             Workspace.   
-             Modified.   
-
-    LRWORK - INTEGER   
-             The number of entries in RWORK.   
-
-    IWORK   INTEGER array, dimension (6*max(NN))   
-            Workspace.   
-            Modified.   
-
-    LIWORK - INTEGER   
-             The number of entries in IWORK.   
-
-    RESULT  REAL array, dimension (??)   
-            The values computed by the tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-            Modified.   
-
-    INFO    INTEGER   
-            If 0, then everything ran OK.   
-             -1: NSIZES < 0   
-             -2: Some NN(j) < 0   
-             -3: NTYPES < 0   
-             -5: THRESH < 0   
-             -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ).   
-            -16: LDU < 1 or LDU < NMAX.   
-            -21: LWORK too small.   
-            If  SLATMR, SLATMS, CHETRD, SORGC3, CSTEQR, SSTERF,   
-                or SORMC2 returns an error code, the   
-                absolute value of it is returned.   
-            Modified.   
-
-   -----------------------------------------------------------------------   
-
-         Some Local Variables and Parameters:   
-         ---- ----- --------- --- ----------   
-         ZERO, ONE       Real 0 and 1.   
-         MAXTYP          The number of types defined.   
-         NTEST           The number of tests performed, or which can   
-                         be performed so far, for the current matrix.   
-         NTESTT          The total number of tests performed so far.   
-         NMAX            Largest value in NN.   
-         NMATS           The number of matrices generated so far.   
-         NERRS           The number of tests which have exceeded THRESH   
-                         so far (computed by SLAFTS).   
-         COND, IMODE     Values to be passed to the matrix generators.   
-         ANORM           Norm of A; passed to matrix generators.   
-
-         OVFL, UNFL      Overflow and underflow thresholds.   
-         ULP, ULPINV     Finest relative precision and its inverse.   
-         RTOVFL, RTUNFL  Square roots of the previous 2 values.   
-                 The following four arrays decode JTYPE:   
-         KTYPE(j)        The general type (1-10) for type "j".   
-         KMODE(j)        The MODE value to be passed to the matrix   
-                         generator for type "j".   
-         KMAGN(j)        The order of magnitude ( O(1),   
-                         O(overflow^(1/2) ), O(underflow^(1/2) )   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
+/*               CHPEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage, using a divide-and-conquer algorithm. */
+
+/*               CHPEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage. */
+
+/*               CHBEVD computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix, */
+/*               using a divide-and-conquer algorithm. */
+
+/*               CHBEVX computes selected eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix. */
+
+/*               CHEEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix. */
+
+/*               CHPEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian matrix in packed */
+/*               storage. */
+
+/*               CHBEV computes all eigenvalues and, optionally, */
+/*               eigenvectors of a complex Hermitian band matrix. */
+
+/*       When CDRVST is called, a number of matrix "sizes" ("n's") and a */
+/*       number of matrix "types" are specified.  For each size ("n") */
+/*       and each type of matrix, one matrix will be generated and used */
+/*       to test the appropriate drivers.  For each matrix and each */
+/*       driver routine called, the following tests will be performed: */
+
+/*       (1)     | A - Z D Z' | / ( |A| n ulp ) */
+
+/*       (2)     | I - Z Z' | / ( n ulp ) */
+
+/*       (3)     | D1 - D2 | / ( |D1| ulp ) */
+
+/*       where Z is the matrix of eigenvectors returned when the */
+/*       eigenvector option is given and D1 and D2 are the eigenvalues */
+/*       returned with and without the eigenvector option. */
+
+/*       The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*       each element NN(j) specifies one size. */
+/*       The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*       Currently, the list of possible types is: */
+
+/*       (1)  The zero matrix. */
+/*       (2)  The identity matrix. */
+
+/*       (3)  A diagonal matrix with evenly spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*            (ULP = (first number larger than 1) - 1 ) */
+/*       (4)  A diagonal matrix with geometrically spaced entries */
+/*            1, ..., ULP  and random signs. */
+/*       (5)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*            and random signs. */
+
+/*       (6)  Same as (4), but multiplied by SQRT( overflow threshold ) */
+/*       (7)  Same as (4), but multiplied by SQRT( underflow threshold ) */
+
+/*       (8)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has evenly spaced entries 1, ..., ULP with random signs */
+/*            on the diagonal. */
+
+/*       (9)  A matrix of the form  U* D U, where U is unitary and */
+/*            D has geometrically spaced entries 1, ..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (10) A matrix of the form  U* D U, where U is unitary and */
+/*            D has "clustered" entries 1, ULP,..., ULP with random */
+/*            signs on the diagonal. */
+
+/*       (11) Same as (8), but multiplied by SQRT( overflow threshold ) */
+/*       (12) Same as (8), but multiplied by SQRT( underflow threshold ) */
+
+/*       (13) Symmetric matrix with random entries chosen from (-1,1). */
+/*       (14) Same as (13), but multiplied by SQRT( overflow threshold ) */
+/*       (15) Same as (13), but multiplied by SQRT( underflow threshold ) */
+/*       (16) A band matrix with half bandwidth randomly chosen between */
+/*            0 and N-1, with evenly spaced eigenvalues 1, ..., ULP */
+/*            with random signs. */
+/*       (17) Same as (16), but multiplied by SQRT( overflow threshold ) */
+/*       (18) Same as (16), but multiplied by SQRT( underflow threshold ) */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  INTEGER */
+/*          The number of sizes of matrices to use.  If it is zero, */
+/*          CDRVST does nothing.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NN      INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+/*          Not modified. */
+
+/*  NTYPES  INTEGER */
+/*          The number of elements in DOTYPE.   If it is zero, CDRVST */
+/*          does nothing.  It must be at least zero.  If it is MAXTYP+1 */
+/*          and NSIZES is 1, then an additional type, MAXTYP+1 is */
+/*          defined, which is to use whatever matrix is in A.  This */
+/*          is only useful if DOTYPE(1:MAXTYP) is .FALSE. and */
+/*          DOTYPE(MAXTYP+1) is .TRUE. . */
+/*          Not modified. */
+
+/*  DOTYPE  LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+/*          Not modified. */
+
+/*  ISEED   INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to CDRVST to continue the same random number */
+/*          sequence. */
+/*          Modified. */
+
+/*  THRESH  REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+/*          Not modified. */
+
+/*  NOUNIT  INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns IINFO not equal to 0.) */
+/*          Not modified. */
+
+/*  A       COMPLEX array, dimension (LDA , max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually */
+/*          used. */
+/*          Modified. */
+
+/*  LDA     INTEGER */
+/*          The leading dimension of A.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  D1      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by CSTEQR simlutaneously */
+/*          with Z.  On exit, the eigenvalues in D1 correspond with the */
+/*          matrix in A. */
+/*          Modified. */
+
+/*  D2      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by CSTEQR if Z is not */
+/*          computed.  On exit, the eigenvalues in D2 correspond with */
+/*          the matrix in A. */
+/*          Modified. */
+
+/*  D3      REAL array, dimension (max(NN)) */
+/*          The eigenvalues of A, as computed by SSTERF.  On exit, the */
+/*          eigenvalues in D3 correspond with the matrix in A. */
+/*          Modified. */
+
+/*  WA1     REAL array, dimension */
+
+/*  WA2     REAL array, dimension */
+
+/*  WA3     REAL array, dimension */
+
+/*  U       COMPLEX array, dimension (LDU, max(NN)) */
+/*          The unitary matrix computed by CHETRD + CUNGC3. */
+/*          Modified. */
+
+/*  LDU     INTEGER */
+/*          The leading dimension of U, Z, and V.  It must be at */
+/*          least 1 and at least max( NN ). */
+/*          Not modified. */
+
+/*  V       COMPLEX array, dimension (LDU, max(NN)) */
+/*          The Housholder vectors computed by CHETRD in reducing A to */
+/*          tridiagonal form. */
+/*          Modified. */
+
+/*  TAU     COMPLEX array, dimension (max(NN)) */
+/*          The Householder factors computed by CHETRD in reducing A */
+/*          to tridiagonal form. */
+/*          Modified. */
+
+/*  Z       COMPLEX array, dimension (LDU, max(NN)) */
+/*          The unitary matrix of eigenvectors computed by CHEEVD, */
+/*          CHEEVX, CHPEVD, CHPEVX, CHBEVD, and CHBEVX. */
+/*          Modified. */
+
+/*  WORK  - COMPLEX array of dimension ( LWORK ) */
+/*           Workspace. */
+/*           Modified. */
+
+/*  LWORK - INTEGER */
+/*           The number of entries in WORK.  This must be at least */
+/*           2*max( NN(j), 2 )**2. */
+/*           Not modified. */
+
+/*  RWORK   REAL array, dimension (3*max(NN)) */
+/*           Workspace. */
+/*           Modified. */
+
+/*  LRWORK - INTEGER */
+/*           The number of entries in RWORK. */
+
+/*  IWORK   INTEGER array, dimension (6*max(NN)) */
+/*          Workspace. */
+/*          Modified. */
+
+/*  LIWORK - INTEGER */
+/*           The number of entries in IWORK. */
+
+/*  RESULT  REAL array, dimension (??) */
+/*          The values computed by the tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+/*          Modified. */
+
+/*  INFO    INTEGER */
+/*          If 0, then everything ran OK. */
+/*           -1: NSIZES < 0 */
+/*           -2: Some NN(j) < 0 */
+/*           -3: NTYPES < 0 */
+/*           -5: THRESH < 0 */
+/*           -9: LDA < 1 or LDA < NMAX, where NMAX is max( NN(j) ). */
+/*          -16: LDU < 1 or LDU < NMAX. */
+/*          -21: LWORK too small. */
+/*          If  SLATMR, SLATMS, CHETRD, SORGC3, CSTEQR, SSTERF, */
+/*              or SORMC2 returns an error code, the */
+/*              absolute value of it is returned. */
+/*          Modified. */
+
+/* ----------------------------------------------------------------------- */
+
+/*       Some Local Variables and Parameters: */
+/*       ---- ----- --------- --- ---------- */
+/*       ZERO, ONE       Real 0 and 1. */
+/*       MAXTYP          The number of types defined. */
+/*       NTEST           The number of tests performed, or which can */
+/*                       be performed so far, for the current matrix. */
+/*       NTESTT          The total number of tests performed so far. */
+/*       NMAX            Largest value in NN. */
+/*       NMATS           The number of matrices generated so far. */
+/*       NERRS           The number of tests which have exceeded THRESH */
+/*                       so far (computed by SLAFTS). */
+/*       COND, IMODE     Values to be passed to the matrix generators. */
+/*       ANORM           Norm of A; passed to matrix generators. */
+
+/*       OVFL, UNFL      Overflow and underflow thresholds. */
+/*       ULP, ULPINV     Finest relative precision and its inverse. */
+/*       RTOVFL, RTUNFL  Square roots of the previous 2 values. */
+/*               The following four arrays decode JTYPE: */
+/*       KTYPE(j)        The general type (1-10) for type "j". */
+/*       KMODE(j)        The MODE value to be passed to the matrix */
+/*                       generator for type "j". */
+/*       KMAGN(j)        The order of magnitude ( O(1), */
+/*                       O(overflow^(1/2) ), O(underflow^(1/2) ) */
+
+/*  ===================================================================== */
+
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d1;
     --d2;
@@ -498,13 +497,13 @@ static integer c__3 = 3;
     --wa2;
     --wa3;
     z_dim1 = *ldu;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     v_dim1 = *ldu;
-    v_offset = 1 + v_dim1 * 1;
+    v_offset = 1 + v_dim1;
     v -= v_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --tau;
     --work;
@@ -512,9 +511,11 @@ static integer c__3 = 3;
     --iwork;
     --result;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       1)      Check for errors */
+/*     1)      Check for errors */
 
     ntestt = 0;
     *info = 0;
@@ -629,20 +630,20 @@ static integer c__3 = 3;
 /* L30: */
 	    }
 
-/*           2)      Compute "A"   
+/*           2)      Compute "A" */
 
-                     Control parameters:   
+/*                   Control parameters: */
 
-                 KMAGN  KMODE        KTYPE   
-             =1  O(1)   clustered 1  zero   
-             =2  large  clustered 2  identity   
-             =3  small  exponential  (none)   
-             =4         arithmetic   diagonal, (w/ eigenvalues)   
-             =5         random log   Hermitian, w/ eigenvalues   
-             =6         random       (none)   
-             =7                      random diagonal   
-             =8                      random Hermitian   
-             =9                      band Hermitian, w/ eigenvalues */
+/*               KMAGN  KMODE        KTYPE */
+/*           =1  O(1)   clustered 1  zero */
+/*           =2  large  clustered 2  identity */
+/*           =3  small  exponential  (none) */
+/*           =4         arithmetic   diagonal, (w/ eigenvalues) */
+/*           =5         random log   Hermitian, w/ eigenvalues */
+/*           =6         random       (none) */
+/*           =7                      random diagonal */
+/*           =8                      random Hermitian */
+/*           =9                      band Hermitian, w/ eigenvalues */
 
 	    if (mtypes > 18) {
 		goto L110;
@@ -677,9 +678,9 @@ L70:
 	    iinfo = 0;
 	    cond = ulpinv;
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                     Zero */
+/*                   Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -690,7 +691,7 @@ L70:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    i__4 = a_subscr(jcol, jcol);
+		    i__4 = jcol + jcol * a_dim1;
 		    a[i__4].r = anorm, a[i__4].i = 0.f;
 /* L80: */
 		}
@@ -699,7 +700,7 @@ L70:
 
 /*              Diagonal Matrix, [Eigen]values Specified */
 
-		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &c__0, &c__0, "N", &a[a_offset], lda, &work[
 			1], &iinfo);
 
@@ -707,7 +708,7 @@ L70:
 
 /*              Hermitian, eigenvalues specified */
 
-		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &n, &n, "N", &a[a_offset], lda, &work[1], &
 			iinfo);
 
@@ -736,7 +737,7 @@ L70:
 /*              Hermitian banded, eigenvalues specified */
 
 		ihbw = (integer) ((n - 1) * slarnd_(&c__1, iseed3));
-		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond,
+		clatms_(&n, &n, "S", &iseed[1], "H", &rwork[1], &imode, &cond, 
 			 &anorm, &ihbw, &ihbw, "Z", &u[u_offset], ldu, &work[
 			1], &iinfo);
 
@@ -755,8 +756,8 @@ L70:
 		    i__4 = j2;
 		    for (j = j1; j <= i__4; ++j) {
 			i__ = j - idiag;
-			i__5 = a_subscr(i__, j);
-			i__6 = u_subscr(irow, j);
+			i__5 = i__ + j * a_dim1;
+			i__6 = irow + j * u_dim1;
 			a[i__5].r = u[i__6].r, a[i__5].i = u[i__6].i;
 /* L90: */
 		    }
@@ -795,8 +796,8 @@ L110:
 		}
 	    }
 
-/*           Perform tests storing upper or lower triangular   
-             part of matrix. */
+/*           Perform tests storing upper or lower triangular */
+/*           part of matrix. */
 
 	    for (iuplo = 0; iuplo <= 1; ++iuplo) {
 		if (iuplo == 0) {
@@ -842,7 +843,7 @@ L110:
 
 		chet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -969,7 +970,7 @@ L130:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		cheevx_("N", "A", uplo, &n, &a[a_offset], ldu, &vl, &vu, &il, 
@@ -1207,8 +1208,8 @@ L170:
 
 		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -1217,7 +1218,7 @@ L170:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1232,7 +1233,7 @@ L170:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1277,7 +1278,7 @@ L170:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -1286,7 +1287,7 @@ L170:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1301,7 +1302,7 @@ L170:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1359,8 +1360,8 @@ L170:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array WORK with the upper or lower triangular part   
-                of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular part */
+/*              of the matrix in packed form. */
 
 L270:
 		if (iuplo == 1) {
@@ -1370,7 +1371,7 @@ L270:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1385,7 +1386,7 @@ L270:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1435,7 +1436,7 @@ L270:
 
 		chpevx_("V", "A", uplo, &n, &work[1], &vl, &vu, &il, &iu, &
 			abstol, &m, &wa1[1], &z__[z_offset], ldu, &v[v_offset]
-			, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
+, &rwork[1], &iwork[1], &iwork[n * 5 + 1], &iinfo);
 		if (iinfo != 0) {
 		    io___69.ciunit = *nounit;
 		    s_wsfe(&io___69);
@@ -1466,7 +1467,7 @@ L270:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -1477,7 +1478,7 @@ L270:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1492,7 +1493,7 @@ L270:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1559,7 +1560,7 @@ L370:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1574,7 +1575,7 @@ L370:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1629,7 +1630,7 @@ L370:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1644,7 +1645,7 @@ L370:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1708,7 +1709,7 @@ L460:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1723,7 +1724,7 @@ L460:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1778,7 +1779,7 @@ L460:
 			i__4 = j;
 			for (i__ = 1; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1793,7 +1794,7 @@ L460:
 			i__4 = n;
 			for (i__ = j; i__ <= i__4; ++i__) {
 			    i__5 = indx;
-			    i__6 = a_subscr(i__, j);
+			    i__6 = i__ + j * a_dim1;
 			    work[i__5].r = a[i__6].r, work[i__5].i = a[i__6]
 				    .i;
 			    ++indx;
@@ -1867,8 +1868,8 @@ L550:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1877,8 +1878,8 @@ L550:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L560: */
 			}
@@ -1891,8 +1892,8 @@ L550:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L580: */
 			}
@@ -1935,7 +1936,7 @@ L550:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -1944,8 +1945,8 @@ L550:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L600: */
 			}
@@ -1958,8 +1959,8 @@ L550:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L620: */
 			}
@@ -2015,8 +2016,8 @@ L550:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L650:
 		if (iuplo == 1) {
@@ -2026,8 +2027,8 @@ L650:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L660: */
 			}
@@ -2040,8 +2041,8 @@ L650:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L680: */
 			}
@@ -2085,7 +2086,7 @@ L650:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 
@@ -2096,8 +2097,8 @@ L650:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L700: */
 			}
@@ -2110,8 +2111,8 @@ L650:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L720: */
 			}
@@ -2168,8 +2169,8 @@ L650:
 		r__1 = unfl, r__2 = ulp * dmax(temp1,temp2);
 		result[ntest] = temp2 / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L750:
 		++ntest;
@@ -2180,8 +2181,8 @@ L750:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L760: */
 			}
@@ -2194,8 +2195,8 @@ L750:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L780: */
 			}
@@ -2249,8 +2250,8 @@ L750:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L800: */
 			}
@@ -2263,8 +2264,8 @@ L750:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L820: */
 			}
@@ -2317,8 +2318,8 @@ L750:
 		r__1 = unfl, r__2 = temp3 * ulp;
 		result[ntest] = (temp1 + temp2) / dmax(r__1,r__2);
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L840:
 		++ntest;
@@ -2329,8 +2330,8 @@ L840:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L850: */
 			}
@@ -2343,8 +2344,8 @@ L840:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L870: */
 			}
@@ -2397,8 +2398,8 @@ L840:
 			i__6 = 1, i__4 = j - kd;
 			i__5 = j;
 			for (i__ = max(i__6,i__4); i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(kd + 1 + i__ - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = kd + 1 + i__ - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L890: */
 			}
@@ -2411,8 +2412,8 @@ L840:
 			i__6 = n, i__4 = j + kd;
 			i__5 = min(i__6,i__4);
 			for (i__ = j; i__ <= i__5; ++i__) {
-			    i__6 = v_subscr(i__ + 1 - j, j);
-			    i__4 = a_subscr(i__, j);
+			    i__6 = i__ + 1 - j + j * v_dim1;
+			    i__4 = i__ + j * a_dim1;
 			    v[i__6].r = a[i__4].r, v[i__6].i = a[i__4].i;
 /* L910: */
 			}
@@ -2509,7 +2510,7 @@ L930:
 
 		chet21_(&c__1, uplo, &n, &c__0, &v[v_offset], ldu, &d1[1], &
 			d2[1], &a[a_offset], ldu, &z__[z_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
@@ -2563,10 +2564,10 @@ L950:
 
 		clacpy_(" ", &n, &n, &v[v_offset], ldu, &a[a_offset], lda);
 
-/*              Call CHPEV   
+/*              Call CHPEV */
 
-                Load array WORK with the upper or lower triangular   
-                part of the matrix in packed form. */
+/*              Load array WORK with the upper or lower triangular */
+/*              part of the matrix in packed form. */
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2575,7 +2576,7 @@ L950:
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2590,7 +2591,7 @@ L950:
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2635,7 +2636,7 @@ L950:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    indx = 1;
@@ -2644,7 +2645,7 @@ L950:
 			i__5 = j;
 			for (i__ = 1; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2659,7 +2660,7 @@ L950:
 			i__5 = n;
 			for (i__ = j; i__ <= i__5; ++i__) {
 			    i__6 = indx;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    work[i__6].r = a[i__4].r, work[i__6].i = a[i__4]
 				    .i;
 			    ++indx;
@@ -2731,8 +2732,8 @@ L1050:
 		    kd = ihbw;
 		}
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2741,8 +2742,8 @@ L1050:
 			i__5 = 1, i__6 = j - kd;
 			i__4 = j;
 			for (i__ = max(i__5,i__6); i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(kd + 1 + i__ - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = kd + 1 + i__ - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L1060: */
 			}
@@ -2755,8 +2756,8 @@ L1050:
 			i__5 = n, i__6 = j + kd;
 			i__4 = min(i__5,i__6);
 			for (i__ = j; i__ <= i__4; ++i__) {
-			    i__5 = v_subscr(i__ + 1 - j, j);
-			    i__6 = a_subscr(i__, j);
+			    i__5 = i__ + 1 - j + j * v_dim1;
+			    i__6 = i__ + j * a_dim1;
 			    v[i__5].r = a[i__6].r, v[i__5].i = a[i__6].i;
 /* L1080: */
 			}
@@ -2798,7 +2799,7 @@ L1050:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], lda, &d1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		if (iuplo == 1) {
 		    i__3 = n;
@@ -2807,8 +2808,8 @@ L1050:
 			i__4 = 1, i__5 = j - kd;
 			i__6 = j;
 			for (i__ = max(i__4,i__5); i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(kd + 1 + i__ - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = kd + 1 + i__ - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L1100: */
 			}
@@ -2821,8 +2822,8 @@ L1050:
 			i__4 = n, i__5 = j + kd;
 			i__6 = min(i__4,i__5);
 			for (i__ = j; i__ <= i__6; ++i__) {
-			    i__4 = v_subscr(i__ + 1 - j, j);
-			    i__5 = a_subscr(i__, j);
+			    i__4 = i__ + 1 - j + j * v_dim1;
+			    i__5 = i__ + j * a_dim1;
 			    v[i__4].r = a[i__5].r, v[i__4].i = a[i__5].i;
 /* L1120: */
 			}
@@ -2918,7 +2919,7 @@ L1140:
 
 		chet21_(&c__1, uplo, &n, &c__0, &a[a_offset], ldu, &wa1[1], &
 			d2[1], &z__[z_offset], ldu, &v[v_offset], ldu, &tau[1]
-			, &work[1], &rwork[1], &result[ntest]);
+, &work[1], &rwork[1], &result[ntest]);
 
 		ntest += 2;
 		i__3 = *liwork - (n << 1);
@@ -3154,8 +3155,8 @@ L1180:
 
 
 
-/*              Load array V with the upper or lower triangular part   
-                of the matrix in band form. */
+/*              Load array V with the upper or lower triangular part */
+/*              of the matrix in band form. */
 
 L1190:
 
@@ -3166,7 +3167,7 @@ L1190:
 /*           End of Loop -- Check for RESULT(j) > THRESH */
 
 	    ntestt += ntest;
-	    slafts_("CST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh,
+	    slafts_("CST", &n, &n, &jtype, &ntest, &result[1], ioldsd, thresh, 
 		     nounit, &nerrs);
 
 L1210:
@@ -3185,12 +3186,3 @@ L1210:
 /*     End of CDRVST */
 
 } /* cdrvst_ */
-
-#undef v_ref
-#undef v_subscr
-#undef u_ref
-#undef u_subscr
-#undef a_ref
-#undef a_subscr
-
-

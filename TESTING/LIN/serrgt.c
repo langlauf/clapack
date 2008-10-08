@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -38,11 +33,11 @@ static integer c__1 = 1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real b[2], c__[2], d__[2], e[2], f[2], w[2], x[2], rcond, anorm;
-    static char c2[2];
-    static real r1[2], r2[2], cf[2], df[2], ef[2];
-    static integer ip[2], iw[2];
+    real b[2], c__[2], d__[2], e[2], f[2], w[2], x[2];
+    char c2[2];
+    real r1[2], r2[2], cf[2], df[2], ef[2];
+    integer ip[2], iw[2], info;
+    real rcond, anorm;
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
@@ -50,7 +45,7 @@ static integer c__1 = 1;
 	    real *, real *, integer *, real *, real *, real *, integer *, 
 	    integer *), sptcon_(integer *, real *, real *, real *, 
 	    real *, real *, integer *), sgtrfs_(char *, integer *, integer *, 
-	    real *, real *, real *, real *, real *, real *, real *, integer *,
+	    real *, real *, real *, real *, real *, real *, real *, integer *, 
 	     real *, integer *, real *, integer *, real *, real *, real *, 
 	    integer *, integer *), sgttrf_(integer *, real *, real *, 
 	    real *, real *, integer *, integer *), sptrfs_(integer *, integer 
@@ -66,29 +61,45 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SERRGT tests the error exits for the REAL tridiagonal   
-    routines.   
+/*  SERRGT tests the error exits for the REAL tridiagonal */
+/*  routines. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -108,9 +119,9 @@ static integer c__1 = 1;
 
     if (lsamen_(&c__2, c2, "GT")) {
 
-/*        Test error exits for the general tridiagonal routines.   
+/*        Test error exits for the general tridiagonal routines. */
 
-          SGTTRF */
+/*        SGTTRF */
 
 	s_copy(srnamc_1.srnamt, "SGTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -186,10 +197,10 @@ static integer c__1 = 1;
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        Test error exits for the positive definite tridiagonal   
-          routines.   
+/*        Test error exits for the positive definite tridiagonal */
+/*        routines. */
 
-          SPTTRF */
+/*        SPTTRF */
 
 	s_copy(srnamc_1.srnamt, "SPTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -260,4 +271,3 @@ static integer c__1 = 1;
 /*     End of SERRGT */
 
 } /* serrgt_ */
-

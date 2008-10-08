@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -25,99 +20,119 @@ static integer c__11 = 11;
     double sqrt(doublereal);
 
     /* Local variables */
-    static logical ieee;
-    static integer nbig;
-    static real dmin__, emin, emax;
-    static integer ndiv, iter;
-    static real qmin, temp, qmax, zmax;
-    static integer splt;
-    static real d__, e;
-    static integer k;
-    static real s, t;
-    static integer nfail;
-    static real desig, trace, sigma;
-    static integer iinfo, i0, i4, n0;
-    extern /* Subroutine */ int slasq3_(integer *, integer *, real *, integer 
+    real d__, e;
+    integer k;
+    real s, t;
+    integer i0, i4, n0;
+    real dn;
+    integer pp;
+    real dn1, dn2, eps, tau, tol;
+    integer ipn4;
+    real tol2;
+    logical ieee;
+    integer nbig;
+    real dmin__, emin, emax;
+    integer ndiv, iter;
+    real qmin, temp, qmax, zmax;
+    integer splt;
+    real dmin1, dmin2;
+    integer nfail;
+    real desig, trace, sigma;
+    integer iinfo, ttype;
+    extern /* Subroutine */ int slazq3_(integer *, integer *, real *, integer 
 	    *, real *, real *, real *, real *, integer *, integer *, integer *
-	    , logical *);
-    static integer pp;
+, logical *, integer *, real *, real *, real *, real *, real *, 
+	    real *);
     extern doublereal slamch_(char *);
-    static integer iwhila, iwhilb;
-    static real oldemn, safmin;
+    integer iwhila, iwhilb;
+    real oldemn, safmin;
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
     extern /* Subroutine */ int slasrt_(char *, integer *, real *, integer *);
-    static real eps, tol;
-    static integer ipn4;
-    static real tol2;
 
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     Modified to call SLAZQ3 in place of SLASQ3, 13 Feb 03, SJH. */
 
-    Purpose   
-    =======   
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    SLASQ2 computes all the eigenvalues of the symmetric positive   
-    definite tridiagonal matrix associated with the qd array Z to high   
-    relative accuracy are computed to high relative accuracy, in the   
-    absence of denormalization, underflow and overflow.   
+/*  Purpose */
+/*  ======= */
 
-    To see the relation of Z to the tridiagonal matrix, let L be a   
-    unit lower bidiagonal matrix with subdiagonals Z(2,4,6,,..) and   
-    let U be an upper bidiagonal matrix with 1's above and diagonal   
-    Z(1,3,5,,..). The tridiagonal is L*U or, if you prefer, the   
-    symmetric tridiagonal to which it is similar.   
+/*  SLASQ2 computes all the eigenvalues of the symmetric positive */
+/*  definite tridiagonal matrix associated with the qd array Z to high */
+/*  relative accuracy are computed to high relative accuracy, in the */
+/*  absence of denormalization, underflow and overflow. */
 
-    Note : SLASQ2 defines a logical variable, IEEE, which is true   
-    on machines which follow ieee-754 floating-point standard in their   
-    handling of infinities and NaNs, and false otherwise. This variable   
-    is passed to SLASQ3.   
+/*  To see the relation of Z to the tridiagonal matrix, let L be a */
+/*  unit lower bidiagonal matrix with subdiagonals Z(2,4,6,,..) and */
+/*  let U be an upper bidiagonal matrix with 1's above and diagonal */
+/*  Z(1,3,5,,..). The tridiagonal is L*U or, if you prefer, the */
+/*  symmetric tridiagonal to which it is similar. */
 
-    Arguments   
-    =========   
+/*  Note : SLASQ2 defines a logical variable, IEEE, which is true */
+/*  on machines which follow ieee-754 floating-point standard in their */
+/*  handling of infinities and NaNs, and false otherwise. This variable */
+/*  is passed to SLAZQ3. */
 
-    N     (input) INTEGER   
-          The number of rows and columns in the matrix. N >= 0.   
+/*  Arguments */
+/*  ========= */
 
-    Z     (workspace) REAL array, dimension ( 4*N )   
-          On entry Z holds the qd array. On exit, entries 1 to N hold   
-          the eigenvalues in decreasing order, Z( 2*N+1 ) holds the   
-          trace, and Z( 2*N+2 ) holds the sum of the eigenvalues. If   
-          N > 2, then Z( 2*N+3 ) holds the iteration count, Z( 2*N+4 )   
-          holds NDIVS/NIN^2, and Z( 2*N+5 ) holds the percentage of   
-          shifts that failed.   
+/*  N     (input) INTEGER */
+/*        The number of rows and columns in the matrix. N >= 0. */
 
-    INFO  (output) INTEGER   
-          = 0: successful exit   
-          < 0: if the i-th argument is a scalar and had an illegal   
-               value, then INFO = -i, if the i-th argument is an   
-               array and the j-entry had an illegal value, then   
-               INFO = -(i*100+j)   
-          > 0: the algorithm failed   
-                = 1, a split was marked by a positive value in E   
-                = 2, current block of Z not diagonalized after 30*N   
-                     iterations (in inner while loop)   
-                = 3, termination criterion of outer while loop not met   
-                     (program created more than N unreduced blocks)   
+/*  Z     (workspace) REAL array, dimension (4*N) */
+/*        On entry Z holds the qd array. On exit, entries 1 to N hold */
+/*        the eigenvalues in decreasing order, Z( 2*N+1 ) holds the */
+/*        trace, and Z( 2*N+2 ) holds the sum of the eigenvalues. If */
+/*        N > 2, then Z( 2*N+3 ) holds the iteration count, Z( 2*N+4 ) */
+/*        holds NDIVS/NIN^2, and Z( 2*N+5 ) holds the percentage of */
+/*        shifts that failed. */
 
-    Further Details   
-    ===============   
-    Local Variables: I0:N0 defines a current unreduced segment of Z.   
-    The shifts are accumulated in SIGMA. Iteration count is in ITER.   
-    Ping-pong is controlled by PP (alternates between 0 and 1).   
+/*  INFO  (output) INTEGER */
+/*        = 0: successful exit */
+/*        < 0: if the i-th argument is a scalar and had an illegal */
+/*             value, then INFO = -i, if the i-th argument is an */
+/*             array and the j-entry had an illegal value, then */
+/*             INFO = -(i*100+j) */
+/*        > 0: the algorithm failed */
+/*              = 1, a split was marked by a positive value in E */
+/*              = 2, current block of Z not diagonalized after 30*N */
+/*                   iterations (in inner while loop) */
+/*              = 3, termination criterion of outer while loop not met */
+/*                   (program created more than N unreduced blocks) */
 
-    =====================================================================   
+/*  Further Details */
+/*  =============== */
+/*  Local Variables: I0:N0 defines a current unreduced segment of Z. */
+/*  The shifts are accumulated in SIGMA. Iteration count is in ITER. */
+/*  Ping-pong is controlled by PP (alternates between 0 and 1). */
 
+/*  ===================================================================== */
 
-       Test the input arguments.   
-       (in case SLASQ2 is not called by SLASQ1)   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+/*     Test the input arguments. */
+/*     (in case SLASQ2 is not called by SLASQ1) */
+
+    /* Parameter adjustments */
     --z__;
 
     /* Function Body */
@@ -243,9 +258,8 @@ static integer c__11 = 11;
 
 /*     Check whether the machine is IEEE conformable. */
 
-    ieee = ilaenv_(&c__10, "SLASQ2", "N", &c__1, &c__2, &c__3, &c__4, (ftnlen)
-	    6, (ftnlen)1) == 1 && ilaenv_(&c__11, "SLASQ2", "N", &c__1, &c__2,
-	     &c__3, &c__4, (ftnlen)6, (ftnlen)1) == 1;
+    ieee = ilaenv_(&c__10, "SLASQ2", "N", &c__1, &c__2, &c__3, &c__4) == 1 && ilaenv_(&c__11, "SLASQ2", "N", &c__1, &c__2, 
+	     &c__3, &c__4) == 1;
 
 /*     Rearrange data for locality: Z=(q1,qq1,e1,ee1,q2,qq2,e2,ee2,...). */
 
@@ -286,7 +300,7 @@ static integer c__11 = 11;
 	i__1 = (i0 << 2) + pp;
 	for (i4 = (n0 - 1 << 2) + pp; i4 >= i__1; i4 += -4) {
 	    if (z__[i4 - 1] <= tol2 * d__) {
-		z__[i4 - 1] = 0.f;
+		z__[i4 - 1] = -0.f;
 		d__ = z__[i4 - 3];
 	    } else {
 		d__ = z__[i4 - 3] * (d__ / (d__ + z__[i4 - 1]));
@@ -302,7 +316,7 @@ static integer c__11 = 11;
 	for (i4 = (i0 << 2) + pp; i4 <= i__1; i4 += 4) {
 	    z__[i4 - (pp << 1) - 2] = d__ + z__[i4 - 1];
 	    if (z__[i4 - 1] <= tol2 * d__) {
-		z__[i4 - 1] = 0.f;
+		z__[i4 - 1] = -0.f;
 		z__[i4 - (pp << 1) - 2] = d__;
 		z__[i4 - (pp << 1)] = 0.f;
 		d__ = z__[i4 + 1];
@@ -340,6 +354,16 @@ static integer c__11 = 11;
 /* L80: */
     }
 
+/*     Initialise variables to pass to SLAZQ3 */
+
+    ttype = 0;
+    dmin1 = 0.f;
+    dmin2 = 0.f;
+    dn = 0.f;
+    dn1 = 0.f;
+    dn2 = 0.f;
+    tau = 0.f;
+
     iter = 2;
     nfail = 0;
     ndiv = n0 - i0 << 1;
@@ -350,10 +374,10 @@ static integer c__11 = 11;
 	    goto L150;
 	}
 
-/*        While array unfinished do   
+/*        While array unfinished do */
 
-          E(N0) holds the value of SIGMA when submatrix in I0:N0   
-          splits from the rest of the array, but is negated. */
+/*        E(N0) holds the value of SIGMA when submatrix in I0:N0 */
+/*        splits from the rest of the array, but is negated. */
 
 	desig = 0.f;
 	if (n0 == *n) {
@@ -366,8 +390,8 @@ static integer c__11 = 11;
 	    return 0;
 	}
 
-/*        Find last unreduced submatrix's top index I0, find QMAX and   
-          EMIN. Find Gershgorin-type bound if Q's much greater than E's. */
+/*        Find last unreduced submatrix's top index I0, find QMAX and */
+/*        EMIN. Find Gershgorin-type bound if Q's much greater than E's. */
 
 	emax = 0.f;
 	if (n0 > i0) {
@@ -402,13 +426,13 @@ static integer c__11 = 11;
 L100:
 	i0 = i4 / 4;
 
-/*        Store EMIN for passing to SLASQ3. */
+/*        Store EMIN for passing to SLAZQ3. */
 
 	z__[(n0 << 2) - 1] = emin;
 
-/*        Put -(initial shift) into DMIN.   
+/*        Put -(initial shift) into DMIN. */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = 0.f, r__2 = qmin - sqrt(qmin) * 2.f * sqrt(emax);
 	dmin__ = -dmax(r__1,r__2);
 
@@ -425,8 +449,9 @@ L100:
 
 /*           While submatrix unfinished take a good dqds step. */
 
-	    slasq3_(&i0, &n0, &z__[1], &pp, &dmin__, &sigma, &desig, &qmax, &
-		    nfail, &iter, &ndiv, &ieee);
+	    slazq3_(&i0, &n0, &z__[1], &pp, &dmin__, &sigma, &desig, &qmax, &
+		    nfail, &iter, &ndiv, &ieee, &ttype, &dmin1, &dmin2, &dn, &
+		    dn1, &dn2, &tau);
 
 	    pp = 1 - pp;
 
@@ -520,4 +545,3 @@ L150:
 /*     End of SLASQ2 */
 
 } /* slasq2_ */
-

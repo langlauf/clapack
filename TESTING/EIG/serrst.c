@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -33,16 +28,14 @@ static real c_b221 = 1.f;
 static integer c__23 = 23;
 static integer c__28 = 28;
 static integer c__12 = 12;
-static integer c__22 = 22;
 static integer c__19 = 19;
 static integer c__11 = 11;
-static integer c__27 = 27;
 static integer c__4 = 4;
 static integer c__20 = 20;
 static integer c__5 = 5;
+static integer c__27 = 27;
 static integer c__16 = 16;
 static integer c__8 = 8;
-static integer c__7 = 7;
 static integer c__25 = 25;
 static integer c__18 = 18;
 
@@ -63,22 +56,21 @@ static integer c__18 = 18;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static real a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */, d__[
-	    3], e[3];
-    static integer i__, j, m, n;
-    static real q[9]	/* was [3][3] */, r__[3], w[60], x[3], z__[9]	/* 
-	    was [3][3] */;
+    real a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */, d__[3], e[3]
+	    ;
+    integer i__, j, m, n;
+    real q[9]	/* was [3][3] */, r__[3], w[60], x[3], z__[9]	/* was [3][3] 
+	    */;
+    char c2[2];
+    integer i1[3], i2[3], i3[3], iw[36], nt;
+    real tau[3];
+    integer info;
     extern /* Subroutine */ int ssbev_(char *, char *, integer *, integer *, 
-	    real *, integer *, real *, real *, integer *, real *, integer *);
-    static char c2[2];
-    static integer i1[3], i2[3], i3[3];
-    extern /* Subroutine */ int sspev_(char *, char *, integer *, real *, 
-	    real *, real *, integer *, real *, integer *), 
-	    sstev_(char *, integer *, real *, real *, real *, integer *, real 
-	    *, integer *), ssyev_(char *, char *, integer *, real *, 
+	    real *, integer *, real *, real *, integer *, real *, integer *), sspev_(char *, char *, integer *, real *, real *, 
+	     real *, integer *, real *, integer *), sstev_(
+	    char *, integer *, real *, real *, real *, integer *, real *, 
+	    integer *), ssyev_(char *, char *, integer *, real *, 
 	    integer *, real *, real *, integer *, integer *);
-    static integer iw[36], nt;
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), sstedc_(char *, integer *, real *, real *, 
@@ -94,17 +86,17 @@ static integer c__18 = 18;
 	    integer *, integer *), ssterf_(integer *, real *, real *, integer 
 	    *), sstevd_(char *, integer *, real *, real *, real *, integer *, 
 	    real *, integer *, integer *, integer *, integer *);
-    static integer nsplit;
+    integer nsplit;
     extern /* Subroutine */ int ssbevx_(char *, char *, char *, integer *, 
 	    integer *, real *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *, integer *)
+, real *, integer *, integer *, integer *)
 	    , sstebz_(char *, char *, integer *, real *, real *, integer *, 
 	    integer *, real *, real *, real *, integer *, integer *, real *, 
 	    integer *, integer *, real *, integer *, integer *), ssyevd_(char *, char *, integer *, real *, integer *, 
 	    real *, real *, integer *, integer *, integer *, integer *), sopgtr_(char *, integer *, real *, real *, real *
-	    , integer *, real *, integer *), spteqr_(char *, integer *
-	    , real *, real *, real *, integer *, real *, integer *), 
+, integer *, real *, integer *), spteqr_(char *, integer *
+, real *, real *, real *, integer *, real *, integer *), 
 	    sorgtr_(char *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *), ssptrd_(char *, integer *, real *, 
 	    real *, real *, real *, integer *), ssteqr_(char *, 
@@ -114,8 +106,8 @@ static integer c__18 = 18;
 	    integer *, integer *), sstevr_(char *, 
 	    char *, integer *, real *, real *, real *, real *, integer *, 
 	    integer *, real *, integer *, real *, real *, integer *, integer *
-	    , real *, integer *, integer *, integer *, integer *), sspevx_(char *, char *, char *, integer *, real *, real *
-	    , real *, integer *, integer *, real *, integer *, real *, real *,
+, real *, integer *, integer *, integer *, integer *), sspevx_(char *, char *, char *, integer *, real *, real *
+, real *, integer *, integer *, real *, integer *, real *, real *, 
 	     integer *, real *, integer *, integer *, integer *), ssytrd_(char *, integer *, real *, integer *, 
 	    real *, real *, real *, real *, integer *, integer *), 
 	    ssyevr_(char *, char *, char *, integer *, real *, integer *, 
@@ -127,8 +119,7 @@ static integer c__18 = 18;
 	    integer *, integer *, integer *), ssyevx_(char *, 
 	    char *, char *, integer *, real *, integer *, real *, real *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *, integer *, integer *, integer *);
-    static real tau[3];
+, real *, integer *, integer *, integer *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -137,35 +128,50 @@ static integer c__18 = 18;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*3 + a_1 - 4]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRST tests the error exits for SSYTRD, SORGTR, SORMTR, SSPTRD, */
+/*  SOPGTR, SOPMTR, SSTEQR, SSTERF, SSTEBZ, SSTEIN, SPTEQR, SSBTRD, */
+/*  SSYEV, SSYEVX, SSYEVD, SSBEV, SSBEVX, SSBEVD, */
+/*  SSPEV, SSPEVX, SSPEVD, SSTEV, SSTEVX, SSTEVD, and SSTEDC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRST tests the error exits for SSYTRD, SORGTR, SORMTR, SSPTRD,   
-    SOPGTR, SOPMTR, SSTEQR, SSTERF, SSTEBZ, SSTEIN, SPTEQR, SSBTRD,   
-    SSYEV, SSYEVX, SSYEVD, SSBEV, SSBEVX, SSBEVD,   
-    SSPEV, SSPEVX, SSPEVD, SSTEV, SSTEVX, SSTEVD, and SSTEDC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    =====================================================================   
-
-       NMAX has to be at least 3 or LIW may be too small */
+/*     NMAX has to be at least 3 or LIW may be too small */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -177,7 +183,7 @@ static integer c__18 = 18;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    a_ref(i__, j) = 1.f / (real) (i__ + j);
+	    a[i__ + j * 3 - 4] = 1.f / (real) (i__ + j);
 /* L10: */
 	}
 /* L20: */
@@ -378,42 +384,42 @@ static integer c__18 = 18;
 
 	s_copy(srnamc_1.srnamt, "SSTEBZ", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	sstebz_("/", "E", &c__0, &c_b220, &c_b221, &c__1, &c__0, &c_b220, d__,
+	sstebz_("/", "E", &c__0, &c_b220, &c_b221, &c__1, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	sstebz_("A", "/", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	sstebz_("A", "/", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	sstebz_("A", "E", &c_n1, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	sstebz_("A", "E", &c_n1, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 5;
-	sstebz_("V", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	sstebz_("V", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	sstebz_("I", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__,
+	sstebz_("I", "E", &c__0, &c_b220, &c_b220, &c__0, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__2, &c__1, &c_b220, d__,
+	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__2, &c__1, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__0, &c_b220, d__,
+	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__0, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 7;
-	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__2, &c_b220, d__,
+	sstebz_("I", "E", &c__1, &c_b220, &c_b220, &c__1, &c__2, &c_b220, d__, 
 		 e, &m, &nsplit, x, i1, i2, w, iw, &info);
 	chkxer_("SSTEBZ", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -490,11 +496,11 @@ static integer c__18 = 18;
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	sstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__12, iw, &c__12, &info);
+	sstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__0, iw, &c__12, &info);
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	sstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__22, iw, &c__28, &info);
+	sstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__0, iw, &c__28, &info);
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
@@ -502,11 +508,11 @@ static integer c__18 = 18;
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	sstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__19, iw, &c__11, &info);
+	sstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__19, iw, &c__0, &info);
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	sstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__23, iw, &c__27, &info);
+	sstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__23, iw, &c__0, &info);
 	chkxer_("SSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 9;
@@ -914,7 +920,7 @@ static integer c__18 = 18;
 		infoc_1.ok);
 	infoc_1.infot = 17;
 	ssyevx_("V", "A", "U", &c__1, a, &c__1, &c_b220, &c_b220, &c__0, &
-		c__0, &c_b220, &m, x, z__, &c__1, w, &c__7, iw, i3, &info);
+		c__0, &c_b220, &m, x, z__, &c__1, w, &c__0, iw, i3, &info);
 	chkxer_("SSYEVX", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 12;
@@ -1084,27 +1090,27 @@ static integer c__18 = 18;
 
 	s_copy(srnamc_1.srnamt, "SSBEVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	ssbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	ssbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	ssbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	ssbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	ssbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	ssbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	ssbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	ssbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	ssbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__4, iw,
+	ssbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__4, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1114,12 +1120,12 @@ static integer c__18 = 18;
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	ssbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, iw,
+	ssbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	ssbevd_("N", "U", &c__2, &c__0, a, &c__1, x, z__, &c__1, w, &c__3, iw,
+	ssbevd_("N", "U", &c__2, &c__0, a, &c__1, x, z__, &c__1, w, &c__3, iw, 
 		 &c__1, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1129,7 +1135,7 @@ static integer c__18 = 18;
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	ssbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw,
+	ssbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, iw, 
 		 &c__0, &info);
 	chkxer_("SSBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1272,7 +1278,3 @@ static integer c__18 = 18;
 /*     End of SERRST */
 
 } /* serrst_ */
-
-#undef a_ref
-
-

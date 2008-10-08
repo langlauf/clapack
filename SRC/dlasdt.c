@@ -1,69 +1,82 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dlasdt_(integer *n, integer *lvl, integer *nd, integer *
 	inode, integer *ndiml, integer *ndimr, integer *msub)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    DLASDT creates a tree of subproblems for bidiagonal divide and   
-    conquer.   
-
-    Arguments   
-    =========   
-
-     N      (input) INTEGER   
-            On entry, the number of diagonal elements of the   
-            bidiagonal matrix.   
-
-     LVL    (output) INTEGER   
-            On exit, the number of levels on the computation tree.   
-
-     ND     (output) INTEGER   
-            On exit, the number of nodes on the tree.   
-
-     INODE  (output) INTEGER array, dimension ( N )   
-            On exit, centers of subproblems.   
-
-     NDIML  (output) INTEGER array, dimension ( N )   
-            On exit, row dimensions of left children.   
-
-     NDIMR  (output) INTEGER array, dimension ( N )   
-            On exit, row dimensions of right children.   
-
-     MSUB   (input) INTEGER.   
-            On entry, the maximum row dimension each subproblem at the   
-            bottom of the tree can be of.   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Ming Gu and Huan Ren, Computer Science Division, University of   
-       California at Berkeley, USA   
-
-    =====================================================================   
-
-
-       Find the number of levels on the tree.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1, i__2;
+
     /* Builtin functions */
     double log(doublereal);
-    /* Local variables */
-    static integer maxn;
-    static doublereal temp;
-    static integer nlvl, llst, i__, ncrnt, il, ir;
 
+    /* Local variables */
+    integer i__, il, ir, maxn;
+    doublereal temp;
+    integer nlvl, llst, ncrnt;
+
+
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLASDT creates a tree of subproblems for bidiagonal divide and */
+/*  conquer. */
+
+/*  Arguments */
+/*  ========= */
+
+/*   N      (input) INTEGER */
+/*          On entry, the number of diagonal elements of the */
+/*          bidiagonal matrix. */
+
+/*   LVL    (output) INTEGER */
+/*          On exit, the number of levels on the computation tree. */
+
+/*   ND     (output) INTEGER */
+/*          On exit, the number of nodes on the tree. */
+
+/*   INODE  (output) INTEGER array, dimension ( N ) */
+/*          On exit, centers of subproblems. */
+
+/*   NDIML  (output) INTEGER array, dimension ( N ) */
+/*          On exit, row dimensions of left children. */
+
+/*   NDIMR  (output) INTEGER array, dimension ( N ) */
+/*          On exit, row dimensions of right children. */
+
+/*   MSUB   (input) INTEGER. */
+/*          On entry, the maximum row dimension each subproblem at the */
+/*          bottom of the tree can be of. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*     Ming Gu and Huan Ren, Computer Science Division, University of */
+/*     California at Berkeley, USA */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Find the number of levels on the tree. */
+
+    /* Parameter adjustments */
     --ndimr;
     --ndiml;
     --inode;
@@ -83,8 +96,8 @@
     i__1 = *lvl - 1;
     for (nlvl = 1; nlvl <= i__1; ++nlvl) {
 
-/*        Constructing the tree at (NLVL+1)-st level. The number of   
-          nodes created on this level is LLST * 2. */
+/*        Constructing the tree at (NLVL+1)-st level. The number of */
+/*        nodes created on this level is LLST * 2. */
 
 	i__2 = llst - 1;
 	for (i__ = 0; i__ <= i__2; ++i__) {
@@ -109,4 +122,3 @@
 /*     End of DLASDT */
 
 } /* dlasdt_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -21,86 +16,97 @@ static doublereal c_b9 = 1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j;
+    integer j;
+    doublereal eps;
     extern /* Subroutine */ int dgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal bnorm;
+    doublereal bnorm;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
-    static doublereal realmn, eps;
+    doublereal realmn;
 
 
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DBDT02 tests the change of basis C = U' * B by computing the residual */
 
-    Purpose   
-    =======   
+/*     RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ), */
 
-    DBDT02 tests the change of basis C = U' * B by computing the residual   
+/*  where B and C are M by N matrices, U is an M by M orthogonal matrix, */
+/*  and EPS is the machine precision. */
 
-       RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
+/*  Arguments */
+/*  ========= */
 
-    where B and C are M by N matrices, U is an M by M orthogonal matrix,   
-    and EPS is the machine precision.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices B and C and the order of */
+/*          the matrix Q. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices B and C. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices B and C and the order of   
-            the matrix Q.   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,N) */
+/*          The m by n matrix B. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices B and C.   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B.  LDB >= max(1,M). */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
-            The m by n matrix B.   
+/*  C       (input) DOUBLE PRECISION array, dimension (LDC,N) */
+/*          The m by n matrix C, assumed to contain U' * B. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the array B.  LDB >= max(1,M).   
+/*  LDC     (input) INTEGER */
+/*          The leading dimension of the array C.  LDC >= max(1,M). */
 
-    C       (input) DOUBLE PRECISION array, dimension (LDC,N)   
-            The m by n matrix C, assumed to contain U' * B.   
+/*  U       (input) DOUBLE PRECISION array, dimension (LDU,M) */
+/*          The m by m orthogonal matrix U. */
 
-    LDC     (input) INTEGER   
-            The leading dimension of the array C.  LDC >= max(1,M).   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of the array U.  LDU >= max(1,M). */
 
-    U       (input) DOUBLE PRECISION array, dimension (LDU,M)   
-            The m by m orthogonal matrix U.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (M) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of the array U.  LDU >= max(1,M).   
+/*  RESID   (output) DOUBLE PRECISION */
+/*          RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ), */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (M)   
+/* ====================================================================== */
 
-    RESID   (output) DOUBLE PRECISION   
-            RESID = norm( B - U * C ) / ( max(m,n) * norm(B) * EPS ),   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-   ======================================================================   
+/*     Quick return if possible */
 
-
-       Quick return if possible   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
 
@@ -116,9 +122,9 @@ static doublereal c_b9 = 1.;
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
-	dcopy_(m, &b_ref(1, j), &c__1, &work[1], &c__1);
-	dgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c___ref(1, j),
-		 &c__1, &c_b9, &work[1], &c__1);
+	dcopy_(m, &b[j * b_dim1 + 1], &c__1, &work[1], &c__1);
+	dgemv_("No transpose", m, m, &c_b7, &u[u_offset], ldu, &c__[j * 
+		c_dim1 + 1], &c__1, &c_b9, &work[1], &c__1);
 /* Computing MAX */
 	d__1 = *resid, d__2 = dasum_(m, &work[1], &c__1);
 	*resid = max(d__1,d__2);
@@ -153,8 +159,3 @@ static doublereal c_b9 = 1.;
 /*     End of DBDT02 */
 
 } /* dbdt02_ */
-
-#undef c___ref
-#undef b_ref
-
-

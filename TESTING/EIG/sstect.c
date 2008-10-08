@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int sstect_(integer *n, real *a, real *b, real *shift, 
 	integer *num)
@@ -17,55 +12,66 @@
     double sqrt(doublereal);
 
     /* Local variables */
-    static real unfl, ovfl, ssun;
-    static integer i__;
-    static real u, m1, m2, mx;
+    integer i__;
+    real u, m1, m2, mx, tmp, tom, sun, sov, unfl, ovfl, ssun;
     extern doublereal slamch_(char *);
-    static real sshift, tmp, tom, sun, sov;
+    real sshift;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-       SSTECT counts the number NUM of eigenvalues of a tridiagonal   
-       matrix T which are less than or equal to SHIFT. T has   
-       diagonal entries A(1), ... , A(N), and offdiagonal entries   
-       B(1), ..., B(N-1).   
-       See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal   
-       Matrix", Report CS41, Computer Science Dept., Stanford   
-       University, July 21, 1966   
+/*     SSTECT counts the number NUM of eigenvalues of a tridiagonal */
+/*     matrix T which are less than or equal to SHIFT. T has */
+/*     diagonal entries A(1), ... , A(N), and offdiagonal entries */
+/*     B(1), ..., B(N-1). */
+/*     See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal */
+/*     Matrix", Report CS41, Computer Science Dept., Stanford */
+/*     University, July 21, 1966 */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    N       (input) INTEGER   
-            The dimension of the tridiagonal matrix T.   
+/*  N       (input) INTEGER */
+/*          The dimension of the tridiagonal matrix T. */
 
-    A       (input) REAL array, dimension (N)   
-            The diagonal entries of the tridiagonal matrix T.   
+/*  A       (input) REAL array, dimension (N) */
+/*          The diagonal entries of the tridiagonal matrix T. */
 
-    B       (input) REAL array, dimension (N-1)   
-            The offdiagonal entries of the tridiagonal matrix T.   
+/*  B       (input) REAL array, dimension (N-1) */
+/*          The offdiagonal entries of the tridiagonal matrix T. */
 
-    SHIFT   (input) REAL   
-            The shift, used as described under Purpose.   
+/*  SHIFT   (input) REAL */
+/*          The shift, used as described under Purpose. */
 
-    NUM     (output) INTEGER   
-            The number of eigenvalues of T less than or equal   
-            to SHIFT.   
+/*  NUM     (output) INTEGER */
+/*          The number of eigenvalues of T less than or equal */
+/*          to SHIFT. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Get machine constants   
+/*     Get machine constants */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --b;
     --a;
 
@@ -96,8 +102,8 @@
 	return 0;
     }
 
-/*     Compute scale factors as in Kahan's report   
-       At this point, MX .NE. 0 so we can divide by it */
+/*     Compute scale factors as in Kahan's report */
+/*     At this point, MX .NE. 0 so we can divide by it */
 
     sun = sqrt(unfl);
     ssun = sqrt(sun);
@@ -147,4 +153,3 @@
 /*     End of SSTECT */
 
 } /* sstect_ */
-

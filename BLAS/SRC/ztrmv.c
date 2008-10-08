@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int ztrmv_(char *uplo, char *trans, char *diag, integer *n, 
 	doublecomplex *a, integer *lda, doublecomplex *x, integer *incx)
@@ -7,88 +7,132 @@
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
     doublecomplex z__1, z__2, z__3;
+
     /* Builtin functions */
     void d_cnjg(doublecomplex *, doublecomplex *);
+
     /* Local variables */
-    static integer info;
-    static doublecomplex temp;
-    static integer i__, j;
+    integer i__, j, ix, jx, kx, info;
+    doublecomplex temp;
     extern logical lsame_(char *, char *);
-    static integer ix, jx, kx;
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static logical noconj, nounit;
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-/*  Purpose   
-    =======   
-    ZTRMV  performs one of the matrix-vector operations   
-       x := A*x,   or   x := A'*x,   or   x := conjg( A' )*x,   
-    where x is an n element vector and  A is an n by n unit, or non-unit,   
-    upper or lower triangular matrix.   
-    Parameters   
-    ==========   
-    UPLO   - CHARACTER*1.   
-             On entry, UPLO specifies whether the matrix is an upper or   
-             lower triangular matrix as follows:   
-                UPLO = 'U' or 'u'   A is an upper triangular matrix.   
-                UPLO = 'L' or 'l'   A is a lower triangular matrix.   
-             Unchanged on exit.   
-    TRANS  - CHARACTER*1.   
-             On entry, TRANS specifies the operation to be performed as   
-             follows:   
-                TRANS = 'N' or 'n'   x := A*x.   
-                TRANS = 'T' or 't'   x := A'*x.   
-                TRANS = 'C' or 'c'   x := conjg( A' )*x.   
-             Unchanged on exit.   
-    DIAG   - CHARACTER*1.   
-             On entry, DIAG specifies whether or not A is unit   
-             triangular as follows:   
-                DIAG = 'U' or 'u'   A is assumed to be unit triangular.   
-                DIAG = 'N' or 'n'   A is not assumed to be unit   
-                                    triangular.   
-             Unchanged on exit.   
-    N      - INTEGER.   
-             On entry, N specifies the order of the matrix A.   
-             N must be at least zero.   
-             Unchanged on exit.   
-    A      - COMPLEX*16       array of DIMENSION ( LDA, n ).   
-             Before entry with  UPLO = 'U' or 'u', the leading n by n   
-             upper triangular part of the array A must contain the upper   
-             triangular matrix and the strictly lower triangular part of   
-             A is not referenced.   
-             Before entry with UPLO = 'L' or 'l', the leading n by n   
-             lower triangular part of the array A must contain the lower   
-             triangular matrix and the strictly upper triangular part of   
-             A is not referenced.   
-             Note that when  DIAG = 'U' or 'u', the diagonal elements of   
-             A are not referenced either, but are assumed to be unity.   
-             Unchanged on exit.   
-    LDA    - INTEGER.   
-             On entry, LDA specifies the first dimension of A as declared   
-             in the calling (sub) program. LDA must be at least   
-             max( 1, n ).   
-             Unchanged on exit.   
-    X      - COMPLEX*16       array of dimension at least   
-             ( 1 + ( n - 1 )*abs( INCX ) ).   
-             Before entry, the incremented array X must contain the n   
-             element vector x. On exit, X is overwritten with the   
-             tranformed vector x.   
-    INCX   - INTEGER.   
-             On entry, INCX specifies the increment for the elements of   
-             X. INCX must not be zero.   
-             Unchanged on exit.   
-    Level 2 Blas routine.   
-    -- Written on 22-October-1986.   
-       Jack Dongarra, Argonne National Lab.   
-       Jeremy Du Croz, Nag Central Office.   
-       Sven Hammarling, Nag Central Office.   
-       Richard Hanson, Sandia National Labs.   
-       Test the input parameters.   
-       Parameter adjustments */
+    logical noconj, nounit;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  ZTRMV  performs one of the matrix-vector operations */
+
+/*     x := A*x,   or   x := A'*x,   or   x := conjg( A' )*x, */
+
+/*  where x is an n element vector and  A is an n by n unit, or non-unit, */
+/*  upper or lower triangular matrix. */
+
+/*  Arguments */
+/*  ========== */
+
+/*  UPLO   - CHARACTER*1. */
+/*           On entry, UPLO specifies whether the matrix is an upper or */
+/*           lower triangular matrix as follows: */
+
+/*              UPLO = 'U' or 'u'   A is an upper triangular matrix. */
+
+/*              UPLO = 'L' or 'l'   A is a lower triangular matrix. */
+
+/*           Unchanged on exit. */
+
+/*  TRANS  - CHARACTER*1. */
+/*           On entry, TRANS specifies the operation to be performed as */
+/*           follows: */
+
+/*              TRANS = 'N' or 'n'   x := A*x. */
+
+/*              TRANS = 'T' or 't'   x := A'*x. */
+
+/*              TRANS = 'C' or 'c'   x := conjg( A' )*x. */
+
+/*           Unchanged on exit. */
+
+/*  DIAG   - CHARACTER*1. */
+/*           On entry, DIAG specifies whether or not A is unit */
+/*           triangular as follows: */
+
+/*              DIAG = 'U' or 'u'   A is assumed to be unit triangular. */
+
+/*              DIAG = 'N' or 'n'   A is not assumed to be unit */
+/*                                  triangular. */
+
+/*           Unchanged on exit. */
+
+/*  N      - INTEGER. */
+/*           On entry, N specifies the order of the matrix A. */
+/*           N must be at least zero. */
+/*           Unchanged on exit. */
+
+/*  A      - COMPLEX*16       array of DIMENSION ( LDA, n ). */
+/*           Before entry with  UPLO = 'U' or 'u', the leading n by n */
+/*           upper triangular part of the array A must contain the upper */
+/*           triangular matrix and the strictly lower triangular part of */
+/*           A is not referenced. */
+/*           Before entry with UPLO = 'L' or 'l', the leading n by n */
+/*           lower triangular part of the array A must contain the lower */
+/*           triangular matrix and the strictly upper triangular part of */
+/*           A is not referenced. */
+/*           Note that when  DIAG = 'U' or 'u', the diagonal elements of */
+/*           A are not referenced either, but are assumed to be unity. */
+/*           Unchanged on exit. */
+
+/*  LDA    - INTEGER. */
+/*           On entry, LDA specifies the first dimension of A as declared */
+/*           in the calling (sub) program. LDA must be at least */
+/*           max( 1, n ). */
+/*           Unchanged on exit. */
+
+/*  X      - COMPLEX*16       array of dimension at least */
+/*           ( 1 + ( n - 1 )*abs( INCX ) ). */
+/*           Before entry, the incremented array X must contain the n */
+/*           element vector x. On exit, X is overwritten with the */
+/*           tranformed vector x. */
+
+/*  INCX   - INTEGER. */
+/*           On entry, INCX specifies the increment for the elements of */
+/*           X. INCX must not be zero. */
+/*           Unchanged on exit. */
+
+
+/*  Level 2 Blas routine. */
+
+/*  -- Written on 22-October-1986. */
+/*     Jack Dongarra, Argonne National Lab. */
+/*     Jeremy Du Croz, Nag Central Office. */
+/*     Sven Hammarling, Nag Central Office. */
+/*     Richard Hanson, Sandia National Labs. */
+
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --x;
+
     /* Function Body */
     info = 0;
     if (! lsame_(uplo, "U") && ! lsame_(uplo, "L")) {
@@ -110,23 +154,32 @@
 	xerbla_("ZTRMV ", &info);
 	return 0;
     }
+
 /*     Quick return if possible. */
+
     if (*n == 0) {
 	return 0;
     }
+
     noconj = lsame_(trans, "T");
     nounit = lsame_(diag, "N");
-/*     Set up the start point in X if the increment is not unity. This   
-       will be  ( N - 1 )*INCX  too small for descending loops. */
+
+/*     Set up the start point in X if the increment is not unity. This */
+/*     will be  ( N - 1 )*INCX  too small for descending loops. */
+
     if (*incx <= 0) {
 	kx = 1 - (*n - 1) * *incx;
     } else if (*incx != 1) {
 	kx = 1;
     }
-/*     Start the operations. In this version the elements of A are   
-       accessed sequentially with one pass through A. */
+
+/*     Start the operations. In this version the elements of A are */
+/*     accessed sequentially with one pass through A. */
+
     if (lsame_(trans, "N")) {
+
 /*        Form  x := A*x. */
+
 	if (lsame_(uplo, "U")) {
 	    if (*incx == 1) {
 		i__1 = *n;
@@ -139,7 +192,7 @@
 			for (i__ = 1; i__ <= i__2; ++i__) {
 			    i__3 = i__;
 			    i__4 = i__;
-			    i__5 = a_subscr(i__, j);
+			    i__5 = i__ + j * a_dim1;
 			    z__2.r = temp.r * a[i__5].r - temp.i * a[i__5].i, 
 				    z__2.i = temp.r * a[i__5].i + temp.i * a[
 				    i__5].r;
@@ -151,7 +204,7 @@
 			if (nounit) {
 			    i__2 = j;
 			    i__3 = j;
-			    i__4 = a_subscr(j, j);
+			    i__4 = j + j * a_dim1;
 			    z__1.r = x[i__3].r * a[i__4].r - x[i__3].i * a[
 				    i__4].i, z__1.i = x[i__3].r * a[i__4].i + 
 				    x[i__3].i * a[i__4].r;
@@ -173,7 +226,7 @@
 			for (i__ = 1; i__ <= i__2; ++i__) {
 			    i__3 = ix;
 			    i__4 = ix;
-			    i__5 = a_subscr(i__, j);
+			    i__5 = i__ + j * a_dim1;
 			    z__2.r = temp.r * a[i__5].r - temp.i * a[i__5].i, 
 				    z__2.i = temp.r * a[i__5].i + temp.i * a[
 				    i__5].r;
@@ -186,7 +239,7 @@
 			if (nounit) {
 			    i__2 = jx;
 			    i__3 = jx;
-			    i__4 = a_subscr(j, j);
+			    i__4 = j + j * a_dim1;
 			    z__1.r = x[i__3].r * a[i__4].r - x[i__3].i * a[
 				    i__4].i, z__1.i = x[i__3].r * a[i__4].i + 
 				    x[i__3].i * a[i__4].r;
@@ -208,7 +261,7 @@
 			for (i__ = *n; i__ >= i__1; --i__) {
 			    i__2 = i__;
 			    i__3 = i__;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    z__2.r = temp.r * a[i__4].r - temp.i * a[i__4].i, 
 				    z__2.i = temp.r * a[i__4].i + temp.i * a[
 				    i__4].r;
@@ -220,7 +273,7 @@
 			if (nounit) {
 			    i__1 = j;
 			    i__2 = j;
-			    i__3 = a_subscr(j, j);
+			    i__3 = j + j * a_dim1;
 			    z__1.r = x[i__2].r * a[i__3].r - x[i__2].i * a[
 				    i__3].i, z__1.i = x[i__2].r * a[i__3].i + 
 				    x[i__2].i * a[i__3].r;
@@ -242,7 +295,7 @@
 			for (i__ = *n; i__ >= i__1; --i__) {
 			    i__2 = ix;
 			    i__3 = ix;
-			    i__4 = a_subscr(i__, j);
+			    i__4 = i__ + j * a_dim1;
 			    z__2.r = temp.r * a[i__4].r - temp.i * a[i__4].i, 
 				    z__2.i = temp.r * a[i__4].i + temp.i * a[
 				    i__4].r;
@@ -255,7 +308,7 @@
 			if (nounit) {
 			    i__1 = jx;
 			    i__2 = jx;
-			    i__3 = a_subscr(j, j);
+			    i__3 = j + j * a_dim1;
 			    z__1.r = x[i__2].r * a[i__3].r - x[i__2].i * a[
 				    i__3].i, z__1.i = x[i__2].r * a[i__3].i + 
 				    x[i__2].i * a[i__3].r;
@@ -268,7 +321,9 @@
 	    }
 	}
     } else {
+
 /*        Form  x := A'*x  or  x := conjg( A' )*x. */
+
 	if (lsame_(uplo, "U")) {
 	    if (*incx == 1) {
 		for (j = *n; j >= 1; --j) {
@@ -276,14 +331,14 @@
 		    temp.r = x[i__1].r, temp.i = x[i__1].i;
 		    if (noconj) {
 			if (nounit) {
-			    i__1 = a_subscr(j, j);
+			    i__1 = j + j * a_dim1;
 			    z__1.r = temp.r * a[i__1].r - temp.i * a[i__1].i, 
 				    z__1.i = temp.r * a[i__1].i + temp.i * a[
 				    i__1].r;
 			    temp.r = z__1.r, temp.i = z__1.i;
 			}
 			for (i__ = j - 1; i__ >= 1; --i__) {
-			    i__1 = a_subscr(i__, j);
+			    i__1 = i__ + j * a_dim1;
 			    i__2 = i__;
 			    z__2.r = a[i__1].r * x[i__2].r - a[i__1].i * x[
 				    i__2].i, z__2.i = a[i__1].r * x[i__2].i + 
@@ -295,14 +350,14 @@
 			}
 		    } else {
 			if (nounit) {
-			    d_cnjg(&z__2, &a_ref(j, j));
+			    d_cnjg(&z__2, &a[j + j * a_dim1]);
 			    z__1.r = temp.r * z__2.r - temp.i * z__2.i, 
 				    z__1.i = temp.r * z__2.i + temp.i * 
 				    z__2.r;
 			    temp.r = z__1.r, temp.i = z__1.i;
 			}
 			for (i__ = j - 1; i__ >= 1; --i__) {
-			    d_cnjg(&z__3, &a_ref(i__, j));
+			    d_cnjg(&z__3, &a[i__ + j * a_dim1]);
 			    i__1 = i__;
 			    z__2.r = z__3.r * x[i__1].r - z__3.i * x[i__1].i, 
 				    z__2.i = z__3.r * x[i__1].i + z__3.i * x[
@@ -325,7 +380,7 @@
 		    ix = jx;
 		    if (noconj) {
 			if (nounit) {
-			    i__1 = a_subscr(j, j);
+			    i__1 = j + j * a_dim1;
 			    z__1.r = temp.r * a[i__1].r - temp.i * a[i__1].i, 
 				    z__1.i = temp.r * a[i__1].i + temp.i * a[
 				    i__1].r;
@@ -333,7 +388,7 @@
 			}
 			for (i__ = j - 1; i__ >= 1; --i__) {
 			    ix -= *incx;
-			    i__1 = a_subscr(i__, j);
+			    i__1 = i__ + j * a_dim1;
 			    i__2 = ix;
 			    z__2.r = a[i__1].r * x[i__2].r - a[i__1].i * x[
 				    i__2].i, z__2.i = a[i__1].r * x[i__2].i + 
@@ -345,7 +400,7 @@
 			}
 		    } else {
 			if (nounit) {
-			    d_cnjg(&z__2, &a_ref(j, j));
+			    d_cnjg(&z__2, &a[j + j * a_dim1]);
 			    z__1.r = temp.r * z__2.r - temp.i * z__2.i, 
 				    z__1.i = temp.r * z__2.i + temp.i * 
 				    z__2.r;
@@ -353,7 +408,7 @@
 			}
 			for (i__ = j - 1; i__ >= 1; --i__) {
 			    ix -= *incx;
-			    d_cnjg(&z__3, &a_ref(i__, j));
+			    d_cnjg(&z__3, &a[i__ + j * a_dim1]);
 			    i__1 = ix;
 			    z__2.r = z__3.r * x[i__1].r - z__3.i * x[i__1].i, 
 				    z__2.i = z__3.r * x[i__1].i + z__3.i * x[
@@ -378,7 +433,7 @@
 		    temp.r = x[i__2].r, temp.i = x[i__2].i;
 		    if (noconj) {
 			if (nounit) {
-			    i__2 = a_subscr(j, j);
+			    i__2 = j + j * a_dim1;
 			    z__1.r = temp.r * a[i__2].r - temp.i * a[i__2].i, 
 				    z__1.i = temp.r * a[i__2].i + temp.i * a[
 				    i__2].r;
@@ -386,7 +441,7 @@
 			}
 			i__2 = *n;
 			for (i__ = j + 1; i__ <= i__2; ++i__) {
-			    i__3 = a_subscr(i__, j);
+			    i__3 = i__ + j * a_dim1;
 			    i__4 = i__;
 			    z__2.r = a[i__3].r * x[i__4].r - a[i__3].i * x[
 				    i__4].i, z__2.i = a[i__3].r * x[i__4].i + 
@@ -398,7 +453,7 @@
 			}
 		    } else {
 			if (nounit) {
-			    d_cnjg(&z__2, &a_ref(j, j));
+			    d_cnjg(&z__2, &a[j + j * a_dim1]);
 			    z__1.r = temp.r * z__2.r - temp.i * z__2.i, 
 				    z__1.i = temp.r * z__2.i + temp.i * 
 				    z__2.r;
@@ -406,7 +461,7 @@
 			}
 			i__2 = *n;
 			for (i__ = j + 1; i__ <= i__2; ++i__) {
-			    d_cnjg(&z__3, &a_ref(i__, j));
+			    d_cnjg(&z__3, &a[i__ + j * a_dim1]);
 			    i__3 = i__;
 			    z__2.r = z__3.r * x[i__3].r - z__3.i * x[i__3].i, 
 				    z__2.i = z__3.r * x[i__3].i + z__3.i * x[
@@ -430,7 +485,7 @@
 		    ix = jx;
 		    if (noconj) {
 			if (nounit) {
-			    i__2 = a_subscr(j, j);
+			    i__2 = j + j * a_dim1;
 			    z__1.r = temp.r * a[i__2].r - temp.i * a[i__2].i, 
 				    z__1.i = temp.r * a[i__2].i + temp.i * a[
 				    i__2].r;
@@ -439,7 +494,7 @@
 			i__2 = *n;
 			for (i__ = j + 1; i__ <= i__2; ++i__) {
 			    ix += *incx;
-			    i__3 = a_subscr(i__, j);
+			    i__3 = i__ + j * a_dim1;
 			    i__4 = ix;
 			    z__2.r = a[i__3].r * x[i__4].r - a[i__3].i * x[
 				    i__4].i, z__2.i = a[i__3].r * x[i__4].i + 
@@ -451,7 +506,7 @@
 			}
 		    } else {
 			if (nounit) {
-			    d_cnjg(&z__2, &a_ref(j, j));
+			    d_cnjg(&z__2, &a[j + j * a_dim1]);
 			    z__1.r = temp.r * z__2.r - temp.i * z__2.i, 
 				    z__1.i = temp.r * z__2.i + temp.i * 
 				    z__2.r;
@@ -460,7 +515,7 @@
 			i__2 = *n;
 			for (i__ = j + 1; i__ <= i__2; ++i__) {
 			    ix += *incx;
-			    d_cnjg(&z__3, &a_ref(i__, j));
+			    d_cnjg(&z__3, &a[i__ + j * a_dim1]);
 			    i__3 = ix;
 			    z__2.r = z__3.r * x[i__3].r - z__3.i * x[i__3].i, 
 				    z__2.i = z__3.r * x[i__3].i + z__3.i * x[
@@ -479,9 +534,9 @@
 	    }
 	}
     }
-    return 0;
-/*     End of ZTRMV . */
-} /* ztrmv_ */
-#undef a_ref
-#undef a_subscr
 
+    return 0;
+
+/*     End of ZTRMV . */
+
+} /* ztrmv_ */

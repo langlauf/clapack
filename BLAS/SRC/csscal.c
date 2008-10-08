@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int csscal_(integer *n, real *sa, complex *cx, integer *incx)
 {
@@ -7,16 +7,34 @@
     integer i__1, i__2, i__3, i__4;
     real r__1, r__2;
     complex q__1;
+
     /* Builtin functions */
     double r_imag(complex *);
+
     /* Local variables */
-    static integer i__, nincx;
-/*     scales a complex vector by a real constant.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, nincx;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     scales a complex vector by a real constant. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --cx;
+
     /* Function Body */
     if (*n <= 0 || *incx <= 0) {
 	return 0;
@@ -24,7 +42,9 @@
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
@@ -38,7 +58,9 @@
 /* L10: */
     }
     return 0;
+
 /*        code for increment equal to 1 */
+
 L20:
     i__2 = *n;
     for (i__ = 1; i__ <= i__2; ++i__) {
@@ -52,4 +74,3 @@ L20:
     }
     return 0;
 } /* csscal_ */
-

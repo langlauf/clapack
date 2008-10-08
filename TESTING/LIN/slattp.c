@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,115 +17,128 @@ static real c_b48 = 1.f;
     real r__1, r__2;
     doublereal d__1, d__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double pow_dd(doublereal *, doublereal *), sqrt(doublereal), r_sign(real *
 	    , real *);
 
     /* Local variables */
-    static real sfac;
-    static integer mode;
-    static char path[3], dist[1];
-    static real unfl, rexp;
-    static char type__[1];
-    static real texp;
+    real c__;
+    integer i__, j;
+    real s, t, x, y, z__;
+    integer jc;
+    real ra;
+    integer jj;
+    real rb;
+    integer jl, kl, jr, ku, iy, jx;
+    real ulp, sfac;
+    integer mode;
+    char path[3], dist[1];
+    real unfl, rexp;
+    char type__[1];
+    real texp;
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
 	    integer *, real *, real *);
-    static real star1, c__, plus1, plus2;
-    static integer i__, j;
-    static real s, bscal, t, x, y, z__;
+    real star1, plus1, plus2, bscal;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static real tscal, anorm, bnorm, tleft, stemp;
-    static logical upper;
+    real tscal, anorm, bnorm, tleft, stemp;
+    logical upper;
     extern /* Subroutine */ int srotg_(real *, real *, real *, real *), 
 	    slatb4_(char *, integer *, integer *, integer *, char *, integer *
-	    , integer *, real *, integer *, real *, char *);
-    static integer jc;
-    static real ra;
-    static integer jj;
-    static real rb;
-    static integer jl, kl;
-    extern /* Subroutine */ int slabad_(real *, real *);
-    static integer jr, ku, iy, jx;
+, integer *, real *, integer *, real *, char *), slabad_(real *, real *);
     extern doublereal slamch_(char *);
-    static char packit[1];
-    static real bignum;
+    char packit[1];
+    real bignum;
     extern integer isamax_(integer *, real *, integer *);
     extern doublereal slarnd_(integer *, integer *);
-    static real cndnum;
-    static integer jcnext, jcount;
+    real cndnum;
+    integer jcnext, jcount;
     extern /* Subroutine */ int slatms_(integer *, integer *, char *, integer 
 	    *, char *, real *, integer *, real *, real *, integer *, integer *
-	    , char *, real *, integer *, real *, integer *), slarnv_(integer *, integer *, integer *, real *);
-    static real smlnum, ulp;
+, char *, real *, integer *, real *, integer *), slarnv_(integer *, integer *, integer *, real *);
+    real smlnum;
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SLATTP generates a triangular test matrix in packed storage.   
-    IMAT and UPLO uniquely specify the properties of the test   
-    matrix, which is returned in the array AP.   
+/*  SLATTP generates a triangular test matrix in packed storage. */
+/*  IMAT and UPLO uniquely specify the properties of the test */
+/*  matrix, which is returned in the array AP. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    IMAT    (input) INTEGER   
-            An integer key describing which matrix to generate for this   
-            path.   
+/*  IMAT    (input) INTEGER */
+/*          An integer key describing which matrix to generate for this */
+/*          path. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the matrix A will be upper or lower   
-            triangular.   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the matrix A will be upper or lower */
+/*          triangular. */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    TRANS   (input) CHARACTER*1   
-            Specifies whether the matrix or its transpose will be used.   
-            = 'N':  No transpose   
-            = 'T':  Transpose   
-            = 'C':  Conjugate transpose (= Transpose)   
+/*  TRANS   (input) CHARACTER*1 */
+/*          Specifies whether the matrix or its transpose will be used. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose */
+/*          = 'C':  Conjugate transpose (= Transpose) */
 
-    DIAG    (output) CHARACTER*1   
-            Specifies whether or not the matrix A is unit triangular.   
-            = 'N':  Non-unit triangular   
-            = 'U':  Unit triangular   
+/*  DIAG    (output) CHARACTER*1 */
+/*          Specifies whether or not the matrix A is unit triangular. */
+/*          = 'N':  Non-unit triangular */
+/*          = 'U':  Unit triangular */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            The seed vector for the random number generator (used in   
-            SLATMS).  Modified on exit.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          The seed vector for the random number generator (used in */
+/*          SLATMS).  Modified on exit. */
 
-    N       (input) INTEGER   
-            The order of the matrix to be generated.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix to be generated. */
 
-    A       (output) REAL array, dimension (N*(N+1)/2)   
-            The upper or lower triangular matrix A, packed columnwise in   
-            a linear array.  The j-th column of A is stored in the array   
-            AP as follows:   
-            if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j;   
-            if UPLO = 'L',   
-               AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n.   
+/*  A       (output) REAL array, dimension (N*(N+1)/2) */
+/*          The upper or lower triangular matrix A, packed columnwise in */
+/*          a linear array.  The j-th column of A is stored in the array */
+/*          AP as follows: */
+/*          if UPLO = 'U', AP((j-1)*j/2 + i) = A(i,j) for 1<=i<=j; */
+/*          if UPLO = 'L', */
+/*             AP((j-1)*(n-j) + j*(j+1)/2 + i-j) = A(i,j) for j<=i<=n. */
 
-    B       (output) REAL array, dimension (N)   
-            The right hand side vector, if IMAT > 10.   
+/*  B       (output) REAL array, dimension (N) */
+/*          The right hand side vector, if IMAT > 10. */
 
-    WORK    (workspace) REAL array, dimension (3*N)   
+/*  WORK    (workspace) REAL array, dimension (3*N) */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0: if INFO = -k, the k-th argument had an illegal value   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0: if INFO = -k, the k-th argument had an illegal value */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     --work;
     --b;
     --a;
@@ -177,10 +185,10 @@ static real c_b48 = 1.f;
 	slatms_(n, n, dist, &iseed[1], type__, &b[1], &mode, &cndnum, &anorm, 
 		&kl, &ku, packit, &a[1], n, &work[1], info);
 
-/*     IMAT > 6:  Unit triangular matrix   
-       The diagonal is deliberately set to something other than 1.   
+/*     IMAT > 6:  Unit triangular matrix */
+/*     The diagonal is deliberately set to something other than 1. */
 
-       IMAT = 7:  Matrix is the identity */
+/*     IMAT = 7:  Matrix is the identity */
 
     } else if (*imat == 7) {
 	if (upper) {
@@ -211,11 +219,11 @@ static real c_b48 = 1.f;
 	    }
 	}
 
-/*     IMAT > 7:  Non-trivial unit triangular matrix   
+/*     IMAT > 7:  Non-trivial unit triangular matrix */
 
-       Generate a unit triangular matrix T with condition CNDNUM by   
-       forming a triangular matrix with known singular values and   
-       filling in the zero entries with Givens rotations. */
+/*     Generate a unit triangular matrix T with condition CNDNUM by */
+/*     forming a triangular matrix with known singular values and */
+/*     filling in the zero entries with Givens rotations. */
 
     } else if (*imat <= 10) {
 	if (upper) {
@@ -246,63 +254,63 @@ static real c_b48 = 1.f;
 	    }
 	}
 
-/*        Since the trace of a unit triangular matrix is 1, the product   
-          of its singular values must be 1.  Let s = sqrt(CNDNUM),   
-          x = sqrt(s) - 1/sqrt(s), y = sqrt(2/(n-2))*x, and z = x**2.   
-          The following triangular matrix has singular values s, 1, 1,   
-          ..., 1, 1/s:   
+/*        Since the trace of a unit triangular matrix is 1, the product */
+/*        of its singular values must be 1.  Let s = sqrt(CNDNUM), */
+/*        x = sqrt(s) - 1/sqrt(s), y = sqrt(2/(n-2))*x, and z = x**2. */
+/*        The following triangular matrix has singular values s, 1, 1, */
+/*        ..., 1, 1/s: */
 
-          1  y  y  y  ...  y  y  z   
-             1  0  0  ...  0  0  y   
-                1  0  ...  0  0  y   
-                   .  ...  .  .  .   
-                       .   .  .  .   
-                           1  0  y   
-                              1  y   
-                                 1   
+/*        1  y  y  y  ...  y  y  z */
+/*           1  0  0  ...  0  0  y */
+/*              1  0  ...  0  0  y */
+/*                 .  ...  .  .  . */
+/*                     .   .  .  . */
+/*                         1  0  y */
+/*                            1  y */
+/*                               1 */
 
-          To fill in the zeros, we first multiply by a matrix with small   
-          condition number of the form   
+/*        To fill in the zeros, we first multiply by a matrix with small */
+/*        condition number of the form */
 
-          1  0  0  0  0  ...   
-             1  +  *  0  0  ...   
-                1  +  0  0  0   
-                   1  +  *  0  0   
-                      1  +  0  0   
-                         ...   
-                            1  +  0   
-                               1  0   
-                                  1   
+/*        1  0  0  0  0  ... */
+/*           1  +  *  0  0  ... */
+/*              1  +  0  0  0 */
+/*                 1  +  *  0  0 */
+/*                    1  +  0  0 */
+/*                       ... */
+/*                          1  +  0 */
+/*                             1  0 */
+/*                                1 */
 
-          Each element marked with a '*' is formed by taking the product   
-          of the adjacent elements marked with '+'.  The '*'s can be   
-          chosen freely, and the '+'s are chosen so that the inverse of   
-          T will have elements of the same magnitude as T.  If the *'s in   
-          both T and inv(T) have small magnitude, T is well conditioned.   
-          The two offdiagonals of T are stored in WORK.   
+/*        Each element marked with a '*' is formed by taking the product */
+/*        of the adjacent elements marked with '+'.  The '*'s can be */
+/*        chosen freely, and the '+'s are chosen so that the inverse of */
+/*        T will have elements of the same magnitude as T.  If the *'s in */
+/*        both T and inv(T) have small magnitude, T is well conditioned. */
+/*        The two offdiagonals of T are stored in WORK. */
 
-          The product of these two matrices has the form   
+/*        The product of these two matrices has the form */
 
-          1  y  y  y  y  y  .  y  y  z   
-             1  +  *  0  0  .  0  0  y   
-                1  +  0  0  .  0  0  y   
-                   1  +  *  .  .  .  .   
-                      1  +  .  .  .  .   
-                         .  .  .  .  .   
-                            .  .  .  .   
-                               1  +  y   
-                                  1  y   
-                                     1   
+/*        1  y  y  y  y  y  .  y  y  z */
+/*           1  +  *  0  0  .  0  0  y */
+/*              1  +  0  0  .  0  0  y */
+/*                 1  +  *  .  .  .  . */
+/*                    1  +  .  .  .  . */
+/*                       .  .  .  .  . */
+/*                          .  .  .  . */
+/*                             1  +  y */
+/*                                1  y */
+/*                                   1 */
 
-          Now we multiply by Givens rotations, using the fact that   
+/*        Now we multiply by Givens rotations, using the fact that */
 
-                [  c   s ] [  1   w ] [ -c  -s ] =  [  1  -w ]   
-                [ -s   c ] [  0   1 ] [  s  -c ]    [  0   1 ]   
-          and   
-                [ -c  -s ] [  1   0 ] [  c   s ] =  [  1   0 ]   
-                [  s  -c ] [  w   1 ] [ -s   c ]    [ -w   1 ]   
+/*              [  c   s ] [  1   w ] [ -c  -s ] =  [  1  -w ] */
+/*              [ -s   c ] [  0   1 ] [  s  -c ]    [  0   1 ] */
+/*        and */
+/*              [ -c  -s ] [  1   0 ] [  c   s ] =  [  1   0 ] */
+/*              [  s  -c ] [  w   1 ] [ -s   c ]    [ -w   1 ] */
 
-          where c = w / sqrt(w**2+4) and s = 2 / sqrt(w**2+4). */
+/*        where c = w / sqrt(w**2+4) and s = 2 / sqrt(w**2+4). */
 
 	star1 = .25f;
 	sfac = .5f;
@@ -343,8 +351,8 @@ static real c_b48 = 1.f;
 
 	if (upper) {
 
-/*           Set the upper triangle of A with a unit triangular matrix   
-             of known condition number. */
+/*           Set the upper triangle of A with a unit triangular matrix */
+/*           of known condition number. */
 
 	    jc = 1;
 	    i__1 = *n;
@@ -368,8 +376,8 @@ static real c_b48 = 1.f;
 	    }
 	} else {
 
-/*           Set the lower triangle of A with a unit triangular matrix   
-             of known condition number. */
+/*           Set the lower triangle of A with a unit triangular matrix */
+/*           of known condition number. */
 
 	    i__1 = *n - 1;
 	    for (i__ = 2; i__ <= i__1; ++i__) {
@@ -473,15 +481,15 @@ static real c_b48 = 1.f;
 	    }
 	}
 
-/*     IMAT > 10:  Pathological test cases.  These triangular matrices   
-       are badly scaled or badly conditioned, so when used in solving a   
-       triangular system they may cause overflow in the solution vector. */
+/*     IMAT > 10:  Pathological test cases.  These triangular matrices */
+/*     are badly scaled or badly conditioned, so when used in solving a */
+/*     triangular system they may cause overflow in the solution vector. */
 
     } else if (*imat == 11) {
 
-/*        Type 11:  Generate a triangular matrix with elements between   
-          -1 and 1. Give the diagonal norm 2 to make it well-conditioned.   
-          Make the right hand side large so that it requires scaling. */
+/*        Type 11:  Generate a triangular matrix with elements between */
+/*        -1 and 1. Give the diagonal norm 2 to make it well-conditioned. */
+/*        Make the right hand side large so that it requires scaling. */
 
 	if (upper) {
 	    jc = 1;
@@ -514,9 +522,9 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 12) {
 
-/*        Type 12:  Make the first diagonal element in the solve small to   
-          cause immediate overflow when dividing by T(j,j).   
-          In type 12, the offdiagonal elements are small (CNORM(j) < 1). */
+/*        Type 12:  Make the first diagonal element in the solve small to */
+/*        cause immediate overflow when dividing by T(j,j). */
+/*        In type 12, the offdiagonal elements are small (CNORM(j) < 1). */
 
 	slarnv_(&c__2, &iseed[1], n, &b[1]);
 /* Computing MAX */
@@ -554,9 +562,9 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 13) {
 
-/*        Type 13:  Make the first diagonal element in the solve small to   
-          cause immediate overflow when dividing by T(j,j).   
-          In type 13, the offdiagonal elements are O(1) (CNORM(j) > 1). */
+/*        Type 13:  Make the first diagonal element in the solve small to */
+/*        cause immediate overflow when dividing by T(j,j). */
+/*        In type 13, the offdiagonal elements are O(1) (CNORM(j) > 1). */
 
 	slarnv_(&c__2, &iseed[1], n, &b[1]);
 	if (upper) {
@@ -587,9 +595,9 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 14) {
 
-/*        Type 14:  T is diagonal with small numbers on the diagonal to   
-          make the growth factor underflow, but a small right hand side   
-          chosen so that the solution does not overflow. */
+/*        Type 14:  T is diagonal with small numbers on the diagonal to */
+/*        make the growth factor underflow, but a small right hand side */
+/*        chosen so that the solution does not overflow. */
 
 	if (upper) {
 	    jcount = 1;
@@ -657,11 +665,11 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 15) {
 
-/*        Type 15:  Make the diagonal elements small to cause gradual   
-          overflow when dividing by T(j,j).  To control the amount of   
-          scaling needed, the matrix is bidiagonal.   
+/*        Type 15:  Make the diagonal elements small to cause gradual */
+/*        overflow when dividing by T(j,j).  To control the amount of */
+/*        scaling needed, the matrix is bidiagonal. */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = 1.f, r__2 = (real) (*n - 1);
 	texp = 1.f / dmax(r__1,r__2);
 	d__1 = (doublereal) smlnum;
@@ -742,10 +750,10 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 17) {
 
-/*        Type 17:  Make the offdiagonal elements large to cause overflow   
-          when adding a column of T.  In the non-transposed case, the   
-          matrix is constructed to cause overflow when adding a column in   
-          every other step. */
+/*        Type 17:  Make the offdiagonal elements large to cause overflow */
+/*        when adding a column of T.  In the non-transposed case, the */
+/*        matrix is constructed to cause overflow when adding a column in */
+/*        every other step. */
 
 	tscal = unfl / ulp;
 	tscal = (1.f - ulp) / tscal;
@@ -791,9 +799,9 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 18) {
 
-/*        Type 18:  Generate a unit triangular matrix with elements   
-          between -1 and 1, and make the right hand side large so that it   
-          requires scaling. */
+/*        Type 18:  Generate a unit triangular matrix with elements */
+/*        between -1 and 1, and make the right hand side large so that it */
+/*        requires scaling. */
 
 	if (upper) {
 	    jc = 1;
@@ -829,11 +837,11 @@ static real c_b48 = 1.f;
 
     } else if (*imat == 19) {
 
-/*        Type 19:  Generate a triangular matrix with elements between   
-          BIGNUM/(n-1) and BIGNUM so that at least one of the column   
-          norms will exceed BIGNUM.   
+/*        Type 19:  Generate a triangular matrix with elements between */
+/*        BIGNUM/(n-1) and BIGNUM so that at least one of the column */
+/*        norms will exceed BIGNUM. */
 
-   Computing MAX */
+/* Computing MAX */
 	r__1 = 1.f, r__2 = (real) (*n - 1);
 	tleft = bignum / dmax(r__1,r__2);
 /* Computing MAX */
@@ -873,8 +881,8 @@ static real c_b48 = 1.f;
 	sscal_(n, &c_b36, &b[1], &c__1);
     }
 
-/*     Flip the matrix across its counter-diagonal if the transpose will   
-       be used. */
+/*     Flip the matrix across its counter-diagonal if the transpose will */
+/*     be used. */
 
     if (! lsame_(trans, "N")) {
 	if (upper) {
@@ -921,4 +929,3 @@ static real c_b48 = 1.f;
 /*     End of SLATTP */
 
 } /* slattp_ */
-

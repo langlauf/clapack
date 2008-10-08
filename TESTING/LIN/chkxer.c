@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -25,16 +20,19 @@ static integer c__1 = 1;
 
 
 
-/*  Tests whether XERBLA has detected an error when it should.   
+/*  Tests whether XERBLA has detected an error when it should. */
 
-    Auxiliary routine for test program for Level 2 Blas.   
+/*  Auxiliary routine for test program for Level 2 Blas. */
 
-    -- Written on 10-August-1987.   
-       Richard Hanson, Sandia National Labs.   
-       Jeremy Du Croz, NAG Central Office.   
+/*  -- Written on 10-August-1987. */
+/*     Richard Hanson, Sandia National Labs. */
+/*     Jeremy Du Croz, NAG Central Office. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Executable Statements .. */
     if (! (*lerr)) {
 	io___1.ciunit = *nout;
 	s_wsfe(&io___1);
@@ -50,4 +48,3 @@ static integer c__1 = 1;
 /*     End of CHKXER. */
 
 } /* chkxer_ */
-

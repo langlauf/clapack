@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -29,13 +24,14 @@ static doublereal c_b35 = 1.;
     doublecomplex z__1;
 
     /* Local variables */
-    static integer info;
-    static doublereal unfl, resid, anorm, bnorm;
+    doublereal ulp;
+    integer info;
+    doublereal unfl, resid, anorm, bnorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *), zherk_(char *, char *, integer *, 
-	    integer *, doublereal *, doublecomplex *, integer *, doublereal *,
+	    integer *, doublereal *, doublecomplex *, integer *, doublereal *, 
 	     doublecomplex *, integer *);
     extern doublereal dlamch_(char *), zlange_(char *, integer *, 
 	    integer *, doublecomplex *, integer *, doublereal *), 
@@ -45,139 +41,140 @@ static doublereal c_b35 = 1.;
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, integer *)
 	    , zlacpy_(char *, integer *, integer *, doublecomplex *, integer *
-	    , doublecomplex *, integer *), zlaset_(char *, integer *, 
+, doublecomplex *, integer *), zlaset_(char *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, doublecomplex *, 
 	    integer *), zungqr_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *), zungrq_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *);
-    static doublereal ulp;
 
 
-#define q_subscr(a_1,a_2) (a_2)*q_dim1 + a_1
-#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
-#define t_subscr(a_1,a_2) (a_2)*t_dim1 + a_1
-#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
-#define z___subscr(a_1,a_2) (a_2)*z_dim1 + a_1
-#define z___ref(a_1,a_2) z__[z___subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*af_dim1 + a_1
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
-#define bf_subscr(a_1,a_2) (a_2)*bf_dim1 + a_1
-#define bf_ref(a_1,a_2) bf[bf_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGQRTS tests ZGGQRF, which computes the GQR factorization of an */
+/*  N-by-M matrix A and a N-by-P matrix B: A = Q*R and B = Q*T*Z. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZGQRTS tests ZGGQRF, which computes the GQR factorization of an   
-    N-by-M matrix A and a N-by-P matrix B: A = Q*R and B = Q*T*Z.   
+/*  N       (input) INTEGER */
+/*          The number of rows of the matrices A and B.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of columns of the matrix A.  M >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows of the matrices A and B.  N >= 0.   
+/*  P       (input) INTEGER */
+/*          The number of columns of the matrix B.  P >= 0. */
 
-    M       (input) INTEGER   
-            The number of columns of the matrix A.  M >= 0.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA,M) */
+/*          The N-by-M matrix A. */
 
-    P       (input) INTEGER   
-            The number of columns of the matrix B.  P >= 0.   
+/*  AF      (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          Details of the GQR factorization of A and B, as returned */
+/*          by ZGGQRF, see CGGQRF for further details. */
 
-    A       (input) COMPLEX*16 array, dimension (LDA,M)   
-            The N-by-M matrix A.   
+/*  Q       (output) COMPLEX*16 array, dimension (LDA,N) */
+/*          The M-by-M unitary matrix Q. */
 
-    AF      (output) COMPLEX*16 array, dimension (LDA,N)   
-            Details of the GQR factorization of A and B, as returned   
-            by ZGGQRF, see CGGQRF for further details.   
+/*  R       (workspace) COMPLEX*16 array, dimension (LDA,MAX(M,N)) */
 
-    Q       (output) COMPLEX*16 array, dimension (LDA,N)   
-            The M-by-M unitary matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, R and Q. */
+/*          LDA >= max(M,N). */
 
-    R       (workspace) COMPLEX*16 array, dimension (LDA,MAX(M,N))   
+/*  TAUA    (output) COMPLEX*16 array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by ZGGQRF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, R and Q.   
-            LDA >= max(M,N).   
+/*  B       (input) COMPLEX*16 array, dimension (LDB,P) */
+/*          On entry, the N-by-P matrix A. */
 
-    TAUA    (output) COMPLEX*16 array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by ZGGQRF.   
+/*  BF      (output) COMPLEX*16 array, dimension (LDB,N) */
+/*          Details of the GQR factorization of A and B, as returned */
+/*          by ZGGQRF, see CGGQRF for further details. */
 
-    B       (input) COMPLEX*16 array, dimension (LDB,P)   
-            On entry, the N-by-P matrix A.   
+/*  Z       (output) COMPLEX*16 array, dimension (LDB,P) */
+/*          The P-by-P unitary matrix Z. */
 
-    BF      (output) COMPLEX*16 array, dimension (LDB,N)   
-            Details of the GQR factorization of A and B, as returned   
-            by ZGGQRF, see CGGQRF for further details.   
+/*  T       (workspace) COMPLEX*16 array, dimension (LDB,max(P,N)) */
 
-    Z       (output) COMPLEX*16 array, dimension (LDB,P)   
-            The P-by-P unitary matrix Z.   
+/*  BWK     (workspace) COMPLEX*16 array, dimension (LDB,N) */
 
-    T       (workspace) COMPLEX*16 array, dimension (LDB,max(P,N))   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B, BF, Z and T. */
+/*          LDB >= max(P,N). */
 
-    BWK     (workspace) COMPLEX*16 array, dimension (LDB,N)   
+/*  TAUB    (output) COMPLEX*16 array, dimension (min(P,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by DGGRQF. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B, BF, Z and T.   
-            LDB >= max(P,N).   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (LWORK) */
 
-    TAUB    (output) COMPLEX*16 array, dimension (min(P,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by DGGRQF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK, LWORK >= max(N,M,P)**2. */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (max(N,M,P)) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK, LWORK >= max(N,M,P)**2.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (4) */
+/*          The test ratios: */
+/*            RESULT(1) = norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP) */
+/*            RESULT(2) = norm( T*Z - Q'*B ) / (MAX(P,N)*norm(B)*ULP) */
+/*            RESULT(3) = norm( I - Q'*Q ) / ( M*ULP ) */
+/*            RESULT(4) = norm( I - Z'*Z ) / ( P*ULP ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(N,M,P))   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (4)   
-            The test ratios:   
-              RESULT(1) = norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP)   
-              RESULT(2) = norm( T*Z - Q'*B ) / (MAX(P,N)*norm(B)*ULP)   
-              RESULT(3) = norm( I - Q'*Q ) / ( M*ULP )   
-              RESULT(4) = norm( I - Z'*Z ) / ( P*ULP )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --taua;
     bwk_dim1 = *ldb;
-    bwk_offset = 1 + bwk_dim1 * 1;
+    bwk_offset = 1 + bwk_dim1;
     bwk -= bwk_offset;
     t_dim1 = *ldb;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     z_dim1 = *ldb;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --taub;
     --work;
@@ -209,7 +206,7 @@ static doublereal c_b35 = 1.;
 
     zlaset_("Full", n, n, &c_b3, &c_b3, &q[q_offset], lda);
     i__1 = *n - 1;
-    zlacpy_("Lower", &i__1, m, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
+    zlacpy_("Lower", &i__1, m, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda);
     i__1 = min(*n,*m);
     zungqr_(n, n, &i__1, &q[q_offset], lda, &taua[1], &work[1], lwork, &info);
 
@@ -219,21 +216,21 @@ static doublereal c_b35 = 1.;
     if (*n <= *p) {
 	if (*n > 0 && *n < *p) {
 	    i__1 = *p - *n;
-	    zlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z___ref(*p - *n + 
-		    1, 1), ldb);
+	    zlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z__[*p - *n + 1 + 
+		    z_dim1], ldb);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    zlacpy_("Lower", &i__1, &i__2, &bf_ref(2, *p - *n + 1), ldb, &
-		    z___ref(*p - *n + 2, *p - *n + 1), ldb);
+	    zlacpy_("Lower", &i__1, &i__2, &bf[(*p - *n + 1) * bf_dim1 + 2], 
+		    ldb, &z__[*p - *n + 2 + (*p - *n + 1) * z_dim1], ldb);
 	}
     } else {
 	if (*p > 1) {
 	    i__1 = *p - 1;
 	    i__2 = *p - 1;
-	    zlacpy_("Lower", &i__1, &i__2, &bf_ref(*n - *p + 2, 1), ldb, &
-		    z___ref(2, 1), ldb);
+	    zlacpy_("Lower", &i__1, &i__2, &bf[*n - *p + 2 + bf_dim1], ldb, &
+		    z__[z_dim1 + 2], ldb);
 	}
     }
     i__1 = min(*n,*p);
@@ -249,20 +246,20 @@ static doublereal c_b35 = 1.;
 
     zlaset_("Full", n, p, &c_b1, &c_b1, &t[t_offset], ldb);
     if (*n <= *p) {
-	zlacpy_("Upper", n, n, &bf_ref(1, *p - *n + 1), ldb, &t_ref(1, *p - *
-		n + 1), ldb);
+	zlacpy_("Upper", n, n, &bf[(*p - *n + 1) * bf_dim1 + 1], ldb, &t[(*p 
+		- *n + 1) * t_dim1 + 1], ldb);
     } else {
 	i__1 = *n - *p;
 	zlacpy_("Full", &i__1, p, &bf[bf_offset], ldb, &t[t_offset], ldb);
-	zlacpy_("Upper", p, p, &bf_ref(*n - *p + 1, 1), ldb, &t_ref(*n - *p + 
-		1, 1), ldb);
+	zlacpy_("Upper", p, p, &bf[*n - *p + 1 + bf_dim1], ldb, &t[*n - *p + 
+		1 + t_dim1], ldb);
     }
 
 /*     Compute R - Q'*A */
 
-    z__1.r = -1., z__1.i = 0.;
+    z__1.r = -1., z__1.i = -0.;
     zgemm_("Conjugate transpose", "No transpose", n, m, n, &z__1, &q[q_offset]
-	    , lda, &a[a_offset], lda, &c_b2, &r__[r_offset], lda);
+, lda, &a[a_offset], lda, &c_b2, &r__[r_offset], lda);
 
 /*     Compute norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP ) . */
 
@@ -279,9 +276,9 @@ static doublereal c_b35 = 1.;
 
     zgemm_("No Transpose", "No transpose", n, p, p, &c_b2, &t[t_offset], ldb, 
 	    &z__[z_offset], ldb, &c_b1, &bwk[bwk_offset], ldb);
-    z__1.r = -1., z__1.i = 0.;
+    z__1.r = -1., z__1.i = -0.;
     zgemm_("Conjugate transpose", "No transpose", n, p, n, &z__1, &q[q_offset]
-	    , lda, &b[b_offset], ldb, &c_b2, &bwk[bwk_offset], ldb);
+, lda, &b[b_offset], ldb, &c_b2, &bwk[bwk_offset], ldb);
 
 /*     Compute norm( T*Z - Q'*B ) / ( MAX(P,N)*norm(A)*ULP ) . */
 
@@ -321,16 +318,3 @@ static doublereal c_b35 = 1.;
 /*     End of ZGQRTS */
 
 } /* zgqrts_ */
-
-#undef bf_ref
-#undef bf_subscr
-#undef af_ref
-#undef af_subscr
-#undef z___ref
-#undef z___subscr
-#undef t_ref
-#undef t_subscr
-#undef q_ref
-#undef q_subscr
-
-

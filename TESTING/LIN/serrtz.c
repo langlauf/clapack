@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -35,66 +30,79 @@ static integer c__1 = 1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real a[4]	/* was [2][2] */, w[2];
-    static char c2[2];
+    real a[4]	/* was [2][2] */, w[2];
+    char c2[2];
+    real tau[2];
+    integer info;
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), stzrqf_(integer *, integer *, real *, 
 	    integer *, real *, integer *), stzrzf_(integer *, integer *, real 
 	    *, integer *, real *, real *, integer *, integer *);
-    static real tau[2];
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*2 + a_1 - 3]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SERRTZ tests the error exits for STZRQF and STZRZF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SERRTZ tests the error exits for STZRQF and STZRZF.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
     s_wsle(&io___1);
     e_wsle();
     s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
-    a_ref(1, 1) = 1.f;
-    a_ref(1, 2) = 2.f;
-    a_ref(2, 2) = 3.f;
-    a_ref(2, 1) = 4.f;
+    a[0] = 1.f;
+    a[2] = 2.f;
+    a[3] = 3.f;
+    a[1] = 4.f;
     w[0] = 0.f;
     w[1] = 0.f;
     infoc_1.ok = TRUE_;
 
     if (lsamen_(&c__2, c2, "TZ")) {
 
-/*        Test error exits for the trapezoidal routines.   
+/*        Test error exits for the trapezoidal routines. */
 
-          STZRQF */
+/*        STZRQF */
 
 	s_copy(srnamc_1.srnamt, "STZRQF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -140,7 +148,3 @@ static integer c__1 = 1;
 /*     End of SERRTZ */
 
 } /* serrtz_ */
-
-#undef a_ref
-
-

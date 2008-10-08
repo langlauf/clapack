@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,150 +18,160 @@ static integer c__65 = 65;
 	    i__5;
     char ch__1[2];
 
-    /* Builtin functions   
-       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
-    static logical left;
-    static integer i__;
-    static real t[4160]	/* was [65][64] */;
+    integer i__;
+    real t[4160]	/* was [65][64] */;
+    integer i1, i2, i3, ib, ic, ja, jc, nb, mi, ni, nq, nw, iws;
+    logical left;
     extern logical lsame_(char *, char *);
-    static integer nbmin, iinfo, i1, i2, i3, ib, ic, ja, jc, nb;
+    integer nbmin, iinfo;
     extern /* Subroutine */ int sormr3_(char *, char *, integer *, integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
-	    , real *, integer *);
-    static integer mi, ni, nq, nw;
-    extern /* Subroutine */ int xerbla_(char *, integer *);
+, real *, integer *), xerbla_(char *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
-	    integer *, integer *, ftnlen, ftnlen);
+	    integer *, integer *);
     extern /* Subroutine */ int slarzb_(char *, char *, char *, char *, 
 	    integer *, integer *, integer *, integer *, real *, integer *, 
 	    real *, integer *, real *, integer *, real *, integer *);
-    static logical notran;
-    static integer ldwork;
-    static char transt[1];
+    logical notran;
+    integer ldwork;
+    char transt[1];
     extern /* Subroutine */ int slarzt_(char *, char *, integer *, integer *, 
 	    real *, integer *, real *, real *, integer *);
-    static integer lwkopt;
-    static logical lquery;
-    static integer iws;
+    integer lwkopt;
+    logical lquery;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define c___ref(a_1,a_2) c__[(a_2)*c_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SORMRZ overwrites the general real M-by-N matrix C with */
 
-    Purpose   
-    =======   
+/*                  SIDE = 'L'     SIDE = 'R' */
+/*  TRANS = 'N':      Q * C          C * Q */
+/*  TRANS = 'T':      Q**T * C       C * Q**T */
 
-    SORMRZ overwrites the general real M-by-N matrix C with   
+/*  where Q is a real orthogonal matrix defined as the product of k */
+/*  elementary reflectors */
 
-                    SIDE = 'L'     SIDE = 'R'   
-    TRANS = 'N':      Q * C          C * Q   
-    TRANS = 'T':      Q**T * C       C * Q**T   
+/*        Q = H(1) H(2) . . . H(k) */
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+/*  as returned by STZRZF. Q is of order M if SIDE = 'L' and of order N */
+/*  if SIDE = 'R'. */
 
-          Q = H(1) H(2) . . . H(k)   
+/*  Arguments */
+/*  ========= */
 
-    as returned by STZRZF. Q is of order M if SIDE = 'L' and of order N   
-    if SIDE = 'R'.   
+/*  SIDE    (input) CHARACTER*1 */
+/*          = 'L': apply Q or Q**T from the Left; */
+/*          = 'R': apply Q or Q**T from the Right. */
 
-    Arguments   
-    =========   
+/*  TRANS   (input) CHARACTER*1 */
+/*          = 'N':  No transpose, apply Q; */
+/*          = 'T':  Transpose, apply Q**T. */
 
-    SIDE    (input) CHARACTER*1   
-            = 'L': apply Q or Q**T from the Left;   
-            = 'R': apply Q or Q**T from the Right.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix C. M >= 0. */
 
-    TRANS   (input) CHARACTER*1   
-            = 'N':  No transpose, apply Q;   
-            = 'T':  Transpose, apply Q**T.   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix C. N >= 0. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix C. M >= 0.   
+/*  K       (input) INTEGER */
+/*          The number of elementary reflectors whose product defines */
+/*          the matrix Q. */
+/*          If SIDE = 'L', M >= K >= 0; */
+/*          if SIDE = 'R', N >= K >= 0. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix C. N >= 0.   
+/*  L       (input) INTEGER */
+/*          The number of columns of the matrix A containing */
+/*          the meaningful part of the Householder reflectors. */
+/*          If SIDE = 'L', M >= L >= 0, if SIDE = 'R', N >= L >= 0. */
 
-    K       (input) INTEGER   
-            The number of elementary reflectors whose product defines   
-            the matrix Q.   
-            If SIDE = 'L', M >= K >= 0;   
-            if SIDE = 'R', N >= K >= 0.   
+/*  A       (input) REAL array, dimension */
+/*                               (LDA,M) if SIDE = 'L', */
+/*                               (LDA,N) if SIDE = 'R' */
+/*          The i-th row must contain the vector which defines the */
+/*          elementary reflector H(i), for i = 1,2,...,k, as returned by */
+/*          STZRZF in the last k rows of its array argument A. */
+/*          A is modified by the routine but restored on exit. */
 
-    L       (input) INTEGER   
-            The number of columns of the matrix A containing   
-            the meaningful part of the Householder reflectors.   
-            If SIDE = 'L', M >= L >= 0, if SIDE = 'R', N >= L >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= max(1,K). */
 
-    A       (input) REAL array, dimension   
-                                 (LDA,M) if SIDE = 'L',   
-                                 (LDA,N) if SIDE = 'R'   
-            The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            STZRZF in the last k rows of its array argument A.   
-            A is modified by the routine but restored on exit.   
+/*  TAU     (input) REAL array, dimension (K) */
+/*          TAU(i) must contain the scalar factor of the elementary */
+/*          reflector H(i), as returned by STZRZF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,K).   
+/*  C       (input/output) REAL array, dimension (LDC,N) */
+/*          On entry, the M-by-N matrix C. */
+/*          On exit, C is overwritten by Q*C or Q**H*C or C*Q**H or C*Q. */
 
-    TAU     (input) REAL array, dimension (K)   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by STZRZF.   
+/*  LDC     (input) INTEGER */
+/*          The leading dimension of the array C. LDC >= max(1,M). */
 
-    C       (input/output) REAL array, dimension (LDC,N)   
-            On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q**H*C or C*Q**H or C*Q.   
+/*  WORK    (workspace/output) REAL array, dimension (MAX(1,LWORK)) */
+/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
 
-    LDC     (input) INTEGER   
-            The leading dimension of the array C. LDC >= max(1,M).   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK. */
+/*          If SIDE = 'L', LWORK >= max(1,N); */
+/*          if SIDE = 'R', LWORK >= max(1,M). */
+/*          For optimum performance LWORK >= N*NB if SIDE = 'L', and */
+/*          LWORK >= M*NB if SIDE = 'R', where NB is the optimal */
+/*          blocksize. */
 
-    WORK    (workspace/output) REAL array, dimension (LWORK)   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
+/*          If LWORK = -1, then a workspace query is assumed; the routine */
+/*          only calculates the optimal size of the WORK array, returns */
+/*          this value as the first entry of the WORK array, and no error */
+/*          message related to LWORK is issued by XERBLA. */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK.   
-            If SIDE = 'L', LWORK >= max(1,N);   
-            if SIDE = 'R', LWORK >= max(1,M).   
-            For optimum performance LWORK >= N*NB if SIDE = 'L', and   
-            LWORK >= M*NB if SIDE = 'R', where NB is the optimal   
-            blocksize.   
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value */
 
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
+/*  Further Details */
+/*  =============== */
 
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
+/*  Based on contributions by */
+/*    A. Petitet, Computer Science Dept., Univ. of Tenn., Knoxville, USA */
 
-    Further Details   
-    ===============   
+/*  ===================================================================== */
 
-    Based on contributions by   
-      A. Petitet, Computer Science Dept., Univ. of Tenn., Knoxville, USA   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1 * 1;
+    c_offset = 1 + c_dim1;
     c__ -= c_offset;
     --work;
 
@@ -180,10 +185,10 @@ static integer c__65 = 65;
 
     if (left) {
 	nq = *m;
-	nw = *n;
+	nw = max(1,*n);
     } else {
 	nq = *n;
-	nw = *m;
+	nw = max(1,*m);
     }
     if (! left && ! lsame_(side, "R")) {
 	*info = -1;
@@ -201,25 +206,30 @@ static integer c__65 = 65;
 	*info = -8;
     } else if (*ldc < max(1,*m)) {
 	*info = -11;
-    } else if (*lwork < max(1,nw) && ! lquery) {
-	*info = -13;
     }
 
     if (*info == 0) {
+	if (*m == 0 || *n == 0) {
+	    lwkopt = 1;
+	} else {
 
-/*        Determine the block size.  NB may be at most NBMAX, where NBMAX   
-          is used to define the local array T.   
+/*           Determine the block size.  NB may be at most NBMAX, where */
+/*           NBMAX is used to define the local array T. */
 
-   Computing MIN   
-   Writing concatenation */
-	i__3[0] = 1, a__1[0] = side;
-	i__3[1] = 1, a__1[1] = trans;
-	s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
-	i__1 = 64, i__2 = ilaenv_(&c__1, "SORMRQ", ch__1, m, n, k, &c_n1, (
-		ftnlen)6, (ftnlen)2);
-	nb = min(i__1,i__2);
-	lwkopt = max(1,nw) * nb;
+/* Computing MIN */
+/* Writing concatenation */
+	    i__3[0] = 1, a__1[0] = side;
+	    i__3[1] = 1, a__1[1] = trans;
+	    s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
+	    i__1 = 64, i__2 = ilaenv_(&c__1, "SORMRQ", ch__1, m, n, k, &c_n1);
+	    nb = min(i__1,i__2);
+	    lwkopt = nw * nb;
+	}
 	work[1] = (real) lwkopt;
+
+	if (*lwork < max(1,nw) && ! lquery) {
+	    *info = -13;
+	}
     }
 
     if (*info != 0) {
@@ -232,8 +242,7 @@ static integer c__65 = 65;
 
 /*     Quick return if possible */
 
-    if (*m == 0 || *n == 0 || *k == 0) {
-	work[1] = 1.f;
+    if (*m == 0 || *n == 0) {
 	return 0;
     }
 
@@ -243,13 +252,12 @@ static integer c__65 = 65;
 	iws = nw * nb;
 	if (*lwork < iws) {
 	    nb = *lwork / ldwork;
-/* Computing MAX   
-   Writing concatenation */
+/* Computing MAX */
+/* Writing concatenation */
 	    i__3[0] = 1, a__1[0] = side;
 	    i__3[1] = 1, a__1[1] = trans;
 	    s_cat(ch__1, a__1, i__3, &c__2, (ftnlen)2);
-	    i__1 = 2, i__2 = ilaenv_(&c__2, "SORMRQ", ch__1, m, n, k, &c_n1, (
-		    ftnlen)6, (ftnlen)2);
+	    i__1 = 2, i__2 = ilaenv_(&c__2, "SORMRQ", ch__1, m, n, k, &c_n1);
 	    nbmin = max(i__1,i__2);
 	}
     } else {
@@ -299,11 +307,11 @@ static integer c__65 = 65;
 	    i__4 = nb, i__5 = *k - i__ + 1;
 	    ib = min(i__4,i__5);
 
-/*           Form the triangular factor of the block reflector   
-             H = H(i+ib-1) . . . H(i+1) H(i) */
+/*           Form the triangular factor of the block reflector */
+/*           H = H(i+ib-1) . . . H(i+1) H(i) */
 
-	    slarzt_("Backward", "Rowwise", l, &ib, &a_ref(i__, ja), lda, &tau[
-		    i__], t, &c__65);
+	    slarzt_("Backward", "Rowwise", l, &ib, &a[i__ + ja * a_dim1], lda, 
+		     &tau[i__], t, &c__65);
 
 	    if (left) {
 
@@ -321,9 +329,9 @@ static integer c__65 = 65;
 
 /*           Apply H or H' */
 
-	    slarzb_(side, transt, "Backward", "Rowwise", &mi, &ni, &ib, l, &
-		    a_ref(i__, ja), lda, t, &c__65, &c___ref(ic, jc), ldc, &
-		    work[1], &ldwork);
+	    slarzb_(side, transt, "Backward", "Rowwise", &mi, &ni, &ib, l, &a[
+		    i__ + ja * a_dim1], lda, t, &c__65, &c__[ic + jc * c_dim1]
+, ldc, &work[1], &ldwork);
 /* L10: */
 	}
 
@@ -336,8 +344,3 @@ static integer c__65 = 65;
 /*     End of SORMRZ */
 
 } /* sormrz_ */
-
-#undef c___ref
-#undef a_ref
-
-

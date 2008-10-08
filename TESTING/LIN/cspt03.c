@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -19,80 +14,90 @@ static integer c__1 = 1;
     complex q__1, q__2;
 
     /* Local variables */
-    static integer icol, jcol, kcol, nall, i__, j, k;
-    static complex t;
+    integer i__, j, k;
+    complex t;
+    real eps;
+    integer icol, jcol, kcol, nall;
     extern logical lsame_(char *, char *);
-    static real anorm;
+    real anorm;
     extern /* Complex */ VOID cdotu_(complex *, integer *, complex *, integer 
 	    *, complex *, integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *), slamch_(char *), clansp_(char 
 	    *, char *, integer *, complex *, real *);
-    static real ainvnm, eps;
+    real ainvnm;
 
 
-#define work_subscr(a_1,a_2) (a_2)*work_dim1 + a_1
-#define work_ref(a_1,a_2) work[work_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CSPT03 computes the residual for a complex symmetric packed matrix */
+/*  times its inverse: */
+/*     norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ), */
+/*  where EPS is the machine epsilon. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========== */
 
-    CSPT03 computes the residual for a complex symmetric packed matrix   
-    times its inverse:   
-       norm( I - A*AINV ) / ( N * norm(A) * norm(AINV) * EPS ),   
-    where EPS is the machine epsilon.   
+/*  UPLO    (input) CHARACTER*1 */
+/*          Specifies whether the upper or lower triangular part of the */
+/*          complex symmetric matrix A is stored: */
+/*          = 'U':  Upper triangular */
+/*          = 'L':  Lower triangular */
 
-    Arguments   
-    ==========   
+/*  N       (input) INTEGER */
+/*          The number of rows and columns of the matrix A.  N >= 0. */
 
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            complex symmetric matrix A is stored:   
-            = 'U':  Upper triangular   
-            = 'L':  Lower triangular   
+/*  A       (input) COMPLEX array, dimension (N*(N+1)/2) */
+/*          The original complex symmetric matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    N       (input) INTEGER   
-            The number of rows and columns of the matrix A.  N >= 0.   
+/*  AINV    (input) COMPLEX array, dimension (N*(N+1)/2) */
+/*          The (symmetric) inverse of the matrix A, stored as a packed */
+/*          triangular matrix. */
 
-    A       (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The original complex symmetric matrix A, stored as a packed   
-            triangular matrix.   
+/*  WORK    (workspace) COMPLEX array, dimension (LDWORK,N) */
 
-    AINV    (input) COMPLEX array, dimension (N*(N+1)/2)   
-            The (symmetric) inverse of the matrix A, stored as a packed   
-            triangular matrix.   
+/*  LDWORK  (input) INTEGER */
+/*          The leading dimension of the array WORK.  LDWORK >= max(1,N). */
 
-    WORK    (workspace) COMPLEX array, dimension (LDWORK,N)   
+/*  RWORK   (workspace) REAL array, dimension (N) */
 
-    LDWORK  (input) INTEGER   
-            The leading dimension of the array WORK.  LDWORK >= max(1,N).   
+/*  RCOND   (output) REAL */
+/*          The reciprocal of the condition number of A, computed as */
+/*          ( 1/norm(A) ) / norm(AINV). */
 
-    RWORK   (workspace) REAL array, dimension (N)   
+/*  RESID   (output) REAL */
+/*          norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS ) */
 
-    RCOND   (output) REAL   
-            The reciprocal of the condition number of A, computed as   
-            ( 1/norm(A) ) / norm(AINV).   
+/*  ===================================================================== */
 
-    RESID   (output) REAL   
-            norm(I - A*AINV) / ( N * norm(A) * norm(AINV) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0. */
 
-
-       Quick exit if N = 0.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --a;
     --ainv;
     work_dim1 = *ldw;
-    work_offset = 1 + work_dim1 * 1;
+    work_offset = 1 + work_dim1;
     work -= work_offset;
     --rwork;
 
@@ -115,9 +120,9 @@ static integer c__1 = 1;
     }
     *rcond = 1.f / anorm / ainvnm;
 
-/*     Case where both A and AINV are upper triangular:   
-       Each element of - A * AINV is computed by taking the dot product   
-       of a row of A with a column of AINV. */
+/*     Case where both A and AINV are upper triangular: */
+/*     Each element of - A * AINV is computed by taking the dot product */
+/*     of a row of A with a column of AINV. */
 
     if (lsame_(uplo, "U")) {
 	i__1 = *n;
@@ -159,7 +164,7 @@ static integer c__1 = 1;
 		    jcol += k;
 /* L20: */
 		}
-		i__3 = work_subscr(i__, j);
+		i__3 = i__ + j * work_dim1;
 		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L30: */
@@ -200,7 +205,7 @@ static integer c__1 = 1;
 		    jcol += k;
 /* L50: */
 		}
-		i__3 = work_subscr(i__, j);
+		i__3 = i__ + j * work_dim1;
 		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L60: */
@@ -252,7 +257,7 @@ static integer c__1 = 1;
 		    kcol = kcol + *n - k;
 /* L90: */
 		}
-		i__3 = work_subscr(i__, j);
+		i__3 = i__ + j * work_dim1;
 		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L100: */
@@ -296,7 +301,7 @@ static integer c__1 = 1;
 		    jcol = jcol + *n - k;
 /* L120: */
 		}
-		i__3 = work_subscr(i__, j);
+		i__3 = i__ + j * work_dim1;
 		q__1.r = -t.r, q__1.i = -t.i;
 		work[i__3].r = q__1.r, work[i__3].i = q__1.i;
 /* L130: */
@@ -309,8 +314,8 @@ static integer c__1 = 1;
 
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	i__2 = work_subscr(i__, i__);
-	i__3 = work_subscr(i__, i__);
+	i__2 = i__ + i__ * work_dim1;
+	i__3 = i__ + i__ * work_dim1;
 	q__1.r = work[i__3].r + 1.f, q__1.i = work[i__3].i;
 	work[i__2].r = q__1.r, work[i__2].i = q__1.i;
 /* L150: */
@@ -328,8 +333,3 @@ static integer c__1 = 1;
 /*     End of CSPT03 */
 
 } /* cspt03_ */
-
-#undef work_ref
-#undef work_subscr
-
-

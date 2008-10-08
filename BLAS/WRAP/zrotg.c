@@ -13,9 +13,9 @@
     double sqrt(doublereal);
     void d_cnjg(doublecomplex *, doublecomplex *);
     /* Local variables */
-    static doublereal norm;
-    static doublecomplex alpha;
-    static doublereal scale;
+    doublereal norm;
+    doublecomplex alpha;
+    doublereal scale;
     if (z_abs(ca) != 0.) {
 	goto L10;
     }

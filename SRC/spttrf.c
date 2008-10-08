@@ -1,60 +1,74 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int spttrf_(integer *n, real *d__, real *e, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    SPTTRF computes the L*D*L' factorization of a real symmetric   
-    positive definite tridiagonal matrix A.  The factorization may also   
-    be regarded as having the form A = U'*D*U.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    D       (input/output) REAL array, dimension (N)   
-            On entry, the n diagonal elements of the tridiagonal matrix   
-            A.  On exit, the n diagonal elements of the diagonal matrix   
-            D from the L*D*L' factorization of A.   
-
-    E       (input/output) REAL array, dimension (N-1)   
-            On entry, the (n-1) subdiagonal elements of the tridiagonal   
-            matrix A.  On exit, the (n-1) subdiagonal elements of the   
-            unit bidiagonal factor L from the L*D*L' factorization of A.   
-            E can also be regarded as the superdiagonal of the unit   
-            bidiagonal factor U from the U'*D*U factorization of A.   
-
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -k, the k-th argument had an illegal value   
-            > 0: if INFO = k, the leading minor of order k is not   
-                 positive definite; if k < N, the factorization could not   
-                 be completed, while if k = N, the factorization was   
-                 completed, but D(N) = 0.   
-
-    =====================================================================   
-
-
-       Test the input parameters.   
-
-       Parameter adjustments */
     /* System generated locals */
     integer i__1;
+
     /* Local variables */
-    static integer i__, i4;
-    static real ei;
+    integer i__, i4;
+    real ei;
     extern /* Subroutine */ int xerbla_(char *, integer *);
 
+
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SPTTRF computes the L*D*L' factorization of a real symmetric */
+/*  positive definite tridiagonal matrix A.  The factorization may also */
+/*  be regarded as having the form A = U'*D*U. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
+
+/*  D       (input/output) REAL array, dimension (N) */
+/*          On entry, the n diagonal elements of the tridiagonal matrix */
+/*          A.  On exit, the n diagonal elements of the diagonal matrix */
+/*          D from the L*D*L' factorization of A. */
+
+/*  E       (input/output) REAL array, dimension (N-1) */
+/*          On entry, the (n-1) subdiagonal elements of the tridiagonal */
+/*          matrix A.  On exit, the (n-1) subdiagonal elements of the */
+/*          unit bidiagonal factor L from the L*D*L' factorization of A. */
+/*          E can also be regarded as the superdiagonal of the unit */
+/*          bidiagonal factor U from the U'*D*U factorization of A. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -k, the k-th argument had an illegal value */
+/*          > 0: if INFO = k, the leading minor of order k is not */
+/*               positive definite; if k < N, the factorization could not */
+/*               be completed, while if k = N, the factorization was */
+/*               completed, but D(N) <= 0. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters. */
+
+    /* Parameter adjustments */
     --e;
     --d__;
 
@@ -91,8 +105,8 @@
     i__1 = *n - 4;
     for (i__ = i4 + 1; i__ <= i__1; i__ += 4) {
 
-/*        Drop out of the loop if d(i) <= 0: the matrix is not positive   
-          definite. */
+/*        Drop out of the loop if d(i) <= 0: the matrix is not positive */
+/*        definite. */
 
 	if (d__[i__] <= 0.f) {
 	    *info = i__;
@@ -152,4 +166,3 @@ L30:
 /*     End of SPTTRF */
 
 } /* spttrf_ */
-

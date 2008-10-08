@@ -1,35 +1,55 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int caxpy_(integer *n, complex *ca, complex *cx, integer *
 	incx, complex *cy, integer *incy)
 {
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
-    real r__1, r__2;
     complex q__1, q__2;
-    /* Builtin functions */
-    double r_imag(complex *);
+
     /* Local variables */
-    static integer i__, ix, iy;
-/*     constant times a vector plus a vector.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, ix, iy;
+    extern doublereal scabs1_(complex *);
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     CAXPY constant times a vector plus a vector. */
+
+/*  Further Details */
+/*  =============== */
+
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --cy;
     --cx;
+
     /* Function Body */
     if (*n <= 0) {
 	return 0;
     }
-    if ((r__1 = ca->r, dabs(r__1)) + (r__2 = r_imag(ca), dabs(r__2)) == 0.f) {
+    if (scabs1_(ca) == 0.f) {
 	return 0;
     }
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -52,7 +72,9 @@
 /* L10: */
     }
     return 0;
+
 /*        code for both increments equal to 1 */
+
 L20:
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -67,4 +89,3 @@ L20:
     }
     return 0;
 } /* caxpy_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -41,29 +36,27 @@ static integer c__4 = 4;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static real anrm;
-    static complex a[16]	/* was [4][4] */, b[4];
-    static integer i__, j;
-    static real r__[4];
-    static complex w[8], x[4];
-    static real rcond;
-    static char c2[2];
-    static real r1[4], r2[4];
-    static complex af[16]	/* was [4][4] */;
+    complex a[16]	/* was [4][4] */, b[4];
+    integer i__, j;
+    real r__[4];
+    complex w[8], x[4];
+    char c2[2];
+    real r1[4], r2[4];
+    complex af[16]	/* was [4][4] */;
+    integer ip[4], info;
+    real anrm, rcond;
     extern /* Subroutine */ int csytf2_(char *, integer *, complex *, integer 
-	    *, integer *, integer *);
-    static integer ip[4];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
+	    *, integer *, integer *), alaesm_(char *, logical *, 
+	    integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), cspcon_(char *, integer *, complex *, 
 	    integer *, real *, real *, complex *, integer *), csycon_(
 	    char *, integer *, complex *, integer *, integer *, real *, real *
-	    , complex *, integer *), csprfs_(char *, integer *, 
+, complex *, integer *), csprfs_(char *, integer *, 
 	    integer *, complex *, complex *, integer *, complex *, integer *, 
 	    complex *, integer *, real *, real *, complex *, real *, integer *
-	    ), csptrf_(char *, integer *, complex *, integer *, 
+), csptrf_(char *, integer *, complex *, integer *, 
 	    integer *), csptri_(char *, integer *, complex *, integer 
 	    *, complex *, integer *), csyrfs_(char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, integer *, 
@@ -79,35 +72,47 @@ static integer c__4 = 4;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define af_subscr(a_1,a_2) (a_2)*4 + a_1 - 5
-#define af_ref(a_1,a_2) af[af_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRSY tests the error exits for the COMPLEX routines */
+/*  for symmetric indefinite matrices. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRSY tests the error exits for the COMPLEX routines   
-    for symmetric indefinite matrices.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -119,12 +124,12 @@ static integer c__4 = 4;
 
     for (j = 1; j <= 4; ++j) {
 	for (i__ = 1; i__ <= 4; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
 	    a[i__1].r = q__1.r, a[i__1].i = q__1.i;
-	    i__1 = af_subscr(i__, j);
+	    i__1 = i__ + (j << 2) - 5;
 	    r__1 = 1.f / (real) (i__ + j);
 	    r__2 = -1.f / (real) (i__ + j);
 	    q__1.r = r__1, q__1.i = r__2;
@@ -145,8 +150,8 @@ static integer c__4 = 4;
     anrm = 1.f;
     infoc_1.ok = TRUE_;
 
-/*     Test error exits of the routines that use the diagonal pivoting   
-       factorization of a symmetric indefinite matrix. */
+/*     Test error exits of the routines that use the diagonal pivoting */
+/*     factorization of a symmetric indefinite matrix. */
 
     if (lsamen_(&c__2, c2, "SY")) {
 
@@ -282,8 +287,8 @@ static integer c__4 = 4;
 	chkxer_("CSYCON", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 
-/*     Test error exits of the routines that use the diagonal pivoting   
-       factorization of a symmetric indefinite packed matrix. */
+/*     Test error exits of the routines that use the diagonal pivoting */
+/*     factorization of a symmetric indefinite packed matrix. */
 
     } else if (lsamen_(&c__2, c2, "SP")) {
 
@@ -387,10 +392,3 @@ static integer c__4 = 4;
 /*     End of CERRSY */
 
 } /* cerrsy_ */
-
-#undef af_ref
-#undef af_subscr
-#undef a_ref
-#undef a_subscr
-
-

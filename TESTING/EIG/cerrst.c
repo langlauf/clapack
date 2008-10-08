@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -31,14 +26,11 @@ static integer c__3 = 3;
 static integer c__4 = 4;
 static integer c__23 = 23;
 static integer c__28 = 28;
-static integer c__16 = 16;
 static integer c__12 = 12;
-static integer c__22 = 22;
-static integer c__11 = 11;
-static integer c__27 = 27;
 static integer c__25 = 25;
 static integer c__8 = 8;
 static integer c__18 = 18;
+static integer c__11 = 11;
 static real c_b458 = 0.f;
 static real c_b472 = 1.f;
 
@@ -60,49 +52,48 @@ static real c_b472 = 1.f;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer info;
-    static complex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
-    static real d__[3], e[3];
-    static integer i__, j, m, n;
-    static complex q[9]	/* was [3][3] */;
-    static real r__[60];
-    static complex w[60];
-    static real x[3];
+    complex a[9]	/* was [3][3] */, c__[9]	/* was [3][3] */;
+    real d__[3], e[3];
+    integer i__, j, m, n;
+    complex q[9]	/* was [3][3] */;
+    real r__[60];
+    complex w[60];
+    real x[3];
+    complex z__[9]	/* was [3][3] */;
+    char c2[2];
+    integer i1[3], i2[3], i3[3], iw[36], nt;
+    real rw[60];
+    complex tau[3];
+    integer info;
     extern /* Subroutine */ int chbev_(char *, char *, integer *, integer *, 
 	    complex *, integer *, real *, complex *, integer *, complex *, 
-	    real *, integer *);
-    static complex z__[9]	/* was [3][3] */;
-    extern /* Subroutine */ int cheev_(char *, char *, integer *, complex *, 
-	    integer *, real *, complex *, integer *, real *, integer *), chpev_(char *, char *, integer *, complex *, 
-	    real *, complex *, integer *, complex *, real *, integer *);
-    static char c2[2];
-    static integer i1[3], i2[3], i3[3];
-    extern /* Subroutine */ int chbevd_(char *, char *, integer *, integer *, 
-	    complex *, integer *, real *, complex *, integer *, complex *, 
-	    integer *, real *, integer *, integer *, integer *, integer *), cheevd_(char *, char *, integer *, complex *, 
-	    integer *, real *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *);
-    static integer iw[36], nt;
-    extern /* Subroutine */ int cstedc_(char *, integer *, real *, real *, 
-	    complex *, integer *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *), chbtrd_(char *, char *, 
-	    integer *, integer *, complex *, integer *, real *, real *, 
-	    complex *, integer *, complex *, integer *);
-    static real rw[60];
-    extern /* Subroutine */ int chetrd_(char *, integer *, complex *, integer 
-	    *, real *, real *, complex *, complex *, integer *, integer *), chpevd_(char *, char *, integer *, complex *, real *, 
-	    complex *, integer *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *), cheevr_(char *, 
-	    char *, char *, integer *, complex *, integer *, real *, real *, 
-	    integer *, integer *, real *, integer *, real *, complex *, 
-	    integer *, integer *, complex *, integer *, real *, integer *, 
-	    integer *, integer *, integer *);
+	    real *, integer *), cheev_(char *, char *, 
+	    integer *, complex *, integer *, real *, complex *, integer *, 
+	    real *, integer *), chpev_(char *, char *, 
+	    integer *, complex *, real *, complex *, integer *, complex *, 
+	    real *, integer *), chbevd_(char *, char *, 
+	    integer *, integer *, complex *, integer *, real *, complex *, 
+	    integer *, complex *, integer *, real *, integer *, integer *, 
+	    integer *, integer *), cheevd_(char *, char *, 
+	    integer *, complex *, integer *, real *, complex *, integer *, 
+	    real *, integer *, integer *, integer *, integer *), cstedc_(char *, integer *, real *, real *, complex *, 
+	    integer *, complex *, integer *, real *, integer *, integer *, 
+	    integer *, integer *), chbtrd_(char *, char *, integer *, 
+	    integer *, complex *, integer *, real *, real *, complex *, 
+	    integer *, complex *, integer *), chetrd_(char *, 
+	    integer *, complex *, integer *, real *, real *, complex *, 
+	    complex *, integer *, integer *), chpevd_(char *, char *, 
+	    integer *, complex *, real *, complex *, integer *, complex *, 
+	    integer *, real *, integer *, integer *, integer *, integer *), cheevr_(char *, char *, char *, integer *, 
+	    complex *, integer *, real *, real *, integer *, integer *, real *
+, integer *, real *, complex *, integer *, integer *, complex *, 
+	    integer *, real *, integer *, integer *, integer *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chbevx_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, real *, complex *
-	    , integer *, complex *, real *, integer *, integer *, integer *), cheevx_(char *, char *, char *, integer *
-	    , complex *, integer *, real *, real *, integer *, integer *, 
+, integer *, complex *, real *, integer *, integer *, integer *), cheevx_(char *, char *, char *, integer *
+, complex *, integer *, real *, real *, integer *, integer *, 
 	    real *, integer *, real *, complex *, integer *, complex *, 
 	    integer *, real *, integer *, integer *, integer *), chkxer_(char *, integer *, integer *, logical *, 
 	    logical *), chptrd_(char *, integer *, complex *, real *, 
@@ -110,19 +101,18 @@ static real c_b472 = 1.f;
 	    real *, integer *, real *, integer *, integer *, complex *, 
 	    integer *, real *, integer *, integer *, integer *), chpevx_(char 
 	    *, char *, char *, integer *, complex *, real *, real *, integer *
-	    , integer *, real *, integer *, real *, complex *, integer *, 
+, integer *, real *, integer *, real *, complex *, integer *, 
 	    complex *, real *, integer *, integer *, integer *), cpteqr_(char *, integer *, real *, real *, 
 	    complex *, integer *, real *, integer *), csteqr_(char *, 
 	    integer *, real *, real *, complex *, integer *, real *, integer *
-	    ), cungtr_(char *, integer *, complex *, integer *, 
+), cungtr_(char *, integer *, complex *, integer *, 
 	    complex *, complex *, integer *, integer *), cupgtr_(char 
 	    *, integer *, complex *, complex *, complex *, integer *, complex 
 	    *, integer *), cunmtr_(char *, char *, char *, integer *, 
 	    integer *, complex *, integer *, complex *, complex *, integer *, 
 	    complex *, integer *, integer *), cupmtr_(
 	    char *, char *, char *, integer *, integer *, complex *, complex *
-	    , complex *, integer *, complex *, integer *);
-    static complex tau[3];
+, complex *, integer *, complex *, integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
@@ -131,35 +121,49 @@ static real c_b472 = 1.f;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*3 + a_1 - 4
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  CERRST tests the error exits for CHETRD, CUNGTR, CUNMTR, CHPTRD, */
+/*  CUNGTR, CUPMTR, CSTEQR, CSTEIN, CPTEQR, CHBTRD, */
+/*  CHEEV, CHEEVX, CHEEVD, CHBEV, CHBEVX, CHBEVD, */
+/*  CHPEV, CHPEVX, CHPEVD, and CSTEDC. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CERRST tests the error exits for CHETRD, CUNGTR, CUNMTR, CHPTRD,   
-    CUNGTR, CUPMTR, CSTEQR, CSTEIN, CPTEQR, CHBTRD,   
-    CHEEV, CHEEVX, CHEEVD, CHBEV, CHBEVX, CHBEVD,   
-    CHPEV, CHPEVX, CHPEVD, and CSTEDC.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -171,7 +175,7 @@ static real c_b472 = 1.f;
 
     for (j = 1; j <= 3; ++j) {
 	for (i__ = 1; i__ <= 3; ++i__) {
-	    i__1 = a_subscr(i__, j);
+	    i__1 = i__ + j * 3 - 4;
 	    r__1 = 1.f / (real) (i__ + j);
 	    a[i__1].r = r__1, a[i__1].i = 0.f;
 /* L10: */
@@ -437,7 +441,7 @@ static real c_b472 = 1.f;
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 8;
-	cstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__3, rw, &c__23, iw, &
+	cstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__0, rw, &c__23, iw, &
 		c__28, &info);
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -447,12 +451,12 @@ static real c_b472 = 1.f;
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	cstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__16, iw, &
+	cstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__1, iw, &
 		c__12, &info);
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 10;
-	cstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__22, iw, &
+	cstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__1, iw, &
 		c__28, &info);
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -463,12 +467,12 @@ static real c_b472 = 1.f;
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	cstedc_("I", &c__2, d__, e, z__, &c__2, w, &c__1, rw, &c__23, iw, &
-		c__11, &info);
+		c__0, &info);
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 12;
 	cstedc_("V", &c__2, d__, e, z__, &c__2, w, &c__4, rw, &c__23, iw, &
-		c__27, &info);
+		c__0, &info);
 	chkxer_("CSTEDC", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	nt += 11;
@@ -910,77 +914,77 @@ static real c_b472 = 1.f;
 
 	s_copy(srnamc_1.srnamt, "CHBEVD", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	chbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("/", "U", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	chbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("N", "/", &c__0, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	chbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("N", "U", &c_n1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 4;
-	chbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("N", "U", &c__0, &c_n1, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 6;
-	chbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__2, rw,
+	chbevd_("N", "U", &c__2, &c__1, a, &c__1, x, z__, &c__1, w, &c__2, rw, 
 		 &c__2, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__1, w, &c__8, rw,
+	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__1, w, &c__8, rw, 
 		 &c__25, iw, &c__12, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, rw,
+	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__0, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__1, rw,
+	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__1, rw, 
 		 &c__2, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__25, iw, &c__12, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__0, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__1, iw, &c__1, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw,
+	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw, 
 		 &c__2, iw, &c__12, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw,
+	chbevd_("N", "U", &c__1, &c__0, a, &c__1, x, z__, &c__1, w, &c__1, rw, 
 		 &c__1, iw, &c__0, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw,
+	chbevd_("N", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__2, rw, 
 		 &c__2, iw, &c__0, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw,
+	chbevd_("V", "U", &c__2, &c__1, a, &c__2, x, z__, &c__2, w, &c__8, rw, 
 		 &c__25, iw, &c__2, &info);
 	chkxer_("CHBEVD", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -1106,8 +1110,3 @@ static real c_b472 = 1.f;
 /*     End of CERRST */
 
 } /* cerrst_ */
-
-#undef a_ref
-#undef a_subscr
-
-

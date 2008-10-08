@@ -1,156 +1,172 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static real c_b35 = 10.f;
+static real c_b71 = .5f;
 
 /* Subroutine */ int sggbal_(char *job, integer *n, real *a, integer *lda, 
 	real *b, integer *ldb, integer *ilo, integer *ihi, real *lscale, real 
 	*rscale, real *work, integer *info)
 {
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SGGBAL balances a pair of general real matrices (A,B).  This   
-    involves, first, permuting A and B by similarity transformations to   
-    isolate eigenvalues in the first 1 to ILO$-$1 and last IHI+1 to N   
-    elements on the diagonal; and second, applying a diagonal similarity   
-    transformation to rows and columns ILO to IHI to make the rows   
-    and columns as close in norm as possible. Both steps are optional.   
-
-    Balancing may reduce the 1-norm of the matrices, and improve the   
-    accuracy of the computed eigenvalues and/or eigenvectors in the   
-    generalized eigenvalue problem A*x = lambda*B*x.   
-
-    Arguments   
-    =========   
-
-    JOB     (input) CHARACTER*1   
-            Specifies the operations to be performed on A and B:   
-            = 'N':  none:  simply set ILO = 1, IHI = N, LSCALE(I) = 1.0   
-                    and RSCALE(I) = 1.0 for i = 1,...,N.   
-            = 'P':  permute only;   
-            = 'S':  scale only;   
-            = 'B':  both permute and scale.   
-
-    N       (input) INTEGER   
-            The order of the matrices A and B.  N >= 0.   
-
-    A       (input/output) REAL array, dimension (LDA,N)   
-            On entry, the input matrix A.   
-            On exit,  A is overwritten by the balanced matrix.   
-            If JOB = 'N', A is not referenced.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,N).   
-
-    B       (input/output) REAL array, dimension (LDB,N)   
-            On entry, the input matrix B.   
-            On exit,  B is overwritten by the balanced matrix.   
-            If JOB = 'N', B is not referenced.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= max(1,N).   
-
-    ILO     (output) INTEGER   
-    IHI     (output) INTEGER   
-            ILO and IHI are set to integers such that on exit   
-            A(i,j) = 0 and B(i,j) = 0 if i > j and   
-            j = 1,...,ILO-1 or i = IHI+1,...,N.   
-            If JOB = 'N' or 'S', ILO = 1 and IHI = N.   
-
-    LSCALE  (output) REAL array, dimension (N)   
-            Details of the permutations and scaling factors applied   
-            to the left side of A and B.  If P(j) is the index of the   
-            row interchanged with row j, and D(j)   
-            is the scaling factor applied to row j, then   
-              LSCALE(j) = P(j)    for J = 1,...,ILO-1   
-                        = D(j)    for J = ILO,...,IHI   
-                        = P(j)    for J = IHI+1,...,N.   
-            The order in which the interchanges are made is N to IHI+1,   
-            then 1 to ILO-1.   
-
-    RSCALE  (output) REAL array, dimension (N)   
-            Details of the permutations and scaling factors applied   
-            to the right side of A and B.  If P(j) is the index of the   
-            column interchanged with column j, and D(j)   
-            is the scaling factor applied to column j, then   
-              LSCALE(j) = P(j)    for J = 1,...,ILO-1   
-                        = D(j)    for J = ILO,...,IHI   
-                        = P(j)    for J = IHI+1,...,N.   
-            The order in which the interchanges are made is N to IHI+1,   
-            then 1 to ILO-1.   
-
-    WORK    (workspace) REAL array, dimension (6*N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-
-    Further Details   
-    ===============   
-
-    See R.C. WARD, Balancing the generalized eigenvalue problem,   
-                   SIAM J. Sci. Stat. Comp. 2 (1981), 141-152.   
-
-    =====================================================================   
-
-
-       Test the input parameters   
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static real c_b34 = 10.f;
-    static real c_b70 = .5f;
-    
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, i__1, i__2, i__3;
     real r__1, r__2, r__3;
+
     /* Builtin functions */
     double r_lg10(real *), r_sign(real *, real *), pow_ri(real *, integer *);
+
     /* Local variables */
-    static integer lcab;
-    static real beta, coef;
-    static integer irab, lrab;
-    static real basl, cmax;
+    integer i__, j, k, l, m;
+    real t;
+    integer jc;
+    real ta, tb, tc;
+    integer ir;
+    real ew;
+    integer it, nr, ip1, jp1, lm1;
+    real cab, rab, ewc, cor, sum;
+    integer nrp2, icab, lcab;
+    real beta, coef;
+    integer irab, lrab;
+    real basl, cmax;
     extern doublereal sdot_(integer *, real *, integer *, real *, integer *);
-    static real coef2, coef5;
-    static integer i__, j, k, l, m;
-    static real gamma, t, alpha;
+    real coef2, coef5, gamma, alpha;
     extern logical lsame_(char *, char *);
     extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static real sfmin, sfmax;
-    static integer iflow;
+    real sfmin, sfmax;
+    integer iflow;
     extern /* Subroutine */ int sswap_(integer *, real *, integer *, real *, 
 	    integer *);
-    static integer kount;
+    integer kount;
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
-    static integer jc;
-    static real ta, tb, tc;
-    static integer ir, it;
-    static real ew;
-    static integer nr;
-    static real pgamma;
+    real pgamma;
     extern doublereal slamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
-    static integer lsfmin, lsfmax, ip1, jp1, lm1;
-    static real cab, rab, ewc, cor, sum;
-    static integer nrp2, icab;
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define b_ref(a_1,a_2) b[(a_2)*b_dim1 + a_1]
+    integer lsfmin, lsfmax;
 
 
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SGGBAL balances a pair of general real matrices (A,B).  This */
+/*  involves, first, permuting A and B by similarity transformations to */
+/*  isolate eigenvalues in the first 1 to ILO$-$1 and last IHI+1 to N */
+/*  elements on the diagonal; and second, applying a diagonal similarity */
+/*  transformation to rows and columns ILO to IHI to make the rows */
+/*  and columns as close in norm as possible. Both steps are optional. */
+
+/*  Balancing may reduce the 1-norm of the matrices, and improve the */
+/*  accuracy of the computed eigenvalues and/or eigenvectors in the */
+/*  generalized eigenvalue problem A*x = lambda*B*x. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  JOB     (input) CHARACTER*1 */
+/*          Specifies the operations to be performed on A and B: */
+/*          = 'N':  none:  simply set ILO = 1, IHI = N, LSCALE(I) = 1.0 */
+/*                  and RSCALE(I) = 1.0 for i = 1,...,N. */
+/*          = 'P':  permute only; */
+/*          = 'S':  scale only; */
+/*          = 'B':  both permute and scale. */
+
+/*  N       (input) INTEGER */
+/*          The order of the matrices A and B.  N >= 0. */
+
+/*  A       (input/output) REAL array, dimension (LDA,N) */
+/*          On entry, the input matrix A. */
+/*          On exit,  A is overwritten by the balanced matrix. */
+/*          If JOB = 'N', A is not referenced. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. LDA >= max(1,N). */
+
+/*  B       (input/output) REAL array, dimension (LDB,N) */
+/*          On entry, the input matrix B. */
+/*          On exit,  B is overwritten by the balanced matrix. */
+/*          If JOB = 'N', B is not referenced. */
+
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the array B. LDB >= max(1,N). */
+
+/*  ILO     (output) INTEGER */
+/*  IHI     (output) INTEGER */
+/*          ILO and IHI are set to integers such that on exit */
+/*          A(i,j) = 0 and B(i,j) = 0 if i > j and */
+/*          j = 1,...,ILO-1 or i = IHI+1,...,N. */
+/*          If JOB = 'N' or 'S', ILO = 1 and IHI = N. */
+
+/*  LSCALE  (output) REAL array, dimension (N) */
+/*          Details of the permutations and scaling factors applied */
+/*          to the left side of A and B.  If P(j) is the index of the */
+/*          row interchanged with row j, and D(j) */
+/*          is the scaling factor applied to row j, then */
+/*            LSCALE(j) = P(j)    for J = 1,...,ILO-1 */
+/*                      = D(j)    for J = ILO,...,IHI */
+/*                      = P(j)    for J = IHI+1,...,N. */
+/*          The order in which the interchanges are made is N to IHI+1, */
+/*          then 1 to ILO-1. */
+
+/*  RSCALE  (output) REAL array, dimension (N) */
+/*          Details of the permutations and scaling factors applied */
+/*          to the right side of A and B.  If P(j) is the index of the */
+/*          column interchanged with column j, and D(j) */
+/*          is the scaling factor applied to column j, then */
+/*            LSCALE(j) = P(j)    for J = 1,...,ILO-1 */
+/*                      = D(j)    for J = ILO,...,IHI */
+/*                      = P(j)    for J = IHI+1,...,N. */
+/*          The order in which the interchanges are made is N to IHI+1, */
+/*          then 1 to ILO-1. */
+
+/*  WORK    (workspace) REAL array, dimension (lwork) */
+/*          lwork must be at least max(1,6*N) when JOB = 'S' or 'B', and */
+/*          at least 1 when JOB = 'N' or 'P'. */
+
+/*  INFO    (output) INTEGER */
+/*          = 0:  successful exit */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  See R.C. WARD, Balancing the generalized eigenvalue problem, */
+/*                 SIAM J. Sci. Stat. Comp. 2 (1981), 141-152. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+/*     Test the input parameters */
+
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --lscale;
     --rscale;
@@ -166,7 +182,7 @@
     } else if (*lda < max(1,*n)) {
 	*info = -4;
     } else if (*ldb < max(1,*n)) {
-	*info = -5;
+	*info = -6;
     }
     if (*info != 0) {
 	i__1 = -(*info);
@@ -174,12 +190,19 @@
 	return 0;
     }
 
-    k = 1;
-    l = *n;
-
 /*     Quick return if possible */
 
     if (*n == 0) {
+	*ilo = 1;
+	*ihi = *n;
+	return 0;
+    }
+
+    if (*n == 1) {
+	*ilo = 1;
+	*ihi = *n;
+	lscale[1] = 1.f;
+	rscale[1] = 1.f;
 	return 0;
     }
 
@@ -195,23 +218,17 @@
 	return 0;
     }
 
-    if (k == l) {
-	*ilo = 1;
-	*ihi = 1;
-	lscale[1] = 1.f;
-	rscale[1] = 1.f;
-	return 0;
-    }
-
+    k = 1;
+    l = *n;
     if (lsame_(job, "S")) {
 	goto L190;
     }
 
     goto L30;
 
-/*     Permute the matrices A and B to isolate the eigenvalues.   
+/*     Permute the matrices A and B to isolate the eigenvalues. */
 
-       Find row with one nonzero in columns 1 through L */
+/*     Find row with one nonzero in columns 1 through L */
 
 L20:
     l = lm1;
@@ -229,7 +246,7 @@ L30:
 	i__1 = lm1;
 	for (j = 1; j <= i__1; ++j) {
 	    jp1 = j + 1;
-	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
+	    if (a[i__ + j * a_dim1] != 0.f || b[i__ + j * b_dim1] != 0.f) {
 		goto L50;
 	    }
 /* L40: */
@@ -240,7 +257,7 @@ L30:
 L50:
 	i__1 = l;
 	for (j = jp1; j <= i__1; ++j) {
-	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
+	    if (a[i__ + j * a_dim1] != 0.f || b[i__ + j * b_dim1] != 0.f) {
 		goto L80;
 	    }
 /* L60: */
@@ -267,7 +284,7 @@ L100:
 	i__2 = lm1;
 	for (i__ = k; i__ <= i__2; ++i__) {
 	    ip1 = i__ + 1;
-	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
+	    if (a[i__ + j * a_dim1] != 0.f || b[i__ + j * b_dim1] != 0.f) {
 		goto L120;
 	    }
 /* L110: */
@@ -277,7 +294,7 @@ L100:
 L120:
 	i__2 = l;
 	for (i__ = ip1; i__ <= i__2; ++i__) {
-	    if (a_ref(i__, j) != 0.f || b_ref(i__, j) != 0.f) {
+	    if (a[i__ + j * a_dim1] != 0.f || b[i__ + j * b_dim1] != 0.f) {
 		goto L150;
 	    }
 /* L130: */
@@ -300,9 +317,9 @@ L160:
 	goto L170;
     }
     i__1 = *n - k + 1;
-    sswap_(&i__1, &a_ref(i__, k), lda, &a_ref(m, k), lda);
+    sswap_(&i__1, &a[i__ + k * a_dim1], lda, &a[m + k * a_dim1], lda);
     i__1 = *n - k + 1;
-    sswap_(&i__1, &b_ref(i__, k), ldb, &b_ref(m, k), ldb);
+    sswap_(&i__1, &b[i__ + k * b_dim1], ldb, &b[m + k * b_dim1], ldb);
 
 /*     Permute columns M and J */
 
@@ -311,8 +328,8 @@ L170:
     if (j == m) {
 	goto L180;
     }
-    sswap_(&l, &a_ref(1, j), &c__1, &a_ref(1, m), &c__1);
-    sswap_(&l, &b_ref(1, j), &c__1, &b_ref(1, m), &c__1);
+    sswap_(&l, &a[j * a_dim1 + 1], &c__1, &a[m * a_dim1 + 1], &c__1);
+    sswap_(&l, &b[j * b_dim1 + 1], &c__1, &b[m * b_dim1 + 1], &c__1);
 
 L180:
     switch (iflow) {
@@ -324,11 +341,17 @@ L190:
     *ilo = k;
     *ihi = l;
 
-    if (*ilo == *ihi) {
+    if (lsame_(job, "P")) {
+	i__1 = *ihi;
+	for (i__ = *ilo; i__ <= i__1; ++i__) {
+	    lscale[i__] = 1.f;
+	    rscale[i__] = 1.f;
+/* L195: */
+	}
 	return 0;
     }
 
-    if (lsame_(job, "P")) {
+    if (*ilo == *ihi) {
 	return 0;
     }
 
@@ -351,13 +374,13 @@ L190:
 
 /*     Compute right side vector in resulting linear equations */
 
-    basl = r_lg10(&c_b34);
+    basl = r_lg10(&c_b35);
     i__1 = *ihi;
     for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *ihi;
 	for (j = *ilo; j <= i__2; ++j) {
-	    tb = b_ref(i__, j);
-	    ta = a_ref(i__, j);
+	    tb = b[i__ + j * b_dim1];
+	    ta = a[i__ + j * a_dim1];
 	    if (ta == 0.f) {
 		goto L210;
 	    }
@@ -389,7 +412,7 @@ L220:
 L250:
 
     gamma = sdot_(&nr, &work[*ilo + (*n << 2)], &c__1, &work[*ilo + (*n << 2)]
-	    , &c__1) + sdot_(&nr, &work[*ilo + *n * 5], &c__1, &work[*ilo + *
+, &c__1) + sdot_(&nr, &work[*ilo + *n * 5], &c__1, &work[*ilo + *
 	    n * 5], &c__1);
 
     ew = 0.f;
@@ -440,13 +463,13 @@ L250:
 	sum = 0.f;
 	i__2 = *ihi;
 	for (j = *ilo; j <= i__2; ++j) {
-	    if (a_ref(i__, j) == 0.f) {
+	    if (a[i__ + j * a_dim1] == 0.f) {
 		goto L280;
 	    }
 	    ++kount;
 	    sum += work[j];
 L280:
-	    if (b_ref(i__, j) == 0.f) {
+	    if (b[i__ + j * b_dim1] == 0.f) {
 		goto L290;
 	    }
 	    ++kount;
@@ -464,13 +487,13 @@ L290:
 	sum = 0.f;
 	i__2 = *ihi;
 	for (i__ = *ilo; i__ <= i__2; ++i__) {
-	    if (a_ref(i__, j) == 0.f) {
+	    if (a[i__ + j * a_dim1] == 0.f) {
 		goto L310;
 	    }
 	    ++kount;
 	    sum += work[i__ + *n];
 L310:
-	    if (b_ref(i__, j) == 0.f) {
+	    if (b[i__ + j * b_dim1] == 0.f) {
 		goto L320;
 	    }
 	    ++kount;
@@ -509,7 +532,7 @@ L320:
 
     r__1 = -alpha;
     saxpy_(&nr, &r__1, &work[*ilo + (*n << 1)], &c__1, &work[*ilo + (*n << 2)]
-	    , &c__1);
+, &c__1);
     r__1 = -alpha;
     saxpy_(&nr, &r__1, &work[*ilo + *n * 3], &c__1, &work[*ilo + *n * 5], &
 	    c__1);
@@ -530,33 +553,34 @@ L350:
     i__1 = *ihi;
     for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *n - *ilo + 1;
-	irab = isamax_(&i__2, &a_ref(i__, *ilo), lda);
-	rab = (r__1 = a_ref(i__, irab + *ilo - 1), dabs(r__1));
+	irab = isamax_(&i__2, &a[i__ + *ilo * a_dim1], lda);
+	rab = (r__1 = a[i__ + (irab + *ilo - 1) * a_dim1], dabs(r__1));
 	i__2 = *n - *ilo + 1;
-	irab = isamax_(&i__2, &b_ref(i__, *ilo), lda);
+	irab = isamax_(&i__2, &b[i__ + *ilo * b_dim1], ldb);
 /* Computing MAX */
-	r__2 = rab, r__3 = (r__1 = b_ref(i__, irab + *ilo - 1), dabs(r__1));
+	r__2 = rab, r__3 = (r__1 = b[i__ + (irab + *ilo - 1) * b_dim1], dabs(
+		r__1));
 	rab = dmax(r__2,r__3);
 	r__1 = rab + sfmin;
 	lrab = (integer) (r_lg10(&r__1) / basl + 1.f);
-	ir = lscale[i__] + r_sign(&c_b70, &lscale[i__]);
+	ir = lscale[i__] + r_sign(&c_b71, &lscale[i__]);
 /* Computing MIN */
 	i__2 = max(ir,lsfmin), i__2 = min(i__2,lsfmax), i__3 = lsfmax - lrab;
 	ir = min(i__2,i__3);
-	lscale[i__] = pow_ri(&c_b34, &ir);
-	icab = isamax_(ihi, &a_ref(1, i__), &c__1);
-	cab = (r__1 = a_ref(icab, i__), dabs(r__1));
-	icab = isamax_(ihi, &b_ref(1, i__), &c__1);
+	lscale[i__] = pow_ri(&c_b35, &ir);
+	icab = isamax_(ihi, &a[i__ * a_dim1 + 1], &c__1);
+	cab = (r__1 = a[icab + i__ * a_dim1], dabs(r__1));
+	icab = isamax_(ihi, &b[i__ * b_dim1 + 1], &c__1);
 /* Computing MAX */
-	r__2 = cab, r__3 = (r__1 = b_ref(icab, i__), dabs(r__1));
+	r__2 = cab, r__3 = (r__1 = b[icab + i__ * b_dim1], dabs(r__1));
 	cab = dmax(r__2,r__3);
 	r__1 = cab + sfmin;
 	lcab = (integer) (r_lg10(&r__1) / basl + 1.f);
-	jc = rscale[i__] + r_sign(&c_b70, &rscale[i__]);
+	jc = rscale[i__] + r_sign(&c_b71, &rscale[i__]);
 /* Computing MIN */
 	i__2 = max(jc,lsfmin), i__2 = min(i__2,lsfmax), i__3 = lsfmax - lcab;
 	jc = min(i__2,i__3);
-	rscale[i__] = pow_ri(&c_b34, &jc);
+	rscale[i__] = pow_ri(&c_b35, &jc);
 /* L360: */
     }
 
@@ -565,9 +589,9 @@ L350:
     i__1 = *ihi;
     for (i__ = *ilo; i__ <= i__1; ++i__) {
 	i__2 = *n - *ilo + 1;
-	sscal_(&i__2, &lscale[i__], &a_ref(i__, *ilo), lda);
+	sscal_(&i__2, &lscale[i__], &a[i__ + *ilo * a_dim1], lda);
 	i__2 = *n - *ilo + 1;
-	sscal_(&i__2, &lscale[i__], &b_ref(i__, *ilo), ldb);
+	sscal_(&i__2, &lscale[i__], &b[i__ + *ilo * b_dim1], ldb);
 /* L370: */
     }
 
@@ -575,8 +599,8 @@ L350:
 
     i__1 = *ihi;
     for (j = *ilo; j <= i__1; ++j) {
-	sscal_(ihi, &rscale[j], &a_ref(1, j), &c__1);
-	sscal_(ihi, &rscale[j], &b_ref(1, j), &c__1);
+	sscal_(ihi, &rscale[j], &a[j * a_dim1 + 1], &c__1);
+	sscal_(ihi, &rscale[j], &b[j * b_dim1 + 1], &c__1);
 /* L380: */
     }
 
@@ -585,8 +609,3 @@ L350:
 /*     End of SGGBAL */
 
 } /* sggbal_ */
-
-#undef b_ref
-#undef a_ref
-
-

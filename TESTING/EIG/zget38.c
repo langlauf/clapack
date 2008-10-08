@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -29,57 +24,56 @@ static integer c__1200 = 1200;
     double d_imag(doublecomplex *);
 
     /* Local variables */
-    static integer ndim, iscl, info, kmin, itmp;
-    static doublereal vmin, vmax;
-    static integer ipnt[20];
-    static doublecomplex qsav[400]	/* was [20][20] */, tsav[400]	/* 
-	    was [20][20] */;
-    static doublereal tnrm;
-    static integer isrt;
-    static doublecomplex qtmp[400]	/* was [20][20] */;
-    static doublereal stmp, vmul;
-    static doublecomplex ttmp[400]	/* was [20][20] */, work[1200], wtmp[
-	    20];
-    static doublereal wsrt[20];
-    static doublecomplex tsav1[400]	/* was [20][20] */;
-    static integer i__, j, m, n;
-    static doublecomplex q[400]	/* was [20][20] */;
-    static doublereal s;
-    static doublecomplex t[400]	/* was [20][20] */;
-    static doublereal v;
-    static doublecomplex w[20];
-    static doublereal sepin, tolin;
+    integer i__, j, m, n;
+    doublecomplex q[400]	/* was [20][20] */;
+    doublereal s;
+    doublecomplex t[400]	/* was [20][20] */;
+    doublereal v;
+    doublecomplex w[20];
+    doublereal val[3], eps, sep, sin__, tol;
+    doublecomplex tmp[400]	/* was [20][20] */;
+    integer ndim, iscl, info, kmin, itmp;
+    doublereal vmin, vmax;
+    integer ipnt[20];
+    doublecomplex qsav[400]	/* was [20][20] */, tsav[400]	/* was [20][
+	    20] */;
+    doublereal tnrm;
+    integer isrt;
+    doublecomplex qtmp[400]	/* was [20][20] */;
+    doublereal stmp, vmul;
+    doublecomplex ttmp[400]	/* was [20][20] */, work[1200], wtmp[20];
+    doublereal wsrt[20];
+    doublecomplex tsav1[400]	/* was [20][20] */;
+    doublereal sepin, tolin;
     extern /* Subroutine */ int zhst01_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublereal *, doublereal *);
-    static doublereal rwork[20];
+    doublereal rwork[20];
     extern /* Subroutine */ int dlabad_(doublereal *, doublereal *);
     extern doublereal dlamch_(char *);
-    static integer iselec[20];
-    static logical select[20];
+    integer iselec[20];
+    logical select[20];
     extern doublereal zlange_(char *, integer *, integer *, doublecomplex *, 
 	    integer *, doublereal *);
-    static doublereal bignum;
+    doublereal bignum;
     extern /* Subroutine */ int zdscal_(integer *, doublereal *, 
 	    doublecomplex *, integer *), zgehrd_(integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
-	    doublecomplex *, integer *, integer *), zlacpy_(char *, integer *,
+	    doublecomplex *, integer *, integer *), zlacpy_(char *, integer *, 
 	     integer *, doublecomplex *, integer *, doublecomplex *, integer *
-	    );
-    static doublereal septmp, smlnum;
+);
+    doublereal septmp, smlnum;
     extern /* Subroutine */ int zhseqr_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, integer *, doublecomplex *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, integer *), zunghr_(integer *, integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *, integer *);
-    static doublereal result[2];
+    doublereal result[2];
     extern /* Subroutine */ int ztrsen_(char *, char *, logical *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublereal *, doublereal *, 
 	    doublecomplex *, integer *, integer *);
-    static doublereal val[3], eps, sep, sin__, tol;
-    static doublecomplex tmp[400]	/* was [20][20] */;
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, 0, 0 };
@@ -89,69 +83,71 @@ static integer c__1200 = 1200;
 
 
 
-#define qsav_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define qsav_ref(a_1,a_2) qsav[qsav_subscr(a_1,a_2)]
-#define qtmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define qtmp_ref(a_1,a_2) qtmp[qtmp_subscr(a_1,a_2)]
-#define ttmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define ttmp_ref(a_1,a_2) ttmp[ttmp_subscr(a_1,a_2)]
-#define q_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define q_ref(a_1,a_2) q[q_subscr(a_1,a_2)]
-#define t_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define t_ref(a_1,a_2) t[t_subscr(a_1,a_2)]
-#define tmp_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define tmp_ref(a_1,a_2) tmp[tmp_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZGET38 tests ZTRSEN, a routine for estimating condition numbers of a */
+/*  cluster of eigenvalues and/or its associated right invariant subspace */
 
-    Purpose   
-    =======   
+/*  The test matrices are read from a file with logical unit number NIN. */
 
-    ZGET38 tests ZTRSEN, a routine for estimating condition numbers of a   
-    cluster of eigenvalues and/or its associated right invariant subspace   
+/*  Arguments */
+/*  ========== */
 
-    The test matrices are read from a file with logical unit number NIN.   
+/*  RMAX    (output) DOUBLE PRECISION array, dimension (3) */
+/*          Values of the largest test ratios. */
+/*          RMAX(1) = largest residuals from ZHST01 or comparing */
+/*                    different calls to ZTRSEN */
+/*          RMAX(2) = largest error in reciprocal condition */
+/*                    numbers taking their conditioning into account */
+/*          RMAX(3) = largest error in reciprocal condition */
+/*                    numbers not taking their conditioning into */
+/*                    account (may be larger than RMAX(2)) */
 
-    Arguments   
-    ==========   
+/*  LMAX    (output) INTEGER array, dimension (3) */
+/*          LMAX(i) is example number where largest test ratio */
+/*          RMAX(i) is achieved. Also: */
+/*          If ZGEHRD returns INFO nonzero on example i, LMAX(1)=i */
+/*          If ZHSEQR returns INFO nonzero on example i, LMAX(2)=i */
+/*          If ZTRSEN returns INFO nonzero on example i, LMAX(3)=i */
 
-    RMAX    (output) DOUBLE PRECISION array, dimension (3)   
-            Values of the largest test ratios.   
-            RMAX(1) = largest residuals from ZHST01 or comparing   
-                      different calls to ZTRSEN   
-            RMAX(2) = largest error in reciprocal condition   
-                      numbers taking their conditioning into account   
-            RMAX(3) = largest error in reciprocal condition   
-                      numbers not taking their conditioning into   
-                      account (may be larger than RMAX(2))   
+/*  NINFO   (output) INTEGER array, dimension (3) */
+/*          NINFO(1) = No. of times ZGEHRD returned INFO nonzero */
+/*          NINFO(2) = No. of times ZHSEQR returned INFO nonzero */
+/*          NINFO(3) = No. of times ZTRSEN returned INFO nonzero */
 
-    LMAX    (output) INTEGER array, dimension (3)   
-            LMAX(i) is example number where largest test ratio   
-            RMAX(i) is achieved. Also:   
-            If ZGEHRD returns INFO nonzero on example i, LMAX(1)=i   
-            If ZHSEQR returns INFO nonzero on example i, LMAX(2)=i   
-            If ZTRSEN returns INFO nonzero on example i, LMAX(3)=i   
+/*  KNT     (output) INTEGER */
+/*          Total number of examples tested. */
 
-    NINFO   (output) INTEGER array, dimension (3)   
-            NINFO(1) = No. of times ZGEHRD returned INFO nonzero   
-            NINFO(2) = No. of times ZHSEQR returned INFO nonzero   
-            NINFO(3) = No. of times ZTRSEN returned INFO nonzero   
+/*  NIN     (input) INTEGER */
+/*          Input logical unit number. */
 
-    KNT     (output) INTEGER   
-            Total number of examples tested.   
+/*  ===================================================================== */
 
-    NIN     (input) INTEGER   
-            Input logical unit number.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --ninfo;
     --lmax;
     --rmax;
@@ -179,9 +175,9 @@ static integer c__1200 = 1200;
     val[1] = 1.;
     val[2] = sqrt(sqrt(bignum));
 
-/*     Read input data until N=0.  Assume input eigenvalues are sorted   
-       lexicographically (increasing by real part, then decreasing by   
-       imaginary part) */
+/*     Read input data until N=0.  Assume input eigenvalues are sorted */
+/*     lexicographically (increasing by real part, then decreasing by */
+/*     imaginary part) */
 
 L10:
     io___5.ciunit = *nin;
@@ -207,8 +203,8 @@ L10:
 	s_rsle(&io___12);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__7, &c__1, (char *)&tmp_ref(i__, j), (ftnlen)sizeof(
-		    doublecomplex));
+	    do_lio(&c__7, &c__1, (char *)&tmp[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(doublecomplex));
 	}
 	e_rsle();
 /* L20: */
@@ -229,7 +225,7 @@ L10:
 	vmul = val[iscl - 1];
 	i__1 = n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
-	    zdscal_(&n, &vmul, &t_ref(1, i__), &c__1);
+	    zdscal_(&n, &vmul, &t[i__ * 20 - 20], &c__1);
 /* L30: */
 	}
 	if (tnrm == 0.) {
@@ -259,7 +255,7 @@ L10:
 	for (j = 1; j <= i__1; ++j) {
 	    i__2 = n;
 	    for (i__ = j + 2; i__ <= i__2; ++i__) {
-		i__3 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
 		t[i__3].r = 0., t[i__3].i = 0.;
 /* L40: */
 	    }
@@ -346,10 +342,10 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          taking its condition number into account   
+/*        Compare condition number for eigenvalue cluster */
+/*        taking its condition number into account */
 
-   Computing MAX */
+/* Computing MAX */
 	d__1 = (doublereal) n * 2. * eps * tnrm;
 	v = max(d__1,smlnum);
 	if (tnrm == 0.) {
@@ -389,8 +385,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        taking its condition number into account */
 
 	if (v > septmp * stmp) {
 	    tol = septmp;
@@ -426,8 +422,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition number for eigenvalue cluster   
-          without taking its condition number into account */
+/*        Compare condition number for eigenvalue cluster */
+/*        without taking its condition number into account */
 
 	if (sin__ <= (doublereal) (n << 1) * eps && stmp <= (doublereal) (n <<
 		 1) * eps) {
@@ -450,8 +446,8 @@ L10:
 	    }
 	}
 
-/*        Compare condition numbers for invariant subspace   
-          without taking its condition number into account */
+/*        Compare condition numbers for invariant subspace */
+/*        without taking its condition number into account */
 
 	if (sepin <= v && septmp <= v) {
 	    vmax = 1.;
@@ -473,8 +469,8 @@ L10:
 	    }
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Update Q */
 
 	vmax = 0.;
 	zlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
@@ -498,13 +494,13 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ttmp_subscr(i__, j);
-		i__4 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1. / eps;
 		}
-		i__3 = qtmp_subscr(i__, j);
-		i__4 = q_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (qtmp[i__3].r != q[i__4].r || qtmp[i__3].i != q[i__4].i) {
 		    vmax = 1. / eps;
 		}
@@ -513,8 +509,8 @@ L10:
 /* L130: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Update Q */
 
 	zlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	zlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -537,13 +533,13 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ttmp_subscr(i__, j);
-		i__4 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1. / eps;
 		}
-		i__3 = qtmp_subscr(i__, j);
-		i__4 = q_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (qtmp[i__3].r != q[i__4].r || qtmp[i__3].i != q[i__4].i) {
 		    vmax = 1. / eps;
 		}
@@ -552,8 +548,8 @@ L10:
 /* L150: */
 	}
 
-/*        Compute eigenvalue condition number only and compare   
-          Do not update Q */
+/*        Compute eigenvalue condition number only and compare */
+/*        Do not update Q */
 
 	zlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	zlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -576,13 +572,13 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ttmp_subscr(i__, j);
-		i__4 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1. / eps;
 		}
-		i__3 = qtmp_subscr(i__, j);
-		i__4 = qsav_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (qtmp[i__3].r != qsav[i__4].r || qtmp[i__3].i != qsav[i__4]
 			.i) {
 		    vmax = 1. / eps;
@@ -592,8 +588,8 @@ L10:
 /* L170: */
 	}
 
-/*        Compute invariant subspace condition number only and compare   
-          Do not update Q */
+/*        Compute invariant subspace condition number only and compare */
+/*        Do not update Q */
 
 	zlacpy_("F", &n, &n, tsav1, &c__20, ttmp, &c__20);
 	zlacpy_("F", &n, &n, qsav, &c__20, qtmp, &c__20);
@@ -616,13 +612,13 @@ L10:
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    i__2 = n;
 	    for (j = 1; j <= i__2; ++j) {
-		i__3 = ttmp_subscr(i__, j);
-		i__4 = t_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (ttmp[i__3].r != t[i__4].r || ttmp[i__3].i != t[i__4].i) {
 		    vmax = 1. / eps;
 		}
-		i__3 = qtmp_subscr(i__, j);
-		i__4 = qsav_subscr(i__, j);
+		i__3 = i__ + j * 20 - 21;
+		i__4 = i__ + j * 20 - 21;
 		if (qtmp[i__3].r != qsav[i__4].r || qtmp[i__3].i != qsav[i__4]
 			.i) {
 		    vmax = 1. / eps;
@@ -645,18 +641,3 @@ L200:
 /*     End of ZGET38 */
 
 } /* zget38_ */
-
-#undef tmp_ref
-#undef tmp_subscr
-#undef t_ref
-#undef t_subscr
-#undef q_ref
-#undef q_subscr
-#undef ttmp_ref
-#undef ttmp_subscr
-#undef qtmp_ref
-#undef qtmp_subscr
-#undef qsav_ref
-#undef qsav_subscr
-
-

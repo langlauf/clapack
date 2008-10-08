@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,89 +15,101 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     real ret_val;
 
     /* Local variables */
-    static integer info, i__, j;
-    static real norma;
+    integer i__, j, info;
+    real norma;
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static real rwork[1];
+    real rwork[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int xerbla_(char *, integer *), sormqr_(
 	    char *, char *, integer *, integer *, integer *, real *, integer *
-	    , real *, real *, integer *, real *, integer *, integer *);
+, real *, real *, integer *, real *, integer *, integer *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  SQPT01 tests the QR-factorization with pivoting of a matrix A.  The */
+/*  array AF contains the (possibly partial) QR-factorization of A, where */
+/*  the upper triangle of AF(1:k,1:k) is a partial triangular factor, */
+/*  the entries below the diagonal in the first k columns are the */
+/*  Householder vectors, and the rest of AF contains a partially updated */
+/*  matrix. */
 
-    Purpose   
-    =======   
+/*  This function returns ||A*P - Q*R||/(||norm(A)||*eps*M) */
 
-    SQPT01 tests the QR-factorization with pivoting of a matrix A.  The   
-    array AF contains the (possibly partial) QR-factorization of A, where   
-    the upper triangle of AF(1:k,1:k) is a partial triangular factor,   
-    the entries below the diagonal in the first k columns are the   
-    Householder vectors, and the rest of AF contains a partially updated   
-    matrix.   
+/*  Arguments */
+/*  ========= */
 
-    This function returns ||A*P - Q*R||/(||norm(A)||*eps*M)   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrices A and AF. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrices A and AF. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrices A and AF.   
+/*  K       (input) INTEGER */
+/*          The number of columns of AF that have been reduced */
+/*          to upper triangular form. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrices A and AF.   
+/*  A       (input) REAL array, dimension (LDA, N) */
+/*          The original matrix A. */
 
-    K       (input) INTEGER   
-            The number of columns of AF that have been reduced   
-            to upper triangular form.   
+/*  AF      (input) REAL array, dimension (LDA,N) */
+/*          The (possibly partial) output of SGEQPF.  The upper triangle */
+/*          of AF(1:k,1:k) is a partial triangular factor, the entries */
+/*          below the diagonal in the first k columns are the Householder */
+/*          vectors, and the rest of AF contains a partially updated */
+/*          matrix. */
 
-    A       (input) REAL array, dimension (LDA, N)   
-            The original matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A and AF. */
 
-    AF      (input) REAL array, dimension (LDA,N)   
-            The (possibly partial) output of SGEQPF.  The upper triangle   
-            of AF(1:k,1:k) is a partial triangular factor, the entries   
-            below the diagonal in the first k columns are the Householder   
-            vectors, and the rest of AF contains a partially updated   
-            matrix.   
+/*  TAU     (input) REAL array, dimension (K) */
+/*          Details of the Householder transformations as returned by */
+/*          SGEQPF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A and AF.   
+/*  JPVT    (input) INTEGER array, dimension (N) */
+/*          Pivot information as returned by SGEQPF. */
 
-    TAU     (input) REAL array, dimension (K)   
-            Details of the Householder transformations as returned by   
-            SGEQPF.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    JPVT    (input) INTEGER array, dimension (N)   
-            Pivot information as returned by SGEQPF.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= M*N+N. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= M*N+N.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --jpvt;
@@ -130,7 +137,7 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    work[(j - 1) * *m + i__] = af_ref(i__, j);
+	    work[(j - 1) * *m + i__] = af[i__ + j * af_dim1];
 /* L10: */
 	}
 	i__2 = *m;
@@ -142,7 +149,8 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
     }
     i__1 = *n;
     for (j = *k + 1; j <= i__1; ++j) {
-	scopy_(m, &af_ref(1, j), &c__1, &work[(j - 1) * *m + 1], &c__1);
+	scopy_(m, &af[j * af_dim1 + 1], &c__1, &work[(j - 1) * *m + 1], &c__1)
+		;
 /* L40: */
     }
 
@@ -155,8 +163,8 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
 
 /*        Compare i-th column of QR and jpvt(i)-th column of A */
 
-	saxpy_(m, &c_b14, &a_ref(1, jpvt[j]), &c__1, &work[(j - 1) * *m + 1], 
-		&c__1);
+	saxpy_(m, &c_b14, &a[jpvt[j] * a_dim1 + 1], &c__1, &work[(j - 1) * *m 
+		+ 1], &c__1);
 /* L50: */
     }
 
@@ -171,8 +179,3 @@ doublereal sqpt01_(integer *m, integer *n, integer *k, real *a, real *af,
 /*     End of SQPT01 */
 
 } /* sqpt01_ */
-
-#undef af_ref
-#undef a_ref
-
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -20,7 +15,7 @@ doublereal sqrt11_(integer *m, integer *k, real *a, integer *lda, real *tau,
     real ret_val;
 
     /* Local variables */
-    static integer info, j;
+    integer j, info;
     extern /* Subroutine */ int sorm2r_(char *, char *, integer *, integer *, 
 	    integer *, real *, integer *, real *, real *, integer *, real *, 
 	    integer *);
@@ -28,62 +23,78 @@ doublereal sqrt11_(integer *m, integer *k, real *a, integer *lda, real *tau,
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int xerbla_(char *, integer *), slaset_(
 	    char *, integer *, integer *, real *, real *, real *, integer *);
-    static real rdummy[1];
+    real rdummy[1];
 
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SQRT11 computes the test ratio   
+/*  SQRT11 computes the test ratio */
 
-          || Q'*Q - I || / (eps * m)   
+/*        || Q'*Q - I || / (eps * m) */
 
-    where the orthogonal matrix Q is represented as a product of   
-    elementary transformations.  Each transformation has the form   
+/*  where the orthogonal matrix Q is represented as a product of */
+/*  elementary transformations.  Each transformation has the form */
 
-       H(k) = I - tau(k) v(k) v(k)'   
+/*     H(k) = I - tau(k) v(k) v(k)' */
 
-    where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form   
-    [ 0 ... 0 1 x(k) ]', where x(k) is a vector of length m-k stored   
-    in A(k+1:m,k).   
+/*  where tau(k) is stored in TAU(k) and v(k) is an m-vector of the form */
+/*  [ 0 ... 0 1 x(k) ]', where x(k) is a vector of length m-k stored */
+/*  in A(k+1:m,k). */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    K       (input) INTEGER   
-            The number of columns of A whose subdiagonal entries   
-            contain information about orthogonal transformations.   
+/*  K       (input) INTEGER */
+/*          The number of columns of A whose subdiagonal entries */
+/*          contain information about orthogonal transformations. */
 
-    A       (input) REAL array, dimension (LDA,K)   
-            The (possibly partial) output of a QR reduction routine.   
+/*  A       (input) REAL array, dimension (LDA,K) */
+/*          The (possibly partial) output of a QR reduction routine. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    TAU     (input) REAL array, dimension (K)   
-            The scaling factors tau for the elementary transformations as   
-            computed by the QR factorization routine.   
+/*  TAU     (input) REAL array, dimension (K) */
+/*          The scaling factors tau for the elementary transformations as */
+/*          computed by the QR factorization routine. */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK.  LWORK >= M*M + M.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK.  LWORK >= M*M + M. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --tau;
     --work;
@@ -114,7 +125,7 @@ doublereal sqrt11_(integer *m, integer *k, real *a, integer *lda, real *tau,
 /*     Form Q'*Q */
 
     sorm2r_("Left", "Transpose", m, m, k, &a[a_offset], lda, &tau[1], &work[1]
-	    , m, &work[*m * *m + 1], &info);
+, m, &work[*m * *m + 1], &info);
 
     i__1 = *m;
     for (j = 1; j <= i__1; ++j) {
@@ -130,4 +141,3 @@ doublereal sqrt11_(integer *m, integer *k, real *a, integer *lda, real *tau,
 /*     End of SQRT11 */
 
 } /* sqrt11_ */
-

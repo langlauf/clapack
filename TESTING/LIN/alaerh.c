@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -178,15 +173,14 @@ static integer c__5 = 5;
     static char fmt_9950[] = "(\002 *** Error code from \002,a6,\002 =\002,i"
 	    "5)";
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char uplo[1];
+    char c3[3], p2[2], uplo[1];
     extern /* Subroutine */ int alahd_(integer *, char *);
     extern logical lsame_(char *, char *);
-    static char c3[3], p2[2];
     extern /* Subroutine */ int aladhd_(integer *, char *);
     extern logical lsamen_(integer *, char *, char *);
 
@@ -297,80 +291,88 @@ static integer c__5 = 5;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    ALAERH is an error handler for the LAPACK routines.  It prints the   
-    header if this is the first error message and prints the error code   
-    and form of recovery, if any.  The character evaluations in this   
-    routine may make it slow, but it should not be called once the LAPACK   
-    routines are fully debugged.   
+/*  ALAERH is an error handler for the LAPACK routines.  It prints the */
+/*  header if this is the first error message and prints the error code */
+/*  and form of recovery, if any.  The character evaluations in this */
+/*  routine may make it slow, but it should not be called once the LAPACK */
+/*  routines are fully debugged. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name of subroutine SUBNAM.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name of subroutine SUBNAM. */
 
-    SUBNAM  (input) CHARACTER*6   
-            The name of the subroutine that returned an error code.   
+/*  SUBNAM  (input) CHARACTER*6 */
+/*          The name of the subroutine that returned an error code. */
 
-    INFO    (input) INTEGER   
-            The error code returned from routine SUBNAM.   
+/*  INFO    (input) INTEGER */
+/*          The error code returned from routine SUBNAM. */
 
-    INFOE   (input) INTEGER   
-            The expected error code from routine SUBNAM, if SUBNAM were   
-            error-free.  If INFOE = 0, an error message is printed, but   
-            if INFOE.NE.0, we assume only the return code INFO is wrong.   
+/*  INFOE   (input) INTEGER */
+/*          The expected error code from routine SUBNAM, if SUBNAM were */
+/*          error-free.  If INFOE = 0, an error message is printed, but */
+/*          if INFOE.NE.0, we assume only the return code INFO is wrong. */
 
-    OPTS    (input) CHARACTER*(*)   
-            The character options to the subroutine SUBNAM, concatenated   
-            into a single character string.  For example, UPLO = 'U',   
-            TRANS = 'T', and DIAG = 'N' for a triangular routine would   
-            be specified as OPTS = 'UTN'.   
+/*  OPTS    (input) CHARACTER*(*) */
+/*          The character options to the subroutine SUBNAM, concatenated */
+/*          into a single character string.  For example, UPLO = 'U', */
+/*          TRANS = 'T', and DIAG = 'N' for a triangular routine would */
+/*          be specified as OPTS = 'UTN'. */
 
-    M       (input) INTEGER   
-            The matrix row dimension.   
+/*  M       (input) INTEGER */
+/*          The matrix row dimension. */
 
-    N       (input) INTEGER   
-            The matrix column dimension.  Accessed only if PATH = xGE or   
-            xGB.   
+/*  N       (input) INTEGER */
+/*          The matrix column dimension.  Accessed only if PATH = xGE or */
+/*          xGB. */
 
-    KL      (input) INTEGER   
-            The number of sub-diagonals of the matrix.  Accessed only if   
-            PATH = xGB, xPB, or xTB.  Also used for NRHS for PATH = xLS.   
+/*  KL      (input) INTEGER */
+/*          The number of sub-diagonals of the matrix.  Accessed only if */
+/*          PATH = xGB, xPB, or xTB.  Also used for NRHS for PATH = xLS. */
 
-    KU      (input) INTEGER   
-            The number of super-diagonals of the matrix.  Accessed only   
-            if PATH = xGB.   
+/*  KU      (input) INTEGER */
+/*          The number of super-diagonals of the matrix.  Accessed only */
+/*          if PATH = xGB. */
 
-    N5      (input) INTEGER   
-            A fifth integer parameter, may be the blocksize NB or the   
-            number of right hand sides NRHS.   
+/*  N5      (input) INTEGER */
+/*          A fifth integer parameter, may be the blocksize NB or the */
+/*          number of right hand sides NRHS. */
 
-    IMAT    (input) INTEGER   
-            The matrix type.   
+/*  IMAT    (input) INTEGER */
+/*          The matrix type. */
 
-    NFAIL   (input) INTEGER   
-            The number of prior tests that did not pass the threshold;   
-            used to determine if the header should be printed.   
+/*  NFAIL   (input) INTEGER */
+/*          The number of prior tests that did not pass the threshold; */
+/*          used to determine if the header should be printed. */
 
-    NERRS   (input/output) INTEGER   
-            On entry, the number of errors already detected; used to   
-            determine if the header should be printed.   
-            On exit, NERRS is increased by 1.   
+/*  NERRS   (input/output) INTEGER */
+/*          On entry, the number of errors already detected; used to */
+/*          determine if the header should be printed. */
+/*          On exit, NERRS is increased by 1. */
 
-    NOUT    (input) INTEGER   
-            The unit number on which results are to be printed.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number on which results are to be printed. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (*info == 0) {
 	return 0;
@@ -390,8 +392,8 @@ static integer c__5 = 5;
     }
     ++(*nerrs);
 
-/*     Print the message detailing the error and form of recovery,   
-       if any. */
+/*     Print the message detailing the error and form of recovery, */
+/*     if any. */
 
     if (lsamen_(&c__2, p2, "GE")) {
 
@@ -1686,159 +1688,159 @@ static integer c__5 = 5;
 	e_wsfe();
     }
 
-/*     Description of error message (alphabetical, left to right)   
+/*     Description of error message (alphabetical, left to right) */
 
-       SUBNAM, INFO, FACT, N, NRHS, IMAT   
+/*     SUBNAM, INFO, FACT, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, FACT, TRANS, N, KL, KU, NRHS, IMAT   
+/*     SUBNAM, INFO, FACT, TRANS, N, KL, KU, NRHS, IMAT */
 
 
-       SUBNAM, INFO, FACT, TRANS, N, NRHS, IMAT   
+/*     SUBNAM, INFO, FACT, TRANS, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, FACT, UPLO, N, KD, NRHS, IMAT   
+/*     SUBNAM, INFO, FACT, UPLO, N, KD, NRHS, IMAT */
 
 
-       SUBNAM, INFO, FACT, UPLO, N, NRHS, IMAT   
+/*     SUBNAM, INFO, FACT, UPLO, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, FACT, N, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, FACT, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, FACT, TRANS, N, KL, KU, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, FACT, TRANS, N, KL, KU, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, FACT, TRANS, N, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, FACT, TRANS, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, FACT, UPLO, N, KD, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, FACT, UPLO, N, KD, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, FACT, UPLO, N, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, FACT, UPLO, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, M, N, KL, KU, NB, IMAT   
+/*     SUBNAM, INFO, INFOE, M, N, KL, KU, NB, IMAT */
 
 
-       SUBNAM, INFO, INFOE, M, N, NB, IMAT   
+/*     SUBNAM, INFO, INFOE, M, N, NB, IMAT */
 
 
-       SUBNAM, INFO, INFOE, N, IMAT   
+/*     SUBNAM, INFO, INFOE, N, IMAT */
 
 
-       SUBNAM, INFO, INFOE, N, KL, KU, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, N, KL, KU, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, N, NB, IMAT   
+/*     SUBNAM, INFO, INFOE, N, NB, IMAT */
 
 
-       SUBNAM, INFO, INFOE, N, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, UPLO, N, IMAT   
+/*     SUBNAM, INFO, INFOE, UPLO, N, IMAT */
 
 
-       SUBNAM, INFO, INFOE, UPLO, N, KD, NB, IMAT   
+/*     SUBNAM, INFO, INFOE, UPLO, N, KD, NB, IMAT */
 
 
-       SUBNAM, INFO, INFOE, UPLO, N, KD, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, UPLO, N, KD, NRHS, IMAT */
 
 
-       SUBNAM, INFO, INFOE, UPLO, N, NB, IMAT   
+/*     SUBNAM, INFO, INFOE, UPLO, N, NB, IMAT */
 
 
-       SUBNAM, INFO, INFOE, UPLO, N, NRHS, IMAT   
+/*     SUBNAM, INFO, INFOE, UPLO, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, M, N, IMAT   
+/*     SUBNAM, INFO, M, N, IMAT */
 
 
-       SUBNAM, INFO, M, N, KL, KU, IMAT   
+/*     SUBNAM, INFO, M, N, KL, KU, IMAT */
 
 
-       SUBNAM, INFO, M, N, KL, KU, NB, IMAT   
+/*     SUBNAM, INFO, M, N, KL, KU, NB, IMAT */
 
 
-       SUBNAM, INFO, M, N, NB, IMAT   
+/*     SUBNAM, INFO, M, N, NB, IMAT */
 
 
-       SUBNAM, INFO, M, N, NRHS, NB, IMAT   
+/*     SUBNAM, INFO, M, N, NRHS, NB, IMAT */
 
 
-       SUBNAM, INFO, N, IMAT   
+/*     SUBNAM, INFO, N, IMAT */
 
 
-       SUBNAM, INFO, N, KL, KU, NRHS, IMAT   
+/*     SUBNAM, INFO, N, KL, KU, NRHS, IMAT */
 
 
-       SUBNAM, INFO, N, NB, IMAT   
+/*     SUBNAM, INFO, N, NB, IMAT */
 
 
-       SUBNAM, INFO, N, NRHS, IMAT   
+/*     SUBNAM, INFO, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, NORM, N, IMAT   
+/*     SUBNAM, INFO, NORM, N, IMAT */
 
 
-       SUBNAM, INFO, NORM, N, KL, KU, IMAT   
+/*     SUBNAM, INFO, NORM, N, KL, KU, IMAT */
 
 
-       SUBNAM, INFO, NORM, UPLO, DIAG, N, IMAT   
+/*     SUBNAM, INFO, NORM, UPLO, DIAG, N, IMAT */
 
 
-       SUBNAM, INFO, NORM, UPLO, DIAG, N, KD, IMAT   
+/*     SUBNAM, INFO, NORM, UPLO, DIAG, N, KD, IMAT */
 
 
-       SUBNAM, INFO, TRANS, M, N, NRHS, NB, IMAT   
+/*     SUBNAM, INFO, TRANS, M, N, NRHS, NB, IMAT */
 
 
-       SUBNAM, INFO, TRANS, N, KL, KU, NRHS, IMAT   
+/*     SUBNAM, INFO, TRANS, N, KL, KU, NRHS, IMAT */
 
 
-       SUBNAM, INFO, TRANS, N, NRHS, IMAT   
+/*     SUBNAM, INFO, TRANS, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, UPLO, DIAG, N, IMAT   
+/*     SUBNAM, INFO, UPLO, DIAG, N, IMAT */
 
 
-       SUBNAM, INFO, UPLO, DIAG, N, NB, IMAT   
+/*     SUBNAM, INFO, UPLO, DIAG, N, NB, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, IMAT   
+/*     SUBNAM, INFO, UPLO, N, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, KD, IMAT   
+/*     SUBNAM, INFO, UPLO, N, KD, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, KD, NB, IMAT   
+/*     SUBNAM, INFO, UPLO, N, KD, NB, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, KD, NRHS, IMAT   
+/*     SUBNAM, INFO, UPLO, N, KD, NRHS, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, NB, IMAT   
+/*     SUBNAM, INFO, UPLO, N, NB, IMAT */
 
 
-       SUBNAM, INFO, UPLO, N, NRHS, IMAT   
+/*     SUBNAM, INFO, UPLO, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, UPLO, TRANS, DIAG, N, KD, NRHS, IMAT   
+/*     SUBNAM, INFO, UPLO, TRANS, DIAG, N, KD, NRHS, IMAT */
 
 
-       SUBNAM, INFO, UPLO, TRANS, DIAG, N, NRHS, IMAT   
+/*     SUBNAM, INFO, UPLO, TRANS, DIAG, N, NRHS, IMAT */
 
 
-       SUBNAM, INFO, UPLO, TRANS, DIAG, NORMIN, N, IMAT   
+/*     SUBNAM, INFO, UPLO, TRANS, DIAG, NORMIN, N, IMAT */
 
 
-       SUBNAM, INFO, UPLO, TRANS, DIAG, NORMIN, N, KD, IMAT   
+/*     SUBNAM, INFO, UPLO, TRANS, DIAG, NORMIN, N, KD, IMAT */
 
 
-       Unknown type   
+/*     Unknown type */
 
 
-       What we do next */
+/*     What we do next */
 
 
     return 0;
@@ -1846,4 +1848,3 @@ static integer c__5 = 5;
 /*     End of ALAERH */
 
 } /* alaerh_ */
-

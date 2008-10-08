@@ -1,44 +1,51 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int dladiv_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *d__, doublereal *p, doublereal *q)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
+    doublereal e, f;
 
 
-    Purpose   
-    =======   
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
-    DLADIV performs complex division in  real arithmetic   
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-                          a + i*b   
-               p + i*q = ---------   
-                          c + i*d   
+/*  Purpose */
+/*  ======= */
 
-    The algorithm is due to Robert L. Smith and can be found   
-    in D. Knuth, The art of Computer Programming, Vol.2, p.195   
+/*  DLADIV performs complex division in  real arithmetic */
 
-    Arguments   
-    =========   
+/*                        a + i*b */
+/*             p + i*q = --------- */
+/*                        c + i*d */
 
-    A       (input) DOUBLE PRECISION   
-    B       (input) DOUBLE PRECISION   
-    C       (input) DOUBLE PRECISION   
-    D       (input) DOUBLE PRECISION   
-            The scalars a, b, c, and d in the above expression.   
+/*  The algorithm is due to Robert L. Smith and can be found */
+/*  in D. Knuth, The art of Computer Programming, Vol.2, p.195 */
 
-    P       (output) DOUBLE PRECISION   
-    Q       (output) DOUBLE PRECISION   
-            The scalars p and q in the above expression.   
+/*  Arguments */
+/*  ========= */
 
-    ===================================================================== */
-    static doublereal e, f;
+/*  A       (input) DOUBLE PRECISION */
+/*  B       (input) DOUBLE PRECISION */
+/*  C       (input) DOUBLE PRECISION */
+/*  D       (input) DOUBLE PRECISION */
+/*          The scalars a, b, c, and d in the above expression. */
 
+/*  P       (output) DOUBLE PRECISION */
+/*  Q       (output) DOUBLE PRECISION */
+/*          The scalars p and q in the above expression. */
 
+/*  ===================================================================== */
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     if (abs(*d__) < abs(*c__)) {
 	e = *d__ / *c__;
@@ -57,4 +64,3 @@
 /*     End of DLADIV */
 
 } /* dladiv_ */
-

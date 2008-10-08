@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -66,27 +61,28 @@ static integer c__9 = 9;
     integer i__1, i__2, i__3[2], i__4, i__5[3], i__6[4];
     char ch__1[2], ch__2[3], ch__3[4];
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen), s_cat(char *,
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen), s_cat(char *,
 	     char **, integer *, integer *, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char diag[1];
-    static integer imat, info;
-    static char path[3];
-    static integer irhs, nrhs;
-    static char norm[1], uplo[1];
-    static integer nrun, i__;
+    integer i__, k, n, nb, in, lda, inb;
+    char diag[1];
+    integer imat, info;
+    char path[3];
+    integer irhs, nrhs;
+    char norm[1], uplo[1];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, idiag, n;
-    static doublereal scale;
-    static integer nfail, iseed[4];
+    integer idiag;
+    doublereal scale;
     extern /* Subroutine */ int dget04_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *);
+    integer nfail, iseed[4];
     extern logical lsame_(char *, char *);
-    static doublereal rcond, anorm;
-    static integer itran;
+    doublereal rcond, anorm;
+    integer itran;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), dtrt01_(char *, char *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
@@ -102,34 +98,33 @@ static integer c__9 = 9;
 	    doublereal *, doublereal *), dtrt06_(
 	    doublereal *, doublereal *, char *, char *, integer *, doublereal 
 	    *, integer *, doublereal *, doublereal *);
-    static char trans[1];
-    static integer iuplo, nerrs;
-    static doublereal dummy;
-    static char xtype[1];
-    static integer nb, in;
+    char trans[1];
+    integer iuplo, nerrs;
+    doublereal dummy;
+    char xtype[1];
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *);
-    static doublereal rcondc;
+    doublereal rcondc;
     extern /* Subroutine */ int dlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *), 
 	    dlarhs_(char *, char *, char *, char *, integer *, integer *, 
 	    integer *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, integer *, 
 	    integer *);
-    static doublereal rcondi;
+    doublereal rcondi;
     extern /* Subroutine */ int alasum_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static doublereal rcondo;
+    doublereal rcondo;
     extern doublereal dlantr_(char *, char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *);
-    static doublereal ainvnm;
+    doublereal ainvnm;
     extern /* Subroutine */ int dlatrs_(char *, char *, char *, char *, 
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    doublereal *, integer *), dlattr_(
 	    integer *, char *, char *, char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *), dtrcon_(char *, char *, char *, integer *
-	    , doublereal *, integer *, doublereal *, doublereal *, integer *, 
+, doublereal *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *), xlaenv_(integer *, integer *),
 	     derrtr_(char *, integer *), dtrrfs_(char *, char *, char 
 	    *, integer *, integer *, doublereal *, integer *, doublereal *, 
@@ -137,11 +132,10 @@ static integer c__9 = 9;
 	    doublereal *, integer *, integer *), 
 	    dtrtri_(char *, char *, integer *, doublereal *, integer *, 
 	    integer *);
-    static doublereal result[9];
+    doublereal result[9];
     extern /* Subroutine */ int dtrtrs_(char *, char *, char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *, integer *, 
 	    integer *);
-    static integer lda, inb;
 
     /* Fortran I/O blocks */
     static cilist io___27 = { 0, 0, 0, fmt_9999, 0 };
@@ -152,80 +146,100 @@ static integer c__9 = 9;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 7, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DCHKTR tests DTRTRI, -TRS, -RFS, and -CON, and DLATRS   
+/*  DCHKTR tests DTRTRI, -TRS, -RFS, and -CON, and DLATRS */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NNB     (input) INTEGER   
-            The number of values of NB contained in the vector NBVAL.   
+/*  NNB     (input) INTEGER */
+/*          The number of values of NB contained in the vector NBVAL. */
 
-    NBVAL   (input) INTEGER array, dimension (NNB)   
-            The values of the blocksize NB.   
+/*  NBVAL   (input) INTEGER array, dimension (NNB) */
+/*          The values of the blocksize NB. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    THRESH  (input) DOUBLE PRECISION   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) DOUBLE PRECISION */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The leading dimension of the work arrays.   
-            NMAX >= the maximum value of N in NVAL.   
+/*  NMAX    (input) INTEGER */
+/*          The leading dimension of the work arrays. */
+/*          NMAX >= the maximum value of N in NVAL. */
 
-    A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  A       (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    AINV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX)   
+/*  AINV    (workspace) DOUBLE PRECISION array, dimension (NMAX*NMAX) */
 
-    B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) DOUBLE PRECISION array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                        (NMAX*max(3,NSMAX))   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension */
+/*                      (NMAX*max(3,NSMAX)) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension   
-                        (max(NMAX,2*NSMAX))   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension */
+/*                      (max(NMAX,2*NSMAX)) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -239,9 +253,11 @@ static integer c__9 = 9;
     --nval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Double precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "TR", (ftnlen)2, (ftnlen)2);
@@ -306,8 +322,8 @@ static integer c__9 = 9;
 		    nb = nbval[inb];
 		    xlaenv_(&c__1, &nb);
 
-/* +    TEST 1   
-                   Form the inverse of A. */
+/* +    TEST 1 */
+/*                 Form the inverse of A. */
 
 		    dlacpy_(uplo, &n, &n, &a[1], &lda, &ainv[1], &lda);
 		    s_copy(srnamc_1.srnamt, "DTRTRI", (ftnlen)6, (ftnlen)6);
@@ -336,9 +352,9 @@ static integer c__9 = 9;
 			rcondi = 1. / anorm / ainvnm;
 		    }
 
-/*                 Compute the residual for the triangular matrix times   
-                   its inverse.  Also compute the 1-norm condition number   
-                   of A. */
+/*                 Compute the residual for the triangular matrix times */
+/*                 its inverse.  Also compute the 1-norm condition number */
+/*                 of A. */
 
 		    dtrt01_(uplo, diag, &n, &a[1], &lda, &ainv[1], &lda, &
 			    rcondo, &rwork[1], result);
@@ -389,13 +405,13 @@ static integer c__9 = 9;
 				rcondc = rcondi;
 			    }
 
-/* +    TEST 2   
-                         Solve and compute residual for op(A)*x = b. */
+/* +    TEST 2 */
+/*                       Solve and compute residual for op(A)*x = b. */
 
 			    s_copy(srnamc_1.srnamt, "DLARHS", (ftnlen)6, (
 				    ftnlen)6);
 			    dlarhs_(path, xtype, uplo, trans, &n, &n, &c__0, &
-				    idiag, &nrhs, &a[1], &lda, &xact[1], &lda,
+				    idiag, &nrhs, &a[1], &lda, &xact[1], &lda, 
 				     &b[1], &lda, iseed, &info);
 			    *(unsigned char *)xtype = 'C';
 			    dlacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
@@ -403,7 +419,7 @@ static integer c__9 = 9;
 
 			    s_copy(srnamc_1.srnamt, "DTRTRS", (ftnlen)6, (
 				    ftnlen)6);
-			    dtrtrs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda,
+			    dtrtrs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
 				     &x[1], &lda, &info);
 
 /*                       Check error code from DTRTRS. */
@@ -425,23 +441,23 @@ static integer c__9 = 9;
 				dummy = a[1];
 			    }
 
-			    dtrt02_(uplo, trans, diag, &n, &nrhs, &a[1], &lda,
+			    dtrt02_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
 				     &x[1], &lda, &b[1], &lda, &work[1], &
 				    result[1]);
 
-/* +    TEST 3   
-                         Check solution from generated exact solution. */
+/* +    TEST 3 */
+/*                       Check solution from generated exact solution. */
 
 			    dget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[2]);
 
-/* +    TESTS 4, 5, and 6   
-                         Use iterative refinement to improve the solution   
-                         and compute error bounds. */
+/* +    TESTS 4, 5, and 6 */
+/*                       Use iterative refinement to improve the solution */
+/*                       and compute error bounds. */
 
 			    s_copy(srnamc_1.srnamt, "DTRRFS", (ftnlen)6, (
 				    ftnlen)6);
-			    dtrrfs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda,
+			    dtrrfs_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
 				     &b[1], &lda, &x[1], &lda, &rwork[1], &
 				    rwork[nrhs + 1], &work[1], &iwork[1], &
 				    info);
@@ -461,12 +477,12 @@ static integer c__9 = 9;
 
 			    dget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[3]);
-			    dtrt05_(uplo, trans, diag, &n, &nrhs, &a[1], &lda,
-				     &b[1], &lda, &x[1], &lda, &xact[1], &lda,
+			    dtrt05_(uplo, trans, diag, &n, &nrhs, &a[1], &lda, 
+				     &b[1], &lda, &x[1], &lda, &xact[1], &lda, 
 				     &rwork[1], &rwork[nrhs + 1], &result[4]);
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = 2; k <= 6; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -499,8 +515,8 @@ static integer c__9 = 9;
 /* L40: */
 		    }
 
-/* +    TEST 7   
-                         Get an estimate of RCOND = 1/CNDNUM. */
+/* +    TEST 7 */
+/*                       Get an estimate of RCOND = 1/CNDNUM. */
 
 		    for (itran = 1; itran <= 2; ++itran) {
 			if (itran == 1) {
@@ -592,8 +608,8 @@ L80:
 		    dlattr_(&imat, uplo, trans, diag, iseed, &n, &a[1], &lda, 
 			    &x[1], &work[1], &info);
 
-/* +    TEST 8   
-                   Solve the system op(A)*x = b. */
+/* +    TEST 8 */
+/*                 Solve the system op(A)*x = b. */
 
 		    s_copy(srnamc_1.srnamt, "DLATRS", (ftnlen)6, (ftnlen)6);
 		    dcopy_(&n, &x[1], &c__1, &b[1], &c__1);
@@ -614,16 +630,16 @@ L80:
 				nout);
 		    }
 
-		    dtrt03_(uplo, trans, diag, &n, &c__1, &a[1], &lda, &scale,
+		    dtrt03_(uplo, trans, diag, &n, &c__1, &a[1], &lda, &scale, 
 			     &rwork[1], &c_b101, &b[1], &lda, &x[1], &lda, &
 			    work[1], &result[7]);
 
-/* +    TEST 9   
-                   Solve op(A)*X = b again with NORMIN = 'Y'. */
+/* +    TEST 9 */
+/*                 Solve op(A)*X = b again with NORMIN = 'Y'. */
 
 		    dcopy_(&n, &x[1], &c__1, &b[n + 1], &c__1);
 		    dlatrs_(uplo, trans, diag, "Y", &n, &a[1], &lda, &b[n + 1]
-			    , &scale, &rwork[1], &info);
+, &scale, &rwork[1], &info);
 
 /*                 Check error code from DLATRS. */
 
@@ -639,12 +655,12 @@ L80:
 				nout);
 		    }
 
-		    dtrt03_(uplo, trans, diag, &n, &c__1, &a[1], &lda, &scale,
-			     &rwork[1], &c_b101, &b[n + 1], &lda, &x[1], &lda,
+		    dtrt03_(uplo, trans, diag, &n, &c__1, &a[1], &lda, &scale, 
+			     &rwork[1], &c_b101, &b[n + 1], &lda, &x[1], &lda, 
 			     &work[1], &result[8]);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    if (result[7] >= *thresh) {
 			if (nfail == 0 && nerrs == 0) {
@@ -704,4 +720,3 @@ L110:
 /*     End of DCHKTR */
 
 } /* dchktr_ */
-

@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -23,140 +18,154 @@ static real c_b30 = -1.f;
     real r__1, r__2, r__3, r__4;
 
     /* Local variables */
-    static integer ince, jcol, jvec;
-    static real unfl, wmat[4]	/* was [2][2] */, temp1;
-    static integer j, iecol;
+    integer j;
+    real ulp;
+    integer ince, jcol, jvec;
+    real unfl, wmat[4]	/* was [2][2] */, temp1;
+    integer iecol;
     extern logical lsame_(char *, char *);
-    static integer ipair;
+    integer ipair;
     extern /* Subroutine */ int sgemm_(char *, char *, integer *, integer *, 
 	    integer *, real *, real *, integer *, real *, integer *, real *, 
 	    real *, integer *);
-    static char norma[1];
-    static real anorm;
-    static char norme[1];
-    static real enorm;
-    static integer ierow;
+    char norma[1];
+    real anorm;
+    char norme[1];
+    real enorm;
+    integer ierow;
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *);
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
-    static real enrmin, enrmax;
+    real enrmin, enrmax;
     extern /* Subroutine */ int slaset_(char *, integer *, integer *, real *, 
 	    real *, real *, integer *);
-    static integer itrnse;
-    static real errnrm, ulp;
+    integer itrnse;
+    real errnrm;
 
 
-#define wmat_ref(a_1,a_2) wmat[(a_2)*2 + a_1 - 3]
-#define e_ref(a_1,a_2) e[(a_2)*e_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SGET22 does an eigenvector check. */
 
-    Purpose   
-    =======   
+/*  The basic test is: */
 
-    SGET22 does an eigenvector check.   
+/*     RESULT(1) = | A E  -  E W | / ( |A| |E| ulp ) */
 
-    The basic test is:   
+/*  using the 1-norm.  It also tests the normalization of E: */
 
-       RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
+/*     RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp ) */
+/*                  j */
 
-    using the 1-norm.  It also tests the normalization of E:   
+/*  where E(j) is the j-th eigenvector, and m-norm is the max-norm of a */
+/*  vector.  If an eigenvector is complex, as determined from WI(j) */
+/*  nonzero, then the max-norm of the vector ( er + i*ei ) is the maximum */
+/*  of */
+/*     |er(1)| + |ei(1)|, ... , |er(n)| + |ei(n)| */
 
-       RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
-                    j   
+/*  W is a block diagonal matrix, with a 1 by 1 block for each real */
+/*  eigenvalue and a 2 by 2 block for each complex conjugate pair. */
+/*  If eigenvalues j and j+1 are a complex conjugate pair, so that */
+/*  WR(j) = WR(j+1) = wr and WI(j) = - WI(j+1) = wi, then the 2 by 2 */
+/*  block corresponding to the pair will be: */
 
-    where E(j) is the j-th eigenvector, and m-norm is the max-norm of a   
-    vector.  If an eigenvector is complex, as determined from WI(j)   
-    nonzero, then the max-norm of the vector ( er + i*ei ) is the maximum   
-    of   
-       |er(1)| + |ei(1)|, ... , |er(n)| + |ei(n)|   
+/*     (  wr  wi  ) */
+/*     ( -wi  wr  ) */
 
-    W is a block diagonal matrix, with a 1 by 1 block for each real   
-    eigenvalue and a 2 by 2 block for each complex conjugate pair.   
-    If eigenvalues j and j+1 are a complex conjugate pair, so that   
-    WR(j) = WR(j+1) = wr and WI(j) = - WI(j+1) = wi, then the 2 by 2   
-    block corresponding to the pair will be:   
+/*  Such a block multiplying an n by 2 matrix ( ur ui ) on the right */
+/*  will be the same as multiplying  ur + i*ui  by  wr + i*wi. */
 
-       (  wr  wi  )   
-       ( -wi  wr  )   
+/*  To handle various schemes for storage of left eigenvectors, there are */
+/*  options to use A-transpose instead of A, E-transpose instead of E, */
+/*  and/or W-transpose instead of W. */
 
-    Such a block multiplying an n by 2 matrix ( ur ui ) on the right   
-    will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
+/*  Arguments */
+/*  ========== */
 
-    To handle various schemes for storage of left eigenvectors, there are   
-    options to use A-transpose instead of A, E-transpose instead of E,   
-    and/or W-transpose instead of W.   
+/*  TRANSA  (input) CHARACTER*1 */
+/*          Specifies whether or not A is transposed. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose */
+/*          = 'C':  Conjugate transpose (= Transpose) */
 
-    Arguments   
-    ==========   
+/*  TRANSE  (input) CHARACTER*1 */
+/*          Specifies whether or not E is transposed. */
+/*          = 'N':  No transpose, eigenvectors are in columns of E */
+/*          = 'T':  Transpose, eigenvectors are in rows of E */
+/*          = 'C':  Conjugate transpose (= Transpose) */
 
-    TRANSA  (input) CHARACTER*1   
-            Specifies whether or not A is transposed.   
-            = 'N':  No transpose   
-            = 'T':  Transpose   
-            = 'C':  Conjugate transpose (= Transpose)   
+/*  TRANSW  (input) CHARACTER*1 */
+/*          Specifies whether or not W is transposed. */
+/*          = 'N':  No transpose */
+/*          = 'T':  Transpose, use -WI(j) instead of WI(j) */
+/*          = 'C':  Conjugate transpose, use -WI(j) instead of WI(j) */
 
-    TRANSE  (input) CHARACTER*1   
-            Specifies whether or not E is transposed.   
-            = 'N':  No transpose, eigenvectors are in columns of E   
-            = 'T':  Transpose, eigenvectors are in rows of E   
-            = 'C':  Conjugate transpose (= Transpose)   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    TRANSW  (input) CHARACTER*1   
-            Specifies whether or not W is transposed.   
-            = 'N':  No transpose   
-            = 'T':  Transpose, use -WI(j) instead of WI(j)   
-            = 'C':  Conjugate transpose, use -WI(j) instead of WI(j)   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The matrix whose eigenvectors are in E. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= max(1,N). */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The matrix whose eigenvectors are in E.   
+/*  E       (input) REAL array, dimension (LDE,N) */
+/*          The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors */
+/*          are stored in the columns of E, if TRANSE = 'T' or 'C', the */
+/*          eigenvectors are stored in the rows of E. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
+/*  LDE     (input) INTEGER */
+/*          The leading dimension of the array E.  LDE >= max(1,N). */
 
-    E       (input) REAL array, dimension (LDE,N)   
-            The matrix of eigenvectors. If TRANSE = 'N', the eigenvectors   
-            are stored in the columns of E, if TRANSE = 'T' or 'C', the   
-            eigenvectors are stored in the rows of E.   
+/*  WR      (input) REAL array, dimension (N) */
+/*  WI      (input) REAL array, dimension (N) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          Purely real eigenvalues are indicated by WI(j) = 0. */
+/*          Complex conjugate pairs are indicated by WR(j)=WR(j+1) and */
+/*          WI(j) = - WI(j+1) non-zero; the real part is assumed to be */
+/*          stored in the j-th row/column and the imaginary part in */
+/*          the (j+1)-th row/column. */
 
-    LDE     (input) INTEGER   
-            The leading dimension of the array E.  LDE >= max(1,N).   
+/*  WORK    (workspace) REAL array, dimension (N*(N+1)) */
 
-    WR      (input) REAL array, dimension (N)   
-    WI      (input) REAL array, dimension (N)   
-            The real and imaginary parts of the eigenvalues of A.   
-            Purely real eigenvalues are indicated by WI(j) = 0.   
-            Complex conjugate pairs are indicated by WR(j)=WR(j+1) and   
-            WI(j) = - WI(j+1) non-zero; the real part is assumed to be   
-            stored in the j-th row/column and the imaginary part in   
-            the (j+1)-th row/column.   
+/*  RESULT  (output) REAL array, dimension (2) */
+/*          RESULT(1) = | A E  -  E W | / ( |A| |E| ulp ) */
+/*          RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp ) */
 
-    WORK    (workspace) REAL array, dimension (N*(N+1))   
+/*  ===================================================================== */
 
-    RESULT  (output) REAL array, dimension (2)   
-            RESULT(1) = | A E  -  E W | / ( |A| |E| ulp )   
-            RESULT(2) = max | m-norm(E(j)) - 1 | / ( n ulp )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Initialize RESULT (in case N=0) */
 
-
-       Initialize RESULT (in case N=0)   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     e_dim1 = *lde;
-    e_offset = 1 + e_dim1 * 1;
+    e_offset = 1 + e_dim1;
     e -= e_offset;
     --wr;
     --wi;
@@ -209,8 +218,9 @@ static real c_b30 = -1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__3 = temp1, r__4 = (r__1 = e_ref(j, jvec), dabs(r__1)) 
-			    + (r__2 = e_ref(j, jvec + 1), dabs(r__2));
+		    r__3 = temp1, r__4 = (r__1 = e[j + jvec * e_dim1], dabs(
+			    r__1)) + (r__2 = e[j + (jvec + 1) * e_dim1], dabs(
+			    r__2));
 		    temp1 = dmax(r__3,r__4);
 /* L10: */
 		}
@@ -226,7 +236,8 @@ static real c_b30 = -1.f;
 		i__2 = *n;
 		for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-		    r__2 = temp1, r__3 = (r__1 = e_ref(j, jvec), dabs(r__1));
+		    r__2 = temp1, r__3 = (r__1 = e[j + jvec * e_dim1], dabs(
+			    r__1));
 		    temp1 = dmax(r__2,r__3);
 /* L20: */
 		}
@@ -257,16 +268,17 @@ static real c_b30 = -1.f;
 		}
 		if (ipair == 1) {
 /* Computing MAX */
-		    r__3 = work[jvec], r__4 = (r__1 = e_ref(j, jvec), dabs(
-			    r__1)) + (r__2 = e_ref(j, jvec + 1), dabs(r__2));
+		    r__3 = work[jvec], r__4 = (r__1 = e[j + jvec * e_dim1], 
+			    dabs(r__1)) + (r__2 = e[j + (jvec + 1) * e_dim1], 
+			    dabs(r__2));
 		    work[jvec] = dmax(r__3,r__4);
 		    work[jvec + 1] = work[jvec];
 		} else if (ipair == 2) {
 		    ipair = 0;
 		} else {
 /* Computing MAX */
-		    r__2 = work[jvec], r__3 = (r__1 = e_ref(j, jvec), dabs(
-			    r__1));
+		    r__2 = work[jvec], r__3 = (r__1 = e[j + jvec * e_dim1], 
+			    dabs(r__1));
 		    work[jvec] = dmax(r__2,r__3);
 		    ipair = 0;
 		}
@@ -287,21 +299,21 @@ static real c_b30 = -1.f;
 	}
     }
 
-/*     Norm of A:   
+/*     Norm of A: */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = slange_(norma, n, n, &a[a_offset], lda, &work[1]);
     anorm = dmax(r__1,unfl);
 
-/*     Norm of E:   
+/*     Norm of E: */
 
-   Computing MAX */
+/* Computing MAX */
     r__1 = slange_(norme, n, n, &e[e_offset], lde, &work[1]);
     enorm = dmax(r__1,ulp);
 
-/*     Norm of error:   
+/*     Norm of error: */
 
-       Error =  AE - EW */
+/*     Error =  AE - EW */
 
     slaset_("Full", n, n, &c_b20, &c_b20, &work[1], n);
 
@@ -322,21 +334,21 @@ static real c_b30 = -1.f;
 	}
 
 	if (ipair == 1) {
-	    wmat_ref(1, 1) = wr[jcol];
-	    wmat_ref(2, 1) = -wi[jcol];
-	    wmat_ref(1, 2) = wi[jcol];
-	    wmat_ref(2, 2) = wr[jcol];
-	    sgemm_(transe, transw, n, &c__2, &c__2, &c_b25, &e_ref(ierow, 
-		    iecol), lde, wmat, &c__2, &c_b20, &work[*n * (jcol - 1) + 
-		    1], n);
+	    wmat[0] = wr[jcol];
+	    wmat[1] = -wi[jcol];
+	    wmat[2] = wi[jcol];
+	    wmat[3] = wr[jcol];
+	    sgemm_(transe, transw, n, &c__2, &c__2, &c_b25, &e[ierow + iecol *
+		     e_dim1], lde, wmat, &c__2, &c_b20, &work[*n * (jcol - 1) 
+		    + 1], n);
 	    ipair = 2;
 	} else if (ipair == 2) {
 	    ipair = 0;
 
 	} else {
 
-	    saxpy_(n, &wr[jcol], &e_ref(ierow, iecol), &ince, &work[*n * (
-		    jcol - 1) + 1], &c__1);
+	    saxpy_(n, &wr[jcol], &e[ierow + iecol * e_dim1], &ince, &work[*n *
+		     (jcol - 1) + 1], &c__1);
 	    ipair = 0;
 	}
 
@@ -363,9 +375,9 @@ static real c_b30 = -1.f;
 	}
     }
 
-/*     Compute RESULT(2) : the normalization error in E.   
+/*     Compute RESULT(2) : the normalization error in E. */
 
-   Computing MAX */
+/* Computing MAX */
     r__3 = (r__1 = enrmax - 1.f, dabs(r__1)), r__4 = (r__2 = enrmin - 1.f, 
 	    dabs(r__2));
     result[2] = dmax(r__3,r__4) / ((real) (*n) * ulp);
@@ -375,8 +387,3 @@ static real c_b30 = -1.f;
 /*     End of SGET22 */
 
 } /* sget22_ */
-
-#undef e_ref
-#undef wmat_ref
-
-

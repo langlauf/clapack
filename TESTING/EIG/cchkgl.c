@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -43,25 +38,23 @@ static integer c__20 = 20;
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
-    static integer info, lmax[3];
-    static real rmax, vmax, work[120];
-    static complex a[400]	/* was [20][20] */, b[400]	/* was [20][
-	    20] */;
-    static integer i__, j, n, ihiin, ninfo, iloin;
-    static real anorm, bnorm;
+    complex a[400]	/* was [20][20] */, b[400]	/* was [20][20] */;
+    integer i__, j, n;
+    complex ain[400]	/* was [20][20] */, bin[400]	/* was [20][20] */;
+    integer ihi, ilo;
+    real eps;
+    integer knt, info, lmax[3];
+    real rmax, vmax, work[120];
+    integer ihiin, ninfo, iloin;
+    real anorm, bnorm;
     extern /* Subroutine */ int cggbal_(char *, integer *, complex *, integer 
 	    *, complex *, integer *, integer *, integer *, real *, real *, 
 	    real *, integer *);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
-    static real lscale[20];
+    real lscale[20];
     extern doublereal slamch_(char *);
-    static real rscale[20], lsclin[20], rsclin[20];
-    static complex ain[400]	/* was [20][20] */, bin[400]	/* was [20][
-	    20] */;
-    static integer ihi, ilo;
-    static real eps;
-    static integer knt;
+    real rscale[20], lsclin[20], rsclin[20];
 
     /* Fortran I/O blocks */
     static cilist io___6 = { 0, 0, 0, 0, 0 };
@@ -82,38 +75,42 @@ static integer c__20 = 20;
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define b_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define b_ref(a_1,a_2) b[b_subscr(a_1,a_2)]
-#define ain_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define ain_ref(a_1,a_2) ain[ain_subscr(a_1,a_2)]
-#define bin_subscr(a_1,a_2) (a_2)*20 + a_1 - 21
-#define bin_ref(a_1,a_2) bin[bin_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  CCHKGL tests CGGBAL, a routine for balancing a matrix pair (A, B). */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    CCHKGL tests CGGBAL, a routine for balancing a matrix pair (A, B).   
+/*  NIN     (input) INTEGER */
+/*          The logical unit number for input.  NIN > 0. */
 
-    Arguments   
-    =========   
+/*  NOUT    (input) INTEGER */
+/*          The logical unit number for output.  NOUT > 0. */
 
-    NIN     (input) INTEGER   
-            The logical unit number for input.  NIN > 0.   
+/*  ===================================================================== */
 
-    NOUT    (input) INTEGER   
-            The logical unit number for output.  NOUT > 0.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     lmax[0] = 0;
     lmax[1] = 0;
@@ -139,8 +136,8 @@ L10:
 	s_rsle(&io___9);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&a[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L20: */
@@ -152,8 +149,8 @@ L10:
 	s_rsle(&io___12);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&b_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&b[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L30: */
@@ -170,8 +167,8 @@ L10:
 	s_rsle(&io___17);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&ain_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&ain[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L40: */
@@ -182,8 +179,8 @@ L10:
 	s_rsle(&io___19);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__6, &c__1, (char *)&bin_ref(i__, j), (ftnlen)sizeof(
-		    complex));
+	    do_lio(&c__6, &c__1, (char *)&bin[i__ + j * 20 - 21], (ftnlen)
+		    sizeof(complex));
 	}
 	e_rsle();
 /* L50: */
@@ -228,15 +225,15 @@ L10:
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
 /* Computing MAX */
-	    i__3 = a_subscr(i__, j);
-	    i__4 = ain_subscr(i__, j);
+	    i__3 = i__ + j * 20 - 21;
+	    i__4 = i__ + j * 20 - 21;
 	    q__1.r = a[i__3].r - ain[i__4].r, q__1.i = a[i__3].i - ain[i__4]
 		    .i;
 	    r__1 = vmax, r__2 = c_abs(&q__1);
 	    vmax = dmax(r__1,r__2);
 /* Computing MAX */
-	    i__3 = b_subscr(i__, j);
-	    i__4 = bin_subscr(i__, j);
+	    i__3 = i__ + j * 20 - 21;
+	    i__4 = i__ + j * 20 - 21;
 	    q__1.r = b[i__3].r - bin[i__4].r, q__1.i = b[i__3].i - bin[i__4]
 		    .i;
 	    r__1 = vmax, r__2 = c_abs(&q__1);
@@ -304,14 +301,3 @@ L90:
 /*     End of CCHKGL */
 
 } /* cchkgl_ */
-
-#undef bin_ref
-#undef bin_subscr
-#undef ain_ref
-#undef ain_subscr
-#undef b_ref
-#undef b_subscr
-#undef a_ref
-#undef a_subscr
-
-

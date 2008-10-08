@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,79 +17,87 @@ static integer c__1 = 1;
     double r_imag(complex *);
 
     /* Local variables */
-    static integer i__, j;
-    static real xnorm;
-    static integer ix;
+    integer i__, j, ix;
+    real eps, xnorm;
     extern integer icamax_(integer *, complex *, integer *);
-    static real diffnm;
+    real diffnm;
     extern doublereal slamch_(char *);
-    static real eps;
 
 
-#define xact_subscr(a_1,a_2) (a_2)*xact_dim1 + a_1
-#define xact_ref(a_1,a_2) xact[xact_subscr(a_1,a_2)]
-#define x_subscr(a_1,a_2) (a_2)*x_dim1 + a_1
-#define x_ref(a_1,a_2) x[x_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  CGET04 computes the difference between a computed solution and the */
+/*  true solution to a system of linear equations. */
 
-    Purpose   
-    =======   
+/*  RESID =  ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS ), */
+/*  where RCOND is the reciprocal of the condition number and EPS is the */
+/*  machine epsilon. */
 
-    CGET04 computes the difference between a computed solution and the   
-    true solution to a system of linear equations.   
+/*  Arguments */
+/*  ========= */
 
-    RESID =  ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS ),   
-    where RCOND is the reciprocal of the condition number and EPS is the   
-    machine epsilon.   
+/*  N       (input) INTEGER */
+/*          The number of rows of the matrices X and XACT.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  NRHS    (input) INTEGER */
+/*          The number of columns of the matrices X and XACT.  NRHS >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows of the matrices X and XACT.  N >= 0.   
+/*  X       (input) COMPLEX array, dimension (LDX,NRHS) */
+/*          The computed solution vectors.  Each vector is stored as a */
+/*          column of the matrix X. */
 
-    NRHS    (input) INTEGER   
-            The number of columns of the matrices X and XACT.  NRHS >= 0.   
+/*  LDX     (input) INTEGER */
+/*          The leading dimension of the array X.  LDX >= max(1,N). */
 
-    X       (input) COMPLEX array, dimension (LDX,NRHS)   
-            The computed solution vectors.  Each vector is stored as a   
-            column of the matrix X.   
+/*  XACT    (input) COMPLEX array, dimension (LDX,NRHS) */
+/*          The exact solution vectors.  Each vector is stored as a */
+/*          column of the matrix XACT. */
 
-    LDX     (input) INTEGER   
-            The leading dimension of the array X.  LDX >= max(1,N).   
+/*  LDXACT  (input) INTEGER */
+/*          The leading dimension of the array XACT.  LDXACT >= max(1,N). */
 
-    XACT    (input) COMPLEX array, dimension (LDX,NRHS)   
-            The exact solution vectors.  Each vector is stored as a   
-            column of the matrix XACT.   
+/*  RCOND   (input) REAL */
+/*          The reciprocal of the condition number of the coefficient */
+/*          matrix in the system of equations. */
 
-    LDXACT  (input) INTEGER   
-            The leading dimension of the array XACT.  LDXACT >= max(1,N).   
+/*  RESID   (output) REAL */
+/*          The maximum over the NRHS solution vectors of */
+/*          ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS ) */
 
-    RCOND   (input) REAL   
-            The reciprocal of the condition number of the coefficient   
-            matrix in the system of equations.   
+/*  ===================================================================== */
 
-    RESID   (output) REAL   
-            The maximum over the NRHS solution vectors of   
-            ( norm(X-XACT) * RCOND ) / ( norm(XACT) * EPS )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Statement Functions .. */
+/*     .. */
+/*     .. Statement Function definitions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Quick exit if N = 0 or NRHS = 0. */
 
-
-       Quick exit if N = 0 or NRHS = 0.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1 * 1;
+    x_offset = 1 + x_dim1;
     x -= x_offset;
     xact_dim1 = *ldxact;
-    xact_offset = 1 + xact_dim1 * 1;
+    xact_offset = 1 + xact_dim1;
     xact -= xact_offset;
 
     /* Function Body */
@@ -111,22 +114,22 @@ static integer c__1 = 1;
 	return 0;
     }
 
-/*     Compute the maximum of   
-          norm(X - XACT) / ( norm(XACT) * EPS )   
-       over all the vectors X and XACT . */
+/*     Compute the maximum of */
+/*        norm(X - XACT) / ( norm(XACT) * EPS ) */
+/*     over all the vectors X and XACT . */
 
     *resid = 0.f;
     i__1 = *nrhs;
     for (j = 1; j <= i__1; ++j) {
-	ix = icamax_(n, &xact_ref(1, j), &c__1);
-	i__2 = xact_subscr(ix, j);
-	xnorm = (r__1 = xact[i__2].r, dabs(r__1)) + (r__2 = r_imag(&xact_ref(
-		ix, j)), dabs(r__2));
+	ix = icamax_(n, &xact[j * xact_dim1 + 1], &c__1);
+	i__2 = ix + j * xact_dim1;
+	xnorm = (r__1 = xact[i__2].r, dabs(r__1)) + (r__2 = r_imag(&xact[ix + 
+		j * xact_dim1]), dabs(r__2));
 	diffnm = 0.f;
 	i__2 = *n;
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    i__3 = x_subscr(i__, j);
-	    i__4 = xact_subscr(i__, j);
+	    i__3 = i__ + j * x_dim1;
+	    i__4 = i__ + j * xact_dim1;
 	    q__2.r = x[i__3].r - xact[i__4].r, q__2.i = x[i__3].i - xact[i__4]
 		    .i;
 	    q__1.r = q__2.r, q__1.i = q__2.i;
@@ -156,10 +159,3 @@ static integer c__1 = 1;
 /*     End of CGET04 */
 
 } /* cget04_ */
-
-#undef x_ref
-#undef x_subscr
-#undef xact_ref
-#undef xact_subscr
-
-

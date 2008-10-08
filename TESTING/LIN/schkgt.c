@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -56,27 +51,30 @@ static real c_b64 = 0.f;
     integer i__1, i__2, i__3, i__4;
     real r__1, r__2;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static real cond;
-    static integer mode, koff, imat, info;
-    static char path[3], dist[1];
-    static integer irhs, nrhs;
-    static char norm[1], type__[1];
-    static integer nrun, i__, j, k;
+    integer i__, j, k, m, n;
+    real z__[3];
+    integer in, kl, ku, ix, lda;
+    real cond;
+    integer mode, koff, imat, info;
+    char path[3], dist[1];
+    integer irhs, nrhs;
+    char norm[1], type__[1];
+    integer nrun;
     extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer m, n, nfail, iseed[4];
-    static real z__[3], rcond;
+    integer nfail, iseed[4];
+    real rcond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *), sscal_(integer *, real *, 
 	    real *, integer *);
-    static integer nimat;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static integer itran;
+    real anorm;
+    integer itran;
     extern /* Subroutine */ int sgtt01_(integer *, real *, real *, real *, 
 	    real *, real *, real *, real *, integer *, real *, integer *, 
 	    real *, real *), sgtt02_(char *, integer *, integer *, real *, 
@@ -84,45 +82,41 @@ static real c_b64 = 0.f;
 	    real *), sgtt05_(char *, integer *, integer *, real *, 
 	    real *, real *, real *, integer *, real *, integer *, real *, 
 	    integer *, real *, real *, real *);
-    static char trans[1];
-    static integer izero, nerrs;
+    char trans[1];
+    integer izero, nerrs;
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
 	    integer *);
-    static logical zerot;
+    logical zerot;
     extern /* Subroutine */ int slatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    );
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku, ix;
-    static real rcondc, rcondi, rcondo;
+), alaerh_(char *, char *, integer *, 
+	    integer *, char *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *, integer *, integer *);
+    real rcondc, rcondi, rcondo;
     extern /* Subroutine */ int alasum_(char *, integer *, integer *, integer 
 	    *, integer *), serrge_(char *, integer *);
-    static real ainvnm;
+    real ainvnm;
     extern doublereal slangt_(char *, integer *, real *, real *, real *);
     extern /* Subroutine */ int slagtm_(char *, integer *, integer *, real *, 
 	    real *, real *, real *, real *, integer *, real *, real *, 
 	    integer *);
-    static logical trfcon;
+    logical trfcon;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), sgtcon_(char *, integer *, 
-	    real *, real *, real *, real *, integer *, real *, real *, real *,
+	    real *, real *, real *, real *, integer *, real *, real *, real *, 
 	     integer *, integer *), slatms_(integer *, integer *, 
 	    char *, integer *, char *, real *, integer *, real *, real *, 
 	    integer *, integer *, char *, real *, integer *, real *, integer *
-	    ), slarnv_(integer *, integer *, integer *
-	    , real *), sgtrfs_(char *, integer *, integer *, real *, real *, 
+), slarnv_(integer *, integer *, integer *
+, real *), sgtrfs_(char *, integer *, integer *, real *, real *, 
 	    real *, real *, real *, real *, real *, integer *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, integer *, 
 	    integer *), sgttrf_(integer *, real *, real *, real *, 
 	    real *, integer *, integer *);
-    static real result[7];
+    real result[7];
     extern /* Subroutine */ int sgttrs_(char *, integer *, integer *, real *, 
 	    real *, real *, real *, integer *, real *, integer *, integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___29 = { 0, 0, 0, fmt_9999, 0 };
@@ -131,70 +125,90 @@ static real c_b64 = 0.f;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SCHKGT tests SGTTRF, -TRS, -RFS, and -CON   
+/*  SCHKGT tests SGTTRF, -TRS, -RFS, and -CON */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) REAL array, dimension (NMAX*4)   
+/*  A       (workspace) REAL array, dimension (NMAX*4) */
 
-    AF      (workspace) REAL array, dimension (NMAX*4)   
+/*  AF      (workspace) REAL array, dimension (NMAX*4) */
 
-    B       (workspace) REAL array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) REAL array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) REAL array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) REAL array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) REAL array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) REAL array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NSMAX))   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (NMAX*max(3,NSMAX)) */
 
-    RWORK   (workspace) REAL array, dimension   
-                        (max(NMAX,2*NSMAX))   
+/*  RWORK   (workspace) REAL array, dimension */
+/*                      (max(NMAX,2*NSMAX)) */
 
-    IWORK   (workspace) INTEGER array, dimension (2*NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (2*NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -208,6 +222,8 @@ static real c_b64 = 0.f;
     --dotype;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "GT", (ftnlen)2, (ftnlen)2);
@@ -258,9 +274,9 @@ static real c_b64 = 0.f;
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Types 1-6:  generate matrices of known condition number.   
+/*              Types 1-6:  generate matrices of known condition number. */
 
-   Computing MAX */
+/* Computing MAX */
 		i__3 = 2 - ku, i__4 = 3 - max(1,n);
 		koff = max(i__3,i__4);
 		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
@@ -286,8 +302,8 @@ static real c_b64 = 0.f;
 		scopy_(&n, &af[2], &c__3, &a[m + 1], &c__1);
 	    } else {
 
-/*              Types 7-12:  generate tridiagonal matrices with   
-                unknown condition numbers. */
+/*              Types 7-12:  generate tridiagonal matrices with */
+/*              unknown condition numbers. */
 
 		if (! zerot || ! dotype[7]) {
 
@@ -301,8 +317,8 @@ static real c_b64 = 0.f;
 		    }
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back the zeroed out   
-                   elements. */
+/*                 Reuse the last matrix by copying back the zeroed out */
+/*                 elements. */
 
 		    if (izero == 1) {
 			a[n] = z__[1];
@@ -351,9 +367,9 @@ static real c_b64 = 0.f;
 		}
 	    }
 
-/* +    TEST 1   
-             Factor A as L*U and compute the ratio   
-                norm(L*U - A) / (n * norm(A) * EPS ) */
+/* +    TEST 1 */
+/*           Factor A as L*U and compute the ratio */
+/*              norm(L*U - A) / (n * norm(A) * EPS ) */
 
 	    i__3 = n + (m << 1);
 	    scopy_(&i__3, &a[1], &c__1, &af[1], &c__1);
@@ -370,7 +386,7 @@ static real c_b64 = 0.f;
 	    trfcon = info != 0;
 
 	    sgtt01_(&n, &a[1], &a[m + 1], &a[n + m + 1], &af[1], &af[m + 1], &
-		    af[n + m + 1], &af[n + (m << 1) + 1], &iwork[1], &work[1],
+		    af[n + m + 1], &af[n + (m << 1) + 1], &iwork[1], &work[1], 
 		     &lda, &rwork[1], result);
 
 /*           Print the test ratio if it is .GE. THRESH. */
@@ -402,9 +418,9 @@ static real c_b64 = 0.f;
 
 		if (! trfcon) {
 
-/*                 Use SGTTRS to solve for one column at a time of inv(A)   
-                   or inv(A^T), computing the maximum column sum as we   
-                   go. */
+/*                 Use SGTTRS to solve for one column at a time of inv(A) */
+/*                 or inv(A^T), computing the maximum column sum as we */
+/*                 go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
@@ -440,9 +456,9 @@ static real c_b64 = 0.f;
 		    rcondc = 0.f;
 		}
 
-/* +    TEST 7   
-                Estimate the reciprocal of the condition number of the   
-                matrix. */
+/* +    TEST 7 */
+/*              Estimate the reciprocal of the condition number of the */
+/*              matrix. */
 
 		s_copy(srnamc_1.srnamt, "SGTCON", (ftnlen)6, (ftnlen)6);
 		sgtcon_(norm, &n, &af[1], &af[m + 1], &af[n + m + 1], &af[n + 
@@ -452,7 +468,7 @@ static real c_b64 = 0.f;
 /*              Check error code from SGTCON. */
 
 		if (info != 0) {
-		    alaerh_(path, "SGTCON", &info, &c__0, norm, &n, &n, &c_n1,
+		    alaerh_(path, "SGTCON", &info, &c__0, norm, &n, &n, &c_n1, 
 			     &c_n1, &c_n1, &imat, &nfail, &nerrs, nout);
 		}
 
@@ -512,13 +528,13 @@ static real c_b64 = 0.f;
 		    slagtm_(trans, &n, &nrhs, &c_b63, &a[1], &a[m + 1], &a[n 
 			    + m + 1], &xact[1], &lda, &c_b64, &b[1], &lda);
 
-/* +    TEST 2   
-                   Solve op(A) * X = B and compute the residual. */
+/* +    TEST 2 */
+/*                 Solve op(A) * X = B and compute the residual. */
 
 		    slacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &lda);
 		    s_copy(srnamc_1.srnamt, "SGTTRS", (ftnlen)6, (ftnlen)6);
 		    sgttrs_(trans, &n, &nrhs, &af[1], &af[m + 1], &af[n + m + 
-			    1], &af[n + (m << 1) + 1], &iwork[1], &x[1], &lda,
+			    1], &af[n + (m << 1) + 1], &iwork[1], &x[1], &lda, 
 			     &info);
 
 /*                 Check error code from SGTTRS. */
@@ -530,21 +546,21 @@ static real c_b64 = 0.f;
 		    }
 
 		    slacpy_("Full", &n, &nrhs, &b[1], &lda, &work[1], &lda);
-		    sgtt02_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+		    sgtt02_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1], 
 			     &x[1], &lda, &work[1], &lda, &rwork[1], &result[
 			    1]);
 
-/* +    TEST 3   
-                   Check solution from generated exact solution. */
+/* +    TEST 3 */
+/*                 Check solution from generated exact solution. */
 
 		    sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
 			    result[2]);
 
-/* +    TESTS 4, 5, and 6   
-                   Use iterative refinement to improve the solution. */
+/* +    TESTS 4, 5, and 6 */
+/*                 Use iterative refinement to improve the solution. */
 
 		    s_copy(srnamc_1.srnamt, "SGTRFS", (ftnlen)6, (ftnlen)6);
-		    sgtrfs_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+		    sgtrfs_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1], 
 			     &af[1], &af[m + 1], &af[n + m + 1], &af[n + (m <<
 			     1) + 1], &iwork[1], &b[1], &lda, &x[1], &lda, &
 			    rwork[1], &rwork[nrhs + 1], &work[1], &iwork[n + 
@@ -560,12 +576,12 @@ static real c_b64 = 0.f;
 
 		    sget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &rcondc, &
 			    result[3]);
-		    sgtt05_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1],
+		    sgtt05_(trans, &n, &nrhs, &a[1], &a[m + 1], &a[n + m + 1], 
 			     &b[1], &lda, &x[1], &lda, &xact[1], &lda, &rwork[
 			    1], &rwork[nrhs + 1], &result[4]);
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    for (k = 2; k <= 6; ++k) {
 			if (result[k - 1] >= *thresh) {
@@ -611,4 +627,3 @@ L100:
 /*     End of SCHKGT */
 
 } /* schkgt_ */
-

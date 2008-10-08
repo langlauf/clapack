@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -39,23 +34,23 @@ static integer c__1 = 1;
     /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    static integer info;
-    static complex b[2];
-    static real d__[2];
-    static complex e[2];
-    static integer i__;
-    static complex w[2], x[2];
-    static real rcond, anorm;
-    static char c2[2];
-    static real r1[2], r2[2], df[2];
-    static complex ef[2], dl[2];
-    static integer ip[2];
-    static complex du[2];
-    extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
-    static real rw[2];
-    extern /* Subroutine */ int cgtcon_(char *, integer *, complex *, complex 
-	    *, complex *, complex *, integer *, real *, real *, complex *, 
-	    integer *);
+    complex b[2];
+    real d__[2];
+    complex e[2];
+    integer i__;
+    complex w[2], x[2];
+    char c2[2];
+    real r1[2], r2[2], df[2];
+    complex ef[2], dl[2];
+    integer ip[2];
+    complex du[2];
+    real rw[2];
+    complex du2[2], dlf[2], duf[2];
+    integer info;
+    real rcond, anorm;
+    extern /* Subroutine */ int alaesm_(char *, logical *, integer *),
+	     cgtcon_(char *, integer *, complex *, complex *, complex *, 
+	    complex *, integer *, real *, real *, complex *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), cptcon_(integer *, real *, complex *, real 
@@ -69,40 +64,54 @@ static integer c__1 = 1;
 	    real *, real *, complex *, real *, integer *), cpttrf_(
 	    integer *, real *, complex *, integer *), cgttrs_(char *, integer 
 	    *, integer *, complex *, complex *, complex *, complex *, integer 
-	    *, complex *, integer *, integer *);
-    static complex du2[2];
-    extern /* Subroutine */ int cpttrs_(char *, integer *, integer *, real *, 
-	    complex *, complex *, integer *, integer *);
-    static complex dlf[2], duf[2];
+	    *, complex *, integer *, integer *), cpttrs_(char *, 
+	    integer *, integer *, real *, complex *, complex *, integer *, 
+	    integer *);
 
     /* Fortran I/O blocks */
     static cilist io___1 = { 0, 0, 0, 0, 0 };
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CERRGT tests the error exits for the COMPLEX tridiagonal   
-    routines.   
+/*  CERRGT tests the error exits for the COMPLEX tridiagonal */
+/*  routines. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     io___1.ciunit = infoc_1.nout;
@@ -124,9 +133,9 @@ static integer c__1 = 1;
 
     if (lsamen_(&c__2, c2, "GT")) {
 
-/*        Test error exits for the general tridiagonal routines.   
+/*        Test error exits for the general tridiagonal routines. */
 
-          CGTTRF */
+/*        CGTTRF */
 
 	s_copy(srnamc_1.srnamt, "CGTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -158,27 +167,27 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "CGTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	cgtrfs_("/", &c__0, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("CGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cgtrfs_("N", &c_n1, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	cgtrfs_("N", &c_n1, &c__0, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("CGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cgtrfs_("N", &c__0, &c_n1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	cgtrfs_("N", &c__0, &c_n1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("CGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 13;
-	cgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1,
+	cgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__1, 
 		 x, &c__2, r1, r2, w, rw, &info);
 	chkxer_("CGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 15;
-	cgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__2,
+	cgtrfs_("N", &c__2, &c__1, dl, e, du, dlf, ef, duf, du2, ip, b, &c__2, 
 		 x, &c__1, r1, r2, w, rw, &info);
 	chkxer_("CGTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -202,10 +211,10 @@ static integer c__1 = 1;
 
     } else if (lsamen_(&c__2, c2, "PT")) {
 
-/*        Test error exits for the positive definite tridiagonal   
-          routines.   
+/*        Test error exits for the positive definite tridiagonal */
+/*        routines. */
 
-          CPTTRF */
+/*        CPTTRF */
 
 	s_copy(srnamc_1.srnamt, "CPTTRF", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
@@ -237,27 +246,27 @@ static integer c__1 = 1;
 
 	s_copy(srnamc_1.srnamt, "CPTRFS", (ftnlen)6, (ftnlen)6);
 	infoc_1.infot = 1;
-	cptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	cptrfs_("/", &c__1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("CPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 2;
-	cptrfs_("U", &c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	cptrfs_("U", &c_n1, &c__0, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("CPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 3;
-	cptrfs_("U", &c__0, &c_n1, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2,
+	cptrfs_("U", &c__0, &c_n1, d__, e, df, ef, b, &c__1, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("CPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 9;
-	cptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__1, x, &c__2, r1, r2,
+	cptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__1, x, &c__2, r1, r2, 
 		 w, rw, &info);
 	chkxer_("CPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
 	infoc_1.infot = 11;
-	cptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__2, x, &c__1, r1, r2,
+	cptrfs_("U", &c__2, &c__1, d__, e, df, ef, b, &c__2, x, &c__1, r1, r2, 
 		 w, rw, &info);
 	chkxer_("CPTRFS", &infoc_1.infot, &infoc_1.nout, &infoc_1.lerr, &
 		infoc_1.ok);
@@ -285,4 +294,3 @@ static integer c__1 = 1;
 /*     End of CERRGT */
 
 } /* cerrgt_ */
-

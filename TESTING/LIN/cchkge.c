@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -23,11 +18,11 @@ struct {
 
 /* Table of constant values */
 
+static integer c__1 = 1;
 static integer c__2 = 2;
 static integer c__0 = 0;
 static integer c_n1 = -1;
-static complex c_b21 = {0.f,0.f};
-static integer c__1 = 1;
+static complex c_b23 = {0.f,0.f};
 static integer c__8 = 8;
 
 /* Subroutine */ int cchkge_(logical *dotype, integer *nm, integer *mval, 
@@ -56,54 +51,51 @@ static integer c__8 = 8;
     /* System generated locals */
     integer i__1, i__2, i__3, i__4, i__5;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer ioff, mode, imat, info;
-    static char path[3], dist[1];
-    static integer irhs, nrhs;
-    static char norm[1], type__[1];
-    static integer nrun, i__;
-    extern /* Subroutine */ int alahd_(integer *, char *);
-    static integer k, m, n;
-    extern /* Subroutine */ int cget01_(integer *, integer *, complex *, 
-	    integer *, complex *, integer *, integer *, real *, real *), 
-	    cget02_(char *, integer *, integer *, integer *, complex *, 
+    integer i__, k, m, n, nb, im, in, kl, ku, nt, lda, inb, ioff, mode, imat, 
+	    info;
+    char path[3], dist[1];
+    integer irhs, nrhs;
+    char norm[1], type__[1];
+    integer nrun;
+    extern /* Subroutine */ int alahd_(integer *, char *), cget01_(
+	    integer *, integer *, complex *, integer *, complex *, integer *, 
+	    integer *, real *, real *), cget02_(char *, integer *, integer *, 
+	    integer *, complex *, integer *, complex *, integer *, complex *, 
+	    integer *, real *, real *), cget03_(integer *, complex *, 
 	    integer *, complex *, integer *, complex *, integer *, real *, 
-	    real *), cget03_(integer *, complex *, integer *, complex 
-	    *, integer *, complex *, integer *, real *, real *, real *), 
-	    cget04_(integer *, integer *, complex *, integer *, complex *, 
-	    integer *, real *, real *);
-    static integer nfail, iseed[4];
+	    real *, real *), cget04_(integer *, integer *, complex *, integer 
+	    *, complex *, integer *, real *, real *);
+    integer nfail, iseed[4];
     extern /* Subroutine */ int cget07_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, complex *, integer *, complex 
 	    *, integer *, real *, real *, real *);
-    static real rcond;
-    static integer nimat;
+    real rcond;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static integer itran;
-    static char trans[1];
-    static integer izero, nerrs;
-    static real dummy;
-    static integer lwork;
-    static logical zerot;
-    static char xtype[1];
+    real anorm;
+    integer itran;
+    char trans[1];
+    integer izero, nerrs;
+    real dummy;
+    integer lwork;
+    logical zerot;
+    char xtype[1];
     extern /* Subroutine */ int clatb4_(char *, integer *, integer *, integer 
 	    *, char *, integer *, integer *, real *, integer *, real *, char *
-	    );
-    static integer nb, im, in, kl;
+);
     extern doublereal clange_(char *, integer *, integer *, complex *, 
 	    integer *, real *);
     extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
 	    char *, integer *, integer *, integer *, integer *, integer *, 
 	    integer *, integer *, integer *, integer *), cgecon_(char *, integer *, complex *, integer *, real *, 
-	    real *, complex *, real *, integer *);
-    static integer ku, nt;
-    extern /* Subroutine */ int cerrge_(char *, integer *);
-    static real rcondc;
+	    real *, complex *, real *, integer *), cerrge_(char *, 
+	    integer *);
+    real rcondc;
     extern /* Subroutine */ int cgerfs_(char *, integer *, integer *, complex 
 	    *, integer *, complex *, integer *, integer *, complex *, integer 
 	    *, complex *, integer *, real *, real *, complex *, real *, 
@@ -114,22 +106,21 @@ static integer c__8 = 8;
 	    integer *, integer *, integer *, complex *, integer *, complex *, 
 	    integer *, complex *, integer *, integer *, integer *), cgetri_(integer *, complex *, integer *, 
 	    integer *, complex *, integer *, integer *);
-    static real rcondi;
+    real rcondi;
     extern /* Subroutine */ int claset_(char *, integer *, integer *, complex 
 	    *, complex *, complex *, integer *), alasum_(char *, 
 	    integer *, integer *, integer *, integer *);
-    static real cndnum, anormi, rcondo;
+    real cndnum, anormi, rcondo;
     extern /* Subroutine */ int cgetrs_(char *, integer *, integer *, complex 
 	    *, integer *, integer *, complex *, integer *, integer *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int clatms_(integer *, integer *, char *, integer 
 	    *, char *, real *, integer *, real *, real *, integer *, integer *
-	    , char *, complex *, integer *, complex *, integer *);
-    static logical trfcon;
-    static real anormo;
+, char *, complex *, integer *, complex *, integer *);
+    logical trfcon;
+    real anormo;
     extern /* Subroutine */ int xlaenv_(integer *, integer *);
-    static real result[8];
-    static integer lda, inb;
+    real result[8];
 
     /* Fortran I/O blocks */
     static cilist io___41 = { 0, 0, 0, fmt_9999, 0 };
@@ -138,92 +129,112 @@ static integer c__8 = 8;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       December 7, 1999   
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    CCHKGE tests CGETRF, -TRI, -TRS, -RFS, and -CON.   
+/*  CCHKGE tests CGETRF, -TRI, -TRS, -RFS, and -CON. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NM      (input) INTEGER   
-            The number of values of M contained in the vector MVAL.   
+/*  NM      (input) INTEGER */
+/*          The number of values of M contained in the vector MVAL. */
 
-    MVAL    (input) INTEGER array, dimension (NM)   
-            The values of the matrix row dimension M.   
+/*  MVAL    (input) INTEGER array, dimension (NM) */
+/*          The values of the matrix row dimension M. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix column dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix column dimension N. */
 
-    NNB     (input) INTEGER   
-            The number of values of NB contained in the vector NBVAL.   
+/*  NNB     (input) INTEGER */
+/*          The number of values of NB contained in the vector NBVAL. */
 
-    NBVAL   (input) INTEGER array, dimension (NBVAL)   
-            The values of the blocksize NB.   
+/*  NBVAL   (input) INTEGER array, dimension (NBVAL) */
+/*          The values of the blocksize NB. */
 
-    NNS     (input) INTEGER   
-            The number of values of NRHS contained in the vector NSVAL.   
+/*  NNS     (input) INTEGER */
+/*          The number of values of NRHS contained in the vector NSVAL. */
 
-    NSVAL   (input) INTEGER array, dimension (NNS)   
-            The values of the number of right hand sides NRHS.   
+/*  NSVAL   (input) INTEGER array, dimension (NNS) */
+/*          The values of the number of right hand sides NRHS. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    NMAX    (input) INTEGER   
-            The maximum value permitted for M or N, used in dimensioning   
-            the work arrays.   
+/*  NMAX    (input) INTEGER */
+/*          The maximum value permitted for M or N, used in dimensioning */
+/*          the work arrays. */
 
-    A       (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  A       (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    AFAC    (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  AFAC    (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    AINV    (workspace) COMPLEX array, dimension (NMAX*NMAX)   
+/*  AINV    (workspace) COMPLEX array, dimension (NMAX*NMAX) */
 
-    B       (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
-            where NSMAX is the largest entry in NSVAL.   
+/*  B       (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
+/*          where NSMAX is the largest entry in NSVAL. */
 
-    X       (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
+/*  X       (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
 
-    XACT    (workspace) COMPLEX array, dimension (NMAX*NSMAX)   
+/*  XACT    (workspace) COMPLEX array, dimension (NMAX*NSMAX) */
 
-    WORK    (workspace) COMPLEX array, dimension   
-                        (NMAX*max(3,NSMAX))   
+/*  WORK    (workspace) COMPLEX array, dimension */
+/*                      (NMAX*max(3,NSMAX)) */
 
-    RWORK   (workspace) REAL array, dimension   
-                        (max(2*NMAX,2*NSMAX+NWORK))   
+/*  RWORK   (workspace) REAL array, dimension */
+/*                      (max(2*NMAX,2*NSMAX+NWORK)) */
 
-    IWORK   (workspace) INTEGER array, dimension (NMAX)   
+/*  IWORK   (workspace) INTEGER array, dimension (NMAX) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iwork;
     --rwork;
     --work;
@@ -239,9 +250,11 @@ static integer c__8 = 8;
     --mval;
     --dotype;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Initialize constants and the random number seed. */
+/*     Initialize constants and the random number seed. */
 
     s_copy(path, "Complex precision", (ftnlen)1, (ftnlen)17);
     s_copy(path + 1, "GE", (ftnlen)2, (ftnlen)2);
@@ -255,6 +268,7 @@ static integer c__8 = 8;
 
 /*     Test the error exits */
 
+    xlaenv_(&c__1, &c__1);
     if (*tsterr) {
 	cerrge_(path, nout);
     }
@@ -295,8 +309,8 @@ static integer c__8 = 8;
 		    goto L100;
 		}
 
-/*              Set up parameters with CLATB4 and generate a test matrix   
-                with CLATMS. */
+/*              Set up parameters with CLATB4 and generate a test matrix */
+/*              with CLATMS. */
 
 		clatb4_(path, &imat, &m, &n, type__, &kl, &ku, &anorm, &mode, 
 			&cndnum, dist);
@@ -314,8 +328,8 @@ static integer c__8 = 8;
 		    goto L100;
 		}
 
-/*              For types 5-7, zero one or more columns of the matrix to   
-                test that INFO is returned correctly. */
+/*              For types 5-7, zero one or more columns of the matrix to */
+/*              test that INFO is returned correctly. */
 
 		if (zerot) {
 		    if (imat == 5) {
@@ -335,20 +349,20 @@ static integer c__8 = 8;
 			}
 		    } else {
 			i__4 = n - izero + 1;
-			claset_("Full", &m, &i__4, &c_b21, &c_b21, &a[ioff + 
+			claset_("Full", &m, &i__4, &c_b23, &c_b23, &a[ioff + 
 				1], &lda);
 		    }
 		} else {
 		    izero = 0;
 		}
 
-/*              These lines, if used in place of the calls in the DO 60   
-                loop, cause the code to bomb on a Sun SPARCstation.   
+/*              These lines, if used in place of the calls in the DO 60 */
+/*              loop, cause the code to bomb on a Sun SPARCstation. */
 
-                 ANORMO = CLANGE( 'O', M, N, A, LDA, RWORK )   
-                 ANORMI = CLANGE( 'I', M, N, A, LDA, RWORK )   
+/*               ANORMO = CLANGE( 'O', M, N, A, LDA, RWORK ) */
+/*               ANORMI = CLANGE( 'I', M, N, A, LDA, RWORK ) */
 
-                Do for each blocksize in NBVAL */
+/*              Do for each blocksize in NBVAL */
 
 		i__4 = *nnb;
 		for (inb = 1; inb <= i__4; ++inb) {
@@ -369,17 +383,17 @@ static integer c__8 = 8;
 		    }
 		    trfcon = FALSE_;
 
-/* +    TEST 1   
-                   Reconstruct matrix from factors and compute residual. */
+/* +    TEST 1 */
+/*                 Reconstruct matrix from factors and compute residual. */
 
 		    clacpy_("Full", &m, &n, &afac[1], &lda, &ainv[1], &lda);
 		    cget01_(&m, &n, &a[1], &lda, &ainv[1], &lda, &iwork[1], &
 			    rwork[1], result);
 		    nt = 1;
 
-/* +    TEST 2   
-                   Form the inverse if the factorization was successful   
-                   and compute the residual. */
+/* +    TEST 2 */
+/*                 Form the inverse if the factorization was successful */
+/*                 and compute the residual. */
 
 		    if (m == n && info == 0) {
 			clacpy_("Full", &n, &n, &afac[1], &lda, &ainv[1], &
@@ -394,14 +408,14 @@ static integer c__8 = 8;
 /*                    Check error code from CGETRI. */
 
 			if (info != 0) {
-			    alaerh_(path, "CGETRI", &info, &c__0, " ", &n, &n,
-				     &c_n1, &c_n1, &nb, &imat, &nfail, &nerrs,
+			    alaerh_(path, "CGETRI", &info, &c__0, " ", &n, &n, 
+				     &c_n1, &c_n1, &nb, &imat, &nfail, &nerrs, 
 				     nout);
 			}
 
-/*                    Compute the residual for the matrix times its   
-                      inverse.  Also compute the 1-norm condition number   
-                      of A. */
+/*                    Compute the residual for the matrix times its */
+/*                    inverse.  Also compute the 1-norm condition number */
+/*                    of A. */
 
 			cget03_(&n, &a[1], &lda, &ainv[1], &lda, &work[1], &
 				lda, &rwork[1], &rcondo, &result[1]);
@@ -429,8 +443,8 @@ static integer c__8 = 8;
 			rcondi = 0.f;
 		    }
 
-/*                 Print information about the tests so far that did not   
-                   pass the threshold. */
+/*                 Print information about the tests so far that did not */
+/*                 pass the threshold. */
 
 		    i__5 = nt;
 		    for (k = 1; k <= i__5; ++k) {
@@ -459,9 +473,9 @@ static integer c__8 = 8;
 		    }
 		    nrun += nt;
 
-/*                 Skip the remaining tests if this is not the first   
-                   block size or if M .ne. N.  Skip the solve tests if   
-                   the matrix is singular. */
+/*                 Skip the remaining tests if this is not the first */
+/*                 block size or if M .ne. N.  Skip the solve tests if */
+/*                 the matrix is singular. */
 
 		    if (inb > 1 || m != n) {
 			goto L90;
@@ -484,14 +498,14 @@ static integer c__8 = 8;
 				rcondc = rcondi;
 			    }
 
-/* +    TEST 3   
-                         Solve and compute residual for A * X = B. */
+/* +    TEST 3 */
+/*                       Solve and compute residual for A * X = B. */
 
 			    s_copy(srnamc_1.srnamt, "CLARHS", (ftnlen)6, (
 				    ftnlen)6);
-			    clarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku,
+			    clarhs_(path, xtype, " ", trans, &n, &n, &kl, &ku, 
 				     &nrhs, &a[1], &lda, &xact[1], &lda, &b[1]
-				    , &lda, iseed, &info);
+, &lda, iseed, &info);
 			    *(unsigned char *)xtype = 'C';
 
 			    clacpy_("Full", &n, &nrhs, &b[1], &lda, &x[1], &
@@ -515,15 +529,15 @@ static integer c__8 = 8;
 				    &lda, &work[1], &lda, &rwork[1], &result[
 				    2]);
 
-/* +    TEST 4   
-                         Check solution from generated exact solution. */
+/* +    TEST 4 */
+/*                       Check solution from generated exact solution. */
 
 			    cget04_(&n, &nrhs, &x[1], &lda, &xact[1], &lda, &
 				    rcondc, &result[3]);
 
-/* +    TESTS 5, 6, and 7   
-                         Use iterative refinement to improve the   
-                         solution. */
+/* +    TESTS 5, 6, and 7 */
+/*                       Use iterative refinement to improve the */
+/*                       solution. */
 
 			    s_copy(srnamc_1.srnamt, "CGERFS", (ftnlen)6, (
 				    ftnlen)6);
@@ -546,8 +560,8 @@ static integer c__8 = 8;
 				    lda, &x[1], &lda, &xact[1], &lda, &rwork[
 				    1], &rwork[nrhs + 1], &result[5]);
 
-/*                       Print information about the tests that did not   
-                         pass the threshold. */
+/*                       Print information about the tests that did not */
+/*                       pass the threshold. */
 
 			    for (k = 3; k <= 7; ++k) {
 				if (result[k - 1] >= *thresh) {
@@ -578,8 +592,8 @@ static integer c__8 = 8;
 /* L60: */
 		    }
 
-/* +    TEST 8   
-                      Get an estimate of RCOND = 1/CNDNUM. */
+/* +    TEST 8 */
+/*                    Get an estimate of RCOND = 1/CNDNUM. */
 
 L70:
 		    for (itran = 1; itran <= 2; ++itran) {
@@ -611,8 +625,8 @@ L70:
 
 			result[7] = sget06_(&rcond, &rcondc);
 
-/*                    Print information about the tests that did not pass   
-                      the threshold. */
+/*                    Print information about the tests that did not pass */
+/*                    the threshold. */
 
 			if (result[7] >= *thresh) {
 			    if (nfail == 0 && nerrs == 0) {
@@ -656,4 +670,3 @@ L100:
 /*     End of CCHKGE */
 
 } /* cchkge_ */
-

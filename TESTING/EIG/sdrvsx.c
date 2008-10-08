@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -32,7 +27,7 @@ static integer c__22 = 22;
 
 /* Subroutine */ int sdrvsx_(integer *nsizes, integer *nn, integer *ntypes, 
 	logical *dotype, integer *iseed, real *thresh, integer *niunit, 
-	integer *nounit, real *a, integer *lda, real *h__, real *ht, real *wr,
+	integer *nounit, real *a, integer *lda, real *h__, real *ht, real *wr, 
 	 real *wi, real *wrt, real *wit, real *wrtmp, real *witmp, real *vs, 
 	integer *ldvs, real *vs1, real *result, real *work, integer *lwork, 
 	integer *iwork, logical *bwork, integer *info)
@@ -106,40 +101,40 @@ static integer c__22 = 22;
     integer a_dim1, a_offset, h_dim1, h_offset, ht_dim1, ht_offset, vs_dim1, 
 	    vs_offset, vs1_dim1, vs1_offset, i__1, i__2, i__3, i__4;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void),
 	     s_rsle(cilist *), do_lio(integer *, integer *, char *, ftnlen), 
 	    e_rsle(void);
 
     /* Local variables */
-    static real cond;
-    static integer jcol;
-    static char path[3];
-    static integer nmax;
-    static real unfl, ovfl;
-    static integer i__, j, n;
-    static logical badnn;
-    static integer nfail, imode, iinfo;
-    static real conds;
+    integer i__, j, n, iwk;
+    real ulp, cond;
+    integer jcol;
+    char path[3];
+    integer nmax;
+    real unfl, ovfl;
+    logical badnn;
+    integer nfail, imode, iinfo;
+    real conds;
     extern /* Subroutine */ int sget24_(logical *, integer *, real *, integer 
 	    *, integer *, integer *, real *, integer *, real *, real *, real *
-	    , real *, real *, real *, real *, real *, real *, integer *, real 
+, real *, real *, real *, real *, real *, real *, integer *, real 
 	    *, real *, real *, integer *, integer *, real *, real *, integer *
-	    , integer *, logical *, integer *);
-    static real anorm;
-    static integer islct[20], nslct, jsize, nerrs, itype, jtype, ntest;
-    static real rtulp;
+, integer *, logical *, integer *);
+    real anorm;
+    integer islct[20], nslct, jsize, nerrs, itype, jtype, ntest;
+    real rtulp;
     extern /* Subroutine */ int slabad_(real *, real *);
-    static real rcdein;
-    static char adumma[1*1];
+    real rcdein;
+    char adumma[1*1];
     extern doublereal slamch_(char *);
-    static integer idumma[1], ioldsd[4];
+    integer idumma[1], ioldsd[4];
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real rcdvin;
+    real rcdvin;
     extern /* Subroutine */ int slatme_(integer *, char *, integer *, real *, 
-	    integer *, real *, real *, char *, char *, char *, char *, real *,
+	    integer *, real *, real *, char *, char *, char *, char *, real *, 
 	     integer *, real *, integer *, integer *, real *, real *, integer 
 	    *, real *, integer *), 
 	    slaset_(char *, integer *, integer *, real *, real *, real *, 
@@ -148,16 +143,15 @@ static integer c__22 = 22;
 	    real *, integer *, real *, real *, integer *, real *, char *, 
 	    integer *, integer *, integer *, real *, real *, char *, real *, 
 	    integer *, integer *, integer *);
-    static integer ntestf;
+    integer ntestf;
     extern /* Subroutine */ int slasum_(char *, integer *, integer *, integer 
 	    *), slatms_(integer *, integer *, char *, integer *, char 
 	    *, real *, integer *, real *, real *, integer *, integer *, char *
-	    , real *, integer *, real *, integer *);
-    static real ulpinv;
-    static integer nnwork;
-    static real rtulpi;
-    static integer mtypes, ntestt, iwk;
-    static real ulp;
+, real *, integer *, real *, integer *);
+    real ulpinv;
+    integer nnwork;
+    real rtulpi;
+    integer mtypes, ntestt;
 
     /* Fortran I/O blocks */
     static cilist io___32 = { 0, 0, 0, fmt_9991, 0 };
@@ -182,345 +176,364 @@ static integer c__22 = 22;
 
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-       SDRVSX checks the nonsymmetric eigenvalue (Schur form) problem   
-       expert driver SGEESX.   
-
-       SDRVSX uses both test matrices generated randomly depending on   
-       data supplied in the calling sequence, as well as on data   
-       read from an input file and including precomputed condition   
-       numbers to which it compares the ones it computes.   
-
-       When SDRVSX is called, a number of matrix "sizes" ("n's") and a   
-       number of matrix "types" are specified.  For each size ("n")   
-       and each type of matrix, one matrix will be generated and used   
-       to test the nonsymmetric eigenroutines.  For each matrix, 15   
-       tests will be performed:   
-
-       (1)     0 if T is in Schur form, 1/ulp otherwise   
-              (no sorting of eigenvalues)   
-
-       (2)     | A - VS T VS' | / ( n |A| ulp )   
-
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (no sorting of eigenvalues).   
-
-       (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues).   
-
-       (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
-
-       (5)     0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
-
-       (6)     0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               (no sorting of eigenvalues)   
-
-       (7)     0 if T is in Schur form, 1/ulp otherwise   
-               (with sorting of eigenvalues)   
-
-       (8)     | A - VS T VS' | / ( n |A| ulp )   
-
-         Here VS is the matrix of Schur eigenvectors, and T is in Schur   
-         form  (with sorting of eigenvalues).   
-
-       (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues).   
-
-       (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T   
-               1/ulp otherwise   
-               If workspace sufficient, also compare WR, WI with and   
-               without reciprocal condition numbers   
-               (with sorting of eigenvalues)   
-
-       (11)    0     if T(with VS) = T(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare T with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
-
-       (12)    0     if eigenvalues(with VS) = eigenvalues(without VS),   
-               1/ulp otherwise   
-               If workspace sufficient, also compare VS with and without   
-               reciprocal condition numbers   
-               (with sorting of eigenvalues)   
-
-       (13)    if sorting worked and SDIM is the number of   
-               eigenvalues which were SELECTed   
-               If workspace sufficient, also compare SDIM with and   
-               without reciprocal condition numbers   
-
-       (14)    if RCONDE the same no matter if VS and/or RCONDV computed   
-
-       (15)    if RCONDV the same no matter if VS and/or RCONDE computed   
-
-       The "sizes" are specified by an array NN(1:NSIZES); the value of   
-       each element NN(j) specifies one size.   
-       The "types" are specified by a logical array DOTYPE( 1:NTYPES );   
-       if DOTYPE(j) is .TRUE., then matrix type "j" will be generated.   
-       Currently, the list of possible types is:   
-
-       (1)  The zero matrix.   
-       (2)  The identity matrix.   
-       (3)  A (transposed) Jordan block, with 1's on the diagonal.   
-
-       (4)  A diagonal matrix with evenly spaced entries   
-            1, ..., ULP  and random signs.   
-            (ULP = (first number larger than 1) - 1 )   
-       (5)  A diagonal matrix with geometrically spaced entries   
-            1, ..., ULP  and random signs.   
-       (6)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP   
-            and random signs.   
-
-       (7)  Same as (4), but multiplied by a constant near   
-            the overflow threshold   
-       (8)  Same as (4), but multiplied by a constant near   
-            the underflow threshold   
-
-       (9)  A matrix of the form  U' T U, where U is orthogonal and   
-            T has evenly spaced entries 1, ..., ULP with random signs   
-            on the diagonal and random O(1) entries in the upper   
-            triangle.   
-
-       (10) A matrix of the form  U' T U, where U is orthogonal and   
-            T has geometrically spaced entries 1, ..., ULP with random   
-            signs on the diagonal and random O(1) entries in the upper   
-            triangle.   
-
-       (11) A matrix of the form  U' T U, where U is orthogonal and   
-            T has "clustered" entries 1, ULP,..., ULP with random   
-            signs on the diagonal and random O(1) entries in the upper   
-            triangle.   
-
-       (12) A matrix of the form  U' T U, where U is orthogonal and   
-            T has real or complex conjugate paired eigenvalues randomly   
-            chosen from ( ULP, 1 ) and random O(1) entries in the upper   
-            triangle.   
-
-       (13) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has evenly spaced entries 1, ..., ULP   
-            with random signs on the diagonal and random O(1) entries   
-            in the upper triangle.   
-
-       (14) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has geometrically spaced entries   
-            1, ..., ULP with random signs on the diagonal and random   
-            O(1) entries in the upper triangle.   
-
-       (15) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has "clustered" entries 1, ULP,..., ULP   
-            with random signs on the diagonal and random O(1) entries   
-            in the upper triangle.   
-
-       (16) A matrix of the form  X' T X, where X has condition   
-            SQRT( ULP ) and T has real or complex conjugate paired   
-            eigenvalues randomly chosen from ( ULP, 1 ) and random   
-            O(1) entries in the upper triangle.   
-
-       (17) Same as (16), but multiplied by a constant   
-            near the overflow threshold   
-       (18) Same as (16), but multiplied by a constant   
-            near the underflow threshold   
-
-       (19) Nonsymmetric matrix with random entries chosen from (-1,1).   
-            If N is at least 4, all entries in first two rows and last   
-            row, and first column and last two columns are zero.   
-       (20) Same as (19), but multiplied by a constant   
-            near the overflow threshold   
-       (21) Same as (19), but multiplied by a constant   
-            near the underflow threshold   
-
-       In addition, an input file will be read from logical unit number   
-       NIUNIT. The file contains matrices along with precomputed   
-       eigenvalues and reciprocal condition numbers for the eigenvalue   
-       average and right invariant subspace. For these matrices, in   
-       addition to tests (1) to (15) we will compute the following two   
-       tests:   
-
-      (16)  |RCONDE - RCDEIN| / cond(RCONDE)   
-
-         RCONDE is the reciprocal average eigenvalue condition number   
-         computed by SGEESX and RCDEIN (the precomputed true value)   
-         is supplied as input.  cond(RCONDE) is the condition number   
-         of RCONDE, and takes errors in computing RCONDE into account,   
-         so that the resulting quantity should be O(ULP). cond(RCONDE)   
-         is essentially given by norm(A)/RCONDV.   
-
-      (17)  |RCONDV - RCDVIN| / cond(RCONDV)   
-
-         RCONDV is the reciprocal right invariant subspace condition   
-         number computed by SGEESX and RCDVIN (the precomputed true   
-         value) is supplied as input. cond(RCONDV) is the condition   
-         number of RCONDV, and takes errors in computing RCONDV into   
-         account, so that the resulting quantity should be O(ULP).   
-         cond(RCONDV) is essentially given by norm(A)/RCONDE.   
-
-    Arguments   
-    =========   
-
-    NSIZES  (input) INTEGER   
-            The number of sizes of matrices to use.  NSIZES must be at   
-            least zero. If it is zero, no randomly generated matrices   
-            are tested, but any test matrices read from NIUNIT will be   
-            tested.   
-
-    NN      (input) INTEGER array, dimension (NSIZES)   
-            An array containing the sizes to be used for the matrices.   
-            Zero values will be skipped.  The values must be at least   
-            zero.   
-
-    NTYPES  (input) INTEGER   
-            The number of elements in DOTYPE. NTYPES must be at least   
-            zero. If it is zero, no randomly generated test matrices   
-            are tested, but and test matrices read from NIUNIT will be   
-            tested. If it is MAXTYP+1 and NSIZES is 1, then an   
-            additional type, MAXTYP+1 is defined, which is to use   
-            whatever matrix is in A.  This is only useful if   
-            DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. .   
-
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            If DOTYPE(j) is .TRUE., then for each size in NN a   
-            matrix of that size and of type j will be generated.   
-            If NTYPES is smaller than the maximum number of types   
-            defined (PARAMETER MAXTYP), then types NTYPES+1 through   
-            MAXTYP will not be generated.  If NTYPES is larger   
-            than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES)   
-            will be ignored.   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry ISEED specifies the seed of the random number   
-            generator. The array elements should be between 0 and 4095;   
-            if not they will be reduced mod 4096.  Also, ISEED(4) must   
-            be odd.  The random number generator uses a linear   
-            congruential sequence limited to small integers, and so   
-            should produce machine independent random numbers. The   
-            values of ISEED are changed on exit, and can be used in the   
-            next call to SDRVSX to continue the same random number   
-            sequence.   
-
-    THRESH  (input) REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-
-    NIUNIT  (input) INTEGER   
-            The FORTRAN unit number for reading in the data file of   
-            problems to solve.   
-
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns INFO not equal to 0.)   
-
-    A       (workspace) REAL array, dimension (LDA, max(NN))   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.  On exit, A contains the last matrix actually used.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A, and H. LDA must be at   
-            least 1 and at least max( NN ).   
-
-    H       (workspace) REAL array, dimension (LDA, max(NN))   
-            Another copy of the test matrix A, modified by SGEESX.   
-
-    HT      (workspace) REAL array, dimension (LDA, max(NN))   
-            Yet another copy of the test matrix A, modified by SGEESX.   
-
-    WR      (workspace) REAL array, dimension (max(NN))   
-    WI      (workspace) REAL array, dimension (max(NN))   
-            The real and imaginary parts of the eigenvalues of A.   
-            On exit, WR + WI*i are the eigenvalues of the matrix in A.   
-
-    WRT     (workspace) REAL array, dimension (max(NN))   
-    WIT     (workspace) REAL array, dimension (max(NN))   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but those computed when SGEESX only computes a partial   
-            eigendecomposition, i.e. not Schur vectors   
-
-    WRTMP   (workspace) REAL array, dimension (max(NN))   
-    WITMP   (workspace) REAL array, dimension (max(NN))   
-            More temporary storage for eigenvalues.   
-
-    VS      (workspace) REAL array, dimension (LDVS, max(NN))   
-            VS holds the computed Schur vectors.   
-
-    LDVS    (input) INTEGER   
-            Leading dimension of VS. Must be at least max(1,max(NN)).   
-
-    VS1     (workspace) REAL array, dimension (LDVS, max(NN))   
-            VS1 holds another copy of the computed Schur vectors.   
-
-    RESULT  (output) REAL array, dimension (17)   
-            The values computed by the 17 tests described above.   
-            The values are currently limited to 1/ulp, to avoid overflow.   
-
-    WORK    (workspace) REAL array, dimension (LWORK)   
-
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            max(3*NN(j),2*NN(j)**2) for all j.   
-
-    IWORK   (workspace) INTEGER array, dimension (max(NN)*max(NN))   
-
-    INFO    (output) INTEGER   
-            If 0,  successful exit.   
-              <0,  input parameter -INFO is incorrect   
-              >0,  SLATMR, SLATMS, SLATME or SGET24 returned an error   
-                   code and INFO is its absolute value   
-
-   -----------------------------------------------------------------------   
-
-       Some Local Variables and Parameters:   
-       ---- ----- --------- --- ----------   
-       ZERO, ONE       Real 0 and 1.   
-       MAXTYP          The number of types defined.   
-       NMAX            Largest value in NN.   
-       NERRS           The number of tests which have exceeded THRESH   
-       COND, CONDS,   
-       IMODE           Values to be passed to the matrix generators.   
-       ANORM           Norm of A; passed to matrix generators.   
-
-       OVFL, UNFL      Overflow and underflow thresholds.   
-       ULP, ULPINV     Finest relative precision and its inverse.   
-       RTULP, RTULPI   Square roots of the previous 4 values.   
-               The following four arrays decode JTYPE:   
-       KTYPE(j)        The general type (1-10) for type "j".   
-       KMODE(j)        The MODE value to be passed to the matrix   
-                       generator for type "j".   
-       KMAGN(j)        The order of magnitude ( O(1),   
-                       O(overflow^(1/2) ), O(underflow^(1/2) )   
-       KCONDS(j)       Selectw whether CONDS is to be 1 or   
-                       1/sqrt(ulp).  (0 means irrelevant.)   
-
-    =====================================================================   
-
-       Parameter adjustments */
+/*  Purpose */
+/*  ======= */
+
+/*     SDRVSX checks the nonsymmetric eigenvalue (Schur form) problem */
+/*     expert driver SGEESX. */
+
+/*     SDRVSX uses both test matrices generated randomly depending on */
+/*     data supplied in the calling sequence, as well as on data */
+/*     read from an input file and including precomputed condition */
+/*     numbers to which it compares the ones it computes. */
+
+/*     When SDRVSX is called, a number of matrix "sizes" ("n's") and a */
+/*     number of matrix "types" are specified.  For each size ("n") */
+/*     and each type of matrix, one matrix will be generated and used */
+/*     to test the nonsymmetric eigenroutines.  For each matrix, 15 */
+/*     tests will be performed: */
+
+/*     (1)     0 if T is in Schur form, 1/ulp otherwise */
+/*            (no sorting of eigenvalues) */
+
+/*     (2)     | A - VS T VS' | / ( n |A| ulp ) */
+
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (no sorting of eigenvalues). */
+
+/*     (3)     | I - VS VS' | / ( n ulp ) (no sorting of eigenvalues). */
+
+/*     (4)     0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
+
+/*     (5)     0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
+
+/*     (6)     0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             (no sorting of eigenvalues) */
+
+/*     (7)     0 if T is in Schur form, 1/ulp otherwise */
+/*             (with sorting of eigenvalues) */
+
+/*     (8)     | A - VS T VS' | / ( n |A| ulp ) */
+
+/*       Here VS is the matrix of Schur eigenvectors, and T is in Schur */
+/*       form  (with sorting of eigenvalues). */
+
+/*     (9)     | I - VS VS' | / ( n ulp ) (with sorting of eigenvalues). */
+
+/*     (10)    0     if WR+sqrt(-1)*WI are eigenvalues of T */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare WR, WI with and */
+/*             without reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
+
+/*     (11)    0     if T(with VS) = T(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare T with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
+
+/*     (12)    0     if eigenvalues(with VS) = eigenvalues(without VS), */
+/*             1/ulp otherwise */
+/*             If workspace sufficient, also compare VS with and without */
+/*             reciprocal condition numbers */
+/*             (with sorting of eigenvalues) */
+
+/*     (13)    if sorting worked and SDIM is the number of */
+/*             eigenvalues which were SELECTed */
+/*             If workspace sufficient, also compare SDIM with and */
+/*             without reciprocal condition numbers */
+
+/*     (14)    if RCONDE the same no matter if VS and/or RCONDV computed */
+
+/*     (15)    if RCONDV the same no matter if VS and/or RCONDE computed */
+
+/*     The "sizes" are specified by an array NN(1:NSIZES); the value of */
+/*     each element NN(j) specifies one size. */
+/*     The "types" are specified by a logical array DOTYPE( 1:NTYPES ); */
+/*     if DOTYPE(j) is .TRUE., then matrix type "j" will be generated. */
+/*     Currently, the list of possible types is: */
+
+/*     (1)  The zero matrix. */
+/*     (2)  The identity matrix. */
+/*     (3)  A (transposed) Jordan block, with 1's on the diagonal. */
+
+/*     (4)  A diagonal matrix with evenly spaced entries */
+/*          1, ..., ULP  and random signs. */
+/*          (ULP = (first number larger than 1) - 1 ) */
+/*     (5)  A diagonal matrix with geometrically spaced entries */
+/*          1, ..., ULP  and random signs. */
+/*     (6)  A diagonal matrix with "clustered" entries 1, ULP, ..., ULP */
+/*          and random signs. */
+
+/*     (7)  Same as (4), but multiplied by a constant near */
+/*          the overflow threshold */
+/*     (8)  Same as (4), but multiplied by a constant near */
+/*          the underflow threshold */
+
+/*     (9)  A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has evenly spaced entries 1, ..., ULP with random signs */
+/*          on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
+
+/*     (10) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has geometrically spaced entries 1, ..., ULP with random */
+/*          signs on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
+
+/*     (11) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has "clustered" entries 1, ULP,..., ULP with random */
+/*          signs on the diagonal and random O(1) entries in the upper */
+/*          triangle. */
+
+/*     (12) A matrix of the form  U' T U, where U is orthogonal and */
+/*          T has real or complex conjugate paired eigenvalues randomly */
+/*          chosen from ( ULP, 1 ) and random O(1) entries in the upper */
+/*          triangle. */
+
+/*     (13) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has evenly spaced entries 1, ..., ULP */
+/*          with random signs on the diagonal and random O(1) entries */
+/*          in the upper triangle. */
+
+/*     (14) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has geometrically spaced entries */
+/*          1, ..., ULP with random signs on the diagonal and random */
+/*          O(1) entries in the upper triangle. */
+
+/*     (15) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has "clustered" entries 1, ULP,..., ULP */
+/*          with random signs on the diagonal and random O(1) entries */
+/*          in the upper triangle. */
+
+/*     (16) A matrix of the form  X' T X, where X has condition */
+/*          SQRT( ULP ) and T has real or complex conjugate paired */
+/*          eigenvalues randomly chosen from ( ULP, 1 ) and random */
+/*          O(1) entries in the upper triangle. */
+
+/*     (17) Same as (16), but multiplied by a constant */
+/*          near the overflow threshold */
+/*     (18) Same as (16), but multiplied by a constant */
+/*          near the underflow threshold */
+
+/*     (19) Nonsymmetric matrix with random entries chosen from (-1,1). */
+/*          If N is at least 4, all entries in first two rows and last */
+/*          row, and first column and last two columns are zero. */
+/*     (20) Same as (19), but multiplied by a constant */
+/*          near the overflow threshold */
+/*     (21) Same as (19), but multiplied by a constant */
+/*          near the underflow threshold */
+
+/*     In addition, an input file will be read from logical unit number */
+/*     NIUNIT. The file contains matrices along with precomputed */
+/*     eigenvalues and reciprocal condition numbers for the eigenvalue */
+/*     average and right invariant subspace. For these matrices, in */
+/*     addition to tests (1) to (15) we will compute the following two */
+/*     tests: */
+
+/*    (16)  |RCONDE - RCDEIN| / cond(RCONDE) */
+
+/*       RCONDE is the reciprocal average eigenvalue condition number */
+/*       computed by SGEESX and RCDEIN (the precomputed true value) */
+/*       is supplied as input.  cond(RCONDE) is the condition number */
+/*       of RCONDE, and takes errors in computing RCONDE into account, */
+/*       so that the resulting quantity should be O(ULP). cond(RCONDE) */
+/*       is essentially given by norm(A)/RCONDV. */
+
+/*    (17)  |RCONDV - RCDVIN| / cond(RCONDV) */
+
+/*       RCONDV is the reciprocal right invariant subspace condition */
+/*       number computed by SGEESX and RCDVIN (the precomputed true */
+/*       value) is supplied as input. cond(RCONDV) is the condition */
+/*       number of RCONDV, and takes errors in computing RCONDV into */
+/*       account, so that the resulting quantity should be O(ULP). */
+/*       cond(RCONDV) is essentially given by norm(A)/RCONDE. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  NSIZES  (input) INTEGER */
+/*          The number of sizes of matrices to use.  NSIZES must be at */
+/*          least zero. If it is zero, no randomly generated matrices */
+/*          are tested, but any test matrices read from NIUNIT will be */
+/*          tested. */
+
+/*  NN      (input) INTEGER array, dimension (NSIZES) */
+/*          An array containing the sizes to be used for the matrices. */
+/*          Zero values will be skipped.  The values must be at least */
+/*          zero. */
+
+/*  NTYPES  (input) INTEGER */
+/*          The number of elements in DOTYPE. NTYPES must be at least */
+/*          zero. If it is zero, no randomly generated test matrices */
+/*          are tested, but and test matrices read from NIUNIT will be */
+/*          tested. If it is MAXTYP+1 and NSIZES is 1, then an */
+/*          additional type, MAXTYP+1 is defined, which is to use */
+/*          whatever matrix is in A.  This is only useful if */
+/*          DOTYPE(1:MAXTYP) is .FALSE. and DOTYPE(MAXTYP+1) is .TRUE. . */
+
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          If DOTYPE(j) is .TRUE., then for each size in NN a */
+/*          matrix of that size and of type j will be generated. */
+/*          If NTYPES is smaller than the maximum number of types */
+/*          defined (PARAMETER MAXTYP), then types NTYPES+1 through */
+/*          MAXTYP will not be generated.  If NTYPES is larger */
+/*          than MAXTYP, DOTYPE(MAXTYP+1) through DOTYPE(NTYPES) */
+/*          will be ignored. */
+
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry ISEED specifies the seed of the random number */
+/*          generator. The array elements should be between 0 and 4095; */
+/*          if not they will be reduced mod 4096.  Also, ISEED(4) must */
+/*          be odd.  The random number generator uses a linear */
+/*          congruential sequence limited to small integers, and so */
+/*          should produce machine independent random numbers. The */
+/*          values of ISEED are changed on exit, and can be used in the */
+/*          next call to SDRVSX to continue the same random number */
+/*          sequence. */
+
+/*  THRESH  (input) REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
+
+/*  NIUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for reading in the data file of */
+/*          problems to solve. */
+
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns INFO not equal to 0.) */
+
+/*  A       (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed.  On exit, A contains the last matrix actually used. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, and H. LDA must be at */
+/*          least 1 and at least max( NN ). */
+
+/*  H       (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          Another copy of the test matrix A, modified by SGEESX. */
+
+/*  HT      (workspace) REAL array, dimension (LDA, max(NN)) */
+/*          Yet another copy of the test matrix A, modified by SGEESX. */
+
+/*  WR      (workspace) REAL array, dimension (max(NN)) */
+/*  WI      (workspace) REAL array, dimension (max(NN)) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          On exit, WR + WI*i are the eigenvalues of the matrix in A. */
+
+/*  WRT     (workspace) REAL array, dimension (max(NN)) */
+/*  WIT     (workspace) REAL array, dimension (max(NN)) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but those computed when SGEESX only computes a partial */
+/*          eigendecomposition, i.e. not Schur vectors */
+
+/*  WRTMP   (workspace) REAL array, dimension (max(NN)) */
+/*  WITMP   (workspace) REAL array, dimension (max(NN)) */
+/*          More temporary storage for eigenvalues. */
+
+/*  VS      (workspace) REAL array, dimension (LDVS, max(NN)) */
+/*          VS holds the computed Schur vectors. */
+
+/*  LDVS    (input) INTEGER */
+/*          Leading dimension of VS. Must be at least max(1,max(NN)). */
+
+/*  VS1     (workspace) REAL array, dimension (LDVS, max(NN)) */
+/*          VS1 holds another copy of the computed Schur vectors. */
+
+/*  RESULT  (output) REAL array, dimension (17) */
+/*          The values computed by the 17 tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid overflow. */
+
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
+
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          max(3*NN(j),2*NN(j)**2) for all j. */
+
+/*  IWORK   (workspace) INTEGER array, dimension (max(NN)*max(NN)) */
+
+/*  INFO    (output) INTEGER */
+/*          If 0,  successful exit. */
+/*            <0,  input parameter -INFO is incorrect */
+/*            >0,  SLATMR, SLATMS, SLATME or SGET24 returned an error */
+/*                 code and INFO is its absolute value */
+
+/* ----------------------------------------------------------------------- */
+
+/*     Some Local Variables and Parameters: */
+/*     ---- ----- --------- --- ---------- */
+/*     ZERO, ONE       Real 0 and 1. */
+/*     MAXTYP          The number of types defined. */
+/*     NMAX            Largest value in NN. */
+/*     NERRS           The number of tests which have exceeded THRESH */
+/*     COND, CONDS, */
+/*     IMODE           Values to be passed to the matrix generators. */
+/*     ANORM           Norm of A; passed to matrix generators. */
+
+/*     OVFL, UNFL      Overflow and underflow thresholds. */
+/*     ULP, ULPINV     Finest relative precision and its inverse. */
+/*     RTULP, RTULPI   Square roots of the previous 4 values. */
+/*             The following four arrays decode JTYPE: */
+/*     KTYPE(j)        The general type (1-10) for type "j". */
+/*     KMODE(j)        The MODE value to be passed to the matrix */
+/*                     generator for type "j". */
+/*     KMAGN(j)        The order of magnitude ( O(1), */
+/*                     O(overflow^(1/2) ), O(underflow^(1/2) ) */
+/*     KCONDS(j)       Selectw whether CONDS is to be 1 or */
+/*                     1/sqrt(ulp).  (0 means irrelevant.) */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Arrays in Common .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --nn;
     --dotype;
     --iseed;
     ht_dim1 = *lda;
-    ht_offset = 1 + ht_dim1 * 1;
+    ht_offset = 1 + ht_dim1;
     ht -= ht_offset;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --wr;
     --wi;
@@ -529,10 +542,10 @@ static integer c__22 = 22;
     --wrtmp;
     --witmp;
     vs1_dim1 = *ldvs;
-    vs1_offset = 1 + vs1_dim1 * 1;
+    vs1_offset = 1 + vs1_dim1;
     vs1 -= vs1_offset;
     vs_dim1 = *ldvs;
-    vs_offset = 1 + vs_dim1 * 1;
+    vs_offset = 1 + vs_dim1;
     vs -= vs_offset;
     --result;
     --work;
@@ -540,6 +553,8 @@ static integer c__22 = 22;
     --bwork;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "SX", (ftnlen)2, (ftnlen)2);
@@ -554,8 +569,8 @@ static integer c__22 = 22;
 
     badnn = FALSE_;
 
-/*     12 is the largest dimension in the input file of precomputed   
-       problems */
+/*     12 is the largest dimension in the input file of precomputed */
+/*     problems */
 
     nmax = 12;
     i__1 = *nsizes;
@@ -588,8 +603,8 @@ static integer c__22 = 22;
     } else if (*ldvs < 1 || *ldvs < nmax) {
 	*info = -20;
     } else /* if(complicated condition) */ {
-/* Computing MAX   
-   Computing 2nd power */
+/* Computing MAX */
+/* Computing 2nd power */
 	i__3 = nmax;
 	i__1 = nmax * 3, i__2 = i__3 * i__3 << 1;
 	if (max(i__1,i__2) > *lwork) {
@@ -645,21 +660,21 @@ static integer c__22 = 22;
 /* L20: */
 	    }
 
-/*           Compute "A"   
+/*           Compute "A" */
 
-             Control parameters:   
+/*           Control parameters: */
 
-             KMAGN  KCONDS  KMODE        KTYPE   
-         =1  O(1)   1       clustered 1  zero   
-         =2  large  large   clustered 2  identity   
-         =3  small          exponential  Jordan   
-         =4                 arithmetic   diagonal, (w/ eigenvalues)   
-         =5                 random log   symmetric, w/ eigenvalues   
-         =6                 random       general, w/ eigenvalues   
-         =7                              random diagonal   
-         =8                              random symmetric   
-         =9                              random general   
-         =10                             random triangular */
+/*           KMAGN  KCONDS  KMODE        KTYPE */
+/*       =1  O(1)   1       clustered 1  zero */
+/*       =2  large  large   clustered 2  identity */
+/*       =3  small          exponential  Jordan */
+/*       =4                 arithmetic   diagonal, (w/ eigenvalues) */
+/*       =5                 random log   symmetric, w/ eigenvalues */
+/*       =6                 random       general, w/ eigenvalues */
+/*       =7                              random diagonal */
+/*       =8                              random symmetric */
+/*       =9                              random general */
+/*       =10                             random triangular */
 
 	    if (mtypes > 21) {
 		goto L90;
@@ -694,9 +709,9 @@ L60:
 	    iinfo = 0;
 	    cond = ulpinv;
 
-/*           Special Matrices -- Identity & Jordan block   
+/*           Special Matrices -- Identity & Jordan block */
 
-                Zero */
+/*              Zero */
 
 	    if (itype == 1) {
 		iinfo = 0;
@@ -707,7 +722,7 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 /* L70: */
 		}
 
@@ -717,9 +732,9 @@ L60:
 
 		i__3 = n;
 		for (jcol = 1; jcol <= i__3; ++jcol) {
-		    a_ref(jcol, jcol) = anorm;
+		    a[jcol + jcol * a_dim1] = anorm;
 		    if (jcol > 1) {
-			a_ref(jcol, jcol - 1) = 1.f;
+			a[jcol + (jcol - 1) * a_dim1] = 1.f;
 		    }
 /* L80: */
 		}
@@ -755,7 +770,7 @@ L60:
 		*(unsigned char *)&adumma[0] = ' ';
 		slatme_(&n, "S", &iseed[1], &work[1], &imode, &cond, &c_b32, 
 			adumma, "T", "T", "T", &work[n + 1], &c__4, &conds, &
-			n, &n, &anorm, &a[a_offset], lda, &work[(n << 1) + 1],
+			n, &n, &anorm, &a[a_offset], lda, &work[(n << 1) + 1], 
 			 &iinfo);
 
 	    } else if (itype == 7) {
@@ -791,13 +806,13 @@ L60:
 		    slaset_("Full", &c__2, &n, &c_b18, &c_b18, &a[a_offset], 
 			    lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a_ref(3, 1)
-			    , lda);
+		    slaset_("Full", &i__3, &c__1, &c_b18, &c_b18, &a[a_dim1 + 
+			    3], lda);
 		    i__3 = n - 3;
-		    slaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a_ref(3, n 
-			    - 1), lda);
-		    slaset_("Full", &c__1, &n, &c_b18, &c_b18, &a_ref(n, 1), 
-			    lda);
+		    slaset_("Full", &i__3, &c__2, &c_b18, &c_b18, &a[(n - 1) *
+			     a_dim1 + 3], lda);
+		    slaset_("Full", &c__1, &n, &c_b18, &c_b18, &a[n + a_dim1], 
+			     lda);
 		}
 
 	    } else if (itype == 10) {
@@ -844,7 +859,7 @@ L90:
 
 		sget24_(&c_false, &jtype, thresh, ioldsd, nounit, &n, &a[
 			a_offset], lda, &h__[h_offset], &ht[ht_offset], &wr[1]
-			, &wi[1], &wrt[1], &wit[1], &wrtmp[1], &witmp[1], &vs[
+, &wi[1], &wrt[1], &wit[1], &wrtmp[1], &witmp[1], &vs[
 			vs_offset], ldvs, &vs1[vs1_offset], &rcdein, &rcdvin, 
 			&nslct, islct, &result[1], &work[1], &nnwork, &iwork[
 			1], &bwork[1], info);
@@ -921,8 +936,8 @@ L130:
 
 L150:
 
-/*     Read in data from file to check accuracy of condition estimation   
-       Read input data until N=0 */
+/*     Read in data from file to check accuracy of condition estimation */
+/*     Read input data until N=0 */
 
     jtype = 0;
 L160:
@@ -964,8 +979,8 @@ L160:
 	s_rsle(&io___51);
 	i__2 = n;
 	for (j = 1; j <= i__2; ++j) {
-	    do_lio(&c__4, &c__1, (char *)&a_ref(i__, j), (ftnlen)sizeof(real))
-		    ;
+	    do_lio(&c__4, &c__1, (char *)&a[i__ + j * a_dim1], (ftnlen)sizeof(
+		    real));
 	}
 	e_rsle();
 /* L170: */
@@ -976,8 +991,8 @@ L160:
     do_lio(&c__4, &c__1, (char *)&rcdvin, (ftnlen)sizeof(real));
     e_rsle();
 
-    sget24_(&c_true, &c__22, thresh, &iseed[1], nounit, &n, &a[a_offset], lda,
-	     &h__[h_offset], &ht[ht_offset], &wr[1], &wi[1], &wrt[1], &wit[1],
+    sget24_(&c_true, &c__22, thresh, &iseed[1], nounit, &n, &a[a_offset], lda, 
+	     &h__[h_offset], &ht[ht_offset], &wr[1], &wi[1], &wrt[1], &wit[1], 
 	     &wrtmp[1], &witmp[1], &vs[vs_offset], ldvs, &vs1[vs1_offset], &
 	    rcdein, &rcdvin, &nslct, islct, &result[1], &work[1], lwork, &
 	    iwork[1], &bwork[1], info);
@@ -1051,7 +1066,3 @@ L200:
 /*     End of SDRVSX */
 
 } /* sdrvsx_ */
-
-#undef a_ref
-
-

@@ -1,70 +1,81 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int slas2_(real *f, real *g, real *h__, real *ssmin, real *
 	ssmax)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
-
-
-    Purpose   
-    =======   
-
-    SLAS2  computes the singular values of the 2-by-2 matrix   
-       [  F   G  ]   
-       [  0   H  ].   
-    On return, SSMIN is the smaller singular value and SSMAX is the   
-    larger singular value.   
-
-    Arguments   
-    =========   
-
-    F       (input) REAL   
-            The (1,1) element of the 2-by-2 matrix.   
-
-    G       (input) REAL   
-            The (1,2) element of the 2-by-2 matrix.   
-
-    H       (input) REAL   
-            The (2,2) element of the 2-by-2 matrix.   
-
-    SSMIN   (output) REAL   
-            The smaller singular value.   
-
-    SSMAX   (output) REAL   
-            The larger singular value.   
-
-    Further Details   
-    ===============   
-
-    Barring over/underflow, all output quantities are correct to within   
-    a few units in the last place (ulps), even in the absence of a guard   
-    digit in addition/subtraction.   
-
-    In IEEE arithmetic, the code works correctly if one matrix element is   
-    infinite.   
-
-    Overflow will not occur unless the largest singular value itself   
-    overflows, or is within a few ulps of overflow. (On machines with   
-    partial overflow, like the Cray, overflow may occur if the largest   
-    singular value is within a factor of 2 of overflow.)   
-
-    Underflow is harmless if underflow is gradual. Otherwise, results   
-    may correspond to a matrix modified by perturbations of size near   
-    the underflow threshold.   
-
-    ==================================================================== */
     /* System generated locals */
     real r__1, r__2;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static real fhmn, fhmx, c__, fa, ga, ha, as, at, au;
+    real c__, fa, ga, ha, as, at, au, fhmn, fhmx;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  SLAS2  computes the singular values of the 2-by-2 matrix */
+/*     [  F   G  ] */
+/*     [  0   H  ]. */
+/*  On return, SSMIN is the smaller singular value and SSMAX is the */
+/*  larger singular value. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  F       (input) REAL */
+/*          The (1,1) element of the 2-by-2 matrix. */
+
+/*  G       (input) REAL */
+/*          The (1,2) element of the 2-by-2 matrix. */
+
+/*  H       (input) REAL */
+/*          The (2,2) element of the 2-by-2 matrix. */
+
+/*  SSMIN   (output) REAL */
+/*          The smaller singular value. */
+
+/*  SSMAX   (output) REAL */
+/*          The larger singular value. */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Barring over/underflow, all output quantities are correct to within */
+/*  a few units in the last place (ulps), even in the absence of a guard */
+/*  digit in addition/subtraction. */
+
+/*  In IEEE arithmetic, the code works correctly if one matrix element is */
+/*  infinite. */
+
+/*  Overflow will not occur unless the largest singular value itself */
+/*  overflows, or is within a few ulps of overflow. (On machines with */
+/*  partial overflow, like the Cray, overflow may occur if the largest */
+/*  singular value is within a factor of 2 of overflow.) */
+
+/*  Underflow is harmless if underflow is gradual. Otherwise, results */
+/*  may correspond to a matrix modified by perturbations of size near */
+/*  the underflow threshold. */
+
+/*  ==================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     fa = dabs(*f);
     ga = dabs(*g);
@@ -94,9 +105,9 @@
 	    au = fhmx / ga;
 	    if (au == 0.f) {
 
-/*              Avoid possible harmful underflow if exponent range   
-                asymmetric (true SSMIN may not underflow even if   
-                AU underflows) */
+/*              Avoid possible harmful underflow if exponent range */
+/*              asymmetric (true SSMIN may not underflow even if */
+/*              AU underflows) */
 
 		*ssmin = fhmn * fhmx / ga;
 		*ssmax = ga;
@@ -120,4 +131,3 @@
 /*     End of SLAS2 */
 
 } /* slas2_ */
-

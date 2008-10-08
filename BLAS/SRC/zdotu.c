@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Double Complex */ VOID zdotu_(doublecomplex * ret_val, integer *n, 
 	doublecomplex *zx, integer *incx, doublecomplex *zy, integer *incy)
@@ -7,16 +7,33 @@
     /* System generated locals */
     integer i__1, i__2, i__3;
     doublecomplex z__1, z__2;
+
     /* Local variables */
-    static integer i__;
-    static doublecomplex ztemp;
-    static integer ix, iy;
-/*     forms the dot product of two vectors.   
-       jack dongarra, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, ix, iy;
+    doublecomplex ztemp;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     ZDOTU forms the dot product of two vectors. */
+
+/*  Further Details */
+/*  =============== */
+
+/*     jack dongarra, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+/*     .. Local Scalars .. */
+/*     .. */
+    /* Parameter adjustments */
     --zy;
     --zx;
+
     /* Function Body */
     ztemp.r = 0., ztemp.i = 0.;
      ret_val->r = 0.,  ret_val->i = 0.;
@@ -26,8 +43,10 @@
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -50,7 +69,9 @@
     }
      ret_val->r = ztemp.r,  ret_val->i = ztemp.i;
     return ;
+
 /*        code for both increments equal to 1 */
+
 L20:
     i__1 = *n;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -65,4 +86,3 @@ L20:
      ret_val->r = ztemp.r,  ret_val->i = ztemp.i;
     return ;
 } /* zdotu_ */
-

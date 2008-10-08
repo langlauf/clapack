@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -30,68 +25,75 @@ static integer c__1 = 1;
 
 /* Subroutine */ int zerrtz_(char *path, integer *nunit)
 {
-    /* System generated locals */
-    integer i__1;
-
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsle(cilist *), e_wsle(void);
 
     /* Local variables */
-    static integer info;
-    static doublecomplex a[4]	/* was [2][2] */, w[2];
-    static char c2[2];
+    doublecomplex a[4]	/* was [2][2] */, w[2];
+    char c2[2];
+    doublecomplex tau[2];
+    integer info;
     extern /* Subroutine */ int alaesm_(char *, logical *, integer *);
     extern logical lsamen_(integer *, char *, char *);
     extern /* Subroutine */ int chkxer_(char *, integer *, integer *, logical 
 	    *, logical *), ztzrqf_(integer *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, integer *), ztzrzf_(
-	    integer *, integer *, doublecomplex *, integer *, doublecomplex *,
+	    integer *, integer *, doublecomplex *, integer *, doublecomplex *, 
 	     doublecomplex *, integer *, integer *);
-    static doublecomplex tau[2];
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, 0, 0 };
 
 
 
-#define a_subscr(a_1,a_2) (a_2)*2 + a_1 - 3
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  ZERRTZ tests the error exits for ZTZRQF and ZTZRZF. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    ZERRTZ tests the error exits for ZTZRQF and ZTZRZF.   
+/*  PATH    (input) CHARACTER*3 */
+/*          The LAPACK path name for the routines to be tested. */
 
-    Arguments   
-    =========   
+/*  NUNIT   (input) INTEGER */
+/*          The unit number for output. */
 
-    PATH    (input) CHARACTER*3   
-            The LAPACK path name for the routines to be tested.   
+/*  ===================================================================== */
 
-    NUNIT   (input) INTEGER   
-            The unit number for output.   
-
-    ===================================================================== */
-
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     infoc_1.nout = *nunit;
     s_copy(c2, path + 1, (ftnlen)2, (ftnlen)2);
-    i__1 = a_subscr(1, 1);
-    a[i__1].r = 1., a[i__1].i = -1.;
-    i__1 = a_subscr(1, 2);
-    a[i__1].r = 2., a[i__1].i = -2.;
-    i__1 = a_subscr(2, 2);
-    a[i__1].r = 3., a[i__1].i = -3.;
-    i__1 = a_subscr(2, 1);
-    a[i__1].r = 4., a[i__1].i = -4.;
+    a[0].r = 1., a[0].i = -1.;
+    a[2].r = 2., a[2].i = -2.;
+    a[3].r = 3., a[3].i = -3.;
+    a[1].r = 4., a[1].i = -4.;
     w[0].r = 0., w[0].i = 0.;
     w[1].r = 0., w[1].i = 0.;
     infoc_1.ok = TRUE_;
@@ -149,8 +151,3 @@ static integer c__1 = 1;
 /*     End of ZERRTZ */
 
 } /* zerrtz_ */
-
-#undef a_ref
-#undef a_subscr
-
-

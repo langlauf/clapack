@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -40,36 +35,33 @@ static integer c__4 = 4;
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static integer kmin;
-    static real vmax, tnrm, vrmx, vtst;
+    integer i__, j;
+    real v;
+    integer jj, ihi, ilo;
+    real dum[1], eps, res[2], tol, ulp, vmx;
+    integer ihi1, ilo1, kmin;
+    real vmax, tnrm, vrmx, vtst;
     extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i__, j;
-    static real v;
-    static logical balok, nobal;
-    static real abnrm;
+    logical balok, nobal;
+    real abnrm;
     extern logical lsame_(char *, char *);
-    static integer iinfo;
+    integer iinfo;
     extern /* Subroutine */ int sget22_(char *, char *, char *, integer *, 
 	    real *, integer *, real *, integer *, real *, real *, real *, 
 	    real *);
-    static char sense[1];
-    static integer isens;
-    static real vimin, tolin, vrmin, abnrm1;
-    extern doublereal slapy2_(real *, real *);
-    static integer jj;
-    extern doublereal slamch_(char *);
+    char sense[1];
+    integer isens;
+    real vimin, tolin, vrmin, abnrm1;
+    extern doublereal slapy2_(real *, real *), slamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *), slacpy_(
 	    char *, integer *, integer *, real *, integer *, real *, integer *
-	    );
-    static integer isensm;
+);
+    integer isensm;
     extern /* Subroutine */ int sgeevx_(char *, char *, char *, char *, 
 	    integer *, real *, integer *, real *, real *, real *, integer *, 
 	    real *, integer *, integer *, integer *, real *, real *, real *, 
 	    real *, real *, integer *, integer *, integer *);
-    static real smlnum, ulpinv;
-    static integer ihi, ilo;
-    static real dum[1], eps, res[2], tol, ulp, vmx;
-    static integer ihi1, ilo1;
+    real smlnum, ulpinv;
 
     /* Fortran I/O blocks */
     static cilist io___14 = { 0, 0, 0, fmt_9998, 0 };
@@ -84,261 +76,272 @@ static integer c__4 = 4;
 
 
 
-#define vl_ref(a_1,a_2) vl[(a_2)*vl_dim1 + a_1]
-#define vr_ref(a_1,a_2) vr[(a_2)*vr_dim1 + a_1]
-#define lre_ref(a_1,a_2) lre[(a_2)*lre_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*     SGET23  checks the nonsymmetric eigenvalue problem driver SGEEVX. */
+/*     If COMP = .FALSE., the first 8 of the following tests will be */
+/*     performed on the input matrix A, and also test 9 if LWORK is */
+/*     sufficiently large. */
+/*     if COMP is .TRUE. all 11 tests will be performed. */
 
-    Purpose   
-    =======   
+/*     (1)     | A * VR - VR * W | / ( n |A| ulp ) */
 
-       SGET23  checks the nonsymmetric eigenvalue problem driver SGEEVX.   
-       If COMP = .FALSE., the first 8 of the following tests will be   
-       performed on the input matrix A, and also test 9 if LWORK is   
-       sufficiently large.   
-       if COMP is .TRUE. all 11 tests will be performed.   
+/*       Here VR is the matrix of unit right eigenvectors. */
+/*       W is a block diagonal matrix, with a 1x1 block for each */
+/*       real eigenvalue and a 2x2 block for each complex conjugate */
+/*       pair.  If eigenvalues j and j+1 are a complex conjugate pair, */
+/*       so WR(j) = WR(j+1) = wr and WI(j) = - WI(j+1) = wi, then the */
+/*       2 x 2 block corresponding to the pair will be: */
 
-       (1)     | A * VR - VR * W | / ( n |A| ulp )   
+/*               (  wr  wi  ) */
+/*               ( -wi  wr  ) */
 
-         Here VR is the matrix of unit right eigenvectors.   
-         W is a block diagonal matrix, with a 1x1 block for each   
-         real eigenvalue and a 2x2 block for each complex conjugate   
-         pair.  If eigenvalues j and j+1 are a complex conjugate pair,   
-         so WR(j) = WR(j+1) = wr and WI(j) = - WI(j+1) = wi, then the   
-         2 x 2 block corresponding to the pair will be:   
+/*       Such a block multiplying an n x 2 matrix  ( ur ui ) on the */
+/*       right will be the same as multiplying  ur + i*ui  by  wr + i*wi. */
 
-                 (  wr  wi  )   
-                 ( -wi  wr  )   
+/*     (2)     | A**H * VL - VL * W**H | / ( n |A| ulp ) */
 
-         Such a block multiplying an n x 2 matrix  ( ur ui ) on the   
-         right will be the same as multiplying  ur + i*ui  by  wr + i*wi.   
+/*       Here VL is the matrix of unit left eigenvectors, A**H is the */
+/*       conjugate transpose of A, and W is as above. */
 
-       (2)     | A**H * VL - VL * W**H | / ( n |A| ulp )   
+/*     (3)     | |VR(i)| - 1 | / ulp and largest component real */
 
-         Here VL is the matrix of unit left eigenvectors, A**H is the   
-         conjugate transpose of A, and W is as above.   
+/*       VR(i) denotes the i-th column of VR. */
 
-       (3)     | |VR(i)| - 1 | / ulp and largest component real   
+/*     (4)     | |VL(i)| - 1 | / ulp and largest component real */
 
-         VR(i) denotes the i-th column of VR.   
+/*       VL(i) denotes the i-th column of VL. */
 
-       (4)     | |VL(i)| - 1 | / ulp and largest component real   
+/*     (5)     0 if W(full) = W(partial), 1/ulp otherwise */
 
-         VL(i) denotes the i-th column of VL.   
+/*       W(full) denotes the eigenvalues computed when VR, VL, RCONDV */
+/*       and RCONDE are also computed, and W(partial) denotes the */
+/*       eigenvalues computed when only some of VR, VL, RCONDV, and */
+/*       RCONDE are computed. */
 
-       (5)     0 if W(full) = W(partial), 1/ulp otherwise   
+/*     (6)     0 if VR(full) = VR(partial), 1/ulp otherwise */
 
-         W(full) denotes the eigenvalues computed when VR, VL, RCONDV   
-         and RCONDE are also computed, and W(partial) denotes the   
-         eigenvalues computed when only some of VR, VL, RCONDV, and   
-         RCONDE are computed.   
+/*       VR(full) denotes the right eigenvectors computed when VL, RCONDV */
+/*       and RCONDE are computed, and VR(partial) denotes the result */
+/*       when only some of VL and RCONDV are computed. */
 
-       (6)     0 if VR(full) = VR(partial), 1/ulp otherwise   
+/*     (7)     0 if VL(full) = VL(partial), 1/ulp otherwise */
 
-         VR(full) denotes the right eigenvectors computed when VL, RCONDV   
-         and RCONDE are computed, and VR(partial) denotes the result   
-         when only some of VL and RCONDV are computed.   
+/*       VL(full) denotes the left eigenvectors computed when VR, RCONDV */
+/*       and RCONDE are computed, and VL(partial) denotes the result */
+/*       when only some of VR and RCONDV are computed. */
 
-       (7)     0 if VL(full) = VL(partial), 1/ulp otherwise   
+/*     (8)     0 if SCALE, ILO, IHI, ABNRM (full) = */
+/*                  SCALE, ILO, IHI, ABNRM (partial) */
+/*             1/ulp otherwise */
 
-         VL(full) denotes the left eigenvectors computed when VR, RCONDV   
-         and RCONDE are computed, and VL(partial) denotes the result   
-         when only some of VR and RCONDV are computed.   
+/*       SCALE, ILO, IHI and ABNRM describe how the matrix is balanced. */
+/*       (full) is when VR, VL, RCONDE and RCONDV are also computed, and */
+/*       (partial) is when some are not computed. */
 
-       (8)     0 if SCALE, ILO, IHI, ABNRM (full) =   
-                    SCALE, ILO, IHI, ABNRM (partial)   
-               1/ulp otherwise   
+/*     (9)     0 if RCONDV(full) = RCONDV(partial), 1/ulp otherwise */
 
-         SCALE, ILO, IHI and ABNRM describe how the matrix is balanced.   
-         (full) is when VR, VL, RCONDE and RCONDV are also computed, and   
-         (partial) is when some are not computed.   
+/*       RCONDV(full) denotes the reciprocal condition numbers of the */
+/*       right eigenvectors computed when VR, VL and RCONDE are also */
+/*       computed. RCONDV(partial) denotes the reciprocal condition */
+/*       numbers when only some of VR, VL and RCONDE are computed. */
 
-       (9)     0 if RCONDV(full) = RCONDV(partial), 1/ulp otherwise   
+/*    (10)     |RCONDV - RCDVIN| / cond(RCONDV) */
 
-         RCONDV(full) denotes the reciprocal condition numbers of the   
-         right eigenvectors computed when VR, VL and RCONDE are also   
-         computed. RCONDV(partial) denotes the reciprocal condition   
-         numbers when only some of VR, VL and RCONDE are computed.   
+/*       RCONDV is the reciprocal right eigenvector condition number */
+/*       computed by SGEEVX and RCDVIN (the precomputed true value) */
+/*       is supplied as input. cond(RCONDV) is the condition number of */
+/*       RCONDV, and takes errors in computing RCONDV into account, so */
+/*       that the resulting quantity should be O(ULP). cond(RCONDV) is */
+/*       essentially given by norm(A)/RCONDE. */
 
-      (10)     |RCONDV - RCDVIN| / cond(RCONDV)   
+/*    (11)     |RCONDE - RCDEIN| / cond(RCONDE) */
 
-         RCONDV is the reciprocal right eigenvector condition number   
-         computed by SGEEVX and RCDVIN (the precomputed true value)   
-         is supplied as input. cond(RCONDV) is the condition number of   
-         RCONDV, and takes errors in computing RCONDV into account, so   
-         that the resulting quantity should be O(ULP). cond(RCONDV) is   
-         essentially given by norm(A)/RCONDE.   
+/*       RCONDE is the reciprocal eigenvalue condition number */
+/*       computed by SGEEVX and RCDEIN (the precomputed true value) */
+/*       is supplied as input.  cond(RCONDE) is the condition number */
+/*       of RCONDE, and takes errors in computing RCONDE into account, */
+/*       so that the resulting quantity should be O(ULP). cond(RCONDE) */
+/*       is essentially given by norm(A)/RCONDV. */
 
-      (11)     |RCONDE - RCDEIN| / cond(RCONDE)   
+/*  Arguments */
+/*  ========= */
 
-         RCONDE is the reciprocal eigenvalue condition number   
-         computed by SGEEVX and RCDEIN (the precomputed true value)   
-         is supplied as input.  cond(RCONDE) is the condition number   
-         of RCONDE, and takes errors in computing RCONDE into account,   
-         so that the resulting quantity should be O(ULP). cond(RCONDE)   
-         is essentially given by norm(A)/RCONDV.   
+/*  COMP    (input) LOGICAL */
+/*          COMP describes which input tests to perform: */
+/*            = .FALSE. if the computed condition numbers are not to */
+/*                      be tested against RCDVIN and RCDEIN */
+/*            = .TRUE.  if they are to be compared */
+
+/*  BALANC  (input) CHARACTER */
+/*          Describes the balancing option to be tested. */
+/*            = 'N' for no permuting or diagonal scaling */
+/*            = 'P' for permuting but no diagonal scaling */
+/*            = 'S' for no permuting but diagonal scaling */
+/*            = 'B' for permuting and diagonal scaling */
+
+/*  JTYPE   (input) INTEGER */
+/*          Type of input matrix. Used to label output if error occurs. */
+
+/*  THRESH  (input) REAL */
+/*          A test will count as "failed" if the "error", computed as */
+/*          described above, exceeds THRESH.  Note that the error */
+/*          is scaled to be O(1), so THRESH should be a reasonably */
+/*          small multiple of 1, e.g., 10 or 100.  In particular, */
+/*          it should not depend on the precision (single vs. double) */
+/*          or the size of the matrix.  It must be at least zero. */
 
-    Arguments   
-    =========   
-
-    COMP    (input) LOGICAL   
-            COMP describes which input tests to perform:   
-              = .FALSE. if the computed condition numbers are not to   
-                        be tested against RCDVIN and RCDEIN   
-              = .TRUE.  if they are to be compared   
-
-    BALANC  (input) CHARACTER   
-            Describes the balancing option to be tested.   
-              = 'N' for no permuting or diagonal scaling   
-              = 'P' for permuting but no diagonal scaling   
-              = 'S' for no permuting but diagonal scaling   
-              = 'B' for permuting and diagonal scaling   
-
-    JTYPE   (input) INTEGER   
-            Type of input matrix. Used to label output if error occurs.   
-
-    THRESH  (input) REAL   
-            A test will count as "failed" if the "error", computed as   
-            described above, exceeds THRESH.  Note that the error   
-            is scaled to be O(1), so THRESH should be a reasonably   
-            small multiple of 1, e.g., 10 or 100.  In particular,   
-            it should not depend on the precision (single vs. double)   
-            or the size of the matrix.  It must be at least zero.   
-
-    ISEED   (input) INTEGER array, dimension (4)   
-            If COMP = .FALSE., the random number generator seed   
-            used to produce matrix.   
-            If COMP = .TRUE., ISEED(1) = the number of the example.   
-            Used to label output if error occurs.   
-
-    NOUNIT  (input) INTEGER   
-            The FORTRAN unit number for printing out error messages   
-            (e.g., if a routine returns INFO not equal to 0.)   
+/*  ISEED   (input) INTEGER array, dimension (4) */
+/*          If COMP = .FALSE., the random number generator seed */
+/*          used to produce matrix. */
+/*          If COMP = .TRUE., ISEED(1) = the number of the example. */
+/*          Used to label output if error occurs. */
+
+/*  NOUNIT  (input) INTEGER */
+/*          The FORTRAN unit number for printing out error messages */
+/*          (e.g., if a routine returns INFO not equal to 0.) */
 
-    N       (input) INTEGER   
-            The dimension of A. N must be at least 0.   
-
-    A       (input/output) REAL array, dimension (LDA,N)   
-            Used to hold the matrix whose eigenvalues are to be   
-            computed.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A, and H. LDA must be at   
-            least 1 and at least N.   
-
-    H       (workspace) REAL array, dimension (LDA,N)   
-            Another copy of the test matrix A, modified by SGEEVX.   
-
-    WR      (workspace) REAL array, dimension (N)   
-    WI      (workspace) REAL array, dimension (N)   
-            The real and imaginary parts of the eigenvalues of A.   
-            On exit, WR + WI*i are the eigenvalues of the matrix in A.   
-
-    WR1     (workspace) REAL array, dimension (N)   
-    WI1     (workspace) REAL array, dimension (N)   
-            Like WR, WI, these arrays contain the eigenvalues of A,   
-            but those computed when SGEEVX only computes a partial   
-            eigendecomposition, i.e. not the eigenvalues and left   
-            and right eigenvectors.   
-
-    VL      (workspace) REAL array, dimension (LDVL,N)   
-            VL holds the computed left eigenvectors.   
-
-    LDVL    (input) INTEGER   
-            Leading dimension of VL. Must be at least max(1,N).   
-
-    VR      (workspace) REAL array, dimension (LDVR,N)   
-            VR holds the computed right eigenvectors.   
-
-    LDVR    (input) INTEGER   
-            Leading dimension of VR. Must be at least max(1,N).   
-
-    LRE     (workspace) REAL array, dimension (LDLRE,N)   
-            LRE holds the computed right or left eigenvectors.   
-
-    LDLRE   (input) INTEGER   
-            Leading dimension of LRE. Must be at least max(1,N).   
-
-    RCONDV  (workspace) REAL array, dimension (N)   
-            RCONDV holds the computed reciprocal condition numbers   
-            for eigenvectors.   
-
-    RCNDV1  (workspace) REAL array, dimension (N)   
-            RCNDV1 holds more computed reciprocal condition numbers   
-            for eigenvectors.   
-
-    RCDVIN  (input) REAL array, dimension (N)   
-            When COMP = .TRUE. RCDVIN holds the precomputed reciprocal   
-            condition numbers for eigenvectors to be compared with   
-            RCONDV.   
-
-    RCONDE  (workspace) REAL array, dimension (N)   
-            RCONDE holds the computed reciprocal condition numbers   
-            for eigenvalues.   
-
-    RCNDE1  (workspace) REAL array, dimension (N)   
-            RCNDE1 holds more computed reciprocal condition numbers   
-            for eigenvalues.   
-
-    RCDEIN  (input) REAL array, dimension (N)   
-            When COMP = .TRUE. RCDEIN holds the precomputed reciprocal   
-            condition numbers for eigenvalues to be compared with   
-            RCONDE.   
-
-    SCALE   (workspace) REAL array, dimension (N)   
-            Holds information describing balancing of matrix.   
-
-    SCALE1  (workspace) REAL array, dimension (N)   
-            Holds information describing balancing of matrix.   
-
-    RESULT  (output) REAL array, dimension (11)   
-            The values computed by the 11 tests described above.   
-            The values are currently limited to 1/ulp, to avoid   
-            overflow.   
-
-    WORK    (workspace) REAL array, dimension (LWORK)   
-
-    LWORK   (input) INTEGER   
-            The number of entries in WORK.  This must be at least   
-            3*N, and 6*N+N**2 if tests 9, 10 or 11 are to be performed.   
-
-    IWORK   (workspace) INTEGER array, dimension (2*N)   
-
-    INFO    (output) INTEGER   
-            If 0,  successful exit.   
-            If <0, input parameter -INFO had an incorrect value.   
-            If >0, SGEEVX returned an error code, the absolute   
-                   value of which is returned.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
+/*  N       (input) INTEGER */
+/*          The dimension of A. N must be at least 0. */
+
+/*  A       (input/output) REAL array, dimension (LDA,N) */
+/*          Used to hold the matrix whose eigenvalues are to be */
+/*          computed. */
+
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A, and H. LDA must be at */
+/*          least 1 and at least N. */
+
+/*  H       (workspace) REAL array, dimension (LDA,N) */
+/*          Another copy of the test matrix A, modified by SGEEVX. */
+
+/*  WR      (workspace) REAL array, dimension (N) */
+/*  WI      (workspace) REAL array, dimension (N) */
+/*          The real and imaginary parts of the eigenvalues of A. */
+/*          On exit, WR + WI*i are the eigenvalues of the matrix in A. */
+
+/*  WR1     (workspace) REAL array, dimension (N) */
+/*  WI1     (workspace) REAL array, dimension (N) */
+/*          Like WR, WI, these arrays contain the eigenvalues of A, */
+/*          but those computed when SGEEVX only computes a partial */
+/*          eigendecomposition, i.e. not the eigenvalues and left */
+/*          and right eigenvectors. */
+
+/*  VL      (workspace) REAL array, dimension (LDVL,N) */
+/*          VL holds the computed left eigenvectors. */
+
+/*  LDVL    (input) INTEGER */
+/*          Leading dimension of VL. Must be at least max(1,N). */
+
+/*  VR      (workspace) REAL array, dimension (LDVR,N) */
+/*          VR holds the computed right eigenvectors. */
+
+/*  LDVR    (input) INTEGER */
+/*          Leading dimension of VR. Must be at least max(1,N). */
+
+/*  LRE     (workspace) REAL array, dimension (LDLRE,N) */
+/*          LRE holds the computed right or left eigenvectors. */
+
+/*  LDLRE   (input) INTEGER */
+/*          Leading dimension of LRE. Must be at least max(1,N). */
+
+/*  RCONDV  (workspace) REAL array, dimension (N) */
+/*          RCONDV holds the computed reciprocal condition numbers */
+/*          for eigenvectors. */
+
+/*  RCNDV1  (workspace) REAL array, dimension (N) */
+/*          RCNDV1 holds more computed reciprocal condition numbers */
+/*          for eigenvectors. */
+
+/*  RCDVIN  (input) REAL array, dimension (N) */
+/*          When COMP = .TRUE. RCDVIN holds the precomputed reciprocal */
+/*          condition numbers for eigenvectors to be compared with */
+/*          RCONDV. */
+
+/*  RCONDE  (workspace) REAL array, dimension (N) */
+/*          RCONDE holds the computed reciprocal condition numbers */
+/*          for eigenvalues. */
+
+/*  RCNDE1  (workspace) REAL array, dimension (N) */
+/*          RCNDE1 holds more computed reciprocal condition numbers */
+/*          for eigenvalues. */
+
+/*  RCDEIN  (input) REAL array, dimension (N) */
+/*          When COMP = .TRUE. RCDEIN holds the precomputed reciprocal */
+/*          condition numbers for eigenvalues to be compared with */
+/*          RCONDE. */
+
+/*  SCALE   (workspace) REAL array, dimension (N) */
+/*          Holds information describing balancing of matrix. */
+
+/*  SCALE1  (workspace) REAL array, dimension (N) */
+/*          Holds information describing balancing of matrix. */
+
+/*  RESULT  (output) REAL array, dimension (11) */
+/*          The values computed by the 11 tests described above. */
+/*          The values are currently limited to 1/ulp, to avoid */
+/*          overflow. */
+
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
+
+/*  LWORK   (input) INTEGER */
+/*          The number of entries in WORK.  This must be at least */
+/*          3*N, and 6*N+N**2 if tests 9, 10 or 11 are to be performed. */
+
+/*  IWORK   (workspace) INTEGER array, dimension (2*N) */
+
+/*  INFO    (output) INTEGER */
+/*          If 0,  successful exit. */
+/*          If <0, input parameter -INFO had an incorrect value. */
+/*          If >0, SGEEVX returned an error code, the absolute */
+/*                 value of which is returned. */
+
+/*  ===================================================================== */
+
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --iseed;
     h_dim1 = *lda;
-    h_offset = 1 + h_dim1 * 1;
+    h_offset = 1 + h_dim1;
     h__ -= h_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --wr;
     --wi;
     --wr1;
     --wi1;
     vl_dim1 = *ldvl;
-    vl_offset = 1 + vl_dim1 * 1;
+    vl_offset = 1 + vl_dim1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = 1 + vr_dim1 * 1;
+    vr_offset = 1 + vr_dim1;
     vr -= vr_offset;
     lre_dim1 = *ldlre;
-    lre_offset = 1 + lre_dim1 * 1;
+    lre_offset = 1 + lre_dim1;
     lre -= lre_offset;
     --rcondv;
     --rcndv1;
@@ -352,9 +355,11 @@ static integer c__4 = 4;
     --work;
     --iwork;
 
-    /* Function Body   
+    /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
-       Check for errors */
+/*     Check for errors */
 
     nobal = lsame_(balanc, "N");
     balok = nobal || lsame_(balanc, "P") || lsame_(
@@ -444,13 +449,13 @@ static integer c__4 = 4;
 
 /*     Do Test (1) */
 
-    sget22_("N", "N", "N", n, &a[a_offset], lda, &vr[vr_offset], ldvr, &wr[1],
+    sget22_("N", "N", "N", n, &a[a_offset], lda, &vr[vr_offset], ldvr, &wr[1], 
 	     &wi[1], &work[1], res);
     result[1] = res[0];
 
 /*     Do Test (2) */
 
-    sget22_("T", "N", "T", n, &a[a_offset], lda, &vl[vl_offset], ldvl, &wr[1],
+    sget22_("T", "N", "T", n, &a[a_offset], lda, &vl[vl_offset], ldvl, &wr[1], 
 	     &wi[1], &work[1], res);
     result[2] = res[0];
 
@@ -460,14 +465,14 @@ static integer c__4 = 4;
     for (j = 1; j <= i__1; ++j) {
 	tnrm = 1.f;
 	if (wi[j] == 0.f) {
-	    tnrm = snrm2_(n, &vr_ref(1, j), &c__1);
+	    tnrm = snrm2_(n, &vr[j * vr_dim1 + 1], &c__1);
 	} else if (wi[j] > 0.f) {
-	    r__1 = snrm2_(n, &vr_ref(1, j), &c__1);
-	    r__2 = snrm2_(n, &vr_ref(1, j + 1), &c__1);
+	    r__1 = snrm2_(n, &vr[j * vr_dim1 + 1], &c__1);
+	    r__2 = snrm2_(n, &vr[(j + 1) * vr_dim1 + 1], &c__1);
 	    tnrm = slapy2_(&r__1, &r__2);
 	}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	r__4 = ulpinv, r__5 = (r__1 = tnrm - 1.f, dabs(r__1)) / ulp;
 	r__2 = result[3], r__3 = dmin(r__4,r__5);
 	result[3] = dmax(r__2,r__3);
@@ -476,13 +481,14 @@ static integer c__4 = 4;
 	    vrmx = 0.f;
 	    i__2 = *n;
 	    for (jj = 1; jj <= i__2; ++jj) {
-		vtst = slapy2_(&vr_ref(jj, j), &vr_ref(jj, j + 1));
+		vtst = slapy2_(&vr[jj + j * vr_dim1], &vr[jj + (j + 1) * 
+			vr_dim1]);
 		if (vtst > vmx) {
 		    vmx = vtst;
 		}
-		if (vr_ref(jj, j + 1) == 0.f && (r__1 = vr_ref(jj, j), dabs(
-			r__1)) > vrmx) {
-		    vrmx = (r__2 = vr_ref(jj, j), dabs(r__2));
+		if (vr[jj + (j + 1) * vr_dim1] == 0.f && (r__1 = vr[jj + j * 
+			vr_dim1], dabs(r__1)) > vrmx) {
+		    vrmx = (r__2 = vr[jj + j * vr_dim1], dabs(r__2));
 		}
 /* L20: */
 	    }
@@ -499,14 +505,14 @@ static integer c__4 = 4;
     for (j = 1; j <= i__1; ++j) {
 	tnrm = 1.f;
 	if (wi[j] == 0.f) {
-	    tnrm = snrm2_(n, &vl_ref(1, j), &c__1);
+	    tnrm = snrm2_(n, &vl[j * vl_dim1 + 1], &c__1);
 	} else if (wi[j] > 0.f) {
-	    r__1 = snrm2_(n, &vl_ref(1, j), &c__1);
-	    r__2 = snrm2_(n, &vl_ref(1, j + 1), &c__1);
+	    r__1 = snrm2_(n, &vl[j * vl_dim1 + 1], &c__1);
+	    r__2 = snrm2_(n, &vl[(j + 1) * vl_dim1 + 1], &c__1);
 	    tnrm = slapy2_(&r__1, &r__2);
 	}
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
 	r__4 = ulpinv, r__5 = (r__1 = tnrm - 1.f, dabs(r__1)) / ulp;
 	r__2 = result[4], r__3 = dmin(r__4,r__5);
 	result[4] = dmax(r__2,r__3);
@@ -515,13 +521,14 @@ static integer c__4 = 4;
 	    vrmx = 0.f;
 	    i__2 = *n;
 	    for (jj = 1; jj <= i__2; ++jj) {
-		vtst = slapy2_(&vl_ref(jj, j), &vl_ref(jj, j + 1));
+		vtst = slapy2_(&vl[jj + j * vl_dim1], &vl[jj + (j + 1) * 
+			vl_dim1]);
 		if (vtst > vmx) {
 		    vmx = vtst;
 		}
-		if (vl_ref(jj, j + 1) == 0.f && (r__1 = vl_ref(jj, j), dabs(
-			r__1)) > vrmx) {
-		    vrmx = (r__2 = vl_ref(jj, j), dabs(r__2));
+		if (vl[jj + (j + 1) * vl_dim1] == 0.f && (r__1 = vl[jj + j * 
+			vl_dim1], dabs(r__1)) > vrmx) {
+		    vrmx = (r__2 = vl[jj + j * vl_dim1], dabs(r__2));
 		}
 /* L40: */
 	    }
@@ -662,7 +669,7 @@ static integer c__4 = 4;
 	for (j = 1; j <= i__2; ++j) {
 	    i__3 = *n;
 	    for (jj = 1; jj <= i__3; ++jj) {
-		if (vr_ref(j, jj) != lre_ref(j, jj)) {
+		if (vr[j + jj * vr_dim1] != lre[j + jj * lre_dim1]) {
 		    result[6] = ulpinv;
 		}
 /* L100: */
@@ -751,7 +758,7 @@ static integer c__4 = 4;
 	for (j = 1; j <= i__2; ++j) {
 	    i__3 = *n;
 	    for (jj = 1; jj <= i__3; ++jj) {
-		if (vl_ref(j, jj) != lre_ref(j, jj)) {
+		if (vl[j + jj * vl_dim1] != lre[j + jj * lre_dim1]) {
 		    result[7] = ulpinv;
 		}
 /* L150: */
@@ -805,7 +812,7 @@ L190:
 	sgeevx_("N", "V", "V", "B", n, &h__[h_offset], lda, &wr[1], &wi[1], &
 		vl[vl_offset], ldvl, &vr[vr_offset], ldvr, &ilo, &ihi, &scale[
 		1], &abnrm, &rconde[1], &rcondv[1], &work[1], lwork, &iwork[1]
-		, &iinfo);
+, &iinfo);
 	if (iinfo != 0) {
 	    result[1] = ulpinv;
 	    io___34.ciunit = *nounit;
@@ -819,8 +826,8 @@ L190:
 	    goto L250;
 	}
 
-/*        Sort eigenvalues and condition numbers lexicographically   
-          to compare with inputs */
+/*        Sort eigenvalues and condition numbers lexicographically */
+/*        to compare with inputs */
 
 	i__1 = *n - 1;
 	for (i__ = 1; i__ <= i__1; ++i__) {
@@ -849,8 +856,8 @@ L190:
 /* L220: */
 	}
 
-/*        Compare condition numbers for eigenvectors   
-          taking their condition numbers into account */
+/*        Compare condition numbers for eigenvectors */
+/*        taking their condition numbers into account */
 
 	result[10] = 0.f;
 	eps = dmax(5.9605e-8f,ulp);
@@ -893,8 +900,8 @@ L190:
 /* L230: */
 	}
 
-/*        Compare condition numbers for eigenvalues   
-          taking their condition numbers into account */
+/*        Compare condition numbers for eigenvalues */
+/*        taking their condition numbers into account */
 
 	result[11] = 0.f;
 	i__1 = *n;
@@ -940,9 +947,3 @@ L250:
 /*     End of SGET23 */
 
 } /* sget23_ */
-
-#undef lre_ref
-#undef vr_ref
-#undef vl_ref
-
-

@@ -1,18 +1,24 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal dcabs1_(doublecomplex *z__)
 {
     /* System generated locals */
-    doublereal ret_val;
-    static doublecomplex equiv_0[1];
-    /* Local variables */
-#define t ((doublereal *)equiv_0)
-#define zz (equiv_0)
-    zz->r = z__->r, zz->i = z__->i;
-    ret_val = abs(t[0]) + abs(t[1]);
+    doublereal ret_val, d__1, d__2;
+
+    /* Builtin functions */
+    double d_imag(doublecomplex *);
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. */
+/*  Purpose */
+/*  ======= */
+
+/*  DCABS1 computes absolute value of a double complex number */
+
+/*     .. Intrinsic Functions .. */
+
+    ret_val = (d__1 = z__->r, abs(d__1)) + (d__2 = d_imag(z__), abs(d__2));
     return ret_val;
 } /* dcabs1_ */
-#undef zz
-#undef t
-

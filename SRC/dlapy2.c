@@ -1,36 +1,47 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal dlapy2_(doublereal *x, doublereal *y)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1992   
-
-
-    Purpose   
-    =======   
-
-    DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary   
-    overflow.   
-
-    Arguments   
-    =========   
-
-    X       (input) DOUBLE PRECISION   
-    Y       (input) DOUBLE PRECISION   
-            X and Y specify the values x and y.   
-
-    ===================================================================== */
     /* System generated locals */
     doublereal ret_val, d__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
-    static doublereal xabs, yabs, w, z__;
+    doublereal w, z__, xabs, yabs;
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLAPY2 returns sqrt(x**2+y**2), taking care not to cause unnecessary */
+/*  overflow. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  X       (input) DOUBLE PRECISION */
+/*  Y       (input) DOUBLE PRECISION */
+/*          X and Y specify the values x and y. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
     xabs = abs(*x);
     yabs = abs(*y);
@@ -48,4 +59,3 @@ doublereal dlapy2_(doublereal *x, doublereal *y)
 /*     End of DLAPY2 */
 
 } /* dlapy2_ */
-

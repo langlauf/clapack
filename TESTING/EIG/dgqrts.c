@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -27,20 +22,21 @@ static doublereal c_b31 = 1.;
     doublereal d__1;
 
     /* Local variables */
-    static integer info;
-    static doublereal unfl;
+    doublereal ulp;
+    integer info;
+    doublereal unfl;
     extern /* Subroutine */ int dgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *);
-    static doublereal resid, anorm, bnorm;
+    doublereal resid, anorm, bnorm;
     extern /* Subroutine */ int dsyrk_(char *, char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, doublereal *,
+	    doublereal *, doublereal *, integer *, doublereal *, doublereal *, 
 	     integer *);
     extern doublereal dlamch_(char *), dlange_(char *, integer *, 
 	    integer *, doublereal *, integer *, doublereal *);
     extern /* Subroutine */ int dggqrf_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *), dlacpy_(char *,
+	    doublereal *, doublereal *, integer *, integer *), dlacpy_(char *, 
 	     integer *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *), dlaset_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, doublereal *, integer *);
@@ -48,129 +44,135 @@ static doublereal c_b31 = 1.;
 	    integer *, doublereal *);
     extern /* Subroutine */ int dorgqr_(integer *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    integer *), dorgrq_(integer *, integer *, integer *, doublereal *,
+	    integer *), dorgrq_(integer *, integer *, integer *, doublereal *, 
 	     integer *, doublereal *, doublereal *, integer *, integer *);
-    static doublereal ulp;
 
 
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
-#define t_ref(a_1,a_2) t[(a_2)*t_dim1 + a_1]
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
-#define af_ref(a_1,a_2) af[(a_2)*af_dim1 + a_1]
-#define bf_ref(a_1,a_2) bf[(a_2)*bf_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  DGQRTS tests DGGQRF, which computes the GQR factorization of an */
+/*  N-by-M matrix A and a N-by-P matrix B: A = Q*R and B = Q*T*Z. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DGQRTS tests DGGQRF, which computes the GQR factorization of an   
-    N-by-M matrix A and a N-by-P matrix B: A = Q*R and B = Q*T*Z.   
+/*  N       (input) INTEGER */
+/*          The number of rows of the matrices A and B.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  M       (input) INTEGER */
+/*          The number of columns of the matrix A.  M >= 0. */
 
-    N       (input) INTEGER   
-            The number of rows of the matrices A and B.  N >= 0.   
+/*  P       (input) INTEGER */
+/*          The number of columns of the matrix B.  P >= 0. */
 
-    M       (input) INTEGER   
-            The number of columns of the matrix A.  M >= 0.   
+/*  A       (input) DOUBLE PRECISION array, dimension (LDA,M) */
+/*          The N-by-M matrix A. */
 
-    P       (input) INTEGER   
-            The number of columns of the matrix B.  P >= 0.   
+/*  AF      (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          Details of the GQR factorization of A and B, as returned */
+/*          by DGGQRF, see SGGQRF for further details. */
 
-    A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
-            The N-by-M matrix A.   
+/*  Q       (output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          The M-by-M orthogonal matrix Q. */
 
-    AF      (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            Details of the GQR factorization of A and B, as returned   
-            by DGGQRF, see SGGQRF for further details.   
+/*  R       (workspace) DOUBLE PRECISION array, dimension (LDA,MAX(M,N)) */
 
-    Q       (output) DOUBLE PRECISION array, dimension (LDA,N)   
-            The M-by-M orthogonal matrix Q.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the arrays A, AF, R and Q. */
+/*          LDA >= max(M,N). */
 
-    R       (workspace) DOUBLE PRECISION array, dimension (LDA,MAX(M,N))   
+/*  TAUA    (output) DOUBLE PRECISION array, dimension (min(M,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by DGGQRF. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the arrays A, AF, R and Q.   
-            LDA >= max(M,N).   
+/*  B       (input) DOUBLE PRECISION array, dimension (LDB,P) */
+/*          On entry, the N-by-P matrix A. */
 
-    TAUA    (output) DOUBLE PRECISION array, dimension (min(M,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by DGGQRF.   
+/*  BF      (output) DOUBLE PRECISION array, dimension (LDB,N) */
+/*          Details of the GQR factorization of A and B, as returned */
+/*          by DGGQRF, see SGGQRF for further details. */
 
-    B       (input) DOUBLE PRECISION array, dimension (LDB,P)   
-            On entry, the N-by-P matrix A.   
+/*  Z       (output) DOUBLE PRECISION array, dimension (LDB,P) */
+/*          The P-by-P orthogonal matrix Z. */
 
-    BF      (output) DOUBLE PRECISION array, dimension (LDB,N)   
-            Details of the GQR factorization of A and B, as returned   
-            by DGGQRF, see SGGQRF for further details.   
+/*  T       (workspace) DOUBLE PRECISION array, dimension (LDB,max(P,N)) */
 
-    Z       (output) DOUBLE PRECISION array, dimension (LDB,P)   
-            The P-by-P orthogonal matrix Z.   
+/*  BWK     (workspace) DOUBLE PRECISION array, dimension (LDB,N) */
 
-    T       (workspace) DOUBLE PRECISION array, dimension (LDB,max(P,N))   
+/*  LDB     (input) INTEGER */
+/*          The leading dimension of the arrays B, BF, Z and T. */
+/*          LDB >= max(P,N). */
 
-    BWK     (workspace) DOUBLE PRECISION array, dimension (LDB,N)   
+/*  TAUB    (output) DOUBLE PRECISION array, dimension (min(P,N)) */
+/*          The scalar factors of the elementary reflectors, as returned */
+/*          by DGGRQF. */
 
-    LDB     (input) INTEGER   
-            The leading dimension of the arrays B, BF, Z and T.   
-            LDB >= max(P,N).   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
-    TAUB    (output) DOUBLE PRECISION array, dimension (min(P,N))   
-            The scalar factors of the elementary reflectors, as returned   
-            by DGGRQF.   
+/*  LWORK   (input) INTEGER */
+/*          The dimension of the array WORK, LWORK >= max(N,M,P)**2. */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (max(N,M,P)) */
 
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK, LWORK >= max(N,M,P)**2.   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (4) */
+/*          The test ratios: */
+/*            RESULT(1) = norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP) */
+/*            RESULT(2) = norm( T*Z - Q'*B ) / (MAX(P,N)*norm(B)*ULP) */
+/*            RESULT(3) = norm( I - Q'*Q ) / ( M*ULP ) */
+/*            RESULT(4) = norm( I - Z'*Z ) / ( P*ULP ) */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (max(N,M,P))   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (4)   
-            The test ratios:   
-              RESULT(1) = norm( R - Q'*A ) / ( MAX(M,N)*norm(A)*ULP)   
-              RESULT(2) = norm( T*Z - Q'*B ) / (MAX(P,N)*norm(B)*ULP)   
-              RESULT(3) = norm( I - Q'*Q ) / ( M*ULP )   
-              RESULT(4) = norm( I - Z'*Z ) / ( P*ULP )   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     r_dim1 = *lda;
-    r_offset = 1 + r_dim1 * 1;
+    r_offset = 1 + r_dim1;
     r__ -= r_offset;
     q_dim1 = *lda;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     af_dim1 = *lda;
-    af_offset = 1 + af_dim1 * 1;
+    af_offset = 1 + af_dim1;
     af -= af_offset;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --taua;
     bwk_dim1 = *ldb;
-    bwk_offset = 1 + bwk_dim1 * 1;
+    bwk_offset = 1 + bwk_dim1;
     bwk -= bwk_offset;
     t_dim1 = *ldb;
-    t_offset = 1 + t_dim1 * 1;
+    t_offset = 1 + t_dim1;
     t -= t_offset;
     z_dim1 = *ldb;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     bf_dim1 = *ldb;
-    bf_offset = 1 + bf_dim1 * 1;
+    bf_offset = 1 + bf_dim1;
     bf -= bf_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1 * 1;
+    b_offset = 1 + b_dim1;
     b -= b_offset;
     --taub;
     --work;
@@ -202,7 +204,7 @@ static doublereal c_b31 = 1.;
 
     dlaset_("Full", n, n, &c_b9, &c_b9, &q[q_offset], lda);
     i__1 = *n - 1;
-    dlacpy_("Lower", &i__1, m, &af_ref(2, 1), lda, &q_ref(2, 1), lda);
+    dlacpy_("Lower", &i__1, m, &af[af_dim1 + 2], lda, &q[q_dim1 + 2], lda);
     i__1 = min(*n,*m);
     dorgqr_(n, n, &i__1, &q[q_offset], lda, &taua[1], &work[1], lwork, &info);
 
@@ -212,21 +214,21 @@ static doublereal c_b31 = 1.;
     if (*n <= *p) {
 	if (*n > 0 && *n < *p) {
 	    i__1 = *p - *n;
-	    dlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z___ref(*p - *n + 
-		    1, 1), ldb);
+	    dlacpy_("Full", n, &i__1, &bf[bf_offset], ldb, &z__[*p - *n + 1 + 
+		    z_dim1], ldb);
 	}
 	if (*n > 1) {
 	    i__1 = *n - 1;
 	    i__2 = *n - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &bf_ref(2, *p - *n + 1), ldb, &
-		    z___ref(*p - *n + 2, *p - *n + 1), ldb);
+	    dlacpy_("Lower", &i__1, &i__2, &bf[(*p - *n + 1) * bf_dim1 + 2], 
+		    ldb, &z__[*p - *n + 2 + (*p - *n + 1) * z_dim1], ldb);
 	}
     } else {
 	if (*p > 1) {
 	    i__1 = *p - 1;
 	    i__2 = *p - 1;
-	    dlacpy_("Lower", &i__1, &i__2, &bf_ref(*n - *p + 2, 1), ldb, &
-		    z___ref(2, 1), ldb);
+	    dlacpy_("Lower", &i__1, &i__2, &bf[*n - *p + 2 + bf_dim1], ldb, &
+		    z__[z_dim1 + 2], ldb);
 	}
     }
     i__1 = min(*n,*p);
@@ -242,13 +244,13 @@ static doublereal c_b31 = 1.;
 
     dlaset_("Full", n, p, &c_b19, &c_b19, &t[t_offset], ldb);
     if (*n <= *p) {
-	dlacpy_("Upper", n, n, &bf_ref(1, *p - *n + 1), ldb, &t_ref(1, *p - *
-		n + 1), ldb);
+	dlacpy_("Upper", n, n, &bf[(*p - *n + 1) * bf_dim1 + 1], ldb, &t[(*p 
+		- *n + 1) * t_dim1 + 1], ldb);
     } else {
 	i__1 = *n - *p;
 	dlacpy_("Full", &i__1, p, &bf[bf_offset], ldb, &t[t_offset], ldb);
-	dlacpy_("Upper", p, p, &bf_ref(*n - *p + 1, 1), ldb, &t_ref(*n - *p + 
-		1, 1), ldb);
+	dlacpy_("Upper", p, p, &bf[*n - *p + 1 + bf_dim1], ldb, &t[*n - *p + 
+		1 + t_dim1], ldb);
     }
 
 /*     Compute R - Q'*A */
@@ -269,7 +271,7 @@ static doublereal c_b31 = 1.;
 
 /*     Compute T*Z - Q'*B */
 
-    dgemm_("No Transpose", "No transpose", n, p, p, &c_b31, &t[t_offset], ldb,
+    dgemm_("No Transpose", "No transpose", n, p, p, &c_b31, &t[t_offset], ldb, 
 	     &z__[z_offset], ldb, &c_b19, &bwk[bwk_offset], ldb);
     dgemm_("Transpose", "No transpose", n, p, n, &c_b30, &q[q_offset], lda, &
 	    b[b_offset], ldb, &c_b31, &bwk[bwk_offset], ldb);
@@ -312,11 +314,3 @@ static doublereal c_b31 = 1.;
 /*     End of DGQRTS */
 
 } /* dgqrts_ */
-
-#undef bf_ref
-#undef af_ref
-#undef z___ref
-#undef t_ref
-#undef q_ref
-
-

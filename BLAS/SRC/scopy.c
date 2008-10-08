@@ -1,20 +1,37 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int scopy_(integer *n, real *sx, integer *incx, real *sy, 
 	integer *incy)
 {
     /* System generated locals */
     integer i__1;
+
     /* Local variables */
-    static integer i__, m, ix, iy, mp1;
-/*     copies a vector, x, to a vector, y.   
-       uses unrolled loops for increments equal to 1.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, ix, iy, mp1;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     copies a vector, x, to a vector, y. */
+/*     uses unrolled loops for increments equal to 1. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --sy;
     --sx;
+
     /* Function Body */
     if (*n <= 0) {
 	return 0;
@@ -22,8 +39,10 @@
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -40,8 +59,12 @@
 /* L10: */
     }
     return 0;
-/*        code for both increments equal to 1   
-          clean-up loop */
+
+/*        code for both increments equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 7;
     if (m == 0) {
@@ -70,4 +93,3 @@ L40:
     }
     return 0;
 } /* scopy_ */
-

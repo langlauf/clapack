@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -24,70 +19,78 @@ static doublereal c_b10 = 0.;
     double d_sign(doublereal *, doublereal *);
 
     /* Local variables */
+    integer i__;
+    doublereal wa, wb, wn, tau;
     extern /* Subroutine */ int dger_(integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     extern doublereal dnrm2_(integer *, doublereal *, integer *);
-    static integer i__;
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *), dgemv_(char *, integer *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *);
-    static doublereal wa, wb, wn;
-    extern /* Subroutine */ int xerbla_(char *, integer *), dlarnv_(
-	    integer *, integer *, integer *, doublereal *);
-    static doublereal tau;
+	    doublereal *, integer *), xerbla_(char *, integer *), dlarnv_(integer *, integer *, integer *, doublereal *);
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK auxiliary test routine (version 3.1) */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK auxiliary test routine (version 3.0)   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       February 29, 1992   
+/*  Purpose */
+/*  ======= */
 
+/*  DLARGE pre- and post-multiplies a real general n by n matrix A */
+/*  with a random orthogonal matrix: A = U*D*U'. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    DLARGE pre- and post-multiplies a real general n by n matrix A   
-    with a random orthogonal matrix: A = U*D*U'.   
+/*  N       (input) INTEGER */
+/*          The order of the matrix A.  N >= 0. */
 
-    Arguments   
-    =========   
+/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */
+/*          On entry, the original n by n matrix A. */
+/*          On exit, A is overwritten by U*A*U' for some random */
+/*          orthogonal matrix U. */
 
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A.  LDA >= N. */
 
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the original n by n matrix A.   
-            On exit, A is overwritten by U*A*U' for some random   
-            orthogonal matrix U.   
+/*  ISEED   (input/output) INTEGER array, dimension (4) */
+/*          On entry, the seed of the random number generator; the array */
+/*          elements must be between 0 and 4095, and ISEED(4) must be */
+/*          odd. */
+/*          On exit, the seed is updated. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= N.   
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (2*N) */
 
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
+/*  INFO    (output) INTEGER */
+/*          = 0: successful exit */
+/*          < 0: if INFO = -i, the i-th argument had an illegal value */
 
-    WORK    (workspace) DOUBLE PRECISION array, dimension (2*N)   
+/*  ===================================================================== */
 
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input arguments */
 
-
-       Test the input arguments   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --iseed;
     --work;
@@ -130,22 +133,22 @@ static doublereal c_b10 = 0.;
 /*        multiply A(i:n,1:n) by random reflection from the left */
 
 	i__1 = *n - i__ + 1;
-	dgemv_("Transpose", &i__1, n, &c_b8, &a_ref(i__, 1), lda, &work[1], &
-		c__1, &c_b10, &work[*n + 1], &c__1);
+	dgemv_("Transpose", &i__1, n, &c_b8, &a[i__ + a_dim1], lda, &work[1], 
+		&c__1, &c_b10, &work[*n + 1], &c__1);
 	i__1 = *n - i__ + 1;
 	d__1 = -tau;
-	dger_(&i__1, n, &d__1, &work[1], &c__1, &work[*n + 1], &c__1, &a_ref(
-		i__, 1), lda);
+	dger_(&i__1, n, &d__1, &work[1], &c__1, &work[*n + 1], &c__1, &a[i__ 
+		+ a_dim1], lda);
 
 /*        multiply A(1:n,i:n) by random reflection from the right */
 
 	i__1 = *n - i__ + 1;
-	dgemv_("No transpose", n, &i__1, &c_b8, &a_ref(1, i__), lda, &work[1],
-		 &c__1, &c_b10, &work[*n + 1], &c__1);
+	dgemv_("No transpose", n, &i__1, &c_b8, &a[i__ * a_dim1 + 1], lda, &
+		work[1], &c__1, &c_b10, &work[*n + 1], &c__1);
 	i__1 = *n - i__ + 1;
 	d__1 = -tau;
-	dger_(n, &i__1, &d__1, &work[*n + 1], &c__1, &work[1], &c__1, &a_ref(
-		1, i__), lda);
+	dger_(n, &i__1, &d__1, &work[*n + 1], &c__1, &work[1], &c__1, &a[i__ *
+		 a_dim1 + 1], lda);
 /* L10: */
     }
     return 0;
@@ -153,7 +156,3 @@ static doublereal c_b10 = 0.;
 /*     End of DLARGE */
 
 } /* dlarge_ */
-
-#undef a_ref
-
-

@@ -1,5 +1,5 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Subroutine */ int cscal_(integer *n, complex *ca, complex *cx, integer *
 	incx)
@@ -7,14 +7,29 @@
     /* System generated locals */
     integer i__1, i__2, i__3, i__4;
     complex q__1;
+
     /* Local variables */
-    static integer i__, nincx;
-/*     scales a vector by a constant.   
-       jack dongarra, linpack,  3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, nincx;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     scales a vector by a constant. */
+/*     jack dongarra, linpack,  3/11/78. */
+/*     modified 3/93 to return if incx .le. 0. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+    /* Parameter adjustments */
     --cx;
+
     /* Function Body */
     if (*n <= 0 || *incx <= 0) {
 	return 0;
@@ -22,7 +37,9 @@
     if (*incx == 1) {
 	goto L20;
     }
+
 /*        code for increment not equal to 1 */
+
     nincx = *n * *incx;
     i__1 = nincx;
     i__2 = *incx;
@@ -35,7 +52,9 @@
 /* L10: */
     }
     return 0;
+
 /*        code for increment equal to 1 */
+
 L20:
     i__2 = *n;
     for (i__ = 1; i__ <= i__2; ++i__) {
@@ -48,4 +67,3 @@ L20:
     }
     return 0;
 } /* cscal_ */
-

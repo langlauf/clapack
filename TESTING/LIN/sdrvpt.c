@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Common Block Declarations */
 
@@ -49,52 +44,49 @@ static real c_b24 = 0.f;
     integer i__1, i__2, i__3, i__4;
     real r__1, r__2, r__3;
 
-    /* Builtin functions   
-       Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Builtin functions */
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
 
     /* Local variables */
-    static char fact[1];
-    static real cond;
-    static integer mode;
-    static real dmax__;
-    static integer imat, info;
-    static char path[3], dist[1], type__[1];
-    static integer nrun, i__, j, k, n, ifact, nfail, iseed[4];
-    static real z__[3], rcond;
+    integer i__, j, k, n;
+    real z__[3];
+    integer k1, ia, in, kl, ku, ix, nt, lda;
+    char fact[1];
+    real cond;
+    integer mode;
+    real dmax__;
+    integer imat, info;
+    char path[3], dist[1], type__[1];
+    integer nrun, ifact, nfail, iseed[4];
+    real rcond;
     extern /* Subroutine */ int sget04_(integer *, integer *, real *, integer 
 	    *, real *, integer *, real *, real *), sscal_(integer *, real *, 
 	    real *, integer *);
-    static integer nimat;
+    integer nimat;
     extern doublereal sget06_(real *, real *);
-    static real anorm;
-    static integer izero, nerrs;
+    real anorm;
+    integer izero, nerrs;
     extern doublereal sasum_(integer *, real *, integer *);
     extern /* Subroutine */ int sptt01_(integer *, real *, real *, real *, 
-	    real *, real *, real *);
-    static integer k1;
-    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
-	    integer *), sptt02_(integer *, integer *, real *, real *, real *, 
-	    integer *, real *, integer *, real *), sptt05_(integer *, integer 
-	    *, real *, real *, real *, integer *, real *, integer *, real *, 
-	    integer *, real *, real *, real *);
-    static logical zerot;
+	    real *, real *, real *), sptt02_(integer *, integer *, real *, 
+	    real *, real *, integer *, real *, integer *, real *), scopy_(
+	    integer *, real *, integer *, real *, integer *), sptt05_(integer 
+	    *, integer *, real *, real *, real *, integer *, real *, integer *
+, real *, integer *, real *, real *, real *);
+    logical zerot;
     extern /* Subroutine */ int sptsv_(integer *, integer *, real *, real *, 
 	    real *, integer *, integer *), slatb4_(char *, integer *, integer 
 	    *, integer *, char *, integer *, integer *, real *, integer *, 
-	    real *, char *);
-    static integer ia;
-    extern /* Subroutine */ int aladhd_(integer *, char *);
-    static integer in, kl;
-    extern /* Subroutine */ int alaerh_(char *, char *, integer *, integer *, 
-	    char *, integer *, integer *, integer *, integer *, integer *, 
-	    integer *, integer *, integer *, integer *);
-    static integer ku, ix, nt;
-    static real rcondc;
+	    real *, char *), aladhd_(integer *, char *
+), alaerh_(char *, char *, integer *, integer *, char *, 
+	    integer *, integer *, integer *, integer *, integer *, integer *, 
+	    integer *, integer *, integer *);
+    real rcondc;
     extern integer isamax_(integer *, real *, integer *);
     extern /* Subroutine */ int alasvm_(char *, integer *, integer *, integer 
 	    *, integer *);
-    static real ainvnm;
+    real ainvnm;
     extern /* Subroutine */ int slacpy_(char *, integer *, integer *, real *, 
 	    integer *, real *, integer *), slaset_(char *, integer *, 
 	    integer *, real *, real *, real *, integer *), slaptm_(
@@ -105,14 +97,13 @@ static real c_b24 = 0.f;
     extern doublereal slanst_(char *, integer *, real *, real *);
     extern /* Subroutine */ int slarnv_(integer *, integer *, integer *, real 
 	    *);
-    static real result[6];
+    real result[6];
     extern /* Subroutine */ int spttrf_(integer *, real *, real *, integer *),
-	     serrvx_(char *, integer *), spttrs_(integer *, integer *,
+	     serrvx_(char *, integer *), spttrs_(integer *, integer *, 
 	     real *, real *, real *, integer *, integer *), sptsvx_(char *, 
 	    integer *, integer *, real *, real *, real *, real *, real *, 
 	    integer *, real *, integer *, real *, real *, real *, real *, 
 	    integer *);
-    static integer lda;
 
     /* Fortran I/O blocks */
     static cilist io___35 = { 0, 0, 0, fmt_9999, 0 };
@@ -120,67 +111,87 @@ static real c_b24 = 0.f;
 
 
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    SDRVPT tests SPTSV and -SVX.   
+/*  SDRVPT tests SPTSV and -SVX. */
 
-    Arguments   
-    =========   
+/*  Arguments */
+/*  ========= */
 
-    DOTYPE  (input) LOGICAL array, dimension (NTYPES)   
-            The matrix types to be used for testing.  Matrices of type j   
-            (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) =   
-            .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used.   
+/*  DOTYPE  (input) LOGICAL array, dimension (NTYPES) */
+/*          The matrix types to be used for testing.  Matrices of type j */
+/*          (for 1 <= j <= NTYPES) are used for testing if DOTYPE(j) = */
+/*          .TRUE.; if DOTYPE(j) = .FALSE., then type j is not used. */
 
-    NN      (input) INTEGER   
-            The number of values of N contained in the vector NVAL.   
+/*  NN      (input) INTEGER */
+/*          The number of values of N contained in the vector NVAL. */
 
-    NVAL    (input) INTEGER array, dimension (NN)   
-            The values of the matrix dimension N.   
+/*  NVAL    (input) INTEGER array, dimension (NN) */
+/*          The values of the matrix dimension N. */
 
-    NRHS    (input) INTEGER   
-            The number of right hand side vectors to be generated for   
-            each linear system.   
+/*  NRHS    (input) INTEGER */
+/*          The number of right hand side vectors to be generated for */
+/*          each linear system. */
 
-    THRESH  (input) REAL   
-            The threshold value for the test ratios.  A result is   
-            included in the output file if RESULT >= THRESH.  To have   
-            every test ratio printed, use THRESH = 0.   
+/*  THRESH  (input) REAL */
+/*          The threshold value for the test ratios.  A result is */
+/*          included in the output file if RESULT >= THRESH.  To have */
+/*          every test ratio printed, use THRESH = 0. */
 
-    TSTERR  (input) LOGICAL   
-            Flag that indicates whether error exits are to be tested.   
+/*  TSTERR  (input) LOGICAL */
+/*          Flag that indicates whether error exits are to be tested. */
 
-    A       (workspace) REAL array, dimension (NMAX*2)   
+/*  A       (workspace) REAL array, dimension (NMAX*2) */
 
-    D       (workspace) REAL array, dimension (NMAX*2)   
+/*  D       (workspace) REAL array, dimension (NMAX*2) */
 
-    E       (workspace) REAL array, dimension (NMAX*2)   
+/*  E       (workspace) REAL array, dimension (NMAX*2) */
 
-    B       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  B       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    X       (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  X       (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    XACT    (workspace) REAL array, dimension (NMAX*NRHS)   
+/*  XACT    (workspace) REAL array, dimension (NMAX*NRHS) */
 
-    WORK    (workspace) REAL array, dimension   
-                        (NMAX*max(3,NRHS))   
+/*  WORK    (workspace) REAL array, dimension */
+/*                      (NMAX*max(3,NRHS)) */
 
-    RWORK   (workspace) REAL array, dimension   
-                        (max(NMAX,2*NRHS))   
+/*  RWORK   (workspace) REAL array, dimension */
+/*                      (max(NMAX,2*NRHS)) */
 
-    NOUT    (input) INTEGER   
-            The unit number for output.   
+/*  NOUT    (input) INTEGER */
+/*          The unit number for output. */
 
-    =====================================================================   
+/*  ===================================================================== */
 
-       Parameter adjustments */
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Scalars in Common .. */
+/*     .. */
+/*     .. Common blocks .. */
+/*     .. */
+/*     .. Data statements .. */
+    /* Parameter adjustments */
     --rwork;
     --work;
     --xact;
@@ -193,6 +204,8 @@ static real c_b24 = 0.f;
     --dotype;
 
     /* Function Body */
+/*     .. */
+/*     .. Executable Statements .. */
 
     s_copy(path, "Single precision", (ftnlen)1, (ftnlen)16);
     s_copy(path + 1, "PT", (ftnlen)2, (ftnlen)2);
@@ -240,8 +253,8 @@ static real c_b24 = 0.f;
 	    zerot = imat >= 8 && imat <= 10;
 	    if (imat <= 6) {
 
-/*              Type 1-6:  generate a symmetric tridiagonal matrix of   
-                known condition number in lower triangular band storage. */
+/*              Type 1-6:  generate a symmetric tridiagonal matrix of */
+/*              known condition number in lower triangular band storage. */
 
 		s_copy(srnamc_1.srnamt, "SLATMS", (ftnlen)6, (ftnlen)6);
 		slatms_(&n, &n, dist, iseed, type__, &rwork[1], &mode, &cond, 
@@ -271,8 +284,8 @@ static real c_b24 = 0.f;
 		}
 	    } else {
 
-/*              Type 7-12:  generate a diagonally dominant matrix with   
-                unknown condition number in the vectors D and E. */
+/*              Type 7-12:  generate a diagonally dominant matrix with */
+/*              unknown condition number in the vectors D and E. */
 
 		if (! zerot || ! dotype[7]) {
 
@@ -313,8 +326,8 @@ static real c_b24 = 0.f;
 
 		} else if (izero > 0) {
 
-/*                 Reuse the last matrix by copying back the zeroed out   
-                   elements. */
+/*                 Reuse the last matrix by copying back the zeroed out */
+/*                 elements. */
 
 		    if (izero == 1) {
 			d__[1] = z__[1];
@@ -331,8 +344,8 @@ static real c_b24 = 0.f;
 		    }
 		}
 
-/*              For types 8-10, set one row and column of the matrix to   
-                zero. */
+/*              For types 8-10, set one row and column of the matrix to */
+/*              zero. */
 
 		izero = 0;
 		if (imat == 8) {
@@ -386,8 +399,8 @@ static real c_b24 = 0.f;
 		    *(unsigned char *)fact = 'N';
 		}
 
-/*              Compute the condition number for comparison with   
-                the value returned by SPTSVX. */
+/*              Compute the condition number for comparison with */
+/*              the value returned by SPTSVX. */
 
 		if (zerot) {
 		    if (ifact == 1) {
@@ -411,8 +424,8 @@ static real c_b24 = 0.f;
 
 		    spttrf_(&n, &d__[n + 1], &e[n + 1], &info);
 
-/*                 Use SPTTRS to solve for one column at a time of   
-                   inv(A), computing the maximum column sum as we go. */
+/*                 Use SPTTRS to solve for one column at a time of */
+/*                 inv(A), computing the maximum column sum as we go. */
 
 		    ainvnm = 0.f;
 		    i__3 = n;
@@ -467,8 +480,8 @@ static real c_b24 = 0.f;
 		    nt = 0;
 		    if (izero == 0) {
 
-/*                    Check the factorization by computing the ratio   
-                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
+/*                    Check the factorization by computing the ratio */
+/*                       norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			sptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
 				work[1], result);
@@ -486,8 +499,8 @@ static real c_b24 = 0.f;
 			nt = 3;
 		    }
 
-/*                 Print information about the tests that did not pass   
-                   the threshold. */
+/*                 Print information about the tests that did not pass */
+/*                 the threshold. */
 
 		    i__3 = nt;
 		    for (k = 1; k <= i__3; ++k) {
@@ -533,12 +546,12 @@ static real c_b24 = 0.f;
 
 		slaset_("Full", &n, nrhs, &c_b24, &c_b24, &x[1], &lda);
 
-/*              Solve the system and compute the condition number and   
-                error bounds using SPTSVX. */
+/*              Solve the system and compute the condition number and */
+/*              error bounds using SPTSVX. */
 
 		s_copy(srnamc_1.srnamt, "SPTSVX", (ftnlen)6, (ftnlen)6);
 		sptsvx_(fact, &n, nrhs, &d__[1], &e[1], &d__[n + 1], &e[n + 1]
-			, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
+, &b[1], &lda, &x[1], &lda, &rcond, &rwork[1], &rwork[
 			*nrhs + 1], &work[1], &info);
 
 /*              Check the error code from SPTSVX. */
@@ -550,8 +563,8 @@ static real c_b24 = 0.f;
 		if (izero == 0) {
 		    if (ifact == 2) {
 
-/*                    Check the factorization by computing the ratio   
-                         norm(L*D*L' - A) / (n * norm(A) * EPS ) */
+/*                    Check the factorization by computing the ratio */
+/*                       norm(L*D*L' - A) / (n * norm(A) * EPS ) */
 
 			k1 = 1;
 			sptt01_(&n, &d__[1], &e[1], &d__[n + 1], &e[n + 1], &
@@ -574,7 +587,7 @@ static real c_b24 = 0.f;
 /*                 Check error bounds from iterative refinement. */
 
 		    sptt05_(&n, nrhs, &d__[1], &e[1], &b[1], &lda, &x[1], &
-			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1],
+			    lda, &xact[1], &lda, &rwork[1], &rwork[*nrhs + 1], 
 			     &result[3]);
 		} else {
 		    k1 = 6;
@@ -584,8 +597,8 @@ static real c_b24 = 0.f;
 
 		result[5] = sget06_(&rcond, &rcondc);
 
-/*              Print information about the tests that did not pass   
-                the threshold. */
+/*              Print information about the tests that did not pass */
+/*              the threshold. */
 
 		for (k = k1; k <= 6; ++k) {
 		    if (result[k - 1] >= *thresh) {
@@ -625,4 +638,3 @@ L110:
 /*     End of SDRVPT */
 
 } /* sdrvpt_ */
-

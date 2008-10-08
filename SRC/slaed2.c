@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -24,158 +19,165 @@ static integer c__1 = 1;
     double sqrt(doublereal);
 
     /* Local variables */
-    static integer imax, jmax, ctot[4];
+    real c__;
+    integer i__, j;
+    real s, t;
+    integer k2, n2, ct, nj, pj, js, iq1, iq2, n1p1;
+    real eps, tau, tol;
+    integer psm[4], imax, jmax, ctot[4];
     extern /* Subroutine */ int srot_(integer *, real *, integer *, real *, 
-	    integer *, real *, real *);
-    static real c__;
-    static integer i__, j;
-    static real s, t;
-    extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
-    static integer k2;
-    extern /* Subroutine */ int scopy_(integer *, real *, integer *, real *, 
-	    integer *);
-    static integer n2;
-    extern doublereal slapy2_(real *, real *);
-    static integer ct, nj, pj, js;
-    extern doublereal slamch_(char *);
+	    integer *, real *, real *), sscal_(integer *, real *, real *, 
+	    integer *), scopy_(integer *, real *, integer *, real *, integer *
+);
+    extern doublereal slapy2_(real *, real *), slamch_(char *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
     extern integer isamax_(integer *, real *, integer *);
     extern /* Subroutine */ int slamrg_(integer *, integer *, real *, integer 
 	    *, integer *, integer *), slacpy_(char *, integer *, integer *, 
 	    real *, integer *, real *, integer *);
-    static integer iq1, iq2, n1p1;
-    static real eps, tau, tol;
-    static integer psm[4];
 
 
-#define q_ref(a_1,a_2) q[(a_2)*q_dim1 + a_1]
+/*  -- LAPACK routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       October 31, 1999   
+/*  Purpose */
+/*  ======= */
 
+/*  SLAED2 merges the two sets of eigenvalues together into a single */
+/*  sorted set.  Then it tries to deflate the size of the problem. */
+/*  There are two ways in which deflation can occur:  when two or more */
+/*  eigenvalues are close together or if there is a tiny entry in the */
+/*  Z vector.  For each such occurrence the order of the related secular */
+/*  equation problem is reduced by one. */
 
-    Purpose   
-    =======   
+/*  Arguments */
+/*  ========= */
 
-    SLAED2 merges the two sets of eigenvalues together into a single   
-    sorted set.  Then it tries to deflate the size of the problem.   
-    There are two ways in which deflation can occur:  when two or more   
-    eigenvalues are close together or if there is a tiny entry in the   
-    Z vector.  For each such occurrence the order of the related secular   
-    equation problem is reduced by one.   
+/*  K      (output) INTEGER */
+/*         The number of non-deflated eigenvalues, and the order of the */
+/*         related secular equation. 0 <= K <=N. */
 
-    Arguments   
-    =========   
+/*  N      (input) INTEGER */
+/*         The dimension of the symmetric tridiagonal matrix.  N >= 0. */
 
-    K      (output) INTEGER   
-           The number of non-deflated eigenvalues, and the order of the   
-           related secular equation. 0 <= K <=N.   
+/*  N1     (input) INTEGER */
+/*         The location of the last eigenvalue in the leading sub-matrix. */
+/*         min(1,N) <= N1 <= N/2. */
 
-    N      (input) INTEGER   
-           The dimension of the symmetric tridiagonal matrix.  N >= 0.   
+/*  D      (input/output) REAL array, dimension (N) */
+/*         On entry, D contains the eigenvalues of the two submatrices to */
+/*         be combined. */
+/*         On exit, D contains the trailing (N-K) updated eigenvalues */
+/*         (those which were deflated) sorted into increasing order. */
 
-    N1     (input) INTEGER   
-           The location of the last eigenvalue in the leading sub-matrix.   
-           min(1,N) <= N1 <= N/2.   
+/*  Q      (input/output) REAL array, dimension (LDQ, N) */
+/*         On entry, Q contains the eigenvectors of two submatrices in */
+/*         the two square blocks with corners at (1,1), (N1,N1) */
+/*         and (N1+1, N1+1), (N,N). */
+/*         On exit, Q contains the trailing (N-K) updated eigenvectors */
+/*         (those which were deflated) in its last N-K columns. */
 
-    D      (input/output) REAL array, dimension (N)   
-           On entry, D contains the eigenvalues of the two submatrices to   
-           be combined.   
-           On exit, D contains the trailing (N-K) updated eigenvalues   
-           (those which were deflated) sorted into increasing order.   
+/*  LDQ    (input) INTEGER */
+/*         The leading dimension of the array Q.  LDQ >= max(1,N). */
 
-    Q      (input/output) REAL array, dimension (LDQ, N)   
-           On entry, Q contains the eigenvectors of two submatrices in   
-           the two square blocks with corners at (1,1), (N1,N1)   
-           and (N1+1, N1+1), (N,N).   
-           On exit, Q contains the trailing (N-K) updated eigenvectors   
-           (those which were deflated) in its last N-K columns.   
+/*  INDXQ  (input/output) INTEGER array, dimension (N) */
+/*         The permutation which separately sorts the two sub-problems */
+/*         in D into ascending order.  Note that elements in the second */
+/*         half of this permutation must first have N1 added to their */
+/*         values. Destroyed on exit. */
 
-    LDQ    (input) INTEGER   
-           The leading dimension of the array Q.  LDQ >= max(1,N).   
+/*  RHO    (input/output) REAL */
+/*         On entry, the off-diagonal element associated with the rank-1 */
+/*         cut which originally split the two submatrices which are now */
+/*         being recombined. */
+/*         On exit, RHO has been modified to the value required by */
+/*         SLAED3. */
 
-    INDXQ  (input/output) INTEGER array, dimension (N)   
-           The permutation which separately sorts the two sub-problems   
-           in D into ascending order.  Note that elements in the second   
-           half of this permutation must first have N1 added to their   
-           values. Destroyed on exit.   
+/*  Z      (input) REAL array, dimension (N) */
+/*         On entry, Z contains the updating vector (the last */
+/*         row of the first sub-eigenvector matrix and the first row of */
+/*         the second sub-eigenvector matrix). */
+/*         On exit, the contents of Z have been destroyed by the updating */
+/*         process. */
 
-    RHO    (input/output) REAL   
-           On entry, the off-diagonal element associated with the rank-1   
-           cut which originally split the two submatrices which are now   
-           being recombined.   
-           On exit, RHO has been modified to the value required by   
-           SLAED3.   
+/*  DLAMDA (output) REAL array, dimension (N) */
+/*         A copy of the first K eigenvalues which will be used by */
+/*         SLAED3 to form the secular equation. */
 
-    Z      (input) REAL array, dimension (N)   
-           On entry, Z contains the updating vector (the last   
-           row of the first sub-eigenvector matrix and the first row of   
-           the second sub-eigenvector matrix).   
-           On exit, the contents of Z have been destroyed by the updating   
-           process.   
+/*  W      (output) REAL array, dimension (N) */
+/*         The first k values of the final deflation-altered z-vector */
+/*         which will be passed to SLAED3. */
 
-    DLAMDA (output) REAL array, dimension (N)   
-           A copy of the first K eigenvalues which will be used by   
-           SLAED3 to form the secular equation.   
+/*  Q2     (output) REAL array, dimension (N1**2+(N-N1)**2) */
+/*         A copy of the first K eigenvectors which will be used by */
+/*         SLAED3 in a matrix multiply (SGEMM) to solve for the new */
+/*         eigenvectors. */
 
-    W      (output) REAL array, dimension (N)   
-           The first k values of the final deflation-altered z-vector   
-           which will be passed to SLAED3.   
+/*  INDX   (workspace) INTEGER array, dimension (N) */
+/*         The permutation used to sort the contents of DLAMDA into */
+/*         ascending order. */
 
-    Q2     (output) REAL array, dimension (N1**2+(N-N1)**2)   
-           A copy of the first K eigenvectors which will be used by   
-           SLAED3 in a matrix multiply (SGEMM) to solve for the new   
-           eigenvectors.   
+/*  INDXC  (output) INTEGER array, dimension (N) */
+/*         The permutation used to arrange the columns of the deflated */
+/*         Q matrix into three groups:  the first group contains non-zero */
+/*         elements only at and above N1, the second contains */
+/*         non-zero elements only below N1, and the third is dense. */
 
-    INDX   (workspace) INTEGER array, dimension (N)   
-           The permutation used to sort the contents of DLAMDA into   
-           ascending order.   
+/*  INDXP  (workspace) INTEGER array, dimension (N) */
+/*         The permutation used to place deflated values of D at the end */
+/*         of the array.  INDXP(1:K) points to the nondeflated D-values */
+/*         and INDXP(K+1:N) points to the deflated eigenvalues. */
 
-    INDXC  (output) INTEGER array, dimension (N)   
-           The permutation used to arrange the columns of the deflated   
-           Q matrix into three groups:  the first group contains non-zero   
-           elements only at and above N1, the second contains   
-           non-zero elements only below N1, and the third is dense.   
+/*  COLTYP (workspace/output) INTEGER array, dimension (N) */
+/*         During execution, a label which will indicate which of the */
+/*         following types a column in the Q2 matrix is: */
+/*         1 : non-zero in the upper half only; */
+/*         2 : dense; */
+/*         3 : non-zero in the lower half only; */
+/*         4 : deflated. */
+/*         On exit, COLTYP(i) is the number of columns of type i, */
+/*         for i=1 to 4 only. */
 
-    INDXP  (workspace) INTEGER array, dimension (N)   
-           The permutation used to place deflated values of D at the end   
-           of the array.  INDXP(1:K) points to the nondeflated D-values   
-           and INDXP(K+1:N) points to the deflated eigenvalues.   
+/*  INFO   (output) INTEGER */
+/*          = 0:  successful exit. */
+/*          < 0:  if INFO = -i, the i-th argument had an illegal value. */
 
-    COLTYP (workspace/output) INTEGER array, dimension (N)   
-           During execution, a label which will indicate which of the   
-           following types a column in the Q2 matrix is:   
-           1 : non-zero in the upper half only;   
-           2 : dense;   
-           3 : non-zero in the lower half only;   
-           4 : deflated.   
-           On exit, COLTYP(i) is the number of columns of type i,   
-           for i=1 to 4 only.   
+/*  Further Details */
+/*  =============== */
 
-    INFO   (output) INTEGER   
-            = 0:  successful exit.   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
+/*  Based on contributions by */
+/*     Jeff Rutter, Computer Science Division, University of California */
+/*     at Berkeley, USA */
+/*  Modified by Francoise Tisseur, University of Tennessee. */
 
-    Further Details   
-    ===============   
+/*  ===================================================================== */
 
-    Based on contributions by   
-       Jeff Rutter, Computer Science Division, University of California   
-       at Berkeley, USA   
-    Modified by Francoise Tisseur, University of Tennessee.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Test the input parameters. */
 
-
-       Test the input parameters.   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     --d__;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1 * 1;
+    q_offset = 1 + q_dim1;
     q -= q_offset;
     --indxq;
     --z__;
@@ -220,8 +222,8 @@ static integer c__1 = 1;
 	sscal_(&n2, &c_b3, &z__[n1p1], &c__1);
     }
 
-/*     Normalize z so that norm(z) = 1.  Since z is the concatenation of   
-       two normalized vectors, norm2(z) = sqrt(2). */
+/*     Normalize z so that norm(z) = 1.  Since z is the concatenation of */
+/*     two normalized vectors, norm2(z) = sqrt(2). */
 
     t = 1.f / sqrt(2.f);
     sscal_(n, &t, &z__[1], &c__1);
@@ -262,9 +264,9 @@ static integer c__1 = 1;
 	    r__2));
     tol = eps * 8.f * dmax(r__3,r__4);
 
-/*     If the rank-1 modifier is small enough, no more needs to be done   
-       except to reorganize Q so that its columns correspond with the   
-       elements in D. */
+/*     If the rank-1 modifier is small enough, no more needs to be done */
+/*     except to reorganize Q so that its columns correspond with the */
+/*     elements in D. */
 
     if (*rho * (r__1 = z__[imax], dabs(r__1)) <= tol) {
 	*k = 0;
@@ -272,7 +274,7 @@ static integer c__1 = 1;
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__ = indx[j];
-	    scopy_(n, &q_ref(1, i__), &c__1, &q2[iq2], &c__1);
+	    scopy_(n, &q[i__ * q_dim1 + 1], &c__1, &q2[iq2], &c__1);
 	    dlamda[j] = d__[i__];
 	    iq2 += *n;
 /* L40: */
@@ -282,11 +284,11 @@ static integer c__1 = 1;
 	goto L190;
     }
 
-/*     If there are multiple eigenvalues then the problem deflates.  Here   
-       the number of equal eigenvalues are found.  As each equal   
-       eigenvalue is found, an elementary reflector is computed to rotate   
-       the corresponding eigensubspace so that the corresponding   
-       components of Z are zero in this new basis. */
+/*     If there are multiple eigenvalues then the problem deflates.  Here */
+/*     the number of equal eigenvalues are found.  As each equal */
+/*     eigenvalue is found, an elementary reflector is computed to rotate */
+/*     the corresponding eigensubspace so that the corresponding */
+/*     components of Z are zero in this new basis. */
 
     i__1 = *n1;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -341,8 +343,8 @@ L80:
 	s = z__[pj];
 	c__ = z__[nj];
 
-/*        Find sqrt(a**2+b**2) without overflow or   
-          destructive underflow. */
+/*        Find sqrt(a**2+b**2) without overflow or */
+/*        destructive underflow. */
 
 	tau = slapy2_(&c__, &s);
 	t = d__[nj] - d__[pj];
@@ -358,7 +360,8 @@ L80:
 		coltyp[nj] = 2;
 	    }
 	    coltyp[pj] = 4;
-	    srot_(n, &q_ref(1, pj), &c__1, &q_ref(1, nj), &c__1, &c__, &s);
+	    srot_(n, &q[pj * q_dim1 + 1], &c__1, &q[nj * q_dim1 + 1], &c__1, &
+		    c__, &s);
 /* Computing 2nd power */
 	    r__1 = c__;
 /* Computing 2nd power */
@@ -404,10 +407,10 @@ L100:
     w[*k] = z__[pj];
     indxp[*k] = pj;
 
-/*     Count up the total number of the various types of columns, then   
-       form a permutation which positions the four column types into   
-       four uniform groups (although one or more of these groups may be   
-       empty). */
+/*     Count up the total number of the various types of columns, then */
+/*     form a permutation which positions the four column types into */
+/*     four uniform groups (although one or more of these groups may be */
+/*     empty). */
 
     for (j = 1; j <= 4; ++j) {
 	ctot[j - 1] = 0;
@@ -428,9 +431,9 @@ L100:
     psm[3] = psm[2] + ctot[2];
     *k = *n - ctot[3];
 
-/*     Fill out the INDXC array so that the permutation which it induces   
-       will place all type-1 columns first, all type-2 columns next,   
-       then all type-3's, and finally all type-4's. */
+/*     Fill out the INDXC array so that the permutation which it induces */
+/*     will place all type-1 columns first, all type-2 columns next, */
+/*     then all type-3's, and finally all type-4's. */
 
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
@@ -442,10 +445,10 @@ L100:
 /* L130: */
     }
 
-/*     Sort the eigenvalues and corresponding eigenvectors into DLAMDA   
-       and Q2 respectively.  The eigenvalues/vectors which were not   
-       deflated go into the first K slots of DLAMDA and Q2 respectively,   
-       while those which were deflated go into the last N - K slots. */
+/*     Sort the eigenvalues and corresponding eigenvectors into DLAMDA */
+/*     and Q2 respectively.  The eigenvalues/vectors which were not */
+/*     deflated go into the first K slots of DLAMDA and Q2 respectively, */
+/*     while those which were deflated go into the last N - K slots. */
 
     i__ = 1;
     iq1 = 1;
@@ -453,7 +456,7 @@ L100:
     i__1 = ctot[0];
     for (j = 1; j <= i__1; ++j) {
 	js = indx[i__];
-	scopy_(n1, &q_ref(1, js), &c__1, &q2[iq1], &c__1);
+	scopy_(n1, &q[js * q_dim1 + 1], &c__1, &q2[iq1], &c__1);
 	z__[i__] = d__[js];
 	++i__;
 	iq1 += *n1;
@@ -463,8 +466,8 @@ L100:
     i__1 = ctot[1];
     for (j = 1; j <= i__1; ++j) {
 	js = indx[i__];
-	scopy_(n1, &q_ref(1, js), &c__1, &q2[iq1], &c__1);
-	scopy_(&n2, &q_ref(*n1 + 1, js), &c__1, &q2[iq2], &c__1);
+	scopy_(n1, &q[js * q_dim1 + 1], &c__1, &q2[iq1], &c__1);
+	scopy_(&n2, &q[*n1 + 1 + js * q_dim1], &c__1, &q2[iq2], &c__1);
 	z__[i__] = d__[js];
 	++i__;
 	iq1 += *n1;
@@ -475,7 +478,7 @@ L100:
     i__1 = ctot[2];
     for (j = 1; j <= i__1; ++j) {
 	js = indx[i__];
-	scopy_(&n2, &q_ref(*n1 + 1, js), &c__1, &q2[iq2], &c__1);
+	scopy_(&n2, &q[*n1 + 1 + js * q_dim1], &c__1, &q2[iq2], &c__1);
 	z__[i__] = d__[js];
 	++i__;
 	iq2 += n2;
@@ -486,17 +489,17 @@ L100:
     i__1 = ctot[3];
     for (j = 1; j <= i__1; ++j) {
 	js = indx[i__];
-	scopy_(n, &q_ref(1, js), &c__1, &q2[iq2], &c__1);
+	scopy_(n, &q[js * q_dim1 + 1], &c__1, &q2[iq2], &c__1);
 	iq2 += *n;
 	z__[i__] = d__[js];
 	++i__;
 /* L170: */
     }
 
-/*     The deflated eigenvalues and their corresponding vectors go back   
-       into the last N - K slots of D and Q respectively. */
+/*     The deflated eigenvalues and their corresponding vectors go back */
+/*     into the last N - K slots of D and Q respectively. */
 
-    slacpy_("A", n, &ctot[3], &q2[iq1], n, &q_ref(1, *k + 1), ldq);
+    slacpy_("A", n, &ctot[3], &q2[iq1], n, &q[(*k + 1) * q_dim1 + 1], ldq);
     i__1 = *n - *k;
     scopy_(&i__1, &z__[*k + 1], &c__1, &d__[*k + 1], &c__1);
 
@@ -513,7 +516,3 @@ L190:
 /*     End of SLAED2 */
 
 } /* slaed2_ */
-
-#undef q_ref
-
-

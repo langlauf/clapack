@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -12,7 +7,7 @@ static doublecomplex c_b1 = {0.,0.};
 static doublecomplex c_b2 = {1.,0.};
 static integer c__1 = 1;
 
-/* Subroutine */ int zhbt21_(char *uplo, integer *n, integer *ka, integer *ks,
+/* Subroutine */ int zhbt21_(char *uplo, integer *n, integer *ka, integer *ks, 
 	 doublecomplex *a, integer *lda, doublereal *d__, doublereal *e, 
 	doublecomplex *u, integer *ldu, doublecomplex *work, doublereal *
 	rwork, doublereal *result)
@@ -23,131 +18,134 @@ static integer c__1 = 1;
     doublecomplex z__1, z__2;
 
     /* Local variables */
-    static doublereal unfl;
+    integer j, jc, jr, ika;
+    doublereal ulp, unfl;
     extern /* Subroutine */ int zhpr_(char *, integer *, doublereal *, 
 	    doublecomplex *, integer *, doublecomplex *), zhpr2_(char 
 	    *, integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *);
-    static integer j;
     extern logical lsame_(char *, char *);
-    static doublereal anorm;
+    doublereal anorm;
     extern /* Subroutine */ int zgemm_(char *, char *, integer *, integer *, 
 	    integer *, doublecomplex *, doublecomplex *, integer *, 
 	    doublecomplex *, integer *, doublecomplex *, doublecomplex *, 
 	    integer *);
-    static char cuplo[1];
-    static logical lower;
-    static doublereal wnorm;
-    static integer jc;
-    extern doublereal dlamch_(char *);
-    static integer jr;
-    extern doublereal zlanhb_(char *, char *, integer *, integer *, 
-	    doublecomplex *, integer *, doublereal *), 
-	    zlange_(char *, integer *, integer *, doublecomplex *, integer *, 
-	    doublereal *), zlanhp_(char *, char *, integer *, 
-	    doublecomplex *, doublereal *);
-    static integer ika;
-    static doublereal ulp;
+    char cuplo[1];
+    logical lower;
+    doublereal wnorm;
+    extern doublereal dlamch_(char *), zlanhb_(char *, char *, 
+	    integer *, integer *, doublecomplex *, integer *, doublereal *), zlange_(char *, integer *, integer *, 
+	    doublecomplex *, integer *, doublereal *), zlanhp_(char *, 
+	     char *, integer *, doublecomplex *, doublereal *)
+	    ;
 
 
-#define a_subscr(a_1,a_2) (a_2)*a_dim1 + a_1
-#define a_ref(a_1,a_2) a[a_subscr(a_1,a_2)]
-#define u_subscr(a_1,a_2) (a_2)*u_dim1 + a_1
-#define u_ref(a_1,a_2) u[u_subscr(a_1,a_2)]
+/*  -- LAPACK test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  ZHBT21  generally checks a decomposition of the form */
 
-    Purpose   
-    =======   
+/*          A = U S U* */
 
-    ZHBT21  generally checks a decomposition of the form   
+/*  where * means conjugate transpose, A is hermitian banded, U is */
+/*  unitary, and S is diagonal (if KS=0) or symmetric */
+/*  tridiagonal (if KS=1). */
 
-            A = U S U*   
+/*  Specifically: */
 
-    where * means conjugate transpose, A is hermitian banded, U is   
-    unitary, and S is diagonal (if KS=0) or symmetric   
-    tridiagonal (if KS=1).   
+/*          RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and* */
+/*          RESULT(2) = | I - UU* | / ( n ulp ) */
 
-    Specifically:   
+/*  Arguments */
+/*  ========= */
 
-            RESULT(1) = | A - U S U* | / ( |A| n ulp ) *and*   
-            RESULT(2) = | I - UU* | / ( n ulp )   
+/*  UPLO    (input) CHARACTER */
+/*          If UPLO='U', the upper triangle of A and V will be used and */
+/*          the (strictly) lower triangle will not be referenced. */
+/*          If UPLO='L', the lower triangle of A and V will be used and */
+/*          the (strictly) upper triangle will not be referenced. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The size of the matrix.  If it is zero, ZHBT21 does nothing. */
+/*          It must be at least zero. */
 
-    UPLO    (input) CHARACTER   
-            If UPLO='U', the upper triangle of A and V will be used and   
-            the (strictly) lower triangle will not be referenced.   
-            If UPLO='L', the lower triangle of A and V will be used and   
-            the (strictly) upper triangle will not be referenced.   
+/*  KA      (input) INTEGER */
+/*          The bandwidth of the matrix A.  It must be at least zero.  If */
+/*          it is larger than N-1, then max( 0, N-1 ) will be used. */
 
-    N       (input) INTEGER   
-            The size of the matrix.  If it is zero, ZHBT21 does nothing.   
-            It must be at least zero.   
+/*  KS      (input) INTEGER */
+/*          The bandwidth of the matrix S.  It may only be zero or one. */
+/*          If zero, then S is diagonal, and E is not referenced.  If */
+/*          one, then S is symmetric tri-diagonal. */
 
-    KA      (input) INTEGER   
-            The bandwidth of the matrix A.  It must be at least zero.  If   
-            it is larger than N-1, then max( 0, N-1 ) will be used.   
+/*  A       (input) COMPLEX*16 array, dimension (LDA, N) */
+/*          The original (unfactored) matrix.  It is assumed to be */
+/*          hermitian, and only the upper (UPLO='U') or only the lower */
+/*          (UPLO='L') will be referenced. */
 
-    KS      (input) INTEGER   
-            The bandwidth of the matrix S.  It may only be zero or one.   
-            If zero, then S is diagonal, and E is not referenced.  If   
-            one, then S is symmetric tri-diagonal.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of A.  It must be at least 1 */
+/*          and at least min( KA, N-1 ). */
 
-    A       (input) COMPLEX*16 array, dimension (LDA, N)   
-            The original (unfactored) matrix.  It is assumed to be   
-            hermitian, and only the upper (UPLO='U') or only the lower   
-            (UPLO='L') will be referenced.   
+/*  D       (input) DOUBLE PRECISION array, dimension (N) */
+/*          The diagonal of the (symmetric tri-) diagonal matrix S. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least 1   
-            and at least min( KA, N-1 ).   
+/*  E       (input) DOUBLE PRECISION array, dimension (N-1) */
+/*          The off-diagonal of the (symmetric tri-) diagonal matrix S. */
+/*          E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and */
+/*          (3,2) element, etc. */
+/*          Not referenced if KS=0. */
 
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The diagonal of the (symmetric tri-) diagonal matrix S.   
+/*  U       (input) COMPLEX*16 array, dimension (LDU, N) */
+/*          The unitary matrix in the decomposition, expressed as a */
+/*          dense matrix (i.e., not as a product of Householder */
+/*          transformations, Givens transformations, etc.) */
 
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The off-diagonal of the (symmetric tri-) diagonal matrix S.   
-            E(1) is the (1,2) and (2,1) element, E(2) is the (2,3) and   
-            (3,2) element, etc.   
-            Not referenced if KS=0.   
+/*  LDU     (input) INTEGER */
+/*          The leading dimension of U.  LDU must be at least N and */
+/*          at least 1. */
 
-    U       (input) COMPLEX*16 array, dimension (LDU, N)   
-            The unitary matrix in the decomposition, expressed as a   
-            dense matrix (i.e., not as a product of Householder   
-            transformations, Givens transformations, etc.)   
+/*  WORK    (workspace) COMPLEX*16 array, dimension (N**2) */
 
-    LDU     (input) INTEGER   
-            The leading dimension of U.  LDU must be at least N and   
-            at least 1.   
+/*  RWORK   (workspace) DOUBLE PRECISION array, dimension (N) */
 
-    WORK    (workspace) COMPLEX*16 array, dimension (N**2)   
+/*  RESULT  (output) DOUBLE PRECISION array, dimension (2) */
+/*          The values computed by the two tests described above.  The */
+/*          values are currently limited to 1/ulp, to avoid overflow. */
 
-    RWORK   (workspace) DOUBLE PRECISION array, dimension (N)   
+/*  ===================================================================== */
 
-    RESULT  (output) DOUBLE PRECISION array, dimension (2)   
-            The values computed by the two tests described above.  The   
-            values are currently limited to 1/ulp, to avoid overflow.   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
+/*     Constants */
 
-
-       Constants   
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --d__;
     --e;
     u_dim1 = *ldu;
-    u_offset = 1 + u_dim1 * 1;
+    u_offset = 1 + u_dim1;
     u -= u_offset;
     --work;
     --rwork;
@@ -160,8 +158,8 @@ static integer c__1 = 1;
 	return 0;
     }
 
-/* Computing MAX   
-   Computing MIN */
+/* Computing MAX */
+/* Computing MIN */
     i__3 = *n - 1;
     i__1 = 0, i__2 = min(i__3,*ka);
     ika = max(i__1,i__2);
@@ -177,19 +175,19 @@ static integer c__1 = 1;
     unfl = dlamch_("Safe minimum");
     ulp = dlamch_("Epsilon") * dlamch_("Base");
 
-/*     Some Error Checks   
+/*     Some Error Checks */
 
-       Do Test 1   
+/*     Do Test 1 */
 
-       Norm of A:   
+/*     Norm of A: */
 
-   Computing MAX */
+/* Computing MAX */
     d__1 = zlanhb_("1", cuplo, n, &ika, &a[a_offset], lda, &rwork[1]);
     anorm = max(d__1,unfl);
 
-/*     Compute error matrix:    Error = A - U S U*   
+/*     Compute error matrix:    Error = A - U S U* */
 
-       Copy A from SB to SP storage format. */
+/*     Copy A from SB to SP storage format. */
 
     j = 0;
     i__1 = *n;
@@ -201,7 +199,7 @@ static integer c__1 = 1;
 	    for (jr = 1; jr <= i__2; ++jr) {
 		++j;
 		i__3 = j;
-		i__4 = a_subscr(jr, jc);
+		i__4 = jr + jc * a_dim1;
 		work[i__3].r = a[i__4].r, work[i__3].i = a[i__4].i;
 /* L10: */
 	    }
@@ -225,7 +223,7 @@ static integer c__1 = 1;
 	    for (jr = min(i__2,i__3); jr >= 0; --jr) {
 		++j;
 		i__2 = j;
-		i__3 = a_subscr(ika + 1 - jr, jc);
+		i__3 = ika + 1 - jr + jc * a_dim1;
 		work[i__2].r = a[i__3].r, work[i__2].i = a[i__3].i;
 /* L40: */
 	    }
@@ -236,7 +234,8 @@ static integer c__1 = 1;
     i__1 = *n;
     for (j = 1; j <= i__1; ++j) {
 	d__1 = -d__[j];
-	zhpr_(cuplo, n, &d__1, &u_ref(1, j), &c__1, &work[1]);
+	zhpr_(cuplo, n, &d__1, &u[j * u_dim1 + 1], &c__1, &work[1])
+		;
 /* L60: */
     }
 
@@ -246,8 +245,8 @@ static integer c__1 = 1;
 	    i__2 = j;
 	    z__2.r = e[i__2], z__2.i = 0.;
 	    z__1.r = -z__2.r, z__1.i = -z__2.i;
-	    zhpr2_(cuplo, n, &z__1, &u_ref(1, j), &c__1, &u_ref(1, j + 1), &
-		    c__1, &work[1]);
+	    zhpr2_(cuplo, n, &z__1, &u[j * u_dim1 + 1], &c__1, &u[(j + 1) * 
+		    u_dim1 + 1], &c__1, &work[1]);
 /* L70: */
 	}
     }
@@ -267,9 +266,9 @@ static integer c__1 = 1;
 	}
     }
 
-/*     Do Test 2   
+/*     Do Test 2 */
 
-       Compute  UU* - I */
+/*     Compute  UU* - I */
 
     zgemm_("N", "C", n, n, n, &c_b2, &u[u_offset], ldu, &u[u_offset], ldu, &
 	    c_b1, &work[1], n);
@@ -278,7 +277,7 @@ static integer c__1 = 1;
     for (j = 1; j <= i__1; ++j) {
 	i__2 = (*n + 1) * (j - 1) + 1;
 	i__3 = (*n + 1) * (j - 1) + 1;
-	z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i + 0.;
+	z__1.r = work[i__3].r - 1., z__1.i = work[i__3].i - 0.;
 	work[i__2].r = z__1.r, work[i__2].i = z__1.i;
 /* L80: */
     }
@@ -293,10 +292,3 @@ static integer c__1 = 1;
 /*     End of ZHBT21 */
 
 } /* zhbt21_ */
-
-#undef u_ref
-#undef u_subscr
-#undef a_ref
-#undef a_subscr
-
-

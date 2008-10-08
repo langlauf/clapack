@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -26,19 +21,21 @@ static integer c__1 = 1;
 
 
 
-/*  -- LAPACK auxiliary test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
+/*  -- LAPACK auxiliary test routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
 
-    Purpose   
-    =======   
+/*  Purpose */
+/*  ======= */
 
-    DLASUM prints a summary of the results from one of the test routines.   
+/*  DLASUM prints a summary of the results from one of the test routines. */
 
-    ===================================================================== */
+/*  ===================================================================== */
 
+/*     .. Executable Statements .. */
 
     if (*ie > 0) {
 	io___1.ciunit = *iounit;
@@ -65,4 +62,3 @@ static integer c__1 = 1;
 /*     End of DLASUM */
 
 } /* dlasum_ */
-

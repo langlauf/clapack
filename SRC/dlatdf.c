@@ -1,147 +1,163 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
+
+/* Table of constant values */
+
+static integer c__1 = 1;
+static integer c_n1 = -1;
+static doublereal c_b23 = 1.;
+static doublereal c_b37 = -1.;
 
 /* Subroutine */ int dlatdf_(integer *ijob, integer *n, doublereal *z__, 
 	integer *ldz, doublereal *rhs, doublereal *rdsum, doublereal *rdscal, 
 	integer *ipiv, integer *jpiv)
 {
-/*  -- LAPACK auxiliary routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       June 30, 1999   
-
-
-    Purpose   
-    =======   
-
-    DLATDF uses the LU factorization of the n-by-n matrix Z computed by   
-    DGETC2 and computes a contribution to the reciprocal Dif-estimate   
-    by solving Z * x = b for x, and choosing the r.h.s. b such that   
-    the norm of x is as large as possible. On entry RHS = b holds the   
-    contribution from earlier solved sub-systems, and on return RHS = x.   
-
-    The factorization of Z returned by DGETC2 has the form Z = P*L*U*Q,   
-    where P and Q are permutation matrices. L is lower triangular with   
-    unit diagonal elements and U is upper triangular.   
-
-    Arguments   
-    =========   
-
-    IJOB    (input) INTEGER   
-            IJOB = 2: First compute an approximative null-vector e   
-                of Z using DGECON, e is normalized and solve for   
-                Zx = +-e - f with the sign giving the greater value   
-                of 2-norm(x). About 5 times as expensive as Default.   
-            IJOB .ne. 2: Local look ahead strategy where all entries of   
-                the r.h.s. b is choosen as either +1 or -1 (Default).   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix Z.   
-
-    Z       (input) DOUBLE PRECISION array, dimension (LDZ, N)   
-            On entry, the LU part of the factorization of the n-by-n   
-            matrix Z computed by DGETC2:  Z = P * L * U * Q   
-
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDA >= max(1, N).   
-
-    RHS     (input/output) DOUBLE PRECISION array, dimension N.   
-            On entry, RHS contains contributions from other subsystems.   
-            On exit, RHS contains the solution of the subsystem with   
-            entries acoording to the value of IJOB (see above).   
-
-    RDSUM   (input/output) DOUBLE PRECISION   
-            On entry, the sum of squares of computed contributions to   
-            the Dif-estimate under computation by DTGSYL, where the   
-            scaling factor RDSCAL (see below) has been factored out.   
-            On exit, the corresponding sum of squares updated with the   
-            contributions from the current sub-system.   
-            If TRANS = 'T' RDSUM is not touched.   
-            NOTE: RDSUM only makes sense when DTGSY2 is called by STGSYL.   
-
-    RDSCAL  (input/output) DOUBLE PRECISION   
-            On entry, scaling factor used to prevent overflow in RDSUM.   
-            On exit, RDSCAL is updated w.r.t. the current contributions   
-            in RDSUM.   
-            If TRANS = 'T', RDSCAL is not touched.   
-            NOTE: RDSCAL only makes sense when DTGSY2 is called by   
-                  DTGSYL.   
-
-    IPIV    (input) INTEGER array, dimension (N).   
-            The pivot indices; for 1 <= i <= N, row i of the   
-            matrix has been interchanged with row IPIV(i).   
-
-    JPIV    (input) INTEGER array, dimension (N).   
-            The pivot indices; for 1 <= j <= N, column j of the   
-            matrix has been interchanged with column JPIV(j).   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Bo Kagstrom and Peter Poromaa, Department of Computing Science,   
-       Umea University, S-901 87 Umea, Sweden.   
-
-    This routine is a further developed implementation of algorithm   
-    BSOLVE in [1] using complete pivoting in the LU factorization.   
-
-    [1] Bo Kagstrom and Lars Westin,   
-        Generalized Schur Methods with Condition Estimators for   
-        Solving the Generalized Sylvester Equation, IEEE Transactions   
-        on Automatic Control, Vol. 34, No. 7, July 1989, pp 745-751.   
-
-    [2] Peter Poromaa,   
-        On Efficient and Robust Estimators for the Separation   
-        between two Regular Matrix Pairs with Applications in   
-        Condition Estimation. Report IMINF-95.05, Departement of   
-        Computing Science, Umea University, S-901 87 Umea, Sweden, 1995.   
-
-    =====================================================================   
-
-
-       Parameter adjustments */
-    /* Table of constant values */
-    static integer c__1 = 1;
-    static integer c_n1 = -1;
-    static doublereal c_b23 = 1.;
-    static doublereal c_b37 = -1.;
-    
     /* System generated locals */
     integer z_dim1, z_offset, i__1, i__2;
     doublereal d__1;
+
     /* Builtin functions */
     double sqrt(doublereal);
+
     /* Local variables */
+    integer i__, j, k;
+    doublereal bm, bp, xm[8], xp[8];
     extern doublereal ddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static integer info;
-    static doublereal temp, work[32];
-    static integer i__, j, k;
+    integer info;
+    doublereal temp, work[32];
     extern /* Subroutine */ int dscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern doublereal dasum_(integer *, doublereal *, integer *);
-    static doublereal pmone;
+    doublereal pmone;
     extern /* Subroutine */ int dcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), daxpy_(integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    static doublereal sminu;
-    static integer iwork[8];
-    static doublereal splus;
+    doublereal sminu;
+    integer iwork[8];
+    doublereal splus;
     extern /* Subroutine */ int dgesc2_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *, integer *, doublereal *);
-    static doublereal bm, bp;
-    extern /* Subroutine */ int dgecon_(char *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, doublereal *, integer *, 
-	    integer *);
-    static doublereal xm[8], xp[8];
-    extern /* Subroutine */ int dlassq_(integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *), dlaswp_(integer *, doublereal *, 
-	    integer *, integer *, integer *, integer *, integer *);
-#define z___ref(a_1,a_2) z__[(a_2)*z_dim1 + a_1]
+	    doublereal *, integer *, integer *, doublereal *), dgecon_(char *, 
+	     integer *, doublereal *, integer *, doublereal *, doublereal *, 
+	    doublereal *, integer *, integer *), dlassq_(integer *, 
+	    doublereal *, integer *, doublereal *, doublereal *), dlaswp_(
+	    integer *, doublereal *, integer *, integer *, integer *, integer 
+	    *, integer *);
 
 
+/*  -- LAPACK auxiliary routine (version 3.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     November 2006 */
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*  DLATDF uses the LU factorization of the n-by-n matrix Z computed by */
+/*  DGETC2 and computes a contribution to the reciprocal Dif-estimate */
+/*  by solving Z * x = b for x, and choosing the r.h.s. b such that */
+/*  the norm of x is as large as possible. On entry RHS = b holds the */
+/*  contribution from earlier solved sub-systems, and on return RHS = x. */
+
+/*  The factorization of Z returned by DGETC2 has the form Z = P*L*U*Q, */
+/*  where P and Q are permutation matrices. L is lower triangular with */
+/*  unit diagonal elements and U is upper triangular. */
+
+/*  Arguments */
+/*  ========= */
+
+/*  IJOB    (input) INTEGER */
+/*          IJOB = 2: First compute an approximative null-vector e */
+/*              of Z using DGECON, e is normalized and solve for */
+/*              Zx = +-e - f with the sign giving the greater value */
+/*              of 2-norm(x). About 5 times as expensive as Default. */
+/*          IJOB .ne. 2: Local look ahead strategy where all entries of */
+/*              the r.h.s. b is choosen as either +1 or -1 (Default). */
+
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix Z. */
+
+/*  Z       (input) DOUBLE PRECISION array, dimension (LDZ, N) */
+/*          On entry, the LU part of the factorization of the n-by-n */
+/*          matrix Z computed by DGETC2:  Z = P * L * U * Q */
+
+/*  LDZ     (input) INTEGER */
+/*          The leading dimension of the array Z.  LDA >= max(1, N). */
+
+/*  RHS     (input/output) DOUBLE PRECISION array, dimension N. */
+/*          On entry, RHS contains contributions from other subsystems. */
+/*          On exit, RHS contains the solution of the subsystem with */
+/*          entries acoording to the value of IJOB (see above). */
+
+/*  RDSUM   (input/output) DOUBLE PRECISION */
+/*          On entry, the sum of squares of computed contributions to */
+/*          the Dif-estimate under computation by DTGSYL, where the */
+/*          scaling factor RDSCAL (see below) has been factored out. */
+/*          On exit, the corresponding sum of squares updated with the */
+/*          contributions from the current sub-system. */
+/*          If TRANS = 'T' RDSUM is not touched. */
+/*          NOTE: RDSUM only makes sense when DTGSY2 is called by STGSYL. */
+
+/*  RDSCAL  (input/output) DOUBLE PRECISION */
+/*          On entry, scaling factor used to prevent overflow in RDSUM. */
+/*          On exit, RDSCAL is updated w.r.t. the current contributions */
+/*          in RDSUM. */
+/*          If TRANS = 'T', RDSCAL is not touched. */
+/*          NOTE: RDSCAL only makes sense when DTGSY2 is called by */
+/*                DTGSYL. */
+
+/*  IPIV    (input) INTEGER array, dimension (N). */
+/*          The pivot indices; for 1 <= i <= N, row i of the */
+/*          matrix has been interchanged with row IPIV(i). */
+
+/*  JPIV    (input) INTEGER array, dimension (N). */
+/*          The pivot indices; for 1 <= j <= N, column j of the */
+/*          matrix has been interchanged with column JPIV(j). */
+
+/*  Further Details */
+/*  =============== */
+
+/*  Based on contributions by */
+/*     Bo Kagstrom and Peter Poromaa, Department of Computing Science, */
+/*     Umea University, S-901 87 Umea, Sweden. */
+
+/*  This routine is a further developed implementation of algorithm */
+/*  BSOLVE in [1] using complete pivoting in the LU factorization. */
+
+/*  [1] Bo Kagstrom and Lars Westin, */
+/*      Generalized Schur Methods with Condition Estimators for */
+/*      Solving the Generalized Sylvester Equation, IEEE Transactions */
+/*      on Automatic Control, Vol. 34, No. 7, July 1989, pp 745-751. */
+
+/*  [2] Peter Poromaa, */
+/*      On Efficient and Robust Estimators for the Separation */
+/*      between two Regular Matrix Pairs with Applications in */
+/*      Condition Estimation. Report IMINF-95.05, Departement of */
+/*      Computing Science, Umea University, S-901 87 Umea, Sweden, 1995. */
+
+/*  ===================================================================== */
+
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Executable Statements .. */
+
+    /* Parameter adjustments */
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1 * 1;
+    z_offset = 1 + z_dim1;
     z__ -= z_offset;
     --rhs;
     --ipiv;
@@ -165,15 +181,15 @@
 	    bm = rhs[j] - 1.;
 	    splus = 1.;
 
-/*           Look-ahead for L-part RHS(1:N-1) = + or -1, SPLUS and   
-             SMIN computed more efficiently than in BSOLVE [1]. */
+/*           Look-ahead for L-part RHS(1:N-1) = + or -1, SPLUS and */
+/*           SMIN computed more efficiently than in BSOLVE [1]. */
 
 	    i__2 = *n - j;
-	    splus += ddot_(&i__2, &z___ref(j + 1, j), &c__1, &z___ref(j + 1, 
-		    j), &c__1);
+	    splus += ddot_(&i__2, &z__[j + 1 + j * z_dim1], &c__1, &z__[j + 1 
+		    + j * z_dim1], &c__1);
 	    i__2 = *n - j;
-	    sminu = ddot_(&i__2, &z___ref(j + 1, j), &c__1, &rhs[j + 1], &
-		    c__1);
+	    sminu = ddot_(&i__2, &z__[j + 1 + j * z_dim1], &c__1, &rhs[j + 1], 
+		     &c__1);
 	    splus *= rhs[j];
 	    if (splus > sminu) {
 		rhs[j] = bp;
@@ -181,11 +197,11 @@
 		rhs[j] = bm;
 	    } else {
 
-/*              In this case the updating sums are equal and we can   
-                choose RHS(J) +1 or -1. The first time this happens   
-                we choose -1, thereafter +1. This is a simple way to   
-                get good estimates of matrices like Byers well-known   
-                example (see [1]). (Not done in BSOLVE.) */
+/*              In this case the updating sums are equal and we can */
+/*              choose RHS(J) +1 or -1. The first time this happens */
+/*              we choose -1, thereafter +1. This is a simple way to */
+/*              get good estimates of matrices like Byers well-known */
+/*              example (see [1]). (Not done in BSOLVE.) */
 
 		rhs[j] += pmone;
 		pmone = 1.;
@@ -195,16 +211,16 @@
 
 	    temp = -rhs[j];
 	    i__2 = *n - j;
-	    daxpy_(&i__2, &temp, &z___ref(j + 1, j), &c__1, &rhs[j + 1], &
-		    c__1);
+	    daxpy_(&i__2, &temp, &z__[j + 1 + j * z_dim1], &c__1, &rhs[j + 1], 
+		     &c__1);
 
 /* L10: */
 	}
 
-/*        Solve for U-part, look-ahead for RHS(N) = +-1. This is not done   
-          in BSOLVE and will hopefully give us a better estimate because   
-          any ill-conditioning of the original matrix is transfered to U   
-          and not to L. U(N, N) is an approximation to sigma_min(LU). */
+/*        Solve for U-part, look-ahead for RHS(N) = +-1. This is not done */
+/*        in BSOLVE and will hopefully give us a better estimate because */
+/*        any ill-conditioning of the original matrix is transfered to U */
+/*        and not to L. U(N, N) is an approximation to sigma_min(LU). */
 
 	i__1 = *n - 1;
 	dcopy_(&i__1, &rhs[1], &c__1, xp, &c__1);
@@ -213,13 +229,13 @@
 	splus = 0.;
 	sminu = 0.;
 	for (i__ = *n; i__ >= 1; --i__) {
-	    temp = 1. / z___ref(i__, i__);
+	    temp = 1. / z__[i__ + i__ * z_dim1];
 	    xp[i__ - 1] *= temp;
 	    rhs[i__] *= temp;
 	    i__1 = *n;
 	    for (k = i__ + 1; k <= i__1; ++k) {
-		xp[i__ - 1] -= xp[k - 1] * (z___ref(i__, k) * temp);
-		rhs[i__] -= rhs[k] * (z___ref(i__, k) * temp);
+		xp[i__ - 1] -= xp[k - 1] * (z__[i__ + k * z_dim1] * temp);
+		rhs[i__] -= rhs[k] * (z__[i__ + k * z_dim1] * temp);
 /* L20: */
 	    }
 	    splus += (d__1 = xp[i__ - 1], abs(d__1));
@@ -273,7 +289,3 @@
 /*     End of DLATDF */
 
 } /* dlatdf_ */
-
-#undef z___ref
-
-

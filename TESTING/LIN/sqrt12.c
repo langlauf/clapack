@@ -1,10 +1,5 @@
-#include "blaswrap.h"
-/*  -- translated by f2c (version 19990503).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-*/
-
 #include "f2c.h"
+#include "blaswrap.h"
 
 /* Table of constant values */
 
@@ -22,76 +17,87 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     real ret_val;
 
     /* Local variables */
-    static integer iscl, info;
-    static real anrm;
-    extern doublereal snrm2_(integer *, real *, integer *);
-    static integer i__, j;
-    extern doublereal sasum_(integer *, real *, integer *);
-    static real dummy[1];
+    integer i__, j, mn, iscl, info;
+    real anrm;
+    extern doublereal snrm2_(integer *, real *, integer *), sasum_(integer *, 
+	    real *, integer *);
+    real dummy[1];
     extern /* Subroutine */ int saxpy_(integer *, real *, real *, integer *, 
 	    real *, integer *), sgebd2_(integer *, integer *, real *, integer 
 	    *, real *, real *, real *, real *, real *, integer *), slabad_(
 	    real *, real *);
-    static integer mn;
     extern doublereal slamch_(char *), slange_(char *, integer *, 
 	    integer *, real *, integer *, real *);
     extern /* Subroutine */ int xerbla_(char *, integer *);
-    static real bignum;
+    real bignum;
     extern /* Subroutine */ int slascl_(char *, integer *, integer *, real *, 
 	    real *, integer *, integer *, real *, integer *, integer *), slaset_(char *, integer *, integer *, real *, real *, 
 	    real *, integer *), sbdsqr_(char *, integer *, integer *, 
 	    integer *, integer *, real *, real *, real *, integer *, real *, 
 	    integer *, real *, integer *, real *, integer *);
-    static real smlnum, nrmsvl;
+    real smlnum, nrmsvl;
 
 
-#define a_ref(a_1,a_2) a[(a_2)*a_dim1 + a_1]
+/*  -- LAPACK test routine (version 3.1.1) -- */
+/*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
+/*     January 2007 */
 
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
 
-/*  -- LAPACK test routine (version 3.0) --   
-       Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,   
-       Courant Institute, Argonne National Lab, and Rice University   
-       September 30, 1994   
+/*  Purpose */
+/*  ======= */
 
+/*  SQRT12 computes the singular values `svlues' of the upper trapezoid */
+/*  of A(1:M,1:N) and returns the ratio */
 
-    Purpose   
-    =======   
+/*       || s - svlues||/(||svlues||*eps*max(M,N)) */
 
-    SQRT12 computes the singular values `svlues' of the upper trapezoid   
-    of A(1:M,1:N) and returns the ratio   
+/*  Arguments */
+/*  ========= */
 
-         || s - svlues||/(||svlues||*eps*max(M,N))   
+/*  M       (input) INTEGER */
+/*          The number of rows of the matrix A. */
 
-    Arguments   
-    =========   
+/*  N       (input) INTEGER */
+/*          The number of columns of the matrix A. */
 
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
+/*  A       (input) REAL array, dimension (LDA,N) */
+/*          The M-by-N matrix A. Only the upper trapezoid is referenced. */
 
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
+/*  LDA     (input) INTEGER */
+/*          The leading dimension of the array A. */
 
-    A       (input) REAL array, dimension (LDA,N)   
-            The M-by-N matrix A. Only the upper trapezoid is referenced.   
+/*  S       (input) REAL array, dimension (min(M,N)) */
+/*          The singular values of the matrix A. */
 
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
+/*  WORK    (workspace) REAL array, dimension (LWORK) */
 
-    S       (input) REAL array, dimension (min(M,N))   
-            The singular values of the matrix A.   
+/*  LWORK   (input) INTEGER */
+/*          The length of the array WORK. LWORK >= max(M*N + 4*min(M,N) + */
+/*          max(M,N), M*N+2*MIN( M, N )+4*N). */
 
-    WORK    (workspace) REAL array, dimension (LWORK)   
+/*  ===================================================================== */
 
-    LWORK   (input) INTEGER   
-            The length of the array WORK. LWORK >= M*N + 4*min(M,N) +   
-            max(M,N).   
+/*     .. Parameters .. */
+/*     .. */
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. External Functions .. */
+/*     .. */
+/*     .. External Subroutines .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+/*     .. Local Arrays .. */
+/*     .. */
+/*     .. Executable Statements .. */
 
-    =====================================================================   
-
-
-       Parameter adjustments */
+    /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1 * 1;
+    a_offset = 1 + a_dim1;
     a -= a_offset;
     --s;
     --work;
@@ -101,7 +107,10 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
 
 /*     Test that enough workspace is supplied */
 
-    if (*lwork < *m * *n + (min(*m,*n) << 2) + max(*m,*n)) {
+/* Computing MAX */
+    i__1 = *m * *n + (min(*m,*n) << 2) + max(*m,*n), i__2 = *m * *n + (min(*m,
+	    *n) << 1) + (*n << 2);
+    if (*lwork < max(i__1,i__2)) {
 	xerbla_("SQRT12", &c__7);
 	return ret_val;
     }
@@ -122,7 +131,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
     for (j = 1; j <= i__1; ++j) {
 	i__2 = min(j,*m);
 	for (i__ = 1; i__ <= i__2; ++i__) {
-	    work[(j - 1) * *m + i__] = a_ref(i__, j);
+	    work[(j - 1) * *m + i__] = a[i__ + j * a_dim1];
 /* L10: */
 	}
 /* L20: */
@@ -157,7 +166,7 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
 /*        Compute SVD of work */
 
 	sgebd2_(m, n, &work[1], m, &work[*m * *n + 1], &work[*m * *n + mn + 1]
-		, &work[*m * *n + (mn << 1) + 1], &work[*m * *n + mn * 3 + 1],
+, &work[*m * *n + (mn << 1) + 1], &work[*m * *n + mn * 3 + 1], 
 		 &work[*m * *n + (mn << 2) + 1], &info);
 	sbdsqr_("Upper", &mn, &c__0, &c__0, &c__0, &work[*m * *n + 1], &work[*
 		m * *n + mn + 1], dummy, &mn, dummy, &c__1, dummy, &mn, &work[
@@ -196,7 +205,3 @@ doublereal sqrt12_(integer *m, integer *n, real *a, integer *lda, real *s,
 /*     End of SQRT12 */
 
 } /* sqrt12_ */
-
-#undef a_ref
-
-

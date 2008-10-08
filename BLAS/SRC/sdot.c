@@ -1,22 +1,38 @@
-#include "blaswrap.h"
 #include "f2c.h"
+#include "blaswrap.h"
 
 doublereal sdot_(integer *n, real *sx, integer *incx, real *sy, integer *incy)
 {
     /* System generated locals */
     integer i__1;
     real ret_val;
+
     /* Local variables */
-    static integer i__, m;
-    static real stemp;
-    static integer ix, iy, mp1;
-/*     forms the dot product of two vectors.   
-       uses unrolled loops for increments equal to one.   
-       jack dongarra, linpack, 3/11/78.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
-       Parameter adjustments */
+    integer i__, m, ix, iy, mp1;
+    real stemp;
+
+/*     .. Scalar Arguments .. */
+/*     .. */
+/*     .. Array Arguments .. */
+/*     .. */
+
+/*  Purpose */
+/*  ======= */
+
+/*     forms the dot product of two vectors. */
+/*     uses unrolled loops for increments equal to one. */
+/*     jack dongarra, linpack, 3/11/78. */
+/*     modified 12/3/93, array(1) declarations changed to array(*) */
+
+
+/*     .. Local Scalars .. */
+/*     .. */
+/*     .. Intrinsic Functions .. */
+/*     .. */
+    /* Parameter adjustments */
     --sy;
     --sx;
+
     /* Function Body */
     stemp = 0.f;
     ret_val = 0.f;
@@ -26,8 +42,10 @@ doublereal sdot_(integer *n, real *sx, integer *incx, real *sy, integer *incy)
     if (*incx == 1 && *incy == 1) {
 	goto L20;
     }
-/*        code for unequal increments or equal increments   
-            not equal to 1 */
+
+/*        code for unequal increments or equal increments */
+/*          not equal to 1 */
+
     ix = 1;
     iy = 1;
     if (*incx < 0) {
@@ -45,8 +63,12 @@ doublereal sdot_(integer *n, real *sx, integer *incx, real *sy, integer *incy)
     }
     ret_val = stemp;
     return ret_val;
-/*        code for both increments equal to 1   
-          clean-up loop */
+
+/*        code for both increments equal to 1 */
+
+
+/*        clean-up loop */
+
 L20:
     m = *n % 5;
     if (m == 0) {
@@ -73,4 +95,3 @@ L60:
     ret_val = stemp;
     return ret_val;
 } /* sdot_ */
-
