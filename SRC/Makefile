@@ -1,6 +1,4 @@
-TOPDIR=..
-include $(TOPDIR)/make.inc
-
+include ../make.inc
 
 #######################################################################
 #  This is the makefile to create a library for LAPACK.
@@ -414,12 +412,12 @@ clean:
 	rm -f *.o
 
 .c.o: 
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -I../INCLUDE -c $<
 
-slaruv.o: slaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
-dlaruv.o: dlaruv.c ; $(CC) $(NOOPT)  -c $< -o $@
-sla_wwaddw.o: sla_wwaddw.c ; $(CC) $(NOOPT)  -c $< -o $@
-dla_wwaddw.o: dla_wwaddw.c ; $(CC) $(NOOPT)  -c $< -o $@
-cla_wwaddw.o: cla_wwaddw.c ; $(CC) $(NOOPT)  -c $< -o $@
-zla_wwaddw.o: zla_wwaddw.c ; $(CC) $(NOOPT)  -c $< -o $@
+slaruv.o: slaruv.c ; $(CC) $(NOOPT)  -I../INCLUDE  -c $< -o $@
+dlaruv.o: dlaruv.c ; $(CC) $(NOOPT)   -I../INCLUDE -c $< -o $@
+sla_wwaddw.o: sla_wwaddw.c ; $(CC) $(NOOPT)  -I../INCLUDE  -c $< -o $@
+dla_wwaddw.o: dla_wwaddw.c ; $(CC) $(NOOPT)  -I../INCLUDE  -c $< -o $@
+cla_wwaddw.o: cla_wwaddw.c ; $(CC) $(NOOPT)  -I../INCLUDE  -c $< -o $@
+zla_wwaddw.o: zla_wwaddw.c ; $(CC) $(NOOPT)  -I../INCLUDE  -c $< -o $@
 

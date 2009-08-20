@@ -33,13 +33,13 @@ integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
 
     /* Local variables */
     integer i__;
-    char c1[1], c2[1], c3[1], c4[1];
+    char c1[1], c2[2], c3[3], c4[2];
     integer ic, nb, iz, nx;
     logical cname;
     integer nbmin;
     logical sname;
     extern integer ieeeck_(integer *, real *, real *);
-    char subnam[1];
+    char subnam[6];
     extern integer iparmq_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
 

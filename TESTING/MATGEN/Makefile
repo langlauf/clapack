@@ -1,5 +1,4 @@
-TOPDIR=../..
-include $(TOPDIR)/make.inc
+include ../../make.inc
 
 #######################################################################
 #  This is the makefile to create a library of the test matrix
@@ -93,8 +92,8 @@ FRC:
 clean: ; \
         rm -f *.o
 
-.c.o: ; $(CC) $(CFLAGS) -c $< -o $@
+.c.o: ; $(CC) $(CFLAGS) -I../../INCLUDE -c $< -o $@
 
-slaran.o: slaran.c ; $(CC) $(NOOPT) -c $< -o $@
-dlaran.o: dlaran.c ; $(CC) $(NOOPT) -c $< -o $@
+slaran.o: slaran.c ; $(CC) $(NOOPT) -I../../INCLUDE -c $< -o $@
+dlaran.o: dlaran.c ; $(CC) $(NOOPT) -I../../INCLUDE -c $< -o $@
 

@@ -22,12 +22,6 @@ lapack_install:
 blaslib:
 	( cd BLAS/SRC; $(MAKE) )
 
-cblaswrap: 
-	( cd BLAS/WRAP; $(MAKE) libcblaswr.a; cp libcblaswr.a ../.. )
-
-fblaswrap: 
-	( cd BLAS/WRAP; $(MAKE) libfblaswr.a; cp libfblaswr.a ../.. )
-
 lapacklib:	lapack_install
 	( cd SRC; $(MAKE) )
 
@@ -81,7 +75,7 @@ cleanlib:
 	( cd SRC/VARIANTS; $(MAKE) clean )
 	( cd TESTING/MATGEN; $(MAKE) clean )
 	( cd F2CLIBS/libf2c; $(MAKE) clean )
-	( cd F2CLIBS; rm -f *.a)
+	( cd F2CLIBS; rm *.a)
 
 cleanblas_testing:	
 	( cd BLAS/TESTING; $(MAKE) -f Makeblat1 clean )
@@ -96,3 +90,4 @@ cleantesting:
 
 cleanall: cleanlib cleanblas_testing cleantesting 
 	rm -f *.a TESTING/*.out INSTALL/test*  BLAS/*.out
+

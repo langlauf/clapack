@@ -4,11 +4,9 @@
 
 ============================================================================================
           Version 3.2.1 (threadsafe)
-          Release date: June 2009 / April 2010
-F2C translation of LAPACK 3.2.1
+    Release date: June 2009
+ F2C translation of LAPACK 3.2.1
 To get revisions info about LAPACK 3.2.1, please see http://www.netlib.org/lapack/lapack-3.2.1.html 
-
-FOR SUPPORT: LAPACK Forum: http://icl.cs.utk.edu/lapack-forum/
 ============================================================================================
 
 This README file describes how and how to install the ANSI C translation of the
@@ -54,15 +52,17 @@ the FORTRAN version (INSTALL/lawn81.*) useful.
     CLAPACK/F2CLIBS/    f2c I/O functions (libI77) and math functions (libF77)
     CLAPACK/INSTALL/    Testing functions and pre-tested make.inc files
                         for various platforms.
-    CLAPACK/INCLUDE/    header files - clapack.h is including C prototypes of all the
-                        CLAPACK routines.
     CLAPACK/SRC/        C source of LAPACK routines
     CLAPACK/TESTING/    driver routines to test correctness
     CLAPACK/make.inc	compiler, compile flags and library definitions, 
 			included in all Makefiles.
 		        NOTE: It's better to use gcc compiler on some older
 			Sun systems.
-    You should be sure to modify the make.inc file for your system. 
+    CLAPACK/clapack.h   A header file including C prototypes of all the
+                        CLAPACK routines.
+    You should be sure to modify the make.inc file for your system.  Sample
+    make.inc files for several platforms are included in the INSTALL
+    subdirectory.
 
 (2) Build the f2c libraries by doing:
       make f2clib
@@ -123,6 +123,11 @@ WARNING: 1) If your system lacks onexit() and you are not using an ANSI C
        the line
           BLASLIB      = ../../blas$(PLAT).a
        in CLAPACK/make.inc to point to the optimized BLAS.
+
+{NOTE: There is a clapack.h file in INCLUDE directory which has all the routine 
+	   declaration. Users are recommended to include this file to compile their
+	   code. Some problem has been reported on 64-bit machine that is caused by
+	   not using the correct declaration.
 
 Link with BLAS which provides the standard CBLAS interface 
 ==========================================================
@@ -211,8 +216,8 @@ Sept 27 1993
 
 {Revised by Julie Langou}
 {University of Tennessee}
-			 {October 2008, April 2010}
+			 {October 2008}
 
 {Revised by Peng Du}
 {University of Tennessee}
-			 {May 2009}
+			 {August 2009}

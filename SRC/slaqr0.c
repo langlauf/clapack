@@ -65,7 +65,7 @@ static integer c__3 = 3;
     integer nibble;
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
-    char jbcmpz[1];
+    char jbcmpz[2];
     extern /* Subroutine */ int slahqr_(logical *, logical *, integer *, 
 	    integer *, integer *, real *, integer *, real *, real *, integer *
 , integer *, real *, integer *, integer *), slacpy_(char *, 

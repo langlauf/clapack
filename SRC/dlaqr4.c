@@ -70,7 +70,7 @@ static integer c__3 = 3;
 	    integer *, doublereal *, integer *);
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
-    char jbcmpz[1];
+    char jbcmpz[2];
     integer nwupbd;
     logical sorted;
     integer lwkopt;

@@ -1,5 +1,4 @@
-TOPDIR=../..
-include $(TOPDIR)/make.inc
+include ../../make.inc
 
 # Unix makefile: see README.
 # For C++, first "make hadd".
@@ -69,7 +68,7 @@ TIME =	dtime_.o etime_.o
 OFILES = $(MISC) $(POW) $(CX) $(DCX) $(REAL) $(DBL) $(INT) \
 	$(HALF) $(CMP) $(EFL) $(CHAR) $(I77) $(TIME)
 
-all: f2c.h signal1.h sysdep1.h libf2c.a clapack_install
+all: libf2c.a clapack_install
 
 libf2c.a: $(OFILES)
 	ar r libf2c.a $?
@@ -93,19 +92,9 @@ i77vers.o: i77vers.c
 	$(CC) -c i77vers.c
 
 # To get an "f2c.h" for use with "f2c -C++", first "make hadd"
-hadd: f2c.h0 f2ch.add
-	cat f2c.h0 f2ch.add >f2c.h
-
-# For use with "f2c" and "f2c -A":
-f2c.h: f2c.h0
-	cp f2c.h0 f2c.h
-
-# You may need to adjust signal1.h and sysdep1.h suitably for your system...
-signal1.h: signal1.h0
-	cp signal1.h0 signal1.h
-
-sysdep1.h: sysdep1.h0
-	cp sysdep1.h0 sysdep1.h
+hadd: f2c.h f2ch.add
+	cat f2c.h f2ch.add >temp
+	mv temp f2c.h
 
 # If your system lacks onexit() and you are not using an
 # ANSI C compiler, then you should uncomment the following

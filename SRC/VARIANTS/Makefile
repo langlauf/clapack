@@ -1,5 +1,4 @@
-TOPDIR=../..
-include $(TOPDIR)/make.inc
+include ../../make.inc
 
 #######################################################################
 #  This is the makefile to create a the variants libraries for LAPACK.
@@ -61,7 +60,7 @@ qrll: $(QRLL)
 
 
 .c.o: 
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -I../../INCLUDE -c $< -o $@
 	
 clean:
 	rm -f $(CHOLRL) $(CHOLTOP) $(LUCR) $(LULL) $(LUREC) $(QRLL) \

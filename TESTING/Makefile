@@ -35,8 +35,7 @@
 #
 #######################################################################
 
-TOPDIR=..
-include $(TOPDIR)/make.inc
+include ../make.inc
 
 ifneq ($(strip $(VARLIB)),)
     LAPACKLIB :=  $(VARLIB) ../$(LAPACKLIB)

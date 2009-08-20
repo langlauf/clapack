@@ -64,7 +64,7 @@ static integer c__3 = 3;
     integer nibble;
     extern integer ilaenv_(integer *, char *, char *, integer *, integer *, 
 	    integer *, integer *);
-    char jbcmpz[1];
+    char jbcmpz[2];
     doublecomplex rtdisc;
     integer nwupbd;
     logical sorted;
